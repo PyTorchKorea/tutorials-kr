@@ -1,26 +1,30 @@
-# PyTorch Tutorials
+# PyTorch 한국어 튜토리얼
+
+## 소개
+
+PyTorch에서 제공하는 튜토리얼의 한국어 번역을 위한 저장소입니다.
+
+번역의 결과물은 [http://9bow.github.io/PyTorch-tutorials-kr](http://9bow.github.io/PyTorch-tutorials-kr)에서 확인하실 수 있습니다. (번역을 진행하며 **불규칙적으로** 빌드합니다.)
+
+PyTorch 0.3.1의 튜토리얼 한국어 번역은 [이 곳](http://9bow.github.io/PyTorch-tutorials-kr-0.3.1)에서 진행되었으며, 현재는 번역이 이뤄지고 있지 않습니다.
 
 
-All the tutorials are now presented as sphinx style documentation at:
+## 원문
 
-## [http://pytorch.org/tutorials](http://pytorch.org/tutorials)
+이 저장소의 튜토리얼은 [이 버전](https://github.com/pytorch/tutorials/tree/e55b6e2f4f99c3d504447f0c151b1f99d2707981)을 복제한 것입니다.
+
+최신의 튜토리얼(영어)은 [PyTorch tutorials repo](https://github.com/pytorch/tutorials)를 참고해주세요.
 
 
+## 목차
 
-# Contributing
+(*번역이 진행 중인 문서들의 목차입니다.*)
 
-We use sphinx-gallery's [notebook styled examples](https://sphinx-gallery.readthedocs.io/en/latest/tutorials/plot_notebook.html#sphx-glr-tutorials-plot-notebook-py) to create the tutorials. Syntax is very simple. In essence, you write a slightly well formatted python file and it shows up as documentation page.
 
-Here's how to create a new tutorial:
-1. Create a notebook styled python file. If you want it executed while inserted into documentation, save the file with suffix `tutorial` so that file name is `your_tutorial.py`.
-2. Put it in one of the beginner_source, intermediate_source, advanced_source based on the level.
-2. Include it in the right TOC tree at index.rst
-3. Create a thumbnail in the index file using a command like `.. galleryitem:: beginner/your_tutorial.py`. (This is a custom directive. See `custom_directives.py` for more info.) 
+## 참여
 
-In case you prefer to write your tutorial in jupyter, you can use [this script](https://gist.github.com/chsasank/7218ca16f8d022e02a9c0deb94a310fe) to convert the notebook to python file. After conversion and addition to the project, please make sure the sections headings etc are in logical order.
+오타나 오역을 발견하시면 [이슈](https://github.com/9bow/PyTorch-tutorials-kr/issues/new)를 남겨주세요. [Pull Request](https://github.com/9bow/PyTorch-tutorials-kr/pulls)도 환영합니다. :)
 
-## Building
 
-- Start with installing torch and torchvision. Install other requirements using `pip install -r requirements.txt`
-- Then you can build using `make docs`. This will download the data, execute the tutorials and build the documentation to `docs/` directory. However, this will take about 30-60 min based on your system. 
-- You can skip the execution by running `make html-noplot` to build html documentation to `_build/html`. This way, you can quickly preview your tutorial.
+---
+This is a project to translate [PyTorch tutorials](https://github.com/pytorch/tutorials/tree/e55b6e2f4f99c3d504447f0c151b1f99d2707981) into Korean. For the latest version, please visit to the [PyTorch tutorials repo](https://github.com/pytorch/tutorials).
