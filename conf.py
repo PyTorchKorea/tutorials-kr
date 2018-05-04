@@ -36,6 +36,9 @@ import sphinx_rtd_theme
 
 # -- General configuration ------------------------------------------------
 
+# site base url
+site_url = 'https://9bow.github.io/PyTorch-tutorials-kr/'
+
 # If your documentation needs a minimal Sphinx version, state it here.
 #
 # needs_sphinx = '1.0'
@@ -44,7 +47,8 @@ import sphinx_rtd_theme
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = ['sphinx.ext.mathjax',
-              'sphinx_gallery.gen_gallery']
+              'sphinx_gallery.gen_gallery',
+              'sphinx_sitemap']
 
 
 # -- Sphinx-gallery configuration --------------------------------------------
