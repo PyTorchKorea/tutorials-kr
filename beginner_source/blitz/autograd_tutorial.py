@@ -42,7 +42,6 @@ Autograd 구현에서 매우 중요한 클래스가 하나 더 있는데요, 바
 ``Tensor`` 가 스칼라(scalar)인 경우(예. 하나의 요소만 갖는 등)에는, ``backward`` 에
 인자를 정해줄 필요가 없습니다. 하지만 여러 개의 요소를 갖고 있을
 때는 tensor의 모양을 ``gradient`` 의 인자로 지정할 필요가 있습니다.
-
 """
 
 import torch
@@ -134,4 +133,5 @@ with torch.no_grad():
 ###############################################################
 # **더 읽을거리:**
 #
-# ``Variable`` 과 ``Function`` 관련 문서는 http://pytorch.org/docs/autograd 에 있습니다.
+# ``Variable`` 과 ``Function`` 관련 문서는 http://pytorch.org/docs/autograd 에
+# 있습니다.
