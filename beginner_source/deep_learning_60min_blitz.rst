@@ -1,17 +1,17 @@
-Deep Learning with PyTorch: A 60 Minute Blitz
+PyTorch로 딥러닝하기: 60분만에 끝장내기
 ---------------------------------------------
 **Author**: `Soumith Chintala <http://soumith.ch>`_
+  **번역**: `박정환 <http://github.com/9bow>`_
 
-Goal of this tutorial:
+이 튜토리얼의 목표:
 
--  Understand PyTorch’s Tensor library and neural networks at a high
-   level.
--  Train a small neural network to classify images
+-  높은 수준에서 PyTorch의 Tensor library와 신경망(Neural Network)를 이해합니다.
+-  이미지를 분류하는 작은 신경망을 학습시킵니다.
 
-*This tutorial assumes that you have a basic familiarity of numpy*
+*이 튜토리얼은 독자가 numpy에 대한 기본적 이해를 하고 있다고 가정합니다.*
 
 .. Note::
-    Make sure you have the `torch`_ and `torchvision`_ packages installed.
+    `torch`_ 와 `torchvision`_ 패키지를 설치했는지 확인하십시오.
 
 .. _torch: https://github.com/pytorch/pytorch
 .. _torchvision: https://github.com/pytorch/vision
