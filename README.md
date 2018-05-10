@@ -21,12 +21,17 @@ PyTorch 0.3.1의 튜토리얼 한국어 번역은 [이 곳](http://9bow.github.i
 (*번역이 진행 중인 문서들의 목차입니다.*)
 
 ### 초급 튜토리얼
+* [PyTorch로 딥러닝하기: 60분만에 끝장내기](https://9bow.github.io/PyTorch-tutorials-kr/beginner/deep_learning_60min_blitz.html)
+  * [PyTorch가 무엇인가요?](https://9bow.github.io/PyTorch-tutorials-kr/beginner/blitz/tensor_tutorial.html)
+  * [Autograd: 자동 미분](https://9bow.github.io/PyTorch-tutorials-kr/beginner/blitz/autograd_tutorial.html)
+  * *TBD*
 * *TBD*
 
 ### 중급 튜토리얼
 * [문자-단위 RNN으로 이름 분류하기](https://9bow.github.io/PyTorch-tutorials-kr/intermediate/char_rnn_classification_tutorial.html)
 * [문자 단위 RNN으로 이름 생성하기](https://9bow.github.io/PyTorch-tutorials-kr/intermediate/char_rnn_generation_tutorial.html)
 * [Sequence to Sequence 네트워크와 Attention을 이용한 번역](https://9bow.github.io/PyTorch-tutorials-kr/intermediate/seq2seq_translation_tutorial.html)
+* *TBD*
 
 ### 고급 튜토리얼
 * *TBD*
