@@ -1,25 +1,28 @@
-Welcome to PyTorch Tutorials
-============================
+PyTorch 튜토리얼에 오신 것을 환영합니다
+========================================
 
-To get started with learning PyTorch, start with our Beginner Tutorials.
-The :doc:`60-minute blitz </beginner/deep_learning_60min_blitz>` is the most common
-starting point, and gives you a quick introduction to PyTorch.
-If you like learning by examples, you will like the tutorial
-:doc:`/beginner/pytorch_with_examples`
+PyTorch 학습을 시작하시려면 초급(Beginner) 튜토리얼로 시작하세요.
+일반적으로 :doc:`/beginner/deep_learning_60min_blitz` 부터 시작하시면 PyTorch의
+개요를 빠르게 학습할 수 있습니다. 예제를 보고 학습하는걸 좋아하신다면
+:doc:`/beginner/pytorch_with_examples` 을 추천합니다.
 
-If you would like to do the tutorials interactively via IPython / Jupyter,
-each tutorial has a download link for a Jupyter Notebook and Python source code.
+튜토리얼을 IPython / Jupyter를 이용하여 대화식으로(interactively) 진행하길 원한다면,
+각각의 튜토리얼의 Jupyter 노트북과 Python 소스코드를 다운로드받으실 수 있습니다.
 
-We also provide a lot of high-quality examples covering image classification,
-unsupervised learning, reinforcement learning, machine translation and
-many other applications at https://github.com/pytorch/examples/
+또한, 이미지 분류, 비지도 학습(unsupervised learning), 강화학습(reinforcement learning),
+기계 번역과 같은 다양한 고품질의 예제들을 https://github.com/pytorch/examples/ 에서
+제공하고 있습니다.
 
-You can find reference documentation for PyTorch's API and layers at
-http://docs.pytorch.org or via inline help.
-If you would like the tutorials section improved, please open a github issue
-here with your feedback: https://github.com/pytorch/tutorials
+PyTorch의 API와 계층(Layer)에 대한 참고 문서는 http://docs.pytorch.org 이나
+인라인(inline) 도움말을 참고해주세요. 만약 튜토리얼을 개선하고 싶으시다면,
+GitHub 이슈를 통해 의견을 주시기 바랍니다: https://github.com/pytorch/tutorials
 
-Beginner Tutorials
+(역자 주: 한국어 번역에 대한 오타나 오역을 발견하시면
+`번역 저장소 <https://github.com/9bow/PyTorch-tutorials-kr>`__ 에
+`이슈 <https://github.com/9bow/PyTorch-tutorials-kr/issues/new>`__ 또는
+`PR <https://github.com/9bow/PyTorch-tutorials-kr/pulls>`__ 을 남겨주세요.)
+
+초급 튜토리얼
 ------------------
 
 .. customgalleryitem::
@@ -64,7 +67,7 @@ Beginner Tutorials
    beginner/data_loading_tutorial
    beginner/deep_learning_nlp_tutorial
 
-Intermediate Tutorials
+중급 튜토리얼
 ----------------------
 
 .. galleryitem:: intermediate/char_rnn_classification_tutorial.py
@@ -105,7 +108,7 @@ Intermediate Tutorials
    intermediate/spatial_transformer_tutorial
 
 
-Advanced Tutorials
+고급 튜토리얼
 ------------------
 
 .. galleryitem:: advanced/neural_style_tutorial.py
