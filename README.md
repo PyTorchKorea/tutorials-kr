@@ -25,6 +25,7 @@ PyTorch 0.3.1의 튜토리얼 한국어 번역은 [이 곳](http://9bow.github.i
   * [PyTorch가 무엇인가요?](https://9bow.github.io/PyTorch-tutorials-kr/beginner/blitz/tensor_tutorial.html)
   * [Autograd: 자동 미분](https://9bow.github.io/PyTorch-tutorials-kr/beginner/blitz/autograd_tutorial.html)
   * [신경망(Neural Networks)](https://9bow.github.io/PyTorch-tutorials-kr/beginner/blitz/neural_networks_tutorial.html)
+  * [분류기(Classifier) 학습하기](https://9bow.github.io/PyTorch-tutorials-kr/beginner/blitz/cifar10_tutorial.html)
   * *TBD*
 * *TBD*
 
