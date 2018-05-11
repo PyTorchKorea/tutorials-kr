@@ -11,7 +11,7 @@ PyTorch 0.3.1의 튜토리얼 한국어 번역은 [이 곳](http://9bow.github.i
 
 ## 원문
 
-이 저장소의 튜토리얼은 [이 버전](https://github.com/pytorch/tutorials/tree/e55b6e2f4f99c3d504447f0c151b1f99d2707981)을 복제한 것입니다.
+이 저장소의 튜토리얼은 [이 버전](https://github.com/pytorch/tutorials/tree/5e5cae8d718da51b36468bfd59f38aabc8bf6512)을 복제한 것입니다.
 
 최신의 튜토리얼(영어)은 [PyTorch tutorials repo](https://github.com/pytorch/tutorials)를 참고해주세요.
 
