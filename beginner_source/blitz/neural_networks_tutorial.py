@@ -1,41 +1,39 @@
 # -*- coding: utf-8 -*-
 """
-Neural Networks
-===============
+신경망(Neural Networks)
+=======================
 
-Neural networks can be constructed using the ``torch.nn`` package.
+신경망은 ``torch.nn`` 패키지를 사용하여 생성할 수 있습니다.
 
-Now that you had a glimpse of ``autograd``, ``nn`` depends on
-``autograd`` to define models and differentiate them.
-An ``nn.Module`` contains layers, and a method ``forward(input)``\ that
-returns the ``output``.
+지금까지 ``autograd`` 를 살펴봤는데요, ``nn`` 은 모델을 정의하고 미분하는데
+``autograd`` 를 사용합니다.
+``nn.Module`` 은 계층(layer)과 ``output`` 을 반환하는 ``forward(input)``
+메서드를 포함하고 있습니다.
 
-For example, look at this network that classifies digit images:
+숫자 이미지를 분류하는 신경망을 예제로 살펴보겠습니다:
 
 .. figure:: /_static/img/mnist.png
    :alt: convnet
 
    convnet
 
-It is a simple feed-forward network. It takes the input, feeds it
-through several layers one after the other, and then finally gives the
-output.
+이는 간단한 피드-포워드 네트워크(Feed-forward network)입니다. 입력(input)을 받아
+여러 계층에 차례로 전달한 후, 최종 출력(output)을 제공합니다.
 
-A typical training procedure for a neural network is as follows:
+신경망의 전형적인 학습 과정은 다음과 같습니다:
 
-- Define the neural network that has some learnable parameters (or
-  weights)
-- Iterate over a dataset of inputs
-- Process input through the network
-- Compute the loss (how far is the output from being correct)
-- Propagate gradients back into the network’s parameters
-- Update the weights of the network, typically using a simple update rule:
-  ``weight = weight - learning_rate * gradient``
+- 학습 가능한 매개변수(또는 가중치(weight))를 갖는 신경망을 정의합니다.
+- 데이터셋(dataset) 입력을 반복합니다.
+- 입력을 신경망에서 처리합니다.
+- 손실(loss; 출력이 정답으로부터 얼마나 떨어져있는지)을 계산합니다.
+- 변화도(gradient)를 신경망의 매개변수들에 역으로 전파합니다.
+- 신경망의 가중치를 갱신합니다. 일반적으로 다음과 같은 간단한 규칙을 사용합니다:
+  ``가중치(wiehgt) = 가중치(weight) - 학습율(learning rate) * 변화도(gradient)``
 
-Define the network
-------------------
+신경망 정의하기
+---------------
 
-Let’s define this network:
+이제 신경망을 정의해보겠습니다:
 """
 import torch
 import torch.nn as nn
@@ -78,82 +76,77 @@ net = Net()
 print(net)
 
 ########################################################################
-# You just have to define the ``forward`` function, and the ``backward``
-# function (where gradients are computed) is automatically defined for you
-# using ``autograd``.
-# You can use any of the Tensor operations in the ``forward`` function.
+# ``forward`` 함수만 정의하고 나면, (변화도를 계산하는) ``backward`` 함수는
+# ``autograd`` 를 사용하여 자동으로 정의됩니다.
+# ``forward`` 함수에서는 어떠한 Tensor 연산을 사용해도 됩니다.
 #
-# The learnable parameters of a model are returned by ``net.parameters()``
+# 모델의 학습 가능한 매개변수들은 ``net.parameters()`` 에 의해 반환됩니다.
 
 params = list(net.parameters())
 print(len(params))
 print(params[0].size())  # conv1's .weight
 
 ########################################################################
-# Let try a random 32x32 input
-# Note: Expected input size to this net(LeNet) is 32x32. To use this net on
-# MNIST dataset, please resize the images from the dataset to 32x32.
+# 임의의 32x32 입력값을 넣어보겠습니다.
+# Note: 이 신경망(LeNet)의 입력은 32x32입니다. 이 신경망에 MNIST 데이터셋을
+# 사용하기 위해서는, 데이터셋의 이미지를 32x32로 크기를 변경해야 합니다.
 
 input = torch.randn(1, 1, 32, 32)
 out = net(input)
 print(out)
 
 ########################################################################
-# Zero the gradient buffers of all parameters and backprops with random
-# gradients:
+# 모든 매개변수의 변화도 버퍼(gradient buffer)를 0으로 설정하고, 무작위 값으로
+# 역전파를 합니다:
 net.zero_grad()
 out.backward(torch.randn(1, 10))
 
 ########################################################################
 # .. note::
 #
-#     ``torch.nn`` only supports mini-batches. The entire ``torch.nn``
-#     package only supports inputs that are a mini-batch of samples, and not
-#     a single sample.
+#     ``torch.nn`` 은 미니 배치(mini-batch)만 지원합니다. ``torch.nn`` 패키지
+#     전체는 하나의 샘플이 아닌, 샘플들의 미니배치만을 입력으로 받습니다.
 #
-#     For example, ``nn.Conv2d`` will take in a 4D Tensor of
-#     ``nSamples x nChannels x Height x Width``.
+#     예를 들어, ``nnConv2D`` 는 ``nSamples x nChannels x Height x Width`` 의
+#     4차원 Tensor를 입력으로 합니다.
 #
-#     If you have a single sample, just use ``input.unsqueeze(0)`` to add
-#     a fake batch dimension.
+#     만약 하나의 샘플만 있다면, ``input.unsqueeze(0)`` 을 사용해서 가짜 차원을
+#     추가합니다.
 #
-# Before proceeding further, let's recap all the classes you’ve seen so far.
+# 계속 진행하기 전에, 지금까지 살펴봤던 것들을 다시 한번 요약해보겠습니다.
 #
 # **Recap:**
-#   -  ``torch.Tensor`` - A *multi-dimensional array* with support for autograd
-#      operations like ``backward()``. Also *holds the gradient* w.r.t. the
-#      tensor.
-#   -  ``nn.Module`` - Neural network module. *Convenient way of
-#      encapsulating parameters*, with helpers for moving them to GPU,
-#      exporting, loading, etc.
-#   -  ``nn.Parameter`` - A kind of Tensor, that is *automatically
-#      registered as a parameter when assigned as an attribute to a*
-#      ``Module``.
-#   -  ``autograd.Function`` - Implements *forward and backward definitions
-#      of an autograd operation*. Every ``Tensor`` operation, creates at
-#      least a single ``Function`` node, that connects to functions that
-#      created a ``Tensor`` and *encodes its history*.
+#   -  ``torch.Tensor`` - ``backward()`` 같은 autograd 연산을 지원하는
+#      *다차원 배열* 입니다. 또한 tensor에 대한 *변화도(Gradient)를 갖고* 있습니다.
+#   -  ``nn.Module`` - 신경망 모듈. *매개변수를 캡슐화(Encapsulation)하는 간편한
+#      방법* 으로, GPU로 이동, 내보내기(exporting), 불러오기(loading) 등의 작업을
+#      위한 헬퍼(helper)를 제공합니다.
+#   -  ``nn.Parameter`` - Tensor의 한 종류로, ``Module`` *에 속성으로 할당될 때
+#      자동으로 매개변수로 등록* 됩니다.
+#   -  ``autograd.Function`` - *autograd 연산의 전방향과 역방향 정의* 를 구현합니다.
+#      모든 ``Tensor`` 연산은 하나 이상의 ``Function`` 노드를 생성하며, 각 노드는
+#      ``Tensor`` 를 생성하고 *이력(History)을 부호화* 하는 함수들과 연결하고 있습니다.
 #
-# **At this point, we covered:**
-#   -  Defining a neural network
-#   -  Processing inputs and calling backward
 #
-# **Still Left:**
-#   -  Computing the loss
-#   -  Updating the weights of the network
+# **지금까지 우리가 다룬 내용은 다음과 같습니다:**
+#   -  신경망을 정의하는 것
+#   -  입력을 처리하고 ``backward`` 를 호출하는 것
 #
-# Loss Function
-# -------------
-# A loss function takes the (output, target) pair of inputs, and computes a
-# value that estimates how far away the output is from the target.
+# **더 살펴볼 내용들은 다음과 같습니다:**
+#   -  손실을 계산하는 것
+#   -  신경망의 가중치를 갱신하는 것
 #
-# There are several different
-# `loss functions <http://pytorch.org/docs/nn.html#loss-functions>`_ under the
-# nn package .
-# A simple loss is: ``nn.MSELoss`` which computes the mean-squared error
-# between the input and the target.
+# 손실 함수 (Loss Function)
+# -------------------------
+# 손실 함수는 (output, target)을 한 쌍(pair)의 입력으로 받아, 출력(output)이
+# 정답(target)으로부터 얼마나 떨어져있는지를 추정하는 값을 계산합니다.
 #
-# For example:
+# nn 패키지에는 여러가지의 `손실 함수들 <http://pytorch.org/docs/nn.html#loss-functions>`_
+# 이 존재합니다.
+# 간단한 손실 함수로는 출력과 대상간의 평균자승오차(mean-squared error)를 계산하는
+# ``nn.MSEloss`` 가 있습니다.
+#
+# 예를 들면:
 
 output = net(input)
 target = torch.arange(1, 11)  # a dummy target, for example
@@ -164,9 +157,8 @@ loss = criterion(output, target)
 print(loss)
 
 ########################################################################
-# Now, if you follow ``loss`` in the backward direction, using its
-# ``.grad_fn`` attribute, you will see a graph of computations that looks
-# like this:
+# 이제 ``.grad_fn`` 속성을 사용하여 ``loss`` 를 역방향에서 따라가다보면,
+# 이러한 모습의 연산 그래프를 볼 수 있습니다.
 #
 # ::
 #
@@ -175,26 +167,26 @@ print(loss)
 #           -> MSELoss
 #           -> loss
 #
-# So, when we call ``loss.backward()``, the whole graph is differentiated
-# w.r.t. the loss, and all Tensors in the graph that has ``requres_grad=True``
-# will have their ``.grad`` Tensor accumulated with the gradient.
+# 따라서, ``loss.backward()`` 를 실행할 때, 전체 그래프는 손실(loss)에 대해
+# 미분되며, 그래프 내의 ``requires_grad=True`` 인 모든 Tensor는 변화도(Gradient)가
+# 누적된 ``.grad`` Tensor를 갖게 됩니다.
 #
-# For illustration, let us follow a few steps backward:
+# 설명을 위해, 역전파의 몇 단계를 따라가보겠습니다:
 
 print(loss.grad_fn)  # MSELoss
 print(loss.grad_fn.next_functions[0][0])  # Linear
 print(loss.grad_fn.next_functions[0][0].next_functions[0][0])  # ReLU
 
 ########################################################################
-# Backprop
-# --------
-# To backpropagate the error all we have to do is to ``loss.backward()``.
-# You need to clear the existing gradients though, else gradients will be
-# accumulated to existing gradients.
+# 역전파(Backprop)
+# ----------------
+# 오차(error)를 역전파하기 위해 할 일은 ``loss.backward()`` 이 전부입니다.
+# 기존 변화도를 지우는 작업이 필요한데, 그렇지 않으면 변화도가 기존의 것에
+# 누적되기 때문입니다.
 #
 #
-# Now we shall call ``loss.backward()``, and have a look at conv1's bias
-# gradients before and after the backward.
+# 이제 ``loss.backward()`` 를 호출하여 역전파 전과 후에 conv1의 bias gradient를
+# 살펴보겠습니다.
 
 
 net.zero_grad()     # zeroes the gradient buffers of all parameters
@@ -208,26 +200,26 @@ print('conv1.bias.grad after backward')
 print(net.conv1.bias.grad)
 
 ########################################################################
-# Now, we have seen how to use loss functions.
+# 지금까지 손실 함수를 어떻게 사용하는지를 살펴봤습니다.
 #
-# **Read Later:**
+# **더 읽어보기:**
 #
-#   The neural network package contains various modules and loss functions
-#   that form the building blocks of deep neural networks. A full list with
-#   documentation is `here <http://pytorch.org/docs/nn>`_.
+#   신경망 패키지(neural network package)에는 심층 신경망(deep neural network)을
+#   구성하는 다양한 모듈과 손실함수가 포함되어 있습니다.
+#   전체 목록은 `이 문서 <http://pytorch.org/docs/nn>`_ 에 있습니다.
 #
-# **The only thing left to learn is:**
+# **이제 더 살펴볼 내용은 다음과 같습니다:**
 #
-#   - Updating the weights of the network
+#   -  신경망의 가중치를 갱신하는 것
 #
-# Update the weights
+# 가중치 갱신
 # ------------------
-# The simplest update rule used in practice is the Stochastic Gradient
-# Descent (SGD):
+# 실제로 많이 사용되는 가장 단순한 갱신 규칙은 확률적 경사하강법(SGD; Stochastic
+# Gradient Descent)입니다:
 #
-#      ``weight = weight - learning_rate * gradient``
+#      ``가중치(wiehgt) = 가중치(weight) - 학습율(learning rate) * 변화도(gradient)``
 #
-# We can implement this using simple python code:
+# 간단한 Python 코드로 이를 구현해볼 수 있습니다:
 #
 # .. code:: python
 #
@@ -235,17 +227,16 @@ print(net.conv1.bias.grad)
 #     for f in net.parameters():
 #         f.data.sub_(f.grad.data * learning_rate)
 #
-# However, as you use neural networks, you want to use various different
-# update rules such as SGD, Nesterov-SGD, Adam, RMSProp, etc.
-# To enable this, we built a small package: ``torch.optim`` that
-# implements all these methods. Using it is very simple:
+# 그러나, 신경망을 구성할 때 SGD, Nesterov-SGD, Adam, RMSProp 등과 같은 다양한
+# 갱신 규칙을 사용하고 싶을 수 있습니다. 이를 위해서 ``torch.optim`` 라는 작은
+# 패키지에 이러한 방법들을 모두 구현해두었습니다. 사용법은 매우 간단합니다:
 
 import torch.optim as optim
 
-# create your optimizer
+# Optimizer를 생성합니다.
 optimizer = optim.SGD(net.parameters(), lr=0.01)
 
-# in your training loop:
+# 학습 과정(training loop)에서는 다음과 같습니다:
 optimizer.zero_grad()   # zero the gradient buffers
 output = net(input)
 loss = criterion(output, target)
@@ -256,6 +247,6 @@ optimizer.step()    # Does the update
 ###############################################################
 # .. Note::
 #
-#       Observe how gradient buffers had to be manually set to zero using
-#       ``optimizer.zero_grad()``. This is because gradients are accumulated
-#       as explained in `Backprop`_ section.
+#       ``optimizer.zero_grad()`` 를 사용하여 수동으로 변화도 버퍼를 0으로 설정하는
+#       것에 유의하세요. 이는 `역전파(Backprop)`_ 섹션에서 설명한 것처럼 변화도가
+#       누적되기 때문입니다.
