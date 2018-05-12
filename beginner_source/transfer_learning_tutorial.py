@@ -1,33 +1,33 @@
 # -*- coding: utf-8 -*-
 """
-Transfer Learning tutorial
-==========================
+전이학습(Transfer Learning) 튜토리얼
+====================================
 **Author**: `Sasank Chilamkurthy <https://chsasank.github.io>`_
+  **번역**: `박정환 <http://github.com/9bow>`_
 
-In this tutorial, you will learn how to train your network using
-transfer learning. You can read more about the transfer learning at `cs231n
-notes <http://cs231n.github.io/transfer-learning/>`__
+이 튜토리얼에서는 전이학습(Transfer Learning)을 이용하여 신경망을 어떻게 학습시키는지
+배워보겠습니다. 전이학습에 대해서 더 알아보시려면
+`CS231n 노트 <http://cs231n.github.io/transfer-learning/>`__ 를 읽어보시면 좋습니다.
 
-Quoting these notes,
+위 노트를 인용해보면,
 
-    In practice, very few people train an entire Convolutional Network
-    from scratch (with random initialization), because it is relatively
-    rare to have a dataset of sufficient size. Instead, it is common to
-    pretrain a ConvNet on a very large dataset (e.g. ImageNet, which
-    contains 1.2 million images with 1000 categories), and then use the
-    ConvNet either as an initialization or a fixed feature extractor for
-    the task of interest.
+    실제로 충분한 크기의 데이터셋을 갖추기는 상대적으로 드물기 때문에,
+    (무작위 초기화를 통해) 바닥부터(from scratch) 전체 합성곱 신경망(Convolutional
+    Network)를 학습하는 사람은 거의 없습니다. 대신, 매우 큰 데이터셋(예.
+    100가지 분류(Category)에 대해 120만개의 이미지가 포함된 ImageNet)에서 합성곱
+    신경망(ConvNet)을 미리 학습(Pretrain)한 후, 이 합성곱 신경망을 관심있는 작업
+    (task of interest)을 위한 초기화(initialization) 또는 고정 특징 추출기(fixed
+    feature extractor)로 사용합니다.
 
-These two major transfer learning scenarios look as follows:
+이러한 2가지의 주요한 전이학습 시나리오는 다음과 같습니다:
 
--  **Finetuning the convnet**: Instead of random initializaion, we
-   initialize the network with a pretrained network, like the one that is
-   trained on imagenet 1000 dataset. Rest of the training looks as
-   usual.
--  **ConvNet as fixed feature extractor**: Here, we will freeze the weights
-   for all of the network except that of the final fully connected
-   layer. This last fully connected layer is replaced with a new one
-   with random weights and only this layer is trained.
+-  **합성곱 신경망의 미세조정(Finetuning)**: 무작위 초기화 대신, 신경망을
+   ImageNet 1000 데이터셋 등으로 미리 학습한 신경망으로 초기화합니다. 학습의 나머지
+   과정들은 평상시와 같습니다.
+-  **고정 특정 추출기로써의 합성곱 신경망**: 여기서는 마지막의 완전히 연결
+   (Fully-connected)된 계층을 제외한 모든 신경망의 가중치를 고정합니다. 이
+   마지막의 완전히 연결된 계층은 새로운 무작위의 가중치를 갖는 계층으로 대체되어
+   이 계층만 학습합니다.
 
 """
 # License: BSD
@@ -50,28 +50,24 @@ import copy
 plt.ion()   # interactive mode
 
 ######################################################################
-# Load Data
-# ---------
+# 데이터 불러오기
+# ---------------
 #
-# We will use torchvision and torch.utils.data packages for loading the
-# data.
+# 데이터를 불러오기 위해 torchvision과 torch.utils.data 패키지를 사용하겠습니다.
 #
-# The problem we're going to solve today is to train a model to classify
-# **ants** and **bees**. We have about 120 training images each for ants and bees.
-# There are 75 validation images for each class. Usually, this is a very
-# small dataset to generalize upon, if trained from scratch. Since we
-# are using transfer learning, we should be able to generalize reasonably
-# well.
+# 오늘 풀고자 하는 문제는 **개미** 와 **벌** 을 분류하는 모델을 학습하는 것입니다.
+# 각각의 분류에는 75개의 검증용 이미지(validation image)가 있습니다. 일반적으로,
+# 만약 바닥부터 학습을 한다면, 이는 일반화하기에는 아주 작은 데이터셋입니다.
+# 하지만 전이학습을 사용할 것이므로, 합리적으로 잘 일반화해 할 수 있습니다.
 #
-# This dataset is a very small subset of imagenet.
+# 이 데이터셋은 ImageNet의 아주 작은 부분(Subset)입니다.
 #
 # .. Note ::
-#    Download the data from
-#    `here <https://download.pytorch.org/tutorial/hymenoptera_data.zip>`_
-#    and extract it to the current directory.
+#    데이터를 `여기 <https://download.pytorch.org/tutorial/hymenoptera_data.zip>`_
+#    에서 다운로드 받아 현재 디렉토리에 압축을 푸십시오.
 
-# Data augmentation and normalization for training
-# Just normalization for validation
+# 학습을 위한 데이터 증가(Augmentation)와 일반화하기
+# 단지 검증을 위한 일반화하기
 data_transforms = {
     'train': transforms.Compose([
         transforms.RandomResizedCrop(224),
@@ -100,10 +96,9 @@ class_names = image_datasets['train'].classes
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 ######################################################################
-# Visualize a few images
-# ^^^^^^^^^^^^^^^^^^^^^^
-# Let's visualize a few training images so as to understand the data
-# augmentations.
+# 일부 이미지 시각화하기
+# ^^^^^^^^^^^^^^^^^^^^^^^^^
+# 데이터 증가를 이해하기 위해 일부 학습용 이미지를 시각화해보겠습니다.
 
 def imshow(inp, title=None):
     """Imshow for Tensor."""
@@ -128,17 +123,17 @@ imshow(out, title=[class_names[x] for x in classes])
 
 
 ######################################################################
-# Training the model
-# ------------------
+# 모델 학습하기
+# --------------
 #
-# Now, let's write a general function to train a model. Here, we will
-# illustrate:
+# 이제 모델을 학습하기 위한 일반 함수를 작성해보겠습니다. 여기서는 다음 내용들을
+# 설명합니다:
 #
-# -  Scheduling the learning rate
-# -  Saving the best model
+# -  Learning Rate 관리(Scheduling)
+# -  최적의 모델 구하기
 #
-# In the following, parameter ``scheduler`` is an LR scheduler object from
-# ``torch.optim.lr_scheduler``.
+# 아래에서 ``scheduler`` 매개변수는 ``torch.optim.lr_scheduler`` 의 LR Scheduler
+# 객체(Object)입니다.
 
 
 def train_model(model, criterion, optimizer, scheduler, num_epochs=25):
@@ -210,10 +205,10 @@ def train_model(model, criterion, optimizer, scheduler, num_epochs=25):
 
 
 ######################################################################
-# Visualizing the model predictions
-# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+# 모델 예측값 시각화하기
+# ^^^^^^^^^^^^^^^^^^^^^^^
 #
-# Generic function to display predictions for a few images
+# 일부 이미지에 대한 예측값을 보여주는 일반화된(Generic) 함수입니다.
 #
 
 def visualize_model(model, num_images=6):
@@ -243,10 +238,10 @@ def visualize_model(model, num_images=6):
         model.train(mode=was_training)
 
 ######################################################################
-# Finetuning the convnet
-# ----------------------
+# 합성곱 신경망 미세조정(Finetuning)
+# ----------------------------------
 #
-# Load a pretrained model and reset final fully connected layer.
+# 미리 학습한 모델을 불러온 후 마지막의 완전히 연결된 계층을 재설정(reset)합니다.
 #
 
 model_ft = models.resnet18(pretrained=True)
@@ -264,11 +259,10 @@ optimizer_ft = optim.SGD(model_ft.parameters(), lr=0.001, momentum=0.9)
 exp_lr_scheduler = lr_scheduler.StepLR(optimizer_ft, step_size=7, gamma=0.1)
 
 ######################################################################
-# Train and evaluate
+# 학습 및 평가하기
 # ^^^^^^^^^^^^^^^^^^
 #
-# It should take around 15-25 min on CPU. On GPU though, it takes less than a
-# minute.
+# CPU에서 15-25분 가량 소요될 것입니다. 그래도 GPU에서는 1분도 걸리지 않습니다.
 #
 
 model_ft = train_model(model_ft, criterion, optimizer_ft, exp_lr_scheduler,
@@ -281,15 +275,16 @@ visualize_model(model_ft)
 
 
 ######################################################################
-# ConvNet as fixed feature extractor
-# ----------------------------------
+# 고정 특정 추출기로써의 합성곱 신경망
+# -------------------------------------
 #
-# Here, we need to freeze all the network except the final layer. We need
-# to set ``requires_grad == False`` to freeze the parameters so that the
-# gradients are not computed in ``backward()``.
+# 이제, 마지막 계층을 제외한 모든 신경망을 고정(freeze)할 필요가 있습니다.
+# ``requires_grad == False`` 를 설정하여 매개변수를 고정하여 ``backward()`` 에서
+# 경사도(gradient)가 계산되지 않도록 해야합니다.
 #
-# You can read more about this in the documentation
-# `here <http://pytorch.org/docs/notes/autograd.html#excluding-subgraphs-from-backward>`__.
+# 이 부분에 대한 문서는
+# `여기 <http://pytorch.org/docs/notes/autograd.html#excluding-subgraphs-from-backward>`__
+# 에서 확인할 수 있습니다.
 #
 
 model_conv = torchvision.models.resnet18(pretrained=True)
@@ -313,12 +308,12 @@ exp_lr_scheduler = lr_scheduler.StepLR(optimizer_conv, step_size=7, gamma=0.1)
 
 
 ######################################################################
-# Train and evaluate
-# ^^^^^^^^^^^^^^^^^^
+# 학습 및 평가하기
+# ^^^^^^^^^^^^^^^^^
 #
-# On CPU this will take about half the time compared to previous scenario.
-# This is expected as gradients don't need to be computed for most of the
-# network. However, forward does need to be computed.
+# CPU에서 실행하는 경우 이전 시나리오와 비교했을 때 약 절반 가량의 시간이 소요됩니다.
+# 이는 대부분의 신경망에서 경사도를 계산할 필요가 없을 것으로 기대합니다. 하지만,
+# 순전파(forward)는 계산해야 할 필요가 있습니다.
 #
 
 model_conv = train_model(model_conv, criterion, optimizer_conv,
