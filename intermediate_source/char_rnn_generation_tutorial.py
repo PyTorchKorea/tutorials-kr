@@ -63,7 +63,7 @@ RNN과 그 작동 방식을 아는 것 또한 유용합니다.:
    `여기 <https://download.pytorch.org/tutorial/data.zip>`_
    에서 데이터를 다운 받고, 현재 디렉토리에 압축을 푸십시오.
 
-이 과정의 더 자세항 사항은 지난 튜토리얼을 보십시오. 요약하면,
+이 과정의 더 자세한 사항은 지난 튜토리얼을 보십시오. 요약하면,
 줄마다 이름이 적힌 텍스트 파일 ``data/names/[Language].txt`` 있습니다.
 이것을 어레이로 분리하고, Unicode를 ASCII로 변경하고,
 사전 ``{language: [names ...]}`` 으로 마무리합니다.
@@ -81,7 +81,7 @@ n_letters = len(all_letters) + 1 # Plus EOS marker
 
 def findFiles(path): return glob.glob(path)
 
-# 유니 코드 문자열을 일반 ASCII로 변환하십시오. http://stackoverflow.com/a/518232/2809427 에 감사드립니다.
+# Unicode 문자열을 일반 ASCII로 변환하십시오. http://stackoverflow.com/a/518232/2809427 에 감사드립니다.
 def unicodeToAscii(s):
     return ''.join(
         c for c in unicodedata.normalize('NFD', s)
