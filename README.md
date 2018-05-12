@@ -27,6 +27,7 @@ PyTorch 0.3.1의 튜토리얼 한국어 번역은 [이 곳](http://9bow.github.i
   * [신경망(Neural Networks)](https://9bow.github.io/PyTorch-tutorials-kr/beginner/blitz/neural_networks_tutorial.html)
   * [분류기(Classifier) 학습하기](https://9bow.github.io/PyTorch-tutorials-kr/beginner/blitz/cifar10_tutorial.html)
   * *TBD*
+* [전이학습(Transfer Learning) 튜토리얼](https://9bow.github.io/PyTorch-tutorials-kr/beginner/transfer_learning_tutorial.html)
 * *TBD*
 
 ### 중급 튜토리얼
