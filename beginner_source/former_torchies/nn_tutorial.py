@@ -1,49 +1,47 @@
 # -*- coding: utf-8 -*-
 """
-nn package
+nn 패키지
 ==========
 
-We’ve redesigned the nn package, so that it’s fully integrated with
-autograd. Let's review the changes.
+nn 패키지는 autograd를 완벽하게 통합하기 위해 재설계(redesign)하였습니다.
+무엇이 변경되었는지 살펴보겠습니다.
 
-**Replace containers with autograd:**
+**autograd로 컨테이너(container)를 교체:**
 
-    You no longer have to use Containers like ``ConcatTable``, or modules like
-    ``CAddTable``, or use and debug with nngraph. We will seamlessly use
-    autograd to define our neural networks. For example,
+    ``ConcatTable`` 같은 컨테이너나 ``CAddTable`` 같은 모듈, 또는 nngraph를 사용하거나
+    디버깅하기 위한 컨테이너들은 이제 더 이상 사용하지 않습니다. 대신 더 깔끔한 autograd를
+    사용해서 신경망을 정의할 것입니다. 예를 들면,
 
-    * ``output = nn.CAddTable():forward({input1, input2})`` simply becomes
-      ``output = input1 + input2``
-    * ``output = nn.MulConstant(0.5):forward(input)`` simply becomes
-      ``output = input * 0.5``
+    * ``output = nn.CAddTable():forward({input1, input2})`` 대신,
+      ``output = input1 + input2`` 를 사용합니다.
+    * ``output = nn.MulConstant(0.5):forward(input)`` 대신,
+      ``output = input * 0.5`` 를 사용합니다.
 
-**State is no longer held in the module, but in the network graph:**
+**상태(state)는 모듈 내에 저장되지 않고, 신경망 그래프 상에 존재합니다:**
 
-    Using recurrent networks should be simpler because of this reason. If
-    you want to create a recurrent network, simply use the same Linear layer
-    multiple times, without having to think about sharing weights.
+    덕분에 순환신경망을 사용하는 방법이 더 간단해졌습니다. 이제 순환신경망을 만들 때,
+    더 이상 가중치(weight) 공유에 대해서는 생각할 필요 없이 동일한 Linear 계층(layer)을
+    여러 차례 호출하면 됩니다.
 
     .. figure:: /_static/img/torch-nn-vs-pytorch-nn.png
        :alt: torch-nn-vs-pytorch-nn
 
        torch-nn-vs-pytorch-nn
 
-**Simplified debugging:**
+**간소화된 디버깅(debugging):**
 
-    Debugging is intuitive using Python’s pdb debugger, and **the debugger
-    and stack traces stop at exactly where an error occurred.** What you see
-    is what you get.
+    디버깅은 Python의 pdb 디버거를 사용하여 직관적이며, **디버거와 스택 추적(stack trace)은
+    에러가 발생한 곳에서 정확히 멈춥니다.** 이제 보이는대로 얻을 것입니다. (What you see is what you get.)
 
-Example 1: ConvNet
-------------------
+예제1: 합성곱 신경망(ConvNet)
+-----------------------------
 
-Let’s see how to create a small ConvNet.
+이제 어떻게 작은 합성곱 신경망을 만드는지 살펴보겠습니다.
 
-All of your networks are derived from the base class ``nn.Module``:
+모든 신경망은 기본(base) 클래스인 ``nn.Module`` 로부터 파생됩니다:
 
--  In the constructor, you declare all the layers you want to use.
--  In the forward function, you define how your model is going to be
-   run, from input to output
+-  생성자(constructor)에서, 사용할 모든 계층(layer)을 선언합니다.
+-  순전파(forward) 함수에서, 신경망 모델이 입력에서 출력까지 어떻게 실행되는지를 정의합니다.
 """
 
 import torch
@@ -54,9 +52,8 @@ import torch.nn.functional as F
 class MNISTConvNet(nn.Module):
 
     def __init__(self):
-        # this is the place where you instantiate all your modules
-        # you can later access them using the same names you've given them in
-        # here
+        # 여기에서모든 모듈을 초기화해놓고,
+        # 나중에 여기에 선언한 이름으로 접근할 수 있습니다.
         super(MNISTConvNet, self).__init__()
         self.conv1 = nn.Conv2d(1, 10, 5)
         self.pool1 = nn.MaxPool2d(2, 2)
@@ -65,23 +62,20 @@ class MNISTConvNet(nn.Module):
         self.fc1 = nn.Linear(320, 50)
         self.fc2 = nn.Linear(50, 10)
 
-    # it's the forward function that defines the network structure
-    # we're accepting only a single input in here, but if you want,
-    # feel free to use more
+    # 순전파 함수에서 신경망의 구조를 정의합니다.
+    # 여기에서는 단 하나의 입력만 받지만, 필요하면 더 받도록 변경하면 됩니다.
     def forward(self, input):
         x = self.pool1(F.relu(self.conv1(input)))
         x = self.pool2(F.relu(self.conv2(x)))
 
-        # in your model definition you can go full crazy and use arbitrary
-        # python code to define your model structure
-        # all these are perfectly legal, and will be handled correctly
-        # by autograd:
+        # 모델 구조를 정의할 때는 어떤 Python 코드를 사용해도 괜찮습니다.
+        # 모든 코드는 autograd에 의해 올바르고 완벽하게 처리될 것입니다.
         # if x.gt(0) > x.numel() / 2:
         #      ...
         #
-        # you can even do a loop and reuse the same module inside it
-        # modules no longer hold ephemeral state, so you can use them
-        # multiple times during your forward pass
+        # 심지어 동일한 모듈을 재사용하거나 반복(loop)해도 됩니다.
+        # 모듈은 더 이상 일시적인 상태를 갖고 있지 않으므로,
+        # 순전파 과정에서 여러번 사용해도 됩니다.
         # while x.norm(2) < 10:
         #    x = self.conv1(x)
 
@@ -91,8 +85,8 @@ class MNISTConvNet(nn.Module):
         return x
 
 ###############################################################
-# Let's use the defined ConvNet now.
-# You create an instance of the class first.
+# 이제 정의한 합성곱 신경망을 사용해봅시다.
+# 먼저 클래스의 인스턴스(instance)를 생성합니다.
 
 
 net = MNISTConvNet()
@@ -101,25 +95,24 @@ print(net)
 ########################################################################
 # .. note::
 #
-#     ``torch.nn`` only supports mini-batches The entire ``torch.nn``
-#     package only supports inputs that are a mini-batch of samples, and not
-#     a single sample.
+#     ``torch.nn`` 은 미니 배치(mini-batch)만 지원합니다. ``torch.nn`` 패키지
+#     전체는 하나의 샘플이 아닌, 샘플들의 미니배치만을 입력으로 받습니다.
 #
-#     For example, ``nn.Conv2d`` will take in a 4D Tensor of
-#     ``nSamples x nChannels x Height x Width``.
+#     예를 들어, ``nnConv2D`` 는 ``nSamples x nChannels x Height x Width`` 의
+#     4차원 Tensor를 입력으로 합니다.
 #
-#     If you have a single sample, just use ``input.unsqueeze(0)`` to add
-#     a fake batch dimension.
+#     만약 하나의 샘플만 있다면, ``input.unsqueeze(0)`` 을 사용해서 가짜 차원을
+#     추가합니다.
 #
-# Create a mini-batch containing a single sample of random data and send the
-# sample through the ConvNet.
+# 무작위 값을 갖는 하나의 미니 배치를 만들어서 합성곱 신경망에 보내보겠습니다.
 
 input = torch.randn(1, 1, 28, 28)
 out = net(input)
 print(out.size())
 
 ########################################################################
-# Define a dummy target label and compute error using a loss function.
+# 가짜(dummy)로 정답(target)을 하나 만들고,
+# 손실 함수를 사용하여 오차(error)를 계산해보겠습니다.
 
 target = torch.tensor([3], dtype=torch.long)
 loss_fn = nn.CrossEntropyLoss()  # LogSoftmax + ClassNLL Loss
@@ -129,12 +122,12 @@ err.backward()
 print(err)
 
 ########################################################################
-# The output of the ConvNet ``out`` is a ``Tensor``. We compute the loss
-# using that, and that results in ``err`` which is also a ``Tensor``.
-# Calling ``.backward`` on ``err`` hence will propagate gradients all the
-# way through the ConvNet to it’s weights
+# 합성곱 신경망의 출력 ``out`` 은 ``Tensor`` 이며, 이를 사용하여 오차를
+# 계산하고 결과를 ``Tensor`` 인 ``err`` 에 저장합니다.
+# ``err`` 에 대해서 ``.backward`` 를 호출하면 변화도가 전체 합성곱 신경망의
+# 가중치에 전파됩니다.
 #
-# Let's access individual layer weights and gradients:
+# 이제 개별 계층의 가중치(weight)와 변화도(gradient)에 접근해보겠습니다:
 
 print(net.conv1.weight.grad.size())
 
@@ -143,21 +136,20 @@ print(net.conv1.weight.data.norm())  # norm of the weight
 print(net.conv1.weight.grad.data.norm())  # norm of the gradients
 
 ########################################################################
-# Forward and Backward Function Hooks
+# 순방향/역방향 함수 훅(Hook)
 # -----------------------------------
 #
-# We’ve inspected the weights and the gradients. But how about inspecting
-# / modifying the output and grad\_output of a layer?
+# 지금까지 가중치와 변화도에 대해서 살펴봤습니다. 그렇다면 계층의 출력이나
+# grad_output 을 살펴보거나 수정하려면 어떻게 해야 할까요?
 #
-# We introduce **hooks** for this purpose.
+# 이런 목적으로 사용할 수 있는 **훅(Hook)** 을 소개합니다.
 #
-# You can register a function on a ``Module`` or a ``Tensor``.
-# The hook can be a forward hook or a backward hook.
-# The forward hook will be executed when a forward call is executed.
-# The backward hook will be executed in the backward phase.
-# Let’s look at an example.
+# ``Module`` 이나 ``Tensor`` 에 함수를 등록할 수 있습니다.
+# 훅(Hook)은 순방향 훅과 역방향 훅이 있는데, 순방향 훅은 순전파가 일어날 때 /
+# 역방향 훅은 역전파가 일어날 때 실행됩니다.
+# 예제를 살펴보겠습니다.
 #
-# We register a forward hook on conv2 and print some information
+# conv2에 전방향 훅을 등록하고 몇 가지 정보를 출력해보겠습니다.
 
 
 def printnorm(self, input, output):
@@ -180,7 +172,7 @@ out = net(input)
 
 ########################################################################
 #
-# We register a backward hook on conv2 and print some information
+# conv2에 역방향 훅을 등록하고 몇 가지 정보를 출력해보겠습니다.
 
 
 def printgradnorm(self, grad_input, grad_output):
@@ -204,17 +196,16 @@ err = loss_fn(out, target)
 err.backward()
 
 ########################################################################
-# A full and working MNIST example is located here
+# 동작하는 전체 MNIST 예제는 여기에서 확인할 수 있습니다.
 # https://github.com/pytorch/examples/tree/master/mnist
 #
-# Example 2: Recurrent Net
-# ------------------------
+# 예제2: 순환 신경망(Recurrent Nets)
+# -----------------------------------
 #
-# Next, let’s look at building recurrent nets with PyTorch.
+# 다음으로 PyTorch를 사용하여 순환 신경망을 만들어보겠습니다.
 #
-# Since the state of the network is held in the graph and not in the
-# layers, you can simply create an nn.Linear and reuse it over and over
-# again for the recurrence.
+# 신경망의 상태는 계층이 아닌 그래프에 저장되므로, 할 일은 nn.Linear을
+# 생성한 후 순환할 때마다 계속 사용하면 됩니다.
 
 
 class RNN(nn.Module):
@@ -240,12 +231,11 @@ rnn = RNN(50, 20, 10)
 
 ########################################################################
 #
-# A more complete Language Modeling example using LSTMs and Penn Tree-bank
-# is located
-# `here <https://github.com/pytorch/examples/tree/master/word\_language\_model>`_
+# LSTM과 Penn Tree-bank를 사용한 좀 더 완벽한 언어 모델링(Language Modeling)에 대한
+# 예제는 `여기 <https://github.com/pytorch/examples/tree/master/word\_language\_model>`_
+# 에 있습니다.
 #
-# PyTorch by default has seamless CuDNN integration for ConvNets and
-# Recurrent Nets
+# PyTorch는 합성곱 신경망과 순환 신경망에 CuDNN 연동을 기본적으로 지원하고 있습니다.
 
 loss_fn = nn.MSELoss()
 

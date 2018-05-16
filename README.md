@@ -11,7 +11,7 @@ PyTorch 0.3.1의 튜토리얼 한국어 번역은 [이 곳](http://9bow.github.i
 
 ## 원문
 
-이 저장소의 튜토리얼은 [이 버전](https://github.com/pytorch/tutorials/tree/5e5cae8d718da51b36468bfd59f38aabc8bf6512)을 복제한 것입니다.
+이 저장소의 튜토리얼은 [이 버전](https://github.com/pytorch/tutorials/tree/2d092a2f8c5ddfd513d4200bc7c9831d854a938a)을 복제한 것입니다.
 
 최신의 튜토리얼(영어)은 [PyTorch tutorials repo](https://github.com/pytorch/tutorials)를 참고해주세요.
 
@@ -27,6 +27,12 @@ PyTorch 0.3.1의 튜토리얼 한국어 번역은 [이 곳](http://9bow.github.i
   * [신경망(Neural Networks)](https://9bow.github.io/PyTorch-tutorials-kr/beginner/blitz/neural_networks_tutorial.html)
   * [분류기(Classifier) 학습하기](https://9bow.github.io/PyTorch-tutorials-kr/beginner/blitz/cifar10_tutorial.html)
   * *TBD*
+* [Torch 사용자를 위한 PyTorch](https://9bow.github.io/PyTorch-tutorials-kr/beginner/former_torchies_tutorial.html)
+  * [Tensor](https://9bow.github.io/PyTorch-tutorials-kr/beginner/former_torchies/tensor_tutorial.html)
+  * [Autograd](https://9bow.github.io/PyTorch-tutorials-kr/beginner/former_torchies/autograd_tutorial.html)
+  * [nn 패키지](https://9bow.github.io/PyTorch-tutorials-kr/beginner/former_torchies/nn_tutorial.html)
+  * [멀티-GPU 예제](https://9bow.github.io/PyTorch-tutorials-kr/beginner/former_torchies/parallelism_tutorial.html)
+* [전이학습(Transfer Learning) 튜토리얼](https://9bow.github.io/PyTorch-tutorials-kr/beginner/transfer_learning_tutorial.html)
 * *TBD*
 
 ### 중급 튜토리얼

@@ -68,8 +68,8 @@ out = z.mean()
 print(z, out)
 
 ################################################################
-# ``.requires_grad_( ... )`` 은 기존 Tensor의 ``requires_grad`` 값을 In-place로
-# 변화시킵니다. 입력 값이 주어지지 않으면 기본 값으로 ``True`` 를 갖습니다.
+# ``.requires_grad_( ... )`` 는 기존 Tensor의 ``requires_grad`` 값을 In-place로
+# 변경합니다. 입력값이 지정되지 않으면 기본값은 ``True`` 입니다.
 a = torch.randn(2, 2)
 a = ((a * 3) / (a - 1))
 print(a.requires_grad)

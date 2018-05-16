@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-문자 단위 RNN으로 이름 생성하기
+문자-단위 RNN으로 이름 생성하기
 *******************************************
 **Author**: `Sean Robertson <https://github.com/spro/practical-pytorch>`_
   **번역**: `황성수 <https://github.com/adonisues>`_
@@ -39,7 +39,7 @@
 
 최소한 Pytorch를 설치했고, Python을 알고, Tensor를 이해한다고 가정합니다.:
 
--  http://pytorch.org/ 설치 안내를 위한 자료 
+-  http://pytorch.org/ 설치 안내를 위한 자료
 -  :doc:`/beginner/deep_learning_60min_blitz` 일반적인 PyTorch 시작을 위한 자료
 -  :doc:`/beginner/pytorch_with_examples` 넓고 깊은 통찰을 위한 자료
 -  :doc:`/beginner/former_torchies_tutorial` 이전 Lua Torch 사용자를 위한 자료
@@ -48,10 +48,10 @@ RNN과 그 작동 방식을 아는 것 또한 유용합니다.:
 
 -  `The Unreasonable Effectiveness of Recurrent Neural
    Networks <http://karpathy.github.io/2015/05/21/rnn-effectiveness/>`__
-   실생활 예들을 보여 줍니다 
+   실생활 예들을 보여 줍니다
 -  `Understanding LSTM
    Networks <http://colah.github.io/posts/2015-08-Understanding-LSTMs/>`__
-   특히 LSTM에 관한 것이지만 일반적인 RNN에 대한 정보입니다. 
+   특히 LSTM에 관한 것이지만 일반적인 RNN에 대한 정보입니다.
 
 이전 튜토리얼도 추천합니다. :doc:`/intermediate/char_rnn_classification_tutorial`
 
@@ -63,7 +63,7 @@ RNN과 그 작동 방식을 아는 것 또한 유용합니다.:
    `여기 <https://download.pytorch.org/tutorial/data.zip>`_
    에서 데이터를 다운 받고, 현재 디렉토리에 압축을 푸십시오.
 
-이 과정의 더 자세항 사항은 지난 튜토리얼을 보십시오. 요약하면,
+이 과정의 더 자세한 사항은 지난 튜토리얼을 보십시오. 요약하면,
 줄마다 이름이 적힌 텍스트 파일 ``data/names/[Language].txt`` 있습니다.
 이것을 어레이로 분리하고, Unicode를 ASCII로 변경하고,
 사전 ``{language: [names ...]}`` 으로 마무리합니다.
@@ -81,7 +81,7 @@ n_letters = len(all_letters) + 1 # Plus EOS marker
 
 def findFiles(path): return glob.glob(path)
 
-# 유니 코드 문자열을 일반 ASCII로 변환하십시오. http://stackoverflow.com/a/518232/2809427 에 감사드립니다.
+# Unicode 문자열을 일반 ASCII로 변환하십시오. http://stackoverflow.com/a/518232/2809427 에 감사드립니다.
 def unicodeToAscii(s):
     return ''.join(
         c for c in unicodedata.normalize('NFD', s)
@@ -118,19 +118,19 @@ print(unicodeToAscii("O'Néàl"))
 # 네트워크 생성
 # ====================
 #
-# 이 네트워크는 `지난 튜토리얼의 RNN <#Creating-the-Network>`__ 이 
+# 이 네트워크는 `지난 튜토리얼의 RNN <#Creating-the-Network>`__ 이
 # 다른 것들과 연결되는 category tensor를 추가 인자로 가지게 확장합니다.
 # category tensor는 문자 입력과 마찬가지로 one-hot 벡터입니다.
 #
-# 우리는 출력을 다음 문자의 확률로 해석 할 것입니다. 샘플링 할 때 
+# 우리는 출력을 다음 문자의 확률로 해석 할 것입니다. 샘플링 할 때
 # 가장 확률이 높은 문자가 다음 입력 문자로 사용됩니다.
 #
-# 더 잘 동작하게 하기 위해 두 번째 선형 레이어 
+# 더 잘 동작하게 하기 위해 두 번째 선형 레이어
 # ``o2o`` (hiddne과 출력을 결합한 후) 를 추가했습니다 .
-# 또한 drop-out 레이어가 있습니다. 이 레이어는 주어진 확률(여기서 0.1)로 
+# 또한 drop-out 레이어가 있습니다. 이 레이어는 주어진 확률(여기서 0.1)로
 # `입력을 무작위로 0 # <https://arxiv.org/abs/1207.0580>`__ 으로 만들고
 # 일반적으로 over-fitting을 방지하기위해 입력을 흐리게 하는 데 사용됩니다.
-# 여기서 우리는 고의로 일부 혼돈을 추가하고 샘플링 다양성을 높이기 
+# 여기서 우리는 고의로 일부 혼돈을 추가하고 샘플링 다양성을 높이기
 # 위해 네트워크의 마지막에 이것을 사용합니다.
 #
 # .. figure:: https://i.imgur.com/jzVrf7f.png
@@ -189,8 +189,8 @@ def randomTrainingPair():
 
 
 ######################################################################
-# 각 스텝 마다 (즉, 학습 단어의 각 문자 마다) 네트워크의 입력은 
-# ``(category, 현재 문자, hidden state)`` 이 되고, 출력은 
+# 각 스텝 마다 (즉, 학습 단어의 각 문자 마다) 네트워크의 입력은
+# ``(category, 현재 문자, hidden state)`` 이 되고, 출력은
 # ``(다음 문자, 다음 hidden state)`` 가 된다. 따라서 각 학습 세트 마다
 # category, 입력 문자의 세트, 출력/목표 문자의 세트가 필요하다.
 #
@@ -208,7 +208,7 @@ def randomTrainingPair():
 # 또다른 전략이 포함될 수 있습니다.
 #
 
-# category를 위한 One-hot 벡터 
+# category를 위한 One-hot 벡터
 def categoryTensor(category):
     li = all_categories.index(category)
     tensor = torch.zeros(1, n_categories)
@@ -231,8 +231,8 @@ def targetTensor(line):
 
 
 ######################################################################
-# 학습 동안 편의를 위해 임의의 (category, line)을 가져오고 
-# 그것을 필요한 형태 (category, input, target) tensor로 바꾸는 
+# 학습 동안 편의를 위해 임의의 (category, line)을 가져오고
+# 그것을 필요한 형태 (category, input, target) tensor로 바꾸는
 # ``randomTrainingExample`` 함수를 만들 예정입니다.
 #
 
@@ -252,7 +252,7 @@ def randomTrainingExample():
 # 마지막 출력만 사용하는 분류와 달리, 모든 단계에서 예측을 수행하므로
 # 모든 단계에서 손실을 계산합니다.
 #
-# autograd 의 마법이 각 스템의 이 손실들을 간단하게 합하고 마지막에 
+# autograd 의 마법이 각 스템의 이 손실들을 간단하게 합하고 마지막에
 # 역전파를 호출하게 해줍니다.
 #
 
@@ -282,7 +282,7 @@ def train(category_tensor, input_line_tensor, target_line_tensor):
 
 
 ######################################################################
-# 학습에 걸리는 시간을 추적하기 위해 사람이 읽을 수있는 문자열을 
+# 학습에 걸리는 시간을 추적하기 위해 사람이 읽을 수있는 문자열을
 # 반환하는``timeSince (timestamp)`` 함수를 추가합니다:
 #
 
@@ -298,9 +298,9 @@ def timeSince(since):
 
 
 ######################################################################
-# 학습은 일상적인 일입니다. - 몇번 train() 을 호출하고 몇 분 정도 
+# 학습은 일상적인 일입니다. - 몇번 train() 을 호출하고 몇 분 정도
 # 기다렸다가 ``print_every`` 예제마다 현재 시간과 손실을 출력하고,
-# 도식화를 위해 ``all_losses`` 에 ``plot_every`` 예제 마다 
+# 도식화를 위해 ``all_losses`` 에 ``plot_every`` 예제 마다
 # 평균 손실을 저장하십시오.
 #
 
@@ -330,7 +330,7 @@ for iter in range(1, n_iters + 1):
 # 손실 도식화
 # -------------------
 #
-# all\_losses를 이용한 역사적인 손실의 
+# all\_losses를 이용한 역사적인 손실의
 # 도식화는 네트워크의 학습을 보여줍니다:
 #
 
@@ -350,17 +350,17 @@ plt.plot(all_losses)
 #
 # -  입력 카테고리, 시작 문자, 빈 hidden state 로 Tensor를 생성하십시오
 # -  시작 문자로 ``output_name`` 문자열을 생성하십시오
-# -  최대 출력 길이까지, 
+# -  최대 출력 길이까지,
 #
 #    -  현재 문자를 네트워크에 전달하십시오.
-#    -  가장 높은 출력에서 다음 문자과 다음 hidden state를 얻으십시오 
+#    -  가장 높은 출력에서 다음 문자과 다음 hidden state를 얻으십시오
 #    -  만일 문자가 EOS면 여기서 멈추십시오
 #    -  만일 일반적인 문자라면 ``output_name`` 에 추가하고 계속하십시오
 #
 # -  마지막 이름 반환
 #
 # .. Note::
-#    시작 문자를 주는 것 외에 "문자열 시작" 토큰을 학습에 
+#    시작 문자를 주는 것 외에 "문자열 시작" 토큰을 학습에
 #    포함하게 하고 네트워크가 자체적으로 시작 문자를 선택하게 하는
 #    다른 전략도 있습니다.
 #
