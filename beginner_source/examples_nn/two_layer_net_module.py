@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
 """
-PyTorch: Custom nn Modules
---------------------------
+PyTorch: 사용자 정의 nn 모듈
+----------------------------
 
-A fully-connected ReLU network with one hidden layer, trained to predict y from x
-by minimizing squared Euclidean distance.
+하나의 은닉 계층(Hidden Layer)을 갖는 완전히 연결된 ReLU 신경망에 유클리드
+거리(Euclidean Distance)의 제곱을 최소화하여 x로부터 y를 예측하도록 학습하겠습니다.
 
-This implementation defines the model as a custom Module subclass. Whenever you
-want a model more complex than a simple sequence of existing Modules you will
-need to define your model this way.
+이번에는 사용자 정의 모듈의 서브클래스로 모델을 정의합니다. 기존 모듈의 간단한
+순차적인 구성보다 더 복잡한 모델을 원한다면, 이 방법으로 모델을 정의하면 됩니다.
 """
 import torch
 
@@ -16,8 +15,8 @@ import torch
 class TwoLayerNet(torch.nn.Module):
     def __init__(self, D_in, H, D_out):
         """
-        In the constructor we instantiate two nn.Linear modules and assign them as
-        member variables.
+        생성자에서 2개의 nn.Linear 모듈을 생성(Instantiate)하고, 멤버 변수로
+        지정합니다.
         """
         super(TwoLayerNet, self).__init__()
         self.linear1 = torch.nn.Linear(D_in, H)
@@ -25,40 +24,39 @@ class TwoLayerNet(torch.nn.Module):
 
     def forward(self, x):
         """
-        In the forward function we accept a Tensor of input data and we must return
-        a Tensor of output data. We can use Modules defined in the constructor as
-        well as arbitrary operators on Tensors.
+        순전파 함수에서는 입력 데이터의 Tensor를 받아서 출력 데이터의 Tensor를
+        반환해야 합니다. Tensor 상의 임의의 연산자뿐만 아니라 생성자에서 정의한
+        모듈을 사용할 수 있습니다.
         """
         h_relu = self.linear1(x).clamp(min=0)
         y_pred = self.linear2(h_relu)
         return y_pred
 
 
-# N is batch size; D_in is input dimension;
-# H is hidden dimension; D_out is output dimension.
+# N은 배치 크기이며, D_in은 입력의 차원입니다;
+# H는 은닉 계층의 차원이며, D_out은 출력 차원입니다.
 N, D_in, H, D_out = 64, 1000, 100, 10
 
-# Create random Tensors to hold inputs and outputs
+# 입력과 출력을 저장하기 위해 무작위 값을 갖는 Tensor를 생성합니다.
 x = torch.randn(N, D_in)
 y = torch.randn(N, D_out)
 
-# Construct our model by instantiating the class defined above
+# 앞에서 정의한 클래스를 생성(Instantiating)해서 모델을 구성합니다.
 model = TwoLayerNet(D_in, H, D_out)
 
-# Construct our loss function and an Optimizer. The call to model.parameters()
-# in the SGD constructor will contain the learnable parameters of the two
-# nn.Linear modules which are members of the model.
+# 손실함수와 Optimizer를 만듭니다. SGD 생성자에서 model.parameters()를 호출하면
+# 모델의 멤버인 2개의 nnLinear 모듈의 학습 가능한 매개변수들이 포함됩니다.
 criterion = torch.nn.MSELoss(size_average=False)
 optimizer = torch.optim.SGD(model.parameters(), lr=1e-4)
 for t in range(500):
-    # Forward pass: Compute predicted y by passing x to the model
+    # 순전파 단계: 모델에 x를 전달하여 예상하는 y 값을 계산합니다.
     y_pred = model(x)
 
-    # Compute and print loss
+    # 손실을 계산하고 출력합니다.
     loss = criterion(y_pred, y)
     print(t, loss.item())
 
-    # Zero gradients, perform a backward pass, and update the weights.
+    # 변화도를 0으로 만들고, 역전파 단계를 수행하고, 가중치를 갱신합니다.
     optimizer.zero_grad()
     loss.backward()
     optimizer.step()
