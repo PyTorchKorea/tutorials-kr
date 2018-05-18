@@ -225,7 +225,7 @@ PyTorch: 제어 흐름(Control Flow) + 가중치 공유(Weight Sharing)
 
 이상의 예제들을 여기에서 확인할 수 있습니다.
 
-Tensors
+Tensor
 -------
 
 .. toctree::
