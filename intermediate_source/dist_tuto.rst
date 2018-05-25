@@ -455,7 +455,7 @@ Advanced Topics
 
 0. ``init_processes(rank, size, fn, backend='tcp')`` :math:`\rightarrow`
    ``init_processes(rank, size, fn, backend='gloo')``
-1.  Use ``device = torch.device("cuda:{}".format(rank))
+1.  Use ``device = torch.device("cuda:{}".format(rank))``
 1. ``model = Net()`` :math:`\rightarrow` ``model = Net().to(device)``
 2.  Use ``data, target = data.to(device), target.to(device)``
 

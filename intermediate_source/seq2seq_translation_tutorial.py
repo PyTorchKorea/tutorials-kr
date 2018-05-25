@@ -5,7 +5,7 @@ Sequence to Sequence 네트워크와 Attention을 이용한 번역
 **Author**: `Sean Robertson <https://github.com/spro/practical-pytorch>`_
   **번역**: `황성수 <https://github.com/adonisues>`_
 
-이 프로젝트에서 신경망이 불어를 영어로 번역하는 것을 가르칠 예정입니다.
+이 프로젝트에서 신경망이 불어를 영어로 번역하도록 가르칠 예정입니다.
 
 ::
 
@@ -27,25 +27,25 @@ Sequence to Sequence 네트워크와 Attention을 이용한 번역
     = you re too skinny .
     < you re all alone .
 
-... 성공도는 변화합니다.
+... 성공율은 변할 수 있습니다.
 
-이것은 하나의 시퀀스를 다른 시퀀스로 바꾸는 두개의 RNN 이 함께 동작하는
-`sequence to sequence network <http://arxiv.org/abs/1409.3215>`__ 의 간단하지만 강력한 아이디어로
-가능합니다. 인코더 네트워크는 입력 시퀀스를 벡터로 압축하고,
+하나의 시퀀스를 다른 시퀀스로 바꾸는 두개의 RNN이 함께 동작하는
+`sequence to sequence network <http://arxiv.org/abs/1409.3215>`__ 의 간단하지만 강력한 아이디어가
+이것(번역)을 가능하게 합니다. 인코더 네트워크는 입력 시퀀스를 벡터로 압축하고,
 디코더 네트워크는 해당 벡터를 새로운 시퀀스로 펼칩니다.
 
 .. figure:: /_static/img/seq-seq-images/seq2seq.png
    :alt:
 
-이 모델을 개선하기 위해 `attention mechanism <https://arxiv.org/abs/1409.0473>`__ 을
-사용하여 디코더가 입력 시퀀스의 특정 범위에 초점을 맞출 수 있도록합니다.
+이 모델을 개선하기 위해 `Attention Mechanism <https://arxiv.org/abs/1409.0473>`__ 을
+사용하면 디코더가 입력 시퀀스의 특정 범위에 초점을 맞출 수 있도록 합니다.
 
 **추천 자료:**
 
-최소한 Pytorch 를 설치했고, Python을 알고, Tensor 를 이해한다고 가정합니다.:
+최소한 Pytorch 를 설치했고, Python을 알고, Tensor 를 이해한다고 가정합니다:
 
 -  http://pytorch.org/ 설치 안내
--  :doc:`/beginner/deep_learning_60min_blitz` 일반적인 PyTorch 시작을 위한 자료
+-  :doc:`/beginner/deep_learning_60min_blitz` 전반적인 PyTorch 시작을 위한 자료
 -  :doc:`/beginner/pytorch_with_examples` 넓고 깊은 통찰을 위한 자료
 -  :doc:`/beginner/former_torchies_tutorial` 이전 Lua Torch 사용자를 위한 자료
 
@@ -63,7 +63,7 @@ Sequence to Sequence 네트워크와 동작 방법에 관해서 아는 것은 �
 이전 튜토리얼에 있는
 :doc:`/intermediate/char_rnn_classification_tutorial`
 와 :doc:`/intermediate/char_rnn_generation_tutorial` 는
-각각 인코더와 디코더 모델과 비슷한 컨센을 가져서 도움이 됩니다.
+각각 인코더와 디코더 모델과 비슷한 컨센을 가지기 때문에 도움이 됩니다.
 
 추가로 이 토픽들을 다루는 논문을 읽어 보십시오:
 
@@ -98,11 +98,10 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 #
 # 이 프로젝트의 데이터는 수천 개의 영어-프랑스어 번역 쌍입니다.
 #
-# `Open Data Stack
-# Exchange 에 관한 이 질문은 <http://opendata.stackexchange.com/questions/3888/dataset-of-sentences-translated-into-many-languages>`__
-# http://tatoeba.org/eng/downloads에서 다운 가능한
-# 공개된 번역 사이트 http://tatoeba.org/ 를 알려 주었습니다 - 더 나은 방법으로
-# 누군가가 언어 쌍을 개별 텍스트 파일로 분할하는 추가 작업을 수행한
+# `Open Data Stack Exchange <http://opendata.stackexchange.com/questions/3888/dataset-of-sentences-translated-into-many-languages>`__ 
+# 에 관한 이 문의는 http://tatoeba.org/eng/downloads 에서 다운 로드가 가능한
+# 공개 번역 사이트 http://tatoeba.org/ 를 알려 주었습니다. 더 나은 방법으로
+# 언어 쌍을 개별 텍스트 파일로 분할하는 추가 작업을 수행한
 # http://www.manythings.org/anki/ 가 있습니다:
 #
 # 영어-프랑스어 쌍이 너무 커서 저장소에 포함 할 수 없기 때문에
@@ -119,10 +118,10 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 ######################################################################
 # 문자 단위 RNN 튜토리얼에서 사용된 문자 인코딩과 유사하게, 언어의 각
-# 단어들은 one-hot 벡터 또는 그 단어의 주소에만 단 하나의 1을 제외하고
+# 단어들은 One-Hot 벡터 또는 그 단어의 주소에만 단 하나의 1을 제외하고
 # 모두 0인 큰 벡터로 표현합니다. 한 가지 언어에 있는 수십 개의 문자와
-# 달리 아주 많은 단어들이 있기 때문에 인코딩 벡터는 아주 더 큽니다.
-# 그러나 우리는 약간의 속임수를 쓰고 언어 당 수천 단어 만
+# 달리 번역에는 아주 많은 단어들이 있기 때문에 인코딩 벡터는 매우 더 큽니다.
+# 그러나 우리는 약간의 속임수를 써서 언어 당 수천 단어 만
 # 사용하도록 데이터를 다듬을 것입니다.
 #
 # .. figure:: /_static/img/seq-seq-images/word-encoding.png
@@ -135,7 +134,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 # 나중에 네트워크의 입력 및 목표로 사용하려면 단어 당 고유 번호가
 # 필요합니다. 이 모든 것을 추적하기 위해 우리는
 # 단어→색인(``word2index``)과 색인→단어(``index2word``) 사전,
-# 그리고 나중에 희귀 단어를 대체하는데 사용할 각 단어의 숫자
+# 그리고 나중에 희귀 단어를 대체하는데 사용할 각 단어의 빈도
 # ``word2count`` 를 가진 ``Lang`` 이라는 헬퍼 클래스를 사용합니다.
 #
 
@@ -190,22 +189,22 @@ def normalizeString(s):
 
 
 ######################################################################
-# 데이터 파일을 읽으려면 파일을 줄로 나누고 줄을 쌍으로 나눕니다.
+# 데이터 파일을 읽으려면 파일을 줄로 나눈 다음 줄을 쌍으로 나눕니다.
 # 파일은 모두 영어 → 기타 언어이므로 만약 다른 언어 → 영어로
-# 번역한다면 쌍을 뒤집도록 ``reverse`` 플래그를 추가했습니다.
+# 번역한다면 쌍을 뒤집을 수 있도록 ``reverse`` 플래그를 추가했습니다.
 #
 
 def readLangs(lang1, lang2, reverse=False):
     print("Reading lines...")
 
-    # Read the file and split into lines
+    # 파일을 읽고 줄로 분리
     lines = open('data/%s-%s.txt' % (lang1, lang2), encoding='utf-8').\
         read().strip().split('\n')
 
-    # 모든 줄을 쌍으로 분리하고 정규화 하십시오
+    # 모든 줄을 쌍으로 분리하고 정규화
     pairs = [[normalizeString(s) for s in l.split('\t')] for l in lines]
 
-    # 쌍을 뒤집고, Lang 인스턴스를 만드십시오
+    # 쌍을 뒤집고, Lang 인스턴스 생성
     if reverse:
         pairs = [list(reversed(p)) for p in pairs]
         input_lang = Lang(lang2)
@@ -282,9 +281,9 @@ print(random.choice(pairs))
 # 입력으로 자신의 출력을 사용하는 네트워크입니다.
 #
 # `Sequence to Sequence network <http://arxiv.org/abs/1409.3215>`__, 또는
-# seq2seq 네트워크, 또는 `Encoder Decoder
+# Seq2Seq 네트워크, 또는 `Encoder Decoder
 # network <https://arxiv.org/pdf/1406.1078v3.pdf>`__ 는 인코더 및
-# 디코더라고하는 두 개의 RNN으로 구성된 모델입니다.
+# 디코더라고 하는 두 개의 RNN으로 구성된 모델입니다.
 # 인코더는 입력 시퀀스를 읽고 단일 벡터를 출력하고,
 # 디코더는 해당 벡터를 읽어 출력 시퀀스를 생성합니다.
 #
@@ -292,18 +291,18 @@ print(random.choice(pairs))
 #    :alt:
 #
 # 모든 입력에 해당하는 출력이 있는 단일 RNN의 시퀀스 예측과 달리
-# seq2seq 모델은 시퀀스 길이와 순서를 자유롭게하여
-# 두 언어 간의 번역에 이상적입니다.
+# Seq2Seq 모델은 시퀀스 길이와 순서를 자유롭게하기 때문에
+# 두 언어 사이의 번역에 이상적입니다.
 #
 # 다음 문장 "Je ne suis pas le chat noir" → "I am not the black cat"
-# 를 살펴 봅시다. 입력 문장의 대부분의 단어는 출력 문장에서
-# 직역되지만 약간 다른 순서도 있습니다. 예시 "chat noir" 와 "black cat".
+# 를 살펴 봅시다. 입력 문장의 단어 대부분은 출력 문장에서
+# 직역("chat noir" 와 "black cat")되지만 약간 다른 순서도 있습니다. 
 # "ne/pas" 구조로 인해 입력 문장에 단어가 하나 더 있습니다.
-# 입력 단어의 시퀀스에서 직접적으로 정확한 번역을 만드는
+# 입력 단어의 시퀀스에서 직접적으로는 정확한 번역을 만드는
 # 것은 어려울 것입니다.
 #
-# seq2seq 모델을 사용하면 인코더는 하나의 벡터를 생성합니다.
-# 이상적인 경우 입력 시퀀스의 "의미"를 문장의 N 차원 공간에 있는
+# Seq2Seq 모델을 사용하면 인코더는 하나의 벡터를 생성합니다.
+# 이상적인 경우에 입력 시퀀스의 "의미"를 문장의 N 차원 공간에 있는
 # 단일 지점인 단일 벡터으로 인코딩합니다.
 #
 
@@ -312,9 +311,9 @@ print(random.choice(pairs))
 # 인코더
 # -----------
 #
-# seq2seq 네트워크의 인코더는 입력 문장의 모든 단어에 대해 어떤 값을
+# Seq2Seq 네트워크의 인코더는 입력 문장의 모든 단어에 대해 어떤 값을
 # 출력하는 RNN입니다. 모든 입력 단어에 대해 인코더는 벡터와
-# hidden state 를 출력하고 다음 입력 단어에 hidden state를 사용합니다.
+# 은닉 상태를 출력하고 다음 입력 단어에 그 은닉 상태를 사용합니다.
 #
 # .. figure:: /_static/img/seq-seq-images/encoder-network.png
 #    :alt:
@@ -351,14 +350,14 @@ class EncoderRNN(nn.Module):
 # 간단한 디코더
 # ^^^^^^^^^^^^^^
 #
-# 가장 간단한 seq2seq 디코더에서 인코더의 마지막 출력만을 이용합니다.
+# 가장 간단한 Seq2Seq 디코더에서 인코더의 마지막 출력만을 이용합니다.
 # 이 마지막 출력은 전체 시퀀스에서 문맥을 인코드하기 때문에
-# *문맥 벡터(context vector)* 로 불립니다. 이 문맥 벡터는 디코더의 초기 hidden state로
+# *문맥 벡터(context vector)* 로 불립니다. 이 문맥 벡터는 디코더의 초기 은닉 상태로
 # 사용 됩니다.
 #
-# 디코딩의 매 단계에서 디코더에게 입력 토큰과 hidden state 가 주어집니다.
+# 디코딩의 매 단계에서 디코더에게 입력 토큰과 은닉 상태가 주어집니다.
 # 초기 입력 토큰은 문자열-시작 (start-of-string) ``<SOS>`` 토큰이고,
-# 첫 hidden state는 문맥 벡터(인코더의 마지막 hidden state) 입니다.
+# 첫 은닉 상태는 문맥 벡터(인코더의 마지막 은닉 상태) 입니다.
 #
 # .. figure:: /_static/img/seq-seq-images/decoder-network.png
 #    :alt:
@@ -386,9 +385,9 @@ class DecoderRNN(nn.Module):
         return torch.zeros(1, 1, self.hidden_size, device=device)
 
 ######################################################################
-# 나는 당신이 이 모델의 결과를 학습하고 관찰하는 것을 권장하지만,
-# 공간을 절약하기 위해 금메달을 위해 곧장 가고
-# 어텐션 메카니즘을 소개 할 것입니다.
+# 이 모델의 결과를 학습하고 관찰하는 것을 권장하지만,
+# 공간을 절약하기 위해 최종 목적지로 바로 이동해서
+# 어텐션(attention) 메카니즘을 소개 할 것입니다.
 #
 
 
@@ -396,22 +395,22 @@ class DecoderRNN(nn.Module):
 # 어텐션 디코더
 # ^^^^^^^^^^^^^^^^^
 #
-# 문맥 벡터만 인코더와 디코더 사이로 전달 된다면, 단일 벡터가 전체 문장의
-# 인코딩 부담을 가지게 됩니다.
+# 문맥 벡터만 인코더와 디코더 사이로 전달 된다면, 단일 벡터가 전체 문장을
+# 인코딩 해야하는 부담을 가지게 됩니다.
 # 어텐션은 디코더 네트워크가 자기 출력의 모든 단계에서 인코더 출력의
-# 다른 부분에 "집중" 할 수 있게 합니다. 첫째 *어텐션 웨이트* 의 셋을
+# 다른 부분에 "집중" 할 수 있게 합니다. 첫째 *어텐션 웨이트* 의 세트를
 # 계산합니다. 이것은 가중치 조합을 만들기 위해서 인코더 출력 벡터와
-# 곱해집니다. 그 결과 (코드에서 ``attn_applied``)는 입력 시퀀스의
+# 곱해집니다. 그 결과(코드에서 ``attn_applied``)는 입력 시퀀스의
 # 특정 부분에 관한 정보를 포함해야하고 따라서 디코더가 알맞은 출력
 # 단어를 선택하는 것을 도와줍니다.
 #
 # .. figure:: https://i.imgur.com/1152PYf.png
 #    :alt:
 #
-# 어텐션 가중치 계산은 디코더의 입력 및 Hidden State를 입력으로
+# 어텐션 가중치 계산은 디코더의 입력 및 은닉 상태를 입력으로
 # 사용하는 다른 feed-forwad layer 인 ``attn`` 으로 수행됩니다.
 # 학습 데이터에는 모든 크기의 문장이 있기 때문에 이 계층을 실제로
-# 만들고 학습시키려면 적용 할 수 있는 최대 문장 길이 (인코더 출력의 입력 길이)를
+# 만들고 학습시키려면 적용 할 수 있는 최대 문장 길이 (인코더 출력을 위한 입력 길이)를
 # 선택해야 합니다. 최대 길이의 문장은 모든 어텐션 가중치를 사용하지만
 # 더 짧은 문장은 처음 몇 개만 사용합니다.
 #
@@ -469,8 +468,8 @@ class AttnDecoderRNN(nn.Module):
 # 학습 데이터 준비
 # -----------------------
 #
-# 학습을 위해서, 각 쌍마다 입력 Tensor (입력 문장의 단어 주소)와
-# 목표 Tensor (목표 문장의 단어 주소)가 필요합니다. 이 벡터들을
+# 학습을 위해서, 각 쌍마다 입력 Tensor(입력 문장의 단어 주소)와
+# 목표 Tensor(목표 문장의 단어 주소)가 필요합니다. 이 벡터들을
 # 생성하는 동안 두 시퀀스에 EOS 토큰을 추가 합니다.
 #
 
@@ -494,9 +493,9 @@ def tensorsFromPair(pair):
 # 모델 학습
 # ------------------
 #
-# 학습을 위해서 인코더에 입력 문장을 넣고 모든 출력과 최신 hidden state를
+# 학습을 위해서 인코더에 입력 문장을 넣고 모든 출력과 최신 은닉 상태를
 # 추적합니다. 그런 다음 디코더에 첫 번째 입력으로 ``<SOS>`` 토큰과
-# 인코더의 마지막 Hidden state가 첫번쩨 Hidden state로 제공됩니다.
+# 인코더의 마지막 은닉 상태가 첫번쩨 은닉 상태로 제공됩니다.
 #
 # "Teacher forcing"은 다음 입력으로 디코더의 예측을 사용하는 대신
 # 실제 목표 출력을 다음 입력으로 사용하는 컨셉입니다.
@@ -504,14 +503,14 @@ def tensorsFromPair(pair):
 # 잘못 사용될 때 불안정성을 보입니다
 # <http://minds.jacobs-university.de/sites/default/files/uploads/papers/ESNTutorialRev.pdf>`__
 #
-# teacher-forced 네트워크의 출력이 일관된 문법으로 읽지만 정확한
-# 번역과는 거리가 멀다는 것을 볼 수 있습니다. - 직관적으로 출력 문법을
-# 표현하는 법을 배우고 교사가 처음 몇 단어를 말하면 의미를 "선택할" 수 있지만
-# 번역에서 처음으로 문장을 만드는 법을 잘 배우지 못했습니다.
+# Teacher-forced 네트워크의 출력이 일관된 문법으로 읽지만 정확한
+# 번역과는 거리가 멀다는 것을 볼 수 있습니다. 직관적으로 출력 문법을
+# 표현하는 법을 배우고 교사가 처음 몇 단어를 말하면 의미를 "선택" 할 수 있지만,
+# 번역에서 처음으로 문장을 만드는 법은 잘 배우지 못합니다.
 #
-# PyTorch의 autograd 가 제공하는 자유 덕분에 간단한 if 문으로
-# teacher forcing 을 사용할지 아니면 사용하지 않을지를 선택할 수 있습니다.
-# 더 많은 것을 사용하려면 ``teacher_forcing_ratio`` 를 확인하십시오.
+# PyTorch의 autograd 가 제공하는 자유 덕분에 간단한 If 문으로
+# Teacher Forcing을 사용할지 아니면 사용하지 않을지를 선택할 수 있습니다.
+# 더 많이 사용하려면 ``teacher_forcing_ratio`` 를 확인하십시오.
 #
 
 teacher_forcing_ratio = 0.5
@@ -542,7 +541,7 @@ def train(input_tensor, target_tensor, encoder, decoder, encoder_optimizer, deco
     use_teacher_forcing = True if random.random() < teacher_forcing_ratio else False
 
     if use_teacher_forcing:
-        # Teacher forcing: 목표를 다음 입력으로 전달
+        # Teacher forcing 포함: 목표를 다음 입력으로 전달
         for di in range(target_length):
             decoder_output, decoder_hidden, decoder_attention = decoder(
                 decoder_input, decoder_hidden, encoder_outputs)
@@ -550,7 +549,7 @@ def train(input_tensor, target_tensor, encoder, decoder, encoder_optimizer, deco
             decoder_input = target_tensor[di]  # Teacher forcing
 
     else:
-        # teacher forcing 없이: 자신의 예측을 다음 입력으로 사용
+        # Teacher forcing 미포함: 자신의 예측을 다음 입력으로 사용
         for di in range(target_length):
             decoder_output, decoder_hidden, decoder_attention = decoder(
                 decoder_input, decoder_hidden, encoder_outputs)
@@ -570,7 +569,7 @@ def train(input_tensor, target_tensor, encoder, decoder, encoder_optimizer, deco
 
 
 ######################################################################
-# 이것은 현재 시간과 진행률%을 고려하여 경과된 시간과 남은 예상
+# 이것은 현재 시간과 진행률%을 고려해 경과된 시간과 남은 예상
 # 시간을 출력하는 헬퍼 함수입니다.
 #
 
@@ -711,8 +710,8 @@ def evaluate(encoder, decoder, sentence, max_length=MAX_LENGTH):
 
 
 ######################################################################
-# 우리는 학습 세트에 있는 임의의 문장을 평가하고
-# 입력, 목표 및 출력을 출력하여 주관적인 품질 판단을 내릴 수 있습니다::
+# 학습 세트에 있는 임의의 문장을 평가하고
+# 입력, 목표 및 출력을 출력하여 주관적인 품질 판단을 내릴 수 있습니다:
 #
 
 def evaluateRandomly(encoder, decoder, n=10):
@@ -734,9 +733,9 @@ def evaluateRandomly(encoder, decoder, n=10):
 # 더 쉽게 수행 할 수 있음) 실제로 네트워크를 초기화하고 학습을
 # 시작할 수 있습니다.
 #
-# 입력 문장은 많이 필터링되었음을 기억하십시오. 이 작은 데이터 세트의
-# 경우 256 개의 hidden node 와 단일 GRU layer의 상대적으로 작은
-# 네트워크를 사용할 수 있습니다. MacBook CPU에 대해 약 40분 후에
+# 입력 문장이 많이 필터링되었음을 기억하십시오. 이 작은 데이터 세트의
+# 경우 256 크기의 은닉 노드(hidden node)와 단일 GRU 계층 같은 상대적으로 작은
+# 네트워크를 사용할 수 있습니다. MacBook CPU에서 약 40분 후에
 # 합리적인 결과를 얻을 것입니다.
 #
 # .. Note::
@@ -761,7 +760,7 @@ evaluateRandomly(encoder1, attn_decoder1)
 # 어텐션 시각화
 # ---------------------
 #
-# 어텐션 메커니즘의 유용한 속성은 해석 가능성이 높은 출력입니다.
+# 어텐션 메커니즘의 유용한 속성은 하나는 해석 가능성이 높은 출력입니다.
 # 입력 시퀀스의 특정 인코더 출력에 가중치를 부여하는 데 사용되므로
 # 각 시간 단계에서 네트워크가 가장 집중되는 위치를 파악할 수 있습니다.
 #
@@ -775,7 +774,7 @@ plt.matshow(attentions.numpy())
 
 
 ######################################################################
-# 더 나은 보기 경험을 위해 축과 라벨을 추가하는 추가 작업을 수행합니다:
+# 더 나은 보기를 위해 축과 라벨을 더하는 추가 작업을 수행합니다:
 #
 
 def showAttention(input_sentence, output_words, attentions):
@@ -815,7 +814,7 @@ evaluateAndShowAttention("c est un jeune directeur plein de talent .")
 
 
 ######################################################################
-# Exercises
+# 연습
 # =========
 #
 # -  다른 데이터 셋을 시도해 보십시오
@@ -828,7 +827,7 @@ evaluateAndShowAttention("c est un jeune directeur plein de talent .")
 # -  word2vec 또는 GloVe 같은 미리 학습된 word embedding 으로
 #    embedding 을 교체하십시오
 #
-# -  더 많은 레이어, hidden units,더 많은 문장을 사용하십시오.
+# -  더 많은 레이어, 은닉 유닛, 더 많은 문장을 사용하십시오.
 #    학습 시간과 결과를 비교해 보십시오
 # -  만약 같은 구문 두개의 쌍으로 된 번역 파일을 이용한다면,
 #    (``I am test \t I am test``), 이것을 오토인코더로
