@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 공간 변형기 네트워크 튜토리얼(Spatial Transformer Networks Tutorial)
-==================================================================
+======================================================================
 **Author**: `Ghassen HAMROUNI <https://github.com/GHamrouni>`_
 
 .. figure:: /_static/img/stn/FSeq.png
