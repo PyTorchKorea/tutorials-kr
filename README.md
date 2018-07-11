@@ -46,7 +46,7 @@ PyTorch 0.3.1의 튜토리얼 한국어 번역은 [이 곳](http://9bow.github.i
 * [Sequence to Sequence 네트워크와 Attention을 이용한 번역](https://9bow.github.io/PyTorch-tutorials-kr/intermediate/seq2seq_translation_tutorial.html)
 * [강화 학습(DQN) 튜토리얼](https://9bow.github.io/PyTorch-tutorials-kr/intermediate/reinforcement_q_learning.html)
 * [PyTorch로 분산 어플리케이션 개발하기](https://9bow.github.io/PyTorch-tutorials-kr/intermediate/dist_tuto.html)
-* [공간 변형기 네트워크 튜토리얼(Spatial Transformer Networks Tutorial)](https://9bow.github.io/PyTorch-tutorials-kr/intermediate/spatial_transformer_tutorial.html)
+* [공간 변형기 네트워크(Spatial Transformer Networks) 튜토리얼](https://9bow.github.io/PyTorch-tutorials-kr/intermediate/spatial_transformer_tutorial.html)
 
 ### 고급 튜토리얼
 * *TBD*
