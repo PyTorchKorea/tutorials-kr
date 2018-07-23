@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
 r"""
-PyTorch 소개 
+Introduction to PyTorch
 ***********************
 
-Torch의 텐서(Tensor) 라이브러리 소개
+Introduction to Torch's tensor library
 ======================================
 
-모든 딥러닝은 2차원 이상으로 색인될 수 있는 행렬의 일반화인 
-텐서의 연산입니다. 이것이 무엇을 의미하지 나중에 정확히 
-알게 될 것입니다. 먼저, 텐서로 무엇을 할 수 있는지 살펴 봅시다.
+All of deep learning is computations on tensors, which are
+generalizations of a matrix that can be indexed in more than 2
+dimensions. We will see exactly what this means in-depth later. First,
+lets look what we can do with tensors.
 """
 # Author: Robert Guthrie
 
@@ -22,23 +23,24 @@ torch.manual_seed(1)
 
 
 ######################################################################
-# 텐서 생성하기
+# Creating Tensors
 # ~~~~~~~~~~~~~~~~
 #
-# 텐서는 파이썬 리스트에서 torch.Tensor() 함수로 생성될 수 있습니다.
+# Tensors can be created from Python lists with the torch.Tensor()
+# function.
 #
 
-# torch.tensor(data) 는 주어진 데이터로 torch.Tensor 객체를 생성합니다. 
+# torch.tensor(data) creates a torch.Tensor object with the given data.
 V_data = [1., 2., 3.]
 V = torch.tensor(V_data)
 print(V)
 
-# 행렬 생성
+# Creates a matrix
 M_data = [[1., 2., 3.], [4., 5., 6]]
 M = torch.tensor(M_data)
 print(M)
 
-# 2x2x2 크기의 3D 텐서 생성.
+# Create a 3D tensor of size 2x2x2.
 T_data = [[[1., 2.], [3., 4.]],
           [[5., 6.], [7., 8.]]]
 T = torch.tensor(T_data)
@@ -46,15 +48,16 @@ print(T)
 
 
 ######################################################################
-# 어쨌든 3D 텐서가 무엇입니까? 이렇게 생각해 보십시오. 만약 벡터가 있다면
-# 벡터에 주소를 입력하면 스칼라를 줍니다. 만약 행렬을 가지고 있다면 행렬에
-# 주소를 입력하면 벡터를 줍니다. 만약 3D 텐서를 가지고 있다면 텐서에 주소를
-# 입력하면 행렬을 줍니다.
+# What is a 3D tensor anyway? Think about it like this. If you have a
+# vector, indexing into the vector gives you a scalar. If you have a
+# matrix, indexing into the matrix gives you a vector. If you have a 3D
+# tensor, then indexing into the tensor gives you a matrix!
 #
-# 용어에 대한 주석:
-# 이 튜토리얼에서 "텐서"를 언급 할 때 그것은 어떤 torch.Tensor 객체를 말합니다.
-# 행렬과 벡터는 각각 차원이 1과 2인 torch.Tensors 의 특별한 케이스 입니다.
-# 3D 텐서를 말할 때는 "3D 텐서"라고 명시적으로 사용하겠습니다.
+# A note on terminology:
+# when I say "tensor" in this tutorial, it refers
+# to any torch.Tensor object. Matrices and vectors are special cases of
+# torch.Tensors, where their dimension is 1 and 2 respectively. When I am
+# talking about 3D tensors, I will explicitly use the term "3D tensor".
 #
 
 # Index into V and get a scalar (0 dimensional tensor)
@@ -70,16 +73,16 @@ print(T[0])
 
 
 ######################################################################
-# 다른 데이터 유형의 텐서를 생성 할 수도 있습니다. 보시다시피 기본값은 
-# Float입니다. 정수형의 텐서를 만들려면 torch.LongTensor ()를 사용하십시오.
-# 더 많은 데이터 유형에 대해서는 설명서를 확인하십시오.
-# 그러나 Float 및 Long이 가장 일반적입니다.
+# You can also create tensors of other datatypes. The default, as you can
+# see, is Float. To create a tensor of integer types, try
+# torch.LongTensor(). Check the documentation for more data types, but
+# Float and Long will be the most common.
 #
 
 
 ######################################################################
-# torch.randn ()을 사용하여 랜덤 데이터와 제공된 차원으로 텐서를 
-# 만들 수 있습니다.
+# You can create a tensor with random data and the supplied dimensionality
+# with torch.randn()
 #
 
 x = torch.randn((3, 4, 5))
@@ -87,10 +90,10 @@ print(x)
 
 
 ######################################################################
-# 텐서로 작업하기
+# Operations with Tensors
 # ~~~~~~~~~~~~~~~~~~~~~~~
 #
-# 기대하는 방식으로 텐서로 작업할 수 있습니다.
+# You can operate on tensors in the ways you would expect.
 
 x = torch.tensor([1., 2., 3.])
 y = torch.tensor([4., 5., 6.])
@@ -99,59 +102,51 @@ print(z)
 
 
 ######################################################################
-# 사용 가능한 방대한 작업의 전체 목록은 
-# `문서 <http://pytorch.org/docs/torch.html>`__ 를 참고하십시오. 단순한
-# 수학적 연산 이상으로 확장됩니다.
-# 
-# 나중에 사용하게 될 유용한 작업 중 하나는 연결입니다.
+# See `the documentation <http://pytorch.org/docs/torch.html>`__ for a
+# complete list of the massive number of operations available to you. They
+# expand beyond just mathematical operations.
+#
+# One helpful operation that we will make use of later is concatenation.
 #
 
-# 기본으로 첫번째 축(가로 연결)을 따라 연결합니다.
+# By default, it concatenates along the first axis (concatenates rows)
 x_1 = torch.randn(2, 5)
 y_1 = torch.randn(3, 5)
 z_1 = torch.cat([x_1, y_1])
 print(z_1)
 
-# 세로 연결:
+# Concatenate columns:
 x_2 = torch.randn(2, 3)
 y_2 = torch.randn(2, 5)
-# 두번째 변수는 연결될 축을 결정합니다.
+# second arg specifies which axis to concat along
 z_2 = torch.cat([x_2, y_2], 1)
 print(z_2)
 
-# 텐서가 호환되지 않으면 Torch가 오류 메시지를 출력 합니다. 주석 처리를 제거하여 오류를 확인하십시오.
+# If your tensors are not compatible, torch will complain.  Uncomment to see the error
 # torch.cat([x_1, x_2])
 
 
 ######################################################################
-# 텐서 재구성
+# Reshaping Tensors
 # ~~~~~~~~~~~~~~~~~
 #
-# .view() 메서드를 사용해서 텐서를 재구성합니다.
-# 이 메서드는 많은 신경망 구성 요소가 입력을 특정 모양으로 예상하기 
-# 때문에 많이 사용됩니다. 데이터를 구성 요소로 전달하기 전에 종종 모양을
-# 변경해야합니다.
+# Use the .view() method to reshape a tensor. This method receives heavy
+# use, because many neural network components expect their inputs to have
+# a certain shape. Often you will need to reshape before passing your data
+# to the component.
 #
 
 x = torch.randn(2, 3, 4)
 print(x)
-print(x.view(2, 12))  # 가로 2 , 세로 12로 재구성 
-# 위와 같이 하나의 차원이 -1이면 그 것의 크기는 유추될 수 있습니다.
+print(x.view(2, 12))  # Reshape to 2 rows, 12 columns
+# Same as above.  If one of the dimensions is -1, its size can be inferred
 print(x.view(2, -1))
 
 
 ######################################################################
-# 연산 그래프(Computation Graph)와 자동 미분(Automatic Differentiation)
+# Computation Graphs and Automatic Differentiation
 # ================================================
 #
-# 연산 그래프의 개념은 효율적인 딥러닝 프로그래밍에 필수적입니다. 
-# 역전파 그라디언트를 직접 작성할 필요가 없기 때문입니다.
-
-계산 그래프는 단순히 데이터를 결합하여 출력을 제공하는 방법의 스펙입니다.
-
-그래프는 어떤 연산과 관련된 매개 변수를 완전하게 지정하기 때문에 파생물을 계산하기에 충분한 정보를 포함합니다.
-
-아마 모호하게 들릴지도 모르니, 근본적인 플래그``requires_grad``를 어떻게 사용하고 있는지 보자.
 # The concept of a computation graph is essential to efficient deep
 # learning programming, because it allows you to not have to write the
 # back propagation gradients yourself. A computation graph is simply a
