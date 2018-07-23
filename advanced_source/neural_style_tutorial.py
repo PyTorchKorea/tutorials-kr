@@ -25,8 +25,8 @@ PyTorch를 이용한 신경망-변환(Neural-Transfer)
 어떻게 동작합니까?
 ~~~~~~~~~~~~~~~~~~
 
-원리는 간단합니다. 2개의 거리(distance)를 정의합니다. 하나는 콘텐츠(:math:`D_C`)를 위한 것, 
-다른 하나는 스타일(:math:`D_S`)을 위한 것입니다.
+원리는 간단합니다. 2개의 거리(distance)를 정의합니다. 하나는 콘텐츠( :math:`D_C` )를 위한 것, 
+다른 하나는 스타일( :math:`D_S` )을 위한 것입니다.
 :math:`D_C` 는 콘텐츠 이미지와 스타일 이미지 간의 콘텐츠가 얼마나 차이가 있는지 측정을 합니다. 
 반면에, :math:`D_S` 는 콘텐츠 이미지와 스타일 이미지 간의 스타일에서 얼마나 차이가 있는지를 측정합니다.
 그런 다음, 세 번째 이미지를 입력(예, 노이즈로 구성된 이미지)으로부터 콘텐츠 이미지와의 콘텐츠 거리 
@@ -60,12 +60,12 @@ PyTorch를 이용한 신경망-변환(Neural-Transfer)
 
     G_{XL}(k,l) = \langle F_{XL}^k, F_{XL}^l\\rangle = \sum_i F_{XL}^k(i) . F_{XL}^l(i)
 
-:math:`F_{XL}^k(i)` 는 :math:`F_{XL}^k` 의 :math:`i^{번째}` 요소 입니다.
-우리는 :math:`G_{XL}(k,l)`를 특징 맵(feature map) :math:`k` 와 :math:`l` 간의 
+:math:`F_{XL}^k(i)` 는 :math:`F_{XL}^k` 의 :math:`i^{번째}` 요소입니다.
+우리는 :math:`G_{XL}(k,l)` 를 특징 맵(feature map) :math:`k` 와 :math:`l` 간의 
 상관 관계(correlation)에 대한 척도로 볼 수 있습니다.
 그런 의미에서, :math:`G_{XL}` 는 특징 맵(feature map) :math:`X` 의 레이어 :math:`L` 에서의 
 상관 관계 행렬을 나타냅니다.
-:math:`G_{XL}`의 크기는 단지 특징 맵(feature map)의 숫자에만 의존성이 있고,
+:math:`G_{XL}` 의 크기는 단지 특징 맵(feature map)의 숫자에만 의존성이 있고,
 :math:`X` 의 크기에는 의존성이 없다는 것을 유의 해야 합니다.
 그러면, 만약 :math:`Y` 가 다른 *어떤 크기의* 이미지라면,
 우리는 다음과 같이 레이어 :math:`L` 에서 스타일의 거리를 정의 합니다.
@@ -74,8 +74,8 @@ PyTorch를 이용한 신경망-변환(Neural-Transfer)
 
     D_S^L(X,Y) = \|G_{XL} - G_{YL}\|^2 = \sum_{k,l} (G_{XL}(k,l) - G_{YL}(k,l))^2
 
-:math:`D_C(X,C)`의 한 번의 최소화를 위해서, 이미지 변수 :math:`X`와 대상 콘텐츠-이미지 :math:`C`와
-:math:`D_S(X,S)` 와 :math:`X`와 대상 스타일-이미지 :math:`S`, 둘 다 여러 레이어들에 대해서 계산되야 하고,
+:math:`D_C(X,C)` 의 한 번의 최소화를 위해서, 이미지 변수 :math:`X` 와 대상 콘텐츠-이미지 :math:`C` 와
+:math:`D_S(X,S)` 와 :math:`X` 와 대상 스타일-이미지 :math:`S` , 둘 다 여러 레이어들에 대해서 계산되야 하고,
 우리는 원하는 레이어 각각에서의 거리의 그레디언트를 계산하고 더합니다(:math:`X` 와 관련된 도함수):
 
 .. math::
@@ -83,9 +83,9 @@ PyTorch를 이용한 신경망-변환(Neural-Transfer)
     \\nabla_{\textit{total}}(X,S,C) = \sum_{L_C} w_{CL_C}.\\nabla_{\textit{content}}^{L_C}(X,C) + \sum_{L_S} w_{SL_S}.\\nabla_{\textit{style}}^{L_S}(X,S)
 
 :math:`L_C` 와 :math:`L_S` 는 각각 콘텐츠와 스타일의 원하는 (임의 상태의) 레이어들을 의미하고,
-:math:`w_{CL_C}`와 :math:`w_{SL_S}`는 원하는 레이어에서의
+:math:`w_{CL_C}` 와 :math:`w_{SL_S}` 는 원하는 레이어에서의
 스타일 또는 콘텐츠의 가중치를 (임의 상태의) 의미합니다.
-그리고 나서, 우리는 :math:`X`에 대해 경사 하강법을 실행합니다.
+그리고 나서, 우리는 :math:`X` 에 대해 경사 하강법을 실행합니다.
 
 .. math:: X \leftarrow X - \\alpha \\nabla_{\textit{total}}(X,S,C)
 
@@ -102,8 +102,7 @@ PyTorch 구현
 ----------------------
 
 위의 모든 수학을 이해할 수 없다면, 구현함으로써 이해도를 높여 갈 수 있을 것 입니다. 
-PyTorch를 이용할 예정이라면, 먼저 이 문서 :doc:`Introduction to
-PyTorch </beginner/deep_learning_60min_blitz>` 를 읽어볼 것을 추천 합니다.
+PyTorch를 이용할 예정이라면, 먼저 이 문서 :doc:`PyTorch로 딥러닝하기: 60분만에 끝장내기 </beginner/deep_learning_60min_blitz>` 를 읽어볼 것을 추천 합니다.
 
 패키지들
 ~~~~~~~~
@@ -112,7 +111,7 @@ PyTorch </beginner/deep_learning_60min_blitz>` 를 읽어볼 것을 추천 합�
 
 -  ``torch``, ``torch.nn``, ``numpy`` (PyTorch로 신경망 처리를 위한 필수 패키지)
 -  ``torch.optim`` (효율적인 그레디언트 디센트)
--  ``PIL``, ``PIL.Image``, ``matplotlib.pyplot`` (이미지를 읽고 보여주는 패키지)
+-  ``PIL`` , ``PIL.Image`` , ``matplotlib.pyplot`` (이미지를 읽고 보여주는 패키지)
 -  ``torchvision.transforms`` (PIL타입의 이미지들을 토치 텐서 형태로 변형해주는 패키지)
 -  ``torchvision.models`` (미리 학습된 모델들의 학습 또는 읽기 패키지)
 -  ``copy`` (모델들의 깊은 복사를 위한 시스템 패키지)
