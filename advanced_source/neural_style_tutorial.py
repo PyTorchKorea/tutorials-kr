@@ -3,7 +3,7 @@
 PyTorch를 이용한 신경망-변환(Neural-Transfer)
 ===============================================
 **저자**: `Alexis Jacq <https://alexis-jacq.github.io>`_
-**번역**: `김봉모 <http://fmttm.egloos.com>`_
+  **번역**: `김봉모 <http://fmttm.egloos.com>`_
 
 소개
 ------------
@@ -271,7 +271,7 @@ class ContentLoss(nn.Module):
 # :math:`\hat{F}_{XL}` 을 KxN 행렬에 대한 :math:`F_{XL}` 의 모양을 변경한 버전이라고 하겠습니다.
 # 여기서, :math:`K` 는 레이어 :math:`L` 에서의 특징 맵(feature map)들의 수이고, :math:`N` 은 임의의 벡터화 된 특징 맵(feature map) :math:`F_{XL}^k` 의 길이가 됩니다. 
 # :math:`F_{XL}^k` 의 :math:`k^{th}` 번째 줄은 :math:`F_{XL}^k` 입니다. 
-# math:`\hat{F}_{XL} \cdot \hat{F}_{XL}^T = G_{XL}` 인지 확인 해보길 바랍니다. 
+# :math:`\hat{F}_{XL} \cdot \hat{F}_{XL}^T = G_{XL}` 인지 확인 해보길 바랍니다. 
 # 이를 확인해보면 모듈을 구현하는 것이 쉬워집니다:
 #
 
