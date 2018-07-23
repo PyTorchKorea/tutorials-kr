@@ -52,7 +52,7 @@ PyTorch를 이용한 신경망-변환(Neural-Transfer)
 벡터화된 :math:`k \leq K` 라고 해 보겠습니다.
 스타일 :math:`G_{XL}` 의 :math:`X` 레이어에서 :math:`L` 은 모든 벡터화된 특징 맵(feature map) :math:`F_{XL}^k` 
 에서 :math:`k \leq K` 그람(Gram)으로 정의 됩니다.
-다시 말하면, :math:`G_{XL}` 는 :math:`K`\ x\ :math:`K` 행렬과 요소 :math:`G_{XL}(k,l)`의 :math:`k^{번째}` 줄과
+다시 말하면, :math:`G_{XL}` 는 :math:`K`\ x\ :math:`K` 행렬과 요소 :math:`G_{XL}(k,l)` 의 :math:`k^{번째}` 줄과
 :math:`l^{번째}` 행의 :math:`G_{XL}` 는 :math:`F_{XL}^k` 와 :math:`F_{XL}^l` 간의
 벡터화 곱을 의미합니다:
 
