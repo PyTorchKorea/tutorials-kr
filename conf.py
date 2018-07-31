@@ -37,7 +37,7 @@ import sphinx_rtd_theme
 # -- General configuration ------------------------------------------------
 
 # site base url
-site_url = 'https://9bow.github.io/PyTorch-tutorials-kr/'
+site_url = 'http://pytorch.kr/'
 
 # If your documentation needs a minimal Sphinx version, state it here.
 #
