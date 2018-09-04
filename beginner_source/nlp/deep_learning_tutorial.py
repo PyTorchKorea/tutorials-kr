@@ -1,35 +1,35 @@
 # -*- coding: utf-8 -*-
 r"""
-Deep Learning with PyTorch
+PyTorch를 이용한 딥러닝
 **************************
 
-Deep Learning Building Blocks: Affine maps, non-linearities and objectives
+딥러닝 블록 구축 : 아핀 맵(affine maps), 비선형성, 객체
 ==========================================================================
 
-Deep learning consists of composing linearities with non-linearities in
-clever ways. The introduction of non-linearities allows for powerful
-models. In this section, we will play with these core components, make
-up an objective function, and see how the model is trained.
+딥러닝은 영리한 방법으로 비선형성을 가진 선형성을 구성하는 것으로
+이루어집니다. 비선형성의 도입은 강력한 모델을 가능하게 합니다.
+이 섹션에서 이 핵심 구성 요소를 다루고, 객체 함수를 만들고, 어떻게
+모델이 학습되지는 살펴봅시다.
 
 
-Affine Maps
+아핀 맵
 ~~~~~~~~~~~
 
-One of the core workhorses of deep learning is the affine map, which is
-a function :math:`f(x)` where
+딥러닝의 핵심 작업자 중 하나는 아핀 맵 입니다.
+이 함수 :math:`f(x)` 는 다음과 같습니다.
 
 .. math::  f(x) = Ax + b
 
-for a matrix :math:`A` and vectors :math:`x, b`. The parameters to be
-learned here are :math:`A` and :math:`b`. Often, :math:`b` is refered to
-as the *bias* term.
+여기서 :math:`A` 는 행렬, :math:`x, b` 는 벡터 입니다.
+여기서 학습되는 변수는 :math:`A` 와 :math:`b` 입니다.
+종종 :math:`b` 는 *바이어스* 로 불립니다..
 
 
-PyTorch and most other deep learning frameworks do things a little
-differently than traditional linear algebra. It maps the rows of the
-input instead of the columns. That is, the :math:`i`'th row of the
-output below is the mapping of the :math:`i`'th row of the input under
-:math:`A`, plus the bias term. Look at the example below.
+PyTorch 와 대부분의 다른 딥러닝 프레임워크들은 고전적인 선형 대수학와
+조금 다르게 동작합니다. 입력의 열 대신에 행으로 매핑합니다.
+즉 주어진 :math:`A` 에서 출력의 :math:`i`번째 행은
+입력의 :math:`i`번째 행에 매핑되고 바이어스를 더합니다.
+아래 예시를 살펴 보십시오.
 
 """
 
@@ -52,187 +52,171 @@ print(lin(data))  # yes
 
 
 ######################################################################
-# Non-Linearities
+# 비선형성
 # ~~~~~~~~~~~~~~~
 #
-# First, note the following fact, which will explain why we need
-# non-linearities in the first place. Suppose we have two affine maps
-# :math:`f(x) = Ax + b` and :math:`g(x) = Cx + d`. What is
-# :math:`f(g(x))`?
+# 먼저 왜 비선형성이 필요한지 설명하는 다음 사실을 주목하십시오.
+# :math:`f(x) = Ax + b` 와 :math:`g(x) = Cx + d` 두개의 아핀맵이 있다고 가정합니다.
+# :math:`f(g(x))` 는 무엇일까요?
 #
 # .. math::  f(g(x)) = A(Cx + d) + b = ACx + (Ad + b)
 #
-# :math:`AC` is a matrix and :math:`Ad + b` is a vector, so we see that
-# composing affine maps gives you an affine map.
+# :math:`AC` 는 행렬이고 :math:`Ad + b` 는 벡터이므로 아핀맵 구성은
+# 아핀맵이 주어집니다.
 #
-# From this, you can see that if you wanted your neural network to be long
-# chains of affine compositions, that this adds no new power to your model
-# than just doing a single affine map.
+# 이것으로 부터, 신경망이 아핀 구성의 긴 체인이 되길 원한다면,
+# 단일 아핀 맵을 작성하는 것보다 이것이 모델에 추가하는 새로운 힘이
+# 없다는 것을 알 수 있습니다.
 #
-# If we introduce non-linearities in between the affine layers, this is no
-# longer the case, and we can build much more powerful models.
+# 아핀 계층 사이에 만약 비선형성을 적용한다면
+# 이것은 위 경우와 달리 더욱 더 강력한 모델을 구축할 수 있습니다.
 #
-# There are a few core non-linearities.
-# :math:`\tanh(x), \sigma(x), \text{ReLU}(x)` are the most common. You are
-# probably wondering: "why these functions? I can think of plenty of other
-# non-linearities." The reason for this is that they have gradients that
-# are easy to compute, and computing gradients is essential for learning.
-# For example
+# 핵심적인 비선형성 :math:`\tanh(x), \sigma(x), \text{ReLU}(x)` 들이 가장
+# 일반적입니다. 아마 의문이 생길겁니다 : "왜 이런 함수들이지? 나는 다른 많은
+# 비선형성을 생각할 수 있는데". 그 이유는 그들이 그래디언트를 계산하기 쉽고,
+# 그래디언트 연산은 학습에 필수적이기 때문입니다.
+# 예를 들어서
 #
 # .. math::  \frac{d\sigma}{dx} = \sigma(x)(1 - \sigma(x))
 #
-# A quick note: although you may have learned some neural networks in your
-# intro to AI class where :math:`\sigma(x)` was the default non-linearity,
-# typically people shy away from it in practice. This is because the
-# gradient *vanishes* very quickly as the absolute value of the argument
-# grows. Small gradients means it is hard to learn. Most people default to
-# tanh or ReLU.
+# 빠른 참고: AI 클래스에 대한 소개에서 일부 신경망을 배웠지만
+#  :math:`\sigma(x)` 가 기본이었을 것입니다.
+# 일반적으로 사람들은 실제로 그것을 사용하지 않고 피합니다.
+# 이것은 그래디언트가 인수의 절대 값이 커짐에 따라 매우 빨리 *사라지기* 때문입니다.
+# 작은 그래디언트는 학습하기 어렵다는 것을 의미합니다.
+# 대부분의 사람들은 tanh 또는 ReLU를 기본값으로 사용합니다.
 #
 
-# In pytorch, most non-linearities are in torch.functional (we have it imported as F)
-# Note that non-linearites typically don't have parameters like affine maps do.
-# That is, they don't have weights that are updated during training.
+# Pytorch에서 대부분의 비선형성은 torch.functional에 있습니다 ( F 로 가져옵니다)
+# 일반적으로 비선형성은 아핀맵과 같은 파라미터를 가지고 있지 않습니다.
+# 즉, 학습 중에 업데이트되는 가중치가 없습니다.
 data = torch.randn(2, 2)
 print(data)
 print(F.relu(data))
 
 
 ######################################################################
-# Softmax and Probabilities
+# Softmax 및 확률
 # ~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-# The function :math:`\text{Softmax}(x)` is also just a non-linearity, but
-# it is special in that it usually is the last operation done in a
-# network. This is because it takes in a vector of real numbers and
-# returns a probability distribution. Its definition is as follows. Let
-# :math:`x` be a vector of real numbers (positive, negative, whatever,
-# there are no constraints). Then the i'th component of
-# :math:`\text{Softmax}(x)` is
+# 함수 :math:`\text{Softmax}(x)` 또한 단지 비선형성 이지만, 일반적으로 네트워크에서
+# 마지막으로 수행되는 작업이라는 점에서 특별합니다.
+# 이는 실수의 벡터를 취하여 확률 분포를 반환하기 때문입니다.
+# 정의는 다음과 같습니다. :math:`x` 는 실수 벡터(음수, 양수 , 제약 없음)라고 하면,
+# i번째 구성 요소는 :math:`\text{Softmax}(x)` 는
 #
 # .. math::  \frac{\exp(x_i)}{\sum_j \exp(x_j)}
 #
-# It should be clear that the output is a probability distribution: each
-# element is non-negative and the sum over all components is 1.
+# 출력은 확률 분포라는 것이 분명해야합니다:
+# 각 요소는 음수가 아니며 모든 구성 요소의 합은 1입니다.
 #
-# You could also think of it as just applying an element-wise
-# exponentiation operator to the input to make everything non-negative and
-# then dividing by the normalization constant.
+# 모두 음수가 아니게 하기 위해서 입력에 요소 단위의 지수 연산자를 적용한 다음
+# 정규화 상수로 나누는 것도 생각할 수 있습니다.
 #
 
-# Softmax is also in torch.nn.functional
+# Softmax 도 torch.nn.functional 에 있습니다.
 data = torch.randn(5)
 print(data)
 print(F.softmax(data, dim=0))
-print(F.softmax(data, dim=0).sum())  # Sums to 1 because it is a distribution!
-print(F.log_softmax(data, dim=0))  # theres also log_softmax
+print(F.softmax(data, dim=0).sum())  # 확률 분포 이기 때문에 합이 1 입니다!
+print(F.log_softmax(data, dim=0))  # log_softmax 도 있습니다.
 
 
 ######################################################################
-# Objective Functions
+# 목적 함수(Objective Functions)
 # ~~~~~~~~~~~~~~~~~~~
 #
-# The objective function is the function that your network is being
-# trained to minimize (in which case it is often called a *loss function*
-# or *cost function*). This proceeds by first choosing a training
-# instance, running it through your neural network, and then computing the
-# loss of the output. The parameters of the model are then updated by
-# taking the derivative of the loss function. Intuitively, if your model
-# is completely confident in its answer, and its answer is wrong, your
-# loss will be high. If it is very confident in its answer, and its answer
-# is correct, the loss will be low.
+# 목적 함수는 네트워크가 최소화하도록 학습되는 함수입니다
+# ( *손실 함수* 또는 *비용 함수* 라고 함).
+# 먼저 학습 인스턴스를 선택하고 신경망을 통해 실행한 다음 출력의 손실을 계산합니다.
+# 그런 다음 손실 함수의 미분을 취함으로써 모델의 파라미터가 업데이트됩니다.
+# 직관적으로 모델이 자신의 대답에 완전히 확신하고 대답이 잘못되면 손실이 높아집니다.
+# 답변에 자신이 있고 답변이 맞으면 손실이 적습니다.
 #
-# The idea behind minimizing the loss function on your training examples
-# is that your network will hopefully generalize well and have small loss
-# on unseen examples in your dev set, test set, or in production. An
-# example loss function is the *negative log likelihood loss*, which is a
-# very common objective for multi-class classification. For supervised
-# multi-class classification, this means training the network to minimize
-# the negative log probability of the correct output (or equivalently,
-# maximize the log probability of the correct output).
+# 학습 예제에서 손실 함수를 최소화하려는 아이디어는
+# 네트워크가 잘 일반화되고 개발자 세트, 테스트 세트 또는 프로덕션에서
+# 나타나지 않았던 예제(unseen examples)에 대해 작은 손실을 가지기를 바랍니다.
+# 손실 함수의 예로 *음의 로그 우도 손실(negative log likelihood loss)* 있습니다. 
+# 이 것은 다중 클래스 분류에서 매우 자주 사용되는 목적 함수입니다.
+# 감독 다중 클래스 분류의 경우에는 올바른 출력(정답을 맞춘 출력)의 음의 로그 확률을
+# 최소화하도록 네트워크를 교육하는 것을 의미합니다.
+# (또는 이와 동등하게 올바른 출력의 로그 확률을 최대화하십시오)
 #
 
 
 ######################################################################
-# Optimization and Training
+# 최적화와 학습
 # =========================
 #
-# So what we can compute a loss function for an instance? What do we do
-# with that? We saw earlier that Tensors know how to compute gradients
-# with respect to the things that were used to compute it. Well,
-# since our loss is an Tensor, we can compute gradients with
-# respect to all of the parameters used to compute it! Then we can perform
-# standard gradient updates. Let :math:`\theta` be our parameters,
-# :math:`L(\theta)` the loss function, and :math:`\eta` a positive
-# learning rate. Then:
+# 그럼 인스턴스에 대해 손실 함수를 계산할 수 있다는 것은 무엇입니까? 그걸 어떻게 할까요?
+# 우리는 이전에 Tensor가 그것을 계산하는데 사용된 것들에 해당하는 그래디언트를
+# 계산하는 방법을 알고 있다는 것을 보았습니다.
+# 손실은 Tensor이기 때문에 그것을 계산하는데 사용된 모든 파라미터와 관련하여
+# 그래디언트를 계산할 수 있습니다! 그런 다음 표준 그래디언트 업데이트를 수행 할 수 있습니다.
+# :math:`\theta` 가 우리의 파라미터라고 합시다.  
+# :math:`L(\theta)` 는 손실 함수, 그리고 :math:`\eta` 는 양의 러닝 레이트 입니다. 그러면
 #
 # .. math::  \theta^{(t+1)} = \theta^{(t)} - \eta \nabla_\theta L(\theta)
 #
-# There are a huge collection of algorithms and active research in
-# attempting to do something more than just this vanilla gradient update.
-# Many attempt to vary the learning rate based on what is happening at
-# train time. You don't need to worry about what specifically these
-# algorithms are doing unless you are really interested. Torch provides
-# many in the torch.optim package, and they are all completely
-# transparent. Using the simplest gradient update is the same as the more
-# complicated algorithms. Trying different update algorithms and different
-# parameters for the update algorithms (like different initial learning
-# rates) is important in optimizing your network's performance. Often,
-# just replacing vanilla SGD with an optimizer like Adam or RMSProp will
-# boost performance noticably.
+# 이 기본적인 그레디언트 업데이트 이상의 것을 하기 위해서 많은 알고리즘과 
+# 시도되고 있는 활발한 연구들이 있습니다.
+# 많은 시도들은 학습 시간에 일어나는 것에 기반한 러닝 레이트를 변경해봅니다.
+# 당신이 정말 관심이 없다면 특별히 이들 알고리즘이 무엇을 하는지 걱정할 
+# 필요가 없습니다. Torch는 torch.optim  패키지에서 많은 것을 제공하며
+# 완전히 공개되어 있습니다. 가장 단순한 그래디언트 업데이트 사용은
+# 더 복잡한 알고리즘을 사용하는 것과 동일합니다.
+# 다른 업데이트 알고리즘과 업데이트 알고리즘을 위한 다른 파라미터(다른 초기 러닝 레이트)를
+# 시도해 보는 것은 네트워크의 성능을 최적화하는데 중요합니다.
+# 종종 기본 SGD를 Adam 또는 RMSprop 으로 교체하는 것이 눈에 띄게 성능 
+# 향상 시킵니다.
 #
 
 
 ######################################################################
-# Creating Network Components in PyTorch
+# Pytorch 에서 네트워크 구성요소 생성하기
 # ======================================
 #
-# Before we move on to our focus on NLP, lets do an annotated example of
-# building a network in PyTorch using only affine maps and
-# non-linearities. We will also see how to compute a loss function, using
-# PyTorch's built in negative log likelihood, and update parameters by
-# backpropagation.
+# NLP에 초점을 맞추기 전에,  PyTorch에서 아핀 맵과 비선형성만을 사용하여
+# 네트워크를 구축하는 주석 처리된 예제를 수행 할 수 있습니다.
+# 또한 손실 함수를 계산하는 방법, PyTorch에 내장된 음의 로그 우도를 사용하는 방법,
+# 역전파를 통해 매개 변수를 업데이트하는 방법을 볼 것입니다.
 #
-# All network components should inherit from nn.Module and override the
-# forward() method. That is about it, as far as the boilerplate is
-# concerned. Inheriting from nn.Module provides functionality to your
-# component. For example, it makes it keep track of its trainable
-# parameters, you can swap it between CPU and GPU with the ``.to(device)``
-# method, where device can be a CPU device ``torch.device("cpu")`` or CUDA
-# device ``torch.device("cuda:0")``.
+# 모든 네트워크 구성 요소는 nn.Module에서 상속 받아 forward() 메서드를 재정의해야합니다.
+# 이것은 상용구에 관한 것입니다. nn.Module에서의 상속은 구성 요소에 기능을 제공합니다.
+# 예를 들어 그것은 학습 가능한 파라미터를 추적하도록 만들고, 
+# ``.to(device)`` 로 CPU와 GPU 를 교환할수 있습니다. 
+# ``torch.device("cpu")`` 는 CPU 장치를 ``torch.device("cuda:0")`` 는 GPU 장치를 사용합니다.
 #
-# Let's write an annotated example of a network that takes in a sparse
-# bag-of-words representation and outputs a probability distribution over
-# two labels: "English" and "Spanish". This model is just logistic
-# regression.
-#
+# 희소한 Bag-of-Words Representation 을 받아서 두개의 레이블 "영어"와 "스페인어"의 확률 분포
+# 출력하는 네트워크의 주석이 달린 예시를 작성해 봅시다. 
+# 이 모델은 단순한 논리 회귀 입니다.
+# 
 
 
 ######################################################################
-# Example: Logistic Regression Bag-of-Words classifier
+# 예제: 논리 회귀 Bag-of-Words 분류기
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-# Our model will map a sparse BoW representation to log probabilities over
-# labels. We assign each word in the vocab an index. For example, say our
-# entire vocab is two words "hello" and "world", with indices 0 and 1
-# respectively. The BoW vector for the sentence "hello hello hello hello"
-# is
+# 우리 모델은 희소한 BoW 표현을 레이블에 대한 로그 확률로 매핑합니다.
+# 사전의 각 단어에 하나의 색인을 할당합니다.
+# 예를 들어서 전체 사전이 각각 0과 1의 색인을 가진 두개의 단어 "hello" 와 "world" 라고 합시다
+#. "hello hello hello hello" 문장의 BoW 벡터는 다음과 같습니다.
 #
 # .. math::  \left[ 4, 0 \right]
 #
-# For "hello world world hello", it is
+#  "hello world world hello"는 다음과 같습니다.
 #
 # .. math::  \left[ 2, 2 \right]
 #
-# etc. In general, it is
+# 일반화 하면 다음과 같습니다.
 #
 # .. math::  \left[ \text{Count}(\text{hello}), \text{Count}(\text{world}) \right]
 #
-# Denote this BOW vector as :math:`x`. The output of our network is:
+# 이 BOW 벡터를 :math:`x` 라하면 네트워크의 출력은 다음과 같습니다:
 #
 # .. math::  \log \text{Softmax}(Ax + b)
 #
-# That is, we pass the input through an affine map and then do log
-# softmax.
+# 즉, 아핀맵에 입력을 주고 그 다음 Log Softmax 를 합니다.
 #
 
 data = [("me gusta comer en la cafeteria".split(), "SPANISH"),
@@ -243,8 +227,8 @@ data = [("me gusta comer en la cafeteria".split(), "SPANISH"),
 test_data = [("Yo creo que si".split(), "SPANISH"),
              ("it is lost on me".split(), "ENGLISH")]
 
-# word_to_ix maps each word in the vocab to a unique integer, which will be its
-# index into the Bag of words vector
+# word_to_ix 는 사전의 각 단어를 고유한 정수로 매핑하고 
+# 그것은 BoW 벡터에서 자신의 색인이 됩니다. 
 word_to_ix = {}
 for sent, _ in data + test_data:
     for word in sent:
@@ -256,27 +240,25 @@ VOCAB_SIZE = len(word_to_ix)
 NUM_LABELS = 2
 
 
-class BoWClassifier(nn.Module):  # inheriting from nn.Module!
+class BoWClassifier(nn.Module):  # nn.Module로 부터 상속 받기 !
 
     def __init__(self, num_labels, vocab_size):
-        # calls the init function of nn.Module.  Dont get confused by syntax,
-        # just always do it in an nn.Module
+        # calls the init function of nn.Module의 초기화 함수 호출.  Dont get confused by syntax,
+        # 문법에 혼란스러워 하지 마시고 단지 항상 nn.Module 에서 수행하십시오.
         super(BoWClassifier, self).__init__()
 
-        # Define the parameters that you will need.  In this case, we need A and b,
-        # the parameters of the affine mapping.
-        # Torch defines nn.Linear(), which provides the affine map.
-        # Make sure you understand why the input dimension is vocab_size
-        # and the output is num_labels!
+        # 필요한 파라미터를 정의 하십시오. 이 경우에는 아핀 매핑의 매개 변수 인 A와 b가 필요합니다.
+        # Torch는 아핀 맵을 제공하는 nn.Linear()를 정의합니다
+        # 입력 차원이 vocab_size이고 출력이 num_labels 인 이유를 이해했는지 확인하십시오!
         self.linear = nn.Linear(vocab_size, num_labels)
 
-        # NOTE! The non-linearity log softmax does not have parameters! So we don't need
-        # to worry about that here
+        # 주의! 비선형성 Log Softmax에는 파라미터가 없습니다! 
+        # 그래서 여기에 대해 걱정할 필요가 없습니다.
 
     def forward(self, bow_vec):
-        # Pass the input through the linear layer,
-        # then pass that through log_softmax.
-        # Many non-linearities and other functions are in torch.nn.functional
+        # 선형 계층를 통해 입력을 전달한 다음 log_softmax로 전달합니다.
+        # 많은 비선형성 및 기타 기능이 torch.nn.functional 에 있습니다
+
         return F.log_softmax(self.linear(bow_vec), dim=1)
 
 
@@ -293,17 +275,16 @@ def make_target(label, label_to_ix):
 
 model = BoWClassifier(NUM_LABELS, VOCAB_SIZE)
 
-# the model knows its parameters.  The first output below is A, the second is b.
-# Whenever you assign a component to a class variable in the __init__ function
-# of a module, which was done with the line
+# 모델은 자신의 파라미터를 알고 있습니다. 아래에 있는 첫번째 출력은 A 두번째는 b 입니다.
+# 모듈의 __init__ 함수에서 클래스 변수에 구성 요소를 할당 할 때마다 다음 행을 사용하여 완료합니다.
 # self.linear = nn.Linear(...)
-# Then through some Python magic from the PyTorch devs, your module
-# (in this case, BoWClassifier) will store knowledge of the nn.Linear's parameters
+# 그런 다음 PyTorch 개발자의 Python 마법을 통해, 모듈(이 경우 BoWClassifier)은 
+# nn.Linear 파라미터에 대한 지식을 저장합니다
 for param in model.parameters():
     print(param)
 
-# To run the model, pass in a BoW vector
-# Here we don't need to train, so the code is wrapped in torch.no_grad()
+# 모델을 실행하려면 BoW 벡터를 전달합니다.
+# 여기서 우리는 학습 할 필요가 없으므로 코드는 torch.no_grad()로 싸여 있습니다. 
 with torch.no_grad():
     sample = data[0]
     bow_vector = make_bow_vector(sample[0], word_to_ix)
@@ -312,64 +293,58 @@ with torch.no_grad():
 
 
 ######################################################################
-# Which of the above values corresponds to the log probability of ENGLISH,
-# and which to SPANISH? We never defined it, but we need to if we want to
-# train the thing.
+# 위의 값 중 어느 것이 ENGLISH와 SPANISH의 로그 확률에 해당하는 값일까요?
+# 우리는 정의하지 않았지만, 학습하기를 원한다면 필요합니다.
 #
 
 label_to_ix = {"SPANISH": 0, "ENGLISH": 1}
 
 
 ######################################################################
-# So lets train! To do this, we pass instances through to get log
-# probabilities, compute a loss function, compute the gradient of the loss
-# function, and then update the parameters with a gradient step. Loss
-# functions are provided by Torch in the nn package. nn.NLLLoss() is the
-# negative log likelihood loss we want. It also defines optimization
-# functions in torch.optim. Here, we will just use SGD.
+# 그럼 학습을 해봅시다! 이를 위해 로그 확률을 얻고, 손실 함수를 계산하고,
+# 손실 함수의 그래디언트를 계산한 다음 그래디언트 단계로 파라미터를 
+# 업데이트하기 위해 인스턴스를 통과시킵니다.  손실 기능은 nn 패키지의 Torch에서 제공합니다.
+# nn.NLLLoss()는 원하는 음의 로그 우도 손실입니다. 또한 torch.optim에서 최적화 함수를 정의합니다.
+# 여기서는 SGD 만 사용합니다.
 #
-# Note that the *input* to NLLLoss is a vector of log probabilities, and a
-# target label. It doesn't compute the log probabilities for us. This is
-# why the last layer of our network is log softmax. The loss function
-# nn.CrossEntropyLoss() is the same as NLLLoss(), except it does the log
-# softmax for you.
+# NLLLoss에 대한 *입력* 은 로그 확률의 벡터이고 목표 레이블입니다.
+# 우리를 위한 로그 확률을 계산하지 않습니다. 이것이 네트워크의 마지막 계층이 
+# Log softmax 인 이유입니다. 손실 함수 nn.CrossEntropyLoss()는 Log softmax를 제외하고는 NLLLoss()와 같습니다.
 #
 
-# Run on test data before we train, just to see a before-and-after
+# 훈련하기 전에 테스트 데이터를 실행하여 전후를 볼 수 있습니다.
 with torch.no_grad():
     for instance, label in test_data:
         bow_vec = make_bow_vector(instance, word_to_ix)
         log_probs = model(bow_vec)
         print(log_probs)
 
-# Print the matrix column corresponding to "creo"
+# "creo"에 해당하는 행렬 열을 인쇄하십시오.
 print(next(model.parameters())[:, word_to_ix["creo"]])
 
 loss_function = nn.NLLLoss()
 optimizer = optim.SGD(model.parameters(), lr=0.1)
 
-# Usually you want to pass over the training data several times.
-# 100 is much bigger than on a real data set, but real datasets have more than
-# two instances.  Usually, somewhere between 5 and 30 epochs is reasonable.
+# 일반적으로 교육 데이터를 여러 번 전달 합니다.
+# 100은 실제 데이터 세트보다 훨씬 더 크지 만 실제 데이터 세트는 두 개 이상의 인스턴스를 가집니다.
+# 일반적으로 5 ~ 30 개 에포크가 적당합니다. 
 for epoch in range(100):
     for instance, label in data:
-        # Step 1. Remember that PyTorch accumulates gradients.
-        # We need to clear them out before each instance
+        # 1 단계. PyTorch는 그라데이션을 축적합니다.
+        # 각 인스턴스 전에 그들을 제거해야합니다.
         model.zero_grad()
 
-        # Step 2. Make our BOW vector and also we must wrap the target in a
-        # Tensor as an integer. For example, if the target is SPANISH, then
-        # we wrap the integer 0. The loss function then knows that the 0th
-        # element of the log probabilities is the log probability
-        # corresponding to SPANISH
+        
+        # 2 단계. BOW 벡터를 만들고 정수로 텐서로 대상을 싸야합니다.
+        # 예를 들어, 대상이 SPANISH이면 정수 0으로 합니다.
+        # 손실 함수는 로그 확률의 0번째 요소가 SPANISH에 해당하는 로그 확률임을 알 수 있습니다
         bow_vec = make_bow_vector(instance, word_to_ix)
         target = make_target(label, label_to_ix)
 
-        # Step 3. Run our forward pass.
+        # 3 단계. 순전파를 실행합니다.
         log_probs = model(bow_vec)
 
-        # Step 4. Compute the loss, gradients, and update the parameters by
-        # calling optimizer.step()
+        # 4 단계. optimizer.step()을 호출하여 손실, 그래디언트를 계산하고 파라미터를 업데이트합니다.
         loss = loss_function(log_probs, target)
         loss.backward()
         optimizer.step()
@@ -380,7 +355,7 @@ with torch.no_grad():
         log_probs = model(bow_vec)
         print(log_probs)
 
-# Index corresponding to Spanish goes up, English goes down!
+# 스페인어에 해당하는 색인이 올라갑니다. 영어가 내려갑니다!!
 print(next(model.parameters())[:, word_to_ix["creo"]])
 
 
