@@ -118,7 +118,7 @@ print(F.relu(data))
 data = torch.randn(5)
 print(data)
 print(F.softmax(data, dim=0))
-print(F.softmax(data, dim=0).sum())  # 확률 분포 이기 때문에 합이 1 입니다!
+print(F.softmax(data, dim=0).sum())  # 확률 분포이기 때문에 합이 1 입니다!
 print(F.log_softmax(data, dim=0))  # log_softmax 도 있습니다.
 
 
@@ -360,11 +360,10 @@ print(next(model.parameters())[:, word_to_ix["creo"]])
 
 
 ######################################################################
-# We got the right answer! You can see that the log probability for
-# Spanish is much higher in the first example, and the log probability for
-# English is much higher in the second for the test data, as it should be.
+# 정답을 얻었습니다! 첫 번째 예제에서는 스페인어의 로그 확률이 ​​훨씬 높고
+# 영어의 로그 확률은 테스트 데이터의 두 번째에서 훨씬 높다는 것을 알 수 있습니다.
 #
-# Now you see how to make a PyTorch component, pass some data through it
-# and do gradient updates. We are ready to dig deeper into what deep NLP
-# has to offer.
+# 이제 PyTorch 구성 요소를 만들고 이를 통해 일부 데이터를 전달하고
+# 그래디언트 업데이트를 수행하는 방법을 살펴 보았습니다. 
+# 우리는 심도있는 NLP가 제공해야하는 것을 더 깊이 파고들 준비가되었습니다.
 #
