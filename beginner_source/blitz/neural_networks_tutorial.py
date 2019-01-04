@@ -151,6 +151,7 @@ out.backward(torch.randn(1, 10))
 output = net(input)
 target = torch.arange(1, 11)  # a dummy target, for example
 target = target.view(1, -1)  # make it the same shape as output
+target = target.type(torch.FloatTensor) # cast to FloatTensor from LongTensor
 criterion = nn.MSELoss()
 
 loss = criterion(output, target)
