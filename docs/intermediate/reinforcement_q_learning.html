@@ -1,0 +1,931 @@
+
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>강화 학습 (DQN) 튜토리얼 &mdash; PyTorch Tutorials 0.4.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!-- <link rel="stylesheet" href="../_static/pygments.css" type="text/css" /> -->
+  <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Pytorch로 분산 어플리케이션 개발하기" href="dist_tuto.html" />
+    <link rel="prev" title="Sequence to Sequence 네트워크와 Attention을 이용한 번역" href="seq2seq_translation_tutorial.html" /> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+</head>
+
+<div class="container-fluid header-holder tutorials-header" id="header-holder">
+  <div class="container">
+    <div class="header-container">
+      <a class="header-logo" href="https://shiftlab.github.io/pytorch/" aria-label="PyTorch"></a>
+
+      <div class="main-menu">
+        <ul>
+          <li>
+            <a href="https://shiftlab.github.io/pytorch/get-started">Get Started</a>
+          </li>
+
+          <li>
+            <a href="https://shiftlab.github.io/pytorch/features">Features</a>
+          </li>
+
+          <li>
+            <a href="https://shiftlab.github.io/pytorch/ecosystem">Ecosystem</a>
+          </li>
+
+          <li>
+            <a href="https://shiftlab.github.io/pytorch/blog/">Blog</a>
+          </li>
+
+          <li class="active">
+            <a href="https://pytorch.org/tutorials">Tutorials</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/docs/stable/index.html">Docs</a>
+          </li>
+
+          <li>
+            <a href="https://shiftlab.github.io/pytorch/resources">Resources</a>
+          </li>
+
+          <li>
+            <a href="https://github.com/pytorch/pytorch">Github</a>
+          </li>
+        </ul>
+      </div>
+
+      <a class="main-menu-open-button" href="#" data-behavior="open-mobile-menu"></a>
+    </div>
+
+  </div>
+</div>
+
+
+<body class="pytorch-body">
+
+   
+  <div>
+
+    
+
+    <div class="table-of-contents-link-wrapper">
+      <span>Table of Contents</span>
+      <a href="#" class="toggle-table-of-contents" data-behavior="toggle-table-of-contents"></a>
+    </div>
+
+    <nav data-toggle="wy-nav-shift" class="pytorch-left-menu" id="pytorch-left-menu">
+      <div class="pytorch-side-scroll">
+        <div class="pytorch-menu pytorch-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          <div class="pytorch-left-menu-search">
+            
+
+            
+              
+              
+                <div class="version">
+                  0.4.1
+                </div>
+              
+            
+
+            
+
+
+  
+
+
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search Tutorials" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+            
+          </div>
+
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Beginner Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/deep_learning_60min_blitz.html">PyTorch로 딥러닝하기: 60분만에 끝장내기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/former_torchies_tutorial.html">Torch 사용자를 위한 PyTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/pytorch_with_examples.html">예제로 배우는 PyTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/transfer_learning_tutorial.html">전이학습(Transfer Learning) 튜토리얼</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/data_loading_tutorial.html">Data Loading and Processing Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/deep_learning_nlp_tutorial.html">Deep Learning for NLP with Pytorch</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Intermediate Tutorials</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="char_rnn_classification_tutorial.html">문자-단위 RNN으로 이름 분류하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="char_rnn_generation_tutorial.html">문자-단위 RNN으로 이름 생성하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="seq2seq_translation_tutorial.html">Sequence to Sequence 네트워크와 Attention을 이용한 번역</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">강화 학습 (DQN) 튜토리얼</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dist_tuto.html">Pytorch로 분산 어플리케이션 개발하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="spatial_transformer_tutorial.html">공간 변형기 네트워크(Spatial Transformer Networks) 튜토리얼</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Advanced Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/neural_style_tutorial.html">PyTorch를 이용한 신경망-변환(Neural-Transfer)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/numpy_extensions_tutorial.html">Creating extensions using numpy and scipy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/super_resolution_with_caffe2.html">Transfering a model from PyTorch to Caffe2 and Mobile using ONNX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_extension.html">Custom C++ and CUDA Extensions</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <div class="pytorch-container">
+
+      <section data-toggle="wy-nav-shift" class="pytorch-content-wrap">
+        <div class="pytorch-page-level-bar" id="pytorch-page-level-bar">
+          <div class="pytorch-breadcrumbs-wrapper">
+            
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="pytorch-breadcrumbs">
+    
+      <li>
+        <a href="../index.html">
+          
+            Tutorials
+          
+        </a> &gt;
+      </li>
+
+        
+      <li>강화 학습 (DQN) 튜토리얼</li>
+    
+    
+      <li class="pytorch-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/intermediate/reinforcement_q_learning.rst.txt" rel="nofollow"><img src="../_static/images/view-page-source-icon.svg"></a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+</div>
+          </div>
+
+          <div class="pytorch-shortcuts-wrapper" id="pytorch-shortcuts-wrapper">
+            Shortcuts
+          </div>
+        </div>
+
+        <div class="pytorch-content-left">
+          
+          <div class="rst-content">
+          
+            <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
+             <article itemprop="articleBody" class="pytorch-article">
+              
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Click <a class="reference internal" href="#sphx-glr-download-intermediate-reinforcement-q-learning-py"><span class="std std-ref">here</span></a> to download the full example code</p>
+</div>
+<div class="sphx-glr-example-title section" id="dqn">
+<span id="sphx-glr-intermediate-reinforcement-q-learning-py"></span><h1>강화 학습 (DQN) 튜토리얼<a class="headerlink" href="#dqn" title="Permalink to this headline">¶</a></h1>
+<dl class="docutils">
+<dt><strong>Author</strong>: <a class="reference external" href="https://github.com/apaszke">Adam Paszke</a></dt>
+<dd><strong>번역</strong>: <a class="reference external" href="https://github.com/adonisues">황성수</a></dd>
+</dl>
+<p>이 튜토리얼에서는 <a class="reference external" href="https://gym.openai.com/">OpenAI Gym</a>
+CartPole-v0 태스크의 DQN (Deep Q Learning) 에이전트를 학습하는데
+PyTorch를 사용하는 방법을 보여드립니다.</p>
+<p><strong>태스크</strong></p>
+<p>에이전트는 연결된 막대가 똑바로 서 있도록 카트를 왼쪽이나 오른쪽으로
+움직이는 두 가지 동작 중 하나를 선택해야합니다.
+다양한 알고리즘과 시각화 기능을 갖춘 공식 순위표를
+<a class="reference external" href="https://gym.openai.com/envs/CartPole-v0">Gym website</a> 에서 찾을 수 있습니다.</p>
+<div class="figure" id="id9">
+<img alt="cartpole" src="../_images/cartpole1.gif" />
+<p class="caption"><span class="caption-text">cartpole</span></p>
+</div>
+<p>에이전트가 현재 환경 상태를 관찰하고 행동을 선택하면
+환경이 새로운 상태로 <em>전환</em> 되고 작업의 결과를 나타내는 보상도 반환됩니다.
+이 태스크에서는 막대가 지나치게 떨어지면 환경이 종료됩니다.</p>
+<p>카트폴 태스크는 에이전트에 대한 입력이 환경 상태(위치, 속도 등)를 나타내는
+4개의 실제 값이 되도록 설계되었습니다. 그러나 신경망은 순수하게 그 장면을 보고
+태스크를 해결할 수 있습니다 따라서 카트 중심의 화면 패치를 입력으로 사용합니다.
+이 때문에 우리의 결과는 공식 순위표의 결과와 직접적으로 비교할 수 없습니다.
+우리의 태스크는 훨씬 더 어렵습니다.
+불행히도 모든 프레임을 렌더링해야되므로 이것은 학습 속도를 늦추게됩니다.</p>
+<p>엄밀히 말하면, 현재 스크린 패치와 이전 스크린 패치 사이의 차이로 상태를 표시 할 것입니다.
+이렇게하면 에이전트가 막대의 속도를 한 이미지에서 고려할 수 있습니다.</p>
+<p><strong>패키지</strong></p>
+<p>먼저 필요한 패키지를 가져옵니다. 첫째, 환경을 위해
+<a class="reference external" href="https://gym.openai.com/docs">gym</a> 이 필요합니다.
+(<cite>pip install gym</cite> 을 사용하여 설치하십시오).
+또한 PyTorch에서 다음을 사용합니다:</p>
+<ul class="simple">
+<li>신경망 (<code class="docutils literal notranslate"><span class="pre">torch.nn</span></code>)</li>
+<li>최적화 (<code class="docutils literal notranslate"><span class="pre">torch.optim</span></code>)</li>
+<li>자동 미분 (<code class="docutils literal notranslate"><span class="pre">torch.autograd</span></code>)</li>
+<li>시각 태스크를 위한 유틸리티들 (<code class="docutils literal notranslate"><span class="pre">torchvision</span></code> - <a class="reference external" href="https://github.com/pytorch/vision">a separate
+package</a>).</li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">gym</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">count</span>
+<span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
+
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">torch.nn</span> <span class="kn">as</span> <span class="nn">nn</span>
+<span class="kn">import</span> <span class="nn">torch.optim</span> <span class="kn">as</span> <span class="nn">optim</span>
+<span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="kn">as</span> <span class="nn">F</span>
+<span class="kn">import</span> <span class="nn">torchvision.transforms</span> <span class="kn">as</span> <span class="nn">T</span>
+
+
+<span class="n">env</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s1">&#39;CartPole-v0&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">unwrapped</span>
+
+<span class="c1"># matplotlib 설정</span>
+<span class="n">is_ipython</span> <span class="o">=</span> <span class="s1">&#39;inline&#39;</span> <span class="ow">in</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">get_backend</span><span class="p">()</span>
+<span class="k">if</span> <span class="n">is_ipython</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">IPython</span> <span class="kn">import</span> <span class="n">display</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">ion</span><span class="p">()</span>
+
+<span class="c1"># GPU를 사용할 경우</span>
+<span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="section" id="replay-memory">
+<h2>재현 메모리(Replay Memory)<a class="headerlink" href="#replay-memory" title="Permalink to this headline">¶</a></h2>
+<p>우리는 DQN 학습을 위해 경험 재현 메모리를 사용할 것입니다.
+에이전트가 관찰한 전환(transition)을 저장해고 나중에 이 데이터를
+재사용 할 수 있습니다. 무작위로 샘플링하면 배치를 구성한는 전환들이
+비상관(decorrelated)하게 됩니다. 이것이 DQN 학습 절차를 크게 안정시키고
+향상시키는 것으로 나타났습니다.</p>
+<p>이를 위해서 두개의 클래스가 필요합니다:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">Transition</span></code> - 우리 환경에서 단일 전환을 나타내도록 명명된 튜플</li>
+<li><code class="docutils literal notranslate"><span class="pre">ReplayMemory</span></code> - 최근 관찰된 전이를 보관 유지하는 제한된 크기의 순환 버퍼.
+또한 학습을 위한 전환의 무작위 배치를 선택하기위한
+<code class="docutils literal notranslate"><span class="pre">.sample</span> <span class="pre">()</span></code> 메소드를 구현합니다.</li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">Transition</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;Transition&#39;</span><span class="p">,</span>
+                        <span class="p">(</span><span class="s1">&#39;state&#39;</span><span class="p">,</span> <span class="s1">&#39;action&#39;</span><span class="p">,</span> <span class="s1">&#39;next_state&#39;</span><span class="p">,</span> <span class="s1">&#39;reward&#39;</span><span class="p">))</span>
+
+
+<span class="k">class</span> <span class="nc">ReplayMemory</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">capacity</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">capacity</span> <span class="o">=</span> <span class="n">capacity</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">memory</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">def</span> <span class="nf">push</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;전환 저장&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">memory</span><span class="p">)</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">capacity</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">memory</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">memory</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">position</span><span class="p">]</span> <span class="o">=</span> <span class="n">Transition</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">position</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">capacity</span>
+
+    <span class="k">def</span> <span class="nf">sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">random</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">memory</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">memory</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>이제 모델을 정의합시다. 그러나 먼저 DQN이 무엇인지 간단히 요약해 보겠습니다.</p>
+</div>
+<div class="section" id="id2">
+<h2>DQN 알고리즘<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<p>우리의 환경은 결정론적이므로 여기에 제시된 모든 방정식은 단순화를 위해
+결정론적으로 공식화됩니다. 강화 학습 자료은 환경에서 확률론적 전환에
+대한 기대값(expectation)도 포함 할 것입니다.</p>
+<p>우리의 목표는 할인된 누적 보상 (discounted cumulative reward)을
+극대화하려는 정책(policy)을 학습하는 것입니다.
+<span class="math notranslate nohighlight">\(R_{t_0} = \sum_{t=t_0}^{\infty} \gamma^{t - t_0} r_t\)</span>, 여기서
+<span class="math notranslate nohighlight">\(R_{t_0}\)</span> 는 <em>반환(return)</em> 입니다. 할인 상수,
+<span class="math notranslate nohighlight">\(\gamma\)</span>, 는 <span class="math notranslate nohighlight">\(0\)</span> 과 <span class="math notranslate nohighlight">\(1\)</span> 의 상수이고 합계가
+수렴되도록 보장합니다. 에이전트에게 불확실한 먼 미래의 보상이
+가까운 미래의 것에 비해 덜 중요하게 만들고, 이것은 상당히 합리적입니다.</p>
+<p>Q-learning의 주요 아이디어는 만일 함수 <span class="math notranslate nohighlight">\(Q^*: State \times Action \rightarrow \mathbb{R}\)</span> 를
+가지고 있다면 반환이 어덯게 될지 알려줄 수 있고,
+만약 주어진 상태(state)에서 행동(action)을 한다면, 보상을 최대화하는
+정책을 쉽게 구축할 수 있습니다:</p>
+<div class="math notranslate nohighlight">
+\[\pi^*(s) = \arg\!\max_a \ Q^*(s, a)\]</div>
+<p>그러나 세계(world)에 관한 모든 것을 알지 못하기 때문에,
+<span class="math notranslate nohighlight">\(Q^*\)</span> 에 도달할 수 없습니다. 그러나 신경망은
+범용 함수 근사자(universal function approximator)이기 때문에
+간단하게 생성하고 <span class="math notranslate nohighlight">\(Q^*\)</span> 를 닮도록 학습 할 수 있습니다.</p>
+<p>학습 업데이트 규칙으로, 일부 정책을 위한 모든 <span class="math notranslate nohighlight">\(Q\)</span> 함수가
+Bellman 방정식을 준수한다는 사실을 사용할 것입니다:</p>
+<div class="math notranslate nohighlight">
+\[Q^{\pi}(s, a) = r + \gamma Q^{\pi}(s', \pi(s'))\]</div>
+<p>평등(equality)의 두 측면 사이의 차이는
+시간차 오류(temporal difference error), <span class="math notranslate nohighlight">\(\delta\)</span> 입니다.:</p>
+<div class="math notranslate nohighlight">
+\[\delta = Q(s, a) - (r + \gamma \max_a Q(s', a))\]</div>
+<p>오류를 최소화하기 위해서 <a class="reference external" href="https://en.wikipedia.org/wiki/Huber_loss">Huber
+loss</a> 를 사용합니다.
+Huber loss 는 오류가 작으면 평균 제곱 오차( mean squared error)와 같이
+동작하고 오류가 클 때는 평균 절대 오류와 유사합니다.
+- 이것은 <span class="math notranslate nohighlight">\(Q\)</span> 의 추정이 매우 혼란스러울 때 이상 값에 더 강건하게 합니다.
+재현 메모리에서 샘플링한 전환 배치 <span class="math notranslate nohighlight">\(B\)</span> 에서 이것을 계산합니다:</p>
+<div class="math notranslate nohighlight">
+\[\mathcal{L} = \frac{1}{|B|}\sum_{(s, a, s', r) \ \in \ B} \mathcal{L}(\delta)\]</div>
+<div class="math notranslate nohighlight">
+\[\begin{split}\text{where} \quad \mathcal{L}(\delta) = \begin{cases}
+  \frac{1}{2}{\delta^2}  &amp; \text{for } |\delta| \le 1, \\
+  |\delta| - \frac{1}{2} &amp; \text{otherwise.}
+\end{cases}\end{split}\]</div>
+<div class="section" id="q">
+<h3>Q-네트워크<a class="headerlink" href="#q" title="Permalink to this headline">¶</a></h3>
+<p>우리 모델은 현재와 이전 스크린 패치의 차이를 취하는
+CNN(convolutional neural network) 입니다. 두가지 출력 <span class="math notranslate nohighlight">\(Q(s, \mathrm{left})\)</span> 와
+<span class="math notranslate nohighlight">\(Q(s, \mathrm{right})\)</span> 가 있습니다. (여기서 <span class="math notranslate nohighlight">\(s\)</span> 는 네트워크의 입력입니다)
+결과적으로 네트워크는 주어진 현재 입력에서 각 행동의 <em>품질</em> 을 예측하려고 합니다.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">DQN</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">DQN</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conv1</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bn1</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">BatchNorm2d</span><span class="p">(</span><span class="mi">16</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conv2</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bn2</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">BatchNorm2d</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conv3</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="mi">32</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bn3</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">BatchNorm2d</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">head</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">448</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bn1</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conv1</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bn2</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conv2</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bn3</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conv3</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id3">
+<h3>입력 추출<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<p>아래 코드는 환경에서 렌더링 된 이미지를 추출하고 처리하는 유틸리티입니다.
+이미지 변환을 쉽게 구성 할 수 있는 <code class="docutils literal notranslate"><span class="pre">torchvision</span></code> 패키지를 사용합니다.
+셀(cell)을 실행하면 추출한 예제 패치가 표시됩니다.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">resize</span> <span class="o">=</span> <span class="n">T</span><span class="o">.</span><span class="n">Compose</span><span class="p">([</span><span class="n">T</span><span class="o">.</span><span class="n">ToPILImage</span><span class="p">(),</span>
+                    <span class="n">T</span><span class="o">.</span><span class="n">Resize</span><span class="p">(</span><span class="mi">40</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="n">Image</span><span class="o">.</span><span class="n">CUBIC</span><span class="p">),</span>
+                    <span class="n">T</span><span class="o">.</span><span class="n">ToTensor</span><span class="p">()])</span>
+
+<span class="c1"># 이것은 gym 코드를 기반으로 합니다.</span>
+<span class="n">screen_width</span> <span class="o">=</span> <span class="mi">600</span>
+
+
+<span class="k">def</span> <span class="nf">get_cart_location</span><span class="p">():</span>
+    <span class="n">world_width</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">x_threshold</span> <span class="o">*</span> <span class="mi">2</span>
+    <span class="n">scale</span> <span class="o">=</span> <span class="n">screen_width</span> <span class="o">/</span> <span class="n">world_width</span>
+    <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">env</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">scale</span> <span class="o">+</span> <span class="n">screen_width</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">)</span>  <span class="c1"># 카트의 중간</span>
+
+
+<span class="k">def</span> <span class="nf">get_screen</span><span class="p">():</span>
+    <span class="n">screen</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s1">&#39;rgb_array&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span>
+        <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>  <span class="c1"># transpose into torch order (CHW)</span>
+    <span class="c1"># Strip off the top and bottom of the screen</span>
+    <span class="n">screen</span> <span class="o">=</span> <span class="n">screen</span><span class="p">[:,</span> <span class="mi">160</span><span class="p">:</span><span class="mi">320</span><span class="p">]</span>
+    <span class="n">view_width</span> <span class="o">=</span> <span class="mi">320</span>
+    <span class="n">cart_location</span> <span class="o">=</span> <span class="n">get_cart_location</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">cart_location</span> <span class="o">&lt;</span> <span class="n">view_width</span> <span class="o">//</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">slice_range</span> <span class="o">=</span> <span class="nb">slice</span><span class="p">(</span><span class="n">view_width</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">cart_location</span> <span class="o">&gt;</span> <span class="p">(</span><span class="n">screen_width</span> <span class="o">-</span> <span class="n">view_width</span> <span class="o">//</span> <span class="mi">2</span><span class="p">):</span>
+        <span class="n">slice_range</span> <span class="o">=</span> <span class="nb">slice</span><span class="p">(</span><span class="o">-</span><span class="n">view_width</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">slice_range</span> <span class="o">=</span> <span class="nb">slice</span><span class="p">(</span><span class="n">cart_location</span> <span class="o">-</span> <span class="n">view_width</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span>
+                            <span class="n">cart_location</span> <span class="o">+</span> <span class="n">view_width</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="c1"># Strip off the edges, so that we have a square image centered on a cart</span>
+    <span class="n">screen</span> <span class="o">=</span> <span class="n">screen</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">slice_range</span><span class="p">]</span>
+    <span class="c1"># Convert to float, rescare, convert to torch tensor</span>
+    <span class="c1"># (this doesn&#39;t require a copy)</span>
+    <span class="n">screen</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ascontiguousarray</span><span class="p">(</span><span class="n">screen</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span> <span class="o">/</span> <span class="mi">255</span>
+    <span class="n">screen</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">screen</span><span class="p">)</span>
+    <span class="c1"># Resize, and add a batch dimension (BCHW)</span>
+    <span class="k">return</span> <span class="n">resize</span><span class="p">(</span><span class="n">screen</span><span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+
+
+<span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">get_screen</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span>
+           <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Example extracted screen&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="id4">
+<h2>학습<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id5">
+<h3>하이퍼 파라미터와 유틸리티<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
+<p>이 셀은 모델과 최적화기를 인스턴스화하고 일부 유틸리티를 정의합니다:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">select_action</span></code> - Epsilon Greedy 정책에 따라 행동을 선택합니다.
+간단히 말해서, 가끔 모델을 사용하여 행동을 선택하고 때로는 단지 하나를
+균일하게 샘플링 할 것입니다. 임의의 액션을 선택할 확률은
+<code class="docutils literal notranslate"><span class="pre">EPS_START</span></code> 에서 시작해서 <code class="docutils literal notranslate"><span class="pre">EPS_END</span></code> 를 향해 지수적으로 감소 할 것입니다.
+<a href="#id6"><span class="problematic" id="id7">``</span></a>EPS_DECAY``는 감쇠 속도를 제어합니다.</li>
+<li><code class="docutils literal notranslate"><span class="pre">plot_durations</span></code> - 지난 100개 에피소드의 평균(공식 평가에서 사용 된 수치)에 따른
+에피소드의 지속을 도표로 그리기 위한 헬퍼. 도표는 기본 훈련 루프가
+포함 된 셀 밑에 있으며, 매 에피소드마다 업데이트됩니다.</li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">BATCH_SIZE</span> <span class="o">=</span> <span class="mi">128</span>
+<span class="n">GAMMA</span> <span class="o">=</span> <span class="mf">0.999</span>
+<span class="n">EPS_START</span> <span class="o">=</span> <span class="mf">0.9</span>
+<span class="n">EPS_END</span> <span class="o">=</span> <span class="mf">0.05</span>
+<span class="n">EPS_DECAY</span> <span class="o">=</span> <span class="mi">200</span>
+<span class="n">TARGET_UPDATE</span> <span class="o">=</span> <span class="mi">10</span>
+
+<span class="n">policy_net</span> <span class="o">=</span> <span class="n">DQN</span><span class="p">()</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+<span class="n">target_net</span> <span class="o">=</span> <span class="n">DQN</span><span class="p">()</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+<span class="n">target_net</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">policy_net</span><span class="o">.</span><span class="n">state_dict</span><span class="p">())</span>
+<span class="n">target_net</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+
+<span class="n">optimizer</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">RMSprop</span><span class="p">(</span><span class="n">policy_net</span><span class="o">.</span><span class="n">parameters</span><span class="p">())</span>
+<span class="n">memory</span> <span class="o">=</span> <span class="n">ReplayMemory</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span>
+
+
+<span class="n">steps_done</span> <span class="o">=</span> <span class="mi">0</span>
+
+
+<span class="k">def</span> <span class="nf">select_action</span><span class="p">(</span><span class="n">state</span><span class="p">):</span>
+    <span class="k">global</span> <span class="n">steps_done</span>
+    <span class="n">sample</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
+    <span class="n">eps_threshold</span> <span class="o">=</span> <span class="n">EPS_END</span> <span class="o">+</span> <span class="p">(</span><span class="n">EPS_START</span> <span class="o">-</span> <span class="n">EPS_END</span><span class="p">)</span> <span class="o">*</span> \
+        <span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mf">1.</span> <span class="o">*</span> <span class="n">steps_done</span> <span class="o">/</span> <span class="n">EPS_DECAY</span><span class="p">)</span>
+    <span class="n">steps_done</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">if</span> <span class="n">sample</span> <span class="o">&gt;</span> <span class="n">eps_threshold</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+            <span class="k">return</span> <span class="n">policy_net</span><span class="p">(</span><span class="n">state</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="mi">1</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([[</span><span class="n">random</span><span class="o">.</span><span class="n">randrange</span><span class="p">(</span><span class="mi">2</span><span class="p">)]],</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">long</span><span class="p">)</span>
+
+
+<span class="n">episode_durations</span> <span class="o">=</span> <span class="p">[]</span>
+
+
+<span class="k">def</span> <span class="nf">plot_durations</span><span class="p">():</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
+    <span class="n">durations_t</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">episode_durations</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Training...&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Episode&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Duration&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">durations_t</span><span class="o">.</span><span class="n">numpy</span><span class="p">())</span>
+    <span class="c1"># 100개의 에피소드 평균을 가져 와서 도표 그리기</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">durations_t</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">100</span><span class="p">:</span>
+        <span class="n">means</span> <span class="o">=</span> <span class="n">durations_t</span><span class="o">.</span><span class="n">unfold</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">means</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">99</span><span class="p">),</span> <span class="n">means</span><span class="p">))</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">means</span><span class="o">.</span><span class="n">numpy</span><span class="p">())</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">pause</span><span class="p">(</span><span class="mf">0.001</span><span class="p">)</span>  <span class="c1"># 도표가 업데이트되도록 잠시 멈춤</span>
+    <span class="k">if</span> <span class="n">is_ipython</span><span class="p">:</span>
+        <span class="n">display</span><span class="o">.</span><span class="n">clear_output</span><span class="p">(</span><span class="n">wait</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="n">display</span><span class="o">.</span><span class="n">display</span><span class="p">(</span><span class="n">plt</span><span class="o">.</span><span class="n">gcf</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id8">
+<h3>학습 루프<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
+<p>최종적으로 모델 학습을 위한 코드.</p>
+<p>여기서, 최적화의 한 단계를 수행하는 <code class="docutils literal notranslate"><span class="pre">optimize_model</span></code> 함수를 찾을 수 있습니다.
+먼저 배치 하나를 샘플링하고 모든 Tensor를 하나로 연결하고
+<span class="math notranslate nohighlight">\(Q(s_t, a_t)\)</span> 와  <span class="math notranslate nohighlight">\(V(s_{t+1}) = \max_a Q(s_{t+1}, a)\)</span> 를 계산하고
+그것들을 손실로 합칩니다. 우리가 설정한 정의를 따르면 만약 <span class="math notranslate nohighlight">\(s\)</span> 가
+마지막 상태라면 <span class="math notranslate nohighlight">\(V(s) = 0\)</span> 이다.
+또한 안정성 추가 위한 <span class="math notranslate nohighlight">\(V(s_{t+1})\)</span> 계산을 위해 목표 네트워크를 사용합니다.
+목표 네트워크는 대부분의 시간 동결 상태로 유지되지만, 가끔 정책
+네트워크의 가중치로 업데이트됩니다.
+이것은 대개 설정한 스텝 숫자이지만 단순화를 위해 에피소드를 사용합니다.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">optimize_model</span><span class="p">():</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">memory</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">BATCH_SIZE</span><span class="p">:</span>
+        <span class="k">return</span>
+    <span class="n">transitions</span> <span class="o">=</span> <span class="n">memory</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">BATCH_SIZE</span><span class="p">)</span>
+    <span class="c1"># Transpose the batch (자세한 설명을 위해 http://stackoverflow.com/a/19343/3343043 를 보십시오).</span>
+    <span class="n">batch</span> <span class="o">=</span> <span class="n">Transition</span><span class="p">(</span><span class="o">*</span><span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">transitions</span><span class="p">))</span>
+
+    <span class="c1"># 최종 상태가 아닌 마스크를 계산하고 배치 요소를 연결합니다.</span>
+    <span class="n">non_final_mask</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">s</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">,</span>
+                                          <span class="n">batch</span><span class="o">.</span><span class="n">next_state</span><span class="p">)),</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+    <span class="n">non_final_next_states</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">batch</span><span class="o">.</span><span class="n">next_state</span>
+                                                <span class="k">if</span> <span class="n">s</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">])</span>
+    <span class="n">state_batch</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">batch</span><span class="o">.</span><span class="n">state</span><span class="p">)</span>
+    <span class="n">action_batch</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">batch</span><span class="o">.</span><span class="n">action</span><span class="p">)</span>
+    <span class="n">reward_batch</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">batch</span><span class="o">.</span><span class="n">reward</span><span class="p">)</span>
+
+    <span class="c1"># Q(s_t, a) 계산 - 모델이 Q(s_t)를 계산하고, 취한 행동의 칼럼을 선택한다.</span>
+    <span class="n">state_action_values</span> <span class="o">=</span> <span class="n">policy_net</span><span class="p">(</span><span class="n">state_batch</span><span class="p">)</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">action_batch</span><span class="p">)</span>
+
+    <span class="c1"># 모든 다음 상태를 위한 V(s_{t+1}) 계산</span>
+    <span class="n">next_state_values</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">BATCH_SIZE</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">next_state_values</span><span class="p">[</span><span class="n">non_final_mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">target_net</span><span class="p">(</span><span class="n">non_final_next_states</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span>
+    <span class="c1"># 기대 Q 값 계산</span>
+    <span class="n">expected_state_action_values</span> <span class="o">=</span> <span class="p">(</span><span class="n">next_state_values</span> <span class="o">*</span> <span class="n">GAMMA</span><span class="p">)</span> <span class="o">+</span> <span class="n">reward_batch</span>
+
+    <span class="c1"># Huber 손실 계산</span>
+    <span class="n">loss</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">smooth_l1_loss</span><span class="p">(</span><span class="n">state_action_values</span><span class="p">,</span> <span class="n">expected_state_action_values</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+
+    <span class="c1"># 모델 최적화</span>
+    <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+    <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">policy_net</span><span class="o">.</span><span class="n">parameters</span><span class="p">():</span>
+        <span class="n">param</span><span class="o">.</span><span class="n">grad</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">clamp_</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>아래에서 주요 학습 루프를 찾을 수 있습니다. 처음으로 환경을
+재설정하고 <code class="docutils literal notranslate"><span class="pre">상태</span></code> Tensor를 초기화합니다. 그런 다음 행동을
+샘플링하고, 그것을 실행하고, 다음 화면과 보상(항상 1)을 관찰하고,
+모델을 한 번 최적화합니다. 에피소드가 끝나면 (모델이 실패)
+루프를 다시 시작합니다.</p>
+<p>아래에서 <cite>num_episodes</cite> 는 작게 설정됩니다. 노트북을 다운받고
+더많은 에피소드를 실행해 보십시오</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">num_episodes</span> <span class="o">=</span> <span class="mi">50</span>
+<span class="k">for</span> <span class="n">i_episode</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_episodes</span><span class="p">):</span>
+    <span class="c1"># Initialize the environment and state</span>
+    <span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+    <span class="n">last_screen</span> <span class="o">=</span> <span class="n">get_screen</span><span class="p">()</span>
+    <span class="n">current_screen</span> <span class="o">=</span> <span class="n">get_screen</span><span class="p">()</span>
+    <span class="n">state</span> <span class="o">=</span> <span class="n">current_screen</span> <span class="o">-</span> <span class="n">last_screen</span>
+    <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">count</span><span class="p">():</span>
+        <span class="c1"># 행동 선택과 수행</span>
+        <span class="n">action</span> <span class="o">=</span> <span class="n">select_action</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">reward</span><span class="p">,</span> <span class="n">done</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">action</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
+        <span class="n">reward</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="n">reward</span><span class="p">],</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+
+        <span class="c1"># 새로운 상태 관찰</span>
+        <span class="n">last_screen</span> <span class="o">=</span> <span class="n">current_screen</span>
+        <span class="n">current_screen</span> <span class="o">=</span> <span class="n">get_screen</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">done</span><span class="p">:</span>
+            <span class="n">next_state</span> <span class="o">=</span> <span class="n">current_screen</span> <span class="o">-</span> <span class="n">last_screen</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">next_state</span> <span class="o">=</span> <span class="bp">None</span>
+
+        <span class="c1"># 메모리에 변이 저장</span>
+        <span class="n">memory</span><span class="o">.</span><span class="n">push</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">action</span><span class="p">,</span> <span class="n">next_state</span><span class="p">,</span> <span class="n">reward</span><span class="p">)</span>
+
+        <span class="c1"># 다음 상태로 이동</span>
+        <span class="n">state</span> <span class="o">=</span> <span class="n">next_state</span>
+
+        <span class="c1"># 최적화 한단계 수행(목표 네트워크에서)</span>
+        <span class="n">optimize_model</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">done</span><span class="p">:</span>
+            <span class="n">episode_durations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">t</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">plot_durations</span><span class="p">()</span>
+            <span class="k">break</span>
+    <span class="c1"># 목표 네트워크 업데이트</span>
+    <span class="k">if</span> <span class="n">i_episode</span> <span class="o">%</span> <span class="n">TARGET_UPDATE</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">target_net</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">policy_net</span><span class="o">.</span><span class="n">state_dict</span><span class="p">())</span>
+
+<span class="k">print</span><span class="p">(</span><span class="s1">&#39;Complete&#39;</span><span class="p">)</span>
+<span class="n">env</span><span class="o">.</span><span class="n">render</span><span class="p">()</span>
+<span class="n">env</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ioff</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<p><strong>Total running time of the script:</strong> ( 0 minutes  0.000 seconds)</p>
+<div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-intermediate-reinforcement-q-learning-py">
+<div class="sphx-glr-download docutils container">
+<a class="reference download internal" download="" href="../_downloads/74370154f4e2d542eeb3cbca7c60a46b/reinforcement_q_learning.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">reinforcement_q_learning.py</span></code></a></div>
+<div class="sphx-glr-download docutils container">
+<a class="reference download internal" download="" href="../_downloads/2a35810a6a16bed2d506ddf6fa518bac/reinforcement_q_learning.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">reinforcement_q_learning.ipynb</span></code></a></div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
+</div>
+</div>
+</div>
+
+
+             </article>
+             
+            </div>
+            <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="dist_tuto.html" class="btn btn-neutral float-right" title="Pytorch로 분산 어플리케이션 개발하기" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
+      
+      
+        <a href="seq2seq_translation_tutorial.html" class="btn btn-neutral" title="Sequence to Sequence 네트워크와 Attention을 이용한 번역" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, PyTorch.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+          </div>
+        </div>
+
+        <div class="pytorch-content-right" id="pytorch-content-right">
+          <div class="pytorch-right-menu" id="pytorch-right-menu">
+            <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
+              <ul>
+<li><a class="reference internal" href="#">강화 학습 (DQN) 튜토리얼</a><ul>
+<li><a class="reference internal" href="#replay-memory">재현 메모리(Replay Memory)</a></li>
+<li><a class="reference internal" href="#id2">DQN 알고리즘</a><ul>
+<li><a class="reference internal" href="#q">Q-네트워크</a></li>
+<li><a class="reference internal" href="#id3">입력 추출</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id4">학습</a><ul>
+<li><a class="reference internal" href="#id5">하이퍼 파라미터와 유틸리티</a></li>
+<li><a class="reference internal" href="#id8">학습 루프</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'0.4.1',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="../_static/language_data.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  <script type="text/javascript" src="../_static/js/vendor/popper.min.js"></script>
+  <script type="text/javascript" src="../_static/js/vendor/bootstrap.min.js"></script>
+  <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+ 
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-71919972-3', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+
+  <!-- Begin Footer -->
+
+  <div class="container-fluid docs-tutorials-resources" id="docs-tutorials-resources">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4 text-center">
+          <h2>Docs</h2>
+          <p>Lorem ipsum dolor sit amet, consectetur</p>
+          <a class="with-right-arrow" href="https://pytorch.org/docs/stable/index.html">View Docs</a>
+        </div>
+
+        <div class="col-md-4 text-center">
+          <h2>Tutorials</h2>
+          <p>Lorem ipsum dolor sit amet, consectetur</p>
+          <a class="with-right-arrow" href="https://pytorch.org/tutorials">View Tutorials</a>
+        </div>
+
+        <div class="col-md-4 text-center">
+          <h2>Resources</h2>
+          <p>Lorem ipsum dolor sit amet, consectetur</p>
+          <a class="with-right-arrow" href="https://shiftlab.github.io/pytorch/resources">View Resources</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container footer-container">
+      <div class="footer-logo-wrapper">
+        <a href="https://shiftlab.github.io/pytorch/" class="footer-logo"></a>
+      </div>
+
+      <div class="footer-links-wrapper">
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title"><a href="https://shiftlab.github.io/pytorch/">PyTorch</a></li>
+            <li><a href="https://shiftlab.github.io/pytorch/get-started">Get Started</a></li>
+            <li><a href="https://shiftlab.github.io/pytorch/features">Features</a></li>
+            <li><a href="https://shiftlab.github.io/pytorch/ecosystem">Ecosystem</a></li>
+            <li><a href="https://shiftlab.github.io/pytorch/blog/">Blog</a></li>
+            <li><a href="https://shiftlab.github.io/pytorch/resources">Resources</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title"><a href="https://shiftlab.github.io/pytorch/support">Support</a></li>
+            <li><a href="https://pytorch.org/tutorials">Tutorials</a></li>
+            <li><a href="https://pytorch.org/docs/stable/index.html">Docs</a></li>
+            <li><a href="https://discuss.pytorch.org" target="_blank">Discuss</a></li>
+            <li><a href="https://github.com/pytorch/pytorch/issues" target="_blank">Github Issues</a></li>
+            <li><a href="https://pytorch.slack.com" target="_blank">Slack</a></li>
+            <li><a href="https://github.com/pytorch/pytorch/blob/master/CONTRIBUTING.md" target="_blank">Contributing</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links-col follow-us-col">
+          <ul>
+            <li class="list-title">Follow Us</li>
+            <li>
+              <div id="mc_embed_signup">
+                <form
+                  action="https://twitter.us14.list-manage.com/subscribe/post?u=75419c71fe0a935e53dfa4a3f&id=91d0dccd39"
+                  method="post"
+                  id="mc-embedded-subscribe-form"
+                  name="mc-embedded-subscribe-form"
+                  class="email-subscribe-form validate"
+                  target="_blank"
+                  novalidate>
+                  <div id="mc_embed_signup_scroll" class="email-subscribe-form-fields-wrapper">
+                    <div class="mc-field-group">
+                      <label for="mce-EMAIL" style="display:none;">Email Address</label>
+                      <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="Email Address">
+                    </div>
+
+                    <div id="mce-responses" class="clear">
+                      <div class="response" id="mce-error-response" style="display:none"></div>
+                      <div class="response" id="mce-success-response" style="display:none"></div>
+                    </div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+
+                    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_75419c71fe0a935e53dfa4a3f_91d0dccd39" tabindex="-1" value=""></div>
+
+                    <div class="clear">
+                      <input type="submit" value="" name="subscribe" id="mc-embedded-subscribe" class="button email-subscribe-button">
+                    </div>
+                  </div>
+                </form>
+              </div>
+
+            </li>
+          </ul>
+
+          <div class="footer-social-icons">
+            <a href="https://www.facebook.com/pytorch" target="_blank" class="facebook"></a>
+            <a href="https://twitter.com/pytorch" target="_blank" class="twitter"></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- End Footer -->
+
+  <!-- Begin Mobile Menu -->
+
+  <div class="mobile-main-menu">
+    <div class="container-fluid">
+      <div class="container">
+        <div class="mobile-main-menu-header-container">
+          <a class="header-logo" href="https://shiftlab.github.io/pytorch/" aria-label="PyTorch"></a>
+          <a class="main-menu-close-button" href="#" data-behavior="close-mobile-menu"></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="mobile-main-menu-links-container">
+      <div class="main-menu">
+        <ul>
+          <li>
+            <a href="#">Get Started</a>
+          </li>
+
+          <li>
+            <a href="#">Features</a>
+          </li>
+
+          <li>
+            <a href="#">Ecosystem</a>
+          </li>
+
+          <li>
+            <a href="https://shiftlab.github.io/pytorch/blog/">Blog</a>
+          </li>
+
+          <li class="active">
+            <a href="https://pytorch.org/tutorials">Tutorials</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/docs/stable/index.html">Docs</a>
+          </li>
+
+          <li>
+            <a href="https://shiftlab.github.io/pytorch/resources">Resources</a>
+          </li>
+
+          <li>
+            <a href="https://github.com/pytorch/pytorch">Github</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- End Mobile Menu -->
+
+  <script type="text/javascript" src="../_static/js/vendor/anchor.min.js"></script>
+
+  <script type="text/javascript">
+    mobileMenu.bind();
+    mobileTOC.bind();
+    pytorchAnchors.bind();
+
+    $(window).on("load", function() {
+      sideMenus.bind();
+      scrollToAnchor.bind();
+      highlightNavigation.bind();
+    })
+
+    // Add class to links that have code blocks, since we cannot create links in code blocks
+    $("article.pytorch-article a span.pre").each(function(e) {
+      $(this).closest("a").addClass("has-code");
+    });
+  </script>
+</body>
+</html>

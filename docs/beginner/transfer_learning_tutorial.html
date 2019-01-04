@@ -1,0 +1,1096 @@
+
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>전이학습(Transfer Learning) 튜토리얼 &mdash; PyTorch Tutorials 0.4.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!-- <link rel="stylesheet" href="../_static/pygments.css" type="text/css" /> -->
+  <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Data Loading and Processing Tutorial" href="data_loading_tutorial.html" />
+    <link rel="prev" title="PyTorch: 제어 흐름(Control Flow) + 가중치 공유(Weight Sharing)" href="examples_nn/dynamic_net.html" /> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+</head>
+
+<div class="container-fluid header-holder tutorials-header" id="header-holder">
+  <div class="container">
+    <div class="header-container">
+      <a class="header-logo" href="https://shiftlab.github.io/pytorch/" aria-label="PyTorch"></a>
+
+      <div class="main-menu">
+        <ul>
+          <li>
+            <a href="https://shiftlab.github.io/pytorch/get-started">Get Started</a>
+          </li>
+
+          <li>
+            <a href="https://shiftlab.github.io/pytorch/features">Features</a>
+          </li>
+
+          <li>
+            <a href="https://shiftlab.github.io/pytorch/ecosystem">Ecosystem</a>
+          </li>
+
+          <li>
+            <a href="https://shiftlab.github.io/pytorch/blog/">Blog</a>
+          </li>
+
+          <li class="active">
+            <a href="https://pytorch.org/tutorials">Tutorials</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/docs/stable/index.html">Docs</a>
+          </li>
+
+          <li>
+            <a href="https://shiftlab.github.io/pytorch/resources">Resources</a>
+          </li>
+
+          <li>
+            <a href="https://github.com/pytorch/pytorch">Github</a>
+          </li>
+        </ul>
+      </div>
+
+      <a class="main-menu-open-button" href="#" data-behavior="open-mobile-menu"></a>
+    </div>
+
+  </div>
+</div>
+
+
+<body class="pytorch-body">
+
+   
+  <div>
+
+    
+
+    <div class="table-of-contents-link-wrapper">
+      <span>Table of Contents</span>
+      <a href="#" class="toggle-table-of-contents" data-behavior="toggle-table-of-contents"></a>
+    </div>
+
+    <nav data-toggle="wy-nav-shift" class="pytorch-left-menu" id="pytorch-left-menu">
+      <div class="pytorch-side-scroll">
+        <div class="pytorch-menu pytorch-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          <div class="pytorch-left-menu-search">
+            
+
+            
+              
+              
+                <div class="version">
+                  0.4.1
+                </div>
+              
+            
+
+            
+
+
+  
+
+
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search Tutorials" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+            
+          </div>
+
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Beginner Tutorials</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="deep_learning_60min_blitz.html">PyTorch로 딥러닝하기: 60분만에 끝장내기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="former_torchies_tutorial.html">Torch 사용자를 위한 PyTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pytorch_with_examples.html">예제로 배우는 PyTorch</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">전이학습(Transfer Learning) 튜토리얼</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_loading_tutorial.html">Data Loading and Processing Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="deep_learning_nlp_tutorial.html">Deep Learning for NLP with Pytorch</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Intermediate Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/char_rnn_classification_tutorial.html">문자-단위 RNN으로 이름 분류하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/char_rnn_generation_tutorial.html">문자-단위 RNN으로 이름 생성하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/seq2seq_translation_tutorial.html">Sequence to Sequence 네트워크와 Attention을 이용한 번역</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/reinforcement_q_learning.html">강화 학습 (DQN) 튜토리얼</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/dist_tuto.html">Pytorch로 분산 어플리케이션 개발하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/spatial_transformer_tutorial.html">공간 변형기 네트워크(Spatial Transformer Networks) 튜토리얼</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Advanced Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/neural_style_tutorial.html">PyTorch를 이용한 신경망-변환(Neural-Transfer)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/numpy_extensions_tutorial.html">Creating extensions using numpy and scipy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/super_resolution_with_caffe2.html">Transfering a model from PyTorch to Caffe2 and Mobile using ONNX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_extension.html">Custom C++ and CUDA Extensions</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <div class="pytorch-container">
+
+      <section data-toggle="wy-nav-shift" class="pytorch-content-wrap">
+        <div class="pytorch-page-level-bar" id="pytorch-page-level-bar">
+          <div class="pytorch-breadcrumbs-wrapper">
+            
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="pytorch-breadcrumbs">
+    
+      <li>
+        <a href="../index.html">
+          
+            Tutorials
+          
+        </a> &gt;
+      </li>
+
+        
+      <li>전이학습(Transfer Learning) 튜토리얼</li>
+    
+    
+      <li class="pytorch-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/beginner/transfer_learning_tutorial.rst.txt" rel="nofollow"><img src="../_static/images/view-page-source-icon.svg"></a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+</div>
+          </div>
+
+          <div class="pytorch-shortcuts-wrapper" id="pytorch-shortcuts-wrapper">
+            Shortcuts
+          </div>
+        </div>
+
+        <div class="pytorch-content-left">
+          
+          <div class="rst-content">
+          
+            <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
+             <article itemprop="articleBody" class="pytorch-article">
+              
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Click <a class="reference internal" href="#sphx-glr-download-beginner-transfer-learning-tutorial-py"><span class="std std-ref">here</span></a> to download the full example code</p>
+</div>
+<div class="sphx-glr-example-title section" id="transfer-learning">
+<span id="sphx-glr-beginner-transfer-learning-tutorial-py"></span><h1>전이학습(Transfer Learning) 튜토리얼<a class="headerlink" href="#transfer-learning" title="Permalink to this headline">¶</a></h1>
+<dl class="docutils">
+<dt><strong>Author</strong>: <a class="reference external" href="https://chsasank.github.io">Sasank Chilamkurthy</a></dt>
+<dd><strong>번역</strong>: <a class="reference external" href="http://github.com/9bow">박정환</a></dd>
+</dl>
+<p>이 튜토리얼에서는 전이학습(Transfer Learning)을 이용하여 신경망을 어떻게 학습시키는지
+배워보겠습니다. 전이학습에 대해서 더 알아보시려면
+<a class="reference external" href="http://cs231n.github.io/transfer-learning/">CS231n 노트</a> 를 읽어보시면 좋습니다.</p>
+<p>위 노트를 인용해보면,</p>
+<blockquote>
+<div>실제로 충분한 크기의 데이터셋을 갖추기는 상대적으로 드물기 때문에,
+(무작위 초기화를 통해) 바닥부터(from scratch) 전체 합성곱 신경망(Convolutional
+Network)를 학습하는 사람은 거의 없습니다. 대신, 매우 큰 데이터셋(예.
+100가지 분류(Category)에 대해 120만개의 이미지가 포함된 ImageNet)에서 합성곱
+신경망(ConvNet)을 미리 학습(Pretrain)한 후, 이 합성곱 신경망을 관심있는 작업
+(task of interest)을 위한 초기화(initialization) 또는 고정 특징 추출기(fixed
+feature extractor)로 사용합니다.</div></blockquote>
+<p>이러한 2가지의 주요한 전이학습 시나리오는 다음과 같습니다:</p>
+<ul class="simple">
+<li><strong>합성곱 신경망의 미세조정(Finetuning)</strong>: 무작위 초기화 대신, 신경망을
+ImageNet 1000 데이터셋 등으로 미리 학습한 신경망으로 초기화합니다. 학습의 나머지
+과정들은 평상시와 같습니다.</li>
+<li><strong>고정 특정 추출기로써의 합성곱 신경망</strong>: 여기서는 마지막의 완전히 연결
+(Fully-connected)된 계층을 제외한 모든 신경망의 가중치를 고정합니다. 이
+마지막의 완전히 연결된 계층은 새로운 무작위의 가중치를 갖는 계층으로 대체되어
+이 계층만 학습합니다.</li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># License: BSD</span>
+<span class="c1"># Author: Sasank Chilamkurthy</span>
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">division</span>
+
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">torch.nn</span> <span class="kn">as</span> <span class="nn">nn</span>
+<span class="kn">import</span> <span class="nn">torch.optim</span> <span class="kn">as</span> <span class="nn">optim</span>
+<span class="kn">from</span> <span class="nn">torch.optim</span> <span class="kn">import</span> <span class="n">lr_scheduler</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">torchvision</span>
+<span class="kn">from</span> <span class="nn">torchvision</span> <span class="kn">import</span> <span class="n">datasets</span><span class="p">,</span> <span class="n">models</span><span class="p">,</span> <span class="n">transforms</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">ion</span><span class="p">()</span>   <span class="c1"># interactive mode</span>
+</pre></div>
+</div>
+<div class="section" id="id2">
+<h2>데이터 불러오기<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<p>데이터를 불러오기 위해 torchvision과 torch.utils.data 패키지를 사용하겠습니다.</p>
+<p>오늘 풀고자 하는 문제는 <strong>개미</strong> 와 <strong>벌</strong> 을 분류하는 모델을 학습하는 것입니다.
+각각의 분류에는 75개의 검증용 이미지(validation image)가 있습니다. 일반적으로,
+만약 바닥부터 학습을 한다면, 이는 일반화하기에는 아주 작은 데이터셋입니다.
+하지만 전이학습을 사용할 것이므로, 합리적으로 잘 일반화해 할 수 있습니다.</p>
+<p>이 데이터셋은 ImageNet의 아주 작은 부분(Subset)입니다.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">데이터를 <a class="reference external" href="https://download.pytorch.org/tutorial/hymenoptera_data.zip">여기</a>
+에서 다운로드 받아 현재 디렉토리에 압축을 푸십시오.</p>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 학습을 위한 데이터 증가(Augmentation)와 일반화하기</span>
+<span class="c1"># 단지 검증을 위한 일반화하기</span>
+<span class="n">data_transforms</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;train&#39;</span><span class="p">:</span> <span class="n">transforms</span><span class="o">.</span><span class="n">Compose</span><span class="p">([</span>
+        <span class="n">transforms</span><span class="o">.</span><span class="n">RandomResizedCrop</span><span class="p">(</span><span class="mi">224</span><span class="p">),</span>
+        <span class="n">transforms</span><span class="o">.</span><span class="n">RandomHorizontalFlip</span><span class="p">(),</span>
+        <span class="n">transforms</span><span class="o">.</span><span class="n">ToTensor</span><span class="p">(),</span>
+        <span class="n">transforms</span><span class="o">.</span><span class="n">Normalize</span><span class="p">([</span><span class="mf">0.485</span><span class="p">,</span> <span class="mf">0.456</span><span class="p">,</span> <span class="mf">0.406</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.229</span><span class="p">,</span> <span class="mf">0.224</span><span class="p">,</span> <span class="mf">0.225</span><span class="p">])</span>
+    <span class="p">]),</span>
+    <span class="s1">&#39;val&#39;</span><span class="p">:</span> <span class="n">transforms</span><span class="o">.</span><span class="n">Compose</span><span class="p">([</span>
+        <span class="n">transforms</span><span class="o">.</span><span class="n">Resize</span><span class="p">(</span><span class="mi">256</span><span class="p">),</span>
+        <span class="n">transforms</span><span class="o">.</span><span class="n">CenterCrop</span><span class="p">(</span><span class="mi">224</span><span class="p">),</span>
+        <span class="n">transforms</span><span class="o">.</span><span class="n">ToTensor</span><span class="p">(),</span>
+        <span class="n">transforms</span><span class="o">.</span><span class="n">Normalize</span><span class="p">([</span><span class="mf">0.485</span><span class="p">,</span> <span class="mf">0.456</span><span class="p">,</span> <span class="mf">0.406</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.229</span><span class="p">,</span> <span class="mf">0.224</span><span class="p">,</span> <span class="mf">0.225</span><span class="p">])</span>
+    <span class="p">]),</span>
+<span class="p">}</span>
+
+<span class="n">data_dir</span> <span class="o">=</span> <span class="s1">&#39;hymenoptera_data&#39;</span>
+<span class="n">image_datasets</span> <span class="o">=</span> <span class="p">{</span><span class="n">x</span><span class="p">:</span> <span class="n">datasets</span><span class="o">.</span><span class="n">ImageFolder</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="n">x</span><span class="p">),</span>
+                                          <span class="n">data_transforms</span><span class="p">[</span><span class="n">x</span><span class="p">])</span>
+                  <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;train&#39;</span><span class="p">,</span> <span class="s1">&#39;val&#39;</span><span class="p">]}</span>
+<span class="n">dataloaders</span> <span class="o">=</span> <span class="p">{</span><span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="n">image_datasets</span><span class="p">[</span><span class="n">x</span><span class="p">],</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+                                             <span class="n">shuffle</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+              <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;train&#39;</span><span class="p">,</span> <span class="s1">&#39;val&#39;</span><span class="p">]}</span>
+<span class="n">dataset_sizes</span> <span class="o">=</span> <span class="p">{</span><span class="n">x</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">image_datasets</span><span class="p">[</span><span class="n">x</span><span class="p">])</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;train&#39;</span><span class="p">,</span> <span class="s1">&#39;val&#39;</span><span class="p">]}</span>
+<span class="n">class_names</span> <span class="o">=</span> <span class="n">image_datasets</span><span class="p">[</span><span class="s1">&#39;train&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">classes</span>
+
+<span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cuda:0&quot;</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="section" id="id4">
+<h3>일부 이미지 시각화하기<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<p>데이터 증가를 이해하기 위해 일부 학습용 이미지를 시각화해보겠습니다.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">imshow</span><span class="p">(</span><span class="n">inp</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Imshow for Tensor.&quot;&quot;&quot;</span>
+    <span class="n">inp</span> <span class="o">=</span> <span class="n">inp</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span><span class="o">.</span><span class="n">transpose</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+    <span class="n">mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.485</span><span class="p">,</span> <span class="mf">0.456</span><span class="p">,</span> <span class="mf">0.406</span><span class="p">])</span>
+    <span class="n">std</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.229</span><span class="p">,</span> <span class="mf">0.224</span><span class="p">,</span> <span class="mf">0.225</span><span class="p">])</span>
+    <span class="n">inp</span> <span class="o">=</span> <span class="n">std</span> <span class="o">*</span> <span class="n">inp</span> <span class="o">+</span> <span class="n">mean</span>
+    <span class="n">inp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">inp</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">inp</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">title</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">pause</span><span class="p">(</span><span class="mf">0.001</span><span class="p">)</span>  <span class="c1"># pause a bit so that plots are updated</span>
+
+
+<span class="c1"># Get a batch of training data</span>
+<span class="n">inputs</span><span class="p">,</span> <span class="n">classes</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">dataloaders</span><span class="p">[</span><span class="s1">&#39;train&#39;</span><span class="p">]))</span>
+
+<span class="c1"># Make a grid from batch</span>
+<span class="n">out</span> <span class="o">=</span> <span class="n">torchvision</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">make_grid</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
+
+<span class="n">imshow</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="n">class_names</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">classes</span><span class="p">])</span>
+</pre></div>
+</div>
+<img alt="../_images/sphx_glr_transfer_learning_tutorial_001.png" class="sphx-glr-single-img" src="../_images/sphx_glr_transfer_learning_tutorial_001.png" />
+</div>
+</div>
+<div class="section" id="id5">
+<h2>모델 학습하기<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h2>
+<p>이제 모델을 학습하기 위한 일반 함수를 작성해보겠습니다. 여기서는 다음 내용들을
+설명합니다:</p>
+<ul class="simple">
+<li>Learning Rate 관리(Scheduling)</li>
+<li>최적의 모델 구하기</li>
+</ul>
+<p>아래에서 <code class="docutils literal notranslate"><span class="pre">scheduler</span></code> 매개변수는 <code class="docutils literal notranslate"><span class="pre">torch.optim.lr_scheduler</span></code> 의 LR Scheduler
+객체(Object)입니다.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">train_model</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">criterion</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">scheduler</span><span class="p">,</span> <span class="n">num_epochs</span><span class="o">=</span><span class="mi">25</span><span class="p">):</span>
+    <span class="n">since</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+    <span class="n">best_model_wts</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">state_dict</span><span class="p">())</span>
+    <span class="n">best_acc</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+    <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_epochs</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Epoch {}/{}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">epoch</span><span class="p">,</span> <span class="n">num_epochs</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;-&#39;</span> <span class="o">*</span> <span class="mi">10</span><span class="p">)</span>
+
+        <span class="c1"># Each epoch has a training and validation phase</span>
+        <span class="k">for</span> <span class="n">phase</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;train&#39;</span><span class="p">,</span> <span class="s1">&#39;val&#39;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">phase</span> <span class="o">==</span> <span class="s1">&#39;train&#39;</span><span class="p">:</span>
+                <span class="n">scheduler</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+                <span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>  <span class="c1"># Set model to training mode</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>   <span class="c1"># Set model to evaluate mode</span>
+
+            <span class="n">running_loss</span> <span class="o">=</span> <span class="mf">0.0</span>
+            <span class="n">running_corrects</span> <span class="o">=</span> <span class="mi">0</span>
+
+            <span class="c1"># Iterate over data.</span>
+            <span class="k">for</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">labels</span> <span class="ow">in</span> <span class="n">dataloaders</span><span class="p">[</span><span class="n">phase</span><span class="p">]:</span>
+                <span class="n">inputs</span> <span class="o">=</span> <span class="n">inputs</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+                <span class="n">labels</span> <span class="o">=</span> <span class="n">labels</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+
+                <span class="c1"># zero the parameter gradients</span>
+                <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+
+                <span class="c1"># forward</span>
+                <span class="c1"># track history if only in train</span>
+                <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">set_grad_enabled</span><span class="p">(</span><span class="n">phase</span> <span class="o">==</span> <span class="s1">&#39;train&#39;</span><span class="p">):</span>
+                    <span class="n">outputs</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
+                    <span class="n">_</span><span class="p">,</span> <span class="n">preds</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                    <span class="n">loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
+
+                    <span class="c1"># backward + optimize only if in training phase</span>
+                    <span class="k">if</span> <span class="n">phase</span> <span class="o">==</span> <span class="s1">&#39;train&#39;</span><span class="p">:</span>
+                        <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+                        <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+
+                <span class="c1"># statistics</span>
+                <span class="n">running_loss</span> <span class="o">+=</span> <span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span> <span class="o">*</span> <span class="n">inputs</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                <span class="n">running_corrects</span> <span class="o">+=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">preds</span> <span class="o">==</span> <span class="n">labels</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+
+            <span class="n">epoch_loss</span> <span class="o">=</span> <span class="n">running_loss</span> <span class="o">/</span> <span class="n">dataset_sizes</span><span class="p">[</span><span class="n">phase</span><span class="p">]</span>
+            <span class="n">epoch_acc</span> <span class="o">=</span> <span class="n">running_corrects</span><span class="o">.</span><span class="n">double</span><span class="p">()</span> <span class="o">/</span> <span class="n">dataset_sizes</span><span class="p">[</span><span class="n">phase</span><span class="p">]</span>
+
+            <span class="k">print</span><span class="p">(</span><span class="s1">&#39;{} Loss: {:.4f} Acc: {:.4f}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">phase</span><span class="p">,</span> <span class="n">epoch_loss</span><span class="p">,</span> <span class="n">epoch_acc</span><span class="p">))</span>
+
+            <span class="c1"># deep copy the model</span>
+            <span class="k">if</span> <span class="n">phase</span> <span class="o">==</span> <span class="s1">&#39;val&#39;</span> <span class="ow">and</span> <span class="n">epoch_acc</span> <span class="o">&gt;</span> <span class="n">best_acc</span><span class="p">:</span>
+                <span class="n">best_acc</span> <span class="o">=</span> <span class="n">epoch_acc</span>
+                <span class="n">best_model_wts</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">state_dict</span><span class="p">())</span>
+
+        <span class="k">print</span><span class="p">()</span>
+
+    <span class="n">time_elapsed</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">since</span>
+    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Training complete in {:.0f}m {:.0f}s&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+        <span class="n">time_elapsed</span> <span class="o">//</span> <span class="mi">60</span><span class="p">,</span> <span class="n">time_elapsed</span> <span class="o">%</span> <span class="mi">60</span><span class="p">))</span>
+    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Best val Acc: {:4f}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">best_acc</span><span class="p">))</span>
+
+    <span class="c1"># load best model weights</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">best_model_wts</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">model</span>
+</pre></div>
+</div>
+<div class="section" id="id6">
+<h3>모델 예측값 시각화하기<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
+<p>일부 이미지에 대한 예측값을 보여주는 일반화된(Generic) 함수입니다.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">visualize_model</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">num_images</span><span class="o">=</span><span class="mi">6</span><span class="p">):</span>
+    <span class="n">was_training</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">training</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+    <span class="n">images_so_far</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+
+    <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">dataloaders</span><span class="p">[</span><span class="s1">&#39;val&#39;</span><span class="p">]):</span>
+            <span class="n">inputs</span> <span class="o">=</span> <span class="n">inputs</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+            <span class="n">labels</span> <span class="o">=</span> <span class="n">labels</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+
+            <span class="n">outputs</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">preds</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">inputs</span><span class="o">.</span><span class="n">size</span><span class="p">()[</span><span class="mi">0</span><span class="p">]):</span>
+                <span class="n">images_so_far</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="n">num_images</span><span class="o">//</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">images_so_far</span><span class="p">)</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;off&#39;</span><span class="p">)</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;predicted: {}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">class_names</span><span class="p">[</span><span class="n">preds</span><span class="p">[</span><span class="n">j</span><span class="p">]]))</span>
+                <span class="n">imshow</span><span class="p">(</span><span class="n">inputs</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+
+                <span class="k">if</span> <span class="n">images_so_far</span> <span class="o">==</span> <span class="n">num_images</span><span class="p">:</span>
+                    <span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="n">was_training</span><span class="p">)</span>
+                    <span class="k">return</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="n">was_training</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="finetuning">
+<h2>합성곱 신경망 미세조정(Finetuning)<a class="headerlink" href="#finetuning" title="Permalink to this headline">¶</a></h2>
+<p>미리 학습한 모델을 불러온 후 마지막의 완전히 연결된 계층을 재설정(reset)합니다.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model_ft</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">resnet18</span><span class="p">(</span><span class="n">pretrained</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">num_ftrs</span> <span class="o">=</span> <span class="n">model_ft</span><span class="o">.</span><span class="n">fc</span><span class="o">.</span><span class="n">in_features</span>
+<span class="n">model_ft</span><span class="o">.</span><span class="n">fc</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">num_ftrs</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+<span class="n">model_ft</span> <span class="o">=</span> <span class="n">model_ft</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+
+<span class="n">criterion</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">CrossEntropyLoss</span><span class="p">()</span>
+
+<span class="c1"># Observe that all parameters are being optimized</span>
+<span class="n">optimizer_ft</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">SGD</span><span class="p">(</span><span class="n">model_ft</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span> <span class="n">momentum</span><span class="o">=</span><span class="mf">0.9</span><span class="p">)</span>
+
+<span class="c1"># Decay LR by a factor of 0.1 every 7 epochs</span>
+<span class="n">exp_lr_scheduler</span> <span class="o">=</span> <span class="n">lr_scheduler</span><span class="o">.</span><span class="n">StepLR</span><span class="p">(</span><span class="n">optimizer_ft</span><span class="p">,</span> <span class="n">step_size</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">gamma</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="section" id="id7">
+<h3>학습 및 평가하기<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
+<p>CPU에서 15-25분 가량 소요될 것입니다. 그래도 GPU에서는 1분도 걸리지 않습니다.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model_ft</span> <span class="o">=</span> <span class="n">train_model</span><span class="p">(</span><span class="n">model_ft</span><span class="p">,</span> <span class="n">criterion</span><span class="p">,</span> <span class="n">optimizer_ft</span><span class="p">,</span> <span class="n">exp_lr_scheduler</span><span class="p">,</span>
+                       <span class="n">num_epochs</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Epoch 0/24
+----------
+train Loss: 0.4893 Acc: 0.7377
+val Loss: 0.1857 Acc: 0.9477
+
+Epoch 1/24
+----------
+train Loss: 0.4109 Acc: 0.8238
+val Loss: 0.2454 Acc: 0.9216
+
+Epoch 2/24
+----------
+train Loss: 0.5519 Acc: 0.7869
+val Loss: 0.4978 Acc: 0.8235
+
+Epoch 3/24
+----------
+train Loss: 0.4729 Acc: 0.8443
+val Loss: 0.3013 Acc: 0.8954
+
+Epoch 4/24
+----------
+train Loss: 0.7289 Acc: 0.7172
+val Loss: 0.3534 Acc: 0.8431
+
+Epoch 5/24
+----------
+train Loss: 0.4799 Acc: 0.8197
+val Loss: 0.3386 Acc: 0.8366
+
+Epoch 6/24
+----------
+train Loss: 0.3612 Acc: 0.8730
+val Loss: 0.2977 Acc: 0.9281
+
+Epoch 7/24
+----------
+train Loss: 0.3399 Acc: 0.8607
+val Loss: 0.3046 Acc: 0.9085
+
+Epoch 8/24
+----------
+train Loss: 0.3575 Acc: 0.8566
+val Loss: 0.2909 Acc: 0.9085
+
+Epoch 9/24
+----------
+train Loss: 0.3762 Acc: 0.8443
+val Loss: 0.2894 Acc: 0.9150
+
+Epoch 10/24
+----------
+train Loss: 0.3283 Acc: 0.8730
+val Loss: 0.2640 Acc: 0.9085
+
+Epoch 11/24
+----------
+train Loss: 0.2567 Acc: 0.9016
+val Loss: 0.2694 Acc: 0.9150
+
+Epoch 12/24
+----------
+train Loss: 0.2759 Acc: 0.8811
+val Loss: 0.2720 Acc: 0.9150
+
+Epoch 13/24
+----------
+train Loss: 0.3445 Acc: 0.8361
+val Loss: 0.3459 Acc: 0.8954
+
+Epoch 14/24
+----------
+train Loss: 0.3258 Acc: 0.8484
+val Loss: 0.2672 Acc: 0.9216
+
+Epoch 15/24
+----------
+train Loss: 0.2483 Acc: 0.8852
+val Loss: 0.2585 Acc: 0.9281
+
+Epoch 16/24
+----------
+train Loss: 0.2832 Acc: 0.8770
+val Loss: 0.2579 Acc: 0.9216
+
+Epoch 17/24
+----------
+train Loss: 0.3363 Acc: 0.8525
+val Loss: 0.2593 Acc: 0.9216
+
+Epoch 18/24
+----------
+train Loss: 0.2375 Acc: 0.9098
+val Loss: 0.2697 Acc: 0.9216
+
+Epoch 19/24
+----------
+train Loss: 0.3749 Acc: 0.8279
+val Loss: 0.2581 Acc: 0.9216
+
+Epoch 20/24
+----------
+train Loss: 0.2744 Acc: 0.8975
+val Loss: 0.2379 Acc: 0.9281
+
+Epoch 21/24
+----------
+train Loss: 0.2352 Acc: 0.9098
+val Loss: 0.2436 Acc: 0.9281
+
+Epoch 22/24
+----------
+train Loss: 0.3086 Acc: 0.8934
+val Loss: 0.2520 Acc: 0.9346
+
+Epoch 23/24
+----------
+train Loss: 0.2167 Acc: 0.9098
+val Loss: 0.2438 Acc: 0.9216
+
+Epoch 24/24
+----------
+train Loss: 0.3008 Acc: 0.8566
+val Loss: 0.2830 Acc: 0.9150
+
+Training complete in 1m 51s
+Best val Acc: 0.947712
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">visualize_model</span><span class="p">(</span><span class="n">model_ft</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../_images/sphx_glr_transfer_learning_tutorial_002.png" class="sphx-glr-single-img" src="../_images/sphx_glr_transfer_learning_tutorial_002.png" />
+</div>
+</div>
+<div class="section" id="id8">
+<h2>고정 특정 추출기로써의 합성곱 신경망<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h2>
+<p>이제, 마지막 계층을 제외한 모든 신경망을 고정(freeze)할 필요가 있습니다.
+<code class="docutils literal notranslate"><span class="pre">requires_grad</span> <span class="pre">==</span> <span class="pre">False</span></code> 를 설정하여 매개변수를 고정하여 <code class="docutils literal notranslate"><span class="pre">backward()</span></code> 에서
+경사도(gradient)가 계산되지 않도록 해야합니다.</p>
+<p>이 부분에 대한 문서는
+<a class="reference external" href="http://pytorch.org/docs/notes/autograd.html#excluding-subgraphs-from-backward">여기</a>
+에서 확인할 수 있습니다.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model_conv</span> <span class="o">=</span> <span class="n">torchvision</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">resnet18</span><span class="p">(</span><span class="n">pretrained</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">model_conv</span><span class="o">.</span><span class="n">parameters</span><span class="p">():</span>
+    <span class="n">param</span><span class="o">.</span><span class="n">requires_grad</span> <span class="o">=</span> <span class="bp">False</span>
+
+<span class="c1"># Parameters of newly constructed modules have requires_grad=True by default</span>
+<span class="n">num_ftrs</span> <span class="o">=</span> <span class="n">model_conv</span><span class="o">.</span><span class="n">fc</span><span class="o">.</span><span class="n">in_features</span>
+<span class="n">model_conv</span><span class="o">.</span><span class="n">fc</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">num_ftrs</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+<span class="n">model_conv</span> <span class="o">=</span> <span class="n">model_conv</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+
+<span class="n">criterion</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">CrossEntropyLoss</span><span class="p">()</span>
+
+<span class="c1"># Observe that only parameters of final layer are being optimized as</span>
+<span class="c1"># opoosed to before.</span>
+<span class="n">optimizer_conv</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">SGD</span><span class="p">(</span><span class="n">model_conv</span><span class="o">.</span><span class="n">fc</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span> <span class="n">momentum</span><span class="o">=</span><span class="mf">0.9</span><span class="p">)</span>
+
+<span class="c1"># Decay LR by a factor of 0.1 every 7 epochs</span>
+<span class="n">exp_lr_scheduler</span> <span class="o">=</span> <span class="n">lr_scheduler</span><span class="o">.</span><span class="n">StepLR</span><span class="p">(</span><span class="n">optimizer_conv</span><span class="p">,</span> <span class="n">step_size</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">gamma</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="section" id="id9">
+<h3>학습 및 평가하기<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
+<p>CPU에서 실행하는 경우 이전 시나리오와 비교했을 때 약 절반 가량의 시간이 소요됩니다.
+이는 대부분의 신경망에서 경사도를 계산할 필요가 없을 것으로 기대합니다. 하지만,
+순전파(forward)는 계산해야 할 필요가 있습니다.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model_conv</span> <span class="o">=</span> <span class="n">train_model</span><span class="p">(</span><span class="n">model_conv</span><span class="p">,</span> <span class="n">criterion</span><span class="p">,</span> <span class="n">optimizer_conv</span><span class="p">,</span>
+                         <span class="n">exp_lr_scheduler</span><span class="p">,</span> <span class="n">num_epochs</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Epoch 0/24
+----------
+train Loss: 0.5616 Acc: 0.6762
+val Loss: 0.2253 Acc: 0.9412
+
+Epoch 1/24
+----------
+train Loss: 0.4141 Acc: 0.8320
+val Loss: 0.2076 Acc: 0.9542
+
+Epoch 2/24
+----------
+train Loss: 0.6311 Acc: 0.7295
+val Loss: 0.4254 Acc: 0.8235
+
+Epoch 3/24
+----------
+train Loss: 0.4675 Acc: 0.7992
+val Loss: 0.4468 Acc: 0.8431
+
+Epoch 4/24
+----------
+train Loss: 0.4523 Acc: 0.8033
+val Loss: 0.2011 Acc: 0.9412
+
+Epoch 5/24
+----------
+train Loss: 0.4304 Acc: 0.8320
+val Loss: 0.1916 Acc: 0.9412
+
+Epoch 6/24
+----------
+train Loss: 0.4597 Acc: 0.8115
+val Loss: 0.2267 Acc: 0.9412
+
+Epoch 7/24
+----------
+train Loss: 0.3057 Acc: 0.8607
+val Loss: 0.1797 Acc: 0.9542
+
+Epoch 8/24
+----------
+train Loss: 0.4701 Acc: 0.7992
+val Loss: 0.1887 Acc: 0.9608
+
+Epoch 9/24
+----------
+train Loss: 0.2520 Acc: 0.8852
+val Loss: 0.1793 Acc: 0.9542
+
+Epoch 10/24
+----------
+train Loss: 0.3838 Acc: 0.7992
+val Loss: 0.1802 Acc: 0.9477
+
+Epoch 11/24
+----------
+train Loss: 0.4564 Acc: 0.7992
+val Loss: 0.2158 Acc: 0.9477
+
+Epoch 12/24
+----------
+train Loss: 0.3211 Acc: 0.8566
+val Loss: 0.2024 Acc: 0.9542
+
+Epoch 13/24
+----------
+train Loss: 0.3628 Acc: 0.8525
+val Loss: 0.1991 Acc: 0.9477
+
+Epoch 14/24
+----------
+train Loss: 0.3473 Acc: 0.8197
+val Loss: 0.2078 Acc: 0.9477
+
+Epoch 15/24
+----------
+train Loss: 0.3260 Acc: 0.8484
+val Loss: 0.1878 Acc: 0.9477
+
+Epoch 16/24
+----------
+train Loss: 0.4102 Acc: 0.8197
+val Loss: 0.2242 Acc: 0.9477
+
+Epoch 17/24
+----------
+train Loss: 0.3861 Acc: 0.8115
+val Loss: 0.2048 Acc: 0.9477
+
+Epoch 18/24
+----------
+train Loss: 0.3825 Acc: 0.8156
+val Loss: 0.1717 Acc: 0.9477
+
+Epoch 19/24
+----------
+train Loss: 0.3611 Acc: 0.8443
+val Loss: 0.1890 Acc: 0.9477
+
+Epoch 20/24
+----------
+train Loss: 0.2936 Acc: 0.8770
+val Loss: 0.2104 Acc: 0.9477
+
+Epoch 21/24
+----------
+train Loss: 0.3091 Acc: 0.8607
+val Loss: 0.2129 Acc: 0.9477
+
+Epoch 22/24
+----------
+train Loss: 0.3332 Acc: 0.8525
+val Loss: 0.2067 Acc: 0.9477
+
+Epoch 23/24
+----------
+train Loss: 0.3609 Acc: 0.8484
+val Loss: 0.1961 Acc: 0.9477
+
+Epoch 24/24
+----------
+train Loss: 0.3405 Acc: 0.8525
+val Loss: 0.1844 Acc: 0.9477
+
+Training complete in 0m 59s
+Best val Acc: 0.960784
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">visualize_model</span><span class="p">(</span><span class="n">model_conv</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">ioff</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="../_images/sphx_glr_transfer_learning_tutorial_003.png" class="sphx-glr-single-img" src="../_images/sphx_glr_transfer_learning_tutorial_003.png" />
+<p><strong>Total running time of the script:</strong> ( 2 minutes  57.338 seconds)</p>
+<div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-beginner-transfer-learning-tutorial-py">
+<div class="sphx-glr-download docutils container">
+<a class="reference download internal" download="" href="../_downloads/56818c09cbb09ad777969cc92f1ffaba/transfer_learning_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">transfer_learning_tutorial.py</span></code></a></div>
+<div class="sphx-glr-download docutils container">
+<a class="reference download internal" download="" href="../_downloads/a5fa2446bb57fcfef260001e46171916/transfer_learning_tutorial.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">transfer_learning_tutorial.ipynb</span></code></a></div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
+</div>
+</div>
+</div>
+
+
+             </article>
+             
+            </div>
+            <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="data_loading_tutorial.html" class="btn btn-neutral float-right" title="Data Loading and Processing Tutorial" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
+      
+      
+        <a href="examples_nn/dynamic_net.html" class="btn btn-neutral" title="PyTorch: 제어 흐름(Control Flow) + 가중치 공유(Weight Sharing)" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, PyTorch.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+          </div>
+        </div>
+
+        <div class="pytorch-content-right" id="pytorch-content-right">
+          <div class="pytorch-right-menu" id="pytorch-right-menu">
+            <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
+              <ul>
+<li><a class="reference internal" href="#">전이학습(Transfer Learning) 튜토리얼</a><ul>
+<li><a class="reference internal" href="#id2">데이터 불러오기</a><ul>
+<li><a class="reference internal" href="#id4">일부 이미지 시각화하기</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id5">모델 학습하기</a><ul>
+<li><a class="reference internal" href="#id6">모델 예측값 시각화하기</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#finetuning">합성곱 신경망 미세조정(Finetuning)</a><ul>
+<li><a class="reference internal" href="#id7">학습 및 평가하기</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id8">고정 특정 추출기로써의 합성곱 신경망</a><ul>
+<li><a class="reference internal" href="#id9">학습 및 평가하기</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'0.4.1',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="../_static/language_data.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  <script type="text/javascript" src="../_static/js/vendor/popper.min.js"></script>
+  <script type="text/javascript" src="../_static/js/vendor/bootstrap.min.js"></script>
+  <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+ 
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-71919972-3', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+
+  <!-- Begin Footer -->
+
+  <div class="container-fluid docs-tutorials-resources" id="docs-tutorials-resources">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4 text-center">
+          <h2>Docs</h2>
+          <p>Lorem ipsum dolor sit amet, consectetur</p>
+          <a class="with-right-arrow" href="https://pytorch.org/docs/stable/index.html">View Docs</a>
+        </div>
+
+        <div class="col-md-4 text-center">
+          <h2>Tutorials</h2>
+          <p>Lorem ipsum dolor sit amet, consectetur</p>
+          <a class="with-right-arrow" href="https://pytorch.org/tutorials">View Tutorials</a>
+        </div>
+
+        <div class="col-md-4 text-center">
+          <h2>Resources</h2>
+          <p>Lorem ipsum dolor sit amet, consectetur</p>
+          <a class="with-right-arrow" href="https://shiftlab.github.io/pytorch/resources">View Resources</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container footer-container">
+      <div class="footer-logo-wrapper">
+        <a href="https://shiftlab.github.io/pytorch/" class="footer-logo"></a>
+      </div>
+
+      <div class="footer-links-wrapper">
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title"><a href="https://shiftlab.github.io/pytorch/">PyTorch</a></li>
+            <li><a href="https://shiftlab.github.io/pytorch/get-started">Get Started</a></li>
+            <li><a href="https://shiftlab.github.io/pytorch/features">Features</a></li>
+            <li><a href="https://shiftlab.github.io/pytorch/ecosystem">Ecosystem</a></li>
+            <li><a href="https://shiftlab.github.io/pytorch/blog/">Blog</a></li>
+            <li><a href="https://shiftlab.github.io/pytorch/resources">Resources</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title"><a href="https://shiftlab.github.io/pytorch/support">Support</a></li>
+            <li><a href="https://pytorch.org/tutorials">Tutorials</a></li>
+            <li><a href="https://pytorch.org/docs/stable/index.html">Docs</a></li>
+            <li><a href="https://discuss.pytorch.org" target="_blank">Discuss</a></li>
+            <li><a href="https://github.com/pytorch/pytorch/issues" target="_blank">Github Issues</a></li>
+            <li><a href="https://pytorch.slack.com" target="_blank">Slack</a></li>
+            <li><a href="https://github.com/pytorch/pytorch/blob/master/CONTRIBUTING.md" target="_blank">Contributing</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links-col follow-us-col">
+          <ul>
+            <li class="list-title">Follow Us</li>
+            <li>
+              <div id="mc_embed_signup">
+                <form
+                  action="https://twitter.us14.list-manage.com/subscribe/post?u=75419c71fe0a935e53dfa4a3f&id=91d0dccd39"
+                  method="post"
+                  id="mc-embedded-subscribe-form"
+                  name="mc-embedded-subscribe-form"
+                  class="email-subscribe-form validate"
+                  target="_blank"
+                  novalidate>
+                  <div id="mc_embed_signup_scroll" class="email-subscribe-form-fields-wrapper">
+                    <div class="mc-field-group">
+                      <label for="mce-EMAIL" style="display:none;">Email Address</label>
+                      <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="Email Address">
+                    </div>
+
+                    <div id="mce-responses" class="clear">
+                      <div class="response" id="mce-error-response" style="display:none"></div>
+                      <div class="response" id="mce-success-response" style="display:none"></div>
+                    </div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+
+                    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_75419c71fe0a935e53dfa4a3f_91d0dccd39" tabindex="-1" value=""></div>
+
+                    <div class="clear">
+                      <input type="submit" value="" name="subscribe" id="mc-embedded-subscribe" class="button email-subscribe-button">
+                    </div>
+                  </div>
+                </form>
+              </div>
+
+            </li>
+          </ul>
+
+          <div class="footer-social-icons">
+            <a href="https://www.facebook.com/pytorch" target="_blank" class="facebook"></a>
+            <a href="https://twitter.com/pytorch" target="_blank" class="twitter"></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- End Footer -->
+
+  <!-- Begin Mobile Menu -->
+
+  <div class="mobile-main-menu">
+    <div class="container-fluid">
+      <div class="container">
+        <div class="mobile-main-menu-header-container">
+          <a class="header-logo" href="https://shiftlab.github.io/pytorch/" aria-label="PyTorch"></a>
+          <a class="main-menu-close-button" href="#" data-behavior="close-mobile-menu"></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="mobile-main-menu-links-container">
+      <div class="main-menu">
+        <ul>
+          <li>
+            <a href="#">Get Started</a>
+          </li>
+
+          <li>
+            <a href="#">Features</a>
+          </li>
+
+          <li>
+            <a href="#">Ecosystem</a>
+          </li>
+
+          <li>
+            <a href="https://shiftlab.github.io/pytorch/blog/">Blog</a>
+          </li>
+
+          <li class="active">
+            <a href="https://pytorch.org/tutorials">Tutorials</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/docs/stable/index.html">Docs</a>
+          </li>
+
+          <li>
+            <a href="https://shiftlab.github.io/pytorch/resources">Resources</a>
+          </li>
+
+          <li>
+            <a href="https://github.com/pytorch/pytorch">Github</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- End Mobile Menu -->
+
+  <script type="text/javascript" src="../_static/js/vendor/anchor.min.js"></script>
+
+  <script type="text/javascript">
+    mobileMenu.bind();
+    mobileTOC.bind();
+    pytorchAnchors.bind();
+
+    $(window).on("load", function() {
+      sideMenus.bind();
+      scrollToAnchor.bind();
+      highlightNavigation.bind();
+    })
+
+    // Add class to links that have code blocks, since we cannot create links in code blocks
+    $("article.pytorch-article a span.pre").each(function(e) {
+      $(this).closest("a").addClass("has-code");
+    });
+  </script>
+</body>
+</html>
