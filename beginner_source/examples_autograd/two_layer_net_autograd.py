@@ -10,7 +10,6 @@ PyTorch: Tensor와 autograd
 이 구현에서는 PyTorch Tensor 연산을 사용하여 순전파를 계산하고, PyTorch autograd를
 사용하여 변화도(Gradient)를 계산하는 것을 구현하겠습니다.
 
-
 PyTorch Tensor는 연산 그래프에서 노드(Node)로 표현(represent)됩니다. 만약 ``x`` 가
 ``x.requires_grad=True`` 인 Tensor라면 ``x.grad`` 는 어떤 스칼라 값에 대해 ``x`` 의
 변화도(gradient)를 갖는 또 다른 Tensor입니다.
@@ -40,13 +39,14 @@ w2 = torch.randn(H, D_out, device=device, dtype=dtype, requires_grad=True)
 learning_rate = 1e-6
 for t in range(500):
     # 순전파 단계: Tensor 연산을 사용하여 y 값을 예측합니다. 이는 Tensor를 사용한
-    # 순전파 단계와 완전히 동일하지만, 역전파 단계를 별도로 구현하지 않기 위해 중간
-    # 값들(Intermediate Value)에 대한 참조(Reference)를 갖고 있을 필요가 없습니다.
+    # 순전파 단계와 완전히 동일하지만, 역전파 단계를 별도로 구현하지 않아도 되므로 
+    # 중간값들(Intermediate Value)에 대한 참조(Reference)를 갖고 있을 필요가 없습니다.
     y_pred = x.mm(w1).clamp(min=0).mm(w2)
 
     # Tensor 연산을 사용하여 손실을 계산하고 출력합니다.
     # loss는 (1,) 모양을 갖는 Variable이며, loss.data는 (1,) 모양의 Tensor입니다;
     # loss.data[0]은 손실(loss)의 스칼라 값입니다.
+    # loss.item()은 loss의 스칼라 값입니다.
     loss = (y_pred - y).pow(2).sum()
     print(t, loss.item())
 
@@ -56,8 +56,8 @@ for t in range(500):
     loss.backward()
 
     # 경사하강법(Gradient Descent)을 사용하여 가중치를 수동으로 갱신합니다.
-    # 가중치들이 requires_grad=True 이기 때문에 torch.no_grad() 로 감싸지만,
-    # autograd 내에서 이를 추적할 필요는 없습니다.
+    # torch.no_grad()로 감싸는 이유는 가중치들이 requires_grad=True인데 
+    # autograd에서는 이를 추적할 필요가 없기 때문입니다.
     # 다른 방법은 weight.data 및 weight.grad.data 를 조작(Operate)하는 방법입니다.
     # tensor.data 가 tensor의 저장공간(Storage)을 공유하기는 하지만, 이력을
     # 추적하지 않는다는 것을 기억하십시오.
