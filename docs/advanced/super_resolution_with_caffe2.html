@@ -1,0 +1,856 @@
+
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Transfering a model from PyTorch to Caffe2 and Mobile using ONNX &mdash; PyTorch Tutorials 0.4.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!-- <link rel="stylesheet" href="../_static/pygments.css" type="text/css" /> -->
+  <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Custom C++ and CUDA Extensions" href="cpp_extension.html" />
+    <link rel="prev" title="Creating extensions using numpy and scipy" href="numpy_extensions_tutorial.html" /> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+</head>
+
+<div class="container-fluid header-holder tutorials-header" id="header-holder">
+  <div class="container">
+    <div class="header-container">
+      <a class="header-logo" href="https://shiftlab.github.io/pytorch/" aria-label="PyTorch"></a>
+
+      <div class="main-menu">
+        <ul>
+          <li>
+            <a href="https://shiftlab.github.io/pytorch/get-started">Get Started</a>
+          </li>
+
+          <li>
+            <a href="https://shiftlab.github.io/pytorch/features">Features</a>
+          </li>
+
+          <li>
+            <a href="https://shiftlab.github.io/pytorch/ecosystem">Ecosystem</a>
+          </li>
+
+          <li>
+            <a href="https://shiftlab.github.io/pytorch/blog/">Blog</a>
+          </li>
+
+          <li class="active">
+            <a href="https://pytorch.org/tutorials">Tutorials</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/docs/stable/index.html">Docs</a>
+          </li>
+
+          <li>
+            <a href="https://shiftlab.github.io/pytorch/resources">Resources</a>
+          </li>
+
+          <li>
+            <a href="https://github.com/pytorch/pytorch">Github</a>
+          </li>
+        </ul>
+      </div>
+
+      <a class="main-menu-open-button" href="#" data-behavior="open-mobile-menu"></a>
+    </div>
+
+  </div>
+</div>
+
+
+<body class="pytorch-body">
+
+   
+  <div>
+
+    
+
+    <div class="table-of-contents-link-wrapper">
+      <span>Table of Contents</span>
+      <a href="#" class="toggle-table-of-contents" data-behavior="toggle-table-of-contents"></a>
+    </div>
+
+    <nav data-toggle="wy-nav-shift" class="pytorch-left-menu" id="pytorch-left-menu">
+      <div class="pytorch-side-scroll">
+        <div class="pytorch-menu pytorch-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          <div class="pytorch-left-menu-search">
+            
+
+            
+              
+              
+                <div class="version">
+                  0.4.1
+                </div>
+              
+            
+
+            
+
+
+  
+
+
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search Tutorials" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+            
+          </div>
+
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Beginner Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/deep_learning_60min_blitz.html">PyTorch로 딥러닝하기: 60분만에 끝장내기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/former_torchies_tutorial.html">Torch 사용자를 위한 PyTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/pytorch_with_examples.html">예제로 배우는 PyTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/transfer_learning_tutorial.html">전이학습(Transfer Learning) 튜토리얼</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/data_loading_tutorial.html">Data Loading and Processing Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/deep_learning_nlp_tutorial.html">Deep Learning for NLP with Pytorch</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Intermediate Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/char_rnn_classification_tutorial.html">문자-단위 RNN으로 이름 분류하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/char_rnn_generation_tutorial.html">문자-단위 RNN으로 이름 생성하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/seq2seq_translation_tutorial.html">Sequence to Sequence 네트워크와 Attention을 이용한 번역</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/reinforcement_q_learning.html">강화 학습 (DQN) 튜토리얼</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/dist_tuto.html">Pytorch로 분산 어플리케이션 개발하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/spatial_transformer_tutorial.html">공간 변형기 네트워크(Spatial Transformer Networks) 튜토리얼</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Advanced Tutorials</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="neural_style_tutorial.html">PyTorch를 이용한 신경망-변환(Neural-Transfer)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="numpy_extensions_tutorial.html">Creating extensions using numpy and scipy</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Transfering a model from PyTorch to Caffe2 and Mobile using ONNX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cpp_extension.html">Custom C++ and CUDA Extensions</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <div class="pytorch-container">
+
+      <section data-toggle="wy-nav-shift" class="pytorch-content-wrap">
+        <div class="pytorch-page-level-bar" id="pytorch-page-level-bar">
+          <div class="pytorch-breadcrumbs-wrapper">
+            
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="pytorch-breadcrumbs">
+    
+      <li>
+        <a href="../index.html">
+          
+            Tutorials
+          
+        </a> &gt;
+      </li>
+
+        
+      <li>Transfering a model from PyTorch to Caffe2 and Mobile using ONNX</li>
+    
+    
+      <li class="pytorch-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/advanced/super_resolution_with_caffe2.rst.txt" rel="nofollow"><img src="../_static/images/view-page-source-icon.svg"></a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+</div>
+          </div>
+
+          <div class="pytorch-shortcuts-wrapper" id="pytorch-shortcuts-wrapper">
+            Shortcuts
+          </div>
+        </div>
+
+        <div class="pytorch-content-left">
+          
+          <div class="rst-content">
+          
+            <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
+             <article itemprop="articleBody" class="pytorch-article">
+              
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Click <a class="reference internal" href="#sphx-glr-download-advanced-super-resolution-with-caffe2-py"><span class="std std-ref">here</span></a> to download the full example code</p>
+</div>
+<div class="sphx-glr-example-title section" id="transfering-a-model-from-pytorch-to-caffe2-and-mobile-using-onnx">
+<span id="sphx-glr-advanced-super-resolution-with-caffe2-py"></span><h1>Transfering a model from PyTorch to Caffe2 and Mobile using ONNX<a class="headerlink" href="#transfering-a-model-from-pytorch-to-caffe2-and-mobile-using-onnx" title="Permalink to this headline">¶</a></h1>
+<p>In this tutorial, we describe how to use ONNX to convert a model defined
+in PyTorch into the ONNX format and then load it into Caffe2. Once in
+Caffe2, we can run the model to double-check it was exported correctly,
+and we then show how to use Caffe2 features such as mobile exporter for
+executing the model on mobile devices.</p>
+<p>For this tutorial, you will need to install <a class="reference external" href="https://github.com/onnx/onnx">onnx</a>,
+<a class="reference external" href="https://github.com/onnx/onnx-caffe2">onnx-caffe2</a> and <a class="reference external" href="https://caffe2.ai/">Caffe2</a>.
+You can get binary builds of onnx and onnx-caffe2 with
+<code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">install</span> <span class="pre">-c</span> <span class="pre">ezyang</span> <span class="pre">onnx</span> <span class="pre">onnx-caffe2</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">NOTE</span></code>: This tutorial needs PyTorch master branch which can be installed by following
+the instructions <a class="reference external" href="https://github.com/pytorch/pytorch#from-source">here</a></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Some standard imports</span>
+<span class="kn">import</span> <span class="nn">io</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span>
+<span class="kn">import</span> <span class="nn">torch.utils.model_zoo</span> <span class="kn">as</span> <span class="nn">model_zoo</span>
+<span class="kn">import</span> <span class="nn">torch.onnx</span>
+</pre></div>
+</div>
+<p>Super-resolution is a way of increasing the resolution of images, videos
+and is widely used in image processing or video editing. For this
+tutorial, we will first use a small super-resolution model with a dummy
+input.</p>
+<p>First, let’s create a SuperResolution model in PyTorch. <a class="reference external" href="https://github.com/pytorch/examples/blob/master/super_resolution/model.py">This
+model</a>
+comes directly from PyTorch’s examples without modification:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Super Resolution model definition in PyTorch</span>
+<span class="kn">import</span> <span class="nn">torch.nn</span> <span class="kn">as</span> <span class="nn">nn</span>
+<span class="kn">import</span> <span class="nn">torch.nn.init</span> <span class="kn">as</span> <span class="nn">init</span>
+
+
+<span class="k">class</span> <span class="nc">SuperResolutionNet</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">upscale_factor</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">SuperResolutionNet</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">relu</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="n">inplace</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conv1</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conv2</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="mi">64</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conv3</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="mi">64</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conv4</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="mi">32</span><span class="p">,</span> <span class="n">upscale_factor</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pixel_shuffle</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">PixelShuffle</span><span class="p">(</span><span class="n">upscale_factor</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_initialize_weights</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conv1</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conv2</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conv3</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pixel_shuffle</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conv4</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">x</span>
+
+    <span class="k">def</span> <span class="nf">_initialize_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">init</span><span class="o">.</span><span class="n">orthogonal_</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conv1</span><span class="o">.</span><span class="n">weight</span><span class="p">,</span> <span class="n">init</span><span class="o">.</span><span class="n">calculate_gain</span><span class="p">(</span><span class="s1">&#39;relu&#39;</span><span class="p">))</span>
+        <span class="n">init</span><span class="o">.</span><span class="n">orthogonal_</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conv2</span><span class="o">.</span><span class="n">weight</span><span class="p">,</span> <span class="n">init</span><span class="o">.</span><span class="n">calculate_gain</span><span class="p">(</span><span class="s1">&#39;relu&#39;</span><span class="p">))</span>
+        <span class="n">init</span><span class="o">.</span><span class="n">orthogonal_</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conv3</span><span class="o">.</span><span class="n">weight</span><span class="p">,</span> <span class="n">init</span><span class="o">.</span><span class="n">calculate_gain</span><span class="p">(</span><span class="s1">&#39;relu&#39;</span><span class="p">))</span>
+        <span class="n">init</span><span class="o">.</span><span class="n">orthogonal_</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conv4</span><span class="o">.</span><span class="n">weight</span><span class="p">)</span>
+
+<span class="c1"># Create the super-resolution model by using the above model definition.</span>
+<span class="n">torch_model</span> <span class="o">=</span> <span class="n">SuperResolutionNet</span><span class="p">(</span><span class="n">upscale_factor</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Ordinarily, you would now train this model; however, for this tutorial,
+we will instead download some pre-trained weights. Note that this model
+was not trained fully for good accuracy and is used here for
+demonstration purposes only.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Load pretrained model weights</span>
+<span class="n">model_url</span> <span class="o">=</span> <span class="s1">&#39;https://s3.amazonaws.com/pytorch/test_data/export/superres_epoch100-44c6958e.pth&#39;</span>
+<span class="n">batch_size</span> <span class="o">=</span> <span class="mi">1</span>    <span class="c1"># just a random number</span>
+
+<span class="c1"># Initialize model with the pretrained weights</span>
+<span class="n">map_location</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">storage</span><span class="p">,</span> <span class="n">loc</span><span class="p">:</span> <span class="n">storage</span>
+<span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">():</span>
+    <span class="n">map_location</span> <span class="o">=</span> <span class="bp">None</span>
+<span class="n">torch_model</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">model_zoo</span><span class="o">.</span><span class="n">load_url</span><span class="p">(</span><span class="n">model_url</span><span class="p">,</span> <span class="n">map_location</span><span class="o">=</span><span class="n">map_location</span><span class="p">))</span>
+
+<span class="c1"># set the train mode to false since we will only run the forward pass.</span>
+<span class="n">torch_model</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Exporting a model in PyTorch works via tracing. To export a model, you
+call the <code class="docutils literal notranslate"><span class="pre">torch.onnx._export()</span></code> function. This will execute the model,
+recording a trace of what operators are used to compute the outputs.
+Because <code class="docutils literal notranslate"><span class="pre">_export</span></code> runs the model, we need provide an input tensor
+<code class="docutils literal notranslate"><span class="pre">x</span></code>. The values in this tensor are not important; it can be an image
+or a random tensor as long as it is the right size.</p>
+<p>To learn more details about PyTorch’s export interface, check out the
+<a class="reference external" href="http://pytorch.org/docs/master/onnx.html">torch.onnx documentation</a>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Input to the model</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">224</span><span class="p">,</span> <span class="mi">224</span><span class="p">,</span> <span class="n">requires_grad</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+<span class="c1"># Export the model</span>
+<span class="n">torch_out</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">onnx</span><span class="o">.</span><span class="n">_export</span><span class="p">(</span><span class="n">torch_model</span><span class="p">,</span>             <span class="c1"># model being run</span>
+                               <span class="n">x</span><span class="p">,</span>                       <span class="c1"># model input (or a tuple for multiple inputs)</span>
+                               <span class="s2">&quot;super_resolution.onnx&quot;</span><span class="p">,</span> <span class="c1"># where to save the model (can be a file or file-like object)</span>
+                               <span class="n">export_params</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>      <span class="c1"># store the trained parameter weights inside the model file</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">torch_out</span></code> is the output after executing the model. Normally you can
+ignore this output, but here we will use it to verify that the model we
+exported computes the same values when run in Caffe2.</p>
+<p>Now let’s take the ONNX representation and use it in Caffe2. This part
+can normally be done in a separate process or on another machine, but we
+will continue in the same process so that we can verify that Caffe2 and
+PyTorch are computing the same value for the network:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">onnx</span>
+<span class="kn">import</span> <span class="nn">onnx_caffe2.backend</span>
+
+<span class="c1"># Load the ONNX ModelProto object. model is a standard Python protobuf object</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">onnx</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;super_resolution.onnx&quot;</span><span class="p">)</span>
+
+<span class="c1"># prepare the caffe2 backend for executing the model this converts the ONNX model into a</span>
+<span class="c1"># Caffe2 NetDef that can execute it. Other ONNX backends, like one for CNTK will be</span>
+<span class="c1"># availiable soon.</span>
+<span class="n">prepared_backend</span> <span class="o">=</span> <span class="n">onnx_caffe2</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">prepare</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+
+<span class="c1"># run the model in Caffe2</span>
+
+<span class="c1"># Construct a map from input names to Tensor data.</span>
+<span class="c1"># The graph of the model itself contains inputs for all weight parameters, after the input image.</span>
+<span class="c1"># Since the weights are already embedded, we just need to pass the input image.</span>
+<span class="c1"># Set the first input.</span>
+<span class="n">W</span> <span class="o">=</span> <span class="p">{</span><span class="n">model</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">input</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">numpy</span><span class="p">()}</span>
+
+<span class="c1"># Run the Caffe2 net:</span>
+<span class="n">c2_out</span> <span class="o">=</span> <span class="n">prepared_backend</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">W</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="c1"># Verify the numerical correctness upto 3 decimal places</span>
+<span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_almost_equal</span><span class="p">(</span><span class="n">torch_out</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="n">c2_out</span><span class="p">,</span> <span class="n">decimal</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+
+<span class="k">print</span><span class="p">(</span><span class="s2">&quot;Exported model has been executed on Caffe2 backend, and the result looks good!&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>We should see that the output of PyTorch and Caffe2 runs match
+numerically up to 3 decimal places. As a side-note, if they do not match
+then there is an issue that the operators in Caffe2 and PyTorch are
+implemented differently and please contact us in that case.</p>
+<div class="section" id="transfering-srresnet-using-onnx">
+<h2>Transfering SRResNet using ONNX<a class="headerlink" href="#transfering-srresnet-using-onnx" title="Permalink to this headline">¶</a></h2>
+<p>Using the same process as above, we also transferred an interesting new
+model “SRResNet” for super-resolution presented in <a class="reference external" href="https://arxiv.org/pdf/1609.04802.pdf">this
+paper</a> (thanks to the authors
+at Twitter for providing us code and pretrained parameters for the
+purpose of this tutorial). The model definition and a pre-trained model
+can be found
+<a class="reference external" href="https://gist.github.com/prigoyal/b245776903efbac00ee89699e001c9bd">here</a>.
+Below is what SRResNet model input, output looks like. <img alt="SRResNet" src="../_images/SRResNet.png" /></p>
+</div>
+<div class="section" id="running-the-model-on-mobile-devices">
+<h2>Running the model on mobile devices<a class="headerlink" href="#running-the-model-on-mobile-devices" title="Permalink to this headline">¶</a></h2>
+<p>So far we have exported a model from PyTorch and shown how to load it
+and run it in Caffe2. Now that the model is loaded in Caffe2, we can
+convert it into a format suitable for <a class="reference external" href="https://caffe2.ai/docs/mobile-integration.html">running on mobile
+devices</a>.</p>
+<p>We will use Caffe2’s
+<a class="reference external" href="https://github.com/caffe2/caffe2/blob/master/caffe2/python/predictor/mobile_exporter.py">mobile_exporter</a>
+to generate the two model protobufs that can run on mobile. The first is
+used to initialize the network with the correct weights, and the second
+actual runs executes the model. We will continue to use the small
+super-resolution model for the rest of this tutorial.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># extract the workspace and the model proto from the internal representation</span>
+<span class="n">c2_workspace</span> <span class="o">=</span> <span class="n">prepared_backend</span><span class="o">.</span><span class="n">workspace</span>
+<span class="n">c2_model</span> <span class="o">=</span> <span class="n">prepared_backend</span><span class="o">.</span><span class="n">predict_net</span>
+
+<span class="c1"># Now import the caffe2 mobile exporter</span>
+<span class="kn">from</span> <span class="nn">caffe2.python.predictor</span> <span class="kn">import</span> <span class="n">mobile_exporter</span>
+
+<span class="c1"># call the Export to get the predict_net, init_net. These nets are needed for running things on mobile</span>
+<span class="n">init_net</span><span class="p">,</span> <span class="n">predict_net</span> <span class="o">=</span> <span class="n">mobile_exporter</span><span class="o">.</span><span class="n">Export</span><span class="p">(</span><span class="n">c2_workspace</span><span class="p">,</span> <span class="n">c2_model</span><span class="p">,</span> <span class="n">c2_model</span><span class="o">.</span><span class="n">external_input</span><span class="p">)</span>
+
+<span class="c1"># Let&#39;s also save the init_net and predict_net to a file that we will later use for running them on mobile</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;init_net.pb&#39;</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fopen</span><span class="p">:</span>
+    <span class="n">fopen</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">init_net</span><span class="o">.</span><span class="n">SerializeToString</span><span class="p">())</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;predict_net.pb&#39;</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fopen</span><span class="p">:</span>
+    <span class="n">fopen</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">predict_net</span><span class="o">.</span><span class="n">SerializeToString</span><span class="p">())</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">init_net</span></code> has the model parameters and the model input embedded in it
+and <code class="docutils literal notranslate"><span class="pre">predict_net</span></code> will be used to guide the <code class="docutils literal notranslate"><span class="pre">init_net</span></code> execution at
+run-time. In this tutorial, we will use the <code class="docutils literal notranslate"><span class="pre">init_net</span></code> and
+<code class="docutils literal notranslate"><span class="pre">predict_net</span></code> generated above and run them in both normal Caffe2
+backend and mobile and verify that the output high-resolution cat image
+produced in both runs is the same.</p>
+<p>For this tutorial, we will use a famous cat image used widely which
+looks like below</p>
+<div class="figure">
+<img alt="cat" src="../_images/cat_224x224.jpg" />
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Some standard imports</span>
+<span class="kn">from</span> <span class="nn">caffe2.proto</span> <span class="kn">import</span> <span class="n">caffe2_pb2</span>
+<span class="kn">from</span> <span class="nn">caffe2.python</span> <span class="kn">import</span> <span class="n">core</span><span class="p">,</span> <span class="n">net_drawer</span><span class="p">,</span> <span class="n">net_printer</span><span class="p">,</span> <span class="n">visualize</span><span class="p">,</span> <span class="n">workspace</span><span class="p">,</span> <span class="n">utils</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span>
+<span class="kn">from</span> <span class="nn">skimage</span> <span class="kn">import</span> <span class="n">io</span><span class="p">,</span> <span class="n">transform</span>
+</pre></div>
+</div>
+<p>First, let’s load the image, pre-process it using standard skimage
+python library. Note that this preprocessing is the standard practice of
+processing data for training/testing neural networks.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># load the image</span>
+<span class="n">img_in</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="s2">&quot;./_static/img/cat.jpg&quot;</span><span class="p">)</span>
+
+<span class="c1"># resize the image to dimensions 224x224</span>
+<span class="n">img</span> <span class="o">=</span> <span class="n">transform</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">img_in</span><span class="p">,</span> <span class="p">[</span><span class="mi">224</span><span class="p">,</span> <span class="mi">224</span><span class="p">])</span>
+
+<span class="c1"># save this resized image to be used as input to the model</span>
+<span class="n">io</span><span class="o">.</span><span class="n">imsave</span><span class="p">(</span><span class="s2">&quot;./_static/img/cat_224x224.jpg&quot;</span><span class="p">,</span> <span class="n">img</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Now, as a next step, let’s take the resized cat image and run the
+super-resolution model in Caffe2 backend and save the output image. The
+image processing steps below have been adopted from PyTorch
+implementation of super-resolution model
+<a class="reference external" href="https://github.com/pytorch/examples/blob/master/super_resolution/super_resolve.py">here</a></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># load the resized image and convert it to Ybr format</span>
+<span class="n">img</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;./_static/img/cat_224x224.jpg&quot;</span><span class="p">)</span>
+<span class="n">img_ycbcr</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s1">&#39;YCbCr&#39;</span><span class="p">)</span>
+<span class="n">img_y</span><span class="p">,</span> <span class="n">img_cb</span><span class="p">,</span> <span class="n">img_cr</span> <span class="o">=</span> <span class="n">img_ycbcr</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+
+<span class="c1"># Let&#39;s run the mobile nets that we generated above so that caffe2 workspace is properly initialized</span>
+<span class="n">workspace</span><span class="o">.</span><span class="n">RunNetOnce</span><span class="p">(</span><span class="n">init_net</span><span class="p">)</span>
+<span class="n">workspace</span><span class="o">.</span><span class="n">RunNetOnce</span><span class="p">(</span><span class="n">predict_net</span><span class="p">)</span>
+
+<span class="c1"># Caffe2 has a nice net_printer to be able to inspect what the net looks like and identify</span>
+<span class="c1"># what our input and output blob names are.</span>
+<span class="k">print</span><span class="p">(</span><span class="n">net_printer</span><span class="o">.</span><span class="n">to_string</span><span class="p">(</span><span class="n">predict_net</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>From the above output, we can see that input is named “9” and output is
+named “27”(it is a little bit weird that we will have numbers as blob
+names but this is because the tracing JIT produces numbered entries for
+the models)</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Now, let&#39;s also pass in the resized cat image for processing by the model.</span>
+<span class="n">workspace</span><span class="o">.</span><span class="n">FeedBlob</span><span class="p">(</span><span class="s2">&quot;9&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">img_y</span><span class="p">)[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">))</span>
+
+<span class="c1"># run the predict_net to get the model output</span>
+<span class="n">workspace</span><span class="o">.</span><span class="n">RunNetOnce</span><span class="p">(</span><span class="n">predict_net</span><span class="p">)</span>
+
+<span class="c1"># Now let&#39;s get the model output blob</span>
+<span class="n">img_out</span> <span class="o">=</span> <span class="n">workspace</span><span class="o">.</span><span class="n">FetchBlob</span><span class="p">(</span><span class="s2">&quot;27&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Now, we’ll refer back to the post-processing steps in PyTorch
+implementation of super-resolution model
+<a class="reference external" href="https://github.com/pytorch/examples/blob/master/super_resolution/super_resolve.py">here</a>
+to construct back the final output image and save the image.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">img_out_y</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">fromarray</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">((</span><span class="n">img_out</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">)),</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;L&#39;</span><span class="p">)</span>
+
+<span class="c1"># get the output image follow post-processing step from PyTorch implementation</span>
+<span class="n">final_img</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span>
+    <span class="s2">&quot;YCbCr&quot;</span><span class="p">,</span> <span class="p">[</span>
+        <span class="n">img_out_y</span><span class="p">,</span>
+        <span class="n">img_cb</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">img_out_y</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">Image</span><span class="o">.</span><span class="n">BICUBIC</span><span class="p">),</span>
+        <span class="n">img_cr</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">img_out_y</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">Image</span><span class="o">.</span><span class="n">BICUBIC</span><span class="p">),</span>
+    <span class="p">])</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s2">&quot;RGB&quot;</span><span class="p">)</span>
+
+<span class="c1"># Save the image, we will compare this with the output image from mobile device</span>
+<span class="n">final_img</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s2">&quot;./_static/img/cat_superres.jpg&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>We have finished running our mobile nets in pure Caffe2 backend and now,
+let’s execute the model on an Android device and get the model output.</p>
+<p><code class="docutils literal notranslate"><span class="pre">NOTE</span></code>: for Android development, <code class="docutils literal notranslate"><span class="pre">adb</span></code> shell is needed otherwise the
+following section of tutorial will not run.</p>
+<p>In our first step of runnig model on mobile, we will push a native speed
+benchmark binary for mobile device to adb. This binary can execute the
+model on mobile and also export the model output that we can retrieve
+later. The binary is available
+<a class="reference external" href="https://github.com/caffe2/caffe2/blob/master/caffe2/binaries/speed_benchmark.cc">here</a>.
+In order to build the binary, execute the <code class="docutils literal notranslate"><span class="pre">build_android.sh</span></code> script
+following the instructions
+<a class="reference external" href="https://github.com/caffe2/caffe2/blob/master/scripts/build_android.sh">here</a>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">NOTE</span></code>: You need to have <code class="docutils literal notranslate"><span class="pre">ANDROID_NDK</span></code> installed and set your env
+variable <code class="docutils literal notranslate"><span class="pre">ANDROID_NDK=path</span> <span class="pre">to</span> <span class="pre">ndk</span> <span class="pre">root</span></code></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># let&#39;s first push a bunch of stuff to adb, specify the path for the binary</span>
+<span class="n">CAFFE2_MOBILE_BINARY</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;caffe2/binaries/speed_benchmark&#39;</span><span class="p">)</span>
+
+<span class="c1"># we had saved our init_net and proto_net in steps above, we use them now.</span>
+<span class="c1"># Push the binary and the model protos</span>
+<span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s1">&#39;adb push &#39;</span> <span class="o">+</span> <span class="n">CAFFE2_MOBILE_BINARY</span> <span class="o">+</span> <span class="s1">&#39; /data/local/tmp/&#39;</span><span class="p">)</span>
+<span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s1">&#39;adb push init_net.pb /data/local/tmp&#39;</span><span class="p">)</span>
+<span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s1">&#39;adb push predict_net.pb /data/local/tmp&#39;</span><span class="p">)</span>
+
+<span class="c1"># Let&#39;s serialize the input image blob to a blob proto and then send it to mobile for execution.</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;input.blobproto&quot;</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fid</span><span class="p">:</span>
+    <span class="n">fid</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">workspace</span><span class="o">.</span><span class="n">SerializeBlob</span><span class="p">(</span><span class="s2">&quot;9&quot;</span><span class="p">))</span>
+
+<span class="c1"># push the input image blob to adb</span>
+<span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s1">&#39;adb push input.blobproto /data/local/tmp/&#39;</span><span class="p">)</span>
+
+<span class="c1"># Now we run the net on mobile, look at the speed_benchmark --help for what various options mean</span>
+<span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span>
+    <span class="s1">&#39;adb shell /data/local/tmp/speed_benchmark &#39;</span>                     <span class="c1"># binary to execute</span>
+    <span class="s1">&#39;--init_net=/data/local/tmp/super_resolution_mobile_init.pb &#39;</span>    <span class="c1"># mobile init_net</span>
+    <span class="s1">&#39;--net=/data/local/tmp/super_resolution_mobile_predict.pb &#39;</span>      <span class="c1"># mobile predict_net</span>
+    <span class="s1">&#39;--input=9 &#39;</span>                                                     <span class="c1"># name of our input image blob</span>
+    <span class="s1">&#39;--input_file=/data/local/tmp/input.blobproto &#39;</span>                  <span class="c1"># serialized input image</span>
+    <span class="s1">&#39;--output_folder=/data/local/tmp &#39;</span>                               <span class="c1"># destination folder for saving mobile output</span>
+    <span class="s1">&#39;--output=27,9 &#39;</span>                                                 <span class="c1"># output blobs we are interested in</span>
+    <span class="s1">&#39;--iter=1 &#39;</span>                                                      <span class="c1"># number of net iterations to execute</span>
+    <span class="s1">&#39;--caffe2_log_level=0 &#39;</span>
+<span class="p">)</span>
+
+<span class="c1"># get the model output from adb and save to a file</span>
+<span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s1">&#39;adb pull /data/local/tmp/27 ./output.blobproto&#39;</span><span class="p">)</span>
+
+
+<span class="c1"># We can recover the output content and post-process the model using same steps as we followed earlier</span>
+<span class="n">blob_proto</span> <span class="o">=</span> <span class="n">caffe2_pb2</span><span class="o">.</span><span class="n">BlobProto</span><span class="p">()</span>
+<span class="n">blob_proto</span><span class="o">.</span><span class="n">ParseFromString</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="s1">&#39;./output.blobproto&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+<span class="n">img_out</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">Caffe2TensorToNumpyArray</span><span class="p">(</span><span class="n">blob_proto</span><span class="o">.</span><span class="n">tensor</span><span class="p">)</span>
+<span class="n">img_out_y</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">fromarray</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">((</span><span class="n">img_out</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">)),</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;L&#39;</span><span class="p">)</span>
+<span class="n">final_img</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span>
+    <span class="s2">&quot;YCbCr&quot;</span><span class="p">,</span> <span class="p">[</span>
+        <span class="n">img_out_y</span><span class="p">,</span>
+        <span class="n">img_cb</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">img_out_y</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">Image</span><span class="o">.</span><span class="n">BICUBIC</span><span class="p">),</span>
+        <span class="n">img_cr</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">img_out_y</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">Image</span><span class="o">.</span><span class="n">BICUBIC</span><span class="p">),</span>
+    <span class="p">])</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s2">&quot;RGB&quot;</span><span class="p">)</span>
+<span class="n">final_img</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s2">&quot;./_static/img/cat_superres_mobile.jpg&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Now, you can compare the image <code class="docutils literal notranslate"><span class="pre">cat_superres.jpg</span></code> (model output from
+pure caffe2 backend execution) and <code class="docutils literal notranslate"><span class="pre">cat_superres_mobile.jpg</span></code> (model
+output from mobile execution) and see that both the images look same. If
+they don’t look same, something went wrong with execution on mobile and
+in that case, please contact Caffe2 community. You should expect to see
+the output image to look like following:</p>
+<div class="figure">
+<img alt="output\_cat" src="../_images/cat_output1.png" />
+</div>
+<p>Using the above steps, you can deploy your models on mobile easily.
+Also, for more information on caffe2 mobile backend, checkout
+<a class="reference external" href="https://caffe2.ai/docs/AI-Camera-demo-android.html">caffe2-android-demo</a>.</p>
+<p><strong>Total running time of the script:</strong> ( 0 minutes  0.000 seconds)</p>
+<div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-advanced-super-resolution-with-caffe2-py">
+<div class="sphx-glr-download docutils container">
+<a class="reference download internal" download="" href="../_downloads/16a107cefe8951ad1af7cecca6253e62/super_resolution_with_caffe2.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">super_resolution_with_caffe2.py</span></code></a></div>
+<div class="sphx-glr-download docutils container">
+<a class="reference download internal" download="" href="../_downloads/07b481cf1a466482cf52aac459e86b0c/super_resolution_with_caffe2.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">super_resolution_with_caffe2.ipynb</span></code></a></div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
+</div>
+</div>
+
+
+             </article>
+             
+            </div>
+            <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="cpp_extension.html" class="btn btn-neutral float-right" title="Custom C++ and CUDA Extensions" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
+      
+      
+        <a href="numpy_extensions_tutorial.html" class="btn btn-neutral" title="Creating extensions using numpy and scipy" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, PyTorch.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+          </div>
+        </div>
+
+        <div class="pytorch-content-right" id="pytorch-content-right">
+          <div class="pytorch-right-menu" id="pytorch-right-menu">
+            <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
+              <ul>
+<li><a class="reference internal" href="#">Transfering a model from PyTorch to Caffe2 and Mobile using ONNX</a><ul>
+<li><a class="reference internal" href="#transfering-srresnet-using-onnx">Transfering SRResNet using ONNX</a></li>
+<li><a class="reference internal" href="#running-the-model-on-mobile-devices">Running the model on mobile devices</a></li>
+</ul>
+</li>
+</ul>
+
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'0.4.1',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="../_static/language_data.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  <script type="text/javascript" src="../_static/js/vendor/popper.min.js"></script>
+  <script type="text/javascript" src="../_static/js/vendor/bootstrap.min.js"></script>
+  <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+ 
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-71919972-3', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+
+  <!-- Begin Footer -->
+
+  <div class="container-fluid docs-tutorials-resources" id="docs-tutorials-resources">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4 text-center">
+          <h2>Docs</h2>
+          <p>Lorem ipsum dolor sit amet, consectetur</p>
+          <a class="with-right-arrow" href="https://pytorch.org/docs/stable/index.html">View Docs</a>
+        </div>
+
+        <div class="col-md-4 text-center">
+          <h2>Tutorials</h2>
+          <p>Lorem ipsum dolor sit amet, consectetur</p>
+          <a class="with-right-arrow" href="https://pytorch.org/tutorials">View Tutorials</a>
+        </div>
+
+        <div class="col-md-4 text-center">
+          <h2>Resources</h2>
+          <p>Lorem ipsum dolor sit amet, consectetur</p>
+          <a class="with-right-arrow" href="https://shiftlab.github.io/pytorch/resources">View Resources</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container footer-container">
+      <div class="footer-logo-wrapper">
+        <a href="https://shiftlab.github.io/pytorch/" class="footer-logo"></a>
+      </div>
+
+      <div class="footer-links-wrapper">
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title"><a href="https://shiftlab.github.io/pytorch/">PyTorch</a></li>
+            <li><a href="https://shiftlab.github.io/pytorch/get-started">Get Started</a></li>
+            <li><a href="https://shiftlab.github.io/pytorch/features">Features</a></li>
+            <li><a href="https://shiftlab.github.io/pytorch/ecosystem">Ecosystem</a></li>
+            <li><a href="https://shiftlab.github.io/pytorch/blog/">Blog</a></li>
+            <li><a href="https://shiftlab.github.io/pytorch/resources">Resources</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title"><a href="https://shiftlab.github.io/pytorch/support">Support</a></li>
+            <li><a href="https://pytorch.org/tutorials">Tutorials</a></li>
+            <li><a href="https://pytorch.org/docs/stable/index.html">Docs</a></li>
+            <li><a href="https://discuss.pytorch.org" target="_blank">Discuss</a></li>
+            <li><a href="https://github.com/pytorch/pytorch/issues" target="_blank">Github Issues</a></li>
+            <li><a href="https://pytorch.slack.com" target="_blank">Slack</a></li>
+            <li><a href="https://github.com/pytorch/pytorch/blob/master/CONTRIBUTING.md" target="_blank">Contributing</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links-col follow-us-col">
+          <ul>
+            <li class="list-title">Follow Us</li>
+            <li>
+              <div id="mc_embed_signup">
+                <form
+                  action="https://twitter.us14.list-manage.com/subscribe/post?u=75419c71fe0a935e53dfa4a3f&id=91d0dccd39"
+                  method="post"
+                  id="mc-embedded-subscribe-form"
+                  name="mc-embedded-subscribe-form"
+                  class="email-subscribe-form validate"
+                  target="_blank"
+                  novalidate>
+                  <div id="mc_embed_signup_scroll" class="email-subscribe-form-fields-wrapper">
+                    <div class="mc-field-group">
+                      <label for="mce-EMAIL" style="display:none;">Email Address</label>
+                      <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="Email Address">
+                    </div>
+
+                    <div id="mce-responses" class="clear">
+                      <div class="response" id="mce-error-response" style="display:none"></div>
+                      <div class="response" id="mce-success-response" style="display:none"></div>
+                    </div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+
+                    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_75419c71fe0a935e53dfa4a3f_91d0dccd39" tabindex="-1" value=""></div>
+
+                    <div class="clear">
+                      <input type="submit" value="" name="subscribe" id="mc-embedded-subscribe" class="button email-subscribe-button">
+                    </div>
+                  </div>
+                </form>
+              </div>
+
+            </li>
+          </ul>
+
+          <div class="footer-social-icons">
+            <a href="https://www.facebook.com/pytorch" target="_blank" class="facebook"></a>
+            <a href="https://twitter.com/pytorch" target="_blank" class="twitter"></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- End Footer -->
+
+  <!-- Begin Mobile Menu -->
+
+  <div class="mobile-main-menu">
+    <div class="container-fluid">
+      <div class="container">
+        <div class="mobile-main-menu-header-container">
+          <a class="header-logo" href="https://shiftlab.github.io/pytorch/" aria-label="PyTorch"></a>
+          <a class="main-menu-close-button" href="#" data-behavior="close-mobile-menu"></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="mobile-main-menu-links-container">
+      <div class="main-menu">
+        <ul>
+          <li>
+            <a href="#">Get Started</a>
+          </li>
+
+          <li>
+            <a href="#">Features</a>
+          </li>
+
+          <li>
+            <a href="#">Ecosystem</a>
+          </li>
+
+          <li>
+            <a href="https://shiftlab.github.io/pytorch/blog/">Blog</a>
+          </li>
+
+          <li class="active">
+            <a href="https://pytorch.org/tutorials">Tutorials</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/docs/stable/index.html">Docs</a>
+          </li>
+
+          <li>
+            <a href="https://shiftlab.github.io/pytorch/resources">Resources</a>
+          </li>
+
+          <li>
+            <a href="https://github.com/pytorch/pytorch">Github</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- End Mobile Menu -->
+
+  <script type="text/javascript" src="../_static/js/vendor/anchor.min.js"></script>
+
+  <script type="text/javascript">
+    mobileMenu.bind();
+    mobileTOC.bind();
+    pytorchAnchors.bind();
+
+    $(window).on("load", function() {
+      sideMenus.bind();
+      scrollToAnchor.bind();
+      highlightNavigation.bind();
+    })
+
+    // Add class to links that have code blocks, since we cannot create links in code blocks
+    $("article.pytorch-article a span.pre").each(function(e) {
+      $(this).closest("a").addClass("has-code");
+    });
+  </script>
+</body>
+</html>
