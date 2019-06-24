@@ -1,62 +1,29 @@
-# PyTorch 한국어 튜토리얼
-
-## 소개
-
-PyTorch에서 제공하는 튜토리얼의 한국어 번역을 위한 저장소입니다.
-
-번역의 결과물은 [http://9bow.github.io/PyTorch-tutorials-kr](http://9bow.github.io/PyTorch-tutorials-kr)에서 확인하실 수 있습니다. (번역을 진행하며 **불규칙적으로** 빌드합니다.)
-
-PyTorch 0.3.1의 튜토리얼 한국어 번역은 [이 곳](http://9bow.github.io/PyTorch-tutorials-kr-0.3.1)에서 진행되었으며, 현재는 번역이 이뤄지고 있지 않습니다.
+# PyTorch Tutorials
 
 
-## 원문
+All the tutorials are now presented as sphinx style documentation at:
 
-이 저장소의 튜토리얼은 [이 버전](https://github.com/pytorch/tutorials/tree/2d092a2f8c5ddfd513d4200bc7c9831d854a938a)을 복제한 것입니다.
-
-최신의 튜토리얼(영어)은 [PyTorch tutorials repo](https://github.com/pytorch/tutorials)를 참고해주세요.
+## [https://pytorch.org/tutorials](https://pytorch.org/tutorials)
 
 
-## 목차
 
-(*번역이 진행 중인 문서들의 목차입니다.*)
+# Contributing
 
-### 초급 튜토리얼
-* [PyTorch로 딥러닝하기: 60분만에 끝장내기](https://9bow.github.io/PyTorch-tutorials-kr/beginner/deep_learning_60min_blitz.html)
-  * [PyTorch가 무엇인가요?](https://9bow.github.io/PyTorch-tutorials-kr/beginner/blitz/tensor_tutorial.html)
-  * [Autograd: 자동 미분](https://9bow.github.io/PyTorch-tutorials-kr/beginner/blitz/autograd_tutorial.html)
-  * [신경망(Neural Networks)](https://9bow.github.io/PyTorch-tutorials-kr/beginner/blitz/neural_networks_tutorial.html)
-  * [분류기(Classifier) 학습하기](https://9bow.github.io/PyTorch-tutorials-kr/beginner/blitz/cifar10_tutorial.html)
-  * *TBD*
-* [Torch 사용자를 위한 PyTorch](https://9bow.github.io/PyTorch-tutorials-kr/beginner/former_torchies_tutorial.html)
-  * [Tensor](https://9bow.github.io/PyTorch-tutorials-kr/beginner/former_torchies/tensor_tutorial.html)
-  * [Autograd](https://9bow.github.io/PyTorch-tutorials-kr/beginner/former_torchies/autograd_tutorial.html)
-  * [nn 패키지](https://9bow.github.io/PyTorch-tutorials-kr/beginner/former_torchies/nn_tutorial.html)
-  * [멀티-GPU 예제](https://9bow.github.io/PyTorch-tutorials-kr/beginner/former_torchies/parallelism_tutorial.html)
-* [예제로 배우는 PyTorch](https://9bow.github.io/PyTorch-tutorials-kr/beginner/pytorch_with_examples.html)
-  * [Tensor](https://9bow.github.io/PyTorch-tutorials-kr/beginner/pytorch_with_examples.html#tensor)
-  * [Autograd](https://9bow.github.io/PyTorch-tutorials-kr/beginner/pytorch_with_examples.html#autograd)
-  * [nn모듈](https://9bow.github.io/PyTorch-tutorials-kr/beginner/pytorch_with_examples.html#nn)
-  * [예제 코드](https://9bow.github.io/PyTorch-tutorials-kr/beginner/pytorch_with_examples.html#examples-download)
-* [전이학습(Transfer Learning) 튜토리얼](https://9bow.github.io/PyTorch-tutorials-kr/beginner/transfer_learning_tutorial.html)
-* *TBD*
+We use sphinx-gallery's [notebook styled examples](https://sphinx-gallery.github.io/tutorials/plot_notebook.html#sphx-glr-tutorials-plot-notebook-py) to create the tutorials. Syntax is very simple. In essence, you write a slightly well formatted python file and it shows up as documentation page.
 
-### 중급 튜토리얼
-* [문자-단위 RNN으로 이름 분류하기](https://9bow.github.io/PyTorch-tutorials-kr/intermediate/char_rnn_classification_tutorial.html)
-* [문자-단위 RNN으로 이름 생성하기](https://9bow.github.io/PyTorch-tutorials-kr/intermediate/char_rnn_generation_tutorial.html)
-* [Sequence to Sequence 네트워크와 Attention을 이용한 번역](https://9bow.github.io/PyTorch-tutorials-kr/intermediate/seq2seq_translation_tutorial.html)
-* [강화 학습(DQN) 튜토리얼](https://9bow.github.io/PyTorch-tutorials-kr/intermediate/reinforcement_q_learning.html)
-* [PyTorch로 분산 어플리케이션 개발하기](https://9bow.github.io/PyTorch-tutorials-kr/intermediate/dist_tuto.html)
-* [공간 변형기 네트워크(Spatial Transformer Networks) 튜토리얼](https://9bow.github.io/PyTorch-tutorials-kr/intermediate/spatial_transformer_tutorial.html)
+Here's how to create a new tutorial:
+1. Create a notebook styled python file. If you want it executed while inserted into documentation, save the file with suffix `tutorial` so that file name is `your_tutorial.py`.
+2. Put it in one of the beginner_source, intermediate_source, advanced_source based on the level.
+2. Include it in the right TOC tree at index.rst
+3. Create a thumbnail in the index file using a command like `.. galleryitem:: beginner/your_tutorial.py`. (This is a custom directive. See `custom_directives.py` for more info.) 
 
-### 고급 튜토리얼
-* [PyTorch를 이용한 신경망-변환(Neural-Transfer)](https://9bow.github.io/PyTorch-tutorials-kr/advanced/neural_style_tutorial.html)
-* *TBD*
+In case you prefer to write your tutorial in jupyter, you can use [this script](https://gist.github.com/chsasank/7218ca16f8d022e02a9c0deb94a310fe) to convert the notebook to python file. After conversion and addition to the project, please make sure the sections headings etc are in logical order.
 
+## Building
 
-## 참여
+- Start with installing torch, torchvision, and your GPUs latest drivers. Install other requirements using `pip install -r requirements.txt`
 
-오타나 오역을 발견하시면 [이슈](https://github.com/9bow/PyTorch-tutorials-kr/issues/new)를 남겨주세요. [Pull Request](https://github.com/9bow/PyTorch-tutorials-kr/pulls)도 환영합니다. :)
+> If you want to use `virtualenv`, make your environment in a `venv` directory like: `virtualenv ./venv`, then `source ./venv/bin/activate`.
 
-
----
-This is a project to translate [PyTorch tutorials](https://github.com/pytorch/tutorials/tree/e55b6e2f4f99c3d504447f0c151b1f99d2707981) into Korean. For the latest version, please visit to the [PyTorch tutorials repo](https://github.com/pytorch/tutorials).
+- Then you can build using `make docs`. This will download the data, execute the tutorials and build the documentation to `docs/` directory. This will take about 60-120 min for systems with GPUs. If you do not have a GPU installed on your system, then see next step.
+- You can skip the computationally intensive graph generation by running `make html-noplot` to build basic html documentation to `_build/html`. This way, you can quickly preview your tutorial.

@@ -1,34 +1,33 @@
-Torch 사용자를 위한 PyTorch
+PyTorch for Former Torch Users
 ------------------------------
 **Author**: `Soumith Chintala <http://soumith.ch>`_
-  **번역**: `박정환 <http://github.com/9bow>`_
 
-이 튜토리얼에서는 다음과 같은 것들을 배웁니다:
+In this tutorial, you will learn the following:
 
-1. torch Tensor를 사용해보고, (Lua)Torch와의 주요한 차이를 알아봅니다.
-2. autograd 패키지를 사용해봅니다.
-3. 신경망을 구성해봅니다.
+1. Using torch Tensors, and important difference against (Lua)Torch
+2. Using the autograd package
+3. Building neural networks
 
-  -  합성곱 신경망(ConvNet) 구성하기
-  -  순환 신경망(Recurrent Net) 구성하기
+  -  Building a ConvNet
+  -  Building a Recurrent Net
 
-4. 여러개의 GPU를 사용해봅니다.
+4. Use multiple GPUs
 
 
 .. toctree::
    :hidden:
 
-   /beginner/former_torchies/tensor_tutorial
-   /beginner/former_torchies/autograd_tutorial
-   /beginner/former_torchies/nn_tutorial
+   /beginner/former_torchies/tensor_tutorial_old
+   /beginner/former_torchies/autograd_tutorial_old
+   /beginner/former_torchies/nnft_tutorial
    /beginner/former_torchies/parallelism_tutorial
 
-.. galleryitem:: /beginner/former_torchies/tensor_tutorial.py
+.. galleryitem:: /beginner/former_torchies/tensor_tutorial_old.py
     :figure: /_static/img/tensor_illustration_flat.png
 
-.. galleryitem:: /beginner/former_torchies/autograd_tutorial.py
+.. galleryitem:: /beginner/former_torchies/autograd_tutorial_old.py
 
-.. galleryitem:: /beginner/former_torchies/nn_tutorial.py
+.. galleryitem:: /beginner/former_torchies/nnft_tutorial.py
     :figure: /_static/img/torch-nn-vs-pytorch-nn.png
 
 .. galleryitem:: /beginner/former_torchies/parallelism_tutorial.py
