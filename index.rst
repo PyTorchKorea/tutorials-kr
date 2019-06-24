@@ -1,9 +1,15 @@
-Welcome to PyTorch Tutorials
-============================
+PyTorch 튜토리얼에 오신 것을 환영합니다
+========================================
 
-To learn how to use PyTorch, begin with our Getting Started Tutorials.
-The :doc:`60-minute blitz </beginner/deep_learning_60min_blitz>` is the most common
-starting point, and provides a broad view into how to use PyTorch from the basics all the way into constructing deep neural networks.
+PyTorch를 어떻게 사용하는지 알고 싶다면 시작하기(Getting Started) 튜토리얼부터 시작해보세요.
+:doc:`/beginner/deep_learning_60min_blitz` 가 가장 일반적인 출발점으로, 심층
+신경망(deep neural network)을 구축할 때 PyTorch를 어떻게 사용하는지에 대한
+전반적인 내용을 기본부터 제공합니다.
+
+(역자 주: 한국어 번역에 대한 오타나 오역을 발견하시면
+`번역 저장소 <https://github.com/9bow/PyTorch-tutorials-kr>`__ 에
+`이슈 <https://github.com/9bow/PyTorch-tutorials-kr/issues/new>`__ 또는
+`PR <https://github.com/9bow/PyTorch-tutorials-kr/pulls>`__ 을 남겨주세요.)
 
 Some considerations:
 
@@ -25,8 +31,8 @@ Some considerations:
 * Finally, here's a link to the
   `PyTorch Release Notes <https://github.com/pytorch/pytorch/releases>`_
 
-Getting Started
-------------------
+시작하기 (Getting Started)
+---------------------------
 
 .. customgalleryitem::
    :figure: /_static/img/thumbnails/pytorch-logo-flat.png
@@ -238,7 +244,7 @@ Production Usage
 
 
 PyTorch in Other Languages
--------------
+---------------------------
 
 .. customgalleryitem::
     :tooltip: Using the PyTorch C++ Frontend
