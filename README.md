@@ -1,29 +1,33 @@
-# PyTorch Tutorials
+# PyTorch 한국어 튜토리얼
+
+## 소개
+
+PyTorch에서 제공하는 튜토리얼의 한국어 번역을 위한 저장소입니다.
+
+번역의 결과물은 [https://tutorials.pytorch.kr](https://tutorials.pytorch.kr)에서 확인하실 수 있습니다. (번역을 진행하며 **불규칙적으로** 업데이트합니다.)
 
 
-All the tutorials are now presented as sphinx style documentation at:
+## 원문
 
-## [https://pytorch.org/tutorials](https://pytorch.org/tutorials)
+현재 PyTorch v1.1 번역이 진행 중입니다. ([pytorch/tutorials#c4d6e11](https://github.com/pytorch/tutorials/commit/c4d6e112ffa460313968e6837a4d610d152e3e34) 기준)
+
+최신의 튜토리얼(영어)은 [PyTorch tutorials 저장소](https://github.com/pytorch/tutorials)를 참고해주세요.
 
 
+## 과거 버전
 
-# Contributing
+아래 링크에서 과거 버전의 튜토리얼 번역을 확인하실 수 있습니다. 현재는 번역이 이뤄지고 있지 않습니다.
 
-We use sphinx-gallery's [notebook styled examples](https://sphinx-gallery.github.io/tutorials/plot_notebook.html#sphx-glr-tutorials-plot-notebook-py) to create the tutorials. Syntax is very simple. In essence, you write a slightly well formatted python file and it shows up as documentation page.
+  | 버전   | 사이트    | 소스     |
+  | ------ | --------- | -------- |
+  | 0.4.1  | [PyTorch-tutorials-kr-0.4](https://9bow.github.io/PyTorch-tutorials-kr-0.4) | [GitHub 저장소](https://github.com/9bow/PyTorch-tutorials-kr-0.4) |
+  | 0.3.1  | [PyTorch-tutorials-kr-0.3.1](https://9bow.github.io/PyTorch-tutorials-kr-0.3.1) | [GitHub 저장소](https://github.com/9bow/PyTorch-tutorials-kr-0.3.1) |
 
-Here's how to create a new tutorial:
-1. Create a notebook styled python file. If you want it executed while inserted into documentation, save the file with suffix `tutorial` so that file name is `your_tutorial.py`.
-2. Put it in one of the beginner_source, intermediate_source, advanced_source based on the level.
-2. Include it in the right TOC tree at index.rst
-3. Create a thumbnail in the index file using a command like `.. galleryitem:: beginner/your_tutorial.py`. (This is a custom directive. See `custom_directives.py` for more info.) 
 
-In case you prefer to write your tutorial in jupyter, you can use [this script](https://gist.github.com/chsasank/7218ca16f8d022e02a9c0deb94a310fe) to convert the notebook to python file. After conversion and addition to the project, please make sure the sections headings etc are in logical order.
+## 참여
 
-## Building
+오타나 오역을 발견하시면 [이슈](https://github.com/9bow/PyTorch-tutorials-kr/issues/new)를 남겨주세요. [Pull Request](https://github.com/9bow/PyTorch-tutorials-kr/pulls)도 환영합니다. :)
 
-- Start with installing torch, torchvision, and your GPUs latest drivers. Install other requirements using `pip install -r requirements.txt`
 
-> If you want to use `virtualenv`, make your environment in a `venv` directory like: `virtualenv ./venv`, then `source ./venv/bin/activate`.
-
-- Then you can build using `make docs`. This will download the data, execute the tutorials and build the documentation to `docs/` directory. This will take about 60-120 min for systems with GPUs. If you do not have a GPU installed on your system, then see next step.
-- You can skip the computationally intensive graph generation by running `make html-noplot` to build basic html documentation to `_build/html`. This way, you can quickly preview your tutorial.
+---
+This is a project to translate [pytorch/tutorials#c4d6e11](https://github.com/pytorch/tutorials/commit/c4d6e112ffa460313968e6837a4d610d152e3e34) into Korean. For the latest version, please visit to the [PyTorch tutorials repo](https://github.com/pytorch/tutorials).
