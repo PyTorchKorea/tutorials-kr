@@ -57,7 +57,7 @@ new_w1 = w1.assign(w1 - learning_rate * grad_w1)
 new_w2 = w2.assign(w2 - learning_rate * grad_w2)
 
 # 지금까지 우리는 연산 그래프를 구성하였으므로, 실제로 그래프를 실행하기 위해 이제
-# Tensorflow 세션(Session)에 들어가보겠습니다.
+# Tensorflow 세션(session)에 들어가보겠습니다.
 with tf.Session() as sess:
     # 그래프를 한 번 실행하여 w1과 w2 Variable을 초기화합니다.
     sess.run(tf.global_variables_initializer())

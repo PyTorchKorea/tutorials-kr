@@ -6,7 +6,7 @@
 이 튜토리얼에서는 `PyTorch <https://github.com/pytorch/pytorch>`__ 의 핵심적인
 개념을 예제를 통해 소개합니다.
 
-PyTorch의 핵심에는 2가지 주요한 특징이 있습니다:
+본질적으로, PyTorch에는 2가지 주요한 특징이 있습니다:
 
 - NumPy와 유사하지만 GPU 상에서 실행 가능한 N차원 Tensor
 - 신경망을 구성하고 학습하는 과정에서의 자동 미분
@@ -17,7 +17,7 @@ PyTorch의 핵심에는 2가지 주요한 특징이 있습니다:
 무작위의 데이터를 맞추도록 학습할 것입니다.
 
 .. Note::
-    각각의 에제들은 :ref:`이 페이지의 마지막 부분 <examples-download>` 에서
+    각각의 예제들은 :ref:`이 페이지의 마지막 부분 <examples-download>` 에서
     살펴볼 수 있습니다.
 
 .. contents:: Table of Contents
@@ -164,8 +164,8 @@ Tensorflow는 `Keras <https://github.com/fchollet/keras>`__,
 추상화(higher-level abstraction)하여 제공하므로 신경망을 구축하는데 있어 유용합니다.
 
 PyTorch에서는 ``nn`` 패키지가 동일한 목적으로 제공됩니다. ``nn`` 패키지는
-신경망 계층(layer)들과 거의 동일한 **모듈들** 의 집합을 정의합니다.
-모듈은 입력 Tensor를 받고 출력 Tensor를 계산하는 한편, 학습 가능한 매개변수를
+신경망 계층(layer)들과 거의 동일한 **Module** 의 집합을 정의합니다.
+Module은 입력 Tensor를 받고 출력 Tensor를 계산하는 한편, 학습 가능한 매개변수를
 갖는 Tensor 같은 내부 상태(internal state)를 갖습니다. ``nn`` 패키지는 또한
 신경망을 학습시킬 때 주로 사용하는 유용한 손실 함수들도 정의하고 있습니다.
 
@@ -176,11 +176,11 @@ PyTorch에서는 ``nn`` 패키지가 동일한 목적으로 제공됩니다. ``n
 PyTorch: optim
 --------------
 
-지금까지는 (autograd의 추적 기록을 피하기 위해``torch.no_grad ()``또는``.data``를
-사용하는 식으로) 학습 가능한 매개변수를 갖는 Tensor를 직접 조작하며 모델의 가중치를
-갱신하였습니다. 이것은 확률적 경사 하강법(SGD)과 같은 간단한 최적화 알고리즘에서는
-크게 부담이 되지는 않지만, 실제로 신경망을 학습할 때는 주로 AdaGrad, RMSProp, Adam
-등과 같은 좀 더 정교한 Optimizer를 사용하곤 합니다.
+지금까지는 (autograd의 추적 기록을 피하기 위해 ``torch.no_grad ()`` 또는 ``.data``
+를 사용하는 식으로) 학습 가능한 매개변수를 갖는 Tensor를 직접 조작하며 모델의
+가중치를 갱신하였습니다. 이것은 확률적 경사 하강법(SGD)과 같은 간단한 최적화
+알고리즘에서는 크게 부담이 되지는 않지만, 실제로 신경망을 학습할 때는 주로 AdaGrad,
+RMSProp, Adam 등과 같은 좀 더 정교한 Optimizer를 사용하곤 합니다.
 
 PyTorch의 ``optim`` 패키지는 최적화 알고리즘에 대한 아이디어를 추상화하고 일반적으로
 사용하는 최적화 알고리즘의 구현체(implementation)를 제공합니다.
