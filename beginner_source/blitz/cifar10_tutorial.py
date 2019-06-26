@@ -141,7 +141,7 @@ net = Net()
 ########################################################################
 # 3. 손실 함수와 Optimizer 정의하기
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-# 교차 엔트로피 손실(Cross-Entropy loss)과 momentum 값을 갖는 SGD를 사용합니다.
+# 교차 엔트로피 손실(Cross-Entropy loss)과 모멘텀(momentum) 값을 갖는 SGD를 사용합니다.
 
 import torch.optim as optim
 
