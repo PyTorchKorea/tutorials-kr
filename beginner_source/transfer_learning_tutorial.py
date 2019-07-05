@@ -1,33 +1,32 @@
 # -*- coding: utf-8 -*-
 """
-Transfer Learning Tutorial
-==========================
+전이학습(Transfer Learning) 튜토리얼
+====================================
 **Author**: `Sasank Chilamkurthy <https://chsasank.github.io>`_
+  **번역**: `박정환 <http://github.com/9bow>`_
 
-In this tutorial, you will learn how to train your network using
-transfer learning. You can read more about the transfer learning at `cs231n
-notes <https://cs231n.github.io/transfer-learning/>`__
+이 튜토리얼에서는 전이학습(Transfer Learning)을 이용하여 신경망을 어떻게 학습시키는지
+배워보겠습니다. 전이학습에 대해서는
+`CS231n 노트 <http://cs231n.github.io/transfer-learning/>`__ 에서 더 많은 내용을
+읽어보실 수 있습니다.
 
-Quoting these notes,
+위 노트를 인용해보면,
 
-    In practice, very few people train an entire Convolutional Network
-    from scratch (with random initialization), because it is relatively
-    rare to have a dataset of sufficient size. Instead, it is common to
-    pretrain a ConvNet on a very large dataset (e.g. ImageNet, which
-    contains 1.2 million images with 1000 categories), and then use the
-    ConvNet either as an initialization or a fixed feature extractor for
-    the task of interest.
+    실제로 충분한 크기의 데이터셋을 갖추기는 상대적으로 드물기 때문에,
+    (무작위 초기화를 통해) 맨 처음부터 합성곱 신경망(Convolutional
+    Network) 전체를 학습하는 사람은 매우 적습니다. 대신, 매우 큰 데이터셋(예.
+    100가지 분류에 대해 120만개의 이미지가 포함된 ImageNet)에서 합성곱
+    신경망(ConvNet)을 미리 학습한 후, 이 합성곱 신경망을 관심있는 작업
+    을 위한 초기 설정 또는 고정된 특징 추출기(fixed feature extractor)로 사용합니다.
 
-These two major transfer learning scenarios look as follows:
+이러한 전이학습 시나리오의 주요한 2가지는 다음과 같습니다:
 
--  **Finetuning the convnet**: Instead of random initializaion, we
-   initialize the network with a pretrained network, like the one that is
-   trained on imagenet 1000 dataset. Rest of the training looks as
-   usual.
--  **ConvNet as fixed feature extractor**: Here, we will freeze the weights
-   for all of the network except that of the final fully connected
-   layer. This last fully connected layer is replaced with a new one
-   with random weights and only this layer is trained.
+-  **합성곱 신경망의 미세조정(finetuning)**: 무작위 초기화 대신, 신경망을
+   ImageNet 1000 데이터셋 등으로 미리 학습한 신경망으로 초기화합니다. 학습의 나머지
+   과정들은 평상시와 같습니다.
+-  **고정된 특징 추출기로써의 합성곱 신경망**: 여기서는 마지막에 완전히 연결
+   된 계층을 제외한 모든 신경망의 가중치를 고정합니다. 이 마지막의 완전히 연결된
+   계층은 새로운 무작위의 가중치를 갖는 계층으로 대체되어 이 계층만 학습합니다.
 
 """
 # License: BSD
@@ -47,31 +46,28 @@ import time
 import os
 import copy
 
-plt.ion()   # interactive mode
+plt.ion()   # 대화형 모드
 
 ######################################################################
-# Load Data
-# ---------
+# 데이터 불러오기
+# ---------------
 #
-# We will use torchvision and torch.utils.data packages for loading the
-# data.
+# 데이터를 불러오기 위해 torchvision과 torch.utils.data 패키지를 사용하겠습니다.
 #
-# The problem we're going to solve today is to train a model to classify
-# **ants** and **bees**. We have about 120 training images each for ants and bees.
-# There are 75 validation images for each class. Usually, this is a very
-# small dataset to generalize upon, if trained from scratch. Since we
-# are using transfer learning, we should be able to generalize reasonably
-# well.
+# 여기서 풀고자 하는 문제는 **개미** 와 **벌** 을 분류하는 모델을 학습하는 것입니다.
+# 개미와 벌 각각의 학습용 이미지는 대략 120장 정도 있고, 75개의 검증용 이미지가
+# 있습니다. 일반적으로 맨 처음부터 학습을 한다면 이는 일반화하기에는 아주 작은
+# 데이터셋입니다. 하지만 우리는 전이학습을 할 것이므로, 일반화를 제법 잘 할 수 있을
+# 것입니다.
 #
-# This dataset is a very small subset of imagenet.
+# 이 데이터셋은 ImageNet의 아주 작은 일부입니다.
 #
 # .. Note ::
-#    Download the data from
-#    `here <https://download.pytorch.org/tutorial/hymenoptera_data.zip>`_
-#    and extract it to the current directory.
+#    데이터를 `여기 <https://download.pytorch.org/tutorial/hymenoptera_data.zip>`_
+#    에서 다운로드 받아 현재 디렉토리에 압축을 푸십시오.
 
-# Data augmentation and normalization for training
-# Just normalization for validation
+# 학습을 위해 데이터 증가(augmentation) 및 일반화(normalization)
+# 검증을 위한 일반화
 data_transforms = {
     'train': transforms.Compose([
         transforms.RandomResizedCrop(224),
@@ -100,10 +96,9 @@ class_names = image_datasets['train'].classes
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 ######################################################################
-# Visualize a few images
-# ^^^^^^^^^^^^^^^^^^^^^^
-# Let's visualize a few training images so as to understand the data
-# augmentations.
+# 일부 이미지 시각화하기
+# ^^^^^^^^^^^^^^^^^^^^^^^^^
+# 데이터 증가를 이해하기 위해 일부 학습용 이미지를 시각화해보겠습니다.
 
 def imshow(inp, title=None):
     """Imshow for Tensor."""
@@ -115,30 +110,30 @@ def imshow(inp, title=None):
     plt.imshow(inp)
     if title is not None:
         plt.title(title)
-    plt.pause(0.001)  # pause a bit so that plots are updated
+    plt.pause(0.001)  # 갱신이 될 때까지 잠시 기다립니다.
 
 
-# Get a batch of training data
+# 학습 데이터의 배치를 얻습니다.
 inputs, classes = next(iter(dataloaders['train']))
 
-# Make a grid from batch
+# 배치로부터 격자 형태의 이미지를 만듭니다.
 out = torchvision.utils.make_grid(inputs)
 
 imshow(out, title=[class_names[x] for x in classes])
 
 
 ######################################################################
-# Training the model
-# ------------------
+# 모델 학습하기
+# --------------
 #
-# Now, let's write a general function to train a model. Here, we will
-# illustrate:
+# 이제 모델을 학습하기 위한 일반 함수를 작성해보겠습니다. 여기서는 다음 내용들을
+# 설명합니다:
 #
-# -  Scheduling the learning rate
-# -  Saving the best model
+# -  학습율(learning rate) 관리(scheduling)
+# -  최적의 모델 구하기
 #
-# In the following, parameter ``scheduler`` is an LR scheduler object from
-# ``torch.optim.lr_scheduler``.
+# 아래에서 ``scheduler`` 매개변수는 ``torch.optim.lr_scheduler`` 의 LR 스케쥴러
+# 객체(Object)입니다.
 
 
 def train_model(model, criterion, optimizer, scheduler, num_epochs=25):
@@ -151,38 +146,38 @@ def train_model(model, criterion, optimizer, scheduler, num_epochs=25):
         print('Epoch {}/{}'.format(epoch, num_epochs - 1))
         print('-' * 10)
 
-        # Each epoch has a training and validation phase
+        # 각 에폭(epoch)은 학습 단계와 검증 단계를 갖습니다.
         for phase in ['train', 'val']:
             if phase == 'train':
                 scheduler.step()
-                model.train()  # Set model to training mode
+                model.train()  # 모델을 학습 모드로 설정
             else:
-                model.eval()   # Set model to evaluate mode
+                model.eval()   # 모델을 평가 모드로 설정
 
             running_loss = 0.0
             running_corrects = 0
 
-            # Iterate over data.
+            # 데이터를 반복
             for inputs, labels in dataloaders[phase]:
                 inputs = inputs.to(device)
                 labels = labels.to(device)
 
-                # zero the parameter gradients
+                # 매개변수 경사도를 0으로 설정
                 optimizer.zero_grad()
 
-                # forward
-                # track history if only in train
+                # 순전파
+                # 학습 시에만 연산 기록을 추적
                 with torch.set_grad_enabled(phase == 'train'):
                     outputs = model(inputs)
                     _, preds = torch.max(outputs, 1)
                     loss = criterion(outputs, labels)
 
-                    # backward + optimize only if in training phase
+                    # 학습 단계인 경우 역전파 + 최적화
                     if phase == 'train':
                         loss.backward()
                         optimizer.step()
 
-                # statistics
+                # 통계
                 running_loss += loss.item() * inputs.size(0)
                 running_corrects += torch.sum(preds == labels.data)
 
@@ -192,7 +187,7 @@ def train_model(model, criterion, optimizer, scheduler, num_epochs=25):
             print('{} Loss: {:.4f} Acc: {:.4f}'.format(
                 phase, epoch_loss, epoch_acc))
 
-            # deep copy the model
+            # 모델을 깊은 복사(deep copy)함
             if phase == 'val' and epoch_acc > best_acc:
                 best_acc = epoch_acc
                 best_model_wts = copy.deepcopy(model.state_dict())
@@ -204,16 +199,16 @@ def train_model(model, criterion, optimizer, scheduler, num_epochs=25):
         time_elapsed // 60, time_elapsed % 60))
     print('Best val Acc: {:4f}'.format(best_acc))
 
-    # load best model weights
+    # 가장 나은 모델 가중치를 불러옴
     model.load_state_dict(best_model_wts)
     return model
 
 
 ######################################################################
-# Visualizing the model predictions
-# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+# 모델 예측값 시각화하기
+# ^^^^^^^^^^^^^^^^^^^^^^^
 #
-# Generic function to display predictions for a few images
+# 일부 이미지에 대한 예측값을 보여주는 일반화된 함수입니다.
 #
 
 def visualize_model(model, num_images=6):
@@ -243,10 +238,10 @@ def visualize_model(model, num_images=6):
         model.train(mode=was_training)
 
 ######################################################################
-# Finetuning the convnet
-# ----------------------
+# 합성곱 신경망 미세조정(finetuning)
+# ----------------------------------
 #
-# Load a pretrained model and reset final fully connected layer.
+# 미리 학습한 모델을 불러온 후 마지막의 완전히 연결된 계층을 초기화합니다.
 #
 
 model_ft = models.resnet18(pretrained=True)
@@ -257,18 +252,17 @@ model_ft = model_ft.to(device)
 
 criterion = nn.CrossEntropyLoss()
 
-# Observe that all parameters are being optimized
+# 모든 매개변수들이 최적화되었는지 관찰
 optimizer_ft = optim.SGD(model_ft.parameters(), lr=0.001, momentum=0.9)
 
-# Decay LR by a factor of 0.1 every 7 epochs
+# 7 에폭마다 0.1씩 학습율 감소
 exp_lr_scheduler = lr_scheduler.StepLR(optimizer_ft, step_size=7, gamma=0.1)
 
 ######################################################################
-# Train and evaluate
+# 학습 및 평가하기
 # ^^^^^^^^^^^^^^^^^^
 #
-# It should take around 15-25 min on CPU. On GPU though, it takes less than a
-# minute.
+# CPU에서는 15-25분 가량, GPU에서는 1분도 이내의 시간이 걸립니다.
 #
 
 model_ft = train_model(model_ft, criterion, optimizer_ft, exp_lr_scheduler,
@@ -281,22 +275,23 @@ visualize_model(model_ft)
 
 
 ######################################################################
-# ConvNet as fixed feature extractor
-# ----------------------------------
+# 고정된 특징 추출기로써의 합성곱 신경망
+# -------------------------------------
 #
-# Here, we need to freeze all the network except the final layer. We need
-# to set ``requires_grad == False`` to freeze the parameters so that the
-# gradients are not computed in ``backward()``.
+# 이제, 마지막 계층을 제외한 신경망의 모든 부분을 고정해야 합니다.
+# ``requires_grad == False`` 로 설정하여 매개변수를 고정하여 ``backward()`` 중에
+# 경사도가 계산되지 않도록 해야합니다.
 #
-# You can read more about this in the documentation
-# `here <https://pytorch.org/docs/notes/autograd.html#excluding-subgraphs-from-backward>`__.
+# 이에 대한 문서는
+# `여기 <http://pytorch.org/docs/notes/autograd.html#excluding-subgraphs-from-backward>`__
+# 에서 확인할 수 있습니다.
 #
 
 model_conv = torchvision.models.resnet18(pretrained=True)
 for param in model_conv.parameters():
     param.requires_grad = False
 
-# Parameters of newly constructed modules have requires_grad=True by default
+# 새로 생성된 모듈의 매개변수는 기본값이 requires_grad=True 임
 num_ftrs = model_conv.fc.in_features
 model_conv.fc = nn.Linear(num_ftrs, 2)
 
@@ -304,21 +299,20 @@ model_conv = model_conv.to(device)
 
 criterion = nn.CrossEntropyLoss()
 
-# Observe that only parameters of final layer are being optimized as
-# opposed to before.
+# 이전과는 다르게 마지막 계층의 매개변수들만 최적화되는지 관찰
 optimizer_conv = optim.SGD(model_conv.fc.parameters(), lr=0.001, momentum=0.9)
 
-# Decay LR by a factor of 0.1 every 7 epochs
+# 7 에폭마다 0.1씩 학습율 감소
 exp_lr_scheduler = lr_scheduler.StepLR(optimizer_conv, step_size=7, gamma=0.1)
 
 
 ######################################################################
-# Train and evaluate
-# ^^^^^^^^^^^^^^^^^^
+# 학습 및 평가하기
+# ^^^^^^^^^^^^^^^^^
 #
-# On CPU this will take about half the time compared to previous scenario.
-# This is expected as gradients don't need to be computed for most of the
-# network. However, forward does need to be computed.
+# CPU에서 실행하는 경우 이전과 비교했을 때 약 절반 가량의 시간만이 소요될 것입니다.
+# 이는 대부분의 신경망에서 경사도를 계산할 필요가 없기 때문입니다. 하지만,
+# 순전파는 계산이 필요합니다.
 #
 
 model_conv = train_model(model_conv, criterion, optimizer_conv,
