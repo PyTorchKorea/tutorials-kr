@@ -18,7 +18,7 @@ Autograd에서 ``requires_grad=True`` 로 설정된 입력 ``Tensor`` 의 연산
 
 Autograd 구현에서 매우 중요한 클래스가 하나 더 있는데, 이것은 바로 ``Function``
 클래스입니다. ``Tensor`` 와 ``Function`` 은 서로 연결되어 있으며, 모든 연산 과정을
-부호화(encode)하여 순환하지 않은 그래프(acyclic graph)를 생성합니다. 각 변수는
+부호화(encode)하여 순환하지 않는 그래프(acyclic graph)를 생성합니다. 각 변수는
 ``.grad_fn`` 속성을 갖고 있는데, 이는 ``Tensor`` 를 생성한 ``Function`` 을
 참조하고 있습니다. (단, 사용자가 만든 Tensor는 예외로, 이 때 ``grad_fn`` 은
 ``None`` 입니다.)

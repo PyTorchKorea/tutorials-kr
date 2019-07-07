@@ -29,16 +29,16 @@ Tensor가 기록을 추적하는 것을 중단하게 하려면, ``.detach()`` �
 필요없지만, `requires_grad=True` 가 설정되어 학습 가능한 매개변수를 갖는 모델을
 평가(evaluate)할 때 유용합니다.
 
-Autograd 구현에서 매우 중요한 클래스가 하나 더 있는데, 바로 ``Function``
+Autograd 구현에서 매우 중요한 클래스가 하나 더 있는데, 이것은 바로 ``Function``
 클래스입니다.
 
-``Tensor`` 와 ``Function`` 은 상호 연결되어 있으며, 모든 연산 과정을
-부호화(encode)하여 순환하지 않은 그래프(acyclic graph)를 생성합니다. 각 tensor는
+``Tensor`` 와 ``Function`` 은 서로 연결되어 있으며, 모든 연산 과정을
+부호화(encode)하여 순환하지 않는 그래프(acyclic graph)를 생성합니다. 각 tensor는
 ``.grad_fn`` 속성을 갖고 있는데, 이는 ``Tensor`` 를 생성한 ``Function`` 을
 참조하고 있습니다. (단, 사용자가 만든 Tensor는 예외로, 이 때 ``grad_fn`` 은
 ``None`` 입니다.)
 
-도함수(derivative)를 계산하기 위해서는 ``Tensor`` 의 ``.backward()`` 를 호출하면
+도함수를 계산하기 위해서는 ``Tensor`` 의 ``.backward()`` 를 호출하면
 됩니다. 만약 ``Tensor`` 가 스칼라(scalar)인 경우(예. 하나의 요소 값만 갖는 등)에는
 ``backward`` 에 인자를 정해줄 필요가 없습니다. 하지만 여러 개의 요소를 갖고 있을
 때는 tensor의 모양을 ``gradient`` 의 인자로 지정할 필요가 있습니다.
