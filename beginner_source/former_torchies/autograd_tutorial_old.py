@@ -10,7 +10,7 @@ Autograd는 자동 미분을 수행하는 torch의 핵심 패키지로, 자동 �
 그리고, 역전파(backward) 단계에서 연산들을 재현(replay)합니다.
 
 연산 기록을 추적하는 Tensor
---------------------------
+----------------------------
 
 Autograd에서 ``requires_grad=True`` 로 설정된 입력 ``Tensor`` 의 연산은
 기록됩니다. 역전파 단계 연산 후에, 이 Tensor에 대한 변화도(grdient)는 ``.grad``
