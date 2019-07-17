@@ -96,9 +96,6 @@ print(x.grad)
 ###############################################################
 # ``4.5`` 로 이루어진 행렬을 확인할 수 있습니다. ``out`` 을 *Tensor* “:math:`o`”
 # 라고 하면, 다음과 같이 구할 수 있습니다.
-
-# You should have got a matrix of ``4.5``. Let’s call the ``out``
-# *Tensor* “:math:`o`”.
 # :math:`o = \frac{1}{4}\sum_i z_i` 이고,
 # :math:`z_i = 3(x_i+2)^2` 이므로 :math:`z_i\bigr\rvert_{x_i=1} = 27` 입니다.
 # 따라서,
@@ -177,5 +174,5 @@ with torch.no_grad():
 ###############################################################
 # **더 읽을거리:**
 #
-# ``Variable`` 과 ``Function`` 관련 문서는 http://pytorch.org/docs/autograd 에
-# 있습니다.
+# ``Function`` 관련 문서는 https://pytorch.org/docs/stable/autograd.html#function
+# 에서 찾아볼 수 있습니다.
