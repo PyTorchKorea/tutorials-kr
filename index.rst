@@ -1,5 +1,5 @@
-PyTorch 튜토리얼에 오신 것을 환영합니다
-========================================
+파이토치(PyTorch) 튜토리얼에 오신 것을 환영합니다
+===================================================
 
 PyTorch를 어떻게 사용하는지 알고 싶다면 시작하기(Getting Started) 튜토리얼부터 시작해보세요.
 :doc:`/beginner/deep_learning_60min_blitz` 가 가장 일반적인 출발점으로, 심층
@@ -77,7 +77,7 @@ Some considerations:
     <div style='clear:both'></div>
 
 
-Image
+이미지 (Image)
 ----------------------
 
 .. customgalleryitem::
@@ -115,7 +115,7 @@ Image
     <div style='clear:both'></div>
 
 
-.. Audio
+.. 오디오 (Audio)
 .. ----------------------
 
 .. Uncomment below when adding content
@@ -124,7 +124,7 @@ Image
     <div style='clear:both'></div>
 
 
-Text
+텍스트 (Text)
 ----------------------
 
 .. customgalleryitem::
@@ -154,7 +154,7 @@ Text
 
     <div style='clear:both'></div>
 
-Generative
+생성 모델 (Generative)
 ----------------------
 
 .. customgalleryitem::
@@ -167,8 +167,8 @@ Generative
     <div style='clear:both'></div>
 
 
-Reinforcement Learning
-----------------------
+강화 학습 (Reinforcement Learning)
+------------------------------------------------------------
 
 .. customgalleryitem::
     :tooltip: Use PyTorch to train a Deep Q Learning (DQN) agent
@@ -179,8 +179,8 @@ Reinforcement Learning
 
     <div style='clear:both'></div>
 
-Extending PyTorch
-----------------------
+PyTorch 확장하기 (Extending PyTorch)
+------------------------------------------------------------
 
 .. customgalleryitem::
     :tooltip: Create extensions using numpy and scipy
@@ -203,8 +203,8 @@ Extending PyTorch
     <div style='clear:both'></div>
 
 
-Production Usage
-----------------------
+운영환경에서 사용 (Production Usage)
+------------------------------------------------------------
 
 .. customgalleryitem::
    :tooltip: Loading a PyTorch model in C++
@@ -243,8 +243,8 @@ Production Usage
     <div style='clear:both'></div>
 
 
-PyTorch in Other Languages
----------------------------
+다른 언어에서의 PyTorch (PyTorch in Other Languages)
+------------------------------------------------------------
 
 .. customgalleryitem::
     :tooltip: Using the PyTorch C++ Frontend
@@ -262,7 +262,7 @@ PyTorch in Other Languages
    :maxdepth: 2
    :hidden:
    :includehidden:
-   :caption: Getting Started
+   :caption: 시작하기 (Getting Started)
 
    beginner/deep_learning_60min_blitz
    beginner/data_loading_tutorial
@@ -276,7 +276,7 @@ PyTorch in Other Languages
    :maxdepth: 2
    :includehidden:
    :hidden:
-   :caption: Image
+   :caption: 이미지 (Image)
 
    intermediate/torchvision_tutorial
    beginner/finetuning_torchvision_models_tutorial
@@ -289,13 +289,13 @@ PyTorch in Other Languages
    :maxdepth: 2
    :includehidden:
    :hidden:
-   :caption: Audio
+   :caption: 오디오 (Audio)
 
 .. toctree::
    :maxdepth: 2
    :includehidden:
    :hidden:
-   :caption: Text
+   :caption: 텍스트 (Text)
 
    beginner/chatbot_tutorial
    intermediate/char_rnn_generation_tutorial
@@ -307,7 +307,7 @@ PyTorch in Other Languages
    :maxdepth: 2
    :includehidden:
    :hidden:
-   :caption: Generative
+   :caption: 생성 모델
 
    beginner/dcgan_faces_tutorial
 
@@ -315,7 +315,7 @@ PyTorch in Other Languages
    :maxdepth: 2
    :includehidden:
    :hidden:
-   :caption: Reinforcement Learning
+   :caption: 강화 학습
 
    intermediate/reinforcement_q_learning
 
@@ -323,7 +323,7 @@ PyTorch in Other Languages
    :maxdepth: 2
    :includehidden:
    :hidden:
-   :caption: Extending PyTorch
+   :caption: PyTorch 확장하기
 
    advanced/numpy_extensions_tutorial
    advanced/cpp_extension
@@ -333,7 +333,7 @@ PyTorch in Other Languages
    :maxdepth: 2
    :includehidden:
    :hidden:
-   :caption: Production Usage
+   :caption: 운영환경에서 사용
 
    intermediate/model_parallel_tutorial
    intermediate/ddp_tutorial
@@ -346,6 +346,6 @@ PyTorch in Other Languages
    :maxdepth: 2
    :includehidden:
    :hidden:
-   :caption: PyTorch in Other Languages
+   :caption: 다른 언어에서의 PyTorch
 
    advanced/cpp_frontend
