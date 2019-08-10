@@ -1,83 +1,71 @@
 # -*- coding: utf-8 -*-
 """
-Saving and Loading Models
+모델 저장하기 & 불러오기
 =========================
 **Author:** `Matthew Inkawhich <https://github.com/MatthewInkawhich>`_
+  **번역**: `박정환 <http://github.com/9bow>`_
 
-This document provides solutions to a variety of use cases regarding the
-saving and loading of PyTorch models. Feel free to read the whole
-document, or just skip to the code you need for a desired use case.
+이 문서에서는 PyTorch 모델을 저장하고 불러오는 다양한 방법을 제공합니다.
+이 문서 전체를 다 읽는 것도 좋은 방법이지만, 필요한 사용 예의 코드만 참고하는
+것도 고려해보세요.
 
-When it comes to saving and loading models, there are three core
-functions to be familiar with:
+모델을 저장하거나 불러올 때는 3가지의 핵심 함수와 익숙해질 필요가 있습니다:
 
 1) `torch.save <https://pytorch.org/docs/stable/torch.html?highlight=save#torch.save>`__:
-   Saves a serialized object to disk. This function uses Python’s
-   `pickle <https://docs.python.org/3/library/pickle.html>`__ utility
-   for serialization. Models, tensors, and dictionaries of all kinds of
-   objects can be saved using this function.
+   직렬화된 객체를 디스크에 저장합니다. 이 함수는 Python의
+   `pickle <https://docs.python.org/3/library/pickle.html>`__ 을 사용하여 직렬화합니다
+   이 함수를 사용하여 모든 종류의 객체의 모델, Tensor 및 사전을 저장할 수 있습니다.
 
 2) `torch.load <https://pytorch.org/docs/stable/torch.html?highlight=torch%20load#torch.load>`__:
-   Uses `pickle <https://docs.python.org/3/library/pickle.html>`__\ ’s
-   unpickling facilities to deserialize pickled object files to memory.
-   This function also facilitates the device to load the data into (see
-   `Saving & Loading Model Across
-   Devices <#saving-loading-model-across-devices>`__).
+   `pickle <https://docs.python.org/3/library/pickle.html>`__\ 을 사용하여
+   저장된 객체 파일들을 역직렬화하여 메모리에 올립니다. 이 함수는 데이터를 장치에
+   불러올 때도 사용합니다.
+   (`장치간 모델 저장하기 & 불러오기 <#device>`__ 참고)
 
 3) `torch.nn.Module.load_state_dict <https://pytorch.org/docs/stable/nn.html?highlight=load_state_dict#torch.nn.Module.load_state_dict>`__:
-   Loads a model’s parameter dictionary using a deserialized
-   *state_dict*. For more information on *state_dict*, see `What is a
-   state_dict? <#what-is-a-state-dict>`__.
+   역직렬화된 *state_dict* 를 사용하여 모델의 매개변수들을 불러옵니다.
+   *state_dict* 에 대한 더 자세한 정보는 `state_dict가 무엇인가요?
+   <#state-dict>`__ 를 참고하세요.
 
 
 
-**Contents:**
+**목차:**
 
--  `What is a state_dict? <#what-is-a-state-dict>`__
--  `Saving & Loading Model for
-   Inference <#saving-loading-model-for-inference>`__
--  `Saving & Loading a General
-   Checkpoint <#saving-loading-a-general-checkpoint-for-inference-and-or-resuming-training>`__
--  `Saving Multiple Models in One
-   File <#saving-multiple-models-in-one-file>`__
--  `Warmstarting Model Using Parameters from a Different
-   Model <#warmstarting-model-using-parameters-from-a-different-model>`__
--  `Saving & Loading Model Across
-   Devices <#saving-loading-model-across-devices>`__
+-  `state_dict가 무엇인가요? <#state-dict>`__
+-  `추론(inference)를 위해 모델 저장하기 & 불러오기 <#inference>`__
+-  `일반 체크포인트(checkpoint) 저장하기 & 불러오기 <#checkpoint>`__
+-  `여러개(multiple)의 모델을 하나의 파일에 저장하기 <#multiple>`__
+-  `다른 모델의 매개변수를 사용하여 빠르게 모델 시작하기(warmstart) <#warmstart>`__
+-  `장치(device)간 모델 저장하기 & 불러오기 <#device>`__
 
 """
 
 
 ######################################################################
-# What is a ``state_dict``?
-# -------------------------
+# ``state_dict`` 가 무엇인가요?
+# -------------------------------
 #
-# In PyTorch, the learnable parameters (i.e. weights and biases) of an
-# ``torch.nn.Module`` model are contained in the model’s *parameters*
-# (accessed with ``model.parameters()``). A *state_dict* is simply a
-# Python dictionary object that maps each layer to its parameter tensor.
-# Note that only layers with learnable parameters (convolutional layers,
-# linear layers, etc.) and registered buffers (batchnorm's running_mean)
-# have entries in the model’s *state_dict*. Optimizer
-# objects (``torch.optim``) also have a *state_dict*, which contains
-# information about the optimizer’s state, as well as the hyperparameters
-# used.
+# PyTorch에서 ``torch.nn.Module`` 모델의 학습 가능한 매개변수(예. 가중치와 편향)들은
+# 모델의 매개변수에 포함되어 있습니다(model.parameters()로 접근합니다).
+# *state_dict* 는 간단히 말해 각 계층을 매개변수 텐서로 매핑되는 Python 사전(dict)
+# 객체입니다. 이 때, 학습 가능한 매개변수를 갖는 계층(합성곱 계층, 선형 계층 등)
+# 및 등록된 버퍼들(batchnorm의 running_mean)만이 모델의 *state_dict* 에 항목을
+# 가짐을 유의하시기 바랍니다. 옵티마이저 객체(``torch.optim``) 또한 옵티마이저의
+# 상태 뿐만 아니라 사용된 하이퍼 매개변수(Hyperparameter) 정보가 포함된
+# *state_dict* 를 갖습니다.
 #
-# Because *state_dict* objects are Python dictionaries, they can be easily
-# saved, updated, altered, and restored, adding a great deal of modularity
-# to PyTorch models and optimizers.
+# *state_dict* 객체는 Python 사전이기 때문에 쉽게 저장하거나 갱신하거나 바꾸거나
+# 되살릴 수 있으며, PyTorch 모델과 옵티마이저에 엄청난 모듈성(modularity)을 제공합니다.
 #
-# Example:
+# 예제:
 # ^^^^^^^^
 #
-# Let’s take a look at the *state_dict* from the simple model used in the
-# `Training a
-# classifier <https://pytorch.org/tutorials/beginner/blitz/cifar10_tutorial.html#sphx-glr-beginner-blitz-cifar10-tutorial-py>`__
-# tutorial.
+# :doc:`/beginner/blitz/cifar10_tutorial` 튜토리얼에서 사용한 간단한 모델의
+# *state_dict* 를 살펴보도록 하겠습니다.
 #
 # .. code:: python
 #
-#    # Define model
+#    # 모델 정의
 #    class TheModelClass(nn.Module):
 #        def __init__(self):
 #            super(TheModelClass, self).__init__()
@@ -97,23 +85,23 @@ functions to be familiar with:
 #            x = self.fc3(x)
 #            return x
 #
-#    # Initialize model
+#    # 모델 초기화
 #    model = TheModelClass()
 #
-#    # Initialize optimizer
+#    # 옵티마이저 초기화
 #    optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
 #
-#    # Print model's state_dict
+#    # 모델의 state_dict 출력
 #    print("Model's state_dict:")
 #    for param_tensor in model.state_dict():
 #        print(param_tensor, "\t", model.state_dict()[param_tensor].size())
 #
-#    # Print optimizer's state_dict
+#    # 옵티마이저의 state_dict 출력
 #    print("Optimizer's state_dict:")
 #    for var_name in optimizer.state_dict():
 #        print(var_name, "\t", optimizer.state_dict()[var_name])
 #
-# **Output:**
+# **출력:**
 #
 # ::
 #
@@ -136,19 +124,19 @@ functions to be familiar with:
 
 
 ######################################################################
-# Saving & Loading Model for Inference
-# ------------------------------------
+# 추론(inference)를 위해 모델 저장하기 & 불러오기
+# ------------------------------------------------
 #
-# Save/Load ``state_dict`` (Recommended)
-# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+# ``state_dict`` 저장하기 / 불러오기 (권장)
+# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 #
-# **Save:**
+# **저장하기:**
 #
 # .. code:: python
 #
 #    torch.save(model.state_dict(), PATH)
 #
-# **Load:**
+# **불러오기:**
 #
 # .. code:: python
 #
@@ -156,71 +144,67 @@ functions to be familiar with:
 #    model.load_state_dict(torch.load(PATH))
 #    model.eval()
 #
-# When saving a model for inference, it is only necessary to save the
-# trained model’s learned parameters. Saving the model’s *state_dict* with
-# the ``torch.save()`` function will give you the most flexibility for
-# restoring the model later, which is why it is the recommended method for
-# saving models.
+# 추론을 위해 모델을 저장할 때는 학습된 모델의 학습된 매개변수만 저장하면 됩니다.
+# ``torch.save()`` 를 사용하여 모델의 *state_dict* 를 저장하는 것이 나중에 모델을
+# 사용할 때 가장 유연하게 사용할 수 있는, 모델 저장 시 권장하는 방법입니다.
 #
-# A common PyTorch convention is to save models using either a ``.pt`` or
-# ``.pth`` file extension.
+# PyTorch에서는 모델을 저장할 때 ``.pt`` 또는 ``.pth`` 확장자를 사용하는 것이
+# 일반적인 규칙입니다.
 #
-# Remember that you must call ``model.eval()`` to set dropout and batch
-# normalization layers to evaluation mode before running inference.
-# Failing to do this will yield inconsistent inference results.
+# 추론을 실행하기 전에는 반드시 ``model.eval()`` 을 호출하여 드롭아웃 및 배치
+# 정규화를 평가 모드로 설정하여야 합니다. 이것을 하지 않으면 추론 결과가 일관성
+# 없게 출력됩니다.
 #
 # .. Note ::
 #
-#    Notice that the ``load_state_dict()`` function takes a dictionary
-#    object, NOT a path to a saved object. This means that you must
-#    deserialize the saved *state_dict* before you pass it to the
-#    ``load_state_dict()`` function. For example, you CANNOT load using
-#    ``model.load_state_dict(PATH)``.
+#    ``load_state_dict()`` 함수에는 저장된 객체의 경로가 아닌, 사전 객체를
+#    전달해야 하는 것에 유의하세요. 따라서 저장된 *state_dict* 를 ``load_state_dict()``
+#    함수에 전달하기 전에 반드시 역직렬화를 해야 합니다. 예를 들어,
+#    ``model.load_state_dict(PATH)`` 과 같은 식으로는 사용하면 안됩니다.
 #
 #
-# Save/Load Entire Model
-# ^^^^^^^^^^^^^^^^^^^^^^
+# 전체 모델 저장하기/불러오기
+# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 #
-# **Save:**
+# **저장하기:**
 #
 # .. code:: python
 #
 #    torch.save(model, PATH)
 #
-# **Load:**
+# **불러오기:**
 #
 # .. code:: python
 #
-#    # Model class must be defined somewhere
+#    # 모델 클래스는 어딘가에 반드시 선언되어 있어야 합니다
 #    model = torch.load(PATH)
 #    model.eval()
 #
-# This save/load process uses the most intuitive syntax and involves the
-# least amount of code. Saving a model in this way will save the entire
-# module using Python’s
-# `pickle <https://docs.python.org/3/library/pickle.html>`__ module. The
-# disadvantage of this approach is that the serialized data is bound to
-# the specific classes and the exact directory structure used when the
-# model is saved. The reason for this is because pickle does not save the
-# model class itself. Rather, it saves a path to the file containing the
-# class, which is used during load time. Because of this, your code can
-# break in various ways when used in other projects or after refactors.
+# 이 저장하기/불러오기 과정은 가장 직관적인 문법을 사용하며 적은 양의
+# 코드를 사용합니다. 이러한 방식으로 모델을 저장하는 것은 Python의
+# `pickle <https://docs.python.org/3/library/pickle.html>`__ 모듈을 사용하여
+# 전체 모듈을 저장하게 됩니다. 하지만 pickle은 모델 그 자체를 저장하지 않기 때문에
+# 직렬화된 데이터가 모델을 저장할 때 사용한 특정 클래스 및 디렉토리 경로(구조)에
+# 얽매인다는 것이 이 방식의 단점입니다. 대신에 클래스가 위치한 파일의 경로를
+# 저장해두고, 불러오는 시점에 사용합니다. 이러한 이유 때문에, 만들어둔 코드를
+# 다른 프로젝트에서 사용하거나 리팩토링 후에 다양한 이유로 동작하지 않을 수
+# 있습니다.
 #
-# A common PyTorch convention is to save models using either a ``.pt`` or
-# ``.pth`` file extension.
+# PyTorch에서는 모델을 저장할 때 ``.pt`` 또는 ``.pth`` 확장자를 사용하는 것이
+# 일반적인 규칙입니다.
 #
-# Remember that you must call ``model.eval()`` to set dropout and batch
-# normalization layers to evaluation mode before running inference.
-# Failing to do this will yield inconsistent inference results.
+# 추론을 실행하기 전에는 반드시 ``model.eval()`` 을 호출하여 드롭아웃 및 배치
+# 정규화를 평가 모드로 설정하여야 합니다. 이것을 하지 않으면 추론 결과가 일관성
+# 없게 출력됩니다.
 #
 
 
 ######################################################################
-# Saving & Loading a General Checkpoint for Inference and/or Resuming Training
-# ----------------------------------------------------------------------------
+# 추론 / 학습 재개를 위해 일반 체크포인트(checkpoint) 저장하기 & 불러오기
+# --------------------------------------------------------------------------
 #
-# Save:
-# ^^^^^
+# 저장하기:
+# ^^^^^^^^^^
 #
 # .. code:: python
 #
@@ -232,8 +216,8 @@ functions to be familiar with:
 #                ...
 #                }, PATH)
 #
-# Load:
-# ^^^^^
+# 불러오기:
+# ^^^^^^^^^^
 #
 # .. code:: python
 #
@@ -250,38 +234,33 @@ functions to be familiar with:
 #    # - or -
 #    model.train()
 #
-# When saving a general checkpoint, to be used for either inference or
-# resuming training, you must save more than just the model’s
-# *state_dict*. It is important to also save the optimizer’s *state_dict*,
-# as this contains buffers and parameters that are updated as the model
-# trains. Other items that you may want to save are the epoch you left off
-# on, the latest recorded training loss, external ``torch.nn.Embedding``
-# layers, etc.
+# 추론 또는 학습 재개를 위해 일반 체크포인트를 저장할 때는 반드시 모델의
+# *state_dict* 보다 많은 것들을 저장해야 합니다. 모델이 학습을 하며 갱신되는
+# 버퍼와 매개변수가 포함된 옵티마이저의 *state_dict* 도 함께 저장하는 것이
+# 중요합니다. 그 외에도 마지막 에폭(epoch), 최근에 기록된 학습 손실, 외부
+# ``torch.nn.Embedding`` 계층 등도 함께 저장합니다.
 #
-# To save multiple components, organize them in a dictionary and use
-# ``torch.save()`` to serialize the dictionary. A common PyTorch
-# convention is to save these checkpoints using the ``.tar`` file
-# extension.
+# 여러가지를 함께 저장하려면, 사전(dictionary) 자료형으로 만든 후
+# ``torch.save()`` 를 사용하여 직렬화합니다. PyTorch가 이러한 체크포인트를 저장할
+# 때는 ``.tar`` 확장자를 사용하는 것이 일반적인 규칙입니다.
 #
-# To load the items, first initialize the model and optimizer, then load
-# the dictionary locally using ``torch.load()``. From here, you can easily
-# access the saved items by simply querying the dictionary as you would
-# expect.
+# 항목들을 불러올 때에는 먼저 모델과 옵티마이저를 초기화한 후, ``torch.load()``
+# 를 사용하여 사전을 불러옵니다. 이후로는 저장된 항목들을 사전에 원하는대로 사전에
+# 질의하여 쉽게 접근할 수 있습니다.
 #
-# Remember that you must call ``model.eval()`` to set dropout and batch
-# normalization layers to evaluation mode before running inference.
-# Failing to do this will yield inconsistent inference results. If you
-# wish to resuming training, call ``model.train()`` to ensure these layers
-# are in training mode.
+# 추론을 실행하기 전에는 반드시 ``model.eval()`` 을 호출하여 드롭아웃 및 배치
+# 정규화를 평가 모드로 설정하여야 합니다. 이것을 하지 않으면 추론 결과가 일관성
+# 없게 출력됩니다. 만약 학습을 계속하고 싶다면, ``model.train()`` 을 호출하여
+# 학습 모드로 전환되도록 해야 합니다.
 #
 
 
 ######################################################################
-# Saving Multiple Models in One File
-# ----------------------------------
+# 여러개(multiple)의 모델을 하나의 파일에 저장하기
+# -------------------------------------------------------
 #
-# Save:
-# ^^^^^
+# 저장하기:
+# ^^^^^^^^^^
 #
 # .. code:: python
 #
@@ -293,8 +272,8 @@ functions to be familiar with:
 #                ...
 #                }, PATH)
 #
-# Load:
-# ^^^^^
+# 불러오기:
+# ^^^^^^^^^^
 #
 # .. code:: python
 #
@@ -315,81 +294,75 @@ functions to be familiar with:
 #    modelA.train()
 #    modelB.train()
 #
-# When saving a model comprised of multiple ``torch.nn.Modules``, such as
-# a GAN, a sequence-to-sequence model, or an ensemble of models, you
-# follow the same approach as when you are saving a general checkpoint. In
-# other words, save a dictionary of each model’s *state_dict* and
-# corresponding optimizer. As mentioned before, you can save any other
-# items that may aid you in resuming training by simply appending them to
-# the dictionary.
+# GAN, Seq2Seq 또는 앙상블 모델과 같이 여러개의 여러개의 ``torch.nn.Modules`` 로
+# 구성된 모델을 저장하는 경우에는 일반 체크포인트를 저장할 때와 같은 방식을
+# 따릅니다. 즉, 각 모델의 *state_dict* 와 해당 옵티마이저를 사전으로 저장합니다.
+# 앞에서 언급했던 것과 같이, 학습을 재개하는데 필요한 다른 항목들을 사전에 추가하여
+# 저장할 수 있습니다.
 #
-# A common PyTorch convention is to save these checkpoints using the
-# ``.tar`` file extension.
+# PyTorch가 이러한 체크포인트를 저장할 때는 ``.tar`` 확장자를 사용하는 것이
+# 일반적인 규칙입니다.
 #
-# To load the models, first initialize the models and optimizers, then
-# load the dictionary locally using ``torch.load()``. From here, you can
-# easily access the saved items by simply querying the dictionary as you
-# would expect.
+# 항목들을 불러올 때에는 먼저 모델과 옵티마이저를 초기화한 후, ``torch.load()``
+# 를 사용하여 사전을 불러옵니다. 이후로는 저장된 항목들을 사전에 원하는대로 사전에
+# 질의하여 쉽게 접근할 수 있습니다.
 #
-# Remember that you must call ``model.eval()`` to set dropout and batch
-# normalization layers to evaluation mode before running inference.
-# Failing to do this will yield inconsistent inference results. If you
-# wish to resuming training, call ``model.train()`` to set these layers to
-# training mode.
+# 추론을 실행하기 전에는 반드시 ``model.eval()`` 을 호출하여 드롭아웃 및 배치
+# 정규화를 평가 모드로 설정하여야 합니다. 이것을 하지 않으면 추론 결과가 일관성
+# 없게 출력됩니다. 만약 학습을 계속하고 싶다면, ``model.train()`` 을 호출하여
+# 학습 모드로 설정해야 합니다.
 #
 
 
 ######################################################################
-# Warmstarting Model Using Parameters from a Different Model
-# ----------------------------------------------------------
+# 다른 모델의 매개변수를 사용하여 빠르게 모델 시작하기(warmstart)
+# --------------------------------------------------------------------
 #
-# Save:
-# ^^^^^
+# 저장하기:
+# ^^^^^^^^^^
 #
 # .. code:: python
 #
 #    torch.save(modelA.state_dict(), PATH)
 #
-# Load:
-# ^^^^^
+# 불러오기:
+# ^^^^^^^^^^
 #
 # .. code:: python
 #
 #    modelB = TheModelBClass(*args, **kwargs)
 #    modelB.load_state_dict(torch.load(PATH), strict=False)
 #
-# Partially loading a model or loading a partial model are common
-# scenarios when transfer learning or training a new complex model.
-# Leveraging trained parameters, even if only a few are usable, will help
-# to warmstart the training process and hopefully help your model converge
-# much faster than training from scratch.
+# 부분적으로 모델을 불러오거나, 모델의 일부를 불러오는 것은 전이학습 또는
+# 새로운 복잡한 모델을 학습할 때 일반적인 시나리오입니다. 학습된 매개변수를
+# 사용하면, 일부만 사용한다 하더라도 학습 과정을 빠르게 시작할 수 있고,
+# 처음부터 시작하는 것보다 훨씬 빠르게 모델이 수렴하도록 도울 것입니다.
 #
-# Whether you are loading from a partial *state_dict*, which is missing
-# some keys, or loading a *state_dict* with more keys than the model that
-# you are loading into, you can set the ``strict`` argument to **False**
-# in the ``load_state_dict()`` function to ignore non-matching keys.
+# 몇몇 키를 제외하고 *state_dict* 의 일부를 불러오거나, 적재하려는 모델보다
+# 더 많은 키를 갖고 있는 *state_dict* 를 불러올 때에는 ``load_state_dict()``
+# 함수에서 ``strict`` 인자를 **False** 로 설정하여 일치하지 않는 키들을
+# 무시하도록 해야 합니다.
 #
-# If you want to load parameters from one layer to another, but some keys
-# do not match, simply change the name of the parameter keys in the
-# *state_dict* that you are loading to match the keys in the model that
-# you are loading into.
+# 한 계층에서 다른 계층으로 매개변수를 불러오고 싶지만, 일부 키가 일치하지
+# 않을 때에는 적재하려는 모델의 키와 일치하도록 *state_dict* 의 매개변수 키의
+# 이름을 변경하면 됩니다.
 #
 
 
 ######################################################################
-# Saving & Loading Model Across Devices
-# -------------------------------------
+# 장치(device)간 모델 저장하기 & 불러오기
+# ----------------------------------------
 #
-# Save on GPU, Load on CPU
-# ^^^^^^^^^^^^^^^^^^^^^^^^
+# GPU에서 저장하고 CPU에서 불러오기
+# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 #
-# **Save:**
+# **저장하기:**
 #
 # .. code:: python
 #
 #    torch.save(model.state_dict(), PATH)
 #
-# **Load:**
+# **불러오기:**
 #
 # .. code:: python
 #
@@ -397,22 +370,21 @@ functions to be familiar with:
 #    model = TheModelClass(*args, **kwargs)
 #    model.load_state_dict(torch.load(PATH, map_location=device))
 #
-# When loading a model on a CPU that was trained with a GPU, pass
-# ``torch.device('cpu')`` to the ``map_location`` argument in the
-# ``torch.load()`` function. In this case, the storages underlying the
-# tensors are dynamically remapped to the CPU device using the
-# ``map_location`` argument.
+# GPU에서 학습한 모델을 CPU에서 불러올 때는 ``torch.load()`` 함수의
+# ``map_location`` 인자에 ``torch.device('cpu')`` 을 전달합니다.
+# 이 경우에는 Tensor에 저장된 내용들은 ``map_location`` 인자를 사용하여 CPU 장치에
+# 동적으로 재배치됩니다.
 #
-# Save on GPU, Load on GPU
-# ^^^^^^^^^^^^^^^^^^^^^^^^
+# GPU에서 저장하고 GPU에서 불러오기
+# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 #
-# **Save:**
+# **저장하기:**
 #
 # .. code:: python
 #
 #    torch.save(model.state_dict(), PATH)
 #
-# **Load:**
+# **불러오기:**
 #
 # .. code:: python
 #
@@ -420,64 +392,60 @@ functions to be familiar with:
 #    model = TheModelClass(*args, **kwargs)
 #    model.load_state_dict(torch.load(PATH))
 #    model.to(device)
-#    # Make sure to call input = input.to(device) on any input tensors that you feed to the model
+#    # 모델에서 사용하는 input Tensor들은 input = input.to(device) 을 호출해야 합니다.
 #
-# When loading a model on a GPU that was trained and saved on GPU, simply
-# convert the initialized ``model`` to a CUDA optimized model using
-# ``model.to(torch.device('cuda'))``. Also, be sure to use the
-# ``.to(torch.device('cuda'))`` function on all model inputs to prepare
-# the data for the model. Note that calling ``my_tensor.to(device)``
-# returns a new copy of ``my_tensor`` on GPU. It does NOT overwrite
-# ``my_tensor``. Therefore, remember to manually overwrite tensors:
-# ``my_tensor = my_tensor.to(torch.device('cuda'))``.
+# GPU에서 학습한 모델을 GPU에서 불러올 때에는, 초기화된 ``model`` 에
+# ``model.to(torch.device('cuda'))`` 을 호출하여 CUDA 최적화된 모델로 변환해야
+# 합니다. 또한, 모델에 데이터를 제공하는 모든 입력에 ``.to(torch.device('cuda'))``
+# 함수를 호출해야 합니다. ``my_tensor.to(device)`` 를 호출하면 GPU에 ``my_tensor``
+# 의 복사본을 반환하기 때문에, Tensor를 직접 덮어써야 합니다:
+# ``my_tensor = my_tensor.to(torch.device('cuda'))`` .
 #
-# Save on CPU, Load on GPU
-# ^^^^^^^^^^^^^^^^^^^^^^^^
+# CPU에서 저장하고 GPU에서 불러오기
+# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 #
-# **Save:**
+# **저장하기:**
 #
 # .. code:: python
 #
 #    torch.save(model.state_dict(), PATH)
 #
-# **Load:**
+# **불러오기:**
 #
 # .. code:: python
 #
 #    device = torch.device("cuda")
 #    model = TheModelClass(*args, **kwargs)
-#    model.load_state_dict(torch.load(PATH, map_location="cuda:0"))  # Choose whatever GPU device number you want
+#    model.load_state_dict(torch.load(PATH, map_location="cuda:0"))  # 사용할 GPU 장치 번호를 선택합니다.
 #    model.to(device)
-#    # Make sure to call input = input.to(device) on any input tensors that you feed to the model
+#    # 모델에서 사용하는 input Tensor들은 input = input.to(device) 을 호출해야 합니다.
 #
-# When loading a model on a GPU that was trained and saved on CPU, set the
-# ``map_location`` argument in the ``torch.load()`` function to
-# *cuda:device_id*. This loads the model to a given GPU device. Next, be
-# sure to call ``model.to(torch.device('cuda'))`` to convert the model’s
-# parameter tensors to CUDA tensors. Finally, be sure to use the
-# ``.to(torch.device('cuda'))`` function on all model inputs to prepare
-# the data for the CUDA optimized model. Note that calling
-# ``my_tensor.to(device)`` returns a new copy of ``my_tensor`` on GPU. It
-# does NOT overwrite ``my_tensor``. Therefore, remember to manually
-# overwrite tensors: ``my_tensor = my_tensor.to(torch.device('cuda'))``.
+# CPU에서 학습한 모델을 GPU에서 불러올 때는 ``torch.load()`` 함수의
+# ``map_location`` 인자에 *cuda:device_id* 을 설정합니다. 이렇게 하면 모델이 해당
+# GPU 장치에 불러와집니다. 다음으로 ``model.to(torch.device('cuda'))`` 을 호출하여
+# 모델의 매개변수 Tensor들을 CUDA Tensor들로 변환해야 합니다. 마지막으로 모든
+# 모델 입력에 ``.to(torch.device('cuda'))`` 을 사용하여 CUDA 최적화된 모델을 위한
+# 데이터로 만들어야 합니다. ``my_tensor.to(device)`` 를 호출하면 GPU에 ``my_tensor``
+# 의 복사본을 반환합니다. 이 동작은 ``my_tensor`` 를 덮어쓰지 않기 때문에, Tensor를
+# 직접 덮어써야 합니다: ``my_tensor = my_tensor.to(torch.device('cuda'))`` .
 #
-# Saving ``torch.nn.DataParallel`` Models
-# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+# ``torch.nn.DataParallel`` 모델 저장하기
+# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 #
-# **Save:**
+# **저장하기:**
 #
 # .. code:: python
 #
 #    torch.save(model.module.state_dict(), PATH)
 #
-# **Load:**
+# **불러오기:**
 #
 # .. code:: python
 #
-#    # Load to whatever device you want
+#    # 사용할 장치에 불러옵니다.
 #
-# ``torch.nn.DataParallel`` is a model wrapper that enables parallel GPU
-# utilization. To save a ``DataParallel`` model generically, save the
-# ``model.module.state_dict()``. This way, you have the flexibility to
-# load the model any way you want to any device you want.
+# ``torch.nn.DataParallel`` 은 병렬 GPU 활용을 가능하게 하는 모델 래퍼(wrapper)입니다.
+# ``DataParallel`` 모델을 범용적으로 저장하려면 ``model.module.state_dict()`` 을
+# 사용하면 됩니다. 이렇게 하면 원하는 모든 장치에 원하는 방식으로 유연하게 모델을
+# 불러올 수 있습니다.
 #
