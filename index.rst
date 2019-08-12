@@ -55,16 +55,16 @@ Some considerations:
    :description: :doc:`beginner/transfer_learning_tutorial`
 
 .. customgalleryitem::
-   :figure: /_static/img/hybrid.png
-   :tooltip: Experiment with some of the key features of the PyTorch hybrid frontend
-   :description: :doc:`beginner/deploy_seq2seq_hybrid_frontend_tutorial`
-
-.. customgalleryitem::
    :figure: /_static/img/thumbnails/floppy.png
    :tooltip: Explore use cases for the saving and loading of PyTorch models
    :description: :doc:`beginner/saving_loading_models`
 
 .. .. galleryitem:: beginner/saving_loading_models.py
+
+.. customgalleryitem::
+   :figure: /_static/img/thumbnails/pytorch_tensorboard.png
+   :tooltip: Learn to use TensorBoard to visualize data and model training
+   :description: :doc:`intermediate/tensorboard_tutorial`
 
 .. customgalleryitem::
    :figure: /_static/img/torch.nn.png
@@ -107,19 +107,23 @@ Some considerations:
 
 .. customgalleryitem::
    :figure: /_static/img/cat.jpg
-   :tooltip: Use ONNX to convert a model defined in PyTorch into the ONNX format and then load it into Caffe2
-   :description: :doc:`advanced/super_resolution_with_caffe2`
+   :tooltip: Exporting a Model from PyTorch to ONNX and Running it using ONNXRuntime
+   :description: :doc:`advanced/super_resolution_with_onnxruntime`
 
 .. raw:: html
 
     <div style='clear:both'></div>
 
 
-.. 오디오 (Audio)
-.. ----------------------
+오디오 (Audio)
+----------------------
 
-.. Uncomment below when adding content
-.. .. raw:: html
+.. customgalleryitem::
+   :figure: /_static/img/audio_preprocessing_tutorial_waveform.png
+   :tooltip: Preprocessing with torchaudio Tutorial
+   :description: :doc:`beginner/audio_preprocessing_tutorial`
+
+.. raw:: html
 
     <div style='clear:both'></div>
 
@@ -149,6 +153,11 @@ Some considerations:
 
 .. galleryitem:: intermediate/seq2seq_translation_tutorial.py
   :figure: _static/img/seq2seq_flat.png
+
+.. customgalleryitem::
+    :tooltip: Sentiment Ngrams with Torchtext
+    :figure: /_static/img/text_sentiment_ngrams_model.png
+    :description: :doc:`/beginner/text_sentiment_ngrams_tutorial`
 
 .. raw:: html
 
@@ -207,15 +216,19 @@ PyTorch 확장하기 (Extending PyTorch)
 ------------------------------------------------------------
 
 .. customgalleryitem::
+   :tooltip: Introduction to TorchScript
+   :description: :doc:`beginner/Intro_to_TorchScript`
+   :figure: _static/img/torchscript.png
+
+.. customgalleryitem::
+   :figure: /_static/img/torchscript.png
+   :tooltip: Experiment with some of the key features of the TorchScript
+   :description: :doc:`beginner/deploy_seq2seq_hybrid_frontend_tutorial`
+
+.. customgalleryitem::
    :tooltip: Loading a PyTorch model in C++
    :description: :doc:`advanced/cpp_export`
    :figure: _static/img/cpp_logo.png
-
-.. customgalleryitem::
-   :tooltip: Convert a neural style transfer model that has been exported from PyTorch into the Apple CoreML format using ONNX
-   :description: :doc:`advanced/ONNXLive`
-   :figure: _static/img/ONNXLive.png
-
 
 .. customgalleryitem::
    :tooltip: Parallelize computations across processes and clusters of machines
@@ -269,8 +282,10 @@ PyTorch 확장하기 (Extending PyTorch)
    beginner/pytorch_with_examples
    beginner/transfer_learning_tutorial
    beginner/deploy_seq2seq_hybrid_frontend_tutorial
+   intermediate/tensorboard_tutorial
    beginner/saving_loading_models
    beginner/nn_tutorial
+   beginner/Intro_to_TorchScript
 
 .. toctree::
    :maxdepth: 2
@@ -283,13 +298,15 @@ PyTorch 확장하기 (Extending PyTorch)
    intermediate/spatial_transformer_tutorial
    advanced/neural_style_tutorial
    beginner/fgsm_tutorial
-   advanced/super_resolution_with_caffe2
+   advanced/super_resolution_with_onnxruntime
 
 .. toctree::
    :maxdepth: 2
    :includehidden:
    :hidden:
    :caption: 오디오 (Audio)
+
+   beginner/audio_preprocessing_tutorial
 
 .. toctree::
    :maxdepth: 2
@@ -302,6 +319,7 @@ PyTorch 확장하기 (Extending PyTorch)
    intermediate/char_rnn_classification_tutorial
    beginner/deep_learning_nlp_tutorial
    intermediate/seq2seq_translation_tutorial
+   beginner/text_sentiment_ngrams_tutorial
 
 .. toctree::
    :maxdepth: 2
@@ -338,8 +356,8 @@ PyTorch 확장하기 (Extending PyTorch)
    intermediate/model_parallel_tutorial
    intermediate/ddp_tutorial
    intermediate/dist_tuto
+   intermediate/flask_rest_api_tutorial
    beginner/aws_distributed_training_tutorial
-   advanced/ONNXLive
    advanced/cpp_export
 
 .. toctree::

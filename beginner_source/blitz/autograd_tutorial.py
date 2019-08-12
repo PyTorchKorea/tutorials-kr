@@ -174,5 +174,5 @@ with torch.no_grad():
 ###############################################################
 # **더 읽을거리:**
 #
-# ``Function`` 관련 문서는 https://pytorch.org/docs/stable/autograd.html#function
+# ``autograd.Function`` 관련 문서는 https://pytorch.org/docs/stable/autograd.html#function
 # 에서 찾아볼 수 있습니다.
