@@ -1,6 +1,8 @@
 Loading a PyTorch Model in C++
 ==============================
 
+**This tutorial was updated to work with PyTorch 1.2**
+
 As its name suggests, the primary interface to PyTorch is the Python
 programming language. While Python is a suitable and preferred language for
 many scenarios requiring dynamism and ease of iteration, there are equally many
@@ -92,8 +94,8 @@ vanilla Pytorch model::
 
 Because the ``forward`` method of this module uses control flow that is
 dependent on the input, it is not suitable for tracing. Instead, we can convert
-it to a ``ScriptModule``.
-In order to convert the module to the ``ScriptModule``, one needs to
+it to a ``ScriptModule``. 
+In order to convert the module to the ``ScriptModule``, one needs to 
 compile the module with ``torch.jit.script`` as follows::
 
     class MyModule(torch.nn.Module):
@@ -129,10 +131,11 @@ earlier in the tracing example. To perform this serialization, simply call
 `save <https://pytorch.org/docs/master/jit.html#torch.jit.ScriptModule.save>`_
 on the module and pass it a filename::
 
-  traced_script_module.save("model.pt")
+  traced_script_module.save("traced_resnet_model.pt")
 
-This will produce a ``model.pt`` file in your working directory. We have now
-officially left the realm of Python and are ready to cross over to the sphere
+This will produce a ``traced_resnet_model.pt`` file in your working directory. 
+If you also would like to serialize ``my_module``, call ``my_module.save("my_module_model.pt")``
+We have now officially left the realm of Python and are ready to cross over to the sphere
 of C++.
 
 Step 3: Loading Your Script Module in C++
@@ -165,7 +168,7 @@ do:
         return -1;
       }
 
-
+      
       torch::jit::script::Module module;
       try {
         // Deserialize the ScriptModule from a file using torch::jit::load().
@@ -285,13 +288,14 @@ distribution. If all goes well, it will look something like this:
   [100%] Linking CXX executable example-app
   [100%] Built target example-app
 
-If we supply the path to the serialized ``ResNet18`` model we created earlier
+If we supply the path to the traced ``ResNet18`` model ``traced_resnet_model.pt``  we created earlier
 to the resulting ``example-app`` binary, we should be rewarded with a friendly
-"ok":
+"ok". Please note, if try to run this example with ``my_module_model.pt`` you will get an error saying that
+your input is of an incompatible shape. ``my_module_model.pt`` expects 1D instead of 4D.
 
 .. code-block:: sh
 
-  root@4b5a67132e81:/example-app/build# ./example-app model.pt
+  root@4b5a67132e81:/example-app/build# ./example-app <path_to_model>/traced_resnet_model.pt
   ok
 
 Step 4: Executing the Script Module in C++
@@ -338,7 +342,7 @@ application and running it with the same serialized model:
   [ 50%] Building CXX object CMakeFiles/example-app.dir/example-app.cpp.o
   [100%] Linking CXX executable example-app
   [100%] Built target example-app
-  root@4b5a67132e81:/example-app/build# ./example-app model.pt
+  root@4b5a67132e81:/example-app/build# ./example-app traced_resnet_model.pt
   -0.2698 -0.0381  0.4023 -0.3010 -0.0448
   [ Variable[CPUFloatType]{1,5} ]
 
