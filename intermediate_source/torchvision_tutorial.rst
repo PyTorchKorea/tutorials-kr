@@ -1,15 +1,15 @@
 TorchVision 객체 검출 미세조정(Finetuning) 튜토리얼
 ====================================================
 
-.. 팁::
+.. tip::
    이 튜토리얼을 최대한 활용하시려면, 다음의 링크를 이용하시길 추천합니다.
-   `Colab 버전 <https://colab.research.google.com/github/pytorch/vision/blob/temp-tutorial/tutorials/torchvision_finetuning_instance_segmentation.ipynb>`__. 
+   `Colab 버전 <https://colab.research.google.com/github/pytorch/vision/blob/temp-tutorial/tutorials/torchvision_finetuning_instance_segmentation.ipynb>`__.
    이를 통해 아래에 제시된 정보로 실험을 해 볼 수 있습니다.
 
 본 튜토리얼에서는 `Penn-Fudan Database for Pedestrian Detection and Segmentation
-<https://www.cis.upenn.edu/~jshi/ped_html/>`__ 데이터셋으로 미리 학습된 
+<https://www.cis.upenn.edu/~jshi/ped_html/>`__ 데이터셋으로 미리 학습된
 `Mask R-CNN <https://arxiv.org/abs/1703.06870>`__ 모델을 미세조정 해 볼 것입니다.
-이 데이터셋에는 보행자 인스턴스(instance, 역자주: 이미지 내에서 사람의 위치 좌표와 픽셀 단위의 사람 여부를 구분한 정보를 포함합니다.) 
+이 데이터셋에는 보행자 인스턴스(instance, 역자주: 이미지 내에서 사람의 위치 좌표와 픽셀 단위의 사람 여부를 구분한 정보를 포함합니다.)
 345명이 있는 170개의 이미지가 포함되어 있으며, 우리는 이 이미지를 사용하여 사용자 정의 데이터셋에 인스턴스 분할(Instance Segmentation)
 모델을 학습하기 위해 torchvision의 새로운 기능을 사용하는 방법을 설명 할 예정입니다.
 
@@ -17,8 +17,8 @@ TorchVision 객체 검출 미세조정(Finetuning) 튜토리얼
 데이터셋 정의하기
 --------------------
 
-객체 검출, 인스턴스 분할 및 사용자 키포인트(Keypoint) 검출을 학습하기 위한 참조 스크립트를 통해 
-새로운 사용자 정의 데이터셋 추가를 쉽게 진행해 볼 수 있습니다. 
+객체 검출, 인스턴스 분할 및 사용자 키포인트(Keypoint) 검출을 학습하기 위한 참조 스크립트를 통해
+새로운 사용자 정의 데이터셋 추가를 쉽게 진행해 볼 수 있습니다.
 데이터셋은 표준 ``torch.utils.data.Dataset`` 클래스를
 상속 받아야 하며, ``__len__`` 와 ``__getitem__`` 메소드를 구현해 주어야 합니다.
 
@@ -29,16 +29,16 @@ TorchVision 객체 검출 미세조정(Finetuning) 튜토리얼
 -  이미지 : PIL(Python Image Library) 이미지의 크기 ``(H, W)``
 -  대상: 다음의 필드를 포함하는 사전 타입
 
-   -  ``boxes (FloatTensor[N, 4])``:  ``N`` 개의 바운딩 박스(Bounding box)의 좌표를 ``[x0, y0, x1, y1]`` 형태로 가집니다. 
+   -  ``boxes (FloatTensor[N, 4])``:  ``N`` 개의 바운딩 박스(Bounding box)의 좌표를 ``[x0, y0, x1, y1]`` 형태로 가집니다.
    x와 관련된 값 범위는 ``0`` 부터 ``W`` 이고 y와 관련된 값의 범위는 ``0`` 부터 ``H`` 까지입니다.
    -  ``labels (Int64Tensor[N])``: 바운딩 박스 마다의 라벨 정보입니다.
    -  ``image_id (Int64Tensor[1])``: 이미지 구분자입니다. 데이터셋의 모든 이미지 간에 고유한 값이어야 하며 평가 중에도 사용됩니다.
    -  ``area (Tensor[N])``: 바운딩 박스의 면적입니다. 면적은 평가 시 작음,중간,큰 박스 간의 점수를 내기 위한 기준이며 COCO 평가를 기준으로 합니다.
    -  ``iscrowd (UInt8Tensor[N])``: 이 값이 참일 경우 평가에서 제외합니다.
    -  (선택적) ``masks (UInt8Tensor[N, H, W])``: ``N`` 개의 객체 마다의 분할 마스크 정보입니다.
-   -  (선택적) ``keypoints (FloatTensor[N, K, 3])``: ``N`` 개의 객체마다의 키포인트 정보입니다. 
+   -  (선택적) ``keypoints (FloatTensor[N, K, 3])``: ``N`` 개의 객체마다의 키포인트 정보입니다.
       키포인트는 ``[x, y, visibility]`` 형태의 값입니다. visibility 값이 0인 경우 키포인트는 보이지 않음을 의미합니다.
-      데이터 증강(Data augmentation)의 경우 키포인트 좌우 반전의 개념은 데이터 표현에 따라 달라지며, 
+      데이터 증강(Data augmentation)의 경우 키포인트 좌우 반전의 개념은 데이터 표현에 따라 달라지며,
       새로운 키포인트 표현에 대해 "references/detection/transforms.py" 코드 부분을 수정 해야 할 수도 있습니다.
 
 모델이 위의 방법대로 리턴을 하면, 학습과 평가 둘 다에 대해서 동작을 할 것이며
@@ -52,7 +52,7 @@ TorchVision 객체 검출 미세조정(Finetuning) 튜토리얼
 PennFudan를 위한 사용자 정의 데이터셋 작성하기
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-PennFudan 데이터셋을 위한 코드를 작성해 보겠습니다. 
+PennFudan 데이터셋을 위한 코드를 작성해 보겠습니다.
 `다운로드 후 압축 파일을 해제하면<https://www.cis.upenn.edu/~jshi/ped_html/PennFudanPed.zip>`__,
 다음의 폴더 구조를 볼 수 있습니다:
 
@@ -127,7 +127,7 @@ PennFudan 데이터셋을 위한 코드를 작성해 보겠습니다.
                ymin = np.min(pos[0])
                ymax = np.max(pos[0])
                boxes.append([xmin, ymin, xmax, ymax])
-               
+
            # 모든 것을 torch.Tensor 타입으로 변환합니다
            boxes = torch.as_tensor(boxes, dtype=torch.float32)
            # 객체 종류는 한 종류만 존재합니다(역자주: 예제에서는 사람만이 대상입니다)
@@ -177,7 +177,7 @@ Torchvision 모델주(model zoo, 역자주:미리 학습된 모델들을 모아 
 모델을 수정하려면 보통 두가지 상황이 있습니다.
 첫 번째 방법은 미리 학습된 모델에서 시작해서 마지막 레이어 수준만 미세 조정하는 것입니다.
 다른 하나는 모델의 백본을 다른 백본으로 교체하는 것입니다.(예를 들면, 더 빠른 예측을 하려고 할때)
-(역자주: 백본 모델을 ResNet101 에서 MobilenetV2 로 교체하면 수행 속도 향상을 기대할 수 있습니다. 
+(역자주: 백본 모델을 ResNet101 에서 MobilenetV2 로 교체하면 수행 속도 향상을 기대할 수 있습니다.
 대신 인식 성능은 저하 될 수 있습니다.)
 
 
@@ -203,7 +203,7 @@ COCO에 대해 미리 학습된 모델에서 시작하여 특정 클래스를 �
    # 분류기에서 사용할 입력 특징의 차원 정보를 얻습니다
    in_features = model.roi_heads.box_predictor.cls_score.in_features
    # 미리 학습된 모델의 머리 부분을 새로운 것으로 교체합니다
-   model.roi_heads.box_predictor = FastRCNNPredictor(in_features, num_classes) 
+   model.roi_heads.box_predictor = FastRCNNPredictor(in_features, num_classes)
 
 2 - 다른 백본을 추가하도록 모델을 수정하기
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -216,20 +216,20 @@ COCO에 대해 미리 학습된 모델에서 시작하여 특정 클래스를 �
 
    # 분류 목적으로 미리 학습된 모델을 로드하고 특징들만을 리턴하도록 합니다
    backbone = torchvision.models.mobilenet_v2(pretrained=True).features
-   # Faster RCNN은 백본의 출력 채널 수를 알아야 합니다. 
+   # Faster RCNN은 백본의 출력 채널 수를 알아야 합니다.
    # mobilenetV2의 경우 1280이므로 여기에 추가해야 합니다.
    backbone.out_channels = 1280
 
    # RPN(Region Proposal Network)이 5개의 서로 다른 크기와 3개의 다른 측면 비율(Aspect ratio)을 가진
    # 5 x 3개의 앵커를 공간 위치마다 생성하도록 합니다.
-   # 각 특징 맵이 잠재적으로 다른 사이즈와 측면 비율을 가질 수 있기 때문에 튜플[Tuple[int]] 타입을 가지도록 합니다.
+   # 각 특징 맵이 잠재적으로 다른 사이즈와 측면 비율을 가질 수 있기 때문에 Tuple[Tuple[int]] 타입을 가지도록 합니다.
 
    anchor_generator = AnchorGenerator(sizes=((32, 64, 128, 256, 512),),
                                       aspect_ratios=((0.5, 1.0, 2.0),))
 
    # 관심 영역의 자르기 및 재할당 후 자르기 크기를 수행하는 데 사용할 피쳐 맵을 정의합니다.
    # 만약 백본이 텐서를 리턴할때, featmap_names 는 [0] 이 될 것이라고 예상합니다.
-   # 일반적으로 백본은 정렬된사전[텐서] 타입을 리턴해야 합니다. 
+   # 일반적으로 백본은 OrderedDict[Tensor] 타입을 리턴해야 합니다.
    # 그리고 특징맵에서 사용할 featmap_names 값을 정할 수 있습니다.
    roi_pooler = torchvision.ops.MultiScaleRoIAlign(featmap_names=[0],
                                                    output_size=7,
@@ -448,7 +448,7 @@ PennFudan 데이터셋을 위한 인스턴스 분할 모델
 
 .. image:: ../../_static/img/tv_tutorial/tv_image05.png
 
-학습된 모델이 이미지에서 9개의 사람 인스턴스를 예측했습니다. 
+학습된 모델이 이미지에서 9개의 사람 인스턴스를 예측했습니다.
 그 중 두어개를 확인해 봅시다:
 
 .. image:: ../../_static/img/tv_tutorial/tv_image06.png
