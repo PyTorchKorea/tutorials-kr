@@ -152,7 +152,7 @@
 </ul>
 <p class="caption"><span class="caption-text">이미지 (Image)</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="torchvision_tutorial.html">TorchVision Object Detection Finetuning Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torchvision_tutorial.html">TorchVision 객체 검출 미세조정(Finetuning) 튜토리얼</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/finetuning_torchvision_models_tutorial.html">Finetuning Torchvision Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="spatial_transformer_tutorial.html">공간 변형기 네트워크(Spatial Transformer Networks) 튜토리얼</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/neural_style_tutorial.html">PyTorch를 이용한 신경망-변환(Neural-Transfer)</a></li>
@@ -161,7 +161,7 @@
 </ul>
 <p class="caption"><span class="caption-text">오디오 (Audio)</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/audio_preprocessing_tutorial.html">torchaudio Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/audio_preprocessing_tutorial.html">torchaudio 튜토리얼</a></li>
 </ul>
 <p class="caption"><span class="caption-text">텍스트 (Text)</span></p>
 <ul>
@@ -308,33 +308,33 @@ which can be read into PyTorch using <cite>torchvision.datasets</cite>.</p>
 <p>In this tutorial, we’ll learn how to:</p>
 <blockquote>
 <div><ol class="arabic simple">
-<li>Read in data and with appropriate transforms (nearly identical to the prior tutorial).</li>
-<li>Set up TensorBoard.</li>
-<li>Write to TensorBoard.</li>
-<li>Inspect a model architecture using TensorBoard.</li>
-<li>Use TensorBoard to create interactive versions of the visualizations we created in last tutorial, with less code</li>
+<li><p>Read in data and with appropriate transforms (nearly identical to the prior tutorial).</p></li>
+<li><p>Set up TensorBoard.</p></li>
+<li><p>Write to TensorBoard.</p></li>
+<li><p>Inspect a model architecture using TensorBoard.</p></li>
+<li><p>Use TensorBoard to create interactive versions of the visualizations we created in last tutorial, with less code</p></li>
 </ol>
 </div></blockquote>
 <p>Specifically, on point #5, we’ll see:</p>
 <blockquote>
 <div><ul class="simple">
-<li>A couple of ways to inspect our training data</li>
-<li>How to track our model’s performance as it trains</li>
-<li>How to assess our model’s performance once it is trained.</li>
+<li><p>A couple of ways to inspect our training data</p></li>
+<li><p>How to track our model’s performance as it trains</p></li>
+<li><p>How to assess our model’s performance once it is trained.</p></li>
 </ul>
 </div></blockquote>
 <p>We’ll begin with similar boilerplate code as in the <a class="reference external" href="https://pytorch.org/tutorials/beginner/blitz/cifar10_tutorial.html">CIFAR-10 tutorial</a>:</p>
-<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># imports</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># imports</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
 
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torchvision</span>
-<span class="kn">import</span> <span class="nn">torchvision.transforms</span> <span class="k">as</span> <span class="nn">transforms</span>
+<span class="kn">import</span> <span class="nn">torchvision.transforms</span> <span class="kn">as</span> <span class="nn">transforms</span>
 
-<span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
-<span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="nn">F</span>
-<span class="kn">import</span> <span class="nn">torch.optim</span> <span class="k">as</span> <span class="nn">optim</span>
+<span class="kn">import</span> <span class="nn">torch.nn</span> <span class="kn">as</span> <span class="nn">nn</span>
+<span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="kn">as</span> <span class="nn">F</span>
+<span class="kn">import</span> <span class="nn">torch.optim</span> <span class="kn">as</span> <span class="nn">optim</span>
 
 <span class="c1"># transforms</span>
 <span class="n">transform</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">Compose</span><span class="p">(</span>
@@ -343,21 +343,21 @@ which can be read into PyTorch using <cite>torchvision.datasets</cite>.</p>
 
 <span class="c1"># datasets</span>
 <span class="n">trainset</span> <span class="o">=</span> <span class="n">torchvision</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">FashionMNIST</span><span class="p">(</span><span class="s1">&#39;./data&#39;</span><span class="p">,</span>
-    <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">train</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">download</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+    <span class="n">train</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
     <span class="n">transform</span><span class="o">=</span><span class="n">transform</span><span class="p">)</span>
 <span class="n">testset</span> <span class="o">=</span> <span class="n">torchvision</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">FashionMNIST</span><span class="p">(</span><span class="s1">&#39;./data&#39;</span><span class="p">,</span>
-    <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">train</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">download</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+    <span class="n">train</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
     <span class="n">transform</span><span class="o">=</span><span class="n">transform</span><span class="p">)</span>
 
 <span class="c1"># dataloaders</span>
 <span class="n">trainloader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="n">trainset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
-                                        <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+                                        <span class="n">shuffle</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
 
 <span class="n">testloader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="n">testset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
-                                        <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+                                        <span class="n">shuffle</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
 <span class="c1"># constant for classes</span>
 <span class="n">classes</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;T-shirt/top&#39;</span><span class="p">,</span> <span class="s1">&#39;Trouser&#39;</span><span class="p">,</span> <span class="s1">&#39;Pullover&#39;</span><span class="p">,</span> <span class="s1">&#39;Dress&#39;</span><span class="p">,</span> <span class="s1">&#39;Coat&#39;</span><span class="p">,</span>
@@ -365,7 +365,7 @@ which can be read into PyTorch using <cite>torchvision.datasets</cite>.</p>
 
 <span class="c1"># helper function to show an image</span>
 <span class="c1"># (used in the `plot_classes_preds` function below)</span>
-<span class="k">def</span> <span class="nf">matplotlib_imshow</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">one_channel</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">matplotlib_imshow</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">one_channel</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">one_channel</span><span class="p">:</span>
         <span class="n">img</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
     <span class="n">img</span> <span class="o">=</span> <span class="n">img</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">+</span> <span class="mf">0.5</span>     <span class="c1"># unnormalize</span>
@@ -379,8 +379,8 @@ which can be read into PyTorch using <cite>torchvision.datasets</cite>.</p>
 <p>We’ll define a similar model architecture from that tutorial, making only
 minor modifications to account for the fact that the images are now
 one channel instead of three and 28x28 instead of 32x32:</p>
-<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Net</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Net</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">Net</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">conv1</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pool</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">MaxPool2d</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
@@ -404,13 +404,14 @@ one channel instead of three and 28x28 instead of 32x32:</p>
 </div>
 <p>We’ll define the same <code class="docutils literal notranslate"><span class="pre">optimizer</span></code> and <code class="docutils literal notranslate"><span class="pre">criterion</span></code> from before:</p>
 <blockquote>
-<div>criterion = nn.CrossEntropyLoss()
-optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)</div></blockquote>
+<div><p>criterion = nn.CrossEntropyLoss()
+optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)</p>
+</div></blockquote>
 <div class="section" id="tensorboard-setup">
 <h2>1. TensorBoard setup<a class="headerlink" href="#tensorboard-setup" title="Permalink to this headline">¶</a></h2>
 <p>Now we’ll set up TensorBoard, importing <code class="docutils literal notranslate"><span class="pre">tensorboard</span></code> from <code class="docutils literal notranslate"><span class="pre">torch.utils</span></code> and defining a
 <code class="docutils literal notranslate"><span class="pre">SummaryWriter</span></code>, our key object for writing information to TensorBoard.</p>
-<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch.utils.tensorboard</span> <span class="k">import</span> <span class="n">SummaryWriter</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch.utils.tensorboard</span> <span class="kn">import</span> <span class="n">SummaryWriter</span>
 
 <span class="c1"># default `log_dir` is &quot;runs&quot; - we&#39;ll be more specific here</span>
 <span class="n">writer</span> <span class="o">=</span> <span class="n">SummaryWriter</span><span class="p">(</span><span class="s1">&#39;runs/fashion_mnist_experiment_1&#39;</span><span class="p">)</span>
@@ -423,7 +424,7 @@ folder.</p>
 <h2>2. Writing to TensorBoard<a class="headerlink" href="#writing-to-tensorboard" title="Permalink to this headline">¶</a></h2>
 <p>Now let’s write an image to our TensorBoard - specifically, a grid -
 using <a class="reference external" href="https://pytorch.org/docs/stable/torchvision/utils.html#torchvision.utils.make_grid">make_grid</a></p>
-<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># get some random training images</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># get some random training images</span>
 <span class="n">dataiter</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">trainloader</span><span class="p">)</span>
 <span class="n">images</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">dataiter</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
 
@@ -431,7 +432,7 @@ using <a class="reference external" href="https://pytorch.org/docs/stable/torchv
 <span class="n">img_grid</span> <span class="o">=</span> <span class="n">torchvision</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">make_grid</span><span class="p">(</span><span class="n">images</span><span class="p">)</span>
 
 <span class="c1"># show images</span>
-<span class="n">matplotlib_imshow</span><span class="p">(</span><span class="n">img_grid</span><span class="p">,</span> <span class="n">one_channel</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">matplotlib_imshow</span><span class="p">(</span><span class="n">img_grid</span><span class="p">,</span> <span class="n">one_channel</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 
 <span class="c1"># write to tensorboard</span>
 <span class="n">writer</span><span class="o">.</span><span class="n">add_image</span><span class="p">(</span><span class="s1">&#39;four_fashion_mnist_images&#39;</span><span class="p">,</span> <span class="n">img_grid</span><span class="p">)</span>
@@ -453,7 +454,7 @@ and several more by the end of the tutorial.</p>
 <h2>3. Inspect the model using TensorBoard<a class="headerlink" href="#inspect-the-model-using-tensorboard" title="Permalink to this headline">¶</a></h2>
 <p>One of TensorBoard’s strengths is its ability to visualize complex model
 structures. Let’s visualize the model we built.</p>
-<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">writer</span><span class="o">.</span><span class="n">add_graph</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">images</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">writer</span><span class="o">.</span><span class="n">add_graph</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">images</span><span class="p">)</span>
 <span class="n">writer</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -470,7 +471,7 @@ next.</p>
 <h2>4. Adding a “Projector” to TensorBoard<a class="headerlink" href="#adding-a-projector-to-tensorboard" title="Permalink to this headline">¶</a></h2>
 <p>We can visualize the lower dimensional representation of higher
 dimensional data via the <a class="reference external" href="https://pytorch.org/docs/stable/tensorboard.html#torch.utils.tensorboard.writer.SummaryWriter.add_embedding">add_embedding</a> method</p>
-<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># helper function</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># helper function</span>
 <span class="k">def</span> <span class="nf">select_n_random</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">100</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Selects n random datapoints and their corresponding labels from a dataset</span>
@@ -512,7 +513,7 @@ training.</p>
 every 2000 iterations. Now, we’ll instead log the running loss to
 TensorBoard, along with a view into the predictions the model is
 making via the <code class="docutils literal notranslate"><span class="pre">plot_classes_preds</span></code> function.</p>
-<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># helper functions</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># helper functions</span>
 
 <span class="k">def</span> <span class="nf">images_to_probs</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">images</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;</span>
@@ -539,8 +540,8 @@ making via the <code class="docutils literal notranslate"><span class="pre">plot
     <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">48</span><span class="p">))</span>
     <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">4</span><span class="p">):</span>
         <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">xticks</span><span class="o">=</span><span class="p">[],</span> <span class="n">yticks</span><span class="o">=</span><span class="p">[])</span>
-        <span class="n">matplotlib_imshow</span><span class="p">(</span><span class="n">images</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">one_channel</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">, </span><span class="si">{1:.1f}</span><span class="s2">%</span><span class="se">\n</span><span class="s2">(label: </span><span class="si">{2}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+        <span class="n">matplotlib_imshow</span><span class="p">(</span><span class="n">images</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">one_channel</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;{0}, {1:.1f}%</span><span class="se">\n</span><span class="s2">(label: {2})&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
             <span class="n">classes</span><span class="p">[</span><span class="n">preds</span><span class="p">[</span><span class="n">idx</span><span class="p">]],</span>
             <span class="n">probs</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">*</span> <span class="mf">100.0</span><span class="p">,</span>
             <span class="n">classes</span><span class="p">[</span><span class="n">labels</span><span class="p">[</span><span class="n">idx</span><span class="p">]]),</span>
@@ -556,7 +557,7 @@ function.</p>
 <p>In addition, as we train, we’ll generate an image showing the model’s
 predictions vs. the actual results on the four images included in that
 batch.</p>
-<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">running_loss</span> <span class="o">=</span> <span class="mf">0.0</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">running_loss</span> <span class="o">=</span> <span class="mf">0.0</span>
 <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">):</span>  <span class="c1"># loop over the dataset multiple times</span>
 
     <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">trainloader</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span>
@@ -587,7 +588,7 @@ batch.</p>
                             <span class="n">plot_classes_preds</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">labels</span><span class="p">),</span>
                             <span class="n">global_step</span><span class="o">=</span><span class="n">epoch</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">trainloader</span><span class="p">)</span> <span class="o">+</span> <span class="n">i</span><span class="p">)</span>
             <span class="n">running_loss</span> <span class="o">=</span> <span class="mf">0.0</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Finished Training&#39;</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s1">&#39;Finished Training&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>You can now look at the scalars tab to see the running loss plotted
@@ -609,7 +610,7 @@ for each class.</p>
 </div>
 <div class="section" id="assessing-trained-models-with-tensorboard">
 <h2>6. Assessing trained models with TensorBoard<a class="headerlink" href="#assessing-trained-models-with-tensorboard" title="Permalink to this headline">¶</a></h2>
-<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># 1. gets the probability predictions in a test_size x num_classes Tensor</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 1. gets the probability predictions in a test_size x num_classes Tensor</span>
 <span class="c1"># 2. gets the preds in a test_size Tensor</span>
 <span class="c1"># takes ~10 seconds to run</span>
 <span class="n">class_probs</span> <span class="o">=</span> <span class="p">[]</span>
@@ -736,7 +737,8 @@ by default.</p>
          <script type="text/javascript" src="../_static/jquery.js"></script>
          <script type="text/javascript" src="../_static/underscore.js"></script>
          <script type="text/javascript" src="../_static/doctools.js"></script>
-         <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+         <script type="text/javascript" src="../_static/language_data.js"></script>
+         <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
      
 
   

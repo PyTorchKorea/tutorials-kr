@@ -152,7 +152,7 @@
 </ul>
 <p class="caption"><span class="caption-text">이미지 (Image)</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/torchvision_tutorial.html">TorchVision Object Detection Finetuning Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/torchvision_tutorial.html">TorchVision 객체 검출 미세조정(Finetuning) 튜토리얼</a></li>
 <li class="toctree-l1"><a class="reference internal" href="finetuning_torchvision_models_tutorial.html">Finetuning Torchvision Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/spatial_transformer_tutorial.html">공간 변형기 네트워크(Spatial Transformer Networks) 튜토리얼</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/neural_style_tutorial.html">PyTorch를 이용한 신경망-변환(Neural-Transfer)</a></li>
@@ -161,7 +161,7 @@
 </ul>
 <p class="caption"><span class="caption-text">오디오 (Audio)</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="audio_preprocessing_tutorial.html">torchaudio Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="audio_preprocessing_tutorial.html">torchaudio 튜토리얼</a></li>
 </ul>
 <p class="caption"><span class="caption-text">텍스트 (Text)</span></p>
 <ul>
@@ -294,51 +294,55 @@
               
   <div class="section" id="pytorch">
 <h1>예제로 배우는 파이토치(PyTorch)<a class="headerlink" href="#pytorch" title="Permalink to this headline">¶</a></h1>
-<dl class="docutils">
-<dt><strong>Author</strong>: <a class="reference external" href="https://github.com/jcjohnson/pytorch-examples">Justin Johnson</a></dt>
-<dd><strong>번역</strong>: <a class="reference external" href="http://github.com/9bow">박정환</a></dd>
+<dl class="simple">
+<dt><strong>Author</strong>: <a class="reference external" href="https://github.com/jcjohnson/pytorch-examples">Justin Johnson</a></dt><dd><p><strong>번역</strong>: <a class="reference external" href="http://github.com/9bow">박정환</a></p>
+</dd>
 </dl>
 <p>이 튜토리얼에서는 <a class="reference external" href="https://github.com/pytorch/pytorch">PyTorch</a> 의 핵심적인
 개념을 예제를 통해 소개합니다.</p>
 <p>본질적으로, PyTorch에는 2가지 주요한 특징이 있습니다:</p>
 <ul class="simple">
-<li>NumPy와 유사하지만 GPU 상에서 실행 가능한 N차원 Tensor</li>
-<li>신경망을 구성하고 학습하는 과정에서의 자동 미분</li>
+<li><p>NumPy와 유사하지만 GPU 상에서 실행 가능한 N차원 Tensor</p></li>
+<li><p>신경망을 구성하고 학습하는 과정에서의 자동 미분</p></li>
 </ul>
 <p>완전히 연결된 ReLU 신경망을 예제로 사용할 것입니다. 이 신경망은 하나의 은닉층
 (hidden layer)을 갖고 있으며, 신경망의 출력과 정답 사이의 유클리드 거리
 (Euclidean distance)를 최소화하는 식으로 경사하강법(gradient descent)을 사용하여
 무작위의 데이터를 맞추도록 학습할 것입니다.</p>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">각각의 예제들은 <a class="reference internal" href="#examples-download"><span class="std std-ref">이 페이지의 마지막 부분</span></a> 에서
+<p class="admonition-title">Note</p>
+<p>각각의 예제들은 <a class="reference internal" href="#examples-download"><span class="std std-ref">이 페이지의 마지막 부분</span></a> 에서
 살펴볼 수 있습니다.</p>
 </div>
 <div class="contents local topic" id="table-of-contents">
 <p class="topic-title first">Table of Contents</p>
 <ul class="simple">
-<li><a class="reference internal" href="#tensors" id="id14">Tensors</a><ul>
-<li><a class="reference internal" href="#numpy" id="id15">준비 운동: NumPy</a></li>
-<li><a class="reference internal" href="#pytorch-tensors" id="id16">PyTorch: Tensors</a></li>
+<li><p><a class="reference internal" href="#tensors" id="id14">Tensors</a></p>
+<ul>
+<li><p><a class="reference internal" href="#numpy" id="id15">준비 운동: NumPy</a></p></li>
+<li><p><a class="reference internal" href="#pytorch-tensors" id="id16">PyTorch: Tensors</a></p></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#autograd" id="id17">Autograd</a><ul>
-<li><a class="reference internal" href="#pytorch-tensor-autograd" id="id18">PyTorch: Tensor와 autograd</a></li>
-<li><a class="reference internal" href="#pytorch-autograd" id="id19">PyTorch: 새 autograd 함수 정의하기</a></li>
-<li><a class="reference internal" href="#tensorflow-static-graph" id="id20">TensorFlow: 정적 그래프(Static Graph)</a></li>
+<li><p><a class="reference internal" href="#autograd" id="id17">Autograd</a></p>
+<ul>
+<li><p><a class="reference internal" href="#pytorch-tensor-autograd" id="id18">PyTorch: Tensor와 autograd</a></p></li>
+<li><p><a class="reference internal" href="#pytorch-autograd" id="id19">PyTorch: 새 autograd 함수 정의하기</a></p></li>
+<li><p><a class="reference internal" href="#tensorflow-static-graph" id="id20">TensorFlow: 정적 그래프(Static Graph)</a></p></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#nn" id="id21"><cite>nn</cite> 모듈</a><ul>
-<li><a class="reference internal" href="#pytorch-nn" id="id22">PyTorch: nn</a></li>
-<li><a class="reference internal" href="#pytorch-optim" id="id23">PyTorch: optim</a></li>
-<li><a class="reference internal" href="#pytorch-nn-module" id="id24">PyTorch: 사용자 정의 nn.Module</a></li>
-<li><a class="reference internal" href="#pytorch-control-flow-weight-sharing" id="id25">PyTorch: 제어 흐름(Control Flow) + 가중치 공유(Weight Sharing)</a></li>
+<li><p><a class="reference internal" href="#nn" id="id21"><cite>nn</cite> 모듈</a></p>
+<ul>
+<li><p><a class="reference internal" href="#pytorch-nn" id="id22">PyTorch: nn</a></p></li>
+<li><p><a class="reference internal" href="#pytorch-optim" id="id23">PyTorch: optim</a></p></li>
+<li><p><a class="reference internal" href="#pytorch-nn-module" id="id24">PyTorch: 사용자 정의 nn.Module</a></p></li>
+<li><p><a class="reference internal" href="#pytorch-control-flow-weight-sharing" id="id25">PyTorch: 제어 흐름(Control Flow) + 가중치 공유(Weight Sharing)</a></p></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#examples-download" id="id26">예제 코드</a><ul>
-<li><a class="reference internal" href="#tensor" id="id27">Tensor</a></li>
-<li><a class="reference internal" href="#id3" id="id28">Autograd</a></li>
-<li><a class="reference internal" href="#id4" id="id29"><cite>nn</cite> 모듈</a></li>
+<li><p><a class="reference internal" href="#examples-download" id="id26">예제 코드</a></p>
+<ul>
+<li><p><a class="reference internal" href="#tensor" id="id27">Tensor</a></p></li>
+<li><p><a class="reference internal" href="#id3" id="id28">Autograd</a></p></li>
+<li><p><a class="reference internal" href="#id4" id="id29"><cite>nn</cite> 모듈</a></p></li>
 </ul>
 </li>
 </ul>
@@ -989,14 +993,14 @@ RMSProp, Adam 등과 같은 좀 더 정교한 Optimizer를 사용하곤 합니�
 <h3><a class="toc-backref" href="#id27">Tensor</a><a class="headerlink" href="#tensor" title="Permalink to this headline">¶</a></h3>
 <div class="toctree-wrapper compound">
 </div>
-<p><div class="sphx-glr-thumbcontainer" tooltip="하나의 은닉층(hidden layer)과 편향(bias)이 없는 완전히 연결된 ReLU 신경망을, 유클리드 오차(Euclidean error)를 최소화하는 식으로 x로부터..."><div class="figure" id="id5">
+<p><div class="sphx-glr-thumbcontainer" tooltip="하나의 은닉층(hidden layer)과 편향(bias)이 없는 완전히 연결된 ReLU 신경망을, 유클리드 오차(Euclidean error)를 최소화하는 식으로 x로부터..."><div class="figure align-default" id="id5">
 <img alt="../_images/sphx_glr_two_layer_net_numpy_thumb.png" src="../_images/sphx_glr_two_layer_net_numpy_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="examples_tensor/two_layer_net_numpy.html#sphx-glr-beginner-examples-tensor-two-layer-net-numpy-py"><span class="std std-ref">준비 운동: NumPy</span></a></span></p>
+<p class="caption"><span class="caption-text"><a class="reference internal" href="examples_tensor/two_layer_net_numpy.html#sphx-glr-beginner-examples-tensor-two-layer-net-numpy-py"><span class="std std-ref">준비 운동: NumPy</span></a></span><a class="headerlink" href="#id5" title="Permalink to this image">¶</a></p>
 </div>
 </div></p>
-<p><div class="sphx-glr-thumbcontainer" tooltip="하나의 은닉층(hidden layer)과 편향(bias)이 없는 완전히 연결된 ReLU 신경망을, 유클리드 거리(Euclidean distance) 제곱을 최소화하는 식으..."><div class="figure" id="id6">
+<p><div class="sphx-glr-thumbcontainer" tooltip="하나의 은닉층(hidden layer)과 편향(bias)이 없는 완전히 연결된 ReLU 신경망을, 유클리드 거리(Euclidean distance) 제곱을 최소화하는 식으..."><div class="figure align-default" id="id6">
 <img alt="../_images/sphx_glr_two_layer_net_tensor_thumb.png" src="../_images/sphx_glr_two_layer_net_tensor_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="examples_tensor/two_layer_net_tensor.html#sphx-glr-beginner-examples-tensor-two-layer-net-tensor-py"><span class="std std-ref">PyTorch: Tensors</span></a></span></p>
+<p class="caption"><span class="caption-text"><a class="reference internal" href="examples_tensor/two_layer_net_tensor.html#sphx-glr-beginner-examples-tensor-two-layer-net-tensor-py"><span class="std std-ref">PyTorch: Tensors</span></a></span><a class="headerlink" href="#id6" title="Permalink to this image">¶</a></p>
 </div>
 </div></p>
 <div style='clear:both'></div></div>
@@ -1004,19 +1008,19 @@ RMSProp, Adam 등과 같은 좀 더 정교한 Optimizer를 사용하곤 합니�
 <h3><a class="toc-backref" href="#id28">Autograd</a><a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
 <div class="toctree-wrapper compound">
 </div>
-<p><div class="sphx-glr-thumbcontainer" tooltip="하나의 은닉층(hidden layer)과 편향(bias)이 없는 완전히 연결된 ReLU 신경망을, 유클리드 거리(Euclidean distance) 제곱을 최소화하는 식으..."><div class="figure" id="id7">
+<p><div class="sphx-glr-thumbcontainer" tooltip="하나의 은닉층(hidden layer)과 편향(bias)이 없는 완전히 연결된 ReLU 신경망을, 유클리드 거리(Euclidean distance) 제곱을 최소화하는 식으..."><div class="figure align-default" id="id7">
 <img alt="../_images/sphx_glr_two_layer_net_autograd_thumb.png" src="../_images/sphx_glr_two_layer_net_autograd_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="examples_autograd/two_layer_net_autograd.html#sphx-glr-beginner-examples-autograd-two-layer-net-autograd-py"><span class="std std-ref">PyTorch: Tensor와 autograd</span></a></span></p>
+<p class="caption"><span class="caption-text"><a class="reference internal" href="examples_autograd/two_layer_net_autograd.html#sphx-glr-beginner-examples-autograd-two-layer-net-autograd-py"><span class="std std-ref">PyTorch: Tensor와 autograd</span></a></span><a class="headerlink" href="#id7" title="Permalink to this image">¶</a></p>
 </div>
 </div></p>
-<p><div class="sphx-glr-thumbcontainer" tooltip="하나의 은닉층(hidden layer)과 편향(bias)이 없는 완전히 연결된 ReLU 신경망을, 유클리드 거리(Euclidean distance) 제곱을 최소화하는 식으..."><div class="figure" id="id8">
+<p><div class="sphx-glr-thumbcontainer" tooltip="하나의 은닉층(hidden layer)과 편향(bias)이 없는 완전히 연결된 ReLU 신경망을, 유클리드 거리(Euclidean distance) 제곱을 최소화하는 식으..."><div class="figure align-default" id="id8">
 <img alt="../_images/sphx_glr_two_layer_net_custom_function_thumb.png" src="../_images/sphx_glr_two_layer_net_custom_function_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="examples_autograd/two_layer_net_custom_function.html#sphx-glr-beginner-examples-autograd-two-layer-net-custom-function-py"><span class="std std-ref">PyTorch: 새 autograd Function 정의하기</span></a></span></p>
+<p class="caption"><span class="caption-text"><a class="reference internal" href="examples_autograd/two_layer_net_custom_function.html#sphx-glr-beginner-examples-autograd-two-layer-net-custom-function-py"><span class="std std-ref">PyTorch: 새 autograd Function 정의하기</span></a></span><a class="headerlink" href="#id8" title="Permalink to this image">¶</a></p>
 </div>
 </div></p>
-<p><div class="sphx-glr-thumbcontainer" tooltip="하나의 은닉층(hidden layer)과 편향(bias)이 없는 완전히 연결된 ReLU 신경망을, 유클리드 거리(Euclidean distance) 제곱을 최소화하는 식으..."><div class="figure" id="id9">
+<p><div class="sphx-glr-thumbcontainer" tooltip="하나의 은닉층(hidden layer)과 편향(bias)이 없는 완전히 연결된 ReLU 신경망을, 유클리드 거리(Euclidean distance) 제곱을 최소화하는 식으..."><div class="figure align-default" id="id9">
 <img alt="../_images/sphx_glr_tf_two_layer_net_thumb.png" src="../_images/sphx_glr_tf_two_layer_net_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="examples_autograd/tf_two_layer_net.html#sphx-glr-beginner-examples-autograd-tf-two-layer-net-py"><span class="std std-ref">TensorFlow: 정적 그래프(Static Graph)</span></a></span></p>
+<p class="caption"><span class="caption-text"><a class="reference internal" href="examples_autograd/tf_two_layer_net.html#sphx-glr-beginner-examples-autograd-tf-two-layer-net-py"><span class="std std-ref">TensorFlow: 정적 그래프(Static Graph)</span></a></span><a class="headerlink" href="#id9" title="Permalink to this image">¶</a></p>
 </div>
 </div></p>
 <div style='clear:both'></div></div>
@@ -1024,24 +1028,24 @@ RMSProp, Adam 등과 같은 좀 더 정교한 Optimizer를 사용하곤 합니�
 <h3><a class="toc-backref" href="#id29"><cite>nn</cite> 모듈</a><a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
 <div class="toctree-wrapper compound">
 </div>
-<p><div class="sphx-glr-thumbcontainer" tooltip="하나의 은닉층(hidden layer)과 편향(bias)이 없는 완전히 연결된 ReLU 신경망을, 유클리드 거리(Euclidean distance) 제곱을 최소화하는 식으..."><div class="figure" id="id10">
+<p><div class="sphx-glr-thumbcontainer" tooltip="하나의 은닉층(hidden layer)과 편향(bias)이 없는 완전히 연결된 ReLU 신경망을, 유클리드 거리(Euclidean distance) 제곱을 최소화하는 식으..."><div class="figure align-default" id="id10">
 <img alt="../_images/sphx_glr_two_layer_net_nn_thumb.png" src="../_images/sphx_glr_two_layer_net_nn_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="examples_nn/two_layer_net_nn.html#sphx-glr-beginner-examples-nn-two-layer-net-nn-py"><span class="std std-ref">PyTorch: nn</span></a></span></p>
+<p class="caption"><span class="caption-text"><a class="reference internal" href="examples_nn/two_layer_net_nn.html#sphx-glr-beginner-examples-nn-two-layer-net-nn-py"><span class="std std-ref">PyTorch: nn</span></a></span><a class="headerlink" href="#id10" title="Permalink to this image">¶</a></p>
 </div>
 </div></p>
-<p><div class="sphx-glr-thumbcontainer" tooltip="하나의 은닉층(hidden layer)과 편향(bias)이 없는 완전히 연결된 ReLU 신경망을, 유클리드 거리(Euclidean distance) 제곱을 최소화하는 식으..."><div class="figure" id="id11">
+<p><div class="sphx-glr-thumbcontainer" tooltip="하나의 은닉층(hidden layer)과 편향(bias)이 없는 완전히 연결된 ReLU 신경망을, 유클리드 거리(Euclidean distance) 제곱을 최소화하는 식으..."><div class="figure align-default" id="id11">
 <img alt="../_images/sphx_glr_two_layer_net_optim_thumb.png" src="../_images/sphx_glr_two_layer_net_optim_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="examples_nn/two_layer_net_optim.html#sphx-glr-beginner-examples-nn-two-layer-net-optim-py"><span class="std std-ref">PyTorch: optim</span></a></span></p>
+<p class="caption"><span class="caption-text"><a class="reference internal" href="examples_nn/two_layer_net_optim.html#sphx-glr-beginner-examples-nn-two-layer-net-optim-py"><span class="std std-ref">PyTorch: optim</span></a></span><a class="headerlink" href="#id11" title="Permalink to this image">¶</a></p>
 </div>
 </div></p>
-<p><div class="sphx-glr-thumbcontainer" tooltip="하나의 은닉층(hidden layer)과 편향(bias)이 없는 완전히 연결된 ReLU 신경망을, 유클리드 거리(Euclidean distance) 제곱을 최소화하는 식으..."><div class="figure" id="id12">
+<p><div class="sphx-glr-thumbcontainer" tooltip="하나의 은닉층(hidden layer)과 편향(bias)이 없는 완전히 연결된 ReLU 신경망을, 유클리드 거리(Euclidean distance) 제곱을 최소화하는 식으..."><div class="figure align-default" id="id12">
 <img alt="../_images/sphx_glr_two_layer_net_module_thumb.png" src="../_images/sphx_glr_two_layer_net_module_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="examples_nn/two_layer_net_module.html#sphx-glr-beginner-examples-nn-two-layer-net-module-py"><span class="std std-ref">PyTorch: 사용자 정의 nn Module</span></a></span></p>
+<p class="caption"><span class="caption-text"><a class="reference internal" href="examples_nn/two_layer_net_module.html#sphx-glr-beginner-examples-nn-two-layer-net-module-py"><span class="std std-ref">PyTorch: 사용자 정의 nn Module</span></a></span><a class="headerlink" href="#id12" title="Permalink to this image">¶</a></p>
 </div>
 </div></p>
-<p><div class="sphx-glr-thumbcontainer" tooltip="PyTorch 동적 그래프의 강력함을 보여주기 위해, 매우 이상한 모델을 구현해보겠습니다: 각 순전파 단계에서 많은 은닉 계층을 갖는 완전히 연결(fully-connect..."><div class="figure" id="id13">
+<p><div class="sphx-glr-thumbcontainer" tooltip="PyTorch 동적 그래프의 강력함을 보여주기 위해, 매우 이상한 모델을 구현해보겠습니다: 각 순전파 단계에서 많은 은닉 계층을 갖는 완전히 연결(fully-connect..."><div class="figure align-default" id="id13">
 <img alt="../_images/sphx_glr_dynamic_net_thumb.png" src="../_images/sphx_glr_dynamic_net_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="examples_nn/dynamic_net.html#sphx-glr-beginner-examples-nn-dynamic-net-py"><span class="std std-ref">PyTorch: 제어 흐름(Control Flow) + 가중치 공유(Weight Sharing)</span></a></span></p>
+<p class="caption"><span class="caption-text"><a class="reference internal" href="examples_nn/dynamic_net.html#sphx-glr-beginner-examples-nn-dynamic-net-py"><span class="std std-ref">PyTorch: 제어 흐름(Control Flow) + 가중치 공유(Weight Sharing)</span></a></span><a class="headerlink" href="#id13" title="Permalink to this image">¶</a></p>
 </div>
 </div></p>
 <div style='clear:both'></div></div>
@@ -1143,7 +1147,8 @@ RMSProp, Adam 등과 같은 좀 더 정교한 Optimizer를 사용하곤 합니�
          <script type="text/javascript" src="../_static/jquery.js"></script>
          <script type="text/javascript" src="../_static/underscore.js"></script>
          <script type="text/javascript" src="../_static/doctools.js"></script>
-         <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+         <script type="text/javascript" src="../_static/language_data.js"></script>
+         <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
      
 
   
