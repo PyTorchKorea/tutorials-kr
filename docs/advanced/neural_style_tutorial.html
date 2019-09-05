@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Neural Transfer Using PyTorch &mdash; PyTorch Tutorials 1.2.0 documentation</title>
+  <title>PyTorch를 이용한 신경망-변환(Neural-Transfer) &mdash; PyTorch Tutorials 1.2.0 documentation</title>
   
 
   
@@ -31,7 +31,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Adversarial Example Generation" href="../beginner/fgsm_tutorial.html" />
-    <link rel="prev" title="Spatial Transformer Networks Tutorial" href="../intermediate/spatial_transformer_tutorial.html" /> 
+    <link rel="prev" title="공간 변형기 네트워크(Spatial Transformer Networks) 튜토리얼" href="../intermediate/spatial_transformer_tutorial.html" /> 
 
   
   <script src="../_static/js/modernizr.min.js"></script>
@@ -154,8 +154,8 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/torchvision_tutorial.html">TorchVision 객체 검출 미세조정(Finetuning) 튜토리얼</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/finetuning_torchvision_models_tutorial.html">Finetuning Torchvision Models</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/spatial_transformer_tutorial.html">Spatial Transformer Networks Tutorial</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Neural Transfer Using PyTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/spatial_transformer_tutorial.html">공간 변형기 네트워크(Spatial Transformer Networks) 튜토리얼</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">PyTorch를 이용한 신경망-변환(Neural-Transfer)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/fgsm_tutorial.html">Adversarial Example Generation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="super_resolution_with_onnxruntime.html">Exporting a Model from PyTorch to ONNX and Running it using ONNXRuntime</a></li>
 </ul>
@@ -178,7 +178,7 @@
 </ul>
 <p class="caption"><span class="caption-text">강화 학습</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/reinforcement_q_learning.html">Reinforcement Learning (DQN) Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/reinforcement_q_learning.html">강화 학습 (DQN) 튜토리얼</a></li>
 </ul>
 <p class="caption"><span class="caption-text">PyTorch 확장하기</span></p>
 <ul>
@@ -190,7 +190,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/model_parallel_tutorial.html">Model Parallel Best Practices</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/ddp_tutorial.html">Getting Started with Distributed Data Parallel</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/dist_tuto.html">Writing Distributed Applications with PyTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/dist_tuto.html">Pytorch로 분산 어플리케이션 개발하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/flask_rest_api_tutorial.html">Deploying PyTorch and Building a REST API using Flask</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/aws_distributed_training_tutorial.html">PyTorch 1.0 Distributed Trainer with Amazon AWS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cpp_export.html">Loading a PyTorch Model in C++</a></li>
@@ -238,7 +238,7 @@
       </li>
 
         
-      <li>Neural Transfer Using PyTorch</li>
+      <li>PyTorch를 이용한 신경망-변환(Neural-Transfer)</li>
     
     
       <li class="pytorch-breadcrumbs-aside">
@@ -296,44 +296,102 @@
 <p class="admonition-title">Note</p>
 <p>Click <a class="reference internal" href="#sphx-glr-download-advanced-neural-style-tutorial-py"><span class="std std-ref">here</span></a> to download the full example code</p>
 </div>
-<div class="sphx-glr-example-title section" id="neural-transfer-using-pytorch">
-<span id="sphx-glr-advanced-neural-style-tutorial-py"></span><h1>Neural Transfer Using PyTorch<a class="headerlink" href="#neural-transfer-using-pytorch" title="Permalink to this headline">¶</a></h1>
-<p><strong>Author</strong>: <a class="reference external" href="https://alexis-jacq.github.io">Alexis Jacq</a></p>
-<p><strong>Edited by</strong>: <a class="reference external" href="https://github.com/winston6">Winston Herring</a></p>
-<div class="section" id="introduction">
-<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
-<p>This tutorial explains how to implement the <a class="reference external" href="https://arxiv.org/abs/1508.06576">Neural-Style algorithm</a>
-developed by Leon A. Gatys, Alexander S. Ecker and Matthias Bethge.
-Neural-Style, or Neural-Transfer, allows you to take an image and
-reproduce it with a new artistic style. The algorithm takes three images,
-an input image, a content-image, and a style-image, and changes the input
-to resemble the content of the content-image and the artistic style of the style-image.</p>
+<div class="sphx-glr-example-title section" id="pytorch-neural-transfer">
+<span id="sphx-glr-advanced-neural-style-tutorial-py"></span><h1>PyTorch를 이용한 신경망-변환(Neural-Transfer)<a class="headerlink" href="#pytorch-neural-transfer" title="Permalink to this headline">¶</a></h1>
+<dl class="simple">
+<dt><strong>저자</strong>: <a class="reference external" href="https://alexis-jacq.github.io">Alexis Jacq</a></dt><dd><p><strong>번역</strong>: <a class="reference external" href="http://fmttm.egloos.com">김봉모</a></p>
+</dd>
+</dl>
+<div class="section" id="id2">
+<h2>소개<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<p>환영합니다!. 이 문서는 Leon A. Gatys와 Alexander S. Ecker, Matthias Bethge 가 개발한
+알고리즘인 <a class="reference external" href="https://arxiv.org/abs/1508.06576">Neural-Style</a> 를 구현하는 방법에 대해
+설명하는 튜토리얼입니다.</p>
+<div class="section" id="id3">
+<h3>신경망 뭐라고?<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<p>신경망 스타일(Neural-Style), 혹은 신경망 변화(Neural-Transfer)는 콘텐츠 이미지(예, 거북이)와
+스타일 이미지(예, 파도를 그린 예술 작품) 을 입력으로 받아 콘텐츠 이미지의 모양대로 스타일 이미지의
+‘그리는 방식’을 이용해 그린 것처럼 결과를 내는 알고리즘입니다:</p>
 <div class="figure align-default">
 <img alt="content1" src="../_images/neuralstyle.png" />
 </div>
 </div>
-<div class="section" id="underlying-principle">
-<h2>Underlying Principle<a class="headerlink" href="#underlying-principle" title="Permalink to this headline">¶</a></h2>
-<p>The principle is simple: we define two distances, one for the content
-(<span class="math notranslate nohighlight">\(D_C\)</span>) and one for the style (<span class="math notranslate nohighlight">\(D_S\)</span>). <span class="math notranslate nohighlight">\(D_C\)</span> measures how different the content
-is between two images while <span class="math notranslate nohighlight">\(D_S\)</span> measures how different the style is
-between two images. Then, we take a third image, the input, and
-transform it to minimize both its content-distance with the
-content-image and its style-distance with the style-image. Now we can
-import the necessary packages and begin the neural transfer.</p>
+<div class="section" id="id4">
+<h3>어떻게 동작합니까?<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<p>원리는 간단합니다. 2개의 거리(distance)를 정의합니다. 하나는 콘텐츠( <span class="math notranslate nohighlight">\(D_C\)</span> )를 위한 것이고
+다른 하나는 스타일( <span class="math notranslate nohighlight">\(D_S\)</span> )을 위한 것입니다.
+<span class="math notranslate nohighlight">\(D_C\)</span> 는 콘텐츠 이미지와 스타일 이미지 간의 콘텐츠가 얼마나 차이가 있는지 측정을 합니다.
+반면에, <span class="math notranslate nohighlight">\(D_S\)</span> 는 콘텐츠 이미지와 스타일 이미지 간의 스타일에서 얼마나 차이가 있는지를 측정합니다.
+그런 다음, 세 번째 이미지를 입력(예, 노이즈로 구성된 이미지)으로부터 콘텐츠 이미지와의 콘텐츠 거리
+및 스타일 이미지와의 스타일 거리를 최소화하는 방향으로 세 번째 이미지를 변환합니다.</p>
+<div class="section" id="id5">
+<h4>그래서. 어떻게 동작하냐고요?<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h4>
+<p>자, 더 나아가려면 수학이 필요합니다. <span class="math notranslate nohighlight">\(C_{nn}\)</span> 를 사전 훈련된 깊은 합성곱 신경망
+네트워크(pre-trained deep convolutional neural network)라고 하고, <span class="math notranslate nohighlight">\(X\)</span> 를 어떤 이미지라고 해보겠습니다.
+<span class="math notranslate nohighlight">\(C_{nn}(X)\)</span> 은 입력 이미지 X를 입력으로 해서 CNN 을 통과한 네트워크(모든 레이어들의 특징 맵(feature map)을 포함하는)를 의미합니다.
+<span class="math notranslate nohighlight">\(F_{XL} \in C_{nn}(X)\)</span> 는 깊이 레벨 L에서의 특징 맵(feature map)을 의미하고,
+모두 벡터화(vectorized)되고 연결된(concatenated) 하나의 단일 벡터입니다.
+그리고, <span class="math notranslate nohighlight">\(Y\)</span> 를 이미지 <span class="math notranslate nohighlight">\(X\)</span> 와 크기가 같은 이미지라고 하면,
+레이어 <span class="math notranslate nohighlight">\(L\)</span> 에 해당하는 콘텐츠의 거리를 정의할 수 있습니다:</p>
+<div class="math notranslate nohighlight">
+\[D_C^L(X,Y) = \|F_{XL} - F_{YL}\|^2 = \sum_i (F_{XL}(i) - F_{YL}(i))^2\]</div>
+<p><span class="math notranslate nohighlight">\(F_{XL}(i)\)</span> 는 <span class="math notranslate nohighlight">\(F_{XL}\)</span> 의 <span class="math notranslate nohighlight">\(i^{번째}\)</span> 요소(element) 입니다.
+스타일에 해당하는 내용은 위 내용보다 조금 더 신경 쓸 부분이 있습니다.
+<span class="math notranslate nohighlight">\(F_{XL}^k\)</span> 를 레이어 <span class="math notranslate nohighlight">\(L\)</span> 에서 특징 맵(feature map) <span class="math notranslate nohighlight">\(K\)</span> 의 <span class="math notranslate nohighlight">\(k^{번째}\)</span> 에 해당하는
+벡터화된 <span class="math notranslate nohighlight">\(k \leq K\)</span> 라고 해 보겠습니다.
+스타일 <span class="math notranslate nohighlight">\(G_{XL}\)</span> 의 <span class="math notranslate nohighlight">\(X\)</span> 레이어에서 <span class="math notranslate nohighlight">\(L\)</span> 은 모든 벡터화된 특징 맵(feature map) <span class="math notranslate nohighlight">\(F_{XL}^k\)</span>
+에서 <span class="math notranslate nohighlight">\(k \leq K\)</span> 그람(Gram)으로 정의 됩니다.
+다시 말하면, <span class="math notranslate nohighlight">\(G_{XL}\)</span> 는 <span class="math notranslate nohighlight">\(K\)</span>x<span class="math notranslate nohighlight">\(K\)</span> 행렬과 요소 <span class="math notranslate nohighlight">\(G_{XL}(k,l)\)</span> 의 <span class="math notranslate nohighlight">\(k^{번째}\)</span> 줄과
+<span class="math notranslate nohighlight">\(l^{번째}\)</span> 행의 <span class="math notranslate nohighlight">\(G_{XL}\)</span> 는 <span class="math notranslate nohighlight">\(F_{XL}^k\)</span> 와 <span class="math notranslate nohighlight">\(F_{XL}^l\)</span> 간의
+벡터화 곱을 의미합니다:</p>
+<div class="math notranslate nohighlight">
+\[G_{XL}(k,l) = \langle F_{XL}^k, F_{XL}^l\rangle = \sum_i F_{XL}^k(i) . F_{XL}^l(i)\]</div>
+<p><span class="math notranslate nohighlight">\(F_{XL}^k(i)\)</span> 는 <span class="math notranslate nohighlight">\(F_{XL}^k\)</span> 의 <span class="math notranslate nohighlight">\(i^{번째}\)</span> 요소 입니다.
+우리는 <span class="math notranslate nohighlight">\(G_{XL}(k,l)\)</span> 를 특징 맵(feature map) <span class="math notranslate nohighlight">\(k\)</span> 와 <span class="math notranslate nohighlight">\(l\)</span> 간의
+상관 관계(correlation)에 대한 척도로 볼 수 있습니다.
+그런 의미에서, <span class="math notranslate nohighlight">\(G_{XL}\)</span> 는 특징 맵(feature map) <span class="math notranslate nohighlight">\(X\)</span> 의 레이어 <span class="math notranslate nohighlight">\(L\)</span> 에서의
+상관 관계 행렬을 나타냅니다.
+<span class="math notranslate nohighlight">\(G_{XL}\)</span> 의 크기는 단지 특징 맵(feature map)의 숫자에만 의존성이 있고,
+<span class="math notranslate nohighlight">\(X\)</span> 의 크기에는 의존성이 없다는 것을 유의 해야 합니다.
+그러면, 만약 <span class="math notranslate nohighlight">\(Y\)</span> 가 다른 <em>어떤 크기의</em> 이미지라면,
+우리는 다음과 같이 레이어 <span class="math notranslate nohighlight">\(L\)</span> 에서 스타일의 거리를 정의 합니다.</p>
+<div class="math notranslate nohighlight">
+\[D_S^L(X,Y) = \|G_{XL} - G_{YL}\|^2 = \sum_{k,l} (G_{XL}(k,l) - G_{YL}(k,l))^2\]</div>
+<p><span class="math notranslate nohighlight">\(D_C(X,C)\)</span> 의 한 번의 최소화를 위해서, 이미지 변수 <span class="math notranslate nohighlight">\(X\)</span> 와 대상 콘텐츠-이미지 <span class="math notranslate nohighlight">\(C\)</span> 와
+<span class="math notranslate nohighlight">\(D_S(X,S)\)</span> 와 <span class="math notranslate nohighlight">\(X\)</span> 와 대상 스타일-이미지 <span class="math notranslate nohighlight">\(S\)</span> , 둘 다 여러 레이어들에 대해서 계산되야 하고,
+우리는 원하는 레이어 각각에서의 거리의 그라디언트를 계산하고 더합니다( <span class="math notranslate nohighlight">\(X\)</span> 와 관련된 도함수):</p>
+<div class="math notranslate nohighlight">
+\[\nabla_{    extit{total}}(X,S,C) = \sum_{L_C} w_{CL_C}.\nabla_{     extit{content}}^{L_C}(X,C) + \sum_{L_S} w_{SL_S}.\nabla_{       extit{style}}^{L_S}(X,S)\]</div>
+<p><span class="math notranslate nohighlight">\(L_C\)</span> 와 <span class="math notranslate nohighlight">\(L_S\)</span> 는 각각 콘텐츠와 스타일의 원하는 (임의 상태의) 레이어들을 의미하고,
+<span class="math notranslate nohighlight">\(w_{CL_C}\)</span> 와 <span class="math notranslate nohighlight">\(w_{SL_S}\)</span> 는 원하는 레이어에서의
+스타일 또는 콘텐츠의 가중치를 (임의 상태의) 의미합니다.
+그리고 나서, 우리는 <span class="math notranslate nohighlight">\(X\)</span> 에 대해 경사 하강법을 실행합니다.</p>
+<div class="math notranslate nohighlight">
+\[X \leftarrow X - \alpha \nabla_{      extit{total}}(X,S,C)\]</div>
+<p>네, 수학은 이정도면 충분합니다. 만약 더 깊이 알고 싶다면 (그레이언트를 어떻게 계산하는지),
+Leon A. Gatys and AL가 작성한 <strong>원래의 논문을 읽어 볼 것을 권장합니다</strong>
+논문에는 앞서 설명한 내용들 모두에 대해 보다 자세하고 명확하게 얘기합니다.</p>
+<p>구현을 위해서 PyTorch에서는 이미 우리가 필요로하는 모든 것을 갖추고 있습니다.
+실제로 PyTorch를 사용하면 라이브러리의 함수를 사용하는 동안 모든 그라디언트(Gradient)가
+자동,동적으로 계산됩니다.(라이브러리에서 함수를 사용하는 동안)
+이런 점이 PyTorch에서 알고리즘 구현을 매우 편리하게 합니다.</p>
 </div>
-<div class="section" id="importing-packages-and-selecting-a-device">
-<h2>Importing Packages and Selecting a Device<a class="headerlink" href="#importing-packages-and-selecting-a-device" title="Permalink to this headline">¶</a></h2>
-<p>Below is a  list of the packages needed to implement the neural transfer.</p>
+</div>
+</div>
+<div class="section" id="pytorch">
+<h2>PyTorch 구현<a class="headerlink" href="#pytorch" title="Permalink to this headline">¶</a></h2>
+<p>위의 모든 수학을 이해할 수 없다면, 구현함으로써 이해도를 높여 갈 수 있을 것 입니다.
+PyTorch를 이용할 예정이라면, 먼저 이 문서 <a class="reference internal" href="../beginner/deep_learning_60min_blitz.html"><span class="doc">Introduction to PyTorch</span></a> 를 읽어볼 것을 추천 합니다.</p>
+<div class="section" id="id6">
+<h3>패키지들<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
+<p>우리는 다음 패키지들을 활용 할 것입니다:</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">torch</span></code>, <code class="docutils literal notranslate"><span class="pre">torch.nn</span></code>, <code class="docutils literal notranslate"><span class="pre">numpy</span></code> (indispensables packages for
-neural networks with PyTorch)</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">torch.optim</span></code> (efficient gradient descents)</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">PIL</span></code>, <code class="docutils literal notranslate"><span class="pre">PIL.Image</span></code>, <code class="docutils literal notranslate"><span class="pre">matplotlib.pyplot</span></code> (load and display
-images)</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">torchvision.transforms</span></code> (transform PIL images into tensors)</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">torchvision.models</span></code> (train or load pre-trained models)</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">copy</span></code> (to deep copy the models; system package)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">torch</span></code> , <code class="docutils literal notranslate"><span class="pre">torch.nn</span></code>, <code class="docutils literal notranslate"><span class="pre">numpy</span></code> (PyTorch로 신경망 처리를 위한 필수 패키지)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">torch.optim</span></code> (효율적인 그라디언트 디센트)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PIL</span></code> , <code class="docutils literal notranslate"><span class="pre">PIL.Image</span></code> , <code class="docutils literal notranslate"><span class="pre">matplotlib.pyplot</span></code> (이미지를 읽고 보여주는 패키지)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">torchvision.transforms</span></code> (PIL타입의 이미지들을 토치 텐서 형태로 변형해주는 패키지)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">torchvision.models</span></code> (사전 훈련된 모델들의 학습 또는 읽기 패키지)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">copy</span></code> (모델들의 깊은 복사를 위한 시스템 패키지)</p></li>
 </ul>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">print_function</span>
 
@@ -351,46 +409,44 @@ images)</p></li>
 <span class="kn">import</span> <span class="nn">copy</span>
 </pre></div>
 </div>
-<p>Next, we need to choose which device to run the network on and import the
-content and style images. Running the neural transfer algorithm on large
-images takes longer and will go much faster when running on a GPU. We can
-use <code class="docutils literal notranslate"><span class="pre">torch.cuda.is_available()</span></code> to detect if there is a GPU available.
-Next, we set the <code class="docutils literal notranslate"><span class="pre">torch.device</span></code> for use throughout the tutorial. Also the <code class="docutils literal notranslate"><span class="pre">.to(device)</span></code>
-method is used to move tensors or modules to a desired device.</p>
+</div>
+<div class="section" id="cuda">
+<h3>쿠다(CUDA)<a class="headerlink" href="#cuda" title="Permalink to this headline">¶</a></h3>
+<p>컴퓨터에 GPU가 있는 경우, 특히 VGG와 같이 깊은 네트워크를 사용하려는 경우
+알고리즘을 CUDA 환경에서 실행하는 것이 좋습니다.
+CUDA를 쓰기 위해서 Pytorch에서는 <code class="docutils literal notranslate"><span class="pre">torch.cuda.is_available()</span></code> 를 제공하는데,
+작업하는 컴퓨터에서 GPU 사용이 가능하면 <code class="docutils literal notranslate"><span class="pre">True</span></code> 를 리턴 합니다.
+이후로, 우리는 <code class="docutils literal notranslate"><span class="pre">.cuda()</span></code> 라는 메소드를 사용하여 모듈과 관련된 할당된 프로세스를 CPU에서 GPU로 수 있습니다.
+이 모듈을 CPU로 되돌리고 싶을 때에는 (예 : numpy에서 사용), 우리는 <code class="docutils literal notranslate"><span class="pre">.cpu</span> <span class="pre">()</span></code> 메소드를 사용하면 됩니다.
+마지막으로, <code class="docutils literal notranslate"><span class="pre">.type(dtype)</span></code> 메소드는 <code class="docutils literal notranslate"><span class="pre">torch.FloatTensor</span></code> 타입을
+GPU에서 사용 할 수 있도록 <code class="docutils literal notranslate"><span class="pre">torch.cuda.FloatTensor</span></code> 로 변환하는데 사용할 수 있습니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
-<div class="section" id="loading-the-images">
-<h2>Loading the Images<a class="headerlink" href="#loading-the-images" title="Permalink to this headline">¶</a></h2>
-<p>Now we will import the style and content images. The original PIL images have values between 0 and 255, but when
-transformed into torch tensors, their values are converted to be between
-0 and 1. The images also need to be resized to have the same dimensions.
-An important detail to note is that neural networks from the
-torch library are trained with tensor values ranging from 0 to 1. If you
-try to feed the networks with 0 to 255 tensor images, then the activated
-feature maps will be unable sense the intended content and style.
-However, pre-trained networks from the Caffe library are trained with 0
-to 255 tensor images.</p>
+<div class="section" id="id7">
+<h3>이미지 읽기<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
+<p>구현을 간단하게 하기 위해서, 스타일 이미지와 콘텐츠 이미지의 크기를 동일하게 맞추어서 시작합니다.
+그런 다음 원하는 출력 이미지 크기로 확장 시킵니다.(본 예제에서는 128이나 512로 하는데 GPU가 가능한 상황에 맞게 선택해서 하세요.)
+그리고 영상 데이터를 토치 텐서로 변환하고, 신경망 네트워크에 사용할 수 있도록 준비합니다.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Here are links to download the images required to run the tutorial:
-<a class="reference external" href="https://pytorch.org/tutorials/_static/img/neural-style/picasso.jpg">picasso.jpg</a> and
-<a class="reference external" href="https://pytorch.org/tutorials/_static/img/neural-style/dancing.jpg">dancing.jpg</a>.
-Download these two images and add them to a directory
-with name <code class="docutils literal notranslate"><span class="pre">images</span></code> in your current working directory.</p>
+<p>튜토리얼을 실행하는 데 필요한 이미지를 다운로드하는 링크는 다음과 같습니다.:
+<a class="reference external" href="http://pytorch.org/tutorials/_static/img/neural-style/picasso.jpg">picasso.jpg</a> 와
+<a class="reference external" href="http://pytorch.org/tutorials/_static/img/neural-style/dancing.jpg">dancing.jpg</a>.
+위 두개의 이미지를 다운로드 받아 디렉토리 이름 <code class="docutils literal notranslate"><span class="pre">images</span></code> 에 추가하세요.</p>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># desired size of the output image</span>
-<span class="n">imsize</span> <span class="o">=</span> <span class="mi">512</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="mi">128</span>  <span class="c1"># use small size if no gpu</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># 출력 이미지의 원하는 크기를 정하세요.</span>
+<span class="n">imsize</span> <span class="o">=</span> <span class="mi">512</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="mi">128</span>  <span class="c1"># gpu가 없다면 작은 크기로</span>
 
 <span class="n">loader</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">Compose</span><span class="p">([</span>
-    <span class="n">transforms</span><span class="o">.</span><span class="n">Resize</span><span class="p">(</span><span class="n">imsize</span><span class="p">),</span>  <span class="c1"># scale imported image</span>
-    <span class="n">transforms</span><span class="o">.</span><span class="n">ToTensor</span><span class="p">()])</span>  <span class="c1"># transform it into a torch tensor</span>
+    <span class="n">transforms</span><span class="o">.</span><span class="n">Resize</span><span class="p">(</span><span class="n">imsize</span><span class="p">),</span>  <span class="c1"># 입력 영상 크기를 맞춤</span>
+    <span class="n">transforms</span><span class="o">.</span><span class="n">ToTensor</span><span class="p">()])</span>  <span class="c1"># 토치 텐서로 변환</span>
 
 
 <span class="k">def</span> <span class="nf">image_loader</span><span class="p">(</span><span class="n">image_name</span><span class="p">):</span>
     <span class="n">image</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">image_name</span><span class="p">)</span>
-    <span class="c1"># fake batch dimension required to fit network&#39;s input dimensions</span>
+    <span class="c1"># 네트워크의 입력 차원을 맞추기 위해 필요한 가짜 배치 차원</span>
     <span class="n">image</span> <span class="o">=</span> <span class="n">loader</span><span class="p">(</span><span class="n">image</span><span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">image</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">float</span><span class="p">)</span>
 
@@ -402,22 +458,28 @@ with name <code class="docutils literal notranslate"><span class="pre">images</s
     <span class="s2">&quot;we need to import style and content images of the same size&quot;</span>
 </pre></div>
 </div>
-<p>Now, let’s create a function that displays an image by reconverting a
-copy of it to PIL format and displaying the copy using
-<code class="docutils literal notranslate"><span class="pre">plt.imshow</span></code>. We will try displaying the content and style images
-to ensure they were imported correctly.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">unloader</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">ToPILImage</span><span class="p">()</span>  <span class="c1"># reconvert into PIL image</span>
+<p>가져온 PIL 이미지는 0에서 255 사이의 이미지 픽셀값을 가집니다.
+토치 텐서로 변환하면 0에서 1의 값으로 변환됩니다.
+이는 중요한 디테일로: 토치 라이브러리의 신경망은 0에서 1의 텐서 이미지로 학습하게 됩니다.
+0-255 텐서 이미지를 네트워크에 공급 하려고 하면 활성화된(activated) 특징 맵(feature map)은 의미가 없습니다.(역자주, 입력 값에 따라 RELU와 같은 활성화 레이어에서 입력으로 되는 값의 범위가 완전히 다르기 때문)
+Caffe 라이브러리의 사전 훈련된 네트워크의 경우는 그렇지 않습니다: 해당 모델들은 0에서 255 사이 값의 텐서 이미지로 학습 되었습니다.</p>
+</div>
+<div class="section" id="id8">
+<h3>이미지 표시하기<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
+<p>우리는 이미지를 표시하기 위해 <code class="docutils literal notranslate"><span class="pre">plt.imshow</span></code> 를 이용합니다.
+그러기 위해 우선 텐서를 PIL 이미지로 변환해 주겠습니다:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">unloader</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">ToPILImage</span><span class="p">()</span>  <span class="c1"># PIL 이미지로 재변환 합니다</span>
 
 <span class="n">plt</span><span class="o">.</span><span class="n">ion</span><span class="p">()</span>
 
 <span class="k">def</span> <span class="nf">imshow</span><span class="p">(</span><span class="n">tensor</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="n">image</span> <span class="o">=</span> <span class="n">tensor</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span>  <span class="c1"># we clone the tensor to not do changes on it</span>
-    <span class="n">image</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>      <span class="c1"># remove the fake batch dimension</span>
+    <span class="n">image</span> <span class="o">=</span> <span class="n">tensor</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span>  <span class="c1"># 텐서의 값에 변화가 적용되지 않도록 텐서를 복제합니다</span>
+    <span class="n">image</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>      <span class="c1"># 페이크 배치 차원을 제거 합니다</span>
     <span class="n">image</span> <span class="o">=</span> <span class="n">unloader</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">title</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">pause</span><span class="p">(</span><span class="mf">0.001</span><span class="p">)</span> <span class="c1"># pause a bit so that plots are updated</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">pause</span><span class="p">(</span><span class="mf">0.001</span><span class="p">)</span> <span class="c1"># 그리는 부분이 업데이트 될 수 있게 잠시 정지합니다</span>
 
 
 <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
@@ -434,35 +496,28 @@ to ensure they were imported correctly.</p>
 </li>
 </ul>
 </div>
-<div class="section" id="loss-functions">
-<h2>Loss Functions<a class="headerlink" href="#loss-functions" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="content-loss">
-<h3>Content Loss<a class="headerlink" href="#content-loss" title="Permalink to this headline">¶</a></h3>
-<p>The content loss is a function that represents a weighted version of the
-content distance for an individual layer. The function takes the feature
-maps <span class="math notranslate nohighlight">\(F_{XL}\)</span> of a layer <span class="math notranslate nohighlight">\(L\)</span> in a network processing input <span class="math notranslate nohighlight">\(X\)</span> and returns the
-weighted content distance <span class="math notranslate nohighlight">\(w_{CL}.D_C^L(X,C)\)</span> between the image <span class="math notranslate nohighlight">\(X\)</span> and the
-content image <span class="math notranslate nohighlight">\(C\)</span>. The feature maps of the content image(<span class="math notranslate nohighlight">\(F_{CL}\)</span>) must be
-known by the function in order to calculate the content distance. We
-implement this function as a torch module with a constructor that takes
-<span class="math notranslate nohighlight">\(F_{CL}\)</span> as an input. The distance <span class="math notranslate nohighlight">\(\|F_{XL} - F_{CL}\|^2\)</span> is the mean square error
-between the two sets of feature maps, and can be computed using <code class="docutils literal notranslate"><span class="pre">nn.MSELoss</span></code>.</p>
-<p>We will add this content loss module directly after the convolution
-layer(s) that are being used to compute the content distance. This way
-each time the network is fed an input image the content losses will be
-computed at the desired layers and because of auto grad, all the
-gradients will be computed. Now, in order to make the content loss layer
-transparent we must define a <code class="docutils literal notranslate"><span class="pre">forward</span></code> method that computes the content
-loss and then returns the layer’s input. The computed loss is saved as a
-parameter of the module.</p>
+<div class="section" id="id9">
+<h3>콘텐츠 로스<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
+<p>콘텐츠 로스는 네트워크에서 <span class="math notranslate nohighlight">\(X\)</span> 로 입력을 받았을 때 레이어 <span class="math notranslate nohighlight">\(L\)</span> 에서 특징 맵(feature map) <span class="math notranslate nohighlight">\(F_{XL}\)</span> 을 입력으로 가져 와서
+이 이미지와 콘텐츠 이미지 사이의 가중치 콘텐츠 거리 <span class="math notranslate nohighlight">\(w_{CL}.D_C^L(X,C)\)</span> 를 반환하는 기능입니다.
+따라서, 가중치 <span class="math notranslate nohighlight">\(w_{CL}\)</span> 및 목표 콘텐츠 <span class="math notranslate nohighlight">\(F_{CL}\)</span> 은 함수의 파라미터 입니다.
+우리는 이 매개 변수를 입력으로 사용하는 생성자(constructor)가 있는 토치 모듈로 함수를 구현합니다.
+거리 <span class="math notranslate nohighlight">\(\|F_{XL} - F_{YL}\|^2\)</span> 는 세 번째 매개 변수로 명시된 기준 <code class="docutils literal notranslate"><span class="pre">nn.MSELoss</span></code> 를 사용하여
+계산할 수 있는 두 세트의 특징 맵(feature map) 사이의 평균 제곱 오차(MSE, Mean Square Error)입니다.</p>
+<p>우리는 신경망의 추가 모듈로서 각 레이어에 컨텐츠 로스를 추가 할 것 입니다.
+이렇게 하면 입력 영상 <span class="math notranslate nohighlight">\(X\)</span> 를 네트워크에 보낼 때마다 원하는 모든 레이어에서
+모든 컨텐츠 로스가 계산되고 자동 그라디언트로 인해 모든 그라디언트가 계산됩니다.
+이를 위해 우리는 입력을 리턴하는 <code class="docutils literal notranslate"><span class="pre">forward</span></code> 메소드를 만들기만 하면 됩니다: 모듈은 신경망의 ‘’투명 레이어’’ 가 됩니다.
+계산된 로스는 모듈의 매개 변수로 저장됩니다.</p>
+<p>마지막으로 그라디언트를 재구성하기 위해 nn.MSELoss의 <code class="docutils literal notranslate"><span class="pre">backward</span></code> 메서드를 호출하는 가짜 backward 메서드를 정의 합니다.
+이 메서드는 계산된 로스를 반환 합니다. 이는 스타일 및 콘텐츠 로스의 진화를 표시하기 위해 그라디언트 디센트를 실행할 때 유용합니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">ContentLoss</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">,):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">ContentLoss</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="c1"># we &#39;detach&#39; the target content from the tree used</span>
-        <span class="c1"># to dynamically compute the gradient: this is a stated value,</span>
-        <span class="c1"># not a variable. Otherwise the forward method of the criterion</span>
-        <span class="c1"># will throw an error.</span>
+        <span class="c1"># 그라디언트를 동적으로 계산하는 데 사용되는 트리에서 대상 콘텐츠를 &#39;분리&#39; 합니다.</span>
+        <span class="c1"># :이 값은 변수(variable)가 아니라 명시된 값입니다.</span>
+        <span class="c1"># 그렇지 않으면 기준의 전달 메소드가 오류를 발생 시킵니다.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">target</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
@@ -472,49 +527,36 @@ parameter of the module.</p>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p><strong>Important detail</strong>: although this module is named <code class="docutils literal notranslate"><span class="pre">ContentLoss</span></code>, it
-is not a true PyTorch Loss function. If you want to define your content
-loss as a PyTorch Loss function, you have to create a PyTorch autograd function
-to recompute/implement the gradient manually in the <code class="docutils literal notranslate"><span class="pre">backward</span></code>
-method.</p>
+<p><strong>중요한 디테일</strong>: 이 모듈은 <code class="docutils literal notranslate"><span class="pre">ContentLoss</span></code> 라고 이름 지어졌지만 진정한 PyTorch Loss 함수는 아닙니다. 컨텐츠 손실을 PyTorch Loss로 정의 하려면 PyTorch autograd Function을 생성 하고 <code class="docutils literal notranslate"><span class="pre">backward</span></code> 메소드에서 직접 그라디언트를 재계산/구현 해야 합니다.</p>
 </div>
 </div>
-<div class="section" id="style-loss">
-<h3>Style Loss<a class="headerlink" href="#style-loss" title="Permalink to this headline">¶</a></h3>
-<p>The style loss module is implemented similarly to the content loss
-module. It will act as a transparent layer in a
-network that computes the style loss of that layer. In order to
-calculate the style loss, we need to compute the gram matrix <span class="math notranslate nohighlight">\(G_{XL}\)</span>. A gram
-matrix is the result of multiplying a given matrix by its transposed
-matrix. In this application the given matrix is a reshaped version of
-the feature maps <span class="math notranslate nohighlight">\(F_{XL}\)</span> of a layer <span class="math notranslate nohighlight">\(L\)</span>. <span class="math notranslate nohighlight">\(F_{XL}\)</span> is reshaped to form <span class="math notranslate nohighlight">\(\hat{F}_{XL}\)</span>, a <span class="math notranslate nohighlight">\(K\)</span>x<span class="math notranslate nohighlight">\(N\)</span>
-matrix, where <span class="math notranslate nohighlight">\(K\)</span> is the number of feature maps at layer <span class="math notranslate nohighlight">\(L\)</span> and <span class="math notranslate nohighlight">\(N\)</span> is the
-length of any vectorized feature map <span class="math notranslate nohighlight">\(F_{XL}^k\)</span>. For example, the first line
-of <span class="math notranslate nohighlight">\(\hat{F}_{XL}\)</span> corresponds to the first vectorized feature map <span class="math notranslate nohighlight">\(F_{XL}^1\)</span>.</p>
-<p>Finally, the gram matrix must be normalized by dividing each element by
-the total number of elements in the matrix. This normalization is to
-counteract the fact that <span class="math notranslate nohighlight">\(\hat{F}_{XL}\)</span> matrices with a large <span class="math notranslate nohighlight">\(N\)</span> dimension yield
-larger values in the Gram matrix. These larger values will cause the
-first layers (before pooling layers) to have a larger impact during the
-gradient descent. Style features tend to be in the deeper layers of the
-network so this normalization step is crucial.</p>
+<div class="section" id="id10">
+<h3>스타일 로스<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h3>
+<p>스타일 손실을 위해 우리는 레이어 <span class="math notranslate nohighlight">\(L\)</span> 에서 <span class="math notranslate nohighlight">\(X\)</span> 로 공급된(입력으로 하는) 신경망의 특징 맵(feature map) <span class="math notranslate nohighlight">\(F_{XL}\)</span> 이 주어진 경우
+그램 생성 <span class="math notranslate nohighlight">\(G_{XL}\)</span> 을 계산하는 모듈을 먼저 정의 해야 합니다.
+<span class="math notranslate nohighlight">\(\hat{F}_{XL}\)</span> 을 KxN 행렬에 대한 <span class="math notranslate nohighlight">\(F_{XL}\)</span> 은 임의의 벡터화 된 특징 맵(feature map) <span class="math notranslate nohighlight">\(F_{XL}^k\)</span> 의 길이가 됩니다.
+<span class="math notranslate nohighlight">\(F_{XL}^k\)</span> 의 <span class="math notranslate nohighlight">\(k^{번째}\)</span> 번째 줄은 <span class="math notranslate nohighlight">\(F_{XL}^k\)</span> 입니다.
+math:<cite>hat{F}_{XL} cdot hat{F}_{XL}^T = G_{XL}</cite> 인지 확인 해보길 바랍니다.
+이를 확인해보면 모듈을 구현하는 것이 쉬워 집니다:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">gram_matrix</span><span class="p">(</span><span class="nb">input</span><span class="p">):</span>
-    <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>  <span class="c1"># a=batch size(=1)</span>
-    <span class="c1"># b=number of feature maps</span>
-    <span class="c1"># (c,d)=dimensions of a f. map (N=c*d)</span>
+    <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>  <span class="c1"># a=배치 크기(=1)</span>
+    <span class="c1"># b=특징 맵의 크기</span>
+    <span class="c1"># (c,d)=특징 맵(N=c*d)의 차원</span>
 
-    <span class="n">features</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">a</span> <span class="o">*</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span> <span class="o">*</span> <span class="n">d</span><span class="p">)</span>  <span class="c1"># resise F_XL into \hat F_XL</span>
+    <span class="n">features</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">a</span> <span class="o">*</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span> <span class="o">*</span> <span class="n">d</span><span class="p">)</span>  <span class="c1"># F_XL을 \hat F_XL로 크기 조정합니다</span>
 
-    <span class="n">G</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">mm</span><span class="p">(</span><span class="n">features</span><span class="p">,</span> <span class="n">features</span><span class="o">.</span><span class="n">t</span><span class="p">())</span>  <span class="c1"># compute the gram product</span>
+    <span class="n">G</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">mm</span><span class="p">(</span><span class="n">features</span><span class="p">,</span> <span class="n">features</span><span class="o">.</span><span class="n">t</span><span class="p">())</span>  <span class="c1"># 그램 곱을 수행합니다</span>
 
-    <span class="c1"># we &#39;normalize&#39; the values of the gram matrix</span>
-    <span class="c1"># by dividing by the number of element in each feature maps.</span>
+    <span class="c1"># 그램 행렬의 값을 각 특징 맵의 요소 숫자로 나누는 방식으로 &#39;정규화&#39;를 수행합니다.</span>
     <span class="k">return</span> <span class="n">G</span><span class="o">.</span><span class="n">div</span><span class="p">(</span><span class="n">a</span> <span class="o">*</span> <span class="n">b</span> <span class="o">*</span> <span class="n">c</span> <span class="o">*</span> <span class="n">d</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Now the style loss module looks almost exactly like the content loss
-module. The style distance is also computed using the mean square
-error between <span class="math notranslate nohighlight">\(G_{XL}\)</span> and <span class="math notranslate nohighlight">\(G_{SL}\)</span>.</p>
+<p>특징 맵(feature map) 차원 :math:<a href="#id11"><span class="problematic" id="id12">`</span></a>N`이 클수록, 그램(Gram) 행렬의 값이 커집니다.
+따라서 :math:<a href="#id13"><span class="problematic" id="id14">`</span></a>N`으로 정규화하지 않으면 첫번째 레이어에서 계산된 로스 (풀링 레이어 전에)는
+경사 하강법 동안 훨씬 더 중요하게 됩니다. (역자주 : 정규화를 하지 않으면 첫번째 레이어에서 계산된 값들의 가중치가 높아져 상대적으로 다른 레이어에서 계산한 값들의 반영이 적게 되버리기 때문에 정규화가 필요해집니다.)
+스타일 특징의 흥미로운 부분들은 가장 깊은 레이어에 있기 때문에 그렇게 동작하지 않도록 해야 합니다!</p>
+<p>그런 다음 스타일 로스 모듈은 콘텐츠 로스 모듈과 완전히 동일한 방식으로 구현되지만
+대상과 입력 간의 그램 매트릭스의 차이를 비교하게 됩니다</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">StyleLoss</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target_feature</span><span class="p">):</span>
@@ -528,50 +570,47 @@ error between <span class="math notranslate nohighlight">\(G_{XL}\)</span> and <
 </pre></div>
 </div>
 </div>
-</div>
-<div class="section" id="importing-the-model">
-<h2>Importing the Model<a class="headerlink" href="#importing-the-model" title="Permalink to this headline">¶</a></h2>
-<p>Now we need to import a pre-trained neural network. We will use a 19
-layer VGG network like the one used in the paper.</p>
-<p>PyTorch’s implementation of VGG is a module divided into two child
-<code class="docutils literal notranslate"><span class="pre">Sequential</span></code> modules: <code class="docutils literal notranslate"><span class="pre">features</span></code> (containing convolution and pooling layers),
-and <code class="docutils literal notranslate"><span class="pre">classifier</span></code> (containing fully connected layers). We will use the
-<code class="docutils literal notranslate"><span class="pre">features</span></code> module because we need the output of the individual
-convolution layers to measure content and style loss. Some layers have
-different behavior during training than evaluation, so we must set the
-network to evaluation mode using <code class="docutils literal notranslate"><span class="pre">.eval()</span></code>.</p>
+<div class="section" id="id15">
+<h3>뉴럴 네트워크 읽기<a class="headerlink" href="#id15" title="Permalink to this headline">¶</a></h3>
+<p>자, 우리는 사전 훈련된 신경망을 가져와야 합니다. 이 논문에서와 같이,
+우리는 19 레이어 층을 가지는 VGG(VGG19) 네트워크를 사전 훈련된 네트워크로 사용할 것입니다.</p>
+<p>PyTorch의 VGG 구현은 두 개의 하위 순차 모듈로 나뉜 모듈 입니다.
+<code class="docutils literal notranslate"><span class="pre">특징(features)</span></code> 모듈 : 합성곱과 풀링 레이어들을 포함 합니다.
+<code class="docutils literal notranslate"><span class="pre">분류(classifier)</span></code> 모듈 : fully connected 레이어들을 포함 합니다.
+우리는 여기서 <code class="docutils literal notranslate"><span class="pre">특징</span></code> 모듈에 관심이 있습니다.
+일부 레이어는 학습 및 평가에 있어서 상황에 따라 다른 동작을 합니다.
+이후 우리는 그것을 특징 추출자로 사용하고 있습니다.
+우리는 .eval() 을 사용하여 네트워크를 평가 모드로 설정 할 수 있습니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cnn</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">vgg19</span><span class="p">(</span><span class="n">pretrained</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">features</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>Additionally, VGG networks are trained on images with each channel
-normalized by mean=[0.485, 0.456, 0.406] and std=[0.229, 0.224, 0.225].
-We will use them to normalize the image before sending it into the network.</p>
+<p>또한 VGG 네트워크는 평균 = [0.485, 0.456, 0.406] 및 표준편차 = [0.229, 0.224, 0.225]로 정규화 된 각 채널의 이미지에 대해 학습된 모델입니다.
+(역자, 일반적으로 네트워크는 이미지넷으로 학습이 되고 이미지넷 데이터의 평균과 표준편차가 위의 값과 같습니다.)
+우리는 입력 이미지를 네트워크로 보내기 전에 정규화 하는데 위 평균과 표준편차 값을 사용합니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cnn_normalization_mean</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="mf">0.485</span><span class="p">,</span> <span class="mf">0.456</span><span class="p">,</span> <span class="mf">0.406</span><span class="p">])</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
 <span class="n">cnn_normalization_std</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="mf">0.229</span><span class="p">,</span> <span class="mf">0.224</span><span class="p">,</span> <span class="mf">0.225</span><span class="p">])</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
 
-<span class="c1"># create a module to normalize input image so we can easily put it in a</span>
-<span class="c1"># nn.Sequential</span>
+<span class="c1"># 입력 이미지를 정규화하는 모듈을 만들어 nn.Sequential에 쉽게 입력 할 수 있게 하세요.</span>
 <span class="k">class</span> <span class="nc">Normalization</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mean</span><span class="p">,</span> <span class="n">std</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">Normalization</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="c1"># .view the mean and std to make them [C x 1 x 1] so that they can</span>
-        <span class="c1"># directly work with image Tensor of shape [B x C x H x W].</span>
-        <span class="c1"># B is batch size. C is number of channels. H is height and W is width.</span>
+        <span class="c1"># .view(텐서의 모양을 바꾸는 함수)로 평균과 표준 편차 텐서를 [C x 1 x 1] 형태로 만들어</span>
+        <span class="c1"># 바로 입력 이미지 텐서의 모양인 [B x C x H x W] 에 연산할 수 있도록 만들어 주세요.</span>
+        <span class="c1"># B는 배치 크기, C는 채널 값, H는 높이, W는 넓이 입니다.</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">mean</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">mean</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">std</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">std</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">img</span><span class="p">):</span>
-        <span class="c1"># normalize img</span>
+        <span class="c1"># img 값 정규화(normalize)</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">img</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">mean</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">std</span>
 </pre></div>
 </div>
-<p>A <code class="docutils literal notranslate"><span class="pre">Sequential</span></code> module contains an ordered list of child modules. For
-instance, <code class="docutils literal notranslate"><span class="pre">vgg19.features</span></code> contains a sequence (Conv2d, ReLU, MaxPool2d,
-Conv2d, ReLU…) aligned in the right order of depth. We need to add our
-content loss and style loss layers immediately after the convolution
-layer they are detecting. To do this we must create a new <code class="docutils literal notranslate"><span class="pre">Sequential</span></code>
-module that has content loss and style loss modules correctly inserted.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># desired depth layers to compute style/content losses :</span>
+<p><code class="docutils literal notranslate"><span class="pre">순차(Sequential)</span></code> 모듈에는 하위 모듈의 정렬된 목록이 있습니다.
+예를 들어 <code class="docutils literal notranslate"><span class="pre">vgg19.features</span></code> 은 vgg19 구조의 올바른 순서로 정렬된 순서 정보(Conv2d, ReLU, MaxPool2d, Conv2d, ReLU …)를 포함합니다.
+콘텐츠 로스 섹션에서 말했듯이 우리는 네트워크의 원하는 레이어에 추가 레이어 ‘투명(transparent)’레이어로 스타일 및 콘텐츠 손실 모듈을 추가하려고 합니다.
+이를 위해 새로운 순차 모듈을 구성합니다.이 모듈에서는 vgg19의 모듈과 손실 모듈을 올바른 순서로 추가합니다.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># 스타일/콘텐츠 로스로 계산하길 원하는 깊이의 레이어들:</span>
 <span class="n">content_layers_default</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;conv_4&#39;</span><span class="p">]</span>
 <span class="n">style_layers_default</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;conv_1&#39;</span><span class="p">,</span> <span class="s1">&#39;conv_2&#39;</span><span class="p">,</span> <span class="s1">&#39;conv_3&#39;</span><span class="p">,</span> <span class="s1">&#39;conv_4&#39;</span><span class="p">,</span> <span class="s1">&#39;conv_5&#39;</span><span class="p">]</span>
 
@@ -581,28 +620,28 @@ module that has content loss and style loss modules correctly inserted.</p>
                                <span class="n">style_layers</span><span class="o">=</span><span class="n">style_layers_default</span><span class="p">):</span>
     <span class="n">cnn</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">cnn</span><span class="p">)</span>
 
-    <span class="c1"># normalization module</span>
+    <span class="c1"># 표준화(normalization) 모듈</span>
     <span class="n">normalization</span> <span class="o">=</span> <span class="n">Normalization</span><span class="p">(</span><span class="n">normalization_mean</span><span class="p">,</span> <span class="n">normalization_std</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
 
-    <span class="c1"># just in order to have an iterable access to or list of content/syle</span>
-    <span class="c1"># losses</span>
+    <span class="c1"># 단지 반복 가능한 접근을 갖거나 콘텐츠/스타일의 리스트를 갖기 위함</span>
+    <span class="c1"># 로스값</span>
     <span class="n">content_losses</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">style_losses</span> <span class="o">=</span> <span class="p">[]</span>
 
-    <span class="c1"># assuming that cnn is a nn.Sequential, so we make a new nn.Sequential</span>
-    <span class="c1"># to put in modules that are supposed to be activated sequentially</span>
+    <span class="c1"># cnn은 nn.Sequential 하다고 가정하므로, 새로운 nn.Sequential을 만들어</span>
+    <span class="c1"># 우리가 순차적으로 활성화 하고자하는 모듈들을 넣겠습니다.</span>
     <span class="n">model</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span><span class="n">normalization</span><span class="p">)</span>
 
-    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># increment every time we see a conv</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># conv레이어를 찾을때마다 값을 증가 시킵니다</span>
     <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="n">cnn</span><span class="o">.</span><span class="n">children</span><span class="p">():</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">layer</span><span class="p">,</span> <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">):</span>
             <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
             <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;conv_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">layer</span><span class="p">,</span> <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">):</span>
             <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;relu_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
-            <span class="c1"># The in-place version doesn&#39;t play very nicely with the ContentLoss</span>
-            <span class="c1"># and StyleLoss we insert below. So we replace with out-of-place</span>
-            <span class="c1"># ones here.</span>
+            <span class="c1"># in-place(입력 값을 직접 업데이트) 버전은 콘텐츠로스와 스타일로스에</span>
+            <span class="c1"># 좋은 결과를 보여주지 못합니다.</span>
+            <span class="c1"># 그래서 여기선 out-of-place로 대체 하겠습니다.</span>
             <span class="n">layer</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">layer</span><span class="p">,</span> <span class="n">nn</span><span class="o">.</span><span class="n">MaxPool2d</span><span class="p">):</span>
             <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;pool_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
@@ -614,20 +653,20 @@ module that has content loss and style loss modules correctly inserted.</p>
         <span class="n">model</span><span class="o">.</span><span class="n">add_module</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">layer</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">content_layers</span><span class="p">:</span>
-            <span class="c1"># add content loss:</span>
+            <span class="c1"># 콘텐츠 로스 추가:</span>
             <span class="n">target</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">content_img</span><span class="p">)</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span>
             <span class="n">content_loss</span> <span class="o">=</span> <span class="n">ContentLoss</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
             <span class="n">model</span><span class="o">.</span><span class="n">add_module</span><span class="p">(</span><span class="s2">&quot;content_loss_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">),</span> <span class="n">content_loss</span><span class="p">)</span>
             <span class="n">content_losses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">content_loss</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">style_layers</span><span class="p">:</span>
-            <span class="c1"># add style loss:</span>
+            <span class="c1"># 스타일 로스 추가:</span>
             <span class="n">target_feature</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">style_img</span><span class="p">)</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span>
             <span class="n">style_loss</span> <span class="o">=</span> <span class="n">StyleLoss</span><span class="p">(</span><span class="n">target_feature</span><span class="p">)</span>
             <span class="n">model</span><span class="o">.</span><span class="n">add_module</span><span class="p">(</span><span class="s2">&quot;style_loss_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">),</span> <span class="n">style_loss</span><span class="p">)</span>
             <span class="n">style_losses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">style_loss</span><span class="p">)</span>
 
-    <span class="c1"># now we trim off the layers after the last content and style losses</span>
+    <span class="c1"># 이제 우리는 마지막 콘텐츠 및 스타일 로스 이후의 레이어들을 잘라냅니다.</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">model</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">ContentLoss</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">StyleLoss</span><span class="p">):</span>
             <span class="k">break</span>
@@ -637,45 +676,59 @@ module that has content loss and style loss modules correctly inserted.</p>
     <span class="k">return</span> <span class="n">model</span><span class="p">,</span> <span class="n">style_losses</span><span class="p">,</span> <span class="n">content_losses</span>
 </pre></div>
 </div>
-<p>Next, we select the input image. You can use a copy of the content image
-or white noise.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>논문에서는 맥스 풀링(Max Pooling) 레이어를 에버리지 풀링(Average Pooling) 레이어로 바꾸는 것을 추천합니다.
+AlexNet에서는 논문에서 사용된 VGG19 네트워크보다 상대적으로 작은 네트워크라 결과 품질에서
+큰 차이를 확인하기 어려울 수 있습니다.
+그러나, 만약 당신이 대체해 보기를 원한다면 아래 코드들을 사용할 수 있습니다:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># avgpool = nn.AvgPool2d(kernel_size=layer.kernel_size,</span>
+<span class="c1">#                         stride=layer.stride, padding = layer.padding)</span>
+<span class="c1"># model.add_module(name,avgpool)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="id16">
+<h3>입력 이미지<a class="headerlink" href="#id16" title="Permalink to this headline">¶</a></h3>
+<p>다시, 코드를 간단하게 하기 위해, 콘텐츠와 스타일 이미지들의 같은 차원의 이미지를 가져옵니다.
+해당 이미지는 백색 노이즈일 수 있거나 콘텐츠-이미지의 값들을 복사해도 좋습니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">input_img</span> <span class="o">=</span> <span class="n">content_img</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span>
-<span class="c1"># if you want to use white noise instead uncomment the below line:</span>
+<span class="c1"># 대신에 백색 노이즈를 이용하길 원한다면 아래 줄의 주석처리를 제거하세요:</span>
 <span class="c1"># input_img = torch.randn(content_img.data.size(), device=device)</span>
 
-<span class="c1"># add the original input image to the figure:</span>
+<span class="c1"># 원본 입력 이미지를 창에 추가합니다:</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
 <span class="n">imshow</span><span class="p">(</span><span class="n">input_img</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Input Image&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <img alt="../_images/sphx_glr_neural_style_tutorial_003.png" class="sphx-glr-single-img" src="../_images/sphx_glr_neural_style_tutorial_003.png" />
 </div>
-<div class="section" id="gradient-descent">
-<h2>Gradient Descent<a class="headerlink" href="#gradient-descent" title="Permalink to this headline">¶</a></h2>
-<p>As Leon Gatys, the author of the algorithm, suggested <a class="reference external" href="https://discuss.pytorch.org/t/pytorch-tutorial-for-neural-transfert-of-artistic-style/336/20?u=alexis-jacq">here</a>, we will use
-L-BFGS algorithm to run our gradient descent. Unlike training a network,
-we want to train the input image in order to minimise the content/style
-losses. We will create a PyTorch L-BFGS optimizer <code class="docutils literal notranslate"><span class="pre">optim.LBFGS</span></code> and pass
-our image to it as the tensor to optimize.</p>
+<div class="section" id="id17">
+<h3>경사 하강법<a class="headerlink" href="#id17" title="Permalink to this headline">¶</a></h3>
+<p>알고리즘의 저자인 Len Gatys 가 <a class="reference external" href="https://discuss.pytorch.org/t/pytorch-tutorial-for-neural-transfert-of-artistic-style/336/20?u=alexis-jacq">여기서</a> 제안한 방식대로
+경사 하강법을 실행하는데 L-BFGS 알고리즘을 사용 하겠습니다.
+일반적인 네트워크 학습과는 다르게, 우리는 콘텐츠/스타일 로스를 최소화 하는 방향으로 입력 영상을 학습 시키려고 합니다.
+우리는 간단히 PyTorch L-BFGS 옵티마이저 <code class="docutils literal notranslate"><span class="pre">optim.LBFGS</span></code> 를 생성하려고 하며, 최적화를 위해 입력 이미지를 텐서 타입으로 전달합니다.
+우리는 <code class="docutils literal notranslate"><span class="pre">.requires_grad_()</span></code> 를 사용하여 해당 이미지가 그라디언트가 필요함을 확실하게 합니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">get_input_optimizer</span><span class="p">(</span><span class="n">input_img</span><span class="p">):</span>
-    <span class="c1"># this line to show that input is a parameter that requires a gradient</span>
+    <span class="c1"># 이 줄은 입력은 그레이던트가 필요한 파라미터라는 것을 보여주기 위해 있습니다.</span>
     <span class="n">optimizer</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">LBFGS</span><span class="p">([</span><span class="n">input_img</span><span class="o">.</span><span class="n">requires_grad_</span><span class="p">()])</span>
     <span class="k">return</span> <span class="n">optimizer</span>
 </pre></div>
 </div>
-<p>Finally, we must define a function that performs the neural transfer. For
-each iteration of the networks, it is fed an updated input and computes
-new losses. We will run the <code class="docutils literal notranslate"><span class="pre">backward</span></code> methods of each loss module to
-dynamicaly compute their gradients. The optimizer requires a “closure”
-function, which reevaluates the modul and returns the loss.</p>
-<p>We still have one final constraint to address. The network may try to
-optimize the input with values that exceed the 0 to 1 tensor range for
-the image. We can address this by correcting the input values to be
-between 0 to 1 each time the network is run.</p>
+<p><strong>마지막 단계</strong>: 경사 하강의 반복. 각 단계에서 우리는 네트워크의 새로운 로스를 계산하기 위해
+업데이트 된 입력을 네트워크에 공급해야 합니다. 우리는 그라디언트를 동적으로 계산하고
+그라디언트 디센트의 단계를 수행하기 위해 각 손실의 <code class="docutils literal notranslate"><span class="pre">역방향(backward)</span></code> 메소드를 실행해야 합니다.
+옵티마이저는 인수로서 “클로저(closure)”를 필요로 합니다: 즉, 모델을 재평가하고 로스를 반환 하는 함수입니다.</p>
+<p>그러나, 여기에 작은 함정이 있습니다. 최적화 된 이미지는 0 과 1 사이에 머물지 않고 <span class="math notranslate nohighlight">\(-\infty\)</span> 사이의 값을 가질 수 있습니다.
+다르게 말하면, 이미지는 잘 최적화될 수 있고(0-1 사이의 정해진 값 범위내의 값을 가질 수 있고) 이상한 값을 가질 수도 있습니다.
+사실 우리는 입력 이미지가 올바른 범위의 값을 유지할 수 있도록 제약 조건 하에서 최적화를 수행해야 합니다.
+각 단계마다 0-1 간격으로 값을 유지하기 위해 이미지를 수정하는 간단한 해결책이 있습니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">run_style_transfer</span><span class="p">(</span><span class="n">cnn</span><span class="p">,</span> <span class="n">normalization_mean</span><span class="p">,</span> <span class="n">normalization_std</span><span class="p">,</span>
                        <span class="n">content_img</span><span class="p">,</span> <span class="n">style_img</span><span class="p">,</span> <span class="n">input_img</span><span class="p">,</span> <span class="n">num_steps</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
                        <span class="n">style_weight</span><span class="o">=</span><span class="mi">1000000</span><span class="p">,</span> <span class="n">content_weight</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Run the style transfer.&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;스타일 변환을 실행합니다.&quot;&quot;&quot;</span>
     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Building the style transfer model..&#39;</span><span class="p">)</span>
     <span class="n">model</span><span class="p">,</span> <span class="n">style_losses</span><span class="p">,</span> <span class="n">content_losses</span> <span class="o">=</span> <span class="n">get_style_model_and_losses</span><span class="p">(</span><span class="n">cnn</span><span class="p">,</span>
         <span class="n">normalization_mean</span><span class="p">,</span> <span class="n">normalization_std</span><span class="p">,</span> <span class="n">style_img</span><span class="p">,</span> <span class="n">content_img</span><span class="p">)</span>
@@ -686,7 +739,7 @@ between 0 to 1 each time the network is run.</p>
     <span class="k">while</span> <span class="n">run</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">num_steps</span><span class="p">:</span>
 
         <span class="k">def</span> <span class="nf">closure</span><span class="p">():</span>
-            <span class="c1"># correct the values of updated input image</span>
+            <span class="c1"># 입력 이미지의 업데이트된 값들을 보정합니다</span>
             <span class="n">input_img</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">clamp_</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 
             <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
@@ -716,13 +769,13 @@ between 0 to 1 each time the network is run.</p>
 
         <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">closure</span><span class="p">)</span>
 
-    <span class="c1"># a last correction...</span>
+    <span class="c1"># 마지막 보정...</span>
     <span class="n">input_img</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">clamp_</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">input_img</span>
 </pre></div>
 </div>
-<p>Finally, we can run the algorithm.</p>
+<p>마지막으로, 알고리즘을 실행 시킵니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">output</span> <span class="o">=</span> <span class="n">run_style_transfer</span><span class="p">(</span><span class="n">cnn</span><span class="p">,</span> <span class="n">cnn_normalization_mean</span><span class="p">,</span> <span class="n">cnn_normalization_std</span><span class="p">,</span>
                             <span class="n">content_img</span><span class="p">,</span> <span class="n">style_img</span><span class="p">,</span> <span class="n">input_img</span><span class="p">)</span>
 
@@ -739,25 +792,25 @@ between 0 to 1 each time the network is run.</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Building the style transfer model..
 Optimizing..
 run [50]:
-Style Loss : 4.379381 Content Loss: 4.102677
+Style Loss : 4.354980 Content Loss: 4.266018
 
 run [100]:
-Style Loss : 1.176700 Content Loss: 3.060229
+Style Loss : 1.136877 Content Loss: 3.035735
 
 run [150]:
-Style Loss : 0.734177 Content Loss: 2.673370
+Style Loss : 0.710663 Content Loss: 2.650886
 
 run [200]:
-Style Loss : 0.493814 Content Loss: 2.502611
+Style Loss : 0.485478 Content Loss: 2.495467
 
 run [250]:
-Style Loss : 0.358389 Content Loss: 2.411382
+Style Loss : 0.349688 Content Loss: 2.405310
 
 run [300]:
-Style Loss : 0.271258 Content Loss: 2.353315
+Style Loss : 0.266456 Content Loss: 2.350118
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  25.772 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  22.931 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-advanced-neural-style-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/b3bcd49c4dd9be3a44c6c5d2e2a8b0cd/neural_style_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">neural_style_tutorial.py</span></code></a></p>
@@ -767,6 +820,7 @@ Style Loss : 0.271258 Content Loss: 2.353315
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
+</div>
 </div>
 </div>
 
@@ -781,7 +835,7 @@ Style Loss : 0.271258 Content Loss: 2.353315
         <a href="../beginner/fgsm_tutorial.html" class="btn btn-neutral float-right" title="Adversarial Example Generation" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
       
       
-        <a href="../intermediate/spatial_transformer_tutorial.html" class="btn btn-neutral" title="Spatial Transformer Networks Tutorial" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
+        <a href="../intermediate/spatial_transformer_tutorial.html" class="btn btn-neutral" title="공간 변형기 네트워크(Spatial Transformer Networks) 튜토리얼" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
       
     </div>
   
@@ -820,18 +874,27 @@ Style Loss : 0.271258 Content Loss: 2.353315
           <div class="pytorch-right-menu" id="pytorch-right-menu">
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
-<li><a class="reference internal" href="#">Neural Transfer Using PyTorch</a><ul>
-<li><a class="reference internal" href="#introduction">Introduction</a></li>
-<li><a class="reference internal" href="#underlying-principle">Underlying Principle</a></li>
-<li><a class="reference internal" href="#importing-packages-and-selecting-a-device">Importing Packages and Selecting a Device</a></li>
-<li><a class="reference internal" href="#loading-the-images">Loading the Images</a></li>
-<li><a class="reference internal" href="#loss-functions">Loss Functions</a><ul>
-<li><a class="reference internal" href="#content-loss">Content Loss</a></li>
-<li><a class="reference internal" href="#style-loss">Style Loss</a></li>
+<li><a class="reference internal" href="#">PyTorch를 이용한 신경망-변환(Neural-Transfer)</a><ul>
+<li><a class="reference internal" href="#id2">소개</a><ul>
+<li><a class="reference internal" href="#id3">신경망 뭐라고?</a></li>
+<li><a class="reference internal" href="#id4">어떻게 동작합니까?</a><ul>
+<li><a class="reference internal" href="#id5">그래서. 어떻게 동작하냐고요?</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#importing-the-model">Importing the Model</a></li>
-<li><a class="reference internal" href="#gradient-descent">Gradient Descent</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#pytorch">PyTorch 구현</a><ul>
+<li><a class="reference internal" href="#id6">패키지들</a></li>
+<li><a class="reference internal" href="#cuda">쿠다(CUDA)</a></li>
+<li><a class="reference internal" href="#id7">이미지 읽기</a></li>
+<li><a class="reference internal" href="#id8">이미지 표시하기</a></li>
+<li><a class="reference internal" href="#id9">콘텐츠 로스</a></li>
+<li><a class="reference internal" href="#id10">스타일 로스</a></li>
+<li><a class="reference internal" href="#id15">뉴럴 네트워크 읽기</a></li>
+<li><a class="reference internal" href="#id16">입력 이미지</a></li>
+<li><a class="reference internal" href="#id17">경사 하강법</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
