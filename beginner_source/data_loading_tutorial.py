@@ -1,19 +1,21 @@
 # -*- coding: utf-8 -*-
 
 """
+Data Loading and Processing Tutorial
+====================================
 데이터 로딩 프로세싱 튜토리얼
-저자 : Sasank Chilamkurthy <https://chsasank.github.io>
-번역 : 정윤성
+**저자** : Sasank Chilamkurthy <https://chsasank.github.io>
+**번역** : 정윤성 <https://github.com/Yunseong-Jeong>
 
-데이터를 준비하는것은 어떤 머신 러닝 문제를 푸는 과정속에 많은 노력이 필요합니다.
-Pytorch는 데이터 로딩을 쉽게 ,  코드를 보다 읽기 편하게 만들어줍니다.
+데이터를 준비하는 것은 머신 러닝 문제를 푸는 과정속에 많은 노력이 필요합니다.
+PyTorch는 데이터 로딩을 쉽게 , 코드를 보다 읽기 편하게 만들어줍니다.
 이번 튜토리얼에서는, 일반적이지 않은 데이터에서 로드하는 방법과 
-데이터를 전처리/증가시키는 방법에 대해서 알아볼 것입니다.
+데이터를 전처리 / 증가시키는 방법에 대해서 알아볼 것입니다.
 
 이번 튜토리얼을 진행하기 위해서, 아래에 있는 패키지를 설치해주시기 바랍니다.
 
 -  ``scikit-image``: 이미지 I/O 와 변형을 위해 필요합니다.
--  ``pandas``: CSV파일 파싱을 보다 쉽게 해줍니다.
+-  ``pandas``: CSV 파일 파싱을 보다 쉽게 해줍니다.
 
 
 """
@@ -28,12 +30,11 @@ import matplotlib.pyplot as plt
 from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms, utils
 
-# Ignore warnings 
-# 경고 무시해주세요
+# 경고 메시지 무시하기
 import warnings
 warnings.filterwarnings("ignore")
 
-plt.ion()   # interactive mode #반응형 모드
+plt.ion()   #반응형 모드
 
 ######################################################################
 
@@ -46,13 +47,12 @@ plt.ion()   # interactive mode #반응형 모드
 # 각각의 얼굴에 68개의 서로다른 중요 포인트들이 존재합니다.
 #
 # .. note::
-# 주의사항::
-#     링크를 통해서 데이터셋을 다운로드 해주세요.<https://download.pytorch.org/tutorial/faces.zip>`_
+#     이 링크 <https://download.pytorch.org/tutorial/faces.zip>`_ 를 통해 데이터셋을 다운로드 해주세요.
 #     다운로드한 데이터셋은 'data/faces/'에 위치해야 합니다.
-#     다운로드 하신 데이터셋은 'facedlib의 pose estimation이 적용된 데이터 셋입니다.
-#     <https://blog.dlib.net/2014/08/real-time-face-pose-estimation.html>
+#     다운로드 하신 데이터셋은 'dlib의 pose estimation`<https://blog.dlib.net/2014/08/real-time-face-pose-estimation.html>__이 적용된 데이터 셋입니다.
+#     
 #
-# 데이터셋은 아래와 같은 특징을 가진 CSV파일이 포함되어 있습니다.
+# 데이터셋은 아래와 같은 특징을 가진 CSV 파일이 포함되어 있습니다.
 #
 # ::
 #
@@ -60,7 +60,7 @@ plt.ion()   # interactive mode #반응형 모드
 #     0805personali01.jpg,27,83,27,98, ... 84,134
 #     1084239450_e76e00b7e7.jpg,70,236,71,257, ... ,128,312
 #
-# 이제 CSV 파일을 불러와서 (N,2)배열안에 있는 특징들을 잡아보겠습니다.
+# 이제 CSV 파일을 불러와서 (N, 2) 배열안에 있는 랜드마크들을 잡아보겠습니다.
 # N은 랜드마크(landmarks)의 개수입니다.
 
 landmarks_frame = pd.read_csv('data/faces/face_landmarks.csv')
@@ -76,7 +76,8 @@ print('First 4 Landmarks: {}'.format(landmarks[:4]))
 
 
 ######################################################################
-# 이미지와 랜드마크(landmark)를 보여주는 간단한 함수를 작성해보고, 실제로 적용해보겠습니다.
+# 이미지와 랜드마크(landmark)를 보여주는 간단한 함수를 작성해보고, 
+# 실제로 적용해보겠습니다.
 #
 def show_landmarks(image, landmarks):
     """Show image with landmarks"""
@@ -92,22 +93,21 @@ plt.show()
 
 
 ######################################################################
-# 데이터셋의 클래스입니다.
+# 데이터셋 클래스
 # -------------
 #
 # ``torch.utils.data.Dataset`` 은 데이터셋을 나타내는 추상클래스입니다.
-# Your custom dataset should inherit ``Dataset`` and override the following
-# 여러분의 데이터셋은 ``Dataset``에 상속하고 아래와같이 오버라이드 해야합니다.
+# 여러분의 데이터셋은 ``Dataset`` 에 상속하고 아래와같이 오버라이드 해야합니다.
 # methods:
 #
-# -  ``len(dataset)``같은 기능을 하는 ``__len__`` 은 데이터셋의 크기를 리턴해야합니다.
-# -  ``dataset[i]`` 처럼 인덱스를 찾는것을 지원하는 ``__getitem__``은
-#    'i'번째 샘플을 찾는데 사용됩니다.
+# -  ``len(dataset)`` 에서 호출되는 ``__len__`` 은 데이터셋의 크기를 리턴해야합니다.
+# -  ``dataset[i]`` 에서 호출되는 ``__getitem__`` 은
+#    math:'i' 번째 샘플을 찾는데 사용됩니다.
 #
 # 이제 데이터셋 클래스를 만들어보도록 하겠습니다.
-# ``__init__``을 사용해서 CSV파일 안에 있는 데이터를 읽지만,
-# ``__getitem__``을 이용해서 이미지의 판독을 합니다.
-# 이방법은 모든 이미지를 메모리에 저장하지 않고 필요할때마다 읽기 때문에 
+# ``__init__`` 을 사용해서 CSV 파일 안에 있는 데이터를 읽지만,
+# ``__getitem__`` 을 이용해서 이미지의 판독을 합니다.
+# 이 방법은 모든 이미지를 메모리에 저장하지 않고 필요할때마다 읽기 때문에 
 # 메모리를 효율적으로 사용합니다.
 #
 # Sample of our dataset will be a dict
@@ -117,8 +117,8 @@ plt.show()
 # next section.
 # 
 # 데이터셋의 샘플은  ``{'image': image, 'landmarks': landmarks}`` 형태를 갖습니다.
-# 필요한 처리가 샘플에 적용될 수 있도록  Optional argument인 ``transform`` 을 갖습니다
-# 다음장에서 전이``transform``를 활용하는 방법에 대해서 알아보겠습니다.
+# Optional argument인 ``transform`` 을 갖고, 필요한 전처리 과정을 샘플에 적용할 수 있습니다.
+# 다음 장에서 전이 ``transform`` 를 활용하는 방법에 대해서 알아보겠습니다.
 #
 
 class FaceLandmarksDataset(Dataset):
@@ -187,36 +187,35 @@ for i in range(len(face_dataset)):
 # ----------
 #
 # 위에서 볼 수 있었던 한가지 문제점은 샘플들이 다 같은 사이즈가 아니라는 것입니다.
-# 대부분의 neural networks 는 고정된 크기의 이미지라고 가정합니다.
-# 그러므로 우리는 neural networks에게 주기전에 처리할 과정을 작성해야합니다.
+# 대부분의 신경망(neural networks)은 고정된 크기의 이미지라고 가정합니다.
+# 그러므로 우리는 신경망(neural networks)에 주기 전에 처리할 과정을 작성해야 합니다.
 #
 # 3가지의 transforms 을 만들어 봅시다:
 # -  ``Rescale``: 이미지의 크기를 조절합니다.
-# -  ``RandomCrop``: to 이미지를 무작위로 자릅니다. 
+# -  ``RandomCrop``: 이미지를 무작위로 자릅니다. 
 #                    이것을 data augmentation이라 합니다.
-# -  ``ToTensor``: numpy images에서 torch images로 변경합니다. 
+# -  ``ToTensor``: numpy 이미지에서 torch 이미지로 변경합니다. 
 #                  (축변환이 필요합니다)
 #
-# parameter가 호출될 때 마다 항상 통과될 필요가없도록 
-# Transform 함수대신에 부를 수 있는 클래스로 작성 합니다.
-# 이것 때문에, ``__call__`` method를 구현할 필요가 있습니다.
-# 필요하다면, ``__init__ method 에도 구현해야합니다.
-# 그런 후에, transform을 다음과 같이 사용할 수 있습니다.
+# 간단한 함수대신에 호출 할 수 있는 클래스로 작성 합니다.
+# 이렇게 한다면, 클래스가 호출 될 때마다 전이(Transform)의 Parameter가 전달 되지 않아도 됩니다.
+# 이와 같이, ``__call__`` 함수를 구현 해야합니다.
+# 필요하다면, ``__init__`` 함수도 해야합니다. 다음과 같이 전이(transform)를 사용할 수 있습니다.
+#
 # ::
 #
 #     tsfm = Transform(params)
 #     transformed_sample = tsfm(sample)
-
-# 아래에서는 이미지와 특징들을 어떻게 적용하는지 살펴보도록 하겠습니다.
+#
+# 아래에서는 이미지와 랜드마크(landmark)들을 어떻게 적용하는지 살펴보도록 하겠습니다.
 
 class Rescale(object):
     """주어진 사이즈로 샘플크기를 조정합니다.
 
     Args:
-        output_size(tuple or int) : 얻고자하는 사이즈 값이 출력됩니다.
-            만약 tuple 이라면 결과값이 output_size(기대값)과 일치하지만,
-            int라면 이미지의 가장자리중 최소값은 종횡비를 유지하기 위해서
-            output_size 와 일치합니다.
+        output_size(tuple or int) : 원하는 사이즈 값
+            tuple인 경우 해당 tuple(output_size)이 결과물(output)의 크기가 되고,
+            int라면 비율을 유지하면서, 길이가 작은 쪽이 output_size가 됩니다.
     """
 
     def __init__(self, output_size):
@@ -239,8 +238,6 @@ class Rescale(object):
 
         img = transform.resize(image, (new_h, new_w))
 
-        # 이미지가 x축과 y축이 1과 0이기 때문에
-        # h 와 w 의 랜드마크(landmarks)의 위치를 바꿔줍니다.
         landmarks = landmarks * [new_w / w, new_h / h]
 
         return {'image': img, 'landmarks': landmarks}
@@ -280,7 +277,7 @@ class RandomCrop(object):
 
 
 class ToTensor(object):
-    """numpy를 tensor(torch)로 변환 시켜줍니다."""
+    """numpy array를 tensor(torch)로 변환 시켜줍니다."""
 
     def __call__(self, sample):
         image, landmarks = sample['image'], sample['landmarks']
@@ -301,9 +298,9 @@ class ToTensor(object):
 #
 # 이미지의 가장 짧은 측면을 256개로 rescale하고, 
 # 그후에 무작위로 224개를 자른다고 가정합시다.
-# 다시말해, ``Rescale`` 과 ``RandomCrop``을 사용해봅시다.
+# 다시말해, ``Rescale`` 과 ``RandomCrop`` 을 사용해봅시다.
 #
-# ``torchvision.transforms.Compose``는 위의 두작업을 하는 간단한 호출할 수 있는 클래스입니다.
+# ``torchvision.transforms.Compose`` 는 위의 두작업을 하는 간단한 호출할 수 있는 클래스입니다.
 #
 
 scale = Rescale(256)
@@ -329,17 +326,17 @@ plt.show()
 # 데이터셋을 이용한 반복작업
 # -----------------------------
 #
-# transforms을 적용한 dataset을 만들기위해서 만들었던것을 다 집어 넣어 봅시다.
+# 전이(transform)를 적용한 dataset을 만들기위해서 만들었던것을 다 집어 넣어 봅시다.
 #
-# 요약하자면, 데이터셋은 다음과 같이 샘플링됩니다.
+# 요약하자면, 데이터셋은 다음과 같이 샘플링 됩니다.
 #
 # -  이미지는 파일 전체를 메모리에 올리지않고 필요할때마다 불러와서 읽습니다.
 # -  그 후에 읽은 이미지에 Transform을 적용합니다.
 # -  transfroms 중 하나가 랜덤이기 때문에, 데이터는 샘플링때 증가합니다.
 #
 #
-# 우리는 이제 이전에 사용하던 것 처럼 for문을 사용해서 
-# 생성된 데이터셋을 반복작업에 사용할 수 있습니다.
+# 우리는 이제 이전에 사용하던 것 처럼 ``for i in range`` 를 사용해서 
+# 생성된 데이터셋을 반복 작업에 사용할 수 있습니다.
 # 
 
 transformed_dataset = FaceLandmarksDataset(csv_file='data/faces/face_landmarks.csv',
@@ -360,18 +357,18 @@ for i in range(len(transformed_dataset)):
 
 
 ######################################################################
-# 그러나, 데이터에``for``문을 이용한 반복을 사용해서 많은 특징들을 놓칠수 있습니다.
-# 특히, 아래와 같은것을 놓칠수 있습니다.
+# 그러나, 데이터 상에서 반복하는 ``for`` 문은 많은 특징(features)를 놓칠 수 있습니다.
+# 특히, 아래와 같은 것을 놓칠 수 있습니다:
 #
-# -  데이터를 처리하는 과정
+# -  데이터를 묶는 과정
 # -  데이터를 섞는 과정
 # -  병렬처리 과정에서 ``multiprocessing`` 을 사용할때 데이터를 불러오는 것
 #
-# ``torch.utils.data.DataLoader``는 위의 기능들을 제공하는 반복자(iterartor)입니다.
-#  아래에 사용되는 Parameters 들은 명확해야합니다.
-#  여러개 중에 ``collate_fn``를 주의깊게 봐야합니다.
-#  이것을 이용해서 샘플들이 정확하게 배치하는 방법을 구체화 할 수 있습니다.
-#  그러나, 일반적인 결합하는 경우에 대해서는 작동을 정확하게 수행해야합니다.
+# ``torch.utils.data.DataLoder`` 는 위와 같은 기능을 모두 제공해주는 반복자(iterator)입니다.
+# 사용되는 매개변수(Parameters)는 명확해야 합니다.
+# ``collate_fn`` 는 흥미로운 매개변수(Parameters) 중 하나입니다.
+# ``collate_fn`` 을 이용하여 샘플들을 정확하게 배치하는 방법을 명시할 수 있습니다.
+# 그러나, 대부분의 경우에 대해서 정확하게 작동해야 합니다.
 
 dataloader = DataLoader(transformed_dataset, batch_size=4,
                         shuffle=True, num_workers=4)
@@ -413,12 +410,11 @@ for i_batch, sample_batched in enumerate(dataloader):
 # Afterword: torchvision
 # ----------------------
 #
-# 이번 튜토리얼에서는, 데이터셋과, 트랜스폼(transforms), 데이터로더(dataloader)를
-# 작성방법과 사용방법에 대해 알아보았습니다.
-#  ``torchvision``패키지는 몇개의 dataset과 transform을 제공합니다.
-# 따라서 여러분은 클래스들을 작성해야할 필요는 없습니다.
-# ``ImageFolder``는 torchvision 에서 사용할수 있는 일반적인 데이터셋 입니다.
-# 다음과 같이 파일이 있다고 가정해 봅시다.: ::
+# 이번 튜토리얼에서는, 데이터셋 작성과 사용, 전이(transforms), 데이터를 불러오는 방법에 대해서 알아봤습니다.
+# ``torchvision`` 패키지는 몇몇의 일반적인 데이터셋과 전이(transforms)들을 제공합니다.
+# 클래스들을 따로 작성하지 않아도 될 것입니다. 
+# torchvision에서의 사용가능한 일반적인 데이터셋 중 하나는 ``ImageFolder`` 입니다. 
+# 이것은 다음과 같은 방식으로 구성되어 있다고 가정합니다: ::
 #
 #     root/ants/xxx.png
 #     root/ants/xxy.jpeg
@@ -430,13 +426,9 @@ for i_batch, sample_batched in enumerate(dataloader):
 #     root/bees/nsdf3.png
 #     root/bees/asd932_.png
 #
-# 여기서 'ants', 'bees' 는 class labels 입니다.
-# Similarly generic transforms 
-# which operate on ``PIL.Image`` like  ``RandomHorizontalFlip``, ``Scale``,
-# are also available. 
-# ``RandomHorizontalFlip``, ``Scale``와 같은``PIL.Image``에서 
-# 동작하는 일반적인 전이(transform)는 다 사용가능합니다.
-# 아래와 같은 데이터로더(dataloader)를 작성하여 사용할수도 있습니다. ::
+# 여기서'ants', 'bees'는 class labels입니다. 
+# 비슷하게, ``RandomHorizontalFlip`` , ``Scale`` 과 같이  ``PIL.Image`` 에서 작동하는 
+# 일반적인 전이(transforms)도 사용가능합니다. 이와 같이 데이터로더(dataloader)를 사용할 수 있습니다: ::
 #
 #   import torch
 #   from torchvision import transforms, datasets
@@ -455,4 +447,4 @@ for i_batch, sample_batched in enumerate(dataloader):
 #                                                num_workers=4)
 #
 #  training code에 대한 예시를 알고 싶다면, 
-#  `transfer_learning_tutorial` 문서를 참고해주세요
+#  :doc:`transfer_learning_tutorial` 문서를 참고해주세요
