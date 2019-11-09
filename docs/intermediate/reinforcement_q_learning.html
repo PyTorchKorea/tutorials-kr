@@ -308,8 +308,8 @@ PyTorch를 사용하는 방법을 보여드립니다.</p>
 <p><strong>태스크</strong></p>
 <p>에이전트는 연결된 막대가 똑바로 서 있도록 카트를 왼쪽이나 오른쪽으로
 움직이는 두 가지 동작 중 하나를 선택해야합니다.
-다양한 알고리즘과 시각화 기능을 갖춘 공식 순위표를
-<a class="reference external" href="https://gym.openai.com/envs/CartPole-v0">Gym website</a> 에서 찾을 수 있습니다.</p>
+다양한 알고리즘과 시각화 기능을 갖춘 공식 순위표가
+<a class="reference external" href="https://gym.openai.com/envs/CartPole-v0">Gym website</a> 에 있습니다.</p>
 <div class="figure align-default" id="id9">
 <img alt="cartpole" src="../_images/cartpole1.gif" />
 <p class="caption"><span class="caption-text">cartpole</span><a class="headerlink" href="#id9" title="Permalink to this image">¶</a></p>
@@ -318,12 +318,12 @@ PyTorch를 사용하는 방법을 보여드립니다.</p>
 환경이 새로운 상태로 <em>전환</em> 되고 작업의 결과를 나타내는 보상도 반환됩니다.
 이 태스크에서는 막대가 지나치게 떨어지면 환경이 종료됩니다.</p>
 <p>카트폴 태스크는 에이전트에 대한 입력이 환경 상태(위치, 속도 등)를 나타내는
-4개의 실제 값이 되도록 설계되었습니다. 그러나 신경망은 순수하게 그 장면을 보고
-태스크를 해결할 수 있습니다 따라서 카트 중심의 화면 패치를 입력으로 사용합니다.
+4개의 실제 값을 갖도록 설계되었습니다. 그러나 신경망은 순수하게 그 장면을 보고
+태스크를 해결할 수 있습니다. 따라서 카트 중심의 화면 패치를 입력으로 사용합니다.
 이 때문에 우리의 결과는 공식 순위표의 결과와 직접적으로 비교할 수 없습니다.
 우리의 태스크는 훨씬 더 어렵습니다.
 불행히도 모든 프레임을 렌더링해야되므로 이것은 학습 속도를 늦추게됩니다.</p>
-<p>엄밀히 말하면, 현재 스크린 패치와 이전 스크린 패치 사이의 차이로 상태를 표시 할 것입니다.
+<p>엄밀히 말하면, 현재 스크린 패치와 이전 스크린 패치 사이의 차이로 상태를 표현할 것입니다.
 이렇게하면 에이전트가 막대의 속도를 한 이미지에서 고려할 수 있습니다.</p>
 <p><strong>패키지</strong></p>
 <p>먼저 필요한 패키지를 가져옵니다. 첫째, 환경을 위해
@@ -370,10 +370,10 @@ package</a>).</p></li>
 <div class="section" id="replay-memory">
 <h2>재현 메모리(Replay Memory)<a class="headerlink" href="#replay-memory" title="Permalink to this headline">¶</a></h2>
 <p>우리는 DQN 학습을 위해 경험 재현 메모리를 사용할 것입니다.
-에이전트가 관찰한 전환(transition)을 저장해고 나중에 이 데이터를
-재사용 할 수 있습니다. 무작위로 샘플링하면 배치를 구성한는 전환들이
-비상관(decorrelated)하게 됩니다. 이것이 DQN 학습 절차를 크게 안정시키고
-향상시키는 것으로 나타났습니다.</p>
+에이전트가 관찰한 전환(transition)을 저장하고 나중에 이 데이터를
+재사용 할 수 있습니다. 무작위로 샘플링하면 배치를 구성하는 전환들의
+상관성이 제거(decorrelated) 됩니다. 이렇게 하면 DQN 학습 절차가 크게 안정되고
+향상된다고 합니다.</p>
 <p>이를 위해서 두개의 클래스가 필요합니다:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">Transition</span></code> - 우리 환경에서 단일 전환을 나타내도록 명명된 튜플</p></li>
@@ -411,15 +411,15 @@ package</a>).</p></li>
 <div class="section" id="id2">
 <h2>DQN 알고리즘<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
 <p>우리의 환경은 결정론적이므로 여기에 제시된 모든 방정식은 단순화를 위해
-결정론적으로 공식화됩니다. 강화 학습 자료은 환경에서 확률론적 전환에
-대한 기대값(expectation)도 포함 할 것입니다.</p>
+결정론적으로 공식화됩니다. 강화 학습 문헌에서는 확률론적 전환에
+대한 기대값(expectation)도 포함할 것입니다.</p>
 <p>우리의 목표는 할인된 누적 보상 (discounted cumulative reward)을
 극대화하려는 정책(policy)을 학습하는 것입니다.
 <span class="math notranslate nohighlight">\(R_{t_0} = \sum_{t=t_0}^{\infty} \gamma^{t - t_0} r_t\)</span>, 여기서
-<span class="math notranslate nohighlight">\(R_{t_0}\)</span> 는 <em>반환(return)</em> 입니다. 할인 상수,
-<span class="math notranslate nohighlight">\(\gamma\)</span>, 는 <span class="math notranslate nohighlight">\(0\)</span> 과 <span class="math notranslate nohighlight">\(1\)</span> 의 상수이고 합계가
-수렴되도록 보장합니다. 에이전트에게 불확실한 먼 미래의 보상이
-가까운 미래의 것에 비해 덜 중요하게 만들고, 이것은 상당히 합리적입니다.</p>
+<span class="math notranslate nohighlight">\(R_{t_0}\)</span> 는 <em>반환(return)</em> 입니다. 할인 상수
+<span class="math notranslate nohighlight">\(\gamma\)</span> 는 <span class="math notranslate nohighlight">\(0\)</span> 과 <span class="math notranslate nohighlight">\(1\)</span> 사이에 있는 상수이고 합계가
+수렴하도록 합니다. 에이전트에게 불확실한 먼 미래의 보상이
+가까운 미래의 것에 비해 덜 중요하게 만들고, 이는 상당히 합리적입니다.</p>
 <p>Q-learning의 주요 아이디어는 만일 함수 <span class="math notranslate nohighlight">\(Q^*: State \times Action \rightarrow \mathbb{R}\)</span> 를
 가지고 있다면 반환이 어덯게 될지 알려줄 수 있고,
 만약 주어진 상태(state)에서 행동(action)을 한다면, 보상을 최대화하는
@@ -429,9 +429,9 @@ package</a>).</p></li>
 <p>그러나 세계(world)에 관한 모든 것을 알지 못하기 때문에,
 <span class="math notranslate nohighlight">\(Q^*\)</span> 에 도달할 수 없습니다. 그러나 신경망은
 범용 함수 근사자(universal function approximator)이기 때문에
-간단하게 생성하고 <span class="math notranslate nohighlight">\(Q^*\)</span> 를 닮도록 학습 할 수 있습니다.</p>
+간단하게 생성하고 <span class="math notranslate nohighlight">\(Q^*\)</span> 를 닮도록 학습할 수 있습니다.</p>
 <p>학습 업데이트 규칙으로, 일부 정책을 위한 모든 <span class="math notranslate nohighlight">\(Q\)</span> 함수가
-Bellman 방정식을 준수한다는 사실을 사용할 것입니다:</p>
+Bellman 방정식을 따른다는 사실을 사용할 것입니다:</p>
 <div class="math notranslate nohighlight">
 \[Q^{\pi}(s, a) = r + \gamma Q^{\pi}(s', \pi(s'))\]</div>
 <p>평등(equality)의 두 측면 사이의 차이는
@@ -442,7 +442,7 @@ Bellman 방정식을 준수한다는 사실을 사용할 것입니다:</p>
 loss</a> 를 사용합니다.
 Huber loss 는 오류가 작으면 평균 제곱 오차( mean squared error)와 같이
 동작하고 오류가 클 때는 평균 절대 오류와 유사합니다.
-- 이것은 <span class="math notranslate nohighlight">\(Q\)</span> 의 추정이 매우 혼란스러울 때 이상 값에 더 강건하게 합니다.
+ 이것은 <span class="math notranslate nohighlight">\(Q\)</span> 의 추정이 매우 혼란스러울 때 이상 값에 더 강건하게 합니다.
 재현 메모리에서 샘플링한 전환 배치 <span class="math notranslate nohighlight">\(B\)</span> 에서 이것을 계산합니다:</p>
 <div class="math notranslate nohighlight">
 \[\mathcal{L} = \frac{1}{|B|}\sum_{(s, a, s', r) \ \in \ B} \mathcal{L}(\delta)\]</div>
@@ -540,8 +540,8 @@ CNN(convolutional neural network) 입니다. 두가지 출력 <span class="math 
 간단히 말해서, 가끔 모델을 사용하여 행동을 선택하고 때로는 단지 하나를
 균일하게 샘플링 할 것입니다. 임의의 액션을 선택할 확률은
 <code class="docutils literal notranslate"><span class="pre">EPS_START</span></code> 에서 시작해서 <code class="docutils literal notranslate"><span class="pre">EPS_END</span></code> 를 향해 지수적으로 감소 할 것입니다.
-<a href="#id6"><span class="problematic" id="id7">``</span></a>EPS_DECAY``는 감쇠 속도를 제어합니다.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">plot_durations</span></code> - 지난 100개 에피소드의 평균(공식 평가에서 사용 된 수치)에 따른
+<code class="docutils literal notranslate"><span class="pre">EPS_DECAY</span></code>는 감쇠 속도를 제어합니다.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">plot_durations</span></code> - 지난 100개 에피소드의 평균(공식 평가에서 사용된 수치)에 따른
 에피소드의 지속을 도표로 그리기 위한 헬퍼. 도표는 기본 훈련 루프가
 포함 된 셀 밑에 있으며, 매 에피소드마다 업데이트됩니다.</p></li>
 </ul>
@@ -607,8 +607,8 @@ CNN(convolutional neural network) 입니다. 두가지 출력 <span class="math 
 <p>여기서, 최적화의 한 단계를 수행하는 <code class="docutils literal notranslate"><span class="pre">optimize_model</span></code> 함수를 찾을 수 있습니다.
 먼저 배치 하나를 샘플링하고 모든 Tensor를 하나로 연결하고
 <span class="math notranslate nohighlight">\(Q(s_t, a_t)\)</span> 와  <span class="math notranslate nohighlight">\(V(s_{t+1}) = \max_a Q(s_{t+1}, a)\)</span> 를 계산하고
-그것들을 손실로 합칩니다. 우리가 설정한 정의를 따르면 만약 <span class="math notranslate nohighlight">\(s\)</span> 가
-마지막 상태라면 <span class="math notranslate nohighlight">\(V(s) = 0\)</span> 이다.
+그것들을 손실로 합칩니다. 우리가 설정한 정의에 따르면 만약 <span class="math notranslate nohighlight">\(s\)</span> 가
+마지막 상태라면 <span class="math notranslate nohighlight">\(V(s) = 0\)</span> 입니다.
 또한 안정성 추가 위한 <span class="math notranslate nohighlight">\(V(s_{t+1})\)</span> 계산을 위해 목표 네트워크를 사용합니다.
 목표 네트워크는 대부분의 시간 동결 상태로 유지되지만, 가끔 정책
 네트워크의 가중치로 업데이트됩니다.
@@ -650,7 +650,7 @@ CNN(convolutional neural network) 입니다. 두가지 출력 <span class="math 
 </pre></div>
 </div>
 <p>아래에서 주요 학습 루프를 찾을 수 있습니다. 처음으로 환경을
-재설정하고 <code class="docutils literal notranslate"><span class="pre">상태</span></code> Tensor를 초기화합니다. 그런 다음 행동을
+재설정하고 <code class="docutils literal notranslate"><span class="pre">state</span></code> 텐서를 초기화합니다. 그런 다음 행동을
 샘플링하고, 그것을 실행하고, 다음 화면과 보상(항상 1)을 관찰하고,
 모델을 한 번 최적화합니다. 에피소드가 끝나면 (모델이 실패)
 루프를 다시 시작합니다.</p>
