@@ -1,6 +1,9 @@
-Visualizing Models, Data, and Training with TensorBoard
-====================================================
+TensorBoard를 사용하여 데이터, 모델 시각화 및 학습하기
+=========================================================
 
+이전의 튜토리얼에서는 어떻게 데이터를 불러오고, ``nn.Module`` 의 서브 클래스로
+정의한 모델에 데이터를 제공하고, 학습용 데이터로 학습하고, 테스트용 데이터로
+시험하는지를 살펴봤습니다. 또한
 In the previous tutorial, we saw how to load in data,
 feed it through a model we defined as a subclass of ``nn.Module``,
 trained this model on training data, and tested it on testing data.
@@ -345,7 +348,7 @@ In the prior tutorial, we looked at per-class accuracy once the model
 had been trained; here, we'll use TensorBoard to plot precision-recall
 curves (good explanation
 `here <https://www.scikit-yb.org/en/latest/api/classifier/prcurve.html>`__)
-for each class. 
+for each class.
 
 6. Assessing trained models with TensorBoard
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

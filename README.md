@@ -23,9 +23,9 @@ PyTorch에서 제공하는 튜토리얼의 한국어 번역을 위한 저장소�
   | 0.4.1  | [PyTorch-tutorials-kr-0.4](https://9bow.github.io/PyTorch-tutorials-kr-0.4) | [GitHub 저장소](https://github.com/9bow/PyTorch-tutorials-kr-0.4) |
   | 0.3.1  | [PyTorch-tutorials-kr-0.3.1](https://9bow.github.io/PyTorch-tutorials-kr-0.3.1) | [GitHub 저장소](https://github.com/9bow/PyTorch-tutorials-kr-0.3.1) |
 
-## 참여
+## 기여하기
 
-오타나 오역을 발견하시면 [이슈](https://github.com/9bow/PyTorch-tutorials-kr/issues/new)를 남겨주세요. [Pull Request](https://github.com/9bow/PyTorch-tutorials-kr/pulls)도 환영합니다. :)
+자세한 방법은 [기여하기 문서](CONTRIBUTING.md)를 참조해주세요. :)
 
 ---
 This is a project to translate [pytorch/tutorials#8ddb3a9](https://github.com/pytorch/tutorials/commit/8ddb3a97cc951510d0f082f7511e6adbdd6b8f5a) into Korean. For the latest version, please visit to the [PyTorch tutorials repo](https://github.com/pytorch/tutorials).
