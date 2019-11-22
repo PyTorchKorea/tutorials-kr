@@ -49,7 +49,8 @@ for t in range(500):
     # 손실을 계산하고 출력합니다. 예측한 y와 정답인 y를 갖는 Tensor들을 전달하고,
     # 손실 함수는 손실 값을 갖는 Tensor를 반환합니다.
     loss = loss_fn(y_pred, y)
-    print(t, loss.item())
+    if t % 100 == 99:
+        print(t, loss.item())
 
     # 역전파 단계를 실행하기 전에 변화도를 0으로 만듭니다.
     model.zero_grad()

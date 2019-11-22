@@ -3,6 +3,12 @@
 **Author**: `Soumith Chintala <http://soumith.ch>`_
   **번역**: `박정환 <http://github.com/9bow>`_
 
+.. raw:: html
+
+   <div style="margin-top:10px; margin-bottom:10px;">
+     <iframe width="560" height="315" src="https://www.youtube.com/embed/u7x8RXwLKcA" frameborder="0" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+   </div>
+
 이 튜토리얼의 목표:
 
 -  높은 수준에서 PyTorch의 Tensor library와 신경망(Neural Network)를 이해합니다.

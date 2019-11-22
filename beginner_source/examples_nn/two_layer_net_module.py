@@ -54,7 +54,8 @@ for t in range(500):
 
     # 손실을 계산하고 출력합니다.
     loss = criterion(y_pred, y)
-    print(t, loss.item())
+    if t % 100 == 99:
+        print(t, loss.item())
 
     # 변화도를 0으로 만들고, 역전파 단계를 수행하고, 가중치를 갱신합니다.
     optimizer.zero_grad()

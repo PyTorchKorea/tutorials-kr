@@ -1,14 +1,12 @@
-TensorBoard를 사용하여 데이터, 모델 시각화 및 학습하기
-=========================================================
+Visualizing Models, Data, and Training with TensorBoard
+====================================================
 
-이전의 튜토리얼에서는 어떻게 데이터를 불러오고, ``nn.Module`` 의 서브 클래스로
-정의한 모델에 데이터를 제공하고, 학습용 데이터로 학습하고, 테스트용 데이터로
-시험하는지를 살펴봤습니다. 또한
-In the previous tutorial, we saw how to load in data,
-feed it through a model we defined as a subclass of ``nn.Module``,
-trained this model on training data, and tested it on testing data.
-In addition, we were able to print out some statistics as the model
-was training to get a sense for whether training was progressing.
+In the `60 Minute Blitz <https://pytorch.org/tutorials/beginner/deep_learning_60min_blitz.html>`_, 
+we show you how to load in data,
+feed it through a model we define as a subclass of ``nn.Module``,
+train this model on training data, and test it on test data.
+To see what's happening, we print out some statistics as the model
+is training to get a sense for whether training is progressing.
 However, we can do much better than that: PyTorch integrates with
 TensorBoard, a tool designed for visualizing the results of neural
 network training runs. This tutorial illustrates some of its
@@ -111,9 +109,11 @@ one channel instead of three and 28x28 instead of 32x32:
             return x
 
 
-        net = Net()
+    net = Net()
 
 We'll define the same ``optimizer`` and ``criterion`` from before:
+
+.. code:: python
 
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
@@ -138,7 +138,7 @@ folder.
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Now let's write an image to our TensorBoard - specifically, a grid -
-using `make_grid <https://pytorch.org/docs/stable/torchvision/utils.html#torchvision.utils.make_grid>`__
+using `make_grid <https://pytorch.org/docs/stable/torchvision/utils.html#torchvision.utils.make_grid>`__.
 
 .. code:: python
 
@@ -159,9 +159,9 @@ Now running
 
 ::
 
-    `tensorboard --logdir=runs`
+    tensorboard --logdir=runs
 
-from the command line and then navigating to `https://localhost:6006`
+from the command line and then navigating to `https://localhost:6006 <https://localhost:6006>`_
 should show the following.
 
 .. image:: ../../_static/img/tensorboard_first_view.png
@@ -185,7 +185,7 @@ structures. Let's visualize the model we built.
 Now upon refreshing TensorBoard you should see a "Graphs" tab that
 looks like this:
 
-.. image:: ../../_static/img/tensorboard_first_view.png
+.. image:: ../../_static/img/tensorboard_model_viz.png
 
 Go ahead and double click on "Net" to see it expand, seeing a
 detailed view of the individual operations that make up the model.
@@ -318,7 +318,7 @@ batch.
 
                 # ...log the running loss
                 writer.add_scalar('training loss',
-                                running_loss / 2000,
+                                running_loss / 1000,
                                 epoch * len(trainloader) + i)
 
                 # ...log a Matplotlib Figure showing the model's predictions on a
@@ -348,7 +348,7 @@ In the prior tutorial, we looked at per-class accuracy once the model
 had been trained; here, we'll use TensorBoard to plot precision-recall
 curves (good explanation
 `here <https://www.scikit-yb.org/en/latest/api/classifier/prcurve.html>`__)
-for each class.
+for each class. 
 
 6. Assessing trained models with TensorBoard
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -397,7 +397,7 @@ curves for each class. Go ahead and poke around; you'll see that on
 some classes the model has nearly 100% "area under the curve",
 whereas on others this area is lower:
 
-.. image:: ../../_static/img/tensorboard_images.png
+.. image:: ../../_static/img/tensorboard_pr_curves.png
 
 And that's an intro to TensorBoard and PyTorch's integration with it.
 Of course, you could do everything TensorBoard does in your Jupyter

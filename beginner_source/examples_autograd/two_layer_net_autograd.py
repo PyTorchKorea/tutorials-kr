@@ -47,7 +47,8 @@ for t in range(500):
     # Tensor 연산을 사용하여 손실을 계산하고 출력합니다.
     # loss는 (1,) 형태의 Tensor이며, loss.item()은 loss의 스칼라 값입니다.
     loss = (y_pred - y).pow(2).sum()
-    print(t, loss.item())
+    if t % 100 == 99:
+        print(t, loss.item())
 
     # autograd를 사용하여 역전파 단계를 계산합니다. 이는 requires_grad=True를
     # 갖는 모든 Tensor에 대해 손실의 변화도를 계산합니다. 이후 w1.grad와 w2.grad는

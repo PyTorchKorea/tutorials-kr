@@ -63,6 +63,10 @@ import torchvision.transforms as transforms
 ########################################################################
 # torchvision 데이터셋의 출력(output)은 [0, 1] 범위를 갖는 PILImage 이미지입니다.
 # 이를 [-1, 1]의 범위로 정규화된 Tensor로 변환합니다.
+#
+# .. note::
+#     만약 Windows 환경에서 BrokenPipeError가 발생한다면,
+#     torch.utils.data.DataLoader()의 num_worker를 0으로 설정해보세요.
 
 transform = transforms.Compose(
     [transforms.ToTensor(),
@@ -182,6 +186,15 @@ for epoch in range(2):   # 데이터셋을 수차례 반복합니다.
 print('Finished Training')
 
 ########################################################################
+# 학습한 모델을 저장해보겠습니다:
+
+PATH = './cifar_net.pth'
+torch.save(net.state_dict(), PATH)
+
+########################################################################
+# PyTorch 모델을 저장하는 자세한 방법은 `여기 <https://pytorch.org/docs/stable/notes/serialization.html>`_
+# 를 참조해주세요.
+#
 # 5. 시험용 데이터로 신경망 검사하기
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 #
@@ -199,6 +212,13 @@ images, labels = dataiter.next()
 # 이미지를 출력합니다.
 imshow(torchvision.utils.make_grid(images))
 print('GroundTruth: ', ' '.join('%5s' % classes[labels[j]] for j in range(4)))
+
+########################################################################
+# 이제, 저장했던 모델을 불러오도록 하겠습니다 (주: 모델을 저장하고 다시 불러오는
+# 작업은 여기에서는 불필요하지만, 어떻게 하는지 설명을 위해 해보겠습니다):
+
+net = Net()
+net.load_state_dict(torch.load(PATH))
 
 ########################################################################
 # 좋습니다, 이제 이 예제들을 신경망이 어떻게 예측했는지를 보겠습니다:

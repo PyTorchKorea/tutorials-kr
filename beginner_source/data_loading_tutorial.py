@@ -1,18 +1,19 @@
 # -*- coding: utf-8 -*-
 
 """
-Data Loading and Processing Tutorial
-====================================
-데이터 로딩 프로세싱 튜토리얼
+사용자 정의 Dataset, Dataloader, Transforms 작성하기
+==========================================================
+
 **저자** : Sasank Chilamkurthy <https://chsasank.github.io>
 **번역** : 정윤성 <https://github.com/Yunseong-Jeong>
 
-데이터를 준비하는 것은 머신 러닝 문제를 푸는 과정속에 많은 노력이 필요합니다.
-PyTorch는 데이터 로딩을 쉽게 , 코드를 보다 읽기 편하게 만들어줍니다.
-이번 튜토리얼에서는, 일반적이지 않은 데이터에서 로드하는 방법과 
-데이터를 전처리 / 증가시키는 방법에 대해서 알아볼 것입니다.
+we will see how to load and preprocess/augment data from a non trivial dataset.
+머신러닝 문제를 푸는 과정에서 데이터를 준비하는데 많은 노력이 필요합니다.
+PyTorch는 데이터를 불러오는 과정을 쉽고 (아마도) 코드를 보다 읽기 편하게 만드는 도구들을
+제공합니다. 이 튜토리얼에서 일반적이지 않은 데이터셋으로부터 데이터를 읽어오고
+전처리하고 증가하는 방법을 알아보겠습니다.
 
-이번 튜토리얼을 진행하기 위해서, 아래에 있는 패키지를 설치해주시기 바랍니다.
+이번 튜토리얼을 진행하기 위해 아래 패키지들을 설치해주세요.
 
 -  ``scikit-image``: 이미지 I/O 와 변형을 위해 필요합니다.
 -  ``pandas``: CSV 파일 파싱을 보다 쉽게 해줍니다.
@@ -34,7 +35,7 @@ from torchvision import transforms, utils
 import warnings
 warnings.filterwarnings("ignore")
 
-plt.ion()   #반응형 모드
+plt.ion()   # 반응형 모드
 
 ######################################################################
 
@@ -50,7 +51,7 @@ plt.ion()   #반응형 모드
 #     이 링크 <https://download.pytorch.org/tutorial/faces.zip>`_ 를 통해 데이터셋을 다운로드 해주세요.
 #     다운로드한 데이터셋은 'data/faces/'에 위치해야 합니다.
 #     다운로드 하신 데이터셋은 'dlib의 pose estimation`<https://blog.dlib.net/2014/08/real-time-face-pose-estimation.html>__이 적용된 데이터 셋입니다.
-#     
+#
 #
 # 데이터셋은 아래와 같은 특징을 가진 CSV 파일이 포함되어 있습니다.
 #
@@ -76,7 +77,7 @@ print('First 4 Landmarks: {}'.format(landmarks[:4]))
 
 
 ######################################################################
-# 이미지와 랜드마크(landmark)를 보여주는 간단한 함수를 작성해보고, 
+# 이미지와 랜드마크(landmark)를 보여주는 간단한 함수를 작성해보고,
 # 실제로 적용해보겠습니다.
 #
 def show_landmarks(image, landmarks):
@@ -84,7 +85,7 @@ def show_landmarks(image, landmarks):
     """ 랜드마크(landmark)와 이미지를 보여줍니다. """
     plt.imshow(image)
     plt.scatter(landmarks[:, 0], landmarks[:, 1], s=10, marker='.', c='r')
-    plt.pause(0.001)  # 업데이트가 될 수 있도록 잠시 멈춥니다.
+    plt.pause(0.001)  # 갱신이 되도록 잠시 멈춥니다.
 
 plt.figure()
 show_landmarks(io.imread(os.path.join('data/faces/', img_name)),
@@ -93,8 +94,8 @@ plt.show()
 
 
 ######################################################################
-# 데이터셋 클래스
-# -------------
+# Dataset 클래스
+# ----------------
 #
 # ``torch.utils.data.Dataset`` 은 데이터셋을 나타내는 추상클래스입니다.
 # 여러분의 데이터셋은 ``Dataset`` 에 상속하고 아래와같이 오버라이드 해야합니다.
@@ -102,23 +103,17 @@ plt.show()
 #
 # -  ``len(dataset)`` 에서 호출되는 ``__len__`` 은 데이터셋의 크기를 리턴해야합니다.
 # -  ``dataset[i]`` 에서 호출되는 ``__getitem__`` 은
-#    math:'i' 번째 샘플을 찾는데 사용됩니다.
+#    math:`i` 번째 샘플을 찾는데 사용됩니다.
 #
 # 이제 데이터셋 클래스를 만들어보도록 하겠습니다.
 # ``__init__`` 을 사용해서 CSV 파일 안에 있는 데이터를 읽지만,
 # ``__getitem__`` 을 이용해서 이미지의 판독을 합니다.
-# 이 방법은 모든 이미지를 메모리에 저장하지 않고 필요할때마다 읽기 때문에 
+# 이 방법은 모든 이미지를 메모리에 저장하지 않고 필요할때마다 읽기 때문에
 # 메모리를 효율적으로 사용합니다.
 #
-# Sample of our dataset will be a dict
-# ``{'image': image, 'landmarks': landmarks}``. Our dataset will take an
-# optional argument ``transform`` so that any required processing can be
-# applied on the sample. We will see the usefulness of ``transform`` in the
-# next section.
-# 
-# 데이터셋의 샘플은  ``{'image': image, 'landmarks': landmarks}`` 형태를 갖습니다.
-# Optional argument인 ``transform`` 을 갖고, 필요한 전처리 과정을 샘플에 적용할 수 있습니다.
-# 다음 장에서 전이 ``transform`` 를 활용하는 방법에 대해서 알아보겠습니다.
+# 데이터셋의 샘플은  ``{'image': image, 'landmarks': landmarks}`` 의 사전 형태를 갖습니다.
+# 선택적 인자인 ``transform`` 을 통해 필요한 전처리 과정을 샘플에 적용할 수 있습니다.
+# 다음 장에서 전이 ``transform`` 의 유용성에 대해 알아보겠습니다.
 #
 
 class FaceLandmarksDataset(Dataset):
@@ -188,19 +183,19 @@ for i in range(len(face_dataset)):
 #
 # 위에서 볼 수 있었던 한가지 문제점은 샘플들이 다 같은 사이즈가 아니라는 것입니다.
 # 대부분의 신경망(neural networks)은 고정된 크기의 이미지라고 가정합니다.
-# 그러므로 우리는 신경망(neural networks)에 주기 전에 처리할 과정을 작성해야 합니다.
+# 그러므로 우리는 신경망에 주기 전에 처리할 과정을 작성해야 합니다.
 #
 # 3가지의 transforms 을 만들어 봅시다:
 # -  ``Rescale``: 이미지의 크기를 조절합니다.
-# -  ``RandomCrop``: 이미지를 무작위로 자릅니다. 
+# -  ``RandomCrop``: 이미지를 무작위로 자릅니다.
 #                    이것을 data augmentation이라 합니다.
-# -  ``ToTensor``: numpy 이미지에서 torch 이미지로 변경합니다. 
+# -  ``ToTensor``: numpy 이미지에서 torch 이미지로 변경합니다.
 #                  (축변환이 필요합니다)
 #
 # 간단한 함수대신에 호출 할 수 있는 클래스로 작성 합니다.
-# 이렇게 한다면, 클래스가 호출 될 때마다 전이(Transform)의 Parameter가 전달 되지 않아도 됩니다.
-# 이와 같이, ``__call__`` 함수를 구현 해야합니다.
-# 필요하다면, ``__init__`` 함수도 해야합니다. 다음과 같이 전이(transform)를 사용할 수 있습니다.
+# 이렇게 한다면, 클래스가 호출 될 때마다 전이(Transform)의 매개변수가 전달 되지 않아도 됩니다.
+# 이와 같이, ``__call__`` 함수를 구현해야 합니다.
+# 필요하다면, ``__init__`` 함수도 구현해야 합니다. 다음과 같이 전이(transform)를 사용할 수 있습니다.
 #
 # ::
 #
@@ -296,7 +291,7 @@ class ToTensor(object):
 #
 # 이제, 샘플에 전이(transform)를 적용해 봅시다.
 #
-# 이미지의 가장 짧은 측면을 256개로 rescale하고, 
+# 이미지의 가장 짧은 측면을 256개로 rescale하고,
 # 그후에 무작위로 224개를 자른다고 가정합시다.
 # 다시말해, ``Rescale`` 과 ``RandomCrop`` 을 사용해봅시다.
 #
@@ -335,9 +330,9 @@ plt.show()
 # -  transfroms 중 하나가 랜덤이기 때문에, 데이터는 샘플링때 증가합니다.
 #
 #
-# 우리는 이제 이전에 사용하던 것 처럼 ``for i in range`` 를 사용해서 
+# 우리는 이제 이전에 사용하던 것 처럼 ``for i in range`` 를 사용해서
 # 생성된 데이터셋을 반복 작업에 사용할 수 있습니다.
-# 
+#
 
 transformed_dataset = FaceLandmarksDataset(csv_file='data/faces/face_landmarks.csv',
                                            root_dir='data/faces/',
@@ -412,8 +407,8 @@ for i_batch, sample_batched in enumerate(dataloader):
 #
 # 이번 튜토리얼에서는, 데이터셋 작성과 사용, 전이(transforms), 데이터를 불러오는 방법에 대해서 알아봤습니다.
 # ``torchvision`` 패키지는 몇몇의 일반적인 데이터셋과 전이(transforms)들을 제공합니다.
-# 클래스들을 따로 작성하지 않아도 될 것입니다. 
-# torchvision에서의 사용가능한 일반적인 데이터셋 중 하나는 ``ImageFolder`` 입니다. 
+# 클래스들을 따로 작성하지 않아도 될 것입니다.
+# torchvision에서의 사용가능한 일반적인 데이터셋 중 하나는 ``ImageFolder`` 입니다.
 # 이것은 다음과 같은 방식으로 구성되어 있다고 가정합니다: ::
 #
 #     root/ants/xxx.png
@@ -426,8 +421,8 @@ for i_batch, sample_batched in enumerate(dataloader):
 #     root/bees/nsdf3.png
 #     root/bees/asd932_.png
 #
-# 여기서'ants', 'bees'는 class labels입니다. 
-# 비슷하게, ``RandomHorizontalFlip`` , ``Scale`` 과 같이  ``PIL.Image`` 에서 작동하는 
+# 여기서'ants', 'bees'는 class labels입니다.
+# 비슷하게, ``RandomHorizontalFlip`` , ``Scale`` 과 같이  ``PIL.Image`` 에서 작동하는
 # 일반적인 전이(transforms)도 사용가능합니다. 이와 같이 데이터로더(dataloader)를 사용할 수 있습니다: ::
 #
 #   import torch
@@ -446,5 +441,5 @@ for i_batch, sample_batched in enumerate(dataloader):
 #                                                batch_size=4, shuffle=True,
 #                                                num_workers=4)
 #
-#  training code에 대한 예시를 알고 싶다면, 
+#  training code에 대한 예시를 알고 싶다면,
 #  :doc:`transfer_learning_tutorial` 문서를 참고해주세요

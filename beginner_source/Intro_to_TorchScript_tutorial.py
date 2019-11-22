@@ -1,21 +1,37 @@
 """
 Introduction to TorchScript
 ===========================
+
 *James Reed (jamesreed@fb.com), Michael Suo (suo@fb.com)*, rev2
+
+This tutorial is an introduction to TorchScript, an intermediate
+representation of a PyTorch model (subclass of ``nn.Module``) that
+can then be run in a high-performance environment such as C++.
+
 In this tutorial we will cover:
+
 1. The basics of model authoring in PyTorch, including:
+
 -  Modules
 -  Defining ``forward`` functions
 -  Composing modules into a hierarchy of modules
-2. Methods for converting PyTorch modules to TorchScript, our
+
+2. Specific methods for converting PyTorch modules to TorchScript, our
    high-performance deployment runtime
+
 -  Tracing an existing module
 -  Using scripting to directly compile a module
 -  How to compose both approaches
 -  Saving and loading TorchScript modules
+
+We hope that after you complete this tutorial, you will proceed to go through
+`the follow-on tutorial <https://pytorch.org/tutorials/advanced/cpp_export.html>`_
+which will walk you through an example of actually calling a TorchScript
+model from C++.
+
 """
 
-import torch # This is all you need to use both PyTorch and TorchScript!
+import torch  # This is all you need to use both PyTorch and TorchScript!
 print(torch.__version__)
 
 
@@ -109,11 +125,11 @@ print(my_cell(x, h))
 #
 
 class MyDecisionGate(torch.nn.Module):
-  def forward(self, x):
-    if x.sum() > 0:
-      return x
-    else:
-      return -x
+    def forward(self, x):
+        if x.sum() > 0:
+            return x
+        else:
+            return -x
 
 class MyCell(torch.nn.Module):
     def __init__(self):
@@ -240,11 +256,11 @@ print(traced_cell(x, h))
 #
 
 class MyDecisionGate(torch.nn.Module):
-  def forward(self, x):
-    if x.sum() > 0:
-      return x
-    else:
-      return -x
+    def forward(self, x):
+        if x.sum() > 0:
+            return x
+        else:
+            return -x
 
 class MyCell(torch.nn.Module):
     def __init__(self, dg):
@@ -295,7 +311,7 @@ traced_cell(x, h)
 # Mixing Scripting and Tracing
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-# Some situations call for using tracing rather than scripting (e.g. a
+# Some situations call for using tracing rather than scripting (e.g. a
 # module has many architectural decisions that are made based on constant
 # Python values that we would like to not appear in TorchScript). In this
 # case, scripting can be composed with tracing: ``torch.jit.script`` will
@@ -326,13 +342,13 @@ print(rnn_loop.code)
 #
 
 class WrapRNN(torch.nn.Module):
-  def __init__(self):
-    super(WrapRNN, self).__init__()
-    self.loop = torch.jit.script(MyRNNLoop())
+    def __init__(self):
+        super(WrapRNN, self).__init__()
+        self.loop = torch.jit.script(MyRNNLoop())
 
-  def forward(self, xs):
-    y, h = self.loop(xs)
-    return torch.relu(y)
+    def forward(self, xs):
+        y, h = self.loop(xs)
+        return torch.relu(y)
 
 traced = torch.jit.trace(WrapRNN(), (torch.rand(10, 3, 4)))
 print(traced.code)
