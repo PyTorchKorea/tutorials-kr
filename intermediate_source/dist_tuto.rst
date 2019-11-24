@@ -74,7 +74,7 @@ Pytorch에 포함된 분산 패키지 (i.e., ``torch.distributed``)는 연구자
 ``dist.init_process_group`` 에서 일어나는 마법을 살펴봅니다. 그러나 기본적으로
 프로세스는 자신의 위치를 공유하여 서로 통신할 수 있습니다.
 
-지점간 통신(Point-to-Point Communication)
+지점 간 통신(Point-to-Point Communication)
 -------------------------------------------
 
 .. figure:: /_static/img/distributed/send_recv.png
@@ -536,7 +536,7 @@ MPI는 또한 자신의 프로세스를 생성하고 ``init_process_group`` 의 
 **TCP**
 
 0순위 프로세스의 IP 주소와 도달 가능한 포트 번호를 제공함으로써 TCP를 통한 초기화를 달성할 수 있습니다.
-모든 작업자는 0순위 프로세스에 연결하고 서로 연락하는 방법에 관한 정보를 교환할 수 있습니다.
+모든 워커는 0순위 프로세스에 연결하고 서로 연락하는 방법에 관한 정보를 교환할 수 있습니다.
 
 .. code:: python
 
