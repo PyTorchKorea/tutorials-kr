@@ -1,54 +1,53 @@
 # -*- coding: utf-8 -*-
 """
-°­È­ ÇÐ½À (DQN) Æ©Åä¸®¾ó
+ê°•í™” í•™ìŠµ (DQN) íŠœí† ë¦¬ì–¼
 =====================================
 **Author**: `Adam Paszke <https://github.com/apaszke>`_
-  **¹ø¿ª**: `È²¼º¼ö <https://github.com/adonisues>`_
+  **ë²ˆì—­**: `í™©ì„±ìˆ˜ <https://github.com/adonisues>`_
 
+ì´ íŠœí† ë¦¬ì–¼ì—ì„œëŠ” `OpenAI Gym <https://gym.openai.com/>`__ ì˜
+CartPole-v0 íƒœìŠ¤í¬ì—ì„œ DQN (Deep Q Learning) ì—ì´ì „íŠ¸ë¥¼ í•™ìŠµí•˜ëŠ”ë°
+PyTorchë¥¼ ì‚¬ìš©í•˜ëŠ” ë°©ë²•ì„ ë³´ì—¬ë“œë¦½ë‹ˆë‹¤.
 
-ÀÌ Æ©Åä¸®¾ó¿¡¼­´Â `OpenAI Gym <https://gym.openai.com/>`__ ÀÇ
-CartPole-v0 ÅÂ½ºÅ©¿¡¼­ DQN (Deep Q Learning) ¿¡ÀÌÀüÆ®¸¦ ÇÐ½ÀÇÏ´Âµ¥
-PyTorch¸¦ »ç¿ëÇÏ´Â ¹æ¹ýÀ» º¸¿©µå¸³´Ï´Ù.
+**íƒœìŠ¤í¬**
 
-**ÅÂ½ºÅ©**
-
-¿¡ÀÌÀüÆ®´Â ¿¬°áµÈ ¸·´ë°¡ ¶È¹Ù·Î ¼­ ÀÖµµ·Ï Ä«Æ®¸¦ ¿ÞÂÊÀÌ³ª ¿À¸¥ÂÊÀ¸·Î 
-¿òÁ÷ÀÌ´Â µÎ °¡Áö µ¿ÀÛ Áß ÇÏ³ª¸¦ ¼±ÅÃÇØ¾ß ÇÕ´Ï´Ù. 
-´Ù¾çÇÑ ¾Ë°í¸®Áò°ú ½Ã°¢È­ ±â´ÉÀ» °®Ãá °ø½Ä ¼øÀ§Ç¥¸¦ 
-`Gym À¥»çÀÌÆ® <https://gym.openai.com/envs/CartPole-v0>`__ ¿¡¼­ Ã£À» ¼ö ÀÖ½À´Ï´Ù.
+ì—ì´ì „íŠ¸ëŠ” ì—°ê²°ëœ ë§‰ëŒ€ê°€ ë˜‘ë°”ë¡œ ì„œ ìžˆë„ë¡ ì¹´íŠ¸ë¥¼ ì™¼ìª½ì´ë‚˜ ì˜¤ë¥¸ìª½ìœ¼ë¡œ
+ì›€ì§ì´ëŠ” ë‘ ê°€ì§€ ë™ìž‘ ì¤‘ í•˜ë‚˜ë¥¼ ì„ íƒí•´ì•¼ í•©ë‹ˆë‹¤.
+ë‹¤ì–‘í•œ ì•Œê³ ë¦¬ì¦˜ê³¼ ì‹œê°í™” ê¸°ëŠ¥ì„ ê°–ì¶˜ ê³µì‹ ìˆœìœ„í‘œë¥¼
+`Gym ì›¹ì‚¬ì´íŠ¸ <https://gym.openai.com/envs/CartPole-v0>`__ ì—ì„œ ì°¾ì„ ìˆ˜ ìžˆìŠµë‹ˆë‹¤.
 
 .. figure:: /_static/img/cartpole.gif
    :alt: cartpole
 
    cartpole
 
-¿¡ÀÌÀüÆ®°¡ ÇöÀç È¯°æ »óÅÂ¸¦ °üÂûÇÏ°í Çàµ¿À» ¼±ÅÃÇÏ¸é,
-È¯°æÀÌ »õ·Î¿î »óÅÂ·Î *ÀüÈ¯* µÇ°í ÀÛ¾÷ÀÇ °á°ú¸¦ ³ªÅ¸³»´Â º¸»óµµ ¹ÝÈ¯µË´Ï´Ù. 
-ÀÌ ÅÂ½ºÅ©¿¡¼­ ¸Å Å¸ÀÓ½ºÅÜ Áõ°¡¸¶´Ù º¸»óÀÌ +1ÀÌ µÇ°í, ¸¸¾à ¸·´ë°¡ ³Ê¹« ¸Ö¸®
-¶³¾îÁö°Å³ª Ä«Æ®°¡ Áß½É¿¡¼­ 2.4 À¯´Ö ÀÌ»ó ¸Ö¾îÁö¸é È¯°æÀÌ Áß´ÜµË´Ï´Ù.
-ÀÌ°ÍÀº ´õ ÁÁÀº ½Ã³ª¸®¿À°¡ ´õ ¿À·§µ¿¾È ´õ ¸¹Àº º¸»óÀ» ÃàÀûÇÏ´Â °ÍÀ» ÀÇ¹ÌÇÕ´Ï´Ù.
+ì—ì´ì „íŠ¸ê°€ í˜„ìž¬ í™˜ê²½ ìƒíƒœë¥¼ ê´€ì°°í•˜ê³  í–‰ë™ì„ ì„ íƒí•˜ë©´,
+í™˜ê²½ì´ ìƒˆë¡œìš´ ìƒíƒœë¡œ *ì „í™˜* ë˜ê³  ìž‘ì—…ì˜ ê²°ê³¼ë¥¼ ë‚˜íƒ€ë‚´ëŠ” ë³´ìƒë„ ë°˜í™˜ë©ë‹ˆë‹¤.
+ì´ íƒœìŠ¤í¬ì—ì„œ ë§¤ íƒ€ìž„ìŠ¤í… ì¦ê°€ë§ˆë‹¤ ë³´ìƒì´ +1ì´ ë˜ê³ , ë§Œì•½ ë§‰ëŒ€ê°€ ë„ˆë¬´ ë©€ë¦¬
+ë–¨ì–´ì§€ê±°ë‚˜ ì¹´íŠ¸ê°€ ì¤‘ì‹¬ì—ì„œ 2.4 ìœ ë‹› ì´ìƒ ë©€ì–´ì§€ë©´ í™˜ê²½ì´ ì¤‘ë‹¨ë©ë‹ˆë‹¤.
+ì´ê²ƒì€ ë” ì¢‹ì€ ì‹œë‚˜ë¦¬ì˜¤ê°€ ë” ì˜¤ëž«ë™ì•ˆ ë” ë§Žì€ ë³´ìƒì„ ì¶•ì í•˜ëŠ” ê²ƒì„ ì˜ë¯¸í•©ë‹ˆë‹¤.
 
-Ä«Æ®Æú ÅÂ½ºÅ©´Â ¿¡ÀÌÀüÆ®¿¡ ´ëÇÑ ÀÔ·ÂÀÌ È¯°æ »óÅÂ(À§Ä¡, ¼Óµµ µî)¸¦ ³ªÅ¸³»´Â 
-4°³ÀÇ ½ÇÁ¦ °ªÀÌ µÇµµ·Ï ¼³°èµÇ¾ú½À´Ï´Ù. ±×·¯³ª ½Å°æ¸ÁÀº ¼ø¼öÇÏ°Ô ±× Àå¸éÀ» º¸°í
-ÅÂ½ºÅ©¸¦ ÇØ°áÇÒ ¼ö ÀÖ½À´Ï´Ù µû¶ó¼­ Ä«Æ® Áß½ÉÀÇ È­¸é ÆÐÄ¡¸¦ ÀÔ·ÂÀ¸·Î »ç¿ëÇÕ´Ï´Ù.
-ÀÌ ¶§¹®¿¡ ¿ì¸®ÀÇ °á°ú´Â °ø½Ä ¼øÀ§Ç¥ÀÇ °á°ú¿Í Á÷Á¢ÀûÀ¸·Î ºñ±³ÇÒ ¼ö ¾ø½À´Ï´Ù. 
-¿ì¸®ÀÇ ÅÂ½ºÅ©´Â ÈÎ¾À ´õ ¾î·Æ½À´Ï´Ù.
-ºÒÇàÈ÷µµ ¸ðµç ÇÁ·¹ÀÓÀ» ·»´õ¸µÇØ¾ßµÇ¹Ç·Î ÀÌ°ÍÀº ÇÐ½À ¼Óµµ¸¦ ´ÊÃß°ÔµË´Ï´Ù.
+ì¹´íŠ¸í´ íƒœìŠ¤í¬ëŠ” ì—ì´ì „íŠ¸ì— ëŒ€í•œ ìž…ë ¥ì´ í™˜ê²½ ìƒíƒœ(ìœ„ì¹˜, ì†ë„ ë“±)ë¥¼ ë‚˜íƒ€ë‚´ëŠ”
+4ê°œì˜ ì‹¤ì œ ê°’ì´ ë˜ë„ë¡ ì„¤ê³„ë˜ì—ˆìŠµë‹ˆë‹¤. ê·¸ëŸ¬ë‚˜ ì‹ ê²½ë§ì€ ìˆœìˆ˜í•˜ê²Œ ê·¸ ìž¥ë©´ì„ ë³´ê³ 
+íƒœìŠ¤í¬ë¥¼ í•´ê²°í•  ìˆ˜ ìžˆìŠµë‹ˆë‹¤ ë”°ë¼ì„œ ì¹´íŠ¸ ì¤‘ì‹¬ì˜ í™”ë©´ íŒ¨ì¹˜ë¥¼ ìž…ë ¥ìœ¼ë¡œ ì‚¬ìš©í•©ë‹ˆë‹¤.
+ì´ ë•Œë¬¸ì— ìš°ë¦¬ì˜ ê²°ê³¼ëŠ” ê³µì‹ ìˆœìœ„í‘œì˜ ê²°ê³¼ì™€ ì§ì ‘ì ìœ¼ë¡œ ë¹„êµí•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤.
+ìš°ë¦¬ì˜ íƒœìŠ¤í¬ëŠ” í›¨ì”¬ ë” ì–´ë µìŠµë‹ˆë‹¤.
+ë¶ˆí–‰ížˆë„ ëª¨ë“  í”„ë ˆìž„ì„ ë Œë”ë§í•´ì•¼ë˜ë¯€ë¡œ ì´ê²ƒì€ í•™ìŠµ ì†ë„ë¥¼ ëŠ¦ì¶”ê²Œë©ë‹ˆë‹¤.
 
-¾ö¹ÐÈ÷ ¸»ÇÏ¸é, ÇöÀç ½ºÅ©¸° ÆÐÄ¡¿Í ÀÌÀü ½ºÅ©¸° ÆÐÄ¡ »çÀÌÀÇ Â÷ÀÌ·Î »óÅÂ¸¦ Ç¥½ÃÇÒ °ÍÀÔ´Ï´Ù.
-ÀÌ·¸°ÔÇÏ¸é ¿¡ÀÌÀüÆ®°¡ ¸·´ëÀÇ ¼Óµµ¸¦ ÇÑ ÀÌ¹ÌÁö¿¡¼­ °í·ÁÇÒ ¼ö ÀÖ½À´Ï´Ù.
+ì—„ë°€ížˆ ë§í•˜ë©´, í˜„ìž¬ ìŠ¤í¬ë¦° íŒ¨ì¹˜ì™€ ì´ì „ ìŠ¤í¬ë¦° íŒ¨ì¹˜ ì‚¬ì´ì˜ ì°¨ì´ë¡œ ìƒíƒœë¥¼ í‘œì‹œí•  ê²ƒìž…ë‹ˆë‹¤.
+ì´ë ‡ê²Œí•˜ë©´ ì—ì´ì „íŠ¸ê°€ ë§‰ëŒ€ì˜ ì†ë„ë¥¼ í•œ ì´ë¯¸ì§€ì—ì„œ ê³ ë ¤í•  ìˆ˜ ìžˆìŠµë‹ˆë‹¤.
 
-**ÆÐÅ°Áö**
+**íŒ¨í‚¤ì§€**
 
-¸ÕÀú ÇÊ¿äÇÑ ÆÐÅ°Áö¸¦ °¡Á®¿É´Ï´Ù. Ã¹Â°, È¯°æÀ» À§ÇØ 
-`gym <https://gym.openai.com/docs>`__ ÀÌ ÇÊ¿äÇÕ´Ï´Ù.
-(`pip install gym` À» »ç¿ëÇÏ¿© ¼³Ä¡ÇÏ½Ê½Ã¿À).
-¶ÇÇÑ PyTorch¿¡¼­ ´ÙÀ½À» »ç¿ëÇÕ´Ï´Ù:
+ë¨¼ì € í•„ìš”í•œ íŒ¨í‚¤ì§€ë¥¼ ê°€ì ¸ì˜µë‹ˆë‹¤. ì²«ì§¸, í™˜ê²½ì„ ìœ„í•´
+`gym <https://gym.openai.com/docs>`__ ì´ í•„ìš”í•©ë‹ˆë‹¤.
+(`pip install gym` ì„ ì‚¬ìš©í•˜ì—¬ ì„¤ì¹˜í•˜ì‹­ì‹œì˜¤).
+ë˜í•œ PyTorchì—ì„œ ë‹¤ìŒì„ ì‚¬ìš©í•©ë‹ˆë‹¤:
 
--  ½Å°æ¸Á (``torch.nn``)
--  ÃÖÀûÈ­ (``torch.optim``)
--  ÀÚµ¿ ¹ÌºÐ (``torch.autograd``)
--  ½Ã°¢ ÅÂ½ºÅ©¸¦ À§ÇÑ À¯Æ¿¸®Æ¼µé (``torchvision`` - `a separate
+-  ì‹ ê²½ë§ (``torch.nn``)
+-  ìµœì í™” (``torch.optim``)
+-  ìžë™ ë¯¸ë¶„ (``torch.autograd``)
+-  ì‹œê° íƒœìŠ¤í¬ë¥¼ ìœ„í•œ ìœ í‹¸ë¦¬í‹°ë“¤ (``torchvision`` - `a separate
    package <https://github.com/pytorch/vision>`__).
 
 """
@@ -72,34 +71,34 @@ import torchvision.transforms as T
 
 env = gym.make('CartPole-v0').unwrapped
 
-# matplotlib ¼³Á¤
+# matplotlib ì„¤ì •
 is_ipython = 'inline' in matplotlib.get_backend()
 if is_ipython:
     from IPython import display
 
 plt.ion()
 
-# GPU¸¦ »ç¿ëÇÒ °æ¿ì
+# GPUë¥¼ ì‚¬ìš©í•  ê²½ìš°
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 ######################################################################
-# ÀçÇö ¸Þ¸ð¸®(Replay Memory)
+# ìž¬í˜„ ë©”ëª¨ë¦¬(Replay Memory)
 # -------------------------------
 #
-# ¿ì¸®´Â DQN ÇÐ½ÀÀ» À§ÇØ °æÇè ÀçÇö ¸Þ¸ð¸®¸¦ »ç¿ëÇÒ °ÍÀÔ´Ï´Ù.
-# ¿¡ÀÌÀüÆ®°¡ °üÂûÇÑ ÀüÈ¯(transition)À» ÀúÀåÇÏ°í ³ªÁß¿¡ ÀÌ µ¥ÀÌÅÍ¸¦ 
-# Àç»ç¿ëÇÒ ¼ö ÀÖ½À´Ï´Ù. ¹«ÀÛÀ§·Î »ùÇÃ¸µÇÏ¸é ¹èÄ¡¸¦ ±¸¼ºÇÏ´Â ÀüÈ¯µéÀÌ
-# ºñ»ó°ü(decorrelated)ÇÏ°Ô µË´Ï´Ù. ÀÌ°ÍÀÌ DQN ÇÐ½À ÀýÂ÷¸¦ Å©°Ô ¾ÈÁ¤½ÃÅ°°í
-# Çâ»ó½ÃÅ°´Â °ÍÀ¸·Î ³ªÅ¸³µ½À´Ï´Ù.
+# ìš°ë¦¬ëŠ” DQN í•™ìŠµì„ ìœ„í•´ ê²½í—˜ ìž¬í˜„ ë©”ëª¨ë¦¬ë¥¼ ì‚¬ìš©í•  ê²ƒìž…ë‹ˆë‹¤.
+# ì—ì´ì „íŠ¸ê°€ ê´€ì°°í•œ ì „í™˜(transition)ì„ ì €ìž¥í•˜ê³  ë‚˜ì¤‘ì— ì´ ë°ì´í„°ë¥¼
+# ìž¬ì‚¬ìš©í•  ìˆ˜ ìžˆìŠµë‹ˆë‹¤. ë¬´ìž‘ìœ„ë¡œ ìƒ˜í”Œë§í•˜ë©´ ë°°ì¹˜ë¥¼ êµ¬ì„±í•˜ëŠ” ì „í™˜ë“¤ì´
+# ë¹„ìƒê´€(decorrelated)í•˜ê²Œ ë©ë‹ˆë‹¤. ì´ê²ƒì´ DQN í•™ìŠµ ì ˆì°¨ë¥¼ í¬ê²Œ ì•ˆì •ì‹œí‚¤ê³ 
+# í–¥ìƒì‹œí‚¤ëŠ” ê²ƒìœ¼ë¡œ ë‚˜íƒ€ë‚¬ìŠµë‹ˆë‹¤.
 #
-# ÀÌ¸¦ À§ÇØ¼­ µÎ°³ÀÇ Å¬·¡½º°¡ ÇÊ¿äÇÕ´Ï´Ù:
+# ì´ë¥¼ ìœ„í•´ì„œ ë‘ê°œì˜ í´ëž˜ìŠ¤ê°€ í•„ìš”í•©ë‹ˆë‹¤:
 #
-# -  ``Transition`` - ¿ì¸® È¯°æ¿¡¼­ ´ÜÀÏ ÀüÈ¯À» ³ªÅ¸³»µµ·Ï ¸í¸íµÈ Æ©ÇÃ.
-#    ±×°ÍÀº È­¸éÀÇ Â÷ÀÌÀÎ state·Î (state, action) ½ÖÀ» (next_state, reward) °á°ú·Î ¸ÅÇÎÇÕ´Ï´Ù.
-# -  ``ReplayMemory`` - ÃÖ±Ù °üÂûµÈ ÀüÀÌ¸¦ º¸°ü À¯ÁöÇÏ´Â Á¦ÇÑµÈ Å©±âÀÇ ¼øÈ¯ ¹öÆÛ.
-#    ¶ÇÇÑ ÇÐ½ÀÀ» À§ÇÑ ÀüÈ¯ÀÇ ¹«ÀÛÀ§ ¹èÄ¡¸¦ ¼±ÅÃÇÏ±âÀ§ÇÑ
-#    ``.sample ()`` ¸Þ¼Òµå¸¦ ±¸ÇöÇÕ´Ï´Ù.
+# -  ``Transition`` - ìš°ë¦¬ í™˜ê²½ì—ì„œ ë‹¨ì¼ ì „í™˜ì„ ë‚˜íƒ€ë‚´ë„ë¡ ëª…ëª…ëœ íŠœí”Œ.
+#    ê·¸ê²ƒì€ í™”ë©´ì˜ ì°¨ì´ì¸ stateë¡œ (state, action) ìŒì„ (next_state, reward) ê²°ê³¼ë¡œ ë§¤í•‘í•©ë‹ˆë‹¤.
+# -  ``ReplayMemory`` - ìµœê·¼ ê´€ì°°ëœ ì „ì´ë¥¼ ë³´ê´€ ìœ ì§€í•˜ëŠ” ì œí•œëœ í¬ê¸°ì˜ ìˆœí™˜ ë²„í¼.
+#    ë˜í•œ í•™ìŠµì„ ìœ„í•œ ì „í™˜ì˜ ë¬´ìž‘ìœ„ ë°°ì¹˜ë¥¼ ì„ íƒí•˜ê¸°ìœ„í•œ
+#    ``.sample ()`` ë©”ì†Œë“œë¥¼ êµ¬í˜„í•©ë‹ˆë‹¤.
 
 Transition = namedtuple('Transition',
                         ('state', 'action', 'next_state', 'reward'))
@@ -113,7 +112,7 @@ class ReplayMemory(object):
         self.position = 0
 
     def push(self, *args):
-        """transition ÀúÀå"""
+        """transition ì €ìž¥"""
         if len(self.memory) < self.capacity:
             self.memory.append(None)
         self.memory[self.position] = Transition(*args)
@@ -127,51 +126,51 @@ class ReplayMemory(object):
 
 
 ######################################################################
-# ÀÌÁ¦ ¸ðµ¨À» Á¤ÀÇÇÕ½Ã´Ù. ±×·¯³ª ¸ÕÀú DQNÀÌ ¹«¾ùÀÎÁö °£´ÜÈ÷ ¿ä¾àÇØ º¸°Ú½À´Ï´Ù.
+# ì´ì œ ëª¨ë¸ì„ ì •ì˜í•©ì‹œë‹¤. ê·¸ëŸ¬ë‚˜ ë¨¼ì € DQNì´ ë¬´ì—‡ì¸ì§€ ê°„ë‹¨ížˆ ìš”ì•½í•´ ë³´ê² ìŠµë‹ˆë‹¤.
 #
-# DQN ¾Ë°í¸®Áò
+# DQN ì•Œê³ ë¦¬ì¦˜
 # -------------
 #
-# ¿ì¸®ÀÇ È¯°æÀº °áÁ¤·ÐÀûÀÌ¹Ç·Î ¿©±â¿¡ Á¦½ÃµÈ ¸ðµç ¹æÁ¤½ÄÀº ´Ü¼øÈ­¸¦ À§ÇØ
-# °áÁ¤·ÐÀûÀ¸·Î °ø½ÄÈ­µË´Ï´Ù. °­È­ ÇÐ½À ÀÚ·áÀº È¯°æ¿¡¼­ È®·ü·ÐÀû ÀüÈ¯¿¡ 
-# ´ëÇÑ ±â´ë°ª(expectation)µµ Æ÷ÇÔÇÒ °ÍÀÔ´Ï´Ù.
+# ìš°ë¦¬ì˜ í™˜ê²½ì€ ê²°ì •ë¡ ì ì´ë¯€ë¡œ ì—¬ê¸°ì— ì œì‹œëœ ëª¨ë“  ë°©ì •ì‹ì€ ë‹¨ìˆœí™”ë¥¼ ìœ„í•´
+# ê²°ì •ë¡ ì ìœ¼ë¡œ ê³µì‹í™”ë©ë‹ˆë‹¤. ê°•í™” í•™ìŠµ ìžë£Œì€ í™˜ê²½ì—ì„œ í™•ë¥ ë¡ ì  ì „í™˜ì—
+# ëŒ€í•œ ê¸°ëŒ€ê°’(expectation)ë„ í¬í•¨í•  ê²ƒìž…ë‹ˆë‹¤.
 #
-# ¿ì¸®ÀÇ ¸ñÇ¥´Â ÇÒÀÎµÈ ´©Àû º¸»ó (discounted cumulative reward)À» 
-# ±Ø´ëÈ­ÇÏ·Á´Â Á¤Ã¥(policy)À» ÇÐ½ÀÇÏ´Â °ÍÀÔ´Ï´Ù.
-# :math:`R_{t_0} = \sum_{t=t_0}^{\infty} \gamma^{t - t_0} r_t`, ¿©±â¼­
-# :math:`R_{t_0}` ´Â *¹ÝÈ¯(return)* ÀÔ´Ï´Ù. ÇÒÀÎ »ó¼ö,
-# :math:`\gamma`, ´Â :math:`0` °ú :math:`1` ÀÇ »ó¼öÀÌ°í ÇÕ°è°¡ 
-# ¼ö·ÅµÇµµ·Ï º¸ÀåÇÕ´Ï´Ù. ¿¡ÀÌÀüÆ®¿¡°Ô ºÒÈ®½ÇÇÑ ¸Õ ¹Ì·¡ÀÇ º¸»óÀÌ
-# °¡±î¿î ¹Ì·¡ÀÇ °Í¿¡ ºñÇØ ´ú Áß¿äÇÏ°Ô ¸¸µé°í, ÀÌ°ÍÀº »ó´çÈ÷ ÇÕ¸®ÀûÀÔ´Ï´Ù.
+# ìš°ë¦¬ì˜ ëª©í‘œëŠ” í• ì¸ëœ ëˆ„ì  ë³´ìƒ (discounted cumulative reward)ì„
+# ê·¹ëŒ€í™”í•˜ë ¤ëŠ” ì •ì±…(policy)ì„ í•™ìŠµí•˜ëŠ” ê²ƒìž…ë‹ˆë‹¤.
+# :math:`R_{t_0} = \sum_{t=t_0}^{\infty} \gamma^{t - t_0} r_t`, ì—¬ê¸°ì„œ
+# :math:`R_{t_0}` ëŠ” *ë°˜í™˜(return)* ìž…ë‹ˆë‹¤. í• ì¸ ìƒìˆ˜,
+# :math:`\gamma`, ëŠ” :math:`0` ê³¼ :math:`1` ì˜ ìƒìˆ˜ì´ê³  í•©ê³„ê°€
+# ìˆ˜ë ´ë˜ë„ë¡ ë³´ìž¥í•©ë‹ˆë‹¤. ì—ì´ì „íŠ¸ì—ê²Œ ë¶ˆí™•ì‹¤í•œ ë¨¼ ë¯¸ëž˜ì˜ ë³´ìƒì´
+# ê°€ê¹Œìš´ ë¯¸ëž˜ì˜ ê²ƒì— ë¹„í•´ ëœ ì¤‘ìš”í•˜ê²Œ ë§Œë“¤ê³ , ì´ê²ƒì€ ìƒë‹¹ížˆ í•©ë¦¬ì ìž…ë‹ˆë‹¤.
 #
-# Q-learningÀÇ ÁÖ¿ä ¾ÆÀÌµð¾î´Â ¸¸ÀÏ ÇÔ¼ö :math:`Q^*: State \times Action \rightarrow \mathbb{R}` ¸¦
-# °¡Áö°í ÀÖ´Ù¸é ¹ÝÈ¯ÀÌ ¾î‰F°Ô µÉÁö ¾Ë·ÁÁÙ ¼ö ÀÖ°í, 
-# ¸¸¾à ÁÖ¾îÁø »óÅÂ(state)¿¡¼­ Çàµ¿(action)À» ÇÑ´Ù¸é, º¸»óÀ» ÃÖ´ëÈ­ÇÏ´Â 
-# Á¤Ã¥À» ½±°Ô ±¸ÃàÇÒ ¼ö ÀÖ½À´Ï´Ù:
+# Q-learningì˜ ì£¼ìš” ì•„ì´ë””ì–´ëŠ” ë§Œì¼ í•¨ìˆ˜ :math:`Q^*: State \times Action \rightarrow \mathbb{R}` ë¥¼
+# ê°€ì§€ê³  ìžˆë‹¤ë©´ ë°˜í™˜ì´ ì–´ë¯ê²Œ ë ì§€ ì•Œë ¤ì¤„ ìˆ˜ ìžˆê³ ,
+# ë§Œì•½ ì£¼ì–´ì§„ ìƒíƒœ(state)ì—ì„œ í–‰ë™(action)ì„ í•œë‹¤ë©´, ë³´ìƒì„ ìµœëŒ€í™”í•˜ëŠ”
+# ì •ì±…ì„ ì‰½ê²Œ êµ¬ì¶•í•  ìˆ˜ ìžˆìŠµë‹ˆë‹¤:
 #
 # .. math:: \pi^*(s) = \arg\!\max_a \ Q^*(s, a)
 #
-# ±×·¯³ª ¼¼°è(world)¿¡ °üÇÑ ¸ðµç °ÍÀ» ¾ËÁö ¸øÇÏ±â ¶§¹®¿¡, 
-# :math:`Q^*` ¿¡ µµ´ÞÇÒ ¼ö ¾ø½À´Ï´Ù. ±×·¯³ª ½Å°æ¸ÁÀº 
-# ¹ü¿ë ÇÔ¼ö ±Ù»çÀÚ(universal function approximator)ÀÌ±â ¶§¹®¿¡
-# °£´ÜÇÏ°Ô »ý¼ºÇÏ°í :math:`Q^*` ¸¦ ´àµµ·Ï ÇÐ½ÀÇÒ ¼ö ÀÖ½À´Ï´Ù. 
+# ê·¸ëŸ¬ë‚˜ ì„¸ê³„(world)ì— ê´€í•œ ëª¨ë“  ê²ƒì„ ì•Œì§€ ëª»í•˜ê¸° ë•Œë¬¸ì—,
+# :math:`Q^*` ì— ë„ë‹¬í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤. ê·¸ëŸ¬ë‚˜ ì‹ ê²½ë§ì€
+# ë²”ìš© í•¨ìˆ˜ ê·¼ì‚¬ìž(universal function approximator)ì´ê¸° ë•Œë¬¸ì—
+# ê°„ë‹¨í•˜ê²Œ ìƒì„±í•˜ê³  :math:`Q^*` ë¥¼ ë‹®ë„ë¡ í•™ìŠµí•  ìˆ˜ ìžˆìŠµë‹ˆë‹¤.
 #
-# ÇÐ½À ¾÷µ¥ÀÌÆ® ±ÔÄ¢À¸·Î, ÀÏºÎ Á¤Ã¥À» À§ÇÑ ¸ðµç :math:`Q` ÇÔ¼ö°¡ 
-# Bellman ¹æÁ¤½ÄÀ» ÁØ¼öÇÑ´Ù´Â »ç½ÇÀ» »ç¿ëÇÒ °ÍÀÔ´Ï´Ù:
+# í•™ìŠµ ì—…ë°ì´íŠ¸ ê·œì¹™ìœ¼ë¡œ, ì¼ë¶€ ì •ì±…ì„ ìœ„í•œ ëª¨ë“  :math:`Q` í•¨ìˆ˜ê°€
+# Bellman ë°©ì •ì‹ì„ ì¤€ìˆ˜í•œë‹¤ëŠ” ì‚¬ì‹¤ì„ ì‚¬ìš©í•  ê²ƒìž…ë‹ˆë‹¤:
 #
 # .. math:: Q^{\pi}(s, a) = r + \gamma Q^{\pi}(s', \pi(s'))
 #
-# Æòµî(equality)ÀÇ µÎ Ãø¸é »çÀÌÀÇ Â÷ÀÌ´Â 
-# ½Ã°£Â÷ ¿À·ù(temporal difference error), :math:`\delta` ÀÔ´Ï´Ù.:
+# í‰ë“±(equality)ì˜ ë‘ ì¸¡ë©´ ì‚¬ì´ì˜ ì°¨ì´ëŠ”
+# ì‹œê°„ì°¨ ì˜¤ë¥˜(temporal difference error), :math:`\delta` ìž…ë‹ˆë‹¤.:
 #
 # .. math:: \delta = Q(s, a) - (r + \gamma \max_a Q(s', a))
 #
-# ¿À·ù¸¦ ÃÖ¼ÒÈ­ÇÏ±â À§ÇØ¼­ `Huber
-# loss <https://en.wikipedia.org/wiki/Huber_loss>`__ ¸¦ »ç¿ëÇÕ´Ï´Ù.
-# Huber loss ´Â ¿À·ù°¡ ÀÛÀ¸¸é Æò±Õ Á¦°ö ¿ÀÂ÷( mean squared error)¿Í °°ÀÌ
-# µ¿ÀÛÇÏ°í ¿À·ù°¡ Å¬ ¶§´Â Æò±Õ Àý´ë ¿À·ù¿Í À¯»çÇÕ´Ï´Ù.
-# - ÀÌ°ÍÀº :math:`Q` ÀÇ ÃßÁ¤ÀÌ ¸Å¿ì È¥¶õ½º·¯¿ï ¶§ ÀÌ»ó °ª¿¡ ´õ °­°ÇÇÏ°Ô ÇÕ´Ï´Ù.
-# ÀçÇö ¸Þ¸ð¸®¿¡¼­ »ùÇÃ¸µÇÑ ÀüÈ¯ ¹èÄ¡ :math:`B` ¿¡¼­ ÀÌ°ÍÀ» °è»êÇÕ´Ï´Ù:
+# ì˜¤ë¥˜ë¥¼ ìµœì†Œí™”í•˜ê¸° ìœ„í•´ì„œ `Huber
+# loss <https://en.wikipedia.org/wiki/Huber_loss>`__ ë¥¼ ì‚¬ìš©í•©ë‹ˆë‹¤.
+# Huber loss ëŠ” ì˜¤ë¥˜ê°€ ìž‘ìœ¼ë©´ í‰ê·  ì œê³± ì˜¤ì°¨( mean squared error)ì™€ ê°™ì´
+# ë™ìž‘í•˜ê³  ì˜¤ë¥˜ê°€ í´ ë•ŒëŠ” í‰ê·  ì ˆëŒ€ ì˜¤ë¥˜ì™€ ìœ ì‚¬í•©ë‹ˆë‹¤.
+# - ì´ê²ƒì€ :math:`Q` ì˜ ì¶”ì •ì´ ë§¤ìš° í˜¼ëž€ìŠ¤ëŸ¬ìš¸ ë•Œ ì´ìƒ ê°’ì— ë” ê°•ê±´í•˜ê²Œ í•©ë‹ˆë‹¤.
+# ìž¬í˜„ ë©”ëª¨ë¦¬ì—ì„œ ìƒ˜í”Œë§í•œ ì „í™˜ ë°°ì¹˜ :math:`B` ì—ì„œ ì´ê²ƒì„ ê³„ì‚°í•©ë‹ˆë‹¤:
 #
 # .. math::
 #
@@ -184,13 +183,13 @@ class ReplayMemory(object):
 #      |\delta| - \frac{1}{2} & \text{otherwise.}
 #    \end{cases}
 #
-# Q-³×Æ®¿öÅ©
+# Q-ë„¤íŠ¸ì›Œí¬
 # ^^^^^^^^^^^
 #
-# ¿ì¸® ¸ðµ¨Àº ÇöÀç¿Í ÀÌÀü ½ºÅ©¸° ÆÐÄ¡ÀÇ Â÷ÀÌ¸¦ ÃëÇÏ´Â 
-# CNN(convolutional neural network) ÀÔ´Ï´Ù. µÎ°¡Áö Ãâ·Â :math:`Q(s, \mathrm{left})` ¿Í
-# :math:`Q(s, \mathrm{right})` °¡ ÀÖ½À´Ï´Ù. (¿©±â¼­ :math:`s` ´Â ³×Æ®¿öÅ©ÀÇ ÀÔ·ÂÀÔ´Ï´Ù)
-# °á°úÀûÀ¸·Î ³×Æ®¿öÅ©´Â ÁÖ¾îÁø ÇöÀç ÀÔ·Â¿¡¼­ °¢ Çàµ¿ÀÇ *±â´ë°ª* À» ¿¹ÃøÇÏ·Á°í ÇÕ´Ï´Ù.
+# ìš°ë¦¬ ëª¨ë¸ì€ í˜„ìž¬ì™€ ì´ì „ ìŠ¤í¬ë¦° íŒ¨ì¹˜ì˜ ì°¨ì´ë¥¼ ì·¨í•˜ëŠ”
+# CNN(convolutional neural network) ìž…ë‹ˆë‹¤. ë‘ê°€ì§€ ì¶œë ¥ :math:`Q(s, \mathrm{left})` ì™€
+# :math:`Q(s, \mathrm{right})` ê°€ ìžˆìŠµë‹ˆë‹¤. (ì—¬ê¸°ì„œ :math:`s` ëŠ” ë„¤íŠ¸ì›Œí¬ì˜ ìž…ë ¥ìž…ë‹ˆë‹¤)
+# ê²°ê³¼ì ìœ¼ë¡œ ë„¤íŠ¸ì›Œí¬ëŠ” ì£¼ì–´ì§„ í˜„ìž¬ ìž…ë ¥ì—ì„œ ê° í–‰ë™ì˜ *ê¸°ëŒ€ê°’* ì„ ì˜ˆì¸¡í•˜ë ¤ê³  í•©ë‹ˆë‹¤.
 #
 
 class DQN(nn.Module):
@@ -204,8 +203,8 @@ class DQN(nn.Module):
         self.conv3 = nn.Conv2d(32, 32, kernel_size=5, stride=2)
         self.bn3 = nn.BatchNorm2d(32)
 
-        # Linear ÀÔ·ÂÀÇ ¿¬°á ¼ýÀÚ´Â conv2d °èÃþÀÇ Ãâ·Â°ú ÀÔ·Â ÀÌ¹ÌÁöÀÇ Å©±â¿¡
-        # µû¶ó °áÁ¤µÇ±â ¶§¹®¿¡ µû·Î °è»êÀ» ÇØ¾ßÇÕ´Ï´Ù.
+        # Linear ìž…ë ¥ì˜ ì—°ê²° ìˆ«ìžëŠ” conv2d ê³„ì¸µì˜ ì¶œë ¥ê³¼ ìž…ë ¥ ì´ë¯¸ì§€ì˜ í¬ê¸°ì—
+        # ë”°ë¼ ê²°ì •ë˜ê¸° ë•Œë¬¸ì— ë”°ë¡œ ê³„ì‚°ì„ í•´ì•¼í•©ë‹ˆë‹¤.
         def conv2d_size_out(size, kernel_size = 5, stride = 2):
             return (size - (kernel_size - 1) - 1) // stride  + 1
         convw = conv2d_size_out(conv2d_size_out(conv2d_size_out(w)))
@@ -213,8 +212,8 @@ class DQN(nn.Module):
         linear_input_size = convw * convh * 32
         self.head = nn.Linear(linear_input_size, outputs)
 
-    # ÃÖÀûÈ­ Áß¿¡ ´ÙÀ½ Çàµ¿À» °áÁ¤ÇÏ±â À§ÇØ¼­ ÇÏ³ªÀÇ ¿ä¼Ò ¶Ç´Â ¹èÄ¡¸¦ ÀÌ¿ëÇØ È£ÃÍµË´Ï´Ù.
-    # ([[left0exp,right0exp]...]) ¸¦ ¹ÝÈ¯ÇÕ´Ï´Ù.
+    # ìµœì í™” ì¤‘ì— ë‹¤ìŒ í–‰ë™ì„ ê²°ì •í•˜ê¸° ìœ„í•´ì„œ í•˜ë‚˜ì˜ ìš”ì†Œ ë˜ëŠ” ë°°ì¹˜ë¥¼ ì´ìš©í•´ í˜¸ì´ë©ë‹ˆë‹¤.
+    # ([[left0exp,right0exp]...]) ë¥¼ ë°˜í™˜í•©ë‹ˆë‹¤.
     def forward(self, x):
         x = F.relu(self.bn1(self.conv1(x)))
         x = F.relu(self.bn2(self.conv2(x)))
@@ -223,12 +222,12 @@ class DQN(nn.Module):
 
 
 ######################################################################
-# ÀÔ·Â ÃßÃâ
+# ìž…ë ¥ ì¶”ì¶œ
 # ^^^^^^^^^^^^^^^^
 #
-# ¾Æ·¡ ÄÚµå´Â È¯°æ¿¡¼­ ·»´õ¸µ µÈ ÀÌ¹ÌÁö¸¦ ÃßÃâÇÏ°í Ã³¸®ÇÏ´Â À¯Æ¿¸®Æ¼ÀÔ´Ï´Ù.
-# ÀÌ¹ÌÁö º¯È¯À» ½±°Ô ±¸¼ºÇÒ ¼ö ÀÖ´Â ``torchvision`` ÆÐÅ°Áö¸¦ »ç¿ëÇÕ´Ï´Ù. 
-# ¼¿(cell)À» ½ÇÇàÇÏ¸é ÃßÃâÇÑ ¿¹Á¦ ÆÐÄ¡°¡ Ç¥½ÃµË´Ï´Ù.
+# ì•„ëž˜ ì½”ë“œëŠ” í™˜ê²½ì—ì„œ ë Œë”ë§ ëœ ì´ë¯¸ì§€ë¥¼ ì¶”ì¶œí•˜ê³  ì²˜ë¦¬í•˜ëŠ” ìœ í‹¸ë¦¬í‹°ìž…ë‹ˆë‹¤.
+# ì´ë¯¸ì§€ ë³€í™˜ì„ ì‰½ê²Œ êµ¬ì„±í•  ìˆ˜ ìžˆëŠ” ``torchvision`` íŒ¨í‚¤ì§€ë¥¼ ì‚¬ìš©í•©ë‹ˆë‹¤.
+# ì…€(cell)ì„ ì‹¤í–‰í•˜ë©´ ì¶”ì¶œí•œ ì˜ˆì œ íŒ¨ì¹˜ê°€ í‘œì‹œë©ë‹ˆë‹¤.
 #
 
 resize = T.Compose([T.ToPILImage(),
@@ -242,10 +241,10 @@ def get_cart_location(screen_width):
     return int(env.state[0] * scale + screen_width / 2.0)  # MIDDLE OF CART
 
 def get_screen():
-    # gymÀÌ ¿äÃ»ÇÑ È­¸éÀº 400x600x3 ÀÌÁö¸¸, °¡²û 800x1200x3 Ã³·³ Å« °æ¿ì°¡ ÀÖ½À´Ï´Ù.
-    # ÀÌ°ÍÀ» Torch order (CHW)·Î º¯È¯ÇÑ´Ù.
+    # gymì´ ìš”ì²­í•œ í™”ë©´ì€ 400x600x3 ì´ì§€ë§Œ, ê°€ë” 800x1200x3 ì²˜ëŸ¼ í° ê²½ìš°ê°€ ìžˆìŠµë‹ˆë‹¤.
+    # ì´ê²ƒì„ Torch order (CHW)ë¡œ ë³€í™˜í•œë‹¤.
     screen = env.render(mode='rgb_array').transpose((2, 0, 1))
-    # Ä«Æ®´Â ¾Æ·¡ÂÊ¿¡ ÀÖÀ¸¹Ç·Î È­¸éÀÇ »ó´Ü°ú ÇÏ´ÜÀ» Á¦°ÅÇÏ½Ê½Ã¿À.
+    # ì¹´íŠ¸ëŠ” ì•„ëž˜ìª½ì— ìžˆìœ¼ë¯€ë¡œ í™”ë©´ì˜ ìƒë‹¨ê³¼ í•˜ë‹¨ì„ ì œê±°í•˜ì‹­ì‹œì˜¤.
     _, screen_height, screen_width = screen.shape
     screen = screen[:, int(screen_height*0.4):int(screen_height * 0.8)]
     view_width = int(screen_width * 0.6)
@@ -257,13 +256,13 @@ def get_screen():
     else:
         slice_range = slice(cart_location - view_width // 2,
                             cart_location + view_width // 2)
-    # Ä«Æ®¸¦ Áß½ÉÀ¸·Î Á¤»ç°¢Çü ÀÌ¹ÌÁö°¡ µÇµµ·Ï °¡ÀåÀÚ¸®¸¦ Á¦°ÅÇÏ½Ê½Ã¿À.
+    # ì¹´íŠ¸ë¥¼ ì¤‘ì‹¬ìœ¼ë¡œ ì •ì‚¬ê°í˜• ì´ë¯¸ì§€ê°€ ë˜ë„ë¡ ê°€ìž¥ìžë¦¬ë¥¼ ì œê±°í•˜ì‹­ì‹œì˜¤.
     screen = screen[:, :, slice_range]
-    # float À¸·Î º¯È¯ÇÏ°í,  rescale ÇÏ°í, torch tensor ·Î º¯È¯ÇÏ½Ê½Ã¿À.
-    # (ÀÌ°ÍÀº º¹»ç¸¦ ÇÊ¿ä·ÎÇÏÁö ¾Ê½À´Ï´Ù)
+    # float ìœ¼ë¡œ ë³€í™˜í•˜ê³ ,  rescale í•˜ê³ , torch tensor ë¡œ ë³€í™˜í•˜ì‹­ì‹œì˜¤.
+    # (ì´ê²ƒì€ ë³µì‚¬ë¥¼ í•„ìš”ë¡œí•˜ì§€ ì•ŠìŠµë‹ˆë‹¤)
     screen = np.ascontiguousarray(screen, dtype=np.float32) / 255
     screen = torch.from_numpy(screen)
-    # Å©±â¸¦ ¼öÁ¤ÇÏ°í ¹èÄ¡ Â÷¿ø(BCHW)À» Ãß°¡ÇÏ½Ê½Ã¿À.
+    # í¬ê¸°ë¥¼ ìˆ˜ì •í•˜ê³  ë°°ì¹˜ ì°¨ì›(BCHW)ì„ ì¶”ê°€í•˜ì‹­ì‹œì˜¤.
     return resize(screen).unsqueeze(0).to(device)
 
 
@@ -276,21 +275,21 @@ plt.show()
 
 
 ######################################################################
-# ÇÐ½À
+# í•™ìŠµ
 # --------
 #
-# ÇÏÀÌÆÛ ÆÄ¶ó¹ÌÅÍ¿Í À¯Æ¿¸®Æ¼
+# í•˜ì´í¼ íŒŒë¼ë¯¸í„°ì™€ ìœ í‹¸ë¦¬í‹°
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-# ÀÌ ¼¿Àº ¸ðµ¨°ú ÃÖÀûÈ­±â¸¦ ÀÎ½ºÅÏ½ºÈ­ÇÏ°í ÀÏºÎ À¯Æ¿¸®Æ¼¸¦ Á¤ÀÇÇÕ´Ï´Ù:
+# ì´ ì…€ì€ ëª¨ë¸ê³¼ ìµœì í™”ê¸°ë¥¼ ì¸ìŠ¤í„´ìŠ¤í™”í•˜ê³  ì¼ë¶€ ìœ í‹¸ë¦¬í‹°ë¥¼ ì •ì˜í•©ë‹ˆë‹¤:
 #
-# -  ``select_action`` - Epsilon Greedy Á¤Ã¥¿¡ µû¶ó Çàµ¿À» ¼±ÅÃÇÕ´Ï´Ù.
-#    °£´ÜÈ÷ ¸»ÇØ¼­, °¡²û ¸ðµ¨À» »ç¿ëÇÏ¿© Çàµ¿À» ¼±ÅÃÇÏ°í ¶§·Î´Â ´ÜÁö ÇÏ³ª¸¦
-#    ±ÕÀÏÇÏ°Ô »ùÇÃ¸µÇÒ °ÍÀÔ´Ï´Ù. ÀÓÀÇÀÇ ¾×¼ÇÀ» ¼±ÅÃÇÒ È®·üÀº 
-#    ``EPS_START`` ¿¡¼­ ½ÃÀÛÇØ¼­ ``EPS_END`` ¸¦ ÇâÇØ Áö¼öÀûÀ¸·Î °¨¼ÒÇÒ °ÍÀÔ´Ï´Ù.
-#    ``EPS_DECAY`` ´Â °¨¼è ¼Óµµ¸¦ Á¦¾îÇÕ´Ï´Ù.
-# -  ``plot_durations`` - Áö³­ 100°³ ¿¡ÇÇ¼ÒµåÀÇ Æò±Õ(°ø½Ä Æò°¡¿¡¼­ »ç¿ë µÈ ¼öÄ¡)¿¡ µû¸¥
-#    ¿¡ÇÇ¼ÒµåÀÇ Áö¼ÓÀ» µµÇ¥·Î ±×¸®±â À§ÇÑ ÇïÆÛ. µµÇ¥´Â ±âº» ÈÆ·Ã ·çÇÁ°¡ 
-#    Æ÷ÇÔ µÈ ¼¿ ¹Ø¿¡ ÀÖÀ¸¸ç, ¸Å ¿¡ÇÇ¼Òµå¸¶´Ù ¾÷µ¥ÀÌÆ®µË´Ï´Ù.
+# -  ``select_action`` - Epsilon Greedy ì •ì±…ì— ë”°ë¼ í–‰ë™ì„ ì„ íƒí•©ë‹ˆë‹¤.
+#    ê°„ë‹¨ížˆ ë§í•´ì„œ, ê°€ë” ëª¨ë¸ì„ ì‚¬ìš©í•˜ì—¬ í–‰ë™ì„ ì„ íƒí•˜ê³  ë•Œë¡œëŠ” ë‹¨ì§€ í•˜ë‚˜ë¥¼
+#    ê· ì¼í•˜ê²Œ ìƒ˜í”Œë§í•  ê²ƒìž…ë‹ˆë‹¤. ìž„ì˜ì˜ ì•¡ì…˜ì„ ì„ íƒí•  í™•ë¥ ì€
+#    ``EPS_START`` ì—ì„œ ì‹œìž‘í•´ì„œ ``EPS_END`` ë¥¼ í–¥í•´ ì§€ìˆ˜ì ìœ¼ë¡œ ê°ì†Œí•  ê²ƒìž…ë‹ˆë‹¤.
+#    ``EPS_DECAY`` ëŠ” ê°ì‡  ì†ë„ë¥¼ ì œì–´í•©ë‹ˆë‹¤.
+# -  ``plot_durations`` - ì§€ë‚œ 100ê°œ ì—í”¼ì†Œë“œì˜ í‰ê· (ê³µì‹ í‰ê°€ì—ì„œ ì‚¬ìš© ëœ ìˆ˜ì¹˜)ì— ë”°ë¥¸
+#    ì—í”¼ì†Œë“œì˜ ì§€ì†ì„ ë„í‘œë¡œ ê·¸ë¦¬ê¸° ìœ„í•œ í—¬í¼. ë„í‘œëŠ” ê¸°ë³¸ í›ˆë ¨ ë£¨í”„ê°€
+#    í¬í•¨ ëœ ì…€ ë°‘ì— ìžˆìœ¼ë©°, ë§¤ ì—í”¼ì†Œë“œë§ˆë‹¤ ì—…ë°ì´íŠ¸ë©ë‹ˆë‹¤.
 #
 
 BATCH_SIZE = 128
@@ -300,13 +299,13 @@ EPS_END = 0.05
 EPS_DECAY = 200
 TARGET_UPDATE = 10
 
-# AI gym¿¡¼­ ¹ÝÈ¯µÈ ÇüÅÂ¸¦ ±â¹ÝÀ¸·Î °èÃþÀ» ÃÊ±âÈ­ ÇÏµµ·Ï È­¸éÀÇ Å©±â¸¦
-# °¡Á®¿É´Ï´Ù. ÀÌ ½ÃÁ¡¿¡ ÀÏ¹ÝÀûÀ¸·Î 3x40x90 ¿¡ °¡±õ½À´Ï´Ù. 
-# ÀÌ Å©±â´Â get_screen()¿¡¼­ °íÁ¤, Ãà¼ÒµÈ ·»´õ ¹öÆÛÀÇ °á°úÀÔ´Ï´Ù. 
+# AI gymì—ì„œ ë°˜í™˜ëœ í˜•íƒœë¥¼ ê¸°ë°˜ìœ¼ë¡œ ê³„ì¸µì„ ì´ˆê¸°í™” í•˜ë„ë¡ í™”ë©´ì˜ í¬ê¸°ë¥¼
+# ê°€ì ¸ì˜µë‹ˆë‹¤. ì´ ì‹œì ì— ì¼ë°˜ì ìœ¼ë¡œ 3x40x90 ì— ê°€ê¹ìŠµë‹ˆë‹¤.
+# ì´ í¬ê¸°ëŠ” get_screen()ì—ì„œ ê³ ì •, ì¶•ì†Œëœ ë Œë” ë²„í¼ì˜ ê²°ê³¼ìž…ë‹ˆë‹¤.
 init_screen = get_screen()
 _, _, screen_height, screen_width = init_screen.shape
 
-# gym Çàµ¿ °ø°£¿¡¼­ Çàµ¿ÀÇ ¼ýÀÚ¸¦ ¾ò½À´Ï´Ù.
+# gym í–‰ë™ ê³µê°„ì—ì„œ í–‰ë™ì˜ ìˆ«ìžë¥¼ ì–»ìŠµë‹ˆë‹¤.
 n_actions = env.action_space.n
 
 policy_net = DQN(screen_height, screen_width, n_actions).to(device)
@@ -329,9 +328,9 @@ def select_action(state):
     steps_done += 1
     if sample > eps_threshold:
         with torch.no_grad():
-            # t.max (1)Àº °¢ ÇàÀÇ °¡Àå Å« ¿­ °ªÀ» ¹ÝÈ¯ÇÕ´Ï´Ù.
-            # ÃÖ´ë °á°úÀÇ µÎ¹øÂ° ¿­Àº ÃÖ´ë ¿ä¼ÒÀÇ ÁÖ¼Ò°ªÀÌ¹Ç·Î,
-            # ±â´ë º¸»óÀÌ ´õ Å« Çàµ¿À» ¼±ÅÃÇÒ ¼ö ÀÖ½À´Ï´Ù. 
+            # t.max (1)ì€ ê° í–‰ì˜ ê°€ìž¥ í° ì—´ ê°’ì„ ë°˜í™˜í•©ë‹ˆë‹¤.
+            # ìµœëŒ€ ê²°ê³¼ì˜ ë‘ë²ˆì§¸ ì—´ì€ ìµœëŒ€ ìš”ì†Œì˜ ì£¼ì†Œê°’ì´ë¯€ë¡œ,
+            # ê¸°ëŒ€ ë³´ìƒì´ ë” í° í–‰ë™ì„ ì„ íƒí•  ìˆ˜ ìžˆìŠµë‹ˆë‹¤.
             return policy_net(state).max(1)[1].view(1, 1)
     else:
         return torch.tensor([[random.randrange(n_actions)]], device=device, dtype=torch.long)
@@ -348,33 +347,33 @@ def plot_durations():
     plt.xlabel('Episode')
     plt.ylabel('Duration')
     plt.plot(durations_t.numpy())
-    # 100°³ÀÇ ¿¡ÇÇ¼Òµå Æò±ÕÀ» °¡Á® ¿Í¼­ µµÇ¥ ±×¸®±â
+    # 100ê°œì˜ ì—í”¼ì†Œë“œ í‰ê· ì„ ê°€ì ¸ ì™€ì„œ ë„í‘œ ê·¸ë¦¬ê¸°
     if len(durations_t) >= 100:
         means = durations_t.unfold(0, 100, 1).mean(1).view(-1)
         means = torch.cat((torch.zeros(99), means))
         plt.plot(means.numpy())
 
-    plt.pause(0.001)  # µµÇ¥°¡ ¾÷µ¥ÀÌÆ®µÇµµ·Ï Àá½Ã ¸ØÃã 
+    plt.pause(0.001)  # ë„í‘œê°€ ì—…ë°ì´íŠ¸ë˜ë„ë¡ ìž ì‹œ ë©ˆì¶¤
     if is_ipython:
         display.clear_output(wait=True)
         display.display(plt.gcf())
 
 
 ######################################################################
-# ÇÐ½À ·çÇÁ
+# í•™ìŠµ ë£¨í”„
 # ^^^^^^^^^^^^^
 #
-# ÃÖÁ¾ÀûÀ¸·Î ¸ðµ¨ ÇÐ½ÀÀ» À§ÇÑ ÄÚµå.
+# ìµœì¢…ì ìœ¼ë¡œ ëª¨ë¸ í•™ìŠµì„ ìœ„í•œ ì½”ë“œ.
 #
-# ¿©±â¼­, ÃÖÀûÈ­ÀÇ ÇÑ ´Ü°è¸¦ ¼öÇàÇÏ´Â ``optimize_model`` ÇÔ¼ö¸¦ Ã£À» ¼ö ÀÖ½À´Ï´Ù.
-# ¸ÕÀú ¹èÄ¡ ÇÏ³ª¸¦ »ùÇÃ¸µÇÏ°í ¸ðµç Tensor¸¦ ÇÏ³ª·Î ¿¬°áÇÏ°í 
-# :math:`Q(s_t, a_t)` ¿Í  :math:`V(s_{t+1}) = \max_a Q(s_{t+1}, a)` ¸¦ °è»êÇÏ°í
-# ±×°ÍµéÀ» ¼Õ½Ç·Î ÇÕÄ¨´Ï´Ù. ¿ì¸®°¡ ¼³Á¤ÇÑ Á¤ÀÇ¿¡ µû¸£¸é ¸¸¾à :math:`s` °¡
-# ¸¶Áö¸· »óÅÂ¶ó¸é :math:`V(s) = 0` ÀÔ´Ï´Ù.
-# ¶ÇÇÑ ¾ÈÁ¤¼º Ãß°¡ À§ÇÑ :math:`V(s_{t+1})` °è»êÀ» À§ÇØ ¸ñÇ¥ ³×Æ®¿öÅ©¸¦ »ç¿ëÇÕ´Ï´Ù. 
-# ¸ñÇ¥ ³×Æ®¿öÅ©´Â ´ëºÎºÐÀÇ ½Ã°£ µ¿°á »óÅÂ·Î À¯ÁöµÇÁö¸¸, °¡²û Á¤Ã¥ 
-# ³×Æ®¿öÅ©ÀÇ °¡ÁßÄ¡·Î ¾÷µ¥ÀÌÆ®µË´Ï´Ù.
-# ÀÌ°ÍÀº ´ë°³ ¼³Á¤ÇÑ ½ºÅÜ ¼ýÀÚÀÌÁö¸¸ ´Ü¼øÈ­¸¦ À§ÇØ ¿¡ÇÇ¼Òµå¸¦ »ç¿ëÇÕ´Ï´Ù.
+# ì—¬ê¸°ì„œ, ìµœì í™”ì˜ í•œ ë‹¨ê³„ë¥¼ ìˆ˜í–‰í•˜ëŠ” ``optimize_model`` í•¨ìˆ˜ë¥¼ ì°¾ì„ ìˆ˜ ìžˆìŠµë‹ˆë‹¤.
+# ë¨¼ì € ë°°ì¹˜ í•˜ë‚˜ë¥¼ ìƒ˜í”Œë§í•˜ê³  ëª¨ë“  Tensorë¥¼ í•˜ë‚˜ë¡œ ì—°ê²°í•˜ê³ 
+# :math:`Q(s_t, a_t)` ì™€  :math:`V(s_{t+1}) = \max_a Q(s_{t+1}, a)` ë¥¼ ê³„ì‚°í•˜ê³ 
+# ê·¸ê²ƒë“¤ì„ ì†ì‹¤ë¡œ í•©ì¹©ë‹ˆë‹¤. ìš°ë¦¬ê°€ ì„¤ì •í•œ ì •ì˜ì— ë”°ë¥´ë©´ ë§Œì•½ :math:`s` ê°€
+# ë§ˆì§€ë§‰ ìƒíƒœë¼ë©´ :math:`V(s) = 0` ìž…ë‹ˆë‹¤.
+# ë˜í•œ ì•ˆì •ì„± ì¶”ê°€ ìœ„í•œ :math:`V(s_{t+1})` ê³„ì‚°ì„ ìœ„í•´ ëª©í‘œ ë„¤íŠ¸ì›Œí¬ë¥¼ ì‚¬ìš©í•©ë‹ˆë‹¤.
+# ëª©í‘œ ë„¤íŠ¸ì›Œí¬ëŠ” ëŒ€ë¶€ë¶„ì˜ ì‹œê°„ ë™ê²° ìƒíƒœë¡œ ìœ ì§€ë˜ì§€ë§Œ, ê°€ë” ì •ì±…
+# ë„¤íŠ¸ì›Œí¬ì˜ ê°€ì¤‘ì¹˜ë¡œ ì—…ë°ì´íŠ¸ë©ë‹ˆë‹¤.
+# ì´ê²ƒì€ ëŒ€ê°œ ì„¤ì •í•œ ìŠ¤í… ìˆ«ìžì´ì§€ë§Œ ë‹¨ìˆœí™”ë¥¼ ìœ„í•´ ì—í”¼ì†Œë“œë¥¼ ì‚¬ìš©í•©ë‹ˆë‹¤.
 #
 
 def optimize_model():
@@ -382,12 +381,12 @@ def optimize_model():
         return
     transitions = memory.sample(BATCH_SIZE)
     # Transpose the batch (see https://stackoverflow.com/a/19343/3343043 for
-    # detailed explanation). ÀÌ°ÍÀº batch-arrayÀÇ TransitionsÀ» TransitionÀÇ batch-arrays·Î
-    # ÀüÈ¯ÇÕ´Ï´Ù.
+    # detailed explanation). ì´ê²ƒì€ batch-arrayì˜ Transitionsì„ Transitionì˜ batch-arraysë¡œ
+    # ì „í™˜í•©ë‹ˆë‹¤.
     batch = Transition(*zip(*transitions))
 
-    # ÃÖÁ¾ÀÌ ¾Æ´Ñ »óÅÂÀÇ ¸¶½ºÅ©¸¦ °è»êÇÏ°í ¹èÄ¡ ¿ä¼Ò¸¦ ¿¬°áÇÕ´Ï´Ù
-    # (ÃÖÁ¾ »óÅÂ´Â ½Ã¹Ä·¹ÀÌ¼ÇÀÌ Á¾·á µÈ ÀÌÈÄÀÇ »óÅÂ)
+    # ìµœì¢…ì´ ì•„ë‹Œ ìƒíƒœì˜ ë§ˆìŠ¤í¬ë¥¼ ê³„ì‚°í•˜ê³  ë°°ì¹˜ ìš”ì†Œë¥¼ ì—°ê²°í•©ë‹ˆë‹¤
+    # (ìµœì¢… ìƒíƒœëŠ” ì‹œë®¬ë ˆì´ì…˜ì´ ì¢…ë£Œ ëœ ì´í›„ì˜ ìƒíƒœ)
     non_final_mask = torch.tensor(tuple(map(lambda s: s is not None,
                                           batch.next_state)), device=device, dtype=torch.uint8)
     non_final_next_states = torch.cat([s for s in batch.next_state
@@ -396,23 +395,23 @@ def optimize_model():
     action_batch = torch.cat(batch.action)
     reward_batch = torch.cat(batch.reward)
 
-    # Q(s_t, a) °è»ê - ¸ðµ¨ÀÌ Q(s_t)¸¦ °è»êÇÏ°í, ÃëÇÑ Çàµ¿ÀÇ ¿­À» ¼±ÅÃÇÕ´Ï´Ù.
-    # ÀÌµéÀº policy_net¿¡ µû¶ó °¢ ¹èÄ¡ »óÅÂ¿¡ ´ëÇØ ¼±ÅÃµÈ Çàµ¿ÀÔ´Ï´Ù.
+    # Q(s_t, a) ê³„ì‚° - ëª¨ë¸ì´ Q(s_t)ë¥¼ ê³„ì‚°í•˜ê³ , ì·¨í•œ í–‰ë™ì˜ ì—´ì„ ì„ íƒí•©ë‹ˆë‹¤.
+    # ì´ë“¤ì€ policy_netì— ë”°ë¼ ê° ë°°ì¹˜ ìƒíƒœì— ëŒ€í•´ ì„ íƒëœ í–‰ë™ìž…ë‹ˆë‹¤.
     state_action_values = policy_net(state_batch).gather(1, action_batch)
 
-    # ¸ðµç ´ÙÀ½ »óÅÂ¸¦ À§ÇÑ V(s_{t+1}) °è»ê
-    # non_final_next_statesÀÇ Çàµ¿µé¿¡ ´ëÇÑ ±â´ë°ªÀº "ÀÌÀü" target_netÀ» ±â¹ÝÀ¸·Î °è»êµË´Ï´Ù.
-    # max(1)[0]À¸·Î ÃÖ°íÀÇ º¸»óÀ» ¼±ÅÃÇÏ½Ê½Ã¿À.
-    # ÀÌ°ÍÀº ¸¶½ºÅ©¸¦ ±â¹ÝÀ¸·Î º´ÇÕµÇ¾î ±â´ë »óÅÂ °ªÀ» °®°Å³ª »óÅÂ°¡ ÃÖÁ¾ÀÎ °æ¿ì 0À» °®½À´Ï´Ù.
+    # ëª¨ë“  ë‹¤ìŒ ìƒíƒœë¥¼ ìœ„í•œ V(s_{t+1}) ê³„ì‚°
+    # non_final_next_statesì˜ í–‰ë™ë“¤ì— ëŒ€í•œ ê¸°ëŒ€ê°’ì€ "ì´ì „" target_netì„ ê¸°ë°˜ìœ¼ë¡œ ê³„ì‚°ë©ë‹ˆë‹¤.
+    # max(1)[0]ìœ¼ë¡œ ìµœê³ ì˜ ë³´ìƒì„ ì„ íƒí•˜ì‹­ì‹œì˜¤.
+    # ì´ê²ƒì€ ë§ˆìŠ¤í¬ë¥¼ ê¸°ë°˜ìœ¼ë¡œ ë³‘í•©ë˜ì–´ ê¸°ëŒ€ ìƒíƒœ ê°’ì„ ê°–ê±°ë‚˜ ìƒíƒœê°€ ìµœì¢…ì¸ ê²½ìš° 0ì„ ê°–ìŠµë‹ˆë‹¤.
     next_state_values = torch.zeros(BATCH_SIZE, device=device)
     next_state_values[non_final_mask] = target_net(non_final_next_states).max(1)[0].detach()
-    # ±â´ë Q °ª °è»ê
+    # ê¸°ëŒ€ Q ê°’ ê³„ì‚°
     expected_state_action_values = (next_state_values * GAMMA) + reward_batch
 
-    # Huber ¼Õ½Ç °è»ê
+    # Huber ì†ì‹¤ ê³„ì‚°
     loss = F.smooth_l1_loss(state_action_values, expected_state_action_values.unsqueeze(1))
 
-    # ¸ðµ¨ ÃÖÀûÈ­
+    # ëª¨ë¸ ìµœì í™”
     optimizer.zero_grad()
     loss.backward()
     for param in policy_net.parameters():
@@ -422,30 +421,30 @@ def optimize_model():
 
 ######################################################################
 #
-# ¾Æ·¡¿¡¼­ ÁÖ¿ä ÇÐ½À ·çÇÁ¸¦ Ã£À» ¼ö ÀÖ½À´Ï´Ù. Ã³À½À¸·Î È¯°æÀ» 
-# Àç¼³Á¤ÇÏ°í ``»óÅÂ`` Tensor¸¦ ÃÊ±âÈ­ÇÕ´Ï´Ù. ±×·± ´ÙÀ½ Çàµ¿À»
-# »ùÇÃ¸µÇÏ°í, ±×°ÍÀ» ½ÇÇàÇÏ°í, ´ÙÀ½ È­¸é°ú º¸»ó(Ç×»ó 1)À» °üÂûÇÏ°í,
-# ¸ðµ¨À» ÇÑ ¹ø ÃÖÀûÈ­ÇÕ´Ï´Ù. ¿¡ÇÇ¼Òµå°¡ ³¡³ª¸é (¸ðµ¨ÀÌ ½ÇÆÐ) 
-# ·çÇÁ¸¦ ´Ù½Ã ½ÃÀÛÇÕ´Ï´Ù.
+# ì•„ëž˜ì—ì„œ ì£¼ìš” í•™ìŠµ ë£¨í”„ë¥¼ ì°¾ì„ ìˆ˜ ìžˆìŠµë‹ˆë‹¤. ì²˜ìŒìœ¼ë¡œ í™˜ê²½ì„
+# ìž¬ì„¤ì •í•˜ê³  ``ìƒíƒœ`` Tensorë¥¼ ì´ˆê¸°í™”í•©ë‹ˆë‹¤. ê·¸ëŸ° ë‹¤ìŒ í–‰ë™ì„
+# ìƒ˜í”Œë§í•˜ê³ , ê·¸ê²ƒì„ ì‹¤í–‰í•˜ê³ , ë‹¤ìŒ í™”ë©´ê³¼ ë³´ìƒ(í•­ìƒ 1)ì„ ê´€ì°°í•˜ê³ ,
+# ëª¨ë¸ì„ í•œ ë²ˆ ìµœì í™”í•©ë‹ˆë‹¤. ì—í”¼ì†Œë“œê°€ ëë‚˜ë©´ (ëª¨ë¸ì´ ì‹¤íŒ¨)
+# ë£¨í”„ë¥¼ ë‹¤ì‹œ ì‹œìž‘í•©ë‹ˆë‹¤.
 #
-# ¾Æ·¡¿¡¼­ `num_episodes` ´Â ÀÛ°Ô ¼³Á¤µË´Ï´Ù. ³ëÆ®ºÏÀ» ´Ù¿î¹Þ°í
-# ÀÇ¹ÌÀÖ´Â °³¼±À» À§ÇØ¼­ 300 ÀÌ»óÀÇ ´õ ¸¹Àº ¿¡ÇÇ¼Òµå¸¦ ½ÇÇàÇØ º¸½Ê½Ã¿À.  
+# ì•„ëž˜ì—ì„œ `num_episodes` ëŠ” ìž‘ê²Œ ì„¤ì •ë©ë‹ˆë‹¤. ë…¸íŠ¸ë¶ì„ ë‹¤ìš´ë°›ê³ 
+# ì˜ë¯¸ìžˆëŠ” ê°œì„ ì„ ìœ„í•´ì„œ 300 ì´ìƒì˜ ë” ë§Žì€ ì—í”¼ì†Œë“œë¥¼ ì‹¤í–‰í•´ ë³´ì‹­ì‹œì˜¤.
 #
 
 num_episodes = 50
 for i_episode in range(num_episodes):
-    # È¯°æ°ú »óÅÂ ÃÊ±âÈ­
+    # í™˜ê²½ê³¼ ìƒíƒœ ì´ˆê¸°í™”
     env.reset()
     last_screen = get_screen()
     current_screen = get_screen()
     state = current_screen - last_screen
     for t in count():
-        # Çàµ¿ ¼±ÅÃ°ú ¼öÇà
+        # í–‰ë™ ì„ íƒê³¼ ìˆ˜í–‰
         action = select_action(state)
         _, reward, done, _ = env.step(action.item())
         reward = torch.tensor([reward], device=device)
 
-        # »õ·Î¿î »óÅÂ °üÂû
+        # ìƒˆë¡œìš´ ìƒíƒœ ê´€ì°°
         last_screen = current_screen
         current_screen = get_screen()
         if not done:
@@ -453,19 +452,19 @@ for i_episode in range(num_episodes):
         else:
             next_state = None
 
-        # ¸Þ¸ð¸®¿¡ º¯ÀÌ ÀúÀå
+        # ë©”ëª¨ë¦¬ì— ë³€ì´ ì €ìž¥
         memory.push(state, action, next_state, reward)
 
-        # ´ÙÀ½ »óÅÂ·Î ÀÌµ¿
+        # ë‹¤ìŒ ìƒíƒœë¡œ ì´ë™
         state = next_state
 
-        # ÃÖÀûÈ­ ÇÑ´Ü°è ¼öÇà(¸ñÇ¥ ³×Æ®¿öÅ©¿¡¼­)
+        # ìµœì í™” í•œë‹¨ê³„ ìˆ˜í–‰(ëª©í‘œ ë„¤íŠ¸ì›Œí¬ì—ì„œ)
         optimize_model()
         if done:
             episode_durations.append(t + 1)
             plot_durations()
             break
-    #¸ñÇ¥ ³×Æ®¿öÅ© ¾÷µ¥ÀÌÆ®, ¸ðµç ¿þÀÌÆ®¿Í ¹ÙÀÌ¾î½º º¹»ç
+    #ëª©í‘œ ë„¤íŠ¸ì›Œí¬ ì—…ë°ì´íŠ¸, ëª¨ë“  ì›¨ì´íŠ¸ì™€ ë°”ì´ì–´ìŠ¤ ë³µì‚¬
     if i_episode % TARGET_UPDATE == 0:
         target_net.load_state_dict(policy_net.state_dict())
 
@@ -476,13 +475,13 @@ plt.ioff()
 plt.show()
 
 ######################################################################
-# ´ÙÀ½Àº ÀüÃ¼ °á°ú µ¥ÀÌÅÍ Èå¸§À» º¸¿©ÁÖ´Â ´ÙÀÌ¾î±×·¥ÀÔ´Ï´Ù.
+# ë‹¤ìŒì€ ì „ì²´ ê²°ê³¼ ë°ì´í„° íë¦„ì„ ë³´ì—¬ì£¼ëŠ” ë‹¤ì´ì–´ê·¸ëž¨ìž…ë‹ˆë‹¤.
 #
 # .. figure:: /_static/img/reinforcement_learning_diagram.jpg
 #
-# Çàµ¿Àº ¹«ÀÛÀ§ ¶Ç´Â Á¤Ã¥¿¡ µû¶ó ¼±ÅÃµÇ¾î, gym È¯°æ¿¡¼­ ´ÙÀ½ ´Ü°è »ùÇÃÀ» °¡Á®¿É´Ï´Ù.
-# °á°ú¸¦ ÀçÇö ¸Þ¸ð¸®¿¡ ÀúÀåÇÏ°í ¸ðµç ¹Ýº¹¿¡¼­ ÃÖÀûÈ­ ´Ü°è¸¦ ½ÇÇàÇÕ´Ï´Ù.
-# ÃÖÀûÈ­´Â ÀçÇö ¸Þ¸ð¸®¿¡¼­ ¹«ÀÛÀ§ ¹èÄ¡¸¦ ¼±ÅÃÇÏ¿© »õ Á¤Ã¥À» ÇÐ½ÀÇÕ´Ï´Ù.
-# "ÀÌÀü" target_netÀº ÃÖÀûÈ­¿¡¼­ ±â´ë Q °ªÀ» °è»êÇÏ´Â µ¥¿¡µµ »ç¿ëµÇ°í,
-# ÃÖ½Å »óÅÂ¸¦ À¯ÁöÇÏ±â À§ÇØ °¡²û ¾÷µ¥ÀÌÆ®µË´Ï´Ù.
+# í–‰ë™ì€ ë¬´ìž‘ìœ„ ë˜ëŠ” ì •ì±…ì— ë”°ë¼ ì„ íƒë˜ì–´, gym í™˜ê²½ì—ì„œ ë‹¤ìŒ ë‹¨ê³„ ìƒ˜í”Œì„ ê°€ì ¸ì˜µë‹ˆë‹¤.
+# ê²°ê³¼ë¥¼ ìž¬í˜„ ë©”ëª¨ë¦¬ì— ì €ìž¥í•˜ê³  ëª¨ë“  ë°˜ë³µì—ì„œ ìµœì í™” ë‹¨ê³„ë¥¼ ì‹¤í–‰í•©ë‹ˆë‹¤.
+# ìµœì í™”ëŠ” ìž¬í˜„ ë©”ëª¨ë¦¬ì—ì„œ ë¬´ìž‘ìœ„ ë°°ì¹˜ë¥¼ ì„ íƒí•˜ì—¬ ìƒˆ ì •ì±…ì„ í•™ìŠµí•©ë‹ˆë‹¤.
+# "ì´ì „" target_netì€ ìµœì í™”ì—ì„œ ê¸°ëŒ€ Q ê°’ì„ ê³„ì‚°í•˜ëŠ” ë°ì—ë„ ì‚¬ìš©ë˜ê³ ,
+# ìµœì‹  ìƒíƒœë¥¼ ìœ ì§€í•˜ê¸° ìœ„í•´ ê°€ë” ì—…ë°ì´íŠ¸ë©ë‹ˆë‹¤.
 #
