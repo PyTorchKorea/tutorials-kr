@@ -45,7 +45,7 @@ print(torch.__version__)
 #    호출 중에 모듈에 의해 사용될 수 있습니다.
 # 3. ``forward`` 함수. 모듈이 호출될 때 실행되는 코드입니다.
 #
-# 작은 예를 살펴봅시다:
+# 작은 예를 시험해 봅시다:
 #
 
 class MyCell(torch.nn.Module):
@@ -115,7 +115,7 @@ print(my_cell(x, h))
 # 복잡한 프로그램을 통해 미분을 계산할 수 있게 합니다. 이 디자인은 모델 제작에 엄청난
 # 유연성을 제공합니다.
 #
-# 이제 유연성을 확인해 봅시다.
+# 이제 유연성을 시험해 봅시다.
 #
 
 class MyDecisionGate(torch.nn.Module):
