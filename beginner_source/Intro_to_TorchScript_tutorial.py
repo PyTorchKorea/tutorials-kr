@@ -1,33 +1,33 @@
 """
-Introduction to TorchScript
+TorchScript 소개
 ===========================
 
-*James Reed (jamesreed@fb.com), Michael Suo (suo@fb.com)*, rev2
+**Author**: James Reed (jamesreed@fb.com), Michael Suo (suo@fb.com), rev2
 
-This tutorial is an introduction to TorchScript, an intermediate
-representation of a PyTorch model (subclass of ``nn.Module``) that
-can then be run in a high-performance environment such as C++.
+**번역**: `강준혁 <https://github.com/k1101jh>`_
 
-In this tutorial we will cover:
+이 튜토리얼은 C++와 같은 고성능 환경에서 실행될 수 있는
+PyTorch 모델(``nn.Module`` 의 하위클래스)의 중간 표현인
+TorchScript에 대한 소개입니다.
 
-1. The basics of model authoring in PyTorch, including:
+이 튜토리얼에서는 다음을 다룰 것입니다:
 
--  Modules
--  Defining ``forward`` functions
--  Composing modules into a hierarchy of modules
+1. 다음을 포함한 PyTorch의 모델 제작의 기본:
 
-2. Specific methods for converting PyTorch modules to TorchScript, our
-   high-performance deployment runtime
+-  모듈(Modules)
+-  ``forward`` 함수 정의하기
+-  모듈을 계층 구조로 구성하기
 
--  Tracing an existing module
--  Using scripting to directly compile a module
--  How to compose both approaches
--  Saving and loading TorchScript modules
+2. PyTorch 모듈을 고성능 배포 런타임인 TorchScript로 변환하는 특정 방법
 
-We hope that after you complete this tutorial, you will proceed to go through
-`the follow-on tutorial <https://pytorch.org/tutorials/advanced/cpp_export.html>`_
-which will walk you through an example of actually calling a TorchScript
-model from C++.
+-  기존 모듈 추적하기
+-  스크립트를 사용하여 모듈을 직접 컴파일하기
+-  두 가지 접근 방법을 구성하는 방법
+-  TorchScript 모듈 저장 및 불러오기
+
+이 튜토리얼을 완료한 후에는
+`다음 학습서 <https://pytorch.org/tutorials/advanced/cpp_export.html>`_
+를 통해 C++에서 TorchScript 모델을 실제로 호출하는 예제를 안내합니다.
 
 """
 
@@ -36,19 +36,18 @@ print(torch.__version__)
 
 
 ######################################################################
-# Basics of PyTorch Model Authoring
+# PyTorch 모델 작성의 기초
 # ---------------------------------
 #
-# Let’s start out be defining a simple ``Module``. A ``Module`` is the
-# basic unit of composition in PyTorch. It contains:
+# 간단한 ``Module`` 을 정의하는 것부터 시작하겠습니다. ``Module`` 은 PyTorch의
+# 기본 구성 단위입니다. 이것은 다음을 포함합니다:
 #
-# 1. A constructor, which prepares the module for invocation
-# 2. A set of ``Parameters`` and sub-\ ``Modules``. These are initialized
-#    by the constructor and can be used by the module during invocation.
-# 3. A ``forward`` function. This is the code that is run when the module
-#    is invoked.
+# 1. 호출을 위해 모듈을 준비하는 생성자
+# 2. ``Parameters`` 집합과 하위 ``Module`` . 이것들은 생성자에 의해 초기화되며
+#    호출 중에 모듈에 의해 사용될 수 있습니다.
+# 3. ``forward`` 함수. 모듈이 호출될 때 실행되는 코드입니다.
 #
-# Let’s examine a small example:
+# 작은 예제로 시작해 보겟습니다:
 #
 
 class MyCell(torch.nn.Module):
@@ -66,22 +65,22 @@ print(my_cell(x, h))
 
 
 ######################################################################
-# So we’ve:
+# 우리는 다음 작업을 수행했습니다.:
 #
-# 1. Created a class that subclasses ``torch.nn.Module``.
-# 2. Defined a constructor. The constructor doesn’t do much, just calls
-#    the constructor for ``super``.
-# 3. Defined a ``forward`` function, which takes two inputs and returns
-#    two outputs. The actual contents of the ``forward`` function are not
-#    really important, but it’s sort of a fake `RNN
-#    cell <https://colah.github.io/posts/2015-08-Understanding-LSTMs/>`__–that
-#    is–it’s a function that is applied on a loop.
+# 1. 하위 클래스로 ``torch.nn.Module`` 을 갖는 클래스를 생성했습니다.
+# 2. 생성자를 정의했습니다. 생성자는 많은 작업을 수행하지 않고 ``super`` 로
+#    생성자를 호출합니다.
+# 3. 두 개의 입력을 받아 두 개의 출력을 반환하는 ``forward`` 함수를 정의했습니다.
+#    ``forward`` 함수의 실제 내용은 크게 중요하진 않지만, 가짜 `RNN
+#    cell <https://colah.github.io/posts/2015-08-Understanding-LSTMs/>`__ 의
+#    일종입니다. 즉, 반복(loop)에 적용되는 함수입니다.
 #
-# We instantiated the module, and made ``x`` and ``y``, which are just 3x4
-# matrices of random values. Then we invoked the cell with
-# ``my_cell(x, h)``. This in turn calls our ``forward`` function.
+# 모듈을 인스턴스화하고, 3x4 크기의 무작위 값들로 이루어진 행렬 ``x`` 와 ``y`` 를
+# 만들었습니다.
+# 그런 다음, ``my_cell(x, h)`` 를 이용해 cell을 호출했습니다. 이것은 ``forward``
+# 함수를 호출합니다.
 #
-# Let’s do something a little more interesting:
+# 좀 더 흥미로운 것을 해봅시다:
 #
 
 class MyCell(torch.nn.Module):
@@ -99,29 +98,27 @@ print(my_cell(x, h))
 
 
 ######################################################################
-# We’ve redefined our module ``MyCell``, but this time we’ve added a
-# ``self.linear`` attribute, and we invoke ``self.linear`` in the forward
-# function.
+# 모듈 ``MyCell`` 을 재정의했지만, 이번에는 ``self.linear`` 속성을 추가하고
+# forward 함수에서 ``self.linear`` 을 호출했습니다.
 #
-# What exactly is happening here? ``torch.nn.Linear`` is a ``Module`` from
-# the PyTorch standard library. Just like ``MyCell``, it can be invoked
-# using the call syntax. We are building a hierarchy of ``Module``\ s.
+# 여기서 무슨 일이 일어날까요? ``torch.nn.Linear`` 은 ``MyCell`` 과
+# 마찬가지로 PyTorch 표준 라이브러리의 ``Module`` 입니다. 이것은 호출 구문을
+# 사용하여 호출할 수 있습니다. 우리는 ``Module`` 의 계층을 구축하고 있습니다.
 #
-# ``print`` on a ``Module`` will give a visual representation of the
-# ``Module``\ ’s subclass hierarchy. In our example, we can see our
-# ``Linear`` subclass and its parameters.
+# ``Module`` 에서 ``print`` 하는 것은 ``Module`` 의 하위 클래스 계층에 대한
+# 시각적 표현을 제공할 것입니다. 이 예제에서는 ``Linear`` 의 하위 클래스와
+# 하위 클래스의 매개 변수를 볼 수 있습니다.
 #
-# By composing ``Module``\ s in this way, we can succintly and readably
-# author models with reusable components.
+# ``Module`` 을 이런 방식으로 작성하면, 재사용 가능한 구성 요소를 사용하여
+# 모델을 간결하고 읽기 쉽게 작성할 수 있습니다.
 #
-# You may have noticed ``grad_fn`` on the outputs. This is a detail of
-# PyTorch’s method of automatic differentiation, called
-# `autograd <https://pytorch.org/tutorials/beginner/blitz/autograd_tutorial.html>`__.
-# In short, this system allows us to compute derivatives through
-# potentially complex programs. The design allows for a massive amount of
-# flexibility in model authoring.
+# 여러분은 출력된 내용에서 ``grad_fn`` 을 확인하셨을 것입니다. 이것은
+# `오토그라드(autograd) <https://pytorch.org/tutorials/beginner/blitz/autograd_tutorial.html>`__
+# 라 불리는 PyTorch의 자동 미분 방법의 세부 정보입니다. 요컨데, 이 시스템은
+# 잠재적으로 복잡한 프로그램을 통해 미분을 계산할 수 있게 합니다. 이 디자인은
+# 모델 제작에 엄청난 유연성을 제공합니다.
 #
-# Now let’s examine said flexibility:
+# 이제 유연성을 시험해 보겠습니다.
 #
 
 class MyDecisionGate(torch.nn.Module):
@@ -147,35 +144,34 @@ print(my_cell(x, h))
 
 
 ######################################################################
-# We’ve once again redefined our MyCell class, but here we’ve defined
-# ``MyDecisionGate``. This module utilizes **control flow**. Control flow
-# consists of things like loops and ``if``-statements.
+# MyCell 클래스를 다시 정의했지만, 여기선 ``MyDecisionGate`` 를 정의했습니다.
+# 이 모듈은 **제어 흐름** 을 활용합니다. 제어 흐름은 루프와 ``if`` 명령문과
+# 같은 것으로 구성됩니다.
 #
-# Many frameworks take the approach of computing symbolic derivatives
-# given a full program representation. However, in PyTorch, we use a
-# gradient tape. We record operations as they occur, and replay them
-# backwards in computing derivatives. In this way, the framework does not
-# have to explicitly define derivatives for all constructs in the
-# language.
+# 많은 프레임워크들은 주어진 프로그램 코드로부터 기호식 미분(symbolic
+# derivatives)을 계산하는 접근법을 취하고 있습니다. 하지만, PyTorch에서는 변화도
+# 테이프(gradient tape)를 사용합니다. 연산이 발생할 때 이를 기록하고, 미분값을
+# 계산할 때 거꾸로 재생합니다. 이런 방식으로, 프레임워크는 언어의 모든 구문에
+# 대한 미분값을 명시적으로 정의할 필요가 없습니다.
 #
 # .. figure:: https://github.com/pytorch/pytorch/raw/master/docs/source/_static/img/dynamic_graph.gif
-#    :alt: How autograd works
+#    :alt: 오토그라드가 작동하는 방식
 #
-#    How autograd works
+#    오토그라드가 작동하는 방식
 #
 
 
 ######################################################################
-# Basics of TorchScript
+# TorchScript의 기초
 # ---------------------
 #
-# Now let’s take our running example and see how we can apply TorchScript.
+# 이제 실행 예제를 살펴보고 TorchScript를 적용하는 방법을 살펴보겠습니다.
 #
-# In short, TorchScript provides tools to capture the definition of your
-# model, even in light of the flexible and dynamic nature of PyTorch.
-# Let’s begin by examining what we call **tracing**.
+# 한마디로, TorchScript는 PyTorch의 유연하고 동적인 특성을 고려하여 모델 정의를
+# 캡쳐할 수 있는 도구를 제공합니다.
+# **추적(tracing)** 이라 부르는 것을 검사하는 것으로 시작하겠습니다.
 #
-# Tracing ``Modules``
+# ``Module`` 추적
 # ~~~~~~~~~~~~~~~~~~~
 #
 
@@ -196,51 +192,44 @@ traced_cell(x, h)
 
 
 ######################################################################
-# We’ve rewinded a bit and taken the second version of our ``MyCell``
-# class. As before, we’ve instantiated it, but this time, we’ve called
-# ``torch.jit.trace``, passed in the ``Module``, and passed in *example
-# inputs* the network might see.
+# 살짝 앞으로 돌아가 ``MyCell`` 의 두 번째 버전을 가져왔습니다. 이전에 이것을
+# 인스턴스화 했지만 이번엔 ``torch.jit.trace`` 를 호출하고, ``Module`` 을
+# 전달했으며, 네트워크가 볼 수 있는 *입력 예* 를 전달했습니다.
 #
-# What exactly has this done? It has invoked the ``Module``, recorded the
-# operations that occured when the ``Module`` was run, and created an
-# instance of ``torch.jit.ScriptModule`` (of which ``TracedModule`` is an
-# instance)
+# 여기서 무슨 일이 발생했습니까? ``Module`` 을 호출하였고, ``Module`` 이 돌아갈 때
+# 발생한 연산을 기록하였고, ``torch.jit.ScriptModule`` 의 인스터스를 생성했습니다.
+# ( ``TracedModule`` 은 인스턴스입니다)
 #
-# TorchScript records its definitions in an Intermediate Representation
-# (or IR), commonly referred to in Deep learning as a *graph*. We can
-# examine the graph with the ``.graph`` property:
+# TorchScript는 일반적으로 딥 러닝에서 *그래프* 라고 하는 중간 표현(또는 IR)에
+# 정의를 기록합니다. ``.graph`` 속성으로 그래프를 확인해볼 수 있습니다:
 #
 
 print(traced_cell.graph)
 
 
 ######################################################################
-# However, this is a very low-level representation and most of the
-# information contained in the graph is not useful for end users. Instead,
-# we can use the ``.code`` property to give a Python-syntax interpretation
-# of the code:
+# 그러나, 이것은 저수준의 표현이며 그래프에 포함된 대부분의 정보는
+# 최종 사용자에게 유용하지 않습니다. 대신, ``.code`` 속성을 사용하여 코드에
+# 대한 Python 구문 해석을 제공할 수 있습니다:
 #
 
 print(traced_cell.code)
 
 
 ######################################################################
-# So **why** did we do all this? There are several reasons:
+# **어째서** 이런 일들을 했을까요? 여기에는 몇 가지 이유가 있습니다:
 #
-# 1. TorchScript code can be invoked in its own interpreter, which is
-#    basically a restricted Python interpreter. This interpreter does not
-#    acquire the Global Interpreter Lock, and so many requests can be
-#    processed on the same instance simultaneously.
-# 2. This format allows us to save the whole model to disk and load it
-#    into another environment, such as in a server written in a language
-#    other than Python
-# 3. TorchScript gives us a representation in which we can do compiler
-#    optimizations on the code to provide more efficient execution
-# 4. TorchScript allows us to interface with many backend/device runtimes
-#    that require a broader view of the program than individual operators.
+# 1. TorchScript 코드는 기본적으로 제한된 Python 인터프리터인 자체 인터프리터에서
+#    호출될 수 있습니다. 이 인터프리터는 GIL(Global Interpreter Lock)을 얻지
+#    않으므로 동일한 인스턴스에서 동시에 많은 요청을 처리할 수 있습니다.
+# 2. 이 형식을 사용하면 전체 모델을 디스크에 저장하고 Python 이외의 언어로 작성된
+#    서버와 같은 다른 환경에서 불러올 수 있습니다.
+# 3. TorchScript는 보다 효율적인 실행을 제공하기 위해 코드에서 컴파일러 최적화를
+#    수행할 수 있는 표현을 제공합니다.
+# 4. TorchScript를 사용하면 개별 연산자보다 프로그램의 더 넓은 관점을 요구하는 많은
+#    백엔드/장치 런타임과 상호작용(interface)할 수 있습니다.
 #
-# We can see that invoking ``traced_cell`` produces the same results as
-# the Python module:
+# ``traced_cell`` 을 호출하면 Python 모듈과 동일한 결과가 생성됩니다:
 #
 
 print(my_cell(x, h))
@@ -248,11 +237,11 @@ print(traced_cell(x, h))
 
 
 ######################################################################
-# Using Scripting to Convert Modules
+# 스크립팅을 사용하여 모듈 변환
 # ----------------------------------
 #
-# There’s a reason we used version two of our module, and not the one with
-# the control-flow-laden submodule. Let’s examine that now:
+# 제어 흐름이 포함된(control-flow-laden) 하위 모듈이 아닌 모듈 버전 2를 사용하는
+# 이유가 있습니다. 지금 살펴봅시다:
 #
 
 class MyDecisionGate(torch.nn.Module):
@@ -278,16 +267,14 @@ print(traced_cell.code)
 
 
 ######################################################################
-# Looking at the ``.code`` output, we can see that the ``if-else`` branch
-# is nowhere to be found! Why? Tracing does exactly what we said it would:
-# run the code, record the operations *that happen* and construct a
-# ScriptModule that does exactly that. Unfortunately, things like control
-# flow are erased.
+# ``.code`` 출력을 보면, ``if-else`` 분기가 어디에도 없다는 것을 알 수 있습니다!
+# 어째서일까요? 추적은 코드를 실행하고 *발생하는* 작업을 기록하며 정확하게 수행하는
+# 스크립트 모듈(ScriptModule)을 구성하는 일을 수행합니다. 불행하게도, 제어 흐름과
+# 같은 것들은 지워집니다.
 #
-# How can we faithfully represent this module in TorchScript? We provide a
-# **script compiler**, which does direct analysis of your Python source
-# code to transform it into TorchScript. Let’s convert ``MyDecisionGate``
-# using the script compiler:
+# TorchScript에서 이 모듈을 어떻게 충실하게 나타낼 수 있을까요? Python 소스 코드를
+# 직접 분석하여 TorchScript로 변환하는 **스크립트 컴파일러(script compiler)** 를
+# 제공합니다. ``MyDecisionGate`` 를 스크립트 컴파일러를 사용하여 변환해 봅시다:
 #
 
 scripted_gate = torch.jit.script(MyDecisionGate())
@@ -298,27 +285,26 @@ print(traced_cell.code)
 
 
 ######################################################################
-# Hooray! We’ve now faithfully captured the behavior of our program in
-# TorchScript. Let’s now try running the program:
+# 만세! 이제 TorchScript에서 프로그램의 동작을 충실하게 캡쳐했습니다. 이제
+# 프로그램을 실행해 봅시다:
 #
 
-# New inputs
+# 새로운 입력
 x, h = torch.rand(3, 4), torch.rand(3, 4)
 traced_cell(x, h)
 
 
 ######################################################################
-# Mixing Scripting and Tracing
+# 스크립팅과 추적 혼합
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-# Some situations call for using tracing rather than scripting (e.g. a
-# module has many architectural decisions that are made based on constant
-# Python values that we would like to not appear in TorchScript). In this
-# case, scripting can be composed with tracing: ``torch.jit.script`` will
-# inline the code for a traced module, and tracing will inline the code
-# for a scripted module.
+# 어떤 상황에서는 스크립팅보다는 추적을 사용해야 합니다. (예: 모듈에는 TorchScript에
+# 표시하지 않으려는 Python 상수 값을 기반으로 만들어진 많은 구조적인
+# 결정(architectural decisions)이 있습니다.) 이 경우, 스크립팅은 추적으로
+# 구성될 수 있습니다: ``torch.jit.script`` 는 추적된 모듈의 코드를 인라인(inline)
+# 할 것이고, 추적은 스크립트 된 모듈의 코드를 인라인 할 것입니다.
 #
-# An example of the first case:
+# 첫 번째 경우의 예:
 #
 
 class MyRNNLoop(torch.nn.Module):
@@ -338,7 +324,7 @@ print(rnn_loop.code)
 
 
 ######################################################################
-# And an example of the second case:
+# 두 번째 경우의 예:
 #
 
 class WrapRNN(torch.nn.Module):
@@ -355,17 +341,16 @@ print(traced.code)
 
 
 ######################################################################
-# This way, scripting and tracing can be used when the situation calls for
-# each of them and used together.
+# 이러한 방식으로, 스크립팅과 추적은 상황에 따라서 따로 사용되거나, 함께
+# 사용될 수 있습니다.
 #
-# Saving and Loading models
+# 모델 저장 및 불러오기
 # -------------------------
 #
-# We provide APIs to save and load TorchScript modules to/from disk in an
-# archive format. This format includes code, parameters, attributes, and
-# debug information, meaning that the archive is a freestanding
-# representation of the model that can be loaded in an entirely separate
-# process. Let’s save and load our wrapped RNN module:
+# TorchScript 모듈을 아카이브 형식으로 디스크에 저장하고 불러오는 API를 제공합니다.
+# 이 형식은 코드, 매개 변수, 속성과 디버그 정보를 포함합니다. 이것은 그 아카이브가
+# 완전히 별개의 프로세스로 로드할 수 있는 모델의 독립 표현임을 의미합니다.
+# 랩핑 된 RNN 모듈을 저장하고 로드해 봅시다:
 #
 
 traced.save('wrapped_rnn.zip')
@@ -377,17 +362,14 @@ print(loaded.code)
 
 
 ######################################################################
-# As you can see, serialization preserves the module hierarchy and the
-# code we’ve been examining throughout. The model can also be loaded, for
-# example, `into
-# C++ <https://pytorch.org/tutorials/advanced/cpp_export.html>`__ for
-# python-free execution.
+# 보시다시피, 직렬화는 모듈 계층과 검사한 코드를 유지합니다. 또한 모델을 로드할
+# 수 있습니다. 예를 들어, Python 없이 실행하기 위해 모델을
+# `C++ <https://pytorch.org/tutorials/advanced/cpp_export.html>`__ 로 로드할
+# 수 있습니다.
 #
-# Further Reading
+# 더 읽을거리
 # ~~~~~~~~~~~~~~~
-#
-# We’ve completed our tutorial! For a more involved demonstration, check
-# out the NeurIPS demo for converting machine translation models using
-# TorchScript:
+# 튜토리얼을 완료했습니다! 관련 데모를 보려면 TorchScript를 사용하여 기계 번역
+# 모델을 변환하기 위한 NeurIPS 데모를 확인하십시오:
 # https://colab.research.google.com/drive/1HiICg6jRkBnr5hvK2-VnMi88Vi9pUzEJ
 #
