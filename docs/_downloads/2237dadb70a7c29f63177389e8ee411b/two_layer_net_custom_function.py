@@ -72,7 +72,8 @@ for t in range(500):
 
     # 손실을 계산하고 출력합니다.
     loss = (y_pred - y).pow(2).sum()
-    print(t, loss.item())
+    if t % 100 == 99:
+        print(t, loss.item())
 
     # autograde를 사용하여 역전파 단계를 계산합니다.
     loss.backward()

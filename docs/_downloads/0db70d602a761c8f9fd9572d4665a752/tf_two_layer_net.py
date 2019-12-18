@@ -65,11 +65,12 @@ with tf.Session() as sess:
     # 입력 데이터 x와 정답 데이터 y를 저장하기 위한 NumPy 배열을 생성합니다.
     x_value = np.random.randn(N, D_in)
     y_value = np.random.randn(N, D_out)
-    for _ in range(500):
+    for t in range(500):
         # 그래프를 여러 번 실행합니다. 매번 그래프가 실행할 때마다 feed_dict
         # 인자에 x_value를 x에, y_value를 y에 할당(bind)하도록 명시합니다.
         # 또한, 그래프를 실행할 때마다 손실과 new_w1, new_w2 값을
         # 계산하려고 합니다; 이러한 Tensor들의 값은 NumPy 배열로 반환됩니다.
         loss_value, _, _ = sess.run([loss, new_w1, new_w2],
                                     feed_dict={x: x_value, y: y_value})
-        print(loss_value)
+        if t % 100 == 99:
+            print(t, loss_value)

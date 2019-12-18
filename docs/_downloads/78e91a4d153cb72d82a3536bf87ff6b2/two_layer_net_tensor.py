@@ -47,7 +47,8 @@ for t in range(500):
 
     # 손실(loss)을 계산하고 출력합니다.
     loss = (y_pred - y).pow(2).sum().item()
-    print(t, loss)
+    if t % 100 == 99:
+        print(t, loss)
 
     # 손실에 따른 w1, w2의 변화도를 계산하고 역전파합니다.
     grad_y_pred = 2.0 * (y_pred - y)

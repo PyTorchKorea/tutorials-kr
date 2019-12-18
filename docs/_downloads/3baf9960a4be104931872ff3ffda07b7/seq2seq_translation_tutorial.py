@@ -1,11 +1,16 @@
 # -*- coding: utf-8 -*-
 """
-Sequence to Sequence 네트워크와 Attention을 이용한 번역
-*************************************************************
+기초부터 시작하는 NLP: Sequence to Sequence 네트워크와 Attention을 이용한 번역
+********************************************************************************
 **Author**: `Sean Robertson <https://github.com/spro/practical-pytorch>`_
   **번역**: `황성수 <https://github.com/adonisues>`_
 
-이 프로젝트에서 신경망이 불어를 영어로 번역하도록 가르칠 예정입니다.
+이 튜토리얼은 "기초부터 시작하는 NLP"의 세번째이자 마지막 편으로, NLP 모델링 작업을
+위한 데이터 전처리에 사용할 자체 클래스와 함수들을 작성해보겠습니다.
+이 튜토리얼을 마친 뒤에는 `torchtext` 가 어떻게 지금까지의 튜토리얼들에서의
+전처리 과정을 다루는지를 이후 튜토리얼들에서 배울 수 있습니다.
+
+이 프로젝트에서는 신경망이 불어를 영어로 번역하도록 가르칠 예정입니다.
 
 ::
 
@@ -30,7 +35,7 @@ Sequence to Sequence 네트워크와 Attention을 이용한 번역
 ... 성공율은 변할 수 있습니다.
 
 하나의 시퀀스를 다른 시퀀스로 바꾸는 두개의 RNN이 함께 동작하는
-`sequence to sequence network <http://arxiv.org/abs/1409.3215>`__ 의 간단하지만 강력한 아이디어가
+`sequence to sequence network <https://arxiv.org/abs/1409.3215>`__ 의 간단하지만 강력한 아이디어가
 이것(번역)을 가능하게 합니다. 인코더 네트워크는 입력 시퀀스를 벡터로 압축하고,
 디코더 네트워크는 해당 벡터를 새로운 시퀀스로 펼칩니다.
 
@@ -38,14 +43,14 @@ Sequence to Sequence 네트워크와 Attention을 이용한 번역
    :alt:
 
 이 모델을 개선하기 위해 `Attention Mechanism <https://arxiv.org/abs/1409.0473>`__ 을
-사용하면 디코더가 입력 시퀀스의 특정 범위에 초점을 맞출 수 있도록 합니다.
+사용하면 디코더가 입력 시퀀스의 특정 범위에 집중할 수 있도록 합니다.
 
 **추천 자료:**
 
-최소한 Pytorch 를 설치했고, Python을 알고, Tensor 를 이해한다고 가정합니다:
+최소한 Pytorch를 설치했고, Python을 알고, Tensor를 이해한다고 가정합니다.:
 
--  http://pytorch.org/ 설치 안내
--  :doc:`/beginner/deep_learning_60min_blitz` 전반적인 PyTorch 시작을 위한 자료
+-  http://pytorch.org/ 설치 안내를 위한 자료
+-  :doc:`/beginner/deep_learning_60min_blitz` 일반적인 PyTorch 시작을 위한 자료
 -  :doc:`/beginner/pytorch_with_examples` 넓고 깊은 통찰을 위한 자료
 -  :doc:`/beginner/former_torchies_tutorial` 이전 Lua Torch 사용자를 위한 자료
 
@@ -53,27 +58,27 @@ Sequence to Sequence 네트워크와 Attention을 이용한 번역
 Sequence to Sequence 네트워크와 동작 방법에 관해서 아는 것은 유용합니다:
 
 -  `Learning Phrase Representations using RNN Encoder-Decoder for
-   Statistical Machine Translation <http://arxiv.org/abs/1406.1078>`__
+   Statistical Machine Translation <https://arxiv.org/abs/1406.1078>`__
 -  `Sequence to Sequence Learning with Neural
-   Networks <http://arxiv.org/abs/1409.3215>`__
+   Networks <https://arxiv.org/abs/1409.3215>`__
 -  `Neural Machine Translation by Jointly Learning to Align and
    Translate <https://arxiv.org/abs/1409.0473>`__
--  `A Neural Conversational Model <http://arxiv.org/abs/1506.05869>`__
+-  `A Neural Conversational Model <https://arxiv.org/abs/1506.05869>`__
 
 이전 튜토리얼에 있는
 :doc:`/intermediate/char_rnn_classification_tutorial`
 와 :doc:`/intermediate/char_rnn_generation_tutorial` 는
-각각 인코더와 디코더 모델과 비슷한 컨센을 가지기 때문에 도움이 됩니다.
+각각 인코더, 디코더 모델과 비슷한 컨센을 가지기 때문에 도움이 됩니다.
 
 추가로 이 토픽들을 다루는 논문을 읽어 보십시오:
 
 -  `Learning Phrase Representations using RNN Encoder-Decoder for
-   Statistical Machine Translation <http://arxiv.org/abs/1406.1078>`__
+   Statistical Machine Translation <https://arxiv.org/abs/1406.1078>`__
 -  `Sequence to Sequence Learning with Neural
-   Networks <http://arxiv.org/abs/1409.3215>`__
+   Networks <https://arxiv.org/abs/1409.3215>`__
 -  `Neural Machine Translation by Jointly Learning to Align and
    Translate <https://arxiv.org/abs/1409.0473>`__
--  `A Neural Conversational Model <http://arxiv.org/abs/1506.05869>`__
+-  `A Neural Conversational Model <https://arxiv.org/abs/1506.05869>`__
 
 
 **요구 사항**
@@ -98,11 +103,11 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 #
 # 이 프로젝트의 데이터는 수천 개의 영어-프랑스어 번역 쌍입니다.
 #
-# `Open Data Stack Exchange <http://opendata.stackexchange.com/questions/3888/dataset-of-sentences-translated-into-many-languages>`__ 
-# 에 관한 이 문의는 http://tatoeba.org/eng/downloads 에서 다운 로드가 가능한
-# 공개 번역 사이트 http://tatoeba.org/ 를 알려 주었습니다. 더 나은 방법으로
+# `Open Data Stack Exchange <https://opendata.stackexchange.com/questions/3888/dataset-of-sentences-translated-into-many-languages>`__ 
+# 에 관한 이 질문은 https://tatoeba.org/eng/downloads 에서 다운 로드가 가능한
+# 공개 번역 사이트 https://tatoeba.org/ 를 알려 주었습니다. 더 나은 방법으로
 # 언어 쌍을 개별 텍스트 파일로 분할하는 추가 작업을 수행한
-# http://www.manythings.org/anki/ 가 있습니다:
+# https://www.manythings.org/anki/ 가 있습니다:
 #
 # 영어-프랑스어 쌍이 너무 커서 저장소에 포함 할 수 없기 때문에
 # 계속하기 전에 ``data/eng-fra.txt`` 로 다운로드하십시오.
@@ -118,10 +123,10 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 ######################################################################
 # 문자 단위 RNN 튜토리얼에서 사용된 문자 인코딩과 유사하게, 언어의 각
-# 단어들은 One-Hot 벡터 또는 그 단어의 주소에만 단 하나의 1을 제외하고
+# 단어들을 One-Hot 벡터 또는 그 단어의 주소에만 단 하나의 1을 제외하고
 # 모두 0인 큰 벡터로 표현합니다. 한 가지 언어에 있는 수십 개의 문자와
 # 달리 번역에는 아주 많은 단어들이 있기 때문에 인코딩 벡터는 매우 더 큽니다.
-# 그러나 우리는 약간의 속임수를 써서 언어 당 수천 단어 만
+# 그러나 우리는 약간의 트릭를 써서 언어 당 수천 단어 만
 # 사용하도록 데이터를 다듬을 것입니다.
 #
 # .. figure:: /_static/img/seq-seq-images/word-encoding.png
@@ -148,7 +153,7 @@ class Lang:
         self.word2index = {}
         self.word2count = {}
         self.index2word = {0: "SOS", 1: "EOS"}
-        self.n_words = 2  #  SOS 와 EOS 단어 숫자 포함
+        self.n_words = 2  # SOS 와 EOS 포함
 
     def addSentence(self, sentence):
         for word in sentence.split(' '):
@@ -171,7 +176,7 @@ class Lang:
 #
 
 # 유니 코드 문자열을 일반 ASCII로 변환하십시오.
-# http://stackoverflow.com/a/518232/2809427 에 감사드립니다.
+# https://stackoverflow.com/a/518232/2809427
 def unicodeToAscii(s):
     return ''.join(
         c for c in unicodedata.normalize('NFD', s)
@@ -189,9 +194,10 @@ def normalizeString(s):
 
 
 ######################################################################
-# 데이터 파일을 읽으려면 파일을 줄로 나눈 다음 줄을 쌍으로 나눕니다.
-# 파일은 모두 영어 → 기타 언어이므로 만약 다른 언어 → 영어로
-# 번역한다면 쌍을 뒤집을 수 있도록 ``reverse`` 플래그를 추가했습니다.
+# To read the data file we will split the file into lines, and then split
+# lines into pairs. The files are all English → Other Language, so if we
+# want to translate from Other Language → English I added the ``reverse``
+# flag to reverse the pairs.
 #
 
 def readLangs(lang1, lang2, reverse=False):
@@ -229,7 +235,7 @@ MAX_LENGTH = 10
 eng_prefixes = (
     "i am ", "i m ",
     "he is", "he s ",
-    "she is", "she s",
+    "she is", "she s ",
     "you are", "you re ",
     "we are", "we re ",
     "they are", "they re "
@@ -251,7 +257,7 @@ def filterPairs(pairs):
 #
 # -  텍스트 파일을 읽고 줄로 분리하고, 줄을 쌍으로 분리합니다.
 # -  텍스트를 정규화 하고 길이와 내용으로 필터링 합니다.
-# -  쌍의 문장들에서 단어 리스트를 생성합니다.
+# -  쌍을 이룬 문장들로 단어 리스트를 생성합니다.
 #
 
 def prepareData(lang1, lang2, reverse=False):
@@ -277,10 +283,10 @@ print(random.choice(pairs))
 # Seq2Seq 모델
 # =================
 #
-# Recurrent Neural Network(RNN)는 시퀀스에서 작동하고 후속 단계의
+# Recurrent Neural Network(RNN)는 시퀀스에서 작동하고 다음 단계의
 # 입력으로 자신의 출력을 사용하는 네트워크입니다.
 #
-# `Sequence to Sequence network <http://arxiv.org/abs/1409.3215>`__, 또는
+# `Sequence to Sequence network <https://arxiv.org/abs/1409.3215>`__, 또는
 # Seq2Seq 네트워크, 또는 `Encoder Decoder
 # network <https://arxiv.org/pdf/1406.1078v3.pdf>`__ 는 인코더 및
 # 디코더라고 하는 두 개의 RNN으로 구성된 모델입니다.
@@ -298,7 +304,7 @@ print(random.choice(pairs))
 # 를 살펴 봅시다. 입력 문장의 단어 대부분은 출력 문장에서
 # 직역("chat noir" 와 "black cat")되지만 약간 다른 순서도 있습니다. 
 # "ne/pas" 구조로 인해 입력 문장에 단어가 하나 더 있습니다.
-# 입력 단어의 시퀀스에서 직접적으로는 정확한 번역을 만드는
+# 입력 단어의 시퀀스를 직역해서 정확한 번역을 만드는
 # 것은 어려울 것입니다.
 #
 # Seq2Seq 모델을 사용하면 인코더는 하나의 벡터를 생성합니다.
@@ -313,7 +319,7 @@ print(random.choice(pairs))
 #
 # Seq2Seq 네트워크의 인코더는 입력 문장의 모든 단어에 대해 어떤 값을
 # 출력하는 RNN입니다. 모든 입력 단어에 대해 인코더는 벡터와
-# 은닉 상태를 출력하고 다음 입력 단어에 그 은닉 상태를 사용합니다.
+# 은닉 상태를 출력하고 다음 입력 단어를 위해 그 은닉 상태를 사용합니다.
 #
 # .. figure:: /_static/img/seq-seq-images/encoder-network.png
 #    :alt:
@@ -341,7 +347,7 @@ class EncoderRNN(nn.Module):
 # 디코더
 # -----------
 #
-# 디코더는 인코더 출력 벡터를 받아서 번역을 생성하는 단어 시퀀스를
+# 디코더는 인코더 출력 벡터를 받아서 번역을 생성하기 위한 단어 시퀀스를
 # 출력합니다.
 #
 
@@ -350,7 +356,7 @@ class EncoderRNN(nn.Module):
 # 간단한 디코더
 # ^^^^^^^^^^^^^^
 #
-# 가장 간단한 Seq2Seq 디코더에서 인코더의 마지막 출력만을 이용합니다.
+# 가장 간단한 Seq2Seq 디코더는 인코더의 마지막 출력만을 이용합니다.
 # 이 마지막 출력은 전체 시퀀스에서 문맥을 인코드하기 때문에
 # *문맥 벡터(context vector)* 로 불립니다. 이 문맥 벡터는 디코더의 초기 은닉 상태로
 # 사용 됩니다.
@@ -387,18 +393,19 @@ class DecoderRNN(nn.Module):
 ######################################################################
 # 이 모델의 결과를 학습하고 관찰하는 것을 권장하지만,
 # 공간을 절약하기 위해 최종 목적지로 바로 이동해서
-# 어텐션(attention) 메카니즘을 소개 할 것입니다.
+# Attention 메카니즘을 소개 할 것입니다.
 #
 
 
 ######################################################################
-# 어텐션 디코더
+# Attention 디코더
 # ^^^^^^^^^^^^^^^^^
 #
 # 문맥 벡터만 인코더와 디코더 사이로 전달 된다면, 단일 벡터가 전체 문장을
 # 인코딩 해야하는 부담을 가지게 됩니다.
-# 어텐션은 디코더 네트워크가 자기 출력의 모든 단계에서 인코더 출력의
-# 다른 부분에 "집중" 할 수 있게 합니다. 첫째 *어텐션 웨이트* 의 세트를
+#
+# Attention은 디코더 네트워크가 자기 출력의 모든 단계에서 인코더 출력의
+# 다른 부분에 "집중" 할 수 있게 합니다. 첫째 *Attension 가중치* 의 세트를
 # 계산합니다. 이것은 가중치 조합을 만들기 위해서 인코더 출력 벡터와
 # 곱해집니다. 그 결과(코드에서 ``attn_applied``)는 입력 시퀀스의
 # 특정 부분에 관한 정보를 포함해야하고 따라서 디코더가 알맞은 출력
@@ -408,10 +415,10 @@ class DecoderRNN(nn.Module):
 #    :alt:
 #
 # 어텐션 가중치 계산은 디코더의 입력 및 은닉 상태를 입력으로
-# 사용하는 다른 feed-forwad layer 인 ``attn`` 으로 수행됩니다.
+# 사용하는 다른 feed-forwad 계층인 ``attn`` 으로 수행됩니다.
 # 학습 데이터에는 모든 크기의 문장이 있기 때문에 이 계층을 실제로
 # 만들고 학습시키려면 적용 할 수 있는 최대 문장 길이 (인코더 출력을 위한 입력 길이)를
-# 선택해야 합니다. 최대 길이의 문장은 모든 어텐션 가중치를 사용하지만
+# 선택해야 합니다. 최대 길이의 문장은 모든 Attention 가중치를 사용하지만
 # 더 짧은 문장은 처음 몇 개만 사용합니다.
 #
 # .. figure:: /_static/img/seq-seq-images/attention-decoder-network.png
@@ -457,10 +464,10 @@ class AttnDecoderRNN(nn.Module):
 
 
 ######################################################################
-# .. note:: 상대 위치 접근을 이용한 길이 제한을 하는 다른 형태의 어텐션
-#   이 있습니다. "local attention"에 관한 자료
-#   `Effective Approaches to Attention-based Neural Machine Translation <https://arxiv.org/abs/1508.04025>`__
-#   를 읽으십시오
+# .. note:: There are other forms of attention that work around the length
+#   limitation by using a relative position approach. Read about "local
+#   attention" in `Effective Approaches to Attention-based Neural Machine
+#   Translation <https://arxiv.org/abs/1508.04025>`__.
 #
 # 학습
 # ========
@@ -500,8 +507,8 @@ def tensorsFromPair(pair):
 # "Teacher forcing"은 다음 입력으로 디코더의 예측을 사용하는 대신
 # 실제 목표 출력을 다음 입력으로 사용하는 컨셉입니다.
 # "Teacher forcing"을 사용하면 수렴이 빨리되지만 `학습된 네트워크가
-# 잘못 사용될 때 불안정성을 보입니다
-# <http://minds.jacobs-university.de/sites/default/files/uploads/papers/ESNTutorialRev.pdf>`__
+# 잘못 사용될 때 불안정성을 보입니다.
+# <http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.378.4095&rep=rep1&type=pdf>`__.
 #
 # Teacher-forced 네트워크의 출력이 일관된 문법으로 읽지만 정확한
 # 번역과는 거리가 멀다는 것을 볼 수 있습니다. 직관적으로 출력 문법을
@@ -606,8 +613,8 @@ def timeSince(since, percent):
 def trainIters(encoder, decoder, n_iters, print_every=1000, plot_every=100, learning_rate=0.01):
     start = time.time()
     plot_losses = []
-    print_loss_total = 0  # 매 print_every 마다 초기화
-    plot_loss_total = 0  # 매 plot_every 마다 초기화
+    print_loss_total = 0  # print_every 마다 초기화
+    plot_loss_total = 0  # plot_every 마다 초기화
 
     encoder_optimizer = optim.SGD(encoder.parameters(), lr=learning_rate)
     decoder_optimizer = optim.SGD(decoder.parameters(), lr=learning_rate)
@@ -670,7 +677,7 @@ def showPlot(points):
 # 예측을 되돌려 전달합니다.
 # 단어를 예측할 때마다 그 단어를 출력 문자열에 추가합니다.
 # 만약 EOS 토큰을 예측하면 거기에서 멈춥니다.
-# 나중에 도식화를 위해서 디코더의 어텐션 출력을 저장합니다.
+# 나중에 도식화를 위해서 디코더의 Attension 출력을 저장합니다.
 #
 
 def evaluate(encoder, decoder, sentence, max_length=MAX_LENGTH):
@@ -757,14 +764,14 @@ evaluateRandomly(encoder1, attn_decoder1)
 
 
 ######################################################################
-# 어텐션 시각화
+# Attention 시각화
 # ---------------------
 #
-# 어텐션 메커니즘의 유용한 속성은 하나는 해석 가능성이 높은 출력입니다.
+# Attention 메커니즘의 유용한 속성은 하나는 해석 가능성이 높은 출력입니다.
 # 입력 시퀀스의 특정 인코더 출력에 가중치를 부여하는 데 사용되므로
 # 각 시간 단계에서 네트워크가 가장 집중되는 위치를 파악할 수 있습니다.
 #
-# 어텐션 출력을 행렬로 표시하기 위해 ``plt.matshow(attentions)`` 를
+# Attention 출력을 행렬로 표시하기 위해 ``plt.matshow(attentions)`` 를
 # 간단하게 실행할 수 있습니다. 열은 입력 단계와 행이 출력 단계입니다:
 #
 

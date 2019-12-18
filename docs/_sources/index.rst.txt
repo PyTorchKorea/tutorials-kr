@@ -45,32 +45,9 @@ Some considerations:
    :description: :doc:`/beginner/data_loading_tutorial`
 
 .. customgalleryitem::
-   :tooltip: This tutorial introduces the fundamental concepts of PyTorch through self-contained examples
-   :figure: /_static/img/thumbnails/examples.png
-   :description: :doc:`/beginner/pytorch_with_examples`
-
-.. customgalleryitem::
-   :figure: /_static/img/thumbnails/sphx_glr_transfer_learning_tutorial_001.png
-   :tooltip: In transfer learning, a model created from one task is used in another
-   :description: :doc:`beginner/transfer_learning_tutorial`
-
-.. customgalleryitem::
-   :figure: /_static/img/thumbnails/floppy.png
-   :tooltip: Explore use cases for the saving and loading of PyTorch models
-   :description: :doc:`beginner/saving_loading_models`
-
-.. .. galleryitem:: beginner/saving_loading_models.py
-
-.. customgalleryitem::
    :figure: /_static/img/thumbnails/pytorch_tensorboard.png
    :tooltip: Learn to use TensorBoard to visualize data and model training
    :description: :doc:`intermediate/tensorboard_tutorial`
-
-.. customgalleryitem::
-   :figure: /_static/img/torch.nn.png
-   :tooltip: Use torch.nn to create and train a neural network
-   :description: :doc:`beginner/nn_tutorial`
-
 
 .. raw:: html
 
@@ -86,9 +63,9 @@ Some considerations:
    :description: :doc:`intermediate/torchvision_tutorial`
 
 .. customgalleryitem::
-   :figure: /_static/img/thumbnails/eye.png
-   :tooltip: Finetune and feature extract the torchvision models
-   :description: :doc:`beginner/finetuning_torchvision_models_tutorial`
+   :figure: /_static/img/thumbnails/sphx_glr_transfer_learning_tutorial_001.png
+   :tooltip: In transfer learning, a model created from one task is used in another
+   :description: :doc:`beginner/transfer_learning_tutorial`
 
 .. customgalleryitem::
    :figure: /_static/img/stn/Five.gif
@@ -106,14 +83,25 @@ Some considerations:
    :description: :doc:`beginner/fgsm_tutorial`
 
 .. customgalleryitem::
-   :figure: /_static/img/cat.jpg
-   :tooltip: Exporting a Model from PyTorch to ONNX and Running it using ONNXRuntime
-   :description: :doc:`advanced/super_resolution_with_onnxruntime`
+   :tooltip: Train a generative adversarial network (GAN) to generate new celebrities
+   :figure: /_static/img/dcgan_generator.png
+   :description: :doc:`beginner/dcgan_faces_tutorial`
 
 .. raw:: html
 
     <div style='clear:both'></div>
 
+Named Tensor (experimental)
+----------------------
+
+.. customgalleryitem::
+   :figure: /_static/img/named_tensor.png
+   :tooltip: Named Tensor
+   :description: :doc:`intermediate/named_tensor_tutorial`
+
+.. raw:: html
+
+    <div style='clear:both'></div>
 
 오디오 (Audio)
 ----------------------
@@ -132,24 +120,14 @@ Some considerations:
 ----------------------
 
 .. customgalleryitem::
-   :figure: /_static/img/chat.png
-   :tooltip: Train a simple chatbot using movie scripts
-   :description: :doc:`beginner/chatbot_tutorial`
-
-.. customgalleryitem::
-   :figure: /_static/img/char_rnn_generation.png
-   :tooltip: Generate names from languages
-   :description: :doc:`intermediate/char_rnn_generation_tutorial`
-
-.. customgalleryitem::
    :figure: /_static/img/rnnclass.png
    :tooltip: Build and train a basic character-level RNN to classify words
    :description: :doc:`intermediate/char_rnn_classification_tutorial`
 
 .. customgalleryitem::
-    :tooltip: Explore the key concepts of deep learning programming using Pytorch
-    :figure: /_static/img/thumbnails/babel.jpg
-    :description: :doc:`/beginner/deep_learning_nlp_tutorial`
+   :figure: /_static/img/char_rnn_generation.png
+   :tooltip: Generate names from languages
+   :description: :doc:`intermediate/char_rnn_generation_tutorial`
 
 .. galleryitem:: intermediate/seq2seq_translation_tutorial.py
   :figure: _static/img/seq2seq_flat.png
@@ -159,17 +137,15 @@ Some considerations:
     :figure: /_static/img/text_sentiment_ngrams_model.png
     :description: :doc:`/beginner/text_sentiment_ngrams_tutorial`
 
-.. raw:: html
-
-    <div style='clear:both'></div>
-
-생성 모델 (Generative)
-----------------------
+.. customgalleryitem::
+    :tooltip: Language Translation with Torchtext
+    :figure: /_static/img/thumbnails/german_to_english_translation.png
+    :description: :doc:`/beginner/torchtext_translation_tutorial`
 
 .. customgalleryitem::
-    :tooltip: Train a generative adversarial network (GAN) to generate new celebrities
-    :figure: /_static/img/dcgan_generator.png
-    :description: :doc:`beginner/dcgan_faces_tutorial`
+    :tooltip: Transformer Tutorial
+    :figure: /_static/img/transformer_architecture.jpg
+    :description: :doc:`/beginner/transformer_tutorial`
 
 .. raw:: html
 
@@ -188,8 +164,67 @@ Some considerations:
 
     <div style='clear:both'></div>
 
-PyTorch 확장하기 (Extending PyTorch)
+PyTorch 모델을 운영환경(Production)에 배포하기
 ------------------------------------------------------------
+
+.. customgalleryitem::
+   :tooltip: Deploying PyTorch and Building a REST API using Flask
+   :description: :doc:`/intermediate/flask_rest_api_tutorial`
+   :figure: _static/img/flask.png
+
+.. customgalleryitem::
+   :tooltip: Introduction to TorchScript
+   :description: :doc:`beginner/Intro_to_TorchScript_tutorial`
+   :figure: _static/img/torchscript.png
+
+.. customgalleryitem::
+   :tooltip: Loading a PyTorch model in C++
+   :description: :doc:`advanced/cpp_export`
+   :figure: _static/img/torchscript_to_cpp.png
+
+.. customgalleryitem::
+   :figure: /_static/img/cat.jpg
+   :tooltip: Exporting a Model from PyTorch to ONNX and Running it using ONNXRuntime
+   :description: :doc:`advanced/super_resolution_with_onnxruntime`
+
+.. raw:: html
+
+    <div style='clear:both'></div>
+
+병렬 & 분산 학습 (Parallel and Distributed Training)
+------------------------------------------------------------
+
+.. customgalleryitem::
+  :tooltip: Model parallel training on multiple GPUs
+  :description: :doc:`/intermediate/model_parallel_tutorial`
+  :figure: _static/img/distributed/DistPyTorch.jpg
+
+.. customgalleryitem::
+  :tooltip: Getting started with DistributedDataParallel
+  :description: :doc:`/intermediate/ddp_tutorial`
+  :figure: _static/img/distributed/DistPyTorch.jpg
+
+.. customgalleryitem::
+   :tooltip: Parallelize computations across processes and clusters of machines
+   :description: :doc:`/intermediate/dist_tuto`
+   :figure: _static/img/distributed/DistPyTorch.jpg
+
+.. customgalleryitem::
+   :tooltip: PyTorch distributed trainer with Amazon AWS
+   :description: :doc:`/beginner/aws_distributed_training_tutorial`
+   :figure: _static/img/distributed/DistPyTorch.jpg
+
+.. raw:: html
+
+    <div style='clear:both'></div>
+
+PyTorch 확장하기
+------------------------------------------------------------
+
+.. customgalleryitem::
+   :tooltip: Implement custom operators in C++ or CUDA for TorchScript
+   :description: :doc:`/advanced/torch_script_custom_ops`
+   :figure: _static/img/cpp_logo.png
 
 .. customgalleryitem::
     :tooltip: Create extensions using numpy and scipy
@@ -201,55 +236,22 @@ PyTorch 확장하기 (Extending PyTorch)
    :description: :doc:`/advanced/cpp_extension`
    :figure: _static/img/cpp_logo.png
 
-.. customgalleryitem::
-   :tooltip: Implement custom operators in C++ or CUDA for TorchScript
-   :description: :doc:`/advanced/torch_script_custom_ops`
-   :figure: _static/img/cpp_logo.png
-
-
 .. raw:: html
 
     <div style='clear:both'></div>
 
-
-운영환경에서 사용 (Production Usage)
-------------------------------------------------------------
-
-.. customgalleryitem::
-   :tooltip: Introduction to TorchScript
-   :description: :doc:`beginner/Intro_to_TorchScript_tutorial`
-   :figure: _static/img/torchscript.png
+Quantization (experimental)
+---------------------------
 
 .. customgalleryitem::
-   :figure: /_static/img/torchscript.png
-   :tooltip: Experiment with some of the key features of the TorchScript
-   :description: :doc:`beginner/deploy_seq2seq_hybrid_frontend_tutorial`
+   :tooltip: Perform dynamic quantization on a pre-trained PyTorch model
+   :description: :doc:`/advanced/dynamic_quantization_tutorial`
+   :figure: _static/img/quant_asym.png
 
 .. customgalleryitem::
-   :tooltip: Loading a PyTorch model in C++
-   :description: :doc:`advanced/cpp_export`
-   :figure: _static/img/cpp_logo.png
-
-.. customgalleryitem::
-   :tooltip: Parallelize computations across processes and clusters of machines
-   :description: :doc:`/intermediate/dist_tuto`
-   :figure: _static/img/distributed/DistPyTorch.jpg
-
-.. customgalleryitem::
-  :tooltip: Train large models with multiple GPUs using model parallel
-  :description: :doc:`/intermediate/model_parallel_tutorial`
-  :figure: _static/img/distributed/DistPyTorch.jpg
-
-.. customgalleryitem::
-  :tooltip: Getting started with DistributedDataParallel
-  :description: :doc:`/intermediate/ddp_tutorial`
-  :figure: _static/img/distributed/DistPyTorch.jpg
-
-.. customgalleryitem::
-   :tooltip: PyTorch distributed trainer with Amazon AWS
-   :description: :doc:`/beginner/aws_distributed_training_tutorial`
-   :figure: _static/img/distributed/DistPyTorch.jpg
-
+    :tooltip: (experimental) Static Quantization with Eager Mode in PyTorch
+    :figure: /_static/img/qat.png
+    :description: :doc:`advanced/static_quantization_tutorial`
 
 .. raw:: html
 
@@ -268,6 +270,24 @@ PyTorch 확장하기 (Extending PyTorch)
 
     <div style='clear:both'></div>
 
+PyTorch Fundamentals In-Depth
+-----------------------------
+
+.. customgalleryitem::
+   :tooltip: This tutorial introduces the fundamental concepts of PyTorch through self-contained examples
+   :figure: /_static/img/thumbnails/examples.png
+   :description: :doc:`/beginner/pytorch_with_examples`
+
+.. customgalleryitem::
+   :figure: /_static/img/torch.nn.png
+   :tooltip: Use torch.nn to create and train a neural network
+   :description: :doc:`beginner/nn_tutorial`
+
+.. raw:: html
+
+    <div style='clear:both'></div>
+
+
 .. -----------------------------------------
 .. Page TOC
 .. -----------------------------------------
@@ -279,13 +299,7 @@ PyTorch 확장하기 (Extending PyTorch)
 
    beginner/deep_learning_60min_blitz
    beginner/data_loading_tutorial
-   beginner/pytorch_with_examples
-   beginner/transfer_learning_tutorial
-   beginner/deploy_seq2seq_hybrid_frontend_tutorial
    intermediate/tensorboard_tutorial
-   beginner/saving_loading_models
-   beginner/nn_tutorial
-   beginner/Intro_to_TorchScript_tutorial
 
 .. toctree::
    :maxdepth: 2
@@ -294,11 +308,11 @@ PyTorch 확장하기 (Extending PyTorch)
    :caption: 이미지 (Image)
 
    intermediate/torchvision_tutorial
-   beginner/finetuning_torchvision_models_tutorial
+   beginner/transfer_learning_tutorial
    intermediate/spatial_transformer_tutorial
    advanced/neural_style_tutorial
    beginner/fgsm_tutorial
-   advanced/super_resolution_with_onnxruntime
+   advanced/dcgan_faces_tutorial
 
 .. toctree::
    :maxdepth: 2
@@ -314,20 +328,20 @@ PyTorch 확장하기 (Extending PyTorch)
    :hidden:
    :caption: 텍스트 (Text)
 
-   beginner/chatbot_tutorial
-   intermediate/char_rnn_generation_tutorial
    intermediate/char_rnn_classification_tutorial
-   beginner/deep_learning_nlp_tutorial
+   intermediate/char_rnn_generation_tutorial
    intermediate/seq2seq_translation_tutorial
    beginner/text_sentiment_ngrams_tutorial
+   beginner/torchtext_translation_tutorial
+   beginner/transformer_tutorial
 
 .. toctree::
    :maxdepth: 2
    :includehidden:
    :hidden:
-   :caption: 생성 모델
+   :caption: Named Tensor (experimental)
 
-   beginner/dcgan_faces_tutorial
+   intermediate/named_tensor_tutorial
 
 .. toctree::
    :maxdepth: 2
@@ -341,24 +355,42 @@ PyTorch 확장하기 (Extending PyTorch)
    :maxdepth: 2
    :includehidden:
    :hidden:
-   :caption: PyTorch 확장하기
+   :caption: PyTorch 모델을 운영환경에 배포하기
 
-   advanced/numpy_extensions_tutorial
-   advanced/cpp_extension
-   advanced/torch_script_custom_ops
+   intermediate/flask_rest_api_tutorial
+   beginner/Intro_to_TorchScript_tutorial
+   advanced/cpp_export
+   advanced/super_resolution_with_onnxruntime
 
 .. toctree::
    :maxdepth: 2
    :includehidden:
    :hidden:
-   :caption: 운영환경에서 사용
+   :caption: 병렬 & 분산 학습
 
    intermediate/model_parallel_tutorial
    intermediate/ddp_tutorial
    intermediate/dist_tuto
-   intermediate/flask_rest_api_tutorial
    beginner/aws_distributed_training_tutorial
-   advanced/cpp_export
+
+.. toctree::
+   :maxdepth: 2
+   :includehidden:
+   :hidden:
+   :caption: PyTorch 확장하기
+
+   advanced/torch_script_custom_ops
+   advanced/numpy_extensions_tutorial
+   advanced/cpp_extension
+
+.. toctree::
+   :maxdepth: 2
+   :includehidden:
+   :hidden:
+   :caption: Quantization (experimental)
+
+   advanced/dynamic_quantization_tutorial
+   advanced/static_quantization_tutorial
 
 .. toctree::
    :maxdepth: 2
@@ -367,3 +399,12 @@ PyTorch 확장하기 (Extending PyTorch)
    :caption: 다른 언어에서의 PyTorch
 
    advanced/cpp_frontend
+
+.. toctree::
+   :maxdepth: 2
+   :includehidden:
+   :hidden:
+   :caption: PyTorch Fundamentals In-Depth
+
+   beginner/pytorch_with_examples
+   beginner/nn_tutorial

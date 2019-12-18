@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 """
-문자-단위 RNN으로 이름 생성하기
-*******************************************
+기초부터 시작하는 NLP:  문자-단위 RNN으로 이름 생성하기
+********************************************************************************
 **Author**: `Sean Robertson <https://github.com/spro/practical-pytorch>`_
   **번역**: `황성수 <https://github.com/adonisues>`_
 
-:doc:`이전 튜토리얼 </intermediate/char_rnn_classification_tutorial>`
+이 튜토리얼은 3개로 이뤄진 "기초부터 시작하는 NLP"의 2번째 튜토리얼입니다.
+`첫번째 튜토리얼 </intermediate/char_rnn_classification_tutorial>`
 에서는 이름의 언어를 분류하기 위해 RNN을 사용했습니다.
 이번에는 반대로 언어로 이름을 생성할 예정입니다.
 

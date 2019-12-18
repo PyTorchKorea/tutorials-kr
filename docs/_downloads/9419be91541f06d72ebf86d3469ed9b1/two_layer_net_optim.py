@@ -44,7 +44,8 @@ for t in range(500):
 
     # 손실을 계산하고 출력합니다.
     loss = loss_fn(y_pred, y)
-    print(t, loss.item())
+    if t % 100 == 99:
+        print(t, loss.item())
 
     # 역전파 단계 전에, Optimizer 객체를 사용하여 (모델의 학습 가능한 가중치인)
     # 갱신할 변수들에 대한 모든 변화도를 0으로 만듭니다. 이렇게 하는 이유는

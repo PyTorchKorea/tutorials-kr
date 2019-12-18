@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 """
-전이학습(Transfer Learning) 튜토리얼
-====================================
+컴퓨터 비전(Vision)을 위한 전이학습(Transfer Learning)
+=======================================================
 **Author**: `Sasank Chilamkurthy <https://chsasank.github.io>`_
   **번역**: `박정환 <http://github.com/9bow>`_
 
-이 튜토리얼에서는 전이학습(Transfer Learning)을 이용하여 신경망을 어떻게 학습시키는지
-배워보겠습니다. 전이학습에 대해서는
+이 튜토리얼에서는 전이학습(Transfer Learning)을 이용하여 이미지 분류를 위한
+합성곱 신경망을 어떻게 학습시키는지 배워보겠습니다. 전이학습에 대해서는
 `CS231n 노트 <http://cs231n.github.io/transfer-learning/>`__ 에서 더 많은 내용을
 읽어보실 수 있습니다.
 
@@ -149,7 +149,6 @@ def train_model(model, criterion, optimizer, scheduler, num_epochs=25):
         # 각 에폭(epoch)은 학습 단계와 검증 단계를 갖습니다.
         for phase in ['train', 'val']:
             if phase == 'train':
-                scheduler.step()
                 model.train()  # 모델을 학습 모드로 설정
             else:
                 model.eval()   # 모델을 평가 모드로 설정
@@ -180,6 +179,8 @@ def train_model(model, criterion, optimizer, scheduler, num_epochs=25):
                 # 통계
                 running_loss += loss.item() * inputs.size(0)
                 running_corrects += torch.sum(preds == labels.data)
+            if phase == 'train':
+                scheduler.step()
 
             epoch_loss = running_loss / dataset_sizes[phase]
             epoch_acc = running_corrects.double() / dataset_sizes[phase]
@@ -246,6 +247,8 @@ def visualize_model(model, num_images=6):
 
 model_ft = models.resnet18(pretrained=True)
 num_ftrs = model_ft.fc.in_features
+# 여기서 각 출력 샘플의 크기는 2로 설정합니다.
+# 또는, nn.Linear(num_ftrs, len (class_names))로 일반화할 수 있습니다.
 model_ft.fc = nn.Linear(num_ftrs, 2)
 
 model_ft = model_ft.to(device)
