@@ -11,8 +11,7 @@ Google Drive의 튜토리얼 데이터를 Colab에서 사용하기
 `여기 <https://colab.research.google.com/notebooks/io.ipynb#scrollTo=XDg9OBaYqRMd>`__
 에서 예제 노트북을 통해 볼 수 있습니다.)
 
-시작하기 전에 `챗봇 튜토리얼
-To get started open the `Chatbot <https://tutorials.pytorch.kr/beginner/chatbot_tutorial.html>`__
+시작하기 전에 `챗봇 튜토리얼 <https://tutorials.pytorch.kr/beginner/chatbot_tutorial.html>`__
 을 브라우저에 띄워주세요.
 
 페이지 상단에 **Run in Google Colab** 을 클릭합니다.
@@ -34,7 +33,7 @@ Colab에서 파일이 열리게 됩니다.
 
 이제 Google Drive 상의 파일을 가르키도록 Colab의 파일을 편집해야 합니다.
 
-Colab에서 *corpus\_name* 로 시작하는 코드 섹션의 윗 부분에 다음 내용을 추가합니다:
+Colab에서 *corpus\_name* 으로 시작하는 코드 섹션의 윗 부분에 다음 내용을 추가합니다:
 
 ::
 
