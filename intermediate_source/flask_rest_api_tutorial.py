@@ -7,12 +7,12 @@ Flask를 이용하여 Python에서 PyTorch를 REST API로 배포하기
 
 이 튜토리얼에서는 Flask를 이용하여 PyTorch 모델을 배포하고 모델 추론(inference)을
 할 수 있는 REST API를 만들어보겠습니다. 미리 훈련된 DenseNet 121 모델을 배포하여
-이미지를 감지해보겠습니다.
+이미지를 인식해보겠습니다.
 
 .. tip:: 여기서 사용한 모든 코드는 MIT 라이선스로 배포되며,
          `GitHub <https://github.com/avinassh/pytorch-flask-api>`_ 에서 확인하실 수 있습니다.
 
-이것은 PyTorch 모델을 상용(in production)으로 배포하는 튜토리얼 시리즈의 첫번째
+이것은 PyTorch 모델을 상용(production)으로 배포하는 튜토리얼 시리즈의 첫번째
 편입니다. Flask를 여기에 소개된 것처럼 사용하는 것이 PyTorch 모델을 제공하는
 가장 쉬운 방법이지만, 고성능을 요구하는 때에는 적합하지 않습니다. 그에 대해서는:
 
@@ -54,7 +54,7 @@ Flask를 이용하여 Python에서 PyTorch를 REST API로 배포하기
 # 간단한 웹 서버
 # -----------------
 #
-# Flask의 문서와 같이, 아래와 같은 코드로 간단한 웹 서버를 만듭니다.
+# Flask의 문서를 참고하여 아래와 같은 코드로 간단한 웹 서버를 구성합니다.
 
 
 from flask import Flask
@@ -173,15 +173,13 @@ def get_prediction(image_bytes):
 
 
 ######################################################################
-# The tensor ``y_hat`` will contain the index of the predicted class id.
-# However, we need a human readable class name. For that we need a class id
-# to name mapping. Download
-# `this file <https://s3.amazonaws.com/deep-learning-models/image-models/imagenet_class_index.json>`_
-# as ``imagenet_class_index.json`` and remember where you saved it (or, if you
-# are following the exact steps in this tutorial, save it in
-# `tutorials/_static`). This file contains the mapping of ImageNet class id to
-# ImageNet class name. We will load this JSON file and get the class name of
-# the predicted index.
+# ``y_hat`` Tensor는 예측된 분류 ID의 인덱스를 포함합니다. 하지만 사람이 읽을 수
+# 있는 분류명이 있어야 하기 떄문에, 이를 위해 이름과 분류 ID를 매핑하는 것이 필요합니다.
+# `이 파일 <https://s3.amazonaws.com/deep-learning-models/image-models/imagenet_class_index.json>`_
+# 을 다운로드 받아 ``imagenet_class_index.json`` 이라는 이름으로 저장 후, 저장한 곳의
+# 위치를 기억해두세요. (또는, 이 튜토리얼과 똑같이 진행하는 경우에는 `tutorials/_static`
+# 에 저장하세요.) 이 파일은 ImageNet 분류 ID와 ImageNet 분류명의 쌍을 포함하고 있습니다.
+# 이제 이 JSON 파일을 불러와 예측 결과의 인덱스에 해당하는 분류명을 가져오겠습니다.
 
 import json
 
