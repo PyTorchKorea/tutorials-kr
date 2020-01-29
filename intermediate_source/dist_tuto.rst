@@ -74,7 +74,7 @@ PyTorch에 포함된 분산 패키지(예. ``torch.distributed``)는 연구자�
 ``dist.init_process_group`` 에서 일어나는 놀라운 일을 살펴볼 것이지만, 기본적으로는
 프로세스가 자신의 위치를 공유함으로써 서로 통신할 수 있도록 합니다.
 
-지점-대-지점 간(Point-to-Point) 통신
+점대점(Point-to-Point) 통신
 ---------------------------------------
 
 .. figure:: /_static/img/distributed/send_recv.png
@@ -85,13 +85,13 @@ PyTorch에 포함된 분산 패키지(예. ``torch.distributed``)는 연구자�
    송신과 수신
 
 
-하나의 프로세스에서 다른 프로세스로 데이터를 전송하는 것을 지점-대-지점 간 통신이라고 합니다.
-지점간 통신은  ``send`` 와 ``recv`` 함수 또는 즉시 응답하는(*immediate* counter-parts)
+하나의 프로세스에서 다른 프로세스로 데이터를 전송하는 것을 점대점 통신이라고 합니다.
+두 지점 간 통신은  ``send`` 와 ``recv`` 함수 또는 즉시 응답하는(*immediate* counter-parts)
 ``isend`` 와 ``irecv`` 를 사용합니다.
 
 .. code:: python
 
-    """블로킹(blocking) 지점-대-지점 간 통신"""
+    """블로킹(blocking) 점대점 통신"""
 
     def run(rank, size):
         tensor = torch.zeros(1)
@@ -114,7 +114,7 @@ PyTorch에 포함된 분산 패키지(예. ``torch.distributed``)는 연구자�
 
 .. code:: python
 
-    """논-블로킹(non-blocking) 지점-대-지점 간 통신"""
+    """논-블로킹(non-blocking) 점대점 간 통신"""
 
     def run(rank, size):
         tensor = torch.zeros(1)
@@ -141,7 +141,7 @@ PyTorch에 포함된 분산 패키지(예. ``torch.distributed``)는 연구자�
 그러나, ``req.wait()`` 를 실행한 후에는 통신이 이루어진 것을 보장받을 수 있기 때문에,
 ``tensor[0]`` 에 저장된 값은 1.0이 됩니다.
 
-지점-대-지점 간 통신은 프로세스 간 통신에 대한 세밀한 제어를 원할 때 유용합니다.
+점대점 통신은 프로세스 간 통신에 대한 세밀한 제어를 원할 때 유용합니다.
 `바이두(Baidu)의 DeepSpeech <https://github.com/baidu-research/baidu-allreduce>`__ 나
 `페이스북(Facebook)의 대규모 실험 <https://research.fb.com/publications/imagenet1kin1h/>`__
 에서 사용하는 것과 같은 멋진 알고리즘을 구현할 때 사용할 수 있습니다.
