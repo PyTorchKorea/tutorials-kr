@@ -47,7 +47,7 @@ plt.ion()   # 반응형 모드
 # 각각의 얼굴에 68개의 서로다른 중요 포인트들이 존재합니다.
 #
 # .. note::
-#     이 링크 `링크 <https://download.pytorch.org/tutorial/faces.zip>`_ 를 통해 데이터셋을 다운로드 해주세요.
+#     이 `링크 <https://download.pytorch.org/tutorial/faces.zip>`_ 를 통해 데이터셋을 다운로드 해주세요.
 #     다운로드한 데이터셋은 'data/faces/'에 위치해야 합니다.
 #     이 데이터셋은 ImageNet에서 '얼굴'이라는 태그를 가진 몇몇 이미지들에 대해
 #     `dlib의 pose estimation <https://blog.dlib.net/2014/08/real-time-face-pose-estimation.html>`_ 을
