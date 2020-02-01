@@ -11,12 +11,12 @@ ONNX 런타임은 `여기
 <https://cloudblogs.microsoft.com/opensource/2019/05/22/onnx-runtime-machine-learning-inferencing-0-4-release>`__ 에서
 설명된 것과 같이 여러 모델들의 성능을 상당히 높일 수 있다는 점이 증명되었습니다.
 
-본 튜토리얼을 위해서는 `ONNX <https://github.com/onnx/onnx>`__
-and `ONNX Runtime <https://github.com/microsoft/onnxruntime>`__ 를 설치해야합니다.
+이 튜토리얼을 진행하기 위해서는 `ONNX <https://github.com/onnx/onnx>`__
+와 `ONNX Runtime <https://github.com/microsoft/onnxruntime>`__ 설치가 필요합니다.
 ONNX와 ONNX 런타임의 바이너리 빌드를 ``pip install onnx onnxruntime`` 를 통해 받을 수 있습니다.
 ONNX 런타임은 버전 3.5에서 3.7까지의 Python과 호환됩니다.
 
-``노트``: 본 튜토리얼은 PyTorch의 master 브랜치를 필요로하며 `링크 <https://github.com/pytorch/pytorch#from-source>`__ 에서
+``참고``: 본 튜토리얼은 PyTorch의 master 브랜치를 필요로하며 `링크 <https://github.com/pytorch/pytorch#from-source>`__ 에서
 설치할 수 있습니다.
 
 """
@@ -40,10 +40,10 @@ import torch.onnx
 # 효율적인 서브픽셀 합성곱 계층을 사용하여 이미지의 해상도를 업스케일 인자만큼 늘립니다.
 # 모델은 이미지의 YCbCr 성분 중 Y 성분을 입력값으로 받고 업스케일된 초해상도의 Y 채널 값을 리턴합니다.
 #
-# 아래는
-# `링크
+# 아래는 PyTorch 예제의
+# `모델
 # <https://github.com/pytorch/examples/blob/master/super_resolution/model.py>`__
-# 에서 구현된 것을 그대로 가져온 모델입니다:
+# 을 그대로 가져온 것입니다:
 #
 
 # PyTorch에서 구현된 초해상도 모델
@@ -145,8 +145,8 @@ torch.onnx.export(torch_model,               # 실행될 모델
 # onnx.ModelProto에 대해 더 자세한 것은 `onnx.proto 기술문서 <https://github.com/onnx/onnx/blob/master/onnx/onnx.proto>`__ 에서
 # 확인하실 수 있습니다.
 # ``onnx.checker.check_model(onnx_model)`` 는 모델의 구조를 확인하고
-# 모델이 타당한 스키마를 가지고 있는지를 체크합니다.
-# ONNX 그래프의 타당성은 모델의 버전, 그래프 구조, 노드들, 그리고 입력값과 출력값들을 모두 체크하여
+# 모델이 유효한 스키마(valid schema)를 가지고 있는지를 체크합니다.
+# ONNX 그래프의 유효성은 모델의 버전, 그래프 구조, 노드들, 그리고 입력값과 출력값들을 모두 체크하여
 # 결정됩니다.
 #
 
