@@ -7,9 +7,8 @@
 **저자** : Sasank Chilamkurthy <https://chsasank.github.io>
 **번역** : 정윤성 <https://github.com/Yunseong-Jeong>
 
-we will see how to load and preprocess/augment data from a non trivial dataset.
 머신러닝 문제를 푸는 과정에서 데이터를 준비하는데 많은 노력이 필요합니다.
-PyTorch는 데이터를 불러오는 과정을 쉽고 (아마도) 코드를 보다 읽기 편하게 만드는 도구들을
+PyTorch는 데이터를 불러오는 과정을 쉽게해주고, 또 잘 사용한다면 코드의 가독성도 보다 높여줄 수 있는 도구들을
 제공합니다. 이 튜토리얼에서 일반적이지 않은 데이터셋으로부터 데이터를 읽어오고
 전처리하고 증가하는 방법을 알아보겠습니다.
 
@@ -48,9 +47,11 @@ plt.ion()   # 반응형 모드
 # 각각의 얼굴에 68개의 서로다른 중요 포인트들이 존재합니다.
 #
 # .. note::
-#     이 링크 <https://download.pytorch.org/tutorial/faces.zip>`_ 를 통해 데이터셋을 다운로드 해주세요.
+#     이 `링크 <https://download.pytorch.org/tutorial/faces.zip>`_ 를 통해 데이터셋을 다운로드 해주세요.
 #     다운로드한 데이터셋은 'data/faces/'에 위치해야 합니다.
-#     다운로드 하신 데이터셋은 'dlib의 pose estimation`<https://blog.dlib.net/2014/08/real-time-face-pose-estimation.html>__이 적용된 데이터 셋입니다.
+#     이 데이터셋은 ImageNet에서 '얼굴'이라는 태그를 가진 몇몇 이미지들에 대해
+#     `dlib의 pose estimation <https://blog.dlib.net/2014/08/real-time-face-pose-estimation.html>`_ 을
+#     적용한 데이터셋입니다.
 #
 #
 # 데이터셋은 아래와 같은 특징을 가진 CSV 파일이 포함되어 있습니다.
@@ -98,12 +99,11 @@ plt.show()
 # ----------------
 #
 # ``torch.utils.data.Dataset`` 은 데이터셋을 나타내는 추상클래스입니다.
-# 여러분의 데이터셋은 ``Dataset`` 에 상속하고 아래와같이 오버라이드 해야합니다.
-# methods:
+# 여러분의 데이터셋은 ``Dataset`` 에 상속하고 아래와 같이 오버라이드 해야합니다.
 #
 # -  ``len(dataset)`` 에서 호출되는 ``__len__`` 은 데이터셋의 크기를 리턴해야합니다.
 # -  ``dataset[i]`` 에서 호출되는 ``__getitem__`` 은
-#    math:`i` 번째 샘플을 찾는데 사용됩니다.
+#    :math:`i`\ 번째 샘플을 찾는데 사용됩니다.
 #
 # 이제 데이터셋 클래스를 만들어보도록 하겠습니다.
 # ``__init__`` 을 사용해서 CSV 파일 안에 있는 데이터를 읽지만,

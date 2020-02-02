@@ -1,24 +1,19 @@
 """
 (선택) PyTorch 모델을 ONNX으로 변환하고 ONNX 런타임에서 실행하기
 ========================================================================
-
 이 튜토리얼에서는 어떻게 PyTorch에서 정의된 모델을 ONNX 형식으로 변환하고 또 어떻게 그 변환된 모델을
 ONNX 런타임에서 실행할 수 있는지에 대해 알아보도록 하겠습니다.
-
 ONNX 런타임은 ONNX 모델을 위한 엔진으로서 성능에 초점을 맞추고 있고 여러 다양한 플랫폼과 하드웨어(윈도우,
 리눅스, 맥을 비롯한 플랫폼 뿐만 아니라 CPU, GPU 등의 하드웨어)에서 효율적인 추론을 가능하게 합니다.
 ONNX 런타임은 `여기
 <https://cloudblogs.microsoft.com/opensource/2019/05/22/onnx-runtime-machine-learning-inferencing-0-4-release>`__ 에서
 설명된 것과 같이 여러 모델들의 성능을 상당히 높일 수 있다는 점이 증명되었습니다.
-
 이 튜토리얼을 진행하기 위해서는 `ONNX <https://github.com/onnx/onnx>`__
 와 `ONNX Runtime <https://github.com/microsoft/onnxruntime>`__ 설치가 필요합니다.
 ONNX와 ONNX 런타임의 바이너리 빌드를 ``pip install onnx onnxruntime`` 를 통해 받을 수 있습니다.
 ONNX 런타임은 버전 3.5에서 3.7까지의 Python과 호환됩니다.
-
 ``참고``: 본 튜토리얼은 PyTorch의 master 브랜치를 필요로하며 `링크 <https://github.com/pytorch/pytorch#from-source>`__ 에서
 설치할 수 있습니다.
-
 """
 
 # 필요한 import문
