@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-Adversarial Example Generation
+적대적 예제 생성(Adversarial Example Generation)
 ==============================
 
-**Author:** `Nathan Inkawhich <https://github.com/inkawhich>`__
+**저자:** `Nathan Inkawhich <https://github.com/inkawhich>`__
+**번역:** `BONGMO KIM <https://github.com/bongmo>`__
 
 If you are reading this, hopefully you can appreciate how effective some
 machine learning models are. Research is constantly pushing ML models to
@@ -11,6 +12,9 @@ be faster, more accurate, and more efficient. However, an often
 overlooked aspect of designing and training models is security and
 robustness, especially in the face of an adversary who wishes to fool
 the model.
+이 글을 읽고 있다면, 머신 러닝 모델이 얼마나 효과적인지 알 수 있을 것입니다. 
+연구는 ML(Machine Learming) 모델을 더욱 빠르고 정확하며 효율적이 되는 방향으로 진행됩니다. 
+그러나 모델을 설계하고 훈련하는 데 종종 간과되는 측면은 특히 모델을 속이려하는 적을 대면했을 때 보안과 견고성입니다.
 
 This tutorial will raise your awareness to the security vulnerabilities
 of ML models, and will give insight into the hot topic of adversarial
@@ -20,12 +24,16 @@ performance. Given that this is a tutorial, we will explore the topic
 via example on an image classifier. Specifically we will use one of the
 first and most popular attack methods, the Fast Gradient Sign Attack
 (FGSM), to fool an MNIST classifier.
-
+이 튜토리얼은 ML 모델들의 보안 취약점에 대한 인식을 높이고, 요즘 이슈가 되는 적대적 머신 러닝 주제에 대한 통찰력을 제공합니다.
+기계 학습. 이미지에 감지 할 수 없는 변화를 추가하면 모델 성능이 크게 달라질 수 있다는 사실에 놀랄 수 있습니다.
+주어진 이번 튜토리얼에서는 이미지 분류기의 예제를 통해 위 내용에 대해 살펴볼 것입니다.
+특히 우리는 가장 많이 사용되는 공격 방법 중 하나인 FGSM (Fast Gradient Sign Attack)을 이용해 MNIST 분류자를 속여 볼 것입니다.
 """
 
 
 ######################################################################
 # Threat Model
+# 위협 모델
 # ------------
 # 
 # For context, there are many categories of adversarial attacks, each with
@@ -45,12 +53,27 @@ first and most popular attack methods, the Fast Gradient Sign Attack
 # misclassification* means the adversary wants to alter an image that is
 # originally of a specific source class so that it is classified as a
 # specific target class.
+# 상황에 따라 다양한 범주의 적대적 공격이 있는데 각각은 목표가 다르고 공격자의 지식에
+# 대한 가정도 다릅니다. 그러나 보통 가장 중요한 목표는 입력 데이터에 최소한의 섭동을 
+# 추가하여 이것이 의도하는대로 잘못 분류되게 하는 것입니다. 공격자의 지식에 대한 
+# 가정도는 여러 종류가 있는데, 보통 **화이트박스**와 **블랙박스** 두 가지가 있습니다. 
+# *화이트박스* 공격은 공격자가 모델에 대해 아키텍처, 입력, 출력, 가중치를 포함한 모든 것을
+# 알고 있고 접근할 수 있다고 가정합니다. *블랙박스* 공격은 공격자가 모델의 입력과 출력에 
+# 대해서만 접근 가능하고 모델의 가중치와 아키텍처에 관한 내용은 모른다고 가정합니다. 
+# 공격자의 목표는 오분류 및 **소스/타겟 오분류**를 포함하는 여러 유형이 있습니다. 
+# *오분류*의 목표는 공격자가 출력으로 나온 분류 결과가 잘못 되도록 하나 새로운 분류 결과가
+# 어떤 것이 나오는지 신경 쓰지 않는 것을 의미합니다. *소스/타겟 오분류*는 공격자가 
+# 원래 특정 소스 클래스의 이미지를 특정 대상의 클래스로 분류하도록 변경 함을 의미합니다.
+
 # 
 # In this case, the FGSM attack is a *white-box* attack with the goal of
 # *misclassification*. With this background information, we can now
 # discuss the attack in detail.
+# 이 경우 FGSM 공격은 *오분류*를 목표로 하는 화이트 박스 공격입니다. 
+# 이 배경 정보를 알고 공격에 대해 자세히 알아 보겠습니다.
 # 
 # Fast Gradient Sign Attack
+# 빠른 경사 부호 공격
 # -------------------------
 # 
 # One of the first and most popular adversarial attacks to date is
@@ -64,10 +87,21 @@ first and most popular attack methods, the Fast Gradient Sign Attack
 # the loss* based on the same backpropagated gradients. In other words,
 # the attack uses the gradient of the loss w.r.t the input data, then
 # adjusts the input data to maximize the loss.
+# 공격 방법에 있어 초기 방식이면서 가장 유명한 방식은 *빠른 경사 부호 공격 (FGSM)* 이라고 하며 
+# `적대적 예제에 대한 설명과 활용 <https://arxiv.org/abs/1412.6572>`__ 에서 
+# 이안 갓펠로우가 기고하였습니다.
+# 이 공격법은 놀랍도록 강력하지만 직관적입니다. 학습 방식, *경사도*를 활용하여 신경망을 공격하도록 
+# 설계 되었습니다. 아이디어는 간단합니다. 역전파 경사도를 기반으로 가중치를 조정하여 손실을 최소화하기보다는
+# 공격이 동일한 역전파 경사도를 기반으로 *손실을 최대화하하는 방향으로 입력 데이터를 조정*합니다. 
+# 다시 말해 공격은 입력 데이터에서 계산된 손실 기울기를 사용하고 입력 데이터를 조정하여 손실이 최대가 되게 합니다.
+
+
 # 
 # Before we jump into the code, let’s look at the famous
 # `FGSM <https://arxiv.org/abs/1412.6572>`__ panda example and extract
 # some notation.
+# 코드로 넘어가기 전에 유명한 `FGSM <https://arxiv.org/abs/1412.6572>`__ 판다 예제를 
+# 보고 몇 가지 표기법을 정리하겠습니다.
 #
 # .. figure:: /_static/img/fgsm_panda_image.png
 #    :alt: fgsm_panda_image
@@ -102,16 +136,21 @@ import matplotlib.pyplot as plt
 
 ######################################################################
 # Implementation
+# 구현
 # --------------
 # 
 # In this section, we will discuss the input parameters for the tutorial,
 # define the model under attack, then code the attack and run some tests.
+# 이 섹션에서는 튜토리얼의 입력 매개 변수에 대해 설명하고 공격중인 모델을
+# 정의한 다음 공격을 코딩하고 일부 테스트를 실행합니다.
 # 
 # Inputs
+# 입력
 # ~~~~~~
 # 
 # There are only three inputs for this tutorial, and are defined as
 # follows:
+# 이 학습서에는 입력이 3 개이며 다음과 같이 정의됩니다:
 # 
 # -  **epsilons** - List of epsilon values to use for the run. It is
 #    important to keep 0 in the list because it represents the model
@@ -120,15 +159,24 @@ import matplotlib.pyplot as plt
 #    but the more effective the attack in terms of degrading model
 #    accuracy. Since the data range here is :math:`[0,1]`, no epsilon
 #    value should exceed 1.
+# - **epsilons** - 실행에 사용할 엡실론의 리스트입니다. 엡실론 0의 값은 원래 테스트 셋의 모델 성능을
+#   나타내므로 목록에 유지하는 것이 중요합니다. 또한 직관적으로 우리는 엡실론이 클수록 섭동이 더 눈에 띄지만
+#   모델 정확도 저하 측면에서 더 효과적인 공격을 기대합니다. 여기서 데이터의 범위는 0-1 이기 때문에 
+#   엡실론의 값은 1을 초과할 수 없습니다.
 # 
 # -  **pretrained_model** - path to the pretrained MNIST model which was
 #    trained with
 #    `pytorch/examples/mnist <https://github.com/pytorch/examples/tree/master/mnist>`__.
 #    For simplicity, download the pretrained model `here <https://drive.google.com/drive/folders/1fn83DF14tWmit0RTKWRhPq5uVXt73e0h?usp=sharing>`__.
+# - **pretrained_model** - `pytorch/examples/mnist <https://github.com/pytorch/examples/tree/master/mnist>`__ 
+#    를 통해 미리 학습된 MNIST 모델의 경로. 
+#    튜토리얼을 간편하게 하려면 `여기 <https://drive.google.com/drive/folders/1fn83DF14tWmit0RTKWRhPq5uVXt73e0h?usp=sharing>`__ 에서 미리 학습된 모델을 다운로드하세요.
 # 
 # -  **use_cuda** - boolean flag to use CUDA if desired and available.
 #    Note, a GPU with CUDA is not critical for this tutorial as a CPU will
 #    not take much time.
+# -  **use_cuda** - CUDA 를 사용할지 말지 정하는 이진 플래그. 
+#    본 튜토리얼에서는 CPU 시간이 오래 걸리지 않으므로 CUDA가 있는 GPU는 중요하지 않습니다.
 # 
 
 epsilons = [0, .05, .1, .15, .2, .25, .3]
@@ -138,6 +186,7 @@ use_cuda=True
 
 ######################################################################
 # Model Under Attack
+# 공격을 받는 모델
 # ~~~~~~~~~~~~~~~~~~
 # 
 # As mentioned, the model under attack is the same MNIST model from
@@ -147,9 +196,14 @@ use_cuda=True
 # been copied from the MNIST example. The purpose of this section is to
 # define the model and dataloader, then initialize the model and load the
 # pretrained weights.
+# 언급한대로, 공격을 받는 모델은 `pytorch/examples/mnist <https://github.com/pytorch/examples/tree/master/mnist>`__
+# 와 동일한 MNIST 모델입니다.  본인의 MNIST 모델을 학습 및 저장하거나 제공된 모델을 다운로드하여 사용할 수 있습니다.
+# 여기서 *Net* 정의 및 테스트 데이터 로더는 MNIST 예제에서 복사 하였습니다. 
+# 이 섹션의 목적은 모델과 데이터 로더를 정의한 다음, 모델을 초기화하고 미리 학습된 가중치를 읽어오는 것입니다.
 # 
 
 # LeNet Model definition
+# LeNet 모델 정의
 class Net(nn.Module):
     def __init__(self):
         super(Net, self).__init__()
@@ -169,6 +223,7 @@ class Net(nn.Module):
         return F.log_softmax(x, dim=1)
 
 # MNIST Test dataset and dataloader declaration
+# MNIST 테스트 데이터셋과 데이터로더 선언
 test_loader = torch.utils.data.DataLoader(
     datasets.MNIST('../data', train=False, download=True, transform=transforms.Compose([
             transforms.ToTensor(),
@@ -176,21 +231,26 @@ test_loader = torch.utils.data.DataLoader(
         batch_size=1, shuffle=True)
 
 # Define what device we are using
+# 어떤 디바이스를 사용할지 정의
 print("CUDA Available: ",torch.cuda.is_available())
 device = torch.device("cuda" if (use_cuda and torch.cuda.is_available()) else "cpu")
 
 # Initialize the network
+# 모델 초기화하기
 model = Net().to(device)
 
 # Load the pretrained model
+# 미리 학습된 모델 읽어오기
 model.load_state_dict(torch.load(pretrained_model, map_location='cpu'))
 
 # Set the model in evaluation mode. In this case this is for the Dropout layers
+# 모델을 평가 모드로 설정하기. 드롭아웃 레이어들을 위해 사용됨
 model.eval()
 
 
 ######################################################################
 # FGSM Attack
+# FGSM 공격
 # ~~~~~~~~~~~
 # 
 # Now, we can define the function that creates the adversarial examples by
@@ -200,27 +260,39 @@ model.eval()
 # is gradient of the loss w.r.t the input image
 # (:math:`\nabla_{x} J(\mathbf{\theta}, \mathbf{x}, y)`). The function
 # then creates perturbed image as
+# 이제 원래 입력을 교란시켜 적대적인 예를 만드는 함수를 정의 할 수 있습니다. 
+# ``fgsm_attack``` 함수는 입력 파라미터로 3가지를 가집니다. 첫번째는 원본 *이미지*(:math:`x`), 
+# 두번째는 *엡실론*으로 픽셀 단위의 섭동을 주는 값입니다 (:math:`\epsilon`). 
+# 마지막은 *data_grad* 로 입력 영상 (:math:`\nabla_{x} J(\mathbf{\theta}, \mathbf{x}, y)`) 에 대한 경사도 손실 값입니다. 
+# 아래 식에 따른 섭동된 이미지를 생성합니다.
 # 
 # .. math:: perturbed\_image = image + epsilon*sign(data\_grad) = x + \epsilon * sign(\nabla_{x} J(\mathbf{\theta}, \mathbf{x}, y))
 # 
 # Finally, in order to maintain the original range of the data, the
 # perturbed image is clipped to range :math:`[0,1]`.
+# 마지막으로 데이터의 원래 범위를 유지하기 위해, 섭동된 이미지가 :math:`[0,1]` 범위로 잘립니다.
 # 
 
 # FGSM attack code
+# FGSM 공격 코드
 def fgsm_attack(image, epsilon, data_grad):
     # Collect the element-wise sign of the data gradient
+    # data_grad 의 요소별 부호 값을 얻어옵니다
     sign_data_grad = data_grad.sign()
     # Create the perturbed image by adjusting each pixel of the input image
+    # 입력 이미지의 각 픽셀에 sign_data_grad 를 적용해 섭동된 이미지를 생성합니다.
     perturbed_image = image + epsilon*sign_data_grad
     # Adding clipping to maintain [0,1] range
+    # 값 범위를 [0,1]로 유지하기 위해 자르기(clipping)를 추가합니다
     perturbed_image = torch.clamp(perturbed_image, 0, 1)
     # Return the perturbed image
+    # 섭동된 이미지를 리턴합니다
     return perturbed_image
 
 
 ######################################################################
 # Testing Function
+# 테스팅 함수
 # ~~~~~~~~~~~~~~~~
 # 
 # Finally, the central result of this tutorial comes from the ``test``
