@@ -144,7 +144,7 @@ class ReplayMemory(object):
 # 가까운 미래의 것에 비해 덜 중요하게 만들고, 이것은 상당히 합리적입니다.
 #
 # Q-learning의 주요 아이디어는 만일 함수 :math:`Q^*: State \times Action \rightarrow \mathbb{R}` 를
-# 가지고 있다면 반환이 어덯게 될지 알려줄 수 있고,
+# 가지고 있다면 반환이 어떻게 될지 알려줄 수 있고,
 # 만약 주어진 상태(state)에서 행동(action)을 한다면, 보상을 최대화하는
 # 정책을 쉽게 구축할 수 있습니다:
 #

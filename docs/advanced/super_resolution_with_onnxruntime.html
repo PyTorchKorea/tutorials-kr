@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>(optional) Exporting a Model from PyTorch to ONNX and Running it using ONNX Runtime &mdash; PyTorch Tutorials 1.3.1 documentation</title>
+  <title>(선택) PyTorch 모델을 ONNX으로 변환하고 ONNX 런타임에서 실행하기 &mdash; PyTorch Tutorials 1.3.1 documentation</title>
   
 
   
@@ -31,7 +31,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Model Parallel Best Practices" href="../intermediate/model_parallel_tutorial.html" />
-    <link rel="prev" title="Loading a TorchScript Model in C++" href="cpp_export.html" /> 
+    <link rel="prev" title="C++에서 TorchScript 모델 로딩하기" href="cpp_export.html" /> 
 
   
   <script src="../_static/js/modernizr.min.js"></script>
@@ -177,8 +177,8 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/flask_rest_api_tutorial.html">Deploying PyTorch in Python via a REST API with Flask</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/Intro_to_TorchScript_tutorial.html">TorchScript 소개</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cpp_export.html">Loading a TorchScript Model in C++</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">(optional) Exporting a Model from PyTorch to ONNX and Running it using ONNX Runtime</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cpp_export.html">C++에서 TorchScript 모델 로딩하기</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">(선택) PyTorch 모델을 ONNX으로 변환하고 ONNX 런타임에서 실행하기</a></li>
 </ul>
 <p class="caption"><span class="caption-text">병렬 &amp; 분산 학습</span></p>
 <ul>
@@ -246,7 +246,7 @@
       </li>
 
         
-      <li>(optional) Exporting a Model from PyTorch to ONNX and Running it using ONNX Runtime</li>
+      <li>(선택) PyTorch 모델을 ONNX으로 변환하고 ONNX 런타임에서 실행하기</li>
     
     
       <li class="pytorch-breadcrumbs-aside">
@@ -304,23 +304,21 @@
 <p class="admonition-title">Note</p>
 <p>Click <a class="reference internal" href="#sphx-glr-download-advanced-super-resolution-with-onnxruntime-py"><span class="std std-ref">here</span></a> to download the full example code</p>
 </div>
-<div class="sphx-glr-example-title section" id="optional-exporting-a-model-from-pytorch-to-onnx-and-running-it-using-onnx-runtime">
-<span id="sphx-glr-advanced-super-resolution-with-onnxruntime-py"></span><h1>(optional) Exporting a Model from PyTorch to ONNX and Running it using ONNX Runtime<a class="headerlink" href="#optional-exporting-a-model-from-pytorch-to-onnx-and-running-it-using-onnx-runtime" title="Permalink to this headline">¶</a></h1>
-<p>In this tutorial, we describe how to convert a model defined
-in PyTorch into the ONNX format and then run it with ONNX Runtime.</p>
-<p>ONNX Runtime is a performance-focused engine for ONNX models,
-which inferences efficiently across multiple platforms and hardware
-(Windows, Linux, and Mac and on both CPUs and GPUs).
-ONNX Runtime has proved to considerably increase performance over
-multiple models as explained <a class="reference external" href="https://cloudblogs.microsoft.com/opensource/2019/05/22/onnx-runtime-machine-learning-inferencing-0-4-release">here</a></p>
-<p>For this tutorial, you will need to install <a class="reference external" href="https://github.com/onnx/onnx">ONNX</a>
-and <a class="reference external" href="https://github.com/microsoft/onnxruntime">ONNX Runtime</a>.
-You can get binary builds of ONNX and ONNX Runtime with
-<code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">onnx</span> <span class="pre">onnxruntime</span></code>.
-Note that ONNX Runtime is compatible with Python versions 3.5 to 3.7.</p>
-<p><code class="docutils literal notranslate"><span class="pre">NOTE</span></code>: This tutorial needs PyTorch master branch which can be installed by following
-the instructions <a class="reference external" href="https://github.com/pytorch/pytorch#from-source">here</a></p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Some standard imports</span>
+<div class="sphx-glr-example-title section" id="pytorch-onnx-onnx">
+<span id="sphx-glr-advanced-super-resolution-with-onnxruntime-py"></span><h1>(선택) PyTorch 모델을 ONNX으로 변환하고 ONNX 런타임에서 실행하기<a class="headerlink" href="#pytorch-onnx-onnx" title="Permalink to this headline">¶</a></h1>
+<p>이 튜토리얼에서는 어떻게 PyTorch에서 정의된 모델을 ONNX 형식으로 변환하고 또 어떻게 그 변환된 모델을
+ONNX 런타임에서 실행할 수 있는지에 대해 알아보도록 하겠습니다.
+ONNX 런타임은 ONNX 모델을 위한 엔진으로서 성능에 초점을 맞추고 있고 여러 다양한 플랫폼과 하드웨어(윈도우,
+리눅스, 맥을 비롯한 플랫폼 뿐만 아니라 CPU, GPU 등의 하드웨어)에서 효율적인 추론을 가능하게 합니다.
+ONNX 런타임은 <a class="reference external" href="https://cloudblogs.microsoft.com/opensource/2019/05/22/onnx-runtime-machine-learning-inferencing-0-4-release">여기</a> 에서
+설명된 것과 같이 여러 모델들의 성능을 상당히 높일 수 있다는 점이 증명되었습니다.
+이 튜토리얼을 진행하기 위해서는 <a class="reference external" href="https://github.com/onnx/onnx">ONNX</a>
+와 <a class="reference external" href="https://github.com/microsoft/onnxruntime">ONNX Runtime</a> 설치가 필요합니다.
+ONNX와 ONNX 런타임의 바이너리 빌드를 <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">onnx</span> <span class="pre">onnxruntime</span></code> 를 통해 받을 수 있습니다.
+ONNX 런타임은 버전 3.5에서 3.7까지의 Python과 호환됩니다.
+<code class="docutils literal notranslate"><span class="pre">참고</span></code>: 본 튜토리얼은 PyTorch의 master 브랜치를 필요로하며 <a class="reference external" href="https://github.com/pytorch/pytorch#from-source">링크</a> 에서
+설치할 수 있습니다.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># 필요한 import문</span>
 <span class="kn">import</span> <span class="nn">io</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
@@ -329,20 +327,17 @@ the instructions <a class="reference external" href="https://github.com/pytorch/
 <span class="kn">import</span> <span class="nn">torch.onnx</span>
 </pre></div>
 </div>
-<p>Super-resolution is a way of increasing the resolution of images, videos
-and is widely used in image processing or video editing. For this
-tutorial, we will use a small super-resolution model.</p>
-<p>First, let’s create a SuperResolution model in PyTorch.
-This model uses the efficient sub-pixel convolution layer described in
-<a class="reference external" href="https://arxiv.org/abs/1609.05158">“Real-Time Single Image and Video Super-Resolution Using an Efficient
-Sub-Pixel Convolutional Neural Network” - Shi et al</a>
-for increasing the resolution of an image by an upscale factor.
-The model expects the Y component of the YCbCr of an image as an input, and
-outputs the upscaled Y component in super resolution.</p>
-<p><a class="reference external" href="https://github.com/pytorch/examples/blob/master/super_resolution/model.py">The
-model</a>
-comes directly from PyTorch’s examples without modification:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Super Resolution model definition in PyTorch</span>
+<p>초해상화(super-resolution)란 이미지나 비디오의 해상도를 높이기 위한 방법으로 이미지 프로세싱이나 비디오 편집에 널리
+사용되고 있는 방법입니다. 이 튜토리얼에서는 사이즈가 작은 초해상화 모델을 사용하도록 하겠습니다.</p>
+<p>먼저, 초해상화 모델을 PyTorch에서 구현하겠습니다.
+이 모델은 <a class="reference external" href="https://arxiv.org/abs/1609.05158">“Real-Time Single Image and Video Super-Resolution Using an Efficient
+Sub-Pixel Convolutional Neural Network” - Shi et al</a> 에서 소개된
+효율적인 서브픽셀 합성곱 계층을 사용하여 이미지의 해상도를 업스케일 인자만큼 늘립니다.
+모델은 이미지의 YCbCr 성분 중 Y 성분을 입력값으로 받고 업스케일된 초해상도의 Y 채널 값을 리턴합니다.</p>
+<p>아래는 PyTorch 예제의
+<a class="reference external" href="https://github.com/pytorch/examples/blob/master/super_resolution/model.py">모델</a>
+을 그대로 가져온 것입니다:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># PyTorch에서 구현된 초해상도 모델</span>
 <span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
 <span class="kn">import</span> <span class="nn">torch.nn.init</span> <span class="k">as</span> <span class="nn">init</span>
 
@@ -373,96 +368,82 @@ comes directly from PyTorch’s examples without modification:</p>
         <span class="n">init</span><span class="o">.</span><span class="n">orthogonal_</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conv3</span><span class="o">.</span><span class="n">weight</span><span class="p">,</span> <span class="n">init</span><span class="o">.</span><span class="n">calculate_gain</span><span class="p">(</span><span class="s1">&#39;relu&#39;</span><span class="p">))</span>
         <span class="n">init</span><span class="o">.</span><span class="n">orthogonal_</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conv4</span><span class="o">.</span><span class="n">weight</span><span class="p">)</span>
 
-<span class="c1"># Create the super-resolution model by using the above model definition.</span>
+<span class="c1"># 위에서 정의된 모델을 사용하여 초해상도 모델 생성</span>
 <span class="n">torch_model</span> <span class="o">=</span> <span class="n">SuperResolutionNet</span><span class="p">(</span><span class="n">upscale_factor</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Ordinarily, you would now train this model; however, for this tutorial,
-we will instead download some pre-trained weights. Note that this model
-was not trained fully for good accuracy and is used here for
-demonstration purposes only.</p>
-<p>It is important to call <code class="docutils literal notranslate"><span class="pre">torch_model.eval()</span></code> or <code class="docutils literal notranslate"><span class="pre">torch_model.train(False)</span></code>
-before exporting the model, to turn the model to inference mode.
-This is required since operators like dropout or batchnorm behave
-differently in inference and training mode.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Load pretrained model weights</span>
+<p>위 과정이 끝나면 일반적인 경우에 모델을 학습시키기 시작할 것입니다. 하지만 본 튜토리얼에서는
+미리 학습된 가중치들을 사용하도록 하겠습니다. 참고로 이 모델은 높은 정확도에 이를 때까지 학습되지 않았고
+본 튜토리얼을 원활히 진행하기 위한 목적으로 사용하는 것입니다.</p>
+<p>모델을 변환하기 전에 모델을 추론 모드로 바꾸기 위해서 <code class="docutils literal notranslate"><span class="pre">torch_model.eval()</span></code> 또는 <code class="docutils literal notranslate"><span class="pre">torch_model.train(False)</span></code> 를
+호출하는 것이 중요합니다.
+이는 dropout이나 batchnorm과 같은 연산들이 추론과 학습 모드에서 다르게 작동하기 때문에 필요합니다.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># 미리 학습된 가중치를 읽어옵니다</span>
 <span class="n">model_url</span> <span class="o">=</span> <span class="s1">&#39;https://s3.amazonaws.com/pytorch/test_data/export/superres_epoch100-44c6958e.pth&#39;</span>
-<span class="n">batch_size</span> <span class="o">=</span> <span class="mi">1</span>    <span class="c1"># just a random number</span>
+<span class="n">batch_size</span> <span class="o">=</span> <span class="mi">1</span>    <span class="c1"># 임의의 수</span>
 
-<span class="c1"># Initialize model with the pretrained weights</span>
+<span class="c1"># 모델을 미리 학습된 가중치로 초기화합니다</span>
 <span class="n">map_location</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">storage</span><span class="p">,</span> <span class="n">loc</span><span class="p">:</span> <span class="n">storage</span>
 <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">():</span>
     <span class="n">map_location</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="n">torch_model</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">model_zoo</span><span class="o">.</span><span class="n">load_url</span><span class="p">(</span><span class="n">model_url</span><span class="p">,</span> <span class="n">map_location</span><span class="o">=</span><span class="n">map_location</span><span class="p">))</span>
 
-<span class="c1"># set the model to inference mode</span>
+<span class="c1"># 모델을 추론 모드로 전환합니다</span>
 <span class="n">torch_model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>Exporting a model in PyTorch works via tracing or scripting. This
-tutorial will use as an example a model exported by tracing.
-To export a model, we call the <code class="docutils literal notranslate"><span class="pre">torch.onnx.export()</span></code> function.
-This will execute the model, recording a trace of what operators
-are used to compute the outputs.
-Because <code class="docutils literal notranslate"><span class="pre">export</span></code> runs the model, we need to provide an input
-tensor <code class="docutils literal notranslate"><span class="pre">x</span></code>. The values in this can be random as long as it is the
-right type and size.
-Note that the input size will be fixed in the exported ONNX graph for
-all the input’s dimensions, unless specified as a dynamic axes.
-In this example we export the model with an input of batch_size 1,
-but then specify the first dimension as dynamic in the <code class="docutils literal notranslate"><span class="pre">dynamic_axes</span></code>
-parameter in <code class="docutils literal notranslate"><span class="pre">torch.onnx.export()</span></code>.
-The exported model will thus accept inputs of size [batch_size, 1, 224, 224]
-where batch_size can be variable.</p>
-<p>To learn more details about PyTorch’s export interface, check out the
-<a class="reference external" href="https://pytorch.org/docs/master/onnx.html">torch.onnx documentation</a>.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Input to the model</span>
+<p>이제 Tracing이나 스크립팅을 통해서 PyTorch 모델을 변환할 수 있습니다.
+이 튜토리얼에서는 tracing을 통해 변환된 모델을 사용하도록 하겠습니다.
+모델을 변환하기 위해서는 <code class="docutils literal notranslate"><span class="pre">torch.onnx.export()</span></code> 함수를 호출합니다.
+이 함수는 모델을 실행하여 어떤 연산자들이 출력값을 계산하는데 사용되었는지를 기록합니다.
+<code class="docutils literal notranslate"><span class="pre">export</span></code> 함수가 모델을 실행하기 때문에, 우리가 직접 텐서를 입력값으로 넘겨주어야 합니다.
+이 텐서의 값은 알맞은 자료형과 모양이라면 랜덤하게 결정되어도 무방합니다.
+특정 차원을 동적인 차원으로 지정하지 않는 이상, ONNX로 변환된 그래프의 경우 입력값의 사이즈는 모든 차원에 대해 고정됩니다.
+예시에서는 모델이 항상 배치 사이즈 1을 사용하도록 변환하였지만, 첫번째 차원을 <code class="docutils literal notranslate"><span class="pre">torch.onnx.export()</span></code> 의
+<code class="docutils literal notranslate"><span class="pre">dynamic_axes</span></code> 인자에 동적인 차원으로 지정해주면 됩니다.</p>
+<p>PyTorch의 변환 인터페이스에 대해 더 자세히 알고 싶다면
+<a class="reference external" href="https://pytorch.org/docs/master/onnx.html">torch.onnx 문서</a> 를 참고해주세요.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># 모델에 대한 입력값</span>
 <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">224</span><span class="p">,</span> <span class="mi">224</span><span class="p">,</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">torch_out</span> <span class="o">=</span> <span class="n">torch_model</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 
-<span class="c1"># Export the model</span>
-<span class="n">torch</span><span class="o">.</span><span class="n">onnx</span><span class="o">.</span><span class="n">export</span><span class="p">(</span><span class="n">torch_model</span><span class="p">,</span>               <span class="c1"># model being run</span>
-                  <span class="n">x</span><span class="p">,</span>                         <span class="c1"># model input (or a tuple for multiple inputs)</span>
-                  <span class="s2">&quot;super_resolution.onnx&quot;</span><span class="p">,</span>   <span class="c1"># where to save the model (can be a file or file-like object)</span>
-                  <span class="n">export_params</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>        <span class="c1"># store the trained parameter weights inside the model file</span>
-                  <span class="n">opset_version</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>          <span class="c1"># the ONNX version to export the model to</span>
-                  <span class="n">do_constant_folding</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>  <span class="c1"># whether to execute constant folding for optimization</span>
-                  <span class="n">input_names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">],</span>   <span class="c1"># the model&#39;s input names</span>
-                  <span class="n">output_names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">],</span> <span class="c1"># the model&#39;s output names</span>
-                  <span class="n">dynamic_axes</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;input&#39;</span> <span class="p">:</span> <span class="p">{</span><span class="mi">0</span> <span class="p">:</span> <span class="s1">&#39;batch_size&#39;</span><span class="p">},</span>    <span class="c1"># variable lenght axes</span>
+<span class="c1"># 모델 변환</span>
+<span class="n">torch</span><span class="o">.</span><span class="n">onnx</span><span class="o">.</span><span class="n">export</span><span class="p">(</span><span class="n">torch_model</span><span class="p">,</span>               <span class="c1"># 실행될 모델</span>
+                  <span class="n">x</span><span class="p">,</span>                         <span class="c1"># 모델 입력값 (튜플 또는 여러 입력값들도 가능)</span>
+                  <span class="s2">&quot;super_resolution.onnx&quot;</span><span class="p">,</span>   <span class="c1"># 모델 저장 경로 (파일 또는 파일과 유사한 객체 모두 가능)</span>
+                  <span class="n">export_params</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>        <span class="c1"># 모델 파일 안에 학습된 모델 가중치를 저장할지의 여부</span>
+                  <span class="n">opset_version</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>          <span class="c1"># 모델을 변환할 때 사용할 ONNX 버전</span>
+                  <span class="n">do_constant_folding</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>  <span class="c1"># 최적하시 상수폴딩을 사용할지의 여부</span>
+                  <span class="n">input_names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">],</span>   <span class="c1"># 모델의 입력값을 가리키는 이름</span>
+                  <span class="n">output_names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">],</span> <span class="c1"># 모델의 출력값을 가리키는 이름</span>
+                  <span class="n">dynamic_axes</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;input&#39;</span> <span class="p">:</span> <span class="p">{</span><span class="mi">0</span> <span class="p">:</span> <span class="s1">&#39;batch_size&#39;</span><span class="p">},</span>    <span class="c1"># 가변적인 길이를 가진 차원</span>
                                 <span class="s1">&#39;output&#39;</span> <span class="p">:</span> <span class="p">{</span><span class="mi">0</span> <span class="p">:</span> <span class="s1">&#39;batch_size&#39;</span><span class="p">}})</span>
 </pre></div>
 </div>
-<p>We also computed <code class="docutils literal notranslate"><span class="pre">torch_out</span></code>, the output after of the model,
-which we will use to verify that the model we exported computes
-the same values when run in ONNX Runtime.</p>
-<p>But before verifying the model’s output with ONNX Runtime, we will check
-the ONNX model with ONNX’s API.
-First, <code class="docutils literal notranslate"><span class="pre">onnx.load(&quot;super_resolution.onnx&quot;)</span></code> will load the saved model and
-will output a onnx.ModelProto structure (a top-level file/container format for bundling a ML model.
-For more information <a class="reference external" href="https://github.com/onnx/onnx/blob/master/onnx/onnx.proto">onnx.proto documentation</a>.).
-Then, <code class="docutils literal notranslate"><span class="pre">onnx.checker.check_model(onnx_model)</span></code> will verify the model’s structure
-and confirm that the model has a valid schema.
-The validity of the ONNX graph is verified by checking the model’s
-version, the graph’s structure, as well as the nodes and their inputs
-and outputs.</p>
+<p>ONNX 런타임에서 변환된 모델을 사용했을 때 같은 결과를 얻는지 확인하기 위해서 <code class="docutils literal notranslate"><span class="pre">torch_out</span></code> 를 계산합니다.</p>
+<p>ONNX 런타임에서의 모델 결과값을 확인하기 전에 먼저 ONNX API를 사용해 ONNX 모델을 확인해보도록 하겠습니다.
+먼저, <code class="docutils literal notranslate"><span class="pre">onnx.load(&quot;super_resolution.onnx&quot;)</span></code> 는 저장된 모델을 읽어온 후
+머신러닝 모델을 취합하여 저장하고 있는 상위 파일 컨테이너인 onnx.ModelProto를 리턴합니다.
+onnx.ModelProto에 대해 더 자세한 것은 <a class="reference external" href="https://github.com/onnx/onnx/blob/master/onnx/onnx.proto">onnx.proto 기술문서</a> 에서
+확인하실 수 있습니다.
+<code class="docutils literal notranslate"><span class="pre">onnx.checker.check_model(onnx_model)</span></code> 는 모델의 구조를 확인하고
+모델이 유효한 스키마(valid schema)를 가지고 있는지를 체크합니다.
+ONNX 그래프의 유효성은 모델의 버전, 그래프 구조, 노드들, 그리고 입력값과 출력값들을 모두 체크하여
+결정됩니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">onnx</span>
 
 <span class="n">onnx_model</span> <span class="o">=</span> <span class="n">onnx</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;super_resolution.onnx&quot;</span><span class="p">)</span>
 <span class="n">onnx</span><span class="o">.</span><span class="n">checker</span><span class="o">.</span><span class="n">check_model</span><span class="p">(</span><span class="n">onnx_model</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Now let’s compute the output using ONNX Runtime’s Python APIs.
-This part can normally be done in a separate process or on another
-machine, but we will continue in the same process so that we can
-verify that ONNX Runtime and PyTorch are computing the same value
-for the network.</p>
-<p>In order to run the model with ONNX Runtime, we need to create an
-inference session for the model with the chosen configuration
-parameters (here we use the default config).
-Once the session is created, we evaluate the model using the run() api.
-The output of this call is a list containing the outputs of the model
-computed by ONNX Runtime.</p>
+<p>이제 ONNX 런타임의 Python API를 통해 결과값을 계산해보도록 하겠습니다.
+이 부분은 보통 별도의 프로세스 또는 별도의 머신에서 실행되지만, 이 튜토리얼에서는 모델이
+ONNX 런타임과 PyTorch에서 동일한 결과를 출력하는지를 확인하기 위해 동일한 프로세스에서 계속 실행하도록
+하겠습니다.</p>
+<p>모델을 ONNX 런타임에서 실행하기 위해서는 미리 설정된 인자들(본 예제에서는 기본값을 사용합니다)로
+모델을 위한 추론 세션을 생성해야 합니다.
+세션이 생성되면, 모델의 run() API를 사용하여 모델을 실행합니다.
+이 API의 리턴값은 ONNX 런타임에서 연산된 모델의 결과값들을 포함하고 있는 리스트입니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">onnxruntime</span>
 
 <span class="n">ort_session</span> <span class="o">=</span> <span class="n">onnxruntime</span><span class="o">.</span><span class="n">InferenceSession</span><span class="p">(</span><span class="s2">&quot;super_resolution.onnx&quot;</span><span class="p">)</span>
@@ -470,40 +451,37 @@ computed by ONNX Runtime.</p>
 <span class="k">def</span> <span class="nf">to_numpy</span><span class="p">(</span><span class="n">tensor</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">tensor</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span> <span class="k">if</span> <span class="n">tensor</span><span class="o">.</span><span class="n">requires_grad</span> <span class="k">else</span> <span class="n">tensor</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
 
-<span class="c1"># compute ONNX Runtime output prediction</span>
+<span class="c1"># ONNX 런타임에서 계산된 결과값</span>
 <span class="n">ort_inputs</span> <span class="o">=</span> <span class="p">{</span><span class="n">ort_session</span><span class="o">.</span><span class="n">get_inputs</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">to_numpy</span><span class="p">(</span><span class="n">x</span><span class="p">)}</span>
 <span class="n">ort_outs</span> <span class="o">=</span> <span class="n">ort_session</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">ort_inputs</span><span class="p">)</span>
 
-<span class="c1"># compare ONNX Runtime and PyTorch results</span>
+<span class="c1"># ONNX 런타임과 PyTorch에서 연산된 결과값 비교</span>
 <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_allclose</span><span class="p">(</span><span class="n">to_numpy</span><span class="p">(</span><span class="n">torch_out</span><span class="p">),</span> <span class="n">ort_outs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">rtol</span><span class="o">=</span><span class="mf">1e-03</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mf">1e-05</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Exported model has been tested with ONNXRuntime, and the result looks good!&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>We should see that the output of PyTorch and ONNX Runtime runs match
-numerically with the given precision (rtol=1e-03 and atol=1e-05).
-As a side-note, if they do not match then there is an issue in the
-ONNX exporter, so please contact us in that case.</p>
-<div class="section" id="running-the-model-on-an-image-using-onnx-runtime">
-<h2>Running the model on an image using ONNX Runtime<a class="headerlink" href="#running-the-model-on-an-image-using-onnx-runtime" title="Permalink to this headline">¶</a></h2>
-<p>So far we have exported a model from PyTorch and shown how to load it
-and run it in ONNX Runtime with a dummy tensor as an input.</p>
-<p>For this tutorial, we will use a famous cat image used widely which
-looks like below</p>
+<p>이제 PyTorch와 ONNX 런타임에서 연산된 결과값이 서로 일치하는지 오차범위 (rtol=1e-03, atol=1e-05)
+이내에서 확인해야 합니다.
+만약 결과가 일치하지 않는다면 ONNX 변환기에 문제가 있는 것이니 저희에게 알려주시기 바랍니다.</p>
+<div class="section" id="onnx">
+<h2>ONNX 런타임에서 이미지를 입력값으로 모델을 실행하기<a class="headerlink" href="#onnx" title="Permalink to this headline">¶</a></h2>
+<p>지금까지 PyTorch 모델을 변환하고 어떻게 ONNX 런타임에서 구동하는지 가상의 텐서를 입력값으로 하여
+살펴보았습니다.</p>
+<p>본 튜토리얼에서는 아래와 같은 유명한 고양이 사진을 사용하도록 하겠습니다.</p>
 <div class="figure align-default">
 <img alt="cat" src="../_images/cat_224x224.jpg" />
 </div>
-<p>First, let’s load the image, pre-process it using standard PIL
-python library. Note that this preprocessing is the standard practice of
-processing data for training/testing neural networks.</p>
-<p>We first resize the image to fit the size of the model’s input (224x224).
-Then we split the image into its Y, Cb, and Cr components.
-These components represent a greyscale image (Y), and
-the blue-difference (Cb) and red-difference (Cr) chroma components.
-The Y component being more sensitive to the human eye, we are
-interested in this component which we will be transforming.
-After extracting the Y component, we convert it to a tensor which
-will be the input of our model.</p>
+<p>먼저, PIL 라이브러리를 사용하여 이미지를 로드하고 전처리하겠습니다. 이 전처리는 신경망 학습과 테스트에
+보편적으로 적용되고 있는 전처리 과정입니다.</p>
+<dl class="simple">
+<dt>먼저 이미지를 모델의 입력값 사이즈(224x224)에 맞게 리사이즈합니다.</dt><dd><p>그리고 이미지를 Y, Cb, Cr 성분으로 분해합니다.</p>
+</dd>
+</dl>
+<p>Y 성분[역자 주: 휘도 성분]은 그레이스케일(회색조) 이미지를 나타내고, Cb 성분은 파란색에서 밝기를 뺀 색차 성분,
+Cr은 빨강색에서 밝기를 뺀 색차 성분을 나타냅니다.
+사람의 눈은 Y 성분에 더 민감하게 반응하기 때문에 저희에게는 현재 이 성분이 중요하고, 이 Y 성분을 변환할 것입니다.
+Y 성분을 뽑아낸 뒤에, 추출한 Y 성분을 모델의 입력값이 될 텐서로 변환합니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">PIL</span> <span class="k">import</span> <span class="n">Image</span>
 <span class="kn">import</span> <span class="nn">torchvision.transforms</span> <span class="k">as</span> <span class="nn">transforms</span>
 
@@ -520,23 +498,20 @@ will be the input of our model.</p>
 <span class="n">img_y</span><span class="o">.</span><span class="n">unsqueeze_</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Now, as a next step, let’s take the tensor representing the
-greyscale resized cat image and run the super-resolution model in
-ONNX Runtime as explained previously.</p>
+<p>다음은 리사이즈된 그레이스케일 고양이 이미지 텐서를 앞서 설명했던 것처럼 초해상도 모델에 넘겨주어
+ONNX 런타임에서 실행하도록 하겠습니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ort_inputs</span> <span class="o">=</span> <span class="p">{</span><span class="n">ort_session</span><span class="o">.</span><span class="n">get_inputs</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">to_numpy</span><span class="p">(</span><span class="n">img_y</span><span class="p">)}</span>
 <span class="n">ort_outs</span> <span class="o">=</span> <span class="n">ort_session</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">ort_inputs</span><span class="p">)</span>
 <span class="n">img_out_y</span> <span class="o">=</span> <span class="n">ort_outs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 </pre></div>
 </div>
-<p>At this point, the output of the model is a tensor.
-Now, we’ll process the output of the model to construct back the
-final output image from the output tensor, and save the image.
-The post-processing steps have been adopted from PyTorch
-implementation of super-resolution model
-<a class="reference external" href="https://github.com/pytorch/examples/blob/master/super_resolution/super_resolve.py">here</a>.</p>
+<p>이렇게 하면 모델의 결과값은 텐서가 됩니다.
+이제 모델의 결과값을 처리하여 결과값 텐서에서 마지막 최종 출력 이미지를 만들고 이를 저장해보도록 하겠습니다.
+후처리 단계는 <a class="reference external" href="https://github.com/pytorch/examples/blob/master/super_resolution/super_resolve.py">링크</a> 에
+구현되어있는 초해상도 모델 코드에서 가져온 것입니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">img_out_y</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">fromarray</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">((</span><span class="n">img_out_y</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mf">255.0</span><span class="p">)</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">)[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;L&#39;</span><span class="p">)</span>
 
-<span class="c1"># get the output image follow post-processing step from PyTorch implementation</span>
+<span class="c1"># PyTorch 버전의 후처리 과정 코드를 이용해 결과 이미지 만들기</span>
 <span class="n">final_img</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span>
     <span class="s2">&quot;YCbCr&quot;</span><span class="p">,</span> <span class="p">[</span>
         <span class="n">img_out_y</span><span class="p">,</span>
@@ -544,19 +519,24 @@ implementation of super-resolution model
         <span class="n">img_cr</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">img_out_y</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">Image</span><span class="o">.</span><span class="n">BICUBIC</span><span class="p">),</span>
     <span class="p">])</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s2">&quot;RGB&quot;</span><span class="p">)</span>
 
-<span class="c1"># Save the image, we will compare this with the output image from mobile device</span>
+<span class="c1"># 이미지를 저장하고 모바일 기기에서의 결과 이미지와 비교하기</span>
 <span class="n">final_img</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s2">&quot;./_static/img/cat_superres_with_ort.jpg&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="figure align-default">
 <img alt="output\_cat" src="../_images/cat_superres_with_ort.jpg" />
 </div>
-<p>ONNX Runtime being a cross platform engine, you can run it across
-multiple platforms and on both CPUs and GPUs.</p>
-<p>ONNX Runtime can also be deployed to the cloud for model inferencing
-using Azure Machine Learning Services. More information <a class="reference external" href="https://docs.microsoft.com/en-us/azure/machine-learning/service/concept-onnx">here</a>.</p>
-<p>More information about ONNX Runtime’s performance <a class="reference external" href="https://github.com/microsoft/onnxruntime#high-performance">here</a>.</p>
-<p>For more information about ONNX Runtime <a class="reference external" href="https://github.com/microsoft/onnxruntime">here</a>.</p>
+<p>ONNX 런타임은 크로스플랫폼 엔진으로서 CPU와 GPU 뿐만 아니라 여러 플랫폼에서 실행될 수 있습니다.</p>
+<p>ONNX 런타임은 Azure Machine Learning Services와 같은 클라우드에 배포되어 모델 추론을 하는데
+사용될 수도 있습니다.
+더 자세한 내용은 <a class="reference external" href="https://docs.microsoft.com/en-us/azure/machine-learning/service/concept-onnx">링크</a> 를
+참조해주십시오.</p>
+<p>ONNX 런타임의 성능에 관한 것은 <a class="reference external" href="https://github.com/microsoft/onnxruntime#high-performance">여기</a> 에서
+확인하실 수 있습니다.</p>
+<p>ONNX 런타임에 관한 더 자세한 내용은 <a class="reference external" href="https://github.com/microsoft/onnxruntime">이 곳</a> 을 참조해 주세요.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#</span>
+</pre></div>
+</div>
 <p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.000 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-advanced-super-resolution-with-onnxruntime-py">
 <div class="sphx-glr-download docutils container">
@@ -581,7 +561,7 @@ using Azure Machine Learning Services. More information <a class="reference exte
         <a href="../intermediate/model_parallel_tutorial.html" class="btn btn-neutral float-right" title="Model Parallel Best Practices" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
       
       
-        <a href="cpp_export.html" class="btn btn-neutral" title="Loading a TorchScript Model in C++" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
+        <a href="cpp_export.html" class="btn btn-neutral" title="C++에서 TorchScript 모델 로딩하기" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
       
     </div>
   
@@ -620,8 +600,8 @@ using Azure Machine Learning Services. More information <a class="reference exte
           <div class="pytorch-right-menu" id="pytorch-right-menu">
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
-<li><a class="reference internal" href="#">(optional) Exporting a Model from PyTorch to ONNX and Running it using ONNX Runtime</a><ul>
-<li><a class="reference internal" href="#running-the-model-on-an-image-using-onnx-runtime">Running the model on an image using ONNX Runtime</a></li>
+<li><a class="reference internal" href="#">(선택) PyTorch 모델을 ONNX으로 변환하고 ONNX 런타임에서 실행하기</a><ul>
+<li><a class="reference internal" href="#onnx">ONNX 런타임에서 이미지를 입력값으로 모델을 실행하기</a></li>
 </ul>
 </li>
 </ul>

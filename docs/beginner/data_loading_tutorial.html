@@ -177,8 +177,8 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/flask_rest_api_tutorial.html">Deploying PyTorch in Python via a REST API with Flask</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Intro_to_TorchScript_tutorial.html">TorchScript 소개</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_export.html">Loading a TorchScript Model in C++</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../advanced/super_resolution_with_onnxruntime.html">(optional) Exporting a Model from PyTorch to ONNX and Running it using ONNX Runtime</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_export.html">C++에서 TorchScript 모델 로딩하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/super_resolution_with_onnxruntime.html">(선택) PyTorch 모델을 ONNX으로 변환하고 ONNX 런타임에서 실행하기</a></li>
 </ul>
 <p class="caption"><span class="caption-text">병렬 &amp; 분산 학습</span></p>
 <ul>
@@ -308,9 +308,8 @@
 <span id="sphx-glr-beginner-data-loading-tutorial-py"></span><h1>사용자 정의 Dataset, Dataloader, Transforms 작성하기<a class="headerlink" href="#dataset-dataloader-transforms" title="Permalink to this headline">¶</a></h1>
 <p><strong>저자</strong> : Sasank Chilamkurthy &lt;<a class="reference external" href="https://chsasank.github.io">https://chsasank.github.io</a>&gt;
 <strong>번역</strong> : 정윤성 &lt;<a class="reference external" href="https://github.com/Yunseong-Jeong">https://github.com/Yunseong-Jeong</a>&gt;</p>
-<p>we will see how to load and preprocess/augment data from a non trivial dataset.
-머신러닝 문제를 푸는 과정에서 데이터를 준비하는데 많은 노력이 필요합니다.
-PyTorch는 데이터를 불러오는 과정을 쉽고 (아마도) 코드를 보다 읽기 편하게 만드는 도구들을
+<p>머신러닝 문제를 푸는 과정에서 데이터를 준비하는데 많은 노력이 필요합니다.
+PyTorch는 데이터를 불러오는 과정을 쉽게해주고, 또 잘 사용한다면 코드의 가독성도 보다 높여줄 수 있는 도구들을
 제공합니다. 이 튜토리얼에서 일반적이지 않은 데이터셋으로부터 데이터를 읽어오고
 전처리하고 증가하는 방법을 알아보겠습니다.</p>
 <p>이번 튜토리얼을 진행하기 위해 아래 패키지들을 설치해주세요.</p>
@@ -342,9 +341,11 @@ PyTorch는 데이터를 불러오는 과정을 쉽고 (아마도) 코드를 보�
 <p>각각의 얼굴에 68개의 서로다른 중요 포인트들이 존재합니다.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>이 링크 &lt;<a class="reference external" href="https://download.pytorch.org/tutorial/faces.zip">https://download.pytorch.org/tutorial/faces.zip</a>&gt;`_ 를 통해 데이터셋을 다운로드 해주세요.
+<p>이 <a class="reference external" href="https://download.pytorch.org/tutorial/faces.zip">링크</a> 를 통해 데이터셋을 다운로드 해주세요.
 다운로드한 데이터셋은 ‘data/faces/’에 위치해야 합니다.
-다운로드 하신 데이터셋은 ‘dlib의 pose estimation`&lt;<a class="reference external" href="https://blog.dlib.net/2014/08/real-time-face-pose-estimation.html">https://blog.dlib.net/2014/08/real-time-face-pose-estimation.html</a>&gt;__이 적용된 데이터 셋입니다.</p>
+이 데이터셋은 ImageNet에서 ‘얼굴’이라는 태그를 가진 몇몇 이미지들에 대해
+<a class="reference external" href="https://blog.dlib.net/2014/08/real-time-face-pose-estimation.html">dlib의 pose estimation</a> 을
+적용한 데이터셋입니다.</p>
 </div>
 <p>데이터셋은 아래와 같은 특징을 가진 CSV 파일이 포함되어 있습니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">image_name</span><span class="p">,</span><span class="n">part_0_x</span><span class="p">,</span><span class="n">part_0_y</span><span class="p">,</span><span class="n">part_1_x</span><span class="p">,</span><span class="n">part_1_y</span><span class="p">,</span><span class="n">part_2_x</span><span class="p">,</span> <span class="o">...</span> <span class="p">,</span><span class="n">part_67_x</span><span class="p">,</span><span class="n">part_67_y</span>
@@ -394,12 +395,11 @@ First 4 Landmarks: [[32. 65.]
 <div class="section" id="dataset">
 <h2>Dataset 클래스<a class="headerlink" href="#dataset" title="Permalink to this headline">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">torch.utils.data.Dataset</span></code> 은 데이터셋을 나타내는 추상클래스입니다.
-여러분의 데이터셋은 <code class="docutils literal notranslate"><span class="pre">Dataset</span></code> 에 상속하고 아래와같이 오버라이드 해야합니다.
-methods:</p>
+여러분의 데이터셋은 <code class="docutils literal notranslate"><span class="pre">Dataset</span></code> 에 상속하고 아래와 같이 오버라이드 해야합니다.</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">len(dataset)</span></code> 에서 호출되는 <code class="docutils literal notranslate"><span class="pre">__len__</span></code> 은 데이터셋의 크기를 리턴해야합니다.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">dataset[i]</span></code> 에서 호출되는 <code class="docutils literal notranslate"><span class="pre">__getitem__</span></code> 은
-math:<cite>i</cite> 번째 샘플을 찾는데 사용됩니다.</p></li>
+<span class="math notranslate nohighlight">\(i\)</span>번째 샘플을 찾는데 사용됩니다.</p></li>
 </ul>
 <p>이제 데이터셋 클래스를 만들어보도록 하겠습니다.
 <code class="docutils literal notranslate"><span class="pre">__init__</span></code> 을 사용해서 CSV 파일 안에 있는 데이터를 읽지만,
@@ -613,8 +613,8 @@ math:<cite>i</cite> 번째 샘플을 찾는데 사용됩니다.</p></li>
 <img alt="../_images/sphx_glr_data_loading_tutorial_003.png" class="sphx-glr-single-img" src="../_images/sphx_glr_data_loading_tutorial_003.png" />
 </div>
 </div>
-<div class="section" id="id1">
-<h2>데이터셋을 이용한 반복작업<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id2">
+<h2>데이터셋을 이용한 반복작업<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
 <p>전이(transform)를 적용한 dataset을 만들기위해서 만들었던것을 다 집어 넣어 봅시다.</p>
 <p>요약하자면, 데이터셋은 다음과 같이 샘플링 됩니다.</p>
 <ul class="simple">
@@ -747,7 +747,7 @@ training code에 대한 예시를 알고 싶다면,
 :doc:`transfer_learning_tutorial` 문서를 참고해주세요
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 1 minutes  2.921 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 1 minutes  4.879 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-beginner-data-loading-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/6042bacf7948939030769777afe22e55/data_loading_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">data_loading_tutorial.py</span></code></a></p>
@@ -816,7 +816,7 @@ training code에 대한 예시를 알고 싶다면,
 <li><a class="reference internal" href="#compose-transforms">Compose transforms</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#id1">데이터셋을 이용한 반복작업</a></li>
+<li><a class="reference internal" href="#id2">데이터셋을 이용한 반복작업</a></li>
 <li><a class="reference internal" href="#afterword-torchvision">Afterword: torchvision</a></li>
 </ul>
 </li>
