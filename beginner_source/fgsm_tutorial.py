@@ -24,9 +24,9 @@ performance. Given that this is a tutorial, we will explore the topic
 via example on an image classifier. Specifically we will use one of the
 first and most popular attack methods, the Fast Gradient Sign Attack
 (FGSM), to fool an MNIST classifier.
-이 튜토리얼은 ML 모델들의 보안 취약점에 대한 인식을 높이고, 요즘 이슈가 되는 적대적 머신 러닝 주제에 대한 통찰력을 제공합니다.
-기계 학습. 이미지에 감지 할 수 없는 변화를 추가하면 모델 성능이 크게 달라질 수 있다는 사실에 놀랄 수 있습니다.
-주어진 이번 튜토리얼에서는 이미지 분류기의 예제를 통해 위 내용에 대해 살펴볼 것입니다.
+이 튜토리얼은 ML 모델들의 보안 취약점에 대한 인식을 높이고, 요즘 이슈가 되는 적대적 머신 러닝 주제에 대한 통찰력을 제공합니다. 
+이미지에 감지 할 수 없는 변화를 추가하면 모델 성능이 크게 달라질 수 있다는 사실에 놀랄 수 있습니다.
+이번 튜토리얼에서는 이미지 분류기의 예제를 통해 위 내용에 대해 살펴볼 것입니다.
 특히 우리는 가장 많이 사용되는 공격 방법 중 하나인 FGSM (Fast Gradient Sign Attack)을 이용해 MNIST 분류자를 속여 볼 것입니다.
 """
 
@@ -54,7 +54,7 @@ first and most popular attack methods, the Fast Gradient Sign Attack
 # originally of a specific source class so that it is classified as a
 # specific target class.
 # 상황에 따라 다양한 범주의 적대적 공격이 있는데 각각은 목표가 다르고 공격자의 지식에
-# 대한 가정도 다릅니다. 그러나 보통 가장 중요한 목표는 입력 데이터에 최소한의 섭동을 
+# 대한 가정도 다릅니다. 그러나 보통 가장 중요한 목표는 입력 데이터에 최소한의 작은 변화(Perturbation)을 
 # 추가하여 이것이 의도하는대로 잘못 분류되게 하는 것입니다. 공격자의 지식에 대한 
 # 가정도는 여러 종류가 있는데, 보통 **화이트박스**와 **블랙박스** 두 가지가 있습니다. 
 # *화이트박스* 공격은 공격자가 모델에 대해 아키텍처, 입력, 출력, 가중치를 포함한 모든 것을
@@ -160,8 +160,8 @@ import matplotlib.pyplot as plt
 #    accuracy. Since the data range here is :math:`[0,1]`, no epsilon
 #    value should exceed 1.
 # - **epsilons** - 실행에 사용할 엡실론의 리스트입니다. 엡실론 0의 값은 원래 테스트 셋의 모델 성능을
-#   나타내므로 목록에 유지하는 것이 중요합니다. 또한 직관적으로 우리는 엡실론이 클수록 섭동이 더 눈에 띄지만
-#   모델 정확도 저하 측면에서 더 효과적인 공격을 기대합니다. 여기서 데이터의 범위는 0-1 이기 때문에 
+#   나타내므로 목록에 유지하는 것이 중요합니다. 또한 직관적으로 엡실론이 클수록 작은 변화가 더 눈에 띄지만
+#   모델 정확도를 저하 시키는 측면에서 더 효과가 있습니다. 여기서 데이터의 범위는 0-1 이기 때문에 
 #   엡실론의 값은 1을 초과할 수 없습니다.
 # 
 # -  **pretrained_model** - path to the pretrained MNIST model which was
@@ -176,7 +176,7 @@ import matplotlib.pyplot as plt
 #    Note, a GPU with CUDA is not critical for this tutorial as a CPU will
 #    not take much time.
 # -  **use_cuda** - CUDA 를 사용할지 말지 정하는 이진 플래그. 
-#    본 튜토리얼에서는 CPU 시간이 오래 걸리지 않으므로 CUDA가 있는 GPU는 중요하지 않습니다.
+#    본 튜토리얼에서는 CPU 시간이 오래 걸리지 않으므로 CUDA를 지원하는 GPU 의 여부는 중요하지 않습니다.
 # 
 
 epsilons = [0, .05, .1, .15, .2, .25, .3]
@@ -196,8 +196,8 @@ use_cuda=True
 # been copied from the MNIST example. The purpose of this section is to
 # define the model and dataloader, then initialize the model and load the
 # pretrained weights.
-# 언급한대로, 공격을 받는 모델은 `pytorch/examples/mnist <https://github.com/pytorch/examples/tree/master/mnist>`__
-# 와 동일한 MNIST 모델입니다.  본인의 MNIST 모델을 학습 및 저장하거나 제공된 모델을 다운로드하여 사용할 수 있습니다.
+# 앞서 말한대로, 공격을 받는 모델은 `pytorch/examples/mnist <https://github.com/pytorch/examples/tree/master/mnist>`__
+# 와 동일한 MNIST 모델입니다. 본인의 MNIST 모델을 학습 및 저장하는 방식으로 하거나 제공된 모델을 다운로드 해 사용하는 식으로 진행할 수 있습니다.
 # 여기서 *Net* 정의 및 테스트 데이터 로더는 MNIST 예제에서 복사 하였습니다. 
 # 이 섹션의 목적은 모델과 데이터 로더를 정의한 다음, 모델을 초기화하고 미리 학습된 가중치를 읽어오는 것입니다.
 # 
@@ -262,15 +262,15 @@ model.eval()
 # then creates perturbed image as
 # 이제 원래 입력을 교란시켜 적대적인 예를 만드는 함수를 정의 할 수 있습니다. 
 # ``fgsm_attack``` 함수는 입력 파라미터로 3가지를 가집니다. 첫번째는 원본 *이미지*(:math:`x`), 
-# 두번째는 *엡실론*으로 픽셀 단위의 섭동을 주는 값입니다 (:math:`\epsilon`). 
+# 두번째는 *엡실론*으로 픽셀 단위의 작은 변화를 주는 값입니다 (:math:`\epsilon`). 
 # 마지막은 *data_grad* 로 입력 영상 (:math:`\nabla_{x} J(\mathbf{\theta}, \mathbf{x}, y)`) 에 대한 경사도 손실 값입니다. 
-# 아래 식에 따른 섭동된 이미지를 생성합니다.
+# 아래 식에 따른 작은 변화가 적용된 이미지를 생성합니다.
 # 
 # .. math:: perturbed\_image = image + epsilon*sign(data\_grad) = x + \epsilon * sign(\nabla_{x} J(\mathbf{\theta}, \mathbf{x}, y))
 # 
 # Finally, in order to maintain the original range of the data, the
 # perturbed image is clipped to range :math:`[0,1]`.
-# 마지막으로 데이터의 원래 범위를 유지하기 위해, 섭동된 이미지가 :math:`[0,1]` 범위로 잘립니다.
+# 마지막으로 데이터의 원래 범위를 유지하기 위해, 작은 변화가 적용된 이미지가 :math:`[0,1]` 범위로 잘립니다.
 # 
 
 # FGSM attack code
@@ -280,13 +280,13 @@ def fgsm_attack(image, epsilon, data_grad):
     # data_grad 의 요소별 부호 값을 얻어옵니다
     sign_data_grad = data_grad.sign()
     # Create the perturbed image by adjusting each pixel of the input image
-    # 입력 이미지의 각 픽셀에 sign_data_grad 를 적용해 섭동된 이미지를 생성합니다.
+    # 입력 이미지의 각 픽셀에 sign_data_grad 를 적용해 작은 변화가 적용된 이미지를 생성합니다.
     perturbed_image = image + epsilon*sign_data_grad
     # Adding clipping to maintain [0,1] range
     # 값 범위를 [0,1]로 유지하기 위해 자르기(clipping)를 추가합니다
     perturbed_image = torch.clamp(perturbed_image, 0, 1)
     # Return the perturbed image
-    # 섭동된 이미지를 리턴합니다
+    # 작은 변화가 적용된 이미지를 리턴합니다
     return perturbed_image
 
 
@@ -311,7 +311,7 @@ def fgsm_attack(image, epsilon, data_grad):
 # 이 테스트 기능을 호출 할 때마다 MNIST 테스트 셋에서 전체 테스트 단계를 수행하고 최종 정확도를 보고합니다.
 # 그러나 이 함수에는 *엡실론* 입력도 필요합니다. 이는 ``테스트``` 함수가 :math:`\epsilon` 크기에 따라 공격자의 공격을 받는 모델의 
 # 정확성을 보고하기 때문입니다. 더 구체적으로 보면 테스트 셋의 각각의 샘플에서 테스트 함수는 입력 데이터에 대한 손실 경사도 (:math:`data\_grad`) 를 계산하고, 
-#  ``FGSM 공격`` (:math:`perturbed\_data`) 을 받은 섭동 이미지를 만들고 나서 섭동 이미지가 적대적인지 확인을 합니다. 
+#  ``FGSM 공격`` (:math:`perturbed\_data`) 을 받은 작은 변화가 적용된 이미지를 만들고 나서 작은 변화가 적용된 이미지가 적대적인지 확인을 합니다. 
 # 추가로 모델의 정확도를 테스트하기 위해서 테스트 함수는 나중에 시각화하여 볼 수 있도록 성공적으로 얻은 적대적 이미지를 저장하고 반환합니다.
 # 
 
@@ -365,7 +365,7 @@ def test( model, device, test_loader, epsilon ):
         perturbed_data = fgsm_attack(data, epsilon, data_grad)
 
         # Re-classify the perturbed image
-        # 섭동된 이미지에 대해 재분류합니다
+        # 작은 변화가 적용된 이미지에 대해 재분류합니다
         output = model(perturbed_data)
 
         # Check for success
@@ -445,7 +445,12 @@ for eps in epsilons:
 # :math:`\epsilon=0.25` and :math:`\epsilon=0.3`.
 # 첫 번째 결과는 정확도 vs 엡실론 을 도식 한 것 입니다. 
 # 앞서 언급했듯이 엡실론이 증가함에 따라 테스트 정확도가 떨어질 것으로 기대합니다.
-# 
+# 이는 학습을 더 진행해 갈수록 엡실론이 클수록 손실을 극대화 할 방향으로 진행되기 때문입니다.
+# 엡실론 값이 선형적으로 분포하더라도 곡선의 추세는 선형의 형태가 아닙니다.
+# 예를 들면, math:`\epsilon=0.05` 에서의 정확도가 :math:`\epsilon=0` 보다 약 4% 낮지만
+# :math:`\epsilon=0.2` 에서의 정확도는 :math:`\epsilon=0.15` 보다 약 25% 정도 낮습니다.
+# 또한, :math:`\epsilon=0.25` 와 :math:`\epsilon=0.3` 사이의 모델 정확도는 랜덤으로
+# 10개중 1개를 선택했을 때의 정확도와 유사한 수준입니다.
 
 plt.figure(figsize=(5,5))
 plt.plot(epsilons, accuracies, "*-")
@@ -459,6 +464,7 @@ plt.show()
 
 ######################################################################
 # Sample Adversarial Examples
+# 샘플 적대적 예제들
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # 
 # Remember the idea of no free lunch? In this case, as epsilon increases
@@ -473,9 +479,17 @@ plt.show()
 # perturbations start to become evident at :math:`\epsilon=0.15` and are
 # quite evident at :math:`\epsilon=0.3`. However, in all cases humans are
 # still capable of identifying the correct class despite the added noise.
-# 
+# 공짜 점심은 없다는 것을 기억하시나요? 이 경우에는 엡실론이 증가할수록 테스트 정확도는 떨어집니다. 
+# **그러나** 작은 변화는 더 쉽게 인식할 수 있게 됩니다.
+# 실제로 정확도 저하와 공격자가 고려해야 하는 이해도 사이에는 상충 관계(tradeoff)가 있습니다.
+# 여기서 우리는 각 엡실론 값에서 성공적인 대적 사례를 보이는 몇 가지 예를 보겠습니다.
+# 아래 이미지의 첫번째로 열은 :math:`\epsilon=0` 인 예제들로 작은 변화가 없는 원본의 "깨끗한" 이미지들을 나타냅니다.
+# 각 이미지의 위의 글자는 "원래 분류 결과 -> 적대적 분류 결과"를 나타냅니다.
+# :math:`\epsilon=0.15` 에서 작은 변화가 눈에 띄기 시작하고 :math:`\epsilon=0.3` 에서는 확실해 보입니다.
+# 그러나 모든 경우에 대해서 노이즈가 추가되었더라도 사람은 올바르게 분류를 수행할 수 있습니다.
 
 # Plot several examples of adversarial samples at each epsilon
+# 각 엡실론에서 적대적 샘플의 몇 가지 예를 도식화합니다.
 cnt = 0
 plt.figure(figsize=(8,10))
 for i in range(len(epsilons)):
@@ -495,6 +509,7 @@ plt.show()
 
 ######################################################################
 # Where to go next?
+# 다음 단계는?
 # -----------------
 # 
 # Hopefully this tutorial gives some insight into the topic of adversarial
@@ -508,7 +523,15 @@ plt.show()
 # on defense also leads into the idea of making machine learning models
 # more *robust* in general, to both naturally perturbed and adversarially
 # crafted inputs.
-# 
+# 이번 튜토리얼에서 적대적 머신 러닝 주제의 인사이트를 얻을 수 있었기를 바랍니다.
+# 여기에서부터 더 많은 것들을 알아나갈 수 있습니다.
+# 튜토리얼의 적대적 공격 예제는 본 분야의 초급 단계이며 
+# 적대적 상황으로부터 ML 모델을 공격하고 방어하는 방법에 대한 많은 후속 아이디어가 있습니다.
+# 사실 NIPS 2017 에서 적대적 공격과 방어에 대한 경쟁(competition)이 있었고 여기서 사용된
+# 다양한 방법들은 다음 논문에 정리 되어 있습니다: `적대적 공격과 방어 경쟁 <https://arxiv.org/pdf/1804.00097.pdf>`__.
+# 방어에 대한 연구는 자연스럽게 교란 및 해킹 목적으로 제작된 입력에 대해 머신 러닝 모델을
+# 보다 *강건하게(robust)* 만드는 아이디어로 이어집니다.
+#  
 # Another direction to go is adversarial attacks and defense in different
 # domains. Adversarial research is not limited to the image domain, check
 # out `this <https://arxiv.org/pdf/1801.01944.pdf>`__ attack on
@@ -517,5 +540,10 @@ plt.show()
 # implement a different attack from the NIPS 2017 competition, and see how
 # it differs from FGSM. Then, try to defend the model from your own
 # attacks.
+# 또 다른 방향은 다른 도메인에서의 적의 공격과 방어입니다. 적대적 연구는 이미지 도메인에 제한되어 있지 않습니다. 
+# `여기 <https://arxiv.org/pdf/1801.01944.pdf>`__ 에서 음성-텍스트 변환 모델에서의 공격도 확인할 수 있습니다.
+# 그러나 적대적 머신 러닝 분야에 대해서 많은 것을 알기 위한 최고의 방법은 많이 해보는 것입니다.
+# NIPS 2017 경쟁에서 소개된 다양한 공격 방법을 직접 구현해 보고, FGSM 과 어떤 점이 다른지 연구해 보세요.
+# 그리고 나서 직접 만든 공격에서부터 모델을 방어해 보세요.
 # 
 
