@@ -307,73 +307,97 @@ def fgsm_attack(image, epsilon, data_grad):
 # if the perturbed example is adversarial. In addition to testing the
 # accuracy of the model, the function also saves and returns some
 # successful adversarial examples to be visualized later.
+# 마지막으로 본 튜토리얼의 중심 결과는 ``테스트`` 함수에서 오게 됩니다. 
+# 이 테스트 기능을 호출 할 때마다 MNIST 테스트 셋에서 전체 테스트 단계를 수행하고 최종 정확도를 보고합니다.
+# 그러나 이 함수에는 *엡실론* 입력도 필요합니다. 이는 ``테스트``` 함수가 :math:`\epsilon` 크기에 따라 공격자의 공격을 받는 모델의 
+# 정확성을 보고하기 때문입니다. 더 구체적으로 보면 테스트 셋의 각각의 샘플에서 테스트 함수는 입력 데이터에 대한 손실 경사도 (:math:`data\_grad`) 를 계산하고, 
+#  ``FGSM 공격`` (:math:`perturbed\_data`) 을 받은 섭동 이미지를 만들고 나서 섭동 이미지가 적대적인지 확인을 합니다. 
+# 추가로 모델의 정확도를 테스트하기 위해서 테스트 함수는 나중에 시각화하여 볼 수 있도록 성공적으로 얻은 적대적 이미지를 저장하고 반환합니다.
 # 
 
 def test( model, device, test_loader, epsilon ):
 
     # Accuracy counter
+    # 정확도 카운터
     correct = 0
     adv_examples = []
 
     # Loop over all examples in test set
+    # 테스트 셋의 모든 예제에 대해 루프를 돕니다
     for data, target in test_loader:
 
         # Send the data and label to the device
+        # 디바이스(CPU or GPU) 에 데이터와 라벨 값을 보냅니다
         data, target = data.to(device), target.to(device)
 
         # Set requires_grad attribute of tensor. Important for Attack
+        # 텐서의 속성 중 requires_grad 를 설정합니다. 공격에서 중요한 부분입니다
         data.requires_grad = True
 
         # Forward pass the data through the model
+        # 데이터를 모델에 통과시킵니다
         output = model(data)
         init_pred = output.max(1, keepdim=True)[1] # get the index of the max log-probability
 
         # If the initial prediction is wrong, dont bother attacking, just move on
+        # 만약 초기 예측이 틀리면, 공격하지 않도록 하고 계속 진행합니다
         if init_pred.item() != target.item():
             continue
 
         # Calculate the loss
+        # 손실을 계산합니다
         loss = F.nll_loss(output, target)
 
         # Zero all existing gradients
+        # 모델의 경사도들을 전부 0으로 설정합니다
         model.zero_grad()
 
         # Calculate gradients of model in backward pass
+        # 후방 전달을 통해 모델의 경사도를 계산합니다
         loss.backward()
 
         # Collect datagrad
+        # 경사도 값을 모읍니다
         data_grad = data.grad.data
 
         # Call FGSM Attack
+        # FGSM 공격을 호출합니다
         perturbed_data = fgsm_attack(data, epsilon, data_grad)
 
         # Re-classify the perturbed image
+        # 섭동된 이미지에 대해 재분류합니다
         output = model(perturbed_data)
 
         # Check for success
+        # 올바른지 확인합니다
         final_pred = output.max(1, keepdim=True)[1] # get the index of the max log-probability
         if final_pred.item() == target.item():
             correct += 1
             # Special case for saving 0 epsilon examples
+            # 0 엡실론 예제에 대해서 저장합니다
             if (epsilon == 0) and (len(adv_examples) < 5):
                 adv_ex = perturbed_data.squeeze().detach().cpu().numpy()
                 adv_examples.append( (init_pred.item(), final_pred.item(), adv_ex) )
         else:
             # Save some adv examples for visualization later
+            # 추후 시각화를 위하 다른 예제들을 저장합니다
             if len(adv_examples) < 5:
                 adv_ex = perturbed_data.squeeze().detach().cpu().numpy()
                 adv_examples.append( (init_pred.item(), final_pred.item(), adv_ex) )
 
     # Calculate final accuracy for this epsilon
+    # 해당 엡실론에서의 최종 정확도를 계산합니다
     final_acc = correct/float(len(test_loader))
     print("Epsilon: {}\tTest Accuracy = {} / {} = {}".format(epsilon, correct, len(test_loader), final_acc))
 
     # Return the accuracy and an adversarial example
+    # 정확도와 적대적 예제를 리턴합니다
     return final_acc, adv_examples
 
 
 ######################################################################
 # Run Attack
+# 공격 실행
 # ~~~~~~~~~~
 # 
 # The last part of the implementation is to actually run the attack. Here,
@@ -383,12 +407,17 @@ def test( model, device, test_loader, epsilon ):
 # the printed accuracies decrease as the epsilon value increases. Also,
 # note the :math:`\epsilon=0` case represents the original test accuracy,
 # with no attack.
+# 구현의 마지막 부분은 공격을 실행하는 것입니다. 여기서 전체 테스트 스텝을 각 *엡실론* 값에 실행합니다. 
+# 각 엡실론마다 최종 정확도와 성공적인 일부 적대 사례를 저장하여 다음 섹션에 표시합니다. 
+# 엡실론 값이 증가함에 따라 출력된 정확도가 어떻게 감소하는지 보십시오. 
+# 또한, :math:`\epsilon=0` 인 경우에는 공격이 없는 원본 테스트 정확도임을 보입니다.
 # 
 
 accuracies = []
 examples = []
 
 # Run test for each epsilon
+# 각 엡실론에 대해 테스트 함수를 실행합니다
 for eps in epsilons:
     acc, ex = test(model, device, test_loader, eps)
     accuracies.append(acc)
@@ -397,9 +426,11 @@ for eps in epsilons:
 
 ######################################################################
 # Results
+# 결과
 # -------
 # 
 # Accuracy vs Epsilon
+# 정확도 vs 엡실론
 # ~~~~~~~~~~~~~~~~~~~
 # 
 # The first result is the accuracy versus epsilon plot. As alluded to
@@ -412,6 +443,8 @@ for eps in epsilons:
 # lower than :math:`\epsilon=0.15`. Also, notice the accuracy of the model
 # hits random accuracy for a 10-class classifier between
 # :math:`\epsilon=0.25` and :math:`\epsilon=0.3`.
+# 첫 번째 결과는 정확도 vs 엡실론 을 도식 한 것 입니다. 
+# 앞서 언급했듯이 엡실론이 증가함에 따라 테스트 정확도가 떨어질 것으로 기대합니다.
 # 
 
 plt.figure(figsize=(5,5))
