@@ -6,11 +6,6 @@ PyTorch를 어떻게 사용하는지 알고 싶다면 시작하기(Getting Start
 신경망(deep neural network)을 구축할 때 PyTorch를 어떻게 사용하는지에 대한
 전반적인 내용을 기본부터 제공합니다.
 
-(역자 주: 한국어 번역에 대한 오타나 오역을 발견하시면
-`번역 저장소 <https://github.com/9bow/PyTorch-tutorials-kr>`__ 에
-`이슈 <https://github.com/9bow/PyTorch-tutorials-kr/issues/new>`__ 또는
-`PR <https://github.com/9bow/PyTorch-tutorials-kr/pulls>`__ 을 남겨주세요.)
-
 아래 내용도 한 번 살펴보시면 좋습니다:
 
 * 사용자들이 튜토리얼과 연관된 노트북을 Google Colab에서 열어볼 수 있는 기능이 추가되었습니다.
