@@ -1,70 +1,64 @@
-Using Tutorial Data from Google Drive in Colab
-==============================================
+Colab에서 Google Drive의 튜토리얼 데이터 사용하기
+====================================================
 
-We've added a new feature to tutorials that allows users to open the
-notebook associated with a tutorial in Google Colab. You may need to
-copy data to your Google drive account to get the more complex tutorials
-to work.
+사용자가 Google Colab에서 튜토리얼과 관련된 노트북을 열 수 있도록 하는 새로운
+기능이 튜토리얼에 추가되었습니다. 이 때, 보다 복잡한 튜토리얼을 실행하려면
+사용자의 Google Drive 계정에 데이터를 복사해야 할 수도 있습니다.
 
-In this example, we'll demonstrate how to change the notebook in Colab
-to work with the Chatbot Tutorial. To do this, you'll first need to be
-logged into Google Drive. (For a full description of how to access data
-in Colab, you can view their example notebook
-`here <https://colab.research.google.com/notebooks/io.ipynb#scrollTo=XDg9OBaYqRMd>`__.)
+이 예제에서는 챗봇(Chatbot) 튜토리얼을 Colab에서 동작하도록 변경하는 방법을
+설명하겠습니다. 이를 위해서, 먼저 Google Drive에 로그인이 되어 있어야 합니다.
+(Colab에서 데이터에 접근하는 방법에 대한 자세한 설명은
+`여기 <https://colab.research.google.com/notebooks/io.ipynb#scrollTo=XDg9OBaYqRMd>`__
+에서 예제 노트북을 통해 볼 수 있습니다.)
 
-To get started open the `Chatbot
-Tutorial <https://pytorch.org/tutorials/beginner/chatbot_tutorial.html>`__
-in your browser.
+시작하기 전에 `챗봇 튜토리얼 <https://tutorials.pytorch.kr/beginner/chatbot_tutorial.html>`__
+을 브라우저에 띄워주세요.
 
-At the top of the page click **Run in Google Colab**.
+페이지 상단에 **Run in Google Colab** 을 클릭합니다.
 
-The file will open in Colab.
+Colab에서 파일이 열리게 됩니다.
 
-If you choose, **Runtime** then **Run All**, you'll get an error as the
-file can't be found.
+**Runtime** 을 선택한 뒤 **Run All** 을 선택하면 파일을 찾을 수 없다(the file can't be found)는
+에러가 발생합니다.
 
-To fix this, we'll copy the required file into our Google Drive account.
+이를 해결하기 위해, 필요한 파일들을 Google Drive에 복사하겠습니다.
 
-1. Log into Google Drive.
-2. In Google Drive, make a folder named **data**, with a subfolder named
-   **cornell**.
-3. Visit the Cornell Movie Dialogs Corpus and download the ZIP file.
-4. Unzip the file on your local machine.
-5. Copy the file **movie\_lines.txt** to **data/cornell** folder you
-   created in Google Drive.
+1. Google Drive에 로그인합니다.
+2. Google Drive에서 **data** 라는 이름의 폴더 및 이 아래에 **cornell** 라는 하위
+   폴더도 생성합니다.
+3. Cornell Movie Dialogs Corpus에 방문하여 ZIP 파일을 내려받습니다.
+4. 로컬 머신에 압축을 풉니다.
+5. **movie\_lines.txt** 파일을 Google Drive에 생성한 **data/cornell** 폴더 안에
+   복사합니다.
 
-Now we'll need to edit the file in\_ \_Colab to point to the file on
-Google Drive.
+이제 Google Drive 상의 파일을 가르키도록 Colab의 파일을 편집해야 합니다.
 
-In Colab, add the following to top of the code section over the line
-that begins *corpus\_name*:
+Colab에서 *corpus\_name* 으로 시작하는 코드 섹션의 윗 부분에 다음 내용을 추가합니다:
 
 ::
 
     from google.colab import drive
     drive.mount('/content/gdrive')
 
-Change the two lines that follow:
 
-1. Change the **corpus\_name** value to **"cornell"**.
-2. Change the line that begins with **corpus** to this:
+이제 다음과 같이 2줄을 변경하세요:
+
+1. **corpus\_name** 값을 **"cornell"** 로 변경합니다.
+2. **corpus** 로 시작하는 줄을 아래처럼 변경합니다:
 
 ::
 
     corpus = os.path.join("/content/gdrive/My Drive/data", corpus_name)
 
-We're now pointing to the file we uploaded to Drive.
+이제 Google Drive에 업로드한 파일을 가리키고 있습니다.
 
-Now when you click on the **Run cell** button for the code section,
-you'll be prompted to authorize Google Drive and you'll get an
-authorization code. Paste the code into the prompt in Colab and you
-should be set.
+이제 코드 섹션의 **Run cell** 버튼을 클릭하게 되면 Google Drive에 인증하라는
+메시지가 표시되고 인증 코드를 받게 됩니다. 인증 코드를 Colab에 붙여넣으면
+설정이 됩니다.
 
-Rerun the notebook from **Runtime** / **Run All** menu command and
-you'll see it process. (Note that this tutorial takes a long time to
-run.)
+노트북의 **Runtime** / **Run All** 메뉴 명령을 다시 실행하면, 진행 상황을 볼 수
+있습니다. (챗봇 튜토리얼은 실행하는데 시간이 오래 걸리니 참고하세요.)
 
-Hopefully this example will give you a good starting point for running
-some of the more complex tutorials in Colab. As we evolve our use of
-Colab on the PyTorch tutorials site, we'll look at ways to make this
-easier for users.
+이 예제가 Coalb에서 보다 복잡한 튜토리얼을 실행하는데 있어서 좋은 시작점이 되길
+바랍니다. PyTorch 튜토리얼 사이트에서 Colab을 더 활용하여 사용자들이 더 쉽게
+사용할 수 있는 방법을 찾아보겠습니다.
