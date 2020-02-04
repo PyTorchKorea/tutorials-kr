@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Deploying PyTorch in Python via a REST API with Flask &mdash; PyTorch Tutorials 1.3.1 documentation</title>
+  <title>Flask를 이용하여 Python에서 PyTorch를 REST API로 배포하기 &mdash; PyTorch Tutorials 1.3.1 documentation</title>
   
 
   
@@ -175,7 +175,7 @@
 </ul>
 <p class="caption"><span class="caption-text">PyTorch 모델을 운영환경에 배포하기</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Deploying PyTorch in Python via a REST API with Flask</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Flask를 이용하여 Python에서 PyTorch를 REST API로 배포하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/Intro_to_TorchScript_tutorial.html">TorchScript 소개</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_export.html">C++에서 TorchScript 모델 로딩하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/super_resolution_with_onnxruntime.html">(선택) PyTorch 모델을 ONNX으로 변환하고 ONNX 런타임에서 실행하기</a></li>
@@ -246,7 +246,7 @@
       </li>
 
         
-      <li>Deploying PyTorch in Python via a REST API with Flask</li>
+      <li>Flask를 이용하여 Python에서 PyTorch를 REST API로 배포하기</li>
     
     
       <li class="pytorch-breadcrumbs-aside">
@@ -304,48 +304,51 @@
 <p class="admonition-title">Note</p>
 <p>Click <a class="reference internal" href="#sphx-glr-download-intermediate-flask-rest-api-tutorial-py"><span class="std std-ref">here</span></a> to download the full example code</p>
 </div>
-<div class="sphx-glr-example-title section" id="deploying-pytorch-in-python-via-a-rest-api-with-flask">
-<span id="sphx-glr-intermediate-flask-rest-api-tutorial-py"></span><h1>Deploying PyTorch in Python via a REST API with Flask<a class="headerlink" href="#deploying-pytorch-in-python-via-a-rest-api-with-flask" title="Permalink to this headline">¶</a></h1>
-<p><strong>Author</strong>: <a class="reference external" href="https://avi.im">Avinash Sajjanshetty</a></p>
-<p>In this tutorial, we will deploy a PyTorch model using Flask and expose a
-REST API for model inference. In particular, we will deploy a pretrained
-DenseNet 121 model which detects the image.</p>
+<div class="sphx-glr-example-title section" id="flask-python-pytorch-rest-api">
+<span id="sphx-glr-intermediate-flask-rest-api-tutorial-py"></span><h1>Flask를 이용하여 Python에서 PyTorch를 REST API로 배포하기<a class="headerlink" href="#flask-python-pytorch-rest-api" title="Permalink to this headline">¶</a></h1>
+<dl class="simple">
+<dt><strong>Author</strong>: <a class="reference external" href="https://avi.im">Avinash Sajjanshetty</a></dt><dd><p><strong>번역</strong>: <a class="reference external" href="http://github.com/9bow">박정환</a></p>
+</dd>
+</dl>
+<p>이 튜토리얼에서는 Flask를 이용하여 PyTorch 모델을 배포하고 모델 추론(inference)을
+할 수 있는 REST API를 만들어보겠습니다. 미리 훈련된 DenseNet 121 모델을 배포하여
+이미지를 인식해보겠습니다.</p>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
-<p>All the code used here is released under MIT license and is available on <a class="reference external" href="https://github.com/avinassh/pytorch-flask-api">Github</a>.</p>
+<p>여기서 사용한 모든 코드는 MIT 라이선스로 배포되며,
+<a class="reference external" href="https://github.com/avinassh/pytorch-flask-api">GitHub</a> 에서 확인하실 수 있습니다.</p>
 </div>
-<p>This represents the first in a series of tutorials on deploying PyTorch models
-in production. Using Flask in this way is by far the easiest way to start
-serving your PyTorch models, but it will not work for a use case
-with high performance requirements. For that:</p>
+<p>이것은 PyTorch 모델을 상용(production)으로 배포하는 튜토리얼 시리즈의 첫번째
+편입니다. Flask를 여기에 소개된 것처럼 사용하는 것이 PyTorch 모델을 제공하는
+가장 쉬운 방법이지만, 고성능을 요구하는 때에는 적합하지 않습니다. 그에 대해서는:</p>
 <blockquote>
 <div><ul class="simple">
-<li><p>If you’re already familiar with TorchScript, you can jump straight into our
-<a class="reference external" href="https://pytorch.org/tutorials/advanced/cpp_export.html">Loading a TorchScript Model in C++</a> tutorial.</p></li>
-<li><p>If you first need a refresher on TorchScript, check out our
-<a class="reference external" href="https://pytorch.org/tutorials/beginner/Intro_to_TorchScript_tutorial.html">Intro a TorchScript</a> tutorial.</p></li>
+<li><p>TorchScript에 이미 익숙하다면, 바로 <a class="reference external" href="https://tutorials.pytorch.kr/advanced/cpp_export.html">Loading a TorchScript Model in C++</a>
+를 읽어보세요.</p></li>
+<li><p>TorchScript가 무엇인지 알아보는 것이 필요하다면 <a class="reference external" href="https://tutorials.pytorch.kr/beginner/Intro_to_TorchScript_tutorial.html">TorchScript 소개</a>
+부터 보시길 추천합니다.</p></li>
 </ul>
 </div></blockquote>
-<div class="section" id="api-definition">
-<h2>API Definition<a class="headerlink" href="#api-definition" title="Permalink to this headline">¶</a></h2>
-<p>We will first define our API endpoints, the request and response types. Our
-API endpoint will be at <code class="docutils literal notranslate"><span class="pre">/predict</span></code> which takes HTTP POST requests with a
-<code class="docutils literal notranslate"><span class="pre">file</span></code> parameter which contains the image. The response will be of JSON
-response containing the prediction:</p>
+<div class="section" id="api">
+<h2>API 정의<a class="headerlink" href="#api" title="Permalink to this headline">¶</a></h2>
+<p>먼저 API 엔드포인트(endpoint)의 요청(request)와 응답(response)을 정의하는 것부터
+시작해보겠습니다. 새로 만들 API 엔드포인트는 이미지가 포함된 <code class="docutils literal notranslate"><span class="pre">file</span></code> 매개변수를
+HTTP POST로 <code class="docutils literal notranslate"><span class="pre">/predict</span></code> 에 요청합니다. 응답은 JSON 형태이며 다음과 같은 예측 결과를
+포함합니다:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="s2">&quot;class_id&quot;</span><span class="p">:</span> <span class="s2">&quot;n02124075&quot;</span><span class="p">,</span> <span class="s2">&quot;class_name&quot;</span><span class="p">:</span> <span class="s2">&quot;Egyptian_cat&quot;</span><span class="p">}</span>
 </pre></div>
 </div>
 </div>
 <div class="section" id="dependencies">
-<h2>Dependencies<a class="headerlink" href="#dependencies" title="Permalink to this headline">¶</a></h2>
-<p>Install the required dependenices by running the following command:</p>
+<h2>의존성(Dependencies)<a class="headerlink" href="#dependencies" title="Permalink to this headline">¶</a></h2>
+<p>아래 명령어를 실행하여 필요한 패키지들을 설치합니다:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install Flask==1.0.3 torchvision-0.3.0
 </pre></div>
 </div>
 </div>
-<div class="section" id="simple-web-server">
-<h2>Simple Web Server<a class="headerlink" href="#simple-web-server" title="Permalink to this headline">¶</a></h2>
-<p>Following is a simple webserver, taken from Flask’s documentaion</p>
+<div class="section" id="id2">
+<h2>간단한 웹 서버<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<p>Flask의 문서를 참고하여 아래와 같은 코드로 간단한 웹 서버를 구성합니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">flask</span> <span class="k">import</span> <span class="n">Flask</span>
 <span class="n">app</span> <span class="o">=</span> <span class="n">Flask</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
@@ -355,26 +358,24 @@ response containing the prediction:</p>
     <span class="k">return</span> <span class="s1">&#39;Hello World!&#39;</span>
 </pre></div>
 </div>
-<p>Save the above snippet in a file called <code class="docutils literal notranslate"><span class="pre">app.py</span></code> and you can now run a
-Flask development server by typing:</p>
+<p>위 코드를 <code class="docutils literal notranslate"><span class="pre">app.py</span></code> 라는 파일명으로 저장한 후, 아래와 같이 Flask 개발 서버를
+실행합니다:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ FLASK_ENV=development FLASK_APP=app.py flask run
 </pre></div>
 </div>
-<p>When you visit <code class="docutils literal notranslate"><span class="pre">http://localhost:5000/</span></code> in your web browser, you will be
-greeted with <code class="docutils literal notranslate"><span class="pre">Hello</span> <span class="pre">World!</span></code> text</p>
-<p>We will make slight changes to the above snippet, so that it suits our API
-definition. First, we will rename the method to <code class="docutils literal notranslate"><span class="pre">predict</span></code>. We will update
-the endpoint path to <code class="docutils literal notranslate"><span class="pre">/predict</span></code>. Since the image files will be sent via
-HTTP POST requests, we will update it so that it also accepts only POST
-requests:</p>
+<p>웹 브라우저로 <code class="docutils literal notranslate"><span class="pre">http://localhost:5000/</span></code> 에 접속하면, <code class="docutils literal notranslate"><span class="pre">Hello</span> <span class="pre">World!</span></code> 가
+표시됩니다.</p>
+<p>API 정의에 맞게 위 코드를 조금 수정해보겠습니다. 먼저, 메소드의 이름을
+<code class="docutils literal notranslate"><span class="pre">predict</span></code> 로 변경합니다. 엔드포인트의 경로(path)도 <code class="docutils literal notranslate"><span class="pre">/predict</span></code> 로 변경합니다.
+이미지 파일은 HTTP POST 요청을 통해서 보내지기 때문에, POST 요청에만 허용하도록
+합니다:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/predict&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;POST&#39;</span><span class="p">])</span>
 <span class="k">def</span> <span class="nf">predict</span><span class="p">():</span>
     <span class="k">return</span> <span class="s1">&#39;Hello World!&#39;</span>
 </pre></div>
 </div>
-<p>We will also change the response type, so that it returns a JSON response
-containing ImageNet class id and name. The updated <code class="docutils literal notranslate"><span class="pre">app.py</span></code> file will
-be now:</p>
+<p>또한, ImageNet 분류 ID와 이름을 포함하는 JSON을 회신하도록 응답 형식을 변경하겠습니다.
+이제 <code class="docutils literal notranslate"><span class="pre">app.py</span></code> 는 아래와 같이 변경되었습니다:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">flask</span> <span class="k">import</span> <span class="n">Flask</span><span class="p">,</span> <span class="n">jsonify</span>
 <span class="n">app</span> <span class="o">=</span> <span class="n">Flask</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
@@ -385,20 +386,18 @@ be now:</p>
 </div>
 </div>
 <div class="section" id="inference">
-<h2>Inference<a class="headerlink" href="#inference" title="Permalink to this headline">¶</a></h2>
-<p>In the next sections we will focus on writing the inference code. This will
-involve two parts, one where we prepare the image so that it can be fed
-to DenseNet and next, we will write the code to get the actual prediction
-from the model.</p>
-<div class="section" id="preparing-the-image">
-<h3>Preparing the image<a class="headerlink" href="#preparing-the-image" title="Permalink to this headline">¶</a></h3>
-<p>DenseNet model requires the image to be of 3 channel RGB image of size
-224 x 224. We will also normalise the image tensor with the required mean
-and standard deviation values. You can read more about it
-<a class="reference external" href="https://pytorch.org/docs/stable/torchvision/models.html">here</a>.</p>
-<p>We will use <code class="docutils literal notranslate"><span class="pre">transforms</span></code> from <code class="docutils literal notranslate"><span class="pre">torchvision</span></code> library and build a
-transform pipeline, which transforms our images as required. You
-can read more about transforms <a class="reference external" href="https://pytorch.org/docs/stable/torchvision/transforms.html">here</a>.</p>
+<h2>추론(Inference)<a class="headerlink" href="#inference" title="Permalink to this headline">¶</a></h2>
+<p>다음 섹션에서는 추론 코드 작성에 집중하겠습니다. 먼저 이미지를 DenseNet에 공급(feed)할 수
+있도록 준비하는 방법을 살펴본 뒤, 모델로부터 예측 결과를 얻는 방법을 살펴보겠습니다.</p>
+<div class="section" id="id3">
+<h3>이미지 준비하기<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<p>DenseNet 모델은 224 x 224의 3채널 RGB 이미지를 필요로 합니다.
+또한 이미지 텐서를 평규 및 표준편차 값으로 정규화합니다. 자세한 내용은
+<a class="reference external" href="https://pytorch.org/docs/stable/torchvision/models.html">여기</a> 를 참고하세요.</p>
+<p><code class="docutils literal notranslate"><span class="pre">torchvision</span></code> 라이브러리의 <code class="docutils literal notranslate"><span class="pre">transforms</span></code> 을 이용하여 변환 파이프라인
+(transform pipeline)을 구축합니다. Transforms와 관련한 더 자세한 내용은
+<a class="reference external" href="https://pytorch.org/docs/stable/torchvision/transforms.html">여기</a> 에서
+읽어볼 수 있습니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">io</span>
 
 <span class="kn">import</span> <span class="nn">torchvision.transforms</span> <span class="k">as</span> <span class="nn">transforms</span>
@@ -415,10 +414,10 @@ can read more about transforms <a class="reference external" href="https://pytor
     <span class="k">return</span> <span class="n">my_transforms</span><span class="p">(</span><span class="n">image</span><span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>The above method takes image data in bytes, applies the series of transforms
-and returns a tensor. To test the above method, read an image file in
-bytes mode (first replacing <cite>../_static/img/sample_file.jpeg</cite> with the actual
-path to the file on your computer) and see if you get a tensor back:</p>
+<p>위 메소드는 이미지를 byte 단위로 읽은 후, 일련의 변환을 적용하고 Tensor를
+반환합니다. 위 메소드를 테스트하기 위해서는 이미지를 byte 모드로 읽은 후
+Tensor를 반환하는지 확인하면 됩니다.  (먼저 <cite>../_static/img/sample_file.jpeg</cite> 을
+컴퓨터 상의 실제 경로로 바꿔야 합니다.)</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;../_static/img/sample_file.jpeg&quot;</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
     <span class="n">image_bytes</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
     <span class="n">tensor</span> <span class="o">=</span> <span class="n">transform_image</span><span class="p">(</span><span class="n">image_bytes</span><span class="o">=</span><span class="n">image_bytes</span><span class="p">)</span>
@@ -453,17 +452,17 @@ path to the file on your computer) and see if you get a tensor back:</p>
 </div>
 </div>
 <div class="section" id="prediction">
-<h3>Prediction<a class="headerlink" href="#prediction" title="Permalink to this headline">¶</a></h3>
-<p>Now will use a pretrained DenseNet 121 model to predict the image class. We
-will use one from <code class="docutils literal notranslate"><span class="pre">torchvision</span></code> library, load the model and get an
-inference. While we’ll be using a pretrained model in this example, you can
-use this same approach for your own models. See more about loading your
-models in this <a class="reference internal" href="../beginner/saving_loading_models.html"><span class="doc">tutorial</span></a>.</p>
+<h3>예측(Prediction)<a class="headerlink" href="#prediction" title="Permalink to this headline">¶</a></h3>
+<p>미리 학습된 DenseNet 121 모델을 사용하여 이미지 분류(class)를 예측합니다.
+<code class="docutils literal notranslate"><span class="pre">torchvision</span></code> 라이브러리의 모델을 사용하여 모델을 읽어오고 추론을 합니다.
+이 예제에서는 미리 학습된 모델을 사용하지만, 직접 만든 모델에 대해서도
+이와 동일한 방법을 사용할 수 있습니다. 모델을 읽어오는 것은 이
+<a class="reference internal" href="../beginner/saving_loading_models.html"><span class="doc">튜토리얼</span></a> 을 참고하세요.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torchvision</span> <span class="k">import</span> <span class="n">models</span>
 
-<span class="c1"># Make sure to pass `pretrained` as `True` to use the pretrained weights:</span>
+<span class="c1"># 이미 학습된 가중치를 사용하기 위해 `pretrained` 에 `True` 값을 전달합니다:</span>
 <span class="n">model</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">densenet121</span><span class="p">(</span><span class="n">pretrained</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="c1"># Since we are using our model only for inference, switch to `eval` mode:</span>
+<span class="c1"># 모델을 추론에만 사용할 것이므로, `eval` 모드로 변경합니다:</span>
 <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
 
 
@@ -474,15 +473,13 @@ models in this <a class="reference internal" href="../beginner/saving_loading_mo
     <span class="k">return</span> <span class="n">y_hat</span>
 </pre></div>
 </div>
-<p>The tensor <code class="docutils literal notranslate"><span class="pre">y_hat</span></code> will contain the index of the predicted class id.
-However, we need a human readable class name. For that we need a class id
-to name mapping. Download
-<a class="reference external" href="https://s3.amazonaws.com/deep-learning-models/image-models/imagenet_class_index.json">this file</a>
-as <code class="docutils literal notranslate"><span class="pre">imagenet_class_index.json</span></code> and remember where you saved it (or, if you
-are following the exact steps in this tutorial, save it in
-<cite>tutorials/_static</cite>). This file contains the mapping of ImageNet class id to
-ImageNet class name. We will load this JSON file and get the class name of
-the predicted index.</p>
+<p><code class="docutils literal notranslate"><span class="pre">y_hat</span></code> Tensor는 예측된 분류 ID의 인덱스를 포함합니다. 하지만 사람이 읽을 수
+있는 분류명이 있어야 하기 떄문에, 이를 위해 이름과 분류 ID를 매핑하는 것이 필요합니다.
+<a class="reference external" href="https://s3.amazonaws.com/deep-learning-models/image-models/imagenet_class_index.json">이 파일</a>
+을 다운로드 받아 <code class="docutils literal notranslate"><span class="pre">imagenet_class_index.json</span></code> 이라는 이름으로 저장 후, 저장한 곳의
+위치를 기억해두세요. (또는, 이 튜토리얼과 똑같이 진행하는 경우에는 <cite>tutorials/_static</cite>
+에 저장하세요.) 이 파일은 ImageNet 분류 ID와 ImageNet 분류명의 쌍을 포함하고 있습니다.
+이제 이 JSON 파일을 불러와 예측 결과의 인덱스에 해당하는 분류명을 가져오겠습니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">json</span>
 
 <span class="n">imagenet_class_index</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="s1">&#39;../_static/imagenet_class_index.json&#39;</span><span class="p">))</span>
@@ -495,10 +492,10 @@ the predicted index.</p>
     <span class="k">return</span> <span class="n">imagenet_class_index</span><span class="p">[</span><span class="n">predicted_idx</span><span class="p">]</span>
 </pre></div>
 </div>
-<p>Before using <code class="docutils literal notranslate"><span class="pre">imagenet_class_index</span></code> dictionary, first we will convert
-tensor value to a string value, since the keys in the
-<code class="docutils literal notranslate"><span class="pre">imagenet_class_index</span></code> dictionary are strings.
-We will test our above method:</p>
+<p><code class="docutils literal notranslate"><span class="pre">imagenet_class_index</span></code> 사전(dictionary)을 사용하기 전에,
+<code class="docutils literal notranslate"><span class="pre">imagenet_class_index</span></code> 의 키 값이 문자열이므로 Tensor의 값도
+문자열로 변환해야 합니다.
+위 메소드를 테스트해보겠습니다:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;../_static/img/sample_file.jpeg&quot;</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
     <span class="n">image_bytes</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">get_prediction</span><span class="p">(</span><span class="n">image_bytes</span><span class="o">=</span><span class="n">image_bytes</span><span class="p">))</span>
@@ -508,33 +505,31 @@ We will test our above method:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[&#39;n02124075&#39;, &#39;Egyptian_cat&#39;]
 </pre></div>
 </div>
-<p>You should get a response like this:</p>
+<p>다음과 같은 응답을 받게 될 것입니다:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s1">&#39;n02124075&#39;</span><span class="p">,</span> <span class="s1">&#39;Egyptian_cat&#39;</span><span class="p">]</span>
 </pre></div>
 </div>
-<p>The first item in array is ImageNet class id and second item is the human
-readable name.</p>
+<p>배열의 첫번째 항목은 ImageNet 분류 ID이고, 두번째 항목은 사람이 읽을 수 있는
+이름입니다.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Did you notice that <code class="docutils literal notranslate"><span class="pre">model</span></code> variable is not part of <code class="docutils literal notranslate"><span class="pre">get_prediction</span></code>
-method? Or why is model a global variable? Loading a model can be an
-expensive operation in terms of memory and compute. If we loaded the model in the
-<code class="docutils literal notranslate"><span class="pre">get_prediction</span></code> method, then it would get unnecessarily loaded every
-time the method is called. Since, we are building a web server, there
-could be thousands of requests per second, we should not waste time
-redundantly loading the model for every inference. So, we keep the model
-loaded in memory just once. In
-production systems, it’s necessary to be efficient about your use of
-compute to be able to serve requests at scale, so you should generally
-load your model before serving requests.</p>
+<p><code class="docutils literal notranslate"><span class="pre">model</span></code> 변수가 <code class="docutils literal notranslate"><span class="pre">get_prediction</span></code> 메소드 내부에 있지 않은 것을 눈치채셨나요?
+왜 모델이 전역 변수일까요? 모델을 읽어오는 것은 메모리와 계산 측면에서 비싼
+연산일 수 있습니다. 만약 <code class="docutils literal notranslate"><span class="pre">get_prediction</span></code> 메소드 내부에서 모델을 불러온다면,
+메소드가 호출될 때마다 불필요하게 불러오게 됩니다. 초당 수천번의 요청을 받을
+지도 모르는 웹 서버를 구축하고 있기 때문에, 매번 추론을 할 때마다 모델을
+중복으로 불러오는데 시간을 낭비해서는 안됩니다. 따라서, 모델은 메모리에
+딱 한번만 불러옵니다. 상용 시스템(production system)에서는 대량의 요청을
+효율적으로 처리해야 하므로, 일반적으로 요청(request)을 처리하기 전에 모델을
+불러와둡니다.</p>
 </div>
 </div>
 </div>
-<div class="section" id="integrating-the-model-in-our-api-server">
-<h2>Integrating the model in our API Server<a class="headerlink" href="#integrating-the-model-in-our-api-server" title="Permalink to this headline">¶</a></h2>
-<p>In this final part we will add our model to our Flask API server. Since
-our API server is supposed to take an image file, we will update our <code class="docutils literal notranslate"><span class="pre">predict</span></code>
-method to read files from the requests:</p>
+<div class="section" id="id7">
+<h2>모델을 API 서버에 통합하기<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h2>
+<p>마지막으로 위에서 만든 Flask API 서버에 모델을 추가하겠습니다.
+API 서버는 이미지 파일을 받는 것을 가정하고 있으므로, 요청으로부터 파일을 읽도록
+<code class="docutils literal notranslate"><span class="pre">predict</span></code> 메소드를 수정해야 합니다:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">request</span>
 
 <span class="nd">@app.route</span><span class="p">(</span><span class="s1">&#39;/predict&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;POST&#39;</span><span class="p">])</span>
@@ -548,8 +543,8 @@ method to read files from the requests:</p>
         <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s1">&#39;class_id&#39;</span><span class="p">:</span> <span class="n">class_id</span><span class="p">,</span> <span class="s1">&#39;class_name&#39;</span><span class="p">:</span> <span class="n">class_name</span><span class="p">})</span>
 </pre></div>
 </div>
-<p>The <code class="docutils literal notranslate"><span class="pre">app.py</span></code> file is now complete. Following is the full version; replace
-the paths with the paths where you saved your files and it should run:</p>
+<p><code class="docutils literal notranslate"><span class="pre">app.py</span></code> 파일은 이제 완성되었습니다. 아래가 정식 버전(full version)입니다;
+아래 &lt;PATH/TO/.json/FILE&gt; 경로를 json 파일을 저장해둔 경로로 바꾸면 동작합니다:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">io</span>
 <span class="kn">import</span> <span class="nn">json</span>
 
@@ -597,55 +592,55 @@ the paths with the paths where you saved your files and it should run:</p>
     <span class="n">app</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>Let’s test our web server! Run:</p>
+<p>이제 웹 서버를 테스트해보겠습니다! 다음과 같이 실행해보세요:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ FLASK_ENV=development FLASK_APP=app.py flask run
 </pre></div>
 </div>
-<p>We can use the
-<a class="reference external" href="https://pypi.org/project/requests/">requests</a>
-library to send a POST request to our app:</p>
+<p><a class="reference external" href="https://pypi.org/project/requests/">requests</a> 라이브러리를 사용하여
+POST 요청을 만들어보겠습니다:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">requests</span>
 
 <span class="n">resp</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;http://localhost:5000/predict&quot;</span><span class="p">,</span>
                      <span class="n">files</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;file&quot;</span><span class="p">:</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;&lt;PATH/TO/.jpg/FILE&gt;/cat.jpg&#39;</span><span class="p">,</span><span class="s1">&#39;rb&#39;</span><span class="p">)})</span>
 </pre></div>
 </div>
-<p>Printing <cite>resp.json()</cite> will now show the following:</p>
+<p><cite>resp.json()</cite> 을 호출하면 다음과 같은 결과를 출력합니다:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="s2">&quot;class_id&quot;</span><span class="p">:</span> <span class="s2">&quot;n02124075&quot;</span><span class="p">,</span> <span class="s2">&quot;class_name&quot;</span><span class="p">:</span> <span class="s2">&quot;Egyptian_cat&quot;</span><span class="p">}</span>
 </pre></div>
 </div>
 </div>
-<div class="section" id="next-steps">
-<h2>Next steps<a class="headerlink" href="#next-steps" title="Permalink to this headline">¶</a></h2>
-<p>The server we wrote is quite trivial and and may not do everything
-you need for your production application. So, here are some things you
-can do to make it better:</p>
+<div class="section" id="id8">
+<h2>다음 단계<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h2>
+<p>지금까지 만든 서버는 매우 간단하여 상용 프로그램(production application)으로써
+갖춰야할 것들을 모두 갖추지 못했습니다. 따라서, 다음과 같이 개선해볼 수 있습니다:</p>
 <ul class="simple">
-<li><p>The endpoint <code class="docutils literal notranslate"><span class="pre">/predict</span></code> assumes that always there will be a image file
-in the request. This may not hold true for all requests. Our user may
-send image with a different parameter or send no images at all.</p></li>
-<li><p>The user may send non-image type files too. Since we are not handling
-errors, this will break our server. Adding an explicit error handing
-path that will throw an exception would allow us to better handle
-the bad inputs</p></li>
-<li><p>Even though the model can recognize a large number of classes of images,
-it may not be able to recognize all images. Enhance the implementation
-to handle cases when the model does not recognize anything in the image.</p></li>
-<li><p>We run the Flask server in the development mode, which is not suitable for
-deploying in production. You can check out <a class="reference external" href="https://flask.palletsprojects.com/en/1.1.x/tutorial/deploy/">this tutorial</a>
-for deploying a Flask server in production.</p></li>
-<li><p>You can also add a UI by creating a page with a form which takes the image and
-displays the prediction. Check out the <a class="reference external" href="https://pytorch-imagenet.herokuapp.com/">demo</a>
-of a similar project and its <a class="reference external" href="https://github.com/avinassh/pytorch-flask-api-heroku">source code</a>.</p></li>
-<li><p>In this tutorial, we only showed how to build a service that could return predictions for
-a single image at a time. We could modify our service to be able to return predictions for
-multiple images at once. In addition, the <a class="reference external" href="https://github.com/ShannonAI/service-streamer">service-streamer</a>
-library automatically queues requests to your service and samples them into mini-batches
-that can be fed into your model. You can check out <a class="reference external" href="https://github.com/ShannonAI/service-streamer/wiki/Vision-Recognition-Service-with-Flask-and-service-streamer">this tutorial</a>.</p></li>
-<li><p>Finally, we encourage you to check out our other tutorials on deploying PyTorch models
-linked-to at the top of the page.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/predict</span></code> 엔드포인트는 요청 시에 반드시 이미지 파일이 전달되는 것을 가정하고
+있습니다. 하지만 모든 요청이 그렇지는 않습니다. 사용자는 다른 매개변수로 이미지를
+보내거나, 이미지를 아예 보내지 않을수도 있습니다.</p></li>
+<li><p>사용자가 이미지가 아닌 유형의 파일을 보낼수도 있습니다. 여기서는 에러를 처리하지
+않고 있으므로, 이러한 경우에 서버는 다운(break)됩니다. 예외 전달(exception throe)을
+위한 명시적인 에러 핸들링 경로를 추가하면 잘못된 입력을 더 잘 처리할 수 있습니다.</p></li>
+<li><p>모델은 많은 종류의 이미지 분류를 인식할 수 있지만, 모든 이미지를 인식할 수 있는
+것은 아닙니다. 모델이 이미지에서 아무것도 인식하지 못하는 경우를 처리하도록
+개선합니다.</p></li>
+<li><p>위에서는 Flask 서버를 개발 모드에로 실행하였지만, 이는 상용으로 배포하기에는
+적당하지 않습니다. Flask 서버를 상용으로 배포하는 것은
+<a class="reference external" href="https://flask.palletsprojects.com/en/1.1.x/tutorial/deploy/">이 튜토리얼</a>
+을 참고해보세요.</p></li>
+<li><p>또한 이미지를 가져오는 양식(form)과 예측 결과를 표시하는 페이지를 만들어
+UI를 추가할 수도 있습니다. 비슷한 프로젝트의 <a class="reference external" href="https://pytorch-imagenet.herokuapp.com/">데모</a>
+와 이 데모의 <a class="reference external" href="https://github.com/avinassh/pytorch-flask-api-heroku">소스 코드</a>
+를 참고해보세요.</p></li>
+<li><p>이 튜토리얼에서는 한 번에 하나의 이미지에 대한 예측 결과를 반환하는 서비스를
+만드는 방법만 살펴보았는데요, 한 번에 여러 이미지에 대한 예측 결과를 반환하도록
+수정해볼 수 있습니다. 추가로, <a class="reference external" href="https://github.com/ShannonAI/service-streamer">service-streamer</a>
+라이브러리는 자동으로 요청을 큐에 넣은 뒤 모델에 공급(feed)할 수 있는 미니-배치로
+샘플링합니다. <a class="reference external" href="https://github.com/ShannonAI/service-streamer/wiki/Vision-Recognition-Service-with-Flask-and-service-streamer">이 튜토리얼</a>
+을 참고해보세요.</p></li>
+<li><p>마지막으로 이 문서 상단에 링크된, PyTorch 모델을 배포하는 다른 튜토리얼들을
+읽어보는 것을 권장합니다.</p></li>
 </ul>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.804 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.396 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-intermediate-flask-rest-api-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/b45d95b1d38fe556c77d1ee548809d28/flask_rest_api_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">flask_rest_api_tutorial.py</span></code></a></p>
@@ -708,17 +703,17 @@ linked-to at the top of the page.</p></li>
           <div class="pytorch-right-menu" id="pytorch-right-menu">
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
-<li><a class="reference internal" href="#">Deploying PyTorch in Python via a REST API with Flask</a><ul>
-<li><a class="reference internal" href="#api-definition">API Definition</a></li>
-<li><a class="reference internal" href="#dependencies">Dependencies</a></li>
-<li><a class="reference internal" href="#simple-web-server">Simple Web Server</a></li>
-<li><a class="reference internal" href="#inference">Inference</a><ul>
-<li><a class="reference internal" href="#preparing-the-image">Preparing the image</a></li>
-<li><a class="reference internal" href="#prediction">Prediction</a></li>
+<li><a class="reference internal" href="#">Flask를 이용하여 Python에서 PyTorch를 REST API로 배포하기</a><ul>
+<li><a class="reference internal" href="#api">API 정의</a></li>
+<li><a class="reference internal" href="#dependencies">의존성(Dependencies)</a></li>
+<li><a class="reference internal" href="#id2">간단한 웹 서버</a></li>
+<li><a class="reference internal" href="#inference">추론(Inference)</a><ul>
+<li><a class="reference internal" href="#id3">이미지 준비하기</a></li>
+<li><a class="reference internal" href="#prediction">예측(Prediction)</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#integrating-the-model-in-our-api-server">Integrating the model in our API Server</a></li>
-<li><a class="reference internal" href="#next-steps">Next steps</a></li>
+<li><a class="reference internal" href="#id7">모델을 API 서버에 통합하기</a></li>
+<li><a class="reference internal" href="#id8">다음 단계</a></li>
 </ul>
 </li>
 </ul>
