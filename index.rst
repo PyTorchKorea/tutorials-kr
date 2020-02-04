@@ -11,25 +11,24 @@ PyTorch를 어떻게 사용하는지 알고 싶다면 시작하기(Getting Start
 `이슈 <https://github.com/9bow/PyTorch-tutorials-kr/issues/new>`__ 또는
 `PR <https://github.com/9bow/PyTorch-tutorials-kr/pulls>`__ 을 남겨주세요.)
 
-Some considerations:
+아래 내용도 한 번 살펴보시면 좋습니다:
 
-* We’ve added a new feature to tutorials that allows users to open the notebook associated with a tutorial in Google Colab.
-  Visit `this page <https://pytorch.org/tutorials/beginner/colab.html>`_ for more information.
-* If you would like to do the tutorials interactively via IPython / Jupyter,
-  each tutorial has a download link for a Jupyter Notebook and Python source code.
-* Additional high-quality examples are available, including image classification,
-  unsupervised learning, reinforcement learning, machine translation, and
-  many other applications, in `PyTorch Examples
-  <https://github.com/pytorch/examples/>`_.
-* You can find reference documentation for the PyTorch API and layers in `PyTorch Docs
-  <https://pytorch.org/docs>`_ or via inline help.
-* If you would like the tutorials section improved, please open a github issue
-  `here <https://github.com/pytorch/tutorials>`_ with your feedback.
-* Check out our
-  `PyTorch Cheat Sheet <https://pytorch.org/tutorials/beginner/ptcheat.html>`_
-  for additional useful information.
-* Finally, here's a link to the
-  `PyTorch Release Notes <https://github.com/pytorch/pytorch/releases>`_
+* 사용자들이 튜토리얼과 연관된 노트북을 Google Colab에서 열어볼 수 있는 기능이 추가되었습니다.
+  `이 페이지 <https://tutorials.pytorch.kr/beginner/colab.html>`_ 을 방문하셔서 자세히 알아보세요!
+* 각 튜토리얼에는 Jupyter 노트북과 Python 소스코드를 다운로드 링크가 있습니다.
+  IPython 또는 Jupyter를 이용하여 대화식으로 실행해보시려면 이용해보세요.
+* 이미지 분류, 비지도 학습, 강화 학습, 기계 번역을 비롯한 다양한 고품질의 예제가
+  `PyTorch Examples <https://github.com/pytorch/examples/>`_ 에 준비되어 있습니다.
+* PyTorch API, 계층(layer)에 대한 참고 문서는 `PyTorch Docs <https://pytorch.org/docs>`_ 를
+  참고해주세요.
+* 튜토리얼 개선에 참여하시려면 `이곳 <https://github.com/pytorch/tutorials>`_ 에 의견과 함께
+  이슈를 남겨주세요.
+  (역자 주: 한국어 번역과 관련한 이슈는
+  `한국어 번역 저장소 <https://github.com/9bow/PyTorch-tutorials-kr>`_ 에 부탁드립니다.)
+* `PyTorch 치트 시트(Cheat Sheet) <https://tutorials.pytorch.kr/beginner/ptcheat.html>`_ 를
+  참고하시면 유용한 정보들을 얻으실 수 있습니다.
+* 마지막으로 `PyTorch 릴리즈 노트(Release Notes) <https://github.com/pytorch/pytorch/releases>`_
+  도 참고해보세요.
 
 시작하기 (Getting Started)
 ---------------------------
