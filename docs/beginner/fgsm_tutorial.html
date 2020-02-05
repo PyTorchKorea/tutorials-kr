@@ -320,31 +320,27 @@
 <p>상황에 따라 다양한 범주의 적대적 공격이 있는데 각각 목표가 다르고 공격자가 알고 있는 정보
 대한 가정도 다릅니다. 그러나 보통 가장 중요한 목표는 입력 데이터에 최소한의 작은 변화를
 추가하여 이것이 의도적으로 잘못 분류되게 하는 것입니다. 공격자가 가지고 있는 정보에 대한
-가정에는 여러 종류가 있는데, 보통 <strong>화이트박스**와 **블랙박스</strong> 두 가지가 있습니다.
+가정에는 여러 종류가 있는데, 보통 <strong>화이트박스</strong> 와 <strong>블랙박스</strong> 두 가지가 있습니다.
 <em>화이트박스</em> 공격은 공격자가 모델에 대해 아키텍처, 입력, 출력, 가중치를 포함한 모든 것을
 알고 있고 접근할 수 있다고 가정합니다. <em>블랙박스</em> 공격은 공격자가 모델의 입력과 출력에
 대해서만 접근 가능하고 모델의 가중치와 아키텍처에 관한 내용은 모른다고 가정합니다.
-공격자의 목표는 오분류 및 <a href="#id2"><span class="problematic" id="id3">**</span></a>소스/타겟 오분류**를 포함하는 여러 유형이 있습니다.
-<a href="#id4"><span class="problematic" id="id5">*</span></a>오분류*의 목표는 공격자가 출력으로 나온 분류 결과가 잘못 되도록 하나 새로운 분류 결과가
-어떤 것이 나오는지 신경 쓰지 않는 것을 의미합니다. <a href="#id6"><span class="problematic" id="id7">*</span></a>소스/타겟 오분류*는 공격자가
+공격자의 목표는 오분류 및 <strong>소스/타겟 오분류</strong> 를 포함하는 여러 유형이 있습니다.
+<em>오분류</em> 의 목표는 공격자가 출력으로 나온 분류 결과가 잘못 되도록 하나 새로운 분류 결과가
+어떤 것이 나오는지 신경 쓰지 않는 것을 의미합니다. <em>소스/타겟 오분류</em> 는 공격자가
 원래 특정 소스 클래스의 이미지를 다른 특정 대상 클래스로 분류하도록 변경하려고 함을 의미합니다.</p>
+<p>이 경우 FGSM 공격은 <em>오분류</em> 를 목표로 하는 화이트 박스 공격입니다.
+이런 배경 정보를 갖고 공격에 대해 자세히 알아 보겠습니다.</p>
+</div>
+<div class="section" id="id2">
+<h2>빠른 변화도 부호 공격<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<p>공격 방법에 있어 초기 방식이면서 가장 유명한 방식은 <em>빠른 변화도 부호 공격 (FGSM)</em> 이라고 하며
+<a class="reference external" href="https://arxiv.org/abs/1412.6572">적대적 예제에 대한 설명과 활용</a> 에서
+이안 갓펠로우가 기고하였습니다.
+이 공격법은 놀랍도록 강력하지만 직관적입니다. 학습 방식, <em>변화도(gradients)</em> 를 활용하여 신경망을 공격하도록
+설계 되었습니다. 아이디어는 간단합니다. 역전파 변화도를 기반으로 가중치를 조정하여 손실을 최소화하기보다는
+공격이 동일한 역전파 변화도를 기반으로 <em>손실을 최대화하하는 방향으로 입력 데이터를 조정</em> 합니다.
+다시 말해 공격은 입력 데이터에서 계산된 손실 변화도를 사용하고 입력 데이터를 조정하여 손실이 최대가 되게 합니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#</span>
-<span class="c1"># 이 경우 FGSM 공격은 *오분류*를 목표로 하는 화이트 박스 공격입니다.</span>
-<span class="c1"># 이런 배경 정보를 갖고 공격에 대해 자세히 알아 보겠습니다.</span>
-<span class="c1">#</span>
-<span class="c1"># 빠른 변화도 부호 공격</span>
-<span class="c1"># -------------------------</span>
-<span class="c1">#</span>
-<span class="c1"># 공격 방법에 있어 초기 방식이면서 가장 유명한 방식은 *빠른 변화도 부호 공격 (FGSM)* 이라고 하며</span>
-<span class="c1"># `적대적 예제에 대한 설명과 활용 &lt;https://arxiv.org/abs/1412.6572&gt;`__ 에서</span>
-<span class="c1"># 이안 갓펠로우가 기고하였습니다.</span>
-<span class="c1"># 이 공격법은 놀랍도록 강력하지만 직관적입니다. 학습 방식, *변화도(gradients)*를 활용하여 신경망을 공격하도록</span>
-<span class="c1"># 설계 되었습니다. 아이디어는 간단합니다. 역전파 변화도를 기반으로 가중치를 조정하여 손실을 최소화하기보다는</span>
-<span class="c1"># 공격이 동일한 역전파 변화도를 기반으로 *손실을 최대화하하는 방향으로 입력 데이터를 조정*합니다.</span>
-<span class="c1"># 다시 말해 공격은 입력 데이터에서 계산된 손실 변화도를 사용하고 입력 데이터를 조정하여 손실이 최대가 되게 합니다.</span>
-
-
-<span class="c1">#</span>
 <span class="c1"># 코드로 넘어가기 전에 유명한 `FGSM &lt;https://arxiv.org/abs/1412.6572&gt;`__ 판다 예제를</span>
 <span class="c1"># 보고 몇 가지 표기법을 정리하겠습니다.</span>
 <span class="c1">#</span>
@@ -357,7 +353,7 @@
 <span class="c1"># 공격은 :math:`\nabla_{x} J(\mathbf{\theta}, \mathbf{x}, y)` 계산을 위해 입력 데이터에 변화도를 역전파합니다.</span>
 <span class="c1"># 그러고 나서, 변화도는 손실 값이 최대화되는 방향으로 (예를 들면, :math:`sign(\nabla_{x} J(\mathbf{\theta}, \mathbf{x}, y))` )</span>
 <span class="c1"># 작은 스텝(step) 만큼 (그림에서는 :math:`\epsilon` 혹은 :math:`0.007`) 입력 데이터에 적용됩니다.</span>
-<span class="c1"># 결과로 나오는 작은 변화된 이미지(:math:`x&#39;`)는 타겟 네트워크에 의해 &quot;긴팔원숭이&quot;로 *오분류*되나 여전히 육안으로는</span>
+<span class="c1"># 결과로 나오는 작은 변화된 이미지( :math:`x&#39;` )는 타겟 네트워크에 의해 &quot;긴팔원숭이&quot;로 *오분류* 되나 여전히 육안으로는</span>
 <span class="c1"># 분명히 &quot;판다&quot; 입니다.</span>
 <span class="c1">#</span>
 <span class="c1"># 이제 본 튜토리얼의 동기가 명확해지길 바라며, 구현으로 넘어가 보겠습니다.</span>
@@ -374,12 +370,12 @@
 </pre></div>
 </div>
 </div>
-<div class="section" id="id8">
-<h2>구현<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id3">
+<h2>구현<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
 <p>이 섹션에서는 튜토리얼의 입력 매개 변수에 대해 설명하고 공격중인 모델을
 정의한 다음 공격을 코딩하고 일부 테스트를 실행합니다.</p>
-<div class="section" id="id9">
-<h3>입력<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id4">
+<h3>입력<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
 <p>이 학습서에는 입력이 3 개이며 다음과 같이 정의됩니다:</p>
 <ul class="simple">
 <li><p><strong>epsilons</strong> - 실행에 사용할 엡실론의 리스트입니다. 엡실론 0의 값은 원래 테스트 셋의 모델 성능을
@@ -401,8 +397,8 @@
 </pre></div>
 </div>
 </div>
-<div class="section" id="id10">
-<h3>공격을 받는 모델<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id5">
+<h3>공격을 받는 모델<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
 <p>앞서 말한대로, 공격을 받는 모델은 <a class="reference external" href="https://github.com/pytorch/examples/tree/master/mnist">pytorch/examples/mnist</a>
 와 동일한 MNIST 모델입니다. 본인의 MNIST 모델을 학습 및 저장하는 방식으로 하거나 제공된 모델을 다운로드 해 사용하는 식으로 진행할 수 있습니다.
 여기서 <em>Net</em> 정의 및 테스트 데이터 로더는 MNIST 예제에서 복사 하였습니다.
@@ -448,26 +444,16 @@
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Downloading http://yann.lecun.com/exdb/mnist/train-images-idx3-ubyte.gz to ../data/MNIST/raw/train-images-idx3-ubyte.gz
-Extracting ../data/MNIST/raw/train-images-idx3-ubyte.gz to ../data/MNIST/raw
-Downloading http://yann.lecun.com/exdb/mnist/train-labels-idx1-ubyte.gz to ../data/MNIST/raw/train-labels-idx1-ubyte.gz
-Extracting ../data/MNIST/raw/train-labels-idx1-ubyte.gz to ../data/MNIST/raw
-Downloading http://yann.lecun.com/exdb/mnist/t10k-images-idx3-ubyte.gz to ../data/MNIST/raw/t10k-images-idx3-ubyte.gz
-Extracting ../data/MNIST/raw/t10k-images-idx3-ubyte.gz to ../data/MNIST/raw
-Downloading http://yann.lecun.com/exdb/mnist/t10k-labels-idx1-ubyte.gz to ../data/MNIST/raw/t10k-labels-idx1-ubyte.gz
-Extracting ../data/MNIST/raw/t10k-labels-idx1-ubyte.gz to ../data/MNIST/raw
-Processing...
-Done!
-CUDA Available:  True
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>CUDA Available:  True
 </pre></div>
 </div>
 </div>
 <div class="section" id="fgsm">
 <h3>FGSM 공격<a class="headerlink" href="#fgsm" title="Permalink to this headline">¶</a></h3>
 <p>이제 원래 입력을 교란시켜 적대적인 예를 만드는 함수를 정의 할 수 있습니다.
-<code class="docutils literal notranslate"><span class="pre">fgsm_attack`</span></code> 함수는 입력 파라미터로 3가지를 가집니다. 첫번째는 원본 <em>이미지</em> (<span class="math notranslate nohighlight">\(x\)</span>),
-두번째는 <em>엡실론*으로 픽셀 단위의 작은 변화를 주는 값입니다 (:math:`epsilon`).
-마지막은 *data_grad</em> 로 입력 영상 (<span class="math notranslate nohighlight">\(\nabla_{x} J(\mathbf{\theta}, \mathbf{x}, y)\)</span>) 에 대한 변화도 손실 값입니다.
+<code class="docutils literal notranslate"><span class="pre">fgsm_attack</span></code> 함수는 입력 파라미터로 3가지를 가집니다. 첫번째는 원본 <em>이미지</em> ( <span class="math notranslate nohighlight">\(x\)</span> ),
+두번째는 <em>엡실론</em> 으로 픽셀 단위의 작은 변화를 주는 값입니다 ( <span class="math notranslate nohighlight">\(\epsilon\)</span> ).
+마지막은 <em>data_grad</em> 로 입력 영상 ( <span class="math notranslate nohighlight">\(\nabla_{x} J(\mathbf{\theta}, \mathbf{x}, y)\)</span> ) 에 대한 변화도 손실 값입니다.
 아래 식에 따른 작은 변화가 적용된 이미지를 생성합니다.</p>
 <div class="math notranslate nohighlight">
 \[perturbed\_image = image + epsilon*sign(data\_grad) = x + \epsilon * sign(\nabla_{x} J(\mathbf{\theta}, \mathbf{x}, y))\]</div>
@@ -485,14 +471,14 @@ CUDA Available:  True
 </pre></div>
 </div>
 </div>
-<div class="section" id="id11">
-<h3>테스팅 함수<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id6">
+<h3>테스팅 함수<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
 <p>마지막으로 본 튜토리얼의 핵심 결과는 <code class="docutils literal notranslate"><span class="pre">테스트</span></code> 함수에서 오게 됩니다.
 이 테스트 기능을 호출 할 때마다 MNIST 테스트 셋에서 전체 테스트 단계를 수행하고 최종 정확도를 보고합니다.
 그러나 이 함수에는 <em>엡실론</em> 입력도 필요합니다. 이는 <code class="docutils literal notranslate"><span class="pre">테스트`</span></code> 함수가 <span class="math notranslate nohighlight">\(\epsilon\)</span> 크기에 따라 공격자의 공격을 받는 모델의
-정확도을 보고하기 때문입니다. 더 구체적으로 보면 테스트 셋의 각각의 샘플에서 테스트 함수는 입력 데이터에 대한 손실 변화도 (<span class="math notranslate nohighlight">\(data\_grad\)</span>) 를 계산하고,</p>
+정확도을 보고하기 때문입니다. 더 구체적으로 보면 테스트 셋의 각각의 샘플에서 테스트 함수는 입력 데이터에 대한 손실 변화도( <span class="math notranslate nohighlight">\(data\_grad\)</span> )를 계산하고,</p>
 <blockquote>
-<div><p><code class="docutils literal notranslate"><span class="pre">FGSM</span> <span class="pre">공격</span></code> (<span class="math notranslate nohighlight">\(perturbed\_data\)</span>) 을 받은 작은 변화가 적용된 이미지를 만들고 나서 작은 변화가 적용된 이미지가 적대적인지 확인을 합니다.</p>
+<div><p><a href="#id7"><span class="problematic" id="id8">``</span></a>FGSM 공격``( <span class="math notranslate nohighlight">\(perturbed\_data\)</span> )을 받은 작은 변화가 적용된 이미지를 만들고 나서 작은 변화가 적용된 이미지가 적대적인지 확인을 합니다.</p>
 </div></blockquote>
 <p>추가로 모델의 정확도를 테스트하기 위해서 테스트 함수는 나중에 시각화하여 볼 수 있도록 성공적으로 얻은 적대적 이미지를 저장하고 반환합니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">test</span><span class="p">(</span> <span class="n">model</span><span class="p">,</span> <span class="n">device</span><span class="p">,</span> <span class="n">test_loader</span><span class="p">,</span> <span class="n">epsilon</span> <span class="p">):</span>
@@ -559,8 +545,8 @@ CUDA Available:  True
 </pre></div>
 </div>
 </div>
-<div class="section" id="id12">
-<h3>공격 실행<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id9">
+<h3>공격 실행<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
 <p>구현의 마지막 부분은 공격을 실행하는 것입니다. 여기서 전체 테스트 스텝을 각 <em>엡실론</em> 값에 실행합니다.
 각 엡실론마다 최종 정확도와 성공적인 일부 적대 사례를 저장하여 다음 섹션에 표시합니다.
 엡실론 값이 증가함에 따라 출력된 정확도가 어떻게 감소하는지 보십시오.
@@ -587,8 +573,8 @@ Epsilon: 0.3    Test Accuracy = 869 / 10000 = 0.0869
 </div>
 </div>
 </div>
-<div class="section" id="id13">
-<h2>결과<a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id10">
+<h2>결과<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="vs">
 <h3>정확도 vs 엡실론<a class="headerlink" href="#vs" title="Permalink to this headline">¶</a></h3>
 <p>첫 번째 결과는 정확도 vs 엡실론 을 도식화 한 것 입니다.
@@ -611,8 +597,8 @@ Epsilon: 0.3    Test Accuracy = 869 / 10000 = 0.0869
 </div>
 <img alt="../_images/sphx_glr_fgsm_tutorial_001.png" class="sphx-glr-single-img" src="../_images/sphx_glr_fgsm_tutorial_001.png" />
 </div>
-<div class="section" id="id14">
-<h3>샘플 적대적 예제들<a class="headerlink" href="#id14" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id11">
+<h3>샘플 적대적 예제들<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h3>
 <p>공짜 점심은 없다는 것을 기억하시나요? 이 경우에는 엡실론이 증가할수록 테스트 정확도는 떨어집니다.
 <strong>그러나</strong> 작은 변화는 더 쉽게 인식할 수 있게 됩니다.
 실제로 정확도 저하와 공격자가 고려해야 하는 이해도 사이에는 상충 관계(tradeoff)가 있습니다.
@@ -642,8 +628,8 @@ Epsilon: 0.3    Test Accuracy = 869 / 10000 = 0.0869
 <img alt="../_images/sphx_glr_fgsm_tutorial_002.png" class="sphx-glr-single-img" src="../_images/sphx_glr_fgsm_tutorial_002.png" />
 </div>
 </div>
-<div class="section" id="id15">
-<h2>다음 단계는?<a class="headerlink" href="#id15" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id12">
+<h2>다음 단계는?<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h2>
 <p>이번 튜토리얼에서 적대적 머신 러닝에 대한 통찰을 얻을 수 있었기를 바랍니다.
 튜토리얼의 내용으로부터 앞으로 더 많은 것들을 알아나갈 수 있습니다.
 튜토리얼의 적대적 공격 예제는 본 분야의 초급 단계이며
@@ -656,8 +642,8 @@ Epsilon: 0.3    Test Accuracy = 869 / 10000 = 0.0869
 <a class="reference external" href="https://arxiv.org/pdf/1801.01944.pdf">여기</a> 에서 음성-텍스트 변환 모델에서의 공격도 확인할 수 있습니다.
 그러나 적대적 머신 러닝 분야에 대해서 많은 것을 알기 위한 최고의 방법은 많이 시도해보는 것입니다.
 NIPS 2017 경쟁에서 소개된 다양한 공격 방법을 직접 구현해 보고, FGSM 과 어떤 점이 다른지 연구해 보세요.
-그리고 나서 직접 만든 공격에서부터 모델을 방어해 보세요.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 4 minutes  2.960 seconds)</p>
+그리고 나서 직접 만든 공격으로부터 모델을 방어해 보세요.</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 5 minutes  7.083 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-beginner-fgsm-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/377bf4a7b1761e5f081e057385870d8e/fgsm_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">fgsm_tutorial.py</span></code></a></p>
@@ -722,20 +708,21 @@ NIPS 2017 경쟁에서 소개된 다양한 공격 방법을 직접 구현해 보
               <ul>
 <li><a class="reference internal" href="#">적대적 예제 생성(Adversarial Example Generation)</a><ul>
 <li><a class="reference internal" href="#id1">위협 모델</a></li>
-<li><a class="reference internal" href="#id8">구현</a><ul>
-<li><a class="reference internal" href="#id9">입력</a></li>
-<li><a class="reference internal" href="#id10">공격을 받는 모델</a></li>
+<li><a class="reference internal" href="#id2">빠른 변화도 부호 공격</a></li>
+<li><a class="reference internal" href="#id3">구현</a><ul>
+<li><a class="reference internal" href="#id4">입력</a></li>
+<li><a class="reference internal" href="#id5">공격을 받는 모델</a></li>
 <li><a class="reference internal" href="#fgsm">FGSM 공격</a></li>
-<li><a class="reference internal" href="#id11">테스팅 함수</a></li>
-<li><a class="reference internal" href="#id12">공격 실행</a></li>
+<li><a class="reference internal" href="#id6">테스팅 함수</a></li>
+<li><a class="reference internal" href="#id9">공격 실행</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#id13">결과</a><ul>
+<li><a class="reference internal" href="#id10">결과</a><ul>
 <li><a class="reference internal" href="#vs">정확도 vs 엡실론</a></li>
-<li><a class="reference internal" href="#id14">샘플 적대적 예제들</a></li>
+<li><a class="reference internal" href="#id11">샘플 적대적 예제들</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#id15">다음 단계는?</a></li>
+<li><a class="reference internal" href="#id12">다음 단계는?</a></li>
 </ul>
 </li>
 </ul>
