@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Adversarial Example Generation &mdash; PyTorch Tutorials 1.3.1 documentation</title>
+  <title>적대적 예제 생성(Adversarial Example Generation) &mdash; PyTorch Tutorials 1.3.1 documentation</title>
   
 
   
@@ -150,7 +150,7 @@
 <li class="toctree-l1"><a class="reference internal" href="transfer_learning_tutorial.html">컴퓨터 비전(Vision)을 위한 전이학습(Transfer Learning)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/spatial_transformer_tutorial.html">공간 변형기 네트워크(Spatial Transformer Networks) 튜토리얼</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/neural_style_tutorial.html">PyTorch를 이용한 신경망-변환(Neural-Transfer)</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Adversarial Example Generation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">적대적 예제 생성(Adversarial Example Generation)</a></li>
 </ul>
 <p class="caption"><span class="caption-text">오디오 (Audio)</span></p>
 <ul>
@@ -175,7 +175,7 @@
 </ul>
 <p class="caption"><span class="caption-text">PyTorch 모델을 운영환경에 배포하기</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/flask_rest_api_tutorial.html">Deploying PyTorch in Python via a REST API with Flask</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/flask_rest_api_tutorial.html">Flask를 이용하여 Python에서 PyTorch를 REST API로 배포하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Intro_to_TorchScript_tutorial.html">TorchScript 소개</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_export.html">C++에서 TorchScript 모델 로딩하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/super_resolution_with_onnxruntime.html">(선택) PyTorch 모델을 ONNX으로 변환하고 ONNX 런타임에서 실행하기</a></li>
@@ -246,7 +246,7 @@
       </li>
 
         
-      <li>Adversarial Example Generation</li>
+      <li>적대적 예제 생성(Adversarial Example Generation)</li>
     
     
       <li class="pytorch-breadcrumbs-aside">
@@ -305,80 +305,65 @@
 <p>Click <a class="reference internal" href="#sphx-glr-download-beginner-fgsm-tutorial-py"><span class="std std-ref">here</span></a> to download the full example code</p>
 </div>
 <div class="sphx-glr-example-title section" id="adversarial-example-generation">
-<span id="sphx-glr-beginner-fgsm-tutorial-py"></span><h1>Adversarial Example Generation<a class="headerlink" href="#adversarial-example-generation" title="Permalink to this headline">¶</a></h1>
-<p><strong>Author:</strong> <a class="reference external" href="https://github.com/inkawhich">Nathan Inkawhich</a></p>
-<p>If you are reading this, hopefully you can appreciate how effective some
-machine learning models are. Research is constantly pushing ML models to
-be faster, more accurate, and more efficient. However, an often
-overlooked aspect of designing and training models is security and
-robustness, especially in the face of an adversary who wishes to fool
-the model.</p>
-<p>This tutorial will raise your awareness to the security vulnerabilities
-of ML models, and will give insight into the hot topic of adversarial
-machine learning. You may be surprised to find that adding imperceptible
-perturbations to an image <em>can</em> cause drastically different model
-performance. Given that this is a tutorial, we will explore the topic
-via example on an image classifier. Specifically we will use one of the
-first and most popular attack methods, the Fast Gradient Sign Attack
-(FGSM), to fool an MNIST classifier.</p>
-<div class="section" id="threat-model">
-<h2>Threat Model<a class="headerlink" href="#threat-model" title="Permalink to this headline">¶</a></h2>
-<p>For context, there are many categories of adversarial attacks, each with
-a different goal and assumption of the attacker’s knowledge. However, in
-general the overarching goal is to add the least amount of perturbation
-to the input data to cause the desired misclassification. There are
-several kinds of assumptions of the attacker’s knowledge, two of which
-are: <strong>white-box</strong> and <strong>black-box</strong>. A <em>white-box</em> attack assumes the
-attacker has full knowledge and access to the model, including
-architecture, inputs, outputs, and weights. A <em>black-box</em> attack assumes
-the attacker only has access to the inputs and outputs of the model, and
-knows nothing about the underlying architecture or weights. There are
-also several types of goals, including <strong>misclassification</strong> and
-<strong>source/target misclassification</strong>. A goal of <em>misclassification</em> means
-the adversary only wants the output classification to be wrong but does
-not care what the new classification is. A <em>source/target
-misclassification</em> means the adversary wants to alter an image that is
-originally of a specific source class so that it is classified as a
-specific target class.</p>
-<p>In this case, the FGSM attack is a <em>white-box</em> attack with the goal of
-<em>misclassification</em>. With this background information, we can now
-discuss the attack in detail.</p>
-</div>
-<div class="section" id="fast-gradient-sign-attack">
-<h2>Fast Gradient Sign Attack<a class="headerlink" href="#fast-gradient-sign-attack" title="Permalink to this headline">¶</a></h2>
-<p>One of the first and most popular adversarial attacks to date is
-referred to as the <em>Fast Gradient Sign Attack (FGSM)</em> and is described
-by Goodfellow et. al. in <a class="reference external" href="https://arxiv.org/abs/1412.6572">Explaining and Harnessing Adversarial
-Examples</a>. The attack is remarkably
-powerful, and yet intuitive. It is designed to attack neural networks by
-leveraging the way they learn, <em>gradients</em>. The idea is simple, rather
-than working to minimize the loss by adjusting the weights based on the
-backpropagated gradients, the attack <em>adjusts the input data to maximize
-the loss</em> based on the same backpropagated gradients. In other words,
-the attack uses the gradient of the loss w.r.t the input data, then
-adjusts the input data to maximize the loss.</p>
-<p>Before we jump into the code, let’s look at the famous
-<a class="reference external" href="https://arxiv.org/abs/1412.6572">FGSM</a> panda example and extract
-some notation.</p>
-<div class="figure align-default">
-<img alt="fgsm_panda_image" src="../_images/fgsm_panda_image.png" />
-</div>
-<p>From the figure, <span class="math notranslate nohighlight">\(\mathbf{x}\)</span> is the original input image
-correctly classified as a “panda”, <span class="math notranslate nohighlight">\(y\)</span> is the ground truth label
-for <span class="math notranslate nohighlight">\(\mathbf{x}\)</span>, <span class="math notranslate nohighlight">\(\mathbf{\theta}\)</span> represents the model
-parameters, and <span class="math notranslate nohighlight">\(J(\mathbf{\theta}, \mathbf{x}, y)\)</span> is the loss
-that is used to train the network. The attack backpropagates the
-gradient back to the input data to calculate
-<span class="math notranslate nohighlight">\(\nabla_{x} J(\mathbf{\theta}, \mathbf{x}, y)\)</span>. Then, it adjusts
-the input data by a small step (<span class="math notranslate nohighlight">\(\epsilon\)</span> or <span class="math notranslate nohighlight">\(0.007\)</span> in the
-picture) in the direction (i.e.
-<span class="math notranslate nohighlight">\(sign(\nabla_{x} J(\mathbf{\theta}, \mathbf{x}, y))\)</span>) that will
-maximize the loss. The resulting perturbed image, <span class="math notranslate nohighlight">\(x'\)</span>, is then
-<em>misclassified</em> by the target network as a “gibbon” when it is still
-clearly a “panda”.</p>
-<p>Hopefully now the motivation for this tutorial is clear, so lets jump
-into the implementation.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">print_function</span>
+<span id="sphx-glr-beginner-fgsm-tutorial-py"></span><h1>적대적 예제 생성(Adversarial Example Generation)<a class="headerlink" href="#adversarial-example-generation" title="Permalink to this headline">¶</a></h1>
+<p><strong>저자:</strong> <a class="reference external" href="https://github.com/inkawhich">Nathan Inkawhich</a>
+<strong>번역:</strong> <a class="reference external" href="https://github.com/bongmo">BONGMO KIM</a></p>
+<p>이 글을 읽고 있다면, 여러분은 이미 머신러닝 모델이 얼마나 효과적인지 그 진가를 알고 있을 것입니다.
+머신 러닝 연구는 ML(Machine Learning) 모델을 더욱 빠르고 정확하며 효율적이게 하는 방향으로 진행 되고 있습니다.
+그러나 모델을 속이려하는 적에 대한 보안과 견고함은 모델을 설계하고 훈련할 때 종종 간과되는 부분입니다.</p>
+<p>이 튜토리얼은 ML 모델들의 보안 취약점에 대한 인식을 높이고, 요즘 화두가 되고있는 적대적 머신 러닝에 대한 통찰력을 제공할 것입니다.
+이미지에 눈치챌 수 없는 작은 변화(perturbation)를 추가하면 모델 성능이 크게 달라질 수 있다는 사실에 놀랄 수 있습니다.
+이번 튜토리얼에서는 이미지 분류기의 예제를 통해 위 내용에 대해 살펴볼 것입니다.
+특히 우리는 가장 많이 사용되는 공격 방법 중 하나인 FGSM (Fast Gradient Sign Attack)을 이용해 MNIST 분류기를 속여 볼 것입니다.</p>
+<div class="section" id="id1">
+<h2>위협 모델<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<p>상황에 따라 다양한 범주의 적대적 공격이 있는데 각각 목표가 다르고 공격자가 알고 있는 정보
+대한 가정도 다릅니다. 그러나 보통 가장 중요한 목표는 입력 데이터에 최소한의 작은 변화를
+추가하여 이것이 의도적으로 잘못 분류되게 하는 것입니다. 공격자가 가지고 있는 정보에 대한
+가정에는 여러 종류가 있는데, 보통 <strong>화이트박스**와 **블랙박스</strong> 두 가지가 있습니다.
+<em>화이트박스</em> 공격은 공격자가 모델에 대해 아키텍처, 입력, 출력, 가중치를 포함한 모든 것을
+알고 있고 접근할 수 있다고 가정합니다. <em>블랙박스</em> 공격은 공격자가 모델의 입력과 출력에
+대해서만 접근 가능하고 모델의 가중치와 아키텍처에 관한 내용은 모른다고 가정합니다.
+공격자의 목표는 오분류 및 <a href="#id2"><span class="problematic" id="id3">**</span></a>소스/타겟 오분류**를 포함하는 여러 유형이 있습니다.
+<a href="#id4"><span class="problematic" id="id5">*</span></a>오분류*의 목표는 공격자가 출력으로 나온 분류 결과가 잘못 되도록 하나 새로운 분류 결과가
+어떤 것이 나오는지 신경 쓰지 않는 것을 의미합니다. <a href="#id6"><span class="problematic" id="id7">*</span></a>소스/타겟 오분류*는 공격자가
+원래 특정 소스 클래스의 이미지를 다른 특정 대상 클래스로 분류하도록 변경하려고 함을 의미합니다.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#</span>
+<span class="c1"># 이 경우 FGSM 공격은 *오분류*를 목표로 하는 화이트 박스 공격입니다.</span>
+<span class="c1"># 이런 배경 정보를 갖고 공격에 대해 자세히 알아 보겠습니다.</span>
+<span class="c1">#</span>
+<span class="c1"># 빠른 변화도 부호 공격</span>
+<span class="c1"># -------------------------</span>
+<span class="c1">#</span>
+<span class="c1"># 공격 방법에 있어 초기 방식이면서 가장 유명한 방식은 *빠른 변화도 부호 공격 (FGSM)* 이라고 하며</span>
+<span class="c1"># `적대적 예제에 대한 설명과 활용 &lt;https://arxiv.org/abs/1412.6572&gt;`__ 에서</span>
+<span class="c1"># 이안 갓펠로우가 기고하였습니다.</span>
+<span class="c1"># 이 공격법은 놀랍도록 강력하지만 직관적입니다. 학습 방식, *변화도(gradients)*를 활용하여 신경망을 공격하도록</span>
+<span class="c1"># 설계 되었습니다. 아이디어는 간단합니다. 역전파 변화도를 기반으로 가중치를 조정하여 손실을 최소화하기보다는</span>
+<span class="c1"># 공격이 동일한 역전파 변화도를 기반으로 *손실을 최대화하하는 방향으로 입력 데이터를 조정*합니다.</span>
+<span class="c1"># 다시 말해 공격은 입력 데이터에서 계산된 손실 변화도를 사용하고 입력 데이터를 조정하여 손실이 최대가 되게 합니다.</span>
+
+
+<span class="c1">#</span>
+<span class="c1"># 코드로 넘어가기 전에 유명한 `FGSM &lt;https://arxiv.org/abs/1412.6572&gt;`__ 판다 예제를</span>
+<span class="c1"># 보고 몇 가지 표기법을 정리하겠습니다.</span>
+<span class="c1">#</span>
+<span class="c1"># .. 그림:: /_static/img/fgsm_panda_image.png</span>
+<span class="c1">#    :alt: fgsm_panda_image</span>
+<span class="c1">#</span>
+<span class="c1"># 그림으로부터, :math:`\mathbf{x}` 는 원본 입력 이미지가 &quot;판다&quot; 로 올바르게 분류된 것을 의미하고,</span>
+<span class="c1"># :math:`y` 는 :math:`\mathbf{x}` 를 위한 정답 라벨이며, :math:`\mathbf{\theta}` 는 모델의</span>
+<span class="c1"># 파라미터를, :math:`J(\mathbf{\theta}, \mathbf{x}, y)` 는 네트워크의 학습을 위해서 사용되는 손실을 나타냅니다.</span>
+<span class="c1"># 공격은 :math:`\nabla_{x} J(\mathbf{\theta}, \mathbf{x}, y)` 계산을 위해 입력 데이터에 변화도를 역전파합니다.</span>
+<span class="c1"># 그러고 나서, 변화도는 손실 값이 최대화되는 방향으로 (예를 들면, :math:`sign(\nabla_{x} J(\mathbf{\theta}, \mathbf{x}, y))` )</span>
+<span class="c1"># 작은 스텝(step) 만큼 (그림에서는 :math:`\epsilon` 혹은 :math:`0.007`) 입력 데이터에 적용됩니다.</span>
+<span class="c1"># 결과로 나오는 작은 변화된 이미지(:math:`x&#39;`)는 타겟 네트워크에 의해 &quot;긴팔원숭이&quot;로 *오분류*되나 여전히 육안으로는</span>
+<span class="c1"># 분명히 &quot;판다&quot; 입니다.</span>
+<span class="c1">#</span>
+<span class="c1"># 이제 본 튜토리얼의 동기가 명확해지길 바라며, 구현으로 넘어가 보겠습니다.</span>
+<span class="c1">#</span>
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">print_function</span>
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
 <span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="nn">F</span>
@@ -389,29 +374,26 @@ into the implementation.</p>
 </pre></div>
 </div>
 </div>
-<div class="section" id="implementation">
-<h2>Implementation<a class="headerlink" href="#implementation" title="Permalink to this headline">¶</a></h2>
-<p>In this section, we will discuss the input parameters for the tutorial,
-define the model under attack, then code the attack and run some tests.</p>
-<div class="section" id="inputs">
-<h3>Inputs<a class="headerlink" href="#inputs" title="Permalink to this headline">¶</a></h3>
-<p>There are only three inputs for this tutorial, and are defined as
-follows:</p>
+<div class="section" id="id8">
+<h2>구현<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h2>
+<p>이 섹션에서는 튜토리얼의 입력 매개 변수에 대해 설명하고 공격중인 모델을
+정의한 다음 공격을 코딩하고 일부 테스트를 실행합니다.</p>
+<div class="section" id="id9">
+<h3>입력<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
+<p>이 학습서에는 입력이 3 개이며 다음과 같이 정의됩니다:</p>
 <ul class="simple">
-<li><p><strong>epsilons</strong> - List of epsilon values to use for the run. It is
-important to keep 0 in the list because it represents the model
-performance on the original test set. Also, intuitively we would
-expect the larger the epsilon, the more noticeable the perturbations
-but the more effective the attack in terms of degrading model
-accuracy. Since the data range here is <span class="math notranslate nohighlight">\([0,1]\)</span>, no epsilon
-value should exceed 1.</p></li>
-<li><p><strong>pretrained_model</strong> - path to the pretrained MNIST model which was
-trained with
-<a class="reference external" href="https://github.com/pytorch/examples/tree/master/mnist">pytorch/examples/mnist</a>.
-For simplicity, download the pretrained model <a class="reference external" href="https://drive.google.com/drive/folders/1fn83DF14tWmit0RTKWRhPq5uVXt73e0h?usp=sharing">here</a>.</p></li>
-<li><p><strong>use_cuda</strong> - boolean flag to use CUDA if desired and available.
-Note, a GPU with CUDA is not critical for this tutorial as a CPU will
-not take much time.</p></li>
+<li><p><strong>epsilons</strong> - 실행에 사용할 엡실론의 리스트입니다. 엡실론 0의 값은 원래 테스트 셋의 모델 성능을
+나타내므로 목록에 유지하는 것이 중요합니다. 또한 직관적으로 엡실론이 클수록 작은 변화가 더 눈에 띄지만
+모델 정확도를 저하 시키는 측면에서 더 효과가 있습니다. 여기서 데이터의 범위는 0-1 이기 때문에
+엡실론의 값은 1을 초과할 수 없습니다.</p></li>
+<li><dl class="simple">
+<dt><strong>pretrained_model</strong> - <a class="reference external" href="https://github.com/pytorch/examples/tree/master/mnist">pytorch/examples/mnist</a></dt><dd><p>를 통해 미리 학습된 MNIST 모델의 경로.
+튜토리얼을 간편하게 하려면 <a class="reference external" href="https://drive.google.com/drive/folders/1fn83DF14tWmit0RTKWRhPq5uVXt73e0h?usp=sharing">여기</a> 에서 미리 학습된 모델을 다운로드하세요.</p>
+</dd>
+</dl>
+</li>
+<li><p><strong>use_cuda</strong> - CUDA 를 사용할지 말지 정하는 이진 플래그.
+본 튜토리얼에서는 CPU 시간이 오래 걸리지 않으므로 CUDA를 지원하는 GPU 의 여부는 중요하지 않습니다.</p></li>
 </ul>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">epsilons</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">.</span><span class="mi">05</span><span class="p">,</span> <span class="o">.</span><span class="mi">1</span><span class="p">,</span> <span class="o">.</span><span class="mi">15</span><span class="p">,</span> <span class="o">.</span><span class="mi">2</span><span class="p">,</span> <span class="o">.</span><span class="mi">25</span><span class="p">,</span> <span class="o">.</span><span class="mi">3</span><span class="p">]</span>
 <span class="n">pretrained_model</span> <span class="o">=</span> <span class="s2">&quot;data/lenet_mnist_model.pth&quot;</span>
@@ -419,16 +401,13 @@ not take much time.</p></li>
 </pre></div>
 </div>
 </div>
-<div class="section" id="model-under-attack">
-<h3>Model Under Attack<a class="headerlink" href="#model-under-attack" title="Permalink to this headline">¶</a></h3>
-<p>As mentioned, the model under attack is the same MNIST model from
-<a class="reference external" href="https://github.com/pytorch/examples/tree/master/mnist">pytorch/examples/mnist</a>.
-You may train and save your own MNIST model or you can download and use
-the provided model. The <em>Net</em> definition and test dataloader here have
-been copied from the MNIST example. The purpose of this section is to
-define the model and dataloader, then initialize the model and load the
-pretrained weights.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># LeNet Model definition</span>
+<div class="section" id="id10">
+<h3>공격을 받는 모델<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h3>
+<p>앞서 말한대로, 공격을 받는 모델은 <a class="reference external" href="https://github.com/pytorch/examples/tree/master/mnist">pytorch/examples/mnist</a>
+와 동일한 MNIST 모델입니다. 본인의 MNIST 모델을 학습 및 저장하는 방식으로 하거나 제공된 모델을 다운로드 해 사용하는 식으로 진행할 수 있습니다.
+여기서 <em>Net</em> 정의 및 테스트 데이터 로더는 MNIST 예제에서 복사 하였습니다.
+이 섹션의 목적은 모델과 데이터 로더를 정의한 다음, 모델을 초기화하고 미리 학습된 가중치를 읽어오는 것입니다.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># LeNet 모델 정의</span>
 <span class="k">class</span> <span class="nc">Net</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">Net</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
@@ -447,24 +426,24 @@ pretrained weights.</p>
         <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fc2</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">log_softmax</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
-<span class="c1"># MNIST Test dataset and dataloader declaration</span>
+<span class="c1"># MNIST 테스트 데이터셋과 데이터로더 선언</span>
 <span class="n">test_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span>
     <span class="n">datasets</span><span class="o">.</span><span class="n">MNIST</span><span class="p">(</span><span class="s1">&#39;../data&#39;</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">transforms</span><span class="o">.</span><span class="n">Compose</span><span class="p">([</span>
             <span class="n">transforms</span><span class="o">.</span><span class="n">ToTensor</span><span class="p">(),</span>
             <span class="p">])),</span>
         <span class="n">batch_size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-<span class="c1"># Define what device we are using</span>
+<span class="c1"># 어떤 디바이스를 사용할지 정의</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;CUDA Available: &quot;</span><span class="p">,</span><span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">())</span>
 <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span> <span class="k">if</span> <span class="p">(</span><span class="n">use_cuda</span> <span class="ow">and</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">())</span> <span class="k">else</span> <span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
 
-<span class="c1"># Initialize the network</span>
+<span class="c1"># 모델 초기화하기</span>
 <span class="n">model</span> <span class="o">=</span> <span class="n">Net</span><span class="p">()</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
 
-<span class="c1"># Load the pretrained model</span>
+<span class="c1"># 미리 학습된 모델 읽어오기</span>
 <span class="n">model</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">pretrained_model</span><span class="p">,</span> <span class="n">map_location</span><span class="o">=</span><span class="s1">&#39;cpu&#39;</span><span class="p">))</span>
 
-<span class="c1"># Set the model in evaluation mode. In this case this is for the Dropout layers</span>
+<span class="c1"># 모델을 평가 모드로 설정하기. 드롭아웃 레이어들을 위해 사용됨</span>
 <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -483,123 +462,113 @@ CUDA Available:  True
 </pre></div>
 </div>
 </div>
-<div class="section" id="fgsm-attack">
-<h3>FGSM Attack<a class="headerlink" href="#fgsm-attack" title="Permalink to this headline">¶</a></h3>
-<p>Now, we can define the function that creates the adversarial examples by
-perturbing the original inputs. The <code class="docutils literal notranslate"><span class="pre">fgsm_attack</span></code> function takes three
-inputs, <em>image</em> is the original clean image (<span class="math notranslate nohighlight">\(x\)</span>), <em>epsilon</em> is
-the pixel-wise perturbation amount (<span class="math notranslate nohighlight">\(\epsilon\)</span>), and <em>data_grad</em>
-is gradient of the loss w.r.t the input image
-(<span class="math notranslate nohighlight">\(\nabla_{x} J(\mathbf{\theta}, \mathbf{x}, y)\)</span>). The function
-then creates perturbed image as</p>
+<div class="section" id="fgsm">
+<h3>FGSM 공격<a class="headerlink" href="#fgsm" title="Permalink to this headline">¶</a></h3>
+<p>이제 원래 입력을 교란시켜 적대적인 예를 만드는 함수를 정의 할 수 있습니다.
+<code class="docutils literal notranslate"><span class="pre">fgsm_attack`</span></code> 함수는 입력 파라미터로 3가지를 가집니다. 첫번째는 원본 <em>이미지</em> (<span class="math notranslate nohighlight">\(x\)</span>),
+두번째는 <em>엡실론*으로 픽셀 단위의 작은 변화를 주는 값입니다 (:math:`epsilon`).
+마지막은 *data_grad</em> 로 입력 영상 (<span class="math notranslate nohighlight">\(\nabla_{x} J(\mathbf{\theta}, \mathbf{x}, y)\)</span>) 에 대한 변화도 손실 값입니다.
+아래 식에 따른 작은 변화가 적용된 이미지를 생성합니다.</p>
 <div class="math notranslate nohighlight">
 \[perturbed\_image = image + epsilon*sign(data\_grad) = x + \epsilon * sign(\nabla_{x} J(\mathbf{\theta}, \mathbf{x}, y))\]</div>
-<p>Finally, in order to maintain the original range of the data, the
-perturbed image is clipped to range <span class="math notranslate nohighlight">\([0,1]\)</span>.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># FGSM attack code</span>
+<p>마지막으로 데이터의 원래 범위를 유지하기 위해, 작은 변화가 적용된 이미지가 <span class="math notranslate nohighlight">\([0,1]\)</span> 범위로 잘립니다.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># FGSM 공격 코드</span>
 <span class="k">def</span> <span class="nf">fgsm_attack</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">,</span> <span class="n">data_grad</span><span class="p">):</span>
-    <span class="c1"># Collect the element-wise sign of the data gradient</span>
+    <span class="c1"># data_grad 의 요소별 부호 값을 얻어옵니다</span>
     <span class="n">sign_data_grad</span> <span class="o">=</span> <span class="n">data_grad</span><span class="o">.</span><span class="n">sign</span><span class="p">()</span>
-    <span class="c1"># Create the perturbed image by adjusting each pixel of the input image</span>
+    <span class="c1"># 입력 이미지의 각 픽셀에 sign_data_grad 를 적용해 작은 변화가 적용된 이미지를 생성합니다</span>
     <span class="n">perturbed_image</span> <span class="o">=</span> <span class="n">image</span> <span class="o">+</span> <span class="n">epsilon</span><span class="o">*</span><span class="n">sign_data_grad</span>
-    <span class="c1"># Adding clipping to maintain [0,1] range</span>
+    <span class="c1"># 값 범위를 [0,1]로 유지하기 위해 자르기(clipping)를 추가합니다</span>
     <span class="n">perturbed_image</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span><span class="n">perturbed_image</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-    <span class="c1"># Return the perturbed image</span>
+    <span class="c1"># 작은 변화가 적용된 이미지를 리턴합니다</span>
     <span class="k">return</span> <span class="n">perturbed_image</span>
 </pre></div>
 </div>
 </div>
-<div class="section" id="testing-function">
-<h3>Testing Function<a class="headerlink" href="#testing-function" title="Permalink to this headline">¶</a></h3>
-<p>Finally, the central result of this tutorial comes from the <code class="docutils literal notranslate"><span class="pre">test</span></code>
-function. Each call to this test function performs a full test step on
-the MNIST test set and reports a final accuracy. However, notice that
-this function also takes an <em>epsilon</em> input. This is because the
-<code class="docutils literal notranslate"><span class="pre">test</span></code> function reports the accuracy of a model that is under attack
-from an adversary with strength <span class="math notranslate nohighlight">\(\epsilon\)</span>. More specifically, for
-each sample in the test set, the function computes the gradient of the
-loss w.r.t the input data (<span class="math notranslate nohighlight">\(data\_grad\)</span>), creates a perturbed
-image with <code class="docutils literal notranslate"><span class="pre">fgsm_attack</span></code> (<span class="math notranslate nohighlight">\(perturbed\_data\)</span>), then checks to see
-if the perturbed example is adversarial. In addition to testing the
-accuracy of the model, the function also saves and returns some
-successful adversarial examples to be visualized later.</p>
+<div class="section" id="id11">
+<h3>테스팅 함수<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h3>
+<p>마지막으로 본 튜토리얼의 핵심 결과는 <code class="docutils literal notranslate"><span class="pre">테스트</span></code> 함수에서 오게 됩니다.
+이 테스트 기능을 호출 할 때마다 MNIST 테스트 셋에서 전체 테스트 단계를 수행하고 최종 정확도를 보고합니다.
+그러나 이 함수에는 <em>엡실론</em> 입력도 필요합니다. 이는 <code class="docutils literal notranslate"><span class="pre">테스트`</span></code> 함수가 <span class="math notranslate nohighlight">\(\epsilon\)</span> 크기에 따라 공격자의 공격을 받는 모델의
+정확도을 보고하기 때문입니다. 더 구체적으로 보면 테스트 셋의 각각의 샘플에서 테스트 함수는 입력 데이터에 대한 손실 변화도 (<span class="math notranslate nohighlight">\(data\_grad\)</span>) 를 계산하고,</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">FGSM</span> <span class="pre">공격</span></code> (<span class="math notranslate nohighlight">\(perturbed\_data\)</span>) 을 받은 작은 변화가 적용된 이미지를 만들고 나서 작은 변화가 적용된 이미지가 적대적인지 확인을 합니다.</p>
+</div></blockquote>
+<p>추가로 모델의 정확도를 테스트하기 위해서 테스트 함수는 나중에 시각화하여 볼 수 있도록 성공적으로 얻은 적대적 이미지를 저장하고 반환합니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">test</span><span class="p">(</span> <span class="n">model</span><span class="p">,</span> <span class="n">device</span><span class="p">,</span> <span class="n">test_loader</span><span class="p">,</span> <span class="n">epsilon</span> <span class="p">):</span>
 
-    <span class="c1"># Accuracy counter</span>
+    <span class="c1"># 정확도 카운터</span>
     <span class="n">correct</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">adv_examples</span> <span class="o">=</span> <span class="p">[]</span>
 
-    <span class="c1"># Loop over all examples in test set</span>
+    <span class="c1"># 테스트 셋의 모든 예제에 대해 루프를 돕니다</span>
     <span class="k">for</span> <span class="n">data</span><span class="p">,</span> <span class="n">target</span> <span class="ow">in</span> <span class="n">test_loader</span><span class="p">:</span>
 
-        <span class="c1"># Send the data and label to the device</span>
+        <span class="c1"># 디바이스(CPU or GPU) 에 데이터와 라벨 값을 보냅니다</span>
         <span class="n">data</span><span class="p">,</span> <span class="n">target</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">),</span> <span class="n">target</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
 
-        <span class="c1"># Set requires_grad attribute of tensor. Important for Attack</span>
+        <span class="c1"># 텐서의 속성 중 requires_grad 를 설정합니다. 공격에서 중요한 부분입니다</span>
         <span class="n">data</span><span class="o">.</span><span class="n">requires_grad</span> <span class="o">=</span> <span class="kc">True</span>
 
-        <span class="c1"># Forward pass the data through the model</span>
+        <span class="c1"># 데이터를 모델에 통과시킵니다</span>
         <span class="n">output</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-        <span class="n">init_pred</span> <span class="o">=</span> <span class="n">output</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdim</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span> <span class="c1"># get the index of the max log-probability</span>
+        <span class="n">init_pred</span> <span class="o">=</span> <span class="n">output</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdim</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span> <span class="c1"># 로그 확률의 최대값을 가지는 인덱스를 얻습니다</span>
 
-        <span class="c1"># If the initial prediction is wrong, dont bother attacking, just move on</span>
+        <span class="c1"># 만약 초기 예측이 틀리면, 공격하지 않도록 하고 계속 진행합니다</span>
         <span class="k">if</span> <span class="n">init_pred</span><span class="o">.</span><span class="n">item</span><span class="p">()</span> <span class="o">!=</span> <span class="n">target</span><span class="o">.</span><span class="n">item</span><span class="p">():</span>
             <span class="k">continue</span>
 
-        <span class="c1"># Calculate the loss</span>
+        <span class="c1"># 손실을 계산합니다</span>
         <span class="n">loss</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">nll_loss</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
 
-        <span class="c1"># Zero all existing gradients</span>
+        <span class="c1"># 모델의 변화도들을 전부 0으로 설정합니다</span>
         <span class="n">model</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
 
-        <span class="c1"># Calculate gradients of model in backward pass</span>
+        <span class="c1"># 후방 전달을 통해 모델의 변화도를 계산합니다</span>
         <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
 
-        <span class="c1"># Collect datagrad</span>
+        <span class="c1"># 변화도 값을 모읍니다</span>
         <span class="n">data_grad</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">grad</span><span class="o">.</span><span class="n">data</span>
 
-        <span class="c1"># Call FGSM Attack</span>
+        <span class="c1"># FGSM 공격을 호출합니다</span>
         <span class="n">perturbed_data</span> <span class="o">=</span> <span class="n">fgsm_attack</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">,</span> <span class="n">data_grad</span><span class="p">)</span>
 
-        <span class="c1"># Re-classify the perturbed image</span>
+        <span class="c1"># 작은 변화가 적용된 이미지에 대해 재분류합니다</span>
         <span class="n">output</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">perturbed_data</span><span class="p">)</span>
 
-        <span class="c1"># Check for success</span>
-        <span class="n">final_pred</span> <span class="o">=</span> <span class="n">output</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdim</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span> <span class="c1"># get the index of the max log-probability</span>
+        <span class="c1"># 올바른지 확인합니다</span>
+        <span class="n">final_pred</span> <span class="o">=</span> <span class="n">output</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdim</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span> <span class="c1"># 로그 확률의 최대값을 가지는 인덱스를 얻습니다</span>
         <span class="k">if</span> <span class="n">final_pred</span><span class="o">.</span><span class="n">item</span><span class="p">()</span> <span class="o">==</span> <span class="n">target</span><span class="o">.</span><span class="n">item</span><span class="p">():</span>
             <span class="n">correct</span> <span class="o">+=</span> <span class="mi">1</span>
-            <span class="c1"># Special case for saving 0 epsilon examples</span>
+            <span class="c1"># 0 엡실론 예제에 대해서 저장합니다</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">epsilon</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">adv_examples</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">5</span><span class="p">):</span>
                 <span class="n">adv_ex</span> <span class="o">=</span> <span class="n">perturbed_data</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
                 <span class="n">adv_examples</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="p">(</span><span class="n">init_pred</span><span class="o">.</span><span class="n">item</span><span class="p">(),</span> <span class="n">final_pred</span><span class="o">.</span><span class="n">item</span><span class="p">(),</span> <span class="n">adv_ex</span><span class="p">)</span> <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="c1"># Save some adv examples for visualization later</span>
+            <span class="c1"># 추후 시각화를 위하 다른 예제들을 저장합니다</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">adv_examples</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">5</span><span class="p">:</span>
                 <span class="n">adv_ex</span> <span class="o">=</span> <span class="n">perturbed_data</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
                 <span class="n">adv_examples</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="p">(</span><span class="n">init_pred</span><span class="o">.</span><span class="n">item</span><span class="p">(),</span> <span class="n">final_pred</span><span class="o">.</span><span class="n">item</span><span class="p">(),</span> <span class="n">adv_ex</span><span class="p">)</span> <span class="p">)</span>
 
-    <span class="c1"># Calculate final accuracy for this epsilon</span>
+    <span class="c1"># 해당 엡실론에서의 최종 정확도를 계산합니다</span>
     <span class="n">final_acc</span> <span class="o">=</span> <span class="n">correct</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">test_loader</span><span class="p">))</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Epsilon: </span><span class="si">{}</span><span class="se">\t</span><span class="s2">Test Accuracy = </span><span class="si">{}</span><span class="s2"> / </span><span class="si">{}</span><span class="s2"> = </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">epsilon</span><span class="p">,</span> <span class="n">correct</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">test_loader</span><span class="p">),</span> <span class="n">final_acc</span><span class="p">))</span>
 
-    <span class="c1"># Return the accuracy and an adversarial example</span>
+    <span class="c1"># 정확도와 적대적 예제를 리턴합니다</span>
     <span class="k">return</span> <span class="n">final_acc</span><span class="p">,</span> <span class="n">adv_examples</span>
 </pre></div>
 </div>
 </div>
-<div class="section" id="run-attack">
-<h3>Run Attack<a class="headerlink" href="#run-attack" title="Permalink to this headline">¶</a></h3>
-<p>The last part of the implementation is to actually run the attack. Here,
-we run a full test step for each epsilon value in the <em>epsilons</em> input.
-For each epsilon we also save the final accuracy and some successful
-adversarial examples to be plotted in the coming sections. Notice how
-the printed accuracies decrease as the epsilon value increases. Also,
-note the <span class="math notranslate nohighlight">\(\epsilon=0\)</span> case represents the original test accuracy,
-with no attack.</p>
+<div class="section" id="id12">
+<h3>공격 실행<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h3>
+<p>구현의 마지막 부분은 공격을 실행하는 것입니다. 여기서 전체 테스트 스텝을 각 <em>엡실론</em> 값에 실행합니다.
+각 엡실론마다 최종 정확도와 성공적인 일부 적대 사례를 저장하여 다음 섹션에 표시합니다.
+엡실론 값이 증가함에 따라 출력된 정확도가 어떻게 감소하는지 보십시오.
+또한, <span class="math notranslate nohighlight">\(\epsilon=0\)</span> 인 경우에는 공격이 없는 원본 테스트 정확도임을 보입니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">accuracies</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="n">examples</span> <span class="o">=</span> <span class="p">[]</span>
 
-<span class="c1"># Run test for each epsilon</span>
+<span class="c1"># 각 엡실론에 대해 테스트 함수를 실행합니다</span>
 <span class="k">for</span> <span class="n">eps</span> <span class="ow">in</span> <span class="n">epsilons</span><span class="p">:</span>
     <span class="n">acc</span><span class="p">,</span> <span class="n">ex</span> <span class="o">=</span> <span class="n">test</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">device</span><span class="p">,</span> <span class="n">test_loader</span><span class="p">,</span> <span class="n">eps</span><span class="p">)</span>
     <span class="n">accuracies</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">acc</span><span class="p">)</span>
@@ -618,20 +587,18 @@ Epsilon: 0.3    Test Accuracy = 869 / 10000 = 0.0869
 </div>
 </div>
 </div>
-<div class="section" id="results">
-<h2>Results<a class="headerlink" href="#results" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="accuracy-vs-epsilon">
-<h3>Accuracy vs Epsilon<a class="headerlink" href="#accuracy-vs-epsilon" title="Permalink to this headline">¶</a></h3>
-<p>The first result is the accuracy versus epsilon plot. As alluded to
-earlier, as epsilon increases we expect the test accuracy to decrease.
-This is because larger epsilons mean we take a larger step in the
-direction that will maximize the loss. Notice the trend in the curve is
-not linear even though the epsilon values are linearly spaced. For
-example, the accuracy at <span class="math notranslate nohighlight">\(\epsilon=0.05\)</span> is only about 4% lower
-than <span class="math notranslate nohighlight">\(\epsilon=0\)</span>, but the accuracy at <span class="math notranslate nohighlight">\(\epsilon=0.2\)</span> is 25%
-lower than <span class="math notranslate nohighlight">\(\epsilon=0.15\)</span>. Also, notice the accuracy of the model
-hits random accuracy for a 10-class classifier between
-<span class="math notranslate nohighlight">\(\epsilon=0.25\)</span> and <span class="math notranslate nohighlight">\(\epsilon=0.3\)</span>.</p>
+<div class="section" id="id13">
+<h2>결과<a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="vs">
+<h3>정확도 vs 엡실론<a class="headerlink" href="#vs" title="Permalink to this headline">¶</a></h3>
+<p>첫 번째 결과는 정확도 vs 엡실론 을 도식화 한 것 입니다.
+앞에서 언급했듯이, 엡실론이 증가함에 따라 우리는 테스트 정확도가 감소할 것으로 예상합니다.
+이는 학습을 더 진행해 갈수록 엡실론이 클수록 손실을 극대화 할 방향으로 진행되기 때문입니다.
+엡실론 값이 선형적으로 분포하더라도 곡선의 추세는 선형의 형태가 아닙니다.
+예를 들면, math:<cite>epsilon=0.05</cite> 에서의 정확도가 <span class="math notranslate nohighlight">\(\epsilon=0\)</span> 보다 약 4% 낮지만
+<span class="math notranslate nohighlight">\(\epsilon=0.2\)</span> 에서의 정확도는 <span class="math notranslate nohighlight">\(\epsilon=0.15\)</span> 보다 약 25% 정도 낮습니다.
+또한, <span class="math notranslate nohighlight">\(\epsilon=0.25\)</span> 와 <span class="math notranslate nohighlight">\(\epsilon=0.3\)</span> 사이의 모델 정확도는 랜덤으로
+10개중 1개를 선택했을 때의 정확도와 유사한 수준입니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">epsilons</span><span class="p">,</span> <span class="n">accuracies</span><span class="p">,</span> <span class="s2">&quot;*-&quot;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">yticks</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mf">0.1</span><span class="p">))</span>
@@ -644,21 +611,17 @@ hits random accuracy for a 10-class classifier between
 </div>
 <img alt="../_images/sphx_glr_fgsm_tutorial_001.png" class="sphx-glr-single-img" src="../_images/sphx_glr_fgsm_tutorial_001.png" />
 </div>
-<div class="section" id="sample-adversarial-examples">
-<h3>Sample Adversarial Examples<a class="headerlink" href="#sample-adversarial-examples" title="Permalink to this headline">¶</a></h3>
-<p>Remember the idea of no free lunch? In this case, as epsilon increases
-the test accuracy decreases <strong>BUT</strong> the perturbations become more easily
-perceptible. In reality, there is a tradeoff between accuracy
-degredation and perceptibility that an attacker must consider. Here, we
-show some examples of successful adversarial examples at each epsilon
-value. Each row of the plot shows a different epsilon value. The first
-row is the <span class="math notranslate nohighlight">\(\epsilon=0\)</span> examples which represent the original
-“clean” images with no perturbation. The title of each image shows the
-“original classification -&gt; adversarial classification.” Notice, the
-perturbations start to become evident at <span class="math notranslate nohighlight">\(\epsilon=0.15\)</span> and are
-quite evident at <span class="math notranslate nohighlight">\(\epsilon=0.3\)</span>. However, in all cases humans are
-still capable of identifying the correct class despite the added noise.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Plot several examples of adversarial samples at each epsilon</span>
+<div class="section" id="id14">
+<h3>샘플 적대적 예제들<a class="headerlink" href="#id14" title="Permalink to this headline">¶</a></h3>
+<p>공짜 점심은 없다는 것을 기억하시나요? 이 경우에는 엡실론이 증가할수록 테스트 정확도는 떨어집니다.
+<strong>그러나</strong> 작은 변화는 더 쉽게 인식할 수 있게 됩니다.
+실제로 정확도 저하와 공격자가 고려해야 하는 이해도 사이에는 상충 관계(tradeoff)가 있습니다.
+여기서 우리는 각 엡실론 값에서 성공적인 대적 사례를 보이는 몇 가지 예를 보겠습니다.
+아래 이미지의 첫번째로 열은 <span class="math notranslate nohighlight">\(\epsilon=0\)</span> 인 예제들로 작은 변화가 없는 원본의 “깨끗한” 이미지들을 나타냅니다.
+각 이미지의 위의 글자는 “원래 분류 결과 -&gt; 적대적 분류 결과”를 나타냅니다.
+<span class="math notranslate nohighlight">\(\epsilon=0.15\)</span> 에서 작은 변화가 눈에 띄기 시작하고 <span class="math notranslate nohighlight">\(\epsilon=0.3\)</span> 에서는 확실해 보입니다.
+그러나 모든 경우에 대해서 노이즈가 추가되었더라도 사람은 올바르게 분류를 수행할 수 있습니다.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># 각 엡실론에서 적대적 샘플의 몇 가지 예를 도식화합니다</span>
 <span class="n">cnt</span> <span class="o">=</span> <span class="mi">0</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">epsilons</span><span class="p">)):</span>
@@ -679,28 +642,22 @@ still capable of identifying the correct class despite the added noise.</p>
 <img alt="../_images/sphx_glr_fgsm_tutorial_002.png" class="sphx-glr-single-img" src="../_images/sphx_glr_fgsm_tutorial_002.png" />
 </div>
 </div>
-<div class="section" id="where-to-go-next">
-<h2>Where to go next?<a class="headerlink" href="#where-to-go-next" title="Permalink to this headline">¶</a></h2>
-<p>Hopefully this tutorial gives some insight into the topic of adversarial
-machine learning. There are many potential directions to go from here.
-This attack represents the very beginning of adversarial attack research
-and since there have been many subsequent ideas for how to attack and
-defend ML models from an adversary. In fact, at NIPS 2017 there was an
-adversarial attack and defense competition and many of the methods used
-in the competition are described in this paper: <a class="reference external" href="https://arxiv.org/pdf/1804.00097.pdf">Adversarial Attacks and
-Defences Competition</a>. The work
-on defense also leads into the idea of making machine learning models
-more <em>robust</em> in general, to both naturally perturbed and adversarially
-crafted inputs.</p>
-<p>Another direction to go is adversarial attacks and defense in different
-domains. Adversarial research is not limited to the image domain, check
-out <a class="reference external" href="https://arxiv.org/pdf/1801.01944.pdf">this</a> attack on
-speech-to-text models. But perhaps the best way to learn more about
-adversarial machine learning is to get your hands dirty. Try to
-implement a different attack from the NIPS 2017 competition, and see how
-it differs from FGSM. Then, try to defend the model from your own
-attacks.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 4 minutes  50.389 seconds)</p>
+<div class="section" id="id15">
+<h2>다음 단계는?<a class="headerlink" href="#id15" title="Permalink to this headline">¶</a></h2>
+<p>이번 튜토리얼에서 적대적 머신 러닝에 대한 통찰을 얻을 수 있었기를 바랍니다.
+튜토리얼의 내용으로부터 앞으로 더 많은 것들을 알아나갈 수 있습니다.
+튜토리얼의 적대적 공격 예제는 본 분야의 초급 단계이며
+적대적 상황으로부터 ML 모델을 공격하고 방어하는 방법에 대한 많은 후속 아이디어가 있습니다.
+사실 NIPS 2017 에서 적대적 공격과 방어에 대한 경쟁(competition)이 있었고 여기서 사용된
+다양한 방법들은 다음 논문에 정리 되어 있습니다: <a class="reference external" href="https://arxiv.org/pdf/1804.00097.pdf">적대적 공격과 방어 경쟁</a>.
+방어에 대한 연구는 자연스럽게 교란 및 해킹 목적으로 제작된 입력에 대해 머신 러닝 모델을
+보다 <em>견고하게(robust)</em> 만드는 아이디어로 이어집니다.</p>
+<p>또 다른 방향은 다른 도메인에서의 적의 공격과 방어입니다. 적대적 연구는 이미지 도메인에 제한되어 있지 않습니다.
+<a class="reference external" href="https://arxiv.org/pdf/1801.01944.pdf">여기</a> 에서 음성-텍스트 변환 모델에서의 공격도 확인할 수 있습니다.
+그러나 적대적 머신 러닝 분야에 대해서 많은 것을 알기 위한 최고의 방법은 많이 시도해보는 것입니다.
+NIPS 2017 경쟁에서 소개된 다양한 공격 방법을 직접 구현해 보고, FGSM 과 어떤 점이 다른지 연구해 보세요.
+그리고 나서 직접 만든 공격에서부터 모델을 방어해 보세요.</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 4 minutes  2.960 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-beginner-fgsm-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/377bf4a7b1761e5f081e057385870d8e/fgsm_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">fgsm_tutorial.py</span></code></a></p>
@@ -763,23 +720,22 @@ attacks.</p>
           <div class="pytorch-right-menu" id="pytorch-right-menu">
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
-<li><a class="reference internal" href="#">Adversarial Example Generation</a><ul>
-<li><a class="reference internal" href="#threat-model">Threat Model</a></li>
-<li><a class="reference internal" href="#fast-gradient-sign-attack">Fast Gradient Sign Attack</a></li>
-<li><a class="reference internal" href="#implementation">Implementation</a><ul>
-<li><a class="reference internal" href="#inputs">Inputs</a></li>
-<li><a class="reference internal" href="#model-under-attack">Model Under Attack</a></li>
-<li><a class="reference internal" href="#fgsm-attack">FGSM Attack</a></li>
-<li><a class="reference internal" href="#testing-function">Testing Function</a></li>
-<li><a class="reference internal" href="#run-attack">Run Attack</a></li>
+<li><a class="reference internal" href="#">적대적 예제 생성(Adversarial Example Generation)</a><ul>
+<li><a class="reference internal" href="#id1">위협 모델</a></li>
+<li><a class="reference internal" href="#id8">구현</a><ul>
+<li><a class="reference internal" href="#id9">입력</a></li>
+<li><a class="reference internal" href="#id10">공격을 받는 모델</a></li>
+<li><a class="reference internal" href="#fgsm">FGSM 공격</a></li>
+<li><a class="reference internal" href="#id11">테스팅 함수</a></li>
+<li><a class="reference internal" href="#id12">공격 실행</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#results">Results</a><ul>
-<li><a class="reference internal" href="#accuracy-vs-epsilon">Accuracy vs Epsilon</a></li>
-<li><a class="reference internal" href="#sample-adversarial-examples">Sample Adversarial Examples</a></li>
+<li><a class="reference internal" href="#id13">결과</a><ul>
+<li><a class="reference internal" href="#vs">정확도 vs 엡실론</a></li>
+<li><a class="reference internal" href="#id14">샘플 적대적 예제들</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#where-to-go-next">Where to go next?</a></li>
+<li><a class="reference internal" href="#id15">다음 단계는?</a></li>
 </ul>
 </li>
 </ul>
