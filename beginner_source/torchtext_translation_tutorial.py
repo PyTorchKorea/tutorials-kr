@@ -70,24 +70,16 @@ TRG.build_vocab(train_data, min_freq = 2)
 
 ######################################################################
 # 위 코드가 실행되면, ``SRC.vocab.stoi`` 는 어휘에 해당하는 토큰을 키로, 관련된 색인을 값으로 가지는
-# 딕셔너리가 됩니다. ``SRC.vocab.itos`` 역시 딕셔너리지만, 키와 값이 서로 반대입니다. 이 튜토리얼에서는
+# 사전(dict)이 됩니다. ``SRC.vocab.itos`` 역시 사전(dict)이지만, 키와 값이 서로 반대입니다. 이 튜토리얼에서는
 # 그다지 중요하지 않은 내용이지만, 이런 특성은 다른 자연어 처리 등에서 유용하게 사용할 수 있습니다.
 
 ######################################################################
 # ``BucketIterator``
 # ----------------
-# The last ``torchtext`` specific feature we'll use is the ``BucketIterator``,
-# which is easy to use since it takes a ``TranslationDataset`` as its
-# first argument. Specifically, as the docs say:
-# Defines an iterator that batches examples of similar lengths together.
-# Minimizes amount of padding needed while producing freshly shuffled
-# batches for each new epoch. See pool for the bucketing procedure used.
-#
 # 마지막으로 사용해 볼 ``torchtext`` 에 특화된 기능은 바로 ``BucketIterator`` 입니다.
 # 첫 번째 인자로 ``TranslationDataset`` 을 전달받기 때문에 사용하기가 쉽습니다. 문서에서도 볼 수 있듯
-# 이 기능은 비슷한 길이의 예제들을 함께 묶은 다음 이를 가리키는 반복자(iterator)를 정의합니다. 
-# 각각의 새로운 에포크(epoch)마다 새로 섞인 결과에 최소한의 패딩만 추가합니다. 이 과정에서 사용하는 저장 공간을
-# 한번 살펴보시기 바랍니다.
+# 이 기능은 비슷한 길이의 예제들을 묶어주는 반복자(iterator)를 정의합니다. 각각의 새로운 에포크(epoch)마다
+# 새로 섞인 결과를 만드는데 필요한 패딩의 수를 최소화 합니다. 버케팅 과정에서 사용되는 저장 공간을 한번 살펴보시기 바랍니다.
 
 import torch
 
@@ -117,10 +109,6 @@ train_iterator, valid_iterator, test_iterator = BucketIterator.splits(
 ######################################################################
 # ``nn.Module`` 과 ``Optimizer`` 정의하기
 # ----------------
-# That's mostly it from a ``torchtext`` perspecive: with the dataset built
-# and the iterator defined, the rest of this tutorial simply defines our
-# model as an ``nn.Module``, along with an ``Optimizer``, and then trains it.
-#
 # 대부분은 ``torchtext`` 가 알아서 해줍니다 : 데이터셋이 만들어지고 반복자가 정의되면, 이 튜토리얼에서
 # 우리가 해야 할 일이라고는 그저 ``nn.Module`` 와 ``Optimizer`` 를 모델로서 정의하고 훈련시키는 것이 전부입니다.
 # 
@@ -370,7 +358,7 @@ print(f'The model has {count_parameters(model):,} trainable parameters')
 
 ######################################################################
 # 노트 : 언어 번역의 성능 점수를 기록하려면, ``nn.CrossEntropyLoss`` 함수가 단순한
-# 패딩을 추가하는 부분을 무시할 수 있도록 해당 색인을 알려줘야 합니다.
+# 패딩을 추가하는 부분을 무시할 수 있도록 해당 색인들을 알려줘야 합니다.
 
 PAD_IDX = TRG.vocab.stoi['<pad>']
 
