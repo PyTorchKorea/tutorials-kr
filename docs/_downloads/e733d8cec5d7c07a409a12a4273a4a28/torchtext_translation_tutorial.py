@@ -1,57 +1,48 @@
 """
-Language Translation with TorchText
+TorchText로 언어 번역하기
 ===================================
 
-This tutorial shows how to use several convenience classes of ``torchtext`` to preprocess
-data from a well-known dataset containing sentences in both English and German and use it to
-train a sequence-to-sequence model with attention that can translate German sentences
-into English.
+이 튜토리얼에서는 ``torchtext`` 의 유용한 여러 클래스들과 시퀀스 투 시퀀스(sequence-to-sequence, seq2seq)모델을 통해
+영어와 독일어 문장들이 포함된 유명한 데이터 셋을 이용해서 독일어 문장을 영어로 번역해 볼 것입니다.
 
-It is based off of
-`this tutorial <https://github.com/bentrevett/pytorch-seq2seq/blob/master/3%20-%20Neural%20Machine%20Translation%20by%20Jointly%20Learning%20to%20Align%20and%20Translate.ipynb>`__
-from PyTorch community member `Ben Trevett <https://github.com/bentrevett>`__
-and was created by `Seth Weidman <https://github.com/SethHWeidman/>`__ with Ben's permission.
+이 튜토리얼은 
+PyTorch 커뮤니티 멤버인 `Ben Trevett <https://github.com/bentrevett>`__ 이 작성한
+`튜토리얼 <https://github.com/bentrevett/pytorch-seq2seq/blob/master/3%20-%20Neural%20Machine%20Translation%20by%20Jointly%20Learning%20to%20Align%20and%20Translate.ipynb>`__ 에 기초하고 있으며
+`Seth Weidman <https://github.com/SethHWeidman/>`__ 이 Ben의 허락을 받고 만들었습니다.
 
-By the end of this tutorial, you will be able to:
+이 튜토리얼을 통해 여러분은 다음과 같은 것을 할 수 있게 됩니다:
 
-- Preprocess sentences into a commonly-used format for NLP modeling using the following ``torchtext`` convenience classes:
+- ``torchtext`` 의 아래와 같은 유용한 클래스들을 통해 문장들을 NLP모델링에 자주 사용되는 형태로 전처리할 수 있게 됩니다:
     - `TranslationDataset <https://torchtext.readthedocs.io/en/latest/datasets.html#torchtext.datasets.TranslationDataset>`__
     - `Field <https://torchtext.readthedocs.io/en/latest/data.html#torchtext.data.Field>`__
     - `BucketIterator <https://torchtext.readthedocs.io/en/latest/data.html#torchtext.data.BucketIterator>`__
 """
 
 ######################################################################
-# `Field` and `TranslationDataset`
+# `Field` 와 `TranslationDataset`
 # ----------------
-# ``torchtext`` has utilities for creating datasets that can be easily
-# iterated through for the purposes of creating a language translation
-# model. One key class is a
-# `Field <https://github.com/pytorch/text/blob/master/torchtext/data/field.py#L64>`__,
-# which specifies the way each sentence should be preprocessed, and another is the
-# `TranslationDataset` ; ``torchtext``
-# has several such datasets; in this tutorial we'll use the
-# `Multi30k dataset <https://github.com/multi30k/dataset>`__, which contains about
-# 30,000 sentences (averaging about 13 words in length) in both English and German.
+# ``torchtext`` 에는 언어 변환 모델을 만들때 쉽게 사용할 수 있는 데이터셋을 만들기 적합한 다양한 도구가 있습니다.
+# 그 중에서도 중요한 클래스 중 하나인 `Field <https://github.com/pytorch/text/blob/master/torchtext/data/field.py#L64>`__ 는
+# 각 문장이 어떻게 전처리되어야 하는지 지정하며, 또 다른 중요한 클래스로는 `TranslationDataset` 이 있습니다. 
+# ``torchtext`` 에는 이 외에도 비슷한 데이터셋들이 있는데, 이번 튜토리얼에서는 `Multi30k dataset <https://github.com/multi30k/dataset>`__ 을 사용할 것입니다.
+# 이 데이터 셋은 평균 약 13개의 단어로 구성된 약 삼만 개의 문장을 영어와 독일어 두 언어로 포함하고 있습니다.
 #
-# Note: the tokenization in this tutorial requires `Spacy <https://spacy.io>`__
-# We use Spacy because it provides strong support for tokenization in languages
-# other than English. ``torchtext`` provides a ``basic_english`` tokenizer
-# and supports other tokenizers for English (e.g.
-# `Moses <https://bitbucket.org/luismsgomes/mosestokenizer/src/default/>`__)
-# but for language translation - where multiple languages are required -
-# Spacy is your best bet.
+# 참고 : 이 튜토리얼에서의 토큰화(tokenization)에는 `Spacy <https://spacy.io>`__ 가 필요합니다.
+# Spacy는 영어 이 외의 다른 언어에 대한 강력한 토큰화 기능을 제공하기 때문에 사용합니다. ``torchtext`` 는
+# `basic_english`` 토크나이저를 제공할 뿐 아니라 영어에 사용할 수 있는 다른 토크나이저들(예컨데
+# `Moses <https://bitbucket.org/luismsgomes/mosestokenizer/src/default/>`__ )을 지원합니다만, 언어 번역을 위해서는 다양한 언어를
+# 다루어야 하기 때문에 Spacy가 가장 적합합니다.
 #
-# To run this tutorial, first install ``spacy`` using ``pip`` or ``conda``.
-# Next, download the raw data for the English and German Spacy tokenizers:
+# 이 튜토리얼을 실행하려면, 우선 ``pip`` 나 ``conda`` 로 ``spacy`` 를 설치하세요. 그 다음,
+# Spacy 토크나이저가 쓸 영어와 독일어에 대한 데이터를 다운로드 받습니다.
 #
 # ::
 #
 #    python -m spacy download en
 #    python -m spacy download de
 #
-# With Spacy installed, the following code will tokenize each of the sentences
-# in the ``TranslationDataset`` based on the tokenizer defined in the ``Field``
-
+# Spacy가 설치되어 있다면, 다음 코드는 ``TranslationDataset`` 에 있는 각 문장을 ``Field`` 에 정의된
+# 내용을 기반으로 토큰화할 것입니다.
 from torchtext.datasets import Multi30k
 from torchtext.data import Field, BucketIterator
 
@@ -71,30 +62,24 @@ train_data, valid_data, test_data = Multi30k.splits(exts = ('.de', '.en'),
                                                     fields = (SRC, TRG))
 
 ######################################################################
-# Now that we've defined ``train_data``, we can see an extremely useful
-# feature of ``torchtext``'s ``Field``: the ``build_vocab`` method
-# now allows us to create the vocabulary associated with each language
+# 이제 ``train_data`` 를 정의했으니, ``torchtext`` 의 ``Field`` 에 있는 엄청나게 유용한 기능을
+# 보게 될 것입니다 : 바로 ``build_vovab`` 메소드(method)로 각 언어와 연관된 어휘들을 만들어 낼 것입니다.
 
 SRC.build_vocab(train_data, min_freq = 2)
 TRG.build_vocab(train_data, min_freq = 2)
 
 ######################################################################
-# Once these lines of code have been run, ``SRC.vocab.stoi`` will  be a
-# dictionary with the tokens in the vocabulary as keys and their
-# corresponding indices as values; ``SRC.vocab.itos`` will be the same
-# dictionary with the keys and values swapped. We won't make extensive
-# use of this fact in this tutorial, but this will likely be useful in
-# other NLP tasks you'll encounter.
+# 위 코드가 실행되면, ``SRC.vocab.stoi`` 는 어휘에 해당하는 토큰을 키로, 관련된 색인을 값으로 가지는
+# 사전(dict)이 됩니다. ``SRC.vocab.itos`` 역시 사전(dict)이지만, 키와 값이 서로 반대입니다. 이 튜토리얼에서는
+# 그다지 중요하지 않은 내용이지만, 이런 특성은 다른 자연어 처리 등에서 유용하게 사용할 수 있습니다.
 
 ######################################################################
 # ``BucketIterator``
 # ----------------
-# The last ``torchtext`` specific feature we'll use is the ``BucketIterator``,
-# which is easy to use since it takes a ``TranslationDataset`` as its
-# first argument. Specifically, as the docs say:
-# Defines an iterator that batches examples of similar lengths together.
-# Minimizes amount of padding needed while producing freshly shuffled
-# batches for each new epoch. See pool for the bucketing procedure used.
+# 마지막으로 사용해 볼 ``torchtext`` 에 특화된 기능은 바로 ``BucketIterator`` 입니다.
+# 첫 번째 인자로 ``TranslationDataset`` 을 전달받기 때문에 사용하기가 쉽습니다. 문서에서도 볼 수 있듯
+# 이 기능은 비슷한 길이의 예제들을 묶어주는 반복자(iterator)를 정의합니다. 각각의 새로운 에포크(epoch)마다
+# 새로 섞인 결과를 만드는데 필요한 패딩의 수를 최소화 합니다. 버케팅 과정에서 사용되는 저장 공간을 한번 살펴보시기 바랍니다.
 
 import torch
 
@@ -108,14 +93,13 @@ train_iterator, valid_iterator, test_iterator = BucketIterator.splits(
     device = device)
 
 ######################################################################
-# These iterators can be called just like ``DataLoader``s; below, in
-# the ``train`` and ``evaluate`` functions, they are called simply with:
-#
+# 이 반복자들은 ``DataLoader`` 와 마찬가지로 호출할 수 있습니다. 아래 ``train`` 과 
+# ``evaluation`` 함수에서 보면, 다음과 같이 간단히 호출할 수 있음을 알 수 있습니다 :
 # ::
 #
 #    for i, batch in enumerate(iterator):
 #
-# Each ``batch`` then has ``src`` and ``trg`` attributes:
+# 각 ``batch`` 는 ``src`` 와 ``trg`` 속성을 가지게 됩니다.
 #
 # ::
 #
@@ -123,25 +107,22 @@ train_iterator, valid_iterator, test_iterator = BucketIterator.splits(
 #    trg = batch.trg
 
 ######################################################################
-# Defining our ``nn.Module`` and ``Optimizer``
+# ``nn.Module`` 과 ``Optimizer`` 정의하기
 # ----------------
-# That's mostly it from a ``torchtext`` perspecive: with the dataset built
-# and the iterator defined, the rest of this tutorial simply defines our
-# model as an ``nn.Module``, along with an ``Optimizer``, and then trains it.
+# 대부분은 ``torchtext`` 가 알아서 해줍니다 : 데이터셋이 만들어지고 반복자가 정의되면, 이 튜토리얼에서
+# 우리가 해야 할 일이라고는 그저 ``nn.Module`` 와 ``Optimizer`` 를 모델로서 정의하고 훈련시키는 것이 전부입니다.
+# 
 #
-# Our model specifically, follows the architecture described
-# `here <https://arxiv.org/abs/1409.0473>`__ (you can find a
-# significantly more commented version
-# `here <https://github.com/SethHWeidman/pytorch-seq2seq/blob/master/3%20-%20Neural%20Machine%20Translation%20by%20Jointly%20Learning%20to%20Align%20and%20Translate.ipynb>`__).
-#
-# Note: this model is just an example model that can be used for language
-# translation; we choose it because it is a standard model for the task,
-# not because it is the recommended model to use for translation. As you're
-# likely aware, state-of-the-art models are currently based on Transformers;
-# you can see PyTorch's capabilities for implementing Transformer layers
-# `here <https://pytorch.org/docs/stable/nn.html#transformer-layers>`__; and
-# in particular, the "attention" used in the model below is different from
-# the multi-headed self-attention present in a transformer model.
+# 이 튜토리얼에서 사용할 모델은 `이곳 <https://arxiv.org/abs/1409.0473>`__ 에서 설명하고 있는 구조를 따르고 있으며,
+# 더 자세한 내용은 `여기 <https://github.com/SethHWeidman/pytorch-seq2seq/blob/master/3%20-%20Neural%20Machine%20Translation%20by%20Jointly%20Learning%20to%20Align%20and%20Translate.ipynb>`__ 
+# 를 참고하시기 바랍니다.
+# 
+# 참고 : 이 튜토리얼에서 사용하는 모델은 언어 번역을 위해 사용할 예시 모델입니다. 이 모델을 사용하는 것은
+# 이 작업에 적당한 표준 모델이기 때문이지, 번역에 적합한 모델이기 때문은 아닙니다. 여러분이 최신 기술 트렌드를
+# 잘 따라가고 있다면 잘 아시겠지만, 현재 번역에서 가장 뛰어난 모델은 Transformers입니다. PyTorch가
+# Transformer 레이어를 구현한 내용은 `여기 <https://pytorch.org/docs/stable/nn.html#transformer-layers>`__
+# 에서 확인할 수 있으며 이 튜토리얼의 모델이 사용하는 "attention" 은 Transformer 모델에서 제안하는
+# 멀티 헤드 셀프 어텐션(multi-headed self-attention) 과는 다르다는 점을 알려드립니다.
 
 
 import random
@@ -316,7 +297,7 @@ class Seq2Seq(nn.Module):
 
         encoder_outputs, hidden = self.encoder(src)
 
-        # first input to the decoder is the <sos> token
+        # 디코더로의 첫 번째 입력은 <sos> 토큰입니다.
         output = trg[0,:]
 
         for t in range(1, max_len):
@@ -376,16 +357,15 @@ def count_parameters(model: nn.Module):
 print(f'The model has {count_parameters(model):,} trainable parameters')
 
 ######################################################################
-# Note: when scoring the performance of a language translation model in
-# particular, we have to tell the ``nn.CrossEntropyLoss`` function to
-# ignore the indices where the target is simply padding.
+# 참고 : 언어 번역의 성능 점수를 기록하려면, ``nn.CrossEntropyLoss`` 함수가 단순한
+# 패딩을 추가하는 부분을 무시할 수 있도록 해당 색인들을 알려줘야 합니다.
 
 PAD_IDX = TRG.vocab.stoi['<pad>']
 
 criterion = nn.CrossEntropyLoss(ignore_index=PAD_IDX)
 
 ######################################################################
-# Finally, we can train and evaluate this model:
+# 마지막으로 이 모델을 훈련하고 평가합니다 :
 
 import math
 import time
@@ -486,11 +466,8 @@ test_loss = evaluate(model, test_iterator, criterion)
 print(f'| Test Loss: {test_loss:.3f} | Test PPL: {math.exp(test_loss):7.3f} |')
 
 ######################################################################
-# Next steps
+# 다음 단계
 # --------------
 #
-# - Check out the rest of Ben Trevett's tutorials using ``torchtext``
-#   `here <https://github.com/bentrevett/>`__
-# - Stay tuned for a tutorial using other ``torchtext`` features along
-#   with ``nn.Transformer`` for language modeling via next word prediction!
-#
+# - ``torchtext`` 를 사용한 Ben Trevett의 튜토리얼을 `이곳 <https://github.com/bentrevett/>`__ 에서 확인할 수 있습니다.
+# - ``nn.Transformer`` 와 ``torchtext`` 의 다른 기능들을 이용한 다음 단어 예측을 통한 언어 모델링 튜토리얼을 살펴보세요.
