@@ -63,7 +63,7 @@ train_data, valid_data, test_data = Multi30k.splits(exts = ('.de', '.en'),
 
 ######################################################################
 # 이제 ``train_data`` 를 정의했으니, ``torchtext`` 의 ``Field`` 에 있는 엄청나게 유용한 기능을
-# 보게 될 것입니다 : 바로 ``build_vovab`` 메써드로 각 언어와 연관된 어휘들을 만들어 낼 것입니다.
+# 보게 될 것입니다 : 바로 ``build_vovab`` 메소드(method)로 각 언어와 연관된 어휘들을 만들어 낼 것입니다.
 
 SRC.build_vocab(train_data, min_freq = 2)
 TRG.build_vocab(train_data, min_freq = 2)
