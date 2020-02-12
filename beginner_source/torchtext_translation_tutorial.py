@@ -1,5 +1,5 @@
 """
-TorchText와 함께 언어 번역하기
+TorchText로 언어 번역하기
 ===================================
 
 이 튜토리얼에서는 ``torchtext`` 의 유용한 여러 클래스들과 시퀀스 투 시퀀스(sequence-to-sequence, seq2seq)모델을 통해
