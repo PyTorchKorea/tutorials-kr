@@ -6,9 +6,9 @@ TorchText와 함께 언어 번역하기
 영어와 독일어 문장들이 포함된 유명한 데이터 셋을 이용해서 독일어 문장을 영어로 번역해 볼 것입니다.
 
 이 튜토리얼은 
-PyTorch 커뮤니티 멤버인 `Ben Trevett <https://github.com/bentrevett>` 이 작성한
-`튜토리얼<https://github.com/bentrevett/pytorch-seq2seq/blob/master/3%20-%20Neural%20Machine%20Translation%20by%20Jointly%20Learning%20to%20Align%20and%20Translate.ipynb>`__ 에 기초하고 있으며
-`Seth Weidman <https://github.com/SethHWeidman/>` 이 Ben의 허락을 받고 만들었습니다.
+PyTorch 커뮤니티 멤버인 `Ben Trevett <https://github.com/bentrevett>`__ 이 작성한
+`튜토리얼 <https://github.com/bentrevett/pytorch-seq2seq/blob/master/3%20-%20Neural%20Machine%20Translation%20by%20Jointly%20Learning%20to%20Align%20and%20Translate.ipynb>`__ 에 기초하고 있으며
+`Seth Weidman <https://github.com/SethHWeidman/>`__ 이 Ben의 허락을 받고 만들었습니다.
 
 이 튜토리얼을 통해 여러분은 다음과 같은 것을 할 수 있게 됩니다:
 
@@ -24,13 +24,13 @@ PyTorch 커뮤니티 멤버인 `Ben Trevett <https://github.com/bentrevett>` 이
 # ``torchtext`` 에는 언어 변환 모델을 만들때 쉽게 사용할 수 있는 데이터셋을 만들기 적합한 다양한 도구가 있습니다.
 # 그 중에서도 중요한 클래스 중 하나인 `Field <https://github.com/pytorch/text/blob/master/torchtext/data/field.py#L64>`__ 는
 # 각 문장이 어떻게 전처리되어야 하는지 지정하며, 또 다른 중요한 클래스로는 `TranslationDataset` 이 있습니다. 
-# ``torchtext`` 에는 이 외에도 비슷한 데이터셋들이 있는데, 이번 튜토리얼에서는 `Multi30k dataset <https://github.com/multi30k/dataset>`__, 을 사용할 것입니다.
+# ``torchtext`` 에는 이 외에도 비슷한 데이터셋들이 있는데, 이번 튜토리얼에서는 `Multi30k dataset <https://github.com/multi30k/dataset>`__ 을 사용할 것입니다.
 # 이 데이터 셋은 평균 약 13개의 단어로 구성된 약 삼만 개의 문장을 영어와 독일어 두 언어로 포함하고 있습니다.
 #
-# 노트 : 이 튜토리얼에서의 토큰화(tokenization)에는 `Spacy <https://spacy.io>`__ 가 필요합니다.
+# 참고 : 이 튜토리얼에서의 토큰화(tokenization)에는 `Spacy <https://spacy.io>`__ 가 필요합니다.
 # Spacy는 영어 이 외의 다른 언어에 대한 강력한 토큰화 기능을 제공하기 때문에 사용합니다. ``torchtext`` 는
 # `basic_english`` 토크나이저를 제공할 뿐 아니라 영어에 사용할 수 있는 다른 토크나이저들(예컨데
-# `Moses <https://bitbucket.org/luismsgomes/mosestokenizer/src/default/>`__)을 지원합니다만, 언어 번역을 위해서는 다양한 언어를
+# `Moses <https://bitbucket.org/luismsgomes/mosestokenizer/src/default/>`__ )을 지원합니다만, 언어 번역을 위해서는 다양한 언어를
 # 다루어야 하기 때문에 Spacy가 가장 적합합니다.
 #
 # 이 튜토리얼을 실행하려면, 우선 ``pip`` 나 ``conda`` 로 ``spacy`` 를 설치하세요. 그 다음,
@@ -113,14 +113,14 @@ train_iterator, valid_iterator, test_iterator = BucketIterator.splits(
 # 우리가 해야 할 일이라고는 그저 ``nn.Module`` 와 ``Optimizer`` 를 모델로서 정의하고 훈련시키는 것이 전부입니다.
 # 
 #
-# 이 튜토리얼에서 사용할 모델은 `이곳 <https://arxiv.org/abs/1409.0473>` 에서 설명하고 있는 구조를 따르고 있으며,
+# 이 튜토리얼에서 사용할 모델은 `이곳 <https://arxiv.org/abs/1409.0473>`__ 에서 설명하고 있는 구조를 따르고 있으며,
 # 더 자세한 내용은 `여기 <https://github.com/SethHWeidman/pytorch-seq2seq/blob/master/3%20-%20Neural%20Machine%20Translation%20by%20Jointly%20Learning%20to%20Align%20and%20Translate.ipynb>`__ 
 # 를 참고하시기 바랍니다.
 # 
-# 노트 : 이 튜토리얼에서 사용하는 모델은 언어 번역을 위해 사용할 예시 모델입니다. 이 모델을 사용하는 것은
+# 참고 : 이 튜토리얼에서 사용하는 모델은 언어 번역을 위해 사용할 예시 모델입니다. 이 모델을 사용하는 것은
 # 이 작업에 적당한 표준 모델이기 때문이지, 번역에 적합한 모델이기 때문은 아닙니다. 여러분이 최신 기술 트렌드를
 # 잘 따라가고 있다면 잘 아시겠지만, 현재 번역에서 가장 뛰어난 모델은 Transformers입니다. PyTorch가
-# Transformer 레이어를 구현한 내용은 `여기 <https://pytorch.org/docs/stable/nn.html#transformer-layers>`
+# Transformer 레이어를 구현한 내용은 `여기 <https://pytorch.org/docs/stable/nn.html#transformer-layers>`__
 # 에서 확인할 수 있으며 이 튜토리얼의 모델이 사용하는 "attention" 은 Transformer 모델에서 제안하는
 # 멀티 헤드 셀프 어텐션(multi-headed self-attention) 과는 다르다는 점을 알려드립니다.
 
@@ -357,7 +357,7 @@ def count_parameters(model: nn.Module):
 print(f'The model has {count_parameters(model):,} trainable parameters')
 
 ######################################################################
-# 노트 : 언어 번역의 성능 점수를 기록하려면, ``nn.CrossEntropyLoss`` 함수가 단순한
+# 참고 : 언어 번역의 성능 점수를 기록하려면, ``nn.CrossEntropyLoss`` 함수가 단순한
 # 패딩을 추가하는 부분을 무시할 수 있도록 해당 색인들을 알려줘야 합니다.
 
 PAD_IDX = TRG.vocab.stoi['<pad>']
