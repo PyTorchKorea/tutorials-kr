@@ -204,6 +204,11 @@ PyTorch 모델을 운영환경(Production)에 배포하기
    :figure: _static/img/distributed/DistPyTorch.jpg
 
 .. customgalleryitem::
+  :tooltip: Getting Started with Distributed RPC Framework
+  :description: :doc:`/intermediate/rpc_tutorial`
+  :figure: _static/img/distributed/DistPyTorch.jpg
+
+.. customgalleryitem::
    :tooltip: PyTorch distributed trainer with Amazon AWS
    :description: :doc:`/beginner/aws_distributed_training_tutorial`
    :figure: _static/img/distributed/DistPyTorch.jpg
@@ -221,6 +226,11 @@ PyTorch 확장하기
    :figure: _static/img/cpp_logo.png
 
 .. customgalleryitem::
+   :tooltip: Implement custom classes in C++ for TorchScript
+   :description: :doc:`/advanced/torch_script_custom_classes`
+   :figure: _static/img/cpp_logo.png
+
+.. customgalleryitem::
     :tooltip: Create extensions using numpy and scipy
     :figure: /_static/img/scipynumpy.png
     :description: :doc:`advanced/numpy_extensions_tutorial`
@@ -234,8 +244,8 @@ PyTorch 확장하기
 
     <div style='clear:both'></div>
 
-Quantization (experimental)
----------------------------
+모델 최적화 (Model Optimization)
+------------------------------------------------------------
 
 .. customgalleryitem::
    :tooltip: Perform dynamic quantization on a pre-trained PyTorch model
@@ -246,6 +256,22 @@ Quantization (experimental)
     :tooltip: (experimental) Static Quantization with Eager Mode in PyTorch
     :figure: /_static/img/qat.png
     :description: :doc:`advanced/static_quantization_tutorial`
+
+.. customgalleryitem::
+    :tooltip: Perform quantized transfer learning with feature extractor
+    :description: :doc:`/intermediate/quantized_transfer_learning_tutorial`
+    :figure: /_static/img/quantized_transfer_learning.png
+
+.. customgalleryitem::
+  :tooltip: Convert a well-known state-of-the-art model like BERT into dynamic quantized model
+  :description: :doc:`/intermediate/dynamic_quantization_bert_tutorial`
+  :figure: /_static/img/bert.png
+
+.. customgalleryitem::
+   :tooltip: Use pruning to sparsify your neural networks
+   :description: :doc:`/intermediate/pruning_tutorial`
+   :figure: _static/img/pruning.png
+
 
 .. raw:: html
 
@@ -365,6 +391,7 @@ PyTorch Fundamentals In-Depth
    intermediate/model_parallel_tutorial
    intermediate/ddp_tutorial
    intermediate/dist_tuto
+   intermediate/rpc_tutorial
    beginner/aws_distributed_training_tutorial
 
 .. toctree::
@@ -374,6 +401,7 @@ PyTorch Fundamentals In-Depth
    :caption: PyTorch 확장하기
 
    advanced/torch_script_custom_ops
+   advanced/torch_script_custom_classes
    advanced/numpy_extensions_tutorial
    advanced/cpp_extension
 
@@ -381,10 +409,13 @@ PyTorch Fundamentals In-Depth
    :maxdepth: 2
    :includehidden:
    :hidden:
-   :caption: Quantization (experimental)
+   :caption: 모델 최적화
 
    advanced/dynamic_quantization_tutorial
    advanced/static_quantization_tutorial
+   intermediate/quantized_transfer_learning_tutorial
+   intermediate/dynamic_quantization_bert_tutorial
+   intermediate/pruning_tutorial
 
 .. toctree::
    :maxdepth: 2

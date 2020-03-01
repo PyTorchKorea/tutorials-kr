@@ -172,6 +172,15 @@ with torch.no_grad():
 	print((x ** 2).requires_grad)
 
 ###############################################################
+# 또는 ``.detach()`` 를 호출하여 내용물(content)은 같지만 require_grad가 다른
+# 새로운 Tensor를 가져옵니다:
+print(x.requires_grad)
+y = x.detach()
+print(y.requires_grad)
+print(x.eq(y).all())
+
+
+###############################################################
 # **더 읽을거리:**
 #
 # ``autograd.Function`` 관련 문서는 https://pytorch.org/docs/stable/autograd.html#function
