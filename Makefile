@@ -14,7 +14,7 @@ DATADIR       = _data
 GH_PAGES_SOURCES = $(SOURCEDIR) Makefile
 
 ZIPOPTS       ?= -qo
-TAROPTS       ?=
+TAROPTS       ?= -xzf
 
 # Put it first so that "make" without argument is like "make help".
 help:
