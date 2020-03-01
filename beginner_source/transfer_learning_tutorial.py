@@ -328,3 +328,12 @@ visualize_model(model_conv)
 
 plt.ioff()
 plt.show()
+
+######################################################################
+# 더 배워볼 내용
+# -----------------
+#
+# 전이학습의 응용 사례(application)들을 더 알아보려면,
+# :doc:`/intermediate/quantized_transfer_learning_tutorial` 을 참조해보세요.
+#
+#

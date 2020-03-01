@@ -388,7 +388,7 @@ def optimize_model():
     # 최종이 아닌 상태의 마스크를 계산하고 배치 요소를 연결합니다
     # (최종 상태는 시뮬레이션이 종료 된 이후의 상태)
     non_final_mask = torch.tensor(tuple(map(lambda s: s is not None,
-                                          batch.next_state)), device=device, dtype=torch.uint8)
+                                          batch.next_state)), device=device, dtype=torch.bool)
     non_final_next_states = torch.cat([s for s in batch.next_state
                                                 if s is not None])
     state_batch = torch.cat(batch.state)
