@@ -317,7 +317,7 @@ TensorBoard는 이미지 데이터와 같은 고차원 데이터를 저차원 �
                 running_loss = 0.0
     print('Finished Training')
 
-이제 'Scalars' 탭에서 15,000번 반복할 때의 학습 중 손실을 확인할 수 있습니다:
+이제 'Scalars' 탭에서 15,000번 반복 학습할 때의 손실을 확인할 수 있습니다:
 
 .. image:: ../../_static/img/tensorboard_scalar_runs.png
 
