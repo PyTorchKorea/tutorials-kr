@@ -116,7 +116,7 @@ plt.plot(transformed[0,:].numpy())
 # 그 Tensor 는 일반적인 Pytorch Tensor이므로 표준 동작을 적용할 수 있습니다.
 # 
 
-# Let's check if the tensor is in the interval [-1,1]
+# 인터벌 [-1,1] 에서 Let's check if the tensor is in the interval [-1,1]
 print("Min of waveform: {}\nMax of waveform: {}\nMean of waveform: {}".format(waveform.min(), waveform.max(), waveform.mean()))
 
 
@@ -168,23 +168,22 @@ print("Median relative difference between original and MuLaw reconstucted signal
 
 
 ######################################################################
-# Functional
+# 함수
 # ---------------
 # 
-# The transformations seen above rely on lower level stateless functions for their computations. 
-# These functions are available under ``torchaudio.functional``. The complete list is available 
-# `here <https://pytorch.org/audio/functional.html>`_ and includes:
+# 위에서 본 변환들은 변환과정의 연산을 위하여 낮은 수준의 stateless 함수에 의존합니다. 
+# ``torchaudio.functional`` 에서 함수들을 확인할 수 있으며, 아래 목록을 포함한 전체 함수는 
+# `여기 <https://pytorch.org/audio/functional.html>`_ 에서 확인할 수 있습니다:
 #
-# -  **istft**: Inverse short time Fourier Transform.
-# -  **gain**: Applies amplification or attenuation to the whole waveform.
-# -  **dither**: Increases the perceived dynamic range of audio stored at a
-#    particular bit-depth.
-# -  **compute_deltas**: Compute delta coefficients of a tensor.
-# -  **equalizer_biquad**: Design biquad peaking equalizer filter and perform filtering.
-# -  **lowpass_biquad**: Design biquad lowpass filter and perform filtering.
-# -  **highpass_biquad**:Design biquad highpass filter and perform filtering.
+# -  **istft**: 단시간 푸리에 역변환.
+# -  **gain**: 전체 파형에 증폭 또는 감쇠 적용.
+# -  **dither**: 특정 비트 심도로 저장된 오디오의 동적 인식 구간 증폭.
+# -  **compute_deltas**: 텐서의 계수 델타값 계산.
+# -  **equalizer_biquad**: 바이쿼드 피크 이퀄라이저 필터 설계 및 필터 수행.
+# -  **lowpass_biquad**: 바이쿼드 저대역 필터 설계 및 필터 수행.
+# -  **highpass_biquad**: 바이쿼드 고대역 필터 설계 및 필터 수행.
 # 
-# For example, let's try the `mu_law_encoding` functional:
+# 예시로 `mu_law_encoding` 함수를 사용해보겠습니다:
 
 mu_law_encoding_waveform = torchaudio.functional.mu_law_encoding(waveform, quantization_channels=256)
 
@@ -194,47 +193,46 @@ plt.figure()
 plt.plot(mu_law_encoding_waveform[0,:].numpy())
 
 ######################################################################
-# You can see how the output fron ``torchaudio.functional.mu_law_encoding`` is the same as 
-# the output from ``torchaudio.transforms.MuLawEncoding``.
-#
-# Now let's experiment with a few of the other functionals and visualize their output. Taking our 
-# spectogram, we can compute it's deltas:
+# ``torchaudio.functional.mu_law_encoding`` 의 출력이 ``torchaudio.transforms.MuLawEncoding`` 의
+# 출력과 어떻게 같은지 볼수 있습니다.
+# 
+# 이제 다른 함수들을 사용해보고 출력을 시각화 해보겠습니다.
+# 스펙트로그램을 사용하여 델타를 구할 수 있습니다:
 
 computed = torchaudio.functional.compute_deltas(specgram, win_length=3)
-print("Shape of computed deltas: {}".format(computed.shape))
+print("계산된 델타의 형태: {}".format(computed.shape))
 
 plt.figure()
 plt.imshow(computed.log2()[0,:,:].detach().numpy(), cmap='gray')
 
 ######################################################################
-# We can take the original waveform and apply different effects to it.
+# 원본 파형을 가지고 다른 효과를 적용해볼 수 있습니다.
 #
 
 gain_waveform = torchaudio.functional.gain(waveform, gain_db=5.0)
-print("Min of gain_waveform: {}\nMax of gain_waveform: {}\nMean of gain_waveform: {}".format(gain_waveform.min(), gain_waveform.max(), gain_waveform.mean()))
+print("gain_waveform 의 최소값: {}\ngain_waveform 의 최대값: {}\ngain_waveform 의 평균값: {}".format(gain_waveform.min(), gain_waveform.max(), gain_waveform.mean()))
 
 dither_waveform = torchaudio.functional.dither(waveform)
-print("Min of dither_waveform: {}\nMax of dither_waveform: {}\nMean of dither_waveform: {}".format(dither_waveform.min(), dither_waveform.max(), dither_waveform.mean()))
+print("dither_waveform 의 최소값: {}\ndither_waveform 의 최대값: {}\ndither_waveform 의 평균값: {}".format(dither_waveform.min(), dither_waveform.max(), dither_waveform.mean()))
 
 ######################################################################
-# Another example of the capabilities in ``torchaudio.functional`` are applying filters to our
-# waveform. Applying the lowpass biquad filter to our waveform will output a new waveform with 
-# the signal of the frequency modified.
+# ``torchaudio.functional`` 에서 가능한 다른 예제는 필터를 파형에 적용하는 것입니다.
+# 바이쿼드 저대역 필터를 파형에 적용하면 새로운 신호의 주파수가 바뀐 새로운 파형을 출력 합니다.
 
 lowpass_waveform = torchaudio.functional.lowpass_biquad(waveform, sample_rate, cutoff_freq=3000)
 
-print("Min of lowpass_waveform: {}\nMax of lowpass_waveform: {}\nMean of lowpass_waveform: {}".format(lowpass_waveform.min(), lowpass_waveform.max(), lowpass_waveform.mean()))
+print("lowpass_waveform 의 최소값: {}\nlowpass_waveform 의 최대값: {}\nlowpass_waveform 의 평균값: {}".format(lowpass_waveform.min(), lowpass_waveform.max(), lowpass_waveform.mean()))
 
 plt.figure()
 plt.plot(lowpass_waveform.t().numpy())
 
 ######################################################################
-# We can also visualize a waveform with the highpass biquad filter.
+# 바이쿼드 고대역 필터를 적용해서 시각화 할수도 있습니다.
 # 
 
 highpass_waveform = torchaudio.functional.highpass_biquad(waveform, sample_rate, cutoff_freq=2000)
 
-print("Min of highpass_waveform: {}\nMax of highpass_waveform: {}\nMean of highpass_waveform: {}".format(highpass_waveform.min(), highpass_waveform.max(), highpass_waveform.mean()))
+print("highpass_waveform의 최소값: {}\nhighpass_waveform의 최대값: {}\nhighpass_waveform 의 평균값: {}".format(highpass_waveform.min(), highpass_waveform.max(), highpass_waveform.mean()))
 
 plt.figure()
 plt.plot(highpass_waveform.t().numpy())
@@ -295,8 +293,8 @@ plt.imshow(fbank.t().numpy(), cmap='gray')
 
 
 ######################################################################
-# You can create mel frequency cepstral coefficients from a raw audio signal
-# This matches the input/output of Kaldi’s compute-mfcc-feats.
+# 오디오 신호에서 멜 주파수 cepstral 계수를 만들 수 있습니다
+# 이것은 Kaldi의 compute-mfcc-feats의 입력 / 출력과 일치합니다.
 # 
 
 mfcc = torchaudio.compliance.kaldi.mfcc(waveform, **params)
@@ -317,20 +315,21 @@ plt.imshow(mfcc.t().numpy(), cmap='gray')
 # 
 # ``torchaudio`` 가 현재 지원하는 데이터셋은 다음과 같습니다:
 #
-# -  **VCTK**: Speech data uttered by 109 native speakers of English with various accents
-#    (`Read more here <https://homepages.inf.ed.ac.uk/jyamagis/page3/page58/page58.html>`_).
-# -  **Yesno**: Sixty recordings of one individual saying yes or no in Hebrew; each
-#    recording is eight words long (`Read more here <https://www.openslr.org/1/>`_).
-# -  **Common Voice**: An open source, multi-language dataset of voices that anyone can use
-#    to train speech-enabled applications (`Read more here <https://voice.mozilla.org/en/datasets>`_).
-# -  **LibriSpeech**: Large-scale (1000 hours) corpus of read English speech (`Read more here <http://www.openslr.org/12>`_).
+# -  **VCTK**: 다양한 억양을 가진 109명의 영어 원어민의 발성 데이터
+#    (`더 읽어보기 <https://homepages.inf.ed.ac.uk/jyamagis/page3/page58/page58.html>`_).
+# -  **Yesno**: 한 사람의 목소리로 히브리어로 네 또는 아니오를 60번 녹음한 데이터; 
+#    각 녹음은 8 단어로 이루어져 있습니다. (`더 읽어보기 <https://www.openslr.org/1/>`_).
+# -  **Common Voice**: 누구나 스피치 어플리케이션을 훈련하기 위해 사용할 수 있는  
+#    오픈소스 다국어 음성 데이터셋 (`더 읽어보기 <https://voice.mozilla.org/en/datasets>`_).
+# -  **LibriSpeech**: 대규모 (1,000 시간) 말뭉치로 구성된 영어 스피치 (`더 읽어보기 <http://www.openslr.org/12>`_).
 # 
 
 yesno_data = torchaudio.datasets.YESNO('./', download=True)
 
-# A data point in Yesno is a tuple (waveform, sample_rate, labels) where labels is a list of integers with 1 for yes and 0 for no.
+# Yesno 의 데이터 포인트는 튜플 (waveform, sample_rate, labels) 이며, 라벨은 정수 배열로 
+# yes 면 1, no 면 0으로 되어 있습니다. 
 
-# Pick data point number 3 to see an example of the the yesno_data:
+# yesno_data 의 예를 보기 위해 데이터 포인트 3번을 확인해 보겠습니다:
 n = 3
 waveform, sample_rate, labels = yesno_data[n]
 
@@ -341,7 +340,7 @@ plt.plot(waveform.t().numpy())
 
 
 ######################################################################
-# 이제 데이터셋에서 소리 파일을 찾을때만 메모리에 로드 됩니다. 
+# 데이터셋에서 소리 파일을 찾을때만 소리 파일이 메모리에 로드 됩니다. 
 # 사용하고자 하는 항목만 메모리에 불러와서 사용하므로 메모리를 절약할 수 있다는 의미입니다.
 #
 
