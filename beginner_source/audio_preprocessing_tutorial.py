@@ -116,7 +116,7 @@ plt.plot(transformed[0,:].numpy())
 # 그 Tensor 는 일반적인 Pytorch Tensor이므로 표준 동작을 적용할 수 있습니다.
 # 
 
-# 인터벌 [-1,1] 에서 Let's check if the tensor is in the interval [-1,1]
+# 인터벌 [-1,1] 에 Tensor가 있는지 확인해복겠습니다. 
 print("Min of waveform: {}\nMax of waveform: {}\nMean of waveform: {}".format(waveform.min(), waveform.max(), waveform.mean()))
 
 
