@@ -1,139 +1,123 @@
 # -*- coding: utf-8 -*-
 r"""
-Word Embeddings: Encoding Lexical Semantics
+단어 임베딩: 어휘의 의미를 인코딩하자
 ===========================================
 
-Word embeddings are dense vectors of real numbers, one per word in your
-vocabulary. In NLP, it is almost always the case that your features are
-words! But how should you represent a word in a computer? You could
-store its ascii character representation, but that only tells you what
-the word *is*, it doesn't say much about what it *means* (you might be
-able to derive its part of speech from its affixes, or properties from
-its capitalization, but not much). Even more, in what sense could you
-combine these representations? We often want dense outputs from our
-neural networks, where the inputs are :math:`|V|` dimensional, where
-:math:`V` is our vocabulary, but often the outputs are only a few
-dimensional (if we are only predicting a handful of labels, for
-instance). How do we get from a massive dimensional space to a smaller
-dimensional space?
+단어 임베딩이란 코퍼스 내 각 단어에 일대일로 대응하는 농밀한 실수 벡터의 집합, 혹은 이 벡터를
+구하는 행위를 가리킵니다. 먼저, 자연어 처리에서는 주로 단어를 피처로 사용합니다. 이는 컴퓨터가
+바로 이해하기는 상당히 어렵기 때문에 컴퓨터에게 친숙한 형태로 표현을 바꾸어 입력해야 합니다.
+그렇다면, 단어를 어떻게 표현하는 것이 좋을까요? 물론 각 문자에 해당하는 ASCII코드를 사용할 수 있겠지만,
+ASCII코드는 이 단어가 *무엇*인지를 알려줄 뿐, 단어가 어떤 *의미*를 가지는지는 알려주지 않습니다.
+(룰베이스로 어미 등 문법적 특징을 활용하거나 영어의 경우 대문자를 사용할 수 있겠지만 충분하지 않습니다.)
+단어를 어떻게 표현할지 뿐 아니라, 이 표현법을 어떠한 방식으로 연산해야 할 지 또한 큰 문제입니다.
+보통 이러한 밀도 높은 벡터를 얻기 위해 사용하는 뉴럴넷 모델은 :math:`|V|`(코퍼스의 단어 개수)의
+큰 인풋 차원과 몇 안되는 (텍스를 분류하는 문제라고 할 경우) 작은 아웃풋 차원을 가집니다.
+즉, 단어들 간의 연산이 필수입니다. 어떻게 이 큰 차원의 공간을 작은 공간으로 변형시킬 수 있을까요?
 
-How about instead of ascii representations, we use a one-hot encoding?
-That is, we represent the word :math:`w` by
+자 먼저, 상기한 ASCII코드 대신 원핫 인코딩을 사용해보는 것은 어떨까요? 원핫 인코딩이란
+하나의 단어 :math:`w`를 아래의 벡터로 표현하는 것을 말합니다.
 
 .. math::  \overbrace{\left[ 0, 0, \dots, 1, \dots, 0, 0 \right]}^\text{|V| elements}
 
-where the 1 is in a location unique to :math:`w`. Any other word will
-have a 1 in some other location, and a 0 everywhere else.
+여기서 1은 해당 벡터가 표현하고자 하는 단어에 해당하는 위치 1곳에 자리합니다. (나머지는 전부
+0입니다.) 다른 단어를 나타내는 벡터에선 1이 다른 곳에 위치해 있겠죠.
 
-There is an enormous drawback to this representation, besides just how
-huge it is. It basically treats all words as independent entities with
-no relation to each other. What we really want is some notion of
-*similarity* between words. Why? Let's see an example.
+원핫 인코딩은 만들기가 쉽다는 장점이 있지만, 단순한 만큼 단점도 있습니다. 일단 모든 단어를
+표현할 수 있을 만한 크기가 되어야 합니다. 우리가 얼마나 많은 종류의 단어를 사용하는지를 생각
+한다면 어마어마하게 큰 벡터라는 것을 알 수 있죠. 이 뿐만이 아닙니다. 원핫벡터는 모든 단어를
+독립적인 개체로 가정하는 것을 볼 수 있습니다. 즉, 공간에서 봤을 때 완전히 다른 축에 위치해
+있어서 단어간의 관계를 나타낼 수가 없습니다. 하지만 우리는 단어 사이의 *유사도*를 어떻게든
+계산하고 싶은거죠. 왜 유사도가 중요하냐구요? 다음 예제를 봅시다.
 
-Suppose we are building a language model. Suppose we have seen the
-sentences
+우리의 목표가 언어 모델을 만드는 것이라고 가정하고 다음의 문장이 학습 데이터로써 주어졌다고 해봅시다.
 
-* The mathematician ran to the store.
-* The physicist ran to the store.
-* The mathematician solved the open problem.
+* 수학자가 가게로 뛰어갔다.
+* 물리학자가 가게로 뛰어갔다.
+* 수학자가 리만 가설을 증명했다.
 
-in our training data. Now suppose we get a new sentence never before
-seen in our training data:
+또한 학습 데이터에는 없는 아래 문장이 있다고 생각해봅시다.
 
-* The physicist solved the open problem.
+* 물리학자가 리만가설을 증명했다.
 
-Our language model might do OK on this sentence, but wouldn't it be much
-better if we could use the following two facts:
+ASCII 코드나 원핫 인코딩 기반 언어 모델은 위 문장을 어느정도 다룰 수 있겠지만, 개선의 여지가 있지 않을까요?
+먼저 아래의 두 사실을 생각해봅시다.
 
-* We have seen  mathematician and physicist in the same role in a sentence. Somehow they
-  have a semantic relation.
-* We have seen mathematician in the same role  in this new unseen sentence
-  as we are now seeing physicist.
+* '수학자'와 '물리학자'가 문장 내에서 같은 역할을 맡고 있습니다. 이 두 단어는 어떻게든 의미적인 연관성이 있을 겁니다.
+* 새로운 문장에서 '물리학자'가 맡고 있는 역할을 '수학자'가 맡고 있는 것을 학습 데이터에서 본 적이 있습니다.
 
-and then infer that physicist is actually a good fit in the new unseen
-sentence? This is what we mean by a notion of similarity: we mean
-*semantic similarity*, not simply having similar orthographic
-representations. It is a technique to combat the sparsity of linguistic
-data, by connecting the dots between what we have seen and what we
-haven't. This example of course relies on a fundamental linguistic
-assumption: that words appearing in similar contexts are related to each
-other semantically. This is called the `distributional
-hypothesis <https://en.wikipedia.org/wiki/Distributional_semantics>`__.
+우리 모델이 위의 사실을 사용해 '물리학자'가 새 문장에 잘 들어맞는다는 것을 추론할 수 있다면 참 좋을 것입니다.
+이것이 위에서 언급한 유사도의 의미 입니다. 철자적 유사도 뿐 아니라 *의미적 유사도*인 것입니다.
+이것이야말로 언어 데이터에 내재하는 희박성 (sparsity)에 대한 처방이 될 것입니다.
+우리가 본 것과 아직 보지 않은 것 사이를 이어주는 것이죠.
+앞으로는 다음의 언어학적 기본 명제를 가정하도록 합시다.
+바로 비슷한 맥락에서 등장하는 단어들은 서로 의미적 연관성을 가진다는 것입니다.
+언어학적으로는 '분산의미가설' 혹은 `distributional
+hypothesis <https://en.wikipedia.org/wiki/Distributional_semantics>`__라고 합니다.
 
 
-Getting Dense Word Embeddings
+농밀한 단어 임베딩을 구해보자
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-How can we solve this problem? That is, how could we actually encode
-semantic similarity in words? Maybe we think up some semantic
-attributes. For example, we see that both mathematicians and physicists
-can run, so maybe we give these words a high score for the "is able to
-run" semantic attribute. Think of some other attributes, and imagine
-what you might score some common words on those attributes.
+어떻게 단어의 의미적 유사도를 인코딩 할 수 있을까요? 다시 말해, 어떻게 해야
+벡터들 사이에 그에 해당하는 단어들이 가지는 유사도를 반영할 수 있을까요?
+단어 데이터에 의미적 속성(attribute)을 부여하는 건 어떤가요? 예를 들어 '수학자'와 '물리학자'가
+모두 뛸 수 있다면, 해당 단어의 '뛸 수 있음' 속성에 높은 점수를 주는 겁니다.
+계속 해봅시다. 다른 단어들에 대해서는 어떠한 속성을 만들 수 있을지 생각해봅시다.
 
-If each attribute is a dimension, then we might give each word a vector,
-like this:
+만약 각 속성을 하나의 차원이라고 본다면 하나의 단어에 아래와 같은 벡터를 배정할 수 있을겁니다.
 
 .. math::
 
-    q_\text{mathematician} = \left[ \overbrace{2.3}^\text{can run},
-   \overbrace{9.4}^\text{likes coffee}, \overbrace{-5.5}^\text{majored in Physics}, \dots \right]
+    q_\text{수학자} = \left[ \overbrace{2.3}^\text{뛸 수 있음},
+   \overbrace{9.4}^\text{커피를 좋아함}, \overbrace{-5.5}^\text{물리 전공임}, \dots \right]
 
 .. math::
 
-    q_\text{physicist} = \left[ \overbrace{2.5}^\text{can run},
-   \overbrace{9.1}^\text{likes coffee}, \overbrace{6.4}^\text{majored in Physics}, \dots \right]
+    q_\text{물리학자} = \left[ \overbrace{2.5}^\text{뛸 수 있음},
+   \overbrace{9.1}^\text{커피를 좋아함}, \overbrace{6.4}^\text{물리 전공임}, \dots \right]
 
-Then we can get a measure of similarity between these words by doing:
+그러면 아래와 같이 두 단어 사이의 유사도를 구할 수 있습니다. ('유사도'라는 함수를 정의하는 겁니다)
 
-.. math::  \text{Similarity}(\text{physicist}, \text{mathematician}) = q_\text{physicist} \cdot q_\text{mathematician}
+.. math::  \text{유사도}(\text{물리학자}, \text{수학자}) = q_\text{물리학자} \cdot q_\text{수학자}
 
-Although it is more common to normalize by the lengths:
+물론 보통은 이렇게 벡터의 길이로 나눠주지만요.
 
 .. math::
 
-    \text{Similarity}(\text{physicist}, \text{mathematician}) = \frac{q_\text{physicist} \cdot q_\text{mathematician}}
-   {\| q_\text{physicist} \| \| q_\text{mathematician} \|} = \cos (\phi)
+    \text{유사도}(\text{물리학자}, \text{수학자}) = \frac{q_\text{물리학자} \cdot q_\text{수학자}}
+   {\| q_\text{물리학자} \| \| q_\text{수학자} \|} = \cos (\phi)
 
-Where :math:`\phi` is the angle between the two vectors. That way,
-extremely similar words (words whose embeddings point in the same
-direction) will have similarity 1. Extremely dissimilar words should
-have similarity -1.
+:math:`\phi`는 두 벡터 사이의 각입니다. 이런 식이면 정말 비슷한 단어는 유사도 1을 갖고,
+정말 다른 단어는 유사도 -1을 갖겠죠. 비슷한 의미를 가질수록 같은 방향을 가리키고 있을 테니까요.
 
 
-You can think of the sparse one-hot vectors from the beginning of this
-section as a special case of these new vectors we have defined, where
-each word basically has similarity 0, and we gave each word some unique
-semantic attribute. These new vectors are *dense*, which is to say their
-entries are (typically) non-zero.
+이 글 초반에 나온 희박한 원핫 벡터가 사실은 우리가 방금 정의한 의미 벡터의
+특이 케이스라는 것을 금방 알 수 있습니다. 단어 벡터의 각 원소는 그 단어의 의미적 속성을
+표현하고, 모든 단어 쌍의 유사도는 0이기 때문이죠. 위에서 정의한 의미 벡터는 *농밀* 합니다.
+즉, 원핫 벡터에 비해 벡터를 이루는 원소의 값 중에 0이 적다고 할 수 있습니다.
 
-But these new vectors are a big pain: you could think of thousands of
-different semantic attributes that might be relevant to determining
-similarity, and how on earth would you set the values of the different
-attributes? Central to the idea of deep learning is that the neural
-network learns representations of the features, rather than requiring
-the programmer to design them herself. So why not just let the word
-embeddings be parameters in our model, and then be updated during
-training? This is exactly what we will do. We will have some *latent
-semantic attributes* that the network can, in principle, learn. Note
-that the word embeddings will probably not be interpretable. That is,
-although with our hand-crafted vectors above we can see that
-mathematicians and physicists are similar in that they both like coffee,
-if we allow a neural network to learn the embeddings and see that both
-mathematicians and physicists have a large value in the second
-dimension, it is not clear what that means. They are similar in some
-latent semantic dimension, but this probably has no interpretation to
-us.
+하지만 이 벡터들은 구하기가 진짜 어렵습니다. 단어간의 유사도를 결정 지을 만한
+의미적 속성은 어떻게 결정할 것이며, 속성을 결정했다고 하더라도 각 속성에
+해당하는 값은 도대체 어떠한 기준으로 정해야 할까요? 속성과 속성값을 데이터에 기반해
+만들고 자동으로 단어 벡터를 만들 수는 없을까요? 바로 그것이 딥러닝이 단어 임베딩에
+필요한 부분입니다. 딥러닝은 인공신경망을 이용하여 사람의 개입 없이 속성의 표현 방법을
+자동으로 학습합니다. 이를 이용해 단어 벡터를 모델 파라미터로 설정하고 모델 학습시에
+단어 벡터도 함께 업데이트 되도록 하면 될 것입니다. 우리 신경망 모델이 적어도 이론상으로는
+충분히 학습할 수 있는 *잠재 의미 속성*을 찾을 것입니다. 여기서 말하는 잠재 의미 속성으로
+이루어진 벡터는 사람이 해석하기 상당히 어렵다는 점을 기억해 두세요. 위에서 수학자와 물리학자에게
+커피를 좋아한다는 등 사람이 임의적으로 단어에 부여한 속성과는 달리, 인공신경망이 자동으로
+단어의 속성을 찾는다면 그 속성과 값이 의미하는 바를 알기가 어려울 것입니다. 예를 들어서
+신경망 모델이 찾은 '수학자'와 '물리학자'의 표현 벡터 둘 다 두번째 원소가 크다고 가정해 봅시다.
+둘이 비슷하다는 건 알겠지만, 도대체 두번째 원소가 무엇을 의미하는지는 알기가 매우 힘든 것입니다.
+표현 벡터 공간상에서 비슷하다는 정보 외에는 우리에게 아마 많은 정보를 주긴 어려울 것입니다.
 
 
-In summary, **word embeddings are a representation of the *semantics* of
-a word, efficiently encoding semantic information that might be relevant
-to the task at hand**. You can embed other things too: part of speech
-tags, parse trees, anything! The idea of feature embeddings is central
-to the field.
+요약하자면, **단어 임베딩은 단어의 *의미*를 표현하는 방법이며, 차후에 임베딩을 사용해서
+풀고자 하는 문제에 유용할 의미 정보를 효율적으로 인코딩한 것입니다.** 품사 태그, 파스 트리 등
+단어의 의미 외에 다른 것도 인코딩 할 수 있습니다! 피처 임베딩의 개념을 잡는 것이 중요합니다.
 
 
-Word Embeddings in Pytorch
+파이토치에서 단어 임베딩을 해보자
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Before we get to a worked example and an exercise, a few quick notes
