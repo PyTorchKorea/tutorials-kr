@@ -1,81 +1,144 @@
 
-<!DOCTYPE html>
 
+
+<!DOCTYPE html>
 <!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en"> <!--<![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>(experimental) Dynamic Quantization on an LSTM Word Language Model — PyTorch Tutorials 1.4.0 documentation</title>
-<link href="../_static/css/theme.css" rel="stylesheet" type="text/css"/>
-<!-- <link rel="stylesheet" href="../_static/pygments.css" type="text/css" /> -->
-<link href="../_static/gallery.css" rel="stylesheet" type="text/css"/>
-<link href="../genindex.html" rel="index" title="Index"/>
-<link href="../search.html" rel="search" title="Search"/>
-<link href="static_quantization_tutorial.html" rel="next" title="(experimental) Static Quantization with Eager Mode in PyTorch"/>
-<link href="cpp_extension.html" rel="prev" title="Custom C++ and CUDA Extensions"/>
-<script src="../_static/js/modernizr.min.js"></script>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>(experimental) Dynamic Quantization on an LSTM Word Language Model &mdash; PyTorch Tutorials 1.4.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!-- <link rel="stylesheet" href="../_static/pygments.css" type="text/css" /> -->
+  <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="(experimental) Static Quantization with Eager Mode in PyTorch" href="static_quantization_tutorial.html" />
+    <link rel="prev" title="Custom C++ and CUDA Extensions" href="cpp_extension.html" /> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
 </head>
+
 <a class="github-ribbon" href="https://github.com/9bow/PyTorch-tutorials-kr">
-<img alt="Fork me on GitHub" class="attachment-full size-full" data-recalc-dims="1" height="149" src="https://github.blog/wp-content/uploads/2008/12/forkme_left_red_aa0000.png?resize=149%2C149" width="149"/>
+  <img class="ribbon-img" width="149" height="149" src="https://github.blog/wp-content/uploads/2008/12/forkme_left_red_aa0000.png?resize=149%2C149" class="attachment-full size-full" alt="Fork me on GitHub" data-recalc-dims="1">
 </a>
+
 <div class="container-fluid header-holder tutorials-header" id="header-holder">
-<div class="container">
-<div class="header-container">
-<a aria-label="PyTorch" class="header-logo" href="https://pytorch.org/"></a>
-<div class="main-menu">
-<ul>
-<li>
-<a href="https://pytorch.org/get-started">Get Started</a>
-</li>
-<li>
-<a href="https://pytorch.org/features">Features</a>
-</li>
-<li>
-<a href="https://pytorch.org/ecosystem">Ecosystem</a>
-</li>
-<li>
-<a href="https://pytorch.org/blog/">Blog</a>
-</li>
-<li class="active">
-<a href="https://pytorch.org/tutorials">Tutorials</a>
-</li>
-<li>
-<a href="https://pytorch.org/docs/stable/index.html">Docs</a>
-</li>
-<li>
-<a href="https://pytorch.org/resources">Resources</a>
-</li>
-<li>
-<a href="https://github.com/pytorch/pytorch">Github</a>
-</li>
-</ul>
+  <div class="container">
+    <div class="header-container">
+      <a class="header-logo" href="https://pytorch.org/" aria-label="PyTorch"></a>
+
+      <div class="main-menu">
+        <ul>
+          <li>
+            <a href="https://pytorch.org/get-started">Get Started</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/features">Features</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/ecosystem">Ecosystem</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/blog/">Blog</a>
+          </li>
+
+          <li class="active">
+            <a href="https://pytorch.org/tutorials">Tutorials</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/docs/stable/index.html">Docs</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/resources">Resources</a>
+          </li>
+
+          <li>
+            <a href="https://github.com/pytorch/pytorch">Github</a>
+          </li>
+        </ul>
+      </div>
+
+      <a class="main-menu-open-button" href="#" data-behavior="open-mobile-menu"></a>
+    </div>
+
+  </div>
 </div>
-<a class="main-menu-open-button" data-behavior="open-mobile-menu" href="#"></a>
-</div>
-</div>
-</div>
+
+
 <body class="pytorch-body">
-<div class="table-of-contents-link-wrapper">
-<span>Table of Contents</span>
-<a class="toggle-table-of-contents" data-behavior="toggle-table-of-contents" href="#"></a>
-</div>
-<nav class="pytorch-left-menu" data-toggle="wy-nav-shift" id="pytorch-left-menu">
-<div class="pytorch-side-scroll">
-<div aria-label="main navigation" class="pytorch-menu pytorch-menu-vertical" data-spy="affix" role="navigation">
-<div class="pytorch-left-menu-search">
-<div class="version">
+
+   
+
+    
+
+    <div class="table-of-contents-link-wrapper">
+      <span>Table of Contents</span>
+      <a href="#" class="toggle-table-of-contents" data-behavior="toggle-table-of-contents"></a>
+    </div>
+
+    <nav data-toggle="wy-nav-shift" class="pytorch-left-menu" id="pytorch-left-menu">
+      <div class="pytorch-side-scroll">
+        <div class="pytorch-menu pytorch-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          <div class="pytorch-left-menu-search">
+            
+
+            
+              
+              
+                <div class="version">
                   1.4.0
                 </div>
+              
+            
+
+            
+
+
+  
+
+
 <div role="search">
-<form action="../search.html" class="wy-form" id="rtd-search-form" method="get">
-<input name="q" placeholder="Search Tutorials" type="text"/>
-<input name="check_keywords" type="hidden" value="yes"/>
-<input name="area" type="hidden" value="default"/>
-</form>
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search Tutorials" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
 </div>
-</div>
-<p class="caption"><span class="caption-text">시작하기 (Getting Started)</span></p>
+
+            
+          </div>
+
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">시작하기 (Getting Started)</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/deep_learning_60min_blitz.html">파이토치(PyTorch)로 딥러닝하기: 60분만에 끝장내기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/data_loading_tutorial.html">사용자 정의 Dataset, Dataloader, Transforms 작성하기</a></li>
@@ -85,8 +148,8 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/torchvision_tutorial.html">TorchVision 객체 검출 미세조정(Finetuning) 튜토리얼</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/transfer_learning_tutorial.html">컴퓨터 비전(Vision)을 위한 전이학습(Transfer Learning)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/spatial_transformer_tutorial.html">Spatial Transformer Networks Tutorial</a></li>
-<li class="toctree-l1"><a class="reference internal" href="neural_style_tutorial.html">Neural Transfer Using PyTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/spatial_transformer_tutorial.html">공간 변형기 네트워크(Spatial Transformer Networks) 튜토리얼</a></li>
+<li class="toctree-l1"><a class="reference internal" href="neural_style_tutorial.html">PyTorch를 이용한 신경망-변환(Neural-Transfer)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/fgsm_tutorial.html">적대적 예제 생성(Adversarial Example Generation)</a></li>
 </ul>
 <p class="caption"><span class="caption-text">오디오 (Audio)</span></p>
@@ -149,56 +212,100 @@
 <li class="toctree-l1"><a class="reference internal" href="../beginner/pytorch_with_examples.html">예제로 배우는 파이토치(PyTorch)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/nn_tutorial.html">What is <cite>torch.nn</cite> <em>really</em>?</a></li>
 </ul>
-</div>
-</div>
-</nav>
-<div class="pytorch-container">
-<div class="pytorch-page-level-bar" id="pytorch-page-level-bar">
-<div class="pytorch-breadcrumbs-wrapper">
-<div aria-label="breadcrumbs navigation" role="navigation">
-<ul class="pytorch-breadcrumbs">
-<li>
-<a href="../index.html">
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <div class="pytorch-container">
+      <div class="pytorch-page-level-bar" id="pytorch-page-level-bar">
+        <div class="pytorch-breadcrumbs-wrapper">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="pytorch-breadcrumbs">
+    
+      <li>
+        <a href="../index.html">
           
             Tutorials
           
         </a> &gt;
       </li>
-<li>(experimental) Dynamic Quantization on an LSTM Word Language Model</li>
-<li class="pytorch-breadcrumbs-aside">
-<a href="../_sources/advanced/dynamic_quantization_tutorial.rst.txt" rel="nofollow"><img src="../_static/images/view-page-source-icon.svg"/></a>
-</li>
-</ul>
+
+        
+      <li>(experimental) Dynamic Quantization on an LSTM Word Language Model</li>
+    
+    
+      <li class="pytorch-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/advanced/dynamic_quantization_tutorial.rst.txt" rel="nofollow"><img src="../_static/images/view-page-source-icon.svg"></a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
 </div>
-</div>
-<div class="pytorch-shortcuts-wrapper" id="pytorch-shortcuts-wrapper">
+        </div>
+
+        <div class="pytorch-shortcuts-wrapper" id="pytorch-shortcuts-wrapper">
           Shortcuts
         </div>
-</div>
-<section class="pytorch-content-wrap" data-toggle="wy-nav-shift" id="pytorch-content-wrap">
-<div class="pytorch-content-left">
-<div class="pytorch-call-to-action-links">
-<div id="tutorial-type">advanced/dynamic_quantization_tutorial</div>
-<div id="google-colab-link">
-<img class="call-to-action-img" src="../_static/images/pytorch-colab.svg">
-<div class="call-to-action-desktop-view">Run in Google Colab</div>
-<div class="call-to-action-mobile-view">Colab</div>
-</img></div>
-<div id="download-notebook-link">
-<img class="call-to-action-notebook-img" src="../_static/images/pytorch-download.svg">
-<div class="call-to-action-desktop-view">Download Notebook</div>
-<div class="call-to-action-mobile-view">Notebook</div>
-</img></div>
-<div id="github-view-link">
-<img class="call-to-action-img" src="../_static/images/pytorch-github.svg"/>
-<div class="call-to-action-desktop-view">View on GitHub</div>
-<div class="call-to-action-mobile-view">GitHub</div>
-</div>
-</div>
-<div class="rst-content">
-<div class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article" role="main">
-<article class="pytorch-article" id="pytorch-article" itemprop="articleBody">
-<div class="sphx-glr-download-link-note admonition note">
+      </div>
+
+      <section data-toggle="wy-nav-shift" id="pytorch-content-wrap" class="pytorch-content-wrap">
+        <div class="pytorch-content-left">
+
+        
+
+          <div class="pytorch-call-to-action-links">
+            <div id="tutorial-type">advanced/dynamic_quantization_tutorial</div>
+
+            <div id="google-colab-link">
+              <img class="call-to-action-img" src="../_static/images/pytorch-colab.svg"/>
+              <div class="call-to-action-desktop-view">Run in Google Colab</div>
+              <div class="call-to-action-mobile-view">Colab</div>
+            </div>
+            <div id="download-notebook-link">
+              <img class="call-to-action-notebook-img" src="../_static/images/pytorch-download.svg"/>
+              <div class="call-to-action-desktop-view">Download Notebook</div>
+              <div class="call-to-action-mobile-view">Notebook</div>
+            </div>
+            <div id="github-view-link">
+              <img class="call-to-action-img" src="../_static/images/pytorch-github.svg"/>
+              <div class="call-to-action-desktop-view">View on GitHub</div>
+              <div class="call-to-action-mobile-view">GitHub</div>
+            </div>
+          </div>
+
+        
+          
+          <div class="rst-content">
+          
+            <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
+             <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
+              
+  <div class="sphx-glr-download-link-note admonition note">
 <p class="admonition-title">Note</p>
 <p>Click <a class="reference internal" href="#sphx-glr-download-advanced-dynamic-quantization-tutorial-py"><span class="std std-ref">here</span></a> to download the full example code</p>
 </div>
@@ -233,7 +340,7 @@ from the PyTorch examples.</p>
 <a class="reference external" href="https://github.com/pytorch/examples/blob/master/word_language_model/model.py">model</a>
 from the word language model example.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">LSTMModel</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="sd">"""Container module with an encoder, a recurrent module, and a decoder."""</span>
+    <span class="sd">&quot;&quot;&quot;Container module with an encoder, a recurrent module, and a decoder.&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ntoken</span><span class="p">,</span> <span class="n">ninp</span><span class="p">,</span> <span class="n">nhid</span><span class="p">,</span> <span class="n">nlayers</span><span class="p">,</span> <span class="n">dropout</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">LSTMModel</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
@@ -292,25 +399,25 @@ from the word language model example.</p>
 <span class="k">class</span> <span class="nc">Corpus</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dictionary</span> <span class="o">=</span> <span class="n">Dictionary</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">train</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenize</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">'train.txt'</span><span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">valid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenize</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">'valid.txt'</span><span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">test</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenize</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">'test.txt'</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">train</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenize</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;train.txt&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">valid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenize</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;valid.txt&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">test</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenize</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;test.txt&#39;</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="nf">tokenize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
-        <span class="sd">"""Tokenizes a text file."""</span>
+        <span class="sd">&quot;&quot;&quot;Tokenizes a text file.&quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
         <span class="c1"># Add words to the dictionary</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">'r'</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf8"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
-                <span class="n">words</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span> <span class="o">+</span> <span class="p">[</span><span class="s1">'&lt;eos&gt;'</span><span class="p">]</span>
+                <span class="n">words</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span> <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;&lt;eos&gt;&#39;</span><span class="p">]</span>
                 <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">words</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">dictionary</span><span class="o">.</span><span class="n">add_word</span><span class="p">(</span><span class="n">word</span><span class="p">)</span>
 
         <span class="c1"># Tokenize file content</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">'r'</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf8"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">idss</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
-                <span class="n">words</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span> <span class="o">+</span> <span class="p">[</span><span class="s1">'&lt;eos&gt;'</span><span class="p">]</span>
+                <span class="n">words</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span> <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;&lt;eos&gt;&#39;</span><span class="p">]</span>
                 <span class="n">ids</span> <span class="o">=</span> <span class="p">[]</span>
                 <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">words</span><span class="p">:</span>
                     <span class="n">ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dictionary</span><span class="o">.</span><span class="n">word2idx</span><span class="p">[</span><span class="n">word</span><span class="p">])</span>
@@ -319,9 +426,9 @@ from the word language model example.</p>
 
         <span class="k">return</span> <span class="n">ids</span>
 
-<span class="n">model_data_filepath</span> <span class="o">=</span> <span class="s1">'data/'</span>
+<span class="n">model_data_filepath</span> <span class="o">=</span> <span class="s1">&#39;data/&#39;</span>
 
-<span class="n">corpus</span> <span class="o">=</span> <span class="n">Corpus</span><span class="p">(</span><span class="n">model_data_filepath</span> <span class="o">+</span> <span class="s1">'wikitext-2'</span><span class="p">)</span>
+<span class="n">corpus</span> <span class="o">=</span> <span class="n">Corpus</span><span class="p">(</span><span class="n">model_data_filepath</span> <span class="o">+</span> <span class="s1">&#39;wikitext-2&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -343,13 +450,22 @@ example.</p>
 
 <span class="n">model</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span>
     <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
-        <span class="n">model_data_filepath</span> <span class="o">+</span> <span class="s1">'word_language_model_quantize.pth'</span><span class="p">,</span>
-        <span class="n">map_location</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s1">'cpu'</span><span class="p">)</span>
+        <span class="n">model_data_filepath</span> <span class="o">+</span> <span class="s1">&#39;word_language_model_quantize.pth&#39;</span><span class="p">,</span>
+        <span class="n">map_location</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s1">&#39;cpu&#39;</span><span class="p">)</span>
         <span class="p">)</span>
     <span class="p">)</span>
 
 <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>LSTMModel(
+  (drop): Dropout(p=0.5, inplace=False)
+  (encoder): Embedding(33278, 512)
+  (rnn): LSTM(512, 256, num_layers=5, dropout=0.5)
+  (decoder): Linear(in_features=256, out_features=33278, bias=True)
+)
 </pre></div>
 </div>
 <p>Now let’s generate some text to ensure that the pre-trained model is working
@@ -360,7 +476,7 @@ properly - similarly to before, we follow
 <span class="n">temperature</span> <span class="o">=</span> <span class="mf">1.0</span>
 <span class="n">num_words</span> <span class="o">=</span> <span class="mi">1000</span>
 
-<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">model_data_filepath</span> <span class="o">+</span> <span class="s1">'out.txt'</span><span class="p">,</span> <span class="s1">'w'</span><span class="p">)</span> <span class="k">as</span> <span class="n">outf</span><span class="p">:</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">model_data_filepath</span> <span class="o">+</span> <span class="s1">&#39;out.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">outf</span><span class="p">:</span>
     <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>  <span class="c1"># no tracking history</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_words</span><span class="p">):</span>
             <span class="n">output</span><span class="p">,</span> <span class="n">hidden</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">input_</span><span class="p">,</span> <span class="n">hidden</span><span class="p">)</span>
@@ -370,14 +486,77 @@ properly - similarly to before, we follow
 
             <span class="n">word</span> <span class="o">=</span> <span class="n">corpus</span><span class="o">.</span><span class="n">dictionary</span><span class="o">.</span><span class="n">idx2word</span><span class="p">[</span><span class="n">word_idx</span><span class="p">]</span>
 
-            <span class="n">outf</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">word</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">'utf-8'</span><span class="p">))</span> <span class="o">+</span> <span class="p">(</span><span class="s1">'</span><span class="se">\n</span><span class="s1">'</span> <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">20</span> <span class="o">==</span> <span class="mi">19</span> <span class="k">else</span> <span class="s1">' '</span><span class="p">))</span>
+            <span class="n">outf</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">word</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span> <span class="o">+</span> <span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">20</span> <span class="o">==</span> <span class="mi">19</span> <span class="k">else</span> <span class="s1">&#39; &#39;</span><span class="p">))</span>
 
             <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">100</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s1">'| Generated </span><span class="si">{}</span><span class="s1">/</span><span class="si">{}</span><span class="s1"> words'</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="mi">1000</span><span class="p">))</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;| Generated </span><span class="si">{}</span><span class="s1">/</span><span class="si">{}</span><span class="s1"> words&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="mi">1000</span><span class="p">))</span>
 
-<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">model_data_filepath</span> <span class="o">+</span> <span class="s1">'out.txt'</span><span class="p">,</span> <span class="s1">'r'</span><span class="p">)</span> <span class="k">as</span> <span class="n">outf</span><span class="p">:</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">model_data_filepath</span> <span class="o">+</span> <span class="s1">&#39;out.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">outf</span><span class="p">:</span>
     <span class="n">all_output</span> <span class="o">=</span> <span class="n">outf</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">all_output</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>| Generated 0/1000 words
+| Generated 100/1000 words
+| Generated 200/1000 words
+| Generated 300/1000 words
+| Generated 400/1000 words
+| Generated 500/1000 words
+| Generated 600/1000 words
+| Generated 700/1000 words
+| Generated 800/1000 words
+| Generated 900/1000 words
+b&#39;be&#39; b&#39;quickly&#39; b&#39;highly&#39; b&#39;regarded&#39; b&#39;for&#39; b&#39;labour&#39; b&#39;.&#39; b&#39;A&#39; b&#39;prominent&#39; b&#39;headquarters&#39; b&#39;includes&#39; b&#39;them&#39; b&#39;to&#39; b&#39;be&#39; b&#39;killed&#39; b&#39;in&#39; b&#39;2015&#39; b&#39;.&#39; b&#39;Upon&#39; b&#39;a&#39;
+b&#39;early&#39; b&#39;part&#39; b&#39;separate&#39; b&#39;incompetent&#39; b&quot;&#39;s&quot; b&#39;decade&#39; b&#39;,&#39; b&#39;a&#39; b&#39;field&#39; b&#39;deal&#39; b&#39;with&#39; b&#39;a&#39; b&#39;demise&#39; b&#39;beyond&#39; b&#39;Ceres&#39; b&#39;after&#39; b&#39;:&#39; b&#39;Super&#39; b&quot;&#39;Malley&quot; b&#39;narrowly&#39;
+b&#39;knew&#39; b&#39;its&#39; b&#39;&lt;unk&gt;&#39; b&#39;.&#39; b&#39;The&#39; b&#39;neighboring&#39; b&#39;celebrity&#39; b&#39;,&#39; b&#39;close&#39; b&#39;to&#39; b&#39;the&#39; b&#39;heart&#39; b&#39;of&#39; b&#39;1853&#39; b&#39;,&#39; b&#39;are&#39; b&#39;based&#39; b&#39;in&#39; b&#39;combination&#39; b&#39;of&#39;
+b&#39;national&#39; b&#39;opponents&#39; b&#39;,&#39; b&#39;demonstrating&#39; b&#39;six&#39; b&#39;more&#39; b&#39;productive&#39; b&#39;;&#39; b&#39;between&#39; b&#39;in&#39; b&#39;the&#39; b&#39;company&#39; b&#39;its&#39; b&#39;last&#39; b&#39;season&#39; b&#39;,&#39; b&#39;&lt;unk&gt;&#39; b&#39;Br\xc3\xbbl\xc3\xa9&#39; b&#39;and&#39; b&#39;1600&#39;
+b&#39;benefactors&#39; b&#39;&lt;unk&gt;&#39; b&#39;Farm&#39; b&#39;,&#39; b&#39;&lt;unk&gt;&#39; b&#39;Papa&#39; b&#39;Rowland&#39; b&#39;and&#39; b&#39;&lt;unk&gt;&#39; b&#39;Radio&#39; b&#39;Association&#39; b&#39;.&#39; b&#39;It&#39; b&#39;was&#39; b&#39;written&#39; b&#39;by&#39; b&#39;Paul&#39; b&#39;Romulans&#39; b&#39;,&#39; b&#39;who&#39;
+b&#39;were&#39; b&#39;particularly&#39; b&#39;known&#39; b&#39;through&#39; b&#39;fifteen&#39; b&#39;recent&#39; b&#39;times&#39; b&#39;,&#39; b&#39;and&#39; b&#39;described&#39; b&#39;ten&#39; b&#39;tracks&#39; b&#39;.&#39; b&#39;&lt;eos&gt;&#39; b&#39;The&#39; b&#39;election&#39; b&#39;hockey&#39; b&#39;&lt;unk&gt;&#39; b&#39;sought&#39; b&#39;to&#39;
+b&#39;be&#39; b&#39;&lt;unk&gt;&#39; b&#39;,&#39; b&#39;particularly&#39; b&#39;autumn&#39; b&#39;(&#39; b&#39;&lt;unk&gt;&#39; b&#39;East&#39; b&#39;Catholic&#39; b&#39;,&#39; b&#39;but&#39; b&#39;Greek&#39; b&#39;,&#39; b&#39;though&#39; b&#39;various&#39; b&#39;tombs&#39; b&#39;,&#39; b&#39;which&#39; b&#39;can&#39; b&#39;be&#39;
+b&#39;present&#39; b&#39;,&#39; b&#39;or&#39; b&#39;the&#39; b&#39;female&#39; b&#39;native&#39; b&#39;to&#39; b&#39;ten&#39; b&#39;times&#39; b&#39;.&#39; b&#39;)&#39; b&#39;are&#39; b&#39;the&#39; b&#39;official&#39; b&#39;nests&#39; b&#39;.&#39; b&#39;The&#39; b&#39;game&#39; b&#39;was&#39; b&#39;needed&#39;
+b&#39;to&#39; b&#39;symbol&#39; b&#39;clear&#39; b&#39;information&#39; b&#39;in&#39; b&#39;the&#39; b&#39;opposition&#39; b&#39;,&#39; b&#39;and&#39; b&#39;lost&#39; b&#39;a&#39; b&#39;assaults&#39; b&#39;first&#39; b&#39;as&#39; b&#39;a&#39; b&#39;flying&#39; b&#39;woman&#39; b&#39;.&#39; b&#39;He&#39; b&#39;attempts&#39;
+b&#39;was&#39; b&#39;killed&#39; b&#39;by&#39; b&#39;Gillian&#39; b&#39;radio&#39; b&#39;subalpine&#39; b&#39;decried&#39; b&#39;the&#39; b&#39;language&#39; b&#39;of&#39; b&#39;government&#39; b&#39;in&#39; b&#39;addition&#39; b&#39;to&#39; b&#39;the&#39; b&#39;city&#39; b&#39;and&#39; b&#39;purposes&#39; b&#39;of&#39; b&#39;amateur&#39;
+b&#39;society&#39; b&#39;again&#39; b&#39;,&#39; b&#39;neck&#39; b&#39;against&#39; b&#39;making&#39; b&#39;gentlemen&#39; b&#39;and&#39; b&#39;&lt;unk&gt;&#39; b&#39;&lt;unk&gt;&#39; b&#39;and&#39; b&#39;maximum&#39; b&#39;destroyed&#39; b&#39;children&#39; b&#39;.&#39; b&#39;and&#39; b&#39;there&#39; b&#39;were&#39; b&#39;significant&#39; b&#39;protein&#39;
+b&#39;,&#39; b&#39;pursuers&#39; b&#39;unmarried&#39; b&#39;or&#39; b&#39;mechanic&#39; b&#39;and&#39; b&#39;found&#39; b&#39;Franceti\xc4\x87&#39; b&quot;&#39;s&quot; b&#39;wives&#39; b&#39;on&#39; b&#39;not&#39; b&#39;one&#39; b&#39;or&#39; b&#39;other&#39; b&#39;possibilities&#39; b&#39;,&#39; b&#39;and&#39; b&#39;instead&#39; b&#39;due&#39;
+b&#39;to&#39; b&#39;other&#39; b&#39;changes&#39; b&#39;.&#39; b&#39;They&#39; b&#39;often&#39; b&#39;lasted&#39; b&#39;and&#39; b&#39;recorded&#39; b&#39;,&#39; b&#39;before&#39; b&#39;this&#39; b&#39;species&#39; b&#39;may&#39; b&#39;have&#39; b&#39;their&#39; b&#39;time&#39; b&#39;to&#39; b&#39;obtain&#39; b&#39;a&#39;
+b&#39;sharp&#39; b&#39;device&#39; b&#39;.&#39; b&#39;Files&#39; b&#39;fold&#39; b&#39;feeding&#39; b&#39;the&#39; b&#39;kingship&#39; b&#39;of&#39; b&#39;Bell&#39; b&#39;and&#39; b&#39;who&#39; b&#39;prefers&#39; b&#39;on&#39; b&#39;into&#39; b&#39;out&#39; b&#39;of&#39; b&#39;Heller&#39; b&#39;.&#39; b&#39;Since&#39;
+b&#39;they&#39; b&#39;shall&#39; b&#39;be&#39; b&#39;played&#39; b&#39;into&#39; b&#39;food&#39; b&#39;,&#39; b&#39;moving&#39; b&#39;as&#39; b&#39;they&#39; b&#39;comprise&#39; b&#39;and&#39; b&#39;lift&#39; b&#39;.&#39; b&#39;In&#39; b&#39;much&#39; b&#39;games&#39; b&#39;,&#39; b&#39;there&#39; b&#39;are&#39;
+b&#39;exactly&#39; b&#39;primarily&#39; b&#39;four&#39; b&#39;African&#39; b&#39;archaea&#39; b&#39;realistic&#39; b&#39;prospects&#39; b&#39;from&#39; b&#39;humans&#39; b&#39;.&#39; b&#39;They&#39; b&#39;rapidly&#39; b&#39;will&#39; b&#39;become&#39; b&#39;thus&#39; b&#39;first&#39; b&#39;&lt;unk&gt;&#39; b&#39;,&#39; b&#39;because&#39; b&#39;it&#39;
+b&#39;should&#39; b&#39;be&#39; b&#39;instructed&#39; b&#39;,&#39; b&#39;by&#39; b&#39;arrival&#39; b&#39;such&#39; b&#39;as&#39; b&#39;the&#39; b&#39;&lt;unk&gt;&#39; b&#39;&lt;unk&gt;&#39; b&#39;,&#39; b&#39;bird&#39; b&#39;,&#39; b&#39;&lt;unk&gt;&#39; b&#39;,&#39; b&#39;and&#39; b&#39;alpha&#39; b&#39;DAGs&#39; b&#39;that&#39;
+b&#39;have&#39; b&#39;Roud&#39; b&#39;populations&#39; b&#39;to&#39; b&#39;circulate&#39; b&#39;.&#39; b&#39;The&#39; b&#39;formation&#39; b&#39;of&#39; b&#39;ancient&#39; b&#39;terrestrial&#39; b&#39;portraits&#39; b&#39;are&#39; b&#39;already&#39; b&#39;attributed&#39; b&#39;.&#39; b&#39;&lt;eos&gt;&#39; b&#39;In&#39; b&#39;1972&#39; b&#39;,&#39;
+b&#39;greatly&#39; b&#39;around&#39; b&#39;for&#39; b&#39;seaward&#39; b&#39;breeding&#39; b&#39;or&#39; b&#39;first&#39; b&#39;inscriptions&#39; b&#39;to&#39; b&#39;be&#39; b&#39;more&#39; b&#39;than&#39; b&#39;160&#39; b&#39;%&#39; b&#39;of&#39; b&#39;parasites&#39; b&#39;,&#39; b&#39;loud&#39; b&#39;,&#39; b&#39;attractions&#39;
+b&#39;,&#39; b&#39;close&#39; b&#39;to&#39; b&#39;the&#39; b&#39;velvet&#39; b&#39;numbers&#39; b&#39;of&#39; b&#39;any&#39; b&#39;model&#39; b&#39;787&#39; b&#39;,&#39; b&#39;breeding&#39; b&#39;common&#39; b&#39;starlings&#39; b&#39;.&#39; b&#39;&lt;unk&gt;&#39; b&#39;,&#39; b&#39;467&#39; b&#39;called&#39; b&#39;a&#39;
+b&#39;catalyst&#39; b&#39;,&#39; b&#39;ring&#39; b&#39;developments&#39; b&#39;processions&#39; b&#39;with&#39; b&#39;more&#39; b&#39;were&#39; b&#39;Hydnellum&#39; b&#39;added&#39; b&#39;.&#39; b&#39;It&#39; b&#39;is&#39; b&#39;an&#39; b&#39;central&#39; b&#39;episode&#39; b&#39;that&#39; b&#39;face&#39; b&#39;soil&#39; b&#39;between&#39;
+b&#39;three&#39; b&#39;and&#39; b&#39;165&#39; b&#39;%&#39; b&#39;of&#39; b&#39;these&#39; b&#39;motion&#39; b&#39;.&#39; b&#39;Before&#39; b&#39;his&#39; b&#39;ellipsoid&#39; b&#39;energy&#39; b&#39;was&#39; b&#39;preferred&#39; b&#39;by&#39; b&#39;both&#39; b&#39;inconsistencies&#39; b&#39;,&#39; b&#39;many&#39; b&#39;birds&#39;
+b&#39;was&#39; b&#39;reprinted&#39; b&#39;.&#39; b&#39;&lt;eos&gt;&#39; b&#39;&lt;eos&gt;&#39; b&#39;=&#39; b&#39;=&#39; b&#39;Yamaha&#39; b&#39;=&#39; b&#39;=&#39; b&#39;&lt;eos&gt;&#39; b&#39;&lt;eos&gt;&#39; b&#39;Common&#39; b&#39;starlings&#39; b&#39;,&#39; b&#39;such&#39; b&#39;as&#39; b&#39;1534&#39; b&#39;,&#39; b&#39;and&#39;
+b&#39;discovered&#39; b&#39;,&#39; b&#39;common&#39; b&#39;folklore&#39; b&#39;such&#39; b&#39;as&#39; b&#39;at&#39; b&#39;least&#39; b&#39;28&#39; b&#39;million&#39; b&#39;kelvin&#39; b&#39;are&#39; b&#39;fully&#39; b&#39;search&#39; b&#39;they&#39; b&#39;perceive&#39; b&#39;,&#39; b&#39;(&#39; b&#39;the&#39; b&#39;thin&#39;
+b&#39;eye&#39; b&#39;had&#39; b&#39;unanimously&#39; b&#39;orbits&#39; b&#39;)&#39; b&#39;,&#39; b&#39;likely&#39; b&#39;\xe2\x80\x93&#39; b&#39;unincorporated&#39; b&#39;packing&#39; b&#39;,&#39; b&#39;options&#39; b&#39;,&#39; b&#39;or&#39; b&#39;water&#39; b&#39;specimens&#39; b&#39;.&#39; b&#39;In&#39; b&#39;resin&#39; b&#39;,&#39;
+b&#39;pores&#39; b&#39;in&#39; b&#39;the&#39; b&#39;breeding&#39; b&#39;desert&#39; b&#39;,&#39; b&#39;their&#39; b&#39;organizations&#39; b&#39;Everett&#39; b&#39;hagiography&#39; b&#39;(&#39; b&#39;Bodyline&#39; b&#39;)&#39; b&#39;were&#39; b&#39;badly&#39; b&#39;flattened&#39; b&#39;,&#39; b&#39;and&#39; b&#39;has&#39; b&#39;occasionally&#39;
+b&#39;first&#39; b&#39;adopted&#39; b&#39;the&#39; b&#39;tallest&#39; b&#39;&lt;unk&gt;&#39; b&#39;,&#39; b&#39;a&#39; b&#39;egg&#39; b&#39;&lt;unk&gt;&#39; b&#39;Museum&#39; b&#39;(&#39; b&#39;which&#39; b&#39;means&#39; b&#39;that&#39; b&#39;devolved&#39; b&#39;crown&#39; b&#39;planet&#39; b&#39;fell&#39; b&#39;in&#39; b&#39;Osborne&#39;
+b&#39;)&#39; b&#39;,&#39; b&#39;has&#39; b&#39;been&#39; b&#39;described&#39; b&#39;by&#39; b&#39;microscope&#39; b&#39;.&#39; b&#39;Other&#39; b&#39;data&#39; b&#39;varies&#39; b&#39;on&#39; b&#39;metre&#39; b&#39;even&#39; b&#39;after&#39; b&#39;the&#39; b&#39;tune&#39; b&#39;.&#39; b&#39;Common&#39; b&#39;bodies&#39;
+b&#39;sex&#39; b&#39;defence&#39; b&#39;for&#39; b&#39;monks&#39; b&#39;was&#39; b&#39;both&#39; b&#39;allowed&#39; b&#39;to&#39; b&#39;be&#39; b&#39;vary&#39; b&#39;,&#39; b&#39;with&#39; b&#39;&quot;&#39; b&#39;&lt;unk&gt;&#39; b&#39;&quot;&#39; b&#39;to&#39; b&#39;cabaret&#39; b&#39;than&#39; b&#39;more&#39; b&#39;than&#39;
+b&#39;8&#39; b&#39;hours&#39; b&#39;since&#39; b&#39;.&#39; b&#39;Three&#39; b&#39;of&#39; b&#39;these&#39; b&#39;possess&#39; b&#39;monarch&#39; b&#39;boasted&#39; b&#39;their&#39; b&#39;first&#39; b&#39;non&#39; b&#39;@-@&#39; b&#39;companion&#39; b&#39;high&#39; b&#39;template&#39; b&#39;and&#39; b&#39;cloudy&#39; b&#39;over&#39;
+b&#39;over&#39; b&#39;5&#39; b&#39;:&#39; b&#39;45&#39; b&#39;(&#39; b&#39;a&#39; b&#39;pace&#39; b&#39;day&#39; b&#39;of&#39; b&#39;8&#39; b&#39;\xc2\xb0&#39; b&#39;years&#39; b&#39;per&#39; b&#39;year&#39; b&#39;)&#39; b&#39;.&#39; b&#39;In&#39; b&#39;pre&#39; b&#39;@-@&#39; b&#39;save&#39;
+b&#39;or&#39; b&#39;&lt;unk&gt;&#39; b&#39;,&#39; b&#39;mixed&#39; b&#39;starlings&#39; b&#39;can&#39; b&#39;help&#39; b&#39;greater&#39; b&#39;species&#39; b&#39;of&#39; b&#39;rigid&#39; b&#39;trees&#39; b&#39;,&#39; b&#39;and&#39; b&#39;have&#39; b&#39;accompanied&#39; b&#39;three&#39; b&#39;storylines&#39; b&#39;led&#39; b&#39;by&#39;
+b&#39;Morton&#39; b&#39;.&#39; b&#39;Subsequently&#39; b&#39;,&#39; b&#39;it&#39; b&#39;is&#39; b&#39;tourism&#39; b&#39;celestial&#39; b&#39;and&#39; b&#39;less&#39; b&#39;in&#39; b&#39;handling&#39; b&#39;@-@&#39; b&#39;predecessors&#39; b&#39;.&#39; b&#39;At&#39; b&#39;around&#39; b&#39;midnight&#39; b&#39;,&#39; b&#39;it&#39;
+b&#39;is&#39; b&#39;described&#39; b&#39;at&#39; b&#39;2&#39; b&#39;to&#39; b&#39;2&#39; b&#39;cm&#39; b&#39;(&#39; b&#39;152&#39; b&#39;@.@&#39; b&#39;8&#39; b&#39;\xe2\x80\x93&#39; b&#39;0&#39; b&#39;@.@&#39; b&#39;7&#39; b&#39;in&#39; b&#39;)&#39; b&#39;at&#39; b&#39;the&#39; b&#39;number&#39;
+b&#39;of&#39; b&#39;roads&#39; b&#39;.&#39; b&#39;In&#39; b&#39;sacramental&#39; b&#39;@-@&#39; b&#39;&lt;unk&gt;&#39; b&#39;efforts&#39; b&#39;,&#39; b&#39;they&#39; b&#39;the&#39; b&#39;population&#39; b&#39;&quot;&#39; b&#39;are&#39; b&#39;damaged&#39; b&#39;in&#39; b&#39;such&#39; b&#39;or&#39; b&#39;increase&#39; b&#39;and&#39;
+b&#39;doubtful&#39; b&#39;patterns&#39; b&#39;,&#39; b&#39;either&#39; b&#39;by&#39; b&#39;neutron&#39; b&#39;well&#39; b&#39;,&#39; b&#39;leaf&#39; b&#39;environmental&#39; b&#39;,&#39; b&#39;black&#39; b&#39;,&#39; b&#39;and&#39; b&#39;long&#39; b&#39;native&#39; b&#39;,&#39; b&#39;&lt;unk&gt;&#39; b&#39;take&#39; b&#39;.&#39;
+b&#39;&quot;&#39; b&#39;Finally&#39; b&#39;,&#39; b&#39;it&#39; b&#39;was&#39; b&#39;at&#39; b&#39;least&#39; b&#39;so&#39; b&#39;that&#39; b&#39;begins&#39; b&#39;for&#39; b&#39;males&#39; b&#39;:&#39; b&#39;50&#39; b&#39;\xe2\x80\x93&#39; b&#39;18&#39; b&#39;:&#39; b&#39;85&#39; b&#39;,&#39; b&#39;six&#39;
+b&#39;activist&#39; b&#39;aspect&#39; b&#39;:&#39; b&#39;&lt;unk&gt;&#39; b&#39;in&#39; b&#39;light&#39; b&#39;,&#39; b&#39;when&#39; b&#39;New&#39; b&#39;Zealand&#39; b&#39;in&#39; b&#39;central&#39; b&#39;areas&#39; b&#39;.&#39; b&#39;If&#39; b&#39;they&#39; b&#39;long&#39; b&#39;distinguished&#39; b&#39;the&#39; b&#39;images&#39;
+b&#39;,&#39; b&#39;they&#39; b&#39;may&#39; b&#39;use&#39; b&#39;well&#39; b&#39;if&#39; b&#39;their&#39; b&#39;male&#39; b&#39;scales&#39; b&#39;disagreed&#39; b&#39;out&#39; b&#39;and&#39; b&#39;there&#39; b&#39;are&#39; b&#39;females&#39; b&#39;while&#39; b&#39;potentially&#39; b&#39;completely&#39; b&#39;exchanged&#39; b&#39;.&#39;
+b&#39;When&#39; b&#39;in&#39; b&#39;the&#39; b&#39;same&#39; b&#39;Constructors&#39; b&quot;&#39;&quot; b&#39;image&#39; b&#39;,&#39; b&#39;it&#39; b&#39;is&#39; b&#39;thick&#39; b&#39;,&#39; b&#39;they&#39; b&#39;have&#39; b&#39;formed&#39; b&#39;in&#39; b&#39;comprised&#39; b&#39;natural&#39; b&#39;starlings&#39; b&#39;\xe2\x80\x93&#39;
+b&#39;and&#39; b&#39;may&#39; b&#39;be&#39; b&#39;pure&#39; b&#39;,&#39; b&#39;strong&#39; b&#39;,&#39; b&#39;biting&#39; b&#39;or&#39; b&#39;mortality&#39; b&#39;.&#39; b&#39;An&#39; b&#39;male&#39; b&#39;spots&#39; b&#39;with&#39; b&#39;little&#39; b&#39;noises&#39; b&#39;may&#39; b&#39;indicate&#39; b&#39;,&#39;
+b&#39;or&#39; b&#39;that&#39; b&#39;a&#39; b&#39;cap&#39; b&#39;to&#39; b&#39;look&#39; b&#39;up&#39; b&#39;&quot;&#39; b&#39;or&#39; b&#39;be&#39; b&#39;unlike&#39; b&#39;conferences&#39; b&#39;that&#39; b&#39;are&#39; b&#39;broken&#39; b&#39;&quot;&#39; b&#39;.&#39; b&#39;However&#39; b&#39;,&#39; b&#39;ibis&#39;
+b&#39;starling&#39; b&#39;Mohan&#39; b&#39;is&#39; b&#39;a&#39; b&#39;type&#39; b&#39;of&#39; b&#39;their&#39; b&#39;coloured&#39; b&#39;&lt;unk&gt;&#39; b&#39;.&#39; b&#39;For&#39; b&#39;example&#39; b&#39;,&#39; b&#39;the&#39; b&#39;tenant&#39; b&#39;depends&#39; b&#39;remainder&#39; b&#39;for&#39; b&#39;their&#39; b&#39;ruin&#39;
+b&#39;that&#39; b&#39;will&#39; b&#39;better&#39; b&#39;be&#39; b&#39;become&#39; b&#39;the&#39; b&#39;planet&#39; b&quot;&#39;s&quot; b&#39;Hispanic&#39; b&#39;hitherto&#39; b&#39;,&#39; b&#39;the&#39; b&#39;duller&#39; b&#39;city&#39; b&#39;immense&#39; b&#39;other&#39; b&#39;fed&#39; b&#39;,&#39; b&#39;1219&#39; b&#39;.&#39;
+b&#39;Another&#39; b&#39;location&#39; b&#39;is&#39; b&#39;connected&#39; b&#39;to&#39; b&#39;a&#39; b&#39;seam&#39; b&#39;orange&#39; b&#39;across&#39; b&#39;discovery&#39; b&#39;,&#39; b&#39;almost&#39; b&#39;giving&#39; b&#39;that&#39; b&#39;they&#39; b&#39;are&#39; b&#39;or&#39; b&#39;either&#39; b&#39;salts&#39; b&#39;only&#39;
+b&#39;growing&#39; b&#39;if&#39; b&#39;it&#39; b&#39;is&#39; b&#39;somewhat&#39; b&#39;impact&#39; b&#39;to&#39; b&#39;website&#39; b&#39;.&#39; b&#39;&lt;eos&gt;&#39; b&#39;Other&#39; b&#39;balanced&#39; b&#39;concentrations&#39; b&#39;are&#39; b&#39;probably&#39; b&#39;isolated&#39; b&#39;to&#39; b&#39;fly&#39; b&#39;inches&#39; b&#39;.&#39;
+b&#39;According&#39; b&#39;to&#39; b&#39;Jeremi&#39; b&#39;890&#39; b&#39;as&#39; b&#39;they&#39; b&#39;they&#39; b&#39;contain&#39; b&#39;weight&#39; b&#39;around&#39; b&#39;the&#39; b&#39;gas&#39; b&#39;restricted&#39; b&#39;areas&#39; b&#39;has&#39; b&#39;Ulysses&#39; b&#39;.&#39; b&#39;The&#39; b&#39;sided&#39; b&#39;on&#39;
+b&#39;the&#39; b&#39;layer&#39; b&#39;of&#39; b&#39;external&#39; b&#39;spots&#39; b&#39;by&#39; b&#39;convection&#39; b&#39;are&#39; b&#39;visible&#39; b&#39;.&#39; b&#39;A&#39; b&#39;other&#39; b&#39;Kentrosaurus&#39; b&#39;object&#39; b&#39;&quot;&#39; b&#39;maintains&#39; b&#39;&quot;&#39; b&#39;bird&#39; b&#39;for&#39; b&#39;copper&#39;
+b&#39;habitat&#39; b&#39;activity&#39; b&#39;,&#39; b&#39;as&#39; b&#39;they&#39; b&#39;are&#39; b&#39;insufficient&#39; b&#39;.&#39; b&#39;Later&#39; b&#39;,&#39; b&#39;they&#39; b&#39;may&#39; b&#39;describe&#39; b&#39;say&#39; b&#39;that&#39; b&#39;a&#39; b&#39;male&#39; b&#39;racist&#39; b&#39;sequence&#39; b&#39;may&#39;
+b&#39;continue&#39; b&#39;to&#39; b&#39;be&#39; b&#39;named&#39; b&#39;when&#39; b&#39;they&#39; b&#39;arrive&#39; b&#39;around&#39; b&#39;their&#39; b&#39;head&#39; b&#39;.&#39; b&#39;Instead&#39; b&#39;,&#39; b&#39;they&#39; b&#39;require&#39; b&#39;viewers&#39; b&#39;,&#39; b&#39;such&#39; b&#39;as&#39; b&#39;chambers&#39;
 </pre></div>
 </div>
 <p>It’s no GPT-2, but it looks like the model has started to learn the structure of
@@ -392,7 +571,7 @@ helper functions:</p>
 <span class="k">def</span> <span class="nf">batchify</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">bsz</span><span class="p">):</span>
     <span class="c1"># Work out how cleanly we can divide the dataset into bsz parts.</span>
     <span class="n">nbatch</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">//</span> <span class="n">bsz</span>
-    <span class="c1"># Trim off any extra elements that wouldn't cleanly fit (remainders).</span>
+    <span class="c1"># Trim off any extra elements that wouldn&#39;t cleanly fit (remainders).</span>
     <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">narrow</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">nbatch</span> <span class="o">*</span> <span class="n">bsz</span><span class="p">)</span>
     <span class="c1"># Evenly divide the data across the bsz batches.</span>
     <span class="k">return</span> <span class="n">data</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">bsz</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">t</span><span class="p">()</span><span class="o">.</span><span class="n">contiguous</span><span class="p">()</span>
@@ -407,7 +586,7 @@ helper functions:</p>
     <span class="k">return</span> <span class="n">data</span><span class="p">,</span> <span class="n">target</span>
 
 <span class="k">def</span> <span class="nf">repackage_hidden</span><span class="p">(</span><span class="n">h</span><span class="p">):</span>
-  <span class="sd">"""Wraps hidden states in new Tensors, to detach them from their history."""</span>
+  <span class="sd">&quot;&quot;&quot;Wraps hidden states in new Tensors, to detach them from their history.&quot;&quot;&quot;</span>
 
   <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
       <span class="k">return</span> <span class="n">h</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span>
@@ -447,15 +626,29 @@ model to be quantized</p></li>
 <span class="nb">print</span><span class="p">(</span><span class="n">quantized_model</span><span class="p">)</span>
 </pre></div>
 </div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>LSTMModel(
+  (drop): Dropout(p=0.5, inplace=False)
+  (encoder): Embedding(33278, 512)
+  (rnn): DynamicQuantizedLSTM(512, 256, num_layers=5, dropout=0.5)
+  (decoder): DynamicQuantizedLinear(in_features=256, out_features=33278, scale=1.0, zero_point=0)
+)
+</pre></div>
+</div>
 <p>The model looks the same; how has this benefited us? First, we see a
 significant reduction in model size:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">print_size_of_model</span><span class="p">(</span><span class="n">model</span><span class="p">):</span>
-    <span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span> <span class="s2">"temp.p"</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">'Size (MB):'</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getsize</span><span class="p">(</span><span class="s2">"temp.p"</span><span class="p">)</span><span class="o">/</span><span class="mf">1e6</span><span class="p">)</span>
-    <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s1">'temp.p'</span><span class="p">)</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span> <span class="s2">&quot;temp.p&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Size (MB):&#39;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getsize</span><span class="p">(</span><span class="s2">&quot;temp.p&quot;</span><span class="p">)</span><span class="o">/</span><span class="mf">1e6</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s1">&#39;temp.p&#39;</span><span class="p">)</span>
 
 <span class="n">print_size_of_model</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
 <span class="n">print_size_of_model</span><span class="p">(</span><span class="n">quantized_model</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Size (MB): 113.941308
+Size (MB): 76.80665
 </pre></div>
 </div>
 <p>Second, we see faster inference time, with no difference in evaluation loss:</p>
@@ -467,10 +660,17 @@ models run single threaded.</p>
     <span class="n">s</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
     <span class="n">loss</span> <span class="o">=</span> <span class="n">evaluate</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">test_data</span><span class="p">)</span>
     <span class="n">elapsed</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">s</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">'''loss: </span><span class="si">{0:.3f}</span><span class="se">\n</span><span class="s1">elapsed time (seconds): </span><span class="si">{1:.1f}</span><span class="s1">'''</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">loss</span><span class="p">,</span> <span class="n">elapsed</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;&#39;&#39;loss: </span><span class="si">{0:.3f}</span><span class="se">\n</span><span class="s1">elapsed time (seconds): </span><span class="si">{1:.1f}</span><span class="s1">&#39;&#39;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">loss</span><span class="p">,</span> <span class="n">elapsed</span><span class="p">))</span>
 
 <span class="n">time_model_evaluation</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">test_data</span><span class="p">)</span>
 <span class="n">time_model_evaluation</span><span class="p">(</span><span class="n">quantized_model</span><span class="p">,</span> <span class="n">test_data</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>loss: 5.167
+elapsed time (seconds): 199.7
+loss: 5.168
+elapsed time (seconds): 133.9
 </pre></div>
 </div>
 <p>Running this locally on a MacBook Pro, without quantization, inference takes about 200 seconds,
@@ -482,7 +682,7 @@ and with quantization it takes just about 100 seconds.</p>
 having a limited effect on accuracy.</p>
 <p>Thanks for reading! As always, we welcome any feedback, so please create an issue
 <a class="reference external" href="https://github.com/pytorch/pytorch/issues">here</a> if you have any.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.000 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 5 minutes  38.510 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-advanced-dynamic-quantization-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/256861ec2cab5f0dc50c523f520dfefd/dynamic_quantization_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">dynamic_quantization_tutorial.py</span></code></a></p>
@@ -494,37 +694,57 @@ having a limited effect on accuracy.</p>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
 </div>
 </div>
-</article>
-</div>
-<footer>
-<div aria-label="footer navigation" class="rst-footer-buttons" role="navigation">
-<a accesskey="n" class="btn btn-neutral float-right" href="static_quantization_tutorial.html" rel="next" title="(experimental) Static Quantization with Eager Mode in PyTorch">Next <img class="next-page" src="../_static/images/chevron-right-orange.svg"/></a>
-<a accesskey="p" class="btn btn-neutral" href="cpp_extension.html" rel="prev" title="Custom C++ and CUDA Extensions"><img class="previous-page" src="../_static/images/chevron-right-orange.svg"/> Previous</a>
-</div>
-<hr class="helpful-hr hr-top"/>
-<div class="helpful-container">
-<div class="helpful-question">Was this helpful?</div>
-<div class="helpful-question yes-link" data-behavior="was-this-helpful-event" data-response="yes">Yes</div>
-<div class="helpful-question no-link" data-behavior="was-this-helpful-event" data-response="no">No</div>
-<div class="was-helpful-thank-you">Thank you</div>
-</div>
-<hr class="helpful-hr hr-bottom">
-<div role="contentinfo">
-<p>
-        © Copyright 2019, PyTorch.
+
+
+             </article>
+             
+            </div>
+            <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="static_quantization_tutorial.html" class="btn btn-neutral float-right" title="(experimental) Static Quantization with Eager Mode in PyTorch" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
+      
+      
+        <a href="cpp_extension.html" class="btn btn-neutral" title="Custom C++ and CUDA Extensions" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
+      
+    </div>
+  
+
+  
+
+    <hr class="helpful-hr hr-top">
+      <div class="helpful-container">
+        <div class="helpful-question">Was this helpful?</div>
+        <div class="helpful-question yes-link" data-behavior="was-this-helpful-event" data-response="yes">Yes</div>
+        <div class="helpful-question no-link" data-behavior="was-this-helpful-event" data-response="no">No</div>
+        <div class="was-helpful-thank-you">Thank you</div>
+      </div>
+    <hr class="helpful-hr hr-bottom"/>
+
+  
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, PyTorch.
 
     </p>
-</div>
-<div>
+  </div>
+    
+      <div>
         Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
       </div>
-</hr></footer>
-</div>
-</div>
-<div class="pytorch-content-right" id="pytorch-content-right">
-<div class="pytorch-right-menu" id="pytorch-right-menu">
-<div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
-<ul>
+     
+
+</footer>
+
+          </div>
+        </div>
+
+        <div class="pytorch-content-right" id="pytorch-content-right">
+          <div class="pytorch-right-menu" id="pytorch-right-menu">
+            <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
+              <ul>
 <li><a class="reference internal" href="#">(experimental) Dynamic Quantization on an LSTM Word Language Model</a><ul>
 <li><a class="reference internal" href="#introduction">Introduction</a></li>
 <li><a class="reference internal" href="#define-the-model">1. Define the model</a></li>
@@ -535,25 +755,39 @@ having a limited effect on accuracy.</p>
 </ul>
 </li>
 </ul>
-</div>
-</div>
-</div>
-</section>
-</div>
-<script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js" type="text/javascript"></script>
-<script src="../_static/jquery.js" type="text/javascript"></script>
-<script src="../_static/underscore.js" type="text/javascript"></script>
-<script src="../_static/doctools.js" type="text/javascript"></script>
-<script src="../_static/language_data.js" type="text/javascript"></script>
-<script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
-<script src="../_static/js/vendor/popper.min.js" type="text/javascript"></script>
-<script src="../_static/js/vendor/bootstrap.min.js" type="text/javascript"></script>
-<script src="../_static/js/theme.js" type="text/javascript"></script>
-<script type="text/javascript">
+
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+  
+
+
+  
+
+     
+       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+         <script type="text/javascript" src="../_static/jquery.js"></script>
+         <script type="text/javascript" src="../_static/underscore.js"></script>
+         <script type="text/javascript" src="../_static/doctools.js"></script>
+         <script type="text/javascript" src="../_static/language_data.js"></script>
+         <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+     
+
+  
+
+  <script type="text/javascript" src="../_static/js/vendor/popper.min.js"></script>
+  <script type="text/javascript" src="../_static/js/vendor/bootstrap.min.js"></script>
+  <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
   </script>
+ 
 <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
   (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -588,138 +822,174 @@ having a limited effect on accuracy.</p>
      $(".hr-bottom").hide();
    }
 </script>
-<!-- Begin Footer -->
-<div class="container-fluid docs-tutorials-resources" id="docs-tutorials-resources">
-<div class="container">
-<div class="row">
-<div class="col-md-4 text-center">
-<h2>Docs</h2>
-<p>Access comprehensive developer documentation for PyTorch</p>
-<a class="with-right-arrow" href="https://pytorch.org/docs/stable/index.html">View Docs</a>
+
+
+  <!-- Begin Footer -->
+
+  <div class="container-fluid docs-tutorials-resources" id="docs-tutorials-resources">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4 text-center">
+          <h2>Docs</h2>
+          <p>Access comprehensive developer documentation for PyTorch</p>
+          <a class="with-right-arrow" href="https://pytorch.org/docs/stable/index.html">View Docs</a>
+        </div>
+
+        <div class="col-md-4 text-center">
+          <h2>Tutorials</h2>
+          <p>Get in-depth tutorials for beginners and advanced developers</p>
+          <a class="with-right-arrow" href="https://pytorch.org/tutorials">View Tutorials</a>
+        </div>
+
+        <div class="col-md-4 text-center">
+          <h2>Resources</h2>
+          <p>Find development resources and get your questions answered</p>
+          <a class="with-right-arrow" href="https://pytorch.org/resources">View Resources</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container footer-container">
+      <div class="footer-logo-wrapper">
+        <a href="https://pytorch.org/" class="footer-logo"></a>
+      </div>
+
+      <div class="footer-links-wrapper">
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title"><a href="https://pytorch.org/">PyTorch</a></li>
+            <li><a href="https://pytorch.org/get-started">Get Started</a></li>
+            <li><a href="https://pytorch.org/features">Features</a></li>
+            <li><a href="https://pytorch.org/ecosystem">Ecosystem</a></li>
+            <li><a href="https://pytorch.org/blog/">Blog</a></li>
+            <li><a href="https://pytorch.org/resources">Resources</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title"><a href="https://pytorch.org/support">Support</a></li>
+            <li><a href="https://pytorch.org/tutorials">Tutorials</a></li>
+            <li><a href="https://pytorch.org/docs/stable/index.html">Docs</a></li>
+            <li><a href="https://discuss.pytorch.org" target="_blank">Discuss</a></li>
+            <li><a href="https://github.com/pytorch/pytorch/issues" target="_blank">Github Issues</a></li>
+            <li><a href="https://pytorch.slack.com" target="_blank">Slack</a></li>
+            <li><a href="https://github.com/pytorch/pytorch/blob/master/CONTRIBUTING.md" target="_blank">Contributing</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links-col follow-us-col">
+          <ul>
+            <li class="list-title">Follow Us</li>
+            <li>
+              <div id="mc_embed_signup">
+                <form
+                  action="https://twitter.us14.list-manage.com/subscribe/post?u=75419c71fe0a935e53dfa4a3f&id=91d0dccd39"
+                  method="post"
+                  id="mc-embedded-subscribe-form"
+                  name="mc-embedded-subscribe-form"
+                  class="email-subscribe-form validate"
+                  target="_blank"
+                  novalidate>
+                  <div id="mc_embed_signup_scroll" class="email-subscribe-form-fields-wrapper">
+                    <div class="mc-field-group">
+                      <label for="mce-EMAIL" style="display:none;">Email Address</label>
+                      <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="Email Address">
+                    </div>
+
+                    <div id="mce-responses" class="clear">
+                      <div class="response" id="mce-error-response" style="display:none"></div>
+                      <div class="response" id="mce-success-response" style="display:none"></div>
+                    </div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+
+                    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_75419c71fe0a935e53dfa4a3f_91d0dccd39" tabindex="-1" value=""></div>
+
+                    <div class="clear">
+                      <input type="submit" value="" name="subscribe" id="mc-embedded-subscribe" class="button email-subscribe-button">
+                    </div>
+                  </div>
+                </form>
+              </div>
+
+            </li>
+          </ul>
+
+          <div class="footer-social-icons">
+            <a href="https://www.facebook.com/pytorch" target="_blank" class="facebook"></a>
+            <a href="https://twitter.com/pytorch" target="_blank" class="twitter"></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <div class="cookie-banner-wrapper">
+  <div class="container">
+    <p class="gdpr-notice">To analyze traffic and optimize your experience, we serve cookies on this site. By clicking or navigating, you agree to allow our usage of cookies. As the current maintainers of this site, Facebook’s Cookies Policy applies. Learn more, including about available controls: <a href="https://www.facebook.com/policies/cookies/">Cookies Policy</a>.</p>
+    <img class="close-button" src="../_static/images/pytorch-x.svg">
+  </div>
 </div>
-<div class="col-md-4 text-center">
-<h2>Tutorials</h2>
-<p>Get in-depth tutorials for beginners and advanced developers</p>
-<a class="with-right-arrow" href="https://pytorch.org/tutorials">View Tutorials</a>
-</div>
-<div class="col-md-4 text-center">
-<h2>Resources</h2>
-<p>Find development resources and get your questions answered</p>
-<a class="with-right-arrow" href="https://pytorch.org/resources">View Resources</a>
-</div>
-</div>
-</div>
-</div>
-<footer class="site-footer">
-<div class="container footer-container">
-<div class="footer-logo-wrapper">
-<a class="footer-logo" href="https://pytorch.org/"></a>
-</div>
-<div class="footer-links-wrapper">
-<div class="footer-links-col">
-<ul>
-<li class="list-title"><a href="https://pytorch.org/">PyTorch</a></li>
-<li><a href="https://pytorch.org/get-started">Get Started</a></li>
-<li><a href="https://pytorch.org/features">Features</a></li>
-<li><a href="https://pytorch.org/ecosystem">Ecosystem</a></li>
-<li><a href="https://pytorch.org/blog/">Blog</a></li>
-<li><a href="https://pytorch.org/resources">Resources</a></li>
-</ul>
-</div>
-<div class="footer-links-col">
-<ul>
-<li class="list-title"><a href="https://pytorch.org/support">Support</a></li>
-<li><a href="https://pytorch.org/tutorials">Tutorials</a></li>
-<li><a href="https://pytorch.org/docs/stable/index.html">Docs</a></li>
-<li><a href="https://discuss.pytorch.org" target="_blank">Discuss</a></li>
-<li><a href="https://github.com/pytorch/pytorch/issues" target="_blank">Github Issues</a></li>
-<li><a href="https://pytorch.slack.com" target="_blank">Slack</a></li>
-<li><a href="https://github.com/pytorch/pytorch/blob/master/CONTRIBUTING.md" target="_blank">Contributing</a></li>
-</ul>
-</div>
-<div class="footer-links-col follow-us-col">
-<ul>
-<li class="list-title">Follow Us</li>
-<li>
-<div id="mc_embed_signup">
-<form action="https://twitter.us14.list-manage.com/subscribe/post?u=75419c71fe0a935e53dfa4a3f&amp;id=91d0dccd39" class="email-subscribe-form validate" id="mc-embedded-subscribe-form" method="post" name="mc-embedded-subscribe-form" novalidate="" target="_blank">
-<div class="email-subscribe-form-fields-wrapper" id="mc_embed_signup_scroll">
-<div class="mc-field-group">
-<label for="mce-EMAIL" style="display:none;">Email Address</label>
-<input class="required email" id="mce-EMAIL" name="EMAIL" placeholder="Email Address" type="email" value=""/>
-</div>
-<div class="clear" id="mce-responses">
-<div class="response" id="mce-error-response" style="display:none"></div>
-<div class="response" id="mce-success-response" style="display:none"></div>
-</div> <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
-<div aria-hidden="true" style="position: absolute; left: -5000px;"><input name="b_75419c71fe0a935e53dfa4a3f_91d0dccd39" tabindex="-1" type="text" value=""/></div>
-<div class="clear">
-<input class="button email-subscribe-button" id="mc-embedded-subscribe" name="subscribe" type="submit" value=""/>
-</div>
-</div>
-</form>
-</div>
-</li>
-</ul>
-<div class="footer-social-icons">
-<a class="facebook" href="https://www.facebook.com/pytorch" target="_blank"></a>
-<a class="twitter" href="https://twitter.com/pytorch" target="_blank"></a>
-</div>
-</div>
-</div>
-</div>
-</footer>
-<div class="cookie-banner-wrapper">
-<div class="container">
-<p class="gdpr-notice">To analyze traffic and optimize your experience, we serve cookies on this site. By clicking or navigating, you agree to allow our usage of cookies. As the current maintainers of this site, Facebook’s Cookies Policy applies. Learn more, including about available controls: <a href="https://www.facebook.com/policies/cookies/">Cookies Policy</a>.</p>
-<img class="close-button" src="../_static/images/pytorch-x.svg"/>
-</div>
-</div>
-<!-- End Footer -->
-<!-- Begin Mobile Menu -->
-<div class="mobile-main-menu">
-<div class="container-fluid">
-<div class="container">
-<div class="mobile-main-menu-header-container">
-<a aria-label="PyTorch" class="header-logo" href="https://pytorch.org/"></a>
-<a class="main-menu-close-button" data-behavior="close-mobile-menu" href="#"></a>
-</div>
-</div>
-</div>
-<div class="mobile-main-menu-links-container">
-<div class="main-menu">
-<ul>
-<li>
-<a href="#">Get Started</a>
-</li>
-<li>
-<a href="#">Features</a>
-</li>
-<li>
-<a href="#">Ecosystem</a>
-</li>
-<li>
-<a href="https://pytorch.org/blog/">Blog</a>
-</li>
-<li class="active">
-<a href="https://pytorch.org/tutorials">Tutorials</a>
-</li>
-<li>
-<a href="https://pytorch.org/docs/stable/index.html">Docs</a>
-</li>
-<li>
-<a href="https://pytorch.org/resources">Resources</a>
-</li>
-<li>
-<a href="https://github.com/pytorch/pytorch">Github</a>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<!-- End Mobile Menu -->
-<script src="../_static/js/vendor/anchor.min.js" type="text/javascript"></script>
-<script type="text/javascript">
+
+  <!-- End Footer -->
+
+  <!-- Begin Mobile Menu -->
+
+  <div class="mobile-main-menu">
+    <div class="container-fluid">
+      <div class="container">
+        <div class="mobile-main-menu-header-container">
+          <a class="header-logo" href="https://pytorch.org/" aria-label="PyTorch"></a>
+          <a class="main-menu-close-button" href="#" data-behavior="close-mobile-menu"></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="mobile-main-menu-links-container">
+      <div class="main-menu">
+        <ul>
+          <li>
+            <a href="#">Get Started</a>
+          </li>
+
+          <li>
+            <a href="#">Features</a>
+          </li>
+
+          <li>
+            <a href="#">Ecosystem</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/blog/">Blog</a>
+          </li>
+
+          <li class="active">
+            <a href="https://pytorch.org/tutorials">Tutorials</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/docs/stable/index.html">Docs</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/resources">Resources</a>
+          </li>
+
+          <li>
+            <a href="https://github.com/pytorch/pytorch">Github</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- End Mobile Menu -->
+
+  <script type="text/javascript" src="../_static/js/vendor/anchor.min.js"></script>
+
+  <script type="text/javascript">
     $(document).ready(function() {
       mobileMenu.bind();
       mobileTOC.bind();
