@@ -1,19 +1,22 @@
 # -*- coding: utf-8 -*-
 
 """
-Chatbot Tutorial
+챗봇 튜토리얼
 ================
 **Author:** `Matthew Inkawhich <https://github.com/MatthewInkawhich>`_
 """
 
 
 ######################################################################
-# In this tutorial, we explore a fun and interesting use-case of recurrent
-# sequence-to-sequence models. We will train a simple chatbot using movie
-# scripts from the `Cornell Movie-Dialogs
-# Corpus <https://www.cs.cornell.edu/~cristian/Cornell_Movie-Dialogs_Corpus.html>`__.
+# 이 튜토리얼에서는 순환(recurrent) sequence-to-sequence 모델의 재미있고
+# 흥미로운 사용 예를 살펴보려 합니다. 간단한 챗봇을 학습해 볼 텐데,
+# 사용할 데이터는 영화 대본으로 구성된 `Cornell Movie-Dialogs
+# Corpus <https://www.cs.cornell.edu/~cristian/Cornell_Movie-Dialogs_Corpus.html>`__ 입니다.
 #
-# Conversational models are a hot topic in artificial intelligence
+# 대화형 모델은 많은 사람들이 관심을 갖는 인공지능 분야의 연구 주제입니다.
+# 고객 서비스와 관련된 활용, 온라인 고객 서비스 등 챗봇은 여러 상황에서
+# 활용될 수 있습니다. 보통은 검색 기반(retrieval-based) 모델을 사용하는
+# 챗봇이 많이 사용되는데, 이는 특정한 형식을 갖춘 ///
 # research. Chatbots can be found in a variety of settings, including
 # customer service applications and online helpdesks. These bots are often
 # powered by retrieval-based models, which output predefined responses to
