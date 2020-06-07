@@ -142,14 +142,14 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/deep_learning_60min_blitz.html">파이토치(PyTorch)로 딥러닝하기: 60분만에 끝장내기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/data_loading_tutorial.html">사용자 정의 Dataset, Dataloader, Transforms 작성하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tensorboard_tutorial.html">Visualizing Models, Data, and Training with TensorBoard</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tensorboard_tutorial.html">TensorBoard로 모델, 데이터, 학습 시각화하기</a></li>
 </ul>
 <p class="caption"><span class="caption-text">이미지 (Image)</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="torchvision_tutorial.html">TorchVision 객체 검출 미세조정(Finetuning) 튜토리얼</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/transfer_learning_tutorial.html">컴퓨터 비전(Vision)을 위한 전이학습(Transfer Learning)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="spatial_transformer_tutorial.html">공간 변형기 네트워크(Spatial Transformer Networks) 튜토리얼</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../advanced/neural_style_tutorial.html">PyTorch를 이용한 신경망-변환(Neural-Transfer)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="spatial_transformer_tutorial.html">Spatial Transformer Networks Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/neural_style_tutorial.html">Neural Transfer Using PyTorch</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/fgsm_tutorial.html">적대적 예제 생성(Adversarial Example Generation)</a></li>
 </ul>
 <p class="caption"><span class="caption-text">오디오 (Audio)</span></p>
@@ -163,7 +163,7 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">기초부터 시작하는 NLP: Sequence to Sequence 네트워크와 Attention을 이용한 번역</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/text_sentiment_ngrams_tutorial.html">Text Classification with TorchText</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/torchtext_translation_tutorial.html">TorchText로 언어 번역하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/transformer_tutorial.html">Sequence-to-Sequence Modeling with nn.Transformer and TorchText</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/transformer_tutorial.html">nn.Transformer 와 TorchText 로 시퀀스-투-시퀀스(Sequence-to-Sequence) 모델링하기</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Named Tensor (experimental)</span></p>
 <ul>
@@ -382,8 +382,8 @@ Translate</a></p></li>
 <li><p><a class="reference external" href="https://arxiv.org/abs/1506.05869">A Neural Conversational Model</a></p></li>
 </ul>
 <p><strong>요구 사항</strong></p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">unicode_literals</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">division</span>
-<span class="kn">from</span> <span class="nn">io</span> <span class="k">import</span> <span class="nb">open</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">unicode_literals</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">division</span>
+<span class="kn">from</span> <span class="nn">io</span> <span class="kn">import</span> <span class="nb">open</span>
 <span class="kn">import</span> <span class="nn">unicodedata</span>
 <span class="kn">import</span> <span class="nn">string</span>
 <span class="kn">import</span> <span class="nn">re</span>
@@ -391,7 +391,7 @@ Translate</a></p></li>
 
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
-<span class="kn">from</span> <span class="nn">torch</span> <span class="k">import</span> <span class="n">optim</span>
+<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">optim</span>
 <span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="nn">F</span>
 
 <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
@@ -435,7 +435,7 @@ Translate</a></p></li>
 
 
 <span class="k">class</span> <span class="nc">Lang</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">word2index</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">word2count</span> <span class="o">=</span> <span class="p">{}</span>
@@ -563,7 +563,7 @@ Counting words...
 Counted words:
 fra 4345
 eng 2803
-[&#39;je suis touchee !&#39;, &#39;i m hit !&#39;]
+[&#39;je suis ponctuel .&#39;, &#39;i m punctual .&#39;]
 </pre></div>
 </div>
 </div>
@@ -601,7 +601,7 @@ Seq2Seq 모델은 시퀀스 길이와 순서를 자유롭게하기 때문에
 <img alt="" src="../_images/encoder-network.png" />
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">EncoderRNN</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_size</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_size</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">EncoderRNN</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">hidden_size</span> <span class="o">=</span> <span class="n">hidden_size</span>
 
@@ -636,7 +636,7 @@ Seq2Seq 모델은 시퀀스 길이와 순서를 자유롭게하기 때문에
 <img alt="" src="../_images/decoder-network.png" />
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">DecoderRNN</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">,</span> <span class="n">output_size</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">,</span> <span class="n">output_size</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">DecoderRNN</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">hidden_size</span> <span class="o">=</span> <span class="n">hidden_size</span>
 
@@ -665,7 +665,7 @@ Attention 메카니즘을 소개 할 것입니다.</p>
 <p>문맥 벡터만 인코더와 디코더 사이로 전달 된다면, 단일 벡터가 전체 문장을
 인코딩 해야하는 부담을 가지게 됩니다.</p>
 <p>Attention은 디코더 네트워크가 자기 출력의 모든 단계에서 인코더 출력의
-다른 부분에 “집중” 할 수 있게 합니다. 첫째 <em>Attension 가중치</em> 의 세트를
+다른 부분에 “집중” 할 수 있게 합니다. 첫째 <em>Attention 가중치</em> 의 세트를
 계산합니다. 이것은 가중치 조합을 만들기 위해서 인코더 출력 벡터와
 곱해집니다. 그 결과(코드에서 <code class="docutils literal notranslate"><span class="pre">attn_applied</span></code>)는 입력 시퀀스의
 특정 부분에 관한 정보를 포함해야하고 따라서 디코더가 알맞은 출력
@@ -683,7 +683,7 @@ Attention 메카니즘을 소개 할 것입니다.</p>
 <img alt="" src="../_images/attention-decoder-network.png" />
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">AttnDecoderRNN</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">,</span> <span class="n">output_size</span><span class="p">,</span> <span class="n">dropout_p</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="n">MAX_LENGTH</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">,</span> <span class="n">output_size</span><span class="p">,</span> <span class="n">dropout_p</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="n">MAX_LENGTH</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">AttnDecoderRNN</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">hidden_size</span> <span class="o">=</span> <span class="n">hidden_size</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">output_size</span> <span class="o">=</span> <span class="n">output_size</span>
@@ -917,7 +917,7 @@ Teacher Forcing을 사용할지 아니면 사용하지 않을지를 선택할 �
 예측을 되돌려 전달합니다.
 단어를 예측할 때마다 그 단어를 출력 문자열에 추가합니다.
 만약 EOS 토큰을 예측하면 거기에서 멈춥니다.
-나중에 도식화를 위해서 디코더의 Attension 출력을 저장합니다.</p>
+나중에 도식화를 위해서 디코더의 Attention 출력을 저장합니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="n">encoder</span><span class="p">,</span> <span class="n">decoder</span><span class="p">,</span> <span class="n">sentence</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="n">MAX_LENGTH</span><span class="p">):</span>
     <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
         <span class="n">input_tensor</span> <span class="o">=</span> <span class="n">tensorFromSentence</span><span class="p">(</span><span class="n">input_lang</span><span class="p">,</span> <span class="n">sentence</span><span class="p">)</span>
@@ -997,66 +997,66 @@ Teacher Forcing을 사용할지 아니면 사용하지 않을지를 선택할 �
 </li>
 </ul>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>2m 42s (- 38m 1s) (5000 6%) 2.8401
-5m 33s (- 36m 6s) (10000 13%) 2.2981
-7m 46s (- 31m 5s) (15000 20%) 1.9975
-9m 29s (- 26m 7s) (20000 26%) 1.7485
-12m 13s (- 24m 27s) (25000 33%) 1.5572
-14m 56s (- 22m 24s) (30000 40%) 1.3737
-17m 31s (- 20m 1s) (35000 46%) 1.2253
-20m 9s (- 17m 38s) (40000 53%) 1.1189
-23m 1s (- 15m 21s) (45000 60%) 0.9975
-25m 38s (- 12m 49s) (50000 66%) 0.9042
-28m 15s (- 10m 16s) (55000 73%) 0.8355
-30m 46s (- 7m 41s) (60000 80%) 0.7517
-33m 30s (- 5m 9s) (65000 86%) 0.7292
-36m 14s (- 2m 35s) (70000 93%) 0.6595
-39m 7s (- 0m 0s) (75000 100%) 0.5840
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>5m 10s (- 72m 32s) (5000 6%) 2.8191
+10m 25s (- 67m 44s) (10000 13%) 2.2977
+15m 39s (- 62m 38s) (15000 20%) 1.9981
+20m 57s (- 57m 38s) (20000 26%) 1.7657
+27m 6s (- 54m 12s) (25000 33%) 1.5631
+33m 20s (- 50m 0s) (30000 40%) 1.3798
+39m 31s (- 45m 10s) (35000 46%) 1.2502
+45m 43s (- 40m 0s) (40000 53%) 1.0991
+51m 59s (- 34m 39s) (45000 60%) 1.0175
+58m 14s (- 29m 7s) (50000 66%) 0.9203
+64m 32s (- 23m 28s) (55000 73%) 0.8440
+70m 54s (- 17m 43s) (60000 80%) 0.7442
+78m 5s (- 12m 0s) (65000 86%) 0.6931
+85m 20s (- 6m 5s) (70000 93%) 0.6204
+92m 33s (- 0m 0s) (75000 100%) 0.5702
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">evaluateRandomly</span><span class="p">(</span><span class="n">encoder1</span><span class="p">,</span> <span class="n">attn_decoder1</span><span class="p">)</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&gt; je suis en train de m entrainer .
-= i m exercising .
-&lt; i m talking . &lt;EOS&gt;
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&gt; il adore la lecture .
+= he s very fond of reading .
+&lt; he s very fond . &lt;EOS&gt;
 
-&gt; vous etes fort craintives .
-= you re very timid .
-&lt; you re very timid . &lt;EOS&gt;
+&gt; j essaye de recuperer mes enfants .
+= i m trying to get my children back .
+&lt; i m trying to my children . &lt;EOS&gt;
 
-&gt; elles sont asiatiques .
-= they re asian .
-&lt; they re asian . &lt;EOS&gt;
+&gt; je ne suis pas fatiguee .
+= i m not tired .
+&lt; i m not tired . &lt;EOS&gt;
 
-&gt; je me demande si j aime tom .
-= i m wondering if i love tom .
-&lt; i m really embarrassed i tom tom . &lt;EOS&gt;
+&gt; je ne suis pas ta servante .
+= i m not your maid .
+&lt; i m not your servant . &lt;EOS&gt;
 
-&gt; nous mourons de faim .
-= we re starving .
-&lt; we re hungry . &lt;EOS&gt;
+&gt; ils sont sur le point de commencer .
+= they are about to start .
+&lt; they are about to start . &lt;EOS&gt;
 
-&gt; je ne suis pas votre ennemie .
-= i am not your enemy .
-&lt; i m not your enemy . &lt;EOS&gt;
+&gt; je me specialise en sociologie .
+= i m majoring in sociology .
+&lt; i m in in sociology . &lt;EOS&gt;
 
-&gt; il est officier de l armee .
-= he is an army officer .
-&lt; he is an army . &lt;EOS&gt;
+&gt; tu es fort talentueux .
+= you re very talented .
+&lt; you re very talented . &lt;EOS&gt;
 
-&gt; je suis presque pret .
-= i am almost ready .
-&lt; i m about ready . &lt;EOS&gt;
+&gt; il n est pas gentil a son egard .
+= he is not kind to her .
+&lt; he is not kind of . . &lt;EOS&gt;
 
-&gt; il lui fait du chantage .
-= she is being blackmailed by him .
-&lt; she is being blackmailed by him . &lt;EOS&gt;
+&gt; j ai faim .
+= i m feeling hungry .
+&lt; i m hungry hungry . &lt;EOS&gt;
 
-&gt; il manque de pratique .
-= he s out of practice .
-&lt; he s out of practice . &lt;EOS&gt;
+&gt; elle lui est vaguement apparentee .
+= she is distantly related to him .
+&lt; she is related to him . &lt;EOS&gt;
 </pre></div>
 </div>
 <div class="section" id="id13">
@@ -1123,11 +1123,11 @@ Teacher Forcing을 사용할지 아니면 사용하지 않을지를 선택할 �
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>input = elle a cinq ans de moins que moi .
 output = she s five years younger than i am . &lt;EOS&gt;
 input = elle est trop petit .
-output = she is too short . &lt;EOS&gt;
+output = she s too trusting . &lt;EOS&gt;
 input = je ne crains pas de mourir .
-output = i m not dying to die . &lt;EOS&gt;
+output = i m not afraid to die . &lt;EOS&gt;
 input = c est un jeune directeur plein de talent .
-output = he s a very in in . &lt;EOS&gt;
+output = he s a talented young . &lt;EOS&gt;
 </pre></div>
 </div>
 </div>
@@ -1158,7 +1158,7 @@ embedding 을 교체하십시오</p></li>
 </ul>
 </li>
 </ul>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 39 minutes  13.251 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 92 minutes  40.142 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-intermediate-seq2seq-translation-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/3baf9960a4be104931872ff3ffda07b7/seq2seq_translation_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">seq2seq_translation_tutorial.py</span></code></a></p>
@@ -1261,11 +1261,11 @@ embedding 을 교체하십시오</p></li>
 
      
        <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-         <script type="text/javascript" src="../_static/jquery.js"></script>
-         <script type="text/javascript" src="../_static/underscore.js"></script>
-         <script type="text/javascript" src="../_static/doctools.js"></script>
-         <script type="text/javascript" src="../_static/language_data.js"></script>
-         <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+         <script src="../_static/jquery.js"></script>
+         <script src="../_static/underscore.js"></script>
+         <script src="../_static/doctools.js"></script>
+         <script src="../_static/language_data.js"></script>
+         <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
      
 
   

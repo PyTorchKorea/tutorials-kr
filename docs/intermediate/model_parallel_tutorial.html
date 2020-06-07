@@ -79,7 +79,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/deep_learning_60min_blitz.html">파이토치(PyTorch)로 딥러닝하기: 60분만에 끝장내기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/data_loading_tutorial.html">사용자 정의 Dataset, Dataloader, Transforms 작성하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tensorboard_tutorial.html">Visualizing Models, Data, and Training with TensorBoard</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tensorboard_tutorial.html">TensorBoard로 모델, 데이터, 학습 시각화하기</a></li>
 </ul>
 <p class="caption"><span class="caption-text">이미지 (Image)</span></p>
 <ul>
@@ -100,7 +100,7 @@
 <li class="toctree-l1"><a class="reference internal" href="seq2seq_translation_tutorial.html">기초부터 시작하는 NLP: Sequence to Sequence 네트워크와 Attention을 이용한 번역</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/text_sentiment_ngrams_tutorial.html">Text Classification with TorchText</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/torchtext_translation_tutorial.html">TorchText로 언어 번역하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/transformer_tutorial.html">Sequence-to-Sequence Modeling with nn.Transformer and TorchText</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/transformer_tutorial.html">nn.Transformer 와 TorchText 로 시퀀스-투-시퀀스(Sequence-to-Sequence) 모델링하기</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Named Tensor (experimental)</span></p>
 <ul>
@@ -180,15 +180,15 @@
 <div class="pytorch-call-to-action-links">
 <div id="tutorial-type">intermediate/model_parallel_tutorial</div>
 <div id="google-colab-link">
-<img class="call-to-action-img" src="../_static/images/pytorch-colab.svg">
+<img class="call-to-action-img" src="../_static/images/pytorch-colab.svg"/>
 <div class="call-to-action-desktop-view">Run in Google Colab</div>
 <div class="call-to-action-mobile-view">Colab</div>
-</img></div>
+</div>
 <div id="download-notebook-link">
-<img class="call-to-action-notebook-img" src="../_static/images/pytorch-download.svg">
+<img class="call-to-action-notebook-img" src="../_static/images/pytorch-download.svg"/>
 <div class="call-to-action-desktop-view">Download Notebook</div>
 <div class="call-to-action-mobile-view">Notebook</div>
-</img></div>
+</div>
 <div id="github-view-link">
 <img class="call-to-action-img" src="../_static/images/pytorch-github.svg"/>
 <div class="call-to-action-desktop-view">View on GitHub</div>
@@ -244,7 +244,7 @@ inputs and intermediate outputs to match the layer devices accordingly.</p>
 
 
 <span class="k">class</span> <span class="nc">ToyModel</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">ToyModel</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">net1</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s1">'cuda:0'</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">relu</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">()</span>
@@ -282,13 +282,13 @@ with just a few lines of changes. The code below shows how to decompose
 the existing <code class="docutils literal notranslate"><span class="pre">ResNet</span></code> module, and split the layers to two GPUs during
 construction. Then, override the <code class="docutils literal notranslate"><span class="pre">forward</span></code> method to stitch two
 sub-networks by moving the intermediate outputs accordingly.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torchvision.models.resnet</span> <span class="k">import</span> <span class="n">ResNet</span><span class="p">,</span> <span class="n">Bottleneck</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torchvision.models.resnet</span> <span class="kn">import</span> <span class="n">ResNet</span><span class="p">,</span> <span class="n">Bottleneck</span>
 
 <span class="n">num_classes</span> <span class="o">=</span> <span class="mi">1000</span>
 
 
 <span class="k">class</span> <span class="nc">ModelParallelResNet50</span><span class="p">(</span><span class="n">ResNet</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">ModelParallelResNet50</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">Bottleneck</span><span class="p">,</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="n">num_classes</span><span class="o">=</span><span class="n">num_classes</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
@@ -428,7 +428,7 @@ GPUs.</p>
 implementation does not need to spawn multiple threads to achieve
 concurrency.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">PipelineParallelResNet50</span><span class="p">(</span><span class="n">ModelParallelResNet50</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">split_size</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">split_size</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">PipelineParallelResNet50</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">split_size</span> <span class="o">=</span> <span class="n">split_size</span>
 
@@ -554,7 +554,7 @@ inputs.</p>
 <div class="helpful-question no-link" data-behavior="was-this-helpful-event" data-response="no">No</div>
 <div class="was-helpful-thank-you">Thank you</div>
 </div>
-<hr class="helpful-hr hr-bottom">
+<hr class="helpful-hr hr-bottom"/>
 <div role="contentinfo">
 <p>
         © Copyright 2019, PyTorch.
@@ -564,7 +564,7 @@ inputs.</p>
 <div>
         Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
       </div>
-</hr></footer>
+</footer>
 </div>
 </div>
 <div class="pytorch-content-right" id="pytorch-content-right">
@@ -584,11 +584,11 @@ inputs.</p>
 </section>
 </div>
 <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js" type="text/javascript"></script>
-<script src="../_static/jquery.js" type="text/javascript"></script>
-<script src="../_static/underscore.js" type="text/javascript"></script>
-<script src="../_static/doctools.js" type="text/javascript"></script>
-<script src="../_static/language_data.js" type="text/javascript"></script>
-<script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
+<script src="../_static/jquery.js"></script>
+<script src="../_static/underscore.js"></script>
+<script src="../_static/doctools.js"></script>
+<script src="../_static/language_data.js"></script>
+<script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
 <script src="../_static/js/vendor/popper.min.js" type="text/javascript"></script>
 <script src="../_static/js/vendor/bootstrap.min.js" type="text/javascript"></script>
 <script src="../_static/js/theme.js" type="text/javascript"></script>
