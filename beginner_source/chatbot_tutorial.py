@@ -387,7 +387,6 @@ def filterPairs(pairs):
     return [pair for pair in pairs if filterPair(pair)]
 
 # 앞에서 정의한 함수를 이용하여 만든 voc 객체와 리스트 pairs를 반환합니다
-Using the functions defined above, return a populated voc object and pairs list
 def loadPrepareData(corpus, corpus_name, datafile, save_dir):
     print("Start preparing training data ...")
     voc, pairs = readVocs(datafile, corpus_name)
