@@ -14,7 +14,7 @@ DATADIR       = _data
 GH_PAGES_SOURCES = $(SOURCEDIR) Makefile
 
 ZIPOPTS       ?= -qo
-TAROPTS       ?= -xzf
+TAROPTS       ?=
 
 # Put it first so that "make" without argument is like "make help".
 help:
@@ -78,7 +78,7 @@ download:
 
 	# Download dataset for beginner_source/audio_classifier_tutorial.py
 	wget -N https://s3.amazonaws.com/pytorch-tutorial-assets/UrbanSound8K.tar.gz -P $(DATADIR)
-	tar $(TAROPTS) $(DATADIR)/UrbanSound8K.tar.gz -C ./beginner_source/data/
+	tar $(TAROPTS) -xzf $(DATADIR)/UrbanSound8K.tar.gz -C ./beginner_source/data/
 
 	# Download model for beginner_source/fgsm_tutorial.py
 	wget -N https://s3.amazonaws.com/pytorch-tutorial-assets/lenet_mnist_model.pth -P $(DATADIR)
@@ -108,11 +108,12 @@ docs:
 	touch docs/.nojekyll
 
 html-noplot:
+	make clean
 	$(SPHINXBUILD) -D plot_gallery=0 -b html $(SPHINXOPTS) "$(SOURCEDIR)" "$(BUILDDIR)/html"
-	bash .jenkins/remove_invisible_code_block_batch.sh "$(BUILDDIR)/html"
+	# bash .jenkins/remove_invisible_code_block_batch.sh "$(BUILDDIR)/html"
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
 
 clean-cache:
 	make clean
-	rm -rf advanced beginner intermediate
+	rm -rf advanced beginner intermediate recipes

@@ -31,7 +31,7 @@ TorchVision 객체 검출 미세조정(Finetuning) 튜토리얼
 
    -  ``boxes (FloatTensor[N, 4])``:  ``N`` 개의 바운딩 박스(Bounding box)의 좌표를 ``[x0, y0, x1, y1]`` 형태로 가집니다.
    x와 관련된 값 범위는 ``0`` 부터 ``W`` 이고 y와 관련된 값의 범위는 ``0`` 부터 ``H`` 까지입니다.
-   -  ``labels (Int64Tensor[N])``: 바운딩 박스 마다의 라벨 정보입니다.
+   -  ``labels (Int64Tensor[N])``: 바운딩 박스 마다의 라벨 정보입니다. ``0`` 은 항상 배경의 클래스를 표현합니다.
    -  ``image_id (Int64Tensor[1])``: 이미지 구분자입니다. 데이터셋의 모든 이미지 간에 고유한 값이어야 하며 평가 중에도 사용됩니다.
    -  ``area (Tensor[N])``: 바운딩 박스의 면적입니다. 면적은 평가 시 작음,중간,큰 박스 간의 점수를 내기 위한 기준이며 COCO 평가를 기준으로 합니다.
    -  ``iscrowd (UInt8Tensor[N])``: 이 값이 참일 경우 평가에서 제외합니다.
@@ -44,8 +44,12 @@ TorchVision 객체 검출 미세조정(Finetuning) 튜토리얼
 모델이 위의 방법대로 리턴을 하면, 학습과 평가 둘 다에 대해서 동작을 할 것이며
 평가 스크립트는 ``pycocotools`` 를 이용하게 될 것입니다.
 
+``labels`` 에 대한 참고사항. 이 모델은 클래스 ``0`` 을 배경으로 취급합니다. 만약 준비한 데이터셋에 배경의 클래스가 없다면, ``labels`` 에도 ``0`` 이 없어야 합니다.
+예를 들어, *고양이* 와 *강아지* 의 오직 2개의 클래스만 분류한다고 가정하면, (``0`` 이 아닌) ``1`` 이 *고양이* 를, ``2`` 가 *강아지* 를 나타내도록 정의해야 합니다.
+따라서, 이 예시에서, 어떤 이미지에 두 개의 클래스를 모두 있다면, ``labels`` 텐서는 ``[1,2]`` 와 같은 식이 되어야 합니다.
+
 추가로, 학습 중에 가로 세로 비율 그룹화를 사용하려는 경우(각 배치에 유사한 가로 세로 비율이 있는 영상만 포함되도록),
-이미지의 넓이, 높이를 리턴할 수 있도록``get_height_and_width`` 메소드를 구현하기를 추천합니다.
+이미지의 넓이, 높이를 리턴할 수 있도록 ``get_height_and_width`` 메소드를 구현하기를 추천합니다.
 이 메소드가 구현되지 않은 경우에는 모든 데이터셋은 ``__getitem__`` 를 통해 메모리에 이미지가 로드되며
 사용자 정의 메소드를 제공하는 것보다 느릴 수 있습니다.
 
@@ -308,6 +312,7 @@ PennFudan 데이터셋을 위한 인스턴스 분할 모델
 동작하는지 살펴보는 것이 좋습니다.
 
 .. code:: python
+
    model = torchvision.models.detection.fasterrcnn_resnet50_fpn(pretrained=True)
    dataset = PennFudanDataset('PennFudanPed', get_transform(train=True))
    data_loader = torch.utils.data.DataLoader(
