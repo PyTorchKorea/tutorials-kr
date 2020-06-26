@@ -15,7 +15,7 @@
    :button_text: 60분 만에 끝장내기 시작
 
 .. customcalloutitem::
-   :description: 한 입 크기의, 바로 사용할 수 있는 PyTorch 코드 예제들
+   :description: 한 입 크기의, 바로 사용할 수 있는 PyTorch 코드 예제들을 확인해보세요.
    :header: 파이토치(PyTorch) 레시피
    :button_link: recipes/recipes_index.html
    :button_text: 레시피 찾아보기
@@ -306,7 +306,7 @@
    :tags: Parallel-and-Distributed-Training
 
 .. customcarditem::
-   :header: intermediate/dist_tuto.html
+   :header: PyTorch로 분산 어플리케이션 개발하기
    :card_description: PyTorch의 분산 패키지를 설정하고, 서로 다른 통신 전략을 사용하고, 내부를 살펴봅니다.
    :image: _static/img/thumbnails/cropped/Writing-Distributed-Applications-with-PyTorch.png
    :link: intermediate/dist_tuto.html
