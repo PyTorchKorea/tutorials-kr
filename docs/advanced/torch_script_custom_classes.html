@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Extending TorchScript with Custom C++ Classes &mdash; PyTorch Tutorials 1.4.0 documentation</title>
+  <title>Extending TorchScript with Custom C++ Classes &mdash; PyTorch Tutorials 1.5.0 documentation</title>
   
 
   
@@ -30,66 +30,57 @@
   <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Creating Extensions Using numpy and scipy" href="numpy_extensions_tutorial.html" />
+    <link rel="next" title="Autograd in C++ Frontend" href="cpp_autograd.html" />
     <link rel="prev" title="Extending TorchScript with Custom C++ Operators" href="torch_script_custom_ops.html" /> 
 
   
   <script src="../_static/js/modernizr.min.js"></script>
+
+  <!-- Preload the theme fonts -->
+
+<link rel="preload" href="../_static/fonts/FreightSans/freight-sans-book.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../_static/fonts/FreightSans/freight-sans-medium.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../_static/fonts/IBMPlexMono/IBMPlexMono-Medium.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../_static/fonts/FreightSans/freight-sans-bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../_static/fonts/FreightSans/freight-sans-medium-italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../_static/fonts/IBMPlexMono/IBMPlexMono-SemiBold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+
+<!-- Preload the katex fonts -->
+
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Math-Italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size1-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size4-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size2-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size3-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Caligraphic-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
 </head>
 
-<a class="github-ribbon" href="https://github.com/9bow/PyTorch-tutorials-kr">
-  <img class="ribbon-img" width="149" height="149" src="https://github.blog/wp-content/uploads/2008/12/forkme_left_red_aa0000.png?resize=149%2C149" class="attachment-full size-full" alt="Fork me on GitHub" data-recalc-dims="1">
-</a>
-
-<div class="container-fluid header-holder tutorials-header" id="header-holder">
-  <div class="container">
-    <div class="header-container">
-      <a class="header-logo" href="https://pytorch.org/" aria-label="PyTorch"></a>
-
-      <div class="main-menu">
-        <ul>
-          <li>
-            <a href="https://pytorch.org/get-started">Get Started</a>
+<body class="pytorch-body">
+  <nav class="navbar sticky-top navbar-dark fixed-top navbar-expand-lg" style="background: rgba(55,55,55,.8)">
+    <div class="container-fluid">
+      <div class="navbar-brand">
+        <a href="https://pytorch.kr/" aria-label="PyTorch">
+          <img src="../_static/images/logo-kr.svg" width="260" height="28" fill="white" />
+        </a>
+      </div>
+      <button type="button" aria-label="Toggle navigation" class="navbar-toggler collapsed" aria-expanded="false" aria-controls="nav-collapse"><span class="navbar-toggler-icon"></span></button>
+      <div id="nav-collapse" class="navbar-collapse collapse">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item">
+            <a href="//pytorch.kr/" target="_self" class="nav-link">홈</a></li>
+          <li class="nav-item">
+            <a href="//tutorials.pytorch.kr/" target="_self" class="nav-link">튜토리얼</a>
           </li>
-
-          <li>
-            <a href="https://pytorch.org/features">Features</a>
-          </li>
-
-          <li>
-            <a href="https://pytorch.org/ecosystem">Ecosystem</a>
-          </li>
-
-          <li>
-            <a href="https://pytorch.org/blog/">Blog</a>
-          </li>
-
-          <li class="active">
-            <a href="https://pytorch.org/tutorials">Tutorials</a>
-          </li>
-
-          <li>
-            <a href="https://pytorch.org/docs/stable/index.html">Docs</a>
-          </li>
-
-          <li>
-            <a href="https://pytorch.org/resources">Resources</a>
-          </li>
-
-          <li>
-            <a href="https://github.com/pytorch/pytorch">Github</a>
-          </li>
+          <li class="nav-item">
+            <a href="//pytorch.kr/about" target="_self" class="nav-link">
+              소개
+            </a></li>
         </ul>
       </div>
-
-      <a class="main-menu-open-button" href="#" data-behavior="open-mobile-menu"></a>
     </div>
-
-  </div>
-</div>
-
-
-<body class="pytorch-body">
+  </nav>
 
    
 
@@ -110,7 +101,7 @@
               
               
                 <div class="version">
-                  1.4.0
+                  1.5.0
                 </div>
               
             
@@ -138,79 +129,74 @@
               
             
             
-              <p class="caption"><span class="caption-text">시작하기 (Getting Started)</span></p>
+              <p class="caption"><span class="caption-text">파이토치(PyTorch) 레시피</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../recipes/recipes_index.html">모든 레시피 보기</a></li>
+</ul>
+<p class="caption"><span class="caption-text">파이토치(PyTorch) 배우기</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/deep_learning_60min_blitz.html">파이토치(PyTorch)로 딥러닝하기: 60분만에 끝장내기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/data_loading_tutorial.html">사용자 정의 Dataset, Dataloader, Transforms 작성하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/pytorch_with_examples.html">예제로 배우는 파이토치(PyTorch)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/nn_tutorial.html">What is <cite>torch.nn</cite> <em>really</em>?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/tensorboard_tutorial.html">TensorBoard로 모델, 데이터, 학습 시각화하기</a></li>
 </ul>
-<p class="caption"><span class="caption-text">이미지 (Image)</span></p>
+<p class="caption"><span class="caption-text">이미지/비디오</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/torchvision_tutorial.html">TorchVision 객체 검출 미세조정(Finetuning) 튜토리얼</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/transfer_learning_tutorial.html">컴퓨터 비전(Vision)을 위한 전이학습(Transfer Learning)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/spatial_transformer_tutorial.html">Spatial Transformer Networks Tutorial</a></li>
-<li class="toctree-l1"><a class="reference internal" href="neural_style_tutorial.html">Neural Transfer Using PyTorch</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/fgsm_tutorial.html">적대적 예제 생성(Adversarial Example Generation)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/dcgan_faces_tutorial.html">DCGAN Tutorial</a></li>
 </ul>
-<p class="caption"><span class="caption-text">오디오 (Audio)</span></p>
+<p class="caption"><span class="caption-text">오디오</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/audio_preprocessing_tutorial.html">torchaudio Tutorial</a></li>
 </ul>
-<p class="caption"><span class="caption-text">텍스트 (Text)</span></p>
+<p class="caption"><span class="caption-text">텍스트</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/transformer_tutorial.html">nn.Transformer 와 TorchText 로 시퀀스-투-시퀀스(Sequence-to-Sequence) 모델링하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/char_rnn_classification_tutorial.html">기초부터 시작하는 NLP: 문자-단위 RNN으로 이름 분류하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/char_rnn_generation_tutorial.html">기초부터 시작하는 NLP:  문자-단위 RNN으로 이름 생성하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/seq2seq_translation_tutorial.html">기초부터 시작하는 NLP: Sequence to Sequence 네트워크와 Attention을 이용한 번역</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/text_sentiment_ngrams_tutorial.html">Text Classification with TorchText</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/torchtext_translation_tutorial.html">TorchText로 언어 번역하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/transformer_tutorial.html">nn.Transformer 와 TorchText 로 시퀀스-투-시퀀스(Sequence-to-Sequence) 모델링하기</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Named Tensor (experimental)</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/named_tensor_tutorial.html">(experimental) Introduction to Named Tensors in PyTorch</a></li>
-</ul>
-<p class="caption"><span class="caption-text">강화 학습</span></p>
+<p class="caption"><span class="caption-text">강화학습</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/reinforcement_q_learning.html">강화 학습 (DQN) 튜토리얼</a></li>
 </ul>
-<p class="caption"><span class="caption-text">PyTorch 모델을 운영환경에 배포하기</span></p>
+<p class="caption"><span class="caption-text">PyTorch 모델을 프로덕션 환경에 배포하기</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/flask_rest_api_tutorial.html">Flask를 이용하여 Python에서 PyTorch를 REST API로 배포하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/Intro_to_TorchScript_tutorial.html">TorchScript 소개</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cpp_export.html">C++에서 TorchScript 모델 로딩하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="super_resolution_with_onnxruntime.html">(선택) PyTorch 모델을 ONNX으로 변환하고 ONNX 런타임에서 실행하기</a></li>
 </ul>
-<p class="caption"><span class="caption-text">병렬 &amp; 분산 학습</span></p>
+<p class="caption"><span class="caption-text">프론트엔드 API</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/named_tensor_tutorial.html">(experimental) Introduction to Named Tensors in PyTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/memory_format_tutorial.html">(experimental) Channels Last Memory Format in PyTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cpp_frontend.html">Using the PyTorch C++ Frontend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cpp_extension.html">Custom C++ and CUDA Extensions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_script_custom_ops.html">Extending TorchScript with Custom C++ Operators</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Extending TorchScript with Custom C++ Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cpp_autograd.html">Autograd in C++ Frontend</a></li>
+</ul>
+<p class="caption"><span class="caption-text">모델 최적화</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/pruning_tutorial.html">Pruning Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dynamic_quantization_tutorial.html">(experimental) Dynamic Quantization on an LSTM Word Language Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/dynamic_quantization_bert_tutorial.html">(experimental) Dynamic Quantization on BERT</a></li>
+<li class="toctree-l1"><a class="reference internal" href="static_quantization_tutorial.html">(experimental) Static Quantization with Eager Mode in PyTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/quantized_transfer_learning_tutorial.html">(experimental) Quantized Transfer Learning for Computer Vision Tutorial</a></li>
+</ul>
+<p class="caption"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/model_parallel_tutorial.html">Single-Machine Model Parallel Best Practices</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/ddp_tutorial.html">Getting Started with Distributed Data Parallel</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/dist_tuto.html">PyTorch로 분산 어플리케이션 개발하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/rpc_tutorial.html">Getting Started with Distributed RPC Framework</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/aws_distributed_training_tutorial.html">(advanced) PyTorch 1.0 Distributed Trainer with Amazon AWS</a></li>
-</ul>
-<p class="caption"><span class="caption-text">PyTorch 확장하기</span></p>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="torch_script_custom_ops.html">Extending TorchScript with Custom C++ Operators</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Extending TorchScript with Custom C++ Classes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="numpy_extensions_tutorial.html">Creating Extensions Using numpy and scipy</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cpp_extension.html">Custom C++ and CUDA Extensions</a></li>
-</ul>
-<p class="caption"><span class="caption-text">모델 최적화</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="dynamic_quantization_tutorial.html">(experimental) Dynamic Quantization on an LSTM Word Language Model</a></li>
-<li class="toctree-l1"><a class="reference internal" href="static_quantization_tutorial.html">(experimental) Static Quantization with Eager Mode in PyTorch</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/quantized_transfer_learning_tutorial.html">(experimental) Quantized Transfer Learning for Computer Vision Tutorial</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/dynamic_quantization_bert_tutorial.html">(experimental) Dynamic Quantization on BERT</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/pruning_tutorial.html">Pruning Tutorial</a></li>
-</ul>
-<p class="caption"><span class="caption-text">다른 언어에서의 PyTorch</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="cpp_frontend.html">Using the PyTorch C++ Frontend</a></li>
-</ul>
-<p class="caption"><span class="caption-text">PyTorch Fundamentals In-Depth</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/pytorch_with_examples.html">예제로 배우는 파이토치(PyTorch)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/nn_tutorial.html">What is <cite>torch.nn</cite> <em>really</em>?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/rpc_param_server_tutorial.html">Implementing a Parameter Server Using Distributed RPC Framework</a></li>
 </ul>
 
             
@@ -330,9 +316,9 @@ state in a member variable.</p>
 <span class="cp">#include</span> <span class="cpf">&lt;vector&gt;</span><span class="cp"></span>
 
 <span class="k">template</span> <span class="o">&lt;</span><span class="k">class</span> <span class="nc">T</span><span class="o">&gt;</span>
-<span class="k">struct</span> <span class="nl">Stack</span> <span class="p">:</span> <span class="n">torch</span><span class="o">::</span><span class="n">jit</span><span class="o">::</span><span class="n">CustomClassHolder</span> <span class="p">{</span>
+<span class="k">struct</span> <span class="nl">MyStackClass</span> <span class="p">:</span> <span class="n">torch</span><span class="o">::</span><span class="n">CustomClassHolder</span> <span class="p">{</span>
   <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">stack_</span><span class="p">;</span>
-  <span class="n">Stack</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">init</span><span class="p">)</span> <span class="o">:</span> <span class="n">stack_</span><span class="p">(</span><span class="n">init</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span> <span class="n">init</span><span class="p">.</span><span class="n">end</span><span class="p">())</span> <span class="p">{}</span>
+  <span class="n">MyStackClass</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">init</span><span class="p">)</span> <span class="o">:</span> <span class="n">stack_</span><span class="p">(</span><span class="n">init</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span> <span class="n">init</span><span class="p">.</span><span class="n">end</span><span class="p">())</span> <span class="p">{}</span>
 
   <span class="kt">void</span> <span class="n">push</span><span class="p">(</span><span class="n">T</span> <span class="n">x</span><span class="p">)</span> <span class="p">{</span>
     <span class="n">stack_</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">x</span><span class="p">);</span>
@@ -343,11 +329,11 @@ state in a member variable.</p>
     <span class="k">return</span> <span class="n">val</span><span class="p">;</span>
   <span class="p">}</span>
 
-  <span class="n">c10</span><span class="o">::</span><span class="n">intrusive_ptr</span><span class="o">&lt;</span><span class="n">Stack</span><span class="o">&gt;</span> <span class="n">clone</span><span class="p">()</span> <span class="k">const</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="n">c10</span><span class="o">::</span><span class="n">make_intrusive</span><span class="o">&lt;</span><span class="n">Stack</span><span class="o">&gt;</span><span class="p">(</span><span class="n">stack_</span><span class="p">);</span>
+  <span class="n">c10</span><span class="o">::</span><span class="n">intrusive_ptr</span><span class="o">&lt;</span><span class="n">MyStackClass</span><span class="o">&gt;</span> <span class="n">clone</span><span class="p">()</span> <span class="k">const</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="n">c10</span><span class="o">::</span><span class="n">make_intrusive</span><span class="o">&lt;</span><span class="n">MyStackClass</span><span class="o">&gt;</span><span class="p">(</span><span class="n">stack_</span><span class="p">);</span>
   <span class="p">}</span>
 
-  <span class="kt">void</span> <span class="n">merge</span><span class="p">(</span><span class="k">const</span> <span class="n">c10</span><span class="o">::</span><span class="n">intrusive_ptr</span><span class="o">&lt;</span><span class="n">Stack</span><span class="o">&gt;&amp;</span> <span class="n">c</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kt">void</span> <span class="n">merge</span><span class="p">(</span><span class="k">const</span> <span class="n">c10</span><span class="o">::</span><span class="n">intrusive_ptr</span><span class="o">&lt;</span><span class="n">MyStackClass</span><span class="o">&gt;&amp;</span> <span class="n">c</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">for</span> <span class="p">(</span><span class="k">auto</span><span class="o">&amp;</span> <span class="nl">elem</span> <span class="p">:</span> <span class="n">c</span><span class="o">-&gt;</span><span class="n">stack_</span><span class="p">)</span> <span class="p">{</span>
       <span class="n">push</span><span class="p">(</span><span class="n">elem</span><span class="p">);</span>
     <span class="p">}</span>
@@ -365,48 +351,49 @@ as a smart pointer like <code class="docutils literal notranslate"><span class="
 is to ensure consistent lifetime management of the object instances between languages
 (C++, Python and TorchScript).</p></li>
 <li><p>The second thing to notice is that the user-defined class must inherit from
-<code class="docutils literal notranslate"><span class="pre">torch::jit::CustomClassHolder</span></code>. This ensures that everything is set up to handle
+<code class="docutils literal notranslate"><span class="pre">torch::CustomClassHolder</span></code>. This ensures that everything is set up to handle
 the lifetime management system previously mentioned.</p></li>
 </ul>
 <p>Now let’s take a look at how we will make this class visible to TorchScript, a process called
 <em>binding</em> the class:</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// Notice a few things:</span>
 <span class="c1">// - We pass the class to be registered as a template parameter to</span>
-<span class="c1">//   `torch::jit::class_`. In this instance, we&#39;ve passed the</span>
-<span class="c1">//   specialization of the Stack class ``Stack&lt;std::string&gt;``.</span>
+<span class="c1">//   `torch::class_`. In this instance, we&#39;ve passed the</span>
+<span class="c1">//   specialization of the MyStackClass class ``MyStackClass&lt;std::string&gt;``.</span>
 <span class="c1">//   In general, you cannot register a non-specialized template</span>
 <span class="c1">//   class. For non-templated classes, you can just pass the</span>
 <span class="c1">//   class name directly as the template parameter.</span>
-<span class="c1">// - The single parameter to ``torch::jit::class_()`` is a</span>
-<span class="c1">//   string indicating the name of the class. This is the name</span>
-<span class="c1">//   the class will appear as in both Python and TorchScript.</span>
-<span class="c1">//   For example, our Stack class would appear as ``torch.classes.Stack``.</span>
+<span class="c1">// - The arguments passed to the constructor make up the &quot;qualified name&quot;</span>
+<span class="c1">//   of the class. In this case, the registered class will appear in</span>
+<span class="c1">//   Python and C++ as `torch.classes.my_classes.MyStackClass`. We call</span>
+<span class="c1">//   the first argument the &quot;namespace&quot; and the second argument the</span>
+<span class="c1">//   actual class name.</span>
 <span class="k">static</span> <span class="k">auto</span> <span class="n">testStack</span> <span class="o">=</span>
-  <span class="n">torch</span><span class="o">::</span><span class="n">jit</span><span class="o">::</span><span class="n">class_</span><span class="o">&lt;</span><span class="n">Stack</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;&gt;</span><span class="p">(</span><span class="s">&quot;Stack&quot;</span><span class="p">)</span>
-      <span class="c1">// The following line registers the contructor of our Stack</span>
+  <span class="n">torch</span><span class="o">::</span><span class="n">class_</span><span class="o">&lt;</span><span class="n">MyStackClass</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;&gt;</span><span class="p">(</span><span class="s">&quot;my_classes&quot;</span><span class="p">,</span> <span class="s">&quot;MyStackClass&quot;</span><span class="p">)</span>
+      <span class="c1">// The following line registers the contructor of our MyStackClass</span>
       <span class="c1">// class that takes a single `std::vector&lt;std::string&gt;` argument,</span>
-      <span class="c1">// i.e. it exposes the C++ method `Stack(std::vector&lt;T&gt; init)`.</span>
+      <span class="c1">// i.e. it exposes the C++ method `MyStackClass(std::vector&lt;T&gt; init)`.</span>
       <span class="c1">// Currently, we do not support registering overloaded</span>
       <span class="c1">// constructors, so for now you can only `def()` one instance of</span>
-      <span class="c1">// `torch::jit::init`.</span>
-      <span class="p">.</span><span class="n">def</span><span class="p">(</span><span class="n">torch</span><span class="o">::</span><span class="n">jit</span><span class="o">::</span><span class="n">init</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;&gt;</span><span class="p">())</span>
+      <span class="c1">// `torch::init`.</span>
+      <span class="p">.</span><span class="n">def</span><span class="p">(</span><span class="n">torch</span><span class="o">::</span><span class="n">init</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;&gt;</span><span class="p">())</span>
       <span class="c1">// The next line registers a stateless (i.e. no captures) C++ lambda</span>
       <span class="c1">// function as a method. Note that a lambda function must take a</span>
       <span class="c1">// `c10::intrusive_ptr&lt;YourClass&gt;` (or some const/ref version of that)</span>
       <span class="c1">// as the first argument. Other arguments can be whatever you want.</span>
-      <span class="p">.</span><span class="n">def</span><span class="p">(</span><span class="s">&quot;top&quot;</span><span class="p">,</span> <span class="p">[](</span><span class="k">const</span> <span class="n">c10</span><span class="o">::</span><span class="n">intrusive_ptr</span><span class="o">&lt;</span><span class="n">Stack</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;&gt;&amp;</span> <span class="n">self</span><span class="p">)</span> <span class="p">{</span>
+      <span class="p">.</span><span class="n">def</span><span class="p">(</span><span class="s">&quot;top&quot;</span><span class="p">,</span> <span class="p">[](</span><span class="k">const</span> <span class="n">c10</span><span class="o">::</span><span class="n">intrusive_ptr</span><span class="o">&lt;</span><span class="n">MyStackClass</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;&gt;&amp;</span> <span class="n">self</span><span class="p">)</span> <span class="p">{</span>
         <span class="k">return</span> <span class="n">self</span><span class="o">-&gt;</span><span class="n">stack_</span><span class="p">.</span><span class="n">back</span><span class="p">();</span>
       <span class="p">})</span>
-      <span class="c1">// The following four lines expose methods of the Stack&lt;std::string&gt;</span>
-      <span class="c1">// class as-is. `torch::jit::class_` will automatically examine the</span>
+      <span class="c1">// The following four lines expose methods of the MyStackClass&lt;std::string&gt;</span>
+      <span class="c1">// class as-is. `torch::class_` will automatically examine the</span>
       <span class="c1">// argument and return types of the passed-in method pointers and</span>
       <span class="c1">// expose these to Python and TorchScript accordingly. Finally, notice</span>
       <span class="c1">// that we must take the *address* of the fully-qualified method name,</span>
       <span class="c1">// i.e. use the unary `&amp;` operator, due to C++ typing rules.</span>
-      <span class="p">.</span><span class="n">def</span><span class="p">(</span><span class="s">&quot;push&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">Stack</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;::</span><span class="n">push</span><span class="p">)</span>
-      <span class="p">.</span><span class="n">def</span><span class="p">(</span><span class="s">&quot;pop&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">Stack</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;::</span><span class="n">pop</span><span class="p">)</span>
-      <span class="p">.</span><span class="n">def</span><span class="p">(</span><span class="s">&quot;clone&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">Stack</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;::</span><span class="n">clone</span><span class="p">)</span>
-      <span class="p">.</span><span class="n">def</span><span class="p">(</span><span class="s">&quot;merge&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">Stack</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;::</span><span class="n">merge</span><span class="p">);</span>
+      <span class="p">.</span><span class="n">def</span><span class="p">(</span><span class="s">&quot;push&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">MyStackClass</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;::</span><span class="n">push</span><span class="p">)</span>
+      <span class="p">.</span><span class="n">def</span><span class="p">(</span><span class="s">&quot;pop&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">MyStackClass</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;::</span><span class="n">pop</span><span class="p">)</span>
+      <span class="p">.</span><span class="n">def</span><span class="p">(</span><span class="s">&quot;clone&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">MyStackClass</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;::</span><span class="n">clone</span><span class="p">)</span>
+      <span class="p">.</span><span class="n">def</span><span class="p">(</span><span class="s">&quot;merge&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">MyStackClass</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;::</span><span class="n">merge</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>
@@ -499,15 +486,15 @@ demonstrates that:</p>
 <span class="c1"># TorchScript</span>
 <span class="n">torch</span><span class="o">.</span><span class="n">classes</span><span class="o">.</span><span class="n">load_library</span><span class="p">(</span><span class="s2">&quot;libcustom_class.so&quot;</span><span class="p">)</span>
 <span class="c1"># You can query the loaded libraries like this:</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">classes</span><span class="o">.</span><span class="n">loaded_libraries</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">classes</span><span class="o">.</span><span class="n">loaded_libraries</span><span class="p">)</span>
 <span class="c1"># prints {&#39;/custom_class_project/build/libcustom_class.so&#39;}</span>
 
 <span class="c1"># We can find and instantiate our custom C++ class in python by using the</span>
 <span class="c1"># `torch.classes` namespace:</span>
 <span class="c1">#</span>
-<span class="c1"># This instantiation will invoke the Stack(std::vector&lt;T&gt; init) constructor</span>
+<span class="c1"># This instantiation will invoke the MyStackClass(std::vector&lt;T&gt; init) constructor</span>
 <span class="c1"># we registered earlier</span>
-<span class="n">s</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">classes</span><span class="o">.</span><span class="n">Stack</span><span class="p">([</span><span class="s2">&quot;foo&quot;</span><span class="p">,</span> <span class="s2">&quot;bar&quot;</span><span class="p">])</span>
+<span class="n">s</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">classes</span><span class="o">.</span><span class="n">my_classes</span><span class="o">.</span><span class="n">MyStackClass</span><span class="p">([</span><span class="s2">&quot;foo&quot;</span><span class="p">,</span> <span class="s2">&quot;bar&quot;</span><span class="p">])</span>
 
 <span class="c1"># We can call methods in Python</span>
 <span class="n">s</span><span class="o">.</span><span class="n">push</span><span class="p">(</span><span class="s2">&quot;pushed&quot;</span><span class="p">)</span>
@@ -523,16 +510,16 @@ demonstrates that:</p>
 <span class="c1"># For now, we need to assign the class&#39;s type to a local in order to</span>
 <span class="c1"># annotate the type on the TorchScript function. This may change</span>
 <span class="c1"># in the future.</span>
-<span class="n">Stack</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">classes</span><span class="o">.</span><span class="n">Stack</span>
+<span class="n">MyStackClass</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">classes</span><span class="o">.</span><span class="n">my_classes</span><span class="o">.</span><span class="n">MyStackClass</span>
 
-<span class="nd">@torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">script</span>
-<span class="k">def</span> <span class="nf">do_stacks</span><span class="p">(</span><span class="n">s</span> <span class="p">:</span> <span class="n">Stack</span><span class="p">):</span> <span class="c1"># We can pass a custom class instance to TorchScript</span>
-    <span class="n">s2</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">classes</span><span class="o">.</span><span class="n">Stack</span><span class="p">([</span><span class="s2">&quot;hi&quot;</span><span class="p">,</span> <span class="s2">&quot;mom&quot;</span><span class="p">])</span> <span class="c1"># We can instantiate the class</span>
+<span class="nd">@torch.jit.script</span>
+<span class="k">def</span> <span class="nf">do_stacks</span><span class="p">(</span><span class="n">s</span> <span class="p">:</span> <span class="n">MyStackClass</span><span class="p">):</span> <span class="c1"># We can pass a custom class instance to TorchScript</span>
+    <span class="n">s2</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">classes</span><span class="o">.</span><span class="n">my_classes</span><span class="o">.</span><span class="n">MyStackClass</span><span class="p">([</span><span class="s2">&quot;hi&quot;</span><span class="p">,</span> <span class="s2">&quot;mom&quot;</span><span class="p">])</span> <span class="c1"># We can instantiate the class</span>
     <span class="n">s2</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="c1"># We can call a method on the class</span>
     <span class="k">return</span> <span class="n">s2</span><span class="o">.</span><span class="n">clone</span><span class="p">(),</span> <span class="n">s2</span><span class="o">.</span><span class="n">top</span><span class="p">()</span>  <span class="c1"># We can also return instances of the class</span>
                                  <span class="c1"># from TorchScript function/methods</span>
 
-<span class="n">stack</span><span class="p">,</span> <span class="n">top</span> <span class="o">=</span> <span class="n">do_stacks</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">classes</span><span class="o">.</span><span class="n">Stack</span><span class="p">([</span><span class="s2">&quot;wow&quot;</span><span class="p">]))</span>
+<span class="n">stack</span><span class="p">,</span> <span class="n">top</span> <span class="o">=</span> <span class="n">do_stacks</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">classes</span><span class="o">.</span><span class="n">my_classes</span><span class="o">.</span><span class="n">MyStackClass</span><span class="p">([</span><span class="s2">&quot;wow&quot;</span><span class="p">]))</span>
 <span class="k">assert</span> <span class="n">top</span> <span class="o">==</span> <span class="s2">&quot;wow&quot;</span>
 <span class="k">for</span> <span class="n">expected</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;wow&quot;</span><span class="p">,</span> <span class="s2">&quot;mom&quot;</span><span class="p">,</span> <span class="s2">&quot;hi&quot;</span><span class="p">]:</span>
     <span class="k">assert</span> <span class="n">stack</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span> <span class="o">==</span> <span class="n">expected</span>
@@ -543,7 +530,7 @@ demonstrates that:</p>
 <h2>Saving, Loading, and Running TorchScript Code Using Custom Classes<a class="headerlink" href="#saving-loading-and-running-torchscript-code-using-custom-classes" title="Permalink to this headline">¶</a></h2>
 <p>We can also use custom-registered C++ classes in a C++ process using
 libtorch. As an example, let’s define a simple <code class="docutils literal notranslate"><span class="pre">nn.Module</span></code> that
-instantiates and calls a method on our Stack class:</p>
+instantiates and calls a method on our MyStackClass class:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
 
 <span class="n">torch</span><span class="o">.</span><span class="n">classes</span><span class="o">.</span><span class="n">load_library</span><span class="p">(</span><span class="s1">&#39;libcustom_class.so&#39;</span><span class="p">)</span>
@@ -553,11 +540,11 @@ instantiates and calls a method on our Stack class:</p>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span> <span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="n">stack</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">classes</span><span class="o">.</span><span class="n">Stack</span><span class="p">([</span><span class="s2">&quot;hi&quot;</span><span class="p">,</span> <span class="s2">&quot;mom&quot;</span><span class="p">])</span>
+        <span class="n">stack</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">classes</span><span class="o">.</span><span class="n">my_classes</span><span class="o">.</span><span class="n">MyStackClass</span><span class="p">([</span><span class="s2">&quot;hi&quot;</span><span class="p">,</span> <span class="s2">&quot;mom&quot;</span><span class="p">])</span>
         <span class="k">return</span> <span class="n">stack</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span> <span class="o">+</span> <span class="n">s</span>
 
 <span class="n">scripted_foo</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">script</span><span class="p">(</span><span class="n">Foo</span><span class="p">())</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">scripted_foo</span><span class="o">.</span><span class="n">graph</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">scripted_foo</span><span class="o">.</span><span class="n">graph</span><span class="p">)</span>
 
 <span class="n">scripted_foo</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;foo.pt&#39;</span><span class="p">)</span>
 </pre></div>
@@ -590,10 +577,10 @@ build the custom class into the binary.</p>
 <span class="cp">#include</span> <span class="cpf">&lt;memory&gt;</span><span class="cp"></span>
 
 <span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
-  <span class="n">torch</span><span class="o">::</span><span class="n">jit</span><span class="o">::</span><span class="n">script</span><span class="o">::</span><span class="n">Module</span> <span class="k">module</span><span class="p">;</span>
+  <span class="n">torch</span><span class="o">::</span><span class="n">script</span><span class="o">::</span><span class="n">Module</span> <span class="n">module</span><span class="p">;</span>
   <span class="k">try</span> <span class="p">{</span>
     <span class="c1">// Deserialize the ScriptModule from a file using torch::jit::load().</span>
-    <span class="k">module</span> <span class="o">=</span> <span class="n">torch</span><span class="o">::</span><span class="n">jit</span><span class="o">::</span><span class="n">load</span><span class="p">(</span><span class="s">&quot;foo.pt&quot;</span><span class="p">);</span>
+    <span class="n">module</span> <span class="o">=</span> <span class="n">torch</span><span class="o">::</span><span class="n">jit</span><span class="o">::</span><span class="n">load</span><span class="p">(</span><span class="s">&quot;foo.pt&quot;</span><span class="p">);</span>
   <span class="p">}</span>
   <span class="k">catch</span> <span class="p">(</span><span class="k">const</span> <span class="n">c10</span><span class="o">::</span><span class="n">Error</span><span class="o">&amp;</span> <span class="n">e</span><span class="p">)</span> <span class="p">{</span>
     <span class="n">std</span><span class="o">::</span><span class="n">cerr</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;error loading the model</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
@@ -601,7 +588,7 @@ build the custom class into the binary.</p>
   <span class="p">}</span>
 
   <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">c10</span><span class="o">::</span><span class="n">IValue</span><span class="o">&gt;</span> <span class="n">inputs</span> <span class="o">=</span> <span class="p">{</span><span class="s">&quot;foobarbaz&quot;</span><span class="p">};</span>
-  <span class="k">auto</span> <span class="n">output</span> <span class="o">=</span> <span class="k">module</span><span class="p">.</span><span class="n">forward</span><span class="p">(</span><span class="n">inputs</span><span class="p">).</span><span class="n">toString</span><span class="p">();</span>
+  <span class="k">auto</span> <span class="n">output</span> <span class="o">=</span> <span class="n">module</span><span class="p">.</span><span class="n">forward</span><span class="p">(</span><span class="n">inputs</span><span class="p">).</span><span class="n">toString</span><span class="p">();</span>
   <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">output</span><span class="o">-&gt;</span><span class="n">string</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
 <span class="p">}</span>
 </pre></div>
@@ -672,6 +659,31 @@ $ make -j
 </div>
 <p>Incredible!</p>
 </div>
+<div class="section" id="moving-custom-classes-to-from-ivalues">
+<h2>Moving Custom Classes To/From IValues<a class="headerlink" href="#moving-custom-classes-to-from-ivalues" title="Permalink to this headline">¶</a></h2>
+<p>It’s also possible that you may need to move custom classes into or out of
+<code class="docutils literal notranslate"><span class="pre">IValue``s,</span> <span class="pre">such</span> <span class="pre">as</span> <span class="pre">when</span> <span class="pre">you</span> <span class="pre">take</span> <span class="pre">or</span> <span class="pre">return</span> <span class="pre">``IValue``s</span> <span class="pre">from</span> <span class="pre">TorchScript</span> <span class="pre">methods</span>
+<span class="pre">or</span> <span class="pre">you</span> <span class="pre">want</span> <span class="pre">to</span> <span class="pre">instantiate</span> <span class="pre">a</span> <span class="pre">custom</span> <span class="pre">class</span> <span class="pre">attribute</span> <span class="pre">in</span> <span class="pre">C++.</span> <span class="pre">For</span> <span class="pre">creating</span> <span class="pre">an</span>
+<span class="pre">``IValue</span></code> from a custom C++ class instance:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">torch::make_custom_class&lt;T&gt;()</span></code> provides an API similar to c10::intrusive_ptr&lt;T&gt;
+in that it will take whatever set of arguments you provide to it, call the constructor
+of T that matches that set of arguments, and wrap that instance up and return it.
+However, instead of returning just a pointer to a custom class object, it returns
+an <code class="docutils literal notranslate"><span class="pre">IValue</span></code> wrapping the object. You can then pass this <code class="docutils literal notranslate"><span class="pre">IValue</span></code> directly to
+TorchScript.</p></li>
+<li><p>In the event that you already have an <code class="docutils literal notranslate"><span class="pre">intrusive_ptr</span></code> pointing to your class, you
+can directly construct an IValue from it using the constructor <code class="docutils literal notranslate"><span class="pre">IValue(intrusive_ptr&lt;T&gt;)</span></code>.</p></li>
+</ul>
+<p>For converting <a href="#id1"><span class="problematic" id="id2">``</span></a>IValue``s back to custom classes:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">IValue::toCustomClass&lt;T&gt;()</span></code> will return an <code class="docutils literal notranslate"><span class="pre">intrusive_ptr&lt;T&gt;</span></code> pointing to the
+custom class that the <code class="docutils literal notranslate"><span class="pre">IValue</span></code> contains. Internally, this function is checking
+that <code class="docutils literal notranslate"><span class="pre">T</span></code> is registered as a custom class and that the <code class="docutils literal notranslate"><span class="pre">IValue</span></code> does in fact contain
+a custom class. You can check whether the <code class="docutils literal notranslate"><span class="pre">IValue</span></code> contains a custom class manually by
+calling <code class="docutils literal notranslate"><span class="pre">isCustomClass()</span></code>.</p></li>
+</ul>
+</div>
 <div class="section" id="defining-serialization-deserialization-methods-for-custom-c-classes">
 <h2>Defining Serialization/Deserialization Methods for Custom C++ Classes<a class="headerlink" href="#defining-serialization-deserialization-methods-for-custom-c-classes" title="Permalink to this headline">¶</a></h2>
 <p>If you try to save a <code class="docutils literal notranslate"><span class="pre">ScriptModule</span></code> with a custom-bound C++ class as
@@ -684,7 +696,7 @@ an attribute, you’ll get the following error:</p>
 <span class="k">class</span> <span class="nc">Foo</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
   <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
       <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-      <span class="bp">self</span><span class="o">.</span><span class="n">stack</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">classes</span><span class="o">.</span><span class="n">Stack</span><span class="p">([</span><span class="s2">&quot;just&quot;</span><span class="p">,</span> <span class="s2">&quot;testing&quot;</span><span class="p">])</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">stack</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">classes</span><span class="o">.</span><span class="n">my_classes</span><span class="o">.</span><span class="n">MyStackClass</span><span class="p">([</span><span class="s2">&quot;just&quot;</span><span class="p">,</span> <span class="s2">&quot;testing&quot;</span><span class="p">])</span>
 
   <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span> <span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
       <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">stack</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span> <span class="o">+</span> <span class="n">s</span>
@@ -695,7 +707,7 @@ an attribute, you’ll get the following error:</p>
 </pre></div>
 </div>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ python export_attr.py
-RuntimeError: Cannot serialize custom bound C++ class __torch__.torch.classes.Stack. Please define serialization methods via torch::jit::pickle_ <span class="k">for</span> this class. <span class="o">(</span>pushIValueImpl at ../torch/csrc/jit/pickler.cpp:128<span class="o">)</span>
+RuntimeError: Cannot serialize custom bound C++ class __torch__.torch.classes.my_classes.MyStackClass. Please define serialization methods via def_pickle <span class="k">for</span> this class. <span class="o">(</span>pushIValueImpl at ../torch/csrc/jit/pickler.cpp:128<span class="o">)</span>
 </pre></div>
 </div>
 <p>This is because TorchScript cannot automatically figure out what information
@@ -710,17 +722,17 @@ equivalent to that of the Python pickle module. You can
 about how we use these methods.</p>
 </div>
 <p>Here is an example of how we can update the registration code for our
-<code class="docutils literal notranslate"><span class="pre">Stack</span></code> class to include serialization methods:</p>
+<code class="docutils literal notranslate"><span class="pre">MyStackClass</span></code> class to include serialization methods:</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">static</span> <span class="k">auto</span> <span class="n">testStack</span> <span class="o">=</span>
-  <span class="n">torch</span><span class="o">::</span><span class="n">jit</span><span class="o">::</span><span class="n">class_</span><span class="o">&lt;</span><span class="n">Stack</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;&gt;</span><span class="p">(</span><span class="s">&quot;Stack&quot;</span><span class="p">)</span>
-      <span class="p">.</span><span class="n">def</span><span class="p">(</span><span class="n">torch</span><span class="o">::</span><span class="n">jit</span><span class="o">::</span><span class="n">init</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;&gt;</span><span class="p">())</span>
-      <span class="p">.</span><span class="n">def</span><span class="p">(</span><span class="s">&quot;top&quot;</span><span class="p">,</span> <span class="p">[](</span><span class="k">const</span> <span class="n">c10</span><span class="o">::</span><span class="n">intrusive_ptr</span><span class="o">&lt;</span><span class="n">Stack</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;&gt;&amp;</span> <span class="n">self</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">torch</span><span class="o">::</span><span class="n">class_</span><span class="o">&lt;</span><span class="n">MyStackClass</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;&gt;</span><span class="p">(</span><span class="s">&quot;my_classes&quot;</span><span class="p">,</span> <span class="s">&quot;MyStackClass&quot;</span><span class="p">)</span>
+      <span class="p">.</span><span class="n">def</span><span class="p">(</span><span class="n">torch</span><span class="o">::</span><span class="n">init</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;&gt;</span><span class="p">())</span>
+      <span class="p">.</span><span class="n">def</span><span class="p">(</span><span class="s">&quot;top&quot;</span><span class="p">,</span> <span class="p">[](</span><span class="k">const</span> <span class="n">c10</span><span class="o">::</span><span class="n">intrusive_ptr</span><span class="o">&lt;</span><span class="n">MyStackClass</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;&gt;&amp;</span> <span class="n">self</span><span class="p">)</span> <span class="p">{</span>
         <span class="k">return</span> <span class="n">self</span><span class="o">-&gt;</span><span class="n">stack_</span><span class="p">.</span><span class="n">back</span><span class="p">();</span>
       <span class="p">})</span>
-      <span class="p">.</span><span class="n">def</span><span class="p">(</span><span class="s">&quot;push&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">Stack</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;::</span><span class="n">push</span><span class="p">)</span>
-      <span class="p">.</span><span class="n">def</span><span class="p">(</span><span class="s">&quot;pop&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">Stack</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;::</span><span class="n">pop</span><span class="p">)</span>
-      <span class="p">.</span><span class="n">def</span><span class="p">(</span><span class="s">&quot;clone&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">Stack</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;::</span><span class="n">clone</span><span class="p">)</span>
-      <span class="p">.</span><span class="n">def</span><span class="p">(</span><span class="s">&quot;merge&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">Stack</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;::</span><span class="n">merge</span><span class="p">)</span>
+      <span class="p">.</span><span class="n">def</span><span class="p">(</span><span class="s">&quot;push&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">MyStackClass</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;::</span><span class="n">push</span><span class="p">)</span>
+      <span class="p">.</span><span class="n">def</span><span class="p">(</span><span class="s">&quot;pop&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">MyStackClass</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;::</span><span class="n">pop</span><span class="p">)</span>
+      <span class="p">.</span><span class="n">def</span><span class="p">(</span><span class="s">&quot;clone&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">MyStackClass</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;::</span><span class="n">clone</span><span class="p">)</span>
+      <span class="p">.</span><span class="n">def</span><span class="p">(</span><span class="s">&quot;merge&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">MyStackClass</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;::</span><span class="n">merge</span><span class="p">)</span>
       <span class="c1">// class_&lt;&gt;::def_pickle allows you to define the serialization</span>
       <span class="c1">// and deserialization methods for your C++ class.</span>
       <span class="c1">// Currently, we only support passing stateless lambda functions</span>
@@ -735,7 +747,7 @@ about how we use these methods.</p>
             <span class="c1">// custom operator API. In this instance, we&#39;ve chosen to return</span>
             <span class="c1">// a std::vector&lt;std::string&gt; as the salient data to preserve</span>
             <span class="c1">// from the class.</span>
-            <span class="p">[](</span><span class="k">const</span> <span class="n">c10</span><span class="o">::</span><span class="n">intrusive_ptr</span><span class="o">&lt;</span><span class="n">Stack</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;&gt;&amp;</span> <span class="n">self</span><span class="p">)</span>
+            <span class="p">[](</span><span class="k">const</span> <span class="n">c10</span><span class="o">::</span><span class="n">intrusive_ptr</span><span class="o">&lt;</span><span class="n">MyStackClass</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;&gt;&amp;</span> <span class="n">self</span><span class="p">)</span>
                 <span class="o">-&gt;</span> <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;</span> <span class="p">{</span>
               <span class="k">return</span> <span class="n">self</span><span class="o">-&gt;</span><span class="n">stack_</span><span class="p">;</span>
             <span class="p">},</span>
@@ -747,13 +759,13 @@ about how we use these methods.</p>
             <span class="c1">// to a new instance of the C++ class, initialized however</span>
             <span class="c1">// you would like given the serialized state.</span>
             <span class="p">[](</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;</span> <span class="n">state</span><span class="p">)</span>
-                <span class="o">-&gt;</span> <span class="n">c10</span><span class="o">::</span><span class="n">intrusive_ptr</span><span class="o">&lt;</span><span class="n">Stack</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;&gt;</span> <span class="p">{</span>
+                <span class="o">-&gt;</span> <span class="n">c10</span><span class="o">::</span><span class="n">intrusive_ptr</span><span class="o">&lt;</span><span class="n">MyStackClass</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;&gt;</span> <span class="p">{</span>
               <span class="c1">// A convenient way to instantiate an object and get an</span>
               <span class="c1">// intrusive_ptr to it is via `make_intrusive`. We use</span>
-              <span class="c1">// that here to allocate an instance of Stack&lt;std::string&gt;</span>
+              <span class="c1">// that here to allocate an instance of MyStackClass&lt;std::string&gt;</span>
               <span class="c1">// and call the single-argument std::vector&lt;std::string&gt;</span>
               <span class="c1">// constructor with the serialized state.</span>
-              <span class="k">return</span> <span class="n">c10</span><span class="o">::</span><span class="n">make_intrusive</span><span class="o">&lt;</span><span class="n">Stack</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;&gt;</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">state</span><span class="p">));</span>
+              <span class="k">return</span> <span class="n">c10</span><span class="o">::</span><span class="n">make_intrusive</span><span class="o">&lt;</span><span class="n">MyStackClass</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;&gt;</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">state</span><span class="p">));</span>
             <span class="p">});</span>
 </pre></div>
 </div>
@@ -773,7 +785,7 @@ now run successfully:</p>
 <span class="k">class</span> <span class="nc">Foo</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">stack</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">classes</span><span class="o">.</span><span class="n">Stack</span><span class="p">([</span><span class="s2">&quot;just&quot;</span><span class="p">,</span> <span class="s2">&quot;testing&quot;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stack</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">classes</span><span class="o">.</span><span class="n">my_classes</span><span class="o">.</span><span class="n">MyStackClass</span><span class="p">([</span><span class="s2">&quot;just&quot;</span><span class="p">,</span> <span class="s2">&quot;testing&quot;</span><span class="p">])</span>
 
     <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span> <span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">stack</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span> <span class="o">+</span> <span class="n">s</span>
@@ -783,12 +795,52 @@ now run successfully:</p>
 <span class="n">scripted_foo</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;foo.pt&#39;</span><span class="p">)</span>
 <span class="n">loaded</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;foo.pt&#39;</span><span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="n">loaded</span><span class="o">.</span><span class="n">stack</span><span class="o">.</span><span class="n">pop</span><span class="p">())</span>
+<span class="k">print</span><span class="p">(</span><span class="n">loaded</span><span class="o">.</span><span class="n">stack</span><span class="o">.</span><span class="n">pop</span><span class="p">())</span>
 </pre></div>
 </div>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ python ../export_attr.py
 testing
 </pre></div>
+</div>
+</div>
+<div class="section" id="defining-custom-operators-that-take-or-return-bound-c-classes">
+<h2>Defining Custom Operators that Take or Return Bound C++ Classes<a class="headerlink" href="#defining-custom-operators-that-take-or-return-bound-c-classes" title="Permalink to this headline">¶</a></h2>
+<p>Once you’ve defined a custom C++ class, you can also use that class
+as an argument or return from a custom operator (i.e. free functions). Here’s an
+example of how to do that:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">c10</span><span class="o">::</span><span class="n">intrusive_ptr</span><span class="o">&lt;</span><span class="n">MyStackClass</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;&gt;</span> <span class="n">manipulate_instance</span><span class="p">(</span><span class="k">const</span> <span class="n">c10</span><span class="o">::</span><span class="n">intrusive_ptr</span><span class="o">&lt;</span><span class="n">MyStackClass</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;&gt;&amp;</span> <span class="n">instance</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">instance</span><span class="o">-&gt;</span><span class="n">pop</span><span class="p">();</span>
+  <span class="k">return</span> <span class="n">instance</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="k">static</span> <span class="k">auto</span> <span class="n">instance_registry</span> <span class="o">=</span> <span class="n">torch</span><span class="o">::</span><span class="n">RegisterOperators</span><span class="p">().</span><span class="n">op</span><span class="p">(</span>
+<span class="n">torch</span><span class="o">::</span><span class="n">RegisterOperators</span><span class="o">::</span><span class="n">options</span><span class="p">()</span>
+    <span class="p">.</span><span class="n">schema</span><span class="p">(</span>
+        <span class="s">&quot;foo::manipulate_instance(__torch__.torch.classes.my_classes.MyStackClass x) -&gt; __torch__.torch.classes.my_classes.MyStackClass Y&quot;</span><span class="p">)</span>
+    <span class="p">.</span><span class="n">catchAllKernel</span><span class="o">&lt;</span><span class="k">decltype</span><span class="p">(</span><span class="n">manipulate_instance</span><span class="p">),</span> <span class="o">&amp;</span><span class="n">manipulate_instance</span><span class="o">&gt;</span><span class="p">());</span>
+</pre></div>
+</div>
+<p>Refer to the <a class="reference external" href="https://pytorch.org/tutorials/advanced/torch_script_custom_ops.html">custom op tutorial</a>
+for more details on the registration API.</p>
+<p>Once this is done, you can use the op like the following example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">TryCustomOp</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">TryCustomOp</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">f</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">classes</span><span class="o">.</span><span class="n">my_classes</span><span class="o">.</span><span class="n">MyStackClass</span><span class="p">([</span><span class="s2">&quot;foo&quot;</span><span class="p">,</span> <span class="s2">&quot;bar&quot;</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">foo</span><span class="o">.</span><span class="n">manipulate_instance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Registration of an operator that takes a C++ class as an argument requires that
+the custom class has already been registered. This is fine if your op is
+registered after your class in a single compilation unit, however, if your
+class is registered in a separate compilation unit from the op you will need
+to enforce that dependency. One way to do this is to wrap the class registration
+in a <a class="reference external" href="https://stackoverflow.com/q/1661529">Meyer’s singleton</a>, which can be
+called from the compilation unit that does the operator registration.</p>
 </div>
 </div>
 <div class="section" id="conclusion">
@@ -814,7 +866,7 @@ lines between Python, TorchScript and C++ to blend smoothly.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="numpy_extensions_tutorial.html" class="btn btn-neutral float-right" title="Creating Extensions Using numpy and scipy" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
+        <a href="cpp_autograd.html" class="btn btn-neutral float-right" title="Autograd in C++ Frontend" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
       
       
         <a href="torch_script_custom_ops.html" class="btn btn-neutral" title="Extending TorchScript with Custom C++ Operators" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
@@ -826,10 +878,10 @@ lines between Python, TorchScript and C++ to blend smoothly.</p>
 
     <hr class="helpful-hr hr-top">
       <div class="helpful-container">
-        <div class="helpful-question">Was this helpful?</div>
-        <div class="helpful-question yes-link" data-behavior="was-this-helpful-event" data-response="yes">Yes</div>
-        <div class="helpful-question no-link" data-behavior="was-this-helpful-event" data-response="no">No</div>
-        <div class="was-helpful-thank-you">Thank you</div>
+        <div class="helpful-question">이 문서가 도움이 되었나요?</div>
+        <div class="helpful-question yes-link" data-behavior="was-this-helpful-event" data-response="yes">네</div>
+        <div class="helpful-question no-link" data-behavior="was-this-helpful-event" data-response="no">아니오</div>
+        <div class="was-helpful-thank-you">피드백을 주셔서 감사합니다.</div>
       </div>
     <hr class="helpful-hr hr-bottom"/>
 
@@ -861,7 +913,9 @@ lines between Python, TorchScript and C++ to blend smoothly.</p>
 <li><a class="reference internal" href="#building-the-example-as-a-c-project-with-cmake">Building the Example as a C++ Project With CMake</a></li>
 <li><a class="reference internal" href="#using-the-c-class-from-python-and-torchscript">Using the C++ Class from Python and TorchScript</a></li>
 <li><a class="reference internal" href="#saving-loading-and-running-torchscript-code-using-custom-classes">Saving, Loading, and Running TorchScript Code Using Custom Classes</a></li>
+<li><a class="reference internal" href="#moving-custom-classes-to-from-ivalues">Moving Custom Classes To/From IValues</a></li>
 <li><a class="reference internal" href="#defining-serialization-deserialization-methods-for-custom-c-classes">Defining Serialization/Deserialization Methods for Custom C++ Classes</a></li>
+<li><a class="reference internal" href="#defining-custom-operators-that-take-or-return-bound-c-classes">Defining Custom Operators that Take or Return Bound C++ Classes</a></li>
 <li><a class="reference internal" href="#conclusion">Conclusion</a></li>
 </ul>
 </li>
@@ -880,17 +934,18 @@ lines between Python, TorchScript and C++ to blend smoothly.</p>
 
      
        <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-         <script src="../_static/jquery.js"></script>
-         <script src="../_static/underscore.js"></script>
-         <script src="../_static/doctools.js"></script>
-         <script src="../_static/language_data.js"></script>
-         <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+         <script type="text/javascript" src="../_static/jquery.js"></script>
+         <script type="text/javascript" src="../_static/underscore.js"></script>
+         <script type="text/javascript" src="../_static/doctools.js"></script>
+         <script type="text/javascript" src="../_static/language_data.js"></script>
+         <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
      
 
   
 
   <script type="text/javascript" src="../_static/js/vendor/popper.min.js"></script>
   <script type="text/javascript" src="../_static/js/vendor/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
   <script type="text/javascript" src="../_static/js/theme.js"></script>
 
   <script type="text/javascript">
@@ -962,75 +1017,24 @@ lines between Python, TorchScript and C++ to blend smoothly.</p>
   </div>
 
   <footer class="site-footer">
-    <div class="container footer-container">
-      <div class="footer-logo-wrapper">
-        <a href="https://pytorch.org/" class="footer-logo"></a>
-      </div>
-
-      <div class="footer-links-wrapper">
+    <div class="footer-container container">
+      <div class="footer-logo-wrapper"><a href="https://pytorch.kr" class="footer-logo"></a></div>
+      <div class="footer-links-wrapper pb-2">
         <div class="footer-links-col">
           <ul>
-            <li class="list-title"><a href="https://pytorch.org/">PyTorch</a></li>
-            <li><a href="https://pytorch.org/get-started">Get Started</a></li>
-            <li><a href="https://pytorch.org/features">Features</a></li>
-            <li><a href="https://pytorch.org/ecosystem">Ecosystem</a></li>
-            <li><a href="https://pytorch.org/blog/">Blog</a></li>
-            <li><a href="https://pytorch.org/resources">Resources</a></li>
+            <li class="list-title"><a href="https://pytorch.org">PyTorch 홈페이지 (공식)</a></li>
+            <li><a href="https://pytorch.org">공식 홈페이지</a></li>
+            <li><a href="https://pytorch.org/tutorials">공식 튜토리얼</a></li>
+            <li><a href="https://pytorch.org/docs">공식 문서</a></li>
           </ul>
         </div>
-
         <div class="footer-links-col">
           <ul>
-            <li class="list-title"><a href="https://pytorch.org/support">Support</a></li>
-            <li><a href="https://pytorch.org/tutorials">Tutorials</a></li>
-            <li><a href="https://pytorch.org/docs/stable/index.html">Docs</a></li>
-            <li><a href="https://discuss.pytorch.org" target="_blank">Discuss</a></li>
-            <li><a href="https://github.com/pytorch/pytorch/issues" target="_blank">Github Issues</a></li>
-            <li><a href="https://pytorch.slack.com" target="_blank">Slack</a></li>
-            <li><a href="https://github.com/pytorch/pytorch/blob/master/CONTRIBUTING.md" target="_blank">Contributing</a></li>
+            <li class="list-title"><a href="https://pytorch.kr">한국어 홈페이지 (비공식)</a></li>
+            <li><a href="https://pytorch.kr/about" class="">사이트 소개</a></li>
+            <li><a href="https://tutorials.pytorch.kr/">한국어 튜토리얼</a></li>
+            <li><a href="https://github.com/9bow/PyTorch-tutorials-kr" target="_blank">한국어 튜토리얼 저장소</a></li>
           </ul>
-        </div>
-
-        <div class="footer-links-col follow-us-col">
-          <ul>
-            <li class="list-title">Follow Us</li>
-            <li>
-              <div id="mc_embed_signup">
-                <form
-                  action="https://twitter.us14.list-manage.com/subscribe/post?u=75419c71fe0a935e53dfa4a3f&id=91d0dccd39"
-                  method="post"
-                  id="mc-embedded-subscribe-form"
-                  name="mc-embedded-subscribe-form"
-                  class="email-subscribe-form validate"
-                  target="_blank"
-                  novalidate>
-                  <div id="mc_embed_signup_scroll" class="email-subscribe-form-fields-wrapper">
-                    <div class="mc-field-group">
-                      <label for="mce-EMAIL" style="display:none;">Email Address</label>
-                      <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="Email Address">
-                    </div>
-
-                    <div id="mce-responses" class="clear">
-                      <div class="response" id="mce-error-response" style="display:none"></div>
-                      <div class="response" id="mce-success-response" style="display:none"></div>
-                    </div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
-
-                    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_75419c71fe0a935e53dfa4a3f_91d0dccd39" tabindex="-1" value=""></div>
-
-                    <div class="clear">
-                      <input type="submit" value="" name="subscribe" id="mc-embedded-subscribe" class="button email-subscribe-button">
-                    </div>
-                  </div>
-                </form>
-              </div>
-
-            </li>
-          </ul>
-
-          <div class="footer-social-icons">
-            <a href="https://www.facebook.com/pytorch" target="_blank" class="facebook"></a>
-            <a href="https://twitter.com/pytorch" target="_blank" class="twitter"></a>
-          </div>
         </div>
       </div>
     </div>
@@ -1051,7 +1055,7 @@ lines between Python, TorchScript and C++ to blend smoothly.</p>
     <div class="container-fluid">
       <div class="container">
         <div class="mobile-main-menu-header-container">
-          <a class="header-logo" href="https://pytorch.org/" aria-label="PyTorch"></a>
+          <a class="header-logo" href="https://pytorch.kr/" aria-label="PyTorch"></a>
           <a class="main-menu-close-button" href="#" data-behavior="close-mobile-menu"></a>
         </div>
       </div>
@@ -1061,15 +1065,23 @@ lines between Python, TorchScript and C++ to blend smoothly.</p>
       <div class="main-menu">
         <ul>
           <li>
-            <a href="#">Get Started</a>
+            <a href="https://pytorch.org/get-started">Get Started</a>
           </li>
 
           <li>
-            <a href="#">Features</a>
+            <a href="https://pytorch.org/features">Features</a>
           </li>
 
           <li>
-            <a href="#">Ecosystem</a>
+            <a href="https://pytorch.org/ecosystem">Ecosystem</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/mobile">Mobile</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/hub">PyTorch Hub</a>
           </li>
 
           <li>
@@ -1108,6 +1120,8 @@ lines between Python, TorchScript and C++ to blend smoothly.</p>
       sideMenus.bind();
       scrollToAnchor.bind();
       highlightNavigation.bind();
+      mainMenuDropdown.bind();
+      filterTags.bind();
 
       // Add class to links that have code blocks, since we cannot create links in code blocks
       $("article.pytorch-article a span.pre").each(function(e) {
