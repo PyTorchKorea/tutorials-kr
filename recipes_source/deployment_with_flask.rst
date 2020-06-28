@@ -60,9 +60,9 @@ TorchServe 저장소에 체크아웃하여 예제 파일 모두를 가져오고(
 Flask 서비스 구축하기
 ---------------------------
 
-Flask 서비스를 구성하는 전체 Python 스크립트는 이 레시피 끝 부분에 있습니다;
-``app.py`` 파일에 복사 & 붙여넣기 할 수 있습니다.
-아래에서는 각각의 기능들을 명확히 살펴보기 위해 각 섹션별로 살펴보겠습니다.
+Flask 서비스를 구성하는 전체 Python 스크립트는 이 레시피의 끝 부분에 있습니다;
+``app.py`` 파일에 복사해서 붙여넣을 수 있습니다.
+아래에서 각각의 기능들을 명확히 살펴보기 위해 각 섹션별로 살펴보겠습니다.
 
 Import
 ~~~~~~~
@@ -255,6 +255,7 @@ TorchVision transforms(변환) 세트를 구성합니다. (정규화에 대한 �
 -  설치 방법과 더 많은 문서, 튜토리얼을 보시려면 `pytorch.org`_
 -  `Flask 사이트`_ 에는 간단한 Flask 서비스를 설정에 대한 자세한 내용이 포함된 `빠른 시작 가이드(Quickstart guide)`_ 가 있습니다.
 
+.. _pytorch.kr: https://pytorch.kr
 .. _pytorch.org: https://pytorch.org
 .. _Flask 사이트: https://flask.palletsprojects.com/en/1.1.x/
 .. _빠른 시작 가이드(Quick Start guide): https://flask.palletsprojects.com/en/1.1.x/quickstart/
