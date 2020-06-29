@@ -53,8 +53,8 @@ Recipes are bite-sized bite-sized, actionable examples of how to use specific Py
    :tags: Basics
 
 .. customcarditem::
-   :header: Saving and loading models for inference in PyTorch
-   :card_description: Learn about the two approaches for saving and loading models for inference in PyTorch - via the state_dict and via the entire model.
+   :header: PyTorch에서 추론(inference)을 위해 모델 저장하기 & 불러오기
+   :card_description: PyTorch에서 추론을 위해 모델을 저장하고 불러오는 두 가지 접근 방식(state_dict 및 전체 모델)을 알아봅니다.
    :image: ../_static/img/thumbnails/cropped/saving-and-loading-models-for-inference.PNG
    :link: ../recipes/recipes/saving_and_loading_models_for_inference.html
    :tags: Basics
@@ -140,8 +140,8 @@ Recipes are bite-sized bite-sized, actionable examples of how to use specific Py
    :tags: TorchScript
 
 .. customcarditem::
-   :header: Deploying with Flask
-   :card_description: Learn how to use Flask, a lightweight web server, to quickly setup a web API from your trained PyTorch model.
+   :header: Flask로 배포하기
+   :card_description: 경량 웹서버 Flask를 사용하여 학습된 PyTorch Model을 Web API로 빠르게 만드는 방법을 알아봅니다.
    :image: ../_static/img/thumbnails/cropped/using-flask-create-restful-api.png
    :link: ../recipes/deployment_with_flask.html
    :tags: Production,TorchScript
