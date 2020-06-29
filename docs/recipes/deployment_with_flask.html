@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Deploying with Flask &mdash; PyTorch Tutorials 1.5.1 documentation</title>
+  <title>Flask로 배포하기 &mdash; PyTorch Tutorials 1.5.1 documentation</title>
   
 
   
@@ -239,7 +239,7 @@
         
           <li><a href="recipes_index.html">PyTorch Recipes</a> &gt;</li>
         
-      <li>Deploying with Flask</li>
+      <li>Flask로 배포하기</li>
     
     
       <li class="pytorch-breadcrumbs-aside">
@@ -293,90 +293,79 @@
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <div class="section" id="deploying-with-flask">
-<h1>Deploying with Flask<a class="headerlink" href="#deploying-with-flask" title="Permalink to this headline">¶</a></h1>
-<p>In this recipe, you will learn:</p>
+  <div class="section" id="flask">
+<h1>Flask로 배포하기<a class="headerlink" href="#flask" title="Permalink to this headline">¶</a></h1>
+<p>이 레시피에서는 다음과 같은 내용들을 학습합니다:</p>
 <ul class="simple">
-<li><p>How to wrap your trained PyTorch model in a Flask container to expose
-it via a web API</p></li>
-<li><p>How to translate incoming web requests into PyTorch tensors for your
-model</p></li>
-<li><p>How to package your model’s output for an HTTP response</p></li>
+<li><p>학습한 PyTorch 모델을 Flask 컨테이너로 감싸고 웹 API로 노출하는 방법</p></li>
+<li><p>웹 요청(request)을 모델에 입력하기 위해 PyTorch 텐서(tensor)로 변환하는 방법</p></li>
+<li><p>모델의 결과를 HTTP 응답(response)로 패키징하는 방법</p></li>
 </ul>
-<div class="section" id="requirements">
-<h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h2>
-<p>You will need a Python 3 environment with the following packages (and
-their dependencies) installed:</p>
+<div class="section" id="id1">
+<h2>필요사항<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<p>아래와 같은 패키지들(과 의존성이 있는 패키지들)이 설치된 Python 3 환경이 필요합니다:</p>
 <ul class="simple">
 <li><p>PyTorch 1.5</p></li>
 <li><p>TorchVision 0.6.0</p></li>
 <li><p>Flask 1.1</p></li>
 </ul>
-<p>Optionally, to get some of the supporting files, you’ll need git.</p>
-<p>The instructions for installing PyTorch and TorchVision are available at
-<a class="reference external" href="https://pytorch.org">pytorch.org</a>. Instructions for installing Flask are available on <a class="reference external" href="https://flask.palletsprojects.com/en/1.1.x/installation/">the
-Flask site</a>.</p>
+<p>선택 사항으로, 일부 예제 파일들(supporting files)을 받기 위해서 git이 필요합니다.</p>
+<p>PyTorch와 TorchVision 설치방법은 <a class="reference external" href="https://pytorch.org">pytorch.org</a> 에서 확인하실 수 있습니다.
+Flask 설치 방법은 <a class="reference external" href="https://flask.palletsprojects.com/en/1.1.x/installation/">Flask 설치 문서</a> 에서 확인하실 수 있습니다.</p>
 </div>
-<div class="section" id="what-is-flask">
-<h2>What is Flask?<a class="headerlink" href="#what-is-flask" title="Permalink to this headline">¶</a></h2>
-<p>Flask is a lightweight web server written in Python. It provides a
-convenient way for you to quickly set up a web API for predictions from
-your trained PyTorch model, either for direct use, or as a web service
-within a larger system.</p>
+<div class="section" id="id2">
+<h2>Flask란?<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<p>Flask는 Python으로 작성된 가벼운 웹 서버입니다. 학습한 PyTorch 모델의 예측을
+위한 웹 API를 편리하게 작성하여, 직접 사용하거나 더 큰 시스템에 포함된 웹 서비스를
+만들 수 있습니다.</p>
 </div>
-<div class="section" id="setup-and-supporting-files">
-<h2>Setup and Supporting Files<a class="headerlink" href="#setup-and-supporting-files" title="Permalink to this headline">¶</a></h2>
-<p>We’re going to create a web service that takes in images, and maps them
-to one of the 1000 classes of the ImageNet dataset. To do this, you’ll
-need an image file for testing. Optionally, you can also get a file that
-will map the class index output by the model to a human-readable class
-name.</p>
-<div class="section" id="option-1-to-get-both-files-quickly">
-<h3>Option 1: To Get Both Files Quickly<a class="headerlink" href="#option-1-to-get-both-files-quickly" title="Permalink to this headline">¶</a></h3>
-<p>You can pull both of the supporting files quickly by checking out the
-TorchServe repository and copying them to your working folder. <em>(NB:
-There is no dependency on TorchServe for this tutorial - it’s just a
-quick way to get the files.)</em> Issue the following commands from your
-shell prompt:</p>
+<div class="section" id="id3">
+<h2>설치 및 예제 파일<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
+<p>이미지를 받아서 ImageNet 데이터셋의 1000개 클래스(class) 중 하나로 예측(map)하는
+웹 서비스를 만들려고 합니다. 이를 위해 테스트할 이미지 파일들이 필요합니다.
+선택 사항으로, 모델이 예측한 클래스 번호(index)를 사람이 읽을 수 있는 클래스 이름으로
+바꾸기 위한 파일을 받을 수도 있습니다.</p>
+<div class="section" id="id4">
+<h3>옵션 1: 예제 파일 모두를 빠르게 받기<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<p>TorchServe 저장소에 체크아웃하여 예제 파일 모두를 가져오고(pull), 작업 폴더로
+복사할 수 있습니다. <em>(안내: 이 튜토리얼은 TorchServe에 어떠한 의존성도 갖지 않습니다.
+- 단순히 빠르게 파일들을 가져오기 위한 방법입니다)</em> 아래 명령을 쉘에서 실행하세요:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">pytorch</span><span class="o">/</span><span class="n">serve</span>
 <span class="n">cp</span> <span class="n">serve</span><span class="o">/</span><span class="n">examples</span><span class="o">/</span><span class="n">image_classifier</span><span class="o">/</span><span class="n">kitten</span><span class="o">.</span><span class="n">jpg</span> <span class="o">.</span>
 <span class="n">cp</span> <span class="n">serve</span><span class="o">/</span><span class="n">examples</span><span class="o">/</span><span class="n">image_classifier</span><span class="o">/</span><span class="n">index_to_name</span><span class="o">.</span><span class="n">json</span> <span class="o">.</span>
 </pre></div>
 </div>
-<p>And you’ve got them!</p>
+<p>이제 파일들을 받았습니다!</p>
 </div>
-<div class="section" id="option-2-bring-your-own-image">
-<h3>Option 2: Bring Your Own Image<a class="headerlink" href="#option-2-bring-your-own-image" title="Permalink to this headline">¶</a></h3>
-<p>The <code class="docutils literal notranslate"><span class="pre">index_to_name.json</span></code> file is optional in the Flask service below.
-You can test your service with your own image - just make sure it’s a
-3-color JPEG.</p>
+<div class="section" id="id5">
+<h3>옵션 2: 이미지 직접 가져오기<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">index_to_name.json</span></code> 파일은 아래 Flask 서비스에서 선택 사항입니다.
+직접 가져온 이미지(물론 3색 JPEG 이미지여야 합니다)도 테스트를 할 수 있습니다.</p>
 </div>
 </div>
-<div class="section" id="building-your-flask-service">
-<h2>Building Your Flask Service<a class="headerlink" href="#building-your-flask-service" title="Permalink to this headline">¶</a></h2>
-<p>The full Python script for the Flask service is shown at the end of this
-recipe; you can copy and paste that into your own <code class="docutils literal notranslate"><span class="pre">app.py</span></code> file. Below
-we’ll look at individual sections to make their functions clear.</p>
-<div class="section" id="imports">
-<h3>Imports<a class="headerlink" href="#imports" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id6">
+<h2>Flask 서비스 구축하기<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h2>
+<p>Flask 서비스를 구성하는 전체 Python 스크립트는 이 레시피의 끝 부분에 있습니다;
+<code class="docutils literal notranslate"><span class="pre">app.py</span></code> 파일에 복사해서 붙여넣을 수 있습니다.
+아래에서 각각의 기능들을 명확히 살펴보기 위해 각 섹션별로 살펴보겠습니다.</p>
+<div class="section" id="import">
+<h3>Import<a class="headerlink" href="#import" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torchvision.models</span> <span class="k">as</span> <span class="nn">models</span>
 <span class="kn">import</span> <span class="nn">torchvision.transforms</span> <span class="k">as</span> <span class="nn">transforms</span>
 <span class="kn">from</span> <span class="nn">PIL</span> <span class="k">import</span> <span class="n">Image</span>
 <span class="kn">from</span> <span class="nn">flask</span> <span class="k">import</span> <span class="n">Flask</span><span class="p">,</span> <span class="n">jsonify</span><span class="p">,</span> <span class="n">request</span>
 </pre></div>
 </div>
-<p>In order:</p>
+<p>순서대로:</p>
 <ul class="simple">
-<li><p>We’ll be using a pre-trained DenseNet model from
-<code class="docutils literal notranslate"><span class="pre">torchvision.models</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">torchvision.transforms</span></code> contains tools for manipulating your image
-data</p></li>
-<li><p>Pillow (<code class="docutils literal notranslate"><span class="pre">PIL</span></code>) is what we’ll use to load the image file initially</p></li>
-<li><p>And of course we’ll need classes from <code class="docutils literal notranslate"><span class="pre">flask</span></code></p></li>
+<li><p>미리 학습된 DenseNet을 <code class="docutils literal notranslate"><span class="pre">torchvision.models</span></code> 에서 가져와서 사용할 것입니다.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">torchvision.transforms</span></code> 에는 이미지 데이터를 다룰 도구들이 포함되어 있습니다.</p></li>
+<li><p>Pillow (<code class="docutils literal notranslate"><span class="pre">PIL</span></code>) 는 이미지 파일을 처음 불러올 때 사용할 것입니다.</p></li>
+<li><p>물론 <code class="docutils literal notranslate"><span class="pre">flask</span></code> 의 클래스들도 필요합니다.</p></li>
 </ul>
 </div>
 <div class="section" id="pre-processing">
-<h3>Pre-Processing<a class="headerlink" href="#pre-processing" title="Permalink to this headline">¶</a></h3>
+<h3>전처리(Pre-Processing)<a class="headerlink" href="#pre-processing" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">transform_image</span><span class="p">(</span><span class="n">infile</span><span class="p">):</span>
     <span class="n">input_transforms</span> <span class="o">=</span> <span class="p">[</span><span class="n">transforms</span><span class="o">.</span><span class="n">Resize</span><span class="p">(</span><span class="mi">255</span><span class="p">),</span>
         <span class="n">transforms</span><span class="o">.</span><span class="n">CenterCrop</span><span class="p">(</span><span class="mi">224</span><span class="p">),</span>
@@ -390,25 +379,21 @@ data</p></li>
     <span class="k">return</span> <span class="n">timg</span>
 </pre></div>
 </div>
-<p>The web request gave us an image file, but our model expects a PyTorch
-tensor of shape (N, 3, 224, 224) where <em>N</em> is the number of items in the
-input batch. (We will just have a batch size of 1.) The first thing we
-do is compose a set of TorchVision transforms that resize and crop the
-image, convert it to a tensor, then normalize the values in the tensor.
-(For more information on this normalization, see the documentation for
-<code class="docutils literal notranslate"><span class="pre">torchvision.models_</span></code>.)</p>
-<p>After that, we open the file and apply the transforms. The transforms
-return a tensor of shape (3, 224, 224) - the 3 color channels of a
-224x224 image. Because we need to make this single image a batch, we use
-the <code class="docutils literal notranslate"><span class="pre">unsqueeze_(0)</span></code> call to modify the tensor in place by adding a new
-first dimension. The tensor contains the same data, but now has shape
-(1, 3, 224, 224).</p>
-<p>In general, even if you’re not working with image data, you will need to
-transform the input from your HTTP request into a tensor that PyTorch
-can consume.</p>
+<p>웹 요청으로 이미지 파일을 받지만, 모델은 (N, 3, 224, 224) 모양(shape)의 PyTorch 텐서가
+필요합니다. 여기서 <em>N</em> 은 입력 배치(input batch)의 항목의 개수입니다. (배치의 크기는 1입니다.)
+먼저 이미지의 크기를 조정(resize)하고 자르고, 텐서로 변환한 뒤, 정규화(normalization)하는
+TorchVision transforms(변환) 세트를 구성합니다. (정규화에 대한 자세한 내용은
+<code class="docutils literal notranslate"><span class="pre">torchvision.models_</span></code> 문서를 참고하세요.)</p>
+<p>그런 다음, 파일을 열고 (위에서 구성한) 변환들을 적용합니다. 결과로는
+3개의 컬러채널을 갖는 244x244 크기의 이미지므로 (3, 224, 224) 모양으로 반환됩니다.
+이 하나의 이미지를 배치로 만들어야 하므로, <code class="docutils literal notranslate"><span class="pre">unsqueeze_(0)</span></code> 을 사용하여
+텐서에 첫번째 차원을 추가해줍니다. 텐서는 같은 데이터를 갖지만 모양(shape)이
+(1, 3, 224, 224)이 되었습니다.</p>
+<p>일반적으로 이미지 데이터에 작업을 하지 않더라도, HTTP 요청(request)으로 받은
+입력을 PyTorch에서 사용할 수 있도록 텐서로 변환해야 합니다.</p>
 </div>
 <div class="section" id="inference">
-<h3>Inference<a class="headerlink" href="#inference" title="Permalink to this headline">¶</a></h3>
+<h3>추론(Inference)<a class="headerlink" href="#inference" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">get_prediction</span><span class="p">(</span><span class="n">input_tensor</span><span class="p">):</span>
     <span class="n">outputs</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">input_tensor</span><span class="p">)</span>
     <span class="n">_</span><span class="p">,</span> <span class="n">y_hat</span> <span class="o">=</span> <span class="n">outputs</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
@@ -416,16 +401,14 @@ can consume.</p>
     <span class="k">return</span> <span class="n">prediction</span>
 </pre></div>
 </div>
-<p>The inference itself is the simplest part: When we pass the input tensor
-to them model, we get back a tensor of values that represent the model’s
-estimated likelihood that the image belongs to a particular class. The
-<code class="docutils literal notranslate"><span class="pre">max()</span></code> call finds the class with the maximum likelihood value, and
-returns that value with the ImageNet class index. Finally, we extract
-that class index from the tensor containing it with the <code class="docutils literal notranslate"><span class="pre">item()</span></code> call, and
-return it.</p>
+<p>추론 자체는 가장 간단한 부분입니다: 입력 텐서를 모델에 전달하면, 모델은 이미지가
+특정 클래스에 속할 것으로 추정하는 가능성(likelihood)을 나타내는 값들의 텐서를
+반환합니다. <code class="docutils literal notranslate"><span class="pre">max()</span></code> 를 호출하여 가장 가능성이 높은 클래스를 찾고, ImageNet 클래스
+번호(index)에 해당하는 값을 반환합니다. 마지막으로, <code class="docutils literal notranslate"><span class="pre">item()</span></code> 을 호출하여 텐서에
+포함된 클래스 번호(index)를 추출하여 반환합니다.</p>
 </div>
 <div class="section" id="post-processing">
-<h3>Post-Processing<a class="headerlink" href="#post-processing" title="Permalink to this headline">¶</a></h3>
+<h3>후처리(Post-Processing)<a class="headerlink" href="#post-processing" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">render_prediction</span><span class="p">(</span><span class="n">prediction_idx</span><span class="p">):</span>
     <span class="n">stridx</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">prediction_idx</span><span class="p">)</span>
     <span class="n">class_name</span> <span class="o">=</span> <span class="s1">&#39;Unknown&#39;</span>
@@ -436,15 +419,14 @@ return it.</p>
     <span class="k">return</span> <span class="n">prediction_idx</span><span class="p">,</span> <span class="n">class_name</span>
 </pre></div>
 </div>
-<p>The <code class="docutils literal notranslate"><span class="pre">render_prediction()</span></code> method maps the predicted class index to a
-human-readable class label. It’s typical, after getting the prediction
-from your model, to perform post-processing to make the prediction ready
-for either human consumption, or for another piece of software.</p>
+<p><code class="docutils literal notranslate"><span class="pre">render_prediction()</span></code> 메소드(method)는 예측된 클래스 번호(index)를 사람이 읽을 수 있는
+클래스 라벨(label)에 매핑합니다. 모델에서 예측 값을 얻은 후에는 후처리를 수행하여
+사람이 소비하거나 다른 소프트웨어에서 사용할 수 있도록 준비하는 것이 일반적입니다.</p>
 </div>
 </div>
-<div class="section" id="running-the-full-flask-app">
-<h2>Running The Full Flask App<a class="headerlink" href="#running-the-full-flask-app" title="Permalink to this headline">¶</a></h2>
-<p>Paste the following into a file called <code class="docutils literal notranslate"><span class="pre">app.py</span></code>:</p>
+<div class="section" id="flask-app">
+<h2>전체 Flask App 실행<a class="headerlink" href="#flask-app" title="Permalink to this headline">¶</a></h2>
+<p>아래 내용을 <code class="docutils literal notranslate"><span class="pre">app.py</span></code> 파일에 붙여넣습니다:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">io</span>
 <span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">os</span>
@@ -456,13 +438,13 @@ for either human consumption, or for another piece of software.</p>
 
 
 <span class="n">app</span> <span class="o">=</span> <span class="n">Flask</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
-<span class="n">model</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">densenet121</span><span class="p">(</span><span class="n">pretrained</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>               <span class="c1"># Trained on 1000 classes from ImageNet</span>
-<span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>                                              <span class="c1"># Turns off autograd and</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">densenet121</span><span class="p">(</span><span class="n">pretrained</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>               <span class="c1"># ImageNet의 1000개 클래스를 학습</span>
+<span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>                                              <span class="c1"># autograd를 끄고</span>
 
 
 
 <span class="n">img_class_map</span> <span class="o">=</span> <span class="kc">None</span>
-<span class="n">mapping_file_path</span> <span class="o">=</span> <span class="s1">&#39;index_to_name.json&#39;</span>                  <span class="c1"># Human-readable names for Imagenet classes</span>
+<span class="n">mapping_file_path</span> <span class="o">=</span> <span class="s1">&#39;index_to_name.json&#39;</span>                  <span class="c1"># 사람이 읽을 수 있는 ImageNet 클래스 이름</span>
 <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">mapping_file_path</span><span class="p">):</span>
     <span class="k">with</span> <span class="nb">open</span> <span class="p">(</span><span class="n">mapping_file_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">img_class_map</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
@@ -471,23 +453,23 @@ for either human consumption, or for another piece of software.</p>
 
 <span class="c1"># Transform input into the form our model expects</span>
 <span class="k">def</span> <span class="nf">transform_image</span><span class="p">(</span><span class="n">infile</span><span class="p">):</span>
-    <span class="n">input_transforms</span> <span class="o">=</span> <span class="p">[</span><span class="n">transforms</span><span class="o">.</span><span class="n">Resize</span><span class="p">(</span><span class="mi">255</span><span class="p">),</span>           <span class="c1"># We use multiple TorchVision transforms to ready the image</span>
+    <span class="n">input_transforms</span> <span class="o">=</span> <span class="p">[</span><span class="n">transforms</span><span class="o">.</span><span class="n">Resize</span><span class="p">(</span><span class="mi">255</span><span class="p">),</span>           <span class="c1"># 이미지 준비를 위해 여러 TorchVision transforms 사용</span>
         <span class="n">transforms</span><span class="o">.</span><span class="n">CenterCrop</span><span class="p">(</span><span class="mi">224</span><span class="p">),</span>
         <span class="n">transforms</span><span class="o">.</span><span class="n">ToTensor</span><span class="p">(),</span>
-        <span class="n">transforms</span><span class="o">.</span><span class="n">Normalize</span><span class="p">([</span><span class="mf">0.485</span><span class="p">,</span> <span class="mf">0.456</span><span class="p">,</span> <span class="mf">0.406</span><span class="p">],</span>       <span class="c1"># Standard normalization for ImageNet model input</span>
+        <span class="n">transforms</span><span class="o">.</span><span class="n">Normalize</span><span class="p">([</span><span class="mf">0.485</span><span class="p">,</span> <span class="mf">0.456</span><span class="p">,</span> <span class="mf">0.406</span><span class="p">],</span>       <span class="c1"># ImageNet 모델 입력에 대한 표준 정규화</span>
             <span class="p">[</span><span class="mf">0.229</span><span class="p">,</span> <span class="mf">0.224</span><span class="p">,</span> <span class="mf">0.225</span><span class="p">])]</span>
     <span class="n">my_transforms</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">Compose</span><span class="p">(</span><span class="n">input_transforms</span><span class="p">)</span>
-    <span class="n">image</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">infile</span><span class="p">)</span>                            <span class="c1"># Open the image file</span>
-    <span class="n">timg</span> <span class="o">=</span> <span class="n">my_transforms</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>                           <span class="c1"># Transform PIL image to appropriately-shaped PyTorch tensor</span>
-    <span class="n">timg</span><span class="o">.</span><span class="n">unsqueeze_</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>                                    <span class="c1"># PyTorch models expect batched input; create a batch of 1</span>
+    <span class="n">image</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">infile</span><span class="p">)</span>                            <span class="c1"># 이미지 파일 열기</span>
+    <span class="n">timg</span> <span class="o">=</span> <span class="n">my_transforms</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>                           <span class="c1"># PIL 이미지를 적절한 모양의 PyTorch 텐서로 변환</span>
+    <span class="n">timg</span><span class="o">.</span><span class="n">unsqueeze_</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>                                    <span class="c1"># PyTorch 모델은 배치 입력을 예상하므로 1짜리 배치를 만듦</span>
     <span class="k">return</span> <span class="n">timg</span>
 
 
 <span class="c1"># Get a prediction</span>
 <span class="k">def</span> <span class="nf">get_prediction</span><span class="p">(</span><span class="n">input_tensor</span><span class="p">):</span>
-    <span class="n">outputs</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">input_tensor</span><span class="p">)</span>                 <span class="c1"># Get likelihoods for all ImageNet classes</span>
-    <span class="n">_</span><span class="p">,</span> <span class="n">y_hat</span> <span class="o">=</span> <span class="n">outputs</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>                             <span class="c1"># Extract the most likely class</span>
-    <span class="n">prediction</span> <span class="o">=</span> <span class="n">y_hat</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>                             <span class="c1"># Extract the int value from the PyTorch tensor</span>
+    <span class="n">outputs</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">input_tensor</span><span class="p">)</span>                 <span class="c1"># 모든 ImageNet 클래스에 대한 가능성(likelihood) 얻기</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">y_hat</span> <span class="o">=</span> <span class="n">outputs</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>                             <span class="c1"># 가장 가능성 높은 클래스 추출</span>
+    <span class="n">prediction</span> <span class="o">=</span> <span class="n">y_hat</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>                             <span class="c1"># PyTorch 텐서에서 int 값 추출</span>
     <span class="k">return</span> <span class="n">prediction</span>
 
 <span class="c1"># Make the prediction human-readable</span>
@@ -521,29 +503,25 @@ for either human consumption, or for another piece of software.</p>
     <span class="n">app</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>To start the server from your shell prompt, issue the following command:</p>
+<p>다음 명령어를 실행하여 서버를 시작합니다:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">FLASK_APP</span><span class="o">=</span><span class="n">app</span><span class="o">.</span><span class="n">py</span> <span class="n">flask</span> <span class="n">run</span>
 </pre></div>
 </div>
-<p>By default, your Flask server is listening on port 5000. Once the server
-is running, open another terminal window, and test your new inference
-server:</p>
+<p>기본적으로 5000번 포트에서 수신 대기(listen)합니다. 서버를 실행하고 나면,
+다른 터미널 창을 열어서 추론 서버(inference server)를 테스트해보세요:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">curl</span> <span class="o">-</span><span class="n">X</span> <span class="n">POST</span> <span class="o">-</span><span class="n">H</span> <span class="s2">&quot;Content-Type: multipart/form-data&quot;</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">localhost</span><span class="p">:</span><span class="mi">5000</span><span class="o">/</span><span class="n">predict</span> <span class="o">-</span><span class="n">F</span> <span class="s2">&quot;file=@kitten.jpg&quot;</span>
 </pre></div>
 </div>
-<p>If everything is set up correctly, you should recevie a response similar
-to the following:</p>
+<p>모든 것들이 제대로 설정되었다면, 아래와 비슷한 응답(response)을 받을 것입니다:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="s2">&quot;class_id&quot;</span><span class="p">:</span><span class="mi">285</span><span class="p">,</span><span class="s2">&quot;class_name&quot;</span><span class="p">:</span><span class="s2">&quot;Egyptian_cat&quot;</span><span class="p">}</span>
 </pre></div>
 </div>
 </div>
-<div class="section" id="important-resources">
-<h2>Important Resources<a class="headerlink" href="#important-resources" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id7">
+<h2>중요한 자료<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><p><a class="reference external" href="https://pytorch.org">pytorch.org</a> for installation instructions, and more documentation
-and tutorials</p></li>
-<li><p>The <a class="reference external" href="https://flask.palletsprojects.com/en/1.1.x/">Flask site</a> has a <a class="reference external" href="https://flask.palletsprojects.com/en/1.1.x/quickstart/">Quick Start guide</a> that goes into more
-detail on setting up a simple Flask service</p></li>
+<li><p>설치 방법과 더 많은 문서, 튜토리얼을 보시려면 <a class="reference external" href="https://pytorch.org">pytorch.org</a></p></li>
+<li><p><a class="reference external" href="https://flask.palletsprojects.com/en/1.1.x/">Flask 사이트</a> 에는 간단한 Flask 서비스를 설정에 대한 자세한 내용이 포함된 <a href="#id10"><span class="problematic" id="id11">`빠른 시작 가이드(Quickstart guide)`_</span></a> 가 있습니다.</p></li>
 </ul>
 </div>
 </div>
@@ -598,23 +576,23 @@ detail on setting up a simple Flask service</p></li>
           <div class="pytorch-right-menu" id="pytorch-right-menu">
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
-<li><a class="reference internal" href="#">Deploying with Flask</a><ul>
-<li><a class="reference internal" href="#requirements">Requirements</a></li>
-<li><a class="reference internal" href="#what-is-flask">What is Flask?</a></li>
-<li><a class="reference internal" href="#setup-and-supporting-files">Setup and Supporting Files</a><ul>
-<li><a class="reference internal" href="#option-1-to-get-both-files-quickly">Option 1: To Get Both Files Quickly</a></li>
-<li><a class="reference internal" href="#option-2-bring-your-own-image">Option 2: Bring Your Own Image</a></li>
+<li><a class="reference internal" href="#">Flask로 배포하기</a><ul>
+<li><a class="reference internal" href="#id1">필요사항</a></li>
+<li><a class="reference internal" href="#id2">Flask란?</a></li>
+<li><a class="reference internal" href="#id3">설치 및 예제 파일</a><ul>
+<li><a class="reference internal" href="#id4">옵션 1: 예제 파일 모두를 빠르게 받기</a></li>
+<li><a class="reference internal" href="#id5">옵션 2: 이미지 직접 가져오기</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#building-your-flask-service">Building Your Flask Service</a><ul>
-<li><a class="reference internal" href="#imports">Imports</a></li>
-<li><a class="reference internal" href="#pre-processing">Pre-Processing</a></li>
-<li><a class="reference internal" href="#inference">Inference</a></li>
-<li><a class="reference internal" href="#post-processing">Post-Processing</a></li>
+<li><a class="reference internal" href="#id6">Flask 서비스 구축하기</a><ul>
+<li><a class="reference internal" href="#import">Import</a></li>
+<li><a class="reference internal" href="#pre-processing">전처리(Pre-Processing)</a></li>
+<li><a class="reference internal" href="#inference">추론(Inference)</a></li>
+<li><a class="reference internal" href="#post-processing">후처리(Post-Processing)</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#running-the-full-flask-app">Running The Full Flask App</a></li>
-<li><a class="reference internal" href="#important-resources">Important Resources</a></li>
+<li><a class="reference internal" href="#flask-app">전체 Flask App 실행</a></li>
+<li><a class="reference internal" href="#id7">중요한 자료</a></li>
 </ul>
 </li>
 </ul>
