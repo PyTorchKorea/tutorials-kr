@@ -123,7 +123,7 @@ print(x.item())
 #
 #
 #   전치(transposing), 인덱싱(indexing), 슬라이싱(slicing), 수학 계산,
-#   선형 대수, 난수(random number)과 같은 100가지 이상의 Tensor 연산은
+#   선형 대수, 난수(random number) 등, 100가지 이상의 Tensor 연산은
 #   `여기 <http://pytorch.org/docs/torch>`_ 에서 확인하실 수 있습니다.
 #
 # NumPy 변환(Bridge)
@@ -131,8 +131,8 @@ print(x.item())
 #
 # Torch Tensor를 NumPy 배열(array)로 변환하거나, 그 반대로 하는 것은 매우 쉽습니다.
 #
-# (CPU상의) Torch Tensor와 NumPy 배열은 메모리상 저장 공간을 공유하기 때문에,
-# 하나를 변경하면 다른 하나도 변경됩니다.
+# (Torch Tensor가 CPU 상에 있다면) Torch Tensor와 NumPy 배열은 메모리 공간을
+# 공유하기 때문에, 하나를 변경하면 다른 하나도 변경됩니다.
 #
 # Torch Tensor를 NumPy 배열로 변환하기
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -156,7 +156,7 @@ print(b)
 ###############################################################
 # NumPy 배열을 Torch Tensor로 변환하기
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-# NumPy 배열을 변경하면 Torch Tensor의 값도 자동 변경되는 것을 확인해보세요.
+# np (NumPy) 배열을 변경하면 Torch Tensor의 값도 자동 변경되는 것을 확인해보세요.
 
 import numpy as np
 a = np.ones(5)
@@ -166,7 +166,7 @@ print(a)
 print(b)
 
 ###############################################################
-# CharTensor를 제외한 CPU상의 모든 Tensor는 NumPy로 변환할 수 있고,
+# CharTensor를 제외한 CPU 상의 모든 Tensor는 NumPy로 변환할 수 있고,
 # (NumPy에서 Tensor로의) 반대 변환도 가능합니다.
 #
 # CUDA Tensors
