@@ -14,7 +14,7 @@ Python 기반의 과학 연산 패키지로 다음과 같은 두 집단을 대�
 Tensors
 ^^^^^^^
 
-Tensor는 NumPy의 ndarray와 유사하며, 추가로 GPU를 사용한 연산 가속도 가능합니다.
+Tensor는 NumPy의 ndarray와 유사하며, GPU를 사용한 연산 가속도 가능합니다.
 """
 
 from __future__ import print_function
@@ -51,8 +51,8 @@ x = torch.tensor([5.5, 3])
 print(x)
 
 ###############################################################
-# 또는 존재하는 tensor를 바탕으로 tensor를 만듭니다. 이 메소드(method)들은
-# 사용자로부터 제공된 새로운 값이 없는 한, 입력 tensor의 속성들(예. dtype)을
+# 또는 기존 tensor를 바탕으로 새로운 tensor를 만듭니다. 이들 메소드(method)는
+# 사용자로부터 새로운 값을 제공받지 않은 한, 입력 tensor의 속성들(예. dtype)을
 # 재사용합니다.
 
 x = x.new_ones(5, 3, dtype=torch.double)      # new_* 메소드는 크기를 받습니다
@@ -68,7 +68,7 @@ print(x.size())
 
 ###############################################################
 # .. note::
-#     ``torch.Size`` 는 사실 튜플(tuple)과 같으며, 모든 튜플 연산을 지원합니다.
+#     ``torch.Size`` 는 튜플(tuple) 타입으로, 모든 튜플 연산을 지원합니다.
 #
 # 연산(Operations)
 # ^^^^^^^^^^^^^^^^
@@ -90,7 +90,7 @@ torch.add(x, y, out=result)
 print(result)
 
 ###############################################################
-# 덧셈: 바꿔치기(In-place) 방식
+# 덧셈: 바꿔치기(in-place) 방식
 
 # y에 x 더하기
 y.add_(x)
@@ -98,11 +98,10 @@ print(y)
 
 ###############################################################
 # .. note::
-#     바꿔치기(In-place) 방식으로 tensor의 값을 변경하는 연산은 ``_`` 를 접미사로
-#     갖습니다.
+#     바꿔치기(in-place) 방식으로 tensor의 값을 변경하는 연산 뒤에는 ``_``가 붙습니다.
 #     예: ``x.copy_(y)``, ``x.t_()`` 는 ``x`` 를 변경합니다.
 #
-# NumPy스러운 인덱싱 표기 방법을 사용할 수도 있습니다!
+# NumPy스러운 인덱싱 표기 방법을 사용하실 수도 있습니다!
 
 print(x[:, 1])
 
@@ -110,7 +109,7 @@ print(x[:, 1])
 # 크기 변경: tensor의 크기(size)나 모양(shape)을 변경하고 싶다면 ``torch.view`` 를 사용합니다:
 x = torch.randn(4, 4)
 y = x.view(16)
-z = x.view(-1, 8)  # -1은 다른 차원들을 사용하여 유추합니다.
+z = x.view(-1, 8)  # -1은 다른 차원에서 유추합니다.
 print(x.size(), y.size(), z.size())
 
 ###############################################################
@@ -124,16 +123,16 @@ print(x.item())
 #
 #
 #   전치(transposing), 인덱싱(indexing), 슬라이싱(slicing), 수학 계산,
-#   선형 대수, 난수(random number) 등과 같은 100가지 이상의 Tensor 연산은
-#   `여기 <http://pytorch.org/docs/torch>`_ 에 설명되어 있습니다.
+#   선형 대수, 난수(random number) 등, 100가지 이상의 Tensor 연산은
+#   `여기 <http://pytorch.org/docs/torch>`_ 에서 확인하실 수 있습니다.
 #
 # NumPy 변환(Bridge)
 # -------------------
 #
 # Torch Tensor를 NumPy 배열(array)로 변환하거나, 그 반대로 하는 것은 매우 쉽습니다.
 #
-# (CPU 상의) Torch Tensor와 NumPy 배열은 저장 공간을 공유하기 때문에,
-# 하나를 변경하면 다른 하나도 변경됩니다.
+# (Torch Tensor가 CPU 상에 있다면) Torch Tensor와 NumPy 배열은 메모리 공간을
+# 공유하기 때문에, 하나를 변경하면 다른 하나도 변경됩니다.
 #
 # Torch Tensor를 NumPy 배열로 변환하기
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -157,7 +156,7 @@ print(b)
 ###############################################################
 # NumPy 배열을 Torch Tensor로 변환하기
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-# NumPy(np) 배열을 변경하면 Torch Tensor의 값도 자동 변경되는 것을 확인해보세요.
+# np (NumPy) 배열을 변경하면 Torch Tensor의 값도 자동 변경되는 것을 확인해보세요.
 
 import numpy as np
 a = np.ones(5)
@@ -167,8 +166,8 @@ print(a)
 print(b)
 
 ###############################################################
-# CharTensor를 제외한 CPU 상의 모든 Tensor는 NumPy로의 변환을 지원하며,
-# (NumPy에서 Tensor로의) 반대 변환도 지원합니다.
+# CharTensor를 제외한 CPU 상의 모든 Tensor는 NumPy로 변환할 수 있고,
+# (NumPy에서 Tensor로의) 반대 변환도 가능합니다.
 #
 # CUDA Tensors
 # ------------
