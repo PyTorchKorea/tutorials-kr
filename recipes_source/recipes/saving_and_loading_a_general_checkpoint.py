@@ -1,32 +1,29 @@
 """
-Saving and loading a general checkpoint in PyTorch
-==================================================
-Saving and loading a general checkpoint model for inference or 
-resuming training can be helpful for picking up where you last left off.
-When saving a general checkpoint, you must save more than just the
-model’s state_dict. It is important to also save the optimizer’s
-state_dict, as this contains buffers and parameters that are updated as
-the model trains. Other items that you may want to save are the epoch
-you left off on, the latest recorded training loss, external
-``torch.nn.Embedding`` layers, and more, based on your own algorithm.
+PyTorch에서 일반적인 체크포인트(checkpoint) 저장하기 & 불러오기
+===================================================================
+추론(inference) 또는 학습(training)의 재개를 위해 체크포인트(checkpoint) 모델을
+저장하고 불러오는 것은 마지막으로 중단했던 부분을 선택하는데 도움을 줄 수 있습니다.
+체크포인트를 저장할 때는 단순히 모델의 state_dict 이상의 것을 저장해야 합니다.
+모델 학습 중에 갱신되는 퍼버와 매개변수들을 포함하는 옵티마이저(Optimizer)의
+state_dict를 함께 저장하는 것이 중요합니다. 이 외에도 중단 시점의 에포크(epoch),
+마지막으로 기록된 학습 오차(training loss), 외부 ``torch.nn.Embedding`` 계층 등,
+알고리즘에 따라 저장하고 싶은 항목들이 있을 것입니다.
 
-Introduction
+개요
 ------------
-To save multiple checkpoints, you must organize them in a dictionary and
-use ``torch.save()`` to serialize the dictionary. A common PyTorch
-convention is to save these checkpoints using the ``.tar`` file
-extension. To load the items, first initialize the model and optimizer,
-then load the dictionary locally using torch.load(). From here, you can
-easily access the saved items by simply querying the dictionary as you
-would expect.
+여러 체크포인트들을 저장하기 위해서는 사전(dictionary)에 체크포인트들을 구성하고
+``torch.save()`` 를 사용하여 사전을 직렬화(serialize)해야 합니다. 일반적인
+PyTorch에서는 이러한 여러 체크포인트들을 저장할 때 ``.tar`` 확장자를 사용하는 것이
+일반적인 규칙입니다. 항목들을 불러올 때에는, 먼저 모델과 옵티마이저를 초기화하고,
+torch.load()를 사용하여 사전을 불러옵니다. 이후 원하는대로 저장한 항목들을 사전에
+조회하여 접근할 수 있습니다.
 
-In this recipe, we will explore how to save and load multiple
-checkpoints.
+이 레시피에서는 여러 체크포인트들을 어떻게 저장하고 불러오는지 살펴보겠습니다.
 
-Setup
+설정
 -----
-Before we begin, we need to install ``torch`` if it isn’t already
-available.
+시작하기 전에 ``torch`` 가 없다면 설치해야 합니다.
+
 
 ::
 
@@ -38,21 +35,21 @@ available.
 
 
 ######################################################################
-# Steps
-# -----
-# 
-# 1. Import all necessary libraries for loading our data
-# 2. Define and intialize the neural network
-# 3. Initialize the optimizer
-# 4. Save the general checkpoint
-# 5. Load the general checkpoint
-# 
-# 1. Import necessary libraries for loading our data
+# 단계(Steps)
+# ------------
+#
+# 1. 데이터 불러올 때 필요한 라이브러리들 불러오기
+# 2. 신경망을 구성하고 초기화하기
+# 3. 옵티마이저 초기화하기
+# 4. 일반적인 체크포인트 저장하기
+# 5. 일반적인 체크포인트 불러오기
+#
+# 1. 데이터 불러올 때 필요한 라이브러리들 불러오기
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# 
-# For this recipe, we will use ``torch`` and its subsidiaries ``torch.nn``
-# and ``torch.optim``.
-# 
+#
+# 이 레시피에서는 ``torch`` 와 여기 포함된 ``torch.nn`` 와 ``torch.optim` 을
+# 사용하겠습니다.
+#
 
 import torch
 import torch.nn as nn
@@ -60,12 +57,12 @@ import torch.optim as optim
 
 
 ######################################################################
-# 2. Define and intialize the neural network
+# 2. 신경망을 구성하고 초기화하기
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# 
-# For sake of example, we will create a neural network for training
-# images. To learn more see the Defining a Neural Network recipe.
-# 
+#
+# 예를 들어, 이미지를 학습하는 신경망을 만들어보겠습니다. 더 자세한 내용은
+# 신경망 구성하기 레시피를 참고해주세요.
+#
 
 class Net(nn.Module):
     def __init__(self):
@@ -91,23 +88,23 @@ print(net)
 
 
 ######################################################################
-# 3. Initialize the optimizer
+# 3. 옵티마이저 초기화하기
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# 
-# We will use SGD with momentum.
-# 
+#
+# 모멘텀(momentum)을 갖는 SGD를 사용하겠습니다.
+#
 
 optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
 
 
 ######################################################################
-# 4. Save the general checkpoint
+# 4. 일반적인 체크포인트 저장하기
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# 
-# Collect all relevant information and build your dictionary.
-# 
+#
+# 관련된 모든 정보들을 모아서 사전을 구성합니다.
+#
 
-# Additional information
+# 추가 정보
 EPOCH = 5
 PATH = "model.pt"
 LOSS = 0.4
@@ -121,12 +118,11 @@ torch.save({
 
 
 ######################################################################
-# 5. Load the general checkpoint
+# 5. 일반적인 체크포인트 불러오기
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# 
-# Remember to first initialize the model and optimizer, then load the
-# dictionary locally.
-# 
+#
+# 먼저 모델과 옵티마이저를 초기화한 뒤, 사전을 불러오는 것을 기억하십시오.
+#
 
 model = Net()
 optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
@@ -138,25 +134,25 @@ epoch = checkpoint['epoch']
 loss = checkpoint['loss']
 
 model.eval()
-# - or -
+# - 또는 -
 model.train()
 
 
 ######################################################################
-# You must call ``model.eval()`` to set dropout and batch normalization
-# layers to evaluation mode before running inference. Failing to do this
-# will yield inconsistent inference results.
-# 
-# If you wish to resuming training, call ``model.train()`` to ensure these
-# layers are in training mode.
-# 
-# Congratulations! You have successfully saved and loaded a general
-# checkpoint for inference and/or resuming training in PyTorch.
-# 
-# Learn More
-# ----------
-# 
-# Take a look at these other recipes to continue your learning:
-# 
-# -  TBD
-# -  TBD
+# 추론(inference)을 실행하기 전에 ``model.eval()`` 을 호출하여 드롭아웃(dropout)과
+# 배치 정규화 층(batch normalization layer)을 평가(evaluation) 모드로 바꿔야한다는
+# 것을 기억하세요. 이것을 빼먹으면 일관성 없는 추론 결과를 얻게 됩니다.
+#
+# 만약 학습을 계속하길 원한다면 ``model.train()`` 을 호출하여 이 층(layer)들이
+# 학습 모드인지 확인(ensure)하세요.
+#
+# 축하합니다! 지금까지 PyTorch에서 추론 또는 학습 재개를 위해 일반적인 체크포인트를
+# 저장하고 불러왔습니다.
+#
+# 더 알아보기
+# ------------
+#
+# 다른 레시피를 둘러보고 계속 배워보세요:
+#
+# - :doc:`/recipes/recipes/saving_and_loading_a_general_checkpoint`
+# - :doc:`/recipes/recipes/saving_multiple_models_in_one_file`
