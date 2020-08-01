@@ -42,7 +42,11 @@ TorchVision 객체 검출 미세조정(Finetuning) 튜토리얼
       새로운 키포인트 표현에 대해 "references/detection/transforms.py" 코드 부분을 수정 해야 할 수도 있습니다.
 
 모델이 위의 방법대로 리턴을 하면, 학습과 평가 둘 다에 대해서 동작을 할 것이며
-평가 스크립트는 ``pycocotools`` 를 이용하게 될 것입니다.
+평가 스크립트는 ``pycocotools`` 를 사용하게 될 것입니다.
+
+.. note ::
+  윈도우즈에서는 ``pip install git+https://github.com/gautamchitnis/cocoapi.git@cocodataset-master#subdirectory=PythonAPI``
+  명령어를 사용하여 ``pycocotools`` 를 `gautamchitnis <https://github.com/gautamchitnis/cocoapi>`__ 로부터 가져와 설치합니다.
 
 ``labels`` 에 대한 참고사항. 이 모델은 클래스 ``0`` 을 배경으로 취급합니다. 만약 준비한 데이터셋에 배경의 클래스가 없다면, ``labels`` 에도 ``0`` 이 없어야 합니다.
 예를 들어, *고양이* 와 *강아지* 의 오직 2개의 클래스만 분류한다고 가정하면, (``0`` 이 아닌) ``1`` 이 *고양이* 를, ``2`` 가 *강아지* 를 나타내도록 정의해야 합니다.
