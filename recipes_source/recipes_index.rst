@@ -61,15 +61,15 @@ Recipes are bite-sized bite-sized, actionable examples of how to use specific Py
 
 
 .. customcarditem::
-   :header: Saving and loading a general checkpoint in PyTorch
-   :card_description: Saving and loading a general checkpoint model for inference or resuming training can be helpful for picking up where you last left off. In this recipe, explore how to save and load multiple checkpoints.
+   :header: PyTorch에서 일반적인 체크포인트(checkpoint) 저장하기 & 불러오기
+   :card_description: 추론 또는 학습을 재개하기 위해 일반적인 체크포인트를 저장하고 불러오는 것은 마지막으로 중단한 부분을 고르는데 도움이 됩니다. 이 레시피에서는 어떻게 여러개의 체크포인트를 저장하고 불러오는지 알아봅니다.
    :image: ../_static/img/thumbnails/cropped/saving-and-loading-general-checkpoint.PNG
    :link: ../recipes/recipes/saving_and_loading_a_general_checkpoint.html
    :tags: Basics
 
 .. customcarditem::
-   :header: Saving and loading multiple models in one file using PyTorch
-   :card_description: In this recipe, learn how saving and loading multiple models can be helpful for reusing models that you have previously trained.
+   :header: PyTorch에서 여러 모델을 하나의 파일에 저장하기 & 불러오기
+   :card_description: 이전에 학습했던 여러 모델들을 저장하고 불러와 모델을 재사용하는 방법을 알아봅니다.
    :image: ../_static/img/thumbnails/cropped/saving-multiple-models.PNG
    :link: ../recipes/recipes/saving_multiple_models_in_one_file.html
    :tags: Basics
