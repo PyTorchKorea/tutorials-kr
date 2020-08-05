@@ -115,7 +115,7 @@ Recipes are bite-sized bite-sized, actionable examples of how to use specific Py
 
 .. customcarditem::
    :header: Captum을 사용하여 모델 해석하기
-   :card_description: Captum을 사용하여 이미지 분류기의 예측을 해당 이미지의 특징(features)에 할당하고 기여(attribution) 결과를 시각화 하는데 사용하는 방법을 학습합니다.
+   :card_description: Captum을 사용하여 이미지 분류기의 예측을 해당 이미지의 특징(features)에 사용하고 속성(attribution) 결과를 시각화 하는데 사용하는 방법을 학습합니다.
    :image: ../_static/img/thumbnails/cropped/model-interpretability-using-captum.png
    :link: ../recipes/recipes/Captum_Recipe.html
    :tags: Interpretability,Captum
