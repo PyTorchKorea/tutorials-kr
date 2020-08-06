@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-Single-Machine Model Parallel Best Practices
-================================
-**Author**: `Shen Li <https://mrshenli.github.io/>`_
+단일 머신을 이용한 모델 병렬화 실습 예제
+===============================================
+**저자** : Shen Li <https://mrshenli.github.io>
+**번역** : 안상준 <https://github.com/Justin-A>
 
 Model parallel is widely-used in distributed training
 techniques. Previous posts have explained how to use
