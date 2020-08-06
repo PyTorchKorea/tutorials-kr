@@ -5,28 +5,25 @@
 **저자** : Shen Li <https://mrshenli.github.io>
 **번역** : 안상준 <https://github.com/Justin-A>
 
-Model parallel is widely-used in distributed training
-techniques. Previous posts have explained how to use
-`DataParallel <https://pytorch.org/tutorials/beginner/blitz/data_parallel_tutorial.html>`_
-to train a neural network on multiple GPUs; this feature replicates the
-same model to all GPUs, where each GPU consumes a different partition of the
-input data. Although it can significantly accelerate the training process, it
-does not work for some use cases where the model is too large to fit into a
-single GPU. This post shows how to solve that problem by using **model parallel**,
-which, in contrast to ``DataParallel``, splits a single model onto different GPUs,
-rather than replicating the entire model on each GPU (to be concrete, say a model
-``m`` contains 10 layers: when using ``DataParallel``, each GPU will have a
-replica of each of these 10 layers, whereas when using model parallel on two GPUs,
-each GPU could host 5 layers).
+모델 병렬 처리는 분산 학습 기술에 범용적으로 사용되고 있습니다.
+이전 튜토리얼에서는  `DataParallel <https://pytorch.org/tutorials/beginner/blitz/data_parallel_tutorial.html>' 
+에서 데이터 병렬처리 기술을 통해 여러 GPU를 이용하여 신경망 모델을 학습시키는 방법을 설명하였습니다.
+이 방법은 입력 데이터를 부분적으로 할당하고 있는 각 GPU에  동일한 신경망 모델을 복제하여 이용하는 방식이었습니다. 
+이 방법은 신경망 모델을 상당히 빠르게 학습시킬 수 있는 장점이 있지만, 신경망 모델이 하나의 GPU에 할당될 수 있도록
+모델 크기가 제한되는 단점이 있습니다.
 
-The high-level idea of model parallel is to place different sub-networks of a
-model onto different devices, and implement the ``forward`` method accordingly
-to move intermediate outputs across devices. As only part of a model operates
-on any individual device, a set of devices can collectively serve a larger
-model. In this post, we will not try to construct huge models and squeeze them
-into a limited number of GPUs. Instead, this post focuses on showing the idea
-of model parallel. It is up to the readers to apply the ideas to real-world
-applications.
+이번 튜토리얼에서는 ''데이터 병렬 처리''가 아닌 **모델 병렬 처리** 문제를 해결하는 방법을 소개합니다.
+각 GPU에 모델 전체를 복제하는 것이 아닌, 하나의 모델을 여러 GPU에 분할하여 할당하는 방법입니다.
+구체적으로, 10개의 층으로 구성된 ''m'' 신경망 모델에 대해서 ''데이터 병렬 처리'' 방법은 10개의 층을
+전부 복제하여 각 GPU에 할당한다면, 이와 반대로 2개의 GPU에 모델을 병렬 처리한다면, 각 GPU에 5개의 층씩
+각각 할당하여 호스팅할 수 있습니다.
+
+모델 병렬 처리의 전반적인 아이디어는 모델의 서브 네트워크들을 각각 다른 GPU에 할당하고, 각 장비 별로
+순전파를 진행하여 계산되는 출력값들을 각 장비 간 공유하여 이용하는 것입니다. 이용하고자 하는 모델을
+부분적으로 각 GPU에 할당하는 것이기 때문에, 여러 GPU를 이용하여 더 큰 모델을 학습시킬 수 있습니다.
+이번 튜토리얼은 거대한 모델을 제한된 수의 GPU에 분할하여 할당하지 않고, 그 대신에, 모델 병렬 처리의
+아이디어를 이해하는 것을 목적으로 작성되었습니다. 모델 병렬 처리의 아이디어를 활용하여 실제 어플리케이션에
+적용하는 것은 독자들의 몫입니다.
 
 .. note::
 
