@@ -164,7 +164,7 @@ _ = viz.visualize_image_attr_multiple(attribution_cat,
 # \* 특정한 출력을 은닉층의 뉴런에 표시합니다 (Captum API reference를 보세요).
 # \* 모델 입력에 대한 은닉층 뉴런의 반응을 표시합니다 (Captum API reference를 보세요).
 #
-# 지원되는 메소드의 전체 API와 튜토리얼의 목록은 http://captum.ai를 참조하세요.
+# 지원되는 메소드의 전체 API와 튜토리얼의 목록은 http://captum.ai 를 참조하세요.
 #
 # Gilbert Tanner의 또 다른 유용한 게시물 :
 # https://gilberttanner.com/blog/interpreting-pytorch-models-with-captum
