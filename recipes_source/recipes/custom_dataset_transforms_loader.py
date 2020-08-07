@@ -176,14 +176,14 @@ class FaceLandmarksDataset(Dataset):
 
 
 ######################################################################
-# 1.3 Iterate through data samples
+# 1.3 반복문을 통한 데이터 샘플 사용
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 
 
 ######################################################################
-# Next let’s instantiate this class and iterate through the data samples.
-# We will print the sizes of first 4 samples and show their landmarks.
+# 다음으로는 이 클래스를 인스턴스화하고 데이터 샘플을 반복문을 이용하여 사용해봅시다. 
+# 우리는 첫 4개의 샘플들만 출력하고 그 4개 샘플들의 랜드마크를 보여주겠습니다.
 #
 
 face_dataset = FaceLandmarksDataset(csv_file='faces/face_landmarks.csv',
@@ -208,42 +208,35 @@ for i in range(len(face_dataset)):
 
 
 ######################################################################
-# Part 2: Data Tranformations
+# 두 번째: 데이터 변혀
 # ---------------------------
 #
 
 
 ######################################################################
-# Now that we have a dataset to work with and have done some level of
-# customization, we can move to creating custom transformations. In
-# computer vision, these come in handy to help generalize algorithms and
-# improve accuracy. A suite of transformations used at training time is
-# typically referred to as data augmentation and is a common practice for
-# modern model development.
+# 우리는 지금까지 어느정도 사용자 정의 데이터셋을 만들어 보았는데 이제는 사용자 정의 변형을 만들 차례 입니다.
+# 컴퓨터 비전에서는 사용자 정의 변형은 알고리즘을 일반화시키고 정확도를 올리는데 도움을 줍니다.
+# 변형들은 훈련시에 사용이 되며 주로 데이터 증강으로 참조되며 최근의 모델 개발에선 흔히 사용됩니다.
 #
-# One issue common in handling datasets is that the samples may not all be
-# the same size. Most neural networks expect the images of a fixed size.
-# Therefore, we will need to write some prepocessing code. Let’s create
-# three transforms:
+# 데이터셋을 다룰때 자주 일어나는 문제중 하나는 모든 샘플들이 같은 크기를 가지고 있지 않을 경우입니다.
+# 대부분의 신경망들은 미리 정해진 크기의 이미지들을 받아드립니다.
+# 그렇기 때문에 우리는 전처리 코드를 작성해야할 필요가 있습니다.
+# 이제 세개의 변형을 만들어 봅시다.
 #
-# -  ``Rescale``: to scale the image
-# -  ``RandomCrop``: to crop from image randomly. This is data
-#    augmentation.
-# -  ``ToTensor``: to convert the numpy images to torch images (we need to
-#    swap axes).
+# -  ``Rescale``: 이미지 크기를 변경할때 사용됩니다.
+# -  ``RandomCrop``: 무작위로 이미지를 잘라내며 데이터 증강에 쓰입니다.
+# -  ``ToTensor``: 넘파이 이미지들을 파이토치 이미지로 변환할때 사용됩니다. (그러기 위해서는 이미지 차원의 순서를 바꿔야합니다.)
 #
-# We will write them as callable classes instead of simple functions so
-# that parameters of the transform need not be passed everytime it’s
-# called. For this, we just need to implement ``__call__`` method and if
-# required, ``__init__`` method. We can then use a transform like this:
+# 우리는 위의 세개의 변형들을 단순한 함수 대신에 호출가능한 클래스로 만들어서 매번 변형이 호출될때 항상 매개변수가 넘겨지지 않도록 할겁니다.
+# 그러기 위해서는 우리는 단순히 ``__call__`` 메소드를 만들고 필요하다면 ``__init__`` 를 만들면 됩니다.
+# 그러면 우리는 변형을 이런식으로 사용할 수 있습니다.
 #
 # ::
 #
 #    tsfm = Transform(params)
 #    transformed_sample = tsfm(sample)
 #
-# Observe below how these transforms had to be applied both on the image
-# and landmarks.
+# 어떻게 이런 변형들이 이미지와 랜드마크에 적용이 되었는지 아래를 봐주시길 바랍니다.
 #
 
 
