@@ -31,7 +31,7 @@ PyTorch는 ``torch.nn`` 을 포함하여 신경망을 만들고 훈련시키는 
 # 1. 데이터를 가져오기 위해 필요한 라이브러리들 불러오기
 # 2. 신경망을 정의하고 초기화하기
 # 3. 데이터가 모델을 어떻게 지나갈 지 구체화하기
-# 4. [선택사항] 시험해보기 위해 데이터가 모델을 지나가게 하기
+# 4. [선택사항] 데이터를 모델에 적용해 테스트하기
 # 
 # 1. 데이터를 가져오기 위해 필요한 라이브러리들 불러오기
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -107,9 +107,9 @@ class Net(nn.Module):
       self.fc1 = nn.Linear(9216, 128)
       self.fc2 = nn.Linear(128, 10)
 
-    # x는 데이터를 대표합니다. 
+    # x는 데이터를 나타냅니다. 
     def forward(self, x):
-      # conv1을 데이터가 지나갑니다. 
+      # 데이터가 conv1을 지나갑니다. 
       x = self.conv1(x)
       # x를 ReLU 활성함수(rectified-linear activation function)에 대입합니다. 
       x = F.relu(x)
@@ -123,7 +123,7 @@ class Net(nn.Module):
       x = self.dropout1(x)
       # start_dim=1으로 x를 압축합니다. 
       x = torch.flatten(x, 1)
-      # 데이터를 fc1을 지나갑니다. 
+      # 데이터가 fc1을 지나갑니다. 
       x = self.fc1(x)
       x = F.relu(x)
       x = self.dropout2(x)
@@ -135,7 +135,7 @@ class Net(nn.Module):
 
 
 ######################################################################
-# 4. [선택사항] 시험해보기 위해 데이터가 모델을 지나가게 하기
+# 4. [선택사항] 데이터를 모델에 적용해 테스트하기
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # 
 # 원하는 출력값을 받을 수 있는 지 확인하기 위해, 무작위의 데이터를 모델에 통과시켜 시험해봅시다. 
@@ -157,7 +157,7 @@ print (result)
 # 더 알아보기
 # -----------
 # 
-# 게속해서 학습하고 싶다면 다른 레시피를 살펴보싶시오:
+# 계속해서 학습하고 싶다면 다른 레시피를 살펴보십시오:
 # 
 # - `PyTorch에서 state_dict이 무엇인지 <https://pytorch.org/tutorials/recipes/recipes/what_is_state_dict.html>`__
 # - `PyTorch로 추론을 위한 모델을 저장하고 가저오기  <https://pytorch.org/tutorials/recipes/recipes/saving_and_loading_models_for_inference.html>`__
