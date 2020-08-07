@@ -95,17 +95,17 @@ print('Landmarks shape: {}'.format(landmarks.shape))
 print('First 4 Landmarks: {}'.format(landmarks[:4]))
 
 ######################################################################
-# 1.1 Write a simple helper function to show an image
+# 1.1 이미지를 표시하기 위해 간단한 헬퍼 함수 작성하기
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Next let’s write a simple helper function to show an image, its landmarks and use it to show a sample.
-#
+# 다음으로는 이미지를 보여주기위해 간단한 헬퍼 함수를 작성하여 이미지가 가지고 있는 랜드마크들과
+# 이미지 샘플을 보여주도록 하겠습니다.
 #
 
 def show_landmarks(image, landmarks):
-    """Show image with landmarks"""
+    """ 랜드마크와 함께 이미지 보여주기 """
     plt.imshow(image)
     plt.scatter(landmarks[:, 0], landmarks[:, 1], s=10, marker='.', c='r')
-    plt.pause(0.001)  # pause a bit so that plots are updated
+    plt.pause(0.001)  #  잠시 멈추어 도표가 업데이트 되게 합니다
 
 plt.figure()
 show_landmarks(io.imread(os.path.join('faces/', img_name)),
@@ -114,44 +114,41 @@ plt.show()
 
 
 ######################################################################
-# 1.2 Create a dataset class
+# 1.2 데이터셋 클래스 만들기
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Now lets talk about the PyTorch dataset class
+# 이제 파이토치 데이터셋 클래스에 대해 알아봅시다.
 #
 #
 
 
 ######################################################################
-# ``torch.utils.data.Dataset`` is an abstract class representing a
-# dataset. Your custom dataset should inherit ``Dataset`` and override the
-# following methods:
+# ``torch.utils.data.Dataset`` 은 추상 클래스로서 데이터셋을 맡고 있습니다
+# ``Dataset`` 을 상속받아야 하며 다음의 메소드들을 오버라이드 해야합니다.
 #
-# -  ``__len__`` so that ``len(dataset)`` returns the size of the dataset.
-# -  ``__getitem__`` to support indexing such that ``dataset[i]`` can be
-#    used to get :math:``i`` th sample
+# -  ``__len__`` 에는 ``len(dataset)`` 데이터셋의 사이즈를 반환합니다.
+# -  ``__getitem__`` 는 이러한 인덱싱을 지원하고 ``dataset[i]`` 
+#     :math:``i`` 번째 샘플을 얻기 위해 사용됩니다.
 #
-# Let’s create a dataset class for our face landmarks dataset. We will
-# read the csv in ``__init__`` but leave the reading of images to
-# ``__getitem__``. This is memory efficient because all the images are not
-# stored in the memory at once but read as required.
+# 우리의 얼굴 랜드마크 데이터셋을 위한 데이터셋 클래스를 만들어 봅시다.
+# 우리는 csv파일을 ``__init__`` 에서 읽고 이미지들은 ``__getitem__`` 에서 읽도록 남겨주세요.
+# 이러한 방법은 메모리를 효율적으로 사용 하도록 하는데 그 이유는 모든 이미지들을 한번에 메모리에 저장하지않고
+# 필요할때마다 불러오게 됩니다.
 #
-# Here we show a sample of our dataset in the forma of a dict
-# ``{'image': image, 'landmarks': landmarks}``. Our dataset will take an
-# optional argument ``transform`` so that any required processing can be
-# applied on the sample. We will see the usefulness of ``transform`` in
-# another recipe.
+# 우리 데이터셋의 샘플은 dict 형태로 이렇게``{'image': image, 'landmarks': landmarks}`` 되어있습니다.
+# 데이터셋은 선택적 매개변수인 ``transform`` 을 가지고 있어서
+# 필요한 프로세싱 어느것이나 샘플에 적용 될 수 있습니다.
+# ``transform`` 이 얼마나 유용한지는 다른 레시피에서 확인 해 볼 수 있습니다.
 #
 
 class FaceLandmarksDataset(Dataset):
-    """Face Landmarks dataset."""
+    """ 얼굴 랜드마크 데이터셋. """
 
     def __init__(self, csv_file, root_dir, transform=None):
         """
-        Args:
-            csv_file (string): Path to the csv file with annotations.
-            root_dir (string): Directory with all the images.
-            transform (callable, optional): Optional transform to be applied
-                on a sample.
+        매개변수 :
+            csv_file (문자열): 설명이 포함된 csv 파일 경로. 
+            root_dir (문자역): 모든 이미지가 있는 폴더 경로.
+            transform (호출가능한 함수, 선택적 매개변수): 샘플에 적용 될 수 있는 선택적 변환.
         """
         self.landmarks_frame = pd.read_csv(csv_file)
         self.root_dir = root_dir
