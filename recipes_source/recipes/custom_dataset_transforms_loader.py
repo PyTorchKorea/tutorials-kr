@@ -14,7 +14,7 @@
  -  ``pandas``: CSV를 더 쉽게 파싱하기 위해 필요합니다.
 
 작성되고 있는 이 시점에서, 이 레시피는 `Sasank Chilamkurthy <https://chsasank.github.io>`__ 의 오리지널 튜토리얼을 기반으로
-나중에는 `Joe Spisak <https://github.com/jspisak>`__ 에 의해 수정되었습니다.
+나중에는 `Joe Spisak <https://github.com/jspisak>`__ 에 의해 수정되었습니다. 한국어로 `Jae Joong Lee <https://https://github.com/JaeLee18>`__  에 의해 번역되었습니다.
 """
 
 
@@ -95,9 +95,9 @@ print('Landmarks shape: {}'.format(landmarks.shape))
 print('First 4 Landmarks: {}'.format(landmarks[:4]))
 
 ######################################################################
-# 1.1 이미지를 표시하기 위해 간단한 헬퍼 함수 작성하기
+# 1.1 이미지를 표시하기 위해 간단한 도움 함수 작성하기
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# 다음으로는 이미지를 보여주기위해 간단한 헬퍼 함수를 작성하여 이미지가 가지고 있는 랜드마크들과
+# 다음으로는 이미지를 보여주기위해 간단한 도움 함수를 작성하여 이미지가 가지고 있는 랜드마크들과
 # 이미지 샘플을 보여주도록 하겠습니다.
 #
 
@@ -360,21 +360,19 @@ plt.show()
 
 
 ######################################################################
-# 2.3 Iterate through the dataset
+# 2.3 데이터셋을 반복문을 통해 사용하기
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Next we will iterate through the dataset
+# 다음으로 우리는 데이터셋을 반복문을 통해 사용해보도록 하겠습니다.
 #
 #
-# Let’s put this all together to create a dataset with composed
-# transforms. To summarize, every time this dataset is sampled:
+# 이제 이 모든것을 다 꺼내어서 변환을 구성하고 데이터셋을 만들어봅시다.
+# 요약하자면 항상 이 데이터셋을 다음과 같이 불러와집니다.
 #
-# -  An image is read from the file on the fly
-# -  Transforms are applied on the read image
-# -  Since one of the transforms is random, data is augmentated on
-#    sampling
+# -  이미지는 읽으려고 할때마다 불러옵니다.
+# -  변형들은 읽은 이미지에 적용이 됩니다.
+# -  변형들중 하나는 무작위를 이용하기 때문에, 데이터는 샘플링에 따라 증강됩니다.
 #
-# We can iterate over the created dataset with a ``for i in range`` loop
-# as before.
+# 저번에 해본것처럼 생성된 데이터셋을 ``for i in range`` 이라는 반복문을 통해 사용할 수 있습니다.
 #
 
 transformed_dataset = FaceLandmarksDataset(csv_file='faces/face_landmarks.csv',
@@ -395,34 +393,32 @@ for i in range(len(transformed_dataset)):
 
 
 ######################################################################
-# Part 3: The Dataloader
+# 세번째: Dataloader
 # ----------------------
 #
 
 
 ######################################################################
-# By operating on the dataset directly, we are losing out on a lot of
-# features by using a simple ``for`` loop to iterate over the data. In
-# particular, we are missing out on:
+# 직접적으로 데이터셋을 ``for``  반복문으로 데이터를 이용하는건 많은 특성들을 놓칠 수 밖에 없습니다.
+# 특히, 우리는 다음과 같은 특성들을 놓친다고 할 수 있습니다.
 #
-# -  Batching the data
-# -  Shuffling the data
-# -  Load the data in parallel using ``multiprocessing`` workers.
+# -  데이터 배치
+# -  데이터 섞기
+# -  ``multiprocessing`` 를 이용하여 병렬적으로 데이터 불러오기
 #
-# ``torch.utils.data.DataLoader`` is an iterator which provides all these
-# features. Parameters used below should be clear. One parameter of
-# interest is ``collate_fn``. You can specify how exactly the samples need
-# to be batched using ``collate_fn``. However, default collate should work
-# fine for most use cases.
+# ``torch.utils.data.DataLoader`` 는 반복자로서 위에 나와있는 모든 특성들을 제공합니다.
+# 아래에 제시된 사용되는 매개변수들은 쉽게 이해가 될겁니다. 흥미로운 배개변수는 ``collate_fn`` 인데
+# 이것은 정확하게 ``collate_fn`` 을 통해 몇개의 샘플들이 배치가 되어야하는지 지정할 수 있습니다.
+# 하지만 굳이 수정하지 않아도 대부분의 경우에는 잘 작동할겁니다.
 #
 
 dataloader = DataLoader(transformed_dataset, batch_size=4,
                         shuffle=True, num_workers=4)
 
 
-# Helper function to show a batch
+# 배치를 보여주기위한 도움 함수
 def show_landmarks_batch(sample_batched):
-    """Show image with landmarks for a batch of samples."""
+    """ 샘플들의 배치에서 이미지와 함께 랜드마크를 보여줍니다. """
     images_batch, landmarks_batch = \
             sample_batched['image'], sample_batched['landmarks']
     batch_size = len(images_batch)
@@ -442,7 +438,7 @@ for i_batch, sample_batched in enumerate(dataloader):
     print(i_batch, sample_batched['image'].size(),
           sample_batched['landmarks'].size())
 
-    # observe 4th batch and stop.
+    # 4번째 배치를 보여주고 반복문을 멈춥니다.
     if i_batch == 3:
         plt.figure()
         show_landmarks_batch(sample_batched)
@@ -453,8 +449,7 @@ for i_batch, sample_batched in enumerate(dataloader):
 
 
 ######################################################################
-# Now that you’ve learned how to create a custom dataloader with PyTorch,
-# we recommend diving deeper into the docs and customizing your workflow
-# even further. You can learn more in the ``torch.utils.data`` docs
-# `here <https://pytorch.org/docs/stable/data.html>`__.
+# 이제 파이토치를 이용해서 어떻게 사용자 정의 dataloader를 만드는지 배웠습니다.
+# 저희는 좀 더 관련된 문서들을 깊게 읽으셔서 더욱 맞춤화된 작업 흐림을 가지길 추천 드립니다.
+# 더 배워보시려면 ``torch.utils.data`` 문서를 ` 여기 <https://pytorch.org/docs/stable/data.html>`__ 에서 읽어 보실 수 있습니다.
 #
