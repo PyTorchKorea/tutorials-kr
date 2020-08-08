@@ -241,19 +241,18 @@ for i in range(len(face_dataset)):
 
 
 ######################################################################
-# 2.1 Create callable classes
+# 2.1 호출 가능한 클래스들 작성하기
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Let’s start with creating callable classes for each transform
+# 각각의 변형에 맞는 호출 가능한 클래스 작성을 시작해 봅시다.
 #
 #
 
 class Rescale(object):
-    """Rescale the image in a sample to a given size.
+    """ 주어진 크기로 샘플안에 있는 이미지를 재변환 합니다.
 
     Args:
-        output_size (tuple or int): Desired output size. If tuple, output is
-            matched to output_size. If int, smaller of image edges is matched
-            to output_size keeping aspect ratio the same.
+        output_size (tuple 또는 int): 원하는 결과값의 크기입니다. tuple로 주어진다면 결과값은 output_size 와 동일해야하며
+        int일때는 설정된 값보다 작은 이미지들의 가로와 세로는 output_size 에 적절한 비율로 변환됩니다.
     """
 
     def __init__(self, output_size):
@@ -276,19 +275,18 @@ class Rescale(object):
 
         img = transform.resize(image, (new_h, new_w))
 
-        # h and w are swapped for landmarks because for images,
-        # x and y axes are axis 1 and 0 respectively
+        # h 와 w  는 이미지의 랜드마크들 때문에 서로 바뀝니다.
+        # x 와 y 축들은 각각 1과 0 값을 가집니다.
         landmarks = landmarks * [new_w / w, new_h / h]
 
         return {'image': img, 'landmarks': landmarks}
 
 
 class RandomCrop(object):
-    """Crop randomly the image in a sample.
+    """ 샘플에 있는 이미지를 무작위로 자르기.
 
     Args:
-        output_size (tuple or int): Desired output size. If int, square crop
-            is made.
+        output_size (tuple 또는 int): 원하는 결과값의 크기입니다. int로 설정하시면 정사각형 형태로 자르게 됩니다.
     """
 
     def __init__(self, output_size):
@@ -317,21 +315,21 @@ class RandomCrop(object):
 
 
 class ToTensor(object):
-    """Convert ndarrays in sample to Tensors."""
+    """ 샘플 안에 있는 n차원 배열을 Tensor로 변홥힙니다. """
 
     def __call__(self, sample):
         image, landmarks = sample['image'], sample['landmarks']
 
-        # swap color axis because
-        # numpy image: H x W x C
-        # torch image: C X H X W
+        # 색깔 축들을 바꿔치기해야하는데 그 이유는 numpy와 torch의 이미지 표현방식이 다르기 때문입니다.
+        # numpy 이미지: H x W x C
+        # torch 이미지: C X H X W
         image = image.transpose((2, 0, 1))
         return {'image': torch.from_numpy(image),
                 'landmarks': torch.from_numpy(landmarks)}
 
 
 ######################################################################
-# 2.2 Compose transforms and apply to a sample
+# 2.2 변환들을 구성하고 샘플에 적용해보기.
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Next let’s compose these transforms and apply to a sample
 #
