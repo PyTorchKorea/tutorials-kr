@@ -2,14 +2,16 @@
 """
 공간 변형 네트워크(Spatial Transformer Networks) 튜토리얼
 =====================================
-**저자**: `Ghassen HAMROUNI <https://github.com/GHamrouni>`
-**번역**: `황성수 <https://github.com/adonisues>`, `정신유 <https://github.com/SSinyu>`
+**저자**: `Ghassen HAMROUNI <https://github.com/GHamrouni>`_  
+
+**번역**: `황성수 <https://github.com/adonisues>`_ , `정신유 <https://github.com/SSinyu>`_
+
 
 .. figure:: /_static/img/stn/FSeq.png
 
 이 튜토리얼에서는 공간 변형 네트워크(spatial transformer networks, 이하 STN)이라 
 불리는 비주얼 어텐션 메커니즘을 이용해 신경망을 증강(augment)시키는 방법에 대해 
-학습합니다. 이 방법에 대한 자세한 내용은 `DeepMind paper <https://arxiv.org/abs/1506.02025>`에서
+학습합니다. 이 방법에 대한 자세한 내용은 `DeepMind paper <https://arxiv.org/abs/1506.02025>`__ 에서
 확인할 수 있습니다.
 
 STN은 어떠한 공간적 변형(spatial transformation)에도 적용할 수 있는 미분 가능한 
