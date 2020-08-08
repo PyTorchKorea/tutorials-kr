@@ -70,20 +70,20 @@ optimizer = optim.SGD(model.parameters(), lr=0.001)
 
 optimizer.zero_grad()
 outputs = model(torch.randn(20, 10))
-labels = torch.randn(20, 5).to('cuda:1')
+labels = torch.randn(20, 5).to('cuda:1') # 신경망 모델의 최종 출력값과 동일한 GPU에 할당
 loss_fn(outputs, labels).backward()
 optimizer.step()
 
 ######################################################################
-# Apply Model Parallel to Existing Modules
+# 기존에 존재하는 모듈에 모델 병렬 처리 적용해보기
 # ----------------------------------------
 #
-# It is also possible to run an existing single-GPU module on multiple GPUs
-# with just a few lines of changes. The code below shows how to decompose
-# ``torchvision.models.reset50()`` to two GPUs. The idea is to inherit from
-# the existing ``ResNet`` module, and split the layers to two GPUs during
-# construction. Then, override the ``forward`` method to stitch two
-# sub-networks by moving the intermediate outputs accordingly.
+# 기존에 단일 GPU에 존재하는 모듈을 여러 GPU에 할당하는 것은  단지 몇 줄의 코드를 수정하는
+# 것만으로도 쉽게 가능합니다. 아래에 있는 코드들은 ResNet50 모델을 분할하는 방법입니다.
+# 이 아이디어는, 기존에 존재하는 ResNet 모듈을 상속받아 설계할 때, 2개의 GPU에 층을 나누어
+# 설계하는 방식으로 진행됩니다. 그 후, 2개 GPU에서 계산되는 중간 산출물 텐서값을 적절히 
+# 배치하기 위헤 순전파 메소드를 수정합니다.
+
 
 
 from torchvision.models.resnet import ResNet, Bottleneck
@@ -104,35 +104,34 @@ class ModelParallelResNet50(ResNet):
 
             self.layer1,
             self.layer2
-        ).to('cuda:0')
+        ).to('cuda:0') # 첫 번째 GPU에 일련의 과정을 할당
 
         self.seq2 = nn.Sequential(
             self.layer3,
             self.layer4,
             self.avgpool,
-        ).to('cuda:1')
+        ).to('cuda:1') # 두 번째 GPU에 일련의 과정을 할당
 
-        self.fc.to('cuda:1')
+        self.fc.to('cuda:1') # ResNet50 구성요소를 두 번째 GPU에 할당
 
     def forward(self, x):
-        x = self.seq2(self.seq1(x).to('cuda:1'))
+        x = self.seq2(self.seq1(x).to('cuda:1')) # seq1의 출력값을 두 번쨰 GPU에 할당하여 연결
         return self.fc(x.view(x.size(0), -1))
 
 
 ######################################################################
-# The above implementation solves the problem for cases where the model is too
-# large to fit into a single GPU. However, you might have already noticed that
-# it will be slower than running it on a single GPU if your model fits. It is
-# because, at any point in time, only one of the two GPUs are working, while
-# the other one is sitting there doing nothing. The performance further
-# deteriorates as the intermediate outputs need to be copied from ``cuda:0`` to
-# ``cuda:1`` between ``layer2`` and ``layer3``.
+# 위의 예제에서는 단일 GPU에 신경망 모델을 할당하여 학습시키기에는 모델 크기가 너위 클 때 
+# 발생하는 문제를 해결하는 방법입니다. 하지만, 여러분은 단일 GPU를 이용할 때보다 학습 과정이
+# 오래걸리며, 이는 여러분들이 이미 알고 있는 내용이었을 수 있습니다. 그 이유는, 두 개의 GPU가 
+# 동시에 계산하는 것이 아니라 1개의 GPU는 계산하지 않고 대기하고 있기 때문입니다.
+# 또한, 두 번째 층 (layer2)이 할당된 첫 번째 GPU에서 계산된 결과를 세 번째 층 (layer3)이 할당된 
+# 두 번째 GPU로 텐서값을 복사하기 때문에 계산 과정이 더 길어지게 됩니다.
 #
-# Let us run an experiment to get a more quantitative view of the execution
-# time. In this experiment, we train ``ModelParallelResNet50`` and the existing
-# ``torchvision.models.reset50()`` by running random inputs and labels through
-# them. After the training, the models will not produce any useful predictions,
-# but we can get a reasonable understanding of the execution times.
+# 코드 실행 시간을 정량적으로 살펴보기 위해 실험을 하나 해봅시다.
+# 입력 텐서값과 레이블값을 랜덤으로 설정한 후, 이미 존재하는 torchvision.models.reset50() 과,
+# 모델 병렬 처리를 진행한 ''ModelParallelResNet50'' 을 통해 학습을 진행합니다.
+# 학습 진행을 완료한 후, 두 모델들은 랜덤으로 생성된 데이터로 학습을 진행했기 때문에 
+# 실용적인 예측을 하진 못하지만, 학습 진행 시간을 실용적으로 비교하여 할 수 있습니다.
 
 
 import torchvision.models as models
@@ -153,27 +152,28 @@ def train(model):
                            .view(batch_size, 1)
 
     for _ in range(num_batches):
-        # generate random inputs and labels
+        # 입력 텐서값과 레이블값을 랜덤으로 생성합니다.
         inputs = torch.randn(batch_size, 3, image_w, image_h)
         labels = torch.zeros(batch_size, num_classes) \
                       .scatter_(1, one_hot_indices, 1)
 
-        # run forward pass
+        # 입력값을 이용하여 순전파를 진행합니다.
         optimizer.zero_grad()
         outputs = model(inputs.to('cuda:0'))
 
-        # run backward pass
+        # 역전파를 진행하여 신경망 모델의 가중치를 업데이트합니다.
         labels = labels.to(outputs.device)
         loss_fn(outputs, labels).backward()
         optimizer.step()
 
 
 ######################################################################
-# The ``train(model)`` method above uses ``nn.MSELoss`` as the loss function,
-# and ``optim.SGD`` as the optimizer. It mimics training on ``128 X 128``
-# images which are organized into 3 batches where each batch contains 120
-# images. Then, we use ``timeit`` to run the ``train(model)`` method 10 times
-# and plot the execution times with standard deviations.
+# 위에서 정의한 '''train(model)''' 메소드는 nn.MSELoss (Mean Squared Error ; 평균 제곱 오차) 로
+# 손실 함수를 정의하여 신경망 모델을 학습하는 것을 의미합니다. 그리고, '''optim.SGD''' 메소드는
+# 최적화 방식을 의미합니다. 위 방식은 128 * 128 크기의 이미지가 120개로 구성된 배치 데이터가 3개
+# 존재하는 상황을 모방하기 위해 랜덤으로 생성하였습니다. 그리고나서, 우리는 '''timeit''' 을 이용하여
+# '''train(model)''' 메소드를 10회 실행하여 학습을 진행하고, 학습 실행 시간에 대해서 표준 편차값을
+# 반영하는 이미지를 생성하여 저장합니다.
 
 
 import matplotlib.pyplot as plt
@@ -186,7 +186,8 @@ num_repeat = 10
 stmt = "train(model)"
 
 setup = "model = ModelParallelResNet50()"
-# globals arg is only available in Python 3. In Python 2, use the following
+# globals 인자값은 파이썬 3 버전에서만 이용할 수 있습니다.
+# 만약 파이썬 2 버전을 이용한다면 다음과 같이 이용할 수 있습니다.
 # import __builtin__
 # __builtin__.__dict__.update(locals())
 mp_run_times = timeit.repeat(
@@ -221,27 +222,26 @@ plot([mp_mean, rn_mean],
 
 ######################################################################
 #
-# .. figure:: /_static/img/model-parallel-images/mp_vs_rn.png
+# .. 실험 결과 파일 :: /_static/img/model-parallel-images/mp_vs_rn.png
 #    :alt:
 #
-# The result shows that the execution time of model parallel implementation is
-# ``4.02/3.75-1=7%`` longer than the existing single-GPU implementation. So we
-# can conclude there is roughly 7% overhead in copying tensors back and forth
-# across the GPUs. There are rooms for improvements, as we know one of the two
-# GPUs is sitting idle throughout the execution. One option is to further
-# divide each batch into a pipeline of splits, such that when one split reaches
-# the second sub-network, the following split can be fed into the first
-# sub-network. In this way, two consecutive splits can run concurrently on two
-# GPUs.
+
+# 실험 결과, 모델 병렬 철리하여 학습하는 시간이 단일 GPU로 학습하는 시간보다 약 7%정도
+# 오래 걸리는 것을 확인할 수 있습니다. 그러므로, 순전파와 역전파를 진행하면서 GPU 간 텐서값들이
+# 복제되어 이용하는 시간이 약 7%정도 소요되는 것으로 결론지을 수 있습니다. 학습하는 과정 속에서
+# 2개의 GPU 중 1개의 GPU가 계산하지 않고 대기하고 있기 때문에, 이를 해결하여 
+# 학습 시간을 빠르게 개선시킬 수 있습니다. 그 중 한 가지 방법은, 학습 단위인 미니 배치 1개의 데이터를
+# 2개로 분할하는 파이프라인을 생성하여, 분할된 첫 번째 데이터가 첫 번째 층을 통과하여 두 번째 층으로
+# 복제되고, 두 번째 층을 통과할 때, 두번재로 분할된 데이터가 첫 번쨰 층을 통해 계산되는 방식으로 설정하는 것입니다.
+# 이러한 방법을 통해서 2개의 GPU가 2개로 분할된 데이터를 동시에 처리할 수 있으며 학습 시간을 단축시킬 수 있습니다.
 
 ######################################################################
-# Speed Up by Pipelining Inputs
+# 입력 텐서값을 분할하는 파이프라인을 설계하여 학습 시간을 단축하는 방법에 대한 예제
 # -----------------------------
 #
-# In the following experiments, we further divide each 120-image batch into
-# 20-image splits. As PyTorch launches CUDA operations asynchronizely, the
-# implementation does not need to spawn multiple threads to achieve
-# concurrency.
+# 아래에 있는 실험은, 120개의 이미지로 구성된 1개의 미니 배치 데이터를 20개씩 나누어 진행하는 
+# 과정입니다. 아래의 과정을 실행할 때, PyTorch가 CUDA 연산을 비동기적으로 이용하기 때문에, 
+# 프로세스를 실행하는 쓰레드를 여러개 생성할 필요가 없습니다.
 
 
 class PipelineParallelResNet50(ModelParallelResNet50):
@@ -256,11 +256,11 @@ class PipelineParallelResNet50(ModelParallelResNet50):
         ret = []
 
         for s_next in splits:
-            # A. s_prev runs on cuda:1
+            # A. s_prev는 두 번째 GPU에서 실행됩니다.
             s_prev = self.seq2(s_prev)
             ret.append(self.fc(s_prev.view(s_prev.size(0), -1)))
 
-            # B. s_next runs on cuda:0, which can run concurrently with A
+            # B. s_next는 A.와 동시에 진행되면서 첫 번째 GPU에서 실행됩니다. 
             s_prev = self.seq1(s_next).to('cuda:1')
 
         s_prev = self.seq2(s_prev)
@@ -280,28 +280,24 @@ plot([mp_mean, rn_mean, pp_mean],
      'mp_vs_rn_vs_pp.png')
 
 ######################################################################
-# Please note, device-to-device tensor copy operations are synchronized on
-# current streams on the source and the destination devices. If you create
-# multiple streams, you have to make sure that copy operations are properly
-# synchronized. Writing the source tensor or reading/writing the destination
-# tensor before finishing the copy operation can lead to undefined behavior.
-# The above implementation only uses default streams on both source and
-# destination devices, hence it is not necessary to enforce additional
-# synchronizations.
-#
-# .. figure:: /_static/img/model-parallel-images/mp_vs_rn_vs_pp.png
+# GPU 간 텐서값이 복사되는 것은 현재 계산되고 있는 소스값과, 소스값의 목적지 GPU 간 연산되고 있는
+# 스트림과 동기화되는 것을 주의하세요. 만약 여러 스트림을 생성하여 진행하고 있다면, GPU 간 텐서값이
+# 정상적으로 복사되어 계산되고 있는지 꼭 확인해야 합니다. 만약 복사되는 과정 중에 소스값을 이용하거나,
+# GPU의 텐서값을 읽거나 쓰는 것은 올바르게 계산되지 않을 수 있습니다. 위의 예제에서는 소스값 및 GPU 
+# 텐서값을 기본 스트림만 이용하여 진행하므로 추가적인 동기화 과정을 진행할 필요는 없습니다.
+
+# .. 실험 결과 파일 :: /_static/img/model-parallel-images/mp_vs_rn_vs_pp.png
 #    :alt:
 #
-# The experiment result shows that, pipelining inputs to model parallel
-# ResNet50 speeds up the training process by roughly ``3.75/2.51-1=49%``. It is
-# still quite far away from the ideal 100% speedup. As we have introduced a new
-# parameter ``split_sizes`` in our pipeline parallel implementation, it is
-# unclear how the new parameter affects the overall training time. Intuitively
-# speaking, using small ``split_size`` leads to many tiny CUDA kernel launch,
-# while using large ``split_size`` results to relatively long idle times during
-# the first and last splits. Neither are optimal. There might be an optimal
-# ``split_size`` configuration for this specific experiment. Let us try to find
-# it by running experiments using several different ``split_size`` values.
+# 파이프라인을 이용하여 미니 배치 내 데이터를 분할하여 적용하였을 때, ResNet50 신경망 모델의
+# 학습 시간이 약 49% 정도 단축된 것을 이번 실험을 통해 확인할 수 있습니다. 하지만, 이상적으로
+# 학습 시간이 2배 단축되는 것에 비해 다소 적게 학습 시간이 단축되었습니다. 파이프라인을 이용할 때,
+# '''split_sizes''' 매개변수를 도입하였기 때문에, 파이프라인을 이용하는 것이 학습 시간 단축에 얼마나
+# 영향을 미쳤는지 불분명합니다. 직관적으로 생각하였을 때, '''split_sizes''' 매개변수 값을 작게 설정한다면,
+# 아주 소규모의 CUDA 연산이 많이 진행되고, '''split_sizes''' 매개변수 값을 크게 설정한다면, 첫 번째와 
+# 마지막 분리될 때 비교적 긴 시간 동안 CUDA 연산이 이루어지게 됩니다. 둘 다 최적의 설정이 아닙니다.
+# 따라서, '''split_sizes''' 매개변수 값을 최적으로 설정하였을 때, 학습 시간 과정이 단축될 수 있을 것이라
+# 기대됩니다. '''split_sizes''' 매개변수 값을 조정하여 실험하면서 최적의 값을 찾아봅시다.
 
 
 means = []
@@ -328,27 +324,21 @@ plt.close(fig)
 
 ######################################################################
 #
-# .. figure:: /_static/img/model-parallel-images/split_size_tradeoff.png
+# .. 실험 결과 파일:: /_static/img/model-parallel-images/split_size_tradeoff.png
 #    :alt:
 #
-# The result shows that setting ``split_size`` to 12 achieves the fastest
-# training speed, which leads to ``3.75/2.43-1=54%`` speedup. There are
-# still opportunities to further accelerate the training process. For example,
-# all operations on ``cuda:0`` is placed on its default stream. It means that
-# computations on the next split cannot overlap with the copy operation of the
-# prev split. However, as prev and next splits are different tensors, there is
-# no problem to overlap one's computation with the other one's copy. The
-# implementation need to use multiple streams on both GPUs, and different
-# sub-network structures require different stream management strategies. As no
-# general multi-stream solution works for all model parallel use cases, we will
-# not discuss it in this tutorial.
-#
+# 실험 결과, '''split_size''' 매개변수값을 12로 설정하였을 때, 학습 시간이 54% 수준으로 
+# 가장 많이 단축되었습니다. 아직 학습 시간을 더 단축시킬 수 있는 방법은 다양하게 존재합니다.
+# 예를 들어, 첫 번째 GPU에서 모든 연산과정이 기본으로 설정되어 진행됩니다. 이는 미니배치 분할 과정 중,
+# 현재 진행되는 과정의 다음 단계는 현재 진행되는 과정과 동시에 복제가 이루어질 수 없는 것을 의미합니다.
+# 그러나, 이전과 다음 단계의 분할과정이 다른 텐서값을 이용하기 때문에, 다른 계산과 중복되어 진행되어도
+# 문제가 없습니다. 이에 대해서, 2개 GPU에 여러개의 스트림을 사용하는 것이 필요하며, 서로 다른 서브 네트워크 
+# 구조가 서로 다른 스트림을 관리하는 전략이 요구됩니다. 모델 병렬 처리에 대해서 여러 스트림을 사용하는 방법이 
+# 일반적을로 존재하지 않기 때문에 이번 튜토리얼에서는 설명하지 않습니다.
+
 # **Note:**
-#
-# This post shows several performance measurements. You might see different
-# numbers when running the same code on your own machine, because the result
-# depends on the underlying hardware and software. To get the best performance
-# for your environment, a proper approach is to first generate the curve to
-# figure out the best split size, and then use that split size to pipeline
-# inputs.
-#
+# 이번 게시물에서는 다양한 성능 측정값을 확인할 수 있습니다. 여러분은 위의 예제를 실행할 때 마다 매번
+# 다른 결과를 확인할 수 있습니다. 그 이유는, 이용하는 소프트웨어 및 하드웨어에 따라 결과가 
+# 다르게 나타나기 때문입니다. 여러분이 이용하고 있는 환경 내에서 가장 좋은 성능을 얻기 위해서는, 곡선을 그려서
+# 최적의 '''split_size''' 값을 도출한 후, 해당 값을 이용하여 미니 배치 내 데이터를 분리하는 파이프라인을 
+# 생성하는 것입니다.
