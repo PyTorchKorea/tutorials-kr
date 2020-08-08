@@ -7,8 +7,8 @@
 
 모델 병렬 처리는 분산 학습 기술에 범용적으로 사용되고 있습니다.
 이전 튜토리얼에서는  `DataParallel <https://pytorch.org/tutorials/beginner/blitz/data_parallel_tutorial.html>' 
-에서 데이터 병렬처리 기술을 통해 여러 GPU를 이용하여 신경망 모델을 학습시키는 방법을 설명하였습니다.
-이 방법은 입력 데이터를 부분적으로 할당하고 있는 각 GPU에  동일한 신경망 모델을 복제하여 이용하는 방식이었습니다. 
+데이터 병렬 처리 기술을 통해 여러 GPU를 이용하여 신경망 모델을 학습시키는 방법을 설명하였습니다.
+이 방법은 각 GPU에 력 데이터를 부분적으로 할당하고 동일한 신경망 모델을 복제하여 이용하는 방식이었습니다. 
 이 방법은 신경망 모델을 상당히 빠르게 학습시킬 수 있는 장점이 있지만, 신경망 모델이 하나의 GPU에 할당될 수 있도록
 모델 크기가 제한되는 단점이 있습니다.
 
@@ -19,27 +19,24 @@
 각각 할당하여 호스팅할 수 있습니다.
 
 모델 병렬 처리의 전반적인 아이디어는 모델의 서브 네트워크들을 각각 다른 GPU에 할당하고, 각 장비 별로
-순전파를 진행하여 계산되는 출력값들을 각 장비 간 공유하여 이용하는 것입니다. 이용하고자 하는 모델을
-부분적으로 각 GPU에 할당하는 것이기 때문에, 여러 GPU를 이용하여 더 큰 모델을 학습시킬 수 있습니다.
+순전파를 진행하여 계산되는 출력값들을 각 장비 간 공유하여 이용하는 것입니다. 이용하고자 하는 신경망 모델을
+부분적으로 각 GPU에 할당하는 것이기 때문에, 여러 GPU를 이용하여 더 큰 신경망 모델을 할당하고 학습시킬 수 있습니다.
 이번 튜토리얼은 거대한 모델을 제한된 수의 GPU에 분할하여 할당하지 않고, 그 대신에, 모델 병렬 처리의
-아이디어를 이해하는 것을 목적으로 작성되었습니다. 모델 병렬 처리의 아이디어를 활용하여 실제 어플리케이션에
+아이디어를 이해하는 목적으로 작성되었습니다. 모델 병렬 처리의 아이디어를 활용하여 실제 어플리케이션에
 적용하는 것은 여러분의 몫입니다.
 
-.. note::
+.. 메모::
+   신경망 모델을 여러 서버를 이용하여 학습시키는 병렬 학습 방법에 대해서는 다음 튜토리얼을 참고하세요.
+   `Getting Started With Distributed RPC Framework <rpc_tutorial.html>`
 
-    For distributed model parallel training where a model spans multiple
-    servers, please refer to
-    `Getting Started With Distributed RPC Framework <rpc_tutorial.html>`__
-    for examples and details.
-
-Basic Usage
+기본적인 사용 방법
 -----------
 """
 
 ######################################################################
-# Let us start with a toy model that contains two linear layers. To run this
-# model on two GPUs, simply put each linear layer on a different GPU, and move
-# inputs and intermediate outputs to match the layer devices accordingly.
+# 2개의 층으로 이루어진 간단한 신경망 모델을 이용해서 기본적인 내용을 실습해봅시다.
+# 신경망 모델을 2개의 GPU에 할당하여 실행하기 위해서, 각 1개의 층을 각각 다른 GPU에 할당하고,
+# 입력 텐서값과 중간 산출물 텐서값을 신경망 모델의 구성에 맞게 배치합니다.
 #
 
 import torch
@@ -50,23 +47,22 @@ import torch.optim as optim
 class ToyModel(nn.Module):
     def __init__(self):
         super(ToyModel, self).__init__()
-        self.net1 = torch.nn.Linear(10, 10).to('cuda:0')
+        self.net1 = torch.nn.Linear(10, 10).to('cuda:0') # 첫 번째 층을 첫 번째 GPU에 할당
         self.relu = torch.nn.ReLU()
-        self.net2 = torch.nn.Linear(10, 5).to('cuda:1')
+        self.net2 = torch.nn.Linear(10, 5).to('cuda:1')  # 두 번째 층을 두 번째 GPU에 할당
 
     def forward(self, x):
-        x = self.relu(self.net1(x.to('cuda:0')))
-        return self.net2(x.to('cuda:1'))
+        x = self.relu(self.net1(x.to('cuda:0'))) 
+        return self.net2(x.to('cuda:1')) # 첫 번째 층의 산출물을 두 번째 GPU에 할당하여 진행
 
 ######################################################################
-# Note that, the above ``ToyModel`` looks very similar to how one would
-# implement it on a single GPU, except the five ``to(device)`` calls which
-# place linear layers and tensors on proper devices. That is the only place in
-# the model that requires changes. The ``backward()`` and ``torch.optim`` will
-# automatically take care of gradients as if the model is on one GPU. You only
-# need to make sure that the labels are on the same device as the outputs when
-# calling the loss function.
-
+# 위의 예제는 각 층, 혹은 텐서값을 GPU에 할당하는 것 외에는 단일 GPU로 
+# 신경망 모델을 구현하는 것과 매우 유사한 구조인 것임을 확인할 수 있습니다.
+# 다시 말해, GPU에 텐서값 혹은 층을 할당하는 것 외에는 추가적으로 설정하는 부분이 없습니다.
+# 역전파 계산하는 부분과, 최적화하는 부분은 단일 GPU를 이용하여 신경망 모델의 가중치값을
+# 업데이트하는 것 처럼, 자동으로 오차에 의한 기울기값을 반영합니다.
+# 여러분은 레이블값과 신경망 모델의 최종 출력 텐서값을 이용하여 오차를 계산할 수 있도록
+# 동일한 GPU에 할당하는 것만 주의하면 됩니다.
 
 model = ToyModel()
 loss_fn = nn.MSELoss()
