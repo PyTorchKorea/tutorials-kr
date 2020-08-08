@@ -1,28 +1,27 @@
 # -*- coding: utf-8 -*-
 """
-Spatial Transformer Networks Tutorial
+공간 변형 네트워크(Spatial Transformer Networks) 튜토리얼
 =====================================
 **Author**: `Ghassen HAMROUNI <https://github.com/GHamrouni>`_
 
 .. figure:: /_static/img/stn/FSeq.png
 
-In this tutorial, you will learn how to augment your network using
-a visual attention mechanism called spatial transformer
-networks. You can read more about the spatial transformer
-networks in the `DeepMind paper <https://arxiv.org/abs/1506.02025>`__
+이 튜토리얼에서는 공간 변형 네트워크(spatial transformer networks, 이하 STN)이라 
+불리는 비주얼 어텐션 메커니즘을 이용해 신경망을 증강(augment)시키는 방법에 대해 
+학습합니다. 이 방법에 대한 자세한 내용은 `DeepMind paper <https://arxiv.org/abs/1506.02025>`에서
+확인할 수 있습니다.
 
-Spatial transformer networks are a generalization of differentiable
-attention to any spatial transformation. Spatial transformer networks
-(STN for short) allow a neural network to learn how to perform spatial
-transformations on the input image in order to enhance the geometric
-invariance of the model.
-For example, it can crop a region of interest, scale and correct
-the orientation of an image. It can be a useful mechanism because CNNs
-are not invariant to rotation and scale and more general affine
-transformations.
+STN은 어떠한 공간적 변형(spatial transformation)에도 적용할 수 있는 미분 가능한 
+어텐션의 일반화입니다. 따라서 STN은 신경망의 기하학적 불변성(geometric invariance)을
+강화하기 위해 입력 이미지를 대상으로 어떠한 공간적 변형을 수행해야 하는지 학습하도록
+합니다.
+예를 들어 이미지의 관심 영역을 잘라내거나, 크기를 조정하거나, 방향(orientation)을 
+수정할 수 있습니다. CNN은 이러한 회전, 크기 조정 등의 일반적인 아핀(affine) 변환된 
+입력에 대해 결과의 변동이 크기 때문에 (민감하기 때문에), STN은 이를 극복하는데 매우
+유용한 메커니즘이 될 수 있습니다.
 
-One of the best things about STN is the ability to simply plug it into
-any existing CNN with very little modification.
+STN이 가진 장점 중 하나는 아주 작은 수정만으로 기존에 사용하던 CNN에 간단하게 연결 시킬 
+수 있다는 것입니다.
 """
 # License: BSD
 # Author: Ghassen Hamrouni
