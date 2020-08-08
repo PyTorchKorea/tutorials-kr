@@ -3,6 +3,10 @@ PyTorch로 분산 어플리케이션 개발하기
 **Author**: `Séb Arnold <https://seba1511.com>`_
   **번역**: `박정환 <https://github.com/9bow>`_
 
+선수과목(Prerequisites):
+
+-  `PyTorch Distributed Overview <../beginner/dist_overview.html>`__
+
 이 짧은 튜토리얼에서는 PyTorch의 분산 패키지를 둘러볼 예정입니다.
 여기에서는 어떻게 분산 환경을 설정하는지와 서로 다른 통신 방법을 사용하는지를
 알아보고, 패키지 내부도 일부 살펴보도록 하겠습니다.
@@ -367,29 +371,28 @@ PyTorch에는 현재 ``dist.all_reduce(tensor, op, group)`` 외에도 6개의 �
 
     """ 링-리듀스(ring-reduce) 구현 """
     def allreduce(send, recv):
-        rank = dist.get_rank()
-        size = dist.get_world_size()
-        send_buff = th.zeros(send.size())
-        recv_buff = th.zeros(send.size())
-        accum = th.zeros(send.size())
-        accum[:] = send[:]
+       rank = dist.get_rank()
+       size = dist.get_world_size()
+       send_buff = send.clone()
+       recv_buff = send.clone()
+       accum = send.clone()
 
-        left = ((rank - 1) + size) % size
-        right = (rank + 1) % size
+       left = ((rank - 1) + size) % size
+       right = (rank + 1) % size
 
-        for i in range(size - 1):
-            if i % 2 == 0:
-                # Send send_buff
-                send_req = dist.isend(send_buff, right)
-                dist.recv(recv_buff, left)
-                accum[:] += recv[:]
-            else:
-                # Send recv_buff
-                send_req = dist.isend(recv_buff, right)
-                dist.recv(send_buff, left)
-                accum[:] += send[:]
-            send_req.wait()
-        recv[:] = accum[:]
+       for i in range(size - 1):
+           if i % 2 == 0:
+               # Send send_buff
+               send_req = dist.isend(send_buff, right)
+               dist.recv(recv_buff, left)
+               accum[:] += recv_buff[:]
+           else:
+               # Send recv_buff
+               send_req = dist.isend(recv_buff, right)
+               dist.recv(send_buff, left)
+               accum[:] += send_buff[:]
+           send_req.wait()
+       recv[:] = accum[:]
 
 위 스크립트에서, ``allreduct(send, recv)`` 함수는 PyTorch에 있는 것과는 약간
 다른 특징을 가지고 있습니다. 이는 ``recv`` Tensor를 받은 후 모든 ``send`` Tensor의

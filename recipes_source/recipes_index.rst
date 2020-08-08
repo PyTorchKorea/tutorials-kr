@@ -61,15 +61,15 @@ Recipes are bite-sized bite-sized, actionable examples of how to use specific Py
 
 
 .. customcarditem::
-   :header: Saving and loading a general checkpoint in PyTorch
-   :card_description: Saving and loading a general checkpoint model for inference or resuming training can be helpful for picking up where you last left off. In this recipe, explore how to save and load multiple checkpoints.
+   :header: PyTorch에서 일반적인 체크포인트(checkpoint) 저장하기 & 불러오기
+   :card_description: 추론 또는 학습을 재개하기 위해 일반적인 체크포인트를 저장하고 불러오는 것은 마지막으로 중단한 부분을 고르는데 도움이 됩니다. 이 레시피에서는 어떻게 여러개의 체크포인트를 저장하고 불러오는지 알아봅니다.
    :image: ../_static/img/thumbnails/cropped/saving-and-loading-general-checkpoint.PNG
    :link: ../recipes/recipes/saving_and_loading_a_general_checkpoint.html
    :tags: Basics
 
 .. customcarditem::
-   :header: Saving and loading multiple models in one file using PyTorch
-   :card_description: In this recipe, learn how saving and loading multiple models can be helpful for reusing models that you have previously trained.
+   :header: PyTorch에서 여러 모델을 하나의 파일에 저장하기 & 불러오기
+   :card_description: 이전에 학습했던 여러 모델들을 저장하고 불러와 모델을 재사용하는 방법을 알아봅니다.
    :image: ../_static/img/thumbnails/cropped/saving-multiple-models.PNG
    :link: ../recipes/recipes/saving_multiple_models_in_one_file.html
    :tags: Basics
@@ -93,6 +93,13 @@ Recipes are bite-sized bite-sized, actionable examples of how to use specific Py
    :card_description: Learn when you should zero out graidents and how doing so can help increase the accuracy of your model.
    :image: ../_static/img/thumbnails/cropped/zeroing-out-gradients.PNG
    :link: ../recipes/recipes/zeroing_out_gradients.html
+   :tags: Basics
+
+.. customcarditem::
+   :header: PyTorch Profiler
+   :card_description: Learn how to use PyTorch's profiler to measure operators time and memory consumption
+   :image: ../_static/img/thumbnails/cropped/profiler.png
+   :link: ../recipes/recipes/profiler.html
    :tags: Basics
 
 .. Customization
@@ -146,6 +153,19 @@ Recipes are bite-sized bite-sized, actionable examples of how to use specific Py
    :link: ../recipes/deployment_with_flask.html
    :tags: Production,TorchScript
 
+.. customcarditem::
+   :header: PyTorch Mobile Performance Recipes
+   :card_description: List of recipes for performance optimizations for using PyTorch on Mobile (Android and iOS).
+   :image: ../_static/img/thumbnails/cropped/mobile.png
+   :link: ../recipes/mobile_perf.html
+   :tags: Mobile,Model-Optimization
+
+.. customcarditem::
+   :header: Making Android Native Application That Uses PyTorch Android Prebuilt Libraries
+   :card_description: Learn how to make Android application from the scratch that uses LibTorch C++ API and uses TorchScript model with custom C++ operator.
+   :image: ../_static/img/thumbnails/cropped/android.png
+   :link: ../recipes/android_native_app_with_custom_op.html
+   :tags: Mobile
 
 .. End of tutorial card section
 
@@ -174,9 +194,11 @@ Recipes are bite-sized bite-sized, actionable examples of how to use specific Py
    /recipes/recipes/warmstarting_model_using_parameters_from_a_different_model
    /recipes/recipes/save_load_across_devices
    /recipes/recipes/zeroing_out_gradients
+   /recipes/recipes/profiler
    /recipes/recipes/custom_dataset_transforms_loader
    /recipes/recipes/Captum_Recipe
    /recipes/recipes/tensorboard_with_pytorch
    /recipes/recipes/dynamic_quantization
    /recipes/torchscript_inference
    /recipes/deployment_with_flask
+   /recipes/distributed_rpc_profiling

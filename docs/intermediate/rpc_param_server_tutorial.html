@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Implementing a Parameter Server Using Distributed RPC Framework &mdash; PyTorch Tutorials 1.5.1 documentation</title>
+  <title>Implementing a Parameter Server Using Distributed RPC Framework &mdash; PyTorch Tutorials 1.6.0 documentation</title>
   
 
   
@@ -30,6 +30,7 @@
   <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Distributed Pipeline Parallelism Using RPC" href="dist_pipeline_parallel_tutorial.html" />
     <link rel="prev" title="(advanced) PyTorch 1.0 Distributed Trainer with Amazon AWS" href="../beginner/aws_distributed_training_tutorial.html" /> 
 
   
@@ -100,7 +101,7 @@
               
               
                 <div class="version">
-                  1.5.1
+                  1.6.0
                 </div>
               
             
@@ -172,30 +173,36 @@
 </ul>
 <p class="caption"><span class="caption-text">프론트엔드 API</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="named_tensor_tutorial.html">(experimental) Introduction to Named Tensors in PyTorch</a></li>
-<li class="toctree-l1"><a class="reference internal" href="memory_format_tutorial.html">(experimental) Channels Last Memory Format in PyTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="named_tensor_tutorial.html">(prototype) Introduction to Named Tensors in PyTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="memory_format_tutorial.html">(beta) Channels Last Memory Format in PyTorch</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_frontend.html">Using the PyTorch C++ Frontend</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_extension.html">Custom C++ and CUDA Extensions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/torch_script_custom_ops.html">Extending TorchScript with Custom C++ Operators</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/torch_script_custom_classes.html">Extending TorchScript with Custom C++ Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/torch-script-parallelism.html">Dynamic Parallelism in TorchScript</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_autograd.html">Autograd in C++ Frontend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/dispatcher.html">Dispatcher in C++</a></li>
 </ul>
 <p class="caption"><span class="caption-text">모델 최적화</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="pruning_tutorial.html">Pruning Tutorial</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../advanced/dynamic_quantization_tutorial.html">(experimental) Dynamic Quantization on an LSTM Word Language Model</a></li>
-<li class="toctree-l1"><a class="reference internal" href="dynamic_quantization_bert_tutorial.html">(experimental) Dynamic Quantization on BERT</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../advanced/static_quantization_tutorial.html">(experimental) Static Quantization with Eager Mode in PyTorch</a></li>
-<li class="toctree-l1"><a class="reference internal" href="quantized_transfer_learning_tutorial.html">(experimental) Quantized Transfer Learning for Computer Vision Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/dynamic_quantization_tutorial.html">(beta) Dynamic Quantization on an LSTM Word Language Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dynamic_quantization_bert_tutorial.html">(beta) Dynamic Quantization on BERT</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/static_quantization_tutorial.html">(beta) Static Quantization with Eager Mode in PyTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quantized_transfer_learning_tutorial.html">(beta) Quantized Transfer Learning for Computer Vision Tutorial</a></li>
 </ul>
 <p class="caption"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../beginner/dist_overview.html">PyTorch Distributed Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="model_parallel_tutorial.html">Single-Machine Model Parallel Best Practices</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ddp_tutorial.html">Getting Started with Distributed Data Parallel</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dist_tuto.html">PyTorch로 분산 어플리케이션 개발하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rpc_tutorial.html">Getting Started with Distributed RPC Framework</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/aws_distributed_training_tutorial.html">(advanced) PyTorch 1.0 Distributed Trainer with Amazon AWS</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Implementing a Parameter Server Using Distributed RPC Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dist_pipeline_parallel_tutorial.html">Distributed Pipeline Parallelism Using RPC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rpc_async_execution.html">Implementing Batch RPC Processing Using Asynchronous Executions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/rpc_ddp_tutorial.html">Combining Distributed DataParallel with Distributed RPC Framework</a></li>
 </ul>
 
             
@@ -293,6 +300,11 @@
   <div class="section" id="implementing-a-parameter-server-using-distributed-rpc-framework">
 <h1>Implementing a Parameter Server Using Distributed RPC Framework<a class="headerlink" href="#implementing-a-parameter-server-using-distributed-rpc-framework" title="Permalink to this headline">¶</a></h1>
 <p><strong>Author</strong>: <a class="reference external" href="https://github.com/rohan-varma">Rohan Varma</a></p>
+<p>Prerequisites:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="../beginner/dist_overview.html">PyTorch Distributed Overview</a></p></li>
+<li><p><a class="reference external" href="https://pytorch.org/docs/master/rpc.html">RPC API documents</a></p></li>
+</ul>
 <p>This tutorial walks through a simple example of implementing a parameter server using PyTorch’s <a class="reference external" href="https://pytorch.org/docs/stable/rpc.html">Distributed RPC framework</a>. The parameter server framework is a paradigm in which a set of servers store parameters, such as large embedding tables, and several trainers query the parameter servers in order to retrieve the most up to date parameters. These trainers can run a training loop locally and occasionally synchronize with the parameter server to get the latest parameters. For more reading on the parameter server approach, check out <a class="reference external" href="https://www.cs.cmu.edu/~muli/file/parameter_server_osdi14.pdf">this paper</a>.</p>
 <p>Using the Distributed RPC Framework, we’ll build an example where multiple trainers use RPC to communicate with the same parameter server and use <a class="reference external" href="https://pytorch.org/docs/stable/rpc.html#torch.distributed.rpc.RRef">RRef</a> to access states on the remote parameter server instance. Each trainer will launch its dedicated backward pass in a distributed fashion through stitching of the autograd graph across multiple nodes using distributed autograd.</p>
 <p><strong>Note</strong>: This tutorial covers the use of the Distributed RPC Framework, which is useful for splitting a model onto multiple machines, or for implementing a parameter-server training strategy where network trainers fetch parameters hosted on a different machine. If instead you are looking for replicating your model across many GPUs, please see the <a class="reference external" href="https://pytorch.org/tutorials/intermediate/ddp_tutorial.html">Distributed Data Parallel tutorial</a>. There is also another <a class="reference external" href="https://pytorch.org/tutorials/intermediate/rpc_tutorial.html">RPC tutorial</a> that covers reinforcement learning and RNN use cases.</p>
@@ -651,6 +663,8 @@
             <footer>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="dist_pipeline_parallel_tutorial.html" class="btn btn-neutral float-right" title="Distributed Pipeline Parallelism Using RPC" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
       
       
         <a href="../beginner/aws_distributed_training_tutorial.html" class="btn btn-neutral" title="(advanced) PyTorch 1.0 Distributed Trainer with Amazon AWS" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
