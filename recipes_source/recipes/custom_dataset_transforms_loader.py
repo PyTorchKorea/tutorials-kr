@@ -331,14 +331,13 @@ class ToTensor(object):
 ######################################################################
 # 2.2 변환들을 구성하고 샘플에 적용해보기.
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Next let’s compose these transforms and apply to a sample
+# 다음에는 작성해왔던 변환들을 구성하고 샘플에 적용해봅시다.
 #
 #
-# Let’s say we want to rescale the shorter side of the image to 256 and
-# then randomly crop a square of size 224 from it. i.e, we want to compose
-# ``Rescale`` and ``RandomCrop`` transforms.
-# ``torchvision.transforms.Compose`` is a simple callable class which
-# allows us to do this.
+# 우리가 한 이미지의 가로나 세로중에서 더작은 쪽을 256으로 크기를 바꾸고싶고 
+# 바뀐 이미지에서 무작위하게 가로 세로 전부 224로 자르고 싶다고 상황을 가정해봅시다.
+# 예를들면, 우리는 ``Rescale`` 과 ``RandomCrop`` 변환을 구성해야 합니다.
+# ``torchvision.transforms.Compose`` 는 간단한 호출가능한 클래스로 이러한것들을 우리에게 가능하게 해줍니다.
 #
 
 scale = Rescale(256)
@@ -346,7 +345,7 @@ crop = RandomCrop(128)
 composed = transforms.Compose([Rescale(256),
                                RandomCrop(224)])
 
-# Apply each of the above transforms on sample.
+# 위에 있는 변환들을 각각 샘플에 적용 시킵니다.
 fig = plt.figure()
 sample = face_dataset[65]
 for i, tsfrm in enumerate([scale, crop, composed]):
