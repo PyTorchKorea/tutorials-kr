@@ -24,7 +24,7 @@ STN은 어떠한 공간적 변형(spatial transformation)에도 적용할 수 �
 STN이 가진 장점 중 하나는 아주 작은 수정만으로 기존에 사용하던 CNN에 간단하게 연결 시킬 
 수 있다는 것입니다.
 """
-# License: BSD
+# 라이센스: BSD
 # 저자: Ghassen Hamrouni
 
 from __future__ import print_function
@@ -69,7 +69,7 @@ test_loader = torch.utils.data.DataLoader(
 # STN은 다음의 세 가지 주요 구성 요소를 갖습니다.
 #
 # -  위치 결정 네트워크(localization network)는 공간 변환 파라미터를 예측(regress)
-#    하는 일반적인 CNN 입니다. 공간 변환은 데이터셋을 이용해 명시적으로 학습되지 않고,
+#    하는 일반적인 CNN 입니다. 공간 변환은 명시적으로 학습되지 않고,
 #    신경망이 전체 정확도를 향상 시키도록 공간 변환을 자동으로 학습합니다.
 # -  그리드 생성기(grid generator)는 출력 이미지로부터 각 픽셀에 대응하는 입력
 #    이미지 내 좌표 그리드를 생성합니다.
