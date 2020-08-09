@@ -1,24 +1,22 @@
 """
-How to use TensorBoard with PyTorch
+PyTorch·Î TensorBoard »ç¿ëÇÏ±â
 ===================================
-TensorBoard is a visualization toolkit for machine learning experimentation. 
-TensorBoard allows tracking and visualizing metrics such as loss and accuracy, 
-visualizing the model graph, viewing histograms, displaying images and much more. 
-In this tutorial we are going to cover TensorBoard installation, 
-basic usage with PyTorch, and how to visualize data you logged in TensorBoard UI.
+TensorBoard´Â ¸Ó½Å·¯´× ½ÇÇèÀ» À§ÇÑ ½Ã°¢È­ ÅøÅ¶(toolkit)ÀÔ´Ï´Ù.
+TensorBoard¸¦ »ç¿ëÇÏ¸é ¼Õ½Ç ¹× Á¤È®µµ¿Í °°Àº ÃøÁ¤ Ç×¸ñÀ» ÃßÀû ¹× ½Ã°¢È­ÇÏ´Â °Í,
+¸ğµ¨ ±×·¡ÇÁ¸¦ ½Ã°¢È­ÇÏ´Â °Í, È÷½ºÅä±×·¥À» º¸´Â °Í, ÀÌ¹ÌÁö¸¦ Ãâ·ÂÇÏ´Â °Í µîÀ» ÇÒ ¼ö ÀÖ½À´Ï´Ù.
+ÀÌ Æ©Åä¸®¾ó¿¡¼­´Â TensorBoard ¼³Ä¡, PyTorchÀÇ ±âº» »ç¿ë¹ı,
+TensorBoard UI¿¡ ±â·ÏÇÑ µ¥ÀÌÅÍ¸¦ ½Ã°¢È­ ÇÏ´Â ¹æ¹ıÀ» ´Ù·ê °ÍÀÔ´Ï´Ù.
 
-Installation
+¼³Ä¡
 ----------------------
-PyTorch should be installed to log models and metrics into TensorBoard log 
-directory. The following command will install PyTorch 1.4+ via 
-Anaconda (recommended):
-
+¸ğµ¨°ú ÃøÁ¤ Ç×¸ñÀ» TensorBoard ·Î±× µğ·ºÅÍ¸®¿¡ ±â·ÏÇÏ·Á¸é PyTorch¸¦ ¼³Ä¡ÇØ¾ß ÇÕ´Ï´Ù.
+Anaconda¸¦ ÅëÇì PyTorch 1.4+¸¦ ¼³Ä¡ÇÏ´Â ¹æ¹ıÀº ´ÙÀ½°ú °°½À´Ï´Ù.(±ÇÀå):
 ::
 
    $ conda install pytorch torchvision -c pytorch 
    
 
-or pip
+¶Ç´Â pip¸¦ ÀÌ¿ëÇÒ ¼öµµ ÀÖ½À´Ï´Ù.
 
 ::
 
@@ -27,11 +25,11 @@ or pip
 """
 
 ######################################################################
-# Using TensorBoard in PyTorch
+# PyTorch·Î TensorBoard »ç¿ëÇÏ±â
 # -----
 # 
-# Letâ€™s now try using TensorBoard with PyTorch! Before logging anything, 
-# we need to create a ``SummaryWriter`` instance.
+# ÀÌÁ¦ PyTorch·Î TensorBoard¸¦ »ç¿ëÇØº¾½Ã´Ù! ¾î¶² °ÍÀ» ±â·ÏÇÏ±â Àü¿¡, 
+# ``SummaryWriter`` ÀÎ½ºÅÏ½º¸¦ »ı¼ºÇØ¾ß ÇÕ´Ï´Ù.
 #   
 
 import torch
@@ -39,23 +37,21 @@ from torch.utils.tensorboard import SummaryWriter
 writer = SummaryWriter()
 
 ######################################################################
-# Writer will output to ``./runs/`` directory by default.
+# Writer´Â ±âº»ÀûÀ¸·Î ``./runs/`` µğ·ºÅÍ¸®¿¡ Ãâ·ÂÇÕ´Ï´Ù.
 # 
 
 
 ######################################################################
-# Log scalars
+# Scalar ±â·ÏÇÏ±â
 # -----
 # 
-# In machine learning, itâ€™s important to understand key metrics such as 
-# loss and how they change during training. Scalar helps to save 
-# the loss value of each training step, or the accuracy after each epoch. 
+# ¸Ó½Å·¯´×¿¡¼­´Â ¼Õ½Ç °°Àº ÁÖ¿ä ÃøÁ¤ Ç×¸ñ°ú ±×°ÍÀÌ ÇĞ½À Áß ¾î¶»°Ô º¯ÇÏ´ÂÁö ÀÌÇØÇÏ´Â °ÍÀÌ
+# Áß¿äÇÕ´Ï´Ù. Scalar´Â °¢ ÇĞ½À ´Ü°è(step)¿¡¼­ÀÇ ¼Õ½Ç °ªÀÌ³ª °¢ ¿¡Æø ÀÌÈÄÀÇ Á¤È®µµ¸¦ ÀúÀåÇÏ´Â µ¥
+# µµ¿òÀ» Áİ´Ï´Ù.
 #
-# To log a scalar value, use 
-# ``add_scalar(tag, scalar_value, global_step=None, walltime=None)``. 
-# For example, lets create a simple linear regression training, and 
-# log loss value using ``add_scalar``
-#
+# Scalar °ªÀ» ±â·ÏÇÏ·Á¸é ``add_scalar(tag, scalar_value, global_step=None, walltime=None)``
+# À» »ç¿ëÇØ¾ß ÇÕ´Ï´Ù. ¿¹·Î, °£´ÜÇÑ ¼±Çü È¸±Í ÇĞ½ÀÀ» ¸¸µé°í ``add_scalar``¸¦ »ç¿ëÇØ
+# ¼Õ½Ç °ªÀ» ±â·ÏÇØ º¾½Ã´Ù.
 
 x = torch.arange(-5, 5, 0.1).view(-1, 1)
 y = -5 * x + 0.1 * torch.randn(x.size())
@@ -78,64 +74,63 @@ writer.flush()
 
 
 ###################################################################### 
-# Call ``flush()`` method to make sure that all pending events 
-# have been written to disk.
+# ¸ğµç º¸·ùÁßÀÎ(pending) ÀÌº¥Æ®°¡ µğ½ºÅ©¿¡ ±â·ÏµÇ¾ú´ÂÁö È®ÀÎÇÏ·Á¸é ``flush()``
+# ¸Ş¼Òµå¸¦ È£ÃâÇÕ´Ï´Ù.
 # 
-# See `torch.utils.tensorboard tutorials <https://pytorch.org/docs/stable/tensorboard.html>`_ 
-# to find more TensorBoard visualization types you can log.
-# 
-# If you do not need the summary writer anymore, call ``close()`` method.
+# ±â·ÏÇÒ ¼ö ÀÖ´Â ´õ ¸¹Àº TensorBoard ½Ã°¢È­ ¹æ¹ıÀ» Ã£À¸·Á¸é 
+# `torch.utils.tensorboard tutorials <https://pytorch.org/docs/stable/tensorboard.html>`_ À»
+# ÂüÁ¶ÇÏ¼¼¿ä.
+#
+# Summary writer°¡ ´õ ÀÌ»ó ÇÊ¿äÇÏÁö ¾ÊÀ¸¸é ``close()`` ¸Ş¼Òµå¸¦ È£ÃâÇÕ´Ï´Ù.
 #
 
 writer.close()
 
 ######################################################################
-# Run TensorBoard
+# TensorBoard ½ÇÇàÇÏ±â
 # -----
 # 
-# Install TensorBoard through the command line to visualize data you logged
+# ±â·ÏÇÑ µ¥ÀÌÅÍ¸¦ ½Ã°¢È­ÇÏ±â À§ÇØ¼­ ´ÙÀ½°ú °°ÀÌ TensorBoard¸¦ ¼³Ä¡ÇÕ´Ï´Ù.
 #
 # ::
 # 
 #    $ pip install tensorboard
 # 
 #
-# Now, start TensorBoard, specifying the root log directory you used above. 
-# Argument ``logdir`` points to directory where TensorBoard will look to find 
-# event files that it can display. TensorBoard will recursively walk 
+# ÀÌÁ¦, À§¿¡¼­ »ç¿ëÇÑ ·çÆ® ·Î±× µğ·ºÅÍ¸®¸¦ ÁöÁ¤ÇÏ¿© TensorBoard¸¦ ½ÃÀÛÇÕ´Ï´Ù.
 # the directory structure rooted at logdir, looking for .*tfevents.* files.
+# ``logdir`` ÀÎÀÚ´Â TensorBoard°¡ Ãâ·ÂÇÒ ¼ö ÀÖ´Â ÀÌº¥Æ® ÆÄÀÏµéÀ» Ã£À» µğ·ºÅÍ¸®¸¦ °¡¸®Åµ´Ï´Ù. 
+# TensorBoard´Â .*tfevents.* ÆÄÀÏÀ» Ã£±â À§ÇØ lodgirÀÇ µğ·ºÅÍ¸® ±¸Á¶¸¦ Àç±ÍÀûÀ¸·Î Å½»öÇÕ´Ï´Ù.
 #
 # ::
 # 
 #    $ tensorboard --logdir=runs
 # 
-# Go to the URL it provides OR to `http://localhost:6006/ <http://localhost:6006/>`_
+# Á¦°øÇÏ´Â URL·Î ÀÌµ¿ÇÏ°Å³ª `http://localhost:6006/ <http://localhost:6006/>`_ ·Î ÀÌµ¿ÇÕ´Ï´Ù.
 # 
 # .. image:: ../../_static/img/thumbnails/tensorboard_scalars.png
 #    :scale: 40 %
 # 
-# This dashboard shows how the loss and accuracy change with every epoch. 
-# You can use it to also track training speed, learning rate, and other 
-# scalar values. Itâ€™s helpful to compare these metrics across different 
-# training runs to improve your model.
-#
+# ÀÌ ´ë½Ãº¸µå´Â ¸Å ¿¡Æø¸¶´Ù ¼Õ½Ç°ú Á¤È®µµ°¡ ¾î¶»°Ô º¯ÇÏ´ÂÁö º¸¿©Áİ´Ï´Ù.
+# ÀÌ¸¦ »ç¿ëÇÏ¿© ÇĞ½À ¼Óµµ, ÇĞ½À·ü ¹× ±âÅ¸ ½ºÄ®¶ó °ªµéÀ» ÃßÀûÇÒ ¼öµµ ÀÖ½À´Ï´Ù.
+# ¸ğµ¨À» Çâ»ó½ÃÅ°·Á¸é ¿©·¯ ´Ù¸¥ ÇĞ½ÀÀ» µ¹¸®¸é¼­ ÀÌ·¯ÇÑ ÃøÁ¤ ±âÁØµéÀ» ºñ±³ÇÏ´Â °ÍÀÌ ÁÁ½À´Ï´Ù.
 
 
 ######################################################################
-# Share TensorBoard dashboards
+# TensorBoard ´ë½Ãº¸µå °øÀ¯ÇÏ±â
 # -----
 # 
-# `TensorBoard.dev <https://tensorboard.dev/>`_ lets you upload and share 
-# your ML experiment results with anyone. Use TensorBoard.dev to host, 
-# track, and share your TensorBoard dashboards.
+# `TensorBoard.dev <https://tensorboard.dev/>`_¸¦ »ç¿ëÇÏ¸é ML ½ÇÇè °á°ú¸¦ 
+# ´©±¸ÇÏ°í³ª ¾÷·ÎµåÇÏ°í °øÀ¯ÇÒ ¼ö ÀÖ½À´Ï´Ù. TensorBoard.dev¸¦ »ç¿ëÇÏ¿© 
+# TensorBoard ´ë½Ãº¸µå¸¦ È£½ºÆÃ, ÃßÀû ¹× °øÀ¯ÇÏ¼¼¿ä.
 # 
-# Install the latest version of TensorBoard to use the uploader.
+# ¾÷·Î´õ(uploader)¸¦ »ç¿ëÇÏ·Á¸é TensorBoard ÃÖ½Å ¹öÀüÀ» ¼³Ä¡ÇÏ¼¼¿ä.
 #
 # :: 
 # 
 #    $ pip install tensorboard --upgrade
 #
-# Use a simple command to upload and share your TensorBoard.
+# ´ÙÀ½°ú °°Àº ¸í·ÉÀ» »ç¿ëÇÏ¿© TensorBoard¸¦ ¾÷·ÎµåÇÏ°í °øÀ¯ÇÏ¼¼¿ä.
 #
 # :: 
 # 
@@ -143,24 +138,24 @@ writer.close()
 #   --name "My latest experiment" \ # optional
 #   --description "Simple comparison of several hyperparameters" # optional
 # 
-# For help, run ``$ tensorboard dev --help``.
+# µµ¿òÀÌ ÇÊ¿äÇÏ¸é ``$ tensorboard dev --help``¸¦ ½ÇÇàÇÏ¼¼¿ä.
 #
-# **Note:** Uploaded TensorBoards are public and visible to everyone. 
-# Do not upload sensitive data.
+# **Âü°í:** ¾÷·Îµå µÈ TensorBoard´Â °ø°³ÀûÀÌ¸ç ¸ğµç »ç¶÷ÀÌ º¼ ¼ö ÀÖ½À´Ï´Ù. 
+# ¹Î°¨ÇÑ µ¥ÀÌÅÍ¸¦ ¾÷·ÎµåÇÏÁö ¸¶¼¼¿ä.
 #
-# View your TensorBoard live at URL provided in your terminal. 
-# E.g. `https://tensorboard.dev/experiment/AdYd1TgeTlaLWXx6I8JUbA <https://tensorboard.dev/experiment/AdYd1TgeTlaLWXx6I8JUbA>`_
+# ÅÍ¹Ì³Î¿¡¼­ Á¦°øÇÑ URL·Î TensorBoard¸¦ ½Ç½Ã°£À¸·Î È®ÀÎÇÏ½Ê½Ã¿À.
+# ¿¹: `https://tensorboard.dev/experiment/AdYd1TgeTlaLWXx6I8JUbA <https://tensorboard.dev/experiment/AdYd1TgeTlaLWXx6I8JUbA>`_
 #
 #
 # .. image:: ../../_static/img/thumbnails/tensorboard_dev.png
 #    :scale: 40 %
 # 
 # 
-# .. note::
-#   TensorBoard.dev currently supports only scalars dashboard.
+# .. Âü°í::
+#   TensorBoard.dev´Â ÇöÀç ½ºÄ®¶ó ´ë½Ãº¸µå¸¸ Áö¿øÇÕ´Ï´Ù.
 
 ########################################################################
-# Learn More
+# ´õ ¾Ë¾Æº¸±â
 # ----------------------------
 # 
 # -  `torch.utils.tensorboard <https://pytorch.org/docs/stable/tensorboard.html>`_ docs
