@@ -1,23 +1,22 @@
 """
-Saving and loading models across devices in PyTorch
+PyTorch에서 다양한 장치 간 모델을 저장하고 불러오기
 ===================================================
 
-There may be instances where you want to save and load your neural
-networks across different devices.
+다양한 장치(device)에서 당신의 신경망 모델을 저장하거나 불러오고 싶은 
+경우가 생길 수 있습니다.
 
-Introduction
+개요
 ------------
 
-Saving and loading models across devices is relatively straightforward
-using PyTorch. In this recipe, we will experiment with saving and
-loading models across CPUs and GPUs.
+PyTorch를 사용하여 장치 간의 모델을 저장하거나 불러오는 것은 비교적 간단합니다.
+이번 레시피에서는, CPU와 GPU에서 모델을 저장하고 불러오는 방법을 실험할 것입니다.
 
-Setup
+설정
 -----
 
-In order for every code block to run properly in this recipe, you must
-first change the runtime to “GPU” or higher. Once you do, we need to
-install ``torch`` if it isn’t already available.
+이번 레시피에서 모든 코드 블록이 제대로 실행되게 하려면, 
+우선 런타임(runtime) 설정을 "GPU"나 더 높게 지정해주어야 합니다. 
+이후, 아래와 같이 torch를 설치해야 PyTorch를 사용할 수 있습니다.
 
 ::
 
@@ -27,21 +26,21 @@ install ``torch`` if it isn’t already available.
 
 
 ######################################################################
-# Steps
+# 단계
 # -----
 # 
-# 1. Import all necessary libraries for loading our data
-# 2. Define and intialize the neural network
-# 3. Save on a GPU, load on a CPU
-# 4. Save on a GPU, load on a GPU
-# 5. Save on a CPU, load on a GPU
-# 6. Saving and loading ``DataParallel`` models
+# 1. 데이터 활용에 필요한 모든 라이브러리 Import 하기
+# 2. 신경망을 구성하고 초기화하기
+# 3. GPU에서 저장하고 CPU에서 불러오기
+# 4. GPU에서 저장하고 GPU에서 불러오기
+# 5. CPU에서 저장하고 GPU에서 불러오기
+# 6. ``DataParallel`` 모델을 저장하고 불러오기
 # 
-# 1. Import necessary libraries for loading our data
+# 1. 데이터 활용에 필요한 모든 라이브러리 Import 하기
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # 
-# For this recipe, we will use ``torch`` and its subsidiaries ``torch.nn``
-# and ``torch.optim``.
+# 이번 레시피에서 우리는 ``torch`` 및 하위 패키지인 ``torch.nn``와 
+# ``torch.optim``을 사용할 것입니다.
 # 
 
 import torch
@@ -50,11 +49,11 @@ import torch.optim as optim
 
 
 ######################################################################
-# 2. Define and intialize the neural network
+# 2. 신경망을 구성하고 초기화하기
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # 
-# For sake of example, we will create a neural network for training
-# images. To learn more see the Defining a Neural Network recipe.
+# 예를 들어, 이미지 트레이닝을 위해 신경망을 생성합니다.
+# 자세한 내용은 신경망 정의 레시피를 참조하세요.
 # 
 
 class Net(nn.Module):
@@ -81,45 +80,44 @@ print(net)
 
 
 ######################################################################
-# 3. Save on GPU, Load on CPU
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# 3. GPU에서 저장하고 CPU에서 불러오기
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # 
-# When loading a model on a CPU that was trained with a GPU, pass
-# ``torch.device('cpu')`` to the ``map_location`` argument in the
-# ``torch.load()`` function.
+# GPU로 학습된 모델을 CPU에서 불러올 때는 ``torch.load()`` 함수의 
+# ``map_location`` 인자에 ``torch.device('cpu')``를 전달합니다.
 # 
 
-# Specify a path to save to
+# 저장하고자 하는 경로를 지정합니다.
 PATH = "model.pt"
 
-# Save
+# 저장하기
 torch.save(net.state_dict(), PATH)
 
-# Load
+# 불러오기
 device = torch.device('cpu')
 model = Net()
 model.load_state_dict(torch.load(PATH, map_location=device))
 
 
 ######################################################################
-# In this case, the storages underlying the tensors are dynamically
-# remapped to the CPU device using the ``map_location`` argument.
+# 이 경우, Tensor의 저장된 내용은 ``map_location`` 인자를 통하여 CPU 장치에
+# 동적으로 재배치됩니다.
 # 
-# 4. Save on GPU, Load on GPU
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# 4. GPU에서 저장하고 GPU에서 불러오기
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # 
-# When loading a model on a GPU that was trained and saved on GPU, simply
-# convert the initialized model to a CUDA optimized model using
-# ``model.to(torch.device('cuda'))``.
+# GPU에서 학습하고 저장된 모델을 GPU에서 불러올 때는, 초기화된 모델에
+# ``model.to(torch.device('cuda'))``을 호출하여 CUDA에 최적화된 모델로 
+# 변환해주세요.
 # 
-# Be sure to use the ``.to(torch.device('cuda'))`` function on all model
-# inputs to prepare the data for the model.
+# 그리고 모든 입력에 ``.to(torch.device('cuda'))`` 함수를 호출해야 
+# 모델에 데이터를 제공할 수 있습니다.
 # 
 
-# Save
+# 저장하기
 torch.save(net.state_dict(), PATH)
 
-# Load
+# 불러오기
 device = torch.device("cuda")
 model = Net()
 model.load_state_dict(torch.load(PATH))
@@ -127,63 +125,58 @@ model.to(device)
 
 
 ######################################################################
-# Note that calling ``my_tensor.to(device)`` returns a new copy of
-# ``my_tensor`` on GPU. It does NOT overwrite ``my_tensor``. Therefore,
-# remember to manually overwrite tensors:
+# ``my_tensor.to(device)``를 호출하면 GPU에 ``my_tensor``의 복사본이
+# 반환되며, 이는 ``my_tensor``를 덮어쓰는 것이 아닙니다.
+# 그러므로, Tensor를 직접 덮어써 주어야 한다는 것을 기억하세요:
 # ``my_tensor = my_tensor.to(torch.device('cuda'))``.
 # 
-# 5. Save on CPU, Load on GPU
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# 5. CPU에서 저장하고 GPU에서 불러오기
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # 
-# When loading a model on a GPU that was trained and saved on CPU, set the
-# ``map_location`` argument in the ``torch.load()`` function to
-# ``cuda:device_id``. This loads the model to a given GPU device.
+# CPU에서 학습하고 저장된 모델을 GPU에서 불러올 때는,``torch.load()``함수의 
+# ``map_location``인자를 ``cuda:device_id``로 설정해주세요.
+# 그러면 주어진 GPU 장치에 모델이 불러와 집니다.
 # 
-# Be sure to call ``model.to(torch.device('cuda'))`` to convert the
-# model’s parameter tensors to CUDA tensors.
-# 
-# Finally, also be sure to use the ``.to(torch.device('cuda'))`` function
-# on all model inputs to prepare the data for the CUDA optimized model.
+# 모델의 매개변수 Tensor를 CUDA Tensor로 변환하기 위해,
+# ``model.to(torch.device('cuda'))``를 호출해주세요.
 # 
 
-# Save
+# 저장하기
 torch.save(net.state_dict(), PATH)
 
-# Load
+# 불러오기
 device = torch.device("cuda")
 model = Net()
-# Choose whatever GPU device number you want
+# 사용하고자 하는 GPU 장치 번호를 지정합니다.
 model.load_state_dict(torch.load(PATH, map_location="cuda:0"))
-# Make sure to call input = input.to(device) on any input tensors that you feed to the model
+# 모델에 사용되는 모든 입력 Tensor들에 대해 input = input.to(device) 을 호출해야 합니다.
 model.to(device)
 
 
 ######################################################################
-# 6. Saving ``torch.nn.DataParallel`` Models
+# 6. ``DataParallel`` 모델을 저장하고 불러오기
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # 
-# ``torch.nn.DataParallel`` is a model wrapper that enables parallel GPU
-# utilization.
+# ``torch.nn.DataParallel``은 병렬 GPU 활용을 가능하게 하는 모델 래퍼(wrapper)입니다.
 # 
-# To save a ``DataParallel`` model generically, save the
-# ``model.module.state_dict()``. This way, you have the flexibility to
-# load the model any way you want to any device you want.
+# ``DataParallel`` 모델을 범용적으로 저장하기 위해서는
+# ``model.module.state_dict()``을 사용하면 됩니다.
+# 그러면 원하는 장치에 원하는 방식으로 유연하게 모델을 불러올 수 있습니다.
 # 
 
-# Save
+# 저장하기
 torch.save(net.module.state_dict(), PATH)
 
-# Load to whatever device you want
+# 사용할 장치에 불러오기
 
 
 ######################################################################
-# Congratulations! You have successfully saved and loaded models across
-# devices in PyTorch.
+# 축하합니다! PyTorch에서 다양한 장치 간에 모델을 성공적으로 저장하고 불러왔습니다.
 # 
-# Learn More
-# ----------
+# 더 알아보기
+# -----------
 # 
-# Take a look at these other recipes to continue your learning:
+# 다른 레시피를 둘러보고 계속 배워보세요:
 # 
 # -  TBD
 # -  TBD
