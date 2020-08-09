@@ -121,8 +121,8 @@ Recipes are bite-sized bite-sized, actionable examples of how to use specific Py
    :tags: Interpretability,Captum
 
 .. customcarditem::
-   :header: How to use TensorBoard with PyTorch
-   :card_description: Learn basic usage of TensorBoard with PyTorch, and how to visualize data in TensorBoard UI
+   :header: PyTorch로 TensorBoard 사용하기
+   :card_description: PyTorch로 TensorBoard를 사용하는 기본 방법과 TensorBoard UI에서 데이터를 시각화하는 방법을 알아봅니다.
    :image: ../_static/img/thumbnails/tensorboard_scalars.png
    :link: ../recipes/recipes/tensorboard_with_pytorch.html
    :tags: Visualization,TensorBoard
