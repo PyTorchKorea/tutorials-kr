@@ -3,7 +3,7 @@ PyTorch로 TensorBoard 사용하기
 ===================================
 TensorBoard는 머신러닝 실험을 위한 시각화 툴킷(toolkit)입니다.
 TensorBoard를 사용하면 손실 및 정확도와 같은 측정 항목을 추적 및 시각화하는 것,
-모델 그래프를 시각화하는 것, 히스토그램을 보는 것, 이미지를 출력하는 것 등을 할 수 있습니다.
+모델 그래프를 시각화하는 것, 히스토그램을 보는 것, 이미지를 출력하는 것 등이 가능합니다.
 이 튜토리얼에서는 TensorBoard 설치, PyTorch의 기본 사용법,
 TensorBoard UI에 기록한 데이터를 시각화 하는 방법을 다룰 것입니다.
 
@@ -16,7 +16,7 @@ Anaconda를 통헤 PyTorch 1.4+를 설치하는 방법은 다음과 같습니다.(권장):
    $ conda install pytorch torchvision -c pytorch 
    
 
-또는 pip를 이용할 수도 있습니다.
+또는 pip를 사용할 수도 있습니다.
 
 ::
 
@@ -28,7 +28,7 @@ Anaconda를 통헤 PyTorch 1.4+를 설치하는 방법은 다음과 같습니다.(권장):
 # PyTorch로 TensorBoard 사용하기
 # -----
 # 
-# 이제 PyTorch로 TensorBoard를 사용해봅시다! 어떤 것을 기록하기 전에, 
+# 이제 PyTorch로 TensorBoard를 사용해봅시다! 기록을 시작하기 전에,
 # ``SummaryWriter`` 인스턴스를 생성해야 합니다.
 #   
 
@@ -42,14 +42,14 @@ writer = SummaryWriter()
 
 
 ######################################################################
-# Scalar 기록하기
+# 스칼라(scalar) 기록하기
 # -----
 # 
-# 머신러닝에서는 손실 같은 주요 측정 항목과 그것이 학습 중 어떻게 변하는지 이해하는 것이
-# 중요합니다. Scalar는 각 학습 단계(step)에서의 손실 값이나 각 에폭 이후의 정확도를 저장하는 데
+# 머신러닝에서는 손실 같은 주요 측정 항목과 학습 중 그것이 어떻게 변하는지 이해하는 것이
+# 중요합니다. 스칼라는 각 학습 단계(step)에서의 손실 값이나 각 에폭 이후의 정확도를 저장하는 데
 # 도움을 줍니다.
 #
-# Scalar 값을 기록하려면 ``add_scalar(tag, scalar_value, global_step=None, walltime=None)``
+# 스칼라 값을 기록하려면 ``add_scalar(tag, scalar_value, global_step=None, walltime=None)``
 # 을 사용해야 합니다. 예로, 간단한 선형 회귀 학습을 만들고 ``add_scalar``를 사용해
 # 손실 값을 기록해 봅시다.
 
@@ -98,7 +98,6 @@ writer.close()
 # 
 #
 # 이제, 위에서 사용한 루트 로그 디렉터리를 지정하여 TensorBoard를 시작합니다.
-# the directory structure rooted at logdir, looking for .*tfevents.* files.
 # ``logdir`` 인자는 TensorBoard가 출력할 수 있는 이벤트 파일들을 찾을 디렉터리를 가리킵니다. 
 # TensorBoard는 .*tfevents.* 파일을 찾기 위해 lodgir의 디렉터리 구조를 재귀적으로 탐색합니다.
 #
@@ -143,7 +142,7 @@ writer.close()
 # **참고:** 업로드 된 TensorBoard는 공개적이며 모든 사람이 볼 수 있습니다. 
 # 민감한 데이터를 업로드하지 마세요.
 #
-# 터미널에서 제공한 URL로 TensorBoard를 실시간으로 확인하십시오.
+# 터미널에서 제공한 URL로 TensorBoard를 실시간으로 확인하세요.
 # 예: `https://tensorboard.dev/experiment/AdYd1TgeTlaLWXx6I8JUbA <https://tensorboard.dev/experiment/AdYd1TgeTlaLWXx6I8JUbA>`_
 #
 #
