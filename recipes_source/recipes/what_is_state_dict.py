@@ -1,30 +1,31 @@
 """
-What is a state_dict in PyTorch
-===============================
-In PyTorch, the learnable parameters (i.e. weights and biases) of a
-``torch.nn.Module`` model are contained in the model’s parameters
-(accessed with ``model.parameters()``). A ``state_dict`` is simply a
-Python dictionary object that maps each layer to its parameter tensor.
+PyTorch에서 state_dict란 무엇인가요?
+======================================
+PyTorch에서 ``torch.nn.Module`` 모델의 학습 가능한
+매개변수(예. 가중치와 편향)들은 모델의 매개변수에 포함되어 있습니다.
+(model.parameters()로 접근합니다)
+``state_dict`` 는 간단히 말해 각 계층을 매개변수 텐서로 매핑되는
+Python 사전(dict) 객체입니다.
 
-Introduction
+개요
 ------------
-A ``state_dict`` is an integral entity if you are interested in saving
-or loading models from PyTorch.
-Because ``state_dict`` objects are Python dictionaries, they can be
-easily saved, updated, altered, and restored, adding a great deal of
-modularity to PyTorch models and optimizers.
-Note that only layers with learnable parameters (convolutional layers,
-linear layers, etc.) and registered buffers (batchnorm’s running_mean)
-have entries in the model’s ``state_dict``. Optimizer objects
-(``torch.optim``) also have a ``state_dict``, which contains information
-about the optimizer’s state, as well as the hyperparameters used.
-In this recipe, we will see how ``state_dict`` is used with a simple
-model.
+``state_dict`` 는 PyTorch에서 모델을 저장하거나 불러오는 데 관심이
+있다면 필수적인 항목입니다.
+``state_dict`` 객체는 Python 사전이기 때문에 쉽게 저장, 업데이트,
+변경 및 복원할 수 있으며, PyTorch 모델과 옵티마이저에 엄청난
+모듈성(modularity)을 제공합니다.
+이 때, 학습 가능한 매개변수를 갖는 계층(합성곱 계층, 선형 계층 등)
+및 등록된 버퍼들(batchnorm의 running_mean)이 모델의 ``state_dict``
+에 항목을 가진다는 점에 유의하시기 바랍니다. 옵티마이저 객체
+( ``torch.optim`` ) 또한 옵티마이저의 상태 뿐만 아니라 사용된
+하이터 매개변수 (Hyperparameter) 정보가 포함된 ``state_dict`` 을
+갖습니다.
+레시피에서 ``state_dict`` 이 간단한 모델에서 어떻게 사용되는지
+살펴보겠습니다.
 
-Setup
------
-Before we begin, we need to install ``torch`` if it isn’t already
-available.
+설정
+----------
+시작하기 전에 ``torch`` 가 없다면 설치해야 합니다.
 
 ::
 
@@ -35,20 +36,20 @@ available.
 
 
 ######################################################################
-# Steps
-# -----
-# 
-# 1. Import all necessary libraries for loading our data
-# 2. Define and intialize the neural network
-# 3. Initialize the optimizer
-# 4. Access the model and optimizer ``state_dict``
-# 
-# 1. Import necessary libraries for loading our data
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# 
-# For this recipe, we will use ``torch`` and its subsidiaries ``torch.nn``
-# and ``torch.optim``.
-# 
+# 단계(Steps)
+# --------------
+#
+# 1. 데이터를 불러올 때 필요한 모든 라이브러리들 불러오기
+# 2. 신경망을 구성하고 초기화하기
+# 3. 옵티마이저 초기화하기
+# 4. 모델과 옵티마이저의 ``state_dict`` 접근하기
+#
+# 1. 데이터를 불러올 때 필요한 모든 라이브러리들 불러오기
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#
+# 이 레시피에서는 ``torch`` 와 여기 포함된 ``torch.nn`` 과 ``torch.optim`` 을
+# 사용하겠습니다.
+#
 
 import torch
 import torch.nn as nn
@@ -56,12 +57,12 @@ import torch.optim as optim
 
 
 ######################################################################
-# 2. Define and intialize the neural network
+# 2. 신경망을 구성하고 초기화하기
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# 
-# For sake of example, we will create a neural network for training
-# images. To learn more see the Defining a Neural Network recipe.
-# 
+#
+# 예를 들기 위해, 이미지를 학습하는 신경망을 만들어보겠습니다.
+# 더 자세한 내용은 신경망 구성하기 레시피를 참고해주세요.
+#
 
 class Net(nn.Module):
     def __init__(self):
@@ -87,46 +88,46 @@ print(net)
 
 
 ######################################################################
-# 3. Initialize the optimizer
+# 3. 옵티마이저 초기화하기
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# 
-# We will use SGD with momentum.
-# 
+#
+# 모멘텀(momentum)을 갖는 SGD를 사용하겠습니다.
+#
 
 optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
 
 
 ######################################################################
-# 4. Access the model and optimizer ``state_dict``
+# 4. 모델과 옵티마이저의 ``state_dict`` 접근하기
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# 
-# Now that we have constructed our model and optimizer, we can understand
-# what is preserved in their respective ``state_dict`` properties.
-# 
+#
+# 이제 모델과 옵티마이저를 구성했으므로 각각의 ``state_dict`` 속성에
+# 무엇이 보존되어 있는지 이해할 수 있습니다.
+#
 
-# Print model's state_dict
+# 모델의 state_dict 출력
 print("Model's state_dict:")
 for param_tensor in net.state_dict():
     print(param_tensor, "\t", net.state_dict()[param_tensor].size())
 
 print()
 
-# Print optimizer's state_dict
+# 옵티마이저의 state_dict 출력
 print("Optimizer's state_dict:")
 for var_name in optimizer.state_dict():
     print(var_name, "\t", optimizer.state_dict()[var_name])
 
 
 ######################################################################
-# This information is relevant for saving and loading the model and
-# optimizers for future use.
-# 
-# Congratulations! You have successfully used ``state_dict`` in PyTorch.
-# 
-# Learn More
-# ----------
-# 
-# Take a look at these other recipes to continue your learning:
-# 
-# - `Saving and loading models for inference in PyTorch <https://pytorch.org/tutorials/recipes/recipes/saving_and_loading_models_for_inference.html>`__
-# - `Saving and loading a general checkpoint in PyTorch <https://pytorch.org/tutorials/recipes/recipes/saving_and_loading_a_general_checkpoint.html>`__
+# 이 정보는 향후 모델 및 옵티마이저를 저장 및
+# 불러오는 데 관련됩니다.
+#
+# 축하합니다! PyTorch에서 ``state_dict`` 을 성공적으로 사용하였습니다.
+#
+# 더 알아보기
+# -------------
+#
+# 다른 레시피를 둘러보고 계속 배워보세요:
+#
+# - :doc:`/recipes/recipes/saving_and_loading_models_for_inference`
+# - :doc:`/recipes/recipes/saving_and_loading_a_general_checkpoint`
