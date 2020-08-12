@@ -14,8 +14,8 @@ Captum을 사용하여 모델 해석하기
 # 최첨단의 feature attribution 알고리즘을 적용할 수 있습니다.
 #
 # 이 레시피에서는 Captum을 사용하여 다음을 수행하는 방법을 배웁니다.
-# \* 이미지 분류기의 예측을 해당 이미지의 특징(features)에 표시합니다.
-# \* 속성(attribution) 결과를 시각화 합니다.
+# \* 이미지 분류기(classifier)의 예측을 해당 이미지의 특징(features)에 표시하기
+# \* 속성(attribution) 결과를 시각화 하기
 
 ######################################################################
 # 시작하기 전에
@@ -29,9 +29,9 @@ Captum을 사용하여 모델 해석하기
 # 자세한 지침은 https://captum.ai/ 의 설치 안내서를 참조하면 됩니다.
 
 ######################################################################
-# 모델의 경우, PyTorch에 내장 된 이미지 분류기를 사용합니다.
+# 모델의 경우, PyTorch에 내장 된 이미지 분류기(classifier)를 사용합니다.
 # Captum은 샘플 이미지의 어떤 부분이 모델에 의해 만들어진
-# 특정한 예측에 도움을 주는지 알 수 있습니다.
+# 특정한 예측에 도움을 주는지 보여줍니다.
 
 import torchvision
 from torchvision import transforms
@@ -101,7 +101,7 @@ attribution_cat = occlusion.attribute(input_img,
 # 속성(attribution) 결과를 통합해서 반환하는 ``attribute(...)`` 메소드를 가지는
 # ``Attribution`` 의 서브클래스 입니다.
 #
-# 이미지일 때 속성(attribution) 결과를 시각화 해보겠습니다.
+# 이미지인 경우 속성(attribution) 결과를 시각화 해보겠습니다.
 #
 
 ######################################################################
@@ -117,13 +117,13 @@ attribution_cat = occlusion.attribute(input_img,
 import numpy as np
 from captum.attr import visualization as viz
 
-# Tensor를 numpy 배열 이미지로 변환합니다.
+# 계산 속성 Tensor를 이미지 같은 numpy 배열로 변환합니다.
 attribution_dog = np.transpose(attribution_dog.squeeze().cpu().detach().numpy(), (1,2,0))
 
 vis_types = ["heat_map", "original_image"]
 vis_signs = ["all", "all"] # "positive", "negative", 또는 모두 표시하는 "all"
 # positive 속성은 해당 영역의 존재가 예측 점수를 증가시킨다는 것을 의미합니다.
-# negative 속성은 해당 영역의 존재가 다른 예측 점수를 증가시키는 주의해야하는 영역을 나타냅니다.
+# negative 속성은 해당 영역의 존재가 예측 점수를 낮추는 오답 영역을 의미합니다.
 
 _ = viz.visualize_image_attr_multiple(attribution_dog,
                                       center_crop(img),
@@ -160,9 +160,9 @@ _ = viz.visualize_image_attr_multiple(attribution_cat,
 ######################################################################
 # Captum은 이미지, 텍스트 등을 포함하여 다양한 방식으로 PyTorch에서 대부분의 모델 타입을 처리할 수 있습니다.
 # Captum을 사용하면 다음을 수행할 수 있습니다.
-# \* 위에 그림처럼 특정한 출력을 모델 입력에 표시합니다.
-# \* 특정한 출력을 은닉층의 뉴런에 표시합니다 (Captum API reference를 보세요).
-# \* 모델 입력에 대한 은닉층 뉴런의 반응을 표시합니다 (Captum API reference를 보세요).
+# \* 위에서 설명한 것처럼 특정한 출력을 모델 입력에 표시하기
+# \* 특정한 출력을 은닉층의 뉴런에 표시하기 (Captum API reference를 보세요).
+# \* 모델 입력에 대한 은닉층 뉴런의 반응을 표시하기 (Captum API reference를 보세요).
 #
 # 지원되는 메소드의 전체 API와 튜토리얼의 목록은 http://captum.ai 를 참조하세요.
 #
