@@ -1,10 +1,9 @@
 """
-Text Classification with TorchText
+TorchText을 활용한 텍스트 분류
 ==================================
 
-This tutorial shows how to use the text classification datasets
-in ``torchtext``, including
-
+이 튜토리얼은 ``torchtext`` 안의 텍스트 분류 데이터셋을 어떻게 이용하는 지를 보여줍니다.
+데이터셋에는
 ::
 
    - AG_NEWS,
@@ -15,26 +14,28 @@ in ``torchtext``, including
    - YahooAnswers,
    - AmazonReviewPolarity,
    - AmazonReviewFull
+이 포함되어 있습니다.
 
-This example shows how to train a supervised learning algorithm for
-classification using one of these ``TextClassification`` datasets.
+이 예제에서는 ``TextClassification`` 의 데이터셋들 중 하나를 이용해 분류를 위한
+ 지도 학습 알고리즘을 훈련하는 방법을 보여줍니다.
 
-Load data with ngrams
+데이터를 ngrams과 함께 불러옵니다.
 ---------------------
 
-A bag of ngrams feature is applied to capture some partial information
-about the local word order. In practice, bi-gram or tri-gram are applied
-to provide more benefits as word groups than only one word. An example:
+
+bag of ngrams 피쳐는 지역(local) 단어 순서에 대한 부분적인 정보를 포착하기위해 적용합니다.
+실제는 bi-gram이나 tri-gram은 단 하나의 단어를 이용하는 것보다 더 많은 이익을 주기 때문에 적용됩니다.
+예를 들어,
+
 
 ::
 
    "load data with ngrams"
-   Bi-grams results: "load data", "data with", "with ngrams"
-   Tri-grams results: "load data with", "data with ngrams"
+   Bi-grams 결과: "load data", "data with", "with ngrams"
+   Tri-grams 결과: "load data with", "data with ngrams"
 
-``TextClassification`` Dataset supports the ngrams method. By setting
-ngrams to 2, the example text in the dataset will be a list of single
-words plus bi-grams string.
+``TextClassification`` 데이터셋은 ngrams method을 지원합니다. ngrams을 2로 설정하면,
+데이터셋안의 예제 text는 각각의(single) 단어들에 bi-grams 문자열이 더해진 리스트가 될 것입니다.
 
 """
 
@@ -51,23 +52,24 @@ BATCH_SIZE = 16
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
+
 ######################################################################
-# Define the model
+# 모델을 정의합니다.
 # ----------------
 #
-# The model is composed of the
+# 모델은  
 # `EmbeddingBag <https://pytorch.org/docs/stable/nn.html?highlight=embeddingbag#torch.nn.EmbeddingBag>`__
-# layer and the linear layer (see the figure below). ``nn.EmbeddingBag``
-# computes the mean value of a “bag” of embeddings. The text entries here
-# have different lengths. ``nn.EmbeddingBag`` requires no padding here
-# since the text lengths are saved in offsets.
+# 계층과 선형 계층으로 이뤄져있습니다. (밑의 그림을 참고하세요). ``nn.EmbeddingBag``
+# 은 임베딩 bag의 평균 값을 계산합니다. 텍스트 항목들은 서로 다른 길이를 갖고 있습니다.
+# ``nn.EmbeddingBag`` 텍스트의 길이가 offsets에 저장되기 때문에 패딩이 필요하지 않다.
 #
-# Additionally, since ``nn.EmbeddingBag`` accumulates the average across
-# the embeddings on the fly, ``nn.EmbeddingBag`` can enhance the
-# performance and memory efficiency to process a sequence of tensors.
+#
+# 추가적으로, ``nn.EmbeddingBag`` 은 상황에 따라 임베딩 값들에 대한 평균을 축적하기 때문에, 
+# ``nn.EmbeddingBag`` 은 텐서들의 시퀀스를 처리하기 위한 메모리 효율상과 성능을 향상 시킬 수 있다.
 #
 # .. image:: ../_static/img/text_sentiment_ngrams_model.png
 #
+
 
 import torch.nn as nn
 import torch.nn.functional as F
@@ -90,11 +92,11 @@ class TextSentiment(nn.Module):
 
 
 ######################################################################
-# Initiate an instance
+
+# 인스턴스 시작
 # --------------------
 #
-# The AG_NEWS dataset has four labels and therefore the number of classes
-# is four.
+# AG_NEWS 데이터셋은 4개의 라벨이 있고 그에 따른 클래스 수도 4개 입니다.
 #
 # ::
 #
@@ -103,9 +105,8 @@ class TextSentiment(nn.Module):
 #    3 : Business
 #    4 : Sci/Tec
 #
-# The vocab size is equal to the length of vocab (including single word
-# and ngrams). The number of classes is equal to the number of labels,
-# which is four in AG_NEWS case.
+# 단어의 사이즈는 단어의 길이와 같습니다.(각 단어와 n-grams을 포함하여)
+# 클래스의 수는 라벨의 수와 같습니다. AG_NEWS의 경우는 4개입니다.
 #
 
 VOCAB_SIZE = len(train_dataset.get_vocab())
@@ -115,34 +116,29 @@ model = TextSentiment(VOCAB_SIZE, EMBED_DIM, NUN_CLASS).to(device)
 
 
 ######################################################################
-# Functions used to generate batch
+# 배치 생성에 사용되는 함수
 # --------------------------------
 #
 
 
 ######################################################################
-# Since the text entries have different lengths, a custom function
-# generate_batch() is used to generate data batches and offsets. The
-# function is passed to ``collate_fn`` in ``torch.utils.data.DataLoader``.
-# The input to ``collate_fn`` is a list of tensors with the size of
-# batch_size, and the ``collate_fn`` function packs them into a
-# mini-batch. Pay attention here and make sure that ``collate_fn`` is
-# declared as a top level def. This ensures that the function is available
-# in each worker.
+# 텍스트 항목의 길이가 다르기 때문에, 사용자 정의 함수 generate_batch()를 사용하여 데이터 배치와 오프셋을 생성한다.
+# 이 함수는 ``torch.utils.data.DataLoader`` 안의 ``collate_fn`` 를 통과한다.
+# 
+#  ``collate_fn`` 에 대한 입력은 batch_size 크기를 갖는 tensors의 리스트이고,
+#  ``collate_fn`` 함수는 이들을 mini-batch로  둡니다. ``collate_fn`` 이 가장  높은 level에서 선언되었다는 것을 기억해야합니다.
+# 이는 함수가 각 worker마다 이용가능하게 하는 것을 보장해줍니다.
 #
-# The text entries in the original data batch input are packed into a list
-# and concatenated as a single tensor as the input of ``nn.EmbeddingBag``.
-# The offsets is a tensor of delimiters to represent the beginning index
-# of the individual sequence in the text tensor. Label is a tensor saving
-# the labels of individual text entries.
+# 원본 데이터 배치 인풋 안의 텍스트들은 리스트에 들어가고 단일 텐서로서 ``nn.EmbeddingBag`` 의 입력으로 연결합니다.
+# offsets은 텍스트 텐서에서 개별 시퀀스의 시작 인덱스를 표현하는 구분자들의 텐서이다.
+# label은 각 텍스트 항목별 라벨을 저장해 두는 tensor이다.
 #
 
 def generate_batch(batch):
     label = torch.tensor([entry[0] for entry in batch])
     text = [entry[1] for entry in batch]
     offsets = [0] + [len(entry) for entry in text]
-    # torch.Tensor.cumsum returns the cumulative sum
-    # of elements in the dimension dim.
+    # torch.Tensor.cumsum은 dim 차원의 요소들의 누적 합계를 반환합니다.
     # torch.Tensor([1.0, 2.0, 3.0]).cumsum(dim=0)
 
     offsets = torch.tensor(offsets[:-1]).cumsum(dim=0)
@@ -151,18 +147,19 @@ def generate_batch(batch):
 
 
 ######################################################################
-# Define functions to train the model and evaluate results.
+# 모델을 훈련하고 결과를 평가하는 함수를 정의
 # ---------------------------------------------------------
 #
 
 
 ######################################################################
+#
 # `torch.utils.data.DataLoader <https://pytorch.org/docs/stable/data.html?highlight=dataloader#torch.utils.data.DataLoader>`__
-# is recommended for PyTorch users, and it makes data loading in parallel
-# easily (a tutorial is
-# `here <https://pytorch.org/tutorials/beginner/data_loading_tutorial.html>`__).
-# We use ``DataLoader`` here to load AG_NEWS datasets and send it to the
-# model for training/validation.
+# 은 데이터을 병렬적으로 로딩할 수있어 Pytorch 유저들에게 추천합니다.
+# (튜토리얼은
+# `여기서 <https://pytorch.org/tutorials/beginner/data_loading_tutorial.html>`__).
+# 우리는 여기서 ``DataLoader`` 를  AG_NEWS 데이터셋을 로드하고 훈련과 검증을 위한
+# 모델링에 보냅니다.
 #
 
 from torch.utils.data import DataLoader
@@ -170,6 +167,7 @@ from torch.utils.data import DataLoader
 def train_func(sub_train_):
 
     # Train the model
+    # 모델을 훈련합니다
     train_loss = 0
     train_acc = 0
     data = DataLoader(sub_train_, batch_size=BATCH_SIZE, shuffle=True,
@@ -185,6 +183,7 @@ def train_func(sub_train_):
         train_acc += (output.argmax(1) == cls).sum().item()
 
     # Adjust the learning rate
+    # learning rate를 조정합니다.
     scheduler.step()
 
     return train_loss / len(sub_train_), train_acc / len(sub_train_)
@@ -205,23 +204,21 @@ def test(data_):
 
 
 ######################################################################
-# Split the dataset and run the model
+# 데이터 셋을 나누고 모델을 실행합니다.
 # -----------------------------------
 #
-# Since the original AG_NEWS has no valid dataset, we split the training
-# dataset into train/valid sets with a split ratio of 0.95 (train) and
-# 0.05 (valid). Here we use
-# `torch.utils.data.dataset.random_split <https://pytorch.org/docs/stable/data.html?highlight=random_split#torch.utils.data.random_split>`__
-# function in PyTorch core library.
+# 원래 AG_NEWS에는 검증 데이터셋이 없기 때문에, 우리는 훈련데이터셋을 0.95(훈련데이터셋)과 
+# 0.05(검증데이터셋)인 비율로 나눈다.  
+# 여기서 우리는 PyTorch core library 안에 있는 `torch.utils.data.dataset.random_split <https://pytorch.org/docs/stable/data.html?highlight=random_split#torch.utils.data.random_split>`__
+# 함수를 사용합니다.
 #
 # `CrossEntropyLoss <https://pytorch.org/docs/stable/nn.html?highlight=crossentropyloss#torch.nn.CrossEntropyLoss>`__
-# criterion combines nn.LogSoftmax() and nn.NLLLoss() in a single class.
-# It is useful when training a classification problem with C classes.
+# 기준은 단일 클래스안에서 nn.LogSoftmax() 과 nn.NLLLoss()을 결합합니다.
+# 이는 C개의 클래스들을 분류하는 문제에서 유용합니다.
 # `SGD <https://pytorch.org/docs/stable/_modules/torch/optim/sgd.html>`__
-# implements stochastic gradient descent method as optimizer. The initial
-# learning rate is set to 4.0.
+# 는 옵티마이저로써 stochastic gradient descent method으로 적용됩니다. 시작 러닝레이트는 4.0으로 설정합니다.
 # `StepLR <https://pytorch.org/docs/master/_modules/torch/optim/lr_scheduler.html#StepLR>`__
-# is used here to adjust the learning rate through epochs.
+# 은 여기서 러닝레이트를 에포크에 따라 조정하기 위해 사용됩니다.
 #
 
 import time
@@ -253,7 +250,7 @@ for epoch in range(N_EPOCHS):
 
 
 ######################################################################
-# Running the model on GPU with the following information:
+# GPU상에서 모델을 실행시킵니다.
 #
 # Epoch: 1 \| time in 0 minutes, 11 seconds
 #
@@ -297,7 +294,7 @@ for epoch in range(N_EPOCHS):
 
 
 ######################################################################
-# Evaluate the model with test dataset
+# 테스트 데이터 셋을 통해 모델을 평가합니다.
 # ------------------------------------
 #
 
@@ -307,7 +304,7 @@ print(f'\tLoss: {test_loss:.4f}(test)\t|\tAcc: {test_acc * 100:.1f}%(test)')
 
 
 ######################################################################
-# Checking the results of test dataset…
+# 테스트 데이터셋을 통한 결과를 확인합니다...
 #
 # ::
 #
@@ -316,13 +313,11 @@ print(f'\tLoss: {test_loss:.4f}(test)\t|\tAcc: {test_acc * 100:.1f}%(test)')
 
 
 ######################################################################
-# Test on a random news
+# 랜덤 뉴스들을 통해 실험합니다.
 # ---------------------
 #
-# Use the best model so far and test a golf news. The label information is
-# available
-# `here <https://pytorch.org/text/datasets.html?highlight=ag_news#torchtext.datasets.AG_NEWS>`__.
-#
+# 가장 좋았던 모델을 사용하여 골프 뉴스를 테스트 해보세요. 라벨에 대한 정보는 밑에 나와있습니다.
+# `here <https://pytorch.org/text/datasets.html?highlight=ag_news#torchtext.datasets.AG_NEWS>`__
 
 import re
 from torchtext.data.utils import ngrams_iterator
@@ -359,11 +354,10 @@ model = model.to("cpu")
 print("This is a %s news" %ag_news_label[predict(ex_text_str, model, vocab, 2)])
 
 ######################################################################
-# This is a Sports news
-#
+# 이것은 스포츠 뉴스입니다,
 
 
 ######################################################################
-# You can find the code examples displayed in this note
-# `here <https://github.com/pytorch/text/tree/master/examples/text_classification>`__.
+# 코드의 결과물들은 밑의 노트에서 찾을 수 있습니다.
 #
+# `here <https://github.com/pytorch/text/tree/master/examples/text_classification>`__
