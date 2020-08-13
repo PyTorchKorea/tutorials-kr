@@ -204,14 +204,14 @@
 .. Frontend APIs
 
 .. customcarditem::
-   :header: (experimental) Introduction to Named Tensors in PyTorch
+   :header: (prototype) Introduction to Named Tensors in PyTorch
    :card_description: Learn how to use PyTorch to train a Deep Q Learning (DQN) agent on the CartPole-v0 task from the OpenAI Gym.
    :image: _static/img/thumbnails/cropped/experimental-Introduction-to-Named-Tensors-in-PyTorch.png
    :link: intermediate/memory_format_tutorial.html
    :tags: Frontend-APIs,Named-Tensor,Best-Practice
 
 .. customcarditem::
-   :header: (experimental) Channels Last Memory Format in PyTorch
+   :header: (beta) Channels Last Memory Format in PyTorch
    :card_description: Get an overview of Channels Last memory format and understand how it is used to order NCHW tensors in memory preserving dimensions.
    :image: _static/img/thumbnails/cropped/experimental-Channels-Last-Memory-Format-in-PyTorch.png
    :link: intermediate/memory_format_tutorial.html
@@ -246,6 +246,13 @@
    :tags: Frontend-APIs,TorchScript,C++
 
 .. customcarditem::
+   :header: Dynamic Parallelism in TorchScript
+   :card_description: This tutorial introduces the syntax for doing *dynamic inter-op parallelism* in TorchScript.
+   :image: _static/img/thumbnails/cropped/TorchScript-Parallelism.jpg
+   :link: advanced/torch-script-parallelism.html
+   :tags: Frontend-APIs,TorchScript,C++
+
+.. customcarditem::
    :header: Autograd in C++ Frontend
    :card_description: The autograd package helps build flexible and dynamic nerural netorks. In this tutorial, exploreseveral examples of doing autograd in PyTorch C++ frontend
    :image: _static/img/thumbnails/cropped/Autograd-in-Cpp-Frontend.png
@@ -262,34 +269,41 @@
    :tags: Model-Optimization,Best-Practice
 
 .. customcarditem::
-   :header: (experimental) Dynamic Quantization on an LSTM Word Language Model
+   :header: (beta) Dynamic Quantization on an LSTM Word Language Model
    :card_description: Apply dynamic quantization, the easiest form of quantization, to a LSTM-based next word prediction model.
    :image: _static/img/thumbnails/cropped/experimental-Dynamic-Quantization-on-an-LSTM-Word-Language-Model.png
    :link: advanced/dynamic_quantization_tutorial.html
    :tags: Text,Quantization,Model-Optimization
 
 .. customcarditem::
-   :header: (experimental) Dynamic Quantization on BERT
+   :header: (beta) Dynamic Quantization on BERT
    :card_description: Apply the dynamic quantization on a BERT (Bidirectional Embedding Representations from Transformers) model.
    :image: _static/img/thumbnails/cropped/experimental-Dynamic-Quantization-on-BERT.png
    :link: intermediate/dynamic_quantization_bert_tutorial.html
    :tags: Text,Quantization,Model-Optimization
 
 .. customcarditem::
-   :header: (experimental) Static Quantization with Eager Mode in PyTorch
+   :header: (beta) Static Quantization with Eager Mode in PyTorch
    :card_description: Learn techniques to impove a model's accuracy =  post-training static quantization, per-channel quantization, and quantization-aware training.
    :image: _static/img/thumbnails/cropped/experimental-Static-Quantization-with-Eager-Mode-in-PyTorch.png
    :link: advanced/static_quantization_tutorial.html
    :tags: Image/Video,Quantization,Model-Optimization
 
 .. customcarditem::
-   :header: (experimental) Quantized Transfer Learning for Computer Vision Tutorial
+   :header: (beta) Quantized Transfer Learning for Computer Vision Tutorial
    :card_description: Learn techniques to impove a model's accuracy -  post-training static quantization, per-channel quantization, and quantization-aware training.
    :image: _static/img/thumbnails/cropped/experimental-Quantized-Transfer-Learning-for-Computer-Vision-Tutorial.png
    :link: advanced/static_quantization_tutorial.html
    :tags: Image/Video,Quantization,Model-Optimization
 
 .. Parallel-and-Distributed-Training
+
+.. customcarditem::
+   :header: PyTorch Distributed Overview
+   :card_description: Briefly go over all concepts and features in the distributed package. Use this document to find the distributed training technology that can best serve your application.
+   :image: _static/img/thumbnails/cropped/PyTorch-Distributed-Overview.png
+   :link: beginner/dist_overview.html
+   :tags: Parallel-and-Distributed-Training
 
 .. customcarditem::
    :header: Single-Machine Model Parallel Best Practices
@@ -303,6 +317,13 @@
    :card_description: Learn the basics of when to use distributed data paralle versus data parallel and work through an example to set it up.
    :image: _static/img/thumbnails/cropped/Getting-Started-with-Distributed-Data-Parallel.png
    :link: intermediate/ddp_tutorial.html
+   :tags: Parallel-and-Distributed-Training
+
+.. customcarditem::
+   :header: (advanced) PyTorch 1.0 Distributed Trainer with Amazon AWS
+   :card_description: Set up the distributed package of PyTorch, use the different communication strategies, and go over some the internals of the package.
+   :image: _static/img/thumbnails/cropped/advanced-PyTorch-1point0-Distributed-Trainer-with-Amazon-AWS.png
+   :link: beginner/aws_distributed_training_tutorial.html
    :tags: Parallel-and-Distributed-Training
 
 .. customcarditem::
@@ -320,17 +341,31 @@
    :tags: Parallel-and-Distributed-Training
 
 .. customcarditem::
-   :header: (advanced) PyTorch 1.0 Distributed Trainer with Amazon AWS
-   :card_description: Set up the distributed package of PyTorch, use the different communication strategies, and go over some the internals of the package.
-   :image: _static/img/thumbnails/cropped/advanced-PyTorch-1point0-Distributed-Trainer-with-Amazon-AWS.png
-   :link: beginner/aws_distributed_training_tutorial.html
-   :tags: Parallel-and-Distributed-Training
-
-.. customcarditem::
    :header: Implementing a Parameter Server Using Distributed RPC Framework
    :card_description: Walk through a through a simple example of implementing a parameter server using PyTorch’s Distributed RPC framework.
    :image: _static/img/thumbnails/cropped/Implementing-a-Parameter-Server-Using-Distributed-RPC-Framework.png
    :link: intermediate/rpc_param_server_tutorial.html
+   :tags: Parallel-and-Distributed-Training
+
+.. customcarditem::
+   :header: Distributed Pipeline Parallelism Using RPC
+   :card_description: Demonstrate how to implement distributed pipeline parallelism using RPC
+   :image: _static/img/thumbnails/cropped/Distributed-Pipeline-Parallelism-Using-RPC.png
+   :link: intermediate/dist_pipeline_parallel_tutorial.html
+   :tags: Parallel-and-Distributed-Training
+
+.. customcarditem::
+   :header: Implementing Batch RPC Processing Using Asynchronous Executions
+   :card_description: Learn how to use rpc.functions.async_execution to implement batch RPC
+   :image: _static/img/thumbnails/cropped/Implementing-Batch-RPC-Processing-Using-Asynchronous-Executions.png
+   :link: intermediate/rpc_async_execution.html
+   :tags: Parallel-and-Distributed-Training
+
+.. customcarditem::
+   :header: Combining Distributed DataParallel with Distributed RPC Framework
+   :card_description: Walk through a through a simple example of how to combine distributed data parallelism with distributed model parallelism.
+   :image: _static/img/thumbnails/cropped/Combining-Distributed-DataParallel-with-Distributed-RPC-Framework.png
+   :link: advanced/rpc_ddp_tutorial.html
    :tags: Parallel-and-Distributed-Training
 
 .. End of tutorial card section
@@ -478,7 +513,9 @@
    advanced/cpp_extension
    advanced/torch_script_custom_ops
    advanced/torch_script_custom_classes
+   advanced/torch-script-parallelism
    advanced/cpp_autograd
+   advanced/dispatcher
 
 .. toctree::
    :maxdepth: 2
@@ -498,9 +535,13 @@
    :hidden:
    :caption: 병렬 및 분산 학습
 
+   beginner/dist_overview
    intermediate/model_parallel_tutorial
    intermediate/ddp_tutorial
    intermediate/dist_tuto
    intermediate/rpc_tutorial
    beginner/aws_distributed_training_tutorial
    intermediate/rpc_param_server_tutorial
+   intermediate/dist_pipeline_parallel_tutorial
+   intermediate/rpc_async_execution
+   advanced/rpc_ddp_tutorial
