@@ -31,8 +31,9 @@ Recipes are bite-sized bite-sized, actionable examples of how to use specific Py
 .. Basics
 
 .. customcarditem::
-   :header: Loading data in PyTorch
-   :card_description: Learn how to use PyTorch packages to prepare and load common datasets for your model.
+   :header: PyTorch에서 데이터 불러오기
+   :card_description: PyTorch 패키지를 이용해서 공용 데이터셋을 불러오고 모델에 적용하는 방법을 알아봅니다.
+Learn how to use PyTorch packages to prepare and load common datasets for your model.
    :image: ../_static/img/thumbnails/cropped/loading-data.PNG
    :link: ../recipes/recipes/loading_data_recipe.html
    :tags: Basics
