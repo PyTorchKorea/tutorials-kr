@@ -12,7 +12,7 @@ Python 사전(dict) 객체입니다.
 ``state_dict`` 는 PyTorch에서 모델을 저장하거나 불러오는 데 관심이
 있다면 필수적인 항목입니다.
 ``state_dict`` 객체는 Python 사전이기 때문에 쉽게 저장, 업데이트,
-변경 및 복원할 수 있으며, PyTorch 모델과 옵티마이저에 엄청난
+변경 및 복원할 수 있으며, 이는 PyTorch 모델과 옵티마이저에 엄청난
 모듈성(modularity)을 제공합니다.
 이 때, 학습 가능한 매개변수를 갖는 계층(합성곱 계층, 선형 계층 등)
 및 등록된 버퍼들(batchnorm의 running_mean)이 모델의 ``state_dict``
