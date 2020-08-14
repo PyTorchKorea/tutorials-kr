@@ -35,7 +35,7 @@ bag of ngrams 피쳐는 지역(local) 단어 순서에 대한 부분적인 정�
    Tri-grams 결과: "load data with", "data with ngrams"
 
 ``TextClassification`` 데이터셋은 ngrams method을 지원합니다. ngrams을 2로 설정하면,
-데이터셋안의 예제 text는 각각의(single) 단어들에 bi-grams 문자열이 더해진 리스트가 될 것입니다.
+데이터셋 안의 예제 텍스트는 각각의(single) 단어들에 bi-grams 문자열이 더해진 리스트가 될 것입니다.
 
 """
 
