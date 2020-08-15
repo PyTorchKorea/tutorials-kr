@@ -58,7 +58,7 @@ data_size = 100
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 ######################################################################
-# 모형 데이터셋
+# 더미(Dummy) 데이터셋
 # -------------
 #
 # 모형 데이터셋을 만들어 봅시다 (random). Getitem 만 구현하면 됩니다.
