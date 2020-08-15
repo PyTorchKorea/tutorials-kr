@@ -1,27 +1,29 @@
-Making Native Android Application that uses PyTorch prebuilt libraries
-======================================================================
+PyTorch 사전 빌드 된 라이브러리를 사용하는 네이티브 Android 애플리케이션 만들기
+==============================================================================
 
-**Author**: `Ivan Kobzarev <https://github.com/IvanKobzarev>`_
+**Author**: `Ivan Kobzarev <https://github.com/IvanKobzarev>`_ 
 
-In this recipe, you will learn:
+**번역**: `Ajin Jeong <https://github.com/ajin-jng>`
 
- - How to make an Android Application that uses LibTorch API from native code (C++).
+이 레시피에서는 다음을 학습합니다.
 
- - How to use within this application TorchScript models with custom operators.
+ - 네이티브 코드 (C ++)에서 LibTorch API를 사용하는 Android 애플리케이션을 만드는 방법.
 
-The full setup of this app you can find in `PyTorch Android Demo Application Repository <https://github.com/pytorch/android-demo-app/tree/master/NativeApp>`_.
+ - 이 응용 프로그램에서 사용자 정의 연산자와 함께 TorchScript 모델을 사용하는 방법.
+
+이 앱의 전체 설정은 `PyTorch Android Demo Application Repository <https://github.com/pytorch/android-demo-app/tree/master/NativeApp>`_ 에서 찾을 수 있습니다.
 
 
-Setup
+설정
 ~~~~~
 
-You will need a Python 3 environment with the following packages (and their dependencies) installed:
+다음 패키지 (및 해당 종속성)가 설치된 Python 3 환경이 필요합니다.
 
-- PyTorch 1.6
+ - PyTorch 1.6
 
-For Android development, you will need to install:
+Android 개발의 경우 다음을 설치해야합니다.
 
-- Android NDK
+ - 안드로이드 NDK
 
 ::
 
@@ -30,7 +32,7 @@ For Android development, you will need to install:
   export ANDROID_NDK=$(pwd)/android-ndk-r19c
 
 
-- Android SDK
+- 안드로이드 SDK
 
 ::
 
@@ -42,7 +44,7 @@ For Android development, you will need to install:
 
 - Gradle 4.10.3
 
-Gradle is the most widely used build system for android applications, and we will need it to build our application. Download it and add to the path to use ``gradle`` in the command line.
+Gradle은 Android 애플리케이션에 가장 널리 사용되는 빌드 시스템이며 애플리케이션을 빌드하는 데 필요합니다. 그것을 다운로드하고 경로에 추가하여 command line 에서 ``gradle '' 을 사용하십시오.
 
 .. code-block:: shell
 
@@ -53,22 +55,22 @@ Gradle is the most widely used build system for android applications, and we wil
 
 - JDK
 
-Gradle requires JDK, you need to install it and set environment variable ``JAVA_HOME`` to point to it.
-For example you can install OpenJDK, following `instructions <https://openjdk.java.net/install/>`_.
+Gradle에는 JDK가 필요하므로이를 설치하고이를 가리 키도록 환경 변수``JAVA_HOME``을 설정해야합니다.
+예를 들어 `<https://openjdk.java.net/install/>`_에 따라 OpenJDK를 설치할 수 있습니다.
 
-- OpenCV SDK for Android
+- Android 용 OpenCV SDK
 
-Our custom operator will be implemented using the OpenCV library. To use it for Android, we need to download OpenCV SDK for Android with prebuilt libraries.
-Download from `OpenCV releases page <https://opencv.org/releases/>`_. Unzip it and set the environment variable ``OPENCV_ANDROID_SDK`` to it.
+사용자 지정 연산자는 OpenCV 라이브러리를 사용하여 구현됩니다. Android 용으로 사용하려면 사전 빌드 된 라이브러리가있는 Android 용 OpenCV SDK를 다운로드해야합니다.
+`OpenCV 릴리스 페이지 <https://opencv.org/releases/>`_ 에서 다운로드하여 압축을 풀고 환경 변수``OPENCV_ANDROID_SDK``를 설정하십시오.
 
 
-Preparing TorchScript Model With Custom C++ Operator
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+사용자 지정 C ++ 연산자로 TorchScript 모델 준비
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ~~
 
-TorchScript allows using custom C++ operators, to read about it with details you can read 
-`the dedicated tutorial <https://pytorch.org/tutorials/advanced/torch_script_custom_ops.html>`_.
+TorchScript는 사용자 정의 C ++ 연산자를 사용하여 읽을 수있는 세부 정보로 읽을 수 있습니다.
+`전용 튜토리얼 <https://pytorch.org/tutorials/advanced/torch_script_custom_ops.html>`_.
 
-As a result, you can script the model that uses custom op, that uses OpenCV ``cv::warpPerspective`` function.
+결과적으로 OpenCV``cv :: warpPerspective ''함수를 사용하는 커스텀 op를 사용하는 모델을 스크립팅 할 수 있습니다.
 
 .. code-block:: python
 
@@ -125,49 +127,48 @@ As a result, you can script the model that uses custom op, that uses OpenCV ``cv
 
   compute.save("compute.pt")
 
+ 
+이 snippet 은 사용자 지정 op ``my_ops.warp_perspective`` 를 사용하는 TorchScript 모델 인 ``compute.pt '' 파일을 생성합니다.
 
-This snippet generates ``compute.pt`` file which is TorchScript model that uses custom op ``my_ops.warp_perspective``.
-
-You need to have installed OpenCV for development to run it.
-For Linux systems that can be done using the next commands:
-CentOS:
+실행하려면 개발 용 OpenCV를 설치해야합니다.
+다음 명령을 사용하여 수행 할 수있는 Linux 시스템의 경우 :
+CentOS :
 
 .. code-block:: shell
 
   yum install opencv-devel
 
-Ubuntu:
+Ubuntu :
 
 .. code-block:: shell
 
   apt-get install libopencv-dev
 
-Making Android Application
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+Android 애플리케이션 만들기
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-After we succeeded in having ``compute.pt``, we want to use this TorchScript model within Android application. Using general TorchScript models (without custom operators) on Android, using Java API, you can find `here <https://pytorch.org/mobile/android/>`_. We can not use this approach for our case, as our model uses a custom operator(``my_ops.warp_perspective``), default TorchScript execution will fail to find it.
+``compute.pt`` 를 갖는 데 성공한 후 Android 애플리케이션 내에서 이 TorchScript 모델을 사용하려고 합니다. Java API를 사용하여 Android에서 일반 TorchScript 모델 (사용자 지정 연산자 없음)을 사용하면`here <https://pytorch.org/mobile/android/>`_에서 찾을 수 있습니다. 모델이 사용자 정의 연산자 ( ``my_ops.warp_perspective '' )를 사용하기 때문에 이 방법을 사용할 수 없습니다. 기본 TorchScript 실행은 이를 찾지 못합니다.
 
-Registration of ops is not exposed to PyTorch Java API, thus we need to build Android Application with native part (C++) and using LibTorch C++ API to implement and register the same custom operator for Android. As our operator uses the OpenCV library - we will use prebuilt OpenCV Android libraries and use the same functions from OpenCV.
+ops 등록은 PyTorch Java API에 노출되지 않으므로 네이티브 파트 (C ++)로 Android 애플리케이션을 빌드하고 LibTorch C ++ API를 사용하여 Android 용 동일한 사용자 지정 연산자를 구현하고 등록해야합니다. 운영자가 OpenCV 라이브러리를 사용하므로 미리 빌드 된 OpenCV Android 라이브러리를 사용하고 OpenCV의 동일한 기능을 사용합니다.
 
-Let's start creating Android application in ``NativeApp`` folder.
+``NativeApp ''폴더에서 Android 애플리케이션 생성을 시작하겠습니다.
 
 .. code-block:: shell
   
   mkdir NativeApp
   cd NativeApp
 
-Android Application Build Setup
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Android 애플리케이션 빌드 설정
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Android Application build consists of the main gradle part and native build CMake part.
-All the listings here are the full file listing, that if to recreate the whole structure,
-you will be able to build and install the result Android Application without any code additions.
+Android 애플리케이션 빌드는 기본 gradle 부분과 기본 빌드 CMake 부분으로 구성됩니다.
+여기에있는 모든 목록은 전체 파일 목록입니다. 전체 구조를 다시 만들려면
+코드 추가없이 결과 Android 애플리케이션을 빌드하고 설치할 수 있습니다.
 
-Gradle Build Setup
+Gradle 빌드 설정
 ------------------
-We will need to add gradle setup files: build.gradle, gradle.properties, settings.gradle.
-More about Android Gradle build configurations you can find `here <https://developer.android.com/studio/build>`_.
-
+gradle 설정 파일 (build.gradle, gradle.properties, settings.gradle)을 추가해야합니다.
+Android Gradle 빌드 구성에 대한 자세한 내용은`여기 <https://developer.android.com/studio/build>`_에서 찾을 수 있습니다.
 ``NativeApp/settings.gradle``
 
 .. code-block:: gradle
@@ -204,10 +205,9 @@ More about Android Gradle build configurations you can find `here <https://devel
       }
   }
 
+``NativeApp / build.gradle``에서 Android gradle 플러그인 버전 '3.5.0'을 지정합니다. 이 버전은 최신 버전이 아님에도 불구하고  PyTorch android gradle 빌드가이 버전을 사용하므로 이를 사용합니다.
 
-In ``NativeApp/build.gradle`` we specify Android gradle plugin version `3.5.0`. This version is not recent. Still, we use it as PyTorch android gradle builds use this version.
-
-``NativeApp/settings.gradle`` shows that out project contains only one module - ``app``, which will be our Android Application.
+``NativeApp / settings.gradle``은 out 프로젝트에 Android 애플리케이션이 될``app ''모듈이 하나만 포함되어 있음을 보여줍니다.
 
 .. code-block:: shell
 
@@ -290,27 +290,24 @@ In ``NativeApp/build.gradle`` we specify Android gradle plugin version `3.5.0`. 
     }
   }
 
-This gradle build script registers dependencies on pytorch_android snapshots,
-that are published on nightly channels.
+이 gradle 빌드 스크립트는 야간 채널에 게시 된 pytorch_android 스냅 샷에 대한 종속성을 등록합니다.
 
-As they are published to nexus sonatype repository - we need to register that repository:
-``https://oss.sonatype.org/content/repositories/snapshots``.
+nexus sonatype 저장소에 게시되므로 해당 저장소를 등록해야합니다.
+``https : // oss.sonatype.org / content / repositories / snapshots``.
 
-In our application we need to use LibTorch C++ API in our application native build part. For this, we need access to prebuilt binaries and headers. They are prepacked in PyTorch Android builds, which is published in Maven repositories.
+우리의 애플리케이션에서 우리는 애플리케이션 네이티브 빌드 부분에서 LibTorch C ++ API를 사용해야합니다. 이를 위해서는 미리 빌드 된 바이너리와 헤더에 대한 액세스가 필요합니다. Maven 저장소에 게시 된 PyTorch Android 빌드에 미리 포장되어 있습니다.
 
-To use PyTorch Android prebuilt libraries from gradle dependencies (which is aar files) - 
-we should add registration for configuration ``extractForNativeBuild``,
-add this configuration in dependencies and put its definition in the end.
+gradle 종속성 (aar 파일)에서 PyTorch Android 사전 빌드 라이브러리를 사용하려면-
+구성``extractForNativeBuild ''에 대한 등록을 추가해야합니다.
+이 구성을 종속성에 추가하고 그 정의를 끝에 넣으십시오.
 
-``extractForNativeBuild`` task will call ``extractAARForNativeBuild`` task that unpacks pytorch_android aar
-to gradle build directory.
+``extractForNativeBuild ''작업은 pytorch_android aar를 gradle 빌드 디렉터리로 압축 해제하는``extractAARForNativeBuild ''작업을 호출합니다.
 
-Pytorch_android aar contains LibTorch headers in ``headers`` folder
-and prebuilt libraries for different Android abis in ``jni`` folder:
-``$ANDROID_ABI/libpytorch_jni.so``, ``$ANDROID_ABI/libfbjni.so``.
-We will use them for our native build.
+Pytorch_android aar에는``headers ''폴더의 LibTorch 헤더와``jni ''폴더의 여러 Android abis 용 사전 빌드 된 라이브러리가 포함되어 있습니다.
+``$ ANDROID_ABI / libpytorch_jni.so``,``$ ANDROID_ABI / libfbjni.so``.
+기본 빌드에 사용합니다.
 
-The native build is registered in this ``build.gradle`` with lines:
+네이티브 빌드는 이 ``build.gradle`` 에 다음과 같이 등록 됩니다:
 
 .. code-block:: gradle
 
@@ -330,13 +327,13 @@ The native build is registered in this ``build.gradle`` with lines:
     }
   }
 
-We will use ``CMake`` configuration for a native build. Here we also specify that we will dynamically link with STL, as we have several libraries. More about this, you can find `here <https://developer.android.com/ndk/guides/cpp-support>`_.
+네이티브 빌드에``CMake ''구성을 사용합니다. 여기에는 여러 라이브러리가 있으므로 STL과 동적으로 링크하도록 지정합니다. 이에 대한 자세한 내용은`여기 <https://developer.android.com/ndk/guides/cpp-support>`_에서 찾을 수 있습니다.
 
 
-Native Build CMake Setup
+네이티브 빌드 CMake 설정
 ------------------------
 
-The native build will be configured in ``NativeApp/app/CMakeLists.txt``:
+이 네이티브 빌드는 ``NativeApp/app/CMakeLists.txt`` 에 다음과 같이  :
 
 .. code-block:: cmake
 
@@ -395,28 +392,27 @@ The native build will be configured in ``NativeApp/app/CMakeLists.txt``:
     ${OPENCV_LIBRARY}
     log)
 
-Here we register only one source file ``pytorch_nativeapp.cpp``.
+여기서는 소스 파일 ``pytorch_nativeapp.cpp`` 를 하나만 등록합니다.
+ 
+``NativeApp / app / build.gradle`` 의 이전 단계에서 ``extractAARForNativeBuild '' 작업은 헤더와 네이티브 라이브러리를 추출하여 디렉터리를 빌드합니다. ``PYTORCH_INCLUDE_DIRS '' 및``PYTORCH_LINK_DIRS`` 를 설정합니다.
 
-On the previous step in ``NativeApp/app/build.gradle``, the task ``extractAARForNativeBuild`` extracts headers and native libraries to build directory.  We set ``PYTORCH_INCLUDE_DIRS`` and ``PYTORCH_LINK_DIRS`` to them.
+그 후 ``libpytorch_jni.so '' 및 ``libfbjni.so '' 라이브러리를 찾아서 타겟 링크에 추가합니다.
 
-After that, we find libraries ``libpytorch_jni.so`` and ``libfbjni.so`` and add them to the linking of our target.
+OpenCV 함수를 사용하여 사용자 지정 연산자 ``my_ops :: warp_perspective ''를 구현할 계획이므로 ``libopencv_java4.so`` 에 링크해야합니다. 설정 단계에서 다운로드 한 Android 용 OpenCV SDK에 패키지되어 있습니다.
+이 구성에서는 환경 변수 ``OPENCV_ANDROID_SDK '' 로 찾습니다.
 
-As we plan to use OpenCV functions to implement our custom operator ``my_ops::warp_perspective`` - we need to link to ``libopencv_java4.so``. It is packaged in OpenCV SDK for Android, that was downloaded on the Setup step.
-In this configuration, we find it by environment variable ``OPENCV_ANDROID_SDK``.
+또한 결과를 Android LogCat에 기록 할 수 있도록 ``log '' 라이브러리와 연결합니다.
 
-We also link with ``log`` library to be able to log our results to Android LogCat.
-
-As we link to OpenCV Android SDK's ``libopencv_java4.so``, we should copy it to ``NativeApp/app/src/main/jniLibs/${ANDROID_ABI}``
+OpenCV Android SDK의 ``libopencv_java4.so`` 에 링크 할 때 이를 ``NativeApp / app / src / main / jniLibs / $ {ANDROID_ABI}`` 에 복사해야합니다.
 
 .. code-block:: shell
 
   cp -R $OPENCV_ANDROID_SDK/sdk/native/libs/* NativeApp/app/src/main/jniLibs/
 
-
-Adding the model file to the application
+애플리케이션에 모델 파일 추가
 ----------------------------------------
 
-To package the TorschScript model ``compute.pt`` within our application we should copy it to assets folder:
+애플리케이션 내에서 TorschScript 모델``compute.pt``를 패키징하려면 해당 모델을 assets 폴더에 복사해야합니다.
 
 .. code-block:: shell
 
@@ -424,11 +420,11 @@ To package the TorschScript model ``compute.pt`` within our application we shoul
   cp compute.pt NativeApp/app/src/main/assets
 
 
-Android Application Manifest
+Android 애플리케이션 매니페스트
 ----------------------------
 
-Every Android application has a manifest. 
-Here we specify the application name, package, main activity.
+모든 Android 애플리케이션에는 매니페스트가 있습니다.
+여기에서 애플리케이션 이름, 패키지, 주요 활동을 지정합니다.
 
 ``NativeApp/app/src/main/AndroidManifest.xml``:
 
@@ -454,13 +450,13 @@ Here we specify the application name, package, main activity.
   </manifest>
 
 
-Sources
+소스 코드
 -------
 
-Java Code
+자바 코드
 ---------
 
-Now we are ready to implement our MainActivity in
+이제 MainActivity를 구현할 준비가되었습니다.
 
 ``NativeApp/app/src/main/java/org/pytorch/nativeapp/MainActivity.java``:
 
@@ -513,13 +509,12 @@ Now we are ready to implement our MainActivity in
     }
   }
 
+이전 단계에서 ``compute.pt`` 를 ``NativeApp / app / src / main / assets`` 에 복사했을 때 해당 파일은 Android 애플리케이션에 한 부분이 되었으며 애플리케이션에 압축됩니다. Android 시스템은 스트림 액세스 만 제공합니다.
+LibTorch에서이 모듈을 사용하려면 디스크에 파일로 구체화해야합니다. ``assetFilePath ''함수는 asset 입력 스트림에서 데이터를 복사하고 디스크에 쓰고 이에 대한 절대 파일 경로를 반환합니다.
 
-In the previous step, when we copied our ``compute.pt`` to ``NativeApp/app/src/main/assets`` that file became an Android application asset, which will be packed in application. Android system provides only stream access to it.
-To use this module from LibTorch, we need to materialize it as a file on the disk. ``assetFilePath`` function copies data from the asset input stream, writes it on the disk, and returns absolute file path for it.
+Activity의 ``OnCreate '' 메서드는 Activity 생성 직후에 호출됩니다. 이 메서드에서는 ``assertFilePath '' 를 호출하고 JNI 호출을 통해 네이티브 코드로 전달하는 ``NativeClient '' 클래스를 호출합니다.
 
-``OnCreate`` method of Activity is called just after Activity creation. In this method, we call ``assertFilePath`` and call ``NativeClient`` class that will dispatch it to native code through JNI call.
-
-``NativeClient`` is a helper class with an internal private class ``NativePeer``, which is responsible for working with the native part of our application. It has a static block that will load ``libpytorch_nativeapp.so``, that is build with ``CMakeLists.txt`` that we added on the previous step. The static block will be executed with the first reference of ``NativePeer`` class. It happens in ``NativeClient#loadAndForwardModel``.
+``NativeClient``는 내부 개인 클래스 ``NativePeer`` 가있는 도우미 클래스로, 애플리케이션의 기본 부분을 담당합니다. 이전 단계에서 추가 한``CMakeLists.txt``로 빌드되는``libpytorch_nativeapp.so`` 를로드하는 정적 블록이 있습니다. 정적 블록은 ``NativePeer '' 클래스의 첫 번째 참조로 실행됩니다. ``NativeClient # loadAndForwardModel`` 에서 발생합니다.
 
 ``NativeApp/app/src/main/java/org/pytorch/nativeapp/NativeClient.java``:
 
@@ -544,10 +539,10 @@ To use this module from LibTorch, we need to materialize it as a file on the dis
 
 ``NativePeer#loadAndForwardModel`` is declared as ``native``, it does not have definition in Java. Call to this method will be re-dispatched through JNI to C++ method in our ``libpytorch_nativeapp.so``, in ``NativeApp/app/src/main/cpp/pytorch_nativeapp.cpp``.
 
-Native code
+네이티브 코드
 -----------
 
-Now we are ready to write a native part of our application.
+이제 우리는 앱의 네이티브 부분를 쓸 준비가 되었습니다:
 
 ``NativeApp/app/src/main/cpp/pytorch_nativeapp.cpp``:
 
@@ -647,25 +642,25 @@ Now we are ready to write a native part of our application.
   }
 
 
-This listing is quite long, and a few things intermixed here, we will follow control flow to understand how this code works.
-The first place where the control flow arrives is ``JNI_OnLoad``.
-This function is called after loading the library. It is responsible for registering native method, which is called when ``NativePeer#loadAndForwardModel`` called, here it is ``pytorch_nativeapp::loadAndForwardModel`` function.
+이 목록은 꽤 길고 여기에 몇 가지가 혼합되어 있으므로 제어 흐름을 따라이 코드가 작동하는 방식을 이해할 것입니다.
+제어 흐름이 도착하는 첫 번째 위치는``JNI_OnLoad``입니다.
+이 함수는 라이브러리를로드 한 후 호출됩니다. ``NativePeer # loadAndForwardModel`` 이 호출 될 때 호출되는 네이티브 메서드를 등록하는 역할을 합니다. 여기서는 ``pytorch_nativeapp :: loadAndForwardModel`` 함수입니다.
 
-``pytorch_nativeapp::loadAndForwardModel`` takes as an argument model path.
-First, we extract its ``const char*`` value and loading the module with ``torch::jit::load``.
+``pytorch_nativeapp :: loadAndForwardModel`` 은 인수 모델 경로로 사용됩니다.
+먼저 ``const char *`` 값을 추출하고``torch :: jit :: load`` 로 모듈을 로드합니다.
 
-To load TorchScript model for mobile, we need to set these guards, because mobile build doesn't support 
-features like autograd for smaller build size, placed in ``struct JITCallGuard`` in this example.
-It may change in the future. You can track the latest changes keeping an eye on the 
-`source in PyTorch GitHub <https://github.com/pytorch/pytorch/blob/master/android/pytorch_android/src/main/cpp/pytorch_jni_jit.cpp>`_.
+모바일 용 TorchScript 모델을로드하려면 모바일 빌드가 지원하지 않기 때문에 이러한 가드를 설정해야합니다.
+이 예제에서는 ``struct JITCallGuard '' 에 배치 된 더 작은 빌드 크기를위한 autograd와 같은 기능입니다.
+향후 변경 될 수 있습니다. 최신 변경 사항을 추적 할 수 있습니다.
+`PyTorch GitHub의 소스 <https://github.com/pytorch/pytorch/blob/master/android/pytorch_android/src/main/cpp/pytorch_jni_jit.cpp>`_.
 
-Implementation of method ``warp_perspective`` and registration of it is entirely the same as
-in `tutorial for desktop build <https://pytorch.org/tutorials/advanced/torch_script_custom_ops.html>`_.
+``warp_perspective '' 메소드 구현 및 등록은 다음과 완전히 동일합니다.
+`데스크톱 빌드 자습서 <https://pytorch.org/tutorials/advanced/torch_script_custom_ops.html>`_에 있습니다.
 
-Building the app
+앱 빌드
 ----------------
 
-To specify to gradle where is Android SDK and Android NDK, we need to fill ``NativeApp/local.properties``.
+Android SDK 및 Android NDK가 어디에 있는지 지정하려면 ``NativeApp / local.properties`` 를 채워야합니다.
 
 .. code-block:: shell
 
@@ -674,35 +669,35 @@ To specify to gradle where is Android SDK and Android NDK, we need to fill ``Nat
   echo "ndk.dir=$ANDROID_NDK" >> NativeApp/local.properties
 
 
-To build the result ``apk`` file we run:
+결과 'apk' 파일을 실행하기 위해서는:
 
 .. code-block:: shell
 
   cd NativeApp
   gradle app:assembleDebug
 
-To install the app on the connected device:
+연결된 디바이스에 앱을 설치하기 위해서 다음을 참고하십시오:
 
 .. code-block:: shell
 
   cd NativeApp
   gradle app::installDebug
 
-After that, you can run the app on the device by clicking on PyTorchNativeApp icon.
-Or you can do it from the command line:
+그 후 PyTorch Native App 아이콘을 클릭하여 장치에서 앱을 실행할 수 있습니다.
+또는 command line 에서 수행 할 수 있습니다.
 
 .. code-block:: shell
 
   adb shell am start -n org.pytorch.nativeapp/.MainActivity
 
-If you check the android logcat:
+android logcat를 체크할 시 다음과 같은 결과가 나와야 합니다:
 
 .. code-block:: shell
 
   adb logcat -v brief | grep PyTorchNativeApp
 
 
-You should see logs with tag 'PyTorchNativeApp' that prints x, y, and the result of the model forward, which we print with ``log`` function in ``NativeApp/app/src/main/cpp/pytorch_nativeapp.cpp``.
+"PyTorchNativeApp"라는 태그 로그가 나타나고 x, y 및 모델의 결과가 전송됩니다. 이것은 "NativeApp / app / src / main / cpp / pytorch_nativeapp.cpp"의 "log"함수에서 출력합니다. 
 
 .. code-block::
 
@@ -732,4 +727,4 @@ You should see logs with tag 'PyTorchNativeApp' that prints x, y, and the result
 
 
 
-The full setup of this app you can find in `PyTorch Android Demo Application Repository <https://github.com/pytorch/android-demo-app/tree/master/NativeApp>`_.
+이 앱의 전체 설정은`PyTorch Android 데모 애플리케이션 저장소 <https://github.com/pytorch/android-demo-app/tree/master/NativeApp>`_에서 찾을 수 있습니다.
