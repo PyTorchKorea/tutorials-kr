@@ -86,7 +86,7 @@ rand_loader = DataLoader(dataset=RandomDataset(input_size, data_size),
 #
 # 데모를 위해 모델은 입력을 받고 선형 연산을 수행하며 출력을 제공합니다. 그러나 ``DataParallel`` 의 어떤 모델 (CNN, RNN, Capsule Net 등) 에서든 사용할 수 있습니다.
 #
-#우리는 input과 output의 크기를 모니터링하기 위히 모델안에 print 문을 넣었습니다.
+#우리는 input과 output의 크기를 모니터링하기 위해 모델안에 print 문을 넣었습니다.
 # 무엇이 배치 순위 (batch rank) 0 에 프린트 되는지 주의 깊게 봐주시길 바랍니다.
 #
 
