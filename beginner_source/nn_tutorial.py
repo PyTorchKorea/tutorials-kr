@@ -9,7 +9,7 @@
 번역: `남상호 <https://github.com/namdori61>`_
 """
 ###############################################################################
-# 이 튜토리얼을 스크립트가 아닌 노트북으로 실행하기를 권유합니다. 노트북 (.ipynb) 파일을 다운 받으시려면,
+# 이 튜토리얼을 스크립트가 아닌 노트북으로 실행하기를 권장합니다. 노트북 (.ipynb) 파일을 다운 받으시려면,
 # 페이지 상단에 있는 링크를 클릭해주세요.
 #
 # PyTorch 는 여러분이 신경망(neural network)를 생성하고 학습시키는 것을 도와주기 위해서
@@ -37,11 +37,11 @@
 # 우리는 손으로 쓴 숫자(0에서 9 사이)의 흑백 이미지로 구성된 클래식
 # `MNIST <http://deeplearning.net/data/mnist/>`_ 데이터셋을 사용할 것 입니다.
 #
-# 우리는 경로 설정을 담당하는 (Python3 표준 라이브러리의 일부로)
+# 우리는 경로 설정을 담당하는 (Python3 표준 라이브러리의 일부인)
 # `pathlib <https://docs.python.org/3/library/pathlib.html>`_ 을 사용할 것이고,
 # `requests <http://docs.python-requests.org/en/master/>`_ 를 이용하여
-# 데이터셋을 다운로드 할 것입니다. 우리는 모듈을 사용할 때만 임포트(import) 할 것이고,
-# 그러므로 여러분은 매 포인트마다 정확히 어떤 것이 사용되는지 확인할 수 있습니다.
+# 데이터셋을 다운로드 할 것입니다. 우리는 모듈을 사용할 때만 임포트(import) 할 것이므로,
+# 여러분은 매 포인트마다 정확히 어떤 것이 사용되는지 확인할 수 있습니다.
 
 from pathlib import Path
 import requests
@@ -69,7 +69,7 @@ with gzip.open((PATH / FILENAME).as_posix(), "rb") as f:
         ((x_train, y_train), (x_valid, y_valid), _) = pickle.load(f, encoding="latin-1")
 
 ###############################################################################
-# 매 이미지는 28 x 28 형태 이고, 784 (=28x28) 크기를 가진 하나의 행으로 저장되어 있습니다.
+# 각 이미지는 28 x 28 형태 이고, 784 (=28x28) 크기를 가진 하나의 행으로 저장되어 있습니다.
 # 하나를 살펴 봅시다; 먼저 우리는 이 이미지를 2d로 재구성해야 합니다.
 
 from matplotlib import pyplot
@@ -98,7 +98,7 @@ print(y_train.min(), y_train.max())
 #
 # PyTorch 텐서 연산만으로 첫 모델을 만들어봅시다.
 # 여러분이 신경망의 기초에 대해서 이미 익숙하다고 가정합니다.
-# (만약 아니라면, 여러분은 그것을 `course.fast.ai <https://course.fast.ai>`_ 에서 배울 수 있습니다).
+# (만약 익숙하지 않다면 `course.fast.ai <https://course.fast.ai>`_ 에서 학습할 수 있습니다).
 #
 # PyTorch는 랜덤 또는 0으로만 이루어진 텐서를 생성하는 메서드를 제공하고,
 # 우리는 간단한 선형 모델의 가중치(weights)와 절편(bias)을 생성하기 위해서 이것을 사용할 것입니다.
@@ -111,8 +111,7 @@ print(y_train.min(), y_train.max())
 # 왜냐하면 우리는 해당 단계가 기울기에 포함되는 것을 원치 않기 때문입니다.
 # (PyTorch에서 ``_`` 다음에 오는 메서드 이름은 연산이 인플레이스(in-place)로 수행되는 것을 의미합니다.)
 #
-# .. note:: 우리는
-#    `Xavier initialisation <http://proceedings.mlr.press/v9/glorot10a/glorot10a.pdf>`_
+# .. note:: `Xavier initialisation <http://proceedings.mlr.press/v9/glorot10a/glorot10a.pdf>`_
 #    기법을 이용하여 가중치를 초기화 합니다. (1/sqrt(n)을 곱해주는 것을 통해서 초기화).
 
 import math
@@ -122,13 +121,13 @@ weights.requires_grad_()
 bias = torch.zeros(10, requires_grad=True)
 
 ###############################################################################
-# PyTorch의 기울기를 자동으로 계산해주는 기능 덕분에, 우리는 어떠한 Python 표준 함수
+# PyTorch의 기울기를 자동으로 계산해주는 기능 덕분에, Python 표준 함수
 # (또는 호출 가능한 객체)를 모델로 사용할 수 있습니다!
 # 그러므로 간단한 선형 모델을 만들기 위해서 단순한 행렬 곱셈과 브로드캐스트(broadcast)
-# 덧셈을 사용합니다. 또한, 우리는 활성화 함수(activation function)가 필요하므로,
+# 덧셈을 사용하여 보겠습니다. 또한, 우리는 활성화 함수(activation function)가 필요하므로,
 # `log_softmax` 를 구현하고 사용할 것입니다.
-# 기억하세요: PyTorch에서 많은 사전 구현된 손실 함수(loss function), 활성화 함수들이 제공되지만,
-# 일반 python을 사용하여 자신만의 함수를 쉽게 작성할 수 있습니다.
+# PyTorch에서 많은 사전 구현된 손실 함수(loss function), 활성화 함수들이 제공되지만,
+# 일반적인 python을 사용하여 자신만의 함수를 쉽게 작성할 수 있음을 기억해주세요.
 # PyTorch는 심지어 여러분의 함수를 위해서 빠른 GPU 또는 벡터화된 CPU 코드를 만들어줄 것입니다.
 
 def log_softmax(x):
@@ -140,8 +139,8 @@ def model(xb):
 ###############################################################################
 # 위에서, ``@`` 기호는 점곱(dot product) 연산을 나타냅니다.
 # 우리는 하나의 배치(batch) 데이터(이 경우에는 64개의 이미지들)에 대하여 함수를 호출할 것입니다.
-# 이것은 하나의 *포워드 전달(forward pass)* 입니다.  이 단계에서 우리는 무작위(random) 가중치로
-# 시작했기 때문에  우리의 예측이 무작위 예측보다 전혀 나은 점이 없을 것입니다.
+# 이것은 하나의 *포워드 전달(forward pass)* 입니다. 이 단계에서 우리는 무작위(random) 가중치로
+# 시작했기 때문에 우리의 예측이 무작위 예측보다 전혀 나은 점이 없을 것입니다.
 
 bs = 64  # 배치 사이즈
 
@@ -197,8 +196,8 @@ print(accuracy(preds, yb))
 # 이제 우리는 이 기울기들을 이용하여 가중치와 절편을 업데이트 합니다.
 # 우리는 이것을 ``torch.no_grad()`` 컨텍스트 매니져(context manager) 내에서 실행합니다,
 # 왜냐하면 이러한 실행이 다음 기울기의 계산에 기록되지 않기를 원하기 때문입니다.
-# 여러분들은 PyTorch의 자동 기울기(Autograd)가 어떻게 연산을 기록하는지
-# `여기 <https://pytorch.org/docs/stable/notes/autograd.html>`_ 에서 더 알 수 있습니다.
+# PyTorch의 자동 기울기(Autograd)가 어떻게 연산을 기록하는지
+# `여기 <https://pytorch.org/docs/stable/notes/autograd.html>`_ 에서 더 알아볼 수 있습니다.
 #
 # 우리는 그러고나서 기울기를 0으로 설정합니다, 그럼으로써 다음 루프(loop)에 준비하게 됩니다.
 # 그렇지 않으면, 우리의 기울기들은 일어난 모든 연산의 누적 집계를 기록하게 되버립니다.
@@ -233,7 +232,7 @@ for epoch in range(epochs):
 
 ###############################################################################
 # 이제 다 됐습니다: 우리는 제일 간단한 신경망(neural network)의 모든 것을 밑바닥부터 생성하고
-# 훈련하였습니다! (이번에는 은닉층(hidden layer) 없기 때문에,
+# 훈련하였습니다! (이번에는 은닉층(hidden layer)이 없기 때문에,
 # 로지스틱 회귀(logistic regression)입니다).
 #
 # 이제 손실과 정확도를 이전 값들과 비교하면서 확인해봅시다.
@@ -370,7 +369,7 @@ print(loss_func(model(xb), yb))
 # `nn.Linear <https://pytorch.org/docs/stable/nn.html#linear-layers>`_ 를 선형
 # 레이어로 사용합니다.
 # Pytorch 에는 다양한 유형의 코드를 크게 단순화 할 수 있는 미리 정의된 레이어가 있고 이는 또한
-# 속도도 빠르게 합니다.
+# 종종 기존 코드보다 속도를 빠르게 합니다.
 
 class Mnist_Logistic(nn.Module):
     def __init__(self):
@@ -412,13 +411,13 @@ print(loss_func(model(xb), yb))
 #   opt.step()
 #   opt.zero_grad()
 #
-# (``optim.zero_grad()`` 는 기울기를 0으로 재설정하고, 우리는 다음 미니 배치에 대한
-# 기울기를 계산하기 전에 이를 호출해야 합니다.)
+# (``optim.zero_grad()`` 는 기울기를 0으로 재설정 해줍니다. 다음 미니 배치에 대한
+# 기울기를 계산하기 전에 호출해야 합니다.)
 
 from torch import optim
 
 ###############################################################################
-# 모델과 옵티마이져를 만드는 작은 함수를 정의할 것이고, 따라서 우리는 나중에 다시 사용할 수 있습니다.
+# 나중에 다시 사용할 수 있도록 모델과 옵티마이져를 만드는 작은 함수를 정의합니다.
 
 def get_model():
     model = Mnist_Logistic()
@@ -588,7 +587,7 @@ for epoch in range(epochs):
     print(epoch, valid_loss / len(valid_dl))
 
 ###############################################################################
-# fit() 및 get_data() 생성하기
+# fit() 와 get_data() 생성하기
 # ----------------------------------
 #
 # 이제 우리는 우리만의 작은 리팩토링을 수행할 것입니다.
@@ -702,8 +701,8 @@ fit(epochs, model, loss_func, opt, train_dl, valid_dl)
 #
 # 이를 활용하려면 주어진 함수에서 **사용자정의 레이어(custom layer)** 를 쉽게
 # 정의할 수 있어야 합니다.
-# 예를 들어, PyTorch에는 `view` 레이어가 없으므로 네트워크 용으로 만들어야 합니다.
-# ``Lambda`` 는 ``Sequential`` 로 네트워크를 정의할 때 사용할 수 있는 레이어를 생성합니다.
+# 예를 들어, PyTorch에는 `view` 레이어가 없으므로 우리의 신경망 용으로 만들어야 합니다.
+# ``Lambda`` 는 ``Sequential`` 로 신경망을 정의할 때 사용할 수 있는 레이어를 생성할 것입니다.
 
 class Lambda(nn.Module):
     def __init__(self, func):
@@ -840,8 +839,8 @@ fit(epochs, model, loss_func, opt, train_dl, valid_dl)
 #
 # 물론 데이터 증강(data augmentation), 초매개변수 조정(hyperparameter tuning),
 # 훈련과정 모니터링(monitoring training), 전이 학습(transfer learning) 등과 같이
-# 추가하고 싶은 많은 항목이 있습니다.
-# 이러한 기능은 이 튜토리얼에 표시된 것과 동일한 설계 접근 방식을 사용하여 개발된 fastai 라이브러리에서
+# 추가하고 싶은 항목들이 많이 있을 것입니다.
+# 이러한 기능들은 이 튜토리얼에 표시된 것과 동일한 설계 접근 방식을 사용하여 개발된 fastai 라이브러리에서
 # 사용할 수 있으며, 모델을 더욱 발전시키려는 실무자에게 자연스러운 다음 단계를 제공합니다.
 #
 # 이 튜토리얼의 시작 부분에서 ``torch.nn``, ``torch.optim``, ``Dataset``,
@@ -863,4 +862,4 @@ fit(epochs, model, loss_func, opt, train_dl, valid_dl)
 #    ``SGD`` 와 같은 옵티마이저를 포함합니다.
 #  - ``Dataset``: ``TensorDataset`` 과 같이 Pytorch와 함께 제공되는 클래스를 포함하여 ``__len__`` 및
 #    ``__getitem__`` 이 있는 객체의 추상 인터페이스
-#  - ``DataLoader``: 모든 종류의 ``Dataset`` 을 기반으로 데이터의 배치들을 출력하는 이터레이터(iterator) 생성합니다.
+#  - ``DataLoader``: 모든 종류의 ``Dataset`` 을 기반으로 데이터의 배치들을 출력하는 반복자(iterator)를 생성합니다.
