@@ -242,5 +242,5 @@ for data in rand_loader:
 # 사용자에게 결과를 반환하기 전에 모든 결과물들을 수집하여 병합합니다.
 #
 # 더 많은 정보를 알고싶다면 아래 주소를 참고하세요.
-# https://pytorch.org/tutorials/beginner/former\_torchies/parallelism\_tutorial.html.
+# https://tutorials.pytorch.kr/beginner/former_torchies/parallelism_tutorial.html
 #
