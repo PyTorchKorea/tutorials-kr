@@ -22,7 +22,7 @@ PyTorch를 통해 GPU를 사용하는 것은 매우 쉽습니다. 먼저, 모델
 ''my_tensor.to(device)'' 를 호출 시 에는 ''my_tensor'' 를 다시쓰는 대신 ''my_tensor'' 의 또다른 복사본이 생긴다는 사실을 기억하십시오. 
 당신은 그것을 새로운 tensor 에 소속시키고 GPU에 그 tensor를 써야합니다.
 
-여러 GPU를 톧해 앞과 뒤의 전파를 실행하는 것은 당연한 일 입니다.
+여러 GPU를 통해 앞과 뒤의 전파를 실행하는 것은 당연한 일 입니다.
 그러나 PyTorch는 기본적 하나의 GPU만 사용합니다. ``DataParallel`` 을 이용하여 모델을 병렬로 실행하여 다수의 GPU 에서 쉽게 작업을 실행할 수 있습니다:
 
 .. code:: python
