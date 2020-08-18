@@ -105,7 +105,7 @@ class TextSentiment(nn.Module):
 #    3 : Business
 #    4 : Sci/Tec
 #
-# 단어의 사이즈는 단어의 길이와 같습니다.(각 단어와 n-grams을 포함하여)
+# 단어의 사이즈는 단어의 길이와 같습니다.(각 단어와 n-grams를 포함하여)
 # 클래스의 수는 라벨의 수와 같습니다. AG_NEWS의 경우는 4개입니다.
 #
 
