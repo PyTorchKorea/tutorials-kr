@@ -131,7 +131,7 @@ model = TextSentiment(VOCAB_SIZE, EMBED_DIM, NUN_CLASS).to(device)
 #
 # 원본 데이터 배치 인풋 안의 텍스트들은 리스트에 들어가고 단일 텐서로서 ``nn.EmbeddingBag`` 의 입력으로 연결합니다.
 # offsets은 텍스트 텐서에서 개별 시퀀스의 시작 인덱스를 표현하는 구분자들의 텐서입니다.
-# label은 각 텍스트 항목별 라벨을 저장해 두는 tensor이다.
+# label은 각 텍스트 항목별 라벨을 저장해 두는 tensor입니다.
 #
 
 def generate_batch(batch):
