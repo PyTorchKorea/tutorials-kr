@@ -123,7 +123,7 @@ model = TextSentiment(VOCAB_SIZE, EMBED_DIM, NUN_CLASS).to(device)
 
 ######################################################################
 # 텍스트 항목의 길이가 다르기 때문에, 사용자 정의 함수 generate_batch()를 사용하여 데이터 배치와 오프셋을 생성합니다.
-# 이 함수는 ``torch.utils.data.DataLoader`` 안의 ``collate_fn`` 를 통과한다.
+# 이 함수는 ``torch.utils.data.DataLoader`` 안의 ``collate_fn`` 를 통과합니다.
 # 
 #  ``collate_fn`` 에 대한 입력은 batch_size 크기를 갖는 tensors의 리스트이고,
 #  ``collate_fn`` 함수는 이들을 mini-batch로  둡니다. ``collate_fn`` 이 가장  높은 level에서 선언되었다는 것을 기억해야합니다.
