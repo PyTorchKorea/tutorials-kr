@@ -75,8 +75,8 @@ Recipes are bite-sized bite-sized, actionable examples of how to use specific Py
    :tags: Basics
 
 .. customcarditem::
-   :header: Warmstarting model using parameters from a different model in PyTorch
-   :card_description: Learn how warmstarting the training process by partially loading a model or loading a partial model can help your model converge much faster than training from scratch.
+   :header: PyTorch에서 다른 모델의 패러미터를 사용하는 웜 스타트 방법
+   :card_description: 모델을 부분적으로 불러오거나, 혹은 부분적인 모델을 불러오는 웜 스타트 방법에 대해 살펴보고, 그렇게 함으로써 모델을 처음부터 훈련시킬 때보다 빠르게 수렴시킬 수 있음을 살펴봅니다.
    :image: ../_static/img/thumbnails/cropped/warmstarting-models.PNG
    :link: ../recipes/recipes/warmstarting_model_using_parameters_from_a_different_model.html
    :tags: Basics
