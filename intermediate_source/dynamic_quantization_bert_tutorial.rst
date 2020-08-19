@@ -2,7 +2,7 @@
 ====================================================
 
 .. tip::
-   To get the most of this tutorial 이 튜토리얼을 따라하기 위해, 이
+   이 튜토리얼을 따라하기 위해, 이
    `Colab Version <https://colab.research.google.com/github/pytorch/tutorials/blob/gh-pages/_downloads/dynamic_quantization_bert_tutorial.ipynb>`_ 을 사용하길 권장합니다.
    그러면 아래에 설명된 정보들을 이용해 실험할 수 있습니다.
 
@@ -21,35 +21,27 @@
 이 튜토리얼에서는 `HuggingFace Transformers
 <https://github.com/huggingface/transformers>`_ 예제들을 따라하면서 BERT
 모델을 동적으로 양자화할 것입니다. BERT 처럼 유명하면서도 최고 성능을
-내는 모델을 어떻게 양자화된 모델로 변환하는지 한 단계씩 설명하겠습니다.
+내는 모델을 어떻게 동적으로 양자화된 모델로 변환하는지 한 단계씩 설명하겠습니다.
 
 -  BERT 또는 Transformer 의 양방향 임베딩 표현(representation) 이라 불리는 방법은
    질의 응답, 문장 분류 등의 여러 자연어 처리 분야(문제)에서 최고 성능을 달성한
-   새로운 언어 표현 사전학습 방법입니다. 원 논문은 `여기<https://arxiv.org/pdf/1810.04805.pdf>`_
+   새로운 언어 표현 사전학습 방법입니다. 원 논문은 `여기 <https://arxiv.org/pdf/1810.04805.pdf>`_
    에서 읽을 수 있습니다.
 
--  Dynamic quantization support in PyTorch converts a float model to a
-   quantized model with static int8 or float16 data types for the
-   weights and dynamic quantization for the activations. The activations
-   are quantized dynamically (per batch) to int8 when the weights are
-   quantized to int8. In PyTorch, we have `torch.quantization.quantize_dynamic API
-   <https://pytorch.org/docs/stable/quantization.html#torch.quantization.quantize_dynamic>`_,
-   which replaces specified modules with dynamic weight-only quantized
-   versions and output the quantized model.
-   PyTorch에서 지원하는 동적 양자화 기능은 부동소수점 모델의 가중치를 정적인
+-  PyTorch에서 지원하는 동적 양자화 기능은 부동소수점 모델의 가중치를 정적인
    int8 또는 float16 타입의 양자화된 모델로 변환하고, 활성 함수 부분은
    동적으로 양자화합니다. 가중치가 int8 타입으로 양자화 됐을 때, 활성 함수 부분은
    각 배치마다 int8 타입으로 동적으로 양자화 됩니다. PyTorch에는 지정된 모듈을
    동적이면서 가중치만 갖도록 양자화된 형태로 변환하고, 양자화된 모델을 만들어내는
-   `torch.quantization.quantize_dynamic API<https://pytorch.org/docs/stable/quantization.html#torch.quantization.quantize_dynamic>`_ 가 있습니다.
+   `torch.quantization.quantize_dynamic API <https://pytorch.org/docs/stable/quantization.html#torch.quantization.quantize_dynamic>`_ 가 있습니다.
 
--  우리는 일반 언어 이해 평가 벤치마크`(GLUE)<https://gluebenchmark.com/>`_ 중
-   `Microsoft Research 의역 코퍼스(MRPC)<https://www.microsoft.com/en-us/download/details.aspx?id=52398>`_ 를
+-  우리는 일반 언어 이해 평가 벤치마크 `(GLUE) <https://gluebenchmark.com/>`_ 중
+   `Microsoft Research 의역 코퍼스(MRPC) <https://www.microsoft.com/en-us/download/details.aspx?id=52398>`_ 를
    대상으로 한 정확도와 추론 성능을 보여줄 것입니다. MRPC (Dolan and Brockett, 2005) 는
    온라인 뉴스로부터 자동으로 추출된 두 개의 문장들과 그 두 문장이 같은 뜻인지 사람이
    평가한 정답으로 이루어져 있습니다. 클래스의 비중이 같지 않아(같음 68%, 다름 32%),
-   많이 쓰이는 방식인 `F1 점수<https://scikit-learn.org/stable/modules/generated/sklearn.metrics.f1_score.html>`_ 를
-   기록합니다. MRPC는 아래 나온 것처럼 문장 쌍을 분류하는 자연어처리 문제에 널리 쓰입니다.
+   많이 쓰이는 `F1 점수 <https://scikit-learn.org/stable/modules/generated/sklearn.metrics.f1_score.html>`_ 를
+   기록합니다. MRPC는 아래에 나온 것처럼 문장 쌍을 분류하는 자연어처리 문제로 많이 쓰입니다.
 
 .. image:: /_static/img/bert.png
 
@@ -60,8 +52,8 @@
 1.1 PyTorch, HuggingFace Transformers 설치하기
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-튜토리얼을 시작하기 위해 먼저 `여기<https://github.com/pytorch/pytorch/#installation>`_ 의
-PyTorch 설치 안내와 HuggingFace `깃허브 저장소<https://github.com/huggingface/transformers#installation>`_ 의
+튜토리얼을 시작하기 위해 먼저 `여기 <https://github.com/pytorch/pytorch/#installation>`_ 의
+PyTorch 설치 안내와 `HuggingFace 깃허브 저장소 <https://github.com/huggingface/transformers#installation>`_ 의
 안내를 따라합시다. 추가적으로 우리가 사용할 F1 점수를 계산하는 보조 함수가 내장된
 `scikit-learn <https://github.com/scikit-learn/scikit-learn>`_ 패키지를 설치합니다.
 
@@ -72,8 +64,8 @@ PyTorch 설치 안내와 HuggingFace `깃허브 저장소<https://github.com/hug
    pip install transformers
 
 
-우리는 PyTorch의 베타 기능들을 사용할 것이므로, 가장 최신 버전의 torch와 torchvision을 설치하는 게 좋습니다.
-가장 최신의 설치 안내는 `여기<https://pytorch.org/get-started/locally/>`_ 에 있습니다.
+PyTorch의 베타 기능들을 사용할 것이므로, 가장 최신 버전의 torch와 torchvision을 설치하는 게 좋습니다.
+가장 최신의 설치 안내는 `여기 <https://pytorch.org/get-started/locally/>`_ 에 있습니다.
 예를 들어 Mac에 설치하려면 :
 
 
@@ -112,8 +104,7 @@ PyTorch 설치 안내와 HuggingFace `깃허브 저장소<https://github.com/hug
     from transformers import glue_processors as processors
     from transformers import glue_convert_examples_to_features as convert_examples_to_features
 
-    # Setup logging
-    # 준비단계 로깅
+    # 로깅 준비
     logger = logging.getLogger(__name__)
     logging.basicConfig(format = '%(asctime)s - %(levelname)s - %(name)s -   %(message)s',
                         datefmt = '%m/%d/%Y %H:%M:%S',
@@ -141,7 +132,7 @@ PyTorch 설치 안내와 HuggingFace `깃허브 저장소<https://github.com/hug
 특징 벡터들로 변환하는 함수이며, 다른 하나는 예측된 결과들에 대한
 F1 점수를 계산하기 위한 함수입니다.
 
-`Glue_convert_examples_to_features<https://github.com/huggingface/transformers/blob/master/transformers/data/processors/glue.py>`_ 함수는
+`Glue_convert_examples_to_features <https://github.com/huggingface/transformers/blob/master/transformers/data/processors/glue.py>`_ 함수는
 텍스트를 입력 특징으로 변환합니다.
 
 
@@ -151,7 +142,7 @@ F1 점수를 계산하기 위한 함수입니다.
 -  토큰이 첫번째 문장에 속하는지 두번째 문장에 속하는지 알려주는 토큰 타입 id 생성하기
 
 `glue_compute_metrics <https://github.com/huggingface/transformers/blob/master/transformers/data/processors/glue.py>`_ 함수는
-정밀도와 지현율의 가중 평균인 `F1 점수<https://scikit-learn.org/stable/modules/generated/sklearn.metrics.f1_score.html>`_ 를
+정밀도와 지현율의 가중 평균인 `F1 점수 <https://scikit-learn.org/stable/modules/generated/sklearn.metrics.f1_score.html>`_ 를
 계산하는 행렬을 갖고 있습니다. F1 점수가 가장 좋을 때는 1이며, 가장 나쁠 때는 0입니다.
 정밀도와 재현율은 F1 점수를 계산할 때 동일한 비중을 갖습니다.
 
@@ -162,7 +153,7 @@ F1 점수를 계산하기 위한 함수입니다.
 1.4 데이터셋 다운로드
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-MRPC 문제를 풀어보기 전에 이 `스크립트<https://gist.github.com/W4ngatang/60c2bdb54d156a41194446737ce03e2e>`_ 를
+MRPC 문제를 풀어보기 전에 `이 스크립트 <https://gist.github.com/W4ngatang/60c2bdb54d156a41194446737ce03e2e>`_ 를
 실행해 `GLUE 데이터셋 <https://gluebenchmark.com/tasks>`_ 을 다운로드 받고 ''glue_data''
 폴더에 저장합니다.
 
@@ -206,7 +197,7 @@ MRPC 문제에 맞게 미세조정하기 위해 `예시들 <https://github.com/h
        --save_steps 100000 \
        --output_dir $OUT_DIR
 
-우리는 MRPC 문제를 위해 미세조정한 BERT 모델을 `여기 <https://download.pytorch.org/tutorial/MRPC.zip>`_ 에 제공합니다.
+MRPC 문제를 위해 미세조정한 BERT 모델을 `여기 <https://download.pytorch.org/tutorial/MRPC.zip>`_ 에 업로드 했습니다.
 시간을 아끼려면 모델 파일(~400MB)을 ``$OUT_DIR`` 에 바로 다운로드할 수 있습니다.
 
 2.1 전역 환경 설정하기
@@ -528,7 +519,7 @@ MRPC 데이터셋을 평가하는데 약 46초가 소요됐습니다.
 약화시키지 않으면서도 모델의 크기를 줄일 수 있습니다.
 
 읽어주셔서 감사합니다. 언제나처럼 어떠한 피드백도 환영이니, 의견이
-있다면 `여기<https://github.com/pytorch/pytorch/issues>`_ 에 이슈를 제기해주세요.
+있다면 `여기 <https://github.com/pytorch/pytorch/issues>`_ 에 이슈를 제기해주세요.
 
 
 
