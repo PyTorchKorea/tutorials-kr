@@ -47,7 +47,7 @@ Recipes are bite-sized bite-sized, actionable examples of how to use specific Py
 
 .. customcarditem::
    :header: PyTorch에서 state_dict란 무엇인가요?
-   :card_description: PyTorch에서 모델을 저장하거나 불러올 때 Python 사전(dict)인 state_dict 객체가 어떻게 사용되는지 알아봅니다.
+   :card_description: PyTorch에서 모델을 저장하거나 불러올 때 Python 사전인 state_dict 객체가 어떻게 사용되는지 알아봅니다.
    :image: ../_static/img/thumbnails/cropped/what-is-a-state-dict.PNG
    :link: ../recipes/recipes/what_is_state_dict.html
    :tags: Basics
