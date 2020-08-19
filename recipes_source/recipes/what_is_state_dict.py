@@ -18,7 +18,7 @@ Python 사전(dict) 객체입니다.
 및 등록된 버퍼들(batchnorm의 running_mean)만 모델의 ``state_dict``
  항목을 가진다는 점에 유의하시기 바랍니다. 옵티마이저 객체
 ( ``torch.optim`` ) 또한 옵티마이저의 상태 뿐만 아니라 사용된
-하이터 매개변수 (Hyperparameter) 정보가 포함된 ``state_dict`` 을
+하이퍼 매개변수 (Hyperparameter) 정보가 포함된 ``state_dict`` 을
 갖습니다.
 레시피에서 ``state_dict`` 이 간단한 모델에서 어떻게 사용되는지
 살펴보겠습니다.
