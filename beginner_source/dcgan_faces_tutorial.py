@@ -3,85 +3,68 @@
 DCGAN Tutorial
 ==============
 
-**Author**: `Nathan Inkawhich <https://github.com/inkawhich>`__
+**저자**: `Nathan Inkawhich <https://github.com/inkawhich>`__
+**번역**: `JaeJoong Lee <https://github.com/JaeLee18>`__
 
 """
 
 
 ######################################################################
-# Introduction
+# 개요
 # ------------
 # 
-# This tutorial will give an introduction to DCGANs through an example. We
-# will train a generative adversarial network (GAN) to generate new
-# celebrities after showing it pictures of many real celebrities. Most of
-# the code here is from the dcgan implementation in
-# `pytorch/examples <https://github.com/pytorch/examples>`__, and this
-# document will give a thorough explanation of the implementation and shed
-# light on how and why this model works. But don’t worry, no prior
-# knowledge of GANs is required, but it may require a first-timer to spend
-# some time reasoning about what is actually happening under the hood.
-# Also, for the sake of time it will help to have a GPU, or two. Lets
-# start from the beginning.
+# 이 튜토리얼은 예제를 해보면서 DCGAN에 대한 소개를 제공합니다.
+# 우리는 생성적 적대 신경망 (GAN)으로 실존하는 많은 연예인들의 사진을 이용해 훈련시켜서 새로운 연예인 사진들을 생성하게 할 것 입니다.
+# 대부분의 코드들은 `pytorch/examples <https://github.com/pytorch/examples>`__, 에서 온 DCGAN 구현을 사용했습니다.
+# 또한, 이 튜토리얼은 구현에 대한 설명과 어떻게 그리고 왜 이 신경망이 작동하는지에 대해 설명해줍니다.
+# GAN에 대한 사전지식은 필요하지않지만 처음 보시는분들은 어떻게 작동되는지에 대해 이해하려고 시간이 좀 필요할수도 있습니다.
+# 시간을 아끼기 위해서는 GPU가 한개나 두개정도 필요로 합니다.
+# 자 그러면, 처음부터 시작해봅시다. 
 # 
-# Generative Adversarial Networks
+# 생성적 적대 신경망
 # -------------------------------
 # 
-# What is a GAN?
+# GAN이란 무엇인가?
 # ~~~~~~~~~~~~~~
 # 
-# GANs are a framework for teaching a DL model to capture the training
-# data’s distribution so we can generate new data from that same
-# distribution. GANs were invented by Ian Goodfellow in 2014 and first
-# described in the paper `Generative Adversarial
-# Nets <https://papers.nips.cc/paper/5423-generative-adversarial-nets.pdf>`__.
-# They are made of two distinct models, a *generator* and a
-# *discriminator*. The job of the generator is to spawn ‘fake’ images that
-# look like the training images. The job of the discriminator is to look
-# at an image and output whether or not it is a real training image or a
-# fake image from the generator. During training, the generator is
-# constantly trying to outsmart the discriminator by generating better and
-# better fakes, while the discriminator is working to become a better
-# detective and correctly classify the real and fake images. The
-# equilibrium of this game is when the generator is generating perfect
-# fakes that look as if they came directly from the training data, and the
-# discriminator is left to always guess at 50% confidence that the
-# generator output is real or fake.
+# GAN은 딥러닝 모델이 데이터의 분포를 배우게 해서 새로운 데이터를 그 분포로부터 생성하게끔 가르치는 프레임워크입니다.
 # 
-# Now, lets define some notation to be used throughout tutorial starting
-# with the discriminator. Let :math:`x` be data representing an image.
-# :math:`D(x)` is the discriminator network which outputs the (scalar)
-# probability that :math:`x` came from training data rather than the
-# generator. Here, since we are dealing with images the input to
-# :math:`D(x)` is an image of CHW size 3x64x64. Intuitively, :math:`D(x)`
-# should be HIGH when :math:`x` comes from training data and LOW when
-# :math:`x` comes from the generator. :math:`D(x)` can also be thought of
-# as a traditional binary classifier.
+# GAN은 Ian Goodfellow에 의해 2014년에 만들어졌으며 처음으로 
+#`Generative Adversarial Nets <https://papers.nips.cc/paper/5423-generative-adversarial-nets.pdf>`__.
+# 이라는 논문에 소개되었습니다.
+# *generator* 와 *discriminator* 라는 두개의 모델로 이루어져 있습니다.
+# generator의 역할은 훈련용 이미지처럼 보이는 'fake' 이미지들을 만들어내는것입니다.
+# 또한, discriminator의 역할은 이미지를 보고 과연 그게 진짜 훈련용 이미지 인지 아니면 generator에서 생성된 가짜 이미지인지 확인하는것입니다.
+# 훈련 과정중에는 generator는 지속적으로 discriminator를 더 좋은 fake 이미지들을 생성하여 속이려 하고 그러는 와중에
+# discriminator는 더 철저하게 구별하여 진짜 훈련용 이미지와 fake 이미지들을 구별해냅니다.
+# 이러한 경쟁 generator가 정말 훈련용 데이터 이미지들중 하나처럼 보이는 이미지를 생성해내고 
+# discriminator는 항상 50%의 신뢰도를 가지고 generator의 결과물이 fake인지 진짜인지 판별할때 끝이 나게됩니다.
 # 
-# For the generator’s notation, let :math:`z` be a latent space vector
-# sampled from a standard normal distribution. :math:`G(z)` represents the
-# generator function which maps the latent vector :math:`z` to data-space.
-# The goal of :math:`G` is to estimate the distribution that the training
-# data comes from (:math:`p_{data}`) so it can generate fake samples from
-# that estimated distribution (:math:`p_g`).
+# 이제 튜토리얼에서 사용될 표기법들을 정의할텐데 discriminator에 사용될것들부터 시작하겠습니다.
+# :math:`x` 를 이미지를 나타내는 데이터라 하겠습니다.
+# :math:`D(x)` 는 discriminator 신경망으로 :math:`x` 가  generator에서 온게 아닌 실제 훈련데이터일 확률을 반환합니다.
+# :math:`D(x)` 에는 이미지를 입력값으로 사용해야하므로 C(채널)H(세로)W(가로)가 3x64x64인 이미지를 사용합니다.
+# 직관적으로, :math:`D(x)` 는 :math:`x` 가 실제 훈련데이터에서 올 경우에는 높은값을 반환하고 generator에서 온 경우라면 낮은값을 반환합니다.
+# :math:`D(x)` 는 전통적인 이진 분류기로 생각될 수도 있습니다.
 # 
-# So, :math:`D(G(z))` is the probability (scalar) that the output of the
-# generator :math:`G` is a real image. As described in `Goodfellow’s
-# paper <https://papers.nips.cc/paper/5423-generative-adversarial-nets.pdf>`__,
-# :math:`D` and :math:`G` play a minimax game in which :math:`D` tries to
-# maximize the probability it correctly classifies reals and fakes
-# (:math:`logD(x)`), and :math:`G` tries to minimize the probability that
-# :math:`D` will predict its outputs are fake (:math:`log(1-D(G(x)))`).
-# From the paper, the GAN loss function is
-# 
+# generator의 표기법에 대해 알아보겠습니다.
+# :math:`z` 는 잠재 공간 벡터로 일반적인 정규분포로부터 샘플되어집니다.
+# :math:`G(z)` 는 generator 함수를 나타내며 :math:`z` 의 잠재 벡터를 데이터 공간으로 맵핑합니다.
+# :math:`G` 의 목적은 (:math:`p_{data}`) 로 부터 온 훈련 데이터의 분포를 예측하여 generator가 fake 샘플을 
+# 예측분포치인  (:math:`p_g`) 로 부터 생성하는것입니다.
+#
+# 그래서 :math:`D(G(z))` 는 generator :math:`G` 의 결과물이 진짜 이미지인지 나타내는 확률입니다.
+# `Goodfellow’s paper <https://papers.nips.cc/paper/5423-generative-adversarial-nets.pdf>`__,
+# 에 묘사된것 처럼 :math:`D` 와 :math:`G` 는 최소최대 게임(minimax game)을 하는데 :math:`D` 는 올바르게 진짜와 fake 
+# 를 구분하는 확률 (:math:`logD(x)`) 을 극대화시키면서 :math:`G` 는 :math:`D` 가  결과값을 fake 로 예측하는 확률 (:math:`log(1-D(G(x)))`) 을 최소화 하는 게임입니다.
+# 논문에서,  GAN의 손실함수는 
 # .. math:: \underset{G}{\text{min}} \underset{D}{\text{max}}V(D,G) = \mathbb{E}_{x\sim p_{data}(x)}\big[logD(x)\big] + \mathbb{E}_{z\sim p_{z}(z)}\big[log(1-D(G(z)))\big]
-# 
-# In theory, the solution to this minimax game is where
-# :math:`p_g = p_{data}`, and the discriminator guesses randomly if the
-# inputs are real or fake. However, the convergence theory of GANs is
-# still being actively researched and in reality models do not always
-# train to this point.
-# 
+# 로 정의하였습니다.
+
+# 이론적으로, 이 최소최대 게임(minimax game)의 답은
+# :math:`p_g = p_{data}` 이며 discriminator가 무작위로 입력값이 진짜인지 fake 인지 예측하는 경우 입니다.
+# 그러나, GAN의 수렴 이론은 현재에도 활발히 연구대상이며 현실적인 신경만들은 항상 이러한 수준까지 훈련되지는 않습니다.
+#
 # What is a DCGAN?
 # ~~~~~~~~~~~~~~~~
 # 
