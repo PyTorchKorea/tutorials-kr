@@ -110,102 +110,92 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from IPython.display import HTML
 
-# Set random seed for reproducibility
+# 재현하기 위한 random seed 설정
 manualSeed = 999
-#manualSeed = random.randint(1, 10000) # use if you want new results
+#manualSeed = random.randint(1, 10000) # 새로운 결과를 보기 원한다면 사용하세요.
 print("Random Seed: ", manualSeed)
 random.seed(manualSeed)
 torch.manual_seed(manualSeed)
 
 
 ######################################################################
-# Inputs
+# 입력값들
 # ------
 # 
-# Let’s define some inputs for the run:
+# 실행하기 위한 입력값들을 정의해봅시다:
 # 
-# -  **dataroot** - the path to the root of the dataset folder. We will
-#    talk more about the dataset in the next section
-# -  **workers** - the number of worker threads for loading the data with
-#    the DataLoader
-# -  **batch_size** - the batch size used in training. The DCGAN paper
-#    uses a batch size of 128
-# -  **image_size** - the spatial size of the images used for training.
-#    This implementation defaults to 64x64. If another size is desired,
-#    the structures of D and G must be changed. See
-#    `here <https://github.com/pytorch/examples/issues/70>`__ for more
-#    details
-# -  **nc** - number of color channels in the input images. For color
-#    images this is 3
-# -  **nz** - length of latent vector
-# -  **ngf** - relates to the depth of feature maps carried through the
-#    generator
-# -  **ndf** - sets the depth of feature maps propagated through the
-#    discriminator
-# -  **num_epochs** - number of training epochs to run. Training for
-#    longer will probably lead to better results but will also take much
-#    longer
-# -  **lr** - learning rate for training. As described in the DCGAN paper,
-#    this number should be 0.0002
-# -  **beta1** - beta1 hyperparameter for Adam optimizers. As described in
-#    paper, this number should be 0.5
-# -  **ngpu** - number of GPUs available. If this is 0, code will run in
-#    CPU mode. If this number is greater than 0 it will run on that number
-#    of GPUs
+# -  **dataroot** - 데이터셋 폴더의 루트에 대한 경로입니다. 데이터셋에 대해서는 다음 섹션에서
+#    더 이야기 할 것입니다.
+# -  **workers** - DataLoader로 데이터를 불러올때 사용될 worker 쓰레드의 갯수입니다.
+# -  **batch_size** - 훈련때 사용될 배치 크기 입니다. DCGAN 논문에서는 128로 사용했습니다.
+# -  **image_size** - 훈련때 사용될 이미지의 크기입니다. 초기값은 64x64로 설정 되어있고,
+#    다른 크기를 원한다면 D와 G의 구조도 다시 설정해야합니다. 
+#    자세하게 보려면 `여기 <https://github.com/pytorch/examples/issues/70>`__ 를 봐주세요.
+# -  **nc** - 입력값으로 사용되는 이미지의 색상 채널 갯수입니다. 컬러 이미지들은 3으로 가지고있습니다.
+# -  **nz** - 잠재 벡터의 길이
+# -  **ngf** - generator를 통해 이용되는 feature map의 깊이와 관련되어있습니다.
+# -  **ndf** - discriminator를 통해 전파되는 feature map의 깊이를 설정합니다.
+# -  **num_epochs** - 훈련때 실행되는 에포크의 수입니다. 더 좋은 결과를 위해선 많은 에포크가 필요하지만
+#    그만큼 더 많은 시간이 필요합니다.
+# -  **lr** - 훈련때 사용되는 러닝레이트 입니다. DCGAN에서 나와있는데로 
+#    0.0002로 설정합니다.
+# -  **beta1** - beta1 는 Adam 옵티마이저에 사용됩니다. 논문에 소개된대로
+#    0.5로 설정합니다.
+# -  **ngpu** - 사용가능한 GPU의 갯수입니다. 0으로 설정되면 코드는 CPU를 사용하며, 
+#    0보다 큰 수 일때는 해당하는 GPU갯수만큼 사용하게됩니다.
 # 
 
-# Root directory for dataset
+# 데이터셋의 루트 경로
 dataroot = "data/celeba"
 
-# Number of workers for dataloader
+# dataloader에 사용되는 worker 갯수
 workers = 2
 
-# Batch size during training
+# 훈련때 사용되는 배치 사이즈
 batch_size = 128
 
-# Spatial size of training images. All images will be resized to this
-#   size using a transformer.
+# 훈련 이미지의 크기입니다. 모든 이미지들은 transformer를 사용되어 크기 변환됩니다.
 image_size = 64
 
-# Number of channels in the training images. For color images this is 3
+# 훈련때 사용될 이미지 갯수입니다. 컬러 이미지에는 3으로 사용됩니다.
 nc = 3
 
-# Size of z latent vector (i.e. size of generator input)
+# 잠재 벡터 z의 크기입니다. (예) generator 입력값의 크기)
 nz = 100
 
-# Size of feature maps in generator
+# generator 안의 feature map 크기
 ngf = 64
 
-# Size of feature maps in discriminator
+# discriminator 안의 feature map 크기
 ndf = 64
 
-# Number of training epochs
+# 훈련 에포크 갯수
 num_epochs = 5
 
-# Learning rate for optimizers
+# 옵티마이저의 러닝레이트
 lr = 0.0002
 
-# Beta1 hyperparam for Adam optimizers
+# Adam 옵티마이저의 Beta1 하이퍼 파라미터
 beta1 = 0.5
 
-# Number of GPUs available. Use 0 for CPU mode.
+# 사용가능한 GPU 갯수. CPU모드 로 설정하려면 0을 사용하세요.
 ngpu = 1
 
 
 ######################################################################
-# Data
+# 데이터
 # ----
 # 
-# In this tutorial we will use the `Celeb-A Faces
-# dataset <http://mmlab.ie.cuhk.edu.hk/projects/CelebA.html>`__ which can
-# be downloaded at the linked site, or in `Google
-# Drive <https://drive.google.com/drive/folders/0B7EVK8r0v71pTUZsaXdaSnZBZzg>`__.
-# The dataset will download as a file named *img_align_celeba.zip*. Once
-# downloaded, create a directory named *celeba* and extract the zip file
-# into that directory. Then, set the *dataroot* input for this notebook to
-# the *celeba* directory you just created. The resulting directory
-# structure should be:
-# 
+# 이번 튜토리얼에서 우리는 `Celeb-A Faces
+# dataset <http://mmlab.ie.cuhk.edu.hk/projects/CelebA.html>`__ 링크된 사이트에서 다운받을 수 있고 또는 
+# `Google
+# Drive <https://drive.google.com/drive/folders/0B7EVK8r0v71pTUZsaXdaSnZBZzg>`__. 에서도 다운 받을 수 있는
+# 데이터를 이용합니다.
+# 데이터 셋은 *img_align_celeba.zip* 이라는 파일로 다운받아집니다. 
+# 다운이 완료된후, *celeba* 라는 폴더를 만들고 zip 파일을 그 폴더에 풀어주세요.
+# 그 다음에  *dataroot* 을 방금 만드신 *celeba* 로 설정 해주시면 됩니다.
+# 폴더 구조는 다음과 같아야 합니다.
+#
 # ::
 # 
 #    /path/to/celeba
@@ -216,15 +206,14 @@ ngpu = 1
 #            -> 537394.jpg
 #               ...
 # 
-# This is an important step because we will be using the ImageFolder
-# dataset class, which requires there to be subdirectories in the
-# dataset’s root folder. Now, we can create the dataset, create the
-# dataloader, set the device to run on, and finally visualize some of the
-# training data.
+# 폴더 구조를 이렇게 만드는것은 중요한 과정이고 ImageFolder 데이터셋 class를 사용할 예정이라 
+# 데이터셋의 하위폴더에 주어진대로 위치해야합니다.
+# 이제 우리는 데이터셋과  dataloder 를 설정하고
+# 실행할 하드웨어 장치 설정과 훈련때 사용되는 데이터들을 시각화 할 수 있습니다.
 # 
 
-# We can use an image folder dataset the way we have it setup.
-# Create the dataset
+# ImageFolder를 우리가 설정해놓은데로 사용할 수 있습니다.
+# 데이터셋 만들기
 dataset = dset.ImageFolder(root=dataroot,
                            transform=transforms.Compose([
                                transforms.Resize(image_size),
@@ -232,14 +221,14 @@ dataset = dset.ImageFolder(root=dataroot,
                                transforms.ToTensor(),
                                transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
                            ]))
-# Create the dataloader
+# dataloader 만들기
 dataloader = torch.utils.data.DataLoader(dataset, batch_size=batch_size,
                                          shuffle=True, num_workers=workers)
 
-# Decide which device we want to run on
+# 어떤 장치로 실행할지 설정합니다.
 device = torch.device("cuda:0" if (torch.cuda.is_available() and ngpu > 0) else "cpu")
 
-# Plot some training images
+# 몇몇개의 훈련 이미지를 시각화합니다.
 real_batch = next(iter(dataloader))
 plt.figure(figsize=(8,8))
 plt.axis("off")
