@@ -348,45 +348,45 @@ print(netG)
 # Discriminator
 # ~~~~~~~~~~~~~
 # 
-# As mentioned, the discriminator, :math:`D`, is a binary classification
-# network that takes an image as input and outputs a scalar probability
-# that the input image is real (as opposed to fake). Here, :math:`D` takes
-# a 3x64x64 input image, processes it through a series of Conv2d,
-# BatchNorm2d, and LeakyReLU layers, and outputs the final probability
-# through a Sigmoid activation function. This architecture can be extended
-# with more layers if necessary for the problem, but there is significance
-# to the use of the strided convolution, BatchNorm, and LeakyReLUs. The
-# DCGAN paper mentions it is a good practice to use strided convolution
-# rather than pooling to downsample because it lets the network learn its
-# own pooling function. Also batch norm and leaky relu functions promote
-# healthy gradient flow which is critical for the learning process of both
-# :math:`G` and :math:`D`.
+# 앞서 말한대로 discriminator :math:`D` 는 이진 분류 신경망에 해당하며
+# 이미지를 입력값으로 입력값으로 사용된 이미지가 가짜 이미지에 대해서 어떤 확률로 진짜 이미지인지 
+# 결과값을 출력해줍니다.
+# :math:`D` 는 3x64x64 크기의 이미지를 입력값으로 받으며 Conv2d, 
+# BatchNorm2d, LeakyReLU 층의 조합으로 처리됩니다. 결과값은은 Sigmoid 활성화 함수를 이용해서
+# 마지막 확률이 나오게 됩니다. 이 신경망 구조는 문제를 해결하는데 필요에 따라 더 많은 층을 추가하여
+# 확장 될수도 있지만, strided convolution, BatchNorm, 그리고  LeakyReLUs층이 주로 
+# 사용되어야 합니다.
+# DCGAN 논문은 다운 샘플을 하기위해 pooling을 사용하는것 보다 trided convolution을
+# 사용하는것이 더 좋다고 언급하고 있는데 그 이유로는 신경망이 신경망 자체의 pooling
+# 함수를 배우도록 하기 떄문이라고 하고 있습니다.
+# 또한 batch norm 과 leaky relu 함수들은 :math:`G` 와 :math:`D` 의
+# 훈련 과정에서 gradient 흐름이 잘 가도록 중요한 역할을 합니다.
 # 
 
 #########################################################################
-# Discriminator Code
+# Discriminator 코드
 
 class Discriminator(nn.Module):
     def __init__(self, ngpu):
         super(Discriminator, self).__init__()
         self.ngpu = ngpu
         self.main = nn.Sequential(
-            # input is (nc) x 64 x 64
+            # 입력값은 (nc) x 64 x 64
             nn.Conv2d(nc, ndf, 4, 2, 1, bias=False),
             nn.LeakyReLU(0.2, inplace=True),
-            # state size. (ndf) x 32 x 32
+            # 상태 크기. (ndf) x 32 x 32
             nn.Conv2d(ndf, ndf * 2, 4, 2, 1, bias=False),
             nn.BatchNorm2d(ndf * 2),
             nn.LeakyReLU(0.2, inplace=True),
-            # state size. (ndf*2) x 16 x 16
+            # 상태 크기. (ndf*2) x 16 x 16
             nn.Conv2d(ndf * 2, ndf * 4, 4, 2, 1, bias=False),
             nn.BatchNorm2d(ndf * 4),
             nn.LeakyReLU(0.2, inplace=True),
-            # state size. (ndf*4) x 8 x 8
+            # 상태 크기. (ndf*4) x 8 x 8
             nn.Conv2d(ndf * 4, ndf * 8, 4, 2, 1, bias=False),
             nn.BatchNorm2d(ndf * 8),
             nn.LeakyReLU(0.2, inplace=True),
-            # state size. (ndf*8) x 4 x 4
+            # 상태 크기. (ndf*8) x 4 x 4
             nn.Conv2d(ndf * 8, 1, 4, 1, 0, bias=False),
             nn.Sigmoid()
         )
@@ -396,70 +396,69 @@ class Discriminator(nn.Module):
 
 
 ######################################################################
-# Now, as with the generator, we can create the discriminator, apply the
-# ``weights_init`` function, and print the model’s structure.
+# 이제 generator와 같이 discriminator 또한 생성 할 수 있습니다.
+# ``weights_init`` 함수를 적용하고 모델의 구조를 출력해봅시다.
 # 
 
-# Create the Discriminator
+# Discriminator 를 생성합니다.
 netD = Discriminator(ngpu).to(device)
 
-# Handle multi-gpu if desired
+# 멀티 gpu 를 설정할 수 있습니다.
 if (device.type == 'cuda') and (ngpu > 1):
     netD = nn.DataParallel(netD, list(range(ngpu)))
     
-# Apply the weights_init function to randomly initialize all weights
-#  to mean=0, stdev=0.2.
+# weights_init 함수를 적용해서 모든 가중치를 무작위로
+# 평균이 0이고 표준편차가 0.2인 것으로 초기화 합니다.
 netD.apply(weights_init)
 
-# Print the model
+# 모델을 출력합니다.
 print(netD)
 
 
 ######################################################################
-# Loss Functions and Optimizers
+# 손실 함수와 옵티마이저
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # 
-# With :math:`D` and :math:`G` setup, we can specify how they learn
-# through the loss functions and optimizers. We will use the Binary Cross
-# Entropy loss
-# (`BCELoss <https://pytorch.org/docs/stable/nn.html#torch.nn.BCELoss>`__)
-# function which is defined in PyTorch as:
+# :math:`D` 와  :math:`G` 을 구현해놨기 때문에 어떻게 손실 함수와 
+# 옵티마이저를 통해 훈련될수 있을지 정할 수 있습니다.
+# 우리는 Binary Cross Entropy 손실함수 
+# (`BCELoss <https://pytorch.org/docs/stable/nn.html#torch.nn.BCELoss>`__) 
+# 를 사용할 예정이며 PyTorch 에는 
 # 
 # .. math:: \ell(x, y) = L = \{l_1,\dots,l_N\}^\top, \quad l_n = - \left[ y_n \cdot \log x_n + (1 - y_n) \cdot \log (1 - x_n) \right]
 # 
-# Notice how this function provides the calculation of both log components
-# in the objective function (i.e. :math:`log(D(x))` and
-# :math:`log(1-D(G(z)))`). We can specify what part of the BCE equation to
-# use with the :math:`y` input. This is accomplished in the training loop
-# which is coming up soon, but it is important to understand how we can
-# choose which component we wish to calculate just by changing :math:`y`
-# (i.e. GT labels).
+# 로 정의되어 있습니다.
 # 
-# Next, we define our real label as 1 and the fake label as 0. These
-# labels will be used when calculating the losses of :math:`D` and
-# :math:`G`, and this is also the convention used in the original GAN
-# paper. Finally, we set up two separate optimizers, one for :math:`D` and
-# one for :math:`G`. As specified in the DCGAN paper, both are Adam
-# optimizers with learning rate 0.0002 and Beta1 = 0.5. For keeping track
-# of the generator’s learning progression, we will generate a fixed batch
-# of latent vectors that are drawn from a Gaussian distribution
-# (i.e. fixed_noise) . In the training loop, we will periodically input
-# this fixed_noise into :math:`G`, and over the iterations we will see
-# images form out of the noise.
+# 이 함수가 어떻게 손실 함수에서 log 부분을 계산하는지 관심있게 봐야 합니다. 
+# (예)  :math:`log(D(x))` 와 :math:`log(1-D(G(z)))`).
+# 우리는 어떤 부분의  BCE 식이 :math:`y` 의 입력값으로 이용될지 지정할 수 도 있습니다.
+# 이 부분은 곧 등장할 훈련 반복문에서 사용될것이지만 :math:`y` (예) GT 라벨)를 바꿈으로서
+# 어떤 부분을 계산하기를 원하는지 정할 수 있다는것을 이해하는게 굉장히 중요합니다.
+# 
+# 다음으로 우리는 진짜 데이터 라벨을 1로 가짜 데이터 라벨을 0으로 정의합니다.
+# 이 라벨들은 :math:`D` 와 :math:`G` 의 손실을 계산할때 사용되며 
+# 이러한 라벨들은 원래의 GAN 논문의 관례가 사용되었습니다.
+# 마침내 우리는 두개의 다른 옵티마이저를 설정했습니다.
+# 하나는 :math:`D` 이며 다른 하나는 :math:`G` 에 해당 합니다.
+# DCGAN 논문에서 밝혔듯이 둘 다 Adam 옵티마이저를 사용하고 러닝 레이트는 0.0002이며
+# Beta1 은 0.5로 설정합니다. 
+# generator의 학습 진행을 계속해서 추적하기 위해서 우리는 가우시안 분포 (예) fixed_noise)에서 
+# 얻은 고정된 잠재 백터의 배치를 생성할것 입니다.
+# 훈련 반복문에서 우리는 주기적으로 이  fixed_noise 를 :math:`G` 의 입력값으로 집어넣고,
+# 반복을 거치면서 노이즈에서 이미지의 형태가 나오는것을 보게 될 것입니다.
 # 
 
-# Initialize BCELoss function
+# BCELoss 함수 초기화
 criterion = nn.BCELoss()
 
-# Create batch of latent vectors that we will use to visualize
-#  the progression of the generator
+# 잠재 벡터의 배치를 만들고 우리는 generator의 진행을 시각화 할때
+# 이용 할 것입니다.
 fixed_noise = torch.randn(64, nz, 1, 1, device=device)
 
-# Establish convention for real and fake labels during training
-real_label = 1.
+# 학습과정때 사용될 진짜와 가짜 데이터 라벨들을 설정 합니다.
 fake_label = 0.
 
-# Setup Adam optimizers for both G and D
+# G 와 D 에 Adam 옵티마이저를 설정 합니다.
 optimizerD = optim.Adam(netD.parameters(), lr=lr, betas=(beta1, 0.999))
 optimizerG = optim.Adam(netG.parameters(), lr=lr, betas=(beta1, 0.999))
 
