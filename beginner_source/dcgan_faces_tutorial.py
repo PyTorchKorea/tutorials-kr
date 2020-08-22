@@ -65,34 +65,30 @@ DCGAN Tutorial
 # :math:`p_g = p_{data}` 이며 discriminator가 무작위로 입력값이 진짜인지 fake 인지 예측하는 경우 입니다.
 # 그러나, GAN의 수렴 이론은 현재에도 활발히 연구대상이며 현실적인 신경만들은 항상 이러한 수준까지 훈련되지는 않습니다.
 #
-# What is a DCGAN?
+# DCGAN이란?
 # ~~~~~~~~~~~~~~~~
 # 
-# A DCGAN is a direct extension of the GAN described above, except that it
-# explicitly uses convolutional and convolutional-transpose layers in the
-# discriminator and generator, respectively. It was first described by
-# Radford et. al. in the paper `Unsupervised Representation Learning With
+# DCGAN은 위에 설명된 GAN의 확장개념이지만 다른점이라면 discriminator에는 convolutional 층을 
+# generator에는 convolutional-transpose 층이 각각 사용됩니다. 
+# DCGAN은 처음으로 Radford et. al. 이 작성한 `Unsupervised Representation Learning With
 # Deep Convolutional Generative Adversarial
-# Networks <https://arxiv.org/pdf/1511.06434.pdf>`__. The discriminator
-# is made up of strided
-# `convolution <https://pytorch.org/docs/stable/nn.html#torch.nn.Conv2d>`__
-# layers, `batch
-# norm <https://pytorch.org/docs/stable/nn.html#torch.nn.BatchNorm2d>`__
-# layers, and
-# `LeakyReLU <https://pytorch.org/docs/stable/nn.html#torch.nn.LeakyReLU>`__
-# activations. The input is a 3x64x64 input image and the output is a
-# scalar probability that the input is from the real data distribution.
-# The generator is comprised of
-# `convolutional-transpose <https://pytorch.org/docs/stable/nn.html#torch.nn.ConvTranspose2d>`__
-# layers, batch norm layers, and
-# `ReLU <https://pytorch.org/docs/stable/nn.html#relu>`__ activations. The
-# input is a latent vector, :math:`z`, that is drawn from a standard
-# normal distribution and the output is a 3x64x64 RGB image. The strided
-# conv-transpose layers allow the latent vector to be transformed into a
-# volume with the same shape as an image. In the paper, the authors also
-# give some tips about how to setup the optimizers, how to calculate the
-# loss functions, and how to initialize the model weights, all of which
-# will be explained in the coming sections.
+# Networks <https://arxiv.org/pdf/1511.06434.pdf>`__  이라는 논문에서 소개가 되었습니다.
+# discriminator는  strided
+# `convolution <https://pytorch.org/docs/stable/nn.html#torch.nn.Conv2d>`__ 층과, 
+# `batch
+# norm <https://pytorch.org/docs/stable/nn.html#torch.nn.BatchNorm2d>`__ 층, 그리고
+# `LeakyReLU <https://pytorch.org/docs/stable/nn.html#torch.nn.LeakyReLU>`__ 를
+# 활성함수로 구성되어 있습니다.
+# 입력값은 3x64x64의 이미지이며 결과값은 입력값이 실제 데이터 분포에서 왔을 확률입니다.
+# generator는  
+# `convolutional-transpose <https://pytorch.org/docs/stable/nn.html#torch.nn.ConvTranspose2d>`__ 층,
+# batch norm 층, 그리고
+# `ReLU <https://pytorch.org/docs/stable/nn.html#relu>`__ 를 활성함수로 구성되어 있습니다.
+# 입력값은 잠재 벡터인 :math:`z` 이며 정규 분포에서 뽑아내진 값입니다.
+# 결과값은 3x64x64 의 RGB 이미지 입니다.
+# strided conv-transpose 층은 잠재 벡터가 같은 모양의 이미지로 변환되는것을 가능하게 합니다.
+# 이 논문에서 저자들은 옵티마이저를 설정하는 방법, 손실함수 계산 방법, 모델 가중치 초기화 방법들을 설명해주었는데
+# 이 모든 방법들은 아래에 전부 설명이 될 예정입니다.
 # 
 
 from __future__ import print_function
