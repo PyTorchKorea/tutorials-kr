@@ -464,148 +464,146 @@ optimizerG = optim.Adam(netG.parameters(), lr=lr, betas=(beta1, 0.999))
 
 
 ######################################################################
-# Training
+# 학습
 # ~~~~~~~~
 # 
-# Finally, now that we have all of the parts of the GAN framework defined,
-# we can train it. Be mindful that training GANs is somewhat of an art
-# form, as incorrect hyperparameter settings lead to mode collapse with
-# little explanation of what went wrong. Here, we will closely follow
-# Algorithm 1 from Goodfellow’s paper, while abiding by some of the best
-# practices shown in `ganhacks <https://github.com/soumith/ganhacks>`__.
-# Namely, we will “construct different mini-batches for real and fake”
-# images, and also adjust G’s objective function to maximize
-# :math:`logD(G(z))`. Training is split up into two main parts. Part 1
-# updates the Discriminator and Part 2 updates the Generator.
+# 마침내 우리는 GAN 프레임워크를 정의 하는 부분을 다 마치고 훈련을 시킬 수 있습니다.
+# GAN을 훈련시킬때에는 알 수 없는 현상들이 나타나는데 잘못된 하이퍼파라미터 셋팅은
+# 모델 붕괴로 가게 할 수 있고 뭐가 잘못되었는지 설명은 거의 할 수 없습니다.
+# 여기서 우리는 최고의 연습이라고 불리는 `ganhacks <https://github.com/soumith/ganhacks>`__ 
+# 을 보면서 Goodfellow의 논문에서 Algorithm 1 을 적용할 예정입니다.
+# 즉, 우리는  “진짜 이미지와 가짜 이미지의 다른 미니 배치 작성” 을 할 예정이고 또한 G의 목적 함수 :math:`logD(G(z))` 를 
+# 최대화 하도록 조정합니다. 
+# 학습 과정은 두개의 메인 파트로 나누어 집니다. 파트1은 Discriminator를 업데이트 하는것이고
+# 파트2는 Generator를 업데이트 하는것입니다.
 # 
-# **Part 1 - Train the Discriminator**
+# **파트 1 - Discriminator 학습시키기**
 # 
-# Recall, the goal of training the discriminator is to maximize the
-# probability of correctly classifying a given input as real or fake. In
-# terms of Goodfellow, we wish to “update the discriminator by ascending
-# its stochastic gradient”. Practically, we want to maximize
-# :math:`log(D(x)) + log(1-D(G(z)))`. Due to the separate mini-batch
-# suggestion from ganhacks, we will calculate this in two steps. First, we
-# will construct a batch of real samples from the training set, forward
-# pass through :math:`D`, calculate the loss (:math:`log(D(x))`), then
-# calculate the gradients in a backward pass. Secondly, we will construct
-# a batch of fake samples with the current generator, forward pass this
-# batch through :math:`D`, calculate the loss (:math:`log(1-D(G(z)))`),
-# and *accumulate* the gradients with a backward pass. Now, with the
-# gradients accumulated from both the all-real and all-fake batches, we
-# call a step of the Discriminator’s optimizer.
+# 다시 한번 말씀 드리자면 discriminator를 학습시키는 목적은 주어진 입력값이
+#  진짜 인지 가짜인지 분류하는 확률을 최대화 시키는것 입니다.
+# Goodfellow의 말에 의하면 우리는 “ discriminator를 자신의 상승시키는 stochastic gradient
+# 를 이용하여 업데이트” 해야하길 원해야 한다고 하고 있습니다.
+# 우리는 :math:`log(D(x)) + log(1-D(G(z)))` 가 최대화 되도록 원합니다.
+# ganhacks 이 제안한 분리된 미니 배치에 의하면, 우리는 이것을 두 단계로 나누어 계산해야합니다.
+# 첫째로 우리는 훈련 세트의 실제 샘플들의 배치를 만들고 :math:`D` 로 전파하여 
+# 손실 (:math:`log(D(x))`) 을 계산합니다. 그 뒤에 역전파로 gradient를 계산합니다.
+# 둘째로 우리는 현재의 generator 로 부터 가짜 샘플의 배치를 생성하고 이것을 :math:`D`
+# 로 전파시킨다음 손실 (:math:`log(1-D(G(z)))`) 을 계산합니다. 그리고 * 축적된 * gradient
+# 들을 역전파 합니다.
+# 이제, 전부 진짜 와 전부 가짜 배치들로 부터 축적된 gradient을 가지고 우리는 Discriminator의 옵티마이저
+# 를 최적화 시킬것입니다.
 # 
-# **Part 2 - Train the Generator**
+# **파트2 - Generator 학습시키기**
 # 
-# As stated in the original paper, we want to train the Generator by
-# minimizing :math:`log(1-D(G(z)))` in an effort to generate better fakes.
-# As mentioned, this was shown by Goodfellow to not provide sufficient
-# gradients, especially early in the learning process. As a fix, we
-# instead wish to maximize :math:`log(D(G(z)))`. In the code we accomplish
-# this by: classifying the Generator output from Part 1 with the
-# Discriminator, computing G’s loss *using real labels as GT*, computing
-# G’s gradients in a backward pass, and finally updating G’s parameters
-# with an optimizer step. It may seem counter-intuitive to use the real
-# labels as GT labels for the loss function, but this allows us to use the
-# :math:`log(x)` part of the BCELoss (rather than the :math:`log(1-x)`
-# part) which is exactly what we want.
+# 본래의 논문이 서술했듯, 우리는 :math:`log(1-D(G(z)))` 을 최소화를 이용하여
+# generator를 학습시켜서 더 나은 가짜를 만들기를 원합니다.
+# 언급한 대로 이것은 Goodfellow가 초기 학습 단계에는 충분한 gradient를 제공하지 못한다는것을
+# 보여주었습니다.
+# 이것을 고치기 위해 우리는 대신에 :math:`log(D(G(z)))` 을 최대화 하려고 합니다.
+# 코드에서 우리는 다음과 같은것을 달성하고자 합니다.
+# 파트1에서의 Generator의 결과값을 Discriminator을 이용해서 분류하고 
+# G의 손실을 * 진짜 라벨을 GT로 * 이용해서 계산하고, 
+# G의 gradient를 역전파로 계산하고 그리고
+# 마침내 G의 파라미터들을 옵티마이저 최적화를 통해 업데이트 합니다.
+# 진짜 라벨을 GT 라벨로 이용하여 손실 함수를 계산하는것은 직관적이지 않아 보일 수도 있지만 
+# 이것은 BCELoss의 :math:`log(x)` 부분을 (:math:`log(1-x)` 이 아니라)
+# 정확히 우리가 원하는것을 계산하기 위해 사용합니다.
+#
+# 마침내, 우리는 통계적인 보고와 각 에포크의 마지막에 우리는
+# 우리의 fixed_noise 배치를 generator를 통해 시각적으로 G의 학습 경과를 보기위해
+# 입력시킬수 있습니다.
+# 학습 통계치 보고는 다음과 같습니다.
 # 
-# Finally, we will do some statistic reporting and at the end of each
-# epoch we will push our fixed_noise batch through the generator to
-# visually track the progress of G’s training. The training statistics
-# reported are:
+# -  **Loss_D** - 모든 실제와 가짜 배치들 (:math:`log(D(x)) + log(D(G(z)))`) 의
+#    손실 합을 discriminator 의 손실로 계산함.
+# -  **Loss_G** - :math:`log(D(G(z)))` 로 계산된 generator의 손실
+# -  **D(x)** - 모든 실제 배치에 대한 discriminator 의 평균 결과값.
+#    이것은 1에 가까운 수에서 시작하여 이론적으로는 G 가 점점 더 나아지면서 0.5에 수렴합니다.
+#    왜 그런지 생각해 보세요.
+# -  **D(G(z))** - 모든 가짜 배치에 대한 discriminator 결과값의 평균.
+#    D 전의 첫 값은 업데이트 되고 두번째 값은 D 이후에 업데이트 됩니다. 이러한 값을은 
+#    0 근처에서 시작하여 G 가 나아지면서 0.5에 수렴합니다.
+#    왜 그런지 생각해보세요. #
 # 
-# -  **Loss_D** - discriminator loss calculated as the sum of losses for
-#    the all real and all fake batches (:math:`log(D(x)) + log(D(G(z)))`).
-# -  **Loss_G** - generator loss calculated as :math:`log(D(G(z)))`
-# -  **D(x)** - the average output (across the batch) of the discriminator
-#    for the all real batch. This should start close to 1 then
-#    theoretically converge to 0.5 when G gets better. Think about why
-#    this is.
-# -  **D(G(z))** - average discriminator outputs for the all fake batch.
-#    The first number is before D is updated and the second number is
-#    after D is updated. These numbers should start near 0 and converge to
-#    0.5 as G gets better. Think about why this is.
-# 
-# **Note:** This step might take a while, depending on how many epochs you
-# run and if you removed some data from the dataset.
+# ** 알림: ** 이 단계는 얼마큼의 에포크로 설정 했냐에 따라 매우 오래걸릴 수도 있습니다.
+# 원한다면 몇몇 데이터들을 데이터셋에서 지우셔도 됩니다.
 # 
 
-# Training Loop
+# 학습 반복문
 
-# Lists to keep track of progress
+# 진행을 추적하기 위한 배열들
 img_list = []
 G_losses = []
 D_losses = []
 iters = 0
 
 print("Starting Training Loop...")
-# For each epoch
+# 각 에포크
 for epoch in range(num_epochs):
-    # For each batch in the dataloader
+    # dataloader의 각 배치
     for i, data in enumerate(dataloader, 0):
         
         ############################
-        # (1) Update D network: maximize log(D(x)) + log(1 - D(G(z)))
+        # (1) D 신경망 업데이트: log(D(x)) + log(1 - D(G(z))) 최대화
         ###########################
-        ## Train with all-real batch
+        ## 전부 진짜 배치를 이용한 학습
         netD.zero_grad()
-        # Format batch
+        # 배치 준비
         real_cpu = data[0].to(device)
         b_size = real_cpu.size(0)
         label = torch.full((b_size,), real_label, device=device)
-        # Forward pass real batch through D
+        # D를 통해 진짜 배치 전파
         output = netD(real_cpu).view(-1)
-        # Calculate loss on all-real batch
+        # 전부 진짜인 배치에 대한 손실 계산
         errD_real = criterion(output, label)
-        # Calculate gradients for D in backward pass
+        # D를 통한 역전파로 gradient 계산
         errD_real.backward()
         D_x = output.mean().item()
 
-        ## Train with all-fake batch
-        # Generate batch of latent vectors
+        ## 전부 가짜인 배치 학습
+        # 잠재 벡터의 배치 생성
         noise = torch.randn(b_size, nz, 1, 1, device=device)
-        # Generate fake image batch with G
+        # G를 이용하여 가짜 이미지 배치 생성
         fake = netG(noise)
         label.fill_(fake_label)
-        # Classify all fake batch with D
+        # D를 이용해서 모두 가짜인 배치 분류
         output = netD(fake.detach()).view(-1)
-        # Calculate D's loss on the all-fake batch
+        # 전부 가짜인 배치를 이용하여 D의 손실 계산
         errD_fake = criterion(output, label)
-        # Calculate the gradients for this batch
+        # 이 배치를 이용하여 gradient 계산
         errD_fake.backward()
         D_G_z1 = output.mean().item()
-        # Add the gradients from the all-real and all-fake batches
+        # 전부 가짜인 배치와 전부 진짜인 배치의 gradient 합치기
         errD = errD_real + errD_fake
-        # Update D
+        # D 업데이트 하기
         optimizerD.step()
 
         ############################
-        # (2) Update G network: maximize log(D(G(z)))
+        # (2) G 신경망 업데이트: log(D(G(z))) 최대화 하기
         ###########################
         netG.zero_grad()
-        label.fill_(real_label)  # fake labels are real for generator cost
-        # Since we just updated D, perform another forward pass of all-fake batch through D
+        label.fill_(real_label)  #  가짜 라벨들은 generator 비용은 진짜 라벨로 처리
+        #  방금 D 를 업데이트 했기 때문에, D를 통한 전부 가짜인 배치 전파를 실행
         output = netD(fake).view(-1)
-        # Calculate G's loss based on this output
+        # 이 결과값을 기반으로 G의 손실 계산
         errG = criterion(output, label)
-        # Calculate gradients for G
+        # G의 gradient 계산
         errG.backward()
         D_G_z2 = output.mean().item()
-        # Update G
+        # G 업데이트
         optimizerG.step()
         
-        # Output training stats
+        # 학습 통계치 출력
         if i % 50 == 0:
             print('[%d/%d][%d/%d]\tLoss_D: %.4f\tLoss_G: %.4f\tD(x): %.4f\tD(G(z)): %.4f / %.4f'
                   % (epoch, num_epochs, i, len(dataloader),
                      errD.item(), errG.item(), D_x, D_G_z1, D_G_z2))
         
-        # Save Losses for plotting later
+        # 나중에 그래프 그리기위해 손실값들 저장
         G_losses.append(errG.item())
         D_losses.append(errD.item())
         
-        # Check how the generator is doing by saving G's output on fixed_noise
+        #  fixed_nois에 대한 G의 결과값과을 저장해서 어떻게 generator가 행동하고 있는지 확인
         if (iters % 500 == 0) or ((epoch == num_epochs-1) and (i == len(dataloader)-1)):
             with torch.no_grad():
                 fake = netG(fixed_noise).detach().cpu()
@@ -615,18 +613,17 @@ for epoch in range(num_epochs):
 
 
 ######################################################################
-# Results
+# 결과
 # -------
 # 
-# Finally, lets check out how we did. Here, we will look at three
-# different results. First, we will see how D and G’s losses changed
-# during training. Second, we will visualize G’s output on the fixed_noise
-# batch for every epoch. And third, we will look at a batch of real data
-# next to a batch of fake data from G.
+# 마침내, 우리가 무엇을 했는지 확인해 볼 수 있습니다. 이곳에서 우리는 세가지 다른
+# 결과를 확인할것 입니다. 첫째, 우리는 어떻게 D와 G의 손실이 학습 도중에 변화하는지
+# 확인합니다. 둘째, 우리는 fixed_noise배치에서 매 에포크에 대한 G의 결과값을 시각화합니다.
+# 셋째, 우리는 G로부터의 가자 데이터 배치 다음으로 진짜 데이터 배치를 확인합니다.
 # 
-# **Loss versus training iteration**
+# ** 손실 V.S. 학습 반복수 **
 # 
-# Below is a plot of D & G’s losses versus training iterations.
+# 아래는 D와 G의 손실과 학습 반복수에 대한 그래프 입니다.
 # 
 
 plt.figure(figsize=(10,5))
@@ -640,12 +637,11 @@ plt.show()
 
 
 ######################################################################
-# **Visualization of G’s progression**
+# ** G의 진행에 대한 시각화**
 # 
-# Remember how we saved the generator’s output on the fixed_noise batch
-# after every epoch of training. Now, we can visualize the training
-# progression of G with an animation. Press the play button to start the
-# animation.
+# 어떻게 우리가 fixed_noise 배치에 대한 generator의 결과값을 훈련의 매 에포크 후에
+# 저장했는지 기억해야 합니다. 이제, 우리는 G의 학습 진행을 애니메이션과 함께 
+# 시각화 할수 있습니다. 재생 버튼을 눌러 애니메이션을 시작해 보세요.
 # 
 
 #%%capture
@@ -658,23 +654,22 @@ HTML(ani.to_jshtml())
 
 
 ######################################################################
-# **Real Images vs. Fake Images**
+# ** 실제 이미지 vs. 가짜 이미지**
 # 
-# Finally, lets take a look at some real images and fake images side by
-# side.
+# 마침내 실제 이미지와 가짜 이미지를 직접 옆에 두고 비교해봅시다.
 # 
 
-# Grab a batch of real images from the dataloader
+# dataloader에서 진짜 이미지 배치를 가져옵니다.
 real_batch = next(iter(dataloader))
 
-# Plot the real images
+# 진짜 이미지 그리기
 plt.figure(figsize=(15,15))
 plt.subplot(1,2,1)
 plt.axis("off")
 plt.title("Real Images")
 plt.imshow(np.transpose(vutils.make_grid(real_batch[0].to(device)[:64], padding=5, normalize=True).cpu(),(1,2,0)))
 
-# Plot the fake images from the last epoch
+# 마지막 에포크에서의 가짜 이미지 그리기
 plt.subplot(1,2,2)
 plt.axis("off")
 plt.title("Fake Images")
@@ -683,18 +678,18 @@ plt.show()
 
 
 ######################################################################
-# Where to Go Next
+# 다음으로 해야할 것들
 # ----------------
 # 
-# We have reached the end of our journey, but there are several places you
-# could go from here. You could:
+# 마침내 우리는 우리의 여정 마지막에 도착했습니다. 하지만 여기서부터
+# 해야할 것들이 남아 있습니다.
+# 아래의 것들을 시도해 보세요.
 # 
-# -  Train for longer to see how good the results get
-# -  Modify this model to take a different dataset and possibly change the
-#    size of the images and the model architecture
-# -  Check out some other cool GAN projects
-#    `here <https://github.com/nashory/gans-awesome-applications>`__
-# -  Create GANs that generate
-#    `music <https://deepmind.com/blog/wavenet-generative-model-raw-audio/>`__
+# -  더 오래 학습하여 얼마나 좋은 결과를 얻는지 확인하기
+# -  다른 데이터셋을 갖기위해 모델을 변경해보고 가능하다면 이미지사이즈와 모델 구조 변경해보기
+# -  다른 멋진 GAN 프로젝트 확인하기
+#    ` 여기 <https://github.com/nashory/gans-awesome-applications>`__
+# -  음악을 생성해내는 GAN 확인해보기
+#    ` 음악 <https://deepmind.com/blog/wavenet-generative-model-raw-audio/>`__
 # 
 
