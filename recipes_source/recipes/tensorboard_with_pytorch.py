@@ -10,7 +10,7 @@ TensorBoard UI에 기록한 데이터를 시각화 하는 방법을 다룰 것입니다.
 설치
 ----------------------
 모델과 측정 항목을 TensorBoard 로그 디렉터리에 기록하려면 PyTorch를 설치해야 합니다.
-Anaconda를 통헤 PyTorch 1.4+를 설치하는 방법은 다음과 같습니다.(권장):
+Anaconda를 통해 PyTorch 1.4+를 설치하는 방법은 다음과 같습니다.(권장):
 ::
 
    $ conda install pytorch torchvision -c pytorch 
