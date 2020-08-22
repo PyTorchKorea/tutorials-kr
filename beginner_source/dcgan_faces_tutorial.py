@@ -238,26 +238,24 @@ plt.imshow(np.transpose(vutils.make_grid(real_batch[0].to(device)[:64], padding=
 
 
 ######################################################################
-# Implementation
+# 구현
 # --------------
 # 
-# With our input parameters set and the dataset prepared, we can now get
-# into the implementation. We will start with the weigth initialization
-# strategy, then talk about the generator, discriminator, loss functions,
-# and training loop in detail.
+# 입력값 파라미터들과 데이터셋으로 이제 우리는 코드 구현을 할 수 있습니다.
+# 우선 우리는 가중치 초기화 전력부터 시작으로 그다음에 generator, discriminator, 손실함수
+# 그리고 훈련 과정에 대해 자세히 알아보겠습니다.
 # 
-# Weight Initialization
+# 가중치 초기화
 # ~~~~~~~~~~~~~~~~~~~~~
 # 
-# From the DCGAN paper, the authors specify that all model weights shall
-# be randomly initialized from a Normal distribution with mean=0,
-# stdev=0.02. The ``weights_init`` function takes an initialized model as
-# input and reinitializes all convolutional, convolutional-transpose, and
-# batch normalization layers to meet this criteria. This function is
-# applied to the models immediately after initialization.
+# DCGAN 논문에서 저자들은 구체적으로 가중치는 평균 0과 표준편차 0.02 를 갖는 정규분포를 이용해서 모든 모델들이
+# 초기화되어야 한다고 밝히고 있습니다.
+# ``weights_init`` 함수는 초기화된 모델을 입력값으로 받고 모든 convolutional, convolutional-transpose
+# 그리고 batch normalization 층들을 기준에 맞도록 초기화 합니다.
+# 이 함수는 초기화 이후에 즉시 모델들에게 적용됩니다.
 # 
 
-# custom weights initialization called on netG and netD
+#  netG와 netD를 호출한뒤에 사용자 정의된 가중치 초기화를 실시합니다.
 def weights_init(m):
     classname = m.__class__.__name__
     if classname.find('Conv') != -1:
@@ -271,57 +269,53 @@ def weights_init(m):
 # Generator
 # ~~~~~~~~~
 # 
-# The generator, :math:`G`, is designed to map the latent space vector
-# (:math:`z`) to data-space. Since our data are images, converting
-# :math:`z` to data-space means ultimately creating a RGB image with the
-# same size as the training images (i.e. 3x64x64). In practice, this is
-# accomplished through a series of strided two dimensional convolutional
-# transpose layers, each paired with a 2d batch norm layer and a relu
-# activation. The output of the generator is fed through a tanh function
-# to return it to the input data range of :math:`[-1,1]`. It is worth
-# noting the existence of the batch norm functions after the
-# conv-transpose layers, as this is a critical contribution of the DCGAN
-# paper. These layers help with the flow of gradients during training. An
-# image of the generator from the DCGAN paper is shown below.
+# generator인 :math:`G` 는 잠배 벡터 공간(:math:`z`)을  데이터 공간에 대응시키도록 고안되었습니다.
+# 우리의 데이터가 이미지이므로 :math:`z` 를 데이터 공간으로 변환한다는 뜻은 사실상 훈련 이미지와 같은 크기(예) 3x64x64) 의
+# 이미지를 만든다는것과 같습니다. 
+# 구현에서는  2차원의 strided convolutional transpose 층과 2차원 batch norm 층, 그리고 relu 활성화 함수의 조합으로 
+# 결과값을 도출해낼수 있습니다.
+# generator의 결과값은 tanh 함수로 들어가서 :math:`[-1,1]` 의 데이터 범위로 반환됩니다.
+# conv-transpose 층 다음에 batch norm 함수들이 존재한다는것을 알아둘 필요가 있습니다. 
+# 왜냐하면 이 배치에 대한 구성은 DCGAN 논문의 핵심적인 기여이기 떄문입니다.
+# 이러한 층들은 훈련도중 gradient의 흐름에 대해 도움을 줍니다.
+# DCGAN 논문에서 generator 의 image는 아래와 같이 보여줍니다.
 #
 # .. figure:: /_static/img/dcgan_generator.png
 #    :alt: dcgan_generator
 #
-# Notice, the how the inputs we set in the input section (*nz*, *ngf*, and
-# *nc*) influence the generator architecture in code. *nz* is the length
-# of the z input vector, *ngf* relates to the size of the feature maps
-# that are propagated through the generator, and *nc* is the number of
-# channels in the output image (set to 3 for RGB images). Below is the
-# code for the generator.
+# 입력 섹션에서 우리가 설정한 입력값에 대한 설정들(*nz*, *ngf*, and *nc*) 이 어떻게 코드 안에 있는 generator 구조에 영향을 미치는지 알아둬야합니다.
+# *nz* 는 z 입력 벡터의 길이고,  *ngf* 는 generator를 통해 전파되는 feature maps 의 크기와 연관이 있습니다.
+# 또한, *nc* 는 결과값 이미지에 대한 채널의 갯수입니다 (RGB이미지는 3으로 설정해야 합니다.)
+# 아래는 generator 코드입니다.
 # 
 
-# Generator Code
+# Generator 코드
 
 class Generator(nn.Module):
     def __init__(self, ngpu):
         super(Generator, self).__init__()
         self.ngpu = ngpu
         self.main = nn.Sequential(
-            # input is Z, going into a convolution
+            # 입력값은 Z이며 convolution으로 들어갑니다.
             nn.ConvTranspose2d( nz, ngf * 8, 4, 1, 0, bias=False),
             nn.BatchNorm2d(ngf * 8),
             nn.ReLU(True),
-            # state size. (ngf*8) x 4 x 4
+            # 상태 크기. (ngf*8) x 4 x 4
             nn.ConvTranspose2d(ngf * 8, ngf * 4, 4, 2, 1, bias=False),
             nn.BatchNorm2d(ngf * 4),
             nn.ReLU(True),
-            # state size. (ngf*4) x 8 x 8
+            # 상태 크기. (ngf*4) x 8 x 8
             nn.ConvTranspose2d( ngf * 4, ngf * 2, 4, 2, 1, bias=False),
             nn.BatchNorm2d(ngf * 2),
             nn.ReLU(True),
-            # state size. (ngf*2) x 16 x 16
+            # 상태 크기. (ngf*2) x 16 x 16
             nn.ConvTranspose2d( ngf * 2, ngf, 4, 2, 1, bias=False),
             nn.BatchNorm2d(ngf),
             nn.ReLU(True),
-            # state size. (ngf) x 32 x 32
+            # 상태 크기. (ngf) x 32 x 32
             nn.ConvTranspose2d( ngf, nc, 4, 2, 1, bias=False),
             nn.Tanh()
-            # state size. (nc) x 64 x 64
+            # 상태 크기. (nc) x 64 x 64
         )
 
     def forward(self, input):
@@ -329,23 +323,24 @@ class Generator(nn.Module):
 
 
 ######################################################################
-# Now, we can instantiate the generator and apply the ``weights_init``
-# function. Check out the printed model to see how the generator object is
-# structured.
+# 이제 우리는 generator 를 초기화하고  ``weights_init`` 
+# 함수를 적용 할 수 있습니다.
+# 출력되는 모델을 확인해서 어떻게 generator 객체가
+# 구성되어있는지 확인해보세요.
 # 
 
-# Create the generator
+# generator 만들기.
 netG = Generator(ngpu).to(device)
 
-# Handle multi-gpu if desired
+# 멀티 gpu를 설정 할 수 있습니다. 
 if (device.type == 'cuda') and (ngpu > 1):
     netG = nn.DataParallel(netG, list(range(ngpu)))
 
-# Apply the weights_init function to randomly initialize all weights
-#  to mean=0, stdev=0.2.
+# weights_init 함수를 적용해서 모든 가중치를 무작위로
+# 평균이 0이고 표준편차가 0.2인 것으로 초기화 합니다.
 netG.apply(weights_init)
 
-# Print the model
+# 모델을 출력해 봅니다.
 print(netG)
 
 
