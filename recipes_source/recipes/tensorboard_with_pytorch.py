@@ -1,22 +1,22 @@
 """
-PyTorch·Î TensorBoard »ç¿ëÇÏ±â
+PyTorchë¡œ TensorBoard ì‚¬ìš©í•˜ê¸°
 ===================================
-TensorBoard´Â ¸Ó½Å·¯´× ½ÇÇèÀ» À§ÇÑ ½Ã°¢È­ ÅøÅ¶(toolkit)ÀÔ´Ï´Ù.
-TensorBoard¸¦ »ç¿ëÇÏ¸é ¼Õ½Ç ¹× Á¤È®µµ¿Í °°Àº ÃøÁ¤ Ç×¸ñÀ» ÃßÀû ¹× ½Ã°¢È­ÇÏ´Â °Í,
-¸ðµ¨ ±×·¡ÇÁ¸¦ ½Ã°¢È­ÇÏ´Â °Í, È÷½ºÅä±×·¥À» º¸´Â °Í, ÀÌ¹ÌÁö¸¦ Ãâ·ÂÇÏ´Â °Í µîÀÌ °¡´ÉÇÕ´Ï´Ù.
-ÀÌ Æ©Åä¸®¾ó¿¡¼­´Â TensorBoard ¼³Ä¡, PyTorchÀÇ ±âº» »ç¿ë¹ý,
-TensorBoard UI¿¡ ±â·ÏÇÑ µ¥ÀÌÅÍ¸¦ ½Ã°¢È­ ÇÏ´Â ¹æ¹ýÀ» ´Ù·ê °ÍÀÔ´Ï´Ù.
+TensorBoardëŠ” ë¨¸ì‹ ëŸ¬ë‹ ì‹¤í—˜ì„ ìœ„í•œ ì‹œê°í™” íˆ´í‚·(toolkit)ìž…ë‹ˆë‹¤.
+TensorBoardë¥¼ ì‚¬ìš©í•˜ë©´ ì†ì‹¤ ë° ì •í™•ë„ì™€ ê°™ì€ ì¸¡ì • í•­ëª©ì„ ì¶”ì  ë° ì‹œê°í™”í•˜ëŠ” ê²ƒ,
+ëª¨ë¸ ê·¸ëž˜í”„ë¥¼ ì‹œê°í™”í•˜ëŠ” ê²ƒ, ížˆìŠ¤í† ê·¸ëž¨ì„ ë³´ëŠ” ê²ƒ, ì´ë¯¸ì§€ë¥¼ ì¶œë ¥í•˜ëŠ” ê²ƒ ë“±ì´ ê°€ëŠ¥í•©ë‹ˆë‹¤.
+ì´ íŠœí† ë¦¬ì–¼ì—ì„œëŠ” TensorBoard ì„¤ì¹˜, PyTorchì˜ ê¸°ë³¸ ì‚¬ìš©ë²•,
+TensorBoard UIì— ê¸°ë¡í•œ ë°ì´í„°ë¥¼ ì‹œê°í™” í•˜ëŠ” ë°©ë²•ì„ ë‹¤ë£° ê²ƒìž…ë‹ˆë‹¤.
 
-¼³Ä¡
+ì„¤ì¹˜
 ----------------------
-¸ðµ¨°ú ÃøÁ¤ Ç×¸ñÀ» TensorBoard ·Î±× µð·ºÅÍ¸®¿¡ ±â·ÏÇÏ·Á¸é PyTorch¸¦ ¼³Ä¡ÇØ¾ß ÇÕ´Ï´Ù.
-Anaconda¸¦ ÅëÇØ PyTorch 1.4+¸¦ ¼³Ä¡ÇÏ´Â ¹æ¹ýÀº ´ÙÀ½°ú °°½À´Ï´Ù.(±ÇÀå):
+ëª¨ë¸ê³¼ ì¸¡ì • í•­ëª©ì„ TensorBoard ë¡œê·¸ ë””ë ‰í„°ë¦¬ì— ê¸°ë¡í•˜ë ¤ë©´ PyTorchë¥¼ ì„¤ì¹˜í•´ì•¼ í•©ë‹ˆë‹¤.
+Anacondaë¥¼ í†µí•´ PyTorch 1.4+ë¥¼ ì„¤ì¹˜í•˜ëŠ” ë°©ë²•ì€ ë‹¤ìŒê³¼ ê°™ìŠµë‹ˆë‹¤.(ê¶Œìž¥):
 ::
 
    $ conda install pytorch torchvision -c pytorch 
    
 
-¶Ç´Â pip¸¦ »ç¿ëÇÒ ¼öµµ ÀÖ½À´Ï´Ù.
+ë˜ëŠ” pipë¥¼ ì‚¬ìš©í•  ìˆ˜ë„ ìžˆìŠµë‹ˆë‹¤.
 
 ::
 
@@ -25,11 +25,11 @@ Anaconda¸¦ ÅëÇØ PyTorch 1.4+¸¦ ¼³Ä¡ÇÏ´Â ¹æ¹ýÀº ´ÙÀ½°ú °°½À´Ï´Ù.(±ÇÀå):
 """
 
 ######################################################################
-# PyTorch·Î TensorBoard »ç¿ëÇÏ±â
+# PyTorchë¡œ TensorBoard ì‚¬ìš©í•˜ê¸°
 # -----
 # 
-# ÀÌÁ¦ PyTorch·Î TensorBoard¸¦ »ç¿ëÇØº¾½Ã´Ù! ±â·ÏÀ» ½ÃÀÛÇÏ±â Àü¿¡,
-# ``SummaryWriter`` ÀÎ½ºÅÏ½º¸¦ »ý¼ºÇØ¾ß ÇÕ´Ï´Ù.
+# ì´ì œ PyTorchë¡œ TensorBoardë¥¼ ì‚¬ìš©í•´ë´…ì‹œë‹¤! ê¸°ë¡ì„ ì‹œìž‘í•˜ê¸° ì „ì—,
+# ``SummaryWriter`` ì¸ìŠ¤í„´ìŠ¤ë¥¼ ìƒì„±í•´ì•¼ í•©ë‹ˆë‹¤.
 #   
 
 import torch
@@ -37,21 +37,21 @@ from torch.utils.tensorboard import SummaryWriter
 writer = SummaryWriter()
 
 ######################################################################
-# Writer´Â ±âº»ÀûÀ¸·Î ``./runs/`` µð·ºÅÍ¸®¿¡ Ãâ·ÂÇÕ´Ï´Ù.
+# WriterëŠ” ê¸°ë³¸ì ìœ¼ë¡œ ``./runs/`` ë””ë ‰í„°ë¦¬ì— ì¶œë ¥í•©ë‹ˆë‹¤.
 # 
 
 
 ######################################################################
-# ½ºÄ®¶ó(scalar) ±â·ÏÇÏ±â
+# ìŠ¤ì¹¼ë¼(scalar) ê¸°ë¡í•˜ê¸°
 # -----
 # 
-# ¸Ó½Å·¯´×¿¡¼­´Â ¼Õ½Ç °°Àº ÁÖ¿ä ÃøÁ¤ Ç×¸ñ°ú ÇÐ½À Áß ±×°ÍÀÌ ¾î¶»°Ô º¯ÇÏ´ÂÁö ÀÌÇØÇÏ´Â °ÍÀÌ
-# Áß¿äÇÕ´Ï´Ù. ½ºÄ®¶ó´Â °¢ ÇÐ½À ´Ü°è(step)¿¡¼­ÀÇ ¼Õ½Ç °ªÀÌ³ª °¢ ¿¡Æø ÀÌÈÄÀÇ Á¤È®µµ¸¦ ÀúÀåÇÏ´Â µ¥
-# µµ¿òÀ» ÁÝ´Ï´Ù.
+# ë¨¸ì‹ ëŸ¬ë‹ì—ì„œëŠ” ì†ì‹¤ ê°™ì€ ì£¼ìš” ì¸¡ì • í•­ëª©ê³¼ í•™ìŠµ ì¤‘ ê·¸ê²ƒì´ ì–´ë–»ê²Œ ë³€í•˜ëŠ”ì§€ ì´í•´í•˜ëŠ” ê²ƒì´
+# ì¤‘ìš”í•©ë‹ˆë‹¤. ìŠ¤ì¹¼ë¼ëŠ” ê° í•™ìŠµ ë‹¨ê³„(step)ì—ì„œì˜ ì†ì‹¤ ê°’ì´ë‚˜ ê° ì—í­ ì´í›„ì˜ ì •í™•ë„ë¥¼ ì €ìž¥í•˜ëŠ” ë°
+# ë„ì›€ì„ ì¤ë‹ˆë‹¤.
 #
-# ½ºÄ®¶ó °ªÀ» ±â·ÏÇÏ·Á¸é ``add_scalar(tag, scalar_value, global_step=None, walltime=None)``
-# À» »ç¿ëÇØ¾ß ÇÕ´Ï´Ù. ¿¹·Î, °£´ÜÇÑ ¼±Çü È¸±Í ÇÐ½ÀÀ» ¸¸µé°í ``add_scalar``¸¦ »ç¿ëÇØ
-# ¼Õ½Ç °ªÀ» ±â·ÏÇØ º¾½Ã´Ù.
+# ìŠ¤ì¹¼ë¼ ê°’ì„ ê¸°ë¡í•˜ë ¤ë©´ ``add_scalar(tag, scalar_value, global_step=None, walltime=None)``
+# ì„ ì‚¬ìš©í•´ì•¼ í•©ë‹ˆë‹¤. ì˜ˆë¡œ, ê°„ë‹¨í•œ ì„ í˜• íšŒê·€ í•™ìŠµì„ ë§Œë“¤ê³  ``add_scalar``ë¥¼ ì‚¬ìš©í•´
+# ì†ì‹¤ ê°’ì„ ê¸°ë¡í•´ ë´…ì‹œë‹¤.
 
 x = torch.arange(-5, 5, 0.1).view(-1, 1)
 y = -5 * x + 0.1 * torch.randn(x.size())
@@ -74,62 +74,62 @@ writer.flush()
 
 
 ###################################################################### 
-# ¸ðµç º¸·ùÁßÀÎ(pending) ÀÌº¥Æ®°¡ µð½ºÅ©¿¡ ±â·ÏµÇ¾ú´ÂÁö È®ÀÎÇÏ·Á¸é ``flush()``
-# ¸Þ¼Òµå¸¦ È£ÃâÇÕ´Ï´Ù.
+# ëª¨ë“  ë³´ë¥˜ì¤‘ì¸(pending) ì´ë²¤íŠ¸ê°€ ë””ìŠ¤í¬ì— ê¸°ë¡ë˜ì—ˆëŠ”ì§€ í™•ì¸í•˜ë ¤ë©´ ``flush()``
+# ë©”ì†Œë“œë¥¼ í˜¸ì¶œí•©ë‹ˆë‹¤.
 # 
-# ±â·ÏÇÒ ¼ö ÀÖ´Â ´õ ¸¹Àº TensorBoard ½Ã°¢È­ ¹æ¹ýÀ» Ã£À¸·Á¸é 
-# `torch.utils.tensorboard tutorials <https://pytorch.org/docs/stable/tensorboard.html>`_ À»
-# ÂüÁ¶ÇÏ¼¼¿ä.
+# ê¸°ë¡í•  ìˆ˜ ìžˆëŠ” ë” ë§Žì€ TensorBoard ì‹œê°í™” ë°©ë²•ì„ ì°¾ìœ¼ë ¤ë©´ 
+# `torch.utils.tensorboard tutorials <https://pytorch.org/docs/stable/tensorboard.html>`_ ì„
+# ì°¸ì¡°í•˜ì„¸ìš”.
 #
-# Summary writer°¡ ´õ ÀÌ»ó ÇÊ¿äÇÏÁö ¾ÊÀ¸¸é ``close()`` ¸Þ¼Òµå¸¦ È£ÃâÇÕ´Ï´Ù.
+# Summary writerê°€ ë” ì´ìƒ í•„ìš”í•˜ì§€ ì•Šìœ¼ë©´ ``close()`` ë©”ì†Œë“œë¥¼ í˜¸ì¶œí•©ë‹ˆë‹¤.
 #
 
 writer.close()
 
 ######################################################################
-# TensorBoard ½ÇÇàÇÏ±â
+# TensorBoard ì‹¤í–‰í•˜ê¸°
 # -----
 # 
-# ±â·ÏÇÑ µ¥ÀÌÅÍ¸¦ ½Ã°¢È­ÇÏ±â À§ÇØ¼­ ´ÙÀ½°ú °°ÀÌ TensorBoard¸¦ ¼³Ä¡ÇÕ´Ï´Ù.
+# ê¸°ë¡í•œ ë°ì´í„°ë¥¼ ì‹œê°í™”í•˜ê¸° ìœ„í•´ì„œ ë‹¤ìŒê³¼ ê°™ì´ TensorBoardë¥¼ ì„¤ì¹˜í•©ë‹ˆë‹¤.
 #
 # ::
 # 
 #    $ pip install tensorboard
 # 
 #
-# ÀÌÁ¦, À§¿¡¼­ »ç¿ëÇÑ ·çÆ® ·Î±× µð·ºÅÍ¸®¸¦ ÁöÁ¤ÇÏ¿© TensorBoard¸¦ ½ÃÀÛÇÕ´Ï´Ù.
-# ``logdir`` ÀÎÀÚ´Â TensorBoard°¡ Ãâ·ÂÇÒ ¼ö ÀÖ´Â ÀÌº¥Æ® ÆÄÀÏµéÀ» Ã£À» µð·ºÅÍ¸®¸¦ °¡¸®Åµ´Ï´Ù. 
-# TensorBoard´Â .*tfevents.* ÆÄÀÏÀ» Ã£±â À§ÇØ lodgirÀÇ µð·ºÅÍ¸® ±¸Á¶¸¦ Àç±ÍÀûÀ¸·Î Å½»öÇÕ´Ï´Ù.
+# ì´ì œ, ìœ„ì—ì„œ ì‚¬ìš©í•œ ë£¨íŠ¸ ë¡œê·¸ ë””ë ‰í„°ë¦¬ë¥¼ ì§€ì •í•˜ì—¬ TensorBoardë¥¼ ì‹œìž‘í•©ë‹ˆë‹¤.
+# ``logdir`` ì¸ìžëŠ” TensorBoardê°€ ì¶œë ¥í•  ìˆ˜ ìžˆëŠ” ì´ë²¤íŠ¸ íŒŒì¼ë“¤ì„ ì°¾ì„ ë””ë ‰í„°ë¦¬ë¥¼ ê°€ë¦¬í‚µë‹ˆë‹¤. 
+# TensorBoardëŠ” .*tfevents.* íŒŒì¼ì„ ì°¾ê¸° ìœ„í•´ lodgirì˜ ë””ë ‰í„°ë¦¬ êµ¬ì¡°ë¥¼ ìž¬ê·€ì ìœ¼ë¡œ íƒìƒ‰í•©ë‹ˆë‹¤.
 #
 # ::
 # 
 #    $ tensorboard --logdir=runs
 # 
-# Á¦°øÇÏ´Â URL·Î ÀÌµ¿ÇÏ°Å³ª `http://localhost:6006/ <http://localhost:6006/>`_ ·Î ÀÌµ¿ÇÕ´Ï´Ù.
+# ì œê³µí•˜ëŠ” URLë¡œ ì´ë™í•˜ê±°ë‚˜ `http://localhost:6006/ <http://localhost:6006/>`_ ë¡œ ì´ë™í•©ë‹ˆë‹¤.
 # 
 # .. image:: ../../_static/img/thumbnails/tensorboard_scalars.png
 #    :scale: 40 %
 # 
-# ÀÌ ´ë½Ãº¸µå´Â ¸Å ¿¡Æø¸¶´Ù ¼Õ½Ç°ú Á¤È®µµ°¡ ¾î¶»°Ô º¯ÇÏ´ÂÁö º¸¿©ÁÝ´Ï´Ù.
-# ÀÌ¸¦ »ç¿ëÇÏ¿© ÇÐ½À ¼Óµµ, ÇÐ½À·ü ¹× ±âÅ¸ ½ºÄ®¶ó °ªµéÀ» ÃßÀûÇÒ ¼öµµ ÀÖ½À´Ï´Ù.
-# ¸ðµ¨À» Çâ»ó½ÃÅ°·Á¸é ¿©·¯ ´Ù¸¥ ÇÐ½ÀÀ» µ¹¸®¸é¼­ ÀÌ·¯ÇÑ ÃøÁ¤ ±âÁØµéÀ» ºñ±³ÇÏ´Â °ÍÀÌ ÁÁ½À´Ï´Ù.
+# ì´ ëŒ€ì‹œë³´ë“œëŠ” ë§¤ ì—í­ë§ˆë‹¤ ì†ì‹¤ê³¼ ì •í™•ë„ê°€ ì–´ë–»ê²Œ ë³€í•˜ëŠ”ì§€ ë³´ì—¬ì¤ë‹ˆë‹¤.
+# ì´ë¥¼ ì‚¬ìš©í•˜ì—¬ í•™ìŠµ ì†ë„, í•™ìŠµë¥  ë° ê¸°íƒ€ ìŠ¤ì¹¼ë¼ ê°’ë“¤ì„ ì¶”ì í•  ìˆ˜ë„ ìžˆìŠµë‹ˆë‹¤.
+# ëª¨ë¸ì„ í–¥ìƒì‹œí‚¤ë ¤ë©´ ì—¬ëŸ¬ ë‹¤ë¥¸ í•™ìŠµì„ ëŒë¦¬ë©´ì„œ ì´ëŸ¬í•œ ì¸¡ì • ê¸°ì¤€ë“¤ì„ ë¹„êµí•˜ëŠ” ê²ƒì´ ì¢‹ìŠµë‹ˆë‹¤.
 
 
 ######################################################################
-# TensorBoard ´ë½Ãº¸µå °øÀ¯ÇÏ±â
+# TensorBoard ëŒ€ì‹œë³´ë“œ ê³µìœ í•˜ê¸°
 # -----
 # 
-# `TensorBoard.dev <https://tensorboard.dev/>`_¸¦ »ç¿ëÇÏ¸é ML ½ÇÇè °á°ú¸¦ 
-# ´©±¸ÇÏ°í³ª ¾÷·ÎµåÇÏ°í °øÀ¯ÇÒ ¼ö ÀÖ½À´Ï´Ù. TensorBoard.dev¸¦ »ç¿ëÇÏ¿© 
-# TensorBoard ´ë½Ãº¸µå¸¦ È£½ºÆÃ, ÃßÀû ¹× °øÀ¯ÇÏ¼¼¿ä.
+# `TensorBoard.dev <https://tensorboard.dev/>`_ë¥¼ ì‚¬ìš©í•˜ë©´ ML ì‹¤í—˜ ê²°ê³¼ë¥¼ 
+# ëˆ„êµ¬í•˜ê³ ë‚˜ ì—…ë¡œë“œí•˜ê³  ê³µìœ í•  ìˆ˜ ìžˆìŠµë‹ˆë‹¤. TensorBoard.devë¥¼ ì‚¬ìš©í•˜ì—¬ 
+# TensorBoard ëŒ€ì‹œë³´ë“œë¥¼ í˜¸ìŠ¤íŒ…, ì¶”ì  ë° ê³µìœ í•˜ì„¸ìš”.
 # 
-# ¾÷·Î´õ(uploader)¸¦ »ç¿ëÇÏ·Á¸é TensorBoard ÃÖ½Å ¹öÀüÀ» ¼³Ä¡ÇÏ¼¼¿ä.
+# ì—…ë¡œë”(uploader)ë¥¼ ì‚¬ìš©í•˜ë ¤ë©´ TensorBoard ìµœì‹  ë²„ì „ì„ ì„¤ì¹˜í•˜ì„¸ìš”.
 #
 # :: 
 # 
 #    $ pip install tensorboard --upgrade
 #
-# ´ÙÀ½°ú °°Àº ¸í·ÉÀ» »ç¿ëÇÏ¿© TensorBoard¸¦ ¾÷·ÎµåÇÏ°í °øÀ¯ÇÏ¼¼¿ä.
+# ë‹¤ìŒê³¼ ê°™ì€ ëª…ë ¹ì„ ì‚¬ìš©í•˜ì—¬ TensorBoardë¥¼ ì—…ë¡œë“œí•˜ê³  ê³µìœ í•˜ì„¸ìš”.
 #
 # :: 
 # 
@@ -137,24 +137,24 @@ writer.close()
 #   --name "My latest experiment" \ # optional
 #   --description "Simple comparison of several hyperparameters" # optional
 # 
-# µµ¿òÀÌ ÇÊ¿äÇÏ¸é ``$ tensorboard dev --help``¸¦ ½ÇÇàÇÏ¼¼¿ä.
+# ë„ì›€ì´ í•„ìš”í•˜ë©´ ``$ tensorboard dev --help``ë¥¼ ì‹¤í–‰í•˜ì„¸ìš”.
 #
-# **Âü°í:** ¾÷·Îµå µÈ TensorBoard´Â °ø°³ÀûÀÌ¸ç ¸ðµç »ç¶÷ÀÌ º¼ ¼ö ÀÖ½À´Ï´Ù. 
-# ¹Î°¨ÇÑ µ¥ÀÌÅÍ¸¦ ¾÷·ÎµåÇÏÁö ¸¶¼¼¿ä.
+# **ì°¸ê³ :** ì—…ë¡œë“œ ëœ TensorBoardëŠ” ê³µê°œì ì´ë©° ëª¨ë“  ì‚¬ëžŒì´ ë³¼ ìˆ˜ ìžˆìŠµë‹ˆë‹¤. 
+# ë¯¼ê°í•œ ë°ì´í„°ë¥¼ ì—…ë¡œë“œí•˜ì§€ ë§ˆì„¸ìš”.
 #
-# ÅÍ¹Ì³Î¿¡¼­ Á¦°øÇÑ URL·Î TensorBoard¸¦ ½Ç½Ã°£À¸·Î È®ÀÎÇÏ¼¼¿ä.
-# ¿¹: `https://tensorboard.dev/experiment/AdYd1TgeTlaLWXx6I8JUbA <https://tensorboard.dev/experiment/AdYd1TgeTlaLWXx6I8JUbA>`_
+# í„°ë¯¸ë„ì—ì„œ ì œê³µí•œ URLë¡œ TensorBoardë¥¼ ì‹¤ì‹œê°„ìœ¼ë¡œ í™•ì¸í•˜ì„¸ìš”.
+# ì˜ˆ: `https://tensorboard.dev/experiment/AdYd1TgeTlaLWXx6I8JUbA <https://tensorboard.dev/experiment/AdYd1TgeTlaLWXx6I8JUbA>`_
 #
 #
 # .. image:: ../../_static/img/thumbnails/tensorboard_dev.png
 #    :scale: 40 %
 # 
 # 
-# .. Âü°í::
-#   TensorBoard.dev´Â ÇöÀç ½ºÄ®¶ó ´ë½Ãº¸µå¸¸ Áö¿øÇÕ´Ï´Ù.
+# .. ì°¸ê³ ::
+#   TensorBoard.devëŠ” í˜„ìž¬ ìŠ¤ì¹¼ë¼ ëŒ€ì‹œë³´ë“œë§Œ ì§€ì›í•©ë‹ˆë‹¤.
 
 ########################################################################
-# ´õ ¾Ë¾Æº¸±â
+# ë” ì•Œì•„ë³´ê¸°
 # ----------------------------
 # 
 # -  `torch.utils.tensorboard <https://pytorch.org/docs/stable/tensorboard.html>`_ docs
