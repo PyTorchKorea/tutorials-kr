@@ -54,7 +54,7 @@
 
 튜토리얼을 시작하기 위해 먼저 `여기 <https://github.com/pytorch/pytorch/#installation>`_ 의
 PyTorch 설치 안내와 `HuggingFace 깃허브 저장소 <https://github.com/huggingface/transformers#installation>`_ 의
-안내를 따라합시다. 추가적으로 우리가 사용할 F1 점수를 계산하는 보조 함수가 내장된
+안내를 따라 합시다. 추가로 우리가 사용할 F1 점수를 계산하는 보조 함수가 내장된
 `scikit-learn <https://github.com/scikit-learn/scikit-learn>`_ 패키지를 설치합니다.
 
 
