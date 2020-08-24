@@ -19,7 +19,7 @@
 -----------------------
 
 이 튜토리얼에서는 `HuggingFace Transformers
-<https://github.com/huggingface/transformers>`_ 예제들을 따라하면서 BERT
+<https://github.com/huggingface/transformers>`_ 예제들을 따라 하면서 BERT
 모델을 동적으로 양자화할 것입니다. BERT 처럼 유명하면서도 최고 성능을
 내는 모델을 어떻게 동적으로 양자화된 모델로 변환하는지 한 단계씩 설명하겠습니다.
 
