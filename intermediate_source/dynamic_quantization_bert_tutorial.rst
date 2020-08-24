@@ -64,7 +64,7 @@ PyTorch 설치 안내와 `HuggingFace 깃허브 저장소 <https://github.com/hu
    pip install transformers
 
 
-PyTorch의 베타 기능들을 사용할 것이므로, 가장 최신 버전의 torch와 torchvision을 설치하는 게 좋습니다.
+PyTorch의 베타 기능들을 사용할 것이므로, 가장 최신 버전의 torch와 torchvision을 설치하는 것을 권해드립니다.
 가장 최신의 설치 안내는 `여기 <https://pytorch.org/get-started/locally/>`_ 에 있습니다.
 예를 들어 Mac에 설치하려면 :
 
