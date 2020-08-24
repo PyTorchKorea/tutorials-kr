@@ -2,7 +2,7 @@
 ====================================================
 
 .. tip::
-   이 튜토리얼을 따라하기 위해, 이
+   이 튜토리얼을 따라 하기 위해, 이
    `Colab Version <https://colab.research.google.com/github/pytorch/tutorials/blob/gh-pages/_downloads/dynamic_quantization_bert_tutorial.ipynb>`_ 을 사용하길 권장합니다.
    그러면 아래에 설명된 정보들을 이용해 실험할 수 있습니다.
 
