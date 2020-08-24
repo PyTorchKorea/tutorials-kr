@@ -99,7 +99,7 @@ writer.close()
 #
 # 이제, 위에서 사용한 루트 로그 디렉터리를 지정하여 TensorBoard를 시작합니다.
 # ``logdir`` 인자는 TensorBoard가 출력할 수 있는 이벤트 파일들을 찾을 디렉터리를 가리킵니다. 
-# TensorBoard는 .*tfevents.* 파일을 찾기 위해 lodgir의 디렉터리 구조를 재귀적으로 탐색합니다.
+# TensorBoard는 .*tfevents.* 파일을 찾기 위해 logdir의 디렉터리 구조를 재귀적으로 탐색합니다.
 #
 # ::
 # 
