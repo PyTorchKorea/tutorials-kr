@@ -524,7 +524,7 @@ MRPC 데이터셋을 평가하는데 약 46초가 소요됐습니다.
 
 
 
-참고 자료들
+참고 자료
 -------------
 
 [1] J.Devlin, M. Chang, K. Lee and K. Toutanova, `BERT: Pre-training of
