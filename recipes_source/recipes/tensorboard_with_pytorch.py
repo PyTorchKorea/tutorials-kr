@@ -37,7 +37,7 @@ from torch.utils.tensorboard import SummaryWriter
 writer = SummaryWriter()
 
 ######################################################################
-# Writer는 기본적으로 ``./runs/`` 디렉터리에 출력합니다.
+# Writer는 기본적으로 ``./runs/`` 디렉터리에 출력됩니다.
 # 
 
 
