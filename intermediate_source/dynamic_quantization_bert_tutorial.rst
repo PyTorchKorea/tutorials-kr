@@ -31,7 +31,7 @@
 -  PyTorch에서 지원하는 동적 양자화 기능은 부동소수점 모델의 가중치를 정적인
    int8 또는 float16 타입의 양자화된 모델로 변환하고, 활성 함수 부분은
    동적으로 양자화합니다. 가중치가 int8 타입으로 양자화 됐을 때, 활성 함수 부분은
-   각 배치마다 int8 타입으로 동적으로 양자화 됩니다. PyTorch에는 지정된 모듈을
+   배치마다 int8 타입으로 동적으로 양자화 됩니다. PyTorch에는 지정된 모듈을
    동적이면서 가중치만 갖도록 양자화된 형태로 변환하고, 양자화된 모델을 만들어내는
    `torch.quantization.quantize_dynamic API <https://pytorch.org/docs/stable/quantization.html#torch.quantization.quantize_dynamic>`_ 가 있습니다.
 
