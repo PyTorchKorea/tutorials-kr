@@ -137,6 +137,9 @@ language = None
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 exclude_patterns += sphinx_gallery_conf['examples_dirs']
 exclude_patterns += ['*/index.rst']
+exclude_patterns += ['venv']
+exclude_patterns += ['virtualenv']
+exclude_patterns += ['ENV']
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
