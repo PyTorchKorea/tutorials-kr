@@ -379,7 +379,7 @@ BERT 모델(FP32)를 불러옵니다.
                                                     label_list=label_list,
                                                     max_length=args.max_seq_length,
                                                     output_mode=output_mode,
-                                                    pad_on_left=bool(args.model_type in ['xlnet']),                 # xlnet의 경우 앞쪽에 패딩한다.
+                                                    pad_on_left=bool(args.model_type in ['xlnet']),                 # xlnet의 경우 앞쪽에 패딩합니다.
                                                     pad_token=tokenizer.convert_tokens_to_ids([tokenizer.pad_token])[0],
                                                     pad_token_segment_id=4 if args.model_type in ['xlnet'] else 0,
             )
