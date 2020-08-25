@@ -358,7 +358,7 @@ BERT 모델(FP32)를 불러옵니다.
 
         processor = processors[task]()
         output_mode = output_modes[task]
-        # 캐시 또는 데이터셋 파일로부터 데이터 특징을 불러온다.
+        # 캐시 또는 데이터셋 파일로부터 데이터 특징을 불러옵니다.
         cached_features_file = os.path.join(args.data_dir, 'cached_{}_{}_{}_{}'.format(
             'dev' if evaluate else 'train',
             list(filter(None, args.model_name_or_path.split('/'))).pop(),
