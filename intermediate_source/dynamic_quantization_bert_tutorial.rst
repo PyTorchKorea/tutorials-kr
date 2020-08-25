@@ -354,7 +354,7 @@ BERT 모델(FP32)를 불러옵니다.
 
     def load_and_cache_examples(args, task, tokenizer, evaluate=False):
         if args.local_rank not in [-1, 0] and not evaluate:
-            torch.distributed.barrier()  # 분산 학습 프로세스들 중 처음 프로세스 한 개만 데이터를 처리하고 다른 프로세스들은 캐시를 이용하도록 한다.
+            torch.distributed.barrier()  # 분산 학습 프로세스들 중 처음 프로세스 한 개만 데이터를 처리하고 다른 프로세스들은 캐시를 이용하도록 합니다.
 
         processor = processors[task]()
         output_mode = output_modes[task]
