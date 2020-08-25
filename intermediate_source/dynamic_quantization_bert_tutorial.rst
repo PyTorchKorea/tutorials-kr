@@ -390,7 +390,7 @@ BERT 모델(FP32)를 불러옵니다.
         if args.local_rank == 0 and not evaluate:
             torch.distributed.barrier()  # 분산 학습 프로세스들 중 처음 프로세스 한 개만 데이터를 처리하고 다른 프로세스들은 캐시를 이용하도록 합니다.
 
-        # 텐서로 변환하고 데이터셋을 빌드한다.
+        # 텐서로 변환하고 데이터셋을 빌드합니다.
         all_input_ids = torch.tensor([f.input_ids for f in features], dtype=torch.long)
         all_attention_mask = torch.tensor([f.attention_mask for f in features], dtype=torch.long)
         all_token_type_ids = torch.tensor([f.token_type_ids for f in features], dtype=torch.long)
