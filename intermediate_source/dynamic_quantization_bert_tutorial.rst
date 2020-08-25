@@ -371,7 +371,7 @@ BERT 모델(FP32)를 불러옵니다.
             logger.info("Creating features from dataset file at %s", args.data_dir)
             label_list = processor.get_labels()
             if task in ['mnli', 'mnli-mm'] and args.model_type in ['roberta']:
-                # 해결책(사전학습된 RoBERTa 모델에서는 라벨 인덱스 순서가 바뀌어 있다.)
+                # 해결책(사전학습된 RoBERTa 모델에서는 라벨 인덱스 순서가 바뀌어 있습니다.)
                 label_list[1], label_list[2] = label_list[2], label_list[1]
             examples = processor.get_dev_examples(args.data_dir) if evaluate else processor.get_train_examples(args.data_dir)
             features = convert_examples_to_features(examples,
