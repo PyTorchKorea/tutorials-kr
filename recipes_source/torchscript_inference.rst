@@ -3,7 +3,7 @@ TorchScript로 배포하기
 
 이 레시피에서는 다음과 같은 것들을 알아봅니다:
 
--  TorchScript 란
+-  TorchScript란
 -  학습된 모델을 TorchScript 형식으로 내보내기
 -  TorchScript 모델을 C++로 불러오고 추론하기
 
@@ -16,18 +16,18 @@ TorchScript로 배포하기
 -  C++ 컴파일러
 
 3가지 PyTorch 컴포넌트를 설치하는 방법은 `pytorch.org`_에서 확인할 수 있습니다.
-C++ 컴파일러는 당신의 플랫폼에 따라 딜리집니다. 
+C++ 컴파일러는 당신의 플랫폼에 따라 달라집니다. 
 
-TorchScript 란?
+TorchScript란?
 --------------------
 
-**TorchScript** 는 PyTorch 모델의 중간 표현으로(``nn.Module``의 하위 클래스) C++ 같은 고성능 환경에서 실행할 수 있습니다. 모델 연산의 런타임 최적화를 수행하는 **PyTorch JIT Compiler,** 에서 사용되는 Python의 고성능 하위 집합입니다. TorchScript는 PyTorch 모델에서 스케일 추론을 수행할 때 권장되는 모델 형식입니다. 자세한 내용은 `pytorch.org`_에 있는 `Introduction to TorchScript
+**TorchScript**는 C++ 같은 고성능 환경에서 실행할 수 있는 PyTorch 모델의 중간 표현(``nn.Module``의 하위 클래스)입니다. Python의 고성능 하위 집합이며 모델 연산의 런타임 최적화를 수행하는 **PyTorch JIT Compiler,** 에서 사용됩니다. TorchScript는 PyTorch 모델에서 스케일 추론을 수행할 때 권장되는 모델 형식입니다. 자세한 내용은 `pytorch.org`_에 있는 `Introduction to TorchScript
 tutorial`_, `Loading A TorchScript Model in C++ tutorial`_, `full TorchScript documentation`_ 에서 확인하세요.
 
 모델 내보내기
 ------------------------
 
-예로, 사전 학습된 시각 모델을 살펴봅시다. TorchVision의 모든 사전 학습 모델은 TorchScript와 호환됩니다. 
+사전 학습된 시각 모델을 살펴봅시다. TorchVision의 모든 사전 학습 모델은 TorchScript와 호환됩니다. 
 
 스크립트나 REPL에서 다음의 Python 3 코드를 실행하세요:
 
@@ -38,10 +38,10 @@ tutorial`_, `Loading A TorchScript Model in C++ tutorial`_, `full TorchScript do
    import torchvision.models as models
 
    r18 = models.resnet18(pretrained=True)       # 이제 사전 학습된 모델의 인스턴스가 있습니다. 
-   r18_scripted = torch.jit.script(r18)         # *** 여기가 TorchScript 로 내보내는 부분입니다. 
-   dummy_input = torch.rand(1, 3, 224, 224)     # 빠른 테스트를 실행해봅니다.
+   r18_scripted = torch.jit.script(r18)         # *** 여기가 TorchScript로 내보내는 부분입니다. 
+   dummy_input = torch.rand(1, 3, 224, 224)     # 빠르게 테스트 해봅니다.
 
-이 두 모델이 정말 같은지에 대해 정밀 테스트를 해보겠습니다. 
+두 모델이 정말 같은지에 대해 정밀 테스트를 해보겠습니다. 
 
 ::
 
@@ -72,7 +72,7 @@ tutorial`_, `Loading A TorchScript Model in C++ tutorial`_, `full TorchScript do
 C++로 TorchScript 모델 불러오기
 ---------------------------------
 
-다음과 같은 C++ 파일을 만들고 파일명을 ``ts-infer.cpp`` 라 힙니다.
+다음과 같은 C++ 파일을 만들고 파일명을 ``ts-infer.cpp`` 라고 짓습니다.
 
 .. code:: cpp
 
@@ -88,7 +88,7 @@ C++로 TorchScript 모델 불러오기
 
        std::cout << "Loading model...\n";
 
-       // ScriptModule을 역직렬화 합니다.
+       // ScriptModule을 역직렬화(deserialize) 합니다.
        torch::jit::script::Module module;
        try {
            module = torch::jit::load(argv[1]);
@@ -124,12 +124,12 @@ C++로 TorchScript 모델 불러오기
 이런 것들을 알아보았습니다:
 
 - 명령 줄에서 지정한 모델 불러오기
-- 더미 "이미지" 입력 tensor 생성하기
+- 더미 입력 "이미지" tensor 생성하기
 - 입력에 대한 추론 수행하기
 
 또한, 이 코드에는 TorchVision에 대한 종속성이 없다는 것에 유의하세요. 저장된 TorchScript 모델에는 학습 가중치와 연산 그래프가 있으며 다른 것은 필요하지 않습니다.
 
-C++ 추론 Engine 빌드하고 실행하기 
+C++ 추론 엔진 빌드하고 실행하기 
 ----------------------------------------------
 
 다음과 같은 ``CMakeLists.txt`` 파일을 생성합니다:
@@ -172,7 +172,7 @@ C++ 추론 Engine 빌드하고 실행하기
 -------------------
 
 -  `pytorch.org`_ 에서 설치 방법과 추가 문서 및 튜토리얼들을 확인할 수 있습니다. 
--  `Introduction to TorchScript tutorial`_ 에서 더 깊은 TorchScript 기초 설명을 확인할 수 있습니다.
+-  `Introduction to TorchScript tutorial`_ 에서 더 심화된 TorchScript 기초 설명을 확인할 수 있습니다.
 -  `Full TorchScript documentation`_ 에서 전체 TorchScript 언어 및 API를 참조할 수 있습니다.
 
 .. _pytorch.org: https://pytorch.org/
