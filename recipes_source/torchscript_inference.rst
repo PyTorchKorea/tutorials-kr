@@ -1,45 +1,35 @@
 TorchScript로 배포하기
 ==========================
 
-In this recipe, you will learn:
+이 레시피에서는 다음과 같은 것들을 알아봅니다:
 
--  What TorchScript is
--  How to export your trained model in TorchScript format
--  How to load your TorchScript model in C++ and do inference
+-  TorchScript 란
+-  학습된 모델을 TorchScript 형식으로 내보내기
+-  TorchScript 모델을 C++로 불러오고 추론하기
 
-Requirements
+요구 사항
 ------------
 
 -  PyTorch 1.5
 -  TorchVision 0.6.0
 -  libtorch 1.5
--  C++ compiler
+-  C++ 컴파일러
 
-The instructions for installing the three PyTorch components are
-available at `pytorch.org`_. The C++ compiler will depend on your
-platform.
+3가지 PyTorch 컴포넌트를 설치하는 방법은 `pytorch.org`_에서 확인할 수 있습니다.
+C++ 컴파일러는 당신의 플랫폼에 따라 딜리집니다. 
 
-What is TorchScript?
+TorchScript 란?
 --------------------
 
-**TorchScript** is an intermediate representation of a PyTorch model
-(subclass of ``nn.Module``) that can then be run in a high-performance
-environment like C++. It’s a high-performance subset of Python that is
-meant to be consumed by the **PyTorch JIT Compiler,** which performs
-run-time optimization on your model’s computation. TorchScript is the
-recommended model format for doing scaled inference with PyTorch models.
-For more information, see the PyTorch `Introduction to TorchScript
-tutorial`_, the `Loading A TorchScript Model in C++ tutorial`_, and the
-`full TorchScript documentation`_, all of which are available on
-`pytorch.org`_.
+**TorchScript** 는 PyTorch 모델의 중간 표현으로(``nn.Module``의 하위 클래스) C++ 같은 고성능 환경에서 실행할 수 있습니다. 모델 연산의 런타임 최적화를 수행하는 **PyTorch JIT Compiler,** 에서 사용되는 Python의 고성능 하위 집합입니다. TorchScript는 PyTorch 모델에서 스케일 추론을 수행할 때 권장되는 모델 형식입니다. 자세한 내용은 `pytorch.org`_에 있는 `Introduction to TorchScript
+tutorial`_, `Loading A TorchScript Model in C++ tutorial`_, `full TorchScript documentation`_ 에서 확인하세요.
 
-How to Export Your Model
+모델 내보내기
 ------------------------
 
-As an example, let’s take a pretrained vision model. All of the
-pretrained models in TorchVision are compatible with TorchScript.
+예로, 사전 학습된 시각 모델을 살펴봅시다. TorchVision의 모든 사전 학습 모델은 TorchScript와 호환됩니다. 
 
-Run the following Python 3 code, either in a script or from the REPL:
+스크립트나 REPL에서 다음의 Python 3 코드를 실행하세요:
 
 .. code:: python3
 
@@ -47,16 +37,16 @@ Run the following Python 3 code, either in a script or from the REPL:
    import torch.nn.functional as F
    import torchvision.models as models
 
-   r18 = models.resnet18(pretrained=True)       # We now have an instance of the pretrained model
-   r18_scripted = torch.jit.script(r18)         # *** This is the TorchScript export
-   dummy_input = torch.rand(1, 3, 224, 224)     # We should run a quick test
+   r18 = models.resnet18(pretrained=True)       # 이제 사전 학습된 모델의 인스턴스가 있습니다. 
+   r18_scripted = torch.jit.script(r18)         # *** 여기가 TorchScript 로 내보내는 부분입니다. 
+   dummy_input = torch.rand(1, 3, 224, 224)     # 빠른 테스트를 실행해봅니다.
 
-Let’s do a sanity check on the equivalence of the two models:
+이 두 모델이 정말 같은지에 대해 정밀 테스트를 해보겠습니다. 
 
 ::
 
-   unscripted_output = r18(dummy_input)         # Get the unscripted model's prediction...
-   scripted_output = r18_scripted(dummy_input)  # ...and do the same for the scripted version
+   unscripted_output = r18(dummy_input)         # 스크립트화 되지 않은 모델의 예측을 얻고...
+   scripted_output = r18_scripted(dummy_input)  # ...스크립트화 된 모델도 똑같이 반복합니다.
 
    unscripted_top5 = F.softmax(unscripted_output, dim=1).topk(5).indices
    scripted_top5 = F.softmax(scripted_output, dim=1).topk(5).indices
@@ -64,7 +54,7 @@ Let’s do a sanity check on the equivalence of the two models:
    print('Python model top 5 results:\n  {}'.format(unscripted_top5))
    print('TorchScript model top 5 results:\n  {}'.format(scripted_top5))
 
-You should see that both versions of the model give the same results:
+두 모델에 똑같은 결과가 나오는 것을 확인할 수 있습니다:
 
 ::
 
@@ -73,16 +63,16 @@ You should see that both versions of the model give the same results:
    TorchScript model top 5 results:
      tensor([[463, 600, 731, 899, 898]])
 
-With that check confirmed, go ahead and save the model:
+확인이 끝났으면 모델을 저장합니다:
 
 ::
 
    r18_scripted.save('r18_scripted.pt')
 
-Loading TorchScript Models in C++
+C++로 TorchScript 모델 불러오기
 ---------------------------------
 
-Create the following C++ file and name it ``ts-infer.cpp``:
+다음과 같은 C++ 파일을 만들고 파일명을 ``ts-infer.cpp`` 라 힙니다.
 
 .. code:: cpp
 
@@ -98,7 +88,7 @@ Create the following C++ file and name it ``ts-infer.cpp``:
 
        std::cout << "Loading model...\n";
 
-       // deserialize ScriptModule
+       // ScriptModule을 역직렬화 합니다.
        torch::jit::script::Module module;
        try {
            module = torch::jit::load(argv[1]);
@@ -110,14 +100,14 @@ Create the following C++ file and name it ``ts-infer.cpp``:
 
        std::cout << "Model loaded successfully\n";
 
-       torch::NoGradGuard no_grad; // ensures that autograd is off
-       module.eval(); // turn off dropout and other training-time layers/functions
+       torch::NoGradGuard no_grad; // autograd가 꺼져있는지 확인합니다.
+       module.eval(); // dropout과 학습 단의 레이어 및 함수들을 끕니다. 
 
-       // create an input "image"
+       // 입력 "이미지"를 생성합니다.
        std::vector<torch::jit::IValue> inputs;
        inputs.push_back(torch::rand({1, 3, 224, 224}));
 
-       // execute model and package output as tensor
+       // 모델을 실행하고 출력 값을 tensor로 뽑아냅니다.
        at::Tensor output = module.forward(inputs).toTensor();
 
        namespace F = torch::nn::functional;
@@ -131,20 +121,18 @@ Create the following C++ file and name it ``ts-infer.cpp``:
        return 0;
    }
 
-This program:
+이런 것들을 알아보았습니다:
 
--  Loads the model you specify on the command line
-- Creates a dummy “image” input tensor
-- Performs inference on the input
+- 명령 줄에서 지정한 모델 불러오기
+- 더미 "이미지" 입력 tensor 생성하기
+- 입력에 대한 추론 수행하기
 
-Also, notice that there is no dependency on TorchVision in this code.
-The saved version of your TorchScript model has your learning weights
-*and* your computation graph - nothing else is needed.
+또한, 이 코드에는 TorchVision에 대한 종속성이 없다는 것에 유의하세요. 저장된 TorchScript 모델에는 학습 가중치와 연산 그래프가 있으며 다른 것은 필요하지 않습니다.
 
-Building and Running Your C++ Inference Engine
+C++ 추론 Engine 빌드하고 실행하기 
 ----------------------------------------------
 
-Create the following ``CMakeLists.txt`` file:
+다음과 같은 ``CMakeLists.txt`` 파일을 생성합니다:
 
 ::
 
@@ -157,14 +145,14 @@ Create the following ``CMakeLists.txt`` file:
    target_link_libraries(ts-infer "${TORCH_LIBRARIES}")
    set_property(TARGET ts-infer PROPERTY CXX_STANDARD 11)
 
-Make the program:
+프로그램을 실행합니다:
 
 ::
 
    cmake -DCMAKE_PREFIX_PATH=<path to your libtorch installation>
    make
 
-Now, we can run inference in C++, and verify that we get a result:
+이제 C++에서 추론을 수행하고 결과를 확인할 수 있습니다.
 
 ::
 
@@ -180,15 +168,12 @@ Now, we can run inference in C++, and verify that we get a result:
 
    DONE
 
-Important Resources
+중요 참고자료
 -------------------
 
--  `pytorch.org`_ for installation instructions, and more documentation
-   and tutorials.
--  `Introduction to TorchScript tutorial`_ for a deeper initial
-   exposition of TorchScript
--  `Full TorchScript documentation`_ for complete TorchScript language
-   and API reference
+-  `pytorch.org`_ 에서 설치 방법과 추가 문서 및 튜토리얼들을 확인할 수 있습니다. 
+-  `Introduction to TorchScript tutorial`_ 에서 더 깊은 TorchScript 기초 설명을 확인할 수 있습니다.
+-  `Full TorchScript documentation`_ 에서 전체 TorchScript 언어 및 API를 참조할 수 있습니다.
 
 .. _pytorch.org: https://pytorch.org/
 .. _Introduction to TorchScript tutorial: https://pytorch.org/tutorials/beginner/Intro_to_TorchScript_tutorial.html
