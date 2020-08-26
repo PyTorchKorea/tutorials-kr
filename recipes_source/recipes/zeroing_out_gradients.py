@@ -1,37 +1,30 @@
 """
-Zeroing out gradients in PyTorch
+PyTorch에서 변화도를 0으로 만들기
 ================================
-It is beneficial to zero out gradients when building a neural network.
-This is because by default, gradients are accumulated in buffers (i.e,
-not overwritten) whenever ``.backward()`` is called.
+신경망을 구축할 때는 변화도를 0으로 만들어 주는 것이 좋습니다. 왜냐하면, 기본적으로 
+``.backward()`` 를 호출할 때마다 변화도가 버퍼에 쌓이기 때문입니다. (덮어쓰지 않는다는 의미입니다.)
 
-Introduction
+개요
 ------------
-When training your neural network, models are able to increase their
-accuracy through gradient decent. In short, gradient descent is the
-process of minimizing our loss (or error) by tweaking the weights and
-biases in our model.
+신경망을 학습시킬 때, 모델은 변화도 하강법(gradient decent)를 거쳐 정확도를 높일 수 
+있습니다. 변화도 하강법은 간단히 말해 모델의 가중치와 편향을 약간씩 수정하면서 손실(또는 오류)를 
+최소화하는 과정입니다. 
 
-``torch.Tensor`` is the central class of PyTorch. When you create a
-tensor, if you set its attribute ``.requires_grad`` as ``True``, the
-package tracks all operations on it. This happens on subsequent backward
-passes. The gradient for this tensor will be accumulated into ``.grad``
-attribute. The accumulation (or sum) of all the gradients is calculated
-when .backward() is called on the loss tensor.
+``torch.Tensor`` 는 PyTorch 의 핵심 클래스 입니다. 텐서를 생성할 때 ``.requires_grad`` 
+속성을 ``True`` 로 설정하면, 패키지는 텐서에 가해진 모든 연산을 추적합니다. 뒤따르는 
+backward pass들에서도 마찬가지입니다. 이 텐서의 변화도는 ``.grad`` 속성에 누적됩니다.
+모든 변화도의 축적 또는 합은 손실 텐서에서 ``.backward()``를 호출할 때 계산됩니다.
 
-There are cases where it may be necessary to zero-out the gradients of a
-tensor. For example: when you start your training loop, you should zero
-out the gradients so that you can perform this tracking correctly.
-In this recipe, we will learn how to zero out gradients using the
-PyTorch library. We will demonstrate how to do this by training a neural
-network on the ``CIFAR10`` dataset built into PyTorch.
+텐서의 변화도를 0으로 만들어 주어야 하는 경우도 있습니다. 예를 들어 학습 과정 반복을 시작할 때, 
+누적되는 변화도를 정확하게 추적하기 위해서는 변화도를 0으로 만들어 주어야 합니다. 
+이 레시피에서는 PyTorch 라이브러리를 사용하여 변화도를 0으로 만드는 방법을 알아봅니다.
+PyTorch에 내장된 ``CIFAR10`` 데이터셋에 대하여 신경망을 훈련시키는 과정을 통해 알아봅시다.
 
-Setup
+설정
 -----
-Since we will be training data in this recipe, if you are in a runable
-notebook, it is best to switch the runtime to GPU or TPU.
-Before we begin, we need to install ``torch`` and ``torchvision`` if
-they aren’t already available.
+이 레시피에는 데이터를 학습시키는 내용이 포함되어 있기 때문에, 실행 가능한 notebook이 있다면
+런타임을 GPU 또는 TPU로 전환하는 것이 좋습니다. 시작하기에 앞서, ``torch`` 와 
+``torchvision`` 패키지가 없다면 설치합니다.
 
 ::
 
@@ -42,24 +35,22 @@ they aren’t already available.
 
 
 ######################################################################
-# Steps
+# 단계(Steps)
 # -----
 # 
-# Steps 1 through 4 set up our data and neural network for training. The
-# process of zeroing out the gradients happens in step 5. If you already
-# have your data and neural network built, skip to 5.
+# 1단계부터 4단계까지는 학습을 위한 데이터와 신경망을 준비합니다. 5단계에서 변화도를 0으로
+# 만들어 줍니다. 이미 준비한 데이터와 신경망이 있다면, 5단계로 건너뛰어도 좋습니다. 
 # 
-# 1. Import all necessary libraries for loading our data
-# 2. Load and normalize the dataset
-# 3. Build the neural network
-# 4. Define the loss function
-# 5. Zero the gradients while training the network
+# 1. 데이터를 불러오기 위해 필요한 모든 라이브러리 import 하기
+# 2. 데이터셋 불러오고 정규화하기
+# 3. 신경망 구축하기
+# 4. 손실 함수 정의하기
+# 5. 신경망을 학습시킬 때 변화도 0으로 만들기
 # 
-# 1. Import necessary libraries for loading our data
+# 1. 데이터를 불러오기 위해 필요한 모든 라이브러리 import 하기
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # 
-# For this recipe, we will just be using ``torch`` and ``torchvision`` to
-# access the dataset.
+# 이 레시피에서는 데이터셋에 접근하기 위해 ``torch`` 와 ``torchvision`` 을 사용합니다.
 # 
 
 import torch
@@ -74,11 +65,11 @@ import torchvision.transforms as transforms
 
 
 ######################################################################
-# 2. Load and normalize the dataset
+# 2. 데이터셋 불러오고 정규화하기
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # 
-# PyTorch features various built-in datasets (see the Loading Data recipe
-# for more information).
+# PyTorch 는 다양한 내장 데이터셋을 제공합니다. (Loading Data 레시피를 참고해 
+# 더 많은 정보를 얻을 수 있습니다.)
 # 
 
 transform = transforms.Compose(
@@ -100,11 +91,11 @@ classes = ('plane', 'car', 'bird', 'cat',
 
 
 ######################################################################
-# 3. Build the neural network
+# 3. 신경망 구축하기
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # 
-# We will use a convolutional neural network. To learn more see the
-# Defining a Neural Network recipe.
+# 컨볼루션 신경망을 정의하겠습니다. 자세한 내용은 Defining a Neural Network 레시피를
+# 참조해주세요.
 # 
 
 class Net(nn.Module):
@@ -128,10 +119,10 @@ class Net(nn.Module):
 
 
 ######################################################################
-# 4. Define a Loss function and optimizer
+# 4. 손실 함수과 옵티마이저 정의하기
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # 
-# Let’s use a Classification Cross-Entropy loss and SGD with momentum.
+# 분류를 위한 Cross-Entropy 손실 함수와 모멘텀을 설정한 SGD 옵티마이저를 사용합니다.
 # 
 
 net = Net()
@@ -141,35 +132,35 @@ optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
 
 ######################################################################
 # 5. Zero the gradients while training the network
+# 5. 신경망을 학습시키는 동안 변화도를 0으로 만들기
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # 
-# This is when things start to get interesting. We simply have to loop
-# over our data iterator, and feed the inputs to the network and optimize.
+# 여기서부터가 재밌어집니다. 우리는 단순하게 데이터 이터레이터를 돌리면서, 신경망에 입력을 주고
+# 최적화를 하면 됩니다. 
 # 
-# Notice that for each entity of data, we zero out the gradients. This is
-# to ensure that we aren’t tracking any unnecessary information when we
-# train our neural network.
+# 데이터의 각 엔터티마다 변화도를 0으로 만들어주는 것에 유의하십시오. 
+# 신경망을 학습시킬 때 불필요한 정보를 추적하지 않도록 하기 위함입니다. 
 # 
 
-for epoch in range(2):  # loop over the dataset multiple times
+for epoch in range(2):  # 데이터셋을 여러번 반복하기
 
     running_loss = 0.0
     for i, data in enumerate(trainloader, 0):
-        # get the inputs; data is a list of [inputs, labels]
+        # 입력 받기; 데이터는 [inputs, labels] 형태의 리스트다.
         inputs, labels = data
 
-        # zero the parameter gradients
+        # 파라미터 변화도를 0으로 만들기
         optimizer.zero_grad()
 
-        # forward + backward + optimize
+        # forward + backward + 최적화
         outputs = net(inputs)
         loss = criterion(outputs, labels)
         loss.backward()
         optimizer.step()
 
-        # print statistics
+        # statistics 출력
         running_loss += loss.item()
-        if i % 2000 == 1999:    # print every 2000 mini-batches
+        if i % 2000 == 1999:    # 미니배치 2000개 마다 출력
             print('[%d, %5d] loss: %.3f' %
                   (epoch + 1, i + 1, running_loss / 2000))
             running_loss = 0.0
@@ -178,16 +169,16 @@ print('Finished Training')
 
 
 ######################################################################
-# You can also use ``model.zero_grad()``. This is the same as using
-# ``optimizer.zero_grad()`` as long as all your model parameters are in
-# that optimizer. Use your best judgement to decide which one to use.
+# ``model.zero_grad()`` 를 사용하여 변화도를 0으로 만들 수도 있습니다. 
+# 옵티마이저에 모델 파라미터가 모두 포함되는 한, ``optimizer.zero_grad()`` 를
+# 사용하는 것과 동일합니다. 어떤 것을 사용할지 최선의 선택을 하기 바랍니다. 
 # 
-# Congratulations! You have successfully zeroed out gradients PyTorch.
+# 축하합니다! 이제 PyTorch에서 변화도를 0으로 만들 수 있습니다. 
 # 
-# Learn More
+# 더 알아보기
 # ----------
 # 
-# Take a look at these other recipes to continue your learning:
+# 다른 레시피를 둘러보고 계속 배워보세요:
 # 
-# - `Loading data in PyTorch <https://pytorch.org/tutorials/recipes/recipes/loading_data_recipe.html>`__
-# - `Saving and loading models across devices in PyTorch <https://pytorch.org/tutorials/recipes/recipes/save_load_across_devices.html>`__
+# - :doc:`/recipes/recipes/loading_data_recipe`
+# - :doc:`/recipes/recipes/save_load_across_devices`
