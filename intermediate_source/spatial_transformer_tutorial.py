@@ -1,31 +1,33 @@
 # -*- coding: utf-8 -*-
 """
-Spatial Transformer Networks Tutorial
+공간 변형 네트워크(Spatial Transformer Networks) 튜토리얼
 =====================================
-**Author**: `Ghassen HAMROUNI <https://github.com/GHamrouni>`_
+**저자**: `Ghassen HAMROUNI <https://github.com/GHamrouni>`_  
+
+**번역**: `황성수 <https://github.com/adonisues>`_ , `정신유 <https://github.com/SSinyu>`_
+
 
 .. figure:: /_static/img/stn/FSeq.png
 
-In this tutorial, you will learn how to augment your network using
-a visual attention mechanism called spatial transformer
-networks. You can read more about the spatial transformer
-networks in the `DeepMind paper <https://arxiv.org/abs/1506.02025>`__
+이 튜토리얼에서는 공간 변형 네트워크(spatial transformer networks, 이하 STN)이라 
+불리는 비주얼 어텐션 메커니즘을 이용해 신경망을 증강(augment)시키는 방법에 대해 
+학습합니다. 이 방법에 대한 자세한 내용은 `DeepMind paper <https://arxiv.org/abs/1506.02025>`__ 에서
+확인할 수 있습니다.
 
-Spatial transformer networks are a generalization of differentiable
-attention to any spatial transformation. Spatial transformer networks
-(STN for short) allow a neural network to learn how to perform spatial
-transformations on the input image in order to enhance the geometric
-invariance of the model.
-For example, it can crop a region of interest, scale and correct
-the orientation of an image. It can be a useful mechanism because CNNs
-are not invariant to rotation and scale and more general affine
-transformations.
+STN은 어떠한 공간적 변형(spatial transformation)에도 적용할 수 있는 미분 가능한 
+어텐션의 일반화입니다. 따라서 STN은 신경망의 기하학적 불변성(geometric invariance)을
+강화하기 위해 입력 이미지를 대상으로 어떠한 공간적 변형을 수행해야 하는지 학습하도록
+합니다.
+예를 들어 이미지의 관심 영역을 잘라내거나, 크기를 조정하거나, 방향(orientation)을 
+수정할 수 있습니다. CNN은 이러한 회전, 크기 조정 등의 일반적인 아핀(affine) 변환된 
+입력에 대해 결과의 변동이 크기 때문에 (민감하기 때문에), STN은 이를 극복하는데 매우
+유용한 메커니즘이 될 수 있습니다.
 
-One of the best things about STN is the ability to simply plug it into
-any existing CNN with very little modification.
+STN이 가진 장점 중 하나는 아주 작은 수정만으로 기존에 사용하던 CNN에 간단하게 연결 시킬 
+수 있다는 것입니다.
 """
-# License: BSD
-# Author: Ghassen Hamrouni
+# 라이센스: BSD
+# 저자: Ghassen Hamrouni
 
 from __future__ import print_function
 import torch
@@ -37,26 +39,25 @@ from torchvision import datasets, transforms
 import matplotlib.pyplot as plt
 import numpy as np
 
-plt.ion()   # interactive mode
+plt.ion()   # 대화형 모드
 
 ######################################################################
-# Loading the data
+# 데이터 불러오기
 # ----------------
 #
-# In this post we experiment with the classic MNIST dataset. Using a
-# standard convolutional network augmented with a spatial transformer
-# network.
+# 이 튜토리얼에서는 MNIST 데이터셋을 이용해 실험합니다. 실험에는 STN으로 
+# 증강된 일반적인 CNN을 사용합니다.
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-# Training dataset
+# 학습용 데이터셋
 train_loader = torch.utils.data.DataLoader(
     datasets.MNIST(root='.', train=True, download=True,
                    transform=transforms.Compose([
                        transforms.ToTensor(),
                        transforms.Normalize((0.1307,), (0.3081,))
                    ])), batch_size=64, shuffle=True, num_workers=4)
-# Test dataset
+# 테스트용 데이터셋
 test_loader = torch.utils.data.DataLoader(
     datasets.MNIST(root='.', train=False, transform=transforms.Compose([
         transforms.ToTensor(),
@@ -64,25 +65,22 @@ test_loader = torch.utils.data.DataLoader(
     ])), batch_size=64, shuffle=True, num_workers=4)
 
 ######################################################################
-# Depicting spatial transformer networks
+# Spatial Transformer Networks(STN) 구성하기
 # --------------------------------------
 #
-# Spatial transformer networks boils down to three main components :
+# STN은 다음의 세 가지 주요 구성 요소로 요약됩니다.
 #
-# -  The localization network is a regular CNN which regresses the
-#    transformation parameters. The transformation is never learned
-#    explicitly from this dataset, instead the network learns automatically
-#    the spatial transformations that enhances the global accuracy.
-# -  The grid generator generates a grid of coordinates in the input
-#    image corresponding to each pixel from the output image.
-# -  The sampler uses the parameters of the transformation and applies
-#    it to the input image.
+# -  위치 결정 네트워크(localization network)는 공간 변환 파라미터를 예측(regress)
+#    하는 일반적인 CNN 입니다. 공간 변환은 데이터 셋으로부터 명시적으로 학습되지 않고,
+#    신경망이 전체 정확도를 향상 시키도록 공간 변환을 자동으로 학습합니다.
+# -  그리드 생성기(grid generator)는 출력 이미지로부터 각 픽셀에 대응하는 입력
+#    이미지 내 좌표 그리드를 생성합니다.
+# -  샘플러(sampler)는 공간 변환 파라미터를 입력 이미지에 적용합니다.
 #
 # .. figure:: /_static/img/stn/stn-arch.png
 #
 # .. Note::
-#    We need the latest version of PyTorch that contains
-#    affine_grid and grid_sample modules.
+#    affine_grid 및 grid_sample 모듈이 포함된 최신 버전의 PyTorch가 필요합니다.
 #
 
 
@@ -95,7 +93,7 @@ class Net(nn.Module):
         self.fc1 = nn.Linear(320, 50)
         self.fc2 = nn.Linear(50, 10)
 
-        # Spatial transformer localization-network
+        # 공간 변환을 위한 위치 결정 네트워크 (localization-network)
         self.localization = nn.Sequential(
             nn.Conv2d(1, 8, kernel_size=7),
             nn.MaxPool2d(2, stride=2),
@@ -105,18 +103,18 @@ class Net(nn.Module):
             nn.ReLU(True)
         )
 
-        # Regressor for the 3 * 2 affine matrix
+        # [3 * 2] 크기의 아핀(affine) 행렬에 대해 예측
         self.fc_loc = nn.Sequential(
             nn.Linear(10 * 3 * 3, 32),
             nn.ReLU(True),
             nn.Linear(32, 3 * 2)
         )
 
-        # Initialize the weights/bias with identity transformation
+        # 항등 변환(identity transformation)으로 가중치/바이어스 초기화
         self.fc_loc[2].weight.data.zero_()
         self.fc_loc[2].bias.data.copy_(torch.tensor([1, 0, 0, 0, 1, 0], dtype=torch.float))
 
-    # Spatial transformer network forward function
+    # STN의 forward 함수
     def stn(self, x):
         xs = self.localization(x)
         xs = xs.view(-1, 10 * 3 * 3)
@@ -129,10 +127,10 @@ class Net(nn.Module):
         return x
 
     def forward(self, x):
-        # transform the input
+        # 입력을 변환
         x = self.stn(x)
 
-        # Perform the usual forward pass
+        # 일반적인 forward pass를 수행
         x = F.relu(F.max_pool2d(self.conv1(x), 2))
         x = F.relu(F.max_pool2d(self.conv2_drop(self.conv2(x)), 2))
         x = x.view(-1, 320)
@@ -145,12 +143,12 @@ class Net(nn.Module):
 model = Net().to(device)
 
 ######################################################################
-# Training the model
+# 모델 학습하기
 # ------------------
 #
-# Now, let's use the SGD algorithm to train the model. The network is
-# learning the classification task in a supervised way. In the same time
-# the model is learning STN automatically in an end-to-end fashion.
+# 이제 SGD 알고리즘을 이용해 모델을 학습시켜 봅시다. 앞서 구성한 신경망은
+# 감독 학습 방식(supervised way)으로 분류 문제를 학습합니다. 또한 이 모델은
+# end-to-end 방식으로 STN을 자동으로 학습합니다. 
 
 
 optimizer = optim.SGD(model.parameters(), lr=0.01)
@@ -171,7 +169,7 @@ def train(epoch):
                 epoch, batch_idx * len(data), len(train_loader.dataset),
                 100. * batch_idx / len(train_loader), loss.item()))
 #
-# A simple test procedure to measure STN the performances on MNIST.
+# MNIST 데이터셋에서 STN의 성능을 측정하기 위한 간단한 테스트 절차
 #
 
 
@@ -184,9 +182,9 @@ def test():
             data, target = data.to(device), target.to(device)
             output = model(data)
 
-            # sum up batch loss
+            # 배치 손실 합하기
             test_loss += F.nll_loss(output, target, size_average=False).item()
-            # get the index of the max log-probability
+            # 로그-확률의 최대값에 해당하는 인덱스 가져오기
             pred = output.max(1, keepdim=True)[1]
             correct += pred.eq(target.view_as(pred)).sum().item()
 
@@ -196,14 +194,12 @@ def test():
                       100. * correct / len(test_loader.dataset)))
 
 ######################################################################
-# Visualizing the STN results
+# STN 결과 시각화하기
 # ---------------------------
 #
-# Now, we will inspect the results of our learned visual attention
-# mechanism.
+# 이제 학습한 비주얼 어텐션 메커니즘의 결과를 살펴보겠습니다.
 #
-# We define a small helper function in order to visualize the
-# transformations while training.
+# 학습하는 동안 변환된 결과를 시각화하기 위해 작은 도움(helper) 함수를 정의합니다.
 
 
 def convert_image_np(inp):
@@ -215,14 +211,13 @@ def convert_image_np(inp):
     inp = np.clip(inp, 0, 1)
     return inp
 
-# We want to visualize the output of the spatial transformers layer
-# after the training, we visualize a batch of input images and
-# the corresponding transformed batch using STN.
+# 학습 후 공간 변환 계층의 출력을 시각화하고, 입력 이미지 배치 데이터 및 
+# STN을 사용해 변환된 배치 데이터를 시각화 합니다.
 
 
 def visualize_stn():
     with torch.no_grad():
-        # Get a batch of training data
+        # 학습 데이터의 배치 가져오기
         data = next(iter(test_loader))[0].to(device)
 
         input_tensor = data.cpu()
@@ -234,7 +229,7 @@ def visualize_stn():
         out_grid = convert_image_np(
             torchvision.utils.make_grid(transformed_input_tensor))
 
-        # Plot the results side-by-side
+        # 결과를 나란히 표시하기
         f, axarr = plt.subplots(1, 2)
         axarr[0].imshow(in_grid)
         axarr[0].set_title('Dataset Images')
@@ -246,7 +241,7 @@ for epoch in range(1, 20 + 1):
     train(epoch)
     test()
 
-# Visualize the STN transformation on some input batch
+# 일부 입력 배치 데이터에서 STN 변환 결과를 시각화
 visualize_stn()
 
 plt.ioff()
