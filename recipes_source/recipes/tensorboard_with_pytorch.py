@@ -28,8 +28,8 @@ Anaconda를 통해 PyTorch 1.4+를 설치하는 방법은 다음과 같습니다
 # PyTorch로 TensorBoard 사용하기
 # -----
 # 
-# 이제 PyTorch로 TensorBoard를 사용해봅시다! 기록을 시작하기 전에,
-# ``SummaryWriter`` 인스턴스를 생성해야 합니다.
+# 이제 PyTorch로 TensorBoard를 사용해봅시다! 
+# 먼저 ``SummaryWriter`` 인스턴스를 생성해야 합니다.
 #   
 
 import torch
@@ -119,8 +119,8 @@ writer.close()
 # TensorBoard 대시보드 공유하기
 # -----
 # 
-# `TensorBoard.dev <https://tensorboard.dev/>`_를 사용하면 ML 실험 결과를 
-# 누구하고나 업로드하고 공유할 수 있습니다. TensorBoard.dev를 사용하여 
+# `TensorBoard.dev <https://tensorboard.dev/>`_를 사용해 ML 실험 결과를 
+# 업로드하고 모두와 공유할 수 있습니다. TensorBoard.dev를 사용하여 
 # TensorBoard 대시보드를 호스팅, 추적 및 공유하세요.
 # 
 # 업로더(uploader)를 사용하려면 TensorBoard 최신 버전을 설치하세요.
