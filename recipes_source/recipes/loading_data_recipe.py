@@ -84,7 +84,7 @@ import torchaudio
 #      transform=None,
 #      target_transform=None)
 #
-# 각각의 데이터 항목 (data point)은 튜플 형태 (waveform: 파형, sample_rate: 샘플 속도, labels: 라벨)를 갖습니다.
+# 각각의 데이터 항목 (item)은 튜플 형태 (waveform: 파형, sample_rate: 샘플 속도, labels: 라벨)를 갖습니다.
 #
 # YesNo 데이터세을 불러올 때 ``root`` 매게변수는 꼭 지정해주셔야 합니다. ``root`` 는
 # 학습(training) 및 테스트(testing) 데이터셋이 존재하는 위치를 가르켜야 합니다.
