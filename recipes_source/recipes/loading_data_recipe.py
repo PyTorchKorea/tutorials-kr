@@ -5,7 +5,7 @@ PyTorch는 인공신경망을 만드는데 필요한 다양한 기본 요소를 
 안정적인 API로 쉽게 이용할 수 있습니다. PyTorch에는 공용 데이터셋을 쉽게 사용할
 수 있도록 도와주는 패키지를 포함하고 있습니다.
 
-소개
+개요
 ------------
 PyTorch 데이터 불러오기 기능의 핵심은
 `torch.utils.data.DataLoader <https://pytorch.org/docs/stable/data.html#torch.utils.data.DataLoader>`__
@@ -56,7 +56,7 @@ PyTorch ``Dataset`` 에서 PyTorch ``DataLoader`` 로 데이터를 효과적이�
 # 1. 데이터를 불러오는데 필요한 라이브러리 import하기
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-# 이번 레시피는 ``torch`` 와 ``torchaudio`` 을 사용합니다. 다른 내장 데이터셋이
+# 이번 레시피는 ``torch`` 와 ``torchaudio`` 를 사용합니다. 다른 내장 데이터셋이
 # 필요하다면 ``torchvision`` 혹은 ``torchtext`` 를 설치해서 사용해도 됩니다.
 #
 
@@ -93,7 +93,7 @@ import torchaudio
 #
 # * ``download``: 참인 경우, 데이터셋 파일을 인터넷에서 다운받고 root 폴더에 저장합니다. 파일이 이미 존재하면 다시 다운받지 않습니다.
 # * ``transform``: 데이터를 변환하여 학습에 사용할 수 있도록 이어붙이고 비정규화된 형태로 불러오실 수 있습니다. 라이브러리마다 다양한 transformation을 지원하고 있으며, 앞으로도 추가될 예정입니다.
-# * ``target_transform``: 타겟 데이터를 변환하기 위한 함수 혹은 transform
+# * ``target_transform``: 타겟 데이터를 변환하기 위한 함수 혹은 transform입니다.
 #
 # 이제 YesNo 데이터를 확인해봅시다:
 
@@ -101,7 +101,7 @@ import torchaudio
 # 이때 labels는 0(no)과 1(yes)을 담은 리스트 형태로 되어 있습니다.
 yesno_data_trainset = torchaudio.datasets.YESNO('./', download=True)
 
-# 실제 데이터에 접근해서 yesno_data 형태를 확인합니다. 세번째 항목을 예시로 살펴봅니다.
+# 실제 데이터에 접근해서 yesno_data의 형태를 확인합니다. 세 번째 항목을 예시로 살펴봅니다.
 n = 3
 waveform, sample_rate, labels = yesno_data[n]
 print("Waveform: {}\nSample rate: {}\nLabels: {}".format(waveform, sample_rate, labels))
@@ -109,8 +109,8 @@ print("Waveform: {}\nSample rate: {}\nLabels: {}".format(waveform, sample_rate, 
 
 ######################################################################
 # 실제 상황에서는 데이터를 "학습(training)" 데이터셋과 "테스트(testing)" 데이터셋으로 나누는 것이
-# best practice로 권장됩니다. 모델의 성능을 제대로 평가하려면 학습에 쓰이지 않은 out-of-sample
-# 데이터를 이용해야하기 때문입니다.
+# 권장됩니다. 모델의 성능을 제대로 평가하려면 학습에 쓰이지 않은 out-of-sample
+# 데이터를 이용해야 하기 때문입니다.
 #
 # 3. 데이터 불러오기
 # ~~~~~~~~~~~~~~~~~~~~~~~
