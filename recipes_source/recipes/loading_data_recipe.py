@@ -97,7 +97,7 @@ import torchaudio
 #
 # 이제 YesNo 데이터를 확인해봅시다:
 
-# YesNo 안에 각각의 데이터 항목은 튜플 형태 (waveform, sample_rate, labels)를 가지며,
+# YesNo 안에 각각의 데이터 항목은 튜플 형태 (파형, 샘플 속도, 라벨)를 가지며,
 # 이때 labels는 0(no)과 1(yes)을 담은 리스트 형태로 되어 있습니다.
 yesno_data_trainset = torchaudio.datasets.YESNO('./', download=True)
 
