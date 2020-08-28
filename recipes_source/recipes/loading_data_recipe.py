@@ -9,7 +9,7 @@ PyTorch는 인공신경망을 만드는데 필요한 다양한 기본 요소를 
 ------------
 PyTorch 데이터 불러오기 기능의 핵심은
 `torch.utils.data.DataLoader <https://pytorch.org/docs/stable/data.html#torch.utils.data.DataLoader>`__
-클래스가 있습니다. 데어터를 파이썬 iterable로써 접근할 수 있게 해주는 클래스입니다.
+클래스입니다. 데어터를 파이썬 iterable로써 접근할 수 있게 해주는 클래스입니다.
 또한, `torch.utils.data.Dataset <https://pytorch.org/docs/stable/data.html#torch.utils.data.Dataset>`__
 클래스를 통해 PyTorch에 내장된 다양한 고품질 데이터셋을 이용하실 수 있습니다.
 
