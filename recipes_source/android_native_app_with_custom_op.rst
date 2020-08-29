@@ -654,7 +654,7 @@ Activity의 ``OnCreate '' 메서드는 Activity 생성 직후에 호출됩니다
 향후 변경 될 수 있습니다. 최신 변경 사항을 추적할 수 있습니다.
 `PyTorch GitHub의 소스 <https://github.com/pytorch/pytorch/blob/master/android/pytorch_android/src/main/cpp/pytorch_jni_jit.cpp>`_.
 
-``warp_perspective '' 메소드 구현 및 등록은 다음과 완전히 동일합니다.
+``warp_perspective `` 메소드 구현 및 등록은 다음과 완전히 동일합니다.
 `데스크톱 빌드 자습서 <https://pytorch.org/tutorials/advanced/torch_script_custom_ops.html>`_에 있습니다.
 
 앱 빌드
