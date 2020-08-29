@@ -394,7 +394,7 @@ Pytorch_android aar에는``headers `` 폴더의 LibTorch 헤더와``jni `` 폴�
 
 여기서는 소스 파일 ``pytorch_nativeapp.cpp`` 를 하나만 등록합니다.
  
-``NativeApp / app / build.gradle`` 의 이전 단계에서 ``extractAARForNativeBuild '' 작업은 헤더와 네이티브 라이브러리를 추출하여 디렉터리를 빌드합니다. ``PYTORCH_INCLUDE_DIRS '' 및``PYTORCH_LINK_DIRS`` 를 설정합니다.
+``NativeApp / app / build.gradle`` 의 이전 단계에서 ``extractAARForNativeBuild `` 작업은 헤더와 네이티브 라이브러리를 추출하여 디렉터리를 빌드합니다. ``PYTORCH_INCLUDE_DIRS `` 및 ``PYTORCH_LINK_DIRS`` 를 설정합니다.
 
 그 후 ``libpytorch_jni.so `` 및 ``libfbjni.so `` 라이브러리를 찾아서 타겟 링크에 추가합니다.
 
