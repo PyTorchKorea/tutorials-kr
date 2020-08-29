@@ -207,7 +207,7 @@ Android Gradle 빌드 구성에 대한 자세한 내용은`여기 <https://devel
 
 ``NativeApp / build.gradle`` 에서 Android gradle 플러그인 버전 '3.5.0'을 지정합니다. 이 버전은 최신 버전이 아님에도 불구하고  PyTorch android gradle 빌드가이 버전을 사용하므로 이를 사용합니다.
 
-``NativeApp / settings.gradle``은 out 프로젝트에 Android 애플리케이션이 될``app ''모듈이 하나만 포함되어 있음을 보여줍니다.
+``NativeApp / settings.gradle`` 은 out 프로젝트에 Android 애플리케이션이 될``app ''모듈이 하나만 포함되어 있음을 보여줍니다.
 
 .. code-block:: shell
 
