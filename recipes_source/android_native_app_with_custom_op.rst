@@ -647,7 +647,7 @@ Activity의 ``OnCreate `` 메서드는 Activity 생성 직후에 호출됩니다
 이 함수는 라이브러리를로드 한 후 호출됩니다. ``NativePeer # loadAndForwardModel`` 이 호출 될 때 호출되는 네이티브 메서드를 등록하는 역할을 합니다. 여기서는 ``pytorch_nativeapp :: loadAndForwardModel`` 함수입니다.
 
 ``pytorch_nativeapp :: loadAndForwardModel`` 은 인수 모델 경로로 사용됩니다.
-먼저 ``const char *`` 값을 추출하고``torch :: jit :: load`` 로 모듈을 로드합니다.
+먼저 ``const char *`` 값을 추출하고 ``torch :: jit :: load`` 로 모듈을 로드합니다.
 
 모바일 용 TorchScript 모델을로드하려면 모바일 빌드가 지원하지 않기 때문에 이러한 가드를 설정해야합니다.
 이 예제에서는 ``struct JITCallGuard '' 에 배치 된 더 작은 빌드 크기를위한 autograd와 같은 기능입니다.
