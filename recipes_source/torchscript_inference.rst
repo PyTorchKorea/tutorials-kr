@@ -1,9 +1,9 @@
 TorchScript로 배포하기
 ==========================
 
-이 레시피에서는 다음과 같은 것들을 알아봅니다:
+이 레시피에서는 다음 내용을 알아봅니다:
 
--  TorchScript란
+-  TorchScript란?
 -  학습된 모델을 TorchScript 형식으로 내보내기
 -  TorchScript 모델을 C++로 불러오고 추론하기
 
@@ -54,7 +54,7 @@ tutorial`_, `Loading A TorchScript Model in C++ tutorial`_, `full TorchScript do
    print('Python model top 5 results:\n  {}'.format(unscripted_top5))
    print('TorchScript model top 5 results:\n  {}'.format(scripted_top5))
 
-두 모델에 똑같은 결과가 나오는 것을 확인할 수 있습니다:
+두 모델의 결과가 동일함을 확인할 수 있습니다:
 
 ::
 
@@ -63,7 +63,7 @@ tutorial`_, `Loading A TorchScript Model in C++ tutorial`_, `full TorchScript do
    TorchScript model top 5 results:
      tensor([[463, 600, 731, 899, 898]])
 
-확인이 끝났으면 모델을 저장합니다:
+검사가 끝났으면 모델을 저장합니다:
 
 ::
 
