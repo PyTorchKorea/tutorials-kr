@@ -298,7 +298,7 @@ nexus sonatype 저장소에 게시되므로 해당 저장소를 등록해야합�
 우리의 애플리케이션에서 우리는 애플리케이션 네이티브 빌드 부분에서 LibTorch C ++ API를 사용해야합니다. 이를 위해서는 미리 빌드 된 바이너리와 헤더에 대한 액세스가 필요합니다. Maven 저장소에 게시된 PyTorch Android 빌드에 미리 포장되어 있습니다.
 
 gradle 종속성 (aar 파일)에서 PyTorch Android 사전 빌드 라이브러리를 사용하려면-
-구성``extractForNativeBuild ''에 대한 등록을 추가해야합니다.
+구성``extractForNativeBuild `` 에 대한 등록을 추가해야합니다.
 이 구성을 종속성에 추가하고 그 정의를 끝에 넣으십시오.
 
 ``extractForNativeBuild ''작업은 pytorch_android aar를 gradle 빌드 디렉터리로 압축 해제하는``extractAARForNativeBuild ''작업을 호출합니다.
