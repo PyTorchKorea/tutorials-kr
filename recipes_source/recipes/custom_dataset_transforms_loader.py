@@ -454,6 +454,6 @@ for i_batch, sample_batched in enumerate(dataloader):
 
 
 ######################################################################
-# 이제 파이토치를 이용해서 어떻게 사용자 정의 dataloader를 만드는지 배웠습니다.
+# 이제 PyTorch를 이용해서 어떻게 사용자 정의 dataloader를 만드는지 배웠습니다.
 # 저희는 좀 더 관련된 문서들을 깊게 읽으셔서 더욱 맞춤화된 작업 흐림을 가지길 추천 드립니다.
 # 더 배워보시려면 ``torch.utils.data`` 문서를 `여기 <https://pytorch.org/docs/stable/data.html>`__ 에서 읽어 보실 수 있습니다.
