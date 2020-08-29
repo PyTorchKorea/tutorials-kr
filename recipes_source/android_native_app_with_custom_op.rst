@@ -327,7 +327,7 @@ Pytorch_android aar에는``headers `` 폴더의 LibTorch 헤더와``jni `` 폴�
     }
   }
 
-네이티브 빌드에``CMake ''구성을 사용합니다. 여기에는 여러 라이브러리가 있으므로 STL과 동적으로 링크하도록 지정합니다. 이에 대한 자세한 내용은`여기 <https://developer.android.com/ndk/guides/cpp-support>`_에서 찾을 수 있습니다.
+네이티브 빌드에``CMake`` 구성을 사용합니다. 여기에는 여러 라이브러리가 있으므로 STL과 동적으로 링크하도록 지정합니다. 이에 대한 자세한 내용은`여기 <https://developer.android.com/ndk/guides/cpp-support>`_에서 찾을 수 있습니다.
 
 
 네이티브 빌드 CMake 설정
