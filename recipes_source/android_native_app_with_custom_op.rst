@@ -651,7 +651,7 @@ Activity의 ``OnCreate '' 메서드는 Activity 생성 직후에 호출됩니다
 
 모바일 용 TorchScript 모델을로드하려면 모바일 빌드가 지원하지 않기 때문에 이러한 가드를 설정해야합니다.
 이 예제에서는 ``struct JITCallGuard '' 에 배치 된 더 작은 빌드 크기를위한 autograd와 같은 기능입니다.
-향후 변경 될 수 있습니다. 최신 변경 사항을 추적 할 수 있습니다.
+향후 변경 될 수 있습니다. 최신 변경 사항을 추적할 수 있습니다.
 `PyTorch GitHub의 소스 <https://github.com/pytorch/pytorch/blob/master/android/pytorch_android/src/main/cpp/pytorch_jni_jit.cpp>`_.
 
 ``warp_perspective '' 메소드 구현 및 등록은 다음과 완전히 동일합니다.
