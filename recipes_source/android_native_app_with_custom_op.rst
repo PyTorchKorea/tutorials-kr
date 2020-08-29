@@ -295,7 +295,7 @@ Android Gradle 빌드 구성에 대한 자세한 내용은`여기 <https://devel
 nexus sonatype 저장소에 게시되므로 해당 저장소를 등록해야합니다.
 ``https : // oss.sonatype.org / content / repositories / snapshots``.
 
-우리의 애플리케이션에서 우리는 애플리케이션 네이티브 빌드 부분에서 LibTorch C ++ API를 사용해야합니다. 이를 위해서는 미리 빌드 된 바이너리와 헤더에 대한 액세스가 필요합니다. Maven 저장소에 게시 된 PyTorch Android 빌드에 미리 포장되어 있습니다.
+우리의 애플리케이션에서 우리는 애플리케이션 네이티브 빌드 부분에서 LibTorch C ++ API를 사용해야합니다. 이를 위해서는 미리 빌드 된 바이너리와 헤더에 대한 액세스가 필요합니다. Maven 저장소에 게시된 PyTorch Android 빌드에 미리 포장되어 있습니다.
 
 gradle 종속성 (aar 파일)에서 PyTorch Android 사전 빌드 라이브러리를 사용하려면-
 구성``extractForNativeBuild ''에 대한 등록을 추가해야합니다.
