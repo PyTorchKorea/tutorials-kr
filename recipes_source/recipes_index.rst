@@ -106,7 +106,7 @@ Recipes are bite-sized bite-sized, actionable examples of how to use specific Py
 
 .. customcarditem::
    :header: 사용자 정의 데이터셋, Transforms & Dataloader
-   :card_description: PyTorch 데이터셋 API를 이용하여 어떻게 쉽게 사용자 정의 데이터셋과 dataloader를 만드는지 배워봅시다.
+   :card_description: PyTorch 데이터셋 API를 이용하여 어떻게 쉽게 사용자 정의 데이터셋과 dataloader를 만드는지 알아봅니다.
    :image: ../_static/img/thumbnails/cropped/custom-datasets-transforms-and-dataloaders.png
    :link: ../recipes/recipes/custom_dataset_transforms_loader.html
    :tags: Data-Customization
