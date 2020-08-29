@@ -301,7 +301,7 @@ gradle 종속성 (aar 파일)에서 PyTorch Android 사전 빌드 라이브러�
 구성``extractForNativeBuild `` 에 대한 등록을 추가해야합니다.
 이 구성을 종속성에 추가하고 그 정의를 끝에 넣으십시오.
 
-``extractForNativeBuild ''작업은 pytorch_android aar를 gradle 빌드 디렉터리로 압축 해제하는``extractAARForNativeBuild ''작업을 호출합니다.
+``extractForNativeBuild `` 작업은 pytorch_android aar를 gradle 빌드 디렉터리로 압축 해제하는``extractAARForNativeBuild `` 작업을 호출합니다.
 
 Pytorch_android aar에는``headers ''폴더의 LibTorch 헤더와``jni ''폴더의 여러 Android abis 용 사전 빌드 된 라이브러리가 포함되어 있습니다.
 ``$ ANDROID_ABI / libpytorch_jni.so``,``$ ANDROID_ABI / libfbjni.so``.
