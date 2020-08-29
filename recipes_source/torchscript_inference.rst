@@ -41,7 +41,7 @@ tutorial`_, `Loading A TorchScript Model in C++ tutorial`_, `full TorchScript do
    r18_scripted = torch.jit.script(r18)         # *** 여기가 TorchScript로 내보내는 부분입니다. 
    dummy_input = torch.rand(1, 3, 224, 224)     # 빠르게 테스트 해봅니다.
 
-두 모델이 정말 같은지에 대해 정밀 테스트를 해보겠습니다. 
+두 모델이 정말 같은지에 대해 정밀 검사를 해보겠습니다. 
 
 ::
 
