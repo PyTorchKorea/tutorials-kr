@@ -333,7 +333,7 @@ Pytorch_android aar에는``headers `` 폴더의 LibTorch 헤더와``jni `` 폴�
 네이티브 빌드 CMake 설정
 ------------------------
 
-이 네이티브 빌드는 ``NativeApp/app/CMakeLists.txt`` 에 다음과 같이  :
+네이티브 빌드는 ``NativeApp/app/CMakeLists.txt`` 에서 구성됩니다. :
 
 .. code-block:: cmake
 
