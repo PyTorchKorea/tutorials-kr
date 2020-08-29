@@ -644,7 +644,7 @@ Activity의 ``OnCreate `` 메서드는 Activity 생성 직후에 호출됩니다
 
 이 목록은 꽤 길고 여기에 몇 가지가 혼합되어 있으므로 제어 흐름을 따라이 코드가 작동하는 방식을 이해할 것입니다.
 제어 흐름이 도착하는 첫 번째 위치는``JNI_OnLoad``입니다.
-이 함수는 라이브러리를로드 한 후 호출됩니다. ``NativePeer # loadAndForwardModel`` 이 호출 될 때 호출되는 네이티브 메서드를 등록하는 역할을 합니다. 여기서는 ``pytorch_nativeapp :: loadAndForwardModel`` 함수입니다.
+이 함수는 라이브러리를 로드한 후 호출됩니다. ``NativePeer # loadAndForwardModel`` 이 호출될 때 호출되는 네이티브 메소드를 등록하는 역할을 합니다. 여기서는 ``pytorch_nativeapp :: loadAndForwardModel`` 함수입니다.
 
 ``pytorch_nativeapp :: loadAndForwardModel`` 은 인수 모델 경로로 사용됩니다.
 먼저 ``const char *`` 값을 추출하고 ``torch :: jit :: load`` 로 모듈을 로드합니다.
