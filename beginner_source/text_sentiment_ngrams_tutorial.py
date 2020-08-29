@@ -109,7 +109,7 @@ class TextSentiment(nn.Module):
 #
 # 어휘집의 크기(Vocab size)는 어휘집(vocab)의 길이와 같습니다 (여기에는
 # 각각의 단어와 ngrame이 모두 포함됩니다). 클래스의 개수는 레이블의 종류
-# 수와 같으며, AG_NEWS의 경우에는 4개입니다.
+# 수와 같으며, AG_NEWS의 경우에는 4개 입니다.
 #
 
 VOCAB_SIZE = len(train_dataset.get_vocab())
