@@ -303,7 +303,7 @@ gradle 종속성 (aar 파일)에서 PyTorch Android 사전 빌드 라이브러�
 
 ``extractForNativeBuild `` 작업은 pytorch_android aar를 gradle 빌드 디렉터리로 압축 해제하는``extractAARForNativeBuild `` 작업을 호출합니다.
 
-Pytorch_android aar에는``headers ''폴더의 LibTorch 헤더와``jni ''폴더의 여러 Android abis 용 사전 빌드 된 라이브러리가 포함되어 있습니다.
+Pytorch_android aar에는``headers `` 폴더의 LibTorch 헤더와``jni `` 폴더의 여러 Android abis 용 사전 빌드된 라이브러리가 포함되어 있습니다.
 ``$ ANDROID_ABI / libpytorch_jni.so``,``$ ANDROID_ABI / libfbjni.so``.
 기본 빌드에 사용합니다.
 
