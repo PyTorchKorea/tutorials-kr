@@ -56,19 +56,6 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 ######################################################################
 # 모델 정의하기
-# ----------------
-#
-# 모델은 `EmbeddingBag <https://pytorch.org/docs/stable/nn.html?highlight=embeddingbag#torch.nn.EmbeddingBag>`__
-# 계층과 선형 계층으로 이뤄져있습니다. (아래 그림을 참고하세요). ``nn.EmbeddingBag``
-# 은 임베딩 bag의 평균 값을 계산합니다. 텍스트 항목들은 서로 다른 길이를 갖고 있습니다.
-# ``nn.EmbeddingBag`` 텍스트의 길이가 offsets에 저장되기 때문에 패딩이 필요하지 않습니다.
-#
-#
-# 추가적으로, ``nn.EmbeddingBag`` 은 상황에 따라 임베딩 값들에 대한 평균을 축적하기 때문에, 
-# ``nn.EmbeddingBag`` 은 텐서들의 시퀀스를 처리하기 위한 메모리 효율상과 성능을 향상 시킬 수 있습니다.
-
-=======
-# 모델 정의하기
 # -------------
 #
 # 우리의 모델은 
