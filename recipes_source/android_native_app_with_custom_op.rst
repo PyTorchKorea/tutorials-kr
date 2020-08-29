@@ -512,7 +512,7 @@ Android 애플리케이션 매니페스트
 이전 단계에서 ``compute.pt`` 를 ``NativeApp / app / src / main / assets`` 에 복사했을 때 해당 파일은 Android 애플리케이션에 한 부분이 되었으며 애플리케이션에 압축됩니다. Android 시스템은 스트림 액세스만 제공합니다.
 LibTorch에서 이 모듈을 사용하려면 디스크에 파일로 구체화해야합니다. ``assetFilePath `` 함수는 asset 입력 스트림에서 데이터를 복사하고 디스크에 쓰고 이에 대한 절대 파일 경로를 반환합니다.
 
-Activity의 ``OnCreate '' 메서드는 Activity 생성 직후에 호출됩니다. 이 메서드에서는 ``assertFilePath '' 를 호출하고 JNI 호출을 통해 네이티브 코드로 전달하는 ``NativeClient '' 클래스를 호출합니다.
+Activity의 ``OnCreate `` 메서드는 Activity 생성 직후에 호출됩니다. 이 메서드에서는 ``assertFilePath `` 를 호출하고 JNI 호출을 통해 네이티브 코드로 전달하는 ``NativeClient `` 클래스를 호출합니다.
 
 ``NativeClient``는 내부 개인 클래스 ``NativePeer`` 가있는 도우미 클래스로, 애플리케이션의 기본 부분을 담당합니다. 이전 단계에서 추가 한``CMakeLists.txt``로 빌드되는``libpytorch_nativeapp.so`` 를로드하는 정적 블록이 있습니다. 정적 블록은 ``NativePeer '' 클래스의 첫 번째 참조로 실행됩니다. ``NativeClient # loadAndForwardModel`` 에서 발생합니다.
 
