@@ -13,7 +13,7 @@
  -  ``scikit-image``: 이미지 I/O와 이미지 변형에 필요합니다.
  -  ``pandas``: CSV를 더 쉽게 파싱하기 위해 필요합니다.
 
-작성되고 있는 이 시점에서, 이 레시피는 `Sasank Chilamkurthy <https://chsasank.github.io>`__ 의 오리지널 튜토리얼을 기반으로
+작성되고 있는 이 시점에서, 이 레시피는 `Sasank Chilamkurthy <https://chsasank.github.io>`__ 의 오리지널 튜토리얼을 바탕으로 하며
 나중에는 `Joe Spisak <https://github.com/jspisak>`__ 에 의해 수정되었습니다.
 한국어로 `Jae Joong Lee <https://https://github.com/JaeLee18>`__ 에 의해 번역되었습니다.
 """
