@@ -55,7 +55,7 @@ Gradle은 Android 애플리케이션에 가장 널리 사용되는 빌드 시스
 
 - JDK
 
-Gradle에는 JDK가 필요하므로이를 설치하고이를 가리 키도록 환경 변수``JAVA_HOME``을 설정해야합니다.
+Gradle에는 JDK가 필요하므로이를 설치하고이를 가리 키도록 환경 변수 ``JAVA_HOME`` 을 설정해야합니다.
 예를 들어 `<https://openjdk.java.net/install/>`_에 따라 OpenJDK를 설치할 수 있습니다.
 
 - Android 용 OpenCV SDK
