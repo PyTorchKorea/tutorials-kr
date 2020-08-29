@@ -70,7 +70,7 @@ Gradle에는 JDK가 필요하므로이를 설치하고이를 가리 키도록 �
 TorchScript는 사용자 정의 C ++ 연산자를 사용하여 읽을 수있는 세부 정보로 읽을 수 있습니다.
 `전용 튜토리얼 <https://pytorch.org/tutorials/advanced/torch_script_custom_ops.html>`_.
 
-결과적으로 OpenCV``cv :: warpPerspective ''함수를 사용하는 커스텀 op를 사용하는 모델을 스크립팅 할 수 있습니다.
+결과적으로 OpenCV``cv :: warpPerspective `` 함수를 사용하는 커스텀 op를 사용하는 모델을 스크립팅 할 수 있습니다.
 
 .. code-block:: python
 
