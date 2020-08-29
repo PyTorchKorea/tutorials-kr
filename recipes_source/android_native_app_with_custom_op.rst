@@ -669,7 +669,7 @@ Android SDK 및 Android NDK가 어디에 있는지 지정하려면 ``NativeApp /
   echo "ndk.dir=$ANDROID_NDK" >> NativeApp/local.properties
 
 
-결과 'apk' 파일을 실행하기 위해서는:
+결과 ``apk`` 파일을 빌드하기 위해서 다음을 실행합니다:
 
 .. code-block:: shell
 
