@@ -401,7 +401,7 @@ Pytorch_android aar에는``headers `` 폴더의 LibTorch 헤더와``jni `` 폴�
 OpenCV 함수를 사용하여 사용자 지정 연산자 ``my_ops :: warp_perspective `` 를 구현할 계획이므로 ``libopencv_java4.so`` 에 링크해야합니다. 설정 단계에서 다운로드 한 Android 용 OpenCV SDK에 패키지되어 있습니다.
 이 구성에서는 환경 변수 ``OPENCV_ANDROID_SDK `` 로 찾을 수 있습니다.
 
-또한 결과를 Android LogCat에 기록 할 수 있도록 ``log '' 라이브러리와 연결합니다.
+또한 결과를 Android LogCat에 기록 할 수 있도록 ``log `` 라이브러리와 연결합니다.
 
 OpenCV Android SDK의 ``libopencv_java4.so`` 에 링크 할 때 이를 ``NativeApp / app / src / main / jniLibs / $ {ANDROID_ABI}`` 에 복사해야합니다.
 
