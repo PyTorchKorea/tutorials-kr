@@ -295,7 +295,7 @@ PyTorch의 베타(beta)를 사용할 것이므로 최신 버전의 ``torch`` 와
 
 
 이번 섹션에서는 “고정 된(frozen)” 양자화 특징 추출기를 사용하고 그 위에 사용자 지정 분류기 헤드를
-학습합니다. 부동 소수점 모델과 다르게 양자화 된 모델에는 학습 가능한 매개 변수가 없으므로
+학습합니다. 부동 소수점 모델과 다르게 양자화된 모델에는 학습 가능한 매개 변수가 없으므로
 requires_grad = False를 설정할 필요가 없습니다. 자세한 내용은 `설명서 <https://pytorch.org/docs/stable/quantization.html>`_ 를 참조하세요.
 
 미리 학습된 모델을 불러옵니다: 이번 예제에서는 `ResNet-18 <https://pytorch.org/hub/pytorch_vision_resnet/>`_ 을 사용할 것입니다.
