@@ -225,7 +225,7 @@ PyTorch의 베타(beta)를 사용할 것이므로 최신 버전의 ``torch`` 와
                 loss.backward()
                 optimizer.step()
 
-            # 통계보기
+            # 통계 보기
             running_loss += loss.item() * inputs.size(0)
             running_corrects += torch.sum(preds == labels.data)
           if phase == 'train':
