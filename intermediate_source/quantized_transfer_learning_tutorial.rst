@@ -99,7 +99,7 @@ PyTorch의 베타(beta)를 사용할 것이므로 최신 버전의 ``torch`` 와
     import torch
     from torchvision import transforms, datasets
 
-    # 학습을 위한 데이터 보강(Data augmentation) 그리고 정규화
+    # 학습을 위한 데이터 보강(Data augmentation)과 정규화
     # 검증을 위한 정규화
     data_transforms = {
         'train': transforms.Compose([
