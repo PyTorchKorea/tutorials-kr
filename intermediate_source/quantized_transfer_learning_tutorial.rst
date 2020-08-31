@@ -91,7 +91,7 @@ PyTorch의 베타(beta)를 사용할 것이므로 최신 버전의 ``torch`` 와
 
 이 데이터셋은 imagenet의 아주 작은 일부입니다.
 
-.. note :: `여기 <https://download.pytorch.org/tutorial/hymenoptera_data.zip>`_ 에서 데이터를 다운로드 받아 ``data`` 디렉토리에 압축을 풀으세요.
+.. note :: `여기 <https://download.pytorch.org/tutorial/hymenoptera_data.zip>`_ 에서 데이터를 다운로드 받아 ``data`` 디렉토리에 압축을 푸세요.
 
 
 .. code:: python
