@@ -469,7 +469,7 @@ GPU에서는 훈련을 실행할 수 없습니다.
     # 더 작은 Learning rate에 주목하세요
     optimizer_ft = optim.SGD(model_ft.parameters(), lr=1e-3, momentum=0.9, weight_decay=0.1)
 
-    # Learning rate를 매번 몇 에폭마다 0.3배 감소시키기
+    # 학습률을 몇 에폭마다 0.3배 감소시키기
     exp_lr_scheduler = optim.lr_scheduler.StepLR(optimizer_ft, step_size=5, gamma=0.3)
 
     model_ft_tuned = train_model(model_ft, criterion, optimizer_ft, exp_lr_scheduler,
