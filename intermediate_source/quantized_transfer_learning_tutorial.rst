@@ -421,7 +421,7 @@ GPU에서는 훈련을 실행할 수 없습니다.
 (3) 단계는 가짜 양자화 모듈을 삽입하는 ``torch.quantization.prepare_qat`` 를 사용하여 수행됩니다.
 
 
-(4) 단계로 모델을 "미세조정(Finetuning)"한 후 완전하게 양자화 된 버전(version)으로 변환 할 수 있습니다. (5 단계)
+(4) 단계로 모델을 "미세조정(Finetuning)"한 후, 완전하게 양자화 된 버전으로 변환(5단계) 할 수 있습니다.
 
 
 미세조정(Finetuning) 모델을 양자화 된 모델로 변환하려면 ``torch.quantization.convert`` 함수를
