@@ -49,7 +49,7 @@
 ---------------------
 
 전이 학습(transfer learning)을 시작하기 전에,
-데이터 불러오기 / 시각화와 같은 "전제 조건(prereqisites)"을 검토하겠습니다.
+데이터 불러오기 / 시각화와 같은 "전제 조건(prerequisites)"을 검토하겠습니다.
 
 .. code:: python
 
