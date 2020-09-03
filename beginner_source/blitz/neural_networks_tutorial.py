@@ -44,19 +44,19 @@ class Net(nn.Module):
 
     def __init__(self):
         super(Net, self).__init__()
-        # 1 input image channel, 6 output channels, 3x3 square convolution
-        # kernel
+        # 입력 이미지 채널 1개, 출력 채널 6개, 3x3의 정사각 컨볼루션 행렬
+        # 컨볼루션 커널 정의
         self.conv1 = nn.Conv2d(1, 6, 3)
         self.conv2 = nn.Conv2d(6, 16, 3)
-        # an affine operation: y = Wx + b
-        self.fc1 = nn.Linear(16 * 6 * 6, 120)  # 6*6 from image dimension
+        # 아핀 연산: y = Wx + b
+        self.fc1 = nn.Linear(16 * 6 * 6, 120)  # 6*6은 이미지 차원에 해당
         self.fc2 = nn.Linear(120, 84)
         self.fc3 = nn.Linear(84, 10)
 
     def forward(self, x):
-        # Max pooling over a (2, 2) window
+        # (2, 2) 크기 윈도우에 대해 맥스 풀링(Max pooling)
         x = F.max_pool2d(F.relu(self.conv1(x)), (2, 2))
-        # If the size is a square you can only specify a single number
+        # 크기가 제곱수라면 하나의 숫자만을 특정
         x = F.max_pool2d(F.relu(self.conv2(x)), 2)
         x = x.view(-1, self.num_flat_features(x))
         x = F.relu(self.fc1(x))
@@ -65,7 +65,7 @@ class Net(nn.Module):
         return x
 
     def num_flat_features(self, x):
-        size = x.size()[1:]  # all dimensions except the batch dimension
+        size = x.size()[1:]  # 배치 차원을 제외한 모든 차원
         num_features = 1
         for s in size:
             num_features *= s
@@ -84,7 +84,7 @@ print(net)
 
 params = list(net.parameters())
 print(len(params))
-print(params[0].size())  # conv1's .weight
+print(params[0].size())  # conv1의 .weight
 
 ########################################################################
 # 임의의 32x32 입력값을 넣어보겠습니다.
@@ -149,8 +149,8 @@ out.backward(torch.randn(1, 10))
 # 예를 들면:
 
 output = net(input)
-target = torch.randn(10)  # a dummy target, for example
-target = target.view(1, -1)  # make it the same shape as output
+target = torch.randn(10)  # 예시를 위한 더미 target
+target = target.view(1, -1)  # 출력과 같은 shape로 만듦
 criterion = nn.MSELoss()
 
 loss = criterion(output, target)
@@ -189,7 +189,7 @@ print(loss.grad_fn.next_functions[0][0].next_functions[0][0])  # ReLU
 # 살펴보겠습니다.
 
 
-net.zero_grad()     # zeroes the gradient buffers of all parameters
+net.zero_grad()     # 모든 파라미터의 변화도 버퍼를 0으로 만듦
 
 print('conv1.bias.grad before backward')
 print(net.conv1.bias.grad)
@@ -237,11 +237,11 @@ import torch.optim as optim
 optimizer = optim.SGD(net.parameters(), lr=0.01)
 
 # 학습 과정(training loop)에서는 다음과 같습니다:
-optimizer.zero_grad()   # zero the gradient buffers
+optimizer.zero_grad()   # 변화도 버퍼를 0으로
 output = net(input)
 loss = criterion(output, target)
 loss.backward()
-optimizer.step()    # Does the update
+optimizer.step()    # 업데이트 진행
 
 
 ###############################################################
