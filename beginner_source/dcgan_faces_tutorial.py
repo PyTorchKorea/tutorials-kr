@@ -14,11 +14,11 @@ DCGAN Tutorial
 # ------------
 # 
 # 이 튜토리얼은 예제를 해보면서 DCGAN에 대한 소개를 제공합니다.
-# 우리는 생성적 적대 신경망 (GAN)으로 실존하는 많은 연예인들의 사진을 이용해 훈련시켜서 새로운 연예인 사진들을 생성하게 할 것 입니다.
+# 우리는 생성적 적대 신경망 (GAN)으로 실제 연예인들의 사진을 많이 이용해 훈련시켜서 새로운 연예인 사진들을 생성하게 할 것 입니다.
 # 대부분의 코드들은 `pytorch/examples <https://github.com/pytorch/examples>`__, 에서 온 DCGAN 구현을 사용했습니다.
-# 또한, 이 튜토리얼은 구현에 대한 설명과 어떻게 그리고 왜 이 신경망이 작동하는지에 대해 설명해줍니다.
-# GAN에 대한 사전지식은 필요하지않지만 처음 보시는분들은 어떻게 작동되는지에 대해 이해하려고 시간이 좀 필요할수도 있습니다.
-# 시간을 아끼기 위해서는 GPU가 한개나 두개정도 필요로 합니다.
+# 또한, 이 튜토리얼은 구현에 대해 자세히 설명하고, 어떻게 그리고 왜 이 신경망이 작동하는지에 대해 알려줍니다.
+# GAN에 대한 사전지식은 필요하지 않지만 처음 보시는 분들은 어떻게 작동되는지에 대해 이해하려고 시간이 좀 필요할 수도 있습니다.
+# 시간을 아끼기 위해서는 GPU가 한 개나 두 개 정도 필요로 합니다.
 # 자 그러면, 처음부터 시작해봅시다. 
 # 
 # 생성적 적대 신경망
@@ -32,18 +32,18 @@ DCGAN Tutorial
 # GAN은 Ian Goodfellow에 의해 2014년에 만들어졌으며 처음으로 
 #`Generative Adversarial Nets <https://papers.nips.cc/paper/5423-generative-adversarial-nets.pdf>`__.
 # 이라는 논문에 소개되었습니다.
-# *generator* 와 *discriminator* 라는 두개의 모델로 이루어져 있습니다.
+# GAN은 *generator* 와 *discriminator* 라는 두개의 모델로 이루어져 있습니다.
 # generator의 역할은 훈련용 이미지처럼 보이는 'fake' 이미지들을 만들어내는것입니다.
 # 또한, discriminator의 역할은 이미지를 보고 과연 그게 진짜 훈련용 이미지 인지 아니면 generator에서 생성된 가짜 이미지인지 확인하는것입니다.
-# 훈련 과정중에는 generator는 지속적으로 discriminator를 더 좋은 fake 이미지들을 생성하여 속이려 하고 그러는 와중에
+# 훈련 과정 중에는 generator는 지속적으로 더 좋은 fake 이미지들을 생성하여 discriminator를 속이려 하고 그러는 와중에
 # discriminator는 더 철저하게 구별하여 진짜 훈련용 이미지와 fake 이미지들을 구별해냅니다.
-# 이러한 경쟁 generator가 정말 훈련용 데이터 이미지들중 하나처럼 보이는 이미지를 생성해내고 
-# discriminator는 항상 50%의 신뢰도를 가지고 generator의 결과물이 fake인지 진짜인지 판별할때 끝이 나게됩니다.
+# 이러한 경쟁은 generator가 정말 훈련용 데이터 이미지들중 하나처럼 보이는 이미지를 생성해내고 
+# discriminator는 항상 50%의 신뢰도를 가지고 generator의 결과물이 fake인지 진짜인지 판별할 때 끝이 나게됩니다.
 # 
 # 이제 튜토리얼에서 사용될 표기법들을 정의할텐데 discriminator에 사용될것들부터 시작하겠습니다.
 # :math:`x` 를 이미지를 나타내는 데이터라 하겠습니다.
 # :math:`D(x)` 는 discriminator 신경망으로 :math:`x` 가  generator에서 온게 아닌 실제 훈련데이터일 확률을 반환합니다.
-# :math:`D(x)` 에는 이미지를 입력값으로 사용해야하므로 C(채널)H(세로)W(가로)가 3x64x64인 이미지를 사용합니다.
+# 우리는 이미지를 다루기 때문에 :math:`D(x)` 의 입력값으로 C(채널)H(세로)W(가로)가 3x64x64인 이미지를 사용합니다.
 # 직관적으로, :math:`D(x)` 는 :math:`x` 가 실제 훈련데이터에서 올 경우에는 높은값을 반환하고 generator에서 온 경우라면 낮은값을 반환합니다.
 # :math:`D(x)` 는 전통적인 이진 분류기로 생각될 수도 있습니다.
 # 
@@ -63,13 +63,13 @@ DCGAN Tutorial
 
 # 이론적으로, 이 최소최대 게임(minimax game)의 답은
 # :math:`p_g = p_{data}` 이며 discriminator가 무작위로 입력값이 진짜인지 fake 인지 예측하는 경우 입니다.
-# 그러나, GAN의 수렴 이론은 현재에도 활발히 연구대상이며 현실적인 신경만들은 항상 이러한 수준까지 훈련되지는 않습니다.
+# 그러나, GAN의 수렴 이론은 현재에도 활발히 연구되고 있으며 현실적인 신경만들은 항상 이러한 수준까지 훈련되지는 않습니다.
 #
 # DCGAN이란?
 # ~~~~~~~~~~~~~~~~
 # 
-# DCGAN은 위에 설명된 GAN의 확장개념이지만 다른점이라면 discriminator에는 convolutional 층을 
-# generator에는 convolutional-transpose 층이 각각 사용됩니다. 
+# DCGAN은 위에 설명된 GAN의 확장개념이지만 다른 점이라면 discriminator에는 convolutional 계층을 
+# generator에는 convolutional-transpose 계층이 각각 사용됩니다. 
 # DCGAN은 처음으로 Radford et. al. 이 작성한 `Unsupervised Representation Learning With
 # Deep Convolutional Generative Adversarial
 # Networks <https://arxiv.org/pdf/1511.06434.pdf>`__  이라는 논문에서 소개가 되었습니다.
@@ -86,7 +86,7 @@ DCGAN Tutorial
 # `ReLU <https://pytorch.org/docs/stable/nn.html#relu>`__ 를 활성함수로 구성되어 있습니다.
 # 입력값은 잠재 벡터인 :math:`z` 이며 정규 분포에서 뽑아내진 값입니다.
 # 결과값은 3x64x64 의 RGB 이미지 입니다.
-# strided conv-transpose 층은 잠재 벡터가 같은 모양의 이미지로 변환되는것을 가능하게 합니다.
+# strided conv-transpose 층은 잠재 벡터가 같은 모양의 이미지로 변환되는 것을 가능하게 합니다.
 # 이 논문에서 저자들은 옵티마이저를 설정하는 방법, 손실함수 계산 방법, 모델 가중치 초기화 방법들을 설명해주었는데
 # 이 모든 방법들은 아래에 전부 설명이 될 예정입니다.
 # 
@@ -131,24 +131,24 @@ torch.manual_seed(manualSeed)
 # -  **image_size** - 훈련때 사용될 이미지의 크기입니다. 초기값은 64x64로 설정 되어있고,
 #    다른 크기를 원한다면 D와 G의 구조도 다시 설정해야합니다. 
 #    자세하게 보려면 `여기 <https://github.com/pytorch/examples/issues/70>`__ 를 봐주세요.
-# -  **nc** - 입력값으로 사용되는 이미지의 색상 채널 갯수입니다. 컬러 이미지들은 3으로 가지고있습니다.
+# -  **nc** - 입력값으로 사용되는 이미지의 색상 채널 갯수입니다. 컬러 이미지들은 3입니다.
 # -  **nz** - 잠재 벡터의 길이
 # -  **ngf** - generator를 통해 이용되는 feature map의 깊이와 관련되어있습니다.
 # -  **ndf** - discriminator를 통해 전파되는 feature map의 깊이를 설정합니다.
-# -  **num_epochs** - 훈련때 실행되는 에포크의 수입니다. 더 좋은 결과를 위해선 많은 에포크가 필요하지만
+# -  **num_epochs** - 훈련 때 실행되는 에포크의 수입니다. 더 좋은 결과를 위해선 많은 에포크가 필요하지만
 #    그만큼 더 많은 시간이 필요합니다.
-# -  **lr** - 훈련때 사용되는 러닝레이트 입니다. DCGAN에서 나와있는데로 
+# -  **lr** - 훈련 때 사용되는 러닝레이트 입니다. DCGAN에서 나와있는 대로 
 #    0.0002로 설정합니다.
-# -  **beta1** - beta1 는 Adam 옵티마이저에 사용됩니다. 논문에 소개된대로
+# -  **beta1** - beta1 는 Adam 옵티마이저에 사용됩니다. 논문에 소개된 대로
 #    0.5로 설정합니다.
 # -  **ngpu** - 사용가능한 GPU의 갯수입니다. 0으로 설정되면 코드는 CPU를 사용하며, 
-#    0보다 큰 수 일때는 해당하는 GPU갯수만큼 사용하게됩니다.
+#    0보다 큰 수일 때는 해당하는 GPU개수만큼 사용하게됩니다.
 # 
 
 # 데이터셋의 루트 경로
 dataroot = "data/celeba"
 
-# dataloader에 사용되는 worker 갯수
+# dataloader에 사용되는 worker 개수
 workers = 2
 
 # 훈련때 사용되는 배치 사이즈
@@ -191,7 +191,7 @@ ngpu = 1
 # `Google
 # Drive <https://drive.google.com/drive/folders/0B7EVK8r0v71pTUZsaXdaSnZBZzg>`__. 에서도 다운 받을 수 있는
 # 데이터를 이용합니다.
-# 데이터 셋은 *img_align_celeba.zip* 이라는 파일로 다운받아집니다. 
+# 데이터셋은 *img_align_celeba.zip* 이라는 파일로 다운받아집니다. 
 # 다운이 완료된후, *celeba* 라는 폴더를 만들고 zip 파일을 그 폴더에 풀어주세요.
 # 그 다음에  *dataroot* 을 방금 만드신 *celeba* 로 설정 해주시면 됩니다.
 # 폴더 구조는 다음과 같아야 합니다.
@@ -206,13 +206,13 @@ ngpu = 1
 #            -> 537394.jpg
 #               ...
 # 
-# 폴더 구조를 이렇게 만드는것은 중요한 과정이고 ImageFolder 데이터셋 class를 사용할 예정이라 
+# 폴더 구조를 이렇게 만드는 것은 중요한 과정이고 ImageFolder 데이터셋 class를 사용할 예정이라 
 # 데이터셋의 하위폴더에 주어진대로 위치해야합니다.
 # 이제 우리는 데이터셋과  dataloder 를 설정하고
 # 실행할 하드웨어 장치 설정과 훈련때 사용되는 데이터들을 시각화 할 수 있습니다.
 # 
 
-# ImageFolder를 우리가 설정해놓은데로 사용할 수 있습니다.
+# ImageFolder를 우리가 설정해놓은 대로 사용할 수 있습니다.
 # 데이터셋 만들기
 dataset = dset.ImageFolder(root=dataroot,
                            transform=transforms.Compose([
@@ -269,16 +269,16 @@ def weights_init(m):
 # Generator
 # ~~~~~~~~~
 # 
-# generator인 :math:`G` 는 잠배 벡터 공간(:math:`z`)을  데이터 공간에 대응시키도록 고안되었습니다.
+# generator인 :math:`G` 는 잠재 벡터 공간(:math:`z`)을  데이터 공간에 대응시키도록 고안되었습니다.
 # 우리의 데이터가 이미지이므로 :math:`z` 를 데이터 공간으로 변환한다는 뜻은 사실상 훈련 이미지와 같은 크기(예) 3x64x64) 의
 # 이미지를 만든다는것과 같습니다. 
 # 구현에서는  2차원의 strided convolutional transpose 층과 2차원 batch norm 층, 그리고 relu 활성화 함수의 조합으로 
 # 결과값을 도출해낼수 있습니다.
 # generator의 결과값은 tanh 함수로 들어가서 :math:`[-1,1]` 의 데이터 범위로 반환됩니다.
 # conv-transpose 층 다음에 batch norm 함수들이 존재한다는것을 알아둘 필요가 있습니다. 
-# 왜냐하면 이 배치에 대한 구성은 DCGAN 논문의 핵심적인 기여이기 떄문입니다.
-# 이러한 층들은 훈련도중 gradient의 흐름에 대해 도움을 줍니다.
-# DCGAN 논문에서 generator 의 image는 아래와 같이 보여줍니다.
+# 왜냐하면 이 배치에 대한 구성이 DCGAN 논문의 핵심적인 기여이기 때문입니다.
+# 이러한 층들은 훈련도중 변화도의 흐름에 대해 도움을 줍니다.
+# DCGAN 논문에서 generator 의 이미지는 아래와 같이 보입니다.
 #
 # .. figure:: /_static/img/dcgan_generator.png
 #    :alt: dcgan_generator
@@ -353,10 +353,10 @@ print(netG)
 # 결과값을 출력해줍니다.
 # :math:`D` 는 3x64x64 크기의 이미지를 입력값으로 받으며 Conv2d, 
 # BatchNorm2d, LeakyReLU 층의 조합으로 처리됩니다. 결과값은은 Sigmoid 활성화 함수를 이용해서
-# 마지막 확률이 나오게 됩니다. 이 신경망 구조는 문제를 해결하는데 필요에 따라 더 많은 층을 추가하여
+# 마지막으로 확률이 나오게 됩니다. 이 신경망 구조는 문제를 해결하는데 필요에 따라 더 많은 층을 추가하여
 # 확장 될수도 있지만, strided convolution, BatchNorm, 그리고  LeakyReLUs층이 주로 
 # 사용되어야 합니다.
-# DCGAN 논문은 다운 샘플을 하기위해 pooling을 사용하는것 보다 trided convolution을
+# DCGAN 논문은 다운 샘플을 하기위해 pooling을 사용하는것 보다 strided convolution을
 # 사용하는것이 더 좋다고 언급하고 있는데 그 이유로는 신경망이 신경망 자체의 pooling
 # 함수를 배우도록 하기 떄문이라고 하고 있습니다.
 # 또한 batch norm 과 leaky relu 함수들은 :math:`G` 와 :math:`D` 의
@@ -470,7 +470,7 @@ optimizerG = optim.Adam(netG.parameters(), lr=lr, betas=(beta1, 0.999))
 # 마침내 우리는 GAN 프레임워크를 정의 하는 부분을 다 마치고 훈련을 시킬 수 있습니다.
 # GAN을 훈련시킬때에는 알 수 없는 현상들이 나타나는데 잘못된 하이퍼파라미터 셋팅은
 # 모델 붕괴로 가게 할 수 있고 뭐가 잘못되었는지 설명은 거의 할 수 없습니다.
-# 여기서 우리는 최고의 연습이라고 불리는 `ganhacks <https://github.com/soumith/ganhacks>`__ 
+# 여기서 우리는 최고의 사례라고 불리는 `ganhacks <https://github.com/soumith/ganhacks>`__ 
 # 을 보면서 Goodfellow의 논문에서 Algorithm 1 을 적용할 예정입니다.
 # 즉, 우리는  “진짜 이미지와 가짜 이미지의 다른 미니 배치 작성” 을 할 예정이고 또한 G의 목적 함수 :math:`logD(G(z))` 를 
 # 최대화 하도록 조정합니다. 
@@ -480,7 +480,7 @@ optimizerG = optim.Adam(netG.parameters(), lr=lr, betas=(beta1, 0.999))
 # **파트 1 - Discriminator 학습시키기**
 # 
 # 다시 한번 말씀 드리자면 discriminator를 학습시키는 목적은 주어진 입력값이
-#  진짜 인지 가짜인지 분류하는 확률을 최대화 시키는것 입니다.
+#  진짜인지 가짜인지 정확히 분류하는 확률을 최대화 시키는것 입니다.
 # Goodfellow의 말에 의하면 우리는 “ discriminator를 자신의 상승시키는 stochastic gradient
 # 를 이용하여 업데이트” 해야하길 원해야 한다고 하고 있습니다.
 # 우리는 :math:`log(D(x)) + log(1-D(G(z)))` 가 최대화 되도록 원합니다.
@@ -495,12 +495,12 @@ optimizerG = optim.Adam(netG.parameters(), lr=lr, betas=(beta1, 0.999))
 # 
 # **파트2 - Generator 학습시키기**
 # 
-# 본래의 논문이 서술했듯, 우리는 :math:`log(1-D(G(z)))` 을 최소화를 이용하여
+# 본래의 논문이 서술했듯, 우리는 :math:`log(1-D(G(z)))` 을 최소화 하도록
 # generator를 학습시켜서 더 나은 가짜를 만들기를 원합니다.
-# 언급한 대로 이것은 Goodfellow가 초기 학습 단계에는 충분한 gradient를 제공하지 못한다는것을
+# 언급한 대로 이것은 Goodfellow가 초기 학습 단계에는 충분한 gradient를 제공하지 못한다는 것을
 # 보여주었습니다.
 # 이것을 고치기 위해 우리는 대신에 :math:`log(D(G(z)))` 을 최대화 하려고 합니다.
-# 코드에서 우리는 다음과 같은것을 달성하고자 합니다.
+# 코드에서 우리는 다음과 같은 것을 달성하고자 합니다.
 # 파트1에서의 Generator의 결과값을 Discriminator을 이용해서 분류하고 
 # G의 손실을 * 진짜 라벨을 GT로 * 이용해서 계산하고, 
 # G의 gradient를 역전파로 계산하고 그리고
@@ -511,7 +511,7 @@ optimizerG = optim.Adam(netG.parameters(), lr=lr, betas=(beta1, 0.999))
 #
 # 마침내, 우리는 통계적인 보고와 각 에포크의 마지막에 우리는
 # 우리의 fixed_noise 배치를 generator를 통해 시각적으로 G의 학습 경과를 보기위해
-# 입력시킬수 있습니다.
+# 입력시킬 수 있습니다.
 # 학습 통계치 보고는 다음과 같습니다.
 # 
 # -  **Loss_D** - 모든 실제와 가짜 배치들 (:math:`log(D(x)) + log(D(G(z)))`) 의
@@ -692,4 +692,3 @@ plt.show()
 # -  음악을 생성해내는 GAN 확인해보기
 #    ` 음악 <https://deepmind.com/blog/wavenet-generative-model-raw-audio/>`__
 # 
-
