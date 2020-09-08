@@ -8,7 +8,7 @@
 
 Channels last에 대하여
 ------------------------
-Channels Last memory format 는 차원을 보존하는 메모리에서 NCHW 텐서를 정렬하는 대안책입니다. Channels Last tensors는 채널(Channel)이 가장 밀도가 높은 방식으로 정렬됩니다.
+Channels Last memory format 는 차원을 보존하는 메모리에서 NCHW 텐서를 정렬하는 대안책입니다. Channels Last tensors는 채널(Channel)이 가장 밀도가 높은 방식으로 정렬됩니다.(대표적으로 pixel단위의 이미지)
 
 예를 들어, 전형적인(연속적인) NCHW tensor의 저장소(이 경우 2개의 2x2 이미지에 3개의 채널이 존재함) 는 다음과 같이 보입니다:
 
@@ -20,7 +20,7 @@ Channels Last memory 형식은 데이터를 다르게 정렬합니다:
 .. figure:: /_static/img/channels_last_memory_format.png   
    :alt: channels_last_memory_format
 
-Pytorch는 존재하는 스트라이드(strides) 구조를 사용함으로써 메모리 형식을 지원합니다(그리고  eager, JIT, 그리고 TorchScrip를 포함한 기존의 모델들과 하위 호환성을 제공합니다). 
+Pytorch는 존재하는 스트라이드(strides) 구조를 사용함으로써 메모리 형식을 지원합니다(그리고  eager, JIT, 그리고 TorchScript를 포함한 기존의 모델들과 하위 호환성을 제공합니다). 
 예를들어, Channels Last 형식에서 10x3x16x16 배치(batch)는 (768, 1, 48, 3)와 같은 폭(strides)을 가지고 있을 것입니다. 
 
 """
@@ -203,7 +203,7 @@ input = input.to(memory_format=torch.channels_last) # Replace with your input # 
 output = model(input)
 
 #######################################################################
-# 그러나, 모든 연산자들이 Channels Last를 지원하도록 완전히 바뀐 것은 아닙니다(대신 보통 연속적인 출력을 반환합니다).
+# 그러나, 모든 연산자들이 Channels Last를 지원하도록 완전히 바뀐 것은 아닙니다(보통 연속적인 출력을 반환합니다).
 # 이것은 사용된 연산자들의 리스트를 지원되는 연산자 리스트에 https://github.com/pytorch/pytorch/wiki/Operators-with-Channels-Last-support 대해 확인하거나 혹은 메모리 형식 검사를 빠른 실행 모드로 도입해 모델을 실행시켜야 합니다.  
 # 
 # 아래 코드를 실행시킨 후, 만약 연산자들의 출력이 입력의 메모리 형식과 일치하지 않는다면 연산자들은 예외를 일으킬 것입니다. 
@@ -279,17 +279,17 @@ attribute(torch)
 
 ######################################################################
 # 만약 Channels Last tensors를 지원하지 않는 연산자를 찾는다면, 그리고 기여하기를 원한다면 
-# 다음 개발자 안내서를 따르면 됩니다. 
+# 다음 개발자 안내서를 자유롭게 사용하세요.
 # https://github.com/pytorch/pytorch/wiki/Writing-memory-format-aware-operators
 #
 
 ######################################################################
 # 해야할 일
 # ----------
-# 다음과 같이 많은 할 것들이 아직 남아있습니다:
+# 다음과 같이 여전히 해야 할 일이 많이 아직 남아있습니다:
 #
 # - N1HW와 NC11 Tensors의 모호성 해결하기;
-# - 분산 훈련을 지원하는 지 확인해보기;
+# - 분산 훈련을 지원하는지 확인해보기;
 # - 연산자 범위를 향상시키기
 #
 # 만약 향상을 위한 피드백이나 제안이 있다면 issue를 만들어 알려주십시오.
