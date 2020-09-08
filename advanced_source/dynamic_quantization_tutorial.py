@@ -1,26 +1,28 @@
 """
-(beta) Dynamic Quantization on an LSTM Word Language Model
+(베타) LSTM 언어 모델에서의 동적 양자화
 ==================================================================
 
 **Author**: `James Reed <https://github.com/jamesr66a>`_
 
 **Edited by**: `Seth Weidman <https://github.com/SethHWeidman/>`_
 
-Introduction
+**번역**: `박경림 <https://github.com/kypark7/>`_
+
+개요
 ------------
 
-Quantization involves converting the weights and activations of your model from float
-to int, which can result in smaller model size and faster inference with only a small
-hit to accuracy.
+양자화는 모델의 가중치와 활성화를 float에서 int로 변환하는 작업이 포함되며,
+이는 작은 적중률만으로 모델 크기를 줄이고 더 빠르게
+추론(inference)할 수 있습니다.
 
-In this tutorial, we'll apply the easiest form of quantization -
-`dynamic quantization <https://pytorch.org/docs/stable/quantization.html#torch.quantization.quantize_dynamic>`_ -
-to an LSTM-based next word-prediction model, closely following the
-`word language model <https://github.com/pytorch/examples/tree/master/word_language_model>`_
-from the PyTorch examples.
+이 튜토리얼에서는 PyTorch 예제의
+`word language 모델 <https://github.com/pytorch/examples/tree/master/word_language_model>`_ 을 따라
+LSTM 기반 next word-prediction 모델에 가장 쉬운 형태인 -
+`동적 양자화 <https://pytorch.org/docs/stable/quantization.html#torch.quantization.quantize_dynamic>`_ -
+를 적용합니다.
 """
 
-# imports
+# 불러오기
 import os
 from io import open
 import time
@@ -30,15 +32,15 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 ######################################################################
-# 1. Define the model
+# 1. 모델 정의하기
 # -------------------
 #
-# Here we define the LSTM model architecture, following the
-# `model <https://github.com/pytorch/examples/blob/master/word_language_model/model.py>`_
-# from the word language model example.
+# 여기서 우리는 word language 모델 예제의
+# `모델 <https://github.com/pytorch/examples/blob/master/word_language_model/model.py>`_
+# 을 따라 LSTM 모델 아키텍처를 정의합니다.
 
 class LSTMModel(nn.Module):
-    """Container module with an encoder, a recurrent module, and a decoder."""
+    """인코더, 반복 모듈 및 디코더가 있는 컨테이너 모듈."""
 
     def __init__(self, ntoken, ninp, nhid, nlayers, dropout=0.5):
         super(LSTMModel, self).__init__()
@@ -71,14 +73,14 @@ class LSTMModel(nn.Module):
                 weight.new_zeros(self.nlayers, bsz, self.nhid))
 
 ######################################################################
-# 2. Load in the text data
+# 2. 텍스트 데이터에 로드
 # ------------------------
 #
-# Next, we load the
-# `Wikitext-2 dataset <https://www.google.com/search?q=wikitext+2+data>`_ into a `Corpus`,
-# again following the
-# `preprocessing <https://github.com/pytorch/examples/blob/master/word_language_model/data.py>`_
-# from the word language model example.
+# 다음으로, word language 모델 예제의 
+# `전처리 <https://github.com/pytorch/examples/blob/master/word_language_model/data.py>`_
+# 에 따라
+# `Wikitext-2 데이터셋 <https://www.google.com/search?q=wikitext+2+data>`_
+# 을 `Corpus` 에 다시 로드합니다.
 
 class Dictionary(object):
     def __init__(self):
@@ -103,16 +105,16 @@ class Corpus(object):
         self.test = self.tokenize(os.path.join(path, 'test.txt'))
 
     def tokenize(self, path):
-        """Tokenizes a text file."""
+        """텍스트 파일 토큰화"""
         assert os.path.exists(path)
-        # Add words to the dictionary
+        # 사전에 단어 추가
         with open(path, 'r', encoding="utf8") as f:
             for line in f:
                 words = line.split() + ['<eos>']
                 for word in words:
                     self.dictionary.add_word(word)
 
-        # Tokenize file content
+        # 파일 콘텐츠 토근화
         with open(path, 'r', encoding="utf8") as f:
             idss = []
             for line in f:
@@ -130,14 +132,14 @@ model_data_filepath = 'data/'
 corpus = Corpus(model_data_filepath + 'wikitext-2')
 
 ######################################################################
-# 3. Load the pre-trained model
+# 3. 사전 훈련된 모델 불러오기
 # -----------------------------
 #
-# This is a tutorial on dynamic quantization, a quantization technique
-# that is applied after a model has been trained. Therefore, we'll simply load some
-# pre-trained weights into this model architecture; these weights were obtained
-# by training for five epochs using the default settings in the word language model
-# example.
+# 이 튜토리얼은 모델이 학습된 후 적용되는 양자화 기술인 동적 양자화에 대한 튜토리얼입니다.
+# 따라서 우리는 미리 학습된 가중치를 모델 아키텍처에 
+# 로드할 것 입니다; 이 가중치는 word language 모델 예제의 기본 설정을
+# 사용하여 5개의 epoch 동안 학습하여 얻은 것입니다.
+# 
 
 ntokens = len(corpus.dictionary)
 
@@ -159,9 +161,9 @@ model.eval()
 print(model)
 
 ######################################################################
-# Now let's generate some text to ensure that the pre-trained model is working
-# properly - similarly to before, we follow
-# `here <https://github.com/pytorch/examples/blob/master/word_language_model/generate.py>`_
+# 이제 사전 학습된 모델이 제대로 작동하는지 확인하기 위해 몇 가지 텍스트를
+# 생성하겠습니다 - 이전과 비슷하게, 우리는 
+# `여기 <https://github.com/pytorch/examples/blob/master/word_language_model/generate.py>`_ 를 따릅니다.
 
 input_ = torch.randint(ntokens, (1, 1), dtype=torch.long)
 hidden = model.init_hidden(1)
@@ -188,28 +190,28 @@ with open(model_data_filepath + 'out.txt', 'r') as outf:
     print(all_output)
 
 ######################################################################
-# It's no GPT-2, but it looks like the model has started to learn the structure of
-# language!
+# GPT-2는 아니지만 모델이 언어 구조를 배우기 시작한 것으로
+# 보여집니다!
 #
-# We're almost ready to demonstrate dynamic quantization. We just need to define a few more
-# helper functions:
+# 동적 양자화를 시연할 준비가 거의 끝났습니다. 몇 가지 helper 함수를 정의하기만
+# 하면 됩니다:
 
 bptt = 25
 criterion = nn.CrossEntropyLoss()
 eval_batch_size = 1
 
-# create test data set
+# 테스트 데이터셋 만들기
 def batchify(data, bsz):
-    # Work out how cleanly we can divide the dataset into bsz parts.
+    # 데이터셋을 bsz 부분으로 얼마나 깔끔하게 나눌 수 있는지 계산해봅니다.
     nbatch = data.size(0) // bsz
-    # Trim off any extra elements that wouldn't cleanly fit (remainders).
+    # 깔끔하게 맞지 않는 추가적인 부분(나머지들)을 잘라냅니다.
     data = data.narrow(0, 0, nbatch * bsz)
-    # Evenly divide the data across the bsz batches.
+    # 데이터에 대하여 bsz 배치들로 동등하게 나눕니다.
     return data.view(bsz, -1).t().contiguous()
 
 test_data = batchify(corpus.test, eval_batch_size)
 
-# Evaluation functions
+# 평가 기능
 def get_batch(source, i):
     seq_len = min(bptt, len(source) - 1 - i)
     data = source[i:i+seq_len]
@@ -217,7 +219,7 @@ def get_batch(source, i):
     return data, target
 
 def repackage_hidden(h):
-  """Wraps hidden states in new Tensors, to detach them from their history."""
+  """hidden states를 새 텐서로 래핑하여 기록에서 분리"""
 
   if isinstance(h, torch.Tensor):
       return h.detach()
@@ -225,7 +227,7 @@ def repackage_hidden(h):
       return tuple(repackage_hidden(v) for v in h)
 
 def evaluate(model_, data_source):
-    # Turn on evaluation mode which disables dropout.
+    # 드랍아웃을 비활성화하는 평가모드 키기
     model_.eval()
     total_loss = 0.
     hidden = model_.init_hidden(eval_batch_size)
@@ -239,15 +241,15 @@ def evaluate(model_, data_source):
     return total_loss / (len(data_source) - 1)
 
 ######################################################################
-# 4. Test dynamic quantization
+# 4. 동적 양자화 테스트
 # ----------------------------
 #
-# Finally, we can call ``torch.quantization.quantize_dynamic`` on the model!
-# Specifically,
+# 마지막으로 모델에서 ``torch.quantization.quantize_dynamic`` 을 호출 할 수 있습니다!
+# 구체적으로,
 #
-# - We specify that we want the ``nn.LSTM`` and ``nn.Linear`` modules in our
-#   model to be quantized
-# - We specify that we want weights to be converted to ``int8`` values
+# - 모델의 ``nn.LSTM`` 그리고 ``nn.Linear`` 모듈이 양자화되도록
+#   지정합니다.
+# - 가중치가 ``int8`` 값으로 변환하도록 지정합니다.
 
 import torch.quantization
 
@@ -257,8 +259,8 @@ quantized_model = torch.quantization.quantize_dynamic(
 print(quantized_model)
 
 ######################################################################
-# The model looks the same; how has this benefited us? First, we see a
-# significant reduction in model size:
+# 모델은 동일하게 보입니다; 이것이 어떤 이득을 주는 것일까요? 첫째, 모델 크기가
+# 상당히 줄어 듭니다:
 
 def print_size_of_model(model):
     torch.save(model.state_dict(), "temp.p")
@@ -269,10 +271,10 @@ print_size_of_model(model)
 print_size_of_model(quantized_model)
 
 ######################################################################
-# Second, we see faster inference time, with no difference in evaluation loss:
+# 둘째, evaluation loss의 차이없이 더 빠른 추론(inference) 시간을 볼 수 있습니다:
 #
-# Note: we number of threads to one for single threaded comparison, since quantized
-# models run single threaded.
+# Note: 양자화 된 모델은 단일 스레드로 실행되기 때문에 단일 스레드 비교를 위해
+# 스레드 수를 하나로 만듭니다.
 
 torch.set_num_threads(1)
 
@@ -286,14 +288,14 @@ time_model_evaluation(model, test_data)
 time_model_evaluation(quantized_model, test_data)
 
 ######################################################################
-# Running this locally on a MacBook Pro, without quantization, inference takes about 200 seconds,
-# and with quantization it takes just about 100 seconds.
+# MacBook Pro에서 로컬로 실행하는 경우, 양자화 없이는 추론(inference)에 약 200초가 걸리고 
+# 양자화를 사용하면 약 100초가 걸립니다.
 #
-# Conclusion
+# 결론
 # ----------
 #
-# Dynamic quantization can be an easy way to reduce model size while only
-# having a limited effect on accuracy.
+# 동적 양자화는 정확도에 제한적인 영향을 미치면서 모델 크기를 줄이는
+# 쉬운 방법이 될 수 있습니다.
 #
-# Thanks for reading! As always, we welcome any feedback, so please create an issue
-# `here <https://github.com/pytorch/pytorch/issues>`_ if you have any.
+# 읽어주셔서 감사합니다! 항상 그렇듯이, 우리는 피드백을 환영하므로 문제가 있으면
+# `여기 <https://github.com/pytorch/pytorch/issues>`_ 에 이슈를 만들어주세요.
