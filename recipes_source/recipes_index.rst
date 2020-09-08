@@ -140,8 +140,8 @@ Recipes are bite-sized bite-sized, actionable examples of how to use specific Py
 .. Production Development
 
 .. customcarditem::
-   :header: TorchScript for Deployment
-   :card_description: Learn how to export your trained model in TorchScript format and how to load your TorchScript model in C++ and do inference.
+   :header: TorchScript로 배포하기
+   :card_description: 학습된 모델을 TorchScript 형식으로 내보내는 방법과 TorchScript 모델을 C++로 불러오고 추론하는 방법에 대해 알아봅니다.
    :image: ../_static/img/thumbnails/cropped/torchscript_overview.png
    :link: ../recipes/torchscript_inference.html
    :tags: TorchScript
