@@ -68,7 +68,7 @@ PyTorch style transfer 모델 다운로드 (또는 학습시키기)
 
 
 직접 모델을 훈련시키기 원한다면 방금 클론한 저장소의 pytorch/examples 를 방문하면 어떻게 해야하는지에 대한 더 많은 정보가 있습니다.
-지금 부터 우리는 미리 훈련된 모델을 저장소가 제공해주는 스크립트를 이용해 다운받도록 하겠습니다.
+지금은 저장소에서 제공해주는 스크립트를 사용하여 미리 훈련된 모델을 다운로드하겠습니다:
 
 .. code-block:: bash
 
@@ -81,7 +81,7 @@ PyTorch style transfer 모델 다운로드 (또는 학습시키기)
 PyTorch 모델을 ONNX 모델로 변환하기
 -----------------------------------------
 
-이제 우리는 미리 훈련된 PyTorch 모델들을 ``.pth`` 파일로 ``saved_models`` 폴더에 가지고 있어서 나중에 저 모델들을 ONNX 형식으로 변환 할 수 있습니다.
+이제 우리는 미리 훈련된 PyTorch 모델들을  ``saved_models`` 폴더에 ``.pth`` 파일로 가지고 있어서 나중에 저 모델들을 ONNX 형식으로 변환 할 수 있습니다.
 모델 정의는 방금 전 클론 했던 저장소의 pytorch/examples 에 있으며 단 몇 줄의 파이썬 코드를 이용해서 ONNX 로 변환 할 수 있습니다.
 인공 신경망을 실제로 실행하는 대신 이러한 경우에는 우리는 ``torch.onnx._export``\ 를 호출하는데 이것은 PyTorch 가 제공하는 API 로 PyTorch 에서 직접적으로 ONNX 형식의 모델로 변환합니다.
 하지만 이번 경우에는 우리는 저것을 호출 안해도 되는데 그 이유는 저런 기능을 우리를 위해 대신해주는 스크립트가 ``neural_style/neural_style.py`` 에 있기 때문입니다.
@@ -109,7 +109,7 @@ PyTorch 에서 ONNX 형식으로 변환하는것은 결과적으로 당신의 �
    python ./neural_style/neural_style.py eval --content-image dummy.jpg --output-image dummy-out.jpg --model ./saved_models/mosaic.pth --cuda 0 --export_onnx ./saved_models/mosaic.onnx
 
 
-위의 과정을 거치면 4개의 파일 ``candy.onnx``\ , ``mosaic.onnx``\ , ``rain_princess.onnx`` 그리고 ``udnie.onnx``\,
+위의 과정을 거치면 4개의 파일 ``candy.onnx``\ , ``mosaic.onnx``\ , ``rain_princess.onnx`` 그리고 ``udnie.onnx``\ ,
 가 ``.pth`` 파일들에 각각 대응되어 생성되어있어야합니다.
 
 ONNX 모델을 CoreML 모델로 변환하기
