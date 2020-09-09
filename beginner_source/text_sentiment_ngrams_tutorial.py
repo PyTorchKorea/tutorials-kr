@@ -1,7 +1,7 @@
 """
 TorchText로 텍스트 분류하기
 ==================================
-	**번역**: `김강민 <https://github.com/gangsss>`_ , `김진현 <https://github.com/lewhe0>`_ 
+**번역**: `김강민 <https://github.com/gangsss>`_ , `김진현 <https://github.com/lewhe0>`_
 
 이 튜토리얼에서는 ``torchtext`` 에 포함되어 있는 텍스트 분류
 데이터셋의 사용 방법을 살펴 봅니다. 데이터셋은 다음을 포함합니다.
@@ -16,14 +16,12 @@ TorchText로 텍스트 분류하기
    - YahooAnswers,
    - AmazonReviewPolarity,
    - AmazonReviewFull
-이 포함되어 있습니다.
 
 이 예제에서는 ``TextClassification`` 의 데이터셋들 중 하나를 이용해 분류를 위한
  지도 학습 알고리즘을 훈련하는 방법을 보여줍니다.
 
 ngrams를 이용하여 데이터 불러오기
----------------------
-
+-----------------------------------
 
 Bag of ngrams 피쳐는 지역(local) 단어 순서에 대한 부분적인 정보를 포착하기 위해 적용합니다.
 실제 상황에서는 bi-gram이나 tri-gram은 단 하나의 단어를 이용하는 것보다 더 많은 이익을 주기 때문에 적용됩니다.
@@ -58,7 +56,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 # 모델 정의하기
 # -------------
 #
-# 우리의 모델은 
+# 우리의 모델은
 # `EmbeddingBag <https://pytorch.org/docs/stable/nn.html?highlight=embeddingbag#torch.nn.EmbeddingBag>`__
 # 레이어와 선형 레이어로 구성됩니다 (아래 그림 참고).
 # ``nn.EmbeddingBag``는 임베딩들로 구성된 '가방'의 평균을 계산합니다.
@@ -128,7 +126,7 @@ model = TextSentiment(VOCAB_SIZE, EMBED_DIM, NUN_CLASS).to(device)
 # 텍스트 원소의 길이가 다를 수 있으므로, 데이터 배치와 오프셋을 생성하기
 # 위한 사용자 함수 generate_batch()를 사용하려 합니다. 이 함수는
 # ``torch.utils.data.DataLoader`` 의 ``collate_fn`` 인자로 넘겨줍니다.
-# 
+#
 # ``collate_fn`` 의 입력은 그 크기가 batch_size인 텐서들의 리스트이며,
 # ``collate_fn`` 은 이들을 미니배치로 묶는 역할을 합니다. 여러분이
 # 주의해야 할 점은, ``collate_fn`` 를 선언할 때 최상위 레벨에서 정의해야
@@ -314,7 +312,7 @@ print(f'\tLoss: {test_loss:.4f}(test)\t|\tAcc: {test_acc * 100:.1f}%(test)')
 
 ######################################################################
 # 평가 데이터셋을 통한 결과를 확인합니다...
-=======
+
 #
 # ::
 #
