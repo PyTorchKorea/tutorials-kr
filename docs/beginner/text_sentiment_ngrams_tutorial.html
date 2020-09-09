@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>SyntaxError &mdash; PyTorch Tutorials 1.6.0 documentation</title>
+  <title>TorchText로 텍스트 분류하기 &mdash; PyTorch Tutorials 1.6.0 documentation</title>
   
 
   
@@ -157,7 +157,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/char_rnn_classification_tutorial.html">기초부터 시작하는 NLP: 문자-단위 RNN으로 이름 분류하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/char_rnn_generation_tutorial.html">기초부터 시작하는 NLP:  문자-단위 RNN으로 이름 생성하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/seq2seq_translation_tutorial.html">기초부터 시작하는 NLP: Sequence to Sequence 네트워크와 Attention을 이용한 번역</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">SyntaxError</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">TorchText로 텍스트 분류하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="torchtext_translation_tutorial.html">TorchText로 언어 번역하기</a></li>
 </ul>
 <p class="caption"><span class="caption-text">강화학습</span></p>
@@ -243,7 +243,7 @@
       </li>
 
         
-      <li>SyntaxError</li>
+      <li>TorchText로 텍스트 분류하기</li>
     
     
       <li class="pytorch-breadcrumbs-aside">
@@ -301,52 +301,38 @@
 <p class="admonition-title">Note</p>
 <p>Click <a class="reference internal" href="#sphx-glr-download-beginner-text-sentiment-ngrams-tutorial-py"><span class="std std-ref">here</span></a> to download the full example code</p>
 </div>
-<div class="sphx-glr-example-title section" id="syntaxerror">
-<span id="sphx-glr-beginner-text-sentiment-ngrams-tutorial-py"></span><h1>SyntaxError<a class="headerlink" href="#syntaxerror" title="Permalink to this headline">¶</a></h1>
-<p>Example script with invalid Python syntax</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">TorchText로 텍스트 분류하기</span>
-<span class="sd">==================================</span>
-<span class="sd">    **번역**: `김강민 &lt;https://github.com/gangsss&gt;`_ , `김진현 &lt;https://github.com/lewhe0&gt;`_</span>
-
-<span class="sd">이 튜토리얼에서는 ``torchtext`` 에 포함되어 있는 텍스트 분류</span>
-<span class="sd">데이터셋의 사용 방법을 살펴 봅니다. 데이터셋은 다음을 포함합니다.</span>
-
-<span class="sd">::</span>
-
-<span class="sd">   - AG_NEWS,</span>
-<span class="sd">   - SogouNews,</span>
-<span class="sd">   - DBpedia,</span>
-<span class="sd">   - YelpReviewPolarity,</span>
-<span class="sd">   - YelpReviewFull,</span>
-<span class="sd">   - YahooAnswers,</span>
-<span class="sd">   - AmazonReviewPolarity,</span>
-<span class="sd">   - AmazonReviewFull</span>
-<span class="sd">이 포함되어 있습니다.</span>
-
-<span class="sd">이 예제에서는 ``TextClassification`` 의 데이터셋들 중 하나를 이용해 분류를 위한</span>
-<span class="sd"> 지도 학습 알고리즘을 훈련하는 방법을 보여줍니다.</span>
-
-<span class="sd">ngrams를 이용하여 데이터 불러오기</span>
-<span class="sd">---------------------</span>
-
-
-<span class="sd">Bag of ngrams 피쳐는 지역(local) 단어 순서에 대한 부분적인 정보를 포착하기 위해 적용합니다.</span>
-<span class="sd">실제 상황에서는 bi-gram이나 tri-gram은 단 하나의 단어를 이용하는 것보다 더 많은 이익을 주기 때문에 적용됩니다.</span>
-<span class="sd">예를 들면 다음과 같습니다.</span>
-
-<span class="sd">::</span>
-
-<span class="sd">   &quot;load data with ngrams&quot;</span>
-<span class="sd">   Bi-grams 결과: &quot;load data&quot;, &quot;data with&quot;, &quot;with ngrams&quot;</span>
-<span class="sd">   Tri-grams 결과: &quot;load data with&quot;, &quot;data with ngrams&quot;</span>
-
-<span class="sd">``TextClassification`` 데이터셋은 ngrams method을 지원합니다. ngrams을 2로 설정하면,</span>
-<span class="sd">데이터셋 안의 예제 텍스트는 각각의(single) 단어들에 bi-grams 문자열이 더해진 리스트가 될 것입니다.</span>
-
-<span class="sd">&quot;&quot;&quot;</span>
-
-<span class="kn">import</span> <span class="nn">torch</span>
+<div class="sphx-glr-example-title section" id="torchtext">
+<span id="sphx-glr-beginner-text-sentiment-ngrams-tutorial-py"></span><h1>TorchText로 텍스트 분류하기<a class="headerlink" href="#torchtext" title="Permalink to this headline">¶</a></h1>
+<p><strong>번역</strong>: <a class="reference external" href="https://github.com/gangsss">김강민</a> , <a class="reference external" href="https://github.com/lewhe0">김진현</a></p>
+<p>이 튜토리얼에서는 <code class="docutils literal notranslate"><span class="pre">torchtext</span></code> 에 포함되어 있는 텍스트 분류
+데이터셋의 사용 방법을 살펴 봅니다. 데이터셋은 다음을 포함합니다.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">-</span> <span class="n">AG_NEWS</span><span class="p">,</span>
+<span class="o">-</span> <span class="n">SogouNews</span><span class="p">,</span>
+<span class="o">-</span> <span class="n">DBpedia</span><span class="p">,</span>
+<span class="o">-</span> <span class="n">YelpReviewPolarity</span><span class="p">,</span>
+<span class="o">-</span> <span class="n">YelpReviewFull</span><span class="p">,</span>
+<span class="o">-</span> <span class="n">YahooAnswers</span><span class="p">,</span>
+<span class="o">-</span> <span class="n">AmazonReviewPolarity</span><span class="p">,</span>
+<span class="o">-</span> <span class="n">AmazonReviewFull</span>
+</pre></div>
+</div>
+<dl class="simple">
+<dt>이 예제에서는 <code class="docutils literal notranslate"><span class="pre">TextClassification</span></code> 의 데이터셋들 중 하나를 이용해 분류를 위한</dt><dd><p>지도 학습 알고리즘을 훈련하는 방법을 보여줍니다.</p>
+</dd>
+</dl>
+<div class="section" id="ngrams">
+<h2>ngrams를 이용하여 데이터 불러오기<a class="headerlink" href="#ngrams" title="Permalink to this headline">¶</a></h2>
+<p>Bag of ngrams 피쳐는 지역(local) 단어 순서에 대한 부분적인 정보를 포착하기 위해 적용합니다.
+실제 상황에서는 bi-gram이나 tri-gram은 단 하나의 단어를 이용하는 것보다 더 많은 이익을 주기 때문에 적용됩니다.
+예를 들면 다음과 같습니다.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;load data with ngrams&quot;</span>
+<span class="n">Bi</span><span class="o">-</span><span class="n">grams</span> <span class="n">결과</span><span class="p">:</span> <span class="s2">&quot;load data&quot;</span><span class="p">,</span> <span class="s2">&quot;data with&quot;</span><span class="p">,</span> <span class="s2">&quot;with ngrams&quot;</span>
+<span class="n">Tri</span><span class="o">-</span><span class="n">grams</span> <span class="n">결과</span><span class="p">:</span> <span class="s2">&quot;load data with&quot;</span><span class="p">,</span> <span class="s2">&quot;data with ngrams&quot;</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">TextClassification</span></code> 데이터셋은 ngrams method을 지원합니다. ngrams을 2로 설정하면,
+데이터셋 안의 예제 텍스트는 각각의(single) 단어들에 bi-grams 문자열이 더해진 리스트가 될 것입니다.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torchtext</span>
 <span class="kn">from</span> <span class="nn">torchtext.datasets</span> <span class="k">import</span> <span class="n">text_classification</span>
 <span class="n">NGRAMS</span> <span class="o">=</span> <span class="mi">2</span>
@@ -359,8 +345,9 @@
 <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="section" id="id1">
-<h2>모델 정의하기<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="id3">
+<h2>모델 정의하기<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
 <p>우리의 모델은
 <a class="reference external" href="https://pytorch.org/docs/stable/nn.html?highlight=embeddingbag#torch.nn.EmbeddingBag">EmbeddingBag</a>
 레이어와 선형 레이어로 구성됩니다 (아래 그림 참고).
@@ -393,8 +380,8 @@
 </pre></div>
 </div>
 </div>
-<div class="section" id="id2">
-<h2>인스턴스 생성하기<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id4">
+<h2>인스턴스 생성하기<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
 <p>AG_NEWS 데이터셋에는 4 종류의 레이블이 달려 있으며, 따라서 클래스의 개수도 4개 입니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">1</span> <span class="p">:</span> <span class="n">World</span> <span class="p">(</span><span class="n">세계</span><span class="p">)</span>
 <span class="mi">2</span> <span class="p">:</span> <span class="n">Sports</span> <span class="p">(</span><span class="n">스포츠</span><span class="p">)</span>
@@ -412,8 +399,8 @@
 </pre></div>
 </div>
 </div>
-<div class="section" id="id3">
-<h2>배치 생성을 위한 함수들<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id5">
+<h2>배치 생성을 위한 함수들<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h2>
 <p>텍스트 원소의 길이가 다를 수 있으므로, 데이터 배치와 오프셋을 생성하기
 위한 사용자 함수 generate_batch()를 사용하려 합니다. 이 함수는
 <code class="docutils literal notranslate"><span class="pre">torch.utils.data.DataLoader</span></code> 의 <code class="docutils literal notranslate"><span class="pre">collate_fn</span></code> 인자로 넘겨줍니다.</p>
@@ -440,8 +427,8 @@
 </pre></div>
 </div>
 </div>
-<div class="section" id="id4">
-<h2>모델을 학습하고 결과를 평가하는 함수 정의하기<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id6">
+<h2>모델을 학습하고 결과를 평가하는 함수 정의하기<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h2>
 <p>PyTorch 사용자라면
 <a class="reference external" href="https://pytorch.org/docs/stable/data.html?highlight=dataloader#torch.utils.data.DataLoader">torch.utils.data.DataLoader</a>
 를 활용하는 것을 추천합니다. 또한 이를 사용하면 데이터를 쉽게 병렬적으로
@@ -489,8 +476,8 @@ AG_NEWS 데이터셋을 읽어오고, 이를 모델로 넘겨 학습과 검증�
 </pre></div>
 </div>
 </div>
-<div class="section" id="id5">
-<h2>데이터셋을 분할하고 모델 수행하기<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id7">
+<h2>데이터셋을 분할하고 모델 수행하기<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h2>
 <p>원본 AG_NEWS에는 검증용 데이터가 포함되어 있지 않기 때문에, 우리는 학습
 데이터를 학습 및 검증 데이터로 분할하려 합니다. 이때 데이터를 분할하는
 비율은 0.95(학습)와 0.05(검증) 입니다. 우리는 여기서 PyTorch의
@@ -560,16 +547,15 @@ optimizer는 확률적 경사 하강법를 구현해놓은 것입니다. 처음�
 </pre></div>
 </div>
 </div>
-<div class="section" id="id6">
-<h2>평가 데이터로 모델 평가하기<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id8">
+<h2>평가 데이터로 모델 평가하기<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Checking the results of test dataset...&#39;</span><span class="p">)</span>
 <span class="n">test_loss</span><span class="p">,</span> <span class="n">test_acc</span> <span class="o">=</span> <span class="n">test</span><span class="p">(</span><span class="n">test_dataset</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">Loss: </span><span class="si">{test_loss:.4f}</span><span class="s1">(test)</span><span class="se">\t</span><span class="s1">|</span><span class="se">\t</span><span class="s1">Acc: {test_acc * 100:.1f}%(test)&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>평가 데이터셋을 통한 결과를 확인합니다…</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">=======</span>
-<span class="c1">#</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#</span>
 <span class="c1"># ::</span>
 <span class="c1">#</span>
 <span class="c1">#        Loss: 0.0237(test)      |       Acc: 90.5%(test)</span>
@@ -577,8 +563,8 @@ optimizer는 확률적 경사 하강법를 구현해놓은 것입니다. 처음�
 </pre></div>
 </div>
 </div>
-<div class="section" id="id7">
-<h2>임의의 뉴스로 평가하기<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id9">
+<h2>임의의 뉴스로 평가하기<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h2>
 <p>현재까지 구한 최고의 모델로 골프 뉴스를 테스트해보려 합니다. 레이블에
 대한 정보는
 <a class="reference external" href="https://pytorch.org/text/datasets.html?highlight=ag_news#torchtext.datasets.AG_NEWS">여기에</a>
@@ -685,14 +671,15 @@ optimizer는 확률적 경사 하강법를 구현해놓은 것입니다. 처음�
           <div class="pytorch-right-menu" id="pytorch-right-menu">
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
-<li><a class="reference internal" href="#">SyntaxError</a><ul>
-<li><a class="reference internal" href="#id1">모델 정의하기</a></li>
-<li><a class="reference internal" href="#id2">인스턴스 생성하기</a></li>
-<li><a class="reference internal" href="#id3">배치 생성을 위한 함수들</a></li>
-<li><a class="reference internal" href="#id4">모델을 학습하고 결과를 평가하는 함수 정의하기</a></li>
-<li><a class="reference internal" href="#id5">데이터셋을 분할하고 모델 수행하기</a></li>
-<li><a class="reference internal" href="#id6">평가 데이터로 모델 평가하기</a></li>
-<li><a class="reference internal" href="#id7">임의의 뉴스로 평가하기</a></li>
+<li><a class="reference internal" href="#">TorchText로 텍스트 분류하기</a><ul>
+<li><a class="reference internal" href="#ngrams">ngrams를 이용하여 데이터 불러오기</a></li>
+<li><a class="reference internal" href="#id3">모델 정의하기</a></li>
+<li><a class="reference internal" href="#id4">인스턴스 생성하기</a></li>
+<li><a class="reference internal" href="#id5">배치 생성을 위한 함수들</a></li>
+<li><a class="reference internal" href="#id6">모델을 학습하고 결과를 평가하는 함수 정의하기</a></li>
+<li><a class="reference internal" href="#id7">데이터셋을 분할하고 모델 수행하기</a></li>
+<li><a class="reference internal" href="#id8">평가 데이터로 모델 평가하기</a></li>
+<li><a class="reference internal" href="#id9">임의의 뉴스로 평가하기</a></li>
 </ul>
 </li>
 </ul>
