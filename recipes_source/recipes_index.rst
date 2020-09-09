@@ -33,11 +33,9 @@ Recipes are bite-sized bite-sized, actionable examples of how to use specific Py
 .. customcarditem::
    :header: PyTorch에서 데이터 불러오기
    :card_description: PyTorch 패키지를 이용해서 공용 데이터셋을 불러오고 모델에 적용하는 방법을 알아봅니다.
-Learn how to use PyTorch packages to prepare and load common datasets for your model.
    :image: ../_static/img/thumbnails/cropped/loading-data.PNG
    :link: ../recipes/recipes/loading_data_recipe.html
    :tags: Basics
-
 
 .. customcarditem::
    :header: 신경망 정의하기
@@ -59,7 +57,6 @@ Learn how to use PyTorch packages to prepare and load common datasets for your m
    :image: ../_static/img/thumbnails/cropped/saving-and-loading-models-for-inference.PNG
    :link: ../recipes/recipes/saving_and_loading_models_for_inference.html
    :tags: Basics
-
 
 .. customcarditem::
    :header: PyTorch에서 일반적인 체크포인트(checkpoint) 저장하기 & 불러오기
