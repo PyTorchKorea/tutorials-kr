@@ -298,7 +298,7 @@ def get_style_model_and_losses(cnn, normalization_mean, normalization_std,
     # 순차적으로 활성화되어야 하는 모듈에 새로운 nn.Sequential을 만듭니다.
     model = nn.Sequential(normalization)
 
-    i = 0  # conv를 볼때마다 증가
+    i = 0  # conv를 볼 때마다 증가
     for layer in cnn.children():
         if isinstance(layer, nn.Conv2d):
             i += 1
