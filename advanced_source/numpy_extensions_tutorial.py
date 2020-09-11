@@ -55,7 +55,7 @@ def incorrect_fft(input):
     return BadFFTFunction.apply(input)
 
 ###############################################################
-# ** 생성 된 레이어의 사용 예시 : **
+# **생성된 레이어의 사용 예시:**
 
 input = torch.randn(8, 8, requires_grad=True)
 result = incorrect_fft(input)
