@@ -174,7 +174,7 @@ class ContentLoss(nn.Module):
 # .. Note::
 #    **중요 세부 사항**: 모듈의 이름은 ``ContentLoss`` 지만, 실제 PyTorch의 손실 함수는 아닙니다.
 #    만약 Content 손실을 PyTorch의 손실 함수로 정의하려면 Pytorch의 autograd 함수를 생성하여
-#    ``backward`` 메소드에서 수동으로 기울기를 다시 계산 / 구현 해야합니다.
+#    ``backward`` 메소드에서 수동으로 기울기를 다시 계산 및 구현 해야합니다.
 
 ######################################################################
 # 스타일 손실(Style Loss)
