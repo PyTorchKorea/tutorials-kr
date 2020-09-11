@@ -13,7 +13,6 @@
 
 양자화는 모델의 가중치와 활성화를 float에서 int로 변환하는 작업이 포함되며,
 이는 작은 적중률만으로 모델 크기를 줄이고 더 빠르게
-추론(inference)할 수 있습니다.
 
 이 튜토리얼에서는 PyTorch 예제의
 `word language 모델 <https://github.com/pytorch/examples/tree/master/word_language_model>`_ 을 따라
