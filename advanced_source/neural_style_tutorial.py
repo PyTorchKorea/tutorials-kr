@@ -236,7 +236,7 @@ class StyleLoss(nn.Module):
 # PyTorch의 VGG 구현은 ``features`` (합성곱 및 풀링 계층 포함) 와
 # ``classifier`` (완전 연결 계층 포함) 두 가지 하위 ``Sequential`` 모듈로 구분 된 모듈입니다.
 # Content 및 Style 손실을 측정하기 위해서 각 합성곱 계층의 출력이 필요하기 때문에 ``features`` 모듈을 사용할 것입니다.
-# 일부 계층은 훈련하는 중 평가와 다른 동작을 하기 때문에, 네트워크를 ``.eval()`` 를 사용해 평가 모드로 설정해야합니다.
+# 일부 계층은 훈련하는 중 평가와 다른 동작을 하므로, 네트워크를 ``.eval()`` 를 사용해 평가 모드로 설정해야합니다.
 #
 
 cnn = models.vgg19(pretrained=True).features.to(device).eval()
