@@ -36,7 +36,7 @@ PyTorch를 사용하여 뉴럴 변환(Neural Transfer)
 # -----------------------------------------
 # 다음은 뉴럴 변환(neural transfer)을 구현하는데 필요한 패키지 목록입니다.
 #
-# -  ``torch``, ``torch.nn``, ``numpy`` (PyTorch로 신경망을 구현하기위한 필수 패키지)
+# -  ``torch``, ``torch.nn``, ``numpy`` (PyTorch로 신경망을 구현하기 위한 필수 패키지)
 # -  ``torch.optim`` (효율적인 경사 하강법)
 # -  ``PIL``, ``PIL.Image``, ``matplotlib.pyplot`` (이미지 불러오기 및 이미지 표시)
 # -  ``torchvision.transforms`` (PIL 이미지를 텐서로 변환)
