@@ -295,7 +295,7 @@ def get_style_model_and_losses(cnn, normalization_mean, normalization_std,
     style_losses = []
 
     # cnn이 nn.Sequential이라고 가정하고,
-    # 순차적으로 활성화되어야하는 모듈에 새로운 nn.Sequential을 만듭니다.
+    # 순차적으로 활성화되어야 하는 모듈에 새로운 nn.Sequential을 만듭니다.
     model = nn.Sequential(normalization)
 
     i = 0  # conv를 볼때마다 증가
