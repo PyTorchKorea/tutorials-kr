@@ -150,7 +150,7 @@ imshow(content_img, title='Content Image')
 # 거리 :math:`\|F_{XL} - F_{CL}\|^2` 는 두개의 특징 맵 집합의 평균 제곱 오차이며 ``nn.MSELoss`` 를 사용하여 계산할 수 있습니다.
 #
 # Content 거리를 계산하기 위해 사용되는 합성곱 계층 바로 뒤에 Content 손실 모듈을 추가합니다.
-# 이렇게하면 입력이미지가 입력될 때마다 Content 손실이 원하는 레이어에서
+# 이렇게 하면 입력 이미지가 입력될 때마다 Content 손실이 원하는 레이어에서
 # 계산되고 autograd 을 통해 모든 기울기가 계산됩니다.
 # 이제 Content 손실 계층을 만들기 위해 Content 손실을 계산한 다음 계층의 입력을 반환하는
 # ``forward`` 메소드를 정의해야합니다.
