@@ -259,7 +259,7 @@ class Normalization(nn.Module):
         super(Normalization, self).__init__()
         # .view 는 mean과 std을 확인해 [B x C x H x W] 형태의
         # 이미지 텐서를 직접적으로 작업할 수 있도록 [C x 1 x 1] 형태로 만듭니다.
-        # B는 배치 크기입니다. C는 채널의 수 입니다. H는 높이고 W는 너비입니다.
+        # B는 배치 크기입니다. C는 채널의 수입니다. H는 높이고 W는 너비입니다.
         self.mean = torch.tensor(mean).view(-1, 1, 1)
         self.std = torch.tensor(std).view(-1, 1, 1)
 
