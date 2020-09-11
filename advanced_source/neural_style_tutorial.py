@@ -15,7 +15,7 @@ PyTorch를 사용하여 뉴럴 변환(Neural Transfer)
 이번 튜토리얼은 Leon A. Gatys, Alexander S. Ecker and Matthias Bethge에 의해 개발 된
 `뉴럴 스타일(Neural-Style) 알고리즘 <https://arxiv.org/abs/1508.06576>`__ 을 구현하는 방법에 대하여 설명합니다.
 뉴럴 스타일(Neural-Style), 또는 뉴럴 변환(Neural-Transfer)을 사용하면 이미지를 새로운 예술적 스타일로 재현할 수 있습니다.
-알고리즘은 입력 이미지, Content 이미지, Style 이미지 3개의 이미지를 가져와서 Content 이미지의 Content와 Style 이미지의 예술적 Style을 닮도록 입력을 변환합니다.
+이 알고리즘은 입력 이미지, Content 이미지, Style 이미지 3개의 이미지를 가져와서 Content 이미지의 Content와 Style 이미지의 예술적 Style을 닮도록 입력을 변환합니다.
 
 .. figure:: /_static/img/neural-style/neuralstyle.png
    :alt: content1
