@@ -40,7 +40,7 @@ PyTorch를 사용하여 뉴럴 변환(Neural Transfer)
 # -  ``torch.optim`` (효율적인 경사 하강법)
 # -  ``PIL``, ``PIL.Image``, ``matplotlib.pyplot`` (이미지 불러오기 및 이미지 표시)
 # -  ``torchvision.transforms`` (PIL 이미지를 텐서로 변환)
-# -  ``torchvision.models`` (미리 학습 된 모델 불러오기 및 학습)
+# -  ``torchvision.models`` (미리 학습된 모델 불러오기 및 학습)
 # -  ``copy`` (모델을 복사; 시스템 패키지)
 
 from __future__ import print_function
