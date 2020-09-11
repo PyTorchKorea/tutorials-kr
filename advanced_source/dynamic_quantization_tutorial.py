@@ -226,7 +226,7 @@ def repackage_hidden(h):
       return tuple(repackage_hidden(v) for v in h)
 
 def evaluate(model_, data_source):
-    # 드랍아웃을 비활성화하는 평가모드 키기
+    # 드랍아웃을 비활성화하는 평가모드 켜기
     model_.eval()
     total_loss = 0.
     hidden = model_.init_hidden(eval_batch_size)
