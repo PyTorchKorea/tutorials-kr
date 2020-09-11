@@ -28,7 +28,7 @@ PyTorch를 사용하여 뉴럴 변환(Neural Transfer)
 # 원리는 간단합니다.
 # Content(:math:`D_C`)와 Style(:math:`D_S`)에 대해 하나씩 두 개의 거리를 정의합니다. 
 # :math:`D_C` 는 두 이미지 간의 Content의 차이를 측정하고 :math:`D_S` 는 두 이미지 간의 Style의 차이를 측정합니다.
-# 그런 다음, 세 번째 이미지인 입력을 가져와서
+# 그런 다음, 입력으로 사용되는 세 번째 이미지를 가져와서
 # Content 이미지로 Content 거리와 Style 이미지로 Style 거리를 최소화하도록 변환합니다.
 # 이제 필요한 패키지를 가져와서 뉴럴 변환(neural transfer)을 시작할 수 있습니다.
 #
