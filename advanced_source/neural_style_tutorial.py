@@ -346,7 +346,7 @@ def get_style_model_and_losses(cnn, normalization_mean, normalization_std,
 #
 
 input_img = content_img.clone()
-# 만약 백색 잡음(white noise)을 사용하려면 아래 주석을 제거하세요
+# 만약 화이트 노이즈(white noise)을 사용하려면 아래 주석을 제거하세요
 # input_img = torch.randn(content_img.data.size(), device=device)
 
 # 그림에 원본 입력 이미지를 추가합니다.
