@@ -113,7 +113,7 @@ class Corpus(object):
                 for word in words:
                     self.dictionary.add_word(word)
 
-        # 파일 콘텐츠 토근화
+        # 파일 내용 토큰화
         with open(path, 'r', encoding="utf8") as f:
             idss = []
             for line in f:
