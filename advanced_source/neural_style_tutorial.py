@@ -274,7 +274,7 @@ class Normalization(nn.Module):
 # 시퀀스(Conv2d, ReLU, MaxPool2d, Conv2d, ReLU…)가 포함되어 있습니다.
 # Content 손실과 Style 손실 계층을 감지하는 합성곱 계층 바로 뒤에 추가해야합니다.
 # 이렇게 하기 위해서는 Content 손실과 Style 손실 모듈이
-# 올바르게 삽입 된 새로운 ``Sequential`` 모듈을 만들어야 합니다.
+# 올바르게 삽입된 새로운 ``Sequential`` 모듈을 만들어야 합니다.
 #
 
 # Style / Content 손실 계산을 원하는 계층
