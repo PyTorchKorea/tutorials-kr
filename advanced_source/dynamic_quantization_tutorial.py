@@ -16,7 +16,7 @@
 
 이 튜토리얼에서는 PyTorch 예제의
 `word language 모델 <https://github.com/pytorch/examples/tree/master/word_language_model>`_ 을 따라
-LSTM 기반 next word-prediction 모델에 가장 쉬운 형태인 -
+LSTM 기반 next word-prediction 모델의 가장 쉬운 형태인 -
 `동적 양자화 <https://pytorch.org/docs/stable/quantization.html#torch.quantization.quantize_dynamic>`_ -
 를 적용합니다.
 """
