@@ -89,7 +89,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 #     두 ``images`` 를 다운로드하고 현재 작업 폴더로 이름이 지정된 곳에 추가하세요.
 
 # 원하는 출력 이미지의 크기
-imsize = 512 if torch.cuda.is_available() else 128  # 만약 GPU를 사용하지 않는다면 작은 크기
+imsize = 512 if torch.cuda.is_available() else 128  # 만약 GPU가 없을 경우 작은 크기를 사용
 
 loader = transforms.Compose([
     transforms.Resize(imsize),  # 가져온 이미지 크기 조정
