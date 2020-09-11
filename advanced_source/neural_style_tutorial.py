@@ -380,7 +380,7 @@ def get_input_optimizer(input_img):
 #
 # 여전히 해결해야 할 마지막 제약이 있습니다.
 # 네트워크가 이미지에 대해 0 ~ 1 텐서 범위를 초과하는 값으로 최적화하려 할 수 있습니다.
-# 네트워크가 실행될 때마다 입력 값을 0에서 1사이로 수정하여 문제를 해결할 수 있습니다.
+# 네트워크가 실행될 때마다 입력값을 0에서 1사이로 수정하여 문제를 해결할 수 있습니다.
 #
 
 def run_style_transfer(cnn, normalization_mean, normalization_std,
