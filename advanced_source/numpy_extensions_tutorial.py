@@ -126,7 +126,7 @@ output.backward(torch.randn(8, 8))
 print("Gradient for the input map: ", input.grad)
 
 ###############################################################
-# **기울기 :**
+# **기울기 확인:**
 
 from torch.autograd.gradcheck import gradcheck
 
