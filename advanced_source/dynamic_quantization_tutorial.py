@@ -258,7 +258,7 @@ quantized_model = torch.quantization.quantize_dynamic(
 print(quantized_model)
 
 ######################################################################
-# 모델은 동일하게 보입니다. 이것이 어떤 이득을 주는 것일까요? 첫째, 모델 크기가
+# 모델은 동일하게 보입니다. 이것이 어떻게 이득을 주는 것일까요? 첫째, 모델 크기가
 # 상당히 줄어 듭니다:
 
 def print_size_of_model(model):
