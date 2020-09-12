@@ -54,7 +54,7 @@ class Net(nn.Module):
         self.fc3 = nn.Linear(84, 10)
 
     def forward(self, x):
-        # (2, 2) 크기 윈도우에 대해 맥스 풀링(Max pooling)
+        # (2, 2) 크기 윈도우에 대해 맥스 풀링(max pooling)
         x = F.max_pool2d(F.relu(self.conv1(x)), (2, 2))
         # 크기가 제곱수라면 하나의 숫자만을 특정
         x = F.max_pool2d(F.relu(self.conv2(x)), 2)
