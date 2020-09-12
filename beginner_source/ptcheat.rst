@@ -222,7 +222,7 @@ nn.X                                  # X에는 ReLU, ReLU6, ELU, SELU, PReLU, L
                                       # Threshold, HardTanh, Sigmoid, Tanh,
                                       # LogSigmoid, Softplus, SoftShrink,
                                       # Softsign, TanhShrink, Softmin, Softmax,
-                                      # Softmax2d 또는 LogSoftmax가 있다.
+                                      # Softmax2d 또는 LogSoftmax가 있음
 
 ```
 
