@@ -201,7 +201,7 @@ eval_batch_size = 1
 
 # 테스트 데이터셋 만들기
 def batchify(data, bsz):
-    # 데이터셋을 bsz 부분으로 얼마나 깔끔하게 나눌 수 있는지 계산해봅니다.
+    # 데이터셋을 bsz 부분으로 얼마나 깔끔하게 나눌 수 있는지 계산합니다.
     nbatch = data.size(0) // bsz
     # 깔끔하게 맞지 않는 추가적인 부분(나머지들)을 잘라냅니다.
     data = data.narrow(0, 0, nbatch * bsz)
