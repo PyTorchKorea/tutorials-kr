@@ -23,7 +23,7 @@ import torch.autograd as autograd         # 계산 그래프
 from torch import Tensor                  # 계산 그래프 안에서 텐서 노드
 import torch.nn as nn                     # 신경망(neural networks)
 import torch.nn.functional as F           # 계층, 활성화 함수 그 외의 것
-import torch.optim as optim               # 옵티마이저와  gradient descent, ADAM, etc.
+import torch.optim as optim               # 옵티마이저 (경사 하강법, ADAM, etc.)
 from torch.jit import script, trace       # 하이브리드 프론트엔드 데코레이터 tracing jit
 
 ```
