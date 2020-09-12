@@ -278,7 +278,7 @@ Concat Dataset             # 데이터셋을 연결시켜주는 클래스
 .. code-block:: python
 
 ```
-DataLoader(dataset, batch_size=1, ...)      # 개별 데이터 지점들의 구조에 관계없이 데이터 배치를 불러온다
+DataLoader(dataset, batch_size=1, ...)      # 개별 데이터 지점들의 구조에 관계없이 데이터 배치를 불러옴
 
 sampler.Sampler(dataset,...)                # 데이터셋에서 샘플링하는 방법을 다루는 추상 클래스
 
