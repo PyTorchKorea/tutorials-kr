@@ -61,7 +61,7 @@ model = onnx.load("alexnet.proto")                     # ONNX 모델 불러오�
 onnx.checker.check_model(model)                        # 모델 IR이 잘 형성되었는지 확인
                                                        
 
-onnx.helper.printable_graph(model.graph)               # 읽을 수 있는 그래프 표현을 print
+onnx.helper.printable_graph(model.graph)               # 읽을 수 있는 그래프 표현을 출력
 
 ```
 
