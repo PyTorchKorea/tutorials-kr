@@ -237,7 +237,7 @@ opt = optim.x(model.parameters(), ...)      # 옵티마이저 생성
 opt.step()                                  # 가중치(weights) 업데이트
 optim.X                                     # X에는 SGD, Adadelta, Adagrad, Adam,
                                             # SparseAdam, Adamax, ASGD,
-                                            # LBFGS, RMSProp 또는 Rprop가 있다.
+                                            # LBFGS, RMSProp 또는 Rprop가 있음
 
 ```
 
