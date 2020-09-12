@@ -283,7 +283,7 @@ DataLoader(dataset, batch_size=1, ...)      # 개별 데이터 지점들의 구�
 sampler.Sampler(dataset,...)                # 데이터셋에서 샘플링하는 방법을 다루는 추상 클래스
 
 sampler.XSampler where ...                  # X에는 Sequential, Random, Subset,
-                                            # WeightedRandom 또는 Distributed가 있다
+                                            # WeightedRandom 또는 Distributed가 존재
 
 ```
 
