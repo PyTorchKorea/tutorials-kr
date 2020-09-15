@@ -134,8 +134,8 @@ writer.close()
 # :: 
 # 
 #   $ tensorboard dev upload --logdir runs \
-#   --name "My latest experiment" \ # optional
-#   --description "Simple comparison of several hyperparameters" # optional
+#   --name "My latest experiment" \ # 선택 사항
+#   --description "Simple comparison of several hyperparameters" # 선택 사항
 # 
 # 도움이 필요하면 ``$ tensorboard dev --help`` 를 실행하세요.
 #
