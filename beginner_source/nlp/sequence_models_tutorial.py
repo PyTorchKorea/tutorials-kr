@@ -1,37 +1,35 @@
 # -*- coding: utf-8 -*-
 r"""
-Sequence Models and Long-Short Term Memory Networks
+시퀀스 모델과 LSTM(Long-Short Teram Memory)
 ===================================================
 
-At this point, we have seen various feed-forward networks. That is,
-there is no state maintained by the network at all. This might not be
-the behavior we want. Sequence models are central to NLP: they are
-models where there is some sort of dependence through time between your
-inputs. The classical example of a sequence model is the Hidden Markov
-Model for part-of-speech tagging. Another example is the conditional
-random field.
+**저자**: `Robert Guthrie`
+**번역**: `정신유 <https://github.com/SSinyu>`
 
-A recurrent neural network is a network that maintains some kind of
-state. For example, its output could be used as part of the next input,
-so that information can propogate along as the network passes over the
-sequence. In the case of an LSTM, for each element in the sequence,
-there is a corresponding *hidden state* :math:`h_t`, which in principle
-can contain information from arbitrary points earlier in the sequence.
-We can use the hidden state to predict words in a language model,
-part-of-speech tags, and a myriad of other things.
+지금까지 다양한 피드 포워드(feed-forward) 네트워크에 대해 알아 보았습니다.
+이러한 네트워크는 유지되는 상태(state)가 전혀 없으며, 이는 우리가 원하는 것이
+아닐 수 있습니다. 시퀀스 모델은 자연어 처리(NLP)의 핵심이며, 이러한 모델은
+입력 데이터들 사이에 시간적인 의존성이 있는 모델입니다. 시퀀스 모델의 예로는 
+품사(part-of-speech) 태깅에 사용되는 Hidden Markove Model 및 Conditional 
+random field가 있습니다.
+
+RNN(Recurrent Neural Network)은 어떠한 상태(state)를 유지하는 네트워크 
+입니다. 예를 들면, RNN의 출력은 다음 입력의 일부로 사용되어 네트워크가 
+시퀀스를 통과하며 정보가 전파될 수 있습니다. LSTM의 경우 시퀀스의 각 원소에
+해당하는 *은닉 상태(hidden state)*인 :math:`h_t` 가 있으며, 이는 원칙적으로
+시퀀스의 이전 임의 지점의 정보를 포함할 수 있습니다. Hidden state를 사용해 
+언어 모델(language model), 품사 태그 및 다른 많은 단어를 예측할 수 있습니다.
 
 
-LSTM's in Pytorch
+Pytorch를 이용한 LSTM
 ~~~~~~~~~~~~~~~~~
 
-Before getting to the example, note a few things. Pytorch's LSTM expects
-all of its inputs to be 3D tensors. The semantics of the axes of these
-tensors is important. The first axis is the sequence itself, the second
-indexes instances in the mini-batch, and the third indexes elements of
-the input. We haven't discussed mini-batching, so lets just ignore that
-and assume we will always have just 1 dimension on the second axis. If
-we want to run the sequence model over the sentence "The cow jumped",
-our input should look like
+LSTM 예제를 시작하기 전에 몇 가지 유의사항이 있습니다. Pytorch LSTM의 모든 
+입력은 3D 텐서이며 텐서 내 각각의 축의 의미는 중요합니다. 첫번째 축은 시퀀스 
+자체이며, 두번째 축은 미니 배치 내의 각 데이터의 인덱스, 세번째 축은 입력 
+원소의 인덱스 입니다. 여기서는 미니 배치에 대해 논의하지 않으므로 두번째 축에 
+대해 무시하고 항상 1차원만 있다고 가정하겠습니다. 만약 "The cow jumped" 라는 
+문장에 대해 시퀀스 모델을 이용하려 할 때, 입력은 다음과 같아야 합니다.
 
 .. math::
 
@@ -42,15 +40,12 @@ our input should look like
    q_\text{jumped}
    \end{bmatrix}
 
-Except remember there is an additional 2nd dimension with size 1.
+크기가 1인 두번째 추가 차원이 있음을 기억하세요.
 
-In addition, you could go through the sequence one at a time, in which
-case the 1st axis will have size 1 also.
+또한 첫번째 축도 크기가 1인 경우, 한 번에 하나의 시퀀스를 통과시킬 수 있습니다.
 
-Let's see a quick example.
+간단한 예제를 살펴봅시다.
 """
-
-# Author: Robert Guthrie
 
 import torch
 import torch.nn as nn
@@ -61,65 +56,65 @@ torch.manual_seed(1)
 
 ######################################################################
 
-lstm = nn.LSTM(3, 3)  # Input dim is 3, output dim is 3
-inputs = [torch.randn(1, 3) for _ in range(5)]  # make a sequence of length 5
+lstm = nn.LSTM(3, 3)  # 입력 및 출력 차원은 모두 3차원입니다.
+inputs = [torch.randn(1, 3) for _ in range(5)]  # 길이 5의 시퀀스를 만듭니다.
 
-# initialize the hidden state.
+# 은닉 상태(hidden state)를 초기화 합니다.
 hidden = (torch.randn(1, 1, 3),
           torch.randn(1, 1, 3))
 for i in inputs:
-    # Step through the sequence one element at a time.
-    # after each step, hidden contains the hidden state.
+    # 한 번에 시퀀스 하나의 원소로 진행합니다.
+    # 각 단계 후에, 아래의 "hidden"은 은닉 상태(hidden state)를 포함합니다.
     out, hidden = lstm(i.view(1, 1, -1), hidden)
 
-# alternatively, we can do the entire sequence all at once.
-# the first value returned by LSTM is all of the hidden states throughout
-# the sequence. the second is just the most recent hidden state
-# (compare the last slice of "out" with "hidden" below, they are the same)
-# The reason for this is that:
-# "out" will give you access to all hidden states in the sequence
-# "hidden" will allow you to continue the sequence and backpropagate,
-# by passing it as an argument  to the lstm at a later time
-# Add the extra 2nd dimension
+# 대안으로 전체 시퀀스를 한번에 수행 할 수 있습니다.
+# LSTM이 반환하는 첫 번째 값은 시퀀스 전체에 대한 모든 은닉 상태(hidden state)입니다.
+# 두 번째 값은 가장 최근의 은닉 상태(hidden state)입니다.
+# (위에서 "hidden"의 마지막 텐서와 "out"을 비교해보면 같음을 확인할 수 있습니다.)
+# 그 이유는 다음과 같습니다.
+# "out"은 시퀀스 내의 모든 은닉 상태(hidden state)에 접근합니다.
+# "hidden"은 이후 lstm의 인자(argument)로 전달되어 시퀀스를 계속하고 역전파 할 수 
+# 있습니다.
+# 추가로 두번째 차원을 더합니다.
 inputs = torch.cat(inputs).view(len(inputs), 1, -1)
-hidden = (torch.randn(1, 1, 3), torch.randn(1, 1, 3))  # clean out hidden state
+hidden = (torch.randn(1, 1, 3), torch.randn(1, 1, 3))
 out, hidden = lstm(inputs, hidden)
 print(out)
 print(hidden)
 
 
 ######################################################################
-# Example: An LSTM for Part-of-Speech Tagging
+# 예제: 형태소 분석(Part-of-Speech tagging)을 위한 LSTM
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-# In this section, we will use an LSTM to get part of speech tags. We will
-# not use Viterbi or Forward-Backward or anything like that, but as a
-# (challenging) exercise to the reader, think about how Viterbi could be
-# used after you have seen what is going on.
+# 이번에는 LSTM을 이용해 형태소 분석을 진행합니다. 이번 예제에서 우리는 
+# Viterbi 알고리즘이나 Forward-Backward 알고리즘 또는 이와 유사한 방법들을 
+# 사용하지 않습니다. 하지만 이 글을 읽는 분들에게 (도전적인) 과제로써, 
+# 이번 예제에서 어떠한 일이 일어나고 있는지 확인한 후 Viterbi 알고리즘을 어떻게 
+# 사용할 수 있는지 생각해 보시기 바랍니다.
 #
-# The model is as follows: let our input sentence be
-# :math:`w_1, \dots, w_M`, where :math:`w_i \in V`, our vocab. Also, let
-# :math:`T` be our tag set, and :math:`y_i` the tag of word :math:`w_i`.
-# Denote our prediction of the tag of word :math:`w_i` by
-# :math:`\hat{y}_i`.
+# 모델은 다음과 같습니다.
+# 입력 문장을 :math:`w_1, \dots, w_M` 라고 합시다. 여기서 :math:`w_i \in V`
+# 은 단어입니다. 또한 :math:`T`를 태그 셋으로, :math:`y_i`를 단어 :math:`w_i`
+# 의 태그라고 합시다. :math:`\hat{y}_i`에 의해 단어 :math:`w_i`의 태그에 대한
+# 예측을 나타냅니다.
 #
-# This is a structure prediction, model, where our output is a sequence
-# :math:`\hat{y}_1, \dots, \hat{y}_M`, where :math:`\hat{y}_i \in T`.
+# 이것은 구조 예측 모델이며, 출력은 :math:`\hat{y}_i \in T`인
+# :math:`\hat{y}_1, \dots, \hat{y}_M` 시퀀스입니다. 
 #
-# To do the prediction, pass an LSTM over the sentence. Denote the hidden
-# state at timestep :math:`i` as :math:`h_i`. Also, assign each tag a
-# unique index (like how we had word\_to\_ix in the word embeddings
-# section). Then our prediction rule for :math:`\hat{y}_i` is
+# 예측을 수행하려면 문장을 LSTM에 전달해야 합니다. 타임 스텝 :math:`i`의
+# 은닉 상태(hidden state)를 :math:`h_i`로 표시합니다. 또한 각 태그에 고유한
+# 인덱스를 할당해야 합니다 (단어 임베딩 섹션에서 word\_to\_ix 가 있는 것과 
+# 같습니다). 그러면 :math:`\hat{y}_i`에 대한 예측은 아래와 같습니다.
 #
 # .. math::  \hat{y}_i = \text{argmax}_j \  (\log \text{Softmax}(Ah_i + b))_j
 #
-# That is, take the log softmax of the affine map of the hidden state,
-# and the predicted tag is the tag that has the maximum value in this
-# vector. Note this implies immediately that the dimensionality of the
-# target space of :math:`A` is :math:`|T|`.
+# 즉, 은닉 상태(hidden state)의 affine map에 log softmax를 취하며, 이 벡터
+# 에서 최대값을 갖는 태그가 예측된 태그입니다. 이는 :math:`A`의 targer space의
+# 차원이 :math:`|T|`임을 의미합니다.
 #
 #
-# Prepare data:
+# 데이터 준비하기:
 
 def prepare_sequence(seq, to_ix):
     idxs = [to_ix[w] for w in seq]
@@ -138,13 +133,13 @@ for sent, tags in training_data:
 print(word_to_ix)
 tag_to_ix = {"DET": 0, "NN": 1, "V": 2}
 
-# These will usually be more like 32 or 64 dimensional.
-# We will keep them small, so we can see how the weights change as we train.
+# 아래와 같이 차원을 작게하면 학습 과정에서 가중치가 어떻게 변하는 지 
+# 볼 수 있습니다. 이들은 일반적으로 32 또는 64 차원 이상으로 사용됩니다.
 EMBEDDING_DIM = 6
 HIDDEN_DIM = 6
 
 ######################################################################
-# Create the model:
+# 모델 생성하기:
 
 
 class LSTMTagger(nn.Module):
@@ -155,11 +150,12 @@ class LSTMTagger(nn.Module):
 
         self.word_embeddings = nn.Embedding(vocab_size, embedding_dim)
 
-        # The LSTM takes word embeddings as inputs, and outputs hidden states
-        # with dimensionality hidden_dim.
+        # LSTM은 단어 임베딩을 입력으로 하며, hidden_dim 차원의
+        # 은닉 상태(hidden state)를 출력합니다. 
         self.lstm = nn.LSTM(embedding_dim, hidden_dim)
 
-        # The linear layer that maps from hidden state space to tag space
+        # 은닉 상태 공간(hidden state space)에서 태그 공간(tag space)로 
+        # 매핑하는 선형 계층입니다.
         self.hidden2tag = nn.Linear(hidden_dim, tagset_size)
 
     def forward(self, sentence):
@@ -170,79 +166,76 @@ class LSTMTagger(nn.Module):
         return tag_scores
 
 ######################################################################
-# Train the model:
+# 모델 학습하기:
 
 
 model = LSTMTagger(EMBEDDING_DIM, HIDDEN_DIM, len(word_to_ix), len(tag_to_ix))
 loss_function = nn.NLLLoss()
 optimizer = optim.SGD(model.parameters(), lr=0.1)
 
-# See what the scores are before training
-# Note that element i,j of the output is the score for tag j for word i.
-# Here we don't need to train, so the code is wrapped in torch.no_grad()
+# 학습하기 전에 스코어를 확인합니다.
+# 출력의 요소 i,j는 단어 i에 해당하는 태그 j에 대한 스코어입니다.
+# 여기에서는 학습할 필요가 없으므로 torch.no_grad()을 이용합니다.
 with torch.no_grad():
     inputs = prepare_sequence(training_data[0][0], word_to_ix)
     tag_scores = model(inputs)
     print(tag_scores)
 
-for epoch in range(300):  # again, normally you would NOT do 300 epochs, it is toy data
+for epoch in range(300):  
     for sentence, tags in training_data:
-        # Step 1. Remember that Pytorch accumulates gradients.
-        # We need to clear them out before each instance
+        # 단계 1. Pytorch가 그래디언트를 축적합니다.
         model.zero_grad()
 
-        # Step 2. Get our inputs ready for the network, that is, turn them into
-        # Tensors of word indices.
+        # 단계 2. 네트워크에 대한 입력을 준비합니다. 
+        # 즉, 단어 인덱스의 텐서로 변환합니다.
         sentence_in = prepare_sequence(sentence, word_to_ix)
         targets = prepare_sequence(tags, tag_to_ix)
 
-        # Step 3. Run our forward pass.
+        # 단계 3. 순방향 전파(forward pass)를 실행합니다.
         tag_scores = model(sentence_in)
 
-        # Step 4. Compute the loss, gradients, and update the parameters by
-        #  calling optimizer.step()
+        # 단계 4. optimizer.step()을 호출하여 손실과 그래디언트를 계산하고
+        # 파라미터를 업데이트 합니다.
         loss = loss_function(tag_scores, targets)
         loss.backward()
         optimizer.step()
 
-# See what the scores are after training
+# 학습 후 스코어 확인하기
 with torch.no_grad():
     inputs = prepare_sequence(training_data[0][0], word_to_ix)
     tag_scores = model(inputs)
 
-    # The sentence is "the dog ate the apple".  i,j corresponds to score for tag j
-    # for word i. The predicted tag is the maximum scoring tag.
-    # Here, we can see the predicted sequence below is 0 1 2 0 1
-    # since 0 is index of the maximum value of row 1,
-    # 1 is the index of maximum value of row 2, etc.
-    # Which is DET NOUN VERB DET NOUN, the correct sequence!
+    # 문장은 "the dog ate the apple" 입니다. i,j는 단어 i에 대한 태그 j의
+    # 스코어에 해당합니다. 예측된 태그는 최대 스코어를 갖는 태그 입니다.
+    # 여기서 0은 1행의 최대값에 해당하는 인덱스이며, 1은 2행의 최대값에 해당하는
+    # 인덱스 등 이므로 예측된 시퀀스가 아래와 같이 0 1 2 0 1 임을 볼 수 있습니다. 
+    # 이 숫자는 DET NOUN VERB DET NOUN 시퀀스가 맞습니다.
     print(tag_scores)
 
 
 ######################################################################
-# Exercise: Augmenting the LSTM part-of-speech tagger with character-level features
+# 연습: 문자 수준(character-level) 피처로 LSTM 형태소 분석기 보강하기
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-# In the example above, each word had an embedding, which served as the
-# inputs to our sequence model. Let's augment the word embeddings with a
-# representation derived from the characters of the word. We expect that
-# this should help significantly, since character-level information like
-# affixes have a large bearing on part-of-speech. For example, words with
-# the affix *-ly* are almost always tagged as adverbs in English.
+# 위의 예제에서 각 단어는 시퀀스 모델에 대한 입력으로 사용되도록 임베딩 합니다.
+# 이번에는 단어를 구성하는 문자로 부터 파생된 표현으로 단어 임베딩을 보강해 
+# 보겠습니다. 접미사 같은 문자 수준의 정보는 품사에 큰 영향을 미치기 때문에
+# 큰 도움이 될 것이라 예상합니다. 예를 들어 *-ly* 접미사가 있는 단어는 거의 
+# 영어에서는 부사(abverbs)로 태그가 지정됩니다.
+# 
+# 우선 :math:`c_w`를 단어 :math:`w`의 문자 수준 표현이라 하겠습니다. 
+# :math:`x_w`는 이전과 같이 단어 임베딩이라 하겠습니다. 그러면 시퀀스 모델에
+# 대해서 :math:`x_w`와 :math:`c_w`이 연결되어 입력됩니다.
+# 따라서 :math:`x_w`이 5차원이고 :math:`c_w`이 3차원이라면 LSTM은 8차원의
+# 입력을 받습니다.
+# 
+# 문자 수준 표현을 얻기 위해서 단어 내 문자에 대해 LSTM을 이용하고, 
+# :math:`c_w`을 이 LSTM의 최종 은닉 상태(hidden state)로 둡니다.
+# 힌트:
 #
-# To do this, let :math:`c_w` be the character-level representation of
-# word :math:`w`. Let :math:`x_w` be the word embedding as before. Then
-# the input to our sequence model is the concatenation of :math:`x_w` and
-# :math:`c_w`. So if :math:`x_w` has dimension 5, and :math:`c_w`
-# dimension 3, then our LSTM should accept an input of dimension 8.
-#
-# To get the character level representation, do an LSTM over the
-# characters of a word, and let :math:`c_w` be the final hidden state of
-# this LSTM. Hints:
-#
-# * There are going to be two LSTM's in your new model.
-#   The original one that outputs POS tag scores, and the new one that
-#   outputs a character-level representation of each word.
-# * To do a sequence model over characters, you will have to embed characters.
-#   The character embeddings will be the input to the character LSTM.
+# * 새 모델에는 두 개의 LSTM이 있습니다.
+#   품사 태그 스코어를 출력하는 것 및 각 단어에 대해 문자 수준 표현을 출력하는 것
+#   두 가지 입니다.
+# * 문자에 대한 시퀀스 모델을 이용하려면 문자를 임베딩해야 합니다. 문자 임베딩은
+#   character LSTM에 대한 입력이 됩니다.
 #
