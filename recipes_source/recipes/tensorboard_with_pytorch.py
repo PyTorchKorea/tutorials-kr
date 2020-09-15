@@ -10,7 +10,7 @@ TensorBoard UI에 기록한 데이터를 시각화 하는 방법을 다룰 것�
 설치하기
 ----------------------
 모델과 측정 항목을 TensorBoard 로그 디렉터리에 기록하려면 PyTorch를 설치해야 합니다.
-Anaconda를 통해 PyTorch 1.4+를 설치하는 방법은 다음과 같습니다.(권장):
+Anaconda를 통해 PyTorch 1.4 이상을 설치하는 방법은 다음과 같습니다.(권장):
 ::
 
    $ conda install pytorch torchvision -c pytorch 
@@ -50,7 +50,7 @@ writer = SummaryWriter()
 # 도움을 줍니다.
 #
 # 스칼라 값을 기록하려면 ``add_scalar(tag, scalar_value, global_step=None, walltime=None)``
-# 을 사용해야 합니다. 예로, 간단한 선형 회귀 학습을 만들고 ``add_scalar``를 사용해
+# 을 사용해야 합니다. 예로, 간단한 선형 회귀 학습을 만들고 ``add_scalar`` 를 사용해
 # 손실 값을 기록해 봅시다.
 
 x = torch.arange(-5, 5, 0.1).view(-1, 1)
@@ -119,7 +119,7 @@ writer.close()
 # TensorBoard 대시보드 공유하기
 # -----
 # 
-# `TensorBoard.dev <https://tensorboard.dev/>`_를 사용해 ML 실험 결과를 
+# `TensorBoard.dev <https://tensorboard.dev/>`_ 를 사용해 ML 실험 결과를 
 # 업로드하고 모두와 공유할 수 있습니다. TensorBoard.dev를 사용하여 
 # TensorBoard 대시보드를 호스팅, 추적 및 공유하세요.
 # 
@@ -137,10 +137,10 @@ writer.close()
 #   --name "My latest experiment" \ # optional
 #   --description "Simple comparison of several hyperparameters" # optional
 # 
-# 도움이 필요하면 ``$ tensorboard dev --help``를 실행하세요.
+# 도움이 필요하면 ``$ tensorboard dev --help`` 를 실행하세요.
 #
-# **참고:** 업로드 된 TensorBoard는 공개적이며 모든 사람이 볼 수 있습니다. 
-# 민감한 데이터를 업로드하지 마세요.
+# **참고:** 업로드 된 TensorBoard는 공개되어 누구나 볼 수 있게 됩니다. 
+# 민감한 데이터가 있다면 업로드하지 마세요.
 #
 # 터미널에서 제공한 URL로 TensorBoard를 실시간으로 확인하세요.
 # 예: `https://tensorboard.dev/experiment/AdYd1TgeTlaLWXx6I8JUbA <https://tensorboard.dev/experiment/AdYd1TgeTlaLWXx6I8JUbA>`_
@@ -150,7 +150,7 @@ writer.close()
 #    :scale: 40 %
 # 
 # 
-# .. 참고::
+# .. note::
 #   TensorBoard.dev는 현재 스칼라 대시보드만 지원합니다.
 
 ########################################################################
