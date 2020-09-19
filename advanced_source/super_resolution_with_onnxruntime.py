@@ -107,10 +107,10 @@ torch_model.eval()
 # 이 함수는 모델을 실행하여 어떤 연산자들이 출력값을 계산하는데 사용되었는지를 기록합니다.
 # ``export`` 함수가 모델을 실행하기 때문에, 우리가 직접 텐서를 입력값으로 넘겨주어야 합니다.
 # 이 텐서의 값은 알맞은 자료형과 모양이라면 랜덤하게 결정되어도 무방합니다.
-# 특정 차원을 동적인 차원으로 지정하지 않는 이상, ONNX로 변환된 그래프의 경우 입력값의 사이즈는 모든 차원에 대해 고정됩니다.  
+# 특정 차원을 동적인 차원으로 지정하지 않는 이상, ONNX로 변환된 그래프의 경우 입력값의 사이즈는 모든 차원에 대해 고정됩니다.
 # 예시에서는 모델이 항상 배치 사이즈 1을 사용하도록 변환하였지만, 첫번째 차원을 ``torch.onnx.export()`` 의
 # ``dynamic_axes`` 인자에 동적인 차원으로 지정해주면 됩니다.
-# 
+#
 # PyTorch의 변환 인터페이스에 대해 더 자세히 알고 싶다면
 # `torch.onnx 문서 <https://pytorch.org/docs/master/onnx.html>`__ 를 참고해주세요.
 #
@@ -156,7 +156,7 @@ onnx.checker.check_model(onnx_model)
 # 이 부분은 보통 별도의 프로세스 또는 별도의 머신에서 실행되지만, 이 튜토리얼에서는 모델이
 # ONNX 런타임과 PyTorch에서 동일한 결과를 출력하는지를 확인하기 위해 동일한 프로세스에서 계속 실행하도록
 # 하겠습니다.
-# 
+#
 # 모델을 ONNX 런타임에서 실행하기 위해서는 미리 설정된 인자들(본 예제에서는 기본값을 사용합니다)로
 # 모델을 위한 추론 세션을 생성해야 합니다.
 # 세션이 생성되면, 모델의 run() API를 사용하여 모델을 실행합니다.
@@ -189,7 +189,7 @@ print("Exported model has been tested with ONNXRuntime, and the result looks goo
 
 ######################################################################
 # ONNX 런타임에서 이미지를 입력값으로 모델을 실행하기
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 
 
@@ -275,7 +275,7 @@ final_img.save("./_static/img/cat_superres_with_ort.jpg")
 # 더 자세한 내용은 `링크 <https://docs.microsoft.com/en-us/azure/machine-learning/service/concept-onnx>`__ 를
 # 참조해주십시오.
 #
-# ONNX 런타임의 성능에 관한 것은 `여기 <https://github.com/microsoft/onnxruntime#high-performance>`__ 에서 
+# ONNX 런타임의 성능에 관한 것은 `여기 <https://github.com/microsoft/onnxruntime#high-performance>`__ 에서
 # 확인하실 수 있습니다.
 #
 # ONNX 런타임에 관한 더 자세한 내용은 `이 곳 <https://github.com/microsoft/onnxruntime>`__ 을 참조해 주세요.

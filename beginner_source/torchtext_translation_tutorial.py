@@ -5,7 +5,7 @@ TorchText로 언어 번역하기
 이 튜토리얼에서는 ``torchtext`` 의 유용한 여러 클래스들과 시퀀스 투 시퀀스(sequence-to-sequence, seq2seq)모델을 통해
 영어와 독일어 문장들이 포함된 유명한 데이터 셋을 이용해서 독일어 문장을 영어로 번역해 볼 것입니다.
 
-이 튜토리얼은 
+이 튜토리얼은
 PyTorch 커뮤니티 멤버인 `Ben Trevett <https://github.com/bentrevett>`__ 이 작성한
 `튜토리얼 <https://github.com/bentrevett/pytorch-seq2seq/blob/master/3%20-%20Neural%20Machine%20Translation%20by%20Jointly%20Learning%20to%20Align%20and%20Translate.ipynb>`__ 에 기초하고 있으며
 `Seth Weidman <https://github.com/SethHWeidman/>`__ 이 Ben의 허락을 받고 만들었습니다.
@@ -16,14 +16,16 @@ PyTorch 커뮤니티 멤버인 `Ben Trevett <https://github.com/bentrevett>`__ �
     - `TranslationDataset <https://torchtext.readthedocs.io/en/latest/datasets.html#torchtext.datasets.TranslationDataset>`__
     - `Field <https://torchtext.readthedocs.io/en/latest/data.html#torchtext.data.Field>`__
     - `BucketIterator <https://torchtext.readthedocs.io/en/latest/data.html#torchtext.data.BucketIterator>`__
+
 """
 
 ######################################################################
 # `Field` 와 `TranslationDataset`
-# ----------------
+# --------------------------------
+#
 # ``torchtext`` 에는 언어 변환 모델을 만들때 쉽게 사용할 수 있는 데이터셋을 만들기 적합한 다양한 도구가 있습니다.
 # 그 중에서도 중요한 클래스 중 하나인 `Field <https://github.com/pytorch/text/blob/master/torchtext/data/field.py#L64>`__ 는
-# 각 문장이 어떻게 전처리되어야 하는지 지정하며, 또 다른 중요한 클래스로는 `TranslationDataset` 이 있습니다. 
+# 각 문장이 어떻게 전처리되어야 하는지 지정하며, 또 다른 중요한 클래스로는 `TranslationDataset` 이 있습니다.
 # ``torchtext`` 에는 이 외에도 비슷한 데이터셋들이 있는데, 이번 튜토리얼에서는 `Multi30k dataset <https://github.com/multi30k/dataset>`__ 을 사용할 것입니다.
 # 이 데이터 셋은 평균 약 13개의 단어로 구성된 약 삼만 개의 문장을 영어와 독일어 두 언어로 포함하고 있습니다.
 #
@@ -43,6 +45,7 @@ PyTorch 커뮤니티 멤버인 `Ben Trevett <https://github.com/bentrevett>`__ �
 #
 # Spacy가 설치되어 있다면, 다음 코드는 ``TranslationDataset`` 에 있는 각 문장을 ``Field`` 에 정의된
 # 내용을 기반으로 토큰화할 것입니다.
+
 from torchtext.datasets import Multi30k
 from torchtext.data import Field, BucketIterator
 
@@ -75,7 +78,7 @@ TRG.build_vocab(train_data, min_freq = 2)
 
 ######################################################################
 # ``BucketIterator``
-# ----------------
+# --------------------
 # 마지막으로 사용해 볼 ``torchtext`` 에 특화된 기능은 바로 ``BucketIterator`` 입니다.
 # 첫 번째 인자로 ``TranslationDataset`` 을 전달받기 때문에 사용하기가 쉽습니다. 문서에서도 볼 수 있듯
 # 이 기능은 비슷한 길이의 예제들을 묶어주는 반복자(iterator)를 정의합니다. 각각의 새로운 에포크(epoch)마다
@@ -93,7 +96,7 @@ train_iterator, valid_iterator, test_iterator = BucketIterator.splits(
     device = device)
 
 ######################################################################
-# 이 반복자들은 ``DataLoader`` 와 마찬가지로 호출할 수 있습니다. 아래 ``train`` 과 
+# 이 반복자들은 ``DataLoader`` 와 마찬가지로 호출할 수 있습니다. 아래 ``train`` 과
 # ``evaluation`` 함수에서 보면, 다음과 같이 간단히 호출할 수 있음을 알 수 있습니다 :
 # ::
 #
@@ -108,15 +111,15 @@ train_iterator, valid_iterator, test_iterator = BucketIterator.splits(
 
 ######################################################################
 # ``nn.Module`` 과 ``Optimizer`` 정의하기
-# ----------------
+# ------------------------------------------
 # 대부분은 ``torchtext`` 가 알아서 해줍니다 : 데이터셋이 만들어지고 반복자가 정의되면, 이 튜토리얼에서
 # 우리가 해야 할 일이라고는 그저 ``nn.Module`` 와 ``Optimizer`` 를 모델로서 정의하고 훈련시키는 것이 전부입니다.
-# 
+#
 #
 # 이 튜토리얼에서 사용할 모델은 `이곳 <https://arxiv.org/abs/1409.0473>`__ 에서 설명하고 있는 구조를 따르고 있으며,
-# 더 자세한 내용은 `여기 <https://github.com/SethHWeidman/pytorch-seq2seq/blob/master/3%20-%20Neural%20Machine%20Translation%20by%20Jointly%20Learning%20to%20Align%20and%20Translate.ipynb>`__ 
+# 더 자세한 내용은 `여기 <https://github.com/SethHWeidman/pytorch-seq2seq/blob/master/3%20-%20Neural%20Machine%20Translation%20by%20Jointly%20Learning%20to%20Align%20and%20Translate.ipynb>`__
 # 를 참고하시기 바랍니다.
-# 
+#
 # 참고 : 이 튜토리얼에서 사용하는 모델은 언어 번역을 위해 사용할 예시 모델입니다. 이 모델을 사용하는 것은
 # 이 작업에 적당한 표준 모델이기 때문이지, 번역에 적합한 모델이기 때문은 아닙니다. 여러분이 최신 기술 트렌드를
 # 잘 따라가고 있다면 잘 아시겠지만, 현재 번역에서 가장 뛰어난 모델은 Transformers입니다. PyTorch가

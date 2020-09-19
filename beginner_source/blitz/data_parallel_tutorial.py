@@ -1,6 +1,7 @@
 """
 선택 사항: 데이터 병렬 처리 (Data Parallelism)
-==========================
+====================================================
+
 **글쓴이**: `Sung Kim <https://github.com/hunkim>`_ and `Jenny Kang <https://github.com/jennykang>`_
 **번역**: '정아진 <https://github.com/ajin-jng>'
 
@@ -19,7 +20,7 @@ PyTorch를 통해 GPU를 사용하는 것은 매우 쉽습니다. 먼저, 모델
 
     mytensor = my_tensor.to(device)
 
-''my_tensor.to(device)'' 를 호출 시 에는 ''my_tensor'' 를 다시쓰는 대신 ''my_tensor'' 의 또다른 복사본이 생긴다는 사실을 기억하십시오. 
+''my_tensor.to(device)'' 를 호출 시 에는 ''my_tensor'' 를 다시쓰는 대신 ''my_tensor'' 의 또다른 복사본이 생긴다는 사실을 기억하십시오.
 당신은 그것을 새로운 tensor 에 소속시키고 GPU에 그 tensor를 써야합니다.
 
 여러 GPU를 통해 앞과 뒤의 전파를 실행하는 것은 당연한 일 입니다.
@@ -59,7 +60,7 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 ######################################################################
 # 더미(Dummy) 데이터셋
-# -------------
+# -----------------------
 #
 # 더미(ramdom) 데이터셋을 만들어 봅시다. Getitem 만 구현하면 됩니다.
 #
@@ -86,7 +87,7 @@ rand_loader = DataLoader(dataset=RandomDataset(input_size, data_size),
 #
 # 데모를 위해 모델은 입력을 받고 선형 연산을 수행하며 출력을 제공합니다. 그러나 ``DataParallel`` 의 어떤 모델 (CNN, RNN, Capsule Net 등) 에서든 사용할 수 있습니다.
 #
-#우리는 input과 output의 크기를 모니터링하기 위해 모델안에 print 문을 넣었습니다.
+# 우리는 input과 output의 크기를 모니터링하기 위해 모델안에 print 문을 넣었습니다.
 # 무엇이 배치 순위 (batch rank) 0 에 프린트 되는지 주의 깊게 봐주시길 바랍니다.
 #
 
@@ -110,7 +111,7 @@ class Model(nn.Module):
 # -----------------------------
 #
 # 이것은 이 튜토리얼의 핵심 부분입니다. 먼저, model instance 를 만들고 가지고 있는 GPU가 여러개인지 확인해야합니다.
-# 만약 다수의 GPU를 보유중이라면, ``nn.DataParallel`` 을 사용하여 모델을 래핑 (wrapping) 할 수 있습니다. 
+# 만약 다수의 GPU를 보유중이라면, ``nn.DataParallel`` 을 사용하여 모델을 래핑 (wrapping) 할 수 있습니다.
 # 그런 다음 ``model.to(device)`` 를 통하여 모델을 GPU에 넣을 수 있습니다.
 #
 
