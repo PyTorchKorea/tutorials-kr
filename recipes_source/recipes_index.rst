@@ -31,23 +31,22 @@ Recipes are bite-sized bite-sized, actionable examples of how to use specific Py
 .. Basics
 
 .. customcarditem::
-   :header: Loading data in PyTorch
-   :card_description: Learn how to use PyTorch packages to prepare and load common datasets for your model.
+   :header: PyTorch에서 데이터 불러오기
+   :card_description: PyTorch 패키지를 이용해서 공용 데이터셋을 불러오고 모델에 적용하는 방법을 알아봅니다.
    :image: ../_static/img/thumbnails/cropped/loading-data.PNG
    :link: ../recipes/recipes/loading_data_recipe.html
    :tags: Basics
 
-
 .. customcarditem::
-   :header: Defining a Neural Network
-   :card_description: Learn how to use PyTorch's torch.nn package to create and define a neural network the MNIST dataset.
+   :header: 신경망 정의하기
+   :card_description: MNIST dataset을 사용한 신경망을 만들고 정의하기 위해 PyTorch의 torch.nn 패키지를 어떻게 사용하는 지 알아봅시다.
    :image: ../_static/img/thumbnails/cropped/defining-a-network.PNG
    :link: ../recipes/recipes/defining_a_neural_network.html
    :tags: Basics
 
 .. customcarditem::
-   :header: What is a state_dict in PyTorch
-   :card_description: Learn how state_dict objects, Python dictionaries, are used in saving or loading models from PyTorch.
+   :header: PyTorch에서 state_dict란 무엇인가요?
+   :card_description: PyTorch에서 모델을 저장하거나 불러올 때 Python 사전인 state_dict 객체가 어떻게 사용되는지 알아봅니다.
    :image: ../_static/img/thumbnails/cropped/what-is-a-state-dict.PNG
    :link: ../recipes/recipes/what_is_state_dict.html
    :tags: Basics
@@ -58,7 +57,6 @@ Recipes are bite-sized bite-sized, actionable examples of how to use specific Py
    :image: ../_static/img/thumbnails/cropped/saving-and-loading-models-for-inference.PNG
    :link: ../recipes/recipes/saving_and_loading_models_for_inference.html
    :tags: Basics
-
 
 .. customcarditem::
    :header: PyTorch에서 일반적인 체크포인트(checkpoint) 저장하기 & 불러오기
@@ -82,15 +80,15 @@ Recipes are bite-sized bite-sized, actionable examples of how to use specific Py
    :tags: Basics
 
 .. customcarditem::
-   :header: Saving and loading models across devices in PyTorch
-   :card_description: Learn how saving and loading models across devices (CPUs and GPUs) is relatively straightforward using PyTorch.
+   :header: PyTorch에서 다양한 장치 간 모델을 저장하고 불러오기
+   :card_description: PyTorch를 사용하여 다양한 장치(CPU와 GPU) 간의 모델을 저장하고 불러오는 비교적 간단한 방법을 알아봅니다.
    :image: ../_static/img/thumbnails/cropped/saving-and-loading-models-across-devices.PNG
    :link: ../recipes/recipes/save_load_across_devices.html
    :tags: Basics
 
 .. customcarditem::
-   :header: Zeroing out gradients in PyTorch
-   :card_description: Learn when you should zero out graidents and how doing so can help increase the accuracy of your model.
+   :header: PyTorch에서 변화도를 0으로 만들기
+   :card_description: 변화도를 언제 0으로 만들어야 하며, 그렇게 하는 것이 모델의 정확도를 높이는 데에 어떻게 도움이 되는지 알아봅니다. 
    :image: ../_static/img/thumbnails/cropped/zeroing-out-gradients.PNG
    :link: ../recipes/recipes/zeroing_out_gradients.html
    :tags: Basics
@@ -105,8 +103,8 @@ Recipes are bite-sized bite-sized, actionable examples of how to use specific Py
 .. Customization
 
 .. customcarditem::
-   :header: Custom Datasets, Transforms & Dataloaders
-   :card_description: Learn how to leverage the PyTorch dataset API to easily create a custom dataset and custom dataloader.
+   :header: 사용자 정의 데이터셋, Transforms & Dataloader
+   :card_description: PyTorch 데이터셋 API를 이용하여 어떻게 쉽게 사용자 정의 데이터셋과 dataloader를 만드는지 알아봅니다.
    :image: ../_static/img/thumbnails/cropped/custom-datasets-transforms-and-dataloaders.png
    :link: ../recipes/recipes/custom_dataset_transforms_loader.html
    :tags: Data-Customization
@@ -114,15 +112,15 @@ Recipes are bite-sized bite-sized, actionable examples of how to use specific Py
 .. Interpretability
 
 .. customcarditem::
-   :header: Model Interpretability using Captum
-   :card_description: Learn how to use Captum attribute the predictions of an image classifier to their corresponding image features and visualize the attribution results.
+   :header: Captum을 사용하여 모델 해석하기
+   :card_description: Captum을 사용하여 이미지 분류기의 예측을 해당 이미지의 특징(features)에 사용하고 속성(attribution) 결과를 시각화 하는데 사용하는 방법을 학습합니다.
    :image: ../_static/img/thumbnails/cropped/model-interpretability-using-captum.png
    :link: ../recipes/recipes/Captum_Recipe.html
    :tags: Interpretability,Captum
 
 .. customcarditem::
-   :header: How to use TensorBoard with PyTorch
-   :card_description: Learn basic usage of TensorBoard with PyTorch, and how to visualize data in TensorBoard UI
+   :header: PyTorch로 TensorBoard 사용하기
+   :card_description: PyTorch로 TensorBoard를 사용하는 기본 방법과 TensorBoard UI에서 데이터를 시각화하는 방법을 알아봅니다.
    :image: ../_static/img/thumbnails/tensorboard_scalars.png
    :link: ../recipes/recipes/tensorboard_with_pytorch.html
    :tags: Visualization,TensorBoard
@@ -140,8 +138,8 @@ Recipes are bite-sized bite-sized, actionable examples of how to use specific Py
 .. Production Development
 
 .. customcarditem::
-   :header: TorchScript for Deployment
-   :card_description: Learn how to export your trained model in TorchScript format and how to load your TorchScript model in C++ and do inference.
+   :header: TorchScript로 배포하기
+   :card_description: 학습된 모델을 TorchScript 형식으로 내보내는 방법과 TorchScript 모델을 C++로 불러오고 추론하는 방법에 대해 알아봅니다.
    :image: ../_static/img/thumbnails/cropped/torchscript_overview.png
    :link: ../recipes/torchscript_inference.html
    :tags: TorchScript

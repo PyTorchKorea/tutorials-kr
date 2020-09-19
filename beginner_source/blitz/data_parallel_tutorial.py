@@ -1,52 +1,50 @@
 """
-Optional: Data Parallelism
+선택 사항: 데이터 병렬 처리 (Data Parallelism)
 ==========================
-**Authors**: `Sung Kim <https://github.com/hunkim>`_ and `Jenny Kang <https://github.com/jennykang>`_
+**글쓴이**: `Sung Kim <https://github.com/hunkim>`_ and `Jenny Kang <https://github.com/jennykang>`_
+**번역**: '정아진 <https://github.com/ajin-jng>'
 
-In this tutorial, we will learn how to use multiple GPUs using ``DataParallel``.
+이 튜토리얼에서는 ``DataParallel`` (데이터 병렬) 을 사용하여 여러 GPU를 사용하는 법을 배우겠습니다.
 
-It's very easy to use GPUs with PyTorch. You can put the model on a GPU:
+PyTorch를 통해 GPU를 사용하는 것은 매우 쉽습니다. 먼저, 모델을 GPU에 넣습니다:
 
 .. code:: python
 
     device = torch.device("cuda:0")
     model.to(device)
 
-Then, you can copy all your tensors to the GPU:
+그 다음으로는 모든 Tensors 를 GPU로 복사합니다:
 
 .. code:: python
 
     mytensor = my_tensor.to(device)
 
-Please note that just calling ``my_tensor.to(device)`` returns a new copy of
-``my_tensor`` on GPU instead of rewriting ``my_tensor``. You need to assign it to
-a new tensor and use that tensor on the GPU.
+''my_tensor.to(device)'' 를 호출 시 에는 ''my_tensor'' 를 다시쓰는 대신 ''my_tensor'' 의 또다른 복사본이 생긴다는 사실을 기억하십시오. 
+당신은 그것을 새로운 tensor 에 소속시키고 GPU에 그 tensor를 써야합니다.
 
-It's natural to execute your forward, backward propagations on multiple GPUs.
-However, Pytorch will only use one GPU by default. You can easily run your
-operations on multiple GPUs by making your model run parallelly using
-``DataParallel``:
+여러 GPU를 통해 앞과 뒤의 전파를 실행하는 것은 당연한 일 입니다.
+그러나 PyTorch는 기본적 하나의 GPU만 사용합니다. ``DataParallel`` 을 이용하여 모델을 병렬로 실행하여 다수의 GPU 에서 쉽게 작업을 실행할 수 있습니다:
 
 .. code:: python
 
     model = nn.DataParallel(model)
 
-That's the core behind this tutorial. We will explore it in more detail below.
+이것이 튜토리얼의 핵심입니다. 자세한 사항들에 대해서는 아래에서 살펴보겠습니다.
 """
 
 
 ######################################################################
-# Imports and parameters
+# 불러오기와 매개변수
 # ----------------------
 #
-# Import PyTorch modules and define parameters.
+# PyTorch 모듈을 불러오고 매개변수를 정의하십시오.
 #
 
 import torch
 import torch.nn as nn
 from torch.utils.data import Dataset, DataLoader
 
-# Parameters and DataLoaders
+# 매개변수와 DataLoaders
 input_size = 5
 output_size = 2
 
@@ -55,16 +53,15 @@ data_size = 100
 
 
 ######################################################################
-# Device
+# 기기
 #
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 ######################################################################
-# Dummy DataSet
+# 더미(Dummy) 데이터셋
 # -------------
 #
-# Make a dummy (random) dataset. You just need to implement the
-# getitem
+# 더미(ramdom) 데이터셋을 만들어 봅시다. Getitem 만 구현하면 됩니다.
 #
 
 class RandomDataset(Dataset):
@@ -84,20 +81,17 @@ rand_loader = DataLoader(dataset=RandomDataset(input_size, data_size),
 
 
 ######################################################################
-# Simple Model
+# 간단한 모델
 # ------------
 #
-# For the demo, our model just gets an input, performs a linear operation, and
-# gives an output. However, you can use ``DataParallel`` on any model (CNN, RNN,
-# Capsule Net etc.)
+# 데모를 위해 모델은 입력을 받고 선형 연산을 수행하며 출력을 제공합니다. 그러나 ``DataParallel`` 의 어떤 모델 (CNN, RNN, Capsule Net 등) 에서든 사용할 수 있습니다.
 #
-# We've placed a print statement inside the model to monitor the size of input
-# and output tensors.
-# Please pay attention to what is printed at batch rank 0.
+#우리는 input과 output의 크기를 모니터링하기 위해 모델안에 print 문을 넣었습니다.
+# 무엇이 배치 순위 (batch rank) 0 에 프린트 되는지 주의 깊게 봐주시길 바랍니다.
 #
 
 class Model(nn.Module):
-    # Our model
+    # 우리의 모델
 
     def __init__(self, input_size, output_size):
         super(Model, self).__init__()
@@ -112,13 +106,12 @@ class Model(nn.Module):
 
 
 ######################################################################
-# Create Model and DataParallel
+# 모델과 데이터 병렬의 구현
 # -----------------------------
 #
-# This is the core part of the tutorial. First, we need to make a model instance
-# and check if we have multiple GPUs. If we have multiple GPUs, we can wrap
-# our model using ``nn.DataParallel``. Then we can put our model on GPUs by
-# ``model.to(device)``
+# 이것은 이 튜토리얼의 핵심 부분입니다. 먼저, model instance 를 만들고 가지고 있는 GPU가 여러개인지 확인해야합니다.
+# 만약 다수의 GPU를 보유중이라면, ``nn.DataParallel`` 을 사용하여 모델을 래핑 (wrapping) 할 수 있습니다. 
+# 그런 다음 ``model.to(device)`` 를 통하여 모델을 GPU에 넣을 수 있습니다.
 #
 
 model = Model(input_size, output_size)
@@ -131,10 +124,10 @@ model.to(device)
 
 
 ######################################################################
-# Run the Model
+# 모델 실행
 # -------------
 #
-# Now we can see the sizes of input and output tensors.
+# 이제 우리는 입력과 출력 tensor의 크기를 볼 수 있습니다
 #
 
 for data in rand_loader:
@@ -145,16 +138,16 @@ for data in rand_loader:
 
 
 ######################################################################
-# Results
+# 결과
 # -------
 #
-# If you have no GPU or one GPU, when we batch 30 inputs and 30 outputs, the model gets 30 and outputs 30 as
-# expected. But if you have multiple GPUs, then you can get results like this.
+# GPU가 없거나 하나인 경우 30개의 입력과 30개의 출력을 일괄 처리하면 모델이 예상대로 30을 입력받고 30을 출력합니다.
+# 하지만 만약 당신이 다수의 GPU를 가지고 있다면, 다음과 같은 결과를 얻을 수 있습니다.
 #
 # 2 GPUs
 # ~~~~~~
 #
-# If you have 2, you will see:
+# 2개의 GPU를 갖고 있다면, 다음과 같이 표시될 것 입니다:
 #
 # .. code:: bash
 #
@@ -176,8 +169,7 @@ for data in rand_loader:
 # 3 GPUs
 # ~~~~~~
 #
-# If you have 3 GPUs, you will see:
-#
+# 만약 당신이 3개의 GPU를 갖고 있다면, 다음과 같이 표시될 것 입니다:
 # .. code:: bash
 #
 #     Let's use 3 GPUs!
@@ -201,7 +193,7 @@ for data in rand_loader:
 # 8 GPUs
 # ~~~~~~~~~~~~~~
 #
-# If you have 8, you will see:
+# 만약 당신이 8개의 GPU를 갖고 있다면, 다음과 같이 표시될 것 입니다:
 #
 # .. code:: bash
 #
@@ -243,13 +235,12 @@ for data in rand_loader:
 
 
 ######################################################################
-# Summary
+# 요약
 # -------
 #
-# DataParallel splits your data automatically and sends job orders to multiple
-# models on several GPUs. After each model finishes their job, DataParallel
-# collects and merges the results before returning it to you.
+# DataParallel은 당신의 데이터를 자동으로 분할하고 여러 GPU에 있는 다수의 모델에 작업을 지시합니다. 각 모델이 작업을 완료하면 DataParallel은
+# 사용자에게 결과를 반환하기 전에 모든 결과물들을 수집하여 병합합니다.
 #
-# For more information, please check out
-# https://pytorch.org/tutorials/beginner/former\_torchies/parallelism\_tutorial.html.
+# 더 많은 정보를 알고싶다면 아래 주소를 참고하세요.
+# https://tutorials.pytorch.kr/beginner/former_torchies/parallelism_tutorial.html
 #
