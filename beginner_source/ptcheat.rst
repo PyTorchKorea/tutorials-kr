@@ -182,7 +182,7 @@ nn.Linear(m,n)                                # m개의 뉴런에서 n개의 뉴
 																							# 완전연결(fully connected) 레이어 
 
 nn.ConvXd(m,n,s)                              # m개의 채널에서 n개의 채널로 연결되는 
-                                              # X 차원 컨벌루션(conv)레이어  where X⍷{1,2,3}
+                                              # X 차원 컨벌루션(conv)레이어, X⍷{1,2,3}
                                               # X는 {1,2,3} 중 하나고 커널 사이즈는 s
 
 nn.MaxPoolXd(s)                               # X 차원 pooling 레이어
