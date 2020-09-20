@@ -192,7 +192,7 @@ nn.BatchNorm                                  # batch norm 레이어
 nn.RNN/LSTM/GRU                               # 순환(recurrent) 레이어들
 nn.Dropout(p=0.5, inplace=False)              # 아무 차원 입력에 대한 드랍아웃(dropout) 레이어 
 nn.Dropout2d(p=0.5, inplace=False)            # 2차원 채널별 드롭아웃
-nn.Embedding(num_embeddings, embedding_dim)   # 인덱스에서 내장 벡터로 매핑
+nn.Embedding(num_embeddings, embedding_dim)   # 인덱스에서 내장 벡터로 매핑(텐서별)
 
 ```
 
