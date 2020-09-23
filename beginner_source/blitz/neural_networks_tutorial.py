@@ -48,7 +48,7 @@ class Net(nn.Module):
         # 컨볼루션 커널 정의
         self.conv1 = nn.Conv2d(1, 6, 3)
         self.conv2 = nn.Conv2d(6, 16, 3)
-        # 아핀 연산: y = Wx + b
+        # 아핀(affine) 연산: y = Wx + b
         self.fc1 = nn.Linear(16 * 6 * 6, 120)  # 6*6은 이미지 차원에 해당
         self.fc2 = nn.Linear(120, 84)
         self.fc3 = nn.Linear(84, 10)
@@ -189,7 +189,7 @@ print(loss.grad_fn.next_functions[0][0].next_functions[0][0])  # ReLU
 # 살펴보겠습니다.
 
 
-net.zero_grad()     # 모든 파라미터의 변화도 버퍼를 0으로 만듦
+net.zero_grad()     # 모든 매개변수의 변화도 버퍼를 0으로 만듦
 
 print('conv1.bias.grad before backward')
 print(net.conv1.bias.grad)
