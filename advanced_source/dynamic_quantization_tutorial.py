@@ -18,7 +18,7 @@
 이 튜토리얼에서, PyTorch의 `단어 단위 언어 모델 <https://github.com/pytorch/examples/tree/master/word_language_model>`_
 예제를 따라하면서, LSTM 기반의 단어 예측 모델에 가장 간단한 양자화 기법인
 `동적 양자화 <https://pytorch.org/docs/stable/quantization.html#torch.quantization.quantize_dynamic>`_
-를 적용할 것입니다.
+를 적용해 보겠습니다.
 """
 
 # imports
@@ -157,7 +157,7 @@ print(model)
 
 ######################################################################
 # 이제 사전학습된 모델이 잘 동작하는지 확인해보기 위해 텍스트를 생성해
-# 보겠습니다. 이때까지와 마찬가지로 `이 예제 <https://github.com/pytorch/examples/blob/master/word_language_model/generate.py>`_ 를
+# 보겠습니다. 지금까지 튜토리얼을 진행했던 방식처럼 `이 예제 <https://github.com/pytorch/examples/blob/master/word_language_model/generate.py>`_ 를
 # 따라 하겠습니다.
 
 input_ = torch.randint(ntokens, (1, 1), dtype=torch.long)
@@ -212,7 +212,7 @@ def get_batch(source, i):
     return data, target
 
 def repackage_hidden(h):
-  """은닉 상태를 기록으로부터 떼어내기 위해 새로운 tensor로 감쌉니다."""
+  """은닉 상태를 변화도 기록에서 제거된 새로운 tensor로 만듭니다."""
 
   if isinstance(h, torch.Tensor):
       return h.detach()
