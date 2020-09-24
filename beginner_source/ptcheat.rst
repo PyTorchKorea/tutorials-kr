@@ -207,7 +207,7 @@ nn.X                                  # X에는 BCELoss, CrossEntropyLoss,
                                       # L1Loss, MSELoss, NLLLoss, SoftMarginLoss,
                                       # MultiLabelSoftMarginLoss, CosineEmbeddingLoss,
                                       # KLDivLoss, MarginRankingLoss, HingeEmbeddingLoss
-                                      # ,CosineEmbeddingLoss가 있다.
+                                      # ,CosineEmbeddingLoss가 있음
 
 ```
 
