@@ -249,7 +249,7 @@ See `optimizers <https://pytorch.org/docs/stable/optim.html>`__
 
 ```
 scheduler = optim.X(optimizer,...)      # 학습률 스케줄러 생성
-scheduler.step()                        # epoch의 시작할 때 학습률 업데이트
+scheduler.step()                        # epoch가 시작할 때 학습률 업데이트
 optim.lr_scheduler.X                    # X에는 LambdaLR, StepLR, MultiStepLR,
 													              # ExponentialLR 또는 ReduceLROnPLateau가 있음
 
