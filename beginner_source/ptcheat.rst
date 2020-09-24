@@ -125,7 +125,7 @@ torch.cat(tensor_seq, dim=0)          # 치수를 따라 텐서를 연결
 x.view(a,b,...)                       # x의 크기를 (a,b,...)로 재조정
 x.view(-1,a)                          # x를 크기(b,a)로 재조정
 x.transpose(a,b)                      # a차원과 b차원 간의 교환
-x.permute(*dims)                      # 차원들간의 재배열
+x.permute(*dims)                      # 차원들 간의 재배열
 x.unsqueeze(dim)                      # 텐서에 축을 추가
 x.unsqueeze(dim=2)                    # (a,b,c) 텐서-> (a,b,1,c) 텐서
 
