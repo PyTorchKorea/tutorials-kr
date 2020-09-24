@@ -151,7 +151,7 @@ x.t()         # x의 전치행렬
 .. code-block:: python
 
 ```
-torch.cuda.is_available                                 # cuda를 체크합니다.
+torch.cuda.is_available                                 # cuda를 체크
 x.cuda()                                                # x의 데이터를 CPU에서 GPU로 옮기고
                                                         # 새로운 객체를 반환
 
