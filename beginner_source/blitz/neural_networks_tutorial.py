@@ -149,7 +149,7 @@ out.backward(torch.randn(1, 10))
 # 예를 들면:
 
 output = net(input)
-target = torch.randn(10)  # 예시를 위한 더미 target
+target = torch.randn(10)  # 예시를 위한 임의의 정답
 target = target.view(1, -1)  # 출력과 같은 shape로 만듦
 criterion = nn.MSELoss()
 
