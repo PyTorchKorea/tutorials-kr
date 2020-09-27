@@ -331,7 +331,7 @@ def get_style_model_and_losses(cnn, normalization_mean, normalization_std,
             model.add_module("style_loss_{}".format(i), style_loss)
             style_losses.append(style_loss)
 
-    # 이제 마지막 Content 및 Style 손실 계층 뒤에 계층을 잘라냅니다.
+    # 이제 마지막 Content 및 Style 손실 뒤에 계층을 잘라냅니다.
     for i in range(len(model) - 1, -1, -1):
         if isinstance(model[i], ContentLoss) or isinstance(model[i], StyleLoss):
             break
