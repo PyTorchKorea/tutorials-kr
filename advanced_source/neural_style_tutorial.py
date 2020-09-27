@@ -359,7 +359,7 @@ imshow(input_img, title='Input Image')
 # ----------------
 #
 #
-# 알고리즘 작성자인 Leon Gatys,
+# 알고리즘 작성자인 Leon Gatys가
 # `여기 <https://discuss.pytorch.org/t/pytorch-tutorial-for-neural-transfert-of-artistic-style/336/20?u=alexis-jacq>`__ 에서 제안했던 것처럼,
 # L-BFGS 알고리즘을 사용하여 경사 하강법을 수행합니다.
 # 네트워크 훈련과 다르게 Content / Style 손실을 최소화하기 위해 입력 이미지를 훈련하려고 합니다.
