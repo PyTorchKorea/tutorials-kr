@@ -204,7 +204,7 @@ def gram_matrix(input):
 
     G = torch.mm(features, features.t())  # gram product를 계산
 
-    # 각 특징 맵의 값의 수로 나누어
+    # 각 특징 맵이 갖는 값의 수로 나누어
     # gram 행렬의 값을 '정규화'
     return G.div(a * b * c * d)
 
