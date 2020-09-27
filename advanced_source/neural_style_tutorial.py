@@ -147,7 +147,7 @@ imshow(content_img, title='Content Image')
 # 가중 콘텐츠 거리(weighted content distance) :math:`w_{CL}.D_C^L(X,C)` 를 반환합니다.
 # Content 거리를 계산하기 위해 Content 이미지(:math:`F_{CL}`)의 특징 맵을 함수에서 알고 있어야합니다.
 # :math:`F_{CL}` 을 입력으로 사용하는 생성자를 사용해 이 함수를 torch 모듈로 구현합니다.
-# 거리 :math:`\|F_{XL} - F_{CL}\|^2` 는 두개의 특징 맵 집합의 평균 제곱 오차이며 ``nn.MSELoss`` 를 사용하여 계산할 수 있습니다.
+# 거리 :math:`\|F_{XL} - F_{CL}\|^2` 는 두 개의 특징 맵 집합의 평균 제곱 오차이며 ``nn.MSELoss`` 를 사용하여 계산할 수 있습니다.
 #
 # Content 거리를 계산하기 위해 사용되는 합성곱 계층 바로 뒤에 Content 손실 모듈을 추가합니다.
 # 이렇게 하면 입력 이미지가 입력될 때마다 Content 손실이 원하는 레이어에서
