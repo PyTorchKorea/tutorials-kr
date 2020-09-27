@@ -86,7 +86,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 #     튜토리얼을 실행하는데 필요한 이미지를 다운로드 할 수 있는 주소는 다음과 같습니다.
 #     `picasso.jpg <https://pytorch.org/tutorials/_static/img/neural-style/picasso.jpg>`__ 와
 #     `dancing.jpg <https://pytorch.org/tutorials/_static/img/neural-style/dancing.jpg>`__.
-#     두 ``images`` 를 다운로드하고 현재 작업 폴더로 이름이 지정된 곳에 추가하세요.
+#     두 이미지를 다운로드하고 현재 작업 폴더의 ``images`` 폴더에 추가하세요.
 
 # 원하는 출력 이미지의 크기
 imsize = 512 if torch.cuda.is_available() else 128  # 만약 GPU가 없을 경우 작은 크기를 사용
