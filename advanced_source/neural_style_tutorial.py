@@ -1,5 +1,5 @@
 """
-PyTorch를 사용하여 뉴럴 변환(Neural Transfer)
+PyTorch를 이용하여 뉴럴 변환(Neural Transfer)
 =============================
 
 
@@ -32,7 +32,7 @@ PyTorch를 사용하여 뉴럴 변환(Neural Transfer)
 # Content 이미지로 Content 거리와 Style 이미지로 Style 거리를 최소화하도록 변환합니다.
 # 이제 필요한 패키지를 가져와서 뉴럴 변환(neural transfer)을 시작할 수 있습니다.
 #
-# 패키지 가져오기 및 장치 선택
+# 패키지 불러오기 및 장치 선택
 # -----------------------------------------
 # 다음은 뉴럴 변환(neural transfer)을 구현하는데 필요한 패키지 목록입니다.
 #
@@ -190,7 +190,9 @@ class ContentLoss(nn.Module):
 # 예를 들어, :math:`\hat{F}_{XL}` 의 첫 번째 줄은 벡터화된 특징 맵 :math:`F_{XL}^1` 에 해당합니다.
 #
 # 마지막으로, gram 행렬은 행렬에서 각 값을 값의 총 개수로 나누어 정규화 해야 합니다.
-# 이러한 정규화는 큰 :math:`N` 차원을 가지는 :math:`\hat{F}_{XL}` 행렬이 gram 행렬에서 더 큰 값을 생성한다는 사실에 대응하기 위한 것입니다.
+# 정규화는 큰 :math:`N` 차원을 가지는 :math:`\hat{F}_{XL}` 행렬이 gram 행렬에서 더 큰 값을 생성한다는 사실에 대응하기 위한 것입니다.
+#
+# 이와 같은 더 큰 값은 첫 번째 계층(풀링 계층 전)이 경사 하강 중에 더 큰 영향을 미치게합니다.
 #
 # Style 특징은 네트워크의 깊은 계층에 있는 경향이 있기에 정규화 단계가 중요합니다.
 #
@@ -198,7 +200,7 @@ class ContentLoss(nn.Module):
 def gram_matrix(input):
     a, b, c, d = input.size()  # a=배치 크기(=1)
     # b=특징 맵의 수
-    # (c,d)=dimensions of a f. map (N=c*d)
+    # (c,d)=특징 맵의 차원 (N=c*d)
 
     features = input.view(a * b, c * d)  # F_XL을 \hat F_XL로 크기 조정
 
