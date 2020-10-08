@@ -9,7 +9,7 @@ ONNX란 무엇인가?
 -------------
 
 ONNX (Open Neural Network Exchange) 는 딥 러닝 모델들을 대표하는 공개되어있는 형식입니다.
-ONNX는 AI 개발자들이 최첨단의 도구들과 모델들의 조합을 그들에게 가장 잘 맞는것을 쉽게 선택하도록 해줍니다.
+ONNX는 AI 개발자들이 최첨단의 도구들과 모델들의 조합을 그들에게 가장 잘 맞는 것을 쉽게 선택하도록 해줍니다.
 ONNX는 커뮤니티의 파트너들이 개발하며 또한 지원됩니다.
 ONNX와 어떤 도구들이 지원되는지는 `onnx.ai <https://onnx.ai/>`_ 를 방문하여 더 알아볼 수 있습니다.
 
@@ -18,7 +18,7 @@ ONNX와 어떤 도구들이 지원되는지는 `onnx.ai <https://onnx.ai/>`_ 를
 -----------------
 
 This tutorial will walk you through 4 main steps:
-이번 튜토리얼에서 4가지 중심 사항들을 소개해드리겠습니다.
+이번 튜토리얼에서는 4가지 중심 사항들을 소개해드리겠습니다.
 
 
 #. `Download (or train) PyTorch style transfer models`_
@@ -46,17 +46,17 @@ PyTorch와 onnx-coreml 변환해주는 라이브러리를 설치해야합니다.
    pip install torchvision onnx-coreml
 
 
-iOS style transfer 어플리케이션을 iPhone에 작동 시키고 싶다면 XCode 또한 설치 되어야 합니다.
-모델을 변환하는것은 Linux 에서도 가능하지만 iOS 어플리케이션을 작동시키고 싶다면 Mac이 필요합니다.
+iPhone 에서 iOS style transfer 어플리케이션을 실행하려면 XCode 가 필요합니다.
+Linux 에서도 모델을 변환할 수 있지만, iOS 어플리케이션을 실행 하려면 Mac 이 필요합니다.
 
 PyTorch style transfer 모델 다운로드 (또는 학습시키기)
 -------------------------------------------------
 
-이번 튜토리얼 에서는 우리는 https://github.com/pytorch/examples/tree/master/fast_neural_style 에  PyTorch 로 만들어진 style transfer 을 이용하겠습니다.
+이번 튜토리얼에서 우리는 https://github.com/pytorch/examples/tree/master/fast_neural_style 에  PyTorch 로 만들어진 style transfer 을 이용하겠습니다.
 다른 PyTorch 나 ONNX 모델을 사용하길 원한다면 이번 단계를 생략해도 좋습니다.
 
 이 모델들은 이미지에 style transfer 가 적용되도록 만들어져서 비디오에 적용하기에는 최적화가 되어있지 않아 충분히 빠르지 않습니다.
-하지만 해상도를 어느정도 낮춘다면 비디오에서 충분한 속도에 작동됩니다.
+하지만 해상도를 어느 정도 낮춘다면 비디오에서 충분한 속도에 작동됩니다.
 
 
 모델들을 다운받아봅시다.
@@ -91,7 +91,7 @@ You can also take a look at that script if you would like to apply it to other m
 PyTorch 에서 ONNX 형식으로 변환하는것은 결과적으로 당신의 신경망을 추적해 나가는것과 같습니다. 이 API 호출은 내부적으로 그래프를 생성해내기 위해 '더미 데이터' 를 이용하여 신경망을 실행합니다.
 이렇기 때문에 입력값으로 style transfer 를 적용할 이미지가 입력값으로 필요하며 기본적인 비어있는 이미지여도 됩니다.
 그러나 이미지의 픽셀 크기는 중요한데 그 이유는 픽셀 크기는 변환될 style transfer 모델의 크기로도 이용되기 때문입니다.
-좋은 퍼포먼스를 얻기 위해 우리는 250x540 의 해상도를 사용할 예정입니다. FPS보다 style transfer의 품질에 더 많이 신경쓰신다면 더 큰 해상도를 사용하셔도 됩니다.
+좋은 퍼포먼스를 얻기 위해 우리는 250x540 의 해상도를 사용할 예정입니다. FPS보다 style transfer의 품질에 더 많이 신경 쓰신다면 더 큰 해상도를 사용하셔도 됩니다.
 
 `ImageMagick <https://www.imagemagick.org/>`_ 을 사용하여 우리가 원하는 크기의 비어있는 이미지를 생성해봅시다.
 .. code-block:: bash
@@ -110,7 +110,7 @@ PyTorch 에서 ONNX 형식으로 변환하는것은 결과적으로 당신의 �
 
 
 위의 과정을 거치면 4개의 파일 ``candy.onnx``\ , ``mosaic.onnx``\ , ``rain_princess.onnx`` 그리고 ``udnie.onnx``\ ,
-가 ``.pth`` 파일들에 각각 대응되어 생성되어있어야합니다.
+가 ``.pth`` 파일들에 각각 대응되어 생성되어있어야 합니다.
 
 ONNX 모델을 CoreML 모델로 변환하기
 ----------------------------------------
@@ -123,7 +123,7 @@ ONNX 모델을 CoreML 모델로 변환하기
 
 style transfer 모델을 보면 (예를 들면 .onnx 파일을 `Netron <https://github.com/lutzroeder/Netron>`_\ 과 같은 어플리케이션에서 여는것)
 우리는 입력값이 '0' 으로 되어있고 출력값이 '186' 으로 되어있는걸 확인할 수 있습니다. 이것들은 PyTorch 에 의해 할당된 숫자 id 들 입니다.
-우리는 이러한 값들을 이미지로서 표시해야합니다.
+우리는 이러한 값들을 이미지로써 표시해야합니다.
 
 자 그래서 이제 ``onnx_to_coreml.py`` 라고 하는 작은 파이썬 파일을 생성합니다. 이것은 touch 명령어나 가장 좋아하는 편집기로 다음의 몇줄의 코드만 추가하면 만들수 있습니다.
 
