@@ -28,7 +28,7 @@
 - 손실(loss; 출력이 정답으로부터 얼마나 떨어져있는지)을 계산합니다.
 - 변화도(gradient)를 신경망의 매개변수들에 역으로 전파합니다.
 - 신경망의 가중치를 갱신합니다. 일반적으로 다음과 같은 간단한 규칙을 사용합니다:
-  ``가중치(wiehgt) = 가중치(weight) - 학습율(learning rate) * 변화도(gradient)``
+  ``가중치(wiehgt) = 가중치(weight) - 학습률(learning rate) * 변화도(gradient)``
 
 신경망 정의하기
 ------------------
@@ -217,7 +217,7 @@ print(net.conv1.bias.grad)
 # 실제로 많이 사용되는 가장 단순한 갱신 규칙은 확률적 경사하강법(SGD; Stochastic
 # Gradient Descent)입니다:
 #
-#      ``가중치(wiehgt) = 가중치(weight) - 학습율(learning rate) * 변화도(gradient)``
+#      ``가중치(wiehgt) = 가중치(weight) - 학습률(learning rate) * 변화도(gradient)``
 #
 # 간단한 Python 코드로 이를 구현해볼 수 있습니다:
 #

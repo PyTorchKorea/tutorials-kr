@@ -129,7 +129,7 @@ imshow(out, title=[class_names[x] for x in classes])
 # 이제 모델을 학습하기 위한 일반 함수를 작성해보겠습니다. 여기서는 다음 내용들을
 # 설명합니다:
 #
-# -  학습율(learning rate) 관리(scheduling)
+# -  학습률(learning rate) 관리(scheduling)
 # -  최적의 모델 구하기
 #
 # 아래에서 ``scheduler`` 매개변수는 ``torch.optim.lr_scheduler`` 의 LR 스케쥴러
@@ -258,7 +258,7 @@ criterion = nn.CrossEntropyLoss()
 # 모든 매개변수들이 최적화되었는지 관찰
 optimizer_ft = optim.SGD(model_ft.parameters(), lr=0.001, momentum=0.9)
 
-# 7 에폭마다 0.1씩 학습율 감소
+# 7 에폭마다 0.1씩 학습률 감소
 exp_lr_scheduler = lr_scheduler.StepLR(optimizer_ft, step_size=7, gamma=0.1)
 
 ######################################################################
@@ -305,7 +305,7 @@ criterion = nn.CrossEntropyLoss()
 # 이전과는 다르게 마지막 계층의 매개변수들만 최적화되는지 관찰
 optimizer_conv = optim.SGD(model_conv.fc.parameters(), lr=0.001, momentum=0.9)
 
-# 7 에폭마다 0.1씩 학습율 감소
+# 7 에폭마다 0.1씩 학습률 감소
 exp_lr_scheduler = lr_scheduler.StepLR(optimizer_conv, step_size=7, gamma=0.1)
 
 
