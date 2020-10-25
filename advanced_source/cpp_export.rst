@@ -38,7 +38,7 @@ PyTorch 모델을 TorchScript로 변환하는 방법에는 두가지가 있습�
 
 PyTorch 모델을 트레이싱을 통해 TorchScript로 변환하기 위해서는, 여러분이 구현한 모델의 인스턴스를
 예제 입력값과 함께 ``torch.jit.trace`` 함수에 넘겨주어야 합니다. 그러면 이 함수는 ``torch.jit.ScriptModule``
-객체를 생성하게 됩니다. 이렇게 생성된 객체에는 모듈의 ``forward`` 메서드의 모델 실행시 런타임을 trace한
+객체를 생성하게 됩니다. 이렇게 생성된 객체에는 모듈의 ``forward`` 메소드의 모델 실행시 런타임을 trace한
 결과가 포함되게 됩니다::
 
   import torch
@@ -47,7 +47,7 @@ PyTorch 모델을 트레이싱을 통해 TorchScript로 변환하기 위해서�
   # 모델 인스턴스 생성
   model = torchvision.models.resnet18()
 
-  # 일반적으로 모델의 forward() 메서드에 넘겨주는 입력값
+  # 일반적으로 모델의 forward() 메소드에 넘겨주는 입력값
   example = torch.rand(1, 3, 224, 224)
 
   # torch.jit.trace를 사용하여 트레이싱을 이용해 torch.jit.ScriptModule 생성
@@ -82,7 +82,7 @@ TorchScript로 바로 작성하는 것이 바람직한 경우가 있습니다. �
           return output
 
 
-이 모듈의 ``forward`` 메서드는 입력값에 영향을 받는 제어흐름을 사용하고 있기 때문에, 이 모듈은
+이 모듈의 ``forward`` 메소드는 입력값에 영향을 받는 제어흐름을 사용하고 있기 때문에, 이 모듈은
 트레이싱에는 적합하지 않습니다. 대신 우리는 이 모듈을 ``ScriptModule`` 로 변환할 수 있습니다.
 모듈을 ``ScriptModule`` 로 변환하기 위해서는, 아래와 같이 ``torch.jit.script`` 함수를 사용해
 모듈을 컴파일해야 합니다::
@@ -103,8 +103,8 @@ TorchScript로 바로 작성하는 것이 바람직한 경우가 있습니다. �
     my_module = MyModule(10,20)
     sm = torch.jit.script(my_module)
 
-아직 TorchScript에서 지원하지 않는 Python 기능을 사용하고 있는 메서드들을 여러분의 ``nn.Module``
-에서 제외하고 싶다면, 그 메서드들을 ``@torch.jit.ignore`` 로 어노테이트하면 됩니다.
+아직 TorchScript에서 지원하지 않는 Python 기능을 사용하고 있는 메소드들을 여러분의 ``nn.Module``
+에서 제외하고 싶다면, 그 메소드들을 ``@torch.jit.ignore`` 로 어노테이트하면 됩니다.
 
 
 단계 2. Script 모듈을 파일로 직렬화하기
@@ -292,10 +292,10 @@ C++ 어플리케이션의 ``main()`` 함수에 아래의 코드를 추가하겠�
     at::Tensor output = module.forward(inputs).toTensor();
     std::cout << output.slice(/*dim=*/1, /*start=*/0, /*end=*/5) << '\n';
 
-첫 두줄은 모델의 입력값을 생성합니다. ``torch::jit::IValue`` (``script::Module`` 메서드들이
+첫 두줄은 모델의 입력값을 생성합니다. ``torch::jit::IValue`` (``script::Module`` 메소드들이
 입력받고 또 리턴할 수 있는 타입이 소거된 자료형)의 벡터를 만들고 그 벡터에 하나의 입력값을 추가합니다.
 입력값 텐서를 만들기 위해서 우리는 ``torch::ones()`` 을 사용합니다. 이 함수는 ``torch.ones`` 의 C++ API 버전입니다.
-이제 ``script::Module`` 의 ``forward`` 메서드에 입력값 벡터를 넘겨주어 실행하면, 우리는 새로운
+이제 ``script::Module`` 의 ``forward`` 메소드에 입력값 벡터를 넘겨주어 실행하면, 우리는 새로운
 ``IValue`` 를 리턴받게되고, 이 값을 ``toTensor()`` 를 통해 텐서로 변환할 수 있습니다.
 
 .. tip::
