@@ -1,20 +1,18 @@
 """
-PyTorch Profiler
+Pytorch 프로파일러
 ====================================
-This recipe explains how to use PyTorch profiler and measure the time and
-memory consumption of the model's operators.
+이 레시피에서는 어떻게 Pytorch 프로파일러를 사용하는지, 또한 모델 운용자의 메모리 소비와 시간측정을 살펴보겠습니다.
 
-Introduction
+개요
 ------------
-PyTorch includes a simple profiler API that is useful when user needs
-to determine the most expensive operators in the model.
+Pytorch는 사용자가 모델안에서 가장 비싼 운용자를 정하는게 필요할때 유용하고 간단한 프로파일러 API 포함하고 있습니다.
 
-In this recipe, we will use a simple Resnet model to demonstrate how to
-use profiler to analyze model performance.
+이 레시피에서는 간단한 Resnet 모델을 사용하여 어떻게 프로파일러가 모델 퍼포먼스를 분석하는지 살펴보겠습니다.
 
-Setup
+설정
 -----
-To install ``torch`` and ``torchvision`` use the following command:
+``torch`` 와 ``torchvision`` 을 설치하기 위해서 아래의 커맨드를 입력합니다. 
+
 
 ::
 
@@ -25,20 +23,20 @@ To install ``torch`` and ``torchvision`` use the following command:
 
 
 ######################################################################
-# Steps
+# 단계(Steps)
 # -----
 #
-# 1. Import all necessary libraries
-# 2. Instantiate a simple Resnet model
-# 3. Use profiler to analyze execution time
-# 4. Use profiler to analyze memory consumption
-# 5. Using tracing functionality
+# 1. 필요한 라이브러리들 불러오기
+# 2. 간단한 Resnet 모델 인스턴스화 하기
+# 3. 프로파일러를 사용하여 실행시간 분석하기
+# 4. 프로파일러를 사용하여 메모리 소비 분석하기
+# 5. 추적기능 사용하기
 #
-# 1. Import all necessary libraries
+# 1. 필요한 라이브러리들 불러오기
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-# In this recipe we will use ``torch``, ``torchvision.models``
-# and ``profiler`` modules:
+# 이 레시피에서는 ``torch`` 와 ``torchvision.models``
+# 그리고 ``profiler`` 모듈을 사용합니다:
 #
 
 import torch
@@ -47,53 +45,51 @@ import torch.autograd.profiler as profiler
 
 
 ######################################################################
-# 2. Instantiate a simple Resnet model
+# 2. 간단한 Resnet 모델 인스턴스화 하기
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-# Let's create an instance of a Resnet model and prepare an input
-# for it:
+# Resnet 모델 인스턴스를 만들고 입력값을
+# 준비합니다 :
 #
 
 model = models.resnet18()
 inputs = torch.randn(5, 3, 224, 224)
 
 ######################################################################
-# 3. Use profiler to analyze execution time
+# 3. 프로파일러를 사용하여 실행시간 분석하기
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-# PyTorch profiler is enabled through the context manager and accepts
-# a number of parameters, some of the most useful are:
+# Pytorch 프로파일러는 컨텍스트 메니저를 통해 실행할 수 있고
+# 몇개의 매개변수를 받아드립니다. 그중 가장 유용한 것들은 아래와 같이 있습니다. :
 #
-# - ``record_shapes`` - whether to record shapes of the operator inputs;
-# - ``profile_memory`` - whether to report amount of memory consumed by
-#   model's Tensors;
-# - ``use_cuda`` - whether to measure execution time of CUDA kernels.
+# - ``record_shapes`` - 운용자의 인풋의 모양을 기록;
+# - ``profile_memory`` - 모델의 텐서 메모리 소비값을 보고;
+# - ``use_cuda`` - CUDA 커넬의 실행시간을 측정;
 #
-# Let's see how we can use profiler to analyze the execution time:
+# 프로파일러를 사용하여 어떻게 실행시간을 분석하는지 보겠습니다. :
 
 with profiler.profile(record_shapes=True) as prof:
     with profiler.record_function("model_inference"):
         model(inputs)
 
 ######################################################################
-# Note that we can use ``record_function`` context manager to label
-# arbitrary code ranges with user provided names
-# (``model_inference`` is used as a label in the example above).
-# Profiler allows one to check which operators were called during the
-# execution of a code range wrapped with a profiler context manager.
-# If multiple profiler ranges are active at the same time (e.g. in
-# parallel PyTorch threads), each profiling context manager tracks only
-# the operators of its corresponding range.
-# Profiler also automatically profiles the async tasks launched
-# with ``torch.jit._fork`` and (in case of a backward pass)
-# the backward pass operators launched with ``backward()`` call.
+# ``record_function`` 컨텍스트 관리자를 사용하여
+# 임의 코드 범위에 사용자가 제공한 이름을 표시할 수 있습니다.
+# (``model_inference`` 은 위의 예제에서 라벨표기에 사용됐습니다.)
+# 프로파일러는 프로파일러 컨텍스트 관리자로 포장된 코드 범위의
+# 실행 중에 호출된 운용자들을 확인할 수 있습니다.
+# 만약 여러 프로파일러 범위들이 동시에 활성화(평행한 Pytorch 쓰레드)된 경우,
+# 각 프로파일링 컨텍스트 관리자는 해당범위의 운용자만 추적합니다.
+# 프로파일러는 또한 ``torch.jit._fork`` 로 실행된 비동기 작업과
+# backward pass의 경우 ``backward()`` 호출로
+# 실행된 backward pass 운용자를 자동으로 프로파일링합니다.
 #
-# Let's print out the stats for the execution above:
+# 위의 실행 통계를 인쇄해 봅시다 :
 
 print(prof.key_averages().table(sort_by="cpu_time_total", row_limit=10))
 
 ######################################################################
-# The output will look like (omitting some columns):
+# 출력값 예시 (몇몇 열은 제외):
 
 # -------------------------  --------------  ----------  ------------  ---------
 # Name                       Self CPU total   CPU total  CPU time avg  # Calls
@@ -111,16 +107,17 @@ print(prof.key_averages().table(sort_by="cpu_time_total", row_limit=10))
 # -------------------------  --------------  ----------  ------------  ---------
 
 ######################################################################
-# Here we see that, as expected, most of the time is spent in convolution (and specifically in ``mkldnn_convolution``
-# for PyTorch compiled with MKL-DNN support).
-# Note the difference between self cpu time and cpu time - operators can call other operators, self cpu time exludes time
-# spent in children operator calls, while total cpu time includes it.
+# 여기서 우리는 예상대로 대부분의 시간이 콘볼루션에서 보낸다는 것이 보입니다.
+# (특히 MKL-DNN 지원으로 컴파일된 Pytorch안에서의 ``mkldnn_convolution`` 기능)
+# 자체 CPU 시간과 CPU 시간 간의 차이점에 유의하셔야 합니다. 운용자들는 다른 운용자들을 호출을 할 수 있으며,
+# 자체 CPU 시간은 하위 운용자 호출에 소비되는 시간을 제외하며, 총 CPU 시간은 이를 포함합니다.
 #
-# To get a finer granularity of results and include operator input shapes, pass ``group_by_input_shape=True``:
+# 보다 세부적인 결과 정보를 얻고 운용자 입력 구조을 포함하려면 ``group_by_input_shape=True`` 를 패스합니다 :
 
-print(prof.key_averages(group_by_input_shape=True).table(sort_by="cpu_time_total", row_limit=10))
+print(prof.key_averages(group_by_input_shape=True).table(
+    sort_by="cpu_time_total", row_limit=10))
 
-# (omitting some columns)
+# (몇몇 열은 제외)
 # -------------------------  -----------  --------  -------------------------------------
 # Name                       CPU total    # Calls         Input Shapes
 # -------------------------  -----------  --------  -------------------------------------
@@ -138,21 +135,22 @@ print(prof.key_averages(group_by_input_shape=True).table(sort_by="cpu_time_total
 
 
 ######################################################################
-# 4. Use profiler to analyze memory consumption
+# 4. 프로파일러를 사용하여 메모리 소비 분석하기
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-# PyTorch profiler can also show the amount of memory (used by the model's tensors)
-# that was allocated (or released) during the execution of the model's operators.
-# In the output below, 'self' memory corresponds to the memory allocated (released)
-# by the operator, excluding the children calls to the other operators.
-# To enable memory profiling functionality pass ``profile_memory=True``.
+# Pytorch 프로파일러는 모델의 운용자 실행중 할당되거나 해제된
+# (모델의 텐서들이 사용된) 메모리 양을 보여줍니다.
+# 아래의 출력값에서, 'self' 메모리는 운용자에 의해 다른 운용자 할당된 (혹은 방출된) 메모리와 일치합니다.
+# 아래 출력에서 'self' 메모리는 다른 운영자에 대한 자식 호출을
+# 제외하고 운영자가 할당(해제)한 메모리에 해당합니다.
+# 메모리 프로파일링 기능을 실행하려면 ``profile_memory=True`` 를 패스하세요.
 
 with profiler.profile(profile_memory=True, record_shapes=True) as prof:
     model(inputs)
 
 print(prof.key_averages().table(sort_by="self_cpu_memory_usage", row_limit=10))
 
-# (omitting some columns)
+# (몇몇 열은 제외)
 # ---------------------------  ---------------  ---------------  ---------------
 # Name                         CPU Mem          Self CPU Mem     Number of Calls
 # ---------------------------  ---------------  ---------------  ---------------
@@ -165,7 +163,7 @@ print(prof.key_averages().table(sort_by="self_cpu_memory_usage", row_limit=10))
 
 print(prof.key_averages().table(sort_by="cpu_memory_usage", row_limit=10))
 
-# (omitting some columns)
+# (몇몇 열은 제외)
 # ---------------------------  ---------------  ---------------  ---------------
 # Name                         CPU Mem          Self CPU Mem     Number of Calls
 # ---------------------------  ---------------  ---------------  ---------------
@@ -187,10 +185,10 @@ print(prof.key_averages().table(sort_by="cpu_memory_usage", row_limit=10))
 # ---------------------------  ---------------  ---------------  ---------------
 
 ######################################################################
-# 5. Using tracing functionality
+# 5. 추적기능 사용하기
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-# Profiling results can be outputted as a .json trace file:
+# 프로파일링 결과는 .json trace 파일로 출력할 수 있습니다. :
 
 with profiler.profile() as prof:
     with profiler.record_function("model_inference"):
@@ -199,17 +197,17 @@ with profiler.profile() as prof:
 prof.export_chrome_trace("trace.json")
 
 ######################################################################
-# User can examine the sequence of profiled operators after loading the trace file
-# in Chrome (``chrome://tracing``):
+# 사용자는 프로파일된 운용자 순서를 trace 파일을 불러 온 후
+# 크롬에서 검토할 수 있습니다. (``chrome://tracing``):
 #
 # .. image:: ../../_static/img/trace_img.png
 #    :scale: 25 %
 
 ######################################################################
-# Learn More
+# 더 알아보기
 # ----------
 #
-# Take a look at the following tutorial to learn how to visualize your model with TensorBoard:
+# 아래의 튜토리얼을 통해 어떻게 TensorBoard를 사용하여 당신의 모델을 시각화 하는지 살펴보세요 :
 #
-# -  `Visualizing models, data, and training with TensorBoard <https://pytorch.org/tutorials/intermediate/tensorboard_tutorial.html>`_ tutorial
+# -  `모델 시각화, 데이터, 그리고 TensorBoard를 사용한 트레이닝 <https://pytorch.org/tutorials/intermediate/tensorboard_tutorial.html>`_ 튜토리얼
 #

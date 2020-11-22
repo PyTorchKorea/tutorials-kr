@@ -94,8 +94,8 @@ Recipes are bite-sized bite-sized, actionable examples of how to use specific Py
    :tags: Basics
 
 .. customcarditem::
-   :header: PyTorch Profiler
-   :card_description: Learn how to use PyTorch's profiler to measure operators time and memory consumption
+   :header: Pytorch 프로파일러
+   :card_description: PyTorch의 프로파일러를 사용하여 운영자 시간과 메모리 소비량을 측정하는 방법을 알아봅니다.
    :image: ../_static/img/thumbnails/cropped/profiler.png
    :link: ../recipes/recipes/profiler.html
    :tags: Basics
