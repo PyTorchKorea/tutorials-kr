@@ -12,12 +12,12 @@ Channels Last memory format 는 차원을 보존하는 메모리에서 NCHW 텐�
 
 예를 들어, 전형적인(연속적인) NCHW tensor의 저장소(이 경우 2개의 2x2 이미지에 3개의 채널이 존재함) 는 다음과 같이 보입니다:
 
-.. figure:: /_static/img/classic_memory_format.png   
+.. figure:: /_static/img/classic_memory_format.png
    :alt: classic_memory_format
 
 Channels Last memory 형식은 데이터를 다르게 정렬합니다: 
 
-.. figure:: /_static/img/channels_last_memory_format.png   
+.. figure:: /_static/img/channels_last_memory_format.png
    :alt: channels_last_memory_format
 
 Pytorch는 존재하는 스트라이드(strides) 구조를 사용함으로써 메모리 형식을 지원합니다(그리고  eager, JIT, 그리고 TorchScrip를 포함한 기존의 모델들과 하위 호환성을 제공합니다). 

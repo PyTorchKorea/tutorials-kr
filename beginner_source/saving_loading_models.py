@@ -144,6 +144,13 @@
 #    model.load_state_dict(torch.load(PATH))
 #    model.eval()
 #
+# .. note::
+#     PyTorch 버전 1.6에서는 새로운 Zip파일-기반의 파일 포맷을 사용하도록
+#     ``torch.save`` 가 변경되었습니다. ``torch.load`` 는 예전 방식의 파일들을
+#     읽어올 수 있도록 하고 있습니다. 어떤 이유에서든 ``torch.save`` 가 예전
+#     방식을 사용하도록 하고 싶다면, ``_use_new_zipfile_serialization=False`` 을
+#     kwarg로 전달하세요.
+#
 # 추론을 위해 모델을 저장할 때는 학습된 모델의 학습된 매개변수만 저장하면 됩니다.
 # ``torch.save()`` 를 사용하여 모델의 *state_dict* 를 저장하는 것이 나중에 모델을
 # 사용할 때 가장 유연하게 사용할 수 있는, 모델 저장 시 권장하는 방법입니다.
