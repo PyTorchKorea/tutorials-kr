@@ -1,61 +1,53 @@
-Distributed Pipeline Parallelism Using RPC
-==========================================
-**Author**: `Shen Li <https://mrshenli.github.io/>`_
+RPC를 이용한 분산 파이프라인 병렬 처리(Parallelism)
+===================================================================
+**저자**: `Shen Li <https://mrshenli.github.io/>`_
+**번역**: `양수진 </https://github.com/musuys>`_ , `RushBsite </https://github.com/RushBsite>`_
 
-Prerequisites:
+선수과목(Prerequisites):
 
--  `PyTorch Distributed Overview <../beginner/dist_overview.html>`__
--  `Single-Machine Model Parallel Best Practices <https://pytorch.org/tutorials/intermediate/model_parallel_tutorial.html>`__
--  `Getting started with Distributed RPC Framework <https://pytorch.org/tutorials/intermediate/rpc_tutorial.html>`__
--  RRef helper functions:
+-  `파이토치 분산(Distributed) 개요 <../beginner/dist_overview.html>`__
+-  `단일 머신(Single-Machine) 모델 병렬(Parallel) 모범 사례 <https://pytorch.org/tutorials/intermediate/model_parallel_tutorial.html>`__
+-  `분산 RPC 프레임워크(Framework) <https://pytorch.org/tutorials/intermediate/rpc_tutorial.html>`__
+-  RRef 도움 함수:
    `RRef.rpc_sync() <https://pytorch.org/docs/master/rpc.html#torch.distributed.rpc.RRef.rpc_sync>`__,
    `RRef.rpc_async() <https://pytorch.org/docs/master/rpc.html#torch.distributed.rpc.RRef.rpc_async>`__, and
    `RRef.remote() <https://pytorch.org/docs/master/rpc.html#torch.distributed.rpc.RRef.remote>`__
 
 
 
-This tutorial uses a Resnet50 model to demonstrate implementing distributed
-pipeline parallelism with `torch.distributed.rpc <https://pytorch.org/docs/master/rpc.html>`__
-APIs. This can be viewed as the distributed counterpart of the multi-GPU
-pipeline parallelism discussed in
-`Single-Machine Model Parallel Best Practices <model_parallel_tutorial.html>`_.
+이 튜토리얼에서는 Resnet50 모델을 사용하여 `torch.distributed.rpc <https://pytorch.org/docs/master/rpc.html>`__
+APIs로 분산 파이프라인 병렬 처리를 구현합니다. `단일 머신 모델 병렬 모범 사례 <model_parallel_tutorial.html>`_ 에서 논의된 다중 GPU(multi-GPU) 파이프라인 병렬 처리의 분산 대안으로 볼 수 있습니다.
 
-.. note:: This tutorial requires PyTorch v1.6.0 or above.
 
-.. note:: Full source code of this tutorial can be found at
-    `pytorch/examples <https://github.com/pytorch/examples/tree/master/distributed/rpc/pipeline>`__.
+.. note:: 이 튜토리얼에서는 PyTorch v1.6.0 이상이 필요합니다.
+
+.. note:: 이 튜토리얼의 전체 소스 코드는
+    `pytorch/examples <https://github.com/pytorch/examples/tree/master/distributed/rpc/pipeline>`__ 에서 찾을 수 있습니다.
 
 Basics
-------
+----------------
 
 
-The previous tutorial, `Getting Started with Distributed RPC Framework <rpc_tutorial.html>`_
-shows how to use `torch.distributed.rpc <https://pytorch.org/docs/master/rpc.html>`_
-to implement distributed model parallelism for an RNN model. That tutorial uses
-one GPU to host the ``EmbeddingTable``, and the provided code works fine.
-However, if a model lives on multiple GPUs, it would require some extra steps to
-increase the amortized utilization of all GPUs. Pipeline parallelism is one type
-of paradigm that can help in this case.
+이전튜토리얼, `분산 RPC 프레임워크 시작하기 <rpc_tutorial.html>`_ 에서는 `torch.distributed.rpc <https://pytorch.org/docs/master/rpc.html>`_
+를 사용하여 RNN 모델에 대한 분산 모델 병렬 처리를 구현하는 방법을 보여줍니다. 이 튜토리얼은 하나의 GPU를 사용하여 ``EmbeddingTable`` 을 호스팅하며,
+제공된 코드는 정상 작동합니다. 하지만 모델이 여러 GPU에 있는 경우, 모든 GPU의 분할 사용률(amortized utilization)을 높이기 위해 몇가지 추가 단계가 필요합니다.
+파이프라인 병렬 처리는 이 경우에 도움이 될 수 있는 패러다임의 한 유형입니다.
 
-In this tutorial, we use ``ResNet50`` as an example model which is also used by
-the `Single-Machine Model Parallel Best Practices <model_parallel_tutorial.html>`_
-tutorial. Similarly, the ``ResNet50`` model is divided into two shards and
-the input batch is partitioned into multiple splits and fed into the two model
-shards in a pipelined fashion. The difference is that, instead of parallelizing
-the execution using CUDA streams, this tutorial invokes asynchronous RPCs. So,
-the solution presented in this tutorial also works across machine boundaries.
-The remainder of this tutorial presents the implementation in four steps.
+이 튜토리얼에서는, ``ResNet50`` 을  `단일 머신 모델 병렬 모범 사례 <model_parallel_tutorial.html>`_ 에서도 사용되는 예제 모델로 사용합니다.
+마찬가지로, ``ResNet50`` 모델은 두개의 shard로 나뉘고 입력 배치(batch)도 여러 개의 분할로 분할되어(partitioned) 파이프라인 방식으로 두개의 모델 shard로 공급됩니다.
+차이점은, CUDA 스트림을 사용하여 실행을 병렬화하는 대신에 이 튜토리얼은 비동기(asynchronous) RPC를 실행한다는 것입니다.
+따라서, 이 튜토리얼에 제시된 솔루션은  머신 경계에서도 작동합니다.
+이 튜토리얼의 나머지 부분에서는 구현을 4단계로 설명합니다.
 
 
 
-Step 1: Partition ResNet50 Model
+Step 1: ResNet50 모델 분할
 --------------------------------
 
-This is the preparation step which implements ``ResNet50`` in two model shards.
-The code below is borrowed from the
-`ResNet implementation in torchvision <https://github.com/pytorch/vision/blob/7c077f6a986f05383bcb86b535aedb5a63dd5c4b/torchvision/models/resnet.py#L124>`_.
-The ``ResNetBase`` module contains the common building blocks and attributes for
-the two ResNet shards.
+이 단계는  ``ResNet50`` 을 두 개의 모델 샤드(shard)에 구현하는 준비 단계입니다.
+아래 코드는
+`torchvision에서의 ResNet 구현 <https://github.com/pytorch/vision/blob/7c077f6a986f05383bcb86b535aedb5a63dd5c4b/torchvision/models/resnet.py#L124>`_ 에서 차용한 것입니다.
+``ResNetBase`` 모듈에는 두개의 ResNet 샤드에 대한 공통 구성 요소와 속성이 포함되어 있습니다.
 
 
 .. code:: python
@@ -112,14 +104,13 @@ the two ResNet shards.
             return [RRef(p) for p in self.parameters()]
 
 
-Now, we are ready to define the two model shards. For the constructor, we
-simply split all ResNet50 layers into two parts and move each part into the
-provided device. The ``forward`` functions of both shards take an ``RRef`` of
-the input data, fetch the data locally, and then move it to the expected device.
-After applying all layers to the input, it moves the output to CPU and returns.
-It is because the RPC API requires tensors to reside on CPU to avoid invalid
-device errors when the numbers of devices in the caller and the callee do not
-match.
+
+이제, 우리는 두개의 모델 샤드를 정의할 준비가 되었습니다. 생성자에서는 간단하게 모든 resNet50 레이어들을
+두개의 부분으로 나누고, 각 부분을 제공된 디바이스로 이동시킵니다. 각 샤드의 ``foward`` 함수는 입력 데이터의
+``RRef`` 를 가져오고, 로컬로 데이터를 가져온 다음, 적절한 디바이스로 이동시킵니다. 모든 레이어의 입력을 처리한 후에,
+출력을 CPU로 전달하고 반환합니다. RPC API 가 발신자(caller)와 수신자(callee)의 장치수가 맞지 않는 경우의 디바이스 에러를
+방지하기 위해 tensor 가 유효한 cpu에 존재하는것을 요구하기 때문입니다.
+
 
 
 .. code:: python
@@ -174,29 +165,22 @@ match.
             return out.cpu()
 
 
-Step 2: Stitch ResNet50 Model Shards Into One Module
-----------------------------------------------------
+
+Step 2: ResNet50 모델 샤드를 하나의 모듈로 연결
+------------------------------------------------------
 
 
-Then, we create a ``DistResNet50`` module to assemble the two shards and
-implement the pipeline parallel logic. In the constructor, we use two
-``rpc.remote`` calls to put the two shards on two different RPC workers
-respectively and hold on to the ``RRef`` to the two model parts so that they
-can be referenced in the forward pass.  The ``forward`` function
-splits the input batch into multiple micro-batches, and feeds these
-micro-batches to the two model parts in a pipelined fashion. It first uses an
-``rpc.remote`` call to apply the first shard to a micro-batch and then forwards
-the returned intermediate output ``RRef`` to the second model shard. After that,
-it collects the ``Future`` of all micro-outputs, and waits for all of them after
-the loop. Note that both ``remote()`` and ``rpc_async()`` return immediately and
-run asynchronously. Therefore, the entire loop is non-blocking, and will launch
-multiple RPCs concurrently. The execution order of one micro-batch on two model
-parts are preserved by intermediate output ``y_rref``. The execution order
-across micro-batches does not matter. In the end, the forward function
-concatenates outputs of all micro-batches into one single output tensor and
-returns. The ``parameter_rrefs`` function is a helper to
-simplify distributed optimizer construction, which will be used later.
-
+그다음, ``DistResNet50`` 모듈을 두개의 샤드를 조립하고 파이프 라인 병렬 로직을
+수행하도록 생성합니다. 생성자에서는, 두개의``rpc.remote`` 호출을 실행해, 두개의 샤드를 각기 
+다른 두개의 RPC 작업자에 배치하고, 호출된 두 모델의 ``RRef`` 파트를 각각 유지하여 포워드(foward) 패스에서
+참조 가능하게 합니다. ``foward`` 함수는 입력 배치를 여러 마이크로 배치로 분할하고 파이프라인 방식으로 두 
+모엘 파트에 마이크로 배치를 제공합니다. 먼저, ``rpc.rmote`` 를 호출하여 첫번째 샤드를 마이크로 배치에 적용한 다음
+``RRef`` 중간 출력을 두번째 모델 샤드에 반환합니다. 그 후, 모든 마이크로 출력의 ``Future`` 를 수집하고 
+루프 이후 모든 출력을 대기합니다. ``remote()`` 와 ``rpc_async()`` 모두 즉시 반환되고 비동기적으로 실행됩니다.
+따라서 전체적인 루프는 차단 없이 이루어지며, 동시에 여러 rpc를 실행 가능하게 합니다. 두 모델 파트에서
+마이크로 배치의 실행 순서는 중간출력 ``y_rref`` 에 의해 보존됩니다. 마이크로 배치간의 실행순서는 중요하지 않습니다.
+마지막으로, 포워드 함수의 모든 마이크로 배치의 출력을 하나의 단일 tensor 로 연결하고 반환합니다.
+``parameter_rrefs`` 함수는 나중에 사용될 분산 최적화 프로그램 구성을 단순화 시키는것 에 사용됩니다.
 
 
 .. code:: python
@@ -240,21 +224,18 @@ simplify distributed optimizer construction, which will be used later.
             return remote_params
 
 
-Step 3: Define The Training Loop
---------------------------------
+
+Step 3: 학습 루프 정의하기
+-------------------------------
 
 
-After defining the model, let us implement the training loop. We use a
-dedicated "master" worker to prepare random inputs and labels, and control the
-distributed backward pass and distributed optimizer step. It first creates an
-instance of the ``DistResNet50`` module. It specifies the number of
-micro-batches for each batch, and also provides the name of the two RPC workers
-(i.e., "worker1", and "worker2"). Then it defines the loss function and creates
-a ``DistributedOptimizer`` using the ``parameter_rrefs()`` helper to acquire a
-list of parameter ``RRefs``. Then, the main training loop is very similar to
-regular local training, except that it uses ``dist_autograd`` to launch
-backward and provides the ``context_id`` for both backward and optimizer
-``step()``.
+모델을 정의했으므로 , 이번에는 학습 루프를 구현해 보겠습니다. 우리는 랜덤 입력들과 라벨들을
+전담하며 분산된 역방향 패스 및 최적화 단계를 컨트롤 하는 ``master`` 작업자를 사용합니다.
+작업자는 먼저 ``DistResNet50`` 모듈의 인스턴스를 생성합니다. 그 다음, 각 배치에 대한 마이크로 배치의 수를
+지정하고, 두 RPC 작업자의 이름도 제공합니다.(예 : "worker1" 및 "worker2") 다음으로, 손실(loss) 함수를 정의하고
+``RRefs`` 의 매개변수 목록을 얻도록 ``parameter_rrefs()`` 헬퍼를 사용하여 ``DistributedOptimizer`` 를 생성합니다.
+이후의 주 학습 루프는 ``dist_autograd`` 를 사용하여 시작하는 것을 제외하곤, 일반적인 로컬 학습과 매우 유사합니다. 
+이는 역방향 실행 및 역방향 프로그램 모두에 대해 ``context_id`` 를 제공하고 ``step()`` 를 최적화 하기 위함입니다.
 
 
 .. code:: python
@@ -296,14 +277,14 @@ backward and provides the ``context_id`` for both backward and optimizer
                 opt.step(context_id)
 
 
-Step 4: Launch RPC Processes
+
+Step 4: RPC 프로세서 실행
 ----------------------------
 
 
-Finally, the code below shows the target function for all processes. The main
-logic is defined in ``run_master``. The workers passively waiting for
-commands from the master, and hence simply runs ``init_rpc`` and ``shutdown``,
-where the ``shutdown`` by default will block until all RPC participants finish.
+마지막으로, 아래 코드는 모든 프로세스에 대한 대상 함수를 나타냅니다. 주 로직은 ``run_master`` 에
+정의되어 있습니다. 작업자는 마스터의 명령을 수동적으로 기다리고 명령이 오면, ``init_rpc`` 와 ``shutdown`` 을
+단순히 실행시키며, 여기서 ``shutdown`` 는 기본적으로 모든 RPC 참가자가 완료 될 때까지 차단됩니다.
 
 .. code:: python
 
@@ -348,8 +329,8 @@ where the ``shutdown`` by default will block until all RPC participants finish.
             print(f"number of splits = {num_split}, execution time = {tok - tik}")
 
 
-The output below shows the speedup attained by increasing the number of splits
-in each batch.
+
+아래의 출력은 각 배치의 분할 수를 늘림으로써 얻은 속도 향상을 보여줍니다.
 
 ::
 
