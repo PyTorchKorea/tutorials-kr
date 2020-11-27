@@ -1,21 +1,21 @@
-Autograd in C++ Frontend
-========================
+C ++ 프론트엔드(FRONTEND)의 AUTOGRAD
+====================================
 
-The ``autograd`` package is crucial for building highly flexible and dynamic neural
-networks in PyTorch. Most of the autograd APIs in PyTorch Python frontend are also available
-in C++ frontend, allowing easy translation of autograd code from Python to C++.
+이 ``autograd`` 패키지는 파이토치(Pytorch)에서 매우 유연하고, 동적 신경망(dynamic neural network)을 구축하는 데 중요합니다.
+파이토치 파이썬(Python) 프론트엔드의 대부분의 autograd API는 C ++ 프론트엔드에서도
+사용할 수 있으므로, Autograd 코드를 파이썬에서 C ++로 쉽게 변환 할 수 있습니다.
 
-In this tutorial we'll look at several examples of doing autograd in PyTorch C++ frontend.
-Note that this tutorial assumes that you already have a basic understanding of
-autograd in Python frontend. If that's not the case, please first read
-`Autograd: Automatic Differentiation <https://pytorch.org/tutorials/beginner/blitz/autograd_tutorial.html>`_.
+이 튜토리얼에서는 파이토치 C++ 프론트엔드에서 autograd를 실행하는 몇 가지 예를 살펴보겠습니다.
+이 튜토리얼에서는 파이썬 프론트 엔드의 autograd에 대한 기본적인 이해가 이미 있다고 가정합니다.
+그렇지 않은 경우 먼저
+`Autograd: Automatic Differentiation <https://pytorch.org/tutorials/beginner/blitz/autograd_tutorial.html>`_ 을 읽어보십시오.
 
-Basic autograd operations
--------------------------
+기본 autograd 연산(operation)
+----------------------------------
 
-(Adapted from `this tutorial <https://pytorch.org/tutorials/beginner/blitz/autograd_tutorial.html#autograd-automatic-differentiation>`_)
+(`이 튜토리얼 <https://pytorch.org/tutorials/beginner/blitz/autograd_tutorial.html#autograd-automatic-differentiation>`_ 을 사용하여 수정됨)
 
-Create a tensor and set ``torch::requires_grad()`` to track computation with it
+tensor를 생성한 후 ``torch::requires_grad()`` 를 설정하여 해당 tensor와의 연산 기록을 추적합니다.
 
 .. code-block:: cpp
 
@@ -31,7 +31,7 @@ Out:
   [ CPUFloatType{2,2} ]
 
 
-Do a tensor operation:
+tensor 연산 수행:
 
 .. code-block:: cpp
 
@@ -46,7 +46,7 @@ Out:
    3  3
   [ CPUFloatType{2,2} ]
 
-``y`` was created as a result of an operation, so it has a ``grad_fn``.
+``y`` 가 연산의 결과로 생성되었으므로, 이것은 ``grad_fn`` 을 갖습니다.
 
 .. code-block:: cpp
 
@@ -58,7 +58,7 @@ Out:
 
   AddBackward1
 
-Do more operations on ``y``
+``y`` 에서 더 많은 연산 수행
 
 .. code-block:: cpp
 
@@ -83,7 +83,7 @@ Out:
   MeanBackward0
 
 
-``.requires_grad_( ... )`` changes an existing tensor's ``requires_grad`` flag in-place.
+``.requires_grad_( ... )`` 은 기존에 존재하는 tensor의 ``requires_grad`` 플래그(flag)를 제자리에서 변경합니다.
 
 .. code-block:: cpp
 
@@ -105,18 +105,20 @@ Out:
   true
   SumBackward0
 
-Let's backprop now. Because ``out`` contains a single scalar, ``out.backward()``
-is equivalent to ``out.backward(torch::tensor(1.))``.
+``out`` 은 하나의 스칼라(scalar)값을 가지고 있기 때문에,
+``out.backward()`` 는 ``out.backward(torch::tensor(1.))`` 와 동일한 값을 리턴합니다.
 
 .. code-block:: cpp
 
   out.backward();
 
-Print gradients d(out)/dx
+
+변화도(gradient) d(out)/dx 출력
 
 .. code-block:: cpp
 
   std::cout << x.grad() << std::endl;
+
 
 Out:
 
@@ -126,10 +128,11 @@ Out:
    4.5000  4.5000
   [ CPUFloatType{2,2} ]
 
-You should have got a matrix of ``4.5``. For explanations on how we arrive at this value,
-please see `the corresponding section in this tutorial <https://pytorch.org/tutorials/beginner/blitz/autograd_tutorial.html#gradients>`_.
 
-Now let's take a look at an example of vector-Jacobian product:
+``4.5`` 의 행렬(matrix)을 얻었어야 했습니다. 이 값에 도달하는 방법에 대한 설명은, `이 튜토리얼의 해당 섹션을 참조하십시오. <https://pytorch.org/tutorials/beginner/blitz/autograd_tutorial.html#gradients>`_
+
+
+이제 vector-Jacobian product의 예를 살펴 보겠습니다:
 
 .. code-block:: cpp
 
@@ -153,7 +156,7 @@ Out:
   [ CPUFloatType{3} ]
   MulBackward1
 
-If we want the vector-Jacobian product, pass the vector to ``backward`` as argument:
+vector-Jacobian product를 원하면 벡터(vector)를 ``backward`` 인자(argument)로 전달하십시오:
 
 .. code-block:: cpp
 
@@ -171,8 +174,7 @@ Out:
       0.1024
   [ CPUFloatType{3} ]
 
-You can also stop autograd from tracking history on tensors that require gradients
-either by putting ``torch::NoGradGuard`` in a code block
+또한 코드 블록에  ``torch::NoGradGuard`` 를 입력하여 변화도를 필요로 하는 tensor에서 autograd가 연산 기록 추적을 중지하도록 할 수도 있습니다.
 
 .. code-block:: cpp
 
@@ -193,8 +195,7 @@ Out:
   true
   false
 
-Or by using ``.detach()`` to get a new tensor with the same content but that does
-not require gradients:
+또는 ``.detach()`` 를 사용하여 동일한 콘텐츠가 있지만 변화도가 필요하지 않은 새로운 tensor를 얻습니다:
 
 .. code-block:: cpp
 
@@ -211,15 +212,13 @@ Out:
   false
   true
 
-For more information on C++ tensor autograd APIs such as ``grad`` / ``requires_grad`` /
-``is_leaf`` / ``backward`` / ``detach`` / ``detach_`` / ``register_hook`` / ``retain_grad``,
-please see `the corresponding C++ API docs <https://pytorch.org/cppdocs/api/classat_1_1_tensor.html>`_.
+``grad`` / ``requires_grad`` / ``is_leaf`` / ``backward`` / ``detach`` / ``detach_`` / ``register_hook`` / ``retain_grad``
+와 같은 C++ tensor autograd API에 대한 자세한 내용은 `해당 C++ API 문서 <https://pytorch.org/cppdocs/api/classat_1_1_tensor.html>`_ 를 참조하십시오.
 
-Computing higher-order gradients in C++
+C++에서의 고차 변화도 연산
 ---------------------------------------
 
-One of the applications of higher-order gradients is calculating gradient penalty.
-Let's see an example of it using ``torch::autograd::grad``:
+고차 변화도의 응용 프로그램 중 하나는 변화도 패널티(penalty)를 계산하는 것입니다.  ``torch::autograd::grad`` 를 사용하여 예제를 보겠습니다:
 
 .. code-block:: cpp
 
@@ -230,16 +229,16 @@ Let's see an example of it using ``torch::autograd::grad``:
   auto input = torch::randn({3, 4}).requires_grad_(true);
   auto output = model(input);
   
-  // Calculate loss
+  // 손실(loss) 계산
   auto target = torch::randn({3, 3});
   auto loss = torch::nn::MSELoss()(output, target);
   
-  // Use norm of gradients as penalty
+  // 변화도의 표준(norm)을 패널티로 사용
   auto grad_output = torch::ones_like(output);
   auto gradient = torch::autograd::grad({output}, {input}, /*grad_outputs=*/{grad_output}, /*create_graph=*/true)[0];
   auto gradient_penalty = torch::pow((gradient.norm(2, /*dim=*/1) - 1), 2).mean();
   
-  // Add gradient penalty to loss
+  // 손실에 변화도 패널티 추가
   auto combined_loss = loss + gradient_penalty;
   combined_loss.backward();
   
@@ -254,25 +253,23 @@ Out:
   -0.1683 -0.1052  0.0355  0.1024
   [ CPUFloatType{3,4} ]
 
-Please see the documentation for ``torch::autograd::backward``
+사용 방법에 대한 자세한 내용은 ``torch::autograd::backward``
 (`link <https://pytorch.org/cppdocs/api/function_namespacetorch_1_1autograd_1afa9b5d4329085df4b6b3d4b4be48914b.html>`_)
-and ``torch::autograd::grad``
+및 ``torch::autograd::grad``
 (`link <https://pytorch.org/cppdocs/api/function_namespacetorch_1_1autograd_1a1e03c42b14b40c306f9eb947ef842d9c.html>`_)
-for more information on how to use them.
+설명서를 참조하십시오.
 
-Using custom autograd function in C++
+C++에서 사용자지정(custom) autograd 함수 사용
 -------------------------------------
 
-(Adapted from `this tutorial <https://pytorch.org/docs/stable/notes/extending.html#extending-torch-autograd>`_)
+(`이 튜토리얼 <https://pytorch.org/docs/stable/notes/extending.html#extending-torch-autograd>`_ 에서 수정됨)
 
-Adding a new elementary operation to ``torch::autograd`` requires implementing a new ``torch::autograd::Function``
-subclass for each operation. ``torch::autograd::Function`` s are what ``torch::autograd``
-uses to compute the results and gradients, and encode the operation history. Every
-new function requires you to implement 2 methods: ``forward`` and ``backward``, and
-please see `this link <https://pytorch.org/cppdocs/api/structtorch_1_1autograd_1_1_function.html>`_
-for the detailed requirements.
+``torch::autograd`` 에 새로운 기본적인 연산을 추가하려면 각 연산마다 새로운 ``torch::autograd::Function`` 하위 클래스를 구현해야 합니다.
+``torch::autograd::Function`` 은 ``torch::autograd`` 가 결과와 변화도를 계산하고,
+연산 기록을 인코딩(encode)하는데 사용됩니다. 모든 새 함수를 사용하려면 ``forward`` 와 ``backward``, 두 가지 메소드를 구현해야합니다.
+자세한 사항은 `이 링크 <https://pytorch.org/cppdocs/api/structtorch_1_1autograd_1_1_function.html>`_ 를 참조하십시오.
 
-Below you can find code for a ``Linear`` function from ``torch::nn``:
+아래는 ``torch::nn`` 에서 ``Linear`` 함수에 대한 코드를 찾을 수 있습니다:
 
 .. code-block:: cpp
 
@@ -280,12 +277,12 @@ Below you can find code for a ``Linear`` function from ``torch::nn``:
   
   using namespace torch::autograd;
   
-  // Inherit from Function
+  // 함수에서 상속(inherit)
   class LinearFunction : public Function<LinearFunction> {
    public:
-    // Note that both forward and backward are static functions
+    // 전방과 후방 모두 정적 함수라는 점을 유의하십시오
   
-    // bias is an optional argument
+    // bias는 선택 인자이다
     static torch::Tensor forward(
         AutogradContext *ctx, torch::Tensor input, torch::Tensor weight, torch::Tensor bias = torch::Tensor()) {
       ctx->save_for_backward({input, weight, bias});
@@ -314,7 +311,7 @@ Below you can find code for a ``Linear`` function from ``torch::nn``:
     }
   };
 
-Then, we can use the ``LinearFunction`` in the following way:
+그런 다음, ``LinearFunction`` 을 다음과 같이 사용할 수 있습니다:
 
 .. code-block:: cpp
 
@@ -339,7 +336,7 @@ Out:
    3.7608  0.9101  0.0073
   [ CPUFloatType{4,3} ]
 
-Here, we give an additional example of a function that is parametrized by non-tensor arguments:
+여기에서는 tensor가 아닌 non-tensor 인자로 매개변수화된 함수의 추가 예제를 제공합니다:
 
 .. code-block:: cpp
 
@@ -350,20 +347,20 @@ Here, we give an additional example of a function that is parametrized by non-te
   class MulConstant : public Function<MulConstant> {
    public:
     static torch::Tensor forward(AutogradContext *ctx, torch::Tensor tensor, double constant) {
-      // ctx is a context object that can be used to stash information
-      // for backward computation
+      // ctx는 정보를 넣어 두는데 사용할 수 있는 context 객체(object)이다
+      // backward 연산을 위한
       ctx->saved_data["constant"] = constant;
       return tensor * constant;
     }
   
     static tensor_list backward(AutogradContext *ctx, tensor_list grad_outputs) {
-      // We return as many input gradients as there were arguments.
-      // Gradients of non-tensor arguments to forward must be `torch::Tensor()`.
+      // 인자가 있었던 만큼 많은 입력 변화도를 반환한다.
+      // 전달할 non-tensor 인자의 변화도는 `torch::Tensor()` 여야 한다.
       return {grad_outputs[0] * ctx->saved_data["constant"].toDouble(), torch::Tensor()};
     }
   };
 
-Then, we can use the ``MulConstant`` in the following way:
+그 다음에 ``MulConstant`` 를 다음과 같이 사용할 수 있습니다:
 
 .. code-block:: cpp
 
@@ -381,15 +378,15 @@ Out:
    5.5000
   [ CPUFloatType{2} ]
 
-For more information on ``torch::autograd::Function``, please see
-`its documentation <https://pytorch.org/cppdocs/api/structtorch_1_1autograd_1_1_function.html>`_.
+``torch::autograd::Function`` 에 대한 자세한 내용은
+`해당 설명서 <https://pytorch.org/cppdocs/api/structtorch_1_1autograd_1_1_function.html>`_ 를 참조하십시오.
 
-Translating autograd code from Python to C++
+파이썬에서 C++로 autograd 코드 변역
 --------------------------------------------
 
-On a high level, the easiest way to use autograd in C++ is to have working
-autograd code in Python first, and then translate your autograd code from Python to
-C++ using the following table:
+높은 수준에서 C ++에서 autograd를 사용하는 가장 쉬운 방법은 먼저 파이썬에서 작동하는 autograd 코드를 만든 다음
+다음 표를 사용하여 파이썬에서 C++로 autograd 코드를 변환하는 것입니다:
+
 
 +--------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | Python                         | C++                                                                                                                                                                    |
@@ -422,16 +419,12 @@ C++ using the following table:
 +--------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | ``torch.Tensor.is_leaf``       | ``torch::Tensor::is_leaf`` (`link <https://pytorch.org/cppdocs/api/classat_1_1_tensor.html#_CPPv4NK2at6Tensor7is_leafEv>`_)                                            |
 +--------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+번역후에는 대부분의 파이썬 autograd 코드가 C++에서만 작동합니다.
+그렇지 않은 경우`GitHub issue에 <https://github.com/pytorch/pytorch/issues>`_ 버그 보고서를 제출해주시면 최대한 빨리 수정하겠습니다.
 
-After translation, most of your Python autograd code should just work in C++.
-If that's not the case, please file a bug report at `GitHub issues <https://github.com/pytorch/pytorch/issues>`_
-and we will fix it as soon as possible.
 
-Conclusion
+결론
 ----------
 
-You should now have a good overview of PyTorch's C++ autograd API.
-You can find the code examples displayed in this note `here
-<https://github.com/pytorch/examples/tree/master/cpp/autograd>`_. As always, if you run into any
-problems or have questions, you can use our `forum <https://discuss.pytorch.org/>`_
-or `GitHub issues <https://github.com/pytorch/pytorch/issues>`_ to get in touch.
+이제 파이토치의 C ++ autograd API에 대한 좋은 개요가 있어야합니다. `여기 <https://github.com/pytorch/examples/tree/master/cpp/autograd>`_ 에서 이 노트에 표시된 코드 예제를 찾을 수 있습니다.
+항상 그렇듯이, 문제가 발생하거나 질문이 있는 경우 `포럼 <https://discuss.pytorch.org/>`_ 또는 `GitHub issues <https://github.com/pytorch/pytorch/issues>`_ 에 올려주십시오.
