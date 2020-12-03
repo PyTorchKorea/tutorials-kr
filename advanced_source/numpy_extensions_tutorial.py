@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 numpy 와 scipy 를 이용한 확장(Extensions) 생성하기
-=========================================
+=====================================================
 **Author**: `Adam Paszke <https://github.com/apaszke>`_
 
 **Updated by**: `Adam Dziedzic <https://github.com/adam-dziedzic>`_
