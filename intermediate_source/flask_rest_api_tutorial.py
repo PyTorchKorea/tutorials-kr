@@ -173,7 +173,7 @@ def get_prediction(image_bytes):
 
 ######################################################################
 # ``y_hat`` Tensor는 예측된 분류 ID의 인덱스를 포함합니다. 하지만 사람이 읽을 수
-# 있는 분류명이 있어야 하기 떄문에, 이를 위해 이름과 분류 ID를 매핑하는 것이 필요합니다.
+# 있는 분류명이 있어야 하기 때문에, 이를 위해 이름과 분류 ID를 매핑하는 것이 필요합니다.
 # `이 파일 <https://s3.amazonaws.com/deep-learning-models/image-models/imagenet_class_index.json>`_
 # 을 다운로드 받아 ``imagenet_class_index.json`` 이라는 이름으로 저장 후, 저장한 곳의
 # 위치를 기억해두세요. (또는, 이 튜토리얼과 똑같이 진행하는 경우에는 `tutorials/_static`
@@ -342,7 +342,7 @@ with open("../_static/img/sample_file.jpeg", 'rb') as f:
 #   것은 아닙니다. 모델이 이미지에서 아무것도 인식하지 못하는 경우를 처리하도록
 #   개선합니다.
 #
-# - 위에서는 Flask 서버를 개발 모드에로 실행하였지만, 이는 상용으로 배포하기에는
+# - 위에서는 Flask 서버를 개발 모드에서 실행하였지만, 이는 상용으로 배포하기에는
 #   적당하지 않습니다. Flask 서버를 상용으로 배포하는 것은
 #   `이 튜토리얼 <https://flask.palletsprojects.com/en/1.1.x/tutorial/deploy/>`_
 #   을 참고해보세요.

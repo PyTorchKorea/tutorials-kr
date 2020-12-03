@@ -187,7 +187,7 @@ def train_func(sub_train_):
         optimizer.step()
         train_acc += (output.argmax(1) == cls).sum().item()
 
-    # 학습율을 조절합니다
+    # 학습률을 조절합니다
     scheduler.step()
 
     return train_loss / len(sub_train_), train_acc / len(sub_train_)
@@ -222,8 +222,8 @@ def test(data_):
 # 기준(criterion)은 각 클래스에 대해 nn.LogSoftmax()와 nn.NLLLoss()를
 # 합쳐 놓은 방식입니다.
 # `SGD <https://pytorch.org/docs/stable/_modules/torch/optim/sgd.html>`__
-# optimizer는 확률적 경사 하강법를 구현해놓은 것입니다. 처음의 학습율은
-# 4.0으로 두었습니다. 매 에폭을 진행하면서 학습율을 조절할 때는
+# optimizer는 확률적 경사 하강법를 구현해놓은 것입니다. 처음의 학습률은
+# 4.0으로 두었습니다. 매 에폭을 진행하면서 학습률을 조절할 때는
 # `StepLR <https://pytorch.org/docs/master/_modules/torch/optim/lr_scheduler.html#StepLR>`__
 # 을 사용합니다.
 #

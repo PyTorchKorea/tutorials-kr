@@ -43,7 +43,6 @@ PyTorch 커뮤니티 멤버인 `Ben Trevett <https://github.com/bentrevett>`__ �
 #
 # Spacy가 설치되어 있다면, 다음 코드는 ``TranslationDataset`` 에 있는 각 문장을 ``Field`` 에 정의된
 # 내용을 기반으로 토큰화할 것입니다.
-
 from torchtext.datasets import Multi30k
 from torchtext.data import Field, BucketIterator
 
@@ -472,4 +471,3 @@ print(f'| Test Loss: {test_loss:.3f} | Test PPL: {math.exp(test_loss):7.3f} |')
 #
 # - ``torchtext`` 를 사용한 Ben Trevett의 튜토리얼을 `이곳 <https://github.com/bentrevett/>`__ 에서 확인할 수 있습니다.
 # - ``nn.Transformer`` 와 ``torchtext`` 의 다른 기능들을 이용한 다음 단어 예측을 통한 언어 모델링 튜토리얼을 살펴보세요.
-

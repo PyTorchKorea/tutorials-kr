@@ -157,7 +157,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/char_rnn_classification_tutorial.html">기초부터 시작하는 NLP: 문자-단위 RNN으로 이름 분류하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/char_rnn_generation_tutorial.html">기초부터 시작하는 NLP:  문자-단위 RNN으로 이름 생성하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/seq2seq_translation_tutorial.html">기초부터 시작하는 NLP: Sequence to Sequence 네트워크와 Attention을 이용한 번역</a></li>
-<li class="toctree-l1"><a class="reference internal" href="text_sentiment_ngrams_tutorial.html">SyntaxError</a></li>
+<li class="toctree-l1"><a class="reference internal" href="text_sentiment_ngrams_tutorial.html">TorchText로 텍스트 분류하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="torchtext_translation_tutorial.html">TorchText로 언어 번역하기</a></li>
 </ul>
 <p class="caption"><span class="caption-text">강화학습</span></p>
@@ -185,7 +185,7 @@
 </ul>
 <p class="caption"><span class="caption-text">모델 최적화</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/pruning_tutorial.html">Pruning Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/pruning_tutorial.html">가지치기 기법(Pruning) 튜토리얼</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/dynamic_quantization_tutorial.html">(beta) Dynamic Quantization on an LSTM Word Language Model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/static_quantization_tutorial.html">(beta) Static Quantization with Eager Mode in PyTorch</a></li>
@@ -194,7 +194,7 @@
 <p class="caption"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="dist_overview.html">PyTorch Distributed Overview</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/model_parallel_tutorial.html">Single-Machine Model Parallel Best Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/model_parallel_tutorial.html">단일 머신을 이용한 모델 병렬화 실습 예제</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/ddp_tutorial.html">Getting Started with Distributed Data Parallel</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/dist_tuto.html">PyTorch로 분산 어플리케이션 개발하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/rpc_tutorial.html">Getting Started with Distributed RPC Framework</a></li>
@@ -453,8 +453,8 @@ PyTorch는 심지어 여러분의 함수를 위해서 빠른 GPU 또는 벡터�
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor([-2.2695, -2.2829, -2.6933, -1.9631, -2.6527, -1.9515, -2.3322, -2.2398,
-        -2.2587, -2.7180], grad_fn=&lt;SelectBackward&gt;) torch.Size([64, 10])
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor([-2.3728, -2.5460, -2.5807, -2.6371, -2.6052, -1.8645, -2.4012, -2.1049,
+        -2.0545, -2.1928], grad_fn=&lt;SelectBackward&gt;) torch.Size([64, 10])
 </pre></div>
 </div>
 <p>여러분이 보시듯이, <code class="docutils literal notranslate"><span class="pre">preds</span></code> 텐서(tensor)는 텐서 값 외에도, 또한
@@ -475,7 +475,7 @@ PyTorch는 심지어 여러분의 함수를 위해서 빠른 GPU 또는 벡터�
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor(2.2232, grad_fn=&lt;NegBackward&gt;)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor(2.4268, grad_fn=&lt;NegBackward&gt;)
 </pre></div>
 </div>
 <p>또한, 우리 모델의 정확도(accuracy)를 계산하기 위한 함수를 구현합시다.
@@ -492,7 +492,7 @@ PyTorch는 심지어 여러분의 함수를 위해서 빠른 GPU 또는 벡터�
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor(0.1719)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor(0.0625)
 </pre></div>
 </div>
 <p>이제 우리는 훈련 루프(training loop)를 실행할 수 있습니다. 매 반복마다, 우리는 다음을 수행할 것입니다:</p>
@@ -548,7 +548,7 @@ PyTorch의 자동 기울기(Autograd)가 어떻게 연산을 기록하는지
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor(0.0830, grad_fn=&lt;NegBackward&gt;) tensor(1.)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor(0.0806, grad_fn=&lt;NegBackward&gt;) tensor(1.)
 </pre></div>
 </div>
 </div>
@@ -583,7 +583,7 @@ Pytorch는 이 둘을 결합하는 단일 함수인 <code class="docutils litera
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor(0.0830, grad_fn=&lt;NllLossBackward&gt;) tensor(1.)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor(0.0806, grad_fn=&lt;NllLossBackward&gt;) tensor(1.)
 </pre></div>
 </div>
 </div>
@@ -591,9 +591,9 @@ Pytorch는 이 둘을 결합하는 단일 함수인 <code class="docutils litera
 <h2>nn.Module 을 이용하여 리팩토링 하기<a class="headerlink" href="#nn-module" title="Permalink to this headline">¶</a></h2>
 <p>다음으로, 더 명확하고 간결한 훈련 루프를 위해 <code class="docutils literal notranslate"><span class="pre">nn.Module</span></code> 및 <code class="docutils literal notranslate"><span class="pre">nn.Parameter</span></code> 를 사용합니다.
 우리는 <code class="docutils literal notranslate"><span class="pre">nn.Module</span></code> (자체가 클래스이고 상태를 추척할 수 있는) 하위 클래스(subclass)를 만듭니다.
-이 경우에는, 포워드(forward) 단계에 대한 가중치, 절편, 그리고 메서드(method) 등을 유지하는
+이 경우에는, 포워드(forward) 단계에 대한 가중치, 절편, 그리고 메소드(method) 등을 유지하는
 클래스를 만들고자 합니다.
-<code class="docutils literal notranslate"><span class="pre">nn.Module</span></code> 은 우리가 사용할 몇 가지 속성(attribute)과 메서드를 (<code class="docutils literal notranslate"><span class="pre">.parameters()</span></code> 와
+<code class="docutils literal notranslate"><span class="pre">nn.Module</span></code> 은 우리가 사용할 몇 가지 속성(attribute)과 메소드를 (<code class="docutils literal notranslate"><span class="pre">.parameters()</span></code> 와
 <code class="docutils literal notranslate"><span class="pre">.zero_grad()</span></code> 같은) 가지고 있습니다.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -621,12 +621,12 @@ Pytorch는 이 둘을 결합하는 단일 함수인 <code class="docutils litera
 </div>
 <p>이제 우리는 이전과 동일한 방식으로 손실을 계산할 수 있습니다.
 여기서 <code class="docutils literal notranslate"><span class="pre">nn.Module</span></code> 오브젝트들은 마치 함수처럼 사용됩니다 (즉, 이들은 <em>호출가능</em> 합니다),
-그러나 배후에서 Pytorch 는 우리의 <code class="docutils literal notranslate"><span class="pre">forward</span></code> 메서드를 자동으로 호출합니다.</p>
+그러나 배후에서 Pytorch 는 우리의 <code class="docutils literal notranslate"><span class="pre">forward</span></code> 메소드를 자동으로 호출합니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">loss_func</span><span class="p">(</span><span class="n">model</span><span class="p">(</span><span class="n">xb</span><span class="p">),</span> <span class="n">yb</span><span class="p">))</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor(2.3279, grad_fn=&lt;NllLossBackward&gt;)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor(2.3677, grad_fn=&lt;NllLossBackward&gt;)
 </pre></div>
 </div>
 <p>이전에는 훈련 루프를 위해 이름 별로 각 매개변수(parameter)의 값을 업데이트하고 다음과 같이
@@ -671,7 +671,7 @@ Pytorch는 이 둘을 결합하는 단일 함수인 <code class="docutils litera
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor(0.0807, grad_fn=&lt;NllLossBackward&gt;)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor(0.0809, grad_fn=&lt;NllLossBackward&gt;)
 </pre></div>
 </div>
 </div>
@@ -699,24 +699,24 @@ Pytorch 에는 다양한 유형의 코드를 크게 단순화 할 수 있는 미
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor(2.3169, grad_fn=&lt;NllLossBackward&gt;)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor(2.4012, grad_fn=&lt;NllLossBackward&gt;)
 </pre></div>
 </div>
-<p>우리는 여전히 이전과 동일한 <code class="docutils literal notranslate"><span class="pre">fit</span></code> 메서드를 사용할 수 있습니다.</p>
+<p>우리는 여전히 이전과 동일한 <code class="docutils literal notranslate"><span class="pre">fit</span></code> 메소드를 사용할 수 있습니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fit</span><span class="p">()</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="n">loss_func</span><span class="p">(</span><span class="n">model</span><span class="p">(</span><span class="n">xb</span><span class="p">),</span> <span class="n">yb</span><span class="p">))</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor(0.0822, grad_fn=&lt;NllLossBackward&gt;)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor(0.0826, grad_fn=&lt;NllLossBackward&gt;)
 </pre></div>
 </div>
 </div>
 <div class="section" id="optim">
 <h2>optim 을 이용하여 리팩토링 하기<a class="headerlink" href="#optim" title="Permalink to this headline">¶</a></h2>
 <p>Pytorch에는 다양한 최적화(optimization) 알고리즘을 가진 패키지인 <code class="docutils literal notranslate"><span class="pre">torch.optim</span></code> 도 있습니다.
-각 매개변수를 수동으로 업데이트 하는 대신, 옵티마이저(optimizer)의 <code class="docutils literal notranslate"><span class="pre">step</span></code> 메서드를 사용하여
+각 매개변수를 수동으로 업데이트 하는 대신, 옵티마이저(optimizer)의 <code class="docutils literal notranslate"><span class="pre">step</span></code> 메소드를 사용하여
 업데이트를 진행할 수 있습니다.</p>
 <p>이렇게 하면 이전에 수동으로 코딩한 최적화 단계를 대체할 수 있습니다:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
@@ -759,8 +759,8 @@ Pytorch 에는 다양한 유형의 코드를 크게 단순화 할 수 있는 미
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor(2.3507, grad_fn=&lt;NllLossBackward&gt;)
-tensor(0.0823, grad_fn=&lt;NllLossBackward&gt;)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor(2.3108, grad_fn=&lt;NllLossBackward&gt;)
+tensor(0.0825, grad_fn=&lt;NllLossBackward&gt;)
 </pre></div>
 </div>
 </div>
@@ -810,7 +810,7 @@ tensor(0.0823, grad_fn=&lt;NllLossBackward&gt;)
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor(0.0817, grad_fn=&lt;NllLossBackward&gt;)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor(0.0824, grad_fn=&lt;NllLossBackward&gt;)
 </pre></div>
 </div>
 </div>
@@ -853,7 +853,7 @@ DataLoader 는 매 미니배치를 자동적으로 제공합니다.</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor(0.0805, grad_fn=&lt;NllLossBackward&gt;)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor(0.0808, grad_fn=&lt;NllLossBackward&gt;)
 </pre></div>
 </div>
 <p>Pytorch의 nn.Module, nn.Parameter, Dataset 및 DataLoader 덕분에 이제 훈련 루프가
@@ -905,8 +905,8 @@ DataLoader 는 매 미니배치를 자동적으로 제공합니다.</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>0 tensor(0.3560)
-1 tensor(0.3162)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>0 tensor(0.3087)
+1 tensor(0.2956)
 </pre></div>
 </div>
 </div>
@@ -916,7 +916,7 @@ DataLoader 는 매 미니배치를 자동적으로 제공합니다.</p>
 훈련 데이터셋과 검증 데이터셋 모두에 대한 손실을 계산하는 유사한 프로세스를 두 번 거치므로,
 이를 하나의 배치에 대한 손실을 계산하는 자체 함수 <code class="docutils literal notranslate"><span class="pre">loss_batch</span></code> 로 만들어보겠습니다.</p>
 <p>훈련 데이터셋에 대한 옵티마이저를 전달하고 이를 사용하여 역전파를 수행합니다.
-검증 데이터셋의 경우 옵티마이저를 전덜하지 않으므로 메서드가 역전파를 수행하지 않습니다.</p>
+검증 데이터셋의 경우 옵티마이저를 전덜하지 않으므로 메소드가 역전파를 수행하지 않습니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">loss_batch</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">loss_func</span><span class="p">,</span> <span class="n">xb</span><span class="p">,</span> <span class="n">yb</span><span class="p">,</span> <span class="n">opt</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="n">loss</span> <span class="o">=</span> <span class="n">loss_func</span><span class="p">(</span><span class="n">model</span><span class="p">(</span><span class="n">xb</span><span class="p">),</span> <span class="n">yb</span><span class="p">)</span>
 
@@ -962,8 +962,8 @@ DataLoader 는 매 미니배치를 자동적으로 제공합니다.</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>0 0.31854841018915175
-1 0.2986952301979065
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>0 0.3331937258243561
+1 0.3399495246887207
 </pre></div>
 </div>
 <p>이러한 기본 3줄의 코드를 사용하여 다양한 모델을 훈련할 수 있습니다.
@@ -1007,8 +1007,8 @@ DataLoader 는 매 미니배치를 자동적으로 제공합니다.</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>0 0.3424831265211105
-1 0.2742073623895645
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>0 0.35547182550430295
+1 0.22808355839252473
 </pre></div>
 </div>
 </div>
@@ -1055,8 +1055,8 @@ DataLoader 는 매 미니배치를 자동적으로 제공합니다.</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>0 0.3882047827720642
-1 0.2118041201710701
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>0 0.36827207362651826
+1 0.2632165398597717
 </pre></div>
 </div>
 </div>
@@ -1115,8 +1115,8 @@ DataLoader 는 매 미니배치를 자동적으로 제공합니다.</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>0 0.4167383362531662
-1 0.3126746720194817
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>0 0.3833379934310913
+1 0.23371935186386109
 </pre></div>
 </div>
 </div>
@@ -1157,8 +1157,8 @@ DataLoader 는 매 미니배치를 자동적으로 제공합니다.</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>0 0.2369337700843811
-1 0.25248708193302155
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>0 0.22367399265766144
+1 0.20463330309391023
 </pre></div>
 </div>
 </div>
@@ -1197,7 +1197,7 @@ DataLoader 는 매 미니배치를 자동적으로 제공합니다.</p>
 <li><p><code class="docutils literal notranslate"><span class="pre">DataLoader</span></code>: 모든 종류의 <code class="docutils literal notranslate"><span class="pre">Dataset</span></code> 을 기반으로 데이터의 배치들을 출력하는 반복자(iterator)를 생성합니다.</p></li>
 </ul>
 </div></blockquote>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  32.235 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  29.780 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-beginner-nn-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/f16255c783f9e487235b8eff6c8792b9/nn_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">nn_tutorial.py</span></code></a></p>
