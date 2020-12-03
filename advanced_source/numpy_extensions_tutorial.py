@@ -1,35 +1,36 @@
 # -*- coding: utf-8 -*-
 """
-Creating Extensions Using numpy and scipy
-=========================================
+numpy 와 scipy 를 이용한 확장(Extensions) 생성하기
+=====================================================
 **Author**: `Adam Paszke <https://github.com/apaszke>`_
 
 **Updated by**: `Adam Dziedzic <https://github.com/adam-dziedzic>`_
 
-In this tutorial, we shall go through two tasks:
+**번역**: `Ajin Jeong <https://github.com/ajin-jng>`_
 
-1. Create a neural network layer with no parameters.
+이번 튜토리얼에서는 두 가지 작업을 수행할 것입니다:
 
-    -  This calls into **numpy** as part of its implementation
+1. 매개 변수가 없는 신경망 계층 만들기
 
-2. Create a neural network layer that has learnable weights
+    - 이는 구현의 일부로서 **numpy** 를 호출합니다.
 
-    -  This calls into **SciPy** as part of its implementation
+2. 학습 가능한 가중치가 있는 신경망 계층 생성하기
+
+    - 이는 구현의 일부로서 **Scipy** 를 호출합니다.
 """
 
 import torch
 from torch.autograd import Function
 
 ###############################################################
-# Parameter-less example
+# 매개 변수가 없는 예
 # ----------------------
 #
-# This layer doesn’t particularly do anything useful or mathematically
-# correct.
+# 이 레이어는 특별히 유용하거나 수학적으로 올바른 작업을 수행하지 않습니다.
 #
-# It is aptly named BadFFTFunction
+# 이름은 BadFFTFunction입니다.
 #
-# **Layer Implementation**
+# **레이어 구현**
 
 from numpy.fft import rfft2, irfft2
 
@@ -47,15 +48,14 @@ class BadFFTFunction(Function):
         result = irfft2(numpy_go)
         return grad_output.new(result)
 
-# since this layer does not have any parameters, we can
-# simply declare this as a function, rather than as an nn.Module class
+# 이 계층에는 매개 변수가 없으므로 nn.Module 클래스가 아닌 함수로 간단히 선언 할 수 있습니다.
 
 
 def incorrect_fft(input):
     return BadFFTFunction.apply(input)
 
 ###############################################################
-# **Example usage of the created layer:**
+# **생성된 레이어의 사용 예시:**
 
 input = torch.randn(8, 8, requires_grad=True)
 result = incorrect_fft(input)
@@ -64,18 +64,15 @@ result.backward(torch.randn(result.size()))
 print(input)
 
 ###############################################################
-# Parametrized example
+# 매개 변수화 된 예시
 # --------------------
 #
-# In deep learning literature, this layer is confusingly referred
-# to as convolution while the actual operation is cross-correlation
-# (the only difference is that filter is flipped for convolution,
-# which is not the case for cross-correlation).
+# 딥러닝 문헌에서 이 레이어는 혼동스럽게도 컨볼루션이라고 칭하지만 실제로는 상호 상관 연산입니다.
+# (컨볼루션과 상호 상관의 유일한 차이점은 컨볼루션에서는 필터를 뒤집어서 연산을 한다는 것입니다).
 #
-# Implementation of a layer with learnable weights, where cross-correlation
-# has a filter (kernel) that represents weights.
+# 학습 가능한 가중치를 가진 필터 (커널)을 갖는 교차 상관 연산 계층의 구현
 #
-# The backward pass computes the gradient wrt the input and the gradient wrt the filter.
+# 역방향 패스는 입력에 대한 기울기와 필터에 대한 기울기를 계산합니다.
 
 from numpy import flip
 import numpy as np
@@ -118,7 +115,7 @@ class ScipyConv2d(Module):
 
 
 ###############################################################
-# **Example usage:**
+# **사용 예시:**
 
 module = ScipyConv2d(3, 3)
 print("Filter and bias: ", list(module.parameters()))
@@ -129,7 +126,7 @@ output.backward(torch.randn(8, 8))
 print("Gradient for the input map: ", input.grad)
 
 ###############################################################
-# **Check the gradients:**
+# **기울기 확인:**
 
 from torch.autograd.gradcheck import gradcheck
 
