@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 """
-numpy 와 scipy 를 이용한 확장 생성
+numpy 와 scipy 를 이용한 확장(Extensions) 생성하기
 =========================================
 **Author**: `Adam Paszke <https://github.com/apaszke>`_
 
 **Updated by**: `Adam Dziedzic <https://github.com/adam-dziedzic>`_
 
-**번역**: `Ajin Jeong <https://github.com/ajin-jng>`
+**번역**: `Ajin Jeong <https://github.com/ajin-jng>`_
 
 이번 튜토리얼에서는 두 가지 작업을 수행할 것입니다:
 
@@ -68,7 +68,7 @@ print(input)
 # --------------------
 #
 # 딥러닝 문헌에서 이 레이어는 혼동스럽게도 컨볼루션이라고 칭하지만 실제로는 상호 상관 연산입니다.
-# (컨벌루션과 상호 상관의 유일한 차이점은 컨벌루션에서는 필터를 뒤집어서 연산을 한다는 것입니다).
+# (컨볼루션과 상호 상관의 유일한 차이점은 컨볼루션에서는 필터를 뒤집어서 연산을 한다는 것입니다).
 #
 # 학습 가능한 가중치를 가진 필터 (커널)을 갖는 교차 상관 연산 계층의 구현
 #
