@@ -3,7 +3,7 @@
 
 .. tip::
    이 튜토리얼을 따라 하기 위해, 이
-   `Colab Version <https://colab.research.google.com/github/pytorch/tutorials/blob/gh-pages/_downloads/dynamic_quantization_bert_tutorial.ipynb>`_ 을 사용하길 권장합니다.
+   `Colab 버전 <https://colab.research.google.com/github/pytorch/tutorials/blob/gh-pages/_downloads/dynamic_quantization_bert_tutorial.ipynb>`_ 을 사용하길 권장합니다.
    그러면 아래에 설명된 정보들을 이용해 실험할 수 있습니다.
 
 **Author**: `Jianyu Huang <https://github.com/jianyuh>`_
@@ -111,7 +111,7 @@ PyTorch의 베타 기능들을 사용할 것이므로, 가장 최신 버전의 t
                         level = logging.WARN)
 
     logging.getLogger("transformers.modeling_utils").setLevel(
-       logging.WARN)  # 로깅 줄이기
+                        logging.WARN)  # 로깅 줄이기
 
     print(torch.__version__)
 
@@ -142,7 +142,7 @@ F1 점수를 계산하기 위한 함수입니다.
 -  토큰이 첫번째 문장에 속하는지 두번째 문장에 속하는지 알려주는 토큰 타입 id 생성하기
 
 `glue_compute_metrics <https://github.com/huggingface/transformers/blob/master/transformers/data/processors/glue.py>`_ 함수는
-정밀도와 지현율의 가중 평균인 `F1 점수 <https://scikit-learn.org/stable/modules/generated/sklearn.metrics.f1_score.html>`_ 를
+정밀도와 재현율의 가중 평균인 `F1 점수 <https://scikit-learn.org/stable/modules/generated/sklearn.metrics.f1_score.html>`_ 를
 계산하는 행렬을 갖고 있습니다. F1 점수가 가장 좋을 때는 1이며, 가장 나쁠 때는 0입니다.
 정밀도와 재현율은 F1 점수를 계산할 때 동일한 비중을 갖습니다.
 
@@ -154,7 +154,7 @@ F1 점수를 계산하기 위한 함수입니다.
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
 MRPC 문제를 풀어보기 전에 `이 스크립트 <https://gist.github.com/W4ngatang/60c2bdb54d156a41194446737ce03e2e>`_ 를
-실행해 `GLUE 데이터셋 <https://gluebenchmark.com/tasks>`_ 을 다운로드 받고 ''glue_data''
+실행해 `GLUE 데이터셋 <https://gluebenchmark.com/tasks>`_ 을 다운로드 받고 ``glue_data``
 폴더에 저장합니다.
 
 
@@ -286,7 +286,8 @@ BERT 모델(FP32)를 불러옵니다.
     def evaluate(args, model, tokenizer, prefix=""):
         # MNLI의 두 평가 결과(일치, 불일치)를 처리하기 위한 반복문
         eval_task_names = ("mnli", "mnli-mm") if args.task_name == "mnli" else (args.task_name,)
-        eval_outputs_dirs = (args.output_dir, args.output_dir + '-MM') if args.task_name == "mnli" else (args.output_dir,)
+        eval_outputs_dirs = (args.output_dir, args.output_dir + '-MM') if args.task_name == "mnli"
+                                else (args.output_dir,)
 
         results = {}
         for eval_task, eval_output_dir in zip(eval_task_names, eval_outputs_dirs):
@@ -297,8 +298,10 @@ BERT 모델(FP32)를 불러옵니다.
 
             args.eval_batch_size = args.per_gpu_eval_batch_size * max(1, args.n_gpu)
             # DistributedSampler는 무작위로 표본을 추출합니다
-            eval_sampler = SequentialSampler(eval_dataset) if args.local_rank == -1 else DistributedSampler(eval_dataset)
-            eval_dataloader = DataLoader(eval_dataset, sampler=eval_sampler, batch_size=args.eval_batch_size)
+            eval_sampler = SequentialSampler(eval_dataset) if args.local_rank == -1
+                            else DistributedSampler(eval_dataset)
+            eval_dataloader = DataLoader(eval_dataset, sampler=eval_sampler,
+                                            batch_size=args.eval_batch_size)
 
             # 다중 gpu로 평가
             if args.n_gpu > 1:
@@ -321,7 +324,10 @@ BERT 모델(FP32)를 불러옵니다.
                               'attention_mask': batch[1],
                               'labels':         batch[3]}
                     if args.model_type != 'distilbert':
-                        inputs['token_type_ids'] = batch[2] if args.model_type in ['bert', 'xlnet'] else None  # XLM, DistilBERT and RoBERTa 모델들은 segment_ids를 사용하지 않습니다
+                        inputs['token_type_ids'] = batch[2] if args.model_type in ['bert', 'xlnet']
+                                                    else None
+                                                    # XLM, DistilBERT and RoBERTa 모델들은 segment_ids를
+                                                    # 사용하지 않습니다
                     outputs = model(**inputs)
                     tmp_eval_loss, logits = outputs[:2]
 
@@ -332,7 +338,8 @@ BERT 모델(FP32)를 불러옵니다.
                     out_label_ids = inputs['labels'].detach().cpu().numpy()
                 else:
                     preds = np.append(preds, logits.detach().cpu().numpy(), axis=0)
-                    out_label_ids = np.append(out_label_ids, inputs['labels'].detach().cpu().numpy(), axis=0)
+                    out_label_ids = np.append(out_label_ids, inputs['labels'].detach().cpu().numpy(),
+                                                axis=0)
 
             eval_loss = eval_loss / nb_eval_steps
             if args.output_mode == "classification":
@@ -354,7 +361,8 @@ BERT 모델(FP32)를 불러옵니다.
 
     def load_and_cache_examples(args, task, tokenizer, evaluate=False):
         if args.local_rank not in [-1, 0] and not evaluate:
-            torch.distributed.barrier()  # 분산 학습 프로세스들 중 처음 프로세스 한 개만 데이터를 처리하고 다른 프로세스들은 캐시를 이용하도록 합니다.
+            torch.distributed.barrier()  # 분산 학습 프로세스들 중 처음 프로세스 한 개만 데이터를 처리하고 다른
+                                         # 프로세스들은 캐시를 이용하도록 합니다.
 
         processor = processors[task]()
         output_mode = output_modes[task]
@@ -373,22 +381,27 @@ BERT 모델(FP32)를 불러옵니다.
             if task in ['mnli', 'mnli-mm'] and args.model_type in ['roberta']:
                 # 해결책(사전학습된 RoBERTa 모델에서는 라벨 인덱스 순서가 바뀌어 있습니다.)
                 label_list[1], label_list[2] = label_list[2], label_list[1]
-            examples = processor.get_dev_examples(args.data_dir) if evaluate else processor.get_train_examples(args.data_dir)
+            examples = processor.get_dev_examples(args.data_dir) if evaluate
+                        else processor.get_train_examples(args.data_dir)
             features = convert_examples_to_features(examples,
                                                     tokenizer,
                                                     label_list=label_list,
                                                     max_length=args.max_seq_length,
                                                     output_mode=output_mode,
-                                                    pad_on_left=bool(args.model_type in ['xlnet']),                 # xlnet의 경우 앞쪽에 패딩합니다.
-                                                    pad_token=tokenizer.convert_tokens_to_ids([tokenizer.pad_token])[0],
-                                                    pad_token_segment_id=4 if args.model_type in ['xlnet'] else 0,
+                                                    pad_on_left=bool(args.model_type in ['xlnet']),
+                                                    # xlnet의 경우 앞쪽에 패딩합니다.
+                                                    pad_token=tokenizer.convert_tokens_to_ids(
+                                                        [tokenizer.pad_token])[0],
+                                                    pad_token_segment_id=4 if args.model_type in
+                                                                            ['xlnet'] else 0,
             )
             if args.local_rank in [-1, 0]:
                 logger.info("Saving features into cached file %s", cached_features_file)
                 torch.save(features, cached_features_file)
 
         if args.local_rank == 0 and not evaluate:
-            torch.distributed.barrier()  # 분산 학습 프로세스들 중 처음 프로세스 한 개만 데이터를 처리하고 다른 프로세스들은 캐시를 이용하도록 합니다.
+            torch.distributed.barrier()  # 분산 학습 프로세스들 중 처음 프로세스 한 개만 데이터를 처리하고 다른
+                                         # 프로세스들은 캐시를 이용하도록 합니다.
 
         # 텐서로 변환하고 데이터셋을 빌드합니다.
         all_input_ids = torch.tensor([f.input_ids for f in features], dtype=torch.long)
