@@ -194,10 +194,10 @@ def normalizeString(s):
 
 
 ######################################################################
-# To read the data file we will split the file into lines, and then split
-# lines into pairs. The files are all English → Other Language, so if we
-# want to translate from Other Language → English I added the ``reverse``
-# flag to reverse the pairs.
+# 데이터 파일을 읽기 위해서 파일을 줄로 분리하고, 줄을 쌍으로
+# 분리합니다. 파일은 모두 영어 → 다른 언어로 번역되기 때문에,
+# 다른 언어 → 영어로 번역할 경우를 위해 쌍을 뒤집어주는 ``reverse``
+# 플래그를 추가합니다.
 #
 
 def readLangs(lang1, lang2, reverse=False):
