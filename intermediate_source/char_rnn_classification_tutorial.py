@@ -51,7 +51,7 @@ RNN과 작동 방식을 아는 것 또한 유용합니다:
 데이터 준비
 ==================
 
-.. NOTE::
+.. note::
    `여기 <https://download.pytorch.org/tutorial/data.zip>`__ 에서 데이터를 다운 받고,
    현재 디렉토리에 압축을 푸십시오.
 
@@ -62,9 +62,10 @@ RNN과 작동 방식을 아는 것 또한 유용합니다:
 각 언어 별로 이름 목록 사전 ``{language: [names ...]}`` 을 만듭니다.
 일반 변수 "category" 와 "line" (우리의 경우 언어와 이름)은 이후의 확장성을 위해 사용됩니다.
 
-.. NOTE::
-역자 주:  "line" 에 입력을 "category"에 클래스를 적용하여 다른 문제에도 활용 할 수 있습니다.
-여기서는 "line"에 이름(ex. Robert )를 입력으로 "category"에 클래스(ex. english)로 사용합니다.
+.. note::
+   역자 주:  "line" 에 입력을 "category"에 클래스를 적용하여 다른 문제에도 활용 할 수 있습니다.
+   여기서는 "line"에 이름(ex. Robert )를 입력으로 "category"에 클래스(ex. english)로 사용합니다.
+
 """
 from __future__ import unicode_literals, print_function, division
 from io import open

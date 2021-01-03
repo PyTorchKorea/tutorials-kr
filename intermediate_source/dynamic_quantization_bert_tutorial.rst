@@ -7,11 +7,8 @@
    그러면 아래에 설명된 정보들을 이용해 실험할 수 있습니다.
 
 **Author**: `Jianyu Huang <https://github.com/jianyuh>`_
-
 **Reviewed by**: `Raghuraman Krishnamoorthi <https://github.com/raghuramank100>`_
-
 **Edited by**: `Jessica Lin <https://github.com/jlin27>`_
-
 **번역**: `Myungha Kwon <https://github.com/kwonmha>`_
 
 
@@ -19,7 +16,7 @@
 -----------------------
 
 이 튜토리얼에서는 `HuggingFace Transformers
-<https://github.com/huggingface/transformers>`_ 예제들을 따라 하면서 BERT
+<https://github.com/huggingface/transformers>`_ 예제들을 따라하면서 BERT
 모델을 동적으로 양자화할 것입니다. BERT 처럼 유명하면서도 최고 성능을
 내는 모델을 어떻게 동적으로 양자화된 모델로 변환하는지 한 단계씩 설명하겠습니다.
 
@@ -147,8 +144,8 @@ F1 점수를 계산하기 위한 함수입니다.
 정밀도와 재현율은 F1 점수를 계산할 때 동일한 비중을 갖습니다.
 
 -  F1 점수를 구하는 식 :
-.. math:: F1 = 2 * (\text{정밀도} * \text{재현율}) / (\text{정밀도} + \text{재현율})
 
+  .. math:: F1 = 2 * (\text{정밀도} * \text{재현율}) / (\text{정밀도} + \text{재현율})
 
 1.4 데이터셋 다운로드
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -156,7 +153,6 @@ F1 점수를 계산하기 위한 함수입니다.
 MRPC 문제를 풀어보기 전에 `이 스크립트 <https://gist.github.com/W4ngatang/60c2bdb54d156a41194446737ce03e2e>`_ 를
 실행해 `GLUE 데이터셋 <https://gluebenchmark.com/tasks>`_ 을 다운로드 받고 ''glue_data''
 폴더에 저장합니다.
-
 
 .. code:: shell
 
