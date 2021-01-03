@@ -187,11 +187,12 @@ for i in range(len(face_dataset)):
 # 그러므로 우리는 신경망에 주기 전에 처리할 과정을 작성해야 합니다.
 #
 # 3가지의 transforms 을 만들어 봅시다:
-# -  ``Rescale``: 이미지의 크기를 조절합니다.
-# -  ``RandomCrop``: 이미지를 무작위로 자릅니다.
-#                    이것을 data augmentation이라 합니다.
-# -  ``ToTensor``: numpy 이미지에서 torch 이미지로 변경합니다.
-#                  (축변환이 필요합니다)
+#
+# - ``Rescale``: 이미지의 크기를 조절합니다.
+# - ``RandomCrop``: 이미지를 무작위로 자릅니다.
+#   이것을 data augmentation이라 합니다.
+# - ``ToTensor``: numpy 이미지에서 torch 이미지로 변경합니다.
+#   (축변환이 필요합니다)
 #
 # 간단한 함수대신에 호출 할 수 있는 클래스로 작성 합니다.
 # 이렇게 한다면, 클래스가 호출 될 때마다 전이(Transform)의 매개변수가 전달 되지 않아도 됩니다.

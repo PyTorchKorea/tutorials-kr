@@ -1331,7 +1331,7 @@ for state in decoder_optimizer.state.values():
     for k, v in state.items():
         if isinstance(v, torch.Tensor):
             state[k] = v.cuda()
-    
+
 # 학습 단계를 수행합니다
 print("Starting Training!")
 trainIters(model_name, voc, pairs, encoder, decoder, encoder_optimizer, decoder_optimizer,
