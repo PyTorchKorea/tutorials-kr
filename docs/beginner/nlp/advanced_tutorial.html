@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Advanced: Making Dynamic Decisions and the Bi-LSTM CRF &mdash; PyTorch Tutorials 1.6.0 documentation</title>
+  <title>심화 과정 : Bi-LSTM CRF와 동적 결정 &mdash; PyTorch Tutorials 1.6.0 documentation</title>
   
 
   
@@ -172,7 +172,7 @@
 <p class="caption"><span class="caption-text">프론트엔드 API</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/named_tensor_tutorial.html">(prototype) Introduction to Named Tensors in PyTorch</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../intermediate/memory_format_tutorial.html">(beta) Channels Last Memory Format in PyTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../intermediate/memory_format_tutorial.html">(실험용) PyTorch를 사용한 Channels Last Memory Format</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../advanced/cpp_frontend.html">Using the PyTorch C++ Frontend</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../advanced/cpp_extension.html">Custom C++ and CUDA Extensions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../advanced/torch_script_custom_ops.html">Extending TorchScript with Custom C++ Operators</a></li>
@@ -184,7 +184,7 @@
 <p class="caption"><span class="caption-text">모델 최적화</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/pruning_tutorial.html">가지치기 기법(Pruning) 튜토리얼</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../advanced/dynamic_quantization_tutorial.html">(beta) Dynamic Quantization on an LSTM Word Language Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../advanced/dynamic_quantization_tutorial.html">(베타) LSTM 기반 단어 단위 언어 모델의 동적 양자화</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../advanced/static_quantization_tutorial.html">(beta) Static Quantization with Eager Mode in PyTorch</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/quantized_transfer_learning_tutorial.html">(beta) 컴퓨터 비전(Vision) 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
@@ -241,7 +241,7 @@
       </li>
 
         
-      <li>Advanced: Making Dynamic Decisions and the Bi-LSTM CRF</li>
+      <li>심화 과정 : Bi-LSTM CRF와 동적 결정</li>
     
     
       <li class="pytorch-breadcrumbs-aside">
@@ -299,109 +299,101 @@
 <p class="admonition-title">Note</p>
 <p>Click <a class="reference internal" href="#sphx-glr-download-beginner-nlp-advanced-tutorial-py"><span class="std std-ref">here</span></a> to download the full example code</p>
 </div>
-<div class="sphx-glr-example-title section" id="advanced-making-dynamic-decisions-and-the-bi-lstm-crf">
-<span id="sphx-glr-beginner-nlp-advanced-tutorial-py"></span><h1>Advanced: Making Dynamic Decisions and the Bi-LSTM CRF<a class="headerlink" href="#advanced-making-dynamic-decisions-and-the-bi-lstm-crf" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="dynamic-versus-static-deep-learning-toolkits">
-<h2>Dynamic versus Static Deep Learning Toolkits<a class="headerlink" href="#dynamic-versus-static-deep-learning-toolkits" title="Permalink to this headline">¶</a></h2>
-<p>Pytorch is a <em>dynamic</em> neural network kit. Another example of a dynamic
-kit is <a class="reference external" href="https://github.com/clab/dynet">Dynet</a> (I mention this because
-working with Pytorch and Dynet is similar. If you see an example in
-Dynet, it will probably help you implement it in Pytorch). The opposite
-is the <em>static</em> tool kit, which includes Theano, Keras, TensorFlow, etc.
-The core difference is the following:</p>
+<div class="sphx-glr-example-title section" id="bi-lstm-crf">
+<span id="sphx-glr-beginner-nlp-advanced-tutorial-py"></span><h1>심화 과정 : Bi-LSTM CRF와 동적 결정<a class="headerlink" href="#bi-lstm-crf" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="toolkits">
+<h2>동적, 정적 딥 러닝 툴킷(toolkits) 비교<a class="headerlink" href="#toolkits" title="Permalink to this headline">¶</a></h2>
+<p>Pytorch는 <em>동적</em> 신경망 툴킷입니다. 다른 동적 신경망 툴킷으로는
+<a class="reference external" href="https://github.com/clab/dynet">Dynet</a> 이 있습니다.(이 툴킷을
+예로 든 이유는 사용하는 법이 Pytorch와 비슷하기 때문입니다. Dynet의 예제를 보면
+Pytorch로 구현할 때도 도움이 될 것입니다.) 반대로 <em>정적</em> 툴킷들로
+Theano, Keras, TensorFlow 등이 있습니다. 주요 차이점은 다음과 같습니다:</p>
 <ul class="simple">
-<li><p>In a static toolkit, you define
-a computation graph once, compile it, and then stream instances to it.</p></li>
-<li><p>In a dynamic toolkit, you define a computation graph <em>for each
-instance</em>. It is never compiled and is executed on-the-fly</p></li>
+<li><p>정적 툴킷을 쓸 때는 계산 그래프를 한 번만 정의하고, 컴파일 한 후,
+데이터를 계산 그래프에 넘깁니다.</p></li>
+<li><p>동적 툴킷에서는 <em>각 데이터</em> 의 계산 그래프를 정의하며 컴파일하지
+않고 즉각 실행됩니다.</p></li>
 </ul>
-<p>Without a lot of experience, it is difficult to appreciate the
-difference. One example is to suppose we want to build a deep
-constituent parser. Suppose our model involves roughly the following
-steps:</p>
+<p>경험이 많지 않다면 두 방식의 차이를 알기 어렵습니다. 딥 러닝 기반의
+구구조 분석기(constituent parser)를 예로 들어보겠습니다. 모델은 대략
+다음과 같은 과정을 수행합니다:</p>
 <ul class="simple">
-<li><p>We build the tree bottom up</p></li>
-<li><p>Tag the root nodes (the words of the sentence)</p></li>
-<li><p>From there, use a neural network and the embeddings
-of the words to find combinations that form constituents. Whenever you
-form a new constituent, use some sort of technique to get an embedding
-of the constituent. In this case, our network architecture will depend
-completely on the input sentence. In the sentence “The green cat
-scratched the wall”, at some point in the model, we will want to combine
-the span <span class="math notranslate nohighlight">\((i,j,r) = (1, 3, \text{NP})\)</span> (that is, an NP constituent
-spans word 1 to word 3, in this case “The green cat”).</p></li>
+<li><p>트리를 상향식(bottom-up)으로 만들어 나갑니다.</p></li>
+<li><p>최상위 노드를 태깅합니다. (문장의 각 단어)</p></li>
+<li><p>거기서부터 신경망과 단어들의 임베딩을 이용해 구구조를 이루는 조합을
+찾아냅니다. 새로운 구구조를 생성할 때마다 구구조의 임베딩을 얻기 위한
+어떤 기술이 필요합니다. 지금은 신경망이 오직 입력 문장만 참고할
+것입니다. “The green cat scratched the wall”이란 문장에서, 모델의 어느 시점에
+<span class="math notranslate nohighlight">\((i,j,r) = (1, 3, \text{NP})\)</span> 범위 (단어 1에서부터 단어 3까지가
+NP 구구조라는 뜻이며, 이 문장에서는 “The green cat”) 를 결합하길 원할
+것입니다.</p></li>
 </ul>
-<p>However, another sentence might be “Somewhere, the big fat cat scratched
-the wall”. In this sentence, we will want to form the constituent
-<span class="math notranslate nohighlight">\((2, 4, NP)\)</span> at some point. The constituents we will want to form
-will depend on the instance. If we just compile the computation graph
-once, as in a static toolkit, it will be exceptionally difficult or
-impossible to program this logic. In a dynamic toolkit though, there
-isn’t just 1 pre-defined computation graph. There can be a new
-computation graph for each instance, so this problem goes away.</p>
-<p>Dynamic toolkits also have the advantage of being easier to debug and
-the code more closely resembling the host language (by that I mean that
-Pytorch and Dynet look more like actual Python code than Keras or
-Theano).</p>
+<p>그런데, 또다른 문장 “Somewhere, the big fat cat scratched the wall” 에서는
+어느 시점에 <span class="math notranslate nohighlight">\((2, 4, NP)\)</span> 구구조를 만들기를 원할 것입니다. 우리가
+만들기 원하는 구구조들은 문장에 따라 다릅니다. 만약 정적 툴킷에서처럼
+계산 그래프를 한 번만 컴파일한다면, 이 과정을 프로그래밍하기 매우 어렵거나
+불가능할 것입니다. 하지만 동적 툴킷에서는 하나의 계산 그래프만 있지
+않습니다. 각 문장들마다 새로운 계산 그래프가 있을 수 있기 때문에 이런
+문제가 없습니다.</p>
+<p>동적 틀킷은 디버깅 하기 더 쉽고, 코드가 기반 언어와 더 비슷합니다
+(Pytorch와 Dynet이 Keras 또는 Theano 보다 Python 코드와 더 비슷합니다).</p>
 </div>
-<div class="section" id="bi-lstm-conditional-random-field-discussion">
-<h2>Bi-LSTM Conditional Random Field Discussion<a class="headerlink" href="#bi-lstm-conditional-random-field-discussion" title="Permalink to this headline">¶</a></h2>
-<p>For this section, we will see a full, complicated example of a Bi-LSTM
-Conditional Random Field for named-entity recognition. The LSTM tagger
-above is typically sufficient for part-of-speech tagging, but a sequence
-model like the CRF is really essential for strong performance on NER.
-Familiarity with CRF’s is assumed. Although this name sounds scary, all
-the model is is a CRF but where an LSTM provides the features. This is
-an advanced model though, far more complicated than any earlier model in
-this tutorial. If you want to skip it, that is fine. To see if you’re
-ready, see if you can:</p>
+<div class="section" id="bi-lstm-conditional-rnadom-field">
+<h2>Bi-LSTM Conditional Rnadom Field 설명<a class="headerlink" href="#bi-lstm-conditional-rnadom-field" title="Permalink to this headline">¶</a></h2>
+<p>이 영역에서는 개체명 인식을 수행하는 완성된 Bi-LSTM Conditional Random
+Field 예시를 살펴보겠습니다. 위에 나온 LSTM 태거(tagger)는 일반적으로
+품사 태깅을 하기에 충분합니다. 하지만 CRF 같은 연속된 데이터를 다루는
+모델은 좋은 개체명 인식 모델(NER)에 꼭 필요합니다. 여러분이 CRF를 잘 알고
+있다고 가정하겠습니다. 이름이 무섭게 들릴 수도 있지만, LSTM이 특징을
+제공하는 점을 제외하면 이 모델은 CRF 입니다. 하지만 더 발전된 모델이며,
+이 튜토리얼의 앞부분에 나왔던 모델보다 훨씬 복잡합니다. 넘어가고 싶다면
+넘어가도 괜찮습니다. 이해할 수 있다고 생각한다면, 아래를 읽어보세요:</p>
 <ul class="simple">
-<li><p>Write the recurrence for the viterbi variable at step i for tag k.</p></li>
-<li><p>Modify the above recurrence to compute the forward variables instead.</p></li>
-<li><p>Modify again the above recurrence to compute the forward variables in
-log-space (hint: log-sum-exp)</p></li>
+<li><p>태그 k에 대한 i번째 단계의 비터비(viterbi) 변수를 위해 순환 흐름을 만든다.</p></li>
+<li><p>순방향 변수를 계산하기 위해 위의 순한 흐름을 조정한다.</p></li>
+<li><p>순방향 변수를 로그 공간에서 계산하기 위해 다시 한 번 조정한다.
+(힌트 : 로그-합-지수승)</p></li>
 </ul>
-<p>If you can do those three things, you should be able to understand the
-code below. Recall that the CRF computes a conditional probability. Let
-<span class="math notranslate nohighlight">\(y\)</span> be a tag sequence and <span class="math notranslate nohighlight">\(x\)</span> an input sequence of words.
-Then we compute</p>
+<p>위의 세가지를 할 수 있다면, 아래의 코드를 이해할 수 있을 것입니다.
+CRF는 조건부 확률을 계산한다는 점을 기억하세요. <span class="math notranslate nohighlight">\(y\)</span> 를 연속된
+태그라 하고, <span class="math notranslate nohighlight">\(x\)</span> 를 연속된 입력 단어라 하겠습니다. 그러면 아래의
+식을 계산할 수 있습니다.</p>
 <div class="math notranslate nohighlight">
 \[P(y|x) = \frac{\exp{(\text{Score}(x, y)})}{\sum_{y'} \exp{(\text{Score}(x, y')})}\]</div>
-<p>Where the score is determined by defining some log potentials
-<span class="math notranslate nohighlight">\(\log \psi_i(x,y)\)</span> such that</p>
+<p>점수(score) 함수는 아래와 같이 정의된 로그 포텐셜(potential) <span class="math notranslate nohighlight">\(\log \psi_i(x,y)\)</span>
+함수에 의해 결정됩니다.</p>
 <div class="math notranslate nohighlight">
 \[\text{Score}(x,y) = \sum_i \log \psi_i(x,y)\]</div>
-<p>To make the partition function tractable, the potentials must look only
-at local features.</p>
-<p>In the Bi-LSTM CRF, we define two kinds of potentials: emission and
-transition. The emission potential for the word at index <span class="math notranslate nohighlight">\(i\)</span> comes
-from the hidden state of the Bi-LSTM at timestep <span class="math notranslate nohighlight">\(i\)</span>. The
-transition scores are stored in a <span class="math notranslate nohighlight">\(|T|x|T|\)</span> matrix
-<span class="math notranslate nohighlight">\(\textbf{P}\)</span>, where <span class="math notranslate nohighlight">\(T\)</span> is the tag set. In my
-implementation, <span class="math notranslate nohighlight">\(\textbf{P}_{j,k}\)</span> is the score of transitioning
-to tag <span class="math notranslate nohighlight">\(j\)</span> from tag <span class="math notranslate nohighlight">\(k\)</span>. So:</p>
+<p>분배 함수(partition function)를 단순화하기 위해서, 포텐셜이 주변의
+특징들만 반영한다고 하겠습니다.</p>
+<p>Bi-LSTM CRF 안에 배출(emission), 전이(transition) 두 종류의 포텐셜을
+정의합니다. <span class="math notranslate nohighlight">\(i\)</span> 번째 단어에 대한 배출 포텐셜은 Bi-LSTM의
+<span class="math notranslate nohighlight">\(i\)</span> 번째 시점의 은닉 상태가 결정합니다. 전이 점수는 <span class="math notranslate nohighlight">\(|T|x|T|\)</span>
+형태인 행렬 <span class="math notranslate nohighlight">\(\textbf{P}\)</span> 에 저장되어 있습니다. <span class="math notranslate nohighlight">\(T\)</span> 는
+태그의 집합입니다. 이 구현에서, <span class="math notranslate nohighlight">\(\textbf{P}_{j,k}\)</span> 는 tag <span class="math notranslate nohighlight">\(j\)</span> 에서
+tag <span class="math notranslate nohighlight">\(k\)</span> 로의 전이 점수를 의미합니다. 따라서:</p>
 <div class="math notranslate nohighlight">
 \[\text{Score}(x,y) = \sum_i \log \psi_\text{EMIT}(y_i \rightarrow x_i) + \log \psi_\text{TRANS}(y_{i-1} \rightarrow y_i)\]</div>
 <div class="math notranslate nohighlight">
 \[= \sum_i h_i[y_i] + \textbf{P}_{y_i, y_{i-1}}\]</div>
-<p>where in this second expression, we think of the tags as being assigned
-unique non-negative indices.</p>
-<p>If the above discussion was too brief, you can check out
-<a class="reference external" href="http://www.cs.columbia.edu/%7Emcollins/crf.pdf">this</a> write up from
-Michael Collins on CRFs.</p>
+<p>두 번째 식에서 고유하고 음수가 아닌 인덱스에 의해 태그가 부여됐다고
+간주합니다.</p>
+<p>위의 설명이 너무 간단하다고 생각한다면 CRF에 대한 Michael Collins의
+글을 <a class="reference external" href="http://www.cs.columbia.edu/%7Emcollins/crf.pdf">여기</a> 에서
+읽어보세요.</p>
 </div>
-<div class="section" id="implementation-notes">
-<h2>Implementation Notes<a class="headerlink" href="#implementation-notes" title="Permalink to this headline">¶</a></h2>
-<p>The example below implements the forward algorithm in log space to
-compute the partition function, and the viterbi algorithm to decode.
-Backpropagation will compute the gradients automatically for us. We
-don’t have to do anything by hand.</p>
-<p>The implementation is not optimized. If you understand what is going on,
-you’ll probably quickly see that iterating over the next tag in the
-forward algorithm could probably be done in one big operation. I wanted
-to code to be more readable. If you want to make the relevant change,
-you could probably use this tagger for real tasks.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Author: Robert Guthrie</span>
+<div class="section" id="id1">
+<h2>구현 문서<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<p>아래의 예시는 로그 공간에서 분배 함수를 계산하기 위한 순방향 알고리즘과
+복호화하기 위한 비터비 알고리즘을 구현한 것입니다. 역전파
+단계에서 변화도는 자동으로 계산될 것입니다. 우리가 직접 할 일은
+없습니다.</p>
+<p>이 구현은 최적의 상태가 아닙니다. 과정을 이해했다면, 순방향 알고리즘
+상에서 다음 태그를 순차적으로 처리하는 과정을 하나의 큰 연산으로 줄일
+수 있다는 것을 아마 빠르게 알 수 있을 것입니다. 이 코드는 가능한 읽기
+쉽게 작성했습니다. 적절하게 수정하면, 이 태거를 실제 문제들에 사용할
+수도 있을 것입니다.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># 작성자: Robert Guthrie</span>
 
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torch.autograd</span> <span class="k">as</span> <span class="nn">autograd</span>
@@ -411,9 +403,9 @@ you could probably use this tagger for real tasks.</p>
 <span class="n">torch</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Helper functions to make the code more readable.</p>
+<p>코드 가독성을 높여주는 보조 함수들</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">argmax</span><span class="p">(</span><span class="n">vec</span><span class="p">):</span>
-    <span class="c1"># return the argmax as a python int</span>
+    <span class="c1"># argmax를 파이썬 정수형으로 반환합니다.</span>
     <span class="n">_</span><span class="p">,</span> <span class="n">idx</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">idx</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
 
@@ -423,7 +415,7 @@ you could probably use this tagger for real tasks.</p>
     <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">idxs</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">long</span><span class="p">)</span>
 
 
-<span class="c1"># Compute log sum exp in a numerically stable way for the forward algorithm</span>
+<span class="c1"># 순방향 알고리즘을 위해 수치적으로 안정적인 방법으로 로그 합 지수승을 계산합니다.</span>
 <span class="k">def</span> <span class="nf">log_sum_exp</span><span class="p">(</span><span class="n">vec</span><span class="p">):</span>
     <span class="n">max_score</span> <span class="o">=</span> <span class="n">vec</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">argmax</span><span class="p">(</span><span class="n">vec</span><span class="p">)]</span>
     <span class="n">max_score_broadcast</span> <span class="o">=</span> <span class="n">max_score</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">vec</span><span class="o">.</span><span class="n">size</span><span class="p">()[</span><span class="mi">1</span><span class="p">])</span>
@@ -431,10 +423,10 @@ you could probably use this tagger for real tasks.</p>
         <span class="n">torch</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">vec</span> <span class="o">-</span> <span class="n">max_score_broadcast</span><span class="p">)))</span>
 </pre></div>
 </div>
-<p>Create model</p>
+<p>모델 생성</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">BiLSTM_CRF</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vocab_size</span><span class="p">,</span> <span class="n">tag_to_ix</span><span class="p">,</span> <span class="n">embedding_dim</span><span class="p">,</span> <span class="n">hidden_dim</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vocab_size</span><span class="p">,</span> <span class="n">tag_to_ix</span><span class="p">,</span> <span class="n">embedding_dim</span><span class="p">,</span> <span class="n">hidden_dim</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">BiLSTM_CRF</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">embedding_dim</span> <span class="o">=</span> <span class="n">embedding_dim</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">hidden_dim</span> <span class="o">=</span> <span class="n">hidden_dim</span>
@@ -446,16 +438,15 @@ you could probably use this tagger for real tasks.</p>
         <span class="bp">self</span><span class="o">.</span><span class="n">lstm</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">LSTM</span><span class="p">(</span><span class="n">embedding_dim</span><span class="p">,</span> <span class="n">hidden_dim</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span>
                             <span class="n">num_layers</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">bidirectional</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-        <span class="c1"># Maps the output of the LSTM into tag space.</span>
+        <span class="c1"># LSTM의 출력을 태그 공간으로 대응시킵니다.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">hidden2tag</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">hidden_dim</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tagset_size</span><span class="p">)</span>
 
-        <span class="c1"># Matrix of transition parameters.  Entry i,j is the score of</span>
-        <span class="c1"># transitioning *to* i *from* j.</span>
+        <span class="c1"># 전이 매개변수 행렬. i, j 성분은 i에서 j로 변할 때의 점수입니다.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">transitions</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Parameter</span><span class="p">(</span>
             <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tagset_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tagset_size</span><span class="p">))</span>
 
-        <span class="c1"># These two statements enforce the constraint that we never transfer</span>
-        <span class="c1"># to the start tag and we never transfer from the stop tag</span>
+        <span class="c1"># 이 두 코드는 시작 태그로 전이하지 않고, 정지 태그에서부터</span>
+        <span class="c1"># 전이하지 않도록 강제합니다.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">transitions</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">tag_to_ix</span><span class="p">[</span><span class="n">START_TAG</span><span class="p">],</span> <span class="p">:]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">10000</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">transitions</span><span class="o">.</span><span class="n">data</span><span class="p">[:,</span> <span class="n">tag_to_ix</span><span class="p">[</span><span class="n">STOP_TAG</span><span class="p">]]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">10000</span>
 
@@ -466,30 +457,28 @@ you could probably use this tagger for real tasks.</p>
                 <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hidden_dim</span> <span class="o">//</span> <span class="mi">2</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="nf">_forward_alg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">feats</span><span class="p">):</span>
-        <span class="c1"># Do the forward algorithm to compute the partition function</span>
+        <span class="c1"># 분배 함수를 계산하기 위해 순방향 알고리즘을 수행합니다.</span>
         <span class="n">init_alphas</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tagset_size</span><span class="p">),</span> <span class="o">-</span><span class="mf">10000.</span><span class="p">)</span>
-        <span class="c1"># START_TAG has all of the score.</span>
+        <span class="c1"># START_TAG는 모든 점수를 갖고 있습니다.</span>
         <span class="n">init_alphas</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">tag_to_ix</span><span class="p">[</span><span class="n">START_TAG</span><span class="p">]]</span> <span class="o">=</span> <span class="mf">0.</span>
 
-        <span class="c1"># Wrap in a variable so that we will get automatic backprop</span>
+        <span class="c1"># 자동으로 역전파 되도록 변수로 감쌉니다.</span>
         <span class="n">forward_var</span> <span class="o">=</span> <span class="n">init_alphas</span>
 
-        <span class="c1"># Iterate through the sentence</span>
+        <span class="c1"># 문장의 각 성분을 반복 처리합니다.</span>
         <span class="k">for</span> <span class="n">feat</span> <span class="ow">in</span> <span class="n">feats</span><span class="p">:</span>
-            <span class="n">alphas_t</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># The forward tensors at this timestep</span>
+            <span class="n">alphas_t</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># 현재 시점의 순방향 텐서</span>
             <span class="k">for</span> <span class="n">next_tag</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tagset_size</span><span class="p">):</span>
-                <span class="c1"># broadcast the emission score: it is the same regardless of</span>
-                <span class="c1"># the previous tag</span>
+                <span class="c1"># 이전의 태그와 상관없이 배출 점수를 전파합니다.</span>
                 <span class="n">emit_score</span> <span class="o">=</span> <span class="n">feat</span><span class="p">[</span><span class="n">next_tag</span><span class="p">]</span><span class="o">.</span><span class="n">view</span><span class="p">(</span>
                     <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tagset_size</span><span class="p">)</span>
-                <span class="c1"># the ith entry of trans_score is the score of transitioning to</span>
-                <span class="c1"># next_tag from i</span>
+                <span class="c1"># trans_score의 i번째 성분은 i로부터 next_tag로 전이할 점수입니다.</span>
                 <span class="n">trans_score</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transitions</span><span class="p">[</span><span class="n">next_tag</span><span class="p">]</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-                <span class="c1"># The ith entry of next_tag_var is the value for the</span>
-                <span class="c1"># edge (i -&gt; next_tag) before we do log-sum-exp</span>
+                <span class="c1"># next_tag_var의 i번째 성분은 로그-합-지수승을 계산하기 전</span>
+                <span class="c1"># i에서 next_tag로 가는 간선의 값입니다.</span>
                 <span class="n">next_tag_var</span> <span class="o">=</span> <span class="n">forward_var</span> <span class="o">+</span> <span class="n">trans_score</span> <span class="o">+</span> <span class="n">emit_score</span>
-                <span class="c1"># The forward variable for this tag is log-sum-exp of all the</span>
-                <span class="c1"># scores.</span>
+                <span class="c1"># 이 태그의 순방향 변수는 모든 점수들의 로그-합-지수승 계산</span>
+                <span class="c1"># 결과입니다.</span>
                 <span class="n">alphas_t</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">log_sum_exp</span><span class="p">(</span><span class="n">next_tag_var</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
             <span class="n">forward_var</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">alphas_t</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
         <span class="n">terminal_var</span> <span class="o">=</span> <span class="n">forward_var</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">transitions</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">tag_to_ix</span><span class="p">[</span><span class="n">STOP_TAG</span><span class="p">]]</span>
@@ -505,7 +494,7 @@ you could probably use this tagger for real tasks.</p>
         <span class="k">return</span> <span class="n">lstm_feats</span>
 
     <span class="k">def</span> <span class="nf">_score_sentence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">feats</span><span class="p">,</span> <span class="n">tags</span><span class="p">):</span>
-        <span class="c1"># Gives the score of a provided tag sequence</span>
+        <span class="c1"># 주어진 태그 순열에 점수를 매깁니다.</span>
         <span class="n">score</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
         <span class="n">tags</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">tag_to_ix</span><span class="p">[</span><span class="n">START_TAG</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">long</span><span class="p">),</span> <span class="n">tags</span><span class="p">])</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">feat</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">feats</span><span class="p">):</span>
@@ -517,44 +506,43 @@ you could probably use this tagger for real tasks.</p>
     <span class="k">def</span> <span class="nf">_viterbi_decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">feats</span><span class="p">):</span>
         <span class="n">backpointers</span> <span class="o">=</span> <span class="p">[]</span>
 
-        <span class="c1"># Initialize the viterbi variables in log space</span>
+        <span class="c1"># 비터비 변수를 로그 공간 상에 초기화합니다.</span>
         <span class="n">init_vvars</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tagset_size</span><span class="p">),</span> <span class="o">-</span><span class="mf">10000.</span><span class="p">)</span>
         <span class="n">init_vvars</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">tag_to_ix</span><span class="p">[</span><span class="n">START_TAG</span><span class="p">]]</span> <span class="o">=</span> <span class="mi">0</span>
 
-        <span class="c1"># forward_var at step i holds the viterbi variables for step i-1</span>
+        <span class="c1"># i 단계의 forward_var는 i-1 단계의 비터비 변수를 갖고 있습니다.</span>
         <span class="n">forward_var</span> <span class="o">=</span> <span class="n">init_vvars</span>
         <span class="k">for</span> <span class="n">feat</span> <span class="ow">in</span> <span class="n">feats</span><span class="p">:</span>
-            <span class="n">bptrs_t</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># holds the backpointers for this step</span>
-            <span class="n">viterbivars_t</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># holds the viterbi variables for this step</span>
+            <span class="n">bptrs_t</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># 현재 단계의 backpointer를 갖고 있습니다.</span>
+            <span class="n">viterbivars_t</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># 현재 단계의 비터비 변수를 갖고 있습니다.</span>
 
             <span class="k">for</span> <span class="n">next_tag</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tagset_size</span><span class="p">):</span>
-                <span class="c1"># next_tag_var[i] holds the viterbi variable for tag i at the</span>
-                <span class="c1"># previous step, plus the score of transitioning</span>
-                <span class="c1"># from tag i to next_tag.</span>
-                <span class="c1"># We don&#39;t include the emission scores here because the max</span>
-                <span class="c1"># does not depend on them (we add them in below)</span>
+                <span class="c1"># next_tag_var[i]는 이전 단계의 태그 i에 대한 비터비 변수와,</span>
+                <span class="c1"># 태그 i에서 next_tag로 전이할 점수를 더한 값을 갖고 있습니다.</span>
+                <span class="c1"># 배출 점수는 argmax와 상관 없기 때문에(아래 코드에서 추가할 것입니다)</span>
+                <span class="c1"># 여기에 포함되지 않습니다.</span>
                 <span class="n">next_tag_var</span> <span class="o">=</span> <span class="n">forward_var</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">transitions</span><span class="p">[</span><span class="n">next_tag</span><span class="p">]</span>
                 <span class="n">best_tag_id</span> <span class="o">=</span> <span class="n">argmax</span><span class="p">(</span><span class="n">next_tag_var</span><span class="p">)</span>
                 <span class="n">bptrs_t</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">best_tag_id</span><span class="p">)</span>
                 <span class="n">viterbivars_t</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">next_tag_var</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">best_tag_id</span><span class="p">]</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
-            <span class="c1"># Now add in the emission scores, and assign forward_var to the set</span>
-            <span class="c1"># of viterbi variables we just computed</span>
+            <span class="c1"># 이제 배출 점수를 더합니다. 그리고 방금 계산한 비터비 변수의</span>
+            <span class="c1"># 집합을 forward_var에 할당합니다.</span>
             <span class="n">forward_var</span> <span class="o">=</span> <span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">viterbivars_t</span><span class="p">)</span> <span class="o">+</span> <span class="n">feat</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
             <span class="n">backpointers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">bptrs_t</span><span class="p">)</span>
 
-        <span class="c1"># Transition to STOP_TAG</span>
+        <span class="c1"># STAP_TAG로의 전이</span>
         <span class="n">terminal_var</span> <span class="o">=</span> <span class="n">forward_var</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">transitions</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">tag_to_ix</span><span class="p">[</span><span class="n">STOP_TAG</span><span class="p">]]</span>
         <span class="n">best_tag_id</span> <span class="o">=</span> <span class="n">argmax</span><span class="p">(</span><span class="n">terminal_var</span><span class="p">)</span>
         <span class="n">path_score</span> <span class="o">=</span> <span class="n">terminal_var</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">best_tag_id</span><span class="p">]</span>
 
-        <span class="c1"># Follow the back pointers to decode the best path.</span>
+        <span class="c1"># 최적의 경로를 구하기 위해 back pointer를 따라갑니다.</span>
         <span class="n">best_path</span> <span class="o">=</span> <span class="p">[</span><span class="n">best_tag_id</span><span class="p">]</span>
         <span class="k">for</span> <span class="n">bptrs_t</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">backpointers</span><span class="p">):</span>
             <span class="n">best_tag_id</span> <span class="o">=</span> <span class="n">bptrs_t</span><span class="p">[</span><span class="n">best_tag_id</span><span class="p">]</span>
             <span class="n">best_path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">best_tag_id</span><span class="p">)</span>
-        <span class="c1"># Pop off the start tag (we dont want to return that to the caller)</span>
+        <span class="c1"># 시작 태그를 빼냅니다 (시작 태그는 반환된 필요가 없습니다)</span>
         <span class="n">start</span> <span class="o">=</span> <span class="n">best_path</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
-        <span class="k">assert</span> <span class="n">start</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag_to_ix</span><span class="p">[</span><span class="n">START_TAG</span><span class="p">]</span>  <span class="c1"># Sanity check</span>
+        <span class="k">assert</span> <span class="n">start</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag_to_ix</span><span class="p">[</span><span class="n">START_TAG</span><span class="p">]</span>  <span class="c1"># 완결성 검사 (Sanity check)</span>
         <span class="n">best_path</span><span class="o">.</span><span class="n">reverse</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">path_score</span><span class="p">,</span> <span class="n">best_path</span>
 
@@ -564,22 +552,22 @@ you could probably use this tagger for real tasks.</p>
         <span class="n">gold_score</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_score_sentence</span><span class="p">(</span><span class="n">feats</span><span class="p">,</span> <span class="n">tags</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">forward_score</span> <span class="o">-</span> <span class="n">gold_score</span>
 
-    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sentence</span><span class="p">):</span>  <span class="c1"># dont confuse this with _forward_alg above.</span>
-        <span class="c1"># Get the emission scores from the BiLSTM</span>
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sentence</span><span class="p">):</span>  <span class="c1"># 이 함수와 위의 _forward_alg를 헷갈리지 마세요.</span>
+        <span class="c1"># Bi-LSTM으로부터 배출 점수를 얻습니다.</span>
         <span class="n">lstm_feats</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_lstm_features</span><span class="p">(</span><span class="n">sentence</span><span class="p">)</span>
 
-        <span class="c1"># Find the best path, given the features.</span>
+        <span class="c1"># 주어진 특징(배출 점수)들로 최적의 경로를 찾아냅니다.</span>
         <span class="n">score</span><span class="p">,</span> <span class="n">tag_seq</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_viterbi_decode</span><span class="p">(</span><span class="n">lstm_feats</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">score</span><span class="p">,</span> <span class="n">tag_seq</span>
 </pre></div>
 </div>
-<p>Run training</p>
+<p>훈련 실행</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">START_TAG</span> <span class="o">=</span> <span class="s2">&quot;&lt;START&gt;&quot;</span>
 <span class="n">STOP_TAG</span> <span class="o">=</span> <span class="s2">&quot;&lt;STOP&gt;&quot;</span>
 <span class="n">EMBEDDING_DIM</span> <span class="o">=</span> <span class="mi">5</span>
 <span class="n">HIDDEN_DIM</span> <span class="o">=</span> <span class="mi">4</span>
 
-<span class="c1"># Make up some training data</span>
+<span class="c1"># 훈련용 데이터를 만듭니다.</span>
 <span class="n">training_data</span> <span class="o">=</span> <span class="p">[(</span>
     <span class="s2">&quot;the wall street journal reported today that apple corporation made money&quot;</span><span class="o">.</span><span class="n">split</span><span class="p">(),</span>
     <span class="s2">&quot;B I I I O O O B I O O&quot;</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
@@ -599,38 +587,39 @@ you could probably use this tagger for real tasks.</p>
 <span class="n">model</span> <span class="o">=</span> <span class="n">BiLSTM_CRF</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">word_to_ix</span><span class="p">),</span> <span class="n">tag_to_ix</span><span class="p">,</span> <span class="n">EMBEDDING_DIM</span><span class="p">,</span> <span class="n">HIDDEN_DIM</span><span class="p">)</span>
 <span class="n">optimizer</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">SGD</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">weight_decay</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">)</span>
 
-<span class="c1"># Check predictions before training</span>
+<span class="c1"># 훈련 전 예측 결과를 확인합니다.</span>
 <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
     <span class="n">precheck_sent</span> <span class="o">=</span> <span class="n">prepare_sequence</span><span class="p">(</span><span class="n">training_data</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">word_to_ix</span><span class="p">)</span>
     <span class="n">precheck_tags</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="n">tag_to_ix</span><span class="p">[</span><span class="n">t</span><span class="p">]</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">training_data</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">long</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="p">(</span><span class="n">precheck_sent</span><span class="p">))</span>
 
 <span class="c1"># Make sure prepare_sequence from earlier in the LSTM section is loaded</span>
+<span class="c1"># 위의 보조 함수 영역에 있는 prepare_sequence 함수가 불러와 졌는지 확인합니다.</span>
 <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span>
-        <span class="mi">300</span><span class="p">):</span>  <span class="c1"># again, normally you would NOT do 300 epochs, it is toy data</span>
+        <span class="mi">300</span><span class="p">):</span>  <span class="c1"># 다시 말하지만, 아마 300 에폭을 실행하진 않을 것입니다. 이것은 연습용 데이터입니다.</span>
     <span class="k">for</span> <span class="n">sentence</span><span class="p">,</span> <span class="n">tags</span> <span class="ow">in</span> <span class="n">training_data</span><span class="p">:</span>
-        <span class="c1"># Step 1. Remember that Pytorch accumulates gradients.</span>
-        <span class="c1"># We need to clear them out before each instance</span>
+        <span class="c1"># 1단계. Pytorch가 변화도를 누적한다는 것을 기억하세요.</span>
+        <span class="c1"># 그것들을 제거합니다.</span>
         <span class="n">model</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
 
-        <span class="c1"># Step 2. Get our inputs ready for the network, that is,</span>
-        <span class="c1"># turn them into Tensors of word indices.</span>
+        <span class="c1"># 2단계. 입력 데이터를 신경망에 사용될 수 있도록 단어</span>
+        <span class="c1"># 인덱스들의 텐서로 변환합니다.</span>
         <span class="n">sentence_in</span> <span class="o">=</span> <span class="n">prepare_sequence</span><span class="p">(</span><span class="n">sentence</span><span class="p">,</span> <span class="n">word_to_ix</span><span class="p">)</span>
         <span class="n">targets</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="n">tag_to_ix</span><span class="p">[</span><span class="n">t</span><span class="p">]</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">tags</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">long</span><span class="p">)</span>
 
-        <span class="c1"># Step 3. Run our forward pass.</span>
+        <span class="c1"># 3단계. 순방향 계산을 수행합니다.</span>
         <span class="n">loss</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">neg_log_likelihood</span><span class="p">(</span><span class="n">sentence_in</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span>
 
-        <span class="c1"># Step 4. Compute the loss, gradients, and update the parameters by</span>
-        <span class="c1"># calling optimizer.step()</span>
+        <span class="c1"># 4단계. 손실값, 변화도를 계산하고 optimizer.step()을 호출하여</span>
+        <span class="c1"># 매개변수들을 갱신합니다.</span>
         <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
         <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
 
-<span class="c1"># Check predictions after training</span>
+<span class="c1"># 훈련이 끝난 후 예측 결과를 확인합니다.</span>
 <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
     <span class="n">precheck_sent</span> <span class="o">=</span> <span class="n">prepare_sequence</span><span class="p">(</span><span class="n">training_data</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">word_to_ix</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="p">(</span><span class="n">precheck_sent</span><span class="p">))</span>
-<span class="c1"># We got it!</span>
+<span class="c1"># 다 했습니다!</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
@@ -639,22 +628,20 @@ you could probably use this tagger for real tasks.</p>
 </pre></div>
 </div>
 </div>
-<div class="section" id="exercise-a-new-loss-function-for-discriminative-tagging">
-<h2>Exercise: A new loss function for discriminative tagging<a class="headerlink" href="#exercise-a-new-loss-function-for-discriminative-tagging" title="Permalink to this headline">¶</a></h2>
-<p>It wasn’t really necessary for us to create a computation graph when
-doing decoding, since we do not backpropagate from the viterbi path
-score. Since we have it anyway, try training the tagger where the loss
-function is the difference between the Viterbi path score and the score
-of the gold-standard path. It should be clear that this function is
-non-negative and 0 when the predicted tag sequence is the correct tag
-sequence. This is essentially <em>structured perceptron</em>.</p>
-<p>This modification should be short, since Viterbi and score_sentence are
-already implemented. This is an example of the shape of the computation
-graph <em>depending on the training instance</em>. Although I haven’t tried
-implementing this in a static toolkit, I imagine that it is possible but
-much less straightforward.</p>
-<p>Pick up some real data and do a comparison!</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  7.666 seconds)</p>
+<div class="section" id="discriminative">
+<h2>연습 : 판별적(discriminative) 태깅을 위한 새로운 손실 함수<a class="headerlink" href="#discriminative" title="Permalink to this headline">¶</a></h2>
+<p>사실 복호화 할 때는 비터비 경로 점수로 역전파를 하지 않기 때문에 계산
+그래프를 만들 필요가 없었습니다. 그러나 이미 만들었으니, 비터비 경로
+점수와 실제 정답 경로 점수의 차이를 손실 함수로 사용해서 태거를
+학습시켜 보세요. 손실 함수의 값은 음수가 아니어야 하며, 예측된 태그
+순열이 정답이라면 손실 함수의 값은 0이어야 합니다. 이것은 본질적으로
+<em>구조화된 퍼셉트론</em> 입니다.</p>
+<p>이미 비터비와 score_sentence 함수가 구현되어 있기 때문에 간단히 수정할
+수 있습니다. 이 모델은 <em>학습 데이터에 따라 변하는</em> 계산 그래프의 한
+예시입니다. 이 모델을 정적 툴킷에서 구현해 보지는 않았는데, 구현이
+가능하지만 덜 직관적일 수 있습니다.</p>
+<p>실제 데이터를 사용해보고 비교해보세요!</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  7.507 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-beginner-nlp-advanced-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/2a7469f7250c4f405b1c4f885994ea69/advanced_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">advanced_tutorial.py</span></code></a></p>
@@ -708,11 +695,11 @@ much less straightforward.</p>
           <div class="pytorch-right-menu" id="pytorch-right-menu">
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
-<li><a class="reference internal" href="#">Advanced: Making Dynamic Decisions and the Bi-LSTM CRF</a><ul>
-<li><a class="reference internal" href="#dynamic-versus-static-deep-learning-toolkits">Dynamic versus Static Deep Learning Toolkits</a></li>
-<li><a class="reference internal" href="#bi-lstm-conditional-random-field-discussion">Bi-LSTM Conditional Random Field Discussion</a></li>
-<li><a class="reference internal" href="#implementation-notes">Implementation Notes</a></li>
-<li><a class="reference internal" href="#exercise-a-new-loss-function-for-discriminative-tagging">Exercise: A new loss function for discriminative tagging</a></li>
+<li><a class="reference internal" href="#">심화 과정 : Bi-LSTM CRF와 동적 결정</a><ul>
+<li><a class="reference internal" href="#toolkits">동적, 정적 딥 러닝 툴킷(toolkits) 비교</a></li>
+<li><a class="reference internal" href="#bi-lstm-conditional-rnadom-field">Bi-LSTM Conditional Rnadom Field 설명</a></li>
+<li><a class="reference internal" href="#id1">구현 문서</a></li>
+<li><a class="reference internal" href="#discriminative">연습 : 판별적(discriminative) 태깅을 위한 새로운 손실 함수</a></li>
 </ul>
 </li>
 </ul>
@@ -730,11 +717,10 @@ much less straightforward.</p>
 
      
        <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-         <script type="text/javascript" src="../../_static/jquery.js"></script>
-         <script type="text/javascript" src="../../_static/underscore.js"></script>
-         <script type="text/javascript" src="../../_static/doctools.js"></script>
-         <script type="text/javascript" src="../../_static/language_data.js"></script>
-         <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+         <script src="../../_static/jquery.js"></script>
+         <script src="../../_static/underscore.js"></script>
+         <script src="../../_static/doctools.js"></script>
+         <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
      
 
   

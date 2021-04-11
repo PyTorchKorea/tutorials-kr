@@ -174,7 +174,7 @@
 <p class="caption"><span class="caption-text">프론트엔드 API</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="named_tensor_tutorial.html">(prototype) Introduction to Named Tensors in PyTorch</a></li>
-<li class="toctree-l1"><a class="reference internal" href="memory_format_tutorial.html">(beta) Channels Last Memory Format in PyTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="memory_format_tutorial.html">(실험용) PyTorch를 사용한 Channels Last Memory Format</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_frontend.html">Using the PyTorch C++ Frontend</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_extension.html">Custom C++ and CUDA Extensions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/torch_script_custom_ops.html">Extending TorchScript with Custom C++ Operators</a></li>
@@ -186,7 +186,7 @@
 <p class="caption"><span class="caption-text">모델 최적화</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="pruning_tutorial.html">가지치기 기법(Pruning) 튜토리얼</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../advanced/dynamic_quantization_tutorial.html">(beta) Dynamic Quantization on an LSTM Word Language Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/dynamic_quantization_tutorial.html">(베타) LSTM 기반 단어 단위 언어 모델의 동적 양자화</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/static_quantization_tutorial.html">(beta) Static Quantization with Eager Mode in PyTorch</a></li>
 <li class="toctree-l1"><a class="reference internal" href="quantized_transfer_learning_tutorial.html">(beta) 컴퓨터 비전(Vision) 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
@@ -376,7 +376,7 @@ which in turn notifies all previous requests from other trainers through the
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">threading</span>
 <span class="kn">import</span> <span class="nn">torchvision</span>
 <span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">import</span> <span class="nn">torch.distributed.rpc</span> <span class="kn">as</span> <span class="nn">rpc</span>
+<span class="kn">import</span> <span class="nn">torch.distributed.rpc</span> <span class="k">as</span> <span class="nn">rpc</span>
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">optim</span>
 
 <span class="n">num_classes</span><span class="p">,</span> <span class="n">batch_update_size</span> <span class="o">=</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">5</span>
@@ -396,7 +396,7 @@ which in turn notifies all previous requests from other trainers through the
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span>
 
     <span class="nd">@staticmethod</span>
-    <span class="nd">@rpc.functions.async_execution</span>
+    <span class="nd">@rpc</span><span class="o">.</span><span class="n">functions</span><span class="o">.</span><span class="n">async_execution</span>
     <span class="k">def</span> <span class="nf">update_and_fetch_model</span><span class="p">(</span><span class="n">ps_rref</span><span class="p">,</span> <span class="n">grads</span><span class="p">):</span>
         <span class="c1"># Using the RRef to retrieve the local PS instance</span>
         <span class="bp">self</span> <span class="o">=</span> <span class="n">ps_rref</span><span class="o">.</span><span class="n">local_value</span><span class="p">()</span>
@@ -499,8 +499,8 @@ additional <code class="docutils literal notranslate"><span class="pre">batch</s
 function contains states from multiple observers and hence the dimension needs
 to change properly. Everything else stays intact.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">argparse</span>
-<span class="kn">import</span> <span class="nn">torch.nn</span> <span class="kn">as</span> <span class="nn">nn</span>
-<span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="kn">as</span> <span class="nn">F</span>
+<span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
+<span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="nn">F</span>
 
 <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s1">&#39;PyTorch RPC Batch RL example&#39;</span><span class="p">)</span>
 <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--gamma&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s1">&#39;G&#39;</span><span class="p">,</span>
@@ -514,7 +514,7 @@ to change properly. Everything else stays intact.</p>
 <span class="n">torch</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">seed</span><span class="p">)</span>
 
 <span class="k">class</span> <span class="nc">Policy</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">Policy</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">affine1</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">128</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="mf">0.6</span><span class="p">)</span>
@@ -535,10 +535,10 @@ actions. In batch mode, it calls <code class="docutils literal notranslate"><spa
 which will be presented shortly, and this function will be decorated with
 <a class="reference external" href="https://pytorch.org/docs/master/rpc.html#torch.distributed.rpc.functions.async_execution">&#64;rpc.functions.async_execution</a>.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">gym</span>
-<span class="kn">import</span> <span class="nn">torch.distributed.rpc</span> <span class="kn">as</span> <span class="nn">rpc</span>
+<span class="kn">import</span> <span class="nn">torch.distributed.rpc</span> <span class="k">as</span> <span class="nn">rpc</span>
 
 <span class="k">class</span> <span class="nc">Observer</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">get_worker_info</span><span class="p">()</span><span class="o">.</span><span class="n">id</span> <span class="o">-</span> <span class="mi">1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">env</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s1">&#39;CartPole-v1&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">seed</span><span class="p">)</span>
@@ -606,7 +606,7 @@ observer.</p>
 <span class="kn">from</span> <span class="nn">torch.distributed.rpc</span> <span class="kn">import</span> <span class="n">RRef</span>
 
 <span class="k">class</span> <span class="nc">Agent</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">world_size</span><span class="p">,</span> <span class="n">batch</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">world_size</span><span class="p">,</span> <span class="n">batch</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ob_rrefs</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">agent_rref</span> <span class="o">=</span> <span class="n">RRef</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">rewards</span> <span class="o">=</span> <span class="p">{}</span>
@@ -658,7 +658,7 @@ all previous RPC requests from other observers.</p>
     <span class="o">...</span>
 
     <span class="nd">@staticmethod</span>
-    <span class="nd">@rpc.functions.async_execution</span>
+    <span class="nd">@rpc</span><span class="o">.</span><span class="n">functions</span><span class="o">.</span><span class="n">async_execution</span>
     <span class="k">def</span> <span class="nf">select_action_batch</span><span class="p">(</span><span class="n">agent_rref</span><span class="p">,</span> <span class="n">ob_id</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
         <span class="bp">self</span> <span class="o">=</span> <span class="n">agent_rref</span><span class="o">.</span><span class="n">local_value</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">[</span><span class="n">ob_id</span><span class="p">]</span><span class="o">.</span><span class="n">copy_</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
@@ -730,7 +730,7 @@ similar to other RPC tutorials. In this tutorial, all observers passively
 waiting for commands from the agent. Please refer to the
 <a class="reference external" href="https://github.com/pytorch/examples/tree/master/distributed/rpc">examples</a>
 repo for the full implementation.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">run_worker</span><span class="p">(</span><span class="n">rank</span><span class="p">,</span> <span class="n">world_size</span><span class="p">,</span> <span class="n">n_episode</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">print_log</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">run_worker</span><span class="p">(</span><span class="n">rank</span><span class="p">,</span> <span class="n">world_size</span><span class="p">,</span> <span class="n">n_episode</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">print_log</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;MASTER_ADDR&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;localhost&#39;</span>
     <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;MASTER_PORT&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;29500&#39;</span>
     <span class="k">if</span> <span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
@@ -742,7 +742,7 @@ repo for the full implementation.</p>
             <span class="n">last_reward</span><span class="p">,</span> <span class="n">running_reward</span> <span class="o">=</span> <span class="n">agent</span><span class="o">.</span><span class="n">run_episode</span><span class="p">(</span><span class="n">n_steps</span><span class="o">=</span><span class="n">NUM_STEPS</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="n">print_log</span><span class="p">:</span>
-                <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Episode {}</span><span class="se">\t</span><span class="s1">Last reward: {:.2f}</span><span class="se">\t</span><span class="s1">Average reward: {:.2f}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Episode </span><span class="si">{}</span><span class="se">\t</span><span class="s1">Last reward: </span><span class="si">{:.2f}</span><span class="se">\t</span><span class="s1">Average reward: </span><span class="si">{:.2f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                     <span class="n">i_episode</span><span class="p">,</span> <span class="n">last_reward</span><span class="p">,</span> <span class="n">running_reward</span><span class="p">))</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="c1"># other ranks are the observer</span>
@@ -754,18 +754,18 @@ repo for the full implementation.</p>
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="k">for</span> <span class="n">world_size</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">12</span><span class="p">):</span>
         <span class="n">delays</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="p">[</span><span class="bp">True</span><span class="p">,</span> <span class="bp">False</span><span class="p">]:</span>
+        <span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">]:</span>
             <span class="n">tik</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
             <span class="n">mp</span><span class="o">.</span><span class="n">spawn</span><span class="p">(</span>
                 <span class="n">run_worker</span><span class="p">,</span>
                 <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">world_size</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">num_episode</span><span class="p">,</span> <span class="n">batch</span><span class="p">),</span>
                 <span class="n">nprocs</span><span class="o">=</span><span class="n">world_size</span><span class="p">,</span>
-                <span class="n">join</span><span class="o">=</span><span class="bp">True</span>
+                <span class="n">join</span><span class="o">=</span><span class="kc">True</span>
             <span class="p">)</span>
             <span class="n">tok</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
             <span class="n">delays</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tok</span> <span class="o">-</span> <span class="n">tik</span><span class="p">)</span>
 
-        <span class="k">print</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;{world_size}, {delays[0]}, {delays[1]}&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">world_size</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">delays</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">delays</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
@@ -865,11 +865,9 @@ that batch processing helped to speed up training.</p>
 
      
        <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-         <script type="text/javascript" src="../_static/jquery.js"></script>
-         <script type="text/javascript" src="../_static/underscore.js"></script>
-         <script type="text/javascript" src="../_static/doctools.js"></script>
-         <script type="text/javascript" src="../_static/language_data.js"></script>
-         <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+         <script src="../_static/jquery.js"></script>
+         <script src="../_static/underscore.js"></script>
+         <script src="../_static/doctools.js"></script>
      
 
   

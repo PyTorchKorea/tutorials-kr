@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Spatial Transformer Networks Tutorial &mdash; PyTorch Tutorials 1.6.0 documentation</title>
+  <title>공간 변형 네트워크(Spatial Transformer Networks) 튜토리얼 &mdash; PyTorch Tutorials 1.6.0 documentation</title>
   
 
   
@@ -172,7 +172,7 @@
 <p class="caption"><span class="caption-text">프론트엔드 API</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="named_tensor_tutorial.html">(prototype) Introduction to Named Tensors in PyTorch</a></li>
-<li class="toctree-l1"><a class="reference internal" href="memory_format_tutorial.html">(beta) Channels Last Memory Format in PyTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="memory_format_tutorial.html">(실험용) PyTorch를 사용한 Channels Last Memory Format</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_frontend.html">Using the PyTorch C++ Frontend</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_extension.html">Custom C++ and CUDA Extensions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/torch_script_custom_ops.html">Extending TorchScript with Custom C++ Operators</a></li>
@@ -184,7 +184,7 @@
 <p class="caption"><span class="caption-text">모델 최적화</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="pruning_tutorial.html">가지치기 기법(Pruning) 튜토리얼</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../advanced/dynamic_quantization_tutorial.html">(beta) Dynamic Quantization on an LSTM Word Language Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/dynamic_quantization_tutorial.html">(베타) LSTM 기반 단어 단위 언어 모델의 동적 양자화</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/static_quantization_tutorial.html">(beta) Static Quantization with Eager Mode in PyTorch</a></li>
 <li class="toctree-l1"><a class="reference internal" href="quantized_transfer_learning_tutorial.html">(beta) 컴퓨터 비전(Vision) 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
@@ -241,7 +241,7 @@
       </li>
 
         
-      <li>Spatial Transformer Networks Tutorial</li>
+      <li>공간 변형 네트워크(Spatial Transformer Networks) 튜토리얼</li>
     
     
       <li class="pytorch-breadcrumbs-aside">
@@ -299,58 +299,55 @@
 <p class="admonition-title">Note</p>
 <p>Click <a class="reference internal" href="#sphx-glr-download-intermediate-spatial-transformer-tutorial-py"><span class="std std-ref">here</span></a> to download the full example code</p>
 </div>
-<div class="sphx-glr-example-title section" id="spatial-transformer-networks-tutorial">
-<span id="sphx-glr-intermediate-spatial-transformer-tutorial-py"></span><h1>Spatial Transformer Networks Tutorial<a class="headerlink" href="#spatial-transformer-networks-tutorial" title="Permalink to this headline">¶</a></h1>
-<p><strong>Author</strong>: <a class="reference external" href="https://github.com/GHamrouni">Ghassen HAMROUNI</a></p>
-<div class="figure align-default">
-<img alt="../_images/FSeq.png" src="../_images/FSeq.png" />
-</div>
-<p>In this tutorial, you will learn how to augment your network using
-a visual attention mechanism called spatial transformer
-networks. You can read more about the spatial transformer
-networks in the <a class="reference external" href="https://arxiv.org/abs/1506.02025">DeepMind paper</a></p>
-<p>Spatial transformer networks are a generalization of differentiable
-attention to any spatial transformation. Spatial transformer networks
-(STN for short) allow a neural network to learn how to perform spatial
-transformations on the input image in order to enhance the geometric
-invariance of the model.
-For example, it can crop a region of interest, scale and correct
-the orientation of an image. It can be a useful mechanism because CNNs
-are not invariant to rotation and scale and more general affine
-transformations.</p>
-<p>One of the best things about STN is the ability to simply plug it into
-any existing CNN with very little modification.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># License: BSD</span>
-<span class="c1"># Author: Ghassen Hamrouni</span>
+<div class="sphx-glr-example-title section" id="spatial-transformer-networks">
+<span id="sphx-glr-intermediate-spatial-transformer-tutorial-py"></span><h1>공간 변형 네트워크(Spatial Transformer Networks) 튜토리얼<a class="headerlink" href="#spatial-transformer-networks" title="Permalink to this headline">¶</a></h1>
+<p><strong>저자</strong>: <a class="reference external" href="https://github.com/GHamrouni">Ghassen HAMROUNI</a>
+<strong>번역</strong>: <a class="reference external" href="https://github.com/adonisues">황성수</a> , <a class="reference external" href="https://github.com/SSinyu">정신유</a>
+.. figure:: /_static/img/stn/FSeq.png
+이 튜토리얼에서는 공간 변형 네트워크(spatial transformer networks, 이하 STN)이라
+불리는 비주얼 어텐션 메커니즘을 이용해 신경망을 증강(augment)시키는 방법에 대해
+학습합니다. 이 방법에 대한 자세한 내용은 <a class="reference external" href="https://arxiv.org/abs/1506.02025">DeepMind paper</a> 에서
+확인할 수 있습니다.
+STN은 어떠한 공간적 변형(spatial transformation)에도 적용할 수 있는 미분 가능한
+어텐션의 일반화입니다. 따라서 STN은 신경망의 기하학적 불변성(geometric invariance)을
+강화하기 위해 입력 이미지를 대상으로 어떠한 공간적 변형을 수행해야 하는지 학습하도록
+합니다.
+예를 들어 이미지의 관심 영역을 잘라내거나, 크기를 조정하거나, 방향(orientation)을
+수정할 수 있습니다. CNN은 이러한 회전, 크기 조정 등의 일반적인 아핀(affine) 변환된
+입력에 대해 결과의 변동이 크기 때문에 (민감하기 때문에), STN은 이를 극복하는데 매우
+유용한 메커니즘이 될 수 있습니다.
+STN이 가진 장점 중 하나는 아주 작은 수정만으로 기존에 사용하던 CNN에 간단하게 연결 시킬
+수 있다는 것입니다.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># 라이센스: BSD</span>
+<span class="c1"># 저자: Ghassen Hamrouni</span>
 
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">print_function</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span>
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
 <span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="nn">F</span>
 <span class="kn">import</span> <span class="nn">torch.optim</span> <span class="k">as</span> <span class="nn">optim</span>
 <span class="kn">import</span> <span class="nn">torchvision</span>
-<span class="kn">from</span> <span class="nn">torchvision</span> <span class="k">import</span> <span class="n">datasets</span><span class="p">,</span> <span class="n">transforms</span>
+<span class="kn">from</span> <span class="nn">torchvision</span> <span class="kn">import</span> <span class="n">datasets</span><span class="p">,</span> <span class="n">transforms</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
-<span class="n">plt</span><span class="o">.</span><span class="n">ion</span><span class="p">()</span>   <span class="c1"># interactive mode</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ion</span><span class="p">()</span>   <span class="c1"># 대화형 모드</span>
 </pre></div>
 </div>
-<div class="section" id="loading-the-data">
-<h2>Loading the data<a class="headerlink" href="#loading-the-data" title="Permalink to this headline">¶</a></h2>
-<p>In this post we experiment with the classic MNIST dataset. Using a
-standard convolutional network augmented with a spatial transformer
-network.</p>
+<div class="section" id="id3">
+<h2>데이터 불러오기<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
+<p>이 튜토리얼에서는 MNIST 데이터셋을 이용해 실험합니다. 실험에는 STN으로
+증강된 일반적인 CNN을 사용합니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
 
-<span class="c1"># Training dataset</span>
+<span class="c1"># 학습용 데이터셋</span>
 <span class="n">train_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span>
     <span class="n">datasets</span><span class="o">.</span><span class="n">MNIST</span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                    <span class="n">transform</span><span class="o">=</span><span class="n">transforms</span><span class="o">.</span><span class="n">Compose</span><span class="p">([</span>
                        <span class="n">transforms</span><span class="o">.</span><span class="n">ToTensor</span><span class="p">(),</span>
                        <span class="n">transforms</span><span class="o">.</span><span class="n">Normalize</span><span class="p">((</span><span class="mf">0.1307</span><span class="p">,),</span> <span class="p">(</span><span class="mf">0.3081</span><span class="p">,))</span>
                    <span class="p">])),</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
-<span class="c1"># Test dataset</span>
+<span class="c1"># 테스트용 데이터셋</span>
 <span class="n">test_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span>
     <span class="n">datasets</span><span class="o">.</span><span class="n">MNIST</span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">transforms</span><span class="o">.</span><span class="n">Compose</span><span class="p">([</span>
         <span class="n">transforms</span><span class="o">.</span><span class="n">ToTensor</span><span class="p">(),</span>
@@ -358,43 +355,27 @@ network.</p>
     <span class="p">])),</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
 </pre></div>
 </div>
-<p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Downloading http://yann.lecun.com/exdb/mnist/train-images-idx3-ubyte.gz to ./MNIST/raw/train-images-idx3-ubyte.gz
-Extracting ./MNIST/raw/train-images-idx3-ubyte.gz to ./MNIST/raw
-Downloading http://yann.lecun.com/exdb/mnist/train-labels-idx1-ubyte.gz to ./MNIST/raw/train-labels-idx1-ubyte.gz
-Extracting ./MNIST/raw/train-labels-idx1-ubyte.gz to ./MNIST/raw
-Downloading http://yann.lecun.com/exdb/mnist/t10k-images-idx3-ubyte.gz to ./MNIST/raw/t10k-images-idx3-ubyte.gz
-Extracting ./MNIST/raw/t10k-images-idx3-ubyte.gz to ./MNIST/raw
-Downloading http://yann.lecun.com/exdb/mnist/t10k-labels-idx1-ubyte.gz to ./MNIST/raw/t10k-labels-idx1-ubyte.gz
-Extracting ./MNIST/raw/t10k-labels-idx1-ubyte.gz to ./MNIST/raw
-Processing...
-Done!
-</pre></div>
 </div>
-</div>
-<div class="section" id="depicting-spatial-transformer-networks">
-<h2>Depicting spatial transformer networks<a class="headerlink" href="#depicting-spatial-transformer-networks" title="Permalink to this headline">¶</a></h2>
-<p>Spatial transformer networks boils down to three main components :</p>
+<div class="section" id="spatial-transformer-networks-stn">
+<h2>Spatial Transformer Networks(STN) 구성하기<a class="headerlink" href="#spatial-transformer-networks-stn" title="Permalink to this headline">¶</a></h2>
+<p>STN은 다음의 세 가지 주요 구성 요소로 요약됩니다.</p>
 <ul class="simple">
-<li><p>The localization network is a regular CNN which regresses the
-transformation parameters. The transformation is never learned
-explicitly from this dataset, instead the network learns automatically
-the spatial transformations that enhances the global accuracy.</p></li>
-<li><p>The grid generator generates a grid of coordinates in the input
-image corresponding to each pixel from the output image.</p></li>
-<li><p>The sampler uses the parameters of the transformation and applies
-it to the input image.</p></li>
+<li><p>위치 결정 네트워크(localization network)는 공간 변환 파라미터를 예측(regress)
+하는 일반적인 CNN 입니다. 공간 변환은 데이터 셋으로부터 명시적으로 학습되지 않고,
+신경망이 전체 정확도를 향상 시키도록 공간 변환을 자동으로 학습합니다.</p></li>
+<li><p>그리드 생성기(grid generator)는 출력 이미지로부터 각 픽셀에 대응하는 입력
+이미지 내 좌표 그리드를 생성합니다.</p></li>
+<li><p>샘플러(sampler)는 공간 변환 파라미터를 입력 이미지에 적용합니다.</p></li>
 </ul>
 <div class="figure align-default">
 <img alt="../_images/stn-arch.png" src="../_images/stn-arch.png" />
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>We need the latest version of PyTorch that contains
-affine_grid and grid_sample modules.</p>
+<p>affine_grid 및 grid_sample 모듈이 포함된 최신 버전의 PyTorch가 필요합니다.</p>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Net</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">Net</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">conv1</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">conv2</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
@@ -402,7 +383,7 @@ affine_grid and grid_sample modules.</p>
         <span class="bp">self</span><span class="o">.</span><span class="n">fc1</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">320</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fc2</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
 
-        <span class="c1"># Spatial transformer localization-network</span>
+        <span class="c1"># 공간 변환을 위한 위치 결정 네트워크 (localization-network)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">localization</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
             <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">7</span><span class="p">),</span>
             <span class="n">nn</span><span class="o">.</span><span class="n">MaxPool2d</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span>
@@ -412,18 +393,18 @@ affine_grid and grid_sample modules.</p>
             <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
         <span class="p">)</span>
 
-        <span class="c1"># Regressor for the 3 * 2 affine matrix</span>
+        <span class="c1"># [3 * 2] 크기의 아핀(affine) 행렬에 대해 예측</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fc_loc</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
             <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">10</span> <span class="o">*</span> <span class="mi">3</span> <span class="o">*</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">32</span><span class="p">),</span>
             <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(</span><span class="kc">True</span><span class="p">),</span>
             <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">32</span><span class="p">,</span> <span class="mi">3</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)</span>
         <span class="p">)</span>
 
-        <span class="c1"># Initialize the weights/bias with identity transformation</span>
+        <span class="c1"># 항등 변환(identity transformation)으로 가중치/바이어스 초기화</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fc_loc</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">weight</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">zero_</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fc_loc</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">bias</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">copy_</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float</span><span class="p">))</span>
 
-    <span class="c1"># Spatial transformer network forward function</span>
+    <span class="c1"># STN의 forward 함수</span>
     <span class="k">def</span> <span class="nf">stn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         <span class="n">xs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">localization</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="n">xs</span> <span class="o">=</span> <span class="n">xs</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span> <span class="o">*</span> <span class="mi">3</span> <span class="o">*</span> <span class="mi">3</span><span class="p">)</span>
@@ -436,10 +417,10 @@ affine_grid and grid_sample modules.</p>
         <span class="k">return</span> <span class="n">x</span>
 
     <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-        <span class="c1"># transform the input</span>
+        <span class="c1"># 입력을 변환</span>
         <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stn</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 
-        <span class="c1"># Perform the usual forward pass</span>
+        <span class="c1"># 일반적인 forward pass를 수행</span>
         <span class="n">x</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">max_pool2d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conv1</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="mi">2</span><span class="p">))</span>
         <span class="n">x</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">max_pool2d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conv2_drop</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conv2</span><span class="p">(</span><span class="n">x</span><span class="p">)),</span> <span class="mi">2</span><span class="p">))</span>
         <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">320</span><span class="p">)</span>
@@ -453,11 +434,11 @@ affine_grid and grid_sample modules.</p>
 </pre></div>
 </div>
 </div>
-<div class="section" id="training-the-model">
-<h2>Training the model<a class="headerlink" href="#training-the-model" title="Permalink to this headline">¶</a></h2>
-<p>Now, let’s use the SGD algorithm to train the model. The network is
-learning the classification task in a supervised way. In the same time
-the model is learning STN automatically in an end-to-end fashion.</p>
+<div class="section" id="id4">
+<h2>모델 학습하기<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
+<p>이제 SGD 알고리즘을 이용해 모델을 학습시켜 봅시다. 앞서 구성한 신경망은
+감독 학습 방식(supervised way)으로 분류 문제를 학습합니다. 또한 이 모델은
+end-to-end 방식으로 STN을 자동으로 학습합니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">optimizer</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">SGD</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.01</span><span class="p">)</span>
 
 
@@ -476,7 +457,7 @@ the model is learning STN automatically in an end-to-end fashion.</p>
                 <span class="n">epoch</span><span class="p">,</span> <span class="n">batch_idx</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">train_loader</span><span class="o">.</span><span class="n">dataset</span><span class="p">),</span>
                 <span class="mf">100.</span> <span class="o">*</span> <span class="n">batch_idx</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">train_loader</span><span class="p">),</span> <span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()))</span>
 <span class="c1">#</span>
-<span class="c1"># A simple test procedure to measure STN the performances on MNIST.</span>
+<span class="c1"># MNIST 데이터셋에서 STN의 성능을 측정하기 위한 간단한 테스트 절차</span>
 <span class="c1">#</span>
 
 
@@ -489,9 +470,9 @@ the model is learning STN automatically in an end-to-end fashion.</p>
             <span class="n">data</span><span class="p">,</span> <span class="n">target</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">),</span> <span class="n">target</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
             <span class="n">output</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 
-            <span class="c1"># sum up batch loss</span>
+            <span class="c1"># 배치 손실 합하기</span>
             <span class="n">test_loss</span> <span class="o">+=</span> <span class="n">F</span><span class="o">.</span><span class="n">nll_loss</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">size_average</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
-            <span class="c1"># get the index of the max log-probability</span>
+            <span class="c1"># 로그-확률의 최대값에 해당하는 인덱스 가져오기</span>
             <span class="n">pred</span> <span class="o">=</span> <span class="n">output</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdim</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
             <span class="n">correct</span> <span class="o">+=</span> <span class="n">pred</span><span class="o">.</span><span class="n">eq</span><span class="p">(</span><span class="n">target</span><span class="o">.</span><span class="n">view_as</span><span class="p">(</span><span class="n">pred</span><span class="p">))</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
 
@@ -502,12 +483,10 @@ the model is learning STN automatically in an end-to-end fashion.</p>
 </pre></div>
 </div>
 </div>
-<div class="section" id="visualizing-the-stn-results">
-<h2>Visualizing the STN results<a class="headerlink" href="#visualizing-the-stn-results" title="Permalink to this headline">¶</a></h2>
-<p>Now, we will inspect the results of our learned visual attention
-mechanism.</p>
-<p>We define a small helper function in order to visualize the
-transformations while training.</p>
+<div class="section" id="stn">
+<h2>STN 결과 시각화하기<a class="headerlink" href="#stn" title="Permalink to this headline">¶</a></h2>
+<p>이제 학습한 비주얼 어텐션 메커니즘의 결과를 살펴보겠습니다.</p>
+<p>학습하는 동안 변환된 결과를 시각화하기 위해 작은 도움(helper) 함수를 정의합니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">convert_image_np</span><span class="p">(</span><span class="n">inp</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Convert a Tensor to numpy image.&quot;&quot;&quot;</span>
     <span class="n">inp</span> <span class="o">=</span> <span class="n">inp</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span><span class="o">.</span><span class="n">transpose</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
@@ -517,14 +496,13 @@ transformations while training.</p>
     <span class="n">inp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">inp</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">inp</span>
 
-<span class="c1"># We want to visualize the output of the spatial transformers layer</span>
-<span class="c1"># after the training, we visualize a batch of input images and</span>
-<span class="c1"># the corresponding transformed batch using STN.</span>
+<span class="c1"># 학습 후 공간 변환 계층의 출력을 시각화하고, 입력 이미지 배치 데이터 및</span>
+<span class="c1"># STN을 사용해 변환된 배치 데이터를 시각화 합니다.</span>
 
 
 <span class="k">def</span> <span class="nf">visualize_stn</span><span class="p">():</span>
     <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
-        <span class="c1"># Get a batch of training data</span>
+        <span class="c1"># 학습 데이터의 배치 가져오기</span>
         <span class="n">data</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">test_loader</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
 
         <span class="n">input_tensor</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span>
@@ -536,7 +514,7 @@ transformations while training.</p>
         <span class="n">out_grid</span> <span class="o">=</span> <span class="n">convert_image_np</span><span class="p">(</span>
             <span class="n">torchvision</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">make_grid</span><span class="p">(</span><span class="n">transformed_input_tensor</span><span class="p">))</span>
 
-        <span class="c1"># Plot the results side-by-side</span>
+        <span class="c1"># 결과를 나란히 표시하기</span>
         <span class="n">f</span><span class="p">,</span> <span class="n">axarr</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
         <span class="n">axarr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">in_grid</span><span class="p">)</span>
         <span class="n">axarr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Dataset Images&#39;</span><span class="p">)</span>
@@ -548,7 +526,7 @@ transformations while training.</p>
     <span class="n">train</span><span class="p">(</span><span class="n">epoch</span><span class="p">)</span>
     <span class="n">test</span><span class="p">()</span>
 
-<span class="c1"># Visualize the STN transformation on some input batch</span>
+<span class="c1"># 일부 입력 배치 데이터에서 STN 변환 결과를 시각화</span>
 <span class="n">visualize_stn</span><span class="p">()</span>
 
 <span class="n">plt</span><span class="o">.</span><span class="n">ioff</span><span class="p">()</span>
@@ -557,108 +535,108 @@ transformations while training.</p>
 </div>
 <img alt="../_images/sphx_glr_spatial_transformer_tutorial_001.png" class="sphx-glr-single-img" src="../_images/sphx_glr_spatial_transformer_tutorial_001.png" />
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Train Epoch: 1 [0/60000 (0%)]   Loss: 2.322509
-Train Epoch: 1 [32000/60000 (53%)]      Loss: 0.931219
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Train Epoch: 1 [0/60000 (0%)]   Loss: 2.317141
+Train Epoch: 1 [32000/60000 (53%)]      Loss: 1.169722
 
-Test set: Average loss: 0.1964, Accuracy: 9460/10000 (95%)
+Test set: Average loss: 0.4297, Accuracy: 8680/10000 (87%)
 
-Train Epoch: 2 [0/60000 (0%)]   Loss: 0.739472
-Train Epoch: 2 [32000/60000 (53%)]      Loss: 0.255152
+Train Epoch: 2 [0/60000 (0%)]   Loss: 0.850162
+Train Epoch: 2 [32000/60000 (53%)]      Loss: 0.403260
 
-Test set: Average loss: 0.1154, Accuracy: 9646/10000 (96%)
+Test set: Average loss: 0.1459, Accuracy: 9536/10000 (95%)
 
-Train Epoch: 3 [0/60000 (0%)]   Loss: 0.292564
-Train Epoch: 3 [32000/60000 (53%)]      Loss: 0.197150
+Train Epoch: 3 [0/60000 (0%)]   Loss: 0.331244
+Train Epoch: 3 [32000/60000 (53%)]      Loss: 0.560218
 
-Test set: Average loss: 0.0941, Accuracy: 9709/10000 (97%)
+Test set: Average loss: 0.1030, Accuracy: 9672/10000 (97%)
 
-Train Epoch: 4 [0/60000 (0%)]   Loss: 0.305629
-Train Epoch: 4 [32000/60000 (53%)]      Loss: 0.350042
+Train Epoch: 4 [0/60000 (0%)]   Loss: 0.168686
+Train Epoch: 4 [32000/60000 (53%)]      Loss: 0.195199
 
-Test set: Average loss: 0.0798, Accuracy: 9751/10000 (98%)
+Test set: Average loss: 0.0786, Accuracy: 9745/10000 (97%)
 
-Train Epoch: 5 [0/60000 (0%)]   Loss: 0.161943
-Train Epoch: 5 [32000/60000 (53%)]      Loss: 0.096154
+Train Epoch: 5 [0/60000 (0%)]   Loss: 0.164006
+Train Epoch: 5 [32000/60000 (53%)]      Loss: 0.368153
 
-Test set: Average loss: 0.0800, Accuracy: 9756/10000 (98%)
+Test set: Average loss: 0.0660, Accuracy: 9816/10000 (98%)
 
-Train Epoch: 6 [0/60000 (0%)]   Loss: 0.179021
-Train Epoch: 6 [32000/60000 (53%)]      Loss: 0.064287
+Train Epoch: 6 [0/60000 (0%)]   Loss: 0.293069
+Train Epoch: 6 [32000/60000 (53%)]      Loss: 0.185670
 
-Test set: Average loss: 0.0685, Accuracy: 9786/10000 (98%)
+Test set: Average loss: 0.0693, Accuracy: 9788/10000 (98%)
 
-Train Epoch: 7 [0/60000 (0%)]   Loss: 0.170600
-Train Epoch: 7 [32000/60000 (53%)]      Loss: 0.064743
+Train Epoch: 7 [0/60000 (0%)]   Loss: 0.115762
+Train Epoch: 7 [32000/60000 (53%)]      Loss: 0.151216
 
-Test set: Average loss: 0.0567, Accuracy: 9827/10000 (98%)
+Test set: Average loss: 0.0695, Accuracy: 9795/10000 (98%)
 
-Train Epoch: 8 [0/60000 (0%)]   Loss: 0.150940
-Train Epoch: 8 [32000/60000 (53%)]      Loss: 0.155436
+Train Epoch: 8 [0/60000 (0%)]   Loss: 0.153606
+Train Epoch: 8 [32000/60000 (53%)]      Loss: 0.219680
 
-Test set: Average loss: 0.0651, Accuracy: 9811/10000 (98%)
+Test set: Average loss: 0.0541, Accuracy: 9834/10000 (98%)
 
-Train Epoch: 9 [0/60000 (0%)]   Loss: 0.266612
-Train Epoch: 9 [32000/60000 (53%)]      Loss: 0.180357
+Train Epoch: 9 [0/60000 (0%)]   Loss: 0.090507
+Train Epoch: 9 [32000/60000 (53%)]      Loss: 0.147483
 
-Test set: Average loss: 0.0496, Accuracy: 9848/10000 (98%)
+Test set: Average loss: 0.0512, Accuracy: 9839/10000 (98%)
 
-Train Epoch: 10 [0/60000 (0%)]  Loss: 0.200832
-Train Epoch: 10 [32000/60000 (53%)]     Loss: 0.163813
+Train Epoch: 10 [0/60000 (0%)]  Loss: 0.065643
+Train Epoch: 10 [32000/60000 (53%)]     Loss: 0.101421
 
-Test set: Average loss: 0.0482, Accuracy: 9853/10000 (99%)
+Test set: Average loss: 0.0533, Accuracy: 9853/10000 (99%)
 
-Train Epoch: 11 [0/60000 (0%)]  Loss: 0.042187
-Train Epoch: 11 [32000/60000 (53%)]     Loss: 0.102783
+Train Epoch: 11 [0/60000 (0%)]  Loss: 0.140934
+Train Epoch: 11 [32000/60000 (53%)]     Loss: 0.188626
 
-Test set: Average loss: 0.0504, Accuracy: 9856/10000 (99%)
+Test set: Average loss: 0.0528, Accuracy: 9832/10000 (98%)
 
-Train Epoch: 12 [0/60000 (0%)]  Loss: 0.040896
-Train Epoch: 12 [32000/60000 (53%)]     Loss: 0.096896
+Train Epoch: 12 [0/60000 (0%)]  Loss: 0.115515
+Train Epoch: 12 [32000/60000 (53%)]     Loss: 0.170645
 
-Test set: Average loss: 0.0442, Accuracy: 9875/10000 (99%)
+Test set: Average loss: 0.0582, Accuracy: 9831/10000 (98%)
 
-Train Epoch: 13 [0/60000 (0%)]  Loss: 0.023365
-Train Epoch: 13 [32000/60000 (53%)]     Loss: 0.276145
+Train Epoch: 13 [0/60000 (0%)]  Loss: 0.158255
+Train Epoch: 13 [32000/60000 (53%)]     Loss: 0.117169
 
-Test set: Average loss: 0.0480, Accuracy: 9863/10000 (99%)
+Test set: Average loss: 0.0545, Accuracy: 9845/10000 (98%)
 
-Train Epoch: 14 [0/60000 (0%)]  Loss: 0.045835
-Train Epoch: 14 [32000/60000 (53%)]     Loss: 0.033465
+Train Epoch: 14 [0/60000 (0%)]  Loss: 0.045876
+Train Epoch: 14 [32000/60000 (53%)]     Loss: 0.043410
 
-Test set: Average loss: 0.0577, Accuracy: 9825/10000 (98%)
+Test set: Average loss: 0.0503, Accuracy: 9852/10000 (99%)
 
-Train Epoch: 15 [0/60000 (0%)]  Loss: 0.055503
-Train Epoch: 15 [32000/60000 (53%)]     Loss: 0.022570
+Train Epoch: 15 [0/60000 (0%)]  Loss: 0.416799
+Train Epoch: 15 [32000/60000 (53%)]     Loss: 0.043577
 
-Test set: Average loss: 0.0679, Accuracy: 9802/10000 (98%)
+Test set: Average loss: 0.0466, Accuracy: 9868/10000 (99%)
 
-Train Epoch: 16 [0/60000 (0%)]  Loss: 0.155806
-Train Epoch: 16 [32000/60000 (53%)]     Loss: 0.085502
+Train Epoch: 16 [0/60000 (0%)]  Loss: 0.068028
+Train Epoch: 16 [32000/60000 (53%)]     Loss: 0.052074
 
-Test set: Average loss: 0.0430, Accuracy: 9871/10000 (99%)
+Test set: Average loss: 0.0496, Accuracy: 9864/10000 (99%)
 
-Train Epoch: 17 [0/60000 (0%)]  Loss: 0.045421
-Train Epoch: 17 [32000/60000 (53%)]     Loss: 0.082653
+Train Epoch: 17 [0/60000 (0%)]  Loss: 0.102239
+Train Epoch: 17 [32000/60000 (53%)]     Loss: 0.111362
 
-Test set: Average loss: 0.0427, Accuracy: 9870/10000 (99%)
+Test set: Average loss: 0.0490, Accuracy: 9864/10000 (99%)
 
-Train Epoch: 18 [0/60000 (0%)]  Loss: 0.059736
-Train Epoch: 18 [32000/60000 (53%)]     Loss: 0.138764
+Train Epoch: 18 [0/60000 (0%)]  Loss: 0.144808
+Train Epoch: 18 [32000/60000 (53%)]     Loss: 0.065100
 
-Test set: Average loss: 0.0454, Accuracy: 9865/10000 (99%)
+Test set: Average loss: 0.0438, Accuracy: 9879/10000 (99%)
 
-Train Epoch: 19 [0/60000 (0%)]  Loss: 0.033023
-Train Epoch: 19 [32000/60000 (53%)]     Loss: 0.135506
+Train Epoch: 19 [0/60000 (0%)]  Loss: 0.054307
+Train Epoch: 19 [32000/60000 (53%)]     Loss: 0.059669
 
-Test set: Average loss: 0.0389, Accuracy: 9888/10000 (99%)
+Test set: Average loss: 0.0494, Accuracy: 9856/10000 (99%)
 
-Train Epoch: 20 [0/60000 (0%)]  Loss: 0.193454
-Train Epoch: 20 [32000/60000 (53%)]     Loss: 0.017996
+Train Epoch: 20 [0/60000 (0%)]  Loss: 0.113642
+Train Epoch: 20 [32000/60000 (53%)]     Loss: 0.126756
 
-Test set: Average loss: 0.0406, Accuracy: 9887/10000 (99%)
+Test set: Average loss: 0.0518, Accuracy: 9852/10000 (99%)
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 2 minutes  5.559 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 2 minutes  26.809 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-intermediate-spatial-transformer-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/a4f07fecba75b5e84fe9e56cac0c7b71/spatial_transformer_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">spatial_transformer_tutorial.py</span></code></a></p>
@@ -712,11 +690,11 @@ Test set: Average loss: 0.0406, Accuracy: 9887/10000 (99%)
           <div class="pytorch-right-menu" id="pytorch-right-menu">
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
-<li><a class="reference internal" href="#">Spatial Transformer Networks Tutorial</a><ul>
-<li><a class="reference internal" href="#loading-the-data">Loading the data</a></li>
-<li><a class="reference internal" href="#depicting-spatial-transformer-networks">Depicting spatial transformer networks</a></li>
-<li><a class="reference internal" href="#training-the-model">Training the model</a></li>
-<li><a class="reference internal" href="#visualizing-the-stn-results">Visualizing the STN results</a></li>
+<li><a class="reference internal" href="#">공간 변형 네트워크(Spatial Transformer Networks) 튜토리얼</a><ul>
+<li><a class="reference internal" href="#id3">데이터 불러오기</a></li>
+<li><a class="reference internal" href="#spatial-transformer-networks-stn">Spatial Transformer Networks(STN) 구성하기</a></li>
+<li><a class="reference internal" href="#id4">모델 학습하기</a></li>
+<li><a class="reference internal" href="#stn">STN 결과 시각화하기</a></li>
 </ul>
 </li>
 </ul>
@@ -734,11 +712,9 @@ Test set: Average loss: 0.0406, Accuracy: 9887/10000 (99%)
 
      
        <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-         <script type="text/javascript" src="../_static/jquery.js"></script>
-         <script type="text/javascript" src="../_static/underscore.js"></script>
-         <script type="text/javascript" src="../_static/doctools.js"></script>
-         <script type="text/javascript" src="../_static/language_data.js"></script>
-         <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+         <script src="../_static/jquery.js"></script>
+         <script src="../_static/underscore.js"></script>
+         <script src="../_static/doctools.js"></script>
      
 
   

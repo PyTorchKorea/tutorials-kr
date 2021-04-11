@@ -174,7 +174,7 @@
 <p class="caption"><span class="caption-text">프론트엔드 API</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="named_tensor_tutorial.html">(prototype) Introduction to Named Tensors in PyTorch</a></li>
-<li class="toctree-l1"><a class="reference internal" href="memory_format_tutorial.html">(beta) Channels Last Memory Format in PyTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="memory_format_tutorial.html">(실험용) PyTorch를 사용한 Channels Last Memory Format</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_frontend.html">Using the PyTorch C++ Frontend</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_extension.html">Custom C++ and CUDA Extensions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/torch_script_custom_ops.html">Extending TorchScript with Custom C++ Operators</a></li>
@@ -186,7 +186,7 @@
 <p class="caption"><span class="caption-text">모델 최적화</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="pruning_tutorial.html">가지치기 기법(Pruning) 튜토리얼</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../advanced/dynamic_quantization_tutorial.html">(beta) Dynamic Quantization on an LSTM Word Language Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/dynamic_quantization_tutorial.html">(베타) LSTM 기반 단어 단위 언어 모델의 동적 양자화</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/static_quantization_tutorial.html">(beta) Static Quantization with Eager Mode in PyTorch</a></li>
 <li class="toctree-l1"><a class="reference internal" href="quantized_transfer_learning_tutorial.html">(beta) 컴퓨터 비전(Vision) 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
@@ -339,14 +339,14 @@ HTTP POST로 <code class="docutils literal notranslate"><span class="pre">/predi
 <div class="section" id="dependencies">
 <h2>의존성(Dependencies)<a class="headerlink" href="#dependencies" title="Permalink to this headline">¶</a></h2>
 <p>아래 명령어를 실행하여 필요한 패키지들을 설치합니다:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install Flask==1.0.3 torchvision-0.3.0
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install Flask==1.0.3 torchvision==0.3.0
 </pre></div>
 </div>
 </div>
 <div class="section" id="id2">
 <h2>간단한 웹 서버<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
 <p>Flask의 문서를 참고하여 아래와 같은 코드로 간단한 웹 서버를 구성합니다.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">flask</span> <span class="k">import</span> <span class="n">Flask</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">Flask</span>
 <span class="n">app</span> <span class="o">=</span> <span class="n">Flask</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
@@ -373,7 +373,7 @@ HTTP POST로 <code class="docutils literal notranslate"><span class="pre">/predi
 </div>
 <p>또한, ImageNet 분류 ID와 이름을 포함하는 JSON을 회신하도록 응답 형식을 변경하겠습니다.
 이제 <code class="docutils literal notranslate"><span class="pre">app.py</span></code> 는 아래와 같이 변경되었습니다:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">flask</span> <span class="k">import</span> <span class="n">Flask</span><span class="p">,</span> <span class="n">jsonify</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">Flask</span><span class="p">,</span> <span class="n">jsonify</span>
 <span class="n">app</span> <span class="o">=</span> <span class="n">Flask</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 <span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/predict&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;POST&#39;</span><span class="p">])</span>
@@ -398,7 +398,7 @@ HTTP POST로 <code class="docutils literal notranslate"><span class="pre">/predi
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">io</span>
 
 <span class="kn">import</span> <span class="nn">torchvision.transforms</span> <span class="k">as</span> <span class="nn">transforms</span>
-<span class="kn">from</span> <span class="nn">PIL</span> <span class="k">import</span> <span class="n">Image</span>
+<span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
 
 <span class="k">def</span> <span class="nf">transform_image</span><span class="p">(</span><span class="n">image_bytes</span><span class="p">):</span>
     <span class="n">my_transforms</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">Compose</span><span class="p">([</span><span class="n">transforms</span><span class="o">.</span><span class="n">Resize</span><span class="p">(</span><span class="mi">255</span><span class="p">),</span>
@@ -455,7 +455,7 @@ Tensor를 반환하는지 확인하면 됩니다.  (먼저 <cite>../_static/img/
 이 예제에서는 미리 학습된 모델을 사용하지만, 직접 만든 모델에 대해서도
 이와 동일한 방법을 사용할 수 있습니다. 모델을 읽어오는 것은 이
 <a class="reference internal" href="../beginner/saving_loading_models.html"><span class="doc">튜토리얼</span></a> 을 참고하세요.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torchvision</span> <span class="k">import</span> <span class="n">models</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torchvision</span> <span class="kn">import</span> <span class="n">models</span>
 
 <span class="c1"># 이미 학습된 가중치를 사용하기 위해 `pretrained` 에 `True` 값을 전달합니다:</span>
 <span class="n">model</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">densenet121</span><span class="p">(</span><span class="n">pretrained</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -529,13 +529,13 @@ API 서버는 이미지 파일을 받는 것을 가정하고 있으므로, 요�
 <code class="docutils literal notranslate"><span class="pre">predict</span></code> 메소드를 수정해야 합니다:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">request</span>
 
-<span class="nd">@app.route</span><span class="p">(</span><span class="s1">&#39;/predict&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;POST&#39;</span><span class="p">])</span>
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/predict&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;POST&#39;</span><span class="p">])</span>
 <span class="k">def</span> <span class="nf">predict</span><span class="p">():</span>
     <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;POST&#39;</span><span class="p">:</span>
         <span class="c1"># we will get the file from the request</span>
-        <span class="nb">file</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">files</span><span class="p">[</span><span class="s1">&#39;file&#39;</span><span class="p">]</span>
+        <span class="n">file</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">files</span><span class="p">[</span><span class="s1">&#39;file&#39;</span><span class="p">]</span>
         <span class="c1"># convert that to bytes</span>
-        <span class="n">img_bytes</span> <span class="o">=</span> <span class="nb">file</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="n">img_bytes</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
         <span class="n">class_id</span><span class="p">,</span> <span class="n">class_name</span> <span class="o">=</span> <span class="n">get_prediction</span><span class="p">(</span><span class="n">image_bytes</span><span class="o">=</span><span class="n">img_bytes</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s1">&#39;class_id&#39;</span><span class="p">:</span> <span class="n">class_id</span><span class="p">,</span> <span class="s1">&#39;class_name&#39;</span><span class="p">:</span> <span class="n">class_name</span><span class="p">})</span>
 </pre></div>
@@ -546,14 +546,14 @@ API 서버는 이미지 파일을 받는 것을 가정하고 있으므로, 요�
 <span class="kn">import</span> <span class="nn">json</span>
 
 <span class="kn">from</span> <span class="nn">torchvision</span> <span class="kn">import</span> <span class="n">models</span>
-<span class="kn">import</span> <span class="nn">torchvision.transforms</span> <span class="kn">as</span> <span class="nn">transforms</span>
+<span class="kn">import</span> <span class="nn">torchvision.transforms</span> <span class="k">as</span> <span class="nn">transforms</span>
 <span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
 <span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">Flask</span><span class="p">,</span> <span class="n">jsonify</span><span class="p">,</span> <span class="n">request</span>
 
 
 <span class="n">app</span> <span class="o">=</span> <span class="n">Flask</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 <span class="n">imagenet_class_index</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="s1">&#39;&lt;PATH/TO/.json/FILE&gt;/imagenet_class_index.json&#39;</span><span class="p">))</span>
-<span class="n">model</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">densenet121</span><span class="p">(</span><span class="n">pretrained</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">densenet121</span><span class="p">(</span><span class="n">pretrained</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
 
 
@@ -576,11 +576,11 @@ API 서버는 이미지 파일을 받는 것을 가정하고 있으므로, 요�
     <span class="k">return</span> <span class="n">imagenet_class_index</span><span class="p">[</span><span class="n">predicted_idx</span><span class="p">]</span>
 
 
-<span class="nd">@app.route</span><span class="p">(</span><span class="s1">&#39;/predict&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;POST&#39;</span><span class="p">])</span>
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/predict&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;POST&#39;</span><span class="p">])</span>
 <span class="k">def</span> <span class="nf">predict</span><span class="p">():</span>
     <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;POST&#39;</span><span class="p">:</span>
-        <span class="nb">file</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">files</span><span class="p">[</span><span class="s1">&#39;file&#39;</span><span class="p">]</span>
-        <span class="n">img_bytes</span> <span class="o">=</span> <span class="nb">file</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="n">file</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">files</span><span class="p">[</span><span class="s1">&#39;file&#39;</span><span class="p">]</span>
+        <span class="n">img_bytes</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
         <span class="n">class_id</span><span class="p">,</span> <span class="n">class_name</span> <span class="o">=</span> <span class="n">get_prediction</span><span class="p">(</span><span class="n">image_bytes</span><span class="o">=</span><span class="n">img_bytes</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s1">&#39;class_id&#39;</span><span class="p">:</span> <span class="n">class_id</span><span class="p">,</span> <span class="s1">&#39;class_name&#39;</span><span class="p">:</span> <span class="n">class_name</span><span class="p">})</span>
 
@@ -637,7 +637,7 @@ UI를 추가할 수도 있습니다. 비슷한 프로젝트의 <a class="referen
 <li><p>마지막으로 이 문서 상단에 링크된, PyTorch 모델을 배포하는 다른 튜토리얼들을
 읽어보는 것을 권장합니다.</p></li>
 </ul>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  1.126 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.767 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-intermediate-flask-rest-api-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/b45d95b1d38fe556c77d1ee548809d28/flask_rest_api_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">flask_rest_api_tutorial.py</span></code></a></p>
@@ -728,11 +728,9 @@ UI를 추가할 수도 있습니다. 비슷한 프로젝트의 <a class="referen
 
      
        <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-         <script type="text/javascript" src="../_static/jquery.js"></script>
-         <script type="text/javascript" src="../_static/underscore.js"></script>
-         <script type="text/javascript" src="../_static/doctools.js"></script>
-         <script type="text/javascript" src="../_static/language_data.js"></script>
-         <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+         <script src="../_static/jquery.js"></script>
+         <script src="../_static/underscore.js"></script>
+         <script src="../_static/doctools.js"></script>
      
 
   

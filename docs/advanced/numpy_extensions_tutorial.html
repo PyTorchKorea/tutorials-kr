@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Creating Extensions Using numpy and scipy &mdash; PyTorch Tutorials 1.6.0 documentation</title>
+  <title>numpy 와 scipy 를 이용한 확장(Extensions) 만들기 &mdash; PyTorch Tutorials 1.6.0 documentation</title>
   
 
   
@@ -172,7 +172,7 @@
 <p class="caption"><span class="caption-text">프론트엔드 API</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/named_tensor_tutorial.html">(prototype) Introduction to Named Tensors in PyTorch</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/memory_format_tutorial.html">(beta) Channels Last Memory Format in PyTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/memory_format_tutorial.html">(실험용) PyTorch를 사용한 Channels Last Memory Format</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cpp_frontend.html">Using the PyTorch C++ Frontend</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cpp_extension.html">Custom C++ and CUDA Extensions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="torch_script_custom_ops.html">Extending TorchScript with Custom C++ Operators</a></li>
@@ -184,7 +184,7 @@
 <p class="caption"><span class="caption-text">모델 최적화</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/pruning_tutorial.html">가지치기 기법(Pruning) 튜토리얼</a></li>
-<li class="toctree-l1"><a class="reference internal" href="dynamic_quantization_tutorial.html">(beta) Dynamic Quantization on an LSTM Word Language Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dynamic_quantization_tutorial.html">(베타) LSTM 기반 단어 단위 언어 모델의 동적 양자화</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="static_quantization_tutorial.html">(beta) Static Quantization with Eager Mode in PyTorch</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/quantized_transfer_learning_tutorial.html">(beta) 컴퓨터 비전(Vision) 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
@@ -241,7 +241,7 @@
       </li>
 
         
-      <li>Creating Extensions Using numpy and scipy</li>
+      <li>numpy 와 scipy 를 이용한 확장(Extensions) 만들기</li>
     
     
       <li class="pytorch-breadcrumbs-aside">
@@ -299,38 +299,38 @@
 <p class="admonition-title">Note</p>
 <p>Click <a class="reference internal" href="#sphx-glr-download-advanced-numpy-extensions-tutorial-py"><span class="std std-ref">here</span></a> to download the full example code</p>
 </div>
-<div class="sphx-glr-example-title section" id="creating-extensions-using-numpy-and-scipy">
-<span id="sphx-glr-advanced-numpy-extensions-tutorial-py"></span><h1>Creating Extensions Using numpy and scipy<a class="headerlink" href="#creating-extensions-using-numpy-and-scipy" title="Permalink to this headline">¶</a></h1>
+<div class="sphx-glr-example-title section" id="numpy-scipy-extensions">
+<span id="sphx-glr-advanced-numpy-extensions-tutorial-py"></span><h1>numpy 와 scipy 를 이용한 확장(Extensions) 만들기<a class="headerlink" href="#numpy-scipy-extensions" title="Permalink to this headline">¶</a></h1>
 <p><strong>Author</strong>: <a class="reference external" href="https://github.com/apaszke">Adam Paszke</a></p>
 <p><strong>Updated by</strong>: <a class="reference external" href="https://github.com/adam-dziedzic">Adam Dziedzic</a></p>
-<p>In this tutorial, we shall go through two tasks:</p>
-<ol class="arabic">
-<li><p>Create a neural network layer with no parameters.</p>
-<blockquote>
-<div><ul class="simple">
-<li><p>This calls into <strong>numpy</strong> as part of its implementation</p></li>
+<p><strong>번역</strong>: <a class="reference external" href="https://github.com/ajin-jng">Ajin Jeong</a></p>
+<p>이번 튜토리얼에서는 두 가지 작업을 수행할 것입니다:</p>
+<ol class="arabic simple">
+<li><dl class="simple">
+<dt>매개 변수가 없는 신경망 계층(layer) 만들기</dt><dd><ul class="simple">
+<li><p>이는 구현의 일부로 <strong>numpy</strong> 를 호출합니다.</p></li>
 </ul>
-</div></blockquote>
+</dd>
+</dl>
 </li>
-<li><p>Create a neural network layer that has learnable weights</p>
-<blockquote>
-<div><ul class="simple">
-<li><p>This calls into <strong>SciPy</strong> as part of its implementation</p></li>
+<li><dl class="simple">
+<dt>학습 가능한 가중치가 있는 신경망 계층(layer) 만들기</dt><dd><ul class="simple">
+<li><p>이는 구현의 일부로 <strong>Scipy</strong> 를 호출합니다.</p></li>
 </ul>
-</div></blockquote>
+</dd>
+</dl>
 </li>
 </ol>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">from</span> <span class="nn">torch.autograd</span> <span class="k">import</span> <span class="n">Function</span>
+<span class="kn">from</span> <span class="nn">torch.autograd</span> <span class="kn">import</span> <span class="n">Function</span>
 </pre></div>
 </div>
-<div class="section" id="parameter-less-example">
-<h2>Parameter-less example<a class="headerlink" href="#parameter-less-example" title="Permalink to this headline">¶</a></h2>
-<p>This layer doesn’t particularly do anything useful or mathematically
-correct.</p>
-<p>It is aptly named BadFFTFunction</p>
-<p><strong>Layer Implementation</strong></p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">numpy.fft</span> <span class="k">import</span> <span class="n">rfft2</span><span class="p">,</span> <span class="n">irfft2</span>
+<div class="section" id="parameter-less">
+<h2>매개 변수가 없는(Parameter-less) 예시<a class="headerlink" href="#parameter-less" title="Permalink to this headline">¶</a></h2>
+<p>이 계층(layer)은 특별히 유용하거나 수학적으로 올바른 작업을 수행하지 않습니다.</p>
+<p>이름은 대충 BadFFTFunction으로 지었습니다.</p>
+<p><strong>계층(layer) 구현</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">numpy.fft</span> <span class="kn">import</span> <span class="n">rfft2</span><span class="p">,</span> <span class="n">irfft2</span>
 
 
 <span class="k">class</span> <span class="nc">BadFFTFunction</span><span class="p">(</span><span class="n">Function</span><span class="p">):</span>
@@ -346,15 +346,14 @@ correct.</p>
         <span class="n">result</span> <span class="o">=</span> <span class="n">irfft2</span><span class="p">(</span><span class="n">numpy_go</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">grad_output</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
 
-<span class="c1"># since this layer does not have any parameters, we can</span>
-<span class="c1"># simply declare this as a function, rather than as an nn.Module class</span>
+<span class="c1"># 이 계층에는 매개 변수가 없으므로 nn.Module 클래스가 아닌 함수로 간단히 선언할 수 있습니다.</span>
 
 
 <span class="k">def</span> <span class="nf">incorrect_fft</span><span class="p">(</span><span class="nb">input</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">BadFFTFunction</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
 </pre></div>
 </div>
-<p><strong>Example usage of the created layer:</strong></p>
+<p><strong>생성된 계층(layer)의 사용 예시:</strong></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">input</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">result</span> <span class="o">=</span> <span class="n">incorrect_fft</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
@@ -363,47 +362,45 @@ correct.</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor([[ 3.2424,  7.8384,  2.1981,  8.0125,  4.6636],
-        [ 9.9235,  2.4468,  5.1007,  1.5843, 14.9859],
-        [ 3.1496,  5.7176,  0.9066,  1.6388,  5.3236],
-        [ 5.2732, 17.6063,  2.0276,  3.9909,  8.4614],
-        [ 3.7512,  7.5392,  4.9101,  2.8231, 16.7665],
-        [ 5.2732,  4.6648,  4.2121, 11.5095,  8.4614],
-        [ 3.1496,  6.7077,  9.1958,  9.6320,  5.3236],
-        [ 9.9235,  7.0507,  5.4910,  6.9685, 14.9859]],
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor([[ 1.5501,  7.1151,  8.4364,  3.6474, 14.8662],
+        [ 5.6864,  6.3446,  7.3238,  6.0770, 10.2071],
+        [ 6.4498,  1.0390, 10.2754,  4.8281,  9.5217],
+        [ 5.0410,  6.6596,  9.5980, 13.9414,  5.8046],
+        [ 0.4062,  7.6052,  5.1859, 14.0548,  2.5884],
+        [ 5.0410,  3.2579,  3.7768,  7.5748,  5.8046],
+        [ 6.4498,  1.5078,  2.7242,  5.3578,  9.5217],
+        [ 5.6864,  3.1304, 10.1956, 13.7476, 10.2071]],
        grad_fn=&lt;BadFFTFunctionBackward&gt;)
-tensor([[-0.2921,  1.3271, -0.5736,  1.1381,  0.1384,  0.0339,  0.0091, -0.9687],
-        [-0.9187,  0.4129, -0.0286, -1.2750,  1.0243, -0.8500,  0.6447,  0.9856],
-        [-1.6390,  0.7035,  0.9991,  2.3061, -0.1823,  2.3427, -0.3509,  0.9336],
-        [ 0.6703,  1.1346,  0.3424,  0.8052, -0.7459, -1.6153,  0.3324,  1.0079],
-        [-2.0462,  0.1600, -1.1903,  0.1683,  1.0622,  1.3530, -0.5710,  0.5226],
-        [-0.6224, -1.3238,  0.5718, -0.1133,  0.8483,  0.5005,  0.6194, -1.1472],
-        [ 0.4906, -0.6809, -0.2076, -0.9867,  0.2497, -0.9971,  0.4948, -0.2496],
-        [ 0.4363, -1.0047, -1.5366,  0.0300,  0.7982, -0.5539,  0.4627, -0.1465]],
+tensor([[-0.3161, -1.1879,  0.8249, -0.3031, -0.0397, -0.3313, -0.2853, -0.4113],
+        [ 0.2903, -1.2508, -0.5438, -0.5214,  1.7453, -1.0563,  0.2863,  0.4996],
+        [ 0.0508, -0.8751,  2.0983,  1.7532,  0.4489,  0.1226, -0.8629,  0.7988],
+        [ 0.4952,  1.8440, -1.4548,  0.0079,  0.3158,  0.0358,  0.3163, -1.4703],
+        [ 0.7663,  0.3652, -0.7990,  1.7538, -0.7449,  0.4170, -0.5825, -1.4284],
+        [-0.1767,  0.2966,  0.6400, -0.6092,  2.3086, -0.8897,  0.3803,  0.5017],
+        [ 0.9124, -0.8463,  0.2494,  0.1161,  0.5655, -1.9462,  1.2726, -0.5775],
+        [-1.6538, -1.5879,  1.1116, -0.6050,  0.5170, -0.4244,  0.0721,  1.1520]],
        requires_grad=True)
 </pre></div>
 </div>
 </div>
-<div class="section" id="parametrized-example">
-<h2>Parametrized example<a class="headerlink" href="#parametrized-example" title="Permalink to this headline">¶</a></h2>
-<p>In deep learning literature, this layer is confusingly referred
-to as convolution while the actual operation is cross-correlation
-(the only difference is that filter is flipped for convolution,
-which is not the case for cross-correlation).</p>
-<p>Implementation of a layer with learnable weights, where cross-correlation
-has a filter (kernel) that represents weights.</p>
-<p>The backward pass computes the gradient wrt the input and the gradient wrt the filter.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">numpy</span> <span class="k">import</span> <span class="n">flip</span>
+<div class="section" id="parameterized">
+<h2>매개 변수가 있는(Parameterized) 예시<a class="headerlink" href="#parameterized" title="Permalink to this headline">¶</a></h2>
+<p>딥러닝 문헌에서 이 계층(layer)의 실제 연산은 상호 상관(cross-correlation)이지만
+합성곱(convolution)이라고 헷갈리게 부르고 있습니다.
+(합성곱은 필터를 뒤집어서 연산을 하는 반면, 상호 상관은 그렇지 않은 차이가 있습니다)</p>
+<p>학습 가능한 가중치를 가는 필터(커널)를 갖는 상호 상관 계층을 구현해보겠습니다.</p>
+<p>역전파 단계(backward pass)에서는 입력에 대한 기울기(gradient)와 필터에 대한 기울기를 계산합니다.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">flip</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">scipy.signal</span> <span class="k">import</span> <span class="n">convolve2d</span><span class="p">,</span> <span class="n">correlate2d</span>
-<span class="kn">from</span> <span class="nn">torch.nn.modules.module</span> <span class="k">import</span> <span class="n">Module</span>
-<span class="kn">from</span> <span class="nn">torch.nn.parameter</span> <span class="k">import</span> <span class="n">Parameter</span>
+<span class="kn">from</span> <span class="nn">scipy.signal</span> <span class="kn">import</span> <span class="n">convolve2d</span><span class="p">,</span> <span class="n">correlate2d</span>
+<span class="kn">from</span> <span class="nn">torch.nn.modules.module</span> <span class="kn">import</span> <span class="n">Module</span>
+<span class="kn">from</span> <span class="nn">torch.nn.parameter</span> <span class="kn">import</span> <span class="n">Parameter</span>
 
 
 <span class="k">class</span> <span class="nc">ScipyConv2dFunction</span><span class="p">(</span><span class="n">Function</span><span class="p">):</span>
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="nb">input</span><span class="p">,</span> <span class="nb">filter</span><span class="p">,</span> <span class="n">bias</span><span class="p">):</span>
-        <span class="c1"># detach so we can cast to NumPy</span>
+        <span class="c1"># 분리(detach)하여 NumPy로 변환(cast)할 수 있습니다.</span>
         <span class="nb">input</span><span class="p">,</span> <span class="nb">filter</span><span class="p">,</span> <span class="n">bias</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">detach</span><span class="p">(),</span> <span class="nb">filter</span><span class="o">.</span><span class="n">detach</span><span class="p">(),</span> <span class="n">bias</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span>
         <span class="n">result</span> <span class="o">=</span> <span class="n">correlate2d</span><span class="p">(</span><span class="nb">input</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="nb">filter</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;valid&#39;</span><span class="p">)</span>
         <span class="n">result</span> <span class="o">+=</span> <span class="n">bias</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
@@ -417,14 +414,14 @@ has a filter (kernel) that represents weights.</p>
         <span class="n">grad_output</span> <span class="o">=</span> <span class="n">grad_output</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
         <span class="n">grad_bias</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">grad_output</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">grad_input</span> <span class="o">=</span> <span class="n">convolve2d</span><span class="p">(</span><span class="n">grad_output</span><span class="p">,</span> <span class="nb">filter</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;full&#39;</span><span class="p">)</span>
-        <span class="c1"># the previous line can be expressed equivalently as:</span>
+        <span class="c1"># 윗줄은 다음과 같이 표현할 수도 있습니다:</span>
         <span class="c1"># grad_input = correlate2d(grad_output, flip(flip(filter.numpy(), axis=0), axis=1), mode=&#39;full&#39;)</span>
         <span class="n">grad_filter</span> <span class="o">=</span> <span class="n">correlate2d</span><span class="p">(</span><span class="nb">input</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="n">grad_output</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;valid&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">grad_input</span><span class="p">),</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">grad_filter</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">float</span><span class="p">),</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">grad_bias</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">float</span><span class="p">)</span>
 
 
 <span class="k">class</span> <span class="nc">ScipyConv2d</span><span class="p">(</span><span class="n">Module</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filter_width</span><span class="p">,</span> <span class="n">filter_height</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filter_width</span><span class="p">,</span> <span class="n">filter_height</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">ScipyConv2d</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">filter</span> <span class="o">=</span> <span class="n">Parameter</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">filter_width</span><span class="p">,</span> <span class="n">filter_height</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">bias</span> <span class="o">=</span> <span class="n">Parameter</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
@@ -433,7 +430,7 @@ has a filter (kernel) that represents weights.</p>
         <span class="k">return</span> <span class="n">ScipyConv2dFunction</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bias</span><span class="p">)</span>
 </pre></div>
 </div>
-<p><strong>Example usage:</strong></p>
+<p><strong>사용 예시:</strong></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">module</span> <span class="o">=</span> <span class="n">ScipyConv2d</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Filter and bias: &quot;</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">module</span><span class="o">.</span><span class="n">parameters</span><span class="p">()))</span>
 <span class="nb">input</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -445,43 +442,43 @@ has a filter (kernel) that represents weights.</p>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Filter and bias:  [Parameter containing:
-tensor([[ 1.1594, -1.5019,  2.3002],
-        [-0.0399, -0.5464,  0.3556],
-        [ 0.9378,  0.6888, -1.6433]], requires_grad=True), Parameter containing:
-tensor([[-0.1342]], requires_grad=True)]
-Output from the convolution:  tensor([[-1.5866, -4.9213,  1.2348, -1.7411,  1.3867, -3.6400, -3.0142,  2.9298],
-        [ 5.0279, -4.7684,  0.9349, -4.7118,  7.2223, -7.0567, -1.1490,  2.9159],
-        [ 1.2355,  0.7761, -0.9240, -3.5258,  5.4679, -3.7748,  6.2502, -0.9549],
-        [-2.9315,  5.2783, -3.9884,  3.0636, -3.9602,  7.4487, -2.9306,  1.1996],
-        [ 4.2224, -5.2260,  1.6353,  3.1985, -5.1410,  7.0212, -1.9695, -2.6567],
-        [ 2.1452, -5.8957,  4.6534, -1.6767,  1.8942, -4.7634,  7.0981,  0.8917],
-        [-3.1319,  2.0006,  3.6807, -4.2530,  5.2136, -5.2570,  2.3453, -4.8116],
-        [ 0.6534,  1.5824, -1.6142,  1.2102, -3.0763,  4.4494, -1.8422,  0.5644]],
+tensor([[ 1.7318,  0.7303,  0.8925],
+        [-0.1013, -0.2586,  0.1423],
+        [ 0.8752, -0.8021, -1.3515]], requires_grad=True), Parameter containing:
+tensor([[0.7393]], requires_grad=True)]
+Output from the convolution:  tensor([[-1.2070, -1.2347, -3.8840, -2.0865, -0.5897,  4.5678,  7.2435,  3.5294],
+        [ 1.3204, -0.2718,  3.9942,  1.1799,  3.2501,  3.4582,  3.3299,  5.1307],
+        [-0.8591,  0.6265,  0.2100, -1.7121,  2.5220, -0.4239,  0.3369, -0.3048],
+        [ 1.7585,  1.7412,  0.3477, -6.7214, -3.8535,  4.3833, -0.9889, -1.3524],
+        [-0.6392,  1.1201,  0.9465,  3.4101,  7.3032,  2.7230, -0.7960,  1.5117],
+        [ 3.3390,  0.2427, -5.0576, -0.0234, -0.1857,  7.6631,  0.5181, -0.1694],
+        [ 3.5709,  2.9849, -1.5485,  0.6234, -5.1039, -0.9237, -1.1887,  1.0532],
+        [ 4.9075,  7.9906,  0.4417,  4.7304,  2.0546,  4.6694,  3.0288,  0.2060]],
        grad_fn=&lt;ScipyConv2dFunctionBackward&gt;)
-Gradient for the input map:  tensor([[ 0.3204,  0.0764, -0.5440,  0.4679,  1.3714, -3.7680,  3.0030, -0.0426,
-         -0.2306,  3.2814],
-        [ 0.0518,  1.7483, -1.5635,  1.4557,  4.8146, -4.6422,  0.1091, -1.0376,
-         -0.7845, -2.4097],
-        [-1.0940,  3.1022, -6.8325,  1.6429, -1.1260,  2.2957, -3.3366,  5.0269,
-         -1.1141, -5.0951],
-        [-0.2152,  1.4700,  1.8167, -5.4662, -0.5164,  0.8981, -1.9527,  4.5233,
-         -0.5912,  3.2236],
-        [-1.7999,  0.5967,  2.4249, -4.5497,  3.8100, -0.5492,  1.5770, -5.9527,
-         -0.7554,  3.6763],
-        [-0.4927,  0.0100, -1.6929, -0.6688,  1.2724,  4.2587, -3.3507, -3.6568,
-          3.1167, -1.3022],
-        [-2.0251,  1.4447, -1.1328,  2.6215, -2.9248, -0.5849, -6.6728,  4.4034,
-         -1.3589, -1.6299],
-        [-1.8930,  1.9998,  0.1931, -8.0635,  3.5877,  1.3187,  3.4759, -0.2619,
-          2.0675, -3.8245],
-        [-1.1161,  0.1658,  2.3411, -1.3095, -0.7334, -2.3646,  0.7730, -0.1118,
-          3.1601, -0.4534],
-        [-1.3985, -1.9474,  3.4416,  1.9089, -3.3054,  3.0016,  1.0033, -3.2258,
-         -2.4228,  2.9648]])
+Gradient for the input map:  tensor([[-1.5639e-01, -2.8550e+00, -1.0226e+00, -2.2953e+00,  2.3711e+00,
+          1.5987e+00,  2.8249e+00,  2.0736e+00,  1.0165e+00,  5.8278e-01],
+        [ 5.3096e-01, -1.4479e+00, -2.2106e+00, -1.2887e+00, -1.1221e+00,
+          1.8156e+00,  6.2694e-01,  1.1915e-01, -4.6073e-01, -3.1541e-01],
+        [-6.7106e-01, -7.4811e-01,  1.3450e+00,  1.2983e-01,  1.2075e+00,
+          1.2204e+00, -8.4251e-01,  1.7919e+00, -5.5791e-01, -3.1286e-01],
+        [-1.3569e+00, -3.4393e+00, -2.4330e+00,  8.4495e-01,  2.2648e+00,
+         -2.2582e+00,  1.6346e-01, -4.3527e+00,  2.7372e-01, -1.0266e-01],
+        [ 7.6037e-02,  1.1122e+00, -1.4549e+00, -2.1135e+00,  5.8307e-01,
+          4.8614e+00,  6.1722e-01,  6.6536e-01, -4.1388e-01, -1.1720e+00],
+        [-3.0112e+00,  9.8146e-01,  2.9347e+00, -1.1867e+00,  1.6878e+00,
+         -9.3850e-01,  2.5720e+00,  1.4011e+00,  8.0337e-02,  7.6082e-01],
+        [ 1.8501e+00,  1.8388e+00, -1.2688e-01,  1.4500e-03,  5.3177e-01,
+         -1.0504e+00,  8.7490e-02, -1.2130e+00,  2.2461e+00,  8.9908e-01],
+        [-2.5281e+00,  1.3529e+00, -1.9791e-01, -2.3832e+00,  3.1050e+00,
+          6.8788e+00,  3.0542e+00, -2.0752e+00,  3.5135e-02,  2.8998e-01],
+        [ 8.8253e-01, -1.6876e-03, -1.7992e+00, -1.4657e+00, -1.5276e-01,
+          1.3057e-01,  2.3409e+00,  9.5714e-01, -2.5217e+00, -1.3817e+00],
+        [-6.7888e-01,  7.3431e-01,  4.7773e-01,  1.0828e+00,  6.5867e-01,
+         -8.0655e-01, -9.4447e-01, -3.3062e+00, -1.2611e+00,  8.4813e-01]])
 </pre></div>
 </div>
-<p><strong>Check the gradients:</strong></p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch.autograd.gradcheck</span> <span class="k">import</span> <span class="n">gradcheck</span>
+<p><strong>기울기(gradient) 확인:</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch.autograd.gradcheck</span> <span class="kn">import</span> <span class="n">gradcheck</span>
 
 <span class="n">moduleConv</span> <span class="o">=</span> <span class="n">ScipyConv2d</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
 
@@ -494,7 +491,7 @@ Gradient for the input map:  tensor([[ 0.3204,  0.0764, -0.5440,  0.4679,  1.371
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Are the gradients correct:  True
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.304 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.310 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-advanced-numpy-extensions-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/ee55f2537c08fa13e041e479675a6c2c/numpy_extensions_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">numpy_extensions_tutorial.py</span></code></a></p>
@@ -548,9 +545,9 @@ Gradient for the input map:  tensor([[ 0.3204,  0.0764, -0.5440,  0.4679,  1.371
           <div class="pytorch-right-menu" id="pytorch-right-menu">
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
-<li><a class="reference internal" href="#">Creating Extensions Using numpy and scipy</a><ul>
-<li><a class="reference internal" href="#parameter-less-example">Parameter-less example</a></li>
-<li><a class="reference internal" href="#parametrized-example">Parametrized example</a></li>
+<li><a class="reference internal" href="#">numpy 와 scipy 를 이용한 확장(Extensions) 만들기</a><ul>
+<li><a class="reference internal" href="#parameter-less">매개 변수가 없는(Parameter-less) 예시</a></li>
+<li><a class="reference internal" href="#parameterized">매개 변수가 있는(Parameterized) 예시</a></li>
 </ul>
 </li>
 </ul>
@@ -568,11 +565,9 @@ Gradient for the input map:  tensor([[ 0.3204,  0.0764, -0.5440,  0.4679,  1.371
 
      
        <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-         <script type="text/javascript" src="../_static/jquery.js"></script>
-         <script type="text/javascript" src="../_static/underscore.js"></script>
-         <script type="text/javascript" src="../_static/doctools.js"></script>
-         <script type="text/javascript" src="../_static/language_data.js"></script>
-         <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+         <script src="../_static/jquery.js"></script>
+         <script src="../_static/underscore.js"></script>
+         <script src="../_static/doctools.js"></script>
      
 
   

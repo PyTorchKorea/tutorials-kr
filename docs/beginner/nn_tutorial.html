@@ -174,7 +174,7 @@
 <p class="caption"><span class="caption-text">프론트엔드 API</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/named_tensor_tutorial.html">(prototype) Introduction to Named Tensors in PyTorch</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/memory_format_tutorial.html">(beta) Channels Last Memory Format in PyTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/memory_format_tutorial.html">(실험용) PyTorch를 사용한 Channels Last Memory Format</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_frontend.html">Using the PyTorch C++ Frontend</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_extension.html">Custom C++ and CUDA Extensions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/torch_script_custom_ops.html">Extending TorchScript with Custom C++ Operators</a></li>
@@ -186,7 +186,7 @@
 <p class="caption"><span class="caption-text">모델 최적화</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/pruning_tutorial.html">가지치기 기법(Pruning) 튜토리얼</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../advanced/dynamic_quantization_tutorial.html">(beta) Dynamic Quantization on an LSTM Word Language Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/dynamic_quantization_tutorial.html">(베타) LSTM 기반 단어 단위 언어 모델의 동적 양자화</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/static_quantization_tutorial.html">(beta) Static Quantization with Eager Mode in PyTorch</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/quantized_transfer_learning_tutorial.html">(beta) 컴퓨터 비전(Vision) 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
@@ -305,8 +305,8 @@
 <span id="sphx-glr-beginner-nn-tutorial-py"></span><h1><cite>torch.nn</cite> 이 <em>실제로</em> 무엇인가요?<a class="headerlink" href="#torch-nn" title="Permalink to this headline">¶</a></h1>
 <p>저자: Jeremy Howard, <a class="reference external" href="https://www.fast.ai">fast.ai</a>.</p>
 <p>도움: Rachel Thomas, Francisco Ingham.</p>
-<p>번역: <a class="reference external" href="https://github.com/namdori61">남상호</a></p>
-<p>이 튜토리얼을 스크립트가 아닌 노트북으로 실행하기를 권장합니다. 노트북 (.ipynb) 파일을 다운 받으시려면,
+<p>번역: <a class="reference external" href="https://github.com/namdori61">남상호</a>
+이 튜토리얼을 스크립트가 아닌 노트북으로 실행하기를 권장합니다. 노트북 (.ipynb) 파일을 다운 받으시려면,
 페이지 상단에 있는 링크를 클릭해주세요.</p>
 <p>PyTorch 는 여러분이 신경망(neural network)를 생성하고 학습시키는 것을 도와주기 위해서
 <a class="reference external" href="https://pytorch.org/docs/stable/nn.html">torch.nn</a> ,
@@ -334,7 +334,7 @@ MNIST 데이터셋에 대해 기초적인 신경망을 학습시킬 것입니다
 <a class="reference external" href="http://docs.python-requests.org/en/master/">requests</a> 를 이용하여
 데이터셋을 다운로드 할 것입니다. 우리는 모듈을 사용할 때만 임포트(import) 할 것이므로,
 여러분은 매 포인트마다 정확히 어떤 것이 사용되는지 확인할 수 있습니다.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="k">import</span> <span class="n">Path</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">import</span> <span class="nn">requests</span>
 
 <span class="n">DATA_PATH</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">)</span>
@@ -342,7 +342,7 @@ MNIST 데이터셋에 대해 기초적인 신경망을 학습시킬 것입니다
 
 <span class="n">PATH</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-<span class="n">URL</span> <span class="o">=</span> <span class="s2">&quot;http://deeplearning.net/data/mnist/&quot;</span>
+<span class="n">URL</span> <span class="o">=</span> <span class="s2">&quot;https://github.com/pytorch/tutorials/raw/master/_static/&quot;</span>
 <span class="n">FILENAME</span> <span class="o">=</span> <span class="s2">&quot;mnist.pkl.gz&quot;</span>
 
 <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">PATH</span> <span class="o">/</span> <span class="n">FILENAME</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
@@ -361,7 +361,7 @@ python 전용 포맷 pickle 을 이용하여 저장되어 있습니다.</p>
 </div>
 <p>각 이미지는 28 x 28 형태 이고, 784 (=28x28) 크기를 가진 하나의 행으로 저장되어 있습니다.
 하나를 살펴 봅시다; 먼저 우리는 이 이미지를 2d로 재구성해야 합니다.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">matplotlib</span> <span class="k">import</span> <span class="n">pyplot</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 <span class="n">pyplot</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">x_train</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">28</span><span class="p">,</span> <span class="mi">28</span><span class="p">)),</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;gray&quot;</span><span class="p">)</span>
@@ -453,8 +453,8 @@ PyTorch는 심지어 여러분의 함수를 위해서 빠른 GPU 또는 벡터�
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor([-2.3728, -2.5460, -2.5807, -2.6371, -2.6052, -1.8645, -2.4012, -2.1049,
-        -2.0545, -2.1928], grad_fn=&lt;SelectBackward&gt;) torch.Size([64, 10])
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor([-2.4213, -2.6816, -2.2776, -2.1147, -2.2795, -1.9980, -2.2832, -1.9899,
+        -2.3805, -2.9871], grad_fn=&lt;SelectBackward&gt;) torch.Size([64, 10])
 </pre></div>
 </div>
 <p>여러분이 보시듯이, <code class="docutils literal notranslate"><span class="pre">preds</span></code> 텐서(tensor)는 텐서 값 외에도, 또한
@@ -475,7 +475,7 @@ PyTorch는 심지어 여러분의 함수를 위해서 빠른 GPU 또는 벡터�
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor(2.4268, grad_fn=&lt;NegBackward&gt;)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor(2.3607, grad_fn=&lt;NegBackward&gt;)
 </pre></div>
 </div>
 <p>또한, 우리 모델의 정확도(accuracy)를 계산하기 위한 함수를 구현합시다.
@@ -492,7 +492,7 @@ PyTorch는 심지어 여러분의 함수를 위해서 빠른 GPU 또는 벡터�
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor(0.0625)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor(0.1250)
 </pre></div>
 </div>
 <p>이제 우리는 훈련 루프(training loop)를 실행할 수 있습니다. 매 반복마다, 우리는 다음을 수행할 것입니다:</p>
@@ -516,7 +516,7 @@ PyTorch의 자동 기울기(Autograd)가 어떻게 연산을 기록하는지
 매 단계마다 다양한 변수 값을 점검할 수 있습니다.
 아래에서 <code class="docutils literal notranslate"><span class="pre">set_trace()</span></code> 를 주석 해제하여 사용해보세요.</p>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">IPython.core.debugger</span> <span class="k">import</span> <span class="n">set_trace</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">IPython.core.debugger</span> <span class="kn">import</span> <span class="n">set_trace</span>
 
 <span class="n">lr</span> <span class="o">=</span> <span class="mf">0.5</span>  <span class="c1"># 학습률(learning rate)</span>
 <span class="n">epochs</span> <span class="o">=</span> <span class="mi">2</span>  <span class="c1"># 훈련에 사용할 에포크(epoch) 수</span>
@@ -548,7 +548,7 @@ PyTorch의 자동 기울기(Autograd)가 어떻게 연산을 기록하는지
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor(0.0806, grad_fn=&lt;NegBackward&gt;) tensor(1.)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor(0.0815, grad_fn=&lt;NegBackward&gt;) tensor(1.)
 </pre></div>
 </div>
 </div>
@@ -583,7 +583,7 @@ Pytorch는 이 둘을 결합하는 단일 함수인 <code class="docutils litera
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor(0.0806, grad_fn=&lt;NllLossBackward&gt;) tensor(1.)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor(0.0815, grad_fn=&lt;NllLossBackward&gt;) tensor(1.)
 </pre></div>
 </div>
 </div>
@@ -602,10 +602,10 @@ Pytorch는 이 둘을 결합하는 단일 함수인 <code class="docutils litera
 <a class="reference external" href="https://docs.python.org/3/tutorial/modules.html">module</a> (소문자 <code class="docutils literal notranslate"><span class="pre">m</span></code>)
 의 개념과 헷갈리지 말아주세요.</p>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch</span> <span class="k">import</span> <span class="n">nn</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span>
 
 <span class="k">class</span> <span class="nc">Mnist_Logistic</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Parameter</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">784</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span> <span class="o">/</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">784</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">bias</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Parameter</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span>
@@ -626,7 +626,7 @@ Pytorch는 이 둘을 결합하는 단일 함수인 <code class="docutils litera
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor(2.3677, grad_fn=&lt;NllLossBackward&gt;)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor(2.3567, grad_fn=&lt;NllLossBackward&gt;)
 </pre></div>
 </div>
 <p>이전에는 훈련 루프를 위해 이름 별로 각 매개변수(parameter)의 값을 업데이트하고 다음과 같이
@@ -671,7 +671,7 @@ Pytorch는 이 둘을 결합하는 단일 함수인 <code class="docutils litera
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor(0.0809, grad_fn=&lt;NllLossBackward&gt;)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor(0.0820, grad_fn=&lt;NllLossBackward&gt;)
 </pre></div>
 </div>
 </div>
@@ -685,7 +685,7 @@ Pytorch는 이 둘을 결합하는 단일 함수인 <code class="docutils litera
 Pytorch 에는 다양한 유형의 코드를 크게 단순화 할 수 있는 미리 정의된 레이어가 있고 이는 또한
 종종 기존 코드보다 속도를 빠르게 합니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Mnist_Logistic</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lin</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">784</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
 
@@ -699,7 +699,7 @@ Pytorch 에는 다양한 유형의 코드를 크게 단순화 할 수 있는 미
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor(2.4012, grad_fn=&lt;NllLossBackward&gt;)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor(2.2816, grad_fn=&lt;NllLossBackward&gt;)
 </pre></div>
 </div>
 <p>우리는 여전히 이전과 동일한 <code class="docutils literal notranslate"><span class="pre">fit</span></code> 메소드를 사용할 수 있습니다.</p>
@@ -709,7 +709,7 @@ Pytorch 에는 다양한 유형의 코드를 크게 단순화 할 수 있는 미
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor(0.0826, grad_fn=&lt;NllLossBackward&gt;)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor(0.0811, grad_fn=&lt;NllLossBackward&gt;)
 </pre></div>
 </div>
 </div>
@@ -731,7 +731,7 @@ Pytorch 에는 다양한 유형의 코드를 크게 단순화 할 수 있는 미
 </div>
 <p>(<code class="docutils literal notranslate"><span class="pre">optim.zero_grad()</span></code> 는 기울기를 0으로 재설정 해줍니다. 다음 미니 배치에 대한
 기울기를 계산하기 전에 호출해야 합니다.)</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch</span> <span class="k">import</span> <span class="n">optim</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">optim</span>
 </pre></div>
 </div>
 <p>나중에 다시 사용할 수 있도록 모델과 옵티마이져를 만드는 작은 함수를 정의합니다.</p>
@@ -759,8 +759,8 @@ Pytorch 에는 다양한 유형의 코드를 크게 단순화 할 수 있는 미
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor(2.3108, grad_fn=&lt;NllLossBackward&gt;)
-tensor(0.0825, grad_fn=&lt;NllLossBackward&gt;)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor(2.3090, grad_fn=&lt;NllLossBackward&gt;)
+tensor(0.0809, grad_fn=&lt;NllLossBackward&gt;)
 </pre></div>
 </div>
 </div>
@@ -777,7 +777,7 @@ tensor(0.0825, grad_fn=&lt;NllLossBackward&gt;)
 은 텐서를 감싸는(wrapping) Dataset 입니다.
 길이와 인덱싱 방식을 정의함으로써 텐서의 첫 번째 차원을 따라 반복, 인덱싱 및 슬라이스(slice)하는 방법도 제공합니다.
 이렇게하면 훈련 할 때 동일한 라인에서 독립(independent) 변수와 종속(dependent) 변수에 쉽게 액세스 할 수 있습니다.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="k">import</span> <span class="n">TensorDataset</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">TensorDataset</span>
 </pre></div>
 </div>
 <p><code class="docutils literal notranslate"><span class="pre">x_train</span></code> 및 <code class="docutils literal notranslate"><span class="pre">y_train</span></code> 모두 하나의 <code class="docutils literal notranslate"><span class="pre">TensorDataset</span></code> 에 합쳐질 수 있습니다,
@@ -810,7 +810,7 @@ tensor(0.0825, grad_fn=&lt;NllLossBackward&gt;)
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor(0.0824, grad_fn=&lt;NllLossBackward&gt;)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor(0.0832, grad_fn=&lt;NllLossBackward&gt;)
 </pre></div>
 </div>
 </div>
@@ -821,7 +821,7 @@ tensor(0.0825, grad_fn=&lt;NllLossBackward&gt;)
 <code class="docutils literal notranslate"><span class="pre">DataLoader</span></code> 는 배치들에 대해서 반복하기 쉽게 만들어줍니다.
 <code class="docutils literal notranslate"><span class="pre">train_ds[i*bs</span> <span class="pre">:</span> <span class="pre">i*bs+bs]</span></code> 를 사용하는 대신,
 DataLoader 는 매 미니배치를 자동적으로 제공합니다.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="k">import</span> <span class="n">DataLoader</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">DataLoader</span>
 
 <span class="n">train_ds</span> <span class="o">=</span> <span class="n">TensorDataset</span><span class="p">(</span><span class="n">x_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
 <span class="n">train_dl</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">train_ds</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">bs</span><span class="p">)</span>
@@ -853,7 +853,7 @@ DataLoader 는 매 미니배치를 자동적으로 제공합니다.</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor(0.0808, grad_fn=&lt;NllLossBackward&gt;)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor(0.0813, grad_fn=&lt;NllLossBackward&gt;)
 </pre></div>
 </div>
 <p>Pytorch의 nn.Module, nn.Parameter, Dataset 및 DataLoader 덕분에 이제 훈련 루프가
@@ -905,8 +905,8 @@ DataLoader 는 매 미니배치를 자동적으로 제공합니다.</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>0 tensor(0.3087)
-1 tensor(0.2956)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>0 tensor(0.2900)
+1 tensor(0.2931)
 </pre></div>
 </div>
 </div>
@@ -962,8 +962,8 @@ DataLoader 는 매 미니배치를 자동적으로 제공합니다.</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>0 0.3331937258243561
-1 0.3399495246887207
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>0 0.2963881206870079
+1 0.2952166391849518
 </pre></div>
 </div>
 <p>이러한 기본 3줄의 코드를 사용하여 다양한 모델을 훈련할 수 있습니다.
@@ -980,7 +980,7 @@ DataLoader 는 매 미니배치를 자동적으로 제공합니다.</p>
 각 컨볼루션 뒤에는 ReLU가 있습니다. 마지막으로 평균 풀링(average pooling)을 수행합니다.
 (<code class="docutils literal notranslate"><span class="pre">view</span></code> 는 PyTorch의 numpy <code class="docutils literal notranslate"><span class="pre">reshape</span></code> 버전입니다.)</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Mnist_CNN</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">conv1</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">conv2</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
@@ -1007,8 +1007,8 @@ DataLoader 는 매 미니배치를 자동적으로 제공합니다.</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>0 0.35547182550430295
-1 0.22808355839252473
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>0 0.35901912598609925
+1 0.26533100905418394
 </pre></div>
 </div>
 </div>
@@ -1024,7 +1024,7 @@ DataLoader 는 매 미니배치를 자동적으로 제공합니다.</p>
 예를 들어, PyTorch에는 <cite>view</cite> 레이어가 없으므로 우리의 신경망 용으로 만들어야 합니다.
 <code class="docutils literal notranslate"><span class="pre">Lambda</span></code> 는 <code class="docutils literal notranslate"><span class="pre">Sequential</span></code> 로 신경망을 정의할 때 사용할 수 있는 레이어를 생성할 것입니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Lambda</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">func</span> <span class="o">=</span> <span class="n">func</span>
 
@@ -1055,8 +1055,8 @@ DataLoader 는 매 미니배치를 자동적으로 제공합니다.</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>0 0.36827207362651826
-1 0.2632165398597717
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>0 0.349177153468132
+1 0.2569092135667801
 </pre></div>
 </div>
 </div>
@@ -1076,14 +1076,14 @@ DataLoader 는 매 미니배치를 자동적으로 제공합니다.</p>
 
 
 <span class="k">class</span> <span class="nc">WrappedDataLoader</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dl</span><span class="p">,</span> <span class="n">func</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dl</span><span class="p">,</span> <span class="n">func</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dl</span> <span class="o">=</span> <span class="n">dl</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">func</span> <span class="o">=</span> <span class="n">func</span>
 
-    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dl</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">batches</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dl</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">batches</span><span class="p">:</span>
             <span class="k">yield</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">b</span><span class="p">))</span>
@@ -1115,8 +1115,8 @@ DataLoader 는 매 미니배치를 자동적으로 제공합니다.</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>0 0.3833379934310913
-1 0.23371935186386109
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>0 0.39713516569137575
+1 0.23623661838769913
 </pre></div>
 </div>
 </div>
@@ -1157,8 +1157,8 @@ DataLoader 는 매 미니배치를 자동적으로 제공합니다.</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>0 0.22367399265766144
-1 0.20463330309391023
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>0 0.2238931974083185
+1 0.19320880868285895
 </pre></div>
 </div>
 </div>
@@ -1197,7 +1197,7 @@ DataLoader 는 매 미니배치를 자동적으로 제공합니다.</p>
 <li><p><code class="docutils literal notranslate"><span class="pre">DataLoader</span></code>: 모든 종류의 <code class="docutils literal notranslate"><span class="pre">Dataset</span></code> 을 기반으로 데이터의 배치들을 출력하는 반복자(iterator)를 생성합니다.</p></li>
 </ul>
 </div></blockquote>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  29.780 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  27.610 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-beginner-nn-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/f16255c783f9e487235b8eff6c8792b9/nn_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">nn_tutorial.py</span></code></a></p>
@@ -1293,11 +1293,9 @@ DataLoader 는 매 미니배치를 자동적으로 제공합니다.</p>
 
      
        <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-         <script type="text/javascript" src="../_static/jquery.js"></script>
-         <script type="text/javascript" src="../_static/underscore.js"></script>
-         <script type="text/javascript" src="../_static/doctools.js"></script>
-         <script type="text/javascript" src="../_static/language_data.js"></script>
-         <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+         <script src="../_static/jquery.js"></script>
+         <script src="../_static/underscore.js"></script>
+         <script src="../_static/doctools.js"></script>
      
 
   

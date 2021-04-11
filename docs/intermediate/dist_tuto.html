@@ -174,7 +174,7 @@
 <p class="caption"><span class="caption-text">프론트엔드 API</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="named_tensor_tutorial.html">(prototype) Introduction to Named Tensors in PyTorch</a></li>
-<li class="toctree-l1"><a class="reference internal" href="memory_format_tutorial.html">(beta) Channels Last Memory Format in PyTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="memory_format_tutorial.html">(실험용) PyTorch를 사용한 Channels Last Memory Format</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_frontend.html">Using the PyTorch C++ Frontend</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_extension.html">Custom C++ and CUDA Extensions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/torch_script_custom_ops.html">Extending TorchScript with Custom C++ Operators</a></li>
@@ -186,7 +186,7 @@
 <p class="caption"><span class="caption-text">모델 최적화</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="pruning_tutorial.html">가지치기 기법(Pruning) 튜토리얼</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../advanced/dynamic_quantization_tutorial.html">(beta) Dynamic Quantization on an LSTM Word Language Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/dynamic_quantization_tutorial.html">(베타) LSTM 기반 단어 단위 언어 모델의 동적 양자화</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/static_quantization_tutorial.html">(beta) Static Quantization with Eager Mode in PyTorch</a></li>
 <li class="toctree-l1"><a class="reference internal" href="quantized_transfer_learning_tutorial.html">(beta) 컴퓨터 비전(Vision) 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
@@ -331,7 +331,7 @@
 <span class="c1">#!/usr/bin/env python</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">import</span> <span class="nn">torch.distributed</span> <span class="kn">as</span> <span class="nn">dist</span>
+<span class="kn">import</span> <span class="nn">torch.distributed</span> <span class="k">as</span> <span class="nn">dist</span>
 <span class="kn">from</span> <span class="nn">torch.multiprocessing</span> <span class="kn">import</span> <span class="n">Process</span>
 
 <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="n">rank</span><span class="p">,</span> <span class="n">size</span><span class="p">):</span>
@@ -369,15 +369,15 @@
 프로세스가 자신의 위치를 공유함으로써 서로 통신할 수 있도록 합니다.</p>
 </div>
 <div class="section" id="point-to-point">
-<h2>지점-대-지점 간(Point-to-Point) 통신<a class="headerlink" href="#point-to-point" title="Permalink to this headline">¶</a></h2>
+<h2>점-대-점 간(Point-to-Point) 통신<a class="headerlink" href="#point-to-point" title="Permalink to this headline">¶</a></h2>
 <div class="figure align-center" id="id2">
 <a class="reference internal image-reference" href="../_images/send_recv.png"><img alt="송신과 수신" src="../_images/send_recv.png" style="width: 100%;" /></a>
 <p class="caption"><span class="caption-text">송신과 수신</span><a class="headerlink" href="#id2" title="Permalink to this image">¶</a></p>
 </div>
-<p>하나의 프로세스에서 다른 프로세스로 데이터를 전송하는 것을 지점-대-지점 간 통신이라고 합니다.
+<p>하나의 프로세스에서 다른 프로세스로 데이터를 전송하는 것을 점-대-점 간 통신이라고 합니다.
 지점간 통신은  <code class="docutils literal notranslate"><span class="pre">send</span></code> 와 <code class="docutils literal notranslate"><span class="pre">recv</span></code> 함수 또는 즉시 응답하는(<em>immediate</em> counter-parts)
 <code class="docutils literal notranslate"><span class="pre">isend</span></code> 와 <code class="docutils literal notranslate"><span class="pre">irecv</span></code> 를 사용합니다.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="sd">&quot;&quot;&quot;블로킹(blocking) 지점-대-지점 간 통신&quot;&quot;&quot;</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="sd">&quot;&quot;&quot;블로킹(blocking) 점-대-점 간 통신&quot;&quot;&quot;</span>
 
 <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="n">rank</span><span class="p">,</span> <span class="n">size</span><span class="p">):</span>
     <span class="n">tensor</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
@@ -388,7 +388,7 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="c1"># Receive tensor from process 0</span>
         <span class="n">dist</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="n">tensor</span><span class="o">=</span><span class="n">tensor</span><span class="p">,</span> <span class="n">src</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Rank &#39;</span><span class="p">,</span> <span class="n">rank</span><span class="p">,</span> <span class="s1">&#39; has data &#39;</span><span class="p">,</span> <span class="n">tensor</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Rank &#39;</span><span class="p">,</span> <span class="n">rank</span><span class="p">,</span> <span class="s1">&#39; has data &#39;</span><span class="p">,</span> <span class="n">tensor</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 </pre></div>
 </div>
 <p>위 예제에서 두 프로세스는 값이 0인 Tensor로 시작한 후, 0번 프로세스가 Tensor의 값을
@@ -397,22 +397,22 @@
 <p>또한 <code class="docutils literal notranslate"><span class="pre">send</span></code>/<code class="docutils literal notranslate"><span class="pre">recv</span></code> 는 모두 <strong>블로킹</strong> 입니다: 두 프로세스는 통신이 완료될 때까지
 멈춰있습니다. 반면에 즉시 응답하는 것이 <strong>논-블로킹</strong> 입니다; 스크립트는 실행을
 계속하고 메소드는 <code class="docutils literal notranslate"><span class="pre">wait()</span></code> 를 선택할 수 있는 <code class="docutils literal notranslate"><span class="pre">Work</span></code> 객체를 반환합니다.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="sd">&quot;&quot;&quot;논-블로킹(non-blocking) 지점-대-지점 간 통신&quot;&quot;&quot;</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="sd">&quot;&quot;&quot;논-블로킹(non-blocking) 점-대-점 간 통신&quot;&quot;&quot;</span>
 
 <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="n">rank</span><span class="p">,</span> <span class="n">size</span><span class="p">):</span>
     <span class="n">tensor</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-    <span class="n">req</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">req</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="k">if</span> <span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="n">tensor</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="c1"># Send the tensor to process 1</span>
         <span class="n">req</span> <span class="o">=</span> <span class="n">dist</span><span class="o">.</span><span class="n">isend</span><span class="p">(</span><span class="n">tensor</span><span class="o">=</span><span class="n">tensor</span><span class="p">,</span> <span class="n">dst</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Rank 0 started sending&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Rank 0 started sending&#39;</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="c1"># Receive tensor from process 0</span>
         <span class="n">req</span> <span class="o">=</span> <span class="n">dist</span><span class="o">.</span><span class="n">irecv</span><span class="p">(</span><span class="n">tensor</span><span class="o">=</span><span class="n">tensor</span><span class="p">,</span> <span class="n">src</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Rank 1 started receiving&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Rank 1 started receiving&#39;</span><span class="p">)</span>
     <span class="n">req</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
-    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Rank &#39;</span><span class="p">,</span> <span class="n">rank</span><span class="p">,</span> <span class="s1">&#39; has data &#39;</span><span class="p">,</span> <span class="n">tensor</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Rank &#39;</span><span class="p">,</span> <span class="n">rank</span><span class="p">,</span> <span class="s1">&#39; has data &#39;</span><span class="p">,</span> <span class="n">tensor</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 </pre></div>
 </div>
 <p>즉시 응답하는 함수들을 사용할 때는 보내고 받는 Tensor에 대한 사용법에 주의해야 합니다.
@@ -424,7 +424,7 @@
 </ul>
 <p>그러나, <code class="docutils literal notranslate"><span class="pre">req.wait()</span></code> 를 실행한 후에는 통신이 이루어진 것을 보장받을 수 있기 때문에,
 <code class="docutils literal notranslate"><span class="pre">tensor[0]</span></code> 에 저장된 값은 1.0이 됩니다.</p>
-<p>지점-대-지점 간 통신은 프로세스 간 통신에 대한 세밀한 제어를 원할 때 유용합니다.
+<p>점-대-점 간 통신은 프로세스 간 통신에 대한 세밀한 제어를 원할 때 유용합니다.
 <a class="reference external" href="https://github.com/baidu-research/baidu-allreduce">바이두(Baidu)의 DeepSpeech</a> 나
 <a class="reference external" href="https://research.fb.com/publications/imagenet1kin1h/">페이스북(Facebook)의 대규모 실험</a>
 에서 사용하는 것과 같은 멋진 알고리즘을 구현할 때 사용할 수 있습니다.
@@ -473,7 +473,7 @@
 </tr>
 </tbody>
 </table>
-<p>지점-대-지점 간 통신과 달리 집합 통신은 <strong>그룹</strong> 의 모든 프로세스에 걸친 통신 패턴을
+<p>점-대-점 간 통신과 달리 집합 통신은 <strong>그룹</strong> 의 모든 프로세스에 걸친 통신 패턴을
 허용합니다. 그룹은 모든 프로세스의 부분 집합입니다. 그룹을 생성하기 위해서는
 <code class="docutils literal notranslate"><span class="pre">dist.new_group(group)</span></code> 에 순서(rank) 목록을 전달합니다. 기본적으로, 집합 통신은
 <strong>월드(world)</strong> 라고 부르는 전체 프로세스에서 실행됩니다. 예를 들어, 모든 프로세스에
@@ -481,11 +481,11 @@
 사용하면 됩니다.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="sd">&quot;&quot;&quot; All-Reduce 예제 &quot;&quot;&quot;</span>
 <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="n">rank</span><span class="p">,</span> <span class="n">size</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; 간단한 지점-대-지점 간 통신 &quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot; 간단한 점-대-점 간 통신 &quot;&quot;&quot;</span>
     <span class="n">group</span> <span class="o">=</span> <span class="n">dist</span><span class="o">.</span><span class="n">new_group</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
     <span class="n">tensor</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">dist</span><span class="o">.</span><span class="n">all_reduce</span><span class="p">(</span><span class="n">tensor</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="n">dist</span><span class="o">.</span><span class="n">reduce_op</span><span class="o">.</span><span class="n">SUM</span><span class="p">,</span> <span class="n">group</span><span class="o">=</span><span class="n">group</span><span class="p">)</span>
-    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Rank &#39;</span><span class="p">,</span> <span class="n">rank</span><span class="p">,</span> <span class="s1">&#39; has data &#39;</span><span class="p">,</span> <span class="n">tensor</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Rank &#39;</span><span class="p">,</span> <span class="n">rank</span><span class="p">,</span> <span class="s1">&#39; has data &#39;</span><span class="p">,</span> <span class="n">tensor</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 </pre></div>
 </div>
 <p>그룹 내의 모든 Tensor들의 합이 필요하기 떄문에, <code class="docutils literal notranslate"><span class="pre">dist.reduce_op.SUM</span></code> 을
@@ -575,7 +575,7 @@ TODO: Custom ring-allreduce
 <p>위 코드를 사용하여 어떤 데이터셋도 몇 줄의 코드로 간단히 분할할 수 있습니다:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="sd">&quot;&quot;&quot; MNIST 데이터셋 분할 &quot;&quot;&quot;</span>
 <span class="k">def</span> <span class="nf">partition_dataset</span><span class="p">():</span>
-    <span class="n">dataset</span> <span class="o">=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">MNIST</span><span class="p">(</span><span class="s1">&#39;./data&#39;</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+    <span class="n">dataset</span> <span class="o">=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">MNIST</span><span class="p">(</span><span class="s1">&#39;./data&#39;</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                              <span class="n">transform</span><span class="o">=</span><span class="n">transforms</span><span class="o">.</span><span class="n">Compose</span><span class="p">([</span>
                                  <span class="n">transforms</span><span class="o">.</span><span class="n">ToTensor</span><span class="p">(),</span>
                                  <span class="n">transforms</span><span class="o">.</span><span class="n">Normalize</span><span class="p">((</span><span class="mf">0.1307</span><span class="p">,),</span> <span class="p">(</span><span class="mf">0.3081</span><span class="p">,))</span>
@@ -587,7 +587,7 @@ TODO: Custom ring-allreduce
     <span class="n">partition</span> <span class="o">=</span> <span class="n">partition</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="n">dist</span><span class="o">.</span><span class="n">get_rank</span><span class="p">())</span>
     <span class="n">train_set</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="n">partition</span><span class="p">,</span>
                                          <span class="n">batch_size</span><span class="o">=</span><span class="n">bsz</span><span class="p">,</span>
-                                         <span class="n">shuffle</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+                                         <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">train_set</span><span class="p">,</span> <span class="n">bsz</span>
 </pre></div>
 </div>
@@ -617,7 +617,7 @@ TODO: Custom ring-allreduce
             <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
             <span class="n">average_gradients</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
             <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
-        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Rank &#39;</span><span class="p">,</span> <span class="n">dist</span><span class="o">.</span><span class="n">get_rank</span><span class="p">(),</span> <span class="s1">&#39;, epoch &#39;</span><span class="p">,</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Rank &#39;</span><span class="p">,</span> <span class="n">dist</span><span class="o">.</span><span class="n">get_rank</span><span class="p">(),</span> <span class="s1">&#39;, epoch &#39;</span><span class="p">,</span>
               <span class="n">epoch</span><span class="p">,</span> <span class="s1">&#39;: &#39;</span><span class="p">,</span> <span class="n">epoch_loss</span> <span class="o">/</span> <span class="n">num_batches</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -640,7 +640,7 @@ TODO: Custom ring-allreduce
 <div class="section" id="ring-allreduce">
 <h3>사용자 정의 링-올리듀스(Ring-Allreduce)<a class="headerlink" href="#ring-allreduce" title="Permalink to this headline">¶</a></h3>
 <p>추가로 DeepSpeech의 효율적인 링 올리듀스(ring allreduce)를 구현하고 싶다고 가정해보겠습니다.
-이것은 지점-대-지점 집합 통신(point-to-point collectives)으로 쉽게 구현할 수 있습니다.</p>
+이것은 점-대-점 집합 통신(point-to-point collectives)으로 쉽게 구현할 수 있습니다.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="sd">&quot;&quot;&quot; 링-리듀스(ring-reduce) 구현 &quot;&quot;&quot;</span>
 <span class="k">def</span> <span class="nf">allreduce</span><span class="p">(</span><span class="n">send</span><span class="p">,</span> <span class="n">recv</span><span class="p">):</span>
    <span class="n">rank</span> <span class="o">=</span> <span class="n">dist</span><span class="o">.</span><span class="n">get_rank</span><span class="p">()</span>
@@ -711,7 +711,7 @@ CUDA Tensor에 대한 집합 연산 구현은 NCCL 백엔드에서 제공하는 
 로 사용률을 모니터링할 수 있습니다.</p>
 <p><strong>MPI 백엔드</strong></p>
 <p>MPI(Message Passing Interface)는 고성능 컴퓨팅 분야의 표준 도구입니다.
-이는 지점-대-지점 간 통신과 집합 통신을 허용하며 <code class="docutils literal notranslate"><span class="pre">torch.distributed</span></code> 의 API에
+이는 점-대-점 간 통신과 집합 통신을 허용하며 <code class="docutils literal notranslate"><span class="pre">torch.distributed</span></code> 의 API에
 영감을 주었습니다. 다양한 목적에 따라 최적화된 몇몇 MPI 구현체들(예.
 <a class="reference external" href="https://www.open-mpi.org/">Open-MPI</a>,
 <a class="reference external" href="http://mvapich.cse.ohio-state.edu/">MVAPICH2</a>,
@@ -869,7 +869,7 @@ CUDA IPC와 GPU Direct 기술을 활용하고 있습니다.</p>
               <ul>
 <li><a class="reference internal" href="#">PyTorch로 분산 어플리케이션 개발하기</a><ul>
 <li><a class="reference internal" href="#setup">설정(Setup)</a></li>
-<li><a class="reference internal" href="#point-to-point">지점-대-지점 간(Point-to-Point) 통신</a></li>
+<li><a class="reference internal" href="#point-to-point">점-대-점 간(Point-to-Point) 통신</a></li>
 <li><a class="reference internal" href="#collective-communication">집합 통신(Collective Communication)</a></li>
 <li><a class="reference internal" href="#distributed-training">분산 학습(Distributed Training)</a><ul>
 <li><a class="reference internal" href="#ring-allreduce">사용자 정의 링-올리듀스(Ring-Allreduce)</a></li>
@@ -897,11 +897,10 @@ CUDA IPC와 GPU Direct 기술을 활용하고 있습니다.</p>
 
      
        <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-         <script type="text/javascript" src="../_static/jquery.js"></script>
-         <script type="text/javascript" src="../_static/underscore.js"></script>
-         <script type="text/javascript" src="../_static/doctools.js"></script>
-         <script type="text/javascript" src="../_static/language_data.js"></script>
-         <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+         <script src="../_static/jquery.js"></script>
+         <script src="../_static/underscore.js"></script>
+         <script src="../_static/doctools.js"></script>
+         <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
      
 
   

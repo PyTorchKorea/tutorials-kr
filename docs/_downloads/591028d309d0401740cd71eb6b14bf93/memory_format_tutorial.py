@@ -1,112 +1,115 @@
 # -*- coding: utf-8 -*-
 """
-(beta) Channels Last Memory Format in PyTorch
+(실험용) PyTorch를 사용한 Channels Last Memory Format
 *******************************************************
+
 **Author**: `Vitaly Fedyunin <https://github.com/VitalyFedyunin>`_
 
-What is Channels Last
----------------------
+**번역**: `Choi Yoonjeong <https://github.com/potatochips178>`_
 
-Channels Last memory format is an alternative way of ordering NCHW tensors in memory preserving dimensions ordering. Channels Last tensors ordered in such a way that channels become the densest dimension (aka storing images pixel-per-pixel).
+Channels Last가 무엇인가요
+----------------------------
+Channels Last 메모리 형식(memory format)은 차원 순서를 유지하면서 메모리 상의 NCHW 텐서(tensor)를 정렬하는 또 다른 방식입니다.
+Channels Last 텐서는 채널(Channel)이 가장 밀도가 높은(densest) 차원으로 정렬(예. 이미지를 픽셀x픽셀로 저장)됩니다.
 
-For example, classic (contiguous) storage of NCHW tensor (in our case it is two 2x2 images with 3 color channels) look like this:
+예를 들어, (2개의 2 x 2 이미지에 3개의 채널이 존재하는 경우) 전형적인(연속적인) NCHW 텐서의 저장 방식은 다음과 같습니다:
 
 .. figure:: /_static/img/classic_memory_format.png
    :alt: classic_memory_format
 
-Channels Last memory format orders data differently:
+Channels Last 메모리 형식은 데이터를 다르게 정렬합니다:
 
 .. figure:: /_static/img/channels_last_memory_format.png
    :alt: channels_last_memory_format
 
-Pytorch supports memory formats (and provides back compatibility with existing models including eager, JIT, and TorchScript) by utilizing  existing strides structure.
-For example, 10x3x16x16 batch in Channels Last format will have strides equal to (768, 1, 48, 3).
+PyTorch는 기존의 스트라이드(strides) 구조를 사용함으로써 메모리 형식을 지원(하며, eager, JIT 및 TorchScript를 포함한
+기존의 모델들과 하위 호환성을 제공)합니다. 예를 들어, Channels Last 형식에서 10x3x16x16 배치(batch)는 (768, 1, 48, 3)와
+같은 폭(strides)을 가지고 있게 됩니다.
+
 """
 
 ######################################################################
-# Channels Last memory format is implemented for 4D NCWH Tensors only.
+# Channels Last 메모리 형식은 오직 4D NCWH Tensors에서만 실행할 수 있습니다.
 #
 
 import torch
 N, C, H, W = 10, 3, 32, 32
 
 ######################################################################
-# Memory Format API
-# -----------------------
+# 메모리 형식(Memory Format) API
+# ---------------------------------
 #
-# Here is how to convert tensors between contiguous and channels
-# last memory formats.
+# 연속 메모리 형식과 channels last 메모리 형식 간에 텐서를 변환하는 방법은 다음과 같습니다.
 
 ######################################################################
-# Classic PyTorch contiguous tensor
+# 전형적인 PyTorch의 연속적인 텐서(tensor)
 x = torch.empty(N, C, H, W)
-print(x.stride()) # Ouputs: (3072, 1024, 32, 1)
+print(x.stride()) # 결과: (3072, 1024, 32, 1)
 
 ######################################################################
-# Conversion operator
+# 변환 연산자
 x = x.contiguous(memory_format=torch.channels_last)
-print(x.shape) # Outputs: (10, 3, 32, 32) as dimensions order preserved
-print(x.stride()) # Outputs: (3072, 1, 96, 3)
+print(x.shape) # 결과: (10, 3, 32, 32) 차원 순서는 보존함
+print(x.stride()) # 결과: (3072, 1, 96, 3)
 
 ######################################################################
-# Back to contiguous
+# 연속적인 형식으로 되돌리기
 x = x.contiguous(memory_format=torch.contiguous_format)
-print(x.stride()) # Outputs: (3072, 1024, 32, 1)
+print(x.stride()) # 결과: (3072, 1024, 32, 1)
 
 ######################################################################
-# Alternative option
+# 다른 방식
 x = x.to(memory_format=torch.channels_last)
-print(x.stride()) # Ouputs: (3072, 1, 96, 3)
+print(x.stride()) # 결과: (3072, 1, 96, 3)
 
 ######################################################################
-# Format checks
-print(x.is_contiguous(memory_format=torch.channels_last)) # Ouputs: True
+# 형식(format) 확인
+print(x.is_contiguous(memory_format=torch.channels_last)) # 결과: True
 
 ######################################################################
-# Create as Channels Last
+# Channels Last 방식으로 생성하기
 x = torch.empty(N, C, H, W, memory_format=torch.channels_last)
-print(x.stride()) # Ouputs: (3072, 1, 96, 3)
+print(x.stride()) # 결과: (3072, 1, 96, 3)
 
 ######################################################################
-# ``clone`` preserves memory format
+# ``clone`` 은 메모리 형식을 보존합니다.
 y = x.clone()
-print(y.stride()) # Ouputs: (3072, 1, 96, 3)
+print(y.stride()) # 결과: (3072, 1, 96, 3)
 
 ######################################################################
-# ``to``, ``cuda``, ``float`` ... preserves memory format
+# ``to``, ``cuda``, ``float`` ... 등도 메모리 형식을 보존합니다.
 if torch.cuda.is_available():
     y = x.cuda()
-    print(y.stride()) # Ouputs: (3072, 1, 96, 3)
+    print(y.stride()) # 결과: (3072, 1, 96, 3)
 
 ######################################################################
-# ``empty_like``, ``*_like`` operators preserves memory format
+# ``empty_like``, ``*_like`` 연산자도 메모리 형식을 보존합니다.
 y = torch.empty_like(x)
-print(y.stride()) # Ouputs: (3072, 1, 96, 3)
+print(y.stride()) # 결과: (3072, 1, 96, 3)
 
 ######################################################################
-# Pointwise operators preserves memory format
+# Pointwise 연산자도 메모리 형식을 보존합니다.
 z = x + y
-print(z.stride()) # Ouputs: (3072, 1, 96, 3)
+print(z.stride()) # 결과: (3072, 1, 96, 3)
 
 ######################################################################
-#  Conv, Batchnorm modules support Channels Last
-#  (only works for CudNN >= 7.6)
+# Conv, Batchnorm 모듈은 Channels Last를 지원합니다. (단, CudNN >=7.6 에서만 동작)
 if torch.backends.cudnn.version() >= 7603:
     input = torch.randint(1, 10, (2, 8, 4, 4), dtype=torch.float32, device="cuda", requires_grad=True)
     model = torch.nn.Conv2d(8, 4, 3).cuda().float()
 
     input = input.contiguous(memory_format=torch.channels_last)
-    model = model.to(memory_format=torch.channels_last) # Module parameters need to be Channels Last
+    model = model.to(memory_format=torch.channels_last) # 모듈 인자들은 Channels Last로 변환이 필요합니다
 
     out = model(input)
-    print(out.is_contiguous(memory_format=torch.channels_last)) # Ouputs: True
+    print(out.is_contiguous(memory_format=torch.channels_last)) # 결과: True
 
 ######################################################################
-# Performance Gains
+# 성능 향상
 # -------------------------------------------------------------------------------------------
-# The most significant performance gains are observed on Nvidia's hardware with
-# Tensor Cores support. We were able to archive over 22%  perf gains while running '
-# AMP (Automated Mixed Precision) training scripts supplied by Nvidia https://github.com/NVIDIA/apex.
+# Tensor Cores를 지원하는 Nvidia의 하드웨어에서 가장 의미심장한 성능 향상을 보였습니다.
+# Nvidia가 제공하는 AMP(Automated Mixed Precision) 학습 스크립트로 22% 이상의 성능 향상을 확인할 수 있었습니다.
+# https://github.com/NVIDIA/apex
 #
 # ``python main_amp.py -a resnet50 --b 200 --workers 16 --opt-level O2  ./data``
 
@@ -143,7 +146,7 @@ if torch.backends.cudnn.version() >= 7603:
 # Epoch: [0][80/125] Time 0.260 (0.335) Speed 770.324 (597.659) Loss 2.2505953312 (1.0879) Prec@1 50.500 (52.938) Prec@5 100.000 (100.000)
 
 ######################################################################
-# Passing ``--channels-last true`` allows running a model in Channels Last format with observed 22% perf gain.
+# ``--channels-last true`` 인자를 전달하여 Channels Last 형식으로 모델을 실행하면 22%의 성능 향상을 보입니다.
 #
 # ``python main_amp.py -a resnet50 --b 200 --workers 16 --opt-level O2 --channels-last true ./data``
 
@@ -184,32 +187,31 @@ if torch.backends.cudnn.version() >= 7603:
 # Epoch: [0][80/125] Time 0.198 (0.269) Speed 1011.827 (743.883) Loss 2.8196096420 (2.4011) Prec@1 47.500 (50.938) Prec@5 100.000 (100.000)
 
 ######################################################################
-# The following list of models has the full support of Channels Last and showing 8%-35% perf gains on Volta devices:
+# 아래 목록의 모델들은 Channels Last 형식을 전적으로 지원(full support)하며 Volta 장비에서 8%-35%의 성능 향상을 보입니다:
 # ``alexnet``, ``mnasnet0_5``, ``mnasnet0_75``, ``mnasnet1_0``, ``mnasnet1_3``, ``mobilenet_v2``, ``resnet101``, ``resnet152``, ``resnet18``, ``resnet34``, ``resnet50``, ``resnext50_32x4d``, ``shufflenet_v2_x0_5``, ``shufflenet_v2_x1_0``, ``shufflenet_v2_x1_5``, ``shufflenet_v2_x2_0``, ``squeezenet1_0``, ``squeezenet1_1``, ``vgg11``, ``vgg11_bn``, ``vgg13``, ``vgg13_bn``, ``vgg16``, ``vgg16_bn``, ``vgg19``, ``vgg19_bn``, ``wide_resnet101_2``, ``wide_resnet50_2``
 #
 
 ######################################################################
-# Converting existing models
+# 기존 모델들 변환하기
 # --------------------------
 #
-# Channels Last support not limited by existing models, as any model can be converted to Channels Last and propagate format through the graph as soon as input formatted correctly.
+# Channels Last 지원은 기존 모델이 무엇이냐에 따라 제한되지 않으며, 어떠한 모델도 Channels Last로 변환할 수 있으며
+# 입력(input)의 형식만 맞춰주면 (신경망) 그래프를 통해 바로 전파(propagate)할 수 있습니다.
 #
 
-# Need to be done once, after model initialization (or load)
-model = model.to(memory_format=torch.channels_last) # Replace with your model
+# 모델을 초기화한(또는 불러온) 이후, 한 번 실행이 필요합니다.
+model = model.to(memory_format=torch.channels_last) # 원하는 모델로 교체하기
 
-# Need to be done for every input
-input = input.to(memory_format=torch.channels_last) # Replace with your input
+# 모든 입력에 대해서 실행이 필요합니다.
+input = input.to(memory_format=torch.channels_last) # 원하는 입력으로 교체하기
 output = model(input)
 
 #######################################################################
-# However, not all operators fully converted to support Channels Last (usually returning
-# contiguous output instead). That means you need to verify the list of used operators
-# against supported operators list https://github.com/pytorch/pytorch/wiki/Operators-with-Channels-Last-support,
-# or introduce memory format checks into eager execution mode and run your model.
+# 그러나, 모든 연산자들이 Channels Last를 지원하도록 완전히 바뀐 것은 아닙니다(일반적으로는 연속적인 출력을 대신 반환합니다).
+# 즉, Channel Last 지원 연산자 목록 https://github.com/pytorch/pytorch/wiki/Operators-with-Channels-Last-support 에서 사용한 연산자들이 존재하는지 확인하거나,
+# eager 실행 모드에서 메모리 형식 검사를 도입하고 모델을 실행해야 합니다.
 #
-# After running the code below, operators will raise an exception if the output of the
-# operator doesn't match the memory format of the input.
+# 아래 코드에서, 연산자들의 출력이 입력의 메모리 형식과 일치하지 않으면 예외(exception)를 발생시킵니다.
 #
 #
 def contains_cl(args):
@@ -281,19 +283,19 @@ attribute(torch)
 
 
 ######################################################################
-# If you found an operator that doesn't support Channels Last tensors
-# and you want to contribute, feel free to use following developers
-# guide https://github.com/pytorch/pytorch/wiki/Writing-memory-format-aware-operators.
+# 만약 Channels Last 텐서를 지원하지 않는 연산자를 발견하였고, 기여하기를 원한다면
+# 다음 개발 문서를 참고해주세요.
+# https://github.com/pytorch/pytorch/wiki/Writing-memory-format-aware-operators
 #
 
 ######################################################################
-# Work to do
+# 해야할 일
 # ----------
-# There are still many things to do, such as:
+# 다음과 같이 여전히 해야 할 일이 많이 남아있습니다:
 #
-# - Resolving ambiguity of N1HW and NC11 Tensors;
-# - Testing of Distributed Training support;
-# - Improving operators coverage.
+# - N1HW와 NC11 Tensors의 모호성 해결하기;
+# - 분산 학습을 지원하는지 확인하기;
+# - 연산자 범위(operators coverage) 개선(improve)하기
 #
-# If you have feedback and/or suggestions for improvement, please let us
-# know by creating `an issue <https://github.com/pytorch/pytorch/issues>`_.
+# 개선할 부분에 대한 피드백 또는 제안이 있다면 `이슈를 만들어 <https://github.com/pytorch/pytorch/issues>`_ 알려주세요.
+#

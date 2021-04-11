@@ -172,7 +172,7 @@
 <p class="caption"><span class="caption-text">프론트엔드 API</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/named_tensor_tutorial.html">(prototype) Introduction to Named Tensors in PyTorch</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/memory_format_tutorial.html">(beta) Channels Last Memory Format in PyTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/memory_format_tutorial.html">(실험용) PyTorch를 사용한 Channels Last Memory Format</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_frontend.html">Using the PyTorch C++ Frontend</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_extension.html">Custom C++ and CUDA Extensions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/torch_script_custom_ops.html">Extending TorchScript with Custom C++ Operators</a></li>
@@ -184,7 +184,7 @@
 <p class="caption"><span class="caption-text">모델 최적화</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/pruning_tutorial.html">가지치기 기법(Pruning) 튜토리얼</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../advanced/dynamic_quantization_tutorial.html">(beta) Dynamic Quantization on an LSTM Word Language Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/dynamic_quantization_tutorial.html">(베타) LSTM 기반 단어 단위 언어 모델의 동적 양자화</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/static_quantization_tutorial.html">(beta) Static Quantization with Eager Mode in PyTorch</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/quantized_transfer_learning_tutorial.html">(beta) 컴퓨터 비전(Vision) 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
@@ -358,7 +358,7 @@ Download from <a class="reference external" href="https://opencv.org/releases/">
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torch.utils.cpp_extension</span>
 
-<span class="k">print</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">version</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">version</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
 <span class="n">op_source</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
 <span class="s2">#include &lt;opencv2/opencv.hpp&gt;</span>
 <span class="s2">#include &lt;torch/script.h&gt;</span>
@@ -389,14 +389,14 @@ Download from <a class="reference external" href="https://opencv.org/releases/">
     <span class="n">name</span><span class="o">=</span><span class="s2">&quot;warp_perspective&quot;</span><span class="p">,</span>
     <span class="n">cpp_sources</span><span class="o">=</span><span class="n">op_source</span><span class="p">,</span>
     <span class="n">extra_ldflags</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;-lopencv_core&quot;</span><span class="p">,</span> <span class="s2">&quot;-lopencv_imgproc&quot;</span><span class="p">],</span>
-    <span class="n">is_python_module</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
-    <span class="n">verbose</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+    <span class="n">is_python_module</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="k">print</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">my_ops</span><span class="o">.</span><span class="n">warp_perspective</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">my_ops</span><span class="o">.</span><span class="n">warp_perspective</span><span class="p">)</span>
 
 
-<span class="nd">@torch.jit.script</span>
+<span class="nd">@torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">script</span>
 <span class="k">def</span> <span class="nf">compute</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
     <span class="k">if</span> <span class="nb">bool</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">42</span><span class="p">):</span>
         <span class="n">z</span> <span class="o">=</span> <span class="mi">5</span>
@@ -692,52 +692,52 @@ Here we specify the application name, package, main activity.</p>
 <h3>Java Code<a class="headerlink" href="#java-code" title="Permalink to this headline">¶</a></h3>
 <p>Now we are ready to implement our MainActivity in</p>
 <p><code class="docutils literal notranslate"><span class="pre">NativeApp/app/src/main/java/org/pytorch/nativeapp/MainActivity.java</span></code>:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kn">package</span> <span class="nn">org.pytorch.nativeapp</span><span class="o">;</span>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kn">package</span> <span class="nn">org.pytorch.nativeapp</span><span class="p">;</span>
 
-<span class="kn">import</span> <span class="nn">android.content.Context</span><span class="o">;</span>
-<span class="kn">import</span> <span class="nn">android.os.Bundle</span><span class="o">;</span>
-<span class="kn">import</span> <span class="nn">android.util.Log</span><span class="o">;</span>
-<span class="kn">import</span> <span class="nn">androidx.appcompat.app.AppCompatActivity</span><span class="o">;</span>
-<span class="kn">import</span> <span class="nn">java.io.File</span><span class="o">;</span>
-<span class="kn">import</span> <span class="nn">java.io.FileOutputStream</span><span class="o">;</span>
-<span class="kn">import</span> <span class="nn">java.io.IOException</span><span class="o">;</span>
-<span class="kn">import</span> <span class="nn">java.io.InputStream</span><span class="o">;</span>
-<span class="kn">import</span> <span class="nn">java.io.OutputStream</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">android.content.Context</span><span class="p">;</span>
+<span class="kn">import</span> <span class="nn">android.os.Bundle</span><span class="p">;</span>
+<span class="kn">import</span> <span class="nn">android.util.Log</span><span class="p">;</span>
+<span class="kn">import</span> <span class="nn">androidx.appcompat.app.AppCompatActivity</span><span class="p">;</span>
+<span class="kn">import</span> <span class="nn">java.io.File</span><span class="p">;</span>
+<span class="kn">import</span> <span class="nn">java.io.FileOutputStream</span><span class="p">;</span>
+<span class="kn">import</span> <span class="nn">java.io.IOException</span><span class="p">;</span>
+<span class="kn">import</span> <span class="nn">java.io.InputStream</span><span class="p">;</span>
+<span class="kn">import</span> <span class="nn">java.io.OutputStream</span><span class="p">;</span>
 
-<span class="kd">public</span> <span class="kd">class</span> <span class="nc">MainActivity</span> <span class="kd">extends</span> <span class="n">AppCompatActivity</span> <span class="o">{</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">MainActivity</span> <span class="kd">extends</span> <span class="n">AppCompatActivity</span> <span class="p">{</span>
 
-  <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">TAG</span> <span class="o">=</span> <span class="s">&quot;PyTorchNativeApp&quot;</span><span class="o">;</span>
+  <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">TAG</span> <span class="o">=</span> <span class="s">&quot;PyTorchNativeApp&quot;</span><span class="p">;</span>
 
-  <span class="kd">public</span> <span class="kd">static</span> <span class="n">String</span> <span class="nf">assetFilePath</span><span class="o">(</span><span class="n">Context</span> <span class="n">context</span><span class="o">,</span> <span class="n">String</span> <span class="n">assetName</span><span class="o">)</span> <span class="o">{</span>
-    <span class="n">File</span> <span class="n">file</span> <span class="o">=</span> <span class="k">new</span> <span class="n">File</span><span class="o">(</span><span class="n">context</span><span class="o">.</span><span class="na">getFilesDir</span><span class="o">(),</span> <span class="n">assetName</span><span class="o">);</span>
-    <span class="k">if</span> <span class="o">(</span><span class="n">file</span><span class="o">.</span><span class="na">exists</span><span class="o">()</span> <span class="o">&amp;&amp;</span> <span class="n">file</span><span class="o">.</span><span class="na">length</span><span class="o">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="o">)</span> <span class="o">{</span>
-      <span class="k">return</span> <span class="n">file</span><span class="o">.</span><span class="na">getAbsolutePath</span><span class="o">();</span>
-    <span class="o">}</span>
+  <span class="kd">public</span> <span class="kd">static</span> <span class="n">String</span> <span class="nf">assetFilePath</span><span class="p">(</span><span class="n">Context</span> <span class="n">context</span><span class="p">,</span> <span class="n">String</span> <span class="n">assetName</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">File</span> <span class="n">file</span> <span class="o">=</span> <span class="k">new</span> <span class="n">File</span><span class="p">(</span><span class="n">context</span><span class="p">.</span><span class="na">getFilesDir</span><span class="p">(),</span> <span class="n">assetName</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">file</span><span class="p">.</span><span class="na">exists</span><span class="p">()</span> <span class="o">&amp;&amp;</span> <span class="n">file</span><span class="p">.</span><span class="na">length</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="n">file</span><span class="p">.</span><span class="na">getAbsolutePath</span><span class="p">();</span>
+    <span class="p">}</span>
 
-    <span class="k">try</span> <span class="o">(</span><span class="n">InputStream</span> <span class="n">is</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="na">getAssets</span><span class="o">().</span><span class="na">open</span><span class="o">(</span><span class="n">assetName</span><span class="o">))</span> <span class="o">{</span>
-      <span class="k">try</span> <span class="o">(</span><span class="n">OutputStream</span> <span class="n">os</span> <span class="o">=</span> <span class="k">new</span> <span class="n">FileOutputStream</span><span class="o">(</span><span class="n">file</span><span class="o">))</span> <span class="o">{</span>
-        <span class="kt">byte</span><span class="o">[]</span> <span class="n">buffer</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">byte</span><span class="o">[</span><span class="mi">4</span> <span class="o">*</span> <span class="mi">1024</span><span class="o">];</span>
-        <span class="kt">int</span> <span class="n">read</span><span class="o">;</span>
-        <span class="k">while</span> <span class="o">((</span><span class="n">read</span> <span class="o">=</span> <span class="n">is</span><span class="o">.</span><span class="na">read</span><span class="o">(</span><span class="n">buffer</span><span class="o">))</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="o">)</span> <span class="o">{</span>
-          <span class="n">os</span><span class="o">.</span><span class="na">write</span><span class="o">(</span><span class="n">buffer</span><span class="o">,</span> <span class="mi">0</span><span class="o">,</span> <span class="n">read</span><span class="o">);</span>
-        <span class="o">}</span>
-        <span class="n">os</span><span class="o">.</span><span class="na">flush</span><span class="o">();</span>
-      <span class="o">}</span>
-      <span class="k">return</span> <span class="n">file</span><span class="o">.</span><span class="na">getAbsolutePath</span><span class="o">();</span>
-    <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">IOException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
-      <span class="n">Log</span><span class="o">.</span><span class="na">e</span><span class="o">(</span><span class="n">TAG</span><span class="o">,</span> <span class="s">&quot;Error process asset &quot;</span> <span class="o">+</span> <span class="n">assetName</span> <span class="o">+</span> <span class="s">&quot; to file path&quot;</span><span class="o">);</span>
-    <span class="o">}</span>
-    <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
-  <span class="o">}</span>
+    <span class="k">try</span> <span class="p">(</span><span class="n">InputStream</span> <span class="n">is</span> <span class="o">=</span> <span class="n">context</span><span class="p">.</span><span class="na">getAssets</span><span class="p">().</span><span class="na">open</span><span class="p">(</span><span class="n">assetName</span><span class="p">))</span> <span class="p">{</span>
+      <span class="k">try</span> <span class="p">(</span><span class="n">OutputStream</span> <span class="n">os</span> <span class="o">=</span> <span class="k">new</span> <span class="n">FileOutputStream</span><span class="p">(</span><span class="n">file</span><span class="p">))</span> <span class="p">{</span>
+        <span class="kt">byte</span><span class="o">[]</span> <span class="n">buffer</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">byte</span><span class="o">[</span><span class="mi">4</span> <span class="o">*</span> <span class="mi">1024</span><span class="o">]</span><span class="p">;</span>
+        <span class="kt">int</span> <span class="n">read</span><span class="p">;</span>
+        <span class="k">while</span> <span class="p">((</span><span class="n">read</span> <span class="o">=</span> <span class="n">is</span><span class="p">.</span><span class="na">read</span><span class="p">(</span><span class="n">buffer</span><span class="p">))</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+          <span class="n">os</span><span class="p">.</span><span class="na">write</span><span class="p">(</span><span class="n">buffer</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">read</span><span class="p">);</span>
+        <span class="p">}</span>
+        <span class="n">os</span><span class="p">.</span><span class="na">flush</span><span class="p">();</span>
+      <span class="p">}</span>
+      <span class="k">return</span> <span class="n">file</span><span class="p">.</span><span class="na">getAbsolutePath</span><span class="p">();</span>
+    <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="n">IOException</span> <span class="n">e</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">Log</span><span class="p">.</span><span class="na">e</span><span class="p">(</span><span class="n">TAG</span><span class="p">,</span> <span class="s">&quot;Error process asset &quot;</span> <span class="o">+</span> <span class="n">assetName</span> <span class="o">+</span> <span class="s">&quot; to file path&quot;</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="kc">null</span><span class="p">;</span>
+  <span class="p">}</span>
 
   <span class="nd">@Override</span>
-  <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">onCreate</span><span class="o">(</span><span class="n">Bundle</span> <span class="n">savedInstanceState</span><span class="o">)</span> <span class="o">{</span>
-    <span class="kd">super</span><span class="o">.</span><span class="na">onCreate</span><span class="o">(</span><span class="n">savedInstanceState</span><span class="o">);</span>
+  <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">onCreate</span><span class="p">(</span><span class="n">Bundle</span> <span class="n">savedInstanceState</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">super</span><span class="p">.</span><span class="na">onCreate</span><span class="p">(</span><span class="n">savedInstanceState</span><span class="p">);</span>
     <span class="kd">final</span> <span class="n">String</span> <span class="n">modelFileAbsoluteFilePath</span> <span class="o">=</span>
-        <span class="k">new</span> <span class="n">File</span><span class="o">(</span><span class="n">assetFilePath</span><span class="o">(</span><span class="k">this</span><span class="o">,</span> <span class="s">&quot;compute.pt&quot;</span><span class="o">)).</span><span class="na">getAbsolutePath</span><span class="o">();</span>
-    <span class="n">NativeClient</span><span class="o">.</span><span class="na">loadAndForwardModel</span><span class="o">(</span><span class="n">modelFileAbsoluteFilePath</span><span class="o">);</span>
-  <span class="o">}</span>
-<span class="o">}</span>
+        <span class="k">new</span> <span class="n">File</span><span class="p">(</span><span class="n">assetFilePath</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="s">&quot;compute.pt&quot;</span><span class="p">)).</span><span class="na">getAbsolutePath</span><span class="p">();</span>
+    <span class="n">NativeClient</span><span class="p">.</span><span class="na">loadAndForwardModel</span><span class="p">(</span><span class="n">modelFileAbsoluteFilePath</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span>
 </pre></div>
 </div>
 <p>In the previous step, when we copied our <code class="docutils literal notranslate"><span class="pre">compute.pt</span></code> to <code class="docutils literal notranslate"><span class="pre">NativeApp/app/src/main/assets</span></code> that file became an Android application asset, which will be packed in application. Android system provides only stream access to it.
@@ -745,22 +745,22 @@ To use this module from LibTorch, we need to materialize it as a file on the dis
 <p><code class="docutils literal notranslate"><span class="pre">OnCreate</span></code> method of Activity is called just after Activity creation. In this method, we call <code class="docutils literal notranslate"><span class="pre">assertFilePath</span></code> and call <code class="docutils literal notranslate"><span class="pre">NativeClient</span></code> class that will dispatch it to native code through JNI call.</p>
 <p><code class="docutils literal notranslate"><span class="pre">NativeClient</span></code> is a helper class with an internal private class <code class="docutils literal notranslate"><span class="pre">NativePeer</span></code>, which is responsible for working with the native part of our application. It has a static block that will load <code class="docutils literal notranslate"><span class="pre">libpytorch_nativeapp.so</span></code>, that is build with <code class="docutils literal notranslate"><span class="pre">CMakeLists.txt</span></code> that we added on the previous step. The static block will be executed with the first reference of <code class="docutils literal notranslate"><span class="pre">NativePeer</span></code> class. It happens in <code class="docutils literal notranslate"><span class="pre">NativeClient#loadAndForwardModel</span></code>.</p>
 <p><code class="docutils literal notranslate"><span class="pre">NativeApp/app/src/main/java/org/pytorch/nativeapp/NativeClient.java</span></code>:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kn">package</span> <span class="nn">org.pytorch.nativeapp</span><span class="o">;</span>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kn">package</span> <span class="nn">org.pytorch.nativeapp</span><span class="p">;</span>
 
-<span class="kd">public</span> <span class="kd">final</span> <span class="kd">class</span> <span class="nc">NativeClient</span> <span class="o">{</span>
+<span class="kd">public</span> <span class="kd">final</span> <span class="kd">class</span> <span class="nc">NativeClient</span> <span class="p">{</span>
 
-  <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">loadAndForwardModel</span><span class="o">(</span><span class="kd">final</span> <span class="n">String</span> <span class="n">modelPath</span><span class="o">)</span> <span class="o">{</span>
-    <span class="n">NativePeer</span><span class="o">.</span><span class="na">loadAndForwardModel</span><span class="o">(</span><span class="n">modelPath</span><span class="o">);</span>
-  <span class="o">}</span>
+  <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">loadAndForwardModel</span><span class="p">(</span><span class="kd">final</span> <span class="n">String</span> <span class="n">modelPath</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">NativePeer</span><span class="p">.</span><span class="na">loadAndForwardModel</span><span class="p">(</span><span class="n">modelPath</span><span class="p">);</span>
+  <span class="p">}</span>
 
-  <span class="kd">private</span> <span class="kd">static</span> <span class="kd">class</span> <span class="nc">NativePeer</span> <span class="o">{</span>
-    <span class="kd">static</span> <span class="o">{</span>
-      <span class="n">System</span><span class="o">.</span><span class="na">loadLibrary</span><span class="o">(</span><span class="s">&quot;pytorch_nativeapp&quot;</span><span class="o">);</span>
-    <span class="o">}</span>
+  <span class="kd">private</span> <span class="kd">static</span> <span class="kd">class</span> <span class="nc">NativePeer</span> <span class="p">{</span>
+    <span class="kd">static</span> <span class="p">{</span>
+      <span class="n">System</span><span class="p">.</span><span class="na">loadLibrary</span><span class="p">(</span><span class="s">&quot;pytorch_nativeapp&quot;</span><span class="p">);</span>
+    <span class="p">}</span>
 
-    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">native</span> <span class="kt">void</span> <span class="nf">loadAndForwardModel</span><span class="o">(</span><span class="kd">final</span> <span class="n">String</span> <span class="n">modelPath</span><span class="o">);</span>
-  <span class="o">}</span>
-<span class="o">}</span>
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">native</span> <span class="kt">void</span> <span class="nf">loadAndForwardModel</span><span class="p">(</span><span class="kd">final</span> <span class="n">String</span> <span class="n">modelPath</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span>
 </pre></div>
 </div>
 <p><code class="docutils literal notranslate"><span class="pre">NativePeer#loadAndForwardModel</span></code> is declared as <code class="docutils literal notranslate"><span class="pre">native</span></code>, it does not have definition in Java. Call to this method will be re-dispatched through JNI to C++ method in our <code class="docutils literal notranslate"><span class="pre">libpytorch_nativeapp.so</span></code>, in <code class="docutils literal notranslate"><span class="pre">NativeApp/app/src/main/cpp/pytorch_nativeapp.cpp</span></code>.</p>
@@ -808,13 +808,13 @@ To use this module from LibTorch, we need to materialize it as a file on the dis
 <span class="k">static</span> <span class="k">auto</span> <span class="n">registry</span> <span class="o">=</span>
     <span class="n">torch</span><span class="o">::</span><span class="n">RegisterOperators</span><span class="p">(</span><span class="s">&quot;my_ops::warp_perspective&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">warp_perspective</span><span class="p">);</span>
 
-<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span> <span class="kt">void</span> <span class="n">log</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">m</span><span class="p">,</span> <span class="n">T</span> <span class="n">t</span><span class="p">)</span> <span class="p">{</span>
+<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">T</span><span class="o">&gt;</span> <span class="kt">void</span> <span class="n">log</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">m</span><span class="p">,</span> <span class="n">T</span> <span class="n">t</span><span class="p">)</span> <span class="p">{</span>
   <span class="n">std</span><span class="o">::</span><span class="n">ostringstream</span> <span class="n">os</span><span class="p">;</span>
   <span class="n">os</span> <span class="o">&lt;&lt;</span> <span class="n">t</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
   <span class="n">ALOGI</span><span class="p">(</span><span class="s">&quot;%s %s&quot;</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">os</span><span class="p">.</span><span class="n">str</span><span class="p">().</span><span class="n">c_str</span><span class="p">());</span>
 <span class="p">}</span>
 
-<span class="k">struct</span> <span class="n">JITCallGuard</span> <span class="p">{</span>
+<span class="k">struct</span> <span class="nc">JITCallGuard</span> <span class="p">{</span>
   <span class="n">torch</span><span class="o">::</span><span class="n">autograd</span><span class="o">::</span><span class="n">AutoGradMode</span> <span class="n">no_autograd_guard</span><span class="p">{</span><span class="nb">false</span><span class="p">};</span>
   <span class="n">torch</span><span class="o">::</span><span class="n">AutoNonVariableTypeMode</span> <span class="n">non_var_guard</span><span class="p">{</span><span class="nb">true</span><span class="p">};</span>
   <span class="n">torch</span><span class="o">::</span><span class="n">jit</span><span class="o">::</span><span class="n">GraphOptimizerEnabledGuard</span> <span class="n">no_optimizer_guard</span><span class="p">{</span><span class="nb">false</span><span class="p">};</span>
@@ -825,13 +825,13 @@ To use this module from LibTorch, we need to materialize it as a file on the dis
   <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">modelPath</span> <span class="o">=</span> <span class="n">env</span><span class="o">-&gt;</span><span class="n">GetStringUTFChars</span><span class="p">(</span><span class="n">jModelPath</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
   <span class="n">assert</span><span class="p">(</span><span class="n">modelPath</span><span class="p">);</span>
   <span class="n">JITCallGuard</span> <span class="n">guard</span><span class="p">;</span>
-  <span class="n">torch</span><span class="o">::</span><span class="n">jit</span><span class="o">::</span><span class="n">Module</span> <span class="n">module</span> <span class="o">=</span> <span class="n">torch</span><span class="o">::</span><span class="n">jit</span><span class="o">::</span><span class="n">load</span><span class="p">(</span><span class="n">modelPath</span><span class="p">);</span>
-  <span class="n">module</span><span class="p">.</span><span class="n">eval</span><span class="p">();</span>
+  <span class="n">torch</span><span class="o">::</span><span class="n">jit</span><span class="o">::</span><span class="n">Module</span> <span class="k">module</span> <span class="o">=</span> <span class="n">torch</span><span class="o">::</span><span class="n">jit</span><span class="o">::</span><span class="n">load</span><span class="p">(</span><span class="n">modelPath</span><span class="p">);</span>
+  <span class="k">module</span><span class="p">.</span><span class="n">eval</span><span class="p">();</span>
   <span class="n">torch</span><span class="o">::</span><span class="n">Tensor</span> <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">::</span><span class="n">randn</span><span class="p">({</span><span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">});</span>
   <span class="n">torch</span><span class="o">::</span><span class="n">Tensor</span> <span class="n">y</span> <span class="o">=</span> <span class="n">torch</span><span class="o">::</span><span class="n">randn</span><span class="p">({</span><span class="mi">8</span><span class="p">,</span> <span class="mi">5</span><span class="p">});</span>
   <span class="n">log</span><span class="p">(</span><span class="s">&quot;x:&quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">);</span>
   <span class="n">log</span><span class="p">(</span><span class="s">&quot;y:&quot;</span><span class="p">,</span> <span class="n">y</span><span class="p">);</span>
-  <span class="n">c10</span><span class="o">::</span><span class="n">IValue</span> <span class="n">t_out</span> <span class="o">=</span> <span class="n">module</span><span class="p">.</span><span class="n">forward</span><span class="p">({</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">});</span>
+  <span class="n">c10</span><span class="o">::</span><span class="n">IValue</span> <span class="n">t_out</span> <span class="o">=</span> <span class="k">module</span><span class="p">.</span><span class="n">forward</span><span class="p">({</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">});</span>
   <span class="n">log</span><span class="p">(</span><span class="s">&quot;result:&quot;</span><span class="p">,</span> <span class="n">t_out</span><span class="p">);</span>
   <span class="n">env</span><span class="o">-&gt;</span><span class="n">ReleaseStringUTFChars</span><span class="p">(</span><span class="n">jModelPath</span><span class="p">,</span> <span class="n">modelPath</span><span class="p">);</span>
 <span class="p">}</span>
@@ -1006,11 +1006,9 @@ Or you can do it from the command line:</p>
 
      
        <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-         <script type="text/javascript" src="../_static/jquery.js"></script>
-         <script type="text/javascript" src="../_static/underscore.js"></script>
-         <script type="text/javascript" src="../_static/doctools.js"></script>
-         <script type="text/javascript" src="../_static/language_data.js"></script>
-         <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+         <script src="../_static/jquery.js"></script>
+         <script src="../_static/underscore.js"></script>
+         <script src="../_static/doctools.js"></script>
      
 
   

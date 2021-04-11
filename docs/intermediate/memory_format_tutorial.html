@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>(beta) Channels Last Memory Format in PyTorch &mdash; PyTorch Tutorials 1.6.0 documentation</title>
+  <title>(실험용) PyTorch를 사용한 Channels Last Memory Format &mdash; PyTorch Tutorials 1.6.0 documentation</title>
   
 
   
@@ -174,7 +174,7 @@
 <p class="caption"><span class="caption-text">프론트엔드 API</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="named_tensor_tutorial.html">(prototype) Introduction to Named Tensors in PyTorch</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">(beta) Channels Last Memory Format in PyTorch</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">(실험용) PyTorch를 사용한 Channels Last Memory Format</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_frontend.html">Using the PyTorch C++ Frontend</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_extension.html">Custom C++ and CUDA Extensions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/torch_script_custom_ops.html">Extending TorchScript with Custom C++ Operators</a></li>
@@ -186,7 +186,7 @@
 <p class="caption"><span class="caption-text">모델 최적화</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="pruning_tutorial.html">가지치기 기법(Pruning) 튜토리얼</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../advanced/dynamic_quantization_tutorial.html">(beta) Dynamic Quantization on an LSTM Word Language Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/dynamic_quantization_tutorial.html">(베타) LSTM 기반 단어 단위 언어 모델의 동적 양자화</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/static_quantization_tutorial.html">(beta) Static Quantization with Eager Mode in PyTorch</a></li>
 <li class="toctree-l1"><a class="reference internal" href="quantized_transfer_learning_tutorial.html">(beta) 컴퓨터 비전(Vision) 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
@@ -243,7 +243,7 @@
       </li>
 
         
-      <li>(beta) Channels Last Memory Format in PyTorch</li>
+      <li>(실험용) PyTorch를 사용한 Channels Last Memory Format</li>
     
     
       <li class="pytorch-breadcrumbs-aside">
@@ -301,45 +301,47 @@
 <p class="admonition-title">Note</p>
 <p>Click <a class="reference internal" href="#sphx-glr-download-intermediate-memory-format-tutorial-py"><span class="std std-ref">here</span></a> to download the full example code</p>
 </div>
-<div class="sphx-glr-example-title section" id="beta-channels-last-memory-format-in-pytorch">
-<span id="sphx-glr-intermediate-memory-format-tutorial-py"></span><h1>(beta) Channels Last Memory Format in PyTorch<a class="headerlink" href="#beta-channels-last-memory-format-in-pytorch" title="Permalink to this headline">¶</a></h1>
+<div class="sphx-glr-example-title section" id="pytorch-channels-last-memory-format">
+<span id="sphx-glr-intermediate-memory-format-tutorial-py"></span><h1>(실험용) PyTorch를 사용한 Channels Last Memory Format<a class="headerlink" href="#pytorch-channels-last-memory-format" title="Permalink to this headline">¶</a></h1>
 <p><strong>Author</strong>: <a class="reference external" href="https://github.com/VitalyFedyunin">Vitaly Fedyunin</a></p>
-<div class="section" id="what-is-channels-last">
-<h2>What is Channels Last<a class="headerlink" href="#what-is-channels-last" title="Permalink to this headline">¶</a></h2>
-<p>Channels Last memory format is an alternative way of ordering NCHW tensors in memory preserving dimensions ordering. Channels Last tensors ordered in such a way that channels become the densest dimension (aka storing images pixel-per-pixel).</p>
-<p>For example, classic (contiguous) storage of NCHW tensor (in our case it is two 2x2 images with 3 color channels) look like this:</p>
+<p><strong>번역</strong>: <a class="reference external" href="https://github.com/potatochips178">Choi Yoonjeong</a></p>
+<div class="section" id="channels-last">
+<h2>Channels Last가 무엇인가요<a class="headerlink" href="#channels-last" title="Permalink to this headline">¶</a></h2>
+<p>Channels Last 메모리 형식(memory format)은 차원 순서를 유지하면서 메모리 상의 NCHW 텐서(tensor)를 정렬하는 또 다른 방식입니다.
+Channels Last 텐서는 채널(Channel)이 가장 밀도가 높은(densest) 차원으로 정렬(예. 이미지를 픽셀x픽셀로 저장)됩니다.</p>
+<p>예를 들어, (2개의 2 x 2 이미지에 3개의 채널이 존재하는 경우) 전형적인(연속적인) NCHW 텐서의 저장 방식은 다음과 같습니다:</p>
 <div class="figure align-default">
 <img alt="classic_memory_format" src="../_images/classic_memory_format.png" />
 </div>
-<p>Channels Last memory format orders data differently:</p>
+<p>Channels Last 메모리 형식은 데이터를 다르게 정렬합니다:</p>
 <div class="figure align-default">
 <img alt="channels_last_memory_format" src="../_images/channels_last_memory_format.png" />
 </div>
-<p>Pytorch supports memory formats (and provides back compatibility with existing models including eager, JIT, and TorchScript) by utilizing  existing strides structure.
-For example, 10x3x16x16 batch in Channels Last format will have strides equal to (768, 1, 48, 3).</p>
-<p>Channels Last memory format is implemented for 4D NCWH Tensors only.</p>
+<p>PyTorch는 기존의 스트라이드(strides) 구조를 사용함으로써 메모리 형식을 지원(하며, eager, JIT 및 TorchScript를 포함한
+기존의 모델들과 하위 호환성을 제공)합니다. 예를 들어, Channels Last 형식에서 10x3x16x16 배치(batch)는 (768, 1, 48, 3)와
+같은 폭(strides)을 가지고 있게 됩니다.
+Channels Last 메모리 형식은 오직 4D NCWH Tensors에서만 실행할 수 있습니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
 <span class="n">N</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">W</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">32</span>
 </pre></div>
 </div>
 </div>
 <div class="section" id="memory-format-api">
-<h2>Memory Format API<a class="headerlink" href="#memory-format-api" title="Permalink to this headline">¶</a></h2>
-<p>Here is how to convert tensors between contiguous and channels
-last memory formats.</p>
-<p>Classic PyTorch contiguous tensor</p>
+<h2>메모리 형식(Memory Format) API<a class="headerlink" href="#memory-format-api" title="Permalink to this headline">¶</a></h2>
+<p>연속 메모리 형식과 channels last 메모리 형식 간에 텐서를 변환하는 방법은 다음과 같습니다.</p>
+<p>전형적인 PyTorch의 연속적인 텐서(tensor)</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">W</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">stride</span><span class="p">())</span> <span class="c1"># Ouputs: (3072, 1024, 32, 1)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">stride</span><span class="p">())</span> <span class="c1"># 결과: (3072, 1024, 32, 1)</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>(3072, 1024, 32, 1)
 </pre></div>
 </div>
-<p>Conversion operator</p>
+<p>변환 연산자</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">contiguous</span><span class="p">(</span><span class="n">memory_format</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">channels_last</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="c1"># Outputs: (10, 3, 32, 32) as dimensions order preserved</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">stride</span><span class="p">())</span> <span class="c1"># Outputs: (3072, 1, 96, 3)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="c1"># 결과: (10, 3, 32, 32) 차원 순서는 보존함</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">stride</span><span class="p">())</span> <span class="c1"># 결과: (3072, 1, 96, 3)</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
@@ -347,89 +349,88 @@ last memory formats.</p>
 (3072, 1, 96, 3)
 </pre></div>
 </div>
-<p>Back to contiguous</p>
+<p>연속적인 형식으로 되돌리기</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">contiguous</span><span class="p">(</span><span class="n">memory_format</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">contiguous_format</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">stride</span><span class="p">())</span> <span class="c1"># Outputs: (3072, 1024, 32, 1)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">stride</span><span class="p">())</span> <span class="c1"># 결과: (3072, 1024, 32, 1)</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>(3072, 1024, 32, 1)
 </pre></div>
 </div>
-<p>Alternative option</p>
+<p>다른 방식</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">memory_format</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">channels_last</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">stride</span><span class="p">())</span> <span class="c1"># Ouputs: (3072, 1, 96, 3)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">stride</span><span class="p">())</span> <span class="c1"># 결과: (3072, 1, 96, 3)</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>(3072, 1, 96, 3)
 </pre></div>
 </div>
-<p>Format checks</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">is_contiguous</span><span class="p">(</span><span class="n">memory_format</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">channels_last</span><span class="p">))</span> <span class="c1"># Ouputs: True</span>
+<p>형식(format) 확인</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">is_contiguous</span><span class="p">(</span><span class="n">memory_format</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">channels_last</span><span class="p">))</span> <span class="c1"># 결과: True</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>True
 </pre></div>
 </div>
-<p>Create as Channels Last</p>
+<p>Channels Last 방식으로 생성하기</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">memory_format</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">channels_last</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">stride</span><span class="p">())</span> <span class="c1"># Ouputs: (3072, 1, 96, 3)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">stride</span><span class="p">())</span> <span class="c1"># 결과: (3072, 1, 96, 3)</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>(3072, 1, 96, 3)
 </pre></div>
 </div>
-<p><code class="docutils literal notranslate"><span class="pre">clone</span></code> preserves memory format</p>
+<p><code class="docutils literal notranslate"><span class="pre">clone</span></code> 은 메모리 형식을 보존합니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">y</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">stride</span><span class="p">())</span> <span class="c1"># Ouputs: (3072, 1, 96, 3)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">stride</span><span class="p">())</span> <span class="c1"># 결과: (3072, 1, 96, 3)</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>(3072, 1, 96, 3)
 </pre></div>
 </div>
-<p><code class="docutils literal notranslate"><span class="pre">to</span></code>, <code class="docutils literal notranslate"><span class="pre">cuda</span></code>, <code class="docutils literal notranslate"><span class="pre">float</span></code> … preserves memory format</p>
+<p><code class="docutils literal notranslate"><span class="pre">to</span></code>, <code class="docutils literal notranslate"><span class="pre">cuda</span></code>, <code class="docutils literal notranslate"><span class="pre">float</span></code> … 등도 메모리 형식을 보존합니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">():</span>
     <span class="n">y</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">stride</span><span class="p">())</span> <span class="c1"># Ouputs: (3072, 1, 96, 3)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">stride</span><span class="p">())</span> <span class="c1"># 결과: (3072, 1, 96, 3)</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>(3072, 1, 96, 3)
 </pre></div>
 </div>
-<p><code class="docutils literal notranslate"><span class="pre">empty_like</span></code>, <code class="docutils literal notranslate"><span class="pre">*_like</span></code> operators preserves memory format</p>
+<p><code class="docutils literal notranslate"><span class="pre">empty_like</span></code>, <code class="docutils literal notranslate"><span class="pre">*_like</span></code> 연산자도 메모리 형식을 보존합니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">y</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">empty_like</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">stride</span><span class="p">())</span> <span class="c1"># Ouputs: (3072, 1, 96, 3)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">stride</span><span class="p">())</span> <span class="c1"># 결과: (3072, 1, 96, 3)</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>(3072, 1, 96, 3)
 </pre></div>
 </div>
-<p>Pointwise operators preserves memory format</p>
+<p>Pointwise 연산자도 메모리 형식을 보존합니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">z</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">z</span><span class="o">.</span><span class="n">stride</span><span class="p">())</span> <span class="c1"># Ouputs: (3072, 1, 96, 3)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">z</span><span class="o">.</span><span class="n">stride</span><span class="p">())</span> <span class="c1"># 결과: (3072, 1, 96, 3)</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>(3072, 1, 96, 3)
 </pre></div>
 </div>
-<p>Conv, Batchnorm modules support Channels Last
-(only works for CudNN &gt;= 7.6)</p>
+<p>Conv, Batchnorm 모듈은 Channels Last를 지원합니다. (단, CudNN &gt;=7.6 에서만 동작)</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">backends</span><span class="o">.</span><span class="n">cudnn</span><span class="o">.</span><span class="n">version</span><span class="p">()</span> <span class="o">&gt;=</span> <span class="mi">7603</span><span class="p">:</span>
     <span class="nb">input</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cuda&quot;</span><span class="p">,</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">model</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
 
     <span class="nb">input</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">contiguous</span><span class="p">(</span><span class="n">memory_format</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">channels_last</span><span class="p">)</span>
-    <span class="n">model</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">memory_format</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">channels_last</span><span class="p">)</span> <span class="c1"># Module parameters need to be Channels Last</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">memory_format</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">channels_last</span><span class="p">)</span> <span class="c1"># 모듈 인자들은 Channels Last로 변환이 필요합니다</span>
 
     <span class="n">out</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">is_contiguous</span><span class="p">(</span><span class="n">memory_format</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">channels_last</span><span class="p">))</span> <span class="c1"># Ouputs: True</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">is_contiguous</span><span class="p">(</span><span class="n">memory_format</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">channels_last</span><span class="p">))</span> <span class="c1"># 결과: True</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
@@ -437,11 +438,11 @@ last memory formats.</p>
 </pre></div>
 </div>
 </div>
-<div class="section" id="performance-gains">
-<h2>Performance Gains<a class="headerlink" href="#performance-gains" title="Permalink to this headline">¶</a></h2>
-<p>The most significant performance gains are observed on Nvidia’s hardware with
-Tensor Cores support. We were able to archive over 22%  perf gains while running ‘
-AMP (Automated Mixed Precision) training scripts supplied by Nvidia <a class="reference external" href="https://github.com/NVIDIA/apex">https://github.com/NVIDIA/apex</a>.</p>
+<div class="section" id="id1">
+<h2>성능 향상<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<p>Tensor Cores를 지원하는 Nvidia의 하드웨어에서 가장 의미심장한 성능 향상을 보였습니다.
+Nvidia가 제공하는 AMP(Automated Mixed Precision) 학습 스크립트로 22% 이상의 성능 향상을 확인할 수 있었습니다.
+<a class="reference external" href="https://github.com/NVIDIA/apex">https://github.com/NVIDIA/apex</a></p>
 <p><code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">main_amp.py</span> <span class="pre">-a</span> <span class="pre">resnet50</span> <span class="pre">--b</span> <span class="pre">200</span> <span class="pre">--workers</span> <span class="pre">16</span> <span class="pre">--opt-level</span> <span class="pre">O2</span>&#160; <span class="pre">./data</span></code></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># opt_level = O2</span>
 <span class="c1"># keep_batchnorm_fp32 = None &lt;class &#39;NoneType&#39;&gt;</span>
@@ -476,7 +477,7 @@ AMP (Automated Mixed Precision) training scripts supplied by Nvidia <a class="re
 <span class="c1"># Epoch: [0][80/125] Time 0.260 (0.335) Speed 770.324 (597.659) Loss 2.2505953312 (1.0879) Prec@1 50.500 (52.938) Prec@5 100.000 (100.000)</span>
 </pre></div>
 </div>
-<p>Passing <code class="docutils literal notranslate"><span class="pre">--channels-last</span> <span class="pre">true</span></code> allows running a model in Channels Last format with observed 22% perf gain.</p>
+<p><code class="docutils literal notranslate"><span class="pre">--channels-last</span> <span class="pre">true</span></code> 인자를 전달하여 Channels Last 형식으로 모델을 실행하면 22%의 성능 향상을 보입니다.</p>
 <p><code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">main_amp.py</span> <span class="pre">-a</span> <span class="pre">resnet50</span> <span class="pre">--b</span> <span class="pre">200</span> <span class="pre">--workers</span> <span class="pre">16</span> <span class="pre">--opt-level</span> <span class="pre">O2</span> <span class="pre">--channels-last</span> <span class="pre">true</span> <span class="pre">./data</span></code></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># opt_level = O2</span>
 <span class="c1"># keep_batchnorm_fp32 = None &lt;class &#39;NoneType&#39;&gt;</span>
@@ -515,26 +516,25 @@ AMP (Automated Mixed Precision) training scripts supplied by Nvidia <a class="re
 <span class="c1"># Epoch: [0][80/125] Time 0.198 (0.269) Speed 1011.827 (743.883) Loss 2.8196096420 (2.4011) Prec@1 47.500 (50.938) Prec@5 100.000 (100.000)</span>
 </pre></div>
 </div>
-<p>The following list of models has the full support of Channels Last and showing 8%-35% perf gains on Volta devices:
+<p>아래 목록의 모델들은 Channels Last 형식을 전적으로 지원(full support)하며 Volta 장비에서 8%-35%의 성능 향상을 보입니다:
 <code class="docutils literal notranslate"><span class="pre">alexnet</span></code>, <code class="docutils literal notranslate"><span class="pre">mnasnet0_5</span></code>, <code class="docutils literal notranslate"><span class="pre">mnasnet0_75</span></code>, <code class="docutils literal notranslate"><span class="pre">mnasnet1_0</span></code>, <code class="docutils literal notranslate"><span class="pre">mnasnet1_3</span></code>, <code class="docutils literal notranslate"><span class="pre">mobilenet_v2</span></code>, <code class="docutils literal notranslate"><span class="pre">resnet101</span></code>, <code class="docutils literal notranslate"><span class="pre">resnet152</span></code>, <code class="docutils literal notranslate"><span class="pre">resnet18</span></code>, <code class="docutils literal notranslate"><span class="pre">resnet34</span></code>, <code class="docutils literal notranslate"><span class="pre">resnet50</span></code>, <code class="docutils literal notranslate"><span class="pre">resnext50_32x4d</span></code>, <code class="docutils literal notranslate"><span class="pre">shufflenet_v2_x0_5</span></code>, <code class="docutils literal notranslate"><span class="pre">shufflenet_v2_x1_0</span></code>, <code class="docutils literal notranslate"><span class="pre">shufflenet_v2_x1_5</span></code>, <code class="docutils literal notranslate"><span class="pre">shufflenet_v2_x2_0</span></code>, <code class="docutils literal notranslate"><span class="pre">squeezenet1_0</span></code>, <code class="docutils literal notranslate"><span class="pre">squeezenet1_1</span></code>, <code class="docutils literal notranslate"><span class="pre">vgg11</span></code>, <code class="docutils literal notranslate"><span class="pre">vgg11_bn</span></code>, <code class="docutils literal notranslate"><span class="pre">vgg13</span></code>, <code class="docutils literal notranslate"><span class="pre">vgg13_bn</span></code>, <code class="docutils literal notranslate"><span class="pre">vgg16</span></code>, <code class="docutils literal notranslate"><span class="pre">vgg16_bn</span></code>, <code class="docutils literal notranslate"><span class="pre">vgg19</span></code>, <code class="docutils literal notranslate"><span class="pre">vgg19_bn</span></code>, <code class="docutils literal notranslate"><span class="pre">wide_resnet101_2</span></code>, <code class="docutils literal notranslate"><span class="pre">wide_resnet50_2</span></code></p>
 </div>
-<div class="section" id="converting-existing-models">
-<h2>Converting existing models<a class="headerlink" href="#converting-existing-models" title="Permalink to this headline">¶</a></h2>
-<p>Channels Last support not limited by existing models, as any model can be converted to Channels Last and propagate format through the graph as soon as input formatted correctly.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Need to be done once, after model initialization (or load)</span>
-<span class="n">model</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">memory_format</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">channels_last</span><span class="p">)</span> <span class="c1"># Replace with your model</span>
+<div class="section" id="id2">
+<h2>기존 모델들 변환하기<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<p>Channels Last 지원은 기존 모델이 무엇이냐에 따라 제한되지 않으며, 어떠한 모델도 Channels Last로 변환할 수 있으며
+입력(input)의 형식만 맞춰주면 (신경망) 그래프를 통해 바로 전파(propagate)할 수 있습니다.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># 모델을 초기화한(또는 불러온) 이후, 한 번 실행이 필요합니다.</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">memory_format</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">channels_last</span><span class="p">)</span> <span class="c1"># 원하는 모델로 교체하기</span>
 
-<span class="c1"># Need to be done for every input</span>
-<span class="nb">input</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">memory_format</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">channels_last</span><span class="p">)</span> <span class="c1"># Replace with your input</span>
+<span class="c1"># 모든 입력에 대해서 실행이 필요합니다.</span>
+<span class="nb">input</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">memory_format</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">channels_last</span><span class="p">)</span> <span class="c1"># 원하는 입력으로 교체하기</span>
 <span class="n">output</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>However, not all operators fully converted to support Channels Last (usually returning
-contiguous output instead). That means you need to verify the list of used operators
-against supported operators list <a class="reference external" href="https://github.com/pytorch/pytorch/wiki/Operators-with-Channels-Last-support">https://github.com/pytorch/pytorch/wiki/Operators-with-Channels-Last-support</a>,
-or introduce memory format checks into eager execution mode and run your model.</p>
-<p>After running the code below, operators will raise an exception if the output of the
-operator doesn’t match the memory format of the input.</p>
+<p>그러나, 모든 연산자들이 Channels Last를 지원하도록 완전히 바뀐 것은 아닙니다(일반적으로는 연속적인 출력을 대신 반환합니다).
+즉, Channel Last 지원 연산자 목록 <a class="reference external" href="https://github.com/pytorch/pytorch/wiki/Operators-with-Channels-Last-support">https://github.com/pytorch/pytorch/wiki/Operators-with-Channels-Last-support</a> 에서 사용한 연산자들이 존재하는지 확인하거나,
+eager 실행 모드에서 메모리 형식 검사를 도입하고 모델을 실행해야 합니다.</p>
+<p>아래 코드에서, 연산자들의 출력이 입력의 메모리 형식과 일치하지 않으면 예외(exception)를 발생시킵니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">contains_cl</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
     <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
@@ -604,25 +604,28 @@ operator doesn’t match the memory format of the input.</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Optional
-&#39;_Optional&#39; object has no attribute &#39;__name__&#39;
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>List
+__name__
+Optional
+&#39;_SpecialForm&#39; object has no attribute &#39;__name__&#39;
+Set
+__name__
 </pre></div>
 </div>
-<p>If you found an operator that doesn’t support Channels Last tensors
-and you want to contribute, feel free to use following developers
-guide <a class="reference external" href="https://github.com/pytorch/pytorch/wiki/Writing-memory-format-aware-operators">https://github.com/pytorch/pytorch/wiki/Writing-memory-format-aware-operators</a>.</p>
+<p>만약 Channels Last 텐서를 지원하지 않는 연산자를 발견하였고, 기여하기를 원한다면
+다음 개발 문서를 참고해주세요.
+<a class="reference external" href="https://github.com/pytorch/pytorch/wiki/Writing-memory-format-aware-operators">https://github.com/pytorch/pytorch/wiki/Writing-memory-format-aware-operators</a></p>
 </div>
-<div class="section" id="work-to-do">
-<h2>Work to do<a class="headerlink" href="#work-to-do" title="Permalink to this headline">¶</a></h2>
-<p>There are still many things to do, such as:</p>
+<div class="section" id="id3">
+<h2>해야할 일<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
+<p>다음과 같이 여전히 해야 할 일이 많이 남아있습니다:</p>
 <ul class="simple">
-<li><p>Resolving ambiguity of N1HW and NC11 Tensors;</p></li>
-<li><p>Testing of Distributed Training support;</p></li>
-<li><p>Improving operators coverage.</p></li>
+<li><p>N1HW와 NC11 Tensors의 모호성 해결하기;</p></li>
+<li><p>분산 학습을 지원하는지 확인하기;</p></li>
+<li><p>연산자 범위(operators coverage) 개선(improve)하기</p></li>
 </ul>
-<p>If you have feedback and/or suggestions for improvement, please let us
-know by creating <a class="reference external" href="https://github.com/pytorch/pytorch/issues">an issue</a>.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.100 seconds)</p>
+<p>개선할 부분에 대한 피드백 또는 제안이 있다면 <a class="reference external" href="https://github.com/pytorch/pytorch/issues">이슈를 만들어</a> 알려주세요.</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.105 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-intermediate-memory-format-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/591028d309d0401740cd71eb6b14bf93/memory_format_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">memory_format_tutorial.py</span></code></a></p>
@@ -685,12 +688,12 @@ know by creating <a class="reference external" href="https://github.com/pytorch/
           <div class="pytorch-right-menu" id="pytorch-right-menu">
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
-<li><a class="reference internal" href="#">(beta) Channels Last Memory Format in PyTorch</a><ul>
-<li><a class="reference internal" href="#what-is-channels-last">What is Channels Last</a></li>
-<li><a class="reference internal" href="#memory-format-api">Memory Format API</a></li>
-<li><a class="reference internal" href="#performance-gains">Performance Gains</a></li>
-<li><a class="reference internal" href="#converting-existing-models">Converting existing models</a></li>
-<li><a class="reference internal" href="#work-to-do">Work to do</a></li>
+<li><a class="reference internal" href="#">(실험용) PyTorch를 사용한 Channels Last Memory Format</a><ul>
+<li><a class="reference internal" href="#channels-last">Channels Last가 무엇인가요</a></li>
+<li><a class="reference internal" href="#memory-format-api">메모리 형식(Memory Format) API</a></li>
+<li><a class="reference internal" href="#id1">성능 향상</a></li>
+<li><a class="reference internal" href="#id2">기존 모델들 변환하기</a></li>
+<li><a class="reference internal" href="#id3">해야할 일</a></li>
 </ul>
 </li>
 </ul>
@@ -708,11 +711,9 @@ know by creating <a class="reference external" href="https://github.com/pytorch/
 
      
        <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-         <script type="text/javascript" src="../_static/jquery.js"></script>
-         <script type="text/javascript" src="../_static/underscore.js"></script>
-         <script type="text/javascript" src="../_static/doctools.js"></script>
-         <script type="text/javascript" src="../_static/language_data.js"></script>
-         <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+         <script src="../_static/jquery.js"></script>
+         <script src="../_static/underscore.js"></script>
+         <script src="../_static/doctools.js"></script>
      
 
   

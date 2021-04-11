@@ -174,7 +174,7 @@
 <p class="caption"><span class="caption-text">프론트엔드 API</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="named_tensor_tutorial.html">(prototype) Introduction to Named Tensors in PyTorch</a></li>
-<li class="toctree-l1"><a class="reference internal" href="memory_format_tutorial.html">(beta) Channels Last Memory Format in PyTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="memory_format_tutorial.html">(실험용) PyTorch를 사용한 Channels Last Memory Format</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_frontend.html">Using the PyTorch C++ Frontend</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_extension.html">Custom C++ and CUDA Extensions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/torch_script_custom_ops.html">Extending TorchScript with Custom C++ Operators</a></li>
@@ -186,7 +186,7 @@
 <p class="caption"><span class="caption-text">모델 최적화</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="pruning_tutorial.html">가지치기 기법(Pruning) 튜토리얼</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../advanced/dynamic_quantization_tutorial.html">(beta) Dynamic Quantization on an LSTM Word Language Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/dynamic_quantization_tutorial.html">(베타) LSTM 기반 단어 단위 언어 모델의 동적 양자화</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/static_quantization_tutorial.html">(beta) Static Quantization with Eager Mode in PyTorch</a></li>
 <li class="toctree-l1"><a class="reference internal" href="quantized_transfer_learning_tutorial.html">(beta) 컴퓨터 비전(Vision) 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
@@ -315,11 +315,11 @@
 <span class="kn">from</span> <span class="nn">threading</span> <span class="kn">import</span> <span class="n">Lock</span>
 
 <span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">import</span> <span class="nn">torch.distributed.autograd</span> <span class="kn">as</span> <span class="nn">dist_autograd</span>
-<span class="kn">import</span> <span class="nn">torch.distributed.rpc</span> <span class="kn">as</span> <span class="nn">rpc</span>
-<span class="kn">import</span> <span class="nn">torch.multiprocessing</span> <span class="kn">as</span> <span class="nn">mp</span>
-<span class="kn">import</span> <span class="nn">torch.nn</span> <span class="kn">as</span> <span class="nn">nn</span>
-<span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="kn">as</span> <span class="nn">F</span>
+<span class="kn">import</span> <span class="nn">torch.distributed.autograd</span> <span class="k">as</span> <span class="nn">dist_autograd</span>
+<span class="kn">import</span> <span class="nn">torch.distributed.rpc</span> <span class="k">as</span> <span class="nn">rpc</span>
+<span class="kn">import</span> <span class="nn">torch.multiprocessing</span> <span class="k">as</span> <span class="nn">mp</span>
+<span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
+<span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="nn">F</span>
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">optim</span>
 <span class="kn">from</span> <span class="nn">torch.distributed.optim</span> <span class="kn">import</span> <span class="n">DistributedOptimizer</span>
 <span class="kn">from</span> <span class="nn">torchvision</span> <span class="kn">import</span> <span class="n">datasets</span><span class="p">,</span> <span class="n">transforms</span>
@@ -329,11 +329,11 @@
 <span class="k">class</span> <span class="nc">Net</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_gpus</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">Net</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="k">print</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Using {num_gpus} GPUs to train&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Using </span><span class="si">{</span><span class="n">num_gpus</span><span class="si">}</span><span class="s2"> GPUs to train&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">num_gpus</span> <span class="o">=</span> <span class="n">num_gpus</span>
         <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span>
             <span class="s2">&quot;cuda:0&quot;</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_gpus</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
-        <span class="k">print</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Putting first 2 convs on {str(device)}&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Putting first 2 convs on </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">device</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="c1"># Put conv layers on the first cuda device, or CPU if no cuda device</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">conv1</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">conv2</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="mi">32</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
@@ -341,7 +341,7 @@
         <span class="k">if</span> <span class="s2">&quot;cuda&quot;</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">device</span><span class="p">)</span> <span class="ow">and</span> <span class="n">num_gpus</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cuda:1&quot;</span><span class="p">)</span>
 
-        <span class="k">print</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Putting rest of layers on {str(device)}&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Putting rest of layers on </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">device</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dropout1</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Dropout2d</span><span class="p">(</span><span class="mf">0.25</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dropout2</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Dropout2d</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fc1</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">9216</span><span class="p">,</span> <span class="mi">128</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
@@ -435,7 +435,7 @@
 </div>
 <p>Finally, we’ll create methods to initialize our parameter server. Note that there will only be one instance of a parameter server across all processes, and all trainers will talk to the same parameter server and update the same stored model. As seen in <code class="docutils literal notranslate"><span class="pre">run_parameter_server</span></code>, the server itself does not take any independent actions; it waits for requests from trainers (which are yet to be defined) and responds to them by running the requested function.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># The global parameter server instance.</span>
-<span class="n">param_server</span> <span class="o">=</span> <span class="bp">None</span>
+<span class="n">param_server</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="c1"># A lock to ensure we only have one parameter server.</span>
 <span class="n">global_lock</span> <span class="o">=</span> <span class="n">Lock</span><span class="p">()</span>
 
@@ -458,11 +458,11 @@
     <span class="c1"># rpc.shutdown() will wait for all workers to complete by default, which</span>
     <span class="c1"># in this case means that the parameter server will wait for all trainers</span>
     <span class="c1"># to complete, and then exit.</span>
-    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;PS master initializing RPC&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;PS master initializing RPC&quot;</span><span class="p">)</span>
     <span class="n">rpc</span><span class="o">.</span><span class="n">init_rpc</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;parameter_server&quot;</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="n">rank</span><span class="p">,</span> <span class="n">world_size</span><span class="o">=</span><span class="n">world_size</span><span class="p">)</span>
-    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;RPC initialized! Running parameter server...&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;RPC initialized! Running parameter server...&quot;</span><span class="p">)</span>
     <span class="n">rpc</span><span class="o">.</span><span class="n">shutdown</span><span class="p">()</span>
-    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;RPC shutdown on parameter server.&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;RPC shutdown on parameter server.&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Note that above, <code class="docutils literal notranslate"><span class="pre">rpc.shutdown()</span></code> will not immediately shut down the Parameter Server. Instead, it will wait for all workers (trainers in this case) to also call into <code class="docutils literal notranslate"><span class="pre">rpc.shutdown()</span></code>. This gives us the guarantee that the parameter server will not go offline before all trainers (yet to be define) have completed their training process.</p>
@@ -520,7 +520,7 @@
             <span class="n">target</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">model_output</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
             <span class="n">loss</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">nll_loss</span><span class="p">(</span><span class="n">model_output</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">5</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="k">print</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Rank {rank} training batch {i} loss {loss.item()}&quot;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Rank </span><span class="si">{</span><span class="n">rank</span><span class="si">}</span><span class="s2"> training batch </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2"> loss </span><span class="si">{</span><span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="n">dist_autograd</span><span class="o">.</span><span class="n">backward</span><span class="p">(</span><span class="n">cid</span><span class="p">,</span> <span class="p">[</span><span class="n">loss</span><span class="p">])</span>
             <span class="c1"># Ensure that dist autograd ran successfully and gradients were</span>
             <span class="c1"># returned.</span>
@@ -530,8 +530,8 @@
                 <span class="n">cid</span><span class="p">)</span> <span class="o">!=</span> <span class="p">{}</span>
             <span class="n">opt</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">cid</span><span class="p">)</span>
 
-     <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Training complete!&quot;</span><span class="p">)</span>
-     <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Getting accuracy....&quot;</span><span class="p">)</span>
+     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Training complete!&quot;</span><span class="p">)</span>
+     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Getting accuracy....&quot;</span><span class="p">)</span>
      <span class="n">get_accuracy</span><span class="p">(</span><span class="n">test_loader</span><span class="p">,</span> <span class="n">net</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -545,24 +545,24 @@
     <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">test_loader</span><span class="p">):</span>
             <span class="n">out</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-            <span class="n">pred</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdim</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+            <span class="n">pred</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdim</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="n">pred</span><span class="p">,</span> <span class="n">target</span> <span class="o">=</span> <span class="n">pred</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">),</span> <span class="n">target</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
             <span class="n">correct</span> <span class="o">=</span> <span class="n">pred</span><span class="o">.</span><span class="n">eq</span><span class="p">(</span><span class="n">target</span><span class="o">.</span><span class="n">view_as</span><span class="p">(</span><span class="n">pred</span><span class="p">))</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
             <span class="n">correct_sum</span> <span class="o">+=</span> <span class="n">correct</span>
 
-    <span class="k">print</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Accuracy {correct_sum / len(test_loader.dataset)}&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Accuracy </span><span class="si">{</span><span class="n">correct_sum</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">test_loader</span><span class="o">.</span><span class="n">dataset</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Next, similar to how we defined <code class="docutils literal notranslate"><span class="pre">run_parameter_server</span></code> as the main loop for our <code class="docutils literal notranslate"><span class="pre">ParameterServer</span></code> that is responsible for initializing RPC, let’s define a similar loop for our trainers. The difference will be that our trainers must run the training loop we defined above:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Main loop for trainers.</span>
 <span class="k">def</span> <span class="nf">run_worker</span><span class="p">(</span><span class="n">rank</span><span class="p">,</span> <span class="n">world_size</span><span class="p">,</span> <span class="n">num_gpus</span><span class="p">,</span> <span class="n">train_loader</span><span class="p">,</span> <span class="n">test_loader</span><span class="p">):</span>
-    <span class="k">print</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Worker rank {rank} initializing RPC&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Worker rank </span><span class="si">{</span><span class="n">rank</span><span class="si">}</span><span class="s2"> initializing RPC&quot;</span><span class="p">)</span>
     <span class="n">rpc</span><span class="o">.</span><span class="n">init_rpc</span><span class="p">(</span>
-        <span class="n">name</span><span class="o">=</span><span class="n">f</span><span class="s2">&quot;trainer_{rank}&quot;</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;trainer_</span><span class="si">{</span><span class="n">rank</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
         <span class="n">rank</span><span class="o">=</span><span class="n">rank</span><span class="p">,</span>
         <span class="n">world_size</span><span class="o">=</span><span class="n">world_size</span><span class="p">)</span>
 
-    <span class="k">print</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Worker {rank} done initializing RPC&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Worker </span><span class="si">{</span><span class="n">rank</span><span class="si">}</span><span class="s2"> done initializing RPC&quot;</span><span class="p">)</span>
 
     <span class="n">run_training_loop</span><span class="p">(</span><span class="n">rank</span><span class="p">,</span> <span class="n">num_gpus</span><span class="p">,</span> <span class="n">train_loader</span><span class="p">,</span> <span class="n">test_loader</span><span class="p">)</span>
     <span class="n">rpc</span><span class="o">.</span><span class="n">shutdown</span><span class="p">()</span>
@@ -582,7 +582,7 @@
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
         <span class="s2">&quot;rank&quot;</span><span class="p">,</span>
         <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span>
-        <span class="n">default</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Global rank of this process. Pass in 0 for master.&quot;</span><span class="p">)</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
         <span class="s2">&quot;num_gpus&quot;</span><span class="p">,</span>
@@ -604,8 +604,8 @@
 <span class="s2">        provided. Master must be able to accept network traffic on the host and port.&quot;&quot;&quot;</span><span class="p">)</span>
 
     <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
-    <span class="k">assert</span> <span class="n">args</span><span class="o">.</span><span class="n">rank</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">,</span> <span class="s2">&quot;must provide rank argument.&quot;</span>
-    <span class="k">assert</span> <span class="n">args</span><span class="o">.</span><span class="n">num_gpus</span> <span class="o">&lt;=</span> <span class="mi">3</span><span class="p">,</span> <span class="n">f</span><span class="s2">&quot;Only 0-2 GPUs currently supported (got {args.num_gpus}).&quot;</span>
+    <span class="k">assert</span> <span class="n">args</span><span class="o">.</span><span class="n">rank</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;must provide rank argument.&quot;</span>
+    <span class="k">assert</span> <span class="n">args</span><span class="o">.</span><span class="n">num_gpus</span> <span class="o">&lt;=</span> <span class="mi">3</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Only 0-2 GPUs currently supported (got </span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">num_gpus</span><span class="si">}</span><span class="s2">).&quot;</span>
     <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;MASTER_ADDR&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">master_addr</span>
     <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;MASTER_PORT&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">master_port</span>
 </pre></div>
@@ -620,22 +620,22 @@
 <span class="k">else</span><span class="p">:</span>
     <span class="c1"># Get data to train on</span>
     <span class="n">train_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span>
-        <span class="n">datasets</span><span class="o">.</span><span class="n">MNIST</span><span class="p">(</span><span class="s1">&#39;../data&#39;</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+        <span class="n">datasets</span><span class="o">.</span><span class="n">MNIST</span><span class="p">(</span><span class="s1">&#39;../data&#39;</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                        <span class="n">transform</span><span class="o">=</span><span class="n">transforms</span><span class="o">.</span><span class="n">Compose</span><span class="p">([</span>
                            <span class="n">transforms</span><span class="o">.</span><span class="n">ToTensor</span><span class="p">(),</span>
                            <span class="n">transforms</span><span class="o">.</span><span class="n">Normalize</span><span class="p">((</span><span class="mf">0.1307</span><span class="p">,),</span> <span class="p">(</span><span class="mf">0.3081</span><span class="p">,))</span>
                        <span class="p">])),</span>
-        <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="bp">True</span><span class="p">,)</span>
+        <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,)</span>
     <span class="n">test_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span>
         <span class="n">datasets</span><span class="o">.</span><span class="n">MNIST</span><span class="p">(</span>
             <span class="s1">&#39;../data&#39;</span><span class="p">,</span>
-            <span class="n">train</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+            <span class="n">train</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
             <span class="n">transform</span><span class="o">=</span><span class="n">transforms</span><span class="o">.</span><span class="n">Compose</span><span class="p">([</span>
                     <span class="n">transforms</span><span class="o">.</span><span class="n">ToTensor</span><span class="p">(),</span>
                     <span class="n">transforms</span><span class="o">.</span><span class="n">Normalize</span><span class="p">((</span><span class="mf">0.1307</span><span class="p">,),</span> <span class="p">(</span><span class="mf">0.3081</span><span class="p">,))</span>
                         <span class="p">])),</span>
         <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span>
-        <span class="n">shuffle</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+        <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="c1"># start training worker on this node</span>
     <span class="n">p</span> <span class="o">=</span> <span class="n">mp</span><span class="o">.</span><span class="n">Process</span><span class="p">(</span>
@@ -722,11 +722,9 @@
 
      
        <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-         <script type="text/javascript" src="../_static/jquery.js"></script>
-         <script type="text/javascript" src="../_static/underscore.js"></script>
-         <script type="text/javascript" src="../_static/doctools.js"></script>
-         <script type="text/javascript" src="../_static/language_data.js"></script>
-         <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+         <script src="../_static/jquery.js"></script>
+         <script src="../_static/underscore.js"></script>
+         <script src="../_static/doctools.js"></script>
      
 
   

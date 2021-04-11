@@ -174,7 +174,7 @@
 <p class="caption"><span class="caption-text">프론트엔드 API</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/named_tensor_tutorial.html">(prototype) Introduction to Named Tensors in PyTorch</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/memory_format_tutorial.html">(beta) Channels Last Memory Format in PyTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/memory_format_tutorial.html">(실험용) PyTorch를 사용한 Channels Last Memory Format</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_frontend.html">Using the PyTorch C++ Frontend</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_extension.html">Custom C++ and CUDA Extensions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/torch_script_custom_ops.html">Extending TorchScript with Custom C++ Operators</a></li>
@@ -186,7 +186,7 @@
 <p class="caption"><span class="caption-text">모델 최적화</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/pruning_tutorial.html">가지치기 기법(Pruning) 튜토리얼</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../advanced/dynamic_quantization_tutorial.html">(beta) Dynamic Quantization on an LSTM Word Language Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/dynamic_quantization_tutorial.html">(베타) LSTM 기반 단어 단위 언어 모델의 동적 양자화</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/static_quantization_tutorial.html">(beta) Static Quantization with Eager Mode in PyTorch</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/quantized_transfer_learning_tutorial.html">(beta) 컴퓨터 비전(Vision) 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
@@ -334,7 +334,7 @@
 데이터셋 안의 예제 텍스트는 각각의(single) 단어들에 bi-grams 문자열이 더해진 리스트가 될 것입니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torchtext</span>
-<span class="kn">from</span> <span class="nn">torchtext.datasets</span> <span class="k">import</span> <span class="n">text_classification</span>
+<span class="kn">from</span> <span class="nn">torchtext.datasets</span> <span class="kn">import</span> <span class="n">text_classification</span>
 <span class="n">NGRAMS</span> <span class="o">=</span> <span class="mi">2</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="s1">&#39;./.data&#39;</span><span class="p">):</span>
@@ -362,7 +362,7 @@
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
 <span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="nn">F</span>
 <span class="k">class</span> <span class="nc">TextSentiment</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vocab_size</span><span class="p">,</span> <span class="n">embed_dim</span><span class="p">,</span> <span class="n">num_class</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vocab_size</span><span class="p">,</span> <span class="n">embed_dim</span><span class="p">,</span> <span class="n">num_class</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">embedding</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">EmbeddingBag</span><span class="p">(</span><span class="n">vocab_size</span><span class="p">,</span> <span class="n">embed_dim</span><span class="p">,</span> <span class="n">sparse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fc</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">embed_dim</span><span class="p">,</span> <span class="n">num_class</span><span class="p">)</span>
@@ -435,7 +435,7 @@
 읽어올 수 있습니다 (이에 대한 튜토리얼은 <a class="reference external" href="https://tutorials.pytorch.kr/beginner/data_loading_tutorial.html">이 문서</a>
 를 참고하시기 바랍니다). 우리는 여기서 <code class="docutils literal notranslate"><span class="pre">DataLoader</span></code> 를 이용하여
 AG_NEWS 데이터셋을 읽어오고, 이를 모델로 넘겨 학습과 검증을 진행합니다.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="k">import</span> <span class="n">DataLoader</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">DataLoader</span>
 
 <span class="k">def</span> <span class="nf">train_func</span><span class="p">(</span><span class="n">sub_train_</span><span class="p">):</span>
 
@@ -493,7 +493,7 @@ optimizer는 확률적 경사 하강법를 구현해놓은 것입니다. 처음�
 <a class="reference external" href="https://pytorch.org/docs/master/_modules/torch/optim/lr_scheduler.html#StepLR">StepLR</a>
 을 사용합니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
-<span class="kn">from</span> <span class="nn">torch.utils.data.dataset</span> <span class="k">import</span> <span class="n">random_split</span>
+<span class="kn">from</span> <span class="nn">torch.utils.data.dataset</span> <span class="kn">import</span> <span class="n">random_split</span>
 <span class="n">N_EPOCHS</span> <span class="o">=</span> <span class="mi">5</span>
 <span class="n">min_valid_loss</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;inf&#39;</span><span class="p">)</span>
 
@@ -516,26 +516,26 @@ optimizer는 확률적 경사 하강법를 구현해놓은 것입니다. 처음�
     <span class="n">secs</span> <span class="o">=</span> <span class="n">secs</span> <span class="o">%</span> <span class="mi">60</span>
 
     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Epoch: </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span><span class="p">(</span><span class="n">epoch</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="s2">&quot; | time in </span><span class="si">%d</span><span class="s2"> minutes, </span><span class="si">%d</span><span class="s2"> seconds&quot;</span> <span class="o">%</span><span class="p">(</span><span class="n">mins</span><span class="p">,</span> <span class="n">secs</span><span class="p">))</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">Loss: </span><span class="si">{train_loss:.4f}</span><span class="s1">(train)</span><span class="se">\t</span><span class="s1">|</span><span class="se">\t</span><span class="s1">Acc: {train_acc * 100:.1f}%(train)&#39;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">Loss: </span><span class="si">{valid_loss:.4f}</span><span class="s1">(valid)</span><span class="se">\t</span><span class="s1">|</span><span class="se">\t</span><span class="s1">Acc: {valid_acc * 100:.1f}%(valid)&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">Loss: </span><span class="si">{</span><span class="n">train_loss</span><span class="si">:</span><span class="s1">.4f</span><span class="si">}</span><span class="s1">(train)</span><span class="se">\t</span><span class="s1">|</span><span class="se">\t</span><span class="s1">Acc: </span><span class="si">{</span><span class="n">train_acc</span> <span class="o">*</span> <span class="mi">100</span><span class="si">:</span><span class="s1">.1f</span><span class="si">}</span><span class="s1">%(train)&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">Loss: </span><span class="si">{</span><span class="n">valid_loss</span><span class="si">:</span><span class="s1">.4f</span><span class="si">}</span><span class="s1">(valid)</span><span class="se">\t</span><span class="s1">|</span><span class="se">\t</span><span class="s1">Acc: </span><span class="si">{</span><span class="n">valid_acc</span> <span class="o">*</span> <span class="mi">100</span><span class="si">:</span><span class="s1">.1f</span><span class="si">}</span><span class="s1">%(valid)&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Epoch: 1  | time in 0 minutes, 18 seconds
-        Loss: 0.0261(train)     |       Acc: 84.8%(train)
-        Loss: 0.0001(valid)     |       Acc: 89.8%(valid)
-Epoch: 2  | time in 0 minutes, 18 seconds
-        Loss: 0.0119(train)     |       Acc: 93.7%(train)
-        Loss: 0.0001(valid)     |       Acc: 91.0%(valid)
-Epoch: 3  | time in 0 minutes, 18 seconds
-        Loss: 0.0068(train)     |       Acc: 96.5%(train)
-        Loss: 0.0002(valid)     |       Acc: 90.8%(valid)
-Epoch: 4  | time in 0 minutes, 18 seconds
-        Loss: 0.0039(train)     |       Acc: 98.1%(train)
-        Loss: 0.0002(valid)     |       Acc: 91.2%(valid)
-Epoch: 5  | time in 0 minutes, 18 seconds
-        Loss: 0.0022(train)     |       Acc: 99.0%(train)
-        Loss: 0.0002(valid)     |       Acc: 91.4%(valid)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Epoch: 1  | time in 0 minutes, 11 seconds
+        Loss: 0.0262(train)     |       Acc: 84.7%(train)
+        Loss: 0.0000(valid)     |       Acc: 90.2%(valid)
+Epoch: 2  | time in 0 minutes, 12 seconds
+        Loss: 0.0119(train)     |       Acc: 93.6%(train)
+        Loss: 0.0000(valid)     |       Acc: 90.2%(valid)
+Epoch: 3  | time in 0 minutes, 13 seconds
+        Loss: 0.0069(train)     |       Acc: 96.4%(train)
+        Loss: 0.0000(valid)     |       Acc: 91.5%(valid)
+Epoch: 4  | time in 0 minutes, 14 seconds
+        Loss: 0.0039(train)     |       Acc: 98.0%(train)
+        Loss: 0.0000(valid)     |       Acc: 91.2%(valid)
+Epoch: 5  | time in 0 minutes, 14 seconds
+        Loss: 0.0023(train)     |       Acc: 99.0%(train)
+        Loss: 0.0000(valid)     |       Acc: 91.2%(valid)
 </pre></div>
 </div>
 <p>이 모델을 GPU 상에서 수행했을 때 다음과 같은 결과를 얻었습니다.</p>
@@ -569,12 +569,12 @@ Epoch: 5  | time in 0 minutes, 18 seconds
 <h2>평가 데이터로 모델 평가하기<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Checking the results of test dataset...&#39;</span><span class="p">)</span>
 <span class="n">test_loss</span><span class="p">,</span> <span class="n">test_acc</span> <span class="o">=</span> <span class="n">test</span><span class="p">(</span><span class="n">test_dataset</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">Loss: </span><span class="si">{test_loss:.4f}</span><span class="s1">(test)</span><span class="se">\t</span><span class="s1">|</span><span class="se">\t</span><span class="s1">Acc: {test_acc * 100:.1f}%(test)&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">Loss: </span><span class="si">{</span><span class="n">test_loss</span><span class="si">:</span><span class="s1">.4f</span><span class="si">}</span><span class="s1">(test)</span><span class="se">\t</span><span class="s1">|</span><span class="se">\t</span><span class="s1">Acc: </span><span class="si">{</span><span class="n">test_acc</span> <span class="o">*</span> <span class="mi">100</span><span class="si">:</span><span class="s1">.1f</span><span class="si">}</span><span class="s1">%(test)&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Checking the results of test dataset...
-        Loss: 0.0003(test)      |       Acc: 90.8%(test)
+        Loss: 0.0003(test)      |       Acc: 89.7%(test)
 </pre></div>
 </div>
 <p>평가 데이터셋을 통한 결과를 확인합니다…</p>
@@ -593,8 +593,8 @@ Epoch: 5  | time in 0 minutes, 18 seconds
 <a class="reference external" href="https://pytorch.org/text/datasets.html?highlight=ag_news#torchtext.datasets.AG_NEWS">여기에</a>
 나와 있습니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">re</span>
-<span class="kn">from</span> <span class="nn">torchtext.data.utils</span> <span class="k">import</span> <span class="n">ngrams_iterator</span>
-<span class="kn">from</span> <span class="nn">torchtext.data.utils</span> <span class="k">import</span> <span class="n">get_tokenizer</span>
+<span class="kn">from</span> <span class="nn">torchtext.data.utils</span> <span class="kn">import</span> <span class="n">ngrams_iterator</span>
+<span class="kn">from</span> <span class="nn">torchtext.data.utils</span> <span class="kn">import</span> <span class="n">get_tokenizer</span>
 
 <span class="n">ag_news_label</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span> <span class="p">:</span> <span class="s2">&quot;World&quot;</span><span class="p">,</span>
                  <span class="mi">2</span> <span class="p">:</span> <span class="s2">&quot;Sports&quot;</span><span class="p">,</span>
@@ -635,7 +635,7 @@ Epoch: 5  | time in 0 minutes, 18 seconds
 <p>이 튜토리얼에서 사용한 예제 코드는
 <a class="reference external" href="https://github.com/pytorch/text/tree/master/examples/text_classification">여기에서</a>
 확인하실 수 있습니다.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 2 minutes  20.286 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 1 minutes  35.676 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-beginner-text-sentiment-ngrams-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/f003f262713c341f497ab4d8dd9be880/text_sentiment_ngrams_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">text_sentiment_ngrams_tutorial.py</span></code></a></p>
@@ -724,11 +724,9 @@ Epoch: 5  | time in 0 minutes, 18 seconds
 
      
        <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-         <script type="text/javascript" src="../_static/jquery.js"></script>
-         <script type="text/javascript" src="../_static/underscore.js"></script>
-         <script type="text/javascript" src="../_static/doctools.js"></script>
-         <script type="text/javascript" src="../_static/language_data.js"></script>
-         <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+         <script src="../_static/jquery.js"></script>
+         <script src="../_static/underscore.js"></script>
+         <script src="../_static/doctools.js"></script>
      
 
   

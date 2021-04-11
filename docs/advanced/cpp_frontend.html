@@ -31,7 +31,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Custom C++ and CUDA Extensions" href="cpp_extension.html" />
-    <link rel="prev" title="(beta) Channels Last Memory Format in PyTorch" href="../intermediate/memory_format_tutorial.html" /> 
+    <link rel="prev" title="(실험용) PyTorch를 사용한 Channels Last Memory Format" href="../intermediate/memory_format_tutorial.html" /> 
 
   
   <script src="../_static/js/modernizr.min.js"></script>
@@ -174,7 +174,7 @@
 <p class="caption"><span class="caption-text">프론트엔드 API</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/named_tensor_tutorial.html">(prototype) Introduction to Named Tensors in PyTorch</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/memory_format_tutorial.html">(beta) Channels Last Memory Format in PyTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/memory_format_tutorial.html">(실험용) PyTorch를 사용한 Channels Last Memory Format</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Using the PyTorch C++ Frontend</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cpp_extension.html">Custom C++ and CUDA Extensions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="torch_script_custom_ops.html">Extending TorchScript with Custom C++ Operators</a></li>
@@ -186,7 +186,7 @@
 <p class="caption"><span class="caption-text">모델 최적화</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/pruning_tutorial.html">가지치기 기법(Pruning) 튜토리얼</a></li>
-<li class="toctree-l1"><a class="reference internal" href="dynamic_quantization_tutorial.html">(beta) Dynamic Quantization on an LSTM Word Language Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dynamic_quantization_tutorial.html">(베타) LSTM 기반 단어 단위 언어 모델의 동적 양자화</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="static_quantization_tutorial.html">(beta) Static Quantization with Eager Mode in PyTorch</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/quantized_transfer_learning_tutorial.html">(beta) 컴퓨터 비전(Vision) 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
@@ -551,7 +551,7 @@ Python interface:</p>
 <p>In C++, it would look like this:</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;torch/torch.h&gt;</span><span class="cp"></span>
 
-<span class="k">struct</span> <span class="nl">Net</span> <span class="p">:</span> <span class="n">torch</span><span class="o">::</span><span class="n">nn</span><span class="o">::</span><span class="n">Module</span> <span class="p">{</span>
+<span class="k">struct</span> <span class="nc">Net</span> <span class="o">:</span> <span class="n">torch</span><span class="o">::</span><span class="n">nn</span><span class="o">::</span><span class="n">Module</span> <span class="p">{</span>
   <span class="n">Net</span><span class="p">(</span><span class="kt">int64_t</span> <span class="n">N</span><span class="p">,</span> <span class="kt">int64_t</span> <span class="n">M</span><span class="p">)</span> <span class="p">{</span>
     <span class="n">W</span> <span class="o">=</span> <span class="n">register_parameter</span><span class="p">(</span><span class="s">&quot;W&quot;</span><span class="p">,</span> <span class="n">torch</span><span class="o">::</span><span class="n">randn</span><span class="p">({</span><span class="n">N</span><span class="p">,</span> <span class="n">M</span><span class="p">}));</span>
     <span class="n">b</span> <span class="o">=</span> <span class="n">register_parameter</span><span class="p">(</span><span class="s">&quot;b&quot;</span><span class="p">,</span> <span class="n">torch</span><span class="o">::</span><span class="n">randn</span><span class="p">(</span><span class="n">M</span><span class="p">));</span>
@@ -593,7 +593,7 @@ assigned as an attribute of a module:</p>
 <p>This allows, for example, to use the <code class="docutils literal notranslate"><span class="pre">parameters()</span></code> method to recursively
 access all parameters in our module hierarchy:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">net</span> <span class="o">=</span> <span class="n">Net</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">net</span><span class="o">.</span><span class="n">parameters</span><span class="p">()))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">net</span><span class="o">.</span><span class="n">parameters</span><span class="p">()))</span>
 <span class="go">[Parameter containing:</span>
 <span class="go">tensor([0.0808, 0.8613, 0.2017, 0.5206, 0.5353], requires_grad=True), Parameter containing:</span>
 <span class="go">tensor([[-0.3740, -0.0976, -0.4786, -0.4928],</span>
@@ -606,13 +606,13 @@ access all parameters in our module hierarchy:</p>
 </div>
 <p>To register submodules in C++, use the aptly named <code class="docutils literal notranslate"><span class="pre">register_module()</span></code> method
 to register a module like <code class="docutils literal notranslate"><span class="pre">torch::nn::Linear</span></code>:</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">struct</span> <span class="nl">Net</span> <span class="p">:</span> <span class="n">torch</span><span class="o">::</span><span class="n">nn</span><span class="o">::</span><span class="n">Module</span> <span class="p">{</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">struct</span> <span class="nc">Net</span> <span class="o">:</span> <span class="n">torch</span><span class="o">::</span><span class="n">nn</span><span class="o">::</span><span class="n">Module</span> <span class="p">{</span>
   <span class="n">Net</span><span class="p">(</span><span class="kt">int64_t</span> <span class="n">N</span><span class="p">,</span> <span class="kt">int64_t</span> <span class="n">M</span><span class="p">)</span>
       <span class="o">:</span> <span class="n">linear</span><span class="p">(</span><span class="n">register_module</span><span class="p">(</span><span class="s">&quot;linear&quot;</span><span class="p">,</span> <span class="n">torch</span><span class="o">::</span><span class="n">nn</span><span class="o">::</span><span class="n">Linear</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">M</span><span class="p">)))</span> <span class="p">{</span>
     <span class="n">another_bias</span> <span class="o">=</span> <span class="n">register_parameter</span><span class="p">(</span><span class="s">&quot;b&quot;</span><span class="p">,</span> <span class="n">torch</span><span class="o">::</span><span class="n">randn</span><span class="p">(</span><span class="n">M</span><span class="p">));</span>
   <span class="p">}</span>
   <span class="n">torch</span><span class="o">::</span><span class="n">Tensor</span> <span class="n">forward</span><span class="p">(</span><span class="n">torch</span><span class="o">::</span><span class="n">Tensor</span> <span class="n">input</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="n">linear</span><span class="p">(</span><span class="n">input</span><span class="p">)</span> <span class="o">+</span> <span class="n">another_bias</span><span class="p">;</span>
+    <span class="k">return</span> <span class="nf">linear</span><span class="p">(</span><span class="n">input</span><span class="p">)</span> <span class="o">+</span> <span class="n">another_bias</span><span class="p">;</span>
   <span class="p">}</span>
   <span class="n">torch</span><span class="o">::</span><span class="n">nn</span><span class="o">::</span><span class="n">Linear</span> <span class="n">linear</span><span class="p">;</span>
   <span class="n">torch</span><span class="o">::</span><span class="n">Tensor</span> <span class="n">another_bias</span><span class="p">;</span>
@@ -747,7 +747,7 @@ using <em>either</em> value semantics <em>or</em> reference semantics. The first
 simplest and was shown in the examples thus far: module objects are allocated on
 the stack and when passed to a function, can be either copied, moved (with
 <code class="docutils literal notranslate"><span class="pre">std::move</span></code>) or taken by reference or by pointer:</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">struct</span> <span class="nl">Net</span> <span class="p">:</span> <span class="n">torch</span><span class="o">::</span><span class="n">nn</span><span class="o">::</span><span class="n">Module</span> <span class="p">{</span> <span class="p">};</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">struct</span> <span class="nc">Net</span> <span class="o">:</span> <span class="n">torch</span><span class="o">::</span><span class="n">nn</span><span class="o">::</span><span class="n">Module</span> <span class="p">{</span> <span class="p">};</span>
 
 <span class="kt">void</span> <span class="nf">a</span><span class="p">(</span><span class="n">Net</span> <span class="n">net</span><span class="p">)</span> <span class="p">{</span> <span class="p">}</span>
 <span class="kt">void</span> <span class="nf">b</span><span class="p">(</span><span class="n">Net</span><span class="o">&amp;</span> <span class="n">net</span><span class="p">)</span> <span class="p">{</span> <span class="p">}</span>
@@ -766,7 +766,7 @@ the stack and when passed to a function, can be either copied, moved (with
 The advantage of reference semantics is that, like in Python, it reduces the
 cognitive overhead of thinking about how modules must be passed to functions and
 how arguments must be declared (assuming you use <code class="docutils literal notranslate"><span class="pre">shared_ptr</span></code> everywhere).</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">struct</span> <span class="nl">Net</span> <span class="p">:</span> <span class="n">torch</span><span class="o">::</span><span class="n">nn</span><span class="o">::</span><span class="n">Module</span> <span class="p">{};</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">struct</span> <span class="nc">Net</span> <span class="o">:</span> <span class="n">torch</span><span class="o">::</span><span class="n">nn</span><span class="o">::</span><span class="n">Module</span> <span class="p">{};</span>
 
 <span class="kt">void</span> <span class="nf">a</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">shared_ptr</span><span class="o">&lt;</span><span class="n">Net</span><span class="o">&gt;</span> <span class="n">net</span><span class="p">)</span> <span class="p">{</span> <span class="p">}</span>
 
@@ -782,7 +782,7 @@ reference semantics over value semantics, even though the latter is more
 design, in order to stay close to the ergonomics of the Python API, relies on
 shared ownership. For example, take our earlier (here shortened) definition of
 <code class="docutils literal notranslate"><span class="pre">Net</span></code>:</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">struct</span> <span class="nl">Net</span> <span class="p">:</span> <span class="n">torch</span><span class="o">::</span><span class="n">nn</span><span class="o">::</span><span class="n">Module</span> <span class="p">{</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">struct</span> <span class="nc">Net</span> <span class="o">:</span> <span class="n">torch</span><span class="o">::</span><span class="n">nn</span><span class="o">::</span><span class="n">Module</span> <span class="p">{</span>
   <span class="n">Net</span><span class="p">(</span><span class="kt">int64_t</span> <span class="n">N</span><span class="p">,</span> <span class="kt">int64_t</span> <span class="n">M</span><span class="p">)</span>
     <span class="o">:</span> <span class="n">linear</span><span class="p">(</span><span class="n">register_module</span><span class="p">(</span><span class="s">&quot;linear&quot;</span><span class="p">,</span> <span class="n">torch</span><span class="o">::</span><span class="n">nn</span><span class="o">::</span><span class="n">Linear</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">M</span><span class="p">)))</span>
   <span class="p">{</span> <span class="p">}</span>
@@ -804,7 +804,7 @@ mention of <code class="docutils literal notranslate"><span class="pre">shared_p
 while retaining reference semantics. To understand how this works, we can take a
 look at a simplified definition of the <code class="docutils literal notranslate"><span class="pre">torch::nn::Linear</span></code> module in the core
 library (the full definition is <a class="reference external" href="https://github.com/pytorch/pytorch/blob/master/torch/csrc/api/include/torch/nn/modules/linear.h">here</a>):</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">struct</span> <span class="nl">LinearImpl</span> <span class="p">:</span> <span class="n">torch</span><span class="o">::</span><span class="n">nn</span><span class="o">::</span><span class="n">Module</span> <span class="p">{</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">struct</span> <span class="nc">LinearImpl</span> <span class="o">:</span> <span class="n">torch</span><span class="o">::</span><span class="n">nn</span><span class="o">::</span><span class="n">Module</span> <span class="p">{</span>
   <span class="n">LinearImpl</span><span class="p">(</span><span class="kt">int64_t</span> <span class="n">in</span><span class="p">,</span> <span class="kt">int64_t</span> <span class="n">out</span><span class="p">);</span>
 
   <span class="n">Tensor</span> <span class="nf">forward</span><span class="p">(</span><span class="k">const</span> <span class="n">Tensor</span><span class="o">&amp;</span> <span class="n">input</span><span class="p">);</span>
@@ -827,7 +827,7 @@ end result is an ownership model that resembles that of the Python API quite
 closely. Reference semantics become the default, but without the extra typing of
 <code class="docutils literal notranslate"><span class="pre">std::shared_ptr</span></code> or <code class="docutils literal notranslate"><span class="pre">std::make_shared</span></code>. For our <code class="docutils literal notranslate"><span class="pre">Net</span></code>, using the module
 holder API looks like this:</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">struct</span> <span class="nl">NetImpl</span> <span class="p">:</span> <span class="n">torch</span><span class="o">::</span><span class="n">nn</span><span class="o">::</span><span class="n">Module</span> <span class="p">{};</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">struct</span> <span class="nc">NetImpl</span> <span class="o">:</span> <span class="n">torch</span><span class="o">::</span><span class="n">nn</span><span class="o">::</span><span class="n">Module</span> <span class="p">{};</span>
 <span class="n">TORCH_MODULE</span><span class="p">(</span><span class="n">Net</span><span class="p">);</span>
 
 <span class="kt">void</span> <span class="nf">a</span><span class="p">(</span><span class="n">Net</span> <span class="n">net</span><span class="p">)</span> <span class="p">{</span> <span class="p">}</span>
@@ -853,7 +853,7 @@ To instead construct the empty holder, you can pass <code class="docutils litera
 constructor of the holder.</p>
 <p>In practice, this means you can use submodules either like shown earlier, where
 the module is registered and constructed in the <em>initializer list</em>:</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">struct</span> <span class="nl">Net</span> <span class="p">:</span> <span class="n">torch</span><span class="o">::</span><span class="n">nn</span><span class="o">::</span><span class="n">Module</span> <span class="p">{</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">struct</span> <span class="nc">Net</span> <span class="o">:</span> <span class="n">torch</span><span class="o">::</span><span class="n">nn</span><span class="o">::</span><span class="n">Module</span> <span class="p">{</span>
   <span class="n">Net</span><span class="p">(</span><span class="kt">int64_t</span> <span class="n">N</span><span class="p">,</span> <span class="kt">int64_t</span> <span class="n">M</span><span class="p">)</span>
     <span class="o">:</span> <span class="n">linear</span><span class="p">(</span><span class="n">register_module</span><span class="p">(</span><span class="s">&quot;linear&quot;</span><span class="p">,</span> <span class="n">torch</span><span class="o">::</span><span class="n">nn</span><span class="o">::</span><span class="n">Linear</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">M</span><span class="p">)))</span>
   <span class="p">{</span> <span class="p">}</span>
@@ -863,7 +863,7 @@ the module is registered and constructed in the <em>initializer list</em>:</p>
 </div>
 <p>or you can first construct the holder with a null pointer and then assign to it
 in the constructor (more familiar for Pythonistas):</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">struct</span> <span class="nl">Net</span> <span class="p">:</span> <span class="n">torch</span><span class="o">::</span><span class="n">nn</span><span class="o">::</span><span class="n">Module</span> <span class="p">{</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">struct</span> <span class="nc">Net</span> <span class="o">:</span> <span class="n">torch</span><span class="o">::</span><span class="n">nn</span><span class="o">::</span><span class="n">Module</span> <span class="p">{</span>
   <span class="n">Net</span><span class="p">(</span><span class="kt">int64_t</span> <span class="n">N</span><span class="p">,</span> <span class="kt">int64_t</span> <span class="n">M</span><span class="p">)</span> <span class="p">{</span>
     <span class="n">linear</span> <span class="o">=</span> <span class="n">register_module</span><span class="p">(</span><span class="s">&quot;linear&quot;</span><span class="p">,</span> <span class="n">torch</span><span class="o">::</span><span class="n">nn</span><span class="o">::</span><span class="n">Linear</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">M</span><span class="p">));</span>
   <span class="p">}</span>
@@ -922,7 +922,7 @@ digits as its output.</p>
 transposed 2D convolutions, batch normalizations and ReLU activation units.
 We explicitly pass inputs (in a functional way) between modules in the
 <code class="docutils literal notranslate"><span class="pre">forward()</span></code> method of a module we define ourselves:</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">struct</span> <span class="nl">DCGANGeneratorImpl</span> <span class="p">:</span> <span class="n">nn</span><span class="o">::</span><span class="n">Module</span> <span class="p">{</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">struct</span> <span class="nc">DCGANGeneratorImpl</span> <span class="o">:</span> <span class="n">nn</span><span class="o">::</span><span class="n">Module</span> <span class="p">{</span>
   <span class="n">DCGANGeneratorImpl</span><span class="p">(</span><span class="kt">int</span> <span class="n">kNoiseSize</span><span class="p">)</span>
       <span class="o">:</span> <span class="n">conv1</span><span class="p">(</span><span class="n">nn</span><span class="o">::</span><span class="n">ConvTranspose2dOptions</span><span class="p">(</span><span class="n">kNoiseSize</span><span class="p">,</span> <span class="mi">256</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
                   <span class="p">.</span><span class="n">bias</span><span class="p">(</span><span class="nb">false</span><span class="p">)),</span>
@@ -1382,12 +1382,12 @@ tensors and display them with matplotlib:</p>
 
 <span class="kn">import</span> <span class="nn">argparse</span>
 
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">torch</span>
 
 
 <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">()</span>
-<span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-i&quot;</span><span class="p">,</span> <span class="s2">&quot;--sample-file&quot;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-i&quot;</span><span class="p">,</span> <span class="s2">&quot;--sample-file&quot;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-o&quot;</span><span class="p">,</span> <span class="s2">&quot;--out-file&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;out.png&quot;</span><span class="p">)</span>
 <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-d&quot;</span><span class="p">,</span> <span class="s2">&quot;--dimension&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
 <span class="n">options</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
@@ -1400,11 +1400,11 @@ tensors and display them with matplotlib:</p>
   <span class="n">array</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
   <span class="n">axis</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">dimension</span><span class="p">,</span> <span class="n">options</span><span class="o">.</span><span class="n">dimension</span><span class="p">,</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">index</span><span class="p">)</span>
   <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;gray&quot;</span><span class="p">)</span>
-  <span class="n">axis</span><span class="o">.</span><span class="n">get_xaxis</span><span class="p">()</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
-  <span class="n">axis</span><span class="o">.</span><span class="n">get_yaxis</span><span class="p">()</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
+  <span class="n">axis</span><span class="o">.</span><span class="n">get_xaxis</span><span class="p">()</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+  <span class="n">axis</span><span class="o">.</span><span class="n">get_yaxis</span><span class="p">()</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
 
 <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">out_file</span><span class="p">)</span>
-<span class="k">print</span><span class="p">(</span><span class="s2">&quot;Saved &quot;</span><span class="p">,</span> <span class="n">options</span><span class="o">.</span><span class="n">out_file</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Saved &quot;</span><span class="p">,</span> <span class="n">options</span><span class="o">.</span><span class="n">out_file</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Let’s now train our model for around 30 epochs:</p>
@@ -1474,7 +1474,7 @@ repository</a>.</p>
         <a href="cpp_extension.html" class="btn btn-neutral float-right" title="Custom C++ and CUDA Extensions" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
       
       
-        <a href="../intermediate/memory_format_tutorial.html" class="btn btn-neutral" title="(beta) Channels Last Memory Format in PyTorch" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
+        <a href="../intermediate/memory_format_tutorial.html" class="btn btn-neutral" title="(실험용) PyTorch를 사용한 Channels Last Memory Format" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
       
     </div>
   
@@ -1555,11 +1555,9 @@ repository</a>.</p>
 
      
        <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-         <script type="text/javascript" src="../_static/jquery.js"></script>
-         <script type="text/javascript" src="../_static/underscore.js"></script>
-         <script type="text/javascript" src="../_static/doctools.js"></script>
-         <script type="text/javascript" src="../_static/language_data.js"></script>
-         <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+         <script src="../_static/jquery.js"></script>
+         <script src="../_static/underscore.js"></script>
+         <script src="../_static/doctools.js"></script>
      
 
   

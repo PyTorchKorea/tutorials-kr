@@ -174,7 +174,7 @@
 <p class="caption"><span class="caption-text">프론트엔드 API</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="named_tensor_tutorial.html">(prototype) Introduction to Named Tensors in PyTorch</a></li>
-<li class="toctree-l1"><a class="reference internal" href="memory_format_tutorial.html">(beta) Channels Last Memory Format in PyTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="memory_format_tutorial.html">(실험용) PyTorch를 사용한 Channels Last Memory Format</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_frontend.html">Using the PyTorch C++ Frontend</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_extension.html">Custom C++ and CUDA Extensions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/torch_script_custom_ops.html">Extending TorchScript with Custom C++ Operators</a></li>
@@ -186,7 +186,7 @@
 <p class="caption"><span class="caption-text">모델 최적화</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="pruning_tutorial.html">가지치기 기법(Pruning) 튜토리얼</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../advanced/dynamic_quantization_tutorial.html">(beta) Dynamic Quantization on an LSTM Word Language Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/dynamic_quantization_tutorial.html">(베타) LSTM 기반 단어 단위 언어 모델의 동적 양자화</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/static_quantization_tutorial.html">(beta) Static Quantization with Eager Mode in PyTorch</a></li>
 <li class="toctree-l1"><a class="reference internal" href="quantized_transfer_learning_tutorial.html">(beta) 컴퓨터 비전(Vision) 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
@@ -353,8 +353,8 @@ The policy code is mostly borrowed from the existing single-thread
 <a class="reference external" href="https://github.com/pytorch/examples/blob/master/reinforcement_learning">example</a>
 as shown below. We will skip details of the <code class="docutils literal notranslate"><span class="pre">Policy</span></code> design, and focus on RPC
 usages.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch.nn</span> <span class="kn">as</span> <span class="nn">nn</span>
-<span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="kn">as</span> <span class="nn">F</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
+<span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="nn">F</span>
 
 <span class="k">class</span> <span class="nc">Policy</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
 
@@ -410,7 +410,7 @@ instead of building the best solver for CartPole. So, let’s keep the logic
 simple and the two steps explicit in this example.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">argparse</span>
 <span class="kn">import</span> <span class="nn">gym</span>
-<span class="kn">import</span> <span class="nn">torch.distributed.rpc</span> <span class="kn">as</span> <span class="nn">rpc</span>
+<span class="kn">import</span> <span class="nn">torch.distributed.rpc</span> <span class="k">as</span> <span class="nn">rpc</span>
 
 <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span>
     <span class="n">description</span><span class="o">=</span><span class="s2">&quot;RPC Reinforcement Learning Example&quot;</span><span class="p">,</span>
@@ -460,11 +460,11 @@ lifetime, and guarantees the remote data object will not be deleted as long as
 there is any live user of that <code class="docutils literal notranslate"><span class="pre">RRef</span></code>. Please refer to the <code class="docutils literal notranslate"><span class="pre">RRef</span></code>
 <a class="reference external" href="https://pytorch.org/docs/master/notes/rref.html">design doc</a> for details.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">gym</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 <span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">import</span> <span class="nn">torch.distributed.rpc</span> <span class="kn">as</span> <span class="nn">rpc</span>
-<span class="kn">import</span> <span class="nn">torch.optim</span> <span class="kn">as</span> <span class="nn">optim</span>
+<span class="kn">import</span> <span class="nn">torch.distributed.rpc</span> <span class="k">as</span> <span class="nn">rpc</span>
+<span class="kn">import</span> <span class="nn">torch.optim</span> <span class="k">as</span> <span class="nn">optim</span>
 <span class="kn">from</span> <span class="nn">torch.distributed.rpc</span> <span class="kn">import</span> <span class="n">RRef</span><span class="p">,</span> <span class="n">rpc_async</span><span class="p">,</span> <span class="n">remote</span>
 <span class="kn">from</span> <span class="nn">torch.distributions</span> <span class="kn">import</span> <span class="n">Categorical</span>
 
@@ -583,7 +583,7 @@ available in the <a class="reference external" href="https://pytorch.org/docs/ma
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">count</span>
 
-<span class="kn">import</span> <span class="nn">torch.multiprocessing</span> <span class="kn">as</span> <span class="nn">mp</span>
+<span class="kn">import</span> <span class="nn">torch.multiprocessing</span> <span class="k">as</span> <span class="nn">mp</span>
 
 <span class="n">AGENT_NAME</span> <span class="o">=</span> <span class="s2">&quot;agent&quot;</span>
 <span class="n">OBSERVER_NAME</span><span class="o">=</span><span class="s2">&quot;obs&quot;</span>
@@ -603,11 +603,11 @@ available in the <a class="reference external" href="https://pytorch.org/docs/ma
             <span class="n">last_reward</span> <span class="o">=</span> <span class="n">agent</span><span class="o">.</span><span class="n">finish_episode</span><span class="p">()</span>
 
             <span class="k">if</span> <span class="n">i_episode</span> <span class="o">%</span> <span class="n">args</span><span class="o">.</span><span class="n">log_interval</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Episode {}</span><span class="se">\t</span><span class="s1">Last reward: {:.2f}</span><span class="se">\t</span><span class="s1">Average reward: {:.2f}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Episode </span><span class="si">{}</span><span class="se">\t</span><span class="s1">Last reward: </span><span class="si">{:.2f}</span><span class="se">\t</span><span class="s1">Average reward: </span><span class="si">{:.2f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                       <span class="n">i_episode</span><span class="p">,</span> <span class="n">last_reward</span><span class="p">,</span> <span class="n">agent</span><span class="o">.</span><span class="n">running_reward</span><span class="p">))</span>
 
             <span class="k">if</span> <span class="n">agent</span><span class="o">.</span><span class="n">running_reward</span> <span class="o">&gt;</span> <span class="n">agent</span><span class="o">.</span><span class="n">reward_threshold</span><span class="p">:</span>
-                <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Solved! Running reward is now {}!&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">agent</span><span class="o">.</span><span class="n">running_reward</span><span class="p">))</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Solved! Running reward is now </span><span class="si">{}</span><span class="s2">!&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">agent</span><span class="o">.</span><span class="n">running_reward</span><span class="p">))</span>
                 <span class="k">break</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="c1"># other ranks are the observer</span>
@@ -622,7 +622,7 @@ available in the <a class="reference external" href="https://pytorch.org/docs/ma
     <span class="n">run_worker</span><span class="p">,</span>
     <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">world_size</span><span class="p">,</span> <span class="p">),</span>
     <span class="n">nprocs</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">world_size</span><span class="p">,</span>
-    <span class="n">join</span><span class="o">=</span><span class="bp">True</span>
+    <span class="n">join</span><span class="o">=</span><span class="kc">True</span>
 <span class="p">)</span>
 </pre></div>
 </div>
@@ -847,7 +847,7 @@ accumulate to the same set of <code class="docutils literal notranslate"><span c
                 <span class="c1"># not necessary to zero grads since they are</span>
                 <span class="c1"># accumulated into the distributed autograd context</span>
                 <span class="c1"># which is reset every iteration.</span>
-        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Training epoch {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">epoch</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Training epoch </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">epoch</span><span class="p">))</span>
 </pre></div>
 </div>
 <p>Finally, let’s add some glue code to launch the parameter server and the trainer
@@ -869,7 +869,7 @@ processes.</p>
 
 <span class="k">if</span> <span class="vm">__name__</span><span class="o">==</span><span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
     <span class="n">world_size</span> <span class="o">=</span> <span class="mi">2</span>
-    <span class="n">mp</span><span class="o">.</span><span class="n">spawn</span><span class="p">(</span><span class="n">run_worker</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">world_size</span><span class="p">,</span> <span class="p">),</span> <span class="n">nprocs</span><span class="o">=</span><span class="n">world_size</span><span class="p">,</span> <span class="n">join</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">mp</span><span class="o">.</span><span class="n">spawn</span><span class="p">(</span><span class="n">run_worker</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">world_size</span><span class="p">,</span> <span class="p">),</span> <span class="n">nprocs</span><span class="o">=</span><span class="n">world_size</span><span class="p">,</span> <span class="n">join</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -945,11 +945,9 @@ processes.</p>
 
      
        <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-         <script type="text/javascript" src="../_static/jquery.js"></script>
-         <script type="text/javascript" src="../_static/underscore.js"></script>
-         <script type="text/javascript" src="../_static/doctools.js"></script>
-         <script type="text/javascript" src="../_static/language_data.js"></script>
-         <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+         <script src="../_static/jquery.js"></script>
+         <script src="../_static/underscore.js"></script>
+         <script src="../_static/doctools.js"></script>
      
 
   

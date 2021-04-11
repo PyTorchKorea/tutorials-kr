@@ -174,7 +174,7 @@
 <p class="caption"><span class="caption-text">프론트엔드 API</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="named_tensor_tutorial.html">(prototype) Introduction to Named Tensors in PyTorch</a></li>
-<li class="toctree-l1"><a class="reference internal" href="memory_format_tutorial.html">(beta) Channels Last Memory Format in PyTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="memory_format_tutorial.html">(실험용) PyTorch를 사용한 Channels Last Memory Format</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_frontend.html">Using the PyTorch C++ Frontend</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_extension.html">Custom C++ and CUDA Extensions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/torch_script_custom_ops.html">Extending TorchScript with Custom C++ Operators</a></li>
@@ -186,7 +186,7 @@
 <p class="caption"><span class="caption-text">모델 최적화</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="pruning_tutorial.html">가지치기 기법(Pruning) 튜토리얼</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../advanced/dynamic_quantization_tutorial.html">(beta) Dynamic Quantization on an LSTM Word Language Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/dynamic_quantization_tutorial.html">(베타) LSTM 기반 단어 단위 언어 모델의 동적 양자화</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/static_quantization_tutorial.html">(beta) Static Quantization with Eager Mode in PyTorch</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">(beta) 컴퓨터 비전(Vision) 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
@@ -305,27 +305,26 @@
 <a class="reference external" href="https://colab.research.google.com/github/pytorch/tutorials/blob/gh-pages/_downloads/quantized_transfer_learning_tutorial.ipynb">Colab 버전</a>.
 이를 통해 아래에 제시된 정보로 실험을 해 볼 수 있습니다.</p>
 </div>
-<p><strong>Author</strong>: <a class="reference external" href="https://github.com/z-a-f">Zafar Takhirov</a></p>
-<p><strong>Reviewed by</strong>: <a class="reference external" href="https://github.com/raghuramank100">Raghuraman Krishnamoorthi</a></p>
-<p><strong>Edited by</strong>: <a class="reference external" href="https://github.com/jlin27">Jessica Lin</a></p>
-<p><strong>번역</strong>: <a class="reference external" href="https://github.com/jjeamin">정재민</a></p>
+<p><strong>Author</strong>: <a class="reference external" href="https://github.com/z-a-f">Zafar Takhirov</a>
+<strong>Reviewed by</strong>: <a class="reference external" href="https://github.com/raghuramank100">Raghuraman Krishnamoorthi</a>
+<strong>Edited by</strong>: <a class="reference external" href="https://github.com/jlin27">Jessica Lin</a>
+<strong>번역</strong>: <a class="reference external" href="https://github.com/jjeamin">정재민</a></p>
 <p>이 튜토리얼은 <a class="reference external" href="https://chsasank.github.io/">Sasank Chilamkurthy</a> 가 작성한 원본
 <a class="reference external" href="https://pytorch.org/tutorials/beginner/transfer_learning_tutorial.html">PyTorch Transfer Learning</a> 을 기반으로 합니다.</p>
 <p>전이학습(Transfer learning)은 다른 데이터셋에 적용하기 위해서 미리 학습된 모델을 사용하는 기술을 말합니다.
 전이학습을 사용하는 2가지 주요 방법이 있습니다.</p>
-<ol class="arabic simple">
+<ol class="arabic">
 <li><p><strong>고정 된 특징 추출기로써 ConvNet</strong>: 여기서는 마지막 몇개의 계층(일명 “헤드(the head)”, 일반적으로 완전히 연결된 계층)
 을 제외하고 네트워크의 모든 매개 변수 가중치를 <a class="reference external" href="https://arxiv.org/abs/1706.04983">“고정(freeze)”</a> 합니다.
 마지막 계층은 임의의 가중치로 초기화된 새로운 계층으로 대체되며 오직 이 계층만 학습됩니다.</p></li>
-</ol>
-<p>2. <strong>ConvNet 미세조정(Finetuning)</strong>: 랜덤 초기화 대신, 미리 학습된 네트워크를 이용하여 모델을 초기화합니다.
-이후 평소처럼 학습을 진행하지만 다른 데이터셋을 사용합니다.</p>
-<blockquote>
-<div><p>평소처럼 학습이 진행되지만 다른 데이터셋을 사용합니다.</p>
+<li><p><strong>ConvNet 미세조정(Finetuning)</strong>: 랜덤 초기화 대신, 미리 학습된 네트워크를 이용하여 모델을 초기화합니다.
+이후 평소처럼 학습을 진행하지만 다른 데이터셋을 사용합니다.
+평소처럼 학습이 진행되지만 다른 데이터셋을 사용합니다.</p>
 <p>출력의 수가 다를 수 있기 때문에, 일반적으로 신경망에서 헤드(또는 그 일부)는 교체됩니다.
 이 방법에서는 학습률을 더 작은 수로 설정하는 것이 일반적입니다.
 이는 네트워크가 이미 학습되었기 때문이며 새로운 데이터셋으로 “미세조정(finetuning)”하려면 약간의 변경만이 필요합니다.</p>
-</div></blockquote>
+</li>
+</ol>
 <p>또한 위의 두 방법을 결합할 수도 있습니다.
 먼저 특징 추출기를 고정(freeze)하고 헤드(the head)를 학습시킵니다.
 그런 다음 특징 추출기(또는 그 일부)를 고정해제(unfreeze)하고 학습률을
@@ -337,8 +336,8 @@
 데이터 불러오기 / 시각화와 같은 “요구사항(prerequisites)”을 검토하겠습니다.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Imports</span>
 <span class="kn">import</span> <span class="nn">copy</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">time</span>
 
@@ -398,7 +397,7 @@ pip install --pre torch torchvision -f https://download.pytorch.org/whl/nightly/
                                           <span class="n">data_transforms</span><span class="p">[</span><span class="n">x</span><span class="p">])</span>
                   <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;train&#39;</span><span class="p">,</span> <span class="s1">&#39;val&#39;</span><span class="p">]}</span>
 <span class="n">dataloaders</span> <span class="o">=</span> <span class="p">{</span><span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="n">image_datasets</span><span class="p">[</span><span class="n">x</span><span class="p">],</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
-                                              <span class="n">shuffle</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+                                              <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
               <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;train&#39;</span><span class="p">,</span> <span class="s1">&#39;val&#39;</span><span class="p">]}</span>
 <span class="n">dataset_sizes</span> <span class="o">=</span> <span class="p">{</span><span class="n">x</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">image_datasets</span><span class="p">[</span><span class="n">x</span><span class="p">])</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;train&#39;</span><span class="p">,</span> <span class="s1">&#39;val&#39;</span><span class="p">]}</span>
 <span class="n">class_names</span> <span class="o">=</span> <span class="n">image_datasets</span><span class="p">[</span><span class="s1">&#39;train&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">classes</span>
@@ -412,19 +411,19 @@ pip install --pre torch torchvision -f https://download.pytorch.org/whl/nightly/
 <p>데이터 보강을 이해하기 위해 일부 학습용 이미지를 시각화 해보겠습니다.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torchvision</span>
 
-<span class="k">def</span> <span class="nf">imshow</span><span class="p">(</span><span class="n">inp</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">)):</span>
+<span class="k">def</span> <span class="nf">imshow</span><span class="p">(</span><span class="n">inp</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">)):</span>
   <span class="sd">&quot;&quot;&quot;Imshow for Tensor.&quot;&quot;&quot;</span>
   <span class="n">inp</span> <span class="o">=</span> <span class="n">inp</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span><span class="o">.</span><span class="n">transpose</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
   <span class="n">mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.485</span><span class="p">,</span> <span class="mf">0.456</span><span class="p">,</span> <span class="mf">0.406</span><span class="p">])</span>
   <span class="n">std</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.229</span><span class="p">,</span> <span class="mf">0.224</span><span class="p">,</span> <span class="mf">0.225</span><span class="p">])</span>
   <span class="n">inp</span> <span class="o">=</span> <span class="n">std</span> <span class="o">*</span> <span class="n">inp</span> <span class="o">+</span> <span class="n">mean</span>
   <span class="n">inp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">inp</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-  <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+  <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
     <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">)</span>
   <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">inp</span><span class="p">)</span>
   <span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([])</span>
   <span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([])</span>
-  <span class="k">if</span> <span class="n">title</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+  <span class="k">if</span> <span class="n">title</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
 
 <span class="c1"># 학습 데이터의 배치를 얻습니다.</span>
@@ -453,7 +452,7 @@ pip install --pre torch torchvision -f https://download.pytorch.org/whl/nightly/
 <span class="sd">    model: 학습할 모델</span>
 <span class="sd">    criterion: 최적화 기준(손실)</span>
 <span class="sd">    optimizer: 학습에 사용할 옵티마이저</span>
-<span class="sd">    scheduler: ``torch.optim.lr_scheduler``의 인스턴스</span>
+<span class="sd">    scheduler: ``torch.optim.lr_scheduler`` 의 인스턴스</span>
 <span class="sd">    num_epochs: 에폭의 수</span>
 <span class="sd">    device: 학습을 동작시킬 장치. &#39;cpu&#39; 또는 &#39;cuda&#39;여야 합니다.</span>
 <span class="sd">  &quot;&quot;&quot;</span>
@@ -463,8 +462,8 @@ pip install --pre torch torchvision -f https://download.pytorch.org/whl/nightly/
   <span class="n">best_acc</span> <span class="o">=</span> <span class="mf">0.0</span>
 
   <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_epochs</span><span class="p">):</span>
-    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Epoch {}/{}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">epoch</span><span class="p">,</span> <span class="n">num_epochs</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
-    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;-&#39;</span> <span class="o">*</span> <span class="mi">10</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Epoch </span><span class="si">{}</span><span class="s1">/</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">epoch</span><span class="p">,</span> <span class="n">num_epochs</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;-&#39;</span> <span class="o">*</span> <span class="mi">10</span><span class="p">)</span>
 
     <span class="c1"># 각 에폭에는 학습 및 검증 단계가 있습니다.</span>
     <span class="k">for</span> <span class="n">phase</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;train&#39;</span><span class="p">,</span> <span class="s1">&#39;val&#39;</span><span class="p">]:</span>
@@ -505,7 +504,7 @@ pip install --pre torch torchvision -f https://download.pytorch.org/whl/nightly/
       <span class="n">epoch_loss</span> <span class="o">=</span> <span class="n">running_loss</span> <span class="o">/</span> <span class="n">dataset_sizes</span><span class="p">[</span><span class="n">phase</span><span class="p">]</span>
       <span class="n">epoch_acc</span> <span class="o">=</span> <span class="n">running_corrects</span><span class="o">.</span><span class="n">double</span><span class="p">()</span> <span class="o">/</span> <span class="n">dataset_sizes</span><span class="p">[</span><span class="n">phase</span><span class="p">]</span>
 
-      <span class="k">print</span><span class="p">(</span><span class="s1">&#39;{} Loss: {:.4f} Acc: {:.4f}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+      <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> Loss: </span><span class="si">{:.4f}</span><span class="s1"> Acc: </span><span class="si">{:.4f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
         <span class="n">phase</span><span class="p">,</span> <span class="n">epoch_loss</span><span class="p">,</span> <span class="n">epoch_acc</span><span class="p">))</span>
 
       <span class="c1"># 모델 복사하기</span>
@@ -513,12 +512,12 @@ pip install --pre torch torchvision -f https://download.pytorch.org/whl/nightly/
         <span class="n">best_acc</span> <span class="o">=</span> <span class="n">epoch_acc</span>
         <span class="n">best_model_wts</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">state_dict</span><span class="p">())</span>
 
-    <span class="k">print</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">()</span>
 
   <span class="n">time_elapsed</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">since</span>
-  <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Training complete in {:.0f}m {:.0f}s&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+  <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Training complete in </span><span class="si">{:.0f}</span><span class="s1">m </span><span class="si">{:.0f}</span><span class="s1">s&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
     <span class="n">time_elapsed</span> <span class="o">//</span> <span class="mi">60</span><span class="p">,</span> <span class="n">time_elapsed</span> <span class="o">%</span> <span class="mi">60</span><span class="p">))</span>
-  <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Best val Acc: {:4f}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">best_acc</span><span class="p">))</span>
+  <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Best val Acc: </span><span class="si">{:4f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">best_acc</span><span class="p">))</span>
 
   <span class="c1"># 최적의 모델 가중치 불러오기</span>
   <span class="n">model</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">best_model_wts</span><span class="p">)</span>
@@ -546,7 +545,7 @@ pip install --pre torch torchvision -f https://download.pytorch.org/whl/nightly/
       <span class="k">for</span> <span class="n">jdx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">imgs</span><span class="o">.</span><span class="n">size</span><span class="p">()[</span><span class="mi">0</span><span class="p">]):</span>
         <span class="n">imshow</span><span class="p">(</span><span class="n">imgs</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">jdx</span><span class="p">],</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="n">current_row</span><span class="p">,</span> <span class="n">current_col</span><span class="p">])</span>
         <span class="n">ax</span><span class="p">[</span><span class="n">current_row</span><span class="p">,</span> <span class="n">current_col</span><span class="p">]</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;off&#39;</span><span class="p">)</span>
-        <span class="n">ax</span><span class="p">[</span><span class="n">current_row</span><span class="p">,</span> <span class="n">current_col</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;predicted: {}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">class_names</span><span class="p">[</span><span class="n">preds</span><span class="p">[</span><span class="n">jdx</span><span class="p">]]))</span>
+        <span class="n">ax</span><span class="p">[</span><span class="n">current_row</span><span class="p">,</span> <span class="n">current_col</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;predicted: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">class_names</span><span class="p">[</span><span class="n">preds</span><span class="p">[</span><span class="n">jdx</span><span class="p">]]))</span>
 
         <span class="n">current_col</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="k">if</span> <span class="n">current_col</span> <span class="o">&gt;=</span> <span class="n">cols</span><span class="p">:</span>
@@ -566,12 +565,12 @@ pip install --pre torch torchvision -f https://download.pytorch.org/whl/nightly/
 학습합니다. 부동 소수점 모델과 다르게 양자화된 모델에는 학습 가능한 매개 변수가 없으므로
 requires_grad = False를 설정할 필요가 없습니다. 자세한 내용은 <a class="reference external" href="https://pytorch.org/docs/stable/quantization.html">설명서</a> 를 참조하세요.</p>
 <p>미리 학습된 모델을 불러옵니다: 이번 예제에서는 <a class="reference external" href="https://pytorch.org/hub/pytorch_vision_resnet/">ResNet-18</a> 을 사용할 것입니다.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torchvision.models.quantization</span> <span class="kn">as</span> <span class="nn">models</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torchvision.models.quantization</span> <span class="k">as</span> <span class="nn">models</span>
 
-<span class="c1"># 나중에 사용할 수 있게 `fc`에 필터의 수가 필요합니다.</span>
+<span class="c1"># 나중에 사용할 수 있게 `fc` 에 필터의 수가 필요합니다.</span>
 <span class="c1"># 여기서 각 출력 샘플의 크기는 2로 설정합니다.</span>
 <span class="c1"># 또한, nn.Linear(num_ftrs, len(class_names))로 일반화 할 수 있습니다.</span>
-<span class="n">model_fe</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">resnet18</span><span class="p">(</span><span class="n">pretrained</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">quantize</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">model_fe</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">resnet18</span><span class="p">(</span><span class="n">pretrained</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">quantize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">num_ftrs</span> <span class="o">=</span> <span class="n">model_fe</span><span class="o">.</span><span class="n">fc</span><span class="o">.</span><span class="n">in_features</span>
 </pre></div>
 </div>
@@ -579,7 +578,7 @@ requires_grad = False를 설정할 필요가 없습니다. 자세한 내용은 <
 그러나 특징 추출기만 사용하기 때문에 역양자화 계층은 선형 계층(헤드) 바로 전으로 이동시켜야 합니다.
 가장 쉬운 방법은 모델을 <code class="docutils literal notranslate"><span class="pre">nn.Sequential</span></code> 모듈로 감싸는 것입니다.</p>
 <p>첫번째 단계는 ResNet 모델에서 특징 추출기를 분리하는 것입니다.
-이 예제에서는 <a href="#id10"><span class="problematic" id="id11">``</span></a>fc``를 제외한 모든 계층을 특징 추출기로 사용해야 하지만, 실제로는 필요한 만큼 많은 부분을 사용할 수 있습니다.
+이 예제에서는 <code class="docutils literal notranslate"><span class="pre">fc</span></code> 를 제외한 모든 계층을 특징 추출기로 사용해야 하지만, 실제로는 필요한 만큼 많은 부분을 사용할 수 있습니다.
 이것은 합성곱 계층 중 일부를 교체하려는 경우에도 유용합니다.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -624,7 +623,7 @@ requires_grad = False를 설정할 필요가 없습니다. 자세한 내용은 <
 <p>현재 양자화된 모델은 CPU에서만 실행할 수 있습니다.
 그러나 모델의 양자화 되지 않은 부분은 GPU로 보낼 수 있습니다.</p>
 </div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch.optim</span> <span class="kn">as</span> <span class="nn">optim</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch.optim</span> <span class="k">as</span> <span class="nn">optim</span>
 <span class="n">new_model</span> <span class="o">=</span> <span class="n">create_combined_model</span><span class="p">(</span><span class="n">model_fe</span><span class="p">)</span>
 <span class="n">new_model</span> <span class="o">=</span> <span class="n">new_model</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s1">&#39;cpu&#39;</span><span class="p">)</span>
 
@@ -637,8 +636,8 @@ requires_grad = False를 설정할 필요가 없습니다. 자세한 내용은 <
 <span class="n">exp_lr_scheduler</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">lr_scheduler</span><span class="o">.</span><span class="n">StepLR</span><span class="p">(</span><span class="n">optimizer_ft</span><span class="p">,</span> <span class="n">step_size</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">gamma</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="section" id="id12">
-<h3>학습과 평가<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id10">
+<h3>학습과 평가<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h3>
 <p>이 단계는 CPU에서 약 15 ~ 25분 걸립니다. 양자화된 모델은 CPU에서만 실행되기 때문에
 GPU에서는 훈련을 실행할 수 없습니다.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">new_model</span> <span class="o">=</span> <span class="n">train_model</span><span class="p">(</span><span class="n">new_model</span><span class="p">,</span> <span class="n">criterion</span><span class="p">,</span> <span class="n">optimizer_ft</span><span class="p">,</span> <span class="n">exp_lr_scheduler</span><span class="p">,</span>
@@ -685,7 +684,7 @@ GPU에서는 훈련을 실행할 수 없습니다.</p>
 <p>랜덤 초기화 때문에 여러분의 결과가 튜토리얼에 표시된 결과와 다를 수 있습니다.</p>
 </div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># `quantize=False` 를 주목하세요</span>
-<span class="n">model</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">resnet18</span><span class="p">(</span><span class="n">pretrained</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">quantize</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">resnet18</span><span class="p">(</span><span class="n">pretrained</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">quantize</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="n">num_ftrs</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">fc</span><span class="o">.</span><span class="n">in_features</span>
 
 <span class="c1"># 1 단계</span>
@@ -695,17 +694,17 @@ GPU에서는 훈련을 실행할 수 없습니다.</p>
 <span class="n">model_ft</span> <span class="o">=</span> <span class="n">create_combined_model</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
 <span class="n">model_ft</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">qconfig</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">quantization</span><span class="o">.</span><span class="n">default_qat_qconfig</span>  <span class="c1"># Use default QAT configuration</span>
 <span class="c1"># 3 단계</span>
-<span class="n">model_ft</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">quantization</span><span class="o">.</span><span class="n">prepare_qat</span><span class="p">(</span><span class="n">model_ft</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">model_ft</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">quantization</span><span class="o">.</span><span class="n">prepare_qat</span><span class="p">(</span><span class="n">model_ft</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="section" id="id13">
-<h3>모델 미세조정<a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id11">
+<h3>모델 미세조정<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h3>
 <p>현재 튜토리얼에서는 전체 모델이 미세조정 되었습니다.
 일반적으로 이것은 더 높은 정확도로 이어질 것입니다.
 그러나 여기서는 크기가 작은 학습용 데이터셋을 사용했기 때문에 결국 과적합하게 됩니다.</p>
 <p>4 단계. 모델 미세조정하기</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">model_ft</span><span class="o">.</span><span class="n">parameters</span><span class="p">():</span>
-  <span class="n">param</span><span class="o">.</span><span class="n">requires_grad</span> <span class="o">=</span> <span class="bp">True</span>
+  <span class="n">param</span><span class="o">.</span><span class="n">requires_grad</span> <span class="o">=</span> <span class="kc">True</span>
 
 <span class="n">model_ft</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>  <span class="c1"># GPU에서 미세조정(Finetuning) 할 수 있습니다.</span>
 
@@ -726,7 +725,7 @@ GPU에서는 훈련을 실행할 수 없습니다.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch.quantization</span> <span class="kn">import</span> <span class="n">convert</span>
 <span class="n">model_ft_tuned</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span>
 
-<span class="n">model_quantized_and_trained</span> <span class="o">=</span> <span class="n">convert</span><span class="p">(</span><span class="n">model_ft_tuned</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<span class="n">model_quantized_and_trained</span> <span class="o">=</span> <span class="n">convert</span><span class="p">(</span><span class="n">model_ft_tuned</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>양자화된 모델이 일부 이미지에서 어떻게 동작하는지 살펴보겠습니다.</p>
@@ -801,11 +800,11 @@ GPU에서는 훈련을 실행할 수 없습니다.</p>
 </ul>
 </li>
 <li><a class="reference internal" href="#quantized-feature-extractor">파트 1. 양자화된 특징 추출기(Quantized Feature Extractor)를 기반으로 사용자 지정 분류기 훈련하기</a><ul>
-<li><a class="reference internal" href="#id12">학습과 평가</a></li>
+<li><a class="reference internal" href="#id10">학습과 평가</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#finetuning">파트 2. 양자화 가능한 모델 미세조정(Finetuning)</a><ul>
-<li><a class="reference internal" href="#id13">모델 미세조정</a></li>
+<li><a class="reference internal" href="#id11">모델 미세조정</a></li>
 </ul>
 </li>
 </ul>
@@ -825,11 +824,9 @@ GPU에서는 훈련을 실행할 수 없습니다.</p>
 
      
        <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-         <script type="text/javascript" src="../_static/jquery.js"></script>
-         <script type="text/javascript" src="../_static/underscore.js"></script>
-         <script type="text/javascript" src="../_static/doctools.js"></script>
-         <script type="text/javascript" src="../_static/language_data.js"></script>
-         <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+         <script src="../_static/jquery.js"></script>
+         <script src="../_static/underscore.js"></script>
+         <script src="../_static/doctools.js"></script>
      
 
   

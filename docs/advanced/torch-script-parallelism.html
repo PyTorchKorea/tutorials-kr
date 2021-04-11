@@ -174,7 +174,7 @@
 <p class="caption"><span class="caption-text">프론트엔드 API</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/named_tensor_tutorial.html">(prototype) Introduction to Named Tensors in PyTorch</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/memory_format_tutorial.html">(beta) Channels Last Memory Format in PyTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/memory_format_tutorial.html">(실험용) PyTorch를 사용한 Channels Last Memory Format</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cpp_frontend.html">Using the PyTorch C++ Frontend</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cpp_extension.html">Custom C++ and CUDA Extensions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="torch_script_custom_ops.html">Extending TorchScript with Custom C++ Operators</a></li>
@@ -186,7 +186,7 @@
 <p class="caption"><span class="caption-text">모델 최적화</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/pruning_tutorial.html">가지치기 기법(Pruning) 튜토리얼</a></li>
-<li class="toctree-l1"><a class="reference internal" href="dynamic_quantization_tutorial.html">(beta) Dynamic Quantization on an LSTM Word Language Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dynamic_quantization_tutorial.html">(베타) LSTM 기반 단어 단위 언어 모델의 동적 양자화</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="static_quantization_tutorial.html">(beta) Static Quantization with Eager Mode in PyTorch</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/quantized_transfer_learning_tutorial.html">(beta) 컴퓨터 비전(Vision) 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
@@ -318,7 +318,7 @@ in TorchScript. This parallelism has the following properties:</p>
 <span class="k">def</span> <span class="nf">foo</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">neg</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 
-<span class="nd">@torch.jit.script</span>
+<span class="nd">@torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">script</span>
 <span class="k">def</span> <span class="nf">example</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
     <span class="c1"># Call `foo` using parallelism:</span>
     <span class="c1"># First, we &quot;fork&quot; off a task. This task will run `foo` with argument `x`</span>
@@ -336,7 +336,7 @@ in TorchScript. This parallelism has the following properties:</p>
 
     <span class="k">return</span> <span class="n">x_normal</span><span class="p">,</span> <span class="n">x_parallel</span>
 
-<span class="k">print</span><span class="p">(</span><span class="n">example</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">1</span><span class="p">)))</span> <span class="c1"># (-1., -1.)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">example</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">1</span><span class="p">)))</span> <span class="c1"># (-1., -1.)</span>
 </pre></div>
 </div>
 <p><code class="docutils literal notranslate"><span class="pre">fork()</span></code> takes the callable <code class="docutils literal notranslate"><span class="pre">fn</span></code> and arguments to that callable <code class="docutils literal notranslate"><span class="pre">args</span></code>
@@ -356,7 +356,7 @@ constructs like loops:</p>
 <span class="k">def</span> <span class="nf">foo</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">neg</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 
-<span class="nd">@torch.jit.script</span>
+<span class="nd">@torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">script</span>
 <span class="k">def</span> <span class="nf">example</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
     <span class="n">futures</span> <span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">Future</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100</span><span class="p">):</span>
@@ -368,7 +368,7 @@ constructs like loops:</p>
 
     <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">results</span><span class="p">))</span>
 
-<span class="k">print</span><span class="p">(</span><span class="n">example</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">([])))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">example</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">([])))</span>
 </pre></div>
 </div>
 <div class="admonition note">
@@ -447,7 +447,7 @@ ensemble of bidirectional LSTM layers.</p>
 <span class="c1"># Let&#39;s see how fast it runs!</span>
 <span class="n">s</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
 <span class="n">ens</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-<span class="k">print</span><span class="p">(</span><span class="s1">&#39;Inference took&#39;</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">s</span><span class="p">,</span> <span class="s1">&#39; seconds&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Inference took&#39;</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">s</span><span class="p">,</span> <span class="s1">&#39; seconds&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>On my machine, this network runs in <code class="docutils literal notranslate"><span class="pre">2.05</span></code> seconds. We can do a lot better!</p>
@@ -488,6 +488,11 @@ cells to be overlapped with each other.</p>
 have for visualizing performance. One important tool is the <a class="reference external" href="https://pytorch.org/docs/stable/autograd.html#profiler">PyTorch profiler</a>.</p>
 <p>Let’s use the profiler along with the Chrome trace export functionality to
 visualize the performance of our parallelized model:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">autograd</span><span class="o">.</span><span class="n">profiler</span><span class="o">.</span><span class="n">profile</span><span class="p">()</span> <span class="k">as</span> <span class="n">prof</span><span class="p">:</span>
+    <span class="n">ens</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="n">prof</span><span class="o">.</span><span class="n">export_chrome_trace</span><span class="p">(</span><span class="s1">&#39;parallel.json&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
 <p>This snippet of code will write out a file named <code class="docutils literal notranslate"><span class="pre">parallel.json</span></code>. If you
 navigate Google Chrome to <code class="docutils literal notranslate"><span class="pre">chrome://tracing</span></code>, click the <code class="docutils literal notranslate"><span class="pre">Load</span></code> button, and
 load in that JSON file, you should see a timeline like the following:</p>
@@ -618,11 +623,9 @@ measurement and visualization tooling available in PyTorch.</p>
 
      
        <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-         <script type="text/javascript" src="../_static/jquery.js"></script>
-         <script type="text/javascript" src="../_static/underscore.js"></script>
-         <script type="text/javascript" src="../_static/doctools.js"></script>
-         <script type="text/javascript" src="../_static/language_data.js"></script>
-         <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+         <script src="../_static/jquery.js"></script>
+         <script src="../_static/underscore.js"></script>
+         <script src="../_static/doctools.js"></script>
      
 
   

@@ -174,7 +174,7 @@
 <p class="caption"><span class="caption-text">프론트엔드 API</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/named_tensor_tutorial.html">(prototype) Introduction to Named Tensors in PyTorch</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/memory_format_tutorial.html">(beta) Channels Last Memory Format in PyTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/memory_format_tutorial.html">(실험용) PyTorch를 사용한 Channels Last Memory Format</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cpp_frontend.html">Using the PyTorch C++ Frontend</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cpp_extension.html">Custom C++ and CUDA Extensions</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Extending TorchScript with Custom C++ Operators</a></li>
@@ -186,7 +186,7 @@
 <p class="caption"><span class="caption-text">모델 최적화</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/pruning_tutorial.html">가지치기 기법(Pruning) 튜토리얼</a></li>
-<li class="toctree-l1"><a class="reference internal" href="dynamic_quantization_tutorial.html">(beta) Dynamic Quantization on an LSTM Word Language Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dynamic_quantization_tutorial.html">(베타) LSTM 기반 단어 단위 언어 모델의 동적 양자화</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="static_quantization_tutorial.html">(beta) Static Quantization with Eager Mode in PyTorch</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/quantized_transfer_learning_tutorial.html">(beta) 컴퓨터 비전(Vision) 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
@@ -564,7 +564,7 @@ get an early sensation of success, we can try running the following code in
 Python:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
 <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">load_library</span><span class="p">(</span><span class="s2">&quot;build/libwarp_perspective.so&quot;</span><span class="p">)</span>
-<span class="k">print</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">my_ops</span><span class="o">.</span><span class="n">warp_perspective</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">my_ops</span><span class="o">.</span><span class="n">warp_perspective</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>If all goes well, this should print something like:</p>
@@ -596,7 +596,7 @@ can also just use it in vanilla eager PyTorch and pass it regular PyTorch
 tensors:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
 <span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">load_library</span><span class="p">(</span><span class="s2">&quot;build/libwarp_perspective.so&quot;</span><span class="p">)</span>
-<span class="k">print</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">my_ops</span><span class="o">.</span><span class="n">warp_perspective</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">32</span><span class="p">,</span> <span class="mi">32</span><span class="p">),</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">)))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">my_ops</span><span class="o">.</span><span class="n">warp_perspective</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">32</span><span class="p">,</span> <span class="mi">32</span><span class="p">),</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">)))</span>
 </pre></div>
 </div>
 <p>producing:</p>
@@ -646,7 +646,7 @@ this is effectively a “frozen” version of the eager PyTorch program, which t
 TorchScript compiler can further analyze, optimize and serialize:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">inputs</span> <span class="o">=</span> <span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">)]</span>
 <span class="n">trace</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">compute</span><span class="p">,</span> <span class="n">inputs</span><span class="p">)</span>
-<span class="k">print</span><span class="p">(</span><span class="n">trace</span><span class="o">.</span><span class="n">graph</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">trace</span><span class="o">.</span><span class="n">graph</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Producing:</p>
@@ -670,7 +670,7 @@ our PyTorch trace as if it were <code class="docutils literal notranslate"><span
 <p>and then trace it as before:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">inputs</span> <span class="o">=</span> <span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">5</span><span class="p">)]</span>
 <span class="n">trace</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">compute</span><span class="p">,</span> <span class="n">inputs</span><span class="p">)</span>
-<span class="k">print</span><span class="p">(</span><span class="n">trace</span><span class="o">.</span><span class="n">graph</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">trace</span><span class="o">.</span><span class="n">graph</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Producing:</p>
@@ -717,7 +717,7 @@ function which does use control flow:</p>
 </div>
 <p>To convert this function from vanilla PyTorch to TorchScript, we annotate it
 with <code class="docutils literal notranslate"><span class="pre">&#64;torch.jit.script</span></code>:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@torch.jit.script</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">script</span>
 <span class="k">def</span> <span class="nf">compute</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
   <span class="k">if</span> <span class="nb">bool</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">42</span><span class="p">):</span>
       <span class="n">z</span> <span class="o">=</span> <span class="mi">5</span>
@@ -757,7 +757,7 @@ representation, which we can inspect in the <code class="docutils literal notran
 function inside of our script code:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">load_library</span><span class="p">(</span><span class="s2">&quot;libwarp_perspective.so&quot;</span><span class="p">)</span>
 
-<span class="nd">@torch.jit.script</span>
+<span class="nd">@torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">script</span>
 <span class="k">def</span> <span class="nf">compute</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
   <span class="k">if</span> <span class="nb">bool</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">42</span><span class="p">):</span>
       <span class="n">z</span> <span class="o">=</span> <span class="mi">5</span>
@@ -842,7 +842,7 @@ equivalents on other platforms.</p>
 <p>Building on the C++ execution tutorial linked above, let’s start with a minimal
 C++ application in one file, <code class="docutils literal notranslate"><span class="pre">main.cpp</span></code> in a different folder from our
 custom operator, that loads and executes a serialized TorchScript model:</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;torch/script.h&gt; // One-stop header.</span><span class="cp"></span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;torch/script.h&gt;</span><span class="c1"> // One-stop header.</span><span class="cp"></span>
 
 <span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp"></span>
 <span class="cp">#include</span> <span class="cpf">&lt;memory&gt;</span><span class="cp"></span>
@@ -851,17 +851,17 @@ custom operator, that loads and executes a serialized TorchScript model:</p>
 <span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
   <span class="k">if</span> <span class="p">(</span><span class="n">argc</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">)</span> <span class="p">{</span>
     <span class="n">std</span><span class="o">::</span><span class="n">cerr</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;usage: example-app &lt;path-to-exported-script-module&gt;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
-    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+    <span class="k">return</span> <span class="mi">-1</span><span class="p">;</span>
   <span class="p">}</span>
 
   <span class="c1">// Deserialize the ScriptModule from a file using torch::jit::load().</span>
-  <span class="n">std</span><span class="o">::</span><span class="n">shared_ptr</span><span class="o">&lt;</span><span class="n">torch</span><span class="o">::</span><span class="n">jit</span><span class="o">::</span><span class="n">script</span><span class="o">::</span><span class="n">Module</span><span class="o">&gt;</span> <span class="n">module</span> <span class="o">=</span> <span class="n">torch</span><span class="o">::</span><span class="n">jit</span><span class="o">::</span><span class="n">load</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
+  <span class="n">std</span><span class="o">::</span><span class="n">shared_ptr</span><span class="o">&lt;</span><span class="n">torch</span><span class="o">::</span><span class="n">jit</span><span class="o">::</span><span class="n">script</span><span class="o">::</span><span class="n">Module</span><span class="o">&gt;</span> <span class="k">module</span> <span class="o">=</span> <span class="n">torch</span><span class="o">::</span><span class="n">jit</span><span class="o">::</span><span class="n">load</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
 
   <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">torch</span><span class="o">::</span><span class="n">jit</span><span class="o">::</span><span class="n">IValue</span><span class="o">&gt;</span> <span class="n">inputs</span><span class="p">;</span>
   <span class="n">inputs</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">torch</span><span class="o">::</span><span class="n">randn</span><span class="p">({</span><span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">}));</span>
   <span class="n">inputs</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">torch</span><span class="o">::</span><span class="n">randn</span><span class="p">({</span><span class="mi">8</span><span class="p">,</span> <span class="mi">5</span><span class="p">}));</span>
 
-  <span class="n">torch</span><span class="o">::</span><span class="n">Tensor</span> <span class="n">output</span> <span class="o">=</span> <span class="n">module</span><span class="o">-&gt;</span><span class="n">forward</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">inputs</span><span class="p">)).</span><span class="n">toTensor</span><span class="p">();</span>
+  <span class="n">torch</span><span class="o">::</span><span class="n">Tensor</span> <span class="n">output</span> <span class="o">=</span> <span class="k">module</span><span class="o">-&gt;</span><span class="n">forward</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">inputs</span><span class="p">)).</span><span class="n">toTensor</span><span class="p">();</span>
 
   <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">output</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
 <span class="p">}</span>
@@ -925,7 +925,7 @@ usage: example_app &lt;path-to-exported-script-module&gt;
 operator:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">load_library</span><span class="p">(</span><span class="s2">&quot;libwarp_perspective.so&quot;</span><span class="p">)</span>
 
-<span class="nd">@torch.jit.script</span>
+<span class="nd">@torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">script</span>
 <span class="k">def</span> <span class="nf">compute</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
   <span class="k">if</span> <span class="nb">bool</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">42</span><span class="p">):</span>
       <span class="n">z</span> <span class="o">=</span> <span class="mi">5</span>
@@ -1127,11 +1127,11 @@ just like <code class="docutils literal notranslate"><span class="pre">torch.ops
     <span class="n">name</span><span class="o">=</span><span class="s2">&quot;warp_perspective&quot;</span><span class="p">,</span>
     <span class="n">sources</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;op.cpp&quot;</span><span class="p">],</span>
     <span class="n">extra_ldflags</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;-lopencv_core&quot;</span><span class="p">,</span> <span class="s2">&quot;-lopencv_imgproc&quot;</span><span class="p">],</span>
-    <span class="n">is_python_module</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
-    <span class="n">verbose</span><span class="o">=</span><span class="bp">True</span>
+    <span class="n">is_python_module</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span>
 <span class="p">)</span>
 
-<span class="k">print</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">my_ops</span><span class="o">.</span><span class="n">warp_perspective</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">my_ops</span><span class="o">.</span><span class="n">warp_perspective</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>This should approximately print:</p>
@@ -1175,11 +1175,11 @@ custom TorchScript operator as a string. For this, use
     <span class="n">name</span><span class="o">=</span><span class="s2">&quot;warp_perspective&quot;</span><span class="p">,</span>
     <span class="n">cpp_sources</span><span class="o">=</span><span class="n">op_source</span><span class="p">,</span>
     <span class="n">extra_ldflags</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;-lopencv_core&quot;</span><span class="p">,</span> <span class="s2">&quot;-lopencv_imgproc&quot;</span><span class="p">],</span>
-    <span class="n">is_python_module</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
-    <span class="n">verbose</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+    <span class="n">is_python_module</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="k">print</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">my_ops</span><span class="o">.</span><span class="n">warp_perspective</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">my_ops</span><span class="o">.</span><span class="n">warp_perspective</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Naturally, it is best practice to only use
@@ -1212,7 +1212,7 @@ this:</p>
             <span class="n">libraries</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;opencv_core&quot;</span><span class="p">,</span> <span class="s2">&quot;opencv_imgproc&quot;</span><span class="p">],</span>
         <span class="p">)</span>
     <span class="p">],</span>
-    <span class="n">cmdclass</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;build_ext&quot;</span><span class="p">:</span> <span class="n">BuildExtension</span><span class="o">.</span><span class="n">with_options</span><span class="p">(</span><span class="n">no_python_abi_suffix</span><span class="o">=</span><span class="bp">True</span><span class="p">)},</span>
+    <span class="n">cmdclass</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;build_ext&quot;</span><span class="p">:</span> <span class="n">BuildExtension</span><span class="o">.</span><span class="n">with_options</span><span class="p">(</span><span class="n">no_python_abi_suffix</span><span class="o">=</span><span class="kc">True</span><span class="p">)},</span>
 <span class="p">)</span>
 </pre></div>
 </div>
@@ -1259,7 +1259,7 @@ pass to <code class="docutils literal notranslate"><span class="pre">torch.ops.l
 visible to TorchScript:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">torch</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">load_library</span><span class="p">(</span><span class="s2">&quot;warp_perspective.so&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">custom</span><span class="o">.</span><span class="n">warp_perspective</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">custom</span><span class="o">.</span><span class="n">warp_perspective</span><span class="p">)</span>
 <span class="go">&lt;built-in method custom::warp_perspective of PyCapsule object at 0x7ff51c5b7bd0&gt;</span>
 </pre></div>
 </div>
@@ -1354,11 +1354,9 @@ visible to TorchScript:</p>
 
      
        <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-         <script type="text/javascript" src="../_static/jquery.js"></script>
-         <script type="text/javascript" src="../_static/underscore.js"></script>
-         <script type="text/javascript" src="../_static/doctools.js"></script>
-         <script type="text/javascript" src="../_static/language_data.js"></script>
-         <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+         <script src="../_static/jquery.js"></script>
+         <script src="../_static/underscore.js"></script>
+         <script src="../_static/doctools.js"></script>
      
 
   

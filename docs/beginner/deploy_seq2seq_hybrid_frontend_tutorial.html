@@ -172,7 +172,7 @@
 <p class="caption"><span class="caption-text">프론트엔드 API</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/named_tensor_tutorial.html">(prototype) Introduction to Named Tensors in PyTorch</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/memory_format_tutorial.html">(beta) Channels Last Memory Format in PyTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/memory_format_tutorial.html">(실험용) PyTorch를 사용한 Channels Last Memory Format</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_frontend.html">Using the PyTorch C++ Frontend</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_extension.html">Custom C++ and CUDA Extensions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/torch_script_custom_ops.html">Extending TorchScript with Custom C++ Operators</a></li>
@@ -184,7 +184,7 @@
 <p class="caption"><span class="caption-text">모델 최적화</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/pruning_tutorial.html">가지치기 기법(Pruning) 튜토리얼</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../advanced/dynamic_quantization_tutorial.html">(beta) Dynamic Quantization on an LSTM Word Language Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/dynamic_quantization_tutorial.html">(베타) LSTM 기반 단어 단위 언어 모델의 동적 양자화</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/static_quantization_tutorial.html">(beta) Static Quantization with Eager Mode in PyTorch</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/quantized_transfer_learning_tutorial.html">(beta) 컴퓨터 비전(Vision) 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
@@ -301,8 +301,8 @@
 </div>
 <div class="sphx-glr-example-title section" id="deploying-a-seq2seq-model-with-torchscript">
 <span id="sphx-glr-beginner-deploy-seq2seq-hybrid-frontend-tutorial-py"></span><h1>Deploying a Seq2Seq Model with TorchScript<a class="headerlink" href="#deploying-a-seq2seq-model-with-torchscript" title="Permalink to this headline">¶</a></h1>
-<p><strong>Author:</strong> <a class="reference external" href="https://github.com/MatthewInkawhich">Matthew Inkawhich</a></p>
-<p>This tutorial will walk through the process of transitioning a
+<p><strong>Author:</strong> <a class="reference external" href="https://github.com/MatthewInkawhich">Matthew Inkawhich</a>
+This tutorial will walk through the process of transitioning a
 sequence-to-sequence model to TorchScript using the TorchScript
 API. The model that we will convert is the chatbot model from the
 <a class="reference external" href="https://pytorch.org/tutorials/beginner/chatbot_tutorial.html">Chatbot tutorial</a>.
@@ -379,10 +379,10 @@ you are planning on using your own model, be sure that the
 <code class="docutils literal notranslate"><span class="pre">MAX_LENGTH</span></code> constant is set correctly. As a reminder, this constant
 defines the maximum allowed sentence length during training and the
 maximum length output that the model is capable of producing.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span>
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">division</span>
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">print_function</span>
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">unicode_literals</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">absolute_import</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">unicode_literals</span>
 
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
@@ -458,7 +458,7 @@ non-letter characters. The <code class="docutils literal notranslate"><span clas
 sentence of words and returns the corresponding sequence of word
 indexes.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Voc</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">trimmed</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">word2index</span> <span class="o">=</span> <span class="p">{}</span>
@@ -544,7 +544,7 @@ script mode. When tracing a module, we can leave the module definition
 as-is. We will initialize all models towards the end of this document
 before we run evaluations.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">EncoderRNN</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">,</span> <span class="n">embedding</span><span class="p">,</span> <span class="n">n_layers</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">dropout</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">,</span> <span class="n">embedding</span><span class="p">,</span> <span class="n">n_layers</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">dropout</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">EncoderRNN</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">n_layers</span> <span class="o">=</span> <span class="n">n_layers</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">hidden_size</span> <span class="o">=</span> <span class="n">hidden_size</span>
@@ -585,7 +585,7 @@ weighted tensor whose largest values represent the most important parts
 of the query sentence at a particular time-step of decoding.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Luong attention layer</span>
 <span class="k">class</span> <span class="nc">Attn</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">Attn</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">=</span> <span class="n">method</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;dot&#39;</span><span class="p">,</span> <span class="s1">&#39;general&#39;</span><span class="p">,</span> <span class="s1">&#39;concat&#39;</span><span class="p">]:</span>
@@ -651,7 +651,7 @@ to select the next word in the output sequence.</p>
 <span class="c1">#</span>
 
 <span class="k">class</span> <span class="nc">LuongAttnDecoderRNN</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attn_model</span><span class="p">,</span> <span class="n">embedding</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">,</span> <span class="n">output_size</span><span class="p">,</span> <span class="n">n_layers</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">dropout</span><span class="o">=</span><span class="mf">0.1</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attn_model</span><span class="p">,</span> <span class="n">embedding</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">,</span> <span class="n">output_size</span><span class="p">,</span> <span class="n">n_layers</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">dropout</span><span class="o">=</span><span class="mf">0.1</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">LuongAttnDecoderRNN</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 
         <span class="c1"># Keep for reference</span>
@@ -792,7 +792,7 @@ by multiplying 1 by our SOS_token value stored in the constant
 </li>
 </ul>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">GreedySearchDecoder</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">encoder</span><span class="p">,</span> <span class="n">decoder</span><span class="p">,</span> <span class="n">decoder_n_layers</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">encoder</span><span class="p">,</span> <span class="n">decoder</span><span class="p">,</span> <span class="n">decoder_n_layers</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">GreedySearchDecoder</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span> <span class="o">=</span> <span class="n">encoder</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span> <span class="o">=</span> <span class="n">decoder</span>
@@ -1073,35 +1073,35 @@ graph, we just need to print the <cite>scripted_searcher</cite> graph</p>
       %input_length.1 : Tensor,
       %max_length.1 : int):
   %51 : bool = prim::Constant[value=0]()
-  %40 : bool = prim::Constant[value=1]() # /home/reserve/Workspace/PyTorch-tutorials-kr/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:566:8
+  %40 : bool = prim::Constant[value=1]() # /home/reserve/Workspace/PyTorch-tutorials-kr/v1.6/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:566:8
   %20 : None = prim::Constant()
-  %17 : int = prim::Constant[value=4]() # /home/reserve/Workspace/PyTorch-tutorials-kr/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:561:68
-  %16 : Device = prim::Constant[value=&quot;cpu&quot;]() # /home/reserve/Workspace/PyTorch-tutorials-kr/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:561:48
-  %13 : int = prim::Constant[value=2]() # /home/reserve/Workspace/PyTorch-tutorials-kr/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:559:41
-  %12 : int = prim::Constant[value=0]() # /home/reserve/Workspace/PyTorch-tutorials-kr/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:559:25
-  %14 : int = prim::Constant[value=1]() # /home/reserve/Workspace/PyTorch-tutorials-kr/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:559:25
+  %17 : int = prim::Constant[value=4]() # /home/reserve/Workspace/PyTorch-tutorials-kr/v1.6/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:561:68
+  %16 : Device = prim::Constant[value=&quot;cpu&quot;]() # /home/reserve/Workspace/PyTorch-tutorials-kr/v1.6/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:561:48
+  %13 : int = prim::Constant[value=2]() # /home/reserve/Workspace/PyTorch-tutorials-kr/v1.6/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:559:41
+  %12 : int = prim::Constant[value=0]() # /home/reserve/Workspace/PyTorch-tutorials-kr/v1.6/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:559:25
+  %14 : int = prim::Constant[value=1]() # /home/reserve/Workspace/PyTorch-tutorials-kr/v1.6/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:559:25
   %4 : __torch__.EncoderRNN = prim::GetAttr[name=&quot;encoder&quot;](%self)
-  %7 : (Tensor, Tensor) = prim::CallMethod[name=&quot;forward&quot;](%4, %input_seq.1, %input_length.1) # /home/reserve/Workspace/PyTorch-tutorials-kr/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:557:42
+  %7 : (Tensor, Tensor) = prim::CallMethod[name=&quot;forward&quot;](%4, %input_seq.1, %input_length.1) # /home/reserve/Workspace/PyTorch-tutorials-kr/v1.6/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:557:42
   %encoder_outputs.1 : Tensor, %encoder_hidden.1 : Tensor = prim::TupleUnpack(%7)
-  %decoder_hidden.1 : Tensor = aten::slice(%encoder_hidden.1, %12, %12, %13, %14) # /home/reserve/Workspace/PyTorch-tutorials-kr/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:559:25
+  %decoder_hidden.1 : Tensor = aten::slice(%encoder_hidden.1, %12, %12, %13, %14) # /home/reserve/Workspace/PyTorch-tutorials-kr/v1.6/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:559:25
   %19 : int[] = prim::ListConstruct(%14, %14)
-  %22 : Tensor = aten::ones(%19, %17, %20, %16, %20) # /home/reserve/Workspace/PyTorch-tutorials-kr/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:561:24
-  %decoder_input.1 : Tensor = aten::mul(%22, %14) # /home/reserve/Workspace/PyTorch-tutorials-kr/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:561:24
+  %22 : Tensor = aten::ones(%19, %17, %20, %16, %20) # /home/reserve/Workspace/PyTorch-tutorials-kr/v1.6/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:561:24
+  %decoder_input.1 : Tensor = aten::mul(%22, %14) # /home/reserve/Workspace/PyTorch-tutorials-kr/v1.6/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:561:24
   %25 : int[] = prim::ListConstruct(%12)
-  %all_tokens.1 : Tensor = aten::zeros(%25, %17, %20, %16, %20) # /home/reserve/Workspace/PyTorch-tutorials-kr/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:563:21
+  %all_tokens.1 : Tensor = aten::zeros(%25, %17, %20, %16, %20) # /home/reserve/Workspace/PyTorch-tutorials-kr/v1.6/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:563:21
   %31 : int[] = prim::ListConstruct(%12)
-  %all_scores.1 : Tensor = aten::zeros(%31, %20, %20, %16, %20) # /home/reserve/Workspace/PyTorch-tutorials-kr/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:564:21
-  %all_tokens : Tensor, %all_scores : Tensor, %decoder_hidden : Tensor, %decoder_input : Tensor = prim::Loop(%max_length.1, %40, %all_tokens.1, %all_scores.1, %decoder_hidden.1, %decoder_input.1) # /home/reserve/Workspace/PyTorch-tutorials-kr/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:566:8
+  %all_scores.1 : Tensor = aten::zeros(%31, %20, %20, %16, %20) # /home/reserve/Workspace/PyTorch-tutorials-kr/v1.6/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:564:21
+  %all_tokens : Tensor, %all_scores : Tensor, %decoder_hidden : Tensor, %decoder_input : Tensor = prim::Loop(%max_length.1, %40, %all_tokens.1, %all_scores.1, %decoder_hidden.1, %decoder_input.1) # /home/reserve/Workspace/PyTorch-tutorials-kr/v1.6/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:566:8
     block0(%41 : int, %all_tokens.6 : Tensor, %all_scores.6 : Tensor, %decoder_hidden.5 : Tensor, %decoder_input.9 : Tensor):
       %42 : __torch__.LuongAttnDecoderRNN = prim::GetAttr[name=&quot;decoder&quot;](%self)
-      %46 : (Tensor, Tensor) = prim::CallMethod[name=&quot;forward&quot;](%42, %decoder_input.9, %decoder_hidden.5, %encoder_outputs.1) # /home/reserve/Workspace/PyTorch-tutorials-kr/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:568:45
+      %46 : (Tensor, Tensor) = prim::CallMethod[name=&quot;forward&quot;](%42, %decoder_input.9, %decoder_hidden.5, %encoder_outputs.1) # /home/reserve/Workspace/PyTorch-tutorials-kr/v1.6/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:568:45
       %decoder_output.1 : Tensor, %decoder_hidden.3 : Tensor = prim::TupleUnpack(%46)
-      %decoder_scores.1 : Tensor, %decoder_input.3 : Tensor = aten::max(%decoder_output.1, %14, %51) # /home/reserve/Workspace/PyTorch-tutorials-kr/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:570:44
+      %decoder_scores.1 : Tensor, %decoder_input.3 : Tensor = aten::max(%decoder_output.1, %14, %51) # /home/reserve/Workspace/PyTorch-tutorials-kr/v1.6/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:570:44
       %59 : Tensor[] = prim::ListConstruct(%all_tokens.6, %decoder_input.3)
-      %all_tokens.3 : Tensor = aten::cat(%59, %12) # /home/reserve/Workspace/PyTorch-tutorials-kr/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:572:25
+      %all_tokens.3 : Tensor = aten::cat(%59, %12) # /home/reserve/Workspace/PyTorch-tutorials-kr/v1.6/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:572:25
       %65 : Tensor[] = prim::ListConstruct(%all_scores.6, %decoder_scores.1)
-      %all_scores.3 : Tensor = aten::cat(%65, %12) # /home/reserve/Workspace/PyTorch-tutorials-kr/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:573:25
-      %decoder_input.7 : Tensor = aten::unsqueeze(%decoder_input.3, %12) # /home/reserve/Workspace/PyTorch-tutorials-kr/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:575:28
+      %all_scores.3 : Tensor = aten::cat(%65, %12) # /home/reserve/Workspace/PyTorch-tutorials-kr/v1.6/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:573:25
+      %decoder_input.7 : Tensor = aten::unsqueeze(%decoder_input.3, %12) # /home/reserve/Workspace/PyTorch-tutorials-kr/v1.6/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:575:28
       -&gt; (%40, %all_tokens.3, %all_scores.3, %decoder_hidden.3, %decoder_input.7)
   %73 : (Tensor, Tensor) = prim::TupleConstruct(%all_tokens, %all_scores)
   return (%73)
@@ -1155,7 +1155,7 @@ of torch.save(model, PATH).</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">scripted_searcher</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s2">&quot;scripted_chatbot.pth&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.768 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.621 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-beginner-deploy-seq2seq-hybrid-frontend-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/b333ee9add2489fe6da06cebde14537a/deploy_seq2seq_hybrid_frontend_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">deploy_seq2seq_hybrid_frontend_tutorial.py</span></code></a></p>
@@ -1266,11 +1266,10 @@ of torch.save(model, PATH).</p>
 
      
        <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-         <script type="text/javascript" src="../_static/jquery.js"></script>
-         <script type="text/javascript" src="../_static/underscore.js"></script>
-         <script type="text/javascript" src="../_static/doctools.js"></script>
-         <script type="text/javascript" src="../_static/language_data.js"></script>
-         <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+         <script src="../_static/jquery.js"></script>
+         <script src="../_static/underscore.js"></script>
+         <script src="../_static/doctools.js"></script>
+         <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
      
 
   

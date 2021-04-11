@@ -174,7 +174,7 @@
 <p class="caption"><span class="caption-text">프론트엔드 API</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/named_tensor_tutorial.html">(prototype) Introduction to Named Tensors in PyTorch</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/memory_format_tutorial.html">(beta) Channels Last Memory Format in PyTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/memory_format_tutorial.html">(실험용) PyTorch를 사용한 Channels Last Memory Format</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cpp_frontend.html">Using the PyTorch C++ Frontend</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cpp_extension.html">Custom C++ and CUDA Extensions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="torch_script_custom_ops.html">Extending TorchScript with Custom C++ Operators</a></li>
@@ -186,7 +186,7 @@
 <p class="caption"><span class="caption-text">모델 최적화</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/pruning_tutorial.html">가지치기 기법(Pruning) 튜토리얼</a></li>
-<li class="toctree-l1"><a class="reference internal" href="dynamic_quantization_tutorial.html">(beta) Dynamic Quantization on an LSTM Word Language Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dynamic_quantization_tutorial.html">(베타) LSTM 기반 단어 단위 언어 모델의 동적 양자화</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="static_quantization_tutorial.html">(beta) Static Quantization with Eager Mode in PyTorch</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/quantized_transfer_learning_tutorial.html">(beta) 컴퓨터 비전(Vision) 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
@@ -322,7 +322,7 @@ state in a member variable.</p>
 <span class="cp">#include</span> <span class="cpf">&lt;vector&gt;</span><span class="cp"></span>
 
 <span class="k">template</span> <span class="o">&lt;</span><span class="k">class</span> <span class="nc">T</span><span class="o">&gt;</span>
-<span class="k">struct</span> <span class="nl">MyStackClass</span> <span class="p">:</span> <span class="n">torch</span><span class="o">::</span><span class="n">CustomClassHolder</span> <span class="p">{</span>
+<span class="k">struct</span> <span class="nc">MyStackClass</span> <span class="o">:</span> <span class="n">torch</span><span class="o">::</span><span class="n">CustomClassHolder</span> <span class="p">{</span>
   <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">stack_</span><span class="p">;</span>
   <span class="n">MyStackClass</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">init</span><span class="p">)</span> <span class="o">:</span> <span class="n">stack_</span><span class="p">(</span><span class="n">init</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span> <span class="n">init</span><span class="p">.</span><span class="n">end</span><span class="p">())</span> <span class="p">{}</span>
 
@@ -494,7 +494,7 @@ demonstrates that:</p>
 <span class="c1"># TorchScript</span>
 <span class="n">torch</span><span class="o">.</span><span class="n">classes</span><span class="o">.</span><span class="n">load_library</span><span class="p">(</span><span class="s2">&quot;build/libcustom_class.so&quot;</span><span class="p">)</span>
 <span class="c1"># You can query the loaded libraries like this:</span>
-<span class="k">print</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">classes</span><span class="o">.</span><span class="n">loaded_libraries</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">classes</span><span class="o">.</span><span class="n">loaded_libraries</span><span class="p">)</span>
 <span class="c1"># prints {&#39;/custom_class_project/build/libcustom_class.so&#39;}</span>
 
 <span class="c1"># We can find and instantiate our custom C++ class in python by using the</span>
@@ -521,7 +521,7 @@ demonstrates that:</p>
 <span class="n">MyStackClass</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">classes</span><span class="o">.</span><span class="n">my_classes</span><span class="o">.</span><span class="n">MyStackClass</span>
 
 
-<span class="nd">@torch.jit.script</span>
+<span class="nd">@torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">script</span>
 <span class="k">def</span> <span class="nf">do_stacks</span><span class="p">(</span><span class="n">s</span><span class="p">:</span> <span class="n">MyStackClass</span><span class="p">):</span>  <span class="c1"># We can pass a custom class instance</span>
     <span class="c1"># We can instantiate the class</span>
     <span class="n">s2</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">classes</span><span class="o">.</span><span class="n">my_classes</span><span class="o">.</span><span class="n">MyStackClass</span><span class="p">([</span><span class="s2">&quot;hi&quot;</span><span class="p">,</span> <span class="s2">&quot;mom&quot;</span><span class="p">])</span>
@@ -558,7 +558,7 @@ instantiates and calls a method on our MyStackClass class:</p>
 
 
 <span class="n">scripted_foo</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">script</span><span class="p">(</span><span class="n">Foo</span><span class="p">())</span>
-<span class="k">print</span><span class="p">(</span><span class="n">scripted_foo</span><span class="o">.</span><span class="n">graph</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">scripted_foo</span><span class="o">.</span><span class="n">graph</span><span class="p">)</span>
 
 <span class="n">scripted_foo</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;foo.pt&#39;</span><span class="p">)</span>
 </pre></div>
@@ -591,18 +591,18 @@ build the custom class into the binary.</p>
 <span class="cp">#include</span> <span class="cpf">&lt;memory&gt;</span><span class="cp"></span>
 
 <span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
-  <span class="n">torch</span><span class="o">::</span><span class="n">jit</span><span class="o">::</span><span class="n">Module</span> <span class="n">module</span><span class="p">;</span>
+  <span class="n">torch</span><span class="o">::</span><span class="n">jit</span><span class="o">::</span><span class="n">Module</span> <span class="k">module</span><span class="p">;</span>
   <span class="k">try</span> <span class="p">{</span>
     <span class="c1">// Deserialize the ScriptModule from a file using torch::jit::load().</span>
-    <span class="n">module</span> <span class="o">=</span> <span class="n">torch</span><span class="o">::</span><span class="n">jit</span><span class="o">::</span><span class="n">load</span><span class="p">(</span><span class="s">&quot;foo.pt&quot;</span><span class="p">);</span>
+    <span class="k">module</span> <span class="o">=</span> <span class="n">torch</span><span class="o">::</span><span class="n">jit</span><span class="o">::</span><span class="n">load</span><span class="p">(</span><span class="s">&quot;foo.pt&quot;</span><span class="p">);</span>
   <span class="p">}</span>
   <span class="k">catch</span> <span class="p">(</span><span class="k">const</span> <span class="n">c10</span><span class="o">::</span><span class="n">Error</span><span class="o">&amp;</span> <span class="n">e</span><span class="p">)</span> <span class="p">{</span>
     <span class="n">std</span><span class="o">::</span><span class="n">cerr</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;error loading the model</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
-    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+    <span class="k">return</span> <span class="mi">-1</span><span class="p">;</span>
   <span class="p">}</span>
 
   <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">c10</span><span class="o">::</span><span class="n">IValue</span><span class="o">&gt;</span> <span class="n">inputs</span> <span class="o">=</span> <span class="p">{</span><span class="s">&quot;foobarbaz&quot;</span><span class="p">};</span>
-  <span class="k">auto</span> <span class="n">output</span> <span class="o">=</span> <span class="n">module</span><span class="p">.</span><span class="n">forward</span><span class="p">(</span><span class="n">inputs</span><span class="p">).</span><span class="n">toString</span><span class="p">();</span>
+  <span class="k">auto</span> <span class="n">output</span> <span class="o">=</span> <span class="k">module</span><span class="p">.</span><span class="n">forward</span><span class="p">(</span><span class="n">inputs</span><span class="p">).</span><span class="n">toString</span><span class="p">();</span>
   <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">output</span><span class="o">-&gt;</span><span class="n">string</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
 <span class="p">}</span>
 </pre></div>
@@ -722,7 +722,7 @@ an attribute, you’ll get the following error:</p>
 <span class="n">scripted_foo</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;foo.pt&#39;</span><span class="p">)</span>
 <span class="n">loaded</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;foo.pt&#39;</span><span class="p">)</span>
 
-<span class="k">print</span><span class="p">(</span><span class="n">loaded</span><span class="o">.</span><span class="n">stack</span><span class="o">.</span><span class="n">pop</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">loaded</span><span class="o">.</span><span class="n">stack</span><span class="o">.</span><span class="n">pop</span><span class="p">())</span>
 </pre></div>
 </div>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ python export_attr.py
@@ -924,11 +924,9 @@ lines between Python, TorchScript and C++ to blend smoothly.</p>
 
      
        <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-         <script type="text/javascript" src="../_static/jquery.js"></script>
-         <script type="text/javascript" src="../_static/underscore.js"></script>
-         <script type="text/javascript" src="../_static/doctools.js"></script>
-         <script type="text/javascript" src="../_static/language_data.js"></script>
-         <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+         <script src="../_static/jquery.js"></script>
+         <script src="../_static/underscore.js"></script>
+         <script src="../_static/doctools.js"></script>
      
 
   

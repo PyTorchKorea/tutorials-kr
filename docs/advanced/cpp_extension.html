@@ -174,7 +174,7 @@
 <p class="caption"><span class="caption-text">프론트엔드 API</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/named_tensor_tutorial.html">(prototype) Introduction to Named Tensors in PyTorch</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/memory_format_tutorial.html">(beta) Channels Last Memory Format in PyTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/memory_format_tutorial.html">(실험용) PyTorch를 사용한 Channels Last Memory Format</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cpp_frontend.html">Using the PyTorch C++ Frontend</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Custom C++ and CUDA Extensions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="torch_script_custom_ops.html">Extending TorchScript with Custom C++ Operators</a></li>
@@ -186,7 +186,7 @@
 <p class="caption"><span class="caption-text">모델 최적화</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/pruning_tutorial.html">가지치기 기법(Pruning) 튜토리얼</a></li>
-<li class="toctree-l1"><a class="reference internal" href="dynamic_quantization_tutorial.html">(beta) Dynamic Quantization on an LSTM Word Language Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dynamic_quantization_tutorial.html">(베타) LSTM 기반 단어 단위 언어 모델의 동적 양자화</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="static_quantization_tutorial.html">(beta) Static Quantization with Eager Mode in PyTorch</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/quantized_transfer_learning_tutorial.html">(beta) 컴퓨터 비전(Vision) 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
@@ -343,7 +343,7 @@ plain PyTorch with Python. For this, we need to subclass
 <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.Module</span></code> and implement the forward pass of the LLTM. This would
 look something like this:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">LLTM</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_features</span><span class="p">,</span> <span class="n">state_size</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_features</span><span class="p">,</span> <span class="n">state_size</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">LLTM</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">input_features</span> <span class="o">=</span> <span class="n">input_features</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">state_size</span> <span class="o">=</span> <span class="n">state_size</span>
@@ -427,8 +427,8 @@ discuss the latter later.</p>
 <p>For the “ahead of time” flavor, we build our C++ extension by writing a
 <code class="docutils literal notranslate"><span class="pre">setup.py</span></code> script that uses setuptools to compile our C++ code. For the LLTM, it
 looks as simple as this:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">setuptools</span> <span class="k">import</span> <span class="n">setup</span><span class="p">,</span> <span class="n">Extension</span>
-<span class="kn">from</span> <span class="nn">torch.utils</span> <span class="k">import</span> <span class="n">cpp_extension</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">setuptools</span> <span class="kn">import</span> <span class="n">setup</span><span class="p">,</span> <span class="n">Extension</span>
+<span class="kn">from</span> <span class="nn">torch.utils</span> <span class="kn">import</span> <span class="n">cpp_extension</span>
 
 <span class="n">setup</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;lltm_cpp&#39;</span><span class="p">,</span>
       <span class="n">ext_modules</span><span class="o">=</span><span class="p">[</span><span class="n">cpp_extension</span><span class="o">.</span><span class="n">CppExtension</span><span class="p">(</span><span class="s1">&#39;lltm_cpp&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;lltm.cpp&#39;</span><span class="p">])],</span>
@@ -710,7 +710,7 @@ class citizens of PyTorch:</p>
 
 
 <span class="k">class</span> <span class="nc">LLTM</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_features</span><span class="p">,</span> <span class="n">state_size</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_features</span><span class="p">,</span> <span class="n">state_size</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">LLTM</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">input_features</span> <span class="o">=</span> <span class="n">input_features</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">state_size</span> <span class="o">=</span> <span class="n">state_size</span>
@@ -845,7 +845,7 @@ elaborate on the latter. The JIT compilation mechanism provides you with a way
 of compiling and loading your extensions on the fly by calling a simple
 function in PyTorch’s API called <code class="xref py py-func docutils literal notranslate"><span class="pre">torch.utils.cpp_extension.load()</span></code>. For
 the LLTM, this would look as simple as this:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch.utils.cpp_extension</span> <span class="k">import</span> <span class="n">load</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch.utils.cpp_extension</span> <span class="kn">import</span> <span class="n">load</span>
 
 <span class="n">lltm_cpp</span> <span class="o">=</span> <span class="n">load</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;lltm_cpp&quot;</span><span class="p">,</span> <span class="n">sources</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;lltm.cpp&quot;</span><span class="p">])</span>
 </pre></div>
@@ -996,7 +996,7 @@ fine). Let’s take a small peek at what this file will look like:</p>
 
 <span class="cp">#include</span> <span class="cpf">&lt;vector&gt;</span><span class="cp"></span>
 
-<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">scalar_t</span><span class="o">&gt;</span>
+<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">scalar_t</span><span class="o">&gt;</span>
 <span class="n">__device__</span> <span class="n">__forceinline__</span> <span class="n">scalar_t</span> <span class="n">sigmoid</span><span class="p">(</span><span class="n">scalar_t</span> <span class="n">z</span><span class="p">)</span> <span class="p">{</span>
   <span class="k">return</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">z</span><span class="p">));</span>
 <span class="p">}</span>
@@ -1006,24 +1006,24 @@ fine). Let’s take a small peek at what this file will look like:</p>
 CUDA-specific declarations like <code class="docutils literal notranslate"><span class="pre">__device__</span></code> and <code class="docutils literal notranslate"><span class="pre">__forceinline__</span></code> and
 functions like <code class="docutils literal notranslate"><span class="pre">exp</span></code>. Let’s continue with a few more helper functions that
 we’ll need:</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">scalar_t</span><span class="o">&gt;</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">scalar_t</span><span class="o">&gt;</span>
 <span class="n">__device__</span> <span class="n">__forceinline__</span> <span class="n">scalar_t</span> <span class="n">d_sigmoid</span><span class="p">(</span><span class="n">scalar_t</span> <span class="n">z</span><span class="p">)</span> <span class="p">{</span>
   <span class="k">const</span> <span class="k">auto</span> <span class="n">s</span> <span class="o">=</span> <span class="n">sigmoid</span><span class="p">(</span><span class="n">z</span><span class="p">);</span>
   <span class="k">return</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">s</span><span class="p">)</span> <span class="o">*</span> <span class="n">s</span><span class="p">;</span>
 <span class="p">}</span>
 
-<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">scalar_t</span><span class="o">&gt;</span>
+<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">scalar_t</span><span class="o">&gt;</span>
 <span class="n">__device__</span> <span class="n">__forceinline__</span> <span class="n">scalar_t</span> <span class="n">d_tanh</span><span class="p">(</span><span class="n">scalar_t</span> <span class="n">z</span><span class="p">)</span> <span class="p">{</span>
   <span class="k">const</span> <span class="k">auto</span> <span class="n">t</span> <span class="o">=</span> <span class="n">tanh</span><span class="p">(</span><span class="n">z</span><span class="p">);</span>
   <span class="k">return</span> <span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="n">t</span> <span class="o">*</span> <span class="n">t</span><span class="p">);</span>
 <span class="p">}</span>
 
-<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">scalar_t</span><span class="o">&gt;</span>
+<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">scalar_t</span><span class="o">&gt;</span>
 <span class="n">__device__</span> <span class="n">__forceinline__</span> <span class="n">scalar_t</span> <span class="n">elu</span><span class="p">(</span><span class="n">scalar_t</span> <span class="n">z</span><span class="p">,</span> <span class="n">scalar_t</span> <span class="n">alpha</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">)</span> <span class="p">{</span>
-  <span class="k">return</span> <span class="n">fmax</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span> <span class="o">+</span> <span class="n">fmin</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">*</span> <span class="p">(</span><span class="n">exp</span><span class="p">(</span><span class="n">z</span><span class="p">)</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">));</span>
+  <span class="k">return</span> <span class="nf">fmax</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span> <span class="o">+</span> <span class="n">fmin</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">*</span> <span class="p">(</span><span class="n">exp</span><span class="p">(</span><span class="n">z</span><span class="p">)</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">));</span>
 <span class="p">}</span>
 
-<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">scalar_t</span><span class="o">&gt;</span>
+<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">scalar_t</span><span class="o">&gt;</span>
 <span class="n">__device__</span> <span class="n">__forceinline__</span> <span class="n">scalar_t</span> <span class="n">d_elu</span><span class="p">(</span><span class="n">scalar_t</span> <span class="n">z</span><span class="p">,</span> <span class="n">scalar_t</span> <span class="n">alpha</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">)</span> <span class="p">{</span>
   <span class="k">const</span> <span class="k">auto</span> <span class="n">e</span> <span class="o">=</span> <span class="n">exp</span><span class="p">(</span><span class="n">z</span><span class="p">);</span>
   <span class="k">const</span> <span class="k">auto</span> <span class="n">d_relu</span> <span class="o">=</span> <span class="n">z</span> <span class="o">&lt;</span> <span class="mf">0.0</span> <span class="o">?</span> <span class="mf">0.0</span> <span class="o">:</span> <span class="mf">1.0</span><span class="p">;</span>
@@ -1054,7 +1054,7 @@ speed up. For the forward pass, the first function should look like this:</p>
   <span class="k">auto</span> <span class="n">candidate_cell</span> <span class="o">=</span> <span class="n">torch</span><span class="o">::</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">old_cell</span><span class="p">);</span>
 
   <span class="k">const</span> <span class="kt">int</span> <span class="n">threads</span> <span class="o">=</span> <span class="mi">1024</span><span class="p">;</span>
-  <span class="k">const</span> <span class="n">dim3</span> <span class="nf">blocks</span><span class="p">((</span><span class="n">state_size</span> <span class="o">+</span> <span class="n">threads</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="n">threads</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">);</span>
+  <span class="k">const</span> <span class="n">dim3</span> <span class="n">blocks</span><span class="p">((</span><span class="n">state_size</span> <span class="o">+</span> <span class="n">threads</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="n">threads</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">);</span>
 
   <span class="n">AT_DISPATCH_FLOATING_TYPES</span><span class="p">(</span><span class="n">gates</span><span class="p">.</span><span class="n">type</span><span class="p">(),</span> <span class="s">&quot;lltm_forward_cuda&quot;</span><span class="p">,</span> <span class="p">([</span><span class="o">&amp;</span><span class="p">]</span> <span class="p">{</span>
     <span class="n">lltm_cuda_forward_kernel</span><span class="o">&lt;</span><span class="n">scalar_t</span><span class="o">&gt;&lt;&lt;&lt;</span><span class="n">blocks</span><span class="p">,</span> <span class="n">threads</span><span class="o">&gt;&gt;&gt;</span><span class="p">(</span>
@@ -1112,7 +1112,7 @@ you’ve never heard of CUDA “blocks” or “grids” before, an <a class="re
 about CUDA</a> may
 help.</p>
 <p>The actual CUDA kernel is fairly simple (if you’ve ever programmed GPUs before):</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">scalar_t</span><span class="o">&gt;</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">scalar_t</span><span class="o">&gt;</span>
 <span class="n">__global__</span> <span class="kt">void</span> <span class="n">lltm_cuda_forward_kernel</span><span class="p">(</span>
     <span class="k">const</span> <span class="n">scalar_t</span><span class="o">*</span> <span class="n">__restrict__</span> <span class="n">gates</span><span class="p">,</span>
     <span class="k">const</span> <span class="n">scalar_t</span><span class="o">*</span> <span class="n">__restrict__</span> <span class="n">old_cell</span><span class="p">,</span>
@@ -1205,7 +1205,7 @@ used. Note also that we’ve used the <code class="docutils literal notranslate"
 sizes and strides in an <code class="docutils literal notranslate"><span class="pre">int32_t</span></code>. This is important as using the 64-bit
 variant (<code class="docutils literal notranslate"><span class="pre">PackedAccessor64</span></code>) can make the kernel slower.</p>
 <p>The function declaration becomes</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">scalar_t</span><span class="o">&gt;</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">scalar_t</span><span class="o">&gt;</span>
 <span class="n">__global__</span> <span class="kt">void</span> <span class="n">lltm_cuda_forward_kernel</span><span class="p">(</span>
     <span class="k">const</span> <span class="n">torch</span><span class="o">::</span><span class="n">PackedTensorAccessor32</span><span class="o">&lt;</span><span class="n">scalar_t</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="n">torch</span><span class="o">::</span><span class="n">RestrictPtrTraits</span><span class="o">&gt;</span> <span class="n">gates</span><span class="p">,</span>
     <span class="k">const</span> <span class="n">torch</span><span class="o">::</span><span class="n">PackedTensorAccessor32</span><span class="o">&lt;</span><span class="n">scalar_t</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="n">torch</span><span class="o">::</span><span class="n">RestrictPtrTraits</span><span class="o">&gt;</span> <span class="n">old_cell</span><span class="p">,</span>
@@ -1252,7 +1252,7 @@ host function.</p>
   <span class="k">auto</span> <span class="n">candidate_cell</span> <span class="o">=</span> <span class="n">torch</span><span class="o">::</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">old_cell</span><span class="p">);</span>
 
   <span class="k">const</span> <span class="kt">int</span> <span class="n">threads</span> <span class="o">=</span> <span class="mi">1024</span><span class="p">;</span>
-  <span class="k">const</span> <span class="n">dim3</span> <span class="nf">blocks</span><span class="p">((</span><span class="n">state_size</span> <span class="o">+</span> <span class="n">threads</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="n">threads</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">);</span>
+  <span class="k">const</span> <span class="n">dim3</span> <span class="n">blocks</span><span class="p">((</span><span class="n">state_size</span> <span class="o">+</span> <span class="n">threads</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="n">threads</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">);</span>
 
   <span class="n">AT_DISPATCH_FLOATING_TYPES</span><span class="p">(</span><span class="n">gates</span><span class="p">.</span><span class="n">type</span><span class="p">(),</span> <span class="s">&quot;lltm_forward_cuda&quot;</span><span class="p">,</span> <span class="p">([</span><span class="o">&amp;</span><span class="p">]</span> <span class="p">{</span>
     <span class="n">lltm_cuda_forward_kernel</span><span class="o">&lt;</span><span class="n">scalar_t</span><span class="o">&gt;&lt;&lt;&lt;</span><span class="n">blocks</span><span class="p">,</span> <span class="n">threads</span><span class="o">&gt;&gt;&gt;</span><span class="p">(</span>
@@ -1271,7 +1271,7 @@ host function.</p>
 </div>
 <p>The backwards pass follows much the same pattern and I won’t elaborate further
 on it:</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">scalar_t</span><span class="o">&gt;</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">scalar_t</span><span class="o">&gt;</span>
 <span class="n">__global__</span> <span class="kt">void</span> <span class="n">lltm_cuda_backward_kernel</span><span class="p">(</span>
     <span class="n">torch</span><span class="o">::</span><span class="n">PackedTensorAccessor32</span><span class="o">&lt;</span><span class="n">scalar_t</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="n">torch</span><span class="o">::</span><span class="n">RestrictPtrTraits</span><span class="o">&gt;</span> <span class="n">d_old_cell</span><span class="p">,</span>
     <span class="n">torch</span><span class="o">::</span><span class="n">PackedTensorAccessor32</span><span class="o">&lt;</span><span class="n">scalar_t</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="n">torch</span><span class="o">::</span><span class="n">RestrictPtrTraits</span><span class="o">&gt;</span> <span class="n">d_gates</span><span class="p">,</span>
@@ -1323,7 +1323,7 @@ on it:</p>
   <span class="k">const</span> <span class="k">auto</span> <span class="n">state_size</span> <span class="o">=</span> <span class="n">new_cell</span><span class="p">.</span><span class="n">size</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
 
   <span class="k">const</span> <span class="kt">int</span> <span class="n">threads</span> <span class="o">=</span> <span class="mi">1024</span><span class="p">;</span>
-  <span class="k">const</span> <span class="n">dim3</span> <span class="nf">blocks</span><span class="p">((</span><span class="n">state_size</span> <span class="o">+</span> <span class="n">threads</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="n">threads</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">);</span>
+  <span class="k">const</span> <span class="n">dim3</span> <span class="n">blocks</span><span class="p">((</span><span class="n">state_size</span> <span class="o">+</span> <span class="n">threads</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="n">threads</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">);</span>
 
   <span class="n">AT_DISPATCH_FLOATING_TYPES</span><span class="p">(</span><span class="n">X</span><span class="p">.</span><span class="n">type</span><span class="p">(),</span> <span class="s">&quot;lltm_forward_cuda&quot;</span><span class="p">,</span> <span class="p">([</span><span class="o">&amp;</span><span class="p">]</span> <span class="p">{</span>
     <span class="n">lltm_cuda_backward_kernel</span><span class="o">&lt;</span><span class="n">scalar_t</span><span class="o">&gt;&lt;&lt;&lt;</span><span class="n">blocks</span><span class="p">,</span> <span class="n">threads</span><span class="o">&gt;&gt;&gt;</span><span class="p">(</span>
@@ -1355,8 +1355,8 @@ on it:</p>
 <h3>Integrating a C++/CUDA Operation with PyTorch<a class="headerlink" href="#integrating-a-c-cuda-operation-with-pytorch" title="Permalink to this headline">¶</a></h3>
 <p>Integration of our CUDA-enabled op with PyTorch is again very straightforward.
 If you want to write a <code class="docutils literal notranslate"><span class="pre">setup.py</span></code> script, it could look like this:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">setuptools</span> <span class="k">import</span> <span class="n">setup</span>
-<span class="kn">from</span> <span class="nn">torch.utils.cpp_extension</span> <span class="k">import</span> <span class="n">BuildExtension</span><span class="p">,</span> <span class="n">CUDAExtension</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">setuptools</span> <span class="kn">import</span> <span class="n">setup</span>
+<span class="kn">from</span> <span class="nn">torch.utils.cpp_extension</span> <span class="kn">import</span> <span class="n">BuildExtension</span><span class="p">,</span> <span class="n">CUDAExtension</span>
 
 <span class="n">setup</span><span class="p">(</span>
     <span class="n">name</span><span class="o">=</span><span class="s1">&#39;lltm&#39;</span><span class="p">,</span>
@@ -1375,7 +1375,7 @@ If you want to write a <code class="docutils literal notranslate"><span class="p
 specify the <code class="docutils literal notranslate"><span class="pre">.cu</span></code> file along with the <code class="docutils literal notranslate"><span class="pre">.cpp</span></code> files – the library takes
 care of all the hassle this entails for you. The JIT mechanism is even
 simpler:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch.utils.cpp_extension</span> <span class="k">import</span> <span class="n">load</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch.utils.cpp_extension</span> <span class="kn">import</span> <span class="n">load</span>
 
 <span class="n">lltm</span> <span class="o">=</span> <span class="n">load</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;lltm&#39;</span><span class="p">,</span> <span class="n">sources</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;lltm_cuda.cpp&#39;</span><span class="p">,</span> <span class="s1">&#39;lltm_cuda_kernel.cu&#39;</span><span class="p">])</span>
 </pre></div>
@@ -1500,11 +1500,9 @@ examples displayed in this note <a class="reference external" href="https://gith
 
      
        <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-         <script type="text/javascript" src="../_static/jquery.js"></script>
-         <script type="text/javascript" src="../_static/underscore.js"></script>
-         <script type="text/javascript" src="../_static/doctools.js"></script>
-         <script type="text/javascript" src="../_static/language_data.js"></script>
-         <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+         <script src="../_static/jquery.js"></script>
+         <script src="../_static/underscore.js"></script>
+         <script src="../_static/doctools.js"></script>
      
 
   

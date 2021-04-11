@@ -174,7 +174,7 @@
 <p class="caption"><span class="caption-text">프론트엔드 API</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="named_tensor_tutorial.html">(prototype) Introduction to Named Tensors in PyTorch</a></li>
-<li class="toctree-l1"><a class="reference internal" href="memory_format_tutorial.html">(beta) Channels Last Memory Format in PyTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="memory_format_tutorial.html">(실험용) PyTorch를 사용한 Channels Last Memory Format</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_frontend.html">Using the PyTorch C++ Frontend</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_extension.html">Custom C++ and CUDA Extensions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/torch_script_custom_ops.html">Extending TorchScript with Custom C++ Operators</a></li>
@@ -186,7 +186,7 @@
 <p class="caption"><span class="caption-text">모델 최적화</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="pruning_tutorial.html">가지치기 기법(Pruning) 튜토리얼</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../advanced/dynamic_quantization_tutorial.html">(beta) Dynamic Quantization on an LSTM Word Language Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/dynamic_quantization_tutorial.html">(베타) LSTM 기반 단어 단위 언어 모델의 동적 양자화</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/static_quantization_tutorial.html">(beta) Static Quantization with Eager Mode in PyTorch</a></li>
 <li class="toctree-l1"><a class="reference internal" href="quantized_transfer_learning_tutorial.html">(beta) 컴퓨터 비전(Vision) 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
@@ -366,8 +366,8 @@ LSTM에 관한 것이지만 RNN에 관해서도 유익합니다.</p></li>
 요약하면, 줄마다 이름이 적힌 텍스트 파일 <code class="docutils literal notranslate"><span class="pre">data/names/[Language].txt</span></code> 있습니다.
 이것을 어레이로 분리하고, Unicode를 ASCII로 변경하고,
 사전 <code class="docutils literal notranslate"><span class="pre">{language:</span> <span class="pre">[names</span> <span class="pre">...]}</span></code> 을 만들어서 마무리합니다.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">unicode_literals</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">division</span>
-<span class="kn">from</span> <span class="nn">io</span> <span class="k">import</span> <span class="nb">open</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">unicode_literals</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">division</span>
+<span class="kn">from</span> <span class="nn">io</span> <span class="kn">import</span> <span class="nb">open</span>
 <span class="kn">import</span> <span class="nn">glob</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">unicodedata</span>
@@ -412,7 +412,7 @@ LSTM에 관한 것이지만 RNN에 관해서도 유익합니다.</p></li>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span># categories: 18 [&#39;Scottish&#39;, &#39;Arabic&#39;, &#39;German&#39;, &#39;Vietnamese&#39;, &#39;French&#39;, &#39;Japanese&#39;, &#39;Spanish&#39;, &#39;Chinese&#39;, &#39;Dutch&#39;, &#39;Italian&#39;, &#39;Russian&#39;, &#39;Irish&#39;, &#39;Portuguese&#39;, &#39;Polish&#39;, &#39;Czech&#39;, &#39;Korean&#39;, &#39;Greek&#39;, &#39;English&#39;]
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span># categories: 18 [&#39;Korean&#39;, &#39;Italian&#39;, &#39;English&#39;, &#39;Polish&#39;, &#39;Scottish&#39;, &#39;Dutch&#39;, &#39;French&#39;, &#39;Chinese&#39;, &#39;Japanese&#39;, &#39;Czech&#39;, &#39;Portuguese&#39;, &#39;Russian&#39;, &#39;Vietnamese&#39;, &#39;Irish&#39;, &#39;Greek&#39;, &#39;Spanish&#39;, &#39;Arabic&#39;, &#39;German&#39;]
 O&#39;Neal
 </pre></div>
 </div>
@@ -440,7 +440,7 @@ category tensor는 문자 입력과 마찬가지로 one-hot 벡터입니다.</p>
 <span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
 
 <span class="k">class</span> <span class="nc">RNN</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_size</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">,</span> <span class="n">output_size</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_size</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">,</span> <span class="n">output_size</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">RNN</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">hidden_size</span> <span class="o">=</span> <span class="n">hidden_size</span>
 
@@ -604,26 +604,26 @@ Tensor</a> 입니다.
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>0m 17s (5000 5%) 3.2079
-0m 31s (10000 10%) 3.0993
-0m 46s (15000 15%) 2.6456
-1m 1s (20000 20%) 1.9240
-1m 16s (25000 25%) 3.0209
-1m 31s (30000 30%) 1.0877
-1m 46s (35000 35%) 2.3249
-2m 1s (40000 40%) 2.5350
-2m 15s (45000 45%) 2.3017
-2m 30s (50000 50%) 2.3729
-2m 45s (55000 55%) 2.1775
-3m 0s (60000 60%) 2.3064
-3m 15s (65000 65%) 3.0474
-3m 30s (70000 70%) 1.9051
-3m 44s (75000 75%) 2.4201
-3m 59s (80000 80%) 2.8119
-4m 14s (85000 85%) 2.2757
-4m 29s (90000 90%) 2.0652
-4m 44s (95000 95%) 2.0606
-4m 59s (100000 100%) 1.2818
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>0m 14s (5000 5%) 2.6873
+0m 29s (10000 10%) 3.2346
+0m 43s (15000 15%) 2.8100
+0m 57s (20000 20%) 2.7549
+1m 12s (25000 25%) 3.4142
+1m 26s (30000 30%) 2.7237
+1m 41s (35000 35%) 2.7037
+1m 55s (40000 40%) 2.4760
+2m 10s (45000 45%) 1.7889
+2m 24s (50000 50%) 1.8619
+2m 39s (55000 55%) 2.1363
+2m 53s (60000 60%) 1.4708
+3m 8s (65000 65%) 2.6330
+3m 22s (70000 70%) 2.3061
+3m 37s (75000 75%) 1.6835
+3m 51s (80000 80%) 2.2866
+4m 6s (85000 85%) 1.0852
+4m 20s (90000 90%) 2.9085
+4m 35s (95000 95%) 2.4591
+4m 49s (100000 100%) 1.5600
 </pre></div>
 </div>
 </div>
@@ -703,18 +703,18 @@ Tensor</a> 입니다.
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Rovanton
-Uartan
-Shallon
-Gerten
-Eerten
-Roune
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Romankin
+Uarinok
+Shakan
+Gerter
+Eringer
+Roure
 Salla
-Palla
-Aran
+Pora
+Artan
 Chan
 Han
-Iuni
+Iun
 </pre></div>
 </div>
 </div>
@@ -737,7 +737,7 @@ choosing a start letter</p></li>
 </ul>
 </li>
 </ul>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 4 minutes  59.343 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 4 minutes  50.128 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-intermediate-char-rnn-generation-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/322506af160d5e2056afd75de1fd34ee/char_rnn_generation_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">char_rnn_generation_tutorial.py</span></code></a></p>
@@ -828,11 +828,9 @@ choosing a start letter</p></li>
 
      
        <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-         <script type="text/javascript" src="../_static/jquery.js"></script>
-         <script type="text/javascript" src="../_static/underscore.js"></script>
-         <script type="text/javascript" src="../_static/doctools.js"></script>
-         <script type="text/javascript" src="../_static/language_data.js"></script>
-         <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+         <script src="../_static/jquery.js"></script>
+         <script src="../_static/underscore.js"></script>
+         <script src="../_static/doctools.js"></script>
      
 
   

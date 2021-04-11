@@ -128,8 +128,7 @@
 
 .. customcarditem::
    :header: 기초부터 시작하는 NLP: 문자-단위 RNN으로 이름 분류하기
-   :card_description:
-   torchtext를 사용하지 않고 기본적인 문자-단위 RNN을 사용하여 단어를 분류하는 모델을 기초부터 만들고 학습합니다. 총 3개로 이뤄진 튜토리얼 시리즈의 첫번째 편입니다.
+   :card_description: torchtext를 사용하지 않고 기본적인 문자-단위 RNN을 사용하여 단어를 분류하는 모델을 기초부터 만들고 학습합니다. 총 3개로 이뤄진 튜토리얼 시리즈의 첫번째 편입니다.
    :image: _static/img/thumbnails/cropped/NLP-From-Scratch-Classifying-Names-with-a-Character-Level-RNN.png
    :link: intermediate/char_rnn_classification_tutorial
    :tags: Text

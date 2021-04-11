@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>PyTorch Profiler &mdash; PyTorch Tutorials 1.6.0 documentation</title>
+  <title>PyTorch 프로파일러(Profiler) &mdash; PyTorch Tutorials 1.6.0 documentation</title>
   
 
   
@@ -174,7 +174,7 @@
 <p class="caption"><span class="caption-text">프론트엔드 API</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/named_tensor_tutorial.html">(prototype) Introduction to Named Tensors in PyTorch</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../intermediate/memory_format_tutorial.html">(beta) Channels Last Memory Format in PyTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../intermediate/memory_format_tutorial.html">(실험용) PyTorch를 사용한 Channels Last Memory Format</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../advanced/cpp_frontend.html">Using the PyTorch C++ Frontend</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../advanced/cpp_extension.html">Custom C++ and CUDA Extensions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../advanced/torch_script_custom_ops.html">Extending TorchScript with Custom C++ Operators</a></li>
@@ -186,7 +186,7 @@
 <p class="caption"><span class="caption-text">모델 최적화</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/pruning_tutorial.html">가지치기 기법(Pruning) 튜토리얼</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../advanced/dynamic_quantization_tutorial.html">(beta) Dynamic Quantization on an LSTM Word Language Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../advanced/dynamic_quantization_tutorial.html">(베타) LSTM 기반 단어 단위 언어 모델의 동적 양자화</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../advanced/static_quantization_tutorial.html">(beta) Static Quantization with Eager Mode in PyTorch</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/quantized_transfer_learning_tutorial.html">(beta) 컴퓨터 비전(Vision) 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
@@ -245,7 +245,7 @@
         
           <li><a href="../recipes_index.html">PyTorch Recipes</a> &gt;</li>
         
-      <li>PyTorch Profiler</li>
+      <li>PyTorch 프로파일러(Profiler)</li>
     
     
       <li class="pytorch-breadcrumbs-aside">
@@ -304,83 +304,79 @@
 <p>Click <a class="reference internal" href="#sphx-glr-download-recipes-recipes-profiler-py"><span class="std std-ref">here</span></a> to download the full example code</p>
 </div>
 <div class="sphx-glr-example-title section" id="pytorch-profiler">
-<span id="sphx-glr-recipes-recipes-profiler-py"></span><h1>PyTorch Profiler<a class="headerlink" href="#pytorch-profiler" title="Permalink to this headline">¶</a></h1>
-<p>This recipe explains how to use PyTorch profiler and measure the time and
-memory consumption of the model’s operators.</p>
-<div class="section" id="introduction">
-<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
-<p>PyTorch includes a simple profiler API that is useful when user needs
-to determine the most expensive operators in the model.</p>
-<p>In this recipe, we will use a simple Resnet model to demonstrate how to
-use profiler to analyze model performance.</p>
+<span id="sphx-glr-recipes-recipes-profiler-py"></span><h1>PyTorch 프로파일러(Profiler)<a class="headerlink" href="#pytorch-profiler" title="Permalink to this headline">¶</a></h1>
+<p>이 레시피에서는 어떻게 PyTorch 프로파일러를 사용하는지, 그리고 모델의 연산자들이 소비하는 메모리와 시간을 측정하는 방법을 살펴보겠습니다.</p>
+<div class="section" id="id1">
+<h2>개요<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<p>PyTorch는 사용자가 모델 내의 연산 비용이 큰(expensive) 연산자들이 무엇인지 알고싶을 때 유용하게 사용할 수 있는 간단한 프로파일러 API를 포함하고 있습니다.</p>
+<p>이 레시피에서는 모델의 성능(performance)을 분석하려고 할 때 어떻게 프로파일러를 사용해야 하는지를 보여주기 위해 간단한 ResNet 모델을 사용하겠습니다.</p>
 </div>
 <div class="section" id="setup">
-<h2>Setup<a class="headerlink" href="#setup" title="Permalink to this headline">¶</a></h2>
-<p>To install <code class="docutils literal notranslate"><span class="pre">torch</span></code> and <code class="docutils literal notranslate"><span class="pre">torchvision</span></code> use the following command:</p>
+<h2>설정(Setup)<a class="headerlink" href="#setup" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">torch</span></code> 와 <code class="docutils literal notranslate"><span class="pre">torchvision</span></code> 을 설치하기 위해서 아래의 커맨드를 입력합니다:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">torch</span> <span class="n">torchvision</span>
 </pre></div>
 </div>
 </div>
 <div class="section" id="steps">
-<h2>Steps<a class="headerlink" href="#steps" title="Permalink to this headline">¶</a></h2>
+<h2>단계(Steps)<a class="headerlink" href="#steps" title="Permalink to this headline">¶</a></h2>
 <ol class="arabic simple">
-<li><p>Import all necessary libraries</p></li>
-<li><p>Instantiate a simple Resnet model</p></li>
-<li><p>Use profiler to analyze execution time</p></li>
-<li><p>Use profiler to analyze memory consumption</p></li>
-<li><p>Using tracing functionality</p></li>
+<li><p>필요한 라이브러리들 불러오기</p></li>
+<li><p>간단한 ResNet 모델 인스턴스화 하기</p></li>
+<li><p>프로파일러를 사용하여 실행시간 분석하기</p></li>
+<li><p>프로파일러를 사용하여 메모리 소비 분석하기</p></li>
+<li><p>추적기능 사용하기</p></li>
 </ol>
-<div class="section" id="import-all-necessary-libraries">
-<h3>1. Import all necessary libraries<a class="headerlink" href="#import-all-necessary-libraries" title="Permalink to this headline">¶</a></h3>
-<p>In this recipe we will use <code class="docutils literal notranslate"><span class="pre">torch</span></code>, <code class="docutils literal notranslate"><span class="pre">torchvision.models</span></code>
-and <code class="docutils literal notranslate"><span class="pre">profiler</span></code> modules:</p>
+<div class="section" id="id2">
+<h3>1. 필요한 라이브러리들 불러오기<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<p>이 레시피에서는 <code class="docutils literal notranslate"><span class="pre">torch</span></code> 와 <code class="docutils literal notranslate"><span class="pre">torchvision.models</span></code>,
+그리고 <code class="docutils literal notranslate"><span class="pre">profiler</span></code> 모듈을 사용합니다:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torchvision.models</span> <span class="k">as</span> <span class="nn">models</span>
 <span class="kn">import</span> <span class="nn">torch.autograd.profiler</span> <span class="k">as</span> <span class="nn">profiler</span>
 </pre></div>
 </div>
 </div>
-<div class="section" id="instantiate-a-simple-resnet-model">
-<h3>2. Instantiate a simple Resnet model<a class="headerlink" href="#instantiate-a-simple-resnet-model" title="Permalink to this headline">¶</a></h3>
-<p>Let’s create an instance of a Resnet model and prepare an input
-for it:</p>
+<div class="section" id="resnet">
+<h3>2. 간단한 ResNet 모델 인스턴스화 하기<a class="headerlink" href="#resnet" title="Permalink to this headline">¶</a></h3>
+<p>ResNet 모델 인스턴스를 만들고 입력값을
+준비합니다 :</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">resnet18</span><span class="p">()</span>
 <span class="n">inputs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">224</span><span class="p">,</span> <span class="mi">224</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
-<div class="section" id="use-profiler-to-analyze-execution-time">
-<h3>3. Use profiler to analyze execution time<a class="headerlink" href="#use-profiler-to-analyze-execution-time" title="Permalink to this headline">¶</a></h3>
-<p>PyTorch profiler is enabled through the context manager and accepts
-a number of parameters, some of the most useful are:</p>
+<div class="section" id="id3">
+<h3>3. 프로파일러를 사용하여 실행시간 분석하기<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<p>PyTorch 프로파일러는 컨텍스트 메니저(context manager)를 통해 활성화되고,
+여러 매개변수를 받을 수 있습니다. 유용한 몇 가지 매개변수는 다음과 같습니다:</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">record_shapes</span></code> - whether to record shapes of the operator inputs;</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">profile_memory</span></code> - whether to report amount of memory consumed by
-model’s Tensors;</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">use_cuda</span></code> - whether to measure execution time of CUDA kernels.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">record_shapes</span></code> - 연사자 입력(input)의 shape을 기록할지 여부;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">profile_memory</span></code> - 모델의 텐서(Tensor)들이 소비하는 메모리 양을 보고(report)할지 여부;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">use_cuda</span></code> - CUDA 커널의 실행시간을 측정할지 여부;</p></li>
 </ul>
-<p>Let’s see how we can use profiler to analyze the execution time:</p>
+<p>프로파일러를 사용하여 어떻게 실행시간을 분석하는지 보겠습니다:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">profiler</span><span class="o">.</span><span class="n">profile</span><span class="p">(</span><span class="n">record_shapes</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">as</span> <span class="n">prof</span><span class="p">:</span>
     <span class="k">with</span> <span class="n">profiler</span><span class="o">.</span><span class="n">record_function</span><span class="p">(</span><span class="s2">&quot;model_inference&quot;</span><span class="p">):</span>
         <span class="n">model</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Note that we can use <code class="docutils literal notranslate"><span class="pre">record_function</span></code> context manager to label
-arbitrary code ranges with user provided names
-(<code class="docutils literal notranslate"><span class="pre">model_inference</span></code> is used as a label in the example above).
-Profiler allows one to check which operators were called during the
-execution of a code range wrapped with a profiler context manager.
-If multiple profiler ranges are active at the same time (e.g. in
-parallel PyTorch threads), each profiling context manager tracks only
-the operators of its corresponding range.
-Profiler also automatically profiles the async tasks launched
-with <code class="docutils literal notranslate"><span class="pre">torch.jit._fork</span></code> and (in case of a backward pass)
-the backward pass operators launched with <code class="docutils literal notranslate"><span class="pre">backward()</span></code> call.</p>
-<p>Let’s print out the stats for the execution above:</p>
+<p><code class="docutils literal notranslate"><span class="pre">record_function</span></code> 컨텍스트 관리자를 사용하여 임의의 코드 범위에
+사용자가 지정한 이름으로 레이블(label)을 표시할 수 있습니다.
+(위 예제에서는 <code class="docutils literal notranslate"><span class="pre">model_inference</span></code> 를 레이블로 사용했습니다.)
+프로파일러를 사용하면 프로파일러 컨텍스트 관리자로 감싸진(wrap) 코드 범위를
+실행하는 동안 어떤 연산자들이 호출되었는지 확인할 수 있습니다.</p>
+<p>만약 여러 프로파일러의 범위가 동시에 활성화된 경우(예. PyTorch 쓰레드가 병렬로
+실행 중인 경우), 각 프로파일링 컨텍스트 관리자는 각각의 범위 내의 연산자들만
+추적(track)합니다.
+프로파일러는 또한 <code class="docutils literal notranslate"><span class="pre">torch.jit._fork</span></code> 로 실행된 비동기 작업과
+(역전파 단계의 경우) <code class="docutils literal notranslate"><span class="pre">backward()</span></code> 의 호출로 실행된 역전파 연산자들도
+자동으로 프로파일링합니다.</p>
+<p>위 코드를 실행한 통계를 출력해보겠습니다:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">prof</span><span class="o">.</span><span class="n">key_averages</span><span class="p">()</span><span class="o">.</span><span class="n">table</span><span class="p">(</span><span class="n">sort_by</span><span class="o">=</span><span class="s2">&quot;cpu_time_total&quot;</span><span class="p">,</span> <span class="n">row_limit</span><span class="o">=</span><span class="mi">10</span><span class="p">))</span>
 </pre></div>
 </div>
-<p>The output will look like (omitting some columns):</p>
+<p>(몇몇 열을 제외하고) 출력값이 이렇게 보일 것입니다:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># -------------------------  --------------  ----------  ------------  ---------</span>
 <span class="c1"># Name                       Self CPU total   CPU total  CPU time avg  # Calls</span>
 <span class="c1"># -------------------------  --------------  ----------  ------------  ---------</span>
@@ -397,14 +393,16 @@ the backward pass operators launched with <code class="docutils literal notransl
 <span class="c1"># -------------------------  --------------  ----------  ------------  ---------</span>
 </pre></div>
 </div>
-<p>Here we see that, as expected, most of the time is spent in convolution (and specifically in <code class="docutils literal notranslate"><span class="pre">mkldnn_convolution</span></code>
-for PyTorch compiled with MKL-DNN support).
-Note the difference between self cpu time and cpu time - operators can call other operators, self cpu time exludes time
-spent in children operator calls, while total cpu time includes it.</p>
-<p>To get a finer granularity of results and include operator input shapes, pass <code class="docutils literal notranslate"><span class="pre">group_by_input_shape=True</span></code>:</p>
+<p>예상했던 대로, 대부분의 시간이 합성곱(convolution) 연산(특히 MKL-DNN을 지원하도록
+컴파일된 PyTorch의 경우에는 <code class="docutils literal notranslate"><span class="pre">mkldnn_convolution</span></code> )에서 소요되는 것을 확인할 수 있습니다.
+(결과 열들 중) Self CPU time과 CPU time의 차이에 유의해야 합니다 -
+연산자는 다른 연산자들을 호출할 수 있으며, Self CPU time에는 하위(child) 연산자 호출에서 발생한
+시간을 제외해서, Totacl CPU time에는 포함해서 표시합니다.</p>
+<p>보다 세부적인 결과 정보 및 연산자의 입력 shape을 함께 보려면 <code class="docutils literal notranslate"><span class="pre">group_by_input_shape=True</span></code> 를
+인자로 전달하면 됩니다:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">prof</span><span class="o">.</span><span class="n">key_averages</span><span class="p">(</span><span class="n">group_by_input_shape</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">table</span><span class="p">(</span><span class="n">sort_by</span><span class="o">=</span><span class="s2">&quot;cpu_time_total&quot;</span><span class="p">,</span> <span class="n">row_limit</span><span class="o">=</span><span class="mi">10</span><span class="p">))</span>
 
-<span class="c1"># (omitting some columns)</span>
+<span class="c1"># (몇몇 열은 제외하였습니다)</span>
 <span class="c1"># -------------------------  -----------  --------  -------------------------------------</span>
 <span class="c1"># Name                       CPU total    # Calls         Input Shapes</span>
 <span class="c1"># -------------------------  -----------  --------  -------------------------------------</span>
@@ -422,19 +420,19 @@ spent in children operator calls, while total cpu time includes it.</p>
 </pre></div>
 </div>
 </div>
-<div class="section" id="use-profiler-to-analyze-memory-consumption">
-<h3>4. Use profiler to analyze memory consumption<a class="headerlink" href="#use-profiler-to-analyze-memory-consumption" title="Permalink to this headline">¶</a></h3>
-<p>PyTorch profiler can also show the amount of memory (used by the model’s tensors)
-that was allocated (or released) during the execution of the model’s operators.
-In the output below, ‘self’ memory corresponds to the memory allocated (released)
-by the operator, excluding the children calls to the other operators.
-To enable memory profiling functionality pass <code class="docutils literal notranslate"><span class="pre">profile_memory=True</span></code>.</p>
+<div class="section" id="id4">
+<h3>4. 프로파일러를 사용하여 메모리 소비 분석하기<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<p>PyTorch 프로파일러는 모델의 연산자들을 실행하며 (모델의 텐서들이 사용하며) 할당(또는 해제)한
+메모리의 양도 표시할 수 있습니다.
+아래 출력 결과에서 ‘Self’ memory는 해당 연산자에 의해 호출된 하위(child) 연산자들을 제외한,
+연산자 자체에 할당(해제)된 메모리에 해당합니다.
+메모리 프로파일링 기능을 활성화하려면 <code class="docutils literal notranslate"><span class="pre">profile_memory=True</span></code> 를 인자로 전달하면 됩니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">profiler</span><span class="o">.</span><span class="n">profile</span><span class="p">(</span><span class="n">profile_memory</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">record_shapes</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">as</span> <span class="n">prof</span><span class="p">:</span>
     <span class="n">model</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="n">prof</span><span class="o">.</span><span class="n">key_averages</span><span class="p">()</span><span class="o">.</span><span class="n">table</span><span class="p">(</span><span class="n">sort_by</span><span class="o">=</span><span class="s2">&quot;self_cpu_memory_usage&quot;</span><span class="p">,</span> <span class="n">row_limit</span><span class="o">=</span><span class="mi">10</span><span class="p">))</span>
 
-<span class="c1"># (omitting some columns)</span>
+<span class="c1"># (몇몇 열은 제외하였습니다)</span>
 <span class="c1"># ---------------------------  ---------------  ---------------  ---------------</span>
 <span class="c1"># Name                         CPU Mem          Self CPU Mem     Number of Calls</span>
 <span class="c1"># ---------------------------  ---------------  ---------------  ---------------</span>
@@ -447,7 +445,7 @@ To enable memory profiling functionality pass <code class="docutils literal notr
 
 <span class="nb">print</span><span class="p">(</span><span class="n">prof</span><span class="o">.</span><span class="n">key_averages</span><span class="p">()</span><span class="o">.</span><span class="n">table</span><span class="p">(</span><span class="n">sort_by</span><span class="o">=</span><span class="s2">&quot;cpu_memory_usage&quot;</span><span class="p">,</span> <span class="n">row_limit</span><span class="o">=</span><span class="mi">10</span><span class="p">))</span>
 
-<span class="c1"># (omitting some columns)</span>
+<span class="c1"># (몇몇 열은 제외하였습니다)</span>
 <span class="c1"># ---------------------------  ---------------  ---------------  ---------------</span>
 <span class="c1"># Name                         CPU Mem          Self CPU Mem     Number of Calls</span>
 <span class="c1"># ---------------------------  ---------------  ---------------  ---------------</span>
@@ -470,9 +468,9 @@ To enable memory profiling functionality pass <code class="docutils literal notr
 </pre></div>
 </div>
 </div>
-<div class="section" id="using-tracing-functionality">
-<h3>5. Using tracing functionality<a class="headerlink" href="#using-tracing-functionality" title="Permalink to this headline">¶</a></h3>
-<p>Profiling results can be outputted as a .json trace file:</p>
+<div class="section" id="id5">
+<h3>5. 추적기능 사용하기<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
+<p>프로파일링 결과는 .json 형태의 추적 파일(trace file)로 출력할 수 있습니다:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">profiler</span><span class="o">.</span><span class="n">profile</span><span class="p">()</span> <span class="k">as</span> <span class="n">prof</span><span class="p">:</span>
     <span class="k">with</span> <span class="n">profiler</span><span class="o">.</span><span class="n">record_function</span><span class="p">(</span><span class="s2">&quot;model_inference&quot;</span><span class="p">):</span>
         <span class="n">model</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
@@ -480,16 +478,16 @@ To enable memory profiling functionality pass <code class="docutils literal notr
 <span class="n">prof</span><span class="o">.</span><span class="n">export_chrome_trace</span><span class="p">(</span><span class="s2">&quot;trace.json&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>User can examine the sequence of profiled operators after loading the trace file
-in Chrome (<code class="docutils literal notranslate"><span class="pre">chrome://tracing</span></code>):</p>
+<p>사용자는 Chrome 브라우저( <code class="docutils literal notranslate"><span class="pre">chrome://tracing</span></code> )에서 추적 파일을 불러와
+프로파일된 일련의 연산자들을 검토해볼 수 있습니다:</p>
 <a class="reference internal image-reference" href="../../_images/trace_img.png"><img alt="../../_images/trace_img.png" src="../../_images/trace_img.png" style="width: 823.5px; height: 78.5px;" /></a>
 </div>
 </div>
-<div class="section" id="learn-more">
-<h2>Learn More<a class="headerlink" href="#learn-more" title="Permalink to this headline">¶</a></h2>
-<p>Take a look at the following tutorial to learn how to visualize your model with TensorBoard:</p>
+<div class="section" id="id6">
+<h2>더 알아보기<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h2>
+<p>다음의 튜토리얼을 통해 Tensorboard를 사용하여 모델 시각화하는 방법을 살펴보세요:</p>
 <ul class="simple">
-<li><p><a class="reference external" href="https://pytorch.org/tutorials/intermediate/tensorboard_tutorial.html">Visualizing models, data, and training with TensorBoard</a> tutorial</p></li>
+<li><p><a class="reference internal" href="../../intermediate/tensorboard_tutorial.html"><span class="doc">TensorBoard로 모델, 데이터, 학습 시각화하기</span></a></p></li>
 </ul>
 <p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.000 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-recipes-recipes-profiler-py">
@@ -554,18 +552,18 @@ in Chrome (<code class="docutils literal notranslate"><span class="pre">chrome:/
           <div class="pytorch-right-menu" id="pytorch-right-menu">
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
-<li><a class="reference internal" href="#">PyTorch Profiler</a><ul>
-<li><a class="reference internal" href="#introduction">Introduction</a></li>
-<li><a class="reference internal" href="#setup">Setup</a></li>
-<li><a class="reference internal" href="#steps">Steps</a><ul>
-<li><a class="reference internal" href="#import-all-necessary-libraries">1. Import all necessary libraries</a></li>
-<li><a class="reference internal" href="#instantiate-a-simple-resnet-model">2. Instantiate a simple Resnet model</a></li>
-<li><a class="reference internal" href="#use-profiler-to-analyze-execution-time">3. Use profiler to analyze execution time</a></li>
-<li><a class="reference internal" href="#use-profiler-to-analyze-memory-consumption">4. Use profiler to analyze memory consumption</a></li>
-<li><a class="reference internal" href="#using-tracing-functionality">5. Using tracing functionality</a></li>
+<li><a class="reference internal" href="#">PyTorch 프로파일러(Profiler)</a><ul>
+<li><a class="reference internal" href="#id1">개요</a></li>
+<li><a class="reference internal" href="#setup">설정(Setup)</a></li>
+<li><a class="reference internal" href="#steps">단계(Steps)</a><ul>
+<li><a class="reference internal" href="#id2">1. 필요한 라이브러리들 불러오기</a></li>
+<li><a class="reference internal" href="#resnet">2. 간단한 ResNet 모델 인스턴스화 하기</a></li>
+<li><a class="reference internal" href="#id3">3. 프로파일러를 사용하여 실행시간 분석하기</a></li>
+<li><a class="reference internal" href="#id4">4. 프로파일러를 사용하여 메모리 소비 분석하기</a></li>
+<li><a class="reference internal" href="#id5">5. 추적기능 사용하기</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#learn-more">Learn More</a></li>
+<li><a class="reference internal" href="#id6">더 알아보기</a></li>
 </ul>
 </li>
 </ul>
@@ -583,11 +581,9 @@ in Chrome (<code class="docutils literal notranslate"><span class="pre">chrome:/
 
      
        <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-         <script type="text/javascript" src="../../_static/jquery.js"></script>
-         <script type="text/javascript" src="../../_static/underscore.js"></script>
-         <script type="text/javascript" src="../../_static/doctools.js"></script>
-         <script type="text/javascript" src="../../_static/language_data.js"></script>
-         <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+         <script src="../../_static/jquery.js"></script>
+         <script src="../../_static/underscore.js"></script>
+         <script src="../../_static/doctools.js"></script>
      
 
   

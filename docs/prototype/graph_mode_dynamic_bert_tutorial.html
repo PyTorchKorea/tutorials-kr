@@ -172,7 +172,7 @@
 <p class="caption"><span class="caption-text">프론트엔드 API</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/named_tensor_tutorial.html">(prototype) Introduction to Named Tensors in PyTorch</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/memory_format_tutorial.html">(beta) Channels Last Memory Format in PyTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/memory_format_tutorial.html">(실험용) PyTorch를 사용한 Channels Last Memory Format</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_frontend.html">Using the PyTorch C++ Frontend</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_extension.html">Custom C++ and CUDA Extensions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/torch_script_custom_ops.html">Extending TorchScript with Custom C++ Operators</a></li>
@@ -184,7 +184,7 @@
 <p class="caption"><span class="caption-text">모델 최적화</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/pruning_tutorial.html">가지치기 기법(Pruning) 튜토리얼</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../advanced/dynamic_quantization_tutorial.html">(beta) Dynamic Quantization on an LSTM Word Language Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/dynamic_quantization_tutorial.html">(베타) LSTM 기반 단어 단위 언어 모델의 동적 양자화</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/static_quantization_tutorial.html">(beta) Static Quantization with Eager Mode in PyTorch</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/quantized_transfer_learning_tutorial.html">(beta) 컴퓨터 비전(Vision) 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
@@ -328,7 +328,7 @@
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
 
 <span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">random</span>
 <span class="kn">import</span> <span class="nn">sys</span>
@@ -349,9 +349,9 @@
 
 <span class="n">global_rng</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">Random</span><span class="p">()</span>
 
-<span class="k">def</span> <span class="nf">ids_tensor</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">vocab_size</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">ids_tensor</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">vocab_size</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="c1">#  Creates a random int32 tensor of the shape within the vocab size</span>
-    <span class="k">if</span> <span class="n">rng</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">rng</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">rng</span> <span class="o">=</span> <span class="n">global_rng</span>
 
     <span class="n">total_dims</span> <span class="o">=</span> <span class="mi">1</span>
@@ -366,17 +366,17 @@
 
 <span class="c1"># Setup logging</span>
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
-<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">format</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%(asctime)s</span><span class="s1"> - </span><span class="si">%(levelname)s</span><span class="s1"> - </span><span class="si">%(name)s</span><span class="s1"> -   </span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">,</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="nb">format</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%(asctime)s</span><span class="s1"> - </span><span class="si">%(levelname)s</span><span class="s1"> - </span><span class="si">%(name)s</span><span class="s1"> -   </span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">,</span>
                     <span class="n">datefmt</span> <span class="o">=</span> <span class="s1">&#39;%m/</span><span class="si">%d</span><span class="s1">/%Y %H:%M:%S&#39;</span><span class="p">,</span>
                     <span class="n">level</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">WARN</span><span class="p">)</span>
 
 <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;transformers.modeling_utils&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span>
    <span class="n">logging</span><span class="o">.</span><span class="n">WARN</span><span class="p">)</span>  <span class="c1"># Reduce logging</span>
 
-<span class="k">print</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
 
 <span class="n">torch</span><span class="o">.</span><span class="n">set_num_threads</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-<span class="k">print</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">__config__</span><span class="o">.</span><span class="n">parallel_info</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">__config__</span><span class="o">.</span><span class="n">parallel_info</span><span class="p">())</span>
 </pre></div>
 </div>
 </div>
@@ -409,14 +409,14 @@
 <span class="n">configs</span><span class="o">.</span><span class="n">output_mode</span> <span class="o">=</span> <span class="n">output_modes</span><span class="p">[</span><span class="n">configs</span><span class="o">.</span><span class="n">task_name</span><span class="p">]</span>
 <span class="n">configs</span><span class="o">.</span><span class="n">label_list</span> <span class="o">=</span> <span class="n">configs</span><span class="o">.</span><span class="n">processor</span><span class="o">.</span><span class="n">get_labels</span><span class="p">()</span>
 <span class="n">configs</span><span class="o">.</span><span class="n">model_type</span> <span class="o">=</span> <span class="s2">&quot;bert&quot;</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-<span class="n">configs</span><span class="o">.</span><span class="n">do_lower_case</span> <span class="o">=</span> <span class="bp">True</span>
+<span class="n">configs</span><span class="o">.</span><span class="n">do_lower_case</span> <span class="o">=</span> <span class="kc">True</span>
 
 <span class="c1"># Set the device, batch size, topology, and caching flags.</span>
 <span class="n">configs</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="s2">&quot;cpu&quot;</span>
 <span class="n">configs</span><span class="o">.</span><span class="n">per_gpu_eval_batch_size</span> <span class="o">=</span> <span class="mi">8</span>
 <span class="n">configs</span><span class="o">.</span><span class="n">n_gpu</span> <span class="o">=</span> <span class="mi">0</span>
 <span class="n">configs</span><span class="o">.</span><span class="n">local_rank</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
-<span class="n">configs</span><span class="o">.</span><span class="n">overwrite_cache</span> <span class="o">=</span> <span class="bp">False</span>
+<span class="n">configs</span><span class="o">.</span><span class="n">overwrite_cache</span> <span class="o">=</span> <span class="kc">False</span>
 
 <span class="c1"># Set random seed for reproducibility.</span>
 <span class="k">def</span> <span class="nf">set_seed</span><span class="p">(</span><span class="n">seed</span><span class="p">):</span>
@@ -428,7 +428,7 @@
 <span class="n">tokenizer</span> <span class="o">=</span> <span class="n">BertTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
     <span class="n">configs</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">do_lower_case</span><span class="o">=</span><span class="n">configs</span><span class="o">.</span><span class="n">do_lower_case</span><span class="p">)</span>
 
-<span class="n">model</span> <span class="o">=</span> <span class="n">BertForSequenceClassification</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">configs</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">torchscript</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">BertForSequenceClassification</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">configs</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">torchscript</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">model</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">configs</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -489,7 +489,7 @@ We choose a batch size of 8 and sequence lenght of 128 based on the input sizes 
 
     <span class="n">results</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">for</span> <span class="n">eval_task</span><span class="p">,</span> <span class="n">eval_output_dir</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">eval_task_names</span><span class="p">,</span> <span class="n">eval_outputs_dirs</span><span class="p">):</span>
-        <span class="n">eval_dataset</span> <span class="o">=</span> <span class="n">load_and_cache_examples</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">eval_task</span><span class="p">,</span> <span class="n">tokenizer</span><span class="p">,</span> <span class="n">evaluate</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="n">eval_dataset</span> <span class="o">=</span> <span class="n">load_and_cache_examples</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">eval_task</span><span class="p">,</span> <span class="n">tokenizer</span><span class="p">,</span> <span class="n">evaluate</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">eval_output_dir</span><span class="p">)</span> <span class="ow">and</span> <span class="n">args</span><span class="o">.</span><span class="n">local_rank</span> <span class="ow">in</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]:</span>
             <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">eval_output_dir</span><span class="p">)</span>
@@ -504,12 +504,12 @@ We choose a batch size of 8 and sequence lenght of 128 based on the input sizes 
             <span class="n">model</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">DataParallel</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
 
         <span class="c1"># Eval!</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;***** Running evaluation {} *****&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">prefix</span><span class="p">))</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;***** Running evaluation </span><span class="si">{}</span><span class="s2"> *****&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">prefix</span><span class="p">))</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;  Num examples = </span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">eval_dataset</span><span class="p">))</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;  Batch size = </span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">eval_batch_size</span><span class="p">)</span>
         <span class="n">nb_eval_steps</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="n">preds</span> <span class="o">=</span> <span class="bp">None</span>
-        <span class="n">out_label_ids</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="n">preds</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">out_label_ids</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">eval_dataloader</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Evaluating&quot;</span><span class="p">):</span>
             <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
             <span class="n">batch</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">device</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">batch</span><span class="p">)</span>
@@ -519,11 +519,11 @@ We choose a batch size of 8 and sequence lenght of 128 based on the input sizes 
                           <span class="s1">&#39;attention_mask&#39;</span><span class="p">:</span> <span class="n">batch</span><span class="p">[</span><span class="mi">1</span><span class="p">]}</span>
                 <span class="n">labels</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
                 <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">model_type</span> <span class="o">!=</span> <span class="s1">&#39;distilbert&#39;</span><span class="p">:</span>
-                    <span class="n">inputs</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">model_type</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;bert&#39;</span><span class="p">,</span> <span class="s1">&#39;xlnet&#39;</span><span class="p">]</span> <span class="k">else</span> <span class="bp">None</span>  <span class="c1"># XLM, DistilBERT and RoBERTa don&#39;t use segment_ids</span>
+                    <span class="n">inputs</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">model_type</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;bert&#39;</span><span class="p">,</span> <span class="s1">&#39;xlnet&#39;</span><span class="p">]</span> <span class="k">else</span> <span class="kc">None</span>  <span class="c1"># XLM, DistilBERT and RoBERTa don&#39;t use segment_ids</span>
                 <span class="n">outputs</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="o">**</span><span class="n">inputs</span><span class="p">)</span>
                 <span class="n">logits</span> <span class="o">=</span> <span class="n">outputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">nb_eval_steps</span> <span class="o">+=</span> <span class="mi">1</span>
-            <span class="k">if</span> <span class="n">preds</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">preds</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">preds</span> <span class="o">=</span> <span class="n">logits</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
                 <span class="n">out_label_ids</span> <span class="o">=</span> <span class="n">labels</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
             <span class="k">else</span><span class="p">:</span>
@@ -539,23 +539,23 @@ We choose a batch size of 8 and sequence lenght of 128 based on the input sizes 
 
         <span class="n">output_eval_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">eval_output_dir</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="s2">&quot;eval_results.txt&quot;</span><span class="p">)</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">output_eval_file</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">writer</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;***** Eval results {} *****&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">prefix</span><span class="p">))</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;***** Eval results </span><span class="si">{}</span><span class="s2"> *****&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">prefix</span><span class="p">))</span>
             <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;  </span><span class="si">%s</span><span class="s2"> = </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="n">key</span><span class="p">]))</span>
                 <span class="n">writer</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> = </span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="n">key</span><span class="p">])))</span>
 
     <span class="k">return</span> <span class="n">results</span>
 
-<span class="k">def</span> <span class="nf">load_and_cache_examples</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">task</span><span class="p">,</span> <span class="n">tokenizer</span><span class="p">,</span> <span class="n">evaluate</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">load_and_cache_examples</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">task</span><span class="p">,</span> <span class="n">tokenizer</span><span class="p">,</span> <span class="n">evaluate</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">local_rank</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">evaluate</span><span class="p">:</span>
         <span class="n">torch</span><span class="o">.</span><span class="n">distributed</span><span class="o">.</span><span class="n">barrier</span><span class="p">()</span>  <span class="c1"># Make sure only the first process in distributed training process the dataset, and the others will use the cache</span>
 
     <span class="n">processor</span> <span class="o">=</span> <span class="n">processors</span><span class="p">[</span><span class="n">task</span><span class="p">]()</span>
     <span class="n">output_mode</span> <span class="o">=</span> <span class="n">output_modes</span><span class="p">[</span><span class="n">task</span><span class="p">]</span>
     <span class="c1"># Load data features from cache or dataset file</span>
-    <span class="n">cached_features_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">data_dir</span><span class="p">,</span> <span class="s1">&#39;cached_{}_{}_{}_{}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+    <span class="n">cached_features_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">data_dir</span><span class="p">,</span> <span class="s1">&#39;cached_</span><span class="si">{}</span><span class="s1">_</span><span class="si">{}</span><span class="s1">_</span><span class="si">{}</span><span class="s1">_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
         <span class="s1">&#39;dev&#39;</span> <span class="k">if</span> <span class="n">evaluate</span> <span class="k">else</span> <span class="s1">&#39;train&#39;</span><span class="p">,</span>
-        <span class="nb">list</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">model_name_or_path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)))</span><span class="o">.</span><span class="n">pop</span><span class="p">(),</span>
+        <span class="nb">list</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">model_name_or_path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)))</span><span class="o">.</span><span class="n">pop</span><span class="p">(),</span>
         <span class="nb">str</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">max_seq_length</span><span class="p">),</span>
         <span class="nb">str</span><span class="p">(</span><span class="n">task</span><span class="p">)))</span>
     <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">cached_features_file</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">args</span><span class="o">.</span><span class="n">overwrite_cache</span><span class="p">:</span>
@@ -597,8 +597,8 @@ We choose a batch size of 8 and sequence lenght of 128 based on the input sizes 
     <span class="n">result</span> <span class="o">=</span> <span class="n">evaluate</span><span class="p">(</span><span class="n">configs</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">tokenizer</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
     <span class="n">eval_end_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
     <span class="n">eval_duration_time</span> <span class="o">=</span> <span class="n">eval_end_time</span> <span class="o">-</span> <span class="n">eval_start_time</span>
-    <span class="k">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
-    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Evaluate total time (seconds): {0:.1f}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">eval_duration_time</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Evaluate total time (seconds): </span><span class="si">{0:.1f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">eval_duration_time</span><span class="p">))</span>
 </pre></div>
 </div>
 <div class="section" id="check-model-size">
@@ -609,12 +609,12 @@ We choose a batch size of 8 and sequence lenght of 128 based on the input sizes 
         <span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="s2">&quot;temp.p&quot;</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">script</span><span class="p">(</span><span class="n">model</span><span class="p">),</span> <span class="s2">&quot;temp.p&quot;</span><span class="p">)</span>
-    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Size (MB):&#39;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getsize</span><span class="p">(</span><span class="s2">&quot;temp.p&quot;</span><span class="p">)</span><span class="o">/</span><span class="mf">1e6</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Size (MB):&#39;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getsize</span><span class="p">(</span><span class="s2">&quot;temp.p&quot;</span><span class="p">)</span><span class="o">/</span><span class="mf">1e6</span><span class="p">)</span>
     <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s1">&#39;temp.p&#39;</span><span class="p">)</span>
 
-<span class="k">print</span><span class="p">(</span><span class="s2">&quot;Size of model before quantization&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Size of model before quantization&quot;</span><span class="p">)</span>
 <span class="n">print_size_of_model</span><span class="p">(</span><span class="n">traced_model</span><span class="p">)</span>
-<span class="k">print</span><span class="p">(</span><span class="s2">&quot;Size of model after quantization&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Size of model after quantization&quot;</span><span class="p">)</span>
 
 <span class="n">print_size_of_model</span><span class="p">(</span><span class="n">quantized_model</span><span class="p">)</span>
 </pre></div>
@@ -655,7 +655,7 @@ We choose a batch size of 8 and sequence lenght of 128 based on the input sizes 
 <li><p>We can access the attributes of the quantized model the same way as in a torchscript model, e.g. model.fc1.weight (might be harder if you use a module list or sequential).</p></li>
 <li><p>The arithmetic operations all occur in floating point with the numerics being identical to the final quantized model, allowing for debugging.</p></li>
 </ul>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">quantized_model_debug</span> <span class="o">=</span> <span class="n">quantize_dynamic_jit</span><span class="p">(</span><span class="n">traced_model</span><span class="p">,</span> <span class="n">qconfig_dict</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">quantized_model_debug</span> <span class="o">=</span> <span class="n">quantize_dynamic_jit</span><span class="p">(</span><span class="n">traced_model</span><span class="p">,</span> <span class="n">qconfig_dict</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Calling <code class="docutils literal notranslate"><span class="pre">quantize_dynamic_jit</span></code> is equivalent to calling <code class="docutils literal notranslate"><span class="pre">prepare_dynamic_jit</span></code> followed by <code class="docutils literal notranslate"><span class="pre">convert_dynamic_jit</span></code>. Usage of the one-line API is recommended. But if you wish to debug or analyze the model after each step, the multi-line API comes into use.</p>
@@ -673,7 +673,7 @@ We choose a batch size of 8 and sequence lenght of 128 based on the input sizes 
 </div>
 <p>Note that the accuracy of the debug version is close to, but not exactly the same as the non-debug version as the debug version uses floating point ops to emulate quantized ops and the numerics match is approximate.
 This is the case only for per-channel quantization (we are working on improving this). Per-tensor quantization (using default_dynamic_qconfig) has exact numerics match between debug and non-debug version.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">quantized_model_debug</span><span class="o">.</span><span class="n">graph</span><span class="p">))</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">quantized_model_debug</span><span class="o">.</span><span class="n">graph</span><span class="p">))</span>
 </pre></div>
 </div>
 <p>Snippet of the graph printed -</p>
@@ -702,7 +702,7 @@ This is the case only for per-channel quantization (we are working on improving 
 </div>
 <p>Size of the debug model is the close to the floating point model because all the weights are in float and not yet quantized and frozen, this allows people to inspect the weight.
 You may access the weight attributes directly in the torchscript model. Accessing the weight in the debug model is the same as accessing the weight in a TorchScript model:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">print</span><span class="p">(</span><span class="n">quantized_model</span><span class="o">.</span><span class="n">bert</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">layer</span><span class="o">.</span><span class="n">_c</span><span class="o">.</span><span class="n">getattr</span><span class="p">(</span><span class="s1">&#39;0&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">attention</span><span class="o">.</span><span class="n">self</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">weight</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">quantized_model</span><span class="o">.</span><span class="n">bert</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">layer</span><span class="o">.</span><span class="n">_c</span><span class="o">.</span><span class="n">getattr</span><span class="p">(</span><span class="s1">&#39;0&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">attention</span><span class="o">.</span><span class="n">self</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">weight</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tensor</span><span class="p">([[</span><span class="o">-</span><span class="mf">0.0157</span><span class="p">,</span>  <span class="mf">0.0257</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.0269</span><span class="p">,</span>  <span class="o">...</span><span class="p">,</span>  <span class="mf">0.0158</span><span class="p">,</span>  <span class="mf">0.0764</span><span class="p">,</span>  <span class="mf">0.0548</span><span class="p">],</span>
@@ -716,8 +716,8 @@ You may access the weight attributes directly in the torchscript model. Accessin
 </pre></div>
 </div>
 <p>Accessing the scale and zero_point for the corresponding weight can be done as follows -</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">print</span><span class="p">(</span><span class="n">quantized_model</span><span class="o">.</span><span class="n">bert</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">layer</span><span class="o">.</span><span class="n">_c</span><span class="o">.</span><span class="n">getattr</span><span class="p">(</span><span class="s1">&#39;0&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">attention</span><span class="o">.</span><span class="n">self</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">getattr</span><span class="p">(</span><span class="s1">&#39;4_scale_0&#39;</span><span class="p">))</span>
-<span class="k">print</span><span class="p">(</span><span class="n">quantized_model</span><span class="o">.</span><span class="n">bert</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">layer</span><span class="o">.</span><span class="n">_c</span><span class="o">.</span><span class="n">getattr</span><span class="p">(</span><span class="s1">&#39;0&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">attention</span><span class="o">.</span><span class="n">self</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">getattr</span><span class="p">(</span><span class="s1">&#39;4_zero_point_0&#39;</span><span class="p">))</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">quantized_model</span><span class="o">.</span><span class="n">bert</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">layer</span><span class="o">.</span><span class="n">_c</span><span class="o">.</span><span class="n">getattr</span><span class="p">(</span><span class="s1">&#39;0&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">attention</span><span class="o">.</span><span class="n">self</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">getattr</span><span class="p">(</span><span class="s1">&#39;4_scale_0&#39;</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">quantized_model</span><span class="o">.</span><span class="n">bert</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">layer</span><span class="o">.</span><span class="n">_c</span><span class="o">.</span><span class="n">getattr</span><span class="p">(</span><span class="s1">&#39;0&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">attention</span><span class="o">.</span><span class="n">self</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">getattr</span><span class="p">(</span><span class="s1">&#39;4_zero_point_0&#39;</span><span class="p">))</span>
 </pre></div>
 </div>
 <p>Since we use per-channel quantization, we get per-channel scales tensor.</p>
@@ -769,13 +769,13 @@ You may access the weight attributes directly in the torchscript model. Accessin
         <span class="n">output</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">input_ids</span><span class="p">,</span> <span class="n">token_type_ids</span><span class="p">,</span> <span class="n">attention_mask</span><span class="p">)</span>
         <span class="n">end</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
         <span class="n">elapsed</span> <span class="o">=</span> <span class="n">elapsed</span> <span class="o">+</span> <span class="p">(</span><span class="n">end</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span>
-    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Elapsed time: &#39;</span><span class="p">,</span> <span class="p">(</span><span class="n">elapsed</span> <span class="o">/</span> <span class="mi">50</span><span class="p">),</span> <span class="s1">&#39; s&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Elapsed time: &#39;</span><span class="p">,</span> <span class="p">(</span><span class="n">elapsed</span> <span class="o">/</span> <span class="mi">50</span><span class="p">),</span> <span class="s1">&#39; s&#39;</span><span class="p">)</span>
     <span class="k">return</span>
-<span class="k">print</span><span class="p">(</span><span class="s2">&quot;Running benchmark for Float model&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Running benchmark for Float model&quot;</span><span class="p">)</span>
 <span class="n">benchmark</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">jit_model_path_float</span><span class="p">)</span>
-<span class="k">print</span><span class="p">(</span><span class="s2">&quot;Running benchmark for Eager Mode Quantized model&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Running benchmark for Eager Mode Quantized model&quot;</span><span class="p">)</span>
 <span class="n">benchmark</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">jit_model_path_eager</span><span class="p">)</span>
-<span class="k">print</span><span class="p">(</span><span class="s2">&quot;Running benchmark for Graph Mode Quantized model&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Running benchmark for Graph Mode Quantized model&quot;</span><span class="p">)</span>
 <span class="n">benchmark</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">jit_model_path_graph</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -879,11 +879,9 @@ Dynamic quantization can reduce the size of the model while only having a limite
 
      
        <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-         <script type="text/javascript" src="../_static/jquery.js"></script>
-         <script type="text/javascript" src="../_static/underscore.js"></script>
-         <script type="text/javascript" src="../_static/doctools.js"></script>
-         <script type="text/javascript" src="../_static/language_data.js"></script>
-         <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+         <script src="../_static/jquery.js"></script>
+         <script src="../_static/underscore.js"></script>
+         <script src="../_static/doctools.js"></script>
      
 
   

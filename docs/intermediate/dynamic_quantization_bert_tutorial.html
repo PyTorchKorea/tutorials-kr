@@ -31,7 +31,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="(beta) Static Quantization with Eager Mode in PyTorch" href="../advanced/static_quantization_tutorial.html" />
-    <link rel="prev" title="(beta) Dynamic Quantization on an LSTM Word Language Model" href="../advanced/dynamic_quantization_tutorial.html" /> 
+    <link rel="prev" title="(베타) LSTM 기반 단어 단위 언어 모델의 동적 양자화" href="../advanced/dynamic_quantization_tutorial.html" /> 
 
   
   <script src="../_static/js/modernizr.min.js"></script>
@@ -174,7 +174,7 @@
 <p class="caption"><span class="caption-text">프론트엔드 API</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="named_tensor_tutorial.html">(prototype) Introduction to Named Tensors in PyTorch</a></li>
-<li class="toctree-l1"><a class="reference internal" href="memory_format_tutorial.html">(beta) Channels Last Memory Format in PyTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="memory_format_tutorial.html">(실험용) PyTorch를 사용한 Channels Last Memory Format</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_frontend.html">Using the PyTorch C++ Frontend</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_extension.html">Custom C++ and CUDA Extensions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/torch_script_custom_ops.html">Extending TorchScript with Custom C++ Operators</a></li>
@@ -186,7 +186,7 @@
 <p class="caption"><span class="caption-text">모델 최적화</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="pruning_tutorial.html">가지치기 기법(Pruning) 튜토리얼</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../advanced/dynamic_quantization_tutorial.html">(beta) Dynamic Quantization on an LSTM Word Language Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/dynamic_quantization_tutorial.html">(베타) LSTM 기반 단어 단위 언어 모델의 동적 양자화</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/static_quantization_tutorial.html">(beta) Static Quantization with Eager Mode in PyTorch</a></li>
 <li class="toctree-l1"><a class="reference internal" href="quantized_transfer_learning_tutorial.html">(beta) 컴퓨터 비전(Vision) 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
@@ -302,16 +302,16 @@
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
 <p>이 튜토리얼을 따라 하기 위해, 이
-<a class="reference external" href="https://colab.research.google.com/github/pytorch/tutorials/blob/gh-pages/_downloads/dynamic_quantization_bert_tutorial.ipynb">Colab Version</a> 을 사용하길 권장합니다.
+<a class="reference external" href="https://colab.research.google.com/github/pytorch/tutorials/blob/gh-pages/_downloads/dynamic_quantization_bert_tutorial.ipynb">Colab 버전</a> 을 사용하길 권장합니다.
 그러면 아래에 설명된 정보들을 이용해 실험할 수 있습니다.</p>
 </div>
-<p><strong>Author</strong>: <a class="reference external" href="https://github.com/jianyuh">Jianyu Huang</a></p>
-<p><strong>Reviewed by</strong>: <a class="reference external" href="https://github.com/raghuramank100">Raghuraman Krishnamoorthi</a></p>
-<p><strong>Edited by</strong>: <a class="reference external" href="https://github.com/jlin27">Jessica Lin</a></p>
-<p><strong>번역</strong>: <a class="reference external" href="https://github.com/kwonmha">Myungha Kwon</a></p>
+<p><strong>Author</strong>: <a class="reference external" href="https://github.com/jianyuh">Jianyu Huang</a>
+<strong>Reviewed by</strong>: <a class="reference external" href="https://github.com/raghuramank100">Raghuraman Krishnamoorthi</a>
+<strong>Edited by</strong>: <a class="reference external" href="https://github.com/jlin27">Jessica Lin</a>
+<strong>번역</strong>: <a class="reference external" href="https://github.com/kwonmha">Myungha Kwon</a></p>
 <div class="section" id="id1">
 <h2>시작하기<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
-<p>이 튜토리얼에서는 <a class="reference external" href="https://github.com/huggingface/transformers">HuggingFace Transformers</a> 예제들을 따라 하면서 BERT
+<p>이 튜토리얼에서는 <a class="reference external" href="https://github.com/huggingface/transformers">HuggingFace Transformers</a> 예제들을 따라하면서 BERT
 모델을 동적으로 양자화할 것입니다. BERT 처럼 유명하면서도 최고 성능을
 내는 모델을 어떻게 동적으로 양자화된 모델로 변환하는지 한 단계씩 설명하겠습니다.</p>
 <ul class="simple">
@@ -361,7 +361,7 @@ yes y <span class="p">|</span> pip install --pre torch -f https://download.pytor
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
 
 <span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">random</span>
 <span class="kn">import</span> <span class="nn">sys</span>
@@ -380,20 +380,20 @@ yes y <span class="p">|</span> pip install --pre torch -f https://download.pytor
 
 <span class="c1"># 로깅 준비</span>
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
-<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">format</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%(asctime)s</span><span class="s1"> - </span><span class="si">%(levelname)s</span><span class="s1"> - </span><span class="si">%(name)s</span><span class="s1"> -   </span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">,</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="nb">format</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%(asctime)s</span><span class="s1"> - </span><span class="si">%(levelname)s</span><span class="s1"> - </span><span class="si">%(name)s</span><span class="s1"> -   </span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">,</span>
                     <span class="n">datefmt</span> <span class="o">=</span> <span class="s1">&#39;%m/</span><span class="si">%d</span><span class="s1">/%Y %H:%M:%S&#39;</span><span class="p">,</span>
                     <span class="n">level</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">WARN</span><span class="p">)</span>
 
 <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;transformers.modeling_utils&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span>
-   <span class="n">logging</span><span class="o">.</span><span class="n">WARN</span><span class="p">)</span>  <span class="c1"># 로깅 줄이기</span>
+                    <span class="n">logging</span><span class="o">.</span><span class="n">WARN</span><span class="p">)</span>  <span class="c1"># 로깅 줄이기</span>
 
-<span class="k">print</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>쓰레드 한 개를 사용할 때의 FP32와 INT8의 성능을 비교하기 위해 쓰레드의 수를 1로 설정합니다.
 이 튜토리얼의 끝부분에서는 PyTorch를 적절하게 병렬적으로 빌드하여 쓰레드 수를 다르게 설정할 수 있습니다.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">torch</span><span class="o">.</span><span class="n">set_num_threads</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-<span class="k">print</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">__config__</span><span class="o">.</span><span class="n">parallel_info</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">__config__</span><span class="o">.</span><span class="n">parallel_info</span><span class="p">())</span>
 </pre></div>
 </div>
 </div>
@@ -412,19 +412,21 @@ F1 점수를 계산하기 위한 함수입니다.</p>
 <li><p>토큰이 첫번째 문장에 속하는지 두번째 문장에 속하는지 알려주는 토큰 타입 id 생성하기</p></li>
 </ul>
 <p><a class="reference external" href="https://github.com/huggingface/transformers/blob/master/transformers/data/processors/glue.py">glue_compute_metrics</a> 함수는
-정밀도와 지현율의 가중 평균인 <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.metrics.f1_score.html">F1 점수</a> 를
+정밀도와 재현율의 가중 평균인 <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.metrics.f1_score.html">F1 점수</a> 를
 계산하는 행렬을 갖고 있습니다. F1 점수가 가장 좋을 때는 1이며, 가장 나쁠 때는 0입니다.
 정밀도와 재현율은 F1 점수를 계산할 때 동일한 비중을 갖습니다.</p>
 <ul class="simple">
 <li><p>F1 점수를 구하는 식 :</p></li>
 </ul>
-<div class="math notranslate nohighlight">
+<blockquote>
+<div><div class="math notranslate nohighlight">
 \[F1 = 2 * (\text{정밀도} * \text{재현율}) / (\text{정밀도} + \text{재현율})\]</div>
+</div></blockquote>
 </div>
 <div class="section" id="id9">
 <h3>1.4 데이터셋 다운로드<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
 <p>MRPC 문제를 풀어보기 전에 <a class="reference external" href="https://gist.github.com/W4ngatang/60c2bdb54d156a41194446737ce03e2e">이 스크립트</a> 를
-실행해 <a class="reference external" href="https://gluebenchmark.com/tasks">GLUE 데이터셋</a> 을 다운로드 받고 ‘’glue_data’’
+실행해 <a class="reference external" href="https://gluebenchmark.com/tasks">GLUE 데이터셋</a> 을 다운로드 받고 <code class="docutils literal notranslate"><span class="pre">glue_data</span></code>
 폴더에 저장합니다.</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>python download_glue_data.py --data_dir<span class="o">=</span><span class="s1">&#39;glue_data&#39;</span> --tasks<span class="o">=</span><span class="s1">&#39;MRPC&#39;</span>
 </pre></div>
@@ -486,14 +488,14 @@ python ./run_glue.py \
 <span class="n">configs</span><span class="o">.</span><span class="n">output_mode</span> <span class="o">=</span> <span class="n">output_modes</span><span class="p">[</span><span class="n">configs</span><span class="o">.</span><span class="n">task_name</span><span class="p">]</span>
 <span class="n">configs</span><span class="o">.</span><span class="n">label_list</span> <span class="o">=</span> <span class="n">configs</span><span class="o">.</span><span class="n">processor</span><span class="o">.</span><span class="n">get_labels</span><span class="p">()</span>
 <span class="n">configs</span><span class="o">.</span><span class="n">model_type</span> <span class="o">=</span> <span class="s2">&quot;bert&quot;</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-<span class="n">configs</span><span class="o">.</span><span class="n">do_lower_case</span> <span class="o">=</span> <span class="bp">True</span>
+<span class="n">configs</span><span class="o">.</span><span class="n">do_lower_case</span> <span class="o">=</span> <span class="kc">True</span>
 
 <span class="c1"># 장비 종류, 배치 크기, 분산 학습 방식, 캐싱 방식 설정</span>
 <span class="n">configs</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="s2">&quot;cpu&quot;</span>
 <span class="n">configs</span><span class="o">.</span><span class="n">per_gpu_eval_batch_size</span> <span class="o">=</span> <span class="mi">8</span>
 <span class="n">configs</span><span class="o">.</span><span class="n">n_gpu</span> <span class="o">=</span> <span class="mi">0</span>
 <span class="n">configs</span><span class="o">.</span><span class="n">local_rank</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
-<span class="n">configs</span><span class="o">.</span><span class="n">overwrite_cache</span> <span class="o">=</span> <span class="bp">False</span>
+<span class="n">configs</span><span class="o">.</span><span class="n">overwrite_cache</span> <span class="o">=</span> <span class="kc">False</span>
 
 
 <span class="c1"># 재현을 위한 랜덤 시드 설정</span>
@@ -540,32 +542,35 @@ BERT 모델(FP32)를 불러옵니다.</p>
 <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">tokenizer</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
     <span class="c1"># MNLI의 두 평가 결과(일치, 불일치)를 처리하기 위한 반복문</span>
     <span class="n">eval_task_names</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;mnli&quot;</span><span class="p">,</span> <span class="s2">&quot;mnli-mm&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">task_name</span> <span class="o">==</span> <span class="s2">&quot;mnli&quot;</span> <span class="k">else</span> <span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">task_name</span><span class="p">,)</span>
-    <span class="n">eval_outputs_dirs</span> <span class="o">=</span> <span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_dir</span> <span class="o">+</span> <span class="s1">&#39;-MM&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">task_name</span> <span class="o">==</span> <span class="s2">&quot;mnli&quot;</span> <span class="k">else</span> <span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,)</span>
+    <span class="n">eval_outputs_dirs</span> <span class="o">=</span> <span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_dir</span> <span class="o">+</span> <span class="s1">&#39;-MM&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">task_name</span> <span class="o">==</span> <span class="s2">&quot;mnli&quot;</span>
+                            <span class="k">else</span> <span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,)</span>
 
     <span class="n">results</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">for</span> <span class="n">eval_task</span><span class="p">,</span> <span class="n">eval_output_dir</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">eval_task_names</span><span class="p">,</span> <span class="n">eval_outputs_dirs</span><span class="p">):</span>
-        <span class="n">eval_dataset</span> <span class="o">=</span> <span class="n">load_and_cache_examples</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">eval_task</span><span class="p">,</span> <span class="n">tokenizer</span><span class="p">,</span> <span class="n">evaluate</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="n">eval_dataset</span> <span class="o">=</span> <span class="n">load_and_cache_examples</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">eval_task</span><span class="p">,</span> <span class="n">tokenizer</span><span class="p">,</span> <span class="n">evaluate</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">eval_output_dir</span><span class="p">)</span> <span class="ow">and</span> <span class="n">args</span><span class="o">.</span><span class="n">local_rank</span> <span class="ow">in</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]:</span>
             <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">eval_output_dir</span><span class="p">)</span>
 
         <span class="n">args</span><span class="o">.</span><span class="n">eval_batch_size</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">per_gpu_eval_batch_size</span> <span class="o">*</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">n_gpu</span><span class="p">)</span>
         <span class="c1"># DistributedSampler는 무작위로 표본을 추출합니다</span>
-        <span class="n">eval_sampler</span> <span class="o">=</span> <span class="n">SequentialSampler</span><span class="p">(</span><span class="n">eval_dataset</span><span class="p">)</span> <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">local_rank</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span> <span class="k">else</span> <span class="n">DistributedSampler</span><span class="p">(</span><span class="n">eval_dataset</span><span class="p">)</span>
-        <span class="n">eval_dataloader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">eval_dataset</span><span class="p">,</span> <span class="n">sampler</span><span class="o">=</span><span class="n">eval_sampler</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">eval_batch_size</span><span class="p">)</span>
+        <span class="n">eval_sampler</span> <span class="o">=</span> <span class="n">SequentialSampler</span><span class="p">(</span><span class="n">eval_dataset</span><span class="p">)</span> <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">local_rank</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span>
+                        <span class="k">else</span> <span class="n">DistributedSampler</span><span class="p">(</span><span class="n">eval_dataset</span><span class="p">)</span>
+        <span class="n">eval_dataloader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">eval_dataset</span><span class="p">,</span> <span class="n">sampler</span><span class="o">=</span><span class="n">eval_sampler</span><span class="p">,</span>
+                                        <span class="n">batch_size</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">eval_batch_size</span><span class="p">)</span>
 
         <span class="c1"># 다중 gpu로 평가</span>
         <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">n_gpu</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">model</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">DataParallel</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
 
         <span class="c1"># 평가 실행!</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;***** Running evaluation {} *****&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">prefix</span><span class="p">))</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;***** Running evaluation </span><span class="si">{}</span><span class="s2"> *****&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">prefix</span><span class="p">))</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;  Num examples = </span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">eval_dataset</span><span class="p">))</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;  Batch size = </span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">eval_batch_size</span><span class="p">)</span>
         <span class="n">eval_loss</span> <span class="o">=</span> <span class="mf">0.0</span>
         <span class="n">nb_eval_steps</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="n">preds</span> <span class="o">=</span> <span class="bp">None</span>
-        <span class="n">out_label_ids</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="n">preds</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">out_label_ids</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">eval_dataloader</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Evaluating&quot;</span><span class="p">):</span>
             <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
             <span class="n">batch</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">device</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">batch</span><span class="p">)</span>
@@ -575,18 +580,22 @@ BERT 모델(FP32)를 불러옵니다.</p>
                           <span class="s1">&#39;attention_mask&#39;</span><span class="p">:</span> <span class="n">batch</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
                           <span class="s1">&#39;labels&#39;</span><span class="p">:</span>         <span class="n">batch</span><span class="p">[</span><span class="mi">3</span><span class="p">]}</span>
                 <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">model_type</span> <span class="o">!=</span> <span class="s1">&#39;distilbert&#39;</span><span class="p">:</span>
-                    <span class="n">inputs</span><span class="p">[</span><span class="s1">&#39;token_type_ids&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">model_type</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;bert&#39;</span><span class="p">,</span> <span class="s1">&#39;xlnet&#39;</span><span class="p">]</span> <span class="k">else</span> <span class="bp">None</span>  <span class="c1"># XLM, DistilBERT and RoBERTa 모델들은 segment_ids를 사용하지 않습니다</span>
+                    <span class="n">inputs</span><span class="p">[</span><span class="s1">&#39;token_type_ids&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">model_type</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;bert&#39;</span><span class="p">,</span> <span class="s1">&#39;xlnet&#39;</span><span class="p">]</span>
+                                                <span class="k">else</span> <span class="kc">None</span>
+                                                <span class="c1"># XLM, DistilBERT and RoBERTa 모델들은 segment_ids를</span>
+                                                <span class="c1"># 사용하지 않습니다</span>
                 <span class="n">outputs</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="o">**</span><span class="n">inputs</span><span class="p">)</span>
                 <span class="n">tmp_eval_loss</span><span class="p">,</span> <span class="n">logits</span> <span class="o">=</span> <span class="n">outputs</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span>
 
                 <span class="n">eval_loss</span> <span class="o">+=</span> <span class="n">tmp_eval_loss</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
             <span class="n">nb_eval_steps</span> <span class="o">+=</span> <span class="mi">1</span>
-            <span class="k">if</span> <span class="n">preds</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">preds</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">preds</span> <span class="o">=</span> <span class="n">logits</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
                 <span class="n">out_label_ids</span> <span class="o">=</span> <span class="n">inputs</span><span class="p">[</span><span class="s1">&#39;labels&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">preds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">preds</span><span class="p">,</span> <span class="n">logits</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-                <span class="n">out_label_ids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">out_label_ids</span><span class="p">,</span> <span class="n">inputs</span><span class="p">[</span><span class="s1">&#39;labels&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                <span class="n">out_label_ids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">out_label_ids</span><span class="p">,</span> <span class="n">inputs</span><span class="p">[</span><span class="s1">&#39;labels&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span>
+                                            <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
         <span class="n">eval_loss</span> <span class="o">=</span> <span class="n">eval_loss</span> <span class="o">/</span> <span class="n">nb_eval_steps</span>
         <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">output_mode</span> <span class="o">==</span> <span class="s2">&quot;classification&quot;</span><span class="p">:</span>
@@ -598,7 +607,7 @@ BERT 모델(FP32)를 불러옵니다.</p>
 
         <span class="n">output_eval_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">eval_output_dir</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="s2">&quot;eval_results.txt&quot;</span><span class="p">)</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">output_eval_file</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">writer</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;***** Eval results {} *****&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">prefix</span><span class="p">))</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;***** Eval results </span><span class="si">{}</span><span class="s2"> *****&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">prefix</span><span class="p">))</span>
             <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;  </span><span class="si">%s</span><span class="s2"> = </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="n">key</span><span class="p">]))</span>
                 <span class="n">writer</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> = </span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="n">key</span><span class="p">])))</span>
@@ -606,16 +615,17 @@ BERT 모델(FP32)를 불러옵니다.</p>
     <span class="k">return</span> <span class="n">results</span>
 
 
-<span class="k">def</span> <span class="nf">load_and_cache_examples</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">task</span><span class="p">,</span> <span class="n">tokenizer</span><span class="p">,</span> <span class="n">evaluate</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">load_and_cache_examples</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">task</span><span class="p">,</span> <span class="n">tokenizer</span><span class="p">,</span> <span class="n">evaluate</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">local_rank</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">evaluate</span><span class="p">:</span>
-        <span class="n">torch</span><span class="o">.</span><span class="n">distributed</span><span class="o">.</span><span class="n">barrier</span><span class="p">()</span>  <span class="c1"># 분산 학습 프로세스들 중 처음 프로세스 한 개만 데이터를 처리하고 다른 프로세스들은 캐시를 이용하도록 합니다.</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">distributed</span><span class="o">.</span><span class="n">barrier</span><span class="p">()</span>  <span class="c1"># 분산 학습 프로세스들 중 처음 프로세스 한 개만 데이터를 처리하고 다른</span>
+                                     <span class="c1"># 프로세스들은 캐시를 이용하도록 합니다.</span>
 
     <span class="n">processor</span> <span class="o">=</span> <span class="n">processors</span><span class="p">[</span><span class="n">task</span><span class="p">]()</span>
     <span class="n">output_mode</span> <span class="o">=</span> <span class="n">output_modes</span><span class="p">[</span><span class="n">task</span><span class="p">]</span>
     <span class="c1"># 캐시 또는 데이터셋 파일로부터 데이터 특징을 불러옵니다.</span>
-    <span class="n">cached_features_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">data_dir</span><span class="p">,</span> <span class="s1">&#39;cached_{}_{}_{}_{}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+    <span class="n">cached_features_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">data_dir</span><span class="p">,</span> <span class="s1">&#39;cached_</span><span class="si">{}</span><span class="s1">_</span><span class="si">{}</span><span class="s1">_</span><span class="si">{}</span><span class="s1">_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
         <span class="s1">&#39;dev&#39;</span> <span class="k">if</span> <span class="n">evaluate</span> <span class="k">else</span> <span class="s1">&#39;train&#39;</span><span class="p">,</span>
-        <span class="nb">list</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">model_name_or_path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)))</span><span class="o">.</span><span class="n">pop</span><span class="p">(),</span>
+        <span class="nb">list</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">model_name_or_path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)))</span><span class="o">.</span><span class="n">pop</span><span class="p">(),</span>
         <span class="nb">str</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">max_seq_length</span><span class="p">),</span>
         <span class="nb">str</span><span class="p">(</span><span class="n">task</span><span class="p">)))</span>
     <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">cached_features_file</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">args</span><span class="o">.</span><span class="n">overwrite_cache</span><span class="p">:</span>
@@ -627,22 +637,27 @@ BERT 모델(FP32)를 불러옵니다.</p>
         <span class="k">if</span> <span class="n">task</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;mnli&#39;</span><span class="p">,</span> <span class="s1">&#39;mnli-mm&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="n">args</span><span class="o">.</span><span class="n">model_type</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;roberta&#39;</span><span class="p">]:</span>
             <span class="c1"># 해결책(사전학습된 RoBERTa 모델에서는 라벨 인덱스 순서가 바뀌어 있습니다.)</span>
             <span class="n">label_list</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">label_list</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">label_list</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">label_list</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-        <span class="n">examples</span> <span class="o">=</span> <span class="n">processor</span><span class="o">.</span><span class="n">get_dev_examples</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">data_dir</span><span class="p">)</span> <span class="k">if</span> <span class="n">evaluate</span> <span class="k">else</span> <span class="n">processor</span><span class="o">.</span><span class="n">get_train_examples</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">data_dir</span><span class="p">)</span>
+        <span class="n">examples</span> <span class="o">=</span> <span class="n">processor</span><span class="o">.</span><span class="n">get_dev_examples</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">data_dir</span><span class="p">)</span> <span class="k">if</span> <span class="n">evaluate</span>
+                    <span class="k">else</span> <span class="n">processor</span><span class="o">.</span><span class="n">get_train_examples</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">data_dir</span><span class="p">)</span>
         <span class="n">features</span> <span class="o">=</span> <span class="n">convert_examples_to_features</span><span class="p">(</span><span class="n">examples</span><span class="p">,</span>
                                                 <span class="n">tokenizer</span><span class="p">,</span>
                                                 <span class="n">label_list</span><span class="o">=</span><span class="n">label_list</span><span class="p">,</span>
                                                 <span class="n">max_length</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">max_seq_length</span><span class="p">,</span>
                                                 <span class="n">output_mode</span><span class="o">=</span><span class="n">output_mode</span><span class="p">,</span>
-                                                <span class="n">pad_on_left</span><span class="o">=</span><span class="nb">bool</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">model_type</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;xlnet&#39;</span><span class="p">]),</span>                 <span class="c1"># xlnet의 경우 앞쪽에 패딩합니다.</span>
-                                                <span class="n">pad_token</span><span class="o">=</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">convert_tokens_to_ids</span><span class="p">([</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">pad_token</span><span class="p">])[</span><span class="mi">0</span><span class="p">],</span>
-                                                <span class="n">pad_token_segment_id</span><span class="o">=</span><span class="mi">4</span> <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">model_type</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;xlnet&#39;</span><span class="p">]</span> <span class="k">else</span> <span class="mi">0</span><span class="p">,</span>
+                                                <span class="n">pad_on_left</span><span class="o">=</span><span class="nb">bool</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">model_type</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;xlnet&#39;</span><span class="p">]),</span>
+                                                <span class="c1"># xlnet의 경우 앞쪽에 패딩합니다.</span>
+                                                <span class="n">pad_token</span><span class="o">=</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">convert_tokens_to_ids</span><span class="p">(</span>
+                                                    <span class="p">[</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">pad_token</span><span class="p">])[</span><span class="mi">0</span><span class="p">],</span>
+                                                <span class="n">pad_token_segment_id</span><span class="o">=</span><span class="mi">4</span> <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">model_type</span> <span class="ow">in</span>
+                                                                        <span class="p">[</span><span class="s1">&#39;xlnet&#39;</span><span class="p">]</span> <span class="k">else</span> <span class="mi">0</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">local_rank</span> <span class="ow">in</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Saving features into cached file </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">cached_features_file</span><span class="p">)</span>
             <span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">features</span><span class="p">,</span> <span class="n">cached_features_file</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">local_rank</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">evaluate</span><span class="p">:</span>
-        <span class="n">torch</span><span class="o">.</span><span class="n">distributed</span><span class="o">.</span><span class="n">barrier</span><span class="p">()</span>  <span class="c1"># 분산 학습 프로세스들 중 처음 프로세스 한 개만 데이터를 처리하고 다른 프로세스들은 캐시를 이용하도록 합니다.</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">distributed</span><span class="o">.</span><span class="n">barrier</span><span class="p">()</span>  <span class="c1"># 분산 학습 프로세스들 중 처음 프로세스 한 개만 데이터를 처리하고 다른</span>
+                                     <span class="c1"># 프로세스들은 캐시를 이용하도록 합니다.</span>
 
     <span class="c1"># 텐서로 변환하고 데이터셋을 빌드합니다.</span>
     <span class="n">all_input_ids</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="n">f</span><span class="o">.</span><span class="n">input_ids</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">features</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">long</span><span class="p">)</span>
@@ -670,7 +685,7 @@ BERT 모델(FP32)를 불러옵니다.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">quantized_model</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">quantization</span><span class="o">.</span><span class="n">quantize_dynamic</span><span class="p">(</span>
     <span class="n">model</span><span class="p">,</span> <span class="p">{</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">},</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">qint8</span>
 <span class="p">)</span>
-<span class="k">print</span><span class="p">(</span><span class="n">quantized_model</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">quantized_model</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="section" id="id20">
@@ -679,7 +694,7 @@ BERT 모델(FP32)를 불러옵니다.</p>
 알 수 있습니다(FP32 형식의 모델 크기 : 438MB; INT8 형식의 모델 크기 : 181MB):</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">print_size_of_model</span><span class="p">(</span><span class="n">model</span><span class="p">):</span>
     <span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span> <span class="s2">&quot;temp.p&quot;</span><span class="p">)</span>
-    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Size (MB):&#39;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getsize</span><span class="p">(</span><span class="s2">&quot;temp.p&quot;</span><span class="p">)</span><span class="o">/</span><span class="mf">1e6</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Size (MB):&#39;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getsize</span><span class="p">(</span><span class="s2">&quot;temp.p&quot;</span><span class="p">)</span><span class="o">/</span><span class="mf">1e6</span><span class="p">)</span>
     <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s1">&#39;temp.p&#39;</span><span class="p">)</span>
 
 <span class="n">print_size_of_model</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
@@ -701,8 +716,8 @@ BERT 모델(FP32)를 불러옵니다.</p>
     <span class="n">result</span> <span class="o">=</span> <span class="n">evaluate</span><span class="p">(</span><span class="n">configs</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">tokenizer</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
     <span class="n">eval_end_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
     <span class="n">eval_duration_time</span> <span class="o">=</span> <span class="n">eval_end_time</span> <span class="o">-</span> <span class="n">eval_start_time</span>
-    <span class="k">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
-    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Evaluate total time (seconds): {0:.1f}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">eval_duration_time</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Evaluate total time (seconds): </span><span class="si">{0:.1f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">eval_duration_time</span><span class="p">))</span>
 
 <span class="c1"># 기존 FP32 BERT 모델 평가</span>
 <span class="n">time_model_evaluation</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">configs</span><span class="p">,</span> <span class="n">tokenizer</span><span class="p">)</span>
@@ -776,7 +791,7 @@ Quantized 8bit BERT</a>.</p>
         <a href="../advanced/static_quantization_tutorial.html" class="btn btn-neutral float-right" title="(beta) Static Quantization with Eager Mode in PyTorch" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
       
       
-        <a href="../advanced/dynamic_quantization_tutorial.html" class="btn btn-neutral" title="(beta) Dynamic Quantization on an LSTM Word Language Model" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
+        <a href="../advanced/dynamic_quantization_tutorial.html" class="btn btn-neutral" title="(베타) LSTM 기반 단어 단위 언어 모델의 동적 양자화" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
       
     </div>
   
@@ -855,11 +870,10 @@ Quantized 8bit BERT</a>.</p>
 
      
        <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-         <script type="text/javascript" src="../_static/jquery.js"></script>
-         <script type="text/javascript" src="../_static/underscore.js"></script>
-         <script type="text/javascript" src="../_static/doctools.js"></script>
-         <script type="text/javascript" src="../_static/language_data.js"></script>
-         <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+         <script src="../_static/jquery.js"></script>
+         <script src="../_static/underscore.js"></script>
+         <script src="../_static/doctools.js"></script>
+         <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
      
 
   

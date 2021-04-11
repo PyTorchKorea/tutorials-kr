@@ -172,7 +172,7 @@
 <p class="caption"><span class="caption-text">프론트엔드 API</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/named_tensor_tutorial.html">(prototype) Introduction to Named Tensors in PyTorch</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../intermediate/memory_format_tutorial.html">(beta) Channels Last Memory Format in PyTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../intermediate/memory_format_tutorial.html">(실험용) PyTorch를 사용한 Channels Last Memory Format</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../advanced/cpp_frontend.html">Using the PyTorch C++ Frontend</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../advanced/cpp_extension.html">Custom C++ and CUDA Extensions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../advanced/torch_script_custom_ops.html">Extending TorchScript with Custom C++ Operators</a></li>
@@ -184,7 +184,7 @@
 <p class="caption"><span class="caption-text">모델 최적화</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/pruning_tutorial.html">가지치기 기법(Pruning) 튜토리얼</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../advanced/dynamic_quantization_tutorial.html">(beta) Dynamic Quantization on an LSTM Word Language Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../advanced/dynamic_quantization_tutorial.html">(베타) LSTM 기반 단어 단위 언어 모델의 동적 양자화</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../advanced/static_quantization_tutorial.html">(beta) Static Quantization with Eager Mode in PyTorch</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/quantized_transfer_learning_tutorial.html">(beta) 컴퓨터 비전(Vision) 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
@@ -320,13 +320,13 @@
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">DataParallel</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>이것이 튜토리얼의 핵심입니다. 자세한 사항들에 대해서는 아래에서 살펴보겠습니다.</p>
-<div class="section" id="id1">
-<h2>불러오기와 매개변수<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<p>이것이 튜토리얼의 핵심입니다. 자세한 사항들에 대해서는 아래에서 살펴보겠습니다.
+불러오기와 매개변수
+———————-</p>
 <p>PyTorch 모듈을 불러오고 매개변수를 정의하십시오.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
-<span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="k">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">DataLoader</span>
+<span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">DataLoader</span>
 
 <span class="c1"># 매개변수와 DataLoaders</span>
 <span class="n">input_size</span> <span class="o">=</span> <span class="mi">5</span>
@@ -340,36 +340,35 @@
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cuda:0&quot;</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
 <div class="section" id="dummy">
 <h2>더미(Dummy) 데이터셋<a class="headerlink" href="#dummy" title="Permalink to this headline">¶</a></h2>
 <p>더미(ramdom) 데이터셋을 만들어 봅시다. Getitem 만 구현하면 됩니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">RandomDataset</span><span class="p">(</span><span class="n">Dataset</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">length</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">length</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">len</span> <span class="o">=</span> <span class="n">length</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">length</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">len</span>
 
 <span class="n">rand_loader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">dataset</span><span class="o">=</span><span class="n">RandomDataset</span><span class="p">(</span><span class="n">input_size</span><span class="p">,</span> <span class="n">data_size</span><span class="p">),</span>
                          <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
-<dl class="simple">
-<dt>간단한 모델</dt><dd><p>데모를 위해 모델은 입력을 받고 선형 연산을 수행하며 출력을 제공합니다. 그러나 <code class="docutils literal notranslate"><span class="pre">DataParallel</span></code> 의 어떤 모델 (CNN, RNN, Capsule Net 등) 에서든 사용할 수 있습니다.</p>
-</dd>
-<dt>우리는 input과 output의 크기를 모니터링하기 위해 모델안에 print 문을 넣었습니다.</dt><dd><p>무엇이 배치 순위 (batch rank) 0 에 프린트 되는지 주의 깊게 봐주시길 바랍니다.</p>
-</dd>
-</dl>
+</div>
+<div class="section" id="id1">
+<h2>간단한 모델<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<p>데모를 위해 모델은 입력을 받고 선형 연산을 수행하며 출력을 제공합니다. 그러나 <code class="docutils literal notranslate"><span class="pre">DataParallel</span></code> 의 어떤 모델 (CNN, RNN, Capsule Net 등) 에서든 사용할 수 있습니다.</p>
+<p>우리는 input과 output의 크기를 모니터링하기 위해 모델안에 print 문을 넣었습니다.
+무엇이 배치 순위 (batch rank) 0 에 프린트 되는지 주의 깊게 봐주시길 바랍니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Model</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
     <span class="c1"># 우리의 모델</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_size</span><span class="p">,</span> <span class="n">output_size</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_size</span><span class="p">,</span> <span class="n">output_size</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">Model</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fc</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">input_size</span><span class="p">,</span> <span class="n">output_size</span><span class="p">)</span>
 
@@ -516,7 +515,7 @@ Outside: input size torch.Size([10, 5]) output_size torch.Size([10, 2])
 사용자에게 결과를 반환하기 전에 모든 결과물들을 수집하여 병합합니다.</p>
 <p>더 많은 정보를 알고싶다면 아래 주소를 참고하세요.
 <a class="reference external" href="https://tutorials.pytorch.kr/beginner/former_torchies/parallelism_tutorial.html">https://tutorials.pytorch.kr/beginner/former_torchies/parallelism_tutorial.html</a></p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.107 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.070 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-beginner-blitz-data-parallel-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/e85264945029fe236addcb864bf5f13f/data_parallel_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">data_parallel_tutorial.py</span></code></a></p>
@@ -571,8 +570,8 @@ Outside: input size torch.Size([10, 5]) output_size torch.Size([10, 2])
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
 <li><a class="reference internal" href="#">선택 사항: 데이터 병렬 처리 (Data Parallelism)</a><ul>
-<li><a class="reference internal" href="#id1">불러오기와 매개변수</a></li>
 <li><a class="reference internal" href="#dummy">더미(Dummy) 데이터셋</a></li>
+<li><a class="reference internal" href="#id1">간단한 모델</a></li>
 <li><a class="reference internal" href="#id2">모델과 데이터 병렬의 구현</a></li>
 <li><a class="reference internal" href="#id3">모델 실행</a></li>
 <li><a class="reference internal" href="#id4">결과</a><ul>
@@ -599,11 +598,9 @@ Outside: input size torch.Size([10, 5]) output_size torch.Size([10, 2])
 
      
        <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-         <script type="text/javascript" src="../../_static/jquery.js"></script>
-         <script type="text/javascript" src="../../_static/underscore.js"></script>
-         <script type="text/javascript" src="../../_static/doctools.js"></script>
-         <script type="text/javascript" src="../../_static/language_data.js"></script>
-         <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+         <script src="../../_static/jquery.js"></script>
+         <script src="../../_static/underscore.js"></script>
+         <script src="../../_static/doctools.js"></script>
      
 
   

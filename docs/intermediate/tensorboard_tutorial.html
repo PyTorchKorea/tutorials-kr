@@ -174,7 +174,7 @@
 <p class="caption"><span class="caption-text">프론트엔드 API</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="named_tensor_tutorial.html">(prototype) Introduction to Named Tensors in PyTorch</a></li>
-<li class="toctree-l1"><a class="reference internal" href="memory_format_tutorial.html">(beta) Channels Last Memory Format in PyTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="memory_format_tutorial.html">(실험용) PyTorch를 사용한 Channels Last Memory Format</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_frontend.html">Using the PyTorch C++ Frontend</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_extension.html">Custom C++ and CUDA Extensions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/torch_script_custom_ops.html">Extending TorchScript with Custom C++ Operators</a></li>
@@ -186,7 +186,7 @@
 <p class="caption"><span class="caption-text">모델 최적화</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="pruning_tutorial.html">가지치기 기법(Pruning) 튜토리얼</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../advanced/dynamic_quantization_tutorial.html">(beta) Dynamic Quantization on an LSTM Word Language Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/dynamic_quantization_tutorial.html">(베타) LSTM 기반 단어 단위 언어 모델의 동적 양자화</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/static_quantization_tutorial.html">(beta) Static Quantization with Eager Mode in PyTorch</a></li>
 <li class="toctree-l1"><a class="reference internal" href="quantized_transfer_learning_tutorial.html">(beta) 컴퓨터 비전(Vision) 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
@@ -328,16 +328,16 @@
 </div></blockquote>
 <p><a class="reference internal" href="../beginner/blitz/cifar10_tutorial.html"><span class="doc">분류기(Classifier) 학습하기</span></a> 와 비슷한 코드로 시작해보겠습니다:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># imports</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torchvision</span>
-<span class="kn">import</span> <span class="nn">torchvision.transforms</span> <span class="kn">as</span> <span class="nn">transforms</span>
+<span class="kn">import</span> <span class="nn">torchvision.transforms</span> <span class="k">as</span> <span class="nn">transforms</span>
 
-<span class="kn">import</span> <span class="nn">torch.nn</span> <span class="kn">as</span> <span class="nn">nn</span>
-<span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="kn">as</span> <span class="nn">F</span>
-<span class="kn">import</span> <span class="nn">torch.optim</span> <span class="kn">as</span> <span class="nn">optim</span>
+<span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
+<span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="nn">F</span>
+<span class="kn">import</span> <span class="nn">torch.optim</span> <span class="k">as</span> <span class="nn">optim</span>
 
 <span class="c1"># transforms</span>
 <span class="n">transform</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">Compose</span><span class="p">(</span>
@@ -346,21 +346,21 @@
 
 <span class="c1"># datasets</span>
 <span class="n">trainset</span> <span class="o">=</span> <span class="n">torchvision</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">FashionMNIST</span><span class="p">(</span><span class="s1">&#39;./data&#39;</span><span class="p">,</span>
-    <span class="n">download</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
-    <span class="n">train</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+    <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">train</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">transform</span><span class="o">=</span><span class="n">transform</span><span class="p">)</span>
 <span class="n">testset</span> <span class="o">=</span> <span class="n">torchvision</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">FashionMNIST</span><span class="p">(</span><span class="s1">&#39;./data&#39;</span><span class="p">,</span>
-    <span class="n">download</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
-    <span class="n">train</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+    <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">train</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">transform</span><span class="o">=</span><span class="n">transform</span><span class="p">)</span>
 
 <span class="c1"># dataloaders</span>
 <span class="n">trainloader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="n">trainset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
-                                        <span class="n">shuffle</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+                                        <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
 
 <span class="n">testloader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="n">testset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
-                                        <span class="n">shuffle</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+                                        <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
 <span class="c1"># 분류 결과를 위한 상수</span>
 <span class="n">classes</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;T-shirt/top&#39;</span><span class="p">,</span> <span class="s1">&#39;Trouser&#39;</span><span class="p">,</span> <span class="s1">&#39;Pullover&#39;</span><span class="p">,</span> <span class="s1">&#39;Dress&#39;</span><span class="p">,</span> <span class="s1">&#39;Coat&#39;</span><span class="p">,</span>
@@ -368,7 +368,7 @@
 
 <span class="c1"># 이미지를 보여주기 위한 헬퍼(helper) 함수</span>
 <span class="c1"># (아래 `plot_classes_preds` 함수에서 사용)</span>
-<span class="k">def</span> <span class="nf">matplotlib_imshow</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">one_channel</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">matplotlib_imshow</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">one_channel</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">one_channel</span><span class="p">:</span>
         <span class="n">img</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
     <span class="n">img</span> <span class="o">=</span> <span class="n">img</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">+</span> <span class="mf">0.5</span>     <span class="c1"># unnormalize</span>
@@ -435,7 +435,7 @@ TensorBoard를 설정합니다.</p>
 <span class="n">img_grid</span> <span class="o">=</span> <span class="n">torchvision</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">make_grid</span><span class="p">(</span><span class="n">images</span><span class="p">)</span>
 
 <span class="c1"># 이미지를 보여줍니다.</span>
-<span class="n">matplotlib_imshow</span><span class="p">(</span><span class="n">img_grid</span><span class="p">,</span> <span class="n">one_channel</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">matplotlib_imshow</span><span class="p">(</span><span class="n">img_grid</span><span class="p">,</span> <span class="n">one_channel</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <span class="c1"># tensorboard에 기록합니다.</span>
 <span class="n">writer</span><span class="o">.</span><span class="n">add_image</span><span class="p">(</span><span class="s1">&#39;four_fashion_mnist_images&#39;</span><span class="p">,</span> <span class="n">img_grid</span><span class="p">)</span>
@@ -447,7 +447,7 @@ TensorBoard를 설정합니다.</p>
 </div>
 <p>를 실행하고, <a class="reference external" href="https://localhost:6006">https://localhost:6006</a> 을 열어보면
 다음과 같은 화면이 나타납니다.</p>
-<img alt="intermediate/../../_static/img/tensorboard_first_view.png" src="intermediate/../../_static/img/tensorboard_first_view.png" />
+<img alt="../_static/img/tensorboard_first_view.png" src="../_static/img/tensorboard_first_view.png" />
 <p>지금까지 TensorBoard를 어떻게 사용하는지를 알아보았습니다! 그러나, 이 예제는
 Jupyter Notebook에서도 가능합니다 - TensorBoard는 대화형 시각화를 만드는데
 특히 뛰어납니다. 다음에 그런 기능들 중 하나를 살펴보고, 튜토리얼의 나머지 부분에서
@@ -462,7 +462,7 @@ Jupyter Notebook에서도 가능합니다 - TensorBoard는 대화형 시각화�
 </pre></div>
 </div>
 <p>TensorBoard를 새로고침(refresh)하면 아래와 같이 “Graphs” 탭을 볼 수 있습니다:</p>
-<img alt="intermediate/../../_static/img/tensorboard_model_viz.png" src="intermediate/../../_static/img/tensorboard_model_viz.png" />
+<img alt="../_static/img/tensorboard_model_viz.png" src="../_static/img/tensorboard_model_viz.png" />
 <p>아래에서 “Net”을 더블클릭하여 펼쳐보면, 모델을 구성하는 개별 연산(operation)들에
 대해 자세히 볼 수 있습니다.</p>
 <p>TensorBoard는 이미지 데이터와 같은 고차원 데이터를 저차원 공간에 시각화하는데
@@ -502,7 +502,7 @@ Jupyter Notebook에서도 가능합니다 - TensorBoard는 대화형 시각화�
 시각화를 더 편히 볼 수 있는 몇 가지 팁이 있습니다: 좌측 상단에서 “Color by: label”을
 선택하고, “야간모드(night mode)”를 활성화하면 이미지 배경이 흰색이 되어 더 편하게
 볼 수 있습니다:</p>
-<img alt="intermediate/../../_static/img/tensorboard_projector.png" src="intermediate/../../_static/img/tensorboard_projector.png" />
+<img alt="../_static/img/tensorboard_projector.png" src="../_static/img/tensorboard_projector.png" />
 <p>지금까지 데이터를 충분히 살펴보았으므로, 이제 학습 과정부터 시작하여 TensorBoard가
 어떻게 모델 학습과 평가(evaluation)를 더 명확히 추적(track)할 수 있는지 살펴보겠습니다.</p>
 </div>
@@ -536,8 +536,8 @@ Jupyter Notebook에서도 가능합니다 - TensorBoard는 대화형 시각화�
     <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">48</span><span class="p">))</span>
     <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">4</span><span class="p">):</span>
         <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">xticks</span><span class="o">=</span><span class="p">[],</span> <span class="n">yticks</span><span class="o">=</span><span class="p">[])</span>
-        <span class="n">matplotlib_imshow</span><span class="p">(</span><span class="n">images</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">one_channel</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;{0}, {1:.1f}%</span><span class="se">\n</span><span class="s2">(label: {2})&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+        <span class="n">matplotlib_imshow</span><span class="p">(</span><span class="n">images</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">one_channel</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">, </span><span class="si">{1:.1f}</span><span class="s2">%</span><span class="se">\n</span><span class="s2">(label: </span><span class="si">{2}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
             <span class="n">classes</span><span class="p">[</span><span class="n">preds</span><span class="p">[</span><span class="n">idx</span><span class="p">]],</span>
             <span class="n">probs</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">*</span> <span class="mf">100.0</span><span class="p">,</span>
             <span class="n">classes</span><span class="p">[</span><span class="n">labels</span><span class="p">[</span><span class="n">idx</span><span class="p">]]),</span>
@@ -582,16 +582,16 @@ Jupyter Notebook에서도 가능합니다 - TensorBoard는 대화형 시각화�
                             <span class="n">plot_classes_preds</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">labels</span><span class="p">),</span>
                             <span class="n">global_step</span><span class="o">=</span><span class="n">epoch</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">trainloader</span><span class="p">)</span> <span class="o">+</span> <span class="n">i</span><span class="p">)</span>
             <span class="n">running_loss</span> <span class="o">=</span> <span class="mf">0.0</span>
-<span class="k">print</span><span class="p">(</span><span class="s1">&#39;Finished Training&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Finished Training&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>이제 ‘Scalars’ 탭에서 15,000번 반복 학습할 때의 손실을 확인할 수 있습니다:</p>
-<img alt="intermediate/../../_static/img/tensorboard_scalar_runs.png" src="intermediate/../../_static/img/tensorboard_scalar_runs.png" />
+<img alt="../_static/img/tensorboard_scalar_runs.png" src="../_static/img/tensorboard_scalar_runs.png" />
 <p>또한, 학습 과정 전반에 걸쳐 임의의 배치에 대한 모델의 예측 결과를 확인할 수 있습니다.
 “Images” 탭에서 스크롤을 내려 “예측 vs. 정답(predictions vs. actuals)” 시각화 부분에서
 이 내용을 볼 수 있습니다; 예를 들어 학습을 단지 3000번 반복하기만 해도, 신뢰도는
 높진 않지만, 모델은 셔츠와 운동화(sneakers), 코트와 같은 분류들을 구분할 수 있었습니다:</p>
-<img alt="intermediate/../../_static/img/tensorboard_images.png" src="intermediate/../../_static/img/tensorboard_images.png" />
+<img alt="../_static/img/tensorboard_images.png" src="../_static/img/tensorboard_images.png" />
 <p>이전 튜토리얼에서는 모델이 학습 완료된 후에 각 분류별 정확도(per-class accuracy)를
 살펴봤습니다; 여기서는 TensorBoard를 사용하여 각 분류별 정밀도-재현율(precision-recall)
 곡선( <a class="reference external" href="https://www.scikit-yb.org/en/latest/api/classifier/prcurve.html">여기</a> 에
@@ -640,7 +640,7 @@ Jupyter Notebook에서도 가능합니다 - TensorBoard는 대화형 시각화�
 <p>이제 “PR Curves” 탭에서 각 분류별 정밀도-재현율 곡선을 볼 수 있습니다.
 내려보면서 살펴보십시오; 일부 분류는 거의 100%의 “영역이 곡선 아래”에 있고,
 다른 분류들은 이 영역이 더 적습니다:</p>
-<img alt="intermediate/../../_static/img/tensorboard_pr_curves.png" src="intermediate/../../_static/img/tensorboard_pr_curves.png" />
+<img alt="../_static/img/tensorboard_pr_curves.png" src="../_static/img/tensorboard_pr_curves.png" />
 <p>여기까지 TensorBoard와 PyTorch의 통합에 대해 소개했습니다. 물론 TensorBoard에서
 제공하는 모든 것들을 Jupyter Notebook에서도 할 수 있지만, TensorBoard를 사용하면
 대화형 시각화가 기본으로 제공됩니다.</p>
@@ -721,11 +721,9 @@ Jupyter Notebook에서도 가능합니다 - TensorBoard는 대화형 시각화�
 
      
        <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-         <script type="text/javascript" src="../_static/jquery.js"></script>
-         <script type="text/javascript" src="../_static/underscore.js"></script>
-         <script type="text/javascript" src="../_static/doctools.js"></script>
-         <script type="text/javascript" src="../_static/language_data.js"></script>
-         <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+         <script src="../_static/jquery.js"></script>
+         <script src="../_static/underscore.js"></script>
+         <script src="../_static/doctools.js"></script>
      
 
   

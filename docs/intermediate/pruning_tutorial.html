@@ -30,7 +30,7 @@
   <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="(beta) Dynamic Quantization on an LSTM Word Language Model" href="../advanced/dynamic_quantization_tutorial.html" />
+    <link rel="next" title="(베타) LSTM 기반 단어 단위 언어 모델의 동적 양자화" href="../advanced/dynamic_quantization_tutorial.html" />
     <link rel="prev" title="Dispatcher in C++" href="../advanced/dispatcher.html" /> 
 
   
@@ -174,7 +174,7 @@
 <p class="caption"><span class="caption-text">프론트엔드 API</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="named_tensor_tutorial.html">(prototype) Introduction to Named Tensors in PyTorch</a></li>
-<li class="toctree-l1"><a class="reference internal" href="memory_format_tutorial.html">(beta) Channels Last Memory Format in PyTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="memory_format_tutorial.html">(실험용) PyTorch를 사용한 Channels Last Memory Format</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_frontend.html">Using the PyTorch C++ Frontend</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_extension.html">Custom C++ and CUDA Extensions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/torch_script_custom_ops.html">Extending TorchScript with Custom C++ Operators</a></li>
@@ -186,7 +186,7 @@
 <p class="caption"><span class="caption-text">모델 최적화</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">가지치기 기법(Pruning) 튜토리얼</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../advanced/dynamic_quantization_tutorial.html">(beta) Dynamic Quantization on an LSTM Word Language Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/dynamic_quantization_tutorial.html">(베타) LSTM 기반 단어 단위 언어 모델의 동적 양자화</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/static_quantization_tutorial.html">(beta) Static Quantization with Eager Mode in PyTorch</a></li>
 <li class="toctree-l1"><a class="reference internal" href="quantized_transfer_learning_tutorial.html">(beta) 컴퓨터 비전(Vision) 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
@@ -320,7 +320,7 @@
 <h2>요구사항<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">&quot;torch&gt;=1.4&quot;</span></code></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">from</span> <span class="nn">torch</span> <span class="k">import</span> <span class="n">nn</span>
+<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span>
 <span class="kn">import</span> <span class="nn">torch.nn.utils.prune</span> <span class="k">as</span> <span class="nn">prune</span>
 <span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="nn">F</span>
 </pre></div>
@@ -333,7 +333,7 @@
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
 
 <span class="k">class</span> <span class="nc">LeNet</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">LeNet</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="c1"># 1개 채널 수의 이미지를 입력값으로 이용하여 6개 채널 수의 출력값을 계산하는 방식</span>
         <span class="c1"># Convolution 연산을 진행하는 커널(필터)의 크기는 3x3 을 이용</span>
@@ -359,42 +359,42 @@
 <div class="section" id="id4">
 <h2>모듈 점검<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
 <p>가지치기 기법이 적용되지 않은 LeNet 모델의 <code class="docutils literal notranslate"><span class="pre">conv1</span></code> 층을 점검해봅시다.
-여기에는 2개의 파라미터값들인 <a href="#id5"><span class="problematic" id="id6">``</span></a>가중치``값과 <a href="#id7"><span class="problematic" id="id8">``</span></a>편향``값을이 포함될 것이며, 버퍼는 존재하지 않을 것입니다.</p>
+여기에는 2개의 파라미터값들인 <code class="docutils literal notranslate"><span class="pre">가중치</span></code> 값과 <code class="docutils literal notranslate"><span class="pre">편향</span></code> 값이 포함될 것이며, 버퍼는 존재하지 않을 것입니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">module</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">conv1</span>
 <span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">module</span><span class="o">.</span><span class="n">named_parameters</span><span class="p">()))</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[(&#39;weight&#39;, Parameter containing:
-tensor([[[[ 0.3161, -0.2212,  0.0417],
-          [ 0.2488,  0.2415,  0.2071],
-          [-0.2412, -0.2400, -0.2016]]],
+tensor([[[[ 0.1220,  0.1574, -0.2430],
+          [ 0.2315,  0.2777, -0.2998],
+          [ 0.2914, -0.2449, -0.0627]]],
 
 
-        [[[ 0.0419,  0.3322, -0.2106],
-          [ 0.1776, -0.1845, -0.3134],
-          [-0.0708,  0.1921,  0.3095]]],
+        [[[ 0.0202, -0.3315,  0.3249],
+          [-0.1553, -0.3050, -0.2590],
+          [ 0.2829, -0.1247,  0.1029]]],
 
 
-        [[[-0.2070,  0.0723,  0.2876],
-          [ 0.2209,  0.2077,  0.2369],
-          [ 0.2108,  0.0861, -0.2279]]],
+        [[[ 0.2747,  0.2280, -0.2064],
+          [ 0.0613, -0.2235,  0.2610],
+          [-0.2872, -0.2117, -0.0720]]],
 
 
-        [[[-0.2799, -0.1527, -0.0388],
-          [-0.2043,  0.1220,  0.1032],
-          [-0.0755,  0.1281,  0.1077]]],
+        [[[ 0.0972, -0.2510, -0.0740],
+          [-0.2693,  0.0858,  0.2765],
+          [-0.2819, -0.0532,  0.1224]]],
 
 
-        [[[ 0.2035,  0.2245, -0.1129],
-          [ 0.3257, -0.0385, -0.0115],
-          [-0.3146, -0.2145, -0.1947]]],
+        [[[-0.2743,  0.2629, -0.0047],
+          [-0.0743, -0.2141,  0.1626],
+          [ 0.0976,  0.1006, -0.3228]]],
 
 
-        [[[-0.1426,  0.2370, -0.1089],
-          [-0.2491,  0.1282,  0.1067],
-          [ 0.2159, -0.1725,  0.0723]]]], device=&#39;cuda:0&#39;, requires_grad=True)), (&#39;bias&#39;, Parameter containing:
-tensor([-0.1214, -0.0749, -0.2656, -0.1519, -0.1021,  0.1425], device=&#39;cuda:0&#39;,
+        [[[ 0.0517,  0.1638,  0.1589],
+          [-0.0781, -0.2169, -0.2271],
+          [ 0.1213, -0.1946, -0.0012]]]], device=&#39;cuda:0&#39;, requires_grad=True)), (&#39;bias&#39;, Parameter containing:
+tensor([-0.2996, -0.1588, -0.1239,  0.0091,  0.1408,  0.0922], device=&#39;cuda:0&#39;,
        requires_grad=True))]
 </pre></div>
 </div>
@@ -406,10 +406,11 @@ tensor([-0.1214, -0.0749, -0.2656, -0.1519, -0.1021,  0.1425], device=&#39;cuda:
 </pre></div>
 </div>
 </div>
-<div class="section" id="id9">
-<h2>모듈 가지치기 기법 적용 예제<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id5">
+<h2>모듈 가지치기 기법 적용 예제<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h2>
 <p>모듈에 대해 가지치기 기법을 적용하기 위해 (이번 예제에서는, LeNet 모델의 <code class="docutils literal notranslate"><span class="pre">conv1</span></code> 층)
-첫 번째로는, <code class="docutils literal notranslate"><span class="pre">torch.nn.utils.prune</span></code> (또는 <code class="docutils literal notranslate"><span class="pre">BasePruningMethod</span></code> 의 서브 클래스로 직접 <a class="reference external" href="torch-nn-utils-prune">구현</a> )
+첫 번째로는, <code class="docutils literal notranslate"><span class="pre">torch.nn.utils.prune</span></code> (또는 <code class="docutils literal notranslate"><span class="pre">BasePruningMethod</span></code> 의 서브 클래스로 직접
+<a class="reference external" href="torch-nn-utils-prune">구현</a> )
 내 존재하는 가지치기 기법을 선택합니다.
 그 후, 해당 모듈 내에서 가지치기 기법을 적용하고자 하는 모듈과 파라미터를 지정합니다.
 마지막으로, 가지치기 기법에 적당한 키워드 인자값을 이용하여 가지치기 매개변수를 지정합니다.
@@ -429,36 +430,36 @@ tensor([-0.1214, -0.0749, -0.2656, -0.1519, -0.1021,  0.1425], device=&#39;cuda:
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[(&#39;bias&#39;, Parameter containing:
-tensor([-0.1214, -0.0749, -0.2656, -0.1519, -0.1021,  0.1425], device=&#39;cuda:0&#39;,
+tensor([-0.2996, -0.1588, -0.1239,  0.0091,  0.1408,  0.0922], device=&#39;cuda:0&#39;,
        requires_grad=True)), (&#39;weight_orig&#39;, Parameter containing:
-tensor([[[[ 0.3161, -0.2212,  0.0417],
-          [ 0.2488,  0.2415,  0.2071],
-          [-0.2412, -0.2400, -0.2016]]],
+tensor([[[[ 0.1220,  0.1574, -0.2430],
+          [ 0.2315,  0.2777, -0.2998],
+          [ 0.2914, -0.2449, -0.0627]]],
 
 
-        [[[ 0.0419,  0.3322, -0.2106],
-          [ 0.1776, -0.1845, -0.3134],
-          [-0.0708,  0.1921,  0.3095]]],
+        [[[ 0.0202, -0.3315,  0.3249],
+          [-0.1553, -0.3050, -0.2590],
+          [ 0.2829, -0.1247,  0.1029]]],
 
 
-        [[[-0.2070,  0.0723,  0.2876],
-          [ 0.2209,  0.2077,  0.2369],
-          [ 0.2108,  0.0861, -0.2279]]],
+        [[[ 0.2747,  0.2280, -0.2064],
+          [ 0.0613, -0.2235,  0.2610],
+          [-0.2872, -0.2117, -0.0720]]],
 
 
-        [[[-0.2799, -0.1527, -0.0388],
-          [-0.2043,  0.1220,  0.1032],
-          [-0.0755,  0.1281,  0.1077]]],
+        [[[ 0.0972, -0.2510, -0.0740],
+          [-0.2693,  0.0858,  0.2765],
+          [-0.2819, -0.0532,  0.1224]]],
 
 
-        [[[ 0.2035,  0.2245, -0.1129],
-          [ 0.3257, -0.0385, -0.0115],
-          [-0.3146, -0.2145, -0.1947]]],
+        [[[-0.2743,  0.2629, -0.0047],
+          [-0.0743, -0.2141,  0.1626],
+          [ 0.0976,  0.1006, -0.3228]]],
 
 
-        [[[-0.1426,  0.2370, -0.1089],
-          [-0.2491,  0.1282,  0.1067],
-          [ 0.2159, -0.1725,  0.0723]]]], device=&#39;cuda:0&#39;, requires_grad=True))]
+        [[[ 0.0517,  0.1638,  0.1589],
+          [-0.0781, -0.2169, -0.2271],
+          [ 0.1213, -0.1946, -0.0012]]]], device=&#39;cuda:0&#39;, requires_grad=True))]
 </pre></div>
 </div>
 <p>위에서 선택한 가지치기 기법에 의해 생성되는 가지치기 마스크는 초기 파라미터  <code class="docutils literal notranslate"><span class="pre">name</span></code> 에 <code class="docutils literal notranslate"><span class="pre">weight_mask</span></code>
@@ -497,42 +498,42 @@ tensor([[[[ 0.3161, -0.2212,  0.0417],
           [1., 1., 0.]]]], device=&#39;cuda:0&#39;))]
 </pre></div>
 </div>
-<p>수정이 되지 않은 상태에서 순전파를 진행하기 위해서는 <code class="docutils literal notranslate"><span class="pre">가중치``값</span> <span class="pre">속성이</span> <span class="pre">존재해야</span> <span class="pre">합니다.</span>
-<span class="pre">``torch.nn.utils.prune</span></code>  내 구현된 가지치기 기법은 가지치기 기법이 적용된 가중치값들을 이용하여
+<p>수정이 되지 않은 상태에서 순전파를 진행하기 위해서는 <code class="docutils literal notranslate"><span class="pre">가중치</span></code> 값 속성이 존재해야 합니다.
+<code class="docutils literal notranslate"><span class="pre">torch.nn.utils.prune</span></code> 내 구현된 가지치기 기법은 가지치기 기법이 적용된 가중치값들을 이용하여
 (기존의 가중치값에 가지치기 기법이 적용된) 순전파를 진행하고, <code class="docutils literal notranslate"><span class="pre">weight</span></code> 속성값에 가지치기 기법이 적용된 가중치값들을 저장합니다.
 이제 가중치값들은 <code class="docutils literal notranslate"><span class="pre">module</span></code> 의 매개변수가 아니라 하나의 속성값으로 취급되는 점을 주의하세요.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">module</span><span class="o">.</span><span class="n">weight</span><span class="p">)</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor([[[[ 0.0000, -0.2212,  0.0000],
-          [ 0.2488,  0.0000,  0.0000],
-          [-0.2412, -0.2400, -0.2016]]],
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor([[[[ 0.0000,  0.1574, -0.0000],
+          [ 0.2315,  0.0000, -0.0000],
+          [ 0.2914, -0.2449, -0.0627]]],
 
 
-        [[[ 0.0419,  0.0000, -0.2106],
-          [ 0.1776, -0.1845, -0.0000],
-          [-0.0708,  0.0000,  0.3095]]],
+        [[[ 0.0202, -0.0000,  0.3249],
+          [-0.1553, -0.3050, -0.0000],
+          [ 0.2829, -0.0000,  0.1029]]],
 
 
-        [[[-0.2070,  0.0000,  0.0000],
-          [ 0.0000,  0.2077,  0.2369],
-          [ 0.2108,  0.0861, -0.2279]]],
+        [[[ 0.2747,  0.0000, -0.0000],
+          [ 0.0000, -0.2235,  0.2610],
+          [-0.2872, -0.2117, -0.0720]]],
 
 
-        [[[-0.2799, -0.0000, -0.0000],
-          [-0.2043,  0.1220,  0.1032],
-          [-0.0755,  0.1281,  0.1077]]],
+        [[[ 0.0972, -0.0000, -0.0000],
+          [-0.2693,  0.0858,  0.2765],
+          [-0.2819, -0.0532,  0.1224]]],
 
 
-        [[[ 0.2035,  0.0000, -0.1129],
-          [ 0.3257, -0.0385, -0.0115],
-          [-0.0000, -0.2145, -0.1947]]],
+        [[[-0.2743,  0.0000, -0.0047],
+          [-0.0743, -0.2141,  0.1626],
+          [ 0.0000,  0.1006, -0.3228]]],
 
 
-        [[[-0.1426,  0.2370, -0.1089],
-          [-0.2491,  0.1282,  0.0000],
-          [ 0.2159, -0.1725,  0.0000]]]], device=&#39;cuda:0&#39;,
+        [[[ 0.0517,  0.1638,  0.1589],
+          [-0.0781, -0.2169, -0.0000],
+          [ 0.1213, -0.1946, -0.0000]]]], device=&#39;cuda:0&#39;,
        grad_fn=&lt;MulBackward0&gt;)
 </pre></div>
 </div>
@@ -545,7 +546,7 @@ tensor([[[[ 0.3161, -0.2212,  0.0417],
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>OrderedDict([(0, &lt;torch.nn.utils.prune.RandomUnstructured object at 0x7f587a5c0550&gt;)])
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>OrderedDict([(3, &lt;torch.nn.utils.prune.RandomUnstructured object at 0x7f72ee46fc90&gt;)])
 </pre></div>
 </div>
 <p>완결성을 위해, 편향값에 대해서도 가지치기 기법을 적용할 수 있으며,
@@ -563,35 +564,35 @@ L1 Norm 값이 가장 작은 편향값 3개를 가지치기를 시도해봅시�
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[(&#39;weight_orig&#39;, Parameter containing:
-tensor([[[[ 0.3161, -0.2212,  0.0417],
-          [ 0.2488,  0.2415,  0.2071],
-          [-0.2412, -0.2400, -0.2016]]],
+tensor([[[[ 0.1220,  0.1574, -0.2430],
+          [ 0.2315,  0.2777, -0.2998],
+          [ 0.2914, -0.2449, -0.0627]]],
 
 
-        [[[ 0.0419,  0.3322, -0.2106],
-          [ 0.1776, -0.1845, -0.3134],
-          [-0.0708,  0.1921,  0.3095]]],
+        [[[ 0.0202, -0.3315,  0.3249],
+          [-0.1553, -0.3050, -0.2590],
+          [ 0.2829, -0.1247,  0.1029]]],
 
 
-        [[[-0.2070,  0.0723,  0.2876],
-          [ 0.2209,  0.2077,  0.2369],
-          [ 0.2108,  0.0861, -0.2279]]],
+        [[[ 0.2747,  0.2280, -0.2064],
+          [ 0.0613, -0.2235,  0.2610],
+          [-0.2872, -0.2117, -0.0720]]],
 
 
-        [[[-0.2799, -0.1527, -0.0388],
-          [-0.2043,  0.1220,  0.1032],
-          [-0.0755,  0.1281,  0.1077]]],
+        [[[ 0.0972, -0.2510, -0.0740],
+          [-0.2693,  0.0858,  0.2765],
+          [-0.2819, -0.0532,  0.1224]]],
 
 
-        [[[ 0.2035,  0.2245, -0.1129],
-          [ 0.3257, -0.0385, -0.0115],
-          [-0.3146, -0.2145, -0.1947]]],
+        [[[-0.2743,  0.2629, -0.0047],
+          [-0.0743, -0.2141,  0.1626],
+          [ 0.0976,  0.1006, -0.3228]]],
 
 
-        [[[-0.1426,  0.2370, -0.1089],
-          [-0.2491,  0.1282,  0.1067],
-          [ 0.2159, -0.1725,  0.0723]]]], device=&#39;cuda:0&#39;, requires_grad=True)), (&#39;bias_orig&#39;, Parameter containing:
-tensor([-0.1214, -0.0749, -0.2656, -0.1519, -0.1021,  0.1425], device=&#39;cuda:0&#39;,
+        [[[ 0.0517,  0.1638,  0.1589],
+          [-0.0781, -0.2169, -0.2271],
+          [ 0.1213, -0.1946, -0.0012]]]], device=&#39;cuda:0&#39;, requires_grad=True)), (&#39;bias_orig&#39;, Parameter containing:
+tensor([-0.2996, -0.1588, -0.1239,  0.0091,  0.1408,  0.0922], device=&#39;cuda:0&#39;,
        requires_grad=True))]
 </pre></div>
 </div>
@@ -626,14 +627,14 @@ tensor([-0.1214, -0.0749, -0.2656, -0.1519, -0.1021,  0.1425], device=&#39;cuda:
 
         [[[1., 1., 1.],
           [1., 1., 0.],
-          [1., 1., 0.]]]], device=&#39;cuda:0&#39;)), (&#39;bias_mask&#39;, tensor([0., 0., 1., 1., 0., 1.], device=&#39;cuda:0&#39;))]
+          [1., 1., 0.]]]], device=&#39;cuda:0&#39;)), (&#39;bias_mask&#39;, tensor([1., 1., 0., 0., 1., 0.], device=&#39;cuda:0&#39;))]
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">module</span><span class="o">.</span><span class="n">bias</span><span class="p">)</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor([-0.0000, -0.0000, -0.2656, -0.1519, -0.0000,  0.1425], device=&#39;cuda:0&#39;,
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor([-0.2996, -0.1588, -0.0000,  0.0000,  0.1408,  0.0000], device=&#39;cuda:0&#39;,
        grad_fn=&lt;MulBackward0&gt;)
 </pre></div>
 </div>
@@ -641,12 +642,12 @@ tensor([-0.1214, -0.0749, -0.2656, -0.1519, -0.1021,  0.1425], device=&#39;cuda:
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>OrderedDict([(0, &lt;torch.nn.utils.prune.RandomUnstructured object at 0x7f587a5c0550&gt;), (1, &lt;torch.nn.utils.prune.L1Unstructured object at 0x7f587a5c0710&gt;)])
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>OrderedDict([(3, &lt;torch.nn.utils.prune.RandomUnstructured object at 0x7f72ee46fc90&gt;), (4, &lt;torch.nn.utils.prune.L1Unstructured object at 0x7f72ee46f890&gt;)])
 </pre></div>
 </div>
 </div>
-<div class="section" id="id11">
-<h2>가지치기 기법 반복 적용<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id7">
+<h2>가지치기 기법 반복 적용<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h2>
 <p>모듈 내 같은 파라미터값에 대해 가지치기 기법이 여러번 적용될 수 있으며, 다양한 가지치기 기법의 조합이 적용된 것과 동일하게 적용될 수 있습니다.
 새로운 마스크와 이전의 마스크의 결합은 <code class="docutils literal notranslate"><span class="pre">PruningContainer</span></code> 의 <code class="docutils literal notranslate"><span class="pre">compute_mask</span></code> 메소드를 통해 처리할 수 있습니다.</p>
 <p>예를 들어, 만약 <code class="docutils literal notranslate"><span class="pre">module.weight</span></code> 값에 가지치기 기법을 적용하고 싶을 때, 텐서의 0번째 축의 L2 norm값을 기준으로 구조화된 가지치기 기법을 적용합니다.
@@ -660,34 +661,34 @@ tensor([-0.1214, -0.0749, -0.2656, -0.1519, -0.1021,  0.1425], device=&#39;cuda:
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor([[[[ 0.0000, -0.2212,  0.0000],
-          [ 0.2488,  0.0000,  0.0000],
-          [-0.2412, -0.2400, -0.2016]]],
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor([[[[ 0.0000,  0.0000, -0.0000],
+          [ 0.0000,  0.0000, -0.0000],
+          [ 0.0000, -0.0000, -0.0000]]],
 
 
-        [[[ 0.0000,  0.0000, -0.0000],
-          [ 0.0000, -0.0000, -0.0000],
-          [-0.0000,  0.0000,  0.0000]]],
+        [[[ 0.0202, -0.0000,  0.3249],
+          [-0.1553, -0.3050, -0.0000],
+          [ 0.2829, -0.0000,  0.1029]]],
 
 
-        [[[-0.2070,  0.0000,  0.0000],
-          [ 0.0000,  0.2077,  0.2369],
-          [ 0.2108,  0.0861, -0.2279]]],
+        [[[ 0.2747,  0.0000, -0.0000],
+          [ 0.0000, -0.2235,  0.2610],
+          [-0.2872, -0.2117, -0.0720]]],
 
 
-        [[[-0.0000, -0.0000, -0.0000],
+        [[[ 0.0000, -0.0000, -0.0000],
           [-0.0000,  0.0000,  0.0000],
-          [-0.0000,  0.0000,  0.0000]]],
+          [-0.0000, -0.0000,  0.0000]]],
 
 
-        [[[ 0.2035,  0.0000, -0.1129],
-          [ 0.3257, -0.0385, -0.0115],
-          [-0.0000, -0.2145, -0.1947]]],
+        [[[-0.2743,  0.0000, -0.0047],
+          [-0.0743, -0.2141,  0.1626],
+          [ 0.0000,  0.1006, -0.3228]]],
 
 
-        [[[-0.0000,  0.0000, -0.0000],
-          [-0.0000,  0.0000,  0.0000],
-          [ 0.0000, -0.0000,  0.0000]]]], device=&#39;cuda:0&#39;,
+        [[[ 0.0000,  0.0000,  0.0000],
+          [-0.0000, -0.0000, -0.0000],
+          [ 0.0000, -0.0000, -0.0000]]]], device=&#39;cuda:0&#39;,
        grad_fn=&lt;MulBackward0&gt;)
 </pre></div>
 </div>
@@ -700,12 +701,12 @@ tensor([-0.1214, -0.0749, -0.2656, -0.1519, -0.1021,  0.1425], device=&#39;cuda:
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[&lt;torch.nn.utils.prune.RandomUnstructured object at 0x7f587a5c0550&gt;, &lt;torch.nn.utils.prune.LnStructured object at 0x7f587a5c09b0&gt;]
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[&lt;torch.nn.utils.prune.RandomUnstructured object at 0x7f72ee46fc90&gt;, &lt;torch.nn.utils.prune.LnStructured object at 0x7f72ee46f750&gt;]
 </pre></div>
 </div>
 </div>
-<div class="section" id="id12">
-<h2>가지치기 기법이 적용된 모델의 직렬화<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id8">
+<h2>가지치기 기법이 적용된 모델의 직렬화<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h2>
 <p>마스크 버퍼들과 가지치기 기법이 적용된 텐서 계산에 사용된 기존의 파라미터를 포함하여 관련된 모든 텐서값들은
 필요한 경우 모델의 <code class="docutils literal notranslate"><span class="pre">state_dict</span></code> 에 저장되기 떄문에, 쉽게 직렬화하여 저장할 수 있습니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">state_dict</span><span class="p">()</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
@@ -716,8 +717,8 @@ tensor([-0.1214, -0.0749, -0.2656, -0.1519, -0.1021,  0.1425], device=&#39;cuda:
 </pre></div>
 </div>
 </div>
-<div class="section" id="id13">
-<h2>가지치기 기법의 재-파라미터화 제거<a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id9">
+<h2>가지치기 기법의 재-파라미터화 제거<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h2>
 <p>가지치기 기법이 적용된 것을 영구적으로 만들기 위해서, 재-파라미터화 관점의
 <code class="docutils literal notranslate"><span class="pre">weight_orig</span></code> 와 <code class="docutils literal notranslate"><span class="pre">weight_mask</span></code> 값을 제거하고, <code class="docutils literal notranslate"><span class="pre">forward_pre_hook</span></code> 값을 제거합니다.
 제거하기 위해 <code class="docutils literal notranslate"><span class="pre">torch.nn.utils.prune</span></code> 내 <code class="docutils literal notranslate"><span class="pre">remove</span></code> 함수를 이용할 수 있습니다.
@@ -729,35 +730,35 @@ tensor([-0.1214, -0.0749, -0.2656, -0.1519, -0.1021,  0.1425], device=&#39;cuda:
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[(&#39;weight_orig&#39;, Parameter containing:
-tensor([[[[ 0.3161, -0.2212,  0.0417],
-          [ 0.2488,  0.2415,  0.2071],
-          [-0.2412, -0.2400, -0.2016]]],
+tensor([[[[ 0.1220,  0.1574, -0.2430],
+          [ 0.2315,  0.2777, -0.2998],
+          [ 0.2914, -0.2449, -0.0627]]],
 
 
-        [[[ 0.0419,  0.3322, -0.2106],
-          [ 0.1776, -0.1845, -0.3134],
-          [-0.0708,  0.1921,  0.3095]]],
+        [[[ 0.0202, -0.3315,  0.3249],
+          [-0.1553, -0.3050, -0.2590],
+          [ 0.2829, -0.1247,  0.1029]]],
 
 
-        [[[-0.2070,  0.0723,  0.2876],
-          [ 0.2209,  0.2077,  0.2369],
-          [ 0.2108,  0.0861, -0.2279]]],
+        [[[ 0.2747,  0.2280, -0.2064],
+          [ 0.0613, -0.2235,  0.2610],
+          [-0.2872, -0.2117, -0.0720]]],
 
 
-        [[[-0.2799, -0.1527, -0.0388],
-          [-0.2043,  0.1220,  0.1032],
-          [-0.0755,  0.1281,  0.1077]]],
+        [[[ 0.0972, -0.2510, -0.0740],
+          [-0.2693,  0.0858,  0.2765],
+          [-0.2819, -0.0532,  0.1224]]],
 
 
-        [[[ 0.2035,  0.2245, -0.1129],
-          [ 0.3257, -0.0385, -0.0115],
-          [-0.3146, -0.2145, -0.1947]]],
+        [[[-0.2743,  0.2629, -0.0047],
+          [-0.0743, -0.2141,  0.1626],
+          [ 0.0976,  0.1006, -0.3228]]],
 
 
-        [[[-0.1426,  0.2370, -0.1089],
-          [-0.2491,  0.1282,  0.1067],
-          [ 0.2159, -0.1725,  0.0723]]]], device=&#39;cuda:0&#39;, requires_grad=True)), (&#39;bias_orig&#39;, Parameter containing:
-tensor([-0.1214, -0.0749, -0.2656, -0.1519, -0.1021,  0.1425], device=&#39;cuda:0&#39;,
+        [[[ 0.0517,  0.1638,  0.1589],
+          [-0.0781, -0.2169, -0.2271],
+          [ 0.1213, -0.1946, -0.0012]]]], device=&#39;cuda:0&#39;, requires_grad=True)), (&#39;bias_orig&#39;, Parameter containing:
+tensor([-0.2996, -0.1588, -0.1239,  0.0091,  0.1408,  0.0922], device=&#39;cuda:0&#39;,
        requires_grad=True))]
 </pre></div>
 </div>
@@ -765,14 +766,14 @@ tensor([-0.1214, -0.0749, -0.2656, -0.1519, -0.1021,  0.1425], device=&#39;cuda:
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[(&#39;weight_mask&#39;, tensor([[[[0., 1., 0.],
-          [1., 0., 0.],
-          [1., 1., 1.]]],
-
-
-        [[[0., 0., 0.],
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[(&#39;weight_mask&#39;, tensor([[[[0., 0., 0.],
           [0., 0., 0.],
           [0., 0., 0.]]],
+
+
+        [[[1., 0., 1.],
+          [1., 1., 0.],
+          [1., 0., 1.]]],
 
 
         [[[1., 0., 0.],
@@ -792,41 +793,41 @@ tensor([-0.1214, -0.0749, -0.2656, -0.1519, -0.1021,  0.1425], device=&#39;cuda:
 
         [[[0., 0., 0.],
           [0., 0., 0.],
-          [0., 0., 0.]]]], device=&#39;cuda:0&#39;)), (&#39;bias_mask&#39;, tensor([0., 0., 1., 1., 0., 1.], device=&#39;cuda:0&#39;))]
+          [0., 0., 0.]]]], device=&#39;cuda:0&#39;)), (&#39;bias_mask&#39;, tensor([1., 1., 0., 0., 1., 0.], device=&#39;cuda:0&#39;))]
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">module</span><span class="o">.</span><span class="n">weight</span><span class="p">)</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor([[[[ 0.0000, -0.2212,  0.0000],
-          [ 0.2488,  0.0000,  0.0000],
-          [-0.2412, -0.2400, -0.2016]]],
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor([[[[ 0.0000,  0.0000, -0.0000],
+          [ 0.0000,  0.0000, -0.0000],
+          [ 0.0000, -0.0000, -0.0000]]],
 
 
-        [[[ 0.0000,  0.0000, -0.0000],
-          [ 0.0000, -0.0000, -0.0000],
-          [-0.0000,  0.0000,  0.0000]]],
+        [[[ 0.0202, -0.0000,  0.3249],
+          [-0.1553, -0.3050, -0.0000],
+          [ 0.2829, -0.0000,  0.1029]]],
 
 
-        [[[-0.2070,  0.0000,  0.0000],
-          [ 0.0000,  0.2077,  0.2369],
-          [ 0.2108,  0.0861, -0.2279]]],
+        [[[ 0.2747,  0.0000, -0.0000],
+          [ 0.0000, -0.2235,  0.2610],
+          [-0.2872, -0.2117, -0.0720]]],
 
 
-        [[[-0.0000, -0.0000, -0.0000],
+        [[[ 0.0000, -0.0000, -0.0000],
           [-0.0000,  0.0000,  0.0000],
-          [-0.0000,  0.0000,  0.0000]]],
+          [-0.0000, -0.0000,  0.0000]]],
 
 
-        [[[ 0.2035,  0.0000, -0.1129],
-          [ 0.3257, -0.0385, -0.0115],
-          [-0.0000, -0.2145, -0.1947]]],
+        [[[-0.2743,  0.0000, -0.0047],
+          [-0.0743, -0.2141,  0.1626],
+          [ 0.0000,  0.1006, -0.3228]]],
 
 
-        [[[-0.0000,  0.0000, -0.0000],
-          [-0.0000,  0.0000,  0.0000],
-          [ 0.0000, -0.0000,  0.0000]]]], device=&#39;cuda:0&#39;,
+        [[[ 0.0000,  0.0000,  0.0000],
+          [-0.0000, -0.0000, -0.0000],
+          [ 0.0000, -0.0000, -0.0000]]]], device=&#39;cuda:0&#39;,
        grad_fn=&lt;MulBackward0&gt;)
 </pre></div>
 </div>
@@ -837,48 +838,48 @@ tensor([-0.1214, -0.0749, -0.2656, -0.1519, -0.1021,  0.1425], device=&#39;cuda:
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[(&#39;bias_orig&#39;, Parameter containing:
-tensor([-0.1214, -0.0749, -0.2656, -0.1519, -0.1021,  0.1425], device=&#39;cuda:0&#39;,
+tensor([-0.2996, -0.1588, -0.1239,  0.0091,  0.1408,  0.0922], device=&#39;cuda:0&#39;,
        requires_grad=True)), (&#39;weight&#39;, Parameter containing:
-tensor([[[[ 0.0000, -0.2212,  0.0000],
-          [ 0.2488,  0.0000,  0.0000],
-          [-0.2412, -0.2400, -0.2016]]],
+tensor([[[[ 0.0000,  0.0000, -0.0000],
+          [ 0.0000,  0.0000, -0.0000],
+          [ 0.0000, -0.0000, -0.0000]]],
 
 
-        [[[ 0.0000,  0.0000, -0.0000],
-          [ 0.0000, -0.0000, -0.0000],
-          [-0.0000,  0.0000,  0.0000]]],
+        [[[ 0.0202, -0.0000,  0.3249],
+          [-0.1553, -0.3050, -0.0000],
+          [ 0.2829, -0.0000,  0.1029]]],
 
 
-        [[[-0.2070,  0.0000,  0.0000],
-          [ 0.0000,  0.2077,  0.2369],
-          [ 0.2108,  0.0861, -0.2279]]],
+        [[[ 0.2747,  0.0000, -0.0000],
+          [ 0.0000, -0.2235,  0.2610],
+          [-0.2872, -0.2117, -0.0720]]],
 
 
-        [[[-0.0000, -0.0000, -0.0000],
+        [[[ 0.0000, -0.0000, -0.0000],
           [-0.0000,  0.0000,  0.0000],
-          [-0.0000,  0.0000,  0.0000]]],
+          [-0.0000, -0.0000,  0.0000]]],
 
 
-        [[[ 0.2035,  0.0000, -0.1129],
-          [ 0.3257, -0.0385, -0.0115],
-          [-0.0000, -0.2145, -0.1947]]],
+        [[[-0.2743,  0.0000, -0.0047],
+          [-0.0743, -0.2141,  0.1626],
+          [ 0.0000,  0.1006, -0.3228]]],
 
 
-        [[[-0.0000,  0.0000, -0.0000],
-          [-0.0000,  0.0000,  0.0000],
-          [ 0.0000, -0.0000,  0.0000]]]], device=&#39;cuda:0&#39;, requires_grad=True))]
+        [[[ 0.0000,  0.0000,  0.0000],
+          [-0.0000, -0.0000, -0.0000],
+          [ 0.0000, -0.0000, -0.0000]]]], device=&#39;cuda:0&#39;, requires_grad=True))]
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">module</span><span class="o">.</span><span class="n">named_buffers</span><span class="p">()))</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[(&#39;bias_mask&#39;, tensor([0., 0., 1., 1., 0., 1.], device=&#39;cuda:0&#39;))]
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[(&#39;bias_mask&#39;, tensor([1., 1., 0., 0., 1., 0.], device=&#39;cuda:0&#39;))]
 </pre></div>
 </div>
 </div>
-<div class="section" id="id14">
-<h2>모델 내 여러 파라미터값들에 대하여 가지치기 기법 적용<a class="headerlink" href="#id14" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id10">
+<h2>모델 내 여러 파라미터값들에 대하여 가지치기 기법 적용<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h2>
 <p>가지치기 기법을 적용하고 싶은 파라미터값들을 지정함으로써, 이번 예제에서 볼 수 있는 것 처럼,
 신경망 모델 내 여러 텐서값들에 대해서 쉽게 가지치기 기법을 적용할 수 있습니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">new_model</span> <span class="o">=</span> <span class="n">LeNet</span><span class="p">()</span>
@@ -898,8 +899,8 @@ tensor([[[[ 0.0000, -0.2212,  0.0000],
 </pre></div>
 </div>
 </div>
-<div class="section" id="id15">
-<h2>전역 범위에 대한 가지치기 기법 적용<a class="headerlink" href="#id15" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id11">
+<h2>전역 범위에 대한 가지치기 기법 적용<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h2>
 <p>지금까지, “지역 변수” 에 대해서만 가지치기 기법을 적용하는 방법을 살펴보았습니다.
 (즉, 가중치 규모, 활성화 정도, 경사값 등의 각 항목의 통계량을 바탕으로 모델 내 텐서값 하나씩 가지치기 기법을 적용하는 방식)
 그러나, 범용적이고 아마 더 강력한 방법은 각 층에서 가장 낮은 20%의 연결을 제거하는것 대신에, 전체 모델에 대해서 가장 낮은 20% 연결을 한번에 제거하는 것입니다.
@@ -975,11 +976,11 @@ tensor([[[[ 0.0000, -0.2212,  0.0000],
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Sparsity in conv1.weight: 7.41%
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Sparsity in conv1.weight: 3.70%
 Sparsity in conv2.weight: 9.49%
-Sparsity in fc1.weight: 22.00%
-Sparsity in fc2.weight: 12.28%
-Sparsity in fc3.weight: 9.76%
+Sparsity in fc1.weight: 22.04%
+Sparsity in fc2.weight: 12.08%
+Sparsity in fc3.weight: 10.48%
 Global sparsity: 20.00%
 </pre></div>
 </div>
@@ -997,8 +998,8 @@ Global sparsity: 20.00%
 이러한 방식은, 가지치기 기법을 반복적으로 적용해야 하는 경우 마스크를 결합하는 방법을 결정하기 위해 필요합니다.
 즉, 이미 가지치기 기법이 적용된 모델에 대해서 가지치기 기법을 적용할 때,
 기존의 가지치기 기법이 적용되지 않은 파라미터 값에 대해 가지치기 기법이 영향을 미칠 것으로 예상됩니다.
-<code class="docutils literal notranslate"><span class="pre">PRUNING_TYPE``을</span> <span class="pre">지정한다면,</span> <span class="pre">가지치기</span> <span class="pre">기법을</span> <span class="pre">적용하기</span> <span class="pre">위해</span> <span class="pre">파라미터</span> <span class="pre">값을</span> <span class="pre">올바르게</span> <span class="pre">제거하는</span>
-<span class="pre">``PruningContainer</span></code> (마스크 가지치기 기법을 반복적으로 적용하는 것을 처리하는)를 가능하게 합니다.
+<code class="docutils literal notranslate"><span class="pre">PRUNING_TYPE</span></code> 을 지정한다면, 가지치기 기법을 적용하기 위해 파라미터 값을 올바르게 제거하는
+<code class="docutils literal notranslate"><span class="pre">PruningContainer</span></code> (마스크 가지치기 기법을 반복적으로 적용하는 것을 처리하는)를 가능하게 합니다.
 예를 들어, 다른 모든 항목이 존재하는 텐서를 가지치기 기법을 구현하고 싶을 때,
 (또는, 텐서가 이전에 가지치기 기법에 의해 제거되었거나 남아있는 텐서에 대해)
 한 층의 개별 연결에 작용하며 전체 유닛/채널 (<code class="docutils literal notranslate"><span class="pre">'structured'</span></code>), 또는 다른 파라미터 간
@@ -1050,7 +1051,7 @@ Global sparsity: 20.00%
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor([0., 1., 0., 1., 0., 1., 0., 1., 0., 1.])
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  2.629 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.170 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-intermediate-pruning-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/ef3541eb2ef78e22efa65b3d6f4ba737/pruning_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">pruning_tutorial.py</span></code></a></p>
@@ -1071,7 +1072,7 @@ Global sparsity: 20.00%
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../advanced/dynamic_quantization_tutorial.html" class="btn btn-neutral float-right" title="(beta) Dynamic Quantization on an LSTM Word Language Model" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
+        <a href="../advanced/dynamic_quantization_tutorial.html" class="btn btn-neutral float-right" title="(베타) LSTM 기반 단어 단위 언어 모델의 동적 양자화" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
       
       
         <a href="../advanced/dispatcher.html" class="btn btn-neutral" title="Dispatcher in C++" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
@@ -1117,12 +1118,12 @@ Global sparsity: 20.00%
 <li><a class="reference internal" href="#id2">요구사항</a></li>
 <li><a class="reference internal" href="#id3">딥러닝 모델 생성</a></li>
 <li><a class="reference internal" href="#id4">모듈 점검</a></li>
-<li><a class="reference internal" href="#id9">모듈 가지치기 기법 적용 예제</a></li>
-<li><a class="reference internal" href="#id11">가지치기 기법 반복 적용</a></li>
-<li><a class="reference internal" href="#id12">가지치기 기법이 적용된 모델의 직렬화</a></li>
-<li><a class="reference internal" href="#id13">가지치기 기법의 재-파라미터화 제거</a></li>
-<li><a class="reference internal" href="#id14">모델 내 여러 파라미터값들에 대하여 가지치기 기법 적용</a></li>
-<li><a class="reference internal" href="#id15">전역 범위에 대한 가지치기 기법 적용</a></li>
+<li><a class="reference internal" href="#id5">모듈 가지치기 기법 적용 예제</a></li>
+<li><a class="reference internal" href="#id7">가지치기 기법 반복 적용</a></li>
+<li><a class="reference internal" href="#id8">가지치기 기법이 적용된 모델의 직렬화</a></li>
+<li><a class="reference internal" href="#id9">가지치기 기법의 재-파라미터화 제거</a></li>
+<li><a class="reference internal" href="#id10">모델 내 여러 파라미터값들에 대하여 가지치기 기법 적용</a></li>
+<li><a class="reference internal" href="#id11">전역 범위에 대한 가지치기 기법 적용</a></li>
 <li><a class="reference internal" href="#torch-nn-utils-prune"><code class="docutils literal notranslate"><span class="pre">torch.nn.utils.prune</span></code> 에서 확장된 맞춤형 가지치기 기법</a></li>
 </ul>
 </li>
@@ -1141,11 +1142,9 @@ Global sparsity: 20.00%
 
      
        <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-         <script type="text/javascript" src="../_static/jquery.js"></script>
-         <script type="text/javascript" src="../_static/underscore.js"></script>
-         <script type="text/javascript" src="../_static/doctools.js"></script>
-         <script type="text/javascript" src="../_static/language_data.js"></script>
-         <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+         <script src="../_static/jquery.js"></script>
+         <script src="../_static/underscore.js"></script>
+         <script src="../_static/doctools.js"></script>
      
 
   

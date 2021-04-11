@@ -31,7 +31,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="강화 학습 (DQN) 튜토리얼" href="../intermediate/reinforcement_q_learning.html" />
-    <link rel="prev" title="SyntaxError" href="text_sentiment_ngrams_tutorial.html" /> 
+    <link rel="prev" title="TorchText로 텍스트 분류하기" href="text_sentiment_ngrams_tutorial.html" /> 
 
   
   <script src="../_static/js/modernizr.min.js"></script>
@@ -157,7 +157,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/char_rnn_classification_tutorial.html">기초부터 시작하는 NLP: 문자-단위 RNN으로 이름 분류하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/char_rnn_generation_tutorial.html">기초부터 시작하는 NLP:  문자-단위 RNN으로 이름 생성하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/seq2seq_translation_tutorial.html">기초부터 시작하는 NLP: Sequence to Sequence 네트워크와 Attention을 이용한 번역</a></li>
-<li class="toctree-l1"><a class="reference internal" href="text_sentiment_ngrams_tutorial.html">SyntaxError</a></li>
+<li class="toctree-l1"><a class="reference internal" href="text_sentiment_ngrams_tutorial.html">TorchText로 텍스트 분류하기</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">TorchText로 언어 번역하기</a></li>
 </ul>
 <p class="caption"><span class="caption-text">강화학습</span></p>
@@ -174,7 +174,7 @@
 <p class="caption"><span class="caption-text">프론트엔드 API</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/named_tensor_tutorial.html">(prototype) Introduction to Named Tensors in PyTorch</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/memory_format_tutorial.html">(beta) Channels Last Memory Format in PyTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/memory_format_tutorial.html">(실험용) PyTorch를 사용한 Channels Last Memory Format</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_frontend.html">Using the PyTorch C++ Frontend</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_extension.html">Custom C++ and CUDA Extensions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/torch_script_custom_ops.html">Extending TorchScript with Custom C++ Operators</a></li>
@@ -185,8 +185,8 @@
 </ul>
 <p class="caption"><span class="caption-text">모델 최적화</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/pruning_tutorial.html">Pruning Tutorial</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../advanced/dynamic_quantization_tutorial.html">(beta) Dynamic Quantization on an LSTM Word Language Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/pruning_tutorial.html">가지치기 기법(Pruning) 튜토리얼</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/dynamic_quantization_tutorial.html">(베타) LSTM 기반 단어 단위 언어 모델의 동적 양자화</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/static_quantization_tutorial.html">(beta) Static Quantization with Eager Mode in PyTorch</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/quantized_transfer_learning_tutorial.html">(beta) 컴퓨터 비전(Vision) 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
@@ -194,7 +194,7 @@
 <p class="caption"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="dist_overview.html">PyTorch Distributed Overview</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/model_parallel_tutorial.html">Single-Machine Model Parallel Best Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/model_parallel_tutorial.html">단일 머신을 이용한 모델 병렬화 실습 예제</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/ddp_tutorial.html">Getting Started with Distributed Data Parallel</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/dist_tuto.html">PyTorch로 분산 어플리케이션 개발하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/rpc_tutorial.html">Getting Started with Distributed RPC Framework</a></li>
@@ -341,8 +341,8 @@ Spacy 토크나이저가 쓸 영어와 독일어에 대한 데이터를 다운�
 </div>
 <p>Spacy가 설치되어 있다면, 다음 코드는 <code class="docutils literal notranslate"><span class="pre">TranslationDataset</span></code> 에 있는 각 문장을 <code class="docutils literal notranslate"><span class="pre">Field</span></code> 에 정의된
 내용을 기반으로 토큰화할 것입니다.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torchtext.datasets</span> <span class="k">import</span> <span class="n">Multi30k</span>
-<span class="kn">from</span> <span class="nn">torchtext.data</span> <span class="k">import</span> <span class="n">Field</span><span class="p">,</span> <span class="n">BucketIterator</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torchtext.datasets</span> <span class="kn">import</span> <span class="n">Multi30k</span>
+<span class="kn">from</span> <span class="nn">torchtext.data</span> <span class="kn">import</span> <span class="n">Field</span><span class="p">,</span> <span class="n">BucketIterator</span>
 
 <span class="n">SRC</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">tokenize</span> <span class="o">=</span> <span class="s2">&quot;spacy&quot;</span><span class="p">,</span>
             <span class="n">tokenizer_language</span><span class="o">=</span><span class="s2">&quot;de&quot;</span><span class="p">,</span>
@@ -413,16 +413,16 @@ Transformer 레이어를 구현한 내용은 <a class="reference external" href=
 에서 확인할 수 있으며 이 튜토리얼의 모델이 사용하는 “attention” 은 Transformer 모델에서 제안하는
 멀티 헤드 셀프 어텐션(multi-headed self-attention) 과는 다르다는 점을 알려드립니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">random</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">Tuple</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span>
 
 <span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
 <span class="kn">import</span> <span class="nn">torch.optim</span> <span class="k">as</span> <span class="nn">optim</span>
 <span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="nn">F</span>
-<span class="kn">from</span> <span class="nn">torch</span> <span class="k">import</span> <span class="n">Tensor</span>
+<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>
 
 
 <span class="k">class</span> <span class="nc">Encoder</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">input_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
                  <span class="n">emb_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
                  <span class="n">enc_hid_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -457,7 +457,7 @@ Transformer 레이어를 구현한 내용은 <a class="reference external" href=
 
 
 <span class="k">class</span> <span class="nc">Attention</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">enc_hid_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
                  <span class="n">dec_hid_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
                  <span class="n">attn_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
@@ -491,7 +491,7 @@ Transformer 레이어를 구현한 내용은 <a class="reference external" href=
 
 
 <span class="k">class</span> <span class="nc">Decoder</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">output_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
                  <span class="n">emb_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
                  <span class="n">enc_hid_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -561,7 +561,7 @@ Transformer 레이어를 구현한 내용은 <a class="reference external" href=
 
 
 <span class="k">class</span> <span class="nc">Seq2Seq</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">encoder</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span>
                  <span class="n">decoder</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span>
                  <span class="n">device</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">):</span>
@@ -641,7 +641,7 @@ Transformer 레이어를 구현한 내용은 <a class="reference external" href=
     <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">()</span> <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">requires_grad</span><span class="p">)</span>
 
 
-<span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;The model has {count_parameters(model):,} trainable parameters&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;The model has </span><span class="si">{</span><span class="n">count_parameters</span><span class="p">(</span><span class="n">model</span><span class="p">)</span><span class="si">:</span><span class="s1">,</span><span class="si">}</span><span class="s1"> trainable parameters&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>참고 : 언어 번역의 성능 점수를 기록하려면, <code class="docutils literal notranslate"><span class="pre">nn.CrossEntropyLoss</span></code> 함수가 단순한
@@ -742,13 +742,13 @@ Transformer 레이어를 구현한 내용은 <a class="reference external" href=
 
     <span class="n">epoch_mins</span><span class="p">,</span> <span class="n">epoch_secs</span> <span class="o">=</span> <span class="n">epoch_time</span><span class="p">(</span><span class="n">start_time</span><span class="p">,</span> <span class="n">end_time</span><span class="p">)</span>
 
-    <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Epoch: {epoch+1:02} | Time: </span><span class="si">{epoch_mins}</span><span class="s1">m </span><span class="si">{epoch_secs}</span><span class="s1">s&#39;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">Train Loss: </span><span class="si">{train_loss:.3f}</span><span class="s1"> | Train PPL: {math.exp(train_loss):7.3f}&#39;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1"> Val. Loss: </span><span class="si">{valid_loss:.3f}</span><span class="s1"> |  Val. PPL: {math.exp(valid_loss):7.3f}&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Epoch: </span><span class="si">{</span><span class="n">epoch</span><span class="o">+</span><span class="mi">1</span><span class="si">:</span><span class="s1">02</span><span class="si">}</span><span class="s1"> | Time: </span><span class="si">{</span><span class="n">epoch_mins</span><span class="si">}</span><span class="s1">m </span><span class="si">{</span><span class="n">epoch_secs</span><span class="si">}</span><span class="s1">s&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">Train Loss: </span><span class="si">{</span><span class="n">train_loss</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1"> | Train PPL: </span><span class="si">{</span><span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">train_loss</span><span class="p">)</span><span class="si">:</span><span class="s1">7.3f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1"> Val. Loss: </span><span class="si">{</span><span class="n">valid_loss</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1"> |  Val. PPL: </span><span class="si">{</span><span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">valid_loss</span><span class="p">)</span><span class="si">:</span><span class="s1">7.3f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
 <span class="n">test_loss</span> <span class="o">=</span> <span class="n">evaluate</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">test_iterator</span><span class="p">,</span> <span class="n">criterion</span><span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;| Test Loss: </span><span class="si">{test_loss:.3f}</span><span class="s1"> | Test PPL: {math.exp(test_loss):7.3f} |&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;| Test Loss: </span><span class="si">{</span><span class="n">test_loss</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1"> | Test PPL: </span><span class="si">{</span><span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">test_loss</span><span class="p">)</span><span class="si">:</span><span class="s1">7.3f</span><span class="si">}</span><span class="s1"> |&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -785,7 +785,7 @@ Transformer 레이어를 구현한 내용은 <a class="reference external" href=
         <a href="../intermediate/reinforcement_q_learning.html" class="btn btn-neutral float-right" title="강화 학습 (DQN) 튜토리얼" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
       
       
-        <a href="text_sentiment_ngrams_tutorial.html" class="btn btn-neutral" title="SyntaxError" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
+        <a href="text_sentiment_ngrams_tutorial.html" class="btn btn-neutral" title="TorchText로 텍스트 분류하기" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
       
     </div>
   
@@ -846,11 +846,9 @@ Transformer 레이어를 구현한 내용은 <a class="reference external" href=
 
      
        <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-         <script type="text/javascript" src="../_static/jquery.js"></script>
-         <script type="text/javascript" src="../_static/underscore.js"></script>
-         <script type="text/javascript" src="../_static/doctools.js"></script>
-         <script type="text/javascript" src="../_static/language_data.js"></script>
-         <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+         <script src="../_static/jquery.js"></script>
+         <script src="../_static/underscore.js"></script>
+         <script src="../_static/doctools.js"></script>
      
 
   
