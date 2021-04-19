@@ -77,6 +77,13 @@ from torchvision import datasets, transforms
 import numpy as np
 import matplotlib.pyplot as plt
 
+# NOTE: 아래는 MNIST 데이터셋을 내려받을 때 "User-agent" 관련한 제한을 푸는 코드입니다.
+#       더 자세한 내용은 https://github.com/pytorch/vision/issues/3497 을 참고해주세요.
+from six.moves import urllib
+opener = urllib.request.build_opener()
+opener.addheaders = [('User-agent', 'Mozilla/5.0')]
+urllib.request.install_opener(opener)
+
 
 ######################################################################
 # 구현

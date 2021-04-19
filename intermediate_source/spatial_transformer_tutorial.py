@@ -2,22 +2,22 @@
 """
 공간 변형 네트워크(Spatial Transformer Networks) 튜토리얼
 =====================================
-**저자**: `Ghassen HAMROUNI <https://github.com/GHamrouni>`_  
+**저자**: `Ghassen HAMROUNI <https://github.com/GHamrouni>`_
 **번역**: `황성수 <https://github.com/adonisues>`_ , `정신유 <https://github.com/SSinyu>`_
 .. figure:: /_static/img/stn/FSeq.png
-이 튜토리얼에서는 공간 변형 네트워크(spatial transformer networks, 이하 STN)이라 
-불리는 비주얼 어텐션 메커니즘을 이용해 신경망을 증강(augment)시키는 방법에 대해 
+이 튜토리얼에서는 공간 변형 네트워크(spatial transformer networks, 이하 STN)이라
+불리는 비주얼 어텐션 메커니즘을 이용해 신경망을 증강(augment)시키는 방법에 대해
 학습합니다. 이 방법에 대한 자세한 내용은 `DeepMind paper <https://arxiv.org/abs/1506.02025>`__ 에서
 확인할 수 있습니다.
-STN은 어떠한 공간적 변형(spatial transformation)에도 적용할 수 있는 미분 가능한 
+STN은 어떠한 공간적 변형(spatial transformation)에도 적용할 수 있는 미분 가능한
 어텐션의 일반화입니다. 따라서 STN은 신경망의 기하학적 불변성(geometric invariance)을
 강화하기 위해 입력 이미지를 대상으로 어떠한 공간적 변형을 수행해야 하는지 학습하도록
 합니다.
-예를 들어 이미지의 관심 영역을 잘라내거나, 크기를 조정하거나, 방향(orientation)을 
-수정할 수 있습니다. CNN은 이러한 회전, 크기 조정 등의 일반적인 아핀(affine) 변환된 
+예를 들어 이미지의 관심 영역을 잘라내거나, 크기를 조정하거나, 방향(orientation)을
+수정할 수 있습니다. CNN은 이러한 회전, 크기 조정 등의 일반적인 아핀(affine) 변환된
 입력에 대해 결과의 변동이 크기 때문에 (민감하기 때문에), STN은 이를 극복하는데 매우
 유용한 메커니즘이 될 수 있습니다.
-STN이 가진 장점 중 하나는 아주 작은 수정만으로 기존에 사용하던 CNN에 간단하게 연결 시킬 
+STN이 가진 장점 중 하나는 아주 작은 수정만으로 기존에 사용하던 CNN에 간단하게 연결 시킬
 수 있다는 것입니다.
 """
 # 라이센스: BSD
@@ -39,8 +39,13 @@ plt.ion()   # 대화형 모드
 # 데이터 불러오기
 # ----------------
 #
-# 이 튜토리얼에서는 MNIST 데이터셋을 이용해 실험합니다. 실험에는 STN으로 
+# 이 튜토리얼에서는 MNIST 데이터셋을 이용해 실험합니다. 실험에는 STN으로
 # 증강된 일반적인 CNN을 사용합니다.
+
+from six.moves import urllib
+opener = urllib.request.build_opener()
+opener.addheaders = [('User-agent', 'Mozilla/5.0')]
+urllib.request.install_opener(opener)
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -142,7 +147,7 @@ model = Net().to(device)
 #
 # 이제 SGD 알고리즘을 이용해 모델을 학습시켜 봅시다. 앞서 구성한 신경망은
 # 감독 학습 방식(supervised way)으로 분류 문제를 학습합니다. 또한 이 모델은
-# end-to-end 방식으로 STN을 자동으로 학습합니다. 
+# end-to-end 방식으로 STN을 자동으로 학습합니다.
 
 
 optimizer = optim.SGD(model.parameters(), lr=0.01)
@@ -205,7 +210,7 @@ def convert_image_np(inp):
     inp = np.clip(inp, 0, 1)
     return inp
 
-# 학습 후 공간 변환 계층의 출력을 시각화하고, 입력 이미지 배치 데이터 및 
+# 학습 후 공간 변환 계층의 출력을 시각화하고, 입력 이미지 배치 데이터 및
 # STN을 사용해 변환된 배치 데이터를 시각화 합니다.
 
 

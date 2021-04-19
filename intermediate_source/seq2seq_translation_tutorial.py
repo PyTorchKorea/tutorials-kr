@@ -70,17 +70,6 @@ Sequence to Sequence 네트워크와 동작 방법에 관해서 아는 것은 �
 와 :doc:`/intermediate/char_rnn_generation_tutorial` 는
 각각 인코더, 디코더 모델과 비슷한 컨센을 가지기 때문에 도움이 됩니다.
 
-추가로 이 토픽들을 다루는 논문을 읽어 보십시오:
-
--  `Learning Phrase Representations using RNN Encoder-Decoder for
-   Statistical Machine Translation <https://arxiv.org/abs/1406.1078>`__
--  `Sequence to Sequence Learning with Neural
-   Networks <https://arxiv.org/abs/1409.3215>`__
--  `Neural Machine Translation by Jointly Learning to Align and
-   Translate <https://arxiv.org/abs/1409.0473>`__
--  `A Neural Conversational Model <https://arxiv.org/abs/1506.05869>`__
-
-
 **요구 사항**
 """
 from __future__ import unicode_literals, print_function, division
@@ -103,7 +92,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 #
 # 이 프로젝트의 데이터는 수천 개의 영어-프랑스어 번역 쌍입니다.
 #
-# `Open Data Stack Exchange <https://opendata.stackexchange.com/questions/3888/dataset-of-sentences-translated-into-many-languages>`__ 
+# `Open Data Stack Exchange <https://opendata.stackexchange.com/questions/3888/dataset-of-sentences-translated-into-many-languages>`__
 # 에 관한 이 질문은 https://tatoeba.org/eng/downloads 에서 다운 로드가 가능한
 # 공개 번역 사이트 https://tatoeba.org/ 를 알려 주었습니다. 더 나은 방법으로
 # 언어 쌍을 개별 텍스트 파일로 분할하는 추가 작업을 수행한
@@ -302,7 +291,7 @@ print(random.choice(pairs))
 #
 # 다음 문장 "Je ne suis pas le chat noir" → "I am not the black cat"
 # 를 살펴 봅시다. 입력 문장의 단어 대부분은 출력 문장에서
-# 직역("chat noir" 와 "black cat")되지만 약간 다른 순서도 있습니다. 
+# 직역("chat noir" 와 "black cat")되지만 약간 다른 순서도 있습니다.
 # "ne/pas" 구조로 인해 입력 문장에 단어가 하나 더 있습니다.
 # 입력 단어의 시퀀스를 직역해서 정확한 번역을 만드는
 # 것은 어려울 것입니다.
@@ -561,7 +550,7 @@ def train(input_tensor, target_tensor, encoder, decoder, encoder_optimizer, deco
             decoder_output, decoder_hidden, decoder_attention = decoder(
                 decoder_input, decoder_hidden, encoder_outputs)
             topv, topi = decoder_output.topk(1)
-            decoder_input = topi.squeeze().detach()  # 입력으로 사용할 부분을 히스토리에서 분리 
+            decoder_input = topi.squeeze().detach()  # 입력으로 사용할 부분을 히스토리에서 분리
 
             loss += criterion(decoder_output, target_tensor[di])
             if decoder_input.item() == EOS_token:

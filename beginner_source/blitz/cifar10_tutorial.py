@@ -51,7 +51,7 @@
 4. 학습용 데이터를 사용하여 신경망을 학습합니다.
 5. 시험용 데이터를 사용하여 신경망을 검사합니다.
 
-1. CIFAR10를 불러오고 정규화하기
+1. CIFAR10을 불러오고 정규화하기
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 ``torchvision`` 을 사용하여 매우 쉽게 CIFAR10을 불러올 수 있습니다.
@@ -72,14 +72,16 @@ transform = transforms.Compose(
     [transforms.ToTensor(),
      transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
 
+batch_size = 4
+
 trainset = torchvision.datasets.CIFAR10(root='./data', train=True,
                                         download=True, transform=transform)
-trainloader = torch.utils.data.DataLoader(trainset, batch_size=4,
+trainloader = torch.utils.data.DataLoader(trainset, batch_size=batch_size,
                                           shuffle=True, num_workers=2)
 
 testset = torchvision.datasets.CIFAR10(root='./data', train=False,
                                        download=True, transform=transform)
-testloader = torch.utils.data.DataLoader(testset, batch_size=4,
+testloader = torch.utils.data.DataLoader(testset, batch_size=batch_size,
                                          shuffle=False, num_workers=2)
 
 classes = ('plane', 'car', 'bird', 'cat',
@@ -107,7 +109,7 @@ images, labels = dataiter.next()
 # 이미지 보여주기
 imshow(torchvision.utils.make_grid(images))
 # 정답(label) 출력
-print(' '.join('%5s' % classes[labels[j]] for j in range(4)))
+print(' '.join('%5s' % classes[labels[j]] for j in range(batch_size)))
 
 
 ########################################################################
@@ -122,7 +124,7 @@ import torch.nn.functional as F
 
 class Net(nn.Module):
     def __init__(self):
-        super(Net, self).__init__()
+        super().__init__()
         self.conv1 = nn.Conv2d(3, 6, 5)
         self.pool = nn.MaxPool2d(2, 2)
         self.conv2 = nn.Conv2d(6, 16, 5)

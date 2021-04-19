@@ -458,13 +458,13 @@ for i_episode in range(num_episodes):
         # 다음 상태로 이동
         state = next_state
 
-        # 최적화 한단계 수행(목표 네트워크에서)
+        # (정책 네트워크에서) 최적화 한단계 수행
         optimize_model()
         if done:
             episode_durations.append(t + 1)
             plot_durations()
             break
-    #목표 네트워크 업데이트, 모든 웨이트와 바이어스 복사
+    # 목표 네트워크 업데이트, 모든 웨이트와 바이어스 복사
     if i_episode % TARGET_UPDATE == 0:
         target_net.load_state_dict(policy_net.state_dict())
 

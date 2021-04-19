@@ -42,7 +42,7 @@ PyTorch에 포함된 분산 패키지(예. ``torch.distributed``)는 연구자�
     import os
     import torch
     import torch.distributed as dist
-    from torch.multiprocessing import Process
+    import torch.multiprocessing as mp
 
     def run(rank, size):
         """ Distributed function to be implemented later. """
@@ -192,18 +192,18 @@ PyTorch에 포함된 분산 패키지(예. ``torch.distributed``)는 연구자�
         """ 간단한 점-대-점 간 통신 """
         group = dist.new_group([0, 1])
         tensor = torch.ones(1)
-        dist.all_reduce(tensor, op=dist.reduce_op.SUM, group=group)
+        dist.all_reduce(tensor, op=dist.ReduceOp.SUM, group=group)
         print('Rank ', rank, ' has data ', tensor[0])
 
-그룹 내의 모든 Tensor들의 합이 필요하기 떄문에, ``dist.reduce_op.SUM`` 을
+그룹 내의 모든 Tensor들의 합이 필요하기 떄문에, ``dist.ReduceOp.SUM`` 을
 리듀스(reduce) 연산자로 사용하였습니다. 일반적으로, 교환 법칙이 허용되는(commutative)
 모든 수학 연산을 연산자로 사용할 수 있습니다. PyTorch는 요소별(element-wise)로
 동작하는 기본적으로 4개의 연산자를 제공합니다.
 
--  ``dist.reduce_op.SUM``,
--  ``dist.reduce_op.PRODUCT``,
--  ``dist.reduce_op.MAX``,
--  ``dist.reduce_op.MIN``.
+-  ``dist.ReduceOp.SUM``,
+-  ``dist.ReduceOp.PRODUCT``,
+-  ``dist.ReduceOp.MAX``,
+-  ``dist.ReduceOp.MIN``.
 
 PyTorch에는 현재 ``dist.all_reduce(tensor, op, group)`` 외에도 6개의 집합 통신이
 구현되어 있습니다.
@@ -350,7 +350,7 @@ PyTorch에는 현재 ``dist.all_reduce(tensor, op, group)`` 외에도 6개의 �
     def average_gradients(model):
         size = float(dist.get_world_size())
         for param in model.parameters():
-            dist.all_reduce(param.grad.data, op=dist.reduce_op.SUM)
+            dist.all_reduce(param.grad.data, op=dist.ReduceOp.SUM)
             param.grad.data /= size
 
 *완성(Et voilà)*! 분산 동기(synchronous) SGD를 성공적으로 구현했으며 어떤 모델도

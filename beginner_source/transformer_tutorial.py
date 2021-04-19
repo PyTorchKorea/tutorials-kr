@@ -53,7 +53,6 @@ class TransformerModel(nn.Module):
         super(TransformerModel, self).__init__()
         from torch.nn import TransformerEncoder, TransformerEncoderLayer
         self.model_type = 'Transformer'
-        self.src_mask = None
         self.pos_encoder = PositionalEncoding(ninp, dropout)
         encoder_layers = TransformerEncoderLayer(ninp, nhead, nhid, dropout)
         self.transformer_encoder = TransformerEncoder(encoder_layers, nlayers)
@@ -63,7 +62,7 @@ class TransformerModel(nn.Module):
 
         self.init_weights()
 
-    def _generate_square_subsequent_mask(self, sz):
+    def generate_square_subsequent_mask(self, sz):
         mask = (torch.triu(torch.ones(sz, sz)) == 1).transpose(0, 1)
         mask = mask.float().masked_fill(mask == 0, float('-inf')).masked_fill(mask == 1, float(0.0))
         return mask
@@ -74,15 +73,10 @@ class TransformerModel(nn.Module):
         self.decoder.bias.data.zero_()
         self.decoder.weight.data.uniform_(-initrange, initrange)
 
-    def forward(self, src):
-        if self.src_mask is None or self.src_mask.size(0) != len(src):
-            device = src.device
-            mask = self._generate_square_subsequent_mask(len(src)).to(device)
-            self.src_mask = mask
-
+    def forward(self, src, src_mask):
         src = self.encoder(src) * math.sqrt(self.ninp)
         src = self.pos_encoder(src)
-        output = self.transformer_encoder(src, self.src_mask)
+        output = self.transformer_encoder(src, src_mask)
         output = self.decoder(output)
         return output
 
@@ -119,7 +113,7 @@ class PositionalEncoding(nn.Module):
 
 
 ######################################################################
-# 학습 과정에서는 ``torchtext`` 의 Wikitext-2 데이터셋을 이용합니다.
+# 이 튜토리얼에서는 ``torchtext`` 를 사용하여 Wikitext-2 데이터셋을 생성합니다.
 # 단어 오브젝트는 훈련 데이터셋(train dataset) 에 의하여 만들어지고, 토큰을 텐서(tensor)로 수치화하는데 사용됩니다.
 # 시퀀스 데이터로부터 시작하여, ``batchify()`` 함수는 데이터셋을 컬럼들로 배열하고, ``batch_size`` 사이즈의 배치들로 나눈 후에 남은 모든 토큰을 버립니다.
 # 예를 들어, 알파벳을 시퀀스(총 길이 26) 로 생각하고 배치 사이즈를 4라고 한다면, 우리는 알파벳을 길이가 6인 4개의 시퀀스로 나눌 수 있습니다.
@@ -139,18 +133,33 @@ class PositionalEncoding(nn.Module):
 # 이 컬럼들은 모델에 의해서 독립적으로 취급되며, 이것은 더 효율적인 배치 프로세싱(batch processing) 이 가능하지만, ``G`` 와 ``F`` 의 의존성이 학습될 수 없다는 것을 의미합니다.
 #
 
-import torchtext
+import io
+import torch
+from torchtext.datasets import WikiText2
 from torchtext.data.utils import get_tokenizer
-TEXT = torchtext.data.Field(tokenize=get_tokenizer("basic_english"),
-                            init_token='<sos>',
-                            eos_token='<eos>',
-                            lower=True)
-train_txt, val_txt, test_txt = torchtext.datasets.WikiText2.splits(TEXT)
-TEXT.build_vocab(train_txt)
+from collections import Counter
+from torchtext.vocab import Vocab
+
+train_iter = WikiText2(split='train')
+tokenizer = get_tokenizer('basic_english')
+counter = Counter()
+for line in train_iter:
+    counter.update(tokenizer(line))
+vocab = Vocab(counter)
+
+def data_process(raw_text_iter):
+  data = [torch.tensor([vocab[token] for token in tokenizer(item)],
+                       dtype=torch.long) for item in raw_text_iter]
+  return torch.cat(tuple(filter(lambda t: t.numel() > 0, data)))
+
+train_iter, val_iter, test_iter = WikiText2()
+train_data = data_process(train_iter)
+val_data = data_process(val_iter)
+test_data = data_process(test_iter)
+
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 def batchify(data, bsz):
-    data = TEXT.numericalize([data.examples[0].text])
     # 데이터셋을 bsz 파트들로 나눕니다.
     nbatch = data.size(0) // bsz
     # 깔끔하게 나누어 떨어지지 않는 추가적인 부분(나머지들) 은 잘라냅니다.
@@ -161,9 +170,9 @@ def batchify(data, bsz):
 
 batch_size = 20
 eval_batch_size = 10
-train_data = batchify(train_txt, batch_size)
-val_data = batchify(val_txt, eval_batch_size)
-test_data = batchify(test_txt, eval_batch_size)
+train_data = batchify(train_data, batch_size)
+val_data = batchify(val_data, eval_batch_size)
+test_data = batchify(test_data, eval_batch_size)
 
 
 ######################################################################
@@ -188,7 +197,7 @@ bptt = 35
 def get_batch(source, i):
     seq_len = min(bptt, len(source) - 1 - i)
     data = source[i:i+seq_len]
-    target = source[i+1:i+1+seq_len].view(-1)
+    target = source[i+1:i+1+seq_len].reshape(-1)
     return data, target
 
 
@@ -203,7 +212,7 @@ def get_batch(source, i):
 # 단어 사이즈는 단어 오브젝트의 길이와 일치 합니다.
 #
 
-ntokens = len(TEXT.vocab.stoi) # 단어 사전의 크기
+ntokens = len(vocab.stoi) # 단어 사전(어휘집)의 크기
 emsize = 200 # 임베딩 차원
 nhid = 200 # nn.TransformerEncoder 에서 피드포워드 네트워크(feedforward network) 모델의 차원
 nlayers = 2 # nn.TransformerEncoder 내부의 nn.TransformerEncoderLayer 개수
@@ -242,11 +251,13 @@ def train():
     model.train() # 학습 모드를 시작합니다.
     total_loss = 0.
     start_time = time.time()
-    ntokens = len(TEXT.vocab.stoi)
+    src_mask = model.generate_square_subsequent_mask(bptt).to(device)
     for batch, i in enumerate(range(0, train_data.size(0) - 1, bptt)):
         data, targets = get_batch(train_data, i)
         optimizer.zero_grad()
-        output = model(data)
+        if data.size(0) != bptt:
+            src_mask = model.generate_square_subsequent_mask(data.size(0)).to(device)
+        output = model(data, src_mask)
         loss = criterion(output.view(-1, ntokens), targets)
         loss.backward()
         torch.nn.utils.clip_grad_norm_(model.parameters(), 0.5)
@@ -260,7 +271,7 @@ def train():
             print('| epoch {:3d} | {:5d}/{:5d} batches | '
                   'lr {:02.2f} | ms/batch {:5.2f} | '
                   'loss {:5.2f} | ppl {:8.2f}'.format(
-                    epoch, batch, len(train_data) // bptt, scheduler.get_lr()[0],
+                    epoch, batch, len(train_data) // bptt, scheduler.get_last_lr()[0],
                     elapsed * 1000 / log_interval,
                     cur_loss, math.exp(cur_loss)))
             total_loss = 0
@@ -269,11 +280,13 @@ def train():
 def evaluate(eval_model, data_source):
     eval_model.eval() # 평가 모드를 시작합니다.
     total_loss = 0.
-    ntokens = len(TEXT.vocab.stoi)
+    src_mask = model.generate_square_subsequent_mask(bptt).to(device)
     with torch.no_grad():
         for i in range(0, data_source.size(0) - 1, bptt):
             data, targets = get_batch(data_source, i)
-            output = eval_model(data)
+            if data.size(0) != bptt:
+                src_mask = model.generate_square_subsequent_mask(data.size(0)).to(device)
+            output = eval_model(data, src_mask)
             output_flat = output.view(-1, ntokens)
             total_loss += len(data) * criterion(output_flat, targets).item()
     return total_loss / (len(data_source) - 1)

@@ -38,7 +38,7 @@
    온라인 뉴스로부터 자동으로 추출된 두 개의 문장들과 그 두 문장이 같은 뜻인지 사람이
    평가한 정답으로 이루어져 있습니다. 클래스의 비중이 같지 않아(같음 68%, 다름 32%),
    많이 쓰이는 `F1 점수 <https://scikit-learn.org/stable/modules/generated/sklearn.metrics.f1_score.html>`_ 를
-   기록합니다. MRPC는 아래에 나온 것처럼 문장 쌍을 분류하는 자연어처리 문제로 많이 쓰입니다.
+   기록합니다. MRPC는 아래에 나온 것처럼 문장 쌍을 분류하는 자연어처리 문제에 많이 쓰입니다.
 
 .. image:: /_static/img/bert.png
 
@@ -485,11 +485,11 @@ HuggingFace BERT 모델에 동적 양자화를 적용하기 위해
 
    | 정확도  |  F1 점수  |  모델 크기  |  쓰레드 1개 |  쓰레드 4개 |
    |  FP32  |  0.9019  |   438 MB   |   160 초   |   85 초    |
-   |  INT8  |  0.8953  |   181 MB   |    90 초   |   46 초    |
+   |  INT8  |  0.902   |   181 MB   |   90 초    |   46 초    |
 
 
 MRPC 문제에 맞게 미세조정한 BERT 모델에 학습 후 동적 양자화를 적용한
-결과, F1 점수 0.6이 나왔습니다. 참고로, `최근 논문 <https://arxiv.org/pdf/1910.06188.pdf>`_
+결과, 0.6% 낮은 F1 점수가 나왔습니다. 참고로, `최근 논문 <https://arxiv.org/pdf/1910.06188.pdf>`_
 (표 1)에서는 학습 후 동적 양자화를 적용했을 때, F1 점수 0.8788이 나왔고,
 양자화 의식 학습을 적용했을 때는 0.8956이 나왔습니다. 우리는 Pytorch의 비대칭
 양자화를 사용했지만, 참고한 논문에서는 대칭적 양자화만을 사용했다는 점이 주요한
@@ -510,14 +510,21 @@ MRPC 데이터셋을 평가하는데 약 46초가 소요됐습니다.
 3.3 양자화된 모델 직렬화하기
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-나중에 다시 쓸 수 있도록 양자화된 모델을 직렬화하고 저장할 수 있습니다.
+나중에 다시 쓸 수 있도록 `torch.jit.save` 을 사용하여 양자화된 모델을 직렬화하고 저장할 수 있습니다.
 
 .. code:: python
 
-    quantized_output_dir = configs.output_dir + "quantized/"
-    if not os.path.exists(quantized_output_dir):
-        os.makedirs(quantized_output_dir)
-        quantized_model.save_pretrained(quantized_output_dir)
+    input_ids = ids_tensor([8, 128], 2)
+    token_type_ids = ids_tensor([8, 128], 2)
+    attention_mask = ids_tensor([8, 128], vocab_size=2)
+    dummy_input = (input_ids, attention_mask, token_type_ids)
+    traced_model = torch.jit.trace(quantized_model, dummy_input)
+    torch.jit.save(traced_model, "bert_traced_eager_quant.pt")
+
+양자화된 모델을 불러올 때는 `torch.jit.load` 를 사용합니다.
+
+.. code:: python
+    loaded_quantized_model = torch.jit.load("bert_traced_eager_quant.pt")
 
 
 마치며

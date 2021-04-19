@@ -3,16 +3,21 @@
 
 .. raw:: html
 
+    <p>여러분의 생각을 들려주세요. <a href="https://forms.gle/ZxBgfDRmMYdE3G6RA" target="_blank">(비공식) 한국어 PyTorch 튜토리얼 독자 설문</a>에 참여 부탁드립니다. </p>
+
+
+.. raw:: html
+
     <div class="tutorials-callout-container">
         <div class="row">
 
 .. Add callout items below this line
 
 .. customcalloutitem::
-   :description: 60분 만에 끝장내기는 PyTorch를 어떻게 사용하는지 대략적으로 알아볼 수 있는 일반적인 시작점입니다. 심층신경망 모델 구성에 대한 기본적인 내용을 다룹니다.
-   :header: PyTorch가 처음이신가요?
-   :button_link: beginner/deep_learning_60min_blitz.html
-   :button_text: 60분 만에 끝장내기 시작
+   :description: Familiarize yourself with PyTorch concepts and modules. Learn how to load data, build deep neural networks, train and save your models in this quickstart guide.
+   :header: Learn the Basics
+   :button_link:  beginner/basics/intro.html
+   :button_text: Get started with PyTorch
 
 .. customcalloutitem::
    :description: 한 입 크기의, 바로 사용할 수 있는 PyTorch 코드 예제들을 확인해보세요.
@@ -51,8 +56,8 @@
 .. Learning PyTorch
 
 .. customcarditem::
-   :header: 파이토치(PyTorch)로 딥러닝하기: 60분만에 끝장내기
-   :card_description: 높은 수준에서 PyTorch의 텐서 라이브러리와 신경망을 이해합니다.
+   :header: Learn the Basics
+   :card_description: A step-by-step guide to building a complete ML workflow with PyTorch.
    :image: _static/img/thumbnails/cropped/60-min-blitz.png
    :link: beginner/deep_learning_60min_blitz.html
    :tags: Getting-Started
@@ -95,6 +100,13 @@
    :tags: Image/Video
 
 .. customcarditem::
+   :header: Optimizing Vision Transformer Model
+   :card_description: Apply cutting-edge, attention-based transformer models to computer vision tasks.
+   :image: _static/img/thumbnails/cropped/60-min-blitz.png
+   :link: beginner/vt_tutorial.html
+   :tags: Image/Video
+
+.. customcarditem::
    :header: 적대적 예제 생성(Adversarial Example Generation)
    :card_description: 가장 많이 사용되는 공격 방법 중 하나인 FGSM (Fast Gradient Sign Attack)을 이용해 MNIST 분류기를 속이는 방법을 배웁니다.
    :image: _static/img/thumbnails/cropped/Adversarial-Example-Generation.png
@@ -115,6 +127,13 @@
    :card_description: Learn to load and preprocess data from a simple dataset with PyTorch's torchaudio library.
    :image: _static/img/thumbnails/cropped/torchaudio-Tutorial.png
    :link: beginner/audio_preprocessing_tutorial.html
+   :tags: Audio
+
+   .. customcarditem::
+   :header: Speech Command Recognition
+   :card_description: Learn how to correctly format an audio dataset and then train/test an audio classifier network on the dataset.
+   :image: _static/img/thumbnails/cropped/torchaudio-speech.png
+   :link: intermediate/speech_command_recognition_with_torchaudio.html
    :tags: Audio
 
 .. Text
@@ -158,7 +177,7 @@
    :header: TorchText로 언어 번역하기
    :card_description: 영어와 독어가 포함된 잘 알려진 데이터셋을 torchtext를 사용하여 전처리한 뒤, 시퀀스-투-시퀀스(Seq-to-Seq) 모델을 사용하여 학습합니다.
    :image: _static/img/thumbnails/cropped/Language-Translation-with-TorchText.png
-   :link: beginner/torchtext_translation_tutorial.html
+   :link: beginner/torchtext_translation.html
    :tags: Text
 
 .. Reinforcement Learning
@@ -169,6 +188,14 @@
    :image: _static/img/cartpole.gif
    :link: intermediate/reinforcement_q_learning.html
    :tags: Reinforcement-Learning
+
+.. customcarditem::
+   :header: Train a Mario-playing RL Agent
+   :card_description: Use PyTorch to train a Double Q-learning agent to play Mario.
+   :image: _static/img/mario.gif
+   :link: intermediate/mario_rl_tutorial.html
+   :tags: Reinforcement-Learning
+
 
 .. Deploying PyTorch Models in Production
 
@@ -184,14 +211,14 @@
    :card_description: C++과 같은 고성능 환경에서 실행할 수 있도록 (nn.Module의 하위 클래스인) PyTorch 모델의 중간 표현(intermediate representation)을 제공하는 TorchScript를 소개합니다.
    :image: _static/img/thumbnails/cropped/Introduction-to-TorchScript.png
    :link: beginner/Intro_to_TorchScript_tutorial.html
-   :tags: Production
+   :tags: Production,TorchScript
 
 .. customcarditem::
    :header: C++에서 TorchScript 모델 로딩하기
    :card_description: PyTorch가 어떻게 기존의 Python 모델을 직렬화된 표현으로 변환하여 Python 의존성 없이 순수하게 C++에서 불러올 수 있는지 배웁니다.
    :image: _static/img/thumbnails/cropped/Loading-a-TorchScript-Model-in-Cpp.png
    :link: advanced/cpp_export.html
-   :tags: Production
+   :tags: Production,TorchScript
 
 .. customcarditem::
    :header: (optional) Exporting a Model from PyTorch to ONNX and Running it using ONNX Runtime
@@ -200,21 +227,30 @@
    :link: advanced/super_resolution_with_onnxruntime.html
    :tags: Production
 
-.. Frontend APIs
+.. Code Transformations with FX
 
 .. customcarditem::
-   :header: (prototype) Introduction to Named Tensors in PyTorch
-   :card_description: Learn how to use PyTorch to train a Deep Q Learning (DQN) agent on the CartPole-v0 task from the OpenAI Gym.
-   :image: _static/img/thumbnails/cropped/experimental-Introduction-to-Named-Tensors-in-PyTorch.png
-   :link: intermediate/memory_format_tutorial.html
-   :tags: Frontend-APIs,Named-Tensor,Best-Practice
+   :header: Building a Convolution/Batch Norm fuser in FX
+   :card_description: Build a simple FX pass that fuses batch norm into convolution to improve performance during inference.
+   :image: _static/img/thumbnails/cropped/Deploying-PyTorch-in-Python-via-a-REST-API-with-Flask.png
+   :link: intermediate/fx_conv_bn_fuser.html
+   :tags: FX
+
+.. customcarditem::
+   :header: Building a Simple Performance Profiler with FX
+   :card_description: Build a simple FX interpreter to record the runtime of op, module, and function calls and report statistics
+   :image: _static/img/thumbnails/cropped/Deploying-PyTorch-in-Python-via-a-REST-API-with-Flask.png
+   :link: intermediate/fx_profiling_tutorial.html
+   :tags: FX
+
+.. Frontend APIs
 
 .. customcarditem::
    :header: (beta) Channels Last Memory Format in PyTorch
    :card_description: Get an overview of Channels Last memory format and understand how it is used to order NCHW tensors in memory preserving dimensions.
    :image: _static/img/thumbnails/cropped/experimental-Channels-Last-Memory-Format-in-PyTorch.png
    :link: intermediate/memory_format_tutorial.html
-   :tags: Memory-Format,Best-Practice
+   :tags: Memory-Format,Best-Practice,Frontend-APIs
 
 .. customcarditem::
    :header: Using the PyTorch C++ Frontend
@@ -228,21 +264,21 @@
    :card_description:  Create a neural network layer with no parameters using numpy. Then use scipy to create a neural network layer that has learnable weights.
    :image: _static/img/thumbnails/cropped/Custom-Cpp-and-CUDA-Extensions.png
    :link: advanced/cpp_extension.html
-   :tags: Frontend-APIs,C++,CUDA
+   :tags: Extending-PyTorch,Frontend-APIs,C++,CUDA
 
 .. customcarditem::
    :header: Extending TorchScript with Custom C++ Operators
    :card_description:  Implement a custom TorchScript operator in C++, how to build it into a shared library, how to use it in Python to define TorchScript models and lastly how to load it into a C++ application for inference workloads.
    :image: _static/img/thumbnails/cropped/Extending-TorchScript-with-Custom-Cpp-Operators.png
    :link: advanced/torch_script_custom_ops.html
-   :tags: Frontend-APIs,TorchScript,C++
+   :tags: Extending-PyTorch,Frontend-APIs,TorchScript,C++
 
 .. customcarditem::
    :header: Extending TorchScript with Custom C++ Classes
    :card_description: This is a continuation of the custom operator tutorial, and introduces the API we’ve built for binding C++ classes into TorchScript and Python simultaneously.
    :image: _static/img/thumbnails/cropped/Extending-TorchScript-with-Custom-Cpp-Classes.png
    :link: advanced/torch_script_custom_classes.html
-   :tags: Frontend-APIs,TorchScript,C++
+   :tags: Extending-PyTorch,Frontend-APIs,TorchScript,C++
 
 .. customcarditem::
    :header: Dynamic Parallelism in TorchScript
@@ -258,7 +294,35 @@
    :link: advanced/cpp_autograd.html
    :tags: Frontend-APIs,C++
 
+.. customcarditem::
+   :header: Registering a Dispatched Operator in C++
+   :card_description: The dispatcher is an internal component of PyTorch which is responsible for figuring out what code should actually get run when you call a function like torch::add.
+   :image: _static/img/thumbnails/cropped/generic-pytorch-logo.PNG
+   :link: advanced/dispatcher.html
+   :tags: Extending-PyTorch,Frontend-APIs,C++
+
+.. customcarditem::
+   :header: Extending Dispatcher For a New Backend in C++
+   :card_description: Learn how to extend the dispatcher to add a new device living outside of the pytorch/pytorch repo and maintain it to keep in sync with native PyTorch devices.
+   :image: _static/img/thumbnails/cropped/generic-pytorch-logo.PNG
+   :link: advanced/extend_dispatcher.html
+   :tags: Extending-PyTorch,Frontend-APIs,C++
+
 .. Model Optimization
+
+.. customcarditem::
+   :header: Performance Profiling in PyTorch
+   :card_description: Learn how to use the PyTorch Profiler to benchmark your module's performance.
+   :image: _static/img/thumbnails/cropped/profiler.png
+   :link: beginner/profiler.html
+   :tags: Model-Optimization,Best-Practice,Profiling
+
+.. customcarditem::
+   :header: Hyperparameter Tuning Tutorial
+   :card_description: Learn how to use Ray Tune to find the best performing set of hyperparameters for your model.
+   :image: _static/img/ray-tune.png
+   :link: beginner/hyperparameter_tuning_tutorial.html
+   :tags: Model-Optimization,Best-Practice
 
 .. customcarditem::
    :header: Pruning Tutorial
@@ -282,17 +346,10 @@
    :tags: Text,Quantization,Model-Optimization
 
 .. customcarditem::
-   :header: (beta) Static Quantization with Eager Mode in PyTorch
-   :card_description: Learn techniques to impove a model's accuracy =  post-training static quantization, per-channel quantization, and quantization-aware training.
-   :image: _static/img/thumbnails/cropped/experimental-Static-Quantization-with-Eager-Mode-in-PyTorch.png
-   :link: advanced/static_quantization_tutorial.html
-   :tags: Image/Video,Quantization,Model-Optimization
-
-.. customcarditem::
    :header: (beta) Quantized Transfer Learning for Computer Vision Tutorial
-   :card_description: Learn techniques to impove a model's accuracy -  post-training static quantization, per-channel quantization, and quantization-aware training.
-   :image: _static/img/thumbnails/cropped/experimental-Quantized-Transfer-Learning-for-Computer-Vision-Tutorial.png
-   :link: advanced/static_quantization_tutorial.html
+   :card_description: Extends the Transfer Learning for Computer Vision Tutorial using a quantized model.
+   :image: _static/img/thumbnails/cropped/60-min-blitz.png
+   :link: intermediate/quantized_transfer_learning_tutorial.html
    :tags: Image/Video,Quantization,Model-Optimization
 
 .. Parallel-and-Distributed-Training
@@ -316,13 +373,6 @@
    :card_description: Learn the basics of when to use distributed data paralle versus data parallel and work through an example to set it up.
    :image: _static/img/thumbnails/cropped/Getting-Started-with-Distributed-Data-Parallel.png
    :link: intermediate/ddp_tutorial.html
-   :tags: Parallel-and-Distributed-Training
-
-.. customcarditem::
-   :header: (advanced) PyTorch 1.0 Distributed Trainer with Amazon AWS
-   :card_description: Set up the distributed package of PyTorch, use the different communication strategies, and go over some the internals of the package.
-   :image: _static/img/thumbnails/cropped/advanced-PyTorch-1point0-Distributed-Trainer-with-Amazon-AWS.png
-   :link: beginner/aws_distributed_training_tutorial.html
    :tags: Parallel-and-Distributed-Training
 
 .. customcarditem::
@@ -366,6 +416,36 @@
    :image: _static/img/thumbnails/cropped/Combining-Distributed-DataParallel-with-Distributed-RPC-Framework.png
    :link: advanced/rpc_ddp_tutorial.html
    :tags: Parallel-and-Distributed-Training
+
+.. customcarditem::
+   :header: Training Transformer models using Pipeline Parallelism
+   :card_description: Walk through a through a simple example of how to train a transformer model using pipeline parallelism.
+   :image: _static/img/thumbnails/cropped/Training-Transformer-models-using-Pipeline-Parallelism.png
+   :link: intermediate/pipeline_tutorial.html
+   :tags: Parallel-and-Distributed-Training
+
+.. customcarditem::
+   :header: Training Transformer models using Distributed Data Parallel and Pipeline Parallelism
+   :card_description: Walk through a through a simple example of how to train a transformer model using Distributed Data Parallel and Pipeline Parallelism
+   :image: _static/img/thumbnails/cropped/Training-Transformer-Models-using-Distributed-Data-Parallel-and-Pipeline-Parallelism.png
+   :link: advanced/ddp_pipeline.html
+   :tags: Parallel-and-Distributed-Training
+
+.. Mobile
+
+.. customcarditem::
+   :header: Image Segmentation DeepLabV3 on iOS
+   :card_description: A comprehensive step-by-step tutorial on how to prepare and run the PyTorch DeepLabV3 image segmentation model on iOS.
+   :image: _static/img/thumbnails/cropped/ios.png
+   :link: beginner/deeplabv3_on_ios.html
+   :tags: Mobile
+
+.. customcarditem::
+   :header: Image Segmentation DeepLabV3 on Android
+   :card_description: A comprehensive step-by-step tutorial on how to prepare and run the PyTorch DeepLabV3 image segmentation model on Android.
+   :image: _static/img/thumbnails/cropped/android.png
+   :link: beginner/deeplabv3_on_android.html
+   :tags: Mobile
 
 .. End of tutorial card section
 
@@ -436,6 +516,7 @@
    :caption: 파이토치(PyTorch) 레시피
 
    모든 레시피 보기 <recipes/recipes_index>
+   모든 프로토타입 레시피 보기 <prototype/prototype_index>
 
 .. toctree::
    :maxdepth: 2
@@ -443,6 +524,7 @@
    :includehidden:
    :caption: 파이토치(PyTorch) 배우기
 
+   beginner/basics/intro
    beginner/deep_learning_60min_blitz
    beginner/pytorch_with_examples
    beginner/nn_tutorial
@@ -458,6 +540,7 @@
    beginner/transfer_learning_tutorial
    beginner/fgsm_tutorial
    beginner/dcgan_faces_tutorial
+   beginner/vt_tutorial
 
 .. toctree::
    :maxdepth: 2
@@ -466,6 +549,7 @@
    :caption: 오디오
 
    beginner/audio_preprocessing_tutorial
+   intermediate/speech_command_recognition_with_torchaudio
 
 .. toctree::
    :maxdepth: 2
@@ -478,7 +562,7 @@
    intermediate/char_rnn_generation_tutorial
    intermediate/seq2seq_translation_tutorial
    beginner/text_sentiment_ngrams_tutorial
-   beginner/torchtext_translation_tutorial
+   beginner/torchtext_translation
 
 
 .. toctree::
@@ -488,6 +572,7 @@
    :caption: 강화학습
 
    intermediate/reinforcement_q_learning
+   intermediate/mario_rl_tutorial
 
 .. toctree::
    :maxdepth: 2
@@ -504,17 +589,33 @@
    :maxdepth: 2
    :includehidden:
    :hidden:
+   :caption: Code Transforms with FX
+
+   intermediate/fx_conv_bn_fuser
+   intermediate/fx_profiling_tutorial
+
+.. toctree::
+   :maxdepth: 2
+   :includehidden:
+   :hidden:
    :caption: 프론트엔드 API
 
-   intermediate/named_tensor_tutorial
    intermediate/memory_format_tutorial
    advanced/cpp_frontend
+   advanced/torch-script-parallelism
+   advanced/cpp_autograd
+
+.. toctree::
+   :maxdepth: 2
+   :includehidden:
+   :hidden:
+   :caption: PyTorch 확장하기
+
    advanced/cpp_extension
    advanced/torch_script_custom_ops
    advanced/torch_script_custom_classes
-   advanced/torch-script-parallelism
-   advanced/cpp_autograd
    advanced/dispatcher
+   advanced/extend_dispatcher
 
 .. toctree::
    :maxdepth: 2
@@ -522,10 +623,11 @@
    :hidden:
    :caption: 모델 최적화
 
+   beginner/profiler
+   beginner/hyperparameter_tuning_tutorial
    intermediate/pruning_tutorial
    advanced/dynamic_quantization_tutorial
    intermediate/dynamic_quantization_bert_tutorial
-   advanced/static_quantization_tutorial
    intermediate/quantized_transfer_learning_tutorial
 
 .. toctree::
@@ -539,8 +641,18 @@
    intermediate/ddp_tutorial
    intermediate/dist_tuto
    intermediate/rpc_tutorial
-   beginner/aws_distributed_training_tutorial
    intermediate/rpc_param_server_tutorial
    intermediate/dist_pipeline_parallel_tutorial
    intermediate/rpc_async_execution
    advanced/rpc_ddp_tutorial
+   intermediate/pipeline_tutorial
+   advanced/ddp_pipeline
+
+.. toctree::
+   :maxdepth: 2
+   :includehidden:
+   :hidden:
+   :caption: Mobile
+
+   beginner/deeplabv3_on_ios
+   beginner/deeplabv3_on_android

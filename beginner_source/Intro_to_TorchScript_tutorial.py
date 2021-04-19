@@ -75,7 +75,7 @@ print(my_cell(x, h))
 #    cell <https://colah.github.io/posts/2015-08-Understanding-LSTMs/>`__ 의
 #    일종입니다. 즉, 반복(loop)에 적용되는 함수입니다.
 #
-# 모듈을 인스턴스화하고, 3x4 크기의 무작위 값들로 이루어진 행렬 ``x`` 와 ``y`` 를
+# 모듈을 인스턴스화하고, 3x4 크기의 무작위 값들로 이루어진 행렬 ``x`` 와 ``h`` 를
 # 만들었습니다.
 # 그런 다음, ``my_cell(x, h)`` 를 이용해 cell을 호출했습니다. 이것은 ``forward``
 # 함수를 호출합니다.
@@ -187,6 +187,8 @@ class MyCell(torch.nn.Module):
 my_cell = MyCell()
 x, h = torch.rand(3, 4), torch.rand(3, 4)
 traced_cell = torch.jit.trace(my_cell, (x, h))
+
+print(traced_cell.dg.code)
 print(traced_cell)
 traced_cell(x, h)
 
@@ -280,8 +282,10 @@ print(traced_cell.code)
 scripted_gate = torch.jit.script(MyDecisionGate())
 
 my_cell = MyCell(scripted_gate)
-traced_cell = torch.jit.script(my_cell)
-print(traced_cell.code)
+scripted_cell = torch.jit.script(my_cell)
+
+print(scripted_gate.code)
+print(scripted_cell.code)
 
 
 ######################################################################
@@ -353,9 +357,9 @@ print(traced.code)
 # 랩핑 된 RNN 모듈을 저장하고 로드해 봅시다:
 #
 
-traced.save('wrapped_rnn.zip')
+traced.save('wrapped_rnn.pt')
 
-loaded = torch.jit.load('wrapped_rnn.zip')
+loaded = torch.jit.load('wrapped_rnn.pt')
 
 print(loaded)
 print(loaded.code)

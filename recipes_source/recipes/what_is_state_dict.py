@@ -29,7 +29,7 @@ Python 사전(dict) 객체입니다.
 
 ::
 
-   pip install torchaudio
+   pip install torch
 
 """
 

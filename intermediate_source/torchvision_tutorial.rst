@@ -42,7 +42,7 @@ TorchVision 객체 검출 미세조정(Finetuning) 튜토리얼
       새로운 키포인트 표현에 대해 "references/detection/transforms.py" 코드 부분을 수정 해야 할 수도 있습니다.
 
 모델이 위의 방법대로 리턴을 하면, 학습과 평가 둘 다에 대해서 동작을 할 것이며
-평가 스크립트는 ``pycocotools`` 를 사용하게 될 것입니다.
+평가 스크립트는 `pip install pycocotools`` 로 설치 가능한 ``pycocotools`` 를 사용하게 될 것입니다.
 
 .. note ::
   윈도우즈에서는 ``pip install git+https://github.com/gautamchitnis/cocoapi.git@cocodataset-master#subdirectory=PythonAPI``
@@ -239,7 +239,7 @@ COCO에 대해 미리 학습된 모델에서 시작하여 특정 클래스를 �
    # 만약 백본이 텐서를 리턴할때, featmap_names 는 [0] 이 될 것이라고 예상합니다.
    # 일반적으로 백본은 OrderedDict[Tensor] 타입을 리턴해야 합니다.
    # 그리고 특징맵에서 사용할 featmap_names 값을 정할 수 있습니다.
-   roi_pooler = torchvision.ops.MultiScaleRoIAlign(featmap_names=[0],
+   roi_pooler = torchvision.ops.MultiScaleRoIAlign(featmap_names=['0'],
                                                    output_size=7,
                                                    sampling_ratio=2)
 
@@ -291,10 +291,10 @@ PennFudan 데이터셋을 위한 인스턴스 분할 모델
 모든 것을 하나로 합치기
 ---------------------------
 
-``references/detection/`` 폴더내에 검출 모델들의 학습과 평과를 쉽게 하기 위한 도움 함수들이 있습니다.
+``references/detection/`` 폴더 내에 검출 모델들의 학습과 평과를 쉽게 하기 위한 도움 함수들이 있습니다.
 여기서 ``references/detection/engine.py``, ``references/detection/utils.py``,
 ``references/detection/transforms.py`` 를 사용 할 것입니다.
-위 파일들을 폴더로 복사하고 사용합시다.
+``references/detection`` 아래의 모든 파일과 폴더들을 사용자의 폴더로 복사한 뒤 사용합니다.
 
 데이터 증강 / 변환을 위한 도움 함수를 작성해 봅시다
 

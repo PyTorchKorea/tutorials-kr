@@ -7,7 +7,7 @@
 
 **Edited by**: `Seth Weidman <https://github.com/SethHWeidman/>`_
 
-**번역**: `박경림 <https://github.com/kypark7/>`_ `Myungha Kwon <https://github.com/kwonmha/>`_ 
+**번역**: `박경림 <https://github.com/kypark7/>`_ `Myungha Kwon <https://github.com/kwonmha/>`_
 
 시작하기
 ------------
@@ -132,9 +132,9 @@ corpus = Corpus(model_data_filepath + 'wikitext-2')
 # -----------------------------
 #
 # 이 튜토리얼은 모델이 학습된 후 적용되는 양자화 기술인 동적 양자화에 대한 튜토리얼입니다.
-# 따라서 우리는 미리 학습된 가중치를 모델 아키텍처에 로드할 것 입니다. 이 가중치는 word 
+# 따라서 우리는 미리 학습된 가중치를 모델 아키텍처에 로드할 것 입니다. 이 가중치는 word
 # language 모델 예제의 기본 설정을 사용하여 5개의 epoch 동안 학습하여 얻은 것입니다.
-# 
+#
 
 ntokens = len(corpus.dictionary)
 
@@ -208,7 +208,7 @@ test_data = batchify(corpus.test, eval_batch_size)
 def get_batch(source, i):
     seq_len = min(bptt, len(source) - 1 - i)
     data = source[i:i+seq_len]
-    target = source[i+1:i+1+seq_len].view(-1)
+    target = source[i+1:i+1+seq_len].reshape(-1)
     return data, target
 
 def repackage_hidden(h):
@@ -280,7 +280,7 @@ time_model_evaluation(model, test_data)
 time_model_evaluation(quantized_model, test_data)
 
 ######################################################################
-# MacBook Pro에서 로컬로 실행하는 경우, 양자화 없이는 추론(inference)에 약 200초가 걸리고 
+# MacBook Pro에서 로컬로 실행하는 경우, 양자화 없이는 추론(inference)에 약 200초가 걸리고
 # 양자화를 사용하면 약 100초가 걸립니다.
 #
 # 마치며

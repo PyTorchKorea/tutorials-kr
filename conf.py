@@ -57,7 +57,7 @@ site_url = 'http://tutorials.pytorch.kr/'
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = ['sphinx.ext.mathjax',
+extensions = ['sphinx.ext.mathjax', 'sphinx_copybutton',
               'sphinx_gallery.gen_gallery',
               'sphinx_sitemap']
 

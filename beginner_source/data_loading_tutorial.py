@@ -286,6 +286,12 @@ class ToTensor(object):
         return {'image': torch.from_numpy(image),
                 'landmarks': torch.from_numpy(landmarks)}
 
+######################################################################
+# .. note::
+#     위 예시에서, `RandomCrop` 은 외부 라이브러리의 난수 생성기(random number generator; 이 경우, Numpy의 `np.random.int` )를
+#     사용하고 있습니다. 이는 `DataLoader` 가 예상치 못한 동작을 하도록 할 수 있습니다.
+#     (https://pytorch.org/docs/stable/notes/faq.html#my-data-loader-workers-return-identical-random-numbers 를 참고하세요)
+#     실제 상황에서는 `torch.randint` 와 같은 PyTorch가 제공하는 난수 생성기를 사용하는 것이 안전합니다.
 
 ######################################################################
 # Compose transforms
@@ -368,7 +374,7 @@ for i in range(len(transformed_dataset)):
 # 그러나, 대부분의 경우에 대해서 정확하게 작동해야 합니다.
 
 dataloader = DataLoader(transformed_dataset, batch_size=4,
-                        shuffle=True, num_workers=4)
+                        shuffle=True, num_workers=0)
 
 
 # 배치하는 과정을 보여주는 함수입니다.
