@@ -22,7 +22,7 @@ Follow the steps below to fuse an example model, quantize it, script it, optimiz
 1. Define the Example Model
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Use the same example model defined in the `PyTorch Mobile Performance Recipes <https://pytorch.org/tutorials/recipes/mobile_perf.html>`_:
+Use the same example model defined in the `PyTorch Mobile Performance Recipes <https://tutorials.pytorch.kr/recipes/mobile_perf.html>`_:
 
 ::
 

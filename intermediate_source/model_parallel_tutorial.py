@@ -6,7 +6,7 @@
 **번역** : `안상준 <https://github.com/Justin-A>`_
 
 모델 병렬 처리는 분산 학습 기술에 범용적으로 사용되고 있습니다.
-이전 튜토리얼들에서는 'DataParallel' `<https://pytorch.org/tutorials/beginner/blitz/data_parallel_tutorial.html>`_
+이전 튜토리얼들에서는 'DataParallel' `<https://tutorials.pytorch.kr/beginner/blitz/data_parallel_tutorial.html>`_
 여러 GPU를 사용하여 신경망 모델을 학습 시킬 때 어떻게 DataParallel을 사용하는지에 대해서 살펴보았습니다.
 이 방법은 각 GPU에 입력 데이터를 부분적으로 할당하고 동일한 신경망 모델을 복제하여 이용하는 방식이었습니다.
 이 방법은 신경망 모델을 상당히 빠르게 학습시킬 수 있는 장점이 있지만, 신경망 모델이 너무 커서 단일 GPU에 할당이 되지 않는 경우에는 동작하지 않습니다.

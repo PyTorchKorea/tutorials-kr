@@ -15,7 +15,7 @@ Requirements
 ------------
 
 - PyTorch 1.8+
-- `Getting Started With Distributed Data Parallel <https://pytorch.org/tutorials/intermediate/ddp_tutorial.html>`_
+- `Getting Started With Distributed Data Parallel <https://tutorials.pytorch.kr/intermediate/ddp_tutorial.html>`_
 
 
 What is ``ZeroRedundancyOptimizer``?
@@ -26,7 +26,7 @@ comes from `DeepSpeed/ZeRO project <https://github.com/microsoft/DeepSpeed>`_ an
 `Marian <https://github.com/marian-nmt/marian-dev>`_ that shard
 optimizer states across distributed data-parallel processes to
 reduce per-process memory footprint. In the
-`Getting Started With Distributed Data Parallel <https://pytorch.org/tutorials/intermediate/ddp_tutorial.html>`_
+`Getting Started With Distributed Data Parallel <https://tutorials.pytorch.kr/intermediate/ddp_tutorial.html>`_
 tutorial, we have shown how to use
 `DistributedDataParallel <https://pytorch.org/docs/stable/generated/torch.nn.parallel.DistributedDataParallel.html>`_
 (DDP) to train models. In that tutorial, each process keeps a dedicated replica

@@ -19,7 +19,7 @@ or retured in a JSON trace file.
     in the future releases. Check the new API at `this page <https://pytorch.org/docs/master/profiler.html>`__.
 
 Head on over to `this
-recipe <https://pytorch.org/tutorials/recipes/recipes/profiler_recipe.html>`__
+recipe <https://tutorials.pytorch.kr/recipes/recipes/profiler_recipe.html>`__
 for a quicker walkthrough of Profiler API usage.
 
 
@@ -315,6 +315,6 @@ Self CPU time total: 225.801ms
 # We have seen how Profiler can be used to investigate time and memory bottlenecks in PyTorch models.
 # Read more about Profiler here:
 #
-# - `Profiler Usage Recipe <https://pytorch.org/tutorials/recipes/recipes/profiler.html>`__
-# - `Profiling RPC-Based Workloads <https://pytorch.org/tutorials/recipes/distributed_rpc_profiling.html>`__
+# - `Profiler Usage Recipe <https://tutorials.pytorch.kr/recipes/recipes/profiler.html>`__
+# - `Profiling RPC-Based Workloads <https://tutorials.pytorch.kr/recipes/distributed_rpc_profiling.html>`__
 # - `Profiler API Docs <https://pytorch.org/docs/stable/autograd.html?highlight=profiler#profiler>`__

@@ -82,4 +82,4 @@ Learn More
 
 1. `PyTorch Mobile site <https://pytorch.org/mobile>`_
 
-2. `Introduction to TorchScript <https://pytorch.org/tutorials/beginner/Intro_to_TorchScript_tutorial.html>`_
+2. `Introduction to TorchScript <https://tutorials.pytorch.kr/beginner/Intro_to_TorchScript_tutorial.html>`_

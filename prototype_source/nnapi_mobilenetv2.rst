@@ -150,7 +150,7 @@ Running Benchmarks
 ------------------
 
 Now that the models are ready, we can benchmark them on our Android devices.
-See `our performance recipe <https://pytorch.org/tutorials/recipes/mobile_perf.html#android-benchmarking-setup>`_ for details.
+See `our performance recipe <https://tutorials.pytorch.kr/recipes/mobile_perf.html#android-benchmarking-setup>`_ for details.
 The best-performing models are likely to be the "fully-quantized" models:
 ``mobilenetv2-quant_full-cpu.pt`` and ``mobilenetv2-quant_full-nnapi.pt``.
 
@@ -180,6 +180,6 @@ Learn More
 ----------
 
 - Learn more about optimization in our
-  `Mobile Performance Recipe <https://pytorch.org/tutorials/recipes/mobile_perf.html>`_
+  `Mobile Performance Recipe <https://tutorials.pytorch.kr/recipes/mobile_perf.html>`_
 - `MobileNetV2 <https://pytorch.org/hub/pytorch_vision_mobilenet_v2/>`_ from torchvision
 - Information about `NNAPI <https://developer.android.com/ndk/guides/neuralnetworks>`_

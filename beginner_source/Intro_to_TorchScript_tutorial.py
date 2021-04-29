@@ -26,7 +26,7 @@ TorchScript에 대한 소개입니다.
 -  TorchScript 모듈 저장 및 불러오기
 
 이 튜토리얼을 완료한 후에는
-`다음 학습서 <https://pytorch.org/tutorials/advanced/cpp_export.html>`_
+`다음 학습서 <https://tutorials.pytorch.kr/advanced/cpp_export.html>`_
 를 통해 C++에서 TorchScript 모델을 실제로 호출하는 예제를 안내합니다.
 
 """
@@ -113,7 +113,7 @@ print(my_cell(x, h))
 # 모델을 간결하고 읽기 쉽게 작성할 수 있습니다.
 #
 # 여러분은 출력된 내용에서 ``grad_fn`` 을 확인하셨을 것입니다. 이것은
-# `오토그라드(autograd) <https://pytorch.org/tutorials/beginner/blitz/autograd_tutorial.html>`__
+# `오토그라드(autograd) <https://tutorials.pytorch.kr/beginner/blitz/autograd_tutorial.html>`__
 # 라 불리는 PyTorch의 자동 미분 방법의 세부 정보입니다. 요컨데, 이 시스템은
 # 잠재적으로 복잡한 프로그램을 통해 미분을 계산할 수 있게 합니다. 이 디자인은
 # 모델 제작에 엄청난 유연성을 제공합니다.
@@ -368,7 +368,7 @@ print(loaded.code)
 ######################################################################
 # 보시다시피, 직렬화는 모듈 계층과 검사한 코드를 유지합니다. 또한 모델을 로드할
 # 수 있습니다. 예를 들어, Python 없이 실행하기 위해 모델을
-# `C++ <https://pytorch.org/tutorials/advanced/cpp_export.html>`__ 로 로드할
+# `C++ <https://tutorials.pytorch.kr/advanced/cpp_export.html>`__ 로 로드할
 # 수 있습니다.
 #
 # 더 읽을거리

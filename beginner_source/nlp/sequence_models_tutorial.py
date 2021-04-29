@@ -97,7 +97,7 @@ print(hidden)
 # (challenging) exercise to the reader, think about how Viterbi could be
 # used after you have seen what is going on. In this example, we also refer
 # to embeddings. If you are unfamiliar with embeddings, you can read up 
-# about them `here <https://pytorch.org/tutorials/beginner/nlp/word_embeddings_tutorial.html>`__.
+# about them `here <https://tutorials.pytorch.kr/beginner/nlp/word_embeddings_tutorial.html>`__.
 #
 # The model is as follows: let our input sentence be
 # :math:`w_1, \dots, w_M`, where :math:`w_i \in V`, our vocab. Also, let

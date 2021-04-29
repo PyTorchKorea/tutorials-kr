@@ -465,7 +465,7 @@ pairs = trimRareWords(voc, pairs, MIN_COUNT)
 # 문장 쌍의 리스트 형태로 만들어두긴 했지만, 결국 우리가 만들 모델에서
 # 사용하는 입력은 수치 값으로 이루어진 torch 텐서입니다. 처리한 데이터를
 # 모델에 맞는 형태로 준비하는 방법의 하나가 `seq2seq 변환 튜토리얼
-# <https://pytorch.org/tutorials/intermediate/seq2seq_translation_tutorial.html>`__
+# <https://tutorials.pytorch.kr/intermediate/seq2seq_translation_tutorial.html>`__
 # 에 나와 있습니다. 이 튜토리얼에서는 배치 크기로 1을 사용하며, 이는 즉
 # 문장에 등장하는 단어를 어휘집에서의 인덱스로 변환하여 모델에 제공하기만
 # 하면 된다는 의미입니다.

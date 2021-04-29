@@ -44,7 +44,7 @@ Steps
 1. Convert the DeepLabV3 model for Android deployment
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The first step to deploying a model on Android is to convert the model into the `TorchScript <https://pytorch.org/tutorials/beginner/Intro_to_TorchScript_tutorial.html>`_ format.
+The first step to deploying a model on Android is to convert the model into the `TorchScript <https://tutorials.pytorch.kr/beginner/Intro_to_TorchScript_tutorial.html>`_ format.
 
 .. note::
     Not all PyTorch models can be converted to TorchScript at this time because a model definition may use language features that are not in TorchScript, which is a subset of Python. See the `Script and Optimize Recipe <../recipes/script_optimized.html>`_ for more details.
@@ -62,7 +62,7 @@ Simply run the script below to generate the scripted model `deeplabv3_scripted.p
     scriptedm = torch.jit.script(model)
     torch.jit.save(scriptedm, "deeplabv3_scripted.pt")
 
-The size of the generated `deeplabv3_scripted.pt` model file should be around 168MB. Ideally, a model should also be quantized for significant size reduction and faster inference before being deployed on an Android app. To have a general understanding of quantization, see the `Quantization Recipe <../recipes/quantization.html>`_ and the resource links there. We will cover in detail how to correctly apply a quantization workflow called Post Training `Static Quantization <https://pytorch.org/tutorials/advanced/static_quantization_tutorial.html>`_ to the DeepLabV3 model in a future tutorial or recipe.
+The size of the generated `deeplabv3_scripted.pt` model file should be around 168MB. Ideally, a model should also be quantized for significant size reduction and faster inference before being deployed on an Android app. To have a general understanding of quantization, see the `Quantization Recipe <../recipes/quantization.html>`_ and the resource links there. We will cover in detail how to correctly apply a quantization workflow called Post Training `Static Quantization <https://tutorials.pytorch.kr/advanced/static_quantization_tutorial.html>`_ to the DeepLabV3 model in a future tutorial or recipe.
 
 2. Get example input and output of the model in Python
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

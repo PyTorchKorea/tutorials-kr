@@ -459,7 +459,7 @@ print(loss_func(model(xb), yb))
 # ``__len__`` 함수 (Python의 표준 ``len`` 함수에 의해 호출됨) 및
 # ``__getitem__`` 함수를 가진 어떤 것이라도 될 수 있으며, 이 함수들을 인덱싱(indexing)하기
 # 위한 방법으로 사용합니다.
-# `이 튜토리얼 <https://pytorch.org/tutorials/beginner/data_loading_tutorial.html>`_
+# `이 튜토리얼 <https://tutorials.pytorch.kr/beginner/data_loading_tutorial.html>`_
 # 은 ``Dataset`` 의 하위 클래스로써, 사용자 지정 ``FacialLandmarkDataset`` 클래스를 만드는
 # 좋은 예를 제시합니다.
 #

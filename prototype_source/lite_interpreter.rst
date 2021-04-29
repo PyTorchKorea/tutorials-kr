@@ -218,4 +218,4 @@ Learn More
 ----------
 
 - To learn more about PyTorch Mobile, please refer to `PyTorch Mobile Home Page <https://pytorch.org/mobile/home/>`_
-- To learn more about Image Segmentation, please refer to the `Image Segmentation DeepLabV3 on Android Recipe <https://pytorch.org/tutorials/beginner/deeplabv3_on_android.html>`_
+- To learn more about Image Segmentation, please refer to the `Image Segmentation DeepLabV3 on Android Recipe <https://tutorials.pytorch.kr/beginner/deeplabv3_on_android.html>`_

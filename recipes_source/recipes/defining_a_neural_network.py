@@ -159,5 +159,5 @@ print (result)
 #
 # 계속해서 학습하고 싶다면 다른 레시피를 살펴보십시오:
 #
-# - `PyTorch에서 state_dict이 무엇인지 <https://pytorch.org/tutorials/recipes/recipes/what_is_state_dict.html>`__
-# - `PyTorch로 추론을 위한 모델을 저장하고 가저오기  <https://pytorch.org/tutorials/recipes/recipes/saving_and_loading_models_for_inference.html>`__
+# - `PyTorch에서 state_dict이 무엇인지 <https://tutorials.pytorch.kr/recipes/recipes/what_is_state_dict.html>`__
+# - `PyTorch로 추론을 위한 모델을 저장하고 가저오기  <https://tutorials.pytorch.kr/recipes/recipes/saving_and_loading_models_for_inference.html>`__

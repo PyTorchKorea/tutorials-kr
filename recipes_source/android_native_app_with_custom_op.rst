@@ -66,7 +66,7 @@ Preparing TorchScript Model With Custom C++ Operator
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 TorchScript allows using custom C++ operators, to read about it with details you can read 
-`the dedicated tutorial <https://pytorch.org/tutorials/advanced/torch_script_custom_ops.html>`_.
+`the dedicated tutorial <https://tutorials.pytorch.kr/advanced/torch_script_custom_ops.html>`_.
 
 As a result, you can script the model that uses custom op, that uses OpenCV ``cv::warpPerspective`` function.
 
@@ -660,7 +660,7 @@ It may change in the future. You can track the latest changes keeping an eye on 
 `source in PyTorch GitHub <https://github.com/pytorch/pytorch/blob/master/android/pytorch_android/src/main/cpp/pytorch_jni_jit.cpp>`_.
 
 Implementation of method ``warp_perspective`` and registration of it is entirely the same as
-in `tutorial for desktop build <https://pytorch.org/tutorials/advanced/torch_script_custom_ops.html>`_.
+in `tutorial for desktop build <https://tutorials.pytorch.kr/advanced/torch_script_custom_ops.html>`_.
 
 Building the app
 ----------------

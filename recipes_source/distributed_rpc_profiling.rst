@@ -429,5 +429,5 @@ Learn More
 .. _Full profiler documentation: https://pytorch.org/docs/stable/autograd.html#profiler
 .. _Pytorch Profiler: https://pytorch.org/docs/stable/autograd.html#profiler
 .. _Distributed RPC Framework: https://pytorch.org/docs/stable/rpc.html
-.. _RPC Tutorials: https://pytorch.org/tutorials/intermediate/rpc_tutorial.html
-.. _Profiler Recipe: https://pytorch.org/tutorials/recipes/recipes/profiler.html
+.. _RPC Tutorials: https://tutorials.pytorch.kr/intermediate/rpc_tutorial.html
+.. _Profiler Recipe: https://tutorials.pytorch.kr/recipes/recipes/profiler.html

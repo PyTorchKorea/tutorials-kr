@@ -1,5 +1,5 @@
 # Sample code from the TorchVision 0.3 Object Detection Finetuning Tutorial
-# http://pytorch.org/tutorials/intermediate/torchvision_tutorial.html
+# http://tutorials.pytorch.kr/intermediate/torchvision_tutorial.html
 
 import os
 import numpy as np

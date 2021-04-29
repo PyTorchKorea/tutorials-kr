@@ -16,7 +16,7 @@ PyTorch 1.6.0 or 1.7.0
 Conversion to TorchScript
 -------------------------
 
-There are two basic ways to convert a PyTorch model to TorchScript, using `trace` and `script`. Mixing `trace` and `script` may also be needed in some cases - see `here <https://pytorch.org/tutorials/beginner/Intro_to_TorchScript_tutorial.html#mixing-scripting-and-tracing>`_ for more information.
+There are two basic ways to convert a PyTorch model to TorchScript, using `trace` and `script`. Mixing `trace` and `script` may also be needed in some cases - see `here <https://tutorials.pytorch.kr/beginner/Intro_to_TorchScript_tutorial.html#mixing-scripting-and-tracing>`_ for more information.
 
 Use the `trace` Method
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -40,7 +40,7 @@ For the example above, calling `script` below makes no difference:
 
     torchscript_model = torch.jit.script(model_quantized)
 
-But if a model has some flow control, then `trace` won't correctly record all the possible traces. Take some code snippet of an example model definition from `here <https://pytorch.org/tutorials/beginner/Intro_to_TorchScript_tutorial.html>`_ for example:
+But if a model has some flow control, then `trace` won't correctly record all the possible traces. Take some code snippet of an example model definition from `here <https://tutorials.pytorch.kr/beginner/Intro_to_TorchScript_tutorial.html>`_ for example:
 
 ::
 
@@ -90,7 +90,7 @@ The scripted model as shown by the `print` result below will be covering all pos
       return _1
 
 
-This is another example of using `trace` and `script` - it converts the model trained in the PyTorch tutorial `NLP FROM SCRATCH: TRANSLATION WITH A SEQUENCE TO SEQUENCE NETWORK AND ATTENTION <https://pytorch.org/tutorials/intermediate/seq2seq_translation_tutorial.html>`_:
+This is another example of using `trace` and `script` - it converts the model trained in the PyTorch tutorial `NLP FROM SCRATCH: TRANSLATION WITH A SEQUENCE TO SEQUENCE NETWORK AND ATTENTION <https://tutorials.pytorch.kr/intermediate/seq2seq_translation_tutorial.html>`_:
 
 ::
 
@@ -120,7 +120,7 @@ So is it true that one can simply always use the `script` call and the model is 
 Fix Common Errors When Using the `script` Method
 ----------------------------------------------------
 
-If you apply the `script` method to a non-trivial model, chances are you may encounter several types of errors. Check out `this tutorial <https://pytorch.org/tutorials/beginner/deploy_seq2seq_hybrid_frontend_tutorial.html>`_ for a complete example of converting a chatbot model to TorchScript. But follow the steps below to fix common errors when you run the `script` method:
+If you apply the `script` method to a non-trivial model, chances are you may encounter several types of errors. Check out `this tutorial <https://tutorials.pytorch.kr/beginner/deploy_seq2seq_hybrid_frontend_tutorial.html>`_ for a complete example of converting a chatbot model to TorchScript. But follow the steps below to fix common errors when you run the `script` method:
 
 1. RuntimeError `attribute lookup is not defined on python value of type`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

@@ -37,4 +37,4 @@ Learn More
 -----------------
 
 1. `PyTorch Mobile site <https://pytorch.org/mobile>`_
-2. `PyTorch Mobile Performance Recipes <https://pytorch.org/tutorials/recipes/mobile_perf.html>`_
+2. `PyTorch Mobile Performance Recipes <https://tutorials.pytorch.kr/recipes/mobile_perf.html>`_

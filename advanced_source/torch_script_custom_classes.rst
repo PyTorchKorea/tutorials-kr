@@ -143,7 +143,7 @@ program we've just defined.
 
 Now, we're going to define a new CMake project to show how you can load
 this model and its required .so file. For a full treatment of how to do this,
-please have a look at the `Loading a TorchScript Model in C++ Tutorial <https://pytorch.org/tutorials/advanced/cpp_export.html>`_.
+please have a look at the `Loading a TorchScript Model in C++ Tutorial <https://tutorials.pytorch.kr/advanced/cpp_export.html>`_.
 
 Similarly to before, let's create a file structure containing the following::
 
@@ -316,7 +316,7 @@ block:
   :start-after: BEGIN def_free
   :end-before: END def_free
 
-Refer to the `custom op tutorial <https://pytorch.org/tutorials/advanced/torch_script_custom_ops.html>`_
+Refer to the `custom op tutorial <https://tutorials.pytorch.kr/advanced/torch_script_custom_ops.html>`_
 for more details on the registration API.
 
 Once this is done, you can use the op like the following example:

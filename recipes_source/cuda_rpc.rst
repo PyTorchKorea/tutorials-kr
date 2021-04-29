@@ -14,7 +14,7 @@ Requirements
 ------------
 
 - PyTorch 1.8+
-- `Getting Started With Distributed RPC Framework <https://pytorch.org/tutorials/intermediate/rpc_tutorial.html>`_
+- `Getting Started With Distributed RPC Framework <https://tutorials.pytorch.kr/intermediate/rpc_tutorial.html>`_
 
 
 What is CUDA RPC?

@@ -74,7 +74,7 @@ model = NeuralNetwork()
 #
 # Hyperparameters are adjustable parameters that let you control the model optimization process. 
 # Different hyperparameter values can impact model training and convergence rates 
-# (`read more <https://pytorch.org/tutorials/beginner/hyperparameter_tuning_tutorial.html>`__ about hyperparameter tuning)
+# (`read more <https://tutorials.pytorch.kr/beginner/hyperparameter_tuning_tutorial.html>`__ about hyperparameter tuning)
 #
 # We define the following hyperparameters for training:
 #  - **Number of Epochs** - the number times to iterate over the dataset
@@ -201,6 +201,6 @@ print("Done!")
 # -----------------------
 # - `Loss Functions <https://pytorch.org/docs/stable/nn.html#loss-functions>`_
 # - `torch.optim <https://pytorch.org/docs/stable/optim.html>`_
-# - `Warmstart Training a Model <https://pytorch.org/tutorials/recipes/recipes/warmstarting_model_using_parameters_from_a_different_model.html>`_
+# - `Warmstart Training a Model <https://tutorials.pytorch.kr/recipes/recipes/warmstarting_model_using_parameters_from_a_different_model.html>`_
 #
 

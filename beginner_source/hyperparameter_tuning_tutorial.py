@@ -16,7 +16,7 @@ supports distributed training through `Ray's distributed machine learning engine
 
 In this tutorial, we will show you how to integrate Ray Tune into your PyTorch
 training workflow. We will extend `this tutorial from the PyTorch documentation
-<https://pytorch.org/tutorials/beginner/blitz/cifar10_tutorial.html>`_ for training
+<https://tutorials.pytorch.kr/beginner/blitz/cifar10_tutorial.html>`_ for training
 a CIFAR10 image classifier.
 
 As you will see, we only need to add some slight modifications. In particular, we
@@ -107,7 +107,7 @@ class Net(nn.Module):
 # The train function
 # ------------------
 # Now it gets interesting, because we introduce some changes to the example `from the PyTorch
-# documentation <https://pytorch.org/tutorials/beginner/blitz/cifar10_tutorial.html>`_.
+# documentation <https://tutorials.pytorch.kr/beginner/blitz/cifar10_tutorial.html>`_.
 #
 # We wrap the training script in a function ``train_cifar(config, checkpoint_dir=None, data_dir=None)``.
 # As you can guess, the ``config`` parameter will receive the hyperparameters we would like to

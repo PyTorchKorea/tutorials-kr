@@ -501,5 +501,5 @@ COCO train2017에 대해 미리 학습된 Mask R-CNN 모델을 활용 했습니�
 다중머신 / 다중GPU 에서의 학습을 포함하는 더 복잡한 예제를 알고 싶다면
 torchvision 저장소에 있는 ``references/detection/train.py`` 를 확인해 보세요.
 
-`여기 <https://pytorch.org/tutorials/_static/tv-training-code.py>`__
+`여기 <https://tutorials.pytorch.kr/_static/tv-training-code.py>`__
 에서 이번 튜토리얼의 전체 소스코드를 다운 받으실 수 있습니다.

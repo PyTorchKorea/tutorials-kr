@@ -269,7 +269,7 @@ writing a ``setup.py`` script that uses ``setuptools`` to compile C++ code.  Her
   )
 
 
-See `our C++ extension tutorial <https://pytorch.org/tutorials/advanced/cpp_extension.html#building-with-setuptools>`_
+See `our C++ extension tutorial <https://tutorials.pytorch.kr/advanced/cpp_extension.html#building-with-setuptools>`_
 for more details.
 
 

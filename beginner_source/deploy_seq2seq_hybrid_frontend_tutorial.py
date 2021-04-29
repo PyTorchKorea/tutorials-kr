@@ -10,7 +10,7 @@ Deploying a Seq2Seq Model with TorchScript
 # This tutorial will walk through the process of transitioning a
 # sequence-to-sequence model to TorchScript using the TorchScript
 # API. The model that we will convert is the chatbot model from the
-# `Chatbot tutorial <https://pytorch.org/tutorials/beginner/chatbot_tutorial.html>`__.
+# `Chatbot tutorial <https://tutorials.pytorch.kr/beginner/chatbot_tutorial.html>`__.
 # You can either treat this tutorial as a “Part 2” to the Chatbot tutorial
 # and deploy your own pretrained model, or you can start with this
 # document and use a pretrained model that we host. In the latter case,

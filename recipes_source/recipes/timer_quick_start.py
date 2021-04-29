@@ -11,7 +11,7 @@ that the reader is familiar with the fundamentals of performance work.
 
 A more comprehensive performace tuning tutorial is available at:
 
-    https://pytorch.org/tutorials/recipes/recipes/benchmark.html
+    https://tutorials.pytorch.kr/recipes/recipes/benchmark.html
 
 
 **Contents:**

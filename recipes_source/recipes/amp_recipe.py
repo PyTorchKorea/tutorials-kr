@@ -276,7 +276,7 @@ scaler.load_state_dict(checkpoint["scaler"])
 # a dedicated fresh GradScaler instance.  GradScaler instances are lightweight.
 #
 # If you're registering a custom C++ op with the dispatcher, see the
-# `autocast section <https://pytorch.org/tutorials/advanced/dispatcher.html#autocast>`_
+# `autocast section <https://tutorials.pytorch.kr/advanced/dispatcher.html#autocast>`_
 # of the dispatcher tutorial.
 
 ##########################################################

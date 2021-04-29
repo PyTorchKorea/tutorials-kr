@@ -105,7 +105,7 @@ print(clsidx.item())
 # Scripting DeiT
 # ----------------------
 # To use the model on mobile, we first need to script the
-# model. See the `Script and Optimize recipe <https://pytorch.org/tutorials/recipes/script_optimized.html>`_ for a
+# model. See the `Script and Optimize recipe <https://tutorials.pytorch.kr/recipes/script_optimized.html>`_ for a
 # quick overview. Run the code below to convert the DeiT model used in the
 # previous step to the TorchScript format that can run on mobile.
 #

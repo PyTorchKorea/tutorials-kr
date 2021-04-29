@@ -99,7 +99,7 @@ Quantization of the model not only moves computation to int8,
 but also reduces the size of your model on a disk.
 That size reduction helps to reduce disk read operations during the first load of the model and decreases the amount of RAM.
 Both of those resources can be crucial for the performance of mobile applications.
-This code does quantization, using stub for model calibration function, you can find more about it `here <https://pytorch.org/tutorials/advanced/static_quantization_tutorial.html#post-training-static-quantization>`__.
+This code does quantization, using stub for model calibration function, you can find more about it `here <https://tutorials.pytorch.kr/advanced/static_quantization_tutorial.html#post-training-static-quantization>`__.
 
 ::
 

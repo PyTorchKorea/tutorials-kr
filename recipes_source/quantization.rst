@@ -76,7 +76,7 @@ where `qconfig_spec` specifies the list of submodule names in `model` to apply q
 
 .. warning:: An important limitation of Dynamic Quantization, while it is the easiest workflow if you do not have a pre-trained quantized model ready for use, is that it currently only supports `nn.Linear` and `nn.LSTM` in `qconfig_spec`, meaning that you will have to use Static Quantization or Quantization Aware Training, to be discussed later, to quantize other modules such as `nn.Conv2d`.
 
-The full documentation of the `quantize_dynamic` API call is `here <https://pytorch.org/docs/stable/quantization.html#torch.quantization.quantize_dynamic>`_. Three other examples of using the post training dynamic quantization are `the Bert example <https://pytorch.org/tutorials/intermediate/dynamic_quantization_bert_tutorial.html>`_, `an LSTM model example <https://pytorch.org/tutorials/advanced/dynamic_quantization_tutorial.html#test-dynamic-quantization>`_, and another `demo LSTM example <https://pytorch.org/tutorials/recipes/recipes/dynamic_quantization.html#do-the-quantization>`_.
+The full documentation of the `quantize_dynamic` API call is `here <https://pytorch.org/docs/stable/quantization.html#torch.quantization.quantize_dynamic>`_. Three other examples of using the post training dynamic quantization are `the Bert example <https://tutorials.pytorch.kr/intermediate/dynamic_quantization_bert_tutorial.html>`_, `an LSTM model example <https://tutorials.pytorch.kr/advanced/dynamic_quantization_tutorial.html#test-dynamic-quantization>`_, and another `demo LSTM example <https://tutorials.pytorch.kr/recipes/recipes/dynamic_quantization.html#do-the-quantization>`_.
 
 3. Post Training Static Quantization
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -95,7 +95,7 @@ To apply static quantization on a model, run the following code:
 
 After this, running `print_model_size(model_static_quantized)` shows the static quantized model is `3.98MB`.
 
-A complete model definition and static quantization example is `here <https://pytorch.org/docs/stable/quantization.html#quantization-api-summary>`_. A dedicated static quantization tutorial is `here <https://pytorch.org/tutorials/advanced/static_quantization_tutorial.html>`_.
+A complete model definition and static quantization example is `here <https://pytorch.org/docs/stable/quantization.html#quantization-api-summary>`_. A dedicated static quantization tutorial is `here <https://tutorials.pytorch.kr/advanced/static_quantization_tutorial.html>`_.
 
 .. note::
   To make the model run on mobile devices which normally have arm architecture, you need to use `qnnpack` for `backend`; to run the model on computer with x86 architecture, use `fbgemm`.
@@ -123,9 +123,9 @@ To do a quantization aware training, use the following code snippet:
     # quantization aware training goes here
     model_qat = torch.quantization.convert(model_qat.eval(), inplace=False)
 
-For more detailed examples of the quantization aware training, see `here <https://pytorch.org/docs/master/quantization.html#quantization-aware-training>`_ and `here <https://pytorch.org/tutorials/advanced/static_quantization_tutorial.html#quantization-aware-training>`_.
+For more detailed examples of the quantization aware training, see `here <https://pytorch.org/docs/master/quantization.html#quantization-aware-training>`_ and `here <https://tutorials.pytorch.kr/advanced/static_quantization_tutorial.html#quantization-aware-training>`_.
 
-A pre-trained quantized model can also be used for quantized aware transfer learning, using the same `quant` and `dequant` calls shown above. See `here <https://pytorch.org/tutorials/intermediate/quantized_transfer_learning_tutorial.html#part-1-training-a-custom-classifier-based-on-a-quantized-feature-extractor>`_ for a complete example.
+A pre-trained quantized model can also be used for quantized aware transfer learning, using the same `quant` and `dequant` calls shown above. See `here <https://tutorials.pytorch.kr/intermediate/quantized_transfer_learning_tutorial.html#part-1-training-a-custom-classifier-based-on-a-quantized-feature-extractor>`_ for a complete example.
 
 After a quantized model is generated using one of the steps above, before the model can be used to run on mobile devices, it needs to be further converted to the `TorchScript` format and then optimized for mobile apps. See the `Script and Optimize for Mobile recipe <script_optimized.html>`_ for details.
 

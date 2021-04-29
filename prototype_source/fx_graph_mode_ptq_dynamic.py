@@ -5,7 +5,7 @@
 **Author**: `Jerry Zhang <https://github.com/jerryzh168>`_
 
 This tutorial introduces the steps to do post training dynamic quantization in graph mode based on ``torch.fx``. 
-We have a separate tutorial for `FX Graph Mode Post Training Static Quantization <https://pytorch.org/tutorials/prototype/fx_graph_mode_ptq_static.html>`_,
+We have a separate tutorial for `FX Graph Mode Post Training Static Quantization <https://tutorials.pytorch.kr/prototype/fx_graph_mode_ptq_static.html>`_,
 comparison between FX Graph Mode Quantization and Eager Mode Quantization can be found in the `quantization docs <https://pytorch.org/docs/master/quantization.html#quantization-api-summary>`_
 
 tldr; The FX Graph Mode API for dynamic quantization looks like the following:
@@ -26,7 +26,7 @@ tldr; The FX Graph Mode API for dynamic quantization looks like the following:
 
 In this tutorial, we’ll apply dynamic quantization to an LSTM-based next word-prediction model, 
 closely following the word language model from the PyTorch examples. 
-We will copy the code from `Dynamic Quantization on an LSTM Word Language Model <https://pytorch.org/tutorials/advanced/dynamic_quantization_tutorial.html>`_ 
+We will copy the code from `Dynamic Quantization on an LSTM Word Language Model <https://tutorials.pytorch.kr/advanced/dynamic_quantization_tutorial.html>`_ 
 and omit the descriptions.
 
 """

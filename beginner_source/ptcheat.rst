@@ -282,7 +282,7 @@ Also see
 --------
 
 -  `Deep Learning with PyTorch: A 60 Minute
-   Blitz <https://pytorch.org/tutorials/beginner/deep_learning_60min_blitz.html>`__
+   Blitz <https://tutorials.pytorch.kr/beginner/deep_learning_60min_blitz.html>`__
    *(pytorch.org)*
 -  `PyTorch Forums <https://discuss.pytorch.org/>`__
    *(discuss.pytorch.org)*

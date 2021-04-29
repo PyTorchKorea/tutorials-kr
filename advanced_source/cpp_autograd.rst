@@ -8,12 +8,12 @@ in C++ frontend, allowing easy translation of autograd code from Python to C++.
 In this tutorial we'll look at several examples of doing autograd in PyTorch C++ frontend.
 Note that this tutorial assumes that you already have a basic understanding of
 autograd in Python frontend. If that's not the case, please first read
-`Autograd: Automatic Differentiation <https://pytorch.org/tutorials/beginner/blitz/autograd_tutorial.html>`_.
+`Autograd: Automatic Differentiation <https://tutorials.pytorch.kr/beginner/blitz/autograd_tutorial.html>`_.
 
 Basic autograd operations
 -------------------------
 
-(Adapted from `this tutorial <https://pytorch.org/tutorials/beginner/blitz/autograd_tutorial.html#autograd-automatic-differentiation>`_)
+(Adapted from `this tutorial <https://tutorials.pytorch.kr/beginner/blitz/autograd_tutorial.html#autograd-automatic-differentiation>`_)
 
 Create a tensor and set ``torch::requires_grad()`` to track computation with it
 
@@ -127,7 +127,7 @@ Out:
   [ CPUFloatType{2,2} ]
 
 You should have got a matrix of ``4.5``. For explanations on how we arrive at this value,
-please see `the corresponding section in this tutorial <https://pytorch.org/tutorials/beginner/blitz/autograd_tutorial.html#gradients>`_.
+please see `the corresponding section in this tutorial <https://tutorials.pytorch.kr/beginner/blitz/autograd_tutorial.html#gradients>`_.
 
 Now let's take a look at an example of vector-Jacobian product:
 

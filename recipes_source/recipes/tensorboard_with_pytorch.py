@@ -158,5 +158,5 @@ writer.close()
 # ----------------------------
 # 
 # -  `torch.utils.tensorboard <https://pytorch.org/docs/stable/tensorboard.html>`_ docs
-# -  `Visualizing models, data, and training with TensorBoard <https://pytorch.org/tutorials/intermediate/tensorboard_tutorial.html>`_ tutorial
+# -  `Visualizing models, data, and training with TensorBoard <https://tutorials.pytorch.kr/intermediate/tensorboard_tutorial.html>`_ tutorial
 #

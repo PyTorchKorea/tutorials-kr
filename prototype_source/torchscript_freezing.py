@@ -15,7 +15,7 @@ Model freezing can be invoked using API below:
  ``torch.jit.freeze(mod : ScriptModule, names : str[]) -> SciptModule``
 
 Note the input module can either be the result of scripting or tracing.
-See https://pytorch.org/tutorials/beginner/Intro_to_TorchScript_tutorial.html
+See https://tutorials.pytorch.kr/beginner/Intro_to_TorchScript_tutorial.html
 
 Next, we demonstrate how freezing works using an example:
 """
