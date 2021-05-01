@@ -53,6 +53,7 @@ You can choose any of keys above to prototype your customized backend.
 To create a Tensor on ``PrivateUse1`` backend, you need to set dispatch key in ``TensorImpl`` constructor.
 
 .. code-block:: cpp
+
   /* Example TensorImpl constructor */
   TensorImpl(
       Storage&& storage,
@@ -269,7 +270,7 @@ writing a ``setup.py`` script that uses ``setuptools`` to compile C++ code.  Her
   )
 
 
-See `our C++ extension tutorial <https://tutorials.pytorch.kr/advanced/cpp_extension.html#building-with-setuptools>`_
+See `our C++ extension tutorial <https://pytorch.org/tutorials/advanced/cpp_extension.html#building-with-setuptools>`_
 for more details.
 
 

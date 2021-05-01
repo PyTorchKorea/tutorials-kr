@@ -6,7 +6,6 @@ in TorchScript. This parallelism has the following properties:
 
 * dynamic - The number of parallel tasks created and their workload can depend on the control flow of the program.
 * inter-op - The parallelism is concerned with running TorchScript program fragments in parallel. This is distinct from *intra-op parallelism*, which is concerned with splitting up individual operators and running subsets of the operator's work in parallel.
-
 Basic Syntax
 ------------
 

@@ -66,7 +66,7 @@ Preparing TorchScript Model With Custom C++ Operator
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 TorchScript allows using custom C++ operators, to read about it with details you can read 
-`the dedicated tutorial <https://tutorials.pytorch.kr/advanced/torch_script_custom_ops.html>`_.
+`the dedicated tutorial <https://pytorch.org/tutorials/advanced/torch_script_custom_ops.html>`_.
 
 As a result, you can script the model that uses custom op, that uses OpenCV ``cv::warpPerspective`` function.
 
@@ -660,7 +660,7 @@ It may change in the future. You can track the latest changes keeping an eye on 
 `source in PyTorch GitHub <https://github.com/pytorch/pytorch/blob/master/android/pytorch_android/src/main/cpp/pytorch_jni_jit.cpp>`_.
 
 Implementation of method ``warp_perspective`` and registration of it is entirely the same as
-in `tutorial for desktop build <https://tutorials.pytorch.kr/advanced/torch_script_custom_ops.html>`_.
+in `tutorial for desktop build <https://pytorch.org/tutorials/advanced/torch_script_custom_ops.html>`_.
 
 Building the app
 ----------------
@@ -704,7 +704,7 @@ If you check the android logcat:
 
 You should see logs with tag 'PyTorchNativeApp' that prints x, y, and the result of the model forward, which we print with ``log`` function in ``NativeApp/app/src/main/cpp/pytorch_nativeapp.cpp``.
 
-.. code-block::
+::
 
   I/PyTorchNativeApp(26968): x: -0.9484 -1.1757 -0.5832  0.9144  0.8867  1.0933 -0.4004 -0.3389
   I/PyTorchNativeApp(26968): -1.0343  1.5200 -0.7625 -1.5724 -1.2073  0.4613  0.2730 -0.6789

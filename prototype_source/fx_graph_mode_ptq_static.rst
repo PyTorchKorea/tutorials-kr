@@ -7,10 +7,11 @@ This tutorial introduces the steps to do post training static quantization in gr
 The advantage of FX graph mode quantization is that we can perform quantization fully automatically on the model    
 although there might some effort required to make the model compatible with FX Graph Mode Quantizatiion (symbolically traceable with ``torch.fx``), 
 we'll have a separate tutorial to show how to make the part of the model we want to quantize compatibble with FX Graph Mode Quantization.   
-We also have a tutorial for `FX Graph Mode Post Training Dynamic Quantization <https://tutorials.pytorch.kr/prototype/fx_graph_mode_ptq_dynamic.html>`_.
+We also have a tutorial for `FX Graph Mode Post Training Dynamic Quantization <https://pytorch.org/tutorials/prototype/fx_graph_mode_ptq_dynamic.html>`_.
 tldr; The FX Graph Mode API looks like the following:
 
-.. code:: python    
+.. code:: python
+
   import torch    
   from torch.quantization import get_default_qconfig  
   # Note that this is temporary, we'll expose these functions to torch.quantization after official releasee   
@@ -32,7 +33,7 @@ tldr; The FX Graph Mode API looks like the following:
 1. Motivation of FX Graph Mode Quantization   
 -------------------------------------------   
   
-Currently PyTorch only has eager mode quantization: `Static Quantization with Eager Mode in PyTorch <https://tutorials.pytorch.kr/advanced/static_quantization_tutorial.html>`_. 
+Currently PyTorch only has eager mode quantization: `Static Quantization with Eager Mode in PyTorch <https://pytorch.org/tutorials/advanced/static_quantization_tutorial.html>`_. 
   
 We can see there are multiple manual steps involved in the process, including:    
   
@@ -53,7 +54,7 @@ Advantages of FX Graph Mode Quantization are:
 ----------------------------------------------    
   
 We’ll start by doing the necessary imports, defining some helper functions and prepare the data.  
-These steps are identitcal to `Static Quantization with Eager Mode in PyTorch <https://tutorials.pytorch.kr/advanced/static_quantization_tutorial.html>`_.       
+These steps are identitcal to `Static Quantization with Eager Mode in PyTorch <https://pytorch.org/tutorials/advanced/static_quantization_tutorial.html>`_.       
 
 To run the code in this tutorial using the entire ImageNet dataset, first download imagenet by following the instructions at here `ImageNet Data <http://www.image-net.org/download>`_. Unzip the downloaded file into the 'data_path' folder.
 
@@ -366,7 +367,7 @@ We can now print the size and accuracy of the quantized model.
   
 If you want to get better accuracy or performance,  try changing the `qconfig_dict`.  
 We plan to add support for graph mode in the Numerical Suite so that you can  
-easily determine the sensitivity towards quantization of different modules in a model: `PyTorch Numeric Suite Tutorial <https://tutorials.pytorch.kr/prototype/numeric_suite_tutorial.html>`_    
+easily determine the sensitivity towards quantization of different modules in a model: `PyTorch Numeric Suite Tutorial <https://pytorch.org/tutorials/prototype/numeric_suite_tutorial.html>`_    
   
 9. Debugging Quantized Model  
 ----------------------------  

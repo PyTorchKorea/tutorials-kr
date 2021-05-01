@@ -541,7 +541,7 @@ keep the original source code around. This is possible in Python, but also in
 C++. For this, PyTorch provides `a pure C++ API <https://pytorch.org/cppdocs/>`_
 for deserializing as well as executing TorchScript models. If you haven't yet,
 please read `the tutorial on loading and running serialized TorchScript models
-in C++ <https://tutorials.pytorch.kr/advanced/cpp_export.html>`_, on which the
+in C++ <https://pytorch.org/tutorials/advanced/cpp_export.html>`_, on which the
 next few paragraphs will build.
 
 In short, custom operators can be executed just like regular ``torch`` operators
@@ -605,7 +605,7 @@ Along with a small ``CMakeLists.txt`` file:
 
 At this point, we should be able to build the application:
 
-.. code-block::
+.. code-block:: shell
 
   $ mkdir build
   $ cd build
@@ -645,7 +645,7 @@ At this point, we should be able to build the application:
 
 And run it without passing a model just yet:
 
-.. code-block::
+.. code-block:: shell
 
   $ ./example_app
   usage: example_app <path-to-exported-script-module>
@@ -672,7 +672,7 @@ The last line will serialize the script function into a file called
 "example.pt". If we then pass this serialized model to our C++ application, we
 can run it straight away:
 
-.. code-block::
+.. code-block:: shell
 
   $ ./example_app example.pt
   terminate called after throwing an instance of 'torch::jit::script::ErrorReport'
@@ -834,7 +834,7 @@ approaches for compilation. Both of them use Python as the "driver" or
 "interface" to the compilation process. Also, both re-use the `existing
 infrastructure <https://pytorch.org/docs/stable/cpp_extension.html>`_ PyTorch
 provides for `*C++ extensions*
-<https://tutorials.pytorch.kr/advanced/cpp_extension.html>`_, which are the
+<https://pytorch.org/tutorials/advanced/cpp_extension.html>`_, which are the
 vanilla (eager) PyTorch equivalent of TorchScript custom operators that rely on
 `pybind11 <https://github.com/pybind/pybind11>`_ for "explicit" binding of
 functions from C++ into Python.
