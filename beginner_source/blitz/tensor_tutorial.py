@@ -40,7 +40,6 @@ x_np = torch.from_numpy(np_array)
 # **다른 텐서로부터 생성하기:**
 #
 # 명시적으로 재정의(override)하지 않는다면, 인자로 주어진 텐서의 속성(모양(shape), 자료형(datatype))을 유지합니다.
-# The new tensor retains the properties (shape, datatype) of the argument tensor, unless explicitly overridden.
 
 x_ones = torch.ones_like(x_data) # x_data의 속성을 유지합니다.
 print(f"Ones Tensor: \n {x_ones} \n")

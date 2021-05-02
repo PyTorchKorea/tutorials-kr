@@ -30,10 +30,9 @@
 PyTorch에서 사용법
 ~~~~~~~~~~~~~~~~~~~~
 
-Let's take a look at a single training step.
-For this example, we load a pretrained resnet18 model from ``torchvision``.
-We create a random data tensor to represent a single image with 3 channels, and height & width of 64,
-and its corresponding ``label`` initialized to some random values.
+학습 단계를 하나만 살펴보겠습니다. 여기에서는 ``torchvision`` 에서 미리 학습된 resnet18 모델을 불러옵니다.
+3채널짜리 높이와 넓이가 64인 이미지 하나를 표현하는 무작위의 데이터 텐서를 생성하고, 이에 상응하는 ``label(정답)`` 을
+무작위 값으로 초기화합니다.
 """
 import torch, torchvision
 model = torchvision.models.resnet18(pretrained=True)
