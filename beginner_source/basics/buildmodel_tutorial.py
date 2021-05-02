@@ -9,16 +9,15 @@
 `Optimization <optimization_tutorial.html>`_ ||
 `Save & Load Model <saveloadrun_tutorial.html>`_
 
-Build the Neural Network
+신경망 구성하기
 ===================
 
-Neural networks comprise of layers/modules that perform operations on data. 
-The `torch.nn <https://pytorch.org/docs/stable/nn.html>`_ namespace provides all the building blocks you need to 
-build your own neural network. Every module in PyTorch subclasses the `nn.Module <https://pytorch.org/docs/stable/generated/torch.nn.Module.html>`_. 
-A neural network is a module itself that consists of other modules (layers). This nested structure allows for
-building and managing complex architectures easily.
+신경망은 데이터에 대한 연산을 수행하는 계층(layer)/모듈(module)로 구성되어 있습니다.
+`torch.nn <https://pytorch.org/docs/stable/nn.html>`_ 네임스페이스는 신경망을 구성하는데 필요한 모든 구성 요소를 제공합니다.
+PyTorch의 모든 모듈은 `nn.Module <https://pytorch.org/docs/stable/generated/torch.nn.Module.html>`_ 의 하위 클래스(subclass)
+입니다. 신경망은 다른 모듈(계층; layer)로 구성된 모듈입니다. 이러한 중첩된 구조는 복잡한 아키텍처를 쉽게 구축하고 관리할 수 있습니다.
 
-In the following sections, we'll build a neural network to classify images in the FashionMNIST dataset.
+이어지는 장에서는 FashionMNIST 데이터셋의 이미지들을 분류하는 신경망을 구성해보겠습니다.
 
 """
 
@@ -30,22 +29,22 @@ from torchvision import datasets, transforms
 
 
 #############################################
-# Get Device for Training
+# 학습을 위한 장치 얻기
 # -----------------------
-# We want to be able to train our model on a hardware accelerator like the GPU, 
-# if it is available. Let's check to see if 
-# `torch.cuda <https://pytorch.org/docs/stable/notes/cuda.html>`_ is available, else we 
-# continue to use the CPU. 
+#
+# 가능한 경우 GPU와 같은 하드웨어 가속기에서 모델을 학습하려고 합니다.
+# `torch.cuda <https://pytorch.org/docs/stable/notes/cuda.html>`_ 를 사용할 수 있는지
+# 확인하고 그렇지 않으면 CPU를 계속 사용합니다.
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 print('Using {} device'.format(device))
 
 ##############################################
-# Define the Class
+# 클래스 정의하기
 # -------------------------
-# We define our neural network by subclassing ``nn.Module``, and 
-# initialize the neural network layers in ``__init__``. Every ``nn.Module`` subclass implements
-# the operations on input data in the ``forward`` method. 
+#
+# 신경망 모델을 ``nn.Module`` 의 하위클래스로 정의하고, ``__init__`` 에서 신경망 계층들을 초기화합니다.
+# ``nn.Module`` 을 상속받은 모든 클래스는 ``forward`` 메소드에 입력 데이터에 대한 연산들을 구현합니다.
 
 class NeuralNetwork(nn.Module):
     def __init__(self):
@@ -66,20 +65,20 @@ class NeuralNetwork(nn.Module):
         return logits
 
 ##############################################
-# We create an instance of ``NeuralNetwork``, and move it to the ``device``, and print 
-# it's structure.
+# ``NeuralNetwork`` 의 인스턴스(instance)를 생성하고 이를 ``device`` 로 이동한 뒤, 
+# 구조(structure)를 출력합니다.
 
 model = NeuralNetwork().to(device)
 print(model)
 
 
 ##############################################
-# To use the model, we pass it the input data. This executes the model's ``forward``,
-# along with some `background operations <https://github.com/pytorch/pytorch/blob/270111b7b611d174967ed204776985cefca9c144/torch/nn/modules/module.py#L866>`_. 
-# Do not call ``model.forward()`` directly!
-# 
-# Calling the model on the input returns a 10-dimensional tensor with raw predicted values for each class.
-# We get the prediction probabilities by passing it through an instance of the ``nn.Softmax`` module.
+# 모델을 사용하기 위해 입력 데이터를 전달합니다. 이는 일부 
+# `백그라운드 연산들 <https://github.com/pytorch/pytorch/blob/270111b7b611d174967ed204776985cefca9c144/torch/nn/modules/module.py#L866>`_ 과 함께
+# 모델의 ``forward`` 를 실행합니다. ``model.forward()`` 를 직접 호출하지 마세요!
+#
+# 모델에 입력을 호출하면 각 분류(class)에 대한 원시(raw) 예측값이 있는 10-차원 텐서가 반환됩니다.
+# 원시 예측값을 ``nn.Softmax`` 모듈의 인스턴스에 통과시켜 예측 확률을 얻습니다.
 
 X = torch.rand(1, 28, 28, device=device)
 logits = model(X) 
@@ -94,12 +93,11 @@ print(f"Predicted class: {y_pred}")
 
 
 ##############################################
-# Model Layers
+# 모델 계층(Layer)
 # -------------------------
 #
-# Lets break down the layers in the FashionMNIST model. To illustrate it, we 
-# will take a sample minibatch of 3 images of size 28x28 and see what happens to it as 
-# we pass it through the network. 
+# FashionMNIST 모델의 계층들을 살펴보겠습니다. 이를 설명하기 위해, 28x28 크기의 이미지 3개로 구성된
+# 미니배치를 가져와, 신경망을 통과할 때 어떤 일이 발생하는지 알아보겠습니다.
 
 input_image = torch.rand(3,28,28)
 print(input_image.size())
@@ -107,9 +105,8 @@ print(input_image.size())
 ##################################################
 # nn.Flatten
 # ^^^^^^^^^^^^^^^^^^^^^^
-# We initialize the `nn.Flatten  <https://pytorch.org/docs/stable/generated/torch.nn.Flatten.html>`_ 
-# layer to convert each 2D 28x28 image into a contiguous array of 784 pixel values (
-# the minibatch dimension (at dim=0) is maintained).
+# `nn.Flatten  <https://pytorch.org/docs/stable/generated/torch.nn.Flatten.html>`_ 계층을 초기화하여
+# 각 28x28의 2D 이미지를 784 픽셀 값을 갖는 연속된 배열로 변환합니다. (dim=0의 미니배치 차원은 유지됩니다.)
  
 flatten = nn.Flatten()
 flat_image = flatten(input_image)
@@ -118,8 +115,8 @@ print(flat_image.size())
 ##############################################
 # nn.Linear 
 # ^^^^^^^^^^^^^^^^^^^^^^
-# The `linear layer <https://pytorch.org/docs/stable/generated/torch.nn.Linear.html>`_
-# is a module that applies a linear transformation on the input using it's stored weights and biases.
+# `선형 계층 <https://pytorch.org/docs/stable/generated/torch.nn.Linear.html>`_ 은 저장된 가중치(weight)와
+# 편향(bias)을 사용하여 입력에 선형 변환(linear transformation)을 적용하는 모듈입니다.
 #
 layer1 = nn.Linear(in_features=28*28, out_features=20)
 hidden1 = layer1(flat_image)
@@ -129,12 +126,11 @@ print(hidden1.size())
 #################################################
 # nn.ReLU
 # ^^^^^^^^^^^^^^^^^^^^^^
-# Non-linear activations are what create the complex mappings between the model's inputs and outputs.
-# They are applied after linear transformations to introduce *nonlinearity*, helping neural networks
-# learn a wide variety of phenomena.
+# 비선형 활성화(activation)는 모델의 입력과 출력 사이에 복잡한 관계(mapping)를 만듭니다.
+# 비선형 활성화는 선형 변환 후에 적용되어 *비선형성(nonlinearity)* 을 도입하고, 신경망이 다양한 현상을 학습할 수 있도록 돕습니다.
 #
-# In this model, we use `nn.ReLU <https://pytorch.org/docs/stable/generated/torch.nn.ReLU.html>`_ between our
-# linear layers, but there's other activations to introduce non-linearity in your model.
+# 이 모델에서는 `nn.ReLU <https://pytorch.org/docs/stable/generated/torch.nn.ReLU.html>`_ 를 선형 계층들 사이에 사용하지만,
+# 모델을 만들 때는 비선형성을 가진 다른 활성화를 도입할 수도 있습니다.
 
 print(f"Before ReLU: {hidden1}\n\n")
 hidden1 = nn.ReLU()(hidden1)
@@ -145,9 +141,9 @@ print(f"After ReLU: {hidden1}")
 #################################################
 # nn.Sequential
 # ^^^^^^^^^^^^^^^^^^^^^^
-# `nn.Sequential <https://pytorch.org/docs/stable/generated/torch.nn.Sequential.html>`_ is an ordered 
-# container of modules. The data is passed through all the modules in the same order as defined. You can use
-# sequential containers to put together a quick network like ``seq_modules``.
+# `nn.Sequential <https://pytorch.org/docs/stable/generated/torch.nn.Sequential.html>`_ 은 순서를 갖는 
+# 모듈의 컨테이너입니다. 데이터는 정의된 것과 같은 순서로 모든 모듈들을 통해 전달됩니다. 순차 컨테이너(sequential container)를 사용하여
+# 아래의 ``seq_modules`` 와 같은 신경망을 빠르게 만들 수 있습니다.
 
 seq_modules = nn.Sequential(
     flatten,
@@ -161,24 +157,23 @@ logits = seq_modules(input_image)
 ################################################################
 # nn.Softmax
 # ^^^^^^^^^^^^^^^^^^^^^^
-# The last linear layer of the neural network returns `logits` - raw values in [-\infty, \infty] - which are passed to the
-# `nn.Softmax <https://pytorch.org/docs/stable/generated/torch.nn.Softmax.html>`_ module. The logits are scaled to values 
-# [0, 1] representing the model's predicted probabilities for each class. ``dim`` parameter indicates the dimension along 
-# which the values must sum to 1. 
+# 신경망의 마지막 선형 계층은 `nn.Softmax <https://pytorch.org/docs/stable/generated/torch.nn.Softmax.html>`_ 모듈에 전달될
+# ([-\infty, \infty] 범위의 원시 값(raw value)인) `logits` 를 반환합니다. logits는 모델의 각 분류(class)에 대한 예측 확률을 나타내도록
+# [0, 1] 범위로 비례하여 조정(scale)됩니다. ``dim`` 매개변수는 값의 합이 1이 되는 차원을 나타냅니다.
 
 softmax = nn.Softmax(dim=1)
 pred_probab = softmax(logits)
 
 
 #################################################
-# Model Parameters
+# 모델 매개변수
 # -------------------------
-# Many layers inside a neural network are *parameterized*, i.e. have associated weights 
-# and biases that are optimized during training. Subclassing ``nn.Module`` automatically 
-# tracks all fields defined inside your model object, and makes all parameters 
-# accessible using your model's ``parameters()`` or ``named_parameters()`` methods. 
 # 
-# In this example, we iterate over each parameter, and print its size and a preview of its values. 
+# 신경망 내부의 많은 계층들은 *매개변수화(parameterize)* 됩니다. 즉, 학습 중에 최적화되는 가중치와 편향과 연관지어집니다.
+# ``nn.Module`` 을 상속하면 모델 객체 내부의 모든 필드들이 자동으로 추적(track)되며, 모델의 ``parameters()`` 및
+# ``named_parameters()`` 메소드로 모든 매개변수에 접근할 수 있게 됩니다.
+# 
+# 이 예제에서는 각 매개변수들을 순회하며(iterate), 매개변수의 크기와 값을 출력합니다.
 #
 
 
@@ -192,7 +187,7 @@ for name, param in model.named_parameters():
 #
 
 #################################################################
-# Further Reading
+# 더 읽어보기
 # --------------
 # - `torch.nn API <https://pytorch.org/docs/stable/nn.html>`_
 

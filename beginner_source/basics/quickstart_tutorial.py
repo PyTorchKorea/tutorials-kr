@@ -82,7 +82,7 @@ for X, y in test_dataloader:
 # ------------------
 # PyTorch에서 신경망 모델은 `nn.Module <https://pytorch.org/docs/stable/generated/torch.nn.Module.html>`_ 을
 # 상속받는 클래스(class)를 생성하여 정의합니다. ``__init__`` 함수에서 신경망의 계층(layer)들을 정의하고 ``forward`` 함수에서
-# 신경망에 데이터를 어떻게 전달할지 지정합니다. 가능한 경우 GPU로 신경망을 이동하여 연산을 가속화(accelerate)합니다.
+# 신경망에 데이터를 어떻게 전달할지 지정합니다. 가능한 경우 GPU로 신경망을 이동시켜 연산을 가속(accelerate)합니다.
 
 # 학습에 사용할 CPU나 GPU 장치를 얻습니다.
 device = "cuda" if torch.cuda.is_available() else "cpu"

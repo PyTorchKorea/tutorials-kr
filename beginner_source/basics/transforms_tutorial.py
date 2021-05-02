@@ -42,7 +42,7 @@ ds = datasets.FashionMNIST(
 #
 # `ToTensor <https://pytorch.org/docs/stable/torchvision/transforms.html#torchvision.transforms.ToTensor>`_ 
 # 는 PIL Image나 NumPy ``ndarray`` 를  ``FloatTensor`` 로 변환하고, 이미지의 픽셀의 크기(intensity) 값을 [0., 1.] 범위로
-# 비례하여 조절(scale)합니다.
+# 비례하여 조정(scale)합니다.
 #
 
 ##############################################
