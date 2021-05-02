@@ -43,7 +43,7 @@ Dataset과 Dataloader
 #  - ``root`` 는 학습/테스트 데이터가 저장되는 경로입니다.
 #  - ``train`` 은 학습용 또는 테스트용 데이터셋 여부를 지정합니다.
 #  - ``download=True`` 는 ``root`` 에 데이터가 없는 경우 인터넷에서 다운로드합니다.
-#  - ``transform`` 과 ``target_transform`` 은 특징(feature)과 정답(label) 변환(transform)을 지정합니다.
+#  - ``transform`` 과 ``target_transform`` 은 특징(feature)과 정답(label) 변형(transform)을 지정합니다.
 
 
 import torch
@@ -151,7 +151,7 @@ class CustomImageDataset(Dataset):
 #
 # __init__ 함수는 Dataset 객체가 생성(instantiate)될 때 한 번만 실행됩니다.
 # 여기서는 이미지와 주석 파일(annotation_file)이 포함된 디렉토리와 (다음 장에서 자세히 살펴볼) 두가지
-# 변환(transform)을 초기화합니다.
+# 변형(transform)을 초기화합니다.
 #
 # labels.csv 파일은 다음과 같습니다: ::
 #
@@ -187,7 +187,7 @@ def __len__(self):
 #
 # __getitem__ 함수는 주어진 인덱스 ``idx`` 에 해당하는 샘플을 데이터셋에서 불러오고 반환합니다.
 # 인덱스를 기반으로, 디스크에서 이미지의 위치를 식별하고, ``read_image`` 를 사용하여 이미지를 텐서로 변환하고, ``self.img_labels`` 의 csv 데이터로부터
-# 해당하는 정답(label)을 가져오고, (해당하는 경우) 변환 함수들을 호출한 뒤, 텐서 이미지와 라벨을 Python 사전(dict)형으로 반환합니다.
+# 해당하는 정답(label)을 가져오고, (해당하는 경우) 변형(transform) 함수들을 호출한 뒤, 텐서 이미지와 라벨을 Python 사전(dict)형으로 반환합니다.
 
 def __getitem__(self, idx):
     img_path = os.path.join(self.img_dir, self.img_labels.iloc[idx, 0])
