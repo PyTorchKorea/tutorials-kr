@@ -9,16 +9,16 @@
 `Optimization <optimization_tutorial.html>`_ ||
 `Save & Load Model <saveloadrun_tutorial.html>`_
 
-Tensors 
+텐서(Tensor)
 ==========================
 
-Tensors are a specialized data structure that are very similar to arrays and matrices. 
-In PyTorch, we use tensors to encode the inputs and outputs of a model, as well as the model’s parameters.
+텐서(tensor)는 배열(array)이나 행렬(matrix)과 매우 유사한 특수한 자료구조입니다.
+PyTorch에서는 텐서를 사용하여 모델의 입력(input)과 출력(output), 그리고 모델의 매개변수들을 부호화(encode)합니다.
 
-Tensors are similar to `NumPy’s <https://numpy.org/>`_ ndarrays, except that tensors can run on GPUs or other hardware accelerators. In fact, tensors and
-NumPy arrays can often share the same underlying memory, eliminating the need to copy data (see :ref:`bridge-to-np-label`). Tensors 
-are also optimized for automatic differentiation (we'll see more about that later in the `Autograd <autogradqs_tutorial.html>`__ 
-section). If you’re familiar with ndarrays, you’ll be right at home with the Tensor API. If not, follow along!
+텐서는 GPU나 다른 하드웨어 가속기에서 실행할 수 있다는 점만 제외하면 `NumPy <https://numpy.org>`_ 의 ndarray와 유사합니다.
+실제로 텐서와 NumPy 배열(array)은 종종 동일한 내부(underly) 메모리를 공유할 수 있어 데이터를 복수할 필요가 없습니다. (:ref:`bridge-to-np-label` 참고)
+텐서는 또한 (`Autograd <autogradqs_tutorial.html>`__ 장에서 살펴볼) 자동 미분(automatic differentiation)에 최적화되어 있습니다.
+ndarray에 익숙하다면 Tensor API를 바로 사용할 수 있을 것입니다. 아니라면, 아래 내용을 함께 보시죠!
 """
 
 import torch
@@ -26,42 +26,42 @@ import numpy as np
 
 
 ######################################################################
-# Initializing a Tensor
+# 텐서(tensor) 초기화
 # ~~~~~~~~~~~~~~~~~~~~~
 #
-# Tensors can be initialized in various ways. Take a look at the following examples:
+# 텐서는 여러가지 방법으로 초기화할 수 있습니다. 다음 예를 살펴보세요:
 #
-# **Directly from data**
+# **데이터로부터 직접(directly) 생성하기**
 #
-# Tensors can be created directly from data. The data type is automatically inferred.
+# 데이터로부터 직접 텐서를 생성할 수 있습니다. 데이터의 자료형(data type)은 자동으로 유추합니다.
 
 data = [[1, 2],[3, 4]]
 x_data = torch.tensor(data)
 
 ######################################################################
-# **From a NumPy array**
+# **NumPy 배열로부터 생성하기**
 #
-# Tensors can be created from NumPy arrays (and vice versa - see :ref:`bridge-to-np-label`).
+# 텐서는 NumPy 배열로 생성할 수 있습니다. (그 반대도 가능합니다 - :ref:`bridge-to-np-label` 참고)
 np_array = np.array(data)
 x_np = torch.from_numpy(np_array)
 
 
 ###############################################################
-# **From another tensor:**
+# **다른 텐서로부터 생성하기:**
 #
-# The new tensor retains the properties (shape, datatype) of the argument tensor, unless explicitly overridden.
+# 명시적으로 재정의(override)하지 않는다면, 인자로 주어진 텐서의 속성(모양(shape), 자료형(datatype))을 유지합니다.
 
-x_ones = torch.ones_like(x_data) # retains the properties of x_data
+x_ones = torch.ones_like(x_data) # x_data의 속성을 유지합니다.
 print(f"Ones Tensor: \n {x_ones} \n")
 
-x_rand = torch.rand_like(x_data, dtype=torch.float) # overrides the datatype of x_data
+x_rand = torch.rand_like(x_data, dtype=torch.float) # x_data의 속성을 덮어씁니다.
 print(f"Random Tensor: \n {x_rand} \n")
 
 
 ######################################################################
-# **With random or constant values:**
+# **무작위(random) 또는 상수(constant) 값을 사용하기:**
 #
-# ``shape`` is a tuple of tensor dimensions. In the functions below, it determines the dimensionality of the output tensor.
+# ``shape`` 은 텐서의 차원(dimension)을 나타내는 튜플(tuple)로, 아래 함수들에서는 출력 텐서의 차원을 결정합니다.
 
 shape = (2,3,)
 rand_tensor = torch.rand(shape)
@@ -79,10 +79,10 @@ print(f"Zeros Tensor: \n {zeros_tensor}")
 #
 
 ######################################################################
-# Attributes of a Tensor
-# ~~~~~~~~~~~~~~~~~
+# 텐서의 속성(Attribute)
+# ~~~~~~~~~~~~~~~~~~~~~~
 #
-# Tensor attributes describe their shape, datatype, and the device on which they are stored.
+# 텐서의 속성은 텐서의 모양(shape), 자료형(datatype) 및 어느 장치에 저장되는지를 나타냅니다.
 
 tensor = torch.rand(3,4)
 
@@ -96,32 +96,32 @@ print(f"Device tensor is stored on: {tensor.device}")
 #
 
 ######################################################################
-# Operations on Tensors
-# ~~~~~~~~~~~~~~~~~
+# 텐서 연산(Operation)
+# ~~~~~~~~~~~~~~~~~~~~
 #
-# Over 100 tensor operations, including arithmetic, linear algebra, matrix manipulation (transposing, 
-# indexing, slicing), sampling and more are
-# comprehensively described `here <https://pytorch.org/docs/stable/torch.html>`__.
+# 전치(transposing), 인덱싱(indexing), 슬라이싱(slicing), 수학 계산, 선형 대수, 
+# 임의 샘플링(random sampling) 등, 100가지 이상의 텐서 연산들을 
+# `여기 <https://pytorch.org/docs/stable/torch.html>`__ 에서 확인할 수 있습니다.
 #
-# Each of these operations can be run on the GPU (at typically higher speeds than on a
-# CPU). If you’re using Colab, allocate a GPU by going to Runtime > Change runtime type > GPU.
+# 각 연산들은 (일반적으로 CPU보다 빠른) GPU에서 실행할 수 있습니다. Colab을 사용한다면,
+# Edit > Notebook Settings 에서 GPU를 할당할 수 있습니다.
 # 
-# By default, tensors are created on the CPU. We need to explicitly move tensors to the GPU using 
-# ``.to`` method (after checking for GPU availability). Keep in mind that copying large tensors
-# across devices can be expensive in terms of time and memory!
+# 기본적으로 텐서는 CPU에 생성됩니다. ``.to`` 메소드를 사용하면 (GPU의 가용성(availability)을 확인한 뒤)
+# GPU로 텐서를 명시적으로 이동할 수 있습니다. 장치들 간에 큰 텐서들을 복사하는 것은 시간과 메모리 측면에서 비용이
+# 많이든다는 것을 기억하세요!
 
-# We move our tensor to the GPU if available
+# GPU가 존재하면 텐서를 이동합니다
 if torch.cuda.is_available():
   tensor = tensor.to('cuda')
 
 
 ######################################################################
-# Try out some of the operations from the list.
-# If you're familiar with the NumPy API, you'll find the Tensor API a breeze to use.
+# 목록에서 몇몇 연산들을 시도해보세요.
+# NumPy API에 익숙하다면 Tensor API를 사용하는 것은 식은 죽 먹기라는 것을 알게 되실 겁니다.
 #
 
 ###############################################################
-# **Standard numpy-like indexing and slicing:**
+# **NumPy식의 표준 인덱싱과 슬라이싱:**
 
 tensor = torch.ones(4, 4)
 print('First row: ',tensor[0])
@@ -131,17 +131,17 @@ tensor[:,1] = 0
 print(tensor)
 
 ######################################################################
-# **Joining tensors** You can use ``torch.cat`` to concatenate a sequence of tensors along a given dimension.
-# See also `torch.stack <https://pytorch.org/docs/stable/generated/torch.stack.html>`__,
-# another tensor joining op that is subtly different from ``torch.cat``.
+# **텐서 합치기** ``torch.cat`` 을 사용하여 주어진 차원에 따라 일련의 텐서를 연결할 수 있습니다.
+# ``torch.cat`` 과 미묘하게 다른 또 다른 텐서 결합 연산인 
+# `torch.stack <https://pytorch.org/docs/stable/generated/torch.stack.html>`__ 도 참고해보세요.
 t1 = torch.cat([tensor, tensor, tensor], dim=1)
 print(t1)
 
 
 ######################################################################
-# **Arithmetic operations**
+# **산술 연산(Arithmetic operations)**
 
-# This computes the matrix multiplication between two tensors. y1, y2, y3 will have the same value
+# 두 텐서 간의 행렬 곱(matrix multiplication)을 계산합니다. y1, y2, y3은 모두 같은 값을 갖습니다.
 y1 = tensor @ tensor.T
 y2 = tensor.matmul(tensor.T)
 
@@ -149,7 +149,7 @@ y3 = torch.rand_like(tensor)
 torch.matmul(tensor, tensor.T, out=y3)
 
 
-# This computes the element-wise product. z1, z2, z3 will have the same value
+# 요소별 곱(element-wise product)을 계산합니다. z1, z2, z3는 모두 같은 값을 갖습니다.
 z1 = tensor * tensor
 z2 = tensor.mul(tensor)
 
@@ -158,9 +158,8 @@ torch.mul(tensor, tensor, out=z3)
 
 
 ######################################################################
-# **Single-element tensors** If you have a one-element tensor, for example by aggregating all
-# values of a tensor into one value, you can convert it to a Python
-# numerical value using ``item()``:
+# **단일-요소(single-element) 텐서** 텐서의 모든 값을 하나로 집계(aggregate)하여 요소가 하나인 텐서의 경우,
+# ``item()`` 을 사용하여 Python 숫자 값으로 변환할 수 있습니다:
 
 agg = tensor.sum()
 agg_item = agg.item()  
@@ -168,9 +167,9 @@ print(agg_item, type(agg_item))
 
 
 ######################################################################
-# **In-place operations**
-# Operations that store the result into the operand are called in-place. They are denoted by a ``_`` suffix. 
-# For example: ``x.copy_(y)``, ``x.t_()``, will change ``x``.
+# **바꿔치기(in-place) 연산**
+# 연산 결과를 피연산자(operand)에 저장하는 연산을 바꿔치기 연산이라고 부르며, ``_`` 접미사를 갖습니다. 
+# 예를 들어: ``x.copy_(y)`` 나 ``x.t_()`` 는 ``x`` 를 변경합니다.
 
 print(tensor, "\n")
 tensor.add_(5)
@@ -178,8 +177,8 @@ print(tensor)
 
 ######################################################################
 # .. note::
-#      In-place operations save some memory, but can be problematic when computing derivatives because of an immediate loss
-#      of history. Hence, their use is discouraged.
+#      바꿔치기 연산은 메모리를 일부 절약하지만, 기록(history)이 즉시 삭제되어 도함수(derivative) 계산에 문제가 발생할 수 있습니다.
+#      따라서, 사용을 권장하지 않습니다.
 
 
 
@@ -191,14 +190,13 @@ print(tensor)
 ######################################################################
 # .. _bridge-to-np-label:
 #
-# Bridge with NumPy
-# ~~~~~~~~~~~~~~~~~
-# Tensors on the CPU and NumPy arrays can share their underlying memory
-# locations, and changing one will change	the other.
+# NumPy 변환(Bridge)
+# ~~~~~~~~~~~~~~~~~~~
+# CPU 상의 텐서와 NumPy 배열은 메모리 공간을 공유하기 때문에, 하나를 변경하면 다른 하나도 변경됩니다.
 
 
 ######################################################################
-# Tensor to NumPy array
+# 텐서를 NumPy 배열로 변환하기
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 t = torch.ones(5)
 print(f"t: {t}")
@@ -206,7 +204,7 @@ n = t.numpy()
 print(f"n: {n}")
 
 ######################################################################
-# A change in the tensor reflects in the NumPy array.
+# 텐서의 변경 사항이 NumPy 배열에 반영됩니다.
 
 t.add_(1)
 print(f"t: {t}")
@@ -214,13 +212,13 @@ print(f"n: {n}")
 
 
 ######################################################################
-# NumPy array to Tensor
+# NumPy 배열을 텐서로 변환하기
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 n = np.ones(5)
 t = torch.from_numpy(n)
 
 ######################################################################
-# Changes in the NumPy array reflects in the tensor.
+# NumPy 배열의 변경 사항이 텐서에 반영됩니다.
 np.add(n, 1, out=n)
 print(f"t: {t}")
 print(f"n: {n}")

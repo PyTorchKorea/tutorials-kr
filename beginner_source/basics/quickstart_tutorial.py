@@ -9,16 +9,15 @@
 `Optimization <optimization_tutorial.html>`_ ||
 `Save & Load Model <saveloadrun_tutorial.html>`_
 
-Quickstart
-===================
-This section runs through the API for common tasks in machine learning. Refer to the links in each section to dive deeper.
+빠른 시작(Quickstart)
+====================
+이번 장에서는 기계 학습의 일반적인 작업들을 위한 API를 통해 실행됩니다. 더 자세히 알아보려면 각 장(section)의 링크를 참고하세요.
 
-Working with data
+데이터 작업하기
 -----------------
-PyTorch has two `primitives to work with data <https://pytorch.org/docs/stable/data.html>`_: 
-``torch.utils.data.DataLoader`` and ``torch.utils.data.Dataset``.
-``Dataset`` stores the samples and their corresponding labels, and ``DataLoader`` wraps an iterable around
-the ``Dataset``.
+파이토치(PyTorch)에는 `데이터 작업을 위한 기본 요소 <https://pytorch.org/docs/stable/data.html>`_ 두가지인
+``torch.utils.data.DataLoader`` 와 ``torch.utils.data.Dataset`` 가 있습니다.
+``Dataset`` 은 샘플과 정답(label)을 저장하고, ``DataLoader`` 는 ``Dataset`` 을 반복 가능한 객체(iterable)로 감쌉니다.
 
 """
 
@@ -30,16 +29,15 @@ from torchvision.transforms import ToTensor, Lambda, Compose
 import matplotlib.pyplot as plt
 
 ######################################################################
-# PyTorch offers domain-specific libraries such as `TorchText <https://pytorch.org/text/stable/index.html>`_, 
-# `TorchVision <https://pytorch.org/vision/stable/index.html>`_, and `TorchAudio <https://pytorch.org/audio/stable/index.html>`_, 
-# all of which include datasets. For this tutorial, we  will be using a TorchVision dataset.
+# PyTorch는 `TorchText <https://pytorch.org/text/stable/index.html>`_, `TorchVision <https://pytorch.org/vision/stable/index.html>`_ 및
+# `TorchAudio <https://pytorch.org/audio/stable/index.html>`_ 와 같이 도메인 특화 라이브러리를 데이터셋과 함께 제공하고 있습니다.
+# 이 튜토리얼에서는 TorchVision 데이터셋을 사용하도록 하겠습니다.
 #
-# The ``torchvision.datasets`` module contains ``Dataset`` objects for many real-world vision data like 
-# CIFAR, COCO (`full list here <https://pytorch.org/docs/stable/torchvision/datasets.html>`_). In this tutorial, we
-# use the FashionMNIST dataset. Every TorchVision ``Dataset`` includes two arguments: ``transform`` and
-# ``target_transform`` to modify the samples and labels respectively.
+# ``torchvision.datasets`` 모듈은 CIFAR, COCO 등 (`전체 목록은 여기 <https://pytorch.org/docs/stable/torchvision/datasets.html>`_) 과 같은 다양한
+# 실제 비전(vision) 데이터에 대한 ``Dataset`` 을 포함하고 있습니다. 이 튜토리얼에서는 FasionMNIST 데이터셋을 사용합니다.
+# 모든 TorchVision ``Dataset`` 은 샘플과 정답을 각각 변경하기 위한 ``transform`` 과 ``target_transform`` 의 두 인자를 포함합니다.
 
-# Download training data from open datasets.
+# 공개 데이터셋에서 학습 데이터를 내려받습니다.
 training_data = datasets.FashionMNIST(
     root="data",
     train=True,
@@ -47,7 +45,7 @@ training_data = datasets.FashionMNIST(
     transform=ToTensor(),
 )
 
-# Download test data from open datasets.
+# 공개 데이터셋에서 테스트 데이터를 내려받습니다.
 test_data = datasets.FashionMNIST(
     root="data",
     train=False,
@@ -56,13 +54,13 @@ test_data = datasets.FashionMNIST(
 )
 
 ######################################################################
-# We pass the ``Dataset`` as an argument to ``DataLoader``. This wraps an iterable over our dataset, and supports
-# automatic batching, sampling, shuffling and multiprocess data loading. Here we define a batch size of 64, i.e. each element 
-# in the dataloader iterable will return a batch of 64 features and labels.
+# ``Dataset`` 을 ``DataLoader`` 의 인자로 전달합니다. 이는 데이터셋을 반복 가능한 객체(iterable)로 감싸고, 자동화된 배치(batch), 샘플링(sampling),
+# 섞기(shuffle) 및 다증 프로세스로 데이터 불러오기(multiprocess data loading)를 지원합니다. 여기서는 배치 크기(batch size)를 64로 정의합니다.
+# 즉, 데이터로더(dataloader) 객체의 각 요소는 64개의 특징(feature)과 정답(label)을 묶음(batch)으로 반환합니다.
 
 batch_size = 64
 
-# Create data loaders.
+# 데이터로더를 생성합니다.
 train_dataloader = DataLoader(training_data, batch_size=batch_size)
 test_dataloader = DataLoader(test_data, batch_size=batch_size)
 
@@ -72,7 +70,7 @@ for X, y in test_dataloader:
     break
 
 ######################################################################
-# Read more about `loading data in PyTorch <data_tutorial.html>`_.
+# `PyTorch에서 데이터를 불러오는 방법 <data_tutorial.html>`_ 을 자세히 알아보세요.
 #
 
 ######################################################################
@@ -80,18 +78,17 @@ for X, y in test_dataloader:
 #
 
 ################################
-# Creating Models
+# 모델 만들기
 # ------------------
-# To define a neural network in PyTorch, we create a class that inherits 
-# from `nn.Module <https://pytorch.org/docs/stable/generated/torch.nn.Module.html>`_. We define the layers of the network
-# in the ``__init__`` function and specify how data will pass through the network in the ``forward`` function. To accelerate 
-# operations in the neural network, we move it to the GPU if available.
+# PyTorch에서 신경망 모델은 `nn.Module <https://pytorch.org/docs/stable/generated/torch.nn.Module.html>`_ 을
+# 상속받는 클래스(class)를 생성하여 정의합니다. ``__init__`` 함수에서 신경망의 계층(layer)들을 정의하고 ``forward`` 함수에서
+# 신경망에 데이터를 어떻게 전달할지 지정합니다. 가능한 경우 GPU로 신경망을 이동하여 연산을 가속화(accelerate)합니다.
 
-# Get cpu or gpu device for training.
+# 학습에 사용할 CPU나 GPU 장치를 얻습니다.
 device = "cuda" if torch.cuda.is_available() else "cpu"
 print("Using {} device".format(device))
 
-# Define model
+# 모델을 정의합니다.
 class NeuralNetwork(nn.Module):
     def __init__(self):
         super(NeuralNetwork, self).__init__()
@@ -114,7 +111,7 @@ model = NeuralNetwork().to(device)
 print(model)
 
 ######################################################################
-# Read more about `building neural networks in PyTorch <buildmodel_tutorial.html>`_.
+# `PyTorch에서 신경망을 정의하는 방법  <buildmodel_tutorial.html>`_ 을 자세히 알아보세요.
 #
 
 
@@ -124,29 +121,29 @@ print(model)
 
 
 #####################################################################
-# Optimizing the Model Parameters
+# 모델 매개변수 최적화하기
 # ----------------------------------------
-# To train a model, we need a `loss function <https://pytorch.org/docs/stable/nn.html#loss-functions>`_
-# and an `optimizer <https://pytorch.org/docs/stable/optim.html>`_. 
+# 모델을 학습하려면 `손실 함수(loss function) <https://pytorch.org/docs/stable/nn.html#loss-functions>`_ 와
+# `옵티마이저(optimizer) <https://pytorch.org/docs/stable/optim.html>`_ 가 필요합니다.
 
 loss_fn = nn.CrossEntropyLoss()
 optimizer = torch.optim.SGD(model.parameters(), lr=1e-3)
 
 
 ####################################################################### 
-# In a single training loop, the model makes predictions on the training dataset (fed to it in batches), and 
-# backpropagates the prediction error to adjust the model's parameters. 
+# 각 학습 단계(training loop)에서 모델은 (배치(batch)로 제공되는) 학습 데이터셋에 대한 예측을 수행하고,
+# 예측 오류를 역전파하여 모델의 매개변수를 조정합니다.
 
 def train(dataloader, model, loss_fn, optimizer):
     size = len(dataloader.dataset)
     for batch, (X, y) in enumerate(dataloader):
         X, y = X.to(device), y.to(device)
         
-        # Compute prediction error
+        # 예측 오류 계산
         pred = model(X)
         loss = loss_fn(pred, y)
         
-        # Backpropagation
+        # 역전파
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
@@ -156,7 +153,7 @@ def train(dataloader, model, loss_fn, optimizer):
             print(f"loss: {loss:>7f}  [{current:>5d}/{size:>5d}]")
 
 ##############################################################################
-# We also check the model's performance against the test dataset to ensure it is learning.
+# 모델이 학습하고 있는지를 확인하기 위해 테스트 데이터셋으로 모델의 성능을 확인합니다.
 
 def test(dataloader, model):
     size = len(dataloader.dataset)
@@ -173,9 +170,8 @@ def test(dataloader, model):
     print(f"Test Error: \n Accuracy: {(100*correct):>0.1f}%, Avg loss: {test_loss:>8f} \n")
 
 ##############################################################################
-# The training process is conducted over several iterations (*epochs*). During each epoch, the model learns 
-# parameters to make better predictions. We print the model's accuracy and loss at each epoch; we'd like to see the
-# accuracy increase and the loss decrease with every epoch.
+# 학습 단계는 여러번의 반복 단계 (*에폭(epochs)*) 를 거쳐서 수행됩니다. 각 에폭에서는 모델은 더 나은 예측을 하기 위해  매개변수를 학습합니다.
+# 각 에폭마다 모델의 정확도(accuracy)와 손실(loss)을 출력합니다; 에폭마다 정확도가 증가하고 손실이 감소하는 것을 보려고 합니다.
 
 epochs = 5
 for t in range(epochs):
@@ -185,7 +181,7 @@ for t in range(epochs):
 print("Done!")
 
 ######################################################################
-# Read more about `Training your model <optimization_tutorial.html>`_.
+# `모델을 학습하는 방법 <optimization_tutorial.html>`_ 을 자세히 알아보세요.
 #
 
 ######################################################################
@@ -193,9 +189,10 @@ print("Done!")
 #
 
 ######################################################################
-# Saving Models
+# 모델 저장하기
 # -------------
-# A common way to save a model is to serialize the internal state dictionary (containing the model parameters).
+# 모델을 저장하는 일반적인 방법은 (모델의 매개변수들을 포함하여) 내부 상태 사전(internal state dictionary)을
+# 직렬화(serialize)하는 것입니다.
 
 torch.save(model.state_dict(), "model.pth")
 print("Saved PyTorch Model State to model.pth")
@@ -203,17 +200,16 @@ print("Saved PyTorch Model State to model.pth")
 
 
 ######################################################################
-# Loading Models
+# 모델 불러오기
 # ----------------------------
 #
-# The process for loading a model includes re-creating the model structure and loading
-# the state dictionary into it. 
+# 모델을 불러오는 과정에는 모델 구조를 다시 만들고 상태 사전을 모델에 불러오는 과정이 포함됩니다.
 
 model = NeuralNetwork()
 model.load_state_dict(torch.load("model.pth"))
 
 #############################################################
-# This model can now be used to make predictions.
+# 이제 이 모델을 사용해서 예측을 할 수 있습니다.
 
 classes = [
     "T-shirt/top",
@@ -237,7 +233,7 @@ with torch.no_grad():
 
       
 ######################################################################
-# Read more about `Saving & Loading your model <saveloadrun_tutorial.html>`_.
+# `모델을 저장하고 불러오는 방법 <saveloadrun_tutorial.html>`_ 을 자세히 알아보세요.
 #
 
 

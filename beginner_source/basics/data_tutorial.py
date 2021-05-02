@@ -9,40 +9,41 @@
 `Optimization <optimization_tutorial.html>`_ ||
 `Save & Load Model <saveloadrun_tutorial.html>`_
 
-Datasets & Dataloaders
-===================
+Dataset과 Dataloader
+========================
 
 """
 
 #################################################################
-# Code for processing data samples can get messy and hard to maintain; we ideally want our dataset code
-# to be decoupled from our model training code for better readability and modularity.
-# PyTorch provides two data primitives: ``torch.utils.data.DataLoader`` and ``torch.utils.data.Dataset``
-# that allow you to use pre-loaded datasets as well as your own data.
-# ``Dataset`` stores the samples and their corresponding labels, and ``DataLoader`` wraps an iterable around
-# the ``Dataset`` to enable easy access to the samples.
+# 데이터 샘플을 처리하는 코드는 지저분(messy)하고 유지보수가 어려울 수 있습니다;
+# 더 나은 가독성(readability)과 모듈성(modularity)을 위해 데이터셋 코드를 모델 학습 코드로부터 분리하는 것이 이상적입니다.
+# PyTorch는 ``torch.utils.data.DataLoader`` 와 ``torch.utils.data.Dataset`` 의 두 가지 데이터 기본 요소를
+# 제공하여 미리 준비해된(pre-loaded) 데이터셋 뿐만 아니라 가지고 있는 데이터를 사용할 수 있도록 합니다.
+# ``Dataset`` 은 샘플과 정답(label)을 저장하고, ``DataLoader`` 는 ``Dataset`` 을 샘플에 쉽게 접근할 수 있도록 
+# 반복 가능한 객체(iterable)로 감쌉니다.
 #
-# PyTorch domain libraries provide a number of pre-loaded datasets (such as FashionMNIST) that 
-# subclass ``torch.utils.data.Dataset`` and implement functions specific to the particular data.
-# They can be used to prototype and benchmark your model. You can find them
-# here: `Image Datasets <https://pytorch.org/docs/stable/torchvision/datasets.html>`_,
-# `Text Datasets  <https://pytorch.org/text/stable/datasets.html>`_, and
-# `Audio Datasets <https://pytorch.org/audio/stable/datasets.html>`_
+# PyTorch의 도메인 특화 라이브러리들은 (FashionMNIST와 같은) 다양한 미리 준비해둔(pre-loaded) 데이터셋을 제공합니다.
+# 데이터셋은 ``torch.utils.data.Dataset`` 의 하위 클래스로 개별 데이터를 특정하는 함수가 구현되어 있습니다.
+# 이러한 데이터셋은 모델을 만들어보고(prototype) 성능을 측정(benchmark)하는데 사용할 수 있습니다.
+# 여기에서 데이터셋들을 찾아볼 수 있습니다: 
+# `이미지 데이터셋 <https://pytorch.org/docs/stable/torchvision/datasets.html>`_,
+# `텍스트 데이터셋 <https://pytorch.org/text/stable/datasets.html>`_ 및
+# `오디오 데이터셋 <https://pytorch.org/audio/stable/datasets.html>`_
 #
 
 ############################################################
-# Loading a Dataset
+# 데이터셋 불러오기
 # -------------------
 #
-# Here is an example of how to load the `Fashion-MNIST <https://research.zalando.com/welcome/mission/research-projects/fashion-mnist/>`_ dataset from TorchVision.
-# Fashion-MNIST is a dataset of Zalando’s article images consisting of of 60,000 training examples and 10,000 test examples.
-# Each example comprises a 28×28 grayscale image and an associated label from one of 10 classes.
+# `TorchVision` 에서 `Fashion-MNIST <https://research.zalando.com/welcome/mission/research-projects/fashion-mnist/>`_ 데이터셋을 
+# 불러오는 예제를 살펴보겠습니다. Fashion-MNIST는 Zalando의 기사 이미지 데이터셋으로 60,000개의 학습 예제와 10,000개의 테스트 예제로 이루어져 있습니다.
+# 각 예제는 흑백(grayscale)의 28x28 이미지와 10개 분류(class) 중 하나인 정답(label)으로 구성됩니다.
 #
-# We load the `FashionMNIST Dataset <https://pytorch.org/docs/stable/torchvision/datasets.html#fashion-mnist>`_ with the following parameters:
-#  - ``root`` is the path where the train/test data is stored,
-#  - ``train`` specifies training or test dataset,
-#  - ``download=True`` downloads the data from the internet if it's not available at ``root``.
-#  - ``transform`` and ``target_transform`` specify the feature and label transformations
+# 다음 매개변수들을 사용하여 `FashionMNIST 데이터셋 <https://pytorch.org/docs/stable/torchvision/datasets.html#fashion-mnist>`_ 을 불러옵니다:
+#  - ``root`` 는 학습/테스트 데이터가 저장되는 경로입니다.
+#  - ``train`` 은 학습용 또는 테스트용 데이터셋 여부를 지정합니다.
+#  - ``download=True`` 는 ``root`` 에 데이터가 없는 경우 인터넷에서 다운로드합니다.
+#  - ``transform`` 과 ``target_transform`` 은 특징(feature)과 정답(label) 변환(transform)을 지정합니다.
 
 
 import torch
@@ -68,11 +69,11 @@ test_data = datasets.FashionMNIST(
 
 
 #################################################################
-# Iterating and Visualizing the Dataset
-# -----------------
+# 데이터셋을 반복하고 시각화하기
+# ------------------------
 #
-# We can index ``Datasets`` manually like a list: ``training_data[index]``. 
-# We use ``matplotlib`` to visualize some samples in our training data.
+# ``Dataset`` 에 리스트(list)처럼 직접 접근(index)할 수 있습니다: ``training_data[index]``. 
+# ``matplotlib`` 을 사용하여 학습 데이터의 일부를 시각화해보겠습니다.
 
 labels_map = {
     0: "T-Shirt",
@@ -108,14 +109,14 @@ plt.show()
 #
 
 #################################################################
-# Creating a Custom Dataset for your files
+# 파일에서 사용자 정의 데이터셋 만들기
 # ---------------------------------------------------
 #
-# A custom Dataset class must implement three functions: `__init__`, `__len__`, and `__getitem__`. 
-# Take a look at this implementation; the FashionMNIST images are stored 
-# in a directory ``img_dir``, and their labels are stored separately in a CSV file ``annotations_file``. 
+# 사용자 정의 Dataset 클래스는 반드시 3개 함수를 구현해야 합니다: `__init__`, `__len__`, and `__getitem__`. 
+# 아래 구현을 살펴보면 FashionMNIST 이미지들은 ``img_dir`` 디렉토리에 저장되고, 정답은 ``annotations_file`` csv 파일에
+# 별도로 저장됩니다.
 #
-# In the next sections, we'll break down what's happening in each of these functions.
+# 다음 장에서 각 함수들에서 일어나는 일들을 자세히 살펴보겠습니다.
 
 
 import os
@@ -148,11 +149,11 @@ class CustomImageDataset(Dataset):
 # __init__
 # ^^^^^^^^^^^^^^^^^^^^
 #
-# The __init__ function is run once when instantiating the Dataset object. We initialize
-# the directory containing the images, the annotations file, and both transforms (covered 
-# in more detail in the next section). 
+# __init__ 함수는 Dataset 객체가 생성(instantiate)될 때 한 번만 실행됩니다.
+# 여기서는 이미지와 주석 파일(annotation_file)이 포함된 디렉토리와 (다음 장에서 자세히 살펴볼) 두가지
+# 변환(transform)을 초기화합니다.
 #
-# The labels.csv file looks like: ::
+# labels.csv 파일은 다음과 같습니다: ::
 #
 #     tshirt1.jpg, 0
 #     tshirt2.jpg, 0
@@ -171,9 +172,9 @@ def __init__(self, annotations_file, img_dir, transform=None, target_transform=N
 # __len__
 # ^^^^^^^^^^^^^^^^^^^^
 #
-# The __len__ function returns the number of samples in our dataset.
+# __len__ 함수는 데이터셋의 샘플 개수를 반환합니다.
 #
-# Example:
+# 예:
 
 
 def __len__(self):
@@ -184,10 +185,9 @@ def __len__(self):
 # __getitem__
 # ^^^^^^^^^^^^^^^^^^^^
 #
-# The __getitem__ function loads and returns a sample from the dataset at the given index ``idx``. 
-# Based on the index, it identifies the image's location on disk, converts that to a tensor using ``read_image``, retrieves the 
-# corresponding label from the csv data in ``self.img_labels``, calls the transform functions on them (if applicable), and returns the 
-# tensor image and corresponding label in a Python dict.
+# __getitem__ 함수는 주어진 인덱스 ``idx`` 에 해당하는 샘플을 데이터셋에서 불러오고 반환합니다.
+# 인덱스를 기반으로, 디스크에서 이미지의 위치를 식별하고, ``read_image`` 를 사용하여 이미지를 텐서로 변환하고, ``self.img_labels`` 의 csv 데이터로부터
+# 해당하는 정답(label)을 가져오고, (해당하는 경우) 변환 함수들을 호출한 뒤, 텐서 이미지와 라벨을 Python 사전(dict)형으로 반환합니다.
 
 def __getitem__(self, idx):
     img_path = os.path.join(self.img_dir, self.img_labels.iloc[idx, 0])
@@ -207,13 +207,14 @@ def __getitem__(self, idx):
 
 
 #################################################################
-# Preparing your data for training with DataLoaders
+# DataLoader로 학습용 데이터 준비하기
 # -------------------------------------------------
-# The ``Dataset`` retrieves our dataset's features and labels one sample at a time. While training a model, we typically want to 
-# pass samples in "minibatches", reshuffle the data at every epoch to reduce model overfitting, and use Python's ``multiprocessing`` to
-# speed up data retrieval.
+# 
+# ``Dataset`` 은 데이터셋의 특징(feature)을 가져오고 하나의 샘플에 정답(label)을 지정하는 일을 한 번에 합니다.
+# 모델을 학습할 때, 일반적으로 샘플들을 "미니배치(minibatch)"로 전달하고, 매 에폭(epoch)마다 데이터를 다시 섞어서 과적합(overfit)을 막고,
+# Python의 ``multiprocessing`` 을 사용하여 데이터 검색 속도를 높이려고 합니다.
 #
-# ``DataLoader`` is an iterable that abstracts this complexity for us in an easy API.
+# ``DataLoader`` 는 간단한 API로 이러한 복잡한 과정들을 추상화한 반복 가능한 객체(iteratable)입니다.
 
 from torch.utils.data import DataLoader
 
@@ -221,15 +222,16 @@ train_dataloader = DataLoader(training_data, batch_size=64, shuffle=True)
 test_dataloader = DataLoader(test_data, batch_size=64, shuffle=True)
 
 ###########################
-# Iterate through the DataLoader
-# --------------------------
+# DataLoader를 통해 반복하기(iterate)
+# --------------------------------
 #
-# We have loaded that dataset into the ``Dataloader`` and can iterate through the dataset as needed.
-# Each iteration below returns a batch of ``train_features`` and ``train_labels``(containing ``batch_size=64`` features and labels respectively).
-# Because we specified ``shuffle=True``, after we iterate over all batches the data is shuffled (for finer-grained control over 
-# the data loading order, take a look at `Samplers <https://pytorch.org/docs/stable/data.html#data-loading-order-and-sampler>`_).
+# ``DataLoader`` 에 데이터셋을 불러온 뒤에는 필요에 따라 데이터셋을 반복(iterate)할 수 있습니다.
+# 아래의 각 반복(iteration)은 (각각 ``batch_size=64`` 의 특징(feature)과 정답(label)을 포함하는) ``train_features`` 와
+# ``train_labels`` 의 묶음(batch)을 반환합니다. ``shuffle=True`` 로 지정했으므로, 모든 배치를 반복한 뒤 데이터가 섞입니다.
+# (데이터 불러오기 순서를 보다 세밀하게(finer-grained) 제어하려면 `Samplers <https://pytorch.org/docs/stable/data.html#data-loading-order-and-sampler>`_
+# 를 살펴보세요.)
 
-# Display image and label.
+# 이미지와 정답(label)을 표시합니다.
 train_features, train_labels = next(iter(train_dataloader))
 print(f"Feature batch shape: {train_features.size()}")
 print(f"Labels batch shape: {train_labels.size()}")
@@ -244,8 +246,6 @@ print(f"Label: {label}")
 #
 
 #################################################################
-# Further Reading
+# 더 읽어보기
 # --------------
 # - `torch.utils.data API <https://pytorch.org/docs/stable/data.html>`_
-
-
