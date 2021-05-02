@@ -21,14 +21,14 @@ device = torch.device("cpu")
 
 # 입력값과 출력값을 갖는 텐서들을 생성합니다.
 # requires_grad=False가 기본값으로 설정되어 역전파 단계 중에 이 텐서들에 대한 변화도를
-# 계산할 필요가 없음을 보여줍니다.
+# 계산할 필요가 없음을 나타냅니다.
 x = torch.linspace(-math.pi, math.pi, 2000, device=device, dtype=dtype)
 y = torch.sin(x)
 
 # 가중치를 갖는 임의의 텐서를 생성합니다. 3차 다항식이므로 4개의 가중치가 필요합니다:
 # y = a + b x + c x^2 + d x^3
 # requires_grad=True로 설정하여 역전파 단계 중에 이 텐서들에 대한 변화도를 계산할 필요가 
-# 있음을 보여줍니다.
+# 있음을 나타냅니다.
 a = torch.randn((), device=device, dtype=dtype, requires_grad=True)
 b = torch.randn((), device=device, dtype=dtype, requires_grad=True)
 c = torch.randn((), device=device, dtype=dtype, requires_grad=True)

@@ -30,7 +30,7 @@ xx = x.unsqueeze(-1).pow(p)
 # nn 패키지를 사용하여 모델을 순차적 계층(sequence of layers)으로 정의합니다.
 # nn.Sequential은 다른 Module을 포함하는 Module로, 포함되는 Module들을 순차적으로 적용하여 
 # 출력을 생성합니다. 각각의 Linear Module은 선형 함수(linear function)를 사용하여 입력으로부터
-# 출력을 계산하고,  내부 Tensor에 가중치와 편향을 저장합니다.
+# 출력을 계산하고, 내부 Tensor에 가중치와 편향을 저장합니다.
 # Flatten 계층은 선형 계층의 출력을 `y` 의 shape과 맞도록(match) 1D 텐서로 폅니다(flatten).
 model = torch.nn.Sequential(
     torch.nn.Linear(3, 1),
@@ -59,8 +59,8 @@ for t in range(2000):
     model.zero_grad()
 
     # 역전파 단계: 모델의 학습 가능한 모든 매개변수에 대해 손실의 변화도를 계산합니다.
-    # 내부적으로 각 Module의 매개변수는 requires_grad=True일 때 텐서에 저장되므로, 아래 호출은 
-    # 모델의 모든 학습 가능한 매개변수의 변화도를 계산하게 됩니다.
+    # 내부적으로 각 Module의 매개변수는 requires_grad=True일 때 텐서에 저장되므로,
+    # 아래 호출은 모델의 모든 학습 가능한 매개변수의 변화도를 계산하게 됩니다.
     loss.backward()
 
     # 경사하강법을 사용하여 가중치를 갱신합니다.

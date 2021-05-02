@@ -55,7 +55,7 @@ device = torch.device("cpu")
 
 # 입력값과 출력값을 갖는 텐서들을 생성합니다.
 # requires_grad=False가 기본값으로 설정되어 역전파 단계 중에 이 텐서들에 대한 변화도를 계산할
-# 필요가 없음을 보여줍니다.
+# 필요가 없음을 나타냅니다.
 x = torch.linspace(-math.pi, math.pi, 2000, device=device, dtype=dtype)
 y = torch.sin(x)
 
@@ -63,8 +63,8 @@ y = torch.sin(x)
 # y = a + b * P3(c + d * x) 
 # 이 가중치들이 수렴(convergence)하기 위해서는 정답으로부터 너무 멀리 떨어지지 않은 값으로
 # 초기화가 되어야 합니다. 
-# requires_grad=True로 설정하여 역전파 단계 중에 이 텐서들에 대한 변화도를 계산할 필요가 있음을
-# 보여줍니다. 
+# requires_grad=True로 설정하여 역전파 단계 중에 이 텐서들에 대한 변화도를 계산할 필요가
+# 있음을 나타냅니다. 
 a = torch.full((), 0.0, device=device, dtype=dtype, requires_grad=True)
 b = torch.full((), -1.0, device=device, dtype=dtype, requires_grad=True)
 c = torch.full((), 0.0, device=device, dtype=dtype, requires_grad=True)
