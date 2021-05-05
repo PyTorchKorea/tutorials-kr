@@ -1,49 +1,50 @@
 """
-**Learn the Basics** ||
-`Quickstart <quickstart_tutorial.html>`_ || 
-`Tensors <tensorqs_tutorial.html>`_ || 
-`Datasets & DataLoaders <data_tutorial.html>`_ ||
-`Transforms <transforms_tutorial.html>`_ ||
-`Build Model <buildmodel_tutorial.html>`_ ||
+**파이토치(PyTorch) 기본 익히기** ||
+`빠른 시작 <quickstart_tutorial.html>`_ ||
+`텐서(Tensor) <tensorqs_tutorial.html>`_ ||
+`Dataset과 Dataloader <data_tutorial.html>`_ ||
+`변형(Transform) <transforms_tutorial.html>`_ ||
+`신경망 모델 구성하기 <buildmodel_tutorial.html>`_ ||
 `Autograd <autogradqs_tutorial.html>`_ ||
-`Optimization <optimization_tutorial.html>`_ ||
-`Save & Load Model <saveloadrun_tutorial.html>`_
+`최적화(Optimization) <optimization_tutorial.html>`_ ||
+`모델 저장하고 불러오기 <saveloadrun_tutorial.html>`_
 
-Learn the Basics
-===================
+파이토치(PyTorch) 기본 익히기
+==========================================================================
 
-Authors: 
+Authors:
 `Suraj Subramanian <https://github.com/suraj813>`_,
-`Seth Juarez <https://github.com/sethjuarez/>`_, 
-`Cassie Breviu <https://github.com/cassieview/>`_, 
-`Dmitry Soshnikov <https://soshnikov.com/>`_, 
-`Ari Bornstein <https://github.com/aribornstein/>`_ 
+`Seth Juarez <https://github.com/sethjuarez/>`_,
+`Cassie Breviu <https://github.com/cassieview/>`_,
+`Dmitry Soshnikov <https://soshnikov.com/>`_,
+`Ari Bornstein <https://github.com/aribornstein/>`_
 
-Most machine learning workflows involve working with data, creating models, optimizing model 
-parameters, and saving the trained models. This tutorial introduces you to a complete ML workflow 
-implemented in PyTorch, with links to learn more about each of these concepts.
+번역:
+`박정환 <https://github.com/9bow>`_
 
-We'll use the FashionMNIST dataset to train a neural network that predicts if an input image belongs 
-to one of the following classes: T-shirt/top, Trouser, Pullover, Dress, Coat, Sandal, Shirt, Sneaker, 
-Bag, or Ankle boot. 
+대부분의 머신러닝 워크플로우는 데이터 작업과 모델 생성, 모델 매개변수 최적화, 학습된 모델 저장이 포함됩니다.
+이 튜토리얼에서는 이러한 개념들에 대해 더 자세히 알아볼 수 있는 바로가기와 함께 PyTorch로 구현된 전체 ML 워크플로우를 소개합니다.
 
-`This tutorial assumes a basic familiarity with Python and Deep Learning concepts.`
+FashionMNIST 데이터셋을 사용하여 입력 이미지가 다음 분류(class) 중 하나에 속하는지를 예측하는 신경망을 학습합니다:
+T-shirt/top, Trouser, Pullover, Dress, Coat, Sandal, Shirt, Sneaker, Bag, or Ankle boot.
 
-
-Running the Tutorial Code
-------------------
-You can run this tutorial in a couple of ways:
-
-- **In the cloud**: This is the easiest way to get started! Each section has a Colab link at the top, which opens a notebook with the code in a fully-hosted environment. Pro tip: Use Colab with a GPU runtime to speed up operations *Runtime > Change runtime type > GPU*
-- **Locally**: This option requires you to setup PyTorch and TorchVision first on your local machine (`installation instructions <https://pytorch.org/get-started/locally/>`_). Download the notebook or copy the code into your favorite IDE.
+`이 튜토리얼은 Python과 딥러닝 개념에 대해 기본적인 지식이 있다고 가정합니다.`
 
 
-How to Use this Guide
------------------ 
-If you're familiar with other deep learning frameworks, check out the `0. Quickstart <quickstart_tutorial.html>`_ first
-to quickly familiarize yourself with PyTorch's API.
+튜토리얼 코드 실행하기
+------------------------------------------------------------------------------------------
 
-If you're new to deep learning frameworks, head right into the first section of our step-by-step guide: `1. Tensors <tensor_tutorial.html>`_.
+다음의 두 가지 방법으로 이 튜토리얼을 실행해볼 수 있습니다:
+
+- **클라우드**: 시작하기 가장 쉬운 방법입니다! 각 섹션에는 Colab 링크가 있으며, 이 링크는 완전히 호스팅되는 환경에서 코드가 있는 노트북을 엽니다. 전문가 팁: Colab을 GPU 런타임으로 사용하면 연산들이 빨라집니다 *Runtime > Change runtime type > GPU*
+- **로컬**: 먼저 로컬 컴퓨터에 PyTorch와 TorchVision을 설치해야 합니다 (`설치 방법 <https://pytorch.org/get-started/locally/>`_). 노트북을 내려받거나 코드를 원하는 IDE에 복사하세요.
+
+
+튜토리얼 사용 방법
+------------------------------------------------------------------------------------------
+다른 딥러닝 프레임워크에 익숙하다면, `0. 빠른 시작 <quickstart_tutorial.html>`_ 을 보고 PyTorch의 API들을 빠르게 익히세요.
+
+딥러닝 프레임워크가 처음이라면, 단계별(step-by-step) 가이드의 첫번째인 `1. 텐서(Tensor) <tensor_tutorial.html>`_ 로 이동하세요.
 
 
 .. include:: /beginner_source/basics/qs_toc.txt

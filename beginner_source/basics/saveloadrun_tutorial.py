@@ -1,18 +1,18 @@
 """
-`Learn the Basics <intro.html>`_ ||
-`Quickstart <quickstart_tutorial.html>`_ || 
-`Tensors <tensorqs_tutorial.html>`_ || 
-`Datasets & DataLoaders <data_tutorial.html>`_ ||
-`Transforms <transforms_tutorial.html>`_ ||
-`Build Model <buildmodel_tutorial.html>`_ ||
+`파이토치(PyTorch) 기본 익히기 <intro.html>`_ ||
+`빠른 시작 <quickstart_tutorial.html>`_ ||
+`텐서(Tensor) <tensorqs_tutorial.html>`_ ||
+`Dataset과 Dataloader <data_tutorial.html>`_ ||
+`변형(Transform) <transforms_tutorial.html>`_ ||
+`신경망 모델 구성하기 <buildmodel_tutorial.html>`_ ||
 `Autograd <autogradqs_tutorial.html>`_ ||
-`Optimization <optimization_tutorial.html>`_ ||
-**Save & Load Model**
+`최적화(Optimization) <optimization_tutorial.html>`_ ||
+**모델 저장하고 불러오기**
 
-Save and Load the Model
-============================
+모델 저장하고 불러오기
+==========================================================================
 
-In this section we will look at how to persist model state with saving, loading and running model predictions.
+이번 장에서는 저장하기나 불러오기를 통해 모델의 상태를 유지(persist)하고 모델의 예측을 실행하는 방법을 알아보겠습니다.
 """
 
 import torch
@@ -21,63 +21,60 @@ import torchvision.models as models
 
 
 #######################################################################
-# Saving and Loading Model Weights
-# --------------------------------
-# PyTorch models store the learned parameters in an internal
-# state dictionary, called ``state_dict``. These can be persisted via the ``torch.save``
-# method:
+# 모델 가중치 저장하고 불러오기
+# ------------------------------------------------------------------------------------------
+#
+# PyTorch 모델은 학습한 매개변수를 ``state_dict``\ 라고 불리는 내부 상태 사전(internal state dictionary)에 저장합니다.
+# 이 상태 값들은 ``torch.save`` 메소드를 사용하여 저장(persist)할 수 있습니다:
 
 model = models.vgg16(pretrained=True)
 torch.save(model.state_dict(), 'model_weights.pth')
 
 ##########################
-# To load model weights, you need to create an instance of the same model first, and then load the parameters 
-# using ``load_state_dict()`` method.
+# 모델 가중치를 불러오기 위해서는, 먼저 동일한 모델의 인스턴스(instance)를 생성한 다음에 ``load_state_dict()`` 메소드를 사용하여
+# 매개변수들을 불러옵니다.
 
-model = models.vgg16() # we do not specify pretrained=True, i.e. do not load default weights
+model = models.vgg16() # 기본 가중치를 불러오지 않으므로 pretrained=True를 지정하지 않습니다.
 model.load_state_dict(torch.load('model_weights.pth'))
 model.eval()
 
 ###########################
-# .. note:: be sure to call ``model.eval()`` method before inferencing to set the dropout and batch normalization layers to evaluation mode. Failing to do this will yield inconsistent inference results.
+# .. note:: 추론(inference)을 하기 전에 ``model.eval()`` 메소드를 호출하여 드롭아웃(dropout)과 배치 정규화(batch normalization)를 평가 모드(evaluation mode)로 설정해야 합니다. 그렇지 않으면 일관성 없는 추론 결과가 생성됩니다.
 
 #######################################################################
-# Saving and Loading Models with Shapes
-# -------------------------------------
-# When loading model weights, we needed to instantiate the model class first, because the class 
-# defines the structure of a network. We might want to save the structure of this class together with 
-# the model, in which case we can pass ``model`` (and not ``model.state_dict()``) to the saving function:
+# 모델의 형태를 포함하여 저장하고 불러오기
+# ------------------------------------------------------------------------------------------
+#
+# 모델의 가중치를 불러올 때, 신경망의 구조를 정의하기 위해 모델 클래스를 먼저 생성(instantiate)해야 했습니다.
+# 이 클래스의 구조를 모델과 함께 저장하고 싶으면, (``model.state_dict()``\ 가 아닌) ``model`` 을 저장 함수에
+# 전달합니다:
 
 torch.save(model, 'model.pth')
 
 ########################
-# We can then load the model like this:
+# 다음과 같이 모델을 불러올 수 있습니다:
 
 model = torch.load('model.pth')
 
 ########################
-# .. note:: This approach uses Python `pickle <https://docs.python.org/3/library/pickle.html>`_ module when serializing the model, thus it relies on the actual class definition to be available when loading the model.
+# .. note:: 이 접근 방식은 Python `pickle <https://docs.python.org/3/library/pickle.html>`_ 모듈을 사용하여 모델을 직렬화(serialize)하므로, 모델을 불러올 때 실제 클래스 정의(definition)를 적용(rely on)합니다.
 
 #######################################################################
-# Exporting Model to ONNX
-# -----------------------
-# PyTorch also has native ONNX export support. Given the dynamic nature of the
-# PyTorch execution graph, however, the export process must
-# traverse the execution graph to produce a persisted ONNX model. For this reason, a
-# test variable of the appropriate size should be passed in to the
-# export routine (in our case, we will create a dummy zero tensor of the correct size):
+# 모델을 ONNX로 내보내기
+# ------------------------------------------------------------------------------------------
+#
+# PyTorch는 기본(native) ONNX 내보내기를 지원합니다. 그러나 PyTorch 실행 그래프의 동적 특성(dynamic nature) 때문에,
+# 내보내는 과정에 ONNX 모델을 생성하기 위해 실행 그래프를 탐색(traverse)해야 합니다.
+# 이러한 이유 때문에 내보내기 단계에서는 적절한 크기의 테스트 변수를 전달해야 합니다. (아래 예시에서는 올바른 크기의 가짜(dummy) 0 텐서를 생성합니다):
 
 input_image = torch.zeros((1,3,224,224))
 onnx.export(model, input_image, 'model.onnx')
 
 ###########################
-# There are a lot of things you can do with ONNX model, including running inference on different platforms 
-# and in different programming languages. For more details, we recommend 
-# visiting `ONNX tutorial <https://github.com/onnx/tutorials>`_.
+# 다양한 플랫폼 및 다양한 언어에서의 추론과 같은, ONNX 모델로 할 수 있는 다양한 일들이 있습니다.
+# 더 자세한 내용은 `ONNX 튜토리얼 <https://github.com/onnx/tutorials>`_\ 을 참조하세요.
 #
-# Congratulations! You have completed the PyTorch beginner tutorial! Try 
-# `revisting the first page <quickstart_tutorial.html>`_ to see the tutorial in its entirety
-# again. We hope this tutorial has helped you get started with deep learning on PyTorch. 
-# Good luck!
+# 축하합니다! 이제 PyTorch 기본 튜토리얼을 마쳤습니다.
+# `첫 페이지를 다시 방문하여 <quickstart_tutorial.html>`_ 전체 내용들을 다시 한 번 살펴보세요.
+# 이 튜토리얼이 PyTorch로 딥러닝을 시작하는데 도움이 되었길 바랍니다. 행운을 빕니다!
 #
-
