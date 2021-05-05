@@ -524,6 +524,7 @@ MRPC 데이터셋을 평가하는데 약 46초가 소요됐습니다.
 양자화된 모델을 불러올 때는 `torch.jit.load` 를 사용합니다.
 
 .. code:: python
+
     loaded_quantized_model = torch.jit.load("bert_traced_eager_quant.pt")
 
 

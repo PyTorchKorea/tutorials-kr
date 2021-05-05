@@ -1,11 +1,11 @@
-예제로 배우는 파이토치(PYTORCH)
-******************************
+예제로 배우는 파이토치(PyTorch)
+************************************
 **Author**: `Justin Johnson <https://github.com/jcjohnson/pytorch-examples>`_
 **번역**: `박정환 <https://github.com/9bow>`_
 
 .. Note::
-    이 튜토리얼은 다소 오래된 PyTorch 튜토리얼입니다. 
-    `기본 다지기 <https://tutorials.pytorch.kr/beginner/basics/intro.html>`_ 에서 
+    이 튜토리얼은 다소 오래된 PyTorch 튜토리얼입니다.
+    `기본 다지기 <https://tutorials.pytorch.kr/beginner/basics/intro.html>`_ 에서
     입문자를 위한 최신의 내용을 보실 수 있습니다.
 
 이 튜토리얼에서는 `PyTorch <https://github.com/pytorch/pytorch>`__ 의 핵심적인 개념을
@@ -30,28 +30,28 @@
 =============
 
 준비 운동: numpy
---------------
+-------------------------------------------------------------------------------
 
 PyTorch를 소개하기 전에, 먼저 NumPy를 사용하여 신경망을 구성해보겠습니다.
 
-NumPy는 n-차원 배열 객체와 이러한 배열들을 조작하기 위한 다양한 함수들을 제공합니다. NumPy는 과학 분야의 
-연산을 위한 포괄적인 프레임워크(generic framework)입니다; 
-NumPy는 연산 그래프(computation graph)나 딥러닝, 변화도(gradient)에 대해서는 알지 못합니다. 
-하지만 NumPy 연산을 사용하여 신경망의 순전파 단계와 역전파 단계를 직접 구현함으로써, 
+NumPy는 n-차원 배열 객체와 이러한 배열들을 조작하기 위한 다양한 함수들을 제공합니다. NumPy는 과학 분야의
+연산을 위한 포괄적인 프레임워크(generic framework)입니다;
+NumPy는 연산 그래프(computation graph)나 딥러닝, 변화도(gradient)에 대해서는 알지 못합니다.
+하지만 NumPy 연산을 사용하여 신경망의 순전파 단계와 역전파 단계를 직접 구현함으로써,
 3차 다항식이 사인(sine) 함수에 근사하도록 만들 수 있습니다:
 
 .. includenodoc:: /beginner/examples_tensor/polynomial_numpy.py
 
 
 파이토치(PyTorch): 텐서(Tensor)
-------------------------------
+-------------------------------------------------------------------------------
 
-NumPy는 훌륭한 프레임워크지만, GPU를 사용하여 수치 연산을 가속화할 수는 없습니다. 
-현대의 심층 신경망에서 GPU는 종종 `50배 또는 그 이상 <https://github.com/jcjohnson/cnn-benchmarks>`__ 의 
+NumPy는 훌륭한 프레임워크지만, GPU를 사용하여 수치 연산을 가속화할 수는 없습니다.
+현대의 심층 신경망에서 GPU는 종종 `50배 또는 그 이상 <https://github.com/jcjohnson/cnn-benchmarks>`__ 의
 속도 향상을 제공하기 때문에, 안타깝게도 NumPy는 현대의 딥러닝에는 충분치 않습니다.
 
 이번에는 PyTorch의 가장 핵심적인 개념인 **텐서(Tensor)** 에 대해서 알아보겠습니다.
-PyTorch 텐서(Tensor)는 개념적으로 NumPy 배열과 동일합니다: 
+PyTorch 텐서(Tensor)는 개념적으로 NumPy 배열과 동일합니다:
 텐서(Tensor)는 n-차원 배열이며, PyTorch는 이러한 텐서들의 연산을 위한 다양한 기능들을 제공합니다.
 NumPy 배열처럼 PyTorch Tensor는 딥러닝이나 연산 그래프, 변화도는 알지 못하며, 과학적 분야의 연산을 위한 포괄적인 도구입니다.
 텐서는 연산 그래프와 변화도를 추적할 수도 있지만, 과학적 연산을 위한 일반적인 도구로도 유용합니다.
@@ -69,16 +69,16 @@ Autograd
 =========
 
 PyTorch: 텐서(Tensor)와 autograd
--------------------------------
+-------------------------------------------------------------------------------
 
-위의 예제들에서는 신경망의 순전파 단계와 역전파 단계를 직접 구현해보았습니다. 
-작은 2계층(2-layer) 신경망에서는 역전파 단계를 직접 구현하는 것이 큰일이 아니지만, 
+위의 예제들에서는 신경망의 순전파 단계와 역전파 단계를 직접 구현해보았습니다.
+작은 2계층(2-layer) 신경망에서는 역전파 단계를 직접 구현하는 것이 큰일이 아니지만,
 복잡한 대규모 신경망에서는 매우 아슬아슬한 일일 것입니다.
 
 다행히도, `자동 미분 <https://en.wikipedia.org/wiki/Automatic_differentiation>`__ 을
-사용하여 신경망의 역전파 단계 연산을 자동화할 수 있습니다. PyTorch의 **autograd** 패키지는 정확히 
-이런 기능을 제공합니다. Autograd를 사용하면, 신경망의 순전파 단계에서 **연산 그래프(computational graph)** 
-를 정의하게 됩니다; 이 그래프의 노드(node)는 텐서(tensor)이고, 엣지(edge)는 입력 텐서로부터 출력 텐서를 
+사용하여 신경망의 역전파 단계 연산을 자동화할 수 있습니다. PyTorch의 **autograd** 패키지는 정확히
+이런 기능을 제공합니다. Autograd를 사용하면, 신경망의 순전파 단계에서 **연산 그래프(computational graph)**
+를 정의하게 됩니다; 이 그래프의 노드(node)는 텐서(tensor)이고, 엣지(edge)는 입력 텐서로부터 출력 텐서를
 만들어내는 함수가 됩니다. 이 그래프를 통해 역전파를 하게 되면 변화도를 쉽게 계산할 수 있습니다.
 
 이는 복잡하게 들리겠지만, 실제로 사용하는 것은 매우 간단합니다. 각 텐서는 연산그래프에서 노드로 표현됩니다.
@@ -91,15 +91,15 @@ PyTorch: 텐서(Tensor)와 autograd
 .. includenodoc:: /beginner/examples_autograd/polynomial_autograd.py
 
 PyTorch: 새 autograd Function 정의하기
-----------------------------------------
+-------------------------------------------------------------------------------
 
 내부적으로, autograd의 기본(primitive) 연산자는 실제로 텐서를 조작하는 2개의 함수입니다.
-**forward** 함수는 입력 텐서로부터 출력 텐서를 계산합니다. 
+**forward** 함수는 입력 텐서로부터 출력 텐서를 계산합니다.
 **backward** 함수는 어떤 스칼라 값에 대한 출력 텐서의 변화도(gradient)를 전달받고,
 동일한 스칼라 값에 대한 입력 텐서의 변화도를 계산합니다.
 
-PyTorch에서 ``torch.autograd.Function`` 의 하위클래스(subclass)를 정의하고 
-``forward`` 와 ``backward`` 함수를 구현함으로써 사용자 정의 autograd 연산자를 손쉽게 
+PyTorch에서 ``torch.autograd.Function`` 의 하위클래스(subclass)를 정의하고
+``forward`` 와 ``backward`` 함수를 구현함으로써 사용자 정의 autograd 연산자를 손쉽게
 정의할 수 있습니다. 그 후, 인스턴스(instance)를 생성하고 이를 함수처럼 호출하고,
 입력 데이터를 갖는 텐서를 전달하는 식으로 새로운 autograd 연산자를 사용할 수 있습니다.
 
@@ -114,10 +114,10 @@ PyTorch에서 ``torch.autograd.Function`` 의 하위클래스(subclass)를 정�
 .. includenodoc:: /beginner/examples_autograd/polynomial_custom_function.py
 
 `nn` 모듈
-===========
+======================
 
 PyTorch: nn
------------
+-------------------------------------------------------------------------------
 
 연산 그래프와 autograd는 복잡한 연산자를 정의하고 도함수(derivative)를 자동으로 계산하는
 매우 강력한 패러다임(paradigm)입니다; 하지만 대규모 신경망에서는 autograd 그 자체만으로는 너무
@@ -126,7 +126,7 @@ PyTorch: nn
 신경망을 구성하는 것을 종종 연산을 **계층(layer)** 에 배열(arrange)하는 것으로 생각하는데,
 이 중 일부는 학습 도중 최적화가 될 **학습 가능한 매개변수** 를 갖고 있습니다.
 
-텐서플로우(Tensorflow)에서는, `Keras <https://github.com/fchollet/keras>`__ 와 
+텐서플로우(Tensorflow)에서는, `Keras <https://github.com/fchollet/keras>`__ 와
 `TensorFlow-Slim <https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/slim>`__,
 `TFLearn <http://tflearn.org/>`__ 같은 패키지들이 연산 그래프를 고수준(high-level)으로 추상화(abstraction)하여
 제공하므로 신경망을 구축하는데 유용합니다.
@@ -142,7 +142,7 @@ PyTorch: nn
 .. includenodoc:: /beginner/examples_nn/polynomial_nn.py
 
 PyTorch: optim
----------------
+-------------------------------------------------------------------------------
 
 지금까지는 ``torch.no_grad()`` 로 학습 가능한 매개변수를 갖는 텐서들을 직접 조작하여 모델의 가중치(weight)를 갱신하였습니다.
 이것은 확률적 경사하강법(SGD; stochastic gradient descent)와 같은 간단한 최적화 알고리즘에서는 크게 부담이 되지 않지만,
@@ -157,7 +157,7 @@ RMSProp 알고리즘을 사용하겠습니다:
 .. includenodoc:: /beginner/examples_nn/polynomial_optim.py
 
 PyTorch: 사용자 정의 nn.Module
------------------------------
+-------------------------------------------------------------------------------
 
 때대로 기존 Module의 구성(sequence)보다 더 복잡한 모델을 구성해야 할 때가 있습니다;
 이러한 경우에는 ``nn.Module`` 의 하위 클래스(subclass)로 새로운 Module을 정의하고,
@@ -168,9 +168,9 @@ PyTorch: 사용자 정의 nn.Module
 .. includenodoc:: /beginner/examples_nn/polynomial_module.py
 
 PyTorch: 제어 흐름(Control Flow) + 가중치 공유(Weight Sharing)
------------------------------------------------------------
+-------------------------------------------------------------------------------
 
-동적 그래프와 가중치 공유의 예를 보이기 위해, 매우 이상한 모델을 구현해보겠습니다: 
+동적 그래프와 가중치 공유의 예를 보이기 위해, 매우 이상한 모델을 구현해보겠습니다:
 각 순전파 단계에서 3 ~ 5 사이의 임의의 숫자(random number)를 선택하여 다차항들에서 사용하고,
 동일한 가중치를 여러번 재사용하여 4차항과 5차항을 계산합니다.
 
@@ -185,12 +185,12 @@ PyTorch: 제어 흐름(Control Flow) + 가중치 공유(Weight Sharing)
 .. _examples-download:
 
 예제 코드
-========
+=============
 
 위의 예제들을 여기서 찾아볼 수 있습니다.
 
 Tensors
--------
+-------------------------------------------------------------------------------
 
 .. toctree::
    :maxdepth: 2
@@ -208,7 +208,7 @@ Tensors
     <div style='clear:both'></div>
 
 Autograd
---------
+-------------------------------------------------------------------------------
 
 .. toctree::
    :maxdepth: 2
@@ -227,7 +227,7 @@ Autograd
     <div style='clear:both'></div>
 
 `nn` module
------------
+-------------------------------------------------------------------------------
 
 .. toctree::
    :maxdepth: 2

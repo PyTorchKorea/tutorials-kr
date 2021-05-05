@@ -72,7 +72,7 @@ print(f"Zeros Tensor: \n {zeros_tensor}")
 
 ######################################################################
 # 텐서의 속성(Attribute)
-# ~~~~~~~~~~~~~~~~~~~~
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 # 텐서의 속성은 텐서의 모양(shape), 자료형(datatype) 및 어느 장치에 저장되는지를 나타냅니다.
 
@@ -90,10 +90,10 @@ print(f"Device tensor is stored on: {tensor.device}")
 
 ######################################################################
 # 텐서 연산(Operation)
-# ~~~~~~~~~~~~~~~~~~
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-# 전치(transposing), 인덱싱(indexing), 슬라이싱(slicing), 수학 계산, 선형 대수, 
-# 임의 샘플링(random sampling) 등, 100가지 이상의 텐서 연산들을 
+# 전치(transposing), 인덱싱(indexing), 슬라이싱(slicing), 수학 계산, 선형 대수,
+# 임의 샘플링(random sampling) 등, 100가지 이상의 텐서 연산들을
 # `여기 <https://pytorch.org/docs/stable/torch.html>`__ 에서 확인할 수 있습니다.
 #
 # 각 연산들은 (일반적으로 CPU보다 빠른) GPU에서 실행할 수 있습니다. Colab을 사용한다면,
@@ -106,7 +106,7 @@ if torch.cuda.is_available():
 
 
 ######################################################################
-# 
+#
 # 목록에서 몇몇 연산들을 시도해보세요.
 # NumPy API에 익숙하다면 Tensor API를 사용하는 것은 식은 죽 먹기라는 것을 알게 되실 겁니다.
 #
@@ -120,7 +120,7 @@ print(tensor)
 
 ######################################################################
 # **텐서 합치기** ``torch.cat`` 을 사용하여 주어진 차원에 따라 일련의 텐서를 연결할 수 있습니다.
-# ``torch.cat`` 과 미묘하게 다른 또 다른 텐서 결합 연산인 `torch.stack <https://pytorch.org/docs/stable/generated/torch.stack.html>`__ 
+# ``torch.cat`` 과 미묘하게 다른 또 다른 텐서 결합 연산인 `torch.stack <https://pytorch.org/docs/stable/generated/torch.stack.html>`__
 # 도 참고해보세요.
 t1 = torch.cat([tensor, tensor, tensor], dim=1)
 print(t1)
@@ -163,7 +163,7 @@ print(tensor)
 # .. _bridge-to-np-label:
 #
 # NumPy 변환(Bridge)
-# ~~~~~~~~~~~~~~~~~
+# ~~~~~~~~~~~~~~~~~~~~~~~~
 # CPU 상의 텐서와 NumPy 배열은 메모리 공간을 공유하기 때문에, 하나를 변경하면 다른 하나도 변경됩니다.
 
 

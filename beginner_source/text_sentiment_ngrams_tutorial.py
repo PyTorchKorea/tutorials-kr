@@ -1,6 +1,7 @@
 """
 torchtext 라이브러리로 텍스트 분류하기
-========================================
+===============================================
+
 **번역**: `김강민 <https://github.com/gangsss>`_ , `김진현 <https://github.com/lewhe0>`_
 
 이 튜토리얼에서는 torchtext 라이브러리를 사용하여 어떻게 텍스트 분류 분석을 위한 데이터셋을 만드는지를 살펴보겠습니다.
@@ -55,7 +56,6 @@ train_iter = AG_NEWS(split='train')
 # 사용자는 Vocab 클래스의 생성자에 인자를 설정하여 사용자 정의된 어휘집(customized vocab)을 만들 수 있습니다.
 # 토큰(token)들의 최소 빈도 ``min_freq`` 에 대한 예시는 아래와 같습니다.
 
-"""
 
 from torchtext.data.utils import get_tokenizer
 from collections import Counter
@@ -308,6 +308,8 @@ for epoch in range(1, EPOCHS + 1):
 ######################################################################
 # 이 모델을 GPU 상에서 수행하고 다음과 같은 결과를 얻었습니다:
 #
+# ::
+#
 #        | epoch   1 |   500/ 1782 batches | accuracy    0.684
 #        | epoch   1 |  1000/ 1782 batches | accuracy    0.852
 #        | epoch   1 |  1500/ 1782 batches | accuracy    0.877
@@ -372,7 +374,7 @@ for epoch in range(1, EPOCHS + 1):
 
 ######################################################################
 # 평가 데이터로 모델 평가하기
-# ---------------------------
+# -------------------------------
 #
 
 
