@@ -9,21 +9,18 @@
 `Optimization <optimization_tutorial.html>`_ ||
 `Save & Load Model <saveloadrun_tutorial.html>`_
 
-Automatic Differentiation with ``torch.autograd``
+``torch.autograd``\ 를 통한 자동 미분
 =======================================
 
-When training neural networks, the most frequently used algorithm is
-**back propagation**. In this algorithm, parameters (model weights) are
-adjusted according to the **gradient** of the loss function with respect
-to the given parameter.
+신경망을 학습할 때 가장 자주 사용되는 알고리즘은 **역전파**\ 입니다. 이 알고리즘에서,
+매개변수(모델 가중치)는 주어진 매개변수에 대한 손실 함수의 **변화도(gradient)**\ 에
+따라 조정됩니다.
 
-To compute those gradients, PyTorch has a built-in differentiation engine
-called ``torch.autograd``. It supports automatic computation of gradient for any
-computational graph.
+이러한 변화도를 계산하기 위해 PyTorch에는 ``torch.autograd``\ 라고 불리는 자동 미분 엔진이
+내장되어 있습니다. 이는 모든 계산 그래프에 대한 변화도의 자동 계산을 지원합니다.
 
-Consider the simplest one-layer neural network, with input ``x``,
-parameters ``w`` and ``b``, and some loss function. It can be defined in
-PyTorch in the following manner:
+입력 ``x``, 매개변수 ``w``\ 와 ``b`` , 그리고 일부 손실 함수가 있는 가장 간단한 단일 계층
+신경망을 가정하겠습니다. PyTorch에서는 다음과 같이 정의할 수 있습니다:
 """
 
 import torch
@@ -37,47 +34,43 @@ loss = torch.nn.functional.binary_cross_entropy_with_logits(z, y)
 
 
 ######################################################################
-# Tensors, Functions and Computational graph
-# ------------------------------------------
+# Tensor, Function과 연산그래프(Computational graph)
+# ---------------------------------------------------
 #
-# This code defines the following **computational graph**:
+# 이 코드는 다음의 **연산 그래프** 를 정의합니다:
 #
 # .. figure:: /_static/img/basics/comp-graph.png
 #    :alt:
 #
-# In this network, ``w`` and ``b`` are **parameters**, which we need to
-# optimize. Thus, we need to be able to compute the gradients of loss
-# function with respect to those variables. In orded to do that, we set
-# the ``requires_grad`` property of those tensors.
+# 이 신경망에서, ``w``\ 와 ``b``\ 는 최적화를 해야 하는 **매개변수**\ 입니다. 따라서
+# 이러한 변수들에 대한 손실 함수의 변화도를 계산할 수 있어야 합니다. 이를 위해서 해당 텐서에
+# ``requires_grad`` 속성을 설정합니다.
 
 #######################################################################
-# .. note:: You can set the value of ``requires_grad`` when creating a
-#           tensor, or later by using ``x.requires_grad_(True)`` method.
+# .. note:: ``requires_grad``\ 의 값은 텐서를 생성할 때 설정하거나, 나중에
+#           ``x.requires_grad_(True)`` 메소드를 사용하여 나중에 설정할 수도 있습니다.
 
 #######################################################################
-# A function that we apply to tensors to construct computational graph is
-# in fact an object of class ``Function``. This object knows how to
-# compute the function in the *forward* direction, and also how to compute
-# it's derivative during the *backward propagation* step. A reference to
-# the backward propagation function is stored in ``grad_fn`` property of a
-# tensor. You can find more information of ``Function`` `in the
-# documentation <https://pytorch.org/docs/stable/autograd.html#function>`__.
+# 연산 그래프를 구성하기 위해 텐서에 적용하는 함수는 사실 ``Function`` 클래스의 객체입니다.
+# 이 객체는 *순전파* 방향으로 함수를 계산하는 방법과, *역방향 전파* 단계에서 미분을 계산하는
+# 방법을 알고 있습니다. 역방향 전파 함수에 대한 참조(reference)는 텐서의 ``grad_fn``
+# 속성에 저장됩니다. ``Function``\ 에 대한 자세한 정보는 
+# `이 문서 <https://pytorch.org/docs/stable/autograd.html#function>`__
+# 에서 찾아볼 수 있습니다.
 #
 
-print('Gradient function for z =',z.grad_fn)
+print('Gradient function for z =', z.grad_fn)
 print('Gradient function for loss =', loss.grad_fn)
 
 ######################################################################
-# Computing Gradients
-# -------------------
+# 변화도(Gradient) 계산하기
+# -------------------------
 #
-# To optimize weights of parameters in the neural network, we need to
-# compute the derivatives of our loss function with respect to parameters,
-# namely, we need :math:`\frac{\partial loss}{\partial w}` and
-# :math:`\frac{\partial loss}{\partial b}` under some fixed values of
-# ``x`` and ``y``. To compute those derivatives, we call
-# ``loss.backward()``, and then retrieve the values from ``w.grad`` and
-# ``b.grad``:
+# 신경망에서 매개변수의 가중치를 최적화하려면 매개변수에 대한 손실함수의 도함수(derivative)를
+# 계산해야 합니다. 즉, ``x``\ 와 ``y``\ 의 일부 고정값에서 :math:`\frac{\partial loss}{\partial w}`\ 와
+# :math:`\frac{\partial loss}{\partial b}` 가 필요합니다.
+# 이러한 도함수를 계산하기 위해, ``loss.backward()`` 를 호출한 다음 ``w.grad``\ 와 
+# ``b.grad``\ 에서 값을 가져옵니다:
 #
 
 loss.backward()
@@ -87,28 +80,23 @@ print(b.grad)
 
 ######################################################################
 # .. note::
-#   - We can only obtain the ``grad`` properties for the leaf
-#     nodes of the computational graph, which have ``requires_grad`` property
-#     set to ``True``. For all other nodes in our graph, gradients will not be
-#     available.
-#   - We can only perform gradient calculations using
-#     ``backward`` once on a given graph, for performance reasons. If we need
-#     to do several ``backward`` calls on the same graph, we need to pass
-#     ``retain_graph=True`` to the ``backward`` call.
+#   - 연산 그래프의 잎(leaf) 노드들 중 ``requires_grad`` 속성이 ``True``\ 로 설정된 
+#     노드들의 ``grad`` 속성만 구할 수 있습니다. 그래프의 다른 모든 노드에서는 변화도가
+#     유효하지 않습니다.
+#   - 성능 상의 이유로, 주어진 그래프에서의 ``backward``\ 를 사용한 변화도 계산은 한 번만
+#     수행할 수 있습니다. 만약 동일한 그래프에서 여러번의 ``backward`` 호출이 필요하면,
+#     ``backward`` 호출 시에 ``retrain_graph=True``\ 를 전달해야 합니다.
 #
 
 
 ######################################################################
-# Disabling Gradient Tracking
+# 변화도 추적 멈추기
 # ---------------------------
 #
-# By default, all tensors with ``requires_grad=True`` are tracking their
-# computational history and support gradient computation. However, there
-# are some cases when we do not need to do that, for example, when we have
-# trained the model and just want to apply it to some input data, i.e. we
-# only want to do *forward* computations through the network. We can stop
-# tracking computations by surrounding our computation code with
-# ``torch.no_grad()`` block:
+# 기본적으로, ``requires_grad=True``\ 인 모든 텐서들은 연산 기록을 추적하고 변화도 계산을
+# 지원합니다. 그러나 모델을 학습한 뒤 입력 데이터를 단순히 적용하기만 하는 경우와 같이 *순전파*
+# 연산만 필요한 경우에는, 이러한 추적이나 지원이 필요없을 수 있습니다.
+# 연산 코드를 ``torch.no_grad()`` 블록으로 둘러싸서 연산 추적을 멈출 수 있습니다:
 #
 
 z = torch.matmul(x, w)+b
@@ -120,8 +108,7 @@ print(z.requires_grad)
 
 
 ######################################################################
-# Another way to achieve the same result is to use the ``detach()`` method
-# on the tensor:
+# 동일한 결과를 얻는 다른 방법은 텐서에 ``detach()`` 메소드를 사용하는 것입니다:
 #
 
 z = torch.matmul(x, w)+b
@@ -129,62 +116,56 @@ z_det = z.detach()
 print(z_det.requires_grad)
 
 ######################################################################
-# There are reasons you might want to disable gradient tracking:
-#   - To mark some parameters in your neural network at **frozen parameters**. This is
-#     a very common scenario for
-#     `finetuning a pretrained network <https://tutorials.pytorch.kr/beginner/finetuning_torchvision_models_tutorial.html>`__
-#   - To **speed up computations** when you are only doing forward pass, because computations on tensors that do
-#     not track gradients would be more efficient.
+# 변화도 추적을 멈춰야 하는 이유들은 다음과 같습니다:
+#   - 신경망의 일부 매개변수를 **고정된 매개변수(frozen parameter)**\ 로 표시합니다. 이는
+#     `사전 학습된 신경망을 미세조정 <https://tutorials.pytorch.kr/beginner/finetuning_torchvision_models_tutorial.html>`__
+#     할 때 매우 일반적인 시나리오입니다.
+#   - 변화도를 추적하지 않는 텐서의 연산이 더 효율적이기 때문에, 순전파 단계만 수행할 때
+#     **연산 속도가 향상됩니다.**
 
 
 ######################################################################
 
 ######################################################################
-# More on Computational Graphs
+# 연산 그래프에 대한 추가 정보
 # ----------------------------
-# Conceptually, autograd keeps a record of data (tensors) and all executed
-# operations (along with the resulting new tensors) in a directed acyclic
-# graph (DAG) consisting of
-# `Function <https://pytorch.org/docs/stable/autograd.html#torch.autograd.Function>`__
-# objects. In this DAG, leaves are the input tensors, roots are the output
-# tensors. By tracing this graph from roots to leaves, you can
-# automatically compute the gradients using the chain rule.
+# 
+# 개념적으로, autograd는 데이터(텐서)의 및 실행된 모든 연산들(및 연산 결과가 새로운 텐서인 경우도 포함하여)의
+# 기록을 `Function <https://pytorch.org/docs/stable/autograd.html#torch.autograd.Function>`__ 객체로
+# 구성된 방향성 비순환 그래프(DAG; Directed Acyclic Graph)에 저장(keep)합니다.
+# 이 방향성 비순환 그래프(DAG)의 잎(leave)은 입력 텐서이고, 뿌리(root)는 결과 텐서입니다.
+# 이 그래프를 뿌리에서부터 잎까지 추적하면 연쇄 법칙(chain rule)에 따라 변화도를 자동으로 계산할 수 있습니다.
 #
-# In a forward pass, autograd does two things simultaneously:
+# 순전파 단계에서, autograd는 다음 두 가지 작업을 동시에 수행합니다:
 #
-# - run the requested operation to compute a resulting tensor
-# - maintain the operation’s *gradient function* in the DAG.
+# - 요청된 연산을 수행하여 결과 텐서를 계산하고,
+# - DAG에 연산의 *변화도 기능(gradient function)* 를 유지(maintain)합니다.
 #
-# The backward pass kicks off when ``.backward()`` is called on the DAG
-# root. ``autograd`` then:
+# 역전파 단계는 DAG 뿌리(root)에서 ``.backward()`` 가 호출될 때 시작됩니다. ``autograd``\ 는 이 때:
 #
-# - computes the gradients from each ``.grad_fn``,
-# - accumulates them in the respective tensor’s ``.grad`` attribute
-# - using the chain rule, propagates all the way to the leaf tensors.
+# - 각 ``.grad_fn`` 으로부터 변화도를 계산하고,
+# - 각 텐서의 ``.grad`` 속성에 계산 결과를 쌓고(accumulate),
+# - 연쇄 법칙을 사용하여, 모든 잎(leaf) 텐서들까지 전파(propagate)합니다.
 #
 # .. note::
-#   **DAGs are dynamic in PyTorch**
-#   An important thing to note is that the graph is recreated from scratch; after each
-#   ``.backward()`` call, autograd starts populating a new graph. This is
-#   exactly what allows you to use control flow statements in your model;
-#   you can change the shape, size and operations at every iteration if
-#   needed.
+#   **PyTorch에서 DAG들은 동적(dynamic)입니다.**
+#   주목해야 할 중요한 점은 그래프가 처음부터(from scratch) 다시 생성된다는 것입니다; 매번 ``.bachward()`` 가
+#   호출되고 나면, autograd는 새로운 그래프를 채우기(populate) 시작합니다. 이러한 점 덕분에 모델에서 
+#   흐름 제어(control flow) 구문들을 사용할 수 있게 되는 것입니다; 매번 반복(iteration)할 때마다 필요하면
+#   모양(shape)이나 크기(size), 연산(operation)을 바꿀 수 있습니다.
 
 ######################################################################
-# Optional Reading: Tensor Gradients and Jacobian Products
-# --------------------------------------
+# 선택적으로 읽기(Optional Reading): 텐서 변화도와 야코비안 곱 (Jacobian Product)
+# ----------------------------------------------------------------------
 #
-# In many cases, we have a scalar loss function, and we need to compute
-# the gradient with respect to some parameters. However, there are cases
-# when the output function is an arbitrary tensor. In this case, PyTorch
-# allows you to compute so-called **Jacobian product**, and not the actual
-# gradient.
+# 대부분의 경우, 스칼라 손실 함수를 가지고 일부 매개변수와 관련한 변화도를 계산해야 합니다.
+# 그러나 출력 함수가 임의의 텐서인 경우가 있습니다. 이럴 때, PyTorch는 실제 변화도가 아닌
+# **야코비안 곱(Jacobian product)**\ 을 계산합니다.
 #
-# For a vector function :math:`\vec{y}=f(\vec{x})`, where
-# :math:`\vec{x}=\langle x_1,\dots,x_n\rangle` and
-# :math:`\vec{y}=\langle y_1,\dots,y_m\rangle`, a gradient of
-# :math:`\vec{y}` with respect to :math:`\vec{x}` is given by **Jacobian
-# matrix**:
+# :math:`\vec{x}=\langle x_1,\dots,x_n\rangle`\ 이고,
+# :math:`\vec{y}=\langle y_1,\dots,y_m\rangle`\ 일 때
+# 벡터 함수 :math:`\vec{y}=f(\vec{x})`\ 에서 :math:`\vec{x}`\ 에 대한
+# :math:`\vec{y}` 의 변화도는 **야코비안 행렬(Jacobian matrix)**\ 로 주어집니다:
 #
 # .. math::
 #
@@ -195,12 +176,10 @@ print(z_det.requires_grad)
 #       \frac{\partial y_{m}}{\partial x_{1}} & \cdots & \frac{\partial y_{m}}{\partial x_{n}}
 #       \end{array}\right)\end{align}
 #
-# Instead of computing the Jacobian matrix itself, PyTorch allows you to
-# compute **Jacobian Product** :math:`v^T\cdot J` for a given input vector
-# :math:`v=(v_1 \dots v_m)`. This is achieved by calling ``backward`` with
-# :math:`v` as an argument. The size of :math:`v` should be the same as
-# the size of the original tensor, with respect to which we want to
-# compute the product:
+# 야코비안 행렬 자체를 계산하는 대신, PyTorch는 주어진 입력 벡터 :math:`v=(v_1 \dots v_m)`\ 에 대한
+# **야코비안 곱(Jacobian Product)**  :math:`v^T\cdot J`\ 을 계산합니다.
+# 이 과정은 :math:`v`\ 를 인자로 ``backward``\ 를 호출하면 이뤄집니다. :math:`v`\ 의 크기는
+# 곱(product)을 계산하려고 하는 원래 텐서의 크기와 같아야 합니다.
 #
 
 inp = torch.eye(5, requires_grad=True)
@@ -215,21 +194,16 @@ print("\nCall after zeroing gradients\n", inp.grad)
 
 
 ######################################################################
-# Notice that when we call ``backward`` for the second time with the same
-# argument, the value of the gradient is different. This happens because
-# when doing ``backward`` propagation, PyTorch **accumulates the
-# gradients**, i.e. the value of computed gradients is added to the
-# ``grad`` property of all leaf nodes of computational graph. If you want
-# to compute the proper gradients, you need to zero out the ``grad``
-# property before. In real-life training an *optimizer* helps us to do
-# this.
+# 동일한 인자로 ``backward``\ 를 두차례 호출하면 변화도 값이 달라집니다.
+# 이는 ``역방향`` 전파를 수행할 때, PyTorch가 **변화도를 누적(accumulate)해두기 때문**\ 
+# 입니다. 즉, 계산된 변화도의 값이 연산 그래프의 모든 잎(leaf) 노드의 ``grad`` 속성에 
+# 추가됩니다. 따라서 제대로된 변화도를 계산하기 위해서는 ``grad`` 속성을 먼저 0으로 만들어야
+# 합니다. 실제 학습 과정에서는 *옵티마이저(optimizer)*\ 가 이 과정을 도와줍니다.
 
 ######################################################################
-# .. note:: Previously we were calling ``backward()`` function without
-#           parameters. This is essentially equivalent to calling
-#           ``backward(torch.tensor(1.0))``, which is a useful way to compute the
-#           gradients in case of a scalar-valued function, such as loss during
-#           neural network training.
+# .. note:: 이전에는 매개변수 없이 ``backward()`` 함수를 호출했습니다. 이는 본질적으로
+#           ``backward(torch.tensor(1.0))`` 을 호출하는 것과 동일하며, 
+#           신경망 훈련 중의 손실과 같은 스칼라-값 함수의 변화도를 계산하는 유용한 방법입니다.
 #
 
 ######################################################################
@@ -237,7 +211,6 @@ print("\nCall after zeroing gradients\n", inp.grad)
 #
 
 #################################################################
-# Further Reading
+# 더 읽어보기
 # ~~~~~~~~~~~~~~~~~
 # - `Autograd Mechanics <https://pytorch.org/docs/stable/notes/autograd.html>`_
-
