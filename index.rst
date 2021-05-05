@@ -14,10 +14,10 @@
 .. Add callout items below this line
 
 .. customcalloutitem::
-   :description: Familiarize yourself with PyTorch concepts and modules. Learn how to load data, build deep neural networks, train and save your models in this quickstart guide.
-   :header: Learn the Basics
-   :button_link:  beginner/basics/intro.html
-   :button_text: Get started with PyTorch
+   :description: PyTorch 개념과 모듈을 익힙니다. 데이터를 불러오고, 심층 신경망을 구성하고, 모델을 학습하고 저장하는 방법을 배웁니다.
+   :header: PyTorch 기본 익히기
+   :button_link: beginner/basics/intro.html
+   :button_text: PyTorch 시작하기
 
 .. customcalloutitem::
    :description: 한 입 크기의, 바로 사용할 수 있는 PyTorch 코드 예제들을 확인해보세요.
@@ -56,10 +56,10 @@
 .. Learning PyTorch
 
 .. customcarditem::
-   :header: Learn the Basics
-   :card_description: A step-by-step guide to building a complete ML workflow with PyTorch.
+   :header: PyTorch 기본 익히기
+   :card_description: PyTorch로 전체 ML워크플로우를 구축하기 위한 단계별 학습 가이드입니다.
    :image: _static/img/thumbnails/cropped/60-min-blitz.png
-   :link: beginner/deep_learning_60min_blitz.html
+   :button_link: beginner/basics/intro.html
    :tags: Getting-Started
 
 .. customcarditem::
