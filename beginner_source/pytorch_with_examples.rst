@@ -1,4 +1,4 @@
-예제로 배우는 파이토치(PYTORCH)
+예제로 배우는 파이토치(PyTorch)
 ******************************
 **Author**: `Justin Johnson <https://github.com/jcjohnson/pytorch-examples>`_
 **번역**: `박정환 <https://github.com/9bow>`_
@@ -30,7 +30,7 @@
 =============
 
 준비 운동: numpy
---------------
+-------------------------------------------------------------------------------
 
 PyTorch를 소개하기 전에, 먼저 NumPy를 사용하여 신경망을 구성해보겠습니다.
 
@@ -44,7 +44,7 @@ NumPy는 연산 그래프(computation graph)나 딥러닝, 변화도(gradient)�
 
 
 파이토치(PyTorch): 텐서(Tensor)
-------------------------------
+-------------------------------------------------------------------------------
 
 NumPy는 훌륭한 프레임워크지만, GPU를 사용하여 수치 연산을 가속화할 수는 없습니다. 
 현대의 심층 신경망에서 GPU는 종종 `50배 또는 그 이상 <https://github.com/jcjohnson/cnn-benchmarks>`__ 의 
@@ -69,7 +69,7 @@ Autograd
 =========
 
 PyTorch: 텐서(Tensor)와 autograd
--------------------------------
+-------------------------------------------------------------------------------
 
 위의 예제들에서는 신경망의 순전파 단계와 역전파 단계를 직접 구현해보았습니다. 
 작은 2계층(2-layer) 신경망에서는 역전파 단계를 직접 구현하는 것이 큰일이 아니지만, 
@@ -91,7 +91,7 @@ PyTorch: 텐서(Tensor)와 autograd
 .. includenodoc:: /beginner/examples_autograd/polynomial_autograd.py
 
 PyTorch: 새 autograd Function 정의하기
-----------------------------------------
+-------------------------------------------------------------------------------
 
 내부적으로, autograd의 기본(primitive) 연산자는 실제로 텐서를 조작하는 2개의 함수입니다.
 **forward** 함수는 입력 텐서로부터 출력 텐서를 계산합니다. 
@@ -114,10 +114,10 @@ PyTorch에서 ``torch.autograd.Function`` 의 하위클래스(subclass)를 정�
 .. includenodoc:: /beginner/examples_autograd/polynomial_custom_function.py
 
 `nn` 모듈
-===========
+======================
 
 PyTorch: nn
------------
+-------------------------------------------------------------------------------
 
 연산 그래프와 autograd는 복잡한 연산자를 정의하고 도함수(derivative)를 자동으로 계산하는
 매우 강력한 패러다임(paradigm)입니다; 하지만 대규모 신경망에서는 autograd 그 자체만으로는 너무
@@ -142,7 +142,7 @@ PyTorch: nn
 .. includenodoc:: /beginner/examples_nn/polynomial_nn.py
 
 PyTorch: optim
----------------
+-------------------------------------------------------------------------------
 
 지금까지는 ``torch.no_grad()`` 로 학습 가능한 매개변수를 갖는 텐서들을 직접 조작하여 모델의 가중치(weight)를 갱신하였습니다.
 이것은 확률적 경사하강법(SGD; stochastic gradient descent)와 같은 간단한 최적화 알고리즘에서는 크게 부담이 되지 않지만,
@@ -157,7 +157,7 @@ RMSProp 알고리즘을 사용하겠습니다:
 .. includenodoc:: /beginner/examples_nn/polynomial_optim.py
 
 PyTorch: 사용자 정의 nn.Module
------------------------------
+-------------------------------------------------------------------------------
 
 때대로 기존 Module의 구성(sequence)보다 더 복잡한 모델을 구성해야 할 때가 있습니다;
 이러한 경우에는 ``nn.Module`` 의 하위 클래스(subclass)로 새로운 Module을 정의하고,
@@ -168,7 +168,7 @@ PyTorch: 사용자 정의 nn.Module
 .. includenodoc:: /beginner/examples_nn/polynomial_module.py
 
 PyTorch: 제어 흐름(Control Flow) + 가중치 공유(Weight Sharing)
------------------------------------------------------------
+-------------------------------------------------------------------------------
 
 동적 그래프와 가중치 공유의 예를 보이기 위해, 매우 이상한 모델을 구현해보겠습니다: 
 각 순전파 단계에서 3 ~ 5 사이의 임의의 숫자(random number)를 선택하여 다차항들에서 사용하고,
@@ -185,12 +185,12 @@ PyTorch: 제어 흐름(Control Flow) + 가중치 공유(Weight Sharing)
 .. _examples-download:
 
 예제 코드
-========
+=============
 
 위의 예제들을 여기서 찾아볼 수 있습니다.
 
 Tensors
--------
+-------------------------------------------------------------------------------
 
 .. toctree::
    :maxdepth: 2
@@ -208,7 +208,7 @@ Tensors
     <div style='clear:both'></div>
 
 Autograd
---------
+-------------------------------------------------------------------------------
 
 .. toctree::
    :maxdepth: 2
@@ -227,7 +227,7 @@ Autograd
     <div style='clear:both'></div>
 
 `nn` module
------------
+-------------------------------------------------------------------------------
 
 .. toctree::
    :maxdepth: 2
