@@ -1,19 +1,19 @@
 """
-`Learn the Basics <intro.html>`_ ||
-`Quickstart <quickstart_tutorial.html>`_ || 
-`Tensors <tensorqs_tutorial.html>`_ || 
-`Datasets & DataLoaders <data_tutorial.html>`_ ||
-`Transforms <transforms_tutorial.html>`_ ||
-`Build Model <buildmodel_tutorial.html>`_ ||
+`파이토치(PyTorch) 기본 익히기 <intro.html>`_ ||
+`빠른 시작 <quickstart_tutorial.html>`_ ||
+`텐서(Tensor) <tensorqs_tutorial.html>`_ ||
+`Dataset과 Dataloader <data_tutorial.html>`_ ||
+`변형(Transform) <transforms_tutorial.html>`_ ||
+`신경망 모델 구성하기 <buildmodel_tutorial.html>`_ ||
 `Autograd <autogradqs_tutorial.html>`_ ||
-**Optimization** ||
-`Save & Load Model <saveloadrun_tutorial.html>`_
+**최적화(Optimization)** ||
+`모델 저장하고 불러오기 <saveloadrun_tutorial.html>`_
 
 모델 매개변수 최적화하기
-===========================
+==========================================================================
 
 이제 모델과 데이터가 준비되었으니, 데이터에 매개변수를 최적화하여 모델을 학습하고, 검증하고, 테스트할 차례입니다.
-모델을 학습하는 과정은 반복적인 과정을 거칩니다; (*에폭(epoch)*\ 이라고 부르는) 각 반복 단계에서 모델은 출력을 추측하고, 
+모델을 학습하는 과정은 반복적인 과정을 거칩니다; (*에폭(epoch)*\ 이라고 부르는) 각 반복 단계에서 모델은 출력을 추측하고,
 추측과 정답 사이의 오류(\ *손실(loss)*\ )를 계산하고, (`이전 장 <autograd_tutorial.html>`_\ 에서 본 것처럼)
 매개변수에 대한 오류의 도함수(derivative)를 수집한 뒤, 경사하강법을 사용하여 이 파라매터들을 **최적화(optimize)**\ 합니다.
 이 과정에 대한 자세한 설명은 `3Blue1Brown의 역전파 <https://www.youtube.com/watch?v=tIeHLnjs5U8>`__ 영상을 참고하세요.
@@ -111,9 +111,9 @@ epochs = 5
 #
 # 일반적인 손실함수에는 회귀 문제(regression task)에 사용하는 `nn.MSELoss <https://pytorch.org/docs/stable/generated/torch.nn.MSELoss.html#torch.nn.MSELoss>`_\ (평균 제곱 오차(MSE; Mean Square Error))나
 # 분류(classification)에 사용하는 `nn.NLLLoss <https://pytorch.org/docs/stable/generated/torch.nn.NLLLoss.html#torch.nn.NLLLoss>`_ (음의 로그 우도(Negative Log Likelihood)),
-# 그리고 ``nn.LogSoftmax``\ 와 ``nn.NLLLoss``\ 를 합친 `nn.CrossEntropyLoss <https://pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html#torch.nn.CrossEntropyLoss>`_ 
+# 그리고 ``nn.LogSoftmax``\ 와 ``nn.NLLLoss``\ 를 합친 `nn.CrossEntropyLoss <https://pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html#torch.nn.CrossEntropyLoss>`_
 # 등이 있습니다.
-# 
+#
 # 모델의 출력 로짓(logit)을 ``nn.CrossEntropyLoss``\ 에 전달하여 로짓(logit)을 정규화하고 예측 오류를 계산합니다.
 
 # 손실 함수를 초기화합니다.
@@ -150,11 +150,11 @@ optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
 
 def train_loop(dataloader, model, loss_fn, optimizer):
     size = len(dataloader.dataset)
-    for batch, (X, y) in enumerate(dataloader):        
+    for batch, (X, y) in enumerate(dataloader):
         # 예측(prediction)과 손실(loss) 계산
         pred = model(X)
         loss = loss_fn(pred, y)
-        
+
         # 역전파
         optimizer.zero_grad()
         loss.backward()
@@ -174,7 +174,7 @@ def test_loop(dataloader, model, loss_fn):
             pred = model(X)
             test_loss += loss_fn(pred, y).item()
             correct += (pred.argmax(1) == y).type(torch.float).sum().item()
-            
+
     test_loss /= size
     correct /= size
     print(f"Test Error: \n Accuracy: {(100*correct):>0.1f}%, Avg loss: {test_loss:>8f} \n")

@@ -1,16 +1,16 @@
 """
-`Learn the Basics <intro.html>`_ ||
-**Quickstart** || 
-`Tensors <tensorqs_tutorial.html>`_ || 
-`Datasets & DataLoaders <data_tutorial.html>`_ ||
-`Transforms <transforms_tutorial.html>`_ ||
-`Build Model <buildmodel_tutorial.html>`_ ||
+`파이토치(PyTorch) 기본 익히기 <intro.html>`_ ||
+**빠른 시작** ||
+`텐서(Tensor) <tensorqs_tutorial.html>`_ ||
+`Dataset과 Dataloader <data_tutorial.html>`_ ||
+`변형(Transform) <transforms_tutorial.html>`_ ||
+`신경망 모델 구성하기 <buildmodel_tutorial.html>`_ ||
 `Autograd <autogradqs_tutorial.html>`_ ||
-`Optimization <optimization_tutorial.html>`_ ||
-`Save & Load Model <saveloadrun_tutorial.html>`_
+`최적화(Optimization) <optimization_tutorial.html>`_ ||
+`모델 저장하고 불러오기 <saveloadrun_tutorial.html>`_
 
 빠른 시작(Quickstart)
-====================
+==========================================================================
 이번 장에서는 기계 학습의 일반적인 작업들을 위한 API를 통해 실행됩니다. 더 자세히 알아보려면 각 장(section)의 링크를 참고하세요.
 
 데이터 작업하기
@@ -33,8 +33,9 @@ import matplotlib.pyplot as plt
 # `TorchAudio <https://pytorch.org/audio/stable/index.html>`_ 와 같이 도메인 특화 라이브러리를 데이터셋과 함께 제공하고 있습니다.
 # 이 튜토리얼에서는 TorchVision 데이터셋을 사용하도록 하겠습니다.
 #
-# ``torchvision.datasets`` 모듈은 CIFAR, COCO 등 (`전체 목록은 여기 <https://pytorch.org/docs/stable/torchvision/datasets.html>`_) 과 같은 다양한
-# 실제 비전(vision) 데이터에 대한 ``Dataset`` 을 포함하고 있습니다. 이 튜토리얼에서는 FasionMNIST 데이터셋을 사용합니다.
+# ``torchvision.datasets`` 모듈은 CIFAR, COCO 등과 같은 다양한 실제 비전(vision) 데이터에 대한
+# ``Dataset``\ (`전체 목록은 여기 <https://pytorch.org/docs/stable/torchvision/datasets.html>`_)\ 을 포함하고 있습니다.
+# 이 튜토리얼에서는 FasionMNIST 데이터셋을 사용합니다.
 # 모든 TorchVision ``Dataset`` 은 샘플과 정답을 각각 변경하기 위한 ``transform`` 과 ``target_transform`` 의 두 인자를 포함합니다.
 
 # 공개 데이터셋에서 학습 데이터를 내려받습니다.
@@ -130,7 +131,7 @@ loss_fn = nn.CrossEntropyLoss()
 optimizer = torch.optim.SGD(model.parameters(), lr=1e-3)
 
 
-####################################################################### 
+#######################################################################
 # 각 학습 단계(training loop)에서 모델은 (배치(batch)로 제공되는) 학습 데이터셋에 대한 예측을 수행하고,
 # 예측 오류를 역전파하여 모델의 매개변수를 조정합니다.
 
@@ -138,11 +139,11 @@ def train(dataloader, model, loss_fn, optimizer):
     size = len(dataloader.dataset)
     for batch, (X, y) in enumerate(dataloader):
         X, y = X.to(device), y.to(device)
-        
+
         # 예측 오류 계산
         pred = model(X)
         loss = loss_fn(pred, y)
-        
+
         # 역전파
         optimizer.zero_grad()
         loss.backward()
@@ -231,7 +232,7 @@ with torch.no_grad():
     predicted, actual = classes[pred[0].argmax(0)], classes[y]
     print(f'Predicted: "{predicted}", Actual: "{actual}"')
 
-      
+
 ######################################################################
 # `모델을 저장하고 불러오는 방법 <saveloadrun_tutorial.html>`_ 을 자세히 알아보세요.
 #

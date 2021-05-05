@@ -1,16 +1,16 @@
 """
-`Learn the Basics <intro.html>`_ ||
-`Quickstart <quickstart_tutorial.html>`_ || 
-`Tensors <tensorqs_tutorial.html>`_ ||
-`Datasets & DataLoaders <data_tutorial.html>`_ ||
-`Transforms <transforms_tutorial.html>`_ ||
-**Build Model** ||
+`파이토치(PyTorch) 기본 익히기 <intro.html>`_ ||
+`빠른 시작 <quickstart_tutorial.html>`_ ||
+`텐서(Tensor) <tensorqs_tutorial.html>`_ ||
+`Dataset과 Dataloader <data_tutorial.html>`_ ||
+`변형(Transform) <transforms_tutorial.html>`_ ||
+**신경망 모델 구성하기** ||
 `Autograd <autogradqs_tutorial.html>`_ ||
-`Optimization <optimization_tutorial.html>`_ ||
-`Save & Load Model <saveloadrun_tutorial.html>`_
+`최적화(Optimization) <optimization_tutorial.html>`_ ||
+`모델 저장하고 불러오기 <saveloadrun_tutorial.html>`_
 
 신경망 모델 구성하기
-===================
+==========================================================================
 
 신경망은 데이터에 대한 연산을 수행하는 계층(layer)/모듈(module)로 구성되어 있습니다.
 `torch.nn <https://pytorch.org/docs/stable/nn.html>`_ 네임스페이스는 신경망을 구성하는데 필요한 모든 구성 요소를 제공합니다.
@@ -65,7 +65,7 @@ class NeuralNetwork(nn.Module):
         return logits
 
 ##############################################
-# ``NeuralNetwork`` 의 인스턴스(instance)를 생성하고 이를 ``device`` 로 이동한 뒤, 
+# ``NeuralNetwork`` 의 인스턴스(instance)를 생성하고 이를 ``device`` 로 이동한 뒤,
 # 구조(structure)를 출력합니다.
 
 model = NeuralNetwork().to(device)
@@ -73,7 +73,7 @@ print(model)
 
 
 ##############################################
-# 모델을 사용하기 위해 입력 데이터를 전달합니다. 이는 일부 
+# 모델을 사용하기 위해 입력 데이터를 전달합니다. 이는 일부
 # `백그라운드 연산들 <https://github.com/pytorch/pytorch/blob/270111b7b611d174967ed204776985cefca9c144/torch/nn/modules/module.py#L866>`_ 과 함께
 # 모델의 ``forward`` 를 실행합니다. ``model.forward()`` 를 직접 호출하지 마세요!
 #
@@ -81,7 +81,7 @@ print(model)
 # 원시 예측값을 ``nn.Softmax`` 모듈의 인스턴스에 통과시켜 예측 확률을 얻습니다.
 
 X = torch.rand(1, 28, 28, device=device)
-logits = model(X) 
+logits = model(X)
 pred_probab = nn.Softmax(dim=1)(logits)
 y_pred = pred_probab.argmax(1)
 print(f"Predicted class: {y_pred}")
@@ -107,13 +107,13 @@ print(input_image.size())
 # ^^^^^^^^^^^^^^^^^^^^^^
 # `nn.Flatten  <https://pytorch.org/docs/stable/generated/torch.nn.Flatten.html>`_ 계층을 초기화하여
 # 각 28x28의 2D 이미지를 784 픽셀 값을 갖는 연속된 배열로 변환합니다. (dim=0의 미니배치 차원은 유지됩니다.)
- 
+
 flatten = nn.Flatten()
 flat_image = flatten(input_image)
 print(flat_image.size())
 
 ##############################################
-# nn.Linear 
+# nn.Linear
 # ^^^^^^^^^^^^^^^^^^^^^^
 # `선형 계층 <https://pytorch.org/docs/stable/generated/torch.nn.Linear.html>`_ 은 저장된 가중치(weight)와
 # 편향(bias)을 사용하여 입력에 선형 변환(linear transformation)을 적용하는 모듈입니다.
@@ -141,7 +141,7 @@ print(f"After ReLU: {hidden1}")
 #################################################
 # nn.Sequential
 # ^^^^^^^^^^^^^^^^^^^^^^
-# `nn.Sequential <https://pytorch.org/docs/stable/generated/torch.nn.Sequential.html>`_ 은 순서를 갖는 
+# `nn.Sequential <https://pytorch.org/docs/stable/generated/torch.nn.Sequential.html>`_ 은 순서를 갖는
 # 모듈의 컨테이너입니다. 데이터는 정의된 것과 같은 순서로 모든 모듈들을 통해 전달됩니다. 순차 컨테이너(sequential container)를 사용하여
 # 아래의 ``seq_modules`` 와 같은 신경망을 빠르게 만들 수 있습니다.
 
@@ -168,11 +168,11 @@ pred_probab = softmax(logits)
 #################################################
 # 모델 매개변수
 # ------------------------------------------------------------------------------------------
-# 
+#
 # 신경망 내부의 많은 계층들은 *매개변수화(parameterize)* 됩니다. 즉, 학습 중에 최적화되는 가중치와 편향과 연관지어집니다.
 # ``nn.Module`` 을 상속하면 모델 객체 내부의 모든 필드들이 자동으로 추적(track)되며, 모델의 ``parameters()`` 및
 # ``named_parameters()`` 메소드로 모든 매개변수에 접근할 수 있게 됩니다.
-# 
+#
 # 이 예제에서는 각 매개변수들을 순회하며(iterate), 매개변수의 크기와 값을 출력합니다.
 #
 

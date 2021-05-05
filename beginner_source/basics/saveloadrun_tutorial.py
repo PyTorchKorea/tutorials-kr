@@ -1,18 +1,18 @@
 """
-`Learn the Basics <intro.html>`_ ||
-`Quickstart <quickstart_tutorial.html>`_ || 
-`Tensors <tensorqs_tutorial.html>`_ || 
-`Datasets & DataLoaders <data_tutorial.html>`_ ||
-`Transforms <transforms_tutorial.html>`_ ||
-`Build Model <buildmodel_tutorial.html>`_ ||
+`파이토치(PyTorch) 기본 익히기 <intro.html>`_ ||
+`빠른 시작 <quickstart_tutorial.html>`_ ||
+`텐서(Tensor) <tensorqs_tutorial.html>`_ ||
+`Dataset과 Dataloader <data_tutorial.html>`_ ||
+`변형(Transform) <transforms_tutorial.html>`_ ||
+`신경망 모델 구성하기 <buildmodel_tutorial.html>`_ ||
 `Autograd <autogradqs_tutorial.html>`_ ||
-`Optimization <optimization_tutorial.html>`_ ||
-**Save & Load Model**
+`최적화(Optimization) <optimization_tutorial.html>`_ ||
+**모델 저장하고 불러오기**
 
 모델 저장하고 불러오기
-============================
+==========================================================================
 
-이번 장에서는 저장하기나 불러오기를 사용하여 모델의 상태를 유지(persist)하고 모델의 예측을 실행하는 방법을 알아보겠습니다.
+이번 장에서는 저장하기나 불러오기를 통해 모델의 상태를 유지(persist)하고 모델의 예측을 실행하는 방법을 알아보겠습니다.
 """
 
 import torch
@@ -23,7 +23,7 @@ import torchvision.models as models
 #######################################################################
 # 모델 가중치 저장하고 불러오기
 # ------------------------------------------------------------------------------------------
-# 
+#
 # PyTorch 모델은 학습한 매개변수를 ``state_dict``\ 라고 불리는 내부 상태 사전(internal state dictionary)에 저장합니다.
 # 이 상태 값들은 ``torch.save`` 메소드를 사용하여 저장(persist)할 수 있습니다:
 
@@ -45,7 +45,7 @@ model.eval()
 # 모델의 형태를 포함하여 저장하고 불러오기
 # ------------------------------------------------------------------------------------------
 #
-# 모델의 가중치를 불러올 때, 신경망의 구조를 정의하기 위해 모델 클래스를 먼저 생성(instantiate)해야 했습니다. 
+# 모델의 가중치를 불러올 때, 신경망의 구조를 정의하기 위해 모델 클래스를 먼저 생성(instantiate)해야 했습니다.
 # 이 클래스의 구조를 모델과 함께 저장하고 싶으면, (``model.state_dict()``\ 가 아닌) ``model`` 을 저장 함수에
 # 전달합니다:
 
@@ -62,7 +62,7 @@ model = torch.load('model.pth')
 #######################################################################
 # 모델을 ONNX로 내보내기
 # ------------------------------------------------------------------------------------------
-# 
+#
 # PyTorch는 기본(native) ONNX 내보내기를 지원합니다. 그러나 PyTorch 실행 그래프의 동적 특성(dynamic nature) 때문에,
 # 내보내는 과정에 ONNX 모델을 생성하기 위해 실행 그래프를 탐색(traverse)해야 합니다.
 # 이러한 이유 때문에 내보내기 단계에서는 적절한 크기의 테스트 변수를 전달해야 합니다. (아래 예시에서는 올바른 크기의 가짜(dummy) 0 텐서를 생성합니다):

@@ -59,7 +59,7 @@
    :header: PyTorch 기본 익히기
    :card_description: PyTorch로 전체 ML워크플로우를 구축하기 위한 단계별 학습 가이드입니다.
    :image: _static/img/thumbnails/cropped/60-min-blitz.png
-   :button_link: beginner/basics/intro.html
+   :link: beginner/basics/intro.html
    :tags: Getting-Started
 
 .. customcarditem::

@@ -1,16 +1,16 @@
 """
-`Learn the Basics <intro.html>`_ ||
-`Quickstart <quickstart_tutorial.html>`_ || 
-`Tensors <tensorqs_tutorial.html>`_ ||
-**Datasets & DataLoaders** ||
-`Transforms <transforms_tutorial.html>`_ ||
-`Build Model <buildmodel_tutorial.html>`_ ||
+`파이토치(PyTorch) 기본 익히기 <intro.html>`_ ||
+`빠른 시작 <quickstart_tutorial.html>`_ ||
+`텐서(Tensor) <tensorqs_tutorial.html>`_ ||
+**Dataset과 Dataloader** ||
+`변형(Transform) <transforms_tutorial.html>`_ ||
+`신경망 모델 구성하기 <buildmodel_tutorial.html>`_ ||
 `Autograd <autogradqs_tutorial.html>`_ ||
-`Optimization <optimization_tutorial.html>`_ ||
-`Save & Load Model <saveloadrun_tutorial.html>`_
+`최적화(Optimization) <optimization_tutorial.html>`_ ||
+`모델 저장하고 불러오기 <saveloadrun_tutorial.html>`_
 
 Dataset과 Dataloader
-========================
+==========================================================================
 
 """
 
@@ -19,13 +19,13 @@ Dataset과 Dataloader
 # 더 나은 가독성(readability)과 모듈성(modularity)을 위해 데이터셋 코드를 모델 학습 코드로부터 분리하는 것이 이상적입니다.
 # PyTorch는 ``torch.utils.data.DataLoader`` 와 ``torch.utils.data.Dataset`` 의 두 가지 데이터 기본 요소를
 # 제공하여 미리 준비해된(pre-loaded) 데이터셋 뿐만 아니라 가지고 있는 데이터를 사용할 수 있도록 합니다.
-# ``Dataset`` 은 샘플과 정답(label)을 저장하고, ``DataLoader`` 는 ``Dataset`` 을 샘플에 쉽게 접근할 수 있도록 
+# ``Dataset`` 은 샘플과 정답(label)을 저장하고, ``DataLoader`` 는 ``Dataset`` 을 샘플에 쉽게 접근할 수 있도록
 # 반복 가능한 객체(iterable)로 감쌉니다.
 #
 # PyTorch의 도메인 특화 라이브러리들은 (FashionMNIST와 같은) 다양한 미리 준비해둔(pre-loaded) 데이터셋을 제공합니다.
 # 데이터셋은 ``torch.utils.data.Dataset`` 의 하위 클래스로 개별 데이터를 특정하는 함수가 구현되어 있습니다.
 # 이러한 데이터셋은 모델을 만들어보고(prototype) 성능을 측정(benchmark)하는데 사용할 수 있습니다.
-# 여기에서 데이터셋들을 찾아볼 수 있습니다: 
+# 여기에서 데이터셋들을 찾아볼 수 있습니다:
 # `이미지 데이터셋 <https://pytorch.org/docs/stable/torchvision/datasets.html>`_,
 # `텍스트 데이터셋 <https://pytorch.org/text/stable/datasets.html>`_ 및
 # `오디오 데이터셋 <https://pytorch.org/audio/stable/datasets.html>`_
@@ -35,7 +35,7 @@ Dataset과 Dataloader
 # 데이터셋 불러오기
 # ------------------------------------------------------------------------------------------
 #
-# `TorchVision` 에서 `Fashion-MNIST <https://research.zalando.com/welcome/mission/research-projects/fashion-mnist/>`_ 데이터셋을 
+# `TorchVision` 에서 `Fashion-MNIST <https://research.zalando.com/welcome/mission/research-projects/fashion-mnist/>`_ 데이터셋을
 # 불러오는 예제를 살펴보겠습니다. Fashion-MNIST는 Zalando의 기사 이미지 데이터셋으로 60,000개의 학습 예제와 10,000개의 테스트 예제로 이루어져 있습니다.
 # 각 예제는 흑백(grayscale)의 28x28 이미지와 10개 분류(class) 중 하나인 정답(label)으로 구성됩니다.
 #
@@ -72,7 +72,7 @@ test_data = datasets.FashionMNIST(
 # 데이터셋을 반복하고 시각화하기
 # ------------------------------------------------------------------------------------------
 #
-# ``Dataset`` 에 리스트(list)처럼 직접 접근(index)할 수 있습니다: ``training_data[index]``. 
+# ``Dataset`` 에 리스트(list)처럼 직접 접근(index)할 수 있습니다: ``training_data[index]``.
 # ``matplotlib`` 을 사용하여 학습 데이터의 일부를 시각화해보겠습니다.
 
 labels_map = {
@@ -112,7 +112,7 @@ plt.show()
 # 파일에서 사용자 정의 데이터셋 만들기
 # ------------------------------------------------------------------------------------------
 #
-# 사용자 정의 Dataset 클래스는 반드시 3개 함수를 구현해야 합니다: `__init__`, `__len__`, and `__getitem__`. 
+# 사용자 정의 Dataset 클래스는 반드시 3개 함수를 구현해야 합니다: `__init__`, `__len__`, and `__getitem__`.
 # 아래 구현을 살펴보면 FashionMNIST 이미지들은 ``img_dir`` 디렉토리에 저장되고, 정답은 ``annotations_file`` csv 파일에
 # 별도로 저장됩니다.
 #
@@ -209,7 +209,7 @@ def __getitem__(self, idx):
 #################################################################
 # DataLoader로 학습용 데이터 준비하기
 # ------------------------------------------------------------------------------------------
-# 
+#
 # ``Dataset`` 은 데이터셋의 특징(feature)을 가져오고 하나의 샘플에 정답(label)을 지정하는 일을 한 번에 합니다.
 # 모델을 학습할 때, 일반적으로 샘플들을 "미니배치(minibatch)"로 전달하고, 매 에폭(epoch)마다 데이터를 다시 섞어서 과적합(overfit)을 막고,
 # Python의 ``multiprocessing`` 을 사용하여 데이터 검색 속도를 높이려고 합니다.

@@ -1,16 +1,16 @@
 """
-`Learn the Basics <intro.html>`_ ||
-`Quickstart <quickstart_tutorial.html>`_ || 
-**Tensors** || 
-`Datasets & DataLoaders <data_tutorial.html>`_ ||
-`Transforms <transforms_tutorial.html>`_ ||
-`Build Model <buildmodel_tutorial.html>`_ ||
+`파이토치(PyTorch) 기본 익히기 <intro.html>`_ ||
+`빠른 시작 <quickstart_tutorial.html>`_ ||
+**텐서(Tensor)** ||
+`Dataset과 Dataloader <data_tutorial.html>`_ ||
+`변형(Transform) <transforms_tutorial.html>`_ ||
+`신경망 모델 구성하기 <buildmodel_tutorial.html>`_ ||
 `Autograd <autogradqs_tutorial.html>`_ ||
-`Optimization <optimization_tutorial.html>`_ ||
-`Save & Load Model <saveloadrun_tutorial.html>`_
+`최적화(Optimization) <optimization_tutorial.html>`_ ||
+`모델 저장하고 불러오기 <saveloadrun_tutorial.html>`_
 
 텐서(Tensor)
-==========================
+==========================================================================
 
 텐서(tensor)는 배열(array)이나 행렬(matrix)과 매우 유사한 특수한 자료구조입니다.
 PyTorch에서는 텐서를 사용하여 모델의 입력(input)과 출력(output), 그리고 모델의 매개변수들을 부호화(encode)합니다.
@@ -99,13 +99,13 @@ print(f"Device tensor is stored on: {tensor.device}")
 # 텐서 연산(Operation)
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-# 전치(transposing), 인덱싱(indexing), 슬라이싱(slicing), 수학 계산, 선형 대수, 
-# 임의 샘플링(random sampling) 등, 100가지 이상의 텐서 연산들을 
+# 전치(transposing), 인덱싱(indexing), 슬라이싱(slicing), 수학 계산, 선형 대수,
+# 임의 샘플링(random sampling) 등, 100가지 이상의 텐서 연산들을
 # `여기 <https://pytorch.org/docs/stable/torch.html>`__ 에서 확인할 수 있습니다.
 #
 # 각 연산들은 (일반적으로 CPU보다 빠른) GPU에서 실행할 수 있습니다. Colab을 사용한다면,
 # Edit > Notebook Settings 에서 GPU를 할당할 수 있습니다.
-# 
+#
 # 기본적으로 텐서는 CPU에 생성됩니다. ``.to`` 메소드를 사용하면 (GPU의 가용성(availability)을 확인한 뒤)
 # GPU로 텐서를 명시적으로 이동할 수 있습니다. 장치들 간에 큰 텐서들을 복사하는 것은 시간과 메모리 측면에서 비용이
 # 많이든다는 것을 기억하세요!
@@ -132,7 +132,7 @@ print(tensor)
 
 ######################################################################
 # **텐서 합치기** ``torch.cat`` 을 사용하여 주어진 차원에 따라 일련의 텐서를 연결할 수 있습니다.
-# ``torch.cat`` 과 미묘하게 다른 또 다른 텐서 결합 연산인 
+# ``torch.cat`` 과 미묘하게 다른 또 다른 텐서 결합 연산인
 # `torch.stack <https://pytorch.org/docs/stable/generated/torch.stack.html>`__ 도 참고해보세요.
 t1 = torch.cat([tensor, tensor, tensor], dim=1)
 print(t1)
@@ -162,13 +162,13 @@ torch.mul(tensor, tensor, out=z3)
 # ``item()`` 을 사용하여 Python 숫자 값으로 변환할 수 있습니다:
 
 agg = tensor.sum()
-agg_item = agg.item()  
+agg_item = agg.item()
 print(agg_item, type(agg_item))
 
 
 ######################################################################
 # **바꿔치기(in-place) 연산**
-# 연산 결과를 피연산자(operand)에 저장하는 연산을 바꿔치기 연산이라고 부르며, ``_`` 접미사를 갖습니다. 
+# 연산 결과를 피연산자(operand)에 저장하는 연산을 바꿔치기 연산이라고 부르며, ``_`` 접미사를 갖습니다.
 # 예를 들어: ``x.copy_(y)`` 나 ``x.t_()`` 는 ``x`` 를 변경합니다.
 
 print(tensor, "\n")
