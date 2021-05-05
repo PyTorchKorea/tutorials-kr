@@ -10,7 +10,7 @@
 `Save & Load Model <saveloadrun_tutorial.html>`_
 
 PyTorch 기본 익히기
-===================
+===========================
 
 Authors: 
 `Suraj Subramanian <https://github.com/suraj813>`_,
@@ -32,7 +32,7 @@ T-shirt/top, Trouser, Pullover, Dress, Coat, Sandal, Shirt, Sneaker, Bag, or Ank
 
 
 튜토리얼 코드 실행하기
-------------------
+------------------------------------------------------------------------------------------
 
 다음의 두 가지 방법으로 이 튜토리얼을 실행해볼 수 있습니다:
 
@@ -41,7 +41,7 @@ T-shirt/top, Trouser, Pullover, Dress, Coat, Sandal, Shirt, Sneaker, Bag, or Ank
 
 
 튜토리얼 사용 방법
------------------ 
+------------------------------------------------------------------------------------------
 다른 딥러닝 프레임워크에 익숙하다면, `0. 빠른 시작 <quickstart_tutorial.html>`_ 을 보고 PyTorch의 API들을 빠르게 익히세요.
 
 딥러닝 프레임워크가 처음이라면, 단계별(step-by-step) 가이드의 첫번째인 `1. 텐서(Tensor) <tensor_tutorial.html>`_ 로 이동하세요.
