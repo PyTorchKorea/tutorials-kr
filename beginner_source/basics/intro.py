@@ -9,7 +9,7 @@
 `Optimization <optimization_tutorial.html>`_ ||
 `Save & Load Model <saveloadrun_tutorial.html>`_
 
-PyTorch 기본 익히기
+파이토치(PyTorch) 기본 익히기
 ===========================
 
 Authors: 

@@ -1,4 +1,4 @@
-파이토치(PyTorch)로 딥러닝하기: 60분만에 끝장내기
+PyTorch로 딥러닝하기: 60분만에 끝장내기
 ---------------------------------------------------
 **Author**: `Soumith Chintala <http://soumith.ch>`_
   **번역**: `박정환 <http://github.com/9bow>`_
