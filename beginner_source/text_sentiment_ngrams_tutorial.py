@@ -426,7 +426,7 @@ ex_text_str = "MEMPHIS, Tenn. – Four days ago, Jon Rahm was \
 
 model = model.to("cpu")
 
-print("This is a %s news" %ag_news_label[predict(ex_text_str, model, vocab, 2)])
+print("This is a %s news" %ag_news_label[predict(ex_text_str, text_pipeline)])
 
 ################################################
 #
