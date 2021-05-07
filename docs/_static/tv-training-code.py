@@ -1,5 +1,5 @@
 # Sample code from the TorchVision 0.3 Object Detection Finetuning Tutorial
-# http://pytorch.org/tutorials/intermediate/torchvision_tutorial.html
+# http://tutorials.pytorch.kr/intermediate/torchvision_tutorial.html
 
 import os
 import numpy as np
@@ -25,7 +25,7 @@ class PennFudanDataset(object):
         self.masks = list(sorted(os.listdir(os.path.join(root, "PedMasks"))))
 
     def __getitem__(self, idx):
-        # load images ad masks
+        # load images and masks
         img_path = os.path.join(self.root, "PNGImages", self.imgs[idx])
         mask_path = os.path.join(self.root, "PedMasks", self.masks[idx])
         img = Image.open(img_path).convert("RGB")
@@ -160,6 +160,6 @@ def main():
         evaluate(model, data_loader_test, device=device)
 
     print("That's it!")
-    
+
 if __name__ == "__main__":
     main()

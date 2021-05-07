@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>(실험용) PyTorch를 사용한 Channels Last Memory Format &mdash; PyTorch Tutorials 1.6.0 documentation</title>
+  <title>(실험용) PyTorch를 사용한 Channels Last Memory Format &mdash; PyTorch Tutorials 1.8.1 documentation</title>
   
 
   
@@ -27,11 +27,12 @@
 
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!-- <link rel="stylesheet" href="../_static/pygments.css" type="text/css" /> -->
+  <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
   <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Using the PyTorch C++ Frontend" href="../advanced/cpp_frontend.html" />
-    <link rel="prev" title="(prototype) Introduction to Named Tensors in PyTorch" href="named_tensor_tutorial.html" /> 
+    <link rel="prev" title="(beta) Building a Simple CPU Performance Profiler with FX" href="fx_profiling_tutorial.html" /> 
 
   
   <script src="../_static/js/modernizr.min.js"></script>
@@ -55,18 +56,21 @@
 <link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size2-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
 <link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size3-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
 <link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Caligraphic-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.2/css/all.css" integrity="sha384-vSIIfh2YWi9wW0r9iZe7RJPrKwp6bG+s9QZMoITbCckVJqGCCRhc+ccxNcdpHuYu" crossorigin="anonymous">
 </head>
 
 <body class="pytorch-body">
-  <nav class="navbar sticky-top navbar-dark fixed-top navbar-expand-lg" style="background: rgba(55,55,55,.8)">
-    <div class="container-fluid">
+  <div class="container-fluid header-holder tutorials-header" id="header-holder">
+    <nav class="navbar sticky-top navbar-dark fixed-top navbar-expand-lg">
       <div class="navbar-brand">
         <a href="https://pytorch.kr/" aria-label="PyTorch">
           <img src="../_static/images/logo-kr.svg" width="260" height="28" fill="white" />
         </a>
       </div>
-      <button type="button" aria-label="Toggle navigation" class="navbar-toggler collapsed" aria-expanded="false" aria-controls="nav-collapse"><span class="navbar-toggler-icon"></span></button>
-      <div id="nav-collapse" class="navbar-collapse collapse">
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div id="navbarSupportedContent" class="navbar-collapse collapse">
         <ul class="navbar-nav ml-auto">
           <li class="nav-item">
             <a href="//pytorch.kr/" target="_self" class="nav-link">홈</a></li>
@@ -79,9 +83,8 @@
             </a></li>
         </ul>
       </div>
-    </div>
-  </nav>
-
+    </nav>
+  </div>
    
 
     
@@ -101,7 +104,7 @@
               
               
                 <div class="version">
-                  1.6.0
+                  1.8.1
                 </div>
               
             
@@ -132,10 +135,12 @@
               <p class="caption"><span class="caption-text">파이토치(PyTorch) 레시피</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../recipes/recipes_index.html">모든 레시피 보기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../prototype/prototype_index.html">모든 프로토타입 레시피 보기</a></li>
 </ul>
 <p class="caption"><span class="caption-text">파이토치(PyTorch) 배우기</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/deep_learning_60min_blitz.html">파이토치(PyTorch)로 딥러닝하기: 60분만에 끝장내기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/basics/intro.html">파이토치(PyTorch) 기본 익히기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/deep_learning_60min_blitz.html">PyTorch로 딥러닝하기: 60분만에 끝장내기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/pytorch_with_examples.html">예제로 배우는 파이토치(PyTorch)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/nn_tutorial.html"><cite>torch.nn</cite> 이 <em>실제로</em> 무엇인가요?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tensorboard_tutorial.html">TensorBoard로 모델, 데이터, 학습 시각화하기</a></li>
@@ -146,10 +151,17 @@
 <li class="toctree-l1"><a class="reference internal" href="../beginner/transfer_learning_tutorial.html">컴퓨터 비전(Vision)을 위한 전이학습(Transfer Learning)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/fgsm_tutorial.html">적대적 예제 생성(Adversarial Example Generation)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/dcgan_faces_tutorial.html">DCGAN Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/vt_tutorial.html">Optimizing Vision Transformer Model for Deployment</a></li>
 </ul>
 <p class="caption"><span class="caption-text">오디오</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/audio_preprocessing_tutorial.html">torchaudio Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/audio_preprocessing_tutorial.html">Audio manipulation with torchaudio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/audio_preprocessing_tutorial.html#audio-i-o">Audio I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/audio_preprocessing_tutorial.html#data-augmentation">Data Augmentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/audio_preprocessing_tutorial.html#feature-extractions">Feature Extractions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/audio_preprocessing_tutorial.html#feature-augmentation">Feature Augmentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/audio_preprocessing_tutorial.html#datasets">Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="speech_command_recognition_with_torchaudio.html">Speech Command Recognition with torchaudio</a></li>
 </ul>
 <p class="caption"><span class="caption-text">텍스트</span></p>
 <ul>
@@ -157,12 +169,13 @@
 <li class="toctree-l1"><a class="reference internal" href="char_rnn_classification_tutorial.html">기초부터 시작하는 NLP: 문자-단위 RNN으로 이름 분류하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="char_rnn_generation_tutorial.html">기초부터 시작하는 NLP:  문자-단위 RNN으로 이름 생성하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="seq2seq_translation_tutorial.html">기초부터 시작하는 NLP: Sequence to Sequence 네트워크와 Attention을 이용한 번역</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/text_sentiment_ngrams_tutorial.html">TorchText로 텍스트 분류하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/torchtext_translation_tutorial.html">TorchText로 언어 번역하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/text_sentiment_ngrams_tutorial.html">torchtext 라이브러리로 텍스트 분류하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/torchtext_translation.html">TorchText로 언어 번역하기</a></li>
 </ul>
 <p class="caption"><span class="caption-text">강화학습</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="reinforcement_q_learning.html">강화 학습 (DQN) 튜토리얼</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mario_rl_tutorial.html">Train a Mario-playing RL Agent</a></li>
 </ul>
 <p class="caption"><span class="caption-text">PyTorch 모델을 프로덕션 환경에 배포하기</span></p>
 <ul>
@@ -171,24 +184,33 @@
 <li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_export.html">C++에서 TorchScript 모델 로딩하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/super_resolution_with_onnxruntime.html">(선택) PyTorch 모델을 ONNX으로 변환하고 ONNX 런타임에서 실행하기</a></li>
 </ul>
+<p class="caption"><span class="caption-text">Code Transforms with FX</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="fx_conv_bn_fuser.html">(beta) Building a Convolution/Batch Norm fuser in FX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fx_profiling_tutorial.html">(beta) Building a Simple CPU Performance Profiler with FX</a></li>
+</ul>
 <p class="caption"><span class="caption-text">프론트엔드 API</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="named_tensor_tutorial.html">(prototype) Introduction to Named Tensors in PyTorch</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">(실험용) PyTorch를 사용한 Channels Last Memory Format</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_frontend.html">Using the PyTorch C++ Frontend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/torch-script-parallelism.html">Dynamic Parallelism in TorchScript</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_autograd.html">Autograd in C++ Frontend</a></li>
+</ul>
+<p class="caption"><span class="caption-text">PyTorch 확장하기</span></p>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_extension.html">Custom C++ and CUDA Extensions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/torch_script_custom_ops.html">Extending TorchScript with Custom C++ Operators</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/torch_script_custom_classes.html">Extending TorchScript with Custom C++ Classes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../advanced/torch-script-parallelism.html">Dynamic Parallelism in TorchScript</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_autograd.html">Autograd in C++ Frontend</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../advanced/dispatcher.html">Dispatcher in C++</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/dispatcher.html">Registering a Dispatched Operator in C++</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/extend_dispatcher.html">Extending dispatcher for a new backend in C++</a></li>
 </ul>
 <p class="caption"><span class="caption-text">모델 최적화</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/profiler.html">Profiling your PyTorch Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/hyperparameter_tuning_tutorial.html">Hyperparameter tuning with Ray Tune</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pruning_tutorial.html">가지치기 기법(Pruning) 튜토리얼</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/dynamic_quantization_tutorial.html">(베타) LSTM 기반 단어 단위 언어 모델의 동적 양자화</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../advanced/static_quantization_tutorial.html">(beta) Static Quantization with Eager Mode in PyTorch</a></li>
 <li class="toctree-l1"><a class="reference internal" href="quantized_transfer_learning_tutorial.html">(beta) 컴퓨터 비전(Vision) 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
 </ul>
 <p class="caption"><span class="caption-text">병렬 및 분산 학습</span></p>
@@ -198,11 +220,17 @@
 <li class="toctree-l1"><a class="reference internal" href="ddp_tutorial.html">Getting Started with Distributed Data Parallel</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dist_tuto.html">PyTorch로 분산 어플리케이션 개발하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rpc_tutorial.html">Getting Started with Distributed RPC Framework</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/aws_distributed_training_tutorial.html">(advanced) PyTorch 1.0 Distributed Trainer with Amazon AWS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rpc_param_server_tutorial.html">Implementing a Parameter Server Using Distributed RPC Framework</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dist_pipeline_parallel_tutorial.html">Distributed Pipeline Parallelism Using RPC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rpc_async_execution.html">Implementing Batch RPC Processing Using Asynchronous Executions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/rpc_ddp_tutorial.html">Combining Distributed DataParallel with Distributed RPC Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pipeline_tutorial.html">Training Transformer models using Pipeline Parallelism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/ddp_pipeline.html">Training Transformer models using Distributed Data Parallel and Pipeline Parallelism</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Mobile</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/deeplabv3_on_ios.html">Image Segmentation DeepLabV3 on iOS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/deeplabv3_on_android.html">Image Segmentation DeepLabV3 on Android</a></li>
 </ul>
 
             
@@ -298,39 +326,37 @@
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
   <div class="sphx-glr-download-link-note admonition note">
-<p class="admonition-title">Note</p>
-<p>Click <a class="reference internal" href="#sphx-glr-download-intermediate-memory-format-tutorial-py"><span class="std std-ref">here</span></a> to download the full example code</p>
+<p class="first admonition-title">Note</p>
+<p class="last">Click <a class="reference internal" href="#sphx-glr-download-intermediate-memory-format-tutorial-py"><span class="std std-ref">here</span></a> to download the full example code</p>
 </div>
 <div class="sphx-glr-example-title section" id="pytorch-channels-last-memory-format">
 <span id="sphx-glr-intermediate-memory-format-tutorial-py"></span><h1>(실험용) PyTorch를 사용한 Channels Last Memory Format<a class="headerlink" href="#pytorch-channels-last-memory-format" title="Permalink to this headline">¶</a></h1>
-<p><strong>Author</strong>: <a class="reference external" href="https://github.com/VitalyFedyunin">Vitaly Fedyunin</a></p>
-<p><strong>번역</strong>: <a class="reference external" href="https://github.com/potatochips178">Choi Yoonjeong</a></p>
+<p><strong>Author</strong>: <a class="reference external" href="https://github.com/VitalyFedyunin">Vitaly Fedyunin</a>
+<strong>번역</strong>: <a class="reference external" href="https://github.com/potatochips178">Choi Yoonjeong</a></p>
 <div class="section" id="channels-last">
-<h2>Channels Last가 무엇인가요<a class="headerlink" href="#channels-last" title="Permalink to this headline">¶</a></h2>
-<p>Channels Last 메모리 형식(memory format)은 차원 순서를 유지하면서 메모리 상의 NCHW 텐서(tensor)를 정렬하는 또 다른 방식입니다.
-Channels Last 텐서는 채널(Channel)이 가장 밀도가 높은(densest) 차원으로 정렬(예. 이미지를 픽셀x픽셀로 저장)됩니다.</p>
+<h2>Channels last가 무엇인가요<a class="headerlink" href="#channels-last" title="Permalink to this headline">¶</a></h2>
+<p>Channels last 메모리 형식(memory format)은 차원 순서를 유지하면서 메모리 상의 NCHW 텐서(tensor)를 정렬하는 또 다른 방식입니다.
+Channels last 텐서는 채널(Channel)이 가장 밀도가 높은(densest) 차원으로 정렬(예. 이미지를 픽셀x픽셀로 저장)됩니다.</p>
 <p>예를 들어, (2개의 2 x 2 이미지에 3개의 채널이 존재하는 경우) 전형적인(연속적인) NCHW 텐서의 저장 방식은 다음과 같습니다:</p>
-<div class="figure align-default">
+<div class="figure">
 <img alt="classic_memory_format" src="../_images/classic_memory_format.png" />
 </div>
-<p>Channels Last 메모리 형식은 데이터를 다르게 정렬합니다:</p>
-<div class="figure align-default">
+<p>Channels last 메모리 형식은 데이터를 다르게 정렬합니다:</p>
+<div class="figure">
 <img alt="channels_last_memory_format" src="../_images/channels_last_memory_format.png" />
 </div>
 <p>PyTorch는 기존의 스트라이드(strides) 구조를 사용함으로써 메모리 형식을 지원(하며, eager, JIT 및 TorchScript를 포함한
-기존의 모델들과 하위 호환성을 제공)합니다. 예를 들어, Channels Last 형식에서 10x3x16x16 배치(batch)는 (768, 1, 48, 3)와
+기존의 모델들과 하위 호환성을 제공)합니다. 예를 들어, Channels last 형식에서 10x3x16x16 배치(batch)는 (768, 1, 48, 3)와
 같은 폭(strides)을 가지고 있게 됩니다.
-Channels Last 메모리 형식은 오직 4D NCWH Tensors에서만 실행할 수 있습니다.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
-<span class="n">N</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">W</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">32</span>
-</pre></div>
-</div>
+Channels last 메모리 형식은 오직 4D NCWH Tensors에서만 실행할 수 있습니다.</p>
 </div>
 <div class="section" id="memory-format-api">
 <h2>메모리 형식(Memory Format) API<a class="headerlink" href="#memory-format-api" title="Permalink to this headline">¶</a></h2>
 <p>연속 메모리 형식과 channels last 메모리 형식 간에 텐서를 변환하는 방법은 다음과 같습니다.</p>
 <p>전형적인 PyTorch의 연속적인 텐서(tensor)</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">W</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
+<span class="n">N</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">W</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">32</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">W</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">stride</span><span class="p">())</span> <span class="c1"># 결과: (3072, 1024, 32, 1)</span>
 </pre></div>
 </div>
@@ -339,7 +365,7 @@ Channels Last 메모리 형식은 오직 4D NCWH Tensors에서만 실행할 수 
 </pre></div>
 </div>
 <p>변환 연산자</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">contiguous</span><span class="p">(</span><span class="n">memory_format</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">channels_last</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">memory_format</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">channels_last</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="c1"># 결과: (10, 3, 32, 32) 차원 순서는 보존함</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">stride</span><span class="p">())</span> <span class="c1"># 결과: (3072, 1, 96, 3)</span>
 </pre></div>
@@ -350,7 +376,7 @@ Channels Last 메모리 형식은 오직 4D NCWH Tensors에서만 실행할 수 
 </pre></div>
 </div>
 <p>연속적인 형식으로 되돌리기</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">contiguous</span><span class="p">(</span><span class="n">memory_format</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">contiguous_format</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">memory_format</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">contiguous_format</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">stride</span><span class="p">())</span> <span class="c1"># 결과: (3072, 1024, 32, 1)</span>
 </pre></div>
 </div>
@@ -359,7 +385,7 @@ Channels Last 메모리 형식은 오직 4D NCWH Tensors에서만 실행할 수 
 </pre></div>
 </div>
 <p>다른 방식</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">memory_format</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">channels_last</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">contiguous</span><span class="p">(</span><span class="n">memory_format</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">channels_last</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">stride</span><span class="p">())</span> <span class="c1"># 결과: (3072, 1, 96, 3)</span>
 </pre></div>
 </div>
@@ -375,7 +401,40 @@ Channels Last 메모리 형식은 오직 4D NCWH Tensors에서만 실행할 수 
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>True
 </pre></div>
 </div>
-<p>Channels Last 방식으로 생성하기</p>
+<p><code class="docutils literal notranslate"><span class="pre">to</span></code> 와 <code class="docutils literal notranslate"><span class="pre">contiguous</span></code> 에는 작은 차이(minor difference)가 있습니다.
+명시적으로 텐서(tensor)의 메모리 형식을 변환할 때는 <code class="docutils literal notranslate"><span class="pre">to</span></code> 를 사용하는 것을
+권장합니다.</p>
+<p>대부분의 경우 두 API는 동일하게 동작합니다. 하지만 <code class="docutils literal notranslate"><span class="pre">C==1</span></code> 이거나
+<code class="docutils literal notranslate"><span class="pre">H</span> <span class="pre">==</span> <span class="pre">1</span> <span class="pre">&amp;&amp;</span> <span class="pre">W</span> <span class="pre">==</span> <span class="pre">1</span></code> 인 <code class="docutils literal notranslate"><span class="pre">NCHW</span></code> 4D 텐서의 특수한 경우에는 <code class="docutils literal notranslate"><span class="pre">to</span></code> 만이
+Channel last 메모리 형식으로 표현된 적절한 폭(stride)을 생성합니다.</p>
+<p>이는 위의 두가지 경우에 텐서의 메모리 형식이 모호하기 때문입니다.
+예를 들어, 크기가 <code class="docutils literal notranslate"><span class="pre">N1HW</span></code> 인 연속적인 텐서(contiguous tensor)는
+<code class="docutils literal notranslate"><span class="pre">연속적</span></code> 이면서 Channel last 형식으로 메모리에 저장됩니다.
+따라서, 주어진 메모리 형식에 대해 이미 <code class="docutils literal notranslate"><span class="pre">is_contiguous</span></code> 로 간주되어
+<code class="docutils literal notranslate"><span class="pre">contiguous</span></code> 호출은 동작하지 않게(no-op) 되어, 폭(stride)을 갱신하지
+않게 됩니다. 반면에, <code class="docutils literal notranslate"><span class="pre">to</span></code> 는 의도한 메모리 형식으로 적절하게 표현하기 위해
+크기가 1인 차원에서 의미있는 폭(stride)으로 재배열(restride)합니다.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">special_x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">special_x</span><span class="o">.</span><span class="n">is_contiguous</span><span class="p">(</span><span class="n">memory_format</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">channels_last</span><span class="p">))</span> <span class="c1"># Ouputs: True</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">special_x</span><span class="o">.</span><span class="n">is_contiguous</span><span class="p">(</span><span class="n">memory_format</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">contiguous_format</span><span class="p">))</span> <span class="c1"># Ouputs: True</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>True
+True
+</pre></div>
+</div>
+<p>명시적 치환(permutation) API인 <code class="docutils literal notranslate"><span class="pre">permute</span></code> 에서도 동일하게 적용됩니다.
+모호성이 발생할 수 있는 특별한 경우에, <code class="docutils literal notranslate"><span class="pre">permute</span></code> 는 의도한 메모리
+형식으로 전달되는 폭(stride)을 생성하는 것이 보장되지 않습니다.
+<code class="docutils literal notranslate"><span class="pre">to</span></code> 로 명시적으로 메모리 형식을 지정하여 의도치 않은 동작을 피할
+것을 권장합니다.</p>
+<dl class="docutils">
+<dt>또한, 3개의 비-배치(non-batch) 차원이 모두 <code class="docutils literal notranslate"><span class="pre">1</span></code> 인 극단적인 경우</dt>
+<dd>(<code class="docutils literal notranslate"><span class="pre">C==1</span> <span class="pre">&amp;&amp;</span> <span class="pre">H==1</span> <span class="pre">&amp;&amp;</span> <span class="pre">W==1</span></code>), 현재 구현은 텐서를 Channels last 메모리</dd>
+</dl>
+<p>형식으로 표시할 수 없음을 알려드립니다.</p>
+<p>Channels last 방식으로 생성하기</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">memory_format</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">channels_last</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">stride</span><span class="p">())</span> <span class="c1"># 결과: (3072, 1, 96, 3)</span>
 </pre></div>
@@ -421,13 +480,17 @@ Channels Last 메모리 형식은 오직 4D NCWH Tensors에서만 실행할 수 
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>(3072, 1, 96, 3)
 </pre></div>
 </div>
-<p>Conv, Batchnorm 모듈은 Channels Last를 지원합니다. (단, CudNN &gt;=7.6 에서만 동작)</p>
+<p>Conv, Batchnorm 모듈은 Channels last를 지원합니다. (단, CudNN &gt;=7.6 에서만 동작)
+합성곱(convolution) 모듈은 이진 p-wise 연산자(binary p-wise operator)와는 다르게
+Channels last가 주된 메모리 형식입니다. 모든 입력은 연속적인 메모리 형식이며,
+연산자는 연속된 메모리 형식으로 출력을 생성합니다. 그렇지 않으면, 출력은
+channels last 메모리 형식입니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">backends</span><span class="o">.</span><span class="n">cudnn</span><span class="o">.</span><span class="n">version</span><span class="p">()</span> <span class="o">&gt;=</span> <span class="mi">7603</span><span class="p">:</span>
-    <span class="nb">input</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cuda&quot;</span><span class="p">,</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">model</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span><span class="o">.</span><span class="n">half</span><span class="p">()</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">memory_format</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">channels_last</span><span class="p">)</span> <span class="c1"># 모듈 인자들은 Channels last로 변환이 필요합니다</span>
 
-    <span class="nb">input</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">contiguous</span><span class="p">(</span><span class="n">memory_format</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">channels_last</span><span class="p">)</span>
-    <span class="n">model</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">memory_format</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">channels_last</span><span class="p">)</span> <span class="c1"># 모듈 인자들은 Channels Last로 변환이 필요합니다</span>
+    <span class="nb">input</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="nb">input</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="o">=</span><span class="s2">&quot;cuda&quot;</span><span class="p">,</span> <span class="n">memory_format</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">channels_last</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float16</span><span class="p">)</span>
 
     <span class="n">out</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">is_contiguous</span><span class="p">(</span><span class="n">memory_format</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">channels_last</span><span class="p">))</span> <span class="c1"># 결과: True</span>
@@ -437,12 +500,17 @@ Channels Last 메모리 형식은 오직 4D NCWH Tensors에서만 실행할 수 
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>True
 </pre></div>
 </div>
+<p>입력 텐서가 Channels last를 지원하지 않는 연산자를 만나면
+치환(permutation)이 커널에 자동으로 적용되어 입력 텐서를 연속적인 형식으로
+복원합니다. 이 경우 과부하가 발생하여 channel last 메모리 형식의 전파가
+중단됩니다. 그럼에도 불구하고, 올바른 출력은 보장됩니다.</p>
 </div>
 <div class="section" id="id1">
 <h2>성능 향상<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
-<p>Tensor Cores를 지원하는 Nvidia의 하드웨어에서 가장 의미심장한 성능 향상을 보였습니다.
-Nvidia가 제공하는 AMP(Automated Mixed Precision) 학습 스크립트로 22% 이상의 성능 향상을 확인할 수 있었습니다.
-<a class="reference external" href="https://github.com/NVIDIA/apex">https://github.com/NVIDIA/apex</a></p>
+<p>정밀도를 줄인(reduced precision <code class="docutils literal notranslate"><span class="pre">torch.float16</span></code>) 상태에서 Tensor Cores를 지원하는 Nvidia의 하드웨어에서
+가장 의미심장한 성능 향상을 보였습니다. <cite>AMP (Automated Mixed Precision)</cite> 학습 스크립트를 활용하여
+연속적인 형식에 비해 Channels last 방식이 22% 이상의 성능 향승을 확인할 수 있었습니다.
+이 때, Nvidia가 제공하는 AMP를 사용했습니다. <a class="reference external" href="https://github.com/NVIDIA/apex">https://github.com/NVIDIA/apex</a></p>
 <p><code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">main_amp.py</span> <span class="pre">-a</span> <span class="pre">resnet50</span> <span class="pre">--b</span> <span class="pre">200</span> <span class="pre">--workers</span> <span class="pre">16</span> <span class="pre">--opt-level</span> <span class="pre">O2</span>&#160; <span class="pre">./data</span></code></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># opt_level = O2</span>
 <span class="c1"># keep_batchnorm_fp32 = None &lt;class &#39;NoneType&#39;&gt;</span>
@@ -477,7 +545,7 @@ Nvidia가 제공하는 AMP(Automated Mixed Precision) 학습 스크립트로 22%
 <span class="c1"># Epoch: [0][80/125] Time 0.260 (0.335) Speed 770.324 (597.659) Loss 2.2505953312 (1.0879) Prec@1 50.500 (52.938) Prec@5 100.000 (100.000)</span>
 </pre></div>
 </div>
-<p><code class="docutils literal notranslate"><span class="pre">--channels-last</span> <span class="pre">true</span></code> 인자를 전달하여 Channels Last 형식으로 모델을 실행하면 22%의 성능 향상을 보입니다.</p>
+<p><code class="docutils literal notranslate"><span class="pre">--channels-last</span> <span class="pre">true</span></code> 인자를 전달하여 Channels last 형식으로 모델을 실행하면 22%의 성능 향상을 보입니다.</p>
 <p><code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">main_amp.py</span> <span class="pre">-a</span> <span class="pre">resnet50</span> <span class="pre">--b</span> <span class="pre">200</span> <span class="pre">--workers</span> <span class="pre">16</span> <span class="pre">--opt-level</span> <span class="pre">O2</span> <span class="pre">--channels-last</span> <span class="pre">true</span> <span class="pre">./data</span></code></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># opt_level = O2</span>
 <span class="c1"># keep_batchnorm_fp32 = None &lt;class &#39;NoneType&#39;&gt;</span>
@@ -516,13 +584,14 @@ Nvidia가 제공하는 AMP(Automated Mixed Precision) 학습 스크립트로 22%
 <span class="c1"># Epoch: [0][80/125] Time 0.198 (0.269) Speed 1011.827 (743.883) Loss 2.8196096420 (2.4011) Prec@1 47.500 (50.938) Prec@5 100.000 (100.000)</span>
 </pre></div>
 </div>
-<p>아래 목록의 모델들은 Channels Last 형식을 전적으로 지원(full support)하며 Volta 장비에서 8%-35%의 성능 향상을 보입니다:
+<p>아래 목록의 모델들은 Channels last 형식을 전적으로 지원(full support)하며 Volta 장비에서 8%-35%의 성능 향상을 보입니다:
 <code class="docutils literal notranslate"><span class="pre">alexnet</span></code>, <code class="docutils literal notranslate"><span class="pre">mnasnet0_5</span></code>, <code class="docutils literal notranslate"><span class="pre">mnasnet0_75</span></code>, <code class="docutils literal notranslate"><span class="pre">mnasnet1_0</span></code>, <code class="docutils literal notranslate"><span class="pre">mnasnet1_3</span></code>, <code class="docutils literal notranslate"><span class="pre">mobilenet_v2</span></code>, <code class="docutils literal notranslate"><span class="pre">resnet101</span></code>, <code class="docutils literal notranslate"><span class="pre">resnet152</span></code>, <code class="docutils literal notranslate"><span class="pre">resnet18</span></code>, <code class="docutils literal notranslate"><span class="pre">resnet34</span></code>, <code class="docutils literal notranslate"><span class="pre">resnet50</span></code>, <code class="docutils literal notranslate"><span class="pre">resnext50_32x4d</span></code>, <code class="docutils literal notranslate"><span class="pre">shufflenet_v2_x0_5</span></code>, <code class="docutils literal notranslate"><span class="pre">shufflenet_v2_x1_0</span></code>, <code class="docutils literal notranslate"><span class="pre">shufflenet_v2_x1_5</span></code>, <code class="docutils literal notranslate"><span class="pre">shufflenet_v2_x2_0</span></code>, <code class="docutils literal notranslate"><span class="pre">squeezenet1_0</span></code>, <code class="docutils literal notranslate"><span class="pre">squeezenet1_1</span></code>, <code class="docutils literal notranslate"><span class="pre">vgg11</span></code>, <code class="docutils literal notranslate"><span class="pre">vgg11_bn</span></code>, <code class="docutils literal notranslate"><span class="pre">vgg13</span></code>, <code class="docutils literal notranslate"><span class="pre">vgg13_bn</span></code>, <code class="docutils literal notranslate"><span class="pre">vgg16</span></code>, <code class="docutils literal notranslate"><span class="pre">vgg16_bn</span></code>, <code class="docutils literal notranslate"><span class="pre">vgg19</span></code>, <code class="docutils literal notranslate"><span class="pre">vgg19_bn</span></code>, <code class="docutils literal notranslate"><span class="pre">wide_resnet101_2</span></code>, <code class="docutils literal notranslate"><span class="pre">wide_resnet50_2</span></code></p>
 </div>
 <div class="section" id="id2">
 <h2>기존 모델들 변환하기<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
-<p>Channels Last 지원은 기존 모델이 무엇이냐에 따라 제한되지 않으며, 어떠한 모델도 Channels Last로 변환할 수 있으며
-입력(input)의 형식만 맞춰주면 (신경망) 그래프를 통해 바로 전파(propagate)할 수 있습니다.</p>
+<p>Channels last 지원은 기존 모델이 무엇이냐에 따라 제한되지 않습니다.
+어떠한 모델도 Channels last로 변환할 수 있으며
+입력(또는 특정 가중치)의 형식만 맞춰주면 (신경망) 그래프를 통해 바로 전파(propagate)할 수 있습니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># 모델을 초기화한(또는 불러온) 이후, 한 번 실행이 필요합니다.</span>
 <span class="n">model</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">memory_format</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">channels_last</span><span class="p">)</span> <span class="c1"># 원하는 모델로 교체하기</span>
 
@@ -531,8 +600,13 @@ Nvidia가 제공하는 AMP(Automated Mixed Precision) 학습 스크립트로 22%
 <span class="n">output</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>그러나, 모든 연산자들이 Channels Last를 지원하도록 완전히 바뀐 것은 아닙니다(일반적으로는 연속적인 출력을 대신 반환합니다).
-즉, Channel Last 지원 연산자 목록 <a class="reference external" href="https://github.com/pytorch/pytorch/wiki/Operators-with-Channels-Last-support">https://github.com/pytorch/pytorch/wiki/Operators-with-Channels-Last-support</a> 에서 사용한 연산자들이 존재하는지 확인하거나,
+<p>그러나, 모든 연산자들이 Channels last를 지원하도록 완전히 바뀐 것은 아닙니다(일반적으로는 연속적인 출력을 대신 반환합니다).
+위의 예시들에서 Channels last를 지원하지 않는 계층(layer)은 메모리 형식 전파를 멈추게 됩니다.
+그럼에도 불구하고, 모델을 channels last 형식으로 변환했으므로, Channels last 메모리 형식으로 4차원의 가중치를 갖는
+각 합성곱 계층(convolution layer)에서는 Channels last 형식으로 복원되고 더 빠른 커널(faster kernel)의 이점을 누릴 수 있게 됩니다.</p>
+<p>하지만 Channels last를 지원하지 않는 연산자들은 치환(permutation)에 의해 과부하가 발생하게 됩니다.
+선택적으로, 변환된 모델의 성능을 향상시키고 싶은 경우 모델의 연산자들 중 channel last를 지원하지 않는 연산자를 조사하고 식별할 수 있습니다.</p>
+<p>이는 Channel Last 지원 연산자 목록 <a class="reference external" href="https://github.com/pytorch/pytorch/wiki/Operators-with-Channels-Last-support">https://github.com/pytorch/pytorch/wiki/Operators-with-Channels-Last-support</a> 에서 사용한 연산자들이 존재하는지 확인하거나,
 eager 실행 모드에서 메모리 형식 검사를 도입하고 모델을 실행해야 합니다.</p>
 <p>아래 코드에서, 연산자들의 출력이 입력의 메모리 형식과 일치하지 않으면 예외(exception)를 발생시킵니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">contains_cl</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
@@ -584,14 +658,17 @@ eager 실행 모드에서 메모리 형식 검사를 도입하고 모델을 실�
         <span class="k">return</span> <span class="n">result</span>
     <span class="k">return</span> <span class="n">check_cl</span>
 
+<span class="n">old_attrs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
 
 <span class="k">def</span> <span class="nf">attribute</span><span class="p">(</span><span class="n">m</span><span class="p">):</span>
+    <span class="n">old_attrs</span><span class="p">[</span><span class="n">m</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="n">m</span><span class="p">):</span>
         <span class="n">e</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
         <span class="n">exclude_functions</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;is_cuda&#39;</span><span class="p">,</span> <span class="s1">&#39;has_names&#39;</span><span class="p">,</span> <span class="s1">&#39;numel&#39;</span><span class="p">,</span>
                              <span class="s1">&#39;stride&#39;</span><span class="p">,</span> <span class="s1">&#39;Tensor&#39;</span><span class="p">,</span> <span class="s1">&#39;is_contiguous&#39;</span><span class="p">,</span> <span class="s1">&#39;__class__&#39;</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">i</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">exclude_functions</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">i</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="s1">&#39;__call__&#39;</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="n">e</span><span class="p">):</span>
             <span class="k">try</span><span class="p">:</span>
+                <span class="n">old_attrs</span><span class="p">[</span><span class="n">m</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">e</span>
                 <span class="nb">setattr</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">check_wrapper</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
             <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
                 <span class="nb">print</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
@@ -604,35 +681,43 @@ eager 실행 모드에서 메모리 형식 검사를 도입하고 모델을 실�
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>List
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Callable
+__name__
+List
 __name__
 Optional
 &#39;_SpecialForm&#39; object has no attribute &#39;__name__&#39;
+Tuple
+__name__
 Set
 __name__
 </pre></div>
 </div>
-<p>만약 Channels Last 텐서를 지원하지 않는 연산자를 발견하였고, 기여하기를 원한다면
+<p>만약 Channels last 텐서를 지원하지 않는 연산자를 발견하였고, 기여하기를 원한다면
 다음 개발 문서를 참고해주세요.
 <a class="reference external" href="https://github.com/pytorch/pytorch/wiki/Writing-memory-format-aware-operators">https://github.com/pytorch/pytorch/wiki/Writing-memory-format-aware-operators</a></p>
+<p>아래 코드는 torch의 속성(attributes)를 복원합니다.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">attrs</span><span class="p">)</span> <span class="ow">in</span> <span class="n">old_attrs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+  <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span><span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="n">attrs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="nb">setattr</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+</pre></div>
+</div>
 </div>
 <div class="section" id="id3">
 <h2>해야할 일<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
 <p>다음과 같이 여전히 해야 할 일이 많이 남아있습니다:</p>
 <ul class="simple">
-<li><p>N1HW와 NC11 Tensors의 모호성 해결하기;</p></li>
-<li><p>분산 학습을 지원하는지 확인하기;</p></li>
-<li><p>연산자 범위(operators coverage) 개선(improve)하기</p></li>
+<li>N1HW와 NC11 Tensors의 모호성 해결하기;</li>
+<li>분산 학습을 지원하는지 확인하기;</li>
+<li>연산자 범위(operators coverage) 개선(improve)하기</li>
 </ul>
 <p>개선할 부분에 대한 피드백 또는 제안이 있다면 <a class="reference external" href="https://github.com/pytorch/pytorch/issues">이슈를 만들어</a> 알려주세요.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.105 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.139 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-intermediate-memory-format-tutorial-py">
 <div class="sphx-glr-download docutils container">
-<p><a class="reference download internal" download="" href="../_downloads/591028d309d0401740cd71eb6b14bf93/memory_format_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">memory_format_tutorial.py</span></code></a></p>
-</div>
+<a class="reference download internal" download="" href="../_downloads/63b16cefbda7565fe77810ea19de55b1/memory_format_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">memory_format_tutorial.py</span></code></a></div>
 <div class="sphx-glr-download docutils container">
-<p><a class="reference download internal" download="" href="../_downloads/f11c58c36c9b8a5daf09d3f9a792ef84/memory_format_tutorial.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">memory_format_tutorial.ipynb</span></code></a></p>
-</div>
+<a class="reference download internal" download="" href="../_downloads/b9b65ebc739602d396a984a8f7a1737a/memory_format_tutorial.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">memory_format_tutorial.ipynb</span></code></a></div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
 </div>
@@ -649,27 +734,31 @@ __name__
         <a href="../advanced/cpp_frontend.html" class="btn btn-neutral float-right" title="Using the PyTorch C++ Frontend" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
       
       
-        <a href="named_tensor_tutorial.html" class="btn btn-neutral" title="(prototype) Introduction to Named Tensors in PyTorch" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
+        <a href="fx_profiling_tutorial.html" class="btn btn-neutral" title="(beta) Building a Simple CPU Performance Profiler with FX" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
       
     </div>
   
 
   
 
-    <hr class="helpful-hr hr-top">
-      <div class="helpful-container">
-        <div class="helpful-question">이 문서가 도움이 되었나요?</div>
-        <div class="helpful-question yes-link" data-behavior="was-this-helpful-event" data-response="yes">네</div>
-        <div class="helpful-question no-link" data-behavior="was-this-helpful-event" data-response="no">아니오</div>
-        <div class="was-helpful-thank-you">피드백을 주셔서 감사합니다.</div>
-      </div>
-    <hr class="helpful-hr hr-bottom"/>
+  <hr class="rating-hr hr-top">
+  <div class="rating-container">
+    <div class="rating-prompt">Rate this Tutorial</div>
+    <div class="stars-outer">
+      <i class="far fa-star" title="1 Star" data-behavior="tutorial-rating" data-count="1"></i>
+      <i class="far fa-star" title="2 Stars" data-behavior="tutorial-rating" data-count="2"></i>
+      <i class="far fa-star" title="3 Stars" data-behavior="tutorial-rating" data-count="3"></i>
+      <i class="far fa-star" title="4 Stars" data-behavior="tutorial-rating" data-count="4"></i>
+      <i class="far fa-star" title="5 Stars" data-behavior="tutorial-rating" data-count="5"></i>
+    </div>
+  </div>
+<hr class="rating-hr hr-bottom"/>
 
   
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2019, PyTorch.
+        &copy; Copyright 2021, PyTorch &amp; PyTorch Korea Community.
 
     </p>
   </div>
@@ -680,7 +769,6 @@ __name__
      
 
 </footer>
-
           </div>
         </div>
 
@@ -689,7 +777,7 @@ __name__
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
 <li><a class="reference internal" href="#">(실험용) PyTorch를 사용한 Channels Last Memory Format</a><ul>
-<li><a class="reference internal" href="#channels-last">Channels Last가 무엇인가요</a></li>
+<li><a class="reference internal" href="#channels-last">Channels last가 무엇인가요</a></li>
 <li><a class="reference internal" href="#memory-format-api">메모리 형식(Memory Format) API</a></li>
 <li><a class="reference internal" href="#id1">성능 향상</a></li>
 <li><a class="reference internal" href="#id2">기존 모델들 변환하기</a></li>
@@ -711,9 +799,12 @@ __name__
 
      
        <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-         <script src="../_static/jquery.js"></script>
-         <script src="../_static/underscore.js"></script>
-         <script src="../_static/doctools.js"></script>
+         <script type="text/javascript" src="../_static/jquery.js"></script>
+         <script type="text/javascript" src="../_static/underscore.js"></script>
+         <script type="text/javascript" src="../_static/doctools.js"></script>
+         <script type="text/javascript" src="../_static/clipboard.min.js"></script>
+         <script type="text/javascript" src="../_static/copybutton.js"></script>
+         <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
      
 
   
@@ -729,45 +820,54 @@ __name__
       });
   </script>
  
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-71919972-3"></script>
 <script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'UA-71919972-3');
+</script>
 
-  ga('create', 'UA-71919972-3', 'auto');
-  ga('send', 'pageview');
 
+<script>
   $("[data-behavior='call-to-action-event']").on('click', function(){
     ga('send', {
       hitType: 'event',
-      eventCategory: 'Download',
+      eventCategory: $(this).attr("data-response"),
       eventAction: 'click',
-      eventLabel: $(this).attr("data-response")
+      eventLabel: window.location.href
+    });
+
+    gtag('event', 'click', {
+      'event_category': $(this).attr("data-response"),
+      'event_label': $("h1").first().text(),
+      'tutorial_link': window.location.href
     });
    });
 
-   $("[data-behavior='was-this-helpful-event']").on('click', function(){
-    $(".helpful-question").hide();
-    $(".was-helpful-thank-you").show();
-    ga('send', {
-      hitType: 'event',
-      eventCategory: 'Was this Helpful?',
-      eventAction: 'click',
-      eventLabel: $(this).attr("data-response")
+   $("[data-behavior='tutorial-rating']").on('click', function(){
+    gtag('event', 'click', {
+      'event_category': 'Tutorial Rating',
+      'event_label': $("h1").first().text(),
+      'value': $(this).attr("data-count")
     });
    });
 
    if (location.pathname == "/") {
-     $(".helpful-container").hide();
+     $(".rating-container").hide();
      $(".hr-bottom").hide();
    }
 </script>
 
+<script type="text/javascript">
+  var collapsedSections = ['PyTorch Recipes', 'Image and Video', 'Audio', 'Text', 'Reinforcement Learning', 'Deploying PyTorch Models in Production', 'Code Transforms with FX', 'Frontend APIs', 'Extending PyTorch', 'Model Optimization', 'Parallel and Distributed Training', 'Mobile'];
+</script>
+
+
 
   <!-- Begin Footer -->
 
-  <div class="container-fluid docs-tutorials-resources" id="docs-tutorials-resources">
+  <!-- <div class="container-fluid docs-tutorials-resources" id="docs-tutorials-resources">
     <div class="container">
       <div class="row">
         <div class="col-md-4 text-center">
@@ -789,7 +889,7 @@ __name__
         </div>
       </div>
     </div>
-  </div>
+  </div> -->
 
   <footer class="site-footer">
     <div class="footer-container container">
@@ -844,10 +944,6 @@ __name__
           </li>
 
           <li>
-            <a href="https://pytorch.org/features">Features</a>
-          </li>
-
-          <li>
             <a href="https://pytorch.org/ecosystem">Ecosystem</a>
           </li>
 
@@ -867,13 +963,65 @@ __name__
             <a href="https://pytorch.org/tutorials">Tutorials</a>
           </li>
 
-          <li>
-            <a href="https://pytorch.org/docs/stable/index.html">Docs</a>
+          <li class="resources-mobile-menu-title">
+            Docs
           </li>
 
-          <li>
-            <a href="https://pytorch.org/resources">Resources</a>
+          <ul class="resources-mobile-menu-items">
+            <li>
+              <a href="https://pytorch.org/docs/stable/index.html">PyTorch</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/audio/stable/index.html">torchaudio</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/text/stable/index.html">torchtext</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/vision/stable/index.html">torchvision</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/elastic/">TorchElastic</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/serve/">TorchServe</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/xla">PyTorch on XLA Devices</a>
+            </li>
+          </ul>
+
+          <li class="resources-mobile-menu-title">
+            Resources
           </li>
+
+          <ul class="resources-mobile-menu-items">
+            <li>
+              <a href="https://pytorch.org/resources">Developer Resources</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/features">About</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/hub">Models (Beta)</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/#community-module">Community</a>
+            </li>
+
+            <li>
+              <a href="https://discuss.pytorch.org/">Forums</a>
+            </li>
+          </ul>
 
           <li>
             <a href="https://github.com/pytorch/pytorch">Github</a>

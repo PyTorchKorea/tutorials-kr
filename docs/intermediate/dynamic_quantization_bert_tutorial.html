@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>(베타) BERT 모델 동적 양자화하기 &mdash; PyTorch Tutorials 1.6.0 documentation</title>
+  <title>(베타) BERT 모델 동적 양자화하기 &mdash; PyTorch Tutorials 1.8.1 documentation</title>
   
 
   
@@ -27,10 +27,11 @@
 
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!-- <link rel="stylesheet" href="../_static/pygments.css" type="text/css" /> -->
+  <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
   <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="(beta) Static Quantization with Eager Mode in PyTorch" href="../advanced/static_quantization_tutorial.html" />
+    <link rel="next" title="(beta) 컴퓨터 비전(Vision) 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)" href="quantized_transfer_learning_tutorial.html" />
     <link rel="prev" title="(베타) LSTM 기반 단어 단위 언어 모델의 동적 양자화" href="../advanced/dynamic_quantization_tutorial.html" /> 
 
   
@@ -55,18 +56,21 @@
 <link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size2-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
 <link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size3-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
 <link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Caligraphic-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.2/css/all.css" integrity="sha384-vSIIfh2YWi9wW0r9iZe7RJPrKwp6bG+s9QZMoITbCckVJqGCCRhc+ccxNcdpHuYu" crossorigin="anonymous">
 </head>
 
 <body class="pytorch-body">
-  <nav class="navbar sticky-top navbar-dark fixed-top navbar-expand-lg" style="background: rgba(55,55,55,.8)">
-    <div class="container-fluid">
+  <div class="container-fluid header-holder tutorials-header" id="header-holder">
+    <nav class="navbar sticky-top navbar-dark fixed-top navbar-expand-lg">
       <div class="navbar-brand">
         <a href="https://pytorch.kr/" aria-label="PyTorch">
           <img src="../_static/images/logo-kr.svg" width="260" height="28" fill="white" />
         </a>
       </div>
-      <button type="button" aria-label="Toggle navigation" class="navbar-toggler collapsed" aria-expanded="false" aria-controls="nav-collapse"><span class="navbar-toggler-icon"></span></button>
-      <div id="nav-collapse" class="navbar-collapse collapse">
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div id="navbarSupportedContent" class="navbar-collapse collapse">
         <ul class="navbar-nav ml-auto">
           <li class="nav-item">
             <a href="//pytorch.kr/" target="_self" class="nav-link">홈</a></li>
@@ -79,9 +83,8 @@
             </a></li>
         </ul>
       </div>
-    </div>
-  </nav>
-
+    </nav>
+  </div>
    
 
     
@@ -101,7 +104,7 @@
               
               
                 <div class="version">
-                  1.6.0
+                  1.8.1
                 </div>
               
             
@@ -132,10 +135,12 @@
               <p class="caption"><span class="caption-text">파이토치(PyTorch) 레시피</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../recipes/recipes_index.html">모든 레시피 보기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../prototype/prototype_index.html">모든 프로토타입 레시피 보기</a></li>
 </ul>
 <p class="caption"><span class="caption-text">파이토치(PyTorch) 배우기</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/deep_learning_60min_blitz.html">파이토치(PyTorch)로 딥러닝하기: 60분만에 끝장내기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/basics/intro.html">파이토치(PyTorch) 기본 익히기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/deep_learning_60min_blitz.html">PyTorch로 딥러닝하기: 60분만에 끝장내기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/pytorch_with_examples.html">예제로 배우는 파이토치(PyTorch)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/nn_tutorial.html"><cite>torch.nn</cite> 이 <em>실제로</em> 무엇인가요?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tensorboard_tutorial.html">TensorBoard로 모델, 데이터, 학습 시각화하기</a></li>
@@ -146,10 +151,17 @@
 <li class="toctree-l1"><a class="reference internal" href="../beginner/transfer_learning_tutorial.html">컴퓨터 비전(Vision)을 위한 전이학습(Transfer Learning)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/fgsm_tutorial.html">적대적 예제 생성(Adversarial Example Generation)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/dcgan_faces_tutorial.html">DCGAN Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/vt_tutorial.html">Optimizing Vision Transformer Model for Deployment</a></li>
 </ul>
 <p class="caption"><span class="caption-text">오디오</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/audio_preprocessing_tutorial.html">torchaudio Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/audio_preprocessing_tutorial.html">Audio manipulation with torchaudio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/audio_preprocessing_tutorial.html#audio-i-o">Audio I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/audio_preprocessing_tutorial.html#data-augmentation">Data Augmentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/audio_preprocessing_tutorial.html#feature-extractions">Feature Extractions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/audio_preprocessing_tutorial.html#feature-augmentation">Feature Augmentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/audio_preprocessing_tutorial.html#datasets">Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="speech_command_recognition_with_torchaudio.html">Speech Command Recognition with torchaudio</a></li>
 </ul>
 <p class="caption"><span class="caption-text">텍스트</span></p>
 <ul>
@@ -157,12 +169,13 @@
 <li class="toctree-l1"><a class="reference internal" href="char_rnn_classification_tutorial.html">기초부터 시작하는 NLP: 문자-단위 RNN으로 이름 분류하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="char_rnn_generation_tutorial.html">기초부터 시작하는 NLP:  문자-단위 RNN으로 이름 생성하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="seq2seq_translation_tutorial.html">기초부터 시작하는 NLP: Sequence to Sequence 네트워크와 Attention을 이용한 번역</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/text_sentiment_ngrams_tutorial.html">TorchText로 텍스트 분류하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/torchtext_translation_tutorial.html">TorchText로 언어 번역하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/text_sentiment_ngrams_tutorial.html">torchtext 라이브러리로 텍스트 분류하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/torchtext_translation.html">TorchText로 언어 번역하기</a></li>
 </ul>
 <p class="caption"><span class="caption-text">강화학습</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="reinforcement_q_learning.html">강화 학습 (DQN) 튜토리얼</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mario_rl_tutorial.html">Train a Mario-playing RL Agent</a></li>
 </ul>
 <p class="caption"><span class="caption-text">PyTorch 모델을 프로덕션 환경에 배포하기</span></p>
 <ul>
@@ -171,24 +184,33 @@
 <li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_export.html">C++에서 TorchScript 모델 로딩하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/super_resolution_with_onnxruntime.html">(선택) PyTorch 모델을 ONNX으로 변환하고 ONNX 런타임에서 실행하기</a></li>
 </ul>
+<p class="caption"><span class="caption-text">Code Transforms with FX</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="fx_conv_bn_fuser.html">(beta) Building a Convolution/Batch Norm fuser in FX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fx_profiling_tutorial.html">(beta) Building a Simple CPU Performance Profiler with FX</a></li>
+</ul>
 <p class="caption"><span class="caption-text">프론트엔드 API</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="named_tensor_tutorial.html">(prototype) Introduction to Named Tensors in PyTorch</a></li>
 <li class="toctree-l1"><a class="reference internal" href="memory_format_tutorial.html">(실험용) PyTorch를 사용한 Channels Last Memory Format</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_frontend.html">Using the PyTorch C++ Frontend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/torch-script-parallelism.html">Dynamic Parallelism in TorchScript</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_autograd.html">Autograd in C++ Frontend</a></li>
+</ul>
+<p class="caption"><span class="caption-text">PyTorch 확장하기</span></p>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_extension.html">Custom C++ and CUDA Extensions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/torch_script_custom_ops.html">Extending TorchScript with Custom C++ Operators</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/torch_script_custom_classes.html">Extending TorchScript with Custom C++ Classes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../advanced/torch-script-parallelism.html">Dynamic Parallelism in TorchScript</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_autograd.html">Autograd in C++ Frontend</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../advanced/dispatcher.html">Dispatcher in C++</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/dispatcher.html">Registering a Dispatched Operator in C++</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/extend_dispatcher.html">Extending dispatcher for a new backend in C++</a></li>
 </ul>
 <p class="caption"><span class="caption-text">모델 최적화</span></p>
 <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../beginner/profiler.html">Profiling your PyTorch Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/hyperparameter_tuning_tutorial.html">Hyperparameter tuning with Ray Tune</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pruning_tutorial.html">가지치기 기법(Pruning) 튜토리얼</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/dynamic_quantization_tutorial.html">(베타) LSTM 기반 단어 단위 언어 모델의 동적 양자화</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">(베타) BERT 모델 동적 양자화하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../advanced/static_quantization_tutorial.html">(beta) Static Quantization with Eager Mode in PyTorch</a></li>
 <li class="toctree-l1"><a class="reference internal" href="quantized_transfer_learning_tutorial.html">(beta) 컴퓨터 비전(Vision) 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
 </ul>
 <p class="caption"><span class="caption-text">병렬 및 분산 학습</span></p>
@@ -198,11 +220,17 @@
 <li class="toctree-l1"><a class="reference internal" href="ddp_tutorial.html">Getting Started with Distributed Data Parallel</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dist_tuto.html">PyTorch로 분산 어플리케이션 개발하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rpc_tutorial.html">Getting Started with Distributed RPC Framework</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/aws_distributed_training_tutorial.html">(advanced) PyTorch 1.0 Distributed Trainer with Amazon AWS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rpc_param_server_tutorial.html">Implementing a Parameter Server Using Distributed RPC Framework</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dist_pipeline_parallel_tutorial.html">Distributed Pipeline Parallelism Using RPC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rpc_async_execution.html">Implementing Batch RPC Processing Using Asynchronous Executions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/rpc_ddp_tutorial.html">Combining Distributed DataParallel with Distributed RPC Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pipeline_tutorial.html">Training Transformer models using Pipeline Parallelism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/ddp_pipeline.html">Training Transformer models using Distributed Data Parallel and Pipeline Parallelism</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Mobile</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/deeplabv3_on_ios.html">Image Segmentation DeepLabV3 on iOS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/deeplabv3_on_android.html">Image Segmentation DeepLabV3 on Android</a></li>
 </ul>
 
             
@@ -300,8 +328,8 @@
   <div class="section" id="bert">
 <h1>(베타) BERT 모델 동적 양자화하기<a class="headerlink" href="#bert" title="Permalink to this headline">¶</a></h1>
 <div class="admonition tip">
-<p class="admonition-title">Tip</p>
-<p>이 튜토리얼을 따라 하기 위해, 이
+<p class="first admonition-title">Tip</p>
+<p class="last">이 튜토리얼을 따라 하기 위해, 이
 <a class="reference external" href="https://colab.research.google.com/github/pytorch/tutorials/blob/gh-pages/_downloads/dynamic_quantization_bert_tutorial.ipynb">Colab 버전</a> 을 사용하길 권장합니다.
 그러면 아래에 설명된 정보들을 이용해 실험할 수 있습니다.</p>
 </div>
@@ -315,23 +343,23 @@
 모델을 동적으로 양자화할 것입니다. BERT 처럼 유명하면서도 최고 성능을
 내는 모델을 어떻게 동적으로 양자화된 모델로 변환하는지 한 단계씩 설명하겠습니다.</p>
 <ul class="simple">
-<li><p>BERT 또는 Transformer 의 양방향 임베딩 표현(representation) 이라 불리는 방법은
+<li>BERT 또는 Transformer 의 양방향 임베딩 표현(representation) 이라 불리는 방법은
 질의응답, 문장 분류 등의 여러 자연어 처리 분야(문제)에서 최고 성능을 달성한
 새로운 언어 표현 사전학습 방법입니다. 원 논문은 <a class="reference external" href="https://arxiv.org/pdf/1810.04805.pdf">여기</a>
-에서 읽을 수 있습니다.</p></li>
-<li><p>PyTorch에서 지원하는 동적 양자화 기능은 부동소수점 모델의 가중치를 정적인
+에서 읽을 수 있습니다.</li>
+<li>PyTorch에서 지원하는 동적 양자화 기능은 부동소수점 모델의 가중치를 정적인
 int8 또는 float16 타입의 양자화된 모델로 변환하고, 활성 함수 부분은
 동적으로 양자화합니다. 가중치가 int8 타입으로 양자화 됐을 때, 활성 함수 부분은
 배치마다 int8 타입으로 동적으로 양자화 됩니다. PyTorch에는 지정된 모듈을
 동적이면서 가중치만 갖도록 양자화된 형태로 변환하고, 양자화된 모델을 만들어내는
-<a class="reference external" href="https://pytorch.org/docs/stable/quantization.html#torch.quantization.quantize_dynamic">torch.quantization.quantize_dynamic API</a> 가 있습니다.</p></li>
-<li><p>우리는 일반 언어 이해 평가 벤치마크 <a class="reference external" href="https://gluebenchmark.com/">(GLUE)</a> 중
+<a class="reference external" href="https://pytorch.org/docs/stable/quantization.html#torch.quantization.quantize_dynamic">torch.quantization.quantize_dynamic API</a> 가 있습니다.</li>
+<li>우리는 일반 언어 이해 평가 벤치마크 <a class="reference external" href="https://gluebenchmark.com/">(GLUE)</a> 중
 <a class="reference external" href="https://www.microsoft.com/en-us/download/details.aspx?id=52398">Microsoft Research 의역 코퍼스(MRPC)</a> 를
 대상으로 한 정확도와 추론 성능을 보여줄 것입니다. MRPC (Dolan and Brockett, 2005) 는
 온라인 뉴스로부터 자동으로 추출된 두 개의 문장들과 그 두 문장이 같은 뜻인지 사람이
 평가한 정답으로 이루어져 있습니다. 클래스의 비중이 같지 않아(같음 68%, 다름 32%),
 많이 쓰이는 <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.metrics.f1_score.html">F1 점수</a> 를
-기록합니다. MRPC는 아래에 나온 것처럼 문장 쌍을 분류하는 자연어처리 문제로 많이 쓰입니다.</p></li>
+기록합니다. MRPC는 아래에 나온 것처럼 문장 쌍을 분류하는 자연어처리 문제에 많이 쓰입니다.</li>
 </ul>
 <img alt="../_images/bert.png" src="../_images/bert.png" />
 </div>
@@ -343,22 +371,22 @@ int8 또는 float16 타입의 양자화된 모델로 변환하고, 활성 함수
 PyTorch 설치 안내와 <a class="reference external" href="https://github.com/huggingface/transformers#installation">HuggingFace 깃허브 저장소</a> 의
 안내를 따라 합시다. 추가로 우리가 사용할 F1 점수를 계산하는 보조 함수가 내장된
 <a class="reference external" href="https://github.com/scikit-learn/scikit-learn">scikit-learn</a> 패키지를 설치합니다.</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>pip install sklearn
-pip install transformers
+<div class="code shell highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">sklearn</span>
+<span class="n">pip</span> <span class="n">install</span> <span class="n">transformers</span>
 </pre></div>
 </div>
 <p>PyTorch의 베타 기능들을 사용할 것이므로, 가장 최신 버전의 torch와 torchvision을 설치하는 것을 권해드립니다.
 가장 최신 버전의 설치 안내는 <a class="reference external" href="https://pytorch.org/get-started/locally/">여기</a> 에 있습니다.
 예를 들어 Mac에 설치하려면 :</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>yes y <span class="p">|</span> pip uninstall torch tochvision
-yes y <span class="p">|</span> pip install --pre torch -f https://download.pytorch.org/whl/nightly/cu101/torch_nightly.html
+<div class="code shell highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yes</span> <span class="n">y</span> <span class="o">|</span> <span class="n">pip</span> <span class="n">uninstall</span> <span class="n">torch</span> <span class="n">tochvision</span>
+<span class="n">yes</span> <span class="n">y</span> <span class="o">|</span> <span class="n">pip</span> <span class="n">install</span> <span class="o">--</span><span class="n">pre</span> <span class="n">torch</span> <span class="o">-</span><span class="n">f</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">download</span><span class="o">.</span><span class="n">pytorch</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="n">whl</span><span class="o">/</span><span class="n">nightly</span><span class="o">/</span><span class="n">cu101</span><span class="o">/</span><span class="n">torch_nightly</span><span class="o">.</span><span class="n">html</span>
 </pre></div>
 </div>
 </div>
 <div class="section" id="id6">
 <h3>1.2 필요한 모듈 불러오기<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
 <p>이 단계에서는 이 튜토리얼에 필요한 파이썬 모듈들을 불러오겠습니다.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
+<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
 
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -392,7 +420,7 @@ yes y <span class="p">|</span> pip install --pre torch -f https://download.pytor
 </div>
 <p>쓰레드 한 개를 사용할 때의 FP32와 INT8의 성능을 비교하기 위해 쓰레드의 수를 1로 설정합니다.
 이 튜토리얼의 끝부분에서는 PyTorch를 적절하게 병렬적으로 빌드하여 쓰레드 수를 다르게 설정할 수 있습니다.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">torch</span><span class="o">.</span><span class="n">set_num_threads</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">torch</span><span class="o">.</span><span class="n">set_num_threads</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">__config__</span><span class="o">.</span><span class="n">parallel_info</span><span class="p">())</span>
 </pre></div>
 </div>
@@ -406,17 +434,17 @@ F1 점수를 계산하기 위한 함수입니다.</p>
 <p><a class="reference external" href="https://github.com/huggingface/transformers/blob/master/transformers/data/processors/glue.py">Glue_convert_examples_to_features</a> 함수는
 텍스트를 입력 특징으로 변환합니다.</p>
 <ul class="simple">
-<li><p>입력 문자열 분리하기;</p></li>
-<li><p>[CLS]를 맨 앞에 삽입하기;</p></li>
-<li><p>[SEP]를 첫번째 문장과 두 번째 문장 사이, 그리고 제일 마지막 위치에 넣기;</p></li>
-<li><p>토큰이 첫번째 문장에 속하는지 두번째 문장에 속하는지 알려주는 토큰 타입 id 생성하기</p></li>
+<li>입력 문자열 분리하기;</li>
+<li>[CLS]를 맨 앞에 삽입하기;</li>
+<li>[SEP]를 첫번째 문장과 두 번째 문장 사이, 그리고 제일 마지막 위치에 넣기;</li>
+<li>토큰이 첫번째 문장에 속하는지 두번째 문장에 속하는지 알려주는 토큰 타입 id 생성하기</li>
 </ul>
 <p><a class="reference external" href="https://github.com/huggingface/transformers/blob/master/transformers/data/processors/glue.py">glue_compute_metrics</a> 함수는
 정밀도와 재현율의 가중 평균인 <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.metrics.f1_score.html">F1 점수</a> 를
 계산하는 행렬을 갖고 있습니다. F1 점수가 가장 좋을 때는 1이며, 가장 나쁠 때는 0입니다.
 정밀도와 재현율은 F1 점수를 계산할 때 동일한 비중을 갖습니다.</p>
 <ul class="simple">
-<li><p>F1 점수를 구하는 식 :</p></li>
+<li>F1 점수를 구하는 식 :</li>
 </ul>
 <blockquote>
 <div><div class="math notranslate nohighlight">
@@ -428,7 +456,7 @@ F1 점수를 계산하기 위한 함수입니다.</p>
 <p>MRPC 문제를 풀어보기 전에 <a class="reference external" href="https://gist.github.com/W4ngatang/60c2bdb54d156a41194446737ce03e2e">이 스크립트</a> 를
 실행해 <a class="reference external" href="https://gluebenchmark.com/tasks">GLUE 데이터셋</a> 을 다운로드 받고 <code class="docutils literal notranslate"><span class="pre">glue_data</span></code>
 폴더에 저장합니다.</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>python download_glue_data.py --data_dir<span class="o">=</span><span class="s1">&#39;glue_data&#39;</span> --tasks<span class="o">=</span><span class="s1">&#39;MRPC&#39;</span>
+<div class="code shell highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">download_glue_data</span><span class="o">.</span><span class="n">py</span> <span class="o">--</span><span class="n">data_dir</span><span class="o">=</span><span class="s1">&#39;glue_data&#39;</span> <span class="o">--</span><span class="n">tasks</span><span class="o">=</span><span class="s1">&#39;MRPC&#39;</span>
 </pre></div>
 </div>
 </div>
@@ -443,7 +471,7 @@ BERT 모델을 MRPC 문제에 맞게 미세조정하여 의미적으로 동일�
 <p>사전학습된 BERT 모델(HuggingFace transformer들 중 <code class="docutils literal notranslate"><span class="pre">bert-base-uncased</span></code> 모델)을
 MRPC 문제에 맞게 미세조정하기 위해 <a class="reference external" href="https://github.com/huggingface/transformers/tree/master/examples#mrpc">예시들</a>
 의 명령을 따라 실행합니다:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>export GLUE_DIR=./glue_data
+<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span>export GLUE_DIR=./glue_data
 export TASK_NAME=MRPC
 export OUT_DIR=./$TASK_NAME/
 python ./run_glue.py \
@@ -469,7 +497,7 @@ python ./run_glue.py \
 <h3>2.1 전역 환경 설정하기<a class="headerlink" href="#id15" title="Permalink to this headline">¶</a></h3>
 <p>이 단계에서는 미세조정한 BERT 모델을 동적 양자화 이전, 이후에 평가하기 위한
 전역 환경 설정을 진행합니다.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">configs</span> <span class="o">=</span> <span class="n">Namespace</span><span class="p">()</span>
+<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">configs</span> <span class="o">=</span> <span class="n">Namespace</span><span class="p">()</span>
 
 <span class="c1"># 미세조정한 모델의 출력을 저장할 폴더, $OUT_DIR.</span>
 <span class="n">configs</span><span class="o">.</span><span class="n">output_dir</span> <span class="o">=</span> <span class="s2">&quot;./MRPC/&quot;</span>
@@ -511,7 +539,7 @@ python ./run_glue.py \
 <h3>2.2 미세조정한 BERT 모델 불러오기<a class="headerlink" href="#id16" title="Permalink to this headline">¶</a></h3>
 <p><code class="docutils literal notranslate"><span class="pre">configs.output_dir</span></code> 에서 토크나이저와 미세조정한 문장 분류
 BERT 모델(FP32)를 불러옵니다.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">tokenizer</span> <span class="o">=</span> <span class="n">BertTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
+<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tokenizer</span> <span class="o">=</span> <span class="n">BertTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
     <span class="n">configs</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">do_lower_case</span><span class="o">=</span><span class="n">configs</span><span class="o">.</span><span class="n">do_lower_case</span><span class="p">)</span>
 
 <span class="n">model</span> <span class="o">=</span> <span class="n">BertForSequenceClassification</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">configs</span><span class="o">.</span><span class="n">output_dir</span><span class="p">)</span>
@@ -523,7 +551,7 @@ BERT 모델(FP32)를 불러옵니다.</p>
 <h3>2.3 토큰화, 평가 함수 정의하기<a class="headerlink" href="#id17" title="Permalink to this headline">¶</a></h3>
 <p><a class="reference external" href="https://github.com/huggingface/transformers/blob/master/examples/run_glue.py">Huggingface</a>
 의 토큰화 함수와 평가 함수를 사용합니다.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># coding=utf-8</span>
+<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># coding=utf-8</span>
 <span class="c1"># Copyright 2018 The Google AI Language Team Authors and The HuggingFace Inc. team.</span>
 <span class="c1"># Copyright (c) 2018, NVIDIA CORPORATION.  All rights reserved.</span>
 <span class="c1">#</span>
@@ -679,10 +707,10 @@ BERT 모델(FP32)를 불러옵니다.</p>
 <p>HuggingFace BERT 모델에 동적 양자화를 적용하기 위해
 <code class="docutils literal notranslate"><span class="pre">torch.quantization.quantize_dynamic</span></code> 을 호출합니다. 구체적으로,</p>
 <ul class="simple">
-<li><p>모델 중 torch.nn.Linear 모듈을 양자화하도록 지정합니다.</p></li>
-<li><p>가중치들을 양자화할 때 int8로 변환하도록 지정합니다.</p></li>
+<li>모델 중 torch.nn.Linear 모듈을 양자화하도록 지정합니다.</li>
+<li>가중치들을 양자화할 때 int8로 변환하도록 지정합니다.</li>
 </ul>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">quantized_model</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">quantization</span><span class="o">.</span><span class="n">quantize_dynamic</span><span class="p">(</span>
+<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">quantized_model</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">quantization</span><span class="o">.</span><span class="n">quantize_dynamic</span><span class="p">(</span>
     <span class="n">model</span><span class="p">,</span> <span class="p">{</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">},</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">qint8</span>
 <span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">quantized_model</span><span class="p">)</span>
@@ -692,7 +720,7 @@ BERT 모델(FP32)를 불러옵니다.</p>
 <h3>3.1 모델 크기 확인하기<a class="headerlink" href="#id20" title="Permalink to this headline">¶</a></h3>
 <p>먼저 모델 크기를 확인해보겠습니다. 보면, 모델 크기가 상당히 줄어든 것을
 알 수 있습니다(FP32 형식의 모델 크기 : 438MB; INT8 형식의 모델 크기 : 181MB):</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">print_size_of_model</span><span class="p">(</span><span class="n">model</span><span class="p">):</span>
+<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">print_size_of_model</span><span class="p">(</span><span class="n">model</span><span class="p">):</span>
     <span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span> <span class="s2">&quot;temp.p&quot;</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Size (MB):&#39;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getsize</span><span class="p">(</span><span class="s2">&quot;temp.p&quot;</span><span class="p">)</span><span class="o">/</span><span class="mf">1e6</span><span class="p">)</span>
     <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s1">&#39;temp.p&#39;</span><span class="p">)</span>
@@ -711,7 +739,7 @@ BERT 모델(FP32)를 불러옵니다.</p>
 <h3>3.2 추론 정확도와 속도 평가하기<a class="headerlink" href="#id21" title="Permalink to this headline">¶</a></h3>
 <p>다음으로, 기존의 FP32 모델과 동적 양자화를 적용한 INT8 모델들의
 추론 속도와 정확도를 비교해보겟습니다.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">time_model_evaluation</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">configs</span><span class="p">,</span> <span class="n">tokenizer</span><span class="p">):</span>
+<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">time_model_evaluation</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">configs</span><span class="p">,</span> <span class="n">tokenizer</span><span class="p">):</span>
     <span class="n">eval_start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
     <span class="n">result</span> <span class="o">=</span> <span class="n">evaluate</span><span class="p">(</span><span class="n">configs</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">tokenizer</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
     <span class="n">eval_end_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
@@ -729,13 +757,13 @@ BERT 모델(FP32)를 불러옵니다.</p>
 <p>맥북 프로에서 양자화하지 않았을 때, 408개의 MRPC 데이터를 모두 추론하는데
 160초가 소요됩니다. 양자화 하면 90초가 걸립니다. 맥북 프로에서 실행해본
 결과를 아래에 정리했습니다:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">|</span> <span class="n">정확도</span>  <span class="o">|</span>  <span class="n">F1</span> <span class="n">점수</span>  <span class="o">|</span>  <span class="n">모델</span> <span class="n">크기</span>  <span class="o">|</span>  <span class="n">쓰레드</span> <span class="mi">1</span><span class="n">개</span> <span class="o">|</span>  <span class="n">쓰레드</span> <span class="mi">4</span><span class="n">개</span> <span class="o">|</span>
+<div class="code highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">|</span> <span class="n">정확도</span>  <span class="o">|</span>  <span class="n">F1</span> <span class="n">점수</span>  <span class="o">|</span>  <span class="n">모델</span> <span class="n">크기</span>  <span class="o">|</span>  <span class="n">쓰레드</span> <span class="mi">1</span><span class="n">개</span> <span class="o">|</span>  <span class="n">쓰레드</span> <span class="mi">4</span><span class="n">개</span> <span class="o">|</span>
 <span class="o">|</span>  <span class="n">FP32</span>  <span class="o">|</span>  <span class="mf">0.9019</span>  <span class="o">|</span>   <span class="mi">438</span> <span class="n">MB</span>   <span class="o">|</span>   <span class="mi">160</span> <span class="n">초</span>   <span class="o">|</span>   <span class="mi">85</span> <span class="n">초</span>    <span class="o">|</span>
-<span class="o">|</span>  <span class="n">INT8</span>  <span class="o">|</span>  <span class="mf">0.8953</span>  <span class="o">|</span>   <span class="mi">181</span> <span class="n">MB</span>   <span class="o">|</span>    <span class="mi">90</span> <span class="n">초</span>   <span class="o">|</span>   <span class="mi">46</span> <span class="n">초</span>    <span class="o">|</span>
+<span class="o">|</span>  <span class="n">INT8</span>  <span class="o">|</span>  <span class="mf">0.902</span>   <span class="o">|</span>   <span class="mi">181</span> <span class="n">MB</span>   <span class="o">|</span>   <span class="mi">90</span> <span class="n">초</span>    <span class="o">|</span>   <span class="mi">46</span> <span class="n">초</span>    <span class="o">|</span>
 </pre></div>
 </div>
 <p>MRPC 문제에 맞게 미세조정한 BERT 모델에 학습 후 동적 양자화를 적용한
-결과, F1 점수 0.6이 나왔습니다. 참고로, <a class="reference external" href="https://arxiv.org/pdf/1910.06188.pdf">최근 논문</a>
+결과, 0.6% 낮은 F1 점수가 나왔습니다. 참고로, <a class="reference external" href="https://arxiv.org/pdf/1910.06188.pdf">최근 논문</a>
 (표 1)에서는 학습 후 동적 양자화를 적용했을 때, F1 점수 0.8788이 나왔고,
 양자화 의식 학습을 적용했을 때는 0.8956이 나왔습니다. 우리는 Pytorch의 비대칭
 양자화를 사용했지만, 참고한 논문에서는 대칭적 양자화만을 사용했다는 점이 주요한
@@ -753,11 +781,17 @@ MRPC 데이터셋을 평가하는데 약 46초가 소요됐습니다.</p>
 </div>
 <div class="section" id="id24">
 <h3>3.3 양자화된 모델 직렬화하기<a class="headerlink" href="#id24" title="Permalink to this headline">¶</a></h3>
-<p>나중에 다시 쓸 수 있도록 양자화된 모델을 직렬화하고 저장할 수 있습니다.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">quantized_output_dir</span> <span class="o">=</span> <span class="n">configs</span><span class="o">.</span><span class="n">output_dir</span> <span class="o">+</span> <span class="s2">&quot;quantized/&quot;</span>
-<span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">quantized_output_dir</span><span class="p">):</span>
-    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">quantized_output_dir</span><span class="p">)</span>
-    <span class="n">quantized_model</span><span class="o">.</span><span class="n">save_pretrained</span><span class="p">(</span><span class="n">quantized_output_dir</span><span class="p">)</span>
+<p>나중에 다시 쓸 수 있도록 <cite>torch.jit.save</cite> 을 사용하여 양자화된 모델을 직렬화하고 저장할 수 있습니다.</p>
+<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">input_ids</span> <span class="o">=</span> <span class="n">ids_tensor</span><span class="p">([</span><span class="mi">8</span><span class="p">,</span> <span class="mi">128</span><span class="p">],</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">token_type_ids</span> <span class="o">=</span> <span class="n">ids_tensor</span><span class="p">([</span><span class="mi">8</span><span class="p">,</span> <span class="mi">128</span><span class="p">],</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">attention_mask</span> <span class="o">=</span> <span class="n">ids_tensor</span><span class="p">([</span><span class="mi">8</span><span class="p">,</span> <span class="mi">128</span><span class="p">],</span> <span class="n">vocab_size</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">dummy_input</span> <span class="o">=</span> <span class="p">(</span><span class="n">input_ids</span><span class="p">,</span> <span class="n">attention_mask</span><span class="p">,</span> <span class="n">token_type_ids</span><span class="p">)</span>
+<span class="n">traced_model</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">quantized_model</span><span class="p">,</span> <span class="n">dummy_input</span><span class="p">)</span>
+<span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">traced_model</span><span class="p">,</span> <span class="s2">&quot;bert_traced_eager_quant.pt&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>양자화된 모델을 불러올 때는 <cite>torch.jit.load</cite> 를 사용합니다.</p>
+<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">loaded_quantized_model</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;bert_traced_eager_quant.pt&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -788,7 +822,7 @@ Quantized 8bit BERT</a>.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../advanced/static_quantization_tutorial.html" class="btn btn-neutral float-right" title="(beta) Static Quantization with Eager Mode in PyTorch" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
+        <a href="quantized_transfer_learning_tutorial.html" class="btn btn-neutral float-right" title="(beta) 컴퓨터 비전(Vision) 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
       
       
         <a href="../advanced/dynamic_quantization_tutorial.html" class="btn btn-neutral" title="(베타) LSTM 기반 단어 단위 언어 모델의 동적 양자화" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
@@ -798,20 +832,24 @@ Quantized 8bit BERT</a>.</p>
 
   
 
-    <hr class="helpful-hr hr-top">
-      <div class="helpful-container">
-        <div class="helpful-question">이 문서가 도움이 되었나요?</div>
-        <div class="helpful-question yes-link" data-behavior="was-this-helpful-event" data-response="yes">네</div>
-        <div class="helpful-question no-link" data-behavior="was-this-helpful-event" data-response="no">아니오</div>
-        <div class="was-helpful-thank-you">피드백을 주셔서 감사합니다.</div>
-      </div>
-    <hr class="helpful-hr hr-bottom"/>
+  <hr class="rating-hr hr-top">
+  <div class="rating-container">
+    <div class="rating-prompt">Rate this Tutorial</div>
+    <div class="stars-outer">
+      <i class="far fa-star" title="1 Star" data-behavior="tutorial-rating" data-count="1"></i>
+      <i class="far fa-star" title="2 Stars" data-behavior="tutorial-rating" data-count="2"></i>
+      <i class="far fa-star" title="3 Stars" data-behavior="tutorial-rating" data-count="3"></i>
+      <i class="far fa-star" title="4 Stars" data-behavior="tutorial-rating" data-count="4"></i>
+      <i class="far fa-star" title="5 Stars" data-behavior="tutorial-rating" data-count="5"></i>
+    </div>
+  </div>
+<hr class="rating-hr hr-bottom"/>
 
   
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2019, PyTorch.
+        &copy; Copyright 2021, PyTorch &amp; PyTorch Korea Community.
 
     </p>
   </div>
@@ -822,7 +860,6 @@ Quantized 8bit BERT</a>.</p>
      
 
 </footer>
-
           </div>
         </div>
 
@@ -870,10 +907,12 @@ Quantized 8bit BERT</a>.</p>
 
      
        <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-         <script src="../_static/jquery.js"></script>
-         <script src="../_static/underscore.js"></script>
-         <script src="../_static/doctools.js"></script>
-         <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+         <script type="text/javascript" src="../_static/jquery.js"></script>
+         <script type="text/javascript" src="../_static/underscore.js"></script>
+         <script type="text/javascript" src="../_static/doctools.js"></script>
+         <script type="text/javascript" src="../_static/clipboard.min.js"></script>
+         <script type="text/javascript" src="../_static/copybutton.js"></script>
+         <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
      
 
   
@@ -889,45 +928,54 @@ Quantized 8bit BERT</a>.</p>
       });
   </script>
  
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-71919972-3"></script>
 <script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'UA-71919972-3');
+</script>
 
-  ga('create', 'UA-71919972-3', 'auto');
-  ga('send', 'pageview');
 
+<script>
   $("[data-behavior='call-to-action-event']").on('click', function(){
     ga('send', {
       hitType: 'event',
-      eventCategory: 'Download',
+      eventCategory: $(this).attr("data-response"),
       eventAction: 'click',
-      eventLabel: $(this).attr("data-response")
+      eventLabel: window.location.href
+    });
+
+    gtag('event', 'click', {
+      'event_category': $(this).attr("data-response"),
+      'event_label': $("h1").first().text(),
+      'tutorial_link': window.location.href
     });
    });
 
-   $("[data-behavior='was-this-helpful-event']").on('click', function(){
-    $(".helpful-question").hide();
-    $(".was-helpful-thank-you").show();
-    ga('send', {
-      hitType: 'event',
-      eventCategory: 'Was this Helpful?',
-      eventAction: 'click',
-      eventLabel: $(this).attr("data-response")
+   $("[data-behavior='tutorial-rating']").on('click', function(){
+    gtag('event', 'click', {
+      'event_category': 'Tutorial Rating',
+      'event_label': $("h1").first().text(),
+      'value': $(this).attr("data-count")
     });
    });
 
    if (location.pathname == "/") {
-     $(".helpful-container").hide();
+     $(".rating-container").hide();
      $(".hr-bottom").hide();
    }
 </script>
 
+<script type="text/javascript">
+  var collapsedSections = ['PyTorch Recipes', 'Image and Video', 'Audio', 'Text', 'Reinforcement Learning', 'Deploying PyTorch Models in Production', 'Code Transforms with FX', 'Frontend APIs', 'Extending PyTorch', 'Model Optimization', 'Parallel and Distributed Training', 'Mobile'];
+</script>
+
+
 
   <!-- Begin Footer -->
 
-  <div class="container-fluid docs-tutorials-resources" id="docs-tutorials-resources">
+  <!-- <div class="container-fluid docs-tutorials-resources" id="docs-tutorials-resources">
     <div class="container">
       <div class="row">
         <div class="col-md-4 text-center">
@@ -949,7 +997,7 @@ Quantized 8bit BERT</a>.</p>
         </div>
       </div>
     </div>
-  </div>
+  </div> -->
 
   <footer class="site-footer">
     <div class="footer-container container">
@@ -1004,10 +1052,6 @@ Quantized 8bit BERT</a>.</p>
           </li>
 
           <li>
-            <a href="https://pytorch.org/features">Features</a>
-          </li>
-
-          <li>
             <a href="https://pytorch.org/ecosystem">Ecosystem</a>
           </li>
 
@@ -1027,13 +1071,65 @@ Quantized 8bit BERT</a>.</p>
             <a href="https://pytorch.org/tutorials">Tutorials</a>
           </li>
 
-          <li>
-            <a href="https://pytorch.org/docs/stable/index.html">Docs</a>
+          <li class="resources-mobile-menu-title">
+            Docs
           </li>
 
-          <li>
-            <a href="https://pytorch.org/resources">Resources</a>
+          <ul class="resources-mobile-menu-items">
+            <li>
+              <a href="https://pytorch.org/docs/stable/index.html">PyTorch</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/audio/stable/index.html">torchaudio</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/text/stable/index.html">torchtext</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/vision/stable/index.html">torchvision</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/elastic/">TorchElastic</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/serve/">TorchServe</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/xla">PyTorch on XLA Devices</a>
+            </li>
+          </ul>
+
+          <li class="resources-mobile-menu-title">
+            Resources
           </li>
+
+          <ul class="resources-mobile-menu-items">
+            <li>
+              <a href="https://pytorch.org/resources">Developer Resources</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/features">About</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/hub">Models (Beta)</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/#community-module">Community</a>
+            </li>
+
+            <li>
+              <a href="https://discuss.pytorch.org/">Forums</a>
+            </li>
+          </ul>
 
           <li>
             <a href="https://github.com/pytorch/pytorch">Github</a>
