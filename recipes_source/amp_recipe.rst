@@ -1,5 +1,5 @@
 AUTOMATIC MIXED PRECISION(자동 혼합 정밀도)
-====================
+===========================================================
 
 **Author**: `Michael Carilli <https://github.com/mcarilli>`_
   **번역**: `하헌진 <https://github.com/hihunjin>`_
@@ -37,7 +37,7 @@ Mixed precision은 원시적으로 텐서 코어를 사용할 수 있는 아키�
        print("Max memory used by tensors = {} bytes".format(torch.cuda.max_memory_allocated()))
 
 간단한 네트워크
-------------
+------------------------
 
 아래 Linear 레이어와 ReLU의 연속으로 이루어진 모델이 mixed precision으로 속도 향상이 될 것입니다.
 ::
@@ -72,7 +72,7 @@ Mixed precision은 원시적으로 텐서 코어를 사용할 수 있는 아키�
    loss_fn = torch.nn.MSELoss().cuda()
 
 디폴트 Precision
-------------
+------------------------
 
 ``torch.cuda.amp`` 없이, 디폴트 precision(``torch.float32``)로 아래 간단한 네트워크를 실행합니다.
 
@@ -92,7 +92,7 @@ Mixed precision은 원시적으로 텐서 코어를 사용할 수 있는 아키�
     end_timer_and_print("Default precision:")
 
 autocast 사용하기
-------------
+---------------------------
 
 `torch.cuda.amp.autocast`_ 의 인스턴스는 컨텍스트 매니저로써 mixed precision을 수행하는 코드 리전을 제공합니다.
 
@@ -120,7 +120,7 @@ autocast 사용하기
             opt.zero_grad()
 
 GradScaler 사용하기
-------------
+---------------------------
 
 `Gradient scaling`_ 은 mixed precision 훈련 시 작은 크기의 gradient 값이 0으로 바뀌는 underflowing 현상을 막습니다.
 
@@ -154,7 +154,7 @@ GradScaler 사용하기
             opt.zero_grad()
 
 모두 합치기 : "Automatic Mixed Precision"
-------------
+------------------------------------------------
 
 ``use_amp`` 를 통해 ``autocast`` 와 ``GradScaler`` 를 끄고 켤 수 있습니다.
 
@@ -179,7 +179,7 @@ GradScaler 사용하기
     end_timer_and_print("Mixed precision:")
 
 Gradient를 검사하고 수정하기(gradient 클리핑)
-------------
+------------------------------------------------
 
 ``scaler.scale(loss).backward()`` 로 생성된 모든 Gradient는 스케일링됩니다. ``backward()`` 와 ``scaler.step(optimizer)`` 사이에서 파라미터의 ``.grad`` 어트리뷰트로 검사하고 싶다면, `scaler.unscale_(optimizer)`_ 를 사용해 먼저 스케일링을 해제해야 합니다.
 
@@ -204,7 +204,7 @@ Gradient를 검사하고 수정하기(gradient 클리핑)
             opt.zero_grad()
 
 저장하기/다시 시작하기
-------------
+------------------------
 
 AMP를 사용한 저장/재시작은 `scaler.state_dict`_ 와 `scaler.load_state_dict`_ 를 사용합니다.
 
@@ -232,7 +232,7 @@ AMP를 사용한 저장/재시작은 `scaler.state_dict`_ 와 `scaler.load_state
 만약 AMP가 함께 checkpoint가 저장되었고, AMP 없이 훈련을 재시작하고 싶다면, 저장된 scaler state를 무시하고 훈련할 수 있습니다.
 
 추론/평가
-------------
+------------------------
 
 ``autocast`` 가 추론과 평가의 순전파를 감쌀 수 있습니다. ``GradScaler`` 는 필요하지 않습니다.
 
