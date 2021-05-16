@@ -963,13 +963,14 @@ $(document).ready(function() {
   var caption = "#pytorch-left-menu p.caption";
   var collapseAdded = $(this).not("checked");
   $(caption).each(function () {
-    var menuName = this.innerText.replace(/[^\w\s]/gi, "").trim();
+    // var menuName = this.innerText.replace(/[^\w\s]/gi, "").trim();
+    var menuName = $(this).find("span")[0].innerText.trim(); // fix for Korean translated menuName
     $(this).find("span").addClass("checked");
     if (collapsedSections.includes(menuName) == true && collapseAdded && sessionStorage.getItem(menuName) !== "expand" || sessionStorage.getItem(menuName) == "collapse") {
       $(this.firstChild).after("<span class='expand-menu'>[ + ]</span>");
       $(this.firstChild).after("<span class='hide-menu collapse'>[ - ]</span>");
       $(this).next("ul").hide();
-    } else if ((collapsedSections.includes(menuName) == false && collapseAdded) || sessionStorage.getItem(menuName) == "expand") {
+    } else if (collapsedSections.includes(menuName) == false && collapseAdded || sessionStorage.getItem(menuName) == "expand") {
       $(this.firstChild).after("<span class='expand-menu collapse'>[ + ]</span>");
       $(this.firstChild).after("<span class='hide-menu'>[ - ]</span>");
     }
@@ -978,7 +979,8 @@ $(document).ready(function() {
   $(".expand-menu").on("click", function () {
     $(this).prev(".hide-menu").toggle();
     $(this).parent().next("ul").toggle();
-    var menuName = $(this).parent().text().replace(/[^\w\s]/gi, "").trim();
+    // var menuName = $(this).parent().text().replace(/[^\w\s]/gi, "").trim();
+    var menuName = $(this).parent().find("span")[0].innerText.trim(); // fix for Korean translated menuName
     if (sessionStorage.getItem(menuName) == "collapse") {
       sessionStorage.removeItem(menuName);
     }
@@ -989,7 +991,8 @@ $(document).ready(function() {
   $(".hide-menu").on("click", function () {
     $(this).next(".expand-menu").toggle();
     $(this).parent().next("ul").toggle();
-    var menuName = $(this).parent().text().replace(/[^\w\s]/gi, "").trim();
+    // var menuName = $(this).parent().text().replace(/[^\w\s]/gi, "").trim();
+    var menuName = $(this).parent().find("span")[0].innerText.trim(); // fix for Korean translated menuName
     if (sessionStorage.getItem(menuName) == "expand") {
       sessionStorage.removeItem(menuName);
     }
@@ -1000,12 +1003,6 @@ $(document).ready(function() {
   function toggleList(menuCommand) {
     $(menuCommand).toggle();
   }
-});
-
-// Get the card link from the card's link attribute
-
-$(".tutorials-card").on("click", function() {
-    window.location = $(this).attr("link");
 });
 
 // Build an array from each tag that's present
