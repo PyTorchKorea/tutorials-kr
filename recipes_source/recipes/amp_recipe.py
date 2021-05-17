@@ -1,30 +1,26 @@
 # -*- coding: utf-8 -*-
 """
-Automatic Mixed Precision
+자동 혼합 정밀도
 *************************
 **Author**: `Michael Carilli <https://github.com/mcarilli>`_
+    **번역**: `하헌진 <https://github.com/hihunjin>`_
 
-`torch.cuda.amp <https://pytorch.org/docs/stable/amp.html>`_ provides convenience methods for mixed precision,
-where some operations use the ``torch.float32`` (``float``) datatype and other operations
-use ``torch.float16`` (``half``). Some ops, like linear layers and convolutions,
-are much faster in ``float16``. Other ops, like reductions, often require the dynamic
-range of ``float32``.  Mixed precision tries to match each op to its appropriate datatype,
-which can reduce your network's runtime and memory footprint.
+`torch.cuda.amp <https://pytorch.org/docs/stable/amp.html>`_ 는 혼합 정밀도를 사용할 수 있는 편리한 메서드를 제공합니다. 
+정밀도는 ``torch.float32`` (``float``)과, ``torch.float16`` (``half``)를 사용하는 연산들이 있습니다. 
+선형 계층과 합성곱 계층들과 같은 연산들은, ``float16`` 에서 더욱 빠릅니다. reduction과 같은 연산들은 ``float32`` 의 동적인 범주 계산을 요구하기도 합니다. 
+혼합 정밀도은 각각의 연산에 맞는 적절한 데이터 타입을 맞춰줍니다. 
+따라서 신경망의 실행 시간과 메모리 할당량을 줄일 수 있습니다.
 
-Ordinarily, "automatic mixed precision training" uses `torch.cuda.amp.autocast <https://pytorch.org/docs/stable/amp.html#torch.cuda.amp.autocast>`_ and
-`torch.cuda.amp.GradScaler <https://pytorch.org/docs/stable/amp.html#torch.cuda.amp.GradScaler>`_ together.
 
-This recipe measures the performance of a simple network in default precision,
-then walks through adding ``autocast`` and ``GradScaler`` to run the same network in
-mixed precision with improved performance.
+보통, "자동 혼합 정밀도 훈련"은 `torch.cuda.amp.autocast <https://pytorch.org/docs/stable/amp.html#torch.cuda.amp.autocast>`_ 와 `torch.cuda.amp.GradScaler <https://pytorch.org/docs/stable/amp.html#torch.cuda.amp.GradScaler>`_ 를 함께 사용합니다.
 
-You may download and run this recipe as a standalone Python script.
-The only requirements are Pytorch 1.6+ and a CUDA-capable GPU.
+이 레시피는 먼저 기본 정밀도에서 간단한 신경망의 성능을 측정하고, 다음으로 ``autocast`` 와 ``GradScaler`` 를 추가하여, 같은 신경망에서 향상된 성능을 살펴봅니다.
 
-Mixed precision primarily benefits Tensor Core-enabled architectures (Volta, Turing, Ampere).
-This recipe should show significant (2-3X) speedup on those architectures.
-On earlier architectures (Kepler, Maxwell, Pascal), you may observe a modest speedup.
-Run ``nvidia-smi`` to display your GPU's architecture.
+이 레시피를 파이썬 스크립트로 다운로드하고 실행해 볼 수 있습니다. 환경은 Pytorch 1.6+와 CUDA-capable GPU가 필요합니다.
+
+혼합 정밀도는 원시적으로 텐서 코어를 사용할 수 있는 아키텍처(볼타, 튜링, 암페어)에서 효과를 잘 발휘합니다. 
+이 레시피는 이 아키텍처에서 2에서 3배의 속도 향상을 보여줍니다. 이전 버전의 아키텍처(케플러, 맥스웰, 파스칼)에서는, 완만한 속도 향상을 관찰할 수 있습니다. 
+``nvidia-smi`` 를 실행해, GPU 아키텍처를 확인하세요.
 """
 
 import torch, time, gc
@@ -48,9 +44,9 @@ def end_timer_and_print(local_msg):
     print("Max memory used by tensors = {} bytes".format(torch.cuda.max_memory_allocated()))
 
 ##########################################################
-# A simple network
-# ----------------
-# The following sequence of linear layers and ReLUs should show a speedup with mixed precision.
+# 간단한 신경망
+# ------------------------
+# 아래 선형 계층과 ReLU의 연속으로 이루어진 모델이 혼합 정밀도로 속도 향상이 될 것입니다.
 
 def make_model(in_size, out_size, num_layers):
     layers = []
@@ -61,33 +57,32 @@ def make_model(in_size, out_size, num_layers):
     return torch.nn.Sequential(*tuple(layers)).cuda()
 
 ##########################################################
-# ``batch_size``, ``in_size``, ``out_size``, and ``num_layers`` are chosen to be large enough to saturate the GPU with work.
-# Typically, mixed precision provides the greatest speedup when the GPU is saturated.
-# Small networks may be CPU bound, in which case mixed precision won't improve performance.
-# Sizes are also chosen such that linear layers' participating dimensions are multiples of 8,
-# to permit Tensor Core usage on Tensor Core-capable GPUs (see :ref:`Troubleshooting<troubleshooting>` below).
-#
-# Exercise: Vary participating sizes and see how the mixed precision speedup changes.
+# ``batch_size``, ``in_size``, ``out_size``, 그리고 ``num_layers`` 를 GPU에 꽉 차도록 크게 조절할 수 있습니다. 
+# 특히, 혼합 정밀도는 GPU가 포화상태일 때, 가장 크게 속도를 증가합니다. 작은 신경망는 CPU 바인딩 될 수 있습니다. 
+# 이 경우 혼합 정밀도가 성능을 향상시키지 못할 수 있습니다. 
+# GPU에서 텐서 코어의 활용을 가능하도록 선형 계층의 사이즈는 8의 배수로 선택됩니다.
+# 
+# 연습문제 : 레이어의 차원을 조절해서 혼합 정밀도가 얼마나 속도를 변화하는지 확인해보세요.
 
-batch_size = 512 # Try, for example, 128, 256, 513.
+batch_size = 512 # 128, 256, 513로 다양하게 시도해보세요.
 in_size = 4096
 out_size = 4096
 num_layers = 3
 num_batches = 50
 epochs = 3
 
-# Creates data in default precision.
-# The same data is used for both default and mixed precision trials below.
-# You don't need to manually change inputs' dtype when enabling mixed precision.
+# 기본 정밀도로 데이터를 생성하세요.
+# 같은 데이터가 기본와 혼합 정밀도 시행 모두에 사용됩니다.
+# 입력 데이터의 타입(dtype)을 조절하지 않는것을 추천합니다.
 data = [torch.randn(batch_size, in_size, device="cuda") for _ in range(num_batches)]
 targets = [torch.randn(batch_size, out_size, device="cuda") for _ in range(num_batches)]
 
 loss_fn = torch.nn.MSELoss().cuda()
 
 ##########################################################
-# Default Precision
+# 기본 정밀도
 # -----------------
-# Without ``torch.cuda.amp``, the following simple network executes all ops in default precision (``torch.float32``):
+# ``torch.cuda.amp`` 없이, 기본 정밀도(``torch.float32``)로 아래 간단한 신경망를 실행합니다.
 
 net = make_model(in_size, out_size, num_layers)
 opt = torch.optim.SGD(net.parameters(), lr=0.001)
@@ -99,81 +94,72 @@ for epoch in range(epochs):
         loss = loss_fn(output, target)
         loss.backward()
         opt.step()
-        opt.zero_grad() # set_to_none=True here can modestly improve performance
+        opt.zero_grad() # set_to_none=True 를 사용하면 속도를 약간 향상할 수 있습니다.
 end_timer_and_print("Default precision:")
 
 ##########################################################
-# Adding autocast
+# autocast 사용하기
 # ---------------
-# Instances of `torch.cuda.amp.autocast <https://pytorch.org/docs/stable/amp.html#autocasting>`_
-# serve as context managers that allow regions of your script to run in mixed precision.
-#
-# In these regions, CUDA ops run in a dtype chosen by autocast
-# to improve performance while maintaining accuracy.
-# See the `Autocast Op Reference <https://pytorch.org/docs/stable/amp.html#autocast-op-reference>`_
-# for details on what precision autocast chooses for each op, and under what circumstances.
+# `torch.cuda.amp.autocast <https://pytorch.org/docs/stable/amp.html#torch.cuda.amp.autocast>`_ 인스턴스는 컨텍스트 매니저로 제공되어, 혼합 정밀도로 실행되는 코드 영역(region)을 제공합니다
+# 
+# 이 영역에서는, 쿠다 연산이 autocast에 의해 선택된 데이터 타입으로 실행됩니다. 이는 정확도를 유지하면서 성능을 향상시킵니다. 
+# `Autocast Op Reference <https://pytorch.org/docs/stable/amp.html#autocast-op-reference>`_ 를 참고하여 각각의 연산마다 어떤 정밀도를 선택하는지 확인해보세요.
 
-for epoch in range(0): # 0 epochs, this section is for illustration only
+for epoch in range(0): # 0 epochs, 이 섹션은 설명을 위한 스크립트입니다.
     for input, target in zip(data, targets):
-        # Runs the forward pass under autocast.
+        # autocast 아래에서 순전파를 진행합니다.
         with torch.cuda.amp.autocast():
             output = net(input)
-            # output is float16 because linear layers autocast to float16.
+            # 선형 계층의 autocast는 float16이기에, output의 데이터 타입은 float16입니다.
             assert output.dtype is torch.float16
 
             loss = loss_fn(output, target)
-            # loss is float32 because mse_loss layers autocast to float32.
+            # loss는 float32입니다. 이유: mse_loss 레이어 때문에.
             assert loss.dtype is torch.float32
 
-        # Exits autocast before backward().
-        # Backward passes under autocast are not recommended.
-        # Backward ops run in the same dtype autocast chose for corresponding forward ops.
+        # backward() 전에 autocast를 빠져 나옵니다.
+        # 역전파시 autocast는 지양됩니다.
+        # 역전파시 autocast 데이터 타입은 순전파의 데이터타입과 같습니다.
         loss.backward()
         opt.step()
-        opt.zero_grad() # set_to_none=True here can modestly improve performance
+        opt.zero_grad()
 
 ##########################################################
-# Adding GradScaler
+# GradScaler 사용하기
 # -----------------
-# `Gradient scaling <https://pytorch.org/docs/stable/amp.html#gradient-scaling>`_
-# helps prevent gradients with small magnitudes from flushing to zero
-# ("underflowing") when training with mixed precision.
-#
-# `torch.cuda.amp.GradScaler <https://pytorch.org/docs/stable/amp.html#torch.cuda.amp.GradScaler>`_
-# performs the steps of gradient scaling conveniently.
+# `Gradient scaling <https://pytorch.org/docs/stable/amp.html#gradient-scaling>`_ 은 혼합 정밀도 훈련 시 작은 크기의 gradient 값이 0으로 바뀌는 underflowing 현상을 막습니다.
+# 
+# `torch.cuda.amp.GradScaler <https://pytorch.org/docs/stable/amp.html#torch.cuda.amp.GradScaler>`_ 는 gradient를 크기를 편리하게 조절합니다.
 
-# Constructs scaler once, at the beginning of the convergence run, using default args.
-# If your network fails to converge with default GradScaler args, please file an issue.
-# The same GradScaler instance should be used for the entire convergence run.
-# If you perform multiple convergence runs in the same script, each run should use
-# a dedicated fresh GradScaler instance.  GradScaler instances are lightweight.
+# scaler를 먼저 생성합니다.
+# 신경망가 수렴하지 않는다면 pytorch github에 issue를 생성해주세요.
+# 같은 GradScaler 인스턴스가 실행 전반에 동일하게 사용되어야 합니다.
+# 다중 수렴을 시행한다면, 각각의 시행에 맞는 GradSacler 인스턴스를 사용해야 합니다. GradScaler 인스턴스는 무겁지 않습니다.
 scaler = torch.cuda.amp.GradScaler()
 
-for epoch in range(0): # 0 epochs, this section is for illustration only
+for epoch in range(0): # 0 epochs, 이 섹션은 설명을 위한 스크립트입니다.
     for input, target in zip(data, targets):
         with torch.cuda.amp.autocast():
             output = net(input)
             loss = loss_fn(output, target)
 
-        # Scales loss.  Calls backward() on scaled loss to create scaled gradients.
+        # Scales 손실값. 스케일된 gradient를 만들기 위해, backward()를 스케일된 손실값에 적용해주세요.
         scaler.scale(loss).backward()
 
-        # scaler.step() first unscales the gradients of the optimizer's assigned params.
-        # If these gradients do not contain infs or NaNs, optimizer.step() is then called,
-        # otherwise, optimizer.step() is skipped.
+        # sacler.step() 은 먼저 optimizer에 할당된 파라미터들을 unscale합니다.
+        # 이 gradients들이 inf나 NaN을 가지고 있지 않다면, optimizer.step()이 호출됩니다.
+        # 가지고 있다면, optimizer.step()은 건너뜁니다.
         scaler.step(opt)
 
-        # Updates the scale for next iteration.
+        # 다음 루프를 위해 scale을 업데이트 합니다.
         scaler.update()
 
-        opt.zero_grad() # set_to_none=True here can modestly improve performance
+        opt.zero_grad()
 
 ##########################################################
-# All together: "Automatic Mixed Precision"
+# 모두 합치기 : "자동 혼합 정밀도"
 # ------------------------------------------
-# (The following also demonstrates ``enabled``, an optional convenience argument to ``autocast`` and ``GradScaler``.
-# If False, ``autocast`` and ``GradScaler``\ 's calls become no-ops.
-# This allows switching between default precision and mixed precision without if/else statements.)
+# ``use_amp`` 를 통해 ``autocast`` 와 ``GradScaler`` 를 끄고 켤 수 있습니다.
 
 use_amp = True
 
@@ -190,56 +176,50 @@ for epoch in range(epochs):
         scaler.scale(loss).backward()
         scaler.step(opt)
         scaler.update()
-        opt.zero_grad() # set_to_none=True here can modestly improve performance
+        opt.zero_grad()
 end_timer_and_print("Mixed precision:")
 
 ##########################################################
-# Inspecting/modifying gradients (e.g., clipping)
+# Gradient를 검사하고 수정하기(gradient 클리핑)
 # --------------------------------------------------------
-# All gradients produced by ``scaler.scale(loss).backward()`` are scaled.  If you wish to modify or inspect
-# the parameters' ``.grad`` attributes between ``backward()`` and ``scaler.step(optimizer)``, you should
-# unscale them first using `scaler.unscale_(optimizer) <https://pytorch.org/docs/stable/amp.html#torch.cuda.amp.GradScaler.unscale_>`_.
+# ``scaler.scale(loss).backward()`` 로 생성된 모든 Gradient는 스케일링됩니다. 
+# ``backward()`` 와 ``scaler.step(optimizer)`` 사이에서 파라미터의 ``.grad`` 어트리뷰트로 검사하고 싶다면, 
+# `scaler.unscale_(optimizer) <https://pytorch.org/docs/stable/amp.html#torch.cuda.amp.GradScaler.unscale_>`_ 를 사용해 먼저 스케일링을 해제해야 합니다.
 
-for epoch in range(0): # 0 epochs, this section is for illustration only
+for epoch in range(0): # 0 epochs, 이 섹션은 설명을 위한 스크립트입니다.
     for input, target in zip(data, targets):
         with torch.cuda.amp.autocast():
             output = net(input)
             loss = loss_fn(output, target)
         scaler.scale(loss).backward()
 
-        # Unscales the gradients of optimizer's assigned params in-place
+        # Gradient를 unscale합니다.
         scaler.unscale_(opt)
 
-        # Since the gradients of optimizer's assigned params are now unscaled, clips as usual.
-        # You may use the same value for max_norm here as you would without gradient scaling.
+        # optimizer에 할당된 파라미터들의 gradient가 unscaled되었기 때문에, 평소처럼 클리핑을 합니다.
+        # max_norm을 같은 값으로 사용할 수 있습니다.
         torch.nn.utils.clip_grad_norm_(net.parameters(), max_norm=0.1)
 
         scaler.step(opt)
         scaler.update()
-        opt.zero_grad() # set_to_none=True here can modestly improve performance
+        opt.zero_grad()
 
 ##########################################################
-# Saving/Resuming
+# 저장하기/다시 시작하기
 # ----------------
-# To save/resume Amp-enabled runs with bitwise accuracy, use
-# `scaler.state_dict <https://pytorch.org/docs/stable/amp.html#torch.cuda.amp.GradScaler.state_dict>`_ and
-# `scaler.load_state_dict <https://pytorch.org/docs/stable/amp.html#torch.cuda.amp.GradScaler.load_state_dict>`_.
-#
-# When saving, save the scaler state dict alongside the usual model and optimizer state dicts.
-# Do this either at the beginning of an iteration before any forward passes, or at the end of
-# an iteration after ``scaler.update()``.
+# AMP를 사용한 저장/재시작은 `scaler.state_dict <https://pytorch.org/docs/stable/amp.html#torch.cuda.amp.GradScaler.state_dict>`_ 와 `scaler.load_state_dict <https://pytorch.org/docs/stable/amp.html#torch.cuda.amp.GradScaler.load_state_dict>`_ 를 사용합니다.
+# 
+# 저장을 할 때는, scaler의 state dict를 모델과 optimizer의 state dict과 함께 저장합니다. 
+# 이것을 루프 시작 전에 하거나, ``scaler.update()`` 후 루프의 끝에 합니다.
 
 checkpoint = {"model": net.state_dict(),
               "optimizer": opt.state_dict(),
               "scaler": scaler.state_dict()}
-# Write checkpoint as desired, e.g.,
 # torch.save(checkpoint, "filename")
 
 ##########################################################
-# When resuming, load the scaler state dict alongside the model and optimizer state dicts.
+# 재시작 할 때는, scaler의 state dict을 모델과 optimizer와 함께 가져옵니다.
 
-# Read checkpoint as desired, e.g.,
-# dev = torch.cuda.current_device()
 # checkpoint = torch.load("filename",
 #                         map_location = lambda storage, loc: storage.cuda(dev))
 net.load_state_dict(checkpoint["model"])
@@ -247,17 +227,14 @@ opt.load_state_dict(checkpoint["optimizer"])
 scaler.load_state_dict(checkpoint["scaler"])
 
 ##########################################################
-# If a checkpoint was created from a run *without* Amp, and you want to resume training *with* Amp,
-# load model and optimizer states from the checkpoint as usual.  The checkpoint won't contain a saved scaler state, so
-# use a fresh instance of ``GradScaler``.
-#
-# If a checkpoint was created from a run *with* Amp and you want to resume training *without* Amp,
-# load model and optimizer states from the checkpoint as usual, and ignore the saved scaler state.
+# 만약 AMP 없이 checkpoint가 생성되었지만, AMP를 사용해 훈련을 재시작하고 싶다면, GradScaler의 새 인스턴스로 훈련할 수 있습니다.
+# 
+# 만약 AMP가 함께 checkpoint가 저장되었고, AMP 없이 훈련을 재시작하고 싶다면, 저장된 scaler state를 무시하고 훈련할 수 있습니다.
 
 ##########################################################
-# Inference/Evaluation
+# 추론/평가
 # --------------------
-# ``autocast`` may be used by itself to wrap inference or evaluation forward passes. ``GradScaler`` is not necessary.
+# ``autocast`` 가 추론과 평가의 순전파를 감쌀 수 있습니다. ``GradScaler`` 는 필요하지 않습니다.
 
 ##########################################################
 # .. _advanced-topics:
