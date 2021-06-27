@@ -15,8 +15,8 @@ Deep Learning with PyTorch: A 60 Minute Blitz
 
 4. cifar10_tutorial.py
 	Training a Classifier
-	https://pytorch.org/tutorials/beginner/blitz/cifar10_tutorial.html
+	https://tutorials.pytorch.kr/beginner/blitz/cifar10_tutorial.html
 
 5. data_parallel_tutorial.py
 	Optional: Data Parallelism
-	https://pytorch.org/tutorials/beginner/blitz/data_parallel_tutorial.html
+	https://tutorials.pytorch.kr/beginner/blitz/data_parallel_tutorial.html

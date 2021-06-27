@@ -34,11 +34,11 @@ Torchscript and JIT
 
 .. code-block:: python
 
-    torch.jit.trace()         # takes your module or function and an example 
-                              # data input, and traces the computational steps 
+    torch.jit.trace()         # takes your module or function and an example
+                              # data input, and traces the computational steps
                               # that the data encounters as it progresses through the model
 
-    @script                   # decorator used to indicate data-dependent 
+    @script                   # decorator used to indicate data-dependent
                               # control flow within the code being traced
 
 See `Torchscript <https://pytorch.org/docs/stable/jit.html>`__
@@ -48,15 +48,15 @@ ONNX
 
 .. code-block:: python
 
-    torch.onnx.export(model, dummy data, xxxx.proto)       # exports an ONNX formatted  
+    torch.onnx.export(model, dummy data, xxxx.proto)       # exports an ONNX formatted
                                                            # model using a trained model, dummy
                                                            # data and the desired file name
 
     model = onnx.load("alexnet.proto")                     # load an ONNX model
-    onnx.checker.check_model(model)                        # check that the model 
-                                                           # IR is well formed  
-                    
-    onnx.helper.printable_graph(model.graph)               # print a human readable 
+    onnx.checker.check_model(model)                        # check that the model
+                                                           # IR is well formed
+
+    onnx.helper.printable_graph(model.graph)               # print a human readable
                                                            # representation of the graph
 
 See `onnx <https://pytorch.org/docs/stable/onnx.html>`__
@@ -66,8 +66,8 @@ Vision
 
 .. code-block:: python
 
-    from torchvision import datasets, models, transforms     # vision datasets, 
-                                                             # architectures & 
+    from torchvision import datasets, models, transforms     # vision datasets,
+                                                             # architectures &
                                                              # transforms
 
     import torchvision.transforms as transforms              # composable transforms
@@ -100,7 +100,7 @@ Creation
     x = torch.tensor(L)                 # create tensor from [nested] list or ndarray L
     y = x.clone()                       # clone of x
     with torch.no_grad():               # code wrap that stops autograd from tracking tensor history
-    requires_grad=True                  # arg, when set to True, tracks computation 
+    requires_grad=True                  # arg, when set to True, tracks computation
                                         # history for future derivative calculations
 
 See `tensor <https://pytorch.org/docs/stable/tensors.html>`__
@@ -142,22 +142,22 @@ GPU Usage
 .. code-block:: python
 
     torch.cuda.is_available                                     # check for cuda
-    x = x.cuda()                                                # move x's data from 
+    x = x.cuda()                                                # move x's data from
                                                                 # CPU to GPU and return new object
 
-    x = x.cpu()                                                 # move x's data from GPU to CPU 
+    x = x.cpu()                                                 # move x's data from GPU to CPU
                                                                 # and return new object
 
-    if not args.disable_cuda and torch.cuda.is_available():     # device agnostic code 
+    if not args.disable_cuda and torch.cuda.is_available():     # device agnostic code
         args.device = torch.device('cuda')                      # and modularity
     else:                                                       #
         args.device = torch.device('cpu')                       #
 
-    net.to(device)                                              # recursively convert their 
-                                                                # parameters and buffers to 
+    net.to(device)                                              # recursively convert their
+                                                                # parameters and buffers to
                                                                 # device specific tensors
 
-    x = x.to(device)                                            # copy your tensors to a device 
+    x = x.to(device)                                            # copy your tensors to a device
                                                                 # (gpu, cpu)
 
 See `cuda <https://pytorch.org/docs/stable/cuda.html>`__
@@ -167,21 +167,21 @@ Deep Learning
 
 .. code-block:: python
 
-    nn.Linear(m,n)                                # fully connected layer from 
+    nn.Linear(m,n)                                # fully connected layer from
                                                   # m to n units
 
-    nn.ConvXd(m,n,s)                              # X dimensional conv layer from 
-                                                  # m to n channels where X⍷{1,2,3} 
+    nn.ConvXd(m,n,s)                              # X dimensional conv layer from
+                                                  # m to n channels where X⍷{1,2,3}
                                                   # and the kernel size is s
 
-    nn.MaxPoolXd(s)                               # X dimension pooling layer 
+    nn.MaxPoolXd(s)                               # X dimension pooling layer
                                                   # (notation as above)
 
     nn.BatchNormXd                                # batch norm layer
     nn.RNN/LSTM/GRU                               # recurrent layers
     nn.Dropout(p=0.5, inplace=False)              # dropout layer for any dimensional input
     nn.Dropout2d(p=0.5, inplace=False)            # 2-dimensional channel-wise dropout
-    nn.Embedding(num_embeddings, embedding_dim)   # (tensor-wise) mapping from 
+    nn.Embedding(num_embeddings, embedding_dim)   # (tensor-wise) mapping from
                                                   # indices to embedding vectors
 
 See `nn <https://pytorch.org/docs/stable/nn.html>`__
@@ -192,15 +192,15 @@ Loss Functions
 .. code-block:: python
 
     nn.X                                  # where X is L1Loss, MSELoss, CrossEntropyLoss
-                                          # CTCLoss, NLLLoss, PoissonNLLLoss, 
+                                          # CTCLoss, NLLLoss, PoissonNLLLoss,
                                           # KLDivLoss, BCELoss, BCEWithLogitsLoss,
                                           # MarginRankingLoss, HingeEmbeddingLoss,
                                           # MultiLabelMarginLoss, SmoothL1Loss,
                                           # SoftMarginLoss, MultiLabelSoftMarginLoss,
                                           # CosineEmbeddingLoss, MultiMarginLoss,
                                           # or TripletMarginLoss
-    
- 
+
+
 See `loss
 functions <https://pytorch.org/docs/stable/nn.html#loss-functions>`__
 
@@ -209,10 +209,10 @@ Activation Functions
 
 .. code-block:: python
 
-    nn.X                                  # where X is ReLU, ReLU6, ELU, SELU, PReLU, LeakyReLU, 
+    nn.X                                  # where X is ReLU, ReLU6, ELU, SELU, PReLU, LeakyReLU,
                                           # RReLu, CELU, GELU, Threshold, Hardshrink, HardTanh,
-                                          # Sigmoid, LogSigmoid, Softplus, SoftShrink, 
-                                          # Softsign, Tanh, TanhShrink, Softmin, Softmax, 
+                                          # Sigmoid, LogSigmoid, Softplus, SoftShrink,
+                                          # Softsign, Tanh, TanhShrink, Softmin, Softmax,
                                           # Softmax2d, LogSoftmax or AdaptiveSoftmaxWithLoss
 
 See `activation
@@ -225,8 +225,8 @@ Optimizers
 
     opt = optim.x(model.parameters(), ...)      # create optimizer
     opt.step()                                  # update weights
-    optim.X                                     # where X is SGD, Adadelta, Adagrad, Adam, 
-                                                # AdamW, SparseAdam, Adamax, ASGD, 
+    optim.X                                     # where X is SGD, Adadelta, Adagrad, Adam,
+                                                # AdamW, SparseAdam, Adamax, ASGD,
                                                 # LBFGS, RMSprop or Rprop
 
 See `optimizers <https://pytorch.org/docs/stable/optim.html>`__
@@ -266,10 +266,10 @@ Dataloaders and DataSamplers
 
 .. code-block:: python
 
-    DataLoader(dataset, batch_size=1, ...)      # loads data batches agnostic 
+    DataLoader(dataset, batch_size=1, ...)      # loads data batches agnostic
                                                 # of structure of individual data points
 
-    sampler.Sampler(dataset,...)                # abstract class dealing with 
+    sampler.Sampler(dataset,...)                # abstract class dealing with
                                                 # ways to sample from dataset
 
     sampler.XSampler where ...                  # Sequential, Random, SubsetRandom,
@@ -282,7 +282,7 @@ Also see
 --------
 
 -  `Deep Learning with PyTorch: A 60 Minute
-   Blitz <https://pytorch.org/tutorials/beginner/deep_learning_60min_blitz.html>`__
+   Blitz <https://tutorials.pytorch.kr/beginner/deep_learning_60min_blitz.html>`__
    *(pytorch.org)*
 -  `PyTorch Forums <https://discuss.pytorch.org/>`__
    *(discuss.pytorch.org)*

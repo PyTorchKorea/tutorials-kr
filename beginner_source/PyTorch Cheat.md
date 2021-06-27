@@ -186,6 +186,6 @@ See [dataloader](https://pytorch.org/docs/stable/data.html?highlight=dataloader#
 
 ## Also see
 
-* [Deep Learning with PyTorch: A 60 Minute Blitz](https://pytorch.org/tutorials/beginner/deep_learning_60min_blitz.html) _(pytorch.org)_
+* [Deep Learning with PyTorch: A 60 Minute Blitz](https://tutorials.pytorch.kr/beginner/deep_learning_60min_blitz.html) _(pytorch.org)_
 * [PyTorch Forums](https://discuss.pytorch.org/) _(discuss.pytorch.org)_
 * [PyTorch for Numpy users](https://github.com/wkentaro/pytorch-for-numpy-users) _(github.com/wkentaro/pytorch-for-numpy-users)_

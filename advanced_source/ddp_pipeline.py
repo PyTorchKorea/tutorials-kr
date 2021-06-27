@@ -7,15 +7,15 @@ Training Transformer models using Distributed Data Parallel and Pipeline Paralle
 This tutorial demonstrates how to train a large Transformer model across
 multiple GPUs using `Distributed Data Parallel <https://pytorch.org/docs/stable/generated/torch.nn.parallel.DistributedDataParallel.html>`__ and
 `Pipeline Parallelism <https://pytorch.org/docs/stable/pipeline.html>`__. This tutorial is an extension of the
-`Sequence-to-Sequence Modeling with nn.Transformer and TorchText <https://pytorch.org/tutorials/beginner/transformer_tutorial.html>`__ tutorial
+`Sequence-to-Sequence Modeling with nn.Transformer and TorchText <https://tutorials.pytorch.kr/beginner/transformer_tutorial.html>`__ tutorial
 and scales up the same model to demonstrate how Distributed Data Parallel and
 Pipeline Parallelism can be used to train Transformer models.
 
 Prerequisites:
 
     * `Pipeline Parallelism <https://pytorch.org/docs/stable/pipeline.html>`__
-    * `Sequence-to-Sequence Modeling with nn.Transformer and TorchText <https://pytorch.org/tutorials/beginner/transformer_tutorial.html>`__
-    * `Getting Started with Distributed Data Parallel <https://pytorch.org/tutorials/intermediate/ddp_tutorial.html>`__
+    * `Sequence-to-Sequence Modeling with nn.Transformer and TorchText <https://tutorials.pytorch.kr/beginner/transformer_tutorial.html>`__
+    * `Getting Started with Distributed Data Parallel <https://tutorials.pytorch.kr/intermediate/ddp_tutorial.html>`__
 """
 
 
@@ -67,7 +67,7 @@ class PositionalEncoding(nn.Module):
 # GPUs 0 and 1 and another process driving a pipe across GPUs 2 and 3. Both these
 # processes then use Distributed Data Parallel to train the two replicas. The
 # model is exactly the same model used in the `Sequence-to-Sequence Modeling with nn.Transformer and TorchText
-# <https://pytorch.org/tutorials/beginner/transformer_tutorial.html>`__ tutorial,
+# <https://tutorials.pytorch.kr/beginner/transformer_tutorial.html>`__ tutorial,
 # but is split into two stages. The largest number of parameters belong to the
 # `nn.TransformerEncoder <https://pytorch.org/docs/stable/generated/torch.nn.TransformerEncoder.html>`__ layer.
 # The `nn.TransformerEncoder <https://pytorch.org/docs/stable/generated/torch.nn.TransformerEncoder.html>`__
@@ -176,7 +176,7 @@ def run_worker(rank, world_size):
     train_iter = WikiText2(split='train')
     tokenizer = get_tokenizer('basic_english')
     vocab = build_vocab_from_iterator(map(tokenizer, train_iter), specials=["<unk>"])
-    vocab.set_default_index(vocab["<unk>"]) 
+    vocab.set_default_index(vocab["<unk>"])
 
     def data_process(raw_text_iter):
       data = [torch.tensor(vocab(tokenizer(item)), dtype=torch.long) for item in raw_text_iter]
@@ -510,4 +510,4 @@ if __name__=="__main__":
 #    [RANK 1]: =========================================================================================
 #    [RANK 1]: | End of training | test loss  0.33 | test ppl     1.39
 #    [RANK 1]: =========================================================================================
-# 
+#

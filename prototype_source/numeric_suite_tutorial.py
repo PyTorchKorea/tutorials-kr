@@ -418,4 +418,4 @@ for key in ob_dict:
 #
 # References
 # ----------
-# [1] `DYNAMIC QUANTIZATION ON AN LSTM WORD LANGUAGE MODEL <https://pytorch.org/tutorials/advanced/dynamic_quantization_tutorial.html>`_.
+# [1] `DYNAMIC QUANTIZATION ON AN LSTM WORD LANGUAGE MODEL <https://tutorials.pytorch.kr/advanced/dynamic_quantization_tutorial.html>`_.

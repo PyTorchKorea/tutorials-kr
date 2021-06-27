@@ -10,8 +10,8 @@ to combine distributed data parallelism with distributed model parallelism to
 train a simple model. Source code of the example can be found `here <https://github.com/pytorch/examples/tree/master/distributed/rpc/ddp_rpc>`__.
 
 Previous tutorials,
-`Getting Started With Distributed Data Parallel <https://pytorch.org/tutorials/intermediate/ddp_tutorial.html>`__
-and `Getting Started with Distributed RPC Framework <https://pytorch.org/tutorials/intermediate/rpc_tutorial.html>`__,
+`Getting Started With Distributed Data Parallel <https://tutorials.pytorch.kr/intermediate/ddp_tutorial.html>`__
+and `Getting Started with Distributed RPC Framework <https://tutorials.pytorch.kr/intermediate/rpc_tutorial.html>`__,
 described how to perform distributed data parallel and distributed model
 parallel training respectively. Although, there are several training paradigms
 where you might want to combine these two techniques. For example:

@@ -14,7 +14,7 @@ Requirements
 ------------
 
 - PyTorch 1.8+
-- `Getting Started With Distributed RPC Framework <https://pytorch.org/tutorials/intermediate/rpc_tutorial.html>`_
+- `Getting Started With Distributed RPC Framework <https://tutorials.pytorch.kr/intermediate/rpc_tutorial.html>`_
 
 
 What is Distributed Optimizer?
@@ -34,9 +34,9 @@ common use cases, training need to be done in multithreaded manner instead of mu
 due to performance concern and resource utilizations (or at least partially multithreaded,
 i.e. Parameter Server hosting part of the model and parameters, with new thread updating the
 parameters per request). PyTorch itself does not support multithreaded training natively as
-it suffers from the Python's Global Interpreter Lock (GIL), but it could leverage 
+it suffers from the Python's Global Interpreter Lock (GIL), but it could leverage
 `TorchScript <https://pytorch.org/docs/stable/jit.html>`_ to get rid of GIL and run the
-model in a multithreaded way. 
+model in a multithreaded way.
 
 For critical model training workloads, improving the training performance is an
 important topic. Researchers often would like to implement different optimization strategies
@@ -105,7 +105,7 @@ update in multithreaded mode, as it eliminates the possible race condition to ``
 
 
 Next we will define a distributed functional optimizer with TorchScript compatability to manage
-the optimizer states and calls into the TorchScript compatible update function we defined above. 
+the optimizer states and calls into the TorchScript compatible update function we defined above.
 Note that a few conventions are different from normal custom optimizers: 1. We don't inherit
 ``torch.optim.Optimizer`` as TorchScript does not support polymorphism 2. ``step`` takes gradients
 list instead of the loss closure.
