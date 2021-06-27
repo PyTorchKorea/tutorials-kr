@@ -135,7 +135,7 @@ class Net(nn.Module):
     def forward(self, x):
         x = self.pool(F.relu(self.conv1(x)))
         x = self.pool(F.relu(self.conv2(x)))
-        x = x.view(-1, 16 * 5 * 5)
+        x = torch.flatten(x, 1) # 배치를 제외한 모든 차원을 평탄화(flatten)
         x = F.relu(self.fc1(x))
         x = F.relu(self.fc2(x))
         x = self.fc3(x)
@@ -243,10 +243,13 @@ print('Predicted: ', ' '.join('%5s' % classes[predicted[j]]
 
 correct = 0
 total = 0
+# 학습 중이 아니므로, 출력에 대한 변화도를 계산할 필요가 없습니다
 with torch.no_grad():
     for data in testloader:
         images, labels = data
+        # 신경망에 이미지를 통과시켜 출력을 계산합니다
         outputs = net(images)
+        # 가장 높은 값(energy)를 갖는 분류(class)를 정답으로 선택하겠습니다
         _, predicted = torch.max(outputs.data, 1)
         total += labels.size(0)
         correct += (predicted == labels).sum().item()
@@ -260,23 +263,28 @@ print('Accuracy of the network on the 10000 test images: %d %%' % (
 #
 # 그럼 어떤 것들을 더 잘 분류하고, 어떤 것들을 더 못했는지 알아보겠습니다:
 
-class_correct = list(0. for i in range(10))
-class_total = list(0. for i in range(10))
+# 각 분류(class)에 대한 예측값 계산을 위해 준비
+correct_pred = {classname: 0 for classname in classes}
+total_pred = {classname: 0 for classname in classes}
+
+# 변화도는 여전히 필요하지 않습니다
 with torch.no_grad():
     for data in testloader:
         images, labels = data
         outputs = net(images)
-        _, predicted = torch.max(outputs, 1)
-        c = (predicted == labels).squeeze()
-        for i in range(4):
-            label = labels[i]
-            class_correct[label] += c[i].item()
-            class_total[label] += 1
+        _, predictions = torch.max(outputs, 1)
+        # 각 분류별로 올바른 예측 수를 모읍니다
+        for label, prediction in zip(labels, predictions):
+            if label == prediction:
+                correct_pred[classes[label]] += 1
+            total_pred[classes[label]] += 1
 
 
-for i in range(10):
-    print('Accuracy of %5s : %2d %%' % (
-        classes[i], 100 * class_correct[i] / class_total[i]))
+# 각 분류별 정확도(accuracy)를 출력합니다
+for classname, correct_count in correct_pred.items():
+    accuracy = 100 * float(correct_count) / total_pred[classname]
+    print("Accuracy for class {:5s} is: {:.1f} %".format(classname,
+                                                   accuracy))
 
 ########################################################################
 # 자, 이제 다음으로 무엇을 해볼까요?

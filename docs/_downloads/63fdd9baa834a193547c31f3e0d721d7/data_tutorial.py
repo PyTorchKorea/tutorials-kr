@@ -26,7 +26,7 @@ Dataset과 Dataloader
 # 데이터셋은 ``torch.utils.data.Dataset`` 의 하위 클래스로 개별 데이터를 특정하는 함수가 구현되어 있습니다.
 # 이러한 데이터셋은 모델을 만들어보고(prototype) 성능을 측정(benchmark)하는데 사용할 수 있습니다.
 # 여기에서 데이터셋들을 찾아볼 수 있습니다:
-# `이미지 데이터셋 <https://pytorch.org/docs/stable/torchvision/datasets.html>`_,
+# `이미지 데이터셋 <https://pytorch.org/vision/stable/datasets.html>`_,
 # `텍스트 데이터셋 <https://pytorch.org/text/stable/datasets.html>`_ 및
 # `오디오 데이터셋 <https://pytorch.org/audio/stable/datasets.html>`_
 #
@@ -35,11 +35,11 @@ Dataset과 Dataloader
 # 데이터셋 불러오기
 # ------------------------------------------------------------------------------------------
 #
-# `TorchVision` 에서 `Fashion-MNIST <https://research.zalando.com/welcome/mission/research-projects/fashion-mnist/>`_ 데이터셋을
+# `TorchVision` 에서 `Fashion-MNIST <https://research.zalando.com/project/fashion_mnist/fashion_mnist/>`_ 데이터셋을
 # 불러오는 예제를 살펴보겠습니다. Fashion-MNIST는 Zalando의 기사 이미지 데이터셋으로 60,000개의 학습 예제와 10,000개의 테스트 예제로 이루어져 있습니다.
 # 각 예제는 흑백(grayscale)의 28x28 이미지와 10개 분류(class) 중 하나인 정답(label)으로 구성됩니다.
 #
-# 다음 매개변수들을 사용하여 `FashionMNIST 데이터셋 <https://pytorch.org/docs/stable/torchvision/datasets.html#fashion-mnist>`_ 을 불러옵니다:
+# 다음 매개변수들을 사용하여 `FashionMNIST 데이터셋 <https://pytorch.org/vision/stable/datasets.html#fashion-mnist>`_ 을 불러옵니다:
 #  - ``root`` 는 학습/테스트 데이터가 저장되는 경로입니다.
 #  - ``train`` 은 학습용 또는 테스트용 데이터셋 여부를 지정합니다.
 #  - ``download=True`` 는 ``root`` 에 데이터가 없는 경우 인터넷에서 다운로드합니다.
@@ -49,7 +49,7 @@ Dataset과 Dataloader
 import torch
 from torch.utils.data import Dataset
 from torchvision import datasets
-from torchvision.transforms import ToTensor, Lambda
+from torchvision.transforms import ToTensor
 import matplotlib.pyplot as plt
 
 
@@ -141,8 +141,7 @@ class CustomImageDataset(Dataset):
             image = self.transform(image)
         if self.target_transform:
             label = self.target_transform(label)
-        sample = {"image": image, "label": label}
-        return sample
+        return image, label
 
 
 #################################################################

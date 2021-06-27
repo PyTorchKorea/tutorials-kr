@@ -2,7 +2,7 @@
 torchtext 라이브러리로 텍스트 분류하기
 ===============================================
 
-**번역**: `김강민 <https://github.com/gangsss>`_ , `김진현 <https://github.com/lewhe0>`_
+**번역**: `김강민 <https://github.com/gangsss>`_ , `김진현 <https://github.com/lewha0>`_
 
 이 튜토리얼에서는 torchtext 라이브러리를 사용하여 어떻게 텍스트 분류 분석을 위한 데이터셋을 만드는지를 살펴보겠습니다.
 다음과 같은 내용들을 알게 됩니다:
@@ -53,34 +53,34 @@ train_iter = AG_NEWS(split='train')
 #
 # 다음은 토크나이저 및 어휘집을 사용한 일반적인 NLP 데이터 처리의 예입니다.
 # 첫번째 단계는 가공되지 않은 학습 데이터셋으로 어휘집을 만드는 것입니다.
-# 사용자는 Vocab 클래스의 생성자에 인자를 설정하여 사용자 정의된 어휘집(customized vocab)을 만들 수 있습니다.
-# 토큰(token)들의 최소 빈도 ``min_freq`` 에 대한 예시는 아래와 같습니다.
-
+# 여기에서는 토큰의 목록 또는 반복자를 받는 내장(built-in) 팩토리 함수(factory function) `build_vocab_from_iterator` 를 사용합니다.
+# 사용자는 어휘집에 추가할 특수 기호(special symbol) 같은 것들을 전달할 수도 있습니다.
 
 from torchtext.data.utils import get_tokenizer
-from collections import Counter
-from torchtext.vocab import Vocab
+from torchtext.vocab import build_vocab_from_iterator
 
 tokenizer = get_tokenizer('basic_english')
 train_iter = AG_NEWS(split='train')
-counter = Counter()
-for (label, line) in train_iter:
-    counter.update(tokenizer(line))
-vocab = Vocab(counter, min_freq=1)
 
+def yield_tokens(data_iter):
+    for _, text in data_iter:
+        yield tokenizer(text)
+
+vocab = build_vocab_from_iterator(yield_tokens(train_iter), specials=["<unk>"])
+vocab.set_default_index(vocab["<unk>"])
 
 ######################################################################
 # 어휘집 블록(vocabulary block)은 토큰 목록을 정수로 변환합니다.
 #
 # ::
 #
-#     [vocab[token] for token in ['here', 'is', 'an', 'example']]
-#     >>> [476, 22, 31, 5298]
+#     vocab(['here', 'is', 'an', 'example'])
+#     >>> [475, 21, 30, 5286]
 #
 # 토크나이저와 어휘집을 갖춘 텍스트 처리 파이프라인을 준비합니다.
 # 텍스트 파이프라인과 레이블(label) 파이프라인은 데이터셋 반복자로부터 얻어온 가공되지 않은 문장 데이터를 처리하기 위해 사용됩니다.
 
-text_pipeline = lambda x: [vocab[token] for token in tokenizer(x)]
+text_pipeline = lambda x: vocab(tokenizer(x))
 label_pipeline = lambda x: int(x) - 1
 
 
@@ -266,6 +266,7 @@ def evaluate(dataloader):
 #
 
 from torch.utils.data.dataset import random_split
+from torchtext.data.functional import to_map_style_dataset
 # Hyperparameters
 EPOCHS = 10 # epoch
 LR = 5  # learning rate
@@ -276,8 +277,8 @@ optimizer = torch.optim.SGD(model.parameters(), lr=LR)
 scheduler = torch.optim.lr_scheduler.StepLR(optimizer, 1.0, gamma=0.1)
 total_accu = None
 train_iter, test_iter = AG_NEWS()
-train_dataset = list(train_iter)
-test_dataset = list(test_iter)
+train_dataset = to_map_style_dataset(train_iter)
+test_dataset = to_map_style_dataset(test_iter)
 num_train = int(len(train_dataset) * 0.95)
 split_train_, split_valid_ = \
     random_split(train_dataset, [num_train, len(train_dataset) - num_train])
@@ -305,72 +306,6 @@ for epoch in range(1, EPOCHS + 1):
     print('-' * 59)
 
 
-######################################################################
-# 이 모델을 GPU 상에서 수행하고 다음과 같은 결과를 얻었습니다:
-#
-# ::
-#
-#        | epoch   1 |   500/ 1782 batches | accuracy    0.684
-#        | epoch   1 |  1000/ 1782 batches | accuracy    0.852
-#        | epoch   1 |  1500/ 1782 batches | accuracy    0.877
-#        -----------------------------------------------------------
-#        | end of epoch   1 | time:  8.33s | valid accuracy    0.867
-#        -----------------------------------------------------------
-#        | epoch   2 |   500/ 1782 batches | accuracy    0.895
-#        | epoch   2 |  1000/ 1782 batches | accuracy    0.900
-#        | epoch   2 |  1500/ 1782 batches | accuracy    0.903
-#        -----------------------------------------------------------
-#        | end of epoch   2 | time:  8.18s | valid accuracy    0.890
-#        -----------------------------------------------------------
-#        | epoch   3 |   500/ 1782 batches | accuracy    0.914
-#        | epoch   3 |  1000/ 1782 batches | accuracy    0.914
-#        | epoch   3 |  1500/ 1782 batches | accuracy    0.916
-#        -----------------------------------------------------------
-#        | end of epoch   3 | time:  8.20s | valid accuracy    0.897
-#        -----------------------------------------------------------
-#        | epoch   4 |   500/ 1782 batches | accuracy    0.926
-#        | epoch   4 |  1000/ 1782 batches | accuracy    0.924
-#        | epoch   4 |  1500/ 1782 batches | accuracy    0.921
-#        -----------------------------------------------------------
-#        | end of epoch   4 | time:  8.18s | valid accuracy    0.895
-#        -----------------------------------------------------------
-#        | epoch   5 |   500/ 1782 batches | accuracy    0.938
-#        | epoch   5 |  1000/ 1782 batches | accuracy    0.935
-#        | epoch   5 |  1500/ 1782 batches | accuracy    0.937
-#        -----------------------------------------------------------
-#        | end of epoch   5 | time:  8.16s | valid accuracy    0.902
-#        -----------------------------------------------------------
-#        | epoch   6 |   500/ 1782 batches | accuracy    0.939
-#        | epoch   6 |  1000/ 1782 batches | accuracy    0.939
-#        | epoch   6 |  1500/ 1782 batches | accuracy    0.938
-#        -----------------------------------------------------------
-#        | end of epoch   6 | time:  8.16s | valid accuracy    0.906
-#        -----------------------------------------------------------
-#        | epoch   7 |   500/ 1782 batches | accuracy    0.941
-#        | epoch   7 |  1000/ 1782 batches | accuracy    0.939
-#        | epoch   7 |  1500/ 1782 batches | accuracy    0.939
-#        -----------------------------------------------------------
-#        | end of epoch   7 | time:  8.19s | valid accuracy    0.903
-#        -----------------------------------------------------------
-#        | epoch   8 |   500/ 1782 batches | accuracy    0.942
-#        | epoch   8 |  1000/ 1782 batches | accuracy    0.941
-#        | epoch   8 |  1500/ 1782 batches | accuracy    0.942
-#        -----------------------------------------------------------
-#        | end of epoch   8 | time:  8.16s | valid accuracy    0.904
-#        -----------------------------------------------------------
-#        | epoch   9 |   500/ 1782 batches | accuracy    0.942
-#        | epoch   9 |  1000/ 1782 batches | accuracy    0.941
-#        | epoch   9 |  1500/ 1782 batches | accuracy    0.942
-#        -----------------------------------------------------------
-#          end of epoch   9 | time:  8.16s | valid accuracy    0.904
-#        -----------------------------------------------------------
-#        | epoch  10 |   500/ 1782 batches | accuracy    0.940
-#        | epoch  10 |  1000/ 1782 batches | accuracy    0.942
-#        | epoch  10 |  1500/ 1782 batches | accuracy    0.942
-#        -----------------------------------------------------------
-#        | end of epoch  10 | time:  8.15s | valid accuracy    0.904
-#        -----------------------------------------------------------
-
 
 ######################################################################
 # 평가 데이터로 모델 평가하기
@@ -386,12 +321,7 @@ print('Checking the results of test dataset.')
 accu_test = evaluate(test_dataloader)
 print('test accuracy {:8.3f}'.format(accu_test))
 
-################################################
-#
-# ::
-#
-#        test accuracy    0.906
-#
+
 
 
 ######################################################################
@@ -428,9 +358,3 @@ model = model.to("cpu")
 
 print("This is a %s news" %ag_news_label[predict(ex_text_str, text_pipeline)])
 
-################################################
-#
-# ::
-#
-#        This is a Sports news
-#

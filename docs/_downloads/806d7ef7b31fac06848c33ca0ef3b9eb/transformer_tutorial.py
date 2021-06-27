@@ -3,7 +3,7 @@ nn.Transformer 와 TorchText 로 시퀀스-투-시퀀스(Sequence-to-Sequence) �
 =================================================================================
 
 이 튜토리얼에서는
-`nn.Transformer <https://pytorch.org/docs/master/nn.html?highlight=nn%20transformer#torch.nn.Transformer>`__ 모듈을
+`nn.Transformer <https://pytorch.org/docs/stable/generated/torch.nn.Transformer.html>`__ 모듈을
 이용하는 시퀀스-투-시퀀스(Sequence-to-Sequence) 모델을 학습하는 방법을 배워보겠습니다.
 
 PyTorch 1.2 버젼에는
@@ -13,9 +13,9 @@ PyTorch 1.2 버젼에는
 많은 시퀀스-투-시퀀스 문제들에서 품질이 우수함이 입증되었습니다.
 ``nn.Transformer`` 모듈은 입력(input) 과 출력(output) 사이의 전역적인 의존성(global dependencies)
 을 나타내기 위하여 전적으로 어텐션(attention) 메커니즘에 의존합니다.
-(최근에 또 다른 모듈이 `nn.MultiheadAttention <https://pytorch.org/docs/master/nn.html?highlight=multiheadattention#torch.nn.MultiheadAttention>`__ 으로 구현되었습니다.)
+(최근에 또 다른 모듈이 `nn.MultiheadAttention <https://pytorch.org/docs/stable/generated/torch.nn.MultiheadAttention.html>`__ 으로 구현되었습니다.)
 ``nn.Transformer`` 모듈은 현재 모듈화가 매우 잘 되어 있어,
-다음과 같은 단일 컴포넌트 (이 튜토리얼의 `nn.TransformerEncoder <https://pytorch.org/docs/master/nn.html?highlight=nn%20transformerencoder#torch.nn.TransformerEncoder>`__ 와 같은)
+다음과 같은 단일 컴포넌트 (이 튜토리얼의 `nn.TransformerEncoder <https://pytorch.org/docs/stable/generated/torch.nn.TransformerEncoder.html>`__ 와 같은)
 는 쉽게 적용 및 구성될 수 있습니다.
 
 .. image:: ../_static/img/transformer_architecture.jpg
@@ -34,7 +34,7 @@ PyTorch 1.2 버젼에는
 # 먼저, 토큰(token) 들의 시퀀스가 임베딩(embedding) 레이어로 전달되며, 이어서 포지셔널 인코딩(positional encoding) 레이어가 각 단어의 순서를 설명합니다.
 # (더 자세한 설명은 다음 단락을 참고해주세요.)
 # ``nn.TransformerEncoder`` 는 여러 개의
-# `nn.TransformerEncoderLayer <https://pytorch.org/docs/master/nn.html?highlight=transformerencoderlayer#torch.nn.TransformerEncoderLayer>`__
+# `nn.TransformerEncoderLayer <https://pytorch.org/docs/stable/generated/torch.nn.TransformerEncoderLayer.html>`__
 # 레이어로 구성되어 있습니다.
 # ``nn.TransformerEncoder`` 내부의 셀프-어텐션(self-attention) 레이어들은 시퀀스 안에서의 이전 포지션에만 집중하도록 허용되기 때문에,
 # 입력(input) 순서와 함께, 정사각 형태의 어텐션 마스크(attention mask) 가 필요합니다.
@@ -43,15 +43,16 @@ PyTorch 1.2 버젼에는
 #
 
 import math
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from torch.nn import TransformerEncoder, TransformerEncoderLayer
 
 class TransformerModel(nn.Module):
 
     def __init__(self, ntoken, ninp, nhead, nhid, nlayers, dropout=0.5):
         super(TransformerModel, self).__init__()
-        from torch.nn import TransformerEncoder, TransformerEncoderLayer
         self.model_type = 'Transformer'
         self.pos_encoder = PositionalEncoding(ninp, dropout)
         encoder_layers = TransformerEncoderLayer(ninp, nhead, nhid, dropout)
@@ -133,23 +134,18 @@ class PositionalEncoding(nn.Module):
 # 이 컬럼들은 모델에 의해서 독립적으로 취급되며, 이것은 더 효율적인 배치 프로세싱(batch processing) 이 가능하지만, ``G`` 와 ``F`` 의 의존성이 학습될 수 없다는 것을 의미합니다.
 #
 
-import io
 import torch
 from torchtext.datasets import WikiText2
 from torchtext.data.utils import get_tokenizer
-from collections import Counter
-from torchtext.vocab import Vocab
+from torchtext.vocab import build_vocab_from_iterator
 
 train_iter = WikiText2(split='train')
 tokenizer = get_tokenizer('basic_english')
-counter = Counter()
-for line in train_iter:
-    counter.update(tokenizer(line))
-vocab = Vocab(counter)
+vocab = build_vocab_from_iterator(map(tokenizer, train_iter), specials=["<unk>"])
+vocab.set_default_index(vocab["<unk>"])
 
 def data_process(raw_text_iter):
-  data = [torch.tensor([vocab[token] for token in tokenizer(item)],
-                       dtype=torch.long) for item in raw_text_iter]
+  data = [torch.tensor(vocab(tokenizer(item)), dtype=torch.long) for item in raw_text_iter]
   return torch.cat(tuple(filter(lambda t: t.numel() > 0, data)))
 
 train_iter, val_iter, test_iter = WikiText2()
@@ -212,7 +208,7 @@ def get_batch(source, i):
 # 단어 사이즈는 단어 오브젝트의 길이와 일치 합니다.
 #
 
-ntokens = len(vocab.stoi) # 단어 사전(어휘집)의 크기
+ntokens = len(vocab) # 단어 사전(어휘집)의 크기
 emsize = 200 # 임베딩 차원
 nhid = 200 # nn.TransformerEncoder 에서 피드포워드 네트워크(feedforward network) 모델의 차원
 nlayers = 2 # nn.TransformerEncoder 내부의 nn.TransformerEncoderLayer 개수
@@ -241,12 +237,13 @@ model = TransformerModel(ntokens, emsize, nhead, nhid, nlayers, dropout).to(devi
 # 을 이용합니다.
 #
 
+import time
+
 criterion = nn.CrossEntropyLoss()
 lr = 5.0 # 학습률
 optimizer = torch.optim.SGD(model.parameters(), lr=lr)
 scheduler = torch.optim.lr_scheduler.StepLR(optimizer, 1.0, gamma=0.95)
 
-import time
 def train():
     model.train() # 학습 모드를 시작합니다.
     total_loss = 0.

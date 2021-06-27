@@ -36,7 +36,7 @@ T-shirt/top, Trouser, Pullover, Dress, Coat, Sandal, Shirt, Sneaker, Bag, or Ank
 
 다음의 두 가지 방법으로 이 튜토리얼을 실행해볼 수 있습니다:
 
-- **클라우드**: 시작하기 가장 쉬운 방법입니다! 각 섹션에는 Colab 링크가 있으며, 이 링크는 완전히 호스팅되는 환경에서 코드가 있는 노트북을 엽니다. 전문가 팁: Colab을 GPU 런타임으로 사용하면 연산들이 빨라집니다 *Runtime > Change runtime type > GPU*
+- **클라우드**: 시작하기 가장 쉬운 방법입니다! 각 섹션의 맨 위에는 "Run in Microsoft Learn" 링크가 있으며, 이 링크는 완전히 호스팅되는 환경에서 Microsoft Learn의 노트북을 엽니다.
 - **로컬**: 먼저 로컬 컴퓨터에 PyTorch와 TorchVision을 설치해야 합니다 (`설치 방법 <https://pytorch.org/get-started/locally/>`_). 노트북을 내려받거나 코드를 원하는 IDE에 복사하세요.
 
 

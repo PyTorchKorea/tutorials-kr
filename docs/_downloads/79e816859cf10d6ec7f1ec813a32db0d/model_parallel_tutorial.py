@@ -53,7 +53,7 @@ class ToyModel(nn.Module):
         return self.net2(x.to('cuda:1')) # 첫 번째 층의 산출물을 두 번째 GPU에 할당하여 진행
 
 ######################################################################
-# 위의 ``ToyModel`` 예제는 선헝 층과 텐션값을 5개의 ``to(device)`` 장비에 적절하게 할당하는 것이 아닌,
+# 위의 ``ToyModel`` 예제는 선헝 층과 텐션값을 4개의 ``to(device)`` 장비에 적절하게 할당하는 것이 아닌,
 # 단일 GPU로 신경망 모델을 구현하는 것과 매우 유사한 구조인 것임을 확인할 수 있습니다.
 # 다시 말해, GPU에 텐서값 혹은 층을 할당하는 것 외에는 추가적으로 설정하는 부분이 없습니다.
 # ``backward()`` 와 ``torch.optim`` 코드를 통해 단일 GPU를 이용하여 신경망 모델의 가중치값을 업데이트하는 것 처럼, 자동으로 오차에 의한 기울기값을 반영합니다.
@@ -173,12 +173,6 @@ num_repeat = 10
 stmt = "train(model)"
 
 setup = "model = ModelParallelResNet50()"
-
-# globals 인자값은 파이썬 3 버전에서만 이용할 수 있습니다.
-# 만약 파이썬 2 버전을 이용한다면 다음과 같이 이용할 수 있습니다.
-# import __builtin__
-# __builtin__.__dict__.update(locals())
-
 mp_run_times = timeit.repeat(
     stmt, setup, number=1, repeat=num_repeat, globals=globals())
 mp_mean, mp_std = np.mean(mp_run_times), np.std(mp_run_times)

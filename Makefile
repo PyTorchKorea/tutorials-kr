@@ -106,6 +106,7 @@ docs:
 	make html
 	rm -rf docs
 	cp -r $(BUILDDIR)/html docs
+	cp CNAME docs/CNAME
 	touch docs/.nojekyll
 
 html-noplot:

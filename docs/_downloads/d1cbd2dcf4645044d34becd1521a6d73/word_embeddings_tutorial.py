@@ -242,6 +242,8 @@ for epoch in range(10):
     losses.append(total_loss)
 print(losses)  # 반복할 떄마다 손실이 줄어드는 것을 봅시다!
 
+# "beauty"와 같이 특정 단어에 대한 임베딩을 확인하려면,
+print(model.embeddings.weight[word_to_ix["beauty"]])
 
 ######################################################################
 # 예시: 단어 임베딩 계산하기: Continuous Bag-of-Words

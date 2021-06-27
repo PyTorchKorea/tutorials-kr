@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 r"""
-Sequence Models and Long-Short Term Memory Networks
+Sequence Models and Long Short-Term Memory Networks
 ===================================================
 
 At this point, we have seen various feed-forward networks. That is,
@@ -96,7 +96,7 @@ print(hidden)
 # not use Viterbi or Forward-Backward or anything like that, but as a
 # (challenging) exercise to the reader, think about how Viterbi could be
 # used after you have seen what is going on. In this example, we also refer
-# to embeddings. If you are unfamiliar with embeddings, you can read up 
+# to embeddings. If you are unfamiliar with embeddings, you can read up
 # about them `here <https://tutorials.pytorch.kr/beginner/nlp/word_embeddings_tutorial.html>`__.
 #
 # The model is as follows: let our input sentence be
@@ -130,7 +130,7 @@ def prepare_sequence(seq, to_ix):
 
 training_data = [
     # Tags are: DET - determiner; NN - noun; V - verb
-    # For example, the word "The" is a determiner 
+    # For example, the word "The" is a determiner
     ("The dog ate the apple".split(), ["DET", "NN", "V", "DET", "NN"]),
     ("Everybody read that book".split(), ["NN", "V", "DET", "NN"])
 ]

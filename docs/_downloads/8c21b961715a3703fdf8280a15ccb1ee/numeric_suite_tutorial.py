@@ -91,14 +91,14 @@ for key in wt_compare_dict:
 import matplotlib.pyplot as plt
 
 f = wt_compare_dict['conv1.weight']['float'].flatten()
-plt.hist(f, bins = 100)
-plt.title("Floating point model weights of conv1")
-plt.show()
+#plt.hist(f, bins = 100)
+#plt.title("Floating point model weights of conv1")
+#plt.show()
 
 q = wt_compare_dict['conv1.weight']['quantized'].flatten().dequantize()
-plt.hist(q, bins = 100)
-plt.title("Quantized model weights of conv1")
-plt.show()
+#plt.hist(q, bins = 100)
+#plt.title("Quantized model weights of conv1")
+#plt.show()
 
 
 
@@ -168,7 +168,7 @@ class MyOutputLogger(ns.Logger):
 # And then we can pass this logger into above APIs such as:
 
 data = img_data[0][0]
-act_compare_dict = ns.compare_model_outputs(float_model, qmodel, data, Logger=MyOutputLogger)
+act_compare_dict = ns.compare_model_outputs(float_model, qmodel, data, logger_cls=MyOutputLogger)
 
 ##############################################################################
 # or:
@@ -260,7 +260,7 @@ class MyShadowLogger(ns.Logger):
 # And then we can pass this logger into above APIs such as:
 
 data = img_data[0][0]
-ob_dict = ns.compare_model_stub(float_model, qmodel, module_swap_list, data, Logger=MyShadowLogger)
+ob_dict = ns.compare_model_stub(float_model, qmodel, module_swap_list, data, logger_cls=MyShadowLogger)
 
 ##############################################################################
 # or:
