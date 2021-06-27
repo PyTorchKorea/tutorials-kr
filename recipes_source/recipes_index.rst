@@ -94,7 +94,7 @@ Recipes are bite-sized bite-sized, actionable examples of how to use specific Py
    :tags: Basics
 
 .. customcarditem::
-   :header: Pytorch 벤치마크
+   :header: PyTorch 벤치마크
    :card_description: PyTorch의 벤치마크 모듈을 사용하여 코드의 성능을 측정하고 비교하는 방법을 알아봅니다.
    :image: ../_static/img/thumbnails/cropped/profiler.png
    :link: ../recipes/recipes/benchmark.html
@@ -215,6 +215,13 @@ Recipes are bite-sized bite-sized, actionable examples of how to use specific Py
   :tags: Mobile
 
 .. customcarditem::
+   :header: Mobile Interpreter Workflow in Android and iOS
+   :card_description: Learn how to use the mobile interpreter on iOS and Andriod devices.
+   :image: ../_static/img/thumbnails/cropped/mobile.png
+   :link: ../recipes/mobile_interpreter.html
+   :tags: Mobile
+
+.. customcarditem::
    :header: Profiling PyTorch RPC-Based Workloads
    :card_description: How to use the PyTorch profiler to profile RPC-based workloads.
    :image: ../_static/img/thumbnails/cropped/profile.png
@@ -251,6 +258,13 @@ Recipes are bite-sized bite-sized, actionable examples of how to use specific Py
    :image: ../_static/img/thumbnails/cropped/profiler.png
    :link: ../recipes/cuda_rpc.html
    :tags: Distributed-Training
+
+.. customcarditem::
+   :header: Distributed Optimizer with TorchScript support
+   :card_description: How to enable TorchScript support for Distributed Optimizer.
+   :image: ../_static/img/thumbnails/cropped/profiler.png
+   :link: ../recipes/distributed_optim_torchscript.html
+   :tags: Distributed-Training,TorchScript
 
 .. End of tutorial card section
 
@@ -290,3 +304,5 @@ Recipes are bite-sized bite-sized, actionable examples of how to use specific Py
    /recipes/distributed_rpc_profiling
    /recipes/zero_redundancy_optimizer
    /recipes/cuda_rpc
+   /recipes/distributed_optim_torchscript
+   /recipes/mobile_interpreter

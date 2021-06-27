@@ -78,7 +78,7 @@ model = NeuralNetwork()
 #
 # 학습 시에는 다음과 같은 하이퍼파라매터를 정의합니다:
 #  - **에폭(epoch) 수** - 데이터셋을 반복하는 횟수
-#  - **배치 크기(batch size)** - 각 에폭에서 한 번에 모델에 전달할 데이터 샘플의 수
+#  - **배치 크기(batch size)** - 매개변수가 갱신되기 전 신경망을 통해 전파된 데이터 샘플의 수
 #  - **학습율(learning rate)** - 각 배치/에폭에서 모델의 매개변수를 조절하는 비율. 값이 작을수록 학습 속도가 느려지고, 값이 크면 학습 중 예측할 수 없는 동작이 발생할 수 있습니다.
 #
 
@@ -167,6 +167,7 @@ def train_loop(dataloader, model, loss_fn, optimizer):
 
 def test_loop(dataloader, model, loss_fn):
     size = len(dataloader.dataset)
+    num_batches = len(dataloader)
     test_loss, correct = 0, 0
 
     with torch.no_grad():
@@ -175,7 +176,7 @@ def test_loop(dataloader, model, loss_fn):
             test_loss += loss_fn(pred, y).item()
             correct += (pred.argmax(1) == y).type(torch.float).sum().item()
 
-    test_loss /= size
+    test_loss /= num_batches
     correct /= size
     print(f"Test Error: \n Accuracy: {(100*correct):>0.1f}%, Avg loss: {test_loss:>8f} \n")
 

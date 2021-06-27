@@ -134,7 +134,7 @@ TensorBoard를 설정합니다.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 이제 TensorBoard에 이미지(구체적으로는
-`make_grid <https://pytorch.org/docs/stable/torchvision/utils.html#torchvision.utils.make_grid>`__
+`make_grid <https://pytorch.org/vision/stable/utils.html#torchvision.utils.make_grid>`__
 를 사용하여 그리드(grid))를 써보겠습니다.
 
 .. code:: python
@@ -158,7 +158,7 @@ TensorBoard를 설정합니다.
 
     tensorboard --logdir=runs
 
-를 실행하고, `https://localhost:6006 <https://localhost:6006>`_ 을 열어보면
+를 실행하고, `http://localhost:6006 <http://localhost:6006>`_ 을 열어보면
 다음과 같은 화면이 나타납니다.
 
 .. image:: ../../_static/img/tensorboard_first_view.png
@@ -342,31 +342,30 @@ TensorBoard는 이미지 데이터와 같은 고차원 데이터를 저차원 �
     # 2. 예측 결과를 test_size 텐서로 가져옵니다
     # 실행하는데 10초 이하 소요
     class_probs = []
-    class_preds = []
+    class_label = []
     with torch.no_grad():
         for data in testloader:
             images, labels = data
             output = net(images)
             class_probs_batch = [F.softmax(el, dim=0) for el in output]
-            _, class_preds_batch = torch.max(output, 1)
 
             class_probs.append(class_probs_batch)
-            class_preds.append(class_preds_batch)
+            class_label.append(labels)
 
     test_probs = torch.cat([torch.stack(batch) for batch in class_probs])
-    test_preds = torch.cat(class_preds)
+    test_label = torch.cat(class_label)
 
     # 헬퍼 함수
-    def add_pr_curve_tensorboard(class_index, test_probs, test_preds, global_step=0):
+    def add_pr_curve_tensorboard(class_index, test_probs, test_label, global_step=0):
         '''
         0부터 9까지의 "class_index"를 가져온 후 해당 정밀도-재현율(precision-recall)
         곡선을 그립니다
         '''
-        tensorboard_preds = test_preds == class_index
+        tensorboard_truth = test_label == class_index
         tensorboard_probs = test_probs[:, class_index]
 
         writer.add_pr_curve(classes[class_index],
-                            tensorboard_preds,
+                            tensorboard_truth,
                             tensorboard_probs,
                             global_step=global_step)
         writer.close()

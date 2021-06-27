@@ -3,11 +3,6 @@
 
 .. raw:: html
 
-    <p>여러분의 생각을 들려주세요. <a href="https://forms.gle/ZxBgfDRmMYdE3G6RA" target="_blank">(비공식) 한국어 PyTorch 튜토리얼 독자 설문</a>에 참여 부탁드립니다. </p>
-
-
-.. raw:: html
-
     <div class="tutorials-callout-container">
         <div class="row">
 
@@ -133,7 +128,7 @@
    :header: Speech Command Recognition
    :card_description: Learn how to correctly format an audio dataset and then train/test an audio classifier network on the dataset.
    :image: _static/img/thumbnails/cropped/torchaudio-speech.png
-   :link: intermediate/speech_command_recognition_with_torchaudio.html
+   :link: intermediate/speech_command_recognition_with_torchaudio_tutorial.html
    :tags: Audio
 
 .. Text
@@ -174,10 +169,10 @@
    :tags: Text
 
 .. customcarditem::
-   :header: TorchText로 언어 번역하기
-   :card_description: 영어와 독어가 포함된 잘 알려진 데이터셋을 torchtext를 사용하여 전처리한 뒤, 시퀀스-투-시퀀스(Seq-to-Seq) 모델을 사용하여 학습합니다.
+   :header: Transformer로 언어 번역하기
+   :card_description: Transformer를 사용하여 언어 번역 모델을 밑바닥부터 학습합니다.
    :image: _static/img/thumbnails/cropped/Language-Translation-with-TorchText.png
-   :link: beginner/torchtext_translation.html
+   :link: beginner/translation_transformer.html
    :tags: Text
 
 .. Reinforcement Learning
@@ -318,10 +313,24 @@
    :tags: Model-Optimization,Best-Practice,Profiling
 
 .. customcarditem::
+   :header: Performance Profiling in TensorBoard
+   :card_description: Learn how to use the TensorBoard plugin to profile and analyze your model's performance.
+   :image: _static/img/thumbnails/cropped/profiler.png
+   :link: intermediate/tensorboard_profiler_tutorial.html
+   :tags: Model-Optimization,Best-Practice,Profiling,TensorBoard
+
+.. customcarditem::
    :header: Hyperparameter Tuning Tutorial
    :card_description: Learn how to use Ray Tune to find the best performing set of hyperparameters for your model.
    :image: _static/img/ray-tune.png
    :link: beginner/hyperparameter_tuning_tutorial.html
+   :tags: Model-Optimization,Best-Practice
+
+.. customcarditem::
+   :header: Parametrizations Tutorial
+   :card_description: Learn how to use torch.nn.utils.parametrize to put constriants on your parameters (e.g. make them orthogonal, symmetric positive definite, low-rank...)
+   :image: _static/img/thumbnails/cropped/parametrizations.png
+   :link: intermediate/parametrizations.html
    :tags: Model-Optimization,Best-Practice
 
 .. customcarditem::
@@ -351,6 +360,13 @@
    :image: _static/img/thumbnails/cropped/60-min-blitz.png
    :link: intermediate/quantized_transfer_learning_tutorial.html
    :tags: Image/Video,Quantization,Model-Optimization
+
+.. customcarditem::
+   :header: (beta) Static Quantization with Eager Mode in PyTorch
+   :card_description: This tutorial shows how to do post-training static quantization.
+   :image: _static/img/thumbnails/cropped/60-min-blitz.png
+   :link: advanced/static_quantization_tutorial.html
+   :tags: Quantization
 
 .. Parallel-and-Distributed-Training
 
@@ -482,7 +498,7 @@
    :header: PyTorch Cheat Sheet
    :description: Quick overview to essential PyTorch elements.
    :button_link: beginner/ptcheat.html
-   :button_text: Download
+   :button_text: Open
 
 .. customcalloutitem::
    :header: 공식 튜토리얼 저장소(GitHub)
@@ -491,11 +507,22 @@
    :button_text: Go To GitHub
 
 .. customcalloutitem::
+   :header: 튜토리얼을 Google Colab에서 실행하기
+   :description: Google Colab에서 튜토리얼을 실행하기 위해 튜토리얼 데이터를 Google Drive로 복사하는 방법을 배웁니다.
+   :button_link: beginner/colab.html
+   :button_text: Open
+
+.. customcalloutitem::
    :header: (비공식) 한국어 튜토리얼 저장소(GitHub)
    :description: GitHub에서 (비공식) 한국어 튜토리얼을 만나보세요.
    :button_link: https://github.com/9bow/PyTorch-tutorials-kr
    :button_text: Go To GitHub
 
+.. customcalloutitem::
+   :header: 파이토치 한국어 사용자 모임
+   :description: 파이토치를 사용하는 다른 사용자들과 의견을 나눠보세요.
+   :button_link: https://discuss.pytorch.kr
+   :button_text: Open
 
 .. End of callout section
 
@@ -522,9 +549,24 @@
    :maxdepth: 2
    :hidden:
    :includehidden:
-   :caption: 파이토치(PyTorch) 배우기
+   :caption: 파이토치(PyTorch) 시작하기
 
    beginner/basics/intro
+   beginner/basics/quickstart_tutorial
+   beginner/basics/tensorqs_tutorial
+   beginner/basics/data_tutorial
+   beginner/basics/transforms_tutorial
+   beginner/basics/buildmodel_tutorial
+   beginner/basics/autogradqs_tutorial
+   beginner/basics/optimization_tutorial
+   beginner/basics/saveloadrun_tutorial
+
+.. toctree::
+   :maxdepth: 2
+   :hidden:
+   :includehidden:
+   :caption: 파이토치(PyTorch) 배우기
+
    beginner/deep_learning_60min_blitz
    beginner/pytorch_with_examples
    beginner/nn_tutorial
@@ -549,7 +591,7 @@
    :caption: 오디오
 
    beginner/audio_preprocessing_tutorial
-   intermediate/speech_command_recognition_with_torchaudio
+   intermediate/speech_command_recognition_with_torchaudio_tutorial
 
 .. toctree::
    :maxdepth: 2
@@ -562,7 +604,7 @@
    intermediate/char_rnn_generation_tutorial
    intermediate/seq2seq_translation_tutorial
    beginner/text_sentiment_ngrams_tutorial
-   beginner/torchtext_translation
+   beginner/translation_transformer
 
 
 .. toctree::
@@ -624,11 +666,14 @@
    :caption: 모델 최적화
 
    beginner/profiler
+   intermediate/tensorboard_profiler_tutorial
    beginner/hyperparameter_tuning_tutorial
+   intermediate/parametrizations
    intermediate/pruning_tutorial
    advanced/dynamic_quantization_tutorial
    intermediate/dynamic_quantization_bert_tutorial
    intermediate/quantized_transfer_learning_tutorial
+   advanced/static_quantization_tutorial
 
 .. toctree::
    :maxdepth: 2

@@ -98,7 +98,7 @@ PennFudan 데이터셋을 위한 코드를 작성해 보겠습니다.
    from PIL import Image
 
 
-   class PennFudanDataset(object):
+   class PennFudanDataset(torch.utils.data.Dataset):
        def __init__(self, root, transforms):
            self.root = root
            self.transforms = transforms

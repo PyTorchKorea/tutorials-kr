@@ -189,7 +189,7 @@ PyTorch에 포함된 분산 패키지(예. ``torch.distributed``)는 연구자�
 
     """ All-Reduce 예제 """
     def run(rank, size):
-        """ 간단한 점-대-점 간 통신 """
+        """ 간단한 집합 통신 """
         group = dist.new_group([0, 1])
         tensor = torch.ones(1)
         dist.all_reduce(tensor, op=dist.ReduceOp.SUM, group=group)
@@ -214,9 +214,9 @@ PyTorch에는 현재 ``dist.all_reduce(tensor, op, group)`` 외에도 6개의 �
    결과를 ``dst`` 에 저장합니다.
 -  ``dist.all_reduce(tensor, op, group)``: 리듀스와 동일하지만, 결과가 모든
    프로세스에 저장됩니다.
--  ``dist.scatter(tensor, src, scatter_list, group)``: :math:`i^{\text{번째}}` Tensor
+-  ``dist.scatter(tensor, scatter_list, src, group)``: :math:`i^{\text{번째}}` Tensor
    ``scatter_list[i]`` 를 :math:`i^{\text{번째}}` 프로세스에 복사합니다.
--  ``dist.gather(tensor, dst, gather_list, group)``: ``dst`` 의 모든 프로세스에서
+-  ``dist.gather(tensor, gather_list, dst, group)``: ``dst`` 의 모든 프로세스에서
    ``tensor`` 를 복사합니다.
 -  ``dist.all_gather(tensor_list, tensor, group)``: 모든 프로세스의 ``tensor`` 를
    모든 프로세스의 ``tensor_list`` 에 복사합니다.

@@ -94,8 +94,8 @@ def unicodeToAscii(s):
 
 # 파일을 읽고 줄 단위로 분리
 def readLines(filename):
-    lines = open(filename, encoding='utf-8').read().strip().split('\n')
-    return [unicodeToAscii(line) for line in lines]
+    with open(filename, encoding='utf-8') as some_file:
+        return [unicodeToAscii(line.strip()) for line in some_file]
 
 # 각 언어의 이름 목록인 category_lines 사전 생성
 category_lines = {}
@@ -340,7 +340,6 @@ for iter in range(1, n_iters + 1):
 #
 
 import matplotlib.pyplot as plt
-import matplotlib.ticker as ticker
 
 plt.figure()
 plt.plot(all_losses)

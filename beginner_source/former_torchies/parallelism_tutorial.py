@@ -39,7 +39,7 @@ class DataParallelModel(nn.Module):
 ########################################################################
 # CPU 모드인 코드를 바꿀 필요가 없습니다.
 #
-# DataParallel에 대한 문서는 `여기 <http://pytorch.org/docs/nn.html#dataparallel>`_
+# DataParallel에 대한 문서는 `여기 <https://pytorch.org/docs/stable/nn.html#dataparallel-layers-multi-gpu-distributed>`_
 # 에서 확인하실 수 있습니다.
 #
 # **래핑된 모듈의 속성**

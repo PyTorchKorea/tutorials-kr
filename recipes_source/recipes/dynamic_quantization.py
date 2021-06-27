@@ -86,7 +86,7 @@ demonstration that the technique can preserve high levels of model
 accuracy on a trained LSTM is left to a more advanced tutorial. If you
 want to move right away to that more rigorous treatment please proceed
 to the `advanced dynamic quantization
-tutorial <https://tutorials.pytorch.kr/advanced/dynamic_quantization_tutorial.html>`__.
+tutorial <https://pytorch.org/tutorials/advanced/dynamic_quantization_tutorial.html>`__.
 
 Steps
 -------------
@@ -128,8 +128,8 @@ import time
 # define a very, very simple LSTM for demonstration purposes
 # in this case, we are wrapping nn.LSTM, one layer, no pre or post processing
 # inspired by
-# https://tutorials.pytorch.kr/beginner/nlp/sequence_models_tutorial.html, by Robert Guthrie
-# and https://tutorials.pytorch.kr/advanced/dynamic_quantization_tutorial.html
+# https://pytorch.org/tutorials/beginner/nlp/sequence_models_tutorial.html, by Robert Guthrie
+# and https://pytorch.org/tutorials/advanced/dynamic_quantization_tutorial.html
 class lstm_for_demonstration(nn.Module):
   """Elementary Long Short Term Memory style model which simply wraps nn.LSTM
      Not to be used for anything other than demonstration.
@@ -220,9 +220,6 @@ f=print_size_of_model(float_lstm,"fp32")
 q=print_size_of_model(quantized_lstm,"int8")
 print("{0:.2f} times smaller".format(f/q))
 
-# note that this value is wrong in PyTorch 1.4 due to https://github.com/pytorch/pytorch/issues/31468
-# this will be fixed in 1.5 with https://github.com/pytorch/pytorch/pull/31540
-
 
 ######################################################################
 # 4. Look at Latency
@@ -283,7 +280,7 @@ print('mean absolute value of the difference between the output tensors is {0:.5
 # to quickly quantize a simple LSTM model.
 #
 # This was a fast and high level treatment of this material; for more
-# detail please continue learning with `(beta) Dynamic Quantization on an LSTM Word Language Model Tutorial <https://tutorials.pytorch.kr/advanced/dynamic\_quantization\_tutorial.html>`_.
+# detail please continue learning with `(beta) Dynamic Quantization on an LSTM Word Language Model Tutorial <https://pytorch.org/tutorials/advanced/dynamic\_quantization\_tutorial.html>`_.
 #
 #
 # Additional Resources
@@ -296,11 +293,11 @@ print('mean absolute value of the difference between the output tensors is {0:.5
 # Tutorials
 # ~~~~~~~~~~~~~~
 #
-# `(beta) Dynamic Quantization on BERT <https://tutorials.pytorch.kr/intermediate/dynamic\_quantization\_bert\_tutorial.html>`_
+# `(beta) Dynamic Quantization on BERT <https://pytorch.org/tutorials/intermediate/dynamic\_quantization\_bert\_tutorial.html>`_
 #
-# `(beta) Dynamic Quantization on an LSTM Word Language Model <https://tutorials.pytorch.kr/advanced/dynamic\_quantization\_tutorial.html>`_
+# `(beta) Dynamic Quantization on an LSTM Word Language Model <https://pytorch.org/tutorials/advanced/dynamic\_quantization\_tutorial.html>`_
 #
 # Blogs
 # ~~~~~~~~~~~~~~
-# ` Introduction to Quantization on PyTorch <https://pytorch.org/blog/introduction-to-quantization-on-pytorch/>`_
+# `Introduction to Quantization on PyTorch <https://pytorch.org/blog/introduction-to-quantization-on-pytorch/>`_
 #

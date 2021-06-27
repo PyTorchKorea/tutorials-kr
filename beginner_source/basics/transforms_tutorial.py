@@ -17,7 +17,7 @@
 
 모든 TorchVision 데이터셋들은 변형 로직을 갖는, 호출 가능한 객체(callable)를 받는 매개변수 두개
 ( 특징(feature)을 변경하기 위한 ``transform`` 과 정답(label)을 변경하기 위한 ``target_transform`` )를 갖습니다
-`torchvision.transforms <https://pytorch.org/docs/stable/torchvision/transforms.html>`_ 모듈은
+`torchvision.transforms <https://pytorch.org/vision/stable/transforms.html>`_ 모듈은
 주로 사용하는 몇가지 변형(transform)을 제공합니다.
 
 FashionMNIST 특징(feature)은 PIL Image 형식이며, 정답(label)은 정수(integer)입니다.
@@ -25,6 +25,7 @@ FashionMNIST 특징(feature)은 PIL Image 형식이며, 정답(label)은 정수(
 정답(label)이 필요합니다. 이러한 변형(transformation)을 하기 위해 ``ToTensor`` 와 ``Lambda`` 를 사용합니다.
 """
 
+import torch
 from torchvision import datasets
 from torchvision.transforms import ToTensor, Lambda
 
@@ -40,7 +41,7 @@ ds = datasets.FashionMNIST(
 # ToTensor()
 # ------------------------------------------------------------------------------------------
 #
-# `ToTensor <https://pytorch.org/docs/stable/torchvision/transforms.html#torchvision.transforms.ToTensor>`_
+# `ToTensor <https://pytorch.org/vision/stable/transforms.html#torchvision.transforms.ToTensor>`_
 # 는 PIL Image나 NumPy ``ndarray`` 를  ``FloatTensor`` 로 변환하고, 이미지의 픽셀의 크기(intensity) 값을 [0., 1.] 범위로
 # 비례하여 조정(scale)합니다.
 #

@@ -4,7 +4,7 @@ about: 번역된 문서에 수정/변경이 필요하다고 생각하실 때 �
 ---
 
 ## 문서 URL
-_수정이 필요한 URL을 남겨주세요. (예. https://tutorials.pytorch.kr/beginner/pytorch_with_examples.html)_
+_수정이 필요한 URL을 남겨주세요. (예. https://tutorials.pytorch.kr/beginner/basics/intro.html)_
 - **URL**:
 
 ## 변경 사항

@@ -9,7 +9,7 @@
 `최적화(Optimization) <optimization_tutorial.html>`_ ||
 `모델 저장하고 불러오기 <saveloadrun_tutorial.html>`_
 
-``torch.autograd``\ 를 통한 자동 미분
+``torch.autograd``\ 를 사용한 자동 미분
 ==========================================================================
 
 신경망을 학습할 때 가장 자주 사용되는 알고리즘은 **역전파**\ 입니다. 이 알고리즘에서,
@@ -52,8 +52,8 @@ loss = torch.nn.functional.binary_cross_entropy_with_logits(z, y)
 
 #######################################################################
 # 연산 그래프를 구성하기 위해 텐서에 적용하는 함수는 사실 ``Function`` 클래스의 객체입니다.
-# 이 객체는 *순전파* 방향으로 함수를 계산하는 방법과, *역방향 전파* 단계에서 미분을 계산하는
-# 방법을 알고 있습니다. 역방향 전파 함수에 대한 참조(reference)는 텐서의 ``grad_fn``
+# 이 객체는 *순전파* 방향으로 함수를 계산하는 방법과, *역방향 전파* 단계에서 도함수(derivative)를
+# 계산하는 방법을 알고 있습니다. 역방향 전파 함수에 대한 참조(reference)는 텐서의 ``grad_fn``
 # 속성에 저장됩니다. ``Function``\ 에 대한 자세한 정보는
 # `이 문서 <https://pytorch.org/docs/stable/autograd.html#function>`__
 # 에서 찾아볼 수 있습니다.
@@ -170,11 +170,11 @@ print(z_det.requires_grad)
 # .. math::
 #
 #
-#    \begin{align}J=\left(\begin{array}{ccc}
+#    J=\left(\begin{array}{ccc}
 #       \frac{\partial y_{1}}{\partial x_{1}} & \cdots & \frac{\partial y_{1}}{\partial x_{n}}\\
 #       \vdots & \ddots & \vdots\\
 #       \frac{\partial y_{m}}{\partial x_{1}} & \cdots & \frac{\partial y_{m}}{\partial x_{n}}
-#       \end{array}\right)\end{align}
+#       \end{array}\right)
 #
 # 야코비안 행렬 자체를 계산하는 대신, PyTorch는 주어진 입력 벡터 :math:`v=(v_1 \dots v_m)`\ 에 대한
 # **야코비안 곱(Jacobian Product)**  :math:`v^T\cdot J`\ 을 계산합니다.

@@ -5,8 +5,8 @@ Distributed Pipeline Parallelism Using RPC
 Prerequisites:
 
 -  `PyTorch Distributed Overview <../beginner/dist_overview.html>`__
--  `Single-Machine Model Parallel Best Practices <https://tutorials.pytorch.kr/intermediate/model_parallel_tutorial.html>`__
--  `Getting started with Distributed RPC Framework <https://tutorials.pytorch.kr/intermediate/rpc_tutorial.html>`__
+-  `Single-Machine Model Parallel Best Practices <https://pytorch.org/tutorials/intermediate/model_parallel_tutorial.html>`__
+-  `Getting started with Distributed RPC Framework <https://pytorch.org/tutorials/intermediate/rpc_tutorial.html>`__
 -  RRef helper functions:
    `RRef.rpc_sync() <https://pytorch.org/docs/master/rpc.html#torch.distributed.rpc.RRef.rpc_sync>`__,
    `RRef.rpc_async() <https://pytorch.org/docs/master/rpc.html#torch.distributed.rpc.RRef.rpc_async>`__, and
@@ -225,7 +225,7 @@ simplify distributed optimizer construction, which will be used later.
 
         def forward(self, xs):
             out_futures = []
-            for x in iter(xs.split(self.split_size, dim=0)):
+            for x in iter(xs.split(self.num_split, dim=0)):
                 x_rref = RRef(x)
                 y_rref = self.p1_rref.remote().forward(x_rref)
                 z_fut = self.p2_rref.rpc_async().forward(y_rref)
