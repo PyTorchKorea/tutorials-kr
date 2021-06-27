@@ -65,6 +65,11 @@ extensions = [
 ]
 
 
+# -- Sphinx-sitemap configuration --------------------------------------------
+
+sitemap_url_scheme = "{lang}{link}"
+
+
 # -- Sphinx-gallery configuration --------------------------------------------
 
 sphinx_gallery_conf = {
