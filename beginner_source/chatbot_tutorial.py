@@ -1200,7 +1200,7 @@ def evaluate(encoder, decoder, searcher, voc, sentence, max_length=MAX_LENGTH):
     input_batch = torch.LongTensor(indexes_batch).transpose(0, 1)
     # 적절한 디바이스를 사용합니다
     input_batch = input_batch.to(device)
-    lengths = lengths.to("cpu"")
+    lengths = lengths.to("cpu")
     # searcher를 이용하여 문장을 디코딩합니다
     tokens, scores = searcher(input_batch, lengths, max_length)
     # 인덱스 -> 단어
