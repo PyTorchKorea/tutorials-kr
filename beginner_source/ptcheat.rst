@@ -206,7 +206,7 @@ nn.Embedding(num_embeddings, embedding_dim)   # 인덱스에서 내장 벡터로
 nn.X                                  # X에는 BCELoss, CrossEntropyLoss,
                                       # L1Loss, MSELoss, NLLLoss, SoftMarginLoss,
                                       # MultiLabelSoftMarginLoss, CosineEmbeddingLoss,
-                                      # KLDivLoss, MarginRankingLoss, HingeEmbeddingLoss
+                                      # KLDivLoss, MarginRankingLoss, HingeEmbeddingLoss, CosineEmbeddingLoss가 있음
                                       # ,CosineEmbeddingLoss가 있음
 
 ```
