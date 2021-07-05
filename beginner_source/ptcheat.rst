@@ -167,7 +167,7 @@ net.to(device)                                          # 매개 변수와 버�
                                                         # 재귀적으로 변환
                                                        
 
-mytensor.to(device)                                     # 장치(gpu, cpu)로 텐서들을 복
+mytensor.to(device)                                     # 장치(gpu, cpu)로 텐서들을 복사
 
 ```
 
