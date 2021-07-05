@@ -40,8 +40,8 @@ from torch.jit import script, trace       # 하이브리드 프론트엔드 데�
 .. code-block:: python
 
 ```
-torch.jit.trace()         # 모듈이나 함수 그리고 예제 데이터 인풋을 취하고 
-													# 모델이 진행되는 동안 데이터가 마주하는 계산 단계를 추적
+torch.jit.trace()         # 모듈이나 함수 그리고 입력값으로 이용되는 예제 데이터를 불러오고
+													# 데이터가 모델을 통과함에 따라 마주하는 계산 단계를 추적
 
 @script                   # 추적 중인 코드 내에서 데이터의 흐름을 나타내기 위한 데코레이터
 
@@ -151,7 +151,7 @@ x.t()         # x의 전치행렬
 .. code-block:: python
 
 ```
-torch.cuda.is_available                                 # cuda를 체크
+torch.cuda.is_available                                 # cuda 사용 가능 여부 확인
 x.cuda()                                                # x의 데이터를 CPU에서 GPU로 옮기고
                                                         # 새로운 객체를 반환
 
@@ -179,7 +179,7 @@ mytensor.to(device)                                     # 장치(gpu, cpu)로 �
 
 ```
 nn.Linear(m,n)                                # m개의 뉴런에서 n개의 뉴런으로 연결되는
-																							# 완전연결(fully connected) 레이어 
+																							# 완전연결(fully connected) 계층 
 
 nn.ConvXd(m,n,s)                              # m개의 채널에서 n개의 채널로 연결되는 
                                               # X 차원 컨벌루션(conv)레이어, X⍷{1,2,3}
@@ -190,8 +190,8 @@ nn.MaxPoolXd(s)                               # X 차원 pooling 레이어
 
 nn.BatchNorm                                  # batch norm 레이어
 nn.RNN/LSTM/GRU                               # 순환(recurrent) 레이어들
-nn.Dropout(p=0.5, inplace=False)              # 아무 차원 입력에 대한 드랍아웃(dropout) 레이어 
-nn.Dropout2d(p=0.5, inplace=False)            # 2차원 채널별 드롭아웃
+nn.Dropout(p=0.5, inplace=False)              # 임의의 차원 입력에 대한 드랍아웃(dropout) 레이어 
+nn.Dropout2d(p=0.5, inplace=False)            # 2차원 채널별 드랍아웃
 nn.Embedding(num_embeddings, embedding_dim)   # 인덱스에서 내장 벡터로 매핑(텐서별)
 
 ```
@@ -207,7 +207,7 @@ nn.X                                  # X에는 BCELoss, CrossEntropyLoss,
                                       # L1Loss, MSELoss, NLLLoss, SoftMarginLoss,
                                       # MultiLabelSoftMarginLoss, CosineEmbeddingLoss,
                                       # KLDivLoss, MarginRankingLoss, HingeEmbeddingLoss, CosineEmbeddingLoss가 있음
-                                      # ,CosineEmbeddingLoss가 있음
+                                     
 
 ```
 
@@ -234,7 +234,7 @@ nn.X                                  # X에는 ReLU, ReLU6, ELU, SELU, PReLU, L
 
 ```
 opt = optim.x(model.parameters(), ...)      # 옵티마이저 생성
-opt.step()                                  # 가중치(weights) 업데이트
+opt.step()                                  # 가중치(weight) 업데이트
 optim.X                                     # X에는 SGD, Adadelta, Adagrad, Adam,
                                             # SparseAdam, Adamax, ASGD,
                                             # LBFGS, RMSProp 또는 Rprop가 있음
