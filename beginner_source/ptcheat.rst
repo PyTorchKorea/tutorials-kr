@@ -156,7 +156,7 @@ x.cuda()                                                # x의 데이터를 CPU�
                                                         # 새로운 객체를 반환
 
 x.cpu()                                                 # x의 데이터를 GPU에서 CPU로 옮기고
-                                                        # 새로운 객체를 반환합니다.
+                                                        # 새로운 객체를 반환
 
 if not args.disable_cuda and torch.cuda.is_available(): # 장치 확인 코드
     args.device = torch.device('cuda')                  # 그리고 모듈화
