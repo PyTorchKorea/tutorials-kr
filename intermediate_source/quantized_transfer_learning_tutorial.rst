@@ -1,4 +1,4 @@
-(beta) 컴퓨터 비전(Vision) 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)
+(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)
 ============================================================================================
 
 .. tip::
@@ -11,8 +11,8 @@
 **Edited by**: `Jessica Lin <https://github.com/jlin27>`_
 **번역**: `정재민 <https://github.com/jjeamin>`_
 
-이 튜토리얼은 `Sasank Chilamkurthy <https://chsasank.github.io/>`_ 가 작성한 원본
-`PyTorch Transfer Learning <https://tutorials.pytorch.kr/beginner/transfer_learning_tutorial.html>`_ 을 기반으로 합니다.
+이 튜토리얼은 `Sasank Chilamkurthy <https://chsasank.github.io/>`_ 가 작성한
+:doc:`/beginner/transfer_learning_tutorial` 을 기반으로 합니다.
 
 전이학습(Transfer learning)은 다른 데이터셋에 적용하기 위해서 미리 학습된 모델을 사용하는 기술을 말합니다.
 전이학습을 사용하는 2가지 주요 방법이 있습니다.

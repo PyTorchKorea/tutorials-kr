@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-(실험용) PyTorch를 사용한 Channels Last Memory Format
+(베타) PyTorch를 사용한 Channels Last 메모리 형식
 *******************************************************
 
 **Author**: `Vitaly Fedyunin <https://github.com/VitalyFedyunin>`_
