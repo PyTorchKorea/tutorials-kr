@@ -29,6 +29,7 @@
   <!-- <link rel="stylesheet" href="../_static/pygments.css" type="text/css" /> -->
   <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
   <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
   <link rel="stylesheet" href="../_static/katex-math.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
@@ -209,7 +210,7 @@
 </ul>
 <p class="caption"><span class="caption-text">프론트엔드 API</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/memory_format_tutorial.html">(실험용) PyTorch를 사용한 Channels Last Memory Format</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/memory_format_tutorial.html">(베타) PyTorch를 사용한 Channels Last 메모리 형식</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_frontend.html">Using the PyTorch C++ Frontend</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/torch-script-parallelism.html">Dynamic Parallelism in TorchScript</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_autograd.html">Autograd in C++ Frontend</a></li>
@@ -231,13 +232,13 @@
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/pruning_tutorial.html">가지치기 기법(Pruning) 튜토리얼</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/dynamic_quantization_tutorial.html">(베타) LSTM 기반 단어 단위 언어 모델의 동적 양자화</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/quantized_transfer_learning_tutorial.html">(beta) 컴퓨터 비전(Vision) 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/quantized_transfer_learning_tutorial.html">(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/static_quantization_tutorial.html">(beta) Static Quantization with Eager Mode in PyTorch</a></li>
 </ul>
 <p class="caption"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/dist_overview.html">PyTorch Distributed Overview</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/model_parallel_tutorial.html">단일 머신을 이용한 모델 병렬화 실습 예제</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/model_parallel_tutorial.html">단일 머신을 사용한 모델 병렬화 모범 사례</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/ddp_tutorial.html">Getting Started with Distributed Data Parallel</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/dist_tuto.html">PyTorch로 분산 어플리케이션 개발하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/rpc_tutorial.html">Getting Started with Distributed RPC Framework</a></li>
@@ -439,37 +440,38 @@ layer1.0.conv2.weight tensor(31.1528)
 layer1.1.conv1.weight tensor(32.1438)
 layer1.1.conv2.weight tensor(31.2477)
 layer2.0.conv1.weight tensor(30.9890)
-layer2.0.conv2.weight tensor(28.8233)
+layer2.0.conv2.weight tensor(28.8232)
 layer2.0.downsample.0.weight tensor(31.5558)
-layer2.1.conv1.weight tensor(30.7668)
-layer2.1.conv2.weight tensor(28.4516)
-layer3.0.conv1.weight tensor(30.9247)
-layer3.0.conv2.weight tensor(26.6840)
+layer2.1.conv1.weight tensor(30.7667)
+layer2.1.conv2.weight tensor(28.4515)
+layer3.0.conv1.weight tensor(30.9245)
+layer3.0.conv2.weight tensor(26.6835)
 layer3.0.downsample.0.weight tensor(28.7825)
-layer3.1.conv1.weight tensor(28.9706)
-layer3.1.conv2.weight tensor(25.6784)
-layer4.0.conv1.weight tensor(26.8494)
-layer4.0.conv2.weight tensor(25.8391)
-layer4.0.downsample.0.weight tensor(28.6355)
-layer4.1.conv1.weight tensor(26.8755)
-layer4.1.conv2.weight tensor(28.4316)
-fc._packed_params._packed_params tensor(32.6506)
+layer3.1.conv1.weight tensor(28.9701)
+layer3.1.conv2.weight tensor(25.6780)
+layer4.0.conv1.weight tensor(26.8488)
+layer4.0.conv2.weight tensor(25.8353)
+layer4.0.downsample.0.weight tensor(28.6354)
+layer4.1.conv1.weight tensor(26.8727)
+layer4.1.conv2.weight tensor(28.4300)
+fc._packed_params._packed_params tensor(32.6502)
 </pre></div>
 </div>
 <p>As another example <code class="docutils literal notranslate"><span class="pre">wt_compare_dict</span></code> can also be used to plot the histogram of the weights of floating point and quantized models.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 
 <span class="n">f</span> <span class="o">=</span> <span class="n">wt_compare_dict</span><span class="p">[</span><span class="s1">&#39;conv1.weight&#39;</span><span class="p">][</span><span class="s1">&#39;float&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
-<span class="c1">#plt.hist(f, bins = 100)</span>
-<span class="c1">#plt.title(&quot;Floating point model weights of conv1&quot;)</span>
-<span class="c1">#plt.show()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">bins</span> <span class="o">=</span> <span class="mi">100</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Floating point model weights of conv1&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 
 <span class="n">q</span> <span class="o">=</span> <span class="n">wt_compare_dict</span><span class="p">[</span><span class="s1">&#39;conv1.weight&#39;</span><span class="p">][</span><span class="s1">&#39;quantized&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span><span class="o">.</span><span class="n">dequantize</span><span class="p">()</span>
-<span class="c1">#plt.hist(q, bins = 100)</span>
-<span class="c1">#plt.title(&quot;Quantized model weights of conv1&quot;)</span>
-<span class="c1">#plt.show()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">bins</span> <span class="o">=</span> <span class="mi">100</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Quantized model weights of conv1&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
+<img alt="../_images/sphx_glr_numeric_suite_tutorial_001.png" class="sphx-glr-single-img" src="../_images/sphx_glr_numeric_suite_tutorial_001.png" />
 </div>
 <div class="section" id="compare-float-point-and-quantized-models-at-corresponding-locations">
 <h3>2. Compare float point and quantized models at corresponding locations<a class="headerlink" href="#compare-float-point-and-quantized-models-at-corresponding-locations" title="Permalink to this headline">¶</a></h3>
@@ -510,36 +512,36 @@ torch.Size([2, 64, 5, 5])
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>conv1.stats tensor(37.0744, grad_fn=&lt;MulBackward0&gt;)
-layer1.0.conv1.stats tensor(29.5372, grad_fn=&lt;MulBackward0&gt;)
-layer1.0.conv2.stats tensor(27.9816, grad_fn=&lt;MulBackward0&gt;)
-layer1.0.add_relu.stats tensor(32.0488, grad_fn=&lt;MulBackward0&gt;)
-layer1.1.conv1.stats tensor(29.6076, grad_fn=&lt;MulBackward0&gt;)
-layer1.1.conv2.stats tensor(25.9433, grad_fn=&lt;MulBackward0&gt;)
-layer1.1.add_relu.stats tensor(29.4233, grad_fn=&lt;MulBackward0&gt;)
-layer2.0.conv1.stats tensor(26.4017, grad_fn=&lt;MulBackward0&gt;)
-layer2.0.conv2.stats tensor(26.4536, grad_fn=&lt;MulBackward0&gt;)
-layer2.0.downsample.0.stats tensor(22.0133, grad_fn=&lt;MulBackward0&gt;)
-layer2.0.add_relu.stats tensor(25.7549, grad_fn=&lt;MulBackward0&gt;)
-layer2.1.conv1.stats tensor(25.6282, grad_fn=&lt;MulBackward0&gt;)
-layer2.1.conv2.stats tensor(24.2039, grad_fn=&lt;MulBackward0&gt;)
-layer2.1.add_relu.stats tensor(25.9522, grad_fn=&lt;MulBackward0&gt;)
-layer3.0.conv1.stats tensor(27.0736, grad_fn=&lt;MulBackward0&gt;)
-layer3.0.conv2.stats tensor(27.4973, grad_fn=&lt;MulBackward0&gt;)
-layer3.0.downsample.0.stats tensor(25.2678, grad_fn=&lt;MulBackward0&gt;)
-layer3.0.add_relu.stats tensor(25.7940, grad_fn=&lt;MulBackward0&gt;)
-layer3.1.conv1.stats tensor(31.7572, grad_fn=&lt;MulBackward0&gt;)
-layer3.1.conv2.stats tensor(26.2022, grad_fn=&lt;MulBackward0&gt;)
-layer3.1.add_relu.stats tensor(25.9785, grad_fn=&lt;MulBackward0&gt;)
-layer4.0.conv1.stats tensor(27.3275, grad_fn=&lt;MulBackward0&gt;)
-layer4.0.conv2.stats tensor(27.6820, grad_fn=&lt;MulBackward0&gt;)
-layer4.0.downsample.0.stats tensor(22.5120, grad_fn=&lt;MulBackward0&gt;)
-layer4.0.add_relu.stats tensor(21.2492, grad_fn=&lt;MulBackward0&gt;)
-layer4.1.conv1.stats tensor(26.5428, grad_fn=&lt;MulBackward0&gt;)
-layer4.1.conv2.stats tensor(17.7780, grad_fn=&lt;MulBackward0&gt;)
-layer4.1.add_relu.stats tensor(18.0856, grad_fn=&lt;MulBackward0&gt;)
-fc.stats tensor(19.4826, grad_fn=&lt;MulBackward0&gt;)
-quant.stats tensor(48.4022)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>conv1.stats tensor(37.3660, grad_fn=&lt;MulBackward0&gt;)
+layer1.0.conv1.stats tensor(30.0867, grad_fn=&lt;MulBackward0&gt;)
+layer1.0.conv2.stats tensor(28.6575, grad_fn=&lt;MulBackward0&gt;)
+layer1.0.add_relu.stats tensor(32.2991, grad_fn=&lt;MulBackward0&gt;)
+layer1.1.conv1.stats tensor(29.9425, grad_fn=&lt;MulBackward0&gt;)
+layer1.1.conv2.stats tensor(26.1311, grad_fn=&lt;MulBackward0&gt;)
+layer1.1.add_relu.stats tensor(29.8661, grad_fn=&lt;MulBackward0&gt;)
+layer2.0.conv1.stats tensor(26.8256, grad_fn=&lt;MulBackward0&gt;)
+layer2.0.conv2.stats tensor(26.5401, grad_fn=&lt;MulBackward0&gt;)
+layer2.0.downsample.0.stats tensor(22.3995, grad_fn=&lt;MulBackward0&gt;)
+layer2.0.add_relu.stats tensor(25.7537, grad_fn=&lt;MulBackward0&gt;)
+layer2.1.conv1.stats tensor(25.4054, grad_fn=&lt;MulBackward0&gt;)
+layer2.1.conv2.stats tensor(24.3196, grad_fn=&lt;MulBackward0&gt;)
+layer2.1.add_relu.stats tensor(26.2059, grad_fn=&lt;MulBackward0&gt;)
+layer3.0.conv1.stats tensor(27.1032, grad_fn=&lt;MulBackward0&gt;)
+layer3.0.conv2.stats tensor(26.7668, grad_fn=&lt;MulBackward0&gt;)
+layer3.0.downsample.0.stats tensor(25.5708, grad_fn=&lt;MulBackward0&gt;)
+layer3.0.add_relu.stats tensor(25.7996, grad_fn=&lt;MulBackward0&gt;)
+layer3.1.conv1.stats tensor(31.4913, grad_fn=&lt;MulBackward0&gt;)
+layer3.1.conv2.stats tensor(25.7601, grad_fn=&lt;MulBackward0&gt;)
+layer3.1.add_relu.stats tensor(25.6974, grad_fn=&lt;MulBackward0&gt;)
+layer4.0.conv1.stats tensor(27.2864, grad_fn=&lt;MulBackward0&gt;)
+layer4.0.conv2.stats tensor(26.9013, grad_fn=&lt;MulBackward0&gt;)
+layer4.0.downsample.0.stats tensor(22.0162, grad_fn=&lt;MulBackward0&gt;)
+layer4.0.add_relu.stats tensor(20.7239, grad_fn=&lt;MulBackward0&gt;)
+layer4.1.conv1.stats tensor(25.6639, grad_fn=&lt;MulBackward0&gt;)
+layer4.1.conv2.stats tensor(17.8332, grad_fn=&lt;MulBackward0&gt;)
+layer4.1.add_relu.stats tensor(17.8302, grad_fn=&lt;MulBackward0&gt;)
+fc.stats tensor(19.6287, grad_fn=&lt;MulBackward0&gt;)
+quant.stats tensor(48.0469)
 </pre></div>
 </div>
 <p>If we want to do the comparison for more than one input data, we can do the following.
@@ -642,14 +644,14 @@ torch.Size([64, 3, 3])
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>layer1.0.stats tensor(33.1309)
-layer1.1.stats tensor(33.8194)
-layer2.0.stats tensor(29.5548)
-layer2.1.stats tensor(31.5631)
-layer3.0.stats tensor(28.2206)
-layer3.1.stats tensor(31.9830)
-layer4.0.stats tensor(25.9028)
-layer4.1.stats tensor(23.4478)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>layer1.0.stats tensor(32.9049)
+layer1.1.stats tensor(34.0934)
+layer2.0.stats tensor(28.9541)
+layer2.1.stats tensor(30.8001)
+layer3.0.stats tensor(28.9565)
+layer3.1.stats tensor(31.8530)
+layer4.0.stats tensor(25.4404)
+layer4.1.stats tensor(22.8652)
 </pre></div>
 </div>
 <p>If we want to do the comparison for more than one input data, we can do the following.</p>
@@ -759,12 +761,12 @@ layer4.1.stats tensor(23.4478)
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>encoder.weight tensor(inf)
-rnn._all_weight_values.0.param tensor(48.1252)
-rnn._all_weight_values.1.param tensor(48.1303)
-rnn._all_weight_values.2.param tensor(48.1224)
-rnn._all_weight_values.3.param tensor(48.1154)
-rnn._all_weight_values.4.param tensor(48.1396)
-decoder._packed_params._packed_params tensor(48.0165)
+rnn._all_weight_values.0.param tensor(48.1186)
+rnn._all_weight_values.1.param tensor(48.1499)
+rnn._all_weight_values.2.param tensor(48.1299)
+rnn._all_weight_values.3.param tensor(48.1303)
+rnn._all_weight_values.4.param tensor(48.1273)
+decoder._packed_params._packed_params tensor(48.1083)
 </pre></div>
 </div>
 <p>The Inf value in <code class="docutils literal notranslate"><span class="pre">encoder.weight</span></code> entry above is because encoder module is not quantized and the weights are the same in both floating point and quantized models.</p>
@@ -790,8 +792,8 @@ decoder._packed_params._packed_params tensor(48.0165)
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>encoder.stats tensor(inf, grad_fn=&lt;MulBackward0&gt;)
-rnn.stats tensor(55.9477, grad_fn=&lt;MulBackward0&gt;)
-decoder.stats tensor(37.9763, grad_fn=&lt;MulBackward0&gt;)
+rnn.stats tensor(55.8208, grad_fn=&lt;MulBackward0&gt;)
+decoder.stats tensor(41.1423, grad_fn=&lt;MulBackward0&gt;)
 </pre></div>
 </div>
 </div>
@@ -828,8 +830,8 @@ decoder.stats tensor(37.9763, grad_fn=&lt;MulBackward0&gt;)
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>rnn.stats tensor(55.6197)
-decoder.stats tensor(40.7399)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>rnn.stats tensor(56.5043)
+decoder.stats tensor(37.4809)
 </pre></div>
 </div>
 <p>SQNR of 40 dB is high and this is a situation where we have very good numerical alignment between the floating point and quantized model.</p>
@@ -843,7 +845,7 @@ decoder.stats tensor(40.7399)
 <div class="section" id="references">
 <h2>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
 <p>[1] <a class="reference external" href="https://tutorials.pytorch.kr/advanced/dynamic_quantization_tutorial.html">DYNAMIC QUANTIZATION ON AN LSTM WORD LANGUAGE MODEL</a>.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  6.829 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 89 minutes  59.894 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-prototype-numeric-suite-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <a class="reference download internal" download="" href="../_downloads/8c21b961715a3703fdf8280a15ccb1ee/numeric_suite_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">numeric_suite_tutorial.py</span></code></a></div>

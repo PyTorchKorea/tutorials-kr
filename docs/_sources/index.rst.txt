@@ -65,8 +65,8 @@
    :tags: Getting-Started
 
 .. customcarditem::
-   :header: What is torch.nn really?
-   :card_description: Use torch.nn to create and train a neural network.
+   :header: torch.nn이 실제로 무엇인가요?
+   :card_description: torch.nn을 사용하여 신경망을 생성하고 학습합니다.
    :image: _static/img/thumbnails/cropped/torch-nn.png
    :link: beginner/nn_tutorial.html
    :tags: Getting-Started
@@ -88,7 +88,7 @@
    :tags: Image/Video
 
 .. customcarditem::
-   :header: 컴퓨터 비전을 위한 전이학습(TRANSFER LEARNING) 튜토리얼
+   :header: 컴퓨터 비전을 위한 전이학습(Transfer Learning) 튜토리얼
    :card_description: 전이학습으로 이미지 분류를 위한 합성곱 신경망을 학습합니다.
    :image: _static/img/thumbnails/cropped/Transfer-Learning-for-Computer-Vision-Tutorial.png
    :link: beginner/transfer_learning_tutorial.html
@@ -124,7 +124,7 @@
    :link: beginner/audio_preprocessing_tutorial.html
    :tags: Audio
 
-   .. customcarditem::
+.. customcarditem::
    :header: Speech Command Recognition
    :card_description: Learn how to correctly format an audio dataset and then train/test an audio classifier network on the dataset.
    :image: _static/img/thumbnails/cropped/torchaudio-speech.png
@@ -134,7 +134,7 @@
 .. Text
 
 .. customcarditem::
-   :header: nn.Transformer 와 TorchText 로 시퀀스-투-시퀀스 모델링하기
+   :header: nn.Transformer와 TorchText로 시퀀스-투-시퀀스 모델링하기
    :card_description: nn.Transformer 모듈을 사용하여 어떻게 시퀀스-투-시퀀스(Seq-to-Seq) 모델을 학습하는지 배웁니다.
    :image: _static/img/thumbnails/cropped/Sequence-to-Sequence-Modeling-with-nnTransformer-andTorchText.png
    :link: beginner/transformer_tutorial.html
@@ -162,15 +162,15 @@
    :tags: Text
 
 .. customcarditem::
-   :header: Text Classification with Torchtext
-   :card_description: This is the third and final tutorial on doing “NLP From Scratch”, where we write our own classes and functions to preprocess the data to do our NLP modeling tasks.
+   :header: torchtext로 텍스트 분류하기
+   :card_description: torchtext 라이브러리를 사용하여 어떻게 텍스트 분류 분석을 위한 데이터셋을 만드는지를 살펴봅니다.
    :image: _static/img/thumbnails/cropped/Text-Classification-with-TorchText.png
    :link: beginner/text_sentiment_ngrams_tutorial.html
    :tags: Text
 
 .. customcarditem::
-   :header: Transformer로 언어 번역하기
-   :card_description: Transformer를 사용하여 언어 번역 모델을 밑바닥부터 학습합니다.
+   :header: Language Translation with Transformer
+   :card_description: Train a language translation model from scratch using Transformer.
    :image: _static/img/thumbnails/cropped/Language-Translation-with-TorchText.png
    :link: beginner/translation_transformer.html
    :tags: Text
@@ -216,8 +216,8 @@
    :tags: Production,TorchScript
 
 .. customcarditem::
-   :header: (optional) Exporting a Model from PyTorch to ONNX and Running it using ONNX Runtime
-   :card_description:  Convert a model defined in PyTorch into the ONNX format and then run it with ONNX Runtime.
+   :header: (선택) PyTorch 모델을 ONNX으로 변환하고 ONNX 런타임에서 실행하기
+   :card_description: PyTorch로 정의한 모델을 ONNX 형식으로 변환하고 ONNX 런타임에서 실행합니다.
    :image: _static/img/thumbnails/cropped/optional-Exporting-a-Model-from-PyTorch-to-ONNX-and-Running-it-using-ONNX-Runtime.png
    :link: advanced/super_resolution_with_onnxruntime.html
    :tags: Production
@@ -241,8 +241,8 @@
 .. Frontend APIs
 
 .. customcarditem::
-   :header: (beta) Channels Last Memory Format in PyTorch
-   :card_description: Get an overview of Channels Last memory format and understand how it is used to order NCHW tensors in memory preserving dimensions.
+   :header: (베타) PyTorch의 Channels Last 메모리 형식
+   :card_description: Channels Last 메모리 형식에 대한 개요를 확인하고 차원 순서를 유지하며 메모리 상의 NCHW 텐서를 정렬하는 방법을 이해합니다.
    :image: _static/img/thumbnails/cropped/experimental-Channels-Last-Memory-Format-in-PyTorch.png
    :link: intermediate/memory_format_tutorial.html
    :tags: Memory-Format,Best-Practice,Frontend-APIs
@@ -334,28 +334,29 @@
    :tags: Model-Optimization,Best-Practice
 
 .. customcarditem::
-   :header: Pruning Tutorial
-   :card_description: Learn how to use torch.nn.utils.prune to sparsify your neural networks, and how to extend it to implement your own custom pruning technique.
+   :header: 가지치기 기법(pruning) 튜토리얼
+   :card_description: torch.nn.utils.prune을 사용하여 신경망을 희소화(sparsify)하는 방법과, 이를 확장하여 사용자 정의 가지치기 기법을 구현하는 방법을 알아봅니다.
    :image: _static/img/thumbnails/cropped/Pruning-Tutorial.png
    :link: intermediate/pruning_tutorial.html
    :tags: Model-Optimization,Best-Practice
 
 .. customcarditem::
-   :header: (beta) Dynamic Quantization on an LSTM Word Language Model
-   :card_description: Apply dynamic quantization, the easiest form of quantization, to a LSTM-based next word prediction model.
+   :header: (베타) LSTM 기반 단어 단위 언어 모델의 동적 양자화
+   :card_description: 가장 간단한 양자화 기법인 동적 양자화(dynamic quantization)를 LSTM 기반의 단어 예측 모델에 적용합니다.
    :image: _static/img/thumbnails/cropped/experimental-Dynamic-Quantization-on-an-LSTM-Word-Language-Model.png
    :link: advanced/dynamic_quantization_tutorial.html
    :tags: Text,Quantization,Model-Optimization
 
 .. customcarditem::
-   :header: (beta) Dynamic Quantization on BERT
-   :card_description: Apply the dynamic quantization on a BERT (Bidirectional Embedding Representations from Transformers) model.
+   :header: (베타) BERT 모델 동적 양자화하기
+   :card_description: BERT(Bidirectional Embedding Representations from Transformers) 모델에 동적 양자화(dynamic quantization)를 적용합니다.
    :image: _static/img/thumbnails/cropped/experimental-Dynamic-Quantization-on-BERT.png
    :link: intermediate/dynamic_quantization_bert_tutorial.html
    :tags: Text,Quantization,Model-Optimization
 
 .. customcarditem::
-   :header: (beta) Quantized Transfer Learning for Computer Vision Tutorial
+   :header: (베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)
+   :card_description: 양자화된 모델을 사용하여 전이학습을 컴퓨터 비전 튜토리얼에 확장합니다.
    :card_description: Extends the Transfer Learning for Computer Vision Tutorial using a quantized model.
    :image: _static/img/thumbnails/cropped/60-min-blitz.png
    :link: intermediate/quantized_transfer_learning_tutorial.html
@@ -378,8 +379,8 @@
    :tags: Parallel-and-Distributed-Training
 
 .. customcarditem::
-   :header: Single-Machine Model Parallel Best Practices
-   :card_description:  Learn how to implement model parallel, a distributed training technique which splits a single model onto different GPUs, rather than replicating the entire model on each GPU
+   :header: 단일 머신을 사용한 모델 병렬화 모범 사례
+   :card_description: 개별 GPU들에 전체 모델을 복제하는 대신, 하나의 모델을 여러 GPU에 분할하여 분산학습을 하는 모델 병렬 처리를 구현하는 방법을 배웁니다.
    :image: _static/img/thumbnails/cropped/Model-Parallel-Best-Practices.png
    :link: intermediate/model_parallel_tutorial.html
    :tags: Parallel-and-Distributed-Training
