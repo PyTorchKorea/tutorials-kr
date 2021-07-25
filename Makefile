@@ -101,6 +101,10 @@ download:
 	wget -N https://download.pytorch.org/models/resnet18-5c106cde.pth -P $(DATADIR)
 	cp $(DATADIR)/resnet18-5c106cde.pth prototype_source/data/resnet18_pretrained_float.pth
 
+	# Download some dataset for beginner_source/translation_transformer.py
+	python -m spacy download en_core_web_sm
+	python -m spacy download de_core_news_sm
+
 docs:
 	make download
 	make html
