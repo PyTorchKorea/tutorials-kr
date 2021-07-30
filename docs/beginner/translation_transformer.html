@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Language Translation with nn.Transformer and torchtext &mdash; PyTorch Tutorials 1.9.0+cu102 documentation</title>
+  <title>nn.Transformer와 torchtext로 언어 번역하기 &mdash; PyTorch Tutorials 1.9.0+cu102 documentation</title>
   
 
   
@@ -191,7 +191,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/char_rnn_generation_tutorial.html">기초부터 시작하는 NLP:  문자-단위 RNN으로 이름 생성하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/seq2seq_translation_tutorial.html">기초부터 시작하는 NLP: Sequence to Sequence 네트워크와 Attention을 이용한 번역</a></li>
 <li class="toctree-l1"><a class="reference internal" href="text_sentiment_ngrams_tutorial.html">torchtext 라이브러리로 텍스트 분류하기</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Language Translation with nn.Transformer and torchtext</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">nn.Transformer와 torchtext로 언어 번역하기</a></li>
 </ul>
 <p class="caption"><span class="caption-text">강화학습</span></p>
 <ul>
@@ -295,7 +295,7 @@
       </li>
 
         
-      <li>Language Translation with nn.Transformer and torchtext</li>
+      <li>nn.Transformer와 torchtext로 언어 번역하기</li>
     
     
       <li class="pytorch-breadcrumbs-aside">
@@ -353,19 +353,22 @@
 <p class="first admonition-title">Note</p>
 <p class="last">Click <a class="reference internal" href="#sphx-glr-download-beginner-translation-transformer-py"><span class="std std-ref">here</span></a> to download the full example code</p>
 </div>
-<div class="sphx-glr-example-title section" id="language-translation-with-nn-transformer-and-torchtext">
-<span id="sphx-glr-beginner-translation-transformer-py"></span><h1>Language Translation with nn.Transformer and torchtext<a class="headerlink" href="#language-translation-with-nn-transformer-and-torchtext" title="Permalink to this headline">¶</a></h1>
-<p>This tutorial shows, how to train a translation model from scratch using
-Transformer. We will be using <a class="reference external" href="http://www.statmt.org/wmt16/multimodal-task.html#task1">Multi30k</a>
-dataset to train a German to English translation model.
-Data Sourcing and Processing
-—————————-</p>
-<p><a class="reference external" href="https://pytorch.org/text/stable/">torchtext library</a> has utilities for creating datasets that can be easily
-iterated through for the purposes of creating a language translation
-model. In this example, we show how to use torchtext’s inbuilt datasets,
-tokenize a raw text sentence, build vocabulary, and numericalize tokens into tensor. We will use
-<a class="reference external" href="https://pytorch.org/text/stable/datasets.html#multi30k">Multi30k dataset from torchtext library</a>
-that yields a pair of source-target raw sentences.</p>
+<div class="sphx-glr-example-title section" id="nn-transformer-torchtext">
+<span id="sphx-glr-beginner-translation-transformer-py"></span><h1>nn.Transformer와 torchtext로 언어 번역하기<a class="headerlink" href="#nn-transformer-torchtext" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>이 튜토리얼에서는 Transformer(트랜스포머)를 사용한 번역 모델을 바닥부터 학습하는 방법을 배워보겠습니다.</li>
+<li><a class="reference external" href="http://www.statmt.org/wmt16/multimodal-task.html#task1">Multi30k</a>
+데이터셋을 사용하여 독일어(German)를 영어(English)로 번역하는 모델을 학습해보겠습니다.</li>
+</ul>
+<div class="section" id="id1">
+<h2>데이터 구하고 처리하기<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="https://pytorch.org/text/stable/">torchtext 라이브러리</a>에는 언어 번역 모델을
+생성하기 위한 데이터셋을 쉽게 만들 수 있는 도구들이 있습니다.
+이 튜토리얼에서는 torchtext의 내장(inbuilt) 데이터셋을 어떻게 사용하고,
+원시(raw) 텍스트 문장을 토큰화(tokenize)하고, 토큰을 텐서로 수치화하는 방법을
+살펴보겠습니다. 출발어(source)-도착어(target) 원시(raw) 문장을 생성하기 위해서는
+<a class="reference external" href="https://pytorch.org/text/stable/datasets.html#multi30k">torchtext 라이브러리의 Multi30k 데이터셋</a>
+을 사용하겠습니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torchtext.data.utils</span> <span class="kn">import</span> <span class="n">get_tokenizer</span>
 <span class="kn">from</span> <span class="nn">torchtext.vocab</span> <span class="kn">import</span> <span class="n">build_vocab_from_iterator</span>
 <span class="kn">from</span> <span class="nn">torchtext.datasets</span> <span class="kn">import</span> <span class="n">Multi30k</span>
@@ -380,7 +383,8 @@ that yields a pair of source-target raw sentences.</p>
 <span class="n">vocab_transform</span> <span class="o">=</span> <span class="p">{}</span>
 
 
-<span class="c1"># Create source and target language tokenizer. Make sure to install the dependencies.</span>
+<span class="c1"># 출발어(source)와 목적어(target)의 토크나이저(tokenizer)를 생성합니다.</span>
+<span class="c1"># 아래 필요 사항(dependency)을 모두 설치해주세요.</span>
 <span class="c1"># pip install -U spacy</span>
 <span class="c1"># python -m spacy download en_core_web_sm</span>
 <span class="c1"># python -m spacy download de_core_news_sm</span>
@@ -388,45 +392,48 @@ that yields a pair of source-target raw sentences.</p>
 <span class="n">token_transform</span><span class="p">[</span><span class="n">TGT_LANGUAGE</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_tokenizer</span><span class="p">(</span><span class="s1">&#39;spacy&#39;</span><span class="p">,</span> <span class="n">language</span><span class="o">=</span><span class="s1">&#39;en_core_web_sm&#39;</span><span class="p">)</span>
 
 
-<span class="c1"># helper function to yield list of tokens</span>
+<span class="c1"># 토큰 목록을 생성하기 위한 헬퍼(helper) 함수</span>
 <span class="k">def</span> <span class="nf">yield_tokens</span><span class="p">(</span><span class="n">data_iter</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">language</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
     <span class="n">language_index</span> <span class="o">=</span> <span class="p">{</span><span class="n">SRC_LANGUAGE</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="n">TGT_LANGUAGE</span><span class="p">:</span> <span class="mi">1</span><span class="p">}</span>
 
     <span class="k">for</span> <span class="n">data_sample</span> <span class="ow">in</span> <span class="n">data_iter</span><span class="p">:</span>
         <span class="k">yield</span> <span class="n">token_transform</span><span class="p">[</span><span class="n">language</span><span class="p">](</span><span class="n">data_sample</span><span class="p">[</span><span class="n">language_index</span><span class="p">[</span><span class="n">language</span><span class="p">]])</span>
 
-<span class="c1"># Define special symbols and indices</span>
+<span class="c1"># 특수 기호(symbol)와 인덱스를 정의합니다</span>
 <span class="n">UNK_IDX</span><span class="p">,</span> <span class="n">PAD_IDX</span><span class="p">,</span> <span class="n">BOS_IDX</span><span class="p">,</span> <span class="n">EOS_IDX</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span>
-<span class="c1"># Make sure the tokens are in order of their indices to properly insert them in vocab</span>
+<span class="c1"># 토큰들이 어휘집(vocab)에 인덱스 순서대로 잘 삽입되어 있는지 확인합니다</span>
 <span class="n">special_symbols</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;&lt;unk&gt;&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt;pad&gt;&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt;bos&gt;&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt;eos&gt;&#39;</span><span class="p">]</span>
 
 <span class="k">for</span> <span class="n">ln</span> <span class="ow">in</span> <span class="p">[</span><span class="n">SRC_LANGUAGE</span><span class="p">,</span> <span class="n">TGT_LANGUAGE</span><span class="p">]:</span>
-    <span class="c1"># Training data Iterator</span>
+    <span class="c1"># 학습용 데이터 반복자(iterator)</span>
     <span class="n">train_iter</span> <span class="o">=</span> <span class="n">Multi30k</span><span class="p">(</span><span class="n">split</span><span class="o">=</span><span class="s1">&#39;train&#39;</span><span class="p">,</span> <span class="n">language_pair</span><span class="o">=</span><span class="p">(</span><span class="n">SRC_LANGUAGE</span><span class="p">,</span> <span class="n">TGT_LANGUAGE</span><span class="p">))</span>
-    <span class="c1"># Create torchtext&#39;s Vocab object</span>
+    <span class="c1"># torchtext의 Vocab(어휘집) 객체 생성</span>
     <span class="n">vocab_transform</span><span class="p">[</span><span class="n">ln</span><span class="p">]</span> <span class="o">=</span> <span class="n">build_vocab_from_iterator</span><span class="p">(</span><span class="n">yield_tokens</span><span class="p">(</span><span class="n">train_iter</span><span class="p">,</span> <span class="n">ln</span><span class="p">),</span>
                                                     <span class="n">min_freq</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
                                                     <span class="n">specials</span><span class="o">=</span><span class="n">special_symbols</span><span class="p">,</span>
                                                     <span class="n">special_first</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-<span class="c1"># Set UNK_IDX as the default index. This index is returned when the token is not found.</span>
-<span class="c1"># If not set, it throws RuntimeError when the queried token is not found in the Vocabulary.</span>
+<span class="c1"># UNK_IDX를 기본 인덱스로 설정합니다. 이 인덱스는 토큰을 찾지 못하는 경우에 반환됩니다.</span>
+<span class="c1"># 만약 기본 인덱스를 설정하지 않으면 어휘집(Vocabulary)에서 토큰을 찾지 못하는 경우</span>
+<span class="c1"># RuntimeError가 발생합니다.</span>
 <span class="k">for</span> <span class="n">ln</span> <span class="ow">in</span> <span class="p">[</span><span class="n">SRC_LANGUAGE</span><span class="p">,</span> <span class="n">TGT_LANGUAGE</span><span class="p">]:</span>
-  <span class="n">vocab_transform</span><span class="p">[</span><span class="n">ln</span><span class="p">]</span><span class="o">.</span><span class="n">set_default_index</span><span class="p">(</span><span class="n">UNK_IDX</span><span class="p">)</span>
+    <span class="n">vocab_transform</span><span class="p">[</span><span class="n">ln</span><span class="p">]</span><span class="o">.</span><span class="n">set_default_index</span><span class="p">(</span><span class="n">UNK_IDX</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="section" id="seq2seq-network-using-transformer">
-<h2>Seq2Seq Network using Transformer<a class="headerlink" href="#seq2seq-network-using-transformer" title="Permalink to this headline">¶</a></h2>
-<p>Transformer is a Seq2Seq model introduced in <a class="reference external" href="https://papers.nips.cc/paper/2017/file/3f5ee243547dee91fbd053c1c4a845aa-Paper.pdf">“Attention is all you
-need”</a>
-paper for solving machine translation tasks.
-Below, we will create a Seq2Seq network that uses Transformer. The network
-consists of three parts. First part is the embedding layer. This layer converts tensor of input indices
-into corresponding tensor of input embeddings. These embedding are further augmented with positional
-encodings to provide position information of input tokens to the model. The second part is the
-actual <a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.Transformer.html">Transformer</a> model.
-Finally, the output of Transformer model is passed through linear layer
-that give un-normalized probabilities for each token in the target language.</p>
+</div>
+<div class="section" id="transformer-seq2seq">
+<h2>Transformer를 사용한 시퀀스-투-시퀀스(Seq2Seq) 신경망<a class="headerlink" href="#transformer-seq2seq" title="Permalink to this headline">¶</a></h2>
+<p>Transformer(트랜스포머)는 기계번역 작업(task)을 위해
+<a class="reference external" href="https://papers.nips.cc/paper/2017/file/3f5ee243547dee91fbd053c1c4a845aa-Paper.pdf">“Attention is all you need”</a>
+논문에 소개된 Seq2Seq 모델입니다.
+아래에서 Transformer를 사용한 Seq2Seq 신경망을 만들어보겠습니다.
+신경망은 세 부분으로 구성되는데, 첫번째 부분은 임베딩 계층(embedding layer)입니다.
+이 계층은 입력 인덱스의 텐서를 입력 임베딩의 해당하는 텐서로 변환합니다.
+이러한 임베딩은 입력 토큰의 위치 정보(position information)를 모델에 전달하기 위해
+위치 인코딩(positional encoding)을 추가합니다.
+두번째 부분은 실제 <a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.Transformer.html">Transformer</a> 모델입니다.
+마지막으로 Transformer 모델의 출력을 선형 계층에 통과시켜 도착어의 각 토큰에 대한 정규화되지 않은
+확률(un-normalized probability)로 제공합니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
@@ -434,7 +441,7 @@ that give un-normalized probabilities for each token in the target language.</p>
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="n">DEVICE</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s1">&#39;cuda&#39;</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s1">&#39;cpu&#39;</span><span class="p">)</span>
 
-<span class="c1"># helper Module that adds positional encoding to the token embedding to introduce a notion of word order.</span>
+<span class="c1"># 단어 순서 개념(notion)을 토큰 임베딩에 도입하기 위한 위치 인코딩(positional encoding)을 위한 헬퍼 모듈(Module)</span>
 <span class="k">class</span> <span class="nc">PositionalEncoding</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">emb_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -454,7 +461,7 @@ that give un-normalized probabilities for each token in the target language.</p>
     <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">token_embedding</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span><span class="p">(</span><span class="n">token_embedding</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">pos_embedding</span><span class="p">[:</span><span class="n">token_embedding</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="p">:])</span>
 
-<span class="c1"># helper Module to convert tensor of input indices into corresponding tensor of token embeddings</span>
+<span class="c1"># 입력 인덱스의 텐서를 해당하는 토큰 임베딩의 텐서로 변환하기 위한 헬퍼 모듈(Module)</span>
 <span class="k">class</span> <span class="nc">TokenEmbedding</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vocab_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">emb_size</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TokenEmbedding</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
@@ -464,7 +471,7 @@ that give un-normalized probabilities for each token in the target language.</p>
     <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tokens</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">embedding</span><span class="p">(</span><span class="n">tokens</span><span class="o">.</span><span class="n">long</span><span class="p">())</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">emb_size</span><span class="p">)</span>
 
-<span class="c1"># Seq2Seq Network</span>
+<span class="c1"># Seq2Seq 신경망</span>
 <span class="k">class</span> <span class="nc">Seq2SeqTransformer</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">num_encoder_layers</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -512,9 +519,9 @@ that give un-normalized probabilities for each token in the target language.</p>
                           <span class="n">tgt_mask</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>During training, we need a subsequent word mask that will prevent model to look into
-the future words when making predictions. We will also need masks to hide
-source and target padding tokens. Below, let’s define a function that will take care of both.</p>
+<p>학습하는 동안, 모델이 예측하는 동안 정답(이후 출현하는 단어)을 보지 못하도록 하는
+후속 단어 마스크(subsequent word mask)가 필요합니다. 또한, 출발어와 도착어의 패딩(padding) 토큰들
+또한 숨겨야 합니다. 아래에 두 가지 모두를 처리할 함수를 정의해보겠습니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">generate_square_subsequent_mask</span><span class="p">(</span><span class="n">sz</span><span class="p">):</span>
     <span class="n">mask</span> <span class="o">=</span> <span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">triu</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">sz</span><span class="p">,</span> <span class="n">sz</span><span class="p">),</span> <span class="n">device</span><span class="o">=</span><span class="n">DEVICE</span><span class="p">))</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
     <span class="n">mask</span> <span class="o">=</span> <span class="n">mask</span><span class="o">.</span><span class="n">float</span><span class="p">()</span><span class="o">.</span><span class="n">masked_fill</span><span class="p">(</span><span class="n">mask</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;-inf&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">masked_fill</span><span class="p">(</span><span class="n">mask</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="mf">0.0</span><span class="p">))</span>
@@ -533,8 +540,9 @@ source and target padding tokens. Below, let’s define a function that will tak
     <span class="k">return</span> <span class="n">src_mask</span><span class="p">,</span> <span class="n">tgt_mask</span><span class="p">,</span> <span class="n">src_padding_mask</span><span class="p">,</span> <span class="n">tgt_padding_mask</span>
 </pre></div>
 </div>
-<p>Let’s now define the parameters of our model and instantiate the same. Below, we also
-define our loss function which is the cross-entropy loss and the optmizer used for training.</p>
+<p>이제 모델의 매개변수를 정의하고 객체를 생성(instantiate)해보겠습니다.
+아래처럼 학습 단계에서 사용할 손실 함수(loss function)를 교차 엔트로피 손실(cross-entropy loss)로 정의하고,
+옵티마이저(optimizer)도 정의합니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">torch</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
 <span class="n">SRC_VOCAB_SIZE</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">vocab_transform</span><span class="p">[</span><span class="n">SRC_LANGUAGE</span><span class="p">])</span>
@@ -562,14 +570,14 @@ define our loss function which is the cross-entropy loss and the optmizer used f
 </div>
 </div>
 <div class="section" id="collation">
-<h2>Collation<a class="headerlink" href="#collation" title="Permalink to this headline">¶</a></h2>
-<p>As seen in the <code class="docutils literal notranslate"><span class="pre">Data</span> <span class="pre">Sourcing</span> <span class="pre">and</span> <span class="pre">Processing</span></code> section, our data iterator yields a pair of raw strings.
-We need to convert these string pairs into the batched tensors that can be processed by our <code class="docutils literal notranslate"><span class="pre">Seq2Seq</span></code> network
-defined previously. Below we define our collate function that convert batch of raw strings into batch tensors that
-can be fed directly into our model.</p>
+<h2>대조(Collation)<a class="headerlink" href="#collation" title="Permalink to this headline">¶</a></h2>
+<p>위의 <code class="docutils literal notranslate"><span class="pre">데이터</span> <span class="pre">구하고</span> <span class="pre">처리하기</span></code> 장에서 봤듯이, 데이터 반복자(iterator)는 원시 문자열의 쌍을 생성합니다.
+이 문자열 쌍들을 이전에 정의한 <code class="docutils literal notranslate"><span class="pre">Seq2Seq</span></code> 신경망에서 처리할 수 있도록 텐서 묶음(batched tensor)으로 변환해야 합니다.
+이제 원시 문자열들의 묶음(batch)을 텐서 묶음으로 변환하여 모델에 직접 전달할 수 있도록 하는 대응어(collate) 함수를
+정의해보겠습니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch.nn.utils.rnn</span> <span class="kn">import</span> <span class="n">pad_sequence</span>
 
-<span class="c1"># helper function to club together sequential operations</span>
+<span class="c1"># 순차적인 작업들을 하나로 묶는 헬퍼 함수</span>
 <span class="k">def</span> <span class="nf">sequential_transforms</span><span class="p">(</span><span class="o">*</span><span class="n">transforms</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">func</span><span class="p">(</span><span class="n">txt_input</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">transform</span> <span class="ow">in</span> <span class="n">transforms</span><span class="p">:</span>
@@ -577,21 +585,21 @@ can be fed directly into our model.</p>
         <span class="k">return</span> <span class="n">txt_input</span>
     <span class="k">return</span> <span class="n">func</span>
 
-<span class="c1"># function to add BOS/EOS and create tensor for input sequence indices</span>
+<span class="c1"># BOS/EOS를 추가하고 입력 순서(sequence) 인덱스에 대한 텐서를 생성하는 함수</span>
 <span class="k">def</span> <span class="nf">tensor_transform</span><span class="p">(</span><span class="n">token_ids</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]):</span>
     <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="n">BOS_IDX</span><span class="p">]),</span>
                       <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">token_ids</span><span class="p">),</span>
                       <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="n">EOS_IDX</span><span class="p">])))</span>
 
-<span class="c1"># src and tgt language text transforms to convert raw strings into tensors indices</span>
+<span class="c1"># 출발어(src)와 도착어(tgt) 원시 문자열들을 텐서 인덱스로 변환하는 변형(transform)</span>
 <span class="n">text_transform</span> <span class="o">=</span> <span class="p">{}</span>
 <span class="k">for</span> <span class="n">ln</span> <span class="ow">in</span> <span class="p">[</span><span class="n">SRC_LANGUAGE</span><span class="p">,</span> <span class="n">TGT_LANGUAGE</span><span class="p">]:</span>
-    <span class="n">text_transform</span><span class="p">[</span><span class="n">ln</span><span class="p">]</span> <span class="o">=</span> <span class="n">sequential_transforms</span><span class="p">(</span><span class="n">token_transform</span><span class="p">[</span><span class="n">ln</span><span class="p">],</span> <span class="c1">#Tokenization</span>
-                                               <span class="n">vocab_transform</span><span class="p">[</span><span class="n">ln</span><span class="p">],</span> <span class="c1">#Numericalization</span>
-                                               <span class="n">tensor_transform</span><span class="p">)</span> <span class="c1"># Add BOS/EOS and create tensor</span>
+    <span class="n">text_transform</span><span class="p">[</span><span class="n">ln</span><span class="p">]</span> <span class="o">=</span> <span class="n">sequential_transforms</span><span class="p">(</span><span class="n">token_transform</span><span class="p">[</span><span class="n">ln</span><span class="p">],</span> <span class="c1"># 토큰화(Tokenization)</span>
+                                               <span class="n">vocab_transform</span><span class="p">[</span><span class="n">ln</span><span class="p">],</span> <span class="c1"># 수치화(Numericalization)</span>
+                                               <span class="n">tensor_transform</span><span class="p">)</span> <span class="c1"># BOS/EOS를 추가하고 텐서를 생성</span>
 
 
-<span class="c1"># function to collate data samples into batch tesors</span>
+<span class="c1"># 데이터를 텐서로 조합(collate)하는 함수</span>
 <span class="k">def</span> <span class="nf">collate_fn</span><span class="p">(</span><span class="n">batch</span><span class="p">):</span>
     <span class="n">src_batch</span><span class="p">,</span> <span class="n">tgt_batch</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">src_sample</span><span class="p">,</span> <span class="n">tgt_sample</span> <span class="ow">in</span> <span class="n">batch</span><span class="p">:</span>
@@ -603,8 +611,7 @@ can be fed directly into our model.</p>
     <span class="k">return</span> <span class="n">src_batch</span><span class="p">,</span> <span class="n">tgt_batch</span>
 </pre></div>
 </div>
-<p>Let’s define training and evaluation loop that will be called for each
-epoch.</p>
+<p>각 에폭(epoch)마다 호출할 학습 및 검증(evaluation) 단계를 정의해보겠습니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">DataLoader</span>
 
 <span class="k">def</span> <span class="nf">train_epoch</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">):</span>
@@ -659,7 +666,7 @@ epoch.</p>
     <span class="k">return</span> <span class="n">losses</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">val_dataloader</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Now we have all the ingredients to train our model. Let’s do it!</p>
+<p>이제 모델 학습을 위한 모든 요소가 준비되었습니다. 학습을 해보겠습니다!</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">timeit</span> <span class="kn">import</span> <span class="n">default_timer</span> <span class="k">as</span> <span class="n">timer</span>
 <span class="n">NUM_EPOCHS</span> <span class="o">=</span> <span class="mi">18</span>
 
@@ -671,7 +678,7 @@ epoch.</p>
     <span class="nb">print</span><span class="p">((</span><span class="sa">f</span><span class="s2">&quot;Epoch: </span><span class="si">{</span><span class="n">epoch</span><span class="si">}</span><span class="s2">, Train loss: </span><span class="si">{</span><span class="n">train_loss</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">, Val loss: </span><span class="si">{</span><span class="n">val_loss</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">, &quot;</span><span class="sa">f</span><span class="s2">&quot;Epoch time = </span><span class="si">{</span><span class="p">(</span><span class="n">end_time</span> <span class="o">-</span> <span class="n">start_time</span><span class="p">)</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">s&quot;</span><span class="p">))</span>
 
 
-<span class="c1"># function to generate output sequence using greedy algorithm</span>
+<span class="c1"># 탐욕(greedy) 알고리즘을 사용하여 출력 순서(sequence)를 생성하는 함수</span>
 <span class="k">def</span> <span class="nf">greedy_decode</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">src_mask</span><span class="p">,</span> <span class="n">max_len</span><span class="p">,</span> <span class="n">start_symbol</span><span class="p">):</span>
     <span class="n">src</span> <span class="o">=</span> <span class="n">src</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">DEVICE</span><span class="p">)</span>
     <span class="n">src_mask</span> <span class="o">=</span> <span class="n">src_mask</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">DEVICE</span><span class="p">)</span>
@@ -695,7 +702,7 @@ epoch.</p>
     <span class="k">return</span> <span class="n">ys</span>
 
 
-<span class="c1"># actual function to translate input sentence into target language</span>
+<span class="c1"># 입력 문장을 도착어로 번역하는 함수</span>
 <span class="k">def</span> <span class="nf">translate</span><span class="p">(</span><span class="n">model</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span> <span class="n">src_sentence</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
     <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
     <span class="n">src</span> <span class="o">=</span> <span class="n">text_transform</span><span class="p">[</span><span class="n">SRC_LANGUAGE</span><span class="p">](</span><span class="n">src_sentence</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
@@ -710,12 +717,12 @@ epoch.</p>
 </pre></div>
 </div>
 </div>
-<div class="section" id="references">
-<h2>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id2">
+<h2>참고자료<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
 <ol class="arabic simple">
-<li>Attention is all you need paper.
+<li>Attention is all you need 논문.
 <a class="reference external" href="https://papers.nips.cc/paper/2017/file/3f5ee243547dee91fbd053c1c4a845aa-Paper.pdf">https://papers.nips.cc/paper/2017/file/3f5ee243547dee91fbd053c1c4a845aa-Paper.pdf</a></li>
-<li>The annotated transformer. <a class="reference external" href="https://nlp.seas.harvard.edu/2018/04/03/attention.html#positional-encoding">https://nlp.seas.harvard.edu/2018/04/03/attention.html#positional-encoding</a></li>
+<li>Transformer에 대한 설명. <a class="reference external" href="https://nlp.seas.harvard.edu/2018/04/03/attention.html#positional-encoding">https://nlp.seas.harvard.edu/2018/04/03/attention.html#positional-encoding</a></li>
 </ol>
 <p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.000 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-beginner-translation-transformer-py">
@@ -782,10 +789,11 @@ epoch.</p>
           <div class="pytorch-right-menu" id="pytorch-right-menu">
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
-<li><a class="reference internal" href="#">Language Translation with nn.Transformer and torchtext</a><ul>
-<li><a class="reference internal" href="#seq2seq-network-using-transformer">Seq2Seq Network using Transformer</a></li>
-<li><a class="reference internal" href="#collation">Collation</a></li>
-<li><a class="reference internal" href="#references">References</a></li>
+<li><a class="reference internal" href="#">nn.Transformer와 torchtext로 언어 번역하기</a><ul>
+<li><a class="reference internal" href="#id1">데이터 구하고 처리하기</a></li>
+<li><a class="reference internal" href="#transformer-seq2seq">Transformer를 사용한 시퀀스-투-시퀀스(Seq2Seq) 신경망</a></li>
+<li><a class="reference internal" href="#collation">대조(Collation)</a></li>
+<li><a class="reference internal" href="#id2">참고자료</a></li>
 </ul>
 </li>
 </ul>
@@ -929,7 +937,7 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
         <div class="col-md-4 text-center">
           <h2>커뮤니티</h2>
           <p>다른 사용자들과 의견을 나눠보세요!</p>
-          <a class="with-right-arrow" href="https://pytorch.org/#community-module">커뮤니티로 이동</a>
+          <a class="with-right-arrow" href="https://discuss.pytorch.kr">커뮤니티로 이동</a>
         </div>
       </div>
     </div>
