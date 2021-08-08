@@ -40,6 +40,7 @@
 |matrix|행렬|박정환||
 |mean-squared error|평균제곱오차|허남규||
 |MelScale|MelScale|||
+|method|메서드|장효영|[음차 표기](https://www.korean.go.kr/front/onlineQna/onlineQnaView.do?mn_id=216&qna_seq=11976)|
 |mini-batch|미니 배치|박정환|음차 표기|
 |momentum|모멘텀|박정환|음차 표기|
 |normalize|정규화|허남규||
