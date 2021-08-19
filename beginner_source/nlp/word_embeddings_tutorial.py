@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 r"""
-단어 임베딩: 어휘의 의미를 인코딩하기
+단어 임베딩: 어휘의 의미(Lexical semantics)를 인코딩하기
 ===========================================
 **번역**: `임성연 <http://github.com/sylim2357>`_
 
@@ -183,7 +183,7 @@ Shall sum my count, and make my old excuse,'
 Proving his beauty by succession thine!
 This were to be new made when thou art old,
 And see thy blood warm when thou feel'st it cold.""".split()
-# 원래는 입력을 제대로 토크나이즈(tokenize) 해야하지만 이번엔 간소화하겠습니다.
+# 원래는 입력을 제대로 토큰화(tokenize) 해야하지만 이번엔 간소화해 진행하겠습니다.
 # 튜플로 이루어진 리스트를 만들겠습니다. 각 튜플은 ([ i-2 번째 단어, i-1 번째 단어 ], 목표 단어)입니다.
 trigrams = [([test_sentence[i], test_sentence[i + 1]], test_sentence[i + 2])
             for i in range(len(test_sentence) - 2)]
