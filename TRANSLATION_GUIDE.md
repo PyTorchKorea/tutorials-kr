@@ -61,6 +61,7 @@
 |scenario|시나리오|박정환|음차 표기|
 |shape|shape|허남규|번역하지 않음|
 |size|크기|박정환||
+|Task|태스크||음차표기|
 |Tensor / Tensors|Tensor|박정환|번역하지 않음|
 |Text|텍스트|박정환|ToC의 분류명입니다.|
 |track (computation) history|연산 기록을 추적하다|박정환||
