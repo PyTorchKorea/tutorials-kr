@@ -98,8 +98,8 @@ out.backward(torch.randn(1, 10))
 ########################################################################
 # .. note::
 #
-#     ``torch.nn`` 은 미니-배치(mini-batch)만 지원합니다. ``torch.nn`` 패키지
-#     전체는 하나의 샘플이 아닌, 샘플들의 미니-배치만을 입력으로 받습니다.
+#     ``torch.nn`` 은 미니배치(mini-batch)만 지원합니다. ``torch.nn`` 패키지
+#     전체는 하나의 샘플이 아닌, 샘플들의 미니배치만을 입력으로 받습니다.
 #
 #     예를 들어, ``nnConv2D`` 는 ``nSamples x nChannels x Height x Width`` 의
 #     4차원 Tensor를 입력으로 합니다.
@@ -111,15 +111,15 @@ out.backward(torch.randn(1, 10))
 #
 # **요약:**
 #   -  ``torch.Tensor`` - ``backward()`` 같은 autograd 연산을 지원하는
-#      *다차원 배열* 입니다. 또한 tensor에 대한 *변화도(gradient)를 갖고* 있습니다.
+#      *다차원 배열* 입니다. 또한 tensor에 대한 *변화도를 갖고* 있습니다.
 #   -  ``nn.Module`` - 신경망 모듈. *매개변수를 캡슐화(encapsulation)하는 간편한
 #      방법* 으로, GPU로 이동, 내보내기(exporting), 불러오기(loading) 등의 작업을
 #      위한 헬퍼(helper)를 제공합니다.
 #   -  ``nn.Parameter`` - Tensor의 한 종류로, ``Module`` *에 속성으로 할당될 때
 #      자동으로 매개변수로 등록* 됩니다.
-#   -  ``autograd.Function`` - *autograd 연산의 전방향과 역방향 정의* 를 구현합니다.
+#   -  ``autograd.Function`` - *autograd 연산의 순방향과 역방향 정의* 를 구현합니다.
 #      모든 ``Tensor`` 연산은 하나 이상의 ``Function`` 노드를 생성하며, 각 노드는
-#      ``Tensor`` 를 생성하고 *이력(history)을 부호화* 하는 함수들과 연결하고 있습니다.
+#      ``Tensor`` 를 생성하고 *이력(history)을 인코딩* 하는 함수들과 연결하고 있습니다.
 #
 # **지금까지 우리가 다룬 내용은 다음과 같습니다:**
 #   -  신경망을 정의하는 것
@@ -131,8 +131,8 @@ out.backward(torch.randn(1, 10))
 #
 # 손실 함수 (Loss Function)
 # -------------------------
-# 손실 함수는 (output, target)을 한 쌍(pair)의 입력으로 받아, 출력(output)이
-# 정답(target)으로부터 얼마나 멀리 떨어져있는지 추정하는 값을 계산합니다.
+# 손실 함수는 (output, target)을 한 쌍(pair)의 입력으로 받아, 출력이
+# 정답으로부터 얼마나 멀리 떨어져있는지 추정하는 값을 계산합니다.
 #
 # nn 패키지에는 여러가지의 `손실 함수들 <http://pytorch.org/docs/nn.html#loss-functions>`_
 # 이 존재합니다.
@@ -161,7 +161,7 @@ print(loss)
 #           -> loss
 #
 # 따라서 ``loss.backward()`` 를 실행할 때, 전체 그래프는 신경망의 매개변수에 대해
-# 미분되며, 그래프 내의 ``requires_grad=True`` 인 모든 Tensor는 변화도(gradient)가
+# 미분되며, 그래프 내의 ``requires_grad=True`` 인 모든 Tensor는 변화도가
 # 누적된 ``.grad`` Tensor를 갖게 됩니다.
 #
 # 설명을 위해, 역전파의 몇 단계를 따라가보겠습니다:
@@ -174,11 +174,11 @@ print(loss.grad_fn.next_functions[0][0].next_functions[0][0])  # ReLU
 # 역전파(Backprop)
 # ----------------
 # 오차(error)를 역전파하기 위해서는 ``loss.backward()`` 만 해주면 됩니다.
-# 기존 변화도를 없애는 작업이 필요한데, 그렇지 않으면 변화도가 기존의 것에
-# 누적되기 때문입니다.
+# 기존에 계산된 변화도의 값을 누적 시키고 싶지 않다면 기존에 계산된 변화도를 0으로 만드는
+# 작업이 필요합니다.
 #
 #
-# 이제 ``loss.backward()`` 를 호출하여 역전파 전과 후에 conv1의 bias gradient를
+# 이제 ``loss.backward()`` 를 호출하여 역전파 전과 후에 conv1의 bias 변수의 변화도를
 # 살펴보겠습니다.
 
 
@@ -229,7 +229,7 @@ import torch.optim as optim
 # Optimizer를 생성합니다.
 optimizer = optim.SGD(net.parameters(), lr=0.01)
 
-# 학습 과정(training loop)에서는 다음과 같습니다:
+# 학습 과정(training loop)은 다음과 같습니다:
 optimizer.zero_grad()   # 변화도 버퍼를 0으로
 output = net(input)
 loss = criterion(output, target)
