@@ -19,6 +19,7 @@
 |Audio|오디오|박정환|ToC의 분류명입니다.|
 |autograd|Autograd|황성수|번역안함|
 |Batch Normalization|배치 정규화|박정환||
+|convolution|합성곱|김현길||
 |dataset|데이터셋|박정환|음차 표기|
 |deep neural network|심층 신경망|박정환||
 |derivative|도함수|박정환||
