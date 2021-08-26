@@ -25,6 +25,7 @@
 |Drop-out|Drop-out|황성수|번역안함|
 |epoch|에폭|박정환|음차 표기|
 |evaluation mode|평가 모드|박정환||
+|feature|특징|백선희||
 |feed data through model|데이터를 모델에 제공|||
 |Feed-forward network|순전파 신경망|박정환||
 |Generative|생성 모델|박정환|ToC의 분류명입니다.|
