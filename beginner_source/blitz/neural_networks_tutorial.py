@@ -131,8 +131,8 @@ out.backward(torch.randn(1, 10))
 #
 # 손실 함수 (Loss Function)
 # -------------------------
-# 손실 함수는 (output, target)을 한 쌍(pair)의 입력으로 받아, 출력이
-# 정답으로부터 얼마나 멀리 떨어져있는지 추정하는 값을 계산합니다.
+# 손실 함수는 (output, target)을 한 쌍(pair)의 입력으로 받아, 출력(output)이
+# 정답(target)으로부터 얼마나 멀리 떨어져있는지 추정하는 값을 계산합니다.
 #
 # nn 패키지에는 여러가지의 `손실 함수들 <http://pytorch.org/docs/nn.html#loss-functions>`_
 # 이 존재합니다.
