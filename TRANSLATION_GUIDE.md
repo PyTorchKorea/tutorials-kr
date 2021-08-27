@@ -64,6 +64,7 @@
 |Tensor / Tensors|Tensor|박정환|번역하지 않음|
 |Text|텍스트|박정환|ToC의 분류명입니다.|
 |track (computation) history|연산 기록을 추적하다|박정환||
+|Transform, Transformation|변환|최재원||
 |warmstart|빠르게 시작하기|박정환|Warmstarting Model = 빠르게 모델 시작하기|
 |weight|가중치|박정환||
 |wrapper|래퍼|박정환|음차 표기|
