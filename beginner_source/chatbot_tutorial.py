@@ -700,7 +700,7 @@ class EncoderRNN(nn.Module):
 # ~~~~~~
 #
 # 디코더 RNN은 토큰 단위로 응답 문장을 생성하는 역할을 수행합니다. 이때
-# 인코더의 문백 벡터를 사용하며, 내부 은닉 상태에 따라 시퀀스의 다음
+# 인코더의 문맥 벡터를 사용하며, 내부 은닉 상태에 따라 시퀀스의 다음
 # 단어를 생성하게 됩니다. 디코더는 *EOS_token*, 즉 문장의 끝을 나타내는
 # 토큰을 출력할 때까지 계속 단어를 생성합니다. 원래의 seq2seq 디코더에는
 # 알려진 문제점이 있습니다. 만약 우리가 입력 시퀀스의 의미를 인코딩할
@@ -806,8 +806,8 @@ class Attn(nn.Module):
 #    1) 현재의 입력 단어에 대한 임베딩을 구합니다.
 #    2) 무방향 GRU로 포워드 패스를 수행합니다.
 #    3) (2)에서 구한 현재의 GRU 출력을 바탕으로 어텐션 가중치를 계산합니다.
-#    4) 인코더 출력에 어텐션을 곱하여 새로운 "가중치 합" 문백 벡터를 구합니다.
-#    5) Luong의 논문에 나온 식 5를 이용하여 가중치 문백 벡터와 GRU 출력을 결합합니다.
+#    4) 인코더 출력에 어텐션을 곱하여 새로운 "가중치 합" 문맥 벡터를 구합니다.
+#    5) Luong의 논문에 나온 식 5를 이용하여 가중치 문맥 벡터와 GRU 출력을 결합합니다.
 #    6) Luong의 논문에 나온 식 6을 이용하여(softmax 없이) 다음 단어를 예측합니다.
 #    7) 출력과 마지막 은닉 상태를 반환합니다.
 #
@@ -858,9 +858,9 @@ class LuongAttnDecoderRNN(nn.Module):
         rnn_output, hidden = self.gru(embedded, last_hidden)
         # 현재의 GRU 출력을 바탕으로 어텐션 가중치를 계산합니다
         attn_weights = self.attn(rnn_output, encoder_outputs)
-        # 인코더 출력에 어텐션을 곱하여 새로운 "가중치 합" 문백 벡터를 구합니다
+        # 인코더 출력에 어텐션을 곱하여 새로운 "가중치 합" 문맥 벡터를 구합니다
         context = attn_weights.bmm(encoder_outputs.transpose(0, 1))
-        # Luong의 논문에 나온 식 5를 이용하여 가중치 문백 벡터와 GRU 출력을 결합합니다
+        # Luong의 논문에 나온 식 5를 이용하여 가중치 문맥 벡터와 GRU 출력을 결합합니다
         rnn_output = rnn_output.squeeze(0)
         context = context.squeeze(1)
         concat_input = torch.cat((rnn_output, context), 1)
@@ -975,7 +975,7 @@ def train(input_variable, lengths, target_variable, mask, max_target_len, encode
     # 인코더로 포워드 패스를 수행합니다
     encoder_outputs, encoder_hidden = encoder(input_variable, lengths)
 
-    # 초기 디코더 입력을 생성합니다(각 문장을 SOS 도큰으로 시작합니다)
+    # 초기 디코더 입력을 생성합니다(각 문장을 SOS 토큰으로 시작합니다)
     decoder_input = torch.LongTensor([[SOS_token for _ in range(batch_size)]])
     decoder_input = decoder_input.to(device)
 
@@ -1187,7 +1187,7 @@ class GreedySearchDecoder(nn.Module):
 #
 # 마지막으로, 만약 어휘집에 포함되어 있지 않은 단어를 포함하고 있는 문장이
 # 입력되더라도 이를 예의 바르게 처리합니다. 즉 에러 메시지를 출력하고
-# 사용자에게 새로운 문장을 입력해달라고 요구청합니다.
+# 사용자에게 새로운 문장을 입력해달라고 요청합니다.
 #
 
 def evaluate(encoder, decoder, searcher, voc, sentence, max_length=MAX_LENGTH):
