@@ -101,8 +101,8 @@ Recipes are bite-sized bite-sized, actionable examples of how to use specific Py
    :tags: Basics
 
 .. customcarditem::
-   :header: PyTorch Benchmark (quick start)
-   :card_description: Learn how to measure snippet run times and collect instructions.
+   :header: Timer 빠른 시작
+   :card_description: 코드 조각(snippet)의 실행 시간을 측정하고 명령어들을 확인하는 방법을 알아봅니다.
    :image: ../_static/img/thumbnails/cropped/profiler.png
    :link: ../recipes/recipes/timer_quick_start.html
    :tags: Basics
