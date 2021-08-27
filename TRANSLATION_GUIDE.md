@@ -27,6 +27,7 @@
 |evaluation mode|평가 모드|박정환||
 |feed data through model|데이터를 모델에 제공|||
 |Feed-forward network|순전파 신경망|박정환||
+|Fully-connected layer|Fully-connected 계층|최재원|Fully-connected에 대해서는 번역하지 않음.|
 |Generative|생성 모델|박정환|ToC의 분류명입니다.|
 |Getting Started tutorial|시작하기 튜토리얼|박정환|ToC의 Getting Started를 뜻합니다.|
 |gradient|변화도|박정환||
