@@ -112,7 +112,7 @@ label_pipeline = lambda x: int(x) - 1
 # ``collate_fn`` 은 이를 미리 선언된 데이터 처리 파이프라인에 따라 처리합니다.
 # ``collate_fn`` 이 최상위 수준으로 정의(top level def)되었는지 확인합니다. 이렇게 하면 모든 워커에서 이 함수를 사용할 수 있습니다.
 #
-# 아래 예제에서, 주어진(original) 데이터 배치의 텍스트 항목들은 리스트(list)에 담긴(pack) 뒤 ``nn.EmbeddingBag`` 의 입력을 위한 하나의 tensor(tensor)로 합쳐(concatenate)집니다.
+# 아래 예제에서, 주어진(original) 데이터 배치의 텍스트 항목들은 리스트(list)에 담긴(pack) 뒤 ``nn.EmbeddingBag`` 의 입력을 위한 하나의 tensor로 합쳐(concatenate)집니다.
 # 오프셋(offset)은 텍스트 tensor에서 개별 시퀀스 시작 인덱스를 표현하기 위한 구분자(delimiter) tensor입니다.
 # 레이블(label)은 개별 텍스트 항목의 레이블을 저장하는 tensor입니다.
 
