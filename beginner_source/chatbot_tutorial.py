@@ -674,7 +674,7 @@ class EncoderRNN(nn.Module):
         self.hidden_size = hidden_size
         self.embedding = embedding
 
-        # GRU를 초기화합니다. input_size와 hidden_size 파라미터는 둘 다 'hidden_size'로
+        # GRU를 초기화합니다. input_size와 hidden_size 매개변수는 둘 다 'hidden_size'로
         # 둡니다. 이는 우리 입력의 크기가 hideen_size 만큼의 피처를 갖는 단어 임베딩이기
         # 때문입니다.
         self.gru = nn.GRU(hidden_size, hidden_size, n_layers,
@@ -935,7 +935,7 @@ def maskNLLLoss(inp, target, mask):
 #    5) 손실을 계산하고 누적합니다.
 #    6) 역전파를 수행합니다.
 #    7) 그라디언트를 클리핑 합니다.
-#    8) 인코더 및 디코더 모델의 파라미터를 갱신합니다.
+#    8) 인코더 및 디코더 모델의 매개변수를 갱신합니다.
 #
 #
 # .. warning::
@@ -1038,10 +1038,10 @@ def train(input_variable, lengths, target_variable, mask, max_target_len, encode
 # 함수에 옮겨 놓았기 때문입니다.
 #
 # 한 가지 주의할 점은 우리가 모델을 저장하려 할 때, 인코더와 디코더의
-# state_dicts (파라미터), optimizer의 state_dicts, 손실, 진행 단계 수
+# state_dicts (매개변수), optimizer의 state_dicts, 손실, 진행 단계 수
 # 등을 tarball로 만들어 저장한다는 점입니다. 모델을 이러한 방식으로
 # 저장하면 checkpoint에 대해 아주 높은 수준의 유연성을 확보할 수 있게
-# 됩니다. Checkpoint를 불러오고 나면, 우리는 모델 파라미터를 이용하여
+# 됩니다. Checkpoint를 불러오고 나면, 우리는 모델 매개변수를 이용하여
 # 예측을 진행할 수도 있고, 이전에 멈췄던 부분부터 학습을 계속  진행할
 # 수도 있게 됩니다.
 #
@@ -1297,7 +1297,7 @@ print('Models built and ready to go!')
 #
 # 모델을 학습해보고 싶다면 다음 블록을 수행하면 됩니다.
 #
-# 먼저 학습 파라미터를 설정하고, optimizer를 초기화한 뒤, 마지막으로 ``trainIters``
+# 먼저 학습 매개변수를 설정하고, optimizer를 초기화한 뒤, 마지막으로 ``trainIters``
 # 함수를 호출하여 학습 단계를 진행합니다.
 #
 
@@ -1364,7 +1364,7 @@ searcher = GreedySearchDecoder(encoder, decoder)
 #
 # 이번 튜토리얼을 이것으로 마무리하겠습니다. 축하합니다! 여러분은 이제 생성
 # 챗봇 모델을 만들기 위한 기초 지식을 습득했습니다. 만약 좀 더 관심이 있다면
-# 모델이나 학습 파라미터를 수정해 보면서, 혹은 모델을 학습할 데이터를 바꿔
+# 모델이나 학습 매개변수를 수정해 보면서, 혹은 모델을 학습할 데이터를 바꿔
 # 보면서 챗봇의 행동을 수정해볼 수 있을 것입니다.
 #
 # 그 외에도 딥러닝의 멋진 활용 예에 대한 PyTorch 튜토리얼이 있으니 한 번
