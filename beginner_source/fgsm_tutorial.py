@@ -53,7 +53,7 @@
 # 코드로 넘어가기 전에 유명한 `FGSM <https://arxiv.org/abs/1412.6572>`__ 판다 예제를
 # 보고 몇 가지 표기법을 정리하겠습니다.
 #
-# .. 그림:: /_static/img/fgsm_panda_image.png
+# .. figure:: /_static/img/fgsm_panda_image.png
 #    :alt: fgsm_panda_image
 #
 # 그림으로부터, :math:`\mathbf{x}` 는 원본 입력 이미지가 "판다" 로 올바르게 분류된 것을 의미하고,
