@@ -27,7 +27,7 @@
 # 우리는 처음에는 가장 기초적인 PyTorch 텐서(tensor) 기능만을 사용할 것입니다.
 # 그리고나서 우리는 점차적으로 ``torch.nn``, ``torch.optim``, ``Dataset``, 또는
 # ``DataLoader`` 로부터 한번에 하나씩 피쳐를 추가하면서, 정확히 각 부분이 어떤 일을 하는지 그리고
-# 이것이 어떻게 코드를 더 정확하고 유연하게 만드는지 보여줄 것입니다.
+# 이것이 어떻게 코드를 더 간결하고 유연하게 만드는지 보여줄 것입니다.
 #
 # **이 튜토리얼은 여러분이 이미 PyTorch를 설치하였고, 그리고 텐서 연산의 기초에 대해 익숙하다고 가정합니다.**
 # (만약 여러분이 Numpy 배열(array) 연산에 익숙하다면, 여기에서 사용되는 PyTorch 텐서 연산도
@@ -212,7 +212,7 @@ print(accuracy(preds, yb))
 from IPython.core.debugger import set_trace
 
 lr = 0.5  # 학습률(learning rate)
-epochs = 2  # 훈련에 사용할 에포크(epoch) 수
+epochs = 2  # 훈련에 사용할 에폭(epoch) 수
 
 for epoch in range(epochs):
     for i in range((n - 1) // bs + 1):
@@ -579,7 +579,7 @@ valid_ds = TensorDataset(x_valid, y_valid)
 valid_dl = DataLoader(valid_ds, batch_size=bs * 2)
 
 ###############################################################################
-# 각 에포크가 끝날 때 검증 손실을 계산하고 프린트 할 것입니다.
+# 각 에폭이 끝날 때 검증 손실을 계산하고 프린트 할 것입니다.
 #
 # (훈련 전에 항상 ``model.train()`` 을 호출하고, 추론(inference) 전에 ``model.eval()``
 # 을 호출합니다, 이는 ``nn.BatchNorm2d`` 및 ``nn.Dropout`` 과 같은 레이어에서
@@ -612,7 +612,7 @@ for epoch in range(epochs):
 # 이를 하나의 배치에 대한 손실을 계산하는 자체 함수 ``loss_batch`` 로 만들어보겠습니다.
 #
 # 훈련 데이터셋에 대한 옵티마이저를 전달하고 이를 사용하여 역전파를 수행합니다.
-# 검증 데이터셋의 경우 옵티마이저를 전덜하지 않으므로 메소드가 역전파를 수행하지 않습니다.
+# 검증 데이터셋의 경우 옵티마이저를 전달하지 않으므로 메소드가 역전파를 수행하지 않습니다.
 
 
 def loss_batch(model, loss_func, xb, yb, opt=None):
@@ -626,7 +626,7 @@ def loss_batch(model, loss_func, xb, yb, opt=None):
     return loss.item(), len(xb)
 
 ###############################################################################
-# ``fit`` 은 모델을 훈련하고 각 에포크에 대한 훈련 및 검증 손실을 계산하는 작업을 수행합니다.
+# ``fit`` 은 모델을 훈련하고 각 에폭에 대한 훈련 및 검증 손실을 계산하는 작업을 수행합니다.
 
 import numpy as np
 
