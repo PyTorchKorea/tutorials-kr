@@ -416,8 +416,8 @@
 이것은 위 경우와 달리 더욱 더 강력한 모델을 구축할 수 있습니다.</p>
 <p>핵심적인 비선형성 <span class="math">\(\tanh(x), \sigma(x), \text{ReLU}(x)\)</span> 들이 가장
 일반적입니다. 아마 의문이 생길겁니다 : “왜 이런 함수들이지? 나는 다른 많은
-비선형성을 생각할 수 있는데”. 그 이유는 그들이 그래디언트를 계산하기 쉽고,
-그래디언트 연산은 학습에 필수적이기 때문입니다.
+비선형성을 생각할 수 있는데”. 그 이유는 그들이 변화도(gradient)를 계산하기 쉽고,
+변화도 연산은 학습에 필수적이기 때문입니다.
 예를 들어서</p>
 <div class="math">
 \[\frac{d\sigma}{dx} = \sigma(x)(1 - \sigma(x))
@@ -425,8 +425,8 @@
 \]</div>
 <p>빠른 참고: AI 클래스에 대한 소개에서 일부 신경망을 배웠지만 <span class="math">\(\sigma(x)\)</span> 가 기본이었을 것입니다.
 일반적으로 사람들은 실제로 그것을 사용하지 않고 피합니다.
-이것은 그래디언트가 인수의 절대 값이 커짐에 따라 매우 빨리 <em>사라지기</em> 때문입니다.
-작은 그래디언트는 학습하기 어렵다는 것을 의미합니다.
+이것은 변화도가 인수의 절대 값이 커짐에 따라 매우 빨리 <em>사라지기</em> 때문입니다.
+작은 변화도는 학습하기 어렵다는 것을 의미합니다.
 대부분의 사람들은 tanh 또는 ReLU를 기본값으로 사용합니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Pytorch에서 대부분의 비선형성은 torch.functional에 있습니다 ( F 로 가져옵니다)</span>
 <span class="c1"># 일반적으로 비선형성은 아핀맵과 같은 파라미터를 가지고 있지 않습니다.</span>
@@ -496,10 +496,10 @@ tensor([-1.2214, -3.9519, -2.2560, -2.0969, -0.7801])
 <div class="section" id="id4">
 <h2>최적화와 학습<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
 <p>그럼 인스턴스에 대해 손실 함수를 계산할 수 있다는 것은 무엇입니까? 그걸 어떻게 할까요?
-우리는 이전에 Tensor가 그것을 계산하는데 사용된 것들에 해당하는 그래디언트를
+우리는 이전에 Tensor가 그것을 계산하는데 사용된 것들에 해당하는 변화도를
 계산하는 방법을 알고 있다는 것을 보았습니다.
 손실은 Tensor이기 때문에 그것을 계산하는데 사용된 모든 파라미터와 관련하여
-그래디언트를 계산할 수 있습니다! 그런 다음 표준 그래디언트 업데이트를 수행 할 수 있습니다.
+변화도를 계산할 수 있습니다! 그런 다음 표준 변화도 업데이트를 수행 할 수 있습니다.
 <span class="math">\(\theta\)</span> 가 우리의 파라미터라고 합시다.
 <span class="math">\(L(\theta)\)</span> 는 손실 함수, 그리고 <span class="math">\(\eta\)</span> 는 양의 러닝 레이트 입니다. 그러면</p>
 <div class="math">
@@ -511,7 +511,7 @@ tensor([-1.2214, -3.9519, -2.2560, -2.0969, -0.7801])
 많은 시도들은 학습 시간에 일어나는 것에 기반한 러닝 레이트를 변경해봅니다.
 당신이 정말 관심이 없다면 특별히 이들 알고리즘이 무엇을 하는지 걱정할
 필요가 없습니다. Torch는 torch.optim  패키지에서 많은 것을 제공하며
-완전히 공개되어 있습니다. 가장 단순한 그래디언트 업데이트 사용은
+완전히 공개되어 있습니다. 가장 단순한 변화도 업데이트 사용은
 더 복잡한 알고리즘을 사용하는 것과 동일합니다.
 다른 업데이트 알고리즘과 업데이트 알고리즘을 위한 다른 파라미터(다른 초기 러닝 레이트)를
 시도해 보는 것은 네트워크의 성능을 최적화하는데 중요합니다.
@@ -652,7 +652,7 @@ tensor([[-0.5378, -0.8771]])
 </pre></div>
 </div>
 <p>그럼 학습을 해봅시다! 이를 위해 로그 확률을 얻고, 손실 함수를 계산하고,
-손실 함수의 그래디언트를 계산한 다음 그래디언트 단계로 파라미터를
+손실 함수의 변화도를 계산한 다음 변화도 단계로 파라미터를
 업데이트하기 위해 인스턴스를 통과시킵니다.  손실 기능은 nn 패키지의 Torch에서 제공합니다.
 nn.NLLLoss()는 원하는 음의 로그 우도 손실입니다. 또한 torch.optim에서 최적화 함수를 정의합니다.
 여기서는 SGD 만 사용합니다.</p>
@@ -691,7 +691,7 @@ Log softmax 인 이유입니다. 손실 함수 nn.CrossEntropyLoss()는 Log soft
         <span class="c1"># 3 단계. 순전파를 실행합니다.</span>
         <span class="n">log_probs</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">bow_vec</span><span class="p">)</span>
 
-        <span class="c1"># 4 단계. optimizer.step()을 호출하여 손실, 그래디언트를 계산하고 파라미터를 업데이트합니다.</span>
+        <span class="c1"># 4 단계. optimizer.step()을 호출하여 손실, 변화도를 계산하고 파라미터를 업데이트합니다.</span>
         <span class="n">loss</span> <span class="o">=</span> <span class="n">loss_function</span><span class="p">(</span><span class="n">log_probs</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
         <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
         <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
@@ -718,9 +718,9 @@ tensor([ 0.2803, -0.5605], grad_fn=&lt;SelectBackward&gt;)
 <p>정답을 얻었습니다! 첫 번째 예제에서는 스페인어의 로그 확률이 ​​훨씬 높고
 영어의 로그 확률은 테스트 데이터의 두 번째에서 훨씬 높다는 것을 알 수 있습니다.</p>
 <p>이제 PyTorch 구성 요소를 만들고 이를 통해 일부 데이터를 전달하고
-그래디언트 업데이트를 수행하는 방법을 살펴 보았습니다.
+변화도 업데이트를 수행하는 방법을 살펴 보았습니다.
 우리는 심도있는 NLP가 제공해야하는 것을 더 깊이 파고들 준비가되었습니다.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.284 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.150 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-beginner-nlp-deep-learning-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <a class="reference download internal" download="" href="../../_downloads/df7502a0f8c6d7dcbf3e27a329b05d03/deep_learning_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">deep_learning_tutorial.py</span></code></a></div>

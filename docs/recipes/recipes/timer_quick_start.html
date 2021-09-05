@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Timer quick start &mdash; PyTorch Tutorials 1.9.0+cu102 documentation</title>
+  <title>Timer 빠르게 시작하기 &mdash; PyTorch Tutorials 1.9.0+cu102 documentation</title>
   
 
   
@@ -293,7 +293,7 @@
       </li>
 
         
-      <li>Timer quick start</li>
+      <li>Timer 빠르게 시작하기</li>
     
     
       <li class="pytorch-breadcrumbs-aside">
@@ -351,75 +351,76 @@
 <p class="first admonition-title">Note</p>
 <p class="last">Click <a class="reference internal" href="#sphx-glr-download-recipes-recipes-timer-quick-start-py"><span class="std std-ref">here</span></a> to download the full example code</p>
 </div>
-<div class="sphx-glr-example-title section" id="timer-quick-start">
-<span id="sphx-glr-recipes-recipes-timer-quick-start-py"></span><h1>Timer quick start<a class="headerlink" href="#timer-quick-start" title="Permalink to this headline">¶</a></h1>
-<p>In this tutorial, we’re going to cover the primary APIs of
-<cite>torch.utils.benchmark.Timer</cite>. The PyTorch Timer is based on the
+<div class="sphx-glr-example-title section" id="timer">
+<span id="sphx-glr-recipes-recipes-timer-quick-start-py"></span><h1>Timer 빠르게 시작하기<a class="headerlink" href="#timer" title="Permalink to this headline">¶</a></h1>
+<p>이 튜토리얼에서는 <cite>torch.utils.benchmark.Timer</cite>의 주요 API들을 다뤄보도록
+하겠습니다. PyTorch Timer는
 <a class="reference external" href="https://docs.python.org/3/library/timeit.html#timeit.Timer">timeit.Timer</a>
-API, with several PyTorch specific modifications. Familiarity with the
-builtin <cite>Timer</cite> class is not required for this tutorial, however we assume
-that the reader is familiar with the fundamentals of performance work.</p>
-<p>A more comprehensive performace tuning tutorial is available at:</p>
+API 기반으로, 몇몇 PyTorch 특화된 기능(modification)을 제공합니다.
+내장 <cite>Timer</cite> 클래스에 익숙하실 필요는 없지만, 성능 측정(work)의 기본적인
+내용들에는 익숙하다고 가정하겠습니다.</p>
+<p>보다 종합적인 성능 튜닝 튜토리얼은 다음 링크를 참고해주세요:</p>
 <blockquote>
 <div><a class="reference external" href="https://tutorials.pytorch.kr/recipes/recipes/benchmark.html">https://tutorials.pytorch.kr/recipes/recipes/benchmark.html</a></div></blockquote>
 <dl class="docutils">
-<dt><strong>Contents:</strong></dt>
+<dt><strong>목차:</strong></dt>
 <dd><ol class="first last arabic simple">
-<li><a class="reference external" href="#defining-a-timer">Defining a Timer</a></li>
-<li><a class="reference external" href="#wall-time-timer-blocked-autorange">Wall time: `Timer.blocked_autorange(…)`</a></li>
-<li><a class="reference external" href="#c-snippets">C++ snippets</a></li>
-<li><a class="reference external" href="#instruction-counts-timer-collect-callgrind">Instruction counts: `Timer.collect_callgrind(…)`</a></li>
-<li><a class="reference external" href="#instruction-counts-delving-deeper">Instruction counts: Delving deeper</a></li>
-<li><a class="reference external" href="#a-b-testing-with-callgrind">A/B testing with Callgrind</a></li>
-<li><a class="reference external" href="#wrapping-up">Wrapping up</a></li>
-<li><a class="reference external" href="#footnotes">Footnotes</a></li>
+<li><a class="reference external" href="#id1">Timer 정의하기</a></li>
+<li><a class="reference external" href="#wall-time-timer-blocked-autorange">실제 시간(wall time): `Timer.blocked_autorange(…)`</a></li>
+<li><a class="reference external" href="#c-snippet">C++ 코드조각(snippet)</a></li>
+<li><a class="reference external" href="#instruction-counts-timer-collect-callgrind">명령어 실행 횟수(instruction counts): `Timer.collect_callgrind(…)`</a></li>
+<li><a class="reference external" href="#id2">명령어 실행 횟수: 더 깊이 파보기</a></li>
+<li><a class="reference external" href="#callgrind-a-b">Callgrind를 사용한 A/B 테스트</a></li>
+<li><a class="reference external" href="#id3">마무리</a></li>
+<li><a class="reference external" href="#id4">각주</a></li>
 </ol>
 </dd>
 </dl>
-<div class="section" id="defining-a-timer">
-<h2>1. Defining a Timer<a class="headerlink" href="#defining-a-timer" title="Permalink to this headline">¶</a></h2>
-<p>A <cite>Timer</cite> serves as a task definition.</p>
+<div class="section" id="id1">
+<h2>1. Timer 정의하기<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<p><cite>Timer</cite> 는 작업을 정의하기 위해 사용합니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch.utils.benchmark</span> <span class="kn">import</span> <span class="n">Timer</span>
 
 <span class="n">timer</span> <span class="o">=</span> <span class="n">Timer</span><span class="p">(</span>
-    <span class="c1"># The computation which will be run in a loop and timed.</span>
+    <span class="c1"># 반복문(loop)에서 실행하고 시간을 측정할 연산을 정의합니다</span>
     <span class="n">stmt</span><span class="o">=</span><span class="s2">&quot;x * y&quot;</span><span class="p">,</span>
 
-    <span class="c1"># `setup` will be run before calling the measurement loop, and is used to</span>
-    <span class="c1"># populate any state which is needed by `stmt`</span>
+    <span class="c1"># `setup` 은 반복 측정을 시작하기 전에 실행되므로,</span>
+    <span class="c1"># `stmt` 에서 필요한 모든 상태를 준비(populate)하는데 사용됩니다</span>
     <span class="n">setup</span><span class="o">=</span><span class="s2">&quot;&quot;&quot;</span>
 <span class="s2">        x = torch.ones((128,))</span>
 <span class="s2">        y = torch.ones((128,))</span>
 <span class="s2">    &quot;&quot;&quot;</span><span class="p">,</span>
 
-    <span class="c1"># Alternately, `globals` can be used to pass variables from the outer scope.</span>
+    <span class="c1"># 또는, `globals` 를 사용하여 외부 범위(outer scope)에서 사용하는 변수들을</span>
+    <span class="c1"># 전달할 수 있습니다</span>
     <span class="c1"># -------------------------------------------------------------------------</span>
     <span class="c1"># globals={</span>
     <span class="c1">#     &quot;x&quot;: torch.ones((128,)),</span>
     <span class="c1">#     &quot;y&quot;: torch.ones((128,)),</span>
     <span class="c1"># },</span>
 
-    <span class="c1"># Control the number of threads that PyTorch uses. (Default: 1)</span>
+    <span class="c1"># PyTorch에서 사용하는 쓰레드(thread)의 수를 조절합니다 (기본값: 1)</span>
     <span class="n">num_threads</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
 <span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="section" id="wall-time-timer-blocked-autorange">
-<h2>2. Wall time: <cite>Timer.blocked_autorange(…)</cite><a class="headerlink" href="#wall-time-timer-blocked-autorange" title="Permalink to this headline">¶</a></h2>
-<p>This method will handle details such as picking a suitable number if repeats,
-fixing the number of threads, and providing a convenient representation of
-the results.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Measurement objects store the results of multiple repeats, and provide</span>
-<span class="c1"># various utility features.</span>
+<h2>2. 실제 실행 시간(wall time): <cite>Timer.blocked_autorange(…)</cite><a class="headerlink" href="#wall-time-timer-blocked-autorange" title="Permalink to this headline">¶</a></h2>
+<p>이 메서드(method)는 몇 번이나 반복할지 적절한 횟수를 고르거나, 쓰레드의 수를
+변경(fix)하거나,결과를 편하게 표현하는 방법을 제공하는 등, 세부적인 사항들을
+처리(handle)합니다.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Measurement 객체는 여러번 반복하여 측정한 결과를 저장하고, 다양한 편의 기능</span>
+<span class="c1"># (utility feature)을 제공합니다.</span>
 <span class="kn">from</span> <span class="nn">torch.utils.benchmark</span> <span class="kn">import</span> <span class="n">Measurement</span>
 
 <span class="n">m</span><span class="p">:</span> <span class="n">Measurement</span> <span class="o">=</span> <span class="n">timer</span><span class="o">.</span><span class="n">blocked_autorange</span><span class="p">(</span><span class="n">min_run_time</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="literal-block-wrapper docutils container" id="id1">
-<div class="code-block-caption"><span class="caption-text"><strong>Snippet wall time.</strong></span><a class="headerlink" href="#id1" title="Permalink to this code">¶</a></div>
+<div class="literal-block-wrapper docutils container" id="id5">
+<div class="code-block-caption"><span class="caption-text"><strong>Snippet wall time.</strong></span><a class="headerlink" href="#id5" title="Permalink to this code">¶</a></div>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>     &lt;torch.utils.benchmark.utils.common.Measurement object at 0x7f1929a38ed0&gt;
      x * y
      setup:
@@ -433,8 +434,8 @@ the results.</p>
 </div>
 </div>
 </div>
-<div class="section" id="c-snippets">
-<h2>3. C++ snippets<a class="headerlink" href="#c-snippets" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="c-snippet">
+<h2>3. C++ 코드 조각(snippet)<a class="headerlink" href="#c-snippet" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch.utils.benchmark</span> <span class="kn">import</span> <span class="n">Language</span>
 
 <span class="n">cpp_timer</span> <span class="o">=</span> <span class="n">Timer</span><span class="p">(</span>
@@ -449,8 +450,8 @@ the results.</p>
 <span class="nb">print</span><span class="p">(</span><span class="n">cpp_timer</span><span class="o">.</span><span class="n">blocked_autorange</span><span class="p">(</span><span class="n">min_run_time</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
 </pre></div>
 </div>
-<div class="literal-block-wrapper docutils container" id="id2">
-<div class="code-block-caption"><span class="caption-text"><strong>C++ snippet wall time.</strong></span><a class="headerlink" href="#id2" title="Permalink to this code">¶</a></div>
+<div class="literal-block-wrapper docutils container" id="id6">
+<div class="code-block-caption"><span class="caption-text"><strong>C++ snippet wall time.</strong></span><a class="headerlink" href="#id6" title="Permalink to this code">¶</a></div>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>     &lt;torch.utils.benchmark.utils.common.Measurement object at 0x7f192b019ed0&gt;
      x * y;
      setup:
@@ -463,23 +464,23 @@ the results.</p>
 </pre></div>
 </div>
 </div>
-<p>Unsurprisingly, the C++ snippet is both faster and has lower variation.</p>
+<p>당연히 C++ 코드 조각(snippet)이 더 빠르고 편차(variation)가 적습니다.</p>
 </div>
 <div class="section" id="instruction-counts-timer-collect-callgrind">
-<h2>4. Instruction counts: <cite>Timer.collect_callgrind(…)</cite><a class="headerlink" href="#instruction-counts-timer-collect-callgrind" title="Permalink to this headline">¶</a></h2>
-<p>For deep dive investigations, <cite>Timer.collect_callgrind</cite> wraps
-<cite>Callgrind &lt;https://valgrind.org/docs/manual/cl-manual.html&gt;</cite> in order to
-collect instruction counts. These are useful as they offer fine grained and
-deterministic (or very low noise in the case of Python) insights into how a
-snippet is run.</p>
+<h2>4. 명령어 실행 횟수(instruction counts): <cite>Timer.collect_callgrind(…)</cite><a class="headerlink" href="#instruction-counts-timer-collect-callgrind" title="Permalink to this headline">¶</a></h2>
+<p>더 자세한 정보를 제공하기 위해, <cite>Timer.collect_callgrind</cite> 는
+명령어 실행 횟수(instruction count)를 수집하는
+<cite>Callgrind &lt;https://valgrind.org/docs/manual/cl-manual.html&gt;</cite> 를 감싸고(wrap) 있습니다.
+이는 코드 조각(snippet)이 어떻게 실행되는지에 대해 세분화되고 결정적인(deterministic)
+통찰을 제공하므로 유용합니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch.utils.benchmark</span> <span class="kn">import</span> <span class="n">CallgrindStats</span><span class="p">,</span> <span class="n">FunctionCounts</span>
 
 <span class="n">stats</span><span class="p">:</span> <span class="n">CallgrindStats</span> <span class="o">=</span> <span class="n">cpp_timer</span><span class="o">.</span><span class="n">collect_callgrind</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">stats</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="literal-block-wrapper docutils container" id="id3">
-<div class="code-block-caption"><span class="caption-text"><strong>C++ Callgrind stats (summary)</strong></span><a class="headerlink" href="#id3" title="Permalink to this code">¶</a></div>
+<div class="literal-block-wrapper docutils container" id="id7">
+<div class="code-block-caption"><span class="caption-text"><strong>C++ Callgrind stats (summary)</strong></span><a class="headerlink" href="#id7" title="Permalink to this code">¶</a></div>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>     &lt;torch.utils.benchmark.utils.valgrind_wrapper.timer_interface.CallgrindStats object at 0x7f1929a35850&gt;
      x * y;
      setup:
@@ -494,37 +495,36 @@ snippet is run.</p>
 </div>
 </div>
 </div>
-<div class="section" id="instruction-counts-delving-deeper">
-<h2>5. Instruction counts: Delving deeper<a class="headerlink" href="#instruction-counts-delving-deeper" title="Permalink to this headline">¶</a></h2>
-<p>The string representation of CallgrindStats is similar to that of
-Measurement. <cite>Noisy symbols</cite> are a Python concept (removing calls in the
-CPython interpreter which are known to be noisy).</p>
-<p>For more detailed analysis, however, we will want to look at specific calls.
-<cite>CallgrindStats.stats()</cite> returns a FunctionCounts object to make this easier.
-Conceptually, FunctionCounts can be thought of as a tuple of pairs with some
-utility methods, where each pair is <cite>(number of instructions, file path and
-function name)</cite>.</p>
+<div class="section" id="id2">
+<h2>5. 명령어 실행 횟수: 더 깊이 파보기<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<p>CallgrindStats의 문자열 표현은 Measurement의 그것과 유사합니다.
+<cite>Noisy symbol</cite> 은 Python의 개념입니다. (CPython 인터프리터(interpreter)에서는
+불필요하다(noisy)고 알려진 호출들을 제외합니다)</p>
+<p>일단 더 자세한 분석을 위해, 특정 호출(call)을 살펴보겠습니다.
+<cite>CallgrindStats.stats()</cite> 은 이를 더 쉽게해주는 FunctionCounts 객체를 반환합니다.
+개념적으로, FunctionCounts는 각 쌍(pair)이 <cite>(명령어 호출 횟수, 파일 경로 및 함수 이름)</cite>
+인 형태로 구성된, 유용한 메서드(utility method)가 있는 쌍(pair)의 튜플(tuple)로
+생각할 수 있습니다.</p>
 <dl class="docutils">
-<dt>A note on paths:</dt>
-<dd><p class="first">One generally doesn’t care about absolute path. For instance, the full path
-and function name for a multiply call is something like:</p>
+<dt>경로(path)에 대한 참고 사항:</dt>
+<dd><p class="first">일반적으로 절대경로(absolute path)는 신경쓰지 않습니다. 예를 들어, 곱하기 호출의
+전체 경로와 함수 이름은 이런 식일 것입니다:</p>
 <blockquote>
 <div>/the/prefix/to/your/pytorch/install/dir/pytorch/build/aten/src/ATen/core/TensorMethods.cpp:at::Tensor::mul(at::Tensor const&amp;) const [/the/path/to/your/conda/install/miniconda3/envs/ab_ref/lib/python3.7/site-packages/torch/lib/libtorch_cpu.so]</div></blockquote>
-<p>when in reality, all of the information that we’re interested in can be
-represented in:</p>
+<p>실제로 우리가 관심을 갖는 정보들은 이런 식으로 표현이 가능합니다:</p>
 <blockquote>
 <div>build/aten/src/ATen/core/TensorMethods.cpp:at::Tensor::mul(at::Tensor const&amp;) const</div></blockquote>
-<p class="last">CallgrindStats.as_standardized() makes a best effort to strip low signal
-portions of the file path, as well as the shared object and is generally
-recommended.</p>
+<p class="last">CallgrindStats.as_standardized()는 파일 경로의 의미없는 부분(low signal portion)뿐만
+아니라, 공유 객체(shared object)들도 제거(strip)하는데 최선을 다하므로, 대부분의 경우
+사용하는 것을 권합니다.</p>
 </dd>
 </dl>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">inclusive_stats</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">as_standardized</span><span class="p">()</span><span class="o">.</span><span class="n">stats</span><span class="p">(</span><span class="n">inclusive</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">inclusive_stats</span><span class="p">[:</span><span class="mi">10</span><span class="p">])</span>
 </pre></div>
 </div>
-<div class="literal-block-wrapper docutils container" id="id4">
-<div class="code-block-caption"><span class="caption-text"><strong>C++ Callgrind stats (detailed)</strong></span><a class="headerlink" href="#id4" title="Permalink to this code">¶</a></div>
+<div class="literal-block-wrapper docutils container" id="id8">
+<div class="code-block-caption"><span class="caption-text"><strong>C++ Callgrind stats (detailed)</strong></span><a class="headerlink" href="#id8" title="Permalink to this code">¶</a></div>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>     torch.utils.benchmark.utils.valgrind_wrapper.timer_interface.FunctionCounts object at 0x7f192a6dfd90&gt;
        47264  ???:_int_free
        25963  ???:_int_malloc
@@ -541,10 +541,10 @@ recommended.</p>
 </pre></div>
 </div>
 </div>
-<p>That’s still quite a lot to digest. Let’s use the <cite>FunctionCounts.transform</cite>
-method to trim some of the function path, and discard the function called.
-When we do, the counts of any collisions (e.g. <cite>foo.h:a()</cite> and <cite>foo.h:b()</cite>
-will both map to <cite>foo.h</cite>) will be added together.</p>
+<p>이 외에도 요약해야 할 내용들이 많습니다. <cite>FunctionCounts.transform</cite> 메소드를
+사용하여 함수 경로의 일부를 자르고, 호출된 함수를 제거(discard)합니다.
+그렇게 하면 중복(collision, 예. <cite>foo.h</cite> 에 같이 매핑된 <cite>foo.h:a()</cite> 와 <cite>foo.h:b()</cite> )된
+횟수는 더해집니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">re</span>
 
@@ -561,8 +561,8 @@ will both map to <cite>foo.h</cite>) will be added together.</p>
 <span class="nb">print</span><span class="p">(</span><span class="n">inclusive_stats</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">group_by_file</span><span class="p">)[:</span><span class="mi">10</span><span class="p">])</span>
 </pre></div>
 </div>
-<div class="literal-block-wrapper docutils container" id="id5">
-<div class="code-block-caption"><span class="caption-text"><strong>Callgrind stats (condensed)</strong></span><a class="headerlink" href="#id5" title="Permalink to this code">¶</a></div>
+<div class="literal-block-wrapper docutils container" id="id9">
+<div class="code-block-caption"><span class="caption-text"><strong>Callgrind stats (condensed)</strong></span><a class="headerlink" href="#id9" title="Permalink to this code">¶</a></div>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>     &lt;torch.utils.benchmark.utils.valgrind_wrapper.timer_interface.FunctionCounts object at 0x7f192995d750&gt;
        118200  aten/src/ATen   TensorIterator.cpp
         65000  c10/util        SmallVector.h
@@ -580,14 +580,12 @@ will both map to <cite>foo.h</cite>) will be added together.</p>
 </div>
 </div>
 </div>
-<div class="section" id="a-b-testing-with-callgrind">
-<h2>6. A/B testing with Callgrind<a class="headerlink" href="#a-b-testing-with-callgrind" title="Permalink to this headline">¶</a></h2>
-<p>One of the most useful features of instruction counts is they allow fine
-grained comparison of computation, which is critical when analyzing
-performance.</p>
-<p>To see this in action, lets compare our multiplication of two size 128
-Tensors with a {128} x {1} multiplication, which will broadcast the second
-Tensor:</p>
+<div class="section" id="callgrind-a-b">
+<h2>6. Callgrind를 사용한 A/B 테스트<a class="headerlink" href="#callgrind-a-b" title="Permalink to this headline">¶</a></h2>
+<p>명령어 실행 횟수 측정의 가장 유용한 기능 중 하나는 성능을 분석할 때
+중요한 것으로, 연산을 세밀하게 비교할 수 있다는 것입니다.</p>
+<p>이를 실제로 확인해보기 위해, 텐서(Tensor)를 브로드캐스트(broadcast)하여
+128 크기의 텐서(Tensor)와 곱하는 {128} x {1} 곱셈과 비교해보겠습니다:</p>
 <blockquote>
 <div>result = {a0 * b0, a1 * b0, …, a127 * b0}</div></blockquote>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">broadcasting_stats</span> <span class="o">=</span> <span class="n">Timer</span><span class="p">(</span>
@@ -600,17 +598,18 @@ Tensor:</p>
 <span class="p">)</span><span class="o">.</span><span class="n">collect_callgrind</span><span class="p">()</span><span class="o">.</span><span class="n">as_standardized</span><span class="p">()</span><span class="o">.</span><span class="n">stats</span><span class="p">(</span><span class="n">inclusive</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Often we want to A/B test two different environments. (e.g. testing a PR, or
-experimenting with compile flags.) This is quite simple, as CallgrindStats,
-FunctionCounts, and Measurement are all pickleable. Simply save measurements
-from each environment, and load them in a single process for analysis.</p>
+<p>종종 서로 다른 두 환경에서 A/B 테스트를 진행하고 싶을 떄가 있습니다. (예.
+PR을 테스트하거나, 컴파일 플래그(flag) 실험 등)
+이는 CallgrindStats와 FunctionCounts, Measurement는 모두 pickle화(picklalbe)가
+가능하기 때문에 매우 간단합니다. 각 환경에서 측정한 결과들을 저장하고, 단일
+프로세스에서 불러와서 분석하기만 하면 됩니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pickle</span>
 
-<span class="c1"># Let&#39;s round trip `broadcasting_stats` just to show that we can.</span>
+<span class="c1"># 가능하다는 것을 보여주기 위해 `broadcasting_stats` 을 저장하고 불러옵니다.</span>
 <span class="n">broadcasting_stats</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">pickle</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">broadcasting_stats</span><span class="p">))</span>
 
 
-<span class="c1"># And now to diff the two tasks:</span>
+<span class="c1"># 두 작업을 비교합니다:</span>
 <span class="n">delta</span> <span class="o">=</span> <span class="n">broadcasting_stats</span> <span class="o">-</span> <span class="n">inclusive_stats</span>
 
 <span class="k">def</span> <span class="nf">extract_fn_name</span><span class="p">(</span><span class="n">fn</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
@@ -618,12 +617,12 @@ from each environment, and load them in a single process for analysis.</p>
     <span class="n">fn</span> <span class="o">=</span> <span class="s2">&quot;:&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">fn</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">:])</span>
     <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\(.+\)&quot;</span><span class="p">,</span> <span class="s2">&quot;(...)&quot;</span><span class="p">,</span> <span class="n">fn</span><span class="p">)</span>
 
-<span class="c1"># We use `.transform` to make the diff readable:</span>
+<span class="c1"># `.transform` 을 사용하여 diff를 읽을 수 있게 만듭니다:</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">delta</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">extract_fn_name</span><span class="p">))</span>
 </pre></div>
 </div>
-<div class="literal-block-wrapper docutils container" id="id6">
-<div class="code-block-caption"><span class="caption-text"><strong>Instruction count delta</strong></span><a class="headerlink" href="#id6" title="Permalink to this code">¶</a></div>
+<div class="literal-block-wrapper docutils container" id="id10">
+<div class="code-block-caption"><span class="caption-text"><strong>Instruction count delta</strong></span><a class="headerlink" href="#id10" title="Permalink to this code">¶</a></div>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>     &lt;torch.utils.benchmark.utils.valgrind_wrapper.timer_interface.FunctionCounts object at 0x7f192995d750&gt;
          17600  at::TensorIteratorBase::compute_strides(...)
          12700  at::TensorIteratorBase::allocate_or_resize_outputs()
@@ -649,15 +648,15 @@ from each environment, and load them in a single process for analysis.</p>
 </pre></div>
 </div>
 </div>
-<p>So the broadcasting version takes an extra 580 instructions per call (recall
-that we’re collecting 100 runs per sample), or about 10%. There are quite a
-few TensorIterator calls, so lets drill down to those. FunctionCounts.filter
-makes this easy.</p>
+<p>브로드캐스팅했던 버전은 호출당(샘플 당 100번의 실행을 수집하였음을 기억하세요)
+580번, 대략 10%만큼 명령어가 더 실행되었습니다. TensorIterator 호출이 제법 많으므로
+조금 더 깊이 살펴보겠습니다. FunctionCounts.filter를 사용하여 이를 쉽게 수행할 수
+있습니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">delta</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">extract_fn_name</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">fn</span><span class="p">:</span> <span class="s2">&quot;TensorIterator&quot;</span> <span class="ow">in</span> <span class="n">fn</span><span class="p">))</span>
 </pre></div>
 </div>
-<div class="literal-block-wrapper docutils container" id="id7">
-<div class="code-block-caption"><span class="caption-text"><strong>Instruction count delta (filter)</strong></span><a class="headerlink" href="#id7" title="Permalink to this code">¶</a></div>
+<div class="literal-block-wrapper docutils container" id="id11">
+<div class="code-block-caption"><span class="caption-text"><strong>Instruction count delta (filter)</strong></span><a class="headerlink" href="#id11" title="Permalink to this code">¶</a></div>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>     &lt;torch.utils.benchmark.utils.valgrind_wrapper.timer_interface.FunctionCounts object at 0x7f19299544d0&gt;
          17600  at::TensorIteratorBase::compute_strides(...)
          12700  at::TensorIteratorBase::allocate_or_resize_outputs()
@@ -675,40 +674,40 @@ makes this easy.</p>
 </pre></div>
 </div>
 </div>
-<p>This makes plain what is going on: there is a fast path in TensorIterator
-setup, but in the {128} x {1} case we miss it and have to do a more general
-analysis which is more expensive. The most prominent call omitted by the
-filter is <cite>c10::SmallVectorImpl&lt;long&gt;::operator=(…)</cite>, which is also part
-of the more general setup.</p>
+<p>이렇게 보면 진행 내역이 명확합니다:TensorIterator 구성(setup) 시 더 빠른 경로가
+있지만, {128} x {1} 경우에는 이것이 아닌 더 비용이 많이 드는 일반적인 분석을
+수행해야 합니다. 필터에서 생략(omit)된 가장 주요한 호출은
+<cite>c10::SmallVectorImpl&lt;long&gt;::operator=(…)</cite> 으로, 일반적인 구성(setup)의 일부
+이기도 합니다.</p>
 </div>
-<div class="section" id="wrapping-up">
-<h2>7. Wrapping up<a class="headerlink" href="#wrapping-up" title="Permalink to this headline">¶</a></h2>
-<p>In summary, use <cite>Timer.blocked_autorange</cite> to collect wall times. If timing
-variation is too high, increase <cite>min_run_time</cite>, or move to C++ snippets if
-convenient.</p>
-<p>For fine grained analysis, use <cite>Timer.collect_callgrind</cite> to measure
-instruction counts and <cite>FunctionCounts.(__add__ / __sub__ / transform / filter)</cite>
-to slice-and-dice them.</p>
+<div class="section" id="id3">
+<h2>7. 마무리<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
+<p>요약하면 <cite>Timer.blocked_autorange</cite> 를 사용하여 실제 실행 시간(wall time)을 수집합니다.
+시간 편차가 너무 크면, <cite>min_run_time</cite> 을 늘리거나, 만약 C++이 더 편하면 C++ 코드
+조각을 사용하도록 합니다.</p>
+<p>세분화된 분석을 위해, <cite>Timer.collect_callgrind</cite> 를 사용하여 명령어 실행 횟수를
+측정하고 <cite>FunctionCounts.(__add__ / __sub__ / transform / filter)</cite> 를 사용하여
+결과를 쪼개어 분석(slice-and-dice)합니다.</p>
 </div>
-<div class="section" id="footnotes">
-<h2>8. Footnotes<a class="headerlink" href="#footnotes" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id4">
+<h2>8. 각주<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
 <blockquote>
 <div><ul class="simple">
 <li><dl class="first docutils">
-<dt>Implied <cite>import torch</cite></dt>
-<dd>If <cite>globals</cite> does not contain “torch”, Timer will automatically
-populate it. This means that <cite>Timer(“torch.empty(())”)</cite> will work.
-(Though other imports should be placed in <cite>setup</cite>,
-e.g. <cite>Timer(“np.zeros(())”, “import numpy as np”)</cite>)</dd>
+<dt>묵시적(implied) <cite>import torch</cite></dt>
+<dd><cite>globals</cite> 가 “torch”를 포함하지 않으면, Timer가 자동으로 불러옵니다.
+즉, <cite>Timer(“torch.empty(())”)</cite> 가 동작합니다. (다른 불러오기(import)
+는 반드시 <cite>setup</cite> 에 포함되어 있어야 합니다 -
+예. <cite>Timer(“np.zeros(())”, “import numpy as np”)</cite> )</dd>
 </dl>
 </li>
 <li><dl class="first docutils">
 <dt>REL_WITH_DEB_INFO</dt>
-<dd>In order to provide full information about the PyTorch internals which
-are executed, Callgrind needs access to C++ debug symbols. This is
-accomplished by setting REL_WITH_DEB_INFO=1 when building PyTorch.
-Otherwise function calls will be opaque. (The resultant CallgrindStats
-will warn if debug symbols are missing.)</dd>
+<dd>실행되는 PyTorch 내부에 대한 전체 정보를 제공하기 위해, Callgrind는
+C++ 디버그 심볼(debug symbol)에 접근해야 합니다. 이를 위해 PyTorch를
+빌드할 때 REL_WITH_DEB_INFO=1 을 설정해야 합니다. 그렇지 않으면
+함수 호출이 불투명(opaque)해집니다. (이런 경우 CallgrindStats가
+디버그 심볼 누락을 경고합니다.)</dd>
 </dl>
 </li>
 </ul>
@@ -769,15 +768,15 @@ will warn if debug symbols are missing.)</dd>
           <div class="pytorch-right-menu" id="pytorch-right-menu">
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
-<li><a class="reference internal" href="#">Timer quick start</a><ul>
-<li><a class="reference internal" href="#defining-a-timer">1. Defining a Timer</a></li>
-<li><a class="reference internal" href="#wall-time-timer-blocked-autorange">2. Wall time: <cite>Timer.blocked_autorange(…)</cite></a></li>
-<li><a class="reference internal" href="#c-snippets">3. C++ snippets</a></li>
-<li><a class="reference internal" href="#instruction-counts-timer-collect-callgrind">4. Instruction counts: <cite>Timer.collect_callgrind(…)</cite></a></li>
-<li><a class="reference internal" href="#instruction-counts-delving-deeper">5. Instruction counts: Delving deeper</a></li>
-<li><a class="reference internal" href="#a-b-testing-with-callgrind">6. A/B testing with Callgrind</a></li>
-<li><a class="reference internal" href="#wrapping-up">7. Wrapping up</a></li>
-<li><a class="reference internal" href="#footnotes">8. Footnotes</a></li>
+<li><a class="reference internal" href="#">Timer 빠르게 시작하기</a><ul>
+<li><a class="reference internal" href="#id1">1. Timer 정의하기</a></li>
+<li><a class="reference internal" href="#wall-time-timer-blocked-autorange">2. 실제 실행 시간(wall time): <cite>Timer.blocked_autorange(…)</cite></a></li>
+<li><a class="reference internal" href="#c-snippet">3. C++ 코드 조각(snippet)</a></li>
+<li><a class="reference internal" href="#instruction-counts-timer-collect-callgrind">4. 명령어 실행 횟수(instruction counts): <cite>Timer.collect_callgrind(…)</cite></a></li>
+<li><a class="reference internal" href="#id2">5. 명령어 실행 횟수: 더 깊이 파보기</a></li>
+<li><a class="reference internal" href="#callgrind-a-b">6. Callgrind를 사용한 A/B 테스트</a></li>
+<li><a class="reference internal" href="#id3">7. 마무리</a></li>
+<li><a class="reference internal" href="#id4">8. 각주</a></li>
 </ul>
 </li>
 </ul>
