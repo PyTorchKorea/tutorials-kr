@@ -23,14 +23,14 @@ TorchVision 객체 검출 미세조정(Finetuning) 튜토리얼
 상속 받아야 하며, ``__len__`` 와 ``__getitem__`` 메소드를 구현해 주어야 합니다.
 
 
-우리가 데이터셋 클래스에서 필요로 하는 유일한 특성은  ``__getitem__`` 를
-리턴을 해야 하는 점입니다:
+데이터셋에서 필요한 유일한 특성은  ``__getitem__`` 메소드가 다음을
+반환 해야 하는 것입니다:
 
 -  이미지 : PIL(Python Image Library) 이미지의 크기 ``(H, W)``
 -  대상: 다음의 필드를 포함하는 사전 타입
 
    -  ``boxes (FloatTensor[N, 4])``:  ``N`` 개의 바운딩 박스(Bounding box)의 좌표를 ``[x0, y0, x1, y1]`` 형태로 가집니다.
-   x와 관련된 값 범위는 ``0`` 부터 ``W`` 이고 y와 관련된 값의 범위는 ``0`` 부터 ``H`` 까지입니다.
+      x와 관련된 값 범위는 ``0`` 부터 ``W`` 이고 y와 관련된 값의 범위는 ``0`` 부터 ``H`` 까지입니다.
    -  ``labels (Int64Tensor[N])``: 바운딩 박스 마다의 라벨 정보입니다. ``0`` 은 항상 배경의 클래스를 표현합니다.
    -  ``image_id (Int64Tensor[1])``: 이미지 구분자입니다. 데이터셋의 모든 이미지 간에 고유한 값이어야 하며 평가 중에도 사용됩니다.
    -  ``area (Tensor[N])``: 바운딩 박스의 면적입니다. 면적은 평가 시 작음,중간,큰 박스 간의 점수를 내기 위한 기준이며 COCO 평가를 기준으로 합니다.
@@ -42,7 +42,7 @@ TorchVision 객체 검출 미세조정(Finetuning) 튜토리얼
       새로운 키포인트 표현에 대해 "references/detection/transforms.py" 코드 부분을 수정 해야 할 수도 있습니다.
 
 모델이 위의 방법대로 리턴을 하면, 학습과 평가 둘 다에 대해서 동작을 할 것이며
-평가 스크립트는 ``pycocotools`` 를 사용하게 될 것입니다.
+평가 스크립트는 `pip install pycocotools`` 로 설치 가능한 ``pycocotools`` 를 사용하게 될 것입니다.
 
 .. note ::
   윈도우즈에서는 ``pip install git+https://github.com/gautamchitnis/cocoapi.git@cocodataset-master#subdirectory=PythonAPI``
@@ -58,7 +58,7 @@ TorchVision 객체 검출 미세조정(Finetuning) 튜토리얼
 사용자 정의 메소드를 제공하는 것보다 느릴 수 있습니다.
 
 PennFudan를 위한 사용자 정의 데이터셋 작성하기
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 PennFudan 데이터셋을 위한 코드를 작성해 보겠습니다.
 `다운로드 후 압축 파일을 해제하면<https://www.cis.upenn.edu/~jshi/ped_html/PennFudanPed.zip>`__,
@@ -98,7 +98,7 @@ PennFudan 데이터셋을 위한 코드를 작성해 보겠습니다.
    from PIL import Image
 
 
-   class PennFudanDataset(object):
+   class PennFudanDataset(torch.utils.data.Dataset):
        def __init__(self, root, transforms):
            self.root = root
            self.transforms = transforms
@@ -239,7 +239,7 @@ COCO에 대해 미리 학습된 모델에서 시작하여 특정 클래스를 �
    # 만약 백본이 텐서를 리턴할때, featmap_names 는 [0] 이 될 것이라고 예상합니다.
    # 일반적으로 백본은 OrderedDict[Tensor] 타입을 리턴해야 합니다.
    # 그리고 특징맵에서 사용할 featmap_names 값을 정할 수 있습니다.
-   roi_pooler = torchvision.ops.MultiScaleRoIAlign(featmap_names=[0],
+   roi_pooler = torchvision.ops.MultiScaleRoIAlign(featmap_names=['0'],
                                                    output_size=7,
                                                    sampling_ratio=2)
 
@@ -284,16 +284,17 @@ PennFudan 데이터셋을 위한 인스턴스 분할 모델
 
        return model
 
-그렇습니다. 이렇게 하면 ``모델``을 사용자 정의 데이터셋에서 학습하고 평가할 준비가 될 겁니다.
+
+그렇습니다. 이렇게 하면 ``모델`` 을 사용자 정의 데이터셋에서 학습하고 평가할 준비가 될 겁니다.
 
 
 모든 것을 하나로 합치기
 ---------------------------
 
-``references/detection/`` 폴더내에 검출 모델들의 학습과 평과를 쉽게 하기 위한 도움 함수들이 있습니다.
+``references/detection/`` 폴더 내에 검출 모델들의 학습과 평과를 쉽게 하기 위한 도움 함수들이 있습니다.
 여기서 ``references/detection/engine.py``, ``references/detection/utils.py``,
 ``references/detection/transforms.py`` 를 사용 할 것입니다.
-위 파일들을 폴더로 복사하고 사용합시다.
+``references/detection`` 아래의 모든 파일과 폴더들을 사용자의 폴더로 복사한 뒤 사용합니다.
 
 데이터 증강 / 변환을 위한 도움 함수를 작성해 봅시다
 
@@ -500,5 +501,5 @@ COCO train2017에 대해 미리 학습된 Mask R-CNN 모델을 활용 했습니�
 다중머신 / 다중GPU 에서의 학습을 포함하는 더 복잡한 예제를 알고 싶다면
 torchvision 저장소에 있는 ``references/detection/train.py`` 를 확인해 보세요.
 
-`여기 <https://pytorch.org/tutorials/_static/tv-training-code.py>`__
+`여기 <https://tutorials.pytorch.kr/_static/tv-training-code.py>`__
 에서 이번 튜토리얼의 전체 소스코드를 다운 받으실 수 있습니다.

@@ -190,7 +190,7 @@ implement batch RPC applications using the
 `@rpc.functions.async_execution <https://pytorch.org/docs/master/rpc.html#torch.distributed.rpc.functions.async_execution>`__
 decorator. In the next section, we re-implement the reinforcement learning
 example in the previous
-`Getting started with Distributed RPC Framework <https://pytorch.org/tutorials/intermediate/rpc_tutorial.html>`__
+`Getting started with Distributed RPC Framework <https://tutorials.pytorch.kr/intermediate/rpc_tutorial.html>`__
 tutorial using batch processing, and demonstrate its impact on the training
 speed.
 
@@ -264,7 +264,7 @@ which will be presented shortly, and this function will be decorated with
             self.select_action = Agent.select_action_batch if batch else Agent.select_action
 
 Compared to the previous tutorial
-`Getting started with Distributed RPC Framework <https://pytorch.org/tutorials/intermediate/rpc_tutorial.html>`__,
+`Getting started with Distributed RPC Framework <https://tutorials.pytorch.kr/intermediate/rpc_tutorial.html>`__,
 observers behave a little differently. Instead of exiting when the environment
 is stopped, it always runs ``n_steps`` iterations in every episode. When the
 environment returns, the observer simply resets the environment and start over

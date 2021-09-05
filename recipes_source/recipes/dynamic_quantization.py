@@ -74,6 +74,7 @@
    실제로 학습된 네트워크의 정확도 손실 기댓값이 어떻게 되는지는
    살펴보지 않을 것입니다.
 
+
 여러분은 동적 양자화가 어떻게 진행되는지 살펴보고, 이를 통해 메모리
 사용량과 응답 시간이 줄어든다는 점을 살펴볼 것입니다. 이 기법을
 학습된 LSTM에 적용하더라도 정확도를 높은 수준으로 유지할 수 있음을
@@ -81,6 +82,7 @@
 좀 더 엄밀한 내용으로 넘어가고 싶다면 `고급 동적 양자화 튜토리얼
 <https://pytorch.org/tutorials/advanced/dynamic_quantization_tutorial.html>`__
 을 참고하시기 바랍니다.
+
 
 단계
 ----
@@ -123,6 +125,7 @@ import copy
 import os
 import time
 
+
 # 설명을 위해 아주 아주 간단한 LSTM을 정의합니다
 # 여기서는 레이어가 하나 뿐이고 사전 작업이나 사후 작업이 없는
 # nn.LSTM을 감싸서 사용합니다
@@ -130,6 +133,7 @@ import time
 # https://pytorch.org/tutorials/beginner/nlp/sequence_models_tutorial.html 과
 # https://pytorch.org/tutorials/advanced/dynamic_quantization_tutorial.html 에서
 # 영감을 받은 부분입니다
+
 class lstm_for_demonstration(nn.Module):
   """기초적인 LSTM모델로, 단순히 nn.LSTM 를 감싼 것입니다.
      설명용 예시 이외의 용도로 사용하기에는 적합하지 않습니다.
@@ -218,10 +222,6 @@ f=print_size_of_model(float_lstm,"fp32")
 q=print_size_of_model(quantized_lstm,"int8")
 print("{0:.2f} times smaller".format(f/q))
 
-# PyTorch 1.4 에서는 https://github.com/pytorch/pytorch/issues/31468 와
-# 같은 이유로 그 값이 잘못될 수 있습니다
-# 이는 1.5에서 고쳐질 예정입니다 https://github.com/pytorch/pytorch/pull/31540
-
 
 ######################################################################
 # 4. 응답 시간 살펴보기
@@ -281,6 +281,10 @@ print('mean absolute value of the difference between the output tensors is {0:.5
 # 우리는 동적 양자화가 무엇이며 어떤 이점이 있는지 살펴보았고, 간단한
 # LSTM 모델을 빠르게 양자화하기 위해 ``torch.quantization.quantize_dynamic()``
 # 함수를 사용했습니다.
+#
+# 이 문서는 빠르고 고수준의 내용입니다. 좀 더 자세하게 보시려면,
+# `(beta) Dynamic Quantization on an LSTM Word Language Model Tutorial <https://tutorials.pytorch.kr/advanced/dynamic\_quantization\_tutorial.html>`_
+# 방문하여 보시기 바랍니다
 #
 # 이 레시피에서는 이러한 내용을 빠르게, 그리고 고수준에서 살펴 보았습니다.
 # 좀 더 자세한 내용을 알아보고 싶다면 `(베타) LSTM 언어 모델 동적 양자화

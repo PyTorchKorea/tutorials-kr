@@ -176,7 +176,7 @@ C++ 추론 엔진 빌드하고 실행하기
 -  `Full TorchScript documentation`_ 에서 전체 TorchScript 언어 및 API를 참조할 수 있습니다.
 
 .. _pytorch.org: https://pytorch.org/
-.. _Introduction to TorchScript tutorial: https://pytorch.org/tutorials/beginner/Intro_to_TorchScript_tutorial.html
+.. _Introduction to TorchScript tutorial: https://tutorials.pytorch.kr/beginner/Intro_to_TorchScript_tutorial.html
 .. _Full TorchScript documentation: https://pytorch.org/docs/stable/jit.html
-.. _Loading A TorchScript Model in C++ tutorial: https://pytorch.org/tutorials/advanced/cpp_export.html
+.. _Loading A TorchScript Model in C++ tutorial: https://tutorials.pytorch.kr/advanced/cpp_export.html
 .. _full TorchScript documentation: https://pytorch.org/docs/stable/jit.html

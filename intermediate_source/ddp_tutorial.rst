@@ -2,6 +2,8 @@ Getting Started with Distributed Data Parallel
 =================================================
 **Author**: `Shen Li <https://mrshenli.github.io/>`_
 
+**Edited by**: `Joe Zhu <https://github.com/gunandrose4u>`_
+
 Prerequisites:
 
 -  `PyTorch Distributed Overview <../beginner/dist_overview.html>`__
@@ -13,7 +15,7 @@ Prerequisites:
 (DDP) implements data parallelism at the module level which can run across
 multiple machines. Applications using DDP should spawn multiple processes and
 create a single DDP instance per process. DDP uses collective communications in the
-`torch.distributed <https://pytorch.org/tutorials/intermediate/dist_tuto.html>`__
+`torch.distributed <https://tutorials.pytorch.kr/intermediate/dist_tuto.html>`__
 package to synchronize gradients and buffers. More specifically, DDP registers
 an autograd hook for each parameter given by ``model.parameters()`` and the
 hook will fire when the corresponding gradient is computed in the backward
@@ -48,7 +50,7 @@ consider using ``DistributedDataParallel`` over ``DataParallel``:
   contention across threads, per-iteration replicated model, and additional
   overhead introduced by scattering inputs and gathering outputs.
 - Recall from the
-  `prior tutorial <https://pytorch.org/tutorials/intermediate/model_parallel_tutorial.html>`__
+  `prior tutorial <https://tutorials.pytorch.kr/intermediate/model_parallel_tutorial.html>`__
   that if your model is too large to fit on a single GPU, you must use **model parallel**
   to split it across multiple GPUs. ``DistributedDataParallel`` works with
   **model parallel**; ``DataParallel`` does not at this time. When DDP is combined
@@ -63,11 +65,12 @@ Basic Use Case
 
 To create DDP modules, first set up process groups properly. More details can
 be found in
-`Writing Distributed Applications with PyTorch <https://pytorch.org/tutorials/intermediate/dist_tuto.html>`__.
+`Writing Distributed Applications with PyTorch <https://tutorials.pytorch.kr/intermediate/dist_tuto.html>`__.
 
 .. code:: python
 
     import os
+    import sys
     import tempfile
     import torch
     import torch.distributed as dist
@@ -77,6 +80,17 @@ be found in
 
     from torch.nn.parallel import DistributedDataParallel as DDP
 
+    # On Windows platform, the torch.distributed package only
+    # supports Gloo backend, FileStore and TcpStore.
+    # For FileStore, set init_method parameter in init_process_group
+    # to a local file. Example as follow:
+    # init_method="file:///f:/libtmp/some_file"
+    # dist.init_process_group(
+    #    "gloo",
+    #    rank=rank,
+    #    init_method=init_method,
+    #    world_size=world_size)
+    # For TcpStore, same way as on Linux.
 
     def setup(rank, world_size):
         os.environ['MASTER_ADDR'] = 'localhost'
@@ -84,7 +98,6 @@ be found in
 
         # initialize the process group
         dist.init_process_group("gloo", rank=rank, world_size=world_size)
-
 
     def cleanup():
         dist.destroy_process_group()
@@ -161,7 +174,7 @@ Save and Load Checkpoints
 
 It's common to use ``torch.save`` and ``torch.load`` to checkpoint modules
 during training and recover from checkpoints. See
-`SAVING AND LOADING MODELS <https://pytorch.org/tutorials/beginner/saving_loading_models.html>`__
+`SAVING AND LOADING MODELS <https://tutorials.pytorch.kr/beginner/saving_loading_models.html>`__
 for more details. When using DDP, one optimization is to save the model in
 only one process and then load it to all processes, reducing write overhead.
 This is correct because all processes start from the same parameters and

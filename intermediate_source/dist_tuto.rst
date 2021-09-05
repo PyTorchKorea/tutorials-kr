@@ -42,7 +42,7 @@ PyTorch에 포함된 분산 패키지(예. ``torch.distributed``)는 연구자�
     import os
     import torch
     import torch.distributed as dist
-    from torch.multiprocessing import Process
+    import torch.multiprocessing as mp
 
     def run(rank, size):
         """ Distributed function to be implemented later. """
@@ -78,7 +78,7 @@ PyTorch에 포함된 분산 패키지(예. ``torch.distributed``)는 연구자�
 ``dist.init_process_group`` 에서 일어나는 놀라운 일을 살펴볼 것이지만, 기본적으로는
 프로세스가 자신의 위치를 공유함으로써 서로 통신할 수 있도록 합니다.
 
-지점-대-지점 간(Point-to-Point) 통신
+점-대-점 간(Point-to-Point) 통신
 ---------------------------------------
 
 .. figure:: /_static/img/distributed/send_recv.png
@@ -89,13 +89,13 @@ PyTorch에 포함된 분산 패키지(예. ``torch.distributed``)는 연구자�
    송신과 수신
 
 
-하나의 프로세스에서 다른 프로세스로 데이터를 전송하는 것을 지점-대-지점 간 통신이라고 합니다.
+하나의 프로세스에서 다른 프로세스로 데이터를 전송하는 것을 점-대-점 간 통신이라고 합니다.
 지점간 통신은  ``send`` 와 ``recv`` 함수 또는 즉시 응답하는(*immediate* counter-parts)
 ``isend`` 와 ``irecv`` 를 사용합니다.
 
 .. code:: python
 
-    """블로킹(blocking) 지점-대-지점 간 통신"""
+    """블로킹(blocking) 점-대-점 간 통신"""
 
     def run(rank, size):
         tensor = torch.zeros(1)
@@ -118,7 +118,7 @@ PyTorch에 포함된 분산 패키지(예. ``torch.distributed``)는 연구자�
 
 .. code:: python
 
-    """논-블로킹(non-blocking) 지점-대-지점 간 통신"""
+    """논-블로킹(non-blocking) 점-대-점 간 통신"""
 
     def run(rank, size):
         tensor = torch.zeros(1)
@@ -145,7 +145,7 @@ PyTorch에 포함된 분산 패키지(예. ``torch.distributed``)는 연구자�
 그러나, ``req.wait()`` 를 실행한 후에는 통신이 이루어진 것을 보장받을 수 있기 때문에,
 ``tensor[0]`` 에 저장된 값은 1.0이 됩니다.
 
-지점-대-지점 간 통신은 프로세스 간 통신에 대한 세밀한 제어를 원할 때 유용합니다.
+점-대-점 간 통신은 프로세스 간 통신에 대한 세밀한 제어를 원할 때 유용합니다.
 `바이두(Baidu)의 DeepSpeech <https://github.com/baidu-research/baidu-allreduce>`__ 나
 `페이스북(Facebook)의 대규모 실험 <https://research.fb.com/publications/imagenet1kin1h/>`__
 에서 사용하는 것과 같은 멋진 알고리즘을 구현할 때 사용할 수 있습니다.
@@ -178,7 +178,7 @@ PyTorch에 포함된 분산 패키지(예. ``torch.distributed``)는 연구자�
 +----------------------------------------------------+-----------------------------------------------------+
 
 
-지점-대-지점 간 통신과 달리 집합 통신은 **그룹** 의 모든 프로세스에 걸친 통신 패턴을
+점-대-점 간 통신과 달리 집합 통신은 **그룹** 의 모든 프로세스에 걸친 통신 패턴을
 허용합니다. 그룹은 모든 프로세스의 부분 집합입니다. 그룹을 생성하기 위해서는
 ``dist.new_group(group)`` 에 순서(rank) 목록을 전달합니다. 기본적으로, 집합 통신은
 **월드(world)** 라고 부르는 전체 프로세스에서 실행됩니다. 예를 들어, 모든 프로세스에
@@ -189,21 +189,21 @@ PyTorch에 포함된 분산 패키지(예. ``torch.distributed``)는 연구자�
 
     """ All-Reduce 예제 """
     def run(rank, size):
-        """ 간단한 지점-대-지점 간 통신 """
+        """ 간단한 집합 통신 """
         group = dist.new_group([0, 1])
         tensor = torch.ones(1)
-        dist.all_reduce(tensor, op=dist.reduce_op.SUM, group=group)
+        dist.all_reduce(tensor, op=dist.ReduceOp.SUM, group=group)
         print('Rank ', rank, ' has data ', tensor[0])
 
-그룹 내의 모든 Tensor들의 합이 필요하기 떄문에, ``dist.reduce_op.SUM`` 을
+그룹 내의 모든 Tensor들의 합이 필요하기 떄문에, ``dist.ReduceOp.SUM`` 을
 리듀스(reduce) 연산자로 사용하였습니다. 일반적으로, 교환 법칙이 허용되는(commutative)
 모든 수학 연산을 연산자로 사용할 수 있습니다. PyTorch는 요소별(element-wise)로
 동작하는 기본적으로 4개의 연산자를 제공합니다.
 
--  ``dist.reduce_op.SUM``,
--  ``dist.reduce_op.PRODUCT``,
--  ``dist.reduce_op.MAX``,
--  ``dist.reduce_op.MIN``.
+-  ``dist.ReduceOp.SUM``,
+-  ``dist.ReduceOp.PRODUCT``,
+-  ``dist.ReduceOp.MAX``,
+-  ``dist.ReduceOp.MIN``.
 
 PyTorch에는 현재 ``dist.all_reduce(tensor, op, group)`` 외에도 6개의 집합 통신이
 구현되어 있습니다.
@@ -214,9 +214,9 @@ PyTorch에는 현재 ``dist.all_reduce(tensor, op, group)`` 외에도 6개의 �
    결과를 ``dst`` 에 저장합니다.
 -  ``dist.all_reduce(tensor, op, group)``: 리듀스와 동일하지만, 결과가 모든
    프로세스에 저장됩니다.
--  ``dist.scatter(tensor, src, scatter_list, group)``: :math:`i^{\text{번째}}` Tensor
+-  ``dist.scatter(tensor, scatter_list, src, group)``: :math:`i^{\text{번째}}` Tensor
    ``scatter_list[i]`` 를 :math:`i^{\text{번째}}` 프로세스에 복사합니다.
--  ``dist.gather(tensor, dst, gather_list, group)``: ``dst`` 의 모든 프로세스에서
+-  ``dist.gather(tensor, gather_list, dst, group)``: ``dst`` 의 모든 프로세스에서
    ``tensor`` 를 복사합니다.
 -  ``dist.all_gather(tensor_list, tensor, group)``: 모든 프로세스의 ``tensor`` 를
    모든 프로세스의 ``tensor_list`` 에 복사합니다.
@@ -350,7 +350,7 @@ PyTorch에는 현재 ``dist.all_reduce(tensor, op, group)`` 외에도 6개의 �
     def average_gradients(model):
         size = float(dist.get_world_size())
         for param in model.parameters():
-            dist.all_reduce(param.grad.data, op=dist.reduce_op.SUM)
+            dist.all_reduce(param.grad.data, op=dist.ReduceOp.SUM)
             param.grad.data /= size
 
 *완성(Et voilà)*! 분산 동기(synchronous) SGD를 성공적으로 구현했으며 어떤 모델도
@@ -365,7 +365,7 @@ PyTorch에는 현재 ``dist.all_reduce(tensor, op, group)`` 외에도 6개의 �
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 추가로 DeepSpeech의 효율적인 링 올리듀스(ring allreduce)를 구현하고 싶다고 가정해보겠습니다.
-이것은 지점-대-지점 집합 통신(point-to-point collectives)으로 쉽게 구현할 수 있습니다.
+이것은 점-대-점 집합 통신(point-to-point collectives)으로 쉽게 구현할 수 있습니다.
 
 .. code:: python
 
@@ -444,7 +444,7 @@ CUDA Tensor에 대한 집합 연산 구현은 NCCL 백엔드에서 제공하는 
 **MPI 백엔드**
 
 MPI(Message Passing Interface)는 고성능 컴퓨팅 분야의 표준 도구입니다.
-이는 지점-대-지점 간 통신과 집합 통신을 허용하며 ``torch.distributed`` 의 API에
+이는 점-대-점 간 통신과 집합 통신을 허용하며 ``torch.distributed`` 의 API에
 영감을 주었습니다. 다양한 목적에 따라 최적화된 몇몇 MPI 구현체들(예.
 `Open-MPI <https://www.open-mpi.org/>`__,
 `MVAPICH2 <http://mvapich.cse.ohio-state.edu/>`__,

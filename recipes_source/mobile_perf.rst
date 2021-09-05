@@ -72,7 +72,7 @@ Code your model:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Do not be confused that fuse_modules is in the quantization package.
-It works for all ``torcn.nn.Module``.
+It works for all ``torch.nn.Module``.
 
 ``torch.quantization.fuse_modules`` fuses a list of modules into a single module.
 It fuses only the following sequence of modules:
@@ -99,7 +99,7 @@ Quantization of the model not only moves computation to int8,
 but also reduces the size of your model on a disk.
 That size reduction helps to reduce disk read operations during the first load of the model and decreases the amount of RAM.
 Both of those resources can be crucial for the performance of mobile applications.
-This code does quantization, using stub for model calibration function, you can find more about it `here <https://pytorch.org/tutorials/advanced/static_quantization_tutorial.html#post-training-static-quantization>`__.
+This code does quantization, using stub for model calibration function, you can find more about it `here <https://tutorials.pytorch.kr/advanced/static_quantization_tutorial.html#post-training-static-quantization>`__.
 
 ::
 
@@ -237,7 +237,7 @@ Now we are ready to benchmark your model:
 
 ::
 
-  adb shell "/data/local/tmp/speed_benchmark_torch --model="/data/local/tmp/model.pt" --input_dims="1,3,224,224" --input_type="float"
+  adb shell "/data/local/tmp/speed_benchmark_torch --model=/data/local/tmp/model.pt" --input_dims="1,3,224,224" --input_type="float"
   ----- output -----
   Starting benchmark.
   Running warmup runs.
@@ -248,9 +248,9 @@ Now we are ready to benchmark your model:
 iOS - Benchmarking Setup
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-For iOS, we'll be using our `TestApp <https://github.com/pytorch/pytorch/tree/master/ios/TestApp>`_ as the benchmarking tool. 
+For iOS, we'll be using our `TestApp <https://github.com/pytorch/pytorch/tree/master/ios/TestApp>`_ as the benchmarking tool.
 
-To begin with, let's apply the ``optimize_for_mobile`` method to our python script located at `TestApp/benchmark/trace_mode.py <https://github.com/pytorch/pytorch/blob/master/ios/TestApp/benchmark/trace_model.py>`_. Simply modify the code as below.
+To begin with, let's apply the ``optimize_for_mobile`` method to our python script located at `TestApp/benchmark/trace_model.py <https://github.com/pytorch/pytorch/blob/master/ios/TestApp/benchmark/trace_model.py>`_. Simply modify the code as below.
 
 ::
 
@@ -265,7 +265,7 @@ To begin with, let's apply the ``optimize_for_mobile`` method to our python scri
   torchscript_model_optimized = optimize_for_mobile(traced_script_module)
   torch.jit.save(torchscript_model_optimized, "model.pt")
 
-Now let's run ``python trace_model.py``. If everything works well, we should be able to generate our optimized model in the benchmark directory. 
+Now let's run ``python trace_model.py``. If everything works well, we should be able to generate our optimized model in the benchmark directory.
 
 Next, we're going to build the PyTorch libraries from source.
 
@@ -273,7 +273,7 @@ Next, we're going to build the PyTorch libraries from source.
 
   BUILD_PYTORCH_MOBILE=1 IOS_ARCH=arm64 ./scripts/build_ios.sh
 
-Now that we have the optimized model and PyTorch ready, it's time to generate our XCode project and do benchmarking. To do that, we'll be using a ruby script - `setup.rb` which does the heavy lifting jobs of setting up the XCode project. 
+Now that we have the optimized model and PyTorch ready, it's time to generate our XCode project and do benchmarking. To do that, we'll be using a ruby script - `setup.rb` which does the heavy lifting jobs of setting up the XCode project.
 
 ::
 
