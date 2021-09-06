@@ -1,116 +1,81 @@
 # -*- coding: utf-8 -*-
 """
-DCGAN Tutorial
+DCGAN 튜토리얼
 ==============
 
-**Author**: `Nathan Inkawhich <https://github.com/inkawhich>`__
+**저자**: `Nathan Inkawhich <https://github.com/inkawhich>`_
+ **번역**: `조민성 <https://github.com/miNept>`_
 
 """
 
 
 ######################################################################
-# Introduction
-# ------------
+# 개요
+# ----
+#
+# 본 튜토리얼에서는 예제를 통해 DCGAN을 알아보겠습니다. 우리는 실제 유명인들의 사진들로 적대적 생성 신경망(GAN)을 훈련시켜, 새로운 유명인의 사진을 만들어볼겁니다. 
+# 사용할 대부분의 코드는 `pytorch/examples <https://github.com/pytorch/examples>`__ 의 DCGAN 구현에서 가져왔으며, 
+# 본 문서는 구현에 대한 설명과 함께, 어째서 이 모델이 작동하는지에 대한 실마리를 줄겁니다. 처음 읽었을때는, 실제로 모델에 무슨일이 일어나고 있는지에 대해 이해하는 것이 조금 시간을 소요할 수 있으나, 
+# 그래도 GAN에 대한 사전지식이 필요하지는 않으니 걱정하지 않으셔도 됩니다. 추가적으로는 GPU 1-2개를 사용하는 것이 시간절약에 도움이 될겁니다. 그럼 처음부터 천천히 시작해봅시다!
 # 
-# This tutorial will give an introduction to DCGANs through an example. We
-# will train a generative adversarial network (GAN) to generate new
-# celebrities after showing it pictures of many real celebrities. Most of
-# the code here is from the dcgan implementation in
-# `pytorch/examples <https://github.com/pytorch/examples>`__, and this
-# document will give a thorough explanation of the implementation and shed
-# light on how and why this model works. But don’t worry, no prior
-# knowledge of GANs is required, but it may require a first-timer to spend
-# some time reasoning about what is actually happening under the hood.
-# Also, for the sake of time it will help to have a GPU, or two. Lets
-# start from the beginning.
+# 적대적 생성 신경망(Generative Adversarial Networks)
+# --------------------------------------------------
 # 
-# Generative Adversarial Networks
-# -------------------------------
+# 그래서 GAN이 뭘까요?
+# ~~~~~~~~~~~~~~~~~~~
+#
+# GAN이란 학습 데이터들의 분포를 학습해, 같은 분포에서 새로운 데이터를 생성할 수 있도록 DL 모델을 훈련시키는 프레임워크입니다. 
+# 2014년 Ian Goodfellow가 개발했으며, `Generative Adversarial
+# Nets <https://papers.nips.cc/paper/5423-generative-adversarial-nets.pdf>`__ 논문에서 처음 소개되었습니다. GAN은 *생성자* 와 *구분자* 로 구별되는 두가지 모델을 가지고 있는것이 특징입니다. 
+# 생성자의 역할은 실제 이미지로 착각되도록 정교한 이미지를 만드는 것이고, 구분자의 역할은 이미지를 보고 생성자에 의해 만들어진 이미지인지 실제 이미지인지 알아내는 것입니다. 
+# 모델을 훈련하는 동안, 생성자는 더 진짜같은 가짜 이미지를 만들어내며 구분자를 속이려 하고, 구분자는 더 정확히 가짜/진짜 이미지를 구별할 수 있도록 노력합니다. 
+# 이 ‘경찰과 도둑’ 게임은, 생성자가 학습 데이터들에서 직접 가져온 것처럼 보일정도로 완벽한 이미지를 만들어내고, 
+# 구분자가 생성자에서 나온 이미지를 50%의 확률로 가짜 혹은 진짜로 판별할 때, 평형상태에 도달하게 됩니다.
 # 
-# What is a GAN?
-# ~~~~~~~~~~~~~~
+# 그럼 이제부터 본 튜토리얼에서 사용할 표기들을 구분자부터 정의해보겠습니다. :math:`x` 는 이미지로 표현되는 데이터로 두겠습니다. 
+# :math:`D(x)` 는, 통상적으로 생성자가 만들어낸 이미지보다는 실제 학습데이터에서 가져온 :math:`x` 를 통과시킨 구분자 신경망(network)을 뜻합니다. 
+# 이때, 우리는 이미지 데이터를 다루고 있으므로, :math:`D(x)` 에는 3x64x64크기의 CHW 데이터가 입력됩니다. 직관적으로 볼때, 
+# :math:`D(x)` 는 :math:`x` 가 학습데이터에서 가져온 것일 때 출력이 크고, 생성자가 만들어낸 :math:`x` 일때 작을 것입니다. :math:`D(x)` 는 전통적인 이진 분류기(binary classification)으로도 생각될 수 있습니다.
 # 
-# GANs are a framework for teaching a DL model to capture the training
-# data’s distribution so we can generate new data from that same
-# distribution. GANs were invented by Ian Goodfellow in 2014 and first
-# described in the paper `Generative Adversarial
-# Nets <https://papers.nips.cc/paper/5423-generative-adversarial-nets.pdf>`__.
-# They are made of two distinct models, a *generator* and a
-# *discriminator*. The job of the generator is to spawn ‘fake’ images that
-# look like the training images. The job of the discriminator is to look
-# at an image and output whether or not it is a real training image or a
-# fake image from the generator. During training, the generator is
-# constantly trying to outsmart the discriminator by generating better and
-# better fakes, while the discriminator is working to become a better
-# detective and correctly classify the real and fake images. The
-# equilibrium of this game is when the generator is generating perfect
-# fakes that look as if they came directly from the training data, and the
-# discriminator is left to always guess at 50% confidence that the
-# generator output is real or fake.
+# 이번엔 생성자의 표기들을 확인해봅시다. :math:`z` 를 정규분포에서 뽑은 잠재공간 벡터(laten space vector)라고 하겠습니다 
+# (번역 주. laten space vector는 쉽게 생각해 정규분포를 따르는 n개의 원소를 가진 vector라 볼 수 있습니다. 다르게 얘기하면 정규분포에서 n개의 원소를 추출한 것과 같습니다). :math:`G(z)` 는 :math:`z` 
+# 벡터를 원하는 데이터 차원으로 대응시키는 신경망으로 둘 수 있습니다. 이때 :math:`G` 의 목적은 :math:`p_{data}`
+# 에서 얻을 수 있는 학습 데이터들의 분포를 추정하여, 모사한 :math:`p_g` 의 분포를 이용해 가짜 데이터들을 만드는 것입니다.
 # 
-# Now, lets define some notation to be used throughout tutorial starting
-# with the discriminator. Let :math:`x` be data representing an image.
-# :math:`D(x)` is the discriminator network which outputs the (scalar)
-# probability that :math:`x` came from training data rather than the
-# generator. Here, since we are dealing with images, the input to
-# :math:`D(x)` is an image of CHW size 3x64x64. Intuitively, :math:`D(x)`
-# should be HIGH when :math:`x` comes from training data and LOW when
-# :math:`x` comes from the generator. :math:`D(x)` can also be thought of
-# as a traditional binary classifier.
-# 
-# For the generator’s notation, let :math:`z` be a latent space vector
-# sampled from a standard normal distribution. :math:`G(z)` represents the
-# generator function which maps the latent vector :math:`z` to data-space.
-# The goal of :math:`G` is to estimate the distribution that the training
-# data comes from (:math:`p_{data}`) so it can generate fake samples from
-# that estimated distribution (:math:`p_g`).
-# 
-# So, :math:`D(G(z))` is the probability (scalar) that the output of the
-# generator :math:`G` is a real image. As described in `Goodfellow’s
-# paper <https://papers.nips.cc/paper/5423-generative-adversarial-nets.pdf>`__,
-# :math:`D` and :math:`G` play a minimax game in which :math:`D` tries to
-# maximize the probability it correctly classifies reals and fakes
-# (:math:`logD(x)`), and :math:`G` tries to minimize the probability that
-# :math:`D` will predict its outputs are fake (:math:`log(1-D(G(z)))`).
-# From the paper, the GAN loss function is
+# 이어서, :math:`D(G(z))` 는 :math:`G` 가 출력한 결과물이 실제 이미지일 0~1사이의 확률값입니다. `Goodfellow의 논문 <https://papers.nips.cc/paper/5423-generative-adversarial-nets.pdf>`__ 
+# 에 기술되어 있듯, :math:`D` 가 이미지의 참/거짓을 정확히 판별할 확률인 :math:`logD(x)`를 최대화 시키고, :math:`G` 에서 생성한 이미지를 :math:`D` 가 가짜로 판별할 확률인 
+# (:math:`log(1-D(G(z)))`)를 최소화 시키려는 점에서, :math:`D` 와 :math:`G` 는 최대최소(minmax)게임을 하는 것과 같습니다. 논문에 따르면, GAN의 손실함수는 아래와 같습니다.
 # 
 # .. math:: \underset{G}{\text{min}} \underset{D}{\text{max}}V(D,G) = \mathbb{E}_{x\sim p_{data}(x)}\big[logD(x)\big] + \mathbb{E}_{z\sim p_{z}(z)}\big[log(1-D(G(z)))\big]
 # 
-# In theory, the solution to this minimax game is where
-# :math:`p_g = p_{data}`, and the discriminator guesses randomly if the
-# inputs are real or fake. However, the convergence theory of GANs is
-# still being actively researched and in reality models do not always
-# train to this point.
+# 이론적으로는, 이 최대최소게임은 :math:`p_g = p_{data}` 이고, 구분자에 입력된 데이터가 1/2의 무작위 확률로 참/거짓이 판별될때 해답에 이릅니다. 
+# 하지만 GAN의 수렴 이론은 아직도 활발히 연구가 진행중이고, 현실에서의 모델들은 이론적인 최적 상태에 도달하지 않는 경우도 많습니다.
+#
+# 그렇다면 DCGAN은 뭘까요?
+# ~~~~~~~~~~~~~~~~~~~~~~~~
 # 
-# What is a DCGAN?
-# ~~~~~~~~~~~~~~~~
-# 
-# A DCGAN is a direct extension of the GAN described above, except that it
-# explicitly uses convolutional and convolutional-transpose layers in the
-# discriminator and generator, respectively. It was first described by
-# Radford et. al. in the paper `Unsupervised Representation Learning With
+# DCGAN은 위에서 기술한 GAN에서 직접적으로 파생된 모델로, 생성자와 구분자에서
+# 합성곱 신경망(convolution)과 전치 합성곱 신경망(convolution-transpose)을 사용했다는 것이 차이점입니다
+# Radford와 그 외가 저술한 `Unsupervised Representation Learning With
 # Deep Convolutional Generative Adversarial
-# Networks <https://arxiv.org/pdf/1511.06434.pdf>`__. The discriminator
-# is made up of strided
+# Networks <https://arxiv.org/pdf/1511.06434.pdf>`__ 논문에서 처음 모델이 소개되었고, 지금은 대부분의 GAN모델이
+# DCGAN을 기반으로 만들어지는 중입니다. 이전 GAN과 모델의 구조가 실제로 어떻게 다른지 확인을 해보자면, 먼저 구분자에서는
 # `convolution <https://pytorch.org/docs/stable/nn.html#torch.nn.Conv2d>`__
-# layers, `batch
+# 계층, `batch
 # norm <https://pytorch.org/docs/stable/nn.html#torch.nn.BatchNorm2d>`__
-# layers, and
+# 계층, 그리고
 # `LeakyReLU <https://pytorch.org/docs/stable/nn.html#torch.nn.LeakyReLU>`__
-# activations. The input is a 3x64x64 input image and the output is a
-# scalar probability that the input is from the real data distribution.
-# The generator is comprised of
+# 활성함수가 사용되었습니다. 클래식한 GAN과 마찬가지로, 구분자의 입력 데이터는 3x64x64 의 이미지이고, 
+# 출력값은 입력 데이터가 실제 데이터일 0~1사이의 확률값입니다.
+# 다음으로, 생성자는 
 # `convolutional-transpose <https://pytorch.org/docs/stable/nn.html#torch.nn.ConvTranspose2d>`__
-# layers, batch norm layers, and
-# `ReLU <https://pytorch.org/docs/stable/nn.html#relu>`__ activations. The
-# input is a latent vector, :math:`z`, that is drawn from a standard
-# normal distribution and the output is a 3x64x64 RGB image. The strided
-# conv-transpose layers allow the latent vector to be transformed into a
-# volume with the same shape as an image. In the paper, the authors also
-# give some tips about how to setup the optimizers, how to calculate the
-# loss functions, and how to initialize the model weights, all of which
-# will be explained in the coming sections.
-# 
+# 계층, 배치 정규화(batch norm) 계층, 그리고
+# `ReLU <https://pytorch.org/docs/stable/nn.html#relu>`__ 활성함수가 사용되었습니다. 입력값은 역시나
+# 정규분포에서 추출한 잠재공간 벡터 :math:`z` 이고, 출력값은 3x64x64 RGB 이미지입니다. 이때,
+# 전치 합성곱 신경망은 잠재공간 벡터로 하여금 이미지와 같은 차원을 갖도록 변환시켜주는 역할을 합니다 (번역 주. 전치 합성곱 신경망은 
+# 합성곱 신경망의 반대적인 개념이라 이해하면 쉽습니다. 입력된 작은 CHW 데이터를 가중치들을 이용해 더 큰 CHW로 업샘플링해주는 계층입니다). 
+# 논문에서는 각종 최적화 방법이나 손실함수의 계산, 모델의 가중치 초기화 방법등에 관한 추가적인 정보들도 적어두었는데,
+# 이 부분은 다음 섹션에서 설명하도록 하겠습니다.
 
 from __future__ import print_function
 #%matplotlib inline
@@ -131,101 +96,86 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from IPython.display import HTML
 
-# Set random seed for reproducibility
+# 코드 실행결과의 동일성을 위해 무작위 시드를 설정합니다
 manualSeed = 999
-#manualSeed = random.randint(1, 10000) # use if you want new results
+#manualSeed = random.randint(1, 10000) # 만일 새로운 결과를 원한다면 주석을 없애면 됩니다
 print("Random Seed: ", manualSeed)
 random.seed(manualSeed)
 torch.manual_seed(manualSeed)
 
 
 ######################################################################
-# Inputs
+# 설정값
 # ------
 # 
-# Let’s define some inputs for the run:
+# 몇가지 필수적인 설정값들을 정의해봅시다:
 # 
-# -  **dataroot** - the path to the root of the dataset folder. We will
-#    talk more about the dataset in the next section
-# -  **workers** - the number of worker threads for loading the data with
-#    the DataLoader
-# -  **batch_size** - the batch size used in training. The DCGAN paper
-#    uses a batch size of 128
-# -  **image_size** - the spatial size of the images used for training.
-#    This implementation defaults to 64x64. If another size is desired,
-#    the structures of D and G must be changed. See
-#    `here <https://github.com/pytorch/examples/issues/70>`__ for more
-#    details
-# -  **nc** - number of color channels in the input images. For color
-#    images this is 3
-# -  **nz** - length of latent vector
-# -  **ngf** - relates to the depth of feature maps carried through the
-#    generator
-# -  **ndf** - sets the depth of feature maps propagated through the
-#    discriminator
-# -  **num_epochs** - number of training epochs to run. Training for
-#    longer will probably lead to better results but will also take much
-#    longer
-# -  **lr** - learning rate for training. As described in the DCGAN paper,
-#    this number should be 0.0002
-# -  **beta1** - beta1 hyperparameter for Adam optimizers. As described in
-#    paper, this number should be 0.5
-# -  **ngpu** - number of GPUs available. If this is 0, code will run in
-#    CPU mode. If this number is greater than 0 it will run on that number
-#    of GPUs
+# -  **dataroot** - 데이터셋 폴더의 경로입니다. 데이터셋에 관한건 다음 섹션에서 
+#    더 자세히 설명하겠습니다.
+# -  **workers** - DataLoader에서 데이터를 불러올 때 사용할 쓰레드의 개수입니다.
+# -  **batch_size** - 학습에 사용할 배치 크기입니다. DCGAN에서는 128을 사용했습니다.
+# -  **image_size** - 학습에 사용되는 이미지의 크기입니다.
+#    본 문서에서는 64x64의 크기를 기본으로 하나, 만일 다른 크기의 이미지를 사용한다면
+#    D와 G의 구조 역시 변경되어야 합니다. 더 자세한 정보를 위해선
+#    `이곳 <https://github.com/pytorch/examples/issues/70>`__ 을 확인해 보세요.
+# -  **nc** - 입력 이미지의 색 채널개수입니다. RGB 이미지이기 때문에 3으로 설정합니다.
+# -  **nz** - 잠재공간 벡터의 원소들 개수입니다.
+# -  **ngf** - 생성자를 통과할때 만들어질 특징 데이터의 채널개수입니다.
+# -  **ndf** - 구분자를 통과할때 만들어질 특징 데이터의 채널개수입니다.
+# -  **num_epochs** - 훈련시킬 에폭 수입니다. 오래 훈련시키는 것이 대부분 좋은 결과를 보이지만, 당연히도 시간이 오래걸리는 것이 단점입니다.
+# -  **lr** - 모델의 학습률입니다. DCGAN에서 사용된대로 0.0002로 설정합니다.
+# -  **beta1** - Adam 옵티마이저에서 사용할 beta1 하이퍼파라미터 값입니다. 역시나 논문에서 사용한대로 0.5로 설정했습니다.
+# -  **ngpu** - 사용가능한 GPU의 번호입니다. 0으로 두면 CPU에서 학습하고, 0보다 큰 수로 설정하면 각 숫자가 가리키는 GPU로 학습시킵니다.
 # 
 
-# Root directory for dataset
+# 데이터셋의 경로
 dataroot = "data/celeba"
 
-# Number of workers for dataloader
+# dataloader에서 사용할 쓰레드 수
 workers = 2
 
-# Batch size during training
+# 배치 크기
 batch_size = 128
 
-# Spatial size of training images. All images will be resized to this
-#   size using a transformer.
+# 이미지의 크기입니다. 모든 이미지들은 transformer를 이용해 64로 크기가 통일됩니다.
 image_size = 64
 
-# Number of channels in the training images. For color images this is 3
+# 이미지의 채널 수로, RGB 이미지이기 때문에 3으로 설정합니다.
 nc = 3
 
-# Size of z latent vector (i.e. size of generator input)
+# 잠재공간 벡터의 크기 (i.e. 생성자의 입력값 크기)
 nz = 100
 
-# Size of feature maps in generator
+# 생성자를 통과하는 특징 데이터들의 채널 크기
 ngf = 64
 
-# Size of feature maps in discriminator
+# 구분자를 통과하는 특징 데이터들의 채널 크기
 ndf = 64
 
-# Number of training epochs
+# 에폭 수
 num_epochs = 5
 
-# Learning rate for optimizers
+# 학습률
 lr = 0.0002
 
-# Beta1 hyperparam for Adam optimizers
+# Adam 옵티마이저의 beta1 하이퍼파라미터
 beta1 = 0.5
 
-# Number of GPUs available. Use 0 for CPU mode.
+# 사용가능한 gpu 번호. CPU를 사용해야 하는경우 0으로 설정하세요
 ngpu = 1
 
 
 ######################################################################
-# Data
-# ----
+# 데이터
+# ------
 # 
-# In this tutorial we will use the `Celeb-A Faces
-# dataset <http://mmlab.ie.cuhk.edu.hk/projects/CelebA.html>`__ which can
-# be downloaded at the linked site, or in `Google
-# Drive <https://drive.google.com/drive/folders/0B7EVK8r0v71pTUZsaXdaSnZBZzg>`__.
-# The dataset will download as a file named *img_align_celeba.zip*. Once
-# downloaded, create a directory named *celeba* and extract the zip file
-# into that directory. Then, set the *dataroot* input for this notebook to
-# the *celeba* directory you just created. The resulting directory
-# structure should be:
+# 본 튜토리얼에서 사용할 데이터는 `Celeb-A Faces
+# dataset <http://mmlab.ie.cuhk.edu.hk/projects/CelebA.html>`__ 로, 해당 링크를 이용하거나 `Google
+# Drive <https://drive.google.com/drive/folders/0B7EVK8r0v71pTUZsaXdaSnZBZzg>`__ 에서 데이터를 받을 수 있습니다.
+# 데이터를 받으면 *img_align_celeba.zip* 라는 파일을 보게될 겁니다. 다운로드가 끝나면
+# *celeba* 이라는 폴더를 새로 만들고, 해당 폴더에 해당 zip 파일을 압축해제 해주시면 됩니다. 
+# 압축 해제 후, 위에서 정의한 *dataroot* 변수에 방금 만든 *celeba* 폴더의 경로를 넣어주세요. 
+# 위의 작업이 끝나면 *celeba* 폴더의 구조는 다음과 같아야 합니다:
 # 
 # ::
 # 
@@ -237,15 +187,14 @@ ngpu = 1
 #            -> 537394.jpg
 #               ...
 # 
-# This is an important step because we will be using the ImageFolder
-# dataset class, which requires there to be subdirectories in the
-# dataset’s root folder. Now, we can create the dataset, create the
-# dataloader, set the device to run on, and finally visualize some of the
-# training data.
+# 이 과정들은 프로그램이 정상적으로 구동하기 위해서는 중요한 부분입니다. 이때 celeba 폴더안에 다시 폴더를 두는 이유는, 
+# ImageFolder 클래스가 데이터셋의 최상위 폴더에 서브폴더를 요구하기 때문입니다. 
+# 좋아요, 이를 통해 우리는 데이터셋과 DataLoader를 만들 수 있었습니다. 
+# 이제 최종적으로 훈련 데이터들을 시각화해봅시다.
 # 
 
-# We can use an image folder dataset the way we have it setup.
-# Create the dataset
+# 우리가 설정한 대로 이미지 데이터셋을 불러와 봅시다
+# 먼저 데이터셋을 만듭니다
 dataset = dset.ImageFolder(root=dataroot,
                            transform=transforms.Compose([
                                transforms.Resize(image_size),
@@ -253,14 +202,14 @@ dataset = dset.ImageFolder(root=dataroot,
                                transforms.ToTensor(),
                                transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
                            ]))
-# Create the dataloader
+# dataloader를 정의해봅시다
 dataloader = torch.utils.data.DataLoader(dataset, batch_size=batch_size,
                                          shuffle=True, num_workers=workers)
 
-# Decide which device we want to run on
+# 어떤 장치를 사용할지 결정합니다
 device = torch.device("cuda:0" if (torch.cuda.is_available() and ngpu > 0) else "cpu")
 
-# Plot some training images
+# 훈련 데이터들 중 몇가지 이미지들을 화면에 띄워봅시다
 real_batch = next(iter(dataloader))
 plt.figure(figsize=(8,8))
 plt.axis("off")
