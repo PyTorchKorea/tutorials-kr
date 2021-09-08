@@ -1,55 +1,61 @@
 """
-Optimizing Vision Transformer Model for Deployment
-===========================
+배포를 위한 비전 트랜스포머(Vision Transformer) 모델 최적화하기
+==============================================================
+Authors : `Jeff Tang <https://github.com/jeffxtang>`_,
+`Geeta Chauhan <https://github.com/gchauhan/>`_
+번역 : `김태영 <https://github.com/Taeyoung96/>`_
 
-Vision Transformer models apply the cutting-edge attention-based
-transformer models, introduced in Natural Language Processing to achieve
-all kinds of the state of the art (SOTA) results, to Computer Vision
-tasks. Facebook Data-efficient Image Transformers `DeiT <https://ai.facebook.com/blog/data-efficient-image-transformers-a-promising-new-technique-for-image-classification>`_
-is a Vision Transformer model trained on ImageNet for image
-classification.
+비전 트랜스포머(Vision Transformer)은 자연어 처리 분야에서 소개된
+비교할 수 없는 최첨단의 결과를 달성한 최신의 어텐션 기반(attention-based) 트랜스포머 모델을
+컴퓨터 비전 분야에 적용을 한 모델입니다.
+FaceBook에서 발표한 Data-efficient Image Transformers는 `DeiT <https://ai.facebook.com/blog/data-efficient-image-transformers-a-promising-new-technique-for-image-classification>`_ 
+이미지 분류를 위해 ImageNet 데이터셋을 통해 훈련된
+비전 트랜스포머 모델입니다.
 
-In this tutorial, we will first cover what DeiT is and how to use it,
-then go through the complete steps of scripting, quantizing, optimizing,
-and using the model in iOS and Android apps. We will also compare the
-performance of quantized, optimized and non-quantized, non-optimized
-models, and show the benefits of applying quantization and optimization
-to the model along the steps.
+이번 튜토리얼에서는, DeiT가 무엇인지 그리고 어떻게 사용하는지 다룰 것입니다.
+그 다음 스크립팅(scripting), 양자화, 최적화, 그리고 iOS와 안드로이드 앱 안에서 
+모델을 사용하는 전체적인 단계를 수행해볼 것입니다.
+또한, 양자화와 최적화가 된 모델과 양자화와 최적화가 되지않은 모델을 비교해볼 것이며,
+단계를 수행해 가면서 양자화와 최적화를 적용한 모델이 얼마나 이점을 가지는지 볼 것입니다
 
-"""
+"""  
 
-
-
-###############################################################################
-# What is DeiT
-# ---------------------
+######################################################################
+# .
 #
-# Convolutional Neural Networks (CNNs) have been the main models for image
-# classification since deep learning took off in 2012, but CNNs typically
-# require hundreds of millions of images for training to achieve the
-# SOTAresults. DeiT is a vision transformer model that requires a lot less
-# data and computing resources for training to compete with the leading
-# CNNs in performing image classification, which is made possible by two
-# key components of of DeiT:
+
+
+
+######################################################################
+# DeiT란 무엇인가
+# --------------------
 #
-# -  Data augmentation that simulates training on a much larger dataset;
-# -  Native distillation that allows the transformer network to learn from
-#    a CNN’s output.
+
+######################################################################
+# 컨벌루션 신경망(CNNs)은 2012년 딥러닝이 시작된 이후
+# 이미지 분류를 수행할 때 주요한 모델이였습니다. 그러나 컨벌루션 신경망은 일반적으로
+# 최첨단의 결과를 달성하기 위해 훈련에 수억 개의 이미지가 필요했습니다.
+# DeiT는 이미지 분류를 수행하는데 있어서 최신 CNN 모델과 경쟁을 하는데
+# 훈련에 더 적은 데이터와 컴퓨팅 자원이 필요로 하는 비전 트랜스포머 모델입니다.
+# 이는 DeiT의 두 가지 주요 구성 요소에 의해 가능하게 되었습니다:
 #
-# DeiT shows that Transformers can be successfully applied to computer
-# vision tasks, with limited access to data and resources. For more
-# details on DeiT, see the `repo <https://github.com/facebookresearch/deit>`_
-# and `paper <https://arxiv.org/abs/2012.12877>`_.
+# -  훨씬 더 큰 데이터 세트에 대한 훈련을 시뮬레이션하는 데이터 증강(augmentation)
+# -  트랜스포머 네트워크에 CNN의 출력값을 그대로 증류(distillation)하여 학습할 수 있도록 하는 기법
+#
+# DeiT는 제한된 데이터와 자원을 활용하여 컴퓨터 비전 태스크(Task)에 트랜스포머 모델을  
+# 성공적으로 적용할 수 있음을 보여줍니다. 
+# DeiT의 좀 더 자세한 내용을 원한다면, `저장소 <https://github.com/facebookresearch/deit>`_
+# 와 `논문 <https://arxiv.org/abs/2012.12877>`_ 을 참고하시길 바랍니다.
 #
 
 
 ######################################################################
-# Classifying Images with DeiT
+# DeiT를 이용하여 이미지 분류하기
 # -------------------------------
 #
-# Follow the README at the DeiT repo for detailed information on how to
-# classify images using DeiT, or for a quick test, first install the
-# required packages:
+# DeiT를 사용하여 어떻게 이미지들을 분류하는지 자세한 정보는 DeiT 저장소에 README를 참고하시길 바랍니다.
+# 빠른 테스트를 위해선, 첫번째로 요구되는 패키지들을
+# 설치해 봅시다:
 #
 # ::
 #
@@ -58,7 +64,7 @@ to the model along the steps.
 #    pip install pandas
 #    pip install requests 
 #
-# then run the script below:
+# 그런 다음 아래 스크립트를 실행해 봅시다:
 #
 
 
@@ -70,7 +76,7 @@ import torchvision.transforms as transforms
 from timm.data.constants import IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD
 
 print(torch.__version__)
-# should be 1.8.0
+# 1.8.0 이여야 합니다.
 
 
 model = torch.hub.load('facebookresearch/deit:main', 'deit_base_patch16_224', pretrained=True)
@@ -91,18 +97,15 @@ print(clsidx.item())
 
 
 ######################################################################
-# The output should be 269, which, according to the ImageNet list of class
-# index to `labels file <https://gist.github.com/yrevar/942d3a0ac09ec9e5eb3a>`_, maps to ‘timber
-# wolf, grey wolf, gray wolf, Canis lupus’.
+# ImageNet 목록에 따른 `라벨(labels) 파일 <https://gist.github.com/yrevar/942d3a0ac09ec9e5eb3a>`_
+# 클래스 인덱스의 따라 출력은 269여야 하며, 이는 '목공 늑대, 회색 늑대, 큰개자리 루푸스'에 매핑됩니다.  
 #
-# Now that we have verified that we can use the DeiT model to classify
-# images, let’s see how to modify the model so it can run on iOS and
-# Android apps.
+# 이제 DeiT 모델을 사용하여 이미지들을 분류할 수 있음을 확인했습니다.
+# iOS 및 Android 앱에서 실행할 수 있도록 모델을 수정하는 방법을 살펴보겠습니다. 
 #
-
 
 ######################################################################
-# Scripting DeiT
+# DeiT 스크립팅(Scripting) 하기
 # ----------------------
 # To use the model on mobile, we first need to script the
 # model. See the `Script and Optimize recipe <https://tutorials.pytorch.kr/recipes/script_optimized.html>`_ for a
@@ -124,7 +127,7 @@ scripted_model.save("fbdeit_scripted.pt")
 
 
 ######################################################################
-# Quantizing DeiT
+# DeiT 양자화하기
 # ---------------------
 # To reduce the trained model size significantly while
 # keeping the inference accuracy about the same, quantization can be
@@ -163,7 +166,7 @@ print(clsidx.item())
 # The same output 269 should be printed
 
 ######################################################################
-# Optimizing DeiT
+# DeiT 최적화하기
 # ---------------------
 # The final step before using the quantized and scripted
 # model on mobile is to optimize it:
