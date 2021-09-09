@@ -1,73 +1,66 @@
-Using the PyTorch C++ Frontend
-==============================
+PyTorch C++ 프론트엔드 사용하기
+========================
 
-The PyTorch C++ frontend is a pure C++ interface to the PyTorch machine learning
-framework. While the primary interface to PyTorch naturally is Python, this
-Python API sits atop a substantial C++ codebase providing foundational data
-structures and functionality such as tensors and automatic differentiation. The
-C++ frontend exposes a pure C++11 API that extends this underlying C++ codebase
-with tools required for machine learning training and inference. This includes a
-built-in collection of common components for neural network modeling; an API to
-extend this collection with custom modules; a library of popular optimization
-algorithms such as stochastic gradient descent; a parallel data loader with an
-API to define and load datasets; serialization routines and more.
+PyTorch C++ 프론트엔드는 PyTorch 머신러닝 프레임워크의 순수 C++ 인터페이스입니다.
+PyTorch의 주된 인터페이스는 물론 파이썬이지만 이 파이썬 API는 텐서(tensor)나 자동
+미분과 같은 기초적인 자료구조 및 기능을 제공하는 C++ 코드베이스 위에 구현돼있습니다.
+C++ 프론트엔드는 이 기초 C++ 코드베이스를 비롯해 머신러닝 학습과 추론을 위해 필요한
+도구들을 상속하는 순수 C++11 API를 노출합니다. 여기에는 신경망 모델링을 위해 필요한
+공동의 빌트인 컴포넌트의 모음, 그것을 상속하기 위한 커스텀 모듈, 경사 하강법과 같은
+뮤명한 최적화 알고리즘 라이브러리, 병렬 데이터 로더 및 데이터셋을 정의하고 로드하기
+위한 API, 직렬화 루틴 등이 포합됩니다.
 
-This tutorial will walk you through an end-to-end example of training a model
-with the C++ frontend. Concretely, we will be training a `DCGAN
-<https://arxiv.org/abs/1511.06434>`_ -- a kind of generative model -- to
-generate images of MNIST digits. While conceptually a simple example, it should
-be enough to give you a whirlwind overview of the PyTorch C++ frontend and wet
-your appetite for training more complex models. We will begin with some
-motivating words for why you would want to use the C++ frontend to begin with,
-and then dive straight into defining and training our model.
+이 튜토리얼은 C++ 프론트엔드로 모델을 학습하는 엔드 투 엔드 예제를 안내합니다.
+구체적으로, 우리는 생성 모델 중 하나인 `DCGAN 
+<https://arxiv.org/abs/1511.06434>`_ 
+을 학습시켜 MNIST 숫자 이미지들을 생성할 것입니다. 개념적으로 쉬운 예시이지만,여러분이 
+PyTorch C++ 프론트엔드에 대한 대략적인 개요를 파악하고 더 복잡한 모델을 학습시키고
+싶은 욕구를 불러일으키기에 충분할 것입니다. 먼저 C++ 프론트엔드를 사용에 동기 부여가
+될 만한 논의로 시작하고, 곧바로 모델을 정의하고 학습하도록 하겠습니다.
 
 .. tip::
 
-  Watch `this lightning talk from CppCon 2018
-  <https://www.youtube.com/watch?v=auRPXMMHJzc>`_ for a quick (and humorous)
-  presentation on the C++ frontend.
+  C++ 프론트엔드에 대한 짧고 재미있는 발표를 보려면 `이 CppCon 2018 라이트닝 토크
+  <https://www.youtube.com/watch?v=auRPXMMHJzc>`_ 를 시청하세요
+  
 
 .. tip::
 
-  `This note <https://pytorch.org/cppdocs/frontend.html>`_ provides a sweeping
-  overview of the C++ frontend's components and design philosophy.
+  `이 노트 <https://pytorch.org/cppdocs/frontend.html>`_ 는 C++ 프론트엔드의 컴포넌트와
+  디자인 철학의 전면적인 개요를 제공합니다.
 
 .. tip::
 
-  Documentation for the PyTorch C++ ecosystem is available at
-  https://pytorch.org/cppdocs. There you can find high level descriptions as
-  well as API-level documentation.
+  PyTorch C++ 생태계에 대한 문서는 https://pytorch.org/cppdocs에서 확인할 수 있습니다.
+  API 레벨의 문서뿐만 아니라 개괄적인 설명도 찾을 수 있을 것입니다. 
 
-Motivation
-----------
+동기 부여의 말
+--------
 
-Before we embark on our exciting journey of GANs and MNIST digits, let's take a
-step back and discuss why you would want to use the C++ frontend instead of the
-Python one to begin with. We (the PyTorch team) created the C++ frontend to
-enable research in environments in which Python cannot be used, or is simply not
-the right tool for the job. Examples for such environments include:
+GAN과 MNIST 숫자로의 설레는 여정을 시작하기에 앞서, 먼저 파이썬 대신 C++ 프론트엔드를
+사용하는 이유에 대해 한 발 물러서서 설명하겠습니다. 우리(PyTorch 팀)는 파이썬을 사용할
+수 없거나 사용하기에 적합하지 않은 환경에서 연구를 가능하게 하기 위해 C++ 프론트엔드를
+만들었습니다. 예를 들면 다음과 같습니다.
 
-- **Low Latency Systems**: You may want to do reinforcement learning research in
-  a pure C++ game engine with high frames-per-second and low latency
-  requirements. Using a pure C++ library is a much better fit to such an
-  environment than a Python library. Python may not be tractable at all because
-  of the slowness of the Python interpreter.
-- **Highly Multithreaded Environments**: Due to the Global Interpreter Lock
-  (GIL), Python cannot run more than one system thread at a time.
-  Multiprocessing is an alternative, but not as scalable and has significant
-  shortcomings. C++ has no such constraints and threads are easy to use and
-  create. Models requiring heavy parallelization, like those used in `Deep
-  Neuroevolution <https://eng.uber.com/deep-neuroevolution/>`_, can benefit from
-  this.
-- **Existing C++ Codebases**: You may be the owner of an existing C++
-  application doing anything from serving web pages in a backend server to
-  rendering 3D graphics in photo editing software, and wish to integrate
-  machine learning methods into your system. The C++ frontend allows you to
-  remain in C++ and spare yourself the hassle of binding back and forth between
-  Python and C++, while retaining much of the flexibility and intuitiveness of
-  the traditional PyTorch (Python) experience.
+- **저지연 시스템**: 초당 프레임 수가 높고 지연 시간이 짧은 순수 C++ 게임 엔진에서
+  강화 학습 연구를 수행할 수 있습니다. 그러한 환경에서는 파이썬 라이브러리보다 순수 C++ 
+  라이브러리를 사용하는 것이 훨씬 더 적합합니다. 파이썬은 느린 인터프리터 때문에 매우
+- **극심한 멀티쓰레딩 환경**: 글로벌 인터프리터 락(GIL)으로 인해 파이썬은 동시에 둘
+  이상의 시스템 쓰레드를 실행할 수 없습니다. 대안으로 멀티프로세싱을 사용하면 확장성이
+  떨어지며 심각한 한계가 있습니다. C++는 이러한 제약 조건이 없으며 쓰레드를 쉽게 만들고
+  사용할 수 있습니다. `Deep
+  Neuroevolution <https://eng.uber.com/deep-neuroevolution/>`_에 사용된 것과 같이 고도의 병렬화가
+  필요한 모델도 이를 활용할 수 있습니다.
+- **기존의 C++ 코드베이스**: 백엔드 서버의 웹 페이지 서비스부터 사진 편집 소프트웨어의
+  3D 그래픽 렌더링에 이르기까지 모든 작업을 수행하는 기존 C++ 애플리케이션의 소유자가
+  머신러닝 방법론을 시스템에 통합하고자 합니다. C++ 프론트엔드는 PyTorch (파이썬) 경험 
+  본연의 높은 유연성과 직관성을 유지하면서, 파이썬과 C++를 앞뒤로 바인딩하는 번거로움 없이
+  C++를 사용할 수 있게 해줍니다.
 
-The C++ frontend is not intended to compete with the Python frontend. It is
+C++ 프론트엔드는 파이썬 프론트엔드와 경쟁하기 위한 것이 아니라 보완하기 위한 것입니다.
+연구자들과 엔지니어들 모두 PyTorch의 단순성, 유연성 및 직관적인 API를 매우 좋아합니다.
+우리의 목표는 여러분이 가능한 모든 환경에서 이러한 핵심 디자인 원칙을 이용할 수 있도록 
+하는 것입니다.
 meant to complement it. We know researchers and engineers alike love PyTorch for
 its simplicity, flexibility and intuitive API. Our goal is to make sure you can
 take advantage of these core design principles in every possible environment,
