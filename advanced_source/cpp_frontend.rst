@@ -7,16 +7,17 @@ PyTorch의 주된 인터페이스는 물론 파이썬이지만 이 파이썬 API
 C++ 프론트엔드는 이 기초 C++ 코드베이스를 비롯해 머신러닝 학습과 추론을 위해 필요한
 도구들을 상속하는 순수 C++11 API를 노출합니다. 여기에는 신경망 모델링을 위해 필요한
 공동의 빌트인 컴포넌트의 모음, 그것을 상속하기 위한 커스텀 모듈, 경사 하강법과 같은
-뮤명한 최적화 알고리즘 라이브러리, 병렬 데이터 로더 및 데이터셋을 정의하고 로드하기
+유명한 최적화 알고리즘 라이브러리, 병렬 데이터 로더 및 데이터셋을 정의하고 불러오기
 위한 API, 직렬화 루틴 등이 포합됩니다.
 
 이 튜토리얼은 C++ 프론트엔드로 모델을 학습하는 엔드 투 엔드 예제를 안내합니다.
 구체적으로, 우리는 생성 모델 중 하나인 `DCGAN 
 <https://arxiv.org/abs/1511.06434>`_ 
-을 학습시켜 MNIST 숫자 이미지들을 생성할 것입니다. 개념적으로 쉬운 예시이지만,여러분이 
-PyTorch C++ 프론트엔드에 대한 대략적인 개요를 파악하고 더 복잡한 모델을 학습시키고
-싶은 욕구를 불러일으키기에 충분할 것입니다. 먼저 C++ 프론트엔드를 사용에 동기 부여가
-될 만한 논의로 시작하고, 곧바로 모델을 정의하고 학습하도록 하겠습니다.
+을 학습시켜 MNIST 숫자 이미지들을 생성할
+것입니다. 개념적으로 쉬운 예시이지만, 여러분이 PyTorch C++ 프론트엔드에 대한 대략적인
+개요를 파악하고 더 복잡한 모델을 학습시키고싶은 욕구를 불러일으키기에 충분할 것입니다.
+먼저 C++ 프론트엔드를 사용에 대한 동기 부여가 될 만한 논의로 시작하고, 곧바로 모델을
+정의하고 학습해보도록 하겠습니다.
 
 .. tip::
 
@@ -57,16 +58,11 @@ GAN과 MNIST 숫자로의 설레는 여정을 시작하기에 앞서, 먼저 파
   본연의 높은 유연성과 직관성을 유지하면서, 파이썬과 C++를 앞뒤로 바인딩하는 번거로움 없이
   C++를 사용할 수 있게 해줍니다.
 
-C++ 프론트엔드는 파이썬 프론트엔드와 경쟁하기 위한 것이 아니라 보완하기 위한 것입니다.
-연구자들과 엔지니어들 모두 PyTorch의 단순성, 유연성 및 직관적인 API를 매우 좋아합니다.
-우리의 목표는 여러분이 가능한 모든 환경에서 이러한 핵심 디자인 원칙을 이용할 수 있도록 
-하는 것입니다.
-meant to complement it. We know researchers and engineers alike love PyTorch for
-its simplicity, flexibility and intuitive API. Our goal is to make sure you can
-take advantage of these core design principles in every possible environment,
-including the ones described above. If one of these scenarios describes your use
-case well, or if you are simply interested or curious, follow along as we
-explore the C++ frontend in detail in the following paragraphs.
+C++ 프론트엔드의 목적은 파이썬 프론트엔드와 경쟁하는 것이 아닌 보완하는 것입니다. 연구자와
+엔지니어 모두가 PyTorch의 단순성, 유연성 및 직관적인 API를 매우 좋아합니다. 우리의 목표는
+여러분이 위의 예시를 비롯한 모든 가능한 환경에서 이 핵심 디자인 원칙을 이용할 수 있도록 하는 
+것입니다. 이러한 시나리오 중 하나가 여러분의 사례에 해당하거나 단순히 관심이 있거나 궁금하다면
+아래 내용을 통해 C++ 프론트엔드에 대해 자세히 살펴보세요.
 
 .. tip::
 
