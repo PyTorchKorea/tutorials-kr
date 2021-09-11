@@ -230,26 +230,24 @@ plt.imshow(np.transpose(vutils.make_grid(real_batch[0].to(device)[:64], padding=
 
 
 ######################################################################
-# Implementation
-# --------------
+# 구현
+# ----
+#
+# 모델의 설정값들과 데이터들이 준비되었기 때문에, 드디어 모델의 구현으로 
+# 들어갈 수 있을 것 같습니다. 먼저 가중치 초기화에 대해 이야기 해보고,
+# 순서대로 생성자, 구분자, 손실 함수, 학습 방법들을 알아보겠습니다.
 # 
-# With our input parameters set and the dataset prepared, we can now get
-# into the implementation. We will start with the weight initialization
-# strategy, then talk about the generator, discriminator, loss functions,
-# and training loop in detail.
+# 가중치 초기화
+# ~~~~~~~~~~~~
 # 
-# Weight Initialization
-# ~~~~~~~~~~~~~~~~~~~~~
-# 
-# From the DCGAN paper, the authors specify that all model weights shall
-# be randomly initialized from a Normal distribution with mean=0,
-# stdev=0.02. The ``weights_init`` function takes an initialized model as
-# input and reinitializes all convolutional, convolutional-transpose, and
-# batch normalization layers to meet this criteria. This function is
-# applied to the models immediately after initialization.
-# 
+# DCGAN 논문에서는, 평균이 0이고 분산이 0.02인 정규분포을 이용해,
+# 구분자와 생성자 모두 무작위 초기화를 진행하는 것이 좋다고 합니다.
+# ``weights_init`` 함수는 매개변수로 모델을 입력받아,
+# 모든 합성곱 계층, 전치 합성곱 계층, 배치 정규화 계층을, 위에서 말한 조건대로
+# 가중치들을 다시 초기화 시킵니다. 이 함수는 모델이 만들어지자 마자 바로 적용을
+# 시키게 됩니다.
 
-# custom weights initialization called on netG and netD
+# netG와 netD에 적용시킬 커스텀 초기화 함수
 def weights_init(m):
     classname = m.__class__.__name__
     if classname.find('Conv') != -1:
@@ -260,60 +258,58 @@ def weights_init(m):
 
 
 ######################################################################
-# Generator
-# ~~~~~~~~~
-# 
-# The generator, :math:`G`, is designed to map the latent space vector
-# (:math:`z`) to data-space. Since our data are images, converting
-# :math:`z` to data-space means ultimately creating a RGB image with the
-# same size as the training images (i.e. 3x64x64). In practice, this is
-# accomplished through a series of strided two dimensional convolutional
-# transpose layers, each paired with a 2d batch norm layer and a relu
-# activation. The output of the generator is fed through a tanh function
-# to return it to the input data range of :math:`[-1,1]`. It is worth
-# noting the existence of the batch norm functions after the
-# conv-transpose layers, as this is a critical contribution of the DCGAN
-# paper. These layers help with the flow of gradients during training. An
-# image of the generator from the DCGAN paper is shown below.
+# 생성자
+# ~~~~~~
+#
+# 생성자 :math:`G` 는 잠재 공간 벡터 :math:`z` 를, 데이터 공간으로 
+# 변환시키도록 설계되었습니다. 우리에게 데이터라 함은 이미지이기 때문에,
+# :math:`z` 를 데이터공간으로 변환한다는 뜻은, 학습이미지와 같은 사이즈를 가진
+# RGB 이미지를 생성하는것과 같습니다 (i.e. 3x64x64).
+# 실제 모델에서는 스트라이드(stride) 2를 가진 전치 합성곱 계층들을 이어서 구성하는데, 
+# 각 전치 합성곱 계층 하나당 2차원 배치 정규화 계층과 relu 활성함수를 한 쌍으로 묶어서 사용합니다. 
+# 생성자의 마지막 출력 계층에서는 데이터를 tanh 함수에 통과시키는데,
+# 이는 출력 값을 :math:`[-1,1]` 사이의 범위로 조정하기 위해서 입니다. 
+# 이때 배치 정규화 계층을 주목할 필요가 있는데, DCGAN 논문에 의하면,
+# 이 계층이 경사하강법(gradient-descent)의 흐름에 중요한 영향을 미치는 것으로 알려져 있습니다. 
+# 아래의 그림은 DCGAN 논문에서 가져온 생성자의 모델 아키텍쳐입니다.
 #
 # .. figure:: /_static/img/dcgan_generator.png
 #    :alt: dcgan_generator
 #
-# Notice, the how the inputs we set in the input section (*nz*, *ngf*, and
-# *nc*) influence the generator architecture in code. *nz* is the length
-# of the z input vector, *ngf* relates to the size of the feature maps
-# that are propagated through the generator, and *nc* is the number of
-# channels in the output image (set to 3 for RGB images). Below is the
-# code for the generator.
+# 우리가 설정값 섹션에서 정의한 값들이 (*nz*, *ngf*, 그리고
+# *nc*) 생성자 모델 아키텍쳐에 어떻게 영향을 끼치는지 주목해주세요. *nz* 는 z 입력 벡터의
+# 길이, *ngf* 는 생성자를 통과하는 특징 데이터의 크기, 그리고 *nc* 는 출력 이미지의 
+# 채널 개수입니다 (RGB 이미지이기 때문에 3으로 설정을 했습니다). 
+# 아래는 생성자의 코드입니다.
 # 
 
-# Generator Code
+# 생성자 코드
 
 class Generator(nn.Module):
     def __init__(self, ngpu):
         super(Generator, self).__init__()
         self.ngpu = ngpu
         self.main = nn.Sequential(
-            # input is Z, going into a convolution
+            # 입력데이터 Z가 가장 처음 통과하는 전치 합성곱 계층입니다.
             nn.ConvTranspose2d( nz, ngf * 8, 4, 1, 0, bias=False),
             nn.BatchNorm2d(ngf * 8),
             nn.ReLU(True),
-            # state size. (ngf*8) x 4 x 4
+            # 위의 계층을 통과한 데이터의 크기. (ngf*8) x 4 x 4
             nn.ConvTranspose2d(ngf * 8, ngf * 4, 4, 2, 1, bias=False),
             nn.BatchNorm2d(ngf * 4),
             nn.ReLU(True),
-            # state size. (ngf*4) x 8 x 8
+            # 위의 계층을 통과한 데이터의 크기. (ngf*4) x 8 x 8
             nn.ConvTranspose2d( ngf * 4, ngf * 2, 4, 2, 1, bias=False),
             nn.BatchNorm2d(ngf * 2),
             nn.ReLU(True),
-            # state size. (ngf*2) x 16 x 16
+            # 위의 계층을 통과한 데이터의 크기. (ngf*2) x 16 x 16
             nn.ConvTranspose2d( ngf * 2, ngf, 4, 2, 1, bias=False),
             nn.BatchNorm2d(ngf),
             nn.ReLU(True),
-            # state size. (ngf) x 32 x 32
+            # 위의 계층을 통과한 데이터의 크기. (ngf) x 32 x 32
             nn.ConvTranspose2d( ngf, nc, 4, 2, 1, bias=False),
             nn.Tanh()
-            # state size. (nc) x 64 x 64
+            # 위의 계층을 통과한 데이터의 크기. (nc) x 64 x 64
         )
 
     def forward(self, input):
@@ -321,69 +317,68 @@ class Generator(nn.Module):
 
 
 ######################################################################
-# Now, we can instantiate the generator and apply the ``weights_init``
-# function. Check out the printed model to see how the generator object is
-# structured.
+# 좋아요, 이제 우리는 생성자의 인스턴스를 만들고 ``weights_init``
+# 함수를 적용시킬 수 있습니다. 모델의 인스턴스를 출력해서 생성자가
+# 어떻게 구성되어있는지 확인해보세요.
 # 
 
-# Create the generator
+# 생성자를 만듭니다
 netG = Generator(ngpu).to(device)
 
-# Handle multi-gpu if desired
+# 필요한 경우 multi-gpu를 설정 해주세요
 if (device.type == 'cuda') and (ngpu > 1):
     netG = nn.DataParallel(netG, list(range(ngpu)))
 
-# Apply the weights_init function to randomly initialize all weights
-#  to mean=0, stdev=0.2.
+# 모든 가중치의 평균을 0, 분산을 0.02로 만들기 위해
+# weight_init 함수를 적용시킵니다
 netG.apply(weights_init)
 
-# Print the model
+# 모델의 구조를 출력합니다
 print(netG)
 
 
 ######################################################################
-# Discriminator
-# ~~~~~~~~~~~~~
+# 구분자
+# ~~~~~~
 # 
-# As mentioned, the discriminator, :math:`D`, is a binary classification
-# network that takes an image as input and outputs a scalar probability
-# that the input image is real (as opposed to fake). Here, :math:`D` takes
-# a 3x64x64 input image, processes it through a series of Conv2d,
-# BatchNorm2d, and LeakyReLU layers, and outputs the final probability
-# through a Sigmoid activation function. This architecture can be extended
-# with more layers if necessary for the problem, but there is significance
-# to the use of the strided convolution, BatchNorm, and LeakyReLUs. The
-# DCGAN paper mentions it is a good practice to use strided convolution
-# rather than pooling to downsample because it lets the network learn its
-# own pooling function. Also batch norm and leaky relu functions promote
-# healthy gradient flow which is critical for the learning process of both
-# :math:`G` and :math:`D`.
-# 
+# 앞서 언급했듯, 구분자 :math:`D`는 입력 이미지가 진짜 이미지인지 (혹은 반대로 가짜 이미지인지)
+# 판별하는 전통적인 이진 분류 신경망으로 볼 수 있습니다. 이때 :math:`D` 는
+# 3x64x64 이미지를 입력받아, Conv2d, BatchNorm2d, 그리고 LeakyReLU 계층을 통과시켜
+# 데이터를 가공시키고, 마지막 출력에서 Sigmoid 함수를 이용하여
+# 0~1 사이의 확률값으로 조정합니다. 이 아키텍쳐는 필요한 경우 더 다양한 레이어를 쌓을 수 있지만,
+# 배치 정규화와 LeakyReLU, 특히 보폭이 있는 (strided) 합성곱 계층을 
+# 사용하는 것에는 이유가 있습니다.
+# DCGAN 논문에서는 보폭이 있는 합성곱 계층을 사용하는 것이 신경망 내에서 스스로의 
+# 풀링(Pooling) 함수를 학습하기 때문에, 데이터를 처리하는 과정에서 직접적으로 풀링 계층( MaxPool or AvgPooling)을 
+# 사용하는 것보다 더 유리하다고 합니다. 또한 배치 정규화와 leaky relu 함수는 학습과정에서
+# :math:`G` 와 :math:`D` 가 더 효과적인 경사도(gradient)를 얻을 수 있습니다.
+#
 
 #########################################################################
-# Discriminator Code
+
+# 구분자 코드
 
 class Discriminator(nn.Module):
     def __init__(self, ngpu):
         super(Discriminator, self).__init__()
         self.ngpu = ngpu
         self.main = nn.Sequential(
-            # input is (nc) x 64 x 64
+            # 입력 데이터의 크기는 (nc) x 64 x 64 입니다
             nn.Conv2d(nc, ndf, 4, 2, 1, bias=False),
             nn.LeakyReLU(0.2, inplace=True),
-            # state size. (ndf) x 32 x 32
+            # 위의 계층을 통과한 데이터의 크기. (ndf) x 32 x 32
             nn.Conv2d(ndf, ndf * 2, 4, 2, 1, bias=False),
             nn.BatchNorm2d(ndf * 2),
             nn.LeakyReLU(0.2, inplace=True),
-            # state size. (ndf*2) x 16 x 16
+            # 위의 계층을 통과한 데이터의 크기. (ndf*2) x 16 x 16
             nn.Conv2d(ndf * 2, ndf * 4, 4, 2, 1, bias=False),
             nn.BatchNorm2d(ndf * 4),
             nn.LeakyReLU(0.2, inplace=True),
-            # state size. (ndf*4) x 8 x 8
+            # 위의 계층을 통과한 데이터의 크기. (ndf*4) x 8 x 8
             nn.Conv2d(ndf * 4, ndf * 8, 4, 2, 1, bias=False),
             nn.BatchNorm2d(ndf * 8),
             nn.LeakyReLU(0.2, inplace=True),
-            # state size. (ndf*8) x 4 x 4
+            # 위의 계층을 통과한 데이터의 크기. (ndf*8) x 4 x 4
             nn.Conv2d(ndf * 8, 1, 4, 1, 0, bias=False),
             nn.Sigmoid()
         )
@@ -393,22 +388,22 @@ class Discriminator(nn.Module):
 
 
 ######################################################################
-# Now, as with the generator, we can create the discriminator, apply the
-# ``weights_init`` function, and print the model’s structure.
+# 이제 우리는 생성자에 한 것처럼 구분자의 인스턴스를 만들고, 
+# ``weights_init`` 함수를 적용시킨 다음, 모델의 구조를 출력해볼 수 있습니다.
 # 
 
-# Create the Discriminator
+# 구분자를 만듭니다
 netD = Discriminator(ngpu).to(device)
 
-# Handle multi-gpu if desired
+# 필요한 경우 multi-gpu를 설정 해주세요
 if (device.type == 'cuda') and (ngpu > 1):
     netD = nn.DataParallel(netD, list(range(ngpu)))
     
-# Apply the weights_init function to randomly initialize all weights
-#  to mean=0, stdev=0.2.
+# 모든 가중치의 평균을 0, 분산을 0.02로 만들기 위해
+# weight_init 함수를 적용시킵니다
 netD.apply(weights_init)
 
-# Print the model
+# 모델의 구조를 출력합니다
 print(netD)
 
 
