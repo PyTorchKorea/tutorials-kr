@@ -49,8 +49,7 @@ GAN과 MNIST 숫자로의 설레는 여정을 시작하기에 앞서, 먼저 파
 - **극심한 멀티쓰레딩 환경**: 글로벌 인터프리터 락(GIL)으로 인해 파이썬은 동시에 둘
   이상의 시스템 쓰레드를 실행할 수 없습니다. 대안으로 멀티프로세싱을 사용하면 확장성이
   떨어지며 심각한 한계가 있습니다. C++는 이러한 제약 조건이 없으며 쓰레드를 쉽게 만들고
-  사용할 수 있습니다. `Deep
-  Neuroevolution <https://eng.uber.com/deep-neuroevolution/>`_에 사용된 것과 같이 고도의 병렬화가
+  사용할 수 있습니다. `Deep Neuroevolution <https://eng.uber.com/deep-neuroevolution/>`_에 사용된 것과 같이 고도의 병렬화가
   필요한 모델도 이를 활용할 수 있습니다.
 - **기존의 C++ 코드베이스**: 백엔드 서버의 웹 페이지 서비스부터 사진 편집 소프트웨어의
   3D 그래픽 렌더링에 이르기까지 모든 작업을 수행하는 기존 C++ 애플리케이션의 소유자가
@@ -66,30 +65,23 @@ C++ 프론트엔드의 목적은 파이썬 프론트엔드와 경쟁하는 것�
 
 .. tip::
 
-	The C++ frontend tries to provide an API as close as possible to that of the
-	Python frontend. If you are experienced with the Python frontend and ever ask
-	yourself "how do I do X with the C++ frontend?", write your code the way you
-	would in Python, and more often than not the same functions and methods will
-	be available in C++ as in Python (just remember to replace dots with double
-	colons).
+	C++ 프론트엔드는 파이썬 프론트엔드와 최대한 유사한 API를 제공하고자 합니다. 만일 파이썬 
+  프론트엔드에 익숙한 사람이 "C++ 프론트엔드로 X를 어떻게 해야 하는가?" 의문을 갖는다면, 많은
+  경우에 파이썬에서와 같은 방식으로 코드를 작성해 파이썬에서와 동일한 함수와 메서드를 사용할 수
+  있을 것입니다. (다만, 온점을 더블 콜론으로 바꾸는 것에 유의하세요.)
 
-Writing a Basic Application
----------------------------
+기본 애플리케이션 작성
+-------------
 
-Let's begin by writing a minimal C++ application to verify that we're on the
-same page regarding our setup and build environment. First, you will need to
-grab a copy of the *LibTorch* distribution -- our ready-built zip archive that
-packages all relevant headers, libraries and CMake build files required to use
-the C++ frontend. The LibTorch distribution is available for download on the
-`PyTorch website <https://pytorch.org/get-started/locally/>`_ for Linux, MacOS
-and Windows. The rest of this tutorial will assume a basic Ubuntu Linux
-environment, however you are free to follow along on MacOS or Windows too.
+먼저 최소한의 C++ 애플리케이션을 작성해 우리의 설정 및 빌드 환경이 동일한지 확인하겠습니다.
+먼저, C++ 프론트엔드를 사용하는 데 필요한 모든 관련 헤더, 라이브러리 및 CMake 빌드 파일을 
+패키징하는 *LibTorch* 배포판의 사본이 필요합니다. 리눅스, 맥OS, 윈도우용 LibTorch 배포판은 
+`PyTorch website <https://pytorch.org/get-started/locally/>`_ 에서 다운로드할 수 있습니다. 이 튜토리얼의 나머지 부분은 기본 우분투 리눅스 
+환경을 가정하지만 맥OS나 윈도우를 사용하셔도 괜찮습니다.
 
 .. tip::
 
-  The note on `Installing C++ Distributions of PyTorch
-  <https://pytorch.org/cppdocs/installing.html>`_ describes the following steps
-  in more detail.
+  `PyTorch C++ 배포판 설치 <https://pytorch.org/cppdocs/installing.html>`_ 의 설명에 다음의 과정이 더 자세히 안내되어 있습니다.
 
 .. tip::
   On Windows, debug and release builds are not ABI-compatible. If you plan to
@@ -97,9 +89,12 @@ environment, however you are free to follow along on MacOS or Windows too.
   Also, make sure you specify the correct configuration in the ``cmake --build .``
   line below.
 
-The first step is to download the LibTorch distribution locally, via the link
-retrieved from the PyTorch website. For a vanilla Ubuntu Linux environment, this
-means running:
+  윈도우에서는 디버그 및 릴리스 빌드가 ABI와 호환되지 않습니다. 프로젝트를 디버그 모드로 빌드하려면
+  LibTorch의 디버그 버전을 사용해보세요. 아래의 ``cmake --build .``에 올바른 설정을 지정하는 것도
+  잊지 마세요.
+
+가장 먼저 할 것은 PyTorch 웹사이트에서 검색된 링크를 통해 LibTorch 배포판을 로컬에 다운로드하는 
+것입니다. 바닐라 Ubuntu Linux 환경의 경우 다음 명령어를 실행합니다.
 
 .. code-block:: shell
 
@@ -107,9 +102,8 @@ means running:
   wget https://download.pytorch.org/libtorch/nightly/cpu/libtorch-shared-with-deps-latest.zip
   unzip libtorch-shared-with-deps-latest.zip
 
-Next, let's write a tiny C++ file called ``dcgan.cpp`` that includes
-``torch/torch.h`` and for now simply prints out a three by three identity
-matrix:
+다음으로 ``torch/torch.h``를 호출하는 ``dcgan.cpp``라는 이름의 C++ 파일 하나를 작성합시다. 우선은
+아래와 같이 3x3 항등 행렬을 출력하기만 하면 됩니다:
 
 .. code-block:: cpp
 
@@ -121,8 +115,8 @@ matrix:
     std::cout << tensor << std::endl;
   }
 
-To build this tiny application as well as our full-fledged training script later
-on we'll use this ``CMakeLists.txt`` file:
+이 작은 애플리케이션과 이후 완성할 학습용 스크립트를 빌드하기 위해 우리는 아래의 ``CMakeLists.txt``를
+사용할 것입니다:
 
 .. code-block:: cmake
 
@@ -137,16 +131,14 @@ on we'll use this ``CMakeLists.txt`` file:
 
 .. note::
 
-  While CMake is the recommended build system for LibTorch, it is not a hard
-  requirement. You can also use Visual Studio project files, QMake, plain
-  Makefiles or any other build environment you feel comfortable with. However,
-  we do not provide out-of-the-box support for this.
+  CMake는 LibTorch에 권장되는 빌드 시스템이지만 필수 요구 사항은 아닙니다. Visual Studio 프로젝트 파일,
+  QMake, 일반 Make 파일 등 다른 빌드 환경을 사용해도 됩니다. 하지만 이에 대한 즉각적인 지원은 제공하지
+  않습니다.
 
-Make note of line 4 in the above CMake file: ``find_package(Torch REQUIRED)``.
-This instructs CMake to find the build configuration for the LibTorch library.
-In order for CMake to know *where* to find these files, we must set the
-``CMAKE_PREFIX_PATH`` when invoking ``cmake``. Before we do this, let's agree on
-the following directory structure for our ``dcgan`` application:
+위 CMake 파일 4번째 줄의 ``find_package(Torch REQUIRED)``는 CMake가 LibTorch 라이브러리 빌드 설정을
+찾도록 안내합니다. CMake가 해당 파일의 *위치*를 찾을 수 있도록 하려면 ``cmake`` 호출 시 ``CMAKE_PREFIX_PATH``를
+설정해야 합니다. 이에 앞서 ``dcgan`` 애플리케이션에 대해 다음의 디렉터리 구조를 다음과 같이 통일하도록 
+하겠습니다:
 
 .. code-block:: shell
 
@@ -154,11 +146,10 @@ the following directory structure for our ``dcgan`` application:
     CMakeLists.txt
     dcgan.cpp
 
-Further, I will refer to the path to the unzipped LibTorch distribution as
-``/path/to/libtorch``. Note that this **must be an absolute path**. In
-particular, setting ``CMAKE_PREFIX_PATH`` to something like ``../../libtorch``
-will break in unexpected ways. Instead, write ``$PWD/../../libtorch`` to get the
-corresponding absolute path. Now, we are ready to build our application:
+또한 앞으로 압축 해제된 LibTorch 배포판의 경로를 ``/path/to/libtorch``로 부르도록 하겠습니다. 이는 **반드시** 
+**절대 경로여야** 합니다. 특히 ``CMAKE_PREFIX_PATH``를 ``../../libtorch``와 같이 설정하면 예상치 못한 
+오류가 발생할 수 있습니다. 그보다는 해당 절대 경로를 가져오기 위해 "$PWD/../../libtorch"를 입력하세요. 
+이제 애플리케이션을 빌드할 준비가 되었습니다.
 
 .. code-block:: shell
 
@@ -198,11 +189,9 @@ corresponding absolute path. Now, we are ready to build our application:
   [100%] Linking CXX executable dcgan
   [100%] Built target dcgan
 
-Above, we first created a ``build`` folder inside of our ``dcgan`` directory,
-entered this folder, ran the ``cmake`` command to generate the necessary build
-(Make) files and finally compiled the project successfully by running ``cmake
---build . --config Release``. We are now all set to execute our minimal binary
-and complete this section on basic project configuration:
+위에서 우리는 먼저 ``dcgan`` 디렉터리 안에 ``build`` 폴더를 만들고 이 폴더에 들어가서 필요한 빌드(Make) 파일을 
+생성하는 ``cmake`` 명령을 실행한 후 ``cmake --build . --config Release``를 실행하여 프로젝트를 성공적으로 
+컴파일했습니다. 이제 우리의 작은 바이너리를 실행하고 기본 프로젝트 설정에 대한 이 섹션을 완료할 준비가 됐습니다.
 
 .. code-block:: shell
 
@@ -212,7 +201,7 @@ and complete this section on basic project configuration:
   0  0  1
   [ Variable[CPUFloatType]{3,3} ]
 
-Looks like an identity matrix to me!
+제가 보기엔 항등 행렬인 것 같군요!
 
 Defining the Neural Network Models
 ----------------------------------
