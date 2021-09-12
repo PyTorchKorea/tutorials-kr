@@ -84,13 +84,9 @@ C++ 프론트엔드의 목적은 파이썬 프론트엔드와 경쟁하는 것�
   `PyTorch C++ 배포판 설치 <https://pytorch.org/cppdocs/installing.html>`_ 의 설명에 다음의 과정이 더 자세히 안내되어 있습니다.
 
 .. tip::
-  On Windows, debug and release builds are not ABI-compatible. If you plan to
-  build your project in debug mode, please try the debug version of LibTorch.
-  Also, make sure you specify the correct configuration in the ``cmake --build .``
-  line below.
 
   윈도우에서는 디버그 및 릴리스 빌드가 ABI와 호환되지 않습니다. 프로젝트를 디버그 모드로 빌드하려면
-  LibTorch의 디버그 버전을 사용해보세요. 아래의 ``cmake --build .``에 올바른 설정을 지정하는 것도
+  LibTorch의 디버그 버전을 사용해보세요. 아래의 ``cmake --build .`` 에 올바른 설정을 지정하는 것도
   잊지 마세요.
 
 가장 먼저 할 것은 PyTorch 웹사이트에서 검색된 링크를 통해 LibTorch 배포판을 로컬에 다운로드하는 
@@ -102,7 +98,7 @@ C++ 프론트엔드의 목적은 파이썬 프론트엔드와 경쟁하는 것�
   wget https://download.pytorch.org/libtorch/nightly/cpu/libtorch-shared-with-deps-latest.zip
   unzip libtorch-shared-with-deps-latest.zip
 
-다음으로 ``torch/torch.h``를 호출하는 ``dcgan.cpp``라는 이름의 C++ 파일 하나를 작성합시다. 우선은
+다음으로 ``torch/torch.h`` 를 호출하는 ``dcgan.cpp`` 라는 이름의 C++ 파일 하나를 작성합시다. 우선은
 아래와 같이 3x3 항등 행렬을 출력하기만 하면 됩니다:
 
 .. code-block:: cpp
@@ -115,7 +111,7 @@ C++ 프론트엔드의 목적은 파이썬 프론트엔드와 경쟁하는 것�
     std::cout << tensor << std::endl;
   }
 
-이 작은 애플리케이션과 이후 완성할 학습용 스크립트를 빌드하기 위해 우리는 아래의 ``CMakeLists.txt``를
+이 작은 애플리케이션과 이후 완성할 학습용 스크립트를 빌드하기 위해 우리는 아래의 ``CMakeLists.txt`` 를
 사용할 것입니다:
 
 .. code-block:: cmake
@@ -135,8 +131,8 @@ C++ 프론트엔드의 목적은 파이썬 프론트엔드와 경쟁하는 것�
   QMake, 일반 Make 파일 등 다른 빌드 환경을 사용해도 됩니다. 하지만 이에 대한 즉각적인 지원은 제공하지
   않습니다.
 
-위 CMake 파일 4번째 줄의 ``find_package(Torch REQUIRED)``는 CMake가 LibTorch 라이브러리 빌드 설정을
-찾도록 안내합니다. CMake가 해당 파일의 *위치*를 찾을 수 있도록 하려면 ``cmake`` 호출 시 ``CMAKE_PREFIX_PATH``를
+위 CMake 파일 4번째 줄의 ``find_package(Torch REQUIRED)`` 는 CMake가 LibTorch 라이브러리 빌드 설정을
+찾도록 안내합니다. CMake가 해당 파일의 *위치*를 찾을 수 있도록 하려면 ``cmake`` 호출 시 ``CMAKE_PREFIX_PATH`` 를
 설정해야 합니다. 이에 앞서 ``dcgan`` 애플리케이션에 대해 다음의 디렉터리 구조를 다음과 같이 통일하도록 
 하겠습니다:
 
@@ -146,8 +142,8 @@ C++ 프론트엔드의 목적은 파이썬 프론트엔드와 경쟁하는 것�
     CMakeLists.txt
     dcgan.cpp
 
-또한 앞으로 압축 해제된 LibTorch 배포판의 경로를 ``/path/to/libtorch``로 부르도록 하겠습니다. 이는 **반드시** 
-**절대 경로여야** 합니다. 특히 ``CMAKE_PREFIX_PATH``를 ``../../libtorch``와 같이 설정하면 예상치 못한 
+또한 앞으로 압축 해제된 LibTorch 배포판의 경로를 ``/path/to/libtorch`` 로 부르도록 하겠습니다. 이는 **반드시** 
+**절대 경로여야** 합니다. 특히 ``CMAKE_PREFIX_PATH`` 를 ``../../libtorch`` 와 같이 설정하면 예상치 못한 
 오류가 발생할 수 있습니다. 그보다는 해당 절대 경로를 가져오기 위해 "$PWD/../../libtorch"를 입력하세요. 
 이제 애플리케이션을 빌드할 준비가 되었습니다.
 
@@ -190,7 +186,7 @@ C++ 프론트엔드의 목적은 파이썬 프론트엔드와 경쟁하는 것�
   [100%] Built target dcgan
 
 위에서 우리는 먼저 ``dcgan`` 디렉터리 안에 ``build`` 폴더를 만들고 이 폴더에 들어가서 필요한 빌드(Make) 파일을 
-생성하는 ``cmake`` 명령을 실행한 후 ``cmake --build . --config Release``를 실행하여 프로젝트를 성공적으로 
+생성하는 ``cmake`` 명령어를 실행한 후 ``cmake --build . --config Release`` 를 실행하여 프로젝트를 성공적으로 
 컴파일했습니다. 이제 우리의 작은 바이너리를 실행하고 기본 프로젝트 설정에 대한 이 섹션을 완료할 준비가 됐습니다.
 
 .. code-block:: shell
@@ -214,7 +210,7 @@ C++ 프론트엔드의 목적은 파이썬 프론트엔드와 경쟁하는 것�
 ^^^^^^^^^^^^^^
 
 파이썬 인터페이스와 마찬가지로, C++ 프론트엔드에 기반을 둔 신경망도 *모듈*이라 불리는 재사용 가능한 빌딩 블록으로 
-구성되어 있습니다. 파이썬에 다른 모든 모듈이 파생되는 ``torch.nn.Module``라는 기본 모듈 클래스가 있듯이 C++에는
+구성되어 있습니다. 파이썬에 다른 모든 모듈이 파생되는 ``torch.nn.Module`` 라는 기본 모듈 클래스가 있듯이 C++에는
 ``torch::nn::Module`` 클래스가 있습니다. 모듈에는 캡슐화하는 알고리즘을 구현하는 ``forward()`` 메서드를 비롯해
 일반적으로 매개 변수, 버퍼 및 하위 모듈의 세 가지 하위 개체가 포함됩니다.
 
@@ -223,9 +219,9 @@ C++ 프론트엔드의 목적은 파이썬 프론트엔드와 경쟁하는 것�
 특정 논리 및 상태 블록을 재사용하기 위해, PyTorch API는 모듈들이 중첩되는 것을 허용합니다. 중첩된 모듈은 *하위*
 *모듈*이라고 합니다.
 
-매개 변수, 버퍼 및 하위 모듈은 명시적으로 등록(register)을 해야 합니다. 등록이 되면 ``parameters()``나 ``buffers()``
+매개 변수, 버퍼 및 하위 모듈은 명시적으로 등록(register)을 해야 합니다. 등록이 되면 ``parameters()`` 나 ``buffers()``
 같은 메서드를 사용하여 (중첩을 포함한) 전체 모듈 계층 구조에서 모든 매개 변수 묶음을 검색할 수 있습니다. 마찬가지로,
-``to(...)``와 같은 메서드는 전체 모듈 계층 구조에 대해 작동하는데, 예를 들어 ``to(torch::kCUDA)``는 모든 매개 
+``to(...)`` 와 같은 메서드는 전체 모듈 계층 구조에 대해 작동하는데, 예를 들어 ``to(torch::kCUDA)`` 는 모든 매개 
 변수와 버퍼를 CPU에서 CUDA 메모리로 이동시킵니다.
 
 Defining a Module and Registering Parameters
@@ -1257,11 +1253,11 @@ the digits look even better?
 결론
 ----
 
-이 튜토리얼을 통해 PyTorch C++ 프론트엔드에 대한 어느 정도 이해도가 생겼기를 바랍니다. 필연적으로 PyTorch
+이 튜토리얼을 통해 PyTorch C++ 프론트엔드에 대한 어느 정도 이해도가 생기셨기 바랍니다. 필연적으로 PyTorch
 같은 머신러닝 라이브러리는 매우 다양하고 광범위한 API를 가지고 있습니다. 따라서, 여기서 논의하기에 시간과
 공간이 부족했던 개념들이 많습니다. 그러나 직접 API를 사용해보고, 특히 `라이브러리 API <https://pytorch.org/cppdocs/api/library_root.html>`_ 섹션을 참조해보는
 것을 권장드립니다. 또한, C++ 프론트엔드가 파이썬 프론트엔드의 디자인과 시맨틱을 따른다는 사실을 잘 기억하면
-학습 능률을 높일 수 있을 것입니다.
+보다 빠르게 학습할 수 있을 것입니다.
 
 .. tip::
 
