@@ -203,39 +203,30 @@ C++ 프론트엔드의 목적은 파이썬 프론트엔드와 경쟁하는 것�
 
 제가 보기엔 항등 행렬인 것 같군요!
 
-Defining the Neural Network Models
-----------------------------------
+신경망 모델 정의하기
+------------
 
-Now that we have our basic environment configured, we can dive into the much
-more interesting parts of this tutorial. First, we will discuss how to define
-and interact with modules in the C++ frontend. We'll begin with basic,
-small-scale example modules and then implement a full-fledged GAN using the
-extensive library of built-in modules provided by the C++ frontend.
+이제 기본적인 환경을 설정했으니, 이번 튜토리얼을 통해 훨씬 더 흥미로운 부분을 살펴봅시다. 먼저 C++ 프론트엔드에서
+모듈을 정의하고 상호 작용하는 방법에 대해 논의하겠습니다. 기본적인 소규모 예제 모듈부터 시작하여 C++ 프론트엔드가
+제공하는 다양한 내장 모듈 라이브러리를 사용하여 완성도 있는 GAN을 구현하겠습니다.
 
-Module API Basics
-^^^^^^^^^^^^^^^^^
+모듈 API 기본기
+^^^^^^^^^^^
 
-In line with the Python interface, neural networks based on the C++ frontend are
-composed of reusable building blocks called *modules*. There is a base module
-class from which all other modules are derived. In Python, this class is
-``torch.nn.Module`` and in C++ it is ``torch::nn::Module``. Besides a
-``forward()`` method that implements the algorithm the module encapsulates, a
-module usually contains any of three kinds of sub-objects: parameters, buffers
-and submodules.
+파이썬 인터페이스와 마찬가지로, C++ 프론트엔드에 기반을 둔 신경망도 *모듈*이라 불리는 재사용 가능한 빌딩 블록으로 
+구성되어 있습니다. 파이썬에 다른 모든 모듈이 파생되는 ``torch.nn.Module``라는 기본 모듈 클래스가 있듯이 C++에는
+``torch::nn::Module`` 클래스가 있습니다. 모듈에는 캡슐화하는 알고리즘을 구현하는 ``forward()`` 메서드를 비롯해
+일반적으로 매개 변수, 버퍼 및 하위 모듈의 세 가지 하위 개체가 포함됩니다.
 
-Parameters and buffers store state in form of tensors. Parameters record
-gradients, while buffers do not. Parameters are usually the trainable weights of
-your neural network. Examples of buffers include means and variances for batch
-normalization. In order to re-use particular blocks of logic and state, the
-PyTorch API allows modules to be nested. A nested module is termed a
-*submodule*.
+매개 변수와 버퍼는 텐서의 형태로 상태를 저장합니다. 매개 변수는 그래디언트를 기록하지만 버퍼는 기록하지 않습니다.
+매개 변수는 일반적으로 신경망의 학습 가능한 가중치입니다. 버퍼의 예로는 배치 정규화를 위한 평균 및 분산이 있습니다.
+특정 논리 및 상태 블록을 재사용하기 위해, PyTorch API는 모듈들이 중첩되는 것을 허용합니다. 중첩된 모듈은 *하위*
+*모듈*이라고 합니다.
 
-Parameters, buffers and submodules must be explicitly registered. Once
-registered, methods like ``parameters()`` or ``buffers()`` can be used to
-retrieve a container of all parameters in the entire (nested) module hierarchy.
-Similarly, methods like ``to(...)``, where e.g. ``to(torch::kCUDA)`` moves all
-parameters and buffers from CPU to CUDA memory, work on the entire module
-hierarchy.
+매개 변수, 버퍼 및 하위 모듈은 명시적으로 등록(register)을 해야 합니다. 등록이 되면 ``parameters()``나 ``buffers()``
+같은 메서드를 사용하여 (중첩을 포함한) 전체 모듈 계층 구조에서 모든 매개 변수 묶음을 검색할 수 있습니다. 마찬가지로,
+``to(...)``와 같은 메서드는 전체 모듈 계층 구조에 대해 작동하는데, 예를 들어 ``to(torch::kCUDA)``는 모든 매개 
+변수와 버퍼를 CPU에서 CUDA 메모리로 이동시킵니다.
 
 Defining a Module and Registering Parameters
 ********************************************
@@ -1263,24 +1254,17 @@ Which should look something like this:
 Digits! Hooray! Now the ball is in your court: can you improve the model to make
 the digits look even better?
 
-Conclusion
-----------
+결론
+--
 
-This tutorial has hopefully given you a digestible digest of the PyTorch C++
-frontend. A machine learning library like PyTorch by necessity has a very broad
-and extensive API. As such, there are many concepts we did not have time or
-space to discuss here. However, I encourage you to try out the API, and consult
-`our documentation <https://pytorch.org/cppdocs/>`_ and in particular the
-`Library API <https://pytorch.org/cppdocs/api/library_root.html>`_ section when
-you get stuck. Also, remember that you can expect the C++ frontend to follow the
-design and semantics of the Python frontend whenever we could make this
-possible, so you can leverage this fact to increase your learning rate.
+이 튜토리얼을 통해 PyTorch C++ 프론트엔드에 대한 어느 정도 이해도가 생겼기를 바랍니다. 필연적으로 PyTorch
+같은 머신러닝 라이브러리는 매우 다양하고 광범위한 API를 가지고 있습니다. 따라서, 여기서 논의하기에 시간과
+공간이 부족했던 개념들이 많습니다. 그러나 직접 API를 사용해보고, 특히 `라이브러리 API <https://pytorch.org/cppdocs/api/library_root.html>`_ 섹션을 참조해보는
+것을 권장드립니다. 또한, C++ 프론트엔드가 파이썬 프론트엔드의 디자인과 시맨틱을 따른다는 사실을 잘 기억하면
+학습 능률을 높일 수 있을 것입니다.
 
 .. tip::
 
-  You can find the full source code presented in this tutorial `in this
-  repository <https://github.com/pytorch/examples/tree/master/cpp/dcgan>`_.
+  본 튜토리얼에 대한 전체 소스코드는 `이 저장소 <https://github.com/pytorch/examples/tree/master/cpp/dcgan>`_ 에 제공되어 있습니다.
 
-As always, if you run into any problems or have questions, you can use our
-`forum <https://discuss.pytorch.org/>`_ or `GitHub issues
-<https://github.com/pytorch/pytorch/issues>`_ to get in touch.
+언제나 그렇듯이 어떤 문제가 생기거나 질문이 있으면 저희 `포럼 <https://discuss.pytorch.org/>`_ 을 이용하거나 `Github 이슈 <https://github.com/pytorch/pytorch/issues>`_ 로 연락주세요.
