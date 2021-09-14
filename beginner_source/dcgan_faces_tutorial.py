@@ -319,7 +319,7 @@ class Generator(nn.Module):
 ######################################################################
 # 좋아요, 이제 우리는 생성자의 인스턴스를 만들고 ``weights_init``
 # 함수를 적용시킬 수 있습니다. 모델의 인스턴스를 출력해서 생성자가
-# 어떻게 구성되어있는지 확인해보세요.
+# 어떻게 구성되어있는지 확인해봅시다.
 # 
 
 # 생성자를 만듭니다
@@ -329,7 +329,7 @@ netG = Generator(ngpu).to(device)
 if (device.type == 'cuda') and (ngpu > 1):
     netG = nn.DataParallel(netG, list(range(ngpu)))
 
-# 모든 가중치의 평균을 0, 분산을 0.02로 만들기 위해
+# 모든 가중치의 평균을 0, 분산을 0.02로 초기화 하기 위해
 # weight_init 함수를 적용시킵니다
 netG.apply(weights_init)
 
@@ -399,7 +399,7 @@ netD = Discriminator(ngpu).to(device)
 if (device.type == 'cuda') and (ngpu > 1):
     netD = nn.DataParallel(netD, list(range(ngpu)))
     
-# 모든 가중치의 평균을 0, 분산을 0.02로 만들기 위해
+# 모든 가중치의 평균을 0, 분산을 0.02로 초기화 하기 위해
 # weight_init 함수를 적용시킵니다
 netD.apply(weights_init)
 
