@@ -11,8 +11,8 @@ C++ 프론트엔드는 이 기초 C++ 코드베이스를 비롯해 머신러닝 
 위한 API, 직렬화 루틴 등이 포합됩니다.
 
 이 튜토리얼은 C++ 프론트엔드로 모델을 학습하는 엔드 투 엔드 예제를 안내합니다.
-구체적으로, 우리는 생성 모델 중 하나인 `DCGAN 
-<https://arxiv.org/abs/1511.06434>`_ 
+구체적으로, 우리는 생성 모델 중 하나인 `DCGAN
+<https://arxiv.org/abs/1511.06434>`_
 을 학습시켜 MNIST 숫자 이미지들을 생성할
 것입니다. 개념적으로 쉬운 예시이지만, 여러분이 PyTorch C++ 프론트엔드에 대한 대략적인
 개요를 파악하고 더 복잡한 모델을 학습시키고싶은 욕구를 불러일으키기에 충분할 것입니다.
@@ -23,7 +23,7 @@ C++ 프론트엔드는 이 기초 C++ 코드베이스를 비롯해 머신러닝 
 
   C++ 프론트엔드에 대한 짧고 재미있는 발표를 보려면 `이 CppCon 2018 라이트닝 토크
   <https://www.youtube.com/watch?v=auRPXMMHJzc>`_ 를 시청하세요
-  
+
 
 .. tip::
 
@@ -33,7 +33,7 @@ C++ 프론트엔드는 이 기초 C++ 코드베이스를 비롯해 머신러닝 
 .. tip::
 
   PyTorch C++ 생태계에 대한 문서는 https://pytorch.org/cppdocs에서 확인할 수 있습니다.
-  API 레벨의 문서뿐만 아니라 개괄적인 설명도 찾을 수 있을 것입니다. 
+  API 레벨의 문서뿐만 아니라 개괄적인 설명도 찾을 수 있을 것입니다.
 
 동기 부여를 위해
 ---------------
@@ -44,7 +44,7 @@ GAN과 MNIST 숫자로의 설레는 여정을 시작하기에 앞서, 먼저 파
 만들었습니다. 예를 들면 다음과 같습니다.
 
 - **저지연 시스템**: 초당 프레임 수가 높고 지연 시간이 짧은 순수 C++ 게임 엔진에서
-  강화 학습 연구를 수행할 수 있습니다. 그러한 환경에서는 파이썬 라이브러리보다 순수 C++ 
+  강화 학습 연구를 수행할 수 있습니다. 그러한 환경에서는 파이썬 라이브러리보다 순수 C++
   라이브러리를 사용하는 것이 훨씬 더 적합합니다. 파이썬은 느린 인터프리터 때문에 매우
 - **극심한 멀티쓰레딩 환경**: 글로벌 인터프리터 락(GIL)으로 인해 파이썬은 동시에 둘
   이상의 시스템 쓰레드를 실행할 수 없습니다. 대안으로 멀티프로세싱을 사용하면 확장성이
@@ -53,19 +53,19 @@ GAN과 MNIST 숫자로의 설레는 여정을 시작하기에 앞서, 먼저 파
   필요한 모델도 이를 활용할 수 있습니다.
 - **기존의 C++ 코드베이스**: 백엔드 서버의 웹 페이지 서비스부터 사진 편집 소프트웨어의
   3D 그래픽 렌더링에 이르기까지 모든 작업을 수행하는 기존 C++ 애플리케이션의 소유자가
-  머신러닝 방법론을 시스템에 통합하고자 합니다. C++ 프론트엔드는 PyTorch (파이썬) 경험 
+  머신러닝 방법론을 시스템에 통합하고자 합니다. C++ 프론트엔드는 PyTorch (파이썬) 경험
   본연의 높은 유연성과 직관성을 유지하면서, 파이썬과 C++를 앞뒤로 바인딩하는 번거로움 없이
   C++를 사용할 수 있게 해줍니다.
 
 C++ 프론트엔드의 목적은 파이썬 프론트엔드와 경쟁하는 것이 아닌 보완하는 것입니다. 연구자와
 엔지니어 모두가 PyTorch의 단순성, 유연성 및 직관적인 API를 매우 좋아합니다. 우리의 목표는
-여러분이 위의 예시를 비롯한 모든 가능한 환경에서 이 핵심 디자인 원칙을 이용할 수 있도록 하는 
+여러분이 위의 예시를 비롯한 모든 가능한 환경에서 이 핵심 디자인 원칙을 이용할 수 있도록 하는
 것입니다. 이러한 시나리오 중 하나가 여러분의 사례에 해당하거나 단순히 관심이 있거나 궁금하다면
 아래 내용을 통해 C++ 프론트엔드에 대해 자세히 살펴보세요.
 
 .. tip::
 
-	C++ 프론트엔드는 파이썬 프론트엔드와 최대한 유사한 API를 제공하고자 합니다. 만일 파이썬 
+	C++ 프론트엔드는 파이썬 프론트엔드와 최대한 유사한 API를 제공하고자 합니다. 만일 파이썬
   프론트엔드에 익숙한 사람이 "C++ 프론트엔드로 X를 어떻게 해야 하는가?" 의문을 갖는다면, 많은
   경우에 파이썬에서와 같은 방식으로 코드를 작성해 파이썬에서와 동일한 함수와 메서드를 사용할 수
   있을 것입니다. (다만, 온점을 더블 콜론으로 바꾸는 것에 유의하세요.)
@@ -74,9 +74,9 @@ C++ 프론트엔드의 목적은 파이썬 프론트엔드와 경쟁하는 것�
 --------------------
 
 먼저 최소한의 C++ 애플리케이션을 작성해 우리의 설정 및 빌드 환경이 동일한지 확인하겠습니다.
-먼저, C++ 프론트엔드를 사용하는 데 필요한 모든 관련 헤더, 라이브러리 및 CMake 빌드 파일을 
-패키징하는 *LibTorch* 배포판의 사본이 필요합니다. 리눅스, 맥OS, 윈도우용 LibTorch 배포판은 
-`PyTorch website <https://pytorch.org/get-started/locally/>`_ 에서 다운로드할 수 있습니다. 이 튜토리얼의 나머지 부분은 기본 우분투 리눅스 
+먼저, C++ 프론트엔드를 사용하는 데 필요한 모든 관련 헤더, 라이브러리 및 CMake 빌드 파일을
+패키징하는 *LibTorch* 배포판의 사본이 필요합니다. 리눅스, 맥OS, 윈도우용 LibTorch 배포판은
+`PyTorch website <https://pytorch.org/get-started/locally/>`_ 에서 다운로드할 수 있습니다. 이 튜토리얼의 나머지 부분은 기본 우분투 리눅스
 환경을 가정하지만 맥OS나 윈도우를 사용하셔도 괜찮습니다.
 
 .. tip::
@@ -89,7 +89,7 @@ C++ 프론트엔드의 목적은 파이썬 프론트엔드와 경쟁하는 것�
   LibTorch의 디버그 버전을 사용해보세요. 아래의 ``cmake --build .`` 에 올바른 설정을 지정하는 것도
   잊지 마세요.
 
-가장 먼저 할 것은 PyTorch 웹사이트에서 검색된 링크를 통해 LibTorch 배포판을 로컬에 다운로드하는 
+가장 먼저 할 것은 PyTorch 웹사이트에서 검색된 링크를 통해 LibTorch 배포판을 로컬에 다운로드하는
 것입니다. 바닐라 Ubuntu Linux 환경의 경우 다음 명령어를 실행합니다.
 
 .. code-block:: shell
@@ -133,7 +133,7 @@ C++ 프론트엔드의 목적은 파이썬 프론트엔드와 경쟁하는 것�
 
 위 CMake 파일 4번째 줄의 ``find_package(Torch REQUIRED)`` 는 CMake가 LibTorch 라이브러리 빌드 설정을
 찾도록 안내합니다. CMake가 해당 파일의 *위치*를 찾을 수 있도록 하려면 ``cmake`` 호출 시 ``CMAKE_PREFIX_PATH`` 를
-설정해야 합니다. 이에 앞서 ``dcgan`` 애플리케이션에 대해 다음의 디렉터리 구조를 다음과 같이 통일하도록 
+설정해야 합니다. 이에 앞서 ``dcgan`` 애플리케이션에 대해 다음의 디렉터리 구조를 다음과 같이 통일하도록
 하겠습니다:
 
 .. code-block:: shell
@@ -142,9 +142,9 @@ C++ 프론트엔드의 목적은 파이썬 프론트엔드와 경쟁하는 것�
     CMakeLists.txt
     dcgan.cpp
 
-또한 앞으로 압축 해제된 LibTorch 배포판의 경로를 ``/path/to/libtorch`` 로 부르도록 하겠습니다. 이는 **반드시** 
-**절대 경로여야** 합니다. 특히 ``CMAKE_PREFIX_PATH`` 를 ``../../libtorch`` 와 같이 설정하면 예상치 못한 
-오류가 발생할 수 있습니다. 그보다는 해당 절대 경로를 가져오기 위해 "$PWD/../../libtorch"를 입력하세요. 
+또한 앞으로 압축 해제된 LibTorch 배포판의 경로를 ``/path/to/libtorch`` 로 부르도록 하겠습니다. 이는 **반드시**
+**절대 경로여야** 합니다. 특히 ``CMAKE_PREFIX_PATH`` 를 ``../../libtorch`` 와 같이 설정하면 예상치 못한
+오류가 발생할 수 있습니다. 그보다는 해당 절대 경로를 가져오기 위해 "$PWD/../../libtorch"를 입력하세요.
 이제 애플리케이션을 빌드할 준비가 되었습니다.
 
 .. code-block:: shell
@@ -185,8 +185,8 @@ C++ 프론트엔드의 목적은 파이썬 프론트엔드와 경쟁하는 것�
   [100%] Linking CXX executable dcgan
   [100%] Built target dcgan
 
-위에서 우리는 먼저 ``dcgan`` 디렉터리 안에 ``build`` 폴더를 만들고 이 폴더에 들어가서 필요한 빌드(Make) 파일을 
-생성하는 ``cmake`` 명령어를 실행한 후 ``cmake --build . --config Release`` 를 실행하여 프로젝트를 성공적으로 
+위에서 우리는 먼저 ``dcgan`` 디렉터리 안에 ``build`` 폴더를 만들고 이 폴더에 들어가서 필요한 빌드(Make) 파일을
+생성하는 ``cmake`` 명령어를 실행한 후 ``cmake --build . --config Release`` 를 실행하여 프로젝트를 성공적으로
 컴파일했습니다. 이제 우리의 작은 바이너리를 실행하고 기본 프로젝트 설정에 대한 이 섹션을 완료할 준비가 됐습니다.
 
 .. code-block:: shell
@@ -209,7 +209,7 @@ C++ 프론트엔드의 목적은 파이썬 프론트엔드와 경쟁하는 것�
 모듈 API 기본기
 ^^^^^^^^^^^^^^
 
-파이썬 인터페이스와 마찬가지로, C++ 프론트엔드에 기반을 둔 신경망도 *모듈*이라 불리는 재사용 가능한 빌딩 블록으로 
+파이썬 인터페이스와 마찬가지로, C++ 프론트엔드에 기반을 둔 신경망도 *모듈*이라 불리는 재사용 가능한 빌딩 블록으로
 구성되어 있습니다. 파이썬에 다른 모든 모듈이 파생되는 ``torch.nn.Module`` 라는 기본 모듈 클래스가 있듯이 C++에는
 ``torch::nn::Module`` 클래스가 있습니다. 모듈에는 캡슐화하는 알고리즘을 구현하는 ``forward()`` 메서드를 비롯해
 일반적으로 매개 변수, 버퍼 및 하위 모듈의 세 가지 하위 개체가 포함됩니다.
@@ -221,14 +221,13 @@ C++ 프론트엔드의 목적은 파이썬 프론트엔드와 경쟁하는 것�
 
 매개 변수, 버퍼 및 하위 모듈은 명시적으로 등록(register)을 해야 합니다. 등록이 되면 ``parameters()`` 나 ``buffers()``
 같은 메서드를 사용하여 (중첩을 포함한) 전체 모듈 계층 구조에서 모든 매개 변수 묶음을 검색할 수 있습니다. 마찬가지로,
-``to(...)`` 와 같은 메서드는 전체 모듈 계층 구조에 대해 작동하는데, 예를 들어 ``to(torch::kCUDA)`` 는 모든 매개 
+``to(...)`` 와 같은 메서드는 모듈 계층 구조 전체에 대한 메서드입니다. 예를 들어, ``to(torch::kCUDA)`` 는 모든 매개
 변수와 버퍼를 CPU에서 CUDA 메모리로 이동시킵니다.
 
-Defining a Module and Registering Parameters
-********************************************
+모듈 정의 및 매개변수 등록
+*************************
 
-To put these words into code, let's consider this simple module written in the
-Python interface:
+이 개념들을 코드로 구현하기 위해, 파이썬 인터페이스로 작성된 아래 모듈을 살펴봅시다.
 
 .. code-block:: python
 
@@ -244,7 +243,7 @@ Python interface:
       return torch.addmm(self.b, input, self.W)
 
 
-In C++, it would look like this:
+이를 C++로 작성하면 다음과 같습니다.
 
 .. code-block:: cpp
 
@@ -261,23 +260,19 @@ In C++, it would look like this:
     torch::Tensor W, b;
   };
 
-Just like in Python, we define a class called ``Net`` (for simplicity here a
-``struct`` instead of a ``class``) and derive it from the module base class.
-Inside the constructor, we create tensors using ``torch::randn`` just like we
-use ``torch.randn`` in Python. One interesting difference is how we register the
-parameters. In Python, we wrap the tensors with the ``torch.nn.Parameter``
-class, while in C++ we have to pass the tensor through the
-``register_parameter`` method instead. The reason for this is that the Python
-API can detect that an attribute is of type ``torch.nn.Parameter`` and
-automatically registers such tensors. In C++, reflection is very limited, so a
-more traditional (and less magical) approach is provided.
+파이썬에서와 마찬가지로 모듈 기본 클래스에서 파생한 ``Net`` 이라는 클래스를 정의합니다. (쉬운 설명을 위해 ``class``
+대신 ``struct``을 사용했습니다.) 파이썬에서 torch.randn을 사용하는 것처럼 생성자에서는 ``torch::randn`` 을 사용해
+텐서를 만듭니다. 한 가지 흥미로운 차이점은 매개변수를 등록하는 방법입니다. 파이썬에서는 텐서를 ``torch.nn``으로
+감싸는 것과 달리, C++에서는 ``register_parameter`` 메서드를 통해 텐서를 전달해야 합니다. 이러한 차이의 원인은 파이썬
+API의 경우, 어떤 속성(attirbute)이 ''torch.nn.Parameter`` 타입인지 감지해 그러한 텐서를 자동으로 등록할 수 있기
+때문에 나타납니다. C++에서는 리플렉션(reflection)이 매우 제한적이므로 보다 전통적인 (그리하여 덜 마법적인) 방식이
+제공됩니다.
 
-Registering Submodules and Traversing the Module Hierarchy
-**********************************************************
+서브모듈 등록 및 모듈 계층 구조 탐색
+**********************************
 
-In the same way we can register parameters, we can also register submodules. In
-Python, submodules are automatically detected and registered when they are
-assigned as an attribute of a module:
+매개 변수 등록과 마찬가지 방법으로 서브모듈을 등록할 수 있습니다. 파이썬에서 서브모듈은 어떤 모듈의 속성으로 지정될 때
+자동으로 감지되고 등록됩니다.
 
 .. code-block:: python
 
@@ -291,8 +286,7 @@ assigned as an attribute of a module:
     def forward(self, input):
       return self.linear(input) + self.another_bias
 
-This allows, for example, to use the ``parameters()`` method to recursively
-access all parameters in our module hierarchy:
+예를 들어, ``parameters()`` 메서드를 사용하면 모듈 계층의 모든 매개 변수에 재귀적으로 액세스할 수 있습니다.
 
 .. code-block:: python
 
@@ -307,8 +301,8 @@ access all parameters in our module hierarchy:
           [ 0.3730,  0.4307,  0.3236, -0.0629]], requires_grad=True), Parameter containing:
   tensor([ 0.2038,  0.4638, -0.2023,  0.1230, -0.0516], requires_grad=True)]
 
-To register submodules in C++, use the aptly named ``register_module()`` method
-to register a module like ``torch::nn::Linear``:
+C++에서 ``torch::nn::Linear`` 등의 모듈을 서브모듈로 등록하려면 이름이 말해주듯이 ``register_module()`` 메서드를
+사용합니다.
 
 .. code-block:: cpp
 
@@ -326,18 +320,13 @@ to register a module like ``torch::nn::Linear``:
 
 .. tip::
 
-  You can find the full list of available built-in modules like
-  ``torch::nn::Linear``, ``torch::nn::Dropout`` or ``torch::nn::Conv2d`` in the
-  documentation of the ``torch::nn`` namespace `here
-  <https://pytorch.org/cppdocs/api/namespace_torch__nn.html>`_.
+  ``torch::nn``에 대한 `이 문서 <https://pytorch.org/cppdocs/api/namespace_torch__nn.html>`_ 에서 ``torch::nn::Linear``, ``torch::nn::Dropout``, ``torch::nn::Conv2d`` 등 사용 가능한
+  전체 빌트인 모듈 목록을 확인할 수 있습니다.
 
-One subtlety about the above code is why the submodule was created in the
-constructor's initializer list, while the parameter was created inside the
-constructor body. There is a good reason for this, which we'll touch upon this
-in the section on the C++ frontend's *ownership model* further below. The end
-result, however, is that we can recursively access our module tree's parameters
-just like in Python. Calling ``parameters()`` returns a
-``std::vector<torch::Tensor>``, which we can iterate over:
+위 코드에서 한 가지 미묘한 사실은 서브모듈은 생성자의 이니셜라이저 목록에 작성되고 매개 변수는 생성자의 바디(body)에
+작성되었다는 것입니다. 여기에는 충분한 이유가 있으며 아래 C++ 프론트엔드의 *오너십 모델* 섹션에서 더 다룰 예정입니다.
+그렇지만 최종 결론은 파이썬에서처럼 모듈 트리의 매개 변수에 재귀적으로 액세스할 수 있다는 것입니다. ``parameters()``를
+호출하면 순회가 가능한 ``std::vector<torch::Tensor>``가 반환됩니다.
 
 .. code-block:: cpp
 
@@ -348,7 +337,7 @@ just like in Python. Calling ``parameters()`` returns a
     }
   }
 
-which prints:
+이를 실행한 결과는 다음과 같습니다.
 
 .. code-block:: shell
 
@@ -373,9 +362,8 @@ which prints:
   -20.0705
   [ Variable[CPUFloatType]{5} ]
 
-with three parameters just like in Python. To also see the names of these
-parameters, the C++ API provides a ``named_parameters()`` method which returns
-an ``OrderedDict`` just like in Python:
+파이썬에서처럼 세 개의 매개변수가 출력됐습니다. 이 매개 변수들의 이름을 확인할 수 있도록 C++ API는 ``named_parameters()``
+메서드를 제공하며, 이는 파이썬에서와 같이 ``Orderdict``를 반환합니다.
 
 .. code-block:: cpp
 
@@ -384,7 +372,7 @@ an ``OrderedDict`` just like in Python:
     std::cout << pair.key() << ": " << pair.value() << std::endl;
   }
 
-which we can execute again to see the output:
+마찬가지로 코드를 실행하면 결과는 아래와 같습니다.
 
 .. code-block:: shell
 
@@ -414,10 +402,7 @@ which we can execute again to see the output:
 
 .. note::
 
-  `The documentation
-  <https://pytorch.org/cppdocs/api/classtorch_1_1nn_1_1_module.html#exhale-class-classtorch-1-1nn-1-1-module>`_
-  for ``torch::nn::Module`` contains the full list of methods that operate on
-  the module hierarchy.
+  ``torch::nn::Module``에 대한 `문서 <https://pytorch.org/cppdocs/api/classtorch_1_1nn_1_1_module.html#exhale-class-classtorch-1-1nn-1-1-module>`_ 는 모듈 계층 구조에 대한 메서드 목록 전체가 포함되어 있습니다.
 
 Running the Network in Forward Mode
 ***********************************
@@ -1111,22 +1096,17 @@ or even
 
   torch::Device device(torch::cuda::is_available() ? torch::kCUDA : torch::kCPU);
 
-Checkpointing and Recovering the Training State
------------------------------------------------
+학습 상태 저장 및 복원
+---------------------
 
-The last augmentation we should make to our training script is to periodically
-save the state of our model parameters, the state of our optimizers as well as a
-few generated image samples. If our computer were to crash in the middle of the
-training procedure, the first two will allow us to restore the training state.
-For long-lasting training sessions, this is absolutely essential. Fortunately,
-the C++ frontend provides an API to serialize and deserialize both model and
-optimizer state, as well as individual tensors.
+마지막으로 학습 스크립트에 추가해야 할 내용은 모델 매개 변수 및 옵티마이저의 상태, 그리고 생성된 몇 개의 이미지 샘플을
+주기적으로 저장하는 것입니다. 학습 과정 도중에 컴퓨터가 다운되면 이렇게 저장된 상태로부터 학습 상태를 복원할 수 있습니다.
+이는 장시간 지속되는 학습을 위해 필수로 요구됩니다. 다행히도 C++ 프론트엔드는 개별 텐서뿐만 아니라 모델 및 옵티마이저
+상태를 직렬화하고 역직렬화할 수 있는 API를 제공합니다.
 
-The core API for this is ``torch::save(thing,filename)`` and
-``torch::load(thing,filename)``, where ``thing`` could be a
-``torch::nn::Module`` subclass or an optimizer instance like the ``Adam`` object
-we have in our training script. Let's update our training loop to checkpoint the
-model and optimizer state at a certain interval:
+이를 위한 핵심 API는 ``torch::save(thing,filename)`` 와 ``torch::load(thing,filename)`` 로, 여기서 ``thing`` 은 ``torch::nn::Module``
+의 하위 클래스 혹은 우리의 학습 스크립트의 ``Adam`` 객체와 같은 옵티마이저 인스턴스가 될 수 있습니다. 모델 및 옵티마이저
+상태를 특정 주기마다 저장하도록 학습 루프를 수정해보겠습니다.
 
 .. code-block:: cpp
 
@@ -1142,12 +1122,10 @@ model and optimizer state at a certain interval:
     std::cout << "\n-> checkpoint " << ++checkpoint_counter << '\n';
   }
 
-where ``kCheckpointEvery`` is an integer set to something like ``100`` to
-checkpoint every ``100`` batches, and ``checkpoint_counter`` is a counter bumped
-every time we make a checkpoint.
+여기서 ``100`` 배치마다 상태를 저장하려면 ``kCheckpointEvery``를 ``100`` 과 같은 정수로 설정할 수 있으며, ``checkpoint_counter``는
+상태를 저장할 때마다 증가하는 카운터입니다.
 
-To restore the training state, you can add lines like these after all models and
-optimizers are created, but before the training loop:
+학습 상태를 복원하기 위해 모델 및 옵티마이저를 모두 생성한 후 학습 루프 앞에 다음 코드를 추가할 수 있습니다.
 
 .. code-block:: cpp
 
@@ -1170,14 +1148,12 @@ optimizers are created, but before the training loop:
     for (torch::data::Example<>& batch : *data_loader) {
 
 
-Inspecting Generated Images
----------------------------
+생성된 이미지 검사하기
+---------------------
 
-Our training script is now complete. We are ready to train our GAN, whether on
-CPU or GPU. To inspect the intermediary output of our training procedure, for
-which we added code to periodically save image samples to the
-``"dcgan-sample-xxx.pt"`` file, we can write a tiny Python script to load the
-tensors and display them with matplotlib:
+학습 스크립트가 완성되어 CPU에서든 GPU에서든 GAN을 훈련시킬 준비가 됐습니다. 학습 과정의 중간 출력을 검사하기 위해
+``"dcgan-sample-xxx.pt"``에 주기적으로 이미지 샘플을 저장하는 코드를 추가했으니, 텐서들을 불러와 matplotlib로
+시각화하는 간단한 파이썬 스크립트를 작성해보겠습니다.
 
 .. code-block:: python
 
@@ -1210,7 +1186,7 @@ tensors and display them with matplotlib:
   plt.savefig(options.out_file)
   print("Saved ", options.out_file)
 
-Let's now train our model for around 30 epochs:
+이제 약 30 에폭 정도 모델을 학습시킵시다.
 
 .. code-block:: shell
 
@@ -1235,20 +1211,19 @@ Let's now train our model for around 30 epochs:
   -> checkpoint 120
   [30/30][938/938] D_loss: 0.3610 | G_loss: 3.8084
 
-And display the imags in a plot:
+그리고 이미지들을 플롯에 시각화합니다.
 
 .. code-block:: shell
 
   root@3c0711f20896:/home/build# python display.py -i dcgan-sample-100.pt
   Saved out.png
 
-Which should look something like this:
+그 결과는 아래와 같을 것입니다.
 
 .. figure:: /_static/img/cpp-frontend/digits.png
    :alt: digits
 
-Digits! Hooray! Now the ball is in your court: can you improve the model to make
-the digits look even better?
+숫자네요! 만세! 이제 여러분 차례입니다. 숫자가 보다 나아 보이도록 모델을 개선할 수 있나요?
 
 결론
 ----
