@@ -1,6 +1,6 @@
 """
 배포를 위한 비전 트랜스포머(Vision Transformer) 모델 최적화하기
-==============================================================
+=================================================================
 Authors : `Jeff Tang <https://github.com/jeffxtang>`_,
 `Geeta Chauhan <https://github.com/gchauhan/>`_
 번역 : `김태영 <https://github.com/Taeyoung96/>`_
@@ -16,24 +16,18 @@ FaceBook에서 발표한 Data-efficient Image Transformers는 `DeiT <https://ai.
 그 다음 스크립팅(scripting), 양자화, 최적화, 그리고 iOS와 안드로이드 앱 안에서 
 모델을 사용하는 전체적인 단계를 수행해볼 것입니다.
 또한, 양자화와 최적화가 된 모델과 양자화와 최적화가 되지않은 모델을 비교해볼 것이며,
-단계를 수행해 가면서 양자화와 최적화를 적용한 모델이 얼마나 이점을 가지는지 볼 것입니다
-
-"""  
-
-######################################################################
-# .
-#
-
-
-
+단계를 수행해 가면서 양자화와 최적화를 적용한 모델이 얼마나 이점을 가지는지 볼 것입니다.
+ 
+""" 
+ 
 ######################################################################
 # DeiT란 무엇인가
 # --------------------
 #
 
 ######################################################################
-# 컨벌루션 신경망(CNNs)은 2012년 딥러닝이 시작된 이후
-# 이미지 분류를 수행할 때 주요한 모델이였습니다. 그러나 컨벌루션 신경망은 일반적으로
+# 합성곱 신경망(CNNs)은 2012년 딥러닝이 시작된 이후
+# 이미지 분류를 수행할 때 주요한 모델이였습니다. 그러나 합성곱 신경망은 일반적으로
 # 최첨단의 결과를 달성하기 위해 훈련에 수억 개의 이미지가 필요했습니다.
 # DeiT는 이미지 분류를 수행하는데 있어서 최신 CNN 모델과 경쟁을 하는데
 # 훈련에 더 적은 데이터와 컴퓨팅 자원이 필요로 하는 비전 트랜스포머 모델입니다.
@@ -50,11 +44,11 @@ FaceBook에서 발표한 Data-efficient Image Transformers는 `DeiT <https://ai.
 
 
 ######################################################################
-# DeiT를 이용하여 이미지 분류하기
+# DeiT를 이용하여 이미지 분류
 # -------------------------------
 #
-# DeiT를 사용하여 어떻게 이미지들을 분류하는지 자세한 정보는 DeiT 저장소에 README를 참고하시길 바랍니다.
-# 빠른 테스트를 위해선, 첫번째로 요구되는 패키지들을
+# DeiT를 사용하여 이미지를 분류하는 방법에 대한 자세한 정보는 DeiT 저장소에 README를 참고하시길 바랍니다.
+# 빠른 테스트를 위해선, 먼저 필요한 패키지들을
 # 설치해 봅시다:
 #
 # ::
@@ -76,7 +70,7 @@ import torchvision.transforms as transforms
 from timm.data.constants import IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD
 
 print(torch.__version__)
-# 1.8.0 이여야 합니다.
+# Pytorch 버전은 1.8.0 이어야 합니다.
 
 
 model = torch.hub.load('facebookresearch/deit:main', 'deit_base_patch16_224', pretrained=True)
@@ -105,12 +99,12 @@ print(clsidx.item())
 #
 
 ######################################################################
-# DeiT 스크립팅(Scripting) 하기
-# ----------------------
-# To use the model on mobile, we first need to script the
-# model. See the `Script and Optimize recipe <https://tutorials.pytorch.kr/recipes/script_optimized.html>`_ for a
-# quick overview. Run the code below to convert the DeiT model used in the
-# previous step to the TorchScript format that can run on mobile.
+# DeiT 스크립팅(Scripting) 
+# -----------------------------
+# 모바일에서 이 모델을 사용하려면, 우리는 첫번째로 모델 스크립팅이 필요합니다.
+# 전체적인 개요는 `스크립트 그리고 최적화 레시피 <https://tutorials.pytorch.kr/recipes/script_optimized.html>`_ 
+# 에서 확인할 수 있습니다. 아래 코드를 실행하여 이전 단계에서 사용한 DeiT 모델을 
+# 모바일에서 실행할 수 있는 TorchScript 형식으로 변환합니다.
 #
 
 
@@ -121,26 +115,27 @@ scripted_model.save("fbdeit_scripted.pt")
 
 
 ######################################################################
-# The scripted model file fbdeit_scripted.pt of size about 346MB is
-# generated.
+# 약 346MB 크기의 스크립팅된 모델 파일 fbdeit_scripted.pt가 생성됩니다.
+# 
 #
 
 
 ######################################################################
-# DeiT 양자화하기
+# DeiT 양자화
 # ---------------------
-# To reduce the trained model size significantly while
-# keeping the inference accuracy about the same, quantization can be
-# applied to the model. Thanks to the transformer model used in DeiT, we
-# can easily apply dynamic-quantization to the model, because dynamic
-# quantization works best for LSTM and transformer models (see `here <https://pytorch.org/docs/stable/quantization.html?highlight=quantization#dynamic-quantization>`_
-# for more details).
+# 추론 정확도를 거의 동일하게 유지하면서 훈련된 모델 크기를 크게 줄이기 위해 
+# 모델에 양자화를 적용할 수 있습니다.
+# DeiT에서 사용된 트랜스포머 모델 덕분에,
+# 모델에 동적 양자화를 쉽게 적용할 수 있습니다.
+# 왜나하면 동적 양자화는 LSTM 모델과 트랜스포머 모델에서 가장 잘 적용되기 때문입니다. 
+# (자세한 내용은 `여기 <https://pytorch.org/docs/stable/quantization.html?highlight=quantization#dynamic-quantization>`_
+# 를 참고하세요.)
 #
-# Now run the code below:
+# 아래의 코드를 실행시켜 봅시다.
 #
 
-# Use 'fbgemm' for server inference and 'qnnpack' for mobile inference
-backend = "fbgemm" # replaced with qnnpack causing much worse inference speed for quantized model on this notebook
+# 서버 추론을 위해 'fbgemm'과 모바일 추론을 위해 'qnnpack'을 사용해 봅시다.
+backend = "fbgemm" # 이 주피터 노트북에서는 양자화된 모델의 더 느린 추론 속도를 일으키는 qnnpack으로 대체되었습니다.
 model.qconfig = torch.quantization.get_default_qconfig(backend)
 torch.backends.quantized.engine = backend
 
@@ -150,26 +145,26 @@ scripted_quantized_model.save("fbdeit_scripted_quantized.pt")
 
 
 ######################################################################
-# This generates the scripted and quantized version of the model
-# fbdeit_quantized_scripted.pt, with size about 89MB, a 74% reduction of
-# the non-quantized model size of 346MB!
+# fbdeit_quantized_scripted.pt 모델의 스크립팅 되고 양자화가 적용된 버전이 만들어졌습니다.
+# 모델의 크기는 단지 89MB 입니다.
+# 양자화가 적용되지 않은 모델의 크기인 346MB보다 74%나 감소했습니다!
 #
 
 ######################################################################
-# You can use the ``scripted_quantized_model`` to generate the same
-# inference result:
+# ``scripted_quantized_model`` 을 사용하고 동일한 추론 결과를
+# 가져와 봅시다.
 #
 
 out = scripted_quantized_model(img)
 clsidx = torch.argmax(out)
 print(clsidx.item())
-# The same output 269 should be printed
+# 동일한 출력 결과인 269가 출력 되어야 합니다.
 
 ######################################################################
-# DeiT 최적화하기
+# DeiT 최적화
 # ---------------------
-# The final step before using the quantized and scripted
-# model on mobile is to optimize it:
+# 모바일에 스크립트 되고 양자화된 모델을 사용하기 위한
+# 마지막 단계는 최적화입니다.
 #
 
 from torch.utils.mobile_optimizer import optimize_for_mobile
@@ -178,9 +173,9 @@ optimized_scripted_quantized_model.save("fbdeit_optimized_scripted_quantized.pt"
 
 
 ######################################################################
-# The generated fbdeit_optimized_scripted_quantized.pt file has about the
-# same size as the quantized, scripted, but non-optimized model. The
-# inference result remains the same.
+# 생성된 fbdeit_optimized_scripted_quantized.pt 파일은 
+# 양자화되고 스크립트되지만 최적화되지 않은 모델과 크기가 거의 같습니다.
+# 추론 결과는 동일하게 유지됩니다.
 #
 
 
@@ -188,15 +183,15 @@ optimized_scripted_quantized_model.save("fbdeit_optimized_scripted_quantized.pt"
 out = optimized_scripted_quantized_model(img)
 clsidx = torch.argmax(out)
 print(clsidx.item())
-# Again, the same output 269 should be printed
+# 다시 한번, 동일한 출력 결과인 269가 출력 되어야 합니다.
 
 
 ######################################################################
-# Using Lite Interpreter
-# ------------------------
+# 가벼운 인터프리터(Interpreter) 사용
+# -----------------------------------------
 #
-# To see how much model size reduction and inference speed up the Lite
-# Interpreter can result in, let’s create the lite version of the model.
+# 가벼운 인터프리터를 사용하는 것이 얼마나 모델의 사이즈가 작아지고, 추론 시간이 빨라지게 하는지 
+# 결과를 확인해 봅시다. 이제 좀 더 가벼운 버전의 모델을 만들어 봅시다.
 #
 
 optimized_scripted_quantized_model._save_for_lite_interpreter("fbdeit_optimized_scripted_quantized_lite.ptl")
@@ -204,18 +199,19 @@ ptl = torch.jit.load("fbdeit_optimized_scripted_quantized_lite.ptl")
 
 
 ######################################################################
-# Although the lite model size is comparable to the non-lite version, when
-# running the lite version on mobile, the inference speed up is expected.
+# 라이트 모델의 크기는 라이트하지 않은 버전의 모델 크기와 비슷하지만,
+# 모바일에서 라이트 버전을 실행하면 추론 속도가 빨라질 것으로 예상됩니다.
 #
 
 
 ######################################################################
-# Comparing Inference Speed
+# 추론 속도 비교
 # ---------------------------
 #
-# To see how the inference speed differs for the four models - the
-# original model, the scripted model, the quantized-and-scripted model,
-# the optimized-quantized-and-scripted model - run the code below:
+# 네 가지 모델(원본 모델, 스크립트된 모델, 스크립트와 양자화를 적용한 모델, 
+# 스크립트와 양자화를 적용한 후 최적화한 모델)의 추론 속도가 어떻게 다른지 확인해 봅시다.
+#
+# 아래의 코드를 실행해 봅시다.
 #
 
 with torch.autograd.profiler.profile(use_cuda=False) as prof1:
@@ -236,7 +232,7 @@ print("scripted & quantized & optimized model: {:.2f}ms".format(prof4.self_cpu_t
 print("lite model: {:.2f}ms".format(prof5.self_cpu_time_total/1000))
 
 ######################################################################
-# The results running on a Google Colab are:
+# Google Colab에서 실행 시킨 결과는 다음과 같습니다:
 #
 # ::
 #
@@ -249,9 +245,9 @@ print("lite model: {:.2f}ms".format(prof5.self_cpu_time_total/1000))
 
 
 ######################################################################
-# The following results summarize the inference time taken by each model
-# and the percentage reduction of each model relative to the original
-# model.
+# 다음 결과는 각 모델이 소요한 추론 시간과 
+# 원본 모델에 대한 각 모델의 감소율을 요약한 것입니다.
+#
 #
 
 import pandas as pd
@@ -282,7 +278,7 @@ print(df)
 """
 
 ######################################################################
-# Learn More
+# 더 읽을거리
 # ~~~~~~~~~~~~~~~~~
 #
 # - `Facebook Data-efficient Image Transformers <https://ai.facebook.com/blog/data-efficient-image-transformers-a-promising-new-technique-for-image-classification>`__
