@@ -121,19 +121,19 @@ class DistributedModel(nn.Module):
 #
 # 또한, 다음의 내용들도 살펴보세요.
 #
-# -  :doc:`Train neural nets to play video games </intermediate/reinforcement_q_learning>`
-# -  `Train a state-of-the-art ResNet network on imagenet`_
-# -  `Train an face generator using Generative Adversarial Networks`_
-# -  `Train a word-level language model using Recurrent LSTM networks`_
+# -  :doc:`비디오 게임을 할 수 있는 신경망 학습시키기 </intermediate/reinforcement_q_learning>`
+# -  `imagenet으로 최첨단 ResNet 신경망 학습시키기`_
+# -  `적대적 생성 신경망으로 얼굴 생성기 학습시키기`_
+# -  `순환 LSTM 네트워크를 사용해 단어 단위 언어 모델 학습시키기`_
 # -  `다른 예제들 참고하기`_
 # -  `더 많은 튜토리얼 보기`_
 # -  `포럼에서 PyTorch에 대해 얘기하기`_
 # -  `Slack에서 다른 사용자와 대화하기`_
 #
-# .. _`Deep Learning with PyTorch: a 60-minute blitz`: https://github.com/pytorch/tutorials/blob/master/Deep%20Learning%20with%20PyTorch.ipynb
-# .. _Train a state-of-the-art ResNet network on imagenet: https://github.com/pytorch/examples/tree/master/imagenet
-# .. _Train an face generator using Generative Adversarial Networks: https://github.com/pytorch/examples/tree/master/dcgan
-# .. _Train a word-level language model using Recurrent LSTM networks: https://github.com/pytorch/examples/tree/master/word_language_model
+# .. _`PyTorch로 딥러닝하기 : 60분만에 끝장내기`: https://github.com/pytorch/tutorials/blob/master/Deep%20Learning%20with%20PyTorch.ipynb
+# .. _imagenet으로 최첨단 ResNet 신경망 학습시키기: https://github.com/pytorch/examples/tree/master/imagenet
+# .. _적대적 생성 신경망으로 얼굴 생성기 학습시키기: https://github.com/pytorch/examples/tree/master/dcgan
+# .. _순환 LSTM 네트워크를 사용해 단어 단위 언어 모델 학습시키기: https://github.com/pytorch/examples/tree/master/word_language_model
 # .. _다른 예제들 참고하기: https://github.com/pytorch/examples
 # .. _더 많은 튜토리얼 보기: https://github.com/pytorch/tutorials
 # .. _포럼에서 PyTorch에 대해 얘기하기: https://discuss.pytorch.org/
