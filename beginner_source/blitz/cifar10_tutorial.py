@@ -342,7 +342,7 @@ print(device)
 # -----------------------
 #
 # -  :doc:`비디오 게임을 할 수 있는 신경망 학습시키기 </intermediate/reinforcement_q_learning>`
-# -  `imagenet으로 최첨단 ResNet 신경망 학습시키기`_
+# -  `imagenet으로 최첨단(state-of-the-art) ResNet 신경망 학습시키기`_
 # -  `적대적 생성 신경망으로 얼굴 생성기 학습시키기`_
 # -  `순환 LSTM 네트워크를 사용해 단어 단위 언어 모델 학습시키기`_
 # -  `다른 예제들 참고하기`_
@@ -350,7 +350,7 @@ print(device)
 # -  `포럼에서 PyTorch에 대해 얘기하기`_
 # -  `Slack에서 다른 사용자와 대화하기`_
 #
-# .. _imagenet으로 최첨단 ResNet 신경망 학습시키기: https://github.com/pytorch/examples/tree/master/imagenet
+# .. _imagenet으로 최첨단(state-of-the-art) ResNet 신경망 학습시키기: https://github.com/pytorch/examples/tree/master/imagenet
 # .. _적대적 생성 신경망으로 얼굴 생성기 학습시키기: https://github.com/pytorch/examples/tree/master/dcgan
 # .. _순환 LSTM 네트워크를 사용해 단어 단위 언어 모델 학습시키기: https://github.com/pytorch/examples/tree/master/word_language_model
 # .. _다른 예제들 참고하기: https://github.com/pytorch/examples
