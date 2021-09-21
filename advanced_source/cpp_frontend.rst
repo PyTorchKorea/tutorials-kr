@@ -227,7 +227,7 @@ C++ 프론트엔드의 목적은 파이썬 프론트엔드와 경쟁하는 것�
 모듈 정의 및 매개변수 등록
 *************************
 
-이 개념들을 코드로 구현하기 위해, 파이썬 인터페이스로 작성된 아래 모듈을 살펴봅시다.
+이 내용을 코드로 구현하기 위해, 파이썬 인터페이스로 작성된 간단한 모듈 하나를 생각해 봅시다.
 
 .. code-block:: python
 
@@ -404,11 +404,10 @@ C++에서 ``torch::nn::Linear`` 등의 모듈을 서브모듈로 등록하려면
 
   ``torch::nn::Module``에 대한 `문서 <https://pytorch.org/cppdocs/api/classtorch_1_1nn_1_1_module.html#exhale-class-classtorch-1-1nn-1-1-module>`_ 는 모듈 계층 구조에 대한 메서드 목록 전체가 포함되어 있습니다.
 
-Running the Network in Forward Mode
-***********************************
+포워드 모드로 네트워크 실행하기
+************************
 
-To execute the network in C++, we simply call the ``forward()`` method we
-defined ourselves:
+네트워크를 C++로 실행하기 위해서는, 우리가 정의한 ``forward()`` 메서드를 호출하기만 하면 됩니다.
 
 .. code-block:: cpp
 
@@ -417,7 +416,7 @@ defined ourselves:
     std::cout << net.forward(torch::ones({2, 4})) << std::endl;
   }
 
-which prints something like:
+출력은 대략 아래와 같을 것입니다
 
 .. code-block:: shell
 
@@ -426,33 +425,25 @@ which prints something like:
   0.8559  1.1572  2.1069 -0.1247  0.8060
   [ Variable[CPUFloatType]{2,5} ]
 
-Module Ownership
-****************
+모듈 오너십 (Ownership)
+********************
 
-At this point, we know how to define a module in C++, register parameters,
-register submodules, traverse the module hierarchy via methods like
-``parameters()`` and finally run the module's ``forward()`` method. While there
-are many more methods, classes and topics to devour in the C++ API, I will refer
-you to `docs <https://pytorch.org/cppdocs/api/namespace_torch__nn.html>`_ for
-the full menu. We'll also touch upon some more concepts as we implement the
-DCGAN model and end-to-end training pipeline in just a second. Before we do so,
-let me briefly touch upon the *ownership model* the C++ frontend provides for
-subclasses of ``torch::nn::Module``.
+이제 우리는 C++에서 모듈을 정의하고, 매개변수를 등록하고, 하위 모듈을 등록하고, ``parameters()`` 등의
+메서드를 통해 모듈 계층을 탐색하고, 마지막으로 모듈의 ``forward()`` 메서드를 실행하는 방법을 배웠습니다.
+C++ API에는 다른 메서드, 클래스, 그리고 주제가 많지만 전체 목록은 `문서 <https://pytorch.org/cppdocs/api/namespace_torch__nn.html>`_ 를 참조하시기 바랍니다.
+잠시 후에 DCGAN 모델과 엔드 투 엔드 학습 파이프라인을 구현하면서도 몇 가지 개념을 더 다룰 예정입니다. 그에
+앞서 C++ 프론트엔드에서 ``torch::nn::Module`` 의 하위 클래스들에 대해 제공하는 *오너십 모델*에 대해
+간단히 설명하겠습니다.
 
-For this discussion, the ownership model refers to the way modules are stored
-and passed around -- which determines who or what *owns* a particular module
-instance. In Python, objects are always allocated dynamically (on the heap) and
-have reference semantics. This is very easy to work with and straightforward to
-understand. In fact, in Python, you can largely forget about where objects live
-and how they get referenced, and focus on getting things done.
+이 논의에서 오너십 모델이란 모듈이 저장되고 전달되는 방식(누가 혹은 무엇이 특정 모듈 인스턴스를 소유하는지)을
+지칭합니다. 파이썬에서 객체는 항상 힙에 동적으로 할당되며 레퍼런스 시맨틱을 가지는데, 이는 다루고 이해하기가
+매우 쉽습니다. 실제로 파이썬에서는 객체가 어디에 존재하고 어떻게 레퍼런스되는지 신경 쓰지 않고 하려는 일에만
+집중할 수 있습니다.
 
-C++, being a lower level language, provides more options in this realm. This
-increases complexity and heavily influences the design and ergonomics of the C++
-frontend. In particular, for modules in the C++ frontend, we have the option of
-using *either* value semantics *or* reference semantics. The first case is the
-simplest and was shown in the examples thus far: module objects are allocated on
-the stack and when passed to a function, can be either copied, moved (with
-``std::move``) or taken by reference or by pointer:
+저급 언어인 C++는 이 부분에서 더 많은 옵션을 제공합니다. 이는 C++ 프론트엔드의 복잡성을 증가시키며 그 설계와
+인간공학적 요소에도 큰 영향을 줍니다. 특히, C++ 프런트엔드 모듈에서는 밸류 시맨틱 *또는* 레퍼런스 시맨틱을 사용할
+수 있습니다. 전자가 지금까지의 사례에서 살펴본 가장 단순한 경우로, 모듈 객체가 스택에 할당되고 함수에 전달될 때
+레퍼런스 혹은 포인터로 복사 및 이동(``std:move``)시키거나 가져올 수 있습니다.
 
 .. code-block:: cpp
 
@@ -470,10 +461,9 @@ the stack and when passed to a function, can be either copied, moved (with
     c(&net);
   }
 
-For the second case -- reference semantics -- we can use ``std::shared_ptr``.
-The advantage of reference semantics is that, like in Python, it reduces the
-cognitive overhead of thinking about how modules must be passed to functions and
-how arguments must be declared (assuming you use ``shared_ptr`` everywhere).
+후자(레퍼런스 시맨틱)의 경우, ``std::shared_ptr`` 를 사용할 수 있습니다. 모든 곳에서 ``shared_ptr`` 를
+사용한다는 가정 하에, 레퍼런스 시맨틱의 장점은 파이썬에서와 같이 모듈이 함수에 전달되고 인자가 선언되는 방식에 대해
+생각할 부담을 덜어준다는 것입니다.
 
 .. code-block:: cpp
 
@@ -486,12 +476,9 @@ how arguments must be declared (assuming you use ``shared_ptr`` everywhere).
     a(net);
   }
 
-In our experience, researchers coming from dynamic languages greatly prefer
-reference semantics over value semantics, even though the latter is more
-"native" to C++. It is also important to note that ``torch::nn::Module``'s
-design, in order to stay close to the ergonomics of the Python API, relies on
-shared ownership. For example, take our earlier (here shortened) definition of
-``Net``:
+경험적으로, 동적 언어를 사용하던 연구자들은 비록 밸류 시맨틱이 더 C++에 "네이티브"함에도 불구하고 레퍼런스 시맨틱을
+훨씬 선호합니다. 또한 ``torch::nn::Module`` 의 설계는 파이썬 API의 인간공학을 유사하게 따르기 위해 shared
+오너십에 의존한다. 앞서 예시로 들었던 ``Net``의 정의를 다시 살펴봅시다.
 
 .. code-block:: cpp
 
@@ -502,13 +489,13 @@ shared ownership. For example, take our earlier (here shortened) definition of
     torch::nn::Linear linear;
   };
 
-In order to use the ``linear`` submodule, we want to store it directly in our
-class. However, we also want the module base class to know about and have access
-to this submodule. For this, it must store a reference to this submodule. At
-this point, we have already arrived at the need for shared ownership. Both the
-``torch::nn::Module`` class and concrete ``Net`` class require a reference to
-the submodule. For this reason, the base class stores modules as
-``shared_ptr``\s, and therefore the concrete class must too.
+하위 모듈인 ``linear`` 를 사용하기 위해 이를 클래스에 직접 저장하고자 합니다.
+그러나 동시에 모듈의 기초 클래스가 이 하위 모듈에 대해 알고 접근할 수 있기를
+원합니다. 이를 위해서는 해당 하위 모듈에 대한 참조를 저장해야 합니다. 이 순간
+이미 우리는 shared 오너십을 필요로 합니다. ``torch::nn::Module`` 
+클래스와 구상 클래스인 ``Net`` 모두에서 하위 모듈에 대한 레퍼런스가 필요합니다.
+따라서 기초 클래스는 모듈을 ``shared_ptr`` 로 저장하며 이에 따라 구상 클래스
+또한 마찬가지일 것입니다.
 
 But wait! I don't see any mention of ``shared_ptr`` in the above code! Why is
 that? Well, because ``std::shared_ptr<MyModule>`` is a hell of a lot to type. To
@@ -726,7 +713,7 @@ of course, found via grad student descent.
 	``LinearOptions`` for ``Linear``. This is what we do for the ``Conv2d``
 	modules above.
 
-The Discriminator Module
+판별자(Discriminator) 모듈
 ************************
 
 The discriminator is similarly a sequence of convolutions, batch normalizations
@@ -771,7 +758,7 @@ entire model as submodules. Using `Sequential`, the discriminator would look lik
   becomes the input of the fourth and so on.
 
 
-Loading Data
+데이터 불러오기
 ------------
 
 Now that we have defined the generator and discriminator model, we need some
@@ -885,8 +872,8 @@ If you rebuild and run this code, you should see something like this:
 
 Which means we are successfully able to load data from the MNIST dataset.
 
-Writing the Training Loop
--------------------------
+학습 루프 작성
+-----------
 
 Let's now finish the algorithmic part of our example and implement the delicate
 dance between the generator and discriminator. First, we'll create two
@@ -1012,50 +999,50 @@ Re-building and running should print something like:
   [ 2/10][500/938] D_loss: 0.4522 | G_loss: 2.6545
   ...
 
-Moving to the GPU
------------------
+GPU로 옮기기
+----------
 
-While our current script can run just fine on the CPU, we all know convolutions
-are a lot faster on GPU. Let's quickly discuss how we can move our training onto
-the GPU. We'll need to do two things for this: pass a GPU device specification
-to tensors we allocate ourselves, and explicitly copy any other tensors onto the
-GPU via the ``to()`` method all tensors and modules in the C++ frontend have.
-The simplest way to achieve both is to create an instance of ``torch::Device``
-at the top level of our training script, and then pass that device to tensor
-factory functions like ``torch::zeros`` as well as the ``to()`` method. We can
-start by doing this with a CPU device:
+현재 스크립트는 물론 CPU에서 잘 실행될 수 있지만, 합성곱 연산이 GPU에서 훨씬 빠르다는
+것은 잘 알려진 사실입니다. 어떻게 학습을 GPU로 옮길 수 있을 지에 대해 빠르게 논의해
+보겠습니다. 이를 위해 해야 할 일 두 가지로 GPU 장치(device) 사양을 우리가 직접 할당한
+텐서에 전달하는 것과, C++ 프론트엔드의 모든 텐서와 모듈이 갖고 있는 ``to()``
+메서드를 사용해 다른 모든 텐서를 GPU에 명시적으로 복사하는 것이 있습니다.
+두 가지를 모두 달성하는 가장 간단한 방법으로 학습 스크립트 최상위에 
+``torch::Device`` 인스턴스를 만들어 ``torch::zeros`` 와 같은
+텐서 팩토리 함수나 ``to()`` 메서드에 전달할 수 있습니다. 먼저 CPU device로
+이를 구현해보겠습니다.
 
 .. code-block:: cpp
 
   // Place this somewhere at the top of your training script.
   torch::Device device(torch::kCPU);
 
-New tensor allocations like
+아래와 같은 새로운 텐서 할당의 경우,
 
 .. code-block:: cpp
 
   torch::Tensor fake_labels = torch::zeros(batch.data.size(0));
 
-should be updated to take the ``device`` as the last argument:
+마지막 인자로 ``device`` 를 받도록 수정합니다.
 
 .. code-block:: cpp
 
   torch::Tensor fake_labels = torch::zeros(batch.data.size(0), device);
 
-For tensors whose creation is not in our hands, like those coming from the MNIST
-dataset, we must insert explicit ``to()`` calls. This means
+MNIST 데이터셋의 텐서처럼 우리가 직접 생성하지 않는 텐서에서는
+명시적으로 ``to()`` 호출을 삽입해야 합니다. 따라서 아래 코드의 경우,
 
 .. code-block:: cpp
 
   torch::Tensor real_images = batch.data;
 
-becomes
+다음과 같이 변합니다.
 
 .. code-block:: cpp
 
   torch::Tensor real_images = batch.data.to(device);
 
-and also our model parameters should be moved to the correct device:
+또한, 모델 매개변수를 올바른 장치로 옮겨야 합니다.
 
 .. code-block:: cpp
 
@@ -1064,23 +1051,23 @@ and also our model parameters should be moved to the correct device:
 
 .. note::
 
-	If a tensor already lives on the device supplied to ``to()``, the call is a
-	no-op. No extra copy is made.
+	만일 텐서가 이미 ``to()``에 전달된 장치 상에 있다면 그 호출은 아무 일도 하지 않습니다.
+  사본이 생성되지도 않습니다.
 
-At this point, we've just made our previous CPU-residing code more explicit.
-However, it is now also very easy to change the device to a CUDA device:
+이제 CPU에서 실행되는 이전의 코드가 보다 명시적으로 바뀌었습니다.
+하지만 이제는 장치를 CUDA 장치로 변경하는 것 또한 매우 쉽습니다.
 
 .. code-block:: cpp
 
   torch::Device device(torch::kCUDA)
 
-And now all tensors will live on the GPU, calling into fast CUDA kernels for all
-operations, without us having to change any downstream code. If we wanted to
-specify a particular device index, it could be passed as the second argument to
-the ``Device`` constructor. If we wanted different tensors to live on different
-devices, we could pass separate device instances (for example one on CUDA device
-0 and the other on CUDA device 1). We can even do this configuration
-dynamically, which is often useful to make our training scripts more portable:
+이제 모든 텐서가 GPU에 존재하며 어떠한 다운스트림 코드 변경 없이도
+모든 연산을 위해 빠른 CUDA 커널을 호출합니다. 특정 인덱스의 장치를
+지정하려면 ``Device`` 생성자의 두 번째 인자로 전달하면 됩니다.
+서로 다른 장치에 서로 다른 텐서가 존재하기를 원하는 경우,
+별도의 장치 인스턴스(예: CUDA 장치 0과 CUDA 장치 1의 경우)를
+전달할 수도 있습니다. 뿐만 아니라, 이러한 설정을 동적으로 수행할 수도
+있어 다음과 같이 학습 스크립트의 휴대성을 높이는 데 종종 유용하게 사용됩니다.
 
 .. code-block:: cpp
 
@@ -1090,14 +1077,14 @@ dynamically, which is often useful to make our training scripts more portable:
     device = torch::kCUDA;
   }
 
-or even
+나아가 아래와 같은 코드도 가능합니다.
 
 .. code-block:: cpp
 
   torch::Device device(torch::cuda::is_available() ? torch::kCUDA : torch::kCPU);
 
 학습 상태 저장 및 복원
----------------------
+-----------------
 
 마지막으로 학습 스크립트에 추가해야 할 내용은 모델 매개 변수 및 옵티마이저의 상태, 그리고 생성된 몇 개의 이미지 샘플을
 주기적으로 저장하는 것입니다. 학습 과정 도중에 컴퓨터가 다운되면 이렇게 저장된 상태로부터 학습 상태를 복원할 수 있습니다.
