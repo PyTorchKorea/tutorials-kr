@@ -497,14 +497,12 @@ C++ API에는 다른 메서드, 클래스, 그리고 주제가 많지만 전체 
 따라서 기초 클래스는 모듈을 ``shared_ptr`` 로 저장하며 이에 따라 구상 클래스
 또한 마찬가지일 것입니다.
 
-But wait! I don't see any mention of ``shared_ptr`` in the above code! Why is
-that? Well, because ``std::shared_ptr<MyModule>`` is a hell of a lot to type. To
-keep our researchers productive, we came up with an elaborate scheme to hide the
-mention of ``shared_ptr`` -- a benefit usually reserved for value semantics --
-while retaining reference semantics. To understand how this works, we can take a
-look at a simplified definition of the ``torch::nn::Linear`` module in the core
-library (the full definition is `here
-<https://github.com/pytorch/pytorch/blob/master/torch/csrc/api/include/torch/nn/modules/linear.h>`_):
+하지만 잠깐! 위의 코드에는 ``shared_ptr`` 에 대한 언급이 없습니다! 왜 그런
+것일까요? 왜냐하면 ``std::shared_ptr<MyModule>`` 는 타이핑하기에 너무 길기 때문입니다.
+연구원들의 생산성을 유지하기 위해, 우리는 레퍼런스 시맨틱을 유지하면서 밸류 시맨틱만의
+장점인 ``shared_ptr`` 에 대한 언급을 숨기기 위한 정교한 계획을 세웠습니다.
+그 작동 방식을 이해하기 위해 코어 라이브러리의 (전체 정의는 `여기 <https://github.com/pytorch/pytorch/blob/master/torch/csrc/api/include/torch/nn/modules/linear.h>`_ 서 확인할 수 있습니다.) 
+``torch::nn::Linear`` 모듈의 단순화된 정의를 살펴보겠습니다.
 
 .. code-block:: cpp
 
@@ -518,18 +516,18 @@ library (the full definition is `here
 
   TORCH_MODULE(Linear);
 
-In brief: the module is not called ``Linear``, but ``LinearImpl``. A macro,
-``TORCH_MODULE`` then defines the actual ``Linear`` class. This "generated"
-class is effectively a wrapper over a ``std::shared_ptr<LinearImpl>``. It is a
-wrapper instead of a simple typedef so that, among other things, constructors
-still work as expected, i.e. you can still write ``torch::nn::Linear(3, 4)``
-instead of ``std::make_shared<LinearImpl>(3, 4)``. We call the class created by
-the macro the module *holder*. Like with (shared) pointers, you access the
-underlying object using the arrow operator (like ``model->forward(...)``). The
-end result is an ownership model that resembles that of the Python API quite
-closely. Reference semantics become the default, but without the extra typing of
-``std::shared_ptr`` or ``std::make_shared``. For our ``Net``, using the module
-holder API looks like this:
+요약하자면 이 모듈은 ``Linear`` 가 아닌 ``LinearImpl`` 이라고 불립니다. 그리고
+``TORCH_MODULE`` 라는 매크로가 실제 ``Linear`` 클래스를 정의합니다. 이렇게 "생성된"
+클래스는 ``std::shared_ptr<LinearImpl>`` 를 감싸는 래퍼(wrapper)입니다. 
+단순한 typedef가 아닌 래퍼이므로 생성자도 여전히 예상하는 대로 작동합니다.
+즉, ``std::make_shared<LinearImpl>(3, 4)`` 가 아닌 ``torch::nn::Linear(3, 4)``
+라고 쓸 수 있습니다. 이렇게 매크로에 의해 생성된 클래스는 *holder* 모듈이라고
+부릅니다. (shared) 포인터와 마찬가지로 화살표 연산자(즉, 
+``model->forward(...)``)를 사용해 기저 객체에 액세스합니다.
+결론적으로 파이썬 API와 매우 유사한 오너십 모델을 얻었습니다.
+기본적으로 레퍼런스 시맨틱을 따르지만, ``std:shared_ptr`` 나
+``std::make_shared`` 등을 타이핑할 필요가 없습니다. 우리의 ``Net`` 예시에서
+모듈 holder API를 사용하면 아래와 같습니다.
 
 .. code-block:: cpp
 
@@ -543,22 +541,22 @@ holder API looks like this:
     a(net);
   }
 
-There is one subtle issue that deserves mention here. A default constructed
-``std::shared_ptr`` is "empty", i.e. contains a null pointer. What is a default
-constructed ``Linear`` or ``Net``? Well, it's a tricky choice. We could say it
-should be an empty (null) ``std::shared_ptr<LinearImpl>``. However, recall that
-``Linear(3, 4)`` is the same as ``std::make_shared<LinearImpl>(3, 4)``. This
-means that if we had decided that ``Linear linear;`` should be a null pointer,
-then there would be no way to construct a module that does not take any
-constructor arguments, or defaults all of them. For this reason, in the current
-API, a default constructed module holder (like ``Linear()``) invokes the
-default constructor of the underlying module (``LinearImpl()``). If the
-underlying module does not have a default constructor, you get a compiler error.
-To instead construct the empty holder, you can pass ``nullptr`` to the
-constructor of the holder.
+여기서 언급할 만한 미묘한 문제가 하나 있습니다. 기본 생성자에 의해 만들어진
+``std::shared_ptr`` 는 "빈" 포인터입니다. 즉, null 포인터입니다. 기본 생성자로
+만들어진 ``Linear`` 이나 ``Net``은 무엇이어야 할까요? 음, 이건 어려운 결정입니다.
+빈 (null) ``std::shared_ptr<LinearImpl>`` 로 정할 수 있다. 하지만
+``Linear(3, 4)`` 가 ``std::make_shared<LinearImpl>(3, 4)`` 와 같다는 것을 기억합시다.
+즉, ``Linear linear;`` 이 null 포인터여야 한다고 결정한다면
+생성자에서 인자를 전혀 받지 않거나 모든 인자에 대해 기본값을 사용하는
+모듈을 생성할 방법이 없어집니다. 이러한 이유로 현재
+API에서 기본 생성자에 의해 만들어진 모듈 holder(``Linear()`` 등)는
+기저 모듈(``LinearImpl()``)의 기본 생성자를 호출합니다. 만약
+기저 모듈에 기본 생성자가 없으면 컴파일러 오류가 발생합니다.
+반대로 빈 holder를 생성하려면 holder 생성자에 ``nullptr``를
+전달하면 됩니다.
 
-In practice, this means you can use submodules either like shown earlier, where
-the module is registered and constructed in the *initializer list*:
+실제로는 앞에서와 같이 하위 모듈을 사용해 모듈을 *이니셜라이저 (initializer) 목록*에
+등록 및 생성하거나,
 
 .. code-block:: cpp
 
@@ -569,8 +567,8 @@ the module is registered and constructed in the *initializer list*:
     torch::nn::Linear linear;
   };
 
-or you can first construct the holder with a null pointer and then assign to it
-in the constructor (more familiar for Pythonistas):
+파이썬 사용자들에게 더 친숙한 방법으로, 먼저 null 포인터로 홀더를 생성한 이후
+생성자에서 값을 지정할 수 있습니다.
 
 .. code-block:: cpp
 
@@ -581,38 +579,36 @@ in the constructor (more familiar for Pythonistas):
     torch::nn::Linear linear{nullptr}; // construct an empty holder
   };
 
-In conclusion: Which ownership model -- which semantics -- should you use? The
-C++ frontend's API best supports the ownership model provided by module holders.
-The only disadvantage of this mechanism is one extra line of boilerplate below
-the module declaration. That said, the simplest model is still the value
-semantics model shown in the introduction to C++ modules. For small, simple
-scripts, you may get away with it too. But you'll find sooner or later that, for
-technical reasons, it is not always supported. For example, the serialization
-API (``torch::save`` and ``torch::load``) only supports module holders (or plain
-``shared_ptr``). As such, the module holder API is the recommended way of
-defining modules with the C++ frontend, and we will use this API in this
-tutorial henceforth.
+결론적으로 어떤 오너십 모델, 어떤 시맨틱을 사용하면 좋을까요? C++
+프론트엔드 API는 모듈 holder가 제공하는 오너십 모델을 가장 잘 지원합니다.
+이 메커니즘의 유일한 단점은 모듈 선언 아래에 boilerplate 한 줄이
+추가된다는 것입니다. 즉, 가장 단순한 모델은 C++ 모듈의 기초를 배울 떄
+나오는 밸류 시맨틱 모델입니다. 작고 간단한 스크립트의 경우,
+이것만으로 충분할 수 있습니다. 그러나 언젠가는 기술적 이유로 인해
+이 기능이 항상 지원되지는 않는다는 사실을 알게 될 것입니다. 예를 들어 직렬화
+API(``torch::save`` 및 ``torch::load``)는 모듈 holder(혹은 일반
+``shared_ptr``)만을 지원합니다. 따라서 C++ 프런트엔드로 모듈을
+정의할 떄에는 모듈 holder API 방식이 권장되며, 앞으로 본 튜토리얼에서
+이 API를 사용하겠습니다.
 
-Defining the DCGAN Modules
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+DCGAN 모듈 정의하기
+^^^^^^^^^^^^^^^^
 
-We now have the necessary background and introduction to define the modules for
-the machine learning task we want to solve in this post. To recap: our task is
-to generate images of digits from the `MNIST dataset
-<http://yann.lecun.com/exdb/mnist/>`_. We want to use a `generative adversarial
-network (GAN)
-<https://papers.nips.cc/paper/5423-generative-adversarial-nets.pdf>`_ to solve
-this task. In particular, we'll use a `DCGAN architecture
-<https://arxiv.org/abs/1511.06434>`_ -- one of the first and simplest of its
-kind, but entirely sufficient for this task.
+이제 이 글에서 해결하려는 머신러닝 태스크를 위한 모듈을 정의하는데
+필요한 배경과 도입부 설명이 끝났습니다. 다시 상기하자면, 우리의 태스크는
+`MNIST 데이터셋  <http://yann.lecun.com/exdb/mnist/>`_ 의 숫자 이미지를 생성하는 것입니다. 
+우리는 이 태스크를 풀기 위해 `적대적 생성 신경망 (GAN) <https://papers.nips.cc/paper/5423-generative-adversarial-nets.pdf>`_ 를
+사용하고자 합니다. 그 중에서도 우리는 `DCGAN 아키텍처 <https://arxiv.org/abs/1511.06434>`_ 를 
+사용할 것입니다. DCGAN은 가장 초기에 발표됐던 제일 간단한 GAN이지만
+이 태스크를 위해서는 매우 충분합니다.
 
 .. tip::
 
-  You can find the full source code presented in this tutorial `in this
-  repository <https://github.com/pytorch/examples/tree/master/cpp/dcgan>`_.
+  이 튜토리얼에 나온 소스 코드 전체는 `이 저장소
+  <https://github.com/pytorch/examples/tree/master/cpp/dcgan>`_ 에서 확인할 수 있습니다.
 
-What was a GAN aGAN?
-********************
+GAN이 뭐였죠?
+***********
 
 A GAN consists of two distinct neural network models: a *generator* and a
 *discriminator*. The generator receives samples from a noise distribution, and
@@ -631,7 +627,7 @@ a probability of ``0.5`` for both real and fake images. For us, the end result
 is a machine that receives noise as input and generates realistic images of
 digits as its output.
 
-The Generator Module
+생성기 (Generator) 모듈
 ********************
 
 We begin by defining the generator module, which consists of a series of
@@ -713,7 +709,7 @@ of course, found via grad student descent.
 	``LinearOptions`` for ``Linear``. This is what we do for the ``Conv2d``
 	modules above.
 
-판별자(Discriminator) 모듈
+판별기(Discriminator) 모듈
 ************************
 
 The discriminator is similarly a sequence of convolutions, batch normalizations
@@ -875,10 +871,10 @@ Which means we are successfully able to load data from the MNIST dataset.
 학습 루프 작성
 -----------
 
-Let's now finish the algorithmic part of our example and implement the delicate
-dance between the generator and discriminator. First, we'll create two
-optimizers, one for the generator and one for the discriminator. The optimizers
-we use implement the `Adam <https://arxiv.org/pdf/1412.6980.pdf>`_ algorithm:
+이제 예제의 알고리즘 부분을 마무리하고 생성기와 판별기 사이에서 일어나는 섬세한
+작용을 구현해 보겠습니다. 먼저 생성기와 판별기 각각을 위해
+총 두 개의 optimizer를 생성하겠습니다. 우리가 사용하는
+optimizer는 `Adam <https://arxiv.org/pdf/1412.6980.pdf>`_ 알고리즘을 구현합니다.
 
 .. code-block:: cpp
 
@@ -894,8 +890,8 @@ we use implement the `Adam <https://arxiv.org/pdf/1412.6980.pdf>`_ algorithm:
 	<https://pytorch.org/cppdocs/api/namespace_torch__optim.html>`_ have the
 	up-to-date list.
 
-Next, we need to update our training loop. We'll add an outer loop to exhaust
-the data loader every epoch and then write the GAN training code:
+다음으로, 우리의 학습 루프를 수정해야 합니다. 매 에폭마다 데이터 로더를 반복 실행하는
+바깥 루프를 추가해 다음의 GAN 학습 코드를 작성합니다.
 
 .. code-block:: cpp
 
@@ -940,41 +936,39 @@ the data loader every epoch and then write the GAN training code:
     }
   }
 
-Above, we first evaluate the discriminator on real images, for which it should
-assign a high probability. For this, we use
-``torch::empty(batch.data.size(0)).uniform_(0.8, 1.0)`` as the target
-probabilities.
+위 코드는 먼저 진짜 (real) 이미지에 대해 판별기를 평가하는데, 이 때 판별기는 높은 확률을
+출력해야 합니다. 이를 위해 ``torch::empty(batch.data.size(0)).uniform_(0.8, 1.0)``를
+목표 확률 값으로 사용합니다.
 
 .. note::
 
-	We pick random values uniformly distributed between 0.8 and 1.0 instead of 1.0
-	everywhere in order to make the discriminator training more robust. This trick
-	is called *label smoothing*.
+	판별기를 보다 robust하게 학습하기 위해 모든 곳에서 1.0이 아닌 0.8과 1.0 사이의
+  균일 분포에서 임의의 값을 선택합니다. 이 트릭을 *label smoothing*이라고 합니다.
 
-Before evaluating the discriminator, we zero out the gradients of its
-parameters. After computing the loss, we back-propagate through the network by
-calling ``d_loss.backward()`` to compute new gradients. We repeat this spiel for
-the fake images. Instead of using images from the dataset, we let the generator
-create fake images for this by feeding it a batch of random noise. We then
-forward those fake images to the discriminator. This time, we want the
-discriminator to emit low probabilities, ideally all zeros. Once we have
-computed the discriminator loss for both the batch of real and the batch of fake
-images, we can progress the discriminator's optimizer by one step in order to
-update its parameters.
+판별기를 평가하기에 앞서 매개 변수의 그래디언트를 0으로 만듭니다.
+손실을 계산한 후 ``d_loss.backward()``를 호출해 이를
+네트워크에 역전파합니다. 가짜 (fake) 이미지들에 대해서 이 과정을
+반복합니다. 데이터셋의 이미지를 사용하는 대신, 생성자에
+무작위 노이즈를 입력하여 여기서 사용할 가짜 이미지를 만듭니다.
+그리고 그 가짜 이미지들을 판별기에 전달합니다. 이번에는
+판별기가 낮은 확률, 이상적으로는 모든 0을 출력하기를 바랍니다.
+진짜 이미지와 가짜 이미지 배치 모두에 대한 판별기 손실을 계산한
+후에는, 판별기의 optimizer 매개 변수 업데이트를 한 단계씩
+진행할 수 있습니다.
 
-To train the generator, we again first zero its gradients, and then re-evaluate
-the discriminator on the fake images. However, this time we want the
-discriminator to assign probabilities very close to one, which would indicate
-that the generator can produce images that fool the discriminator into thinking
-they are actually real (from the dataset). For this, we fill the ``fake_labels``
-tensor with all ones. We finally step the generator's optimizer to also update
-its parameters.
+생성기를 학습시키기 위해 우선 그래디언트를 다시 한번 0으로 설정하고
+다시 가짜 이미지로 판별기를 평가합니다. 그러나 이번에는 판별기가
+확률 1에 매우 근접하게 출력하게 하여, 생성기가 판별기를
+속여 실제 (데이터셋에 있는) 진짜라고 생각하는 이미지를 생성할 수
+있도록 하려 합니다. 이를 위해 ``fake_labels`` 텐서를 모두
+1로 채우겠습니다. 마지막으로 매개 변수를 업데이트하기 위해
+생성기의 optimzier 매개 변수 업데이트를 진행합니다.
 
-We should now be ready to train our model on the CPU. We don't have any code yet
-to capture state or sample outputs, but we'll add this in just a moment. For
-now, let's just observe that our model is doing *something* -- we'll later
-verify based on the generated images whether this something is meaningful.
-Re-building and running should print something like:
+이제 CPU로 모델을 학습시킬 준비가 되었습니다. 상태나 샘플 출력을
+캡처할 수 있는 코드는 아직 없지만 잠시 후에 추가하겠습니다. 지금은
+모델이 *무언가*를 수행하고 있다는 것만을 관찰하고, 나중에는 생성된
+이미지를 기반으로 이 무언가가 의미 있는지 여부를 확인할 것입니다.
+다시 빌드하고 실행하면 다음과 같은 내용이 출력돼야 합니다.
 
 .. code-block:: shell
 
@@ -1136,7 +1130,7 @@ MNIST 데이터셋의 텐서처럼 우리가 직접 생성하지 않는 텐서�
 
 
 생성된 이미지 검사하기
----------------------
+-----------------
 
 학습 스크립트가 완성되어 CPU에서든 GPU에서든 GAN을 훈련시킬 준비가 됐습니다. 학습 과정의 중간 출력을 검사하기 위해
 ``"dcgan-sample-xxx.pt"``에 주기적으로 이미지 샘플을 저장하는 코드를 추가했으니, 텐서들을 불러와 matplotlib로
@@ -1213,7 +1207,7 @@ MNIST 데이터셋의 텐서처럼 우리가 직접 생성하지 않는 텐서�
 숫자네요! 만세! 이제 여러분 차례입니다. 숫자가 보다 나아 보이도록 모델을 개선할 수 있나요?
 
 결론
-----
+---
 
 이 튜토리얼을 통해 PyTorch C++ 프론트엔드에 대한 어느 정도 이해도가 생기셨기 바랍니다. 필연적으로 PyTorch
 같은 머신러닝 라이브러리는 매우 다양하고 광범위한 API를 가지고 있습니다. 따라서, 여기서 논의하기에 시간과
