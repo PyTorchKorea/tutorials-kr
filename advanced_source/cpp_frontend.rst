@@ -610,30 +610,30 @@ DCGAN 모듈 정의하기
 GAN이 뭐였죠?
 ***********
 
-A GAN consists of two distinct neural network models: a *generator* and a
-*discriminator*. The generator receives samples from a noise distribution, and
-its aim is to transform each noise sample into an image that resembles those of
-a target distribution -- in our case the MNIST dataset. The discriminator in
-turn receives either *real* images from the MNIST dataset, or *fake* images from
-the generator. It is asked to emit a probability judging how real (closer to
-``1``) or fake (closer to ``0``) a particular image is. Feedback from the
-discriminator on how real the images produced by the generator are is used to
-train the generator. Feedback on how good of an eye for authenticity the
-discriminator has is used to optimize the discriminator. In theory, a delicate
-balance between the generator and discriminator makes them improve in tandem,
-leading to the generator producing images indistinguishable from the target
-distribution, fooling the discriminator's (by then) excellent eye into emitting
-a probability of ``0.5`` for both real and fake images. For us, the end result
-is a machine that receives noise as input and generates realistic images of
-digits as its output.
+GAN은 *생성기(generator)*와 *판별기(discriminator)* 라는
+두 가지 신경망 모델로 구성됩니다. 생성기는 노이즈 분포에서 샘플을 입력받고,
+각 노이즈 샘플을 목표 분포(이 경우 MNIST 데이터셋)와 유사한 이미지로
+변환하는 것이 목표입니다. 판별기는 MNIST 데이터셋의 *진짜* 
+이미지를 입력받거나 생성기로부터 *가짜* 이미지를 입력받습니다.
+그리고 어떤 이미지가 얼마나 진짜같은 지 (``1`` 에 가까운 출력)
+혹은 가짜같은 지 (``0`` 에 가까운 출력) 판별합니다. 생성기가
+만든 이미지가 얼마나 진짜같은 지 판별기가 피드백하면 이는 생성기
+학습에 사용됩니다. 판별기가 진짜에 대한 안목이 얼마나 좋은 지에
+대한 피드백은 판별기를 최적화하기 위해 사용됩니다. 이론적으로,
+생성기와 판별기 사이의 섬세한 균형은 이 둘을 동시에 개선시킵니다.
+이를 통해 생성기는 목표 분포와 구별할 수 없는 이미지를 생성하고,
+(그때쯤이면) 잘 학습되어 있을 판별기의 안목을 속여 진짜와 가짜
+이미지 모두에 대해 ``0.5`` 의 확률을 출력할 것입니다. 최종
+결과물은 노이즈를 입력받아 실제 숫자의 이미지를 출력으로 생성하는
+기계입니다.
 
 생성기 (Generator) 모듈
 ********************
 
-We begin by defining the generator module, which consists of a series of
-transposed 2D convolutions, batch normalizations and ReLU activation units.
-We explicitly pass inputs (in a functional way) between modules in the
-``forward()`` method of a module we define ourselves:
+먼저 일련의 전치된 (transposed) 2D 합성곱, 배치 정규화 및
+ReLU 활성화 유닛으로 구성된 생성기 모듈을 정의하겠습니다.
+모듈의 ``forward()`` 메서드를 직접 정의하여 모듈 간 입력을
+(함수형으로) 명시적으로 전달합니다.
 
 .. code-block:: cpp
 
@@ -682,48 +682,48 @@ We explicitly pass inputs (in a functional way) between modules in the
 
   DCGANGenerator generator(kNoiseSize);
 
-We can now invoke ``forward()`` on the ``DCGANGenerator`` to map a noise sample to an image.
+이제 ``DCGANGenerator`` 의 ``forward()`` 를 호출해 노이즈 샘플을 이미지에 매핑할 수 있습니다.
 
-The particular modules chosen, like ``nn::ConvTranspose2d`` and ``nn::BatchNorm2d``,
-follows the structure outlined earlier. The ``kNoiseSize`` constant determines
-the size of the input noise vector and is set to ``100``. Hyperparameters were,
-of course, found via grad student descent.
+여기서 사용한 ``nn::ConvTranspose2d`` 및 ``nn::BatchNorm2d`` 등의 모듈은
+앞서 설명한 구조를 따릅니다. 상수 ``kNoiseSize`` 는 입력 노이즈 벡터의 크기를
+결정하며 ``100`` 으로 설정됩니다. 하이퍼파라미터는 물론 대학원생들의 많은 노력을
+통해 세팅됐습니다.
 
 .. attention::
 
-	No grad students were harmed in the discovery of hyperparameters. They were
-	fed Soylent regularly.
+	하이퍼파라미터를 정하느라 다친 대학원생은 없었습니다. 그들은 정기적으로 소일렌트를
+  사료로 먹었으니까요.
 
 .. note::
 
-	A brief word on the way options are passed to built-in modules like ``Conv2d``
-	in the C++ frontend: Every module has some required options, like the number
-	of features for ``BatchNorm2d``. If you only need to configure the required
-	options, you can pass them directly to the module's constructor, like
-	``BatchNorm2d(128)`` or ``Dropout(0.5)`` or ``Conv2d(8, 4, 2)`` (for input
-	channel count, output channel count, and kernel size). If, however, you need
-	to modify other options, which are normally defaulted, such as ``bias``
-	for ``Conv2d``, you need to construct and pass an *options* object. Every
-	module in the C++ frontend has an associated options struct, called
-	``ModuleOptions`` where ``Module`` is the name of the module, like
-	``LinearOptions`` for ``Linear``. This is what we do for the ``Conv2d``
-	modules above.
+  C++ 프론트엔드의 ``Conv2d`` 와 같은 기본 제공 모듈에 옵션이 전달되는 방법에 대한
+  간단히 설명하자면, 모든 모듈은 몇 가지 필수 옵션을 갖고 있습니다. (예: ``BatchNorm2d`` 의
+  feature 개수) 만약 ``BatchNorm2d(128)``, ``Dropout(0.5)``, ``Conv2d(8, 4, 2)``와
+  같이 필수 옵션만 설정하려 한다면 모듈 생성자에 직접 전달할 수 있습니다.
+  (여기서는 각각   입력 채널 수, 출력 채널 수 및 커널 크기를 의미)
+  그러나 만약 ``Conv2d`` 의 ``bias`` 와 같이 일반적으로 기본값을 사용하는
+  다른 옵션을 수정해야 하는 경우, *options* 객체를 생성해 전달해야 합니다.
+  C++ 프론트엔드의  모듈은 ``ModuleOptions`` 이라고 하는 연관된 옵션 struct를
+  가지고 있습니다. 여기서 ``Module`` 은 해당 모듈의 이름으로, 예를 들어 ``Linear``
+  의 경우 ``LinearOptions`` 와 같습니다. 우리는 위의 ``Conv2d`` 모듈에
+  대해 이를 수행한 것입니다.
+
 
 판별기(Discriminator) 모듈
 ************************
 
-The discriminator is similarly a sequence of convolutions, batch normalizations
-and activations. However, the convolutions are now regular ones instead of
-transposed, and we use a leaky ReLU with an alpha value of 0.2 instead of a
-vanilla ReLU. Also, the final activation becomes a Sigmoid, which squashes
-values into a range between 0 and 1. We can then interpret these squashed values
-as the probabilities the discriminator assigns to images being real.
+판별기는 마찬가지로 합성곱, 배치 정규화 및 활성화의
+연속입니다. 하지만 이번에 합성곱은 전치되지 않은 기본
+합성곱이며, 바닐라 ReLU 대신에 알파 값이 0.2인 leaky ReLU를
+사용합니다. 또한 최종 활성화는 값을 0과 1 사이의 범위로 압축하는
+Sigmoid가 됩니다. 그런 다음 이렇게 압축된 값을 판별자가
+이미지에 대해 출력하는 확률로 해석할 수 있습니다.
 
-To build the discriminator, we will try something different: a `Sequential` module.
-Like in Python, PyTorch here provides two APIs for model definition: a functional one
-where inputs are passed through successive functions (e.g. the generator module example),
-and a more object-oriented one where we build a `Sequential` module containing the
-entire model as submodules. Using `Sequential`, the discriminator would look like:
+판별기를 만들기 위해 `Sequential` 모듈이라는 다른 것을 시도해보겠습니다.
+파이썬에서와 같이, PyTorch는 모델 정의를 위해 두 가지 API를 제공합니다.
+(생성기 모듈 예시와 같이) 입력이 연속적인 함수를 통해 전달되는 함수형 API와
+전체 모델을 하위 모듈로 포함하는 `Sequential` 모듈을 생성하는 객체 지향형
+API입니다. `Sequential` 을 사용하면 판별기는 대략 다음과 같습니다.
 
 .. code-block:: cpp
 
@@ -749,9 +749,9 @@ entire model as submodules. Using `Sequential`, the discriminator would look lik
 
 .. tip::
 
-  A ``Sequential`` module simply performs function composition. The output of
-  the first submodule becomes the input of the second, the output of the third
-  becomes the input of the fourth and so on.
+  ``Sequential`` 모듈은 단순한 함수 합성만을 수행합니다. 첫 번째 하위 모듈의 출력은
+  두 번째 하위 모듈의 입력이 되고 세 번째 하위 모듈의 출력은 네 번째 하위 모듈의 입력이
+  되고 이후에도 마찬가지입니다.
 
 
 데이터 불러오기
@@ -762,27 +762,32 @@ data we can train these models with. The C++ frontend, like the Python one,
 comes with a powerful parallel data loader. This data loader can read batches of
 data from a dataset (which you can define yourself) and provides many
 configuration knobs.
+이제 생성기와 판별기 모델을 정의했으므로 이러한 모델을 학습시킬
+데이터가 필요합니다. 파이썬과 마찬가지로 C++ 프론트엔드는
+강력한 병렬 데이터 로더(data loader)를 제공한다. 이 데이터 로더는
+사용자가 직접 정의할 수 있는 데이터셋에서 데이터 배치를 읽을 수 있으며
+설정을 위한 많은 옵션을 제공합니다.
 
 .. note::
 
-	While the Python data loader uses multi-processing, the C++ data loader is truly
-	multi-threaded and does not launch any new processes.
+	파이썬 데이터 로더가 멀티 프로세싱을 사용하는 반면, C++ 데이터 로더는 실제로
+  멀티 스레딩을 사용해 어떠한 새로운 프로세스도 시작하지 않습니다.
 
-The data loader is part of the C++ frontend's ``data`` api, contained in the
-``torch::data::`` namespace. This API consists of a few different components:
+데이터 로더는 ``torch::data::`` 네임스페이스에 포함된 C++ 프론트엔드의
+``data`` api의 일부입니다. 이 API는 다음과 같은 몇 가지 컴포넌트로 구성됩니다.
 
-- The data loader class,
-- An API for defining datasets,
-- An API for defining *transforms*, which can be applied to datasets,
-- An API for defining *samplers*, which produce the indices with which datasets are indexed,
-- A library of existing datasets, transforms and samplers.
+- 데이터 로더 클래스
+- 데이터셋을 정의하기 위한 API
+- *변환*을 정의하기 위한 API (데이터셋에 적용 가능)
+- *샘플러*를 정의하기 위한 API (데이터셋을 위한 인덱스를 생성)
+- 기존 데이터셋, 변환, 샘플러들의 라이브러리
 
-For this tutorial, we can use the ``MNIST`` dataset that comes with the C++
-frontend. Let's instantiate a ``torch::data::datasets::MNIST`` for this, and
-apply two transformations: First, we normalize the images so that they are in
-the range of ``-1`` to ``+1`` (from an original range of ``0`` to ``1``).
-Second, we apply the ``Stack`` *collation*, which takes a batch of tensors and
-stacks them into a single tensor along the first dimension:
+이 튜토리얼에서는 C++ 프론트엔드와 함께 제공되는 ``MNIST`` 데이터셋을
+사용합니다. ``torch::data::datasets::MNIST`` 인스턴스를 만들어
+다음 두 가지 변환을 적용해봅시다. 첫째, 이미지를 정규화하여 ``-1`` 과
+``+1`` 사이에 있도록 합니다. (기존 범위는 ``0`` 과 ``1`` 사이) 
+둘째, 텐서 배치를 첫 번째 차원을 따라 단일 텐서로 쌓는 이른바
+``Stack`` *collation*을 적용합니다.
 
 .. code-block:: cpp
 
@@ -790,29 +795,27 @@ stacks them into a single tensor along the first dimension:
       .map(torch::data::transforms::Normalize<>(0.5, 0.5))
       .map(torch::data::transforms::Stack<>());
 
-Note that the MNIST dataset should be located in the ``./mnist`` directory
-relative to wherever you execute the training binary from. You can use `this
-script <https://gist.github.com/goldsborough/6dd52a5e01ed73a642c1e772084bcd03>`_
-to download the MNIST dataset.
+MNIST 데이터셋은 학습 바이너리 실행 위치를 기준으로 ``./mnist``
+디렉토리에 위치해야 합니다. `이 스크립트 <https://gist.github.com/goldsborough/6dd52a5e01ed73a642c1e772084bcd03>`_ 를 사용해
+MNIST 데이터셋을 다운로드할 수 있습니다.
 
-Next, we create a data loader and pass it this dataset. To make a new data
-loader, we use ``torch::data::make_data_loader``, which returns a
-``std::unique_ptr`` of the correct type (which depends on the type of the
-dataset, the type of the sampler and some other implementation details):
+다음으로, 데이터 로더를 만들고 이 데이터셋을 전달합니다. 새로운 데이터
+로더를 만들기 위해 ``torch::data::make_data_loader`를 사용합니다.
+이 로더는 올바른 타입(데이터셋 타입, 샘플러 타입 및 기타 구현 세부사항에
+따라 결정됨)의 ``std::unique_ptr`` 를 반환합니다.
 
 .. code-block:: cpp
 
   auto data_loader = torch::data::make_data_loader(std::move(dataset));
 
-The data loader does come with a lot of options. You can inspect the full set
-`here
-<https://github.com/pytorch/pytorch/blob/master/torch/csrc/api/include/torch/data/dataloader_options.h>`_.
-For example, to speed up the data loading, we can increase the number of
-workers. The default number is zero, which means the main thread will be used.
-If we set ``workers`` to ``2``, two threads will be spawned that load data
-concurrently. We should also increase the batch size from its default of ``1``
-to something more reasonable, like ``64`` (the value of ``kBatchSize``). So
-let's create a ``DataLoaderOptions`` object and set the appropriate properties:
+데이터 로더에는 많은 옵션이 제공됩니다. 전체 목록은
+`여기 <https://github.com/pytorch/pytorch/blob/master/torch/csrc/api/include/torch/data/dataloader_options.h>`_ 에서 확인할 수 있습니다.
+예를 들어 데이터 로딩 속도를 높이기 위해 작업자 수를 늘릴 수
+있습니다. 기본값은 0이며, 이는 주 스레드가 사용됨을 의미합니다.
+``workers`` 를 ``2`` 로 설정하면 데이터를 동시에 로드하는 스레드가
+두 개 생성됩니다. 또한 배치 크기를 기본값 ``1`` 에서 ``64``(``kBatchSize`` 값)
+와 같이 더 적당한 값으로 늘려야 합니다. 그러면 
+``DataLoaderOptions`` 객체를 만들어 적절한 속성을 설정해 보겠습니다.
 
 .. code-block:: cpp
 
@@ -821,8 +824,7 @@ let's create a ``DataLoaderOptions`` object and set the appropriate properties:
       torch::data::DataLoaderOptions().batch_size(kBatchSize).workers(2));
 
 
-We can now write a loop to load batches of data, which we'll only print to the
-console for now:
+이제 데이터 배치를 로드하는 루프를 작성할 수 있습니다. 지금은 콘솔에만 출력할 것입니다.
 
 .. code-block:: cpp
 
@@ -834,14 +836,14 @@ console for now:
     std::cout << std::endl;
   }
 
-The type returned by the data loader in this case is a ``torch::data::Example``.
-This type is a simple struct with a ``data`` field for the data and a ``target``
-field for the label. Because we applied the ``Stack`` collation earlier, the
-data loader returns only a single such example. If we had not applied the
-collation, the data loader would yield ``std::vector<torch::data::Example<>>``
-instead, with one element per example in the batch.
+이 경우 데이터 로더가 반환하는 타입은 ``torch::data::Example`` 입니다.
+이 타입은 데이터를 위한 ``data`` 필드와 레이블을 위한 ``target`` 필드가
+있는 간단한 struct입니다. 앞서 ``Stack`` collation을 적용했기 때문에,
+데이터 로더는 이 example을 하나만 반환합니다. 데이터 로더에 collation을
+적용하지 않으면, ``std::vector<torch::data::Example<>>`` 를 yield하며,
+각 배치의 example에는 하나의 element가 있을 것입니다.
 
-If you rebuild and run this code, you should see something like this:
+이 코드를 다시 빌드하고 실행하면 대략 다음과 같은 내용을 얻을 것입니다.
 
 .. code-block:: shell
 
@@ -866,7 +868,7 @@ If you rebuild and run this code, you should see something like this:
   Batch size: 64 | Labels: 7 6 5 7 7 5 2 2 4 9 9 4 8 7 4 8 9 4 5 7 1 2 6 9 8 5 1 2 3 6 7 8 1 1 3 9 8 7 9 5 0 8 5 1 8 7 2 6 5 1 2 0 9 7 4 0 9 0 4 6 0 0 8 6
   ...
 
-Which means we are successfully able to load data from the MNIST dataset.
+즉, MNIST 데이터셋에서 데이터를 성공적으로 로드할 수 있습니다.
 
 학습 루프 작성
 -----------
