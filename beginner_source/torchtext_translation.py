@@ -92,7 +92,7 @@ test_data = data_process(test_filepaths)
 # 마지막으로 사용해 볼 ``torch`` 에 특화된 기능은 바로 ``DataLoader`` 로,
 # 첫 번째 인자로 데이터를 전달받기 때문에 사용하기가 쉽습니다. 문서에서도 볼 수 있듯이,
 # ``DataLoader 는 데이터셋과 샘플러를 결합하고, 주어진 데이터셋에 반복 기능을 제공합니다.
-# ``DataLoader`` 는 맵 형태(map-style)과 순회 가능한 형태(iterable-style) 데이터셋을 모두 지원하며,
+# ``DataLoader`` 는 맵 형태(map-style)과 반복 가능한 형태(iteratable-style) 데이터셋을 모두 지원하며,
 # 단일 또는 다중 프로세스로 불러오거나, 불러오는 순서를 조정(customize)하거나
 # 선택적 자동 일괄 처리(optional automatic batching), 메모리 피닝(memory pinning)을 지원합니다.
 #

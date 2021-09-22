@@ -213,7 +213,7 @@ def __getitem__(self, idx):
 # 모델을 학습할 때, 일반적으로 샘플들을 "미니배치(minibatch)"로 전달하고, 매 에폭(epoch)마다 데이터를 다시 섞어서 과적합(overfit)을 막고,
 # Python의 ``multiprocessing`` 을 사용하여 데이터 검색 속도를 높이려고 합니다.
 #
-# ``DataLoader`` 는 간단한 API로 이러한 복잡한 과정들을 추상화한 순회 가능한 객체(iterable)입니다.
+# ``DataLoader`` 는 간단한 API로 이러한 복잡한 과정들을 추상화한 순회 가능한 객체(iteratable)입니다.
 
 from torch.utils.data import DataLoader
 

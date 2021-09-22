@@ -17,7 +17,7 @@
 ------------------------------------------------------------------------------------------
 파이토치(PyTorch)에는 `데이터 작업을 위한 기본 요소 <https://pytorch.org/docs/stable/data.html>`_ 두가지인
 ``torch.utils.data.DataLoader`` 와 ``torch.utils.data.Dataset`` 가 있습니다.
-``Dataset`` 은 샘플과 정답(label)을 저장하고, ``DataLoader`` 는 ``Dataset`` 을 순회 가능한 객체(iterable)로 감쌉니다.
+``Dataset`` 은 샘플과 정답(label)을 저장하고, ``DataLoader`` 는 ``Dataset`` 을 반복 가능한 객체(iterable)로 감쌉니다.
 
 """
 
@@ -55,7 +55,7 @@ test_data = datasets.FashionMNIST(
 )
 
 ######################################################################
-# ``Dataset`` 을 ``DataLoader`` 의 인자로 전달합니다. 이는 데이터셋을 순회 가능한 객체(iterable)로 감싸고, 자동화된 배치(batch), 샘플링(sampling),
+# ``Dataset`` 을 ``DataLoader`` 의 인자로 전달합니다. 이는 데이터셋을 반복 가능한 객체(iterable)로 감싸고, 자동화된 배치(batch), 샘플링(sampling),
 # 섞기(shuffle) 및 다중 프로세스로 데이터 불러오기(multiprocess data loading)를 지원합니다. 여기서는 배치 크기(batch size)를 64로 정의합니다.
 # 즉, 데이터로더(dataloader) 객체의 각 요소는 64개의 특징(feature)과 정답(label)을 묶음(batch)으로 반환합니다.
 

@@ -105,7 +105,7 @@ label_pipeline = lambda x: int(x) - 1
 # `torch.utils.data.DataLoader <https://pytorch.org/docs/stable/data.html?highlight=dataloader#torch.utils.data.DataLoader>`__ 를
 # 권장합니다. (튜토리얼은 `여기 <https://tutorials.pytorch.kr/beginner/data_loading_tutorial.html>`__ 있습니다.)
 # 이는 ``getitem()`` 과 ``len()`` 프로토콜을 구현한 맵 형태(map-style)의 데이터셋으로 동작하며, 맵(map)처럼 인덱스/키로 데이터 샘플을 얻어옵니다.
-# 또한, 셔플(shuffle) 인자를 ``False`` 로 설정하면 순회 가능한(iterable) 데이터셋처럼 동작합니다.
+# 또한, 셔플(shuffle) 인자를 ``False`` 로 설정하면 반복 가능한(iteratable) 데이터셋처럼 동작합니다.
 #
 # 모델로 보내기 전, ``collate_fn`` 함수는 ``DataLoader`` 로부터 생성된 샘플 배치로 동작합니다.
 # ``collate_fn`` 의 입력은 ``DataLoader`` 에 배치 크기(batch size)가 있는 배치(batch) 데이터이며,
