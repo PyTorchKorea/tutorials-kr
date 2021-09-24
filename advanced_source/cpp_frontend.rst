@@ -1169,7 +1169,7 @@ MNIST 데이터셋의 텐서처럼 우리가 직접 생성하지 않는 텐서�
   plt.savefig(options.out_file)
   print("Saved ", options.out_file)
 
-이제 약 30 에폭 정도 모델을 학습시킵시다.
+이제 약 모델을 30 에폭 정도 학습시킵시다.
 
 .. code-block:: shell
 
