@@ -5,17 +5,17 @@ Authors : `Jeff Tang <https://github.com/jeffxtang>`_,
 `Geeta Chauhan <https://github.com/gchauhan/>`_
 번역 : `김태영 <https://github.com/Taeyoung96/>`_
 
-비전 트랜스포머(Vision Transformer)은 자연어 처리 분야에서 소개된
-비교할 수 없는 최첨단의 결과를 달성한 최신의 어텐션 기반(attention-based) 트랜스포머 모델을
+비전 트랜스포머(Vision Transformer)는 자연어 처리 분야에서 소개된
+최고 수준의 결과를 달성한 최신의 어텐션 기반(attention-based) 트랜스포머 모델을
 컴퓨터 비전 분야에 적용을 한 모델입니다.
 FaceBook에서 발표한 Data-efficient Image Transformers는 `DeiT <https://ai.facebook.com/blog/data-efficient-image-transformers-a-promising-new-technique-for-image-classification>`_ 
 이미지 분류를 위해 ImageNet 데이터셋을 통해 훈련된
 비전 트랜스포머 모델입니다.
 
 이번 튜토리얼에서는, DeiT가 무엇인지 그리고 어떻게 사용하는지 다룰 것입니다.
-그 다음 스크립팅(scripting), 양자화, 최적화, 그리고 iOS와 안드로이드 앱 안에서 
-모델을 사용하는 전체적인 단계를 수행해볼 것입니다.
-또한, 양자화와 최적화가 된 모델과 양자화와 최적화가 되지않은 모델을 비교해볼 것이며,
+그 다음 스크립팅, 양자화, 최적화, 그리고 iOS와 안드로이드 앱 안에서 
+모델을 사용하는 전체적인 단계를 수행해 볼 것입니다.
+또한, 양자화와 최적화가 된 모델과 양자화와 최적화가 되지 않은 모델을 비교해 볼 것이며,
 단계를 수행해 가면서 양자화와 최적화를 적용한 모델이 얼마나 이점을 가지는지 볼 것입니다.
  
 """ 
@@ -30,13 +30,13 @@ FaceBook에서 발표한 Data-efficient Image Transformers는 `DeiT <https://ai.
 # 이미지 분류를 수행할 때 주요한 모델이였습니다. 그러나 합성곱 신경망은 일반적으로
 # 최첨단의 결과를 달성하기 위해 훈련에 수억 개의 이미지가 필요했습니다.
 # DeiT는 이미지 분류를 수행하는데 있어서 최신 CNN 모델과 경쟁을 하는데
-# 훈련에 더 적은 데이터와 컴퓨팅 자원이 필요로 하는 비전 트랜스포머 모델입니다.
+# 훈련에 더 적은 데이터와 컴퓨팅 자원을 필요로 하는 비전 트랜스포머 모델입니다.
 # 이는 DeiT의 두 가지 주요 구성 요소에 의해 가능하게 되었습니다:
 #
 # -  훨씬 더 큰 데이터 세트에 대한 훈련을 시뮬레이션하는 데이터 증강(augmentation)
 # -  트랜스포머 네트워크에 CNN의 출력값을 그대로 증류(distillation)하여 학습할 수 있도록 하는 기법
 #
-# DeiT는 제한된 데이터와 자원을 활용하여 컴퓨터 비전 태스크(Task)에 트랜스포머 모델을  
+# DeiT는 제한된 데이터와 자원을 활용하여 컴퓨터 비전 태스크(task)에 트랜스포머 모델을  
 # 성공적으로 적용할 수 있음을 보여줍니다. 
 # DeiT의 좀 더 자세한 내용을 원한다면, `저장소 <https://github.com/facebookresearch/deit>`_
 # 와 `논문 <https://arxiv.org/abs/2012.12877>`_ 을 참고하시길 바랍니다.
@@ -44,11 +44,11 @@ FaceBook에서 발표한 Data-efficient Image Transformers는 `DeiT <https://ai.
 
 
 ######################################################################
-# DeiT를 이용하여 이미지 분류
+# DeiT를 활용한 이미지 분류
 # -------------------------------
 #
 # DeiT를 사용하여 이미지를 분류하는 방법에 대한 자세한 정보는 DeiT 저장소에 README를 참고하시길 바랍니다.
-# 빠른 테스트를 위해선, 먼저 필요한 패키지들을
+# 빠른 테스트를 위해서, 먼저 필요한 패키지들을
 # 설치해 봅시다:
 #
 # ::
@@ -91,16 +91,16 @@ print(clsidx.item())
 
 
 ######################################################################
-# ImageNet 목록에 따른 `라벨(labels) 파일 <https://gist.github.com/yrevar/942d3a0ac09ec9e5eb3a>`_
-# 클래스 인덱스의 따라 출력은 269여야 하며, 이는 '목공 늑대, 회색 늑대, 큰개자리 루푸스'에 매핑됩니다.  
+# ImageNet 목록에 따라 `라벨(labels) 파일 <https://gist.github.com/yrevar/942d3a0ac09ec9e5eb3a>`_
+# 클래스 인덱스의 출력은 269여야 하며, 이는 ‘timber wolf, grey wolf, gray wolf, Canis lupus’에 매핑됩니다.  
 #
 # 이제 DeiT 모델을 사용하여 이미지들을 분류할 수 있음을 확인했습니다.
 # iOS 및 Android 앱에서 실행할 수 있도록 모델을 수정하는 방법을 살펴보겠습니다. 
 #
 
 ######################################################################
-# DeiT 스크립팅(Scripting) 
-# -----------------------------
+# DeiT 스크립팅 
+# ----------------------
 # 모바일에서 이 모델을 사용하려면, 우리는 첫번째로 모델 스크립팅이 필요합니다.
 # 전체적인 개요는 `스크립트 그리고 최적화 레시피 <https://tutorials.pytorch.kr/recipes/script_optimized.html>`_ 
 # 에서 확인할 수 있습니다. 아래 코드를 실행하여 이전 단계에서 사용한 DeiT 모델을 
@@ -134,7 +134,7 @@ scripted_model.save("fbdeit_scripted.pt")
 # 아래의 코드를 실행시켜 봅시다.
 #
 
-# 서버 추론을 위해 'fbgemm'과 모바일 추론을 위해 'qnnpack'을 사용해 봅시다.
+# 서버 추론을 위해 'fbgemm'을, 모바일 추론을 위해 'qnnpack'을 사용해 봅시다.
 backend = "fbgemm" # 이 주피터 노트북에서는 양자화된 모델의 더 느린 추론 속도를 일으키는 qnnpack으로 대체되었습니다.
 model.qconfig = torch.quantization.get_default_qconfig(backend)
 torch.backends.quantized.engine = backend
@@ -145,14 +145,14 @@ scripted_quantized_model.save("fbdeit_scripted_quantized.pt")
 
 
 ######################################################################
-# fbdeit_quantized_scripted.pt 모델의 스크립팅 되고 양자화가 적용된 버전이 만들어졌습니다.
+# fbdeit_quantized_scripted.pt 모델의 스크립팅과 양자화가 적용된 버전이 만들어졌습니다.
 # 모델의 크기는 단지 89MB 입니다.
 # 양자화가 적용되지 않은 모델의 크기인 346MB보다 74%나 감소했습니다!
 #
 
 ######################################################################
-# ``scripted_quantized_model`` 을 사용하고 동일한 추론 결과를
-# 가져와 봅시다.
+# 동일한 추론 결과를 만들기 위해 ``scripted_quantized_model``을
+# 사용해 봅시다.
 #
 
 out = scripted_quantized_model(img)
@@ -190,7 +190,7 @@ print(clsidx.item())
 # 가벼운 인터프리터(Interpreter) 사용
 # -----------------------------------------
 #
-# 가벼운 인터프리터를 사용하는 것이 얼마나 모델의 사이즈가 작아지고, 추론 시간이 빨라지게 하는지 
+# 가벼운 인터프리터를 사용하면 얼마나 모델의 사이즈가 작아지고, 추론 시간이 짧아지는지 
 # 결과를 확인해 봅시다. 이제 좀 더 가벼운 버전의 모델을 만들어 봅시다.
 #
 
@@ -199,8 +199,8 @@ ptl = torch.jit.load("fbdeit_optimized_scripted_quantized_lite.ptl")
 
 
 ######################################################################
-# 라이트 모델의 크기는 라이트하지 않은 버전의 모델 크기와 비슷하지만,
-# 모바일에서 라이트 버전을 실행하면 추론 속도가 빨라질 것으로 예상됩니다.
+# 가벼운 모델의 크기는 그렇지 않은 버전의 모델 크기와 비슷하지만,
+# 모바일에서 가벼운 버전을 실행하면 추론 속도가 빨라질 것으로 예상됩니다.
 #
 
 
