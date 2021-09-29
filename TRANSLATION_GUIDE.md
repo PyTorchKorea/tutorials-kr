@@ -17,20 +17,24 @@
 |API endpoint|API 엔드포인트|박정환|음차 표기|
 |argument|인자|박정환||
 |Audio|오디오|박정환|ToC의 분류명입니다.|
+|augmentation|증강|이재복||
 |autograd|Autograd|황성수|번역안함|
 |Batch Normalization|배치 정규화|박정환||
 |bias|편향|이하람||
+|convolution|합성곱|김현길||
 |dataset|데이터셋|박정환|음차 표기|
 |deep neural network|심층 신경망|박정환||
 |derivative|도함수|박정환||
 |Drop-out|Drop-out|황성수|번역안함|
 |epoch|에폭|박정환|음차 표기|
 |evaluation mode|평가 모드|박정환||
+|feature|특징|백선희||
 |feed data through model|데이터를 모델에 제공|||
 |Feed-forward network|순전파 신경망|박정환||
 |Generative|생성 모델|박정환|ToC의 분류명입니다.|
 |Getting Started tutorial|시작하기 튜토리얼|박정환|ToC의 Getting Started를 뜻합니다.|
 |gradient|변화도|박정환||
+|Hyperparameter|하이퍼파라미터|김태영|음차 표기|
 |Image|이미지|박정환|ToC의 분류명입니다.|
 |in-place|제자리|허남규||
 |instance|인스턴스|박정환|음차 표기|
@@ -41,6 +45,7 @@
 |matrix|행렬|박정환||
 |mean-squared error|평균제곱오차|허남규||
 |MelScale|MelScale|||
+|method|메소드|장효영|[음차 표기](https://terms.tta.or.kr/dictionary/dictionaryView.do?word_seq=090780-1)|
 |mini-batch|미니 배치|박정환|음차 표기|
 |momentum|모멘텀|박정환|음차 표기|
 |normalize|정규화|허남규||
@@ -65,6 +70,7 @@
 |Tensor / Tensors|Tensor|박정환|번역하지 않음|
 |Text|텍스트|박정환|ToC의 분류명입니다.|
 |track (computation) history|연산 기록을 추적하다|박정환||
+|training|학습|이하람||
 |warmstart|빠르게 시작하기|박정환|Warmstarting Model = 빠르게 모델 시작하기|
 |weight|가중치|박정환||
 |wrapper|래퍼|박정환|음차 표기|

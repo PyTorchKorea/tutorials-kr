@@ -20,7 +20,7 @@ Dataset과 Dataloader
 # PyTorch는 ``torch.utils.data.DataLoader`` 와 ``torch.utils.data.Dataset`` 의 두 가지 데이터 기본 요소를
 # 제공하여 미리 준비해된(pre-loaded) 데이터셋 뿐만 아니라 가지고 있는 데이터를 사용할 수 있도록 합니다.
 # ``Dataset`` 은 샘플과 정답(label)을 저장하고, ``DataLoader`` 는 ``Dataset`` 을 샘플에 쉽게 접근할 수 있도록
-# 반복 가능한 객체(iterable)로 감쌉니다.
+# 순회 가능한 객체(iterable)로 감쌉니다.
 #
 # PyTorch의 도메인 특화 라이브러리들은 (FashionMNIST와 같은) 다양한 미리 준비해둔(pre-loaded) 데이터셋을 제공합니다.
 # 데이터셋은 ``torch.utils.data.Dataset`` 의 하위 클래스로 개별 데이터를 특정하는 함수가 구현되어 있습니다.
@@ -69,7 +69,7 @@ test_data = datasets.FashionMNIST(
 
 
 #################################################################
-# 데이터셋을 반복하고 시각화하기
+# 데이터셋을 순회하고 시각화하기
 # ------------------------------------------------------------------------------------------
 #
 # ``Dataset`` 에 리스트(list)처럼 직접 접근(index)할 수 있습니다: ``training_data[index]``.
@@ -213,7 +213,7 @@ def __getitem__(self, idx):
 # 모델을 학습할 때, 일반적으로 샘플들을 "미니배치(minibatch)"로 전달하고, 매 에폭(epoch)마다 데이터를 다시 섞어서 과적합(overfit)을 막고,
 # Python의 ``multiprocessing`` 을 사용하여 데이터 검색 속도를 높이려고 합니다.
 #
-# ``DataLoader`` 는 간단한 API로 이러한 복잡한 과정들을 추상화한 반복 가능한 객체(iteratable)입니다.
+# ``DataLoader`` 는 간단한 API로 이러한 복잡한 과정들을 추상화한 순회 가능한 객체(iteratable)입니다.
 
 from torch.utils.data import DataLoader
 
@@ -221,12 +221,12 @@ train_dataloader = DataLoader(training_data, batch_size=64, shuffle=True)
 test_dataloader = DataLoader(test_data, batch_size=64, shuffle=True)
 
 ###########################
-# DataLoader를 통해 반복하기(iterate)
+# DataLoader를 통해 순회하기(iterate)
 # ------------------------------------------------------------------------------------------
 #
-# ``DataLoader`` 에 데이터셋을 불러온 뒤에는 필요에 따라 데이터셋을 반복(iterate)할 수 있습니다.
-# 아래의 각 반복(iteration)은 (각각 ``batch_size=64`` 의 특징(feature)과 정답(label)을 포함하는) ``train_features`` 와
-# ``train_labels`` 의 묶음(batch)을 반환합니다. ``shuffle=True`` 로 지정했으므로, 모든 배치를 반복한 뒤 데이터가 섞입니다.
+# ``DataLoader`` 에 데이터셋을 불러온 뒤에는 필요에 따라 데이터셋을 순회(iterate)할 수 있습니다.
+# 아래의 각 순회(iteration)는 (각각 ``batch_size=64`` 의 특징(feature)과 정답(label)을 포함하는) ``train_features`` 와
+# ``train_labels`` 의 묶음(batch)을 반환합니다. ``shuffle=True`` 로 지정했으므로, 모든 배치를 순회한 뒤 데이터가 섞입니다.
 # (데이터 불러오기 순서를 보다 세밀하게(finer-grained) 제어하려면 `Samplers <https://pytorch.org/docs/stable/data.html#data-loading-order-and-sampler>`_
 # 를 살펴보세요.)
 

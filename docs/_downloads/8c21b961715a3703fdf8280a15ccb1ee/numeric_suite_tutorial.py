@@ -85,21 +85,21 @@ def compute_error(x, y):
 for key in wt_compare_dict:
     print(key, compute_error(wt_compare_dict[key]['float'], wt_compare_dict[key]['quantized'].dequantize()))
 
-
 ##############################################################################
 # As another example ``wt_compare_dict`` can also be used to plot the histogram of the weights of floating point and quantized models.
 
 import matplotlib.pyplot as plt
 
 f = wt_compare_dict['conv1.weight']['float'].flatten()
-#plt.hist(f, bins = 100)
-#plt.title("Floating point model weights of conv1")
-#plt.show()
+plt.hist(f, bins = 100)
+plt.title("Floating point model weights of conv1")
+plt.show()
 
 q = wt_compare_dict['conv1.weight']['quantized'].flatten().dequantize()
-#plt.hist(q, bins = 100)
-#plt.title("Quantized model weights of conv1")
-#plt.show()
+plt.hist(q, bins = 100)
+plt.title("Quantized model weights of conv1")
+plt.show()
+
 
 
 ##############################################################################
