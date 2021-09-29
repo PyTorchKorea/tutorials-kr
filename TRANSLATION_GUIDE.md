@@ -20,6 +20,7 @@
 |augmentation|증강|이재복||
 |autograd|Autograd|황성수|번역안함|
 |Batch Normalization|배치 정규화|박정환||
+|bias|편향|이하람||
 |convolution|합성곱|김현길||
 |dataset|데이터셋|박정환|음차 표기|
 |deep neural network|심층 신경망|박정환||
