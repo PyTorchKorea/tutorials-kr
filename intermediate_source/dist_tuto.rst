@@ -208,16 +208,16 @@ PyTorch에 포함된 분산 패키지(예. ``torch.distributed``)는 연구자�
 PyTorch에는 현재 ``dist.all_reduce(tensor, op, group)`` 외에도 6개의 집합 통신이
 구현되어 있습니다.
 
--  ``dist.broadcast(tensor, src, group)``: ``src`` 의 ``tensor`` 를 모든 프로세스에
+-  ``dist.broadcast(tensor, src, group)``: ``src`` 의 ``tensor`` 를 모든 프로세스의 ``tensor`` 에
    복사합니다.
 -  ``dist.reduce(tensor, dst, op, group)``: ``op`` 를 모든 ``tensor`` 에 적용한 뒤
-   결과를 ``dst`` 에 저장합니다.
+   결과를 ``dst`` 프로세스의 ``tensor`` 에 저장합니다.
 -  ``dist.all_reduce(tensor, op, group)``: 리듀스와 동일하지만, 결과가 모든
-   프로세스에 저장됩니다.
+   프로세스의 ``tensor`` 에 저장됩니다.
 -  ``dist.scatter(tensor, scatter_list, src, group)``: :math:`i^{\text{번째}}` Tensor
-   ``scatter_list[i]`` 를 :math:`i^{\text{번째}}` 프로세스에 복사합니다.
--  ``dist.gather(tensor, gather_list, dst, group)``: ``dst`` 의 모든 프로세스에서
-   ``tensor`` 를 복사합니다.
+   ``scatter_list[i]`` 를 :math:`i^{\text{번째}}` 프로세스의 ``tensor`` 에 복사합니다.
+-  ``dist.gather(tensor, gather_list, dst, group)``: 모든 프로세스의 ``tensor`` 를 ``dst`` 프로세스의
+   ``gather_list`` 에 복사합니다.
 -  ``dist.all_gather(tensor_list, tensor, group)``: 모든 프로세스의 ``tensor`` 를
    모든 프로세스의 ``tensor_list`` 에 복사합니다.
 -  ``dist.barrier(group)``: `group` 내의 모든 프로세스가 이 함수에 진입할 때까지
