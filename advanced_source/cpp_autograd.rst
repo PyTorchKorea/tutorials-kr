@@ -1,21 +1,21 @@
 C++ 프론트엔드의 자동 미분 (autograd)
 ===============================
 
-``autograd`` 는 PyTorch로 매우 유연하고 역동적인 신경망을 구축하기 위해
-필수적인 패키지입니다. PyTorch 파이썬 프론트엔드의 자동 미분 API 대부분은 C++ 프론트엔드에서
-사용할 수 있으며, 파이썬에서 C++로 autograd 코드를 쉽게 변환할 수 있습니다.
+``autograd`` 는 PyTorch로 유연하고 역동적인 신경망을 구축하기 위해
+필수적인 패키지입니다. PyTorch 파이썬 프론트엔드의 자동 미분 API 대부분은 C++ 프론트엔드에서도
+사용할 수 있으며, 파이썬에서 C++로 자동 미분 코드를 쉽게 변환할 수 있습니다.
 
 이 튜토리얼에서는 PyTorch C++ 프론트엔드에서 자동 미분을 수행하는 몇 가지 예를 살펴보겠습니다.
 이 튜토리얼은 여러분이 파이썬 프론트엔드의 자동 미분에 대해 기본적으로 이해하고 있다고
-가정합니다. 그렇지 않은 경우 먼저 `Autograd: 자동 미분
+가정합니다. 그렇지 않은 경우 먼저 `Autograd: Automatic Differentiation
 <https://tutorials.pytorch.kr/beginner/blitz/autograd_tutorial.html>`_ 을 읽어보세요.
 
 기초 자동 미분 연산
 ---------------
 
-(`이 튜토리얼 <https://tutorials.pytorch.kr/beginner/blitz/autograd_tutorial.html#autograd-automatic-differentiation>`_ 의 내용에 기반함.)
+(`이 튜토리얼 <https://tutorials.pytorch.kr/beginner/blitz/autograd_tutorial.html#autograd-automatic-differentiation>`_ 의 내용에 기반함)
 
-텐서를 생성하고 그것의 계산을 추적하기 위해 ``torch::requires_grad()`` 를 실행합니다.
+텐서를 생성하고 그것의 계산을 추적하기 위해 ``torch::requires_grad()`` 를 실행해봅시다.
 
 .. code-block:: cpp
 
@@ -83,7 +83,7 @@ Out:
   MeanBackward0
 
 
-``.requires_grad_( ... )`` 는 텐서의 기존 ``requires_grad`` flag를 in-place로 바꿉니다. 
+``.requires_grad_( ... )`` 는 in-place로 텐서의 기존 ``requires_grad`` 플래그를 바꿉니다. 
 
 .. code-block:: cpp
 
@@ -127,8 +127,8 @@ Out:
    4.5000  4.5000
   [ CPUFloatType{2,2} ]
 
-``4.5`` 행렬이 출력돼야 합니다. 이 값을 얻게 된 과정에 대한 설명은 `이 튜토리얼의 해당 섹션
-<https://tutorials.pytorch.kr/beginner/blitz/autograd_tutorial.html#gradients>`_ 을 확인하세요.
+``4.5`` 행렬이 출력돼야 합니다. 이 값을 얻는 과정에 대한 설명은 `이 튜토리얼의 해당 섹션
+<https://tutorials.pytorch.kr/beginner/blitz/autograd_tutorial.html#gradients>`_ 에서 확인하세요.
 
 이제 벡터-야코비안 곱의 예를 살펴보겠습니다.
 
@@ -172,7 +172,7 @@ Out:
       0.1024
   [ CPUFloatType{3} ]
 
-또한 코드에 ``torch::NoGradGuard`` 를 넣어주면 자동 미분이 그래디언트가
+또한 코드에 ``torch::NoGradGuard`` 를 넣어주면 자동 미분으로 하여금 그래디언트가
 필요한 텐서를 추적하지 않도록 할 수 있습니다.
 
 .. code-block:: cpp
@@ -194,7 +194,7 @@ Out:
   true
   false
 
-혹은 ``.detach()`` 를 사용하여 내용은 동일하지만 그라데이션이 필요하지 않은
+혹은 ``.detach()`` 를 사용하여 내용은 동일하지만 그래디언트가 필요 없는
 새 텐서를 얻을 수도 있습니다.
 
 .. code-block:: cpp
@@ -264,7 +264,7 @@ Out:
 C++에서 사용자 지정 자동 미분 함수 사용하기
 ----------------------------------
 
-(`이 튜토리얼 <https://pytorch.org/docs/stable/notes/extending.html#extending-torch-autograd>`_ 의 내용에 기반함.)
+(`이 튜토리얼 <https://pytorch.org/docs/stable/notes/extending.html#extending-torch-autograd>`_ 의 내용에 기반함)
 
 ``torch::autograd`` 에 새로운 기본(elementary) 연산을 추가하려면 각 연산에 대해 새로운 ``torch::autograd::Function``
 하위 클래스(subclass)를 구현해야 합니다. ``torch::autograd`` 는 결과와 그래디언트를 계산하고 연산 기록을 인코딩하기 위해 위해
@@ -272,7 +272,7 @@ C++에서 사용자 지정 자동 미분 함수 사용하기
 구현해야 하며 자세한 요구사항은 ``이 링크 https://pytorch.org/cppdocs/api/structtorch_1_1autograd_1_1_function.html``_
 에서 확인하세요.
 
-아래 코드에서 ``torch::nn`` 의 ``Linear`` 함수를 사용합니다.
+아래 코드는 ``torch::nn`` 의 ``Linear`` 함수를 사용합니다.
 
 .. code-block:: cpp
 
@@ -314,7 +314,7 @@ C++에서 사용자 지정 자동 미분 함수 사용하기
     }
   };
 
-이제 아래와 같이 ``LinearFunction`` 를 사용할 수 있습니다.
+이제 아래와 같이 ``LinearFunction`` 을 사용할 수 있습니다.
 
 .. code-block:: cpp
 
@@ -339,7 +339,7 @@ Out:
    3.7608  0.9101  0.0073
   [ CPUFloatType{4,3} ]
 
-여기서, 텐서가 아닌 인수로 매개화된 또 다른 함수를 예로 들어 보겠습니다.
+여기서, 텐서가 아닌 인수를 매개변수로 갖는 또 다른 함수를 예로 들어 보겠습니다.
 
 .. code-block:: cpp
 
@@ -387,8 +387,8 @@ Out:
 파이썬 자동 미분 코드를 C++로 변환하기
 ------------------------------
 
-간단히 말하자면, C++에서 자동 미분을 사용하는 가장 쉬운 방법은 먼저 파이썬에서 동작하는
-자동 미분 코드를 작성한 후에, 아래 표를 참고해 파이썬 자동 미분 코드를 C++로 코드를
+개략적으로 말하면, C++에서 자동 미분을 사용하는 가장 쉬운 방법은 먼저
+파이썬에서 동작하는 자동 미분 코드를 작성한 후, 아래 표를 참고해 C++ 코드로
 변환하는 것입니다.
 
 +--------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
