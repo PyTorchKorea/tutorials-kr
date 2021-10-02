@@ -89,7 +89,7 @@ DCGAN 튜토리얼
 # 이 부분은 다음 섹션에서 설명하도록 하겠습니다.
 
 from __future__ import print_function
-# %matplotlib inline
+#%matplotlib inline
 import argparse
 import os
 import random
@@ -187,11 +187,11 @@ ngpu = 1
 # *celeba* 이라는 폴더를 새로 만들고, 해당 폴더에 해당 zip 파일을 압축해제 해주시면 됩니다.
 # 압축 해제 후, 위에서 정의한 *dataroot* 변수에 방금 만든 *celeba* 폴더의 경로를 넣어주세요.
 # 위의 작업이 끝나면 *celeba* 폴더의 구조는 다음과 같아야 합니다:
-#
+# 
 # ::
-#
+# 
 #    /path/to/celeba
-#        -> img_align_celeba
+#        -> img_align_celeba 
 #            -> 188242.jpg
 #            -> 173822.jpg
 #            -> 284702.jpg
@@ -224,11 +224,10 @@ device = torch.device("cuda:0" if (
 
 # 학습 데이터들 중 몇가지 이미지들을 화면에 띄워봅시다
 real_batch = next(iter(dataloader))
-plt.figure(figsize=(8, 8))
+plt.figure(figsize=(8,8))
 plt.axis("off")
 plt.title("Training Images")
-plt.imshow(np.transpose(vutils.make_grid(real_batch[0].to(device)[
-           :64], padding=2, normalize=True).cpu(), (1, 2, 0)))
+plt.imshow(np.transpose(vutils.make_grid(real_batch[0].to(device)[:64], padding=2, normalize=True).cpu(), (1, 2, 0)))
 
 
 ######################################################################
@@ -293,7 +292,7 @@ class Generator(nn.Module):
         self.ngpu = ngpu
         self.main = nn.Sequential(
             # 입력데이터 Z가 가장 처음 통과하는 전치 합성곱 계층입니다.
-            nn.ConvTranspose2d(nz, ngf * 8, 4, 1, 0, bias=False),
+            nn.ConvTranspose2d( nz, ngf * 8, 4, 1, 0, bias=False),
             nn.BatchNorm2d(ngf * 8),
             nn.ReLU(True),
             # 위의 계층을 통과한 데이터의 크기. (ngf*8) x 4 x 4
@@ -301,15 +300,15 @@ class Generator(nn.Module):
             nn.BatchNorm2d(ngf * 4),
             nn.ReLU(True),
             # 위의 계층을 통과한 데이터의 크기. (ngf*4) x 8 x 8
-            nn.ConvTranspose2d(ngf * 4, ngf * 2, 4, 2, 1, bias=False),
+            nn.ConvTranspose2d( ngf * 4, ngf * 2, 4, 2, 1, bias=False),
             nn.BatchNorm2d(ngf * 2),
             nn.ReLU(True),
             # 위의 계층을 통과한 데이터의 크기. (ngf*2) x 16 x 16
-            nn.ConvTranspose2d(ngf * 2, ngf, 4, 2, 1, bias=False),
+            nn.ConvTranspose2d( ngf * 2, ngf, 4, 2, 1, bias=False),
             nn.BatchNorm2d(ngf),
             nn.ReLU(True),
             # 위의 계층을 통과한 데이터의 크기. (ngf) x 32 x 32
-            nn.ConvTranspose2d(ngf, nc, 4, 2, 1, bias=False),
+            nn.ConvTranspose2d( ngf, nc, 4, 2, 1, bias=False),
             nn.Tanh()
             # 위의 계층을 통과한 데이터의 크기. (nc) x 64 x 64
         )
@@ -606,8 +605,8 @@ for epoch in range(num_epochs):
 
 plt.figure(figsize=(10, 5))
 plt.title("Generator and Discriminator Loss During Training")
-plt.plot(G_losses, label="G")
-plt.plot(D_losses, label="D")
+plt.plot(G_losses,label="G")
+plt.plot(D_losses,label="D")
 plt.xlabel("iterations")
 plt.ylabel("Loss")
 plt.legend()
@@ -642,18 +641,17 @@ HTML(ani.to_jshtml())
 real_batch = next(iter(dataloader))
 
 # 진짜 이미지들을 화면에 출력합니다
-plt.figure(figsize=(15, 15))
-plt.subplot(1, 2, 1)
+plt.figure(figsize=(15,15))
+plt.subplot(1,2,1)
 plt.axis("off")
 plt.title("Real Images")
-plt.imshow(np.transpose(vutils.make_grid(real_batch[0].to(device)[
-           :64], padding=5, normalize=True).cpu(), (1, 2, 0)))
+plt.imshow(np.transpose(vutils.make_grid(real_batch[0].to(device)[:64], padding=5, normalize=True).cpu(), (1, 2, 0)))
 
 # 가짜 이미지들을 화면에 출력합니다
-plt.subplot(1, 2, 2)
+plt.subplot(1,2,2)
 plt.axis("off")
 plt.title("Fake Images")
-plt.imshow(np.transpose(img_list[-1], (1, 2, 0)))
+plt.imshow(np.transpose(img_list[-1], (1,2,0)))
 plt.show()
 
 
