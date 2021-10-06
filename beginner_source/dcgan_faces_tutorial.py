@@ -119,7 +119,7 @@ torch.manual_seed(manualSeed)
 # 설정값
 # ------
 #
-# 몇가지 설정값들을 정의해봅시다:
+# 몇 가지 설정값들을 정의해봅시다:
 #
 # -  **dataroot** - 데이터셋 폴더의 경로입니다. 데이터셋에 관한건 다음 섹션에서
 #    더 자세히 설명하겠습니다.
@@ -163,10 +163,10 @@ ngf = 64
 # 구분자를 통과하는 특징 데이터들의 채널 크기
 ndf = 64
 
-# 에폭 수
+# 학습할 에폭 수
 num_epochs = 5
 
-# 학습률
+# 옵티마이저의 학습률
 lr = 0.0002
 
 # Adam 옵티마이저의 beta1 하이퍼파라미터
@@ -439,7 +439,7 @@ criterion = nn.BCELoss()
 # 생성자의 학습상태를 확인할 잠재 공간 벡터를 생성합니다
 fixed_noise = torch.randn(64, nz, 1, 1, device=device)
 
-# 참/거짓의 라벨을 정합니다
+# 학습에 사용되는 참/거짓의 라벨을 정합니다
 real_label = 1.
 fake_label = 0.
 
@@ -660,5 +660,5 @@ plt.show()
 # -  결과물이 얼마나 더 좋아지는지 확인해보기 위해서 학습시간을 늘려볼 수 있습니다
 # -  다른 데이터셋을 이용해 훈련시켜보거나, 이미지의 사이즈를 다르게 해보거나, 아키텍쳐의 구성을 바꿔볼 수도 있습니다
 # -  `여기 <https://github.com/nashory/gans-awesome-applications>`__ 에서 더욱 멋진 GAN 프로젝트들을 찾을수도 있죠
-# -  아니면 `음악 <https://deepmind.com/blog/wavenet-generative-model-raw-audio/>`__ 을 작곡하는 GAN도 만들 수 있습니다
+# -  `음악 <https://deepmind.com/blog/wavenet-generative-model-raw-audio/>`__ 을 작곡하는 GAN도 만들 수 있습니다
 #
