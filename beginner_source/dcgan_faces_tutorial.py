@@ -109,7 +109,7 @@ from IPython.display import HTML
 
 # 코드 실행결과의 동일성을 위해 무작위 시드를 설정합니다
 manualSeed = 999
-# manualSeed = random.randint(1, 10000) # 만일 새로운 결과를 원한다면 주석을 없애면 됩니다
+#manualSeed = random.randint(1, 10000) # 만일 새로운 결과를 원한다면 주석을 없애면 됩니다
 print("Random Seed: ", manualSeed)
 random.seed(manualSeed)
 torch.manual_seed(manualSeed)
@@ -191,7 +191,7 @@ ngpu = 1
 # ::
 # 
 #    /path/to/celeba
-#        -> img_align_celeba 
+#        -> img_align_celeba  
 #            -> 188242.jpg
 #            -> 173822.jpg
 #            -> 284702.jpg
@@ -211,23 +211,20 @@ dataset = dset.ImageFolder(root=dataroot,
                                transforms.Resize(image_size),
                                transforms.CenterCrop(image_size),
                                transforms.ToTensor(),
-                               transforms.Normalize(
-                                   (0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
-                           ]))
+                               transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),]))
 # dataloader를 정의해봅시다
 dataloader = torch.utils.data.DataLoader(dataset, batch_size=batch_size,
                                          shuffle=True, num_workers=workers)
 
 # GPU 사용여부를 결정해 줍니다
-device = torch.device("cuda:0" if (
-    torch.cuda.is_available() and ngpu > 0) else "cpu")
+device = torch.device("cuda:0" if (torch.cuda.is_available() and ngpu > 0) else "cpu")
 
 # 학습 데이터들 중 몇가지 이미지들을 화면에 띄워봅시다
 real_batch = next(iter(dataloader))
 plt.figure(figsize=(8,8))
 plt.axis("off")
 plt.title("Training Images")
-plt.imshow(np.transpose(vutils.make_grid(real_batch[0].to(device)[:64], padding=2, normalize=True).cpu(), (1, 2, 0)))
+plt.imshow(np.transpose(vutils.make_grid(real_batch[0].to(device)[:64], padding=2, normalize=True).cpu(), (1,2,0)))
 
 
 ######################################################################
@@ -516,7 +513,7 @@ print("Starting Training Loop...")
 for epoch in range(num_epochs):
     # 한 에폭 내에서 배치 반복
     for i, data in enumerate(dataloader, 0):
-
+        
         ############################
         # (1) D 신경망을 업데이트 합니다: log(D(x)) + log(1 - D(G(z)))를 최대화 합니다
         ###########################
@@ -569,23 +566,23 @@ for epoch in range(num_epochs):
         D_G_z2 = output.mean().item()
         # G를 업데이트 합니다
         optimizerG.step()
-
+        
         # 훈련 상태를 출력합니다
         if i % 50 == 0:
             print('[%d/%d][%d/%d]\tLoss_D: %.4f\tLoss_G: %.4f\tD(x): %.4f\tD(G(z)): %.4f / %.4f'
                   % (epoch, num_epochs, i, len(dataloader),
                      errD.item(), errG.item(), D_x, D_G_z1, D_G_z2))
-
+        
         # 이후 그래프를 그리기 위해 손실값들을 저장해둡니다
         G_losses.append(errG.item())
         D_losses.append(errD.item())
-
+        
         # fixed_noise를 통과시킨 G의 출력값을 저장해둡니다
         if (iters % 500 == 0) or ((epoch == num_epochs-1) and (i == len(dataloader)-1)):
             with torch.no_grad():
                 fake = netG(fixed_noise).detach().cpu()
             img_list.append(vutils.make_grid(fake, padding=2, normalize=True))
-
+            
         iters += 1
 
 
@@ -603,7 +600,7 @@ for epoch in range(num_epochs):
 # 아래는 D와 G의 손실값들을 그래프로 그린 모습입니다
 #
 
-plt.figure(figsize=(10, 5))
+plt.figure(figsize=(10,5))
 plt.title("Generator and Discriminator Loss During Training")
 plt.plot(G_losses,label="G")
 plt.plot(D_losses,label="D")
@@ -620,13 +617,11 @@ plt.show()
 # 저장한 이미지들을애니메이션 형식으로 확인해 봅시다. play버튼을 누르면 애니매이션이 실행됩니다
 #
 
-# %%capture
-fig = plt.figure(figsize=(8, 8))
+#%%capture
+fig = plt.figure(figsize=(8,8))
 plt.axis("off")
-ims = [[plt.imshow(np.transpose(i, (1, 2, 0)), animated=True)]
-       for i in img_list]
-ani = animation.ArtistAnimation(
-    fig, ims, interval=1000, repeat_delay=1000, blit=True)
+ims = [[plt.imshow(np.transpose(i, (1, 2, 0)), animated=True)] for i in img_list]
+ani = animation.ArtistAnimation(fig, ims, interval=1000, repeat_delay=1000, blit=True)
 
 HTML(ani.to_jshtml())
 
@@ -645,13 +640,13 @@ plt.figure(figsize=(15,15))
 plt.subplot(1,2,1)
 plt.axis("off")
 plt.title("Real Images")
-plt.imshow(np.transpose(vutils.make_grid(real_batch[0].to(device)[:64], padding=5, normalize=True).cpu(), (1, 2, 0)))
+plt.imshow(np.transpose(vutils.make_grid(real_batch[0].to(device)[:64], padding=5, normalize=True).cpu(), (1,2,0)))
 
 # 가짜 이미지들을 화면에 출력합니다
 plt.subplot(1,2,2)
 plt.axis("off")
 plt.title("Fake Images")
-plt.imshow(np.transpose(img_list[-1], (1,2,0)))
+plt.imshow(np.transpose(img_list[-1],(1,2,0)))
 plt.show()
 
 
