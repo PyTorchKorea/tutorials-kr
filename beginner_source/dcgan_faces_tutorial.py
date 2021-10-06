@@ -318,7 +318,7 @@ class Generator(nn.Module):
 # 좋습니다. 이제 우리는 생성자의 인스턴스를 만들고 ``weights_init``
 # 함수를 적용시킬 수 있습니다. 모델의 인스턴스를 출력해서 생성자가
 # 어떻게 구성되어있는지 확인해봅시다.
-#
+# 
 
 # 생성자를 만듭니다
 netG = Generator(ngpu).to(device)
@@ -396,7 +396,7 @@ netD = Discriminator(ngpu).to(device)
 # 필요한 경우 multi-gpu를 설정 해주세요
 if (device.type == 'cuda') and (ngpu > 1):
     netD = nn.DataParallel(netD, list(range(ngpu)))
-
+    
 # 모든 가중치의 평균을 0, 분산을 0.02로 초기화 하기 위해
 # weight_init 함수를 적용시킵니다
 netD.apply(weights_init)
@@ -413,7 +413,7 @@ print(netD)
 # 학습을 구체화시킬 시간입니다. 손실함수로는 Binary Cross Entropy loss
 # (`BCELoss <https://pytorch.org/docs/stable/nn.html#torch.nn.BCELoss>`__)
 # 를 사용할겁니다. 해당함수는 아래의 식으로 파이토치에 구현되어 있습니다:
-#
+# 
 # .. math:: \ell(x, y) = L = \{l_1,\dots,l_N\}^\top, \quad l_n = - \left[ y_n \cdot \log x_n + (1 - y_n) \cdot \log (1 - x_n) \right]
 #
 # 이때, 위의 함수가 로그함수 요소를 정의한 방식을 주의깊게 봐주세요 (예. :math:`log(D(x))` 와
