@@ -211,7 +211,8 @@ dataset = dset.ImageFolder(root=dataroot,
                                transforms.Resize(image_size),
                                transforms.CenterCrop(image_size),
                                transforms.ToTensor(),
-                               transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),]))
+                               transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
+                            ]))
 # dataloader를 정의해봅시다
 dataloader = torch.utils.data.DataLoader(dataset, batch_size=batch_size,
                                          shuffle=True, num_workers=workers)
@@ -224,7 +225,7 @@ real_batch = next(iter(dataloader))
 plt.figure(figsize=(8,8))
 plt.axis("off")
 plt.title("Training Images")
-plt.imshow(np.transpose(vutils.make_grid(real_batch[0].to(device)[:64], padding=2, normalize=True).cpu(), (1,2,0)))
+plt.imshow(np.transpose(vutils.make_grid(real_batch[0].to(device)[:64], padding=2, normalize=True).cpu(),(1,2,0)))
 
 
 ######################################################################
@@ -388,7 +389,7 @@ class Discriminator(nn.Module):
 ######################################################################
 # 이제 우리는 생성자에 한 것처럼 구분자의 인스턴스를 만들고,
 # ``weights_init`` 함수를 적용시킨 다음, 모델의 구조를 출력해볼 수 있습니다.
-#
+# 
 
 # 구분자를 만듭니다
 netD = Discriminator(ngpu).to(device)
@@ -517,7 +518,7 @@ for epoch in range(num_epochs):
         ############################
         # (1) D 신경망을 업데이트 합니다: log(D(x)) + log(1 - D(G(z)))를 최대화 합니다
         ###########################
-        # 진짜 데이터들로 학습을 합니다
+        ## 진짜 데이터들로 학습을 합니다
         netD.zero_grad()
         # 배치들의 사이즈나 사용할 디바이스에 맞게 조정합니다
         real_cpu = data[0].to(device)
@@ -532,7 +533,7 @@ for epoch in range(num_epochs):
         errD_real.backward()
         D_x = output.mean().item()
 
-        # 가짜 데이터들로 학습을 합니다
+        ## 가짜 데이터들로 학습을 합니다
         # 생성자에 사용할 잠재공간 벡터를 생성합니다
         noise = torch.randn(b_size, nz, 1, 1, device=device)
         # G를 이용해 가짜 이미지를 생성합니다
@@ -620,7 +621,7 @@ plt.show()
 #%%capture
 fig = plt.figure(figsize=(8,8))
 plt.axis("off")
-ims = [[plt.imshow(np.transpose(i, (1, 2, 0)), animated=True)] for i in img_list]
+ims = [[plt.imshow(np.transpose(i,(1,2,0)), animated=True)] for i in img_list]
 ani = animation.ArtistAnimation(fig, ims, interval=1000, repeat_delay=1000, blit=True)
 
 HTML(ani.to_jshtml())
@@ -640,7 +641,7 @@ plt.figure(figsize=(15,15))
 plt.subplot(1,2,1)
 plt.axis("off")
 plt.title("Real Images")
-plt.imshow(np.transpose(vutils.make_grid(real_batch[0].to(device)[:64], padding=5, normalize=True).cpu(), (1,2,0)))
+plt.imshow(np.transpose(vutils.make_grid(real_batch[0].to(device)[:64], padding=5, normalize=True).cpu(),(1,2,0)))
 
 # 가짜 이미지들을 화면에 출력합니다
 plt.subplot(1,2,2)
