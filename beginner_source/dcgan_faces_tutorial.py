@@ -212,7 +212,7 @@ dataset = dset.ImageFolder(root=dataroot,
                                transforms.CenterCrop(image_size),
                                transforms.ToTensor(),
                                transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
-                            ]))
+                           ]))
 # dataloader를 정의해봅시다
 dataloader = torch.utils.data.DataLoader(dataset, batch_size=batch_size,
                                          shuffle=True, num_workers=workers)
