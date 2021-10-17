@@ -34,7 +34,7 @@
 # 결과적으로, 우리는 ``nn.TransformerEncoder`` 에 중점을 두고 있으며, 
 # ``nn.TransformerEncoderLayer`` 의 절반은 한 GPU에 두고 
 # 나머지 절반은 다른 GPU에 있도록 모델을 분할합니다. 이를 위해서 ``Encoder`` 와
-# ``Decoder`` 세션을 분리된 모듈로 빼낸 다음, 원본 트랜스포머 모듈을
+# ``Decoder`` 섹션을 분리된 모듈로 빼낸 다음, 원본 트랜스포머 모듈을
 # 나타내는 nn.Sequential을 빌드 합니다.
 
 import sys
@@ -89,7 +89,7 @@ class Decoder(nn.Module):
 ######################################################################
 # ``PositionalEncoding`` 모듈은 시퀀스 안에서 토큰의 상대적인 또는 절대적인 포지션에 대한 정보를 주입합니다. 
 # 포지셔널 인코딩은 임베딩과 합칠 수 있도록 똑같은 차원을 가집니다. 여기서
-# 다른 주파수(frequency)의 ``sine`` 과 ``cosine`` 함수를 사용합니다.
+# 다른 주기(frequency)의 ``sine`` 과 ``cosine`` 함수를 사용합니다.
 
 
 class PositionalEncoding(nn.Module):
@@ -139,7 +139,7 @@ class PositionalEncoding(nn.Module):
 #   \end{bmatrix}
 #
 # 이 컬럼들은 모델에 의해서 독립적으로 취급되며, 이는 
-# G 와 F 의 의존성이 학습될 수 없다는 것을 의미하지만, 더 효율적인 
+# ``G`` 와 ``F`` 의 의존성이 학습될 수 없다는 것을 의미하지만, 더 효율적인 
 # 배치 프로세싱(batch processing)을 허용합니다. 
 #
 
@@ -187,9 +187,9 @@ test_data = batchify(test_data, eval_batch_size)
 
 
 ######################################################################
-# ``get_batch()`` 함수는 트랜스포머 모델을 위한 입력과 타겟(target) 시퀀스를 
+# ``get_batch()`` 함수는 트랜스포머 모델을 위한 입력과 타겟 시퀀스를 
 # 생성합니다. 이 함수는 소스 데이터를 ``bptt`` 길이를 가진 덩어리로 세분화합니다. 
-# 언어 모델링 과제를 위해서, 모델은 다음 단어인 Target이 필요합니다. 에를 들어 ``bptt`` 의 값이 2라면,
+# 언어 모델링 과제를 위해서, 모델은 다음 단어인 ``Target`` 이 필요합니다. 에를 들어 ``bptt`` 의 값이 2라면,
 # ``i`` = 0 일 때 다음의 2 개 변수(Variable)를 얻을 수 있습니다:
 #
 # .. image:: ../_static/img/transformer_input_target.png
@@ -222,7 +222,8 @@ def get_batch(source, i):
 # Pipe는 `RRef <https://pytorch.org/docs/stable/rpc.html#rref>`__ 를 통해
 # `RPC 프레임워크 <https://pytorch.org/docs/stable/rpc.html>`__ 에 의존하는데
 # 이는 향후 호스트 파이프라인을 교차 확장할 수 있도록 하기 때문에
-# RPC 프레임워크를 초기화해야 합니다.  
+# RPC 프레임워크를 초기화해야 합니다. 이때 RPC 프레임워크는 오직 하나의 하나의 worker로 초기화를 해야 하는데,
+# 여러 GPU를 다루기 위해 프로세스 하나만 사용하고 있기 때문입니다.
 #
 # 그런 다음 파이프라인은 한 GPU에 8개의 트랜스포머와
 # 다른 GPU에 8개의 트랜스포머 레이어로 초기화됩니다. 
@@ -303,7 +304,7 @@ print ('Total parameters in model: {:,}'.format(get_total_params(model)))
 # 는 확률적 경사하강법(stochastic gradient descent method)을 구현합니다. 초기
 # 학습률(learning rate)은 5.0로 설정됩니다. `StepLR <https://pytorch.org/docs/master/optim.html?highlight=steplr#torch.optim.lr_scheduler.StepLR>`__ 는
 # 에폭(epoch)에 따라서 학습률을 조절하는 데 사용됩니다. 학습하는 동안, 
-# 기울기 폭발(gradient exploding)를 방지하기 위해 모든 기울기를 함께 조정(scale)하는 함수
+# 기울기 폭발(gradient exploding)을 방지하기 위해 모든 기울기를 함께 조정(scale)하는 함수
 # `nn.utils.clip_grad_norm\_ <https://pytorch.org/docs/master/nn.html?highlight=nn%20utils%20clip_grad_norm#torch.nn.utils.clip_grad_norm_>`__
 # 을 이용합니다. 
 #
@@ -368,7 +369,7 @@ def evaluate(eval_model, data_source):
     return total_loss / (len(data_source) - 1)
 
 ######################################################################
-# 에폭 내에서 반복됩니다. 만약 검증 오차(validation loss)가 지금까지 관찰한 것 중 최적이라면
+# 에폭을 반복합니다. 만약 검증 오차(validation loss)가 지금까지 관찰한 것 중 최적이라면
 # 모델을 저장합니다. 각 에폭 이후에 학습률을 조절합니다. 
 
 best_val_loss = float("inf")
@@ -399,7 +400,7 @@ for epoch in range(1, epochs + 1):
 
 
 ######################################################################
-# 평가 데이터셋에 대한 결과를 확인하기 위해 최고의 모델을 적용합니다. 
+# 평가 데이터셋에서의 결과를 확인하기 위해 최고의 모델을 적용합니다. 
 
 test_loss = evaluate(best_model, test_data)
 print('=' * 89)
