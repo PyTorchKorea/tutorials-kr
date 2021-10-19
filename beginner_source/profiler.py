@@ -34,7 +34,7 @@ import torch.autograd.profiler as profiler
 # 프로파일러를 이용하여 성능 디버깅하기
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-# 프로파일러는 모델에서 성능의 병목 현상을 파악할 때 유용할 수 있습니다.
+# 프로파일러는 모델에서 성능의 병목을 파악할 때 유용할 수 있습니다.
 # 이번 예제에서, 두 가지 하위 작업을 수행하는 사용자 정의 모듈을 만들겠습니다:
 #
 # - 입력에 대한 선형 변환
@@ -74,7 +74,7 @@ class MyModule(nn.Module):
 #
 # 프로파일러를 실행하기 전, 정확한 성능 벤치마킹을 보장하기 위해 CUDA를 워밍업(warm-up) 시킵니다.
 # 모델의 순전파 단계를 ``profiler.profile`` 컨텍스트 매니저를 통해 감쌉니다.
-# ``with_stack=True`` 인자는 연산의 추적(trace)에 파일과 줄번호를 붙입니다.
+# ``with_stack=True`` 인자는 연산의 추적(trace) 파일 내부에 파일과 줄번호를 덧붙입니다.
 #
 # .. WARNING::
 #     ``with_stack=True`` 는 추가적인 오버헤드를 발생시키기 때문에 코드를 분석할 때에 사용하는 것이 바람직합니다.
@@ -101,7 +101,7 @@ with profiler.profile(with_stack=True, profile_memory=True) as prof:
 # 선택적으로 입력의 shape과/또는 스택 추적(stack trace) 이벤트에 따라서도 결과를 집계할 수 있습니다.
 # 입력의 shape에 따라서 그룹화 하는 것은 어떠한 shape의 텐서들이 모델에 의해 사용되는지 파악하는 데 유용합니다.
 #
-# 여기서, ``group_by_stack_n=5`` 를 사용하는데 이는 연산(operation)과 traceback(가장 최근 5개의 이벤트로 잘린)을
+# 여기서, ``group_by_stack_n=5`` 를 사용하는데 이는 연산(operation)과 traceback(가장 최근 5개의 이벤트에 대한)을
 # 기준으로 실행시간을 집계하는 것이고, 이벤트들이 등록된 순서로 정렬되어 표시됩니다.
 # 결과 표는 ``sort_by`` 인자 (유효한 정렬 키는 `docs <https://pytorch.org/docs/stable/autograd.html#profiler>`__ 에서
 # 확인하세요) 를 넘겨줌으로써 정렬될 수 있습니다.
@@ -157,7 +157,7 @@ Self CPU time total: 5.931s
 ######################################################################
 # 메모리 성능 향상시키기
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# 메모리와 시간 측면에서 가장 비용이 큰 연산은 ``forward(10)`` 이 나타내는 MASK INDICES 내 연산입니다.
+# 메모리와 시간 측면에서 가장 비용이 큰 연산은 MASK INDICES 내 ``forward(10)`` 연산입니다.
 # 먼저 메모리 소모 문제를 해결해봅시다.
 # 12번째 줄의 ``.to()`` 연산은 953.67 Mb를 소모하는 것을 확인할 수 있습니다.
 # 이 연산은 ``mask`` 를 CPU에 복사합니다.
@@ -228,7 +228,6 @@ Self CPU time total: 5.347s
 # CUDA 에서 CPU 로 행렬을 복사하는 것이 꽤 비용이 큰 연산인 것이 밝혀졌습니다.
 # ``forward(12)`` 의 ``aten::copy_`` 연산은 ``mask`` 를 CPU에 복사하여 NumPy 의 ``argwhere`` 함수를 사용할 수 있게 합니다.
 # ``forward(13)`` 의 ``aten::copy_`` 는 배열을 다시 텐서로 CUDA에 복사합니다.
-# copies the array back to CUDA as a tensor. We could eliminate both of these if we use a
 # 이곳에서 ``torch`` 함수 ``nonzero()`` 를 대신 사용한다면 두 연산을 모두 제거할 수 있습니다.
 #
 
@@ -308,6 +307,6 @@ Self CPU time total: 225.801ms
 # PyTorch 모델에서 시간과 메모리 병목을 분석하기 위해 프로파일러가 어떻게 사용될 수 있는지를 살펴보았습니다.
 # 아래에 프로파일러에 대한 읽을거리가 더 있습니다:
 #
-# - `PyTorch 프로파일러 <https://tutorials.pytorch.kr/recipes/recipes/profiler_recipe.html>`__
+# - `프로파일러 사용 레시피 <https://tutorials.pytorch.kr/recipes/recipes/profiler_recipe.html>`__
 # - `Profiling RPC-Based Workloads <https://tutorials.pytorch.kr/recipes/distributed_rpc_profiling.html>`__
 # - `Profiler API Docs <https://pytorch.org/docs/stable/autograd.html?highlight=profiler#profiler>`__
