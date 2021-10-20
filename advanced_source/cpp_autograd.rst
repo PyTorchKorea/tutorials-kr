@@ -1,6 +1,8 @@
 C++ 프론트엔드의 자동 미분 (autograd)
 ==================================
 
+**번역**: `유용환 <https://github.com/eric-yoo>`_
+
 ``autograd`` 는 PyTorch로 유연하고 역동적인 신경망을 구축하기 위해
 필수적인 패키지입니다. PyTorch 파이썬 프론트엔드의 자동 미분 API 대부분은 C++ 프론트엔드에서도
 사용할 수 있으며, 파이썬에서 C++로 자동 미분 코드를 쉽게 변환할 수 있습니다.
@@ -64,7 +66,7 @@ Out:
 
   auto z = y * y * 3;
   auto out = z.mean();
-  
+
   std::cout << z << std::endl;
   std::cout << z.grad_fn()->name() << std::endl;
   std::cout << out << std::endl;
@@ -83,17 +85,17 @@ Out:
   MeanBackward0
 
 
-``.requires_grad_( ... )`` 는 in-place로 텐서의 기존 ``requires_grad`` 플래그를 바꿉니다. 
+``.requires_grad_( ... )`` 는 in-place로 텐서의 기존 ``requires_grad`` 플래그를 바꿉니다.
 
 .. code-block:: cpp
 
   auto a = torch::randn({2, 2});
   a = ((a * 3) / (a - 1));
   std::cout << a.requires_grad() << std::endl;
-  
+
   a.requires_grad_(true);
   std::cout << a.requires_grad() << std::endl;
-  
+
   auto b = (a * a).sum();
   std::cout << b.grad_fn()->name() << std::endl;
 
@@ -135,12 +137,12 @@ Out:
 .. code-block:: cpp
 
   x = torch::randn(3, torch::requires_grad());
-  
+
   y = x * 2;
   while (y.norm().item<double>() < 1000) {
     y = y * 2;
   }
-    
+
   std::cout << y << std::endl;
   std::cout << y.grad_fn()->name() << std::endl;
 
@@ -160,7 +162,7 @@ Out:
 
   auto v = torch::tensor({0.1, 1.0, 0.0001}, torch::kFloat);
   y.backward(v);
-  
+
   std::cout << x.grad() << std::endl;
 
 Out:
@@ -179,7 +181,7 @@ Out:
 
   std::cout << x.requires_grad() << std::endl;
   std::cout << x.pow(2).requires_grad() << std::endl;
-  
+
   {
     torch::NoGradGuard no_grad;
     std::cout << x.pow(2).requires_grad() << std::endl;
@@ -225,25 +227,25 @@ C++로 고차원 그래디언트 계산하기
 .. code-block:: cpp
 
   #include <torch/torch.h>
-  
+
   auto model = torch::nn::Linear(4, 3);
-  
+
   auto input = torch::randn({3, 4}).requires_grad_(true);
   auto output = model(input);
-  
+
   // Calculate loss
   auto target = torch::randn({3, 3});
   auto loss = torch::nn::MSELoss()(output, target);
-  
+
   // Use norm of gradients as penalty
   auto grad_output = torch::ones_like(output);
   auto gradient = torch::autograd::grad({output}, {input}, /*grad_outputs=*/{grad_output}, /*create_graph=*/true)[0];
   auto gradient_penalty = torch::pow((gradient.norm(2, /*dim=*/1) - 1), 2).mean();
-  
+
   // Add gradient penalty to loss
   auto combined_loss = loss + gradient_penalty;
   combined_loss.backward();
-  
+
   std::cout << input.grad() << std::endl;
 
 Out:
@@ -269,7 +271,7 @@ C++에서 사용자 지정 자동 미분 함수 사용하기
 ``torch::autograd`` 에 새로운 기본(elementary) 연산을 추가하려면 각 연산에 대해 새로운 ``torch::autograd::Function``
 하위 클래스(subclass)를 구현해야 합니다. ``torch::autograd`` 는 결과와 그래디언트를 계산하고 연산 기록을 인코딩하기 위해 위해
 이 ``torch::autograd::Function`` 들을 사용합니다. 모든 새로운 함수에는 두 가지 방법, 즉 ``forward`` 와 ``backward`` 를
-구현해야 하며 자세한 요구사항은 ``이 링크 https://pytorch.org/cppdocs/api/structtorch_1_1autograd_1_1_function.html``_
+구현해야 하며 자세한 요구사항은 ``이 링크 <https://pytorch.org/cppdocs/api/structtorch_1_1autograd_1_1_function.html>``_
 에서 확인하세요.
 
 아래 코드는 ``torch::nn`` 의 ``Linear`` 함수를 사용합니다.
@@ -277,14 +279,14 @@ C++에서 사용자 지정 자동 미분 함수 사용하기
 .. code-block:: cpp
 
   #include <torch/torch.h>
-  
+
   using namespace torch::autograd;
-  
+
   // Inherit from Function
   class LinearFunction : public Function<LinearFunction> {
    public:
     // Note that both forward and backward are static functions
-  
+
     // bias is an optional argument
     static torch::Tensor forward(
         AutogradContext *ctx, torch::Tensor input, torch::Tensor weight, torch::Tensor bias = torch::Tensor()) {
@@ -295,13 +297,13 @@ C++에서 사용자 지정 자동 미분 함수 사용하기
       }
       return output;
     }
-  
+
     static tensor_list backward(AutogradContext *ctx, tensor_list grad_outputs) {
       auto saved = ctx->get_saved_variables();
       auto input = saved[0];
       auto weight = saved[1];
       auto bias = saved[2];
-  
+
       auto grad_output = grad_outputs[0];
       auto grad_input = grad_output.mm(weight);
       auto grad_weight = grad_output.t().mm(input);
@@ -309,7 +311,7 @@ C++에서 사용자 지정 자동 미분 함수 사용하기
       if (bias.defined()) {
         grad_bias = grad_output.sum(0);
       }
-  
+
       return {grad_input, grad_weight, grad_bias};
     }
   };
@@ -322,7 +324,7 @@ C++에서 사용자 지정 자동 미분 함수 사용하기
   auto weight = torch::randn({4, 3}).requires_grad_();
   auto y = LinearFunction::apply(x, weight);
   y.sum().backward();
-  
+
   std::cout << x.grad() << std::endl;
   std::cout << weight.grad() << std::endl;
 
@@ -344,9 +346,9 @@ Out:
 .. code-block:: cpp
 
   #include <torch/torch.h>
-  
+
   using namespace torch::autograd;
-  
+
   class MulConstant : public Function<MulConstant> {
    public:
     static torch::Tensor forward(AutogradContext *ctx, torch::Tensor tensor, double constant) {
@@ -355,7 +357,7 @@ Out:
       ctx->saved_data["constant"] = constant;
       return tensor * constant;
     }
-  
+
     static tensor_list backward(AutogradContext *ctx, tensor_list grad_outputs) {
       // We return as many input gradients as there were arguments.
       // Gradients of non-tensor arguments to forward must be `torch::Tensor()`.
@@ -381,8 +383,8 @@ Out:
    5.5000
   [ CPUFloatType{2} ]
 
-``torch::autograd::Function`` 에 대한 더 많은 내용은 `이 문서
-<https://pytorch.org/cppdocs/api/structtorch_1_1autograd_1_1_function.html>`_ 에서 확인할 수 있습니다.
+``torch::autograd::Function`` 에 대한 더 많은 내용은
+`이 문서 <https://pytorch.org/cppdocs/api/structtorch_1_1autograd_1_1_function.html>`_ 에서 확인할 수 있습니다.
 
 파이썬 자동 미분 코드를 C++로 변환하기
 ------------------------------
@@ -428,7 +430,7 @@ Out:
 최대한 빨리 고쳐드리겠습니다.
 
 결론
----
+-----
 
 이제 PyTorch의 C++ 자동 미분 API에 대한 개괄적인 이해가 생겼을 것입니다.
 여기서 사용된 코드 예제들은 `여기 <https://github.com/pytorch/examples/tree/master/cpp/autograd>`_ 에서
