@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Autograd in C++ Frontend &mdash; PyTorch Tutorials 1.9.0+cu102 documentation</title>
+  <title>C++ 프론트엔드의 자동 미분 (autograd) &mdash; PyTorch Tutorials 1.9.0+cu102 documentation</title>
   
 
   
@@ -170,8 +170,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/torchvision_tutorial.html">TorchVision 객체 검출 미세조정(Finetuning) 튜토리얼</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/transfer_learning_tutorial.html">컴퓨터 비전(Vision)을 위한 전이학습(Transfer Learning)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/fgsm_tutorial.html">적대적 예제 생성(Adversarial Example Generation)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/dcgan_faces_tutorial.html">DCGAN Tutorial</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/vt_tutorial.html">Optimizing Vision Transformer Model for Deployment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/dcgan_faces_tutorial.html">DCGAN 튜토리얼</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/vt_tutorial.html">배포를 위한 비전 트랜스포머(Vision Transformer) 모델 최적화하기</a></li>
 </ul>
 <p class="caption"><span class="caption-text">오디오</span></p>
 <ul>
@@ -213,9 +213,9 @@
 <p class="caption"><span class="caption-text">프론트엔드 API</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/memory_format_tutorial.html">(베타) PyTorch를 사용한 Channels Last 메모리 형식</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cpp_frontend.html">Using the PyTorch C++ Frontend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cpp_frontend.html">PyTorch C++ 프론트엔드 사용하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="torch-script-parallelism.html">Dynamic Parallelism in TorchScript</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Autograd in C++ Frontend</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">C++ 프론트엔드의 자동 미분 (autograd)</a></li>
 </ul>
 <p class="caption"><span class="caption-text">PyTorch 확장하기</span></p>
 <ul>
@@ -295,7 +295,7 @@
       </li>
 
         
-      <li>Autograd in C++ Frontend</li>
+      <li>C++ 프론트엔드의 자동 미분 (autograd)</li>
     
     
       <li class="pytorch-breadcrumbs-aside">
@@ -349,19 +349,18 @@
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <div class="section" id="autograd-in-c-frontend">
-<h1>Autograd in C++ Frontend<a class="headerlink" href="#autograd-in-c-frontend" title="Permalink to this headline">¶</a></h1>
-<p>The <code class="docutils literal notranslate"><span class="pre">autograd</span></code> package is crucial for building highly flexible and dynamic neural
-networks in PyTorch. Most of the autograd APIs in PyTorch Python frontend are also available
-in C++ frontend, allowing easy translation of autograd code from Python to C++.</p>
-<p>In this tutorial we’ll look at several examples of doing autograd in PyTorch C++ frontend.
-Note that this tutorial assumes that you already have a basic understanding of
-autograd in Python frontend. If that’s not the case, please first read
-<a class="reference external" href="https://tutorials.pytorch.kr/beginner/blitz/autograd_tutorial.html">Autograd: Automatic Differentiation</a>.</p>
-<div class="section" id="basic-autograd-operations">
-<h2>Basic autograd operations<a class="headerlink" href="#basic-autograd-operations" title="Permalink to this headline">¶</a></h2>
-<p>(Adapted from <a class="reference external" href="https://tutorials.pytorch.kr/beginner/blitz/autograd_tutorial.html#autograd-automatic-differentiation">this tutorial</a>)</p>
-<p>Create a tensor and set <code class="docutils literal notranslate"><span class="pre">torch::requires_grad()</span></code> to track computation with it</p>
+  <div class="section" id="c-autograd">
+<h1>C++ 프론트엔드의 자동 미분 (autograd)<a class="headerlink" href="#c-autograd" title="Permalink to this headline">¶</a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">autograd</span></code> 는 PyTorch로 유연하고 역동적인 신경망을 구축하기 위해
+필수적인 패키지입니다. PyTorch 파이썬 프론트엔드의 자동 미분 API 대부분은 C++ 프론트엔드에서도
+사용할 수 있으며, 파이썬에서 C++로 자동 미분 코드를 쉽게 변환할 수 있습니다.</p>
+<p>이 튜토리얼에서는 PyTorch C++ 프론트엔드에서 자동 미분을 수행하는 몇 가지 예를 살펴보겠습니다.
+이 튜토리얼은 여러분이 파이썬 프론트엔드의 자동 미분에 대해 기본적으로 이해하고 있다고
+가정합니다. 그렇지 않은 경우 먼저 <a class="reference external" href="https://tutorials.pytorch.kr/beginner/blitz/autograd_tutorial.html">Autograd: Automatic Differentiation</a> 을 읽어보세요.</p>
+<div class="section" id="id1">
+<h2>기초 자동 미분 연산<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<p>(<a class="reference external" href="https://tutorials.pytorch.kr/beginner/blitz/autograd_tutorial.html#autograd-automatic-differentiation">이 튜토리얼</a> 의 내용에 기반함)</p>
+<p>텐서를 생성하고 그것의 계산을 추적하기 위해 <code class="docutils literal notranslate"><span class="pre">torch::requires_grad()</span></code> 를 실행해봅시다.</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span> <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">::</span><span class="n">ones</span><span class="p">({</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">},</span> <span class="n">torch</span><span class="o">::</span><span class="n">requires_grad</span><span class="p">());</span>
 <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">x</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
 </pre></div>
@@ -372,7 +371,7 @@ autograd in Python frontend. If that’s not the case, please first read
 <span class="o">[</span> CPUFloatType<span class="o">{</span><span class="m">2</span>,2<span class="o">}</span> <span class="o">]</span>
 </pre></div>
 </div>
-<p>Do a tensor operation:</p>
+<p>텐서 연산을 수행해보겠습니다.</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span> <span class="n">y</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="mi">2</span><span class="p">;</span>
 <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">y</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
 </pre></div>
@@ -383,7 +382,7 @@ autograd in Python frontend. If that’s not the case, please first read
 <span class="o">[</span> CPUFloatType<span class="o">{</span><span class="m">2</span>,2<span class="o">}</span> <span class="o">]</span>
 </pre></div>
 </div>
-<p><code class="docutils literal notranslate"><span class="pre">y</span></code> was created as a result of an operation, so it has a <code class="docutils literal notranslate"><span class="pre">grad_fn</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">y</span></code> 는 연산의 결과로 생성되었으므로 <code class="docutils literal notranslate"><span class="pre">grad_fn</span></code> 를 갖고 있습니다.</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">y</span><span class="p">.</span><span class="n">grad_fn</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
 </pre></div>
 </div>
@@ -391,7 +390,7 @@ autograd in Python frontend. If that’s not the case, please first read
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>AddBackward1
 </pre></div>
 </div>
-<p>Do more operations on <code class="docutils literal notranslate"><span class="pre">y</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">y</span></code> 에 대해 더 많은 연산을 수행해봅시다.</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span> <span class="n">z</span> <span class="o">=</span> <span class="n">y</span> <span class="o">*</span> <span class="n">y</span> <span class="o">*</span> <span class="mi">3</span><span class="p">;</span>
 <span class="k">auto</span> <span class="n">out</span> <span class="o">=</span> <span class="n">z</span><span class="p">.</span><span class="n">mean</span><span class="p">();</span>
 
@@ -411,7 +410,7 @@ MulBackward1
 MeanBackward0
 </pre></div>
 </div>
-<p><code class="docutils literal notranslate"><span class="pre">.requires_grad_(</span> <span class="pre">...</span> <span class="pre">)</span></code> changes an existing tensor’s <code class="docutils literal notranslate"><span class="pre">requires_grad</span></code> flag in-place.</p>
+<p><code class="docutils literal notranslate"><span class="pre">.requires_grad_(</span> <span class="pre">...</span> <span class="pre">)</span></code> 는 in-place로 텐서의 기존 <code class="docutils literal notranslate"><span class="pre">requires_grad</span></code> 플래그를 바꿉니다.</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span> <span class="n">a</span> <span class="o">=</span> <span class="n">torch</span><span class="o">::</span><span class="n">randn</span><span class="p">({</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">});</span>
 <span class="n">a</span> <span class="o">=</span> <span class="p">((</span><span class="n">a</span> <span class="o">*</span> <span class="mi">3</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">a</span> <span class="o">-</span> <span class="mi">1</span><span class="p">));</span>
 <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">a</span><span class="p">.</span><span class="n">requires_grad</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
@@ -429,12 +428,12 @@ MeanBackward0
 SumBackward0
 </pre></div>
 </div>
-<p>Let’s backprop now. Because <code class="docutils literal notranslate"><span class="pre">out</span></code> contains a single scalar, <code class="docutils literal notranslate"><span class="pre">out.backward()</span></code>
-is equivalent to <code class="docutils literal notranslate"><span class="pre">out.backward(torch::tensor(1.))</span></code>.</p>
+<p>이제 역전파를 수행해봅시다. <code class="docutils literal notranslate"><span class="pre">out</span></code> 이 단일 스칼라만을 포함하므로, <code class="docutils literal notranslate"><span class="pre">out.backward()</span></code> 는
+<code class="docutils literal notranslate"><span class="pre">out.backward(torch::tensor(1.))</span></code> 와 같습니다.</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">out</span><span class="p">.</span><span class="n">backward</span><span class="p">();</span>
 </pre></div>
 </div>
-<p>Print gradients d(out)/dx</p>
+<p>변화도 d(out)/dx를 출력해보겠습니다.</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">x</span><span class="p">.</span><span class="n">grad</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
 </pre></div>
 </div>
@@ -444,9 +443,8 @@ is equivalent to <code class="docutils literal notranslate"><span class="pre">ou
 <span class="o">[</span> CPUFloatType<span class="o">{</span><span class="m">2</span>,2<span class="o">}</span> <span class="o">]</span>
 </pre></div>
 </div>
-<p>You should have got a matrix of <code class="docutils literal notranslate"><span class="pre">4.5</span></code>. For explanations on how we arrive at this value,
-please see <a class="reference external" href="https://tutorials.pytorch.kr/beginner/blitz/autograd_tutorial.html#gradients">the corresponding section in this tutorial</a>.</p>
-<p>Now let’s take a look at an example of vector-Jacobian product:</p>
+<p><code class="docutils literal notranslate"><span class="pre">4.5</span></code> 행렬이 출력돼야 합니다. 이 값을 얻는 과정에 대한 설명은 <a class="reference external" href="https://tutorials.pytorch.kr/beginner/blitz/autograd_tutorial.html#gradients">이 튜토리얼의 해당 섹션</a> 에서 확인하세요.</p>
+<p>이제 벡터-야코비안 곱의 예를 살펴보겠습니다.</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">::</span><span class="n">randn</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">torch</span><span class="o">::</span><span class="n">requires_grad</span><span class="p">());</span>
 
 <span class="n">y</span> <span class="o">=</span> <span class="n">x</span> <span class="o">*</span> <span class="mi">2</span><span class="p">;</span>
@@ -466,7 +464,7 @@ please see <a class="reference external" href="https://tutorials.pytorch.kr/begi
 MulBackward1
 </pre></div>
 </div>
-<p>If we want the vector-Jacobian product, pass the vector to <code class="docutils literal notranslate"><span class="pre">backward</span></code> as argument:</p>
+<p>벡터-야코비안 곱을 얻기 위해 벡터를 <code class="docutils literal notranslate"><span class="pre">backward</span></code> 의 인자로 넣어줍니다.</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span> <span class="n">v</span> <span class="o">=</span> <span class="n">torch</span><span class="o">::</span><span class="n">tensor</span><span class="p">({</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0001</span><span class="p">},</span> <span class="n">torch</span><span class="o">::</span><span class="n">kFloat</span><span class="p">);</span>
 <span class="n">y</span><span class="p">.</span><span class="n">backward</span><span class="p">(</span><span class="n">v</span><span class="p">);</span>
 
@@ -480,8 +478,8 @@ MulBackward1
 <span class="o">[</span> CPUFloatType<span class="o">{</span><span class="m">3</span><span class="o">}</span> <span class="o">]</span>
 </pre></div>
 </div>
-<p>You can also stop autograd from tracking history on tensors that require gradients
-either by putting <code class="docutils literal notranslate"><span class="pre">torch::NoGradGuard</span></code> in a code block</p>
+<p>또한 코드에 <code class="docutils literal notranslate"><span class="pre">torch::NoGradGuard</span></code> 를 넣어주면 자동 미분으로 하여금 그래디언트가
+필요한 텐서를 추적하지 않도록 할 수 있습니다.</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">x</span><span class="p">.</span><span class="n">requires_grad</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
 <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">x</span><span class="p">.</span><span class="n">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">).</span><span class="n">requires_grad</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
 
@@ -497,8 +495,8 @@ either by putting <code class="docutils literal notranslate"><span class="pre">t
 <span class="nb">false</span>
 </pre></div>
 </div>
-<p>Or by using <code class="docutils literal notranslate"><span class="pre">.detach()</span></code> to get a new tensor with the same content but that does
-not require gradients:</p>
+<p>혹은 <code class="docutils literal notranslate"><span class="pre">.detach()</span></code> 를 사용하여 내용은 동일하지만 그래디언트가 필요 없는
+새 텐서를 얻을 수도 있습니다.</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">x</span><span class="p">.</span><span class="n">requires_grad</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
 <span class="n">y</span> <span class="o">=</span> <span class="n">x</span><span class="p">.</span><span class="n">detach</span><span class="p">();</span>
 <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">y</span><span class="p">.</span><span class="n">requires_grad</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
@@ -511,14 +509,13 @@ not require gradients:</p>
 <span class="nb">true</span>
 </pre></div>
 </div>
-<p>For more information on C++ tensor autograd APIs such as <code class="docutils literal notranslate"><span class="pre">grad</span></code> / <code class="docutils literal notranslate"><span class="pre">requires_grad</span></code> /
-<code class="docutils literal notranslate"><span class="pre">is_leaf</span></code> / <code class="docutils literal notranslate"><span class="pre">backward</span></code> / <code class="docutils literal notranslate"><span class="pre">detach</span></code> / <code class="docutils literal notranslate"><span class="pre">detach_</span></code> / <code class="docutils literal notranslate"><span class="pre">register_hook</span></code> / <code class="docutils literal notranslate"><span class="pre">retain_grad</span></code>,
-please see <a class="reference external" href="https://pytorch.org/cppdocs/api/classat_1_1_tensor.html">the corresponding C++ API docs</a>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">grad</span></code> / <code class="docutils literal notranslate"><span class="pre">requires_grad</span></code> / <code class="docutils literal notranslate"><span class="pre">is_leaf</span></code> / <code class="docutils literal notranslate"><span class="pre">backward</span></code> / <code class="docutils literal notranslate"><span class="pre">detach</span></code> / <code class="docutils literal notranslate"><span class="pre">detach_</span></code> /
+<code class="docutils literal notranslate"><span class="pre">register_hook</span></code> / <code class="docutils literal notranslate"><span class="pre">retain_grad</span></code> 등 C++ 텐서 자동 미분 API에 대한 자세한 내용은 <a class="reference external" href="https://pytorch.org/cppdocs/api/classat_1_1_tensor.html">해당 C++ API 문서</a> 에서 확인하세요.</p>
 </div>
-<div class="section" id="computing-higher-order-gradients-in-c">
-<h2>Computing higher-order gradients in C++<a class="headerlink" href="#computing-higher-order-gradients-in-c" title="Permalink to this headline">¶</a></h2>
-<p>One of the applications of higher-order gradients is calculating gradient penalty.
-Let’s see an example of it using <code class="docutils literal notranslate"><span class="pre">torch::autograd::grad</span></code>:</p>
+<div class="section" id="c">
+<h2>C++로 고차원 그래디언트 계산하기<a class="headerlink" href="#c" title="Permalink to this headline">¶</a></h2>
+<p>고차원 그래디언트를 사용하는 사례로 그래디언트 패널티 계산이 있습니다.
+<code class="docutils literal notranslate"><span class="pre">torch::autograd::grad</span></code> 를 사용하는 예를 살펴봅시다.</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;torch/torch.h&gt;</span><span class="cp"></span>
 
 <span class="k">auto</span> <span class="n">model</span> <span class="o">=</span> <span class="n">torch</span><span class="o">::</span><span class="n">nn</span><span class="o">::</span><span class="n">Linear</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">);</span>
@@ -549,22 +546,21 @@ Let’s see an example of it using <code class="docutils literal notranslate"><s
 <span class="o">[</span> CPUFloatType<span class="o">{</span><span class="m">3</span>,4<span class="o">}</span> <span class="o">]</span>
 </pre></div>
 </div>
-<p>Please see the documentation for <code class="docutils literal notranslate"><span class="pre">torch::autograd::backward</span></code>
-(<a class="reference external" href="https://pytorch.org/cppdocs/api/function_namespacetorch_1_1autograd_1afa9b5d4329085df4b6b3d4b4be48914b.html">link</a>)
-and <code class="docutils literal notranslate"><span class="pre">torch::autograd::grad</span></code>
-(<a class="reference external" href="https://pytorch.org/cppdocs/api/function_namespacetorch_1_1autograd_1a1e03c42b14b40c306f9eb947ef842d9c.html">link</a>)
-for more information on how to use them.</p>
+<p><code class="docutils literal notranslate"><span class="pre">torch::autograd::backward</span></code>
+(<a class="reference external" href="https://pytorch.org/cppdocs/api/function_namespacetorch_1_1autograd_1afa9b5d4329085df4b6b3d4b4be48914b.html">링크</a>) 및
+<code class="docutils literal notranslate"><span class="pre">torch::autograd::grad</span></code>
+(<a class="reference external" href="https://pytorch.org/cppdocs/api/function_namespacetorch_1_1autograd_1a1e03c42b14b40c306f9eb947ef842d9c.html">링크</a>) 문서에서
+이 함수들의 사용법에 대해 더 알아보세요.</p>
 </div>
-<div class="section" id="using-custom-autograd-function-in-c">
-<h2>Using custom autograd function in C++<a class="headerlink" href="#using-custom-autograd-function-in-c" title="Permalink to this headline">¶</a></h2>
-<p>(Adapted from <a class="reference external" href="https://pytorch.org/docs/stable/notes/extending.html#extending-torch-autograd">this tutorial</a>)</p>
-<p>Adding a new elementary operation to <code class="docutils literal notranslate"><span class="pre">torch::autograd</span></code> requires implementing a new <code class="docutils literal notranslate"><span class="pre">torch::autograd::Function</span></code>
-subclass for each operation. <code class="docutils literal notranslate"><span class="pre">torch::autograd::Function</span></code> s are what <code class="docutils literal notranslate"><span class="pre">torch::autograd</span></code>
-uses to compute the results and gradients, and encode the operation history. Every
-new function requires you to implement 2 methods: <code class="docutils literal notranslate"><span class="pre">forward</span></code> and <code class="docutils literal notranslate"><span class="pre">backward</span></code>, and
-please see <a class="reference external" href="https://pytorch.org/cppdocs/api/structtorch_1_1autograd_1_1_function.html">this link</a>
-for the detailed requirements.</p>
-<p>Below you can find code for a <code class="docutils literal notranslate"><span class="pre">Linear</span></code> function from <code class="docutils literal notranslate"><span class="pre">torch::nn</span></code>:</p>
+<div class="section" id="id6">
+<h2>C++에서 사용자 지정 자동 미분 함수 사용하기<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h2>
+<p>(<a class="reference external" href="https://pytorch.org/docs/stable/notes/extending.html#extending-torch-autograd">이 튜토리얼</a> 의 내용에 기반함)</p>
+<p><code class="docutils literal notranslate"><span class="pre">torch::autograd</span></code> 에 새로운 기본(elementary) 연산을 추가하려면 각 연산에 대해 새로운 <code class="docutils literal notranslate"><span class="pre">torch::autograd::Function</span></code>
+하위 클래스(subclass)를 구현해야 합니다. <code class="docutils literal notranslate"><span class="pre">torch::autograd</span></code> 는 결과와 그래디언트를 계산하고 연산 기록을 인코딩하기 위해 위해
+이 <code class="docutils literal notranslate"><span class="pre">torch::autograd::Function</span></code> 들을 사용합니다. 모든 새로운 함수에는 두 가지 방법, 즉 <code class="docutils literal notranslate"><span class="pre">forward</span></code> 와 <code class="docutils literal notranslate"><span class="pre">backward</span></code> 를
+구현해야 하며 자세한 요구사항은 <a href="#id8"><span class="problematic" id="id9">``</span></a>이 링크 <a class="reference external" href="https://pytorch.org/cppdocs/api/structtorch_1_1autograd_1_1_function">https://pytorch.org/cppdocs/api/structtorch_1_1autograd_1_1_function</a>.html``_
+에서 확인하세요.</p>
+<p>아래 코드는 <code class="docutils literal notranslate"><span class="pre">torch::nn</span></code> 의 <code class="docutils literal notranslate"><span class="pre">Linear</span></code> 함수를 사용합니다.</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;torch/torch.h&gt;</span><span class="cp"></span>
 
 <span class="k">using</span> <span class="k">namespace</span> <span class="n">torch</span><span class="o">::</span><span class="n">autograd</span><span class="p">;</span>
@@ -604,7 +600,7 @@ for the detailed requirements.</p>
 <span class="p">};</span>
 </pre></div>
 </div>
-<p>Then, we can use the <code class="docutils literal notranslate"><span class="pre">LinearFunction</span></code> in the following way:</p>
+<p>이제 아래와 같이 <code class="docutils literal notranslate"><span class="pre">LinearFunction</span></code> 을 사용할 수 있습니다.</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span> <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">::</span><span class="n">randn</span><span class="p">({</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">}).</span><span class="n">requires_grad_</span><span class="p">();</span>
 <span class="k">auto</span> <span class="n">weight</span> <span class="o">=</span> <span class="n">torch</span><span class="o">::</span><span class="n">randn</span><span class="p">({</span><span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">}).</span><span class="n">requires_grad_</span><span class="p">();</span>
 <span class="k">auto</span> <span class="n">y</span> <span class="o">=</span> <span class="n">LinearFunction</span><span class="o">::</span><span class="n">apply</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">weight</span><span class="p">);</span>
@@ -625,7 +621,7 @@ for the detailed requirements.</p>
 <span class="o">[</span> CPUFloatType<span class="o">{</span><span class="m">4</span>,3<span class="o">}</span> <span class="o">]</span>
 </pre></div>
 </div>
-<p>Here, we give an additional example of a function that is parametrized by non-tensor arguments:</p>
+<p>여기서, 텐서가 아닌 인자를 매개변수로 갖는 또 다른 함수를 예로 들어 보겠습니다.</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;torch/torch.h&gt;</span><span class="cp"></span>
 
 <span class="k">using</span> <span class="k">namespace</span> <span class="n">torch</span><span class="o">::</span><span class="n">autograd</span><span class="p">;</span>
@@ -647,7 +643,7 @@ for the detailed requirements.</p>
 <span class="p">};</span>
 </pre></div>
 </div>
-<p>Then, we can use the <code class="docutils literal notranslate"><span class="pre">MulConstant</span></code> in the following way:</p>
+<p>이제 아래와 같이 <code class="docutils literal notranslate"><span class="pre">MulConstant</span></code> 를 사용할 수 있습니다.</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span> <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">::</span><span class="n">randn</span><span class="p">({</span><span class="mi">2</span><span class="p">}).</span><span class="n">requires_grad_</span><span class="p">();</span>
 <span class="k">auto</span> <span class="n">y</span> <span class="o">=</span> <span class="n">MulConstant</span><span class="o">::</span><span class="n">apply</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mf">5.5</span><span class="p">);</span>
 <span class="n">y</span><span class="p">.</span><span class="n">sum</span><span class="p">().</span><span class="n">backward</span><span class="p">();</span>
@@ -661,14 +657,13 @@ for the detailed requirements.</p>
 <span class="o">[</span> CPUFloatType<span class="o">{</span><span class="m">2</span><span class="o">}</span> <span class="o">]</span>
 </pre></div>
 </div>
-<p>For more information on <code class="docutils literal notranslate"><span class="pre">torch::autograd::Function</span></code>, please see
-<a class="reference external" href="https://pytorch.org/cppdocs/api/structtorch_1_1autograd_1_1_function.html">its documentation</a>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">torch::autograd::Function</span></code> 에 대한 더 많은 내용은 <a class="reference external" href="https://pytorch.org/cppdocs/api/structtorch_1_1autograd_1_1_function.html">이 문서</a> 에서 확인할 수 있습니다.</p>
 </div>
-<div class="section" id="translating-autograd-code-from-python-to-c">
-<h2>Translating autograd code from Python to C++<a class="headerlink" href="#translating-autograd-code-from-python-to-c" title="Permalink to this headline">¶</a></h2>
-<p>On a high level, the easiest way to use autograd in C++ is to have working
-autograd code in Python first, and then translate your autograd code from Python to
-C++ using the following table:</p>
+<div class="section" id="id11">
+<h2>파이썬 자동 미분 코드를 C++로 변환하기<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h2>
+<p>개략적으로 말하면, C++에서 자동 미분을 사용하는 가장 쉬운 방법은 먼저
+파이썬에서 동작하는 자동 미분 코드를 작성한 후, 아래 표를 참고해 C++ 코드로
+변환하는 것입니다.</p>
 <table border="1" class="docutils">
 <colgroup>
 <col width="16%" />
@@ -681,59 +676,58 @@ C++ using the following table:</p>
 </thead>
 <tbody valign="top">
 <tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">torch.autograd.backward</span></code></td>
-<td><code class="docutils literal notranslate"><span class="pre">torch::autograd::backward</span></code> (<a class="reference external" href="https://pytorch.org/cppdocs/api/function_namespacetorch_1_1autograd_1afa9b5d4329085df4b6b3d4b4be48914b.html">link</a>)</td>
+<td><code class="docutils literal notranslate"><span class="pre">torch::autograd::backward</span></code> (<a class="reference external" href="https://pytorch.org/cppdocs/api/function_namespacetorch_1_1autograd_1afa9b5d4329085df4b6b3d4b4be48914b.html">링크</a>)</td>
 </tr>
 <tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">torch.autograd.grad</span></code></td>
-<td><code class="docutils literal notranslate"><span class="pre">torch::autograd::grad</span></code> (<a class="reference external" href="https://pytorch.org/cppdocs/api/function_namespacetorch_1_1autograd_1a1e03c42b14b40c306f9eb947ef842d9c.html">link</a>)</td>
+<td><code class="docutils literal notranslate"><span class="pre">torch::autograd::grad</span></code> (<a class="reference external" href="https://pytorch.org/cppdocs/api/function_namespacetorch_1_1autograd_1a1e03c42b14b40c306f9eb947ef842d9c.html">링크</a>)</td>
 </tr>
 <tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">torch.Tensor.detach</span></code></td>
-<td><code class="docutils literal notranslate"><span class="pre">torch::Tensor::detach</span></code> (<a class="reference external" href="https://pytorch.org/cppdocs/api/classat_1_1_tensor.html#_CPPv4NK2at6Tensor6detachEv">link</a>)</td>
+<td><code class="docutils literal notranslate"><span class="pre">torch::Tensor::detach</span></code> (<a class="reference external" href="https://pytorch.org/cppdocs/api/classat_1_1_tensor.html#_CPPv4NK2at6Tensor6detachEv">링크</a>)</td>
 </tr>
 <tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">torch.Tensor.detach_</span></code></td>
-<td><code class="docutils literal notranslate"><span class="pre">torch::Tensor::detach_</span></code> (<a class="reference external" href="https://pytorch.org/cppdocs/api/classat_1_1_tensor.html#_CPPv4NK2at6Tensor7detach_Ev">link</a>)</td>
+<td><code class="docutils literal notranslate"><span class="pre">torch::Tensor::detach_</span></code> (<a class="reference external" href="https://pytorch.org/cppdocs/api/classat_1_1_tensor.html#_CPPv4NK2at6Tensor7detach_Ev">링크</a>)</td>
 </tr>
 <tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">torch.Tensor.backward</span></code></td>
-<td><code class="docutils literal notranslate"><span class="pre">torch::Tensor::backward</span></code> (<a class="reference external" href="https://pytorch.org/cppdocs/api/classat_1_1_tensor.html#_CPPv4NK2at6Tensor8backwardERK6Tensorbb">link</a>)</td>
+<td><code class="docutils literal notranslate"><span class="pre">torch::Tensor::backward</span></code> (<a class="reference external" href="https://pytorch.org/cppdocs/api/classat_1_1_tensor.html#_CPPv4NK2at6Tensor8backwardERK6Tensorbb">링크</a>)</td>
 </tr>
 <tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">torch.Tensor.register_hook</span></code></td>
-<td><code class="docutils literal notranslate"><span class="pre">torch::Tensor::register_hook</span></code> (<a class="reference external" href="https://pytorch.org/cppdocs/api/classat_1_1_tensor.html#_CPPv4I0ENK2at6Tensor13register_hookE18hook_return_void_tI1TERR1T">link</a>)</td>
+<td><code class="docutils literal notranslate"><span class="pre">torch::Tensor::register_hook</span></code> (<a class="reference external" href="https://pytorch.org/cppdocs/api/classat_1_1_tensor.html#_CPPv4I0ENK2at6Tensor13register_hookE18hook_return_void_tI1TERR1T">링크</a>)</td>
 </tr>
 <tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">torch.Tensor.requires_grad</span></code></td>
-<td><code class="docutils literal notranslate"><span class="pre">torch::Tensor::requires_grad_</span></code> (<a class="reference external" href="https://pytorch.org/cppdocs/api/classat_1_1_tensor.html#_CPPv4NK2at6Tensor14requires_grad_Eb">link</a>)</td>
+<td><code class="docutils literal notranslate"><span class="pre">torch::Tensor::requires_grad_</span></code> (<a class="reference external" href="https://pytorch.org/cppdocs/api/classat_1_1_tensor.html#_CPPv4NK2at6Tensor14requires_grad_Eb">링크</a>)</td>
 </tr>
 <tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">torch.Tensor.retain_grad</span></code></td>
-<td><code class="docutils literal notranslate"><span class="pre">torch::Tensor::retain_grad</span></code> (<a class="reference external" href="https://pytorch.org/cppdocs/api/classat_1_1_tensor.html#_CPPv4NK2at6Tensor11retain_gradEv">link</a>)</td>
+<td><code class="docutils literal notranslate"><span class="pre">torch::Tensor::retain_grad</span></code> (<a class="reference external" href="https://pytorch.org/cppdocs/api/classat_1_1_tensor.html#_CPPv4NK2at6Tensor11retain_gradEv">링크</a>)</td>
 </tr>
 <tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">torch.Tensor.grad</span></code></td>
-<td><code class="docutils literal notranslate"><span class="pre">torch::Tensor::grad</span></code> (<a class="reference external" href="https://pytorch.org/cppdocs/api/classat_1_1_tensor.html#_CPPv4NK2at6Tensor4gradEv">link</a>)</td>
+<td><code class="docutils literal notranslate"><span class="pre">torch::Tensor::grad</span></code> (<a class="reference external" href="https://pytorch.org/cppdocs/api/classat_1_1_tensor.html#_CPPv4NK2at6Tensor4gradEv">링크</a>)</td>
 </tr>
 <tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">torch.Tensor.grad_fn</span></code></td>
-<td><code class="docutils literal notranslate"><span class="pre">torch::Tensor::grad_fn</span></code> (<a class="reference external" href="https://pytorch.org/cppdocs/api/classat_1_1_tensor.html#_CPPv4NK2at6Tensor7grad_fnEv">link</a>)</td>
+<td><code class="docutils literal notranslate"><span class="pre">torch::Tensor::grad_fn</span></code> (<a class="reference external" href="https://pytorch.org/cppdocs/api/classat_1_1_tensor.html#_CPPv4NK2at6Tensor7grad_fnEv">링크</a>)</td>
 </tr>
 <tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">torch.Tensor.set_data</span></code></td>
-<td><code class="docutils literal notranslate"><span class="pre">torch::Tensor::set_data</span></code> (<a class="reference external" href="https://pytorch.org/cppdocs/api/classat_1_1_tensor.html#_CPPv4NK2at6Tensor8set_dataERK6Tensor">link</a>)</td>
+<td><code class="docutils literal notranslate"><span class="pre">torch::Tensor::set_data</span></code> (<a class="reference external" href="https://pytorch.org/cppdocs/api/classat_1_1_tensor.html#_CPPv4NK2at6Tensor8set_dataERK6Tensor">링크</a>)</td>
 </tr>
 <tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">torch.Tensor.data</span></code></td>
-<td><code class="docutils literal notranslate"><span class="pre">torch::Tensor::data</span></code> (<a class="reference external" href="https://pytorch.org/cppdocs/api/classat_1_1_tensor.html#_CPPv4NK2at6Tensor4dataEv">link</a>)</td>
+<td><code class="docutils literal notranslate"><span class="pre">torch::Tensor::data</span></code> (<a class="reference external" href="https://pytorch.org/cppdocs/api/classat_1_1_tensor.html#_CPPv4NK2at6Tensor4dataEv">링크</a>)</td>
 </tr>
 <tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">torch.Tensor.output_nr</span></code></td>
-<td><code class="docutils literal notranslate"><span class="pre">torch::Tensor::output_nr</span></code> (<a class="reference external" href="https://pytorch.org/cppdocs/api/classat_1_1_tensor.html#_CPPv4NK2at6Tensor9output_nrEv">link</a>)</td>
+<td><code class="docutils literal notranslate"><span class="pre">torch::Tensor::output_nr</span></code> (<a class="reference external" href="https://pytorch.org/cppdocs/api/classat_1_1_tensor.html#_CPPv4NK2at6Tensor9output_nrEv">링크</a>)</td>
 </tr>
 <tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">torch.Tensor.is_leaf</span></code></td>
-<td><code class="docutils literal notranslate"><span class="pre">torch::Tensor::is_leaf</span></code> (<a class="reference external" href="https://pytorch.org/cppdocs/api/classat_1_1_tensor.html#_CPPv4NK2at6Tensor7is_leafEv">link</a>)</td>
+<td><code class="docutils literal notranslate"><span class="pre">torch::Tensor::is_leaf</span></code> (<a class="reference external" href="https://pytorch.org/cppdocs/api/classat_1_1_tensor.html#_CPPv4NK2at6Tensor7is_leafEv">링크</a>)</td>
 </tr>
 </tbody>
 </table>
-<p>After translation, most of your Python autograd code should just work in C++.
-If that’s not the case, please file a bug report at <a class="reference external" href="https://github.com/pytorch/pytorch/issues">GitHub issues</a>
-and we will fix it as soon as possible.</p>
-</div>
-<div class="section" id="conclusion">
-<h2>Conclusion<a class="headerlink" href="#conclusion" title="Permalink to this headline">¶</a></h2>
-<p>You should now have a good overview of PyTorch’s C++ autograd API.
-You can find the code examples displayed in this note <a class="reference external" href="https://github.com/pytorch/examples/tree/master/cpp/autograd">here</a>. As always, if you run into any
-problems or have questions, you can use our <a class="reference external" href="https://discuss.pytorch.org/">forum</a>
-or <a class="reference external" href="https://github.com/pytorch/pytorch/issues">GitHub issues</a> to get in touch.</p>
+<p>대부분의 변환된 파이썬 자동 미분 코드가 C++에서도 잘 동작할 것입니다.
+동작하지 않을 경우, <a class="reference external" href="https://github.com/pytorch/pytorch/issues">GitHub issues</a> 에 버그 리포트를 제출해 주시면
+최대한 빨리 고쳐드리겠습니다.</p>
+<p>결론
+—</p>
+<p>이제 PyTorch의 C++ 자동 미분 API에 대한 개괄적인 이해가 생겼을 것입니다.
+여기서 사용된 코드 예제들은 <a class="reference external" href="https://github.com/pytorch/examples/tree/master/cpp/autograd">여기</a> 에서
+확인할 수 있습니다. 언제나 그렇듯이 어떤 문제가 생기거나 질문이 있으면 저희
+<a class="reference external" href="https://discuss.pytorch.org/">포럼</a> 을 이용하거나 <a class="reference external" href="https://github.com/pytorch/pytorch/issues">Github 이슈</a> 로 연락주세요.</p>
 </div>
 </div>
 
@@ -791,12 +785,11 @@ or <a class="reference external" href="https://github.com/pytorch/pytorch/issues
           <div class="pytorch-right-menu" id="pytorch-right-menu">
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
-<li><a class="reference internal" href="#">Autograd in C++ Frontend</a><ul>
-<li><a class="reference internal" href="#basic-autograd-operations">Basic autograd operations</a></li>
-<li><a class="reference internal" href="#computing-higher-order-gradients-in-c">Computing higher-order gradients in C++</a></li>
-<li><a class="reference internal" href="#using-custom-autograd-function-in-c">Using custom autograd function in C++</a></li>
-<li><a class="reference internal" href="#translating-autograd-code-from-python-to-c">Translating autograd code from Python to C++</a></li>
-<li><a class="reference internal" href="#conclusion">Conclusion</a></li>
+<li><a class="reference internal" href="#">C++ 프론트엔드의 자동 미분 (autograd)</a><ul>
+<li><a class="reference internal" href="#id1">기초 자동 미분 연산</a></li>
+<li><a class="reference internal" href="#c">C++로 고차원 그래디언트 계산하기</a></li>
+<li><a class="reference internal" href="#id6">C++에서 사용자 지정 자동 미분 함수 사용하기</a></li>
+<li><a class="reference internal" href="#id11">파이썬 자동 미분 코드를 C++로 변환하기</a></li>
 </ul>
 </li>
 </ul>

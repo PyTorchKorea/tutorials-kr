@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>DCGAN Tutorial &mdash; PyTorch Tutorials 1.9.0+cu102 documentation</title>
+  <title>DCGAN 튜토리얼 &mdash; PyTorch Tutorials 1.9.0+cu102 documentation</title>
   
 
   
@@ -34,7 +34,7 @@
   <link rel="stylesheet" href="../_static/katex-math.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Optimizing Vision Transformer Model for Deployment" href="vt_tutorial.html" />
+    <link rel="next" title="배포를 위한 비전 트랜스포머(Vision Transformer) 모델 최적화하기" href="vt_tutorial.html" />
     <link rel="prev" title="적대적 예제 생성(Adversarial Example Generation)" href="fgsm_tutorial.html" /> 
 
   
@@ -170,8 +170,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/torchvision_tutorial.html">TorchVision 객체 검출 미세조정(Finetuning) 튜토리얼</a></li>
 <li class="toctree-l1"><a class="reference internal" href="transfer_learning_tutorial.html">컴퓨터 비전(Vision)을 위한 전이학습(Transfer Learning)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="fgsm_tutorial.html">적대적 예제 생성(Adversarial Example Generation)</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">DCGAN Tutorial</a></li>
-<li class="toctree-l1"><a class="reference internal" href="vt_tutorial.html">Optimizing Vision Transformer Model for Deployment</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">DCGAN 튜토리얼</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vt_tutorial.html">배포를 위한 비전 트랜스포머(Vision Transformer) 모델 최적화하기</a></li>
 </ul>
 <p class="caption"><span class="caption-text">오디오</span></p>
 <ul>
@@ -213,9 +213,9 @@
 <p class="caption"><span class="caption-text">프론트엔드 API</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/memory_format_tutorial.html">(베타) PyTorch를 사용한 Channels Last 메모리 형식</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_frontend.html">Using the PyTorch C++ Frontend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_frontend.html">PyTorch C++ 프론트엔드 사용하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/torch-script-parallelism.html">Dynamic Parallelism in TorchScript</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_autograd.html">Autograd in C++ Frontend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_autograd.html">C++ 프론트엔드의 자동 미분 (autograd)</a></li>
 </ul>
 <p class="caption"><span class="caption-text">PyTorch 확장하기</span></p>
 <ul>
@@ -295,7 +295,7 @@
       </li>
 
         
-      <li>DCGAN Tutorial</li>
+      <li>DCGAN 튜토리얼</li>
     
     
       <li class="pytorch-breadcrumbs-aside">
@@ -353,103 +353,82 @@
 <p class="first admonition-title">Note</p>
 <p class="last">Click <a class="reference internal" href="#sphx-glr-download-beginner-dcgan-faces-tutorial-py"><span class="std std-ref">here</span></a> to download the full example code</p>
 </div>
-<div class="sphx-glr-example-title section" id="dcgan-tutorial">
-<span id="sphx-glr-beginner-dcgan-faces-tutorial-py"></span><h1>DCGAN Tutorial<a class="headerlink" href="#dcgan-tutorial" title="Permalink to this headline">¶</a></h1>
-<p><strong>Author</strong>: <a class="reference external" href="https://github.com/inkawhich">Nathan Inkawhich</a>
-Introduction
-————</p>
-<p>This tutorial will give an introduction to DCGANs through an example. We
-will train a generative adversarial network (GAN) to generate new
-celebrities after showing it pictures of many real celebrities. Most of
-the code here is from the dcgan implementation in
-<a class="reference external" href="https://github.com/pytorch/examples">pytorch/examples</a>, and this
-document will give a thorough explanation of the implementation and shed
-light on how and why this model works. But don’t worry, no prior
-knowledge of GANs is required, but it may require a first-timer to spend
-some time reasoning about what is actually happening under the hood.
-Also, for the sake of time it will help to have a GPU, or two. Lets
-start from the beginning.</p>
+<div class="sphx-glr-example-title section" id="dcgan">
+<span id="sphx-glr-beginner-dcgan-faces-tutorial-py"></span><h1>DCGAN 튜토리얼<a class="headerlink" href="#dcgan" title="Permalink to this headline">¶</a></h1>
+<dl class="docutils">
+<dt><strong>저자</strong>: <a class="reference external" href="https://github.com/inkawhich">Nathan Inkawhich</a></dt>
+<dd><strong>번역</strong>: <a class="reference external" href="https://github.com/miNept">조민성</a></dd>
+</dl>
+<div class="section" id="id2">
+<h2>개요<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<p>본 튜토리얼에서는 예제를 통해 DCGAN을 알아보겠습니다. 우리는 실제 유명인들의 사진들로 적대적 생성 신경망(GAN)을 학습시켜,
+새로운 유명인의 사진을 만들어볼겁니다.
+사용할 대부분의 코드는 <a class="reference external" href="https://github.com/pytorch/examples">pytorch/examples</a> 의 DCGAN 구현에서 가져왔으며,
+본 문서는 구현에 대한 설명과 함께, 어째서 이 모델이 작동하는지에 대해 설명을 해줄 것입니다.
+처음 읽었을때는, 실제로 모델에 무슨일이 일어나고 있는지에 대해 이해하는 것이 조금 시간을 소요할 수 있으나,
+그래도 GAN에 대한 사전지식이 필요하지는 않으니 걱정하지 않으셔도 됩니다.
+추가로, GPU 1-2개를 사용하는 것이 시간절약에 도움이 될겁니다. 그럼 처음부터 천천히 시작해봅시다!</p>
+</div>
 <div class="section" id="generative-adversarial-networks">
-<h2>Generative Adversarial Networks<a class="headerlink" href="#generative-adversarial-networks" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="what-is-a-gan">
-<h3>What is a GAN?<a class="headerlink" href="#what-is-a-gan" title="Permalink to this headline">¶</a></h3>
-<p>GANs are a framework for teaching a DL model to capture the training
-data’s distribution so we can generate new data from that same
-distribution. GANs were invented by Ian Goodfellow in 2014 and first
-described in the paper <a class="reference external" href="https://papers.nips.cc/paper/5423-generative-adversarial-nets.pdf">Generative Adversarial
-Nets</a>.
-They are made of two distinct models, a <em>generator</em> and a
-<em>discriminator</em>. The job of the generator is to spawn ‘fake’ images that
-look like the training images. The job of the discriminator is to look
-at an image and output whether or not it is a real training image or a
-fake image from the generator. During training, the generator is
-constantly trying to outsmart the discriminator by generating better and
-better fakes, while the discriminator is working to become a better
-detective and correctly classify the real and fake images. The
-equilibrium of this game is when the generator is generating perfect
-fakes that look as if they came directly from the training data, and the
-discriminator is left to always guess at 50% confidence that the
-generator output is real or fake.</p>
-<p>Now, lets define some notation to be used throughout tutorial starting
-with the discriminator. Let <span class="math">\(x\)</span> be data representing an image.
-<span class="math">\(D(x)\)</span> is the discriminator network which outputs the (scalar)
-probability that <span class="math">\(x\)</span> came from training data rather than the
-generator. Here, since we are dealing with images, the input to
-<span class="math">\(D(x)\)</span> is an image of CHW size 3x64x64. Intuitively, <span class="math">\(D(x)\)</span>
-should be HIGH when <span class="math">\(x\)</span> comes from training data and LOW when
-<span class="math">\(x\)</span> comes from the generator. <span class="math">\(D(x)\)</span> can also be thought of
-as a traditional binary classifier.</p>
-<p>For the generator’s notation, let <span class="math">\(z\)</span> be a latent space vector
-sampled from a standard normal distribution. <span class="math">\(G(z)\)</span> represents the
-generator function which maps the latent vector <span class="math">\(z\)</span> to data-space.
-The goal of <span class="math">\(G\)</span> is to estimate the distribution that the training
-data comes from (<span class="math">\(p_{data}\)</span>) so it can generate fake samples from
-that estimated distribution (<span class="math">\(p_g\)</span>).</p>
-<p>So, <span class="math">\(D(G(z))\)</span> is the probability (scalar) that the output of the
-generator <span class="math">\(G\)</span> is a real image. As described in <a class="reference external" href="https://papers.nips.cc/paper/5423-generative-adversarial-nets.pdf">Goodfellow’s
-paper</a>,
-<span class="math">\(D\)</span> and <span class="math">\(G\)</span> play a minimax game in which <span class="math">\(D\)</span> tries to
-maximize the probability it correctly classifies reals and fakes
-(<span class="math">\(logD(x)\)</span>), and <span class="math">\(G\)</span> tries to minimize the probability that
-<span class="math">\(D\)</span> will predict its outputs are fake (<span class="math">\(log(1-D(G(z)))\)</span>).
-From the paper, the GAN loss function is</p>
+<h2>적대적 생성 신경망(Generative Adversarial Networks)<a class="headerlink" href="#generative-adversarial-networks" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="gan">
+<h3>그래서 GAN이 뭘까요?<a class="headerlink" href="#gan" title="Permalink to this headline">¶</a></h3>
+<p>GAN이란 학습 데이터들의 분포를 학습해, 같은 분포에서 새로운 데이터를 생성할 수 있도록 DL 모델을 학습시키는 프레임워크입니다.
+2014년 Ian Goodfellow가 개발했으며, <a class="reference external" href="https://papers.nips.cc/paper/5423-generative-adversarial-nets.pdf">Generative Adversarial
+Nets</a> 논문에서 처음 소개되었습니다.
+GAN은 <em>생성자</em> 와 <em>구분자</em> 로 구별되는 두가지 모델을 가지고 있는것이 특징입니다.
+생성자의 역할은 실제 이미지로 착각되도록 정교한 이미지를 만드는 것이고,
+구분자의 역할은 이미지를 보고 생성자에 의해 만들어진 이미지인지 실제 이미지인지 알아내는 것입니다.
+모델을 학습하는 동안, 생성자는 더 진짜같은 가짜 이미지를 만들어내며 구분자를 속이려 하고,
+구분자는 더 정확히 가짜/진짜 이미지를 구별할 수 있도록 노력합니다.
+이 ‘경찰과 도둑’ 게임은, 생성자가 학습 데이터들에서 직접 가져온 것처럼 보일정도로 완벽한 이미지를 만들어내고,
+구분자가 생성자에서 나온 이미지를 50%의 확률로 가짜 혹은 진짜로 판별할 때, 균형상태에 도달하게 됩니다.</p>
+<p>그럼 이제부터 본 튜토리얼에서 사용할 표기들을 구분자부터 정의해보겠습니다. <span class="math">\(x\)</span> 는 이미지로 표현되는 데이터로 두겠습니다.
+<span class="math">\(D(x)\)</span> 는 구분자 신경망이고, 실제 학습데이터에서 가져온 <span class="math">\(x\)</span> 를 통과시켜 상수(scalar) 확률값을 결과로 출려합니다.
+이때, 우리는 이미지 데이터를 다루고 있으므로, <span class="math">\(D(x)\)</span> 에는 3x64x64크기의 CHW 데이터가 입력됩니다. 직관적으로 볼때,
+<span class="math">\(D(x)\)</span> 는 <span class="math">\(x\)</span> 가 학습데이터에서 가져온 것일 때 출력이 크고, 생성자가 만들어낸 <span class="math">\(x\)</span> 일때 작을 것입니다.
+<span class="math">\(D(x)\)</span> 는 전통적인 이진 분류기(binary classification)으로도 생각될 수 있습니다.</p>
+<p>이번엔 생성자의 표기들을 확인해봅시다. <span class="math">\(z\)</span> 를 정규분포에서 뽑은 잠재공간 벡터(laten space vector)라고 하겠습니다
+(번역 주. laten space vector는 쉽게 생각해 정규분포를 따르는 n개의 원소를 가진 vector라 볼 수 있습니다.
+다르게 얘기하면 정규분포에서 n개의 원소를 추출한 것과 같습니다). <span class="math">\(G(z)\)</span> 는 <span class="math">\(z\)</span>
+벡터를 원하는 데이터 차원으로 대응시키는 신경망으로 둘 수 있습니다. 이때 <span class="math">\(G\)</span> 의 목적은 <span class="math">\(p_{data}\)</span>
+에서 얻을 수 있는 학습 데이터들의 분포를 추정하여, 모사한 <span class="math">\(p_g\)</span> 의 분포를 이용해 가짜 데이터들을 만드는 것입니다.</p>
+<p>이어서, <span class="math">\(D(G(z))\)</span> 는 <span class="math">\(G\)</span> 가 출력한 결과물이 실제 이미지일 0~1사이의 상수의 확률값입니다.
+<a class="reference external" href="https://papers.nips.cc/paper/5423-generative-adversarial-nets.pdf">Goodfellow의 논문</a>
+에 기술되어 있듯, <span class="math">\(D\)</span> 가 이미지의 참/거짓을 정확히 판별할 확률인 <span class="math">\(logD(x)\)</span> 에서 생성한 이미지를 <span class="math">\(D\)</span> 가 가짜로 판별할 확률인
+(<span class="math">\(log(1-D(G(z)))\)</span>)를 최소화 시키려는 점에서, <span class="math">\(D\)</span> 와 <span class="math">\(G\)</span> 는 최대최소(minmax)게임을 하는 것과 같습니다.
+논문에 따르면, GAN의 손실함수는 아래와 같습니다.</p>
 <div class="math">
 \[\underset{G}{\text{min}} \underset{D}{\text{max}}V(D,G) = \mathbb{E}_{x\sim p_{data}(x)}\big[logD(x)\big] + \mathbb{E}_{z\sim p_{z}(z)}\big[log(1-D(G(z)))\big]
 
 \]</div>
-<p>In theory, the solution to this minimax game is where
-<span class="math">\(p_g = p_{data}\)</span>, and the discriminator guesses randomly if the
-inputs are real or fake. However, the convergence theory of GANs is
-still being actively researched and in reality models do not always
-train to this point.</p>
+<p>이론적으로는, 이 최대최소게임은 <span class="math">\(p_g = p_{data}\)</span> 이고, 구분자에 입력된 데이터가 1/2의 무작위 확률로 참/거짓이 판별될때 해답에 이릅니다.
+하지만 GAN의 수렴 이론은 아직도 활발히 연구가 진행중이고, 현실에서의 모델들은 이론적인 최적 상태에 도달하지 않는 경우도 많습니다.</p>
 </div>
-<div class="section" id="what-is-a-dcgan">
-<h3>What is a DCGAN?<a class="headerlink" href="#what-is-a-dcgan" title="Permalink to this headline">¶</a></h3>
-<p>A DCGAN is a direct extension of the GAN described above, except that it
-explicitly uses convolutional and convolutional-transpose layers in the
-discriminator and generator, respectively. It was first described by
-Radford et. al.&nbsp;in the paper <a class="reference external" href="https://arxiv.org/pdf/1511.06434.pdf">Unsupervised Representation Learning With
+<div class="section" id="id3">
+<h3>그렇다면 DCGAN은 뭘까요?<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<p>DCGAN은 위에서 기술한 GAN에서 직접적으로 파생된 모델로, 생성자와 구분자에서
+합성곱 신경망(convolution)과 전치 합성곱 신경망(convolution-transpose)을 사용했다는 것이 차이점입니다
+Radford와 그 외가 저술한 <a class="reference external" href="https://arxiv.org/pdf/1511.06434.pdf">Unsupervised Representation Learning With
 Deep Convolutional Generative Adversarial
-Networks</a>. The discriminator
-is made up of strided
+Networks</a> 논문에서 처음 모델이 소개되었고, 지금은 대부분의 GAN모델이
+DCGAN을 기반으로 만들어지는 중입니다. 이전 GAN과 모델의 구조가 실제로 어떻게 다른지 확인을 해보자면, 먼저 구분자에서는
 <a class="reference external" href="https://pytorch.org/docs/stable/nn.html#torch.nn.Conv2d">convolution</a>
-layers, <a class="reference external" href="https://pytorch.org/docs/stable/nn.html#torch.nn.BatchNorm2d">batch
+계층, <a class="reference external" href="https://pytorch.org/docs/stable/nn.html#torch.nn.BatchNorm2d">batch
 norm</a>
-layers, and
+계층, 그리고
 <a class="reference external" href="https://pytorch.org/docs/stable/nn.html#torch.nn.LeakyReLU">LeakyReLU</a>
-activations. The input is a 3x64x64 input image and the output is a
-scalar probability that the input is from the real data distribution.
-The generator is comprised of
+활성함수가 사용되었습니다. 클래식한 GAN과 마찬가지로, 구분자의 입력 데이터는 3x64x64 의 이미지이고,
+출력값은 입력 데이터가 실제 데이터일 0~1사이의 확률값입니다.
+다음으로, 생성자는
 <a class="reference external" href="https://pytorch.org/docs/stable/nn.html#torch.nn.ConvTranspose2d">convolutional-transpose</a>
-layers, batch norm layers, and
-<a class="reference external" href="https://pytorch.org/docs/stable/nn.html#relu">ReLU</a> activations. The
-input is a latent vector, <span class="math">\(z\)</span>, that is drawn from a standard
-normal distribution and the output is a 3x64x64 RGB image. The strided
-conv-transpose layers allow the latent vector to be transformed into a
-volume with the same shape as an image. In the paper, the authors also
-give some tips about how to setup the optimizers, how to calculate the
-loss functions, and how to initialize the model weights, all of which
-will be explained in the coming sections.</p>
+계층, 배치 정규화(batch norm) 계층, 그리고
+<a class="reference external" href="https://pytorch.org/docs/stable/nn.html#relu">ReLU</a> 활성함수가 사용되었습니다. 입력값은 역시나
+정규분포에서 추출한 잠재공간 벡터 <span class="math">\(z\)</span> 이고, 출력값은 3x64x64 RGB 이미지입니다. 이때,
+전치 합성곱 신경망은 잠재공간 벡터로 하여금 이미지와 같은 차원을 갖도록 변환시켜주는 역할을 합니다 (번역 주. 전치 합성곱 신경망은
+합성곱 신경망의 반대적인 개념이라 이해하면 쉽습니다. 입력된 작은 CHW 데이터를 가중치들을 이용해 더 큰 CHW로 업샘플링해주는 계층입니다).
+논문에서는 각종 최적화 방법이나 손실함수의 계산, 모델의 가중치 초기화 방법등에 관한 추가적인 정보들도 적어두었는데,
+이 부분은 다음 섹션에서 설명하도록 하겠습니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span>
 <span class="c1">#%matplotlib inline</span>
 <span class="kn">import</span> <span class="nn">argparse</span>
@@ -469,9 +448,9 @@ will be explained in the coming sections.</p>
 <span class="kn">import</span> <span class="nn">matplotlib.animation</span> <span class="k">as</span> <span class="nn">animation</span>
 <span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">HTML</span>
 
-<span class="c1"># Set random seed for reproducibility</span>
+<span class="c1"># 코드 실행결과의 동일성을 위해 무작위 시드를 설정합니다</span>
 <span class="n">manualSeed</span> <span class="o">=</span> <span class="mi">999</span>
-<span class="c1">#manualSeed = random.randint(1, 10000) # use if you want new results</span>
+<span class="c1">#manualSeed = random.randint(1, 10000) # 만일 새로운 결과를 원한다면 주석을 없애면 됩니다</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Random Seed: &quot;</span><span class="p">,</span> <span class="n">manualSeed</span><span class="p">)</span>
 <span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">manualSeed</span><span class="p">)</span>
 <span class="n">torch</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="n">manualSeed</span><span class="p">)</span>
@@ -483,89 +462,74 @@ will be explained in the coming sections.</p>
 </div>
 </div>
 </div>
-<div class="section" id="inputs">
-<h2>Inputs<a class="headerlink" href="#inputs" title="Permalink to this headline">¶</a></h2>
-<p>Let’s define some inputs for the run:</p>
+<div class="section" id="id4">
+<h2>설정값<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
+<p>몇 가지 설정값들을 정의해봅시다:</p>
 <ul class="simple">
-<li><strong>dataroot</strong> - the path to the root of the dataset folder. We will
-talk more about the dataset in the next section</li>
-<li><strong>workers</strong> - the number of worker threads for loading the data with
-the DataLoader</li>
-<li><strong>batch_size</strong> - the batch size used in training. The DCGAN paper
-uses a batch size of 128</li>
-<li><strong>image_size</strong> - the spatial size of the images used for training.
-This implementation defaults to 64x64. If another size is desired,
-the structures of D and G must be changed. See
-<a class="reference external" href="https://github.com/pytorch/examples/issues/70">here</a> for more
-details</li>
-<li><strong>nc</strong> - number of color channels in the input images. For color
-images this is 3</li>
-<li><strong>nz</strong> - length of latent vector</li>
-<li><strong>ngf</strong> - relates to the depth of feature maps carried through the
-generator</li>
-<li><strong>ndf</strong> - sets the depth of feature maps propagated through the
-discriminator</li>
-<li><strong>num_epochs</strong> - number of training epochs to run. Training for
-longer will probably lead to better results but will also take much
-longer</li>
-<li><strong>lr</strong> - learning rate for training. As described in the DCGAN paper,
-this number should be 0.0002</li>
-<li><strong>beta1</strong> - beta1 hyperparameter for Adam optimizers. As described in
-paper, this number should be 0.5</li>
-<li><strong>ngpu</strong> - number of GPUs available. If this is 0, code will run in
-CPU mode. If this number is greater than 0 it will run on that number
-of GPUs</li>
+<li><strong>dataroot</strong> - 데이터셋 폴더의 경로입니다. 데이터셋에 관한건 다음 섹션에서
+더 자세히 설명하겠습니다.</li>
+<li><strong>workers</strong> - DataLoader에서 데이터를 불러올 때 사용할 쓰레드의 개수입니다.</li>
+<li><strong>batch_size</strong> - 학습에 사용할 배치 크기입니다. DCGAN에서는 128을 사용했습니다.</li>
+<li><strong>image_size</strong> - 학습에 사용되는 이미지의 크기입니다.
+본 문서에서는 64x64의 크기를 기본으로 하나, 만일 다른 크기의 이미지를 사용한다면
+D와 G의 구조 역시 변경되어야 합니다. 더 자세한 정보를 위해선
+<a class="reference external" href="https://github.com/pytorch/examples/issues/70">이곳</a> 을 확인해 보세요.</li>
+<li><strong>nc</strong> - 입력 이미지의 색 채널개수입니다. RGB 이미지이기 때문에 3으로 설정합니다.</li>
+<li><strong>nz</strong> - 잠재공간 벡터의 원소들 개수입니다.</li>
+<li><strong>ngf</strong> - 생성자를 통과할때 만들어질 특징 데이터의 채널개수입니다.</li>
+<li><strong>ndf</strong> - 구분자를 통과할때 만들어질 특징 데이터의 채널개수입니다.</li>
+<li><strong>num_epochs</strong> - 학습시킬 에폭 수입니다. 오래 학습시키는 것이 대부분 좋은 결과를 보이지만, 당연히도 시간이 오래걸리는 것이 단점입니다.</li>
+<li><strong>lr</strong> - 모델의 학습률입니다. DCGAN에서 사용된대로 0.0002로 설정합니다.</li>
+<li><strong>beta1</strong> - Adam 옵티마이저에서 사용할 beta1 하이퍼파라미터 값입니다. 역시나 논문에서 사용한대로 0.5로 설정했습니다.</li>
+<li><strong>ngpu</strong> - 사용가능한 GPU의 번호입니다. 0으로 두면 CPU에서 학습하고, 0보다 큰 수로 설정하면 각 숫자가 가리키는 GPU로 학습시킵니다.</li>
 </ul>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Root directory for dataset</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># 데이터셋의 경로</span>
 <span class="n">dataroot</span> <span class="o">=</span> <span class="s2">&quot;data/celeba&quot;</span>
 
-<span class="c1"># Number of workers for dataloader</span>
+<span class="c1"># dataloader에서 사용할 쓰레드 수</span>
 <span class="n">workers</span> <span class="o">=</span> <span class="mi">2</span>
 
-<span class="c1"># Batch size during training</span>
+<span class="c1"># 배치 크기</span>
 <span class="n">batch_size</span> <span class="o">=</span> <span class="mi">128</span>
 
-<span class="c1"># Spatial size of training images. All images will be resized to this</span>
-<span class="c1">#   size using a transformer.</span>
+<span class="c1"># 이미지의 크기입니다. 모든 이미지들은 transformer를 이용해 64로 크기가 통일됩니다.</span>
 <span class="n">image_size</span> <span class="o">=</span> <span class="mi">64</span>
 
-<span class="c1"># Number of channels in the training images. For color images this is 3</span>
+<span class="c1"># 이미지의 채널 수로, RGB 이미지이기 때문에 3으로 설정합니다.</span>
 <span class="n">nc</span> <span class="o">=</span> <span class="mi">3</span>
 
-<span class="c1"># Size of z latent vector (i.e. size of generator input)</span>
+<span class="c1"># 잠재공간 벡터의 크기 (예. 생성자의 입력값 크기)</span>
 <span class="n">nz</span> <span class="o">=</span> <span class="mi">100</span>
 
-<span class="c1"># Size of feature maps in generator</span>
+<span class="c1"># 생성자를 통과하는 특징 데이터들의 채널 크기</span>
 <span class="n">ngf</span> <span class="o">=</span> <span class="mi">64</span>
 
-<span class="c1"># Size of feature maps in discriminator</span>
+<span class="c1"># 구분자를 통과하는 특징 데이터들의 채널 크기</span>
 <span class="n">ndf</span> <span class="o">=</span> <span class="mi">64</span>
 
-<span class="c1"># Number of training epochs</span>
+<span class="c1"># 학습할 에폭 수</span>
 <span class="n">num_epochs</span> <span class="o">=</span> <span class="mi">5</span>
 
-<span class="c1"># Learning rate for optimizers</span>
+<span class="c1"># 옵티마이저의 학습률</span>
 <span class="n">lr</span> <span class="o">=</span> <span class="mf">0.0002</span>
 
-<span class="c1"># Beta1 hyperparam for Adam optimizers</span>
+<span class="c1"># Adam 옵티마이저의 beta1 하이퍼파라미터</span>
 <span class="n">beta1</span> <span class="o">=</span> <span class="mf">0.5</span>
 
-<span class="c1"># Number of GPUs available. Use 0 for CPU mode.</span>
+<span class="c1"># 사용가능한 gpu 번호. CPU를 사용해야 하는경우 0으로 설정하세요</span>
 <span class="n">ngpu</span> <span class="o">=</span> <span class="mi">1</span>
 </pre></div>
 </div>
 </div>
-<div class="section" id="data">
-<h2>Data<a class="headerlink" href="#data" title="Permalink to this headline">¶</a></h2>
-<p>In this tutorial we will use the <a class="reference external" href="http://mmlab.ie.cuhk.edu.hk/projects/CelebA.html">Celeb-A Faces
-dataset</a> which can
-be downloaded at the linked site, or in <a class="reference external" href="https://drive.google.com/drive/folders/0B7EVK8r0v71pTUZsaXdaSnZBZzg">Google
-Drive</a>.
-The dataset will download as a file named <em>img_align_celeba.zip</em>. Once
-downloaded, create a directory named <em>celeba</em> and extract the zip file
-into that directory. Then, set the <em>dataroot</em> input for this notebook to
-the <em>celeba</em> directory you just created. The resulting directory
-structure should be:</p>
+<div class="section" id="id5">
+<h2>데이터<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h2>
+<p>본 튜토리얼에서 사용할 데이터는 <a class="reference external" href="http://mmlab.ie.cuhk.edu.hk/projects/CelebA.html">Celeb-A Faces
+dataset</a> 로, 해당 링크를 이용하거나 <a class="reference external" href="https://drive.google.com/drive/folders/0B7EVK8r0v71pTUZsaXdaSnZBZzg">Google
+Drive</a> 에서 데이터를 받을 수 있습니다.
+데이터를 받으면 <em>img_align_celeba.zip</em> 라는 파일을 보게될 겁니다. 다운로드가 끝나면
+<em>celeba</em> 이라는 폴더를 새로 만들고, 해당 폴더에 해당 zip 파일을 압축해제 해주시면 됩니다.
+압축 해제 후, 위에서 정의한 <em>dataroot</em> 변수에 방금 만든 <em>celeba</em> 폴더의 경로를 넣어주세요.
+위의 작업이 끝나면 <em>celeba</em> 폴더의 구조는 다음과 같아야 합니다:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">celeba</span>
     <span class="o">-&gt;</span> <span class="n">img_align_celeba</span>
         <span class="o">-&gt;</span> <span class="mf">188242.</span><span class="n">jpg</span>
@@ -575,13 +539,12 @@ structure should be:</p>
            <span class="o">...</span>
 </pre></div>
 </div>
-<p>This is an important step because we will be using the ImageFolder
-dataset class, which requires there to be subdirectories in the
-dataset’s root folder. Now, we can create the dataset, create the
-dataloader, set the device to run on, and finally visualize some of the
-training data.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># We can use an image folder dataset the way we have it setup.</span>
-<span class="c1"># Create the dataset</span>
+<p>이 과정들은 프로그램이 정상적으로 구동하기 위해서는 중요한 부분입니다. 이때 celeba 폴더안에 다시 폴더를 두는 이유는,
+ImageFolder 클래스가 데이터셋의 최상위 폴더에 서브폴더를 요구하기 때문입니다.
+이제 데이터셋과 DataLoader의 설정을 끝냈습니다.
+최종적으로 학습 데이터들을 시각화해봅시다.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># 우리가 설정한 대로 이미지 데이터셋을 불러와 봅시다</span>
+<span class="c1"># 먼저 데이터셋을 만듭니다</span>
 <span class="n">dataset</span> <span class="o">=</span> <span class="n">dset</span><span class="o">.</span><span class="n">ImageFolder</span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="n">dataroot</span><span class="p">,</span>
                            <span class="n">transform</span><span class="o">=</span><span class="n">transforms</span><span class="o">.</span><span class="n">Compose</span><span class="p">([</span>
                                <span class="n">transforms</span><span class="o">.</span><span class="n">Resize</span><span class="p">(</span><span class="n">image_size</span><span class="p">),</span>
@@ -589,14 +552,14 @@ training data.</p>
                                <span class="n">transforms</span><span class="o">.</span><span class="n">ToTensor</span><span class="p">(),</span>
                                <span class="n">transforms</span><span class="o">.</span><span class="n">Normalize</span><span class="p">((</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span> <span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)),</span>
                            <span class="p">]))</span>
-<span class="c1"># Create the dataloader</span>
+<span class="c1"># dataloader를 정의해봅시다</span>
 <span class="n">dataloader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span>
                                          <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="n">workers</span><span class="p">)</span>
 
-<span class="c1"># Decide which device we want to run on</span>
+<span class="c1"># GPU 사용여부를 결정해 줍니다</span>
 <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cuda:0&quot;</span> <span class="k">if</span> <span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="ow">and</span> <span class="n">ngpu</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="k">else</span> <span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
 
-<span class="c1"># Plot some training images</span>
+<span class="c1"># 학습 데이터들 중 몇가지 이미지들을 화면에 띄워봅시다</span>
 <span class="n">real_batch</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">dataloader</span><span class="p">))</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">8</span><span class="p">))</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
@@ -606,21 +569,20 @@ training data.</p>
 </div>
 <img alt="../_images/sphx_glr_dcgan_faces_tutorial_001.png" class="sphx-glr-single-img" src="../_images/sphx_glr_dcgan_faces_tutorial_001.png" />
 </div>
-<div class="section" id="implementation">
-<h2>Implementation<a class="headerlink" href="#implementation" title="Permalink to this headline">¶</a></h2>
-<p>With our input parameters set and the dataset prepared, we can now get
-into the implementation. We will start with the weight initialization
-strategy, then talk about the generator, discriminator, loss functions,
-and training loop in detail.</p>
-<div class="section" id="weight-initialization">
-<h3>Weight Initialization<a class="headerlink" href="#weight-initialization" title="Permalink to this headline">¶</a></h3>
-<p>From the DCGAN paper, the authors specify that all model weights shall
-be randomly initialized from a Normal distribution with mean=0,
-stdev=0.02. The <code class="docutils literal notranslate"><span class="pre">weights_init</span></code> function takes an initialized model as
-input and reinitializes all convolutional, convolutional-transpose, and
-batch normalization layers to meet this criteria. This function is
-applied to the models immediately after initialization.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># custom weights initialization called on netG and netD</span>
+<div class="section" id="id6">
+<h2>구현<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h2>
+<p>모델의 설정값들과 데이터들이 준비되었기 때문에, 드디어 모델의 구현으로
+들어갈 수 있을 것 같습니다. 먼저 가중치 초기화에 대해 이야기 해보고,
+순서대로 생성자, 구분자, 손실 함수, 학습 방법들을 알아보겠습니다.</p>
+<div class="section" id="id7">
+<h3>가중치 초기화<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
+<p>DCGAN 논문에서는, 평균이 0이고 분산이 0.02인 정규분포을 이용해,
+구분자와 생성자 모두 무작위 초기화를 진행하는 것이 좋다고 합니다.
+<code class="docutils literal notranslate"><span class="pre">weights_init</span></code> 함수는 매개변수로 모델을 입력받아,
+모든 합성곱 계층, 전치 합성곱 계층, 배치 정규화 계층을, 위에서 말한 조건대로
+가중치들을 다시 초기화 시킵니다. 이 함수는 모델이 만들어지자 마자 바로 적용을
+시키게 됩니다.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># netG와 netD에 적용시킬 커스텀 가중치 초기화 함수</span>
 <span class="k">def</span> <span class="nf">weights_init</span><span class="p">(</span><span class="n">m</span><span class="p">):</span>
     <span class="n">classname</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
     <span class="k">if</span> <span class="n">classname</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;Conv&#39;</span><span class="p">)</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
@@ -631,77 +593,75 @@ applied to the models immediately after initialization.</p>
 </pre></div>
 </div>
 </div>
-<div class="section" id="generator">
-<h3>Generator<a class="headerlink" href="#generator" title="Permalink to this headline">¶</a></h3>
-<p>The generator, <span class="math">\(G\)</span>, is designed to map the latent space vector
-(<span class="math">\(z\)</span>) to data-space. Since our data are images, converting
-<span class="math">\(z\)</span> to data-space means ultimately creating a RGB image with the
-same size as the training images (i.e.&nbsp;3x64x64). In practice, this is
-accomplished through a series of strided two dimensional convolutional
-transpose layers, each paired with a 2d batch norm layer and a relu
-activation. The output of the generator is fed through a tanh function
-to return it to the input data range of <span class="math">\([-1,1]\)</span>. It is worth
-noting the existence of the batch norm functions after the
-conv-transpose layers, as this is a critical contribution of the DCGAN
-paper. These layers help with the flow of gradients during training. An
-image of the generator from the DCGAN paper is shown below.</p>
+<div class="section" id="id8">
+<h3>생성자<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
+<p>생성자 <span class="math">\(G\)</span> 는 잠재 공간 벡터 <span class="math">\(z\)</span> 를, 데이터 공간으로
+변환시키도록 설계되었습니다. 우리에게 데이터라 함은 이미지이기 때문에,
+<span class="math">\(z\)</span> 를 데이터공간으로 변환한다는 뜻은, 학습이미지와 같은 사이즈를 가진
+RGB 이미지를 생성하는것과 같습니다 (예.&nbsp;3x64x64).
+실제 모델에서는 스트라이드(stride) 2를 가진 전치 합성곱 계층들을 이어서 구성하는데,
+각 전치 합성곱 계층 하나당 2차원 배치 정규화 계층과 relu 활성함수를 한 쌍으로 묶어서 사용합니다.
+생성자의 마지막 출력 계층에서는 데이터를 tanh 함수에 통과시키는데,
+이는 출력 값을 <span class="math">\([-1,1]\)</span> 사이의 범위로 조정하기 위해서 입니다.
+이때 배치 정규화 계층을 주목할 필요가 있는데, DCGAN 논문에 의하면,
+이 계층이 경사하강법(gradient-descent)의 흐름에 중요한 영향을 미치는 것으로 알려져 있습니다.
+아래의 그림은 DCGAN 논문에서 가져온 생성자의 모델 아키텍쳐입니다.</p>
 <div class="figure">
 <img alt="dcgan_generator" src="../_images/dcgan_generator.png" />
 </div>
-<p>Notice, the how the inputs we set in the input section (<em>nz</em>, <em>ngf</em>, and
-<em>nc</em>) influence the generator architecture in code. <em>nz</em> is the length
-of the z input vector, <em>ngf</em> relates to the size of the feature maps
-that are propagated through the generator, and <em>nc</em> is the number of
-channels in the output image (set to 3 for RGB images). Below is the
-code for the generator.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Generator Code</span>
+<p>우리가 설정값 섹션에서 정의한 값들이 (<em>nz</em>, <em>ngf</em>, 그리고
+<em>nc</em>) 생성자 모델 아키텍쳐에 어떻게 영향을 끼치는지 주목해주세요. <em>nz</em> 는 z 입력 벡터의
+길이, <em>ngf</em> 는 생성자를 통과하는 특징 데이터의 크기, 그리고 <em>nc</em> 는 출력 이미지의
+채널 개수입니다 (RGB 이미지이기 때문에 3으로 설정을 했습니다).
+아래는 생성자의 코드입니다.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># 생성자 코드</span>
 
 <span class="k">class</span> <span class="nc">Generator</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ngpu</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">Generator</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ngpu</span> <span class="o">=</span> <span class="n">ngpu</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">main</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
-            <span class="c1"># input is Z, going into a convolution</span>
+            <span class="c1"># 입력데이터 Z가 가장 처음 통과하는 전치 합성곱 계층입니다.</span>
             <span class="n">nn</span><span class="o">.</span><span class="n">ConvTranspose2d</span><span class="p">(</span> <span class="n">nz</span><span class="p">,</span> <span class="n">ngf</span> <span class="o">*</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
             <span class="n">nn</span><span class="o">.</span><span class="n">BatchNorm2d</span><span class="p">(</span><span class="n">ngf</span> <span class="o">*</span> <span class="mi">8</span><span class="p">),</span>
             <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(</span><span class="kc">True</span><span class="p">),</span>
-            <span class="c1"># state size. (ngf*8) x 4 x 4</span>
+            <span class="c1"># 위의 계층을 통과한 데이터의 크기. (ngf*8) x 4 x 4</span>
             <span class="n">nn</span><span class="o">.</span><span class="n">ConvTranspose2d</span><span class="p">(</span><span class="n">ngf</span> <span class="o">*</span> <span class="mi">8</span><span class="p">,</span> <span class="n">ngf</span> <span class="o">*</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
             <span class="n">nn</span><span class="o">.</span><span class="n">BatchNorm2d</span><span class="p">(</span><span class="n">ngf</span> <span class="o">*</span> <span class="mi">4</span><span class="p">),</span>
             <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(</span><span class="kc">True</span><span class="p">),</span>
-            <span class="c1"># state size. (ngf*4) x 8 x 8</span>
+            <span class="c1"># 위의 계층을 통과한 데이터의 크기. (ngf*4) x 8 x 8</span>
             <span class="n">nn</span><span class="o">.</span><span class="n">ConvTranspose2d</span><span class="p">(</span> <span class="n">ngf</span> <span class="o">*</span> <span class="mi">4</span><span class="p">,</span> <span class="n">ngf</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
             <span class="n">nn</span><span class="o">.</span><span class="n">BatchNorm2d</span><span class="p">(</span><span class="n">ngf</span> <span class="o">*</span> <span class="mi">2</span><span class="p">),</span>
             <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(</span><span class="kc">True</span><span class="p">),</span>
-            <span class="c1"># state size. (ngf*2) x 16 x 16</span>
+            <span class="c1"># 위의 계층을 통과한 데이터의 크기. (ngf*2) x 16 x 16</span>
             <span class="n">nn</span><span class="o">.</span><span class="n">ConvTranspose2d</span><span class="p">(</span> <span class="n">ngf</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span> <span class="n">ngf</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
             <span class="n">nn</span><span class="o">.</span><span class="n">BatchNorm2d</span><span class="p">(</span><span class="n">ngf</span><span class="p">),</span>
             <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(</span><span class="kc">True</span><span class="p">),</span>
-            <span class="c1"># state size. (ngf) x 32 x 32</span>
+            <span class="c1"># 위의 계층을 통과한 데이터의 크기. (ngf) x 32 x 32</span>
             <span class="n">nn</span><span class="o">.</span><span class="n">ConvTranspose2d</span><span class="p">(</span> <span class="n">ngf</span><span class="p">,</span> <span class="n">nc</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
             <span class="n">nn</span><span class="o">.</span><span class="n">Tanh</span><span class="p">()</span>
-            <span class="c1"># state size. (nc) x 64 x 64</span>
+            <span class="c1"># 위의 계층을 통과한 데이터의 크기. (nc) x 64 x 64</span>
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">main</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Now, we can instantiate the generator and apply the <code class="docutils literal notranslate"><span class="pre">weights_init</span></code>
-function. Check out the printed model to see how the generator object is
-structured.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create the generator</span>
+<p>좋습니다. 이제 우리는 생성자의 인스턴스를 만들고 <code class="docutils literal notranslate"><span class="pre">weights_init</span></code>
+함수를 적용시킬 수 있습니다. 모델의 인스턴스를 출력해서 생성자가
+어떻게 구성되어있는지 확인해봅시다.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># 생성자를 만듭니다</span>
 <span class="n">netG</span> <span class="o">=</span> <span class="n">Generator</span><span class="p">(</span><span class="n">ngpu</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
 
-<span class="c1"># Handle multi-gpu if desired</span>
+<span class="c1"># 필요한 경우 multi-gpu를 설정 해주세요</span>
 <span class="k">if</span> <span class="p">(</span><span class="n">device</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">&#39;cuda&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">ngpu</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">):</span>
     <span class="n">netG</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">DataParallel</span><span class="p">(</span><span class="n">netG</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">ngpu</span><span class="p">)))</span>
 
-<span class="c1"># Apply the weights_init function to randomly initialize all weights</span>
-<span class="c1">#  to mean=0, stdev=0.2.</span>
+<span class="c1"># 모든 가중치의 평균을 0, 분산을 0.02로 초기화 하기 위해</span>
+<span class="c1"># weight_init 함수를 적용시킵니다</span>
 <span class="n">netG</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">weights_init</span><span class="p">)</span>
 
-<span class="c1"># Print the model</span>
+<span class="c1"># 모델의 구조를 출력합니다</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">netG</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -727,43 +687,41 @@ structured.</p>
 </pre></div>
 </div>
 </div>
-<div class="section" id="discriminator">
-<h3>Discriminator<a class="headerlink" href="#discriminator" title="Permalink to this headline">¶</a></h3>
-<p>As mentioned, the discriminator, <span class="math">\(D\)</span>, is a binary classification
-network that takes an image as input and outputs a scalar probability
-that the input image is real (as opposed to fake). Here, <span class="math">\(D\)</span> takes
-a 3x64x64 input image, processes it through a series of Conv2d,
-BatchNorm2d, and LeakyReLU layers, and outputs the final probability
-through a Sigmoid activation function. This architecture can be extended
-with more layers if necessary for the problem, but there is significance
-to the use of the strided convolution, BatchNorm, and LeakyReLUs. The
-DCGAN paper mentions it is a good practice to use strided convolution
-rather than pooling to downsample because it lets the network learn its
-own pooling function. Also batch norm and leaky relu functions promote
-healthy gradient flow which is critical for the learning process of both
-<span class="math">\(G\)</span> and <span class="math">\(D\)</span>.</p>
-<p>Discriminator Code</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Discriminator</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<div class="section" id="id9">
+<h3>구분자<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
+<p>앞서 언급했듯, 구분자 <span class="math">\(D\)</span> 는
+3x64x64 이미지를 입력받아, Conv2d, BatchNorm2d, 그리고 LeakyReLU 계층을 통과시켜
+데이터를 가공시키고, 마지막 출력에서 Sigmoid 함수를 이용하여
+0~1 사이의 확률값으로 조정합니다. 이 아키텍쳐는 필요한 경우 더 다양한 레이어를 쌓을 수 있지만,
+배치 정규화와 LeakyReLU, 특히 보폭이 있는 (strided) 합성곱 계층을
+사용하는 것에는 이유가 있습니다.
+DCGAN 논문에서는 보폭이 있는 합성곱 계층을 사용하는 것이 신경망 내에서 스스로의
+풀링(Pooling) 함수를 학습하기 때문에, 데이터를 처리하는 과정에서 직접적으로 풀링 계층( MaxPool or AvgPooling)을
+사용하는 것보다 더 유리하다고 합니다. 또한 배치 정규화와 leaky relu 함수는 학습과정에서
+<span class="math">\(G\)</span> 와 <span class="math">\(D\)</span> 가 더 효과적인 경사도(gradient)를 얻을 수 있습니다.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># 구분자 코드</span>
+
+<span class="k">class</span> <span class="nc">Discriminator</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ngpu</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">Discriminator</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ngpu</span> <span class="o">=</span> <span class="n">ngpu</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">main</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
-            <span class="c1"># input is (nc) x 64 x 64</span>
+            <span class="c1"># 입력 데이터의 크기는 (nc) x 64 x 64 입니다</span>
             <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="n">nc</span><span class="p">,</span> <span class="n">ndf</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
             <span class="n">nn</span><span class="o">.</span><span class="n">LeakyReLU</span><span class="p">(</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
-            <span class="c1"># state size. (ndf) x 32 x 32</span>
+            <span class="c1"># 위의 계층을 통과한 데이터의 크기. (ndf) x 32 x 32</span>
             <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="n">ndf</span><span class="p">,</span> <span class="n">ndf</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
             <span class="n">nn</span><span class="o">.</span><span class="n">BatchNorm2d</span><span class="p">(</span><span class="n">ndf</span> <span class="o">*</span> <span class="mi">2</span><span class="p">),</span>
             <span class="n">nn</span><span class="o">.</span><span class="n">LeakyReLU</span><span class="p">(</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
-            <span class="c1"># state size. (ndf*2) x 16 x 16</span>
+            <span class="c1"># 위의 계층을 통과한 데이터의 크기. (ndf*2) x 16 x 16</span>
             <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="n">ndf</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span> <span class="n">ndf</span> <span class="o">*</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
             <span class="n">nn</span><span class="o">.</span><span class="n">BatchNorm2d</span><span class="p">(</span><span class="n">ndf</span> <span class="o">*</span> <span class="mi">4</span><span class="p">),</span>
             <span class="n">nn</span><span class="o">.</span><span class="n">LeakyReLU</span><span class="p">(</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
-            <span class="c1"># state size. (ndf*4) x 8 x 8</span>
+            <span class="c1"># 위의 계층을 통과한 데이터의 크기. (ndf*4) x 8 x 8</span>
             <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="n">ndf</span> <span class="o">*</span> <span class="mi">4</span><span class="p">,</span> <span class="n">ndf</span> <span class="o">*</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
             <span class="n">nn</span><span class="o">.</span><span class="n">BatchNorm2d</span><span class="p">(</span><span class="n">ndf</span> <span class="o">*</span> <span class="mi">8</span><span class="p">),</span>
             <span class="n">nn</span><span class="o">.</span><span class="n">LeakyReLU</span><span class="p">(</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
-            <span class="c1"># state size. (ndf*8) x 4 x 4</span>
+            <span class="c1"># 위의 계층을 통과한 데이터의 크기. (ndf*8) x 4 x 4</span>
             <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="n">ndf</span> <span class="o">*</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
             <span class="n">nn</span><span class="o">.</span><span class="n">Sigmoid</span><span class="p">()</span>
         <span class="p">)</span>
@@ -772,20 +730,20 @@ healthy gradient flow which is critical for the learning process of both
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">main</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Now, as with the generator, we can create the discriminator, apply the
-<code class="docutils literal notranslate"><span class="pre">weights_init</span></code> function, and print the model’s structure.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create the Discriminator</span>
+<p>이제 우리는 생성자에 한 것처럼 구분자의 인스턴스를 만들고,
+<code class="docutils literal notranslate"><span class="pre">weights_init</span></code> 함수를 적용시킨 다음, 모델의 구조를 출력해볼 수 있습니다.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># 구분자를 만듭니다</span>
 <span class="n">netD</span> <span class="o">=</span> <span class="n">Discriminator</span><span class="p">(</span><span class="n">ngpu</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
 
-<span class="c1"># Handle multi-gpu if desired</span>
+<span class="c1"># 필요한 경우 multi-gpu를 설정 해주세요</span>
 <span class="k">if</span> <span class="p">(</span><span class="n">device</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">&#39;cuda&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">ngpu</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">):</span>
     <span class="n">netD</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">DataParallel</span><span class="p">(</span><span class="n">netD</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">ngpu</span><span class="p">)))</span>
 
-<span class="c1"># Apply the weights_init function to randomly initialize all weights</span>
-<span class="c1">#  to mean=0, stdev=0.2.</span>
+<span class="c1"># 모든 가중치의 평균을 0, 분산을 0.02로 초기화 하기 위해</span>
+<span class="c1"># weight_init 함수를 적용시킵니다</span>
 <span class="n">netD</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">weights_init</span><span class="p">)</span>
 
-<span class="c1"># Print the model</span>
+<span class="c1"># 모델의 구조를 출력합니다</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">netD</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -810,186 +768,166 @@ healthy gradient flow which is critical for the learning process of both
 </pre></div>
 </div>
 </div>
-<div class="section" id="loss-functions-and-optimizers">
-<h3>Loss Functions and Optimizers<a class="headerlink" href="#loss-functions-and-optimizers" title="Permalink to this headline">¶</a></h3>
-<p>With <span class="math">\(D\)</span> and <span class="math">\(G\)</span> setup, we can specify how they learn
-through the loss functions and optimizers. We will use the Binary Cross
-Entropy loss
+<div class="section" id="id10">
+<h3>손실함수와 옵티마이저<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h3>
+<p><span class="math">\(D\)</span> 와 <span class="math">\(G\)</span> 의 설정을 끝냈으니, 이제 손실함수와 옵티마이저를 정하여
+학습을 구체화시킬 시간입니다. 손실함수로는 Binary Cross Entropy loss
 (<a class="reference external" href="https://pytorch.org/docs/stable/nn.html#torch.nn.BCELoss">BCELoss</a>)
-function which is defined in PyTorch as:</p>
+를 사용할겁니다. 해당함수는 아래의 식으로 파이토치에 구현되어 있습니다:</p>
 <div class="math">
 \[\ell(x, y) = L = \{l_1,\dots,l_N\}^\top, \quad l_n = - \left[ y_n \cdot \log x_n + (1 - y_n) \cdot \log (1 - x_n) \right]
 
 \]</div>
-<p>Notice how this function provides the calculation of both log components
-in the objective function (i.e. <span class="math">\(log(D(x))\)</span> and
-<span class="math">\(log(1-D(G(z)))\)</span>). We can specify what part of the BCE equation to
-use with the <span class="math">\(y\)</span> input. This is accomplished in the training loop
-which is coming up soon, but it is important to understand how we can
-choose which component we wish to calculate just by changing <span class="math">\(y\)</span>
-(i.e.&nbsp;GT labels).</p>
-<p>Next, we define our real label as 1 and the fake label as 0. These
-labels will be used when calculating the losses of <span class="math">\(D\)</span> and
-<span class="math">\(G\)</span>, and this is also the convention used in the original GAN
-paper. Finally, we set up two separate optimizers, one for <span class="math">\(D\)</span> and
-one for <span class="math">\(G\)</span>. As specified in the DCGAN paper, both are Adam
-optimizers with learning rate 0.0002 and Beta1 = 0.5. For keeping track
-of the generator’s learning progression, we will generate a fixed batch
-of latent vectors that are drawn from a Gaussian distribution
-(i.e.&nbsp;fixed_noise) . In the training loop, we will periodically input
-this fixed_noise into <span class="math">\(G\)</span>, and over the iterations we will see
-images form out of the noise.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Initialize BCELoss function</span>
+<p>이때, 위의 함수가 로그함수 요소를 정의한 방식을 주의깊게 봐주세요 (예. <span class="math">\(log(D(x))\)</span> 와
+<span class="math">\(log(1-D(G(z)))\)</span>). 우린 <span class="math">\(y\)</span> 을 조정을 조정하여, BCE 함수에서
+사용할 요소를 고를 수 있습니다.
+이 부분은 이후에 서술할 학습 섹션에서 다루겠지만, 어떻게 <span class="math">\(y\)</span> 를 이용하여
+우리가 원하는 요소들만 골라낼 수 있는지 이해하는 것이 먼저입니다 (예.&nbsp;GT labels).</p>
+<p>좋습니다. 다음으로 넘어가겠습니다. 참 라벨 (혹은 정답)은 1로 두고, 거짓 라벨 (혹은 오답)은 0으로
+두겠습니다. 각 라벨의 값을 정한건 GAN 논문에서 사용된 값들로, GAN을 구성할때의 관례라 할
+수 있습니다. 방금 정한 라벨 값들은 추후에 손실값을 계산하는 과정에서 사용될겁니다.
+마지막으로, 서로 구분되는 두 옵티마이저를 구성하겠습니다. 하나는 <span class="math">\(D\)</span> 를 위한 것,
+다른 하나는 <span class="math">\(G\)</span> 를 위한 것입니다. DCGAN에 서술된 대로, 두 옵티마이저는 모두 Adam을 사용하고,
+학습률은 0.0002, Beta1 값은 0.5로 둡니다. 추가적으로, 학습이 진행되는 동안 생성자의 상태를 알아보기 위하여,
+프로그램이 끝날때까지 고정된 잠재공간 벡터를 생성하겠습니다 (예. fixed_noise).
+이 벡터들 역시 가우시안 분포에서 추출합니다. 학습 과정을 반복하면서  <span class="math">\(G\)</span> 에 주기적으로 같은 잠재공간 벡터를
+입력하면, 그 출력값을 기반으로 생성자의 상태를 확인 할 수 있습니다.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># BCELoss 함수의 인스턴스를 생성합니다</span>
 <span class="n">criterion</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">BCELoss</span><span class="p">()</span>
 
-<span class="c1"># Create batch of latent vectors that we will use to visualize</span>
-<span class="c1">#  the progression of the generator</span>
+<span class="c1"># 생성자의 학습상태를 확인할 잠재 공간 벡터를 생성합니다</span>
 <span class="n">fixed_noise</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">64</span><span class="p">,</span> <span class="n">nz</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
 
-<span class="c1"># Establish convention for real and fake labels during training</span>
+<span class="c1"># 학습에 사용되는 참/거짓의 라벨을 정합니다</span>
 <span class="n">real_label</span> <span class="o">=</span> <span class="mf">1.</span>
 <span class="n">fake_label</span> <span class="o">=</span> <span class="mf">0.</span>
 
-<span class="c1"># Setup Adam optimizers for both G and D</span>
+<span class="c1"># G와 D에서 사용할 Adam옵티마이저를 생성합니다</span>
 <span class="n">optimizerD</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">netD</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="n">lr</span><span class="p">,</span> <span class="n">betas</span><span class="o">=</span><span class="p">(</span><span class="n">beta1</span><span class="p">,</span> <span class="mf">0.999</span><span class="p">))</span>
 <span class="n">optimizerG</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">netG</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="n">lr</span><span class="p">,</span> <span class="n">betas</span><span class="o">=</span><span class="p">(</span><span class="n">beta1</span><span class="p">,</span> <span class="mf">0.999</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
-<div class="section" id="training">
-<h3>Training<a class="headerlink" href="#training" title="Permalink to this headline">¶</a></h3>
-<p>Finally, now that we have all of the parts of the GAN framework defined,
-we can train it. Be mindful that training GANs is somewhat of an art
-form, as incorrect hyperparameter settings lead to mode collapse with
-little explanation of what went wrong. Here, we will closely follow
-Algorithm 1 from Goodfellow’s paper, while abiding by some of the best
-practices shown in <a class="reference external" href="https://github.com/soumith/ganhacks">ganhacks</a>.
-Namely, we will “construct different mini-batches for real and fake”
-images, and also adjust G’s objective function to maximize
-<span class="math">\(logD(G(z))\)</span>. Training is split up into two main parts. Part 1
-updates the Discriminator and Part 2 updates the Generator.</p>
-<p><strong>Part 1 - Train the Discriminator</strong></p>
-<p>Recall, the goal of training the discriminator is to maximize the
-probability of correctly classifying a given input as real or fake. In
-terms of Goodfellow, we wish to “update the discriminator by ascending
-its stochastic gradient”. Practically, we want to maximize
-<span class="math">\(log(D(x)) + log(1-D(G(z)))\)</span>. Due to the separate mini-batch
-suggestion from ganhacks, we will calculate this in two steps. First, we
-will construct a batch of real samples from the training set, forward
-pass through <span class="math">\(D\)</span>, calculate the loss (<span class="math">\(log(D(x))\)</span>), then
-calculate the gradients in a backward pass. Secondly, we will construct
-a batch of fake samples with the current generator, forward pass this
-batch through <span class="math">\(D\)</span>, calculate the loss (<span class="math">\(log(1-D(G(z)))\)</span>),
-and <em>accumulate</em> the gradients with a backward pass. Now, with the
-gradients accumulated from both the all-real and all-fake batches, we
-call a step of the Discriminator’s optimizer.</p>
-<p><strong>Part 2 - Train the Generator</strong></p>
-<p>As stated in the original paper, we want to train the Generator by
-minimizing <span class="math">\(log(1-D(G(z)))\)</span> in an effort to generate better fakes.
-As mentioned, this was shown by Goodfellow to not provide sufficient
-gradients, especially early in the learning process. As a fix, we
-instead wish to maximize <span class="math">\(log(D(G(z)))\)</span>. In the code we accomplish
-this by: classifying the Generator output from Part 1 with the
-Discriminator, computing G’s loss <em>using real labels as GT</em>, computing
-G’s gradients in a backward pass, and finally updating G’s parameters
-with an optimizer step. It may seem counter-intuitive to use the real
-labels as GT labels for the loss function, but this allows us to use the
-<span class="math">\(log(x)\)</span> part of the BCELoss (rather than the <span class="math">\(log(1-x)\)</span>
-part) which is exactly what we want.</p>
-<p>Finally, we will do some statistic reporting and at the end of each
-epoch we will push our fixed_noise batch through the generator to
-visually track the progress of G’s training. The training statistics
-reported are:</p>
+<div class="section" id="id11">
+<h3>학습<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h3>
+<p>드디어 최종입니다. GAN 프레임워크에 필요한 부분들은 모두 가졌으니,
+실제 모델을 학습시키는 방법을 알아보겠습니다. 주의를 기울일 것은, GAN을 학습시키는 건
+관례적인 기술들의 집합이기 때문에, 잘못된 하이퍼파라미터의 설정은
+모델의 학습을 망가뜨릴 수 있습니다. 무엇이 잘못되었는지 알아내는 것 조차도 힘들죠.
+그러한 이유로, 본 튜토리얼에서는 Goodfellow의 논문에서 서술된 Algorithm 1을 기반으로,
+<a class="reference external" href="https://github.com/soumith/ganhacks">ganhacks</a> 에서 사용된 몇가지 괜찮은 테크닉들을
+더할 것입니다. 앞서 몇번 설명했지만, 우리의 의도는 “진짜 혹은 가짜 이미지를 구성”하고,
+<span class="math">\(logD(G(z))\)</span> 를 최대화하는 G의 목적함수를 최적화 시키는 겁니다. 학습과정은 크게 두가지로 나눕니다.
+Part 1은 구분자를, Part 2는 생성자를 업데이트하는 과정입니다.</p>
+<p><strong>Part 1 - 구분자의 학습</strong></p>
+<p>구분자의 목적은 주어진 입력값이 진짜인지 가짜인지 판별하는 것임을 상기합시다.
+Goodfellow의 말을 빌리자면, 구분자는 “변화도(gradient)를 상승(ascending)시키며 훈련”하게 됩니다.
+실전적으로 얘기하면, <span class="math">\(log(D(x)) + log(1-D(G(z)))\)</span> 를 최대화시키는 것과 같습니다.
+ganhacks에서 미니 배치(mini-batch)를 분리하여 사용한 개념을 가져와서,
+우리 역시 두가지 스텝으로 분리해 계산을 해보겠습니다. 먼저,
+진짜 데이터들로만 이루어진 배치를 만들어 <span class="math">\(D\)</span> 에 통과시킵니다. 그 출력값으로 (<span class="math">\(log(D(x))\)</span>) 의 손실값을 계산하고,
+역전파 과정에서의 변화도들을 계산합니다. 여기까지가 첫번째 스텝입니다. 두번째 스텝에서는, 오로지 가짜 데이터들로만
+이루어진 배치를 만들어 <span class="math">\(D\)</span> 에 통과시키고, 그 출력값으로 (<span class="math">\(log(1-D(G(z)))\)</span>) 의 손실값을 계산해
+역전파 변화도를 구하면 됩니다. 이때 두가지 스텝에서 나오는 변화도들은 <em>축적(accumulate)</em> 시켜야 합니다.
+변화도까지 구했으니, 이제 옵티마이저를 사용해야겠죠. 파이토치의 함수를 호출해주면 알아서 변화도가 적용될겁니다.</p>
+<p><strong>Part 2 - 생성자의 학습</strong></p>
+<p>오리지널 GAN 논문에 명시되어 있듯, 생성자는 <span class="math">\(log(1-D(G(z)))\)</span> 을 최소화시키는 방향으로 학습합니다.
+하지만 이 방식은 충분한 변화도를 제공하지 못함을 Goodfellow가 보여줬습니다. 특히 학습초기에는 더욱 문제를 일으키죠.
+이를 해결하기 위해 <span class="math">\(log(D(G(z)))\)</span> 를 최대화 하는 방식으로 바꿔서 학습을 하겠습니다. 코드에서 구현하기
+위해서는 : Part 1에서 한대로 구분자를 이용해 생성자의 출력값을 판별해주고, <em>진짜 라벨값</em> 을 이용해 G의 손실값을 구해줍니다.
+그러면 구해진 손실값으로 변화도를 구하고, 최종적으로는 옵티마이저를 이용해 G의 가중치들을 업데이트시켜주면 됩니다.
+언뜻 볼때는, 생성자가 만들어낸 <em>가짜</em> 이미지에 <em>진짜</em> 라벨을 사용하는것이 직관적으로 위배가 될테지만, 이렇게 라벨을
+바꿈으로써 <span class="math">\(log(x)\)</span> 라는 BCELoss의 일부분을 사용할 수 있게 합니다 (앞서 우리는 BCELoss에서 라벨을 이용해 원하는 로그 계산
+요소를 고를 수 있음을 알아봤습니다).</p>
+<p>마무리로 G의 훈련 상태를 알아보기 위하여, 몇가지 통계적인 수치들과, fixed_noise를 통과시킨
+결과를 화면에 출력하는 코드를 추가하겠습니다. 이때 통계적인 수치들이라 함은 :</p>
 <ul class="simple">
-<li><strong>Loss_D</strong> - discriminator loss calculated as the sum of losses for
-the all real and all fake batches (<span class="math">\(log(D(x)) + log(1 - D(G(z)))\)</span>).</li>
-<li><strong>Loss_G</strong> - generator loss calculated as <span class="math">\(log(D(G(z)))\)</span></li>
-<li><strong>D(x)</strong> - the average output (across the batch) of the discriminator
-for the all real batch. This should start close to 1 then
-theoretically converge to 0.5 when G gets better. Think about why
-this is.</li>
-<li><strong>D(G(z))</strong> - average discriminator outputs for the all fake batch.
-The first number is before D is updated and the second number is
-after D is updated. These numbers should start near 0 and converge to
-0.5 as G gets better. Think about why this is.</li>
+<li><strong>Loss_D</strong> - 진짜 데이터와 가짜 데이터들 모두에서 구해진 손실값. (<span class="math">\(log(D(x)) + log(1 - D(G(z)))\)</span>).</li>
+<li><strong>Loss_G</strong> - 생성자의 손실값. <span class="math">\(log(D(G(z)))\)</span></li>
+<li><strong>D(x)</strong> - 구분자가 데이터를 판별한 확률값입니다. 처음에는 1에 가까운 값이다가,
+G가 학습할수록 0.5값에 수렴하게 됩니다.</li>
+<li><strong>D(G(z))</strong> - 가짜데이터들에 대한 구분자의 출력값입니다. 처음에는 0에 가까운 값이다가,
+G가 학습할수록 0.5에 수렴하게 됩니다</li>
 </ul>
-<p><strong>Note:</strong> This step might take a while, depending on how many epochs you
-run and if you removed some data from the dataset.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Training Loop</span>
+<p><strong>Note:</strong> 이후의 과정은 epoch의 수와 데이터의 수에 따라 시간이 좀 걸릴 수 있습니다</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># 학습 과정</span>
 
-<span class="c1"># Lists to keep track of progress</span>
+<span class="c1"># 학습상태를 체크하기 위해 손실값들을 저장합니다</span>
 <span class="n">img_list</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="n">G_losses</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="n">D_losses</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="n">iters</span> <span class="o">=</span> <span class="mi">0</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Starting Training Loop...&quot;</span><span class="p">)</span>
-<span class="c1"># For each epoch</span>
+<span class="c1"># 에폭(epoch) 반복</span>
 <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_epochs</span><span class="p">):</span>
-    <span class="c1"># For each batch in the dataloader</span>
+    <span class="c1"># 한 에폭 내에서 배치 반복</span>
     <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">dataloader</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span>
 
         <span class="c1">############################</span>
-        <span class="c1"># (1) Update D network: maximize log(D(x)) + log(1 - D(G(z)))</span>
+        <span class="c1"># (1) D 신경망을 업데이트 합니다: log(D(x)) + log(1 - D(G(z)))를 최대화 합니다</span>
         <span class="c1">###########################</span>
-        <span class="c1">## Train with all-real batch</span>
+        <span class="c1">## 진짜 데이터들로 학습을 합니다</span>
         <span class="n">netD</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
-        <span class="c1"># Format batch</span>
+        <span class="c1"># 배치들의 사이즈나 사용할 디바이스에 맞게 조정합니다</span>
         <span class="n">real_cpu</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
         <span class="n">b_size</span> <span class="o">=</span> <span class="n">real_cpu</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-        <span class="n">label</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">b_size</span><span class="p">,),</span> <span class="n">real_label</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
-        <span class="c1"># Forward pass real batch through D</span>
+        <span class="n">label</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">b_size</span><span class="p">,),</span> <span class="n">real_label</span><span class="p">,</span>
+                           <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+        <span class="c1"># 진짜 데이터들로 이루어진 배치를 D에 통과시킵니다</span>
         <span class="n">output</span> <span class="o">=</span> <span class="n">netD</span><span class="p">(</span><span class="n">real_cpu</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-        <span class="c1"># Calculate loss on all-real batch</span>
+        <span class="c1"># 손실값을 구합니다</span>
         <span class="n">errD_real</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span>
-        <span class="c1"># Calculate gradients for D in backward pass</span>
+        <span class="c1"># 역전파의 과정에서 변화도를 계산합니다</span>
         <span class="n">errD_real</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
         <span class="n">D_x</span> <span class="o">=</span> <span class="n">output</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
 
-        <span class="c1">## Train with all-fake batch</span>
-        <span class="c1"># Generate batch of latent vectors</span>
+        <span class="c1">## 가짜 데이터들로 학습을 합니다</span>
+        <span class="c1"># 생성자에 사용할 잠재공간 벡터를 생성합니다</span>
         <span class="n">noise</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">b_size</span><span class="p">,</span> <span class="n">nz</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
-        <span class="c1"># Generate fake image batch with G</span>
+        <span class="c1"># G를 이용해 가짜 이미지를 생성합니다</span>
         <span class="n">fake</span> <span class="o">=</span> <span class="n">netG</span><span class="p">(</span><span class="n">noise</span><span class="p">)</span>
         <span class="n">label</span><span class="o">.</span><span class="n">fill_</span><span class="p">(</span><span class="n">fake_label</span><span class="p">)</span>
-        <span class="c1"># Classify all fake batch with D</span>
+        <span class="c1"># D를 이용해 데이터의 진위를 판별합니다</span>
         <span class="n">output</span> <span class="o">=</span> <span class="n">netD</span><span class="p">(</span><span class="n">fake</span><span class="o">.</span><span class="n">detach</span><span class="p">())</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-        <span class="c1"># Calculate D&#39;s loss on the all-fake batch</span>
+        <span class="c1"># D의 손실값을 계산합니다</span>
         <span class="n">errD_fake</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span>
-        <span class="c1"># Calculate the gradients for this batch, accumulated (summed) with previous gradients</span>
+        <span class="c1"># 역전파를 통해 변화도를 계산합니다. 이때 앞서 구한 변화도에 더합니다(accumulate)</span>
         <span class="n">errD_fake</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
         <span class="n">D_G_z1</span> <span class="o">=</span> <span class="n">output</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
-        <span class="c1"># Compute error of D as sum over the fake and the real batches</span>
+        <span class="c1"># 가짜 이미지와 진짜 이미지 모두에서 구한 손실값들을 더합니다</span>
+        <span class="c1"># 이때 errD는 역전파에서 사용되지 않고, 이후 학습 상태를 리포팅(reporting)할 때 사용합니다</span>
         <span class="n">errD</span> <span class="o">=</span> <span class="n">errD_real</span> <span class="o">+</span> <span class="n">errD_fake</span>
-        <span class="c1"># Update D</span>
+        <span class="c1"># D를 업데이트 합니다</span>
         <span class="n">optimizerD</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
 
         <span class="c1">############################</span>
-        <span class="c1"># (2) Update G network: maximize log(D(G(z)))</span>
+        <span class="c1"># (2) G 신경망을 업데이트 합니다: log(D(G(z)))를 최대화 합니다</span>
         <span class="c1">###########################</span>
         <span class="n">netG</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
-        <span class="n">label</span><span class="o">.</span><span class="n">fill_</span><span class="p">(</span><span class="n">real_label</span><span class="p">)</span>  <span class="c1"># fake labels are real for generator cost</span>
-        <span class="c1"># Since we just updated D, perform another forward pass of all-fake batch through D</span>
+        <span class="n">label</span><span class="o">.</span><span class="n">fill_</span><span class="p">(</span><span class="n">real_label</span><span class="p">)</span>  <span class="c1"># 생성자의 손실값을 구하기 위해 진짜 라벨을 이용할 겁니다</span>
+        <span class="c1"># 우리는 방금 D를 업데이트했기 때문에, D에 다시 가짜 데이터를 통과시킵니다.</span>
+        <span class="c1"># 이때 G는 업데이트되지 않았지만, D가 업데이트 되었기 때문에 앞선 손실값가 다른 값이 나오게 됩니다</span>
         <span class="n">output</span> <span class="o">=</span> <span class="n">netD</span><span class="p">(</span><span class="n">fake</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-        <span class="c1"># Calculate G&#39;s loss based on this output</span>
+        <span class="c1"># G의 손실값을 구합니다</span>
         <span class="n">errG</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span>
-        <span class="c1"># Calculate gradients for G</span>
+        <span class="c1"># G의 변화도를 계산합니다</span>
         <span class="n">errG</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
         <span class="n">D_G_z2</span> <span class="o">=</span> <span class="n">output</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
-        <span class="c1"># Update G</span>
+        <span class="c1"># G를 업데이트 합니다</span>
         <span class="n">optimizerG</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
 
-        <span class="c1"># Output training stats</span>
+        <span class="c1"># 훈련 상태를 출력합니다</span>
         <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">50</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;[</span><span class="si">%d</span><span class="s1">/</span><span class="si">%d</span><span class="s1">][</span><span class="si">%d</span><span class="s1">/</span><span class="si">%d</span><span class="s1">]</span><span class="se">\t</span><span class="s1">Loss_D: </span><span class="si">%.4f</span><span class="se">\t</span><span class="s1">Loss_G: </span><span class="si">%.4f</span><span class="se">\t</span><span class="s1">D(x): </span><span class="si">%.4f</span><span class="se">\t</span><span class="s1">D(G(z)): </span><span class="si">%.4f</span><span class="s1"> / </span><span class="si">%.4f</span><span class="s1">&#39;</span>
                   <span class="o">%</span> <span class="p">(</span><span class="n">epoch</span><span class="p">,</span> <span class="n">num_epochs</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataloader</span><span class="p">),</span>
                      <span class="n">errD</span><span class="o">.</span><span class="n">item</span><span class="p">(),</span> <span class="n">errG</span><span class="o">.</span><span class="n">item</span><span class="p">(),</span> <span class="n">D_x</span><span class="p">,</span> <span class="n">D_G_z1</span><span class="p">,</span> <span class="n">D_G_z2</span><span class="p">))</span>
 
-        <span class="c1"># Save Losses for plotting later</span>
+        <span class="c1"># 이후 그래프를 그리기 위해 손실값들을 저장해둡니다</span>
         <span class="n">G_losses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">errG</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
         <span class="n">D_losses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">errD</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
 
-        <span class="c1"># Check how the generator is doing by saving G&#39;s output on fixed_noise</span>
+        <span class="c1"># fixed_noise를 통과시킨 G의 출력값을 저장해둡니다</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">iters</span> <span class="o">%</span> <span class="mi">500</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> <span class="p">((</span><span class="n">epoch</span> <span class="o">==</span> <span class="n">num_epochs</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">i</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataloader</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)):</span>
             <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
                 <span class="n">fake</span> <span class="o">=</span> <span class="n">netG</span><span class="p">(</span><span class="n">fixed_noise</span><span class="p">)</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span>
@@ -1001,178 +939,177 @@ run and if you removed some data from the dataset.</p>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Starting Training Loop...
 [0/5][0/1583]   Loss_D: 2.0788  Loss_G: 4.4556  D(x): 0.4740    D(G(z)): 0.6160 / 0.0179
-[0/5][50/1583]  Loss_D: 0.1336  Loss_G: 22.5272 D(x): 0.9285    D(G(z)): 0.0000 / 0.0000
-[0/5][100/1583] Loss_D: 0.0266  Loss_G: 20.2746 D(x): 0.9813    D(G(z)): 0.0000 / 0.0000
-[0/5][150/1583] Loss_D: 0.7492  Loss_G: 8.2665  D(x): 0.9499    D(G(z)): 0.4083 / 0.0007
-[0/5][200/1583] Loss_D: 1.1057  Loss_G: 10.5362 D(x): 0.9890    D(G(z)): 0.5663 / 0.0002
-[0/5][250/1583] Loss_D: 0.9833  Loss_G: 4.1661  D(x): 0.8517    D(G(z)): 0.4622 / 0.0296
-[0/5][300/1583] Loss_D: 0.4451  Loss_G: 3.9256  D(x): 0.8050    D(G(z)): 0.1523 / 0.0333
-[0/5][350/1583] Loss_D: 0.6234  Loss_G: 4.7202  D(x): 0.7914    D(G(z)): 0.2665 / 0.0129
-[0/5][400/1583] Loss_D: 0.7334  Loss_G: 3.1430  D(x): 0.6325    D(G(z)): 0.0558 / 0.0967
-[0/5][450/1583] Loss_D: 1.3024  Loss_G: 8.5206  D(x): 0.9579    D(G(z)): 0.6092 / 0.0015
-[0/5][500/1583] Loss_D: 0.4118  Loss_G: 5.0914  D(x): 0.8110    D(G(z)): 0.1382 / 0.0124
-[0/5][550/1583] Loss_D: 0.4287  Loss_G: 4.4409  D(x): 0.8775    D(G(z)): 0.1814 / 0.0304
-[0/5][600/1583] Loss_D: 0.2518  Loss_G: 5.6852  D(x): 0.8792    D(G(z)): 0.0768 / 0.0076
-[0/5][650/1583] Loss_D: 0.6563  Loss_G: 3.2367  D(x): 0.7163    D(G(z)): 0.1460 / 0.0718
-[0/5][700/1583] Loss_D: 0.5622  Loss_G: 3.4976  D(x): 0.6625    D(G(z)): 0.0212 / 0.0538
-[0/5][750/1583] Loss_D: 0.4498  Loss_G: 3.7666  D(x): 0.8423    D(G(z)): 0.1844 / 0.0398
-[0/5][800/1583] Loss_D: 0.3247  Loss_G: 4.2201  D(x): 0.7891    D(G(z)): 0.0266 / 0.0278
-[0/5][850/1583] Loss_D: 0.9287  Loss_G: 6.0446  D(x): 0.9174    D(G(z)): 0.5042 / 0.0052
-[0/5][900/1583] Loss_D: 0.6508  Loss_G: 5.3319  D(x): 0.8469    D(G(z)): 0.3185 / 0.0104
-[0/5][950/1583] Loss_D: 0.4474  Loss_G: 4.4350  D(x): 0.7818    D(G(z)): 0.0987 / 0.0227
-[0/5][1000/1583]        Loss_D: 0.4437  Loss_G: 4.2447  D(x): 0.8914    D(G(z)): 0.2382 / 0.0241
-[0/5][1050/1583]        Loss_D: 0.7753  Loss_G: 2.7856  D(x): 0.6580    D(G(z)): 0.1928 / 0.1079
-[0/5][1100/1583]        Loss_D: 0.5990  Loss_G: 4.8332  D(x): 0.8506    D(G(z)): 0.2939 / 0.0143
-[0/5][1150/1583]        Loss_D: 0.4546  Loss_G: 4.1017  D(x): 0.8918    D(G(z)): 0.2585 / 0.0256
-[0/5][1200/1583]        Loss_D: 0.7750  Loss_G: 6.4102  D(x): 0.9427    D(G(z)): 0.4242 / 0.0040
-[0/5][1250/1583]        Loss_D: 0.5237  Loss_G: 3.2464  D(x): 0.7747    D(G(z)): 0.1665 / 0.0670
-[0/5][1300/1583]        Loss_D: 1.2842  Loss_G: 2.8973  D(x): 0.3641    D(G(z)): 0.0033 / 0.0959
-[0/5][1350/1583]        Loss_D: 0.3977  Loss_G: 3.3880  D(x): 0.8357    D(G(z)): 0.1462 / 0.0571
-[0/5][1400/1583]        Loss_D: 0.2759  Loss_G: 5.4215  D(x): 0.8934    D(G(z)): 0.1178 / 0.0107
-[0/5][1450/1583]        Loss_D: 0.4669  Loss_G: 4.1814  D(x): 0.8482    D(G(z)): 0.2123 / 0.0331
-[0/5][1500/1583]        Loss_D: 0.9602  Loss_G: 0.7192  D(x): 0.4938    D(G(z)): 0.0228 / 0.5820
-[0/5][1550/1583]        Loss_D: 0.4989  Loss_G: 2.3176  D(x): 0.7436    D(G(z)): 0.1301 / 0.1357
-[1/5][0/1583]   Loss_D: 0.4167  Loss_G: 4.6577  D(x): 0.9243    D(G(z)): 0.2526 / 0.0149
-[1/5][50/1583]  Loss_D: 0.7802  Loss_G: 5.3986  D(x): 0.8692    D(G(z)): 0.4000 / 0.0095
-[1/5][100/1583] Loss_D: 0.4008  Loss_G: 4.0453  D(x): 0.8492    D(G(z)): 0.1723 / 0.0316
-[1/5][150/1583] Loss_D: 0.3635  Loss_G: 3.5050  D(x): 0.8416    D(G(z)): 0.1367 / 0.0489
-[1/5][200/1583] Loss_D: 0.5444  Loss_G: 5.0018  D(x): 0.9116    D(G(z)): 0.3163 / 0.0119
-[1/5][250/1583] Loss_D: 0.8070  Loss_G: 5.2859  D(x): 0.9176    D(G(z)): 0.4469 / 0.0091
-[1/5][300/1583] Loss_D: 0.5557  Loss_G: 3.4713  D(x): 0.8345    D(G(z)): 0.2600 / 0.0445
-[1/5][350/1583] Loss_D: 0.6211  Loss_G: 1.8103  D(x): 0.6498    D(G(z)): 0.0868 / 0.2328
-[1/5][400/1583] Loss_D: 0.4145  Loss_G: 3.5382  D(x): 0.7724    D(G(z)): 0.1014 / 0.0436
-[1/5][450/1583] Loss_D: 0.5056  Loss_G: 3.6139  D(x): 0.8065    D(G(z)): 0.2058 / 0.0446
-[1/5][500/1583] Loss_D: 0.6913  Loss_G: 2.2856  D(x): 0.6015    D(G(z)): 0.0506 / 0.1526
-[1/5][550/1583] Loss_D: 0.7163  Loss_G: 4.2999  D(x): 0.8934    D(G(z)): 0.3854 / 0.0248
-[1/5][600/1583] Loss_D: 0.3654  Loss_G: 2.9540  D(x): 0.8280    D(G(z)): 0.1291 / 0.0774
-[1/5][650/1583] Loss_D: 0.8867  Loss_G: 5.3868  D(x): 0.9582    D(G(z)): 0.5120 / 0.0095
-[1/5][700/1583] Loss_D: 0.5530  Loss_G: 3.9142  D(x): 0.8905    D(G(z)): 0.3125 / 0.0320
-[1/5][750/1583] Loss_D: 1.3083  Loss_G: 5.7441  D(x): 0.9347    D(G(z)): 0.6290 / 0.0061
-[1/5][800/1583] Loss_D: 0.4518  Loss_G: 2.7797  D(x): 0.7773    D(G(z)): 0.1469 / 0.0876
-[1/5][850/1583] Loss_D: 1.2018  Loss_G: 1.1855  D(x): 0.4182    D(G(z)): 0.0758 / 0.3665
-[1/5][900/1583] Loss_D: 1.1658  Loss_G: 6.6148  D(x): 0.9456    D(G(z)): 0.6062 / 0.0035
-[1/5][950/1583] Loss_D: 0.5145  Loss_G: 3.2153  D(x): 0.8154    D(G(z)): 0.2320 / 0.0578
-[1/5][1000/1583]        Loss_D: 0.6238  Loss_G: 2.1119  D(x): 0.6231    D(G(z)): 0.0752 / 0.1564
-[1/5][1050/1583]        Loss_D: 0.7297  Loss_G: 4.5981  D(x): 0.8953    D(G(z)): 0.4198 / 0.0139
-[1/5][1100/1583]        Loss_D: 0.4853  Loss_G: 2.8517  D(x): 0.7488    D(G(z)): 0.1355 / 0.0864
-[1/5][1150/1583]        Loss_D: 0.5236  Loss_G: 2.2831  D(x): 0.7471    D(G(z)): 0.1554 / 0.1304
-[1/5][1200/1583]        Loss_D: 0.4797  Loss_G: 2.0469  D(x): 0.7269    D(G(z)): 0.0961 / 0.1705
-[1/5][1250/1583]        Loss_D: 0.3709  Loss_G: 2.5734  D(x): 0.7907    D(G(z)): 0.0983 / 0.1145
-[1/5][1300/1583]        Loss_D: 0.6252  Loss_G: 2.1771  D(x): 0.6074    D(G(z)): 0.0388 / 0.1431
-[1/5][1350/1583]        Loss_D: 0.7187  Loss_G: 2.6066  D(x): 0.7619    D(G(z)): 0.2994 / 0.1005
-[1/5][1400/1583]        Loss_D: 0.9418  Loss_G: 2.7760  D(x): 0.7008    D(G(z)): 0.3533 / 0.1025
-[1/5][1450/1583]        Loss_D: 0.8398  Loss_G: 4.2971  D(x): 0.9288    D(G(z)): 0.4857 / 0.0216
-[1/5][1500/1583]        Loss_D: 0.9696  Loss_G: 4.9069  D(x): 0.9356    D(G(z)): 0.5340 / 0.0108
-[1/5][1550/1583]        Loss_D: 1.2568  Loss_G: 5.1750  D(x): 0.9579    D(G(z)): 0.6383 / 0.0099
-[2/5][0/1583]   Loss_D: 0.3269  Loss_G: 2.4899  D(x): 0.8276    D(G(z)): 0.1129 / 0.1038
-[2/5][50/1583]  Loss_D: 0.9633  Loss_G: 4.3752  D(x): 0.9195    D(G(z)): 0.5408 / 0.0188
-[2/5][100/1583] Loss_D: 0.6153  Loss_G: 3.7183  D(x): 0.8588    D(G(z)): 0.3251 / 0.0363
-[2/5][150/1583] Loss_D: 0.8289  Loss_G: 3.0146  D(x): 0.7083    D(G(z)): 0.3172 / 0.0656
-[2/5][200/1583] Loss_D: 0.6439  Loss_G: 2.8851  D(x): 0.8312    D(G(z)): 0.3204 / 0.0844
-[2/5][250/1583] Loss_D: 0.7659  Loss_G: 0.9905  D(x): 0.5544    D(G(z)): 0.0578 / 0.4284
-[2/5][300/1583] Loss_D: 0.6736  Loss_G: 1.8612  D(x): 0.6882    D(G(z)): 0.2078 / 0.1865
-[2/5][350/1583] Loss_D: 0.7041  Loss_G: 2.9224  D(x): 0.8467    D(G(z)): 0.3675 / 0.0774
-[2/5][400/1583] Loss_D: 0.4252  Loss_G: 2.3332  D(x): 0.8295    D(G(z)): 0.1758 / 0.1255
-[2/5][450/1583] Loss_D: 1.0703  Loss_G: 4.7883  D(x): 0.9560    D(G(z)): 0.5998 / 0.0135
-[2/5][500/1583] Loss_D: 0.5131  Loss_G: 2.1348  D(x): 0.7332    D(G(z)): 0.1358 / 0.1500
-[2/5][550/1583] Loss_D: 0.6039  Loss_G: 4.1798  D(x): 0.9276    D(G(z)): 0.3640 / 0.0219
-[2/5][600/1583] Loss_D: 0.4488  Loss_G: 2.4636  D(x): 0.8042    D(G(z)): 0.1777 / 0.1126
-[2/5][650/1583] Loss_D: 0.8537  Loss_G: 1.0929  D(x): 0.5317    D(G(z)): 0.1059 / 0.4079
-[2/5][700/1583] Loss_D: 0.6275  Loss_G: 2.1596  D(x): 0.7306    D(G(z)): 0.2190 / 0.1512
-[2/5][750/1583] Loss_D: 0.6228  Loss_G: 2.1126  D(x): 0.7437    D(G(z)): 0.2277 / 0.1548
-[2/5][800/1583] Loss_D: 0.5282  Loss_G: 3.6157  D(x): 0.8734    D(G(z)): 0.2963 / 0.0374
-[2/5][850/1583] Loss_D: 0.8211  Loss_G: 4.1300  D(x): 0.9297    D(G(z)): 0.4773 / 0.0230
-[2/5][900/1583] Loss_D: 0.4782  Loss_G: 2.5613  D(x): 0.8577    D(G(z)): 0.2492 / 0.0948
-[2/5][950/1583] Loss_D: 0.5194  Loss_G: 2.6385  D(x): 0.7350    D(G(z)): 0.1440 / 0.0977
-[2/5][1000/1583]        Loss_D: 0.7086  Loss_G: 1.3156  D(x): 0.6097    D(G(z)): 0.1152 / 0.3262
-[2/5][1050/1583]        Loss_D: 1.0278  Loss_G: 1.0475  D(x): 0.4457    D(G(z)): 0.0702 / 0.3937
-[2/5][1100/1583]        Loss_D: 0.6801  Loss_G: 3.4944  D(x): 0.9040    D(G(z)): 0.4021 / 0.0399
-[2/5][1150/1583]        Loss_D: 0.5038  Loss_G: 2.8505  D(x): 0.8282    D(G(z)): 0.2423 / 0.0758
-[2/5][1200/1583]        Loss_D: 0.7763  Loss_G: 4.4848  D(x): 0.9567    D(G(z)): 0.4802 / 0.0151
-[2/5][1250/1583]        Loss_D: 0.3958  Loss_G: 2.4774  D(x): 0.7554    D(G(z)): 0.0778 / 0.1098
-[2/5][1300/1583]        Loss_D: 0.7848  Loss_G: 3.9343  D(x): 0.9109    D(G(z)): 0.4609 / 0.0270
-[2/5][1350/1583]        Loss_D: 0.5626  Loss_G: 2.0432  D(x): 0.7635    D(G(z)): 0.2189 / 0.1635
-[2/5][1400/1583]        Loss_D: 0.5218  Loss_G: 3.2172  D(x): 0.8507    D(G(z)): 0.2674 / 0.0539
-[2/5][1450/1583]        Loss_D: 0.6594  Loss_G: 2.2018  D(x): 0.6847    D(G(z)): 0.1893 / 0.1443
-[2/5][1500/1583]        Loss_D: 0.8448  Loss_G: 3.7127  D(x): 0.9438    D(G(z)): 0.4740 / 0.0407
-[2/5][1550/1583]        Loss_D: 0.9594  Loss_G: 4.8205  D(x): 0.9327    D(G(z)): 0.5331 / 0.0135
-[3/5][0/1583]   Loss_D: 0.4645  Loss_G: 3.6827  D(x): 0.9257    D(G(z)): 0.2967 / 0.0374
-[3/5][50/1583]  Loss_D: 0.5229  Loss_G: 1.6820  D(x): 0.7499    D(G(z)): 0.1713 / 0.2169
-[3/5][100/1583] Loss_D: 0.4587  Loss_G: 3.1557  D(x): 0.8646    D(G(z)): 0.2513 / 0.0505
-[3/5][150/1583] Loss_D: 1.3468  Loss_G: 5.3924  D(x): 0.9312    D(G(z)): 0.6497 / 0.0090
-[3/5][200/1583] Loss_D: 0.7547  Loss_G: 0.9608  D(x): 0.5619    D(G(z)): 0.0978 / 0.4176
-[3/5][250/1583] Loss_D: 1.1100  Loss_G: 5.7571  D(x): 0.9576    D(G(z)): 0.5875 / 0.0052
-[3/5][300/1583] Loss_D: 0.5958  Loss_G: 1.9221  D(x): 0.7451    D(G(z)): 0.2216 / 0.1834
-[3/5][350/1583] Loss_D: 0.5294  Loss_G: 2.6801  D(x): 0.8469    D(G(z)): 0.2724 / 0.0908
-[3/5][400/1583] Loss_D: 0.5071  Loss_G: 2.8087  D(x): 0.8322    D(G(z)): 0.2452 / 0.0823
-[3/5][450/1583] Loss_D: 1.8875  Loss_G: 4.3944  D(x): 0.9656    D(G(z)): 0.7894 / 0.0209
-[3/5][500/1583] Loss_D: 1.5372  Loss_G: 0.3911  D(x): 0.2885    D(G(z)): 0.0401 / 0.7129
-[3/5][550/1583] Loss_D: 0.3835  Loss_G: 2.2864  D(x): 0.7878    D(G(z)): 0.1109 / 0.1243
-[3/5][600/1583] Loss_D: 0.8495  Loss_G: 1.5188  D(x): 0.5349    D(G(z)): 0.1004 / 0.2790
-[3/5][650/1583] Loss_D: 0.7227  Loss_G: 1.5969  D(x): 0.6248    D(G(z)): 0.1563 / 0.2487
-[3/5][700/1583] Loss_D: 0.3822  Loss_G: 2.6960  D(x): 0.7589    D(G(z)): 0.0774 / 0.0931
-[3/5][750/1583] Loss_D: 1.6458  Loss_G: 0.4031  D(x): 0.2806    D(G(z)): 0.0619 / 0.7083
-[3/5][800/1583] Loss_D: 0.4649  Loss_G: 2.3168  D(x): 0.7739    D(G(z)): 0.1579 / 0.1274
-[3/5][850/1583] Loss_D: 0.4297  Loss_G: 2.6595  D(x): 0.8620    D(G(z)): 0.2247 / 0.0911
-[3/5][900/1583] Loss_D: 0.5648  Loss_G: 3.4247  D(x): 0.8919    D(G(z)): 0.3288 / 0.0453
-[3/5][950/1583] Loss_D: 0.9022  Loss_G: 4.1500  D(x): 0.9675    D(G(z)): 0.5299 / 0.0241
-[3/5][1000/1583]        Loss_D: 0.7273  Loss_G: 1.3219  D(x): 0.5830    D(G(z)): 0.0862 / 0.3240
-[3/5][1050/1583]        Loss_D: 0.7459  Loss_G: 2.6255  D(x): 0.7336    D(G(z)): 0.3009 / 0.0950
-[3/5][1100/1583]        Loss_D: 0.3658  Loss_G: 2.4440  D(x): 0.8405    D(G(z)): 0.1553 / 0.1106
-[3/5][1150/1583]        Loss_D: 0.5393  Loss_G: 1.5364  D(x): 0.6876    D(G(z)): 0.1039 / 0.2699
-[3/5][1200/1583]        Loss_D: 0.6045  Loss_G: 1.2186  D(x): 0.6268    D(G(z)): 0.0754 / 0.3380
-[3/5][1250/1583]        Loss_D: 0.4764  Loss_G: 2.6400  D(x): 0.7688    D(G(z)): 0.1604 / 0.0976
-[3/5][1300/1583]        Loss_D: 0.6522  Loss_G: 2.1386  D(x): 0.5933    D(G(z)): 0.0417 / 0.1622
-[3/5][1350/1583]        Loss_D: 0.4834  Loss_G: 2.2380  D(x): 0.7592    D(G(z)): 0.1511 / 0.1402
-[3/5][1400/1583]        Loss_D: 1.7650  Loss_G: 4.7679  D(x): 0.9487    D(G(z)): 0.7550 / 0.0183
-[3/5][1450/1583]        Loss_D: 0.7952  Loss_G: 1.4233  D(x): 0.5732    D(G(z)): 0.1430 / 0.2860
-[3/5][1500/1583]        Loss_D: 1.1718  Loss_G: 4.9506  D(x): 0.9008    D(G(z)): 0.5877 / 0.0122
-[3/5][1550/1583]        Loss_D: 1.1179  Loss_G: 4.6989  D(x): 0.9366    D(G(z)): 0.5862 / 0.0153
-[4/5][0/1583]   Loss_D: 0.6271  Loss_G: 2.7378  D(x): 0.8744    D(G(z)): 0.3476 / 0.0902
-[4/5][50/1583]  Loss_D: 0.4784  Loss_G: 2.9202  D(x): 0.8782    D(G(z)): 0.2710 / 0.0708
-[4/5][100/1583] Loss_D: 1.5556  Loss_G: 0.2723  D(x): 0.2824    D(G(z)): 0.0301 / 0.7841
-[4/5][150/1583] Loss_D: 0.5324  Loss_G: 2.8927  D(x): 0.8205    D(G(z)): 0.2557 / 0.0696
-[4/5][200/1583] Loss_D: 0.5482  Loss_G: 2.9173  D(x): 0.8320    D(G(z)): 0.2749 / 0.0683
-[4/5][250/1583] Loss_D: 0.9050  Loss_G: 4.3739  D(x): 0.8907    D(G(z)): 0.4764 / 0.0219
-[4/5][300/1583] Loss_D: 0.4904  Loss_G: 1.4676  D(x): 0.7090    D(G(z)): 0.1104 / 0.2742
-[4/5][350/1583] Loss_D: 1.1761  Loss_G: 4.6398  D(x): 0.9273    D(G(z)): 0.5898 / 0.0160
-[4/5][400/1583] Loss_D: 0.6014  Loss_G: 3.8863  D(x): 0.8690    D(G(z)): 0.3262 / 0.0312
-[4/5][450/1583] Loss_D: 0.3564  Loss_G: 3.0078  D(x): 0.8830    D(G(z)): 0.1932 / 0.0622
-[4/5][500/1583] Loss_D: 1.2559  Loss_G: 1.0207  D(x): 0.3642    D(G(z)): 0.0350 / 0.4202
-[4/5][550/1583] Loss_D: 0.7063  Loss_G: 1.4607  D(x): 0.6231    D(G(z)): 0.1358 / 0.2750
-[4/5][600/1583] Loss_D: 1.4609  Loss_G: 0.5332  D(x): 0.2988    D(G(z)): 0.0280 / 0.6272
-[4/5][650/1583] Loss_D: 1.0419  Loss_G: 3.8496  D(x): 0.9362    D(G(z)): 0.5639 / 0.0324
-[4/5][700/1583] Loss_D: 0.4620  Loss_G: 3.2759  D(x): 0.8901    D(G(z)): 0.2667 / 0.0487
-[4/5][750/1583] Loss_D: 0.5502  Loss_G: 3.5101  D(x): 0.9235    D(G(z)): 0.3416 / 0.0411
-[4/5][800/1583] Loss_D: 0.4685  Loss_G: 3.0002  D(x): 0.8462    D(G(z)): 0.2315 / 0.0659
-[4/5][850/1583] Loss_D: 1.7398  Loss_G: 0.8499  D(x): 0.2477    D(G(z)): 0.0405 / 0.4943
-[4/5][900/1583] Loss_D: 0.6515  Loss_G: 4.3214  D(x): 0.9373    D(G(z)): 0.4073 / 0.0189
-[4/5][950/1583] Loss_D: 1.1889  Loss_G: 4.0372  D(x): 0.9065    D(G(z)): 0.6022 / 0.0258
-[4/5][1000/1583]        Loss_D: 0.5309  Loss_G: 4.1275  D(x): 0.8941    D(G(z)): 0.3120 / 0.0235
-[4/5][1050/1583]        Loss_D: 0.6024  Loss_G: 1.8101  D(x): 0.6742    D(G(z)): 0.1406 / 0.2011
-[4/5][1100/1583]        Loss_D: 0.3694  Loss_G: 2.5308  D(x): 0.8702    D(G(z)): 0.1857 / 0.1044
-[4/5][1150/1583]        Loss_D: 0.6418  Loss_G: 2.6591  D(x): 0.7792    D(G(z)): 0.2862 / 0.0909
-[4/5][1200/1583]        Loss_D: 0.3701  Loss_G: 2.3141  D(x): 0.8281    D(G(z)): 0.1429 / 0.1279
-[4/5][1250/1583]        Loss_D: 0.6509  Loss_G: 4.2568  D(x): 0.9370    D(G(z)): 0.4096 / 0.0201
-[4/5][1300/1583]        Loss_D: 1.3589  Loss_G: 4.2329  D(x): 0.9476    D(G(z)): 0.6523 / 0.0281
-[4/5][1350/1583]        Loss_D: 1.3444  Loss_G: 4.6466  D(x): 0.9467    D(G(z)): 0.6599 / 0.0160
-[4/5][1400/1583]        Loss_D: 1.9402  Loss_G: 4.5664  D(x): 0.9274    D(G(z)): 0.7805 / 0.0231
-[4/5][1450/1583]        Loss_D: 0.5117  Loss_G: 2.0471  D(x): 0.7700    D(G(z)): 0.1906 / 0.1595
-[4/5][1500/1583]        Loss_D: 0.4292  Loss_G: 2.6322  D(x): 0.8099    D(G(z)): 0.1749 / 0.0981
-[4/5][1550/1583]        Loss_D: 0.3763  Loss_G: 2.8171  D(x): 0.8315    D(G(z)): 0.1532 / 0.0757
+[0/5][50/1583]  Loss_D: 2.2930  Loss_G: 21.5609 D(x): 0.9712    D(G(z)): 0.8273 / 0.0000
+[0/5][100/1583] Loss_D: 0.2121  Loss_G: 28.5835 D(x): 0.8997    D(G(z)): 0.0000 / 0.0000
+[0/5][150/1583] Loss_D: 2.5595  Loss_G: 19.7542 D(x): 0.9621    D(G(z)): 0.8543 / 0.0000
+[0/5][200/1583] Loss_D: 0.2928  Loss_G: 4.1767  D(x): 0.8354    D(G(z)): 0.0549 / 0.0235
+[0/5][250/1583] Loss_D: 0.3301  Loss_G: 2.9303  D(x): 0.8566    D(G(z)): 0.1124 / 0.0678
+[0/5][300/1583] Loss_D: 0.5055  Loss_G: 4.0355  D(x): 0.9045    D(G(z)): 0.2791 / 0.0318
+[0/5][350/1583] Loss_D: 0.8370  Loss_G: 6.2336  D(x): 0.7827    D(G(z)): 0.3258 / 0.0068
+[0/5][400/1583] Loss_D: 1.3494  Loss_G: 7.9882  D(x): 0.8548    D(G(z)): 0.5951 / 0.0024
+[0/5][450/1583] Loss_D: 0.4705  Loss_G: 1.6221  D(x): 0.7394    D(G(z)): 0.0548 / 0.2796
+[0/5][500/1583] Loss_D: 0.5846  Loss_G: 7.7170  D(x): 0.9632    D(G(z)): 0.3754 / 0.0010
+[0/5][550/1583] Loss_D: 0.7568  Loss_G: 7.1703  D(x): 0.9023    D(G(z)): 0.4135 / 0.0021
+[0/5][600/1583] Loss_D: 0.3927  Loss_G: 4.4559  D(x): 0.7891    D(G(z)): 0.0802 / 0.0234
+[0/5][650/1583] Loss_D: 0.6154  Loss_G: 5.7018  D(x): 0.9172    D(G(z)): 0.3311 / 0.0078
+[0/5][700/1583] Loss_D: 0.4503  Loss_G: 4.3969  D(x): 0.7359    D(G(z)): 0.0201 / 0.0231
+[0/5][750/1583] Loss_D: 0.5381  Loss_G: 3.3158  D(x): 0.7518    D(G(z)): 0.1391 / 0.0636
+[0/5][800/1583] Loss_D: 0.7920  Loss_G: 2.6451  D(x): 0.6610    D(G(z)): 0.1900 / 0.1026
+[0/5][850/1583] Loss_D: 0.6866  Loss_G: 6.5501  D(x): 0.9289    D(G(z)): 0.4007 / 0.0029
+[0/5][900/1583] Loss_D: 0.4511  Loss_G: 3.3947  D(x): 0.7781    D(G(z)): 0.0947 / 0.0570
+[0/5][950/1583] Loss_D: 1.3426  Loss_G: 7.6450  D(x): 0.9297    D(G(z)): 0.6317 / 0.0010
+[0/5][1000/1583]        Loss_D: 0.4277  Loss_G: 4.3566  D(x): 0.9447    D(G(z)): 0.2735 / 0.0203
+[0/5][1050/1583]        Loss_D: 0.5892  Loss_G: 3.9574  D(x): 0.9505    D(G(z)): 0.3439 / 0.0408
+[0/5][1100/1583]        Loss_D: 1.5069  Loss_G: 2.5982  D(x): 0.3748    D(G(z)): 0.0192 / 0.1298
+[0/5][1150/1583]        Loss_D: 0.5497  Loss_G: 3.0445  D(x): 0.7159    D(G(z)): 0.1054 / 0.0737
+[0/5][1200/1583]        Loss_D: 0.7594  Loss_G: 7.0448  D(x): 0.9561    D(G(z)): 0.4344 / 0.0024
+[0/5][1250/1583]        Loss_D: 0.8960  Loss_G: 6.3316  D(x): 0.9239    D(G(z)): 0.4921 / 0.0036
+[0/5][1300/1583]        Loss_D: 0.3828  Loss_G: 3.3440  D(x): 0.8530    D(G(z)): 0.1435 / 0.0627
+[0/5][1350/1583]        Loss_D: 0.8514  Loss_G: 7.7650  D(x): 0.8799    D(G(z)): 0.4692 / 0.0009
+[0/5][1400/1583]        Loss_D: 0.7959  Loss_G: 7.4152  D(x): 0.9293    D(G(z)): 0.4639 / 0.0012
+[0/5][1450/1583]        Loss_D: 4.1326  Loss_G: 4.8515  D(x): 0.0531    D(G(z)): 0.0000 / 0.0358
+[0/5][1500/1583]        Loss_D: 0.5388  Loss_G: 4.2176  D(x): 0.8506    D(G(z)): 0.2594 / 0.0236
+[0/5][1550/1583]        Loss_D: 1.0070  Loss_G: 6.0083  D(x): 0.9426    D(G(z)): 0.5373 / 0.0056
+[1/5][0/1583]   Loss_D: 0.4135  Loss_G: 3.6423  D(x): 0.7920    D(G(z)): 0.0952 / 0.0469
+[1/5][50/1583]  Loss_D: 0.5044  Loss_G: 2.5438  D(x): 0.7421    D(G(z)): 0.1313 / 0.1191
+[1/5][100/1583] Loss_D: 0.4006  Loss_G: 2.9416  D(x): 0.7618    D(G(z)): 0.0718 / 0.0809
+[1/5][150/1583] Loss_D: 0.5780  Loss_G: 3.0789  D(x): 0.7116    D(G(z)): 0.1251 / 0.0767
+[1/5][200/1583] Loss_D: 0.5346  Loss_G: 3.0967  D(x): 0.7758    D(G(z)): 0.1892 / 0.0767
+[1/5][250/1583] Loss_D: 0.5574  Loss_G: 2.3892  D(x): 0.6618    D(G(z)): 0.0359 / 0.1546
+[1/5][300/1583] Loss_D: 1.6095  Loss_G: 7.2454  D(x): 0.9701    D(G(z)): 0.7042 / 0.0025
+[1/5][350/1583] Loss_D: 0.4145  Loss_G: 4.6013  D(x): 0.8881    D(G(z)): 0.2054 / 0.0215
+[1/5][400/1583] Loss_D: 0.5692  Loss_G: 2.3989  D(x): 0.6870    D(G(z)): 0.0866 / 0.1274
+[1/5][450/1583] Loss_D: 0.6928  Loss_G: 5.9100  D(x): 0.9363    D(G(z)): 0.4047 / 0.0052
+[1/5][500/1583] Loss_D: 0.5386  Loss_G: 5.2747  D(x): 0.9250    D(G(z)): 0.3098 / 0.0123
+[1/5][550/1583] Loss_D: 0.4556  Loss_G: 4.5272  D(x): 0.9273    D(G(z)): 0.2854 / 0.0175
+[1/5][600/1583] Loss_D: 0.5686  Loss_G: 3.3821  D(x): 0.7139    D(G(z)): 0.1036 / 0.0587
+[1/5][650/1583] Loss_D: 0.3692  Loss_G: 3.2576  D(x): 0.8381    D(G(z)): 0.1457 / 0.0564
+[1/5][700/1583] Loss_D: 0.6217  Loss_G: 3.0664  D(x): 0.7945    D(G(z)): 0.2629 / 0.0626
+[1/5][750/1583] Loss_D: 0.5884  Loss_G: 2.3483  D(x): 0.7006    D(G(z)): 0.1334 / 0.1366
+[1/5][800/1583] Loss_D: 0.3834  Loss_G: 3.7985  D(x): 0.8850    D(G(z)): 0.1954 / 0.0377
+[1/5][850/1583] Loss_D: 1.0443  Loss_G: 5.1859  D(x): 0.9393    D(G(z)): 0.5519 / 0.0111
+[1/5][900/1583] Loss_D: 2.4334  Loss_G: 1.7420  D(x): 0.1618    D(G(z)): 0.0049 / 0.2912
+[1/5][950/1583] Loss_D: 0.6867  Loss_G: 3.9991  D(x): 0.8065    D(G(z)): 0.3169 / 0.0272
+[1/5][1000/1583]        Loss_D: 0.7597  Loss_G: 4.4330  D(x): 0.8696    D(G(z)): 0.3989 / 0.0192
+[1/5][1050/1583]        Loss_D: 0.4448  Loss_G: 2.6202  D(x): 0.7494    D(G(z)): 0.0923 / 0.0965
+[1/5][1100/1583]        Loss_D: 0.5243  Loss_G: 2.9443  D(x): 0.6731    D(G(z)): 0.0355 / 0.0756
+[1/5][1150/1583]        Loss_D: 0.4711  Loss_G: 3.2013  D(x): 0.8372    D(G(z)): 0.2048 / 0.0612
+[1/5][1200/1583]        Loss_D: 0.9691  Loss_G: 1.4335  D(x): 0.4674    D(G(z)): 0.0182 / 0.3085
+[1/5][1250/1583]        Loss_D: 0.4603  Loss_G: 4.1385  D(x): 0.8937    D(G(z)): 0.2635 / 0.0263
+[1/5][1300/1583]        Loss_D: 0.9872  Loss_G: 2.0366  D(x): 0.4984    D(G(z)): 0.1059 / 0.1925
+[1/5][1350/1583]        Loss_D: 0.7777  Loss_G: 1.3478  D(x): 0.5563    D(G(z)): 0.0689 / 0.3125
+[1/5][1400/1583]        Loss_D: 0.5378  Loss_G: 2.9356  D(x): 0.6795    D(G(z)): 0.0564 / 0.0771
+[1/5][1450/1583]        Loss_D: 0.3532  Loss_G: 3.8616  D(x): 0.8901    D(G(z)): 0.1919 / 0.0306
+[1/5][1500/1583]        Loss_D: 0.6919  Loss_G: 2.7892  D(x): 0.8284    D(G(z)): 0.3457 / 0.0802
+[1/5][1550/1583]        Loss_D: 0.6818  Loss_G: 3.7447  D(x): 0.8776    D(G(z)): 0.3718 / 0.0365
+[2/5][0/1583]   Loss_D: 0.5698  Loss_G: 3.9109  D(x): 0.8988    D(G(z)): 0.3404 / 0.0277
+[2/5][50/1583]  Loss_D: 1.1212  Loss_G: 4.8971  D(x): 0.9443    D(G(z)): 0.6005 / 0.0144
+[2/5][100/1583] Loss_D: 0.4483  Loss_G: 3.3940  D(x): 0.9343    D(G(z)): 0.2836 / 0.0493
+[2/5][150/1583] Loss_D: 0.5273  Loss_G: 2.8611  D(x): 0.8147    D(G(z)): 0.2411 / 0.0750
+[2/5][200/1583] Loss_D: 0.6876  Loss_G: 3.8274  D(x): 0.9299    D(G(z)): 0.4179 / 0.0307
+[2/5][250/1583] Loss_D: 0.7056  Loss_G: 3.5993  D(x): 0.8343    D(G(z)): 0.3566 / 0.0406
+[2/5][300/1583] Loss_D: 0.5325  Loss_G: 1.5807  D(x): 0.6879    D(G(z)): 0.0977 / 0.2462
+[2/5][350/1583] Loss_D: 0.5484  Loss_G: 2.1188  D(x): 0.6557    D(G(z)): 0.0722 / 0.1528
+[2/5][400/1583] Loss_D: 0.5407  Loss_G: 2.6284  D(x): 0.8143    D(G(z)): 0.2418 / 0.0983
+[2/5][450/1583] Loss_D: 0.5372  Loss_G: 2.8273  D(x): 0.8166    D(G(z)): 0.2527 / 0.0773
+[2/5][500/1583] Loss_D: 0.4514  Loss_G: 3.2169  D(x): 0.8381    D(G(z)): 0.2176 / 0.0572
+[2/5][550/1583] Loss_D: 0.4242  Loss_G: 2.7711  D(x): 0.8205    D(G(z)): 0.1806 / 0.0803
+[2/5][600/1583] Loss_D: 0.4653  Loss_G: 2.3516  D(x): 0.8075    D(G(z)): 0.1898 / 0.1245
+[2/5][650/1583] Loss_D: 0.8745  Loss_G: 0.7047  D(x): 0.5276    D(G(z)): 0.0966 / 0.5452
+[2/5][700/1583] Loss_D: 0.5128  Loss_G: 3.1893  D(x): 0.8319    D(G(z)): 0.2521 / 0.0522
+[2/5][750/1583] Loss_D: 1.4986  Loss_G: 4.3768  D(x): 0.7493    D(G(z)): 0.6388 / 0.0201
+[2/5][800/1583] Loss_D: 0.7576  Loss_G: 4.5175  D(x): 0.9158    D(G(z)): 0.4366 / 0.0180
+[2/5][850/1583] Loss_D: 0.3435  Loss_G: 3.1931  D(x): 0.8587    D(G(z)): 0.1546 / 0.0553
+[2/5][900/1583] Loss_D: 3.3697  Loss_G: 8.1763  D(x): 0.9957    D(G(z)): 0.9472 / 0.0006
+[2/5][950/1583] Loss_D: 0.5261  Loss_G: 2.5220  D(x): 0.7978    D(G(z)): 0.2258 / 0.1020
+[2/5][1000/1583]        Loss_D: 0.7368  Loss_G: 2.9868  D(x): 0.7871    D(G(z)): 0.3515 / 0.0645
+[2/5][1050/1583]        Loss_D: 0.6216  Loss_G: 3.9985  D(x): 0.8663    D(G(z)): 0.3453 / 0.0258
+[2/5][1100/1583]        Loss_D: 0.4432  Loss_G: 3.3995  D(x): 0.9026    D(G(z)): 0.2664 / 0.0417
+[2/5][1150/1583]        Loss_D: 0.7553  Loss_G: 4.4721  D(x): 0.9083    D(G(z)): 0.4423 / 0.0161
+[2/5][1200/1583]        Loss_D: 0.4380  Loss_G: 2.2786  D(x): 0.8181    D(G(z)): 0.1874 / 0.1242
+[2/5][1250/1583]        Loss_D: 0.4837  Loss_G: 2.0693  D(x): 0.7304    D(G(z)): 0.1269 / 0.1605
+[2/5][1300/1583]        Loss_D: 0.7050  Loss_G: 4.2499  D(x): 0.9086    D(G(z)): 0.4242 / 0.0193
+[2/5][1350/1583]        Loss_D: 0.5115  Loss_G: 2.2213  D(x): 0.7905    D(G(z)): 0.2064 / 0.1418
+[2/5][1400/1583]        Loss_D: 1.1635  Loss_G: 4.8744  D(x): 0.9489    D(G(z)): 0.6108 / 0.0111
+[2/5][1450/1583]        Loss_D: 0.8962  Loss_G: 5.0924  D(x): 0.9324    D(G(z)): 0.5223 / 0.0091
+[2/5][1500/1583]        Loss_D: 0.8622  Loss_G: 0.6770  D(x): 0.5341    D(G(z)): 0.1082 / 0.5427
+[2/5][1550/1583]        Loss_D: 0.4694  Loss_G: 3.5047  D(x): 0.8972    D(G(z)): 0.2800 / 0.0405
+[3/5][0/1583]   Loss_D: 0.5920  Loss_G: 2.9256  D(x): 0.7924    D(G(z)): 0.2637 / 0.0717
+[3/5][50/1583]  Loss_D: 0.6670  Loss_G: 4.1536  D(x): 0.8926    D(G(z)): 0.3896 / 0.0225
+[3/5][100/1583] Loss_D: 0.9053  Loss_G: 4.6917  D(x): 0.8185    D(G(z)): 0.4562 / 0.0132
+[3/5][150/1583] Loss_D: 0.6166  Loss_G: 3.5527  D(x): 0.9166    D(G(z)): 0.3734 / 0.0394
+[3/5][200/1583] Loss_D: 0.6164  Loss_G: 2.0629  D(x): 0.6840    D(G(z)): 0.1585 / 0.1668
+[3/5][250/1583] Loss_D: 0.3607  Loss_G: 2.4837  D(x): 0.7951    D(G(z)): 0.1040 / 0.1119
+[3/5][300/1583] Loss_D: 0.7423  Loss_G: 1.8397  D(x): 0.5722    D(G(z)): 0.1056 / 0.2087
+[3/5][350/1583] Loss_D: 0.5967  Loss_G: 2.4349  D(x): 0.8394    D(G(z)): 0.3133 / 0.1050
+[3/5][400/1583] Loss_D: 0.5028  Loss_G: 2.5396  D(x): 0.7275    D(G(z)): 0.1297 / 0.1078
+[3/5][450/1583] Loss_D: 1.2095  Loss_G: 4.3340  D(x): 0.9184    D(G(z)): 0.6200 / 0.0205
+[3/5][500/1583] Loss_D: 0.5119  Loss_G: 2.2832  D(x): 0.7843    D(G(z)): 0.2065 / 0.1224
+[3/5][550/1583] Loss_D: 0.6834  Loss_G: 3.5339  D(x): 0.8860    D(G(z)): 0.3890 / 0.0423
+[3/5][600/1583] Loss_D: 0.6168  Loss_G: 2.7616  D(x): 0.7439    D(G(z)): 0.2359 / 0.0824
+[3/5][650/1583] Loss_D: 0.6064  Loss_G: 2.2165  D(x): 0.7137    D(G(z)): 0.1918 / 0.1485
+[3/5][700/1583] Loss_D: 0.8072  Loss_G: 3.9146  D(x): 0.9320    D(G(z)): 0.4720 / 0.0283
+[3/5][750/1583] Loss_D: 0.5469  Loss_G: 2.4994  D(x): 0.7913    D(G(z)): 0.2273 / 0.1068
+[3/5][800/1583] Loss_D: 0.6647  Loss_G: 1.6493  D(x): 0.5996    D(G(z)): 0.0711 / 0.2350
+[3/5][850/1583] Loss_D: 0.7835  Loss_G: 4.0205  D(x): 0.8805    D(G(z)): 0.4442 / 0.0248
+[3/5][900/1583] Loss_D: 0.4664  Loss_G: 2.2126  D(x): 0.7357    D(G(z)): 0.1067 / 0.1403
+[3/5][950/1583] Loss_D: 0.4230  Loss_G: 2.7478  D(x): 0.7579    D(G(z)): 0.1058 / 0.0820
+[3/5][1000/1583]        Loss_D: 0.5255  Loss_G: 2.3811  D(x): 0.7296    D(G(z)): 0.1527 / 0.1287
+[3/5][1050/1583]        Loss_D: 0.5840  Loss_G: 2.3618  D(x): 0.7435    D(G(z)): 0.2129 / 0.1216
+[3/5][1100/1583]        Loss_D: 0.5747  Loss_G: 2.8053  D(x): 0.8719    D(G(z)): 0.3123 / 0.0797
+[3/5][1150/1583]        Loss_D: 1.0238  Loss_G: 0.7899  D(x): 0.4459    D(G(z)): 0.0863 / 0.5008
+[3/5][1200/1583]        Loss_D: 0.6427  Loss_G: 1.3228  D(x): 0.6398    D(G(z)): 0.1278 / 0.3182
+[3/5][1250/1583]        Loss_D: 0.8415  Loss_G: 4.6374  D(x): 0.8855    D(G(z)): 0.4572 / 0.0158
+[3/5][1300/1583]        Loss_D: 1.0452  Loss_G: 1.2505  D(x): 0.4373    D(G(z)): 0.0485 / 0.3503
+[3/5][1350/1583]        Loss_D: 0.5688  Loss_G: 1.7658  D(x): 0.6640    D(G(z)): 0.0900 / 0.2180
+[3/5][1400/1583]        Loss_D: 0.8654  Loss_G: 1.5240  D(x): 0.4946    D(G(z)): 0.0608 / 0.2657
+[3/5][1450/1583]        Loss_D: 0.7480  Loss_G: 1.7208  D(x): 0.5809    D(G(z)): 0.0834 / 0.2172
+[3/5][1500/1583]        Loss_D: 0.8632  Loss_G: 2.9617  D(x): 0.8346    D(G(z)): 0.4464 / 0.0706
+[3/5][1550/1583]        Loss_D: 0.7050  Loss_G: 1.2279  D(x): 0.6227    D(G(z)): 0.1443 / 0.3363
+[4/5][0/1583]   Loss_D: 1.0428  Loss_G: 1.8572  D(x): 0.5592    D(G(z)): 0.2516 / 0.2209
+[4/5][50/1583]  Loss_D: 0.6335  Loss_G: 3.4674  D(x): 0.8930    D(G(z)): 0.3684 / 0.0417
+[4/5][100/1583] Loss_D: 2.6752  Loss_G: 5.4656  D(x): 0.9702    D(G(z)): 0.8807 / 0.0081
+[4/5][150/1583] Loss_D: 0.6388  Loss_G: 1.9690  D(x): 0.6731    D(G(z)): 0.1494 / 0.1834
+[4/5][200/1583] Loss_D: 0.8072  Loss_G: 3.3005  D(x): 0.8520    D(G(z)): 0.4230 / 0.0517
+[4/5][250/1583] Loss_D: 0.5047  Loss_G: 2.3790  D(x): 0.8163    D(G(z)): 0.2274 / 0.1274
+[4/5][300/1583] Loss_D: 0.6910  Loss_G: 2.8790  D(x): 0.8284    D(G(z)): 0.3564 / 0.0687
+[4/5][350/1583] Loss_D: 0.4474  Loss_G: 3.7237  D(x): 0.9127    D(G(z)): 0.2731 / 0.0321
+[4/5][400/1583] Loss_D: 0.7013  Loss_G: 2.0709  D(x): 0.6151    D(G(z)): 0.1057 / 0.1752
+[4/5][450/1583] Loss_D: 0.9719  Loss_G: 4.6762  D(x): 0.9595    D(G(z)): 0.5503 / 0.0153
+[4/5][500/1583] Loss_D: 1.1665  Loss_G: 4.9829  D(x): 0.9390    D(G(z)): 0.6055 / 0.0124
+[4/5][550/1583] Loss_D: 1.7712  Loss_G: 4.1393  D(x): 0.9221    D(G(z)): 0.7546 / 0.0280
+[4/5][600/1583] Loss_D: 0.4697  Loss_G: 2.4686  D(x): 0.7523    D(G(z)): 0.1307 / 0.1116
+[4/5][650/1583] Loss_D: 0.5001  Loss_G: 2.5939  D(x): 0.9107    D(G(z)): 0.3050 / 0.0939
+[4/5][700/1583] Loss_D: 0.8477  Loss_G: 1.1303  D(x): 0.4979    D(G(z)): 0.0632 / 0.3747
+[4/5][750/1583] Loss_D: 0.5618  Loss_G: 1.8943  D(x): 0.7097    D(G(z)): 0.1446 / 0.1990
+[4/5][800/1583] Loss_D: 0.6871  Loss_G: 4.0168  D(x): 0.9045    D(G(z)): 0.4077 / 0.0252
+[4/5][850/1583] Loss_D: 0.9617  Loss_G: 3.7546  D(x): 0.8349    D(G(z)): 0.4877 / 0.0397
+[4/5][900/1583] Loss_D: 0.4744  Loss_G: 2.1323  D(x): 0.7368    D(G(z)): 0.1198 / 0.1523
+[4/5][950/1583] Loss_D: 1.2430  Loss_G: 4.3982  D(x): 0.9019    D(G(z)): 0.6164 / 0.0203
+[4/5][1000/1583]        Loss_D: 0.5578  Loss_G: 3.3854  D(x): 0.8982    D(G(z)): 0.3310 / 0.0460
+[4/5][1050/1583]        Loss_D: 0.4438  Loss_G: 2.3844  D(x): 0.8405    D(G(z)): 0.2166 / 0.1105
+[4/5][1100/1583]        Loss_D: 0.4795  Loss_G: 2.5408  D(x): 0.8392    D(G(z)): 0.2282 / 0.1044
+[4/5][1150/1583]        Loss_D: 1.7211  Loss_G: 4.4120  D(x): 0.9836    D(G(z)): 0.7642 / 0.0197
+[4/5][1200/1583]        Loss_D: 0.6427  Loss_G: 1.7806  D(x): 0.6218    D(G(z)): 0.0707 / 0.2085
+[4/5][1250/1583]        Loss_D: 0.6531  Loss_G: 3.8371  D(x): 0.8877    D(G(z)): 0.3676 / 0.0325
+[4/5][1300/1583]        Loss_D: 1.5331  Loss_G: 5.3135  D(x): 0.9372    D(G(z)): 0.6960 / 0.0085
+[4/5][1350/1583]        Loss_D: 0.9353  Loss_G: 4.2256  D(x): 0.9416    D(G(z)): 0.5153 / 0.0222
+[4/5][1400/1583]        Loss_D: 0.7073  Loss_G: 4.1386  D(x): 0.9110    D(G(z)): 0.4103 / 0.0224
+[4/5][1450/1583]        Loss_D: 0.9528  Loss_G: 1.8534  D(x): 0.5661    D(G(z)): 0.2083 / 0.2093
+[4/5][1500/1583]        Loss_D: 0.6852  Loss_G: 3.2041  D(x): 0.7745    D(G(z)): 0.3052 / 0.0512
+[4/5][1550/1583]        Loss_D: 0.5872  Loss_G: 1.8966  D(x): 0.6404    D(G(z)): 0.0754 / 0.2024
 </pre></div>
 </div>
 </div>
 </div>
-<div class="section" id="results">
-<h2>Results<a class="headerlink" href="#results" title="Permalink to this headline">¶</a></h2>
-<p>Finally, lets check out how we did. Here, we will look at three
-different results. First, we will see how D and G’s losses changed
-during training. Second, we will visualize G’s output on the fixed_noise
-batch for every epoch. And third, we will look at a batch of real data
-next to a batch of fake data from G.</p>
-<p><strong>Loss versus training iteration</strong></p>
-<p>Below is a plot of D &amp; G’s losses versus training iterations.</p>
+<div class="section" id="id12">
+<h2>결과<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h2>
+<p>결과를 알아봅시다. 이 섹션에서는 총 세가지를 확인할겁니다.
+첫번째는 G와 D의 손실값들이 어떻게 변했는가, 두번째는 매 에폭마다
+fixed_noise를 이용해 G가 만들어낸 이미지들, 마지막은 학습이 끝난 G가 만들어낸 이미지와
+진짜이미지들의 비교입니다</p>
+<p><strong>학습하는 동안의 손실값들</strong></p>
+<p>아래는 D와 G의 손실값들을 그래프로 그린 모습입니다</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Generator and Discriminator Loss During Training&quot;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">G_losses</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;G&quot;</span><span class="p">)</span>
@@ -1184,11 +1121,9 @@ next to a batch of fake data from G.</p>
 </pre></div>
 </div>
 <img alt="../_images/sphx_glr_dcgan_faces_tutorial_002.png" class="sphx-glr-single-img" src="../_images/sphx_glr_dcgan_faces_tutorial_002.png" />
-<p><strong>Visualization of G’s progression</strong></p>
-<p>Remember how we saved the generator’s output on the fixed_noise batch
-after every epoch of training. Now, we can visualize the training
-progression of G with an animation. Press the play button to start the
-animation.</p>
+<p><strong>G의 학습 과정 시각화</strong></p>
+<p>매 에폭마다 fixed_noise를 이용해 생성자가 만들어낸 이미지를 저장한 것을 기억할겁니다.
+저장한 이미지들을애니메이션 형식으로 확인해 봅시다. play버튼을 누르면 애니매이션이 실행됩니다</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#%%capture</span>
 <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">8</span><span class="p">))</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
@@ -1199,20 +1134,19 @@ animation.</p>
 </pre></div>
 </div>
 <img alt="../_images/sphx_glr_dcgan_faces_tutorial_003.png" class="sphx-glr-single-img" src="../_images/sphx_glr_dcgan_faces_tutorial_003.png" />
-<p><strong>Real Images vs.&nbsp;Fake Images</strong></p>
-<p>Finally, lets take a look at some real images and fake images side by
-side.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Grab a batch of real images from the dataloader</span>
+<p><strong>진짜 이미지 vs.&nbsp;가짜 이미지</strong></p>
+<p>진짜 이미지들과 가짜 이미지들을 옆으로 두고 비교를 해봅시다</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># dataloader에서 진짜 데이터들을 가져옵니다</span>
 <span class="n">real_batch</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">dataloader</span><span class="p">))</span>
 
-<span class="c1"># Plot the real images</span>
+<span class="c1"># 진짜 이미지들을 화면에 출력합니다</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">15</span><span class="p">))</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Real Images&quot;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">vutils</span><span class="o">.</span><span class="n">make_grid</span><span class="p">(</span><span class="n">real_batch</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)[:</span><span class="mi">64</span><span class="p">],</span> <span class="n">padding</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">cpu</span><span class="p">(),(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">)))</span>
 
-<span class="c1"># Plot the fake images from the last epoch</span>
+<span class="c1"># 가짜 이미지들을 화면에 출력합니다</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Fake Images&quot;</span><span class="p">)</span>
@@ -1222,20 +1156,17 @@ side.</p>
 </div>
 <img alt="../_images/sphx_glr_dcgan_faces_tutorial_004.png" class="sphx-glr-single-img" src="../_images/sphx_glr_dcgan_faces_tutorial_004.png" />
 </div>
-<div class="section" id="where-to-go-next">
-<h2>Where to Go Next<a class="headerlink" href="#where-to-go-next" title="Permalink to this headline">¶</a></h2>
-<p>We have reached the end of our journey, but there are several places you
-could go from here. You could:</p>
+<div class="section" id="id13">
+<h2>이제 어디로 여행을 떠나볼까요?<a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h2>
+<p>드디어 DCGAN이 끝났습니다! 하지만 더 알아볼 것들이 많이 남아있죠.
+무엇을 더 시도해볼 수 있을까요?</p>
 <ul class="simple">
-<li>Train for longer to see how good the results get</li>
-<li>Modify this model to take a different dataset and possibly change the
-size of the images and the model architecture</li>
-<li>Check out some other cool GAN projects
-<a class="reference external" href="https://github.com/nashory/gans-awesome-applications">here</a></li>
-<li>Create GANs that generate
-<a class="reference external" href="https://deepmind.com/blog/wavenet-generative-model-raw-audio/">music</a></li>
+<li>결과물이 얼마나 더 좋아지는지 확인해보기 위해서 학습시간을 늘려볼 수 있습니다</li>
+<li>다른 데이터셋을 이용해 훈련시켜보거나, 이미지의 사이즈를 다르게 해보거나, 아키텍쳐의 구성을 바꿔볼 수도 있습니다</li>
+<li><a class="reference external" href="https://github.com/nashory/gans-awesome-applications">여기</a> 에서 더욱 멋진 GAN 프로젝트들을 찾을수도 있죠</li>
+<li><a class="reference external" href="https://deepmind.com/blog/wavenet-generative-model-raw-audio/">음악</a> 을 작곡하는 GAN도 만들 수 있습니다</li>
 </ul>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 24 minutes  9.762 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 21 minutes  57.317 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-beginner-dcgan-faces-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <a class="reference download internal" download="" href="../_downloads/515421514f2fadec9176f425f3adf76b/dcgan_faces_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">dcgan_faces_tutorial.py</span></code></a></div>
@@ -1254,7 +1185,7 @@ size of the images and the model architecture</li>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="vt_tutorial.html" class="btn btn-neutral float-right" title="Optimizing Vision Transformer Model for Deployment" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
+        <a href="vt_tutorial.html" class="btn btn-neutral float-right" title="배포를 위한 비전 트랜스포머(Vision Transformer) 모델 최적화하기" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
       
       
         <a href="fgsm_tutorial.html" class="btn btn-neutral" title="적대적 예제 생성(Adversarial Example Generation)" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
@@ -1300,24 +1231,25 @@ size of the images and the model architecture</li>
           <div class="pytorch-right-menu" id="pytorch-right-menu">
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
-<li><a class="reference internal" href="#">DCGAN Tutorial</a><ul>
-<li><a class="reference internal" href="#generative-adversarial-networks">Generative Adversarial Networks</a><ul>
-<li><a class="reference internal" href="#what-is-a-gan">What is a GAN?</a></li>
-<li><a class="reference internal" href="#what-is-a-dcgan">What is a DCGAN?</a></li>
+<li><a class="reference internal" href="#">DCGAN 튜토리얼</a><ul>
+<li><a class="reference internal" href="#id2">개요</a></li>
+<li><a class="reference internal" href="#generative-adversarial-networks">적대적 생성 신경망(Generative Adversarial Networks)</a><ul>
+<li><a class="reference internal" href="#gan">그래서 GAN이 뭘까요?</a></li>
+<li><a class="reference internal" href="#id3">그렇다면 DCGAN은 뭘까요?</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#inputs">Inputs</a></li>
-<li><a class="reference internal" href="#data">Data</a></li>
-<li><a class="reference internal" href="#implementation">Implementation</a><ul>
-<li><a class="reference internal" href="#weight-initialization">Weight Initialization</a></li>
-<li><a class="reference internal" href="#generator">Generator</a></li>
-<li><a class="reference internal" href="#discriminator">Discriminator</a></li>
-<li><a class="reference internal" href="#loss-functions-and-optimizers">Loss Functions and Optimizers</a></li>
-<li><a class="reference internal" href="#training">Training</a></li>
+<li><a class="reference internal" href="#id4">설정값</a></li>
+<li><a class="reference internal" href="#id5">데이터</a></li>
+<li><a class="reference internal" href="#id6">구현</a><ul>
+<li><a class="reference internal" href="#id7">가중치 초기화</a></li>
+<li><a class="reference internal" href="#id8">생성자</a></li>
+<li><a class="reference internal" href="#id9">구분자</a></li>
+<li><a class="reference internal" href="#id10">손실함수와 옵티마이저</a></li>
+<li><a class="reference internal" href="#id11">학습</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#results">Results</a></li>
-<li><a class="reference internal" href="#where-to-go-next">Where to Go Next</a></li>
+<li><a class="reference internal" href="#id12">결과</a></li>
+<li><a class="reference internal" href="#id13">이제 어디로 여행을 떠나볼까요?</a></li>
 </ul>
 </li>
 </ul>
