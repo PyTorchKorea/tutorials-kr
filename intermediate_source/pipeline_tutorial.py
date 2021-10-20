@@ -65,7 +65,7 @@ class Encoder(nn.Module):
         self.encoder.weight.data.uniform_(-initrange, initrange)
 
     def forward(self, src):
-        # Need (S, N) format for encoder.
+        # 인코더로 (S, N) 포맷이 필요합니다.
         src = src.t()
         src = self.encoder(src) * math.sqrt(self.ninp)
         return self.pos_encoder(src)
@@ -82,7 +82,7 @@ class Decoder(nn.Module):
         self.decoder.weight.data.uniform_(-initrange, initrange)
 
     def forward(self, inp):
-        # Need batch dimension first for output of pipeline.
+        # 파이프라인 결과물을 위해 먼저 배치 차원 필요합니다.
         return self.decoder(inp).permute(1, 0, 2)
 
 
@@ -165,11 +165,11 @@ test_data = data_process(test_iter)
 device = torch.device("cuda")
 
 def batchify(data, bsz):
-    # Divide the dataset into bsz parts.
+    # 데이터셋을 bsz 파트들로 나눕니다.
     nbatch = data.size(0) // bsz
-    # Trim off any extra elements that wouldn't cleanly fit (remainders).
+    # 깔끔하게 나누어 떨어지지 않는 추가적인 부분(나머지)은 잘라냅니다.
     data = data.narrow(0, 0, nbatch * bsz)
-    # Evenly divide the data across the bsz batches.
+    # 데이터를 bsz 배치들로 동일하게 나눕니다.
     data = data.view(bsz, -1).t().contiguous()
     return data.to(device)
 
@@ -203,7 +203,7 @@ def get_batch(source, i):
     seq_len = min(bptt, len(source) - 1 - i)
     data = source[i:i+seq_len]
     target = source[i+1:i+1+seq_len].view(-1)
-    # Need batch dimension first for pipeline parallelism.
+    # 파이프라인 병렬화를 위해 먼저 배치 차원이 필요합니다.
     return data.t(), target
 
 ######################################################################
@@ -234,12 +234,12 @@ def get_batch(source, i):
 #    allows the Pipe to work with only two partitions and avoid any
 #    cross-partition overheads.
 
-ntokens = len(vocab) # the size of vocabulary
-emsize = 4096 # embedding dimension
-nhid = 4096 # the dimension of the feedforward network model in nn.TransformerEncoder
-nlayers = 12 # the number of nn.TransformerEncoderLayer in nn.TransformerEncoder
-nhead = 16 # the number of heads in the multiheadattention models
-dropout = 0.2 # the dropout value
+ntokens = len(vocab) # 단어 사전(어휘집)의 크기
+emsize = 4096 # 임베딩 차원
+nhid = 4096 # nn.TransformerEncoder 에서 순전파(feedforward) 신경망 모델의 차원
+nlayers = 12 # nn.TransformerEncoder 내부의 nn.TransformerEncoderLayer 개수
+nhead = 16 # multiheadattention 모델의 헤드 개수
+dropout = 0.2 # dropout 값
 
 from torch.distributed import rpc
 tmpfile = tempfile.NamedTemporaryFile()
@@ -249,9 +249,9 @@ rpc.init_rpc(
     world_size=1,
     rpc_backend_options=rpc.TensorPipeRpcBackendOptions(
         init_method="file://{}".format(tmpfile.name),
-        # Specifying _transports and _channels is a workaround and we no longer
-        # will have to specify _transports and _channels for PyTorch
-        # versions >= 1.8.1
+        # _transports와 _channels를 지정하는 것이 해결 방법이며
+        # PyTorch 버전 >= 1.8.1 에서는 _transports와 _channels를 
+        # 지정하지 않아도 됩니다.
         _transports=["ibv", "uv"],
         _channels=["cuda_ipc", "cuda_basic"],
     )
@@ -260,11 +260,11 @@ rpc.init_rpc(
 num_gpus = 2
 partition_len = ((nlayers - 1) // num_gpus) + 1
 
-# Add encoder in the beginning.
+# 처음에 인코더를 추가합니다.
 tmp_list = [Encoder(ntokens, emsize, dropout).cuda(0)]
 module_list = []
 
-# Add all the necessary transformer blocks.
+# 필요한 모든 트랜스포머 블록들을 추가합니다.
 for i in range(nlayers):
     transformer_block = TransformerEncoderLayer(emsize, nhead, nhid, dropout)
     if i != 0 and i % (partition_len) == 0:
@@ -273,13 +273,13 @@ for i in range(nlayers):
     device = i // (partition_len)
     tmp_list.append(transformer_block.to(device))
 
-# Add decoder in the end.
+# 마지막에 디코더를 추가합니다.
 tmp_list.append(Decoder(ntokens, emsize).cuda(num_gpus - 1))
 module_list.append(nn.Sequential(*tmp_list))
 
 from torch.distributed.pipeline.sync import Pipe
 
-# Build the pipeline.
+# 파이프라인을 빌드합니다.
 chunks = 8
 model = Pipe(torch.nn.Sequential(*module_list), chunks = chunks)
 
@@ -310,29 +310,29 @@ print ('Total parameters in model: {:,}'.format(get_total_params(model)))
 #
 
 criterion = nn.CrossEntropyLoss()
-lr = 5.0 # learning rate
+lr = 5.0 # 학습률
 optimizer = torch.optim.SGD(model.parameters(), lr=lr)
 scheduler = torch.optim.lr_scheduler.StepLR(optimizer, 1.0, gamma=0.95)
 
 import time
 def train():
-    model.train() # Turn on the train mode
+    model.train() # 훈련 모드로 전환
     total_loss = 0.
     start_time = time.time()
     ntokens = len(vocab)
 
-    # Train only for 50 batches to keep script execution time low.
+    # 스크립트 실행 시간을 짧게 유지하기 위해서 50 배치만 학습합니다.
     nbatches = min(50 * bptt, train_data.size(0) - 1)
 
     for batch, i in enumerate(range(0, nbatches, bptt)):
         data, targets = get_batch(train_data, i)
         optimizer.zero_grad()
-        # Since the Pipe is only within a single host and process the ``RRef``
-        # returned by forward method is local to this node and can simply
-        # retrieved via ``RRef.local_value()``.
+        # Pipe는 단일 호스트 내에 있고
+        # forward 메서드로 반환된 ``RRef`` 프로세스는 이 노드에 국한되어 있기 때문에
+        # ``RRef.local_value()`` 를 통해 간단히 찾을 수 있습니다.
         output = model(data).local_value()
-        # Need to move targets to the device where the output of the
-        # pipeline resides.
+        # 타겟을 파이프라인 출력이 있는
+        # 장치로 옮겨야합니다.
         loss = criterion(output.view(-1, ntokens), targets.cuda(1))
         loss.backward()
         torch.nn.utils.clip_grad_norm_(model.parameters(), 0.5)
@@ -353,18 +353,18 @@ def train():
             start_time = time.time()
 
 def evaluate(eval_model, data_source):
-    eval_model.eval() # Turn on the evaluation mode
+    eval_model.eval() # 평가 모드로 전환
     total_loss = 0.
     ntokens = len(vocab)
-    # Evaluate only for 50 batches to keep script execution time low.
+    # 스크립트 실행 시간을 짧게 유지하기 위해 50 배치만 평가합니다.
     nbatches = min(50 * bptt, data_source.size(0) - 1)
     with torch.no_grad():
         for i in range(0, nbatches, bptt):
             data, targets = get_batch(data_source, i)
             output = eval_model(data).local_value()
             output_flat = output.view(-1, ntokens)
-            # Need to move targets to the device where the output of the
-            # pipeline resides.
+            # 타겟을 파이프라인 출력이 있는
+            # 장치로 옮겨야합니다.
             total_loss += len(data) * criterion(output_flat, targets.cuda(1)).item()
     return total_loss / (len(data_source) - 1)
 
@@ -373,7 +373,7 @@ def evaluate(eval_model, data_source):
 # 모델을 저장합니다. 각 에폭 이후에 학습률을 조절합니다. 
 
 best_val_loss = float("inf")
-epochs = 3 # The number of epochs
+epochs = 3 # 에폭 수
 best_model = None
 
 for epoch in range(1, epochs + 1):
