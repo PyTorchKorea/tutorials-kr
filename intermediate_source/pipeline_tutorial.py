@@ -229,10 +229,10 @@ def get_batch(source, i):
 # 다른 GPU에 8개의 트랜스포머 레이어로 초기화됩니다. 
 #
 # .. note::
-#    For efficiency purposes we ensure that the ``nn.Sequential`` passed to
-#    ``Pipe`` only consists of two elements (corresponding to two GPUs), this
-#    allows the Pipe to work with only two partitions and avoid any
-#    cross-partition overheads.
+#    효율성을 위해 ``Pipe`` 에 전달된 ``nn.Sequential`` 이
+#    오직 두 개의 요소(2개의 GPU)로만 구성되도록 합니다. 이렇게 하면
+#    Pipe가 두 개의 파티션에서만 작동하고
+#    파티션 간 오버헤드를 피할 수 있습니다.
 
 ntokens = len(vocab) # 단어 사전(어휘집)의 크기
 emsize = 4096 # 임베딩 차원
