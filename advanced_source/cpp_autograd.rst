@@ -271,7 +271,7 @@ C++에서 사용자 지정 자동 미분 함수 사용하기
 ``torch::autograd`` 에 새로운 기본(elementary) 연산을 추가하려면 각 연산에 대해 새로운 ``torch::autograd::Function``
 하위 클래스(subclass)를 구현해야 합니다. ``torch::autograd`` 는 결과와 그래디언트를 계산하고 연산 기록을 인코딩하기 위해 위해
 이 ``torch::autograd::Function`` 들을 사용합니다. 모든 새로운 함수에는 두 가지 방법, 즉 ``forward`` 와 ``backward`` 를
-구현해야 하며 자세한 요구사항은 ``이 링크 <https://pytorch.org/cppdocs/api/structtorch_1_1autograd_1_1_function.html>``_
+구현해야 하며 자세한 요구사항은 ``이 링크 <https://pytorch.org/cppdocs/api/structtorch_1_1autograd_1_1_function.html>``__
 에서 확인하세요.
 
 아래 코드는 ``torch::nn`` 의 ``Linear`` 함수를 사용합니다.
