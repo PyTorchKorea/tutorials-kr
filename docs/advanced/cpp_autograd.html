@@ -351,14 +351,15 @@
               
   <div class="section" id="c-autograd">
 <h1>C++ 프론트엔드의 자동 미분 (autograd)<a class="headerlink" href="#c-autograd" title="Permalink to this headline">¶</a></h1>
+<p><strong>번역</strong>: <a class="reference external" href="https://github.com/eric-yoo">유용환</a></p>
 <p><code class="docutils literal notranslate"><span class="pre">autograd</span></code> 는 PyTorch로 유연하고 역동적인 신경망을 구축하기 위해
 필수적인 패키지입니다. PyTorch 파이썬 프론트엔드의 자동 미분 API 대부분은 C++ 프론트엔드에서도
 사용할 수 있으며, 파이썬에서 C++로 자동 미분 코드를 쉽게 변환할 수 있습니다.</p>
 <p>이 튜토리얼에서는 PyTorch C++ 프론트엔드에서 자동 미분을 수행하는 몇 가지 예를 살펴보겠습니다.
 이 튜토리얼은 여러분이 파이썬 프론트엔드의 자동 미분에 대해 기본적으로 이해하고 있다고
 가정합니다. 그렇지 않은 경우 먼저 <a class="reference external" href="https://tutorials.pytorch.kr/beginner/blitz/autograd_tutorial.html">Autograd: Automatic Differentiation</a> 을 읽어보세요.</p>
-<div class="section" id="id1">
-<h2>기초 자동 미분 연산<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id2">
+<h2>기초 자동 미분 연산<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
 <p>(<a class="reference external" href="https://tutorials.pytorch.kr/beginner/blitz/autograd_tutorial.html#autograd-automatic-differentiation">이 튜토리얼</a> 의 내용에 기반함)</p>
 <p>텐서를 생성하고 그것의 계산을 추적하기 위해 <code class="docutils literal notranslate"><span class="pre">torch::requires_grad()</span></code> 를 실행해봅시다.</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span> <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">::</span><span class="n">ones</span><span class="p">({</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">},</span> <span class="n">torch</span><span class="o">::</span><span class="n">requires_grad</span><span class="p">());</span>
@@ -552,13 +553,13 @@ MulBackward1
 (<a class="reference external" href="https://pytorch.org/cppdocs/api/function_namespacetorch_1_1autograd_1a1e03c42b14b40c306f9eb947ef842d9c.html">링크</a>) 문서에서
 이 함수들의 사용법에 대해 더 알아보세요.</p>
 </div>
-<div class="section" id="id6">
-<h2>C++에서 사용자 지정 자동 미분 함수 사용하기<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id7">
+<h2>C++에서 사용자 지정 자동 미분 함수 사용하기<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h2>
 <p>(<a class="reference external" href="https://pytorch.org/docs/stable/notes/extending.html#extending-torch-autograd">이 튜토리얼</a> 의 내용에 기반함)</p>
 <p><code class="docutils literal notranslate"><span class="pre">torch::autograd</span></code> 에 새로운 기본(elementary) 연산을 추가하려면 각 연산에 대해 새로운 <code class="docutils literal notranslate"><span class="pre">torch::autograd::Function</span></code>
 하위 클래스(subclass)를 구현해야 합니다. <code class="docutils literal notranslate"><span class="pre">torch::autograd</span></code> 는 결과와 그래디언트를 계산하고 연산 기록을 인코딩하기 위해 위해
 이 <code class="docutils literal notranslate"><span class="pre">torch::autograd::Function</span></code> 들을 사용합니다. 모든 새로운 함수에는 두 가지 방법, 즉 <code class="docutils literal notranslate"><span class="pre">forward</span></code> 와 <code class="docutils literal notranslate"><span class="pre">backward</span></code> 를
-구현해야 하며 자세한 요구사항은 <a href="#id8"><span class="problematic" id="id9">``</span></a>이 링크 <a class="reference external" href="https://pytorch.org/cppdocs/api/structtorch_1_1autograd_1_1_function">https://pytorch.org/cppdocs/api/structtorch_1_1autograd_1_1_function</a>.html``_
+구현해야 하며 자세한 요구사항은 <a href="#id9"><span class="problematic" id="id10">``</span></a>이 링크 &lt;<a class="reference external" href="https://pytorch.org/cppdocs/api/structtorch_1_1autograd_1_1_function.html">https://pytorch.org/cppdocs/api/structtorch_1_1autograd_1_1_function.html</a>&gt;``__
 에서 확인하세요.</p>
 <p>아래 코드는 <code class="docutils literal notranslate"><span class="pre">torch::nn</span></code> 의 <code class="docutils literal notranslate"><span class="pre">Linear</span></code> 함수를 사용합니다.</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;torch/torch.h&gt;</span><span class="cp"></span>
@@ -657,10 +658,11 @@ MulBackward1
 <span class="o">[</span> CPUFloatType<span class="o">{</span><span class="m">2</span><span class="o">}</span> <span class="o">]</span>
 </pre></div>
 </div>
-<p><code class="docutils literal notranslate"><span class="pre">torch::autograd::Function</span></code> 에 대한 더 많은 내용은 <a class="reference external" href="https://pytorch.org/cppdocs/api/structtorch_1_1autograd_1_1_function.html">이 문서</a> 에서 확인할 수 있습니다.</p>
+<p><code class="docutils literal notranslate"><span class="pre">torch::autograd::Function</span></code> 에 대한 더 많은 내용은
+<a class="reference external" href="https://pytorch.org/cppdocs/api/structtorch_1_1autograd_1_1_function.html">이 문서</a> 에서 확인할 수 있습니다.</p>
 </div>
-<div class="section" id="id11">
-<h2>파이썬 자동 미분 코드를 C++로 변환하기<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id12">
+<h2>파이썬 자동 미분 코드를 C++로 변환하기<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h2>
 <p>개략적으로 말하면, C++에서 자동 미분을 사용하는 가장 쉬운 방법은 먼저
 파이썬에서 동작하는 자동 미분 코드를 작성한 후, 아래 표를 참고해 C++ 코드로
 변환하는 것입니다.</p>
@@ -722,8 +724,9 @@ MulBackward1
 <p>대부분의 변환된 파이썬 자동 미분 코드가 C++에서도 잘 동작할 것입니다.
 동작하지 않을 경우, <a class="reference external" href="https://github.com/pytorch/pytorch/issues">GitHub issues</a> 에 버그 리포트를 제출해 주시면
 최대한 빨리 고쳐드리겠습니다.</p>
-<p>결론
-—</p>
+</div>
+<div class="section" id="id27">
+<h2>결론<a class="headerlink" href="#id27" title="Permalink to this headline">¶</a></h2>
 <p>이제 PyTorch의 C++ 자동 미분 API에 대한 개괄적인 이해가 생겼을 것입니다.
 여기서 사용된 코드 예제들은 <a class="reference external" href="https://github.com/pytorch/examples/tree/master/cpp/autograd">여기</a> 에서
 확인할 수 있습니다. 언제나 그렇듯이 어떤 문제가 생기거나 질문이 있으면 저희
@@ -786,10 +789,11 @@ MulBackward1
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
 <li><a class="reference internal" href="#">C++ 프론트엔드의 자동 미분 (autograd)</a><ul>
-<li><a class="reference internal" href="#id1">기초 자동 미분 연산</a></li>
+<li><a class="reference internal" href="#id2">기초 자동 미분 연산</a></li>
 <li><a class="reference internal" href="#c">C++로 고차원 그래디언트 계산하기</a></li>
-<li><a class="reference internal" href="#id6">C++에서 사용자 지정 자동 미분 함수 사용하기</a></li>
-<li><a class="reference internal" href="#id11">파이썬 자동 미분 코드를 C++로 변환하기</a></li>
+<li><a class="reference internal" href="#id7">C++에서 사용자 지정 자동 미분 함수 사용하기</a></li>
+<li><a class="reference internal" href="#id12">파이썬 자동 미분 코드를 C++로 변환하기</a></li>
+<li><a class="reference internal" href="#id27">결론</a></li>
 </ul>
 </li>
 </ul>
