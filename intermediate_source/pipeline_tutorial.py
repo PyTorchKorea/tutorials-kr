@@ -28,7 +28,7 @@
 # 모델은 바로 `NN.TRANSFORMER 와 TORCHTEXT 로 시퀀스-투-시퀀스(SEQUENCE-TO-SEQUENCE) 모델링하기 
 # <https://tutorials.pytorch.kr/beginner/transformer_tutorial.html>`__ 튜토리얼과
 # 똑같은 모델이지만 두 단계로 나뉩니다. 대부분 파라미터(parameter)들은 
-# `nn.TransformerEncoder <https://pytorch.org/docs/stable/generated/torch.nn.TransformerEncoder.html>`__ 레이어에 포함됩니다. 
+# `nn.TransformerEncoder <https://pytorch.org/docs/stable/generated/torch.nn.TransformerEncoder.html>`__ 계층(layer)에 포함됩니다. 
 # `nn.TransformerEncoder <https://pytorch.org/docs/stable/generated/torch.nn.TransformerEncoder.html>`__ 는
 # `nn.TransformerEncoderLayer <https://pytorch.org/docs/stable/generated/torch.nn.TransformerEncoderLayer.html>`__ 의 ``nlayers`` 로 구성되어 있습니다.
 # 결과적으로, 우리는 ``nn.TransformerEncoder`` 에 중점을 두고 있으며, 
@@ -121,7 +121,7 @@ class PositionalEncoding(nn.Module):
 ######################################################################
 # 학습 프로세스는 ``torchtext`` 의 Wikitext-2 데이터셋을 사용합니다.
 # 단어 오브젝트는 훈련 데이터셋으로 만들어지고, 토큰을 텐서(tensor)로 수치화하는데 사용됩니다.
-# 시퀀스 데이터로부터 시작하여, ``batchify()`` 함수는 데이터셋을 컬럼들로 배열하고, 
+# 시퀀스 데이터로부터 시작하여, ``batchify()`` 함수는 데이터셋을 열(column)들로 정리하고, 
 # ``batch_size`` 사이즈의 배치들로 나눈 후에 남은 모든 토큰을 버립니다. 
 # 예를 들어, 알파벳을 시퀀스(총 길이 26)로 생각하고 배치 사이즈를 4라고 한다면, 
 # 알파벳을 길이가 6인 4개의 시퀀스로 나눌 수 있습니다:
@@ -138,7 +138,7 @@ class PositionalEncoding(nn.Module):
 #   \begin{bmatrix}\text{S} \\ \text{T} \\ \text{U} \\ \text{V} \\ \text{W} \\ \text{X}\end{bmatrix}
 #   \end{bmatrix}
 #
-# 이 컬럼들은 모델에 의해서 독립적으로 취급되며, 이는 
+# 이 열들은 모델에 의해서 독립적으로 취급되며, 이는 
 # ``G`` 와 ``F`` 의 의존성이 학습될 수 없다는 것을 의미하지만, 더 효율적인 
 # 배치 프로세싱(batch processing)을 허용합니다. 
 #
@@ -214,8 +214,8 @@ def get_batch(source, i):
 
 ######################################################################
 # 파이프라인 병렬화를 활용한 대형 트랜스포머 모델 학습을 증명하기 위해서
-# 트랜스포머 레이어 규모를 적절히 확장시킵니다. 4096차원의 임베딩 벡터, 4096의 은닉 사이즈, 
-# 16개의 어텐션 헤드(attention head)와 총 12 계층의 트랜스포머 레이어 
+# 트랜스포머 계층 규모를 적절히 확장시킵니다. 4096차원의 임베딩 벡터, 4096의 은닉 사이즈, 
+# 16개의 어텐션 헤드(attention head)와 총 12 개의 트랜스포머 계층 
 # (``nn.TransformerEncoderLayer``)를 사용합니다. 이는 최대
 # **1.4억** 개의 파라미터를 갖는 모델을 생성합니다. 
 #
