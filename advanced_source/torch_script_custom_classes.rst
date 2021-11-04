@@ -277,36 +277,33 @@ Here is an example of the ``def_pickle`` call we can add to the registration of
   we have a separate method ``def_pickle`` for this purpose. This is because the
   name ``torch::jit::pickle`` was already taken, and we didn't want to cause confusion.
 
-Once we have defined the (de)serialization behavior in this way, our script can
-now run successfully:
+이러한 방식으로 (역)직렬화 동작을 정의하면 이제 스크립트를 성공적으로 실행할 수 있습니다.:
 
 .. code-block:: shell
 
   $ python ../export_attr.py
   testing
 
-Defining Custom Operators that Take or Return Bound C++ Classes
+바인딩된 C++ 클래스를 사용하거나 반환하는 사용자 지정 연산자 정의
 ---------------------------------------------------------------
 
-Once you've defined a custom C++ class, you can also use that class
-as an argument or return from a custom operator (i.e. free functions). Suppose
-you have the following free function:
+사용자 정의 C++ 클래스를 정의한 후에는 해당 클래스를 인수로 사용하거나 사용자 정의 연산자(즉, 자유 함수)에서 반환할 수도 있습니다. 
+다음과 같은 무료 기능이 있다고 가정합니다.:
 
 .. literalinclude:: ../advanced_source/torch_script_custom_classes/custom_class_project/class.cpp
   :language: cpp
   :start-after: BEGIN free_function
   :end-before: END free_function
 
-You can register it running the following code inside your ``TORCH_LIBRARY``
-block:
+ ``TORCH_LIBRARY`` 내부에서 다음 코드를 실행하여 등록할 수 있습니다.:
 
 .. literalinclude:: ../advanced_source/torch_script_custom_classes/custom_class_project/class.cpp
   :language: cpp
   :start-after: BEGIN def_free
   :end-before: END def_free
 
-Refer to the `custom op tutorial <https://tutorials.pytorch.kr/advanced/torch_script_custom_ops.html>`_
-for more details on the registration API.
+등록 API에 대한 자세한 내용은 `custom op tutorial <https://tutorials.pytorch.kr/advanced/torch_script_custom_ops.html>`_을 참고하세요.
+
 
 Once this is done, you can use the op like the following example:
 
@@ -322,27 +319,11 @@ Once this is done, you can use the op like the following example:
 
 .. note::
 
-  Registration of an operator that takes a C++ class as an argument requires that
-  the custom class has already been registered.  You can enforce this by
-  making sure the custom class registration and your free function definitions
-  are in the same ``TORCH_LIBRARY`` block, and that the custom class
-  registration comes first.  In the future, we may relax this requirement,
-  so that these can be registered in any order.
+C++ 클래스를 인수로 사용하는 연산자를 등록하려면 사용자 정의 클래스가 이미 등록되어 있어야 합니다. 사용자 정의 클래스 등록과 자유 함수 정의가 동일한 ``TORCH_LIBRARY`` 블록에 있고 사용자 정의 클래스 등록이 먼저 오게 하여 이를 시행할 수 있습니다. 앞으로 어떤 순서로든 등록할 수 있도록 이 요구 사항을 완화할 수 있습니다.
 
-
-Conclusion
+결론
 ----------
 
-This tutorial walked you through how to expose a C++ class to TorchScript
-(and by extension Python), how to register its methods, how to use that
-class from Python and TorchScript, and how to save and load code using
-the class and run that code in a standalone C++ process. You are now ready
-to extend your TorchScript models with C++ classes that interface with
-third party C++ libraries or implement any other use case that requires the
-lines between Python, TorchScript and C++ to blend smoothly.
+이 튜토리얼에서는 C++ 클래스를 TorchScript(및 확장 Python)에 노출하는 방법, 해당 메서드를 등록하는 방법, Python 및 TorchScript에서 해당 클래스를 사용하는 방법, 클래스를 사용하여 코드를 저장 및 로드하고 해당 코드를 실행하는 방법을 안내했습니다. 독립 실행형 C++ 프로세스에서. 이제 타사 C++ 라이브러리와 인터페이스하는 C++ 클래스로 TorchScript 모델을 확장하거나 Python, TorchScript 및 C++ 간의 라인이 원활하게 혼합되어야 하는 다른 사용 사례를 구현할 준비가 되었습니다.
 
-As always, if you run into any problems or have questions, you can use our
-`forum <https://discuss.pytorch.org/>`_ or `GitHub issues
-<https://github.com/pytorch/pytorch/issues>`_ to get in touch. Also, our
-`frequently asked questions (FAQ) page
-<https://pytorch.org/cppdocs/notes/faq.html>`_ may have helpful information.
+항상 그렇듯이 문제가 발생하거나 질문이 있는 경우 `포럼 <https://discuss.pytorch.org/>`_ 또는 `GitHub 문제 <https://github.com/pytorch/pytorch/ 문제>`_ 연락하십시오. 또한 '자주 묻는 질문(FAQ)' 페이지 <https://pytorch.org/cppdocs/notes/faq.html>`_에서 유용한 정보를 얻을 수 있습니다.
