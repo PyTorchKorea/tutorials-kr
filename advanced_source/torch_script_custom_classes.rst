@@ -1,41 +1,31 @@
-Extending TorchScript with Custom C++ Classes
+사용자 정의 C++ 클래스로의 TorchScript 확장
 ===============================================
 
-This tutorial is a follow-on to the
+이 튜토리얼은 다음의 문서의 튜토리얼을 따릅니다.
 :doc:`custom operator <torch_script_custom_ops>`
-tutorial, and introduces the API we've built for binding C++ classes into TorchScript
-and Python simultaneously. The API is very similar to
-`pybind11 <https://github.com/pybind/pybind11>`_, and most of the concepts will transfer
-over if you're familiar with that system.
+C++ 클래스를 TorchScript와 Python에 동시에 바인딩하기 위해 구축한 API를 소개합니다. API는 다음과 매우 유사합니다.
+`pybind11 <https://github.com/pybind/pybind11>`_ 및 해당 시스템에 익숙하다면 대부분의 개념이 이전됩니다.
 
-Implementing and Binding the Class in C++
+
+C++에서 클래스 구현 및 바인딩
 -----------------------------------------
 
-For this tutorial, we are going to define a simple C++ class that maintains persistent
-state in a member variable.
+이 튜토리얼에서는 멤버 변수에서 지속 상태를 유지하는 간단한 C++ 클래스를 정의할 것입니다.
 
 .. literalinclude:: ../advanced_source/torch_script_custom_classes/custom_class_project/class.cpp
   :language: cpp
   :start-after: BEGIN class
   :end-before: END class
 
-There are several things to note:
+몇가지 사항을 명시하겠습니다. :
 
-- ``torch/custom_class.h`` is the header you need to include to extend TorchScript
-  with your custom class.
-- Notice that whenever we are working with instances of the custom
-  class, we do it via instances of ``c10::intrusive_ptr<>``. Think of ``intrusive_ptr``
-  as a smart pointer like ``std::shared_ptr``, but the reference count is stored
-  directly in the object, as opposed to a separate metadata block (as is done in
-  ``std::shared_ptr``.  ``torch::Tensor`` internally uses the same pointer type;
-  and custom classes have to also use this pointer type so that we can
-  consistently manage different object types.
-- The second thing to notice is that the user-defined class must inherit from
-  ``torch::CustomClassHolder``. This ensures that the custom class has space to
-  store the reference count.
+- ``torch/custom_class.h`` 는 사용자 정의 클래스로 TorchScript를 확장하기 위해 포함해야 하는 헤더입니다.
+- 커스텀 클래스의 인스턴스로 작업할 때마다 ``c10::intrusive_ptr<>``의 인스턴스를 통해 작업을 수행합니다. ``intrusive_ptr``을 ``std::shared_ptr``과 같은 스마트 포인터로 생각됩니다.
+  그러나 참조 카운트는 별도의 메타데이터 블록과 달리 객체에 직접 저장됩니다.
+  ``std::shared_ptr ``.``torch::Tensor``는 내부적으로 동일한 포인터 유형을 사용하며 사용자 정의 클래스도 이 포인터 유형을 사용해야 다양한 객체 유형을 일관되게 관리할 수 있습니다.
+- 두 번째로 주목해야 할 점은 사용자 정의 클래스가 ``torch::CustomClassHolder``에서 상속되어야 한다는 것입니다. 이렇게 하면 사용자 지정 클래스에 참조 횟수를 저장할 공간이 있습니다.
 
-Now let's take a look at how we will make this class visible to TorchScript, a process called
-*binding* the class:
+이제 이 클래스를 *binding* 이라는 프로세스인 TorchScript에 표시하는 방법을 살펴보겠습니다.:
 
 .. literalinclude:: ../advanced_source/torch_script_custom_classes/custom_class_project/class.cpp
   :language: cpp
@@ -47,28 +37,27 @@ Now let's take a look at how we will make this class visible to TorchScript, a p
 
 
 
-Building the Example as a C++ Project With CMake
+CMake를 사용하여 C++ 프로젝트로 예제 빌드
 ------------------------------------------------
 
-Now, we're going to build the above C++ code with the `CMake
-<https://cmake.org>`_ build system. First, take all the C++ code
-we've covered so far and place it in a file called ``class.cpp``.
-Then, write a simple ``CMakeLists.txt`` file and place it in the
-same directory. Here is what ``CMakeLists.txt`` should look like:
+이제 `CMake <https://cmake.org>`_ 빌드 시스템을 사용하여 위의 C++ 코드를 빌드합니다.
+먼저, 지금까지 다룬 모든 C++ 코드를 ``class.cpp``라는 파일에 넣습니다.
+그런 다음 간단한 ``CMakeLists.txt`` 파일을 작성하여 동일한 디렉토리에 배치합니다. 
+``CMakeLists.txt``는 다음과 같아야 합니다. :
 
 .. literalinclude:: ../advanced_source/torch_script_custom_classes/custom_class_project/CMakeLists.txt
   :language: cmake
 
-Also, create a ``build`` directory. Your file tree should look like this::
+
+또한 ``build`` 디렉토리를 만듭니다. 파일 트리는 다음과 같아야 합니다::
 
   custom_class_project/
     class.cpp
     CMakeLists.txt
     build/
 
-We assume you've setup your environment in the same way as described in
-the :doc:`previous tutorial <torch_script_custom_ops>`.
-Go ahead and invoke cmake and then make to build the project:
+:doc:`이전 튜토리얼 <torch_script_custom_ops>`에서 설명한 것과 동일한 방식으로 환경을 설정했다고 가정합니다.
+계속해서 cmake를 호출한 다음 make를 호출하여 프로젝트를 빌드합니다.:
 
 .. code-block:: shell
 
