@@ -1,50 +1,46 @@
 # -*- coding: utf-8 -*-
 """
-Parametrizations Tutorial
+매개변수화 튜토리얼
 =========================
-**Author**: `Mario Lezcano <https://github.com/lezcano>`_
+**저자**: `Mario Lezcano <https://github.com/lezcano>`_
 
-Regularizing deep-learning models is a surprisingly challenging task.
-Classical techniques such as penalty methods often fall short when applied
-on deep models due to the complexity of the function being optimized.
-This is particularly problematic when working with ill-conditioned models.
-Examples of these are RNNs trained on long sequences and GANs. A number
-of techniques have been proposed in recent years to regularize these
-models and improve their convergence. On recurrent models, it has been
-proposed to control the singular values of the recurrent kernel for the
-RNN to be well-conditioned. This can be achieved, for example, by making
-the recurrent kernel `orthogonal <https://en.wikipedia.org/wiki/Orthogonal_matrix>`_.
-Another way to regularize recurrent models is via
-"`weight normalization <https://pytorch.org/docs/stable/generated/torch.nn.utils.weight_norm.html>`_".
-This approach proposes to decouple the learning of the parameters from the
-learning of their norms.  To do so, the parameter is divided by its
+딥 러닝 모델을 정규화하는 것은 놀랍도록 어려운 작업입니다.
+패널티 방법과 같은 고전적인 기술은 최적화되는 기능의 복잡성으로 인해 심층 모델에 적용할 때 종종 부족합니다.
+이는 조건이 나쁜 모델로 작업할 때 특히 문제가 됩니다.
+예를 들어 긴 시퀀스와 GAN에 대해 훈련된 RNN이 있습니다. 
+이러한 모델을 정규화하고 수렴을 개선하기 위해 최근 몇 년 동안 많은 기술이 제안되었습니다.
+순환 모델에서 RNN이 잘 조절되도록 순환 커널의 특이값을 제어하는 것이 제안되었습니다. 
+이것은 예를 들어 순환 커널 
+`직교 <https://en.wikipedia.org/wiki/Orthogonal_matrix>`_
+을 만들어서 달성할 수 있습니다.
+순환 모델을 정규화하는 또 다른 방법은 다음을 활용한 방법입니다 : 
+"`비중 정규화 <https://pytorch.org/docs/stable/generated/torch.nn.utils.weight_norm.html>`_".
+이 접근 방식은 매개변수 학습을 규범 학습과 분리할 것을 제안합니다.
+그렇게 하기 위해 매개변수는
 `Frobenius norm <https://en.wikipedia.org/wiki/Matrix_norm#Frobenius_norm>`_
-and a separate parameter encoding its norm is learnt.
-A similar regularization was proposed for GANs under the name of
-"`spectral normalization <https://pytorch.org/docs/stable/generated/torch.nn.utils.spectral_norm.html>`_". This method
-controls the Lipschitz constant of the network by dividing its parameters by
-their `spectral norm <https://en.wikipedia.org/wiki/Matrix_norm#Special_cases>`_,
-rather than their Frobenius norm.
+으로 나누어지고 해당 표준을 인코딩하는 별도의 매개변수가 학습됩니다.
 
-All these methods have a common pattern: they all transform a parameter
-in an appropriate way before using it. In the first case, they make it orthogonal by
-using a function that maps matrices to orthogonal matrices. In the case of weight
-and spectral normalization, they divide the original parameter by its norm.
+"`spectral normalization <https://pytorch.org/docs/stable/generated/torch.nn.utils.spectral_norm.html>`_" 라는 이름으로 GAN에 대해 유사한 정규화가 제안되었습니다.
+이 방법은 매개변수를 Frobenius 표준이 아닌 스펙트럼 표준 
+ `spectral norm <https://en.wikipedia.org/wiki/Matrix_norm#Special_cases>`_,
+으로 나누어 네트워크의 Lipschitz 상수를 제어합니다.
 
-More generally, all these examples use a function to put extra structure on the parameters.
-In other words, they use a function to constrain the parameters.
+이러한 모든 방법에는 공통 패턴이 있습니다. 모든 방법은 매개변수를 사용하기 전에 적절한 방식으로 변환합니다.
+첫 번째 경우에는 행렬을 직교 행렬에 매핑하는 함수를 사용하여 직교하게 만듭니다.
+가중치 및 스펙트럼 정규화의 경우 원래 매개변수를 표준으로 나눕니다.
 
-In this tutorial, you will learn how to implement and use this pattern to put
-constraints on your model. Doing so is as easy as writing your own ``nn.Module``.
+보다 일반적으로, 이러한 모든 예는 매개변수에 추가 구조를 추가하는 함수를 사용합니다.
+즉, 매개변수를 제한하는 기능을 사용합니다.
 
-Requirements: ``torch>=1.9.0``
+이 자습서에서는 이 패턴을 구현하고 사용하여 모델에 제약 조건을 적용하는 방법을 배웁니다.그렇게 하는 것은 자신만의 ``nn.Module``를 작성하는 것만큼 쉽습니다.
 
-Implementing parametrizations by hand
+요구사항: ``torch>=1.9.0``
+
+수동으로 매개변수화 구현
 -------------------------------------
 
-Assume that we want to have a square linear layer with symmetric weights, that is,
-with weights ``X`` such that ``X = Xᵀ``. One way to do so is
-to copy the upper-triangular part of the matrix into its lower-triangular part
+가중치 ``X`` 로 ``X = Xᵀ`` 라는 대칭 가중치를 가진 정사각형 선형 레이어를 갖고 싶다고 가정합니다.
+그렇게 하는 한 가지 방법은 행렬의 위쪽 삼각형 부분을 아래쪽 삼각형 부분으로 복사하는 것입니다
 """
 
 import torch
@@ -60,7 +56,7 @@ assert torch.allclose(A, A.T)  # A is symmetric
 print(A)                       # Quick visual check
 
 ###############################################################################
-# We can then use this idea to implement a linear layer with symmetric weights
+# 그런 다음 이 아이디어를 사용하여 대칭 가중치가 있는 선형 레이어를 구현할 수 있습니다.
 class LinearSymmetric(nn.Module):
     def __init__(self, n_features):
         super().__init__()
@@ -71,39 +67,36 @@ class LinearSymmetric(nn.Module):
         return x @ A
 
 ###############################################################################
-# The layer can be then used as a regular linear layer
+# 그런 다음 레이어를 일반 선형 레이어로 사용할 수 있습니다.
 layer = LinearSymmetric(3)
 out = layer(torch.rand(8, 3))
 
 ###############################################################################
-# This implementation, although correct and self-contained, presents a number of problems:
+# 이 구현은 정확하고 독립적이지만 여러 문제를 나타냅니다.:
 #
-# 1) It reimplements the layer. We had to implement the linear layer as ``x @ A``. This is
-#    not very problematic for a linear layer, but imagine having to reimplement a CNN or a
-#    Transformer...
-# 2) It does not separate the layer and the parametrization.  If the parametrization were
-#    more difficult, we would have to rewrite its code for each layer that we want to use it
-#    in.
-# 3) It recomputes the parametrization everytime we use the layer. If we use the layer
-#    several times during the forward pass, (imagine the recurrent kernel of an RNN), it
-#    would compute the same ``A`` every time that the layer is called.
+# 1) 레이어를 다시 구현합니다. 선형 레이어를 ``x @ A`` 로 구현해야 했습니다. 
+#    이것은 선형 레이어에서는 그다지 문제가 되지 않지만 CNN이나 Transformer를 다시 구현해야 한다고 상상해보세요...
+# 2) 레이어와 매개변수화를 분리하지 않습니다. 
+#    매개변수화가 더 어렵다면 사용하려는 각 계층에 대한 코드를 다시 작성해야 합니다.
+# 3) 레이어를 사용할 때마다 매개변수화를 다시 계산합니다. 
+#    만약 순방향 패스 동안 레이어를 여러 번 사용하면(RNN의 반복 커널을 상상해 보세요) 레이어가 호출될 때마다 동일한 ``A``를 계산합니다.
 #
-# Introduction to parametrizations
+# 매개변수화 소개
 # --------------------------------
 #
-# Parametrizations can solve all these problems as well as others.
+# 매개변수화는 이러한 모든 문제는 물론 다른 문제도 해결할 수 있습니다.
 #
-# Let's start by reimplementing the code above using ``torch.nn.utils.parametrize``.
-# The only thing that we have to do is to write the parametrization as a regular ``nn.Module``
+# ``torch.nn.utils.parametrize`` 를 사용하여 위의 코드를 다시 구현하는 것으로 시작해봅시다.
+# 우리가 해야 할 유일한 일은 매개변수화를 일반 ``nn.Module``로 작성하는 것 뿐 입니다.
 class Symmetric(nn.Module):
     def forward(self, X):
         return X.triu() + X.triu(1).transpose(-1, -2)
 
 ###############################################################################
-# This is all we need to do. Once we have this, we can transform any regular layer into a
-# symmetric layer by doing
+# 이것이 우리가 해야 할 전부입니다. 일단 이것이 있으면  
 layer = nn.Linear(3, 3)
 parametrize.register_parametrization(layer, "weight", Symmetric())
+# 을 수행하여 일반 레이어를 대칭 레이어로 변환할 수 있습니다.
 
 ###############################################################################
 # Now, the matrix of the linear layer is symmetric
