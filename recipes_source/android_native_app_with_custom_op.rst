@@ -65,8 +65,8 @@ Download from `OpenCV releases page <https://opencv.org/releases/>`_. Unzip it a
 Preparing TorchScript Model With Custom C++ Operator
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-TorchScript allows using custom C++ operators, to read about it with details you can read 
-`the dedicated tutorial <https://pytorch.org/tutorials/advanced/torch_script_custom_ops.html>`_.
+TorchScript allows using custom C++ operators, to read about it with details you can read
+`the dedicated tutorial <https://tutorials.pytorch.kr/advanced/torch_script_custom_ops.html>`_.
 
 As a result, you can script the model that uses custom op, that uses OpenCV ``cv::warpPerspective`` function.
 
@@ -152,7 +152,7 @@ Registration of ops is not exposed to PyTorch Java API, thus we need to build An
 Let's start creating Android application in ``NativeApp`` folder.
 
 .. code-block:: shell
-  
+
   mkdir NativeApp
   cd NativeApp
 
@@ -218,7 +218,7 @@ In ``NativeApp/build.gradle`` we specify Android gradle plugin version `3.5.0`. 
 ``NativeApp/app/build.gradle``
 
 .. code-block:: gradle
-  
+
   apply plugin: 'com.android.application'
 
   repositories {
@@ -298,7 +298,7 @@ As they are published to nexus sonatype repository - we need to register that re
 
 In our application we need to use LibTorch C++ API in our application native build part. For this, we need access to prebuilt binaries and headers. They are prepacked in PyTorch Android builds, which is published in Maven repositories.
 
-To use PyTorch Android prebuilt libraries from gradle dependencies (which is aar files) - 
+To use PyTorch Android prebuilt libraries from gradle dependencies (which is aar files) -
 we should add registration for configuration ``extractForNativeBuild``,
 add this configuration in dependencies and put its definition in the end.
 
@@ -427,7 +427,7 @@ To package the TorschScript model ``compute.pt`` within our application we shoul
 Android Application Manifest
 ----------------------------
 
-Every Android application has a manifest. 
+Every Android application has a manifest.
 Here we specify the application name, package, main activity.
 
 ``NativeApp/app/src/main/AndroidManifest.xml``:
@@ -654,13 +654,13 @@ This function is called after loading the library. It is responsible for registe
 ``pytorch_nativeapp::loadAndForwardModel`` takes as an argument model path.
 First, we extract its ``const char*`` value and loading the module with ``torch::jit::load``.
 
-To load TorchScript model for mobile, we need to set these guards, because mobile build doesn't support 
+To load TorchScript model for mobile, we need to set these guards, because mobile build doesn't support
 features like autograd for smaller build size, placed in ``struct JITCallGuard`` in this example.
-It may change in the future. You can track the latest changes keeping an eye on the 
+It may change in the future. You can track the latest changes keeping an eye on the
 `source in PyTorch GitHub <https://github.com/pytorch/pytorch/blob/master/android/pytorch_android/src/main/cpp/pytorch_jni_jit.cpp>`_.
 
 Implementation of method ``warp_perspective`` and registration of it is entirely the same as
-in `tutorial for desktop build <https://pytorch.org/tutorials/advanced/torch_script_custom_ops.html>`_.
+in `tutorial for desktop build <https://tutorials.pytorch.kr/advanced/torch_script_custom_ops.html>`_.
 
 Building the app
 ----------------
@@ -704,7 +704,7 @@ If you check the android logcat:
 
 You should see logs with tag 'PyTorchNativeApp' that prints x, y, and the result of the model forward, which we print with ``log`` function in ``NativeApp/app/src/main/cpp/pytorch_nativeapp.cpp``.
 
-.. code-block::
+::
 
   I/PyTorchNativeApp(26968): x: -0.9484 -1.1757 -0.5832  0.9144  0.8867  1.0933 -0.4004 -0.3389
   I/PyTorchNativeApp(26968): -1.0343  1.5200 -0.7625 -1.5724 -1.2073  0.4613  0.2730 -0.6789

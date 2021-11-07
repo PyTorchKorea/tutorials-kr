@@ -28,7 +28,7 @@ Colab에서 파일이 열리게 됩니다.
    폴더도 생성합니다.
 3. Cornell Movie Dialogs Corpus에 방문하여 ZIP 파일을 내려받습니다.
 4. 로컬 머신에 압축을 풉니다.
-5. **movie\_lines.txt** 파일을 Google Drive에 생성한 **data/cornell** 폴더 안에
+5. **movie\_lines.txt** 와 **movie\_conversations.txt** 파일을 Google Drive에 생성한 **data/cornell** 폴더 안에
    복사합니다.
 
 이제 Google Drive 상의 파일을 가르키도록 Colab의 파일을 편집해야 합니다.

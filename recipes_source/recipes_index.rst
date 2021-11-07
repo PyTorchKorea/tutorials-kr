@@ -33,11 +33,9 @@ Recipes are bite-sized bite-sized, actionable examples of how to use specific Py
 .. customcarditem::
    :header: PyTorch에서 데이터 불러오기
    :card_description: PyTorch 패키지를 이용해서 공용 데이터셋을 불러오고 모델에 적용하는 방법을 알아봅니다.
-Learn how to use PyTorch packages to prepare and load common datasets for your model.
    :image: ../_static/img/thumbnails/cropped/loading-data.PNG
    :link: ../recipes/recipes/loading_data_recipe.html
    :tags: Basics
-
 
 .. customcarditem::
    :header: 신경망 정의하기
@@ -59,7 +57,6 @@ Learn how to use PyTorch packages to prepare and load common datasets for your m
    :image: ../_static/img/thumbnails/cropped/saving-and-loading-models-for-inference.PNG
    :link: ../recipes/recipes/saving_and_loading_models_for_inference.html
    :tags: Basics
-
 
 .. customcarditem::
    :header: PyTorch에서 일반적인 체크포인트(checkpoint) 저장하기 & 불러오기
@@ -91,23 +88,37 @@ Learn how to use PyTorch packages to prepare and load common datasets for your m
 
 .. customcarditem::
    :header: PyTorch에서 변화도를 0으로 만들기
-   :card_description: 변화도를 언제 0으로 만들어야 하며, 그렇게 하는 것이 모델의 정확도를 높이는 데에 어떻게 도움이 되는지 알아봅니다. 
+   :card_description: 변화도를 언제 0으로 만들어야 하며, 그렇게 하는 것이 모델의 정확도를 높이는 데에 어떻게 도움이 되는지 알아봅니다.
    :image: ../_static/img/thumbnails/cropped/zeroing-out-gradients.PNG
    :link: ../recipes/recipes/zeroing_out_gradients.html
    :tags: Basics
 
 .. customcarditem::
-   :header: PyTorch Profiler
-   :card_description: Learn how to use PyTorch's profiler to measure operators time and memory consumption
+   :header: PyTorch 벤치마크
+   :card_description: PyTorch의 벤치마크 모듈을 사용하여 코드의 성능을 측정하고 비교하는 방법을 알아봅니다.
    :image: ../_static/img/thumbnails/cropped/profiler.png
-   :link: ../recipes/recipes/profiler.html
+   :link: ../recipes/recipes/benchmark.html
+   :tags: Basics
+
+.. customcarditem::
+   :header: Timer 빠른 시작
+   :card_description: 코드 조각(snippet)의 실행 시간을 측정하고 명령어들을 확인하는 방법을 알아봅니다.
+   :image: ../_static/img/thumbnails/cropped/profiler.png
+   :link: ../recipes/recipes/timer_quick_start.html
+   :tags: Basics
+
+.. customcarditem::
+   :header: Pytorch 프로파일러
+   :card_description: PyTorch의 프로파일러를 사용하여 연산 시간과 메모리 소비량을 측정하는 방법을 알아봅니다.
+   :image: ../_static/img/thumbnails/cropped/profiler.png
+   :link: ../recipes/recipes/profiler_recipe.html
    :tags: Basics
 
 .. Customization
 
 .. customcarditem::
-   :header: Custom Datasets, Transforms & Dataloaders
-   :card_description: Learn how to leverage the PyTorch dataset API to easily create a custom dataset and custom dataloader.
+   :header: 사용자 정의 데이터셋, Transforms & Dataloader
+   :card_description: PyTorch 데이터셋 API를 이용하여 어떻게 쉽게 사용자 정의 데이터셋과 dataloader를 만드는지 알아봅니다.
    :image: ../_static/img/thumbnails/cropped/custom-datasets-transforms-and-dataloaders.png
    :link: ../recipes/recipes/custom_dataset_transforms_loader.html
    :tags: Data-Customization
@@ -122,8 +133,8 @@ Learn how to use PyTorch packages to prepare and load common datasets for your m
    :tags: Interpretability,Captum
 
 .. customcarditem::
-   :header: How to use TensorBoard with PyTorch
-   :card_description: Learn basic usage of TensorBoard with PyTorch, and how to visualize data in TensorBoard UI
+   :header: PyTorch로 TensorBoard 사용하기
+   :card_description: PyTorch로 TensorBoard를 사용하는 기본 방법과 TensorBoard UI에서 데이터를 시각화하는 방법을 알아봅니다.
    :image: ../_static/img/thumbnails/tensorboard_scalars.png
    :link: ../recipes/recipes/tensorboard_with_pytorch.html
    :tags: Visualization,TensorBoard
@@ -168,6 +179,93 @@ Learn how to use PyTorch packages to prepare and load common datasets for your m
    :link: ../recipes/android_native_app_with_custom_op.html
    :tags: Mobile
 
+.. customcarditem::
+  :header: Fuse Modules recipe
+  :card_description: Learn how to fuse a list of PyTorch modules into a single module to reduce the model size before quantization.
+  :image: ../_static/img/thumbnails/cropped/mobile.png
+  :link: ../recipes/fuse.html
+  :tags: Mobile
+
+.. customcarditem::
+  :header: Quantization for Mobile Recipe
+  :card_description: Learn how to reduce the model size and make it run faster without losing much on accuracy.
+  :image: ../_static/img/thumbnails/cropped/mobile.png
+  :link: ../recipes/quantization.html
+  :tags: Mobile,Quantization
+
+.. customcarditem::
+  :header: Script and Optimize for Mobile
+  :card_description: Learn how to convert the model to TorchScipt and (optional) optimize it for mobile apps.
+  :image: ../_static/img/thumbnails/cropped/mobile.png
+  :link: ../recipes/script_optimized.html
+  :tags: Mobile
+
+.. customcarditem::
+  :header: Model Preparation for iOS Recipe
+  :card_description: Learn how to add the model in an iOS project and use PyTorch pod for iOS.
+  :image: ../_static/img/thumbnails/cropped/ios.png
+  :link: ../recipes/model_preparation_ios.html
+  :tags: Mobile
+
+.. customcarditem::
+  :header: Model Preparation for Android Recipe
+  :card_description: Learn how to add the model in an Android project and use the PyTorch library for Android.
+  :image: ../_static/img/thumbnails/cropped/android.png
+  :link: ../recipes/model_preparation_android.html
+  :tags: Mobile
+
+.. customcarditem::
+   :header: Mobile Interpreter Workflow in Android and iOS
+   :card_description: Learn how to use the mobile interpreter on iOS and Andriod devices.
+   :image: ../_static/img/thumbnails/cropped/mobile.png
+   :link: ../recipes/mobile_interpreter.html
+   :tags: Mobile
+
+.. customcarditem::
+   :header: Profiling PyTorch RPC-Based Workloads
+   :card_description: How to use the PyTorch profiler to profile RPC-based workloads.
+   :image: ../_static/img/thumbnails/cropped/profile.png
+   :link: ../recipes/distributed_rpc_profiling.html
+   :tags: Production
+
+.. Automatic Mixed Precision
+.. customcarditem::
+   :header: Automatic Mixed Precision
+   :card_description: Use torch.cuda.amp to reduce runtime and save memory on NVIDIA GPUs.
+   :image: ../_static/img/thumbnails/cropped/amp.png
+   :link: ../recipes/recipes/amp_recipe.html
+   :tags: Model-Optimization
+
+.. Performance
+.. customcarditem::
+   :header: Performance Tuning Guide
+   :card_description: Tips for achieving optimal performance.
+   :image: ../_static/img/thumbnails/cropped/profiler.png
+   :link: ../recipes/recipes/tuning_guide.html
+   :tags: Model-Optimization
+
+.. Distributed Training
+.. customcarditem::
+   :header: Shard Optimizer States with ZeroRedundancyOptimizer
+   :card_description: How to use ZeroRedundancyOptimizer to reduce memory consumption.
+   :image: ../_static/img/thumbnails/cropped/profiler.png
+   :link: ../recipes/zero_redundancy_optimizer.html
+   :tags: Distributed-Training
+
+.. customcarditem::
+   :header: Direct Device-to-Device Communication with TensorPipe RPC
+   :card_description: How to use RPC with direct GPU-to-GPU communication.
+   :image: ../_static/img/thumbnails/cropped/profiler.png
+   :link: ../recipes/cuda_rpc.html
+   :tags: Distributed-Training
+
+.. customcarditem::
+   :header: Distributed Optimizer with TorchScript support
+   :card_description: How to enable TorchScript support for Distributed Optimizer.
+   :image: ../_static/img/thumbnails/cropped/profiler.png
+   :link: ../recipes/distributed_optim_torchscript.html
+   :tags: Distributed-Training,TorchScript
+
 .. End of tutorial card section
 
 .. raw:: html
@@ -195,11 +293,16 @@ Learn how to use PyTorch packages to prepare and load common datasets for your m
    /recipes/recipes/warmstarting_model_using_parameters_from_a_different_model
    /recipes/recipes/save_load_across_devices
    /recipes/recipes/zeroing_out_gradients
-   /recipes/recipes/profiler
-   /recipes/recipes/custom_dataset_transforms_loader
+   /recipes/recipes/profiler_recipe
    /recipes/recipes/Captum_Recipe
    /recipes/recipes/tensorboard_with_pytorch
    /recipes/recipes/dynamic_quantization
+   /recipes/recipes/amp_recipe
+   /recipes/recipes/tuning_guide
    /recipes/torchscript_inference
    /recipes/deployment_with_flask
    /recipes/distributed_rpc_profiling
+   /recipes/zero_redundancy_optimizer
+   /recipes/cuda_rpc
+   /recipes/distributed_optim_torchscript
+   /recipes/mobile_interpreter

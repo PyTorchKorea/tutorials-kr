@@ -8,7 +8,7 @@ Python은 동적성과 신속한 이터레이션이 필요한 상황에 적합�
 배포하는 데에도 많은 제약이 따릅니다. 이로 인해 상용 환경에서는 많은 사람들이 C++를 개발언어로 채택하게
 됩니다. 단지 Java, Rust, 또는 Go와 같은 다른 언어들을 바인딩하기 위한 목적일 뿐일지라도 말이죠.
 앞으로 이 튜토리얼에서 저희는 어떻게 PyTorch에서 Python으로 작성된 모델들을 Python 의존성이 전혀
-없는 C++환경에서도 읽고 실행할 수 있는 방식으로 직렬화할 수 있는지 알아보겠습니다. 
+없는 C++환경에서도 읽고 실행할 수 있는 방식으로 직렬화할 수 있는지 알아보겠습니다.
 
 단계 1. PyTorch 모델을 TorchScript 모델로 변환하기
 -----------------------------------------------------
@@ -34,11 +34,11 @@ PyTorch 모델을 TorchScript로 변환하는 방법에는 두가지가 있습�
   reference <https://pytorch.org/docs/master/jit.html>`_ 에서 확인하실 수 있습니다.
 
 트레이싱(tracing)을 통해 TorchScript로 변환하기
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 PyTorch 모델을 트레이싱을 통해 TorchScript로 변환하기 위해서는, 여러분이 구현한 모델의 인스턴스를
 예제 입력값과 함께 ``torch.jit.trace`` 함수에 넘겨주어야 합니다. 그러면 이 함수는 ``torch.jit.ScriptModule``
-객체를 생성하게 됩니다. 이렇게 생성된 객체에는 모듈의 ``forward`` 메서드의 모델 실행시 런타임을 trace한
+객체를 생성하게 됩니다. 이렇게 생성된 객체에는 모듈의 ``forward`` 메소드의 모델 실행시 런타임을 trace한
 결과가 포함되게 됩니다::
 
   import torch
@@ -47,7 +47,7 @@ PyTorch 모델을 트레이싱을 통해 TorchScript로 변환하기 위해서�
   # 모델 인스턴스 생성
   model = torchvision.models.resnet18()
 
-  # 일반적으로 모델의 forward() 메서드에 넘겨주는 입력값
+  # 일반적으로 모델의 forward() 메소드에 넘겨주는 입력값
   example = torch.rand(1, 3, 224, 224)
 
   # torch.jit.trace를 사용하여 트레이싱을 이용해 torch.jit.ScriptModule 생성
@@ -61,7 +61,7 @@ PyTorch 모델을 트레이싱을 통해 TorchScript로 변환하기 위해서�
   Out[2]: tensor([-0.2698, -0.0381,  0.4023, -0.3010, -0.0448], grad_fn=<SliceBackward>)
 
 어노테이션(annotation)을 통해 TorchScript로 변환하기
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 특정한 환경(가령 모델이 어떤 제어흐름을 사용하고 있는 경우)에서는 여러분의 모델을 어노테이트(annotate)하여
 TorchScript로 바로 작성하는 것이 바람직한 경우가 있습니다. 예를 들어, 아래와 같은 PyTorch 모델이
@@ -82,7 +82,7 @@ TorchScript로 바로 작성하는 것이 바람직한 경우가 있습니다. �
           return output
 
 
-이 모듈의 ``forward`` 메서드는 입력값에 영향을 받는 제어흐름을 사용하고 있기 때문에, 이 모듈은
+이 모듈의 ``forward`` 메소드는 입력값에 영향을 받는 제어흐름을 사용하고 있기 때문에, 이 모듈은
 트레이싱에는 적합하지 않습니다. 대신 우리는 이 모듈을 ``ScriptModule`` 로 변환할 수 있습니다.
 모듈을 ``ScriptModule`` 로 변환하기 위해서는, 아래와 같이 ``torch.jit.script`` 함수를 사용해
 모듈을 컴파일해야 합니다::
@@ -103,9 +103,10 @@ TorchScript로 바로 작성하는 것이 바람직한 경우가 있습니다. �
     my_module = MyModule(10,20)
     sm = torch.jit.script(my_module)
 
-아직 TorchScript에서 지원하지 않는 Python 기능을 사용하고 있는 메서드들을 여러분의 ``nn.Module``
-에서 제외하고 싶다면, 그 메서드들을 ``@torch.jit.ignore`` 로 어노테이트하면 됩니다.
+아직 TorchScript에서 지원하지 않는 Python 기능을 사용하고 있는 메소드들을 여러분의 ``nn.Module``
+에서 제외하고 싶다면, 그 메소드들을 ``@torch.jit.ignore`` 로 어노테이트하면 됩니다.
 
+``sm`` 은 직렬화(serialization) 준비가 된 ``ScriptModule`` 의 인스턴스입니다.
 
 단계 2. Script 모듈을 파일로 직렬화하기
 -------------------------------------------------
@@ -119,7 +120,7 @@ TorchScript로 바로 작성하는 것이 바람직한 경우가 있습니다. �
   traced_script_module.save("traced_resnet_model.pt")
 
 이 함수는 ``traced_resnet_model.pt`` 파일을 작업 디렉토리에 생성할 것입니다. 만약 어노테이션 예시의
-``my_module`` 를 직렬화하고 싶다면, ``my_module.save("my_module_model.pt")`` 를
+``sm`` 을 직렬화하고 싶다면, ``sm.save("my_module_model.pt")`` 를
 호출하면 됩니다. 이로써 우리는 이제 Python의 세계에서 벗어나 C++ 환경에서 작업할 준비를 마쳤습니다.
 
 단계 3. C++에서 Script 모듈 로딩하기
@@ -292,10 +293,10 @@ C++ 어플리케이션의 ``main()`` 함수에 아래의 코드를 추가하겠�
     at::Tensor output = module.forward(inputs).toTensor();
     std::cout << output.slice(/*dim=*/1, /*start=*/0, /*end=*/5) << '\n';
 
-첫 두줄은 모델의 입력값을 생성합니다. ``torch::jit::IValue`` (``script::Module`` 메서드들이
+첫 두줄은 모델의 입력값을 생성합니다. ``torch::jit::IValue`` (``script::Module`` 메소드들이
 입력받고 또 리턴할 수 있는 타입이 소거된 자료형)의 벡터를 만들고 그 벡터에 하나의 입력값을 추가합니다.
 입력값 텐서를 만들기 위해서 우리는 ``torch::ones()`` 을 사용합니다. 이 함수는 ``torch.ones`` 의 C++ API 버전입니다.
-이제 ``script::Module`` 의 ``forward`` 메서드에 입력값 벡터를 넘겨주어 실행하면, 우리는 새로운
+이제 ``script::Module`` 의 ``forward`` 메소드에 입력값 벡터를 넘겨주어 실행하면, 우리는 새로운
 ``IValue`` 를 리턴받게되고, 이 값을 ``toTensor()`` 를 통해 텐서로 변환할 수 있습니다.
 
 .. tip::
@@ -343,7 +344,7 @@ C++ 어플리케이션의 ``main()`` 함수에 아래의 코드를 추가하겠�
 물론 이 튜토리얼에서 다루지못한 개념들도 많습니다. 예를 들어 여러분의 ``ScriptModule`` 이 C++나 CUDA로
 정의된 커스텀 연산자를 사용할 수 있게하는 방법 또는 이러한 커스텀 연산자를 C++ 상용 환경의 ``ScriptModule`` 에서
 사용할 수 있게하는 방법에 대해서는 본 튜토리얼에서 다루지 않았습니다. 좋은 소식은 이러한 것들이 가능하다는 것이고 지원되고
-있다는 점입니다! 저희가 곧 이것에 관한 튜토리얼을 업로드할 때까지 `이 폴더<https://github.com/pytorch/pytorch/tree/master/test/custom_operator>`_
+있다는 점입니다! 저희가 곧 이것에 관한 튜토리얼을 업로드할 때까지 `이 폴더 <https://github.com/pytorch/pytorch/tree/master/test/custom_operator>`_
 를 예시로 삼아 참고하시면 되겠습니다. 또 아래 링크들이 도움이 될 것입니다:
 
 - The Torch Script reference: https://pytorch.org/docs/master/jit.html

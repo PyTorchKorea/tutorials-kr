@@ -88,6 +88,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 #     `dancing.jpg <https://pytorch.org/tutorials/_static/img/neural-style/dancing.jpg>`__.
 #     두 이미지를 다운로드하고 현재 작업 폴더의 ``images`` 폴더에 추가하세요.
 
+
 # 원하는 출력 이미지의 크기
 imsize = 512 if torch.cuda.is_available() else 128  # 만약 GPU가 없을 경우 작은 크기를 사용
 

@@ -97,23 +97,20 @@ download:
 	wget -N https://download.pytorch.org/models/mobilenet_v2-b0353104.pth -P $(DATADIR)
 	cp $(DATADIR)/mobilenet_v2-b0353104.pth advanced_source/data/mobilenet_pretrained_float.pth
 
-	# Download dataset for advanced_source/static_quantization_tutorial.py
-	wget -N https://s3.amazonaws.com/pytorch-tutorial-assets/imagenet_1k.zip -P $(DATADIR)
-	unzip $(ZIPOPTS) $(DATADIR)/imagenet_1k.zip -d advanced_source/data/
-
 	# Download model for prototype_source/graph_mode_static_quantization_tutorial.py
 	wget -N https://download.pytorch.org/models/resnet18-5c106cde.pth -P $(DATADIR)
 	cp $(DATADIR)/resnet18-5c106cde.pth prototype_source/data/resnet18_pretrained_float.pth
 
-	# Download dataset for prototype_source/graph_mode_static_quantization_tutorial.py
-	wget -N https://s3.amazonaws.com/pytorch-tutorial-assets/imagenet_1k.zip -P $(DATADIR)
-	unzip $(ZIPOPTS) $(DATADIR)/imagenet_1k.zip -d prototype_source/data/
+	# Download some dataset for beginner_source/translation_transformer.py
+	python -m spacy download en_core_web_sm
+	python -m spacy download de_core_news_sm
 
 docs:
 	make download
 	make html
 	rm -rf docs
 	cp -r $(BUILDDIR)/html docs
+	cp CNAME docs/CNAME
 	touch docs/.nojekyll
 
 html-noplot:

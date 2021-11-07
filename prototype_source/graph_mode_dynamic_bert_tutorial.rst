@@ -15,7 +15,7 @@ Advantages of graph mode quantization are:
 - Simple quantization flow, minimal manual steps.
 - Unlocks the possibility of doing higher level optimizations like automatic precision selection.
 
-For additional details on Graph Mode Quantization please refer to the `Graph Mode Static Quantization Tutorial <https://pytorch.org/tutorials/prototype/graph_mode_static_quantization_tutorial.html>`_.
+For additional details on Graph Mode Quantization please refer to the `Graph Mode Static Quantization Tutorial <https://tutorials.pytorch.kr/prototype/graph_mode_static_quantization_tutorial.html>`_.
 
 tl;dr The Graph Mode Dynamic `Quantization API <https://pytorch.org/docs/master/quantization.html#torch-quantization>`_:
 
@@ -32,7 +32,7 @@ tl;dr The Graph Mode Dynamic `Quantization API <https://pytorch.org/docs/master/
 1. Quantizing BERT Model
 ------------------------
 
-The installaion steps and details about the model are identical to the steps in the Eager Mode Tutorial. Please refer to the tutorial `here <https://pytorch.org/tutorials/intermediate/dynamic_quantization_bert_tutorial.html#install-pytorch-and-huggingface-transformers>`_ for more details.
+The installaion steps and details about the model are identical to the steps in the Eager Mode Tutorial. Please refer to the tutorial `here <https://tutorials.pytorch.kr/intermediate/dynamic_quantization_bert_tutorial.html#install-pytorch-and-huggingface-transformers>`_ for more details.
 
 1.1 Setup
 ^^^^^^^^^
@@ -499,7 +499,7 @@ Zero-point tensor -
 4. Comparing Results with Eager Mode
 ------------------------------------
 
-Following results show the F1 score and model size for Eager Mode Quantization of the same model by following the steps mentioned in the `tutorial <https://pytorch.org/tutorials/intermediate/dynamic_quantization_bert_tutorial.html#evaluate-the-inference-accuracy-and-time>`_. Results show that Eager and Graph Mode Quantization on the model produce identical results.
+Following results show the F1 score and model size for Eager Mode Quantization of the same model by following the steps mentioned in the `tutorial <https://tutorials.pytorch.kr/intermediate/dynamic_quantization_bert_tutorial.html#evaluate-the-inference-accuracy-and-time>`_. Results show that Eager and Graph Mode Quantization on the model produce identical results.
 
 .. code::
 
