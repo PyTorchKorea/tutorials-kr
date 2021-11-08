@@ -18,7 +18,7 @@ C++에서 클래스 구현 및 바인딩
 
 몇 가지 주의할 사항이 있습니다:
 
-- ``torch/custom_class.h``는 커스텀 클래스로 TorchScript를 확장하기 위해 포함해야하는 헤더입니다.
+- ``torch/custom_class.h`` 는 커스텀 클래스로 TorchScript를 확장하기 위해 포함해야하는 헤더입니다.
 - 커스텀 클래스의 인스턴스로 작업할 때마다 ``c10::intrusive_ptr<>`` 의 인스턴스를 통해 작업을 수행합니다.
   ``intrusive_ptr`` 를 ``std::shared_ptr`` 과 같은 스마트 포인터로 생각하세요. 그러나 참조 계수는
   ``std::shared_ptr`` 같이 별도의 메타데이터 블록과 달리 객체에 직접 저장됩니다.
@@ -43,9 +43,9 @@ CMake를 사용하여 C++ 프로젝트로 예제 빌드
 ------------------------------------------------
 
 이제 `CMake <https://cmake.org>`_ 빌드 시스템을 사용하여 위의 C++ 코드를 빌드합니다.
-먼저, 지금까지 다룬 모든 C++ code를 ``class.cpp``라는 파일에 넣습니다.
-그런 다음 간단한 ``CMakeLists.txt``파일을 작성하여 동일한 디렉토리에 배치합니다.
-``CMakeLists.txt``는 다음과 같아야 합니다:
+먼저, 지금까지 다룬 모든 C++ code를 ``class.cpp`` 라는 파일에 넣습니다.
+그런 다음 간단한 ``CMakeLists.txt`` 파일을 작성하여 동일한 디렉토리에 배치합니다.
+``CMakeLists.txt`` 는 다음과 같아야 합니다:
 
 .. literalinclude:: ../advanced_source/torch_script_custom_classes/custom_class_project/CMakeLists.txt
   :language: cmake
@@ -129,7 +129,7 @@ libtorch를 사용하여 C++ 프로세스에서 커스텀 등록 C++ 클래스�
 우리 파일 시스템의 ``foo.pt`` 는 이제 우리가 방금 정의한 직렬화된 TorchScript 프로그램을 포함합니다.
 
 이제 이 모델과 필요한 .so 파일을 로드하는 방법을 보여주기 위해 새 CMake 프로젝트를 정의하겠습니다.
-이 작업을 수행하는 방법에 대한 자세한 내용은 `C++에서 TorchScript 모델 로딩하기<https://tutorials.pytorch.kr/advanced/cpp_export.html>`_
+이 작업을 수행하는 방법에 대한 자세한 내용은 `C++에서 TorchScript 모델 로딩하기 <https://tutorials.pytorch.kr/advanced/cpp_export.html>`_
 를 참조하세요.
 
 이전과 유사하게 다음을 포함하는 파일 구조를 생성해 보겠습니다::
