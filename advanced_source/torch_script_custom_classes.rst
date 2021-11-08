@@ -324,6 +324,6 @@ TorchScript 모델을 확장하거나 Python, TorchScript 및 C++ 간의 라인�
 혼합되어야 하는 다른 사용 사례를 구현할 준비가 되었습니다.
 
 언제나 그렇듯이, 문제를 맞닥뜨리시거나 질문이 있으시면 저희 `forum <https://discuss.pytorch.org/>`_ 또는 
- `GitHub issues <https://github.com/pytorch/pytorch/issues>`_ 에 올려주시면 되겠습니다.
+`GitHub issues <https://github.com/pytorch/pytorch/issues>`_ 에 올려주시면 되겠습니다.
 또한 `자주 묻는 질문(FAQ) 페이지 <https://pytorch.org/cppdocs/notes/faq.html>`_에
 유용한 정보가 있을 수 있습니다.
