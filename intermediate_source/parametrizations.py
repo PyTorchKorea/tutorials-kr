@@ -52,8 +52,8 @@ def symmetric(X):
 
 X = torch.rand(3, 3)
 A = symmetric(X)
-assert torch.allclose(A, A.T)  # A is symmetric
-print(A)                       # Quick visual check
+assert torch.allclose(A, A.T)  # A 는 대칭이다.
+print(A)                       # 빠른 육안 
 
 ###############################################################################
 # 그런 다음 이 아이디어를 사용하여 대칭 가중치가 있는 선형 레이어를 구현할 수 있습니다.
@@ -99,16 +99,16 @@ parametrize.register_parametrization(layer, "weight", Symmetric())
 # 을 수행하여 일반 레이어를 대칭 레이어로 변환할 수 있습니다.
 
 ###############################################################################
-# Now, the matrix of the linear layer is symmetric
+# 이제 선형 레이어의 행렬은 대칭입니다.
 A = layer.weight
 assert torch.allclose(A, A.T)  # A is symmetric
 print(A)                       # Quick visual check
 
 ###############################################################################
-# We can do the same thing with any other layer. For example, we can create a CNN with
-# `skew-symmetric <https://en.wikipedia.org/wiki/Skew-symmetric_matrix>`_ kernels.
-# We use a similar parametrization, copying the upper-triangular part with signs
-# reversed into the lower-triangular part
+# 다른 레이어에서도 동일한 작업을 수행할 수 있습니다. 예를 들어 `skew-symmetric <https://en.wikipedia.org/wiki/Skew-symmetric_matrix>`_ 
+# 커널을 사용하여 CNN을 만들 수 있습니다.
+# 우리는 유사한 매개변수화를 사용하여 기호가 반대인 위쪽 삼각형 부분을
+# 아래쪽 삼각형 부분으로 복사합니다.
 class Skew(nn.Module):
     def forward(self, X):
         A = X.triu(1)
@@ -122,72 +122,72 @@ print(cnn.weight[0, 1])
 print(cnn.weight[2, 2])
 
 ###############################################################################
-# Inspecting a parametrized module
+# 매개변수화된 모듈 검사
 # --------------------------------
 #
-# When a module is parametrized, we find that the module has changed in three ways:
+# 모듈이 매개변수화되면 모듈이 세 가지 방식으로 변경되었음을 알 수 있습니다.:
 #
-# 1) ``model.weight`` is now a property
+# 1) ``model.weight`` 는 이제 속성입니다.
 #
-# 2) It has a new ``module.parametrizations`` attribute
+# 2) 이것은 새로운 ``module.parametrizations`` 속성을 가지고 있습니다.
 #
-# 3) The unparametrized weight has been moved to ``module.parametrizations.weight.original``
+# 3) 매개변수화되지 않은 가중치가 ``module.parametrizations.weight.original`` 로 이동되었습니다.
 #
 # |
-# After parametrizing ``weight``, ``layer.weight`` is turned into a
-# `Python property <https://docs.python.org/3/library/functions.html#property>`_.
-# This property computes ``parametrization(weight)`` every time we request ``layer.weight``
-# just as we did in our implementation of ``LinearSymmetric`` above.
+#  ``weight`` 를 매개변수화하면, ``layer.weight`` 는
+# `Python 속성 <https://docs.python.org/3/library/functions.html#property>`_ 로 바뀝니다.
+# 이 속성은  ``layer.weight`` 을 요청할 때마다 ``LinearSymmetric`` 에서 구현했던 것 처럼
+# ``parametrization(weight)`` 을 구현합니다..
 #
-# Registered parametrizations are stored under a ``parametrizations`` attribute within the module.
+# 등록돈 매개변수들은 모듈 내의 ``parametrizations`` 속성 아래로 저장됩니다.
 layer = nn.Linear(3, 3)
 print(f"Unparametrized:\n{layer}")
 parametrize.register_parametrization(layer, "weight", Symmetric())
 print(f"\nParametrized:\n{layer}")
 
 ###############################################################################
-# This ``parametrizations`` attribute is an ``nn.ModuleDict``, and it can be accessed as such
+# 이 ``parametrizations`` 속성은 ``nn.ModuleDict``이며 다음과 같이 액세스할 수 있습니다.
 print(layer.parametrizations)
 print(layer.parametrizations.weight)
 
 ###############################################################################
-# Each element of this ``nn.ModuleDict`` is a ``ParametrizationList``, which behaves like an
-# ``nn.Sequential``. This list will allow us to concatenate parametrizations on one weight.
-# Since this is a list, we can access the parametrizations indexing it. Here's
-# where our ``Symmetric`` parametrization sits
+# 이 ``nn.ModuleDict``의 각 요소는 ``nn.Sequential``처럼 작동하는 ``ParametrizationList``입니다.
+# 이 목록을 사용하면 매개변수화를 하나의 가중치로 연결할 수 있습니다.
+# 이것은 list 이기 때문에 그것을 인덱싱하는 매개변수화에 접근할 수 있습니다.
+# 여기에서 ``Symmetric`` 매개변수화가 수행됩니다.
 print(layer.parametrizations.weight[0])
 
 ###############################################################################
-# The other thing that we notice is that, if we print the parameters, we see that the
-# parameter ``weight`` has been moved
+# 우리가 알아차린 또 다른 점은 매개변수를 출력하면
+# ``weight`` 매개변수가 이동되었음을 알 수 있다는 것입니다.
 print(dict(layer.named_parameters()))
 
 ###############################################################################
-# It now sits under ``layer.parametrizations.weight.original``
+# 이것은 이제 ``layer.parametrizations.weight.original`` 아래에 있습니다.
 print(layer.parametrizations.weight.original)
 
 ###############################################################################
-# Besides these three small differences, the parametrization is doing exactly the same
-# as our manual implementation
+# 이 세 가지 작은 차이점 외에도 매개 변수화는
+# 수동 구현과 정확히 동일합니다.
 symmetric = Symmetric()
 weight_orig = layer.parametrizations.weight.original
 print(torch.dist(layer.weight, symmetric(weight_orig)))
 
 ###############################################################################
-# Parametrizations are first-class citizens
+# 매개변수화는 일급 객체입니다.
 # -----------------------------------------
 #
-# Since ``layer.parametrizations`` is an ``nn.ModuleList``, it means that the parametrizations
-# are properly registered as submodules of the original module. As such, the same rules
-# for registering parameters in a module apply to register a parametrization.
-# For example, if a parametrization has parameters, these will be moved from CPU
-# to CUDA when calling ``model = model.cuda()``.
+# ``layer.parametrizations`` 는 ``nn.ModuleList`` 이므로, 매개변수가 원래
+# 모듈의 하위 모듈로 제대로 등록되었음을 의미합니다. 
+# 따라서 모듈에 매개변수를 등록하는 것과 동일한 규칙이 매개변수화를 등록하는 데 적용됩니다.
+# 예를 들어 매개변수에 매개변수가 있는 경우, ``model = model.cuda()`  
+# 를 호출할 때 매개변수가 CPU에서 CUDA로 이동됩니다.
 #
-# Caching the value of a parametrization
+# 매개변수화 값 캐싱
 # --------------------------------------
 #
-# Parametrizations come with an inbuilt caching system via the context manager
-# ``parametrize.cached()``
+# 매개변수화는 컨텍스트 관리자 ``parametrize.cached()`` 를 통해
+# 내장된 캐싱 시스템과 함께 제공됩니다
 class NoisyParametrization(nn.Module):
     def forward(self, X):
         print("Computing the Parametrization")
@@ -204,15 +204,15 @@ with parametrize.cached():
     bar = layer.weight.sum()
 
 ###############################################################################
-# Concatenating parametrizations
+# 매개변수화 연결
 # ------------------------------
 #
-# Concatenating two parametrizations is as easy as registering them on the same tensor.
-# We may use this to create more complex parametrizations from simpler ones. For example, the
-# `Cayley map <https://en.wikipedia.org/wiki/Cayley_transform#Matrix_map>`_
-# maps the skew-symmetric matrices to the orthogonal matrices of positive determinant. We can
-# concatenate ``Skew`` and a parametrization that implements the Cayley map to get a layer with
-# orthogonal weights
+# 두 개의 매개변수화를 연결하는 것은 동일한 텐서에 등록하는 것만큼 쉽습니다.
+# 우리는 이것을 사용하여 더 단순한 것에서 더 복잡한 매개변수화를 생성할 수 있습니다.
+# 예를 들어 `Cayley map <https://en.wikipedia.org/wiki/Cayley_transform#Matrix_map>`_ 는
+# 비대칭 행렬을 양수 행렬의 직교 행렬에 매핑합니다. 
+# 직교 가중치가 있는 레이어를 얻기 위해 Cayley 맵을 구현하는 매개변수화와
+#  ``Skew`` 를 연결할 수 있습니다.
 class CayleyMap(nn.Module):
     def __init__(self, n):
         super().__init__()
@@ -226,13 +226,13 @@ layer = nn.Linear(3, 3)
 parametrize.register_parametrization(layer, "weight", Skew())
 parametrize.register_parametrization(layer, "weight", CayleyMap(3))
 X = layer.weight
-print(torch.dist(X.T @ X, torch.eye(3)))  # X is orthogonal
+print(torch.dist(X.T @ X, torch.eye(3)))  # X는 직교
 
 ###############################################################################
-# This may also be used to prune a parametrized module, or to reuse parametrizations. For example,
-# the matrix exponential maps the symmetric matrices to the Symmetric Positive Definite (SPD) matrices
-# But the matrix exponential also maps the skew-symmetric matrices to the orthogonal matrices.
-# Using these two facts, we may reuse the parametrizations before to our advantage
+# 이것은 매개변수화된 모듈을 제거하거나 매개변수화를 재사용하는 데에도 사용할 수 있습니다.
+# 예를 들어, 행렬 지수는 대칭 행렬을 대칭 양수(SPD) 행렬에 매핑하지만 
+# 행렬 지수는 비대칭 행렬도 직교 행렬에 매핑합니다. 이 두 가지 사실을 사용하여
+# 이전에 매개변수화를 재사용할 수 있습니다.
 class MatrixExponential(nn.Module):
     def forward(self, X):
         return torch.matrix_exp(X)
@@ -241,71 +241,71 @@ layer_orthogonal = nn.Linear(3, 3)
 parametrize.register_parametrization(layer_orthogonal, "weight", Skew())
 parametrize.register_parametrization(layer_orthogonal, "weight", MatrixExponential())
 X = layer_orthogonal.weight
-print(torch.dist(X.T @ X, torch.eye(3)))         # X is orthogonal
+print(torch.dist(X.T @ X, torch.eye(3)))         # X는 직교
 
 layer_spd = nn.Linear(3, 3)
 parametrize.register_parametrization(layer_spd, "weight", Symmetric())
 parametrize.register_parametrization(layer_spd, "weight", MatrixExponential())
 X = layer_spd.weight
-print(torch.dist(X, X.T))                        # X is symmetric
-print((torch.symeig(X).eigenvalues > 0.).all())  # X is positive definite
+print(torch.dist(X, X.T))                        # X 는 대칭
+print((torch.symeig(X).eigenvalues > 0.).all())  # X 는 양수
 
 ###############################################################################
-# Intializing parametrizations
+# 매개변수화 초기화
 # ----------------------------
 #
-# Parametrizations come with a mechanism to initialize them. If we implement a method
-# ``right_inverse`` with signature
+# 매개변수화에는 매개변수화를 초기화하는 메커니즘이 함께 제공됩니다.
+# 만약 우리가 하단의 표시가 있는``right_inverse`` 메서드를 구현하면
 #
 # .. code-block:: python
 #
 #     def right_inverse(self, X: Tensor) -> Tensor
 #
-# it will be used when assigning to the parametrized tensor.
+# 매개변수화된 텐서에 할당할 때 사용될 것입니다.
 #
-# Let's upgrade our implementation of the ``Skew`` class to support this
+# L이것을 지원하기 위해 ``Skew`` 클래스의 구현을 업그레이드해봅시다.
 class Skew(nn.Module):
     def forward(self, X):
         A = X.triu(1)
         return A - A.transpose(-1, -2)
 
     def right_inverse(self, A):
-        # We assume that A is skew-symmetric
-        # We take the upper-triangular elements, as these are those used in the forward
+        # A가 비대칭 대칭이라고 가정합니다.
+        # 우리는 앞으로 사용될 위쪽 삼각형 요소를 사용합니다.
         return A.triu(1)
 
 ###############################################################################
-# We may now initialize a layer that is parametrized with ``Skew``
+# 이제 ``Skew``로 매개변수화된 레이어를 초기화할 수 있습니다.
 layer = nn.Linear(3, 3)
 parametrize.register_parametrization(layer, "weight", Skew())
 X = torch.rand(3, 3)
-X = X - X.T                             # X is now skew-symmetric
-layer.weight = X                        # Initialize layer.weight to be X
+X = X - X.T                             # X 는 이제 비대칭
+layer.weight = X                        # layer.weight를 X로 초기화
 print(torch.dist(layer.weight, X))      # layer.weight == X
 
 ###############################################################################
-# This ``right_inverse`` works as expected when we concatenate parametrizations.
-# To see this, let's upgrade the Cayley parametrization to also support being initialized
+# 이 ``right_inverse`` 는 매개변수화를 연결할 때 예상대로 작동합니다.
+# 이를 확인하기 위해 Cayley 매개변수화를 업그레이드하여 초기화도 지원하도록 합시다.
 class CayleyMap(nn.Module):
     def __init__(self, n):
         super().__init__()
         self.register_buffer("Id", torch.eye(n))
 
     def forward(self, X):
-        # Assume X skew-symmetric
+        # X는 비대칭이라고 가정
         # (I + X)(I - X)^{-1}
         return torch.solve(self.Id + X, self.Id - X).solution
 
     def right_inverse(self, A):
-        # Assume A orthogonal
-        # See https://en.wikipedia.org/wiki/Cayley_transform#Matrix_map
+        # A는 직교로 가정
+        # https://en.wikipedia.org/wiki/Cayley_transform#Matrix_map 
         # (X - I)(X + I)^{-1}
         return torch.solve(X - self.Id, self.Id + X).solution
 
 layer_orthogonal = nn.Linear(3, 3)
 parametrize.register_parametrization(layer_orthogonal, "weight", Skew())
 parametrize.register_parametrization(layer_orthogonal, "weight", CayleyMap(3))
-# Sample an orthogonal matrix with positive determinant
+# 양의 행렬식이 있는 직교 행렬 샘플링
 X = torch.empty(3, 3)
 nn.init.orthogonal_(X)
 if X.det() < 0.:
