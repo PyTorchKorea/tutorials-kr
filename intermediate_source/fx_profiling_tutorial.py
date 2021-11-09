@@ -1,22 +1,18 @@
 # -*- coding: utf-8 -*-
 """
-(beta) Building a Simple CPU Performance Profiler with FX
+(beta) FX를 이용한 단순 CPU 성능 프로파일러 구축하기
 *******************************************************
-**Author**: `James Reed <https://github.com/jamesr66a>`_
+**저자** : `James Reed <https://github.com/jamesr66a>`_
 
-In this tutorial, we are going to use FX to do the following:
+이 튜토리얼에서, 우리는 FX를 사용하여 다음을 수행할 것입니다.:
 
-1) Capture PyTorch Python code in a way that we can inspect and gather
-   statistics about the structure and execution of the code
-2) Build out a small class that will serve as a simple performance "profiler",
-   collecting runtime statistics about each part of the model from actual
-   runs.
+1) 파이토치 파이썬 코드의 구조 및 실행에 대한 통계를 검사하고 수집할 수 있는 방식으로 코드를 캡쳐합니다.
+2) 실제 실행에서 모델의 각 부분에 대한 런타임 통계를 수집하는 간단한 성능 "프로파일러" 역할을 할 작은 클래스를 구축합니다.
 
 """
 
 ######################################################################
-# For this tutorial, we are going to use the torchvision ResNet18 model
-# for demonstration purposes.
+# 이 튜토리얼에서는, orchvision ResNet18 모델을 시연용으로 사용할 것입니다.
 
 import torch
 import torch.fx
@@ -26,211 +22,183 @@ rn18 = models.resnet18()
 rn18.eval()
 
 ######################################################################
-# Now that we have our model, we want to inspect deeper into its
-# performance. That is, for the following invocation, which parts
-# of the model are taking the longest?
+# 이제 모델이 나왔으니 성능을 좀 더 자세히 살펴보도록 하겠습니다. 
+# 즉, 다음 호출을 위해 모델의 어떤 부분이 가장 오래 걸릴까요?
+
 input = torch.randn(5, 3, 224, 224)
 output = rn18(input)
 
 ######################################################################
-# A common way of answering that question is to go through the program
-# source, add code that collects timestamps at various points in the
-# program, and compare the difference between those timestamps to see
-# how long the regions between the timestamps take.
+# 이 질문에 답하는 일반적인 방법은 프로그램 소스를 살펴보고, 
+# 프로그램의 다양한 지점에서 타임스탬프를 수집하는 코드를 추가하고, 
+# 타임스탬프 사이의 영역이 얼마나 걸리는지 알아보기 위해 
+# 타임스탬프 간의 차이를 비교하는 것입니다.
 #
-# That technique is certainly applicable to PyTorch code, however it
-# would be nicer if we didn't have to copy over model code and edit it,
-# especially code we haven't written (like this torchvision model).
-# Instead, we are going to use FX to automate this "instrumentation"
-# process without needing to modify any source.
+# 이 기술은 PyTorch 코드에 적용 가능하지만, 모델 코드를 복사하여 편집할 필요가 없다면 더 좋을 것입니다.
+# (특히 이 Torchvision 모델처럼 우리가 작성하지 않은 코드일 경우).
+# 대신, 우리는 FX를 사용하여 소스를 수정할 필요 없이 이 "계측" 과정을 자동화할 것입니다.
 
 ######################################################################
-# First, let's get some imports out of the way (we will be using all
-# of these later in the code).
+# 먼저 몇 가지 가져오기(import)를 제거하겠습니다
+# (나중에 코드에서 이 모든 것들을 사용할 것입니다).
 
 import statistics, tabulate, time
 from typing import Any, Dict, List
 from torch.fx import Interpreter
 
 ######################################################################
-# .. note::
-#     ``tabulate`` is an external library that is not a dependency of PyTorch.
-#     We will be using it to more easily visualize performance data. Please
-#     make sure you've installed it from your favorite Python package source.
+# .. Note::
+#       ''tabulate''는 PyTorch에 종속되지 않은 외부 라이브러리입니다.
+#       성능 데이터를 보다 쉽게 시각화하는 데 사용할 것입니다. 
+#       당신이 가장 좋아하는 파이썬 패키지 소스에서 설치했는지 확인하세요.
 
 ######################################################################
-# Capturing the Model with Symbolic Tracing
+# 심볼트레이싱으로 모형 캡처하기
 # -----------------------------------------
-# Next, we are going to use FX's symbolic tracing mechanism to capture
-# the definition of our model in a data structure we can manipulate
-# and examine.
+# 다음으로, 우리는 FX의 심볼 추적 메커니즘을 사용하여 
+# 우리가 조작하고 조사할 수 있는 데이터 구조에서 우리 모델의 정의를 캡처할 것입니다.
 
 traced_rn18 = torch.fx.symbolic_trace(rn18)
 print(traced_rn18.graph)
 
 ######################################################################
-# This gives us a Graph representation of the ResNet18 model. A Graph
-# consists of a series of Nodes connected to each other. Each Node
-# represents a call-site in the Python code (whether to a function,
-# a module, or a method) and the edges (represented as ``args`` and ``kwargs``
-# on each node) represent the values passed between these call-sites. More
-# information about the Graph representation and the rest of FX's APIs ca
-# be found at the FX documentation https://pytorch.org/docs/master/fx.html.
+# 이것은 ResNet18 모델의 그래프 표현을 제공합니다.
+# 그래프는 서로 연결된 일련의 노드로 구성됩니다. 
+# 각 노드는 파이썬 코드의 호출 사이트(call-site)(함수, 모듈 또는 메서드)를 나타내며 
+# 에지(각 노드의 ''args' 및 ''kwargs''로 표시됨)는 이러한 호출 사이트 간에 전달된 값을 나타냅니다.
+# 그래프 표현 및 나머지 FX API에 대한 자세한 내용은 FX 설명서는
+# https://pytorch.org/docs/master/fx.html에서 확인할 수 있습니다.
 
 
 ######################################################################
-# Creating a Profiling Interpreter
-# --------------------------------
-# Next, we are going to create a class that inherits from ``torch.fx.Interpreter``.
-# Though the ``GraphModule`` that ``symbolic_trace`` produces compiles Python code
-# that is run when you call a ``GraphModule``, an alternative way to run a
-# ``GraphModule`` is by executing each ``Node`` in the ``Graph`` one by one. That is
-# the functionality that ``Interpreter`` provides: It interprets the graph node-
-# by-node.
+# 프로파일링 인터프리터 생성
+#---------------------------
+# 다음으로 ''torch.fx.interpreter''에서 상속하는 클래스를 만들겠습니다.
+# 비록 "심볼릭_트레이스"가 생산하는 "그래픽모듈"이, 당신이 "그래픽모듈"을 호출했을때 실행되는 파이썬 코드를 컴파일 하지만, 
+# "그래프모듈"을 실행하는 다른 방법은 "그래프"의 "노드"를 하나씩 실행하는 것입니다.
+#이것이 ''인터프리터''가 제공하는 기능입니다. : 그것은 그래프를 노드 하나하나씩 해석합니다.
 #
-# By inheriting from ``Interpreter``, we can override various functionality and
-# install the profiling behavior we want. The goal is to have an object to which
-# we can pass a model, invoke the model 1 or more times, then get statistics about
-# how long the model and each part of the model took during those runs.
+# 우리는 "인터프리터"를 계승함으로써, 다양한 기능을 재정의하고 원하는 프로파일링 동작을 설치할 수 있습니다. 
+# 목표는 모델을 통과시키고, 모델을 1회 이상 호출한 다음, 해당 실행 동안 모델과 모델의 각 부분이 얼마나 걸렸는지에 대한 통계를 얻는 것입니다.
 #
-# Let's define our ``ProfilingInterpreter`` class:
+#"프로필링 인터프리터" 클래스를  정의해봅시다.:
+
 
 class ProfilingInterpreter(Interpreter):
     def __init__(self, mod : torch.nn.Module):
-        # Rather than have the user symbolically trace their model,
-        # we're going to do it in the constructor. As a result, the
-        # user can pass in any ``Module`` without having to worry about
-        # symbolic tracing APIs
+        # 사용자가 상징적으로 모델을 추적하도록 하는 대신, 
+        # 우리는 생성자에서 모델을 추적할 것입니다. 
+        # 따라서 사용자는 심볼 추적 API에 대해 걱정할 필요 없이 어떤 모듈이라도 패스할 수 있다.
         gm = torch.fx.symbolic_trace(mod)
         super().__init__(gm)
 
-        # We are going to store away two things here:
+        # 우리는 이곳에 두가지를 보관해 두겠습니다.:
         #
-        # 1. A list of total runtimes for ``mod``. In other words, we are
-        #    storing away the time ``mod(...)`` took each time this
-        #    interpreter is called.
+        # 1. "mod"의 총 실행 시간 목록입니다. 
+        # 다시 말해서, 이 인터프리터가 호출되어질 때 마다 "mod"에 걸린 시간을 따로 보관하고 있습니다.
         self.total_runtime_sec : List[float] = []
-        # 2. A map from ``Node`` to a list of times (in seconds) that
-        #    node took to run. This can be seen as similar to (1) but
-        #    for specific sub-parts of the model.
+        # 2. "노드"로 부터 노드가 실행되기위해 걸린 시간의 리스트까지의 하나의 지도입니다.
+        # 이것은 (1)과 비슷해보일 수 있지만, 모델의 특정 하위 부품에 대한 것으로 볼 수 있습니다. 
         self.runtimes_sec : Dict[torch.fx.Node, List[float]] = {}
 
     ######################################################################
-    # Next, let's override our first method: ``run()``. ``Interpreter``'s ``run``
-    # method is the top-level entrypoint for execution of the model. We will
-    # want to intercept this so that we can record the total runtime of the
-    # model.
+    # 다음은, 첫번째 메서드를 재정의 해봅시다. : ``run()``. ``Interpreter``의 ``run``
+    # 메서드는 모델 실행을 위한 최상위 진입점입니다.
+    # 모델의 총 런타임을 기록할 수 있도록 이것을 가로채려고 합니다.
+    
 
     def run(self, *args) -> Any:
-        # Record the time we started running the model
+        # 모델을 실행시키기 시작한 시간을 기록합니다.
         t_start = time.time()
-        # Run the model by delegating back into Interpreter.run()
+        #Interprector.run()으로 다시 위임하여 모델을 실행합니다.
         return_val = super().run(*args)
-        # Record the time we finished running the model
+        # 모델 실행 완료 시간을 기록합니다.
         t_end = time.time()
-        # Store the total elapsed time this model execution took in the
-        # ProfilingInterpreter
+        # ProfilingInterpreter에 본 모델 실행의 총 경과시간을 저장합니다.
         self.total_runtime_sec.append(t_end - t_start)
         return return_val
 
     ######################################################################
-    # Now, let's override ``run_node``. ``Interpreter`` calls ``run_node`` each
-    # time it executes a single node. We will intercept this so that we
-    # can measure and record the time taken for each individual call in
-    # the model.
+    # 이제, ''run_node''를 재정의합시다.
+    # ''인터프리터는 단일 노드를 실행할 때마다 ''run_node''를 호출합니다.
+    # 우리는 모델의 개별 호출에 걸리는 시간을 측정하고 기록할 수 있도록 이것을 가로챌 것입니다.
 
     def run_node(self, n : torch.fx.Node) -> Any:
-        # Record the time we started running the op
+        # op를 실행하기 시작한 시간을 기록합니다. 
         t_start = time.time()
-        # Run the op by delegating back into Interpreter.run_node()
+        # Interpreter.run_node()에 재위임을 함으로써 op를 실행시킵니다.
         return_val = super().run_node(n)
-        # Record the time we finished running the op
+        # op의 실행을 끝낸 시간을 기록합니다.
         t_end = time.time()
-        # If we don't have an entry for this node in our runtimes_sec
-        # data structure, add one with an empty list value.
+        # runtimes_sec 데이터 구조에 이 노드에 대한 항목이 없는 경우 목록 값이 비어 있는 노드를 추가합니다.
         self.runtimes_sec.setdefault(n, [])
-        # Record the total elapsed time for this single invocation
-        # in the runtimes_sec data structure
+        # 이 단일 호출에 대한 총 경과 시간을 런타임_sec 데이터 구조에 기록합니다.
         self.runtimes_sec[n].append(t_end - t_start)
         return return_val
 
     ######################################################################
-    # Finally, we are going to define a method (one which doesn't override
-    # any ``Interpreter`` method) that provides us a nice, organized view of
-    # the data we have collected.
+    # 마지막으로, 우리는 우리가 수집한 데이터를 잘 정리된 시각으로 볼 수 있는 
+    # 메소드 (어떠한 "인터프리터"메서드를 재정의 하지 않는)를 정의할 것입니다.
 
     def summary(self, should_sort : bool = False) -> str:
-        # Build up a list of summary information for each node
+        # 각 노드별 요약정보 목록을 작성합니다.
         node_summaries : List[List[Any]] = []
-        # Calculate the mean runtime for the whole network. Because the
-        # network may have been called multiple times during profiling,
-        # we need to summarize the runtimes. We choose to use the
-        # arithmetic mean for this.
+        # 전체 네트워크의 평균 런타임을 계산합니다. 
+        # 프로파일링 중에 네트워크가 여러 번 호출되었을 수 있으므로 실행 시간을 요약해야 합니다. 
+        # 우리는 이것에 대해 산술 평균을 사용하기로 결정했습니다..
         mean_total_runtime = statistics.mean(self.total_runtime_sec)
 
-        # For each node, record summary statistics
+        # 각 노드별 요약통계를 기록한다.
         for node, runtimes in self.runtimes_sec.items():
-            # Similarly, compute the mean runtime for ``node``
+            # 이와 유사하게, "노드"의 평균 런타임을 계산합니다.
             mean_runtime = statistics.mean(runtimes)
-            # For easier understanding, we also compute the percentage
-            # time each node took with respect to the whole network.
+            # 보다 쉽게 이해할 수 있도록 
+            # 전체 네트워크에 대해 각 노드가 소요된 시간의 백분율도 계산합니다.
             pct_total = mean_runtime / mean_total_runtime * 100
-            # Record the node's type, name of the node, mean runtime, and
-            # percent runtim
+           # 노드의 유형, 노드 이름, 평균 런타임 및 실행률을 기록합니다.
             node_summaries.append(
                 [node.op, str(node), mean_runtime, pct_total])
-
-        # One of the most important questions to answer when doing performance
-        # profiling is "Which op(s) took the longest?". We can make this easy
-        # to see by providing sorting functionality in our summary view
+       
+        # 성능 프로파일링을 할 때 가장 중요한 질문 중 하나는 "어떤 작업이 가장 오래 걸립니까?"입니다.
+        # 우리는 요약 보기에서 정렬 기능을 제공함으로써 이것을 쉽게 볼 수 있습니다.
         if should_sort:
             node_summaries.sort(key=lambda s: s[2], reverse=True)
 
-        # Use the ``tabulate`` library to create a well-formatted table
-        # presenting our summary information
+        # 요약 정보를 표시하는 올바른 형식의 표를 만들려면 ''tabulate'' 라이브러리를 사용하십시오.
         headers : List[str] = [
             'Op type', 'Op', 'Average runtime (s)', 'Pct total runtime'
         ]
         return tabulate.tabulate(node_summaries, headers=headers)
 
 ######################################################################
-# .. note::
-#       We use Python's ``time.time`` function to pull wall clock
-#       timestamps and compare them. This is not the most accurate
-#       way to measure performance, and will only give us a first-
-#       order approximation. We use this simple technique only for the
-#       purpose of demonstration in this tutorial.
+# ..참고::
+#       우리는 벽시계 타임스탬프들을 끌어와 그들을 비교하는 파이썬의 ''time.time"함수를 사용한다. 
+#       이 방법은 성능을 측정하는 가장 정확한 방법이 아니며 1차 근사치만 제공합니다.
+#       이 간단한 기술은 이 튜토리얼의 시연 목적으로만 사용됩니다.
 
 ######################################################################
-# Investigating the Performance of ResNet18
+# ResNet18의 성능 조사
 # -----------------------------------------
-# We can now use ``ProfilingInterpreter`` to inspect the performance
-# characteristics of our ResNet18 model;
+# 이제 ResNet18 모델의 성능 특성을 점검하기 위해서 "ProfilingInterpreter"을 쓸 수 있습니다.
 
 interp = ProfilingInterpreter(rn18)
 interp.run(input)
 print(interp.summary(True))
 
 ######################################################################
-# There are two things we should call out here:
+# 여기서 우리가 호출해야할 할 두 가지가 있습니다.:
 #
-# * MaxPool2d takes up the most time. This is a known issue:
-#   https://github.com/pytorch/pytorch/issues/51393
-# * BatchNorm2d also takes up significant time. We can continue this
-#   line of thinking and optimize this in the Conv-BN Fusion with FX
-#   tutorial TODO: link
+# * MaxPool2d가 가장 많은 시간을 차지합니다.
+# 이것은 알려진 문제입니다: https://github.com/pytorch/pytorch/issues/51393
+# * BatchNorm2d도 상당한 시간이 소요됩니다.
+# FX 튜토리얼 TODO 를 통해 Conv-BN Fusion에서 이러한 생각을 계속하고 이것을 최적화할 수 있습니다. : 링크
+# 
+# 
+# 결론
+# --------- -
+# 보시다시피, FX를 사용하면 PyTorch 프로그램(소스 코드가 없는 프로그램도 포함)을 
+# 기계 해석 가능한 형식으로 쉽게 캡처하여, 우리가 이곳에서 한 성능 분석과 같은 분석에 사용할 수 있습니다.
+# FX는 PyTorch 프로그램으로 작업할 수 있는 흥미로운 가능성의 세계를 열어줍니다.
 #
-#
-# Conclusion
-# ----------
-# As we can see, using FX we can easily capture PyTorch programs (even
-# ones we don't have the source code for!) in a machine-interpretable
-# format and use that for analysis, such as the performance analysis
-# we've done here. FX opens up an exiciting world of possibilities for
-# working with PyTorch programs.
-#
-# Finally, since FX is still in beta, we would be happy to hear any
-# feedback you have about using it. Please feel free to use the
-# PyTorch Forums (https://discuss.pytorch.org/) and the issue tracker
-# (https://github.com/pytorch/pytorch/issues) to provide any feedback
-# you might have.
+# 마지막으로, FX는 아직 베타 버전이기 때문에 FX 사용에 대한 귀하의 의견을 듣고 싶습니다.
+# 당신이 가지고 있는 피드백을 제공하기 위해서 언제든지 PyTorch 포럼(https://discuss.pytorch.org/)과 문제 추적기(https://github.com/pytorch/pytorch/issues)를 사용하세요.
