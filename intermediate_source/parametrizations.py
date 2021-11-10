@@ -314,16 +314,16 @@ layer_orthogonal.weight = X
 print(torch.dist(layer_orthogonal.weight, X))  # layer_orthogonal.weight == X
 
 ###############################################################################
-# This initialization step can be written more succinctly as
+# 이 초기화 단계는 다음과 같이 더 간결하게 작성할 수 있습니다.
 layer_orthogonal.weight = nn.init.orthogonal_(layer_orthogonal.weight)
 
 ###############################################################################
-# The name of this method comes from the fact that we would often expect
-# that ``forward(right_inverse(X)) == X``. This is a direct way of rewriting that
-# the forward afer the initalization with value ``X`` should return the value ``X``.
-# This constraint is not strongly enforced in practice. In fact, at times, it might be of
-# interest to relax this relation. For example, consider the following implementation
-# of a randomized pruning method:
+# 이 메서드의 이름은 우리가 종종 ``forward(right_inverse(X)) == X`` 라고 예상한다는
+# 사실에서 유래합니다. 이것은 ``X`` 값으로 초기화를 수행한 후 앞으로 ``X`` 값을
+# 반환해야 한다는 것을 다시 작성하는 직접적인 방법입니다. 이 제약은 실제로 강력하게 시행되지 않습니다. 
+# 사실, 때때로 이 관계를 완화하는 것이 흥미로울 수 있습니다.
+# 예를 들어, 무작위 가지치기 방법의 다음 구현을 고려하십시오. :
+
 class PruningParametrization(nn.Module):
     def __init__(self, X, p_drop=0.2):
         super().__init__()
@@ -338,10 +338,9 @@ class PruningParametrization(nn.Module):
         return A
 
 ###############################################################################
-# In this case, it is not true that for every matrix A ``forward(right_inverse(A)) == A``.
-# This is only true when the matrix ``A`` has zeros in the same positions as the mask.
-# Even then, if we assign a tensor to a pruned parameter, it will comes as no surprise
-# that tensor will be, in fact, pruned
+# 이 경우 모든 행렬 A에 대해  ``forward(right_inverse(A)) == A``라는 것은 사실이 아닙니다.
+# 이는 행렬 ``A`` 가 마스크와 동일한 위치에 0을 가질 때만 해당됩니다.
+# 그렇더라도 텐서를 정리된 매개변수에 할당하면 실제로 텐서가 정리되는 것은 놀라운 일이 아닙니다.
 layer = nn.Linear(3, 4)
 X = torch.rand_like(layer.weight)
 print(f"Initialization matrix:\n{X}")
@@ -350,11 +349,11 @@ layer.weight = X
 print(f"\nInitialized weight:\n{layer.weight}")
 
 ###############################################################################
-# Removing parametrizations
+# 매개변수화 제거
 # -------------------------
 #
-# We may remove all the parametrizations from a parameter or a buffer in a module
-# by using ``parametrize.remove_parametrizations()``
+# ``parametrize.remove_parametrizations()``을 사용하여
+#  모듈의 매개변수 또는 버퍼에서 모든 매개변수화를 제거할 수 있습니다.
 layer = nn.Linear(3, 3)
 print("Before:")
 print(layer)
@@ -369,9 +368,9 @@ print(layer)
 print(layer.weight)
 
 ###############################################################################
-# When removing a parametrization, we may choose to leave the original parameter (i.e. that in
-# ``layer.parametriations.weight.original``) rather than its parametrized version by setting
-# the flag ``leave_parametrized=False``
+# 매개변수화를 제거할 때 플래그 ``leave_parametrized=False`` 를 설정하여 매개변수화된 버전 대신
+# 원래 매개변수(예: ``layer.parametriations.weight.original``에 있는 매개변수)를 그대로 둘 수 있습니다.
+
 layer = nn.Linear(3, 3)
 print("Before:")
 print(layer)
