@@ -2,7 +2,7 @@
 """
 (베타) FX에서 합성곱/배치 정규화(Convolution/Batch Norm) 결합기(Fuser) 구축하기
 ****************************************************************************
-**Author**: `Horace He <https://github.com/chillee>`_
+**저자**: `Horace He <https://github.com/chillee>`_
 
 **번역:** `오찬희 <https://github.com/kozeldark>`_
 
@@ -13,7 +13,7 @@
 
 이 최적화는 추론 모드(즉, `mode.eval()`)의 모델에만 적용된다는 점에 유의하세요.
 
-우리는 다음 링크에 있는 결합기를 구축할 것입니다.
+다음 링크에 있는 결합기를 구축할 것입니다.
 https://github.com/pytorch/pytorch/blob/orig/release/1.8/torch/fx/experimental/fuser.py
 
 """
@@ -69,7 +69,7 @@ model.eval()
 # -----------------------------
 # PyTorch에서 합성곱과 배치 정규화를 자동으로 결합하려고 할 때 가장 큰 어려움 중 하나는
 # PyTorch가 계산 그래프에 쉽게 접근할 수 있는 방법을 제공하지 않는다는 것입니다.
-# FX는 호출된 실제 연산을 상징적으로 추적하여 이 문제를 해결하므로 순차적 모듈 내에 중첩되거나
+# FX는 호출된 실제 연산을 기호적(symbolically)으로 추적하여 이 문제를 해결하므로 순차적 모듈 내에 중첩되거나
 # 사용자 정의 모듈로 감싸진 `forward` 호출을 통해 계산을 추적할 수 있습니다.
 
 traced_model = torch.fx.symbolic_trace(model)
@@ -147,9 +147,9 @@ def replace_node_module(node: fx.Node, modules: Dict[str, Any], new_module: torc
 def fuse(model: torch.nn.Module) -> torch.nn.Module:
     model = copy.deepcopy(model)
     # 대부분의 FX 전달의 첫 번째 단계는 `GraphModule` 을 얻기 위해
-    # 모델을 상징적으로 추적하는 것입니다.
+    # 모델을 기호적으로 추적하는 것입니다.
     # 이것은 원래 모델과 기능적으로 동일한 원래 모델의 표현입니다.
-    # 단, 이제 우리는 우리의 순전파 단계(forward pass)에 대한 그래프 표현도 가지고 있습니다.
+    # 단, 이제는 순전파 단계(forward pass)에 대한 그래프 표현도 가지고 있습니다.
     fx_model: fx.GraphModule = fx.symbolic_trace(model)
     modules = dict(fx_model.named_modules())
 
@@ -232,7 +232,7 @@ print("Unfused time: ", benchmark(rn18))
 print("Fused time: ", benchmark(fused_rn18))
 ######################################################################
 # 앞서 살펴본 바와 같이, FX 변환의 출력은 (Torchscriptable) PyTorch 코드입니다.
-# 따라서 우리는 `jit.script` 를 통해 쉽게 출력하여 성능을 더 높일 수 있습니다.
+# 따라서 `jit.script` 를 통해 쉽게 출력하여 성능을 더 높일 수 있습니다.
 # 이러한 방식으로 FX 모델 변환은 Torchscript와 아무런 문제 없이 구성됩니다.
 
 jit_rn18 = torch.jit.script(fused_rn18)
