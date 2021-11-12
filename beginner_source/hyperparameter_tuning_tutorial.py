@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 """
-Hyperparameter tuning with Ray Tune
+RAY TUNE을 사용한 하이퍼파라미터 튜닝
 ===================================
 
-Hyperparameter tuning can make the difference between an average model and a highly
-accurate one. Often simple things like choosing a different learning rate or changing
-a network layer size can have a dramatic impact on your model performance.
+하이퍼파라미터 튜닝을 통해서 평균적인 모델보다 더 정확한 모델을 만들 수 있습니다.
+간혹 다른 학습률(learning rate)을 적용하거나 네트워크 계층의 크기(network layer size)를 
+바꾸는 것과 같은 간단한 행동들이 모델 성능에 극적인 영향을 미칠 수 있습니다.
 
 Fortunately, there are tools that help with finding the best combination of parameters.
 `Ray Tune <https://docs.ray.io/en/latest/tune.html>`_ is an industry standard tool for
