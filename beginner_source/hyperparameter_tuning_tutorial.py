@@ -7,37 +7,33 @@ RAY TUNE을 사용한 하이퍼파라미터 튜닝
 간혹 다른 학습률(learning rate)을 적용하거나 네트워크 계층의 크기(network layer size)를 
 바꾸는 것과 같은 간단한 행동들이 모델 성능에 극적인 영향을 미칠 수 있습니다.
 
-Fortunately, there are tools that help with finding the best combination of parameters.
-`Ray Tune <https://docs.ray.io/en/latest/tune.html>`_ is an industry standard tool for
-distributed hyperparameter tuning. Ray Tune includes the latest hyperparameter search
-algorithms, integrates with TensorBoard and other analysis libraries, and natively
-supports distributed training through `Ray's distributed machine learning engine
-<https://ray.io/>`_.
+다행히도, 파라미터들의 최적의 조합을 찾을 때 도움이 되는 수단들이 있습니다.
+`Ray Tune <https://docs.ray.io/en/latest/tune.html>`_은 분산(distributed) 하이퍼파라미터 튜닝을 위한 업계표준 수단입니다.
+Ray Tune은 최신 하이퍼파라미터 탐색(search) 알고리즘을 포함하고,
+텐서보드(TensorBoard)와 그 밖의 분석 라이브러리들과 통합되며, 또한
+`Ray의 분산기계학습 엔진 <https://ray.io/>`_을 통해 분산훈련(distributed training)을 기본적으로 지원합니다.
 
-In this tutorial, we will show you how to integrate Ray Tune into your PyTorch
-training workflow. We will extend `this tutorial from the PyTorch documentation
-<https://tutorials.pytorch.kr/beginner/blitz/cifar10_tutorial.html>`_ for training
-a CIFAR10 image classifier.
+이 튜토리얼을 통해서 Ray Tune을 PyTorch 훈련 워크플로우에 통합하는 방법을 보여드리겠습니다.
+`해당 PyTorch 문서(documentation) <https://tutorials.pytorch.kr/beginner/blitz/cifar10_tutorial.html>`_에서
+확장해 CIFAR10 이미지 분류기(classifier)를 훈련시킬것입니다.
 
-As you will see, we only need to add some slight modifications. In particular, we
-need to
+보시다시피, 몇가지 수정만 추가하면 됩니다.
 
-1. wrap data loading and training in functions,
-2. make some network parameters configurable,
-3. add checkpointing (optional),
-4. and define the search space for the model tuning
+1. 데이터 불러오기 그리고 훈련(training)을 각각의 함수들로 포장(wrap)해 줍니다,
+2. 변경 가능한 네트워크 파라미터들을 구성합니다,
+3. 체크포인트를 추가합니다 (선택사항),
+4. 모델 튜닝을 위한 탐색범위(search space)를 정의합니다
 
 |
 
-To run this tutorial, please make sure the following packages are
-installed:
+이 튜토리얼을 실행하기 위해서, 아래와 같은 패키지들이 설치되어야합니다:
 
--  ``ray[tune]``: Distributed hyperparameter tuning library
--  ``torchvision``: For the data transformers
+-  ``ray[tune]``: 분산 하이퍼파라미터 튜닝 라이브러리
+-  ``torchvision``: 데이터 변환용(transformers)
 
-Setup / Imports
+설정/가져오기(Imports)
 ---------------
-Let's start with the imports:
+imports를 시작으로 진행합니다:
 """
 from functools import partial
 import numpy as np
@@ -54,13 +50,13 @@ from ray.tune import CLIReporter
 from ray.tune.schedulers import ASHAScheduler
 
 ######################################################################
-# Most of the imports are needed for building the PyTorch model. Only the last three
-# imports are for Ray Tune.
+# 대부분의 imports는 PyTorch 모델을 구성하기위해 필요한 것들입니다. 
+# 마지막 세개의 imports만 Ray Tune을 위한것입니다.
 #
-# Data loaders
+# 데이터 로더(loaders)
 # ------------
-# We wrap the data loaders in their own function and pass a global data directory.
-# This way we can share a data directory between different trials.
+# 데이터 로더(loaders)를 함수로 포장(wrap)하고 전역(global) 데이터 디렉토리(directory)를 전달합니다.
+# 이 방법을 통해 서로다른 시도(trials)간 데이터 디렉토리(directory)를 공유할 수 있습니다.
 
 
 def load_data(data_dir="./data"):
@@ -78,10 +74,10 @@ def load_data(data_dir="./data"):
     return trainset, testset
 
 ######################################################################
-# Configurable neural network
+# 변경 가능한 인공신경망(neural network)
 # ---------------------------
-# We can only tune those parameters that are configurable. In this example, we can specify
-# the layer sizes of the fully connected layers:
+# 변경 가능한 파라미터들만 조정(tune)할 수 있습니다. 이 예시에서는 
+# 완전연결계층(fully connected layers)에서 계층(layer)의 크기가 해당됩니다.
 
 
 class Net(nn.Module):
@@ -104,15 +100,15 @@ class Net(nn.Module):
         return x
 
 ######################################################################
-# The train function
+# 훈련 함수(The train function)
 # ------------------
-# Now it gets interesting, because we introduce some changes to the example `from the PyTorch
-# documentation <https://tutorials.pytorch.kr/beginner/blitz/cifar10_tutorial.html>`_.
+# `이 PyTorch documentation <https://tutorials.pytorch.kr/beginner/blitz/cifar10_tutorial.html>`_에서 
+# 수정할 부분을 소개하겠습니다.
 #
-# We wrap the training script in a function ``train_cifar(config, checkpoint_dir=None, data_dir=None)``.
-# As you can guess, the ``config`` parameter will receive the hyperparameters we would like to
-# train with. The ``checkpoint_dir`` parameter is used to restore checkpoints. The ``data_dir`` specifies
-# the directory where we load and store the data, so multiple runs can share the same data source.
+# 훈련 스크립트(script)를 함수로 포장(wrap)합니다 ``train_cifar(config, checkpoint_dir=None, data_dir=None)``.
+# 짐작과 같이 ``config`` 파라미터는 훈련하고자 하는 하이퍼파라미터들을 전달받게됩니다.
+# ``checkpoint_dir`` 파라미터는 체크포인트로 복원할 때 사용됩니다.
+# ``data_dir`` 가 데이터를 불러오고 저장할 디렉토리를 지정함으로써 다중 실행시에도 동일한 데이터 소스를 공유할 수 있습니다.
 #
 # .. code-block:: python
 #
@@ -124,21 +120,21 @@ class Net(nn.Module):
 #         net.load_state_dict(model_state)
 #         optimizer.load_state_dict(optimizer_state)
 #
-# The learning rate of the optimizer is made configurable, too:
+# optimizer의 학습률(learning rate) 또한 변경할 수 있습니다.
 #
 # .. code-block:: python
 #
 #     optimizer = optim.SGD(net.parameters(), lr=config["lr"], momentum=0.9)
 #
-# We also split the training data into a training and validation subset. We thus train on
-# 80% of the data and calculate the validation loss on the remaining 20%. The batch sizes
-# with which we iterate through the training and test sets are configurable as well.
+# 또한 훈련(training) 데이터를 훈련 데이터와 검증(validation) 데이터로 나눌 수 있습니다.
+# 따라서 데이터의 80%를 훈련에 사용하고 남은 20%로 검증데이터에 대한 손실(the validation loss)을 계산할 수 있습니다.
+# 훈련 및 테스트 셋을 통해 반복되는 배치 크기(batch size)도 변경할 수 있습니다.
 #
-# Adding (multi) GPU support with DataParallel
+# DataParallel을 통한 (다중) GPU 지원 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Image classification benefits largely from GPUs. Luckily, we can continue to use
-# PyTorch's abstractions in Ray Tune. Thus, we can wrap our model in ``nn.DataParallel``
-# to support data parallel training on multiple GPUs:
+# 이미지 분류는 GPU에서 얻는 이점이 매우 많습니다.
+# 다행히도 Ray Tune 에서 PyTorch의 추상화 개념(abstractions)을 계속 사용할 수 있습니다.
+# 따라서 다중(multiple) GPU에서의 데이터 병렬(parallel) 훈련(training)을 위해 모델을 nn.DataParallel 내에 포장(wrap)할 수 있습니다:
 #
 # .. code-block:: python
 #
@@ -149,9 +145,8 @@ class Net(nn.Module):
 #             net = nn.DataParallel(net)
 #     net.to(device)
 #
-# By using a ``device`` variable we make sure that training also works when we have
-# no GPUs available. PyTorch requires us to send our data to the GPU memory explicitly,
-# like this:
+# ``device`` 변수를 사용하여 사용가능한 GPU가 없을때도 훈련(training)이 잘 수행되도록 합니다.
+# PyTorch는 아래와 같이 GPU 메모리에 데이터를 명시적으로 전송하도록 요구합니다:
 #
 # .. code-block:: python
 #
@@ -159,15 +154,15 @@ class Net(nn.Module):
 #         inputs, labels = data
 #         inputs, labels = inputs.to(device), labels.to(device)
 #
-# The code now supports training on CPUs, on a single GPU, and on multiple GPUs. Notably, Ray
-# also supports `fractional GPUs <https://docs.ray.io/en/master/using-ray-with-gpus.html#fractional-gpus>`_
-# so we can share GPUs among trials, as long as the model still fits on the GPU memory. We'll come back
-# to that later.
+# 이제 이 코드는 CPU, 단일CPU 그리고 다중 GPU에 대한 훈련을 지원합니다. 특히, 
+# Ray는 `분할(fractional) GPUs <https://docs.ray.io/en/master/using-ray-with-gpus.html#fractional-gpus>`_
+# 또한 지원하므로 모델이 여전히 GPU 메모리에 적합(fit)하다면 여러 시도(trials)간 GPU를 공유할 수 있습니다.
+# 이는 나중에 다시 소개하겠습니다.
 #
-# Communicating with Ray Tune
+# Ray Tune과 소통(communicating)
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-# The most interesting part is the communication with Ray Tune:
+# 가장 흥미로운 부분은 Ray Tune과 소통(communication) 하는 것입니다:
 #
 # .. code-block:: python
 #
@@ -177,22 +172,20 @@ class Net(nn.Module):
 #
 #     tune.report(loss=(val_loss / val_steps), accuracy=correct / total)
 #
-# Here we first save a checkpoint and then report some metrics back to Ray Tune. Specifically,
-# we send the validation loss and accuracy back to Ray Tune. Ray Tune can then use these metrics
-# to decide which hyperparameter configuration lead to the best results. These metrics
-# can also be used to stop bad performing trials early in order to avoid wasting
-# resources on those trials.
+# 첫번째로 체크포인트를 저장하고 몇가지 지표(metrics)를 Ray Tune에 보고(report)합니다. 구체적으로,
+# 검증데이터에 대한 손실(the validation loss)과 정확도(accuracy)를 Ray Tune에 전달합니다.
+# Ray Tune은 이 지표(metrics)들을 사용해 어떤 하이퍼파라미터 구성이 최고의 결과를 도출하는지 결정할 수 있습니다.
+# 이 지표(metrics)들을 사용해 나쁜 성능을 보이는 시도(trials)를 빨리 멈추어 자원(resources) 낭비를 막을수도 있습니다.
 #
-# The checkpoint saving is optional, however, it is necessary if we wanted to use advanced
-# schedulers like
-# `Population Based Training <https://docs.ray.io/en/master/tune/tutorials/tune-advanced-tutorial.html>`_.
-# Also, by saving the checkpoint we can later load the trained models and validate them
-# on a test set.
+# 체크포인트 저장은 선택사항이지만
+# `모수 기반 훈련(Population Based Training) <https://docs.ray.io/en/master/tune/tutorials/tune-advanced-tutorial.html>`_과
+# 같은 고급(advanced) 스케쥴러(schedulers)를 사용한다면 필요한 기능입니다.
+# 또한 체크포인트를 저장함으로써 나중에 훈련된 모델을 불러오고 테스트셋에서 검증(validate)할 수 있습니다.
 #
-# Full training function
+# 훈련 함수 전문
 # ~~~~~~~~~~~~~~~~~~~~~~
 #
-# The full code example looks like this:
+# 전체 코드는 아래와 같습니다:
 
 
 def train_cifar(config, checkpoint_dir=None, data_dir=None):
@@ -283,13 +276,12 @@ def train_cifar(config, checkpoint_dir=None, data_dir=None):
     print("Finished Training")
 
 ######################################################################
-# As you can see, most of the code is adapted directly from the original example.
+# 보시다시피 대부분의 코드는 원래의 예시에서 직접 조정되었습니다.
 #
-# Test set accuracy
+# 테스트셋 정확도(accuracy)
 # -----------------
-# Commonly the performance of a machine learning model is tested on a hold-out test
-# set with data that has not been used for training the model. We also wrap this in a
-# function:
+# 일반적으로 기계 학습 모델의 성능은 훈련에 사용되지 않고 보류된(hold-out) 테스트셋을 통해 테스트됩니다.
+# 이 과정 또한 함수로 포장합니다:
 
 
 def test_accuracy(net, device="cpu"):
@@ -312,12 +304,11 @@ def test_accuracy(net, device="cpu"):
     return correct / total
 
 ######################################################################
-# The function also expects a ``device`` parameter, so we can do the
-# test set validation on a GPU.
+# 또한 함수는 device 파라미터를 요구하므로 테스트셋 검증(validation)을 GPU에서 진행할 수 있습니다.
 #
-# Configuring the search space
+# 탐색범위(search space) 구성
 # ----------------------------
-# Lastly, we need to define Ray Tune's search space. Here is an example:
+# 마지막으로 아래의 예시와 같이 Ray Tune의 탐색범위(search space)를 정의해야합니다:
 #
 # .. code-block:: python
 #
@@ -328,20 +319,17 @@ def test_accuracy(net, device="cpu"):
 #         "batch_size": tune.choice([2, 4, 8, 16])
 #     }
 #
-# The ``tune.sample_from()`` function makes it possible to define your own sample
-# methods to obtain hyperparameters. In this example, the ``l1`` and ``l2`` parameters
-# should be powers of 2 between 4 and 256, so either 4, 8, 16, 32, 64, 128, or 256.
-# The ``lr`` (learning rate) should be uniformly sampled between 0.0001 and 0.1. Lastly,
-# the batch size is a choice between 2, 4, 8, and 16.
+# ``tune.sample_from()`` 함수로 하이퍼파라미터를 얻기 위한  당신의 표본(sample) 방법(methods)를 정의할 수 있게 해줍니다.
+# 위의 예시에서  ``l1`` 과 ``l2``파라미터는 4~256 범위의 2의 거듭제곱이어야 하므로 4, 8, 16, 32, 64, 128, 256 중 하나입니다.
+# ``lr`` 즉 학습률(learning rate)은 0.0001~0.1 범위에서 균일확률로(uniformly) 추출(sampled)됩니다. 마지막으로,
+# 배치 크기(batch size)는 2, 4, 8, 16 중 하나가 됩니다.
 #
-# At each trial, Ray Tune will now randomly sample a combination of parameters from these
-# search spaces. It will then train a number of models in parallel and find the best
-# performing one among these. We also use the ``ASHAScheduler`` which will terminate bad
-# performing trials early.
+# 각각의 시도(trial)에서 RayTune은 각 파라미터들을 탐색범위(search spalces)내에서 무작위(randomly) 추출(sample)해 조합할 것입니다.
+# 그런 다음 여러 모델을 병렬(parallel)로 훈련하고 이들중 가장 좋은 성능을 보이는 모델을 찾을것입니다.
+# 또한 ``ASHAScheduler`` 를 사용해 나쁜 성능을 보이는 시도(trials)를 일찍 제거할것입니다.
 #
-# We wrap the ``train_cifar`` function with ``functools.partial`` to set the constant
-# ``data_dir`` parameter. We can also tell Ray Tune what resources should be
-# available for each trial:
+# ``data_dir`` 파라미터를 설정해주기 위해 ``train_cifar`` 함수를 ``functools.partial`` 로 포장(wrap)합니다.
+# 또한 Ray Tune에게 각각의 시도(trial)에서 어떤 자원(resources)이 사용가능한지 전달할 수 있습니다:
 #
 # .. code-block:: python
 #
@@ -356,21 +344,19 @@ def test_accuracy(net, device="cpu"):
 #         progress_reporter=reporter,
 #         checkpoint_at_end=True)
 #
-# You can specify the number of CPUs, which are then available e.g.
-# to increase the ``num_workers`` of the PyTorch ``DataLoader`` instances. The selected
-# number of GPUs are made visible to PyTorch in each trial. Trials do not have access to
-# GPUs that haven't been requested for them - so you don't have to care about two trials
-# using the same set of resources.
+# 사용가능한 CPU의 수를 지정할 수 있습니다. 예시로 PyTorch ``DataLoader`` 인스턴스(instances) 의 ``num_workers`` 를 증가시키는것을 들수 있습니다.
+# 선택한 GPU의 수는 각각의 시도(trial)에서 PyTorch에 표시됩니다.
+# 각 시도(trials)는 요청되지 않은 GPU에 접근(access)할 수 없습니다 - 
+# 따라서 동일한 자원(resource)을 사용하는 두 가지 시도(trial)에 대해 신경 쓸 필요가 없습니다.
 #
-# Here we can also specify fractional GPUs, so something like ``gpus_per_trial=0.5`` is
-# completely valid. The trials will then share GPUs among each other.
-# You just have to make sure that the models still fit in the GPU memory.
+# 또한 GPU 분할 지정도 가능하므로 ``gpus_per_trial=0.5`` 와 같은 것들도 사용할 수 있습니다.
+# 그 후 각 시도(trials)들은 GPU를 서로 공유할 것입니다.
+# 모델이 GPU 메모리에 여전히 적합(fit)한지 확인해야합니다.
 #
-# After training the models, we will find the best performing one and load the trained
-# network from the checkpoint file. We then obtain the test set accuracy and report
-# everything by printing.
+# 모델을 훈련시킨뒤 가장 좋은성능을 보이는 모델을 찾고 체크포인트 파일로 훈련된 네트워크를 로드할것입니다.
+# 그 후 테스트셋 정확도를 구하고 출력(printing)을 통해 모두 보고(report)합니다.
 #
-# The full main function looks like this:
+# main 함수의 전문은 아래와 같습니다:
 
 
 def main(num_samples=10, max_num_epochs=10, gpus_per_trial=2):
@@ -429,7 +415,7 @@ if __name__ == "__main__":
 
 
 ######################################################################
-# If you run the code, an example output could look like this:
+# 코드 실행시 출력은 아래와 같습니다:
 #
 # ::
 #
@@ -455,8 +441,7 @@ if __name__ == "__main__":
 #     Best trial final validation accuracy: 0.5836
 #     Best trial test set accuracy: 0.5806
 #
-# Most trials have been stopped early in order to avoid wasting resources.
-# The best performing trial achieved a validation accuracy of about 58%, which could
-# be confirmed on the test set.
+# 대부분의 시도(trials)는 자원(resources)의 낭비를 막기위해 조기 종료(stopped early)됩니다.
+# 가장 좋은성능을 보이는 시도는 검증데이터에 대한 정확도(validation accuracy)가 약 58%임을 테스트셋에서 확인할 수 있습니다.
 #
-# So that's it! You can now tune the parameters of your PyTorch models.
+# 끝났습니다! 이제 당신은 PyTorch 모델의 파라미터를 조정(tune)할 수 있습니다.
