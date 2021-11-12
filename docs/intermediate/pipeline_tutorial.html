@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Training Transformer models using Pipeline Parallelism &mdash; PyTorch Tutorials 1.9.0+cu102 documentation</title>
+  <title>파이프라인 병렬화로 트랜스포머 모델 학습시키기 &mdash; PyTorch Tutorials 1.9.0+cu102 documentation</title>
   
 
   
@@ -227,7 +227,7 @@
 </ul>
 <p class="caption"><span class="caption-text">모델 최적화</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/profiler.html">Profiling your PyTorch Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/profiler.html">PyTorch 모듈 프로파일링 하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tensorboard_profiler_tutorial.html">PyTorch Profiler With TensorBoard</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/hyperparameter_tuning_tutorial.html">Hyperparameter tuning with Ray Tune</a></li>
 <li class="toctree-l1"><a class="reference internal" href="parametrizations.html">Parametrizations Tutorial</a></li>
@@ -248,13 +248,13 @@
 <li class="toctree-l1"><a class="reference internal" href="dist_pipeline_parallel_tutorial.html">Distributed Pipeline Parallelism Using RPC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rpc_async_execution.html">Implementing Batch RPC Processing Using Asynchronous Executions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/rpc_ddp_tutorial.html">Combining Distributed DataParallel with Distributed RPC Framework</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Training Transformer models using Pipeline Parallelism</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">파이프라인 병렬화로 트랜스포머 모델 학습시키기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/ddp_pipeline.html">Training Transformer models using Distributed Data Parallel and Pipeline Parallelism</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Mobile</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/deeplabv3_on_ios.html">Image Segmentation DeepLabV3 on iOS</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/deeplabv3_on_android.html">Image Segmentation DeepLabV3 on Android</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/deeplabv3_on_android.html">안드로이드에서의 이미지 분할 DeepLapV3</a></li>
 </ul>
 
             
@@ -295,7 +295,7 @@
       </li>
 
         
-      <li>Training Transformer models using Pipeline Parallelism</li>
+      <li>파이프라인 병렬화로 트랜스포머 모델 학습시키기</li>
     
     
       <li class="pytorch-breadcrumbs-aside">
@@ -353,35 +353,36 @@
 <p class="first admonition-title">Note</p>
 <p class="last">Click <a class="reference internal" href="#sphx-glr-download-intermediate-pipeline-tutorial-py"><span class="std std-ref">here</span></a> to download the full example code</p>
 </div>
-<div class="sphx-glr-example-title section" id="training-transformer-models-using-pipeline-parallelism">
-<span id="sphx-glr-intermediate-pipeline-tutorial-py"></span><h1>Training Transformer models using Pipeline Parallelism<a class="headerlink" href="#training-transformer-models-using-pipeline-parallelism" title="Permalink to this headline">¶</a></h1>
-<p><strong>Author</strong>: <a class="reference external" href="https://github.com/pritamdamania87">Pritam Damania</a></p>
-<p>This tutorial demonstrates how to train a large Transformer model across
-multiple GPUs using pipeline parallelism. This tutorial is an extension of the
-<a class="reference external" href="https://tutorials.pytorch.kr/beginner/transformer_tutorial.html">Sequence-to-Sequence Modeling with nn.Transformer and TorchText</a> tutorial
-and scales up the same model to demonstrate how pipeline parallelism can be
-used to train Transformer models.</p>
-<p>Prerequisites:</p>
+<div class="sphx-glr-example-title section" id="sphx-glr-intermediate-pipeline-tutorial-py">
+<span id="id1"></span><h1>파이프라인 병렬화로 트랜스포머 모델 학습시키기<a class="headerlink" href="#sphx-glr-intermediate-pipeline-tutorial-py" title="Permalink to this headline">¶</a></h1>
+<dl class="docutils">
+<dt><strong>Author</strong>: <a class="reference external" href="https://github.com/pritamdamania87">Pritam Damania</a></dt>
+<dd><strong>번역</strong>: <a class="reference external" href="https://github.com/spongebob03">백선희</a></dd>
+</dl>
+<p>이 튜토리얼은 파이프라인(pipeline) 병렬화(parallelism)를 사용하여 여러 GPU에 걸친 거대한 트랜스포머(transformer)
+모델을 어떻게 학습시키는지 보여줍니다. <a class="reference external" href="https://tutorials.pytorch.kr/beginner/transformer_tutorial.html">NN.TRANSFORMER 와 TORCHTEXT 로 시퀀스-투-시퀀스(SEQUENCE-TO-SEQUENCE) 모델링하기</a> 튜토리얼의
+확장판이며 파이프라인 병렬화가 어떻게 트랜스포머 모델 학습에 쓰이는지 증명하기 위해 이전 튜토리얼에서의
+모델 규모를 증가시켰습니다.</p>
+<p>선수과목(Prerequisites):</p>
 <blockquote>
 <div><ul class="simple">
 <li><a class="reference external" href="https://pytorch.org/docs/stable/pipeline.html">Pipeline Parallelism</a></li>
-<li><a class="reference external" href="https://tutorials.pytorch.kr/beginner/transformer_tutorial.html">Sequence-to-Sequence Modeling with nn.Transformer and TorchText</a></li>
+<li><a class="reference external" href="https://tutorials.pytorch.kr/beginner/transformer_tutorial.html">NN.TRANSFORMER 와 TORCHTEXT 로 시퀀스-투-시퀀스(SEQUENCE-TO-SEQUENCE) 모델링하기</a></li>
 </ul>
 </div></blockquote>
-<div class="section" id="define-the-model">
-<h2>Define the model<a class="headerlink" href="#define-the-model" title="Permalink to this headline">¶</a></h2>
-<p>In this tutorial, we will split a Transformer model across two GPUs and use
-pipeline parallelism to train the model. The model is exactly the same model
-used in the <a class="reference external" href="https://tutorials.pytorch.kr/beginner/transformer_tutorial.html">Sequence-to-Sequence Modeling with nn.Transformer and TorchText</a> tutorial,
-but is split into two stages. The largest number of parameters belong to the
-<a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.TransformerEncoder.html">nn.TransformerEncoder</a> layer.
-The <a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.TransformerEncoder.html">nn.TransformerEncoder</a>
-itself consists of <code class="docutils literal notranslate"><span class="pre">nlayers</span></code> of <a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.TransformerEncoderLayer.html">nn.TransformerEncoderLayer</a>.
-As a result, our focus is on <code class="docutils literal notranslate"><span class="pre">nn.TransformerEncoder</span></code> and we split the model
-such that half of the <code class="docutils literal notranslate"><span class="pre">nn.TransformerEncoderLayer</span></code> are on one GPU and the
-other half are on another. To do this, we pull out the <code class="docutils literal notranslate"><span class="pre">Encoder</span></code> and
-<code class="docutils literal notranslate"><span class="pre">Decoder</span></code> sections into seperate modules and then build an nn.Sequential
-representing the original Transformer module.</p>
+<div class="section" id="id3">
+<h2>모델 정의하기<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
+<p>이번 튜토리얼에서는, 트랜스포머 모델을 두 개의 GPU에 걸쳐서 나누고 파이프라인 병렬화로 학습시켜 보겠습니다.
+모델은 바로 <a class="reference external" href="https://tutorials.pytorch.kr/beginner/transformer_tutorial.html">NN.TRANSFORMER 와 TORCHTEXT 로 시퀀스-투-시퀀스(SEQUENCE-TO-SEQUENCE) 모델링하기</a> 튜토리얼과
+똑같은 모델이지만 두 단계로 나뉩니다. 대부분 파라미터(parameter)들은
+<a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.TransformerEncoder.html">nn.TransformerEncoder</a> 계층(layer)에 포함됩니다.
+<a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.TransformerEncoder.html">nn.TransformerEncoder</a> 는
+<a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.TransformerEncoderLayer.html">nn.TransformerEncoderLayer</a> 의 <code class="docutils literal notranslate"><span class="pre">nlayers</span></code> 로 구성되어 있습니다.
+결과적으로, 우리는 <code class="docutils literal notranslate"><span class="pre">nn.TransformerEncoder</span></code> 에 중점을 두고 있으며,
+<code class="docutils literal notranslate"><span class="pre">nn.TransformerEncoderLayer</span></code> 의 절반은 한 GPU에 두고
+나머지 절반은 다른 GPU에 있도록 모델을 분할합니다. 이를 위해서 <code class="docutils literal notranslate"><span class="pre">Encoder</span></code> 와
+<code class="docutils literal notranslate"><span class="pre">Decoder</span></code> 섹션을 분리된 모듈로 빼낸 다음, 원본 트랜스포머 모듈을
+나타내는 nn.Sequential을 빌드 합니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">import</span> <span class="nn">torch</span>
@@ -410,7 +411,7 @@ representing the original Transformer module.</p>
         <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">weight</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">uniform_</span><span class="p">(</span><span class="o">-</span><span class="n">initrange</span><span class="p">,</span> <span class="n">initrange</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">src</span><span class="p">):</span>
-        <span class="c1"># Need (S, N) format for encoder.</span>
+        <span class="c1"># 인코더로 (S, N) 포맷이 필요합니다.</span>
         <span class="n">src</span> <span class="o">=</span> <span class="n">src</span><span class="o">.</span><span class="n">t</span><span class="p">()</span>
         <span class="n">src</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="p">(</span><span class="n">src</span><span class="p">)</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ninp</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pos_encoder</span><span class="p">(</span><span class="n">src</span><span class="p">)</span>
@@ -427,15 +428,13 @@ representing the original Transformer module.</p>
         <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span><span class="o">.</span><span class="n">weight</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">uniform_</span><span class="p">(</span><span class="o">-</span><span class="n">initrange</span><span class="p">,</span> <span class="n">initrange</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inp</span><span class="p">):</span>
-        <span class="c1"># Need batch dimension first for output of pipeline.</span>
+        <span class="c1"># 파이프라인 결과물을 위해 먼저 배치 차원 필요합니다.</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span><span class="p">(</span><span class="n">inp</span><span class="p">)</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
 </pre></div>
 </div>
-<p><code class="docutils literal notranslate"><span class="pre">PositionalEncoding</span></code> module injects some information about the
-relative or absolute position of the tokens in the sequence. The
-positional encodings have the same dimension as the embeddings so that
-the two can be summed. Here, we use <code class="docutils literal notranslate"><span class="pre">sine</span></code> and <code class="docutils literal notranslate"><span class="pre">cosine</span></code> functions of
-different frequencies.</p>
+<p><code class="docutils literal notranslate"><span class="pre">PositionalEncoding</span></code>&nbsp;모듈은 시퀀스 안에서 토큰의 상대적인 또는 절대적인 포지션에 대한 정보를 주입합니다.
+포지셔널 인코딩은 임베딩과 합칠 수 있도록 똑같은 차원을 가집니다. 여기서
+다른 주기(frequency)의&nbsp;<code class="docutils literal notranslate"><span class="pre">sine</span></code>&nbsp;과&nbsp;<code class="docutils literal notranslate"><span class="pre">cosine</span></code>&nbsp;함수를 사용합니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">PositionalEncoding</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d_model</span><span class="p">,</span> <span class="n">dropout</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">max_len</span><span class="o">=</span><span class="mi">5000</span><span class="p">):</span>
@@ -456,16 +455,14 @@ different frequencies.</p>
 </pre></div>
 </div>
 </div>
-<div class="section" id="load-and-batch-data">
-<h2>Load and batch data<a class="headerlink" href="#load-and-batch-data" title="Permalink to this headline">¶</a></h2>
-<p>The training process uses Wikitext-2 dataset from <code class="docutils literal notranslate"><span class="pre">torchtext</span></code>. The
-vocab object is built based on the train dataset and is used to numericalize
-tokens into tensors. Starting from sequential data, the <code class="docutils literal notranslate"><span class="pre">batchify()</span></code>
-function arranges the dataset into columns, trimming off any tokens remaining
-after the data has been divided into batches of size <code class="docutils literal notranslate"><span class="pre">batch_size</span></code>.
-For instance, with the alphabet as the sequence (total length of 26)
-and a batch size of 4, we would divide the alphabet into 4 sequences of
-length 6:</p>
+<div class="section" id="id4">
+<h2>데이터 로드하고 배치 만들기<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
+<p>학습 프로세스는 <code class="docutils literal notranslate"><span class="pre">torchtext</span></code> 의 Wikitext-2 데이터셋을 사용합니다.
+단어 오브젝트는 훈련 데이터셋으로 만들어지고, 토큰을 텐서(tensor)로 수치화하는데 사용됩니다.
+시퀀스 데이터로부터 시작하여, <code class="docutils literal notranslate"><span class="pre">batchify()</span></code> 함수는 데이터셋을 열(column)들로 정리하고,
+<code class="docutils literal notranslate"><span class="pre">batch_size</span></code> 사이즈의 배치들로 나눈 후에 남은 모든 토큰을 버립니다.
+예를 들어, 알파벳을 시퀀스(총 길이 26)로 생각하고 배치 사이즈를 4라고 한다면,
+알파벳을 길이가 6인 4개의 시퀀스로 나눌 수 있습니다:</p>
 <div class="math">
 \[\begin{bmatrix}
 \text{A} & \text{B} & \text{C} & \ldots & \text{X} & \text{Y} & \text{Z}
@@ -479,9 +476,9 @@ length 6:</p>
 \end{bmatrix}
 
 \]</div>
-<p>These columns are treated as independent by the model, which means that
-the dependence of <code class="docutils literal notranslate"><span class="pre">G</span></code> and <code class="docutils literal notranslate"><span class="pre">F</span></code> can not be learned, but allows more
-efficient batch processing.</p>
+<p>이 열들은 모델에 의해서 독립적으로 취급되며, 이는
+<code class="docutils literal notranslate"><span class="pre">G</span></code>&nbsp;와&nbsp;<code class="docutils literal notranslate"><span class="pre">F</span></code>&nbsp;의 의존성이 학습될 수 없다는 것을 의미하지만, 더 효율적인
+배치 프로세싱(batch processing)을 허용합니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">from</span> <span class="nn">torchtext.datasets</span> <span class="kn">import</span> <span class="n">WikiText2</span>
 <span class="kn">from</span> <span class="nn">torchtext.data.utils</span> <span class="kn">import</span> <span class="n">get_tokenizer</span>
@@ -504,11 +501,11 @@ efficient batch processing.</p>
 <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span><span class="p">)</span>
 
 <span class="k">def</span> <span class="nf">batchify</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">bsz</span><span class="p">):</span>
-    <span class="c1"># Divide the dataset into bsz parts.</span>
+    <span class="c1"># 데이터셋을 bsz 파트들로 나눕니다.</span>
     <span class="n">nbatch</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">//</span> <span class="n">bsz</span>
-    <span class="c1"># Trim off any extra elements that wouldn&#39;t cleanly fit (remainders).</span>
+    <span class="c1"># 깔끔하게 나누어 떨어지지 않는 추가적인 부분(나머지)은 잘라냅니다.</span>
     <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">narrow</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">nbatch</span> <span class="o">*</span> <span class="n">bsz</span><span class="p">)</span>
-    <span class="c1"># Evenly divide the data across the bsz batches.</span>
+    <span class="c1"># 데이터를 bsz 배치들로 동일하게 나눕니다.</span>
     <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">bsz</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">t</span><span class="p">()</span><span class="o">.</span><span class="n">contiguous</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">data</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
 
@@ -519,55 +516,53 @@ efficient batch processing.</p>
 <span class="n">test_data</span> <span class="o">=</span> <span class="n">batchify</span><span class="p">(</span><span class="n">test_data</span><span class="p">,</span> <span class="n">eval_batch_size</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="section" id="functions-to-generate-input-and-target-sequence">
-<h3>Functions to generate input and target sequence<a class="headerlink" href="#functions-to-generate-input-and-target-sequence" title="Permalink to this headline">¶</a></h3>
-<p><code class="docutils literal notranslate"><span class="pre">get_batch()</span></code> function generates the input and target sequence for
-the transformer model. It subdivides the source data into chunks of
-length <code class="docutils literal notranslate"><span class="pre">bptt</span></code>. For the language modeling task, the model needs the
-following words as <code class="docutils literal notranslate"><span class="pre">Target</span></code>. For example, with a <code class="docutils literal notranslate"><span class="pre">bptt</span></code> value of 2,
-we’d get the following two Variables for <code class="docutils literal notranslate"><span class="pre">i</span></code> = 0:</p>
+<div class="section" id="id5">
+<h3>입력과 타겟 시퀀스를 생성하기 위한 함수들<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">get_batch()</span></code> 함수는 트랜스포머 모델을 위한 입력과 타겟 시퀀스를
+생성합니다. 이 함수는 소스 데이터를 <code class="docutils literal notranslate"><span class="pre">bptt</span></code> 길이를 가진 덩어리로 세분화합니다.
+언어 모델링 과제를 위해서, 모델은 다음 단어인 <code class="docutils literal notranslate"><span class="pre">Target</span></code> 이 필요합니다. 에를 들어 <code class="docutils literal notranslate"><span class="pre">bptt</span></code> 의 값이 2라면,
+<code class="docutils literal notranslate"><span class="pre">i</span></code> = 0 일 때 다음의 2 개 변수(Variable)를 얻을 수 있습니다:</p>
 <img alt="../_images/transformer_input_target2.png" src="../_images/transformer_input_target2.png" />
-<p>It should be noted that the chunks are along dimension 0, consistent
-with the <code class="docutils literal notranslate"><span class="pre">S</span></code> dimension in the Transformer model. The batch dimension
-<code class="docutils literal notranslate"><span class="pre">N</span></code> is along dimension 1.</p>
+<p>변수 덩어리는 트랜스포머 모델의&nbsp;<code class="docutils literal notranslate"><span class="pre">S</span></code>&nbsp;차원과 일치하는 0 차원에 해당합니다.
+배치 차원&nbsp;<code class="docutils literal notranslate"><span class="pre">N</span></code>&nbsp;은 1 차원에 해당합니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">bptt</span> <span class="o">=</span> <span class="mi">35</span>
 <span class="k">def</span> <span class="nf">get_batch</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
     <span class="n">seq_len</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">bptt</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">source</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">i</span><span class="p">)</span>
     <span class="n">data</span> <span class="o">=</span> <span class="n">source</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">seq_len</span><span class="p">]</span>
     <span class="n">target</span> <span class="o">=</span> <span class="n">source</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="o">+</span><span class="n">seq_len</span><span class="p">]</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-    <span class="c1"># Need batch dimension first for pipeline parallelism.</span>
+    <span class="c1"># 파이프라인 병렬화를 위해 먼저 배치 차원이 필요합니다.</span>
     <span class="k">return</span> <span class="n">data</span><span class="o">.</span><span class="n">t</span><span class="p">(),</span> <span class="n">target</span>
 </pre></div>
 </div>
 </div>
 </div>
-<div class="section" id="model-scale-and-pipe-initialization">
-<h2>Model scale and Pipe initialization<a class="headerlink" href="#model-scale-and-pipe-initialization" title="Permalink to this headline">¶</a></h2>
-<p>To demonstrate training large Transformer models using pipeline parallelism,
-we scale up the Transformer layers appropriately. We use an embedding
-dimension of 4096, hidden size of 4096, 16 attention heads and 12 total
-transformer layers (<code class="docutils literal notranslate"><span class="pre">nn.TransformerEncoderLayer</span></code>). This creates a model with
-<strong>~1.4 billion</strong> parameters.</p>
-<p>We need to initialize the <a class="reference external" href="https://pytorch.org/docs/stable/rpc.html">RPC Framework</a>
-since Pipe depends on the RPC framework via <a class="reference external" href="https://pytorch.org/docs/stable/rpc.html#rref">RRef</a>
-which allows for future expansion to cross host pipelining. We need to
-initialize the RPC framework with only a single worker since we’re using a
-single process to drive multiple GPUs.</p>
-<p>The pipeline is then initialized with 8 transformer layers on one GPU and 8
-transformer layers on the other GPU.</p>
+<div class="section" id="id6">
+<h2>모델 규모와 파이프 초기화<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h2>
+<p>파이프라인 병렬화를 활용한 대형 트랜스포머 모델 학습을 증명하기 위해서
+트랜스포머 계층 규모를 적절히 확장시킵니다. 4096차원의 임베딩 벡터, 4096의 은닉 사이즈,
+16개의 어텐션 헤드(attention head)와 총 12 개의 트랜스포머 계층
+(<code class="docutils literal notranslate"><span class="pre">nn.TransformerEncoderLayer</span></code>)를 사용합니다. 이는 최대
+<strong>1.4억</strong> 개의 파라미터를 갖는 모델을 생성합니다.</p>
+<p>Pipe는 <a class="reference external" href="https://pytorch.org/docs/stable/rpc.html#rref">RRef</a> 를 통해
+<a class="reference external" href="https://pytorch.org/docs/stable/rpc.html">RPC 프레임워크</a> 에 의존하는데
+이는 향후 호스트 파이프라인을 교차 확장할 수 있도록 하기 때문에
+RPC 프레임워크를 초기화해야 합니다. 이때 RPC 프레임워크는 오직 하나의 하나의 worker로 초기화를 해야 하는데,
+여러 GPU를 다루기 위해 프로세스 하나만 사용하고 있기 때문입니다.</p>
+<p>그런 다음 파이프라인은 한 GPU에 8개의 트랜스포머와
+다른 GPU에 8개의 트랜스포머 레이어로 초기화됩니다.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">For efficiency purposes we ensure that the <code class="docutils literal notranslate"><span class="pre">nn.Sequential</span></code> passed to
-<code class="docutils literal notranslate"><span class="pre">Pipe</span></code> only consists of two elements (corresponding to two GPUs), this
-allows the Pipe to work with only two partitions and avoid any
-cross-partition overheads.</p>
+<p class="last">효율성을 위해 <code class="docutils literal notranslate"><span class="pre">Pipe</span></code> 에 전달된 <code class="docutils literal notranslate"><span class="pre">nn.Sequential</span></code> 이
+오직 두 개의 요소(2개의 GPU)로만 구성되도록 합니다. 이렇게 하면
+Pipe가 두 개의 파티션에서만 작동하고
+파티션 간 오버헤드를 피할 수 있습니다.</p>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ntokens</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">vocab</span><span class="p">)</span> <span class="c1"># the size of vocabulary</span>
-<span class="n">emsize</span> <span class="o">=</span> <span class="mi">4096</span> <span class="c1"># embedding dimension</span>
-<span class="n">nhid</span> <span class="o">=</span> <span class="mi">4096</span> <span class="c1"># the dimension of the feedforward network model in nn.TransformerEncoder</span>
-<span class="n">nlayers</span> <span class="o">=</span> <span class="mi">12</span> <span class="c1"># the number of nn.TransformerEncoderLayer in nn.TransformerEncoder</span>
-<span class="n">nhead</span> <span class="o">=</span> <span class="mi">16</span> <span class="c1"># the number of heads in the multiheadattention models</span>
-<span class="n">dropout</span> <span class="o">=</span> <span class="mf">0.2</span> <span class="c1"># the dropout value</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ntokens</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">vocab</span><span class="p">)</span> <span class="c1"># 단어 사전(어휘집)의 크기</span>
+<span class="n">emsize</span> <span class="o">=</span> <span class="mi">4096</span> <span class="c1"># 임베딩 차원</span>
+<span class="n">nhid</span> <span class="o">=</span> <span class="mi">4096</span> <span class="c1"># nn.TransformerEncoder 에서 순전파(feedforward) 신경망 모델의 차원</span>
+<span class="n">nlayers</span> <span class="o">=</span> <span class="mi">12</span> <span class="c1"># nn.TransformerEncoder 내부의 nn.TransformerEncoderLayer 개수</span>
+<span class="n">nhead</span> <span class="o">=</span> <span class="mi">16</span> <span class="c1"># multiheadattention 모델의 헤드 개수</span>
+<span class="n">dropout</span> <span class="o">=</span> <span class="mf">0.2</span> <span class="c1"># dropout 값</span>
 
 <span class="kn">from</span> <span class="nn">torch.distributed</span> <span class="kn">import</span> <span class="n">rpc</span>
 <span class="n">tmpfile</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">NamedTemporaryFile</span><span class="p">()</span>
@@ -577,9 +572,9 @@ cross-partition overheads.</p>
     <span class="n">world_size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
     <span class="n">rpc_backend_options</span><span class="o">=</span><span class="n">rpc</span><span class="o">.</span><span class="n">TensorPipeRpcBackendOptions</span><span class="p">(</span>
         <span class="n">init_method</span><span class="o">=</span><span class="s2">&quot;file://</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">tmpfile</span><span class="o">.</span><span class="n">name</span><span class="p">),</span>
-        <span class="c1"># Specifying _transports and _channels is a workaround and we no longer</span>
-        <span class="c1"># will have to specify _transports and _channels for PyTorch</span>
-        <span class="c1"># versions &gt;= 1.8.1</span>
+        <span class="c1"># _transports와 _channels를 지정하는 것이 해결 방법이며</span>
+        <span class="c1"># PyTorch 버전 &gt;= 1.8.1 에서는 _transports와 _channels를</span>
+        <span class="c1"># 지정하지 않아도 됩니다.</span>
         <span class="n">_transports</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;ibv&quot;</span><span class="p">,</span> <span class="s2">&quot;uv&quot;</span><span class="p">],</span>
         <span class="n">_channels</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;cuda_ipc&quot;</span><span class="p">,</span> <span class="s2">&quot;cuda_basic&quot;</span><span class="p">],</span>
     <span class="p">)</span>
@@ -588,11 +583,11 @@ cross-partition overheads.</p>
 <span class="n">num_gpus</span> <span class="o">=</span> <span class="mi">2</span>
 <span class="n">partition_len</span> <span class="o">=</span> <span class="p">((</span><span class="n">nlayers</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="n">num_gpus</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
 
-<span class="c1"># Add encoder in the beginning.</span>
+<span class="c1"># 처음에 인코더를 추가합니다.</span>
 <span class="n">tmp_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">Encoder</span><span class="p">(</span><span class="n">ntokens</span><span class="p">,</span> <span class="n">emsize</span><span class="p">,</span> <span class="n">dropout</span><span class="p">)</span><span class="o">.</span><span class="n">cuda</span><span class="p">(</span><span class="mi">0</span><span class="p">)]</span>
 <span class="n">module_list</span> <span class="o">=</span> <span class="p">[]</span>
 
-<span class="c1"># Add all the necessary transformer blocks.</span>
+<span class="c1"># 필요한 모든 트랜스포머 블록들을 추가합니다.</span>
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nlayers</span><span class="p">):</span>
     <span class="n">transformer_block</span> <span class="o">=</span> <span class="n">TransformerEncoderLayer</span><span class="p">(</span><span class="n">emsize</span><span class="p">,</span> <span class="n">nhead</span><span class="p">,</span> <span class="n">nhid</span><span class="p">,</span> <span class="n">dropout</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">i</span> <span class="o">%</span> <span class="p">(</span><span class="n">partition_len</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
@@ -601,13 +596,13 @@ cross-partition overheads.</p>
     <span class="n">device</span> <span class="o">=</span> <span class="n">i</span> <span class="o">//</span> <span class="p">(</span><span class="n">partition_len</span><span class="p">)</span>
     <span class="n">tmp_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">transformer_block</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">))</span>
 
-<span class="c1"># Add decoder in the end.</span>
+<span class="c1"># 마지막에 디코더를 추가합니다.</span>
 <span class="n">tmp_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Decoder</span><span class="p">(</span><span class="n">ntokens</span><span class="p">,</span> <span class="n">emsize</span><span class="p">)</span><span class="o">.</span><span class="n">cuda</span><span class="p">(</span><span class="n">num_gpus</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
 <span class="n">module_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span><span class="o">*</span><span class="n">tmp_list</span><span class="p">))</span>
 
 <span class="kn">from</span> <span class="nn">torch.distributed.pipeline.sync</span> <span class="kn">import</span> <span class="n">Pipe</span>
 
-<span class="c1"># Build the pipeline.</span>
+<span class="c1"># 파이프라인을 빌드합니다.</span>
 <span class="n">chunks</span> <span class="o">=</span> <span class="mi">8</span>
 <span class="n">model</span> <span class="o">=</span> <span class="n">Pipe</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span><span class="o">*</span><span class="n">module_list</span><span class="p">),</span> <span class="n">chunks</span> <span class="o">=</span> <span class="n">chunks</span><span class="p">)</span>
 
@@ -626,41 +621,40 @@ cross-partition overheads.</p>
 </pre></div>
 </div>
 </div>
-<div class="section" id="run-the-model">
-<h2>Run the model<a class="headerlink" href="#run-the-model" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://pytorch.org/docs/master/nn.html?highlight=crossentropyloss#torch.nn.CrossEntropyLoss">CrossEntropyLoss</a>
-is applied to track the loss and
-<a class="reference external" href="https://pytorch.org/docs/master/optim.html?highlight=sgd#torch.optim.SGD">SGD</a>
-implements stochastic gradient descent method as the optimizer. The initial
-learning rate is set to 5.0. <a class="reference external" href="https://pytorch.org/docs/master/optim.html?highlight=steplr#torch.optim.lr_scheduler.StepLR">StepLR</a> is
-applied to adjust the learn rate through epochs. During the
-training, we use
+<div class="section" id="id7">
+<h2>모델 실행하기<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h2>
+<p>손실(loss)을 추적하기 위해 <a class="reference external" href="https://pytorch.org/docs/master/nn.html?highlight=crossentropyloss#torch.nn.CrossEntropyLoss">CrossEntropyLoss</a> 가
+적용되며, 옵티마이저(optimizer)로서 <a class="reference external" href="https://pytorch.org/docs/master/optim.html?highlight=sgd#torch.optim.SGD">SGD</a>
+는 확률적 경사하강법(stochastic gradient descent method)을 구현합니다. 초기
+학습률(learning rate)은 5.0로 설정됩니다. <a class="reference external" href="https://pytorch.org/docs/master/optim.html?highlight=steplr#torch.optim.lr_scheduler.StepLR">StepLR</a> 는
+에폭(epoch)에 따라서 학습률을 조절하는 데 사용됩니다. 학습하는 동안,
+기울기 폭발(gradient exploding)을 방지하기 위해 모든 기울기를 함께 조정(scale)하는 함수
 <a class="reference external" href="https://pytorch.org/docs/master/nn.html?highlight=nn%20utils%20clip_grad_norm#torch.nn.utils.clip_grad_norm_">nn.utils.clip_grad_norm_</a>
-function to scale all the gradient together to prevent exploding.</p>
+을 이용합니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">criterion</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">CrossEntropyLoss</span><span class="p">()</span>
-<span class="n">lr</span> <span class="o">=</span> <span class="mf">5.0</span> <span class="c1"># learning rate</span>
+<span class="n">lr</span> <span class="o">=</span> <span class="mf">5.0</span> <span class="c1"># 학습률</span>
 <span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">SGD</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="n">lr</span><span class="p">)</span>
 <span class="n">scheduler</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">lr_scheduler</span><span class="o">.</span><span class="n">StepLR</span><span class="p">(</span><span class="n">optimizer</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">gamma</span><span class="o">=</span><span class="mf">0.95</span><span class="p">)</span>
 
 <span class="kn">import</span> <span class="nn">time</span>
 <span class="k">def</span> <span class="nf">train</span><span class="p">():</span>
-    <span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">()</span> <span class="c1"># Turn on the train mode</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">()</span> <span class="c1"># 훈련 모드로 전환</span>
     <span class="n">total_loss</span> <span class="o">=</span> <span class="mf">0.</span>
     <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
     <span class="n">ntokens</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">vocab</span><span class="p">)</span>
 
-    <span class="c1"># Train only for 50 batches to keep script execution time low.</span>
+    <span class="c1"># 스크립트 실행 시간을 짧게 유지하기 위해서 50 배치만 학습합니다.</span>
     <span class="n">nbatches</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="mi">50</span> <span class="o">*</span> <span class="n">bptt</span><span class="p">,</span> <span class="n">train_data</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
 
     <span class="k">for</span> <span class="n">batch</span><span class="p">,</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">nbatches</span><span class="p">,</span> <span class="n">bptt</span><span class="p">)):</span>
         <span class="n">data</span><span class="p">,</span> <span class="n">targets</span> <span class="o">=</span> <span class="n">get_batch</span><span class="p">(</span><span class="n">train_data</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
         <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
-        <span class="c1"># Since the Pipe is only within a single host and process the ``RRef``</span>
-        <span class="c1"># returned by forward method is local to this node and can simply</span>
-        <span class="c1"># retrieved via ``RRef.local_value()``.</span>
+        <span class="c1"># Pipe는 단일 호스트 내에 있고</span>
+        <span class="c1"># forward 메서드로 반환된 ``RRef`` 프로세스는 이 노드에 국한되어 있기 때문에</span>
+        <span class="c1"># ``RRef.local_value()`` 를 통해 간단히 찾을 수 있습니다.</span>
         <span class="n">output</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="n">local_value</span><span class="p">()</span>
-        <span class="c1"># Need to move targets to the device where the output of the</span>
-        <span class="c1"># pipeline resides.</span>
+        <span class="c1"># 타겟을 파이프라인 출력이 있는</span>
+        <span class="c1"># 장치로 옮겨야합니다.</span>
         <span class="n">loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">output</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">ntokens</span><span class="p">),</span> <span class="n">targets</span><span class="o">.</span><span class="n">cuda</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
         <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
         <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">clip_grad_norm_</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="mf">0.5</span><span class="p">)</span>
@@ -681,26 +675,26 @@ function to scale all the gradient together to prevent exploding.</p>
             <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
 
 <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="n">eval_model</span><span class="p">,</span> <span class="n">data_source</span><span class="p">):</span>
-    <span class="n">eval_model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span> <span class="c1"># Turn on the evaluation mode</span>
+    <span class="n">eval_model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span> <span class="c1"># 평가 모드로 전환</span>
     <span class="n">total_loss</span> <span class="o">=</span> <span class="mf">0.</span>
     <span class="n">ntokens</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">vocab</span><span class="p">)</span>
-    <span class="c1"># Evaluate only for 50 batches to keep script execution time low.</span>
+    <span class="c1"># 스크립트 실행 시간을 짧게 유지하기 위해 50 배치만 평가합니다.</span>
     <span class="n">nbatches</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="mi">50</span> <span class="o">*</span> <span class="n">bptt</span><span class="p">,</span> <span class="n">data_source</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
     <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">nbatches</span><span class="p">,</span> <span class="n">bptt</span><span class="p">):</span>
             <span class="n">data</span><span class="p">,</span> <span class="n">targets</span> <span class="o">=</span> <span class="n">get_batch</span><span class="p">(</span><span class="n">data_source</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
             <span class="n">output</span> <span class="o">=</span> <span class="n">eval_model</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="n">local_value</span><span class="p">()</span>
             <span class="n">output_flat</span> <span class="o">=</span> <span class="n">output</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">ntokens</span><span class="p">)</span>
-            <span class="c1"># Need to move targets to the device where the output of the</span>
-            <span class="c1"># pipeline resides.</span>
+            <span class="c1"># 타겟을 파이프라인 출력이 있는</span>
+            <span class="c1"># 장치로 옮겨야합니다.</span>
             <span class="n">total_loss</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">*</span> <span class="n">criterion</span><span class="p">(</span><span class="n">output_flat</span><span class="p">,</span> <span class="n">targets</span><span class="o">.</span><span class="n">cuda</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">total_loss</span> <span class="o">/</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data_source</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Loop over epochs. Save the model if the validation loss is the best
-we’ve seen so far. Adjust the learning rate after each epoch.</p>
+<p>에폭을 반복합니다. 만약 검증 오차(validation loss)가 지금까지 관찰한 것 중 최적이라면
+모델을 저장합니다. 각 에폭 이후에 학습률을 조절합니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">best_val_loss</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;inf&quot;</span><span class="p">)</span>
-<span class="n">epochs</span> <span class="o">=</span> <span class="mi">3</span> <span class="c1"># The number of epochs</span>
+<span class="n">epochs</span> <span class="o">=</span> <span class="mi">3</span> <span class="c1"># 에폭 수</span>
 <span class="n">best_model</span> <span class="o">=</span> <span class="kc">None</span>
 
 <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">epochs</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
@@ -721,33 +715,33 @@ we’ve seen so far. Adjust the learning rate after each epoch.</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>| epoch   1 |    10/   50 batches | lr 5.00 | ms/batch 1740.28 | loss 50.14 | ppl 5980525373084196143104.00
-| epoch   1 |    20/   50 batches | lr 5.00 | ms/batch 1597.76 | loss 41.04 | ppl 663833668603598848.00
-| epoch   1 |    30/   50 batches | lr 5.00 | ms/batch 1620.00 | loss 41.86 | ppl 1517773323920218112.00
-| epoch   1 |    40/   50 batches | lr 5.00 | ms/batch 1747.61 | loss 40.70 | ppl 473399018754303872.00
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>| epoch   1 |    10/   50 batches | lr 5.00 | ms/batch 1732.57 | loss 47.65 | ppl 492333900565249196032.00
+| epoch   1 |    20/   50 batches | lr 5.00 | ms/batch 1587.88 | loss 46.37 | ppl 136864981985371881472.00
+| epoch   1 |    30/   50 batches | lr 5.00 | ms/batch 1629.83 | loss 41.87 | ppl 1533297460923181824.00
+| epoch   1 |    40/   50 batches | lr 5.00 | ms/batch 1733.55 | loss 34.86 | ppl 1377085584626264.50
 -----------------------------------------------------------------------------------------
-| end of epoch   1 | time: 95.48s | valid loss  0.93 | valid ppl     2.54
+| end of epoch   1 | time: 94.86s | valid loss  0.72 | valid ppl     2.06
 -----------------------------------------------------------------------------------------
-| epoch   2 |    10/   50 batches | lr 4.51 | ms/batch 1932.93 | loss 40.28 | ppl 310878572035573952.00
-| epoch   2 |    20/   50 batches | lr 4.51 | ms/batch 1757.35 | loss 30.70 | ppl 21564140291862.36
-| epoch   2 |    30/   50 batches | lr 4.51 | ms/batch 1756.24 | loss 28.36 | ppl 2082204609249.13
-| epoch   2 |    40/   50 batches | lr 4.51 | ms/batch 1755.88 | loss 21.20 | ppl 1605777735.11
+| epoch   2 |    10/   50 batches | lr 4.51 | ms/batch 1906.81 | loss 36.26 | ppl 5584929422107115.00
+| epoch   2 |    20/   50 batches | lr 4.51 | ms/batch 1733.25 | loss 27.19 | ppl 646561080758.33
+| epoch   2 |    30/   50 batches | lr 4.51 | ms/batch 1733.68 | loss 26.45 | ppl 305846605945.31
+| epoch   2 |    40/   50 batches | lr 4.51 | ms/batch 1732.56 | loss 19.96 | ppl 465651757.96
 -----------------------------------------------------------------------------------------
-| end of epoch   2 | time: 100.42s | valid loss  0.29 | valid ppl     1.34
+| end of epoch   2 | time: 99.09s | valid loss  0.36 | valid ppl     1.43
 -----------------------------------------------------------------------------------------
-| epoch   3 |    10/   50 batches | lr 4.29 | ms/batch 1930.29 | loss 16.47 | ppl 14163115.16
-| epoch   3 |    20/   50 batches | lr 4.29 | ms/batch 1754.96 | loss 10.44 | ppl 34247.88
-| epoch   3 |    30/   50 batches | lr 4.29 | ms/batch 1755.21 | loss 11.89 | ppl 145144.67
-| epoch   3 |    40/   50 batches | lr 4.29 | ms/batch 1753.86 | loss 11.31 | ppl 81468.28
+| epoch   3 |    10/   50 batches | lr 4.29 | ms/batch 1906.98 | loss 16.07 | ppl 9566824.71
+| epoch   3 |    20/   50 batches | lr 4.29 | ms/batch 1732.40 | loss 10.31 | ppl 30046.23
+| epoch   3 |    30/   50 batches | lr 4.29 | ms/batch 1731.85 | loss 10.51 | ppl 36848.62
+| epoch   3 |    40/   50 batches | lr 4.29 | ms/batch 1733.73 | loss  9.77 | ppl 17565.60
 -----------------------------------------------------------------------------------------
-| end of epoch   3 | time: 100.35s | valid loss  0.26 | valid ppl     1.30
+| end of epoch   3 | time: 99.07s | valid loss  0.22 | valid ppl     1.24
 -----------------------------------------------------------------------------------------
 </pre></div>
 </div>
 </div>
-<div class="section" id="evaluate-the-model-with-the-test-dataset">
-<h2>Evaluate the model with the test dataset<a class="headerlink" href="#evaluate-the-model-with-the-test-dataset" title="Permalink to this headline">¶</a></h2>
-<p>Apply the best model to check the result with the test dataset.</p>
+<div class="section" id="id8">
+<h2>평가 데이터셋으로 모델 평가하기<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h2>
+<p>평가 데이터셋에서의 결과를 확인하기 위해 최고의 모델을 적용합니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">test_loss</span> <span class="o">=</span> <span class="n">evaluate</span><span class="p">(</span><span class="n">best_model</span><span class="p">,</span> <span class="n">test_data</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;=&#39;</span> <span class="o">*</span> <span class="mi">89</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;| End of training | test loss </span><span class="si">{:5.2f}</span><span class="s1"> | test ppl </span><span class="si">{:8.2f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
@@ -757,11 +751,11 @@ we’ve seen so far. Adjust the learning rate after each epoch.</p>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>=========================================================================================
-| End of training | test loss  0.23 | test ppl     1.25
+| End of training | test loss  0.19 | test ppl     1.21
 =========================================================================================
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 5 minutes  38.419 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 5 minutes  38.531 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-intermediate-pipeline-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <a class="reference download internal" download="" href="../_downloads/0f7092cb660ccb79962f314758ab0b78/pipeline_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">pipeline_tutorial.py</span></code></a></div>
@@ -826,15 +820,15 @@ we’ve seen so far. Adjust the learning rate after each epoch.</p>
           <div class="pytorch-right-menu" id="pytorch-right-menu">
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
-<li><a class="reference internal" href="#">Training Transformer models using Pipeline Parallelism</a><ul>
-<li><a class="reference internal" href="#define-the-model">Define the model</a></li>
-<li><a class="reference internal" href="#load-and-batch-data">Load and batch data</a><ul>
-<li><a class="reference internal" href="#functions-to-generate-input-and-target-sequence">Functions to generate input and target sequence</a></li>
+<li><a class="reference internal" href="#">파이프라인 병렬화로 트랜스포머 모델 학습시키기</a><ul>
+<li><a class="reference internal" href="#id3">모델 정의하기</a></li>
+<li><a class="reference internal" href="#id4">데이터 로드하고 배치 만들기</a><ul>
+<li><a class="reference internal" href="#id5">입력과 타겟 시퀀스를 생성하기 위한 함수들</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#model-scale-and-pipe-initialization">Model scale and Pipe initialization</a></li>
-<li><a class="reference internal" href="#run-the-model">Run the model</a></li>
-<li><a class="reference internal" href="#evaluate-the-model-with-the-test-dataset">Evaluate the model with the test dataset</a></li>
+<li><a class="reference internal" href="#id6">모델 규모와 파이프 초기화</a></li>
+<li><a class="reference internal" href="#id7">모델 실행하기</a></li>
+<li><a class="reference internal" href="#id8">평가 데이터셋으로 모델 평가하기</a></li>
 </ul>
 </li>
 </ul>
