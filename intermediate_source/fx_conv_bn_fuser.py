@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-(베타) FX에서 합성곱/배치 정규화(Convolution/Batch Norm) 결합기(Fuser) 구축하기
+(베타) FX에서 합성곱/배치 정규화(Convolution/Batch Norm) 결합기(Fuser) 만들기
 ****************************************************************************
 **저자**: `Horace He <https://github.com/chillee>`_
 
@@ -13,7 +13,7 @@
 
 이 최적화는 추론 모드(즉, `mode.eval()`)의 모델에만 적용된다는 점에 유의하세요.
 
-다음 링크에 있는 결합기를 구축할 것입니다.
+다음 링크에 있는 결합기를 만들 것입니다.
 https://github.com/pytorch/pytorch/blob/orig/release/1.8/torch/fx/experimental/fuser.py
 
 """
@@ -159,7 +159,7 @@ def fuse(model: torch.nn.Module) -> torch.nn.Module:
     # `그래프` 자체는 `노드` 객체의 목록으로 표시됩니다.
     # 따라서 그래프의 모든 작업을 반복하기 위해 `그래프` 에서 각 `노드` 에 대해 반복합니다.
     for node in fx_model.graph.nodes:
-        # FX IR 에는 일반적으로 모듈, 함수 또는 메서드에 대한
+        # FX IR 에는 일반적으로 모듈, 함수 또는 메소드에 대한
         # 호출 사이트를 나타내는 여러 유형의 노드가 있습니다.
         # 노드의 유형은 `Node.op` 에 의해 결정됩니다.
         if node.op != 'call_module': # 현재 노드가 모듈을 호출하지 않으면 무시할 수 있습니다.
