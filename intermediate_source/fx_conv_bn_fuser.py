@@ -188,7 +188,7 @@ def fuse(model: torch.nn.Module) -> torch.nn.Module:
 
 ######################################################################
 # .. note::
-#       여기서는 2D 합성곱만 일치시키는 등 시연 목적으로 몇 가지 단순화를 수행합니다.
+#       여기서는 2D 합성곱만 일치시키는 등 시연 목적으로 약간의 단순화를 하였습니다.
 #       더 유용한 전달은 다음 링크를 참조하십시오.
 #       https://github.com/pytorch/pytorch/blob/master/torch/fx/experimental/fuser.py
 
@@ -244,7 +244,7 @@ print("jit time: ", benchmark(jit_rn18))
 # ---
 # FX를 사용하면 PyTorch 코드에 정적 그래프 변환을 쉽게 작성할 수 있습니다.
 #
-# FX는 아직 베타 버전이기 때문에 FX 사용에 대한 피드백을 들려주시면 감사하겠습니다.
+# FX는 아직 베타 버전이기 때문에 FX 사용에 대한 피드백을 보내주시면 감사하겠습니다.
 # PyTorch 포럼 (https://discuss.pytorch.org/)
 # 이슈 추적기 (https://github.com/pytorch/pytorch/issues)
 # 위 두 링크를 사용하여 피드백을 제공해주시면 됩니다.
