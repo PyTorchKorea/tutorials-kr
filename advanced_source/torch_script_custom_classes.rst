@@ -111,7 +111,7 @@ CMake를 사용하여 C++ 프로젝트로 예제 빌드
 Python 및 TorchScript의 C++ 클래스 사용
 --------------------------------------
 
-이제 클래스와 등록이 ``.so`` 파일로 컴파일되었으므로 해당 `.so` 를 Python에 로드하고 사용해 볼 수 있습니다.
+이제 클래스와 등록이 ``.so`` 파일로 컴파일되었으므로 해당 `.so` 를 Python에 읽어들이고 사용해 볼 수 있습니다.
 다음은 이를 보여주는 스크립트입니다:
 
 .. literalinclude:: ../advanced_source/torch_script_custom_classes/custom_class_project/custom_test.py
@@ -129,7 +129,7 @@ libtorch를 사용하여 C++ 프로세스에서 커스텀 등록 C++ 클래스�
 
 파일 시스템의 foo.pt는 방금 정의한 직렬화된 TorchScript 프로그램을 포함합니다.
 
-이제 이 모델과 필요한 .so 파일을 로드하는 방법을 보여주기 위해 새 CMake 프로젝트를 정의하겠습니다.
+이제 이 모델과 필요한 .so 파일을 읽어들이는 방법을 보여주기 위해 새 CMake 프로젝트를 정의하겠습니다.
 이 작업을 수행하는 방법에 대한 자세한 내용은 `C++에서 TorchScript 모델 로딩하기 <https://tutorials.pytorch.kr/advanced/cpp_export.html>`_ 를 
 참조하세요.
 
@@ -320,10 +320,9 @@ TorchScript가 C++ 클래스에서 저장한 정보를 자동으로 파악할 �
 
 이 튜토리얼에서는 독립된 C++ 프로세스에서 C++ 클래스를 TorchScript 및 
 확장 Python에 나타내는 방법, 해당 메소드를 등록하는 방법, Python 및 TorchScript에서 
-해당 클래스를 사용하는 방법, 클래스를 사용하여 코드를 저장 및 로드하고 해당 코드를 
-실행하는 방법을 안내했습니다. 이제 타사 C++ 라이브러리와 인터페이스가 있는 C++ 클래스로
-TorchScript 모델을 확장하거나 Python, TorchScript 및 C++ 간의 라인이 원활하게
-혼합되어야 하는 다른 사용 사례를 구현할 준비가 되었습니다.
+해당 클래스를 사용하는 방법, 클래스를 사용하여 코드를 저장 및 읽어들이고 해당 코드를 실행하는 방법을 안내했습니다.
+이제 타사 C++ 라이브러리와 인터페이스가 있는 C++ 클래스로 TorchScript 모델을 확장하거나,
+Python, TorchScript 및 C++ 간의 라인이 원활하게 혼합되어야 하는 다른 사용 사례를 구현할 준비가 되었습니다.
 
 언제나 처럼 문제를 마주치거나 질문이 있으면 저희 `forum <https://discuss.pytorch.org/>`_ 또는 
 `GitHub issues <https://github.com/pytorch/pytorch/issues>`_ 에 올려주시면 되겠습니다.
