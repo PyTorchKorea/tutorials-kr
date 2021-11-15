@@ -38,29 +38,28 @@ class HybridModel(torch.nn.Module):
 # BEGIN setup_trainer
 def _run_trainer(remote_emb_module, rank):
     r"""
-    Each trainer runs a forward pass which involves an embedding lookup on the
-    parameter server and running nn.Linear locally. During the backward pass,
-    DDP is responsible for aggregating the gradients for the dense part
-    (nn.Linear) and distributed autograd ensures gradients updates are
-    propagated to the parameter server.
+    각 트레이너는 매개변수 서버(parameter server)에서 임베딩 룩업(embedding lookup)을 포함하고
+    전역에서 nn.Linear를 실행하는 전방 전달(forward pass)를 실행합니다.
+    후방 전달(backward pass) 동안에 DDP는 조밀한 부분(nn.Linear)에 대한 그래디언트(gradient) 집계를 담당하고
+    분산 autograd는 그래디언트 업데이트가 매개변수 서버로 전파되도록 합니다.
     """
 
-    # Setup the model.
+    # 모델을 설정합니다.
     model = HybridModel(remote_emb_module, rank)
 
-    # Retrieve all model parameters as rrefs for DistributedOptimizer.
+    # 모든 모델 매개변수를 DistributedOptimizer에 대한 rref로 검색합니다.
 
-    # Retrieve parameters for embedding table.
+    # 임베딩 테이블에 대한 매개변수를 검색합니다.
     model_parameter_rrefs = model.remote_emb_module.remote_parameters()
 
-    # model.fc.parameters() only includes local parameters.
-    # NOTE: Cannot call model.parameters() here,
-    # because this will call remote_emb_module.parameters(),
-    # which supports remote_parameters() but not parameters().
+    # model.fc.parameters()은 오직 지역 매개변수만 포함합니다.
+    # 참고: 여기에서는 model.parameters()를 호출할 수 없습니다.
+    # 왜냐하면 parameters()가 아니라 remote_parameters()를 지원하는
+    # remote_emb_module.parameters()를 호출하기 때문입니다.
     for param in model.fc.parameters():
         model_parameter_rrefs.append(RRef(param))
 
-    # Setup distributed optimizer
+    # Distributed optimizer을 설정합니다.
     opt = DistributedOptimizer(
         optim.SGD,
         model_parameter_rrefs,
@@ -76,7 +75,7 @@ def _run_trainer(remote_emb_module, rank):
             num_indices = random.randint(20, 50)
             indices = torch.LongTensor(num_indices).random_(0, NUM_EMBEDDINGS)
 
-            # Generate offsets.
+            # 오프셋(offset)을 생성합니다.
             offsets = []
             start = 0
             batch_size = 0
@@ -89,22 +88,24 @@ def _run_trainer(remote_emb_module, rank):
             target = torch.LongTensor(batch_size).random_(8).cuda(rank)
             yield indices, offsets_tensor, target
 
-    # Train for 100 epochs
+    # 100개의 에폭크(ephoc)에 대해 학습합니다.
     for epoch in range(100):
-        # create distributed autograd context
+        # Distributed autograd context를 생성합니다.
         for indices, offsets, target in get_next_batch(rank):
             with dist_autograd.context() as context_id:
                 output = model(indices, offsets)
                 loss = criterion(output, target)
 
-                # Run distributed backward pass
+                # 분산 후방 전달(distributed backward pass)을 실행합니다.
                 dist_autograd.backward(context_id, [loss])
 
-                # Tun distributed optimizer
+                # Distributed optimizer를 실행시킵니다.
                 opt.step(context_id)
 
                 # Not necessary to zero grads as each iteration creates a different
                 # distributed autograd context which hosts different grads
+                # 반복할 때마다 다른 그래디언트를 호스팅하는 하나의 다른 distributed autograd context를 생성하므로
+                # 그래디언트를 0으로 만들 필요가 없습니다.
         print("Training done for epoch {}".format(epoch))
         # END run_trainer
 
@@ -115,12 +116,12 @@ def run_worker(rank, world_size):
     RPC.
     """
 
-    # We need to use different port numbers in TCP init_method for init_rpc and
-    # init_process_group to avoid port conflicts.
+    # 포트 충돌을 피하기 위해 init_rpc 및 init_process_group에 대해
+    # TCP init_method에서 다른 포트 번호를 사용해야 합니다.
     rpc_backend_options = TensorPipeRpcBackendOptions()
     rpc_backend_options.init_method = "tcp://localhost:29501"
 
-    # Rank 2 is master, 3 is ps and 0 and 1 are trainers.
+    # Rank 2 는  master를 의미하고, 3은 is 매개변수 서버, 그리고 0과 1은 트레이너를 뜻한다.
     if rank == 2:
         rpc.init_rpc(
             "master",
@@ -136,7 +137,7 @@ def run_worker(rank, world_size):
             kwargs={"mode": "sum"},
         )
 
-        # Run the training loop on trainers.
+        # 트레이너에서 학습 루프를 실행합니다.
         futs = []
         for trainer_rank in [0, 1]:
             trainer_name = "trainer{}".format(trainer_rank)
@@ -145,16 +146,16 @@ def run_worker(rank, world_size):
             )
             futs.append(fut)
 
-        # Wait for all training to finish.
+        # 모든 학습이 끝날 때까지 기다립니다.
         for fut in futs:
             fut.wait()
     elif rank <= 1:
-        # Initialize process group for Distributed DataParallel on trainers.
+        # 트레이너에서 분산 데이터 병렬(Distributed DataParallel)에 대한 프로세스 그룹을 초기화합니다.
         dist.init_process_group(
             backend="gloo", rank=rank, world_size=2, init_method="tcp://localhost:29500"
         )
 
-        # Initialize RPC.
+        # RPC를 초기화합니다.
         trainer_name = "trainer{}".format(rank)
         rpc.init_rpc(
             trainer_name,
@@ -163,7 +164,7 @@ def run_worker(rank, world_size):
             rpc_backend_options=rpc_backend_options,
         )
 
-        # Trainer just waits for RPCs from master.
+        # 트레이너는 마스터의 RPC를 기다리기만 합니다.
     else:
         rpc.init_rpc(
             "ps",
@@ -171,15 +172,15 @@ def run_worker(rank, world_size):
             world_size=world_size,
             rpc_backend_options=rpc_backend_options,
         )
-        # parameter server do nothing
+        # 매개변수 서버는 아무것도 하지 않습니다.
         pass
 
-    # block until all rpcs finish
+    # 모든 rpc가 끝날 때까지 차단합니다.
     rpc.shutdown()
 
 
 if __name__ == "__main__":
-    # 2 trainers, 1 parameter server, 1 master.
+    # 2개의 트레이너, 1개의 매개변수 서버, 1개의 마스터
     world_size = 4
     mp.spawn(run_worker, args=(world_size,), nprocs=world_size, join=True)
 # END run_worker

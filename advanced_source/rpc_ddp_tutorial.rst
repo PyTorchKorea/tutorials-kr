@@ -1,93 +1,85 @@
-Combining Distributed DataParallel with Distributed RPC Framework
+분산 데이터 병렬(DDP)과 분산 RPC 프레임워크 결합
 =================================================================
-**Authors**: `Pritam Damania <https://github.com/pritamdamania87>`_ and `Yi Wang <https://github.com/SciPioneer>`_
+**Authors**: `Pritam Damania <https://github.com/pritamdamania87>`__ and `Yi Wang <https://github.com/SciPioneer>`__
+
+**번역**: `박다정 <https://github.com/dajeongPark-dev>`_
 
 
-This tutorial uses a simple example to demonstrate how you can combine
-`DistributedDataParallel <https://pytorch.org/docs/stable/nn.html#torch.nn.parallel.DistributedDataParallel>`__ (DDP)
-with the `Distributed RPC framework <https://pytorch.org/docs/master/rpc.html>`__
-to combine distributed data parallelism with distributed model parallelism to
-train a simple model. Source code of the example can be found `here <https://github.com/pytorch/examples/tree/master/distributed/rpc/ddp_rpc>`__.
+이 튜토리얼은 간단한 예제를 사용하여 분산 데이터 병렬 처리(distributed data parallelism)와
+분산 모델 병렬 처리(distributed model parallelism)를 결합하여 간단한 모델 학습시킬 때
+`분산 데이터 병렬(DistributedDataParallel) <https://pytorch.org/docs/stable/nn.html#torch.nn.parallel.DistributedDataParallel>`__ (DDP)과
+`분산 RPC 프레임워크(Distributed RPC framework) <https://pytorch.org/docs/master/rpc.html>`__를 결합하는 방법에 대해 설명합니다.
+예제의 소스 코드는 `여기 <https://github.com/pytorch/examples/tree/master/distributed/rpc/ddp_rpc>`__에서 확인할 수 있습니다.
 
-Previous tutorials,
-`Getting Started With Distributed Data Parallel <https://tutorials.pytorch.kr/intermediate/ddp_tutorial.html>`__
-and `Getting Started with Distributed RPC Framework <https://tutorials.pytorch.kr/intermediate/rpc_tutorial.html>`__,
-described how to perform distributed data parallel and distributed model
-parallel training respectively. Although, there are several training paradigms
-where you might want to combine these two techniques. For example:
+이전 튜토리얼 내용이었던
+`분산 데이터 병렬 시작하기 <https://tutorials.pytorch.kr/intermediate/ddp_tutorial.html>`__
+와 `분산 RPC 프레임워크 시작하기 <https://tutorials.pytorch.kr/intermediate/rpc_tutorial.html>`__는
+분산 데이터 병렬 및 분산 모델 병렬 학습을 각각 수행하는 방법에 대해 설명합니다.
+그러나 이 두 가지 기술을 결합할 수 있는 몇 가지 학습 패러다임이 있습니다. 예를 들어:
 
-1) If we have a model with a sparse part (large embedding table) and a dense
-   part (FC layers), we might want to put the embedding table on a parameter
-   server and replicate the FC layer across multiple trainers using `DistributedDataParallel <https://pytorch.org/docs/stable/nn.html#torch.nn.parallel.DistributedDataParallel>`__.
-   The `Distributed RPC framework <https://pytorch.org/docs/master/rpc.html>`__
-   can be used to perform embedding lookups on the parameter server.
-2) Enable hybrid parallelism as described in the `PipeDream <https://arxiv.org/abs/1806.03377>`__ paper.
-   We can use the `Distributed RPC framework <https://pytorch.org/docs/master/rpc.html>`__
-   to pipeline stages of the model across multiple workers and replicate each
-   stage (if needed) using `DistributedDataParallel <https://pytorch.org/docs/stable/nn.html#torch.nn.parallel.DistributedDataParallel>`__.
-
-|
-In this tutorial we will cover case 1 mentioned above. We have a total of 4
-workers in our setup as follows:
-
-
-1) 1 Master, which is responsible for creating an embedding table
-   (nn.EmbeddingBag) on the parameter server. The master also drives the
-   training loop on the two trainers.
-2) 1 Parameter Server, which basically holds the embedding table in memory and
-   responds to RPCs from the Master and Trainers.
-3) 2 Trainers, which store an FC layer (nn.Linear) which is replicated amongst
-   themselves using `DistributedDataParallel <https://pytorch.org/docs/stable/nn.html#torch.nn.parallel.DistributedDataParallel>`__.
-   The trainers are also responsible for executing the forward pass, backward
-   pass and optimizer step.
+1) 희소 부분(큰 임베딩 테이블)과 밀집 부분(FC 레이어)이 있는 모델이 있는 경우,
+   매개변수 서버(parameter server)에 임베딩 테이블(embedding table)을 놓고 `분산 데이터 병렬 <https://pytorch.org/docs/stable/nn.html#torch.nn.parallel.DistributedDataParallel>`__을 사용하여
+   여러 트레이너(trainer)에 걸쳐 FC 레이어를 복제하는 것을 원할 수도 있습니다.
+   이때 `분산 RPC 프레임워크 <https://pytorch.org/docs/master/rpc.html>`__는
+   매개변수 서버에서 임베딩 룩업(embedding lookup)을 수행하는 데 사용할 수 있습니다.
+2) 다음은 `PipeDream <https://arxiv.org/abs/1806.03377>`__ 문서에서 설명된 하이브리드 병렬 처리 활성화하기 입니다.
+   `분산 RPC 프레임워크 <https://pytorch.org/docs/master/rpc.html>`__를 사용하여
+   여러 worker에 걸쳐 모델의 단계를 파이프라인할 수 있고
+   (필요에 따라) `분산 데이터 병렬 <https://pytorch.org/docs/stable/nn.html#torch.nn.parallel.DistributedDataParallel>`__을 이용해서
+   각 단계를 복제할 수 있습니다.
 
 |
-The entire training process is executed as follows:
-
-1) The master creates a `RemoteModule <https://pytorch.org/docs/master/rpc.html#remotemodule>`__
-   that holds an embedding table on the Parameter Server.
-2) The master, then kicks off the training loop on the trainers and passes the
-   remote module to the trainers.
-3) The trainers create a ``HybridModel`` which first performs an embedding lookup
-   using the remote module provided by the master and then executes the
-   FC layer which is wrapped inside DDP.
-4) The trainer executes the forward pass of the model and uses the loss to
-   execute the backward pass using `Distributed Autograd <https://pytorch.org/docs/master/rpc.html#distributed-autograd-framework>`__.
-5) As part of the backward pass, the gradients for the FC layer are computed
-   first and synced to all trainers via allreduce in DDP.
-6) Next, Distributed Autograd propagates the gradients to the parameter server,
-   where the gradients for the embedding table are updated.
-7) Finally, the `Distributed Optimizer <https://pytorch.org/docs/master/rpc.html#module-torch.distributed.optim>`__ is used to update all the parameters.
+이 튜토리얼에서는 위에서 언급한 첫 번째 경우를 다룰 것입니다.
+다음과 같이 총 4개의 worker가 있습니다:
 
 
-.. attention::
+1) 1개의 마스터는 매개변수 서버에 임베딩 테이블(nn.EmbeddingBag) 생성을 담당합니다.
+   또한 마스터는 두 트레이너의 트레이닝 루프를 구동합니다.
+2) 1개의 매개변수 서버는 기본적으로 메모리에 임베딩 테이블을 보유하고 마스터 및 트레이너의 RPC에 응답합니다.
+3) 2개의 트레이너는 `분산 데이터 병렬(DistributedDataParallel) <https://pytorch.org/docs/stable/nn.html#torch.nn.parallel.DistributedDataParallel>`__을
+   사용하여 자체적으로 복제되는 FC 레이어(nn.Linear)를 저장합니다.
+   트레이너는 또한 전방 전달(forward pass), 후방 전달(backward pass) 및 옵티마이저 단계를 실행해야 합니다.
 
-  You should always use `Distributed Autograd <https://pytorch.org/docs/master/rpc.html#distributed-autograd-framework>`__
-  for the backward pass if you're combining DDP and RPC.
+|
+전체적인 학습과정은 다음과 같이 실행됩니다:
+
+1) 마스터는 매개변수 서버에 임베딩 테이블을 홀딩(holding)하고 있는 
+   `RemoteModule <https://pytorch.org/docs/master/rpc.html#remotemodule>`__을 생성합니다.
+2) 그런 다음 마스터는 트레이너의 트레이닝 루프를 시작하고 원격 모듈(remote module)을 트레이너에게 전달합니다.
+3) 트레이너는 먼저 마스터에서 제공하는 원격 모듈을 사용하여
+   임베딩 룩업을 수행한 다음 DDP 내부에 래핑된 FC 레이어를 실행하는 ``HybridModel``을 생성합니다.
+4) 트레이너는 모델의 순방향 패스를 실행하고 손실을 사용하여 `Distributed Autograd <https://pytorch.org/docs/master/rpc.html#distributed-autograd-framework>`__를
+   사용하여 후방 전달(backward pass)을 실행합니다.
+5) 후방 전달(backward pass)의 일부로 FC 레이어의 그라디언트(gradient)가 먼저 계산되고 DDP의 allreduce를 통해 모든 트레이너와 동기화됩니다.
+6) 다음으로, Distributed Autograd는 매개변수 서버로 그라디언트를 전파합니다. 여기서 임베딩 테이블의 그라디언트가 업데이트됩니다.
+7) 마지막으로, `Distributed Optimizer <https://pytorch.org/docs/master/rpc.html#module-torch.distributed.optim>`__는 모든 매개변수를 업데이트하는 데 사용됩니다.
+
+.. 주의사항::
+
+  DDP와 RPC를 결합할 때, 후방 전달(backward pass)에 대해 항상
+  `Distributed Autograd <https://pytorch.org/docs/master/rpc.html#distributed-autograd-framework>`__을 사용해야 합니다.
 
 
-Now, let's go through each part in detail. Firstly, we need to setup all of our
-workers before we can perform any training. We create 4 processes such that
-ranks 0 and 1 are our trainers, rank 2 is the master and rank 3 is the
-parameter server.
+이제 각 부분을 자세히 살펴보겠습니다.
+먼저 학습을 수행하기 전에 모든 작업자를 설정해야 합니다.
+순위 0과 1은 트레이너, 순위 2는 마스터, 순위 3은 매개변수 서버인 4개의 프로세스를 만듭니다.
 
-We initialize the RPC framework on all 4 workers using the TCP init_method.
-Once RPC initialization is done, the master creates a remote module that holds an `EmbeddingBag <https://pytorch.org/docs/master/generated/torch.nn.EmbeddingBag.html>`__
-layer on the Parameter Server using `RemoteModule <https://pytorch.org/docs/master/rpc.html#torch.distributed.nn.api.remote_module.RemoteModule>`__.
-The master then loops through each trainer and kicks off the training loop by
-calling ``_run_trainer`` on each trainer using `rpc_async <https://pytorch.org/docs/master/rpc.html#torch.distributed.rpc.rpc_async>`__.
-Finally, the master waits for all training to finish before exiting.
+TCP init_method를 사용하여 4개의 모든 worker에서 RPC 프레임워크를 초기화합니다.
+RPC 초기화가 끝나면, 마스터는 `EmbeddingBag <https://pytorch.org/docs/master/generated/torch.nn.EmbeddingBag.html>`__ 레이어를
+`RemoteModule <https://pytorch.org/docs/master/rpc.html#remotemodule>`__을 사용하여
+매개변수 서버에 홀딩(holding)하고 있는 원격 모듈 하나를 생성합니다.
+그런 다음 마스터는 각 트레이너를 반복하고 `rpc_async <https://pytorch.org/docs/master/rpc.html#torch.distributed.rpc.rpc_async>`__를
+사용하여 각 트레이너에서 ``_run_trainer``를 호출하여 반복 학습을 시작합니다.
+마지막으로 마스터는 종료하기 전에 모든 학습이 완료될 때까지 기다립니다.
 
-The trainers first initialize a ``ProcessGroup`` for DDP with world_size=2
-(for two trainers) using `init_process_group <https://pytorch.org/docs/stable/distributed.html#torch.distributed.init_process_group>`__.
-Next, they initialize the RPC framework using the TCP init_method. Note that
-the ports are different in RPC initialization and ProcessGroup initialization.
-This is to avoid port conflicts between initialization of both frameworks.
-Once the initialization is done, the trainers just wait for the ``_run_trainer``
-RPC from the master.
+트레이너는 `init_process_group <https://pytorch.org/docs/stable/distributed.html#torch.distributed.init_process_group>`__을 사용하여
+(2개의 트레이너) world_size=2로 DDP를 위해 ``ProcessGroup``을 초기화 합니다.
+다음으로 TCP init_method를 사용하여 RPC 프레임워크를 초기화합니다.
+여기서 주의 할 점은 RPC 초기화와 ProgressGroup 초기화에서 쓰이는 포트(port)가 다르다는 것입니다.
+이는 두 프레임워크의 초기화 간에 포트 충돌을 피하기 위해서 입니다.
+초기화가 완료되면 트레이너는 마스터의 ``_run_trainer` RPC를 기다리기만 하면 됩니다.
 
-The parameter server just initializes the RPC framework and waits for RPCs from
-the trainers and master.
+파라피터 서버는 RPC 프레임워크를 초기화하고 트레이너와 마스터의 RPC를 기다립니다.
 
 
 .. literalinclude:: ../advanced_source/rpc_ddp_tutorial/main.py
@@ -95,16 +87,14 @@ the trainers and master.
   :start-after: BEGIN run_worker
   :end-before: END run_worker
 
-Before we discuss details of the Trainer, let's introduce the ``HybridModel`` that
-the trainer uses. As described below, the ``HybridModel`` is initialized using a
-remote module that holds an embedding table (``remote_emb_module``) on the parameter server and the ``device``
-to use for DDP. The initialization of the model wraps an
-`nn.Linear <https://pytorch.org/docs/master/generated/torch.nn.Linear.html>`__
-layer inside DDP to replicate and synchronize this layer across all trainers.
+트레이너에 대한 자세한 설명에 앞서, 트레이너가 사용하는 ``HybridModel``에 대해 설명드리겠습니다.
+아래에 설명된 대로 ``HybridModel``은 매개변수 서버의 임베딩 테이블(``remote_emb_module``)과 DDP에 사용할 ``장치(device)``를 보유하는 원격 모듈을 사용하여 초기화됩니다.
+모델 초기화는 DDP 내부의 `nn.Linear <https://pytorch.org/docs/master/generated/torch.nn.Linear.html>`__ 레이어를
+래핑하여 모든 트레이너에서 이 레이어를 복제하고 동기화합니다.
 
-The forward method of the model is pretty straightforward. It performs an
-embedding lookup on the parameter server using RemoteModule's ``forward``
-and passes its output onto the FC layer.
+
+모델의 forward 함수는 꽤 간단합니다.
+RemoteModule의 ``forward``를 사용하여 매개변수 서버에서 임베딩 룩업을 수행하고 그 출력을 FC 레이어에 전달합니다.
 
 
 .. literalinclude:: ../advanced_source/rpc_ddp_tutorial/main.py
@@ -112,44 +102,38 @@ and passes its output onto the FC layer.
   :start-after: BEGIN hybrid_model
   :end-before: END hybrid_model
 
-Next, let's look at the setup on the Trainer. The trainer first creates the
-``HybridModel`` described above using a remote module that holds the embedding table on the
-parameter server and its own rank.
+다음으로 트레이너의 설정을 살펴보겠습니다.
+트레이너는 먼저 매개변수 서버의 임베딩 테이블과 자체 순위를 보유하는 원격 모듈을 사용하여
+위에서 설명한 ``HybridModel``을 생성합니다.
 
-Now, we need to retrieve a list of RRefs to all the parameters that we would
-like to optimize with `DistributedOptimizer <https://pytorch.org/docs/master/rpc.html#module-torch.distributed.optim>`__.
-To retrieve the parameters for the embedding table from the parameter server,
-we can call RemoteModule's `remote_parameters <https://pytorch.org/docs/master/rpc.html#torch.distributed.nn.api.remote_module.RemoteModule.remote_parameters>`__,
-which basically walks through all the parameters for the embedding table and returns
-a list of RRefs. The trainer calls this method on the parameter server via RPC
-to receive a list of RRefs to the desired parameters. Since the
-DistributedOptimizer always takes a list of RRefs to parameters that need to
-be optimized, we need to create RRefs even for the local parameters for our
-FC layers. This is done by walking ``model.fc.parameters()``, creating an RRef for
-each parameter and appending it to the list returned from ``remote_parameters()``.
-Note that we cannnot use ``model.parameters()``,
-because it will recursively call ``model.remote_emb_module.parameters()``,
-which is not supported by ``RemoteModule``.
+이제 `DistributedOptimizer <https://pytorch.org/docs/master/rpc.html#module-torch.distributed.optim>`__로
+최적화하려는 모든 매개변수에 대한 RRef 목록을 검색해야 합니다.
+매개변수 서버에서 임베딩 테이블의 매개변수를 검색하기 위해
+RemoteModule의 `remote_parameters <https://pytorch.org/docs/master/rpc.html#torch.distributed.nn.api.remote_module.RemoteModule.remote_parameters>`__를 호출할 수 있습니다.
+그리고 이것은 기본적으로 임베딩 테이블의 모든 매개변수를 살펴보고 RRef 목록을 반환합니다.
+트레이너는 RPC를 통해 매개변수 서버에서 이 메서드를 호출하여 원하는 매개변수에 대한 RRef 목록을 수신합니다.
+DistributedOptimizer는 항상 최적화해야 하는 매개변수에 대한 RRef 목록을 가져오기 때문에 FC 레이어의 전역 매개변수에 대해서도 RRef를 생성해야 합니다.
+이것은 ``model.fc.parameters()``를 탐색하고 각 매개변수에 대한 RRef를 생성하고
+``remote_parameters()``에서 반환된 목록에 추가함으로써 수행됩니다.
+참고로 ``model.parameters()``는 사용할 수 없습니다. ``RemoteModule``에서 지원하지 않는 ``model.remote_emb_module.parameters()``를 재귀적으로 호출하기 때문입니다.
 
-Finally, we create our DistributedOptimizer using all the RRefs and define a
-CrossEntropyLoss function.
+마지막으로 모든 RRef를 사용하여 DistributedOptimizer를 만들고 CrossEntropyLoss 함수를 정의합니다.
 
 .. literalinclude:: ../advanced_source/rpc_ddp_tutorial/main.py
   :language: py
   :start-after: BEGIN setup_trainer
   :end-before: END setup_trainer
 
-Now we're ready to introduce the main training loop that is run on each trainer.
-``get_next_batch`` is just a helper function to generate random inputs and
-targets for training. We run the training loop for multiple epochs and for each
-batch:
+이제 각 트레이너에서 실행되는 기본 트레이닝 루프(training loop)를 소개하겠습니다.
+``get_next_batch``는 학습을 위한 임의의 입력과 대상을 생성하는 것을 도와주는 함수일 뿐입니다.
+여러 에포크(ephoc)와 각 배치(batch)에 대해 트레이닝 루프를 실행합니다:
 
-1) Setup a `Distributed Autograd Context <https://pytorch.org/docs/master/rpc.html#torch.distributed.autograd.context>`__
-   for Distributed Autograd.
-2) Run the forward pass of the model and retrieve its output.
-3) Compute the loss based on our outputs and targets using the loss function.
-4) Use Distributed Autograd to execute a distributed backward pass using the loss.
-5) Finally, run a Distributed Optimizer step to optimize all the parameters.
+1) 먼저 Distributed Autograd에 대해
+   `Distributed Autograd Context <https://pytorch.org/docs/master/rpc.html#torch.distributed.autograd.context>`를 설정합니다.
+2) 모델의 정방 전달(forward pass)을 실행하고 해당 출력을 검색(retrieve)합니다.
+3) 손실 함수를 사용하여 출력과 목표를 기반으로 손실을 계산합니다.
+4) Distributed Autograd를 사용하여 손실을 사용하여 분산 역방향 패스를 실행합니다.
+5) 마지막으로 Distributed Optimizer 단계를 실행하여 모든 매개변수를 최적화합니다.
 
 .. literalinclude:: ../advanced_source/rpc_ddp_tutorial/main.py
   :language: py
@@ -157,4 +141,4 @@ batch:
   :end-before: END run_trainer
 .. code:: python
 
-Source code for the entire example can be found `here <https://github.com/pytorch/examples/tree/master/distributed/rpc/ddp_rpc>`__.
+전체 예제의 소스 코드는 `여기 <https://github.com/pytorch/examples/tree/master/distributed/rpc/ddp_rpc>`__에서 찾을 수 있습니다.
