@@ -1,6 +1,5 @@
 분산 데이터 병렬 처리 시작하기
 ===================================
-
 **저자**: `Shen Li <https://mrshenli.github.io/>`_
 
 **편집자**: `Joe Zhu <https://github.com/gunandrose4u>`_
