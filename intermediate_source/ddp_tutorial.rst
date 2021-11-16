@@ -163,7 +163,7 @@ DDP에서는 생성자, 순전파(forward pass) 및 역전파(backward pass) 호
 학습 중에 ``torch.save``\와 ``torch.load`` 로 모듈의 체크포인트를 만들고 그 체크포인트로부터 복구하는 것이 일반적입니다.
 더 자세한 내용은 `SAVING AND LOADING MODELS <https://tutorials.pytorch.kr/beginner/saving_loading_models.html>`__\를 참고하세요. 
 DDP를 사용할 때, 최적의 방법은 모델을 한 프로세스에만 저장하고 
-그 모델을 모든 프로세스에 작성 오버헤드(write overhead)를 줄이며 읽어오는 것입니다.
+그 모델을 모든 프로세스에 쓰기 과부하(write overhead)를 줄이며 읽어오는 것입니다.
 이는 모든 프로세스가 같은 매개변수로부터 시작되고 변화도(gradient)는 
 역전파 전달(backward pass)로 동기화되므로 옵티마이저(optimizer)는 
 매개변수를 동일한 값으로 계속 설정해야 하기 때문에 정확합니다. 이러한 최적화를 사용하는 경우, 
