@@ -5,6 +5,8 @@
 
 **편집자**: `Joe Zhu <https://github.com/gunandrose4u>`_
 
+**번역자**: `조병근 <https://github.com/Jo-byung-geun>`_
+
 선수과목(Prerequisites):
 
 -  `PyTorch 분산 처리 개요 <../beginner/dist_overview.html>`__
@@ -26,7 +28,7 @@ hook은 역방향 전달에서 해당 변화도(gradient)가 계산될 때 작�
 DDP의 권장 사용법은, 여러 장치에 있을 수 있는 각 모델 복제본당 하나의 프로세스를 생성하는 것입니다.
 DDP 프로세스는 동일한 기기 또는 여러 기기에 배치할 수 있지만 GPU 장치는 프로세스 간에 공유할 수 없습니다.
 이 튜토리얼에서는 기본 DDP 사용 사례에서 시작하여, 
-checkpointing 모델 및 DDP와 모델 병렬 처리의 결합을 포함한 추가적인 사용 사례를 보여 줍니다.
+checkpointing 모델 및 DDP와 모델 병렬 처리의 결합을 포함한 추가적인 사용 사례를 보여줍니다.
 
 
 .. note::
@@ -94,7 +96,6 @@ DDP 모듈을 생성하기 전에 우선 작업 그룹을 올바르게 설정해
     def cleanup():
         dist.destroy_process_group()
 
-
 이제 DDP로 감싸여진 Toy 모듈을 생성하고 더미 입력 데이터를 입력해 보겠습니다.
 우선 DDP는 0순위 프로세스에서부터 DDP 생성자의 다른 모든 프로세스들에게 모델의 상태를 전달하므로, 
 다른 모델의 매개 변수 초기값들에서 시작하는 다른 DDP 프로세스들에 대하여 걱정할 필요가 없습니다.
@@ -110,6 +111,7 @@ DDP 모듈을 생성하기 전에 우선 작업 그룹을 올바르게 설정해
 
         def forward(self, x):
             return self.net2(self.relu(self.net1(x)))
+
 
     def demo_basic(rank, world_size):
         print(f"Running basic DDP example on rank {rank}.")
@@ -130,12 +132,12 @@ DDP 모듈을 생성하기 전에 우선 작업 그룹을 올바르게 설정해
 
         cleanup()
 
+
     def run_demo(demo_fn, world_size):
         mp.spawn(demo_fn,
                  args=(world_size,),
                  nprocs=world_size,
                  join=True)
-
 
 보여지는 바와 같이 DDP는 하위 수준의 분산 커뮤니케이션 세부 사항을 포함하고 
 로컬 모델처럼 깔끔한 API를 제공합니다. 변화도 동기화 통신(gradient synchronization communications)은 
