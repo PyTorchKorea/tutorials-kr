@@ -2,9 +2,9 @@
 ===================================
 **저자**: `Shen Li <https://mrshenli.github.io/>`_
 
-**편집자**: `Joe Zhu <https://github.com/gunandrose4u>`_
+**감수**: `Joe Zhu <https://github.com/gunandrose4u>`_
 
-**번역자**: `조병근 <https://github.com/Jo-byung-geun>`_
+**번역**: `조병근 <https://github.com/Jo-byung-geun>`_
 
 선수과목(Prerequisites):
 
@@ -19,8 +19,8 @@ DDP를 사용하는 어플리케이션은 여러 프로세스를 생성하고 �
 DDP는 `torch.distributed <https://tutorials.pytorch.kr/intermediate/dist_tuto.html>`__
 패키지의 집합 통신(collective communication)을 사용하여 변화도(gradient)와 버퍼를 동기화합니다. 
 좀 더 구체적으로, DDP는 ``model.parameters()``\에 의해 주어진 각 파라미터에 대해 Autograd hook을 등록하고, 
-hook은 역방향 전달에서 해당 변화도(gradient)가 계산될 때 작동합니다.
-다음으로 DDP는 이 신호를 사용하여 프로세스 간에 변화도(gradient) 동기화를 발생시킵니다. 자세한 내용은
+hook은 역방향 전달에서 해당 변화도가 계산될 때 작동합니다.
+다음으로 DDP는 이 신호를 사용하여 프로세스 간에 변화도 동기화를 발생시킵니다. 자세한 내용은
 `DDP design note <https://pytorch.org/docs/master/notes/ddp.html>`__\를 참조하십시오.
 
 
@@ -116,7 +116,7 @@ DDP 모듈을 생성하기 전에 우선 작업 그룹을 올바르게 설정해
         print(f"Running basic DDP example on rank {rank}.")
         setup(rank, world_size)
 
-        # 모델을 생성하고 rank 아이디가 있는 GPU로 전달.
+        # 모델을 생성하고 순위 아이디가 있는 GPU로 전달
         model = ToyModel().to(rank)
         ddp_model = DDP(model, device_ids=[rank])
 
@@ -140,18 +140,18 @@ DDP 모듈을 생성하기 전에 우선 작업 그룹을 올바르게 설정해
 
 보여지는 바와 같이 DDP는 하위 수준의 분산 커뮤니케이션 세부 사항을 포함하고 
 로컬 모델처럼 깔끔한 API를 제공합니다. 변화도 동기화 통신(gradient synchronization communications)은 
-역전파 작업(backward pass)간 수행되며 역전파 계산(backward computation)과 겹치게 됩니다.
+역전파 전달(backward pass)간 수행되며 역전파 계산(backward computation)과 겹치게 됩니다.
 ``backword()``\가 반환되면 ``param.grad``\에는 동기화된 변화도 텐서(synchronized gradient tensor)가 포함되어 있습니다.
 기본적으로 DDP는 프로세스 그룹을 설정하는데 몇 개의 LoCs만이 필요하지만 보다 다양하게 사용하는 경우 주의가 필요합니다.
 
 비대칭 프로세싱 속도
 --------------------
 
-DDP에서는 생성자, 순전파(forward pass) 및 역전파(backward pass) 호출 지점이 분산 동기화 지점(distribute synchronization point)입니다.
-서로 다른 프로세스가 동일한 수의 동기화를 시작하고 동일한 순서로 이러한 동기화 지점에 도달하여 각 동기화 지점을 거의 동시에 입력할 것을 요구합니다.
-그렇지 않으면 빠른 프로세스가 일찍 도착하고 다른 프로세스 대기 시간이 초과될 수 있습니다.
-따라서 사용자는 프로세스간의 작업량을 균형 있게 분배할 필요가 있습니다.
-때때로 비대칭 프로세스(skewed processing) 속도는 다음과 같은 이유로 인하여 불가피하게 발생합니다.
+DDP에서는 생성자, 순전파(forward pass) 및 역전파 전달 호출 지점이 분산 동기화 지점(distribute synchronization point)입니다.
+서로 다른 작업(process)이 동일한 수의 동기화를 시작하고 동일한 순서로 이러한 동기화 지점에 도달하여 각 동기화 지점을 거의 동시에 입력할 것을 요구합니다.
+그렇지 않으면 빠른 작업이 일찍 도착하고 다른 작업의 대기 시간이 초과될 수 있습니다.
+따라서 사용자는 작업 간의 작업량을 균형 있게 분배할 필요가 있습니다.
+때때로 비대칭 작업(skewed processing) 속도는 다음과 같은 이유로 인하여 불가피하게 발생합니다.
 예를 들어, 네트워크 지연, 리소스 경쟁(resource contentions), 예측하지 못한 작업량 급증 등입니다.
 이러한 상황에서 시간 초과를 방지하려면, `init_process_group <https://pytorch.org/docs/stable/distributed.html#torch.distributed.init_process_group>`__\를 
 호출할 때 충분한 ``timeout``\값을 전달해야 합니다.
@@ -163,8 +163,8 @@ DDP에서는 생성자, 순전파(forward pass) 및 역전파(backward pass) 호
 더 자세한 내용은 `SAVING AND LOADING MODELS <https://tutorials.pytorch.kr/beginner/saving_loading_models.html>`__\를 참고하세요. 
 DDP를 사용할 때, 최적의 방법은 모델을 한 프로세스에만 저장하고 
 그 모델을 모든 프로세스에 쓰기 과부하(write overhead)를 줄이며 읽어오는 것입니다.
-이는 모든 프로세스가 같은 매개변수로부터 시작되고 변화도(gradient)는 
-역전파 전달(backward pass)로 동기화되므로 옵티마이저(optimizer)는 
+이는 모든 프로세스가 같은 매개변수로부터 시작되고 변화도는 
+역전파 전달로 동기화되므로 옵티마이저(optimizer)는 
 매개변수를 동일한 값으로 계속 설정해야 하기 때문에 정확합니다. 이러한 최적화를 사용하는 경우, 
 저장이 완료되기 전에 읽어오는 프로세스를 시작하지 않도록 해야 합니다. 게다가, 모듈을 읽어올 때,
 프로세스가 다른 기기에 접근하지 않도록 적절한 ``map_location`` 인자를 제공해야합니다.
@@ -187,7 +187,7 @@ DDP를 사용할 때, 최적의 방법은 모델을 한 프로세스에만 저�
         CHECKPOINT_PATH = tempfile.gettempdir() + "/model.checkpoint"
         if rank == 0:
             # 모든 프로세스는 같은 매개변수로부터 시작된다고 생각해야 합니다.
-            # 무작위의 매개변수와 변화도(gradients)는 역전파 전달(backward pass)로 동기화 됩니다.
+            # 무작위의 매개변수와 변화도는 역전파 전달로 동기화 됩니다.
             # 그럼으로, 하나의 프로세스는 모델을 저장하기에 충분합니다.
             torch.save(ddp_model.state_dict(), CHECKPOINT_PATH)
 
@@ -206,7 +206,7 @@ DDP를 사용할 때, 최적의 방법은 모델을 한 프로세스에만 저�
         optimizer.step()
 
         # 파일삭제를 보호하기 위해 아래에 dist.barrier()를 사용할 필요는 없습니다.  
-        # DDP의 역전파 전달(backward pass)에 있는 AllReduce 옵스(ops)가 동기화 기능을 수행했기 때문에
+        # DDP의 역전파 전달 과정에 있는 AllReduce 옵스(ops)가 동기화 기능을 수행했기 때문에
 
         if rank == 0:
             os.remove(CHECKPOINT_PATH)
