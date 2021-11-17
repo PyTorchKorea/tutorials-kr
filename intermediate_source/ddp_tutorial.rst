@@ -42,7 +42,7 @@ checkpointing 모델 및 DDP와 모델 병렬 처리의 결합을 포함한 추�
 - 첫째, ``DataParallel``\은 단일 프로세스, 멀티쓰레드이며 단일 기기에서만 작동하는 반면,
   ``DistributedDataParallel``\은 다중 프로세스이며 단일 및 다중 기기 학습을 전부 지원합니다.
   ``DataParallel``\은 쓰레드간 GIL 경합, 복제 모델의 반복 당 생성, 산란 입력 및 수집 출력으로 인한 
-  추가 오버헤드로 인해 일반적으로 단일 시스템에서조차 ``DistributedDataParallel``\보다 느립니다.
+  추가적인 오버헤드로 인해 일반적으로 단일 시스템에서조차 ``DistributedDataParallel``\보다 느립니다.
 - 모델이 너무 커서 단일 GPU에 맞지 않을 경우 **model parallel**\을 사용하여 여러 GPU로 분할해야 한다는
   `prior tutorial <https://tutorials.pytorch.kr/intermediate/model_parallel_tutorial.html>`__\을 떠올려 보세요. 
   ``DistributedDataParallel``\은 **model parallel**\에서 실행되지만 ``DataParallel``\은 이때 실행되지 않습니다. 
@@ -188,7 +188,7 @@ DDP를 사용할 때, 최적의 방법은 모델을 한 프로세스에만 저�
         CHECKPOINT_PATH = tempfile.gettempdir() + "/model.checkpoint"
         if rank == 0:
             # 모든 프로세스는 같은 매개변수로부터 시작된다고 생각해야 합니다.
-            # 무작위의 매개변수와 변화도는 역전파 전달로 동기화 됩니다.
+            # 무작위의 매개변수와 변화도는 역전파 전달로 동기화됩니다.
             # 그럼으로, 하나의 프로세스는 모델을 저장하기에 충분합니다.
             torch.save(ddp_model.state_dict(), CHECKPOINT_PATH)
 
