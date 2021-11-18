@@ -1,71 +1,63 @@
-Getting Started with Distributed Data Parallel
-=================================================
-**Author**: `Shen Li <https://mrshenli.github.io/>`_
+분산 데이터 병렬 처리 시작하기
+===================================
+**저자**: `Shen Li <https://mrshenli.github.io/>`_
 
-**Edited by**: `Joe Zhu <https://github.com/gunandrose4u>`_
+**감수**: `Joe Zhu <https://github.com/gunandrose4u>`_
 
-Prerequisites:
+**번역**: `조병근 <https://github.com/Jo-byung-geun>`_
 
--  `PyTorch Distributed Overview <../beginner/dist_overview.html>`__
--  `DistributedDataParallel API documents <https://pytorch.org/docs/master/generated/torch.nn.parallel.DistributedDataParallel.html>`__
--  `DistributedDataParallel notes <https://pytorch.org/docs/master/notes/ddp.html>`__
+선수과목(Prerequisites):
 
-
-`DistributedDataParallel <https://pytorch.org/docs/stable/nn.html#torch.nn.parallel.DistributedDataParallel>`__
-(DDP) implements data parallelism at the module level which can run across
-multiple machines. Applications using DDP should spawn multiple processes and
-create a single DDP instance per process. DDP uses collective communications in the
-`torch.distributed <https://tutorials.pytorch.kr/intermediate/dist_tuto.html>`__
-package to synchronize gradients and buffers. More specifically, DDP registers
-an autograd hook for each parameter given by ``model.parameters()`` and the
-hook will fire when the corresponding gradient is computed in the backward
-pass. Then DDP uses that signal to trigger gradient synchronization across
-processes. Please refer to
-`DDP design note <https://pytorch.org/docs/master/notes/ddp.html>`__ for more details.
+-  `PyTorch 분산 처리 개요 <../beginner/dist_overview.html>`__
+-  `분산 데이터 병렬 처리 API 문서 <https://pytorch.org/docs/master/generated/torch.nn.parallel.DistributedDataParallel.html>`__
+-  `분산 데이터 병렬 처리 문서 <https://pytorch.org/docs/master/notes/ddp.html>`__
 
 
-The recommended way to use DDP is to spawn one process for each model replica,
-where a model replica can span multiple devices. DDP processes can be
-placed on the same machine or across machines, but GPU devices cannot be
-shared across processes. This tutorial starts from a basic DDP use case and
-then demonstrates more advanced use cases including checkpointing models and
-combining DDP with model parallel.
+`분산 데이터 병렬 처리 <https://pytorch.org/docs/stable/nn.html#torch.nn.parallel.DistributedDataParallel>`__\(DDP)는 
+여러 기기에서 실행할 수 있는 데이터 병렬 처리를 모듈 수준에서 구현합니다. 
+DDP를 사용하는 어플리케이션은 여러 작업(process)을 생성하고 작업 당 단일 DDP 인스턴스를 생성해야 합니다.
+DDP는 `torch.distributed <https://tutorials.pytorch.kr/intermediate/dist_tuto.html>`__
+패키지의 집합 통신(collective communication)을 사용하여 변화도(gradient)와 버퍼를 동기화합니다. 
+좀 더 구체적으로, DDP는 ``model.parameters()``\에 의해 주어진 각 파라미터에 대해 Autograd hook을 등록하고, 
+hook은 역방향 전달에서 해당 변화도가 계산될 때 작동합니다.
+다음으로 DDP는 이 신호를 사용하여 작업 간에 변화도 동기화를 발생시킵니다. 자세한 내용은
+`DDP design note <https://pytorch.org/docs/master/notes/ddp.html>`__\를 참조하십시오.
+
+
+DDP의 권장 사용법은, 여러 장치에 있을 수 있는 각 모델 복제본당 하나의 작업을 생성하는 것입니다.
+DDP 작업은 동일한 기기 또는 여러 기기에 배치할 수 있지만 GPU 장치는 작업 간에 공유할 수 없습니다.
+이 튜토리얼에서는 기본 DDP 사용 사례에서 시작하여, 
+checkpointing 모델 및 DDP와 모델 병렬 처리의 결합을 포함한 추가적인 사용 사례를 보여줍니다.
 
 
 .. note::
-  The code in this tutorial runs on an 8-GPU server, but it can be easily
-  generalized to other environments.
+    이 튜토리얼의 코드는 8-GPU 서버에서 실행되지만 다른 환경에서도 쉽게 적용할 수 있습니다.
+
+``DataParallel``\과 ``DistributedDataParallel`` 간의 비교
+----------------------------------------------------------
+
+내용에 들어가기에 앞서 복잡성이 증가했음에도 불구하고 
+``DataParallel``\에 ``DistributedDataParallel`` 사용을 고려하는 이유를 생각해봅시다.
+
+- 첫째, ``DataParallel``\은 단일 작업, 멀티쓰레드이며 단일 기기에서만 작동하는 반면,
+  ``DistributedDataParallel``\은 다중 작업이며 단일 및 다중 기기 학습을 전부 지원합니다.
+  ``DataParallel``\은 쓰레드간 GIL 경합, 복제 모델의 반복 당 생성, 산란 입력 및 수집 출력으로 인한 
+  추가적인 오버헤드로 인해 일반적으로 단일 시스템에서조차 ``DistributedDataParallel``\보다 느립니다.
+- 모델이 너무 커서 단일 GPU에 맞지 않을 경우 **model parallel**\을 사용하여 여러 GPU로 분할해야 한다는
+  `prior tutorial <https://tutorials.pytorch.kr/intermediate/model_parallel_tutorial.html>`__\을 떠올려 보세요. 
+  ``DistributedDataParallel``\은 **model parallel**\에서 실행되지만 ``DataParallel``\은 이때 실행되지 않습니다. 
+  DDP를 모델 병렬 처리와 결합하면 각 DDP 작업은 모델 병렬 처리를 사용하며 
+  모든 작업은 데이터 병렬 처리를 사용합니다.
+- 모델이 여러 대의 기기에 존재해야 하거나 사용 사례가 데이터 병렬화 패러다임에 맞지 않는 경우, 
+  일반적인 분산 학습 지원을 보려면 `the RPC API <https://pytorch.org/docs/stable/rpc.html>`__\를 참조하십시오.
+  
 
 
-Comparison between ``DataParallel`` and ``DistributedDataParallel``
--------------------------------------------------------------------
+기본적인 사용법
+---------------
 
-Before we dive in, let's clarify why, despite the added complexity, you would
-consider using ``DistributedDataParallel`` over ``DataParallel``:
-
-- First, ``DataParallel`` is single-process, multi-thread, and only works on a
-  single machine, while ``DistributedDataParallel`` is multi-process and works
-  for both single- and multi- machine training. ``DataParallel`` is usually
-  slower than ``DistributedDataParallel`` even on a single machine due to GIL
-  contention across threads, per-iteration replicated model, and additional
-  overhead introduced by scattering inputs and gathering outputs.
-- Recall from the
-  `prior tutorial <https://tutorials.pytorch.kr/intermediate/model_parallel_tutorial.html>`__
-  that if your model is too large to fit on a single GPU, you must use **model parallel**
-  to split it across multiple GPUs. ``DistributedDataParallel`` works with
-  **model parallel**; ``DataParallel`` does not at this time. When DDP is combined
-  with model parallel, each DDP process would use model parallel, and all processes
-  collectively would use data parallel.
-- If your model needs to span multiple machines or if your use case does not fit
-  into data parallelism paradigm, please see `the RPC API <https://pytorch.org/docs/stable/rpc.html>`__
-  for more generic distributed training support.
-
-Basic Use Case
---------------
-
-To create DDP modules, first set up process groups properly. More details can
-be found in
-`Writing Distributed Applications with PyTorch <https://tutorials.pytorch.kr/intermediate/dist_tuto.html>`__.
+DDP 모듈을 생성하기 전에 우선 작업 그룹을 올바르게 설정해야 합니다. 자세한 내용은 
+`PYTORCH로 분산 어플리케이션 개발하기 <https://tutorials.pytorch.kr/intermediate/dist_tuto.html>`__\에서 확인할 수 있습니다.
 
 .. code:: python
 
@@ -80,32 +72,32 @@ be found in
 
     from torch.nn.parallel import DistributedDataParallel as DDP
 
-    # On Windows platform, the torch.distributed package only
-    # supports Gloo backend, FileStore and TcpStore.
-    # For FileStore, set init_method parameter in init_process_group
-    # to a local file. Example as follow:
+    # 윈도우 플랫폼에서 torch.distributed 패키지는
+    # Gloo backend, FileStore 및 TcpStore 만을 지원합니다. 
+    # FileStore의 경우, init_process_group 에서 
+    # init_method 매개변수를 로컬 파일로 설정합니다.
+    # 다음 예시:
     # init_method="file:///f:/libtmp/some_file"
     # dist.init_process_group(
     #    "gloo",
     #    rank=rank,
     #    init_method=init_method,
     #    world_size=world_size)
-    # For TcpStore, same way as on Linux.
+    # TcpStore의 경우 리눅스와 동일한 방식입니다.
 
     def setup(rank, world_size):
         os.environ['MASTER_ADDR'] = 'localhost'
         os.environ['MASTER_PORT'] = '12355'
 
-        # initialize the process group
+        # 작업 그룹 초기화
         dist.init_process_group("gloo", rank=rank, world_size=world_size)
 
     def cleanup():
         dist.destroy_process_group()
 
-Now, let's create a toy module, wrap it with DDP, and feed it with some dummy
-input data. Please note, as DDP broadcasts model states from rank 0 process to
-all other processes in the DDP constructor, you don't need to worry about
-different DDP processes start from different model parameter initial values.
+이제 DDP로 감싸여진 Toy 모듈을 생성하고 더미 입력 데이터를 입력해 보겠습니다.
+우선 DDP는 0순위 작업에서부터 DDP 생성자의 다른 모든 작업들에게 모델의 상태를 전달하므로, 
+다른 모델의 매개 변수 초기값들에서 시작하는 다른 DDP 작업들에 대하여 걱정할 필요가 없습니다.
 
 .. code:: python
 
@@ -124,7 +116,7 @@ different DDP processes start from different model parameter initial values.
         print(f"Running basic DDP example on rank {rank}.")
         setup(rank, world_size)
 
-        # create model and move it to GPU with id rank
+        # 모델을 생성하고 순위 아이디가 있는 GPU로 전달
         model = ToyModel().to(rank)
         ddp_model = DDP(model, device_ids=[rank])
 
@@ -146,47 +138,40 @@ different DDP processes start from different model parameter initial values.
                  nprocs=world_size,
                  join=True)
 
-As you can see, DDP wraps lower-level distributed communication details and
-provides a clean API as if it is a local model. Gradient synchronization
-communications take place during the backward pass and overlap with the
-backward computation. When the ``backward()`` returns, ``param.grad`` already
-contains the synchronized gradient tensor. For basic use cases, DDP only
-requires a few more LoCs to set up the process group. When applying DDP to more
-advanced use cases, some caveats require caution.
+보여지는 바와 같이 DDP는 하위 수준의 분산 커뮤니케이션 세부 사항을 포함하고 
+로컬 모델처럼 깔끔한 API를 제공합니다. 변화도 동기화 통신(gradient synchronization communications)은 
+역전파 전달(backward pass)간 수행되며 역전파 계산(backward computation)과 겹치게 됩니다.
+``backword()``\가 반환되면 ``param.grad``\에는 동기화된 변화도 텐서(synchronized gradient tensor)가 포함되어 있습니다.
+기본적으로 DDP는 작업 그룹을 설정하는데 몇 개의 LoCs만이 필요하지만 보다 다양하게 사용하는 경우 주의가 필요합니다.
 
-Skewed Processing Speeds
-------------------------
+비대칭 작업 속도
+--------------------
 
-In DDP, the constructor, the forward pass, and the backward pass are
-distributed synchronization points. Different processes are expected to launch
-the same number of synchronizations and reach these synchronization points in
-the same order and enter each synchronization point at roughly the same time.
-Otherwise, fast processes might arrive early and timeout on waiting for
-stragglers. Hence, users are responsible for balancing workloads distributions
-across processes. Sometimes, skewed processing speeds are inevitable due to,
-e.g., network delays, resource contentions, unpredictable workload spikes. To
-avoid timeouts in these situations, make sure that you pass a sufficiently
-large ``timeout`` value when calling
-`init_process_group <https://pytorch.org/docs/stable/distributed.html#torch.distributed.init_process_group>`__.
+DDP에서는 생성자, 순전파(forward pass) 및 역전파 전달 호출 지점이 분산 동기화 지점(distribute synchronization point)입니다.
+서로 다른 작업이 동일한 수의 동기화를 시작하고 동일한 순서로 이러한 동기화 지점에 도달하여 
+각 동기화 지점을 거의 동시에 진입을 요구합니다.
+그렇지 않으면 빠른 작업이 일찍 도착하고 다른 작업의 대기 시간이 초과될 수 있습니다.
+따라서 사용자는 작업 간의 작업량을 균형 있게 분배할 필요가 있습니다.
+때때로 비대칭 작업(skewed processing) 속도는 다음과 같은 이유로 인하여 불가피하게 발생합니다.
+예를 들어, 네트워크 지연, 리소스 경쟁(resource contentions), 예측하지 못한 작업량 급증 등입니다.
+이러한 상황에서 시간 초과를 방지하려면, `init_process_group <https://pytorch.org/docs/stable/distributed.html#torch.distributed.init_process_group>`__\를 
+호출할 때 충분한 ``timeout``\값을 전달해야 합니다.
 
-Save and Load Checkpoints
--------------------------
+체크포인트를 저장하고 읽어오기
+------------------------------
 
-It's common to use ``torch.save`` and ``torch.load`` to checkpoint modules
-during training and recover from checkpoints. See
-`SAVING AND LOADING MODELS <https://tutorials.pytorch.kr/beginner/saving_loading_models.html>`__
-for more details. When using DDP, one optimization is to save the model in
-only one process and then load it to all processes, reducing write overhead.
-This is correct because all processes start from the same parameters and
-gradients are synchronized in backward passes, and hence optimizers should keep
-setting parameters to the same values. If you use this optimization, make sure all
-processes do not start loading before the saving is finished. Besides, when
-loading the module, you need to provide an appropriate ``map_location``
-argument to prevent a process to step into others' devices. If ``map_location``
-is missing, ``torch.load`` will first load the module to CPU and then copy each
-parameter to where it was saved, which would result in all processes on the
-same machine using the same set of devices. For more advanced failure recovery
-and elasticity support, please refer to `TorchElastic <https://pytorch.org/elastic>`__.
+학습 중에 ``torch.save``\와 ``torch.load`` 로 모듈의 체크포인트를 만들고 그 체크포인트로부터 복구하는 것이 일반적입니다.
+더 자세한 내용은 `SAVING AND LOADING MODELS <https://tutorials.pytorch.kr/beginner/saving_loading_models.html>`__\를 참고하세요. 
+DDP를 사용할 때, 최적의 방법은 모델을 한 작업에만 저장하고 
+그 모델을 모든 작업에 쓰기 과부하(write overhead)를 줄이며 읽어오는 것입니다.
+이는 모든 작업이 같은 매개변수로부터 시작되고 변화도는 
+역전파 전달로 동기화되므로 옵티마이저(optimizer)는 
+매개변수를 동일한 값으로 계속 설정해야 하기 때문에 정확합니다. 이러한 최적화를 사용하는 경우, 
+저장이 완료되기 전에 읽어오는 작업을 시작하지 않도록 해야 합니다. 게다가, 모듈을 읽어올 때,
+작업이 다른 기기에 접근하지 않도록 적절한 ``map_location`` 인자를 제공해야합니다.
+``map_location``\값이 없을 경우, ``torch.load``\는 먼저 모듈을 CPU에 읽어온 다음 각 매개변수가 
+저장된 위치로 복사하여 동일한 장치를 사용하는 동일한 기기에서 모든 작업을 발생시킵니다. 
+더 추가적인 실패 복구와 엘라스틱(elasticity support)은 `TorchElastic <https://pytorch.org/elastic>`__\을 참고하세요.
 
 .. code:: python
 
@@ -202,13 +187,12 @@ and elasticity support, please refer to `TorchElastic <https://pytorch.org/elast
 
         CHECKPOINT_PATH = tempfile.gettempdir() + "/model.checkpoint"
         if rank == 0:
-            # All processes should see same parameters as they all start from same
-            # random parameters and gradients are synchronized in backward passes.
-            # Therefore, saving it in one process is sufficient.
+            # 모든 작업은 같은 매개변수로부터 시작된다고 생각해야 합니다.
+            # 무작위의 매개변수와 변화도는 역전파 전달로 동기화됩니다.
+            # 그럼으로, 하나의 작업은 모델을 저장하기에 충분합니다.
             torch.save(ddp_model.state_dict(), CHECKPOINT_PATH)
 
-        # Use a barrier() to make sure that process 1 loads the model after process
-        # 0 saves it.
+        # 작업 0이 저장한 후 작업 1이 모델을 읽어오도록 barrier()를 사용합니다. 
         dist.barrier()
         # configure map_location properly
         map_location = {'cuda:%d' % 0: 'cuda:%d' % rank}
@@ -222,20 +206,19 @@ and elasticity support, please refer to `TorchElastic <https://pytorch.org/elast
         loss_fn(outputs, labels).backward()
         optimizer.step()
 
-        # Not necessary to use a dist.barrier() to guard the file deletion below
-        # as the AllReduce ops in the backward pass of DDP already served as
-        # a synchronization.
+        # 파일삭제를 보호하기 위해 아래에 dist.barrier()를 사용할 필요는 없습니다.  
+        # DDP의 역전파 전달 과정에 있는 AllReduce 옵스(ops)가 동기화 기능을 수행했기 때문에
 
         if rank == 0:
             os.remove(CHECKPOINT_PATH)
 
         cleanup()
 
-Combine DDP with Model Parallelism
-----------------------------------
+모델 병렬 처리를 활용한 DDP
+---------------------------
 
-DDP also works with multi-GPU models. DDP wrapping multi-GPU models is especially
-helpful when training large models with a huge amount of data.
+DDP는 다중 – GPU 모델에서도 작동합니다. 
+다중 – GPU 모델을 활용한 DDP는 대용량의 데이터를 가진 대용량 모델을 학습시킬 때 특히 유용합니다.
 
 .. code:: python
 
@@ -254,9 +237,8 @@ helpful when training large models with a huge amount of data.
             x = x.to(self.dev1)
             return self.net2(x)
 
-When passing a multi-GPU model to DDP, ``device_ids`` and ``output_device``
-must NOT be set. Input and output data will be placed in proper devices by
-either the application or the model ``forward()`` method.
+다중 GPU 모델을 DDP로 전달할 때, ``device_ids``\와 ``output_device``\를 설정하지 않아야 합니다. 
+입력 및 출력 데이터는 어플리케이션 또는 모델 ``forward()``\에 의해 적절한 장치에 배치됩니다.
 
 .. code:: python
 
@@ -264,7 +246,7 @@ either the application or the model ``forward()`` method.
         print(f"Running DDP with model parallel example on rank {rank}.")
         setup(rank, world_size)
 
-        # setup mp_model and devices for this process
+        # 작업을 위한 mp_model 및 장치 설정
         dev0 = rank * 2
         dev1 = rank * 2 + 1
         mp_model = ToyMpModel(dev0, dev1)
@@ -274,7 +256,7 @@ either the application or the model ``forward()`` method.
         optimizer = optim.SGD(ddp_mp_model.parameters(), lr=0.001)
 
         optimizer.zero_grad()
-        # outputs will be on dev1
+        # 출력값은 dev1에 저장
         outputs = ddp_mp_model(torch.randn(20, 10))
         labels = torch.randn(20, 5).to(dev1)
         loss_fn(outputs, labels).backward()
