@@ -217,29 +217,24 @@ the cmake files for our PyTorch install are.
 
 이것은 나중에 사용자 정의 연산자를 호출하는 데 사용할 Python 함수입니다.
 
-Using the TorchScript Custom Operator in Python
+Python에서 TorchScript 사용자 지정 연산자 사용
 -----------------------------------------------
 
-Once our custom operator is built into a shared library  we are ready to use
-this operator in our TorchScript models in Python. There are two parts to this:
-first loading the operator into Python, and second using the operator in
-TorchScript code.
+일단 사용자 지정 연산자를 공유 라이브러리에 만들어 내면 파이썬의 TorchScript 모델에서 연산자를
+사용할 수 있습니다. 먼저 연산자를 파이썬에 로드하고, TorchScript 코드에서 연산자를 사용합니다.
 
-You already saw how to import your operator into Python:
-``torch.ops.load_library()``. This function takes the path to a shared library
-containing custom operators, and loads it into the current process. Loading the
-shared library will also execute the ``TORCH_LIBRARY`` block. This will register
-our custom operator with the TorchScript compiler and allow us to use that
-operator in TorchScript code.
+연산자를 Python으로 가져오는 방법은 이미 보았듯이 ``torch.ops.load_library()``입니다.
+이 함수는 사용자 지정 연산자가 포함된 공유 라이브러리의 경로를 통해 현재 프로세스에 사용자 지정
+연산자를 로드합니다. 공유 라이브러리를 로드하면 ``TORCH_LIBRARY`` 블록도 실행됩니다. 이렇게
+하면 TorchScript 컴파일러에 사용자 정의 연산자가 등록되고 TorchScript 코드에서 해당 연산자
+를 사용할 수 있습니다.
 
-You can refer to your loaded operator as ``torch.ops.<namespace>.<function>``,
-where ``<namespace>`` is the namespace part of your operator name, and
-``<function>`` the function name of your operator. For the operator we wrote
-above, the namespace was ``my_ops`` and the function name ``warp_perspective``,
-which means our operator is available as ``torch.ops.my_ops.warp_perspective``.
-While this function can be used in scripted or traced TorchScript modules, we
-can also just use it in vanilla eager PyTorch and pass it regular PyTorch
-tensors:
+로드된 연산자는 ``torch.ops.<namespace>.<function>``으로 참조 가능합니다.``<namespace>``
+는 연산자 이름의 네임스페이스 부분이며,``<function>`` 은 연산자의 함수 이름입니다.위쪽의 예제
+에서 볼 수 있는 연산자의 네임스페이스는 ``my_ops`` 이고 함수 이름은 ``warp_perspective``
+였습니다. 따라서 연산자는 ``torch.ops.my_ops.warp_perspective``. 로 사용 가능합니다.
+이 함수는 작성되거나 추적된 TorchScript 모듈에서 사용할 수 있지만, 기본 PyTorch에서도 사용
+가능하고 일반 PyTorch 텐서로 전달할 수 있습니다..
 
 .. literalinclude:: ../advanced_source/torch_script_custom_ops/test.py
   :language: python
@@ -247,7 +242,7 @@ tensors:
   :start-after: BEGIN preamble
   :end-before: END preamble
 
-producing:
+출력::
 
 .. code-block:: python
 
@@ -262,50 +257,42 @@ producing:
 
 .. note::
 
-    What happens behind the scenes is that the first time you access
-    ``torch.ops.namespace.function`` in Python, the TorchScript compiler (in C++
-    land) will see if a function ``namespace::function`` has been registered, and
-    if so, return a Python handle to this function that we can subsequently use to
-    call into our C++ operator implementation from Python. This is one noteworthy
-    difference between TorchScript custom operators and C++ extensions: C++
-    extensions are bound manually using pybind11, while TorchScript custom ops are
-    bound on the fly by PyTorch itself. Pybind11 gives you more flexibility with
-    regards to what types and classes you can bind into Python and is thus
-    recommended for purely eager code, but it is not supported for TorchScript
-    ops.
+    파이썬에서 처음 ``torch.ops.namespace.function`` 에 접근할 때 TorchScript 컴파일러(C++ 영역에서)
+    는 함수의 ``namespace::function`` 이 등록되었는지, 등록되었다면 Python에서 C++ 연산자 구현을 호출하는
+    데 사용할 수 있는 이 함수에 대한 Python 핸들을 반환합니다. 이것은 TorchScript 사용자 정의 연산자와 C++
+    확장 사이의 주목할만한 차이점 중 하나입니다. (C++ 확장은 pybind11을 사용하여 수동으로 바인딩되지만
+    TorchScript 사용자 지정 작업은 PyTorch 자체에 의해 즉석에서 바인딩됩니다. Pybind11은 파이썬에 바인딩할
+    수 있는 유형과 클래스에 대해 더 많은 유연성을 제공하므로 순수하게 보이는 코드에 권장되지만 TorchScript
+    작업에는 지원되지 않습니다.)
 
-From here on, you can use your custom operator in scripted or traced code just
-as you would other functions from the ``torch`` package. In fact, "standard
-library" functions like ``torch.matmul`` go through largely the same
-registration path as custom operators, which makes custom operators really
-first-class citizens when it comes to how and where they can be used in
-TorchScript.  (One difference, however, is that standard library functions
-have custom written Python argument parsing logic that differs from
-``torch.ops`` argument parsing.)
+이제 ``torch``패키지의 다른 함수처럼 작성되거나 추적된 코드로 사용자 지정 연산자를 사용할
+수 있습니다. 실제로 ``torch.matmul`` 과 같은 '표준 라이브러리' 기능은 맞춤 연산자와 거의
+동일한 등록 경로를 거칩니다. 이는 사용자 정의 연산자를 TorchScript에서 사용할 수 있는 방법
+과 위치에 관하여  최고 수준으로 만듭니다. (그러나 한 가지 차이점은 표준 라이브러리 함수에는
+``torch.ops`` 인수 파싱과 다른 맞춤 작성 Python 인수 파싱 로직이 있다는 것입니다.)
 
-Using the Custom Operator with Tracing
+트레이싱과 함께 사용자 지정 연산자 사용
 **************************************
 
-Let's start by embedding our operator in a traced function. Recall that for
-tracing, we start with some vanilla Pytorch code:
+트레이싱된 함수에 연산자를 포함하는 것으로 시작하겠습니다. 트레이싱을 위해 바닐라 Pytorch
+코드로 시작한다는 것을 기억해주시면 좋겠습니다.
 
 .. literalinclude:: ../advanced_source/torch_script_custom_ops/test.py
   :language: python
   :start-after: BEGIN compute
   :end-before: END compute
 
-and then call ``torch.jit.trace`` on it. We further pass ``torch.jit.trace``
-some example inputs, which it will forward to our implementation to record the
-sequence of operations that occur as the inputs flow through it. The result of
-this is effectively a "frozen" version of the eager PyTorch program, which the
-TorchScript compiler can further analyze, optimize and serialize:
+위 코드에 이어 ``torch.jit.trace``를 호출합니다.  우리는 추가로 ``torch.jit.trace``
+몇 가지 예제 입력을 전달합니다.그리고 이 입력을 통해 입력이 흐를 때 발생하는 작업 시퀀스를
+기록하기 위해 구현에 전달할 것입니다. 그 결과TorchScript 컴파일러가 추가로 분석, 최적화
+및 직렬화할 수 있는 Eager PyTorch 프로그램의 사실상 "고정" 버전이 생성됩니다.:
 
 .. literalinclude:: ../advanced_source/torch_script_custom_ops/test.py
   :language: python
   :start-after: BEGIN trace
   :end-before: END trace
 
-Producing::
+출력::
 
     graph(%x : Float(4:8, 8:1),
           %y : Float(8:5, 5:1),
@@ -316,22 +303,22 @@ Producing::
       %6 : Float(4:5, 5:1) = aten::add(%3, %4, %5) # test.py:10:0
       return (%6)
 
-Now, the exciting revelation is that we can simply drop our custom operator into
-our PyTorch trace as if it were ``torch.relu`` or any other ``torch`` function:
+이제 흥미로운 사실은 사용자 지정 연산자를 ``torch.relu`` 또는 다른 ``torch`` 함수처럼 PyTorch
+트레이스에 간단히 드롭할 수 있다는 것입니다.
 
 .. literalinclude:: ../advanced_source/torch_script_custom_ops/test.py
   :language: python
   :start-after: BEGIN compute2
   :end-before: END compute2
 
-and then trace it as before:
+이전 코드와 같이 따라합니다.
 
 .. literalinclude:: ../advanced_source/torch_script_custom_ops/test.py
   :language: python
   :start-after: BEGIN trace2
   :end-before: END trace2
 
-Producing::
+출력::
 
     graph(%x.1 : Float(4:8, 8:1),
           %y : Float(8:5, 5:1),
@@ -349,24 +336,21 @@ Producing::
       %13 : Float(8:5, 5:1) = aten::add(%10, %11, %12) # test.py:26:0
       return (%13)
 
-Integrating TorchScript custom ops into traced PyTorch code is as easy as this!
+TorchScript 사용자 정의 작업을 추적된 PyTorch 코드에 통합하는 것은 이렇게 쉽습니다!
 
-Using the Custom Operator with Script
+스크립트와 함께 사용자 정의 연산자 사용
 *************************************
 
-Besides tracing, another way to arrive at a TorchScript representation of a
-PyTorch program is to directly write your code *in* TorchScript. TorchScript is
-largely a subset of the Python language, with some restrictions that make it
-easier for the TorchScript compiler to reason about programs. You turn your
-regular PyTorch code into TorchScript by annotating it with
-``@torch.jit.script`` for free functions and ``@torch.jit.script_method`` for
-methods in a class (which must also derive from ``torch.jit.ScriptModule``). See
-`here <https://pytorch.org/docs/master/jit.html>`_ for more details on
-TorchScript annotations.
+트레이싱 이외에도 PyTorch 프로그램의 TorchScript 표현에 도달하는 또 다른 방법은 TorchScript
+에서 직접 코드를 작성하는 것입니다. TorchScript는 대부분 Python 언어의 하위 집합이며
+TorchScript 컴파일러가 프로그램에 대해 더 쉽게 추론할 수 있도록 하는 몇 가지 제한 사항이
+있습니다. 일반 PyTorch 코드를 함수의 경우 ``@torch.jit.script`` Annotation을, 클래스의
+메서드의 경우 ``@torch.jit.script_method`` (``torch.jit.ScriptModule``에서
+파생되어야 함) 어노테이션을 추가하여 TorchScript로 변환합니다. TorchScript Annotation에
+대한 자세한 내용은 `여기 <https://pytorch.org/docs/master/jit.html>`_ 를 참조하십시오.
 
-One particular reason to use TorchScript instead of tracing is that tracing is
-unable to capture control flow in PyTorch code. As such, let us consider this
-function which does use control flow:
+트레이싱 대신 TorchScript를 사용하는 한 가지 특별한 이유는 트레이싱이 PyTorch 코드에서
+제어 흐름을 캡처할 수 없기 때문입니다. 따라서 제어 흐름을 사용하는 이 함수를 고려해봐야합니다.
 
 .. code-block:: python
 
@@ -377,8 +361,9 @@ function which does use control flow:
         z = 10
     return x.matmul(y) + z
 
-To convert this function from vanilla PyTorch to TorchScript, we annotate it
-with ``@torch.jit.script``:
+
+이 함수를 바닐라 PyTorch에서 TorchScript로 변환하기 위해서는 ``@torch.jit.script``
+ Annotation을 달아야합니다.
 
 .. code-block:: python
 
@@ -390,8 +375,8 @@ with ``@torch.jit.script``:
         z = 10
     return x.matmul(y) + z
 
-This will just-in-time compile the ``compute`` function into a graph
-representation, which we can inspect in the ``compute.graph`` property:
+이것은 ``compute`` 함수를 그래프로 적절한 때에 컴파일합니다.표현은 ``compute.graph``
+속성에서 확인할 수 있습니다.
 
 .. code-block:: python
 
@@ -419,8 +404,7 @@ representation, which we can inspect in the ``compute.graph`` property:
     return (%15);
   }
 
-And now, just like before, we can use our custom operator like any other
-function inside of our script code:
+이제 이전과 같이 스크립트 코드 내에서 다른 함수처럼 사용자 지정 연산자를 사용할 수 있습니다.
 
 .. code-block:: python
 
@@ -435,10 +419,8 @@ function inside of our script code:
     x = torch.ops.my_ops.warp_perspective(x, torch.eye(3))
     return x.matmul(y) + z
 
-When the TorchScript compiler sees the reference to
-``torch.ops.my_ops.warp_perspective``, it will find the implementation we
-registered via the ``TORCH_LIBRARY`` function in C++, and compile it into its
-graph representation:
+TorchScript 컴파일러가``torch.ops.my_ops.warp_perspective``, 에 대한 참조를 볼 때
+C++의  ``TORCH_LIBRARY`` 함수를 통해 등록한 구현을 찾아 그래프 표현으로 컴파일합니다.
 
 .. code-block:: python
 
@@ -471,295 +453,44 @@ graph representation:
       return (%21);
     }
 
-Notice in particular the reference to ``my_ops::warp_perspective`` at the end of
-the graph.
+특히 그래프 끝 부분의 ``my_ops::warp_perspective``에 대한 참조를 주의하십시오.
 
-.. attention::
+.. 주의::
 
-	The TorchScript graph representation is still subject to change. Do not rely
-	on it looking like this.
+	TorchScript 그래프 형태는 변경될 수 있습니다. 위 예제의 형태에 의존하지 마십시오.
+Python에서 사용자 지정 연산자를 사용할 때 그렇습니다. 간단히 말해서,
+``torch.ops.load_library``, 를 사용하여 연산자가 포함된 라이브러리를 가져오고 트레이싱
+되거나 스크립팅된 TorchScript 코드에서 다른 ``torch``연산자처럼 사용자 정의 연산자를
+호출합니다.
 
-And that's really it when it comes to using our custom operator in Python. In
-short, you import the library containing your operator(s) using
-``torch.ops.load_library``, and call your custom op like any other ``torch``
-operator from your traced or scripted TorchScript code.
-
-Using the TorchScript Custom Operator in C++
+C++에서 TorchScript 사용자 지정 연산자 사용
 --------------------------------------------
 
-One useful feature of TorchScript is the ability to serialize a model into an
-on-disk file. This file can be sent over the wire, stored in a file system or,
-more importantly, be dynamically deserialized and executed without needing to
-keep the original source code around. This is possible in Python, but also in
-C++. For this, PyTorch provides `a pure C++ API <https://pytorch.org/cppdocs/>`_
-for deserializing as well as executing TorchScript models. If you haven't yet,
-please read `the tutorial on loading and running serialized TorchScript models
-in C++ <https://tutorials.pytorch.kr/advanced/cpp_export.html>`_, on which the
-next few paragraphs will build.
+TorchScript의 유용한 기능 중 하나는 모델을 디스크 상의 파일로 직렬화하는 기능입니다. 이
+파일은 유선을 통해 전송되어 파일 시스템에 저장되거나 더 중요하게는 원본 소스 코드를 유지할
+필요 없이 동적으로 역직렬화 및 실행될 수 있습니다. 이것은 Python뿐아니라 C++에서도 가능합
+니다. 이를 위해 PyTorch는 TorchScript 모델 실행 및 역직렬화를 위한
+`순수 C++ API <https://pytorch.org/cppdocs/>`_ 를 제공합니다. 아직 읽지 않았다면
+다음에 나올 몇몇 부분에서 보여주고 있는
+`C++에서 직렬화된 TorchScript 모델을 로드하고 실행하는 방법에 대한 튜토리얼
+ <https://tutorials.pytorch.kr/advanced/cpp_export.html>`_ 을 읽어보세요.
 
-In short, custom operators can be executed just like regular ``torch`` operators
-even when deserialized from a file and run in C++. The only requirement for this
-is to link the custom operator shared library we built earlier with the C++
-application in which we execute the model. In Python, this worked simply calling
-``torch.ops.load_library``. In C++, you need to link the shared library with
-your main application in whatever build system you are using. The following
-example will showcase this using CMake.
+간단히 말해서 사용자 정의 연산자는 파일에서 역직렬화되고 C++에서 실행되는 경우에도 일반
+``torch`` 연산자처럼 실행할 수 있습니다. 이에 대한 유일한 요구 사항은 이전에 빌드한
+사용자 지정 연산자 공유 라이브러리를 모델을 실행하는 C++ 응용 프로그램과 연결하는 것입
+니다. Python에서는 단순히 ``torch.ops.load_library``를 호출하여 작동했습니다. C++
+에서는 사용 중인 빌드 시스템에 관계없이 공유 라이브러리를 기본 애플리케이션과 연결해야
+합니다. 다음 예제에서는 CMake를 사용하여 이를 보여줍니다.
 
 .. note::
 
-	Technically, you can also dynamically load the shared library into your C++
-	application at runtime in much the same way we did it in Python. On Linux,
-	`you can do this with dlopen
-	<https://tldp.org/HOWTO/Program-Library-HOWTO/dl-libraries.html>`_. There exist
-	equivalents on other platforms.
+	기술적으로 Python에서 수행한 것과 거의 동일한 방식으로 런타임 시 C++ 애플리케이션에 공유
+    라이브러리를 동적으로 로드할 수도 있습니다.Linux에서는 `dlopen을 사용하여
+	<https://tldp.org/HOWTO/Program-Library-HOWTO/dl-libraries.html>`_. 이 작업을 수행할
+    수 있습니다. 다른 플랫폼에도 같은 것이 있습니다.
 
-Building on the C++ execution tutorial linked above, let's start with a minimal
-C++ application in one file, ``main.cpp`` in a different folder from our
-custom operator, that loads and executes a serialized TorchScript model:
-
-.. code-block:: cpp
-
-  #include <torch/script.h> // One-stop header.
-
-  #include <iostream>
-  #include <memory>
-
-
-  int main(int argc, const char* argv[]) {
-    if (argc != 2) {
-      std::cerr << "usage: example-app <path-to-exported-script-module>\n";
-      return -1;
-    }
-
-    // Deserialize the ScriptModule from a file using torch::jit::load().
-    std::shared_ptr<torch::jit::script::Module> module = torch::jit::load(argv[1]);
-
-    std::vector<torch::jit::IValue> inputs;
-    inputs.push_back(torch::randn({4, 8}));
-    inputs.push_back(torch::randn({8, 5}));
-
-    torch::Tensor output = module->forward(std::move(inputs)).toTensor();
-
-    std::cout << output << std::endl;
-  }
-
-Along with a small ``CMakeLists.txt`` file:
-
-.. code-block:: cmake
-
-  cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
-  project(example_app)
-
-  find_package(Torch REQUIRED)
-
-  add_executable(example_app main.cpp)
-  target_link_libraries(example_app "${TORCH_LIBRARIES}")
-  target_compile_features(example_app PRIVATE cxx_range_for)
-
-At this point, we should be able to build the application:
-
-.. code-block:: shell
-
-  $ mkdir build
-  $ cd build
-  $ cmake -DCMAKE_PREFIX_PATH="$(python -c 'import torch.utils; print(torch.utils.cmake_prefix_path)')" ..
-  -- The C compiler identification is GNU 5.4.0
-  -- The CXX compiler identification is GNU 5.4.0
-  -- Check for working C compiler: /usr/bin/cc
-  -- Check for working C compiler: /usr/bin/cc -- works
-  -- Detecting C compiler ABI info
-  -- Detecting C compiler ABI info - done
-  -- Detecting C compile features
-  -- Detecting C compile features - done
-  -- Check for working CXX compiler: /usr/bin/c++
-  -- Check for working CXX compiler: /usr/bin/c++ -- works
-  -- Detecting CXX compiler ABI info
-  -- Detecting CXX compiler ABI info - done
-  -- Detecting CXX compile features
-  -- Detecting CXX compile features - done
-  -- Looking for pthread.h
-  -- Looking for pthread.h - found
-  -- Looking for pthread_create
-  -- Looking for pthread_create - not found
-  -- Looking for pthread_create in pthreads
-  -- Looking for pthread_create in pthreads - not found
-  -- Looking for pthread_create in pthread
-  -- Looking for pthread_create in pthread - found
-  -- Found Threads: TRUE
-  -- Found torch: /libtorch/lib/libtorch.so
-  -- Configuring done
-  -- Generating done
-  -- Build files have been written to: /example_app/build
-  $ make -j
-  Scanning dependencies of target example_app
-  [ 50%] Building CXX object CMakeFiles/example_app.dir/main.cpp.o
-  [100%] Linking CXX executable example_app
-  [100%] Built target example_app
-
-And run it without passing a model just yet:
-
-.. code-block:: shell
-
-  $ ./example_app
-  usage: example_app <path-to-exported-script-module>
-
-Next, let's serialize the script function we wrote earlier that uses our custom
-operator:
-
-.. code-block:: python
-
-  torch.ops.load_library("libwarp_perspective.so")
-
-  @torch.jit.script
-  def compute(x, y):
-    if bool(x[0][0] == 42):
-        z = 5
-    else:
-        z = 10
-    x = torch.ops.my_ops.warp_perspective(x, torch.eye(3))
-    return x.matmul(y) + z
-
-  compute.save("example.pt")
-
-The last line will serialize the script function into a file called
-"example.pt". If we then pass this serialized model to our C++ application, we
-can run it straight away:
-
-.. code-block:: shell
-
-  $ ./example_app example.pt
-  terminate called after throwing an instance of 'torch::jit::script::ErrorReport'
-  what():
-  Schema not found for node. File a bug report.
-  Node: %16 : Dynamic = my_ops::warp_perspective(%0, %19)
-
-Or maybe not. Maybe not just yet. Of course! We haven't linked the custom
-operator library with our application yet. Let's do this right now, and to do it
-properly let's update our file organization slightly, to look like this::
-
-  example_app/
-    CMakeLists.txt
-    main.cpp
-    warp_perspective/
-      CMakeLists.txt
-      op.cpp
-
-This will allow us to add the ``warp_perspective`` library CMake target as a
-subdirectory of our application target. The top level ``CMakeLists.txt`` in the
-``example_app`` folder should look like this:
-
-.. code-block:: cmake
-
-  cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
-  project(example_app)
-
-  find_package(Torch REQUIRED)
-
-  add_subdirectory(warp_perspective)
-
-  add_executable(example_app main.cpp)
-  target_link_libraries(example_app "${TORCH_LIBRARIES}")
-  target_link_libraries(example_app -Wl,--no-as-needed warp_perspective)
-  target_compile_features(example_app PRIVATE cxx_range_for)
-
-This basic CMake configuration looks much like before, except that we add the
-``warp_perspective`` CMake build as a subdirectory. Once its CMake code runs, we
-link our ``example_app`` application with the ``warp_perspective`` shared
-library.
-
-.. attention::
-
-  There is one crucial detail embedded in the above example: The
-  ``-Wl,--no-as-needed`` prefix to the ``warp_perspective`` link line. This is
-  required because we will not actually be calling any function from the
-  ``warp_perspective`` shared library in our application code. We only need the
-  ``TORCH_LIBRARY`` function to run. Inconveniently, this
-  confuses the linker and makes it think it can just skip linking against the
-  library altogether. On Linux, the ``-Wl,--no-as-needed`` flag forces the link
-  to happen (NB: this flag is specific to Linux!). There are other workarounds
-  for this. The simplest is to define *some function* in the operator library
-  that you need to call from the main application. This could be as simple as a
-  function ``void init();`` declared in some header, which is then defined as
-  ``void init() { }`` in the operator library. Calling this ``init()`` function
-  in the main application will give the linker the impression that this is a
-  library worth linking against. Unfortunately, this is outside of our control,
-  and we would rather let you know the reason and the simple workaround for this
-  than handing you some opaque macro to plop in your code.
-
-Now, since we find the ``Torch`` package at the top level now, the
-``CMakeLists.txt`` file in the  ``warp_perspective`` subdirectory can be
-shortened a bit. It should look like this:
-
-.. code-block:: cmake
-
-  find_package(OpenCV REQUIRED)
-  add_library(warp_perspective SHARED op.cpp)
-  target_compile_features(warp_perspective PRIVATE cxx_range_for)
-  target_link_libraries(warp_perspective PRIVATE "${TORCH_LIBRARIES}")
-  target_link_libraries(warp_perspective PRIVATE opencv_core opencv_photo)
-
-Let's re-build our example app, which will also link with the custom operator
-library. In the top level ``example_app`` directory:
-
-.. code-block:: shell
-
-  $ mkdir build
-  $ cd build
-  $ cmake -DCMAKE_PREFIX_PATH="$(python -c 'import torch.utils; print(torch.utils.cmake_prefix_path)')" ..
-  -- The C compiler identification is GNU 5.4.0
-  -- The CXX compiler identification is GNU 5.4.0
-  -- Check for working C compiler: /usr/bin/cc
-  -- Check for working C compiler: /usr/bin/cc -- works
-  -- Detecting C compiler ABI info
-  -- Detecting C compiler ABI info - done
-  -- Detecting C compile features
-  -- Detecting C compile features - done
-  -- Check for working CXX compiler: /usr/bin/c++
-  -- Check for working CXX compiler: /usr/bin/c++ -- works
-  -- Detecting CXX compiler ABI info
-  -- Detecting CXX compiler ABI info - done
-  -- Detecting CXX compile features
-  -- Detecting CXX compile features - done
-  -- Looking for pthread.h
-  -- Looking for pthread.h - found
-  -- Looking for pthread_create
-  -- Looking for pthread_create - not found
-  -- Looking for pthread_create in pthreads
-  -- Looking for pthread_create in pthreads - not found
-  -- Looking for pthread_create in pthread
-  -- Looking for pthread_create in pthread - found
-  -- Found Threads: TRUE
-  -- Found torch: /libtorch/lib/libtorch.so
-  -- Configuring done
-  -- Generating done
-  -- Build files have been written to: /warp_perspective/example_app/build
-  $ make -j
-  Scanning dependencies of target warp_perspective
-  [ 25%] Building CXX object warp_perspective/CMakeFiles/warp_perspective.dir/op.cpp.o
-  [ 50%] Linking CXX shared library libwarp_perspective.so
-  [ 50%] Built target warp_perspective
-  Scanning dependencies of target example_app
-  [ 75%] Building CXX object CMakeFiles/example_app.dir/main.cpp.o
-  [100%] Linking CXX executable example_app
-  [100%] Built target example_app
-
-If we now run the ``example_app`` binary and hand it our serialized model, we
-should arrive at a happy ending:
-
-.. code-block:: shell
-
-  $ ./example_app example.pt
-  11.4125   5.8262   9.5345   8.6111  12.3997
-   7.4683  13.5969   9.0850  11.0698   9.4008
-   7.4597  15.0926  12.5727   8.9319   9.0666
-   9.4834  11.1747   9.0162  10.9521   8.6269
-  10.0000  10.0000  10.0000  10.0000  10.0000
-  10.0000  10.0000  10.0000  10.0000  10.0000
-  10.0000  10.0000  10.0000  10.0000  10.0000
-  10.0000  10.0000  10.0000  10.0000  10.0000
-  [ Variable[CPUFloatType]{8,5} ]
-
-Success! You are now ready to inference away.
+위에 링크된 C++ 실행 자습서를 기반으로 직렬화된 TorchScript 모델을 로드하고 실행하는 사용자 지정 연산
+자와 다른 폴더의 ``main.cpp`` 인 한 파일의 최소 C++ 응용 프로그램부터 시작해 보겠습니다.
 
 결론
 ----------
