@@ -808,64 +808,72 @@ should arrive at a happy ending:
 
 Success! You are now ready to inference away.
 
-결론
+Conclusion
 ----------
 
-이 튜토리얼에서는 C++에서 사용자 지정 TorchScript 연산자를 구현하는 방법, 
-공유 라이브러리로 빌드하는 방법, Python에서 이를 사용하여 TorchScript 모델을 정의하는 방법, 
-마지막으로 추론 워크로드(inference workloads)를 위해 C++ 애플리케이션에 로드하는 방법을 설명했습니다. 
-이제 써드파티 C++ 라이브러리와 인터페이스하는 C++ 연산자로 TorchScript 모델을 확장하거나, 
-맞춤형 고성능 CUDA 커널을 작성하거나, Python, TorchScript 및 C++ 간의 라인이 원활하게 
-혼합되어야 하는 다른 사용 사례를 구현할 준비가 되었습니다.
+This tutorial walked you throw how to implement a custom TorchScript operator in
+C++, how to build it into a shared library, how to use it in Python to define
+TorchScript models and lastly how to load it into a C++ application for
+inference workloads. You are now ready to extend your TorchScript models with
+C++ operators that interface with third party C++ libraries, write custom high
+performance CUDA kernels, or implement any other use case that requires the
+lines between Python, TorchScript and C++ to blend smoothly.
 
-항상 그렇듯이 문제가 발생하거나 질문이 있는 경우 
-`포럼 <https://discuss.pytorch.org/>`_ 또는 `GitHub 이슈
-<https://github.com/pytorch/pytorch/issues>`_를 통해 연락할 수 있습니다. 
-`또한 자주 묻는 질문(FAQ) 페이지
-<https://pytorch.org/cppdocs/notes/faq.html>`_에 유용한 정보가 있을 수 있습니다.
+As always, if you run into any problems or have questions, you can use our
+`forum <https://discuss.pytorch.org/>`_ or `GitHub issues
+<https://github.com/pytorch/pytorch/issues>`_ to get in touch. Also, our
+`frequently asked questions (FAQ) page
+<https://pytorch.org/cppdocs/notes/faq.html>`_ may have helpful information.
 
-부록 A: 사용자 지정 연산자(Custom Operators)를 구축하는 더 많은 방법
+Appendix A: More Ways of Building Custom Operators
 --------------------------------------------------
 
-"사용자 지정 연산자 빌드" 섹션에서는 CMake를 사용하여 사용자 지정 연산자를 
-공유 라이브러리에 빌드하는 방법을 설명했습니다. 
-이 부록에서는 추가적으로 컴파일을 위한 두 가지 접근 방식을 설명합니다. 
-둘 다 Python을 컴파일 프로세스의 "드라이버" 또는 "인터페이스"로 사용합니다. 
-또한 둘 다 `기존 인프라 <https://pytorch.org/docs/stable/cpp_extension.html>`_ 
-PyTorch가 제공하는 `*C++ 확장*
-<https://tutorials.pytorch.kr/advanced/cpp_extension.html>`_을 재사용합니다. 
-이는 C++에서 Python으로 함수의 "명시적" 바인딩을 위해 pybind11에 의존하는 
-TorchScript 사용자 정의 연산자와 동일한 바닐라(eager) PyTorch입니다.
+The section "Building the Custom Operator" explained how to build a custom
+operator into a shared library using CMake. This appendix outlines two further
+approaches for compilation. Both of them use Python as the "driver" or
+"interface" to the compilation process. Also, both re-use the `existing
+infrastructure <https://pytorch.org/docs/stable/cpp_extension.html>`_ PyTorch
+provides for `*C++ extensions*
+<https://tutorials.pytorch.kr/advanced/cpp_extension.html>`_, which are the
+vanilla (eager) PyTorch equivalent of TorchScript custom operators that rely on
+`pybind11 <https://github.com/pybind/pybind11>`_ for "explicit" binding of
+functions from C++ into Python.
 
-첫 번째 접근 방식은 `C++ 확장의 편리한 JIT(Just-In-Time) 컴파일 인터페이스
-<https://pytorch.org/docs/stable/cpp_extension.html#torch.utils.cpp_extension.load>`_를 사용하여 
-처음 실행할 때 PyTorch 스크립트의 백그라운드에서 코드를 컴파일합니다. 
-두 번째 접근 방식은 ``setuptools`` 패키지에 의존하며 별도의 ``setup.py`` 파일 작성을 포함합니다. 
-이를 통해 다른 ``setuptools`` 기반 프로젝트와의 통합뿐만 아니라 고급 구성이 가능합니다.
-아래에서 두 가지 접근 방식을 자세히 살펴보겠습니다.
+The first approach uses C++ extensions' `convenient just-in-time (JIT)
+compilation interface
+<https://pytorch.org/docs/stable/cpp_extension.html#torch.utils.cpp_extension.load>`_
+to compile your code in the background of your PyTorch script the first time you
+run it. The second approach relies on the venerable ``setuptools`` package and
+involves writing a separate ``setup.py`` file. This allows more advanced
+configuration as well as integration with other ``setuptools``-based projects.
+We will explore both approaches in detail below.
 
-JIT 컴파일로 빌드
+Building with JIT compilation
 *****************************
 
-PyTorch C++ 확장 툴킷에서 제공하는 JIT 컴파일 기능을 사용하면 사용자 지정 연산자의 컴파일을 
-Python 코드에 직접 포함할 수 있습니다. 예시로 그것은 훈련 스크립트의 맨 위에 있습니다.
+The JIT compilation feature provided by the PyTorch C++ extension toolkit allows
+embedding the compilation of your custom operator directly into your Python
+code, e.g. at the top of your training script.
 
 .. note::
 
-  여기서 "JIT 컴파일"은 프로그램을 최적화하기 위해 TorchScript 컴파일러에서 
-  발생하는 JIT 컴파일과 아무 관련이 없습니다. 
-  이는 단순히 사용자 정의 연산자 C++ 코드가 미리 컴파일한 것처럼 처음 가져올 때 
-  시스템의 /tmp 디렉토리 아래 폴더에 컴파일된다는 것을 의미합니다.
+	"JIT compilation" here has nothing to do with the JIT compilation taking place
+	in the TorchScript compiler to optimize your program. It simply means that
+	your custom operator C++ code will be compiled in a folder under your system's
+	`/tmp` directory the first time you import it, as if you had compiled it
+	yourself beforehand.
 
-이 JIT 컴파일 기능은 두 가지 형태로 제공됩니다. 
-첫 번째 단계에서는 동일하게 별도의 파일(``op.cpp``)에 연산자 구현을 유지한 다음 
-``torch.utils.cpp_extension.load()``를 사용하여 확장을 컴파일합니다. 
-일반적으로 이 함수는 C++ 확장을 노출하는 Python 모듈을 반환합니다. 
-그러나 사용자 정의 연산자를 자체 Python 모듈로 컴파일하지 않기 때문에 일반 공유 라이브러리만 컴파일하려고 합니다. 
-다행스럽게도 ``torch.utils.cpp_extension.load()`` 에는 Python 모듈이 아닌 공유 라이브러리 
-구축에만 목적이 있음을 나타내기 위해 False로 설정할 수 있는 ``is_python_module`` 인수가 있습니다. 
-그러면 ``torch.utils.cpp_extension.load()``는 이전 ``torch.ops.load_library``와 동일하게 
-현재 프로세스에 공유 라이브러리를 컴파일하고 로드합니다.
+This JIT compilation feature comes in two flavors. In the first, you still keep
+your operator implementation in a separate file (``op.cpp``), and then use
+``torch.utils.cpp_extension.load()`` to compile your extension. Usually, this
+function will return the Python module exposing your C++ extension. However,
+since we are not compiling our custom operator into its own Python module, we
+only want to compile a plain shared library . Fortunately,
+``torch.utils.cpp_extension.load()`` has an argument ``is_python_module`` which
+we can set to ``False`` to indicate that we are only interested in building a
+shared library and not a Python module. ``torch.utils.cpp_extension.load()``
+will then compile and also load the shared library into the current process,
+just like ``torch.ops.load_library`` did before:
 
 .. code-block:: python
 
@@ -881,14 +889,15 @@ Python 코드에 직접 포함할 수 있습니다. 예시로 그것은 훈련 �
 
   print(torch.ops.my_ops.warp_perspective)
 
-다음과 같이 출력됩니다:
+This should approximately print:
 
 .. code-block:: python
 
   <built-in method my_ops::warp_perspective of PyCapsule object at 0x7f3e0f840b10>
 
-JIT 컴파일의 두 번째 flavor을 사용하면 사용자 지정 TorchScript 연산자에 대한 소스 코드를 문자열로 전달할 수 있습니다.
-이를 위해 ``torch.utils.cpp_extension.load_inline``을 사용하십시오.
+The second flavor of JIT compilation allows you to pass the source code for your
+custom TorchScript operator as a string. For this, use
+``torch.utils.cpp_extension.load_inline``:
 
 .. code-block:: python
 
@@ -932,14 +941,16 @@ JIT 컴파일의 두 번째 flavor을 사용하면 사용자 지정 TorchScript 
 
   print(torch.ops.my_ops.warp_perspective)
 
-당연히 소스 코드가 상당히 짧은 경우에만 
-``torch.utils.cpp_extension.load_inline``을 사용하는 것이 가장 좋습니다.
+Naturally, it is best practice to only use
+``torch.utils.cpp_extension.load_inline`` if your source code is reasonably
+short.
 
-Jupyter Notebook에서 이것을 사용하는 경우 각 실행이 새 라이브러리를 등록하고 
-사용자 지정 연산자를 다시 등록하기 때문에 등록이 있는 셀을 여러 번 실행하면 안 됩니다. 
-다시 실행해야 하는 경우 미리 노트북의 Python 커널을 다시 시작하십시오.
+Note that if you're using this in a Jupyter Notebook, you should not execute
+the cell with the registration multiple times because each execution registers
+a new library and re-registers the custom operator. If you need to re-execute it,
+please restart the Python kernel of your notebook beforehand.
 
-Setuptools를 사용하여 빌드
+Building with Setuptools
 ************************
 
 The second approach to building our custom operator exclusively from Python is
@@ -950,12 +961,6 @@ not plain shared libraries (which do not have the necessary entry points Python
 expects from a module), this route can be slightly quirky. That said, all you
 need is a ``setup.py`` file in place of the ``CMakeLists.txt`` which looks like
 this:
-Python에서만 사용자 정의 연산자를 구축하는 두 번째 접근 방식은 ``setuptools``를 사용하는 것입니다. 
-이것은 ``setuptools``가 C++로 작성된 Python 모듈을 빌드하기 위한 매우 강력하고 
-광범위한 인터페이스를 가지고 있다는 장점이 있습니다. 
-그러나 ``setuptools``는 실제로 Python 모듈을 빌드하기 위한 것이며 
-일반 공유 라이브러리(Python이 모듈에서 기대하는 필수 엔트리가 없음)가 아니라 이 경로가 약간 이상할 수 있습니다. 
-즉, 다음과 같은 ``CMakeLists.txt`` 대신 ``setup.py`` 파일만 있으면 됩니다:
 
 .. code-block:: python
 
@@ -974,13 +979,17 @@ Python에서만 사용자 정의 연산자를 구축하는 두 번째 접근 방
       cmdclass={"build_ext": BuildExtension.with_options(no_python_abi_suffix=True)},
   )
 
-하단의 ``BuildExtension``에서 ``no_python_abi_suffix`` 옵션을 활성화했습니다. 
-이는 생성된 공유 라이브러리의 이름에서 Python-3 특정 ABI 접미사를 생략하도록 ``setuptools``에 지시합니다.
-그렇지 않으면 Python 3.7에서 라이브러리를 ``warp_perspective.cpython-37m-x86_64-linux-gnu``라고 할 수 있습니다.
-따라서 ``cpython-37m-x86_64-linux-gnu``는 ABI 태그이지만 실제로는 ``warp_perspective.so``라고 부르기를 원합니다.
 
-이제 ``setup.py``가 있는 폴더 내 터미널에서 
-``python setup.py build development``를 실행하면 다음과 같이 표시되어야 합니다.
+Notice that we enabled the ``no_python_abi_suffix`` option in the
+``BuildExtension`` at the bottom. This instructs ``setuptools`` to omit any
+Python-3 specific ABI suffixes in the name of the produced shared library.
+Otherwise, on Python 3.7 for example, the library may be called
+``warp_perspective.cpython-37m-x86_64-linux-gnu.so`` where
+``cpython-37m-x86_64-linux-gnu`` is the ABI tag, but we really just want it to
+be called ``warp_perspective.so``
+
+If we now run ``python setup.py build develop`` in a terminal from within the
+folder in which ``setup.py`` is situated, we should see something like:
 
 .. code-block:: shell
 
@@ -1012,8 +1021,9 @@ Python에서만 사용자 정의 연산자를 구축하는 두 번째 접근 방
   Processing dependencies for warp-perspective==0.0.0
   Finished processing dependencies for warp-perspective==0.0.0
 
-이것은 ``warp_perspective.so``라는 공유 라이브러리를 생성합니다. 
-이 라이브러리는 이전에 TorchScript에 연산자를 표시했던 것처럼 ``torch.ops.load_library``에 전달할 수 있습니다.
+This will produce a shared library called ``warp_perspective.so``, which we can
+pass to ``torch.ops.load_library`` as we did earlier to make our operator
+visible to TorchScript:
 
 .. code-block:: python
 
