@@ -1,36 +1,36 @@
 #include <opencv2/opencv.hpp>
 #include <torch/script.h>
 
-// BEGIN warp_perspective
+// warp_perspective 시작
 torch::Tensor warp_perspective(torch::Tensor image, torch::Tensor warp) {
-  // BEGIN image_mat
-  cv::Mat image_mat(/*rows=*/image.size(0),
-                    /*cols=*/image.size(1),
-                    /*type=*/CV_32FC1,
-                    /*data=*/image.data_ptr<float>());
-  // END image_mat
+  // image_mat 시작
+  cv::Mat image_mat(/*행=*/image.size(0),
+                    /*열=*/image.size(1),
+                    /*타입=*/CV_32FC1,
+                    /*데이터=*/image.data_ptr<float>());
+  // image_mat 완료
 
-  // BEGIN warp_mat
-  cv::Mat warp_mat(/*rows=*/warp.size(0),
-                   /*cols=*/warp.size(1),
-                   /*type=*/CV_32FC1,
-                   /*data=*/warp.data_ptr<float>());
-  // END warp_mat
+  // warp_mat 시작
+  cv::Mat warp_mat(/*행=*/warp.size(0),
+                   /*열=*/warp.size(1),
+                   /*타입=*/CV_32FC1,
+                   /*데이터=*/warp.data_ptr<float>());
+  // warp_mat 완료
 
-  // BEGIN output_mat
+  // output_mat 시작
   cv::Mat output_mat;
   cv::warpPerspective(image_mat, output_mat, warp_mat, /*dsize=*/{8, 8});
-  // END output_mat
+  // output_mat 완료
 
-  // BEGIN output_tensor
+  // output_tensor 시작
   torch::Tensor output = torch::from_blob(output_mat.ptr<float>(), /*sizes=*/{8, 8});
   return output.clone();
-  // END output_tensor
+  // output_tensor 완료
 }
-// END warp_perspective
+// warp_perspective 완료
 
-// BEGIN registry
+// registry 시작
 TORCH_LIBRARY(my_ops, m) {
   m.def("warp_perspective", warp_perspective);
 }
-// END registry
+// registry 완료
