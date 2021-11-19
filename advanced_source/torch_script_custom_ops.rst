@@ -27,8 +27,8 @@ C++에서 사용자 정의 연산자 구현
 
 .. literalinclude:: ../advanced_source/torch_script_custom_ops/op.cpp
   :language: cpp
-  :start-after: BEGIN warp_perspective
-  :end-before: END warp_perspective
+  :start-after: warp_perspective 시작
+  :end-before: warp_perspective 완료
 
 이 연산자의 코드는 매우 짧습니다. 파일 맨 위에 OpenCV 헤더 파일이 포함되어 있으며 ``opencv2/opencv.hpp`` 와 ``torch/
 script.h`` 헤더와 함께 사용자 지정 TorchScript 연산자를 작성하는 데 필요한 PyTorch의 C++ API에서 필요한 모든 
@@ -68,7 +68,7 @@ script.h`` 헤더와 함께 사용자 지정 TorchScript 연산자를 작성하�
 .. literalinclude:: ../advanced_source/torch_script_custom_ops/op.cpp
   :language: cpp
   :start-after: warp_mat 시작
-  :end-before: warp_mat 끝
+  :end-before: warp_mat 완료
 
 다음으로 TorchScript에서 사용하고 싶었던 OpenCV 함수를 호출할 준비가 되었습니다: ``warpPerspective`` . 이를 위해 
 OpenCV 함수 ``image_mat`` 와 ``warp_mat`` 매트릭스, 빈 출력 매트릭스인 ``output_mat`` 를 전달합니다.  또한 출력 
@@ -77,7 +77,7 @@ OpenCV 함수 ``image_mat`` 와 ``warp_mat`` 매트릭스, 빈 출력 매트릭�
 .. literalinclude:: ../advanced_source/torch_script_custom_ops/op.cpp
   :language: cpp
   :start-after: output_mat 시작
-  :end-before: output_mat 끝
+  :end-before: output_mat 완료
 
 사용자 정의 연산자 구현의 마지막 단계는 ``output_mat`` 을 PyTorch에서 더 사용할 수 있도록 다시 PyTorch 텐서로 변환하는 
 것입니다. 이것은 우리가 다른 방향으로 변환하기 위해 이전에 수행한 것과 놀랍도록 유사합니다. 이 경우 PyTorch에서 ``torch::from_blob`` 메소드를 제공합니다. 우리가 PyTorch 텐서로 해석하려는 *blob* 은 메모리에 약간 불투명한, 평면 포인터를 의미합니다. ``torch::from_blob`` 에 대한 호출은 다음과 같습니다.
@@ -85,7 +85,7 @@ OpenCV 함수 ``image_mat`` 와 ``warp_mat`` 매트릭스, 빈 출력 매트릭�
 .. literalinclude:: ../advanced_source/torch_script_custom_ops/op.cpp
   :language: cpp
   :start-after: output_tensor 시작
-  :end-before: output_tensor 끝
+  :end-before: output_tensor 완료
 
 우리는 OpenCV ``Mat`` 클래스의 ``.ptr<float>()`` 메서드를 사용하여 기본 데이터에 대한 원시 포인터를 얻습니다.(이전의 PyTorch 텐서 ``.data_ptr<float>()`` 와 마찬가지로). 우리는 또한 ``8 x 8`` 처럼 하드코딩한 텐서의 출력 형태를 지정합니다. ``torch::from_blob`` 의 출력은 OpenCV 매트릭스가 소유한 메모리를 가리키는 ``torch::Tensor`` 입니다.
 
@@ -105,7 +105,7 @@ TorchScript 컴파일러는 TorchScript 코드에서 사용자 지정 연산자�
 .. literalinclude:: ../advanced_source/torch_script_custom_ops/op.cpp
   :language: cpp
   :start-after: registry 시작
-  :end-before: registry 끝
+  :end-before: registry 완료
 
 ``op.cpp`` 파일의 최상위 레벨 어딘가에 있습니다. ``TORCH_LIBRARY`` 매크로는 프로그램이 시작될 때 호출되는 함수를 
 작성합니다.  라이브러리 이름( ``my_ops`` )이 첫 번째 인수로 제공됩니다(따옴표로 묶지 않아야 함). 두 번째 인수(``m``) 는 
