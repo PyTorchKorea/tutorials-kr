@@ -9,12 +9,12 @@ PyTorch 1.0 릴리스는 PyTorch에 `TorchScript <https://pytorch.org/docs/maste
 TorchScript는 ``torch`` 패키지에서 제공하는 작업의 큰 부분 집합을 지원 하므로 PyTorch의 "표준 라이브러리"에서 순수하게 
 일련의 텐서 작업으로 많은 종류의 복잡한 모델을 표현할 수 있습니다. 그럼에도 불구하고 사용자 정의 C++ 또는 CUDA 기능으로 
 TorchScript를 확장해야 하는 경우가 있습니다. 아이디어를 간단한 Python 함수로 표현할 수 없는 경우에만 이 옵션을 사용하는 
-것이 좋지만 PyTorch의 고성능 C++ 텐서 라이브러리인 `ATen <https://pytorch.org/cppdocs/#aten>`_을 사용하여 
+것이 좋지만 PyTorch의 고성능 C++ 텐서 라이브러리인 `ATen <https://pytorch.org/cppdocs/#aten>`_ 을 사용하여 
 사용자 지정 C++ 및 CUDA 커널을 정의하기 위한 매우 친숙하고 간단한 인터페이스를 제공합니다. TorchScript에 바인딩되면 이러한 
 사용자 지정 커널(또는 "ops")을 TorchScript 모델에 포함하고 Python 및 직렬화된 형식으로 C++에서 직접 실행할 수 있습니다.
 
-다음 단락 에서는 C++로 작성된 컴퓨터 비전 라이브러리인 `OpenCV <https://www.opencv.org>`_를 호출하는 TorchScript 
-사용자 지정 작업을 작성하는 예를 보여줍니다 . C++에서 텐서를 사용하는 방법, 타사 텐서 형식(이 경우 OpenCV ``Mat``) 으로 
+다음 단락 에서는 C++로 작성된 컴퓨터 비전 라이브러리인 `OpenCV <https://www.opencv.org>`_ 를 호출하는 TorchScript 
+사용자 지정 작업을 작성하는 예를 보여줍니다 . C++에서 텐서를 사용하는 방법, 타사 텐서 형식(이 경우 OpenCV ``Mat`` ) 으로 
 효율적으로 변환하는 방법, TorchScript 런타임에 연산자를 등록하는 방법, 마지막으로 Python과 C++에서 연산자를 컴파일하고 
 사용하는 방법에 대해 설명합니다. 
 
@@ -22,7 +22,7 @@ C++에서 사용자 정의 연산자 구현
 ---------------------------------------
 
 이 튜토리얼에서는 OpenCV에서 TorchScript로 이미지에 투영 변환을 적용하는 `warpPerspective <https://docs.opencv.org/2.4/modules/imgproc/doc/geometric_transformations.html#warpperspective>`_ 
-함수를 사용자 정의 연산자로 노출합니다. 첫 번째 단계는 C++로 사용자 정의 연산자 구현을 작성하는 것입니다. 이 구현 ``op.cpp``
+함수를 사용자 정의 연산자로 노출합니다. 첫 번째 단계는 C++로 사용자 정의 연산자 구현을 작성하는 것입니다. 이 구현 ``op.cpp`` 
 을 위한 파일을 호출하고 이 구현을 위한 파일을 호출하고 다음과 같이 보이도록 합시다 : 
 
 .. literalinclude:: ../advanced_source/torch_script_custom_ops/op.cpp
@@ -30,14 +30,14 @@ C++에서 사용자 정의 연산자 구현
   :start-after: BEGIN warp_perspective
   :end-before: END warp_perspective
 
-이 연산자의 코드는 매우 짧습니다. 파일 맨 위에 OpenCV 헤더 파일이 포함되어 있으며 ``opencv2/opencv.hpp``와 ``torch/
-script.h`` 헤더 와 함께 사용자 지정 TorchScript 연산자를 작성하는 데 필요한 PyTorch의 C++ API에서 필요한 모든 
+이 연산자의 코드는 매우 짧습니다. 파일 맨 위에 OpenCV 헤더 파일이 포함되어 있으며 ``opencv2/opencv.hpp`` 와 ``torch/
+script.h`` 헤더와 함께 사용자 지정 TorchScript 연산자를 작성하는 데 필요한 PyTorch의 C++ API에서 필요한 모든 
 항목을 노출합니다.
 
 우리의 함수 ``warp_perspective`` 는 두 가지 인수를 취합니다: 입력 ``image`` 와 이미지에 적용하고자 하는 ``warp`` 
 변환 행렬. 
-이러한 입력 유형은 ``torch::Tensor``, C++에서 PyTorch의 텐서 유형(파이썬에서 모든 텐서의 기본 유형이기도 함)입니다. 
-``warp_perspective`` 함수의 반환 유형 또한 ``torch::Tensor`` 입니다. 
+이러한 입력 유형은 ``torch::Tensor`` , C++에서 PyTorch의 텐서 유형(파이썬에서 모든 텐서의 기본 유형이기도 함)입니다. 
+ ``warp_perspective`` 함수의 반환 유형 또한 ``torch::Tensor`` 입니다. 
 
 .. tip::
 
@@ -48,11 +48,12 @@ script.h`` 헤더 와 함께 사용자 지정 TorchScript 연산자를 작성하
 .. attention::
 
   TorchScript 컴파일러는 고정된 수의 유형을 이해합니다. 이러한 유형만 사용자 지정 연산자에 대한 인수로 사용할 수 있습니다. 
-  현재 이러한 유형은 다음과 같습니다: ``torch::Tensor``, ``torch::Scalar``, ``double``, ``int64_t`` 및
-  ``std::vector`` 의 이러한 유형들.``float``가 아니라 *오로지* ``double`` 이며, ``int``, ``short`` 이나 ``long`` 처럼 다른 정수타입이 아닌 *오로지* ``int64_t``을 지원합니다. 
+  현재 이러한 유형은 다음과 같습니다: ``torch::Tensor`` , ``torch::Scalar`` , ``double`` , ``int64_t`` 및
+ ``std::vector`` 의 이러한 유형들. ``float`` 가 아니라 *오로지* ``double`` 이며, ``int`` , ``short`` 이나 ``long`` 처럼 다른 정수타입이 아닌 *오로지*  
+  ``int64_t`` 을 지원합니다. 
 
-함수 내부에서 가장 먼저 해야 할 일은 PyTorch 텐서를 OpenCV 행렬로 변환하는 것 입니다. OpenCV ``warpPerspective``는 
-``cv::Mat``객체를 입력으로 기대하기 때문입니다. 다행히 데이터를 **복사하지 않고** 이 작업을 수행할 수 있는 방법이 있습니다. 
+함수 내부에서 가장 먼저 해야 할 일은 PyTorch 텐서를 OpenCV 행렬로 변환하는 것 입니다. OpenCV ``warpPerspective`` 는 
+ ``cv::Mat`` 객체를 입력으로 기대하기 때문입니다. 다행히 데이터를 **복사하지 않고** 이 작업을 수행할 수 있는 방법이 있습니다. 
 처음 몇 줄에는,
 
 .. literalinclude:: ../advanced_source/torch_script_custom_ops/op.cpp
@@ -60,10 +61,10 @@ script.h`` 헤더 와 함께 사용자 지정 TorchScript 연산자를 작성하
   :start-after: BEGIN image_mat
   :end-before: END image_mat
 
-우리의 텐서를 ``Mat`` 객체로 변환하기 위해 OpenCV ``Mat`` 클래스의 `이 생성자 <https://docs.opencv.org/trunk/d3/d63/classcv_1_1Mat.html#a922de793eabcec705b3579c5f95a643e>`_를 호출합니다. 우리는 오리지널 ``이미지`` 
+우리의 텐서를 ``Mat`` 객체로 변환하기 위해 OpenCV ``Mat`` 클래스의 `이 생성자 <https://docs.opencv.org/trunk/d3/d63/classcv_1_1Mat.html#a922de793eabcec705b3579c5f95a643e>`_ 를 호출합니다. 우리는 오리지널 ``이미지`` 
 텐서의 행과 열의 수, 데이터 유형(이 예제에서는 ``float32`` 로 고칠 것), 그리고 마지막으로 기본 데이터에 대한 원시 포인터인 
 -- a ``float*`` 를 전달합니다. 이 ``Mat``  클래스 생성자의 특별한 점은 입력 데이터를 복사하지 않는다는 것입니다. 대신 ``
-Mat``에서 수행된 모든 작업에 대해 이 메모리를 참조합니다. ``image_mat``에서 제자리 작업을 수행 하면 원본 ``이미지`` 
+Mat`` 에서 수행된 모든 작업에 대해 이 메모리를 참조합니다. ``image_mat`` 에서 제자리 작업을 수행 하면 원본 ``이미지`` 
 텐서에 반영됩니다.(반대의 경우도 마찬가지). 이것은 우리가 실제로 데이터를 PyTorch 텐서에 저장하고 있더라도 라이브러리의 기본 
 매트릭스 유형으로 후속 OpenCV 루틴을 호출할 수 있도록 합니다. ``warp`` PyTorch 텐서를 ``warp_mat`` OpenCV 
 매트릭스로 변환하기 위해 이 절차를 반복합니다.
@@ -73,32 +74,31 @@ Mat``에서 수행된 모든 작업에 대해 이 메모리를 참조합니다. 
   :start-after: BEGIN warp_mat
   :end-before: END warp_mat
 
-다음으로 TorchScript에서 사용하고 싶었던 OpenCV 함수를 호출할 준비가 되었습니다: ``warpPerspective``. 이를 위해 
-OpenCV 함수 ``image_mat``와 ``warp_mat``매트릭스, 빈 출력 매트릭스인 ``output_mat`` 를 전달합니다.  또한 출력 
-매트릭스(이미지)의 원하는 크기 ``dsize``를 지정합니다 . 이 예제에서는 다음 ``8 x 8``과 같이 하드코딩됩니다.
+다음으로 TorchScript에서 사용하고 싶었던 OpenCV 함수를 호출할 준비가 되었습니다: ``warpPerspective`` . 이를 위해 
+OpenCV 함수 ``image_mat`` 와 ``warp_mat`` 매트릭스, 빈 출력 매트릭스인 ``output_mat`` 를 전달합니다.  또한 출력 
+매트릭스(이미지)의 원하는 크기 ``dsize`` 를 지정합니다 . 이 예제에서는 다음 ``8 x 8`` 과 같이 하드코딩됩니다.
 
 .. literalinclude:: ../advanced_source/torch_script_custom_ops/op.cpp
   :language: cpp
   :start-after: BEGIN output_mat
   :end-before: END output_mat
 
-사용자 정의 연산자 구현의 마지막 단계는 ``output_mat``을 PyTorch에서 더 사용할 수 있도록 다시 PyTorch 텐서로 변환하는 
-것입니다. 이것은 우리가 다른 방향으로 변환하기 위해 이전에 수행한 것과 놀랍도록 유사합니다. 이 경우 PyTorch에서 ``torch::
-from_blob``메소드를 제공합니다. 우리가 PyTorch 텐서로 해석하려는 *blob*은 메모리에 약간 불투명한, 평면 포인터를 의미합니다. ``torch::from_blob``에 대한 호출은 다음과 같습니다.
+사용자 정의 연산자 구현의 마지막 단계는 ``output_mat`` 을 PyTorch에서 더 사용할 수 있도록 다시 PyTorch 텐서로 변환하는 
+것입니다. 이것은 우리가 다른 방향으로 변환하기 위해 이전에 수행한 것과 놀랍도록 유사합니다. 이 경우 PyTorch에서 ``torch::from_blob`` 메소드를 제공합니다. 우리가 PyTorch 텐서로 해석하려는 *blob*은 메모리에 약간 불투명한, 평면 포인터를 의미합니다. ``torch::from_blob`` 에 대한 호출은 다음과 같습니다.
 
 .. literalinclude:: ../advanced_source/torch_script_custom_ops/op.cpp
   :language: cpp
   :start-after: BEGIN output_tensor
   :end-before: END output_tensor
 
-우리는 OpenCV ``Mat`` 클래스의 ``.ptr<float>()``메서드를 사용하여 기본 데이터에 대한 원시 포인터를 얻습니다.(이전의 
-PyTorch 텐서 ``.data_ptr<float>()``와 마찬가지로). 우리는 또한 ``8 x 8``처럼 하드코딩한 텐서의 출력 형태를 
-지정합니다 . ``torch::from_blob``의 출력은 OpenCV 매트릭스가 소유한 메모리를 가리키는 ``torch::Tensor``입니다.
+우리는 OpenCV ``Mat`` 클래스의 ``.ptr<float>()`` 메서드를 사용하여 기본 데이터에 대한 원시 포인터를 얻습니다.(이전의 
+PyTorch 텐서 ``.data_ptr<float>()`` 와 마찬가지로). 우리는 또한 ``8 x 8`` 처럼 하드코딩한 텐서의 출력 형태를 
+지정합니다. ``torch::from_blob`` 의 출력은 OpenCV 매트릭스가 소유한 메모리를 가리키는 ``torch::Tensor`` 입니다.
 
-연산자 구현에서 이 텐서를 반환하기 전에, 기본 데이터의 메모리 복사를 수행하기 위해 ``.clone()``를 호출해야 합니다 . 그 
-이유는 ``torch::from_blob``는 데이터를 소유하지 않는 텐서를 반환하기 때문입니다 . 그 시점에서 데이터는 여전히 OpenCV 
+연산자 구현에서 이 텐서를 반환하기 전에, 기본 데이터의 메모리 복사를 수행하기 위해 ``.clone()`` 를 호출해야 합니다 . 그 
+이유는 ``torch::from_blob`` 는 데이터를 소유하지 않는 텐서를 반환하기 때문입니다 . 그 시점에서 데이터는 여전히 OpenCV 
 매트릭스에 의해 소유됩니다. 그러나 이 OpenCV 매트릭스는 범위를 벗어나 함수가 끝날 때 할당이 해제됩니다. ``output`` 텐서를 
-있는 그대로 반환 하면 함수 외부에서 사용할 때까지 유효하지 않은 메모리를 가리킬 것입니다. ``.clone()``을 호출하면 새 텐서가 
+있는 그대로 반환 하면 함수 외부에서 사용할 때까지 유효하지 않은 메모리를 가리킬 것입니다. ``.clone()`` 을 호출하면 새 텐서가 
 자체적으로 소유한 원본 데이터의 복사본과 함께 새 텐서를 반환합니다. 따라서 바깥으로 돌아가는 것은(반환하는 것은) 안전합니다.
 
 TorchScript에 사용자 정의 연산자 등록
@@ -114,9 +114,9 @@ TorchScript 컴파일러는 TorchScript 코드에서 사용자 지정 연산자�
   :end-before: END registry
 
 ``op.cpp`` 파일의 최상위 레벨 어딘가에 있습니다. ``TORCH_LIBRARY`` 매크로는 프로그램이 시작될 때 호출되는 함수를 
-작성합니다.  라이브러리 이름(``my_ops``)이 첫 번째 인수로 제공됩니다(따옴표로 묶지 않아야 함). 두 번째 인수(``m``) 는 
-연산자를 등록하기 위한 기본 인터페이스 유형 ``torch::Library``의 변수를 정의합니다.
-이 메서드 ``Library::def``는 실제로 ``warp_perspective``라는 연산자를 생성하여,Python과 TorchScript에 모두 
+작성합니다.  라이브러리 이름( ``my_ops`` )이 첫 번째 인수로 제공됩니다(따옴표로 묶지 않아야 함). 두 번째 인수(``m``) 는 
+연산자를 등록하기 위한 기본 인터페이스 유형 ``torch::Library`` 의 변수를 정의합니다.
+이 메서드 ``Library::def`` 는 실제로 ``warp_perspective`` 라는 연산자를 생성하여,Python과 TorchScript에 모두 
 노출합니다. ``def`` 를 여러 번 호출하여 원하는 만큼 연산자를 정의할 수 있습니다.
 
 뒤에서 def함수는 실제로 꽤 많은 작업을 수행하고 있습니다: 템플릿 메타프로그래밍을 사용하여 함수의 유형 특징을 검사하고 이를 
@@ -126,7 +126,7 @@ TorchScript의 유형 시스템 내에서 연산자 유형을 지정하는 연�
 ----------------------------
 
 이제 C++로 사용자 정의 연산자를 구현하고 등록 코드를 작성했으므로 연구 및 실험을 위해 Python으로 로드하거나 Python이 아닌 
-환경에서 추론을 위해 C++로 로드할 수 있는 (공유) 라이브러리로 연산자를 빌드할 때입니다. 순수 CMake 또는 ``setuptools``
+환경에서 추론을 위해 C++로 로드할 수 있는 (공유) 라이브러리로 연산자를 빌드할 때입니다. 순수 CMake 또는 ``setuptools`` 
 과 같은 Python 대안을 사용하여 연산자를 빌드하는 여러 가지 방법이 있습니다. 간결함을 위해 아래 단락에서는 CMake 접근 방식에 
 대해서만 설명합니다. 이 튜토리얼의 부록에서는 다른 대안을 다룹니다.
 
@@ -142,7 +142,7 @@ CMake로 빌드
 *******************
 
 `CMake <https://cmake.org>`_ 빌드 시스템을 사용하여 사용자 지정 연산자를 공유 라이브러리에 빌드하려면 짧은 
-``CMakeLists.txt`` 파일 을 작성 하고 이전  ``op.cpp``파일과 함께 배치해야 합니다. 이를 위해 다음과 같은 디렉토리 
+``CMakeLists.txt`` 파일 을 작성 하고 이전  ``op.cpp`` 파일과 함께 배치해야 합니다. 이를 위해 다음과 같은 디렉토리 
 구조에 동의합니다 ::
 
   warp-perspective/
@@ -196,13 +196,8 @@ The contents of our ``CMakeLists.txt`` file should then be the following:
   [100%] Linking CXX shared library libwarp_perspective.so
   [100%] Built target warp_perspective
 
-which will place a ``libwarp_perspective.so`` shared library file in the
-``build`` folder. In the ``cmake`` command above, we use the helper
-variable ``torch.utils.cmake_prefix_path`` to conveniently tell us where
-the cmake files for our PyTorch install are.
-
 ``build`` 폴더에 ``libwarp_perspective.so`` 공유 라이브러리 파일을 저장합니다. 위의 ``cmake`` 명령에서는 helper 
-변수 ``torch.utils.cmake_prefix_path``를 사용하여 PyTorch 설치를 위한 cmake 파일이 어디에 있는지 편리하게 
+변수 ``torch.utils.cmake_prefix_path`` 를 사용하여 PyTorch 설치를 위한 cmake 파일이 어디에 있는지 편리하게 
 알려줍니다.
 
 아래에서 연산자를 사용하고 호출하는 방법을 자세히 살펴보겠지만 더 일찍 성공을 느껴보기 위해 Python에서 다음 코드를 실행할 수 
