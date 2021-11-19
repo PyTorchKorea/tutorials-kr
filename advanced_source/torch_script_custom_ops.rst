@@ -1,212 +1,162 @@
-Extending TorchScript with Custom C++ Operators
+사용자 정의 C++ 연산자로 TORCHSCRIPT 확장하기
 ===============================================
 
-The PyTorch 1.0 release introduced a new programming model to PyTorch called
-`TorchScript <https://pytorch.org/docs/master/jit.html>`_. TorchScript is a
-subset of the Python programming language which can be parsed, compiled and
-optimized by the TorchScript compiler. Further, compiled TorchScript models have
-the option of being serialized into an on-disk file format, which you can
-subsequently load and run from pure C++ (as well as Python) for inference.
+PyTorch 1.0 릴리스는 PyTorch에 `TorchScript <https://pytorch.org/docs/master/jit.html>`_ 라는 새로운 
+프로그래밍 모델을 도입하였습니다 .TorchScript는 TorchScript 컴파일러에서 구문 분석, 컴파일 및 최적화할 수 있는 Python
+프로그래밍 언어의 하위 집합입니다. 또한 컴파일된 TorchScript 모델에는 디스크에 있는 파일 형식으로 직렬화할 수 있는 옵션이 
+있으며, 추론(inference)을 위해 순수 C++(Python뿐만 아니라)에서 로드하고 실행할 수 있습니다.
 
-TorchScript supports a large subset of operations provided by the ``torch``
-package, allowing you to express many kinds of complex models purely as a series
-of tensor operations from PyTorch's "standard library". Nevertheless, there may
-be times where you find yourself in need of extending TorchScript with a custom
-C++ or CUDA function. While we recommend that you only resort to this option if
-your idea cannot be expressed (efficiently enough) as a simple Python function,
-we do provide a very friendly and simple interface for defining custom C++ and
-CUDA kernels using `ATen <https://pytorch.org/cppdocs/#aten>`_, PyTorch's high
-performance C++ tensor library. Once bound into TorchScript, you can embed these
-custom kernels (or "ops") into your TorchScript model and execute them both in
-Python and in their serialized form directly in C++.
+TorchScript는 ``torch`` 패키지에서 제공하는 작업의 큰 부분 집합을 지원 하므로 PyTorch의 "표준 라이브러리"에서 순수하게 
+일련의 텐서 작업으로 많은 종류의 복잡한 모델을 표현할 수 있습니다. 그럼에도 불구하고 사용자 정의 C++ 또는 CUDA 기능으로 
+TorchScript를 확장해야 하는 경우가 있습니다. 아이디어를 간단한 Python 함수로 표현할 수 없는 경우에만 이 옵션을 사용하는 
+것이 좋지만 PyTorch의 고성능 C++ 텐서 라이브러리인 `ATen <https://pytorch.org/cppdocs/#aten>`_을 사용하여 
+사용자 지정 C++ 및 CUDA 커널을 정의하기 위한 매우 친숙하고 간단한 인터페이스를 제공합니다. TorchScript에 바인딩되면 이러한 
+사용자 지정 커널(또는 "ops")을 TorchScript 모델에 포함하고 Python 및 직렬화된 형식으로 C++에서 직접 실행할 수 있습니다.
 
-The following paragraphs give an example of writing a TorchScript custom op to
-call into `OpenCV <https://www.opencv.org>`_, a computer vision library written
-in C++. We will discuss how to work with tensors in C++, how to efficiently
-convert them to third party tensor formats (in this case, OpenCV ``Mat``), how
-to register your operator with the TorchScript runtime and finally how to
-compile the operator and use it in Python and C++.
+다음 단락 에서는 C++로 작성된 컴퓨터 비전 라이브러리인 `OpenCV <https://www.opencv.org>`_를 호출하는 TorchScript 
+사용자 지정 작업을 작성하는 예를 보여줍니다 . C++에서 텐서를 사용하는 방법, 타사 텐서 형식(이 경우 OpenCV ``Mat``) 으로 
+효율적으로 변환하는 방법, TorchScript 런타임에 연산자를 등록하는 방법, 마지막으로 Python과 C++에서 연산자를 컴파일하고 
+사용하는 방법에 대해 설명합니다. 
 
-Implementing the Custom Operator in C++
+C++에서 사용자 정의 연산자 구현
 ---------------------------------------
 
-For this tutorial, we'll be exposing the `warpPerspective
-<https://docs.opencv.org/2.4/modules/imgproc/doc/geometric_transformations.html#warpperspective>`_
-function, which applies a perspective transformation to an image, from OpenCV to
-TorchScript as a custom operator. The first step is to write the implementation
-of our custom operator in C++. Let's call the file for this implementation
-``op.cpp`` and make it look like this:
+이 튜토리얼에서는 OpenCV에서 TorchScript로 이미지에 투영 변환을 적용하는 `warpPerspective <https://docs.opencv.org/2.4/modules/imgproc/doc/geometric_transformations.html#warpperspective>`_ 
+함수를 사용자 정의 연산자로 노출합니다. 첫 번째 단계는 C++로 사용자 정의 연산자 구현을 작성하는 것입니다. 이 구현 ``op.cpp``
+을 위한 파일을 호출하고 이 구현을 위한 파일을 호출하고 다음과 같이 보이도록 합시다 : 
 
 .. literalinclude:: ../advanced_source/torch_script_custom_ops/op.cpp
   :language: cpp
   :start-after: BEGIN warp_perspective
   :end-before: END warp_perspective
 
-The code for this operator is quite short. At the top of the file, we include
-the OpenCV header file, ``opencv2/opencv.hpp``, alongside the ``torch/script.h``
-header which exposes all the necessary goodies from PyTorch's C++ API that we
-need to write custom TorchScript operators. Our function ``warp_perspective``
-takes two arguments: an input ``image`` and the ``warp`` transformation matrix
-we wish to apply to the image. The type of these inputs is ``torch::Tensor``,
-PyTorch's tensor type in C++ (which is also the underlying type of all tensors
-in Python). The return type of our ``warp_perspective`` function will also be a
-``torch::Tensor``.
+이 연산자의 코드는 매우 짧습니다. 파일 맨 위에 OpenCV 헤더 파일이 포함되어 있으며 ``opencv2/opencv.hpp``와 ``torch/
+script.h`` 헤더 와 함께 사용자 지정 TorchScript 연산자를 작성하는 데 필요한 PyTorch의 C++ API에서 필요한 모든 
+항목을 노출합니다.
+
+우리의 함수 ``warp_perspective`` 는 두 가지 인수를 취합니다: 입력 ``image`` 와 이미지에 적용하고자 하는 ``warp`` 
+변환 행렬. 
+이러한 입력 유형은 ``torch::Tensor``, C++에서 PyTorch의 텐서 유형(파이썬에서 모든 텐서의 기본 유형이기도 함)입니다. 
+``warp_perspective`` 함수의 반환 유형 또한 ``torch::Tensor`` 입니다. 
 
 .. tip::
 
-  See `this note <https://pytorch.org/cppdocs/notes/tensor_basics.html>`_ for
-  more information about ATen, the library that provides the ``Tensor`` class to
-  PyTorch. Further, `this tutorial
-  <https://pytorch.org/cppdocs/notes/tensor_creation.html>`_ describes how to
-  allocate and initialize new tensor objects in C++ (not required for this
-  operator).
+  `이 노트 <https://pytorch.org/cppdocs/notes/tensor_basics.html>`_ 에는 ``Tensor`` 클래스를 제공하는 
+  라이브러리인 ATen에 대한 자세한 내용이 있습니다. 또, `이 튜토리얼 <https://pytorch.org/cppdocs/notes/tensor_creation.html>`_ 에서는 C++에서 새 텐서 개체를 할당하고 초기화하는 방법을 설명합니다(이 연산자에는 필요하지 않
+  음).
 
 .. attention::
 
-  The TorchScript compiler understands a fixed number of types. Only these types
-  can be used as arguments to your custom operator. Currently these types are:
-  ``torch::Tensor``, ``torch::Scalar``, ``double``, ``int64_t`` and
-  ``std::vector`` s of these types. Note that *only* ``double`` and *not*
-  ``float``, and *only* ``int64_t`` and *not* other integral types such as
-  ``int``, ``short`` or ``long`` are supported.
+  TorchScript 컴파일러는 고정된 수의 유형을 이해합니다. 이러한 유형만 사용자 지정 연산자에 대한 인수로 사용할 수 있습니다. 
+  현재 이러한 유형은 다음과 같습니다: ``torch::Tensor``, ``torch::Scalar``, ``double``, ``int64_t`` 및
+  ``std::vector`` 의 이러한 유형들.``float``가 아니라 *오로지* ``double`` 이며, ``int``, ``short`` 이나 ``long`` 처럼 다른 정수타입이 아닌 *오로지* ``int64_t``을 지원합니다. 
 
-Inside of our function, the first thing we need to do is convert our PyTorch
-tensors to OpenCV matrices, as OpenCV's ``warpPerspective`` expects ``cv::Mat``
-objects as inputs. Fortunately, there is a way to do this **without copying
-any** data. In the first few lines,
+함수 내부에서 가장 먼저 해야 할 일은 PyTorch 텐서를 OpenCV 행렬로 변환하는 것 입니다. OpenCV ``warpPerspective``는 
+``cv::Mat``객체를 입력으로 기대하기 때문입니다. 다행히 데이터를 **복사하지 않고** 이 작업을 수행할 수 있는 방법이 있습니다. 
+처음 몇 줄에는,
 
 .. literalinclude:: ../advanced_source/torch_script_custom_ops/op.cpp
   :language: cpp
   :start-after: BEGIN image_mat
   :end-before: END image_mat
 
-we are calling `this constructor
-<https://docs.opencv.org/trunk/d3/d63/classcv_1_1Mat.html#a922de793eabcec705b3579c5f95a643e>`_
-of the OpenCV ``Mat`` class to convert our tensor to a ``Mat`` object. We pass
-it the number of rows and columns of the original ``image`` tensor, the datatype
-(which we'll fix as ``float32`` for this example), and finally a raw pointer to
-the underlying data -- a ``float*``. What is special about this constructor of
-the ``Mat`` class is that it does not copy the input data. Instead, it will
-simply reference this memory for all operations performed on the ``Mat``. If an
-in-place operation is performed on the ``image_mat``, this will be reflected in
-the original ``image`` tensor (and vice-versa). This allows us to call
-subsequent OpenCV routines with the library's native matrix type, even though
-we're actually storing the data in a PyTorch tensor. We repeat this procedure to
-convert the ``warp`` PyTorch tensor to the ``warp_mat`` OpenCV matrix:
+우리의 텐서를 ``Mat`` 객체로 변환하기 위해 OpenCV ``Mat`` 클래스의 `이 생성자 <https://docs.opencv.org/trunk/d3/d63/classcv_1_1Mat.html#a922de793eabcec705b3579c5f95a643e>`_를 호출합니다. 우리는 오리지널 ``이미지`` 
+텐서의 행과 열의 수, 데이터 유형(이 예제에서는 ``float32`` 로 고칠 것), 그리고 마지막으로 기본 데이터에 대한 원시 포인터인 
+-- a ``float*`` 를 전달합니다. 이 ``Mat``  클래스 생성자의 특별한 점은 입력 데이터를 복사하지 않는다는 것입니다. 대신 ``
+Mat``에서 수행된 모든 작업에 대해 이 메모리를 참조합니다. ``image_mat``에서 제자리 작업을 수행 하면 원본 ``이미지`` 
+텐서에 반영됩니다.(반대의 경우도 마찬가지). 이것은 우리가 실제로 데이터를 PyTorch 텐서에 저장하고 있더라도 라이브러리의 기본 
+매트릭스 유형으로 후속 OpenCV 루틴을 호출할 수 있도록 합니다. ``warp`` PyTorch 텐서를 ``warp_mat`` OpenCV 
+매트릭스로 변환하기 위해 이 절차를 반복합니다.
 
 .. literalinclude:: ../advanced_source/torch_script_custom_ops/op.cpp
   :language: cpp
   :start-after: BEGIN warp_mat
   :end-before: END warp_mat
 
-Next, we are ready to call the OpenCV function we were so eager to use in
-TorchScript: ``warpPerspective``. For this, we pass the OpenCV function the
-``image_mat`` and ``warp_mat`` matrices, as well as an empty output matrix
-called ``output_mat``. We also specify the size ``dsize`` we want the output
-matrix (image) to be. It is hardcoded to ``8 x 8`` for this example:
+다음으로 TorchScript에서 사용하고 싶었던 OpenCV 함수를 호출할 준비가 되었습니다: ``warpPerspective``. 이를 위해 
+OpenCV 함수 ``image_mat``와 ``warp_mat``매트릭스, 빈 출력 매트릭스인 ``output_mat`` 를 전달합니다.  또한 출력 
+매트릭스(이미지)의 원하는 크기 ``dsize``를 지정합니다 . 이 예제에서는 다음 ``8 x 8``과 같이 하드코딩됩니다.
 
 .. literalinclude:: ../advanced_source/torch_script_custom_ops/op.cpp
   :language: cpp
   :start-after: BEGIN output_mat
   :end-before: END output_mat
 
-The final step in our custom operator implementation is to convert the
-``output_mat`` back into a PyTorch tensor, so that we can further use it in
-PyTorch. This is strikingly similar to what we did earlier to convert in the
-other direction. In this case, PyTorch provides a ``torch::from_blob`` method. A
-*blob* in this case is intended to mean some opaque, flat pointer to memory that
-we want to interpret as a PyTorch tensor. The call to ``torch::from_blob`` looks
-like this:
+사용자 정의 연산자 구현의 마지막 단계는 ``output_mat``을 PyTorch에서 더 사용할 수 있도록 다시 PyTorch 텐서로 변환하는 
+것입니다. 이것은 우리가 다른 방향으로 변환하기 위해 이전에 수행한 것과 놀랍도록 유사합니다. 이 경우 PyTorch에서 ``torch::
+from_blob``메소드를 제공합니다. 우리가 PyTorch 텐서로 해석하려는 *blob*은 메모리에 약간 불투명한, 평면 포인터를 의미합니다. ``torch::from_blob``에 대한 호출은 다음과 같습니다.
 
 .. literalinclude:: ../advanced_source/torch_script_custom_ops/op.cpp
   :language: cpp
   :start-after: BEGIN output_tensor
   :end-before: END output_tensor
 
-We use the ``.ptr<float>()`` method on the OpenCV ``Mat`` class to get a raw
-pointer to the underlying data (just like ``.data_ptr<float>()`` for the PyTorch
-tensor earlier). We also specify the output shape of the tensor, which we
-hardcoded as ``8 x 8``. The output of ``torch::from_blob`` is then a
-``torch::Tensor``, pointing to the memory owned by the OpenCV matrix.
+우리는 OpenCV ``Mat`` 클래스의 ``.ptr<float>()``메서드를 사용하여 기본 데이터에 대한 원시 포인터를 얻습니다.(이전의 
+PyTorch 텐서 ``.data_ptr<float>()``와 마찬가지로). 우리는 또한 ``8 x 8``처럼 하드코딩한 텐서의 출력 형태를 
+지정합니다 . ``torch::from_blob``의 출력은 OpenCV 매트릭스가 소유한 메모리를 가리키는 ``torch::Tensor``입니다.
 
-Before returning this tensor from our operator implementation, we must call
-``.clone()`` on the tensor to perform a memory copy of the underlying data. The
-reason for this is that ``torch::from_blob`` returns a tensor that does not own
-its data. At that point, the data is still owned by the OpenCV matrix. However,
-this OpenCV matrix will go out of scope and be deallocated at the end of the
-function. If we returned the ``output`` tensor as-is, it would point to invalid
-memory by the time we use it outside the function. Calling ``.clone()`` returns
-a new tensor with a copy of the original data that the new tensor owns itself.
-It is thus safe to return to the outside world.
+연산자 구현에서 이 텐서를 반환하기 전에, 기본 데이터의 메모리 복사를 수행하기 위해 ``.clone()``를 호출해야 합니다 . 그 
+이유는 ``torch::from_blob``는 데이터를 소유하지 않는 텐서를 반환하기 때문입니다 . 그 시점에서 데이터는 여전히 OpenCV 
+매트릭스에 의해 소유됩니다. 그러나 이 OpenCV 매트릭스는 범위를 벗어나 함수가 끝날 때 할당이 해제됩니다. ``output`` 텐서를 
+있는 그대로 반환 하면 함수 외부에서 사용할 때까지 유효하지 않은 메모리를 가리킬 것입니다. ``.clone()``을 호출하면 새 텐서가 
+자체적으로 소유한 원본 데이터의 복사본과 함께 새 텐서를 반환합니다. 따라서 바깥으로 돌아가는 것은(반환하는 것은) 안전합니다.
 
-Registering the Custom Operator with TorchScript
+TorchScript에 사용자 정의 연산자 등록
 ------------------------------------------------
 
-Now that have implemented our custom operator in C++, we need to *register* it
-with the TorchScript runtime and compiler. This will allow the TorchScript
-compiler to resolve references to our custom operator in TorchScript code.
-If you have ever used the pybind11 library, our syntax for registration
-resembles the pybind11 syntax very closely.  To register a single function,
-we write:
+이제 C++에서 사용자 정의 연산자를 구현 했으므로 TorchScript 런타임 및 컴파일러에 *등록* 해야 합니다 . 이를 통해 
+TorchScript 컴파일러는 TorchScript 코드에서 사용자 지정 연산자에 대한 참조를 확인할 수 있습니다. pybind11 라이브러리를 
+사용한 적이 있다면 등록 구문이 pybind11 구문과 매우 유사합니다. 단일 함수를 등록하려면 다음과 같이 작성합니다:
 
 .. literalinclude:: ../advanced_source/torch_script_custom_ops/op.cpp
   :language: cpp
   :start-after: BEGIN registry
   :end-before: END registry
 
-somewhere at the top level of our ``op.cpp`` file.  The ``TORCH_LIBRARY`` macro
-creates a function that will be called when your program starts.  The name
-of your library (``my_ops``) is given as the first argument (it should not
-be in quotes).  The second argument (``m``) defines a variable of type
-``torch::Library`` which is the main interface to register your operators.
-The method ``Library::def`` actually creates an operator named ``warp_perspective``,
-exposing it to both Python and TorchScript.  You can define as many operators
-as you like by making multiple calls to ``def``.
+``op.cpp`` 파일의 최상위 레벨 어딘가에 있습니다. ``TORCH_LIBRARY`` 매크로는 프로그램이 시작될 때 호출되는 함수를 
+작성합니다.  라이브러리 이름(``my_ops``)이 첫 번째 인수로 제공됩니다(따옴표로 묶지 않아야 함). 두 번째 인수(``m``) 는 
+연산자를 등록하기 위한 기본 인터페이스 유형 ``torch::Library``의 변수를 정의합니다.
+이 메서드 ``Library::def``는 실제로 ``warp_perspective``라는 연산자를 생성하여,Python과 TorchScript에 모두 
+노출합니다. ``def`` 를 여러 번 호출하여 원하는 만큼 연산자를 정의할 수 있습니다.
 
-Behinds the scenes, the ``def`` function is actually doing quite a bit of work:
-it is using template metaprogramming to inspect the type signature of your
-function and translate it into an operator schema which specifies the operators
-type within TorchScript's type system.
+뒤에서 def함수는 실제로 꽤 많은 작업을 수행하고 있습니다: 템플릿 메타프로그래밍을 사용하여 함수의 유형 특징을 검사하고 이를 
+TorchScript의 유형 시스템 내에서 연산자 유형을 지정하는 연산자 스키마로 변환합니다.
 
-Building the Custom Operator
+사용자 정의 연산자 빌드
 ----------------------------
 
-Now that we have implemented our custom operator in C++ and written its
-registration code, it is time to build the operator into a (shared) library that
-we can load into Python for research and experimentation, or into C++ for
-inference in a no-Python environment. There exist multiple ways to build our
-operator, using either pure CMake, or Python alternatives like ``setuptools``.
-For brevity, the paragraphs below only discuss the CMake approach. The appendix
-of this tutorial dives into other alternatives.
+이제 C++로 사용자 정의 연산자를 구현하고 등록 코드를 작성했으므로 연구 및 실험을 위해 Python으로 로드하거나 Python이 아닌 
+환경에서 추론을 위해 C++로 로드할 수 있는 (공유) 라이브러리로 연산자를 빌드할 때입니다. 순수 CMake 또는 ``setuptools``
+과 같은 Python 대안을 사용하여 연산자를 빌드하는 여러 가지 방법이 있습니다. 간결함을 위해 아래 단락에서는 CMake 접근 방식에 
+대해서만 설명합니다. 이 튜토리얼의 부록에서는 다른 대안을 다룹니다.
 
-Environment setup
+환경 설정
 *****************
 
-We need an installation of PyTorch and OpenCV.  The easiest and most platform
-independent way to get both is to via Conda::
+PyTorch와 OpenCV를 설치해야 합니다. 둘 다를 가장 쉽고 가장 플랫폼에 독립적으로 얻을 수 있는 방법 Conda:: 
 
   conda install -c pytorch pytorch
   conda install opencv
 
-Building with CMake
+CMake로 빌드
 *******************
 
-To build our custom operator into a shared library using the `CMake
-<https://cmake.org>`_ build system, we need to write a short ``CMakeLists.txt``
-file and place it with our previous ``op.cpp`` file. For this, let's agree on a
-a directory structure that looks like this::
+`CMake <https://cmake.org>`_ 빌드 시스템을 사용하여 사용자 지정 연산자를 공유 라이브러리에 빌드하려면 짧은 
+``CMakeLists.txt`` 파일 을 작성 하고 이전  ``op.cpp``파일과 함께 배치해야 합니다. 이를 위해 다음과 같은 디렉토리 
+구조에 동의합니다 ::
 
   warp-perspective/
     op.cpp
     CMakeLists.txt
 
 The contents of our ``CMakeLists.txt`` file should then be the following:
+``CMakeLists.txt`` 파일의 내용은 다음과 같아야 합니다.
 
 .. literalinclude:: ../advanced_source/torch_script_custom_ops/CMakeLists.txt
   :language: cpp
 
-To now build our operator, we can run the following commands from our
-``warp_perspective`` folder:
+
+이제 연산자를 빌드하기 위해 ``warp_perspective`` 폴더에서 다음 명령을 실행할 수 있습니다:
 
 .. code-block:: shell
 
@@ -251,18 +201,21 @@ which will place a ``libwarp_perspective.so`` shared library file in the
 variable ``torch.utils.cmake_prefix_path`` to conveniently tell us where
 the cmake files for our PyTorch install are.
 
-We will explore how to use and call our operator in detail further below, but to
-get an early sensation of success, we can try running the following code in
-Python:
+``build`` 폴더에 ``libwarp_perspective.so`` 공유 라이브러리 파일을 저장합니다. 위의 ``cmake`` 명령에서는 helper 
+변수 ``torch.utils.cmake_prefix_path``를 사용하여 PyTorch 설치를 위한 cmake 파일이 어디에 있는지 편리하게 
+알려줍니다.
+
+아래에서 연산자를 사용하고 호출하는 방법을 자세히 살펴보겠지만 더 일찍 성공을 느껴보기 위해 Python에서 다음 코드를 실행할 수 
+있습니다. : 
 
 .. literalinclude:: ../advanced_source/torch_script_custom_ops/smoke_test.py
   :language: python
 
-If all goes well, this should print something like::
+모두 잘되었다면 다음과 같이 인쇄됩니다.::
 
   <built-in method my_ops::warp_perspective of PyCapsule object at 0x7f618fc6fa50>
 
-which is the Python function we will later use to invoke our custom operator.
+이것은 나중에 사용자 정의 연산자를 호출하는 데 사용할 Python 함수입니다.
 
 Using the TorchScript Custom Operator in Python
 -----------------------------------------------
