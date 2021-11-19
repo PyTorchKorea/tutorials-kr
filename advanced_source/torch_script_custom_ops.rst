@@ -498,9 +498,9 @@ TorchScript의 유용한 기능 중 하나는 모델을 디스크 상의 파일�
 
 항상 그렇듯이 문제가 발생하거나 질문이 있는 경우 
 `포럼 <https://discuss.pytorch.org/>`_ 또는 `GitHub 이슈
-<https://github.com/pytorch/pytorch/issues>`_를 통해 연락할 수 있습니다. 
+<https://github.com/pytorch/pytorch/issues>`_ 를 통해 연락할 수 있습니다. 
 `또한 자주 묻는 질문(FAQ) 페이지
-<https://pytorch.org/cppdocs/notes/faq.html>`_에 유용한 정보가 있을 수 있습니다.
+<https://pytorch.org/cppdocs/notes/faq.html>`_ 에 유용한 정보가 있을 수 있습니다.
 
 부록 A: 사용자 지정 연산자(Custom Operators)를 구축하는 더 많은 방법
 --------------------------------------------------
@@ -511,12 +511,12 @@ TorchScript의 유용한 기능 중 하나는 모델을 디스크 상의 파일�
 둘 다 Python을 컴파일 프로세스의 "드라이버" 또는 "인터페이스"로 사용합니다. 
 또한 둘 다 `기존 인프라 <https://pytorch.org/docs/stable/cpp_extension.html>`_ 
 PyTorch가 제공하는 `*C++ 확장*
-<https://tutorials.pytorch.kr/advanced/cpp_extension.html>`_을 재사용합니다. 
+<https://tutorials.pytorch.kr/advanced/cpp_extension.html>`_ 을 재사용합니다. 
 이는 C++에서 Python으로 함수의 "명시적" 바인딩을 위해 pybind11에 의존하는 
 TorchScript 사용자 정의 연산자와 동일한 바닐라(eager) PyTorch입니다.
 
 첫 번째 접근 방식은 `C++ 확장의 편리한 JIT(Just-In-Time) 컴파일 인터페이스
-<https://pytorch.org/docs/stable/cpp_extension.html#torch.utils.cpp_extension.load>`_를 사용하여 
+<https://pytorch.org/docs/stable/cpp_extension.html#torch.utils.cpp_extension.load>`_ 를 사용하여 
 처음 실행할 때 PyTorch 스크립트의 백그라운드에서 코드를 컴파일합니다. 
 두 번째 접근 방식은 ``setuptools`` 패키지에 의존하며 별도의 ``setup.py`` 파일 작성을 포함합니다. 
 이를 통해 다른 ``setuptools`` 기반 프로젝트와의 통합뿐만 아니라 고급 구성이 가능합니다.
@@ -537,12 +537,12 @@ Python 코드에 직접 포함할 수 있습니다. 예시로 그것은 훈련 �
 
 이 JIT 컴파일 기능은 두 가지 형태로 제공됩니다. 
 첫 번째 단계에서는 동일하게 별도의 파일(``op.cpp``)에 연산자 구현을 유지한 다음 
-``torch.utils.cpp_extension.load()``를 사용하여 확장을 컴파일합니다. 
+``torch.utils.cpp_extension.load()`` 를 사용하여 확장을 컴파일합니다. 
 일반적으로 이 함수는 C++ 확장을 노출하는 Python 모듈을 반환합니다. 
 그러나 사용자 정의 연산자를 자체 Python 모듈로 컴파일하지 않기 때문에 일반 공유 라이브러리만 컴파일하려고 합니다. 
 다행스럽게도 ``torch.utils.cpp_extension.load()`` 에는 Python 모듈이 아닌 공유 라이브러리 
 구축에만 목적이 있음을 나타내기 위해 False로 설정할 수 있는 ``is_python_module`` 인수가 있습니다. 
-그러면 ``torch.utils.cpp_extension.load()``는 이전 ``torch.ops.load_library``와 동일하게 
+그러면 ``torch.utils.cpp_extension.load()`` 는 이전 ``torch.ops.load_library`` 와 동일하게 
 현재 프로세스에 공유 라이브러리를 컴파일하고 로드합니다.
 
 .. code-block:: python
@@ -566,7 +566,7 @@ Python 코드에 직접 포함할 수 있습니다. 예시로 그것은 훈련 �
   <built-in method my_ops::warp_perspective of PyCapsule object at 0x7f3e0f840b10>
 
 JIT 컴파일의 두 번째 flavor을 사용하면 사용자 지정 TorchScript 연산자에 대한 소스 코드를 문자열로 전달할 수 있습니다.
-이를 위해 ``torch.utils.cpp_extension.load_inline``을 사용하십시오.
+이를 위해 ``torch.utils.cpp_extension.load_inline`` 을 사용하십시오.
 
 .. code-block:: python
 
@@ -611,7 +611,7 @@ JIT 컴파일의 두 번째 flavor을 사용하면 사용자 지정 TorchScript 
   print(torch.ops.my_ops.warp_perspective)
 
 당연히 소스 코드가 상당히 짧은 경우에만 
-``torch.utils.cpp_extension.load_inline``을 사용하는 것이 가장 좋습니다.
+``torch.utils.cpp_extension.load_inline`` 을 사용하는 것이 가장 좋습니다.
 
 Jupyter Notebook에서 이것을 사용하는 경우 각 실행이 새 라이브러리를 등록하고 
 사용자 지정 연산자를 다시 등록하기 때문에 등록이 있는 셀을 여러 번 실행하면 안 됩니다. 
@@ -620,10 +620,10 @@ Jupyter Notebook에서 이것을 사용하는 경우 각 실행이 새 라이브
 Setuptools를 사용하여 빌드
 ************************
 
-Python에서만 사용자 정의 연산자를 구축하는 두 번째 접근 방식은 ``setuptools``를 사용하는 것입니다. 
-이것은 ``setuptools``가 C++로 작성된 Python 모듈을 빌드하기 위한 매우 강력하고 
+Python에서만 사용자 정의 연산자를 구축하는 두 번째 접근 방식은 ``setuptools`` 를 사용하는 것입니다. 
+이것은 ``setuptools`` 가 C++로 작성된 Python 모듈을 빌드하기 위한 매우 강력하고 
 광범위한 인터페이스를 가지고 있다는 장점이 있습니다. 
-그러나 ``setuptools``는 실제로 Python 모듈을 빌드하기 위한 것이며 
+그러나 ``setuptools`` 는 실제로 Python 모듈을 빌드하기 위한 것이며 
 일반 공유 라이브러리(Python이 모듈에서 기대하는 필수 엔트리가 없음)가 아니라 이 경로가 약간 이상할 수 있습니다. 
 즉, 다음과 같은 ``CMakeLists.txt`` 대신 ``setup.py`` 파일만 있으면 됩니다:
 
@@ -644,13 +644,13 @@ Python에서만 사용자 정의 연산자를 구축하는 두 번째 접근 방
       cmdclass={"build_ext": BuildExtension.with_options(no_python_abi_suffix=True)},
   )
 
-하단의 ``BuildExtension``에서 ``no_python_abi_suffix`` 옵션을 활성화했습니다. 
-이는 생성된 공유 라이브러리의 이름에서 Python-3 특정 ABI 접미사를 생략하도록 ``setuptools``에 지시합니다.
-그렇지 않으면 Python 3.7에서 라이브러리를 ``warp_perspective.cpython-37m-x86_64-linux-gnu``라고 할 수 있습니다.
-따라서 ``cpython-37m-x86_64-linux-gnu``는 ABI 태그이지만 실제로는 ``warp_perspective.so``라고 부르기를 원합니다.
+하단의 ``BuildExtension`` 에서 ``no_python_abi_suffix`` 옵션을 활성화했습니다. 
+이는 생성된 공유 라이브러리의 이름에서 Python-3 특정 ABI 접미사를 생략하도록 ``setuptools`` 에 지시합니다.
+그렇지 않으면 Python 3.7에서 라이브러리를 `` warp_perspective.cpython-37m-x86_64-linux-gnu`` 라고 할 수 있습니다.
+따라서 ``cpython-37m-x86_64-linux-gnu`` 는 ABI 태그이지만 실제로는 ``warp_perspective.so`` 라고 부르기를 원합니다.
 
-이제 ``setup.py``가 있는 폴더 내 터미널에서 
-``python setup.py build development``를 실행하면 다음과 같이 표시되어야 합니다.
+이제 ``setup.py`` 가 있는 폴더 내 터미널에서 
+``python setup.py build development`` 를 실행하면 다음과 같이 표시되어야 합니다.
 
 .. code-block:: shell
 
@@ -682,8 +682,8 @@ Python에서만 사용자 정의 연산자를 구축하는 두 번째 접근 방
   Processing dependencies for warp-perspective==0.0.0
   Finished processing dependencies for warp-perspective==0.0.0
 
-이것은 ``warp_perspective.so``라는 공유 라이브러리를 생성합니다. 
-이 라이브러리는 이전에 TorchScript에 연산자를 표시했던 것처럼 ``torch.ops.load_library``에 전달할 수 있습니다.
+이것은 ``warp_perspective.so`` 라는 공유 라이브러리를 생성합니다. 
+이 라이브러리는 이전에 TorchScript에 연산자를 표시했던 것처럼 ``torch.ops.load_library`` 에 전달할 수 있습니다.
 
 .. code-block:: python
 
