@@ -2,7 +2,7 @@
 ===============================================
 
 PyTorch 1.0 릴리스는 PyTorch에 `TorchScript <https://pytorch.org/docs/master/jit.html>`_ 라는 새로운 
-프로그래밍 모델을 도입하였습니다 .TorchScript는 TorchScript 컴파일러에서 구문 분석, 컴파일 및 최적화할 수 있는 Python
+프로그래밍 모델을 도입하였습니다. TorchScript는 TorchScript 컴파일러에서 구문 분석, 컴파일 및 최적화할 수 있는 Python
 프로그래밍 언어의 하위 집합입니다. 또한 컴파일된 TorchScript 모델에는 디스크에 있는 파일 형식으로 직렬화할 수 있는 옵션이 
 있으며, 추론(inference)을 위해 순수 C++(Python뿐만 아니라)에서 로드하고 실행할 수 있습니다.
 
@@ -14,7 +14,7 @@ TorchScript를 확장해야 하는 경우가 있습니다. 아이디어를 간�
 사용자 지정 커널(또는 "ops")을 TorchScript 모델에 포함하고 Python 및 직렬화된 형식으로 C++에서 직접 실행할 수 있습니다.
 
 다음 단락 에서는 C++로 작성된 컴퓨터 비전 라이브러리인 `OpenCV <https://www.opencv.org>`_ 를 호출하는 TorchScript 
-사용자 지정 작업을 작성하는 예를 보여줍니다 . C++에서 텐서를 사용하는 방법, 타사 텐서 형식(이 경우 OpenCV ``Mat`` ) 으로 
+사용자 지정 작업을 작성하는 예를 보여줍니다. C++에서 텐서를 사용하는 방법, 타사 텐서 형식(이 경우 OpenCV ``Mat`` ) 으로 
 효율적으로 변환하는 방법, TorchScript 런타임에 연산자를 등록하는 방법, 마지막으로 Python과 C++에서 연산자를 컴파일하고 
 사용하는 방법에 대해 설명합니다. 
 
@@ -42,36 +42,33 @@ script.h`` 헤더와 함께 사용자 지정 TorchScript 연산자를 작성하�
 .. tip::
 
   `이 노트 <https://pytorch.org/cppdocs/notes/tensor_basics.html>`_ 에는 ``Tensor`` 클래스를 제공하는 
-  라이브러리인 ATen에 대한 자세한 내용이 있습니다. 또, `이 튜토리얼 <https://pytorch.org/cppdocs/notes/tensor_creation.html>`_ 에서는 C++에서 새 텐서 개체를 할당하고 초기화하는 방법을 설명합니다(이 연산자에는 필요하지 않
-  음).
+  라이브러리인 ATen에 대한 자세한 내용이 있습니다. 또, `이 튜토리얼 <https://pytorch.org/cppdocs/notes/tensor_creation.html>`_ 에서는 C++에서 새 텐서 개체를 할당하고 초기화하는 방법을 설명합니다(이 연산자에는 필요하지 않음).
 
 .. attention::
 
   TorchScript 컴파일러는 고정된 수의 유형을 이해합니다. 이러한 유형만 사용자 지정 연산자에 대한 인수로 사용할 수 있습니다. 
-  현재 이러한 유형은 다음과 같습니다: ``torch::Tensor`` , ``torch::Scalar`` , ``double`` , ``int64_t`` 및
- ``std::vector`` 의 이러한 유형들. ``float`` 가 아니라 *오로지* ``double`` 이며, ``int`` , ``short`` 이나 ``long`` 처럼 다른 정수타입이 아닌 *오로지*  
+  현재 이러한 유형은 다음과 같습니다: ``torch::Tensor`` , ``torch::Scalar`` , ``double`` , ``int64_t`` 및 ``std::vector`` 의 이러한 유형들. ``float`` 가 아니라 *오직* ``double`` 이며, ``int`` , ``short`` 이나 ``long`` 처럼 다른 정수타입이 아닌 *오직*  
   ``int64_t`` 을 지원합니다. 
 
-함수 내부에서 가장 먼저 해야 할 일은 PyTorch 텐서를 OpenCV 행렬로 변환하는 것 입니다. OpenCV ``warpPerspective`` 는 
- ``cv::Mat`` 객체를 입력으로 기대하기 때문입니다. 다행히 데이터를 **복사하지 않고** 이 작업을 수행할 수 있는 방법이 있습니다. 
+함수 내부에서 가장 먼저 해야 할 일은 PyTorch 텐서를 OpenCV 행렬로 변환하는 것 입니다. OpenCV ``warpPerspective`` 는 ``cv::Mat`` 객체를 입력으로 기대하기 때문입니다. 다행히 데이터를 **복사하지 않고** 이 작업을 수행할 수 있는 방법이 있습니다. 
 처음 몇 줄에는,
 
 .. literalinclude:: ../advanced_source/torch_script_custom_ops/op.cpp
   :language: cpp
-  :start-after: BEGIN image_mat
-  :end-before: END image_mat
+  :start-after: image_mat 시작
+  :end-before: image_mat 완료
 
 우리의 텐서를 ``Mat`` 객체로 변환하기 위해 OpenCV ``Mat`` 클래스의 `이 생성자 <https://docs.opencv.org/trunk/d3/d63/classcv_1_1Mat.html#a922de793eabcec705b3579c5f95a643e>`_ 를 호출합니다. 우리는 오리지널 ``이미지`` 
 텐서의 행과 열의 수, 데이터 유형(이 예제에서는 ``float32`` 로 고칠 것), 그리고 마지막으로 기본 데이터에 대한 원시 포인터인 
 -- a ``float*`` 를 전달합니다. 이 ``Mat``  클래스 생성자의 특별한 점은 입력 데이터를 복사하지 않는다는 것입니다. 대신 ``Mat`` 에서 수행된 모든 작업에 대해 이 메모리를 참조합니다. ``image_mat`` 에서 제자리 작업을 수행 하면 원본 ``이미지`` 
-텐서에 반영됩니다.(반대의 경우도 마찬가지). 이것은 우리가 실제로 데이터를 PyTorch 텐서에 저장하고 있더라도 라이브러리의 기본 
+텐서에 반영됩니다. (반대의 경우도 마찬가지) 이것은 우리가 실제로 데이터를 PyTorch 텐서에 저장하고 있더라도 라이브러리의 기본 
 매트릭스 유형으로 후속 OpenCV 루틴을 호출할 수 있도록 합니다. ``warp`` PyTorch 텐서를 ``warp_mat`` OpenCV 
 매트릭스로 변환하기 위해 이 절차를 반복합니다.
 
 .. literalinclude:: ../advanced_source/torch_script_custom_ops/op.cpp
   :language: cpp
-  :start-after: BEGIN warp_mat
-  :end-before: END warp_mat
+  :start-after: warp_mat 시작
+  :end-before: warp_mat 끝
 
 다음으로 TorchScript에서 사용하고 싶었던 OpenCV 함수를 호출할 준비가 되었습니다: ``warpPerspective`` . 이를 위해 
 OpenCV 함수 ``image_mat`` 와 ``warp_mat`` 매트릭스, 빈 출력 매트릭스인 ``output_mat`` 를 전달합니다.  또한 출력 
@@ -79,20 +76,18 @@ OpenCV 함수 ``image_mat`` 와 ``warp_mat`` 매트릭스, 빈 출력 매트릭�
 
 .. literalinclude:: ../advanced_source/torch_script_custom_ops/op.cpp
   :language: cpp
-  :start-after: BEGIN output_mat
-  :end-before: END output_mat
+  :start-after: output_mat 시작
+  :end-before: output_mat 끝
 
 사용자 정의 연산자 구현의 마지막 단계는 ``output_mat`` 을 PyTorch에서 더 사용할 수 있도록 다시 PyTorch 텐서로 변환하는 
-것입니다. 이것은 우리가 다른 방향으로 변환하기 위해 이전에 수행한 것과 놀랍도록 유사합니다. 이 경우 PyTorch에서 ``torch::from_blob`` 메소드를 제공합니다. 우리가 PyTorch 텐서로 해석하려는 *blob*은 메모리에 약간 불투명한, 평면 포인터를 의미합니다. ``torch::from_blob`` 에 대한 호출은 다음과 같습니다.
+것입니다. 이것은 우리가 다른 방향으로 변환하기 위해 이전에 수행한 것과 놀랍도록 유사합니다. 이 경우 PyTorch에서 ``torch::from_blob`` 메소드를 제공합니다. 우리가 PyTorch 텐서로 해석하려는 *blob* 은 메모리에 약간 불투명한, 평면 포인터를 의미합니다. ``torch::from_blob`` 에 대한 호출은 다음과 같습니다.
 
 .. literalinclude:: ../advanced_source/torch_script_custom_ops/op.cpp
   :language: cpp
-  :start-after: BEGIN output_tensor
-  :end-before: END output_tensor
+  :start-after: output_tensor 시작
+  :end-before: output_tensor 끝
 
-우리는 OpenCV ``Mat`` 클래스의 ``.ptr<float>()`` 메서드를 사용하여 기본 데이터에 대한 원시 포인터를 얻습니다.(이전의 
-PyTorch 텐서 ``.data_ptr<float>()`` 와 마찬가지로). 우리는 또한 ``8 x 8`` 처럼 하드코딩한 텐서의 출력 형태를 
-지정합니다. ``torch::from_blob`` 의 출력은 OpenCV 매트릭스가 소유한 메모리를 가리키는 ``torch::Tensor`` 입니다.
+우리는 OpenCV ``Mat`` 클래스의 ``.ptr<float>()`` 메서드를 사용하여 기본 데이터에 대한 원시 포인터를 얻습니다.(이전의 PyTorch 텐서 ``.data_ptr<float>()`` 와 마찬가지로). 우리는 또한 ``8 x 8`` 처럼 하드코딩한 텐서의 출력 형태를 지정합니다. ``torch::from_blob`` 의 출력은 OpenCV 매트릭스가 소유한 메모리를 가리키는 ``torch::Tensor`` 입니다.
 
 연산자 구현에서 이 텐서를 반환하기 전에, 기본 데이터의 메모리 복사를 수행하기 위해 ``.clone()`` 를 호출해야 합니다 . 그 
 이유는 ``torch::from_blob`` 는 데이터를 소유하지 않는 텐서를 반환하기 때문입니다 . 그 시점에서 데이터는 여전히 OpenCV 
@@ -109,8 +104,8 @@ TorchScript 컴파일러는 TorchScript 코드에서 사용자 지정 연산자�
 
 .. literalinclude:: ../advanced_source/torch_script_custom_ops/op.cpp
   :language: cpp
-  :start-after: BEGIN registry
-  :end-before: END registry
+  :start-after: registry 시작
+  :end-before: registry 끝
 
 ``op.cpp`` 파일의 최상위 레벨 어딘가에 있습니다. ``TORCH_LIBRARY`` 매크로는 프로그램이 시작될 때 호출되는 함수를 
 작성합니다.  라이브러리 이름( ``my_ops`` )이 첫 번째 인수로 제공됩니다(따옴표로 묶지 않아야 함). 두 번째 인수(``m``) 는 
@@ -148,8 +143,7 @@ CMake로 빌드
     op.cpp
     CMakeLists.txt
 
-The contents of our ``CMakeLists.txt`` file should then be the following:
-``CMakeLists.txt`` 파일의 내용은 다음과 같아야 합니다.
+``CMakeLists.txt`` 파일의 내용은 다음과 같아야 합니다. : 
 
 .. literalinclude:: ../advanced_source/torch_script_custom_ops/CMakeLists.txt
   :language: cpp
@@ -205,7 +199,7 @@ The contents of our ``CMakeLists.txt`` file should then be the following:
 .. literalinclude:: ../advanced_source/torch_script_custom_ops/smoke_test.py
   :language: python
 
-모두 잘되었다면 다음과 같이 인쇄됩니다.::
+모두 잘되었다면 다음과 같이 인쇄됩니다. ::
 
   <built-in method my_ops::warp_perspective of PyCapsule object at 0x7f618fc6fa50>
 
