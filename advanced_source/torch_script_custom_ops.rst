@@ -223,14 +223,14 @@ Python에서 TorchScript 사용자 지정 연산자 사용
 일단 사용자 지정 연산자를 공유 라이브러리에 만들어 내면 파이썬의 TorchScript 모델에서 연산자를
 사용할 수 있습니다. 먼저 연산자를 파이썬에 로드하고, TorchScript 코드에서 연산자를 사용합니다.
 
-연산자를 Python으로 가져오는 방법은 이미 보았듯이 ``torch.ops.load_library()``입니다.
+연산자를 Python으로 가져오는 방법은 이미 보았듯이 ``torch.ops.load_library()`` 입니다.
 이 함수는 사용자 지정 연산자가 포함된 공유 라이브러리의 경로를 통해 현재 프로세스에 사용자 지정
 연산자를 로드합니다. 공유 라이브러리를 로드하면 ``TORCH_LIBRARY`` 블록도 실행됩니다. 이렇게
 하면 TorchScript 컴파일러에 사용자 정의 연산자가 등록되고 TorchScript 코드에서 해당 연산자
 를 사용할 수 있습니다.
 
-로드된 연산자는 ``torch.ops.<namespace>.<function>``으로 참조 가능합니다.``<namespace>``
-는 연산자 이름의 네임스페이스 부분이며,``<function>`` 은 연산자의 함수 이름입니다.위쪽의 예제
+로드된 연산자는 ``torch.ops.<namespace>.<function>`` 으로 참조 가능합니다. ``<namespace>``
+는 연산자 이름의 네임스페이스 부분이며, ``<function>`` 은 연산자의 함수 이름입니다.위쪽의 예제
 에서 볼 수 있는 연산자의 네임스페이스는 ``my_ops`` 이고 함수 이름은 ``warp_perspective``
 였습니다. 따라서 연산자는 ``torch.ops.my_ops.warp_perspective``. 로 사용 가능합니다.
 이 함수는 작성되거나 추적된 TorchScript 모듈에서 사용할 수 있지만, 기본 PyTorch에서도 사용
@@ -242,7 +242,7 @@ Python에서 TorchScript 사용자 지정 연산자 사용
   :start-after: BEGIN preamble
   :end-before: END preamble
 
-출력::
+출력:
 
 .. code-block:: python
 
@@ -265,11 +265,11 @@ Python에서 TorchScript 사용자 지정 연산자 사용
     수 있는 유형과 클래스에 대해 더 많은 유연성을 제공하므로 순수하게 보이는 코드에 권장되지만 TorchScript
     작업에는 지원되지 않습니다.)
 
-이제 ``torch``패키지의 다른 함수처럼 작성되거나 추적된 코드로 사용자 지정 연산자를 사용할
-수 있습니다. 실제로 ``torch.matmul`` 과 같은 '표준 라이브러리' 기능은 맞춤 연산자와 거의
-동일한 등록 경로를 거칩니다. 이는 사용자 정의 연산자를 TorchScript에서 사용할 수 있는 방법
-과 위치에 관하여  최고 수준으로 만듭니다. (그러나 한 가지 차이점은 표준 라이브러리 함수에는
-``torch.ops`` 인수 파싱과 다른 맞춤 작성 Python 인수 파싱 로직이 있다는 것입니다.)
+이제 ``torch`` 패키지의 다른 함수처럼 작성되거나 추적된 코드로 사용자 지정 연산자를 사용할수 있습니다.
+실제로 ``torch.matmul`` 과 같은 '표준 라이브러리' 기능은 맞춤 연산자와 거의 동일한 등록 경로를 거칩니다.
+이는 사용자 정의 연산자를 TorchScript에서 사용할 수 있는 방법과 위치에 관하여 최고 수준으로 만듭니다.
+(그러나 한 가지 차이점은 표준 라이브러리 함수에는 ``torch.ops`` 인수 파싱과 다른 맞춤 작성 Python
+인수 파싱 로직이 있다는 것입니다.)
 
 트레이싱과 함께 사용자 지정 연산자 사용
 **************************************
@@ -282,7 +282,7 @@ Python에서 TorchScript 사용자 지정 연산자 사용
   :start-after: BEGIN compute
   :end-before: END compute
 
-위 코드에 이어 ``torch.jit.trace``를 호출합니다.  우리는 추가로 ``torch.jit.trace``
+위 코드에 이어 ``torch.jit.trace`` 를 호출합니다.  우리는 추가로 ``torch.jit.trace``
 몇 가지 예제 입력을 전달합니다.그리고 이 입력을 통해 입력이 흐를 때 발생하는 작업 시퀀스를
 기록하기 위해 구현에 전달할 것입니다. 그 결과TorchScript 컴파일러가 추가로 분석, 최적화
 및 직렬화할 수 있는 Eager PyTorch 프로그램의 사실상 "고정" 버전이 생성됩니다.:
@@ -345,7 +345,7 @@ TorchScript 사용자 정의 작업을 추적된 PyTorch 코드에 통합하는 
 에서 직접 코드를 작성하는 것입니다. TorchScript는 대부분 Python 언어의 하위 집합이며
 TorchScript 컴파일러가 프로그램에 대해 더 쉽게 추론할 수 있도록 하는 몇 가지 제한 사항이
 있습니다. 일반 PyTorch 코드를 함수의 경우 ``@torch.jit.script`` Annotation을, 클래스의
-메서드의 경우 ``@torch.jit.script_method`` (``torch.jit.ScriptModule``에서
+메서드의 경우 ``@torch.jit.script_method`` ( ``torch.jit.ScriptModule`` 에서
 파생되어야 함) 어노테이션을 추가하여 TorchScript로 변환합니다. TorchScript Annotation에
 대한 자세한 내용은 `여기 <https://pytorch.org/docs/master/jit.html>`_ 를 참조하십시오.
 
@@ -362,8 +362,7 @@ TorchScript 컴파일러가 프로그램에 대해 더 쉽게 추론할 수 있�
     return x.matmul(y) + z
 
 
-이 함수를 바닐라 PyTorch에서 TorchScript로 변환하기 위해서는 ``@torch.jit.script``
- Annotation을 달아야합니다.
+이 함수를 바닐라 PyTorch에서 TorchScript로 변환하기 위해서는 ``@torch.jit.script`` Annotation을 달아야합니다.
 
 .. code-block:: python
 
@@ -419,7 +418,7 @@ TorchScript 컴파일러가 프로그램에 대해 더 쉽게 추론할 수 있�
     x = torch.ops.my_ops.warp_perspective(x, torch.eye(3))
     return x.matmul(y) + z
 
-TorchScript 컴파일러가``torch.ops.my_ops.warp_perspective``, 에 대한 참조를 볼 때
+TorchScript 컴파일러가 ``torch.ops.my_ops.warp_perspective`` 에 대한 참조를 볼 때
 C++의  ``TORCH_LIBRARY`` 함수를 통해 등록한 구현을 찾아 그래프 표현으로 컴파일합니다.
 
 .. code-block:: python
@@ -472,8 +471,8 @@ TorchScript의 유용한 기능 중 하나는 모델을 디스크 상의 파일�
 니다. 이를 위해 PyTorch는 TorchScript 모델 실행 및 역직렬화를 위한
 `순수 C++ API <https://pytorch.org/cppdocs/>`_ 를 제공합니다. 아직 읽지 않았다면
 다음에 나올 몇몇 부분에서 보여주고 있는
-`C++에서 직렬화된 TorchScript 모델을 로드하고 실행하는 방법에 대한 튜토리얼
- <https://tutorials.pytorch.kr/advanced/cpp_export.html>`_ 을 읽어보세요.
+`C++에서 직렬화된 TorchScript 모델을 로드하고 실행하는 방법에 대한 튜토리얼 <https://tutorials.pytorch.kr/advanced/cpp_export.html>`_
+을 읽어보세요.
 
 간단히 말해서 사용자 정의 연산자는 파일에서 역직렬화되고 C++에서 실행되는 경우에도 일반
 ``torch`` 연산자처럼 실행할 수 있습니다. 이에 대한 유일한 요구 사항은 이전에 빌드한
