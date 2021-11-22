@@ -130,7 +130,7 @@ DistributedOptimizer는 항상 최적화해야 하는 매개변수에 대한 RRe
 
 1) 먼저 Distributed Autograd에 대해
    `Distributed Autograd Context <https://pytorch.org/docs/master/rpc.html#torch.distributed.autograd.context>`를 설정합니다.
-2) 모델의 정방 전달(forward pass)을 실행하고 해당 출력을 검색(retrieve)합니다.
+2) 모델의 전방 전달(forward pass)을 실행하고 해당 출력을 검색(retrieve)합니다.
 3) 손실 함수를 사용하여 출력과 목표를 기반으로 손실을 계산합니다.
 4) Distributed Autograd를 사용하여 손실을 사용하여 분산 역방향 패스를 실행합니다.
 5) 마지막으로 Distributed Optimizer 단계를 실행하여 모든 매개변수를 최적화합니다.
