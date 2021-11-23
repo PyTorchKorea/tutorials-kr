@@ -2,8 +2,8 @@
 """
 (beta) FX를 이용한 단순 CPU 성능 프로파일러 구축하기
 *******************************************************
-**저자** : `James Reed <https://github.com/jamesr66a>`_
-**번역:** `김태희 <https://github.com/taehui530>`_
+**저자**: `James Reed <https://github.com/jamesr66a>`_
+**번역**: `김태희 <https://github.com/taehui530>`_
 
 이 튜토리얼에선, FX를 사용하여 다음을 수행할 것입니다.:
 
@@ -24,7 +24,7 @@ rn18.eval()
 
 ######################################################################
 # 이제 모델이 나왔으니 성능을 좀 더 자세히 살펴보도록 하겠습니다. 
-# 즉, 다음 호출을 위해 모델의 어떤 부분이 가장 오래 걸릴까요?
+# 다음 코드의 호출에서, 모델의 어떤 부분이 가장 오래 걸릴까요?
 
 input = torch.randn(5, 3, 224, 224)
 output = rn18(input)
@@ -37,7 +37,7 @@ output = rn18(input)
 #
 # 이 기술은 PyTorch 코드에 적용 가능하지만, 모델 코드를 복사하여 편집할 필요가 없다면 더 좋을 것입니다.
 # (특히 이 Torchvision 모델처럼 우리가 작성하지 않은 코드일 경우).
-# 대신, FX를 사용하여 소스를 수정할 필요 없이 이 "계측" 과정을 자동화할 것입니다.
+# 어떤 소스도 수정할 필요 없이, FX를 사용하여 이 "계측" 과정을 자동화할 것입니다.
 
 ######################################################################
 # 먼저 몇 가지를 import 처리하겠습니다
@@ -75,14 +75,14 @@ print(traced_rn18.graph)
 # Profiling Interpreter 생성
 #---------------------------
 # 다음으로 ``torch.fx.interpreter`` 에서 상속하는 클래스를 만들겠습니다.
-# 비록 ``symbolic_trace`` 가 생산하는 ``GraphModule`` 이, 당신이 ``GraphModule`` 을 호출했을때 실행되는 파이썬 코드를 컴파일 하지만, 
+# 비록 ``symbolic_trace`` 가 생산하는 ``GraphModule`` 이, ``GraphModule`` 을 호출했을때 실행되는 파이썬 코드를 컴파일 하지만, 
 # ``GraphModule`` 을 실행하는 다른 방법은 ``그래프`` 의 ``노드`` 를 하나씩 실행하는 것입니다.
-# 이것이 ``Interpreter`` 가 제공하는 기능입니다. : 그것은 그래프를 노드 하나하나씩 해석합니다.
+# 이것이 ``Interpreter`` 가 제공하는 기능입니다. : 그래프를 노드 하나하나씩 해석합니다.
 #
-# ``Interpreter`` 를 계승함으로써, 다양한 기능을 재정의하고 원하는 프로파일링 동작을 설치할 수 있습니다. 
+# ``Interpreter`` 를 상속함으로써, 다양한 기능을 재정의하고 원하는 프로파일링 동작을 설치할 수 있습니다. 
 # 목표는 모델을 통과시키고, 모델을 1회 이상 호출한 다음, 해당 실행 동안 모델과 모델의 각 부분이 얼마나 걸렸는지에 대해 얻을 수 있는 오브젝트를 갖는 것입니다.
 #
-#``Profiling Interpreter`` 클래스를  정의해봅시다.:
+#``ProfilingInterpreter`` 클래스를  정의해봅시다.:
 
 
 class ProfilingInterpreter(Interpreter):
@@ -122,7 +122,7 @@ class ProfilingInterpreter(Interpreter):
     ######################################################################
     # 이제, ``run_node`` 를 재정의합시다.
     # ``Interpreter`` 는 단일 노드를 실행할 때마다 ``run_node`` 를 호출합니다.
-    # 모델에서의 개별 호출에 걸리는 시간을 측정하고 기록할 수 있도록 이것을 가로챌 것입니다.
+    # 모델에서의 개별 호출에 걸리는 시간을 측정하고 기록할 수 있도록, 이것을 가로챌 것입니다.
 
     def run_node(self, n : torch.fx.Node) -> Any:
         # op를 실행하기 시작한 시간을 기록합니다. 
@@ -139,7 +139,7 @@ class ProfilingInterpreter(Interpreter):
         return return_val
 
     ######################################################################
-    # 마지막으로, 우리는 우리가 수집한 데이터를 잘 정리된 시각으로 볼 수 있는 
+    # 마지막으로, 수집한 데이터를 잘 정리된 시각으로 볼 수 있는 
     # 메소드를 정의할 것입니다. (어떠한 ``Interpreter`` 메소드를 재정의 하지 않는 메소드)
 
     def summary(self, should_sort : bool = False) -> str:
@@ -174,7 +174,7 @@ class ProfilingInterpreter(Interpreter):
 
 ######################################################################
 # ..Note::
-#       우리는 wall clock의 타임스탬프들을 끌어와 그들을 비교하는 파이썬의 ``time.time`` 함수를 사용합니다. 
+#       wall clock의 타임스탬프들을 끌어와 그들을 비교하는, 파이썬의 ``time.time`` 함수를 사용합니다. 
 #       이 방법은 성능을 측정하는 가장 정확한 방법이 아니며, 1차 근사치만 제공합니다.
 #       이 간단한 기술은 이 튜토리얼의 시연 목적으로만 사용됩니다.
 
@@ -191,7 +191,7 @@ print(interp.summary(True))
 # 여기서 호출해야할 할 두 가지가 있습니다.:
 #
 # * MaxPool2d가 가장 많은 시간을 차지합니다.
-# 이것은 알려진 문제입니다: https://github.com/pytorch/pytorch/issues/51393
+# 이것은 잘 알려진 문제입니다: https://github.com/pytorch/pytorch/issues/51393
 # * BatchNorm2d도 상당한 시간이 소요됩니다.
 # Conv-BN Fusion에서 FX 튜토리얼 TODO 를 통해 이러한 생각을 계속하고 이것을 최적화할 수 있습니다. : 링크
 # 
@@ -202,5 +202,5 @@ print(interp.summary(True))
 # 기계 해석 가능한 형식으로 쉽게 캡처하여, 이곳에서 이뤄진 성능 분석과 같은 분석에 사용할 수 있습니다.
 # FX는 PyTorch 프로그램으로 작업할 수 있는 흥미로운 가능성의 세계를 열어줍니다.
 #
-# 마지막으로, FX는 아직 베타 버전이기 때문에 FX 사용에 대한 귀하의 의견을 듣고 싶습니다.
-# 당신이 가지고 있는 피드백을 제공하기 위해서 언제든지 PyTorch 포럼(https://discuss.pytorch.org/)과 문제 추적기(https://github.com/pytorch/pytorch/issues)를 사용하세요.
+# 마지막으로, FX는 아직 베타 버전이기 때문에 FX 사용에 대한 당신의 의견을 듣고 싶습니다.
+# 당신이 가지고 있는 피드백을 제공하기 위해서 언제든지 PyTorch 포럼(https://discuss.pytorch.org/)과 문제 추적기(https://github.com/pytorch/pytorch/issues)를 이용하세요.
