@@ -3,7 +3,7 @@
 PyTorch: 새 autograd Function 정의하기
 ----------------------------------------
 
-:math:`y=\sin(x)` 을 예측할 수 있도록, :math:`-\pi` 부터 :math:`pi` 까지
+:math:`y=\sin(x)` 을 예측할 수 있도록, :math:`-\pi` 부터 :math:`\pi` 까지
 유클리드 거리(Euclidean distance)를 최소화하도록 3차 다항식을 학습합니다.
 다항식을 :math:`y=a+bx+cx^2+dx^3` 라고 쓰는 대신 :math:`y=a+b P_3(c+dx)` 로 다항식을 적겠습니다.
 여기서 :math:`P_3(x)=\frac{1}{2}\left(5x^3-3x\right)` 은 3차
@@ -60,11 +60,11 @@ x = torch.linspace(-math.pi, math.pi, 2000, device=device, dtype=dtype)
 y = torch.sin(x)
 
 # 가중치를 갖는 임의의 텐서를 생성합니다. 3차 다항식이므로 4개의 가중치가 필요합니다:
-# y = a + b * P3(c + d * x) 
+# y = a + b * P3(c + d * x)
 # 이 가중치들이 수렴(convergence)하기 위해서는 정답으로부터 너무 멀리 떨어지지 않은 값으로
-# 초기화가 되어야 합니다. 
+# 초기화가 되어야 합니다.
 # requires_grad=True로 설정하여 역전파 단계 중에 이 텐서들에 대한 변화도를 계산할 필요가
-# 있음을 나타냅니다. 
+# 있음을 나타냅니다.
 a = torch.full((), 0.0, device=device, dtype=dtype, requires_grad=True)
 b = torch.full((), -1.0, device=device, dtype=dtype, requires_grad=True)
 c = torch.full((), 0.0, device=device, dtype=dtype, requires_grad=True)
@@ -76,7 +76,7 @@ for t in range(2000):
     # 여기에 'P3'라고 이름을 붙였습니다.
     P3 = LegendrePolynomial3.apply
 
-    # 순전파 단계: 연산을 하여 예측값 y를 계산합니다; 
+    # 순전파 단계: 연산을 하여 예측값 y를 계산합니다;
     # 사용자 정의 autograd 연산을 사용하여 P3를 계산합니다.
     y_pred = a + b * P3(c + d * x)
 

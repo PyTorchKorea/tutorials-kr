@@ -84,8 +84,8 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 #
 # .. Note::
 #     튜토리얼을 실행하는데 필요한 이미지를 다운로드 할 수 있는 주소는 다음과 같습니다.
-#     `picasso.jpg <https://pytorch.org/tutorials/_static/img/neural-style/picasso.jpg>`__ 와
-#     `dancing.jpg <https://pytorch.org/tutorials/_static/img/neural-style/dancing.jpg>`__.
+#     `picasso.jpg <https://tutorials.pytorch.kr/_static/img/neural-style/picasso.jpg>`__ 와
+#     `dancing.jpg <https://tutorials.pytorch.kr/_static/img/neural-style/dancing.jpg>`__.
 #     두 이미지를 다운로드하고 현재 작업 폴더의 ``images`` 폴더에 추가하세요.
 
 
@@ -288,8 +288,6 @@ def get_style_model_and_losses(cnn, normalization_mean, normalization_std,
                                style_img, content_img,
                                content_layers=content_layers_default,
                                style_layers=style_layers_default):
-    cnn = copy.deepcopy(cnn)
-
     # 모듈 정규화
     normalization = Normalization(normalization_mean, normalization_std).to(device)
 
@@ -371,7 +369,7 @@ imshow(input_img, title='Input Image')
 
 def get_input_optimizer(input_img):
     # 입력이 기울기가 필요한 매개 변수임을 표시하는 줄
-    optimizer = optim.LBFGS([input_img.requires_grad_()])
+    optimizer = optim.LBFGS([input_img])
     return optimizer
 
 
@@ -393,6 +391,12 @@ def run_style_transfer(cnn, normalization_mean, normalization_std,
     print('Building the style transfer model..')
     model, style_losses, content_losses = get_style_model_and_losses(cnn,
         normalization_mean, normalization_std, style_img, content_img)
+
+    # 모델의 매개변수를 제외한 입력을 최적화해야 하므로
+    # 이에 맞춰서 requires_grad 값을 갱신합니다.
+    input_img.requires_grad_(True)
+    model.requires_grad_(False)
+
     optimizer = get_input_optimizer(input_img)
 
     print('Optimizing..')
@@ -401,7 +405,8 @@ def run_style_transfer(cnn, normalization_mean, normalization_std,
 
         def closure():
             # 업데이트 된 입력 이미지의 값을 수정
-            input_img.data.clamp_(0, 1)
+            with torch.no_grad():
+                input_img.clamp_(0, 1)
 
             optimizer.zero_grad()
             model(input_img)
@@ -431,7 +436,8 @@ def run_style_transfer(cnn, normalization_mean, normalization_std,
         optimizer.step(closure)
 
     # 마지막 수정...
-    input_img.data.clamp_(0, 1)
+    with torch.no_grad():
+        input_img.clamp_(0, 1)
 
     return input_img
 

@@ -112,7 +112,7 @@ print(f"Device tensor is stored on: {tensor.device}")
 
 # GPU가 존재하면 텐서를 이동합니다
 if torch.cuda.is_available():
-  tensor = tensor.to('cuda')
+    tensor = tensor.to('cuda')
 
 
 ######################################################################
@@ -124,7 +124,7 @@ if torch.cuda.is_available():
 # **NumPy식의 표준 인덱싱과 슬라이싱:**
 
 tensor = torch.ones(4, 4)
-print('First row: ',tensor[0])
+print('First row: ', tensor[0])
 print('First column: ', tensor[:, 0])
 print('Last column:', tensor[..., -1])
 tensor[:,1] = 0

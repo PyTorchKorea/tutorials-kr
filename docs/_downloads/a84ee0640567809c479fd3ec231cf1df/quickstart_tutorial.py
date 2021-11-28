@@ -87,7 +87,7 @@ for X, y in test_dataloader:
 
 # 학습에 사용할 CPU나 GPU 장치를 얻습니다.
 device = "cuda" if torch.cuda.is_available() else "cpu"
-print("Using {} device".format(device))
+print(f"Using {device} device")
 
 # 모델을 정의합니다.
 class NeuralNetwork(nn.Module):
@@ -99,8 +99,7 @@ class NeuralNetwork(nn.Module):
             nn.ReLU(),
             nn.Linear(512, 512),
             nn.ReLU(),
-            nn.Linear(512, 10),
-            nn.ReLU()
+            nn.Linear(512, 10)
         )
 
     def forward(self, x):
@@ -237,5 +236,3 @@ with torch.no_grad():
 ######################################################################
 # `모델을 저장하고 불러오는 방법 <saveloadrun_tutorial.html>`_ 을 자세히 알아보세요.
 #
-
-

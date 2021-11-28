@@ -53,7 +53,7 @@ ds = datasets.FashionMNIST(
 # Lambda 변형은 사용자 정의 람다(lambda) 함수를 적용합니다. 여기에서는 정수를 원-핫으로 부호화된 텐서로 바꾸는
 # 함수를 정의합니다.
 # 이 함수는 먼저 (데이터셋 정답의 개수인) 크기 10짜리 영 텐서(zero tensor)를 만들고,
-# `scatter_ <https://pytorch.org/docs/stable/tensors.html#torch.Tensor.scatter_>`_ 를 호출하여
+# `scatter_ <https://pytorch.org/docs/stable/generated/torch.Tensor.scatter_.html>`_ 를 호출하여
 # 주어진 정답 ``y`` 에 해당하는 인덱스에 ``value=1`` 을 할당합니다.
 
 target_transform = Lambda(lambda y: torch.zeros(
