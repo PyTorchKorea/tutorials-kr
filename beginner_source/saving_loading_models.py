@@ -22,7 +22,7 @@
    불러올 때도 사용합니다.
    (`장치간 모델 저장하기 & 불러오기 <#device>`__ 참고)
 
-3) `torch.nn.Module.load_state_dict <https://pytorch.org/docs/stable/nn.html?highlight=load_state_dict#torch.nn.Module.load_state_dict>`__:
+3) `torch.nn.Module.load_state_dict <https://pytorch.org/docs/stable/generated/torch.nn.Module.html?highlight=load_state_dict#torch.nn.Module.load_state_dict>`__:
    역직렬화된 *state_dict* 를 사용하여 모델의 매개변수들을 불러옵니다.
    *state_dict* 에 대한 더 자세한 정보는 `state_dict가 무엇인가요?
    <#state-dict>`__ 를 참고하세요.

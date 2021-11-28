@@ -244,6 +244,15 @@ Recipes are bite-sized bite-sized, actionable examples of how to use specific Py
    :link: ../recipes/recipes/tuning_guide.html
    :tags: Model-Optimization
 
+.. Intel(R) Extension for PyTorch*
+
+.. customcarditem::
+   :header: Intel® Extension for PyTorch*
+   :card_description: Introduction of Intel® Extension for PyTorch*
+   :image: ../_static/img/thumbnails/cropped/profiler.png
+   :link: ../recipes/intel_extension_for_pytorch.html
+   :tags: Model-Optimization
+
 .. Distributed Training
 .. customcarditem::
    :header: Shard Optimizer States with ZeroRedundancyOptimizer
@@ -299,6 +308,7 @@ Recipes are bite-sized bite-sized, actionable examples of how to use specific Py
    /recipes/recipes/dynamic_quantization
    /recipes/recipes/amp_recipe
    /recipes/recipes/tuning_guide
+   /recipes/recipes/intel_extension_for_pytorch
    /recipes/torchscript_inference
    /recipes/deployment_with_flask
    /recipes/distributed_rpc_profiling

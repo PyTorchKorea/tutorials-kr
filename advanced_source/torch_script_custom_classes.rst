@@ -3,7 +3,7 @@
 
 이 튜토리얼은 :doc:`커스텀 오퍼레이터 <torch_script_custom_ops>` 튜토리얼의 후속이며
 C++ 클래스를 TorchScript와 Python에 동시에 바인딩하기 위해 구축한 API를 소개합니다.
-API는 `pybind11 <https://github.com/pybind/pybind11>`_ 과 
+API는 `pybind11 <https://github.com/pybind/pybind11>`_ 과
 매우 유사하며 해당 시스템에 익숙하다면 대부분의 개념이 이전됩니다.
 
 C++에서 클래스 구현 및 바인딩
@@ -24,7 +24,7 @@ C++에서 클래스 구현 및 바인딩
   ``std::shared_ptr`` 같이 별도의 메타데이터 블록과 달리 객체에 직접 저장됩니다.
   ``torch::Tensor`` 는 내부적으로 동일한 포인터 유형을 사용합니다.
   커스텀 클래스도 ``torch::Tensor`` 포인터 유형을 사용해야 다양한 객체 유형을 일관되게 관리할 수 있습니다.
-- 두 번째로 주목해야 할 점은 커스텀 클래스가 ``torch::CustomClassHolder`` 에서 상속되어야 한다는 것입니다. 
+- 두 번째로 주목해야 할 점은 커스텀 클래스가 ``torch::CustomClassHolder`` 에서 상속되어야 한다는 것입니다.
   이렇게 하면 커스텀 클래스에 참조 계수를 저장할 공간이 있습니다.
 
 이제 이 클래스를 어떻게 TorchScript에서 사용가능하게 하는지 살펴보겠습니다.
@@ -130,7 +130,7 @@ libtorch를 사용하여 C++ 프로세스에서 커스텀 등록 C++ 클래스�
 파일 시스템의 foo.pt는 방금 정의한 직렬화된 TorchScript 프로그램을 포함합니다.
 
 이제 이 모델과 필요한 .so 파일을 읽어들이는 방법을 보여주기 위해 새 CMake 프로젝트를 정의하겠습니다.
-이 작업을 수행하는 방법에 대한 자세한 내용은 `C++에서 TorchScript 모델 로딩하기 <https://tutorials.pytorch.kr/advanced/cpp_export.html>`_ 를 
+이 작업을 수행하는 방법에 대한 자세한 내용은 `C++에서 TorchScript 모델 로딩하기 <https://tutorials.pytorch.kr/advanced/cpp_export.html>`_ 를
 참조하세요.
 
 이전과 유사하게 다음을 포함하는 파일 구조를 생성해 보겠습니다::
@@ -251,7 +251,7 @@ TorchScript가 C++ 클래스에서 저장한 정보를 자동으로 파악할 �
 
 .. note::
   TorchScript에서 ``__getstate__`` 및 ``__setstate__`` 의 의미는 Python pickle 모듈의 의미와 동일합니다.
-  이러한 방법을 어떻게 사용하는지에 대하여 `자세한 내용 <https://github.com/pytorch/pytorch/blob/master/torch/csrc/jit/docs/serialization.md#getstate-and-setstate>`_ 을 
+  이러한 방법을 어떻게 사용하는지에 대하여 `자세한 내용 <https://github.com/pytorch/pytorch/blob/master/torch/csrc/jit/docs/serialization.md#getstate-and-setstate>`_ 을
   참조하세요.
 
 다음은 직렬화 메소드를 포함하기 위해 ``MyStackClass`` 등록에 추가할 수 있는 ``def_pickle`` 호출의 예시입니다:
@@ -292,7 +292,7 @@ TorchScript가 C++ 클래스에서 저장한 정보를 자동으로 파악할 �
   :start-after: BEGIN def_free
   :end-before: END def_free
 
-등록 API에 대한 자세한 내용은 `커스텀 C++ 연산자로 TorchScript 확장 <https://tutorials.pytorch.kr/advanced/torch_script_custom_ops.html>`_ 을 
+등록 API에 대한 자세한 내용은 `커스텀 C++ 연산자로 TorchScript 확장 <https://tutorials.pytorch.kr/advanced/torch_script_custom_ops.html>`_ 을
 참조하세요.
 
 이 작업이 완료되면 다음 예제와 같이 연산자를 사용할 수 있습니다:
@@ -305,7 +305,7 @@ TorchScript가 C++ 클래스에서 저장한 정보를 자동으로 파악할 �
           self.f = torch.classes.my_classes.MyStackClass(["foo", "bar"])
 
       def forward(self):
-          return torch.ops.foo.manipulate_instance(self.f)
+          return torch.ops.my_classes.manipulate_instance(self.f)
 
 .. note::
 
@@ -318,13 +318,13 @@ TorchScript가 C++ 클래스에서 저장한 정보를 자동으로 파악할 �
 결론
 ----
 
-이 튜토리얼에서는 독립된 C++ 프로세스에서 C++ 클래스를 TorchScript 및 
-확장 Python에 나타내는 방법, 해당 메소드를 등록하는 방법, Python 및 TorchScript에서 
+이 튜토리얼에서는 독립된 C++ 프로세스에서 C++ 클래스를 TorchScript 및
+확장 Python에 나타내는 방법, 해당 메소드를 등록하는 방법, Python 및 TorchScript에서
 해당 클래스를 사용하는 방법, 클래스를 사용하여 코드를 저장 및 읽어들이고 해당 코드를 실행하는 방법을 안내했습니다.
 이제 타사 C++ 라이브러리와 인터페이스가 있는 C++ 클래스로 TorchScript 모델을 확장하거나,
 Python, TorchScript 및 C++ 간의 라인이 원활하게 혼합되어야 하는 다른 사용 사례를 구현할 준비가 되었습니다.
 
-언제나 처럼 문제를 마주치거나 질문이 있으면 저희 `forum <https://discuss.pytorch.org/>`_ 또는 
+언제나처럼 문제를 마주치거나 질문이 있으면 저희 `forum <https://discuss.pytorch.org/>`_ 또는
 `GitHub issues <https://github.com/pytorch/pytorch/issues>`_ 에 올려주시면 되겠습니다.
-또한 `자주 묻는 질문(FAQ) 페이지 <https://pytorch.org/cppdocs/notes/faq.html>`_ 에 
+또한 `자주 묻는 질문(FAQ) 페이지 <https://pytorch.org/cppdocs/notes/faq.html>`_ 에
 유용한 정보가 있을 수 있습니다.

@@ -1,5 +1,5 @@
 """
-Speech Command Recognition with torchaudio
+Speech Command Classification with torchaudio
 ******************************************
 
 This tutorial will show you how to correctly format an audio dataset and

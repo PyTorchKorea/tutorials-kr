@@ -2,14 +2,14 @@
 `파이토치(PyTorch) 기본 익히기 <intro.html>`_ ||
 `빠른 시작 <quickstart_tutorial.html>`_ ||
 `텐서(Tensor) <tensorqs_tutorial.html>`_ ||
-**Dataset과 Dataloader** ||
+**Dataset과 DataLoader** ||
 `변형(Transform) <transforms_tutorial.html>`_ ||
 `신경망 모델 구성하기 <buildmodel_tutorial.html>`_ ||
 `Autograd <autogradqs_tutorial.html>`_ ||
 `최적화(Optimization) <optimization_tutorial.html>`_ ||
 `모델 저장하고 불러오기 <saveloadrun_tutorial.html>`_
 
-Dataset과 Dataloader
+Dataset과 DataLoader
 ==========================================================================
 
 """
@@ -125,7 +125,7 @@ from torchvision.io import read_image
 
 class CustomImageDataset(Dataset):
     def __init__(self, annotations_file, img_dir, transform=None, target_transform=None):
-        self.img_labels = pd.read_csv(annotations_file)
+        self.img_labels = pd.read_csv(annotations_file, names=['file_name', 'label'])
         self.img_dir = img_dir
         self.transform = transform
         self.target_transform = target_transform
@@ -161,7 +161,7 @@ class CustomImageDataset(Dataset):
 
 
 def __init__(self, annotations_file, img_dir, transform=None, target_transform=None):
-    self.img_labels = pd.read_csv(annotations_file)
+    self.img_labels = pd.read_csv(annotations_file, names=['file_name', 'label'])
     self.img_dir = img_dir
     self.transform = transform
     self.target_transform = target_transform

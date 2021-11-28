@@ -115,20 +115,83 @@
    :link: beginner/dcgan_faces_tutorial.html
    :tags: Image/Video
 
+.. customcarditem::
+   :header: Spatial Transformer Networks Tutorial
+   :card_description: Learn how to augment your network using a visual attention mechanism.
+   :image: _static/img/stn/Five.gif
+   :link: intermediate/spatial_transformer_tutorial.html
+   :tags: Image/Video
+
 .. Audio
 
 .. customcarditem::
-   :header: torchaudio Tutorial
-   :card_description: Learn to load and preprocess data from a simple dataset with PyTorch's torchaudio library.
+   :header: Audio IO
+   :card_description: Learn to load data with torchaudio.
    :image: _static/img/thumbnails/cropped/torchaudio-Tutorial.png
-   :link: beginner/audio_preprocessing_tutorial.html
+   :link: beginner/audio_io_tutorial.html
    :tags: Audio
 
 .. customcarditem::
-   :header: Speech Command Recognition
+   :header: Audio Resampling
+   :card_description: Learn to resample audio waveforms using torchaudio.
+   :image: _static/img/thumbnails/cropped/torchaudio-Tutorial.png
+   :link: beginner/audio_resampling_tutorial.html
+   :tags: Audio
+
+.. customcarditem::
+   :header: Audio Data Augmentation
+   :card_description: Learn to apply data augmentations using torchaudio.
+   :image: _static/img/thumbnails/cropped/torchaudio-Tutorial.png
+   :link: beginner/audio_data_augmentation_tutorial.html
+   :tags: Audio
+
+.. customcarditem::
+   :header: Audio Feature Extractions
+   :card_description: Learn to extract features using torchaudio.
+   :image: _static/img/thumbnails/cropped/torchaudio-Tutorial.png
+   :link: beginner/audio_feature_extractions_tutorial.html
+   :tags: Audio
+
+.. customcarditem::
+   :header: Audio Feature Augmentation
+   :card_description: Learn to augment features using torchaudio.
+   :image: _static/img/thumbnails/cropped/torchaudio-Tutorial.png
+   :link: beginner/audio_feature_augmentation_tutorial.html
+   :tags: Audio
+
+.. customcarditem::
+   :header: Audio Datasets
+   :card_description: Learn to use torchaudio datasets.
+   :image: _static/img/thumbnails/cropped/torchaudio-Tutorial.png
+   :link: beginner/audio_datasets_tutorial.html
+   :tags: Audio
+
+.. customcarditem::
+   :header: Automatic Speech Recognition with Wav2Vec2 in torchaudio
+   :card_description: Learn how to use torchaudio's pretrained models for building a speech recognition application.
+   :image: _static/img/thumbnails/cropped/torchaudio-asr.png
+   :link: intermediate/speech_recognition_pipeline_tutorial.html
+   :tags: Audio
+
+.. customcarditem::
+   :header: Speech Command Classification
    :card_description: Learn how to correctly format an audio dataset and then train/test an audio classifier network on the dataset.
    :image: _static/img/thumbnails/cropped/torchaudio-speech.png
-   :link: intermediate/speech_command_recognition_with_torchaudio_tutorial.html
+   :link: intermediate/speech_command_classification_with_torchaudio_tutorial.html
+   :tags: Audio
+
+.. customcarditem::
+   :header: Text-to-Speech with torchaudio
+   :card_description: Learn how to use torchaudio's pretrained models for building a text-to-speech application.
+   :image: _static/img/thumbnails/cropped/torchaudio-speech.png
+   :link: intermediate/text_to_speech_with_torchaudio.html
+   :tags: Audio
+
+.. customcarditem::
+   :header: Forced Alignment with Wav2Vec2 in torchaudio
+   :card_description: Learn how to use torchaudio's Wav2Vec2 pretrained models for aligning text to speech
+   :image: _static/img/thumbnails/cropped/torchaudio-alignment.png
+   :link: intermediate/forced_alignment_with_torchaudio_tutorial.html
    :tags: Audio
 
 .. Text
@@ -303,6 +366,20 @@
    :link: advanced/extend_dispatcher.html
    :tags: Extending-PyTorch,Frontend-APIs,C++
 
+.. customcarditem::
+   :header: Custom Function Tutorial: Double Backward
+   :card_description: Learn how to write a custom autograd Function that supports double backward.
+   :image: _static/img/thumbnails/cropped/generic-pytorch-logo.PNG
+   :link: intermediate/custom_function_double_backward_tutorial.html
+   :tags: Extending-PyTorch,Frontend-APIs
+
+.. customcarditem::
+   :header: Custom Function Tutorial: Fusing Convolution and Batch Norm
+   :card_description: Learn how to create a custom autograd Function that fuses batch norm into a convolution to improve memory usage.
+   :image: _static/img/thumbnails/cropped/generic-pytorch-logo.PNG
+   :link: intermediate/custom_function_conv_bn_tutorial.html
+   :tags: Extending-PyTorch,Frontend-APIs
+
 .. Model Optimization
 
 .. customcarditem::
@@ -325,6 +402,13 @@
    :image: _static/img/ray-tune.png
    :link: beginner/hyperparameter_tuning_tutorial.html
    :tags: Model-Optimization,Best-Practice
+
+.. customcarditem::
+    :header: Optimizing Vision Transformer Model
+    :card_description: Learn how to use Facebook Data-efficient Image Transformers DeiT and script and optimize it for mobile.
+    :image: _static/img/thumbnails/cropped/mobile.png
+    :link: beginner/vt_tutorial.html
+    :tags: Model-Optimization,Best-Practice,Mobile
 
 .. customcarditem::
    :header: Parametrizations Tutorial
@@ -357,7 +441,6 @@
 .. customcarditem::
    :header: (베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)
    :card_description: 양자화된 모델을 사용하여 전이학습을 컴퓨터 비전 튜토리얼에 확장합니다.
-   :card_description: Extends the Transfer Learning for Computer Vision Tutorial using a quantized model.
    :image: _static/img/thumbnails/cropped/60-min-blitz.png
    :link: intermediate/quantized_transfer_learning_tutorial.html
    :tags: Image/Video,Quantization,Model-Optimization
@@ -591,8 +674,16 @@
    :hidden:
    :caption: 오디오
 
-   beginner/audio_preprocessing_tutorial
-   intermediate/speech_command_recognition_with_torchaudio_tutorial
+   beginner/audio_io_tutorial
+   beginner/audio_resampling_tutorial
+   beginner/audio_data_augmentation_tutorial
+   beginner/audio_feature_extractions_tutorial
+   beginner/audio_feature_augmentation_tutorial
+   beginner/audio_datasets_tutorial
+   intermediate/speech_recognition_pipeline_tutorial
+   intermediate/speech_command_classification_with_torchaudio_tutorial
+   intermediate/text_to_speech_with_torchaudio
+   intermediate/forced_alignment_with_torchaudio_tutorial
 
 .. toctree::
    :maxdepth: 2
@@ -654,6 +745,8 @@
    :hidden:
    :caption: PyTorch 확장하기
 
+   intermediate/custom_function_double_backward_tutorial
+   intermediate/custom_function_conv_bn_tutorial
    advanced/cpp_extension
    advanced/torch_script_custom_ops
    advanced/torch_script_custom_classes
@@ -669,6 +762,7 @@
    beginner/profiler
    intermediate/tensorboard_profiler_tutorial
    beginner/hyperparameter_tuning_tutorial
+   beginner/vt_tutorial
    intermediate/parametrizations
    intermediate/pruning_tutorial
    advanced/dynamic_quantization_tutorial
@@ -693,6 +787,7 @@
    advanced/rpc_ddp_tutorial
    intermediate/pipeline_tutorial
    advanced/ddp_pipeline
+   advanced/generic_join
 
 .. toctree::
    :maxdepth: 2

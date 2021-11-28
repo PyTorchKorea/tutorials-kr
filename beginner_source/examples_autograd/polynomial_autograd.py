@@ -3,7 +3,7 @@
 PyTorch: 텐서(Tensor)와 autograd
 --------------------------------
 
-:math:`y=\sin(x)` 을 예측할 수 있도록, :math:`-\pi` 부터 :math:`pi` 까지
+:math:`y=\sin(x)` 을 예측할 수 있도록, :math:`-\pi` 부터 :math:`\pi` 까지
 유클리드 거리(Euclidean distance)를 최소화하도록 3차 다항식을 학습합니다.
 
 이 구현은 PyTorch 텐서 연산을 사용하여 순전파 단계를 계산하고, PyTorch autograd를 사용하여
@@ -27,7 +27,7 @@ y = torch.sin(x)
 
 # 가중치를 갖는 임의의 텐서를 생성합니다. 3차 다항식이므로 4개의 가중치가 필요합니다:
 # y = a + b x + c x^2 + d x^3
-# requires_grad=True로 설정하여 역전파 단계 중에 이 텐서들에 대한 변화도를 계산할 필요가 
+# requires_grad=True로 설정하여 역전파 단계 중에 이 텐서들에 대한 변화도를 계산할 필요가
 # 있음을 나타냅니다.
 a = torch.randn((), device=device, dtype=dtype, requires_grad=True)
 b = torch.randn((), device=device, dtype=dtype, requires_grad=True)
@@ -47,7 +47,7 @@ for t in range(2000):
         print(t, loss.item())
 
     # autograd 를 사용하여 역전파 단계를 계산합니다. 이는 requires_grad=True를 갖는
-    # 모든 텐서들에 대한 손실의 변화도를 계산합니다. 
+    # 모든 텐서들에 대한 손실의 변화도를 계산합니다.
     # 이후 a.grad와 b.grad, c.grad, d.grad는 각각 a, b, c, d에 대한 손실의 변화도를
     # 갖는 텐서가 됩니다.
     loss.backward()

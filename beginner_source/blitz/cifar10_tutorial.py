@@ -20,7 +20,7 @@
    유용합니다.
 
 특별히 영상 분야를 위한 ``torchvision`` 이라는 패키지가 만들어져 있는데,
-여기에는 Imagenet이나 CIFAR10, MNIST 등과 같이 일반적으로 사용하는 데이터셋을 위한
+여기에는 ImageNet이나 CIFAR10, MNIST 등과 같이 일반적으로 사용하는 데이터셋을 위한
 데이터 로더(data loader), 즉 ``torchvision.datasets`` 과 이미지용 데이터 변환기
 (data transformer), 즉 ``torch.utils.data.DataLoader`` 가 포함되어 있습니다.
 

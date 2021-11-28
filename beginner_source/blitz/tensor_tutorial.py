@@ -25,7 +25,7 @@ import numpy as np
 #
 # 데이터로부터 직접 텐서를 생성할 수 있습니다. 데이터의 자료형(data type)은 자동으로 유추합니다.
 
-data = [[1, 2],[3, 4]]
+data = [[1, 2], [3, 4]]
 x_data = torch.tensor(data)
 
 ######################################################################
@@ -53,7 +53,7 @@ print(f"Random Tensor: \n {x_rand} \n")
 #
 # ``shape`` 은 텐서의 차원(dimension)을 나타내는 튜플(tuple)로, 아래 함수들에서는 출력 텐서의 차원을 결정합니다.
 
-shape = (2,3,)
+shape = (2, 3,)
 rand_tensor = torch.rand(shape)
 ones_tensor = torch.ones(shape)
 zeros_tensor = torch.zeros(shape)
@@ -76,7 +76,7 @@ print(f"Zeros Tensor: \n {zeros_tensor}")
 #
 # 텐서의 속성은 텐서의 모양(shape), 자료형(datatype) 및 어느 장치에 저장되는지를 나타냅니다.
 
-tensor = torch.rand(3,4)
+tensor = torch.rand(3, 4)
 
 print(f"Shape of tensor: {tensor.shape}")
 print(f"Datatype of tensor: {tensor.dtype}")
@@ -103,6 +103,7 @@ print(f"Device tensor is stored on: {tensor.device}")
 # GPU가 존재하면 텐서를 이동합니다
 if torch.cuda.is_available():
   tensor = tensor.to('cuda')
+  print(f"Device tensor is stored on: {tensor.device}")
 
 
 ######################################################################

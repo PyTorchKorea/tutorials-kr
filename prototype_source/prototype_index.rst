@@ -42,14 +42,14 @@ Prototype features are not available as part of binary distributions like PyPI o
 
 .. customcarditem::
    :header: FX Graph Mode Post Training Dynamic Quantization
-   :card_description: Learn how to do post training dynamic quantization in graph mode based on torch.fx. 
+   :card_description: Learn how to do post training dynamic quantization in graph mode based on torch.fx.
    :image: ../_static/img/thumbnails/cropped/generic-pytorch-logo.png
    :link: ../prototype/fx_graph_mode_ptq_dynamic.html
    :tags: FX,Quantization
 
 .. customcarditem::
    :header: FX Graph Mode Post Training Static Quantization
-   :card_description: Learn how to do post training static quantization in graph mode based on torch.fx. 
+   :card_description: Learn how to do post training static quantization in graph mode based on torch.fx.
    :image: ../_static/img/thumbnails/cropped/generic-pytorch-logo.png
    :link: ../prototype/fx_graph_mode_ptq_static.html
    :tags: FX,Quantization
@@ -90,7 +90,21 @@ Prototype features are not available as part of binary distributions like PyPI o
    :image: ../_static/img/thumbnails/cropped/android.png
    :link: ../prototype/vulkan_workflow.html
    :tags: Mobile
-   
+
+.. customcarditem::
+   :header: Tracing-based Selective Build Mobile Interpreter in Android and iOS
+   :card_description: Learn how to optimize the mobile interpreter size with a tracing-based selective build.
+   :image: ../_static/img/thumbnails/cropped/mobile.png
+   :link: ../prototype/tracing_based_selective_build.html
+   :tags: Mobile
+
+.. customcarditem::
+   :header: Convert Mobilenetv2 to Core ML
+   :card_description: Learn how to prepare a computer vision model to use the PyTorch Core ML mobile backend.
+   :image: ../_static/img/thumbnails/cropped/ios.png
+   :link: ../prototype/ios_coreml_workflow.html
+   :tags: Mobile
+
 .. Modules
 
 .. customcarditem::
@@ -142,6 +156,8 @@ Prototype features are not available as part of binary distributions like PyPI o
    prototype/graph_mode_dynamic_bert_tutorial.html
    prototype/ios_gpu_workflow.html
    prototype/nnapi_mobilenetv2.html
+   prototype/tracing_based_selective_build.html
+   prototype/ios_coreml_workflow.html
    prototype/numeric_suite_tutorial.html
    prototype/torchscript_freezing.html
    prototype/vmap_recipe.html

@@ -3,7 +3,7 @@ TorchVision 객체 검출 미세조정(Finetuning) 튜토리얼
 
 .. tip::
    이 튜토리얼을 최대한 활용하시려면, 다음의 링크를 이용하시길 추천합니다.
-   `Colab 버전 <https://colab.research.google.com/github/pytorch/vision/blob/temp-tutorial/tutorials/torchvision_finetuning_instance_segmentation.ipynb>`__.
+   `Colab 버전 <https://colab.research.google.com/github/pytorch/tutorials/blob/gh-pages/_downloads/torchvision_finetuning_instance_segmentation.ipynb>`__.
    이를 통해 아래에 제시된 정보로 실험을 해 볼 수 있습니다.
 
 본 튜토리얼에서는 `Penn-Fudan Database for Pedestrian Detection and Segmentation
@@ -203,7 +203,7 @@ COCO에 대해 미리 학습된 모델에서 시작하여 특정 클래스를 �
    import torchvision
    from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
 
-   # COCO로 미리 학솝된 모델 읽기
+   # COCO로 미리 학습된 모델 읽기
    model = torchvision.models.detection.fasterrcnn_resnet50_fpn(pretrained=True)
 
    # 분류기를 새로운 것으로 교체하는데, num_classes는 사용자가 정의합니다

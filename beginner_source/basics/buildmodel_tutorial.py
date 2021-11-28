@@ -37,7 +37,7 @@ from torchvision import datasets, transforms
 # 확인하고 그렇지 않으면 CPU를 계속 사용합니다.
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
-print('Using {} device'.format(device))
+print(f'Using {device} device')
 
 ##############################################
 # 클래스 정의하기
@@ -56,7 +56,6 @@ class NeuralNetwork(nn.Module):
             nn.Linear(512, 512),
             nn.ReLU(),
             nn.Linear(512, 10),
-            nn.ReLU()
         )
 
     def forward(self, x):
@@ -190,6 +189,3 @@ for name, param in model.named_parameters():
 # 더 읽어보기
 # ------------------------------------------------------------------------------------------
 # - `torch.nn API <https://pytorch.org/docs/stable/nn.html>`_
-
-
-

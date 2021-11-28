@@ -9,9 +9,9 @@ Learn the Basics
     Quickstart
     https://tutorials.pytorch.kr/beginner/basics/quickstart_tutorial.html
 
-3. tensors_tutorial.py
+3. tensorqs_tutorial.py
     Tensors
-    https://tutorials.pytorch.kr/beginner/basics/tensor_tutorial.html
+    https://tutorials.pytorch.kr/beginner/basics/tensorqs_tutorial.html
 
 4. dataquickstart_tutorial.py
     Datasets & DataLoaders
@@ -25,9 +25,9 @@ Learn the Basics
     Building the Neural Network
     https://tutorials.pytorch.kr/beginner/basics/buildmodel_tutorial.html
 
-7. autograd_tutorial.py
+7. autogradqs_tutorial.py
     Automatic Differentiation with torch.autograd_tutorial
-    https://tutorials.pytorch.kr/beginner/basics/autograd_tutorial.html
+    https://tutorials.pytorch.kr/beginner/basics/autogradqs_tutorial.html
 
 8. optimization_tutorial.py
     Optimizing Model Parameters

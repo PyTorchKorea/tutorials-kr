@@ -13,9 +13,10 @@ Captum을 사용하여 모델 해석하기
 # 그리고 \ ``Integrated Gradients``\ 와 \ ``Guided GradCam``\ 과 같은
 # 최첨단의 feature attribution 알고리즘을 적용할 수 있습니다.
 #
-# 이 레시피에서는 Captum을 사용하여 다음을 수행하는 방법을 배웁니다.
-# \* 이미지 분류기(classifier)의 예측을 해당 이미지의 특징(features)에 표시하기
-# \* 속성(attribution) 결과를 시각화 하기
+# 이 레시피에서는 Captum을 사용하여 다음을 수행하는 방법을 배웁니다:
+#
+# - 이미지 분류기(classifier)의 예측을 해당 이미지의 특징(features)에 표시하기
+# - 속성(attribution) 결과를 시각화 하기
 
 ######################################################################
 # 시작하기 전에
@@ -126,7 +127,7 @@ vis_signs = ["all", "all"] # "positive", "negative", 또는 모두 표시하는 
 # negative 속성은 해당 영역의 존재가 예측 점수를 낮추는 오답 영역을 의미합니다.
 
 _ = viz.visualize_image_attr_multiple(attribution_dog,
-                                      center_crop(img),
+                                      np.array(center_crop(img)),
                                       vis_types,
                                       vis_signs,
                                       ["attribution for dog", "image"],
@@ -137,7 +138,7 @@ _ = viz.visualize_image_attr_multiple(attribution_dog,
 attribution_cat = np.transpose(attribution_cat.squeeze().cpu().detach().numpy(), (1,2,0))
 
 _ = viz.visualize_image_attr_multiple(attribution_cat,
-                                      center_crop(img),
+                                      np.array(center_crop(img)),
                                       ["heat_map", "original_image"],
                                       ["all", "all"], # positive/negative 속성 또는 all
                                       ["attribution for cat", "image"],
