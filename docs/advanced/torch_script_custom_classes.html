@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Extending TorchScript with Custom C++ Classes &mdash; PyTorch Tutorials 1.9.0+cu102 documentation</title>
+  <title>커스텀 C++ 클래스로 TorchScript 확장하기 &mdash; PyTorch Tutorials 1.9.0+cu102 documentation</title>
   
 
   
@@ -207,7 +207,7 @@
 </ul>
 <p class="caption"><span class="caption-text">Code Transforms with FX</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/fx_conv_bn_fuser.html">(beta) Building a Convolution/Batch Norm fuser in FX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/fx_conv_bn_fuser.html">(베타) FX에서 합성곱/배치 정규화(Convolution/Batch Norm) 결합기(Fuser) 만들기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/fx_profiling_tutorial.html">(beta) Building a Simple CPU Performance Profiler with FX</a></li>
 </ul>
 <p class="caption"><span class="caption-text">프론트엔드 API</span></p>
@@ -221,7 +221,7 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="cpp_extension.html">Custom C++ and CUDA Extensions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="torch_script_custom_ops.html">Extending TorchScript with Custom C++ Operators</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Extending TorchScript with Custom C++ Classes</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">커스텀 C++ 클래스로 TorchScript 확장하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dispatcher.html">Registering a Dispatched Operator in C++</a></li>
 <li class="toctree-l1"><a class="reference internal" href="extend_dispatcher.html">Extending dispatcher for a new backend in C++</a></li>
 </ul>
@@ -241,7 +241,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/dist_overview.html">PyTorch Distributed Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/model_parallel_tutorial.html">단일 머신을 사용한 모델 병렬화 모범 사례</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/ddp_tutorial.html">Getting Started with Distributed Data Parallel</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/ddp_tutorial.html">분산 데이터 병렬 처리 시작하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/dist_tuto.html">PyTorch로 분산 어플리케이션 개발하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/rpc_tutorial.html">Getting Started with Distributed RPC Framework</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/rpc_param_server_tutorial.html">Implementing a Parameter Server Using Distributed RPC Framework</a></li>
@@ -253,7 +253,7 @@
 </ul>
 <p class="caption"><span class="caption-text">Mobile</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/deeplabv3_on_ios.html">Image Segmentation DeepLabV3 on iOS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/deeplabv3_on_ios.html">iOS에서의 이미지 분할 DeepLapV3</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/deeplabv3_on_android.html">안드로이드에서의 이미지 분할 DeepLapV3</a></li>
 </ul>
 
@@ -295,7 +295,7 @@
       </li>
 
         
-      <li>Extending TorchScript with Custom C++ Classes</li>
+      <li>커스텀 C++ 클래스로 TorchScript 확장하기</li>
     
     
       <li class="pytorch-breadcrumbs-aside">
@@ -349,18 +349,15 @@
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <div class="section" id="extending-torchscript-with-custom-c-classes">
-<h1>Extending TorchScript with Custom C++ Classes<a class="headerlink" href="#extending-torchscript-with-custom-c-classes" title="Permalink to this headline">¶</a></h1>
-<p>This tutorial is a follow-on to the
-<a class="reference internal" href="torch_script_custom_ops.html"><span class="doc">custom operator</span></a>
-tutorial, and introduces the API we’ve built for binding C++ classes into TorchScript
-and Python simultaneously. The API is very similar to
-<a class="reference external" href="https://github.com/pybind/pybind11">pybind11</a>, and most of the concepts will transfer
-over if you’re familiar with that system.</p>
-<div class="section" id="implementing-and-binding-the-class-in-c">
-<h2>Implementing and Binding the Class in C++<a class="headerlink" href="#implementing-and-binding-the-class-in-c" title="Permalink to this headline">¶</a></h2>
-<p>For this tutorial, we are going to define a simple C++ class that maintains persistent
-state in a member variable.</p>
+  <div class="section" id="c-torchscript">
+<h1>커스텀 C++ 클래스로 TorchScript 확장하기<a class="headerlink" href="#c-torchscript" title="Permalink to this headline">¶</a></h1>
+<p>이 튜토리얼은 <a class="reference internal" href="torch_script_custom_ops.html"><span class="doc">커스텀 오퍼레이터</span></a> 튜토리얼의 후속이며
+C++ 클래스를 TorchScript와 Python에 동시에 바인딩하기 위해 구축한 API를 소개합니다.
+API는 <a class="reference external" href="https://github.com/pybind/pybind11">pybind11</a> 과
+매우 유사하며 해당 시스템에 익숙하다면 대부분의 개념이 이전됩니다.</p>
+<div class="section" id="c">
+<h2>C++에서 클래스 구현 및 바인딩<a class="headerlink" href="#c" title="Permalink to this headline">¶</a></h2>
+<p>이 튜토리얼에서는 멤버 변수에서 지속 상태를 유지하는 간단한 C++ 클래스를 정의할 것입니다.</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// This header is all you need to do the C++ portions of this</span>
 <span class="c1">// tutorial</span>
 <span class="cp">#include</span> <span class="cpf">&lt;torch/script.h&gt;</span><span class="cp"></span>
@@ -399,23 +396,19 @@ state in a member variable.</p>
 <span class="p">};</span>
 </pre></div>
 </div>
-<p>There are several things to note:</p>
+<p>몇 가지 주의할 사항이 있습니다:</p>
 <ul class="simple">
-<li><code class="docutils literal notranslate"><span class="pre">torch/custom_class.h</span></code> is the header you need to include to extend TorchScript
-with your custom class.</li>
-<li>Notice that whenever we are working with instances of the custom
-class, we do it via instances of <code class="docutils literal notranslate"><span class="pre">c10::intrusive_ptr&lt;&gt;</span></code>. Think of <code class="docutils literal notranslate"><span class="pre">intrusive_ptr</span></code>
-as a smart pointer like <code class="docutils literal notranslate"><span class="pre">std::shared_ptr</span></code>, but the reference count is stored
-directly in the object, as opposed to a separate metadata block (as is done in
-<code class="docutils literal notranslate"><span class="pre">std::shared_ptr</span></code>.  <code class="docutils literal notranslate"><span class="pre">torch::Tensor</span></code> internally uses the same pointer type;
-and custom classes have to also use this pointer type so that we can
-consistently manage different object types.</li>
-<li>The second thing to notice is that the user-defined class must inherit from
-<code class="docutils literal notranslate"><span class="pre">torch::CustomClassHolder</span></code>. This ensures that the custom class has space to
-store the reference count.</li>
+<li><code class="docutils literal notranslate"><span class="pre">torch/custom_class.h</span></code> 는 커스텀 클래스로 TorchScript를 확장하기 위해 포함해야하는 헤더입니다.</li>
+<li>커스텀 클래스의 인스턴스로 작업할 때마다 <code class="docutils literal notranslate"><span class="pre">c10::intrusive_ptr&lt;&gt;</span></code> 의 인스턴스를 통해 작업을 수행합니다.
+<code class="docutils literal notranslate"><span class="pre">intrusive_ptr</span></code> 를 <code class="docutils literal notranslate"><span class="pre">std::shared_ptr</span></code> 과 같은 스마트 포인터로 생각하세요. 그러나 참조 계수는
+<code class="docutils literal notranslate"><span class="pre">std::shared_ptr</span></code> 같이 별도의 메타데이터 블록과 달리 객체에 직접 저장됩니다.
+<code class="docutils literal notranslate"><span class="pre">torch::Tensor</span></code> 는 내부적으로 동일한 포인터 유형을 사용합니다.
+커스텀 클래스도 <code class="docutils literal notranslate"><span class="pre">torch::Tensor</span></code> 포인터 유형을 사용해야 다양한 객체 유형을 일관되게 관리할 수 있습니다.</li>
+<li>두 번째로 주목해야 할 점은 커스텀 클래스가 <code class="docutils literal notranslate"><span class="pre">torch::CustomClassHolder</span></code> 에서 상속되어야 한다는 것입니다.
+이렇게 하면 커스텀 클래스에 참조 계수를 저장할 공간이 있습니다.</li>
 </ul>
-<p>Now let’s take a look at how we will make this class visible to TorchScript, a process called
-<em>binding</em> the class:</p>
+<p>이제 이 클래스를 어떻게 TorchScript에서 사용가능하게 하는지 살펴보겠습니다.
+이런 과정은 클래스를 <em>바인딩</em> 한다고 합니다:</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// Notice a few things:</span>
 <span class="c1">// - We pass the class to be registered as a template parameter to</span>
 <span class="c1">//   `torch::class_`. In this instance, we&#39;ve passed the</span>
@@ -459,12 +452,12 @@ store the reference count.</li>
 </pre></div>
 </div>
 </div>
-<div class="section" id="building-the-example-as-a-c-project-with-cmake">
-<h2>Building the Example as a C++ Project With CMake<a class="headerlink" href="#building-the-example-as-a-c-project-with-cmake" title="Permalink to this headline">¶</a></h2>
-<p>Now, we’re going to build the above C++ code with the <a class="reference external" href="https://cmake.org">CMake</a> build system. First, take all the C++ code
-we’ve covered so far and place it in a file called <code class="docutils literal notranslate"><span class="pre">class.cpp</span></code>.
-Then, write a simple <code class="docutils literal notranslate"><span class="pre">CMakeLists.txt</span></code> file and place it in the
-same directory. Here is what <code class="docutils literal notranslate"><span class="pre">CMakeLists.txt</span></code> should look like:</p>
+<div class="section" id="cmake-c">
+<h2>CMake를 사용하여 C++ 프로젝트로 예제 빌드<a class="headerlink" href="#cmake-c" title="Permalink to this headline">¶</a></h2>
+<p>이제 <a class="reference external" href="https://cmake.org">CMake</a> 빌드 시스템을 사용하여 위의 C++ 코드를 빌드합니다.
+먼저, 지금까지 다룬 모든 C++ code를 <code class="docutils literal notranslate"><span class="pre">class.cpp</span></code> 라는 파일에 넣습니다.
+그런 다음 간단한 <code class="docutils literal notranslate"><span class="pre">CMakeLists.txt</span></code> 파일을 작성하여 동일한 디렉토리에 배치합니다.
+<code class="docutils literal notranslate"><span class="pre">CMakeLists.txt</span></code> 는 다음과 같아야 합니다:</p>
 <div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="nb">cmake_minimum_required</span><span class="p">(</span><span class="s">VERSION</span> <span class="s">3.1</span> <span class="s">FATAL_ERROR</span><span class="p">)</span>
 <span class="nb">project</span><span class="p">(</span><span class="s">custom_class</span><span class="p">)</span>
 
@@ -477,16 +470,15 @@ same directory. Here is what <code class="docutils literal notranslate"><span cl
 <span class="nb">target_link_libraries</span><span class="p">(</span><span class="s">custom_class</span> <span class="s2">&quot;${TORCH_LIBRARIES}&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Also, create a <code class="docutils literal notranslate"><span class="pre">build</span></code> directory. Your file tree should look like this:</p>
+<p>또한 <code class="docutils literal notranslate"><span class="pre">build</span></code> 디렉토리를 만듭니다. 파일 트리는 다음과 같아야 합니다:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">custom_class_project</span><span class="o">/</span>
   <span class="n">class</span><span class="o">.</span><span class="n">cpp</span>
   <span class="n">CMakeLists</span><span class="o">.</span><span class="n">txt</span>
   <span class="n">build</span><span class="o">/</span>
 </pre></div>
 </div>
-<p>We assume you’ve setup your environment in the same way as described in
-the <a class="reference internal" href="torch_script_custom_ops.html"><span class="doc">previous tutorial</span></a>.
-Go ahead and invoke cmake and then make to build the project:</p>
+<p><a class="reference internal" href="torch_script_custom_ops.html"><span class="doc">이전 튜토리얼</span></a> 에서 설명한 것과 동일한 방식으로 환경을 설정했다고 가정합니다.
+계속해서 cmake를 호출한 다음 make를 호출하여 프로젝트를 빌드합니다:</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> build
 $ cmake -DCMAKE_PREFIX_PATH<span class="o">=</span><span class="s2">&quot;</span><span class="k">$(</span>python -c <span class="s1">&#39;import torch.utils; print(torch.utils.cmake_prefix_path)&#39;</span><span class="k">)</span><span class="s2">&quot;</span> ..
   -- The C compiler identification is GNU <span class="m">7</span>.3.1
@@ -523,9 +515,9 @@ $ make -j
   <span class="o">[</span><span class="m">100</span>%<span class="o">]</span> Built target custom_class
 </pre></div>
 </div>
-<p>What you’ll find is there is now (among other things) a dynamic library
-file present in the build directory. On Linux, this is probably named
-<code class="docutils literal notranslate"><span class="pre">libcustom_class.so</span></code>. So the file tree should look like:</p>
+<p>이제 무엇보다도 빌드 디렉토리에 동적 라이브러리 파일이 있다는 것을 알게 될 것입니다.
+리눅스에서는 아마도 <code class="docutils literal notranslate"><span class="pre">libcustom_class.so</span></code> 로 이름이 지정될 것입니다.
+따라서 파일 트리는 다음과 같아야 합니다:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">custom_class_project</span><span class="o">/</span>
   <span class="n">class</span><span class="o">.</span><span class="n">cpp</span>
   <span class="n">CMakeLists</span><span class="o">.</span><span class="n">txt</span>
@@ -534,11 +526,10 @@ file present in the build directory. On Linux, this is probably named
 </pre></div>
 </div>
 </div>
-<div class="section" id="using-the-c-class-from-python-and-torchscript">
-<h2>Using the C++ Class from Python and TorchScript<a class="headerlink" href="#using-the-c-class-from-python-and-torchscript" title="Permalink to this headline">¶</a></h2>
-<p>Now that we have our class and its registration compiled into an <code class="docutils literal notranslate"><span class="pre">.so</span></code> file,
-we can load that <cite>.so</cite> into Python and try it out. Here’s a script that
-demonstrates that:</p>
+<div class="section" id="python-torchscript-c">
+<h2>Python 및 TorchScript의 C++ 클래스 사용<a class="headerlink" href="#python-torchscript-c" title="Permalink to this headline">¶</a></h2>
+<p>이제 클래스와 등록이 <code class="docutils literal notranslate"><span class="pre">.so</span></code> 파일로 컴파일되었으므로 해당 <cite>.so</cite> 를 Python에 읽어들이고 사용해 볼 수 있습니다.
+다음은 이를 보여주는 스크립트입니다:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
 
 <span class="c1"># `torch.classes.load_library()` allows you to pass the path to your .so file</span>
@@ -590,11 +581,10 @@ demonstrates that:</p>
 </pre></div>
 </div>
 </div>
-<div class="section" id="saving-loading-and-running-torchscript-code-using-custom-classes">
-<h2>Saving, Loading, and Running TorchScript Code Using Custom Classes<a class="headerlink" href="#saving-loading-and-running-torchscript-code-using-custom-classes" title="Permalink to this headline">¶</a></h2>
-<p>We can also use custom-registered C++ classes in a C++ process using
-libtorch. As an example, let’s define a simple <code class="docutils literal notranslate"><span class="pre">nn.Module</span></code> that
-instantiates and calls a method on our MyStackClass class:</p>
+<div class="section" id="torchscript">
+<h2>커스텀 클래스를 사용하여 TorchScript 코드 저장, 읽기 및 실행<a class="headerlink" href="#torchscript" title="Permalink to this headline">¶</a></h2>
+<p>libtorch를 사용하여 C++ 프로세스에서 커스텀 등록 C++ 클래스를 사용할 수도 있습니다.
+예를 들어 MyStackClass 클래스에서 메소드를 인스턴스화하고 호출하는 간단한 <code class="docutils literal notranslate"><span class="pre">nn.Module</span></code> 을 정의해 보겠습니다:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
 
 <span class="n">torch</span><span class="o">.</span><span class="n">classes</span><span class="o">.</span><span class="n">load_library</span><span class="p">(</span><span class="s1">&#39;build/libcustom_class.so&#39;</span><span class="p">)</span>
@@ -615,12 +605,11 @@ instantiates and calls a method on our MyStackClass class:</p>
 <span class="n">scripted_foo</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;foo.pt&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p><code class="docutils literal notranslate"><span class="pre">foo.pt</span></code> in our filesystem now contains the serialized TorchScript
-program we’ve just defined.</p>
-<p>Now, we’re going to define a new CMake project to show how you can load
-this model and its required .so file. For a full treatment of how to do this,
-please have a look at the <a class="reference external" href="https://tutorials.pytorch.kr/advanced/cpp_export.html">Loading a TorchScript Model in C++ Tutorial</a>.</p>
-<p>Similarly to before, let’s create a file structure containing the following:</p>
+<p>파일 시스템의 foo.pt는 방금 정의한 직렬화된 TorchScript 프로그램을 포함합니다.</p>
+<p>이제 이 모델과 필요한 .so 파일을 읽어들이는 방법을 보여주기 위해 새 CMake 프로젝트를 정의하겠습니다.
+이 작업을 수행하는 방법에 대한 자세한 내용은 <a class="reference external" href="https://tutorials.pytorch.kr/advanced/cpp_export.html">C++에서 TorchScript 모델 로딩하기</a> 를
+참조하세요.</p>
+<p>이전과 유사하게 다음을 포함하는 파일 구조를 생성해 보겠습니다:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cpp_inference_example</span><span class="o">/</span>
   <span class="n">infer</span><span class="o">.</span><span class="n">cpp</span>
   <span class="n">CMakeLists</span><span class="o">.</span><span class="n">txt</span>
@@ -632,11 +621,9 @@ please have a look at the <a class="reference external" href="https://tutorials.
     <span class="n">build</span><span class="o">/</span>
 </pre></div>
 </div>
-<p>Notice we’ve copied over the serialized <code class="docutils literal notranslate"><span class="pre">foo.pt</span></code> file, as well as the source
-tree from the <code class="docutils literal notranslate"><span class="pre">custom_class_project</span></code> above. We will be adding the
-<code class="docutils literal notranslate"><span class="pre">custom_class_project</span></code> as a dependency to this C++ project so that we can
-build the custom class into the binary.</p>
-<p>Let’s populate <code class="docutils literal notranslate"><span class="pre">infer.cpp</span></code> with the following:</p>
+<p>직렬화된 foo.pt 파일과 위의 <code class="docutils literal notranslate"><span class="pre">custom_class_project</span></code> 소스 트리를 복사했음을 주목하세요.
+커스텀 클래스를 바이너리로 빌드할 수 있도록 <code class="docutils literal notranslate"><span class="pre">custom_class_project</span></code> 를 이 C++ 프로젝트에 의존성으로 추가할 것입니다.</p>
+<p><code class="docutils literal notranslate"><span class="pre">infer.cpp</span></code> 를 다음으로 채우겠습니다:</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;torch/script.h&gt;</span><span class="cp"></span>
 
 <span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp"></span>
@@ -659,7 +646,7 @@ build the custom class into the binary.</p>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>And similarly let’s define our CMakeLists.txt file:</p>
+<p>마찬가지로 CMakeLists.txt 파일을 정의해 보겠습니다:</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">cmake_minimum_required</span><span class="p">(</span><span class="n">VERSION</span> <span class="mf">3.1</span> <span class="n">FATAL_ERROR</span><span class="p">)</span>
 <span class="n">project</span><span class="p">(</span><span class="n">infer</span><span class="p">)</span>
 
@@ -677,7 +664,7 @@ build the custom class into the binary.</p>
 <span class="n">target_link_libraries</span><span class="p">(</span><span class="n">infer</span> <span class="o">-</span><span class="n">Wl</span><span class="p">,</span><span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">as</span><span class="o">-</span><span class="n">needed</span> <span class="n">custom_class</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>You know the drill: <code class="docutils literal notranslate"><span class="pre">cd</span> <span class="pre">build</span></code>, <code class="docutils literal notranslate"><span class="pre">cmake</span></code>, and <code class="docutils literal notranslate"><span class="pre">make</span></code>:</p>
+<p><code class="docutils literal notranslate"><span class="pre">cd</span> <span class="pre">build</span></code>, <code class="docutils literal notranslate"><span class="pre">cmake</span></code>, 및 <code class="docutils literal notranslate"><span class="pre">make</span></code> 에 대한 사용 방법을 알고 있습니다:</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> build
 $ cmake -DCMAKE_PREFIX_PATH<span class="o">=</span><span class="s2">&quot;</span><span class="k">$(</span>python -c <span class="s1">&#39;import torch.utils; print(torch.utils.cmake_prefix_path)&#39;</span><span class="k">)</span><span class="s2">&quot;</span> ..
   -- The C compiler identification is GNU <span class="m">7</span>.3.1
@@ -718,42 +705,38 @@ $ make -j
   <span class="o">[</span><span class="m">100</span>%<span class="o">]</span> Built target infer
 </pre></div>
 </div>
-<p>And now we can run our exciting C++ binary:</p>
+<p>이제 흥미로운 C++ 바이너리를 실행할 수 있습니다:</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ ./infer
   momfoobarbaz
 </pre></div>
 </div>
-<p>Incredible!</p>
+<p>대단합니다!</p>
 </div>
-<div class="section" id="moving-custom-classes-to-from-ivalues">
-<h2>Moving Custom Classes To/From IValues<a class="headerlink" href="#moving-custom-classes-to-from-ivalues" title="Permalink to this headline">¶</a></h2>
-<p>It’s also possible that you may need to move custom classes into or out of
-<code class="docutils literal notranslate"><span class="pre">IValue``s,</span> <span class="pre">such</span> <span class="pre">as</span> <span class="pre">when</span> <span class="pre">you</span> <span class="pre">take</span> <span class="pre">or</span> <span class="pre">return</span> <span class="pre">``IValue``s</span> <span class="pre">from</span> <span class="pre">TorchScript</span> <span class="pre">methods</span>
-<span class="pre">or</span> <span class="pre">you</span> <span class="pre">want</span> <span class="pre">to</span> <span class="pre">instantiate</span> <span class="pre">a</span> <span class="pre">custom</span> <span class="pre">class</span> <span class="pre">attribute</span> <span class="pre">in</span> <span class="pre">C++.</span> <span class="pre">For</span> <span class="pre">creating</span> <span class="pre">an</span>
-<span class="pre">``IValue</span></code> from a custom C++ class instance:</p>
+<div class="section" id="ivalues">
+<h2>커스텀 클래스를 IValues로/에서 이동<a class="headerlink" href="#ivalues" title="Permalink to this headline">¶</a></h2>
+<p>TorchScript 메소드에서 <code class="docutils literal notranslate"><span class="pre">IValue</span></code> 를 가져오거나 반환하기, 또는 C++에서 커스텀 클래스 속성을 인스턴스화하려는
+경우와 같이 커스텀 클래스를 <code class="docutils literal notranslate"><span class="pre">IValue</span></code> 안팎으로 이동해야 할 수도 있습니다.
+커스텀 C++ 클래스 인스턴스에서 <code class="docutils literal notranslate"><span class="pre">IValue</span></code> 를 생성하려면:</p>
 <ul class="simple">
-<li><code class="docutils literal notranslate"><span class="pre">torch::make_custom_class&lt;T&gt;()</span></code> provides an API similar to c10::intrusive_ptr&lt;T&gt;
-in that it will take whatever set of arguments you provide to it, call the constructor
-of T that matches that set of arguments, and wrap that instance up and return it.
-However, instead of returning just a pointer to a custom class object, it returns
-an <code class="docutils literal notranslate"><span class="pre">IValue</span></code> wrapping the object. You can then pass this <code class="docutils literal notranslate"><span class="pre">IValue</span></code> directly to
-TorchScript.</li>
-<li>In the event that you already have an <code class="docutils literal notranslate"><span class="pre">intrusive_ptr</span></code> pointing to your class, you
-can directly construct an IValue from it using the constructor <code class="docutils literal notranslate"><span class="pre">IValue(intrusive_ptr&lt;T&gt;)</span></code>.</li>
+<li><code class="docutils literal notranslate"><span class="pre">torch::make_custom_class&lt;T&gt;()</span></code> 는 제공하는 인수 집합을 사용하고 해당 인수 집합과 일치하는
+T의 생성자를 호출하며 해당 인스턴스를 래핑하고 반환하는 c10::intrusive_ptr&lt;T&gt;와 유사한 API를 제공합니다.
+그러나 커스텀 클래스 객체에 대한 포인터만 반환하는 대신 객체를 래핑하는 <code class="docutils literal notranslate"><span class="pre">IValue</span></code> 를 반환합니다.
+그런 다음 이 <code class="docutils literal notranslate"><span class="pre">IValue</span></code> 를 TorchScript에 직접 전달할 수 있습니다.</li>
+<li>이미 클래스를 가리키는 <code class="docutils literal notranslate"><span class="pre">intrusive_ptr</span></code> 이 있는 경우 생성자 <code class="docutils literal notranslate"><span class="pre">IValue(intrusive_ptr&lt;T&gt;)</span></code> 를 사용하여
+해당 클래스에서 IValue를 직접 생성할 수 있습니다.</li>
 </ul>
-<p>For converting <code class="docutils literal notranslate"><span class="pre">IValue</span></code> back to custom classes:</p>
+<p><code class="docutils literal notranslate"><span class="pre">IValue</span></code> 를 커스텀 클래스로 다시 변환하려면:</p>
 <ul class="simple">
-<li><code class="docutils literal notranslate"><span class="pre">IValue::toCustomClass&lt;T&gt;()</span></code> will return an <code class="docutils literal notranslate"><span class="pre">intrusive_ptr&lt;T&gt;</span></code> pointing to the
-custom class that the <code class="docutils literal notranslate"><span class="pre">IValue</span></code> contains. Internally, this function is checking
-that <code class="docutils literal notranslate"><span class="pre">T</span></code> is registered as a custom class and that the <code class="docutils literal notranslate"><span class="pre">IValue</span></code> does in fact contain
-a custom class. You can check whether the <code class="docutils literal notranslate"><span class="pre">IValue</span></code> contains a custom class manually by
-calling <code class="docutils literal notranslate"><span class="pre">isCustomClass()</span></code>.</li>
+<li><code class="docutils literal notranslate"><span class="pre">IValue::toCustomClass&lt;T&gt;()</span></code> 는 <code class="docutils literal notranslate"><span class="pre">IValue</span></code> 에 포함된 커스텀 클래스를 가리키는 <code class="docutils literal notranslate"><span class="pre">intrusive_ptr&lt;T&gt;</span></code> 를
+반환합니다. 내부적으로 이 함수는 <code class="docutils literal notranslate"><span class="pre">T</span></code> 가 커스텀 클래스로 등록되어 있고 <code class="docutils literal notranslate"><span class="pre">IValue</span></code> 에 실제로 커스텀 클래스가
+포함되어 있는지 확인합니다. <code class="docutils literal notranslate"><span class="pre">isCustomClass()</span></code> 를 호출하여 <code class="docutils literal notranslate"><span class="pre">IValue</span></code> 에 커스텀 클래스가 포함되어 있는지
+수동으로 확인할 수 있습니다.</li>
 </ul>
 </div>
-<div class="section" id="defining-serialization-deserialization-methods-for-custom-c-classes">
-<h2>Defining Serialization/Deserialization Methods for Custom C++ Classes<a class="headerlink" href="#defining-serialization-deserialization-methods-for-custom-c-classes" title="Permalink to this headline">¶</a></h2>
-<p>If you try to save a <code class="docutils literal notranslate"><span class="pre">ScriptModule</span></code> with a custom-bound C++ class as
-an attribute, you’ll get the following error:</p>
+<div class="section" id="id2">
+<h2>커스텀 C++ 클래스에 대한 직렬화/역직렬화 방법 정의<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<p>커스텀 바인딩 된 C++ 클래스를 속성으로 사용하여 <code class="docutils literal notranslate"><span class="pre">ScriptModule</span></code> 을 저장하려고 하면
+다음 오류가 발생합니다:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># export_attr.py</span>
 <span class="kn">import</span> <span class="nn">torch</span>
 
@@ -781,19 +764,16 @@ an attribute, you’ll get the following error:</p>
 RuntimeError: Cannot serialize custom bound C++ class __torch__.torch.classes.my_classes.MyStackClass. Please define serialization methods via def_pickle <span class="k">for</span> this class. <span class="o">(</span>pushIValueImpl at ../torch/csrc/jit/pickler.cpp:128<span class="o">)</span>
 </pre></div>
 </div>
-<p>This is because TorchScript cannot automatically figure out what information
-save from your C++ class. You must specify that manually. The way to do that
-is to define <code class="docutils literal notranslate"><span class="pre">__getstate__</span></code> and <code class="docutils literal notranslate"><span class="pre">__setstate__</span></code> methods on the class using
-the special <code class="docutils literal notranslate"><span class="pre">def_pickle</span></code> method on <code class="docutils literal notranslate"><span class="pre">class_</span></code>.</p>
+<p>TorchScript가 C++ 클래스에서 저장한 정보를 자동으로 파악할 수 없기 때문입니다.
+수동으로 지정해야 합니다. 그렇게 하는 방법은 <code class="docutils literal notranslate"><span class="pre">class_</span></code> 에서 특별한 <code class="docutils literal notranslate"><span class="pre">def_pickle</span></code> 메소드를
+사용하여 클래스에서 <code class="docutils literal notranslate"><span class="pre">__getstate__</span></code> 및 <code class="docutils literal notranslate"><span class="pre">__setstate__</span></code> 메소드를 정의하는 것입니다.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">The semantics of <code class="docutils literal notranslate"><span class="pre">__getstate__</span></code> and <code class="docutils literal notranslate"><span class="pre">__setstate__</span></code> in TorchScript are
-equivalent to that of the Python pickle module. You can
-<a class="reference external" href="https://github.com/pytorch/pytorch/blob/master/torch/csrc/jit/docs/serialization.md#getstate-and-setstate">read more</a>
-about how we use these methods.</p>
+<p class="last">TorchScript에서 <code class="docutils literal notranslate"><span class="pre">__getstate__</span></code> 및 <code class="docutils literal notranslate"><span class="pre">__setstate__</span></code> 의 의미는 Python pickle 모듈의 의미와 동일합니다.
+이러한 방법을 어떻게 사용하는지에 대하여 <a class="reference external" href="https://github.com/pytorch/pytorch/blob/master/torch/csrc/jit/docs/serialization.md#getstate-and-setstate">자세한 내용</a> 을
+참조하세요.</p>
 </div>
-<p>Here is an example of the <code class="docutils literal notranslate"><span class="pre">def_pickle</span></code> call we can add to the registration of
-<code class="docutils literal notranslate"><span class="pre">MyStackClass</span></code> to include serialization methods:</p>
+<p>다음은 직렬화 메소드를 포함하기 위해 <code class="docutils literal notranslate"><span class="pre">MyStackClass</span></code> 등록에 추가할 수 있는 <code class="docutils literal notranslate"><span class="pre">def_pickle</span></code> 호출의 예시입니다:</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span>    <span class="c1">// class_&lt;&gt;::def_pickle allows you to define the serialization</span>
     <span class="c1">// and deserialization methods for your C++ class.</span>
     <span class="c1">// Currently, we only support passing stateless lambda functions</span>
@@ -832,40 +812,37 @@ about how we use these methods.</p>
 </div>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">We take a different approach from pybind11 in the pickle API. Whereas pybind11
-as a special function <code class="docutils literal notranslate"><span class="pre">pybind11::pickle()</span></code> which you pass into <code class="docutils literal notranslate"><span class="pre">class_::def()</span></code>,
-we have a separate method <code class="docutils literal notranslate"><span class="pre">def_pickle</span></code> for this purpose. This is because the
-name <code class="docutils literal notranslate"><span class="pre">torch::jit::pickle</span></code> was already taken, and we didn’t want to cause confusion.</p>
+<p class="last">pickle API에서 pybind11과 다른 접근 방식을 취합니다. pybind11이 <code class="docutils literal notranslate"><span class="pre">class_::def()</span></code> 로
+전달되는 특수 함수 <code class="docutils literal notranslate"><span class="pre">pybind11::pickle()</span></code> 인 반면, 이 목적을 위해 별도의 메소드
+<code class="docutils literal notranslate"><span class="pre">def_pickle</span></code> 를 가지고 있습니다. 이미 <code class="docutils literal notranslate"><span class="pre">torch::jit::pickle</span></code> 라는 이름이 사용되었고
+혼동을 일으키고 싶지 않았기 때문입니다.</p>
 </div>
-<p>Once we have defined the (de)serialization behavior in this way, our script can
-now run successfully:</p>
+<p>이러한 방식으로 (역)직렬화 동작을 정의하면 이제 스크립트를 성공적으로 실행할 수 있습니다:</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ python ../export_attr.py
 testing
 </pre></div>
 </div>
 </div>
-<div class="section" id="defining-custom-operators-that-take-or-return-bound-c-classes">
-<h2>Defining Custom Operators that Take or Return Bound C++ Classes<a class="headerlink" href="#defining-custom-operators-that-take-or-return-bound-c-classes" title="Permalink to this headline">¶</a></h2>
-<p>Once you’ve defined a custom C++ class, you can also use that class
-as an argument or return from a custom operator (i.e. free functions). Suppose
-you have the following free function:</p>
+<div class="section" id="id4">
+<h2>바인딩된 C++ 클래스를 사용하거나 반환하는 커스텀 연산자 정의<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
+<p>커스텀 C++ 클래스를 정의한 후에는 해당 클래스를 인수로 사용하거나 커스텀 연산자(예를 들어 free 함수)에서
+반환할 수도 있습니다. 다음과 같은 free 함수가 있다고 가정합니다:</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">c10</span><span class="o">::</span><span class="n">intrusive_ptr</span><span class="o">&lt;</span><span class="n">MyStackClass</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;&gt;</span> <span class="n">manipulate_instance</span><span class="p">(</span><span class="k">const</span> <span class="n">c10</span><span class="o">::</span><span class="n">intrusive_ptr</span><span class="o">&lt;</span><span class="n">MyStackClass</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;&gt;&amp;</span> <span class="n">instance</span><span class="p">)</span> <span class="p">{</span>
   <span class="n">instance</span><span class="o">-&gt;</span><span class="n">pop</span><span class="p">();</span>
   <span class="k">return</span> <span class="n">instance</span><span class="p">;</span>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>You can register it running the following code inside your <code class="docutils literal notranslate"><span class="pre">TORCH_LIBRARY</span></code>
-block:</p>
+<p><code class="docutils literal notranslate"><span class="pre">TORCH_LIBRARY</span></code> 블록 내에서 다음 코드를 실행하여 등록할 수 있습니다:</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span>    <span class="n">m</span><span class="p">.</span><span class="n">def</span><span class="p">(</span>
       <span class="s">&quot;foo::manipulate_instance(__torch__.torch.classes.my_classes.MyStackClass x) -&gt; __torch__.torch.classes.my_classes.MyStackClass Y&quot;</span><span class="p">,</span>
       <span class="n">manipulate_instance</span>
     <span class="p">);</span>
 </pre></div>
 </div>
-<p>Refer to the <a class="reference external" href="https://tutorials.pytorch.kr/advanced/torch_script_custom_ops.html">custom op tutorial</a>
-for more details on the registration API.</p>
-<p>Once this is done, you can use the op like the following example:</p>
+<p>등록 API에 대한 자세한 내용은 <a class="reference external" href="https://tutorials.pytorch.kr/advanced/torch_script_custom_ops.html">커스텀 C++ 연산자로 TorchScript 확장</a> 을
+참조하세요.</p>
+<p>이 작업이 완료되면 다음 예제와 같이 연산자를 사용할 수 있습니다:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">TryCustomOp</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TryCustomOp</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
@@ -877,26 +854,23 @@ for more details on the registration API.</p>
 </div>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">Registration of an operator that takes a C++ class as an argument requires that
-the custom class has already been registered.  You can enforce this by
-making sure the custom class registration and your free function definitions
-are in the same <code class="docutils literal notranslate"><span class="pre">TORCH_LIBRARY</span></code> block, and that the custom class
-registration comes first.  In the future, we may relax this requirement,
-so that these can be registered in any order.</p>
+<p class="last">C++ 클래스를 인수로 사용하는 연산자를 등록하려면 커스텀 클래스가 이미 등록되어
+있어야 합니다. 커스텀 클래스 등록과 free 함수 정의가 동일한 <code class="docutils literal notranslate"><span class="pre">TORCH_LIBRARY</span></code>
+블록에 있고 커스텀 클래스 등록이 먼저 오게 하여 이를 시행할 수 있습니다.
+향후 어떤 순서로든 등록할 수 있도록 이 요구사항을 완화할 수 있습니다.</p>
 </div>
 </div>
-<div class="section" id="conclusion">
-<h2>Conclusion<a class="headerlink" href="#conclusion" title="Permalink to this headline">¶</a></h2>
-<p>This tutorial walked you through how to expose a C++ class to TorchScript
-(and by extension Python), how to register its methods, how to use that
-class from Python and TorchScript, and how to save and load code using
-the class and run that code in a standalone C++ process. You are now ready
-to extend your TorchScript models with C++ classes that interface with
-third party C++ libraries or implement any other use case that requires the
-lines between Python, TorchScript and C++ to blend smoothly.</p>
-<p>As always, if you run into any problems or have questions, you can use our
-<a class="reference external" href="https://discuss.pytorch.org/">forum</a> or <a class="reference external" href="https://github.com/pytorch/pytorch/issues">GitHub issues</a> to get in touch. Also, our
-<a class="reference external" href="https://pytorch.org/cppdocs/notes/faq.html">frequently asked questions (FAQ) page</a> may have helpful information.</p>
+<div class="section" id="id6">
+<h2>결론<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h2>
+<p>이 튜토리얼에서는 독립된 C++ 프로세스에서 C++ 클래스를 TorchScript 및
+확장 Python에 나타내는 방법, 해당 메소드를 등록하는 방법, Python 및 TorchScript에서
+해당 클래스를 사용하는 방법, 클래스를 사용하여 코드를 저장 및 읽어들이고 해당 코드를 실행하는 방법을 안내했습니다.
+이제 타사 C++ 라이브러리와 인터페이스가 있는 C++ 클래스로 TorchScript 모델을 확장하거나,
+Python, TorchScript 및 C++ 간의 라인이 원활하게 혼합되어야 하는 다른 사용 사례를 구현할 준비가 되었습니다.</p>
+<p>언제나 처럼 문제를 마주치거나 질문이 있으면 저희 <a class="reference external" href="https://discuss.pytorch.org/">forum</a> 또는
+<a class="reference external" href="https://github.com/pytorch/pytorch/issues">GitHub issues</a> 에 올려주시면 되겠습니다.
+또한 <a class="reference external" href="https://pytorch.org/cppdocs/notes/faq.html">자주 묻는 질문(FAQ) 페이지</a> 에
+유용한 정보가 있을 수 있습니다.</p>
 </div>
 </div>
 
@@ -954,15 +928,15 @@ lines between Python, TorchScript and C++ to blend smoothly.</p>
           <div class="pytorch-right-menu" id="pytorch-right-menu">
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
-<li><a class="reference internal" href="#">Extending TorchScript with Custom C++ Classes</a><ul>
-<li><a class="reference internal" href="#implementing-and-binding-the-class-in-c">Implementing and Binding the Class in C++</a></li>
-<li><a class="reference internal" href="#building-the-example-as-a-c-project-with-cmake">Building the Example as a C++ Project With CMake</a></li>
-<li><a class="reference internal" href="#using-the-c-class-from-python-and-torchscript">Using the C++ Class from Python and TorchScript</a></li>
-<li><a class="reference internal" href="#saving-loading-and-running-torchscript-code-using-custom-classes">Saving, Loading, and Running TorchScript Code Using Custom Classes</a></li>
-<li><a class="reference internal" href="#moving-custom-classes-to-from-ivalues">Moving Custom Classes To/From IValues</a></li>
-<li><a class="reference internal" href="#defining-serialization-deserialization-methods-for-custom-c-classes">Defining Serialization/Deserialization Methods for Custom C++ Classes</a></li>
-<li><a class="reference internal" href="#defining-custom-operators-that-take-or-return-bound-c-classes">Defining Custom Operators that Take or Return Bound C++ Classes</a></li>
-<li><a class="reference internal" href="#conclusion">Conclusion</a></li>
+<li><a class="reference internal" href="#">커스텀 C++ 클래스로 TorchScript 확장하기</a><ul>
+<li><a class="reference internal" href="#c">C++에서 클래스 구현 및 바인딩</a></li>
+<li><a class="reference internal" href="#cmake-c">CMake를 사용하여 C++ 프로젝트로 예제 빌드</a></li>
+<li><a class="reference internal" href="#python-torchscript-c">Python 및 TorchScript의 C++ 클래스 사용</a></li>
+<li><a class="reference internal" href="#torchscript">커스텀 클래스를 사용하여 TorchScript 코드 저장, 읽기 및 실행</a></li>
+<li><a class="reference internal" href="#ivalues">커스텀 클래스를 IValues로/에서 이동</a></li>
+<li><a class="reference internal" href="#id2">커스텀 C++ 클래스에 대한 직렬화/역직렬화 방법 정의</a></li>
+<li><a class="reference internal" href="#id4">바인딩된 C++ 클래스를 사용하거나 반환하는 커스텀 연산자 정의</a></li>
+<li><a class="reference internal" href="#id6">결론</a></li>
 </ul>
 </li>
 </ul>

@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>(beta) Building a Convolution/Batch Norm fuser in FX &mdash; PyTorch Tutorials 1.9.0+cu102 documentation</title>
+  <title>(베타) FX에서 합성곱/배치 정규화(Convolution/Batch Norm) 결합기(Fuser) 만들기 &mdash; PyTorch Tutorials 1.9.0+cu102 documentation</title>
   
 
   
@@ -207,7 +207,7 @@
 </ul>
 <p class="caption"><span class="caption-text">Code Transforms with FX</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">(beta) Building a Convolution/Batch Norm fuser in FX</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">(베타) FX에서 합성곱/배치 정규화(Convolution/Batch Norm) 결합기(Fuser) 만들기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="fx_profiling_tutorial.html">(beta) Building a Simple CPU Performance Profiler with FX</a></li>
 </ul>
 <p class="caption"><span class="caption-text">프론트엔드 API</span></p>
@@ -221,7 +221,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_extension.html">Custom C++ and CUDA Extensions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/torch_script_custom_ops.html">Extending TorchScript with Custom C++ Operators</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../advanced/torch_script_custom_classes.html">Extending TorchScript with Custom C++ Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/torch_script_custom_classes.html">커스텀 C++ 클래스로 TorchScript 확장하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/dispatcher.html">Registering a Dispatched Operator in C++</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/extend_dispatcher.html">Extending dispatcher for a new backend in C++</a></li>
 </ul>
@@ -241,7 +241,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/dist_overview.html">PyTorch Distributed Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="model_parallel_tutorial.html">단일 머신을 사용한 모델 병렬화 모범 사례</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ddp_tutorial.html">Getting Started with Distributed Data Parallel</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ddp_tutorial.html">분산 데이터 병렬 처리 시작하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dist_tuto.html">PyTorch로 분산 어플리케이션 개발하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rpc_tutorial.html">Getting Started with Distributed RPC Framework</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rpc_param_server_tutorial.html">Implementing a Parameter Server Using Distributed RPC Framework</a></li>
@@ -253,7 +253,7 @@
 </ul>
 <p class="caption"><span class="caption-text">Mobile</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/deeplabv3_on_ios.html">Image Segmentation DeepLabV3 on iOS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/deeplabv3_on_ios.html">iOS에서의 이미지 분할 DeepLapV3</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/deeplabv3_on_android.html">안드로이드에서의 이미지 분할 DeepLapV3</a></li>
 </ul>
 
@@ -295,7 +295,7 @@
       </li>
 
         
-      <li>(beta) Building a Convolution/Batch Norm fuser in FX</li>
+      <li>(베타) FX에서 합성곱/배치 정규화(Convolution/Batch Norm) 결합기(Fuser) 만들기</li>
     
     
       <li class="pytorch-breadcrumbs-aside">
@@ -353,20 +353,19 @@
 <p class="first admonition-title">Note</p>
 <p class="last">Click <a class="reference internal" href="#sphx-glr-download-intermediate-fx-conv-bn-fuser-py"><span class="std std-ref">here</span></a> to download the full example code</p>
 </div>
-<div class="sphx-glr-example-title section" id="beta-building-a-convolution-batch-norm-fuser-in-fx">
-<span id="sphx-glr-intermediate-fx-conv-bn-fuser-py"></span><h1>(beta) Building a Convolution/Batch Norm fuser in FX<a class="headerlink" href="#beta-building-a-convolution-batch-norm-fuser-in-fx" title="Permalink to this headline">¶</a></h1>
-<p><strong>Author</strong>: <a class="reference external" href="https://github.com/chillee">Horace He</a></p>
-<p>In this tutorial, we are going to use FX, a toolkit for composable function
-transformations of PyTorch, to do the following:</p>
+<div class="sphx-glr-example-title section" id="fx-convolution-batch-norm-fuser">
+<span id="sphx-glr-intermediate-fx-conv-bn-fuser-py"></span><h1>(베타) FX에서 합성곱/배치 정규화(Convolution/Batch Norm) 결합기(Fuser) 만들기<a class="headerlink" href="#fx-convolution-batch-norm-fuser" title="Permalink to this headline">¶</a></h1>
+<p><strong>저자</strong>: <a class="reference external" href="https://github.com/chillee">Horace He</a></p>
+<p><strong>번역:</strong> <a class="reference external" href="https://github.com/kozeldark">오찬희</a></p>
+<p>이 튜토리얼에서는 PyTorch의 구성 가능한 함수의 변환을 위한 툴킷인 FX를 사용하여 다음을 수행하고자 합니다.</p>
 <ol class="arabic simple">
-<li>Find patterns of conv/batch norm in the data dependencies.</li>
-<li>For the patterns found in 1), fold the batch norm statistics into the convolution weights.</li>
+<li>데이터 의존성에서 합성곱/배치 정규화 패턴을 찾습니다.</li>
+<li>1번에서 발견된 패턴의 경우 배치 정규화 통계를 합성곱 가중치로 결합합니다(folding).</li>
 </ol>
-<p>Note that this optimization only works for models in inference mode (i.e. <cite>mode.eval()</cite>)</p>
-<p>We will be building the fuser that exists here:
+<p>이 최적화는 추론 모드(즉, <cite>mode.eval()</cite>)의 모델에만 적용된다는 점에 유의하세요.</p>
+<p>다음 링크에 있는 결합기를 만들 것입니다.
 <a class="reference external" href="https://github.com/pytorch/pytorch/blob/orig/release/1.8/torch/fx/experimental/fuser.py">https://github.com/pytorch/pytorch/blob/orig/release/1.8/torch/fx/experimental/fuser.py</a>
-First, let’s get some imports out of the way (we will be using all
-of these later in the code).</p>
+몇 가지의 import 과정을 먼저 처리해줍시다(나중에 코드에서 모두 사용할 것입니다).</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Type</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Iterable</span>
 <span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">import</span> <span class="nn">torch.fx</span> <span class="k">as</span> <span class="nn">fx</span>
@@ -374,10 +373,10 @@ of these later in the code).</p>
 <span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
 </pre></div>
 </div>
-<p>For this tutorial, we are going to create a model consisting of convolutions
-and batch norms. Note that this model has some tricky components - some of
-the conv/batch norm patterns are hidden within Sequentials and one of the
-BatchNorms is wrapped in another Module.</p>
+<p>이 튜토리얼에서는 합성곱과 배치 정규화로 구성된 모델을 만들 것입니다.
+이 모델에는 아래와 같은 까다로운 요소가 있습니다.
+합성곱/배치 정규화 패턴 중의 일부는 시퀀스에 숨겨져 있고
+배치 정규화 중 하나는 다른 모듈로 감싸져 있습니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">WrappedBatchNorm</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
@@ -410,39 +409,36 @@ BatchNorms is wrapped in another Module.</p>
 <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
 </pre></div>
 </div>
-<div class="section" id="fusing-convolution-with-batch-norm">
-<h2>Fusing Convolution with Batch Norm<a class="headerlink" href="#fusing-convolution-with-batch-norm" title="Permalink to this headline">¶</a></h2>
-<p>One of the primary challenges with trying to automatically fuse convolution
-and batch norm in PyTorch is that PyTorch does not provide an easy way of
-accessing the computational graph. FX resolves this problem by symbolically
-tracing the actual operations called, so that we can track the computations
-through the <cite>forward</cite> call, nested within Sequential modules, or wrapped in
-an user-defined module.</p>
+<div class="section" id="id2">
+<h2>합성곱과 배치 정규화 결합하기<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<p>PyTorch에서 합성곱과 배치 정규화를 자동으로 결합하려고 할 때 가장 큰 어려움 중 하나는
+PyTorch가 계산 그래프에 쉽게 접근할 수 있는 방법을 제공하지 않는다는 것입니다.
+FX는 호출된 실제 연산을 기호적(symbolically)으로 추적하여 이 문제를 해결하므로 순차적 모듈 내에 중첩되거나
+사용자 정의 모듈로 감싸진 <cite>forward</cite> 호출을 통해 계산을 추적할 수 있습니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">traced_model</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">fx</span><span class="o">.</span><span class="n">symbolic_trace</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">traced_model</span><span class="o">.</span><span class="n">graph</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>This gives us a graph representation of our model. Note that both the modules
-hidden within the sequential as well as the wrapped Module have been inlined
-into the graph. This is the default level of abstraction, but it can be
-configured by the pass writer. More information can be found at the FX
-overview <a class="reference external" href="https://pytorch.org/docs/master/fx.html#module-torch.fx">https://pytorch.org/docs/master/fx.html#module-torch.fx</a></p>
+<p>이렇게 하면 모델을 그래프로 나타낼 수 있습니다.
+순차적 모듈 및 감싸진 모듈 내에 숨겨진 두 모듈이 모두 그래프에 삽입되어 있습니다.
+이는 기본 추상화 수준이지만 전달 기록기(pass writer)에서 구성할 수 있습니다.
+자세한 내용은 다음 링크의 FX 개요에서 확인할 수 있습니다.
+<a class="reference external" href="https://pytorch.org/docs/master/fx.html#module-torch.fx">https://pytorch.org/docs/master/fx.html#module-torch.fx</a></p>
 </div>
-<div class="section" id="id1">
-<h2>Fusing Convolution with Batch Norm<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
-<p>Unlike some other fusions, fusion of convolution with batch norm does not
-require any new operators. Instead, as batch norm during inference
-consists of a pointwise add and multiply, these operations can be “baked”
-into the preceding convolution’s weights. This allows us to remove the batch
-norm entirely from our model! Read
-<a class="reference external" href="https://nenadmarkus.com/p/fusing-batchnorm-and-conv/">https://nenadmarkus.com/p/fusing-batchnorm-and-conv/</a> for further details. The
-code here is copied from
-<a class="reference external" href="https://github.com/pytorch/pytorch/blob/orig/release/1.8/torch/nn/utils/fusion.py">https://github.com/pytorch/pytorch/blob/orig/release/1.8/torch/nn/utils/fusion.py</a>
-clarity purposes.</p>
+<div class="section" id="id3">
+<h2>합성곱과 배치 정규화 결합하기<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
+<p>일부 다른 결합과 달리, 합성곱과 배치 정규화의 결합은 새로운 연산자를 필요로 하지 않습니다.
+대신, 추론 중 배치 정규화는 점별 덧셈과 곱셈으로 구성되므로,
+이러한 연산은 이전 합성곱의 가중치로 “미리 계산되어 저장(baked)” 될 수 있습니다.
+이를 통해 배치 정규화를 모델에서 완전히 제거할 수 있습니다!
+자세한 내용은 다음 링크에서 확인 할 수 있습니다.
+<a class="reference external" href="https://nenadmarkus.com/p/fusing-batchnorm-and-conv/">https://nenadmarkus.com/p/fusing-batchnorm-and-conv/</a>
+이 코드는 명확성을 위해 다음 링크에서 복사한 것입니다.
+<a class="reference external" href="https://github.com/pytorch/pytorch/blob/orig/release/1.8/torch/nn/utils/fusion.py">https://github.com/pytorch/pytorch/blob/orig/release/1.8/torch/nn/utils/fusion.py</a></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">fuse_conv_bn_eval</span><span class="p">(</span><span class="n">conv</span><span class="p">,</span> <span class="n">bn</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Given a conv Module `A` and an batch_norm module `B`, returns a conv</span>
-<span class="sd">    module `C` such that C(x) == B(A(x)) in inference mode.</span>
+<span class="sd">    합성곱 모듈 &#39;A&#39;와 배치 정규화 모듈 &#39;B&#39;가 주어지면</span>
+<span class="sd">    C(x) == B(A(x))를 만족하는 합성곱 모듈 &#39;C&#39;를 추론 모드로 반환합니다.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="p">(</span><span class="n">conv</span><span class="o">.</span><span class="n">training</span> <span class="ow">or</span> <span class="n">bn</span><span class="o">.</span><span class="n">training</span><span class="p">)),</span> <span class="s2">&quot;Fusion only for eval!&quot;</span>
     <span class="n">fused_conv</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">conv</span><span class="p">)</span>
@@ -469,15 +465,14 @@ clarity purposes.</p>
 </pre></div>
 </div>
 </div>
-<div class="section" id="fx-fusion-pass">
-<h2>FX Fusion Pass<a class="headerlink" href="#fx-fusion-pass" title="Permalink to this headline">¶</a></h2>
-<p>Now that we have our computational graph as well as a method for fusing
-convolution and batch norm, all that remains is to iterate over the FX graph
-and apply the desired fusions.</p>
+<div class="section" id="fx-pass">
+<h2>FX 결합 전달(pass)<a class="headerlink" href="#fx-pass" title="Permalink to this headline">¶</a></h2>
+<p>이제 합성곱과 배치 정규화를 결합하는 방법뿐만 아니라 계산 그래프도 얻었으므로
+남은 것은 FX 그래프에 절차를 반복하고 원하는 결합을 적용하는 것입니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">_parent_name</span><span class="p">(</span><span class="n">target</span> <span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Splits a qualname into parent path and last atom.</span>
-<span class="sd">    For example, `foo.bar.baz` -&gt; (`foo.bar`, `baz`)</span>
+<span class="sd">    정규화 된 이름(qualname)을 부모경로(parent path)와 마지막 요소(last atom)로 나눠줍니다.</span>
+<span class="sd">    예를 들어, `foo.bar.baz` -&gt; (`foo.bar`, `baz`)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="o">*</span><span class="n">parent</span><span class="p">,</span> <span class="n">name</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">parent</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">parent</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">name</span>
@@ -490,62 +485,57 @@ and apply the desired fusions.</p>
 
 <span class="k">def</span> <span class="nf">fuse</span><span class="p">(</span><span class="n">model</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">:</span>
     <span class="n">model</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
-    <span class="c1"># The first step of most FX passes is to symbolically trace our model to</span>
-    <span class="c1"># obtain a `GraphModule`. This is a representation of our original model</span>
-    <span class="c1"># that is functionally identical to our original model, except that we now</span>
-    <span class="c1"># also have a graph representation of our forward pass.</span>
+    <span class="c1"># 대부분의 FX 전달의 첫 번째 단계는 `GraphModule` 을 얻기 위해</span>
+    <span class="c1"># 모델을 기호적으로 추적하는 것입니다.</span>
+    <span class="c1"># 이것은 원래 모델과 기능적으로 동일한 원래 모델의 표현입니다.</span>
+    <span class="c1"># 단, 이제는 순전파 단계(forward pass)에 대한 그래프 표현도 가지고 있습니다.</span>
     <span class="n">fx_model</span><span class="p">:</span> <span class="n">fx</span><span class="o">.</span><span class="n">GraphModule</span> <span class="o">=</span> <span class="n">fx</span><span class="o">.</span><span class="n">symbolic_trace</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
     <span class="n">modules</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">fx_model</span><span class="o">.</span><span class="n">named_modules</span><span class="p">())</span>
 
-    <span class="c1"># The primary representation for working with FX are the `Graph` and the</span>
-    <span class="c1"># `Node`. Each `GraphModule` has a `Graph` associated with it - this</span>
-    <span class="c1"># `Graph` is also what generates `GraphModule.code`.</span>
-    <span class="c1"># The `Graph` itself is represented as a list of `Node` objects. Thus, to</span>
-    <span class="c1"># iterate through all of the operations in our graph, we iterate over each</span>
-    <span class="c1"># `Node` in our `Graph`.</span>
+    <span class="c1"># FX 작업을 위한 기본 표현은 `그래프(Graph)` 와 `노드(Node)` 입니다.</span>
+    <span class="c1"># 각 `GraphModule` 에는 연관된 `그래프` 가 있습니다.</span>
+    <span class="c1"># 이 `그래프` 는 `GraphModule.code` 를 생성하는 것이기도 합니다.</span>
+    <span class="c1"># `그래프` 자체는 `노드` 객체의 목록으로 표시됩니다.</span>
+    <span class="c1"># 따라서 그래프의 모든 작업을 반복하기 위해 `그래프` 에서 각 `노드` 에 대해 반복합니다.</span>
     <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">fx_model</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">nodes</span><span class="p">:</span>
-        <span class="c1"># The FX IR contains several types of nodes, which generally represent</span>
-        <span class="c1"># call sites to modules, functions, or methods. The type of node is</span>
-        <span class="c1"># determined by `Node.op`.</span>
-        <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">op</span> <span class="o">!=</span> <span class="s1">&#39;call_module&#39;</span><span class="p">:</span> <span class="c1"># If our current node isn&#39;t calling a Module then we can ignore it.</span>
+        <span class="c1"># FX IR 에는 일반적으로 모듈, 함수 또는 메소드에 대한</span>
+        <span class="c1"># 호출 사이트를 나타내는 여러 유형의 노드가 있습니다.</span>
+        <span class="c1"># 노드의 유형은 `Node.op` 에 의해 결정됩니다.</span>
+        <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">op</span> <span class="o">!=</span> <span class="s1">&#39;call_module&#39;</span><span class="p">:</span> <span class="c1"># 현재 노드가 모듈을 호출하지 않으면 무시할 수 있습니다.</span>
             <span class="k">continue</span>
-        <span class="c1"># For call sites, `Node.target` represents the module/function/method</span>
-        <span class="c1"># that&#39;s being called. Here, we check `Node.target` to see if it&#39;s a</span>
-        <span class="c1"># batch norm module, and then check `Node.args[0].target` to see if the</span>
-        <span class="c1"># input `Node` is a convolution.</span>
+        <span class="c1"># 호출 사이트의 경우, `Node.target` 은 호출되는 모듈/함수/방법을 나타냅니다.</span>
+        <span class="c1"># 여기서는 &#39;Node.target&#39; 을 확인하여 배치 정규화 모듈인지 확인한 다음</span>
+        <span class="c1"># `Node.args[0].target` 을 확인하여 입력 `노드` 가 합성곱인지 확인합니다.</span>
         <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">modules</span><span class="p">[</span><span class="n">node</span><span class="o">.</span><span class="n">target</span><span class="p">])</span> <span class="ow">is</span> <span class="n">nn</span><span class="o">.</span><span class="n">BatchNorm2d</span> <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="n">modules</span><span class="p">[</span><span class="n">node</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">target</span><span class="p">])</span> <span class="ow">is</span> <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">users</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>  <span class="c1"># Output of conv is used by other nodes</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">users</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>  <span class="c1"># 합성곱 출력은 다른 노드에서 사용됩니다.</span>
                 <span class="k">continue</span>
             <span class="n">conv</span> <span class="o">=</span> <span class="n">modules</span><span class="p">[</span><span class="n">node</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">target</span><span class="p">]</span>
             <span class="n">bn</span> <span class="o">=</span> <span class="n">modules</span><span class="p">[</span><span class="n">node</span><span class="o">.</span><span class="n">target</span><span class="p">]</span>
             <span class="n">fused_conv</span> <span class="o">=</span> <span class="n">fuse_conv_bn_eval</span><span class="p">(</span><span class="n">conv</span><span class="p">,</span> <span class="n">bn</span><span class="p">)</span>
             <span class="n">replace_node_module</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">modules</span><span class="p">,</span> <span class="n">fused_conv</span><span class="p">)</span>
-            <span class="c1"># As we&#39;ve folded the batch nor into the conv, we need to replace all uses</span>
-            <span class="c1"># of the batch norm with the conv.</span>
+            <span class="c1"># 배치 정규화를 합성곱으로 결합했기 때문에</span>
+            <span class="c1"># 배치 정규화의 사용을 모두 합성곱으로 교체해야 합니다.</span>
             <span class="n">node</span><span class="o">.</span><span class="n">replace_all_uses_with</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-            <span class="c1"># Now that all uses of the batch norm have been replaced, we can</span>
-            <span class="c1"># safely remove the batch norm.</span>
+            <span class="c1"># 배치 정규화 사용을 모두 교체했으므로</span>
+            <span class="c1"># 안전하게 배치 정규화를 제거할 수 있습니다.</span>
             <span class="n">fx_model</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">erase_node</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
     <span class="n">fx_model</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">lint</span><span class="p">()</span>
-    <span class="c1"># After we&#39;ve modified our graph, we need to recompile our graph in order</span>
-    <span class="c1"># to keep the generated code in sync.</span>
+    <span class="c1"># 그래프를 수정한 후에는 생성된 코드를 동기화하기 위해 그래프를 다시 컴파일해야 합니다.</span>
     <span class="n">fx_model</span><span class="o">.</span><span class="n">recompile</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">fx_model</span>
 </pre></div>
 </div>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">We make some simplifications here for demonstration purposes, such as only
-matching 2D convolutions. View
-<a class="reference external" href="https://github.com/pytorch/pytorch/blob/master/torch/fx/experimental/fuser.py">https://github.com/pytorch/pytorch/blob/master/torch/fx/experimental/fuser.py</a>
-for a more usable pass.</p>
+<p class="last">여기서는 2D 합성곱만 일치시키는 등 시연 목적으로 약간의 단순화를 하였습니다.
+더 유용한 전달은 다음 링크를 참조하십시오.
+<a class="reference external" href="https://github.com/pytorch/pytorch/blob/master/torch/fx/experimental/fuser.py">https://github.com/pytorch/pytorch/blob/master/torch/fx/experimental/fuser.py</a></p>
 </div>
 </div>
-<div class="section" id="testing-out-our-fusion-pass">
-<h2>Testing out our Fusion Pass<a class="headerlink" href="#testing-out-our-fusion-pass" title="Permalink to this headline">¶</a></h2>
-<p>We can now run this fusion pass on our initial toy model and verify that our
-results are identical. In addition, we can print out the code for our fused
-model and verify that there are no more batch norms.</p>
+<div class="section" id="fusion-pass">
+<h2>결합 전달(Fusion pass) 실험하기<a class="headerlink" href="#fusion-pass" title="Permalink to this headline">¶</a></h2>
+<p>이제 아주 작은 초기 모델에 대해 이 결합 전달을 실행해 결과가 동일한지 확인할 수 있습니다.
+또한 결합 모델의 코드를 출력하여 더 이상 배치 정규화가 없는지 확인할 수 있습니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fused_model</span> <span class="o">=</span> <span class="n">fuse</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">fused_model</span><span class="o">.</span><span class="n">code</span><span class="p">)</span>
 <span class="n">inp</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
@@ -553,10 +543,10 @@ model and verify that there are no more batch norms.</p>
 </pre></div>
 </div>
 </div>
-<div class="section" id="benchmarking-our-fusion-on-resnet18">
-<h2>Benchmarking our Fusion on ResNet18<a class="headerlink" href="#benchmarking-our-fusion-on-resnet18" title="Permalink to this headline">¶</a></h2>
-<p>We can test our fusion pass on a larger model like ResNet18 and see how much
-this pass improves inference performance.</p>
+<div class="section" id="resnet18">
+<h2>ResNet18에서 결합 벤치마킹하기<a class="headerlink" href="#resnet18" title="Permalink to this headline">¶</a></h2>
+<p>이제 ResNet18과 같은 대형 모델에서 결합 전달을 실험하고
+이 전달이 추론 성능을 얼마나 향상시키는지 확인할 수 있습니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torchvision.models</span> <span class="k">as</span> <span class="nn">models</span>
 <span class="kn">import</span> <span class="nn">time</span>
 
@@ -579,25 +569,22 @@ this pass improves inference performance.</p>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Fused time: &quot;</span><span class="p">,</span> <span class="n">benchmark</span><span class="p">(</span><span class="n">fused_rn18</span><span class="p">))</span>
 </pre></div>
 </div>
-<p>As we previously saw, the output of our FX transformation is
-(Torchscriptable) PyTorch code, we can easily <cite>jit.script</cite> the output to try
-and increase our performance even more. In this way, our FX model
-transformation composes with Torchscript with no issues.</p>
+<p>앞서 살펴본 바와 같이, FX 변환의 출력은 (Torchscriptable) PyTorch 코드입니다.
+따라서 <cite>jit.script</cite> 를 통해 쉽게 출력하여 성능을 더 높일 수 있습니다.
+이러한 방식으로 FX 모델 변환은 Torchscript와 아무런 문제 없이 구성됩니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">jit_rn18</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">script</span><span class="p">(</span><span class="n">fused_rn18</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;jit time: &quot;</span><span class="p">,</span> <span class="n">benchmark</span><span class="p">(</span><span class="n">jit_rn18</span><span class="p">))</span>
 
 
-<span class="c1">############</span>
-<span class="c1"># Conclusion</span>
-<span class="c1"># ----------</span>
-<span class="c1"># As we can see, using FX we can easily write static graph transformations on</span>
-<span class="c1"># PyTorch code.</span>
+<span class="c1">######</span>
+<span class="c1"># 결론</span>
+<span class="c1"># ---</span>
+<span class="c1"># FX를 사용하면 PyTorch 코드에 정적 그래프 변환을 쉽게 작성할 수 있습니다.</span>
 <span class="c1">#</span>
-<span class="c1"># Since FX is still in beta, we would be happy to hear any</span>
-<span class="c1"># feedback you have about using it. Please feel free to use the</span>
-<span class="c1"># PyTorch Forums (https://discuss.pytorch.org/) and the issue tracker</span>
-<span class="c1"># (https://github.com/pytorch/pytorch/issues) to provide any feedback</span>
-<span class="c1"># you might have.</span>
+<span class="c1"># FX는 아직 베타 버전이기 때문에 FX 사용에 대한 피드백을 보내주시면 감사하겠습니다.</span>
+<span class="c1"># PyTorch 포럼 (https://discuss.pytorch.org/)</span>
+<span class="c1"># 이슈 추적기 (https://github.com/pytorch/pytorch/issues)</span>
+<span class="c1"># 위 두 링크를 사용하여 피드백을 제공해주시면 됩니다.</span>
 </pre></div>
 </div>
 <p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.000 seconds)</p>
@@ -665,12 +652,12 @@ transformation composes with Torchscript with no issues.</p>
           <div class="pytorch-right-menu" id="pytorch-right-menu">
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
-<li><a class="reference internal" href="#">(beta) Building a Convolution/Batch Norm fuser in FX</a><ul>
-<li><a class="reference internal" href="#fusing-convolution-with-batch-norm">Fusing Convolution with Batch Norm</a></li>
-<li><a class="reference internal" href="#id1">Fusing Convolution with Batch Norm</a></li>
-<li><a class="reference internal" href="#fx-fusion-pass">FX Fusion Pass</a></li>
-<li><a class="reference internal" href="#testing-out-our-fusion-pass">Testing out our Fusion Pass</a></li>
-<li><a class="reference internal" href="#benchmarking-our-fusion-on-resnet18">Benchmarking our Fusion on ResNet18</a></li>
+<li><a class="reference internal" href="#">(베타) FX에서 합성곱/배치 정규화(Convolution/Batch Norm) 결합기(Fuser) 만들기</a><ul>
+<li><a class="reference internal" href="#id2">합성곱과 배치 정규화 결합하기</a></li>
+<li><a class="reference internal" href="#id3">합성곱과 배치 정규화 결합하기</a></li>
+<li><a class="reference internal" href="#fx-pass">FX 결합 전달(pass)</a></li>
+<li><a class="reference internal" href="#fusion-pass">결합 전달(Fusion pass) 실험하기</a></li>
+<li><a class="reference internal" href="#resnet18">ResNet18에서 결합 벤치마킹하기</a></li>
 </ul>
 </li>
 </ul>
