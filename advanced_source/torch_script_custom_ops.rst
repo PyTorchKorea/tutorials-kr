@@ -46,8 +46,8 @@ script.h`` 헤더와 함께 사용자 지정 TorchScript 연산자를 작성하�
 
 .. attention::
 
-  TorchScript 컴파일러는 고정된 수의 유형을 이해합니다. 이러한 유형만 사용자 지정 연산자에 대한 인수로 사용할 수 있습니다. 
-  현재 이러한 유형은 다음과 같습니다: ``torch::Tensor`` , ``torch::Scalar`` , ``double`` , ``int64_t`` 및 ``std::vector`` 의 이러한 유형들. ``float`` 가 아니라 *오직* ``double`` 이며, ``int`` , ``short`` 이나 ``long`` 처럼 다른 정수타입이 아닌 *오직*  
+TorchScript 컴파일러는 아래 나열된 유형(type)만을 사용자 지정 연산자에 대한 인수로 사용할 수 있습니다.
+  현재 사용 가능한 유형은 다음과 같습니다: ``torch::Tensor`` , ``torch::Scalar`` , ``double`` , ``int64_t`` 및 ``std::vector`` 의 이러한 유형들. ``float`` 가 아니라 *오직* ``double`` 이며, ``int`` , ``short`` 이나 ``long`` 처럼 다른 정수타입이 아닌 *오직*  
   ``int64_t`` 을 지원합니다. 
 
 함수 내부에서 가장 먼저 해야 할 일은 PyTorch 텐서를 OpenCV 행렬로 변환하는 것 입니다. OpenCV ``warpPerspective`` 는 ``cv::Mat`` 객체를 입력으로 기대하기 때문입니다. 다행히 데이터를 **복사하지 않고** 이 작업을 수행할 수 있는 방법이 있습니다. 
@@ -122,12 +122,12 @@ TorchScript의 유형 시스템 내에서 연산자 유형을 지정하는 연�
 이제 C++로 사용자 정의 연산자를 구현하고 등록 코드를 작성했으므로 연구 및 실험을 위해 Python으로 로드하거나 Python이 아닌 
 환경에서 추론을 위해 C++로 로드할 수 있는 (공유) 라이브러리로 연산자를 빌드할 때입니다. 순수 CMake 또는 ``setuptools`` 
 과 같은 Python 대안을 사용하여 연산자를 빌드하는 여러 가지 방법이 있습니다. 간결함을 위해 아래 단락에서는 CMake 접근 방식에 
-대해서만 설명합니다. 이 튜토리얼의 부록에서는 다른 대안을 다룹니다.
+대해서만 설명합니다. 이 튜토리얼의 부록에서는 다른 방식을 다룹니다.
 
 환경 설정
 *****************
 
-PyTorch와 OpenCV를 설치해야 합니다. 둘 다를 가장 쉽고 가장 플랫폼에 독립적으로 얻을 수 있는 방법 Conda:: 
+아래 Conda 명령을 통해 플랫폼에 영향을 받지 않으면서 쉽게 설치할 수 있습니다 :: 
 
   conda install -c pytorch pytorch
   conda install opencv
@@ -136,8 +136,7 @@ CMake로 빌드
 *******************
 
 `CMake <https://cmake.org>`_ 빌드 시스템을 사용하여 사용자 지정 연산자를 공유 라이브러리에 빌드하려면 짧은 
-``CMakeLists.txt`` 파일 을 작성 하고 이전  ``op.cpp`` 파일과 함께 배치해야 합니다. 이를 위해 다음과 같은 디렉토리 
-구조에 동의합니다 ::
+``CMakeLists.txt`` 파일 을 작성 하고 이전  ``op.cpp`` 파일과 함께 배치해야 합니다. 이를 위한 디렉토리 구조는 아래와 같이 설정되어야 합니다. ::
 
   warp-perspective/
     op.cpp
@@ -193,13 +192,12 @@ CMake로 빌드
 변수 ``torch.utils.cmake_prefix_path`` 를 사용하여 PyTorch 설치를 위한 cmake 파일이 어디에 있는지 편리하게 
 알려줍니다.
 
-아래에서 연산자를 사용하고 호출하는 방법을 자세히 살펴보겠지만 더 일찍 성공을 느껴보기 위해 Python에서 다음 코드를 실행할 수 
-있습니다. : 
+아래에서 연산자를 사용하고 호출하는 방법을 자세히 살펴보겠지만 Python에서 다음 코드를 통해 미리 실행해볼 수 있습니다. : 
 
 .. literalinclude:: ../advanced_source/torch_script_custom_ops/smoke_test.py
   :language: python
 
-모두 잘되었다면 다음과 같이 인쇄됩니다. ::
+모두 잘되었다면 다음과 같이 출력됩니다. ::
 
   <built-in method my_ops::warp_perspective of PyCapsule object at 0x7f618fc6fa50>
 
@@ -362,7 +360,7 @@ TorchScript 컴파일러가 프로그램에 대해 더 쉽게 추론할 수 있�
         z = 10
     return x.matmul(y) + z
 
-이것은 ``compute`` 함수를 그래프로 적절한 때에 컴파일합니다.표현은 ``compute.graph``
+이것은 ``compute`` 함수를 그래프로 즉시 컴파일합니다.표현은 ``compute.graph``
 속성에서 확인할 수 있습니다.
 
 .. code-block:: python
@@ -391,7 +389,7 @@ TorchScript 컴파일러가 프로그램에 대해 더 쉽게 추론할 수 있�
     return (%15);
   }
 
-이제 이전과 같이 스크립트 코드 내에서 다른 함수처럼 사용자 지정 연산자를 사용할 수 있습니다.
+이제 이전과 같이 스크립트 내에서 다른 함수처럼 사용자 지정 연산자를 사용할 수 있습니다.
 
 .. code-block:: python
 
