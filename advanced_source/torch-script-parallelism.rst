@@ -25,7 +25,7 @@ TorchScript의 동적 병렬 처리(Dynamic Parallelism)
 
     @torch.jit.script
     def example(x):
-        # 병렬로 `foo` 를 호출합니다:
+        # 병렬적으로 `foo` 를 호출합니다.
         # 먼저, 작업을 "fork" 합니다. 이 작업은 `x` 인자(argument)와 함께 `foo` 를 실행합니다.
         future = torch.jit.fork(foo, x)
 
@@ -53,7 +53,7 @@ TorchScript의 동적 병렬 처리(Dynamic Parallelism)
 따라서, ``wait()`` 은 비동기 작업이 완료 될때까지 대기하고 값을 
 반환하는데 사용됩니다.
 
-이러한 구조는 함수 내에서 명령문 실행을 오버랩하거나
+이러한 구조는 함수 내에서 명령문 실행을 중첩하거나
 작업된 (예제 섹션에 표시됨) 루프와 같은 다른
 언어 구조로 구성 될 수 있습니다:
 
@@ -101,7 +101,7 @@ TorchScript의 동적 병렬 처리(Dynamic Parallelism)
     import torch, time
 
     # RNN 용어에서는 우리가 관심 갖는 차원들을 아래와 같이 부릅니다:
-    # 시간 단계의 # (T)
+    # 단위시간의 갯수 (T)
     # 배치 크기 (B)
     # "channels"의 숨겨진 크기/숫자 (C)
     T, B, C = 50, 50, 1024
@@ -174,7 +174,7 @@ Forward, Backward 계층 병렬화
 
         def forward(self, x : torch.Tensor) -> torch.Tensor:
             
-            # Forward 계층 - fork() 이므로 이는 backward 계층과 병렬로 실행될 수 있습니다.
+            # Backward 계층과 병렬로 실행시키기 위해 forward layer를 fork()를 한다.
             future_f = torch.jit.fork(self.cell_f, x)
 
             # Backward 계층. 시간 차원(time dimension)(dim 0)에서 입력을 flip (dim 0),
@@ -226,7 +226,7 @@ JSON 파일을 로드하면 다음과 같은 타임라인을 보게 될 겁니�
 앙상블에서의 병렬화 모델
 ------------------------------------
 
-당신은 이 코드에 더 많은 병렬화 기회가 있다는 것을 눈치챘을지도 모릅니다:
+이 코드에 더 많은 병렬화 기회가 있다는 것을 눈치챘을지도 모릅니다:
 ``LSTMEnsemble`` 에 포함된 모델들을 서로 병렬로 실행할 수도 있습니다.
 이렇게 하기 위한 방법은 아주 간단합니다.
 바로 ``LSTMEnsemble`` 의 ``forward`` 메소드를 변경하는 방법입니다:
@@ -246,7 +246,7 @@ JSON 파일을 로드하면 다음과 같은 타임라인을 보게 될 겁니�
 
             return torch.stack(results).sum(dim=0)
 
-또는, 만약 당신이 간결함을 중요하게 생각한다면 리스트 컴프리헨션(list comprehension)을 사용할 수 있습니다.
+또는, 만약 간결함을 중요하게 생각한다면 리스트 컴프리헨션(list comprehension)을 사용할 수 있습니다.
 
 .. code-block:: python
 
@@ -255,7 +255,7 @@ JSON 파일을 로드하면 다음과 같은 타임라인을 보게 될 겁니�
             results = [torch.jit.wait(fut) for fut in futures]
             return torch.stack(results).sum(dim=0)
 
-인트로에서 설명했듯이, 우리는 루프를 사용해 앙상블의 각 모델들에 대한 작업을 나눴습니다.
+서두에서 설명했듯이, 우리는 루프를 사용해 앙상블의 각 모델들에 대한 작업을 나눴습니다.
 그리고 모든 작업이 완료될 때까지 기다릴 다른 루프를 사용했습니다.
 이는 더 많은 계산의 오버랩을 제공합니다.
 
