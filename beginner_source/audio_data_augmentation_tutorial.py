@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 """
-Audio Data Augmentation
+오디오 데이터 보강
 =================
 
-``torchaudio`` provides a variety of ways to augment audio data.
+``torchaudio`` 는 오디오 데이터를 보강하는 다양한 방법을 제공합니다
 """
 
-# When running this tutorial in Google Colab, install the required packages
-# with the following.
+# Google Colab에서 이 튜토리얼을 실행할 때 다음을 사용하여 필수 패키지를 설치하십시오.
 # !pip install torchaudio
 
 import torch
@@ -18,19 +17,18 @@ print(torch.__version__)
 print(torchaudio.__version__)
 
 ######################################################################
-# Preparing data and utility functions (skip this section)
+# 데이터 및 유틸리티 기능 준비(이 섹션 건너뛰기)
 # --------------------------------------------------------
 #
 
-#@title Prepare data and utility functions. {display-mode: "form"}
+#@title 데이터 및 유틸리티 함수를 준비합니다. {display-mode: "form"}
 #@markdown
-#@markdown You do not need to look into this cell.
-#@markdown Just execute once and you are good to go.
+#@markdown 이 셀을 들여다볼 필요가 없습니다.
+#@markdown 한 번만 실행하면 됩니다.
 #@markdown
-#@markdown In this tutorial, we will use a speech data from [VOiCES dataset](https://iqtlabs.github.io/voices/), which is licensed under Creative Commos BY 4.0.
-
+#@markdown 이 튜토리얼에서는 Creative Commos 4.0에 따라 라이선스가 부여된 [VOiCES dataset](https://iqtlabs.github.io/voices/)의 음성 데이터를 사용합니다.
 #-------------------------------------------------------------------------------
-# Preparation of data and helper functions.
+# 데이터 및 도우미 기능 준비
 #-------------------------------------------------------------------------------
 
 import math
@@ -168,55 +166,49 @@ def get_noise_sample(*, resample=None):
 
 
 ######################################################################
-# Applying effects and filtering
+# 효과 적용 및 필터링
 # ------------------------------
 #
-# ``torchaudio.sox_effects`` allows for directly applying filters similar to
-# those available in ``sox`` to Tensor objects and file object audio sources.
+# ``torchaudio.sox_effects`` 를 사용하면 ``sox`` 에서 사용 가능한 것과 유사한 필터를
+# Tensor 개체 및 파일 개체 오디오 소스에 직접 적용할 수 있습니다.
 #
-# There are two functions for this:
+# 이를 위한 두 가지 함수이 있습니다.
 #
-# -  ``torchaudio.sox_effects.apply_effects_tensor`` for applying effects
-#    to Tensor.
-# -  ``torchaudio.sox_effects.apply_effects_file`` for applying effects to
-#    other audio sources.
+# -  Tensor에 효과를 적용하기 위한 ``torchaudio.sox_effects.apply_effects_tensor``.
+# - 다른 오디오 소스에 효과를 적용하기 위한 ``torchaudio.sox_effects.apply_effects_file``.
 #
-# Both functions accept effect definitions in the form
-# ``List[List[str]]``.
-# This is mostly consistent with how ``sox`` command works, but one caveat is
-# that ``sox`` adds some effects automatically, whereas ``torchaudio``’s
-# implementation does not.
+# 두 함수 모두 ``List[List[str]]`` 형식의 효과 정의를 허용합니다.
+# 이것은 대부분 ``sox`` 명령이 작동하는 방식과 일치하지만, 한 가지 주의할 점은 ``sox`` 는
+# 일부 효과를 자동으로 추가하는 반면, ``torchaudio`` 의 구현은 그렇지 않다는 것입니다.
 #
-# For the list of available effects, please refer to `the sox
-# documentation <http://sox.sourceforge.net/sox.html>`__.
+# 사용 가능한 효과 목록은 `sox 문서 <http://sox.sourceforge.net/sox.html>`__ 를 참조하십시오.
 #
-# **Tip** If you need to load and resample your audio data on the fly,
-# then you can use ``torchaudio.sox_effects.apply_effects_file`` with
-# effect ``"rate"``.
+# **Tip** 즉석에서 오디오 데이터를 로드하고 다시 샘플링해야 하는 경우 ``"rate"`` 효과와
+# 함께 ``torchaudio.sox_effects.apply_effects_file`` 을 사용할 수 있습니다.
 #
-# **Note** ``apply_effects_file`` accepts a file-like object or path-like
-# object. Similar to ``torchaudio.load``, when the audio format cannot be
-# inferred from either the file extension or header, you can provide
-# argument ``format`` to specify the format of the audio source.
+# **Note** ``apply_effects_file`` 은 파일류 객체나 경로류 객체를
+# 받아들입니다. ``torchaudio.load`` 와 유사하게
+# 파일 확장자나 헤더에서 오디오 형식을 유추할 수 없는 경우
+# 인수 ``형식`` 을 제공하여 오디오 소스의 형식을 지정할 수 있습니다.
 #
-# **Note** This process is not differentiable.
+# **Note** 이 과정은 미분할 수 없습니다.
 #
 
 
-# Load the data
+# 데이터 로드 Load the data
 waveform1, sample_rate1 = get_sample(resample=16000)
 
-# Define effects
+# 효과 정의 Define effects
 effects = [
-  ["lowpass", "-1", "300"], # apply single-pole lowpass filter
-  ["speed", "0.8"],  # reduce the speed
-                     # This only changes sample rate, so it is necessary to
-                     # add `rate` effect with original sample rate after this.
+  ["lowpass", "-1", "300"], # 단극 저역 통과 필터(low pass) 적용
+  ["speed", "0.8"],  # speed 줄이기
+                     # 샘플 rate만 변경하므로 이후에 원래 샘플 레이트와
+                     # 함께 'rate' 효과를 추가해야 합니다.
   ["rate", f"{sample_rate1}"],
   ["reverb", "-w"],  # Reverbration gives some dramatic feeling
 ]
 
-# Apply effects
+# 효과 적용 Apply effects
 waveform2, sample_rate2 = torchaudio.sox_effects.apply_effects_tensor(
     waveform1, sample_rate1, effects)
 
@@ -226,9 +218,8 @@ print_stats(waveform1, sample_rate=sample_rate1, src="Original")
 print_stats(waveform2, sample_rate=sample_rate2, src="Effects Applied")
 
 ######################################################################
-# Note that the number of frames and number of channels are different from
-# those of the original after the effects are applied. Let’s listen to the
-# audio. Doesn’t it sound more dramatic?
+# 효과를 적용한 후의 프레임 수와 채널 수는 원본과 다릅니다. 오디오를
+# 들어봅시다. 더 드라마틱하지 않나요?
 #
 
 plot_specgram(waveform1, sample_rate1, title="Original", xlim=(0, 3.04))
@@ -238,20 +229,18 @@ play_audio(waveform2, sample_rate2)
 
 
 ######################################################################
-# Simulating room reverberation
+# 룸 잔향 시뮬레이션
 # ----------------------------
 #
-# `Convolution
-# reverb <https://en.wikipedia.org/wiki/Convolution_reverb>`__ is a
-# technique that's used to make clean audio sound as though it has been
-# produced in a different environment.
+# `컨볼루션
+# 리버브 <https://en.wikipedia.org/wiki/Convolution_reverb>`__ 는 다른 환경에서
+# 생성된 것처럼 깨끗한 오디오 사운드를 만드는 데 사용되는 기술입니다.
 #
-# Using Room Impulse Response (RIR), for instance, we can make clean speech
-# sound as though it has been uttered in a conference room.
+# 예를 들어 RIR(Room Impulse Response)을 사용하면 회의실에서
+# 말하는 것처럼 깨끗한 음성을 만들 수 있습니다.
 #
-# For this process, we need RIR data. The following data are from the VOiCES
-# dataset, but you can record your own — just turn on your microphone
-# and clap your hands.
+# 이 프로세스를 위해서는 RIR 데이터가 필요합니다. 다음 데이터는 VOiCES 데이터 세트에서
+# 가져온 것이지만 직접 녹음할 수도 있습니다. 마이크를 켜고 박수를 치기만 하면 됩니다.
 #
 
 
@@ -264,8 +253,8 @@ plot_specgram(rir_raw, sample_rate, title="Room Impulse Response (raw)")
 play_audio(rir_raw, sample_rate)
 
 ######################################################################
-# First, we need to clean up the RIR. We extract the main impulse, normalize
-# the signal power, then flip along the time axis.
+# 먼저 RIR을 정리해야 합니다. 메인 임펄스를 추출하고 신호 전력을
+# 정규화한 다음 시간 축을 따라 뒤집습니다.
 #
 
 rir = rir_raw[:, int(sample_rate*1.01):int(sample_rate*1.3)]
@@ -276,7 +265,7 @@ print_stats(rir)
 plot_waveform(rir, sample_rate, title="Room Impulse Response", ylim=None)
 
 ######################################################################
-# Then, we convolve the speech signal with the RIR filter.
+# 그런 다음 RIR 필터를 사용하여 음성 신호를 합성합니다.
 #
 
 speech, _ = get_speech_sample(resample=sample_rate)
@@ -295,12 +284,12 @@ play_audio(augmented, sample_rate)
 
 
 ######################################################################
-# Adding background noise
+# 배경 소음 추가
 # -----------------------
 #
-# To add background noise to audio data, you can simply add a noise Tensor to
-# the Tensor representing the audio data. A common method to adjust the
-# intensity of noise is changing the Signal-to-Noise Ratio (SNR).
+# 오디오 데이터에 배경 잡음을 추가하려면 오디오 데이터를 나타내는
+# Tensor에 잡음 Tensor를 추가하기만 하면 됩니다. 노이즈 강도를 조정하는
+# 일반적인 방법은 SNR(Signal-to-Noise Ratio)을 변경하는 것입니다.
 # [`wikipedia <https://en.wikipedia.org/wiki/Signal-to-noise_ratio>`__]
 #
 # \begin{align}\mathrm{SNR} = \frac{P_\mathrm{signal}}{P_\mathrm{noise}}\end{align}
@@ -331,12 +320,12 @@ for snr_db in [20, 10, 3]:
   play_audio(noisy_speech, sample_rate)
 
 ######################################################################
-# Applying codec to Tensor object
+# Tensor 객체에 코덱 적용
 # -------------------------------
 #
-# ``torchaudio.functional.apply_codec`` can apply codecs to a Tensor object.
+# ``torchaudio.functional.apply_codec`` 는 Tensor 객체에 코덱을 적용할 수 있습니다.
 #
-# **Note** This process is not differentiable.
+# **Note** 이 과정은 미분할 수 없습니다.
 #
 
 
@@ -357,12 +346,11 @@ for param, title in configs:
   play_audio(augmented, sample_rate)
 
 ######################################################################
-# Simulating a phone recoding
+# 전화 녹음 시뮬레이션
 # ---------------------------
 #
-# Combining the previous techniques, we can simulate audio that sounds
-# like a person talking over a phone in a echoey room with people talking
-# in the background.
+# 이전 기술을 결합하여 사람들이 배경에서 말하는 소리가 들리는 방에서
+# 전화 통화를 하는 것처럼 들리는 오디오를 시뮬레이션할 수 있습니다.
 #
 
 sample_rate = 16000
@@ -371,7 +359,7 @@ speech, _ = get_speech_sample(resample=sample_rate)
 plot_specgram(speech, sample_rate, title="Original")
 play_audio(speech, sample_rate)
 
-# Apply RIR
+# RIR 적용
 rir, _ = get_rir_sample(resample=sample_rate, processed=True)
 speech_ = torch.nn.functional.pad(speech, (rir.shape[1]-1, 0))
 speech = torch.nn.functional.conv1d(speech_[None, ...], rir[None, ...])[0]
@@ -379,10 +367,9 @@ speech = torch.nn.functional.conv1d(speech_[None, ...], rir[None, ...])[0]
 plot_specgram(speech, sample_rate, title="RIR Applied")
 play_audio(speech, sample_rate)
 
-# Add background noise
-# Because the noise is recorded in the actual environment, we consider that
-# the noise contains the acoustic feature of the environment. Therefore, we add
-# the noise after RIR application.
+# 배경 소음 추가
+# 소음은 실제 환경에서 녹음되기 때문에 소음에는 환경의 음향적 특성이
+# 포함되어 있다고 간주합니다. 따라서 RIR 적용 후 노이즈를 추가합니다.
 noise, _ = get_noise_sample(resample=sample_rate)
 noise = noise[:, :speech.shape[1]]
 
@@ -393,7 +380,7 @@ speech = (scale * speech + noise) / 2
 plot_specgram(speech, sample_rate, title="BG noise added")
 play_audio(speech, sample_rate)
 
-# Apply filtering and change sample rate
+# 필터링 적용 및 샘플 레이트 변경
 speech, sample_rate = torchaudio.sox_effects.apply_effects_tensor(
   speech,
   sample_rate,
@@ -407,7 +394,7 @@ speech, sample_rate = torchaudio.sox_effects.apply_effects_tensor(
 plot_specgram(speech, sample_rate, title="Filtered")
 play_audio(speech, sample_rate)
 
-# Apply telephony codec
+# 적용 telephony codec
 speech = F.apply_codec(speech, sample_rate, format="gsm")
 
 plot_specgram(speech, sample_rate, title="GSM Codec Applied")
