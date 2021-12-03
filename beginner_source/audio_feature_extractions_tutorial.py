@@ -1,28 +1,25 @@
 # -*- coding: utf-8 -*-
 """
-Audio Feature Extractions
+오디오 기능 추출
 ===================
 
-``torchaudio`` implements feature extractions commonly used in the audio
-domain. They are available in ``torchaudio.functional`` and
-``torchaudio.transforms``.
+``torchaudio`` 는 오디오 도메인에서 일반적으로 사용되는 기능 추출을 구현합니다.
+이들은 ``torchaudio.functional`` 와 ``torchaudio.transforms``에서 이용할 수 있습니다.
 
-``functional`` implements features as standalone functions.
-They are stateless.
+``functional`` 은 독립형 기능으로 기능을 구현합니다.
+이들은 국적이 없습니다.
 
-``transforms`` implements features as objects,
-using implementations from ``functional`` and ``torch.nn.Module``. Because all
-transforms are subclasses of ``torch.nn.Module``, they can be serialized
-using TorchScript.
+``transforms`` 은 ``functional`` 과 ``torch.nn.Module`` 의 구현을 사용하여
+기능을 객체로 구현합니다. 모든 변환은 ``torch.nn.Module``의 하위 분류이기 때문에
+TorchScript를 사용하여 직렬화할 수 있습니다.
 
-For the complete list of available features, please refer to the
-documentation. In this tutorial, we will look into converting between the
-time domain and frequency domain (``Spectrogram``, ``GriffinLim``,
+사용 가능한 기능의 전체 목록은 설명서를 참조하십시오.
+이 튜토리얼에서는 시간 영역과 주파수 영역 간의
+변환을 살펴보겠습니다 (``Spectrogram``, ``GriffinLim``,
 ``MelSpectrogram``).
 """
 
-# When running this tutorial in Google Colab, install the required packages
-# with the following.
+# Google Colab에서 이 튜토리얼을 실행할 때 필요한 패키지를 다음과 같이 설치합니다.
 # !pip install torchaudio librosa
 
 import torch
@@ -34,19 +31,19 @@ print(torch.__version__)
 print(torchaudio.__version__)
 
 ######################################################################
-# Preparing data and utility functions (skip this section)
+# 데이터 및 utility 함수 준비 (skip this section)
 # --------------------------------------------------------
 #
 
-#@title Prepare data and utility functions. {display-mode: "form"}
+#@title 데이터 및 utility 함수 준비. {display-mode: "form"}
 #@markdown
-#@markdown You do not need to look into this cell.
-#@markdown Just execute once and you are good to go.
+#@markdown 이 부분을 자세히 살펴볼 필요는 없습니다.
+#@markdown 한번만 실행해보면 쉽게 할 수 있습니다.
 #@markdown
-#@markdown In this tutorial, we will use a speech data from [VOiCES dataset](https://iqtlabs.github.io/voices/), which is licensed under Creative Commos BY 4.0.
+#@markdown 이 튜토리얼에서는 Creative Commos BY 4.0에 따라 라이선스가 부여된 [VOiCES dataset](https://iqtlabs.github.io/voices/)의 음성데이터를 사용할 것입니다.
 
 #-------------------------------------------------------------------------------
-# Preparation of data and helper functions.
+# 데이터 및 helper 함수 준비.
 #-------------------------------------------------------------------------------
 
 import os
@@ -201,8 +198,8 @@ def plot_kaldi_pitch(waveform, sample_rate, pitch, nfcc):
 # Spectrogram
 # -----------
 #
-# To get the frequency make-up of an audio signal as it varies with time,
-# you can use ``Spectrogram``.
+# 시간에 따라 변하는 오디오 신호의 주파수 구성을 얻기 위해
+# ``Spectrogram``을 사용할 수 있습니다.
 #
 
 
@@ -232,7 +229,7 @@ plot_spectrogram(spec[0], title='torchaudio')
 # GriffinLim
 # ----------
 #
-# To recover a waveform from a spectrogram, you can use ``GriffinLim``.
+# Spectrogram에서 파형을 복구하기 위해 ``GriffinLim``을 사용할 수 있습니다.
 #
 
 
@@ -265,11 +262,11 @@ play_audio(waveform, sample_rate)
 # Mel Filter Bank
 # ---------------
 #
-# ``torchaudio.functional.create_fb_matrix`` generates the filter bank
-# for converting frequency bins to mel-scale bins.
+# ``torchaudio.functional.create_fb_matrix``는 주파수 빈을 
+# mel-scale 빈으로 변환하기 위한 Fiter Bank 를 생성합니다.
 #
-# Since this function does not require input audio/features, there is no
-# equivalent transform in ``torchaudio.transforms``.
+# 이 함수는 입력 오디오/특징을 필요로 하지 않기 때문에
+# ``torchaudio.transforms``에는 동등한 변환이 없습니다..
 #
 
 
@@ -288,11 +285,11 @@ mel_filters = F.create_fb_matrix(
 plot_mel_fbank(mel_filters, "Mel Filter Bank - torchaudio")
 
 ######################################################################
-# Comparison against librosa
+# librosa와 비교
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-# For reference, here is the equivalent way to get the mel filter bank
-# with ``librosa``.
+# 참고로 여기 ``librosa`` 가 있는 mel filter bank를 얻는
+# 동등한 방법이 있습니다.
 #
 
 
@@ -315,9 +312,9 @@ print('Mean Square Difference: ', mse)
 # MelSpectrogram
 # --------------
 #
-# Generating a mel-scale spectrogram involves generating a spectrogram
-# and performing mel-scale conversion. In ``torchaudio``, ``MelSpectrogram`` provides
-# this functionality.
+# mel-scale spectrogram을 생성하는 것은 spectrogram을 생성하고 mel-scale 변환을 수행하는 것을 포함합니다.
+# ``torchaudio``, ``MelSpectrogram`` 에서 이러한 기능을 제공합니다.
+# 
 #
 
 
@@ -347,11 +344,11 @@ plot_spectrogram(
     melspec[0], title="MelSpectrogram - torchaudio", ylabel='mel freq')
 
 ######################################################################
-# Comparison against librosa
+# librosa와 비교
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-# For reference, here is the equivalent means of generating mel-scale
-# spectrograms with ``librosa``.
+# 참고로 여기 ``librosa``로 mel-scale spectrograms를 생성하는
+# 동등한 방법이 있습니다.
 #
 
 
@@ -403,7 +400,7 @@ mfcc = mfcc_transform(waveform)
 plot_spectrogram(mfcc[0])
 
 ######################################################################
-# Comparing against librosa
+# librosa와 비교
 # ~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 
@@ -438,11 +435,11 @@ play_audio(waveform, sample_rate)
 # Kaldi Pitch (beta)
 # ------------------
 #
-# Kaldi Pitch feature [1] is a pitch detection mechanism tuned for automatic
-# speech recognition (ASR) applications. This is a beta feature in ``torchaudio``,
-# and it is available only in ``functional``.
+# Kaldi Pitch 기능 [1]은 자동 음성 인식 (ASR) 애플리케이션을 위해 조정된 피치 감지 매커니즘입니다.
+# 이 기능은 ``torchaudio``의 베타 기능으로,
+#  ``functional``에서만 사용할 수 있습니다..
 #
-# 1. A pitch extraction algorithm tuned for automatic speech recognition
+# 1. 자동 음성 인식을 위해 조정된 피치 추출 알고리즘
 #
 #    Ghahremani, B. BabaAli, D. Povey, K. Riedhammer, J. Trmal and S.
 #    Khudanpur
