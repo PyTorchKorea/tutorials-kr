@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 """
-Audio I/O
+오디오 I/O
 =========
 
-``torchaudio`` integrates ``libsox`` and provides a rich set of audio I/O.
+``torchaudio`` 는 ``libsox`` 를 통합하고 풍부한 오디오 I/O 세트를 제공합니다.
 """
 
-# When running this tutorial in Google Colab, install the required packages
-# with the following.
+# Google Colab에서 이 튜토리얼을 실행할 때 다음을 사용하여 
+# 필수 패키지를 설치하십시오.
 # !pip install torchaudio boto3
 
 import torch
@@ -17,16 +17,16 @@ print(torch.__version__)
 print(torchaudio.__version__)
 
 ######################################################################
-# Preparing data and utility functions (skip this section)
+# 데이터 및 유틸리티 기능 준비(이 섹션 건너뛰기)
 # --------------------------------------------------------
 #
 
-#@title Prepare data and utility functions. {display-mode: "form"}
+#@title 데이터 및 유틸리티 기능을 준비합니다. {display-mode: "form"}
 #@markdown
-#@markdown You do not need to look into this cell.
-#@markdown Just execute once and you are good to go.
+#@markdown 이 셀을 들여다볼 필요가 없습니다.
+#@markdown 한 번만 실행하면 됩니다.
 #@markdown
-#@markdown In this tutorial, we will use a speech data from [VOiCES dataset](https://iqtlabs.github.io/voices/), which is licensed under Creative Commos BY 4.0.
+#@markdown 이 튜토리얼에서는 Creative Commos BY 4.0에 따라 라이선스가 부여된 [VOiCES dataset](https://iqtlabs.github.io/voices/)의 음성 데이터를 사용합니다.
 
 
 import io
@@ -166,11 +166,11 @@ def inspect_file(path):
   print(f" - {torchaudio.info(path)}")
 
 ######################################################################
-# Quering audio metadata
+# 오디오 메타데이터 쿼리
 # ----------------------
 #
-# Function ``torchaudio.info`` fetches audio metadata. You can provide
-# a path-like object or file-like object.
+# 함수 ``torchaudio.info`` 는 오디오 메타데이터를 가져옵니다. 
+# path-like object 또는 file-like object를 제공할 수 있습니다.
 #
 
 metadata = torchaudio.info(SAMPLE_WAV_PATH)
@@ -179,17 +179,17 @@ print(metadata)
 ######################################################################
 # Where
 #
-# -  ``sample_rate`` is the sampling rate of the audio
-# -  ``num_channels`` is the number of channels
-# -  ``num_frames`` is the number of frames per channel
-# -  ``bits_per_sample`` is bit depth
-# -  ``encoding`` is the sample coding format
+# -  ``sample_rate`` 는 오디오의 샘플링 속도입니다
+# -  ``num_channels`` 는 채널 수입니다
+# -  ``num_frames`` 는 채널당 프레임 수입니다
+# -  ``bits_per_sample`` 은 비트 심도입니다
+# -  ``encoding`` 은 샘플 코딩 형식입니다
 #
-# ``encoding`` can take on one of the following values:
+# ``encoding`` 은 다음 값 중 하나를 사용할 수 있습니다:
 #
-# -  ``"PCM_S"``: Signed integer linear PCM
-# -  ``"PCM_U"``: Unsigned integer linear PCM
-# -  ``"PCM_F"``: Floating point linear PCM
+# -  ``"PCM_S"``: 부호 있는 정수 선형 PCM
+# -  ``"PCM_U"``: 부호 없는 정수 선형 PCM
+# -  ``"PCM_F"``: 부동 소수점 선형 PCM
 # -  ``"FLAC"``: Flac, `Free Lossless Audio
 #    Codec <https://xiph.org/flac/>`__
 # -  ``"ULAW"``: Mu-law,
@@ -205,15 +205,15 @@ print(metadata)
 # -  ``"OPUS"``: Opus [`opus-codec.org <https://opus-codec.org/>`__]
 # -  ``"GSM"``: GSM-FR
 #    [`wikipedia <https://en.wikipedia.org/wiki/Full_Rate>`__]
-# -  ``"UNKNOWN"`` None of above
+# -  ``"UNKNOWN"`` 위에 없는것
 #
 
 ######################################################################
 # **Note**
 #
-# -  ``bits_per_sample`` can be ``0`` for formats with compression and/or
-#    variable bit rate (such as MP3).
-# -  ``num_frames`` can be ``0`` for GSM-FR format.
+# -  압축 및/또는 가변 비트 전송률(예: MP3)이 있는 형식의 경우
+#     ``bits_per_sample`` 이 ``0`` 일 수 있습니다.
+# -  ``num_frames`` 는 GSM-FR 형식의 경우 ``0`` 일 수 있습니다.
 #
 
 metadata = torchaudio.info(SAMPLE_MP3_PATH)
@@ -224,27 +224,25 @@ print(metadata)
 
 
 ######################################################################
-# Querying file-like object
+# 쿼리 파일 - 객체와 같은
 # ~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-# ``info`` works on file-like objects.
+# ``info`` 는 파일류 객체에서 작동합니다.
 #
 
-print("Source:", SAMPLE_WAV_URL)
+print("Source:" , SAMPLE_WAV_URL)
 with requests.get(SAMPLE_WAV_URL, stream=True) as response:
   metadata = torchaudio.info(response.raw)
 print(metadata)
 
 ######################################################################
-# **Note** When passing a file-like object, ``info`` does not read
-# all of the underlying data; rather, it reads only a portion
-# of the data from the beginning.
-# Therefore, for a given audio format, it may not be able to retrieve the
-# correct metadata, including the format itself.
-# The following example illustrates this.
+# **참고** 파일류 객체를 전달할 때, ``info`` 는 모든 기본 데이터를 읽지 않습니다. 
+# 오히려 처음부터 데이터의 일부만 읽습니다. 
+# 따라서 지정된 오디오 형식의 경우 형식 자체를 포함하여 올바른 메타데이터를 검색하지 못할 수 있습니다. 
+# 다음 예는 이를 보여줍니다.
 #
-# -  Use argument ``format`` to specify the audio format of the input.
-# -  The returned metadata has ``num_frames = 0``
+# -  인수 ``format`` 을 사용하여 입력의 오디오 형식을 지정합니다.
+# -  반환된 메타데이터에는 ``num_frames = 0`` 이 있습니다.
 #
 
 print("Source:", SAMPLE_MP3_URL)
@@ -255,20 +253,19 @@ with requests.get(SAMPLE_MP3_URL, stream=True) as response:
 print(metadata)
 
 ######################################################################
-# Loading audio data into Tensor
+# Tensor에 오디오 데이터 로드
 # ------------------------------
 #
-# To load audio data, you can use ``torchaudio.load``.
+# 오디오 데이터를 로드하려면 ``torchaudio.load`` 를 사용할 수 있습니다.
 #
-# This function accepts a path-like object or file-like object as input.
+# 이 함수는 경로류 객체 또는 파일류 객체를 입력으로 받습니다.
 #
-# The returned value is a tuple of waveform (``Tensor``) and sample rate
-# (``int``).
+# 반환된 값은 파형(``tensor``)과 샘플 속도(``int``)의 튜플입니다.
 #
-# By default, the resulting tensor object has ``dtype=torch.float32`` and
-# its value range is normalized within ``[-1.0, 1.0]``.
+# 기본적으로 결과 텐서 객체는 ``dtype=torch.float32`` 를 가지며 값 범위는 ``[-1.0, 1.0]`` 내에서 정규화됩니다.
+# 값 범위는 ``[-1.0, 1.0]`` 내에서 정규화됩니다.
 #
-# For the list of supported format, please refer to `the torchaudio
+# 지원되는 형식 목록은 다음을 참조하십시오. `the torchaudio
 # documentation <https://pytorch.org/audio>`__.
 #
 
@@ -281,27 +278,26 @@ play_audio(waveform, sample_rate)
 
 
 ######################################################################
-# Loading from file-like object
+# 파일류 객체에서 로드
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-# ``torchaudio``\ ’s I/O functions now support file-like objects. This
-# allows for fetching and decoding audio data from locations
-# within and beyond the local file system.
-# The following examples illustrate this.
+# ``torchaudio`` 의 I/O 기능은 이제 파일과 유사한 객체를 지원합니다. 
+# 이를 통해 로컬 파일 시스템 내부 및 외부 위치에서 오디오 데이터를 가져오고 디코딩할 수 있습니다. 
+# 다음 예는 이를 보여줍니다.
 #
 
-# Load audio data as HTTP request
+# HTTP 요청으로 오디오 데이터 로드
 with requests.get(SAMPLE_WAV_SPEECH_URL, stream=True) as response:
   waveform, sample_rate = torchaudio.load(response.raw)
 plot_specgram(waveform, sample_rate, title="HTTP datasource")
 
-# Load audio from tar file
+# tar 파일에서 오디오 로드
 with tarfile.open(SAMPLE_TAR_PATH, mode='r') as tarfile_:
   fileobj = tarfile_.extractfile(SAMPLE_TAR_ITEM)
   waveform, sample_rate = torchaudio.load(fileobj)
 plot_specgram(waveform, sample_rate, title="TAR file")
 
-# Load audio from S3
+# S3에서 오디오 로드
 client = boto3.client('s3', config=Config(signature_version=UNSIGNED))
 response = client.get_object(Bucket=S3_BUCKET, Key=S3_KEY)
 waveform, sample_rate = torchaudio.load(response['Body'])
@@ -309,86 +305,79 @@ plot_specgram(waveform, sample_rate, title="From S3")
 
 
 ######################################################################
-# Tips on slicing
+# 슬라이싱 팁
 # ~~~~~~~~~~~~~~~
 #
-# Providing ``num_frames`` and ``frame_offset`` arguments restricts
-# decoding to the corresponding segment of the input.
+# ``num_frames`` 및 ``frame_offset`` 인수를 제공하면 디코딩이 입력의 해당 세그먼트로 제한됩니다.
 #
-# The same result can be achieved using vanilla Tensor slicing,
-# (i.e. ``waveform[:, frame_offset:frame_offset+num_frames]``). However,
-# providing ``num_frames`` and ``frame_offset`` arguments is more
-# efficient.
+# vanilla Tensor 슬라이싱을 사용하여 동일한 결과를 얻을 수 있습니다.
+# (i.e. ``waveform[:, frame_offset:frame_offset+num_frames]``). 그러나 
+# ``num_frames`` 및 ``frame_offset`` 인수를 제공하는 것이 더 효율적입니다.
 #
-# This is because the function will end data acquisition and decoding
-# once it finishes decoding the requested frames. This is advantageous
-# when the audio data are transferred via network as the data transfer will
-# stop as soon as the necessary amount of data is fetched.
+# 이는 요청된 프레임 디코딩이 완료되면 함수가 데이터 수집 및 디코딩을 종료하기 때문입니다. 
+# 필요한 양의 데이터를 가져오는 즉시 데이터 전송이 중지되므로 
+# 네트워크를 통해 오디오 데이터를 전송할 때 유리합니다.
 #
-# The following example illustrates this.
+# 다음 예는 이를 보여줍니다.
 #
 
-# Illustration of two different decoding methods.
-# The first one will fetch all the data and decode them, while
-# the second one will stop fetching data once it completes decoding.
-# The resulting waveforms are identical.
+# 두 가지 다른 디코딩 방법의 일러스트레이션.
+# 첫 번째 것은 모든 데이터를 가져와 디코딩하는 반면,
+# 두 번째는 디코딩이 완료되면 데이터 가져오기를 중지합니다.
+# 파형의 결과는 동일합니다.
 
 frame_offset, num_frames = 16000, 16000  # Fetch and decode the 1 - 2 seconds
 
-print("Fetching all the data...")
+print("모든 데이터를 가져오는 중...")
 with requests.get(SAMPLE_WAV_SPEECH_URL, stream=True) as response:
   waveform1, sample_rate1 = torchaudio.load(response.raw)
   waveform1 = waveform1[:, frame_offset:frame_offset+num_frames]
   print(f" - Fetched {response.raw.tell()} bytes")
 
-print("Fetching until the requested frames are available...")
+print("요청한 프레임을 사용할 수 있을 때까지 가져오는 중...")
 with requests.get(SAMPLE_WAV_SPEECH_URL, stream=True) as response:
   waveform2, sample_rate2 = torchaudio.load(
       response.raw, frame_offset=frame_offset, num_frames=num_frames)
   print(f" - Fetched {response.raw.tell()} bytes")
 
-print("Checking the resulting waveform ... ", end="")
+print("파형의 결과 확인 중... ", end="")
 assert (waveform1 == waveform2).all()
-print("matched!")
+print("일치!")
 
 
 ######################################################################
-# Saving audio to file
+# 파일에 오디오 저장
 # --------------------
 #
-# To save audio data in formats interpretable by common applications,
-# you can use ``torchaudio.save``.
+# 일반 응용 프로그램에서 해석할 수 있는 형식으로 오디오 데이터를 저장하려면,
+# ``torchaudio.save`` 를 사용할 수 있습니다.
 #
-# This function accepts a path-like object or file-like object.
+# 이 함수는 path-like object 또는 file-like object를 받습니다.
 #
-# When passing a file-like object, you also need to provide argument ``format``
-# so that the function knows which format it should use. In the
-# case of a path-like object, the function will infer the format from
-# the extension. If you are saving to a file without an extension, you need
-# to provide argument ``format``.
+# file-like object를 전달할 때 함수가 어떤 형식을 사용해야 하는지 알 수 있도록 인수 ``format`` 도 제공해야 합니다. 
+# path-like object의 경우 함수는 확장자에서 형식을 유추합니다. 
+# 확장자가 없는 파일에 저장하는 경우 ``format`` 인수를 제공해야 합니다.
 #
-# When saving WAV-formatted data, the default encoding for ``float32`` Tensor
-# is 32-bit floating-point PCM. You can provide arguments ``encoding`` and
-# ``bits_per_sample`` to change this behavior. For example, to save data
-# in 16-bit signed integer PCM, you can do the following.
+# WAV 형식의 데이터를 저장할 때 ``float32`` Tensor의 기본 인코딩은 32비트 부동 소수점 PCM입니다. 
+# 인수 ``encoding`` 및 ``bits_per_sample`` 을 제공하여 이 동작을 변경할 수 있습니다. 
+# 예를 들어, 16비트 부호 있는 정수 PCM에 데이터를 저장하려면 다음을 수행할 수 있습니다.
 #
-# **Note** Saving data in encodings with lower bit depth reduces the
-# resulting file size but also precision.
+# **참고** 낮은 비트 심도로 인코딩으로 데이터를 저장하면 
+# 결과 파일 크기는 줄어들지만 정밀도도 줄어듭니다.
 #
 
 
 waveform, sample_rate = get_sample()
 print_stats(waveform, sample_rate=sample_rate)
 
-# Save without any encoding option.
-# The function will pick up the encoding which
-# the provided data fit
+# 인코딩 옵션 없이 저장합니다.
+# 함수는 제공된 데이터에 맞는 인코딩을 선택합니다.
 path = "save_example_default.wav"
 torchaudio.save(path, waveform, sample_rate)
 inspect_file(path)
 
-# Save as 16-bit signed integer Linear PCM
-# The resulting file occupies half the storage but loses precision
+# 16비트 부호 있는 정수 Linear PCM으로 저장
+# 결과 파일은 스토리지의 절반을 차지하지만 정밀도가 떨어집니다
 path = "save_example_PCM_S16.wav"
 torchaudio.save(
     path, waveform, sample_rate,
@@ -397,7 +386,7 @@ inspect_file(path)
 
 
 ######################################################################
-# ``torchaudio.save`` can also handle other formats. To name a few:
+# ``torchaudio.save`` 는 다른 형식도 처리할 수 있습니다. 몇 가지 예를 들면 다음과 같습니다:
 #
 
 waveform, sample_rate = get_sample(resample=8000)
@@ -419,18 +408,17 @@ for format in formats:
 
 
 ######################################################################
-# Saving to file-like object
+# file-like object에 저장
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-# Similar to the other I/O functions, you can save audio to file-like
-# objects. When saving to a file-like object, argument ``format`` is
-# required.
+# 다른 I/O 기능과 마찬가지로 오디오를 파일과 같은 개체에 저장할 수 있습니다. 
+# file-like object에 저장할 때 ``format`` 인수가 필요합니다.
 #
 
 
 waveform, sample_rate = get_sample()
 
-# Saving to bytes buffer
+# bytes buffer에 저장
 buffer_ = io.BytesIO()
 torchaudio.save(buffer_, waveform, sample_rate, format="wav")
 
