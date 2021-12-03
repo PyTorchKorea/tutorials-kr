@@ -1,40 +1,39 @@
 """
-Speech Recognition with Wav2Vec2
+Wav2Vec2를 사용한 음성 인식
 ================================
 
 **Author**: `Moto Hira <moto@fb.com>`__
 
-This tutorial shows how to perform speech recognition using using
-pre-trained models from wav2vec 2.0
+이 튜토리얼은 wav2vec 2.0의 사전 훈련된 모델을 사용하여
+음성 인식을 수행하는 방법을 보여줍니다
 [`paper <https://arxiv.org/abs/2006.11477>`__].
 
 """
 
 
 ######################################################################
-# Overview
+# 개요
 # --------
 # 
-# The process of speech recognition looks like the following.
+# 음성 인식의 과정은 다음과 같습니다.
 # 
-# 1. Extract the acoustic features from audio waveform
+# 1. 오디오 파형에서 음향 특징 추출
 # 
-# 2. Estimate the class of the acoustic features frame-by-frame
+# 2. 프레임별 음향 특징의 클래스 추정
 # 
-# 3. Generate hypothesis from the sequence of the class probabilities
+# 3. 클래스 확률의 수열에서 가설 생성
 # 
-# Torchaudio provides easy access to the pre-trained weights and
-# associated information, such as the expected sample rate and class
-# labels. They are bundled together and available under
-# ``torchaudio.pipelines`` module.
+# Torchaudio는 사전 훈련된 가중치와 예상 샘플링 속도 및 클래스 레이블과
+# 같은 관련 정보에 쉽게 접근할 수 있도록 하며
+# ``torchaudio.pipelines`` 모듈에서 함께 사용할 수 있습니다.
 # 
 
 
 ######################################################################
-# Preparation
+# 준비
 # -----------
 # 
-# First we import the necessary packages, and fetch data that we work on.
+# 먼저 필요한 패키지를 가져오고 작업하는 데이터를 가져옵니다.
 # 
 
 # %matplotlib inline
@@ -67,32 +66,29 @@ if not os.path.exists(SPEECH_FILE):
 
 
 ######################################################################
-# Creating a pipeline
+# pipeline 작성
 # -------------------
 # 
-# First, we will create a Wav2Vec2 model that performs the feature
-# extraction and the classification.
+# 먼저 형상 추출과 분류를 수행하는
+# Wav2Vec2 모델을 만들 것입니다.
 # 
-# There are two types of Wav2Vec2 pre-trained weights available in
-# torchaudio. The ones fine-tuned for ASR task, and the ones not
-# fine-tuned.
+# Torchaudio에서 사용할 수 있는 두 가지 유형의 Wav2Vec2 사전 훈련 웨이트가 있습니다.
+# ARS 작업을 위해 미세 조정된 것과 미세 조정되지 않은 것입니다.
 # 
-# Wav2Vec2 (and HuBERT) models are trained in self-supervised manner. They
-# are firstly trained with audio only for representation learning, then
-# fine-tuned for a specific task with additional labels.
+# Wav2Vec2 (및 HuBERT) 모델은 자체 감독 방식으로 훈련됩니다. 그들은 먼저
+# 표현 학습을 위한 오디오로만 훈련한 다음 추가 레이블이 있는
+# 특정 작업에 맞게 미세 조정됩니다.
 # 
-# The pre-trained weights without fine-tuning can be fine-tuned
-# for other downstream tasks as well, but this tutorial does not
-# cover that.
+# 미세 조정 없이 사전 훈련된 가중치는 다른 다운스트림 작업에도
+# 미세 조정할 수 있지만, 이 튜토리얼에서는 이를 다루지 않습니다.
 # 
-# We will use :py:func:`torchaudio.pipelines.WAV2VEC2_ASR_BASE_960H` here.
+# 여기서는 :py:func:`torchaudio.pipelines.WAV2VEC2_ASR_BASE_960H` 를 사용합니다.
 # 
-# There are multiple models available as
-# :py:mod:`torchaudio.pipelines`. Please check the documentation for
-# the detail of how they are trained.
+# :py:mod:`torchaudio.pipelines` 로 사용할 수 있는 여러 모델이 있습니다.
+# 교육 방법에 대한 자세한 내용은 문서를 참조하십시오.
 # 
-# The bundle object provides the interface to instantiate model and other
-# information. Sampling rate and the class labels are found as follow.
+# Bundle 객체는 모델 및 기타 정보를 인스턴스화할 수 있는 인터페이스를
+# 제공합니다. 샘플링 속도 및 클래스 라벨은 다음과 같습니다.
 # 
 
 bundle = torchaudio.pipelines.WAV2VEC2_ASR_BASE_960H
@@ -103,8 +99,8 @@ print("Labels:", bundle.get_labels())
 
 
 ######################################################################
-# Model can be constructed as following. This process will automatically
-# fetch the pre-trained weights and load it into the model.
+# 모델은 다음과 같이 구성할 수 있습니다. 이 프로세스는 사전 훈련된
+# 가중치를 자동으로 가져와 모델에 로드합니다.
 # 
 
 model = bundle.get_model().to(device)
@@ -113,28 +109,28 @@ print(model.__class__)
 
 
 ######################################################################
-# Loading data
+# 데이터 로딩
 # ------------
 # 
-# We will use the speech data from `VOiCES
-# dataset <https://iqtlabs.github.io/voices/>`__, which is licensed under
-# Creative Commos BY 4.0.
+# Creative Commos BY 4.0에 따라 라이선스가 부여된 `VOiCES
+# dataset <https://iqtlabs.github.io/voices/>`__ 의 음성 데이터를
+# 사용할 것입니다.
 # 
 
 IPython.display.Audio(SPEECH_FILE)
 
 
 ######################################################################
-# To load data, we use :py:func:`torchaudio.load`.
+# 데이터를 로드하기 위해 :py:func:`torchaudio.load` 를 사용합니다.
 # 
-# If the sampling rate is different from what the pipeline expects, then
-# we can use :py:func:`torchaudio.functional.resample` for resampling.
+# 샘플링 속도가 파이프라인에서 예상하는 것과 다르다면 
+# :py:func:`torchaudio.functional.resample` 을 사용하여 다시 샘플링할 수 있습니다.
 # 
 # .. note::
 #
-#    - :py:func:`torchaudio.functional.resample` works on CUDA tensors as well.
-#    - When performing resampling multiple times on the same set of sample rates,
-#      using :py:func:`torchaudio.transforms.Resample` might improve the performace.
+#    - :py:func:`torchaudio.functional.resample` 은 CUDA 텐더에서도 작동합니다.
+#    - 동일한 샘플링 속도 집합에서 여러 번 재샘플링을 수행하는 경우
+#      :py:func:`torchaudio.transforms.Resample` 을 사용하면 성능이 향상될 수 있습니다.
 # 
 
 waveform, sample_rate = torchaudio.load(SPEECH_FILE)
@@ -145,15 +141,15 @@ if sample_rate != bundle.sample_rate:
 
 
 ######################################################################
-# Extracting acoustic features
+# 음향 특징 추출
 # ----------------------------
 # 
-# The next step is to extract acoustic features from the audio.
+# 다음 단계는 오디오에서 음향 특징을 추출하는 것입니다.
 # 
 # .. note::
-#    Wav2Vec2 models fine-tuned for ASR task can perform feature
-#    extraction and classification with one step, but for the sake of the
-#    tutorial, we also show how to perform feature extraction here.
+#    ARS 작업에 맞게 미세 조정된 Wav2Vec2 모델은 형상 추출 및 분류를 한번에 
+#    수행할 수 있지만, 튜토리얼을 위해 여기서는 형상 추출을
+#    수행하는 방법도 보여줍니다.
 # 
 
 with torch.inference_mode():
@@ -161,8 +157,8 @@ with torch.inference_mode():
 
 
 ######################################################################
-# The returned features is a list of tensors. Each tensor is the output of
-# a transformer layer.
+# 반환된 기능은 텐서 목록입니다. 
+# 각 텐서는 변압기 층의 출력입니다.
 # 
 
 fig, ax = plt.subplots(len(features), 1, figsize=(16, 4.3 * len(features)))
@@ -176,14 +172,14 @@ plt.show()
 
 
 ######################################################################
-# Feature classification
+# 특징 분류
 # ----------------------
 # 
-# Once the acoustic features are extracted, the next step is to classify
-# them into a set of categories.
+# 음향 특징을 추출한 후 다음 단계는 
+# 이들을 일련의 범주로 분류하는 것입니다.
 # 
-# Wav2Vec2 model provides method to perform the feature extraction and
-# classification in one step.
+# Wav2Vec2 모델은 형상 추출 및 분류를 한번에 수행할 수 있는
+# 방법을 제공합니다.
 # 
 
 with torch.inference_mode():
@@ -191,10 +187,10 @@ with torch.inference_mode():
 
 
 ######################################################################
-# The output is in the form of logits. It is not in the form of
-# probability.
+# 출력은 logits의 형태입니다. 
+# 이것은 확률의 형태가 아닙니다.
 # 
-# Let’s visualize this.
+# 시각화 해 봅시다.
 # 
 
 plt.imshow(emission[0].cpu().T)
@@ -206,43 +202,38 @@ print("Class labels:", bundle.get_labels())
 
 
 ######################################################################
-# We can see that there are strong indications to certain labels across
-# the time line.
+# 시간대에 걸쳐 특정 라벨에 강한 징후가 있음을 알 수 있습니다.
 # 
-# Note that the class 1 to 3, (``<pad>``, ``</s>`` and ``<unk>``) have
-# mostly huge negative values, this is an artifact from the original
-# ``fairseq`` implementation where these labels are added by default but
-# not used during the training.
+# 클래스 1 부터 3까지, (``<pad>``, ``</s>`` and ``<unk>``) 대부분
+# 큰 음수 값을 가지고 있으며, 이러한 라벨이 기본적으로 추가되지만
+# 훈련중에는 사용되지 않는 원래의 ``fairseq`` 구현에서
+# 비롯된 인공물입니다.
 # 
 
 ######################################################################
-# Generating transcripts
+# Transcripts 생성
 # ----------------------
 # 
-# From the sequence of label probabilities, now we want to generate
-# transcripts. The process to generate hypotheses is often called
-# “decoding”.
+# 레이블 확률의 순서로부터, 이제 transcript를 생성하려고 합니다.
+# 가설을 생성하는 과정을 보통 “decoding” 이라고 합니다.
 # 
-# Decoding is more elaborate than simple classification because
-# decoding at certain time step can be affected by surrounding
-# observations.
+# 특정 시간 단계의 디코딩은 주변 관측치에 의해 영향을 받을 수 있기 때문에
+# 디코딩은 단순한 분류보다 더 정교합니다.
 # 
-# For example, take a word like ``night`` and ``knight``. Even if their
-# prior probability distribution are differnt (in typical conversations,
-# ``night`` would occur way more often than ``knight``), to accurately
-# generate transcripts with ``knight``, such as ``a knight with a sword``,
-# the decoding process has to postpone the final decision until it sees
-# enough context.
+# 예를 들어 ``night`` 와 ``knight`` 같은 단어를 생각해 보세요. 비록 그들의
+# 사전 확률 분포가 다르더라도 (일반적인 대화에서는, ``night`` 이 ``knight`` 보다
+# 훨씬 더 자주 발생함), "칼을 든 기사"와 같은 "knight"로 정확한 대화록을
+# 생성하기 위해서는 해독 과정이 충분한 맥락을 볼 때까지
+# 최종 결정을 미뤄야 합니다.
 # 
-# There are many decoding techniques proposed, and they require external
-# resources, such as word dictionary and language models.
+# 제안된 많은 디코딩 기법이 있으며, 단어 사전 및 언어 모델과 같은
+# 외부 자원이 필요합니다.
 # 
-# In this tutorial, for the sake of simplicity, we will perform greedy
-# decoding which does not depend on such external components, and simply
-# pick up the best hypothesis at each time step. Therefore, the context
-# information are not used, and only one transcript can be generated.
+# 이 튜토리얼에서는 단순성을 위해 이러한 외부 구성 요소에 의존하지 않는
+# Greedy decoding을 수행하고 각 시간 단계에서 가장 좋은 가설을 간단하게 선택할 것입니다.
+# 따라서 컨텍스트 정보는 사용되지 않으며 하나의 스크립트만 생성할 수 있습니다.
 # 
-# We start by defining greedy decoding algorithm.
+# Greedy decoding 알고리즘을 정의하는 것으로 시작합니다.
 # 
 
 class GreedyCTCDecoder(torch.nn.Module):
@@ -266,7 +257,7 @@ class GreedyCTCDecoder(torch.nn.Module):
 
 
 ######################################################################
-# Now create the decoder object and decode the transcript.
+# 이제 디코더 객체를 만들고 스크립트를 디코딩하십시오.
 # 
 
 decoder = GreedyCTCDecoder(
@@ -277,7 +268,7 @@ transcript = decoder(emission[0])
 
 
 ######################################################################
-# Let’s check the result and listen again to the audio.
+# 결과를 확인하고 다시 오디오를 들어봅니다.
 # 
 
 print(transcript)
@@ -285,24 +276,24 @@ IPython.display.Audio(SPEECH_FILE)
 
 
 ######################################################################
-# The ASR model is fine-tuned using a loss function called Connectionist Temporal Classification (CTC).
-# The detail of CTC loss is explained
-# `here <https://distill.pub/2017/ctc/>`__. In CTC a blank token (ϵ) is a
-# special token which represents a repetition of the previous symbol. In
-# decoding, these are simply ignored.
+# ASR 모델은 Connectionist Temporal Classification (CTC)라는 손실 함수를 사용하여 미세 조정됩니다.
+# CTC 손실에 대한 자세한 내용은 
+# `<https://distill.pub/2017/ctc/>`__에 설명되어 있습니다. CTC에서 빈 토큰(ϵ)은
+# 이전 기호의 반복을 나타내는 특별한 토큰입니다.
+# 디코딩에서는 이러한 사항이 단순하게 무시됩니다.
 # 
-# Secondly, as is explained in the feature extraction section, the
-# Wav2Vec2 model originated from ``fairseq`` has labels that are not used.
-# These also have to be ignored.
+# 두 번째로, 형상 추출 섹션에서 설명했듯이, ``fairseq`` 에서 유래한
+# Wav2Vec2 모델은 사용되지 않는 라벨을 가지고 있습니다.
+# 이것들 또한 무시되어야 합니다.
 # 
 
 ######################################################################
-# Conclusion
+# 결론
 # ----------
 # 
-# In this tutorial, we looked at how to use :py:mod:`torchaudio.pipelines` to
-# perform acoustic feature extraction and speech recognition. Constructing
-# a model and getting the emission is as short as two lines.
+# 본 튜토리얼에서는 :py:mod:`torchaudio.pipelines` 를 사용하여 음향 기능 추출 및
+# 음성 인식을 수행하는 방법에 대해 알아보았습니다.
+# 모델을 구성하고 emission을 얻는 것은 두 줄로 짧습니다.
 # 
 # ::
 # 
