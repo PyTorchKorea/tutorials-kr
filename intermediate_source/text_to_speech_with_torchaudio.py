@@ -1,5 +1,5 @@
 """
-Text-to-speech with torchaudio
+토치 오디오를 사용한 텍스트 음성 변환
 ==============================
 
 **Author**: `Yao-Yuan Yang <https://github.com/yangarbiter>`__, `Moto
@@ -11,48 +11,47 @@ Hira <moto@fb.com>`__
 
 
 ######################################################################
-# Overview
+# 개요
 # --------
 # 
-# This tutorial shows how to build text-to-speech pipeline, using the
-# pretrained Tacotron2 in torchaudio.
+# 이 튜토리얼은 토치오디오에서 사전 훈련된 Tacotron2를 사용하여 
+# 텍스트 음성 변환 파이프라인을 구축하는 방법을 보여줍니다.
 # 
-# The text-to-speech pipeline goes as follows: 1. Text preprocessing
+# TTS(텍스트 음성 변환) 파이프라인은 다음과 같이 진행됩니다: 1. 텍스트 전처리
 # 
-# First, the input text is encoded into a list of symbols. In this
-# tutorial, we will use English characters and phonemes as the symbols.
+# 첫째, 입력 텍스트는 기호 목록으로 인코딩됩니다. 
+# 이 튜토리얼에서는 영어 문자와 음소를 기호로 사용합니다.
 # 
-# 2. Spectrogram generation
+# 2. 스펙트로그램 생
 # 
-# From the encoded text, a spectrogram is generated. We use ``Tacotron2``
-# model for this.
+# 인코딩된 텍스트에서 스펙트로그램이 생성됩니다. 
+# 이를 위해 ``Tacotron2`` 모델을 사용합니다.
 # 
-# 3. Time-domain conversion
+# 3. 시간 영역 변환
 # 
-# The last step is converting the spectrogram into the waveform. The
-# process to generate speech from spectrogram is also called Vocoder. In
-# this tutorial, three different vocoders are used,
+# 마지막 단계는 스펙트로그램을 파형으로 변환하는 것입니다. 
+# 스펙트로그램에서 음성을 생성하는 프로세스를 보코더라고도 합니다. 
+# 이 튜토리얼에서는 세 가지 다른 보코더를 사용합니다.
 # ```WaveRNN`` <https://pytorch.org/audio/stable/models/wavernn.html>`__,
 # ```Griffin-Lim`` <https://pytorch.org/audio/stable/transforms.html#griffinlim>`__,
 # and
 # ```Nvidia's WaveGlow`` <https://pytorch.org/hub/nvidia_deeplearningexamples_tacotron2/>`__.
 # 
-# The following figure illustrates the whole process.
+# 다음 그림은 전체 프로세스를 보여줍니다.
 # 
 # .. image:: https://download.pytorch.org/torchaudio/tutorial-assets/tacotron2_tts_pipeline.png
 # 
 
 
 ######################################################################
-# Preparation
+# 준비
 # -----------
 # 
-# First, we install the necessary dependencies. In addition to
-# ``torchaudio``, ``DeepPhonemizer`` is required to perform phoneme-based
-# encoding.
+# 먼저 필요한 종속성을 설치합니다. 
+# 음소 기반 인코딩을 수행하려면 ``torchaudio`` 외에 ``DeepPhonemizer`` 가 필요합니다.
 # 
 
-# When running this example in notebook, install DeepPhonemizer
+# 노트북에서 이 예제를 실행할 때 DeepPhonemizer를 설치하십시오.
 # !pip3 install deep_phonemizer
 
 import torch
@@ -70,29 +69,26 @@ device = "cuda" if torch.cuda.is_available() else "cpu"
 
 
 ######################################################################
-# Text Processing
+# 텍스트 프로세싱
 # ---------------
 # 
 
 
 ######################################################################
-# Character-based encoding
+# 문자 기반 인코딩
 # ~~~~~~~~~~~~~~~~~~~~~~~~
 # 
-# In this section, we will go through how the character-based encoding
-# works.
+# 이 섹션에서는 문자 기반 인코딩이 작동하는 방식을 살펴보겠습니다.
 # 
-# Since the pre-trained Tacotron2 model expects specific set of symbol
-# tables, the same functionalities available in ``torchaudio``. This
-# section is more for the explanation of the basis of encoding.
+# 사전 훈련된 Tacotron2 모델은 특정 기호 테이블 세트를 기대하기 때문에 
+# ``torchaudio`` 에서 동일한 기능을 사용할 수 있습니다. 
+# 이 섹션은 인코딩의 기초에 대한 설명입니다.
 # 
-# Firstly, we define the set of symbols. For example, we can use
-# ``'_-!\'(),.:;? abcdefghijklmnopqrstuvwxyz'``. Then, we will map the
-# each character of the input text into the index of the corresponding
-# symbol in the table.
+# 먼저 기호 집합을 정의합니다. 예를 들어 ``'_-!\'(),.:;? abcdefghijklmnopqrstuvwxyz'`` 를 사용할 수 있습니다. 
+# 그런 다음 입력 텍스트의 각 문자를 테이블의 해당 기호 인덱스에 매핑합니다.
 # 
-# The following is an example of such processing. In the example, symbols
-# that are not in the table are ignored.
+# 다음은 그러한 처리의 예입니다. 
+# 예에서 테이블에 없는 기호는 무시됩니다.
 # 
 
 symbols = '_-!\'(),.:;? abcdefghijklmnopqrstuvwxyz'
@@ -108,10 +104,9 @@ print(text_to_sequence(text))
 
 
 ######################################################################
-# As mentioned in the above, the symbol table and indices must match
-# what the pretrained Tacotron2 model expects. ``torchaudio`` provides the
-# transform along with the pretrained model. For example, you can
-# instantiate and use such transform as follow.
+# 위에서 언급했듯이 기호 테이블과 인덱스는 사전 훈련된 Tacotron2 모델이 기대하는 것과 일치해야 합니다. 
+# ``torchaudio`` 는 사전 훈련된 모델과 함께 변환을 제공합니다. 
+# 예를 들어 다음과 같은 변환을 인스턴스화하고 사용할 수 있습니다.
 # 
 
 processor = torchaudio.pipelines.TACOTRON2_WAVERNN_CHAR_LJSPEECH.get_text_processor()
@@ -124,36 +119,33 @@ print(lengths)
 
 
 ######################################################################
-# The ``processor`` object takes either a text or list of texts as inputs.
-# When a list of texts are provided, the returned ``lengths`` variable
-# represents the valid length of each processed tokens in the output
-# batch.
+# ``processor`` 객체는 텍스트 또는 텍스트 목록을 입력으로 사용합니다
+# 텍스트 목록이 제공되면 반환된 ``lengths`` 변수는 출력 배치에서 
+# 처리된 각 토큰의 유효한 길이를 나타냅니다.
 # 
-# The intermediate representation can be retrieved as follow.
+# 중간 표현은 다음과 같이 검색할 수 있습니다.
 # 
 
 print([processor.tokens[i] for i in processed[0, :lengths[0]]])
 
 
 ######################################################################
-# Phoneme-based encoding
+# 음소 기반 인코딩
 # ~~~~~~~~~~~~~~~~~~~~~~
 # 
-# Phoneme-based encoding is similar to character-based encoding, but it
-# uses a symbol table based on phonemes and a G2P (Grapheme-to-Phoneme)
-# model.
+# 음소 기반 인코딩은 문자 기반 인코딩과 유사하지만 
+# 음소 기반의 기호 테이블과 G2P(Grapheme-to-Phoneme) 모델을 사용합니다.
 # 
-# The detail of the G2P model is out of scope of this tutorial, we will
-# just look at what the conversion looks like.
+# G2P 모델의 세부 사항은 이 듀토리얼의 범위를 벗어납니다. 
+# 변환이 어떻게 보이는지 살펴보겠습니다.
 # 
-# Similar to the case of character-based encoding, the encoding process is
-# expected to match what a pretrained Tacotron2 model is trained on.
-# ``torchaudio`` has an interface to create the process.
+# 문자 기반 인코딩의 경우와 유사하게 
+# 인코딩 프로세스는 사전 훈련된 Tacotron2 모델이 훈련된 것과 일치할 것으로 예상됩니다.
+# ``torchaudio`` 에는 프로세스를 생성하는 인터페이스가 있습니다.
 # 
-# The following code illustrates how to make and use the process. Behind
-# the scene, a G2P model is created using ``DeepPhonemizer`` package, and
-# the pretrained weights published by the author of ``DeepPhonemizer`` is
-# fetched.
+# 다음 코드는 프로세스를 만들고 사용하는 방법을 보여줍니다. 
+# 무대 뒤에서 ``DeepPhonemizer`` 패키지를 사용하여 G2P 모델을 만들고 
+# ``DeepPhonemizer`` 의 작성자가 게시한 사전 훈련된 가중치를 가져옵니다.
 # 
 
 bundle = torchaudio.pipelines.TACOTRON2_WAVERNN_PHONE_LJSPEECH
@@ -169,31 +161,28 @@ print(lengths)
 
 
 ######################################################################
-# Notice that the encoded values are different from the example of
-# character-based encoding.
+# 인코딩된 값은 문자 기반 인코딩의 예와 다릅니다.
 # 
-# The intermediate representation looks like the following.
+# 중간 표현은 다음과 같습니다.
 # 
 
 print([processor.tokens[i] for i in processed[0, :lengths[0]]])
 
 
 ######################################################################
-# Spectrogram Generation
+# 스펙트로그램 생성
 # ----------------------
 # 
-# ``Tacotron2`` is the model we use to generate spectrogram from the
-# encoded text. For the detail of the model, please refer to `the
+# ``Tacotron2`` 는 인코딩된 텍스트에서 스펙트로그램을 생성하는 데 사용하는 모델입니다. 
+# 모델에 대한 자세한 내용은 다음을 참조하십시오. `the
 # paper <https://arxiv.org/abs/1712.05884>`__.
 # 
-# It is easy to instantiate a Tacotron2 model with pretrained weight,
-# however, note that the input to Tacotron2 models are processed by the
-# matching text processor.
+# 사전 훈련된 가중치로 Tacotron2 모델을 인스턴스화하는 것은 쉽지만 
+# Tacotron2 모델에 대한 입력은 일치하는 텍스트 프로세서에 의해 처리됩니다.
 # 
-# ``torchaudio`` bundles the matching models and processors together so
-# that it is easy to create the pipeline.
+# ``torchaudio`` 는 파이프라인을 쉽게 생성할 수 있도록 일치하는 모델과 프로세서를 함께 묶습니다
 # 
-# (For the available bundles, and its usage, please refer to `the
+# (사용 가능한 번들 및 사용법은 다음을 참조하십시오 : `the
 # documentation <https://pytorch.org/audio/stable/pipelines.html#tacotron2-text-to-speech>`__.)
 # 
 
@@ -214,8 +203,8 @@ plt.imshow(spec[0].cpu().detach())
 
 
 ######################################################################
-# Note that ``Tacotron2.infer`` method perfoms multinomial sampling,
-# therefor, the process of generating the spectrogram incurs randomness.
+# ``Tacotron2.infer`` 방법은 다항 샘플링을 수행하므로 
+# 스펙트로그램을 생성하는 과정에서 임의성이 발생합니다.
 # 
 
 for _ in range(3):
@@ -226,14 +215,12 @@ for _ in range(3):
 
 
 ######################################################################
-# Waveform Generation
+# 파형 생성
 # -------------------
 # 
-# Once the spectrogram is generated, the last process is to recover the
-# waveform from the spectrogram.
+# 스펙트로그램이 생성되면 마지막 프로세스는 스펙트로그램에서 파형을 복구하는 것입니다.
 # 
-# ``torchaudio`` provides vocoders based on ``GriffinLim`` and
-# ``WaveRNN``.
+# ``torchaudio`` 는 ``GriffinLim`` 및 ``WaveRNN`` 기반의 보코더를 제공합니다.
 # 
 
 
@@ -241,8 +228,7 @@ for _ in range(3):
 # WaveRNN
 # ~~~~~~~
 # 
-# Continuing from the previous section, we can instantiate the matching
-# WaveRNN model from the same bundle.
+# 이전 섹션에 계속해서 동일한 번들에서 일치하는 WaveRNN 모델을 인스턴스화할 수 있습니다.
 # 
 
 bundle = torchaudio.pipelines.TACOTRON2_WAVERNN_PHONE_LJSPEECH
@@ -268,8 +254,8 @@ IPython.display.display(IPython.display.Audio("output_wavernn.wav"))
 # Griffin-Lim
 # ~~~~~~~~~~~
 # 
-# Using the Griffin-Lim vocoder is same as WaveRNN. You can instantiate
-# the vocode object with ``get_vocoder`` method and pass the spectrogram.
+# Griffin-Lim 보코더를 사용하는 것은 WaveRNN과 동일합니다. 
+# ``get_vocoder`` 메소드를 사용하여 vocode 객체를 인스턴스화하고 스펙트로그램을 전달할 수 있습니다.
 # 
 
 bundle = torchaudio.pipelines.TACOTRON2_GRIFFINLIM_PHONE_LJSPEECH
@@ -293,9 +279,8 @@ IPython.display.display(IPython.display.Audio("output_griffinlim.wav"))
 # Waveglow
 # ~~~~~~~~
 # 
-# Waveglow is a vocoder published by Nvidia. The pretrained weight is
-# publishe on Torch Hub. One can instantiate the model using ``torch.hub``
-# module.
+# Waveglow는 Nvidia에서 출시한 보코더입니다. 사전 훈련된 가중치는 Torch Hub에 게시됩니다. 
+# ``torch.hub`` 모듈을 사용하여 모델을 인스턴스화할 수 있습니다.
 # 
 
 waveglow = torch.hub.load('NVIDIA/DeepLearningExamples:torchhub', 'nvidia_waveglow', model_math='fp32')
