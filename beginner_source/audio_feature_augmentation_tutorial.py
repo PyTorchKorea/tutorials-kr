@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-Audio Feature Augmentation
+오디오 기능 
 ====================
 """
 
-# When running this tutorial in Google Colab, install the required packages
-# with the following.
+# Google Colab에서 이 튜토리얼을 실행할 때 다음과 함께 필요한 패키지를 설치하세요.
 # !pip install torchaudio librosa
 
 import torch
@@ -16,19 +15,19 @@ print(torch.__version__)
 print(torchaudio.__version__)
 
 ######################################################################
-# Preparing data and utility functions (skip this section)
+# 데이터 및 utility 함수 준비 (skip this section)
 # --------------------------------------------------------
 #
 
-#@title Prepare data and utility functions. {display-mode: "form"}
+#@title 데이터 및 utility 함수 준비 {display-mode: "form"}
 #@markdown
-#@markdown You do not need to look into this cell.
-#@markdown Just execute once and you are good to go.
+#@markdown 이 부분을 자세히 살펴볼 필요는 없습니다.
+#@markdown 한번만 실행해보면 쉽게 할 수 있습니다.
 #@markdown
-#@markdown In this tutorial, we will use a speech data from [VOiCES dataset](https://iqtlabs.github.io/voices/), which is licensed under Creative Commos BY 4.0.
+#@markdown 이 튜토리얼에서는 Creative Commos BY 4.0에 따라 라이선스가 부여된 [VOiCES dataset](https://iqtlabs.github.io/voices/)의 음성 데이터를 사용할 것입니다.
 
 #-------------------------------------------------------------------------------
-# Preparation of data and helper functions.
+# 데이터 및 helper  준비.
 #-------------------------------------------------------------------------------
 
 import os
@@ -98,13 +97,13 @@ def plot_spectrogram(spec, title=None, ylabel='freq_bin', aspect='auto', xmax=No
   plt.show(block=False)
 
 ######################################################################
-# SpecAugment
+# 사양증강
 # -----------
 #
 # `SpecAugment <https://ai.googleblog.com/2019/04/specaugment-new-data-augmentation.html>`__
-# is a popular spectrogram augmentation technique.
+# 는 널리 사용되는 스펙트로그램 확대 기법이다.
 #
-# ``torchaudio`` implements ``TimeStretch``, ``TimeMasking`` and
+# ``torchaudio`` implements ``TimeStretch``, ``TimeMasking`` 및
 # ``FrequencyMasking``.
 #
 # TimeStretch
