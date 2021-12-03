@@ -1,38 +1,36 @@
 """
-Forced Alignment with Wav2Vec2
+Wav2Vec2를 사용한 강제 정렬
 ==============================
 
 **Author** `Moto Hira <moto@fb.com>`__
 
-This tutorial shows how to align transcript to speech with
-``torchaudio``, using CTC segmentation algorithm described in
+이 튜토리얼은 스크립트를 음성으로 정렬하는 방법을 보여줍니다.
 `CTC-Segmentation of Large Corpora for German End-to-end Speech
 Recognition <https://arxiv.org/abs/2007.09127>`__.
+에 설명된 CTC 분할 알고리즘 사용-``torchaudio``
 
 """
 
 
 ######################################################################
-# Overview
+# 개요
 # --------
 # 
-# The process of alignment looks like the following.
+# 정렬 과정은 다음과 같습니다.
 # 
-# 1. Estimate the frame-wise label probability from audio waveform
-# 2. Generate the trellis matrix which represents the probability of
-#    labels aligned at time step.
-# 3. Find the most likely path from the trellis matrix.
+# 1. 오디오 파형에서 프레임별 레이블 확률 추정
+# 2. 시간 단계에서 레이블이 정렬될 확률을 나타내는 격자 행렬을 생성합니다.
+# 3. 격자 행렬에서 가장 가능성이 높은 경로를 찾습니다.
 # 
-# In this example, we use ``torchaudio``\ ’s ``Wav2Vec2`` model for
-# acoustic feature extraction.
+# 이 예에서는 음향 특징 추출을 위해 ``torchaudio`` 의 ``Wav2Vec2`` 모델을 사용합니다.
 # 
 
 
 ######################################################################
-# Preparation
+# 준비
 # -----------
 # 
-# First we import the necessary packages, and fetch data that we work on.
+# 먼저 필요한 패키지를 가져오고 작업할 데이터를 가져옵니다.
 # 
 
 # %matplotlib inline
@@ -65,21 +63,19 @@ if not os.path.exists(SPEECH_FILE):
     file.write(requests.get(SPEECH_URL).content)
 
 ######################################################################
-# Generate frame-wise label probability
+# 프레임별 레이블 확률 생성
 # -------------------------------------
 # 
-# The first step is to generate the label class porbability of each aduio
-# frame. We can use a Wav2Vec2 model that is trained for ASR. Here we use
-# :py:func:`torchaudio.pipelines.WAV2VEC2_ASR_BASE_960H`.
+# 첫 번째 단계는 각 Aduio 프레임의 레이블 클래스 이식성을 생성하는 것입니다. 
+# ASR에 대해 훈련된 Wav2Vec2 모델을 사용할 수 있습니다. 
+# 여기서 우리가 사용하는 것 :py:func:`torchaudio.pipelines.WAV2VEC2_ASR_BASE_960H`.
 # 
-# ``torchaudio`` provides easy access to pretrained models with associated
-# labels.
+# ``torchaudio`` 는 관련 레이블이 있는 사전 훈련된 모델에 쉽게 액세스할 수 있도록 합니다.
 # 
 # .. note::
 #
-#    In the subsequent sections, we will compute the probability in
-#    log-domain to avoid numerical instability. For this purpose, we
-#    normalize the ``emission`` with :py:func:`torch.log_softmax`.
+#    다음 섹션에서는 수치적 불안정성을 피하기 위해 로그 영역에서 확률을 계산할 것입니다. 
+#    이를 위해 우리는 ``emission`` 을 :py:func:`torch.log_softmax`로 정규화합니다.
 # 
 
 bundle = torchaudio.pipelines.WAV2VEC2_ASR_BASE_960H
@@ -93,7 +89,7 @@ with torch.inference_mode():
 emission = emissions[0].cpu().detach()
 
 ################################################################################
-# Visualization
+# 시각화
 ################################################################################
 print(labels)
 plt.imshow(emission.T)
@@ -105,41 +101,31 @@ plt.show()
 
 
 ######################################################################
-# Generate alignment probability (trellis)
+# 정렬 확률 생성(격자)
 # ----------------------------------------
 # 
-# From the emission matrix, next we generate the trellis which represents
-# the probability of transcript labels occur at each time frame.
+# 방출 행렬에서 다음으로 각 시간 프레임에서 성적표 레이블이 발생할 확률을 나타내는 격자를 생성합니다.
 # 
-# Trellis is 2D matrix with time axis and label axis. The label axis
-# represents the transcript that we are aligning. In the following, we use
-# :math:`t` to denote the index in time axis and :math:`j` to denote the
-# index in label axis. :math:`c_j` represents the label at label index
-# :math:`j`.
+# 격자는 시간 축과 레이블 축이 있는 2D 행렬입니다. 레이블 축은 우리가 정렬하고 있는 성적표를 나타냅니다. 
+# 다음에서 :math:`t` 를 사용하여 시간 축의 인덱스를 나타내고 :math:`j` 를 사용하여 레이블 축의 인덱스를 나타냅니다. 
+# :math:`c_j` 는 레이블 인덱스 :math:`j` 의 레이블을 나타냅니다.
 # 
-# To generate, the probability of time step :math:`t+1`, we look at the
-# trellis from time step :math:`t` and emission at time step :math:`t+1`.
-# There are two path to reach to time step :math:`t+1` with label
-# :math:`c_{j+1}`. The first one is the case where the label was
-# :math:`c_{j+1}` at :math:`t` and there was no label change from
-# :math:`t` to :math:`t+1`. The other case is where the label was
-# :math:`c_j` at :math:`t` and it transitioned to the next label
-# :math:`c_{j+1}` at :math:`t+1`.
+# 시간 단계 :math:`t+1` 의 확률을 생성하기 위해 시간 단계 :math:`t` 의 격자와 시간 단계 :math:`t+1` 의 방출을 봅니다. 
+# 레이블이 :math:`c_{j+1}` 인 시간 단계 :math:`t+1` 에 도달하는 두 가지 경로가 있습니다. 
+# 첫 번째는 레이블이 :math:`c_{j+1}` at :math:`t` 이고 레이블이 :math:`t` 에서 :math:`t+1` 로 변경되지 않은 경우입니다.
+# 다른 경우는 레이블이 :math:`c_j` 에서 :math:`t` 이고 다음 레이블인 :math:`c_{j+1}` 에서 :math:`t+1` 로 전환된 경우입니다.
 # 
-# The follwoing diagram illustrates this transition.
+# 다음 다이어그램은 이러한 전환을 보여줍니다.
 # 
 # .. image:: https://download.pytorch.org/torchaudio/tutorial-assets/ctc-forward.png
 # 
-# Since we are looking for the most likely transitions, we take the more
-# likely path for the value of :math:`k_{(t+1, j+1)}`, that is
+# 가장 가능성 있는 전환을 찾고 있기 때문에 :math:`k_{(t+1, j+1)}` 값에 대해 더 가능성이 높은 경로를 선택합니다. 즉,
 # 
 # :math:`k_{(t+1, j+1)} = max( k_{(t, j)} p(t+1, c_{j+1}), k_{(t, j+1)} p(t+1, repeat) )`
 # 
-# where :math:`k` represents is trellis matrix, and :math:`p(t, c_j)`
-# represents the probability of label :math:`c_j` at time step :math:`t`.
-# :math:`repeat` represents the blank token from CTC formulation. (For the
-# detail of CTC algorithm, please refer to the *Sequence Modeling with CTC*
-# [`distill.pub <https://distill.pub/2017/ctc/>`__])
+# 여기서 :math:`k` 는 격자 행렬을 나타내고, :math:`p(t, c_j)` 는 시간 단계 :math:`t` 에서 레이블 :math:`c_j` 의 확률을 나타냅니다. 
+# :math:`repeat` 는 CTC 공식의 빈 토큰을 나타냅니다. 
+# (CTC 알고리즘에 대한 자세한 내용은 *CTC를 사용한 시퀀스 모델링* [`distill.pub <https://distill.pub/2017/ctc/>`__] 참조)
 # 
 
 transcript = 'I|HAD|THAT|CURIOSITY|BESIDE|ME|AT|THIS|MOMENT'
@@ -152,9 +138,9 @@ def get_trellis(emission, tokens, blank_id=0):
   num_frame = emission.size(0)
   num_tokens = len(tokens)
 
-  # Trellis has extra diemsions for both time axis and tokens.
-  # The extra dim for tokens represents <SoS> (start-of-sentence)
-  # The extra dim for time axis is for simplification of the code. 
+  # Trellis에는 시간 축과 토큰 모두에 대한 추가 치수가 있습니다.
+  # 토큰에 대한 추가 dim은 <SoS>(문장 시작)를 나타냅니다.
+  # 시간 축에 대한 추가 dim은 코드를 단순화하기 위한 것입니다.
   trellis = torch.full((num_frame+1, num_tokens+1), -float('inf'))
   trellis[:, 0] = 0
   for t in range(num_frame):
@@ -169,7 +155,7 @@ def get_trellis(emission, tokens, blank_id=0):
 trellis = get_trellis(emission, tokens)
 
 ################################################################################
-# Visualization
+# 시각화
 ################################################################################
 plt.imshow(trellis[1:, 1:].T, origin='lower')
 plt.annotate("- Inf", (trellis.size(1) / 5, trellis.size(1) / 1.5))
@@ -177,30 +163,27 @@ plt.colorbar()
 plt.show()
 
 ######################################################################
-# In the above visualization, we can see that there is a trace of high
-# probability crossing the matrix diagonally.
+# 위의 시각화에서 우리는 행렬을 대각선으로 가로지르는 높은 확률의 흔적이 있음을 알 수 있습니다.
 # 
 
 
 ######################################################################
-# Find the most likely path (backtracking)
+# 가장 가능성 있는 경로 찾기(역추적)
 # ----------------------------------------
 # 
-# Once the trellis is generated, we will traverse it following the
-# elements with high probability.
+# 격자가 생성되면 높은 확률로 요소를 따라 이동합니다.
 # 
-# We will start from the last label index with the time step of highest
-# probability, then, we traverse back in time, picking stay
-# (:math:`c_j \rightarrow c_j`) or transition
-# (:math:`c_j \rightarrow c_{j+1}`), based on the post-transition
-# probability :math:`k_{t, j} p(t+1, c_{j+1})` or
+# 확률이 가장 높은 시간 단계로 마지막 레이블 인덱스부터 시작합니다.
+# 그 다음 우리는 시간을 거슬러 올라가, picking stay
+# (:math:`c_j \rightarrow c_j` ) or transition
+# (:math:`c_j \rightarrow c_{j+1}` ), 전환 후 확률에 기반하여
+# :math:`k_{t, j} p(t+1, c_{j+1})` or
 # :math:`k_{t, j+1} p(t+1, repeat)`.
 # 
-# Transition is done once the label reaches the beginning.
+# 레이블이 시작 부분에 도달하면 전환이 완료됩니다.
 # 
-# The trellis matrix is used for path-finding, but for the final
-# probability of each segment, we take the frame-wise probability from
-# emission matrix.
+# trellis matrix는 path-finding에 사용되지만 각 
+# segment의 최종 확률은 emission matrix에서 frame-wise 확률을 취한다.
 # 
 
 @dataclass
@@ -212,12 +195,9 @@ class Point:
 
 def backtrack(trellis, emission, tokens, blank_id=0):
   # Note:
-  # j and t are indices for trellis, which has extra dimensions 
-  # for time and tokens at the beginning.
-  # When refering to time frame index `T` in trellis,
-  # the corresponding index in emission is `T-1`.
-  # Similarly, when refering to token index `J` in trellis,
-  # the corresponding index in transcript is `J-1`.
+  # j와 t는 처음에 시간과 토큰에 대한 추가 차원이 있는 격자에 대한 인덱스입니다.
+  # 격자의 시간 프레임 인덱스 'T' 를 참조할 때 해당 방출 인덱스는 'T-1' 입니다.
+  # 마찬가지로 격자에서 토큰 인덱스 'JS'를 참조할 때 transcript 해당 인덱스는 'J-1' 입니다.
   j = trellis.size(1) - 1
   t_start = torch.argmax(trellis[:, j]).item()
 
@@ -249,7 +229,7 @@ path = backtrack(trellis, emission, tokens)
 print(path)
 
 ################################################################################
-# Visualization
+# 시각화
 ################################################################################
 def plot_trellis_with_path(trellis, path):
   # To plot trellis with path, we take advantage of 'nan' value
@@ -263,14 +243,13 @@ plt.title("The path found by backtracking")
 plt.show()
 
 ######################################################################
-# Looking good. Now this path contains repetations for the same labels, so
-# let’s merge them to make it close to the original transcript.
+# 좋습니다. 이제 이 경로에는 동일한 레이블에 대한 반복이 포함되어 있으므로 
+# 이를 병합하여 원본 대본에 가깝게 만들겠습니다.
 # 
-# When merging the multiple path points, we simply take the average
-# probability for the merged segments.
+# 여러 경로 포인트를 병합할 때 병합된 segment에 대한 평균 확률을 취합니다.
 # 
 
-# Merge the labels
+# 레이블 병합
 @dataclass
 class Segment:
   label: str
@@ -301,7 +280,7 @@ for seg in segments:
   print(seg)
 
 ################################################################################
-# Visualization
+# 
 ################################################################################
 def plot_trellis_with_segments(trellis, segments, transcript):
   # To plot trellis with path, we take advantage of 'nan' value
@@ -348,12 +327,11 @@ plt.show()
 
 
 ######################################################################
-# Looks good. Now let’s merge the words. The Wav2Vec2 model uses ``'|'``
-# as the word boundary, so we merge the segments before each occurance of
-# ``'|'``.
+# 이제 단어를 병합해 보겠습니다. 
+# Wav2Vec2 모델은 단어 경계로 사용하므로 각 발생 전에 segment를 병합합니다.
+# ``'|'`` . ``'|'``
 # 
-# Then, finally, we segment the original audio into segmented audio and
-# listen to them to see if the segmentation is correct.
+# 그런 다음 마지막으로 원본 오디오를 분할된 오디오로 분할하고 듣고 분할이 올바른지 확인합니다.
 # 
 
 # Merge words
@@ -378,7 +356,7 @@ for word in word_segments:
   print(word)
 
 ################################################################################
-# Visualization
+# 시각화
 ################################################################################
 def plot_alignments(trellis, segments, word_segments, waveform):
   trellis_with_path = trellis.clone()
@@ -401,7 +379,7 @@ def plot_alignments(trellis, segments, word_segments, waveform):
       ax1.annotate(seg.label, (seg.start, i + 0.3))
       ax1.annotate(f'{seg.score:.2f}', (seg.start , i + 4), fontsize=8)
 
-  # The original waveform
+  # 원래 파형
   ratio = waveform.size(0) / (trellis.size(0) - 1)
   ax2.plot(waveform)
   for word in word_segments:
@@ -423,9 +401,9 @@ def plot_alignments(trellis, segments, word_segments, waveform):
 plot_alignments(trellis, segments, word_segments, waveform[0],)
 plt.show()
 
-# A trick to embed the resulting audio to the generated file.
-# `IPython.display.Audio` has to be the last call in a cell,
-# and there should be only one call par cell.
+# 생성된 파일에 결과 오디오를 포함하는 트릭입니다.
+# 'IPython.display.Audio' 는 셀의 마지막 호출이어야 하며,
+# 그리고 오직 하나의 call par cell만 있어야 합니다.
 def display_segment(i):
   ratio = waveform.size(1) / (trellis.size(0) - 1)
   word = word_segments[i]
@@ -439,7 +417,7 @@ def display_segment(i):
 ######################################################################
 # 
 
-# Generate the audio for each segment
+# 각 segment에 대한 오디오 생성
 print(transcript)
 IPython.display.Audio(SPEECH_FILE)
 
@@ -490,9 +468,9 @@ display_segment(7)
 display_segment(8)
 
 ######################################################################
-# Conclusion
+# 결론
 # ----------
 # 
-# In this tutorial, we looked how to use torchaudio’s Wav2Vec2 model to
-# perform CTC segmentation for forced alignment.
+# 이 튜토리얼에서 우리는 토치오디오의 Wav2Vec2 모델을 사용하여 
+# 강제 정렬을 위한 CTC 분할을 수행하는 방법을 살펴보았습니다.
 # 
