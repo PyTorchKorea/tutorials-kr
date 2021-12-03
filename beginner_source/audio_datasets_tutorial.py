@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
 """
-오디오 데이터셋
+Audio Datasets
 ========
 
-``torchaudio`` 는 공개적으로 접근할 수 있는
-공통 데이터 셋에 대한 쉬운 액세스를 제공합니다.
-사용 가능한 데이터 셋 목록은 공식 설명서를 참조하십시오.
+``torchaudio`` provides easy access to common, publicly accessible
+datasets. Please refer to the official documentation for the list of
+available datasets.
 """
 
-# Google Colab에서 이 튜토리얼을 실행할 때 다음과 함께 필요한 패키지를 설치하세요.
+# When running this tutorial in Google Colab, install the required packages
+# with the following.
 # !pip install torchaudio
 
 import torch
@@ -18,17 +19,17 @@ print(torch.__version__)
 print(torchaudio.__version__)
 
 ######################################################################
-# 데이터 및 utility 함수 준비 (skip this section)
+# Preparing data and utility functions (skip this section)
 # --------------------------------------------------------
 #
 
-#@title 데이터 및 utility 함수 준비 {display-mode: "form"}
+#@title Prepare data and utility functions. {display-mode: "form"}
 #@markdown
-#@markdown 이 부분을 자세히 살펴볼 필요는 없습니다.
-#@markdown 한번만 실행해보면 쉽게 할 수 있습니다.
+#@markdown You do not need to look into this cell.
+#@markdown Just execute once and you are good to go.
 
 #-------------------------------------------------------------------------------
-# 데이터 및 helper 함수 준비.
+# Preparation of data and helper functions.
 #-------------------------------------------------------------------------------
 import multiprocessing
 import os
@@ -79,7 +80,7 @@ def play_audio(waveform, sample_rate):
     raise ValueError("Waveform with more than 2 channels are not supported.")
 
 ######################################################################
-# 여기서는 ''YESNO'' 데이터 의 사용 방법을 보여 줍니다.
+# Here, we show how to use the ``YESNO`` dataset.
 #
 
 YESNO_DOWNLOAD_PROCESS.join()
