@@ -394,7 +394,7 @@ speech, sample_rate = torchaudio.sox_effects.apply_effects_tensor(
 plot_specgram(speech, sample_rate, title="Filtered")
 play_audio(speech, sample_rate)
 
-# 적용 telephony codec
+# telephony codec 적용
 speech = F.apply_codec(speech, sample_rate, format="gsm")
 
 plot_specgram(speech, sample_rate, title="GSM Codec Applied")
