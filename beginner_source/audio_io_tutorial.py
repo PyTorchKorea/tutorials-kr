@@ -170,7 +170,7 @@ def inspect_file(path):
 # ----------------------
 #
 # 함수 ``torchaudio.info`` 는 오디오 메타데이터를 가져옵니다. 
-# path-like object 또는 file-like object를 제공할 수 있습니다.
+# 파일의 경로 또는 파일을 제공할 수 있습니다.
 #
 
 metadata = torchaudio.info(SAMPLE_WAV_PATH)
@@ -179,7 +179,7 @@ print(metadata)
 ######################################################################
 # Where
 #
-# -  ``sample_rate`` 는 오디오의 샘플링 속도입니다
+# -  ``sample_rate`` 는 오디오의 샘플링 비율입니다
 # -  ``num_channels`` 는 채널 수입니다
 # -  ``num_frames`` 는 채널당 프레임 수입니다
 # -  ``bits_per_sample`` 은 비트 심도입니다
@@ -262,7 +262,7 @@ print(metadata)
 #
 # 반환된 값은 파형(``tensor``)과 샘플 속도(``int``)의 튜플입니다.
 #
-# 기본적으로 결과 텐서 객체는 ``dtype=torch.float32`` 를 가지며 값 범위는 ``[-1.0, 1.0]`` 내에서 정규화됩니다.
+# 기본적으로 결과 텐서 객체는 ``dtype=torch.float32`` 를 가지며
 # 값 범위는 ``[-1.0, 1.0]`` 내에서 정규화됩니다.
 #
 # 지원되는 형식 목록은 다음을 참조하십시오. `the torchaudio
