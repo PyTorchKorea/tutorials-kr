@@ -24,13 +24,13 @@ print(torchaudio.__version__)
 # --------------------------------------------------------
 #
 
-#@제목 데이터와 유틸리티 함수를 준비합니다. {display-mode: "form"}
+#@title 데이터와 유틸리티 함수를 준비합니다. {display-mode: "form"}
 #@markdown
 #@markdown 이 셀을 들여다볼 필요가 없습니다.
 #@markdown 한 번만 실행하면 됩니다.
 
 #-------------------------------------------------------------------------------
-# 데이터 및 helper 함수 준비
+# 데이터 및 보조(helper) 함수 준비
 #-------------------------------------------------------------------------------
 
 import math
@@ -52,7 +52,7 @@ DEFAULT_RESAMPLING_METHOD = 'sinc_interpolation'
 def _get_log_freq(sample_rate, max_sweep_rate, offset):
   """[0, max_sweep_rate // 2] 사이의 로그 스케일에서 균등한 간격으로 주파수를 가져옵니다.
 
-  offset은 음의 무한대 `log(offset + x)`를 피하기 위해 사용됩니다.
+  x 가 0일 경우 log 값이 음의 무한대로 가는 것을 피하기 위해 다음과 같이 offset 을 더해 줍니다. `log(offset + x)`
   """
   half = sample_rate // 2
   start, stop = math.log(offset), math.log(offset + max_sweep_rate // 2)
@@ -65,7 +65,7 @@ def _get_inverse_log_freq(freq, sample_rate, offset):
 
 def _get_freq_ticks(sample_rate, offset, f_max):
   # 스윕 생성에 사용된 원래 샘플 속도가 주어지면,
-  # 로그 스케일 주요 주파수 값이 속하는 x축 값을 찾습니다.
+  # 로그 스케일로 변환된 주요 주파수 값의 값을 x축에서 찾습니다.
   time, freq = [], []
   for exp in range(2, 5):
     for v in range(1, 10):
