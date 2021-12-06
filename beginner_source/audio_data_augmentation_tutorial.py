@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-오디오 데이터 보강
+오디오 데이터 증강
 =================
 
-``torchaudio`` 는 오디오 데이터를 보강하는 다양한 방법을 제공합니다
+``torchaudio`` 는 오디오 데이터를 증강하는 다양한 방법을 제공합니다
 """
 
 # Google Colab에서 이 튜토리얼을 실행할 때 다음을 사용하여 필수 패키지를 설치하십시오.
@@ -28,7 +28,7 @@ print(torchaudio.__version__)
 #@markdown
 #@markdown 이 튜토리얼에서는 Creative Commos 4.0에 따라 라이선스가 부여된 [VOiCES dataset](https://iqtlabs.github.io/voices/)의 음성 데이터를 사용합니다.
 #-------------------------------------------------------------------------------
-# 데이터 및 도우미 기능 준비
+# 데이터 및 보조(helper) 함수 준비
 #-------------------------------------------------------------------------------
 
 import math
@@ -172,7 +172,7 @@ def get_noise_sample(*, resample=None):
 # ``torchaudio.sox_effects`` 를 사용하면 ``sox`` 에서 사용 가능한 것과 유사한 필터를
 # Tensor 개체 및 파일 개체 오디오 소스에 직접 적용할 수 있습니다.
 #
-# 이를 위한 두 가지 함수이 있습니다.
+# 이를 위한 두 가지 함수가 있습니다.
 #
 # -  Tensor에 효과를 적용하기 위한 ``torchaudio.sox_effects.apply_effects_tensor``.
 # - 다른 오디오 소스에 효과를 적용하기 위한 ``torchaudio.sox_effects.apply_effects_file``.
