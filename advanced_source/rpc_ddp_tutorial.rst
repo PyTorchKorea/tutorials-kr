@@ -1,6 +1,6 @@
 분산 데이터 병렬(DDP)과 분산 RPC 프레임워크 결합
 =================================================================
-**Authors**: `Pritam Damania <https://github.com/pritamdamania87>`__ and `Yi Wang <https://github.com/SciPioneer>`__
+**저자**: `Pritam Damania <https://github.com/pritamdamania87>`__ and `Yi Wang <https://github.com/SciPioneer>`__
 
 **번역**: `박다정 <https://github.com/dajeongPark-dev>`_
 
@@ -21,7 +21,7 @@
    매개변수 서버(parameter server)에 임베딩 테이블(embedding table)을 놓고 `분산 데이터 병렬 <https://pytorch.org/docs/stable/nn.html#torch.nn.parallel.DistributedDataParallel>`__을 사용하여
    여러 트레이너(trainer)에 걸쳐 FC 레이어를 복제하는 것을 원할 수도 있습니다.
    이때 `분산 RPC 프레임워크 <https://pytorch.org/docs/master/rpc.html>`__는
-   매개변수 서버에서 임베딩 룩업(embedding lookup)을 수행하는 데 사용할 수 있습니다.
+   매개변수 서버에서 임베딩 색인 작업(embedding lookup)을 수행하는 데 사용할 수 있습니다.
 2) 다음은 `PipeDream <https://arxiv.org/abs/1806.03377>`__ 문서에서 설명된 하이브리드 병렬 처리 활성화하기 입니다.
    `분산 RPC 프레임워크 <https://pytorch.org/docs/master/rpc.html>`__를 사용하여
    여러 worker에 걸쳐 모델의 단계를 파이프라인할 수 있고
@@ -38,25 +38,25 @@
 2) 1개의 매개변수 서버는 기본적으로 메모리에 임베딩 테이블을 보유하고 마스터 및 트레이너의 RPC에 응답합니다.
 3) 2개의 트레이너는 `분산 데이터 병렬(DistributedDataParallel) <https://pytorch.org/docs/stable/nn.html#torch.nn.parallel.DistributedDataParallel>`__을
    사용하여 자체적으로 복제되는 FC 레이어(nn.Linear)를 저장합니다.
-   트레이너는 또한 전방 전달(forward pass), 후방 전달(backward pass) 및 옵티마이저 단계를 실행해야 합니다.
+   트레이너는 또한 순방향 전달(forward pass), 역방향 전달(backward pass) 및 최적화 단계를 실행해야 합니다.
 
 |
 전체적인 학습과정은 다음과 같이 실행됩니다:
 
-1) 마스터는 매개변수 서버에 임베딩 테이블을 홀딩(holding)하고 있는 
+1) 마스터는 매개변수 서버에 임베딩 테이블을 담고 있는
    `RemoteModule <https://pytorch.org/docs/master/rpc.html#remotemodule>`__을 생성합니다.
 2) 그런 다음 마스터는 트레이너의 트레이닝 루프를 시작하고 원격 모듈(remote module)을 트레이너에게 전달합니다.
 3) 트레이너는 먼저 마스터에서 제공하는 원격 모듈을 사용하여
-   임베딩 룩업을 수행한 다음 DDP 내부에 래핑된 FC 레이어를 실행하는 ``HybridModel``을 생성합니다.
-4) 트레이너는 모델의 순방향 패스를 실행하고 손실을 사용하여 `Distributed Autograd <https://pytorch.org/docs/master/rpc.html#distributed-autograd-framework>`__를
-   사용하여 후방 전달(backward pass)을 실행합니다.
-5) 후방 전달(backward pass)의 일부로 FC 레이어의 그라디언트(gradient)가 먼저 계산되고 DDP의 allreduce를 통해 모든 트레이너와 동기화됩니다.
+   임베딩 색인 작업(embedding lookup)을 수행한 다음 DDP 내부에 래핑된 FC 레이어를 실행하는 ``HybridModel``을 생성합니다.
+4) 트레이너는 모델의 순방향 전달을 실행하고 손실을 사용하여 `Distributed Autograd <https://pytorch.org/docs/master/rpc.html#distributed-autograd-framework>`__를
+   사용하여 역방향 전달을 실행합니다.
+5) 역방향 전달의 일부로 FC 레이어의 그라디언트(gradient)가 먼저 계산되고 DDP의 allreduce를 통해 모든 트레이너와 동기화됩니다.
 6) 다음으로, Distributed Autograd는 매개변수 서버로 그라디언트를 전파합니다. 여기서 임베딩 테이블의 그라디언트가 업데이트됩니다.
 7) 마지막으로, `Distributed Optimizer <https://pytorch.org/docs/master/rpc.html#module-torch.distributed.optim>`__는 모든 매개변수를 업데이트하는 데 사용됩니다.
 
 .. 주의사항::
 
-  DDP와 RPC를 결합할 때, 후방 전달(backward pass)에 대해 항상
+  DDP와 RPC를 결합할 때, 역방향 전달에 대해 항상
   `Distributed Autograd <https://pytorch.org/docs/master/rpc.html#distributed-autograd-framework>`__을 사용해야 합니다.
 
 
@@ -93,8 +93,8 @@ RPC 초기화가 끝나면, 마스터는 `EmbeddingBag <https://pytorch.org/docs
 래핑하여 모든 트레이너에서 이 레이어를 복제하고 동기화합니다.
 
 
-모델의 forward 함수는 꽤 간단합니다.
-RemoteModule의 ``forward``를 사용하여 매개변수 서버에서 임베딩 룩업을 수행하고 그 출력을 FC 레이어에 전달합니다.
+모델의 순방향(forward) 함수는 꽤 간단합니다.
+RemoteModule의 ``forward``를 사용하여 매개변수 서버에서 임베딩 색인 작업(embedding lookup)을 수행하고 그 출력을 FC 레이어에 전달합니다.
 
 
 .. literalinclude:: ../advanced_source/rpc_ddp_tutorial/main.py
@@ -126,13 +126,13 @@ DistributedOptimizer는 항상 최적화해야 하는 매개변수에 대한 RRe
 
 이제 각 트레이너에서 실행되는 기본 트레이닝 루프(training loop)를 소개하겠습니다.
 ``get_next_batch``는 학습을 위한 임의의 입력과 대상을 생성하는 것을 도와주는 함수일 뿐입니다.
-여러 에포크(ephoc)와 각 배치(batch)에 대해 트레이닝 루프를 실행합니다:
+여러 에폭(epoch)과 각 배치(batch)에 대해 트레이닝 루프를 실행합니다:
 
 1) 먼저 Distributed Autograd에 대해
    `Distributed Autograd Context <https://pytorch.org/docs/master/rpc.html#torch.distributed.autograd.context>`를 설정합니다.
-2) 모델의 전방 전달(forward pass)을 실행하고 해당 출력을 검색(retrieve)합니다.
+2) 모델의 순방향 전달을 실행하고 해당 출력을 검색(retrieve)합니다.
 3) 손실 함수를 사용하여 출력과 목표를 기반으로 손실을 계산합니다.
-4) Distributed Autograd를 사용하여 손실을 사용하여 분산 역방향 패스를 실행합니다.
+4) Distributed Autograd를 사용하여 손실을 사용하여 분산 역방향 전달을 실행합니다.
 5) 마지막으로 Distributed Optimizer 단계를 실행하여 모든 매개변수를 최적화합니다.
 
 .. literalinclude:: ../advanced_source/rpc_ddp_tutorial/main.py
