@@ -15,11 +15,11 @@ print(torch.__version__)
 print(torchaudio.__version__)
 
 ######################################################################
-# 데이터 및 utility 함수 준비 (skip this section)
+# 데이터 및 유틸리티 함수 준비 (skip this section)
 # --------------------------------------------------------
 #
 
-#@title 데이터 및 utility 함수 준비 {display-mode: "form"}
+#@title 데이터 및 유틸리티 함수 준비 {display-mode: "form"}
 #@markdown
 #@markdown 이 부분을 자세히 살펴볼 필요는 없습니다.
 #@markdown 한번만 실행해보면 쉽게 할 수 있습니다.
@@ -27,7 +27,7 @@ print(torchaudio.__version__)
 #@markdown 이 튜토리얼에서는 Creative Commos BY 4.0에 따라 라이선스가 부여된 [VOiCES dataset](https://iqtlabs.github.io/voices/)의 음성 데이터를 사용할 것입니다.
 
 #-------------------------------------------------------------------------------
-# 데이터 및 helper  준비.
+# 데이터 및 보조(helper) 함수 준비
 #-------------------------------------------------------------------------------
 
 import os
