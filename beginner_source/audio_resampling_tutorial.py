@@ -2,7 +2,9 @@
 """
 Audio Resampling
 ==========
+
 Here, we will walk through resampling audio waveforms using ``torchaudio``.
+
 """
 
 # When running this tutorial in Google Colab, install the required packages
@@ -49,7 +51,9 @@ DEFAULT_RESAMPLING_METHOD = 'sinc_interpolation'
 
 def _get_log_freq(sample_rate, max_sweep_rate, offset):
   """Get freqs evenly spaced out in log-scale, between [0, max_sweep_rate // 2]
+
   offset is used to avoid negative infinity `log(offset + x)`.
+
   """
   half = sample_rate // 2
   start, stop = math.log(offset), math.log(offset + max_sweep_rate // 2)
