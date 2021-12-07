@@ -166,11 +166,11 @@ def inspect_file(path):
   print(f" - {torchaudio.info(path)}")
 
 ######################################################################
-# 오디오 메타데이터 쿼리
+# 오디오 메타데이터 질의하기
 # ----------------------
 #
 # 함수 ``torchaudio.info`` 는 오디오 메타데이터를 가져옵니다. 
-# 파일의 경로 또는 파일을 제공할 수 있습니다.
+# 이때 파일의 경로 또는 파일을 제공할 수 있습니다.
 #
 
 metadata = torchaudio.info(SAMPLE_WAV_PATH)
@@ -205,7 +205,7 @@ print(metadata)
 # -  ``"OPUS"``: Opus [`opus-codec.org <https://opus-codec.org/>`__]
 # -  ``"GSM"``: GSM-FR
 #    [`wikipedia <https://en.wikipedia.org/wiki/Full_Rate>`__]
-# -  ``"UNKNOWN"`` 위에 없는것
+# -  ``"UNKNOWN"`` 위에서 정의되지 않은 것
 #
 
 ######################################################################
@@ -224,19 +224,19 @@ print(metadata)
 
 
 ######################################################################
-# 쿼리 파일 - 객체와 같은
+# 질의(query) 파일 - 객체와 같은
 # ~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-# ``info`` 는 파일류 객체에서 작동합니다.
+# ``info`` 는 파일같은 객체에서 작동합니다.
 #
 
-print("Source:" , SAMPLE_WAV_URL)
+print("Source:", SAMPLE_WAV_URL)
 with requests.get(SAMPLE_WAV_URL, stream=True) as response:
   metadata = torchaudio.info(response.raw)
 print(metadata)
 
 ######################################################################
-# **참고** 파일류 객체를 전달할 때, ``info`` 는 모든 기본 데이터를 읽지 않습니다. 
+# **참고** 파일같은 객체를 전달할 때, ``info`` 는 기저의 모든 데이터를 읽지 않습니다. 
 # 오히려 처음부터 데이터의 일부만 읽습니다. 
 # 따라서 지정된 오디오 형식의 경우 형식 자체를 포함하여 올바른 메타데이터를 검색하지 못할 수 있습니다. 
 # 다음 예는 이를 보여줍니다.
@@ -253,12 +253,12 @@ with requests.get(SAMPLE_MP3_URL, stream=True) as response:
 print(metadata)
 
 ######################################################################
-# Tensor에 오디오 데이터 로드
+# Tensor에 오디오 데이터 읽어 들이기
 # ------------------------------
 #
 # 오디오 데이터를 로드하려면 ``torchaudio.load`` 를 사용할 수 있습니다.
 #
-# 이 함수는 경로류 객체 또는 파일류 객체를 입력으로 받습니다.
+# 이 함수는 경로같은 객체 또는 파일류 객체를 입력으로 받습니다.
 #
 # 반환된 값은 파형(``tensor``)과 샘플 속도(``int``)의 튜플입니다.
 #
@@ -305,7 +305,7 @@ plot_specgram(waveform, sample_rate, title="From S3")
 
 
 ######################################################################
-# 슬라이싱 팁
+# 자르기 팁
 # ~~~~~~~~~~~~~~~
 #
 # ``num_frames`` 및 ``frame_offset`` 인수를 제공하면 디코딩이 입력의 해당 세그먼트로 제한됩니다.
@@ -340,7 +340,7 @@ with requests.get(SAMPLE_WAV_SPEECH_URL, stream=True) as response:
       response.raw, frame_offset=frame_offset, num_frames=num_frames)
   print(f" - Fetched {response.raw.tell()} bytes")
 
-print("파형의 결과 확인 중... ", end="")
+print("결과 파형 확인 중... ", end="")
 assert (waveform1 == waveform2).all()
 print("일치!")
 
@@ -352,7 +352,7 @@ print("일치!")
 # 일반 응용 프로그램에서 해석할 수 있는 형식으로 오디오 데이터를 저장하려면,
 # ``torchaudio.save`` 를 사용할 수 있습니다.
 #
-# 이 함수는 path-like object 또는 file-like object를 받습니다.
+# 이 함수는 경로 같은 객체 또는 파일 같은 객체를 받습니다.
 #
 # file-like object를 전달할 때 함수가 어떤 형식을 사용해야 하는지 알 수 있도록 인수 ``format`` 도 제공해야 합니다. 
 # path-like object의 경우 함수는 확장자에서 형식을 유추합니다. 
