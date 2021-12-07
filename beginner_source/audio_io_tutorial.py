@@ -286,18 +286,18 @@ play_audio(waveform, sample_rate)
 # 다음 예는 이를 보여줍니다.
 #
 
-# HTTP 요청으로 오디오 데이터 로드
+# HTTP 요청으로 오디오 데이터 읽어 
 with requests.get(SAMPLE_WAV_SPEECH_URL, stream=True) as response:
   waveform, sample_rate = torchaudio.load(response.raw)
 plot_specgram(waveform, sample_rate, title="HTTP datasource")
 
-# tar 파일에서 오디오 로드
+# tar 파일에서 오디오 읽어 들이기
 with tarfile.open(SAMPLE_TAR_PATH, mode='r') as tarfile_:
   fileobj = tarfile_.extractfile(SAMPLE_TAR_ITEM)
   waveform, sample_rate = torchaudio.load(fileobj)
 plot_specgram(waveform, sample_rate, title="TAR file")
 
-# S3에서 오디오 로드
+# S3에서 오디오 읽어 들이기
 client = boto3.client('s3', config=Config(signature_version=UNSIGNED))
 response = client.get_object(Bucket=S3_BUCKET, Key=S3_KEY)
 waveform, sample_rate = torchaudio.load(response['Body'])
