@@ -21,10 +21,10 @@
    매개변수 서버(parameter server)에 임베딩 테이블(embedding table)을 놓고 `분산 데이터 병렬 <https://pytorch.org/docs/stable/nn.html#torch.nn.parallel.DistributedDataParallel>`__을 사용하여
    여러 트레이너(trainer)에 걸쳐 FC 레이어를 복제하는 것을 원할 수도 있습니다.
    이때 `분산 RPC 프레임워크 <https://pytorch.org/docs/master/rpc.html>`__는
-   매개변수 서버에서 임베딩 색인 작업(embedding lookup)을 수행하는 데 사용할 수 있습니다.
+   매개변수 서버에서 임베딩 찾기 작업(embedding lookup)을 수행하는 데 사용할 수 있습니다.
 2) 다음은 `PipeDream <https://arxiv.org/abs/1806.03377>`__ 문서에서 설명된 하이브리드 병렬 처리 활성화하기 입니다.
    `분산 RPC 프레임워크 <https://pytorch.org/docs/master/rpc.html>`__를 사용하여
-   여러 worker에 걸쳐 모델의 단계를 파이프라인할 수 있고
+   여러 worker에 걸쳐 모델의 단계를 파이프라인(pipeline)할 수 있고
    (필요에 따라) `분산 데이터 병렬 <https://pytorch.org/docs/stable/nn.html#torch.nn.parallel.DistributedDataParallel>`__을 이용해서
    각 단계를 복제할 수 있습니다.
 
@@ -34,7 +34,7 @@
 
 
 1) 1개의 마스터는 매개변수 서버에 임베딩 테이블(nn.EmbeddingBag) 생성을 담당합니다.
-   또한 마스터는 두 트레이너의 트레이닝 루프를 구동합니다.
+   또한 마스터는 두 트레이너의 학습 루프를 수행합니다.
 2) 1개의 매개변수 서버는 기본적으로 메모리에 임베딩 테이블을 보유하고 마스터 및 트레이너의 RPC에 응답합니다.
 3) 2개의 트레이너는 `분산 데이터 병렬(DistributedDataParallel) <https://pytorch.org/docs/stable/nn.html#torch.nn.parallel.DistributedDataParallel>`__을
    사용하여 자체적으로 복제되는 FC 레이어(nn.Linear)를 저장합니다.
@@ -45,13 +45,13 @@
 
 1) 마스터는 매개변수 서버에 임베딩 테이블을 담고 있는
    `RemoteModule <https://pytorch.org/docs/master/rpc.html#remotemodule>`__을 생성합니다.
-2) 그런 다음 마스터는 트레이너의 트레이닝 루프를 시작하고 원격 모듈(remote module)을 트레이너에게 전달합니다.
+2) 그런 다음 마스터는 트레이너의 학습 루프를 시작하고 원격 모듈(remote module)을 트레이너에게 전달합니다.
 3) 트레이너는 먼저 마스터에서 제공하는 원격 모듈을 사용하여
-   임베딩 색인 작업(embedding lookup)을 수행한 다음 DDP 내부에 래핑된 FC 레이어를 실행하는 ``HybridModel``을 생성합니다.
+   임베딩 찾기 작업(embedding lookup)을 수행한 다음 DDP 내부에 감싸진 FC 레이어를 실행하는 ``HybridModel``을 생성합니다.
 4) 트레이너는 모델의 순방향 전달을 실행하고 손실을 사용하여 `Distributed Autograd <https://pytorch.org/docs/master/rpc.html#distributed-autograd-framework>`__를
    사용하여 역방향 전달을 실행합니다.
-5) 역방향 전달의 일부로 FC 레이어의 그라디언트(gradient)가 먼저 계산되고 DDP의 allreduce를 통해 모든 트레이너와 동기화됩니다.
-6) 다음으로, Distributed Autograd는 매개변수 서버로 그라디언트를 전파합니다. 여기서 임베딩 테이블의 그라디언트가 업데이트됩니다.
+5) 역방향 전달의 일부로 FC 레이어의 변화도가 먼저 계산되고 DDP의 allreduce를 통해 모든 트레이너와 동기화됩니다.
+6) 다음으로, 분산 Autograd는 매개변수 서버로 변화도를 전파하고 그곳에서 임베딩 테이블의 변화도가 업데이트됩니다.
 7) 마지막으로, `Distributed Optimizer <https://pytorch.org/docs/master/rpc.html#module-torch.distributed.optim>`__는 모든 매개변수를 업데이트하는 데 사용됩니다.
 
 .. 주의사항::
@@ -90,11 +90,11 @@ RPC 초기화가 끝나면, 마스터는 `EmbeddingBag <https://pytorch.org/docs
 트레이너에 대한 자세한 설명에 앞서, 트레이너가 사용하는 ``HybridModel``에 대해 설명드리겠습니다.
 아래에 설명된 대로 ``HybridModel``은 매개변수 서버의 임베딩 테이블(``remote_emb_module``)과 DDP에 사용할 ``장치(device)``를 보유하는 원격 모듈을 사용하여 초기화됩니다.
 모델 초기화는 DDP 내부의 `nn.Linear <https://pytorch.org/docs/master/generated/torch.nn.Linear.html>`__ 레이어를
-래핑하여 모든 트레이너에서 이 레이어를 복제하고 동기화합니다.
+감싸 모든 트레이너에서 이 레이어를 복제하고 동기화합니다.
 
 
 모델의 순방향(forward) 함수는 꽤 간단합니다.
-RemoteModule의 ``forward``를 사용하여 매개변수 서버에서 임베딩 색인 작업(embedding lookup)을 수행하고 그 출력을 FC 레이어에 전달합니다.
+RemoteModule의 ``forward``를 사용하여 매개변수 서버에서 임베딩 찾기 작업(embedding lookup)을 수행하고 그 출력을 FC 레이어에 전달합니다.
 
 
 .. literalinclude:: ../advanced_source/rpc_ddp_tutorial/main.py
@@ -124,11 +124,11 @@ DistributedOptimizer는 항상 최적화해야 하는 매개변수에 대한 RRe
   :start-after: BEGIN setup_trainer
   :end-before: END setup_trainer
 
-이제 각 트레이너에서 실행되는 기본 트레이닝 루프(training loop)를 소개하겠습니다.
+이제 각 트레이너에서 실행되는 기본 학습 루프를 소개하겠습니다.
 ``get_next_batch``는 학습을 위한 임의의 입력과 대상을 생성하는 것을 도와주는 함수일 뿐입니다.
-여러 에폭(epoch)과 각 배치(batch)에 대해 트레이닝 루프를 실행합니다:
+여러 에폭(epoch)과 각 배치(batch)에 대해 학습 루프를 실행합니다:
 
-1) 먼저 Distributed Autograd에 대해
+1) 먼저 분산 Autograd에 대해
    `Distributed Autograd Context <https://pytorch.org/docs/master/rpc.html#torch.distributed.autograd.context>`를 설정합니다.
 2) 모델의 순방향 전달을 실행하고 해당 출력을 검색(retrieve)합니다.
 3) 손실 함수를 사용하여 출력과 목표를 기반으로 손실을 계산합니다.
