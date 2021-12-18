@@ -44,10 +44,10 @@ def _run_trainer(remote_emb_module, rank):
     분산 autograd는 변화도 업데이트가 매개변수 서버로 전파되도록 합니다.
     """
 
-    # 모델을 설정합니다.
+    # 모델을 생성합니다.
     model = HybridModel(remote_emb_module, rank)
 
-    # 모든 모델 매개변수를 DistributedOptimizer에 대한 rrefs로 검색합니다.
+    # 모든 모델 매개변수를 분산 옵티마이저에 대한 rrefs로 검색합니다.
 
     # 임베딩 테이블에 대한 매개변수를 검색합니다.
     model_parameter_rrefs = model.remote_emb_module.remote_parameters()
@@ -99,7 +99,7 @@ def _run_trainer(remote_emb_module, rank):
                 # 분산 역방향 전달(distributed backward pass)을 실행합니다.
                 dist_autograd.backward(context_id, [loss])
 
-                # 분산 최적화를 갱신합니다.
+                # 분산 옵티마이저를 갱신합니다.
                 opt.step(context_id)
 
                 # 반복될 때마다 다른 변화도를 호스팅하는 하나의 다른 분산 autograd context를 생성하므로
@@ -110,8 +110,8 @@ def _run_trainer(remote_emb_module, rank):
 # BEGIN run_worker
 def run_worker(rank, world_size):
     r"""
-    A wrapper function that initializes RPC, calls the function, and shuts down
-    RPC.
+    이 함수는 RPC를 초기화하고, 함수를 호출하고,
+    RPC를 종료하는 래퍼 함수(wrapper function)입니다.
     """
 
     # 포트 충돌을 피하기 위해 init_rpc 및 init_process_group에 대해
@@ -119,7 +119,7 @@ def run_worker(rank, world_size):
     rpc_backend_options = TensorPipeRpcBackendOptions()
     rpc_backend_options.init_method = "tcp://localhost:29501"
 
-    # Rank 2는  master를 의미하고, 3은 is 매개변수 서버, 그리고 0과 1은 트레이너를 뜻합니다.
+    # Rank 2는  master를 의미하고, 3은 매개변수 서버, 그리고 0과 1은 트레이너를 뜻합니다.
     if rank == 2:
         rpc.init_rpc(
             "master",
