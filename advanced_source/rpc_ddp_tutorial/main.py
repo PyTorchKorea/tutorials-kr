@@ -119,7 +119,7 @@ def run_worker(rank, world_size):
     rpc_backend_options = TensorPipeRpcBackendOptions()
     rpc_backend_options.init_method = "tcp://localhost:29501"
 
-    # Rank 2는  master를 의미하고, 3은 매개변수 서버, 그리고 0과 1은 트레이너를 뜻합니다.
+    # 순위(rank) 2는  master를 의미하고, 3은 매개변수 서버, 그리고 0과 1은 트레이너를 뜻합니다.
     if rank == 2:
         rpc.init_rpc(
             "master",
