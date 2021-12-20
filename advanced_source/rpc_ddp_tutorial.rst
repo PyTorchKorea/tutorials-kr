@@ -38,7 +38,7 @@
 2) 1개의 매개변수 서버는 기본적으로 메모리에 임베딩 테이블을 보유하고 마스터 및 트레이너의 RPC에 응답합니다.
 3) 2개의 트레이너는 `분산 데이터 병렬 <https://pytorch.org/docs/stable/nn.html#torch.nn.parallel.DistributedDataParallel>`__을
    사용하여 자체적으로 복제되는 FC 레이어(nn.Linear)를 저장합니다.
-   트레이너는 또한 순방향 전달(forward pass), 역방향 전달(backward pass) 및 옵티마이저 단계를 실행해야 합니다.
+   트레이너는 또한 순방향 전달(forward pass), 역방향 전달(backward pass) 및 최적화 단계를 실행해야 합니다.
 
 |
 전체적인 학습과정은 다음과 같이 실행됩니다:
