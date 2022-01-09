@@ -167,7 +167,7 @@ TorchVision transforms(변환) 세트를 구성합니다. (정규화에 대한 �
 
    app = Flask(__name__)
    model = models.densenet121(pretrained=True)               # ImageNet의 1000개 클래스를 학습
-   model.eval()                                              # autograd를 끄고
+   model.eval()                                              # autograd 끄기
 
 
 

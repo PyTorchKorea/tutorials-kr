@@ -47,7 +47,7 @@ Flask를 사용하여 Python에서 PyTorch를 REST API로 배포하기
 #
 # ::
 #
-#     $ pip install Flask==1.0.3 torchvision==0.3.0
+#     $ pip install Flask==2.0.1 torchvision==0.10.0
 
 
 ######################################################################

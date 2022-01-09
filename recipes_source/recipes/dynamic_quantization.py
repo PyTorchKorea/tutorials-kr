@@ -80,7 +80,7 @@
 학습된 LSTM에 적용하더라도 정확도를 높은 수준으로 유지할 수 있음을
 살펴보는 것은 고급 튜토리얼의 내용으로 남겨두겠습니다. 만약 여러분이
 좀 더 엄밀한 내용으로 넘어가고 싶다면 `고급 동적 양자화 튜토리얼
-<https://pytorch.org/tutorials/advanced/dynamic_quantization_tutorial.html>`__
+<https://tutorials.pytorch.kr/advanced/dynamic_quantization_tutorial.html>`__
 을 참고하시기 바랍니다.
 
 
@@ -130,8 +130,8 @@ import time
 # 여기서는 레이어가 하나 뿐이고 사전 작업이나 사후 작업이 없는
 # nn.LSTM을 감싸서 사용합니다
 # 이는 Robert Guthrie 의
-# https://pytorch.org/tutorials/beginner/nlp/sequence_models_tutorial.html 과
-# https://pytorch.org/tutorials/advanced/dynamic_quantization_tutorial.html 에서
+# https://tutorials.pytorch.kr/beginner/nlp/sequence_models_tutorial.html 과
+# https://tutorials.pytorch.kr/advanced/dynamic_quantization_tutorial.html 에서
 # 영감을 받은 부분입니다
 
 class lstm_for_demonstration(nn.Module):
@@ -288,7 +288,7 @@ print('mean absolute value of the difference between the output tensors is {0:.5
 #
 # 이 레시피에서는 이러한 내용을 빠르게, 그리고 고수준에서 살펴 보았습니다.
 # 좀 더 자세한 내용을 알아보고 싶다면 `(베타) LSTM 언어 모델 동적 양자화
-# 튜토리얼 <https://pytorch.org/tutorials/advanced/dynamic\_quantization\_tutorial.html>`_
+# 튜토리얼 <https://tutorials.pytorch.kr/advanced/dynamic\_quantization\_tutorial.html>`_
 # 을 계속 공부해 보시기 바랍니다.
 #
 # 참고 자료
@@ -301,9 +301,9 @@ print('mean absolute value of the difference between the output tensors is {0:.5
 # 튜토리얼
 # ~~~~~~~~
 #
-# `(베타) BERT 동적 양자화 <https://pytorch.org/tutorials/intermediate/dynamic\_quantization\_bert\_tutorial.html>`_
+# `(베타) BERT 동적 양자화 <https://tutorials.pytorch.kr/intermediate/dynamic\_quantization\_bert\_tutorial.html>`_
 #
-# `(베타) LSTM 언어 모델 동적 양자화 <https://pytorch.org/tutorials/advanced/dynamic\_quantization\_tutorial.html>`_
+# `(베타) LSTM 언어 모델 동적 양자화 <https://tutorials.pytorch.kr/advanced/dynamic\_quantization\_tutorial.html>`_
 #
 # 블로그 글
 # ~~~~~~~~~

@@ -2,14 +2,14 @@
 `파이토치(PyTorch) 기본 익히기 <intro.html>`_ ||
 `빠른 시작 <quickstart_tutorial.html>`_ ||
 `텐서(Tensor) <tensorqs_tutorial.html>`_ ||
-**Dataset과 Dataloader** ||
+**Dataset과 DataLoader** ||
 `변형(Transform) <transforms_tutorial.html>`_ ||
 `신경망 모델 구성하기 <buildmodel_tutorial.html>`_ ||
 `Autograd <autogradqs_tutorial.html>`_ ||
 `최적화(Optimization) <optimization_tutorial.html>`_ ||
 `모델 저장하고 불러오기 <saveloadrun_tutorial.html>`_
 
-Dataset과 Dataloader
+Dataset과 DataLoader
 ==========================================================================
 
 """
@@ -125,7 +125,7 @@ from torchvision.io import read_image
 
 class CustomImageDataset(Dataset):
     def __init__(self, annotations_file, img_dir, transform=None, target_transform=None):
-        self.img_labels = pd.read_csv(annotations_file)
+        self.img_labels = pd.read_csv(annotations_file, names=['file_name', 'label'])
         self.img_dir = img_dir
         self.transform = transform
         self.target_transform = target_transform
@@ -161,7 +161,7 @@ class CustomImageDataset(Dataset):
 
 
 def __init__(self, annotations_file, img_dir, transform=None, target_transform=None):
-    self.img_labels = pd.read_csv(annotations_file)
+    self.img_labels = pd.read_csv(annotations_file, names=['file_name', 'label'])
     self.img_dir = img_dir
     self.transform = transform
     self.target_transform = target_transform
@@ -213,7 +213,7 @@ def __getitem__(self, idx):
 # 모델을 학습할 때, 일반적으로 샘플들을 "미니배치(minibatch)"로 전달하고, 매 에폭(epoch)마다 데이터를 다시 섞어서 과적합(overfit)을 막고,
 # Python의 ``multiprocessing`` 을 사용하여 데이터 검색 속도를 높이려고 합니다.
 #
-# ``DataLoader`` 는 간단한 API로 이러한 복잡한 과정들을 추상화한 순회 가능한 객체(iteratable)입니다.
+# ``DataLoader`` 는 간단한 API로 이러한 복잡한 과정들을 추상화한 순회 가능한 객체(iterable)입니다.
 
 from torch.utils.data import DataLoader
 

@@ -6,17 +6,16 @@ nn.Transformer 와 TorchText 로 시퀀스-투-시퀀스(Sequence-to-Sequence) �
 `nn.Transformer <https://pytorch.org/docs/stable/generated/torch.nn.Transformer.html>`__ 모듈을
 이용하는 시퀀스-투-시퀀스(Sequence-to-Sequence) 모델을 학습하는 방법을 배워보겠습니다.
 
-PyTorch 1.2 버젼에는
-`Attention is All You Need <https://arxiv.org/pdf/1706.03762.pdf>`__ 논문에
+PyTorch 1.2 버젼에는 `Attention is All You Need <https://arxiv.org/pdf/1706.03762.pdf>`__ 논문에
 기반한 표준 트랜스포머(transformer) 모듈을 포함하고 있습니다.
-트랜스포머 모델은 더 높은 수준의 병렬화(parallelization)가 가능하면서도
-많은 시퀀스-투-시퀀스 문제들에서 품질이 우수함이 입증되었습니다.
+트랜스포머 모델은 다양한 시퀀스-투-시퀀스 문제들에서 더 병렬화(parallelizable)가 가능하면서도
+순환 신경망(RNN; Recurrent Neural Network)과 비교하여 더 나은 성능을 보임이 입증되었습니다.
 ``nn.Transformer`` 모듈은 입력(input) 과 출력(output) 사이의 전역적인 의존성(global dependencies)
-을 나타내기 위하여 전적으로 어텐션(attention) 메커니즘에 의존합니다.
-(최근에 또 다른 모듈이 `nn.MultiheadAttention <https://pytorch.org/docs/stable/generated/torch.nn.MultiheadAttention.html>`__ 으로 구현되었습니다.)
-``nn.Transformer`` 모듈은 현재 모듈화가 매우 잘 되어 있어,
-다음과 같은 단일 컴포넌트 (이 튜토리얼의 `nn.TransformerEncoder <https://pytorch.org/docs/stable/generated/torch.nn.TransformerEncoder.html>`__ 와 같은)
-는 쉽게 적용 및 구성될 수 있습니다.
+을 나타내기 위하여 (`nn.MultiheadAttention <https://pytorch.org/docs/stable/generated/torch.nn.MultiheadAttention.html>`__ 으로
+구현된) 어텐션(attention) 메커니즘에 전적으로 의존합니다.
+현재 ``nn.Transformer`` 모듈은 모듈화가 잘 되어 있어
+단일 컴포넌트 (예. `nn.TransformerEncoder <https://pytorch.org/docs/stable/generated/torch.nn.TransformerEncoder.html>`__ )
+로 쉽게 적용 및 구성할 수 있습니다.
 
 .. image:: ../_static/img/transformer_architecture.jpg
 
@@ -43,43 +42,54 @@ PyTorch 1.2 버젼에는
 #
 
 import math
+from typing import Tuple
 
 import torch
-import torch.nn as nn
+from torch import nn, Tensor
 import torch.nn.functional as F
 from torch.nn import TransformerEncoder, TransformerEncoderLayer
+from torch.utils.data import dataset
 
 class TransformerModel(nn.Module):
 
-    def __init__(self, ntoken, ninp, nhead, nhid, nlayers, dropout=0.5):
-        super(TransformerModel, self).__init__()
+    def __init__(self, ntoken: int, d_model: int, nhead: int, d_hid: int,
+                 nlayers: int, dropout: float = 0.5):
+        super().__init__()
         self.model_type = 'Transformer'
-        self.pos_encoder = PositionalEncoding(ninp, dropout)
-        encoder_layers = TransformerEncoderLayer(ninp, nhead, nhid, dropout)
+        self.pos_encoder = PositionalEncoding(d_model, dropout)
+        encoder_layers = TransformerEncoderLayer(d_model, nhead, d_hid, dropout)
         self.transformer_encoder = TransformerEncoder(encoder_layers, nlayers)
-        self.encoder = nn.Embedding(ntoken, ninp)
-        self.ninp = ninp
-        self.decoder = nn.Linear(ninp, ntoken)
+        self.encoder = nn.Embedding(ntoken, d_model)
+        self.d_model = d_model
+        self.decoder = nn.Linear(d_model, ntoken)
 
         self.init_weights()
 
-    def generate_square_subsequent_mask(self, sz):
-        mask = (torch.triu(torch.ones(sz, sz)) == 1).transpose(0, 1)
-        mask = mask.float().masked_fill(mask == 0, float('-inf')).masked_fill(mask == 1, float(0.0))
-        return mask
-
-    def init_weights(self):
+    def init_weights(self) -> None:
         initrange = 0.1
         self.encoder.weight.data.uniform_(-initrange, initrange)
         self.decoder.bias.data.zero_()
         self.decoder.weight.data.uniform_(-initrange, initrange)
 
-    def forward(self, src, src_mask):
-        src = self.encoder(src) * math.sqrt(self.ninp)
+    def forward(self, src: Tensor, src_mask: Tensor) -> Tensor:
+        """
+        Args:
+            src: Tensor, shape [seq_len, batch_size]
+            src_mask: Tensor, shape [seq_len, seq_len]
+
+        Returns:
+            output Tensor of shape [seq_len, batch_size, ntoken]
+        """
+        src = self.encoder(src) * math.sqrt(self.d_model)
         src = self.pos_encoder(src)
         output = self.transformer_encoder(src, src_mask)
         output = self.decoder(output)
         return output
+
+
+def generate_square_subsequent_mask(sz: int) -> Tensor:
+    """Generates an upper-triangular matrix of -inf, with zeros on diag."""
+    return torch.triu(torch.ones(sz, sz) * float('-inf'), diagonal=1)
 
 
 ######################################################################
@@ -90,20 +100,23 @@ class TransformerModel(nn.Module):
 
 class PositionalEncoding(nn.Module):
 
-    def __init__(self, d_model, dropout=0.1, max_len=5000):
-        super(PositionalEncoding, self).__init__()
+    def __init__(self, d_model: int, dropout: float = 0.1, max_len: int = 5000):
+        super().__init__()
         self.dropout = nn.Dropout(p=dropout)
 
-        pe = torch.zeros(max_len, d_model)
-        position = torch.arange(0, max_len, dtype=torch.float).unsqueeze(1)
-        div_term = torch.exp(torch.arange(0, d_model, 2).float() * (-math.log(10000.0) / d_model))
-        pe[:, 0::2] = torch.sin(position * div_term)
-        pe[:, 1::2] = torch.cos(position * div_term)
-        pe = pe.unsqueeze(0).transpose(0, 1)
+        position = torch.arange(max_len).unsqueeze(1)
+        div_term = torch.exp(torch.arange(0, d_model, 2) * (-math.log(10000.0) / d_model))
+        pe = torch.zeros(max_len, 1, d_model)
+        pe[:, 0, 0::2] = torch.sin(position * div_term)
+        pe[:, 0, 1::2] = torch.cos(position * div_term)
         self.register_buffer('pe', pe)
 
-    def forward(self, x):
-        x = x + self.pe[:x.size(0), :]
+    def forward(self, x: Tensor) -> Tensor:
+        """
+        Args:
+            x: Tensor, shape [seq_len, batch_size, embedding_dim]
+        """
+        x = x + self.pe[:x.size(0)]
         return self.dropout(x)
 
 
@@ -115,9 +128,12 @@ class PositionalEncoding(nn.Module):
 
 ######################################################################
 # 이 튜토리얼에서는 ``torchtext`` 를 사용하여 Wikitext-2 데이터셋을 생성합니다.
-# 단어 오브젝트는 훈련 데이터셋(train dataset) 에 의하여 만들어지고, 토큰을 텐서(tensor)로 수치화하는데 사용됩니다.
-# 시퀀스 데이터로부터 시작하여, ``batchify()`` 함수는 데이터셋을 컬럼들로 배열하고, ``batch_size`` 사이즈의 배치들로 나눈 후에 남은 모든 토큰을 버립니다.
-# 예를 들어, 알파벳을 시퀀스(총 길이 26) 로 생각하고 배치 사이즈를 4라고 한다면, 우리는 알파벳을 길이가 6인 4개의 시퀀스로 나눌 수 있습니다.
+# 단어 오브젝트는 훈련 데이터셋(train dataset) 에 의하여 만들어지고, 토큰(token)을 텐서(tensor)로 수치화하는데 사용됩니다.
+# Wikitext-2에서 보기 드믄 토큰(rare token)은 `<unk>` 로 표현됩니다.
+#
+# 주어진 1D 벡터의 시퀀스 데이터에서, ``batchify()`` 함수는 데이터를 ``batch_size`` 컬럼들로 정렬합니다.
+# 만약 데이터가 ``batch_size`` 컬럼으로 나누어 떨어지지 않으면, 데이터를 잘라내서 맞춥니다.
+# 예를 들어 (총 길이 26의) 알파벳을 데이터로 보고 ``batch_size=4`` 일 때, 알파벳은 길이가 6인 4개의 시퀀스로 나눠집니다:
 #
 # .. math::
 #   \begin{bmatrix}
@@ -131,42 +147,52 @@ class PositionalEncoding(nn.Module):
 #   \begin{bmatrix}\text{S} \\ \text{T} \\ \text{U} \\ \text{V} \\ \text{W} \\ \text{X}\end{bmatrix}
 #   \end{bmatrix}
 #
-# 이 컬럼들은 모델에 의해서 독립적으로 취급되며, 이것은 더 효율적인 배치 프로세싱(batch processing) 이 가능하지만, ``G`` 와 ``F`` 의 의존성이 학습될 수 없다는 것을 의미합니다.
+# 배치 작업(batching)은 더 많은 병렬 처리를 가능하게 하지만, 모델이 독립적으로 각 컬럼들을 취급해야 함을 뜻합니다;
+# 예를 들어, 위 예제에서 ``G`` 와 ``F`` 의 의존성(dependance)은 학습되지 않습니다.
 #
 
-import torch
 from torchtext.datasets import WikiText2
 from torchtext.data.utils import get_tokenizer
 from torchtext.vocab import build_vocab_from_iterator
 
 train_iter = WikiText2(split='train')
 tokenizer = get_tokenizer('basic_english')
-vocab = build_vocab_from_iterator(map(tokenizer, train_iter), specials=["<unk>"])
-vocab.set_default_index(vocab["<unk>"])
+vocab = build_vocab_from_iterator(map(tokenizer, train_iter), specials=['<unk>'])
+vocab.set_default_index(vocab['<unk>'])
 
-def data_process(raw_text_iter):
-  data = [torch.tensor(vocab(tokenizer(item)), dtype=torch.long) for item in raw_text_iter]
-  return torch.cat(tuple(filter(lambda t: t.numel() > 0, data)))
+def data_process(raw_text_iter: dataset.IterableDataset) -> Tensor:
+    """Converts raw text into a flat Tensor."""
+    data = [torch.tensor(vocab(tokenizer(item)), dtype=torch.long) for item in raw_text_iter]
+    return torch.cat(tuple(filter(lambda t: t.numel() > 0, data)))
 
+# train_iter was "consumed" by the process of building the vocab,
+# so we have to create it again
 train_iter, val_iter, test_iter = WikiText2()
 train_data = data_process(train_iter)
 val_data = data_process(val_iter)
 test_data = data_process(test_iter)
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-def batchify(data, bsz):
-    # 데이터셋을 bsz 파트들로 나눕니다.
-    nbatch = data.size(0) // bsz
-    # 깔끔하게 나누어 떨어지지 않는 추가적인 부분(나머지들) 은 잘라냅니다.
-    data = data.narrow(0, 0, nbatch * bsz)
-    # 데이터에 대하여 bsz 배치들로 동등하게 나눕니다.
-    data = data.view(bsz, -1).t().contiguous()
+def batchify(data: Tensor, bsz: int) -> Tensor:
+    """Divides the data into bsz separate sequences, removing extra elements
+    that wouldn't cleanly fit.
+
+    Args:
+        data: Tensor, shape [N]
+        bsz: int, batch size
+
+    Returns:
+        Tensor of shape [N // bsz, bsz]
+    """
+    seq_len = data.size(0) // bsz
+    data = data[:seq_len * bsz]
+    data = data.view(bsz, seq_len).t().contiguous()
     return data.to(device)
 
 batch_size = 20
 eval_batch_size = 10
-train_data = batchify(train_data, batch_size)
+train_data = batchify(train_data, batch_size)  # shape [seq_len, batch_size]
 val_data = batchify(val_data, eval_batch_size)
 test_data = batchify(test_data, eval_batch_size)
 
@@ -178,7 +204,7 @@ test_data = batchify(test_data, eval_batch_size)
 
 
 ######################################################################
-# ``get_batch()`` 함수는 트랜스포머 모델을 위한 입력과 타겟 시퀀스를 생성합니다.
+# ``get_batch()`` 함수는 트랜스포머 모델을 위한 입력-타겟 시퀀스 쌍(pair)을 생성합니다.
 # 이 함수는 소스 데이터를 ``bptt`` 길이를 가진 덩어리로 세분화 합니다.
 # 언어 모델링 과제를 위해서, 모델은 다음 단어인 ``Target`` 이 필요 합니다.
 # 예를 들어, ``bptt`` 의 값이 2 라면, 우리는 ``i`` = 0 일 때 다음의 2 개의 변수(Variable) 를 얻을 수 있습니다:
@@ -190,7 +216,16 @@ test_data = batchify(test_data, eval_batch_size)
 #
 
 bptt = 35
-def get_batch(source, i):
+def get_batch(source: Tensor, i: int) -> Tuple[Tensor, Tensor]:
+    """
+    Args:
+        source: Tensor, shape [full_seq_len, batch_size]
+        i: int
+
+    Returns:
+        tuple (data, target), where data has shape [seq_len, batch_size] and
+        target has shape [seq_len * batch_size]
+    """
     seq_len = min(bptt, len(source) - 1 - i)
     data = source[i:i+seq_len]
     target = source[i+1:i+1+seq_len].reshape(-1)
@@ -204,17 +239,17 @@ def get_batch(source, i):
 
 
 ######################################################################
-# 모델은 아래와 같은 하이퍼파라미터(hyperparameter) 로 세팅 됩니다.
+# 모델의 하이퍼파라미터(hyperparameter)는 아래와 같이 정의됩니다.
 # 단어 사이즈는 단어 오브젝트의 길이와 일치 합니다.
 #
 
 ntokens = len(vocab) # 단어 사전(어휘집)의 크기
 emsize = 200 # 임베딩 차원
-nhid = 200 # nn.TransformerEncoder 에서 피드포워드 네트워크(feedforward network) 모델의 차원
+d_hid = 200 # nn.TransformerEncoder 에서 피드포워드 네트워크(feedforward network) 모델의 차원
 nlayers = 2 # nn.TransformerEncoder 내부의 nn.TransformerEncoderLayer 개수
-nhead = 2 # 멀티헤드 어텐션(multi-head attention) 모델의 헤드 개수
-dropout = 0.2 # 드랍아웃(dropout) 값
-model = TransformerModel(ntokens, emsize, nhead, nhid, nlayers, dropout).to(device)
+nhead = 2 # nn.MultiheadAttention의 헤드 개수
+dropout = 0.2 # 드랍아웃(dropout) 확률
+model = TransformerModel(ntokens, emsize, nhead, d_hid, nlayers, dropout).to(device)
 
 
 ######################################################################
@@ -224,91 +259,91 @@ model = TransformerModel(ntokens, emsize, nhead, nhid, nlayers, dropout).to(devi
 
 
 ######################################################################
-# 손실(loss) 을 추적하는 데에는
-# `CrossEntropyLoss <https://pytorch.org/docs/master/nn.html?highlight=crossentropyloss#torch.nn.CrossEntropyLoss>`__
-# 가 적용되며, 옵티마이저(optimizer) 로서
-# `SGD <https://pytorch.org/docs/master/optim.html?highlight=sgd#torch.optim.SGD>`__
-# 는 확률적 경사 하강법(stochastic gradient descent method) 을 구현합니다.
-# 초기 학습률(learning rate) 은 5.0 으로 설정됩니다.
-# `StepLR <https://pytorch.org/docs/master/optim.html?highlight=steplr#torch.optim.lr_scheduler.StepLR>`__
-# 은 에포크(epoch) 에 따라서 학습률을 조절하는데 사용됩니다.
-# 학습하는 동안에, 우리는 기울기 폭발(gradient exploding) 을 방지하기 위하여 모든 기울기를 함께 스케일(scale) 하는 함수인
-# `nn.utils.clip_grad_norm\_ <https://pytorch.org/docs/master/nn.html?highlight=nn%20utils%20clip_grad_norm#torch.nn.utils.clip_grad_norm_>`__
-# 을 이용합니다.
+# `CrossEntropyLoss <https://pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html>`__ 를
+# `SGD <https://pytorch.org/docs/stable/generated/torch.optim.SGD.html>`__ (확률적 경사 하강법) 옵티마이저(optimizer)와
+# 함께 사용하였습니다. 학습률(learning rate)는 5.0으로 초기화하였으며 `StepLR <https://pytorch.org/docs/master/optim.html?highlight=steplr#torch.optim.lr_scheduler.StepLR>`__
+# 스케쥴을 따릅니다. 학습하는 동안, `nn.utils.clip_grad_norm\_ <https://pytorch.org/docs/stable/generated/torch.nn.utils.clip_grad_norm_.html>`__
+# 을 사용하여 기울기(gradient)가 폭발(exploding)하지 않도록 합니다.
 #
 
+import copy
 import time
 
 criterion = nn.CrossEntropyLoss()
-lr = 5.0 # 학습률
+lr = 5.0  # 학습률(learning rate)
 optimizer = torch.optim.SGD(model.parameters(), lr=lr)
 scheduler = torch.optim.lr_scheduler.StepLR(optimizer, 1.0, gamma=0.95)
 
-def train():
-    model.train() # 학습 모드를 시작합니다.
+def train(model: nn.Module) -> None:
+    model.train()  # 학습 모드 시작
     total_loss = 0.
+    log_interval = 200
     start_time = time.time()
-    src_mask = model.generate_square_subsequent_mask(bptt).to(device)
+    src_mask = generate_square_subsequent_mask(bptt).to(device)
+
+    num_batches = len(train_data) // bptt
     for batch, i in enumerate(range(0, train_data.size(0) - 1, bptt)):
         data, targets = get_batch(train_data, i)
-        optimizer.zero_grad()
-        if data.size(0) != bptt:
-            src_mask = model.generate_square_subsequent_mask(data.size(0)).to(device)
+        batch_size = data.size(0)
+        if batch_size != bptt:  # 마지막 배치에만 적용
+            src_mask = src_mask[:batch_size, :batch_size]
         output = model(data, src_mask)
         loss = criterion(output.view(-1, ntokens), targets)
+
+        optimizer.zero_grad()
         loss.backward()
         torch.nn.utils.clip_grad_norm_(model.parameters(), 0.5)
         optimizer.step()
 
         total_loss += loss.item()
-        log_interval = 200
         if batch % log_interval == 0 and batch > 0:
+            lr = scheduler.get_last_lr()[0]
+            ms_per_batch = (time.time() - start_time) * 1000 / log_interval
             cur_loss = total_loss / log_interval
-            elapsed = time.time() - start_time
-            print('| epoch {:3d} | {:5d}/{:5d} batches | '
-                  'lr {:02.2f} | ms/batch {:5.2f} | '
-                  'loss {:5.2f} | ppl {:8.2f}'.format(
-                    epoch, batch, len(train_data) // bptt, scheduler.get_last_lr()[0],
-                    elapsed * 1000 / log_interval,
-                    cur_loss, math.exp(cur_loss)))
+            ppl = math.exp(cur_loss)
+            print(f'| epoch {epoch:3d} | {batch:5d}/{num_batches:5d} batches | '
+                  f'lr {lr:02.2f} | ms/batch {ms_per_batch:5.2f} | '
+                  f'loss {cur_loss:5.2f} | ppl {ppl:8.2f}')
             total_loss = 0
             start_time = time.time()
 
-def evaluate(eval_model, data_source):
-    eval_model.eval() # 평가 모드를 시작합니다.
+def evaluate(model: nn.Module, eval_data: Tensor) -> float:
+    model.eval()  # 평가 모드 시작
     total_loss = 0.
-    src_mask = model.generate_square_subsequent_mask(bptt).to(device)
+    src_mask = generate_square_subsequent_mask(bptt).to(device)
     with torch.no_grad():
-        for i in range(0, data_source.size(0) - 1, bptt):
-            data, targets = get_batch(data_source, i)
-            if data.size(0) != bptt:
-                src_mask = model.generate_square_subsequent_mask(data.size(0)).to(device)
-            output = eval_model(data, src_mask)
+        for i in range(0, eval_data.size(0) - 1, bptt):
+            data, targets = get_batch(eval_data, i)
+            batch_size = data.size(0)
+            if batch_size != bptt:
+                src_mask = src_mask[:batch_size, :batch_size]
+            output = model(data, src_mask)
             output_flat = output.view(-1, ntokens)
-            total_loss += len(data) * criterion(output_flat, targets).item()
-    return total_loss / (len(data_source) - 1)
+            total_loss += batch_size * criterion(output_flat, targets).item()
+    return total_loss / (len(eval_data) - 1)
 
 ######################################################################
 # 에포크 내에서 반복됩니다. 만약 검증 오차(validation loss) 가 우리가 지금까지 관찰한 것 중 최적이라면 모델을 저장합니다.
 # 매 에포크 이후에 학습률을 조절합니다.
 
-best_val_loss = float("inf")
-epochs = 3 # 에포크 수
+best_val_loss = float('inf')
+epochs = 3
 best_model = None
 
 for epoch in range(1, epochs + 1):
     epoch_start_time = time.time()
-    train()
+    train(model)
     val_loss = evaluate(model, val_data)
+    val_ppl = math.exp(val_loss)
+    elapsed = time.time() - epoch_start_time
     print('-' * 89)
-    print('| end of epoch {:3d} | time: {:5.2f}s | valid loss {:5.2f} | '
-          'valid ppl {:8.2f}'.format(epoch, (time.time() - epoch_start_time),
-                                     val_loss, math.exp(val_loss)))
+    print(f'| end of epoch {epoch:3d} | time: {elapsed:5.2f}s | '
+          f'valid loss {val_loss:5.2f} | valid ppl {val_ppl:8.2f}')
     print('-' * 89)
 
     if val_loss < best_val_loss:
         best_val_loss = val_loss
-        best_model = model
+        best_model = copy.deepcopy(model)
 
     scheduler.step()
 
@@ -317,10 +352,10 @@ for epoch in range(1, epochs + 1):
 # 평가 데이터셋(test dataset)으로 모델을 평가하기
 # -------------------------------------------------
 #
-# 평가 데이터셋에 대한 결과를 확인하기 위해서 최고의 모델을 적용합니다.
 
 test_loss = evaluate(best_model, test_data)
+test_ppl = math.exp(test_loss)
 print('=' * 89)
-print('| End of training | test loss {:5.2f} | test ppl {:8.2f}'.format(
-    test_loss, math.exp(test_loss)))
+print(f'| End of training | test loss {test_loss:5.2f} | '
+      f'test ppl {test_ppl:8.2f}')
 print('=' * 89)

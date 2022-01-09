@@ -173,8 +173,8 @@ Recipes are bite-sized bite-sized, actionable examples of how to use specific Py
    :tags: Mobile,Model-Optimization
 
 .. customcarditem::
-   :header: Making Android Native Application That Uses PyTorch Android Prebuilt Libraries
-   :card_description: Learn how to make Android application from the scratch that uses LibTorch C++ API and uses TorchScript model with custom C++ operator.
+   :header: PyTorch 사전 빌드된 라이브러리를 사용하는 네이티브 Android 애플리케이션 만들기
+   :card_description: LibTorch C++ API와 사용자 지정 C++ 연산자를 가지는 TorchScript를 사용해서 Android 애플리케이션을 처음부터 만드는 방법을 알아봅니다.
    :image: ../_static/img/thumbnails/cropped/android.png
    :link: ../recipes/android_native_app_with_custom_op.html
    :tags: Mobile
@@ -244,6 +244,15 @@ Recipes are bite-sized bite-sized, actionable examples of how to use specific Py
    :link: ../recipes/recipes/tuning_guide.html
    :tags: Model-Optimization
 
+.. Intel(R) Extension for PyTorch*
+
+.. customcarditem::
+   :header: Intel® Extension for PyTorch*
+   :card_description: Introduction of Intel® Extension for PyTorch*
+   :image: ../_static/img/thumbnails/cropped/profiler.png
+   :link: ../recipes/intel_extension_for_pytorch.html
+   :tags: Model-Optimization
+
 .. Distributed Training
 .. customcarditem::
    :header: Shard Optimizer States with ZeroRedundancyOptimizer
@@ -299,6 +308,7 @@ Recipes are bite-sized bite-sized, actionable examples of how to use specific Py
    /recipes/recipes/dynamic_quantization
    /recipes/recipes/amp_recipe
    /recipes/recipes/tuning_guide
+   /recipes/recipes/intel_extension_for_pytorch
    /recipes/torchscript_inference
    /recipes/deployment_with_flask
    /recipes/distributed_rpc_profiling

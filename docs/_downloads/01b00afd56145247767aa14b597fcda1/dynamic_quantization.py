@@ -1,123 +1,123 @@
 """
-Dynamic Quantization
-====================
+동적 양자화
+===========
 
-In this recipe you will see how to take advantage of Dynamic
-Quantization to accelerate inference on an LSTM-style recurrent neural
-network. This reduces the size of the model weights and speeds up model
-execution.
+이 레시피에서는 동적 양자화(dynamic quantization)를 활용하여, LSTM과
+유사한 형태의 순환 신경망이 좀 더 빠르게 추론하도록 만드는 방법을 살펴
+봅니다. 이를 통해 모델에서 사용하는 가중치의 규모를 줄이고 수행 속도를
+빠르게 만들 것입니다.
 
-Introduction
--------------
+도입
+----
 
-There are a number of trade-offs that can be made when designing neural
-networks. During model developmenet and training you can alter the
-number of layers and number of parameters in a recurrent neural network
-and trade-off accuracy against model size and/or model latency or
-throughput. Such changes can take lot of time and compute resources
-because you are iterating over the model training. Quantization gives
-you a way to make a similar trade off between performance and model
-accuracy with a known model after training is completed.
+우리는 신경망을 설계할 때 여러 트레이드오프(trade-off)를 마주하게
+됩니다. 모델을 개발하고 학습할 때 순환 신경망의 레이어나 매개변수의
+수를 바꿔볼 수 있을 텐데, 그럴 때면 정확도와 모델의 규모나 응답
+속도(또는 처리량) 사이에 트레이드오프가 생기게 됩니다. 그러한 변화를 줄
+때면 시간과 컴퓨터 자원이 많이 소모되는데, 이는 모델 학습 과정에 대해
+반복 작업을 수행하기 때문입니다. 양자화 기법을 기법을 사용하면 알려진
+모델의 학습이 끝난 후 성능과 모델의 정확도 사이에 비슷한 트레이드오프를
+줄 수 있게 될 것입니다.
 
-You can give it a try in a single session and you will certainly reduce
-your model size significantly and may get a significant latency
-reduction without losing a lot of accuracy.
+여러분이 이를 한 번 시도해 본다면 정확도가 별로 손실되지 않으면서도
+모델의 규모를 상당히 줄이면서 응답 시간도 감소시킬 수 있을 것입니다.
 
-What is dynamic quantization?
--------------
+동적 양자화란 무엇인가?
+-----------------------
 
-Quantizing a network means converting it to use a reduced precision
-integer representation for the weights and/or activations. This saves on
-model size and allows the use of higher throughput math operations on
-your CPU or GPU.
+신경망을 양자화한다는 말의 의미는 가중치나 활성화 함수에서 정밀도가
+낮은 정수 표현을 사용하도록 바꾼다는 것입니다. 이를 통해 모델의 규모를
+줄일 수 있으며, CPU나 GPU에서 수행하는 수치 연산의 처리량도 높일 수
+있습니다.
 
-When converting from floating point to integer values you are
-essentially multiplying the floating point value by some scale factor
-and rounding the result to a whole number. The various quantization
-approaches differ in the way they approach determining that scale
-factor.
+부동소수점 실수 값을 정수로 바꾸는 것은 본질적으로 실수 값에 어떤
+배율을 곱하여 그 결괏값을 정수로 반올림하는 것과 같습니다. 이 배율을
+어떻게 정할 것이냐에 따라 양자화하는 방법도 여러 가지로 나뉩니다.
 
-The key idea with dynamic quantization as described here is that we are
-going to determine the scale factor for activations dynamically based on
-the data range observed at runtime. This ensures that the scale factor
-is "tuned" so that as much signal as possible about each observed
-dataset is preserved.
+여기서 살펴 볼 동적 양자화의 핵심은 모델을 수행할 때 데이터의 범위를
+살펴 보고, 그에 따라 활성화 함수에 곱할 배율을 동적으로 결정하는 데에
+있습니다. 이를 통해 배율이 튜닝될 수 있도록, 즉 살펴보고 있는
+데이터셋에 포함된 정보가 최대한 유지되도록 할 수 있습니다.
 
-The model parameters on the other hand are known during model conversion
-and they are converted ahead of time and stored in INT8 form.
+반면에 모델 매개변수는 모델을 변환하는 시점에 이미 알고 있는 상태이며,
+따라서 사전에 INT8 형태로 바꿔놓을 수 있습니다.
 
-Arithmetic in the quantized model is done using vectorized INT8
-instructions. Accumulation is typically done with INT16 or INT32 to
-avoid overflow. This higher precision value is scaled back to INT8 if
-the next layer is quantized or converted to FP32 for output.
+양자화된 모델에서의 수치 연산은 벡터화된 INT8 연산을 통해 이뤄집니다.
+값을 누적하는 연산은 보통 INT16이나 INT32로 수행하게 되는데, 이는
+오버플로를 방지하기 위합니다. 이처럼 높은 정밀도로 표현한 값은, 그
+다음 레이어가 양자화되어 있다면 다시 INT8로 맞추고, 출력이라면 FP32로
+바꿉니다.
 
-Dynamic quantization is relatively free of tuning parameters which makes
-it well suited to be added into production pipelines as a standard part
-of converting LSTM models to deployment.
+동적 양자화는 매개변수 튜닝, 즉 모델을 제품 파이프라인에 넣기 적합한
+형태로 만들어야 한다는 부담이 적은 편입니다. 이러한 작업은 LSTM 모델을
+배포용으로 변환할 때면 표준적으로 거치는 단계입니다.
 
 
 
 .. note::
-   Limitations on the approach taken here
+   여기서 소개할 접근법의 한계
 
 
-   This recipe provides a quick introduction to the dynamic quantization
-   features in PyTorch and the workflow for using it. Our focus is on
-   explaining the specific functions used to convert the model. We will
-   make a number of significant simplifications in the interest of brevity
-   and clarity
+   이 레시피에서는 PyTorch의 동적 양자화 기능과 이를 사용하기 위한
+   작업 흐름에 대해 간단히 살펴보려 합니다. 우리는 모델을 변환할 때
+   사용할 특정 함수에 초점을 맞춰 설명하려 합니다. 그리고 간결하고
+   명료한 설명을 위해 상당한 부분을 단순화할 것입니다.
 
 
-1. You will start with a minimal LSTM network
-2. You are simply going to initialize the network with a random hidden
-   state
-3. You are going to test the network with random inputs
-4. You are not going to train the network in this tutorial
-5. You will see that the quantized form of this network is smaller and
-   runs faster than the floating point network we started with
-6. You will see that the output values are generally in the same
-   ballpark as the output of the FP32 network, but we are not
-   demonstrating here the expected accuracy loss on a real trained
-   network
-
-You will see how dynamic quantization is done and be able to see
-suggestive reductions in memory use and latency times. Providing a
-demonstration that the technique can preserve high levels of model
-accuracy on a trained LSTM is left to a more advanced tutorial. If you
-want to move right away to that more rigorous treatment please proceed
-to the `advanced dynamic quantization
-tutorial <https://tutorials.pytorch.kr/advanced/dynamic_quantization_tutorial.html>`__.
-
-Steps
--------------
-
-This recipe has 5 steps.
-
-1. Set Up - Here you define a very simple LSTM, import modules, and establish
-   some random input tensors.
-
-2. Do the Quantization - Here you instantiate a floating point model and then create quantized
-   version of it.
-
-3. Look at Model Size - Here you show that the model size gets smaller.
-
-4. Look at Latency - Here you run the two models and compare model runtime (latency).
-
-5. Look at Accuracy - Here you run the two models and compare outputs.
+1. 아주 작은 LSTM 네트워크를 가지고 시작합니다.
+2. 네트워크를 랜덤한 은닉 상태로 초기화합니다.
+3. 네트워크를 랜덤한 입력으로 테스트합니다.
+4. 이 튜토리얼에서는 네트워크를 학습하지 않을 것입니다.
+5. 우리가 가지고 시작한 부동소수점 실수를 사용하는 네트워크를 양자화
+   했을 때, 규모가 줄어들고 수행 속도가 빨라짐을 살펴볼 것입니다.
+6. 네트워크의 출력값이 FP32 네트워크와 크게 다르지 않음을 살펴보겠지만,
+   실제로 학습된 네트워크의 정확도 손실 기댓값이 어떻게 되는지는
+   살펴보지 않을 것입니다.
 
 
-1: Set Up
-~~~~~~~~~~~~~~~
-This is a straightfoward bit of code to set up for the rest of the
-recipe.
+여러분은 동적 양자화가 어떻게 진행되는지 살펴보고, 이를 통해 메모리
+사용량과 응답 시간이 줄어든다는 점을 살펴볼 것입니다. 이 기법을
+학습된 LSTM에 적용하더라도 정확도를 높은 수준으로 유지할 수 있음을
+살펴보는 것은 고급 튜토리얼의 내용으로 남겨두겠습니다. 만약 여러분이
+좀 더 엄밀한 내용으로 넘어가고 싶다면 `고급 동적 양자화 튜토리얼
+<https://tutorials.pytorch.kr/advanced/dynamic_quantization_tutorial.html>`__
+을 참고하시기 바랍니다.
 
-The unique module we are importing here is torch.quantization which
-includes PyTorch's quantized operators and conversion functions. We also
-define a very simple LSTM model and set up some inputs.
+
+단계
+----
+
+이 레시피는 다섯 단계로 구성되어 있습니다.
+
+1. 준비 - 이 단계에서는 아주 간단한 LSTM을 정의하고, 필요한 모듈을
+   불러 오고, 몇 개의 랜덤 입력 텐서를 준비합니다.
+
+2. 양자화 수행 - 이 단계에서는 부동소수점 실수를 사용하는 모델을
+   만들고 이를 양자화한 버전을 생성합니다.
+
+3. 모델의 규모 살펴보기 - 이 단계에서는 모델의 규모가 줄어들었음을
+   살펴봅니다.
+
+4. 응답 시간 살펴보기 - 이 단계에서는 두 모델을 구동시키고 실행
+   속도(응답 시간)를 비교합니다.
+
+5. 정확도 살펴보기 - 이 단계에서는 두 모델을 구동시키고 출력을
+   비교합니다.
+
+
+1: 준비
+~~~~~~~
+이 단계에서는 이 레시피에서 계속 사용할 몇 줄의 간단한 코드를
+준비합니다.
+
+우리가 여기서 불러올 유일한 모듈은 torch.quantization 뿐이며, 이
+모듈에는 PyTorch의 양자화 관련 연산자 및 변환 함수가 포함되어
+있습니다. 우리는 또 아주 간단한 LSTM 모델을 정의하고 몇 개의 입력을
+준비합니다.
 
 """
 
-# import the modules used here in this recipe
+# 이 레시피에서 사용할 모듈을 여기서 불러옵니다
 import torch
 import torch.quantization
 import torch.nn as nn
@@ -125,14 +125,18 @@ import copy
 import os
 import time
 
-# define a very, very simple LSTM for demonstration purposes
-# in this case, we are wrapping nn.LSTM, one layer, no pre or post processing
-# inspired by
-# https://tutorials.pytorch.kr/beginner/nlp/sequence_models_tutorial.html, by Robert Guthrie
-# and https://tutorials.pytorch.kr/advanced/dynamic_quantization_tutorial.html
+
+# 설명을 위해 아주 아주 간단한 LSTM을 정의합니다
+# 여기서는 레이어가 하나 뿐이고 사전 작업이나 사후 작업이 없는
+# nn.LSTM을 감싸서 사용합니다
+# 이는 Robert Guthrie 의
+# https://tutorials.pytorch.kr/beginner/nlp/sequence_models_tutorial.html 과
+# https://tutorials.pytorch.kr/advanced/dynamic_quantization_tutorial.html 에서
+# 영감을 받은 부분입니다
+
 class lstm_for_demonstration(nn.Module):
-  """Elementary Long Short Term Memory style model which simply wraps nn.LSTM
-     Not to be used for anything other than demonstration.
+  """기초적인 LSTM모델로, 단순히 nn.LSTM 를 감싼 것입니다.
+     설명용 예시 이외의 용도로 사용하기에는 적합하지 않습니다.
   """
   def __init__(self,in_dim,out_dim,depth):
      super(lstm_for_demonstration,self).__init__()
@@ -143,51 +147,49 @@ class lstm_for_demonstration(nn.Module):
      return out, hidden
 
 
-torch.manual_seed(29592)  # set the seed for reproducibility
+torch.manual_seed(29592)  # 재현을 위한 설정
 
-#shape parameters
+# 매개변수 다듬기(네트워크의 모양(shape) 정하기)
 model_dimension=8
 sequence_length=20
 batch_size=1
 lstm_depth=1
 
-# random data for input
+# 입력용 랜덤 데이터
 inputs = torch.randn(sequence_length,batch_size,model_dimension)
-# hidden is actually is a tuple of the initial hidden state and the initial cell state
+# hidden 은 사실 초기 은닉 상태(hidden state)와 초기 셀 상태(cell state)로 구성된 튜플입니다
 hidden = (torch.randn(lstm_depth,batch_size,model_dimension), torch.randn(lstm_depth,batch_size,model_dimension))
 
 
 ######################################################################
-# 2: Do the Quantization
+# 2: 양자화 수행
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-# Now we get to the fun part. First we create an instance of the model
-# called float\_lstm then we are going to quantize it. We're going to use
-# the
+# 이제 재밌는 부분을 살펴보려 합니다. 우선은 양자화 할 모델 객체를 하나
+# 만들고 그 이름을 float\_lstm 으로 둡니다. 우리가 여기서 사용할 함수는
 #
 # ::
 #
 #     torch.quantization.quantize_dynamic()
 #
-# function here (`see
-# documentation <https://pytorch.org/docs/stable/quantization.html#torch.quantization.quantize_dynamic>`__)
-# which takes the model, then a list of the submodules which we want to
-# have quantized if they appear, then the datatype we are targeting. This
-# function returns a quantized version of the original model as a new
-# module.
+# 입니다 (`관련 문서 참고
+# <https://pytorch.org/docs/stable/quantization.html#torch.quantization.quantize_dynamic>`__).
+# 이 함수는 모델과, 만약 등장한다면 양자화하고 싶은 서브모듈의 목록,
+# 그리고 우리가 사용하려 하는 자료형을 입력으로 받습니다. 이 함수는
+# 원본 모델을 양자화한 버전을 새로운 모듈의 형태로 반환합니다.
 #
-# That's all it takes.
+# 이게 내용의 전부입니다.
 #
 
- # here is our floating point instance
+# 부동소수점 실수를 사용하는 객체입니다
 float_lstm = lstm_for_demonstration(model_dimension, model_dimension,lstm_depth)
 
-# this is the call that does the work
+# 이 함수 호출이 작업을 수행하는 부분입니다
 quantized_lstm = torch.quantization.quantize_dynamic(
     float_lstm, {nn.LSTM, nn.Linear}, dtype=torch.qint8
 )
 
-# show the changes that were made
+# 어떤 차이가 있는지 살펴봅니다
 print('Here is the floating point version of this module:')
 print(float_lstm)
 print('')
@@ -196,16 +198,16 @@ print(quantized_lstm)
 
 
 ######################################################################
-# 3. Look at Model Size
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Ok, so we've quantized the model. What does that get us? Well the first
-# benefit is that we've replaced the FP32 model parameters with INT8
-# values (and some recorded scale factors). This means about 75% less data
-# to store and move around. With the default values the reduction shown
-# below will be less than 75% but if you increase the model size above
-# (for example you can set model dimension to something like 80) this will
-# converge towards 4x smaller as the stored model size dominated more and
-# more by the parameter values.
+# 3. 모델의 규모 살펴보기
+# ~~~~~~~~~~~~~~~~~~~~~~~
+# 자, 이제 모델을 양자화 했습니다. 그러면 어떤 이득이 있을까요? 우선 첫
+# 번째는 FP32 모델 매개변수를 INT8 값으로 변환했다는 (그리고 배율 값도
+# 구했다는) 점입니다. 이는 우리가 값을 저장하고 다루는 데에 필요한 데이터의
+# 양이 약 75% 감소했다는 의미입니다. 기본적인 값이 있기 때문에 아래처럼
+# 감소량이 75% 보다는 적지만, 만약 앞에서 모델의 규모를 더 크게 잡았다면
+# (가령 모델의 차원을 80 같은 값으로 두었다면) 감소율이 4분의 1로 수렴할
+# 것입니다. 이는 저장된 모델의 규모가 매개변수의 값에 훨씬 더 의존하게 되기
+# 때문입니다.
 #
 
 def print_size_of_model(model, label=""):
@@ -215,28 +217,30 @@ def print_size_of_model(model, label=""):
     os.remove('temp.p')
     return size
 
-# compare the sizes
+# 규모 비교하기
 f=print_size_of_model(float_lstm,"fp32")
 q=print_size_of_model(quantized_lstm,"int8")
 print("{0:.2f} times smaller".format(f/q))
 
 
 ######################################################################
-# 4. Look at Latency
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# The second benefit is that the quantized model will typically run
-# faster. This is due to a combinations of effects including at least:
+# 4. 응답 시간 살펴보기
+# ~~~~~~~~~~~~~~~~~~~~~
+# 좋은 점 두 번째는 통상적으로 양자화된 모델의 수행 속도가 좀 더
+# 빠르다는 점입니다. 이는
 #
-# 1. Less time spent moving parameter data in
-# 2. Faster INT8 operations
+# 1. 매개변수 데이터를 처리하는 데 시간이 덜 들기 때문
+# 2. INT8 연산이 빠르기 때문
 #
-# As you will see the quantized version of this super-simple network runs
-# faster. This will generally be true of more complex networks but as they
-# say "your milage may vary" depending on a number of factors including
-# the structure of the model and the hardware you are running on.
+# 등의 이유 때문입니다.
+#
+# 이제 살펴보겠지만, 이 아주 간단한 네트워크의 양자화된 버전은 그 수행
+# 속도가 더 빠릅니다. 이는 좀 더 복잡한 네트워크에 대해서도 대체로
+# 성립하는 특징이지만, 모델의 구조나 작업을 수행할 하드웨어의 특성 등
+# 여러 가지 요소에 따라 그때 그때 다를 수 있습니다.
 #
 
-# compare the performance
+# 성능 비교하기
 print("Floating point FP32")
 # %timeit float_lstm.forward(inputs, hidden)
 
@@ -245,59 +249,63 @@ print("Quantized INT8")
 
 
 ######################################################################
-# 5: Look at Accuracy
+# 5: 정확도 살펴보기
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# We are not going to do a careful look at accuracy here because we are
-# working with a randomly initialized network rather than a properly
-# trained one. However, I think it is worth quickly showing that the
-# quantized network does produce output tensors that are "in the same
-# ballpark" as the original one.
+# 우리는 여기서 정확도를 자세히 살펴보진 않을 것입니다. 이는 우리가
+# 제대로 학습된 네트워크가 아니라 랜덤하게 초기화된 네트워크를 사용하기
+# 때문입니다. 그럼에도 불구하고 양자화된 네트워크의 출력 텐서가 원본과
+# '크게 다르지 않다'는 점을 살펴보는 것은 의미가 있다고 봅니다.
 #
-# For a more detailed analysis please see the more advanced tutorials
-# referenced at the end of this recipe.
+# 좀 더 자세한 분석은 이 레시피의 끝부분에 참고 자료로 올려둔 고급
+# 튜토리얼을 참고하시기 바랍니다.
 #
 
-# run the float model
+# 부동소수점 모델 구동하기
 out1, hidden1 = float_lstm(inputs, hidden)
 mag1 = torch.mean(abs(out1)).item()
 print('mean absolute value of output tensor values in the FP32 model is {0:.5f} '.format(mag1))
 
-# run the quantized model
+# 양자화된 모델 구동하기
 out2, hidden2 = quantized_lstm(inputs, hidden)
 mag2 = torch.mean(abs(out2)).item()
 print('mean absolute value of output tensor values in the INT8 model is {0:.5f}'.format(mag2))
 
-# compare them
+# 둘의 결과 비교하기
 mag3 = torch.mean(abs(out1-out2)).item()
 print('mean absolute value of the difference between the output tensors is {0:.5f} or {1:.2f} percent'.format(mag3,mag3/mag1*100))
 
 
 ######################################################################
-#  Learn More
-# ------------
-# We've explained what dynamic quantization is, what benefits it brings,
-# and you have used the ``torch.quantization.quantize_dynamic()`` function
-# to quickly quantize a simple LSTM model.
+# 좀 더 알아보기
+# --------------
+# 우리는 동적 양자화가 무엇이며 어떤 이점이 있는지 살펴보았고, 간단한
+# LSTM 모델을 빠르게 양자화하기 위해 ``torch.quantization.quantize_dynamic()``
+# 함수를 사용했습니다.
 #
-# This was a fast and high level treatment of this material; for more
-# detail please continue learning with `(beta) Dynamic Quantization on an LSTM Word Language Model Tutorial <https://tutorials.pytorch.kr/advanced/dynamic\_quantization\_tutorial.html>`_.
+# 이 문서는 빠르고 고수준의 내용입니다. 좀 더 자세하게 보시려면,
+# `(beta) Dynamic Quantization on an LSTM Word Language Model Tutorial <https://tutorials.pytorch.kr/advanced/dynamic\_quantization\_tutorial.html>`_
+# 방문하여 보시기 바랍니다
 #
+# 이 레시피에서는 이러한 내용을 빠르게, 그리고 고수준에서 살펴 보았습니다.
+# 좀 더 자세한 내용을 알아보고 싶다면 `(베타) LSTM 언어 모델 동적 양자화
+# 튜토리얼 <https://tutorials.pytorch.kr/advanced/dynamic\_quantization\_tutorial.html>`_
+# 을 계속 공부해 보시기 바랍니다.
 #
-# Additional Resources
+# 참고 자료
 # =========
-# Documentation
-# ~~~~~~~~~~~~~~
+# 문서
+# ~~~~
 #
-# `Quantization API Documentaion <https://pytorch.org/docs/stable/quantization.html>`_
+# `양자화 API 문서 <https://pytorch.org/docs/stable/quantization.html>`_
 #
-# Tutorials
-# ~~~~~~~~~~~~~~
+# 튜토리얼
+# ~~~~~~~~
 #
-# `(beta) Dynamic Quantization on BERT <https://tutorials.pytorch.kr/intermediate/dynamic\_quantization\_bert\_tutorial.html>`_
+# `(베타) BERT 동적 양자화 <https://tutorials.pytorch.kr/intermediate/dynamic\_quantization\_bert\_tutorial.html>`_
 #
-# `(beta) Dynamic Quantization on an LSTM Word Language Model <https://tutorials.pytorch.kr/advanced/dynamic\_quantization\_tutorial.html>`_
+# `(베타) LSTM 언어 모델 동적 양자화 <https://tutorials.pytorch.kr/advanced/dynamic\_quantization\_tutorial.html>`_
 #
-# Blogs
-# ~~~~~~~~~~~~~~
-# `Introduction to Quantization on PyTorch <https://pytorch.org/blog/introduction-to-quantization-on-pytorch/>`_
+# 블로그 글
+# ~~~~~~~~~
+# `PyTorch에서 양자화 수행하기 입문서 <https://pytorch.org/blog/introduction-to-quantization-on-pytorch/>`_
 #

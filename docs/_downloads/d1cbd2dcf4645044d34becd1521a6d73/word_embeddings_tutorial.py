@@ -184,11 +184,16 @@ Proving his beauty by succession thine!
 This were to be new made when thou art old,
 And see thy blood warm when thou feel'st it cold.""".split()
 # 원래는 입력을 제대로 토큰화(tokenize) 해야하지만 이번엔 간소화하여 진행하겠습니다.
-# 튜플로 이루어진 리스트를 만들겠습니다. 각 튜플은 ([ i-2 번째 단어, i-1 번째 단어 ], 목표 단어)입니다.
-trigrams = [([test_sentence[i], test_sentence[i + 1]], test_sentence[i + 2])
-            for i in range(len(test_sentence) - 2)]
+# 튜플로 이루어진 리스트를 만들겠습니다. 각 튜플은 ([ i-CONTEXT_SIZE 번째 단어, ..., i-1 번째 단어 ], 목표 단어)입니다.
+ngrams = [
+    (
+        [test_sentence[i - j - 1] for j in range(CONTEXT_SIZE)],
+        test_sentence[i]
+    )
+    for i in range(CONTEXT_SIZE, len(test_sentence))
+]
 # 첫 3개의 튜플을 출력하여 데이터가 어떻게 생겼는지 보겠습니다.
-print(trigrams[:3])
+print(ngrams[:3])
 
 vocab = set(test_sentence)
 word_to_ix = {word: i for i, word in enumerate(vocab)}
@@ -217,7 +222,7 @@ optimizer = optim.SGD(model.parameters(), lr=0.001)
 
 for epoch in range(10):
     total_loss = 0
-    for context, target in trigrams:
+    for context, target in ngrams:
 
         # 첫번째. 모델에 넣어줄 입력값을 준비합니다. (i.e, 단어를 정수 인덱스로
         # 바꾸고 파이토치 텐서로 감싸줍시다.)
@@ -260,7 +265,7 @@ print(model.embeddings.weight[word_to_ix["beauty"]])
 # 문맥 단어 :math:`w_{i-1}, \dots, w_{i-N}` 와 :math:`w_{i+1}, \dots, w_{i+N}`
 # 가 주어졌을 때, (문맥 단어를 총칭해 :math:`C` 라고 합시다.)
 #
-# .. math::  -\log p(w_i | C) = -\log \text{Softmax}(A(\sum_{w \in C} q_w) + b)
+# .. math::  -\log p(w_i | C) = -\log \text{Softmax}\left(A(\sum_{w \in C} q_w) + b\right)
 #
 # 위 식을 최소화하는 것이 CBOW의 목적입니다. 여기서 :math:`q_w` 는 단어 :math:`w` 의
 # 임베딩 입니다.
@@ -286,9 +291,11 @@ vocab_size = len(vocab)
 
 word_to_ix = {word: i for i, word in enumerate(vocab)}
 data = []
-for i in range(2, len(raw_text) - 2):
-    context = [raw_text[i - 2], raw_text[i - 1],
-               raw_text[i + 1], raw_text[i + 2]]
+for i in range(CONTEXT_SIZE, len(raw_text) - CONTEXT_SIZE):
+    context = (
+        [raw_text[i - j - 1] for j in range(CONTEXT_SIZE)]
+        + [raw_text[i + j + 1] for j in range(CONTEXT_SIZE)]
+    )
     target = raw_text[i]
     data.append((context, target))
 print(data[:5])

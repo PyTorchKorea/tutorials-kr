@@ -16,7 +16,6 @@
 """
 
 import torch
-import torch.onnx as onnx
 import torchvision.models as models
 
 
@@ -59,22 +58,7 @@ model = torch.load('model.pth')
 ########################
 # .. note:: 이 접근 방식은 Python `pickle <https://docs.python.org/3/library/pickle.html>`_ 모듈을 사용하여 모델을 직렬화(serialize)하므로, 모델을 불러올 때 실제 클래스 정의(definition)를 적용(rely on)합니다.
 
-#######################################################################
-# 모델을 ONNX로 내보내기
-# ------------------------------------------------------------------------------------------
-#
-# PyTorch는 기본(native) ONNX 내보내기를 지원합니다. 그러나 PyTorch 실행 그래프의 동적 특성(dynamic nature) 때문에,
-# 내보내는 과정에 ONNX 모델을 생성하기 위해 실행 그래프를 탐색(traverse)해야 합니다.
-# 이러한 이유 때문에 내보내기 단계에서는 적절한 크기의 테스트 변수를 전달해야 합니다. (아래 예시에서는 올바른 크기의 가짜(dummy) 0 텐서를 생성합니다):
-
-input_image = torch.zeros((1,3,224,224))
-onnx.export(model, input_image, 'model.onnx')
-
-###########################
-# 다양한 플랫폼 및 다양한 언어에서의 추론과 같은, ONNX 모델로 할 수 있는 다양한 일들이 있습니다.
-# 더 자세한 내용은 `ONNX 튜토리얼 <https://github.com/onnx/tutorials>`_\ 을 참조하세요.
-#
-# 축하합니다! 이제 PyTorch 기본 튜토리얼을 마쳤습니다.
-# `첫 페이지를 다시 방문하여 <quickstart_tutorial.html>`_ 전체 내용들을 다시 한 번 살펴보세요.
-# 이 튜토리얼이 PyTorch로 딥러닝을 시작하는데 도움이 되었길 바랍니다. 행운을 빕니다!
-#
+#######################
+# 관련 튜토리얼
+# -----------------
+# :doc:`/recipes/recipes/saving_and_loading_a_general_checkpoint`

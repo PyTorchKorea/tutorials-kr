@@ -11,7 +11,7 @@ Channels last가 무엇인가요
 Channels last 메모리 형식(memory format)은 차원 순서를 유지하면서 메모리 상의 NCHW 텐서(tensor)를 정렬하는 또 다른 방식입니다.
 Channels last 텐서는 채널(Channel)이 가장 밀도가 높은(densest) 차원으로 정렬(예. 이미지를 픽셀x픽셀로 저장)됩니다.
 
-예를 들어, (2개의 2 x 2 이미지에 3개의 채널이 존재하는 경우) 전형적인(연속적인) NCHW 텐서의 저장 방식은 다음과 같습니다:
+예를 들어, (2개의 4 x 4 이미지에 3개의 채널이 존재하는 경우) 전형적인(연속적인) NCHW 텐서의 저장 방식은 다음과 같습니다:
 
 .. figure:: /_static/img/classic_memory_format.png
    :alt: classic_memory_format
@@ -274,13 +274,13 @@ def contains_cl(args):
     return False
 
 
-def print_inputs(args, indent=''):
+def print_inputs(args, indent=""):
     for t in args:
         if isinstance(t, torch.Tensor):
             print(indent, t.stride(), t.shape, t.device, t.dtype)
         elif isinstance(t, list) or isinstance(t, tuple):
             print(indent, type(t))
-            print_inputs(list(t), indent=indent + '    ')
+            print_inputs(list(t), indent=indent + "    ")
         else:
             print(indent, t)
 
@@ -295,32 +295,38 @@ def check_wrapper(fn):
         except Exception as e:
             print("`{}` inputs are:".format(name))
             print_inputs(args)
-            print('-------------------')
+            print("-------------------")
             raise e
         failed = False
         if was_cl:
             if isinstance(result, torch.Tensor):
                 if result.dim() == 4 and not result.is_contiguous(memory_format=torch.channels_last):
-                    print("`{}` got channels_last input, but output is not channels_last:".format(name),
-                          result.shape, result.stride(), result.device, result.dtype)
+                    print(
+                        "`{}` got channels_last input, but output is not channels_last:".format(name),
+                        result.shape,
+                        result.stride(),
+                        result.device,
+                        result.dtype,
+                    )
                     failed = True
         if failed and True:
             print("`{}` inputs are:".format(name))
             print_inputs(args)
-            raise Exception(
-                'Operator `{}` lost channels_last property'.format(name))
+            raise Exception("Operator `{}` lost channels_last property".format(name))
         return result
+
     return check_cl
 
+
 old_attrs = dict()
+
 
 def attribute(m):
     old_attrs[m] = dict()
     for i in dir(m):
         e = getattr(m, i)
-        exclude_functions = ['is_cuda', 'has_names', 'numel',
-                             'stride', 'Tensor', 'is_contiguous', '__class__']
-        if i not in exclude_functions and not i.startswith('_') and '__call__' in dir(e):
+        exclude_functions = ["is_cuda", "has_names", "numel", "stride", "Tensor", "is_contiguous", "__class__"]
+        if i not in exclude_functions and not i.startswith("_") and "__call__" in dir(e):
             try:
                 old_attrs[m][i] = e
                 setattr(m, i, check_wrapper(e))
@@ -344,8 +350,8 @@ attribute(torch)
 # 아래 코드는 torch의 속성(attributes)를 복원합니다.
 
 for (m, attrs) in old_attrs.items():
-  for (k,v) in attrs.items():
-    setattr(m, k, v)
+    for (k,v) in attrs.items():
+      setattr(m, k, v)
 
 ######################################################################
 # 해야할 일
