@@ -253,6 +253,14 @@ Recipes are bite-sized bite-sized, actionable examples of how to use specific Py
    :link: ../recipes/intel_extension_for_pytorch.html
    :tags: Model-Optimization
 
+.. Intel(R) Neural Compressor for PyTorch*
+.. customcarditem::
+   :header: Intel® Neural Compressor for PyTorch
+   :card_description: Ease-of-use quantization for PyTorch with Intel® Neural Compressor.
+   :image: ../_static/img/thumbnails/cropped/profiler.png
+   :link: ../recipes/intel_neural_compressor_for_pytorch.html
+   :tags: Quantization,Model-Optimization
+
 .. Distributed Training
 .. customcarditem::
    :header: Shard Optimizer States with ZeroRedundancyOptimizer

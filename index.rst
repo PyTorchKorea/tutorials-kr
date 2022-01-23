@@ -58,6 +58,13 @@
    :tags: Getting-Started
 
 .. customcarditem::
+   :header: Introduction to PyTorch on YouTube
+   :card_description: An introduction to building a complete ML workflow with PyTorch. Follows the PyTorch Beginner Series on YouTube.
+   :image: _static/img/thumbnails/cropped/generic-pytorch-logo.png
+   :link: beginner/introyt.html
+   :tags: Getting-Started
+
+.. customcarditem::
    :header: 예제로 배우는 파이토치(PyTorch)
    :card_description: 튜토리얼에 포함된 예제들로 PyTorch의 기본 개념을 이해합니다.
    :image: _static/img/thumbnails/cropped/learning-pytorch-with-examples.png
@@ -355,30 +362,37 @@
 .. customcarditem::
    :header: Registering a Dispatched Operator in C++
    :card_description: The dispatcher is an internal component of PyTorch which is responsible for figuring out what code should actually get run when you call a function like torch::add.
-   :image: _static/img/thumbnails/cropped/generic-pytorch-logo.PNG
+   :image: _static/img/thumbnails/cropped/generic-pytorch-logo.png
    :link: advanced/dispatcher.html
    :tags: Extending-PyTorch,Frontend-APIs,C++
 
 .. customcarditem::
    :header: Extending Dispatcher For a New Backend in C++
    :card_description: Learn how to extend the dispatcher to add a new device living outside of the pytorch/pytorch repo and maintain it to keep in sync with native PyTorch devices.
-   :image: _static/img/thumbnails/cropped/generic-pytorch-logo.PNG
+   :image: _static/img/thumbnails/cropped/generic-pytorch-logo.png
    :link: advanced/extend_dispatcher.html
    :tags: Extending-PyTorch,Frontend-APIs,C++
 
 .. customcarditem::
    :header: Custom Function Tutorial: Double Backward
    :card_description: Learn how to write a custom autograd Function that supports double backward.
-   :image: _static/img/thumbnails/cropped/generic-pytorch-logo.PNG
+   :image: _static/img/thumbnails/cropped/generic-pytorch-logo.png
    :link: intermediate/custom_function_double_backward_tutorial.html
    :tags: Extending-PyTorch,Frontend-APIs
 
 .. customcarditem::
    :header: Custom Function Tutorial: Fusing Convolution and Batch Norm
    :card_description: Learn how to create a custom autograd Function that fuses batch norm into a convolution to improve memory usage.
-   :image: _static/img/thumbnails/cropped/generic-pytorch-logo.PNG
+   :image: _static/img/thumbnails/cropped/generic-pytorch-logo.png
    :link: intermediate/custom_function_conv_bn_tutorial.html
    :tags: Extending-PyTorch,Frontend-APIs
+
+.. customcarditem::
+   :header: Forward-mode Automatic Differentiation
+   :card_description: Learn how to use forward-mode automatic differentiation.
+   :image: _static/img/thumbnails/cropped/generic-pytorch-logo.png
+   :link: intermediate/forward_ad_usage.html
+   :tags: Frontend-APIs
 
 .. Model Optimization
 
@@ -649,6 +663,21 @@
    :maxdepth: 2
    :hidden:
    :includehidden:
+   :caption: Introduction to PyTorch on YouTube
+
+   beginner/introyt
+   beginner/introyt/introyt1_tutorial
+   beginner/introyt/tensors_deeper_tutorial
+   beginner/introyt/autogradyt_tutorial
+   beginner/introyt/modelsyt_tutorial
+   beginner/introyt/tensorboardyt_tutorial
+   beginner/introyt/trainingyt
+   beginner/introyt/captumyt
+
+.. toctree::
+   :maxdepth: 2
+   :hidden:
+   :includehidden:
    :caption: 파이토치(PyTorch) 배우기
 
    beginner/deep_learning_60min_blitz
@@ -735,6 +764,7 @@
    :caption: 프론트엔드 API
 
    intermediate/memory_format_tutorial
+   intermediate/forward_ad_usage
    advanced/cpp_frontend
    advanced/torch-script-parallelism
    advanced/cpp_autograd

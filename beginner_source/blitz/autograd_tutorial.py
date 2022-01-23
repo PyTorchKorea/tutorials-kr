@@ -32,7 +32,11 @@ PyTorch에서 사용법
 
 학습 단계를 하나만 살펴보겠습니다. 여기에서는 ``torchvision`` 에서 미리 학습된 resnet18 모델을 불러옵니다.
 3채널짜리 높이와 넓이가 64인 이미지 하나를 표현하는 무작위의 데이터 텐서를 생성하고, 이에 상응하는 ``label(정답)`` 을
-무작위 값으로 초기화합니다.
+무작위 값으로 초기화합니다. 미리 학습된 모델의 정답(label)은 (1, 1000)의 모양(shape)을 갖습니다.
+
+.. note::
+     이 튜토리얼은 (텐서를 CUDA로 이동하더라도) GPU에서는 동작하지 않으며 CPU에서만 동작합니다.
+
 """
 import torch, torchvision
 model = torchvision.models.resnet18(pretrained=True)
@@ -59,8 +63,8 @@ loss.backward() # 역전파 단계(backward pass)
 
 ############################################################
 # 다음으로, 옵티마이저(optimizer)를 불러옵니다.
-# 이 예제에서는 학습율(learning rate) 0.1과 모멘텀(momentum) 0.9를 갖는 SGD입니다.
-# 옵티마이저(optimizer)에 모델의 모든 매개변수를 등록합니다.
+# 이 예제에서는 학습율(learning rate) 0.1과 `모멘텀(momentum) <https://towardsdatascience.com/stochastic-gradient-descent-with-momentum-a84097641a5d>`__
+# 0.9를 갖는 SGD입니다. 옵티마이저(optimizer)에 모델의 모든 매개변수를 등록합니다.
 #
 
 optim = torch.optim.SGD(model.parameters(), lr=1e-2, momentum=0.9)
@@ -234,7 +238,7 @@ print(-2*b == b.grad)
 # .. note::
 #   **PyTorch에서 DAG들은 동적(dynamic)입니다.**
 #   주목해야 할 중요한 점은 그래프가 처음부터(from scratch) 다시 생성된다는 것입니다; 매번 ``.backward()`` 가
-#   호출되고 나면, autograd는 새로운 그래프를 채우기(populate) 시작합니다. 이러한 점 덕분에 모델에서 
+#   호출되고 나면, autograd는 새로운 그래프를 채우기(populate) 시작합니다. 이러한 점 덕분에 모델에서
 #   흐름 제어(control flow) 구문들을 사용할 수 있게 되는 것입니다; 매번 반복(iteration)할 때마다 필요하면
 #   모양(shape)이나 크기(size), 연산(operation)을 바꿀 수 있습니다.
 #
@@ -286,14 +290,14 @@ for param in model.parameters():
 model.fc = nn.Linear(512, 10)
 
 ######################################################################
-# 이제 ``model.fc`` 를 제외한 모델의 모든 매개변수들이 고정되었습니다. 
+# 이제 ``model.fc`` 를 제외한 모델의 모든 매개변수들이 고정되었습니다.
 # 변화도를 계산하는 유일한 매개변수는 ``model.fc`` 의 가중치(weight)와 편향(bias)뿐입니다.
 
 # 분류기만 최적화합니다.
 optimizer = optim.SGD(model.parameters(), lr=1e-2, momentum=0.9)
 
 ##########################################################################
-# 옵티마이저(optimizer)에 모든 매개변수를 등록하더라도, 
+# 옵티마이저(optimizer)에 모든 매개변수를 등록하더라도,
 # 변화도를 계산(하고 경사하강법으로 갱신)할 수 있는 매개변수들은 분류기의 가중치와 편향뿐입니다.
 #
 # 컨텍스트 매니저(context manager)에 `torch.no_grad() <https://pytorch.org/docs/stable/generated/torch.no_grad.html>`__
