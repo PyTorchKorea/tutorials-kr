@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Pytorch Mobile Performance Recipes &mdash; PyTorch Tutorials 1.10.0+cu102 documentation</title>
+  <title>PyTorch 모바일 성능 레시피 &mdash; PyTorch Tutorials 1.10.1+cu113 documentation</title>
   
 
   
@@ -111,7 +111,7 @@
               
               
                 <div class="version">
-                  1.10.0+cu102
+                  1.10.1+cu113
                 </div>
               
             
@@ -155,6 +155,17 @@
 <li class="toctree-l1"><a class="reference internal" href="../beginner/basics/autogradqs_tutorial.html"><code class="docutils literal notranslate"><span class="pre">torch.autograd</span></code>를 사용한 자동 미분</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/basics/optimization_tutorial.html">모델 매개변수 최적화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/basics/saveloadrun_tutorial.html">모델 저장하고 불러오기</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Introduction to PyTorch on YouTube</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/introyt.html">Introduction to PyTorch - YouTube Series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/introyt1_tutorial.html">Introduction to PyTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/tensors_deeper_tutorial.html">Introduction to PyTorch Tensors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/autogradyt_tutorial.html">The Fundamentals of Autograd</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/modelsyt_tutorial.html">Building Models with PyTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/tensorboardyt_tutorial.html">PyTorch TensorBoard Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/trainingyt.html">Training with PyTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/captumyt.html">Model Understanding with Captum</a></li>
 </ul>
 <p class="caption"><span class="caption-text">파이토치(PyTorch) 배우기</span></p>
 <ul>
@@ -213,6 +224,7 @@
 <p class="caption"><span class="caption-text">프론트엔드 API</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/memory_format_tutorial.html">(베타) PyTorch를 사용한 Channels Last 메모리 형식</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/forward_ad_usage.html">Forward-mode Automatic Differentiation (Beta)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_frontend.html">PyTorch C++ 프론트엔드 사용하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/torch-script-parallelism.html">TorchScript의 동적 병렬 처리(Dynamic Parallelism)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_autograd.html">C++ 프론트엔드의 자동 미분 (autograd)</a></li>
@@ -250,7 +262,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/rpc_param_server_tutorial.html">Implementing a Parameter Server Using Distributed RPC Framework</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/dist_pipeline_parallel_tutorial.html">Distributed Pipeline Parallelism Using RPC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/rpc_async_execution.html">Implementing Batch RPC Processing Using Asynchronous Executions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../advanced/rpc_ddp_tutorial.html">Combining Distributed DataParallel with Distributed RPC Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/rpc_ddp_tutorial.html">분산 데이터 병렬(DDP)과 분산 RPC 프레임워크 결합</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/pipeline_tutorial.html">파이프라인 병렬화로 트랜스포머 모델 학습시키기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/ddp_pipeline.html">Training Transformer models using Distributed Data Parallel and Pipeline Parallelism</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/generic_join.html">Distributed Training with Uneven Inputs Using the Join Context Manager</a></li>
@@ -299,7 +311,7 @@
       </li>
 
         
-      <li>Pytorch Mobile Performance Recipes</li>
+      <li>PyTorch 모바일 성능 레시피</li>
     
     
       <li class="pytorch-breadcrumbs-aside">
@@ -353,35 +365,35 @@
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <div class="section" id="pytorch-mobile-performance-recipes">
-<h1>Pytorch Mobile Performance Recipes<a class="headerlink" href="#pytorch-mobile-performance-recipes" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="introduction">
-<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
-<p>Performance (aka latency) is crucial to most, if not all,
-applications and use-cases of ML model inference on mobile devices.</p>
-<p>Today, PyTorch executes the models on the CPU backend pending availability
-of other hardware backends such as GPU, DSP, and NPU.</p>
-<p>In this recipe, you will learn:</p>
+  <div class="section" id="pytorch">
+<h1>PyTorch 모바일 성능 레시피<a class="headerlink" href="#pytorch" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="id1">
+<h2>소개<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<p>전부는 아니지만, 모바일 기기에서의 애플리케이션과 ML 모델 추론 사용 사례에
+성능(지연시간)은 매우 중대한 사항입니다.</p>
+<p>오늘날 PyTorch는 GPU, DSP, NPU와 같은 하드웨어 백엔드가 사용 가능할 때까지
+CPU 백엔드에서 모델을 실행합니다.</p>
+<p>이 레시피에서 배울 내용은:</p>
 <ul class="simple">
-<li>How to optimize your model to help decrease execution time (higher performance, lower latency) on the mobile device.</li>
-<li>How to benchmark (to check if optimizations helped your use case).</li>
+<li>모바일 기기에서 실행 시간을 줄이는데 도움이 될(성능은 높이고, 지연시간은 줄이는) 모델 최적화 방법</li>
+<li>벤치마킹(최적화가 사용 사례에 도움이 되었는지 확인) 하는 방법</li>
 </ul>
 </div>
-<div class="section" id="model-preparation">
-<h2>Model preparation<a class="headerlink" href="#model-preparation" title="Permalink to this headline">¶</a></h2>
-<p>We will start with preparing to optimize your model to help decrease execution time
-(higher performance, lower latency) on the mobile device.</p>
-<div class="section" id="setup">
-<h3>Setup<a class="headerlink" href="#setup" title="Permalink to this headline">¶</a></h3>
-<p>First we need to installed pytorch using conda or pip with version at least 1.5.0.</p>
+<div class="section" id="id2">
+<h2>모델 준비<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<p>모바일 기기에서 실행 시간을 줄이는데 도움이 될(성능은 높이고, 지연시간은 줄이는)
+모델의 최적화를 위한 준비부터 시작합니다.</p>
+<div class="section" id="id3">
+<h3>설정<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<p>첫번째로 적어도 버전이 1.5.0 이상인 PyTorch를 conda나 pip으로 설치합니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">install</span> <span class="n">pytorch</span> <span class="n">torchvision</span> <span class="o">-</span><span class="n">c</span> <span class="n">pytorch</span>
 </pre></div>
 </div>
-<p>or</p>
+<p>또는</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">torch</span> <span class="n">torchvision</span>
 </pre></div>
 </div>
-<p>Code your model:</p>
+<p>모델 코드:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">from</span> <span class="nn">torch.utils.mobile_optimizer</span> <span class="kn">import</span> <span class="n">optimize_for_mobile</span>
 
@@ -406,88 +418,88 @@ of other hardware backends such as GPU, DSP, and NPU.</p>
 <span class="n">model</span> <span class="o">=</span> <span class="n">AnnotatedConvBnReLUModel</span><span class="p">()</span>
 </pre></div>
 </div>
-<p><code class="docutils literal notranslate"><span class="pre">torch.quantization.QuantStub</span></code> and <code class="docutils literal notranslate"><span class="pre">torch.quantization.DeQuantStub()</span></code> are no-op stubs, which will be used for quantization step.</p>
+<p><code class="docutils literal notranslate"><span class="pre">torch.quantization.QuantStub</span></code> 와 <code class="docutils literal notranslate"><span class="pre">torch.quantization.DeQuantStub()</span></code> 은 미사용 스텁(stub)이며, 양자화(quantization) 단계에 사용합니다.</p>
 </div>
-<div class="section" id="fuse-operators-using-torch-quantization-fuse-modules">
-<h3>1. Fuse operators using <code class="docutils literal notranslate"><span class="pre">torch.quantization.fuse_modules</span></code><a class="headerlink" href="#fuse-operators-using-torch-quantization-fuse-modules" title="Permalink to this headline">¶</a></h3>
-<p>Do not be confused that fuse_modules is in the quantization package.
-It works for all <code class="docutils literal notranslate"><span class="pre">torch.nn.Module</span></code>.</p>
-<p><code class="docutils literal notranslate"><span class="pre">torch.quantization.fuse_modules</span></code> fuses a list of modules into a single module.
-It fuses only the following sequence of modules:</p>
+<div class="section" id="torch-quantization-fuse-modules-fuse">
+<h3>1. <code class="docutils literal notranslate"><span class="pre">torch.quantization.fuse_modules</span></code> 이용하여 연산자 결합(fuse)하기<a class="headerlink" href="#torch-quantization-fuse-modules-fuse" title="Permalink to this headline">¶</a></h3>
+<p>fuse_modules은 양자화 패키지 내부에 있다는 것을 혼동하지 마십시오.
+fuse_modules은 모든 <code class="docutils literal notranslate"><span class="pre">torch.nn.Module</span></code> 에서 동작합니다.</p>
+<p><code class="docutils literal notranslate"><span class="pre">torch.quantization.fuse_modules</span></code> 은 모듈들의 리스트를 하나의 모듈로 결합합니다.
+이것은 아래 순서의 모듈들만 결합시킵니다:</p>
 <ul class="simple">
 <li>Convolution, Batch normalization</li>
 <li>Convolution, Batch normalization, Relu</li>
 <li>Convolution, Relu</li>
 <li>Linear, Relu</li>
 </ul>
-<p>This script will fuse Convolution, Batch Normalization and Relu in previously declared model.</p>
+<p>이 스크립트는 이전에 선언된 모델에서 Convolution, Batch Normalization, Relu를 결합합니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">torch</span><span class="o">.</span><span class="n">quantization</span><span class="o">.</span><span class="n">fuse_modules</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="p">[[</span><span class="s1">&#39;conv&#39;</span><span class="p">,</span> <span class="s1">&#39;bn&#39;</span><span class="p">,</span> <span class="s1">&#39;relu&#39;</span><span class="p">]],</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
-<div class="section" id="quantize-your-model">
-<h3>2. Quantize your model<a class="headerlink" href="#quantize-your-model" title="Permalink to this headline">¶</a></h3>
-<p>You can find more about PyTorch quantization in
-<a class="reference external" href="https://pytorch.org/blog/introduction-to-quantization-on-pytorch/">the dedicated tutorial</a>.</p>
-<p>Quantization of the model not only moves computation to int8,
-but also reduces the size of your model on a disk.
-That size reduction helps to reduce disk read operations during the first load of the model and decreases the amount of RAM.
-Both of those resources can be crucial for the performance of mobile applications.
-This code does quantization, using stub for model calibration function, you can find more about it <a class="reference external" href="https://tutorials.pytorch.kr/advanced/static_quantization_tutorial.html#post-training-static-quantization">here</a>.</p>
+<div class="section" id="id4">
+<h3>2. 모델 양자화하기<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<p>PyTorch 양자화에 대한 내용은
+<a class="reference external" href="https://pytorch.org/blog/introduction-to-quantization-on-pytorch/">the dedicated tutorial</a> 에서 찾을 수 있습니다.</p>
+<p>모델의 양자화는 연산을 int8로 옮기면서
+디스크상의 모델 크기를 줄이기도 합니다.
+이런 크기 감소는 모델을 처음 읽어 들일 때 디스크 읽기 연산을 줄이는데 도움을 주고 램(RAM)의 총량도 줄입니다.
+이러한 두 자원은 모바일 애플리케이션의 성능에 매우 중요할 수 있습니다.
+이 코드는 모델 보정(calibration) 함수를 위해 스텁을 사용해서 양자화를 합니다. <a class="reference external" href="https://tutorials.pytorch.kr/advanced/static_quantization_tutorial.html#post-training-static-quantization">여기</a> 에서 관련된 사항을 찾을 수 있습니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">qconfig</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">quantization</span><span class="o">.</span><span class="n">get_default_qconfig</span><span class="p">(</span><span class="s1">&#39;qnnpack&#39;</span><span class="p">)</span>
 <span class="n">torch</span><span class="o">.</span><span class="n">quantization</span><span class="o">.</span><span class="n">prepare</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="c1"># Calibrate your model</span>
+<span class="c1"># 모델 보정</span>
 <span class="k">def</span> <span class="nf">calibrate</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">calibration_data</span><span class="p">):</span>
-    <span class="c1"># Your calibration code here</span>
+    <span class="c1"># 모델 보정 코드</span>
     <span class="k">return</span>
 <span class="n">calibrate</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="p">[])</span>
 <span class="n">torch</span><span class="o">.</span><span class="n">quantization</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
-<div class="section" id="use-torch-utils-mobile-optimizer">
-<h3>3. Use torch.utils.mobile_optimizer<a class="headerlink" href="#use-torch-utils-mobile-optimizer" title="Permalink to this headline">¶</a></h3>
-<p>Torch mobile_optimizer package does several optimizations with the scripted model,
-which will help to conv2d and linear operations.
-It pre-packs model weights in an optimized format and fuses ops above with relu
-if it is the next operation.</p>
-<p>First we script the result model from previous step:</p>
+<div class="section" id="torch-utils-mobile-optimizer">
+<h3>3. torch.utils.mobile_optimizer 사용하기<a class="headerlink" href="#torch-utils-mobile-optimizer" title="Permalink to this headline">¶</a></h3>
+<p>Torch mobile_optimizer 패키지는 스크립트된 모델을 이용해서 몇 가지 최적화를 수행하고,
+이러한 최적화는 conv2d와 선형 연산에 도움이 됩니다.
+이 패키지는 최적화된 형식으로 모델 가중치를 우선 패키징하며(pre-packs)
+다음 연산이 relu이면 위의 연산들과 relu 연산을 결합 시킵니다.</p>
+<p>먼저 이전 단계에서부터 결과 모델을 작성합니다:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">torchscript_model</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">script</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Next we call <code class="docutils literal notranslate"><span class="pre">optimize_for_mobile</span></code> and save model on the disk.</p>
+<p>다음은 <code class="docutils literal notranslate"><span class="pre">optimize_for_mobile</span></code> 을 호출하고 디스크에 모델을 저장합니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">torchscript_model_optimized</span> <span class="o">=</span> <span class="n">optimize_for_mobile</span><span class="p">(</span><span class="n">torchscript_model</span><span class="p">)</span>
 <span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">torchscript_model_optimized</span><span class="p">,</span> <span class="s2">&quot;model.pt&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
-<div class="section" id="prefer-using-channels-last-tensor-memory-format">
-<h3>4. Prefer Using Channels Last Tensor memory format<a class="headerlink" href="#prefer-using-channels-last-tensor-memory-format" title="Permalink to this headline">¶</a></h3>
-<p>Channels Last(NHWC) memory format was introduced in PyTorch 1.4.0. It is supported only for four-dimensional tensors. This memory format gives a better memory locality for most operators, especially convolution. Our measurements showed a 3x speedup of MobileNetV2 model compared with the default Channels First(NCHW) format.</p>
-<p>At the moment of writing this recipe, PyTorch Android java API does not support using inputs in Channels Last memory format. But it can be used on the TorchScript model level, by adding the conversion to it for model inputs.</p>
+<div class="section" id="channels-last-tensor">
+<h3>4. Channels Last Tensor 메모리 형식 선택하기<a class="headerlink" href="#channels-last-tensor" title="Permalink to this headline">¶</a></h3>
+<p>Channels Last(NHWC) 메모리 형식은 PyTorch 1.4.0에서 도입되었습니다. 이 형식은 오직 4차원 텐서만을 지원합니다. 이 메모리 형식은 대부분의 연산에, 특히 합성곱 연산에 더 나은 메모리 지역성을 제공합니다. 측정 결과는 MobileNetV2 모델에서 기본 Channels First(NCHW) 형식에 비해 3배의 속도 향상을 보여 줍니다.</p>
+<p>이 레시피를 작성하는 시점에서는, PyTorch Android 자바 API는 Channels Last 메모리 형식으로 된 입력을 지원하지 않습니다. 하지만 모델 입력을 위해 이 메모리 형식으로 변환하면 TorchScript 모델 수준에서 사용이 가능합니다.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
     <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">contiguous</span><span class="p">(</span><span class="n">memory_format</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">channels_last</span><span class="p">)</span>
     <span class="o">...</span>
 </pre></div>
 </div>
-<p>This conversion is zero cost if your input is already in Channels Last memory format. After it, all operators will work preserving ChannelsLast memory format.</p>
+<p>이 변환은 입력이 Channels Last 메모리 형식이면 비용이 들지 않습니다. 결국에는 모든 연산자가 Channels Last 메모리 형식을 유지하면서 작업을 합니다.</p>
 </div>
-<div class="section" id="android-reusing-tensors-for-forward">
-<h3>5. Android - Reusing tensors for forward<a class="headerlink" href="#android-reusing-tensors-for-forward" title="Permalink to this headline">¶</a></h3>
-<p>This part of the recipe is Android only.</p>
-<p>Memory is a critical resource for android performance, especially on old devices.
-Tensors can need a significant amount of memory.
-For example, standard computer vision tensor contains 1*3*224*224 elements,
-assuming that data type is float and will need 588Kb of memory.</p>
+<div class="section" id="android">
+<h3>5. Android - 순방향 전달을 위한 텐서 재사용하기<a class="headerlink" href="#android" title="Permalink to this headline">¶</a></h3>
+<p>레시피에서 이 부분은 Android에만 해당합니다.</p>
+<p>메모리는 Android 성능에 매우 중요한 자원입니다. 오래된 디바이스에선 특히나 더 중요합니다.
+텐서는 상당한 양의 메모리를 필요로 할 수 있습니다.
+예를 들어 표준 컴퓨터 비전 텐서는 1*3*224*224개의 요소를 포함합니다.
+데이터 타입이 float이고 588kb 메모리가 필요하다고 가정한 경우입니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">FloatBuffer</span> <span class="n">buffer</span> <span class="o">=</span> <span class="n">Tensor</span><span class="o">.</span><span class="n">allocateFloatBuffer</span><span class="p">(</span><span class="mi">1</span><span class="o">*</span><span class="mi">3</span><span class="o">*</span><span class="mi">224</span><span class="o">*</span><span class="mi">224</span><span class="p">);</span>
 <span class="n">Tensor</span> <span class="n">tensor</span> <span class="o">=</span> <span class="n">Tensor</span><span class="o">.</span><span class="n">fromBlob</span><span class="p">(</span><span class="n">buffer</span><span class="p">,</span> <span class="n">new</span> <span class="n">long</span><span class="p">[]{</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">224</span><span class="p">,</span> <span class="mi">224</span><span class="p">});</span>
 </pre></div>
 </div>
-<p>Here we allocate native memory as <code class="docutils literal notranslate"><span class="pre">java.nio.FloatBuffer</span></code> and creating <code class="docutils literal notranslate"><span class="pre">org.pytorch.Tensor</span></code> which storage will be pointing to the memory of the allocated buffer.</p>
-<p>For most of the use cases, we do not do model forward only once, repeating it with some frequency or as fast as possible.</p>
-<p>If we are doing new memory allocation for every module forward - that will be suboptimal.
-Instead of this, we can reuse the same memory that we allocated on the previous step, fill it with new data, and run module forward again on the same tensor object.</p>
-<p>You can check how it looks in code in <a class="reference external" href="https://github.com/pytorch/android-demo-app/blob/master/PyTorchDemoApp/app/src/main/java/org/pytorch/demo/vision/ImageClassificationActivity.java#L174">pytorch android application example</a>.</p>
+<p>여기에선 네이티브 메모리를 <code class="docutils literal notranslate"><span class="pre">java.nio.FloatBuffer</span></code> 로 할당하고 저장소가 할당된 버퍼의 메모리를 가리킬 <code class="docutils literal notranslate"><span class="pre">org.pytorch.Tensor</span></code> 를 만듭니다.</p>
+<p>대부분의 사용 사례에서 모델 순방향 전달을 단 한 번만 하지 않고, 일정한 빈도로 혹은 가능한 한 빨리 진행합니다.</p>
+<p>만약 모든 모듈 순방향 전달을 위해 메모리 할당을 새로 한다면 - 그건 최적화가 아닙니다.
+대신에, 이전 단계에서 할당한 동일한 메모리에 새 데이터를 채우고 모듈 순방향 전달을 동일한 텐서 객체에서 다시 실행함으로써 동일한 메모리를 재사용 할 수 있습니다.</p>
+<p>코드가 어떤 식으로 구성이 되어 있는지는 <a class="reference external" href="https://github.com/pytorch/android-demo-app/blob/master/PyTorchDemoApp/app/src/main/java/org/pytorch/demo/vision/ImageClassificationActivity.java#L174">pytorch android application example</a> 에서 확인할 수 있습니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">protected</span> <span class="n">AnalysisResult</span> <span class="n">analyzeImage</span><span class="p">(</span><span class="n">ImageProxy</span> <span class="n">image</span><span class="p">,</span> <span class="nb">int</span> <span class="n">rotationDegrees</span><span class="p">)</span> <span class="p">{</span>
   <span class="k">if</span> <span class="p">(</span><span class="n">mModule</span> <span class="o">==</span> <span class="n">null</span><span class="p">)</span> <span class="p">{</span>
     <span class="n">mModule</span> <span class="o">=</span> <span class="n">Module</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">moduleFileAbsoluteFilePath</span><span class="p">);</span>
@@ -507,33 +519,33 @@ Instead of this, we can reuse the same memory that we allocated on the previous 
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>Member fields <code class="docutils literal notranslate"><span class="pre">mModule</span></code>, <code class="docutils literal notranslate"><span class="pre">mInputTensorBuffer</span></code> and <code class="docutils literal notranslate"><span class="pre">mInputTensor</span></code> are initialized only once
-and buffer is refilled using <code class="docutils literal notranslate"><span class="pre">org.pytorch.torchvision.TensorImageUtils.imageYUV420CenterCropToFloatBuffer</span></code>.</p>
+<p>멤버 변수 <code class="docutils literal notranslate"><span class="pre">mModule</span></code> , <code class="docutils literal notranslate"><span class="pre">mInputTensorBuffer</span></code> , <code class="docutils literal notranslate"><span class="pre">mInputTensor</span></code> 는 단 한 번 초기화를 하고
+버퍼는 <code class="docutils literal notranslate"><span class="pre">org.pytorch.torchvision.TensorImageUtils.imageYUV420CenterCropToFloatBuffer</span></code> 를 이용해서 다시 채워집니다.</p>
 </div>
 </div>
-<div class="section" id="benchmarking">
-<h2>Benchmarking<a class="headerlink" href="#benchmarking" title="Permalink to this headline">¶</a></h2>
-<p>The best way to benchmark (to check if optimizations helped your use case) - is to measure your particular use case that you want to optimize, as performance behavior can vary in different environments.</p>
-<p>PyTorch distribution provides a way to benchmark naked binary that runs the model forward,
-this approach can give more stable measurements rather than testing inside the application.</p>
-<div class="section" id="android-benchmarking-setup">
-<h3>Android - Benchmarking Setup<a class="headerlink" href="#android-benchmarking-setup" title="Permalink to this headline">¶</a></h3>
-<p>This part of the recipe is Android only.</p>
-<p>For this you first need to build benchmark binary:</p>
+<div class="section" id="id5">
+<h2>벤치마킹<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h2>
+<p>벤치마킹(최적화가 사용 사례에 도움이 되었는지 확인)하는 최고의 방법은 최적화를 하고 싶은 특정한 사용 사례를 측정하는 것입니다. 성능 측정 행위가 환경에 따라 달라질 수 있기 때문입니다.</p>
+<p>PyTorch 배포판은 모델 순방향 전달을 실행하는 방식을 사용해서 원형 그대로의(naked) 바이너리를 벤치마킹하는 수단을 제공합니다.
+이 접근법은 애플리케이션 내부에서 시험하는 방법보다 더 안정적인 측정치를 제공합니다.</p>
+<div class="section" id="id6">
+<h3>Android - 벤치마킹 설정<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
+<p>레시피에서 이 부분은 Android에만 해당합니다.</p>
+<p>벤치마킹을 위해 먼저 벤치마크 바이너리를 빌드해야 합니다:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">from</span><span class="o">-</span><span class="n">your</span><span class="o">-</span><span class="n">root</span><span class="o">-</span><span class="n">pytorch</span><span class="o">-</span><span class="nb">dir</span><span class="o">&gt;</span>
 <span class="n">rm</span> <span class="o">-</span><span class="n">rf</span> <span class="n">build_android</span>
 <span class="n">BUILD_PYTORCH_MOBILE</span><span class="o">=</span><span class="mi">1</span> <span class="n">ANDROID_ABI</span><span class="o">=</span><span class="n">arm64</span><span class="o">-</span><span class="n">v8a</span> <span class="o">./</span><span class="n">scripts</span><span class="o">/</span><span class="n">build_android</span><span class="o">.</span><span class="n">sh</span> <span class="o">-</span><span class="n">DBUILD_BINARY</span><span class="o">=</span><span class="n">ON</span>
 </pre></div>
 </div>
-<p>You should have arm64 binary at: <code class="docutils literal notranslate"><span class="pre">build_android/bin/speed_benchmark_torch</span></code>.
-This binary takes <code class="docutils literal notranslate"><span class="pre">--model=&lt;path-to-model&gt;</span></code>, <code class="docutils literal notranslate"><span class="pre">--input_dim=&quot;1,3,224,224&quot;</span></code> as dimension information for the input and <code class="docutils literal notranslate"><span class="pre">--input_type=&quot;float&quot;</span></code> as the type of the input as arguments.</p>
-<p>Once you have your android device connected,
-push speedbenchark_torch binary and your model to the phone:</p>
+<p>이 곳에 arm64 바이너리가 있어야 합니다: <code class="docutils literal notranslate"><span class="pre">build_android/bin/speed_benchmark_torch</span></code> .
+이 바이너리는 <code class="docutils literal notranslate"><span class="pre">--model=&lt;path-to-model&gt;</span></code>, <code class="docutils literal notranslate"><span class="pre">--input_dim=&quot;1,3,224,224&quot;</span></code> 을 입력을 위한 차원 정보로 받고  <code class="docutils literal notranslate"><span class="pre">--input_type=&quot;float&quot;</span></code> 으로 입력 타입을 인자로 받습니다.</p>
+<p>Android 디바이스를 연결한 적이 있으면,
+speedbenchark_torch 바이너리와 모델을 폰으로 푸시합니다:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">adb</span> <span class="n">push</span> <span class="o">&lt;</span><span class="n">speedbenchmark</span><span class="o">-</span><span class="n">torch</span><span class="o">&gt;</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">tmp</span>
 <span class="n">adb</span> <span class="n">push</span> <span class="o">&lt;</span><span class="n">path</span><span class="o">-</span><span class="n">to</span><span class="o">-</span><span class="n">scripted</span><span class="o">-</span><span class="n">model</span><span class="o">&gt;</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">tmp</span>
 </pre></div>
 </div>
-<p>Now we are ready to benchmark your model:</p>
+<p>이제 모델을 벤치마킹할 준비가 되었습니다:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">adb</span> <span class="n">shell</span> <span class="s2">&quot;/data/local/tmp/speed_benchmark_torch --model=/data/local/tmp/model.pt&quot;</span> <span class="o">--</span><span class="n">input_dims</span><span class="o">=</span><span class="s2">&quot;1,3,224,224&quot;</span> <span class="o">--</span><span class="n">input_type</span><span class="o">=</span><span class="s2">&quot;float&quot;</span>
 <span class="o">-----</span> <span class="n">output</span> <span class="o">-----</span>
 <span class="n">Starting</span> <span class="n">benchmark</span><span class="o">.</span>
@@ -543,10 +555,10 @@ push speedbenchark_torch binary and your model to the phone:</p>
 </pre></div>
 </div>
 </div>
-<div class="section" id="ios-benchmarking-setup">
-<h3>iOS - Benchmarking Setup<a class="headerlink" href="#ios-benchmarking-setup" title="Permalink to this headline">¶</a></h3>
-<p>For iOS, we’ll be using our <a class="reference external" href="https://github.com/pytorch/pytorch/tree/master/ios/TestApp">TestApp</a> as the benchmarking tool.</p>
-<p>To begin with, let’s apply the <code class="docutils literal notranslate"><span class="pre">optimize_for_mobile</span></code> method to our python script located at <a class="reference external" href="https://github.com/pytorch/pytorch/blob/master/ios/TestApp/benchmark/trace_model.py">TestApp/benchmark/trace_model.py</a>. Simply modify the code as below.</p>
+<div class="section" id="ios">
+<h3>iOS - 벤치마킹 설정<a class="headerlink" href="#ios" title="Permalink to this headline">¶</a></h3>
+<p>iOS의 경우 , 벤치마킹의 도구로 <a class="reference external" href="https://github.com/pytorch/pytorch/tree/master/ios/TestApp">TestApp</a> 을 사용합니다.</p>
+<p>먼저 <code class="docutils literal notranslate"><span class="pre">optimize_for_mobile</span></code> 메소드를  <a class="reference external" href="https://github.com/pytorch/pytorch/blob/master/ios/TestApp/benchmark/trace_model.py">TestApp/benchmark/trace_model.py</a> 에 있는 파이썬 스크립트에 적용합니다. 간단히 아래와 같이 코드를 수정합니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torchvision</span>
 <span class="kn">from</span> <span class="nn">torch.utils.mobile_optimizer</span> <span class="kn">import</span> <span class="n">optimize_for_mobile</span>
@@ -559,16 +571,16 @@ push speedbenchark_torch binary and your model to the phone:</p>
 <span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">torchscript_model_optimized</span><span class="p">,</span> <span class="s2">&quot;model.pt&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Now let’s run <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">trace_model.py</span></code>. If everything works well, we should be able to generate our optimized model in the benchmark directory.</p>
-<p>Next, we’re going to build the PyTorch libraries from source.</p>
+<p>이제 <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">trace_model.py</span></code> 를 실행합시다. 모든 것이 잘 작동한다면 벤치마킹 디렉토리 내부에 최적화된 모델을 생성할 수 있어야 합니다.</p>
+<p>다음은 소스에서부터 PyTorch 라이브러리를 빌드합니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">BUILD_PYTORCH_MOBILE</span><span class="o">=</span><span class="mi">1</span> <span class="n">IOS_ARCH</span><span class="o">=</span><span class="n">arm64</span> <span class="o">./</span><span class="n">scripts</span><span class="o">/</span><span class="n">build_ios</span><span class="o">.</span><span class="n">sh</span>
 </pre></div>
 </div>
-<p>Now that we have the optimized model and PyTorch ready, it’s time to generate our XCode project and do benchmarking. To do that, we’ll be using a ruby script - <cite>setup.rb</cite> which does the heavy lifting jobs of setting up the XCode project.</p>
+<p>이제 최적화된 모델과 PyTorch가 준비되었기에 XCode 프로젝트를 만들고 벤치마킹할 시간입니다. 이를 위해 XCode 프로젝트를 설정하는 무거운 작업을 수행하는 루비 스크립트 <cite>setup.rb</cite> 를 사용합니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ruby</span> <span class="n">setup</span><span class="o">.</span><span class="n">rb</span>
 </pre></div>
 </div>
-<p>Now open the <cite>TestApp.xcodeproj</cite> and plug in your iPhone, you’re ready to go. Below is an example result from iPhoneX</p>
+<p>이제 <cite>TestApp.xcodeproj</cite> 를 열고 iPhone을 연결하면 준비가 끝났습니다. 아래는 iPhoneX에서의 예제 결과입니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">TestApp</span><span class="p">[</span><span class="mi">2121</span><span class="p">:</span><span class="mi">722447</span><span class="p">]</span> <span class="n">Main</span> <span class="n">runs</span>
 <span class="n">TestApp</span><span class="p">[</span><span class="mi">2121</span><span class="p">:</span><span class="mi">722447</span><span class="p">]</span> <span class="n">Main</span> <span class="n">run</span> <span class="n">finished</span><span class="o">.</span> <span class="n">Milliseconds</span> <span class="n">per</span> <span class="nb">iter</span><span class="p">:</span> <span class="mf">28.767</span>
 <span class="n">TestApp</span><span class="p">[</span><span class="mi">2121</span><span class="p">:</span><span class="mi">722447</span><span class="p">]</span> <span class="n">Iters</span> <span class="n">per</span> <span class="n">second</span><span class="p">:</span> <span class="p">:</span> <span class="mf">34.762</span>
@@ -624,20 +636,20 @@ push speedbenchark_torch binary and your model to the phone:</p>
           <div class="pytorch-right-menu" id="pytorch-right-menu">
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
-<li><a class="reference internal" href="#">Pytorch Mobile Performance Recipes</a><ul>
-<li><a class="reference internal" href="#introduction">Introduction</a></li>
-<li><a class="reference internal" href="#model-preparation">Model preparation</a><ul>
-<li><a class="reference internal" href="#setup">Setup</a></li>
-<li><a class="reference internal" href="#fuse-operators-using-torch-quantization-fuse-modules">1. Fuse operators using <code class="docutils literal notranslate"><span class="pre">torch.quantization.fuse_modules</span></code></a></li>
-<li><a class="reference internal" href="#quantize-your-model">2. Quantize your model</a></li>
-<li><a class="reference internal" href="#use-torch-utils-mobile-optimizer">3. Use torch.utils.mobile_optimizer</a></li>
-<li><a class="reference internal" href="#prefer-using-channels-last-tensor-memory-format">4. Prefer Using Channels Last Tensor memory format</a></li>
-<li><a class="reference internal" href="#android-reusing-tensors-for-forward">5. Android - Reusing tensors for forward</a></li>
+<li><a class="reference internal" href="#">PyTorch 모바일 성능 레시피</a><ul>
+<li><a class="reference internal" href="#id1">소개</a></li>
+<li><a class="reference internal" href="#id2">모델 준비</a><ul>
+<li><a class="reference internal" href="#id3">설정</a></li>
+<li><a class="reference internal" href="#torch-quantization-fuse-modules-fuse">1. <code class="docutils literal notranslate"><span class="pre">torch.quantization.fuse_modules</span></code> 이용하여 연산자 결합(fuse)하기</a></li>
+<li><a class="reference internal" href="#id4">2. 모델 양자화하기</a></li>
+<li><a class="reference internal" href="#torch-utils-mobile-optimizer">3. torch.utils.mobile_optimizer 사용하기</a></li>
+<li><a class="reference internal" href="#channels-last-tensor">4. Channels Last Tensor 메모리 형식 선택하기</a></li>
+<li><a class="reference internal" href="#android">5. Android - 순방향 전달을 위한 텐서 재사용하기</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#benchmarking">Benchmarking</a><ul>
-<li><a class="reference internal" href="#android-benchmarking-setup">Android - Benchmarking Setup</a></li>
-<li><a class="reference internal" href="#ios-benchmarking-setup">iOS - Benchmarking Setup</a></li>
+<li><a class="reference internal" href="#id5">벤치마킹</a><ul>
+<li><a class="reference internal" href="#id6">Android - 벤치마킹 설정</a></li>
+<li><a class="reference internal" href="#ios">iOS - 벤치마킹 설정</a></li>
 </ul>
 </li>
 </ul>

@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>분류기(Classifier) 학습하기 &mdash; PyTorch Tutorials 1.10.0+cu102 documentation</title>
+  <title>분류기(Classifier) 학습하기 &mdash; PyTorch Tutorials 1.10.1+cu113 documentation</title>
   
 
   
@@ -113,7 +113,7 @@
               
               
                 <div class="version">
-                  1.10.0+cu102
+                  1.10.1+cu113
                 </div>
               
             
@@ -157,6 +157,17 @@
 <li class="toctree-l1"><a class="reference internal" href="../basics/autogradqs_tutorial.html"><code class="docutils literal notranslate"><span class="pre">torch.autograd</span></code>를 사용한 자동 미분</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../basics/optimization_tutorial.html">모델 매개변수 최적화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../basics/saveloadrun_tutorial.html">모델 저장하고 불러오기</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Introduction to PyTorch on YouTube</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../introyt.html">Introduction to PyTorch - YouTube Series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../introyt/introyt1_tutorial.html">Introduction to PyTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../introyt/tensors_deeper_tutorial.html">Introduction to PyTorch Tensors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../introyt/autogradyt_tutorial.html">The Fundamentals of Autograd</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../introyt/modelsyt_tutorial.html">Building Models with PyTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../introyt/tensorboardyt_tutorial.html">PyTorch TensorBoard Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../introyt/trainingyt.html">Training with PyTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../introyt/captumyt.html">Model Understanding with Captum</a></li>
 </ul>
 <p class="caption"><span class="caption-text">파이토치(PyTorch) 배우기</span></p>
 <ul class="current">
@@ -215,6 +226,7 @@
 <p class="caption"><span class="caption-text">프론트엔드 API</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/memory_format_tutorial.html">(베타) PyTorch를 사용한 Channels Last 메모리 형식</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../intermediate/forward_ad_usage.html">Forward-mode Automatic Differentiation (Beta)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../advanced/cpp_frontend.html">PyTorch C++ 프론트엔드 사용하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../advanced/torch-script-parallelism.html">TorchScript의 동적 병렬 처리(Dynamic Parallelism)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../advanced/cpp_autograd.html">C++ 프론트엔드의 자동 미분 (autograd)</a></li>
@@ -252,7 +264,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/rpc_param_server_tutorial.html">Implementing a Parameter Server Using Distributed RPC Framework</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/dist_pipeline_parallel_tutorial.html">Distributed Pipeline Parallelism Using RPC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/rpc_async_execution.html">Implementing Batch RPC Processing Using Asynchronous Executions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../advanced/rpc_ddp_tutorial.html">Combining Distributed DataParallel with Distributed RPC Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../advanced/rpc_ddp_tutorial.html">분산 데이터 병렬(DDP)과 분산 RPC 프레임워크 결합</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/pipeline_tutorial.html">파이프라인 병렬화로 트랜스포머 모델 학습시키기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../advanced/ddp_pipeline.html">Training Transformer models using Distributed Data Parallel and Pipeline Parallelism</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../advanced/generic_join.html">Distributed Training with Uneven Inputs Using the Join Context Manager</a></li>
@@ -463,12 +475,12 @@ Files already downloaded and verified
 <span class="c1"># 이미지 보여주기</span>
 <span class="n">imshow</span><span class="p">(</span><span class="n">torchvision</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">make_grid</span><span class="p">(</span><span class="n">images</span><span class="p">))</span>
 <span class="c1"># 정답(label) 출력</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%5s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">classes</span><span class="p">[</span><span class="n">labels</span><span class="p">[</span><span class="n">j</span><span class="p">]]</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">batch_size</span><span class="p">)))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">classes</span><span class="p">[</span><span class="n">labels</span><span class="p">[</span><span class="n">j</span><span class="p">]]</span><span class="si">:</span><span class="s1">5s</span><span class="si">}</span><span class="s1">&#39;</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">batch_size</span><span class="p">)))</span>
 </pre></div>
 </div>
 <img alt="../../_images/sphx_glr_cifar10_tutorial_001.png" class="sphx-glr-single-img" src="../../_images/sphx_glr_cifar10_tutorial_001.png" />
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>bird  ship  frog  deer
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>car   car   horse deer
 </pre></div>
 </div>
 </div>
@@ -538,26 +550,25 @@ Files already downloaded and verified
         <span class="c1"># 통계를 출력합니다.</span>
         <span class="n">running_loss</span> <span class="o">+=</span> <span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">2000</span> <span class="o">==</span> <span class="mi">1999</span><span class="p">:</span>    <span class="c1"># print every 2000 mini-batches</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;[</span><span class="si">%d</span><span class="s1">, </span><span class="si">%5d</span><span class="s1">] loss: </span><span class="si">%.3f</span><span class="s1">&#39;</span> <span class="o">%</span>
-                  <span class="p">(</span><span class="n">epoch</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">running_loss</span> <span class="o">/</span> <span class="mi">2000</span><span class="p">))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;[</span><span class="si">{</span><span class="n">epoch</span> <span class="o">+</span> <span class="mi">1</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="si">:</span><span class="s1">5d</span><span class="si">}</span><span class="s1">] loss: </span><span class="si">{</span><span class="n">running_loss</span> <span class="o">/</span> <span class="mi">2000</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
             <span class="n">running_loss</span> <span class="o">=</span> <span class="mf">0.0</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Finished Training&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[1,  2000] loss: 2.173
-[1,  4000] loss: 1.837
-[1,  6000] loss: 1.653
-[1,  8000] loss: 1.559
-[1, 10000] loss: 1.528
-[1, 12000] loss: 1.509
-[2,  2000] loss: 1.419
-[2,  4000] loss: 1.407
-[2,  6000] loss: 1.369
-[2,  8000] loss: 1.322
-[2, 10000] loss: 1.291
-[2, 12000] loss: 1.285
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[1,  2000] loss: 2.227
+[1,  4000] loss: 1.911
+[1,  6000] loss: 1.720
+[1,  8000] loss: 1.651
+[1, 10000] loss: 1.572
+[1, 12000] loss: 1.508
+[2,  2000] loss: 1.453
+[2,  4000] loss: 1.423
+[2,  6000] loss: 1.401
+[2,  8000] loss: 1.359
+[2, 10000] loss: 1.342
+[2, 12000] loss: 1.323
 Finished Training
 </pre></div>
 </div>
@@ -581,12 +592,12 @@ Finished Training
 
 <span class="c1"># 이미지를 출력합니다.</span>
 <span class="n">imshow</span><span class="p">(</span><span class="n">torchvision</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">make_grid</span><span class="p">(</span><span class="n">images</span><span class="p">))</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;GroundTruth: &#39;</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%5s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">classes</span><span class="p">[</span><span class="n">labels</span><span class="p">[</span><span class="n">j</span><span class="p">]]</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">)))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;GroundTruth: &#39;</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">classes</span><span class="p">[</span><span class="n">labels</span><span class="p">[</span><span class="n">j</span><span class="p">]]</span><span class="si">:</span><span class="s1">5s</span><span class="si">}</span><span class="s1">&#39;</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">)))</span>
 </pre></div>
 </div>
 <img alt="../../_images/sphx_glr_cifar10_tutorial_002.png" class="sphx-glr-single-img" src="../../_images/sphx_glr_cifar10_tutorial_002.png" />
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>GroundTruth:    cat  ship  ship plane
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>GroundTruth:  cat   ship  ship  plane
 </pre></div>
 </div>
 <p>이제, 저장했던 모델을 불러오도록 하겠습니다 (주: 모델을 저장하고 다시 불러오는
@@ -604,12 +615,12 @@ Finished Training
 따라서, 가장 높은 값을 갖는 인덱스(index)를 뽑아보겠습니다:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">_</span><span class="p">,</span> <span class="n">predicted</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Predicted: &#39;</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%5s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">classes</span><span class="p">[</span><span class="n">predicted</span><span class="p">[</span><span class="n">j</span><span class="p">]]</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Predicted: &#39;</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">classes</span><span class="p">[</span><span class="n">predicted</span><span class="p">[</span><span class="n">j</span><span class="p">]]</span><span class="si">:</span><span class="s1">5s</span><span class="si">}</span><span class="s1">&#39;</span>
                               <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">)))</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Predicted:   ship   car   car plane
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Predicted:  cat   ship  car   ship
 </pre></div>
 </div>
 <p>결과가 괜찮아보이네요.</p>
@@ -627,8 +638,7 @@ Finished Training
         <span class="n">total</span> <span class="o">+=</span> <span class="n">labels</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="n">correct</span> <span class="o">+=</span> <span class="p">(</span><span class="n">predicted</span> <span class="o">==</span> <span class="n">labels</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Accuracy of the network on the 10000 test images: </span><span class="si">%d</span><span class="s1"> </span><span class="si">%%</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span>
-    <span class="mi">100</span> <span class="o">*</span> <span class="n">correct</span> <span class="o">/</span> <span class="n">total</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Accuracy of the network on the 10000 test images: </span><span class="si">{</span><span class="mi">100</span> <span class="o">*</span> <span class="n">correct</span> <span class="o">//</span> <span class="n">total</span><span class="si">}</span><span class="s1"> %&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
@@ -658,21 +668,20 @@ Finished Training
 <span class="c1"># 각 분류별 정확도(accuracy)를 출력합니다</span>
 <span class="k">for</span> <span class="n">classname</span><span class="p">,</span> <span class="n">correct_count</span> <span class="ow">in</span> <span class="n">correct_pred</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
     <span class="n">accuracy</span> <span class="o">=</span> <span class="mi">100</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="n">correct_count</span><span class="p">)</span> <span class="o">/</span> <span class="n">total_pred</span><span class="p">[</span><span class="n">classname</span><span class="p">]</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Accuracy for class </span><span class="si">{:5s}</span><span class="s2"> is: </span><span class="si">{:.1f}</span><span class="s2"> %&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">classname</span><span class="p">,</span>
-                                                   <span class="n">accuracy</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Accuracy for class: </span><span class="si">{</span><span class="n">classname</span><span class="si">:</span><span class="s1">5s</span><span class="si">}</span><span class="s1"> is </span><span class="si">{</span><span class="n">accuracy</span><span class="si">:</span><span class="s1">.1f</span><span class="si">}</span><span class="s1"> %&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Accuracy for class plane is: 53.4 %
-Accuracy for class car   is: 77.7 %
-Accuracy for class bird  is: 26.0 %
-Accuracy for class cat   is: 33.5 %
-Accuracy for class deer  is: 56.5 %
-Accuracy for class dog   is: 29.9 %
-Accuracy for class frog  is: 59.4 %
-Accuracy for class horse is: 68.2 %
-Accuracy for class ship  is: 77.6 %
-Accuracy for class truck is: 53.4 %
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Accuracy for class: plane is 53.1 %
+Accuracy for class: car   is 80.3 %
+Accuracy for class: bird  is 31.3 %
+Accuracy for class: cat   is 40.0 %
+Accuracy for class: deer  is 55.7 %
+Accuracy for class: dog   is 36.9 %
+Accuracy for class: frog  is 62.0 %
+Accuracy for class: horse is 64.6 %
+Accuracy for class: ship  is 73.9 %
+Accuracy for class: truck is 39.1 %
 </pre></div>
 </div>
 <p>자, 이제 다음으로 무엇을 해볼까요?</p>
@@ -683,7 +692,7 @@ Accuracy for class truck is: 53.4 %
 <h2>GPU에서 학습하기<a class="headerlink" href="#gpu" title="Permalink to this headline">¶</a></h2>
 <p>Tensor를 GPU로 이동했던 것처럼, 신경망 또한 GPU로 옮길 수 있습니다.</p>
 <p>먼저 (CUDA를 사용할 수 있다면) 첫번째 CUDA 장치를 사용하도록 설정합니다:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cuda:0&quot;</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s1">&#39;cuda:0&#39;</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s1">&#39;cpu&#39;</span><span class="p">)</span>
 
 <span class="c1"># CUDA 기기가 존재한다면, 아래 코드가 CUDA 장치를 출력합니다:</span>
 
@@ -738,7 +747,7 @@ CUDA tensor로 변경합니다:</p>
 <span class="c1"># %%%%%%INVISIBLE_CODE_BLOCK%%%%%%</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 104 minutes  16.957 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 1 minutes  52.032 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-beginner-blitz-cifar10-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <a class="reference download internal" download="" href="../../_downloads/a2f76da60063248809d17b780ca9d1f8/cifar10_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">cifar10_tutorial.py</span></code></a></div>

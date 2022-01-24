@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>모델 매개변수 최적화하기 &mdash; PyTorch Tutorials 1.10.0+cu102 documentation</title>
+  <title>모델 매개변수 최적화하기 &mdash; PyTorch Tutorials 1.10.1+cu113 documentation</title>
   
 
   
@@ -113,7 +113,7 @@
               
               
                 <div class="version">
-                  1.10.0+cu102
+                  1.10.1+cu113
                 </div>
               
             
@@ -157,6 +157,17 @@
 <li class="toctree-l1"><a class="reference internal" href="autogradqs_tutorial.html"><code class="docutils literal notranslate"><span class="pre">torch.autograd</span></code>를 사용한 자동 미분</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">모델 매개변수 최적화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="saveloadrun_tutorial.html">모델 저장하고 불러오기</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Introduction to PyTorch on YouTube</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../introyt.html">Introduction to PyTorch - YouTube Series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../introyt/introyt1_tutorial.html">Introduction to PyTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../introyt/tensors_deeper_tutorial.html">Introduction to PyTorch Tensors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../introyt/autogradyt_tutorial.html">The Fundamentals of Autograd</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../introyt/modelsyt_tutorial.html">Building Models with PyTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../introyt/tensorboardyt_tutorial.html">PyTorch TensorBoard Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../introyt/trainingyt.html">Training with PyTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../introyt/captumyt.html">Model Understanding with Captum</a></li>
 </ul>
 <p class="caption"><span class="caption-text">파이토치(PyTorch) 배우기</span></p>
 <ul>
@@ -215,6 +226,7 @@
 <p class="caption"><span class="caption-text">프론트엔드 API</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/memory_format_tutorial.html">(베타) PyTorch를 사용한 Channels Last 메모리 형식</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../intermediate/forward_ad_usage.html">Forward-mode Automatic Differentiation (Beta)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../advanced/cpp_frontend.html">PyTorch C++ 프론트엔드 사용하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../advanced/torch-script-parallelism.html">TorchScript의 동적 병렬 처리(Dynamic Parallelism)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../advanced/cpp_autograd.html">C++ 프론트엔드의 자동 미분 (autograd)</a></li>
@@ -252,7 +264,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/rpc_param_server_tutorial.html">Implementing a Parameter Server Using Distributed RPC Framework</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/dist_pipeline_parallel_tutorial.html">Distributed Pipeline Parallelism Using RPC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/rpc_async_execution.html">Implementing Batch RPC Processing Using Asynchronous Executions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../advanced/rpc_ddp_tutorial.html">Combining Distributed DataParallel with Distributed RPC Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../advanced/rpc_ddp_tutorial.html">분산 데이터 병렬(DDP)과 분산 RPC 프레임워크 결합</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/pipeline_tutorial.html">파이프라인 병렬화로 트랜스포머 모델 학습시키기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../advanced/ddp_pipeline.html">Training Transformer models using Distributed Data Parallel and Pipeline Parallelism</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../advanced/generic_join.html">Distributed Training with Uneven Inputs Using the Join Context Manager</a></li>
@@ -485,7 +497,7 @@
 <dt>학습 단계(loop)에서 최적화는 세단계로 이뤄집니다:</dt>
 <dd><ul class="first last simple">
 <li><code class="docutils literal notranslate"><span class="pre">optimizer.zero_grad()</span></code>를 호출하여 모델 매개변수의 변화도를 재설정합니다. 기본적으로 변화도는 더해지기(add up) 때문에 중복 계산을 막기 위해 반복할 때마다 명시적으로 0으로 설정합니다.</li>
-<li><code class="docutils literal notranslate"><span class="pre">loss.backward()</span></code>를 호출하여 예측 손실(prediction loss)을 역전파합니다. PyTorch는 각 매개변수에 대한 손실의 변화도를 저장합니다.</li>
+<li><code class="docutils literal notranslate"><span class="pre">loss.backwards()</span></code>를 호출하여 예측 손실(prediction loss)을 역전파합니다. PyTorch는 각 매개변수에 대한 손실의 변화도를 저장합니다.</li>
 <li>변화도를 계산한 뒤에는 <code class="docutils literal notranslate"><span class="pre">optimizer.step()</span></code>을 호출하여 역전파 단계에서 수집된 변화도로 매개변수를 조정합니다.</li>
 </ul>
 </dd>
@@ -544,153 +556,153 @@
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Epoch 1
 -------------------------------
-loss: 2.297667  [    0/60000]
-loss: 2.288437  [ 6400/60000]
-loss: 2.263328  [12800/60000]
-loss: 2.257169  [19200/60000]
-loss: 2.247666  [25600/60000]
-loss: 2.212698  [32000/60000]
-loss: 2.225966  [38400/60000]
-loss: 2.189206  [44800/60000]
-loss: 2.184744  [51200/60000]
-loss: 2.159022  [57600/60000]
+loss: 2.309114  [    0/60000]
+loss: 2.296637  [ 6400/60000]
+loss: 2.273656  [12800/60000]
+loss: 2.263827  [19200/60000]
+loss: 2.254685  [25600/60000]
+loss: 2.219302  [32000/60000]
+loss: 2.231607  [38400/60000]
+loss: 2.197931  [44800/60000]
+loss: 2.207725  [51200/60000]
+loss: 2.157077  [57600/60000]
 Test Error:
- Accuracy: 47.6%, Avg loss: 2.147638
+ Accuracy: 37.6%, Avg loss: 2.157381
 
 Epoch 2
 -------------------------------
-loss: 2.159235  [    0/60000]
-loss: 2.148570  [ 6400/60000]
-loss: 2.087576  [12800/60000]
-loss: 2.101889  [19200/60000]
-loss: 2.059111  [25600/60000]
-loss: 1.996428  [32000/60000]
-loss: 2.025541  [38400/60000]
-loss: 1.946750  [44800/60000]
-loss: 1.947519  [51200/60000]
-loss: 1.883851  [57600/60000]
+loss: 2.179635  [    0/60000]
+loss: 2.162237  [ 6400/60000]
+loss: 2.102557  [12800/60000]
+loss: 2.117307  [19200/60000]
+loss: 2.058732  [25600/60000]
+loss: 2.007824  [32000/60000]
+loss: 2.038783  [38400/60000]
+loss: 1.961226  [44800/60000]
+loss: 1.986912  [51200/60000]
+loss: 1.891202  [57600/60000]
 Test Error:
- Accuracy: 57.1%, Avg loss: 1.875115
+ Accuracy: 54.3%, Avg loss: 1.893652
 
 Epoch 3
 -------------------------------
-loss: 1.910883  [    0/60000]
-loss: 1.881189  [ 6400/60000]
-loss: 1.762595  [12800/60000]
-loss: 1.798843  [19200/60000]
-loss: 1.702180  [25600/60000]
-loss: 1.651339  [32000/60000]
-loss: 1.669264  [38400/60000]
-loss: 1.575650  [44800/60000]
-loss: 1.595151  [51200/60000]
-loss: 1.496814  [57600/60000]
+loss: 1.938195  [    0/60000]
+loss: 1.897808  [ 6400/60000]
+loss: 1.782062  [12800/60000]
+loss: 1.826115  [19200/60000]
+loss: 1.698095  [25600/60000]
+loss: 1.664929  [32000/60000]
+loss: 1.688249  [38400/60000]
+loss: 1.591299  [44800/60000]
+loss: 1.628325  [51200/60000]
+loss: 1.509761  [57600/60000]
 Test Error:
- Accuracy: 60.9%, Avg loss: 1.509708
+ Accuracy: 60.9%, Avg loss: 1.531171
 
 Epoch 4
 -------------------------------
-loss: 1.579333  [    0/60000]
-loss: 1.545489  [ 6400/60000]
-loss: 1.394003  [12800/60000]
-loss: 1.465191  [19200/60000]
-loss: 1.355316  [25600/60000]
-loss: 1.345034  [32000/60000]
-loss: 1.360228  [38400/60000]
-loss: 1.287417  [44800/60000]
-loss: 1.316762  [51200/60000]
-loss: 1.228462  [57600/60000]
+loss: 1.602614  [    0/60000]
+loss: 1.563527  [ 6400/60000]
+loss: 1.415628  [12800/60000]
+loss: 1.486565  [19200/60000]
+loss: 1.352646  [25600/60000]
+loss: 1.364252  [32000/60000]
+loss: 1.369879  [38400/60000]
+loss: 1.301470  [44800/60000]
+loss: 1.341615  [51200/60000]
+loss: 1.231464  [57600/60000]
 Test Error:
- Accuracy: 63.7%, Avg loss: 1.247289
+ Accuracy: 62.7%, Avg loss: 1.263597
 
 Epoch 5
 -------------------------------
-loss: 1.324726  [    0/60000]
-loss: 1.308615  [ 6400/60000]
-loss: 1.140116  [12800/60000]
-loss: 1.247383  [19200/60000]
-loss: 1.127408  [25600/60000]
-loss: 1.145594  [32000/60000]
-loss: 1.170998  [38400/60000]
-loss: 1.108844  [44800/60000]
-loss: 1.141388  [51200/60000]
-loss: 1.070778  [57600/60000]
+loss: 1.344318  [    0/60000]
+loss: 1.324303  [ 6400/60000]
+loss: 1.159900  [12800/60000]
+loss: 1.262730  [19200/60000]
+loss: 1.126851  [25600/60000]
+loss: 1.165071  [32000/60000]
+loss: 1.174239  [38400/60000]
+loss: 1.121101  [44800/60000]
+loss: 1.165434  [51200/60000]
+loss: 1.068317  [57600/60000]
 Test Error:
- Accuracy: 65.3%, Avg loss: 1.083758
+ Accuracy: 64.1%, Avg loss: 1.098074
 
 Epoch 6
 -------------------------------
-loss: 1.155012  [    0/60000]
-loss: 1.159262  [ 6400/60000]
-loss: 0.972789  [12800/60000]
-loss: 1.110614  [19200/60000]
-loss: 0.986740  [25600/60000]
-loss: 1.011903  [32000/60000]
-loss: 1.053057  [38400/60000]
-loss: 0.994850  [44800/60000]
-loss: 1.027619  [51200/60000]
-loss: 0.970390  [57600/60000]
+loss: 1.172554  [    0/60000]
+loss: 1.172784  [ 6400/60000]
+loss: 0.992082  [12800/60000]
+loss: 1.124159  [19200/60000]
+loss: 0.989490  [25600/60000]
+loss: 1.031983  [32000/60000]
+loss: 1.055757  [38400/60000]
+loss: 1.007001  [44800/60000]
+loss: 1.051895  [51200/60000]
+loss: 0.966870  [57600/60000]
 Test Error:
- Accuracy: 66.1%, Avg loss: 0.977957
+ Accuracy: 65.3%, Avg loss: 0.991838
 
 Epoch 7
 -------------------------------
-loss: 1.037205  [    0/60000]
-loss: 1.061737  [ 6400/60000]
-loss: 0.858403  [12800/60000]
-loss: 1.019374  [19200/60000]
-loss: 0.898276  [25600/60000]
-loss: 0.917665  [32000/60000]
-loss: 0.975407  [38400/60000]
-loss: 0.920467  [44800/60000]
-loss: 0.949663  [51200/60000]
-loss: 0.902337  [57600/60000]
+loss: 1.053285  [    0/60000]
+loss: 1.074427  [ 6400/60000]
+loss: 0.877771  [12800/60000]
+loss: 1.031698  [19200/60000]
+loss: 0.903183  [25600/60000]
+loss: 0.938429  [32000/60000]
+loss: 0.979001  [38400/60000]
+loss: 0.932577  [44800/60000]
+loss: 0.973253  [51200/60000]
+loss: 0.898465  [57600/60000]
 Test Error:
- Accuracy: 67.5%, Avg loss: 0.905939
+ Accuracy: 66.5%, Avg loss: 0.919200
 
 Epoch 8
 -------------------------------
-loss: 0.950413  [    0/60000]
-loss: 0.993465  [ 6400/60000]
-loss: 0.776608  [12800/60000]
-loss: 0.955140  [19200/60000]
-loss: 0.839390  [25600/60000]
-loss: 0.848378  [32000/60000]
-loss: 0.920902  [38400/60000]
-loss: 0.870173  [44800/60000]
-loss: 0.893778  [51200/60000]
-loss: 0.852947  [57600/60000]
+loss: 0.965374  [    0/60000]
+loss: 1.006081  [ 6400/60000]
+loss: 0.796143  [12800/60000]
+loss: 0.965510  [19200/60000]
+loss: 0.844687  [25600/60000]
+loss: 0.869514  [32000/60000]
+loss: 0.924996  [38400/60000]
+loss: 0.882722  [44800/60000]
+loss: 0.916114  [51200/60000]
+loss: 0.848628  [57600/60000]
 Test Error:
- Accuracy: 68.6%, Avg loss: 0.854085
+ Accuracy: 67.9%, Avg loss: 0.866466
 
 Epoch 9
 -------------------------------
-loss: 0.883246  [    0/60000]
-loss: 0.941644  [ 6400/60000]
-loss: 0.715409  [12800/60000]
-loss: 0.907684  [19200/60000]
-loss: 0.797529  [25600/60000]
-loss: 0.796580  [32000/60000]
-loss: 0.879777  [38400/60000]
-loss: 0.835162  [44800/60000]
-loss: 0.852075  [51200/60000]
-loss: 0.815358  [57600/60000]
+loss: 0.897727  [    0/60000]
+loss: 0.954936  [ 6400/60000]
+loss: 0.734816  [12800/60000]
+loss: 0.915699  [19200/60000]
+loss: 0.802328  [25600/60000]
+loss: 0.817231  [32000/60000]
+loss: 0.883739  [38400/60000]
+loss: 0.847771  [44800/60000]
+loss: 0.872737  [51200/60000]
+loss: 0.810096  [57600/60000]
 Test Error:
- Accuracy: 70.0%, Avg loss: 0.814951
+ Accuracy: 68.8%, Avg loss: 0.826350
 
 Epoch 10
 -------------------------------
-loss: 0.829739  [    0/60000]
-loss: 0.899805  [ 6400/60000]
-loss: 0.668211  [12800/60000]
-loss: 0.871210  [19200/60000]
-loss: 0.765915  [25600/60000]
-loss: 0.756920  [32000/60000]
-loss: 0.846650  [38400/60000]
-loss: 0.809210  [44800/60000]
-loss: 0.819659  [51200/60000]
-loss: 0.785059  [57600/60000]
+loss: 0.843776  [    0/60000]
+loss: 0.914282  [ 6400/60000]
+loss: 0.687114  [12800/60000]
+loss: 0.876821  [19200/60000]
+loss: 0.769921  [25600/60000]
+loss: 0.776901  [32000/60000]
+loss: 0.850385  [38400/60000]
+loss: 0.821988  [44800/60000]
+loss: 0.838630  [51200/60000]
+loss: 0.778950  [57600/60000]
 Test Error:
- Accuracy: 71.0%, Avg loss: 0.783848
+ Accuracy: 69.9%, Avg loss: 0.794426
 
 Done!
 </pre></div>
@@ -703,7 +715,7 @@ Done!
 <li><a class="reference external" href="https://pytorch.org/docs/stable/optim.html">torch.optim</a></li>
 <li><a class="reference external" href="https://tutorials.pytorch.kr/recipes/recipes/warmstarting_model_using_parameters_from_a_different_model.html">Warmstart Training a Model</a></li>
 </ul>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 19 minutes  54.221 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 1 minutes  54.657 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-beginner-basics-optimization-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <a class="reference download internal" download="" href="../../_downloads/79b656218bea45f97468ffa42f191880/optimization_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">optimization_tutorial.py</span></code></a></div>

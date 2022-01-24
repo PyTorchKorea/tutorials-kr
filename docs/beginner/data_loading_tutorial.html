@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>사용자 정의 Dataset, Dataloader, Transforms 작성하기 &mdash; PyTorch Tutorials 1.10.0+cu102 documentation</title>
+  <title>사용자 정의 Dataset, Dataloader, Transforms 작성하기 &mdash; PyTorch Tutorials 1.10.1+cu113 documentation</title>
   
 
   
@@ -111,7 +111,7 @@
               
               
                 <div class="version">
-                  1.10.0+cu102
+                  1.10.1+cu113
                 </div>
               
             
@@ -155,6 +155,17 @@
 <li class="toctree-l1"><a class="reference internal" href="basics/autogradqs_tutorial.html"><code class="docutils literal notranslate"><span class="pre">torch.autograd</span></code>를 사용한 자동 미분</a></li>
 <li class="toctree-l1"><a class="reference internal" href="basics/optimization_tutorial.html">모델 매개변수 최적화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="basics/saveloadrun_tutorial.html">모델 저장하고 불러오기</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Introduction to PyTorch on YouTube</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="introyt.html">Introduction to PyTorch - YouTube Series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="introyt/introyt1_tutorial.html">Introduction to PyTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="introyt/tensors_deeper_tutorial.html">Introduction to PyTorch Tensors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="introyt/autogradyt_tutorial.html">The Fundamentals of Autograd</a></li>
+<li class="toctree-l1"><a class="reference internal" href="introyt/modelsyt_tutorial.html">Building Models with PyTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="introyt/tensorboardyt_tutorial.html">PyTorch TensorBoard Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="introyt/trainingyt.html">Training with PyTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="introyt/captumyt.html">Model Understanding with Captum</a></li>
 </ul>
 <p class="caption"><span class="caption-text">파이토치(PyTorch) 배우기</span></p>
 <ul>
@@ -213,6 +224,7 @@
 <p class="caption"><span class="caption-text">프론트엔드 API</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/memory_format_tutorial.html">(베타) PyTorch를 사용한 Channels Last 메모리 형식</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/forward_ad_usage.html">Forward-mode Automatic Differentiation (Beta)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_frontend.html">PyTorch C++ 프론트엔드 사용하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/torch-script-parallelism.html">TorchScript의 동적 병렬 처리(Dynamic Parallelism)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_autograd.html">C++ 프론트엔드의 자동 미분 (autograd)</a></li>
@@ -250,7 +262,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/rpc_param_server_tutorial.html">Implementing a Parameter Server Using Distributed RPC Framework</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/dist_pipeline_parallel_tutorial.html">Distributed Pipeline Parallelism Using RPC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/rpc_async_execution.html">Implementing Batch RPC Processing Using Asynchronous Executions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../advanced/rpc_ddp_tutorial.html">Combining Distributed DataParallel with Distributed RPC Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/rpc_ddp_tutorial.html">분산 데이터 병렬(DDP)과 분산 RPC 프레임워크 결합</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/pipeline_tutorial.html">파이프라인 병렬화로 트랜스포머 모델 학습시키기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/ddp_pipeline.html">Training Transformer models using Distributed Data Parallel and Pipeline Parallelism</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/generic_join.html">Distributed Training with Uneven Inputs Using the Join Context Manager</a></li>
@@ -406,8 +418,9 @@ PyTorch는 데이터를 불러오는 과정을 쉽게해주고, 또 잘 사용�
 <span class="mi">1084239450</span><span class="n">_e76e00b7e7</span><span class="o">.</span><span class="n">jpg</span><span class="p">,</span><span class="mi">70</span><span class="p">,</span><span class="mi">236</span><span class="p">,</span><span class="mi">71</span><span class="p">,</span><span class="mi">257</span><span class="p">,</span> <span class="o">...</span> <span class="p">,</span><span class="mi">128</span><span class="p">,</span><span class="mi">312</span>
 </pre></div>
 </div>
-<p>이제 CSV 파일을 불러와서 (N, 2) 배열안에 있는 랜드마크들을 잡아보겠습니다.
-N은 랜드마크(landmarks)의 개수입니다.</p>
+<p>이제 CSV에서 이미지 이름과 그에 해당하는 데이터(annotation)을 가져와 보겠습니다. 예시로 person-7.jpg가 있는
+65번째 줄(row index number)을 가져오겠습니다.이미지 이름을 읽어 <code class="docutils literal notranslate"><span class="pre">img_name</span></code> 에 저장하고, 데이터는 (L, 2)
+배열인 <code class="docutils literal notranslate"><span class="pre">landmarks</span></code> 에 저장합니다. 이 때 L은 해당 행의 랜드마크의 개수입니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">landmarks_frame</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;data/faces/face_landmarks.csv&#39;</span><span class="p">)</span>
 
 <span class="n">n</span> <span class="o">=</span> <span class="mi">65</span>
@@ -532,7 +545,7 @@ First 4 Landmarks: [[32. 65.]
 </div>
 <div class="section" id="transforms">
 <h2>Transforms<a class="headerlink" href="#transforms" title="Permalink to this headline">¶</a></h2>
-<p>위에서 볼 수 있었던 한가지 문제점은 샘플들이 다 같은 사이즈가 아니라는 것입니다.
+<p>위에서 볼 수 있었던 한가지 문제점은 샘플들이 다 같은 크기가 아니라는 것입니다.
 대부분의 신경망(neural networks)은 고정된 크기의 이미지라고 가정합니다.
 그러므로 우리는 신경망에 주기 전에 처리할 과정을 작성해야 합니다.</p>
 <p>3가지의 transforms 을 만들어 봅시다:</p>
@@ -553,10 +566,10 @@ First 4 Landmarks: [[32. 65.]
 </div>
 <p>아래에서는 이미지와 랜드마크(landmark)들을 어떻게 적용하는지 살펴보도록 하겠습니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Rescale</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;주어진 사이즈로 샘플크기를 조정합니다.</span>
+    <span class="sd">&quot;&quot;&quot;주어진 크기로 샘플크기를 조정합니다.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        output_size(tuple or int) : 원하는 사이즈 값</span>
+<span class="sd">        output_size(tuple or int) : 원하는 출력 크기가</span>
 <span class="sd">            tuple인 경우 해당 tuple(output_size)이 결과물(output)의 크기가 되고,</span>
 <span class="sd">            int라면 비율을 유지하면서, 길이가 작은 쪽이 output_size가 됩니다.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -739,6 +752,10 @@ First 4 Landmarks: [[32. 65.]
 
         <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Batch from dataloader&#39;</span><span class="p">)</span>
 
+<span class="c1"># Windows를 사용 중이라면, 다음 줄의 주석을 제거하고 for 반복문을 들여쓰기합니다.</span>
+<span class="c1"># &quot;num_workers&quot;를 0으로 변경해야 할 수도 있습니다.</span>
+
+<span class="c1"># if __name__ == &#39;__main__&#39;:</span>
 <span class="k">for</span> <span class="n">i_batch</span><span class="p">,</span> <span class="n">sample_batched</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">dataloader</span><span class="p">):</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">i_batch</span><span class="p">,</span> <span class="n">sample_batched</span><span class="p">[</span><span class="s1">&#39;image&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">size</span><span class="p">(),</span>
           <span class="n">sample_batched</span><span class="p">[</span><span class="s1">&#39;landmarks&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">size</span><span class="p">())</span>
@@ -803,7 +820,7 @@ training code에 대한 예시를 알고 싶다면,
 :doc:`transfer_learning_tutorial` 문서를 참고해주세요
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  3.416 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  2.796 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-beginner-data-loading-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <a class="reference download internal" download="" href="../_downloads/835ea022253ad114963d56bfa2cc8a6b/data_loading_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">data_loading_tutorial.py</span></code></a></div>

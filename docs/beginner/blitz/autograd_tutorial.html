@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torch.autograd 에 대한 간단한 소개 &mdash; PyTorch Tutorials 1.10.0+cu102 documentation</title>
+  <title>torch.autograd 에 대한 간단한 소개 &mdash; PyTorch Tutorials 1.10.1+cu113 documentation</title>
   
 
   
@@ -113,7 +113,7 @@
               
               
                 <div class="version">
-                  1.10.0+cu102
+                  1.10.1+cu113
                 </div>
               
             
@@ -157,6 +157,17 @@
 <li class="toctree-l1"><a class="reference internal" href="../basics/autogradqs_tutorial.html"><code class="docutils literal notranslate"><span class="pre">torch.autograd</span></code>를 사용한 자동 미분</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../basics/optimization_tutorial.html">모델 매개변수 최적화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../basics/saveloadrun_tutorial.html">모델 저장하고 불러오기</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Introduction to PyTorch on YouTube</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../introyt.html">Introduction to PyTorch - YouTube Series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../introyt/introyt1_tutorial.html">Introduction to PyTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../introyt/tensors_deeper_tutorial.html">Introduction to PyTorch Tensors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../introyt/autogradyt_tutorial.html">The Fundamentals of Autograd</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../introyt/modelsyt_tutorial.html">Building Models with PyTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../introyt/tensorboardyt_tutorial.html">PyTorch TensorBoard Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../introyt/trainingyt.html">Training with PyTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../introyt/captumyt.html">Model Understanding with Captum</a></li>
 </ul>
 <p class="caption"><span class="caption-text">파이토치(PyTorch) 배우기</span></p>
 <ul class="current">
@@ -215,6 +226,7 @@
 <p class="caption"><span class="caption-text">프론트엔드 API</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/memory_format_tutorial.html">(베타) PyTorch를 사용한 Channels Last 메모리 형식</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../intermediate/forward_ad_usage.html">Forward-mode Automatic Differentiation (Beta)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../advanced/cpp_frontend.html">PyTorch C++ 프론트엔드 사용하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../advanced/torch-script-parallelism.html">TorchScript의 동적 병렬 처리(Dynamic Parallelism)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../advanced/cpp_autograd.html">C++ 프론트엔드의 자동 미분 (autograd)</a></li>
@@ -252,7 +264,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/rpc_param_server_tutorial.html">Implementing a Parameter Server Using Distributed RPC Framework</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/dist_pipeline_parallel_tutorial.html">Distributed Pipeline Parallelism Using RPC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/rpc_async_execution.html">Implementing Batch RPC Processing Using Asynchronous Executions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../advanced/rpc_ddp_tutorial.html">Combining Distributed DataParallel with Distributed RPC Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../advanced/rpc_ddp_tutorial.html">분산 데이터 병렬(DDP)과 분산 RPC 프레임워크 결합</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/pipeline_tutorial.html">파이프라인 병렬화로 트랜스포머 모델 학습시키기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../advanced/ddp_pipeline.html">Training Transformer models using Distributed Data Parallel and Pipeline Parallelism</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../advanced/generic_join.html">Distributed Training with Uneven Inputs Using the Join Context Manager</a></li>
@@ -385,7 +397,11 @@
 <h2>PyTorch에서 사용법<a class="headerlink" href="#pytorch" title="Permalink to this headline">¶</a></h2>
 <p>학습 단계를 하나만 살펴보겠습니다. 여기에서는 <code class="docutils literal notranslate"><span class="pre">torchvision</span></code> 에서 미리 학습된 resnet18 모델을 불러옵니다.
 3채널짜리 높이와 넓이가 64인 이미지 하나를 표현하는 무작위의 데이터 텐서를 생성하고, 이에 상응하는 <code class="docutils literal notranslate"><span class="pre">label(정답)</span></code> 을
-무작위 값으로 초기화합니다.</p>
+무작위 값으로 초기화합니다. 미리 학습된 모델의 정답(label)은 (1, 1000)의 모양(shape)을 갖습니다.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">이 튜토리얼은 (텐서를 CUDA로 이동하더라도) GPU에서는 동작하지 않으며 CPU에서만 동작합니다.</p>
+</div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span><span class="o">,</span> <span class="nn">torchvision</span>
 <span class="n">model</span> <span class="o">=</span> <span class="n">torchvision</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">resnet18</span><span class="p">(</span><span class="n">pretrained</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">data</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">64</span><span class="p">)</span>
@@ -407,8 +423,8 @@
 </pre></div>
 </div>
 <p>다음으로, 옵티마이저(optimizer)를 불러옵니다.
-이 예제에서는 학습율(learning rate) 0.1과 모멘텀(momentum) 0.9를 갖는 SGD입니다.
-옵티마이저(optimizer)에 모델의 모든 매개변수를 등록합니다.</p>
+이 예제에서는 학습율(learning rate) 0.1과 <a class="reference external" href="https://towardsdatascience.com/stochastic-gradient-descent-with-momentum-a84097641a5d">모멘텀(momentum)</a>
+0.9를 갖는 SGD입니다. 옵티마이저(optimizer)에 모델의 모든 매개변수를 등록합니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">optim</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">SGD</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">1e-2</span><span class="p">,</span> <span class="n">momentum</span><span class="o">=</span><span class="mf">0.9</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -617,7 +633,7 @@ resnet에서 분류기(classifier)는 마지막 선형 계층(linear layer)인 <
 <li><a class="reference external" href="https://pytorch.org/docs/stable/notes/autograd.html">In-place operations &amp; Multithreaded Autograd</a></li>
 <li><a class="reference external" href="https://colab.research.google.com/drive/1VpeE6UvEPRz9HmsHh1KS0XxXjYu533EC">Example implementation of reverse-mode autodiff</a></li>
 </ul>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  4.542 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.527 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-beginner-blitz-autograd-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <a class="reference download internal" download="" href="../../_downloads/7d1524c26c049dccb65e51c22bb881ca/autograd_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">autograd_tutorial.py</span></code></a></div>

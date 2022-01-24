@@ -135,7 +135,7 @@ optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
 #####################################
 # 학습 단계(loop)에서 최적화는 세단계로 이뤄집니다:
 #  * ``optimizer.zero_grad()``\ 를 호출하여 모델 매개변수의 변화도를 재설정합니다. 기본적으로 변화도는 더해지기(add up) 때문에 중복 계산을 막기 위해 반복할 때마다 명시적으로 0으로 설정합니다.
-#  * ``loss.backward()``\ 를 호출하여 예측 손실(prediction loss)을 역전파합니다. PyTorch는 각 매개변수에 대한 손실의 변화도를 저장합니다.
+#  * ``loss.backwards()``\ 를 호출하여 예측 손실(prediction loss)을 역전파합니다. PyTorch는 각 매개변수에 대한 손실의 변화도를 저장합니다.
 #  * 변화도를 계산한 뒤에는 ``optimizer.step()``\ 을 호출하여 역전파 단계에서 수집된 변화도로 매개변수를 조정합니다.
 
 

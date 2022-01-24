@@ -62,8 +62,9 @@ plt.ion()   # 반응형 모드
 #     0805personali01.jpg,27,83,27,98, ... 84,134
 #     1084239450_e76e00b7e7.jpg,70,236,71,257, ... ,128,312
 #
-# 이제 CSV 파일을 불러와서 (N, 2) 배열안에 있는 랜드마크들을 잡아보겠습니다.
-# N은 랜드마크(landmarks)의 개수입니다.
+# 이제 CSV에서 이미지 이름과 그에 해당하는 데이터(annotation)을 가져와 보겠습니다. 예시로 person-7.jpg가 있는
+# 65번째 줄(row index number)을 가져오겠습니다.이미지 이름을 읽어 ``img_name`` 에 저장하고, 데이터는 (L, 2)
+# 배열인 ``landmarks`` 에 저장합니다. 이 때 L은 해당 행의 랜드마크의 개수입니다.
 
 landmarks_frame = pd.read_csv('data/faces/face_landmarks.csv')
 
@@ -182,7 +183,7 @@ for i in range(len(face_dataset)):
 # Transforms
 # ----------
 #
-# 위에서 볼 수 있었던 한가지 문제점은 샘플들이 다 같은 사이즈가 아니라는 것입니다.
+# 위에서 볼 수 있었던 한가지 문제점은 샘플들이 다 같은 크기가 아니라는 것입니다.
 # 대부분의 신경망(neural networks)은 고정된 크기의 이미지라고 가정합니다.
 # 그러므로 우리는 신경망에 주기 전에 처리할 과정을 작성해야 합니다.
 #
@@ -207,10 +208,10 @@ for i in range(len(face_dataset)):
 # 아래에서는 이미지와 랜드마크(landmark)들을 어떻게 적용하는지 살펴보도록 하겠습니다.
 
 class Rescale(object):
-    """주어진 사이즈로 샘플크기를 조정합니다.
+    """주어진 크기로 샘플크기를 조정합니다.
 
     Args:
-        output_size(tuple or int) : 원하는 사이즈 값
+        output_size(tuple or int) : 원하는 출력 크기가
             tuple인 경우 해당 tuple(output_size)이 결과물(output)의 크기가 되고,
             int라면 비율을 유지하면서, 길이가 작은 쪽이 output_size가 됩니다.
     """
@@ -396,6 +397,10 @@ def show_landmarks_batch(sample_batched):
 
         plt.title('Batch from dataloader')
 
+# Windows를 사용 중이라면, 다음 줄의 주석을 제거하고 for 반복문을 들여쓰기합니다.
+# "num_workers"를 0으로 변경해야 할 수도 있습니다.
+
+# if __name__ == '__main__':
 for i_batch, sample_batched in enumerate(dataloader):
     print(i_batch, sample_batched['image'].size(),
           sample_batched['landmarks'].size())

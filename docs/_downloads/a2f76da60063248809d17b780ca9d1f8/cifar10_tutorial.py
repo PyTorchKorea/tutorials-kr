@@ -109,7 +109,7 @@ images, labels = dataiter.next()
 # 이미지 보여주기
 imshow(torchvision.utils.make_grid(images))
 # 정답(label) 출력
-print(' '.join('%5s' % classes[labels[j]] for j in range(batch_size)))
+print(' '.join(f'{classes[labels[j]]:5s}' for j in range(batch_size)))
 
 
 ########################################################################
@@ -181,8 +181,7 @@ for epoch in range(2):   # 데이터셋을 수차례 반복합니다.
         # 통계를 출력합니다.
         running_loss += loss.item()
         if i % 2000 == 1999:    # print every 2000 mini-batches
-            print('[%d, %5d] loss: %.3f' %
-                  (epoch + 1, i + 1, running_loss / 2000))
+            print(f'[{epoch + 1}, {i + 1:5d}] loss: {running_loss / 2000:.3f}')
             running_loss = 0.0
 
 print('Finished Training')
@@ -213,7 +212,7 @@ images, labels = dataiter.next()
 
 # 이미지를 출력합니다.
 imshow(torchvision.utils.make_grid(images))
-print('GroundTruth: ', ' '.join('%5s' % classes[labels[j]] for j in range(4)))
+print('GroundTruth: ', ' '.join(f'{classes[labels[j]]:5s}' for j in range(4)))
 
 ########################################################################
 # 이제, 저장했던 모델을 불러오도록 하겠습니다 (주: 모델을 저장하고 다시 불러오는
@@ -233,7 +232,7 @@ outputs = net(images)
 # 따라서, 가장 높은 값을 갖는 인덱스(index)를 뽑아보겠습니다:
 _, predicted = torch.max(outputs, 1)
 
-print('Predicted: ', ' '.join('%5s' % classes[predicted[j]]
+print('Predicted: ', ' '.join(f'{classes[predicted[j]]:5s}'
                               for j in range(4)))
 
 ########################################################################
@@ -254,8 +253,7 @@ with torch.no_grad():
         total += labels.size(0)
         correct += (predicted == labels).sum().item()
 
-print('Accuracy of the network on the 10000 test images: %d %%' % (
-    100 * correct / total))
+print(f'Accuracy of the network on the 10000 test images: {100 * correct // total} %')
 
 ########################################################################
 # (10가지 분류 중에 하나를 무작위로) 찍었을 때의 정확도인 10% 보다는 나아보입니다.
@@ -283,8 +281,7 @@ with torch.no_grad():
 # 각 분류별 정확도(accuracy)를 출력합니다
 for classname, correct_count in correct_pred.items():
     accuracy = 100 * float(correct_count) / total_pred[classname]
-    print("Accuracy for class {:5s} is: {:.1f} %".format(classname,
-                                                   accuracy))
+    print(f'Accuracy for class: {classname:5s} is {accuracy:.1f} %')
 
 ########################################################################
 # 자, 이제 다음으로 무엇을 해볼까요?
@@ -297,7 +294,7 @@ for classname, correct_count in correct_pred.items():
 #
 # 먼저 (CUDA를 사용할 수 있다면) 첫번째 CUDA 장치를 사용하도록 설정합니다:
 
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
 # CUDA 기기가 존재한다면, 아래 코드가 CUDA 장치를 출력합니다:
 
