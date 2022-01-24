@@ -166,8 +166,8 @@ Recipes are bite-sized bite-sized, actionable examples of how to use specific Py
    :tags: Production,TorchScript
 
 .. customcarditem::
-   :header: PyTorch Mobile Performance Recipes
-   :card_description: List of recipes for performance optimizations for using PyTorch on Mobile (Android and iOS).
+   :header: PyTorch 모바일 성능 레시피
+   :card_description: 모바일(Android와 iOS) 상에서 PyTorch를 사용하기 위한 성능 최적화 레시피 목록들.
    :image: ../_static/img/thumbnails/cropped/mobile.png
    :link: ../recipes/mobile_perf.html
    :tags: Mobile,Model-Optimization
