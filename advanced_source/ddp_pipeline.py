@@ -1,35 +1,36 @@
 """
-Training Transformer models using Distributed Data Parallel and Pipeline Parallelism
+분산 데이터 병렬 처리와 파이프라인 병렬화를 사용한 트랜스포머 모델 학습
 ====================================================================================
 
 **Author**: `Pritam Damania <https://github.com/pritamdamania87>`_
+  **번역**: `백선희 <https://github.com/spongebob03>`_
+  
+이 튜토리얼은 `분산 데이터 병렬처리(Distributed Data Parallel) <https://pytorch.org/docs/stable/generated/torch.nn.parallel.DistributedDataParallel.html>`__ 와
+`파이프라인 병렬화 <https://pytorch.org/docs/stable/pipeline.html>`__
+를 사용하여 여러 GPU에 걸친 거대한 트랜스포머(transformer) 모델을 어떻게 학습시키는지 보여줍니다.
+이번 튜토리얼은 `NN.TRANSFORMER 와 TORCHTEXT 로 시퀀스-투-시퀀스(SEQUENCE-TO-SEQUENCE) 모델링하기 <https://tutorials.pytorch.kr/beginner/transformer_tutorial.html>`__ 의
+확장판이며 파이프라인 병렬화가 어떻게 트랜스포머 모델 학습에 쓰이는지 증명하기 위해 이전 튜토리얼에서의
+모델 규모를 증가시켰습니다.
 
-This tutorial demonstrates how to train a large Transformer model across
-multiple GPUs using `Distributed Data Parallel <https://pytorch.org/docs/stable/generated/torch.nn.parallel.DistributedDataParallel.html>`__ and
-`Pipeline Parallelism <https://pytorch.org/docs/stable/pipeline.html>`__. This tutorial is an extension of the
-`Sequence-to-Sequence Modeling with nn.Transformer and TorchText <https://tutorials.pytorch.kr/beginner/transformer_tutorial.html>`__ tutorial
-and scales up the same model to demonstrate how Distributed Data Parallel and
-Pipeline Parallelism can be used to train Transformer models.
-
-Prerequisites:
+선수과목(Prerequisites):
 
     * `Pipeline Parallelism <https://pytorch.org/docs/stable/pipeline.html>`__
-    * `Sequence-to-Sequence Modeling with nn.Transformer and TorchText <https://tutorials.pytorch.kr/beginner/transformer_tutorial.html>`__
-    * `Getting Started with Distributed Data Parallel <https://tutorials.pytorch.kr/intermediate/ddp_tutorial.html>`__
+    * `NN.TRANSFORMER 와 TORCHTEXT 로 시퀀스-투-시퀀스(SEQUENCE-TO-SEQUENCE) 모델링하기 <https://tutorials.pytorch.kr/beginner/transformer_tutorial.html>`__
+    * `분산 데이터 병렬 처리 시작하기 <https://tutorials.pytorch.kr/intermediate/ddp_tutorial.html>`__
 """
 
 
 ######################################################################
-# Define the model
+# 모델 정의하기
 # ----------------
 #
 
 ######################################################################
-# ``PositionalEncoding`` module injects some information about the
-# relative or absolute position of the tokens in the sequence. The
-# positional encodings have the same dimension as the embeddings so that
-# the two can be summed. Here, we use ``sine`` and ``cosine`` functions of
-# different frequencies.
+# ``PositionalEncoding`` 모듈은 시퀀스에서 토큰의 상대적, 절대 위치에 대한 
+# 일부 정보를 주입합니다.
+# 위치 인코딩은 임베딩과 같은 차원을 가지므로
+# 둘을 합칠 수 있습니다. 여기서, 주파수가 다른 ``sine``과 ``cosine`` 기능을
+# 사용합니다.
 
 import sys
 import os
@@ -60,23 +61,23 @@ class PositionalEncoding(nn.Module):
 
 
 ######################################################################
-# In this tutorial, we will split a Transformer model across two GPUs and use
-# pipeline parallelism to train the model. In addition to this, we use
-# `Distributed Data Parallel <https://pytorch.org/docs/stable/generated/torch.nn.parallel.DistributedDataParallel.html>`__
-# to train two replicas of this pipeline. We have one process driving a pipe across
-# GPUs 0 and 1 and another process driving a pipe across GPUs 2 and 3. Both these
-# processes then use Distributed Data Parallel to train the two replicas. The
-# model is exactly the same model used in the `Sequence-to-Sequence Modeling with nn.Transformer and TorchText
-# <https://tutorials.pytorch.kr/beginner/transformer_tutorial.html>`__ tutorial,
-# but is split into two stages. The largest number of parameters belong to the
-# `nn.TransformerEncoder <https://pytorch.org/docs/stable/generated/torch.nn.TransformerEncoder.html>`__ layer.
-# The `nn.TransformerEncoder <https://pytorch.org/docs/stable/generated/torch.nn.TransformerEncoder.html>`__
-# itself consists of ``nlayers`` of `nn.TransformerEncoderLayer <https://pytorch.org/docs/stable/generated/torch.nn.TransformerEncoderLayer.html>`__.
-# As a result, our focus is on ``nn.TransformerEncoder`` and we split the model
-# such that half of the ``nn.TransformerEncoderLayer`` are on one GPU and the
-# other half are on another. To do this, we pull out the ``Encoder`` and
-# ``Decoder`` sections into seperate modules and then build an nn.Sequential
-# representing the original Transformer module.
+# 이번 튜토리얼에서는, 트랜스포머 모델을 두 개의 GPU에 걸쳐서 나누고  
+# 파이프라인 병렬화로 학습시켜 보겠습니다. 추가로,
+# `분산 데이터 병럴 처리 <https://pytorch.org/docs/stable/generated/torch.nn.parallel.DistributedDataParallel.html>`__
+# 를 사용하여 이 파이프라인의 두 복제를 훈련시킵니다. 한 프로세스는 
+# GPUs 0, 1에 거쳐 파이프를 구동하고 다른 프로세스는 GPUs 2, 3에서 파이프를 구동합니다. 그 다음, 이 두
+# 프로세스는 분산 데이터 병렬처리로 두 복제본을 학습시킵니다.
+# 모델은 바로 `NN.TRANSFORMER 와 TORCHTEXT 로 시퀀스-투-시퀀스(SEQUENCE-TO-SEQUENCE) 모델링하기
+# <https://tutorials.pytorch.kr/beginner/transformer_tutorial.html>`__ 튜토리얼과
+# 똑같은 모델이지만 두 단계로 나뉩니다. 대부분 파라미터(parameter)들은
+# `nn.TransformerEncoder <https://pytorch.org/docs/stable/generated/torch.nn.TransformerEncoder.html>`__ 계층(layer)에 포함됩니다.
+# `nn.TransformerEncoder <https://pytorch.org/docs/stable/generated/torch.nn.TransformerEncoder.html>`__ 는
+# `nn.TransformerEncoderLayer <https://pytorch.org/docs/stable/generated/torch.nn.TransformerEncoderLayer.html>`__ 의 ``nlayers`` 로 구성되어 있습니다.
+# 결과적으로, 우리는 ``nn.TransformerEncoder`` 에 중점을 두고 있으며
+# ``nn.TransformerEncoderLayer`` 의 절반은 한 GPU에 두고
+# 나머지 절반은 다른 GPU에 있도록 모델을 분할합니다. 이를 위해서 ``Encoder`` 와
+# ``Decoder`` 섹션을 분리된 모듈로 빼낸 다음, 원본 트랜스포머 모듈을
+# 나타내는 nn.Sequential을 빌드 합니다.
 
 
 if sys.platform == 'win32':
@@ -120,33 +121,31 @@ class Decoder(nn.Module):
         return self.decoder(inp).permute(1, 0, 2)
 
 ######################################################################
-# Start multiple processes for training
+# 학습을 위한 다중 프로세스 시작
 # -------------------------------------
 #
 
 
 ######################################################################
-# We start two processes where each process drives its own pipeline across two
-# GPUs. ``run_worker`` is executed for each process.
+# 각자 두 개의 GPU에서 자체 파이프라인을 구동하는 두 가지 프로세스를 시작합니다.
+# ``run_worker``는 각 프로세스에 실행됩니다.
 
 def run_worker(rank, world_size):
 
 
 ######################################################################
-# Load and batch data
+# 데이터 로드하고 배치 만들기
 # -------------------
 #
 
 
 ######################################################################
-# The training process uses Wikitext-2 dataset from ``torchtext``. The
-# vocab object is built based on the train dataset and is used to numericalize
-# tokens into tensors. Starting from sequential data, the ``batchify()``
-# function arranges the dataset into columns, trimming off any tokens remaining
-# after the data has been divided into batches of size ``batch_size``.
-# For instance, with the alphabet as the sequence (total length of 26)
-# and a batch size of 4, we would divide the alphabet into 4 sequences of
-# length 6:
+# 학습 프로세스는 ``torchtext`` 의 Wikitext-2 데이터셋을 사용합니다.
+# 단어 오브젝트는 훈련 데이터셋으로 만들어지고, 토큰을 텐서(tensor)로 수치화하는데 사용됩니다.
+# 시퀀스 데이터로부터 시작하여, ``batchify()`` 함수는 데이터셋을 열(column)들로 정리하고,
+# ``batch_size`` 사이즈의 배치들로 나눈 후에 남은 모든 토큰을 버립니다.
+# 예를 들어, 알파벳을 시퀀스(총 길이 26)로 생각하고 배치 사이즈를 4라고 한다면,
+# 알파벳을 길이가 6인 4개의 시퀀스로 나눌 수 있습니다:
 #
 # .. math::
 #   \begin{bmatrix}
@@ -160,9 +159,9 @@ def run_worker(rank, world_size):
 #   \begin{bmatrix}\text{S} \\ \text{T} \\ \text{U} \\ \text{V} \\ \text{W} \\ \text{X}\end{bmatrix}
 #   \end{bmatrix}
 #
-# These columns are treated as independent by the model, which means that
-# the dependence of ``G`` and ``F`` can not be learned, but allows more
-# efficient batch processing.
+# 이 열들은 모델에 의해서 독립적으로 취급되며, 이는
+# ``G`` 와 ``F`` 의 의존성이 학습될 수 없다는 것을 의미하지만, 더 효율적인
+# 배치 프로세싱(batch processing)을 허용합니다.
 #
 
 # In 'run_worker'
@@ -210,23 +209,23 @@ def run_worker(rank, world_size):
 
 
 ######################################################################
-# Functions to generate input and target sequence
+# 입력과 타겟 시퀀스를 생성하기 위한 함수들
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 
 
 ######################################################################
-# ``get_batch()`` function generates the input and target sequence for
-# the transformer model. It subdivides the source data into chunks of
-# length ``bptt``. For the language modeling task, the model needs the
-# following words as ``Target``. For example, with a ``bptt`` value of 2,
-# we’d get the following two Variables for ``i`` = 0:
+# ``get_batch()`` 함수는 트랜스포머 모델을 위한 입력과 타겟 시퀀스를
+# 생성합니다. 이 함수는 소스 데이터를 ``bptt`` 길이를 가진 덩어리로 세분화합니다.
+# 언어 모델링 과제를 위해서, 모델은
+# 다음 단어인 ``Target`` 이 필요합니다. 에를 들어 ``bptt`` 의 값이 2라면,
+# ``i`` = 0 일 때 다음의 2 개 변수(Variable)를 얻을 수 있습니다:
 #
 # .. image:: ../_static/img/transformer_input_target.png
-#
-# It should be noted that the chunks are along dimension 0, consistent
-# with the ``S`` dimension in the Transformer model. The batch dimension
-# ``N`` is along dimension 1.
+# 
+# 청크가 차원 0을 속하며 
+# 트랜스포머 모델의 ''S'' 차원과 일치한다는 것을 유의해야 합니다. 
+# 배치 차원 ``N`` 은 1 차원에 해당합니다.
 #
 
 # In 'run_worker'
@@ -239,27 +238,27 @@ def run_worker(rank, world_size):
         return data.t(), target
 
 ######################################################################
-# Model scale and Pipe initialization
+# 모델 규모와 파이프 초기화
 # -----------------------------------
 #
 
 
 ######################################################################
-# To demonstrate training large Transformer models using pipeline parallelism,
-# we scale up the Transformer layers appropriately. We use an embedding
-# dimension of 4096, hidden size of 4096, 16 attention heads and 8 total
-# transformer layers (``nn.TransformerEncoderLayer``). This creates a model with
-# **~1 billion** parameters.
+# 파이프라인 병렬화를 활용한 대형 트랜스포머 모델 학습을 증명하기 위해,
+# 트랜스포머 계층 규모를 적절히 확장시킵니다. We use an embedding
+# 4096차원의 임베딩 벡터, 4096의 은닉 사이즈, 16개의 어텐션 헤드(attention head)와  총 8 개의 
+#  트랜스포머 계층 (``nn.TransformerEncoderLayer``)를 사용합니다. 이는 최대
+# **~1 억** 개의 파라미터를 갖는 모델을 생성합니다.
 #
-# We need to initialize the `RPC Framework <https://pytorch.org/docs/stable/rpc.html>`__
-# since Pipe depends on the RPC framework via `RRef <https://pytorch.org/docs/stable/rpc.html#rref>`__
-# which allows for future expansion to cross host pipelining. We need to
-# initialize the RPC framework with only a single worker since we're using a
-# single process to drive multiple GPUs.
+# `RPC 프레임워크 <https://pytorch.org/docs/stable/rpc.html>`__ 를 초기화해야 합니다.
+# Pipe는 `RRef <https://pytorch.org/docs/stable/rpc.html#rref>`__ 를 통해 RPC 프레임워크에 의존하는데
+# 이는 향후 호스트 파이프라인을 교차 확장할 수 있도록 하기 때문입니다.
+# 이때 RPC 프레임워크는 오직 하나의 하나의 worker로 초기화를 해야 하는데, 
+# 여러 GPU를 다루기 위해 프로세스 하나만 사용하고 있기 때문입니다.
 #
-# The pipeline is then initialized with 8 transformer layers on one GPU and 8
-# transformer layers on the other GPU. One pipe is setup across GPUs 0 and 1 and
-# another across GPUs 2 and 3. Both pipes are then replicated using DistributedDataParallel.
+# 그런 다음 파이프라인은 한 GPU에 8개의 트랜스포머와
+# 다른 GPU에 8개의 트랜스포머 레이어로 초기화됩니다. 한 파이프는 GPU 0, 1에 거쳐 설정되고
+# 다른 하나는 GPU 2, 3에 설정됩니다. 그런 다음 분산 데이터 병렬을 사용하여 두 파이프가 모두 복제됩니다.
 
 # In 'run_worker'
     ntokens = len(vocab) # the size of vocabulary
@@ -331,21 +330,20 @@ def run_worker(rank, world_size):
     print_with_rank('Total parameters in model: {:,}'.format(get_total_params(model)))
 
 ######################################################################
-# Run the model
+# 모델 실행하기
 # -------------
 #
 
 
 ######################################################################
-# `CrossEntropyLoss <https://pytorch.org/docs/master/nn.html?highlight=crossentropyloss#torch.nn.CrossEntropyLoss>`__
-# is applied to track the loss and
-# `SGD <https://pytorch.org/docs/master/optim.html?highlight=sgd#torch.optim.SGD>`__
-# implements stochastic gradient descent method as the optimizer. The initial
-# learning rate is set to 5.0. `StepLR <https://pytorch.org/docs/master/optim.html?highlight=steplr#torch.optim.lr_scheduler.StepLR>`__ is
-# applied to adjust the learn rate through epochs. During the
-# training, we use
+# 손실(loss)을 추적하기 위해 `CrossEntropyLoss <https://pytorch.org/docs/master/nn.html?highlight=crossentropyloss#torch.nn.CrossEntropyLoss>`__ 가
+# 적용되며, 옵티마이저(optimizer)로서 `SGD <https://pytorch.org/docs/master/optim.html?highlight=sgd#torch.optim.SGD>`__
+# 는 확률적 경사하강법(stochastic gradient descent method)을 구현합니다. 초기
+# 학습률(learning rate)은 5.0로 설정됩니다. `StepLR <https://pytorch.org/docs/master/optim.html?highlight=steplr#torch.optim.lr_scheduler.StepLR>`__ 는
+# 에폭(epoch)에 따라서 학습률을 조절하는 데 사용됩니다. 학습하는 동안,
+# 기울기 폭발(gradient exploding)을 방지하기 위해 모든 기울기를 함께 조정(scale)하는 함수
 # `nn.utils.clip_grad_norm\_ <https://pytorch.org/docs/master/nn.html?highlight=nn%20utils%20clip_grad_norm#torch.nn.utils.clip_grad_norm_>`__
-# function to scale all the gradient together to prevent exploding.
+# 을 이용합니다.
 #
 
 # In 'run_worker'
@@ -409,8 +407,8 @@ def run_worker(rank, world_size):
         return total_loss / (len(data_source) - 1)
 
 ######################################################################
-# Loop over epochs. Save the model if the validation loss is the best
-# we've seen so far. Adjust the learning rate after each epoch.
+# 에폭을 반복합니다. 만약 검증 오차(validation loss)가 지금까지 관찰한 것 중 최적이라면
+# 모델을 저장합니다. 각 에폭 이후에 학습률을 조절합니다.
 
 # In 'run_worker'
     best_val_loss = float("inf")
@@ -435,10 +433,10 @@ def run_worker(rank, world_size):
 
 
 ######################################################################
-# Evaluate the model with the test dataset
+# 평가 데이터셋으로 모델 평가하기
 # -------------------------------------
 #
-# Apply the best model to check the result with the test dataset.
+# 평가 데이터셋에서의 결과를 확인하기 위해 최고의 모델을 적용합니다.
 
 # In 'run_worker'
     test_loss = evaluate(best_model, test_data)
