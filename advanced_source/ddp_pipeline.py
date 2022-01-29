@@ -1,15 +1,15 @@
 """
-분산 데이터 병렬 처리와 파이프라인 병렬화를 사용한 트랜스포머 모델 학습
+분산 데이터 병렬 처리와 병렬 처리 파이프라인을 사용한 트랜스포머 모델 학습
 =======================================================================
 
 **Author**: `Pritam Damania <https://github.com/pritamdamania87>`_
   **번역**: `백선희 <https://github.com/spongebob03>`_
   
 이 튜토리얼은 `분산 데이터 병렬처리(Distributed Data Parallel) <https://pytorch.org/docs/stable/generated/torch.nn.parallel.DistributedDataParallel.html>`__ 와
-`파이프라인 병렬화 <https://pytorch.org/docs/stable/pipeline.html>`__
+`병렬 처리 파이프라인 <https://pytorch.org/docs/stable/pipeline.html>`__
 를 사용하여 여러 GPU에 걸친 거대한 트랜스포머(transformer) 모델을 어떻게 학습시키는지 보여줍니다.
 이번 튜토리얼은 `NN.TRANSFORMER 와 TORCHTEXT 로 시퀀스-투-시퀀스(SEQUENCE-TO-SEQUENCE) 모델링하기 <https://tutorials.pytorch.kr/beginner/transformer_tutorial.html>`__ 의
-확장판이며 파이프라인 병렬화가 어떻게 트랜스포머 모델 학습에 쓰이는지 증명하기 위해 이전 튜토리얼에서의
+확장판이며 분산 데이터 병렬 처리와 병렬 처리 파이프라인이 어떻게 트랜스포머 모델 학습에 쓰이는지 증명하기 위해 이전 튜토리얼에서의
 모델 규모를 증가시켰습니다.
 
 선수과목(Prerequisites):
@@ -26,8 +26,8 @@
 #
 
 ######################################################################
-# ``PositionalEncoding`` 모듈은 시퀀스에서 토큰의 상대적, 절대 위치에 대한 
-# 일부 정보를 주입합니다.
+# ``PositionalEncoding`` 모듈은 시퀀스에서 토큰의 상대적, 절대적 위치에 대한 
+# 몇몇 정보를 주입합니다.
 # 위치 인코딩은 임베딩과 같은 차원을 가지므로
 # 둘을 합칠 수 있습니다. 여기서, 주파수가 다른 ``sine`` 과 ``cosine`` 기능을
 # 사용합니다.
@@ -62,18 +62,18 @@ class PositionalEncoding(nn.Module):
 
 ######################################################################
 # 이번 튜토리얼에서는, 트랜스포머 모델을 두 개의 GPU에 걸쳐서 나누고  
-# 파이프라인 병렬화로 학습시켜 보겠습니다. 추가로,
+# 병렬 처리 파이프라인으로 학습시켜 보겠습니다. 추가로,
 # `분산 데이터 병럴 처리 <https://pytorch.org/docs/stable/generated/torch.nn.parallel.DistributedDataParallel.html>`__
 # 를 사용하여 이 파이프라인의 두 복제를 훈련시킵니다. 한 프로세스는 
 # GPUs 0, 1에 거쳐 파이프를 구동하고 다른 프로세스는 GPUs 2, 3에서 파이프를 구동합니다. 그 다음, 이 두
-# 프로세스는 분산 데이터 병렬처리로 두 복제본을 학습시킵니다.
+# 프로세스는 분산 데이터 병렬처리로 두 복제본(replica)을 학습시킵니다.
 # 모델은 바로 `NN.TRANSFORMER 와 TORCHTEXT 로 시퀀스-투-시퀀스(SEQUENCE-TO-SEQUENCE) 모델링하기
 # <https://tutorials.pytorch.kr/beginner/transformer_tutorial.html>`__ 튜토리얼과
 # 똑같은 모델이지만 두 단계로 나뉩니다. 대부분 파라미터(parameter)들은
 # `nn.TransformerEncoder <https://pytorch.org/docs/stable/generated/torch.nn.TransformerEncoder.html>`__ 계층(layer)에 포함됩니다.
 # `nn.TransformerEncoder <https://pytorch.org/docs/stable/generated/torch.nn.TransformerEncoder.html>`__ 는
 # `nn.TransformerEncoderLayer <https://pytorch.org/docs/stable/generated/torch.nn.TransformerEncoderLayer.html>`__ 의 ``nlayers`` 로 구성되어 있습니다.
-# 결과적으로, ``nn.TransformerEncoder`` 에 중점을 두고 있으며
+# 결과적으로, 이 튜토리얼에서는 ``nn.TransformerEncoder`` 에 중점을 두고 있으며
 # ``nn.TransformerEncoderLayer`` 의 절반은 한 GPU에 두고
 # 나머지 절반은 다른 GPU에 있도록 모델을 분할합니다. 이를 위해서 ``Encoder`` 와
 # ``Decoder`` 섹션을 분리된 모듈로 빼낸 다음, 원본 트랜스포머 모듈을
@@ -218,13 +218,13 @@ def run_worker(rank, world_size):
 # ``get_batch()`` 함수는 트랜스포머 모델을 위한 입력과 타겟 시퀀스를
 # 생성합니다. 이 함수는 소스 데이터를 ``bptt`` 길이를 가진 덩어리로 세분화합니다.
 # 언어 모델링 과제를 위해서, 모델은
-# 다음 단어인 ``Target`` 이 필요합니다. 에를 들어 ``bptt`` 의 값이 2라면,
+# 다음 단어인 ``Target`` 이 필요합니다. 예를 들어 ``bptt`` 의 값이 2라면,
 # ``i`` = 0 일 때 다음의 2 개 변수(Variable)를 얻을 수 있습니다:
 #
 # .. image:: ../_static/img/transformer_input_target.png
-# 
-# 청크가 차원 0을 속하며 
-# 트랜스포머 모델의 ''S'' 차원과 일치한다는 것을 유의해야 합니다. 
+#
+# 청크가 차원 0에 속하며 
+# 트랜스포머 모델의 ``S`` 차원과 일치한다는 것을 유의해야 합니다.
 # 배치 차원 ``N`` 은 1 차원에 해당합니다.
 #
 
@@ -244,21 +244,21 @@ def run_worker(rank, world_size):
 
 
 ######################################################################
-# 파이프라인 병렬화를 활용한 대형 트랜스포머 모델 학습을 증명하기 위해,
-# 트랜스포머 계층 규모를 적절히 확장시킵니다. We use an embedding
-# 4096차원의 임베딩 벡터, 4096의 은닉 사이즈, 16개의 어텐션 헤드(attention head)와  총 8 개의 
+# 병렬 처리 파이프라인을 활용한 대형 트랜스포머 모델 학습을 증명하기 위해,
+# 트랜스포머 계층 규모를 적절히 확장시킵니다.
+# 4096차원의 임베딩 벡터, 4096의 은닉 사이즈, 16개의 어텐션 헤드(attention head)와 총 8 개의 
 # 트랜스포머 계층 (``nn.TransformerEncoderLayer``)를 사용합니다. 이는 최대
 # **~1 억** 개의 파라미터를 갖는 모델을 생성합니다.
 #
 # `RPC 프레임워크 <https://pytorch.org/docs/stable/rpc.html>`__ 를 초기화해야 합니다.
 # Pipe는 `RRef <https://pytorch.org/docs/stable/rpc.html#rref>`__ 를 통해 RPC 프레임워크에 의존하는데
 # 이는 향후 호스트 파이프라인을 교차 확장할 수 있도록 하기 때문입니다.
-# 이때 RPC 프레임워크는 오직 하나의 하나의 worker로 초기화를 해야 하는데, 
+# 이때 RPC 프레임워크는 오직 하나의 하나의 worker로 초기화를 해야 하는데,
 # 여러 GPU를 다루기 위해 프로세스 하나만 사용하고 있기 때문입니다.
 #
 # 그런 다음 파이프라인은 한 GPU에 8개의 트랜스포머와
-# 다른 GPU에 8개의 트랜스포머 레이어로 초기화됩니다. 한 파이프는 GPU 0, 1에 거쳐 설정되고
-# 다른 하나는 GPU 2, 3에 설정됩니다. 그런 다음 분산 데이터 병렬을 사용하여 두 파이프가 모두 복제됩니다.
+# 다른 GPU에 8개의 트랜스포머 계층으로 초기화됩니다. 한 파이프는 GPU 0, 1에 거쳐 설정되고
+# 다른 하나는 GPU 2, 3에 설정됩니다. 그런 다음 DistributedDataParallel을 사용하여 두 파이프가 모두 복제됩니다.
 
 # In 'run_worker'
     ntokens = len(vocab) # the size of vocabulary
