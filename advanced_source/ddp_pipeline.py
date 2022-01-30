@@ -7,15 +7,15 @@
   
 이 튜토리얼은 `분산 데이터 병렬처리(Distributed Data Parallel) <https://pytorch.org/docs/stable/generated/torch.nn.parallel.DistributedDataParallel.html>`__ 와
 `병렬 처리 파이프라인 <https://pytorch.org/docs/stable/pipeline.html>`__
-를 사용하여 여러 GPU에 걸친 거대한 트랜스포머(transformer) 모델을 어떻게 학습시키는지 보여줍니다.
-이번 튜토리얼은 `NN.TRANSFORMER 와 TORCHTEXT 로 시퀀스-투-시퀀스(SEQUENCE-TO-SEQUENCE) 모델링하기 <https://tutorials.pytorch.kr/beginner/transformer_tutorial.html>`__ 의
-확장판이며 분산 데이터 병렬 처리와 병렬 처리 파이프라인이 어떻게 트랜스포머 모델 학습에 쓰이는지 증명하기 위해 이전 튜토리얼에서의
+를 사용하여 여러 GPU에 걸친 거대한 트랜스포머(Transformer) 모델을 어떻게 학습시키는지 보여줍니다.
+이번 튜토리얼은 `nn.Transformer 와 TorchText 로 시퀀스-투-시퀀스(Sequence-to-Sequence) 모델링하기 <https://tutorials.pytorch.kr/beginner/transformer_tutorial.html>`__ 의
+확장판이며 분산 데이터 병렬 처리와 병렬 처리 파이프라인이 어떻게 트랜스포머 모델 학습에 쓰이는지 보여주기 위해 이전 튜토리얼에서의
 모델 규모를 증가시켰습니다.
 
 선수과목(Prerequisites):
 
     * `Pipeline Parallelism <https://pytorch.org/docs/stable/pipeline.html>`__
-    * `NN.TRANSFORMER 와 TORCHTEXT 로 시퀀스-투-시퀀스(SEQUENCE-TO-SEQUENCE) 모델링하기 <https://tutorials.pytorch.kr/beginner/transformer_tutorial.html>`__
+    * `nn.Transformer 와 TorchText 로 시퀀스-투-시퀀스(Sequence-to-Sequence) 모델링하기 <https://tutorials.pytorch.kr/beginner/transformer_tutorial.html>`__
     * `분산 데이터 병렬 처리 시작하기 <https://tutorials.pytorch.kr/intermediate/ddp_tutorial.html>`__
 """
 
@@ -29,7 +29,7 @@
 # ``PositionalEncoding`` 모듈은 시퀀스에서 토큰의 상대적, 절대적 위치에 대한 
 # 몇몇 정보를 주입합니다.
 # 위치 인코딩은 임베딩과 같은 차원을 가지므로
-# 둘을 합칠 수 있습니다. 여기서, 주파수가 다른 ``sine`` 과 ``cosine`` 기능을
+# 둘을 합칠 수 있습니다. 여기서, 주파수가 다른 ``sine`` 과 ``cosine`` 함수를
 # 사용합니다.
 
 import sys
@@ -63,11 +63,11 @@ class PositionalEncoding(nn.Module):
 ######################################################################
 # 이번 튜토리얼에서는, 트랜스포머 모델을 두 개의 GPU에 걸쳐서 나누고  
 # 병렬 처리 파이프라인으로 학습시켜 보겠습니다. 추가로,
-# `분산 데이터 병럴 처리 <https://pytorch.org/docs/stable/generated/torch.nn.parallel.DistributedDataParallel.html>`__
+# `분산 데이터 병렬 처리 <https://pytorch.org/docs/stable/generated/torch.nn.parallel.DistributedDataParallel.html>`__
 # 를 사용하여 이 파이프라인의 두 복제를 훈련시킵니다. 한 프로세스는 
 # GPUs 0, 1에 거쳐 파이프를 구동하고 다른 프로세스는 GPUs 2, 3에서 파이프를 구동합니다. 그 다음, 이 두
 # 프로세스는 분산 데이터 병렬처리로 두 복제본(replica)을 학습시킵니다.
-# 모델은 바로 `NN.TRANSFORMER 와 TORCHTEXT 로 시퀀스-투-시퀀스(SEQUENCE-TO-SEQUENCE) 모델링하기
+# 모델은 바로 `nn.Transformer 와 TorchText 로 시퀀스-투-시퀀스(Sequence-to-Sequence) 모델링하기
 # <https://tutorials.pytorch.kr/beginner/transformer_tutorial.html>`__ 튜토리얼과
 # 똑같은 모델이지만 두 단계로 나뉩니다. 대부분 파라미터(parameter)들은
 # `nn.TransformerEncoder <https://pytorch.org/docs/stable/generated/torch.nn.TransformerEncoder.html>`__ 계층(layer)에 포함됩니다.
@@ -127,7 +127,7 @@ class Decoder(nn.Module):
 
 
 ######################################################################
-# 각자 두 개의 GPU에서 자체 파이프라인을 구동하는 두 가지 프로세스를 시작합니다.
+# 각각 두 개의 GPU에서 자체 파이프라인을 구동하는 두 개의 프로세스를 시작합니다.
 # ``run_worker`` 는 각 프로세스에 실행됩니다.
 
 def run_worker(rank, world_size):
@@ -244,15 +244,15 @@ def run_worker(rank, world_size):
 
 
 ######################################################################
-# 병렬 처리 파이프라인을 활용한 대형 트랜스포머 모델 학습을 증명하기 위해,
+# 병렬 처리 파이프라인을 활용한 대형 트랜스포머 모델 학습을 보이기 위해,
 # 트랜스포머 계층 규모를 적절히 확장시킵니다.
 # 4096차원의 임베딩 벡터, 4096의 은닉 사이즈, 16개의 어텐션 헤드(attention head)와 총 8 개의 
 # 트랜스포머 계층 (``nn.TransformerEncoderLayer``)를 사용합니다. 이는 최대
 # **~1 억** 개의 파라미터를 갖는 모델을 생성합니다.
 #
 # `RPC 프레임워크 <https://pytorch.org/docs/stable/rpc.html>`__ 를 초기화해야 합니다.
-# Pipe는 `RRef <https://pytorch.org/docs/stable/rpc.html#rref>`__ 를 통해 RPC 프레임워크에 의존하는데
-# 이는 향후 호스트 파이프라인을 교차 확장할 수 있도록 하기 때문입니다.
+# Pipe가  향후 호스트 파이프라인을 교차 확장할 수 있도록 하는 `RRef <https://pytorch.org/docs/stable/rpc.html#rref>`__ 를 통해
+# RPC 프레임워크에 의존하기 때문입니다.
 # 이때 RPC 프레임워크는 오직 하나의 하나의 worker로 초기화를 해야 하는데,
 # 여러 GPU를 다루기 위해 프로세스 하나만 사용하고 있기 때문입니다.
 #
