@@ -12,7 +12,7 @@
 저자: `Brad Heintz <https://github.com/fbbradheintz>`_
 번역: `박정환 <https://github.com/9bow>`_
 
-이 튜토리얼에서는 유튜브의 `PyTorch 초급자 시리즈 <https://www.youtube.com/playlist?list=PL_lsbAsL_o2CTlGHgMxNrKhzP97BaG9ZN>`_ 를 따라해보겠습니다.
+이 튜토리얼에서는 유튜브의 `PyTorch 초급자 시리즈 <https://www.youtube.com/playlist?list=PL_lsbAsL_o2CTlGHgMxNrKhzP97BaG9ZN>`_ 를 따라 해보겠습니다.
 
 `이 튜토리얼은 독자가 Python 및 Deep Learning 개념에 대한 기본적인 지식이 있다고 가정합니다.`
 
