@@ -6,7 +6,7 @@ Introduction to PyTorch on YouTube
     https://tutorials.pytorch.kr/beginner/introyt/introyt.html
 
 2. introyt1_tutorial.py
-    Introduction to PyTorch
+    파이토치(PyTorch) 소개
     https://tutorials.pytorch.kr/beginner/introyt/introyt1_tutorial.html
 
 3. tensors_deeper_tutorial.py

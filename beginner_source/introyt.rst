@@ -1,4 +1,4 @@
-`Introduction <introyt/introyt1_tutorial.html>`_ ||
+`파이토치(PyTorch) 소개 <introyt/introyt1_tutorial.html>`_ ||
 `Tensors <introyt/tensors_deeper_tutorial.html>`_ ||
 `Autograd <introyt/autogradyt_tutorial.html>`_ ||
 `Building Models <introyt/modelsyt_tutorial.html>`_ ||

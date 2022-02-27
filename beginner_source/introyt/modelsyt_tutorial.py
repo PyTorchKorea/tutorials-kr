@@ -1,5 +1,5 @@
 """
-`Introduction <introyt1_tutorial.html>`_ ||
+`파이토치(PyTorch) 소개 <introyt1_tutorial.html>`_ ||
 `Tensors <tensors_deeper_tutorial.html>`_ ||
 `Autograd <autogradyt_tutorial.html>`_ ||
 **Building Models** ||
