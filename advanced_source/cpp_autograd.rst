@@ -1,7 +1,7 @@
 C++ 프론트엔드의 자동 미분 (autograd)
 ==================================
 
-**번역**: `유용환 <https://github.com/eric-yoo>`_
+**번역**: `유용환 <https://github.com/yoosful>`_
 
 ``autograd`` 는 PyTorch로 유연하고 역동적인 신경망을 구축하기 위해
 필수적인 패키지입니다. PyTorch 파이썬 프론트엔드의 자동 미분 API 대부분은 C++ 프론트엔드에서도
