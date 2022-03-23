@@ -1,7 +1,7 @@
 PyTorch C++ 프론트엔드 사용하기
 =============================
 
-**번역**: `유용환 <https://github.com/eric-yoo>`_
+**번역**: `유용환 <https://github.com/yoosful>`_
 
 PyTorch C++ 프론트엔드는 PyTorch 머신러닝 프레임워크의 순수 C++
 인터페이스입니다. PyTorch의 주된 인터페이스는 물론 파이썬이지만
