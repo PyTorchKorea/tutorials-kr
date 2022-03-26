@@ -1,6 +1,6 @@
 ## 라이선스 동의
 _변경해주시는 내용에 BSD 3항 라이선스가 적용됨을 동의해주셔야 합니다._<br />
-_더 자세한 내용은 [기여하기 문서](https://github.com/9bow/PyTorch-tutorials-kr/blob/master/CONTRIBUTING.md)를 참고해주세요._<br />
+_더 자세한 내용은 [기여하기 문서](https://github.com/PyTorchKorea/tutorials-kr/blob/master/CONTRIBUTING.md)를 참고해주세요._<br />
 _동의하시면 아래 `[ ]`를 `[x]`로 만들어주세요._<br />
 
 - [ ] 기여하기 문서를 확인하였으며, 본 PR 내용에 BSD 3항 라이선스가 적용됨에 동의합니다.
