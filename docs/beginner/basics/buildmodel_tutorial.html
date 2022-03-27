@@ -217,6 +217,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../Intro_to_TorchScript_tutorial.html">TorchScript 소개</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../advanced/cpp_export.html">C++에서 TorchScript 모델 로딩하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../advanced/super_resolution_with_onnxruntime.html">(선택) PyTorch 모델을 ONNX으로 변환하고 ONNX 런타임에서 실행하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../intermediate/realtime_rpi.html">Real Time Inference on Raspberry Pi 4 (30 fps!)</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Code Transforms with FX</span></p>
 <ul>
@@ -260,6 +261,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/model_parallel_tutorial.html">단일 머신을 사용한 모델 병렬화 모범 사례</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/ddp_tutorial.html">분산 데이터 병렬 처리 시작하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/dist_tuto.html">PyTorch로 분산 어플리케이션 개발하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../intermediate/FSDP_tutorial.html">Getting Started with Fully Sharded Data Parallel(FSDP)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../intermediate/process_group_cpp_extension_tutorial.html">Customize Process Group Backends Using Cpp Extensions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/rpc_tutorial.html">Getting Started with Distributed RPC Framework</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/rpc_param_server_tutorial.html">Implementing a Parameter Server Using Distributed RPC Framework</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/dist_pipeline_parallel_tutorial.html">Distributed Pipeline Parallelism Using RPC</a></li>
@@ -273,6 +276,10 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../deeplabv3_on_ios.html">iOS에서의 이미지 분할 DeepLapV3</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../deeplabv3_on_android.html">안드로이드에서의 이미지 분할 DeepLapV3</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Recommendation Systems</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../intermediate/torchrec_tutorial.html">Introduction to TorchRec</a></li>
 </ul>
 
             
@@ -399,8 +406,8 @@ PyTorch의 모든 모듈은 <a class="reference external" href="https://pytorch.
 <p>가능한 경우 GPU와 같은 하드웨어 가속기에서 모델을 학습하려고 합니다.
 <a class="reference external" href="https://pytorch.org/docs/stable/notes/cuda.html">torch.cuda</a> 를 사용할 수 있는지
 확인하고 그렇지 않으면 CPU를 계속 사용합니다.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">device</span> <span class="o">=</span> <span class="s1">&#39;cuda&#39;</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s1">&#39;cpu&#39;</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Using </span><span class="si">{</span><span class="n">device</span><span class="si">}</span><span class="s1"> device&#39;</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">device</span> <span class="o">=</span> <span class="s2">&quot;cuda&quot;</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;cpu&quot;</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Using </span><span class="si">{</span><span class="n">device</span><span class="si">}</span><span class="s2"> device&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
@@ -462,7 +469,7 @@ PyTorch의 모든 모듈은 <a class="reference external" href="https://pytorch.
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Predicted class: tensor([6], device=&#39;cuda:0&#39;)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Predicted class: tensor([1], device=&#39;cuda:0&#39;)
 </pre></div>
 </div>
 </div>
@@ -519,30 +526,26 @@ PyTorch의 모든 모듈은 <a class="reference external" href="https://pytorch.
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Before ReLU: tensor([[ 1.5047e-01,  3.6946e-01, -2.1153e-02, -3.4564e-04, -3.0788e-01,
-          1.9882e-02, -1.1780e-01, -5.4993e-01, -5.9037e-01, -2.5108e-01,
-         -5.1110e-01,  2.6428e-01, -1.5706e-01, -3.4855e-01,  2.4683e-01,
-          6.6800e-02,  1.1840e-01,  2.0951e-01,  2.1114e-01,  5.9677e-01],
-        [-2.0407e-01, -1.0187e-01, -1.3862e-01,  5.8749e-02, -1.1944e-02,
-         -3.9302e-01,  4.2164e-01, -3.6521e-01, -8.1786e-01, -1.8983e-01,
-         -3.8495e-01,  5.3707e-01, -7.4002e-02, -2.6657e-01, -1.4418e-01,
-          2.3176e-01,  3.7283e-01,  3.6056e-01,  1.0917e-01,  3.4045e-01],
-        [-3.6583e-01,  6.8759e-02,  2.1978e-01, -3.4410e-01,  2.0898e-02,
-         -1.0892e-01,  4.3534e-02, -2.3046e-01, -7.4926e-01, -4.0952e-01,
-         -1.3200e-01,  3.0964e-01,  1.9641e-01, -4.8414e-01,  1.0395e-01,
-          7.7206e-02,  5.4719e-01,  2.9023e-01,  4.2290e-02,  3.4000e-01]],
-       grad_fn=&lt;AddmmBackward0&gt;)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Before ReLU: tensor([[-0.3210,  0.4567, -0.1856, -0.0248,  0.2569, -0.1851,  0.2959, -0.2036,
+         -0.1826, -0.2463,  0.5870,  0.1439,  0.3465, -0.0878,  0.1823, -0.4572,
+          0.0707, -0.4577,  0.2820,  0.3032],
+        [-0.4338,  0.4006, -0.2905,  0.2335,  0.0911,  0.1628,  0.7589, -0.2234,
+         -0.3580,  0.0491,  0.6716,  0.1492,  0.3337, -0.1488, -0.1923, -0.2653,
+          0.1021, -0.5094,  0.6679,  0.5900],
+        [-0.2097,  0.4363,  0.0444,  0.1949, -0.2322, -0.2940,  0.5973, -0.0995,
+         -0.2574, -0.1234,  0.6779,  0.4221,  0.1109, -0.2013,  0.3623, -0.3681,
+          0.1860, -0.2944,  0.2692,  0.4581]], grad_fn=&lt;AddmmBackward0&gt;)
 
 
-After ReLU: tensor([[0.1505, 0.3695, 0.0000, 0.0000, 0.0000, 0.0199, 0.0000, 0.0000, 0.0000,
-         0.0000, 0.0000, 0.2643, 0.0000, 0.0000, 0.2468, 0.0668, 0.1184, 0.2095,
-         0.2111, 0.5968],
-        [0.0000, 0.0000, 0.0000, 0.0587, 0.0000, 0.0000, 0.4216, 0.0000, 0.0000,
-         0.0000, 0.0000, 0.5371, 0.0000, 0.0000, 0.0000, 0.2318, 0.3728, 0.3606,
-         0.1092, 0.3404],
-        [0.0000, 0.0688, 0.2198, 0.0000, 0.0209, 0.0000, 0.0435, 0.0000, 0.0000,
-         0.0000, 0.0000, 0.3096, 0.1964, 0.0000, 0.1039, 0.0772, 0.5472, 0.2902,
-         0.0423, 0.3400]], grad_fn=&lt;ReluBackward0&gt;)
+After ReLU: tensor([[0.0000, 0.4567, 0.0000, 0.0000, 0.2569, 0.0000, 0.2959, 0.0000, 0.0000,
+         0.0000, 0.5870, 0.1439, 0.3465, 0.0000, 0.1823, 0.0000, 0.0707, 0.0000,
+         0.2820, 0.3032],
+        [0.0000, 0.4006, 0.0000, 0.2335, 0.0911, 0.1628, 0.7589, 0.0000, 0.0000,
+         0.0491, 0.6716, 0.1492, 0.3337, 0.0000, 0.0000, 0.0000, 0.1021, 0.0000,
+         0.6679, 0.5900],
+        [0.0000, 0.4363, 0.0444, 0.1949, 0.0000, 0.0000, 0.5973, 0.0000, 0.0000,
+         0.0000, 0.6779, 0.4221, 0.1109, 0.0000, 0.3623, 0.0000, 0.1860, 0.0000,
+         0.2692, 0.4581]], grad_fn=&lt;ReluBackward0&gt;)
 </pre></div>
 </div>
 </div>
@@ -579,14 +582,14 @@ After ReLU: tensor([[0.1505, 0.3695, 0.0000, 0.0000, 0.0000, 0.0199, 0.0000, 0.0
 <code class="docutils literal notranslate"><span class="pre">nn.Module</span></code> 을 상속하면 모델 객체 내부의 모든 필드들이 자동으로 추적(track)되며, 모델의 <code class="docutils literal notranslate"><span class="pre">parameters()</span></code> 및
 <code class="docutils literal notranslate"><span class="pre">named_parameters()</span></code> 메소드로 모든 매개변수에 접근할 수 있게 됩니다.</p>
 <p>이 예제에서는 각 매개변수들을 순회하며(iterate), 매개변수의 크기와 값을 출력합니다.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Model structure: &quot;</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Model structure: </span><span class="si">{</span><span class="n">model</span><span class="si">}</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">)</span>
 
 <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">named_parameters</span><span class="p">():</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Layer: </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> | Size: </span><span class="si">{</span><span class="n">param</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="si">}</span><span class="s2"> | Values : </span><span class="si">{</span><span class="n">param</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Model structure:  NeuralNetwork(
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Model structure: NeuralNetwork(
   (flatten): Flatten(start_dim=1, end_dim=-1)
   (linear_relu_stack): Sequential(
     (0): Linear(in_features=784, out_features=512, bias=True)
@@ -598,23 +601,23 @@ After ReLU: tensor([[0.1505, 0.3695, 0.0000, 0.0000, 0.0000, 0.0199, 0.0000, 0.0
 )
 
 
-Layer: linear_relu_stack.0.weight | Size: torch.Size([512, 784]) | Values : tensor([[-0.0022,  0.0268, -0.0294,  ..., -0.0003,  0.0119,  0.0287],
-        [-0.0302, -0.0101, -0.0178,  ...,  0.0267,  0.0028,  0.0005]],
+Layer: linear_relu_stack.0.weight | Size: torch.Size([512, 784]) | Values : tensor([[-0.0174, -0.0284,  0.0216,  ...,  0.0213, -0.0153,  0.0053],
+        [ 0.0292,  0.0160, -0.0106,  ...,  0.0126,  0.0354,  0.0146]],
        device=&#39;cuda:0&#39;, grad_fn=&lt;SliceBackward0&gt;)
 
-Layer: linear_relu_stack.0.bias | Size: torch.Size([512]) | Values : tensor([0.0060, 0.0200], device=&#39;cuda:0&#39;, grad_fn=&lt;SliceBackward0&gt;)
+Layer: linear_relu_stack.0.bias | Size: torch.Size([512]) | Values : tensor([ 0.0354, -0.0160], device=&#39;cuda:0&#39;, grad_fn=&lt;SliceBackward0&gt;)
 
-Layer: linear_relu_stack.2.weight | Size: torch.Size([512, 512]) | Values : tensor([[ 0.0271,  0.0029,  0.0394,  ..., -0.0272,  0.0303,  0.0002],
-        [-0.0295, -0.0030, -0.0409,  ..., -0.0163, -0.0404, -0.0160]],
+Layer: linear_relu_stack.2.weight | Size: torch.Size([512, 512]) | Values : tensor([[ 0.0123, -0.0367,  0.0422,  ..., -0.0331,  0.0116, -0.0241],
+        [ 0.0010,  0.0327, -0.0206,  ...,  0.0159,  0.0271, -0.0442]],
        device=&#39;cuda:0&#39;, grad_fn=&lt;SliceBackward0&gt;)
 
-Layer: linear_relu_stack.2.bias | Size: torch.Size([512]) | Values : tensor([-0.0064, -0.0245], device=&#39;cuda:0&#39;, grad_fn=&lt;SliceBackward0&gt;)
+Layer: linear_relu_stack.2.bias | Size: torch.Size([512]) | Values : tensor([ 0.0248, -0.0155], device=&#39;cuda:0&#39;, grad_fn=&lt;SliceBackward0&gt;)
 
-Layer: linear_relu_stack.4.weight | Size: torch.Size([10, 512]) | Values : tensor([[-0.0007, -0.0037,  0.0023,  ...,  0.0149, -0.0237, -0.0083],
-        [ 0.0305,  0.0092, -0.0349,  ..., -0.0014,  0.0030, -0.0152]],
+Layer: linear_relu_stack.4.weight | Size: torch.Size([10, 512]) | Values : tensor([[ 0.0218, -0.0040, -0.0392,  ..., -0.0154, -0.0401,  0.0215],
+        [-0.0063, -0.0125, -0.0071,  ...,  0.0017,  0.0276, -0.0174]],
        device=&#39;cuda:0&#39;, grad_fn=&lt;SliceBackward0&gt;)
 
-Layer: linear_relu_stack.4.bias | Size: torch.Size([10]) | Values : tensor([0.0319, 0.0247], device=&#39;cuda:0&#39;, grad_fn=&lt;SliceBackward0&gt;)
+Layer: linear_relu_stack.4.bias | Size: torch.Size([10]) | Values : tensor([-0.0192,  0.0092], device=&#39;cuda:0&#39;, grad_fn=&lt;SliceBackward0&gt;)
 </pre></div>
 </div>
 </div>
@@ -624,7 +627,7 @@ Layer: linear_relu_stack.4.bias | Size: torch.Size([10]) | Values : tensor([0.03
 <ul class="simple">
 <li><a class="reference external" href="https://pytorch.org/docs/stable/nn.html">torch.nn API</a></li>
 </ul>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.208 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.137 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-beginner-basics-buildmodel-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <a class="reference download internal" download="" href="../../_downloads/b58cb0c09128b3591131ba55000513c5/buildmodel_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">buildmodel_tutorial.py</span></code></a></div>

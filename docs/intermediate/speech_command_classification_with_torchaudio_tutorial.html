@@ -217,6 +217,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../beginner/Intro_to_TorchScript_tutorial.html">TorchScript 소개</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_export.html">C++에서 TorchScript 모델 로딩하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/super_resolution_with_onnxruntime.html">(선택) PyTorch 모델을 ONNX으로 변환하고 ONNX 런타임에서 실행하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="realtime_rpi.html">Real Time Inference on Raspberry Pi 4 (30 fps!)</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Code Transforms with FX</span></p>
 <ul>
@@ -260,6 +261,8 @@
 <li class="toctree-l1"><a class="reference internal" href="model_parallel_tutorial.html">단일 머신을 사용한 모델 병렬화 모범 사례</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ddp_tutorial.html">분산 데이터 병렬 처리 시작하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dist_tuto.html">PyTorch로 분산 어플리케이션 개발하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="FSDP_tutorial.html">Getting Started with Fully Sharded Data Parallel(FSDP)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="process_group_cpp_extension_tutorial.html">Customize Process Group Backends Using Cpp Extensions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rpc_tutorial.html">Getting Started with Distributed RPC Framework</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rpc_param_server_tutorial.html">Implementing a Parameter Server Using Distributed RPC Framework</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dist_pipeline_parallel_tutorial.html">Distributed Pipeline Parallelism Using RPC</a></li>
@@ -273,6 +276,10 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/deeplabv3_on_ios.html">iOS에서의 이미지 분할 DeepLapV3</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/deeplabv3_on_android.html">안드로이드에서의 이미지 분할 DeepLapV3</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Recommendation Systems</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="torchrec_tutorial.html">Introduction to TorchRec</a></li>
 </ul>
 
             
@@ -440,7 +447,7 @@ standard training, validation, testing subsets.</p>
         <span class="k">def</span> <span class="nf">load_list</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
             <span class="n">filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
             <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span> <span class="k">as</span> <span class="n">fileobj</span><span class="p">:</span>
-                <span class="k">return</span> <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">,</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">fileobj</span><span class="p">]</span>
+                <span class="k">return</span> <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">normpath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">,</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()))</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">fileobj</span><span class="p">]</span>
 
         <span class="k">if</span> <span class="n">subset</span> <span class="o">==</span> <span class="s2">&quot;validation&quot;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_walker</span> <span class="o">=</span> <span class="n">load_list</span><span class="p">(</span><span class="s2">&quot;validation_list.txt&quot;</span><span class="p">)</span>
@@ -783,53 +790,45 @@ varies during the training.</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Train Epoch: 1 [0/105829 (0%)]  Loss: 3.736179
-Train Epoch: 1 [5120/105829 (5%)]       Loss: 3.051184
-Train Epoch: 1 [10240/105829 (10%)]     Loss: 2.572980
-Train Epoch: 1 [15360/105829 (14%)]     Loss: 2.313636
-Train Epoch: 1 [20480/105829 (19%)]     Loss: 2.037795
-Train Epoch: 1 [25600/105829 (24%)]     Loss: 1.955413
-Train Epoch: 1 [30720/105829 (29%)]     Loss: 1.817404
-Train Epoch: 1 [35840/105829 (34%)]     Loss: 1.700235
-Train Epoch: 1 [40960/105829 (39%)]     Loss: 1.674807
-Train Epoch: 1 [46080/105829 (43%)]     Loss: 1.551724
-Train Epoch: 1 [51200/105829 (48%)]     Loss: 1.598838
-Train Epoch: 1 [56320/105829 (53%)]     Loss: 1.385229
-Train Epoch: 1 [61440/105829 (58%)]     Loss: 1.351581
-Train Epoch: 1 [66560/105829 (63%)]     Loss: 1.180362
-Train Epoch: 1 [71680/105829 (68%)]     Loss: 1.180249
-Train Epoch: 1 [76800/105829 (72%)]     Loss: 1.264227
-Train Epoch: 1 [81920/105829 (77%)]     Loss: 1.179268
-Train Epoch: 1 [87040/105829 (82%)]     Loss: 1.138407
-Train Epoch: 1 [92160/105829 (87%)]     Loss: 1.170726
-Train Epoch: 1 [97280/105829 (92%)]     Loss: 0.973946
-Train Epoch: 1 [102400/105829 (97%)]    Loss: 1.124344
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Train Epoch: 1 [0/84843 (0%)]   Loss: 3.829445
+Train Epoch: 1 [5120/84843 (6%)]        Loss: 3.133549
+Train Epoch: 1 [10240/84843 (12%)]      Loss: 2.634627
+Train Epoch: 1 [15360/84843 (18%)]      Loss: 2.408019
+Train Epoch: 1 [20480/84843 (24%)]      Loss: 2.063461
+Train Epoch: 1 [25600/84843 (30%)]      Loss: 1.974027
+Train Epoch: 1 [30720/84843 (36%)]      Loss: 1.671876
+Train Epoch: 1 [35840/84843 (42%)]      Loss: 1.756686
+Train Epoch: 1 [40960/84843 (48%)]      Loss: 1.370814
+Train Epoch: 1 [46080/84843 (54%)]      Loss: 1.398597
+Train Epoch: 1 [51200/84843 (60%)]      Loss: 1.267618
+Train Epoch: 1 [56320/84843 (66%)]      Loss: 1.197207
+Train Epoch: 1 [61440/84843 (72%)]      Loss: 1.156299
+Train Epoch: 1 [66560/84843 (78%)]      Loss: 1.210402
+Train Epoch: 1 [71680/84843 (84%)]      Loss: 1.049099
+Train Epoch: 1 [76800/84843 (90%)]      Loss: 1.165873
+Train Epoch: 1 [81920/84843 (96%)]      Loss: 1.051924
 
-Test Epoch: 1   Accuracy: 7561/11005 (69%)
+Test Epoch: 1   Accuracy: 7092/11005 (64%)
 
-Train Epoch: 2 [0/105829 (0%)]  Loss: 0.868233
-Train Epoch: 2 [5120/105829 (5%)]       Loss: 0.853936
-Train Epoch: 2 [10240/105829 (10%)]     Loss: 1.077593
-Train Epoch: 2 [15360/105829 (14%)]     Loss: 0.906005
-Train Epoch: 2 [20480/105829 (19%)]     Loss: 0.797292
-Train Epoch: 2 [25600/105829 (24%)]     Loss: 0.829637
-Train Epoch: 2 [30720/105829 (29%)]     Loss: 0.925682
-Train Epoch: 2 [35840/105829 (34%)]     Loss: 0.926850
-Train Epoch: 2 [40960/105829 (39%)]     Loss: 0.877303
-Train Epoch: 2 [46080/105829 (43%)]     Loss: 0.960394
-Train Epoch: 2 [51200/105829 (48%)]     Loss: 0.856535
-Train Epoch: 2 [56320/105829 (53%)]     Loss: 0.843938
-Train Epoch: 2 [61440/105829 (58%)]     Loss: 0.776917
-Train Epoch: 2 [66560/105829 (63%)]     Loss: 0.956552
-Train Epoch: 2 [71680/105829 (68%)]     Loss: 0.838626
-Train Epoch: 2 [76800/105829 (72%)]     Loss: 0.740142
-Train Epoch: 2 [81920/105829 (77%)]     Loss: 0.666153
-Train Epoch: 2 [87040/105829 (82%)]     Loss: 0.983563
-Train Epoch: 2 [92160/105829 (87%)]     Loss: 0.852618
-Train Epoch: 2 [97280/105829 (92%)]     Loss: 0.703855
-Train Epoch: 2 [102400/105829 (97%)]    Loss: 0.806780
+Train Epoch: 2 [0/84843 (0%)]   Loss: 0.973614
+Train Epoch: 2 [5120/84843 (6%)]        Loss: 1.031381
+Train Epoch: 2 [10240/84843 (12%)]      Loss: 1.033061
+Train Epoch: 2 [15360/84843 (18%)]      Loss: 1.056879
+Train Epoch: 2 [20480/84843 (24%)]      Loss: 0.900399
+Train Epoch: 2 [25600/84843 (30%)]      Loss: 1.056934
+Train Epoch: 2 [30720/84843 (36%)]      Loss: 0.931641
+Train Epoch: 2 [35840/84843 (42%)]      Loss: 0.864873
+Train Epoch: 2 [40960/84843 (48%)]      Loss: 0.895111
+Train Epoch: 2 [46080/84843 (54%)]      Loss: 0.808062
+Train Epoch: 2 [51200/84843 (60%)]      Loss: 0.956192
+Train Epoch: 2 [56320/84843 (66%)]      Loss: 0.844488
+Train Epoch: 2 [61440/84843 (72%)]      Loss: 0.914888
+Train Epoch: 2 [66560/84843 (78%)]      Loss: 1.022187
+Train Epoch: 2 [71680/84843 (84%)]      Loss: 0.768123
+Train Epoch: 2 [76800/84843 (90%)]      Loss: 0.846313
+Train Epoch: 2 [81920/84843 (96%)]      Loss: 0.833772
 
-Test Epoch: 2   Accuracy: 8410/11005 (76%)
+Test Epoch: 2   Accuracy: 7862/11005 (71%)
 </pre></div>
 </div>
 <p>The network should be more than 65% accurate on the test set after 2
@@ -870,7 +869,7 @@ train set, and see how the model did on it.</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Data point #1. Expected: right. Predicted: seven.
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Data point #1. Expected: right. Predicted: nine.
 </pre></div>
 </div>
 <p>Feel free to try with one of your own recordings of one of the labels!
@@ -935,7 +934,7 @@ recognize a given command. There are also other data preprocessing
 methods, such as finding the mel frequency cepstral coefficients (MFCC),
 that can reduce the size of the dataset. This transform is also
 available in torchaudio as <code class="docutils literal notranslate"><span class="pre">torchaudio.transforms.MFCC</span></code>.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 4 minutes  51.447 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 5 minutes  34.779 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-intermediate-speech-command-classification-with-torchaudio-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <a class="reference download internal" download="" href="../_downloads/d9bc65df9ec0dea082e3b1da2aa64a68/speech_command_classification_with_torchaudio_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">speech_command_classification_with_torchaudio_tutorial.py</span></code></a></div>

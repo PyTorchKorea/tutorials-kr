@@ -217,6 +217,7 @@
 <li class="toctree-l1"><a class="reference internal" href="Intro_to_TorchScript_tutorial.html">TorchScript 소개</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_export.html">C++에서 TorchScript 모델 로딩하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/super_resolution_with_onnxruntime.html">(선택) PyTorch 모델을 ONNX으로 변환하고 ONNX 런타임에서 실행하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/realtime_rpi.html">Real Time Inference on Raspberry Pi 4 (30 fps!)</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Code Transforms with FX</span></p>
 <ul>
@@ -260,6 +261,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/model_parallel_tutorial.html">단일 머신을 사용한 모델 병렬화 모범 사례</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/ddp_tutorial.html">분산 데이터 병렬 처리 시작하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/dist_tuto.html">PyTorch로 분산 어플리케이션 개발하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/FSDP_tutorial.html">Getting Started with Fully Sharded Data Parallel(FSDP)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/process_group_cpp_extension_tutorial.html">Customize Process Group Backends Using Cpp Extensions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/rpc_tutorial.html">Getting Started with Distributed RPC Framework</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/rpc_param_server_tutorial.html">Implementing a Parameter Server Using Distributed RPC Framework</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/dist_pipeline_parallel_tutorial.html">Distributed Pipeline Parallelism Using RPC</a></li>
@@ -273,6 +276,10 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="deeplabv3_on_ios.html">iOS에서의 이미지 분할 DeepLapV3</a></li>
 <li class="toctree-l1"><a class="reference internal" href="deeplabv3_on_android.html">안드로이드에서의 이미지 분할 DeepLapV3</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Recommendation Systems</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/torchrec_tutorial.html">Introduction to TorchRec</a></li>
 </ul>
 
             
@@ -407,6 +414,7 @@ ImageNet 1000 데이터셋 등으로 미리 학습한 신경망으로 초기화�
 <span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
 <span class="kn">import</span> <span class="nn">torch.optim</span> <span class="k">as</span> <span class="nn">optim</span>
 <span class="kn">from</span> <span class="nn">torch.optim</span> <span class="kn">import</span> <span class="n">lr_scheduler</span>
+<span class="kn">import</span> <span class="nn">torch.backends.cudnn</span> <span class="k">as</span> <span class="nn">cudnn</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">torchvision</span>
 <span class="kn">from</span> <span class="nn">torchvision</span> <span class="kn">import</span> <span class="n">datasets</span><span class="p">,</span> <span class="n">models</span><span class="p">,</span> <span class="n">transforms</span>
@@ -415,6 +423,7 @@ ImageNet 1000 데이터셋 등으로 미리 학습한 신경망으로 초기화�
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">copy</span>
 
+<span class="n">cudnn</span><span class="o">.</span><span class="n">benchmark</span> <span class="o">=</span> <span class="kc">True</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">ion</span><span class="p">()</span>   <span class="c1"># 대화형 모드</span>
 </pre></div>
 </div>
@@ -507,7 +516,7 @@ ImageNet 1000 데이터셋 등으로 미리 학습한 신경망으로 초기화�
     <span class="n">best_acc</span> <span class="o">=</span> <span class="mf">0.0</span>
 
     <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_epochs</span><span class="p">):</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Epoch </span><span class="si">{}</span><span class="s1">/</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">epoch</span><span class="p">,</span> <span class="n">num_epochs</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Epoch </span><span class="si">{</span><span class="n">epoch</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="n">num_epochs</span> <span class="o">-</span> <span class="mi">1</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;-&#39;</span> <span class="o">*</span> <span class="mi">10</span><span class="p">)</span>
 
         <span class="c1"># 각 에폭(epoch)은 학습 단계와 검증 단계를 갖습니다.</span>
@@ -549,8 +558,7 @@ ImageNet 1000 데이터셋 등으로 미리 학습한 신경망으로 초기화�
             <span class="n">epoch_loss</span> <span class="o">=</span> <span class="n">running_loss</span> <span class="o">/</span> <span class="n">dataset_sizes</span><span class="p">[</span><span class="n">phase</span><span class="p">]</span>
             <span class="n">epoch_acc</span> <span class="o">=</span> <span class="n">running_corrects</span><span class="o">.</span><span class="n">double</span><span class="p">()</span> <span class="o">/</span> <span class="n">dataset_sizes</span><span class="p">[</span><span class="n">phase</span><span class="p">]</span>
 
-            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> Loss: </span><span class="si">{:.4f}</span><span class="s1"> Acc: </span><span class="si">{:.4f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                <span class="n">phase</span><span class="p">,</span> <span class="n">epoch_loss</span><span class="p">,</span> <span class="n">epoch_acc</span><span class="p">))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">phase</span><span class="si">}</span><span class="s1"> Loss: </span><span class="si">{</span><span class="n">epoch_loss</span><span class="si">:</span><span class="s1">.4f</span><span class="si">}</span><span class="s1"> Acc: </span><span class="si">{</span><span class="n">epoch_acc</span><span class="si">:</span><span class="s1">.4f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
             <span class="c1"># 모델을 깊은 복사(deep copy)함</span>
             <span class="k">if</span> <span class="n">phase</span> <span class="o">==</span> <span class="s1">&#39;val&#39;</span> <span class="ow">and</span> <span class="n">epoch_acc</span> <span class="o">&gt;</span> <span class="n">best_acc</span><span class="p">:</span>
@@ -560,9 +568,8 @@ ImageNet 1000 데이터셋 등으로 미리 학습한 신경망으로 초기화�
         <span class="nb">print</span><span class="p">()</span>
 
     <span class="n">time_elapsed</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">since</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Training complete in </span><span class="si">{:.0f}</span><span class="s1">m </span><span class="si">{:.0f}</span><span class="s1">s&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-        <span class="n">time_elapsed</span> <span class="o">//</span> <span class="mi">60</span><span class="p">,</span> <span class="n">time_elapsed</span> <span class="o">%</span> <span class="mi">60</span><span class="p">))</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Best val Acc: </span><span class="si">{:4f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">best_acc</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Training complete in </span><span class="si">{</span><span class="n">time_elapsed</span> <span class="o">//</span> <span class="mi">60</span><span class="si">:</span><span class="s1">.0f</span><span class="si">}</span><span class="s1">m </span><span class="si">{</span><span class="n">time_elapsed</span> <span class="o">%</span> <span class="mi">60</span><span class="si">:</span><span class="s1">.0f</span><span class="si">}</span><span class="s1">s&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Best val Acc: </span><span class="si">{</span><span class="n">best_acc</span><span class="si">:</span><span class="s1">4f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
     <span class="c1"># 가장 나은 모델 가중치를 불러옴</span>
     <span class="n">model</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">best_model_wts</span><span class="p">)</span>
@@ -590,7 +597,7 @@ ImageNet 1000 데이터셋 등으로 미리 학습한 신경망으로 초기화�
                 <span class="n">images_so_far</span> <span class="o">+=</span> <span class="mi">1</span>
                 <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="n">num_images</span><span class="o">//</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">images_so_far</span><span class="p">)</span>
                 <span class="n">ax</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;off&#39;</span><span class="p">)</span>
-                <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;predicted: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">class_names</span><span class="p">[</span><span class="n">preds</span><span class="p">[</span><span class="n">j</span><span class="p">]]))</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;predicted: </span><span class="si">{</span><span class="n">class_names</span><span class="p">[</span><span class="n">preds</span><span class="p">[</span><span class="n">j</span><span class="p">]]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
                 <span class="n">imshow</span><span class="p">(</span><span class="n">inputs</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
 
                 <span class="k">if</span> <span class="n">images_so_far</span> <span class="o">==</span> <span class="n">num_images</span><span class="p">:</span>
@@ -631,131 +638,131 @@ ImageNet 1000 데이터셋 등으로 미리 학습한 신경망으로 초기화�
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Epoch 0/24
 ----------
-train Loss: 0.5448 Acc: 0.7418
-val Loss: 0.4322 Acc: 0.8235
+train Loss: 0.6087 Acc: 0.7172
+val Loss: 0.2199 Acc: 0.9216
 
 Epoch 1/24
 ----------
-train Loss: 0.5082 Acc: 0.7623
-val Loss: 0.4709 Acc: 0.8758
+train Loss: 0.7328 Acc: 0.7623
+val Loss: 0.7191 Acc: 0.7320
 
 Epoch 2/24
 ----------
-train Loss: 0.5229 Acc: 0.7869
-val Loss: 0.5242 Acc: 0.8235
+train Loss: 0.7051 Acc: 0.7541
+val Loss: 0.4668 Acc: 0.8758
 
 Epoch 3/24
 ----------
-train Loss: 0.6859 Acc: 0.7582
-val Loss: 0.2557 Acc: 0.9216
+train Loss: 0.6494 Acc: 0.7787
+val Loss: 0.3824 Acc: 0.8693
 
 Epoch 4/24
 ----------
-train Loss: 0.5333 Acc: 0.8279
-val Loss: 0.3518 Acc: 0.8562
+train Loss: 0.9363 Acc: 0.7049
+val Loss: 1.1360 Acc: 0.7124
 
 Epoch 5/24
 ----------
-train Loss: 0.7070 Acc: 0.7500
-val Loss: 0.3021 Acc: 0.9020
+train Loss: 0.7781 Acc: 0.7500
+val Loss: 0.4039 Acc: 0.8693
 
 Epoch 6/24
 ----------
-train Loss: 0.4568 Acc: 0.8238
-val Loss: 0.3126 Acc: 0.9020
+train Loss: 0.7377 Acc: 0.7541
+val Loss: 1.2748 Acc: 0.6667
 
 Epoch 7/24
 ----------
-train Loss: 0.3965 Acc: 0.7992
-val Loss: 0.2226 Acc: 0.9085
+train Loss: 0.5538 Acc: 0.8238
+val Loss: 0.3709 Acc: 0.8758
 
 Epoch 8/24
 ----------
-train Loss: 0.3094 Acc: 0.8607
-val Loss: 0.2124 Acc: 0.9216
+train Loss: 0.2894 Acc: 0.8811
+val Loss: 0.3117 Acc: 0.8889
 
 Epoch 9/24
 ----------
-train Loss: 0.2884 Acc: 0.8607
-val Loss: 0.2159 Acc: 0.9281
+train Loss: 0.3536 Acc: 0.8607
+val Loss: 0.3012 Acc: 0.8758
 
 Epoch 10/24
 ----------
-train Loss: 0.3254 Acc: 0.8484
-val Loss: 0.2010 Acc: 0.9216
+train Loss: 0.3076 Acc: 0.8484
+val Loss: 0.2831 Acc: 0.8954
 
 Epoch 11/24
 ----------
-train Loss: 0.3368 Acc: 0.8402
-val Loss: 0.1781 Acc: 0.9412
+train Loss: 0.3289 Acc: 0.8811
+val Loss: 0.2804 Acc: 0.8889
 
 Epoch 12/24
 ----------
-train Loss: 0.3547 Acc: 0.8402
-val Loss: 0.2311 Acc: 0.9020
+train Loss: 0.4131 Acc: 0.8361
+val Loss: 0.3114 Acc: 0.8889
 
 Epoch 13/24
 ----------
-train Loss: 0.2423 Acc: 0.8934
-val Loss: 0.1888 Acc: 0.9412
+train Loss: 0.3091 Acc: 0.8525
+val Loss: 0.2646 Acc: 0.8954
 
 Epoch 14/24
 ----------
-train Loss: 0.2389 Acc: 0.9057
-val Loss: 0.1818 Acc: 0.9477
+train Loss: 0.3351 Acc: 0.8443
+val Loss: 0.2858 Acc: 0.8954
 
 Epoch 15/24
 ----------
-train Loss: 0.3115 Acc: 0.8689
-val Loss: 0.1752 Acc: 0.9281
+train Loss: 0.3097 Acc: 0.8648
+val Loss: 0.2573 Acc: 0.8889
 
 Epoch 16/24
 ----------
-train Loss: 0.2481 Acc: 0.8975
-val Loss: 0.1826 Acc: 0.9281
+train Loss: 0.2817 Acc: 0.8811
+val Loss: 0.2632 Acc: 0.8889
 
 Epoch 17/24
 ----------
-train Loss: 0.3134 Acc: 0.8484
-val Loss: 0.1779 Acc: 0.9477
+train Loss: 0.2677 Acc: 0.8689
+val Loss: 0.2476 Acc: 0.8954
 
 Epoch 18/24
 ----------
-train Loss: 0.2149 Acc: 0.9180
-val Loss: 0.1808 Acc: 0.9412
+train Loss: 0.2391 Acc: 0.9098
+val Loss: 0.2856 Acc: 0.8889
 
 Epoch 19/24
 ----------
-train Loss: 0.2740 Acc: 0.8811
-val Loss: 0.1874 Acc: 0.9281
+train Loss: 0.4273 Acc: 0.8156
+val Loss: 0.2473 Acc: 0.8954
 
 Epoch 20/24
 ----------
-train Loss: 0.2922 Acc: 0.9016
-val Loss: 0.1751 Acc: 0.9477
+train Loss: 0.3346 Acc: 0.8566
+val Loss: 0.2563 Acc: 0.8954
 
 Epoch 21/24
 ----------
-train Loss: 0.3219 Acc: 0.8402
-val Loss: 0.1919 Acc: 0.9216
+train Loss: 0.2710 Acc: 0.8934
+val Loss: 0.2395 Acc: 0.8954
 
 Epoch 22/24
 ----------
-train Loss: 0.3389 Acc: 0.8361
-val Loss: 0.1895 Acc: 0.9412
+train Loss: 0.1661 Acc: 0.9426
+val Loss: 0.2581 Acc: 0.8824
 
 Epoch 23/24
 ----------
-train Loss: 0.2265 Acc: 0.9098
-val Loss: 0.1823 Acc: 0.9346
+train Loss: 0.2893 Acc: 0.8811
+val Loss: 0.2693 Acc: 0.9020
 
 Epoch 24/24
 ----------
-train Loss: 0.1705 Acc: 0.9426
-val Loss: 0.1626 Acc: 0.9412
+train Loss: 0.3056 Acc: 0.8607
+val Loss: 0.2697 Acc: 0.8824
 
-Training complete in 1m 6s
-Best val Acc: 0.947712
+Training complete in 0m 53s
+Best val Acc: 0.921569
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">visualize_model</span><span class="p">(</span><span class="n">model_ft</span><span class="p">)</span>
@@ -803,130 +810,130 @@ Best val Acc: 0.947712
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Epoch 0/24
 ----------
-train Loss: 0.6823 Acc: 0.6557
-val Loss: 0.6561 Acc: 0.6471
+train Loss: 0.5081 Acc: 0.7172
+val Loss: 0.2566 Acc: 0.9020
 
 Epoch 1/24
 ----------
-train Loss: 0.7023 Acc: 0.6844
-val Loss: 0.3875 Acc: 0.8627
+train Loss: 0.5548 Acc: 0.7459
+val Loss: 0.1828 Acc: 0.9412
 
 Epoch 2/24
 ----------
-train Loss: 0.5336 Acc: 0.7459
-val Loss: 0.1788 Acc: 0.9281
+train Loss: 0.5404 Acc: 0.7541
+val Loss: 0.1870 Acc: 0.9346
 
 Epoch 3/24
 ----------
-train Loss: 0.3917 Acc: 0.8525
-val Loss: 0.2410 Acc: 0.9216
+train Loss: 0.5495 Acc: 0.7664
+val Loss: 0.2743 Acc: 0.8954
 
 Epoch 4/24
 ----------
-train Loss: 0.4671 Acc: 0.7992
-val Loss: 0.1580 Acc: 0.9412
+train Loss: 0.4350 Acc: 0.8197
+val Loss: 0.2818 Acc: 0.9150
 
 Epoch 5/24
 ----------
-train Loss: 0.4924 Acc: 0.7869
-val Loss: 0.2655 Acc: 0.9020
+train Loss: 0.4281 Acc: 0.7992
+val Loss: 0.1991 Acc: 0.9346
 
 Epoch 6/24
 ----------
-train Loss: 0.4109 Acc: 0.8361
-val Loss: 0.1649 Acc: 0.9542
+train Loss: 0.3501 Acc: 0.8156
+val Loss: 0.1901 Acc: 0.9412
 
 Epoch 7/24
 ----------
-train Loss: 0.3835 Acc: 0.8320
-val Loss: 0.2319 Acc: 0.9346
+train Loss: 0.3239 Acc: 0.8607
+val Loss: 0.1686 Acc: 0.9542
 
 Epoch 8/24
 ----------
-train Loss: 0.3232 Acc: 0.8648
-val Loss: 0.1930 Acc: 0.9477
+train Loss: 0.3961 Acc: 0.8361
+val Loss: 0.1695 Acc: 0.9477
 
 Epoch 9/24
 ----------
-train Loss: 0.3663 Acc: 0.8566
-val Loss: 0.1989 Acc: 0.9281
+train Loss: 0.3502 Acc: 0.8443
+val Loss: 0.1897 Acc: 0.9542
 
 Epoch 10/24
 ----------
-train Loss: 0.3067 Acc: 0.8648
-val Loss: 0.1733 Acc: 0.9477
+train Loss: 0.3570 Acc: 0.8279
+val Loss: 0.1862 Acc: 0.9477
 
 Epoch 11/24
 ----------
-train Loss: 0.3591 Acc: 0.8484
-val Loss: 0.1729 Acc: 0.9542
+train Loss: 0.3974 Acc: 0.7910
+val Loss: 0.1920 Acc: 0.9477
 
 Epoch 12/24
 ----------
-train Loss: 0.4629 Acc: 0.7664
-val Loss: 0.1780 Acc: 0.9477
+train Loss: 0.4136 Acc: 0.8156
+val Loss: 0.1870 Acc: 0.9542
 
 Epoch 13/24
 ----------
-train Loss: 0.3821 Acc: 0.8402
-val Loss: 0.1752 Acc: 0.9346
+train Loss: 0.2712 Acc: 0.9016
+val Loss: 0.2260 Acc: 0.9281
 
 Epoch 14/24
 ----------
-train Loss: 0.3467 Acc: 0.8320
-val Loss: 0.1746 Acc: 0.9542
+train Loss: 0.3243 Acc: 0.8852
+val Loss: 0.1878 Acc: 0.9346
 
 Epoch 15/24
 ----------
-train Loss: 0.4357 Acc: 0.8115
-val Loss: 0.1646 Acc: 0.9412
+train Loss: 0.3193 Acc: 0.8525
+val Loss: 0.1748 Acc: 0.9477
 
 Epoch 16/24
 ----------
-train Loss: 0.3633 Acc: 0.8484
-val Loss: 0.1719 Acc: 0.9412
+train Loss: 0.3688 Acc: 0.8402
+val Loss: 0.1777 Acc: 0.9412
 
 Epoch 17/24
 ----------
-train Loss: 0.3826 Acc: 0.8197
-val Loss: 0.1710 Acc: 0.9477
+train Loss: 0.3606 Acc: 0.8320
+val Loss: 0.1837 Acc: 0.9412
 
 Epoch 18/24
 ----------
-train Loss: 0.3695 Acc: 0.8197
-val Loss: 0.1917 Acc: 0.9477
+train Loss: 0.3044 Acc: 0.8689
+val Loss: 0.1937 Acc: 0.9412
 
 Epoch 19/24
 ----------
-train Loss: 0.3424 Acc: 0.8361
-val Loss: 0.1702 Acc: 0.9542
+train Loss: 0.3768 Acc: 0.8402
+val Loss: 0.1793 Acc: 0.9477
 
 Epoch 20/24
 ----------
-train Loss: 0.3347 Acc: 0.8525
-val Loss: 0.1627 Acc: 0.9542
+train Loss: 0.3809 Acc: 0.8279
+val Loss: 0.1843 Acc: 0.9477
 
 Epoch 21/24
 ----------
-train Loss: 0.3401 Acc: 0.8730
-val Loss: 0.1703 Acc: 0.9542
+train Loss: 0.2890 Acc: 0.8525
+val Loss: 0.1941 Acc: 0.9542
 
 Epoch 22/24
 ----------
-train Loss: 0.3250 Acc: 0.8320
-val Loss: 0.1663 Acc: 0.9412
+train Loss: 0.2869 Acc: 0.8893
+val Loss: 0.2036 Acc: 0.9346
 
 Epoch 23/24
 ----------
-train Loss: 0.3175 Acc: 0.8566
-val Loss: 0.1776 Acc: 0.9477
+train Loss: 0.3403 Acc: 0.8607
+val Loss: 0.1850 Acc: 0.9477
 
 Epoch 24/24
 ----------
-train Loss: 0.3373 Acc: 0.8607
-val Loss: 0.1693 Acc: 0.9542
+train Loss: 0.3317 Acc: 0.8402
+val Loss: 0.1855 Acc: 0.9477
 
-Training complete in 0m 43s
+Training complete in 0m 33s
 Best val Acc: 0.954248
 </pre></div>
 </div>
@@ -943,7 +950,7 @@ Best val Acc: 0.954248
 <h2>더 배워볼 내용<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h2>
 <p>전이학습의 응용 사례(application)들을 더 알아보려면,
 <a class="reference internal" href="../intermediate/quantized_transfer_learning_tutorial.html"><span class="doc">(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</span></a> 을 참조해보세요.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 2 minutes  0.282 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 1 minutes  31.590 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-beginner-transfer-learning-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <a class="reference download internal" download="" href="../_downloads/5ea9d042a7fca20feaa640dc2f090b29/transfer_learning_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">transfer_learning_tutorial.py</span></code></a></div>

@@ -217,6 +217,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../Intro_to_TorchScript_tutorial.html">TorchScript 소개</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../advanced/cpp_export.html">C++에서 TorchScript 모델 로딩하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../advanced/super_resolution_with_onnxruntime.html">(선택) PyTorch 모델을 ONNX으로 변환하고 ONNX 런타임에서 실행하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../intermediate/realtime_rpi.html">Real Time Inference on Raspberry Pi 4 (30 fps!)</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Code Transforms with FX</span></p>
 <ul>
@@ -260,6 +261,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/model_parallel_tutorial.html">단일 머신을 사용한 모델 병렬화 모범 사례</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/ddp_tutorial.html">분산 데이터 병렬 처리 시작하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/dist_tuto.html">PyTorch로 분산 어플리케이션 개발하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../intermediate/FSDP_tutorial.html">Getting Started with Fully Sharded Data Parallel(FSDP)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../intermediate/process_group_cpp_extension_tutorial.html">Customize Process Group Backends Using Cpp Extensions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/rpc_tutorial.html">Getting Started with Distributed RPC Framework</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/rpc_param_server_tutorial.html">Implementing a Parameter Server Using Distributed RPC Framework</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/dist_pipeline_parallel_tutorial.html">Distributed Pipeline Parallelism Using RPC</a></li>
@@ -273,6 +276,10 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../deeplabv3_on_ios.html">iOS에서의 이미지 분할 DeepLapV3</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../deeplabv3_on_android.html">안드로이드에서의 이미지 분할 DeepLapV3</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Recommendation Systems</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../intermediate/torchrec_tutorial.html">Introduction to TorchRec</a></li>
 </ul>
 
             
@@ -467,8 +474,8 @@ torch.Size([6, 1, 5, 5])
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor([[-0.1039, -0.1124, -0.0259, -0.1009,  0.0693, -0.1057, -0.0105,  0.0943,
-         -0.0275,  0.0789]], grad_fn=&lt;AddmmBackward&gt;)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor([[ 0.1610,  0.0053, -0.1274, -0.1105,  0.1045,  0.0308,  0.0887, -0.0027,
+          0.0022,  0.0310]], grad_fn=&lt;AddmmBackward0&gt;)
 </pre></div>
 </div>
 <p>모든 매개변수의 변화도 버퍼(gradient buffer)를 0으로 설정하고, 무작위 값으로
@@ -535,7 +542,7 @@ torch.Size([6, 1, 5, 5])
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor(0.6841, grad_fn=&lt;MseLossBackward&gt;)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor(0.9474, grad_fn=&lt;MseLossBackward0&gt;)
 </pre></div>
 </div>
 <p>이제 <code class="docutils literal notranslate"><span class="pre">.grad_fn</span></code> 속성을 사용하여 <code class="docutils literal notranslate"><span class="pre">loss</span></code> 를 역방향에서 따라가다보면,
@@ -556,9 +563,9 @@ torch.Size([6, 1, 5, 5])
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;MseLossBackward object at 0x7f3e50ad17c0&gt;
-&lt;AddmmBackward object at 0x7f3e50ad1100&gt;
-&lt;AccumulateGrad object at 0x7f3e50ad1100&gt;
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;MseLossBackward0 object at 0x7f3378718760&gt;
+&lt;AddmmBackward0 object at 0x7f3378718ee0&gt;
+&lt;AccumulateGrad object at 0x7f3378718ee0&gt;
 </pre></div>
 </div>
 </div>
@@ -584,7 +591,7 @@ torch.Size([6, 1, 5, 5])
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>conv1.bias.grad before backward
 tensor([0., 0., 0., 0., 0., 0.])
 conv1.bias.grad after backward
-tensor([-0.0037, -0.0029, -0.0005,  0.0152,  0.0034,  0.0057])
+tensor([-0.0177,  0.0242,  0.0262, -0.0143,  0.0194,  0.0152])
 </pre></div>
 </div>
 <p>지금까지 손실 함수를 어떻게 사용하는지를 살펴봤습니다.</p>
@@ -634,7 +641,7 @@ Gradient Descent)입니다:</p>
 것에 유의하세요. 이는 <a class="reference internal" href="#backprop">역전파(Backprop)</a> 섹션에서 설명한 것처럼 변화도가
 누적되기 때문입니다.</p>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.077 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.126 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-beginner-blitz-neural-networks-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <a class="reference download internal" download="" href="../../_downloads/bde407c55b96b9a4392e80db717c9d6b/neural_networks_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">neural_networks_tutorial.py</span></code></a></div>

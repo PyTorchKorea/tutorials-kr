@@ -215,6 +215,7 @@
 <li class="toctree-l1"><a class="reference internal" href="Intro_to_TorchScript_tutorial.html">TorchScript 소개</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_export.html">C++에서 TorchScript 모델 로딩하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/super_resolution_with_onnxruntime.html">(선택) PyTorch 모델을 ONNX으로 변환하고 ONNX 런타임에서 실행하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/realtime_rpi.html">Real Time Inference on Raspberry Pi 4 (30 fps!)</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Code Transforms with FX</span></p>
 <ul>
@@ -258,6 +259,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/model_parallel_tutorial.html">단일 머신을 사용한 모델 병렬화 모범 사례</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/ddp_tutorial.html">분산 데이터 병렬 처리 시작하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/dist_tuto.html">PyTorch로 분산 어플리케이션 개발하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/FSDP_tutorial.html">Getting Started with Fully Sharded Data Parallel(FSDP)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/process_group_cpp_extension_tutorial.html">Customize Process Group Backends Using Cpp Extensions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/rpc_tutorial.html">Getting Started with Distributed RPC Framework</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/rpc_param_server_tutorial.html">Implementing a Parameter Server Using Distributed RPC Framework</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/dist_pipeline_parallel_tutorial.html">Distributed Pipeline Parallelism Using RPC</a></li>
@@ -271,6 +274,10 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="deeplabv3_on_ios.html">iOS에서의 이미지 분할 DeepLapV3</a></li>
 <li class="toctree-l1"><a class="reference internal" href="deeplabv3_on_android.html">안드로이드에서의 이미지 분할 DeepLapV3</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Recommendation Systems</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/torchrec_tutorial.html">Introduction to TorchRec</a></li>
 </ul>
 
             
@@ -1146,8 +1153,8 @@ graph, we just need to print the <cite>scripted_searcher</cite> graph</p>
   %12 : int = prim::Constant[value=2]() # /workspace/ko-latest/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:559:41
   %16 : int = prim::Constant[value=1]() # /workspace/ko-latest/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:561:35
   %26 : int = prim::Constant[value=0]() # /workspace/ko-latest/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:563:34
-  %4 : __torch__.EncoderRNN = prim::GetAttr[name=&quot;encoder&quot;](%self)
-  %7 : (Tensor, Tensor) = prim::CallMethod[name=&quot;forward&quot;](%4, %input_seq.1, %input_length.1) # /workspace/ko-latest/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:557:42
+  %encoder : __torch__.EncoderRNN = prim::GetAttr[name=&quot;encoder&quot;](%self)
+  %7 : (Tensor, Tensor) = prim::CallMethod[name=&quot;forward&quot;](%encoder, %input_seq.1, %input_length.1) # /workspace/ko-latest/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:557:42
   %encoder_outputs.1 : Tensor, %encoder_hidden.1 : Tensor = prim::TupleUnpack(%7)
   %decoder_hidden.1 : Tensor = aten::slice(%encoder_hidden.1, %26, %14, %12, %16) # /workspace/ko-latest/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:559:25
   %20 : int[] = prim::ListConstruct(%16, %16)
@@ -1159,8 +1166,8 @@ graph, we just need to print the <cite>scripted_searcher</cite> graph</p>
   %all_scores.1 : Tensor = aten::zeros(%33, %14, %14, %17, %14) # /workspace/ko-latest/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:564:21
   %all_tokens : Tensor, %all_scores : Tensor, %decoder_hidden : Tensor, %decoder_input : Tensor = prim::Loop(%max_length.1, %42, %all_tokens.1, %all_scores.1, %decoder_hidden.1, %decoder_input.1) # /workspace/ko-latest/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:566:8
     block0(%43 : int, %all_tokens.11 : Tensor, %all_scores.11 : Tensor, %decoder_hidden.9 : Tensor, %decoder_input.17 : Tensor):
-      %44 : __torch__.LuongAttnDecoderRNN = prim::GetAttr[name=&quot;decoder&quot;](%self)
-      %48 : (Tensor, Tensor) = prim::CallMethod[name=&quot;forward&quot;](%44, %decoder_input.17, %decoder_hidden.9, %encoder_outputs.1) # /workspace/ko-latest/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:568:45
+      %decoder : __torch__.LuongAttnDecoderRNN = prim::GetAttr[name=&quot;decoder&quot;](%self)
+      %48 : (Tensor, Tensor) = prim::CallMethod[name=&quot;forward&quot;](%decoder, %decoder_input.17, %decoder_hidden.9, %encoder_outputs.1) # /workspace/ko-latest/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:568:45
       %decoder_output.1 : Tensor, %decoder_hidden.5 : Tensor = prim::TupleUnpack(%48)
       %decoder_scores.1 : Tensor, %decoder_input.5 : Tensor = aten::max(%decoder_output.1, %16, %53) # /workspace/ko-latest/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:570:44
       %61 : Tensor[] = prim::ListConstruct(%all_tokens.11, %decoder_input.5)
@@ -1221,7 +1228,7 @@ of torch.save(model, PATH).</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">scripted_searcher</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s2">&quot;scripted_chatbot.pth&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  5.582 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  1.038 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-beginner-deploy-seq2seq-hybrid-frontend-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <a class="reference download internal" download="" href="../_downloads/45357057c93bfed1360f925e84da2682/deploy_seq2seq_hybrid_frontend_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">deploy_seq2seq_hybrid_frontend_tutorial.py</span></code></a></div>

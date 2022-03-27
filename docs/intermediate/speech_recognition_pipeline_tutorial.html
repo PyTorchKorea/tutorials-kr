@@ -217,6 +217,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../beginner/Intro_to_TorchScript_tutorial.html">TorchScript 소개</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_export.html">C++에서 TorchScript 모델 로딩하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/super_resolution_with_onnxruntime.html">(선택) PyTorch 모델을 ONNX으로 변환하고 ONNX 런타임에서 실행하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="realtime_rpi.html">Real Time Inference on Raspberry Pi 4 (30 fps!)</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Code Transforms with FX</span></p>
 <ul>
@@ -260,6 +261,8 @@
 <li class="toctree-l1"><a class="reference internal" href="model_parallel_tutorial.html">단일 머신을 사용한 모델 병렬화 모범 사례</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ddp_tutorial.html">분산 데이터 병렬 처리 시작하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dist_tuto.html">PyTorch로 분산 어플리케이션 개발하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="FSDP_tutorial.html">Getting Started with Fully Sharded Data Parallel(FSDP)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="process_group_cpp_extension_tutorial.html">Customize Process Group Backends Using Cpp Extensions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rpc_tutorial.html">Getting Started with Distributed RPC Framework</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rpc_param_server_tutorial.html">Implementing a Parameter Server Using Distributed RPC Framework</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dist_pipeline_parallel_tutorial.html">Distributed Pipeline Parallelism Using RPC</a></li>
@@ -273,6 +276,10 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/deeplabv3_on_ios.html">iOS에서의 이미지 분할 DeepLapV3</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/deeplabv3_on_android.html">안드로이드에서의 이미지 분할 DeepLapV3</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Recommendation Systems</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="torchrec_tutorial.html">Introduction to TorchRec</a></li>
 </ul>
 
             
@@ -388,7 +395,7 @@ Overview
 <p>Torchaudio provides easy access to the pre-trained weights and
 associated information, such as the expected sample rate and class
 labels. They are bundled together and available under
-<code class="docutils literal notranslate"><span class="pre">torchaudio.pipelines</span></code> module.</p>
+<code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.pipelines()</span></code> module.</p>
 <div class="section" id="preparation">
 <h2>Preparation<a class="headerlink" href="#preparation" title="Permalink to this headline">¶</a></h2>
 <p>First we import the necessary packages, and fetch data that we work on.</p>
@@ -396,34 +403,34 @@ labels. They are bundled together and available under
 
 <span class="kn">import</span> <span class="nn">os</span>
 
-<span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">import</span> <span class="nn">torchaudio</span>
-<span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">import</span> <span class="nn">IPython</span>
 <span class="kn">import</span> <span class="nn">matplotlib</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">import</span> <span class="nn">IPython</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">torchaudio</span>
 
-<span class="n">matplotlib</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;figure.figsize&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mf">16.0</span><span class="p">,</span> <span class="mf">4.8</span><span class="p">]</span>
+<span class="n">matplotlib</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s2">&quot;figure.figsize&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mf">16.0</span><span class="p">,</span> <span class="mf">4.8</span><span class="p">]</span>
 
 <span class="n">torch</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-<span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s1">&#39;cuda&#39;</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s1">&#39;cpu&#39;</span><span class="p">)</span>
+<span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">torchaudio</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
 
-<span class="n">SPEECH_URL</span> <span class="o">=</span> <span class="s2">&quot;https://pytorch-tutorial-assets.s3.amazonaws.com/VOiCES_devkit/source-16k/train/sp0307/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav&quot;</span>
+<span class="n">SPEECH_URL</span> <span class="o">=</span> <span class="s2">&quot;https://pytorch-tutorial-assets.s3.amazonaws.com/VOiCES_devkit/source-16k/train/sp0307/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav&quot;</span>  <span class="c1"># noqa: E501</span>
 <span class="n">SPEECH_FILE</span> <span class="o">=</span> <span class="s2">&quot;_assets/speech.wav&quot;</span>
 
 <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">SPEECH_FILE</span><span class="p">):</span>
-  <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="s1">&#39;_assets&#39;</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-  <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">SPEECH_FILE</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
-    <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">SPEECH_URL</span><span class="p">)</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="s2">&quot;_assets&quot;</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">SPEECH_FILE</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+        <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">SPEECH_URL</span><span class="p">)</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>1.10.0+cu102
-0.10.0+cu102
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>1.11.0+cu102
+0.11.0+cu102
 cuda
 </pre></div>
 </div>
@@ -456,7 +463,7 @@ information. Sampling rate and the class labels are found as follow.</p>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Sample Rate: 16000
-Labels: (&#39;&lt;s&gt;&#39;, &#39;&lt;pad&gt;&#39;, &#39;&lt;/s&gt;&#39;, &#39;&lt;unk&gt;&#39;, &#39;|&#39;, &#39;E&#39;, &#39;T&#39;, &#39;A&#39;, &#39;O&#39;, &#39;N&#39;, &#39;I&#39;, &#39;H&#39;, &#39;S&#39;, &#39;R&#39;, &#39;D&#39;, &#39;L&#39;, &#39;U&#39;, &#39;M&#39;, &#39;W&#39;, &#39;C&#39;, &#39;F&#39;, &#39;G&#39;, &#39;Y&#39;, &#39;P&#39;, &#39;B&#39;, &#39;V&#39;, &#39;K&#39;, &quot;&#39;&quot;, &#39;X&#39;, &#39;J&#39;, &#39;Q&#39;, &#39;Z&#39;)
+Labels: (&#39;-&#39;, &#39;|&#39;, &#39;E&#39;, &#39;T&#39;, &#39;A&#39;, &#39;O&#39;, &#39;N&#39;, &#39;I&#39;, &#39;H&#39;, &#39;S&#39;, &#39;R&#39;, &#39;D&#39;, &#39;L&#39;, &#39;U&#39;, &#39;M&#39;, &#39;W&#39;, &#39;C&#39;, &#39;F&#39;, &#39;G&#39;, &#39;Y&#39;, &#39;P&#39;, &#39;B&#39;, &#39;V&#39;, &#39;K&#39;, &quot;&#39;&quot;, &#39;X&#39;, &#39;J&#39;, &#39;Q&#39;, &#39;Z&#39;)
 </pre></div>
 </div>
 <p>Model can be constructed as following. This process will automatically
@@ -494,7 +501,7 @@ using <code class="xref py py-func docutils literal notranslate"><span class="pr
 <span class="n">waveform</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
 
 <span class="k">if</span> <span class="n">sample_rate</span> <span class="o">!=</span> <span class="n">bundle</span><span class="o">.</span><span class="n">sample_rate</span><span class="p">:</span>
-  <span class="n">waveform</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">bundle</span><span class="o">.</span><span class="n">sample_rate</span><span class="p">)</span>
+    <span class="n">waveform</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">bundle</span><span class="o">.</span><span class="n">sample_rate</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -508,17 +515,17 @@ extraction and classification with one step, but for the sake of the
 tutorial, we also show how to perform feature extraction here.</p>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">inference_mode</span><span class="p">():</span>
-  <span class="n">features</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">extract_features</span><span class="p">(</span><span class="n">waveform</span><span class="p">)</span>
+    <span class="n">features</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">extract_features</span><span class="p">(</span><span class="n">waveform</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>The returned features is a list of tensors. Each tensor is the output of
 a transformer layer.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">features</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="mf">4.3</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">features</span><span class="p">)))</span>
 <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">feats</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">features</span><span class="p">):</span>
-  <span class="n">ax</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">feats</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">cpu</span><span class="p">())</span>
-  <span class="n">ax</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Feature from transformer layer </span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-  <span class="n">ax</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Feature dimension&quot;</span><span class="p">)</span>
-  <span class="n">ax</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Frame (time-axis)&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">feats</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">cpu</span><span class="p">())</span>
+    <span class="n">ax</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Feature from transformer layer </span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Feature dimension&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Frame (time-axis)&quot;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
@@ -532,7 +539,7 @@ them into a set of categories.</p>
 <p>Wav2Vec2 model provides method to perform the feature extraction and
 classification in one step.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">inference_mode</span><span class="p">():</span>
-  <span class="n">emission</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">waveform</span><span class="p">)</span>
+    <span class="n">emission</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">waveform</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>The output is in the form of logits. It is not in the form of
@@ -548,15 +555,11 @@ probability.</p>
 </div>
 <img alt="../_images/sphx_glr_speech_recognition_pipeline_tutorial_002.png" class="sphx-glr-single-img" src="../_images/sphx_glr_speech_recognition_pipeline_tutorial_002.png" />
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Class labels: (&#39;&lt;s&gt;&#39;, &#39;&lt;pad&gt;&#39;, &#39;&lt;/s&gt;&#39;, &#39;&lt;unk&gt;&#39;, &#39;|&#39;, &#39;E&#39;, &#39;T&#39;, &#39;A&#39;, &#39;O&#39;, &#39;N&#39;, &#39;I&#39;, &#39;H&#39;, &#39;S&#39;, &#39;R&#39;, &#39;D&#39;, &#39;L&#39;, &#39;U&#39;, &#39;M&#39;, &#39;W&#39;, &#39;C&#39;, &#39;F&#39;, &#39;G&#39;, &#39;Y&#39;, &#39;P&#39;, &#39;B&#39;, &#39;V&#39;, &#39;K&#39;, &quot;&#39;&quot;, &#39;X&#39;, &#39;J&#39;, &#39;Q&#39;, &#39;Z&#39;)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Class labels: (&#39;-&#39;, &#39;|&#39;, &#39;E&#39;, &#39;T&#39;, &#39;A&#39;, &#39;O&#39;, &#39;N&#39;, &#39;I&#39;, &#39;H&#39;, &#39;S&#39;, &#39;R&#39;, &#39;D&#39;, &#39;L&#39;, &#39;U&#39;, &#39;M&#39;, &#39;W&#39;, &#39;C&#39;, &#39;F&#39;, &#39;G&#39;, &#39;Y&#39;, &#39;P&#39;, &#39;B&#39;, &#39;V&#39;, &#39;K&#39;, &quot;&#39;&quot;, &#39;X&#39;, &#39;J&#39;, &#39;Q&#39;, &#39;Z&#39;)
 </pre></div>
 </div>
 <p>We can see that there are strong indications to certain labels across
 the time line.</p>
-<p>Note that the class 1 to 3, (<code class="docutils literal notranslate"><span class="pre">&lt;pad&gt;</span></code>, <code class="docutils literal notranslate"><span class="pre">&lt;/s&gt;</span></code> and <code class="docutils literal notranslate"><span class="pre">&lt;unk&gt;</span></code>) have
-mostly huge negative values, this is an artifact from the original
-<code class="docutils literal notranslate"><span class="pre">fairseq</span></code> implementation where these labels are added by default but
-not used during the training.</p>
 </div>
 <div class="section" id="generating-transcripts">
 <h2>Generating transcripts<a class="headerlink" href="#generating-transcripts" title="Permalink to this headline">¶</a></h2>
@@ -580,30 +583,27 @@ pick up the best hypothesis at each time step. Therefore, the context
 information are not used, and only one transcript can be generated.</p>
 <p>We start by defining greedy decoding algorithm.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">GreedyCTCDecoder</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">ignore</span><span class="p">):</span>
-    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">labels</span> <span class="o">=</span> <span class="n">labels</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">ignore</span> <span class="o">=</span> <span class="n">ignore</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">blank</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">labels</span> <span class="o">=</span> <span class="n">labels</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">blank</span> <span class="o">=</span> <span class="n">blank</span>
 
-  <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">emission</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Given a sequence emission over labels, get the best path string</span>
-<span class="sd">    Args:</span>
-<span class="sd">      emission (Tensor): Logit tensors. Shape `[num_seq, num_label]`.</span>
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">emission</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Given a sequence emission over labels, get the best path string</span>
+<span class="sd">        Args:</span>
+<span class="sd">          emission (Tensor): Logit tensors. Shape `[num_seq, num_label]`.</span>
 
-<span class="sd">    Returns:</span>
-<span class="sd">      str: The resulting transcript</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">indices</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">emission</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># [num_seq,]</span>
-    <span class="n">indices</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">unique_consecutive</span><span class="p">(</span><span class="n">indices</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
-    <span class="n">indices</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">indices</span> <span class="k">if</span> <span class="n">i</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ignore</span><span class="p">]</span>
-    <span class="k">return</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">labels</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">])</span>
+<span class="sd">        Returns:</span>
+<span class="sd">          str: The resulting transcript</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">indices</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">emission</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># [num_seq,]</span>
+        <span class="n">indices</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">unique_consecutive</span><span class="p">(</span><span class="n">indices</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">indices</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">indices</span> <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">blank</span><span class="p">]</span>
+        <span class="k">return</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">labels</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">])</span>
 </pre></div>
 </div>
 <p>Now create the decoder object and decode the transcript.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">decoder</span> <span class="o">=</span> <span class="n">GreedyCTCDecoder</span><span class="p">(</span>
-    <span class="n">labels</span><span class="o">=</span><span class="n">bundle</span><span class="o">.</span><span class="n">get_labels</span><span class="p">(),</span>
-    <span class="n">ignore</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
-<span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">decoder</span> <span class="o">=</span> <span class="n">GreedyCTCDecoder</span><span class="p">(</span><span class="n">labels</span><span class="o">=</span><span class="n">bundle</span><span class="o">.</span><span class="n">get_labels</span><span class="p">())</span>
 <span class="n">transcript</span> <span class="o">=</span> <span class="n">decoder</span><span class="p">(</span><span class="n">emission</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 </pre></div>
 </div>
@@ -621,9 +621,6 @@ The detail of CTC loss is explained
 <a class="reference external" href="https://distill.pub/2017/ctc/">here</a>. In CTC a blank token (ϵ) is a
 special token which represents a repetition of the previous symbol. In
 decoding, these are simply ignored.</p>
-<p>Secondly, as is explained in the feature extraction section, the
-Wav2Vec2 model originated from <code class="docutils literal notranslate"><span class="pre">fairseq</span></code> has labels that are not used.
-These also have to be ignored.</p>
 </div>
 <div class="section" id="conclusion">
 <h2>Conclusion<a class="headerlink" href="#conclusion" title="Permalink to this headline">¶</a></h2>
@@ -634,7 +631,7 @@ a model and getting the emission is as short as two lines.</p>
 <span class="n">emission</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">waveforms</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  47.400 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  40.850 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-intermediate-speech-recognition-pipeline-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <a class="reference download internal" download="" href="../_downloads/e17ada3b5b94e8fd77827d500d8a7973/speech_recognition_pipeline_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">speech_recognition_pipeline_tutorial.py</span></code></a></div>

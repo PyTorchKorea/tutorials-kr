@@ -217,6 +217,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../beginner/Intro_to_TorchScript_tutorial.html">TorchScript 소개</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_export.html">C++에서 TorchScript 모델 로딩하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/super_resolution_with_onnxruntime.html">(선택) PyTorch 모델을 ONNX으로 변환하고 ONNX 런타임에서 실행하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="realtime_rpi.html">Real Time Inference on Raspberry Pi 4 (30 fps!)</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Code Transforms with FX</span></p>
 <ul>
@@ -260,6 +261,8 @@
 <li class="toctree-l1"><a class="reference internal" href="model_parallel_tutorial.html">단일 머신을 사용한 모델 병렬화 모범 사례</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ddp_tutorial.html">분산 데이터 병렬 처리 시작하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dist_tuto.html">PyTorch로 분산 어플리케이션 개발하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="FSDP_tutorial.html">Getting Started with Fully Sharded Data Parallel(FSDP)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="process_group_cpp_extension_tutorial.html">Customize Process Group Backends Using Cpp Extensions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rpc_tutorial.html">Getting Started with Distributed RPC Framework</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rpc_param_server_tutorial.html">Implementing a Parameter Server Using Distributed RPC Framework</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dist_pipeline_parallel_tutorial.html">Distributed Pipeline Parallelism Using RPC</a></li>
@@ -273,6 +276,10 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/deeplabv3_on_ios.html">iOS에서의 이미지 분할 DeepLapV3</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/deeplabv3_on_android.html">안드로이드에서의 이미지 분할 DeepLapV3</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Recommendation Systems</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="torchrec_tutorial.html">Introduction to TorchRec</a></li>
 </ul>
 
             
@@ -606,9 +613,9 @@ torch.Size([5, 1, 57])
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor([[-2.8379, -2.9045, -2.9315, -2.8983, -2.8976, -2.8884, -2.9605, -2.8254,
-         -2.9040, -2.8685, -2.8511, -2.8195, -2.9614, -2.7920, -2.8799, -2.9890,
-         -2.8539, -2.9918]], grad_fn=&lt;LogSoftmaxBackward&gt;)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor([[-2.8429, -2.9488, -2.9798, -2.9684, -2.8784, -2.8165, -2.9414, -3.0085,
+         -2.7781, -2.9327, -2.8473, -2.9629, -2.8174, -2.7859, -2.9314, -2.9382,
+         -2.8815, -2.8116]], grad_fn=&lt;LogSoftmaxBackward0&gt;)
 </pre></div>
 </div>
 <p>보시다시피 출력은 <code class="docutils literal notranslate"><span class="pre">&lt;1</span> <span class="pre">x</span> <span class="pre">n_categories&gt;</span></code> Tensor이고, 모든 항목은
@@ -632,7 +639,7 @@ torch.Size([5, 1, 57])
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>(&#39;Italian&#39;, 13)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>(&#39;Korean&#39;, 8)
 </pre></div>
 </div>
 <p>학습 예시(하나의 이름과 그 언어)를 얻는 빠른 방법도 필요합니다.:</p>
@@ -752,26 +759,26 @@ category = Czech / line = Meszes
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>5000 5% (1m 28s) 2.2156 Mishima / Japanese ✓
-10000 10% (2m 37s) 2.3854 Choshi / Italian ✗ (Japanese)
-15000 15% (4m 21s) 2.2965 Shamshurin / Irish ✗ (Russian)
-20000 20% (5m 42s) 4.3417 Deeb / Dutch ✗ (Arabic)
-25000 25% (7m 29s) 4.5581 Lockwood / Scottish ✗ (English)
-30000 30% (9m 13s) 0.6556 O&#39;Kelly / Irish ✓
-35000 35% (10m 44s) 0.3256 Ferreira / Portuguese ✓
-40000 40% (12m 3s) 0.5009 Suk / Korean ✓
-45000 45% (13m 53s) 2.2802 Schermer / German ✗ (Dutch)
-50000 50% (15m 23s) 0.7773 Mo / Korean ✓
-55000 55% (16m 47s) 1.0185 Luo / Vietnamese ✗ (Chinese)
-60000 60% (18m 22s) 4.7954 Lyon / Korean ✗ (French)
-65000 65% (19m 40s) 3.2921 Doljs / Greek ✗ (Czech)
-70000 70% (21m 21s) 1.3794 Roma / Spanish ✓
-75000 75% (22m 49s) 1.1727 Jia / Chinese ✓
-80000 80% (24m 16s) 0.6959 Blaise / French ✓
-85000 85% (25m 48s) 4.2108 Maceachthighearna / Greek ✗ (Irish)
-90000 90% (27m 44s) 0.4474 Zobnin / Russian ✓
-95000 95% (29m 42s) 0.3489 Amoretto / Italian ✓
-100000 100% (31m 20s) 1.6778 Ventura / Spanish ✗ (Portuguese)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>5000 5% (0m 5s) 2.2783 Mishima / Japanese ✓
+10000 10% (0m 10s) 2.4392 Choshi / Polish ✗ (Japanese)
+15000 15% (0m 15s) 2.2940 Shamshurin / Arabic ✗ (Russian)
+20000 20% (0m 21s) 4.5845 Deeb / Dutch ✗ (Arabic)
+25000 25% (0m 26s) 4.4474 Lockwood / Korean ✗ (English)
+30000 30% (0m 32s) 0.7043 O&#39;Kelly / Irish ✓
+35000 35% (0m 37s) 0.1962 Ferreira / Portuguese ✓
+40000 40% (0m 42s) 0.5206 Suk / Korean ✓
+45000 45% (0m 47s) 2.3965 Schermer / German ✗ (Dutch)
+50000 50% (0m 53s) 0.7267 Mo / Korean ✓
+55000 55% (0m 58s) 0.9876 Luo / Vietnamese ✗ (Chinese)
+60000 60% (1m 3s) 4.8467 Lyon / Korean ✗ (French)
+65000 65% (1m 9s) 3.2689 Doljs / Greek ✗ (Czech)
+70000 70% (1m 14s) 1.7791 Roma / Japanese ✗ (Spanish)
+75000 75% (1m 19s) 1.2842 Jia / Korean ✗ (Chinese)
+80000 80% (1m 25s) 0.6494 Blaise / French ✓
+85000 85% (1m 30s) 8.4589 Maceachthighearna / Vietnamese ✗ (Irish)
+90000 90% (1m 35s) 0.6173 Zobnin / Russian ✓
+95000 95% (1m 40s) 0.4312 Amoretto / Italian ✓
+100000 100% (1m 46s) 1.2987 Ventura / Spanish ✗ (Portuguese)
 </pre></div>
 </div>
 </div>
@@ -868,19 +875,19 @@ category = Czech / line = Meszes
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&gt; Dovesky
-(-0.84) Czech
-(-1.10) Russian
-(-2.30) English
+(-0.91) Czech
+(-1.01) Russian
+(-2.14) Polish
 
 &gt; Jackson
-(-0.74) English
-(-1.35) Scottish
-(-2.27) Russian
+(-0.72) English
+(-1.23) Scottish
+(-2.07) Russian
 
 &gt; Satoshi
-(-1.09) Japanese
-(-1.27) Polish
-(-1.38) Arabic
+(-0.91) Polish
+(-1.30) Arabic
+(-1.53) Japanese
 </pre></div>
 </div>
 <p><a class="reference external" href="https://github.com/spro/practical-pytorch/tree/master/char-rnn-classification">실용 PyTorch 저장소</a>
@@ -921,7 +928,7 @@ category = Czech / line = Meszes
 </ul>
 </li>
 </ul>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 32 minutes  42.231 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 1 minutes  52.036 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-intermediate-char-rnn-classification-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <a class="reference download internal" download="" href="../_downloads/c5f0a7783784e7ad6ad5b891d881e020/char_rnn_classification_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">char_rnn_classification_tutorial.py</span></code></a></div>

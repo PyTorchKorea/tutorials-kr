@@ -217,6 +217,7 @@
 <li class="toctree-l1"><a class="reference internal" href="Intro_to_TorchScript_tutorial.html">TorchScript 소개</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_export.html">C++에서 TorchScript 모델 로딩하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/super_resolution_with_onnxruntime.html">(선택) PyTorch 모델을 ONNX으로 변환하고 ONNX 런타임에서 실행하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/realtime_rpi.html">Real Time Inference on Raspberry Pi 4 (30 fps!)</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Code Transforms with FX</span></p>
 <ul>
@@ -260,6 +261,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/model_parallel_tutorial.html">단일 머신을 사용한 모델 병렬화 모범 사례</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/ddp_tutorial.html">분산 데이터 병렬 처리 시작하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/dist_tuto.html">PyTorch로 분산 어플리케이션 개발하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/FSDP_tutorial.html">Getting Started with Fully Sharded Data Parallel(FSDP)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/process_group_cpp_extension_tutorial.html">Customize Process Group Backends Using Cpp Extensions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/rpc_tutorial.html">Getting Started with Distributed RPC Framework</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/rpc_param_server_tutorial.html">Implementing a Parameter Server Using Distributed RPC Framework</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/dist_pipeline_parallel_tutorial.html">Distributed Pipeline Parallelism Using RPC</a></li>
@@ -273,6 +276,10 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="deeplabv3_on_ios.html">iOS에서의 이미지 분할 DeepLapV3</a></li>
 <li class="toctree-l1"><a class="reference internal" href="deeplabv3_on_android.html">안드로이드에서의 이미지 분할 DeepLapV3</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Recommendation Systems</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/torchrec_tutorial.html">Introduction to TorchRec</a></li>
 </ul>
 
             
@@ -387,27 +394,30 @@
 <h2>기초 데이터셋 반복자(raw data iterator)에 접근하기<a class="headerlink" href="#raw-data-iterator" title="Permalink to this headline">¶</a></h2>
 <p>torchtext 라이브러리는 가공되지 않은 텍스트 문장들을 만드는(yield) 몇 가지 기초 데이터셋 반복자(raw dataset iterator)를 제공합니다.
 예를 들어, <code class="docutils literal notranslate"><span class="pre">AG_NEWS</span></code> 데이터셋 반복자는 레이블(label)과 문장의 튜플(tuple) 형태로 가공되지 않은 데이터를 만듭니다.</p>
+<p>torchtext 데이터셋에 접근하기 전에, <a class="reference external" href="https://github.com/pytorch/data">https://github.com/pytorch/data</a> 을 참고하여 torchdata를
+설치하시기 바랍니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">from</span> <span class="nn">torchtext.datasets</span> <span class="kn">import</span> <span class="n">AG_NEWS</span>
-<span class="n">train_iter</span> <span class="o">=</span> <span class="n">AG_NEWS</span><span class="p">(</span><span class="n">split</span><span class="o">=</span><span class="s1">&#39;train&#39;</span><span class="p">)</span>
+<span class="n">train_iter</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">AG_NEWS</span><span class="p">(</span><span class="n">split</span><span class="o">=</span><span class="s1">&#39;train&#39;</span><span class="p">))</span>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">next</span><span class="p">(</span><span class="n">train_iter</span><span class="p">)</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;Wall St. Bears Claw Back Into the Black (Reuters) Reuters -</span>
-<span class="n">Short</span><span class="o">-</span><span class="n">sellers</span><span class="p">,</span> <span class="n">Wall</span> <span class="n">Street</span><span class="s1">&#39;s dwindling</span><span class="se">\\</span><span class="s1">band of ultra-cynics, are seeing green</span>
-<span class="n">again</span><span class="o">.</span><span class="s2">&quot;)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;Fears for T N pension after talks Unions representing workers at Turner</span>
+<span class="n">Newall</span> <span class="n">say</span> <span class="n">they</span> <span class="n">are</span> <span class="s1">&#39;disappointed&#39;</span> <span class="n">after</span> <span class="n">talks</span> <span class="k">with</span> <span class="n">stricken</span> <span class="n">parent</span> <span class="n">firm</span> <span class="n">Federal</span>
+<span class="n">Mogul</span><span class="o">.</span><span class="s2">&quot;)</span>
 
 <span class="nb">next</span><span class="p">(</span><span class="n">train_iter</span><span class="p">)</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;Carlyle Looks Toward Commercial Aerospace (Reuters) Reuters - Private</span>
-<span class="n">investment</span> <span class="n">firm</span> <span class="n">Carlyle</span> <span class="n">Group</span><span class="p">,</span>\\<span class="n">which</span> <span class="n">has</span> <span class="n">a</span> <span class="n">reputation</span> <span class="k">for</span> <span class="n">making</span> <span class="n">well</span><span class="o">-</span><span class="n">timed</span>
-<span class="ow">and</span> <span class="n">occasionally</span>\\<span class="n">controversial</span> <span class="n">plays</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">defense</span> <span class="n">industry</span><span class="p">,</span> <span class="n">has</span> <span class="n">quietly</span>
-<span class="n">placed</span>\\<span class="n">its</span> <span class="n">bets</span> <span class="n">on</span> <span class="n">another</span> <span class="n">part</span> <span class="n">of</span> <span class="n">the</span> <span class="n">market</span><span class="o">.</span><span class="s1">&#39;)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;The Race is On: Second Private Team Sets Launch Date for Human</span>
+<span class="n">Spaceflight</span> <span class="p">(</span><span class="n">SPACE</span><span class="o">.</span><span class="n">com</span><span class="p">)</span> <span class="n">SPACE</span><span class="o">.</span><span class="n">com</span> <span class="o">-</span> <span class="n">TORONTO</span><span class="p">,</span> <span class="n">Canada</span> <span class="o">--</span> <span class="n">A</span> <span class="n">second</span>\\<span class="n">team</span> <span class="n">of</span>
+<span class="n">rocketeers</span> <span class="n">competing</span> <span class="k">for</span> <span class="n">the</span>  <span class="c1">#36;10 million Ansari X Prize, a contest</span>
+<span class="k">for</span>\\<span class="n">privately</span> <span class="n">funded</span> <span class="n">suborbital</span> <span class="n">space</span> <span class="n">flight</span><span class="p">,</span> <span class="n">has</span> <span class="n">officially</span> <span class="n">announced</span>
+<span class="n">the</span> <span class="n">first</span>\\<span class="n">launch</span> <span class="n">date</span> <span class="k">for</span> <span class="n">its</span> <span class="n">manned</span> <span class="n">rocket</span><span class="o">.</span><span class="s2">&quot;)</span>
 
 <span class="nb">next</span><span class="p">(</span><span class="n">train_iter</span><span class="p">)</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;Oil and Economy Cloud Stocks&#39; Outlook (Reuters) Reuters - Soaring</span>
-<span class="n">crude</span> <span class="n">prices</span> <span class="n">plus</span> <span class="n">worries</span>\\<span class="n">about</span> <span class="n">the</span> <span class="n">economy</span> <span class="ow">and</span> <span class="n">the</span> <span class="n">outlook</span> <span class="k">for</span> <span class="n">earnings</span> <span class="n">are</span>
-<span class="n">expected</span> <span class="n">to</span>\\<span class="n">hang</span> <span class="n">over</span> <span class="n">the</span> <span class="n">stock</span> <span class="n">market</span> <span class="nb">next</span> <span class="n">week</span> <span class="n">during</span> <span class="n">the</span> <span class="n">depth</span> <span class="n">of</span>
-<span class="n">the</span>\\<span class="n">summer</span> <span class="n">doldrums</span><span class="o">.</span><span class="s2">&quot;)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="s1">&#39;Ky. Company Wins Grant to Study Peptides (AP) AP - A company founded</span>
+<span class="n">by</span> <span class="n">a</span> <span class="n">chemistry</span> <span class="n">researcher</span> <span class="n">at</span> <span class="n">the</span> <span class="n">University</span> <span class="n">of</span> <span class="n">Louisville</span> <span class="n">won</span> <span class="n">a</span> <span class="n">grant</span> <span class="n">to</span> <span class="n">develop</span>
+<span class="n">a</span> <span class="n">method</span> <span class="n">of</span> <span class="n">producing</span> <span class="n">better</span> <span class="n">peptides</span><span class="p">,</span> <span class="n">which</span> <span class="n">are</span> <span class="n">short</span> <span class="n">chains</span> <span class="n">of</span> <span class="n">amino</span> <span class="n">acids</span><span class="p">,</span> <span class="n">the</span>
+<span class="n">building</span> <span class="n">blocks</span> <span class="n">of</span> <span class="n">proteins</span><span class="o">.</span><span class="s1">&#39;)</span>
 </pre></div>
 </div>
 </div>
@@ -435,7 +445,7 @@
 </div>
 <p>어휘집 블록(vocabulary block)은 토큰 목록을 정수로 변환합니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">vocab</span><span class="p">([</span><span class="s1">&#39;here&#39;</span><span class="p">,</span> <span class="s1">&#39;is&#39;</span><span class="p">,</span> <span class="s1">&#39;an&#39;</span><span class="p">,</span> <span class="s1">&#39;example&#39;</span><span class="p">])</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="p">[</span><span class="mi">475</span><span class="p">,</span> <span class="mi">21</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">5286</span><span class="p">]</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="p">[</span><span class="mi">475</span><span class="p">,</span> <span class="mi">21</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">5297</span><span class="p">]</span>
 </pre></div>
 </div>
 <p>토크나이저와 어휘집을 갖춘 텍스트 처리 파이프라인을 준비합니다.
@@ -447,7 +457,7 @@
 <p>텍스트 파이프라인은 어휘집에 정의된 룩업 테이블(순람표; lookup table)에 기반하여 텍스트 문장을 정수 목록으로 변환합니다.
 레이블(label) 파이프라인은 레이블을 정수로 변환합니다. 예를 들어,</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">text_pipeline</span><span class="p">(</span><span class="s1">&#39;here is the an example&#39;</span><span class="p">)</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="p">[</span><span class="mi">475</span><span class="p">,</span> <span class="mi">21</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">5286</span><span class="p">]</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="p">[</span><span class="mi">475</span><span class="p">,</span> <span class="mi">21</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">5297</span><span class="p">]</span>
 <span class="n">label_pipeline</span><span class="p">(</span><span class="s1">&#39;10&#39;</span><span class="p">)</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="mi">9</span>
 </pre></div>
@@ -639,64 +649,64 @@ optimizer는 확률적 경사 하강법를 구현해놓은 것입니다. 처음�
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>| epoch   1 |   500/ 1782 batches | accuracy    0.688
-| epoch   1 |  1000/ 1782 batches | accuracy    0.853
-| epoch   1 |  1500/ 1782 batches | accuracy    0.876
+| epoch   1 |  1000/ 1782 batches | accuracy    0.855
+| epoch   1 |  1500/ 1782 batches | accuracy    0.878
 -----------------------------------------------------------
-| end of epoch   1 | time: 14.83s | valid accuracy    0.881
+| end of epoch   1 | time:  7.56s | valid accuracy    0.871
 -----------------------------------------------------------
-| epoch   2 |   500/ 1782 batches | accuracy    0.898
+| epoch   2 |   500/ 1782 batches | accuracy    0.896
 | epoch   2 |  1000/ 1782 batches | accuracy    0.902
-| epoch   2 |  1500/ 1782 batches | accuracy    0.903
+| epoch   2 |  1500/ 1782 batches | accuracy    0.904
 -----------------------------------------------------------
-| end of epoch   2 | time: 13.31s | valid accuracy    0.892
+| end of epoch   2 | time:  7.47s | valid accuracy    0.887
 -----------------------------------------------------------
 | epoch   3 |   500/ 1782 batches | accuracy    0.915
-| epoch   3 |  1000/ 1782 batches | accuracy    0.915
-| epoch   3 |  1500/ 1782 batches | accuracy    0.915
+| epoch   3 |  1000/ 1782 batches | accuracy    0.916
+| epoch   3 |  1500/ 1782 batches | accuracy    0.912
 -----------------------------------------------------------
-| end of epoch   3 | time: 12.24s | valid accuracy    0.899
+| end of epoch   3 | time:  7.50s | valid accuracy    0.895
 -----------------------------------------------------------
-| epoch   4 |   500/ 1782 batches | accuracy    0.925
+| epoch   4 |   500/ 1782 batches | accuracy    0.923
 | epoch   4 |  1000/ 1782 batches | accuracy    0.925
-| epoch   4 |  1500/ 1782 batches | accuracy    0.924
+| epoch   4 |  1500/ 1782 batches | accuracy    0.921
 -----------------------------------------------------------
-| end of epoch   4 | time: 12.54s | valid accuracy    0.901
+| end of epoch   4 | time:  7.51s | valid accuracy    0.905
 -----------------------------------------------------------
 | epoch   5 |   500/ 1782 batches | accuracy    0.931
-| epoch   5 |  1000/ 1782 batches | accuracy    0.931
-| epoch   5 |  1500/ 1782 batches | accuracy    0.928
+| epoch   5 |  1000/ 1782 batches | accuracy    0.927
+| epoch   5 |  1500/ 1782 batches | accuracy    0.931
 -----------------------------------------------------------
-| end of epoch   5 | time: 12.79s | valid accuracy    0.906
+| end of epoch   5 | time:  7.51s | valid accuracy    0.896
 -----------------------------------------------------------
-| epoch   6 |   500/ 1782 batches | accuracy    0.934
-| epoch   6 |  1000/ 1782 batches | accuracy    0.935
-| epoch   6 |  1500/ 1782 batches | accuracy    0.935
+| epoch   6 |   500/ 1782 batches | accuracy    0.943
+| epoch   6 |  1000/ 1782 batches | accuracy    0.942
+| epoch   6 |  1500/ 1782 batches | accuracy    0.942
 -----------------------------------------------------------
-| end of epoch   6 | time: 12.64s | valid accuracy    0.903
+| end of epoch   6 | time:  7.48s | valid accuracy    0.903
 -----------------------------------------------------------
-| epoch   7 |   500/ 1782 batches | accuracy    0.946
-| epoch   7 |  1000/ 1782 batches | accuracy    0.949
-| epoch   7 |  1500/ 1782 batches | accuracy    0.949
+| epoch   7 |   500/ 1782 batches | accuracy    0.944
+| epoch   7 |  1000/ 1782 batches | accuracy    0.944
+| epoch   7 |  1500/ 1782 batches | accuracy    0.944
 -----------------------------------------------------------
-| end of epoch   7 | time: 13.33s | valid accuracy    0.906
+| end of epoch   7 | time:  7.46s | valid accuracy    0.903
 -----------------------------------------------------------
-| epoch   8 |   500/ 1782 batches | accuracy    0.950
-| epoch   8 |  1000/ 1782 batches | accuracy    0.950
-| epoch   8 |  1500/ 1782 batches | accuracy    0.948
+| epoch   8 |   500/ 1782 batches | accuracy    0.944
+| epoch   8 |  1000/ 1782 batches | accuracy    0.946
+| epoch   8 |  1500/ 1782 batches | accuracy    0.944
 -----------------------------------------------------------
-| end of epoch   8 | time: 12.80s | valid accuracy    0.907
+| end of epoch   8 | time:  7.43s | valid accuracy    0.903
 -----------------------------------------------------------
-| epoch   9 |   500/ 1782 batches | accuracy    0.950
-| epoch   9 |  1000/ 1782 batches | accuracy    0.949
-| epoch   9 |  1500/ 1782 batches | accuracy    0.949
+| epoch   9 |   500/ 1782 batches | accuracy    0.948
+| epoch   9 |  1000/ 1782 batches | accuracy    0.943
+| epoch   9 |  1500/ 1782 batches | accuracy    0.945
 -----------------------------------------------------------
-| end of epoch   9 | time: 12.78s | valid accuracy    0.907
+| end of epoch   9 | time:  7.43s | valid accuracy    0.902
 -----------------------------------------------------------
-| epoch  10 |   500/ 1782 batches | accuracy    0.952
-| epoch  10 |  1000/ 1782 batches | accuracy    0.948
-| epoch  10 |  1500/ 1782 batches | accuracy    0.950
+| epoch  10 |   500/ 1782 batches | accuracy    0.945
+| epoch  10 |  1000/ 1782 batches | accuracy    0.944
+| epoch  10 |  1500/ 1782 batches | accuracy    0.945
 -----------------------------------------------------------
-| end of epoch  10 | time: 13.59s | valid accuracy    0.907
+| end of epoch  10 | time:  7.44s | valid accuracy    0.902
 -----------------------------------------------------------
 </pre></div>
 </div>
@@ -750,7 +760,7 @@ test accuracy    0.908
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>This is a Sports news
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 2 minutes  34.203 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 1 minutes  37.270 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-beginner-text-sentiment-ngrams-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <a class="reference download internal" download="" href="../_downloads/94a9d45986dd030a54a92e1793ccaf15/text_sentiment_ngrams_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">text_sentiment_ngrams_tutorial.py</span></code></a></div>

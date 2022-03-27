@@ -217,6 +217,7 @@
 <li class="toctree-l1"><a class="reference internal" href="Intro_to_TorchScript_tutorial.html">TorchScript 소개</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_export.html">C++에서 TorchScript 모델 로딩하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/super_resolution_with_onnxruntime.html">(선택) PyTorch 모델을 ONNX으로 변환하고 ONNX 런타임에서 실행하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/realtime_rpi.html">Real Time Inference on Raspberry Pi 4 (30 fps!)</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Code Transforms with FX</span></p>
 <ul>
@@ -260,6 +261,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/model_parallel_tutorial.html">단일 머신을 사용한 모델 병렬화 모범 사례</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/ddp_tutorial.html">분산 데이터 병렬 처리 시작하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/dist_tuto.html">PyTorch로 분산 어플리케이션 개발하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/FSDP_tutorial.html">Getting Started with Fully Sharded Data Parallel(FSDP)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/process_group_cpp_extension_tutorial.html">Customize Process Group Backends Using Cpp Extensions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/rpc_tutorial.html">Getting Started with Distributed RPC Framework</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/rpc_param_server_tutorial.html">Implementing a Parameter Server Using Distributed RPC Framework</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/dist_pipeline_parallel_tutorial.html">Distributed Pipeline Parallelism Using RPC</a></li>
@@ -273,6 +276,10 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="deeplabv3_on_ios.html">iOS에서의 이미지 분할 DeepLapV3</a></li>
 <li class="toctree-l1"><a class="reference internal" href="deeplabv3_on_android.html">안드로이드에서의 이미지 분할 DeepLapV3</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Recommendation Systems</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/torchrec_tutorial.html">Introduction to TorchRec</a></li>
 </ul>
 
             
@@ -480,6 +487,7 @@
 <div class="section" id="id2">
 <h2>데이터 로드하고 배치 만들기<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
 <p>이 튜토리얼에서는 <code class="docutils literal notranslate"><span class="pre">torchtext</span></code> 를 사용하여 Wikitext-2 데이터셋을 생성합니다.
+torchtext 데이터셋에 접근하기 전에, <a class="reference external" href="https://github.com/pytorch/data">https://github.com/pytorch/data</a> 을 참고하여 torchdata를 설치하시기 바랍니다.
 단어 오브젝트는 훈련 데이터셋(train dataset) 에 의하여 만들어지고, 토큰(token)을 텐서(tensor)로 수치화하는데 사용됩니다.
 Wikitext-2에서 보기 드믄 토큰(rare token)은 <cite>&lt;unk&gt;</cite> 로 표현됩니다.</p>
 <p>주어진 1D 벡터의 시퀀스 데이터에서, <code class="docutils literal notranslate"><span class="pre">batchify()</span></code> 함수는 데이터를 <code class="docutils literal notranslate"><span class="pre">batch_size</span></code> 컬럼들로 정렬합니다.
@@ -677,56 +685,56 @@ Wikitext-2에서 보기 드믄 토큰(rare token)은 <cite>&lt;unk&gt;</cite> �
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>| epoch   1 |   200/ 2928 batches | lr 5.00 | ms/batch 17.26 | loss  8.05 | ppl  3142.12
-| epoch   1 |   400/ 2928 batches | lr 5.00 | ms/batch 17.42 | loss  6.88 | ppl   974.11
-| epoch   1 |   600/ 2928 batches | lr 5.00 | ms/batch 17.16 | loss  6.44 | ppl   629.34
-| epoch   1 |   800/ 2928 batches | lr 5.00 | ms/batch 17.65 | loss  6.30 | ppl   543.91
-| epoch   1 |  1000/ 2928 batches | lr 5.00 | ms/batch 16.80 | loss  6.18 | ppl   484.51
-| epoch   1 |  1200/ 2928 batches | lr 5.00 | ms/batch 17.24 | loss  6.15 | ppl   470.18
-| epoch   1 |  1400/ 2928 batches | lr 5.00 | ms/batch 18.06 | loss  6.11 | ppl   450.18
-| epoch   1 |  1600/ 2928 batches | lr 5.00 | ms/batch 18.58 | loss  6.10 | ppl   447.73
-| epoch   1 |  1800/ 2928 batches | lr 5.00 | ms/batch 19.02 | loss  6.02 | ppl   411.90
-| epoch   1 |  2000/ 2928 batches | lr 5.00 | ms/batch 18.86 | loss  6.01 | ppl   408.84
-| epoch   1 |  2200/ 2928 batches | lr 5.00 | ms/batch 19.04 | loss  5.90 | ppl   363.51
-| epoch   1 |  2400/ 2928 batches | lr 5.00 | ms/batch 18.86 | loss  5.97 | ppl   392.08
-| epoch   1 |  2600/ 2928 batches | lr 5.00 | ms/batch 19.15 | loss  5.95 | ppl   385.63
-| epoch   1 |  2800/ 2928 batches | lr 5.00 | ms/batch 19.77 | loss  5.88 | ppl   356.85
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>| epoch   1 |   200/ 2928 batches | lr 5.00 | ms/batch 15.99 | loss  8.26 | ppl  3855.32
+| epoch   1 |   400/ 2928 batches | lr 5.00 | ms/batch 15.85 | loss  6.93 | ppl  1025.32
+| epoch   1 |   600/ 2928 batches | lr 5.00 | ms/batch 15.80 | loss  6.47 | ppl   643.92
+| epoch   1 |   800/ 2928 batches | lr 5.00 | ms/batch 15.77 | loss  6.32 | ppl   555.98
+| epoch   1 |  1000/ 2928 batches | lr 5.00 | ms/batch 15.86 | loss  6.20 | ppl   493.49
+| epoch   1 |  1200/ 2928 batches | lr 5.00 | ms/batch 15.90 | loss  6.16 | ppl   474.74
+| epoch   1 |  1400/ 2928 batches | lr 5.00 | ms/batch 15.85 | loss  6.12 | ppl   454.93
+| epoch   1 |  1600/ 2928 batches | lr 5.00 | ms/batch 15.88 | loss  6.12 | ppl   454.84
+| epoch   1 |  1800/ 2928 batches | lr 5.00 | ms/batch 15.90 | loss  6.04 | ppl   417.82
+| epoch   1 |  2000/ 2928 batches | lr 5.00 | ms/batch 15.89 | loss  6.03 | ppl   414.65
+| epoch   1 |  2200/ 2928 batches | lr 5.00 | ms/batch 15.88 | loss  5.91 | ppl   369.36
+| epoch   1 |  2400/ 2928 batches | lr 5.00 | ms/batch 16.03 | loss  5.98 | ppl   396.23
+| epoch   1 |  2600/ 2928 batches | lr 5.00 | ms/batch 16.23 | loss  5.96 | ppl   385.89
+| epoch   1 |  2800/ 2928 batches | lr 5.00 | ms/batch 17.31 | loss  5.89 | ppl   360.70
 -----------------------------------------------------------------------------------------
-| end of epoch   1 | time: 55.89s | valid loss  5.84 | valid ppl   345.07
+| end of epoch   1 | time: 49.00s | valid loss  5.84 | valid ppl   343.94
 -----------------------------------------------------------------------------------------
-| epoch   2 |   200/ 2928 batches | lr 4.75 | ms/batch 19.49 | loss  5.86 | ppl   350.09
-| epoch   2 |   400/ 2928 batches | lr 4.75 | ms/batch 19.09 | loss  5.84 | ppl   343.61
-| epoch   2 |   600/ 2928 batches | lr 4.75 | ms/batch 18.89 | loss  5.67 | ppl   288.71
-| epoch   2 |   800/ 2928 batches | lr 4.75 | ms/batch 19.02 | loss  5.70 | ppl   298.62
-| epoch   2 |  1000/ 2928 batches | lr 4.75 | ms/batch 18.94 | loss  5.65 | ppl   282.91
-| epoch   2 |  1200/ 2928 batches | lr 4.75 | ms/batch 18.92 | loss  5.68 | ppl   293.29
-| epoch   2 |  1400/ 2928 batches | lr 4.75 | ms/batch 19.35 | loss  5.69 | ppl   296.20
-| epoch   2 |  1600/ 2928 batches | lr 4.75 | ms/batch 19.51 | loss  5.71 | ppl   301.32
-| epoch   2 |  1800/ 2928 batches | lr 4.75 | ms/batch 19.10 | loss  5.65 | ppl   283.79
-| epoch   2 |  2000/ 2928 batches | lr 4.75 | ms/batch 19.21 | loss  5.67 | ppl   288.92
-| epoch   2 |  2200/ 2928 batches | lr 4.75 | ms/batch 19.25 | loss  5.55 | ppl   256.71
-| epoch   2 |  2400/ 2928 batches | lr 4.75 | ms/batch 19.05 | loss  5.65 | ppl   282.90
-| epoch   2 |  2600/ 2928 batches | lr 4.75 | ms/batch 18.79 | loss  5.64 | ppl   281.97
-| epoch   2 |  2800/ 2928 batches | lr 4.75 | ms/batch 19.21 | loss  5.58 | ppl   264.58
+| epoch   2 |   200/ 2928 batches | lr 4.75 | ms/batch 17.77 | loss  5.88 | ppl   356.89
+| epoch   2 |   400/ 2928 batches | lr 4.75 | ms/batch 17.70 | loss  5.86 | ppl   351.26
+| epoch   2 |   600/ 2928 batches | lr 4.75 | ms/batch 17.67 | loss  5.68 | ppl   292.52
+| epoch   2 |   800/ 2928 batches | lr 4.75 | ms/batch 17.64 | loss  5.71 | ppl   300.72
+| epoch   2 |  1000/ 2928 batches | lr 4.75 | ms/batch 17.70 | loss  5.66 | ppl   288.36
+| epoch   2 |  1200/ 2928 batches | lr 4.75 | ms/batch 17.66 | loss  5.69 | ppl   294.53
+| epoch   2 |  1400/ 2928 batches | lr 4.75 | ms/batch 17.66 | loss  5.70 | ppl   298.10
+| epoch   2 |  1600/ 2928 batches | lr 4.75 | ms/batch 17.65 | loss  5.72 | ppl   305.05
+| epoch   2 |  1800/ 2928 batches | lr 4.75 | ms/batch 17.66 | loss  5.66 | ppl   287.00
+| epoch   2 |  2000/ 2928 batches | lr 4.75 | ms/batch 17.65 | loss  5.67 | ppl   291.03
+| epoch   2 |  2200/ 2928 batches | lr 4.75 | ms/batch 17.66 | loss  5.56 | ppl   258.81
+| epoch   2 |  2400/ 2928 batches | lr 4.75 | ms/batch 17.67 | loss  5.65 | ppl   283.00
+| epoch   2 |  2600/ 2928 batches | lr 4.75 | ms/batch 17.67 | loss  5.65 | ppl   283.35
+| epoch   2 |  2800/ 2928 batches | lr 4.75 | ms/batch 17.68 | loss  5.58 | ppl   265.43
 -----------------------------------------------------------------------------------------
-| end of epoch   2 | time: 58.37s | valid loss  5.63 | valid ppl   279.62
+| end of epoch   2 | time: 53.68s | valid loss  5.70 | valid ppl   298.22
 -----------------------------------------------------------------------------------------
-| epoch   3 |   200/ 2928 batches | lr 4.51 | ms/batch 19.55 | loss  5.60 | ppl   270.94
-| epoch   3 |   400/ 2928 batches | lr 4.51 | ms/batch 19.50 | loss  5.62 | ppl   275.01
-| epoch   3 |   600/ 2928 batches | lr 4.51 | ms/batch 19.19 | loss  5.43 | ppl   227.54
-| epoch   3 |   800/ 2928 batches | lr 4.51 | ms/batch 19.37 | loss  5.49 | ppl   241.50
-| epoch   3 |  1000/ 2928 batches | lr 4.51 | ms/batch 19.06 | loss  5.43 | ppl   228.65
-| epoch   3 |  1200/ 2928 batches | lr 4.51 | ms/batch 18.99 | loss  5.48 | ppl   238.65
-| epoch   3 |  1400/ 2928 batches | lr 4.51 | ms/batch 18.98 | loss  5.50 | ppl   243.85
-| epoch   3 |  1600/ 2928 batches | lr 4.51 | ms/batch 19.04 | loss  5.52 | ppl   249.43
-| epoch   3 |  1800/ 2928 batches | lr 4.51 | ms/batch 18.89 | loss  5.47 | ppl   237.80
-| epoch   3 |  2000/ 2928 batches | lr 4.51 | ms/batch 19.23 | loss  5.48 | ppl   240.81
-| epoch   3 |  2200/ 2928 batches | lr 4.51 | ms/batch 19.45 | loss  5.36 | ppl   212.44
-| epoch   3 |  2400/ 2928 batches | lr 4.51 | ms/batch 19.47 | loss  5.46 | ppl   235.76
-| epoch   3 |  2600/ 2928 batches | lr 4.51 | ms/batch 19.05 | loss  5.47 | ppl   237.56
-| epoch   3 |  2800/ 2928 batches | lr 4.51 | ms/batch 19.23 | loss  5.40 | ppl   220.89
+| epoch   3 |   200/ 2928 batches | lr 4.51 | ms/batch 17.74 | loss  5.61 | ppl   273.23
+| epoch   3 |   400/ 2928 batches | lr 4.51 | ms/batch 17.68 | loss  5.63 | ppl   277.81
+| epoch   3 |   600/ 2928 batches | lr 4.51 | ms/batch 17.66 | loss  5.43 | ppl   228.01
+| epoch   3 |   800/ 2928 batches | lr 4.51 | ms/batch 17.67 | loss  5.49 | ppl   243.27
+| epoch   3 |  1000/ 2928 batches | lr 4.51 | ms/batch 17.66 | loss  5.44 | ppl   229.98
+| epoch   3 |  1200/ 2928 batches | lr 4.51 | ms/batch 17.68 | loss  5.48 | ppl   240.29
+| epoch   3 |  1400/ 2928 batches | lr 4.51 | ms/batch 17.67 | loss  5.49 | ppl   242.79
+| epoch   3 |  1600/ 2928 batches | lr 4.51 | ms/batch 17.67 | loss  5.53 | ppl   251.22
+| epoch   3 |  1800/ 2928 batches | lr 4.51 | ms/batch 17.67 | loss  5.48 | ppl   238.80
+| epoch   3 |  2000/ 2928 batches | lr 4.51 | ms/batch 17.67 | loss  5.48 | ppl   241.03
+| epoch   3 |  2200/ 2928 batches | lr 4.51 | ms/batch 17.66 | loss  5.36 | ppl   212.07
+| epoch   3 |  2400/ 2928 batches | lr 4.51 | ms/batch 17.68 | loss  5.47 | ppl   237.53
+| epoch   3 |  2600/ 2928 batches | lr 4.51 | ms/batch 17.69 | loss  5.47 | ppl   238.05
+| epoch   3 |  2800/ 2928 batches | lr 4.51 | ms/batch 17.67 | loss  5.40 | ppl   221.77
 -----------------------------------------------------------------------------------------
-| end of epoch   3 | time: 58.61s | valid loss  5.60 | valid ppl   269.89
+| end of epoch   3 | time: 53.68s | valid loss  5.57 | valid ppl   263.03
 -----------------------------------------------------------------------------------------
 </pre></div>
 </div>
@@ -743,11 +751,11 @@ Wikitext-2에서 보기 드믄 토큰(rare token)은 <cite>&lt;unk&gt;</cite> �
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>=========================================================================================
-| End of training | test loss  5.51 | test ppl   247.88
+| End of training | test loss  5.48 | test ppl   240.39
 =========================================================================================
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 3 minutes  4.996 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 2 minutes  46.802 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-beginner-transformer-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <a class="reference download internal" download="" href="../_downloads/806d7ef7b31fac06848c33ca0ef3b9eb/transformer_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">transformer_tutorial.py</span></code></a></div>

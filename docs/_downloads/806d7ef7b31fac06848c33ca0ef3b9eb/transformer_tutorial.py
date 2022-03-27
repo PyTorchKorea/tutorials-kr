@@ -128,6 +128,7 @@ class PositionalEncoding(nn.Module):
 
 ######################################################################
 # 이 튜토리얼에서는 ``torchtext`` 를 사용하여 Wikitext-2 데이터셋을 생성합니다.
+# torchtext 데이터셋에 접근하기 전에, https://github.com/pytorch/data 을 참고하여 torchdata를 설치하시기 바랍니다.
 # 단어 오브젝트는 훈련 데이터셋(train dataset) 에 의하여 만들어지고, 토큰(token)을 텐서(tensor)로 수치화하는데 사용됩니다.
 # Wikitext-2에서 보기 드믄 토큰(rare token)은 `<unk>` 로 표현됩니다.
 #

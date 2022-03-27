@@ -217,6 +217,7 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">TorchScript 소개</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_export.html">C++에서 TorchScript 모델 로딩하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/super_resolution_with_onnxruntime.html">(선택) PyTorch 모델을 ONNX으로 변환하고 ONNX 런타임에서 실행하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/realtime_rpi.html">Real Time Inference on Raspberry Pi 4 (30 fps!)</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Code Transforms with FX</span></p>
 <ul>
@@ -260,6 +261,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/model_parallel_tutorial.html">단일 머신을 사용한 모델 병렬화 모범 사례</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/ddp_tutorial.html">분산 데이터 병렬 처리 시작하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/dist_tuto.html">PyTorch로 분산 어플리케이션 개발하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/FSDP_tutorial.html">Getting Started with Fully Sharded Data Parallel(FSDP)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/process_group_cpp_extension_tutorial.html">Customize Process Group Backends Using Cpp Extensions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/rpc_tutorial.html">Getting Started with Distributed RPC Framework</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/rpc_param_server_tutorial.html">Implementing a Parameter Server Using Distributed RPC Framework</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/dist_pipeline_parallel_tutorial.html">Distributed Pipeline Parallelism Using RPC</a></li>
@@ -273,6 +276,10 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="deeplabv3_on_ios.html">iOS에서의 이미지 분할 DeepLapV3</a></li>
 <li class="toctree-l1"><a class="reference internal" href="deeplabv3_on_android.html">안드로이드에서의 이미지 분할 DeepLapV3</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Recommendation Systems</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/torchrec_tutorial.html">Introduction to TorchRec</a></li>
 </ul>
 
             
@@ -404,7 +411,7 @@ TorchScript에 대한 소개입니다.</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>1.9.0+cu102
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>1.11.0+cu102
 </pre></div>
 </div>
 <div class="section" id="pytorch">
@@ -433,11 +440,11 @@ TorchScript에 대한 소개입니다.</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>(tensor([[0.8045, 0.8395, 0.9376, 0.6081],
-        [0.9558, 0.8698, 0.9191, 0.4523],
-        [0.8678, 0.8770, 0.9550, 0.5993]]), tensor([[0.8045, 0.8395, 0.9376, 0.6081],
-        [0.9558, 0.8698, 0.9191, 0.4523],
-        [0.8678, 0.8770, 0.9550, 0.5993]]))
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>(tensor([[0.6679, 0.6787, 0.6084, 0.7576],
+        [0.7185, 0.7383, 0.8659, 0.9017],
+        [0.6521, 0.1082, 0.9146, 0.4928]]), tensor([[0.6679, 0.6787, 0.6084, 0.7576],
+        [0.7185, 0.7383, 0.8659, 0.9017],
+        [0.6521, 0.1082, 0.9146, 0.4928]]))
 </pre></div>
 </div>
 <p>우리는 다음 작업을 수행했습니다.:</p>
@@ -473,11 +480,11 @@ cell</a> 의
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>MyCell(
   (linear): Linear(in_features=4, out_features=4, bias=True)
 )
-(tensor([[0.6989, 0.7184, 0.4359, 0.4009],
-        [0.6782, 0.2859, 0.4014, 0.3897],
-        [0.5879, 0.3362, 0.4334, 0.1496]], grad_fn=&lt;TanhBackward&gt;), tensor([[0.6989, 0.7184, 0.4359, 0.4009],
-        [0.6782, 0.2859, 0.4014, 0.3897],
-        [0.5879, 0.3362, 0.4334, 0.1496]], grad_fn=&lt;TanhBackward&gt;))
+(tensor([[ 0.5565,  0.0218,  0.2396,  0.2834],
+        [ 0.4548,  0.1006,  0.7964,  0.3484],
+        [ 0.5125, -0.2054,  0.7117,  0.2492]], grad_fn=&lt;TanhBackward0&gt;), tensor([[ 0.5565,  0.0218,  0.2396,  0.2834],
+        [ 0.4548,  0.1006,  0.7964,  0.3484],
+        [ 0.5125, -0.2054,  0.7117,  0.2492]], grad_fn=&lt;TanhBackward0&gt;))
 </pre></div>
 </div>
 <p>모듈 <code class="docutils literal notranslate"><span class="pre">MyCell</span></code> 을 재정의했지만, 이번에는 <code class="docutils literal notranslate"><span class="pre">self.linear</span></code> 속성을 추가하고
@@ -523,11 +530,11 @@ forward 함수에서 <code class="docutils literal notranslate"><span class="pre
   (dg): MyDecisionGate()
   (linear): Linear(in_features=4, out_features=4, bias=True)
 )
-(tensor([[0.2515, 0.8997, 0.6623, 0.6763],
-        [0.4062, 0.8011, 0.4691, 0.3767],
-        [0.2168, 0.8640, 0.5762, 0.5166]], grad_fn=&lt;TanhBackward&gt;), tensor([[0.2515, 0.8997, 0.6623, 0.6763],
-        [0.4062, 0.8011, 0.4691, 0.3767],
-        [0.2168, 0.8640, 0.5762, 0.5166]], grad_fn=&lt;TanhBackward&gt;))
+(tensor([[0.7792, 0.5607, 0.5920, 0.8849],
+        [0.7521, 0.5053, 0.9050, 0.9405],
+        [0.7842, 0.3034, 0.8633, 0.8721]], grad_fn=&lt;TanhBackward0&gt;), tensor([[0.7792, 0.5607, 0.5920, 0.8849],
+        [0.7521, 0.5053, 0.9050, 0.9405],
+        [0.7842, 0.3034, 0.8633, 0.8721]], grad_fn=&lt;TanhBackward0&gt;))
 </pre></div>
 </div>
 <p>MyCell 클래스를 다시 정의했지만, 여기선 <code class="docutils literal notranslate"><span class="pre">MyDecisionGate</span></code> 를 정의했습니다.
@@ -589,8 +596,8 @@ derivatives)을 계산하는 접근법을 취하고 있습니다. 하지만, PyT
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>graph(%self.1 : __torch__.MyCell,
       %x : Float(3, 4, strides=[4, 1], requires_grad=0, device=cpu),
       %h : Float(3, 4, strides=[4, 1], requires_grad=0, device=cpu)):
-  %18 : __torch__.torch.nn.modules.linear.Linear = prim::GetAttr[name=&quot;linear&quot;](%self.1)
-  %20 : Tensor = prim::CallMethod[name=&quot;forward&quot;](%18, %x)
+  %linear : __torch__.torch.nn.modules.linear.Linear = prim::GetAttr[name=&quot;linear&quot;](%self.1)
+  %20 : Tensor = prim::CallMethod[name=&quot;forward&quot;](%linear, %x)
   %11 : int = prim::Constant[value=1]() # /workspace/ko-latest/beginner_source/Intro_to_TorchScript_tutorial.py:184:0
   %12 : Float(3, 4, strides=[4, 1], requires_grad=1, device=cpu) = aten::add(%20, %h, %11) # /workspace/ko-latest/beginner_source/Intro_to_TorchScript_tutorial.py:184:0
   %13 : Float(3, 4, strides=[4, 1], requires_grad=1, device=cpu) = aten::tanh(%12) # /workspace/ko-latest/beginner_source/Intro_to_TorchScript_tutorial.py:184:0
@@ -608,9 +615,9 @@ derivatives)을 계산하는 접근법을 취하고 있습니다. 하지만, PyT
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>def forward(self,
     x: Tensor,
     h: Tensor) -&gt; Tuple[Tensor, Tensor]:
-  _0 = torch.add((self.linear).forward(x, ), h)
-  _1 = torch.tanh(_0)
-  return (_1, _1)
+  linear = self.linear
+  _0 = torch.tanh(torch.add((linear).forward(x, ), h))
+  return (_0, _0)
 </pre></div>
 </div>
 <p><strong>어째서</strong> 이런 일들을 했을까요? 여기에는 몇 가지 이유가 있습니다:</p>
@@ -631,16 +638,18 @@ derivatives)을 계산하는 접근법을 취하고 있습니다. 하지만, PyT
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>(tensor([[-0.0163,  0.7120,  0.7867,  0.7295],
-        [ 0.3265,  0.4923,  0.4672,  0.5469],
-        [ 0.3561,  0.8345,  0.7816,  0.8678]], grad_fn=&lt;TanhBackward&gt;), tensor([[-0.0163,  0.7120,  0.7867,  0.7295],
-        [ 0.3265,  0.4923,  0.4672,  0.5469],
-        [ 0.3561,  0.8345,  0.7816,  0.8678]], grad_fn=&lt;TanhBackward&gt;))
-(tensor([[-0.0163,  0.7120,  0.7867,  0.7295],
-        [ 0.3265,  0.4923,  0.4672,  0.5469],
-        [ 0.3561,  0.8345,  0.7816,  0.8678]], grad_fn=&lt;TanhBackward&gt;), tensor([[-0.0163,  0.7120,  0.7867,  0.7295],
-        [ 0.3265,  0.4923,  0.4672,  0.5469],
-        [ 0.3561,  0.8345,  0.7816,  0.8678]], grad_fn=&lt;TanhBackward&gt;))
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>(tensor([[ 0.5319,  0.2998,  0.6391, -0.2231],
+        [ 0.5659,  0.0858,  0.1937, -0.5242],
+        [ 0.6820,  0.6629,  0.1828,  0.3112]], grad_fn=&lt;TanhBackward0&gt;), tensor([[ 0.5319,  0.2998,  0.6391, -0.2231],
+        [ 0.5659,  0.0858,  0.1937, -0.5242],
+        [ 0.6820,  0.6629,  0.1828,  0.3112]], grad_fn=&lt;TanhBackward0&gt;))
+(tensor([[ 0.5319,  0.2998,  0.6391, -0.2231],
+        [ 0.5659,  0.0858,  0.1937, -0.5242],
+        [ 0.6820,  0.6629,  0.1828,  0.3112]],
+       grad_fn=&lt;DifferentiableGraphBackward&gt;), tensor([[ 0.5319,  0.2998,  0.6391, -0.2231],
+        [ 0.5659,  0.0858,  0.1937, -0.5242],
+        [ 0.6820,  0.6629,  0.1828,  0.3112]],
+       grad_fn=&lt;DifferentiableGraphBackward&gt;))
 </pre></div>
 </div>
 </div>
@@ -681,11 +690,12 @@ derivatives)을 계산하는 접근법을 취하고 있습니다. 하지만, PyT
 def forward(self,
     x: Tensor,
     h: Tensor) -&gt; Tuple[Tensor, Tensor]:
-  _0 = self.dg
-  _1 = (self.linear).forward(x, )
-  _2 = (_0).forward(_1, )
-  _3 = torch.tanh(torch.add(_1, h))
-  return (_3, _3)
+  dg = self.dg
+  linear = self.linear
+  _0 = (linear).forward(x, )
+  _1 = (dg).forward(_0, )
+  _2 = torch.tanh(torch.add(_0, h))
+  return (_2, _2)
 </pre></div>
 </div>
 <p><code class="docutils literal notranslate"><span class="pre">.code</span></code> 출력을 보면, <code class="docutils literal notranslate"><span class="pre">if-else</span></code> 분기가 어디에도 없다는 것을 알 수 있습니다!
@@ -716,8 +726,10 @@ def forward(self,
 def forward(self,
     x: Tensor,
     h: Tensor) -&gt; Tuple[Tensor, Tensor]:
-  _0 = (self.dg).forward((self.linear).forward(x, ), )
-  new_h = torch.tanh(torch.add(_0, h))
+  dg = self.dg
+  linear = self.linear
+  _0 = torch.add((dg).forward((linear).forward(x, ), ), h)
+  new_h = torch.tanh(_0)
   return (new_h, new_h)
 </pre></div>
 </div>
@@ -759,7 +771,8 @@ def forward(self,
   y0 = y
   h0 = h
   for i in range(torch.size(xs, 0)):
-    _0 = (self.cell).forward(torch.select(xs, 0, i), h0, )
+    cell = self.cell
+    _0 = (cell).forward(torch.select(xs, 0, i), h0, )
     y1, h1, = _0
     y0, h0 = y1, h1
   return (y0, h0)
@@ -782,7 +795,8 @@ def forward(self,
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>def forward(self,
     xs: Tensor) -&gt; Tensor:
-  _0, y, = (self.loop).forward(xs, )
+  loop = self.loop
+  _0, y, = (loop).forward(xs, )
   return torch.relu(y)
 </pre></div>
 </div>
@@ -818,7 +832,8 @@ def forward(self,
 )
 def forward(self,
     xs: Tensor) -&gt; Tensor:
-  _0, y, = (self.loop).forward(xs, )
+  loop = self.loop
+  _0, y, = (loop).forward(xs, )
   return torch.relu(y)
 </pre></div>
 </div>
@@ -831,7 +846,7 @@ def forward(self,
 <p>튜토리얼을 완료했습니다! 관련 데모를 보려면 TorchScript를 사용하여 기계 번역
 모델을 변환하기 위한 NeurIPS 데모를 확인하십시오:
 <a class="reference external" href="https://colab.research.google.com/drive/1HiICg6jRkBnr5hvK2-VnMi88Vi9pUzEJ">https://colab.research.google.com/drive/1HiICg6jRkBnr5hvK2-VnMi88Vi9pUzEJ</a></p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.373 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.724 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-beginner-intro-to-torchscript-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <a class="reference download internal" download="" href="../_downloads/8f391b3e6d5a0aa105a7b4d366198e96/Intro_to_TorchScript_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">Intro_to_TorchScript_tutorial.py</span></code></a></div>

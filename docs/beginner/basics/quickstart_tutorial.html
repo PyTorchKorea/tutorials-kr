@@ -217,6 +217,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../Intro_to_TorchScript_tutorial.html">TorchScript 소개</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../advanced/cpp_export.html">C++에서 TorchScript 모델 로딩하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../advanced/super_resolution_with_onnxruntime.html">(선택) PyTorch 모델을 ONNX으로 변환하고 ONNX 런타임에서 실행하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../intermediate/realtime_rpi.html">Real Time Inference on Raspberry Pi 4 (30 fps!)</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Code Transforms with FX</span></p>
 <ul>
@@ -260,6 +261,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/model_parallel_tutorial.html">단일 머신을 사용한 모델 병렬화 모범 사례</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/ddp_tutorial.html">분산 데이터 병렬 처리 시작하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/dist_tuto.html">PyTorch로 분산 어플리케이션 개발하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../intermediate/FSDP_tutorial.html">Getting Started with Fully Sharded Data Parallel(FSDP)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../intermediate/process_group_cpp_extension_tutorial.html">Customize Process Group Backends Using Cpp Extensions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/rpc_tutorial.html">Getting Started with Distributed RPC Framework</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/rpc_param_server_tutorial.html">Implementing a Parameter Server Using Distributed RPC Framework</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/dist_pipeline_parallel_tutorial.html">Distributed Pipeline Parallelism Using RPC</a></li>
@@ -273,6 +276,10 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../deeplabv3_on_ios.html">iOS에서의 이미지 분할 DeepLapV3</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../deeplabv3_on_android.html">안드로이드에서의 이미지 분할 DeepLapV3</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Recommendation Systems</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../intermediate/torchrec_tutorial.html">Introduction to TorchRec</a></li>
 </ul>
 
             
@@ -392,8 +399,7 @@
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span>
 <span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">DataLoader</span>
 <span class="kn">from</span> <span class="nn">torchvision</span> <span class="kn">import</span> <span class="n">datasets</span>
-<span class="kn">from</span> <span class="nn">torchvision.transforms</span> <span class="kn">import</span> <span class="n">ToTensor</span><span class="p">,</span> <span class="n">Lambda</span><span class="p">,</span> <span class="n">Compose</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">torchvision.transforms</span> <span class="kn">import</span> <span class="n">ToTensor</span>
 </pre></div>
 </div>
 <p>PyTorch는 <a class="reference external" href="https://pytorch.org/text/stable/index.html">TorchText</a>, <a class="reference external" href="https://pytorch.org/vision/stable/index.html">TorchVision</a> 및
@@ -430,14 +436,14 @@
 <span class="n">test_dataloader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">test_data</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">)</span>
 
 <span class="k">for</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">test_dataloader</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Shape of X [N, C, H, W]: &quot;</span><span class="p">,</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Shape of y: &quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">y</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Shape of X [N, C, H, W]: </span><span class="si">{</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Shape of y: </span><span class="si">{</span><span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">y</span><span class="o">.</span><span class="n">dtype</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="k">break</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Shape of X [N, C, H, W]:  torch.Size([64, 1, 28, 28])
-Shape of y:  torch.Size([64]) torch.int64
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Shape of X [N, C, H, W]: torch.Size([64, 1, 28, 28])
+Shape of y: torch.Size([64]) torch.int64
 </pre></div>
 </div>
 <p><a class="reference external" href="data_tutorial.html">PyTorch에서 데이터를 불러오는 방법</a> 을 자세히 알아보세요.</p>
@@ -550,78 +556,78 @@ NeuralNetwork(
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Epoch 1
 -------------------------------
-loss: 2.295211  [    0/60000]
-loss: 2.284395  [ 6400/60000]
-loss: 2.265383  [12800/60000]
-loss: 2.261899  [19200/60000]
-loss: 2.237997  [25600/60000]
-loss: 2.207066  [32000/60000]
-loss: 2.224948  [38400/60000]
-loss: 2.181812  [44800/60000]
-loss: 2.184829  [51200/60000]
-loss: 2.141422  [57600/60000]
+loss: 2.303634  [    0/60000]
+loss: 2.281419  [ 6400/60000]
+loss: 2.262224  [12800/60000]
+loss: 2.253071  [19200/60000]
+loss: 2.215731  [25600/60000]
+loss: 2.202008  [32000/60000]
+loss: 2.208793  [38400/60000]
+loss: 2.169434  [44800/60000]
+loss: 2.175368  [51200/60000]
+loss: 2.133471  [57600/60000]
 Test Error:
- Accuracy: 44.1%, Avg loss: 2.138473
+ Accuracy: 47.2%, Avg loss: 2.126842
 
 Epoch 2
 -------------------------------
-loss: 2.152499  [    0/60000]
-loss: 2.141812  [ 6400/60000]
-loss: 2.086017  [12800/60000]
-loss: 2.102535  [19200/60000]
-loss: 2.044491  [25600/60000]
-loss: 1.986190  [32000/60000]
-loss: 2.016856  [38400/60000]
-loss: 1.930973  [44800/60000]
-loss: 1.947213  [51200/60000]
-loss: 1.859143  [57600/60000]
+loss: 2.147639  [    0/60000]
+loss: 2.123496  [ 6400/60000]
+loss: 2.064095  [12800/60000]
+loss: 2.078091  [19200/60000]
+loss: 1.988038  [25600/60000]
+loss: 1.951345  [32000/60000]
+loss: 1.973126  [38400/60000]
+loss: 1.887740  [44800/60000]
+loss: 1.906288  [51200/60000]
+loss: 1.812276  [57600/60000]
 Test Error:
- Accuracy: 55.3%, Avg loss: 1.862441
+ Accuracy: 49.3%, Avg loss: 1.817082
 
 Epoch 3
 -------------------------------
-loss: 1.903413  [    0/60000]
-loss: 1.872524  [ 6400/60000]
-loss: 1.753855  [12800/60000]
-loss: 1.794951  [19200/60000]
-loss: 1.675161  [25600/60000]
-loss: 1.632720  [32000/60000]
-loss: 1.653912  [38400/60000]
-loss: 1.546782  [44800/60000]
-loss: 1.584031  [51200/60000]
-loss: 1.472300  [57600/60000]
+loss: 1.868756  [    0/60000]
+loss: 1.821610  [ 6400/60000]
+loss: 1.706918  [12800/60000]
+loss: 1.743565  [19200/60000]
+loss: 1.609101  [25600/60000]
+loss: 1.592633  [32000/60000]
+loss: 1.608342  [38400/60000]
+loss: 1.521914  [44800/60000]
+loss: 1.548279  [51200/60000]
+loss: 1.438821  [57600/60000]
 Test Error:
- Accuracy: 60.9%, Avg loss: 1.489272
+ Accuracy: 61.0%, Avg loss: 1.460211
 
 Epoch 4
 -------------------------------
-loss: 1.563166  [    0/60000]
-loss: 1.527206  [ 6400/60000]
-loss: 1.372134  [12800/60000]
-loss: 1.449222  [19200/60000]
-loss: 1.325124  [25600/60000]
-loss: 1.324858  [32000/60000]
-loss: 1.339672  [38400/60000]
-loss: 1.253078  [44800/60000]
-loss: 1.298479  [51200/60000]
-loss: 1.204793  [57600/60000]
+loss: 1.538985  [    0/60000]
+loss: 1.496307  [ 6400/60000]
+loss: 1.354269  [12800/60000]
+loss: 1.423324  [19200/60000]
+loss: 1.290872  [25600/60000]
+loss: 1.315079  [32000/60000]
+loss: 1.323546  [38400/60000]
+loss: 1.259725  [44800/60000]
+loss: 1.286838  [51200/60000]
+loss: 1.195238  [57600/60000]
 Test Error:
- Accuracy: 63.7%, Avg loss: 1.223393
+ Accuracy: 64.3%, Avg loss: 1.215341
 
 Epoch 5
 -------------------------------
-loss: 1.302596  [    0/60000]
-loss: 1.286011  [ 6400/60000]
-loss: 1.114192  [12800/60000]
-loss: 1.230416  [19200/60000]
-loss: 1.104935  [25600/60000]
-loss: 1.128849  [32000/60000]
-loss: 1.150323  [38400/60000]
-loss: 1.076418  [44800/60000]
-loss: 1.125954  [51200/60000]
-loss: 1.051389  [57600/60000]
+loss: 1.296602  [    0/60000]
+loss: 1.271514  [ 6400/60000]
+loss: 1.113367  [12800/60000]
+loss: 1.219095  [19200/60000]
+loss: 1.084190  [25600/60000]
+loss: 1.129875  [32000/60000]
+loss: 1.146607  [38400/60000]
+loss: 1.091371  [44800/60000]
+loss: 1.123528  [51200/60000]
+loss: 1.047675  [57600/60000]
 Test Error:
- Accuracy: 65.0%, Avg loss: 1.063200
+ Accuracy: 65.8%, Avg loss: 1.061192
 
 Done!
 </pre></div>
@@ -676,7 +682,7 @@ Done!
 </pre></div>
 </div>
 <p><a class="reference external" href="saveloadrun_tutorial.html">모델을 저장하고 불러오는 방법</a> 을 자세히 알아보세요.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 1 minutes  3.017 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  36.271 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-beginner-basics-quickstart-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <a class="reference download internal" download="" href="../../_downloads/a84ee0640567809c479fd3ec231cf1df/quickstart_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">quickstart_tutorial.py</span></code></a></div>

@@ -217,6 +217,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../beginner/Intro_to_TorchScript_tutorial.html">TorchScript 소개</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_export.html">C++에서 TorchScript 모델 로딩하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/super_resolution_with_onnxruntime.html">(선택) PyTorch 모델을 ONNX으로 변환하고 ONNX 런타임에서 실행하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="realtime_rpi.html">Real Time Inference on Raspberry Pi 4 (30 fps!)</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Code Transforms with FX</span></p>
 <ul>
@@ -260,6 +261,8 @@
 <li class="toctree-l1"><a class="reference internal" href="model_parallel_tutorial.html">단일 머신을 사용한 모델 병렬화 모범 사례</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ddp_tutorial.html">분산 데이터 병렬 처리 시작하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dist_tuto.html">PyTorch로 분산 어플리케이션 개발하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="FSDP_tutorial.html">Getting Started with Fully Sharded Data Parallel(FSDP)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="process_group_cpp_extension_tutorial.html">Customize Process Group Backends Using Cpp Extensions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rpc_tutorial.html">Getting Started with Distributed RPC Framework</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rpc_param_server_tutorial.html">Implementing a Parameter Server Using Distributed RPC Framework</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dist_pipeline_parallel_tutorial.html">Distributed Pipeline Parallelism Using RPC</a></li>
@@ -273,6 +276,10 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/deeplabv3_on_ios.html">iOS에서의 이미지 분할 DeepLapV3</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/deeplabv3_on_android.html">안드로이드에서의 이미지 분할 DeepLapV3</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Recommendation Systems</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="torchrec_tutorial.html">Introduction to TorchRec</a></li>
 </ul>
 
             
@@ -492,29 +499,29 @@ Tensor를 반환하는지 확인하면 됩니다.  (먼저 <cite>../_static/img/
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor([[[[ 0.4508,  0.4166,  0.3994,  ..., -1.3473, -1.3302, -1.3473],
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor([[[[ 0.4508,  0.4166,  0.3994,  ..., -1.3473, -1.3473, -1.3473],
           [ 0.5364,  0.4851,  0.4508,  ..., -1.2959, -1.3130, -1.3302],
-          [ 0.7077,  0.6392,  0.6049,  ..., -1.2959, -1.3302, -1.3644],
+          [ 0.7248,  0.6392,  0.6049,  ..., -1.2959, -1.3302, -1.3644],
           ...,
-          [ 1.3755,  1.3927,  1.4098,  ...,  1.1700,  1.3584,  1.6667],
+          [ 1.3584,  1.3755,  1.4098,  ...,  1.1700,  1.3584,  1.6667],
           [ 1.8893,  1.7694,  1.4440,  ...,  1.2899,  1.4783,  1.5468],
           [ 1.6324,  1.8379,  1.8379,  ...,  1.4783,  1.7352,  1.4612]],
 
-         [[ 0.5728,  0.5378,  0.5203,  ..., -1.3704, -1.3529, -1.3529],
-          [ 0.6604,  0.6078,  0.5728,  ..., -1.3004, -1.3179, -1.3354],
+         [[ 0.5728,  0.5378,  0.5203,  ..., -1.3529, -1.3529, -1.3529],
+          [ 0.6604,  0.6078,  0.5728,  ..., -1.3004, -1.3354, -1.3529],
           [ 0.8529,  0.7654,  0.7304,  ..., -1.3004, -1.3354, -1.3704],
           ...,
           [ 1.4657,  1.4657,  1.4832,  ...,  1.3256,  1.5357,  1.8508],
           [ 2.0084,  1.8683,  1.5182,  ...,  1.4657,  1.6583,  1.7283],
           [ 1.7458,  1.9384,  1.9209,  ...,  1.6583,  1.9209,  1.6408]],
 
-         [[ 0.7228,  0.6879,  0.6531,  ..., -1.6476, -1.6302, -1.6476],
-          [ 0.8099,  0.7576,  0.7228,  ..., -1.6476, -1.6476, -1.6650],
-          [ 1.0017,  0.9145,  0.8797,  ..., -1.6476, -1.6650, -1.6999],
+         [[ 0.7228,  0.6879,  0.6531,  ..., -1.6476, -1.6302, -1.6302],
+          [ 0.8099,  0.7576,  0.7228,  ..., -1.6302, -1.6302, -1.6476],
+          [ 1.0017,  0.9145,  0.8797,  ..., -1.6650, -1.6650, -1.6999],
           ...,
           [ 1.6291,  1.6291,  1.6465,  ...,  1.6291,  1.8208,  2.1346],
-          [ 2.1868,  2.0300,  1.6814,  ...,  1.7685,  1.9428,  2.0125],
-          [ 1.9254,  2.0997,  2.0823,  ...,  1.9428,  2.2043,  1.9080]]]])
+          [ 2.1694,  2.0300,  1.6814,  ...,  1.7685,  1.9428,  2.0125],
+          [ 1.9254,  2.0997,  2.0823,  ...,  1.9428,  2.2043,  1.9254]]]])
 </pre></div>
 </div>
 </div>
@@ -707,7 +714,7 @@ UI를 추가할 수도 있습니다. 비슷한 프로젝트의 <a class="referen
 <li>마지막으로 이 문서 상단에 링크된, PyTorch 모델을 배포하는 다른 튜토리얼들을
 읽어보는 것을 권장합니다.</li>
 </ul>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  9.111 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  3.285 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-intermediate-flask-rest-api-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <a class="reference download internal" download="" href="../_downloads/0cf2a99068f111983bb22c168599f848/flask_rest_api_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">flask_rest_api_tutorial.py</span></code></a></div>

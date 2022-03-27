@@ -59,8 +59,8 @@ loss = torch.nn.functional.binary_cross_entropy_with_logits(z, y)
 # 에서 찾아볼 수 있습니다.
 #
 
-print('Gradient function for z =', z.grad_fn)
-print('Gradient function for loss =', loss.grad_fn)
+print(f"Gradient function for z = {z.grad_fn}")
+print(f"Gradient function for loss = {loss.grad_fn}")
 
 ######################################################################
 # 변화도(Gradient) 계산하기
@@ -185,12 +185,12 @@ print(z_det.requires_grad)
 inp = torch.eye(5, requires_grad=True)
 out = (inp+1).pow(2)
 out.backward(torch.ones_like(inp), retain_graph=True)
-print("First call\n", inp.grad)
+print(f"First call\n{inp.grad}")
 out.backward(torch.ones_like(inp), retain_graph=True)
-print("\nSecond call\n", inp.grad)
+print(f"\nSecond call\n{inp.grad}")
 inp.grad.zero_()
 out.backward(torch.ones_like(inp), retain_graph=True)
-print("\nCall after zeroing gradients\n", inp.grad)
+print(f"\nCall after zeroing gradients\n{inp.grad}")
 
 
 ######################################################################
