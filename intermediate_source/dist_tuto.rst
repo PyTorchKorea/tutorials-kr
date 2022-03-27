@@ -135,7 +135,7 @@ PyTorch에 포함된 분산 패키지(예. ``torch.distributed``)는 연구자�
         req.wait()
         print('Rank ', rank, ' has data ', tensor[0])
 
-즉시 응답하는 함수들을 사용할 때는 보내고 받는 Tensor에 대한 사용법에 주의해야 합니다.
+즉시 응답하는 함수들을 사용할 때는 Tensor를 어떻게 주고 받을지를 주의해야 합니다.
 데이터가 언제 다른 프로세스로 송수신되는지 모르기 때문에, ``req.wait()`` 가 완료되기
 전에는 전송된 Tensor를 수정하거나 수신된 Tensor에 접근해서는 안됩니다.
 
@@ -145,7 +145,7 @@ PyTorch에 포함된 분산 패키지(예. ``torch.distributed``)는 연구자�
 그러나, ``req.wait()`` 를 실행한 후에는 통신이 이루어진 것을 보장받을 수 있기 때문에,
 ``tensor[0]`` 에 저장된 값은 1.0이 됩니다.
 
-점-대-점 간 통신은 프로세스 간 통신에 대한 세밀한 제어를 원할 때 유용합니다.
+점-대-점 간 통신은 프로세스 간 통신에 대한 더 세밀한 제어를 원할 때 유용합니다.
 `바이두(Baidu)의 DeepSpeech <https://github.com/baidu-research/baidu-allreduce>`__ 나
 `페이스북(Facebook)의 대규모 실험 <https://research.fb.com/publications/imagenet1kin1h/>`__
 에서 사용하는 것과 같은 멋진 알고리즘을 구현할 때 사용할 수 있습니다.
@@ -568,6 +568,6 @@ CUDA IPC와 GPU Direct 기술을 활용하고 있습니다.
 
 PyTorch 개발자분들께 구현, 문서화 및 테스트를 잘해주신 것에 감사드립니다. 코드가
 불분명할 때는 언제나 `문서 <https://pytorch.org/docs/stable/distributed.html>`__
-또는 `테스트 <https://github.com/pytorch/pytorch/blob/master/test/test_distributed.py>`__
+또는 `테스트 <https://github.com/pytorch/pytorch/tree/master/test/distributed>`__
 에서 답을 찾을 수 있었습니다. 또한 튜토리얼 초안에 대해 통찰력있는 의견과 질문에
 답변을 해주신 Soumith Chintala, Adam Paszke 그리고 Natalia Gimelshei께도 감사드립니다.

@@ -38,6 +38,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.optim import lr_scheduler
+import torch.backends.cudnn as cudnn
 import numpy as np
 import torchvision
 from torchvision import datasets, models, transforms
@@ -46,6 +47,7 @@ import time
 import os
 import copy
 
+cudnn.benchmark = True
 plt.ion()   # 대화형 모드
 
 ######################################################################
@@ -143,7 +145,7 @@ def train_model(model, criterion, optimizer, scheduler, num_epochs=25):
     best_acc = 0.0
 
     for epoch in range(num_epochs):
-        print('Epoch {}/{}'.format(epoch, num_epochs - 1))
+        print(f'Epoch {epoch}/{num_epochs - 1}')
         print('-' * 10)
 
         # 각 에폭(epoch)은 학습 단계와 검증 단계를 갖습니다.
@@ -185,8 +187,7 @@ def train_model(model, criterion, optimizer, scheduler, num_epochs=25):
             epoch_loss = running_loss / dataset_sizes[phase]
             epoch_acc = running_corrects.double() / dataset_sizes[phase]
 
-            print('{} Loss: {:.4f} Acc: {:.4f}'.format(
-                phase, epoch_loss, epoch_acc))
+            print(f'{phase} Loss: {epoch_loss:.4f} Acc: {epoch_acc:.4f}')
 
             # 모델을 깊은 복사(deep copy)함
             if phase == 'val' and epoch_acc > best_acc:
@@ -196,9 +197,8 @@ def train_model(model, criterion, optimizer, scheduler, num_epochs=25):
         print()
 
     time_elapsed = time.time() - since
-    print('Training complete in {:.0f}m {:.0f}s'.format(
-        time_elapsed // 60, time_elapsed % 60))
-    print('Best val Acc: {:4f}'.format(best_acc))
+    print(f'Training complete in {time_elapsed // 60:.0f}m {time_elapsed % 60:.0f}s')
+    print(f'Best val Acc: {best_acc:4f}')
 
     # 가장 나은 모델 가중치를 불러옴
     model.load_state_dict(best_model_wts)
@@ -230,7 +230,7 @@ def visualize_model(model, num_images=6):
                 images_so_far += 1
                 ax = plt.subplot(num_images//2, 2, images_so_far)
                 ax.axis('off')
-                ax.set_title('predicted: {}'.format(class_names[preds[j]]))
+                ax.set_title(f'predicted: {class_names[preds[j]]}')
                 imshow(inputs.cpu().data[j])
 
                 if images_so_far == num_images:

@@ -18,30 +18,35 @@ torchtext 라이브러리로 텍스트 분류하기
 #
 # torchtext 라이브러리는 가공되지 않은 텍스트 문장들을 만드는(yield) 몇 가지 기초 데이터셋 반복자(raw dataset iterator)를 제공합니다.
 # 예를 들어, ``AG_NEWS`` 데이터셋 반복자는 레이블(label)과 문장의 튜플(tuple) 형태로 가공되지 않은 데이터를 만듭니다.
+#
+# torchtext 데이터셋에 접근하기 전에, https://github.com/pytorch/data 을 참고하여 torchdata를
+# 설치하시기 바랍니다.
+#
 
 import torch
 from torchtext.datasets import AG_NEWS
-train_iter = AG_NEWS(split='train')
+train_iter = iter(AG_NEWS(split='train'))
 
 ######################################################################
 # ::
 #
 #     next(train_iter)
-#     >>> (3, "Wall St. Bears Claw Back Into the Black (Reuters) Reuters -
-#     Short-sellers, Wall Street's dwindling\\band of ultra-cynics, are seeing green
-#     again.")
+#     >>> (3, "Fears for T N pension after talks Unions representing workers at Turner
+#     Newall say they are 'disappointed' after talks with stricken parent firm Federal
+#     Mogul.")
 #
 #     next(train_iter)
-#     >>> (3, 'Carlyle Looks Toward Commercial Aerospace (Reuters) Reuters - Private
-#     investment firm Carlyle Group,\\which has a reputation for making well-timed
-#     and occasionally\\controversial plays in the defense industry, has quietly
-#     placed\\its bets on another part of the market.')
+#     >>> (4, "The Race is On: Second Private Team Sets Launch Date for Human
+#     Spaceflight (SPACE.com) SPACE.com - TORONTO, Canada -- A second\\team of
+#     rocketeers competing for the  #36;10 million Ansari X Prize, a contest
+#     for\\privately funded suborbital space flight, has officially announced
+#     the first\\launch date for its manned rocket.")
 #
 #     next(train_iter)
-#     >>> (3, "Oil and Economy Cloud Stocks' Outlook (Reuters) Reuters - Soaring
-#     crude prices plus worries\\about the economy and the outlook for earnings are
-#     expected to\\hang over the stock market next week during the depth of
-#     the\\summer doldrums.")
+#     >>> (4, 'Ky. Company Wins Grant to Study Peptides (AP) AP - A company founded
+#     by a chemistry researcher at the University of Louisville won a grant to develop
+#     a method of producing better peptides, which are short chains of amino acids, the
+#     building blocks of proteins.')
 #
 
 ######################################################################
@@ -75,7 +80,7 @@ vocab.set_default_index(vocab["<unk>"])
 # ::
 #
 #     vocab(['here', 'is', 'an', 'example'])
-#     >>> [475, 21, 30, 5286]
+#     >>> [475, 21, 30, 5297]
 #
 # 토크나이저와 어휘집을 갖춘 텍스트 처리 파이프라인을 준비합니다.
 # 텍스트 파이프라인과 레이블(label) 파이프라인은 데이터셋 반복자로부터 얻어온 가공되지 않은 문장 데이터를 처리하기 위해 사용됩니다.
@@ -91,7 +96,7 @@ label_pipeline = lambda x: int(x) - 1
 # ::
 #
 #     text_pipeline('here is the an example')
-#     >>> [475, 21, 2, 30, 5286]
+#     >>> [475, 21, 2, 30, 5297]
 #     label_pipeline('10')
 #     >>> 9
 #

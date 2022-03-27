@@ -4,7 +4,7 @@
 
 **Author**: `Pritam Damania <https://github.com/pritamdamania87>`_
   **번역**: `백선희 <https://github.com/spongebob03>`_
-  
+
 이 튜토리얼은 `분산 데이터 병렬처리(Distributed Data Parallel) <https://pytorch.org/docs/stable/generated/torch.nn.parallel.DistributedDataParallel.html>`__ 와
 `병렬 처리 파이프라인 <https://pytorch.org/docs/stable/pipeline.html>`__
 를 사용하여 여러 GPU에 걸친 거대한 트랜스포머(Transformer) 모델을 어떻게 학습시키는지 보여줍니다.
@@ -26,7 +26,7 @@
 #
 
 ######################################################################
-# ``PositionalEncoding`` 모듈은 시퀀스에서 토큰의 상대적, 절대적 위치에 대한 
+# ``PositionalEncoding`` 모듈은 시퀀스에서 토큰의 상대적, 절대적 위치에 대한
 # 몇몇 정보를 주입합니다.
 # 위치 인코딩은 임베딩과 같은 차원을 가지므로
 # 둘을 합칠 수 있습니다. 여기서, 주파수가 다른 ``sine`` 과 ``cosine`` 함수를
@@ -61,10 +61,10 @@ class PositionalEncoding(nn.Module):
 
 
 ######################################################################
-# 이번 튜토리얼에서는, 트랜스포머 모델을 두 개의 GPU에 걸쳐서 나누고  
+# 이번 튜토리얼에서는, 트랜스포머 모델을 두 개의 GPU에 걸쳐서 나누고
 # 병렬 처리 파이프라인으로 학습시켜 보겠습니다. 추가로,
 # `분산 데이터 병렬 처리 <https://pytorch.org/docs/stable/generated/torch.nn.parallel.DistributedDataParallel.html>`__
-# 를 사용하여 이 파이프라인의 두 복제를 훈련시킵니다. 한 프로세스는 
+# 를 사용하여 이 파이프라인의 두 복제를 훈련시킵니다. 한 프로세스는
 # GPUs 0, 1에 거쳐 파이프를 구동하고 다른 프로세스는 GPUs 2, 3에서 파이프를 구동합니다. 그 다음, 이 두
 # 프로세스는 분산 데이터 병렬처리로 두 복제본(replica)을 학습시킵니다.
 # 모델은 바로 `nn.Transformer 와 TorchText 로 시퀀스-투-시퀀스(Sequence-to-Sequence) 모델링하기
@@ -138,9 +138,10 @@ def run_worker(rank, world_size):
 # ---------------------------
 #
 
-
 ######################################################################
 # 학습 프로세스는 ``torchtext`` 의 Wikitext-2 데이터셋을 사용합니다.
+# torchtext 데이터셋에 접근하기 전에, https://github.com/pytorch/data 을 참고하여 torchdata를
+# 설치하시기 바랍니다.
 # 단어 오브젝트는 훈련 데이터셋으로 만들어지고, 토큰을 텐서(tensor)로 수치화하는데 사용됩니다.
 # 시퀀스 데이터로부터 시작하여, ``batchify()`` 함수는 데이터셋을 열(column)들로 정리하고,
 # ``batch_size`` 사이즈의 배치들로 나눈 후에 남은 모든 토큰을 버립니다.
@@ -223,7 +224,7 @@ def run_worker(rank, world_size):
 #
 # .. image:: ../_static/img/transformer_input_target.png
 #
-# 청크가 차원 0에 속하며 
+# 청크가 차원 0에 속하며
 # 트랜스포머 모델의 ``S`` 차원과 일치한다는 것을 유의해야 합니다.
 # 배치 차원 ``N`` 은 1 차원에 해당합니다.
 #
@@ -246,7 +247,7 @@ def run_worker(rank, world_size):
 ######################################################################
 # 병렬 처리 파이프라인을 활용한 대형 트랜스포머 모델 학습을 보이기 위해,
 # 트랜스포머 계층 규모를 적절히 확장시킵니다.
-# 4096차원의 임베딩 벡터, 4096의 은닉 사이즈, 16개의 어텐션 헤드(attention head)와 총 8 개의 
+# 4096차원의 임베딩 벡터, 4096의 은닉 사이즈, 16개의 어텐션 헤드(attention head)와 총 8 개의
 # 트랜스포머 계층 (``nn.TransformerEncoderLayer``)를 사용합니다. 이는 최대
 # **~1 억** 개의 파라미터를 갖는 모델을 생성합니다.
 #

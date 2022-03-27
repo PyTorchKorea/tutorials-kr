@@ -353,6 +353,13 @@
    :tags: Frontend-APIs,TorchScript,C++
 
 .. customcarditem::
+   :header: Real Time Inference on Raspberry Pi 4
+   :card_description: This tutorial covers how to run quantized and fused models on a Raspberry Pi 4 at 30 fps.
+   :image: _static/img/thumbnails/cropped/realtime_rpi.png
+   :link: intermediate/realtime_rpi.html
+   :tags: TorchScript,Model Optimization,Image/Video,Quantization
+
+.. customcarditem::
    :header: Autograd in C++ Frontend
    :card_description: The autograd package helps build flexible and dynamic nerural netorks. In this tutorial, exploreseveral examples of doing autograd in PyTorch C++ frontend
    :image: _static/img/thumbnails/cropped/Autograd-in-Cpp-Frontend.png
@@ -497,6 +504,13 @@
    :tags: Parallel-and-Distributed-Training
 
 .. customcarditem::
+   :header: Customize Process Group Backends Using Cpp Extensions
+   :card_description: Extend ProcessGroup with custom collective communication implementations.
+   :image: _static/img/thumbnails/cropped/Customize-Process-Group-Backends-Using-Cpp-Extensions.png
+   :link: intermediate/process_group_cpp_extension_tutorial.html
+   :tags: Parallel-and-Distributed-Training
+
+.. customcarditem::
    :header: Getting Started with Distributed RPC Framework
    :card_description: Learn how to build distributed training using the torch.distributed.rpc package.
    :image: _static/img/thumbnails/cropped/Getting Started with Distributed-RPC-Framework.png
@@ -545,6 +559,13 @@
    :link: advanced/ddp_pipeline.html
    :tags: Parallel-and-Distributed-Training
 
+.. customcarditem::
+   :header: Getting Started with Fully Sharded Data Parallel(FSDP)
+   :card_description: Learn how to train models with Fully Sharded Data Parallel package.
+   :image: _static/img/thumbnails/cropped/Getting Started with FSDP.png
+   :link: intermediate/FSDP_tutorial.html
+   :tags: Parallel-and-Distributed-Training
+
 .. Mobile
 
 .. customcarditem::
@@ -560,6 +581,14 @@
    :image: _static/img/thumbnails/cropped/android.png
    :link: beginner/deeplabv3_on_android.html
    :tags: Mobile
+
+.. Recommendation Systems
+.. customcarditem::
+   :header: Introduction to TorchRec
+   :card_description: TorchRec is a PyTorch domain library built to provide common sparsity & parallelism primitives needed for large-scale recommender systems.
+   :image: _static/img/thumbnails/torchrec.png
+   :link: intermediate/torchrec_tutorial.html
+   :tags: TorchRec,Recommender
 
 .. End of tutorial card section
 
@@ -747,6 +776,7 @@
    beginner/Intro_to_TorchScript_tutorial
    advanced/cpp_export
    advanced/super_resolution_with_onnxruntime
+   intermediate/realtime_rpi
 
 .. toctree::
    :maxdepth: 2
@@ -810,6 +840,8 @@
    intermediate/model_parallel_tutorial
    intermediate/ddp_tutorial
    intermediate/dist_tuto
+   intermediate/FSDP_tutorial
+   intermediate/process_group_cpp_extension_tutorial
    intermediate/rpc_tutorial
    intermediate/rpc_param_server_tutorial
    intermediate/dist_pipeline_parallel_tutorial
@@ -827,3 +859,11 @@
 
    beginner/deeplabv3_on_ios
    beginner/deeplabv3_on_android
+
+.. toctree::
+   :maxdepth: 2
+   :includehidden:
+   :hidden:
+   :caption: Recommendation Systems
+
+   intermediate/torchrec_tutorial

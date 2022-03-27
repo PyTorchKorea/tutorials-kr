@@ -36,8 +36,8 @@ from torchvision import datasets, transforms
 # `torch.cuda <https://pytorch.org/docs/stable/notes/cuda.html>`_ 를 사용할 수 있는지
 # 확인하고 그렇지 않으면 CPU를 계속 사용합니다.
 
-device = 'cuda' if torch.cuda.is_available() else 'cpu'
-print(f'Using {device} device')
+device = "cuda" if torch.cuda.is_available() else "cpu"
+print(f"Using {device} device")
 
 ##############################################
 # 클래스 정의하기
@@ -176,7 +176,7 @@ pred_probab = softmax(logits)
 #
 
 
-print("Model structure: ", model, "\n\n")
+print(f"Model structure: {model}\n\n")
 
 for name, param in model.named_parameters():
     print(f"Layer: {name} | Size: {param.size()} | Values : {param[:2]} \n")

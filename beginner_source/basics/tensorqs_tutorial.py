@@ -112,7 +112,7 @@ print(f"Device tensor is stored on: {tensor.device}")
 
 # GPU가 존재하면 텐서를 이동합니다
 if torch.cuda.is_available():
-    tensor = tensor.to('cuda')
+    tensor = tensor.to("cuda")
 
 
 ######################################################################
@@ -124,9 +124,9 @@ if torch.cuda.is_available():
 # **NumPy식의 표준 인덱싱과 슬라이싱:**
 
 tensor = torch.ones(4, 4)
-print('First row: ', tensor[0])
-print('First column: ', tensor[:, 0])
-print('Last column:', tensor[..., -1])
+print(f"First row: {tensor[0]}")
+print(f"First column: {tensor[:, 0]}")
+print(f"Last column: {tensor[..., -1]}")
 tensor[:,1] = 0
 print(tensor)
 
@@ -171,7 +171,7 @@ print(agg_item, type(agg_item))
 # 연산 결과를 피연산자(operand)에 저장하는 연산을 바꿔치기 연산이라고 부르며, ``_`` 접미사를 갖습니다.
 # 예를 들어: ``x.copy_(y)`` 나 ``x.t_()`` 는 ``x`` 를 변경합니다.
 
-print(tensor, "\n")
+print(f"{tensor} \n")
 tensor.add_(5)
 print(tensor)
 

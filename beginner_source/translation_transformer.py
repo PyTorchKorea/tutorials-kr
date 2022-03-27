@@ -2,9 +2,10 @@
 nn.Transformer와 torchtext로 언어 번역하기
 ======================================================
 
-- 이 튜토리얼에서는 Transformer(트랜스포머)를 사용한 번역 모델을 바닥부터 학습하는 방법을 배워보겠습니다.
-- `Multi30k <http://www.statmt.org/wmt16/multimodal-task.html#task1>`__
-  데이터셋을 사용하여 독일어(German)를 영어(English)로 번역하는 모델을 학습해보겠습니다.
+이 튜토리얼에서는,
+    - Transformer(트랜스포머)를 사용한 번역 모델을 바닥부터 학습하는 방법을 배워보겠습니다.
+    - `Multi30k <http://www.statmt.org/wmt16/multimodal-task.html#task1>`__
+      데이터셋을 사용하여 독일어(German)를 영어(English)로 번역하는 모델을 학습해보겠습니다.
 """
 
 ######################################################################
@@ -19,6 +20,7 @@ nn.Transformer와 torchtext로 언어 번역하기
 # `torchtext 라이브러리의 Multi30k 데이터셋 <https://pytorch.org/text/stable/datasets.html#multi30k>`__
 # 을 사용하겠습니다.
 #
+# torchtext 데이터셋에 접근하기 전에, https://github.com/pytorch/data 을 참고하여 torchdata를 설치하시기 바랍니다.
 #
 
 from torchtext.data.utils import get_tokenizer
