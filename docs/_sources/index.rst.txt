@@ -613,7 +613,7 @@
 .. customcalloutitem::
    :header: (비공식) 한국어 튜토리얼 저장소(GitHub)
    :description: GitHub에서 (비공식) 한국어 튜토리얼을 만나보세요.
-   :button_link: https://github.com/9bow/PyTorch-tutorials-kr
+   :button_link: https://github.com/PyTorchKorea/tutorials-kr
    :button_text: Go To GitHub
 
 .. customcalloutitem::

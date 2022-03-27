@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>(beta) Static Quantization with Eager Mode in PyTorch &mdash; PyTorch Tutorials 1.10.2+cu102 documentation</title>
+  <title>(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화 &mdash; PyTorch Tutorials 1.11.0+cu102 documentation</title>
   
 
   
@@ -113,7 +113,7 @@
               
               
                 <div class="version">
-                  1.10.2+cu102
+                  1.11.0+cu102
                 </div>
               
             
@@ -209,7 +209,7 @@
 <p class="caption"><span class="caption-text">강화학습</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/reinforcement_q_learning.html">강화 학습 (DQN) 튜토리얼</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/mario_rl_tutorial.html">Train a Mario-playing RL Agent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/mario_rl_tutorial.html">마리오 게임 RL 에이전트로 학습하기</a></li>
 </ul>
 <p class="caption"><span class="caption-text">PyTorch 모델을 프로덕션 환경에 배포하기</span></p>
 <ul>
@@ -252,7 +252,7 @@
 <li class="toctree-l1"><a class="reference internal" href="dynamic_quantization_tutorial.html">(베타) LSTM 기반 단어 단위 언어 모델의 동적 양자화</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/quantized_transfer_learning_tutorial.html">(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">(beta) Static Quantization with Eager Mode in PyTorch</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화</a></li>
 </ul>
 <p class="caption"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul>
@@ -313,7 +313,7 @@
       </li>
 
         
-      <li>(beta) Static Quantization with Eager Mode in PyTorch</li>
+      <li>(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화</li>
     
     
       <li class="pytorch-breadcrumbs-aside">
@@ -367,24 +367,24 @@
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <div class="section" id="beta-static-quantization-with-eager-mode-in-pytorch">
-<h1>(beta) Static Quantization with Eager Mode in PyTorch<a class="headerlink" href="#beta-static-quantization-with-eager-mode-in-pytorch" title="Permalink to this headline">¶</a></h1>
-<p><strong>Author</strong>: <a class="reference external" href="https://github.com/raghuramank100">Raghuraman Krishnamoorthi</a>
-<strong>Edited by</strong>: <a class="reference external" href="https://github.com/SethHWeidman/">Seth Weidman</a>, <a class="reference external" href="https:github.com/jerryzh168">Jerry Zhang</a></p>
-<p>This tutorial shows how to do post-training static quantization, as well as illustrating
-two more advanced techniques - per-channel quantization and quantization-aware training -
-to further improve the model’s accuracy. Note that quantization is currently only supported
-for CPUs, so we will not be utilizing GPUs / CUDA in this tutorial.
-By the end of this tutorial, you will see how quantization in PyTorch can result in
-significant decreases in model size while increasing speed. Furthermore, you’ll see how
-to easily apply some advanced quantization techniques shown
-<a class="reference external" href="https://arxiv.org/abs/1806.08342">here</a> so that your quantized models take much less
-of an accuracy hit than they would otherwise.
-Warning: we use a lot of boilerplate code from other PyTorch repos to, for example,
-define the <code class="docutils literal notranslate"><span class="pre">MobileNetV2</span></code> model archtecture, define data loaders, and so on. We of course
-encourage you to read it; but if you want to get to the quantization features, feel free
-to skip to the “4. Post-training static quantization” section.
-We’ll start by doing the necessary imports:</p>
+  <div class="section" id="pytorch-eager-mode">
+<h1>(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화<a class="headerlink" href="#pytorch-eager-mode" title="Permalink to this headline">¶</a></h1>
+<p><strong>저자</strong>: <a class="reference external" href="https://github.com/raghuramank100">Raghuraman Krishnamoorthi</a>
+<strong>편집</strong>: <a class="reference external" href="https://github.com/SethHWeidman/">Seth Weidman</a>, <a class="reference external" href="https:github.com/jerryzh168">Jerry Zhang</a>
+<strong>번역</strong>: <a class="reference external" href="https://github.com/des00">김현길</a>, <a class="reference external" href="https://github.com/potatochips178/">Choi Yoonjeong</a></p>
+<p>이 튜토리얼에서는 어떻게 학습 후 정적 양자화(post-training static quantization)를 하는지 보여주며,
+모델의 정확도(accuracy)을 더욱 높이기 위한 두 가지 고급 기술인 채널별 양자화(per-channel quantization)와
+양자화 자각 학습(quantization-aware training)도 살펴봅니다. 현재 양자화는 CPU만 지원하기에,
+이 튜토리얼에서는 GPU/ CUDA를 이용하지 않습니다.
+이 튜토리얼을 끝내면 PyTorch에서 양자화가 어떻게 속도는 향상시키면서 모델 사이즈를 큰 폭으로 줄이는지
+확인할 수 있습니다. 게다가 <a class="reference external" href="https://arxiv.org/abs/1806.08342">여기</a> 에 소개된 몇몇 고급 양자화 기술을
+얼마나 쉽게 적용하는지도 볼 수 있고, 이런 기술들이 다른 양자화 기술들보다 모델의 정확도에 부정적인 영향을
+덜 끼치는 것도 볼 수 있습니다.</p>
+<p>주의: 다른 PyTorch 저장소의 상용구 코드(boilerplate code)를 많이 사용합니다.
+예를 들어 <code class="docutils literal notranslate"><span class="pre">MobileNetV2</span></code> 모델 아키텍처 정의, DataLoader 정의 같은 것들입니다.
+물론 이런 코드들을 읽는 것을 추천하지만, 양자화 특징만 알고 싶다면
+“4. 학습 후 정적 양자화” 부분으로 넘어가도 됩니다.
+필요한 것들을 import 하는 것부터 시작해 봅시다:</p>
 <div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
@@ -397,7 +397,7 @@ We’ll start by doing the necessary imports:</p>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">torch.quantization</span>
 
-<span class="c1"># # Setup warnings</span>
+<span class="c1"># # warnings 설정</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span>
     <span class="n">action</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">,</span>
@@ -409,28 +409,28 @@ We’ll start by doing the necessary imports:</p>
     <span class="n">module</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;torch.quantization&#39;</span>
 <span class="p">)</span>
 
-<span class="c1"># Specify random seed for repeatable results</span>
+<span class="c1"># 반복 가능한 결과를 위한 랜덤 시드 지정하기</span>
 <span class="n">torch</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="mi">191009</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="section" id="model-architecture">
-<h2>1. Model architecture<a class="headerlink" href="#model-architecture" title="Permalink to this headline">¶</a></h2>
-<p>We first define the MobileNetV2 model architecture, with several notable modifications
-to enable quantization:</p>
+<div class="section" id="id3">
+<h2>1. 모델 아키텍처<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
+<p>처음으로 MobileNetV2 모델 아키텍처를 정의합니다.
+이 모델은 양자화를 위한 몇 가지 중요한 변경사항들이 있습니다:</p>
 <ul class="simple">
-<li>Replacing addition with <code class="docutils literal notranslate"><span class="pre">nn.quantized.FloatFunctional</span></code></li>
-<li>Insert <code class="docutils literal notranslate"><span class="pre">QuantStub</span></code> and <code class="docutils literal notranslate"><span class="pre">DeQuantStub</span></code> at the beginning and end of the network.</li>
-<li>Replace ReLU6 with ReLU</li>
+<li>덧셈을 <code class="docutils literal notranslate"><span class="pre">nn.quantized.FloatFunctional</span></code> 으로 교체</li>
+<li>신경망의 처음과 끝에 <code class="docutils literal notranslate"><span class="pre">QuantStub</span></code> 및 <code class="docutils literal notranslate"><span class="pre">DeQuantStub</span></code> 삽입</li>
+<li>ReLU를 ReLU6로 교체</li>
 </ul>
-<p>Note: this code is taken from
-<a class="reference external" href="https://github.com/pytorch/vision/blob/master/torchvision/models/mobilenet.py">here</a>.</p>
+<p>알림: <a class="reference external" href="https://github.com/pytorch/vision/blob/master/torchvision/models/mobilenet.py">여기</a> 에서
+이 코드를 가져왔습니다.</p>
 <div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch.quantization</span> <span class="kn">import</span> <span class="n">QuantStub</span><span class="p">,</span> <span class="n">DeQuantStub</span>
 
 <span class="k">def</span> <span class="nf">_make_divisible</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">divisor</span><span class="p">,</span> <span class="n">min_value</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    This function is taken from the original tf repo.</span>
-<span class="sd">    It ensures that all layers have a channel number that is divisible by 8</span>
-<span class="sd">    It can be seen here:</span>
+<span class="sd">    이 함수는 원본 TensorFlow 저장소에서 가져왔습니다.</span>
+<span class="sd">    모든 계층이 8로 나누어지는 채널 숫자를 가지고 있습니다.</span>
+<span class="sd">    이곳에서 확인 가능합니다:</span>
 <span class="sd">    https://github.com/tensorflow/models/blob/master/research/slim/nets/mobilenet/mobilenet.py</span>
 <span class="sd">    :param v:</span>
 <span class="sd">    :param divisor:</span>
@@ -440,7 +440,7 @@ to enable quantization:</p>
     <span class="k">if</span> <span class="n">min_value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">min_value</span> <span class="o">=</span> <span class="n">divisor</span>
     <span class="n">new_v</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">min_value</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">v</span> <span class="o">+</span> <span class="n">divisor</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">//</span> <span class="n">divisor</span> <span class="o">*</span> <span class="n">divisor</span><span class="p">)</span>
-    <span class="c1"># Make sure that round down does not go down by more than 10%.</span>
+    <span class="c1"># 내림은 10% 넘게 내려가지 않는 것을 보장합니다.</span>
     <span class="k">if</span> <span class="n">new_v</span> <span class="o">&lt;</span> <span class="mf">0.9</span> <span class="o">*</span> <span class="n">v</span><span class="p">:</span>
         <span class="n">new_v</span> <span class="o">+=</span> <span class="n">divisor</span>
     <span class="k">return</span> <span class="n">new_v</span>
@@ -452,7 +452,7 @@ to enable quantization:</p>
         <span class="nb">super</span><span class="p">(</span><span class="n">ConvBNReLU</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="n">in_planes</span><span class="p">,</span> <span class="n">out_planes</span><span class="p">,</span> <span class="n">kernel_size</span><span class="p">,</span> <span class="n">stride</span><span class="p">,</span> <span class="n">padding</span><span class="p">,</span> <span class="n">groups</span><span class="o">=</span><span class="n">groups</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
             <span class="n">nn</span><span class="o">.</span><span class="n">BatchNorm2d</span><span class="p">(</span><span class="n">out_planes</span><span class="p">,</span> <span class="n">momentum</span><span class="o">=</span><span class="mf">0.1</span><span class="p">),</span>
-            <span class="c1"># Replace with ReLU</span>
+            <span class="c1"># ReLU로 교체</span>
             <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="p">)</span>
 
@@ -478,7 +478,7 @@ to enable quantization:</p>
             <span class="n">nn</span><span class="o">.</span><span class="n">BatchNorm2d</span><span class="p">(</span><span class="n">oup</span><span class="p">,</span> <span class="n">momentum</span><span class="o">=</span><span class="mf">0.1</span><span class="p">),</span>
         <span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">conv</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span><span class="o">*</span><span class="n">layers</span><span class="p">)</span>
-        <span class="c1"># Replace torch.add with floatfunctional</span>
+        <span class="c1"># torch.add를 floatfunctional로 교체</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">skip_add</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">quantized</span><span class="o">.</span><span class="n">FloatFunctional</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
@@ -491,13 +491,13 @@ to enable quantization:</p>
 <span class="k">class</span> <span class="nc">MobileNetV2</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_classes</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">width_mult</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">inverted_residual_setting</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">round_nearest</span><span class="o">=</span><span class="mi">8</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        MobileNet V2 main class</span>
+<span class="sd">        MobileNet V2 메인 클래스</span>
 <span class="sd">        Args:</span>
-<span class="sd">            num_classes (int): Number of classes</span>
-<span class="sd">            width_mult (float): Width multiplier - adjusts number of channels in each layer by this amount</span>
-<span class="sd">            inverted_residual_setting: Network structure</span>
-<span class="sd">            round_nearest (int): Round the number of channels in each layer to be a multiple of this number</span>
-<span class="sd">            Set to 1 to turn off rounding</span>
+<span class="sd">            num_classes (int): 클래스 숫자</span>
+<span class="sd">            width_mult (float): 넓이 multiplier - 이 수를 통해 각 계층의 채널 개수를 조절</span>
+<span class="sd">            inverted_residual_setting: 네트워크 구조</span>
+<span class="sd">            round_nearest (int): 각 계층의 채널 숫를 이 숫자의 배수로 반올림</span>
+<span class="sd">            1로 설정하면 반올림 정지</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">MobileNetV2</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="n">block</span> <span class="o">=</span> <span class="n">InvertedResidual</span>
@@ -516,35 +516,35 @@ to enable quantization:</p>
                 <span class="p">[</span><span class="mi">6</span><span class="p">,</span> <span class="mi">320</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
             <span class="p">]</span>
 
-        <span class="c1"># only check the first element, assuming user knows t,c,n,s are required</span>
+        <span class="c1"># 사용자가 t,c,n,s를 필요하다는 것을 안다는 전제하에 첫 번째 요소만 확인</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">inverted_residual_setting</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">inverted_residual_setting</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">!=</span> <span class="mi">4</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;inverted_residual_setting should be non-empty &quot;</span>
                              <span class="s2">&quot;or a 4-element list, got </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">inverted_residual_setting</span><span class="p">))</span>
 
-        <span class="c1"># building first layer</span>
+        <span class="c1"># 첫 번째 계층 만들기</span>
         <span class="n">input_channel</span> <span class="o">=</span> <span class="n">_make_divisible</span><span class="p">(</span><span class="n">input_channel</span> <span class="o">*</span> <span class="n">width_mult</span><span class="p">,</span> <span class="n">round_nearest</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">last_channel</span> <span class="o">=</span> <span class="n">_make_divisible</span><span class="p">(</span><span class="n">last_channel</span> <span class="o">*</span> <span class="nb">max</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">width_mult</span><span class="p">),</span> <span class="n">round_nearest</span><span class="p">)</span>
         <span class="n">features</span> <span class="o">=</span> <span class="p">[</span><span class="n">ConvBNReLU</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">input_channel</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">)]</span>
-        <span class="c1"># building inverted residual blocks</span>
+        <span class="c1"># 역전된 잔차 블럭(inverted residual blocks) 만들기</span>
         <span class="k">for</span> <span class="n">t</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">inverted_residual_setting</span><span class="p">:</span>
             <span class="n">output_channel</span> <span class="o">=</span> <span class="n">_make_divisible</span><span class="p">(</span><span class="n">c</span> <span class="o">*</span> <span class="n">width_mult</span><span class="p">,</span> <span class="n">round_nearest</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
                 <span class="n">stride</span> <span class="o">=</span> <span class="n">s</span> <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">1</span>
                 <span class="n">features</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">block</span><span class="p">(</span><span class="n">input_channel</span><span class="p">,</span> <span class="n">output_channel</span><span class="p">,</span> <span class="n">stride</span><span class="p">,</span> <span class="n">expand_ratio</span><span class="o">=</span><span class="n">t</span><span class="p">))</span>
                 <span class="n">input_channel</span> <span class="o">=</span> <span class="n">output_channel</span>
-        <span class="c1"># building last several layers</span>
+        <span class="c1"># 마지막 계층들 만들기</span>
         <span class="n">features</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ConvBNReLU</span><span class="p">(</span><span class="n">input_channel</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">last_channel</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
-        <span class="c1"># make it nn.Sequential</span>
+        <span class="c1"># nn.Sequential로 만들기</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">features</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span><span class="o">*</span><span class="n">features</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">quant</span> <span class="o">=</span> <span class="n">QuantStub</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dequant</span> <span class="o">=</span> <span class="n">DeQuantStub</span><span class="p">()</span>
-        <span class="c1"># building classifier</span>
+        <span class="c1"># 분류기(classifier) 만들기</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">classifier</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
             <span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="mf">0.2</span><span class="p">),</span>
             <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">last_channel</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">),</span>
         <span class="p">)</span>
 
-        <span class="c1"># weight initialization</span>
+        <span class="c1"># 가중치 초기화</span>
         <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="p">():</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">):</span>
                 <span class="n">nn</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">kaiming_normal_</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">weight</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;fan_out&#39;</span><span class="p">)</span>
@@ -567,8 +567,8 @@ to enable quantization:</p>
         <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dequant</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">x</span>
 
-    <span class="c1"># Fuse Conv+BN and Conv+BN+Relu modules prior to quantization</span>
-    <span class="c1"># This operation does not change the numerics</span>
+    <span class="c1"># 양자화 전에 Conv+BN과 Conv+BN+Relu 모듈 결합(fusion)</span>
+    <span class="c1"># 이 연산은 숫자를 변경하지 않음</span>
     <span class="k">def</span> <span class="nf">fuse_model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="p">():</span>
             <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">m</span><span class="p">)</span> <span class="o">==</span> <span class="n">ConvBNReLU</span><span class="p">:</span>
@@ -580,12 +580,12 @@ to enable quantization:</p>
 </pre></div>
 </div>
 </div>
-<div class="section" id="helper-functions">
-<h2>2. Helper functions<a class="headerlink" href="#helper-functions" title="Permalink to this headline">¶</a></h2>
-<p>We next define several helper functions to help with model evaluation. These mostly come from
-<a class="reference external" href="https://github.com/pytorch/examples/blob/master/imagenet/main.py">here</a>.</p>
+<div class="section" id="helper">
+<h2>2. 헬퍼(Helper) 함수<a class="headerlink" href="#helper" title="Permalink to this headline">¶</a></h2>
+<p>다음으로 모델 평가를 위한 헬퍼 함수들을 만듭니다. 코드 대부분은
+<a class="reference external" href="https://github.com/pytorch/examples/blob/master/imagenet/main.py">여기</a> 에서 가져왔습니다.</p>
 <div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">AverageMeter</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Computes and stores the average and current value&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;평균과 현재 값 계산 및 저장&quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;:f&#39;</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fmt</span> <span class="o">=</span> <span class="n">fmt</span>
@@ -609,7 +609,7 @@ to enable quantization:</p>
 
 
 <span class="k">def</span> <span class="nf">accuracy</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">topk</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,)):</span>
-    <span class="sd">&quot;&quot;&quot;Computes the accuracy over the k top predictions for the specified values of k&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;특정 k값을 위해 top k 예측의 정확도 계산&quot;&quot;&quot;</span>
     <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
         <span class="n">maxk</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">topk</span><span class="p">)</span>
         <span class="n">batch_size</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
@@ -658,15 +658,15 @@ to enable quantization:</p>
 </pre></div>
 </div>
 </div>
-<div class="section" id="define-dataset-and-data-loaders">
-<h2>3. Define dataset and data loaders<a class="headerlink" href="#define-dataset-and-data-loaders" title="Permalink to this headline">¶</a></h2>
-<p>As our last major setup step, we define our dataloaders for our training and testing set.</p>
-<div class="section" id="imagenet-data">
-<h3>ImageNet Data<a class="headerlink" href="#imagenet-data" title="Permalink to this headline">¶</a></h3>
-<p>To run the code in this tutorial using the entire ImageNet dataset, first download imagenet by following the instructions at here <a class="reference external" href="http://www.image-net.org/download">ImageNet Data</a>. Unzip the downloaded file into the ‘data_path’ folder.</p>
-<p>With the data downloaded, we show functions below that define dataloaders we’ll use to read
-in this data. These functions mostly come from
-<a class="reference external" href="https://github.com/pytorch/vision/blob/master/references/detection/train.py">here</a>.</p>
+<div class="section" id="dataset-dataloader">
+<h2>3. Dataset과 DataLoader 정의하기<a class="headerlink" href="#dataset-dataloader" title="Permalink to this headline">¶</a></h2>
+<p>마지막 주요 설정 단계로서 학습과 테스트 데이터를 위한 DataLoader를 정의합니다.</p>
+<div class="section" id="imagenet">
+<h3>ImageNet 데이터<a class="headerlink" href="#imagenet" title="Permalink to this headline">¶</a></h3>
+<p>전체 ImageNet Dataset을 이용해서 이 튜토리얼의 코드를 실행시키기 위해, 첫번째로 <a class="reference external" href="http://www.image-net.org/download">ImageNet Data</a> 의 지시를 따라 ImageNet을 다운로드합니다. 다운로드한 파일의 압축을 ‘data_path’에 풉니다.</p>
+<p>다운로드받은 데이터를 읽기 위해 아래에 정의된 DataLoader 함수들을 사용합니다.
+이런 함수들 대부분은
+<a class="reference external" href="https://github.com/pytorch/vision/blob/master/references/detection/train.py">여기</a> 에서 가져왔습니다.</p>
 <div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">prepare_data_loaders</span><span class="p">(</span><span class="n">data_path</span><span class="p">):</span>
 
     <span class="n">normalize</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">Normalize</span><span class="p">(</span><span class="n">mean</span><span class="o">=</span><span class="p">[</span><span class="mf">0.485</span><span class="p">,</span> <span class="mf">0.456</span><span class="p">,</span> <span class="mf">0.406</span><span class="p">],</span>
@@ -702,8 +702,8 @@ in this data. These functions mostly come from
     <span class="k">return</span> <span class="n">data_loader</span><span class="p">,</span> <span class="n">data_loader_test</span>
 </pre></div>
 </div>
-<p>Next, we’ll load in the pre-trained MobileNetV2 model. We provide the URL to download the data from in <code class="docutils literal notranslate"><span class="pre">torchvision</span></code>
-<a class="reference external" href="https://github.com/pytorch/vision/blob/master/torchvision/models/mobilenet.py#L9">here</a>.</p>
+<p>다음으로 사전에 학습된 MobileNetV2을 불러옵니다. <code class="docutils literal notranslate"><span class="pre">torchvision</span></code> 에서 데이터를 다운로드받을 수 있는 URL은
+<a class="reference external" href="https://github.com/pytorch/vision/blob/master/torchvision/models/mobilenet.py#L9">여기</a> 입니다.</p>
 <div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">data_path</span> <span class="o">=</span> <span class="s1">&#39;~/.data/imagenet&#39;</span>
 <span class="n">saved_model_dir</span> <span class="o">=</span> <span class="s1">&#39;data/&#39;</span>
 <span class="n">float_model_file</span> <span class="o">=</span> <span class="s1">&#39;mobilenet_pretrained_float.pth&#39;</span>
@@ -717,22 +717,22 @@ in this data. These functions mostly come from
 <span class="n">criterion</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">CrossEntropyLoss</span><span class="p">()</span>
 <span class="n">float_model</span> <span class="o">=</span> <span class="n">load_model</span><span class="p">(</span><span class="n">saved_model_dir</span> <span class="o">+</span> <span class="n">float_model_file</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s1">&#39;cpu&#39;</span><span class="p">)</span>
 
-<span class="c1"># Next, we&#39;ll &quot;fuse modules&quot;; this can both make the model faster by saving on memory access</span>
-<span class="c1"># while also improving numerical accuracy. While this can be used with any model, this is</span>
-<span class="c1"># especially common with quantized models.</span>
+<span class="c1"># 다음으로 &quot;모듈 결합&quot;을 합니다. 모듈 결합은 메모리 접근을 줄여 모델을 빠르게 만들면서</span>
+<span class="c1"># 정확도 수치를 향상시킵니다. 모듈 결합은 어떠한 모델에라도 사용할 수 있지만,</span>
+<span class="c1"># 양자화된 모델에 사용하는 것이 특히나 더 일반적입니다.</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1"> Inverted Residual Block: Before fusion </span><span class="se">\n\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">float_model</span><span class="o">.</span><span class="n">features</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">conv</span><span class="p">)</span>
 <span class="n">float_model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
 
-<span class="c1"># Fuses modules</span>
+<span class="c1"># 모듈 결합</span>
 <span class="n">float_model</span><span class="o">.</span><span class="n">fuse_model</span><span class="p">()</span>
 
-<span class="c1"># Note fusion of Conv+BN+Relu and Conv+Relu</span>
+<span class="c1"># Conv+BN+Relu와 Conv+Relu 결합에 유의</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1"> Inverted Residual Block: After fusion</span><span class="se">\n\n</span><span class="s1">&#39;</span><span class="p">,</span><span class="n">float_model</span><span class="o">.</span><span class="n">features</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">conv</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Finally to get a “baseline” accuracy, let’s see the accuracy of our un-quantized model
-with fused modules</p>
+<p>마지막으로 “기준”이 될 정확도를 얻기 위해,
+모듈 결합을 사용한 양자화되지 않은 모델의 정확도를 봅시다.</p>
 <div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">num_eval_batches</span> <span class="o">=</span> <span class="mi">1000</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Size of baseline model&quot;</span><span class="p">)</span>
@@ -743,44 +743,44 @@ with fused modules</p>
 <span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">script</span><span class="p">(</span><span class="n">float_model</span><span class="p">),</span> <span class="n">saved_model_dir</span> <span class="o">+</span> <span class="n">scripted_float_model_file</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>On the entire model, we get an accuracy of 71.9% on the eval dataset of 50,000 images.</p>
-<p>This will be our baseline to compare to. Next, let’s try different quantization methods</p>
+<p>전체 모델은 50,000개의 이미지를 가진 eval 데이터셋에서 71.9%의 정확도를 보입니다.</p>
+<p>이 값이 비교를 위한 기준이 될 것입니다. 다음으로 양자화된 모델을 봅시다.</p>
 </div>
 </div>
 <div class="section" id="post-training-static-quantization">
-<h2>4. Post-training static quantization<a class="headerlink" href="#post-training-static-quantization" title="Permalink to this headline">¶</a></h2>
-<p>Post-training static quantization involves not just converting the weights from float to int,
-as in dynamic quantization, but also performing the additional step of first feeding batches
-of data through the network and computing the resulting distributions of the different activations
-(specifically, this is done by inserting <cite>observer</cite> modules at different points that record this
-data). These distributions are then used to determine how the specifically the different activations
-should be quantized at inference time (a simple technique would be to simply divide the entire range
-of activations into 256 levels, but we support more sophisticated methods as well). Importantly,
-this additional step allows us to pass quantized values between operations instead of converting these
-values to floats - and then back to ints - between every operation, resulting in a significant speed-up.</p>
+<h2>4. 학습 후 정적 양자화(post-training static quantization)<a class="headerlink" href="#post-training-static-quantization" title="Permalink to this headline">¶</a></h2>
+<p>학습 후 정적 양자화는 동적 양자화처럼 가중치를 float에서 int로 변환하는 것뿐만 아니라
+추가적인 단계도 수행합니다. 네트워크에 데이터 배치의 첫 번째 공급과 다른 활성값들의
+분포 결과 계산이 이러한 단계입니다. (특히 이러한 추가적인 단계는 계산한 값을
+기록하고 싶은 지점에 <cite>observer</cite> 모듈을 삽입합으로써 끝납니다.)
+이러한 분포들은 추론 시점에 특정한 다른 활성값들이 어떻게 양자화되어야 하는지 결정하는데 사용됩니다.
+(간단한 방법으로는 단순히 활성값들의 전체 범위를 256개의 단계로 나누는 것이지만,
+좀 더 복잡한 방법도 제공합니다.) 특히, 이러한 추가적인 단계는 각 연산 사이사이의
+양자화된 값을 float으로 변환 - 및 int로 되돌림 - 하는 것뿐만 아니라
+양자화된 값을 모든 연산들끼리 주고 받는 것도 가능하게 하여 엄청난 속도 향상이 됩니다.</p>
 <div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">num_calibration_batches</span> <span class="o">=</span> <span class="mi">32</span>
 
 <span class="n">myModel</span> <span class="o">=</span> <span class="n">load_model</span><span class="p">(</span><span class="n">saved_model_dir</span> <span class="o">+</span> <span class="n">float_model_file</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s1">&#39;cpu&#39;</span><span class="p">)</span>
 <span class="n">myModel</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
 
-<span class="c1"># Fuse Conv, bn and relu</span>
+<span class="c1"># Conv, bn과 relu 결합</span>
 <span class="n">myModel</span><span class="o">.</span><span class="n">fuse_model</span><span class="p">()</span>
 
-<span class="c1"># Specify quantization configuration</span>
-<span class="c1"># Start with simple min/max range estimation and per-tensor quantization of weights</span>
+<span class="c1"># 양자화 설정 명시</span>
+<span class="c1"># 간단한 min/max 범위 추정 및 텐서별 가중치 양자화로 시작</span>
 <span class="n">myModel</span><span class="o">.</span><span class="n">qconfig</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">quantization</span><span class="o">.</span><span class="n">default_qconfig</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">myModel</span><span class="o">.</span><span class="n">qconfig</span><span class="p">)</span>
 <span class="n">torch</span><span class="o">.</span><span class="n">quantization</span><span class="o">.</span><span class="n">prepare</span><span class="p">(</span><span class="n">myModel</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-<span class="c1"># Calibrate first</span>
+<span class="c1"># 첫 번째 보정</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Post Training Quantization Prepare: Inserting Observers&#39;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1"> Inverted Residual Block:After observer insertion </span><span class="se">\n\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">myModel</span><span class="o">.</span><span class="n">features</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">conv</span><span class="p">)</span>
 
-<span class="c1"># Calibrate with the training set</span>
+<span class="c1"># 학습 세트로 보정</span>
 <span class="n">evaluate</span><span class="p">(</span><span class="n">myModel</span><span class="p">,</span> <span class="n">criterion</span><span class="p">,</span> <span class="n">data_loader</span><span class="p">,</span> <span class="n">neval_batches</span><span class="o">=</span><span class="n">num_calibration_batches</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Post Training Quantization: Calibration done&#39;</span><span class="p">)</span>
 
-<span class="c1"># Convert to quantized model</span>
+<span class="c1"># 양자화된 모델로 변환</span>
 <span class="n">torch</span><span class="o">.</span><span class="n">quantization</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="n">myModel</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Post Training Quantization: Convert done&#39;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1"> Inverted Residual Block: After fusion and quantization, note fused modules: </span><span class="se">\n\n</span><span class="s1">&#39;</span><span class="p">,</span><span class="n">myModel</span><span class="o">.</span><span class="n">features</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">conv</span><span class="p">)</span>
@@ -792,14 +792,13 @@ values to floats - and then back to ints - between every operation, resulting in
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Evaluation accuracy on </span><span class="si">%d</span><span class="s1"> images, </span><span class="si">%2.2f</span><span class="s1">&#39;</span><span class="o">%</span><span class="p">(</span><span class="n">num_eval_batches</span> <span class="o">*</span> <span class="n">eval_batch_size</span><span class="p">,</span> <span class="n">top1</span><span class="o">.</span><span class="n">avg</span><span class="p">))</span>
 </pre></div>
 </div>
-<p>For this quantized model, we see an accuracy of 56.7% on the eval dataset. This is because we used a simple min/max observer to determine quantization parameters. Nevertheless, we did reduce the size of our model down to just under 3.6 MB, almost a 4x decrease.</p>
-<p>In addition, we can significantly improve on the accuracy simply by using a different
-quantization configuration. We repeat the same exercise with the recommended configuration for
-quantizing for x86 architectures. This configuration does the following:</p>
+<p>양자화된 모델은 eval 데이터셋에서 56.7%의 정확도를 보여줍니다. 이는 양자화 파라미터를 결정하기 위해 단순 min/max Observer를 사용했기 때문입니다. 그럼에도 불구하고 모델의 크기를 3.6 MB 밑으로 줄였습니다. 이는 거의 4분의 1 로 줄어든 크기입니다.</p>
+<p>이에 더해 단순히 다른 양자화 설정을 사용하기만 해도 정확도를 큰 폭으로 향상시킬 수 있습니다.
+x86 아키텍처에서 양자화를 위한 권장 설정을 그대로 쓰기만 해도 됩니다.
+이러한 설정은 아래와 같습니다:</p>
 <ul class="simple">
-<li>Quantizes weights on a per-channel basis</li>
-<li>Uses a histogram observer that collects a histogram of activations and then picks
-quantization parameters in an optimal manner.</li>
+<li>채널별 기본 가중치 양자화</li>
+<li>활성값을 수집해서 최적화된 양자화 파라미터를 고르는 히스토그램 Observer 사용</li>
 </ul>
 <div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">per_channel_quantized_model</span> <span class="o">=</span> <span class="n">load_model</span><span class="p">(</span><span class="n">saved_model_dir</span> <span class="o">+</span> <span class="n">float_model_file</span><span class="p">)</span>
 <span class="n">per_channel_quantized_model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
@@ -815,26 +814,25 @@ quantization parameters in an optimal manner.</li>
 <span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">script</span><span class="p">(</span><span class="n">per_channel_quantized_model</span><span class="p">),</span> <span class="n">saved_model_dir</span> <span class="o">+</span> <span class="n">scripted_quantized_model_file</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Changing just this quantization configuration method resulted in an increase
-of the accuracy to over 67.3%! Still, this is 4% worse than the baseline of 71.9% achieved above.
-So lets try quantization aware training.</p>
+<p>단순히 양자화 설정 방법을 변경하는 것만으로도 정확도가 67.3%를 넘을 정도로 향상이 되었습니다!
+그럼에도 이 수치는 위에서 구한 기준값 71.9%에서 4퍼센트나 낮은 수치입니다.
+이제 양자화 자각 학습을 시도해 봅시다.</p>
 </div>
 <div class="section" id="quantization-aware-training">
-<h2>5. Quantization-aware training<a class="headerlink" href="#quantization-aware-training" title="Permalink to this headline">¶</a></h2>
-<p>Quantization-aware training (QAT) is the quantization method that typically results in the highest accuracy.
-With QAT, all weights and activations are “fake quantized” during both the forward and backward passes of
-training: that is, float values are rounded to mimic int8 values, but all computations are still done with
-floating point numbers. Thus, all the weight adjustments during training are made while “aware” of the fact
-that the model will ultimately be quantized; after quantizing, therefore, this method will usually yield
-higher accuracy than either dynamic quantization or post-training static quantization.</p>
-<p>The overall workflow for actually performing QAT is very similar to before:</p>
+<h2>5. 양자화 자각 학습(Quantization-aware training)<a class="headerlink" href="#quantization-aware-training" title="Permalink to this headline">¶</a></h2>
+<p>양자화 자각 학습(QAT)은 일반적으로 가장 높은 정확도를 제공하는 양자화 방법입니다.
+모든 가중치화 활성값은 QAT로 인해 학습 도중에 순전파와 역전파를 도중 “가짜 양자화”됩니다.
+이는 float값이 int8 값으로 반올림하는 것처럼 흉내를 내지만, 모든 계산은 여전히
+부동소수점 숫자로 계산을 합니다. 그래서 결국 훈련 동안의 모든 가중치 조정은 모델이 양자화될
+것이라는 사실을 “자각”한 채로 이루어지게 됩니다. 그래서 QAT는 양자화가 이루어지고 나면
+동적 양자화나 학습 전 정적 양자화보다 대체로 더 높은 정확도를 보여줍니다.</p>
+<p>실제로 QAT가 이루어지는 전체 흐름은 이전과 매우 유사합니다:</p>
 <ul class="simple">
-<li>We can use the same model as before: there is no additional preparation needed for quantization-aware
-training.</li>
-<li>We need to use a <code class="docutils literal notranslate"><span class="pre">qconfig</span></code> specifying what kind of fake-quantization is to be inserted after weights
-and activations, instead of specifying observers</li>
+<li>이전과 같은 모델을 사용할 수 있습니다. 양자화 자각 학습을 위한 추가적인 준비는 필요 없습니다.</li>
+<li>가중치와 활성값 뒤에 어떤 종류의 가짜 양자화를 사용할 것인지 명시하는 <code class="docutils literal notranslate"><span class="pre">qconfig</span></code> 의 사용이 필요합니다.
+Observer를 명시하는 것 대신에 말이죠.</li>
 </ul>
-<p>We first define a training function:</p>
+<p>먼저 학습 함수부터 정의합니다:</p>
 <div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">train_one_epoch</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">criterion</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">data_loader</span><span class="p">,</span> <span class="n">device</span><span class="p">,</span> <span class="n">ntrain_batches</span><span class="p">):</span>
     <span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
     <span class="n">top1</span> <span class="o">=</span> <span class="n">AverageMeter</span><span class="p">(</span><span class="s1">&#39;Acc@1&#39;</span><span class="p">,</span> <span class="s1">&#39;:6.2f&#39;</span><span class="p">)</span>
@@ -868,7 +866,7 @@ and activations, instead of specifying observers</li>
     <span class="k">return</span>
 </pre></div>
 </div>
-<p>We fuse modules as before</p>
+<p>이전처럼 모듈을 결합합니다.</p>
 <div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">qat_model</span> <span class="o">=</span> <span class="n">load_model</span><span class="p">(</span><span class="n">saved_model_dir</span> <span class="o">+</span> <span class="n">float_model_file</span><span class="p">)</span>
 <span class="n">qat_model</span><span class="o">.</span><span class="n">fuse_model</span><span class="p">()</span>
 
@@ -876,58 +874,57 @@ and activations, instead of specifying observers</li>
 <span class="n">qat_model</span><span class="o">.</span><span class="n">qconfig</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">quantization</span><span class="o">.</span><span class="n">get_default_qat_qconfig</span><span class="p">(</span><span class="s1">&#39;fbgemm&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Finally, <code class="docutils literal notranslate"><span class="pre">prepare_qat</span></code> performs the “fake quantization”, preparing the model for quantization-aware training</p>
+<p>마지막으로 모델이 양자화 자각 학습을 준비하기 위해 <code class="docutils literal notranslate"><span class="pre">prepare_qat</span></code> 로 “가짜 양자화”를 수행합니다.</p>
 <div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">torch</span><span class="o">.</span><span class="n">quantization</span><span class="o">.</span><span class="n">prepare_qat</span><span class="p">(</span><span class="n">qat_model</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Inverted Residual Block: After preparation for QAT, note fake-quantization modules </span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span><span class="n">qat_model</span><span class="o">.</span><span class="n">features</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">conv</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Training a quantized model with high accuracy requires accurate modeling of numerics at
-inference. For quantization aware training, therefore, we modify the training loop by:</p>
+<p>높은 정확도의 양자화된 모델을 학습시키기 위해서는 추론 시점에서 정확한 숫자 모델링을 필요로 합니다.
+그래서 양자화 자각 학습에서는 학습 루프를 이렇게 변경합니다:</p>
 <ul class="simple">
-<li>Switch batch norm to use running mean and variance towards the end of training to better
-match inference numerics.</li>
-<li>We also freeze the quantizer parameters (scale and zero-point) and fine tune the weights.</li>
+<li>추론 수치와 더 잘 일치하도록 학습이 끝날 때 배치 정규화를 이동 평균과 분산을 사용하는 것으로 변경합니다.</li>
+<li>양자화 파라미터(크기와 영점)를 고정하고 가중치를 미세 조정(fine tune)합니다.</li>
 </ul>
 <div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">num_train_batches</span> <span class="o">=</span> <span class="mi">20</span>
 
-<span class="c1"># QAT takes time and one needs to train over a few epochs.</span>
-<span class="c1"># Train and check accuracy after each epoch</span>
+<span class="c1"># QAT는 시간이 걸리는 작업이며 몇 에폭에 걸쳐 훈련이 필요합니다.</span>
+<span class="c1"># 학습 및 각 에폭 이후 정확도 확인</span>
 <span class="k">for</span> <span class="n">nepoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">8</span><span class="p">):</span>
     <span class="n">train_one_epoch</span><span class="p">(</span><span class="n">qat_model</span><span class="p">,</span> <span class="n">criterion</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">data_loader</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s1">&#39;cpu&#39;</span><span class="p">),</span> <span class="n">num_train_batches</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">nepoch</span> <span class="o">&gt;</span> <span class="mi">3</span><span class="p">:</span>
-        <span class="c1"># Freeze quantizer parameters</span>
+        <span class="c1"># 양자화 파라미터 고정</span>
         <span class="n">qat_model</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">quantization</span><span class="o">.</span><span class="n">disable_observer</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">nepoch</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
-        <span class="c1"># Freeze batch norm mean and variance estimates</span>
+        <span class="c1"># 배치 정규화 평균 및 분산 추정값 고정</span>
         <span class="n">qat_model</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">intrinsic</span><span class="o">.</span><span class="n">qat</span><span class="o">.</span><span class="n">freeze_bn_stats</span><span class="p">)</span>
 
-    <span class="c1"># Check the accuracy after each epoch</span>
+    <span class="c1"># 각 에폭 이후 정확도 확인</span>
     <span class="n">quantized_model</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">quantization</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="n">qat_model</span><span class="o">.</span><span class="n">eval</span><span class="p">(),</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="n">quantized_model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
     <span class="n">top1</span><span class="p">,</span> <span class="n">top5</span> <span class="o">=</span> <span class="n">evaluate</span><span class="p">(</span><span class="n">quantized_model</span><span class="p">,</span><span class="n">criterion</span><span class="p">,</span> <span class="n">data_loader_test</span><span class="p">,</span> <span class="n">neval_batches</span><span class="o">=</span><span class="n">num_eval_batches</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Epoch </span><span class="si">%d</span><span class="s1"> :Evaluation accuracy on </span><span class="si">%d</span><span class="s1"> images, </span><span class="si">%2.2f</span><span class="s1">&#39;</span><span class="o">%</span><span class="p">(</span><span class="n">nepoch</span><span class="p">,</span> <span class="n">num_eval_batches</span> <span class="o">*</span> <span class="n">eval_batch_size</span><span class="p">,</span> <span class="n">top1</span><span class="o">.</span><span class="n">avg</span><span class="p">))</span>
 </pre></div>
 </div>
-<p>Quantization-aware training yields an accuracy of over 71.5% on the entire imagenet dataset, which is close to the floating point accuracy of 71.9%.</p>
-<p>More on quantization-aware training:</p>
+<p>양자화 자각 학습은 전체 ImageNet 데이터셋에서 71.5%의 정확도를 나타냅니다. 이 값은 기준값 71.9%에 소수점 수준으로 근접한 수치입니다.</p>
+<p>양자화 자각 학습에 대한 더 많은 것들:</p>
 <ul class="simple">
-<li>QAT is a super-set of post training quant techniques that allows for more debugging.
-For example, we can analyze if the accuracy of the model is limited by weight or activation
-quantization.</li>
-<li>We can also simulate the accuracy of a quantized model in floating point since
-we are using fake-quantization to model the numerics of actual quantized arithmetic.</li>
-<li>We can mimic post training quantization easily too.</li>
+<li>QAT는 더 많은 디버깅을 가능하게 하는 학습 후 양자화 기술의 상위 집합입니다.
+예를 들어 모델의 정확도가 가중치나 활성 양자화로 인해 제한을 받아
+더 높아질 수 없는 상황인지 분석할 수 있습니다.</li>
+<li>부동소수점을 사용한 양자화된 모델을 시뮬레이션 할 수도 있습니다.
+실제 양자화된 연산의 수치를 모델링하기 위해 가짜 양자화를 이용하고 있기 때문입니다.</li>
+<li>학습 후 양자화 또한 쉽게 흉내낼 수 있습니다.</li>
 </ul>
-<div class="section" id="speedup-from-quantization">
-<h3>Speedup from quantization<a class="headerlink" href="#speedup-from-quantization" title="Permalink to this headline">¶</a></h3>
-<p>Finally, let’s confirm something we alluded to above: do our quantized models actually perform inference
-faster? Let’s test:</p>
+<div class="section" id="id8">
+<h3>양자화를 통한 속도 향상<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
+<p>마지막으로 위에서 언급한 것들을 확인해 봅시다. 양자화된 모델이 실제로 추론도 더 빠르게 하는 걸까요?
+시험해 봅시다:</p>
 <div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">run_benchmark</span><span class="p">(</span><span class="n">model_file</span><span class="p">,</span> <span class="n">img_loader</span><span class="p">):</span>
     <span class="n">elapsed</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">model</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">model_file</span><span class="p">)</span>
     <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
     <span class="n">num_batches</span> <span class="o">=</span> <span class="mi">5</span>
-    <span class="c1"># Run the scripted model on a few batches of images</span>
+    <span class="c1"># 이미지 배치들 이용하여 스크립트된 모델 실행</span>
     <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">img_loader</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">num_batches</span><span class="p">:</span>
             <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
@@ -946,18 +943,18 @@ faster? Let’s test:</p>
 <span class="n">run_benchmark</span><span class="p">(</span><span class="n">saved_model_dir</span> <span class="o">+</span> <span class="n">scripted_quantized_model_file</span><span class="p">,</span> <span class="n">data_loader_test</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Running this locally on a MacBook pro yielded 61 ms for the regular model, and
-just 20 ms for the quantized model, illustrating the typical 2-4x speedup
-we see for quantized models compared to floating point ones.</p>
+<p>맥북 프로의 로컬 환경에서 일반적인 모델 실행은 61ms, 양자화된 모델 실행은 20ms가 걸렸습니다.
+이러한 결과는 부동소수점 모델과 양자화된 모델을 비교했을 때,
+양자화된 모델에서 일반적으로 2-4x 속도 향상이 이루어진 것을 보여줍니다.</p>
 </div>
 </div>
-<div class="section" id="conclusion">
-<h2>Conclusion<a class="headerlink" href="#conclusion" title="Permalink to this headline">¶</a></h2>
-<p>In this tutorial, we showed two quantization methods - post-training static quantization,
-and quantization-aware training - describing what they do “under the hood” and how to use
-them in PyTorch.</p>
-<p>Thanks for reading! As always, we welcome any feedback, so please create an issue
-<a class="reference external" href="https://github.com/pytorch/pytorch/issues">here</a> if you have any.</p>
+<div class="section" id="id9">
+<h2>결론<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h2>
+<p>이 튜토리얼에서 학습 후 정적 양자화와 양자화 자각 학습이라는 두 가지 양자화 방법을 살펴봤습니다.
+이 양자화 방법들이 “내부적으로” 어떻게 동작을 하는지와
+PyTorch에서 어떻게 사용할 수 있는지도 보았습니다.</p>
+<p>읽어주셔서 감사합니다. 언제나처럼 어떠한 피드백도 환영이니, 의견이 있다면
+<a class="reference external" href="https://github.com/pytorch/pytorch/issues">여기</a> 에 이슈를 남겨 주세요.</p>
 </div>
 </div>
 
@@ -1015,19 +1012,19 @@ them in PyTorch.</p>
           <div class="pytorch-right-menu" id="pytorch-right-menu">
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
-<li><a class="reference internal" href="#">(beta) Static Quantization with Eager Mode in PyTorch</a><ul>
-<li><a class="reference internal" href="#model-architecture">1. Model architecture</a></li>
-<li><a class="reference internal" href="#helper-functions">2. Helper functions</a></li>
-<li><a class="reference internal" href="#define-dataset-and-data-loaders">3. Define dataset and data loaders</a><ul>
-<li><a class="reference internal" href="#imagenet-data">ImageNet Data</a></li>
+<li><a class="reference internal" href="#">(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화</a><ul>
+<li><a class="reference internal" href="#id3">1. 모델 아키텍처</a></li>
+<li><a class="reference internal" href="#helper">2. 헬퍼(Helper) 함수</a></li>
+<li><a class="reference internal" href="#dataset-dataloader">3. Dataset과 DataLoader 정의하기</a><ul>
+<li><a class="reference internal" href="#imagenet">ImageNet 데이터</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#post-training-static-quantization">4. Post-training static quantization</a></li>
-<li><a class="reference internal" href="#quantization-aware-training">5. Quantization-aware training</a><ul>
-<li><a class="reference internal" href="#speedup-from-quantization">Speedup from quantization</a></li>
+<li><a class="reference internal" href="#post-training-static-quantization">4. 학습 후 정적 양자화(post-training static quantization)</a></li>
+<li><a class="reference internal" href="#quantization-aware-training">5. 양자화 자각 학습(Quantization-aware training)</a><ul>
+<li><a class="reference internal" href="#id8">양자화를 통한 속도 향상</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#conclusion">Conclusion</a></li>
+<li><a class="reference internal" href="#id9">결론</a></li>
 </ul>
 </li>
 </ul>
