@@ -17,7 +17,6 @@ ONNX와 어떤 도구들이 지원되는지는 `onnx.ai <https://onnx.ai/>`_ 를
 튜토리얼 개요
 -----------------
 
-This tutorial will walk you through 4 main steps:
 이번 튜토리얼에서는 4가지 중심 사항들을 소개해드리겠습니다.
 
 
