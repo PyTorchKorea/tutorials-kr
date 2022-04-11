@@ -91,14 +91,14 @@ for key in wt_compare_dict:
 import matplotlib.pyplot as plt
 
 f = wt_compare_dict['conv1.weight']['float'].flatten()
-plt.hist(f, bins = 100)
-plt.title("Floating point model weights of conv1")
-plt.show()
+#plt.hist(f, bins = 100)
+#plt.title("Floating point model weights of conv1")
+#plt.show()
 
 q = wt_compare_dict['conv1.weight']['quantized'].flatten().dequantize()
-plt.hist(q, bins = 100)
-plt.title("Quantized model weights of conv1")
-plt.show()
+#plt.hist(q, bins = 100)
+#plt.title("Quantized model weights of conv1")
+#plt.show()
 
 
 
