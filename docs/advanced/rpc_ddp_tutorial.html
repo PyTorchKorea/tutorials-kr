@@ -7,12 +7,27 @@
 <head>
   <meta charset="utf-8">
   
+<meta property="og:title" content="분산 데이터 병렬(DDP)과 분산 RPC 프레임워크 결합" />
+  
+<meta property="og:type" content="article" />
+  
+<meta property="og:url" content="http://tutorials.pytorch.kr/advanced/rpc_ddp_tutorial.html" />
+  
+<meta property="og:description" content="저자: Pritam Damania and Yi Wang 번역: 박다정 이 튜토리얼은 간단한 예제를 사용하여 분산 데이터 병렬 처리(distributed data parallelism)와 분산 모델 병렬 처리(distributed model parallelism)를 결합하여 간단한 모델 학습시킬 때 분산 데이터 병렬(DistributedDataParallel)(DDP)과` 분산 RPC 프레임워크(Distributed RPC framework) < https://pytorch.org/docs/master/rpc.html>`__를 ..." />
+  
+<meta property="og:image" content="http://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
+  
+<meta property="og:image:alt" content="분산 데이터 병렬(DDP)과 분산 RPC 프레임워크 결합" />
+  
+<meta property="og:ignore_canonical" content="true" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>분산 데이터 병렬(DDP)과 분산 RPC 프레임워크 결합 &mdash; PyTorch Tutorials 1.11.0+cu102 documentation</title>
+  <title>분산 데이터 병렬(DDP)과 분산 RPC 프레임워크 결합 &mdash; 파이토치 한국어 튜토리얼(PyTorch tutorials in Korean)</title>
   
 
   
+  
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
   
   
   
@@ -27,6 +42,8 @@
 
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!-- <link rel="stylesheet" href="../_static/pygments.css" type="text/css" /> -->
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
   <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
@@ -141,12 +158,12 @@
               
             
             
-              <p class="caption"><span class="caption-text">파이토치(PyTorch) 레시피</span></p>
+              <p class="caption" role="heading"><span class="caption-text">파이토치(PyTorch) 레시피</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../recipes/recipes_index.html">모든 레시피 보기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../prototype/prototype_index.html">모든 프로토타입 레시피 보기</a></li>
 </ul>
-<p class="caption"><span class="caption-text">파이토치(PyTorch) 시작하기</span></p>
+<p class="caption" role="heading"><span class="caption-text">파이토치(PyTorch) 시작하기</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/basics/intro.html">파이토치(PyTorch) 기본 익히기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/basics/quickstart_tutorial.html">빠른 시작(Quickstart)</a></li>
@@ -158,7 +175,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../beginner/basics/optimization_tutorial.html">모델 매개변수 최적화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/basics/saveloadrun_tutorial.html">모델 저장하고 불러오기</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Introduction to PyTorch on YouTube</span></p>
+<p class="caption" role="heading"><span class="caption-text">Introduction to PyTorch on YouTube</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/introyt.html">Introduction to PyTorch - YouTube Series</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/introyt1_tutorial.html">Introduction to PyTorch</a></li>
@@ -169,14 +186,14 @@
 <li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/trainingyt.html">Training with PyTorch</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/captumyt.html">Model Understanding with Captum</a></li>
 </ul>
-<p class="caption"><span class="caption-text">파이토치(PyTorch) 배우기</span></p>
+<p class="caption" role="heading"><span class="caption-text">파이토치(PyTorch) 배우기</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/deep_learning_60min_blitz.html">PyTorch로 딥러닝하기: 60분만에 끝장내기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/pytorch_with_examples.html">예제로 배우는 파이토치(PyTorch)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/nn_tutorial.html"><cite>torch.nn</cite> 이 <em>실제로</em> 무엇인가요?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/tensorboard_tutorial.html">TensorBoard로 모델, 데이터, 학습 시각화하기</a></li>
 </ul>
-<p class="caption"><span class="caption-text">이미지/비디오</span></p>
+<p class="caption" role="heading"><span class="caption-text">이미지/비디오</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/torchvision_tutorial.html">TorchVision 객체 검출 미세조정(Finetuning) 튜토리얼</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/transfer_learning_tutorial.html">컴퓨터 비전(Vision)을 위한 전이학습(Transfer Learning)</a></li>
@@ -184,7 +201,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../beginner/dcgan_faces_tutorial.html">DCGAN 튜토리얼</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/vt_tutorial.html">배포를 위한 비전 트랜스포머(Vision Transformer) 모델 최적화하기</a></li>
 </ul>
-<p class="caption"><span class="caption-text">오디오</span></p>
+<p class="caption" role="heading"><span class="caption-text">오디오</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/audio_io_tutorial.html">Audio I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/audio_resampling_tutorial.html">Audio Resampling</a></li>
@@ -197,7 +214,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/text_to_speech_with_torchaudio.html">Text-to-speech with torchaudio</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/forced_alignment_with_torchaudio_tutorial.html">Forced Alignment with Wav2Vec2</a></li>
 </ul>
-<p class="caption"><span class="caption-text">텍스트</span></p>
+<p class="caption" role="heading"><span class="caption-text">텍스트</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/transformer_tutorial.html">nn.Transformer 와 TorchText 로 시퀀스-투-시퀀스(Sequence-to-Sequence) 모델링하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/char_rnn_classification_tutorial.html">기초부터 시작하는 NLP: 문자-단위 RNN으로 이름 분류하기</a></li>
@@ -206,12 +223,12 @@
 <li class="toctree-l1"><a class="reference internal" href="../beginner/text_sentiment_ngrams_tutorial.html">torchtext 라이브러리로 텍스트 분류하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/translation_transformer.html">nn.Transformer와 torchtext로 언어 번역하기</a></li>
 </ul>
-<p class="caption"><span class="caption-text">강화학습</span></p>
+<p class="caption" role="heading"><span class="caption-text">강화학습</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/reinforcement_q_learning.html">강화 학습 (DQN) 튜토리얼</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/mario_rl_tutorial.html">마리오 게임 RL 에이전트로 학습하기</a></li>
 </ul>
-<p class="caption"><span class="caption-text">PyTorch 모델을 프로덕션 환경에 배포하기</span></p>
+<p class="caption" role="heading"><span class="caption-text">PyTorch 모델을 프로덕션 환경에 배포하기</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/flask_rest_api_tutorial.html">Flask를 사용하여 Python에서 PyTorch를 REST API로 배포하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/Intro_to_TorchScript_tutorial.html">TorchScript 소개</a></li>
@@ -219,12 +236,12 @@
 <li class="toctree-l1"><a class="reference internal" href="super_resolution_with_onnxruntime.html">(선택) PyTorch 모델을 ONNX으로 변환하고 ONNX 런타임에서 실행하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/realtime_rpi.html">Real Time Inference on Raspberry Pi 4 (30 fps!)</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Code Transforms with FX</span></p>
+<p class="caption" role="heading"><span class="caption-text">Code Transforms with FX</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/fx_conv_bn_fuser.html">(베타) FX에서 합성곱/배치 정규화(Convolution/Batch Norm) 결합기(Fuser) 만들기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/fx_profiling_tutorial.html">(beta) Building a Simple CPU Performance Profiler with FX</a></li>
 </ul>
-<p class="caption"><span class="caption-text">프론트엔드 API</span></p>
+<p class="caption" role="heading"><span class="caption-text">프론트엔드 API</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/memory_format_tutorial.html">(베타) PyTorch를 사용한 Channels Last 메모리 형식</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/forward_ad_usage.html">Forward-mode Automatic Differentiation (Beta)</a></li>
@@ -232,7 +249,7 @@
 <li class="toctree-l1"><a class="reference internal" href="torch-script-parallelism.html">TorchScript의 동적 병렬 처리(Dynamic Parallelism)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cpp_autograd.html">C++ 프론트엔드의 자동 미분 (autograd)</a></li>
 </ul>
-<p class="caption"><span class="caption-text">PyTorch 확장하기</span></p>
+<p class="caption" role="heading"><span class="caption-text">PyTorch 확장하기</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/custom_function_double_backward_tutorial.html">Double Backward with Custom Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/custom_function_conv_bn_tutorial.html">Fusing Convolution and Batch Norm using Custom Function</a></li>
@@ -242,7 +259,7 @@
 <li class="toctree-l1"><a class="reference internal" href="dispatcher.html">Registering a Dispatched Operator in C++</a></li>
 <li class="toctree-l1"><a class="reference internal" href="extend_dispatcher.html">Extending dispatcher for a new backend in C++</a></li>
 </ul>
-<p class="caption"><span class="caption-text">모델 최적화</span></p>
+<p class="caption" role="heading"><span class="caption-text">모델 최적화</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/profiler.html">PyTorch 모듈 프로파일링 하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/tensorboard_profiler_tutorial.html">PyTorch Profiler With TensorBoard</a></li>
@@ -255,7 +272,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/quantized_transfer_learning_tutorial.html">(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="static_quantization_tutorial.html">(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화</a></li>
 </ul>
-<p class="caption"><span class="caption-text">병렬 및 분산 학습</span></p>
+<p class="caption" role="heading"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../beginner/dist_overview.html">PyTorch Distributed Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/model_parallel_tutorial.html">단일 머신을 사용한 모델 병렬화 모범 사례</a></li>
@@ -272,12 +289,12 @@
 <li class="toctree-l1"><a class="reference internal" href="ddp_pipeline.html">분산 데이터 병렬 처리와 병렬 처리 파이프라인을 사용한 트랜스포머 모델 학습</a></li>
 <li class="toctree-l1"><a class="reference internal" href="generic_join.html">Distributed Training with Uneven Inputs Using the Join Context Manager</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Mobile</span></p>
+<p class="caption" role="heading"><span class="caption-text">Mobile</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/deeplabv3_on_ios.html">iOS에서의 이미지 분할 DeepLapV3</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/deeplabv3_on_android.html">안드로이드에서의 이미지 분할 DeepLapV3</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Recommendation Systems</span></p>
+<p class="caption" role="heading"><span class="caption-text">Recommendation Systems</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/torchrec_tutorial.html">Introduction to TorchRec</a></li>
 </ul>
@@ -389,16 +406,16 @@
 분산 데이터 병렬 및 분산 모델 병렬 학습을 각각 수행하는 방법에 대해 설명합니다.
 그러나 이 두 가지 기술을 결합할 수 있는 몇 가지 학습 패러다임이 있습니다. 예를 들어:</p>
 <ol class="arabic simple">
-<li>희소 부분(큰 임베딩 테이블)과 밀집 부분(FC 레이어)이 있는 모델이 있는 경우,
+<li><p>희소 부분(큰 임베딩 테이블)과 밀집 부분(FC 레이어)이 있는 모델이 있는 경우,
 매개변수 서버(parameter server)에 임베딩 테이블(embedding table)을 놓고 <a href="#id10"><span class="problematic" id="id11">`</span></a>분산 데이터 병렬 &lt;<a class="reference external" href="https://pytorch.org/docs/stable/nn.html#torch.nn.parallel.DistributedDataParallel">https://pytorch.org/docs/stable/nn.html#torch.nn.parallel.DistributedDataParallel</a>&gt;`__을 사용하여
 여러 트레이너에 걸쳐 FC 레이어를 복제하는 것을 원할 수도 있습니다.
 이때 <a href="#id12"><span class="problematic" id="id13">`</span></a>분산 RPC 프레임워크 &lt;<a class="reference external" href="https://pytorch.org/docs/master/rpc.html">https://pytorch.org/docs/master/rpc.html</a>&gt;`__는
-매개변수 서버에서 임베딩 찾기 작업(embedding lookup)을 수행하는 데 사용할 수 있습니다.</li>
-<li>다음은 <a class="reference external" href="https://arxiv.org/abs/1806.03377">PipeDream</a> 문서에서 설명된 하이브리드 병렬 처리 활성화하기 입니다.
+매개변수 서버에서 임베딩 찾기 작업(embedding lookup)을 수행하는 데 사용할 수 있습니다.</p></li>
+<li><p>다음은 <a class="reference external" href="https://arxiv.org/abs/1806.03377">PipeDream</a> 문서에서 설명된 하이브리드 병렬 처리 활성화하기 입니다.
 <a href="#id14"><span class="problematic" id="id15">`</span></a>분산 RPC 프레임워크 &lt;<a class="reference external" href="https://pytorch.org/docs/master/rpc.html">https://pytorch.org/docs/master/rpc.html</a>&gt;`__를 사용하여
 여러 worker에 걸쳐 모델의 단계를 파이프라인(pipeline)할 수 있고
 (필요에 따라) <a href="#id16"><span class="problematic" id="id17">`</span></a>분산 데이터 병렬 &lt;<a class="reference external" href="https://pytorch.org/docs/stable/nn.html#torch.nn.parallel.DistributedDataParallel">https://pytorch.org/docs/stable/nn.html#torch.nn.parallel.DistributedDataParallel</a>&gt;`__을 이용해서
-각 단계를 복제할 수 있습니다.</li>
+각 단계를 복제할 수 있습니다.</p></li>
 </ol>
 <div class="line-block">
 <div class="line"><br /></div>
@@ -406,28 +423,28 @@
 <p>이 튜토리얼에서는 위에서 언급한 첫 번째 경우를 다룰 것입니다.
 다음과 같이 총 4개의 worker가 있습니다:</p>
 <ol class="arabic simple">
-<li>1개의 마스터는 매개변수 서버에 임베딩 테이블(nn.EmbeddingBag) 생성을 담당합니다.
-또한 마스터는 두 트레이너의 학습 루프를 수행합니다.</li>
-<li>1개의 매개변수 서버는 기본적으로 메모리에 임베딩 테이블을 보유하고 마스터 및 트레이너의 RPC에 응답합니다.</li>
-<li>2개의 트레이너는 <a href="#id18"><span class="problematic" id="id19">`</span></a>분산 데이터 병렬 &lt;<a class="reference external" href="https://pytorch.org/docs/stable/nn.html#torch.nn.parallel.DistributedDataParallel">https://pytorch.org/docs/stable/nn.html#torch.nn.parallel.DistributedDataParallel</a>&gt;`__을
+<li><p>1개의 마스터는 매개변수 서버에 임베딩 테이블(nn.EmbeddingBag) 생성을 담당합니다.
+또한 마스터는 두 트레이너의 학습 루프를 수행합니다.</p></li>
+<li><p>1개의 매개변수 서버는 기본적으로 메모리에 임베딩 테이블을 보유하고 마스터 및 트레이너의 RPC에 응답합니다.</p></li>
+<li><p>2개의 트레이너는 <a href="#id18"><span class="problematic" id="id19">`</span></a>분산 데이터 병렬 &lt;<a class="reference external" href="https://pytorch.org/docs/stable/nn.html#torch.nn.parallel.DistributedDataParallel">https://pytorch.org/docs/stable/nn.html#torch.nn.parallel.DistributedDataParallel</a>&gt;`__을
 사용하여 자체적으로 복제되는 FC 레이어(nn.Linear)를 저장합니다.
-트레이너는 또한 순방향 전달(forward pass), 역방향 전달(backward pass) 및 최적화 단계를 실행해야 합니다.</li>
+트레이너는 또한 순방향 전달(forward pass), 역방향 전달(backward pass) 및 최적화 단계를 실행해야 합니다.</p></li>
 </ol>
 <div class="line-block">
 <div class="line"><br /></div>
 </div>
 <p>전체적인 학습과정은 다음과 같이 실행됩니다:</p>
 <ol class="arabic simple">
-<li>마스터는 매개변수 서버에 임베딩 테이블을 담고 있는
-<a href="#id20"><span class="problematic" id="id21">`</span></a>원격 모듈(RemoteModule) &lt;<a class="reference external" href="https://pytorch.org/docs/master/rpc.html#remotemodule">https://pytorch.org/docs/master/rpc.html#remotemodule</a>&gt;`__을 생성합니다.</li>
-<li>그런 다음 마스터는 트레이너의 학습 루프를 시작하고 원격 모듈(remote module)을 트레이너에게 전달합니다.</li>
-<li>트레이너는 먼저 마스터에서 제공하는 원격 모듈을 사용하여
-임베딩 찾기 작업(embedding lookup)을 수행한 다음 DDP 내부에 감싸진 FC 레이어를 실행하는 <a href="#id22"><span class="problematic" id="id23">``</span></a>HybridModel``을 생성합니다.</li>
-<li>트레이너는 모델의 순방향 전달을 실행하고 손실을 사용하여 <a href="#id24"><span class="problematic" id="id25">`</span></a>분산 Autograd &lt;<a class="reference external" href="https://pytorch.org/docs/master/rpc.html#distributed-autograd-framework">https://pytorch.org/docs/master/rpc.html#distributed-autograd-framework</a>&gt;`__를
-사용하여 역방향 전달을 실행합니다.</li>
-<li>역방향 전달의 일부로 FC 레이어의 변화도가 먼저 계산되고 DDP의 allreduce를 통해 모든 트레이너와 동기화됩니다.</li>
-<li>다음으로, 분산 Autograd는 매개변수 서버로 변화도를 전파하고 그곳에서 임베딩 테이블의 변화도가 업데이트됩니다.</li>
-<li>마지막으로, <a href="#id26"><span class="problematic" id="id27">`</span></a>분산 옵티마이저(DistributedOptimizer) &lt;<a class="reference external" href="https://pytorch.org/docs/master/rpc.html#module-torch.distributed.optim">https://pytorch.org/docs/master/rpc.html#module-torch.distributed.optim</a>&gt;`__는 모든 매개변수를 업데이트하는 데 사용됩니다.</li>
+<li><p>마스터는 매개변수 서버에 임베딩 테이블을 담고 있는
+<a href="#id20"><span class="problematic" id="id21">`</span></a>원격 모듈(RemoteModule) &lt;<a class="reference external" href="https://pytorch.org/docs/master/rpc.html#remotemodule">https://pytorch.org/docs/master/rpc.html#remotemodule</a>&gt;`__을 생성합니다.</p></li>
+<li><p>그런 다음 마스터는 트레이너의 학습 루프를 시작하고 원격 모듈(remote module)을 트레이너에게 전달합니다.</p></li>
+<li><p>트레이너는 먼저 마스터에서 제공하는 원격 모듈을 사용하여
+임베딩 찾기 작업(embedding lookup)을 수행한 다음 DDP 내부에 감싸진 FC 레이어를 실행하는 <a href="#id22"><span class="problematic" id="id23">``</span></a>HybridModel``을 생성합니다.</p></li>
+<li><p>트레이너는 모델의 순방향 전달을 실행하고 손실을 사용하여 <a href="#id24"><span class="problematic" id="id25">`</span></a>분산 Autograd &lt;<a class="reference external" href="https://pytorch.org/docs/master/rpc.html#distributed-autograd-framework">https://pytorch.org/docs/master/rpc.html#distributed-autograd-framework</a>&gt;`__를
+사용하여 역방향 전달을 실행합니다.</p></li>
+<li><p>역방향 전달의 일부로 FC 레이어의 변화도가 먼저 계산되고 DDP의 allreduce를 통해 모든 트레이너와 동기화됩니다.</p></li>
+<li><p>다음으로, 분산 Autograd는 매개변수 서버로 변화도를 전파하고 그곳에서 임베딩 테이블의 변화도가 업데이트됩니다.</p></li>
+<li><p>마지막으로, <a href="#id26"><span class="problematic" id="id27">`</span></a>분산 옵티마이저(DistributedOptimizer) &lt;<a class="reference external" href="https://pytorch.org/docs/master/rpc.html#module-torch.distributed.optim">https://pytorch.org/docs/master/rpc.html#module-torch.distributed.optim</a>&gt;`__는 모든 매개변수를 업데이트하는 데 사용됩니다.</p></li>
 </ol>
 <p>이제 각 부분을 자세히 살펴보겠습니다.
 먼저 학습을 수행하기 전에 모든 작업자를 설정해야 합니다.
@@ -597,12 +614,12 @@ DistributedOptimizer는 항상 최적화해야 하는 매개변수에 대한 RRe
 <a href="#id54"><span class="problematic" id="id55">``</span></a>get_next_batch``는 학습을 위한 임의의 입력과 대상을 생성하는 것을 도와주는 함수일 뿐입니다.
 여러 에폭(epoch)과 각 배치(batch)에 대해 학습 루프를 실행합니다:</p>
 <ol class="arabic simple">
-<li>먼저 분산 Autograd에 대해
-<a href="#id56"><span class="problematic" id="id57">`</span></a>분산 Autograd Context &lt;<a class="reference external" href="https://pytorch.org/docs/master/rpc.html#torch.distributed.autograd.context">https://pytorch.org/docs/master/rpc.html#torch.distributed.autograd.context</a>&gt;`__를 설정합니다.</li>
-<li>모델의 순방향 전달을 실행하고 해당 출력을 검색(retrieve)합니다.</li>
-<li>손실 함수를 사용하여 출력과 목표를 기반으로 손실을 계산합니다.</li>
-<li>분산 Autograd를 사용하여 손실을 사용하여 분산 역방향 전달을 실행합니다.</li>
-<li>마지막으로 분산 옵티마이저 단계를 실행하여 모든 매개변수를 최적화합니다.</li>
+<li><p>먼저 분산 Autograd에 대해
+<a href="#id56"><span class="problematic" id="id57">`</span></a>분산 Autograd Context &lt;<a class="reference external" href="https://pytorch.org/docs/master/rpc.html#torch.distributed.autograd.context">https://pytorch.org/docs/master/rpc.html#torch.distributed.autograd.context</a>&gt;`__를 설정합니다.</p></li>
+<li><p>모델의 순방향 전달을 실행하고 해당 출력을 검색(retrieve)합니다.</p></li>
+<li><p>손실 함수를 사용하여 출력과 목표를 기반으로 손실을 계산합니다.</p></li>
+<li><p>분산 Autograd를 사용하여 손실을 사용하여 분산 역방향 전달을 실행합니다.</p></li>
+<li><p>마지막으로 분산 옵티마이저 단계를 실행하여 모든 매개변수를 최적화합니다.</p></li>
 </ol>
 <div class="highlight-py notranslate"><div class="highlight"><pre><span></span>    <span class="k">def</span> <span class="nf">get_next_batch</span><span class="p">(</span><span class="n">rank</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
@@ -714,14 +731,15 @@ DistributedOptimizer는 항상 최적화해야 하는 매개변수에 대한 RRe
 
      
        <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-         <script type="text/javascript" src="../_static/jquery.js"></script>
-         <script type="text/javascript" src="../_static/underscore.js"></script>
-         <script type="text/javascript" src="../_static/doctools.js"></script>
-         <script type="text/javascript" src="../_static/clipboard.min.js"></script>
-         <script type="text/javascript" src="../_static/copybutton.js"></script>
-         <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js"></script>
-         <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
-         <script type="text/javascript" src="../_static/katex_autorenderer.js"></script>
+         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+         <script src="../_static/jquery.js"></script>
+         <script src="../_static/underscore.js"></script>
+         <script src="../_static/doctools.js"></script>
+         <script src="../_static/clipboard.min.js"></script>
+         <script src="../_static/copybutton.js"></script>
+         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js"></script>
+         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
+         <script src="../_static/katex_autorenderer.js"></script>
      
 
   
@@ -868,7 +886,7 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
             <li class="list-title"><a href="">한국 사용자 모임</a></li>
             <li><a href="https://pytorch.kr/about">사이트 소개</a></li>
             <li><a href="https://tutorials.pytorch.kr/">한국어 튜토리얼</a></li>
-            <li><a href="https://github.com/9bow/PyTorch-tutorials-kr" target="_blank">한국어 튜토리얼 저장소</a></li>
+            <li><a href="https://github.com/PyTorchKorea/tutorials-kr" target="_blank">한국어 튜토리얼 저장소</a></li>
           </ul>
         </div>
 
