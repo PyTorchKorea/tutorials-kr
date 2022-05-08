@@ -62,6 +62,18 @@ extensions = [
     'sphinx_copybutton',
     'sphinx_gallery.gen_gallery',
     'sphinx_sitemap',
+    'sphinxext.opengraph',
+]
+
+
+# -- Sphinxext-opengraph configuration ---------------------------------------
+
+ogp_site_url = site_url
+ogp_image = '{}{}'.format(site_url, '_static/logos/logo-kr-sm-dark.png')
+ogp_description_length = 300
+ogp_type = 'article'
+ogp_custom_meta_tags = [
+    '<meta property="og:ignore_canonical" content="true" />',
 ]
 
 
@@ -189,7 +201,9 @@ html_static_path = ['_static']
 
 html_theme = 'pytorch_sphinx_theme'
 html_theme_path = [pytorch_sphinx_theme.get_html_theme_path()]
-html_logo = '_static/img/pytorch-logo-dark.svg'
+html_logo = '_static/logos/logo-kr-sm-dark.svg'
+html_favicon = '_static/favicon.ico'    # under html_static_path
+html_title = '파이토치 한국어 튜토리얼(PyTorch tutorials in Korean)'
 html_theme_options = {
     'pytorch_project': 'tutorials',
     'collapse_navigation': False,
