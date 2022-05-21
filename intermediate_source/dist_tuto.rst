@@ -425,7 +425,7 @@ PyTorch에는 현재 ``dist.all_reduce(tensor, op, group)`` 외에도 6개의 �
 **Gloo 백엔드**
 
 지금껏 우리는 `Gloo backend <https://github.com/facebookincubator/gloo>`__ 를
-광범위하게 사용했습니다. 이것은 미리 컴파일된 PyTOrch 바이너리가 포함되어 있으며
+광범위하게 사용했습니다. 이것은 미리 컴파일된 PyTorch 바이너리가 포함되어 있으며
 Linux(0.2 이상)와 macOS(1.3 이상)을 모두 지원하고 있어 개발 플랫폼으로 매우 편리합니다.
 또한 CPU에서는 모든 저짐-대-지점 및 집합 연산들을, GPU에서는 집합 연산을 지원합니다.
 CUDA Tensor에 대한 집합 연산 구현은 NCCL 백엔드에서 제공하는 것만큼 최적화되어
