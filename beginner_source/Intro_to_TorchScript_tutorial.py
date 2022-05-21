@@ -47,7 +47,7 @@ print(torch.__version__)
 #    호출 중에 모듈에 의해 사용될 수 있습니다.
 # 3. ``forward`` 함수. 모듈이 호출될 때 실행되는 코드입니다.
 #
-# 작은 예제로 시작해 보겟습니다:
+# 작은 예제로 시작해 보겠습니다:
 #
 
 class MyCell(torch.nn.Module):
