@@ -272,7 +272,7 @@ broadcasting_stats = Timer(
 ).collect_callgrind().as_standardized().stats(inclusive=False)
 
 ###############################################################################
-# 종종 서로 다른 두 환경에서 A/B 테스트를 진행하고 싶을 떄가 있습니다. (예.
+# 종종 서로 다른 두 환경에서 A/B 테스트를 진행하고 싶을 때가 있습니다. (예.
 # PR을 테스트하거나, 컴파일 플래그(flag) 실험 등)
 # 이는 CallgrindStats와 FunctionCounts, Measurement는 모두 pickle화(picklalbe)가
 # 가능하기 때문에 매우 간단합니다. 각 환경에서 측정한 결과들을 저장하고, 단일
