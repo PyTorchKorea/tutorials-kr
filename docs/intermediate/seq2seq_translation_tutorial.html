@@ -6,7 +6,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
 <meta property="og:title" content="기초부터 시작하는 NLP: Sequence to Sequence 네트워크와 Attention을 이용한 번역" />
   
 <meta property="og:type" content="article" />
@@ -395,7 +396,7 @@
 <p class="admonition-title">Note</p>
 <p>Click <a class="reference internal" href="#sphx-glr-download-intermediate-seq2seq-translation-tutorial-py"><span class="std std-ref">here</span></a> to download the full example code</p>
 </div>
-<div class="sphx-glr-example-title section" id="nlp-sequence-to-sequence-attention">
+<section class="sphx-glr-example-title" id="nlp-sequence-to-sequence-attention">
 <span id="sphx-glr-intermediate-seq2seq-translation-tutorial-py"></span><h1>기초부터 시작하는 NLP: Sequence to Sequence 네트워크와 Attention을 이용한 번역<a class="headerlink" href="#nlp-sequence-to-sequence-attention" title="Permalink to this headline">¶</a></h1>
 <dl class="simple">
 <dt><strong>Author</strong>: <a class="reference external" href="https://github.com/spro/practical-pytorch">Sean Robertson</a></dt><dd><p><strong>번역</strong>: <a class="reference external" href="https://github.com/adonisues">황성수</a></p>
@@ -430,9 +431,9 @@
 <a class="reference external" href="https://arxiv.org/abs/1409.3215">sequence to sequence network</a> 의 간단하지만 강력한 아이디어가
 이것(번역)을 가능하게 합니다. 인코더 네트워크는 입력 시퀀스를 벡터로 압축하고,
 디코더 네트워크는 해당 벡터를 새로운 시퀀스로 펼칩니다.</p>
-<div class="figure align-default">
+<figure class="align-default">
 <img alt="" src="../_images/seq2seq.png" />
-</div>
+</figure>
 <p>이 모델을 개선하기 위해 <a class="reference external" href="https://arxiv.org/abs/1409.0473">Attention Mechanism</a> 을
 사용하면 디코더가 입력 시퀀스의 특정 범위에 집중할 수 있도록 합니다.</p>
 <p><strong>추천 자료:</strong></p>
@@ -473,7 +474,7 @@ Translate</a></p></li>
 <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="section" id="id2">
+<section id="id2">
 <h2>데이터 파일 로딩<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
 <p>이 프로젝트의 데이터는 수천 개의 영어-프랑스어 번역 쌍입니다.</p>
 <p><a class="reference external" href="https://opendata.stackexchange.com/questions/3888/dataset-of-sentences-translated-into-many-languages">Open Data Stack Exchange</a>
@@ -498,9 +499,9 @@ Translate</a></p></li>
 달리 번역에는 아주 많은 단어들이 있기 때문에 인코딩 벡터는 매우 더 큽니다.
 그러나 우리는 약간의 트릭를 써서 언어 당 수천 단어 만
 사용하도록 데이터를 다듬을 것입니다.</p>
-<div class="figure align-default">
+<figure class="align-default">
 <img alt="" src="../_images/word-encoding.png" />
-</div>
+</figure>
 <p>나중에 네트워크의 입력 및 목표로 사용하려면 단어 당 고유 번호가
 필요합니다. 이 모든 것을 추적하기 위해 우리는
 단어→색인(<code class="docutils literal notranslate"><span class="pre">word2index</span></code>)과 색인→단어(<code class="docutils literal notranslate"><span class="pre">index2word</span></code>) 사전,
@@ -639,11 +640,11 @@ Counting words...
 Counted words:
 fra 4345
 eng 2803
-[&#39;je ne vais pas encore abandonner .&#39;, &#39;i m not giving up yet .&#39;]
+[&#39;c est un fondu de musique .&#39;, &#39;he is mad about music .&#39;]
 </pre></div>
 </div>
-</div>
-<div class="section" id="seq2seq">
+</section>
+<section id="seq2seq">
 <h2>Seq2Seq 모델<a class="headerlink" href="#seq2seq" title="Permalink to this headline">¶</a></h2>
 <p>Recurrent Neural Network(RNN)는 시퀀스에서 작동하고 다음 단계의
 입력으로 자신의 출력을 사용하는 네트워크입니다.</p>
@@ -653,9 +654,9 @@ network</a> 는 인코더 및
 디코더라고 하는 두 개의 RNN으로 구성된 모델입니다.
 인코더는 입력 시퀀스를 읽고 단일 벡터를 출력하고,
 디코더는 해당 벡터를 읽어 출력 시퀀스를 생성합니다.</p>
-<div class="figure align-default">
+<figure class="align-default">
 <img alt="" src="../_images/seq2seq.png" />
-</div>
+</figure>
 <p>모든 입력에 해당하는 출력이 있는 단일 RNN의 시퀀스 예측과 달리
 Seq2Seq 모델은 시퀀스 길이와 순서를 자유롭게하기 때문에
 두 언어 사이의 번역에 이상적입니다.</p>
@@ -668,14 +669,14 @@ Seq2Seq 모델은 시퀀스 길이와 순서를 자유롭게하기 때문에
 <p>Seq2Seq 모델을 사용하면 인코더는 하나의 벡터를 생성합니다.
 이상적인 경우에 입력 시퀀스의 “의미”를 문장의 N 차원 공간에 있는
 단일 지점인 단일 벡터으로 인코딩합니다.</p>
-<div class="section" id="id4">
+<section id="id4">
 <h3>인코더<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
 <p>Seq2Seq 네트워크의 인코더는 입력 문장의 모든 단어에 대해 어떤 값을
 출력하는 RNN입니다. 모든 입력 단어에 대해 인코더는 벡터와
 은닉 상태를 출력하고 다음 입력 단어를 위해 그 은닉 상태를 사용합니다.</p>
-<div class="figure align-default">
+<figure class="align-default">
 <img alt="" src="../_images/encoder-network.png" />
-</div>
+</figure>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">EncoderRNN</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_size</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">EncoderRNN</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
@@ -694,12 +695,12 @@ Seq2Seq 모델은 시퀀스 길이와 순서를 자유롭게하기 때문에
         <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hidden_size</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="id5">
+</section>
+<section id="id5">
 <h3>디코더<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
 <p>디코더는 인코더 출력 벡터를 받아서 번역을 생성하기 위한 단어 시퀀스를
 출력합니다.</p>
-<div class="section" id="id6">
+<section id="id6">
 <h4>간단한 디코더<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h4>
 <p>가장 간단한 Seq2Seq 디코더는 인코더의 마지막 출력만을 이용합니다.
 이 마지막 출력은 전체 시퀀스에서 문맥을 인코드하기 때문에
@@ -708,9 +709,9 @@ Seq2Seq 모델은 시퀀스 길이와 순서를 자유롭게하기 때문에
 <p>디코딩의 매 단계에서 디코더에게 입력 토큰과 은닉 상태가 주어집니다.
 초기 입력 토큰은 문자열-시작 (start-of-string) <code class="docutils literal notranslate"><span class="pre">&lt;SOS&gt;</span></code> 토큰이고,
 첫 은닉 상태는 문맥 벡터(인코더의 마지막 은닉 상태) 입니다.</p>
-<div class="figure align-default">
+<figure class="align-default">
 <img alt="" src="../_images/decoder-network.png" />
-</div>
+</figure>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">DecoderRNN</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">,</span> <span class="n">output_size</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">DecoderRNN</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
@@ -735,8 +736,8 @@ Seq2Seq 모델은 시퀀스 길이와 순서를 자유롭게하기 때문에
 <p>이 모델의 결과를 학습하고 관찰하는 것을 권장하지만,
 공간을 절약하기 위해 최종 목적지로 바로 이동해서
 Attention 메커니즘을 소개 할 것입니다.</p>
-</div>
-<div class="section" id="attention">
+</section>
+<section id="attention">
 <h4>Attention 디코더<a class="headerlink" href="#attention" title="Permalink to this headline">¶</a></h4>
 <p>문맥 벡터만 인코더와 디코더 사이로 전달 된다면, 단일 벡터가 전체 문장을
 인코딩 해야하는 부담을 가지게 됩니다.</p>
@@ -746,18 +747,18 @@ Attention 메커니즘을 소개 할 것입니다.</p>
 곱해집니다. 그 결과(코드에서 <code class="docutils literal notranslate"><span class="pre">attn_applied</span></code>)는 입력 시퀀스의
 특정 부분에 관한 정보를 포함해야하고 따라서 디코더가 알맞은 출력
 단어를 선택하는 것을 도와줍니다.</p>
-<div class="figure align-default">
+<figure class="align-default">
 <img alt="" src="https://i.imgur.com/1152PYf.png" />
-</div>
+</figure>
 <p>어텐션 가중치 계산은 디코더의 입력 및 은닉 상태를 입력으로
 사용하는 다른 feed-forwad 계층인 <code class="docutils literal notranslate"><span class="pre">attn</span></code> 으로 수행됩니다.
 학습 데이터에는 모든 크기의 문장이 있기 때문에 이 계층을 실제로
 만들고 학습시키려면 적용 할 수 있는 최대 문장 길이 (인코더 출력을 위한 입력 길이)를
 선택해야 합니다. 최대 길이의 문장은 모든 Attention 가중치를 사용하지만
 더 짧은 문장은 처음 몇 개만 사용합니다.</p>
-<div class="figure align-default">
+<figure class="align-default">
 <img alt="" src="../_images/attention-decoder-network.png" />
-</div>
+</figure>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">AttnDecoderRNN</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">,</span> <span class="n">output_size</span><span class="p">,</span> <span class="n">dropout_p</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="n">MAX_LENGTH</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">AttnDecoderRNN</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
@@ -802,12 +803,12 @@ limitation by using a relative position approach. Read about “local
 attention” in <a class="reference external" href="https://arxiv.org/abs/1508.04025">Effective Approaches to Attention-based Neural Machine
 Translation</a>.</p>
 </div>
-</div>
-</div>
-</div>
-<div class="section" id="id7">
+</section>
+</section>
+</section>
+<section id="id7">
 <h2>학습<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="id8">
+<section id="id8">
 <h3>학습 데이터 준비<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
 <p>학습을 위해서, 각 쌍마다 입력 Tensor(입력 문장의 단어 주소)와
 목표 Tensor(목표 문장의 단어 주소)가 필요합니다. 이 벡터들을
@@ -828,8 +829,8 @@ Translation</a>.</p>
     <span class="k">return</span> <span class="p">(</span><span class="n">input_tensor</span><span class="p">,</span> <span class="n">target_tensor</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="id9">
+</section>
+<section id="id9">
 <h3>모델 학습<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
 <p>학습을 위해서 인코더에 입력 문장을 넣고 모든 출력과 최신 은닉 상태를
 추적합니다. 그런 다음 디코더에 첫 번째 입력으로 <code class="docutils literal notranslate"><span class="pre">&lt;SOS&gt;</span></code> 토큰과
@@ -965,8 +966,8 @@ Teacher Forcing을 사용할지 아니면 사용하지 않을지를 선택할 �
     <span class="n">showPlot</span><span class="p">(</span><span class="n">plot_losses</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="id10">
+</section>
+<section id="id10">
 <h3>결과 도식화<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h3>
 <p>matplotlib로 학습 중에 저장된 손실 값 <code class="docutils literal notranslate"><span class="pre">plot_losses</span></code> 의 배열을
 사용하여 도식화합니다.</p>
@@ -985,9 +986,9 @@ Teacher Forcing을 사용할지 아니면 사용하지 않을지를 선택할 �
     <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">points</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-</div>
-<div class="section" id="id11">
+</section>
+</section>
+<section id="id11">
 <h2>평가<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h2>
 <p>평가는 대부분 학습과 동일하지만 목표가 없으므로 각 단계마다 디코더의
 예측을 되돌려 전달합니다.
@@ -1043,8 +1044,8 @@ Teacher Forcing을 사용할지 아니면 사용하지 않을지를 선택할 �
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="id12">
+</section>
+<section id="id12">
 <h2>학습과 평가<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h2>
 <p>이러한 모든 헬퍼 함수를 이용해서 (추가 작업처럼 보이지만 여러 실험을
 더 쉽게 수행 할 수 있음) 실제로 네트워크를 초기화하고 학습을
@@ -1073,69 +1074,69 @@ Teacher Forcing을 사용할지 아니면 사용하지 않을지를 선택할 �
 </li>
 </ul>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>1m 40s (- 23m 23s) (5000 6%) 2.8601
-3m 15s (- 21m 10s) (10000 13%) 2.2849
-4m 51s (- 19m 27s) (15000 20%) 1.9771
-6m 27s (- 17m 45s) (20000 26%) 1.7248
-8m 2s (- 16m 5s) (25000 33%) 1.5307
-9m 38s (- 14m 27s) (30000 40%) 1.3466
-11m 15s (- 12m 51s) (35000 46%) 1.2022
-12m 51s (- 11m 15s) (40000 53%) 1.0941
-14m 27s (- 9m 38s) (45000 60%) 0.9423
-16m 3s (- 8m 1s) (50000 66%) 0.8755
-17m 41s (- 6m 26s) (55000 73%) 0.8031
-19m 17s (- 4m 49s) (60000 80%) 0.7307
-20m 55s (- 3m 13s) (65000 86%) 0.6967
-22m 32s (- 1m 36s) (70000 93%) 0.6411
-24m 10s (- 0m 0s) (75000 100%) 0.5666
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>1m 29s (- 20m 51s) (5000 6%) 2.8082
+2m 51s (- 18m 34s) (10000 13%) 2.3015
+4m 13s (- 16m 52s) (15000 20%) 1.9728
+5m 36s (- 15m 24s) (20000 26%) 1.7474
+7m 0s (- 14m 0s) (25000 33%) 1.5357
+8m 23s (- 12m 35s) (30000 40%) 1.3427
+9m 49s (- 11m 13s) (35000 46%) 1.2301
+11m 34s (- 10m 7s) (40000 53%) 1.1096
+13m 0s (- 8m 40s) (45000 60%) 0.9718
+14m 25s (- 7m 12s) (50000 66%) 0.9142
+15m 53s (- 5m 46s) (55000 73%) 0.8231
+17m 31s (- 4m 22s) (60000 80%) 0.7588
+18m 58s (- 2m 55s) (65000 86%) 0.6891
+20m 23s (- 1m 27s) (70000 93%) 0.6308
+21m 47s (- 0m 0s) (75000 100%) 0.5364
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">evaluateRandomly</span><span class="p">(</span><span class="n">encoder1</span><span class="p">,</span> <span class="n">attn_decoder1</span><span class="p">)</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&gt; je n en suis pas persuadee .
-= i m not persuaded .
-&lt; i m not persuaded . &lt;EOS&gt;
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&gt; nous n allons pas vous repondre .
+= we re not going to do it .
+&lt; we re not going to do that . &lt;EOS&gt;
 
-&gt; vous etes decue n est ce pas ?
-= you re disappointed aren t you ?
-&lt; you re disappointed aren t you ? &lt;EOS&gt;
+&gt; elle sait parler dix langues .
+= she is able to speak ten languages .
+&lt; she is able to speak ten languages . &lt;EOS&gt;
 
-&gt; je suis distrait .
-= i m forgetful .
-&lt; i m forgetful . &lt;EOS&gt;
+&gt; il est methodique .
+= he is a methodical person .
+&lt; he is a methodical person . &lt;EOS&gt;
 
-&gt; il fait attention a ses manieres .
-= he is careful about his manners .
-&lt; he is used to her herself . &lt;EOS&gt;
+&gt; t es plantee .
+= you re stuck .
+&lt; you re stuck . &lt;EOS&gt;
 
-&gt; tu es fort bon .
-= you re very good .
-&lt; you re very good . &lt;EOS&gt;
+&gt; je suis plutot occupe .
+= i m rather busy .
+&lt; i m pretty busy . &lt;EOS&gt;
 
-&gt; nous sommes a l interieur .
-= we re inside .
-&lt; we re inside . &lt;EOS&gt;
+&gt; elle est habillee en mariee .
+= she is dressed like a bride .
+&lt; she is dressed like a bride . &lt;EOS&gt;
 
-&gt; je ne suis pas perfectionniste .
-= i m not a perfectionist .
-&lt; i m not a . &lt;EOS&gt;
+&gt; tu me decois .
+= i m disappointed in you .
+&lt; i m disappointed in you . &lt;EOS&gt;
 
-&gt; il adore l opera .
-= he s an opera lover .
-&lt; he s an opera lover . &lt;EOS&gt;
+&gt; je suis voyant .
+= i m psychic .
+&lt; i m psychic . &lt;EOS&gt;
 
-&gt; je suis cette voiture .
-= i am following that car .
-&lt; i am on my car . &lt;EOS&gt;
+&gt; elle a six ans de plus que moi .
+= she s six years older than i am .
+&lt; she s six years older than i am &lt;EOS&gt;
 
-&gt; elles sont trop grosses .
-= they re too fat .
-&lt; they re too . &lt;EOS&gt;
+&gt; vous etes fort elegant .
+= you re very sophisticated .
+&lt; you re very sophisticated . &lt;EOS&gt;
 </pre></div>
 </div>
-<div class="section" id="id13">
+<section id="id13">
 <h3>Attention 시각화<a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h3>
 <p>Attention 메커니즘의 유용한 속성은 하나는 해석 가능성이 높은 출력입니다.
 입력 시퀀스의 특정 인코더 출력에 가중치를 부여하는 데 사용되므로
@@ -1197,18 +1198,18 @@ Teacher Forcing을 사용할지 아니면 사용하지 않을지를 선택할 �
 </ul>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>input = elle a cinq ans de moins que moi .
-output = she s five years younger than i am . &lt;EOS&gt;
+output = she s five years younger than me . &lt;EOS&gt;
 input = elle est trop petit .
 output = she is too short . &lt;EOS&gt;
 input = je ne crains pas de mourir .
-output = i m not afraid to die . &lt;EOS&gt;
+output = i m not scared to die . &lt;EOS&gt;
 input = c est un jeune directeur plein de talent .
-output = he is a very talented player . &lt;EOS&gt;
+output = he s a talented . &lt;EOS&gt;
 </pre></div>
 </div>
-</div>
-</div>
-<div class="section" id="id14">
+</section>
+</section>
+<section id="id14">
 <h2>연습<a class="headerlink" href="#id14" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>다른 데이터 셋을 시도해 보십시오</p>
@@ -1234,7 +1235,7 @@ embedding 을 교체하십시오</p></li>
 </ul>
 </li>
 </ul>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 24 minutes  17.947 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 21 minutes  56.805 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-intermediate-seq2seq-translation-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/3baf9960a4be104931872ff3ffda07b7/seq2seq_translation_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">seq2seq_translation_tutorial.py</span></code></a></p>
@@ -1244,8 +1245,8 @@ embedding 을 교체하십시오</p></li>
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
-</div>
-</div>
+</section>
+</section>
 
 
              </article>
@@ -1338,7 +1339,7 @@ embedding 을 교체하십시오</p></li>
 
 
   
-
+  
      
        <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
          <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
@@ -1351,7 +1352,6 @@ embedding 을 교체하십시오</p></li>
          <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
          <script src="../_static/katex_autorenderer.js"></script>
      
-
   
 
   <script type="text/javascript" src="../_static/js/vendor/popper.min.js"></script>

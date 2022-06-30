@@ -6,7 +6,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
 <meta property="og:title" content="PyTorch 사전 빌드된 라이브러리를 사용하는 네이티브 Android 애플리케이션 만들기" />
   
 <meta property="og:type" content="article" />
@@ -389,7 +390,7 @@
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <div class="section" id="pytorch-android">
+  <section id="pytorch-android">
 <h1>PyTorch 사전 빌드된 라이브러리를 사용하는 네이티브 Android 애플리케이션 만들기<a class="headerlink" href="#pytorch-android" title="Permalink to this headline">¶</a></h1>
 <p><strong>저자</strong>: <a class="reference external" href="https://github.com/IvanKobzarev">Ivan Kobzarev</a></p>
 <p><strong>번역</strong>: <a class="reference external" href="https://github.com/des00">김현길</a>,  <a class="reference external" href="https://github.com/ajin-jng">Ajin Jeong</a></p>
@@ -401,7 +402,7 @@
 </ul>
 </div></blockquote>
 <p>이 앱의 전체 설정은 <a class="reference external" href="https://github.com/pytorch/android-demo-app/tree/master/NativeApp">PyTorch Android Demo Application Repository</a> 에서 찾을 수 있습니다.</p>
-<div class="section" id="id2">
+<section id="id2">
 <h2>설정<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
 <p>다음과 같은 패키지(및 종속성)가 설치된 Python 3 환경이 필요합니다:</p>
 <ul class="simple">
@@ -444,8 +445,8 @@ unzip gradle-4.10.3-bin.zip
 </ul>
 <p>사용자 지정 연산자는 OpenCV 라이브러리를 사용하여 구현합니다. OpenCV를 Android를 위해 사용하려면 사전 빌드된 Android용 OpenCV 라이브러리를 다운로드해야 됩니다.
 <a class="reference external" href="https://opencv.org/releases/">OpenCV releases page</a> 에서 다운로드합니다. 압축을 풀고 환경 변수 <code class="docutils literal notranslate"><span class="pre">OPENCV_ANDROID_SDK</span></code> 를 설정합니다.</p>
-</div>
-<div class="section" id="c-torchscript-model">
+</section>
+<section id="c-torchscript-model">
 <h2>사용자 지정 C++ 연산자로 TorchScript Model 준비하기<a class="headerlink" href="#c-torchscript-model" title="Permalink to this headline">¶</a></h2>
 <p>TorchScript는 사용자 정의 C++ 연산자를 사용하는 것을 허용하며, 사용자 정의 연산 관련된 세부사항은
 <a class="reference external" href="https://tutorials.pytorch.kr/advanced/torch_script_custom_ops.html">the dedicated tutorial</a> 여기에서 읽을 수 있습니다.</p>
@@ -515,8 +516,8 @@ CentOS:</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>apt-get install libopencv-dev
 </pre></div>
 </div>
-</div>
-<div class="section" id="android">
+</section>
+<section id="android">
 <h2>Android 애플리케이션 만들기<a class="headerlink" href="#android" title="Permalink to this headline">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">compute.pt</span></code> 를 만들었으면 Android 애플리케이션 내에서 이 TorchScript 모델을 사용하겠습니다. Java API를 이용해서 Android상에서 일반적인 TorchScript 모델(사용자 지정 연산자 없이)을 사용하고자 한다면 <a class="reference external" href="https://pytorch.org/mobile/android/">여기</a> 를 살펴 보십시오. 이 예제에서는 사용자 지정 연산자(<code class="docutils literal notranslate"><span class="pre">my_ops.warp_perspective</span></code>)를 사용해서 위와 같은 방밥을 사용할 수 없습니다. 기본 TorchScript 실행이 이 사용자 지정 연산자를 찾지 못하기 때문입니다.</p>
 <p>연산자 동륵은 PyTorch Java API에 노출이 되지 않기에, Android 애플리케이션 네이티브 부분(C++)을 빌드하고, Android용 동일한 사용자 지정 연산자를 LibTorch C++ API를 이용해서 구현하고 등록해야 합니다. 연산자가 OpenCV 라이브러리를 사용하기에, 사전 빌드된 OpenCV Android 라이브러리와 OpenCV의 동일한 함수를 이용합니다.</p>
@@ -525,13 +526,13 @@ CentOS:</p>
 <span class="nb">cd</span> NativeApp
 </pre></div>
 </div>
-</div>
-<div class="section" id="id5">
+</section>
+<section id="id5">
 <h2>Android 애플리케이션 빌드 설정하기<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h2>
 <p>Android 애플리케이션 빌드는 메인 gradle 부분과 네이티브 빌드 Cmake 부분으로 이루어집니다.
 여기 나열된 목록은 전체 파일 목록입니다. 그래서 전체 구조를 새로이 만들고자 한다면
 코드를 별도로 추가하지 않아도 결과로 나온 Android 애플리케이션을 빌드하고 설치할 수 있습니다.</p>
-<div class="section" id="gradle">
+<section id="gradle">
 <h3>Gradle 빌드 설정하기<a class="headerlink" href="#gradle" title="Permalink to this headline">¶</a></h3>
 <p>이러한 gradle 설정 파일울 추가해야 합니다: build.gradle, gradle.properties, settings.gradle.
 추가적인 Android Gradle 빌드 설정은 <a class="reference external" href="https://developer.android.com/studio/build">여기</a> 에서 찾을 수 있습니다.</p>
@@ -672,64 +673,64 @@ defaultConfig {
 </pre></div>
 </div>
 <p>네이티브 빌드를 위해 <code class="docutils literal notranslate"><span class="pre">CMake</span></code> 설정을 사용합니다. 우리가 사용하는 다양한 라이브러리들이 있기 때문에, STL과 동적으로 연결시키는 것도 명기합니다. 이에 대한 자세한 내용은 <a class="reference external" href="https://developer.android.com/ndk/guides/cpp-support">여기</a> 에서 찾을 수 있습니다.</p>
-</div>
-<div class="section" id="cmake">
+</section>
+<section id="cmake">
 <h3>네이티브 빌드 CMake 설정하기<a class="headerlink" href="#cmake" title="Permalink to this headline">¶</a></h3>
 <p>네이티브 빌드는 <code class="docutils literal notranslate"><span class="pre">NativeApp/app/CMakeLists.txt</span></code> 에서 설정합니다:</p>
-<div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="nb">cmake_minimum_required</span><span class="p">(</span><span class="s">VERSION</span> <span class="s">3.4.1</span><span class="p">)</span>
-<span class="nb">set</span><span class="p">(</span><span class="s">TARGET</span> <span class="s">pytorch_nativeapp</span><span class="p">)</span>
-<span class="nb">project</span><span class="p">(</span><span class="o">${</span><span class="nv">TARGET</span><span class="o">}</span> <span class="s">CXX</span><span class="p">)</span>
-<span class="nb">set</span><span class="p">(</span><span class="s">CMAKE_CXX_STANDARD</span> <span class="s">14</span><span class="p">)</span>
+<div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="nb">cmake_minimum_required</span><span class="p">(</span><span class="s">VERSION</span><span class="w"> </span><span class="s">3.4.1</span><span class="p">)</span>
+<span class="nb">set</span><span class="p">(</span><span class="s">TARGET</span><span class="w"> </span><span class="s">pytorch_nativeapp</span><span class="p">)</span>
+<span class="nb">project</span><span class="p">(</span><span class="o">${</span><span class="nv">TARGET</span><span class="o">}</span><span class="w"> </span><span class="s">CXX</span><span class="p">)</span>
+<span class="nb">set</span><span class="p">(</span><span class="s">CMAKE_CXX_STANDARD</span><span class="w"> </span><span class="s">14</span><span class="p">)</span>
 
-<span class="nb">set</span><span class="p">(</span><span class="s">build_DIR</span> <span class="o">${</span><span class="nv">CMAKE_SOURCE_DIR</span><span class="o">}</span><span class="s">/build</span><span class="p">)</span>
+<span class="nb">set</span><span class="p">(</span><span class="s">build_DIR</span><span class="w"> </span><span class="o">${</span><span class="nv">CMAKE_SOURCE_DIR</span><span class="o">}</span><span class="s">/build</span><span class="p">)</span>
 
-<span class="nb">set</span><span class="p">(</span><span class="s">pytorch_testapp_cpp_DIR</span> <span class="o">${</span><span class="nv">CMAKE_CURRENT_LIST_DIR</span><span class="o">}</span><span class="s">/src/main/cpp</span><span class="p">)</span>
-<span class="nb">file</span><span class="p">(</span><span class="s">GLOB</span> <span class="s">pytorch_testapp_SOURCES</span>
-  <span class="o">${</span><span class="nv">pytorch_testapp_cpp_DIR</span><span class="o">}</span><span class="s">/pytorch_nativeapp.cpp</span>
+<span class="nb">set</span><span class="p">(</span><span class="s">pytorch_testapp_cpp_DIR</span><span class="w"> </span><span class="o">${</span><span class="nv">CMAKE_CURRENT_LIST_DIR</span><span class="o">}</span><span class="s">/src/main/cpp</span><span class="p">)</span>
+<span class="nb">file</span><span class="p">(</span><span class="s">GLOB</span><span class="w"> </span><span class="s">pytorch_testapp_SOURCES</span>
+<span class="w">  </span><span class="o">${</span><span class="nv">pytorch_testapp_cpp_DIR</span><span class="o">}</span><span class="s">/pytorch_nativeapp.cpp</span>
 <span class="p">)</span>
 
-<span class="nb">add_library</span><span class="p">(</span><span class="o">${</span><span class="nv">TARGET</span><span class="o">}</span> <span class="s">SHARED</span>
-    <span class="o">${</span><span class="nv">pytorch_testapp_SOURCES</span><span class="o">}</span>
+<span class="nb">add_library</span><span class="p">(</span><span class="o">${</span><span class="nv">TARGET</span><span class="o">}</span><span class="w"> </span><span class="s">SHARED</span>
+<span class="w">    </span><span class="o">${</span><span class="nv">pytorch_testapp_SOURCES</span><span class="o">}</span>
 <span class="p">)</span>
 
-<span class="nb">file</span><span class="p">(</span><span class="s">GLOB</span> <span class="s">PYTORCH_INCLUDE_DIRS</span> <span class="s2">&quot;${build_DIR}/pytorch_android*.aar/headers&quot;</span><span class="p">)</span>
-<span class="nb">file</span><span class="p">(</span><span class="s">GLOB</span> <span class="s">PYTORCH_LINK_DIRS</span> <span class="s2">&quot;${build_DIR}/pytorch_android*.aar/jni/${ANDROID_ABI}&quot;</span><span class="p">)</span>
+<span class="nb">file</span><span class="p">(</span><span class="s">GLOB</span><span class="w"> </span><span class="s">PYTORCH_INCLUDE_DIRS</span><span class="w"> </span><span class="s2">&quot;${build_DIR}/pytorch_android*.aar/headers&quot;</span><span class="p">)</span>
+<span class="nb">file</span><span class="p">(</span><span class="s">GLOB</span><span class="w"> </span><span class="s">PYTORCH_LINK_DIRS</span><span class="w"> </span><span class="s2">&quot;${build_DIR}/pytorch_android*.aar/jni/${ANDROID_ABI}&quot;</span><span class="p">)</span>
 
-<span class="nb">target_compile_options</span><span class="p">(</span><span class="o">${</span><span class="nv">TARGET</span><span class="o">}</span> <span class="s">PRIVATE</span>
-  <span class="s">-fexceptions</span>
+<span class="nb">target_compile_options</span><span class="p">(</span><span class="o">${</span><span class="nv">TARGET</span><span class="o">}</span><span class="w"> </span><span class="s">PRIVATE</span>
+<span class="w">  </span><span class="s">-fexceptions</span>
 <span class="p">)</span>
 
-<span class="nb">set</span><span class="p">(</span><span class="s">BUILD_SUBDIR</span> <span class="o">${</span><span class="nv">ANDROID_ABI</span><span class="o">}</span><span class="p">)</span>
+<span class="nb">set</span><span class="p">(</span><span class="s">BUILD_SUBDIR</span><span class="w"> </span><span class="o">${</span><span class="nv">ANDROID_ABI</span><span class="o">}</span><span class="p">)</span>
 
-<span class="nb">find_library</span><span class="p">(</span><span class="s">PYTORCH_LIBRARY</span> <span class="s">pytorch_jni</span>
-  <span class="s">PATHS</span> <span class="o">${</span><span class="nv">PYTORCH_LINK_DIRS</span><span class="o">}</span>
-  <span class="s">NO_CMAKE_FIND_ROOT_PATH</span><span class="p">)</span>
-<span class="nb">find_library</span><span class="p">(</span><span class="s">FBJNI_LIBRARY</span> <span class="s">fbjni</span>
-  <span class="s">PATHS</span> <span class="o">${</span><span class="nv">PYTORCH_LINK_DIRS</span><span class="o">}</span>
-  <span class="s">NO_CMAKE_FIND_ROOT_PATH</span><span class="p">)</span>
+<span class="nb">find_library</span><span class="p">(</span><span class="s">PYTORCH_LIBRARY</span><span class="w"> </span><span class="s">pytorch_jni</span>
+<span class="w">  </span><span class="s">PATHS</span><span class="w"> </span><span class="o">${</span><span class="nv">PYTORCH_LINK_DIRS</span><span class="o">}</span>
+<span class="w">  </span><span class="s">NO_CMAKE_FIND_ROOT_PATH</span><span class="p">)</span>
+<span class="nb">find_library</span><span class="p">(</span><span class="s">FBJNI_LIBRARY</span><span class="w"> </span><span class="s">fbjni</span>
+<span class="w">  </span><span class="s">PATHS</span><span class="w"> </span><span class="o">${</span><span class="nv">PYTORCH_LINK_DIRS</span><span class="o">}</span>
+<span class="w">  </span><span class="s">NO_CMAKE_FIND_ROOT_PATH</span><span class="p">)</span>
 
 <span class="c"># OpenCV</span>
-<span class="nb">if</span><span class="p">(</span><span class="s">NOT</span> <span class="s">DEFINED</span> <span class="s">ENV{OPENCV_ANDROID_SDK}</span><span class="p">)</span>
-  <span class="nb">message</span><span class="p">(</span><span class="s">FATAL_ERROR</span> <span class="s2">&quot;Environment var OPENCV_ANDROID_SDK is not set&quot;</span><span class="p">)</span>
+<span class="nb">if</span><span class="p">(</span><span class="s">NOT</span><span class="w"> </span><span class="s">DEFINED</span><span class="w"> </span><span class="s">ENV{OPENCV_ANDROID_SDK}</span><span class="p">)</span>
+<span class="w">  </span><span class="nb">message</span><span class="p">(</span><span class="s">FATAL_ERROR</span><span class="w"> </span><span class="s2">&quot;Environment var OPENCV_ANDROID_SDK is not set&quot;</span><span class="p">)</span>
 <span class="nb">endif</span><span class="p">()</span>
 
-<span class="nb">set</span><span class="p">(</span><span class="s">OPENCV_INCLUDE_DIR</span> <span class="s2">&quot;$ENV{OPENCV_ANDROID_SDK}/sdk/native/jni/include&quot;</span><span class="p">)</span>
+<span class="nb">set</span><span class="p">(</span><span class="s">OPENCV_INCLUDE_DIR</span><span class="w"> </span><span class="s2">&quot;$ENV{OPENCV_ANDROID_SDK}/sdk/native/jni/include&quot;</span><span class="p">)</span>
 
-<span class="nb">target_include_directories</span><span class="p">(</span><span class="o">${</span><span class="nv">TARGET</span><span class="o">}</span> <span class="s">PRIVATE</span>
- <span class="s2">&quot;${OPENCV_INCLUDE_DIR}&quot;</span>
-  <span class="o">${</span><span class="nv">PYTORCH_INCLUDE_DIRS</span><span class="o">}</span><span class="p">)</span>
+<span class="nb">target_include_directories</span><span class="p">(</span><span class="o">${</span><span class="nv">TARGET</span><span class="o">}</span><span class="w"> </span><span class="s">PRIVATE</span>
+<span class="w"> </span><span class="s2">&quot;${OPENCV_INCLUDE_DIR}&quot;</span>
+<span class="w">  </span><span class="o">${</span><span class="nv">PYTORCH_INCLUDE_DIRS</span><span class="o">}</span><span class="p">)</span>
 
-<span class="nb">set</span><span class="p">(</span><span class="s">OPENCV_LIB_DIR</span> <span class="s2">&quot;$ENV{OPENCV_ANDROID_SDK}/sdk/native/libs/${ANDROID_ABI}&quot;</span><span class="p">)</span>
+<span class="nb">set</span><span class="p">(</span><span class="s">OPENCV_LIB_DIR</span><span class="w"> </span><span class="s2">&quot;$ENV{OPENCV_ANDROID_SDK}/sdk/native/libs/${ANDROID_ABI}&quot;</span><span class="p">)</span>
 
-<span class="nb">find_library</span><span class="p">(</span><span class="s">OPENCV_LIBRARY</span> <span class="s">opencv_java4</span>
-  <span class="s">PATHS</span> <span class="o">${</span><span class="nv">OPENCV_LIB_DIR</span><span class="o">}</span>
-  <span class="s">NO_CMAKE_FIND_ROOT_PATH</span><span class="p">)</span>
+<span class="nb">find_library</span><span class="p">(</span><span class="s">OPENCV_LIBRARY</span><span class="w"> </span><span class="s">opencv_java4</span>
+<span class="w">  </span><span class="s">PATHS</span><span class="w"> </span><span class="o">${</span><span class="nv">OPENCV_LIB_DIR</span><span class="o">}</span>
+<span class="w">  </span><span class="s">NO_CMAKE_FIND_ROOT_PATH</span><span class="p">)</span>
 
 <span class="nb">target_link_libraries</span><span class="p">(</span><span class="o">${</span><span class="nv">TARGET</span><span class="o">}</span>
-  <span class="o">${</span><span class="nv">PYTORCH_LIBRARY</span><span class="o">}</span>
-  <span class="o">${</span><span class="nv">FBJNI_LIBRARY</span><span class="o">}</span>
-  <span class="o">${</span><span class="nv">OPENCV_LIBRARY</span><span class="o">}</span>
-  <span class="s">log</span><span class="p">)</span>
+<span class="w">  </span><span class="o">${</span><span class="nv">PYTORCH_LIBRARY</span><span class="o">}</span>
+<span class="w">  </span><span class="o">${</span><span class="nv">FBJNI_LIBRARY</span><span class="o">}</span>
+<span class="w">  </span><span class="o">${</span><span class="nv">OPENCV_LIBRARY</span><span class="o">}</span>
+<span class="w">  </span><span class="s">log</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>여기에서는 소스 파일 <code class="docutils literal notranslate"><span class="pre">pytorch_nativeapp.cpp</span></code> 하나만 등록합니다.</p>
@@ -742,16 +743,16 @@ defaultConfig {
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>cp -R <span class="nv">$OPENCV_ANDROID_SDK</span>/sdk/native/libs/* NativeApp/app/src/main/jniLibs/
 </pre></div>
 </div>
-</div>
-<div class="section" id="id10">
+</section>
+<section id="id10">
 <h3>애플리케이션에 모델 파일 추가하기<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h3>
 <p>애플리케이션 내부에 TorschScript 모델인 <code class="docutils literal notranslate"><span class="pre">compute.pt</span></code> 를 패키징하려면 모델 파일을 assets 폴더로 복사를 해야 합니다:</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>mkdir -p NativeApp/app/src/main/assets
 cp compute.pt NativeApp/app/src/main/assets
 </pre></div>
 </div>
-</div>
-<div class="section" id="android-manifest">
+</section>
+<section id="android-manifest">
 <h3>Android 애플리케이션 매니페스트(Manifest)<a class="headerlink" href="#android-manifest" title="Permalink to this headline">¶</a></h3>
 <p>모든 Android 애플리케이션은 매니페스트가 있습니다.
 여기에 애플리케이션 이름, 패키지, 메인 액티비티를 명기합니다.</p>
@@ -776,60 +777,60 @@ cp compute.pt NativeApp/app/src/main/assets
 &lt;/manifest&gt;
 </pre></div>
 </div>
-</div>
-<div class="section" id="id11">
+</section>
+<section id="id11">
 <h3>소스코드<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h3>
-</div>
-<div class="section" id="java">
+</section>
+<section id="java">
 <h3>Java 코드<a class="headerlink" href="#java" title="Permalink to this headline">¶</a></h3>
 <p>이제 MainActivity를 아래 파일에서 구현할 준비가 되었습니다</p>
 <p><code class="docutils literal notranslate"><span class="pre">NativeApp/app/src/main/java/org/pytorch/nativeapp/MainActivity.java</span></code>:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kn">package</span> <span class="nn">org.pytorch.nativeapp</span><span class="p">;</span>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kn">package</span><span class="w"> </span><span class="nn">org.pytorch.nativeapp</span><span class="p">;</span><span class="w"></span>
 
-<span class="kn">import</span> <span class="nn">android.content.Context</span><span class="p">;</span>
-<span class="kn">import</span> <span class="nn">android.os.Bundle</span><span class="p">;</span>
-<span class="kn">import</span> <span class="nn">android.util.Log</span><span class="p">;</span>
-<span class="kn">import</span> <span class="nn">androidx.appcompat.app.AppCompatActivity</span><span class="p">;</span>
-<span class="kn">import</span> <span class="nn">java.io.File</span><span class="p">;</span>
-<span class="kn">import</span> <span class="nn">java.io.FileOutputStream</span><span class="p">;</span>
-<span class="kn">import</span> <span class="nn">java.io.IOException</span><span class="p">;</span>
-<span class="kn">import</span> <span class="nn">java.io.InputStream</span><span class="p">;</span>
-<span class="kn">import</span> <span class="nn">java.io.OutputStream</span><span class="p">;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">android.content.Context</span><span class="p">;</span><span class="w"></span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">android.os.Bundle</span><span class="p">;</span><span class="w"></span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">android.util.Log</span><span class="p">;</span><span class="w"></span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">androidx.appcompat.app.AppCompatActivity</span><span class="p">;</span><span class="w"></span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">java.io.File</span><span class="p">;</span><span class="w"></span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">java.io.FileOutputStream</span><span class="p">;</span><span class="w"></span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">java.io.IOException</span><span class="p">;</span><span class="w"></span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">java.io.InputStream</span><span class="p">;</span><span class="w"></span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">java.io.OutputStream</span><span class="p">;</span><span class="w"></span>
 
-<span class="kd">public</span> <span class="kd">class</span> <span class="nc">MainActivity</span> <span class="kd">extends</span> <span class="n">AppCompatActivity</span> <span class="p">{</span>
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">MainActivity</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">AppCompatActivity</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
 
-  <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">TAG</span> <span class="o">=</span> <span class="s">&quot;PyTorchNativeApp&quot;</span><span class="p">;</span>
+<span class="w">  </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">TAG</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;PyTorchNativeApp&quot;</span><span class="p">;</span><span class="w"></span>
 
-  <span class="kd">public</span> <span class="kd">static</span> <span class="n">String</span> <span class="nf">assetFilePath</span><span class="p">(</span><span class="n">Context</span> <span class="n">context</span><span class="p">,</span> <span class="n">String</span> <span class="n">assetName</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">File</span> <span class="n">file</span> <span class="o">=</span> <span class="k">new</span> <span class="n">File</span><span class="p">(</span><span class="n">context</span><span class="p">.</span><span class="na">getFilesDir</span><span class="p">(),</span> <span class="n">assetName</span><span class="p">);</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">file</span><span class="p">.</span><span class="na">exists</span><span class="p">()</span> <span class="o">&amp;&amp;</span> <span class="n">file</span><span class="p">.</span><span class="na">length</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-      <span class="k">return</span> <span class="n">file</span><span class="p">.</span><span class="na">getAbsolutePath</span><span class="p">();</span>
-    <span class="p">}</span>
+<span class="w">  </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">assetFilePath</span><span class="p">(</span><span class="n">Context</span><span class="w"> </span><span class="n">context</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">assetName</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">File</span><span class="w"> </span><span class="n">file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">File</span><span class="p">(</span><span class="n">context</span><span class="p">.</span><span class="na">getFilesDir</span><span class="p">(),</span><span class="w"> </span><span class="n">assetName</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">file</span><span class="p">.</span><span class="na">exists</span><span class="p">()</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">file</span><span class="p">.</span><span class="na">length</span><span class="p">()</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="n">file</span><span class="p">.</span><span class="na">getAbsolutePath</span><span class="p">();</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
 
-    <span class="k">try</span> <span class="p">(</span><span class="n">InputStream</span> <span class="n">is</span> <span class="o">=</span> <span class="n">context</span><span class="p">.</span><span class="na">getAssets</span><span class="p">().</span><span class="na">open</span><span class="p">(</span><span class="n">assetName</span><span class="p">))</span> <span class="p">{</span>
-      <span class="k">try</span> <span class="p">(</span><span class="n">OutputStream</span> <span class="n">os</span> <span class="o">=</span> <span class="k">new</span> <span class="n">FileOutputStream</span><span class="p">(</span><span class="n">file</span><span class="p">))</span> <span class="p">{</span>
-        <span class="kt">byte</span><span class="o">[]</span> <span class="n">buffer</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">byte</span><span class="o">[</span><span class="mi">4</span> <span class="o">*</span> <span class="mi">1024</span><span class="o">]</span><span class="p">;</span>
-        <span class="kt">int</span> <span class="n">read</span><span class="p">;</span>
-        <span class="k">while</span> <span class="p">((</span><span class="n">read</span> <span class="o">=</span> <span class="n">is</span><span class="p">.</span><span class="na">read</span><span class="p">(</span><span class="n">buffer</span><span class="p">))</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-          <span class="n">os</span><span class="p">.</span><span class="na">write</span><span class="p">(</span><span class="n">buffer</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">read</span><span class="p">);</span>
-        <span class="p">}</span>
-        <span class="n">os</span><span class="p">.</span><span class="na">flush</span><span class="p">();</span>
-      <span class="p">}</span>
-      <span class="k">return</span> <span class="n">file</span><span class="p">.</span><span class="na">getAbsolutePath</span><span class="p">();</span>
-    <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="n">IOException</span> <span class="n">e</span><span class="p">)</span> <span class="p">{</span>
-      <span class="n">Log</span><span class="p">.</span><span class="na">e</span><span class="p">(</span><span class="n">TAG</span><span class="p">,</span> <span class="s">&quot;Error process asset &quot;</span> <span class="o">+</span> <span class="n">assetName</span> <span class="o">+</span> <span class="s">&quot; to file path&quot;</span><span class="p">);</span>
-    <span class="p">}</span>
-    <span class="k">return</span> <span class="kc">null</span><span class="p">;</span>
-  <span class="p">}</span>
+<span class="w">    </span><span class="k">try</span><span class="w"> </span><span class="p">(</span><span class="n">InputStream</span><span class="w"> </span><span class="n">is</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">context</span><span class="p">.</span><span class="na">getAssets</span><span class="p">().</span><span class="na">open</span><span class="p">(</span><span class="n">assetName</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">      </span><span class="k">try</span><span class="w"> </span><span class="p">(</span><span class="n">OutputStream</span><span class="w"> </span><span class="n">os</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">FileOutputStream</span><span class="p">(</span><span class="n">file</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="kt">byte</span><span class="o">[]</span><span class="w"> </span><span class="n">buffer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="kt">byte</span><span class="o">[</span><span class="mi">4</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">1024</span><span class="o">]</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">read</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">while</span><span class="w"> </span><span class="p">((</span><span class="n">read</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">is</span><span class="p">.</span><span class="na">read</span><span class="p">(</span><span class="n">buffer</span><span class="p">))</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">          </span><span class="n">os</span><span class="p">.</span><span class="na">write</span><span class="p">(</span><span class="n">buffer</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">read</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">        </span><span class="n">os</span><span class="p">.</span><span class="na">flush</span><span class="p">();</span><span class="w"></span>
+<span class="w">      </span><span class="p">}</span><span class="w"></span>
+<span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="n">file</span><span class="p">.</span><span class="na">getAbsolutePath</span><span class="p">();</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">IOException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">      </span><span class="n">Log</span><span class="p">.</span><span class="na">e</span><span class="p">(</span><span class="n">TAG</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Error process asset &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">assetName</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&quot; to file path&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
 
-  <span class="nd">@Override</span>
-  <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">onCreate</span><span class="p">(</span><span class="n">Bundle</span> <span class="n">savedInstanceState</span><span class="p">)</span> <span class="p">{</span>
-    <span class="kd">super</span><span class="p">.</span><span class="na">onCreate</span><span class="p">(</span><span class="n">savedInstanceState</span><span class="p">);</span>
-    <span class="kd">final</span> <span class="n">String</span> <span class="n">modelFileAbsoluteFilePath</span> <span class="o">=</span>
-        <span class="k">new</span> <span class="n">File</span><span class="p">(</span><span class="n">assetFilePath</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="s">&quot;compute.pt&quot;</span><span class="p">)).</span><span class="na">getAbsolutePath</span><span class="p">();</span>
-    <span class="n">NativeClient</span><span class="p">.</span><span class="na">loadAndForwardModel</span><span class="p">(</span><span class="n">modelFileAbsoluteFilePath</span><span class="p">);</span>
-  <span class="p">}</span>
-<span class="p">}</span>
+<span class="w">  </span><span class="nd">@Override</span><span class="w"></span>
+<span class="w">  </span><span class="kd">protected</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">onCreate</span><span class="p">(</span><span class="n">Bundle</span><span class="w"> </span><span class="n">savedInstanceState</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kd">super</span><span class="p">.</span><span class="na">onCreate</span><span class="p">(</span><span class="n">savedInstanceState</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="kd">final</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">modelFileAbsoluteFilePath</span><span class="w"> </span><span class="o">=</span><span class="w"></span>
+<span class="w">        </span><span class="k">new</span><span class="w"> </span><span class="n">File</span><span class="p">(</span><span class="n">assetFilePath</span><span class="p">(</span><span class="k">this</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;compute.pt&quot;</span><span class="p">)).</span><span class="na">getAbsolutePath</span><span class="p">();</span><span class="w"></span>
+<span class="w">    </span><span class="n">NativeClient</span><span class="p">.</span><span class="na">loadAndForwardModel</span><span class="p">(</span><span class="n">modelFileAbsoluteFilePath</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
 </pre></div>
 </div>
 <p>이전 단계에서 <code class="docutils literal notranslate"><span class="pre">compute.pt</span></code> 을 <code class="docutils literal notranslate"><span class="pre">NativeApp/app/src/main/assets</span></code> 으로 복사했기 때문에, 이 파일은 Android 애플리케이션에 포함이 되는 asset이 되었습니다. Android 시스템은 그 파일에 접근할 수 있는 스트림만 제공합니다.
@@ -837,122 +838,122 @@ cp compute.pt NativeApp/app/src/main/assets
 <p>액티비티의 <code class="docutils literal notranslate"><span class="pre">OnCreate</span></code> 메소드는 액티비티 생성 직후 호출됩니다. 이 메소드 안에서 <code class="docutils literal notranslate"><span class="pre">assertFilePath</span></code> 를 호출하고, 앞서 생성한 파일을 JNI 호출을 통해 네이티브 코드로 전달하는 <code class="docutils literal notranslate"><span class="pre">NativeClient</span></code> 클래스를 호출합니다.</p>
 <p><code class="docutils literal notranslate"><span class="pre">NativeClient</span></code> 는 내부에 private 클래스인 <code class="docutils literal notranslate"><span class="pre">NativePeer</span></code> 가 있는 헬퍼 클래스로서, 애플리케이션의 네이티브 부분과 같이 동작하는 클래스입니다. 이 클래스의 static 블록에선 이전 단계에서 추가했던 <code class="docutils literal notranslate"><span class="pre">CMakeLists.txt</span></code> 와 함께 빌드하는 <code class="docutils literal notranslate"><span class="pre">libpytorch_nativeapp.so</span></code> 를 읽습니다. static 블록은 <code class="docutils literal notranslate"><span class="pre">NativePeer</span></code> 를 처음 참조할 때에 같이 실행이 됩니다. <code class="docutils literal notranslate"><span class="pre">NativeClient#loadAndForwardModel</span></code> 안에서 일어납니다.</p>
 <p><code class="docutils literal notranslate"><span class="pre">NativeApp/app/src/main/java/org/pytorch/nativeapp/NativeClient.java</span></code>:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kn">package</span> <span class="nn">org.pytorch.nativeapp</span><span class="p">;</span>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kn">package</span><span class="w"> </span><span class="nn">org.pytorch.nativeapp</span><span class="p">;</span><span class="w"></span>
 
-<span class="kd">public</span> <span class="kd">final</span> <span class="kd">class</span> <span class="nc">NativeClient</span> <span class="p">{</span>
+<span class="kd">public</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="kd">class</span> <span class="nc">NativeClient</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
 
-  <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">loadAndForwardModel</span><span class="p">(</span><span class="kd">final</span> <span class="n">String</span> <span class="n">modelPath</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">NativePeer</span><span class="p">.</span><span class="na">loadAndForwardModel</span><span class="p">(</span><span class="n">modelPath</span><span class="p">);</span>
-  <span class="p">}</span>
+<span class="w">  </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">loadAndForwardModel</span><span class="p">(</span><span class="kd">final</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">modelPath</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">NativePeer</span><span class="p">.</span><span class="na">loadAndForwardModel</span><span class="p">(</span><span class="n">modelPath</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
 
-  <span class="kd">private</span> <span class="kd">static</span> <span class="kd">class</span> <span class="nc">NativePeer</span> <span class="p">{</span>
-    <span class="kd">static</span> <span class="p">{</span>
-      <span class="n">System</span><span class="p">.</span><span class="na">loadLibrary</span><span class="p">(</span><span class="s">&quot;pytorch_nativeapp&quot;</span><span class="p">);</span>
-    <span class="p">}</span>
+<span class="w">  </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">class</span> <span class="nc">NativePeer</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kd">static</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">      </span><span class="n">System</span><span class="p">.</span><span class="na">loadLibrary</span><span class="p">(</span><span class="s">&quot;pytorch_nativeapp&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
 
-    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">native</span> <span class="kt">void</span> <span class="nf">loadAndForwardModel</span><span class="p">(</span><span class="kd">final</span> <span class="n">String</span> <span class="n">modelPath</span><span class="p">);</span>
-  <span class="p">}</span>
-<span class="p">}</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">native</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">loadAndForwardModel</span><span class="p">(</span><span class="kd">final</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">modelPath</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
 </pre></div>
 </div>
 <p><code class="docutils literal notranslate"><span class="pre">NativePeer#loadAndForwardModel</span></code> 은 <code class="docutils literal notranslate"><span class="pre">native</span></code> 로 선언이 되어 있는데, Java를 위한 정의는 아닙니다. 이 메소드를 호출하면 JNI를 통해 <code class="docutils literal notranslate"><span class="pre">NativeApp/app/src/main/cpp/pytorch_nativeapp.cpp</span></code> 내부에 있는 <code class="docutils literal notranslate"><span class="pre">libpytorch_nativeapp.so</span></code> 의 C++ 메소드를 다시 가져옵니다.</p>
-</div>
-<div class="section" id="id12">
+</section>
+<section id="id12">
 <h3>네이티브 코드<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h3>
 <p>이제 애플리케이션의 네이티브 부분을 작성할 준비가 되었습니다.</p>
 <p><code class="docutils literal notranslate"><span class="pre">NativeApp/app/src/main/cpp/pytorch_nativeapp.cpp</span></code>:</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;android/log.h&gt;</span><span class="cp"></span>
-<span class="cp">#include</span> <span class="cpf">&lt;cassert&gt;</span><span class="cp"></span>
-<span class="cp">#include</span> <span class="cpf">&lt;cmath&gt;</span><span class="cp"></span>
-<span class="cp">#include</span> <span class="cpf">&lt;pthread.h&gt;</span><span class="cp"></span>
-<span class="cp">#include</span> <span class="cpf">&lt;unistd.h&gt;</span><span class="cp"></span>
-<span class="cp">#include</span> <span class="cpf">&lt;vector&gt;</span><span class="cp"></span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;android/log.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cassert&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cmath&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;pthread.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;unistd.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;vector&gt;</span><span class="cp"></span>
 <span class="cp">#define ALOGI(...)                                                             \</span>
 <span class="cp">  __android_log_print(ANDROID_LOG_INFO, &quot;PyTorchNativeApp&quot;, __VA_ARGS__)</span>
 <span class="cp">#define ALOGE(...)                                                             \</span>
 <span class="cp">  __android_log_print(ANDROID_LOG_ERROR, &quot;PyTorchNativeApp&quot;, __VA_ARGS__)</span>
 
-<span class="cp">#include</span> <span class="cpf">&quot;jni.h&quot;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;jni.h&quot;</span><span class="cp"></span>
 
-<span class="cp">#include</span> <span class="cpf">&lt;opencv2/opencv.hpp&gt;</span><span class="cp"></span>
-<span class="cp">#include</span> <span class="cpf">&lt;torch/script.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;opencv2/opencv.hpp&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;torch/script.h&gt;</span><span class="cp"></span>
 
-<span class="k">namespace</span> <span class="n">pytorch_nativeapp</span> <span class="p">{</span>
-<span class="k">namespace</span> <span class="p">{</span>
-<span class="n">torch</span><span class="o">::</span><span class="n">Tensor</span> <span class="n">warp_perspective</span><span class="p">(</span><span class="n">torch</span><span class="o">::</span><span class="n">Tensor</span> <span class="n">image</span><span class="p">,</span> <span class="n">torch</span><span class="o">::</span><span class="n">Tensor</span> <span class="n">warp</span><span class="p">)</span> <span class="p">{</span>
-  <span class="n">cv</span><span class="o">::</span><span class="n">Mat</span> <span class="n">image_mat</span><span class="p">(</span><span class="cm">/*rows=*/</span><span class="n">image</span><span class="p">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
-                    <span class="cm">/*cols=*/</span><span class="n">image</span><span class="p">.</span><span class="n">size</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span>
-                    <span class="cm">/*type=*/</span><span class="n">CV_32FC1</span><span class="p">,</span>
-                    <span class="cm">/*data=*/</span><span class="n">image</span><span class="p">.</span><span class="n">data_ptr</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">());</span>
-  <span class="n">cv</span><span class="o">::</span><span class="n">Mat</span> <span class="n">warp_mat</span><span class="p">(</span><span class="cm">/*rows=*/</span><span class="n">warp</span><span class="p">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
-                   <span class="cm">/*cols=*/</span><span class="n">warp</span><span class="p">.</span><span class="n">size</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span>
-                   <span class="cm">/*type=*/</span><span class="n">CV_32FC1</span><span class="p">,</span>
-                   <span class="cm">/*data=*/</span><span class="n">warp</span><span class="p">.</span><span class="n">data_ptr</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">());</span>
+<span class="k">namespace</span><span class="w"> </span><span class="nn">pytorch_nativeapp</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="k">namespace</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="n">torch</span><span class="o">::</span><span class="n">Tensor</span><span class="w"> </span><span class="nf">warp_perspective</span><span class="p">(</span><span class="n">torch</span><span class="o">::</span><span class="n">Tensor</span><span class="w"> </span><span class="n">image</span><span class="p">,</span><span class="w"> </span><span class="n">torch</span><span class="o">::</span><span class="n">Tensor</span><span class="w"> </span><span class="n">warp</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="n">cv</span><span class="o">::</span><span class="n">Mat</span><span class="w"> </span><span class="n">image_mat</span><span class="p">(</span><span class="cm">/*rows=*/</span><span class="n">image</span><span class="p">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span><span class="w"></span>
+<span class="w">                    </span><span class="cm">/*cols=*/</span><span class="n">image</span><span class="p">.</span><span class="n">size</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span><span class="w"></span>
+<span class="w">                    </span><span class="cm">/*type=*/</span><span class="n">CV_32FC1</span><span class="p">,</span><span class="w"></span>
+<span class="w">                    </span><span class="cm">/*data=*/</span><span class="n">image</span><span class="p">.</span><span class="n">data_ptr</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">());</span><span class="w"></span>
+<span class="w">  </span><span class="n">cv</span><span class="o">::</span><span class="n">Mat</span><span class="w"> </span><span class="n">warp_mat</span><span class="p">(</span><span class="cm">/*rows=*/</span><span class="n">warp</span><span class="p">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span><span class="w"></span>
+<span class="w">                   </span><span class="cm">/*cols=*/</span><span class="n">warp</span><span class="p">.</span><span class="n">size</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span><span class="w"></span>
+<span class="w">                   </span><span class="cm">/*type=*/</span><span class="n">CV_32FC1</span><span class="p">,</span><span class="w"></span>
+<span class="w">                   </span><span class="cm">/*data=*/</span><span class="n">warp</span><span class="p">.</span><span class="n">data_ptr</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">());</span><span class="w"></span>
 
-  <span class="n">cv</span><span class="o">::</span><span class="n">Mat</span> <span class="n">output_mat</span><span class="p">;</span>
-  <span class="n">cv</span><span class="o">::</span><span class="n">warpPerspective</span><span class="p">(</span><span class="n">image_mat</span><span class="p">,</span> <span class="n">output_mat</span><span class="p">,</span> <span class="n">warp_mat</span><span class="p">,</span> <span class="cm">/*dsize=*/</span><span class="p">{</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">});</span>
+<span class="w">  </span><span class="n">cv</span><span class="o">::</span><span class="n">Mat</span><span class="w"> </span><span class="n">output_mat</span><span class="p">;</span><span class="w"></span>
+<span class="w">  </span><span class="n">cv</span><span class="o">::</span><span class="n">warpPerspective</span><span class="p">(</span><span class="n">image_mat</span><span class="p">,</span><span class="w"> </span><span class="n">output_mat</span><span class="p">,</span><span class="w"> </span><span class="n">warp_mat</span><span class="p">,</span><span class="w"> </span><span class="cm">/*dsize=*/</span><span class="p">{</span><span class="mi">8</span><span class="p">,</span><span class="w"> </span><span class="mi">8</span><span class="p">});</span><span class="w"></span>
 
-  <span class="n">torch</span><span class="o">::</span><span class="n">Tensor</span> <span class="n">output</span> <span class="o">=</span>
-      <span class="n">torch</span><span class="o">::</span><span class="n">from_blob</span><span class="p">(</span><span class="n">output_mat</span><span class="p">.</span><span class="n">ptr</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">(),</span> <span class="cm">/*sizes=*/</span><span class="p">{</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">});</span>
-  <span class="k">return</span> <span class="n">output</span><span class="p">.</span><span class="n">clone</span><span class="p">();</span>
-<span class="p">}</span>
+<span class="w">  </span><span class="n">torch</span><span class="o">::</span><span class="n">Tensor</span><span class="w"> </span><span class="n">output</span><span class="w"> </span><span class="o">=</span><span class="w"></span>
+<span class="w">      </span><span class="n">torch</span><span class="o">::</span><span class="n">from_blob</span><span class="p">(</span><span class="n">output_mat</span><span class="p">.</span><span class="n">ptr</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">(),</span><span class="w"> </span><span class="cm">/*sizes=*/</span><span class="p">{</span><span class="mi">8</span><span class="p">,</span><span class="w"> </span><span class="mi">8</span><span class="p">});</span><span class="w"></span>
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">output</span><span class="p">.</span><span class="n">clone</span><span class="p">();</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
 
-<span class="k">static</span> <span class="k">auto</span> <span class="n">registry</span> <span class="o">=</span>
-    <span class="n">torch</span><span class="o">::</span><span class="n">RegisterOperators</span><span class="p">(</span><span class="s">&quot;my_ops::warp_perspective&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">warp_perspective</span><span class="p">);</span>
+<span class="k">static</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="n">registry</span><span class="w"> </span><span class="o">=</span><span class="w"></span>
+<span class="w">    </span><span class="n">torch</span><span class="o">::</span><span class="n">RegisterOperators</span><span class="p">(</span><span class="s">&quot;my_ops::warp_perspective&quot;</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">warp_perspective</span><span class="p">);</span><span class="w"></span>
 
-<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">T</span><span class="o">&gt;</span> <span class="kt">void</span> <span class="n">log</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">m</span><span class="p">,</span> <span class="n">T</span> <span class="n">t</span><span class="p">)</span> <span class="p">{</span>
-  <span class="n">std</span><span class="o">::</span><span class="n">ostringstream</span> <span class="n">os</span><span class="p">;</span>
-  <span class="n">os</span> <span class="o">&lt;&lt;</span> <span class="n">t</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
-  <span class="n">ALOGI</span><span class="p">(</span><span class="s">&quot;%s %s&quot;</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">os</span><span class="p">.</span><span class="n">str</span><span class="p">().</span><span class="n">c_str</span><span class="p">());</span>
-<span class="p">}</span>
+<span class="k">template</span><span class="w"> </span><span class="o">&lt;</span><span class="k">typename</span><span class="w"> </span><span class="nc">T</span><span class="o">&gt;</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">log</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">m</span><span class="p">,</span><span class="w"> </span><span class="n">T</span><span class="w"> </span><span class="n">t</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="n">std</span><span class="o">::</span><span class="n">ostringstream</span><span class="w"> </span><span class="n">os</span><span class="p">;</span><span class="w"></span>
+<span class="w">  </span><span class="n">os</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">t</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span><span class="w"></span>
+<span class="w">  </span><span class="n">ALOGI</span><span class="p">(</span><span class="s">&quot;%s %s&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">m</span><span class="p">,</span><span class="w"> </span><span class="n">os</span><span class="p">.</span><span class="n">str</span><span class="p">().</span><span class="n">c_str</span><span class="p">());</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
 
-<span class="k">struct</span> <span class="nc">JITCallGuard</span> <span class="p">{</span>
-  <span class="n">torch</span><span class="o">::</span><span class="n">autograd</span><span class="o">::</span><span class="n">AutoGradMode</span> <span class="n">no_autograd_guard</span><span class="p">{</span><span class="nb">false</span><span class="p">};</span>
-  <span class="n">torch</span><span class="o">::</span><span class="n">AutoNonVariableTypeMode</span> <span class="n">non_var_guard</span><span class="p">{</span><span class="nb">true</span><span class="p">};</span>
-  <span class="n">torch</span><span class="o">::</span><span class="n">jit</span><span class="o">::</span><span class="n">GraphOptimizerEnabledGuard</span> <span class="n">no_optimizer_guard</span><span class="p">{</span><span class="nb">false</span><span class="p">};</span>
-<span class="p">};</span>
-<span class="p">}</span> <span class="c1">// namespace</span>
+<span class="k">struct</span><span class="w"> </span><span class="nc">JITCallGuard</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="n">torch</span><span class="o">::</span><span class="n">autograd</span><span class="o">::</span><span class="n">AutoGradMode</span><span class="w"> </span><span class="n">no_autograd_guard</span><span class="p">{</span><span class="nb">false</span><span class="p">};</span><span class="w"></span>
+<span class="w">  </span><span class="n">torch</span><span class="o">::</span><span class="n">AutoNonVariableTypeMode</span><span class="w"> </span><span class="n">non_var_guard</span><span class="p">{</span><span class="nb">true</span><span class="p">};</span><span class="w"></span>
+<span class="w">  </span><span class="n">torch</span><span class="o">::</span><span class="n">jit</span><span class="o">::</span><span class="n">GraphOptimizerEnabledGuard</span><span class="w"> </span><span class="n">no_optimizer_guard</span><span class="p">{</span><span class="nb">false</span><span class="p">};</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+<span class="p">}</span><span class="w"> </span><span class="c1">// namespace</span>
 
-<span class="k">static</span> <span class="kt">void</span> <span class="n">loadAndForwardModel</span><span class="p">(</span><span class="n">JNIEnv</span> <span class="o">*</span><span class="n">env</span><span class="p">,</span> <span class="n">jclass</span><span class="p">,</span> <span class="n">jstring</span> <span class="n">jModelPath</span><span class="p">)</span> <span class="p">{</span>
-  <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">modelPath</span> <span class="o">=</span> <span class="n">env</span><span class="o">-&gt;</span><span class="n">GetStringUTFChars</span><span class="p">(</span><span class="n">jModelPath</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
-  <span class="n">assert</span><span class="p">(</span><span class="n">modelPath</span><span class="p">);</span>
-  <span class="n">JITCallGuard</span> <span class="n">guard</span><span class="p">;</span>
-  <span class="n">torch</span><span class="o">::</span><span class="n">jit</span><span class="o">::</span><span class="n">Module</span> <span class="k">module</span> <span class="o">=</span> <span class="n">torch</span><span class="o">::</span><span class="n">jit</span><span class="o">::</span><span class="n">load</span><span class="p">(</span><span class="n">modelPath</span><span class="p">);</span>
-  <span class="k">module</span><span class="p">.</span><span class="n">eval</span><span class="p">();</span>
-  <span class="n">torch</span><span class="o">::</span><span class="n">Tensor</span> <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">::</span><span class="n">randn</span><span class="p">({</span><span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">});</span>
-  <span class="n">torch</span><span class="o">::</span><span class="n">Tensor</span> <span class="n">y</span> <span class="o">=</span> <span class="n">torch</span><span class="o">::</span><span class="n">randn</span><span class="p">({</span><span class="mi">8</span><span class="p">,</span> <span class="mi">5</span><span class="p">});</span>
-  <span class="n">log</span><span class="p">(</span><span class="s">&quot;x:&quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">);</span>
-  <span class="n">log</span><span class="p">(</span><span class="s">&quot;y:&quot;</span><span class="p">,</span> <span class="n">y</span><span class="p">);</span>
-  <span class="n">c10</span><span class="o">::</span><span class="n">IValue</span> <span class="n">t_out</span> <span class="o">=</span> <span class="k">module</span><span class="p">.</span><span class="n">forward</span><span class="p">({</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">});</span>
-  <span class="n">log</span><span class="p">(</span><span class="s">&quot;result:&quot;</span><span class="p">,</span> <span class="n">t_out</span><span class="p">);</span>
-  <span class="n">env</span><span class="o">-&gt;</span><span class="n">ReleaseStringUTFChars</span><span class="p">(</span><span class="n">jModelPath</span><span class="p">,</span> <span class="n">modelPath</span><span class="p">);</span>
-<span class="p">}</span>
-<span class="p">}</span> <span class="c1">// namespace pytorch_nativeapp</span>
+<span class="k">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">loadAndForwardModel</span><span class="p">(</span><span class="n">JNIEnv</span><span class="w"> </span><span class="o">*</span><span class="n">env</span><span class="p">,</span><span class="w"> </span><span class="n">jclass</span><span class="p">,</span><span class="w"> </span><span class="n">jstring</span><span class="w"> </span><span class="n">jModelPath</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">modelPath</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">env</span><span class="o">-&gt;</span><span class="n">GetStringUTFChars</span><span class="p">(</span><span class="n">jModelPath</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="n">assert</span><span class="p">(</span><span class="n">modelPath</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="n">JITCallGuard</span><span class="w"> </span><span class="n">guard</span><span class="p">;</span><span class="w"></span>
+<span class="w">  </span><span class="n">torch</span><span class="o">::</span><span class="n">jit</span><span class="o">::</span><span class="n">Module</span><span class="w"> </span><span class="k">module</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">torch</span><span class="o">::</span><span class="n">jit</span><span class="o">::</span><span class="n">load</span><span class="p">(</span><span class="n">modelPath</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="k">module</span><span class="p">.</span><span class="n">eval</span><span class="p">();</span><span class="w"></span>
+<span class="w">  </span><span class="n">torch</span><span class="o">::</span><span class="n">Tensor</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">torch</span><span class="o">::</span><span class="n">randn</span><span class="p">({</span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="mi">8</span><span class="p">});</span><span class="w"></span>
+<span class="w">  </span><span class="n">torch</span><span class="o">::</span><span class="n">Tensor</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">torch</span><span class="o">::</span><span class="n">randn</span><span class="p">({</span><span class="mi">8</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">});</span><span class="w"></span>
+<span class="w">  </span><span class="n">log</span><span class="p">(</span><span class="s">&quot;x:&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="n">log</span><span class="p">(</span><span class="s">&quot;y:&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="n">c10</span><span class="o">::</span><span class="n">IValue</span><span class="w"> </span><span class="n">t_out</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">module</span><span class="p">.</span><span class="n">forward</span><span class="p">({</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">});</span><span class="w"></span>
+<span class="w">  </span><span class="n">log</span><span class="p">(</span><span class="s">&quot;result:&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">t_out</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="n">env</span><span class="o">-&gt;</span><span class="n">ReleaseStringUTFChars</span><span class="p">(</span><span class="n">jModelPath</span><span class="p">,</span><span class="w"> </span><span class="n">modelPath</span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"> </span><span class="c1">// namespace pytorch_nativeapp</span>
 
-<span class="n">JNIEXPORT</span> <span class="n">jint</span> <span class="n">JNI_OnLoad</span><span class="p">(</span><span class="n">JavaVM</span> <span class="o">*</span><span class="n">vm</span><span class="p">,</span> <span class="kt">void</span> <span class="o">*</span><span class="p">)</span> <span class="p">{</span>
-  <span class="n">JNIEnv</span> <span class="o">*</span><span class="n">env</span><span class="p">;</span>
-  <span class="k">if</span> <span class="p">(</span><span class="n">vm</span><span class="o">-&gt;</span><span class="n">GetEnv</span><span class="p">(</span><span class="k">reinterpret_cast</span><span class="o">&lt;</span><span class="kt">void</span> <span class="o">**&gt;</span><span class="p">(</span><span class="o">&amp;</span><span class="n">env</span><span class="p">),</span> <span class="n">JNI_VERSION_1_6</span><span class="p">)</span> <span class="o">!=</span> <span class="n">JNI_OK</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="n">JNI_ERR</span><span class="p">;</span>
-  <span class="p">}</span>
+<span class="n">JNIEXPORT</span><span class="w"> </span><span class="n">jint</span><span class="w"> </span><span class="n">JNI_OnLoad</span><span class="p">(</span><span class="n">JavaVM</span><span class="w"> </span><span class="o">*</span><span class="n">vm</span><span class="p">,</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="n">JNIEnv</span><span class="w"> </span><span class="o">*</span><span class="n">env</span><span class="p">;</span><span class="w"></span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">vm</span><span class="o">-&gt;</span><span class="n">GetEnv</span><span class="p">(</span><span class="k">reinterpret_cast</span><span class="o">&lt;</span><span class="kt">void</span><span class="w"> </span><span class="o">**&gt;</span><span class="p">(</span><span class="o">&amp;</span><span class="n">env</span><span class="p">),</span><span class="w"> </span><span class="n">JNI_VERSION_1_6</span><span class="p">)</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">JNI_OK</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">JNI_ERR</span><span class="p">;</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
 
-  <span class="n">jclass</span> <span class="n">c</span> <span class="o">=</span> <span class="n">env</span><span class="o">-&gt;</span><span class="n">FindClass</span><span class="p">(</span><span class="s">&quot;org/pytorch/nativeapp/NativeClient$NativePeer&quot;</span><span class="p">);</span>
-  <span class="k">if</span> <span class="p">(</span><span class="n">c</span> <span class="o">==</span> <span class="k">nullptr</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="n">JNI_ERR</span><span class="p">;</span>
-  <span class="p">}</span>
+<span class="w">  </span><span class="n">jclass</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">env</span><span class="o">-&gt;</span><span class="n">FindClass</span><span class="p">(</span><span class="s">&quot;org/pytorch/nativeapp/NativeClient$NativePeer&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">c</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="k">nullptr</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">JNI_ERR</span><span class="p">;</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
 
-  <span class="k">static</span> <span class="k">const</span> <span class="n">JNINativeMethod</span> <span class="n">methods</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{</span>
-      <span class="p">{</span><span class="s">&quot;loadAndForwardModel&quot;</span><span class="p">,</span> <span class="s">&quot;(Ljava/lang/String;)V&quot;</span><span class="p">,</span>
-       <span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="p">)</span><span class="n">pytorch_nativeapp</span><span class="o">::</span><span class="n">loadAndForwardModel</span><span class="p">},</span>
-  <span class="p">};</span>
-  <span class="kt">int</span> <span class="n">rc</span> <span class="o">=</span> <span class="n">env</span><span class="o">-&gt;</span><span class="n">RegisterNatives</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">methods</span><span class="p">,</span>
-                                <span class="k">sizeof</span><span class="p">(</span><span class="n">methods</span><span class="p">)</span> <span class="o">/</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">JNINativeMethod</span><span class="p">));</span>
+<span class="w">  </span><span class="k">static</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">JNINativeMethod</span><span class="w"> </span><span class="n">methods</span><span class="p">[]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">      </span><span class="p">{</span><span class="s">&quot;loadAndForwardModel&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;(Ljava/lang/String;)V&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">       </span><span class="p">(</span><span class="kt">void</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">pytorch_nativeapp</span><span class="o">::</span><span class="n">loadAndForwardModel</span><span class="p">},</span><span class="w"></span>
+<span class="w">  </span><span class="p">};</span><span class="w"></span>
+<span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">rc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">env</span><span class="o">-&gt;</span><span class="n">RegisterNatives</span><span class="p">(</span><span class="n">c</span><span class="p">,</span><span class="w"> </span><span class="n">methods</span><span class="p">,</span><span class="w"></span>
+<span class="w">                                </span><span class="k">sizeof</span><span class="p">(</span><span class="n">methods</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="n">JNINativeMethod</span><span class="p">));</span><span class="w"></span>
 
-  <span class="k">if</span> <span class="p">(</span><span class="n">rc</span> <span class="o">!=</span> <span class="n">JNI_OK</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="n">rc</span><span class="p">;</span>
-  <span class="p">}</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">rc</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">JNI_OK</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">rc</span><span class="p">;</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
 
-  <span class="k">return</span> <span class="n">JNI_VERSION_1_6</span><span class="p">;</span>
-<span class="p">}</span>
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">JNI_VERSION_1_6</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
 </pre></div>
 </div>
 <p>이 목록은 꽤 긴데다 이런저런 것들이 혼합되어 있기 때문에 이 코드가 어떻게 동작하는지 이해하기 위해 제어 흐름을 따라가 보겠습니다.
@@ -966,8 +967,8 @@ cp compute.pt NativeApp/app/src/main/assets
 <a class="reference external" href="https://github.com/pytorch/pytorch/blob/master/android/pytorch_android/src/main/cpp/pytorch_jni_jit.cpp">PyTorch GitHub 내부 소스</a>.</p>
 <p>메소드 <code class="docutils literal notranslate"><span class="pre">warp_perspective</span></code> 구현과 등록은  <a class="reference external" href="https://tutorials.pytorch.kr/advanced/torch_script_custom_ops.html">tutorial for desktop build</a>
 내부에 있는 내용과 정확히 동일합니다.</p>
-</div>
-<div class="section" id="id13">
+</section>
+<section id="id13">
 <h3>앱 빌드하기<a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h3>
 <p>gradle에 Android SDK와 Android NDK를 명기하기 위해 <code class="docutils literal notranslate"><span class="pre">NativeApp/local.properties</span></code> 를 작성합니다.</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span> NativeApp
@@ -1021,9 +1022,9 @@ gradle app::installDebug
 </pre></div>
 </div>
 <p>이 앱의 전체 설정은 <a class="reference external" href="https://github.com/pytorch/android-demo-app/tree/master/NativeApp">PyTorch Android 데모 애플리케이션 저장소</a> 에서 찾을 수 있습니다.</p>
-</div>
-</div>
-</div>
+</section>
+</section>
+</section>
 
 
              </article>
@@ -1099,7 +1100,7 @@ gradle app::installDebug
 
 
   
-
+  
      
        <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
          <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
@@ -1112,7 +1113,6 @@ gradle app::installDebug
          <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
          <script src="../_static/katex_autorenderer.js"></script>
      
-
   
 
   <script type="text/javascript" src="../_static/js/vendor/popper.min.js"></script>

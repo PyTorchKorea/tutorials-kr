@@ -6,7 +6,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
 <meta property="og:title" content="선택 사항: 데이터 병렬 처리 (Data Parallelism)" />
   
 <meta property="og:type" content="article" />
@@ -393,7 +394,7 @@
 <p class="admonition-title">Note</p>
 <p>Click <a class="reference internal" href="#sphx-glr-download-beginner-blitz-data-parallel-tutorial-py"><span class="std std-ref">here</span></a> to download the full example code</p>
 </div>
-<div class="sphx-glr-example-title section" id="data-parallelism">
+<section class="sphx-glr-example-title" id="data-parallelism">
 <span id="sphx-glr-beginner-blitz-data-parallel-tutorial-py"></span><h1>선택 사항: 데이터 병렬 처리 (Data Parallelism)<a class="headerlink" href="#data-parallelism" title="Permalink to this headline">¶</a></h1>
 <p><strong>글쓴이</strong>: <a class="reference external" href="https://github.com/hunkim">Sung Kim</a> and <a class="reference external" href="https://github.com/jennykang">Jenny Kang</a>
 <strong>번역</strong>: ‘정아진 &lt;<a class="reference external" href="https://github.com/ajin-jng">https://github.com/ajin-jng</a>&gt;’</p>
@@ -434,7 +435,7 @@
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cuda:0&quot;</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="section" id="dummy">
+<section id="dummy">
 <h2>더미(Dummy) 데이터셋<a class="headerlink" href="#dummy" title="Permalink to this headline">¶</a></h2>
 <p>더미(ramdom) 데이터셋을 만들어 봅시다. Getitem 만 구현하면 됩니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">RandomDataset</span><span class="p">(</span><span class="n">Dataset</span><span class="p">):</span>
@@ -453,8 +454,8 @@
                          <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="id1">
+</section>
+<section id="id1">
 <h2>간단한 모델<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
 <p>데모를 위해 모델은 입력을 받고 선형 연산을 수행하며 출력을 제공합니다. 그러나 <code class="docutils literal notranslate"><span class="pre">DataParallel</span></code> 의 어떤 모델 (CNN, RNN, Capsule Net 등) 에서든 사용할 수 있습니다.</p>
 <p>우리는 input과 output의 크기를 모니터링하기 위해 모델안에 print 문을 넣었습니다.
@@ -474,8 +475,8 @@
         <span class="k">return</span> <span class="n">output</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="id2">
+</section>
+<section id="id2">
 <h2>모델과 데이터 병렬의 구현<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
 <p>이것은 이 튜토리얼의 핵심 부분입니다. 먼저, model instance 를 만들고 가지고 있는 GPU가 여러개인지 확인해야합니다.
 만약 다수의 GPU를 보유중이라면, <code class="docutils literal notranslate"><span class="pre">nn.DataParallel</span></code> 을 사용하여 모델을 래핑 (wrapping) 할 수 있습니다.
@@ -493,8 +494,8 @@
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Let&#39;s use 2 GPUs!
 </pre></div>
 </div>
-</div>
-<div class="section" id="id3">
+</section>
+<section id="id3">
 <h2>모델 실행<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
 <p>이제 우리는 입력과 출력 tensor의 크기를 볼 수 있습니다</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">rand_loader</span><span class="p">:</span>
@@ -519,12 +520,12 @@ Outside: input size torch.Size([30, 5]) output_size torch.Size([30, 2])
 Outside: input size torch.Size([10, 5]) output_size torch.Size([10, 2])
 </pre></div>
 </div>
-</div>
-<div class="section" id="id4">
+</section>
+<section id="id4">
 <h2>결과<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
 <p>GPU가 없거나 하나인 경우 30개의 입력과 30개의 출력을 일괄 처리하면 모델이 예상대로 30을 입력받고 30을 출력합니다.
 하지만 만약 당신이 다수의 GPU를 가지고 있다면, 다음과 같은 결과를 얻을 수 있습니다.</p>
-<div class="section" id="gpus">
+<section id="gpus">
 <h3>2 GPUs<a class="headerlink" href="#gpus" title="Permalink to this headline">¶</a></h3>
 <p>2개의 GPU를 갖고 있다면, 다음과 같이 표시될 것 입니다:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span># on 2 GPUs
@@ -543,8 +544,8 @@ Outside: input size torch.Size([30, 5]) output_size torch.Size([30, 2])
 Outside: input size torch.Size([10, 5]) output_size torch.Size([10, 2])
 </pre></div>
 </div>
-</div>
-<div class="section" id="id5">
+</section>
+<section id="id5">
 <h3>3 GPUs<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
 <p>만약 당신이 3개의 GPU를 갖고 있다면, 다음과 같이 표시될 것 입니다:
 .. code:: bash</p>
@@ -569,8 +570,8 @@ In Model: input size torch.Size([2, 5]) output size torch.Size([2, 2])</p>
 </dl>
 <p>Outside: input size torch.Size([10, 5]) output_size torch.Size([10, 2])</p>
 </div></blockquote>
-</div>
-<div class="section" id="id6">
+</section>
+<section id="id6">
 <h3>8 GPUs<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
 <p>만약 당신이 8개의 GPU를 갖고 있다면, 다음과 같이 표시될 것 입니다:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>Let&#39;s use 8 GPUs!
@@ -609,15 +610,15 @@ Outside: input size torch.Size([30, 5]) output_size torch.Size([30, 2])
 Outside: input size torch.Size([10, 5]) output_size torch.Size([10, 2])
 </pre></div>
 </div>
-</div>
-</div>
-<div class="section" id="id7">
+</section>
+</section>
+<section id="id7">
 <h2>요약<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h2>
 <p>DataParallel은 당신의 데이터를 자동으로 분할하고 여러 GPU에 있는 다수의 모델에 작업을 지시합니다. 각 모델이 작업을 완료하면 DataParallel은
 사용자에게 결과를 반환하기 전에 모든 결과물들을 수집하여 병합합니다.</p>
 <p>더 많은 정보를 알고싶다면 아래 주소를 참고하세요.
 <a class="reference external" href="https://tutorials.pytorch.kr/beginner/former_torchies/parallelism_tutorial.html">https://tutorials.pytorch.kr/beginner/former_torchies/parallelism_tutorial.html</a></p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  1.632 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  2.314 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-beginner-blitz-data-parallel-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/e85264945029fe236addcb864bf5f13f/data_parallel_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">data_parallel_tutorial.py</span></code></a></p>
@@ -627,8 +628,8 @@ Outside: input size torch.Size([10, 5]) output_size torch.Size([10, 2])
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
-</div>
-</div>
+</section>
+</section>
 
 
              </article>
@@ -701,7 +702,7 @@ Outside: input size torch.Size([10, 5]) output_size torch.Size([10, 2])
 
 
   
-
+  
      
        <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
          <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
@@ -714,7 +715,6 @@ Outside: input size torch.Size([10, 5]) output_size torch.Size([10, 2])
          <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
          <script src="../../_static/katex_autorenderer.js"></script>
      
-
   
 
   <script type="text/javascript" src="../../_static/js/vendor/popper.min.js"></script>

@@ -6,7 +6,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
 <meta property="og:title" content="기초부터 시작하는 NLP:  문자-단위 RNN으로 이름 생성하기" />
   
 <meta property="og:type" content="article" />
@@ -395,7 +396,7 @@
 <p class="admonition-title">Note</p>
 <p>Click <a class="reference internal" href="#sphx-glr-download-intermediate-char-rnn-generation-tutorial-py"><span class="std std-ref">here</span></a> to download the full example code</p>
 </div>
-<div class="sphx-glr-example-title section" id="nlp-rnn">
+<section class="sphx-glr-example-title" id="nlp-rnn">
 <span id="sphx-glr-intermediate-char-rnn-generation-tutorial-py"></span><h1>기초부터 시작하는 NLP:  문자-단위 RNN으로 이름 생성하기<a class="headerlink" href="#nlp-rnn" title="Permalink to this headline">¶</a></h1>
 <dl class="simple">
 <dt><strong>Author</strong>: <a class="reference external" href="https://github.com/spro/practical-pytorch">Sean Robertson</a></dt><dd><p><strong>번역</strong>: <a class="reference external" href="https://github.com/adonisues">황성수</a></p>
@@ -449,7 +450,7 @@ Networks</a>
 LSTM에 관한 것이지만 RNN에 관해서도 유익합니다.</p></li>
 </ul>
 <p>이전 튜토리얼도 추천합니다. <a class="reference internal" href="char_rnn_classification_tutorial.html"><span class="doc">기초부터 시작하는 NLP: 문자-단위 RNN으로 이름 분류하기</span></a></p>
-<div class="section" id="id2">
+<section id="id2">
 <h2>데이터 준비<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -458,7 +459,7 @@ LSTM에 관한 것이지만 RNN에 관해서도 유익합니다.</p></li>
 </div>
 <p>이 과정의 더 자세한 사항은 지난 튜토리얼을 보십시오.
 요약하면, 줄마다 이름이 적힌 텍스트 파일 <code class="docutils literal notranslate"><span class="pre">data/names/[Language].txt</span></code> 있습니다.
-이것을 어레이로 분리하고, Unicode를 ASCII로 변경하고,
+이것을 array로 분리하고, Unicode를 ASCII로 변경하고,
 사전 <code class="docutils literal notranslate"><span class="pre">{language:</span> <span class="pre">[names</span> <span class="pre">...]}</span></code> 을 만들어서 마무리합니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">unicode_literals</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">division</span>
 <span class="kn">from</span> <span class="nn">io</span> <span class="kn">import</span> <span class="nb">open</span>
@@ -506,12 +507,12 @@ LSTM에 관한 것이지만 RNN에 관해서도 유익합니다.</p></li>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span># categories: 18 [&#39;Arabic&#39;, &#39;Irish&#39;, &#39;Russian&#39;, &#39;Dutch&#39;, &#39;Czech&#39;, &#39;Portuguese&#39;, &#39;German&#39;, &#39;French&#39;, &#39;Korean&#39;, &#39;Japanese&#39;, &#39;Chinese&#39;, &#39;Polish&#39;, &#39;Spanish&#39;, &#39;Italian&#39;, &#39;English&#39;, &#39;Greek&#39;, &#39;Vietnamese&#39;, &#39;Scottish&#39;]
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span># categories: 18 [&#39;Japanese&#39;, &#39;Korean&#39;, &#39;Polish&#39;, &#39;Portuguese&#39;, &#39;Russian&#39;, &#39;Scottish&#39;, &#39;Spanish&#39;, &#39;Vietnamese&#39;, &#39;Arabic&#39;, &#39;Chinese&#39;, &#39;Czech&#39;, &#39;Dutch&#39;, &#39;English&#39;, &#39;French&#39;, &#39;German&#39;, &#39;Greek&#39;, &#39;Irish&#39;, &#39;Italian&#39;]
 O&#39;Neal
 </pre></div>
 </div>
-</div>
-<div class="section" id="id4">
+</section>
+<section id="id4">
 <h2>네트워크 생성<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
 <p>이 네트워크는 <a class="reference external" href="#Creating-the-Network">지난 튜토리얼의 RNN</a> 이
 다른 입력들과 연결되는 category tensor를 추가 인자로 가지게 확장합니다.
@@ -527,9 +528,9 @@ category tensor는 문자 입력과 마찬가지로 one-hot 벡터입니다.</p>
 일반적으로 입력을 흐리게 해서 과적합을 막는 데 사용됩니다.
 여기서 우리는 고의로 일부 혼돈을 추가하고 샘플링 다양성을 높이기
 위해 네트워크의 마지막에 이것을 사용합니다.</p>
-<div class="figure align-default">
+<figure class="align-default">
 <img alt="" src="https://i.imgur.com/jzVrf7f.png" />
-</div>
+</figure>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
 
@@ -558,10 +559,10 @@ category tensor는 문자 입력과 마찬가지로 one-hot 벡터입니다.</p>
         <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hidden_size</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="id5">
+</section>
+<section id="id5">
 <h2>학습<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="id6">
+<section id="id6">
 <h3>학습 준비<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
 <p>제일 먼저 (category, line)의 무작위 쌍을 얻는 함수:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">random</span>
@@ -584,9 +585,9 @@ category tensor는 문자 입력과 마찬가지로 one-hot 벡터입니다.</p>
 <p>각 시간 단계마다 현재 문자에서 다음 문자를 예측하기 때문에,
 문자 쌍은 한 줄(하나의 이름)에서 연속된 문자 그룹입니다. - 예를 들어 <code class="docutils literal notranslate"><span class="pre">&quot;ABCD&lt;EOS&gt;&quot;</span></code> 는
 (“A”, “B”), (“B”, “C”), (“C”, “D”), (“D”, “EOS”) 로 생성합니다.</p>
-<div class="figure align-default">
+<figure class="align-default">
 <img alt="" src="https://i.imgur.com/JH58tXY.png" />
-</div>
+</figure>
 <p>Category(언어) Tensor는 <code class="docutils literal notranslate"><span class="pre">&lt;1</span> <span class="pre">x</span> <span class="pre">n_categories&gt;</span></code> 크기의 <a class="reference external" href="https://en.wikipedia.org/wiki/One-hot">One-hot
 Tensor</a> 입니다.
 학습시에 모든 시간 단계에서 네트워크에 이것을 전달합니다.
@@ -626,8 +627,8 @@ Tensor</a> 입니다.
     <span class="k">return</span> <span class="n">category_tensor</span><span class="p">,</span> <span class="n">input_line_tensor</span><span class="p">,</span> <span class="n">target_line_tensor</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="id7">
+</section>
+<section id="id7">
 <h3>네트워크 학습<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
 <p>마지막 출력만 사용하는 분류와 달리, 모든 단계에서 예측을 수행하므로
 모든 단계에서 손실을 계산합니다.</p>
@@ -698,30 +699,30 @@ Tensor</a> 입니다.
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>0m 16s (5000 5%) 2.9399
-0m 30s (10000 10%) 2.5804
-0m 44s (15000 15%) 3.2048
-0m 58s (20000 20%) 3.0868
-1m 12s (25000 25%) 2.7980
-1m 26s (30000 30%) 3.0473
-1m 40s (35000 35%) 3.5333
-1m 56s (40000 40%) 1.8964
-2m 12s (45000 45%) 2.5839
-2m 27s (50000 50%) 2.6403
-2m 42s (55000 55%) 2.3172
-2m 57s (60000 60%) 3.1767
-3m 13s (65000 65%) 2.0697
-3m 29s (70000 70%) 2.4960
-3m 45s (75000 75%) 2.6743
-4m 1s (80000 80%) 2.3528
-4m 17s (85000 85%) 1.9046
-4m 33s (90000 90%) 1.7784
-4m 48s (95000 95%) 2.5688
-5m 2s (100000 100%) 2.5011
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>0m 22s (5000 5%) 3.2306
+0m 44s (10000 10%) 3.0183
+1m 6s (15000 15%) 2.6587
+1m 27s (20000 20%) 2.8595
+1m 49s (25000 25%) 2.5882
+2m 11s (30000 30%) 2.5817
+2m 32s (35000 35%) 2.9950
+2m 54s (40000 40%) 2.4839
+3m 15s (45000 45%) 2.3423
+3m 37s (50000 50%) 2.8761
+3m 58s (55000 55%) 2.4806
+4m 20s (60000 60%) 2.8386
+4m 41s (65000 65%) 2.1833
+5m 3s (70000 70%) 2.3296
+5m 25s (75000 75%) 2.4976
+5m 47s (80000 80%) 2.6587
+6m 8s (85000 85%) 1.6812
+6m 30s (90000 90%) 2.4816
+6m 52s (95000 95%) 2.4584
+7m 14s (100000 100%) 1.6480
 </pre></div>
 </div>
-</div>
-<div class="section" id="id8">
+</section>
+<section id="id8">
 <h3>손실 도식화<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
 <p>all_losses를 이용한 손실의 도식화는
 네트워크의 학습 상태를 보여줍니다:</p>
@@ -732,9 +733,9 @@ Tensor</a> 입니다.
 </pre></div>
 </div>
 <img alt="../_images/sphx_glr_char_rnn_generation_tutorial_001.png" class="sphx-glr-single-img" src="../_images/sphx_glr_char_rnn_generation_tutorial_001.png" />
-</div>
-</div>
-<div class="section" id="id9">
+</section>
+</section>
+<section id="id9">
 <h2>네트워크 샘플링<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h2>
 <p>샘플링을 위해서, 네트워크에 하나의 글자를 주고 다음 문자를 물어보고
 이것을 다음 문자로 전달하는 것을 EOS 토큰까지 반복합니다.</p>
@@ -796,22 +797,22 @@ Tensor</a> 입니다.
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Rovaki
-Uantov
-Shavaki
-Gerter
-Eran
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Rover
+Uanton
+Shavan
+Gerterr
+Eren
 Rong
-Salla
-Panter
-Allan
-Chan
-Hann
-Iun
+Sander
+Para
+Arane
+Chang
+Han
+Iue
 </pre></div>
 </div>
-</div>
-<div class="section" id="exercises">
+</section>
+<section id="exercises">
 <h2>Exercises<a class="headerlink" href="#exercises" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Try with a different dataset of category -&gt; line, for example:</p>
@@ -830,7 +831,7 @@ choosing a start letter</p></li>
 </ul>
 </li>
 </ul>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 5 minutes  3.245 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 7 minutes  14.853 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-intermediate-char-rnn-generation-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/322506af160d5e2056afd75de1fd34ee/char_rnn_generation_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">char_rnn_generation_tutorial.py</span></code></a></p>
@@ -840,8 +841,8 @@ choosing a start letter</p></li>
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
-</div>
-</div>
+</section>
+</section>
 
 
              </article>
@@ -922,7 +923,7 @@ choosing a start letter</p></li>
 
 
   
-
+  
      
        <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
          <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
@@ -935,7 +936,6 @@ choosing a start letter</p></li>
          <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
          <script src="../_static/katex_autorenderer.js"></script>
      
-
   
 
   <script type="text/javascript" src="../_static/js/vendor/popper.min.js"></script>

@@ -6,7 +6,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
 <meta property="og:title" content="Registering a Dispatched Operator in C++" />
   
 <meta property="og:type" content="article" />
@@ -391,7 +392,7 @@
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <div class="section" id="registering-a-dispatched-operator-in-c">
+  <section id="registering-a-dispatched-operator-in-c">
 <h1>Registering a Dispatched Operator in C++<a class="headerlink" href="#registering-a-dispatched-operator-in-c" title="Permalink to this headline">¶</a></h1>
 <p>The dispatcher is an internal component of PyTorch which is responsible for
 figuring out what code should actually get run when you call a function like
@@ -417,7 +418,7 @@ registration to use the dispatcher to organize various components.  We’ll
 assume that you are familiar with how to
 <a class="reference external" href="torch_script_custom_ops">register an operator</a> and how to write
 a <a class="reference external" href="cpp_autograd">custom autograd function</a>.</p>
-<div class="section" id="defining-schema-and-backend-implementations">
+<section id="defining-schema-and-backend-implementations">
 <h2>Defining schema and backend implementations<a class="headerlink" href="#defining-schema-and-backend-implementations" title="Permalink to this headline">¶</a></h2>
 <p>The general principle behind the dispatcher is that it divides the
 implementation of an operator into multiple kernels, each of which implements
@@ -434,28 +435,28 @@ Unlike simple pybind11-style operator registration, we don’t actually
 provide an implementation of our operator at this point; we just
 provide a schema string specifying the type signature of the operator
 that all of our other kernels will abide by:</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">TORCH_LIBRARY</span><span class="p">(</span><span class="n">myops</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span> <span class="p">{</span>
-  <span class="n">m</span><span class="p">.</span><span class="n">def</span><span class="p">(</span><span class="s">&quot;myadd(Tensor self, Tensor other) -&gt; Tensor&quot;</span><span class="p">);</span>
-<span class="p">}</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">TORCH_LIBRARY</span><span class="p">(</span><span class="n">myops</span><span class="p">,</span><span class="w"> </span><span class="n">m</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="n">m</span><span class="p">.</span><span class="n">def</span><span class="p">(</span><span class="s">&quot;myadd(Tensor self, Tensor other) -&gt; Tensor&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
 </pre></div>
 </div>
 <p>Next, we need to actually provide some implementations of this operator.
 For concreteness, here is a really simple implementation of addition on CPU:</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">Tensor</span> <span class="nf">myadd_cpu</span><span class="p">(</span><span class="k">const</span> <span class="n">Tensor</span><span class="o">&amp;</span> <span class="n">self_</span><span class="p">,</span> <span class="k">const</span> <span class="n">Tensor</span><span class="o">&amp;</span> <span class="n">other_</span><span class="p">)</span> <span class="p">{</span>
-  <span class="n">TORCH_CHECK</span><span class="p">(</span><span class="n">self_</span><span class="p">.</span><span class="n">sizes</span><span class="p">()</span> <span class="o">==</span> <span class="n">other_</span><span class="p">.</span><span class="n">sizes</span><span class="p">());</span>
-  <span class="n">TORCH_INTERNAL_ASSERT</span><span class="p">(</span><span class="n">self_</span><span class="p">.</span><span class="n">device</span><span class="p">().</span><span class="n">type</span><span class="p">()</span> <span class="o">==</span> <span class="n">DeviceType</span><span class="o">::</span><span class="n">CPU</span><span class="p">);</span>
-  <span class="n">TORCH_INTERNAL_ASSERT</span><span class="p">(</span><span class="n">other_</span><span class="p">.</span><span class="n">device</span><span class="p">().</span><span class="n">type</span><span class="p">()</span> <span class="o">==</span> <span class="n">DeviceType</span><span class="o">::</span><span class="n">CPU</span><span class="p">);</span>
-  <span class="n">Tensor</span> <span class="n">self</span> <span class="o">=</span> <span class="n">self_</span><span class="p">.</span><span class="n">contiguous</span><span class="p">();</span>
-  <span class="n">Tensor</span> <span class="n">other</span> <span class="o">=</span> <span class="n">other_</span><span class="p">.</span><span class="n">contiguous</span><span class="p">();</span>
-  <span class="n">Tensor</span> <span class="n">result</span> <span class="o">=</span> <span class="n">torch</span><span class="o">::</span><span class="n">empty</span><span class="p">(</span><span class="n">self</span><span class="p">.</span><span class="n">sizes</span><span class="p">(),</span> <span class="n">self</span><span class="p">.</span><span class="n">options</span><span class="p">());</span>
-  <span class="k">const</span> <span class="kt">float</span><span class="o">*</span> <span class="n">self_ptr</span> <span class="o">=</span> <span class="n">self</span><span class="p">.</span><span class="n">data_ptr</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">();</span>
-  <span class="k">const</span> <span class="kt">float</span><span class="o">*</span> <span class="n">other_ptr</span> <span class="o">=</span> <span class="n">other</span><span class="p">.</span><span class="n">data_ptr</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">();</span>
-  <span class="kt">float</span><span class="o">*</span> <span class="n">result_ptr</span> <span class="o">=</span> <span class="n">result</span><span class="p">.</span><span class="n">data_ptr</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">();</span>
-  <span class="k">for</span> <span class="p">(</span><span class="kt">int64_t</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">result</span><span class="p">.</span><span class="n">numel</span><span class="p">();</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">result_ptr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">self_ptr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">other_ptr</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
-  <span class="p">}</span>
-  <span class="k">return</span> <span class="n">result</span><span class="p">;</span>
-<span class="p">}</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">Tensor</span><span class="w"> </span><span class="nf">myadd_cpu</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">Tensor</span><span class="o">&amp;</span><span class="w"> </span><span class="n">self_</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">Tensor</span><span class="o">&amp;</span><span class="w"> </span><span class="n">other_</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="n">TORCH_CHECK</span><span class="p">(</span><span class="n">self_</span><span class="p">.</span><span class="n">sizes</span><span class="p">()</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">other_</span><span class="p">.</span><span class="n">sizes</span><span class="p">());</span><span class="w"></span>
+<span class="w">  </span><span class="n">TORCH_INTERNAL_ASSERT</span><span class="p">(</span><span class="n">self_</span><span class="p">.</span><span class="n">device</span><span class="p">().</span><span class="n">type</span><span class="p">()</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">DeviceType</span><span class="o">::</span><span class="n">CPU</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="n">TORCH_INTERNAL_ASSERT</span><span class="p">(</span><span class="n">other_</span><span class="p">.</span><span class="n">device</span><span class="p">().</span><span class="n">type</span><span class="p">()</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">DeviceType</span><span class="o">::</span><span class="n">CPU</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="n">Tensor</span><span class="w"> </span><span class="n">self</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self_</span><span class="p">.</span><span class="n">contiguous</span><span class="p">();</span><span class="w"></span>
+<span class="w">  </span><span class="n">Tensor</span><span class="w"> </span><span class="n">other</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">other_</span><span class="p">.</span><span class="n">contiguous</span><span class="p">();</span><span class="w"></span>
+<span class="w">  </span><span class="n">Tensor</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">torch</span><span class="o">::</span><span class="n">empty</span><span class="p">(</span><span class="n">self</span><span class="p">.</span><span class="n">sizes</span><span class="p">(),</span><span class="w"> </span><span class="n">self</span><span class="p">.</span><span class="n">options</span><span class="p">());</span><span class="w"></span>
+<span class="w">  </span><span class="k">const</span><span class="w"> </span><span class="kt">float</span><span class="o">*</span><span class="w"> </span><span class="n">self_ptr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self</span><span class="p">.</span><span class="n">data_ptr</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">();</span><span class="w"></span>
+<span class="w">  </span><span class="k">const</span><span class="w"> </span><span class="kt">float</span><span class="o">*</span><span class="w"> </span><span class="n">other_ptr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">other</span><span class="p">.</span><span class="n">data_ptr</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">();</span><span class="w"></span>
+<span class="w">  </span><span class="kt">float</span><span class="o">*</span><span class="w"> </span><span class="n">result_ptr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">result</span><span class="p">.</span><span class="n">data_ptr</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">();</span><span class="w"></span>
+<span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int64_t</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">result</span><span class="p">.</span><span class="n">numel</span><span class="p">();</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">result_ptr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">self_ptr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">other_ptr</span><span class="p">[</span><span class="n">i</span><span class="p">];</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">result</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
 </pre></div>
 </div>
 <p>We’d like to register this function as an implementation of <code class="docutils literal notranslate"><span class="pre">myops::myadd</span></code>.
@@ -464,9 +465,9 @@ register the kernel to run in all cases, even if the tensor is not a CPU
 tensor!  (Internally, we refer to these as “catch-all” kernels, since they
 catch all cases.)  To ensure that <code class="docutils literal notranslate"><span class="pre">myadd_cpu</span></code> is only run for
 CPU tensors, we can use the <code class="docutils literal notranslate"><span class="pre">TORCH_LIBRARY_IMPL</span></code> macro:</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">TORCH_LIBRARY_IMPL</span><span class="p">(</span><span class="n">myops</span><span class="p">,</span> <span class="n">CPU</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span> <span class="p">{</span>
-  <span class="n">m</span><span class="p">.</span><span class="n">impl</span><span class="p">(</span><span class="s">&quot;myadd&quot;</span><span class="p">,</span> <span class="n">myadd_cpu</span><span class="p">);</span>
-<span class="p">}</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">TORCH_LIBRARY_IMPL</span><span class="p">(</span><span class="n">myops</span><span class="p">,</span><span class="w"> </span><span class="n">CPU</span><span class="p">,</span><span class="w"> </span><span class="n">m</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="n">m</span><span class="p">.</span><span class="n">impl</span><span class="p">(</span><span class="s">&quot;myadd&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">myadd_cpu</span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
 </pre></div>
 </div>
 <p>The <code class="docutils literal notranslate"><span class="pre">TORCH_LIBRARY_IMPL</span></code> lets us register implementations for operators on
@@ -474,9 +475,9 @@ a specific dispatch key (in this case, CPU).  Each call to <code class="docutils
 associates a CPU kernel with the corresponding operator (which we previously
 defined in the <code class="docutils literal notranslate"><span class="pre">TORCH_LIBRARY</span></code> block).  If we also have a CUDA implementation <code class="docutils literal notranslate"><span class="pre">myadd_cuda</span></code>,
 we can register it in a separate <code class="docutils literal notranslate"><span class="pre">TORCH_LIBRARY_IMPL</span></code> block:</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">TORCH_LIBRARY_IMPL</span><span class="p">(</span><span class="n">myops</span><span class="p">,</span> <span class="n">CUDA</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span> <span class="p">{</span>
-  <span class="n">m</span><span class="p">.</span><span class="n">impl</span><span class="p">(</span><span class="s">&quot;myadd&quot;</span><span class="p">,</span> <span class="n">myadd_cuda</span><span class="p">);</span>
-<span class="p">}</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">TORCH_LIBRARY_IMPL</span><span class="p">(</span><span class="n">myops</span><span class="p">,</span><span class="w"> </span><span class="n">CUDA</span><span class="p">,</span><span class="w"> </span><span class="n">m</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="n">m</span><span class="p">.</span><span class="n">impl</span><span class="p">(</span><span class="s">&quot;myadd&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">myadd_cuda</span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
 </pre></div>
 </div>
 <p>These registrations can be split across files or even across library boundaries; so
@@ -501,17 +502,17 @@ implemented: the <code class="docutils literal notranslate"><span class="pre">to
 that provides implementations for all basic operators on the XLA dispatch
 key.</p>
 </div>
-</div>
-<div class="section" id="for-operators-that-do-not-need-autograd">
+</section>
+<section id="for-operators-that-do-not-need-autograd">
 <h2>For operators that do not need autograd<a class="headerlink" href="#for-operators-that-do-not-need-autograd" title="Permalink to this headline">¶</a></h2>
 <p>Note: This section only applies to versions of PyTorch <code class="docutils literal notranslate"><span class="pre">&gt;=</span> <span class="pre">1.10</span></code>.</p>
 <p>In the next section, we will discuss how to add autograd support to an operator.
 But for the ops that do not need autograd support, the following kernel should be
 registered improve useability and make your op behave like PyTorch’s built-in
 operators.</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">TORCH_LIBRARY_IMPL</span><span class="p">(</span><span class="n">myops</span><span class="p">,</span> <span class="n">Autograd</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span> <span class="p">{</span>
-  <span class="n">m</span><span class="p">.</span><span class="n">impl</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="n">autogradNotImplementedFallback</span><span class="p">());</span>
-<span class="p">}</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">TORCH_LIBRARY_IMPL</span><span class="p">(</span><span class="n">myops</span><span class="p">,</span><span class="w"> </span><span class="n">Autograd</span><span class="p">,</span><span class="w"> </span><span class="n">m</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="n">m</span><span class="p">.</span><span class="n">impl</span><span class="p">(</span><span class="n">op</span><span class="p">,</span><span class="w"> </span><span class="n">autogradNotImplementedFallback</span><span class="p">());</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
 </pre></div>
 </div>
 <p>The above lines registers an <code class="docutils literal notranslate"><span class="pre">Autograd</span></code> kernel that appends a dummy
@@ -519,7 +520,7 @@ operators.</p>
 On backward, the <code class="docutils literal notranslate"><span class="pre">NotImplemented</span></code> node raises an error. This can be helpful
 for debugging in larger models where previously it can be hard to pin-point
 exactly where the <code class="docutils literal notranslate"><span class="pre">requires_grad</span></code>-ness is lost during the forward pass.</p>
-<div class="section" id="in-place-or-view-ops">
+<section id="in-place-or-view-ops">
 <h3>In-place or view ops<a class="headerlink" href="#in-place-or-view-ops" title="Permalink to this headline">¶</a></h3>
 <p>To ensure correctness and best possible performance, if your op mutates an input
 in-place or returns a tensor that aliases with one of the inputs, two additional
@@ -530,12 +531,12 @@ above. This kernel handles the necessary bookkeeping to ensure the correctness
 of in-place or view operations. It is important to note that this ADInplaceOrView
 kernel should only be used with <code class="docutils literal notranslate"><span class="pre">autogradNotImplementedFallback</span></code>.</p></li>
 </ol>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">TORCH_LIBRARY_IMPL</span><span class="p">(</span><span class="n">myops</span><span class="p">,</span> <span class="n">Autograd</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span> <span class="p">{</span>
-  <span class="n">m</span><span class="p">.</span><span class="n">impl</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="n">autogradNotImplementedFallback</span><span class="p">());</span>
-<span class="p">}</span>
-<span class="n">TORCH_LIBRARY_IMPL</span><span class="p">(</span><span class="n">myops</span><span class="p">,</span> <span class="n">ADInplaceOrView</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span> <span class="p">{</span>
-  <span class="n">m</span><span class="p">.</span><span class="n">impl</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="n">autogradNotImplementedInplaceOrViewFallback</span><span class="p">());</span>
-<span class="p">}</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">TORCH_LIBRARY_IMPL</span><span class="p">(</span><span class="n">myops</span><span class="p">,</span><span class="w"> </span><span class="n">Autograd</span><span class="p">,</span><span class="w"> </span><span class="n">m</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="n">m</span><span class="p">.</span><span class="n">impl</span><span class="p">(</span><span class="n">op</span><span class="p">,</span><span class="w"> </span><span class="n">autogradNotImplementedFallback</span><span class="p">());</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+<span class="n">TORCH_LIBRARY_IMPL</span><span class="p">(</span><span class="n">myops</span><span class="p">,</span><span class="w"> </span><span class="n">ADInplaceOrView</span><span class="p">,</span><span class="w"> </span><span class="n">m</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="n">m</span><span class="p">.</span><span class="n">impl</span><span class="p">(</span><span class="n">op</span><span class="p">,</span><span class="w"> </span><span class="n">autogradNotImplementedInplaceOrViewFallback</span><span class="p">());</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
 </pre></div>
 </div>
 <ol class="arabic simple" start="2">
@@ -546,9 +547,9 @@ ensure that your schema properly reflects this. See
 <a class="reference external" href="https://github.com/pytorch/pytorch/blob/master/aten/src/ATen/native/README.md">here</a>
 for more information on how to annotate the schema.</p></li>
 </ol>
-</div>
-</div>
-<div class="section" id="adding-autograd-support">
+</section>
+</section>
+<section id="adding-autograd-support">
 <span id="autograd-support"></span><h2>Adding autograd support<a class="headerlink" href="#adding-autograd-support" title="Permalink to this headline">¶</a></h2>
 <p>At this point, we have an operator with both CPU and CUDA implementations.  How
 can we add autograd support to it?  As you might guess, we will register an
@@ -561,12 +562,12 @@ which calls into the dispatcher to find the right kernel for your operator.
 This function constitutes the public C++ API for your operators–in fact, all of
 the tensor functions in PyTorch’s C++ API all call the dispatcher in the same
 way under the hood.  Here’s what the dispatching function looks like:</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">Tensor</span> <span class="nf">myadd</span><span class="p">(</span><span class="k">const</span> <span class="n">Tensor</span><span class="o">&amp;</span> <span class="n">self</span><span class="p">,</span> <span class="k">const</span> <span class="n">Tensor</span><span class="o">&amp;</span> <span class="n">other</span><span class="p">)</span> <span class="p">{</span>
-  <span class="k">static</span> <span class="k">auto</span> <span class="n">op</span> <span class="o">=</span> <span class="n">torch</span><span class="o">::</span><span class="n">Dispatcher</span><span class="o">::</span><span class="n">singleton</span><span class="p">()</span>
-    <span class="p">.</span><span class="n">findSchemaOrThrow</span><span class="p">(</span><span class="s">&quot;myops::myadd&quot;</span><span class="p">,</span> <span class="s">&quot;&quot;</span><span class="p">)</span>
-    <span class="p">.</span><span class="n">typed</span><span class="o">&lt;</span><span class="k">decltype</span><span class="p">(</span><span class="n">myadd</span><span class="p">)</span><span class="o">&gt;</span><span class="p">();</span>
-  <span class="k">return</span> <span class="n">op</span><span class="p">.</span><span class="n">call</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">other</span><span class="p">);</span>
-<span class="p">}</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">Tensor</span><span class="w"> </span><span class="nf">myadd</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">Tensor</span><span class="o">&amp;</span><span class="w"> </span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">Tensor</span><span class="o">&amp;</span><span class="w"> </span><span class="n">other</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="k">static</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="n">op</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">torch</span><span class="o">::</span><span class="n">Dispatcher</span><span class="o">::</span><span class="n">singleton</span><span class="p">()</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">findSchemaOrThrow</span><span class="p">(</span><span class="s">&quot;myops::myadd&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">typed</span><span class="o">&lt;</span><span class="k">decltype</span><span class="p">(</span><span class="n">myadd</span><span class="p">)</span><span class="o">&gt;</span><span class="p">();</span><span class="w"></span>
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">op</span><span class="p">.</span><span class="n">call</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">other</span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
 </pre></div>
 </div>
 <p>Let’s break it down:</p>
@@ -591,23 +592,23 @@ the dispatcher and in the end control will be transferred to whatever kernel
 is appropriate for this call.</p></li>
 </ul>
 <p>With the dispatch function in hand, we can now write the autograd kernel:</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MyAddFunction</span> <span class="o">:</span> <span class="k">public</span> <span class="n">torch</span><span class="o">::</span><span class="n">autograd</span><span class="o">::</span><span class="n">Function</span><span class="o">&lt;</span><span class="n">MyAddFunction</span><span class="o">&gt;</span> <span class="p">{</span>
- <span class="k">public</span><span class="o">:</span>
-  <span class="k">static</span> <span class="n">Tensor</span> <span class="n">forward</span><span class="p">(</span>
-      <span class="n">AutogradContext</span> <span class="o">*</span><span class="n">ctx</span><span class="p">,</span> <span class="n">torch</span><span class="o">::</span><span class="n">Tensor</span> <span class="n">self</span><span class="p">,</span> <span class="n">torch</span><span class="o">::</span><span class="n">Tensor</span> <span class="n">other</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">at</span><span class="o">::</span><span class="n">AutoNonVariableTypeMode</span> <span class="n">g</span><span class="p">;</span>
-    <span class="k">return</span> <span class="nf">myadd</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">other</span><span class="p">);</span>
-  <span class="p">}</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">MyAddFunction</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="n">torch</span><span class="o">::</span><span class="n">autograd</span><span class="o">::</span><span class="n">Function</span><span class="o">&lt;</span><span class="n">MyAddFunction</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w"> </span><span class="k">public</span><span class="o">:</span><span class="w"></span>
+<span class="w">  </span><span class="k">static</span><span class="w"> </span><span class="n">Tensor</span><span class="w"> </span><span class="n">forward</span><span class="p">(</span><span class="w"></span>
+<span class="w">      </span><span class="n">AutogradContext</span><span class="w"> </span><span class="o">*</span><span class="n">ctx</span><span class="p">,</span><span class="w"> </span><span class="n">torch</span><span class="o">::</span><span class="n">Tensor</span><span class="w"> </span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">torch</span><span class="o">::</span><span class="n">Tensor</span><span class="w"> </span><span class="n">other</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">at</span><span class="o">::</span><span class="n">AutoNonVariableTypeMode</span><span class="w"> </span><span class="n">g</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">myadd</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">other</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
 
-  <span class="k">static</span> <span class="n">tensor_list</span> <span class="n">backward</span><span class="p">(</span><span class="n">AutogradContext</span> <span class="o">*</span><span class="n">ctx</span><span class="p">,</span> <span class="n">tensor_list</span> <span class="n">grad_outputs</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">auto</span> <span class="n">grad_output</span> <span class="o">=</span> <span class="n">grad_outputs</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
-    <span class="k">return</span> <span class="p">{</span><span class="n">grad_output</span><span class="p">,</span> <span class="n">grad_output</span><span class="p">};</span>
-  <span class="p">}</span>
-<span class="p">};</span>
+<span class="w">  </span><span class="k">static</span><span class="w"> </span><span class="n">tensor_list</span><span class="w"> </span><span class="n">backward</span><span class="p">(</span><span class="n">AutogradContext</span><span class="w"> </span><span class="o">*</span><span class="n">ctx</span><span class="p">,</span><span class="w"> </span><span class="n">tensor_list</span><span class="w"> </span><span class="n">grad_outputs</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">grad_output</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">grad_outputs</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="p">{</span><span class="n">grad_output</span><span class="p">,</span><span class="w"> </span><span class="n">grad_output</span><span class="p">};</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
 
-<span class="n">Tensor</span> <span class="nf">myadd_autograd</span><span class="p">(</span><span class="k">const</span> <span class="n">Tensor</span><span class="o">&amp;</span> <span class="n">self</span><span class="p">,</span> <span class="k">const</span> <span class="n">Tensor</span><span class="o">&amp;</span> <span class="n">other</span><span class="p">)</span> <span class="p">{</span>
-  <span class="k">return</span> <span class="n">MyAddFunction</span><span class="o">::</span><span class="n">apply</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)[</span><span class="mi">0</span><span class="p">];</span>
-<span class="p">}</span>
+<span class="n">Tensor</span><span class="w"> </span><span class="nf">myadd_autograd</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">Tensor</span><span class="o">&amp;</span><span class="w"> </span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">Tensor</span><span class="o">&amp;</span><span class="w"> </span><span class="n">other</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">MyAddFunction</span><span class="o">::</span><span class="n">apply</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">other</span><span class="p">)[</span><span class="mi">0</span><span class="p">];</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
 </pre></div>
 </div>
 <p>The autograd function is written as normal using <code class="docutils literal notranslate"><span class="pre">torch::autograd::Function</span></code>,
@@ -625,9 +626,9 @@ autograd is excluded from the set of dispatch keys under consideration, and
 we will go to the next handlers, which will either be CPU and CUDA.</p>
 <p>We can now register this function in the same way we registered the CPU/CUDA
 functions:</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">TORCH_LIBRARY_IMPL</span><span class="p">(</span><span class="n">myops</span><span class="p">,</span> <span class="n">Autograd</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span> <span class="p">{</span>
-  <span class="n">m</span><span class="p">.</span><span class="n">impl</span><span class="p">(</span><span class="s">&quot;myadd&quot;</span><span class="p">,</span> <span class="n">myadd_autograd</span><span class="p">);</span>
-<span class="p">}</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">TORCH_LIBRARY_IMPL</span><span class="p">(</span><span class="n">myops</span><span class="p">,</span><span class="w"> </span><span class="n">Autograd</span><span class="p">,</span><span class="w"> </span><span class="n">m</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="n">m</span><span class="p">.</span><span class="n">impl</span><span class="p">(</span><span class="s">&quot;myadd&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">myadd_autograd</span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
 </pre></div>
 </div>
 <div class="admonition note">
@@ -639,26 +640,26 @@ backends by using the corresponding backend-specific dispatch key - for example,
 options in more detail, check out the <code class="docutils literal notranslate"><span class="pre">PythonDispatcher</span></code> tool provided in
 <a class="reference external" href="https://github.com/pytorch/pytorch/blob/master/torch/_python_dispatcher.py">torch/_python_dispatcher.py</a>.</p>
 </div>
-</div>
-<div class="section" id="going-beyond-autograd">
+</section>
+<section id="going-beyond-autograd">
 <h2>Going beyond autograd<a class="headerlink" href="#going-beyond-autograd" title="Permalink to this headline">¶</a></h2>
 <p>In some sense, the dispatcher isn’t doing all that much: all it does is
 implement a glorified if-statement, along the lines of this:</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MyAddFunction</span> <span class="o">:</span> <span class="p">...</span> <span class="p">{</span>
-<span class="k">public</span><span class="o">:</span>
-  <span class="k">static</span> <span class="n">Tensor</span> <span class="n">forward</span><span class="p">(</span>
-    <span class="n">AutogradContext</span> <span class="o">*</span><span class="n">ctx</span><span class="p">,</span> <span class="n">torch</span><span class="o">::</span><span class="n">Tensor</span> <span class="n">self</span><span class="p">,</span> <span class="n">torch</span><span class="o">::</span><span class="n">Tensor</span> <span class="n">other</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">MyAddFunction</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="k">public</span><span class="o">:</span><span class="w"></span>
+<span class="w">  </span><span class="k">static</span><span class="w"> </span><span class="n">Tensor</span><span class="w"> </span><span class="n">forward</span><span class="p">(</span><span class="w"></span>
+<span class="w">    </span><span class="n">AutogradContext</span><span class="w"> </span><span class="o">*</span><span class="n">ctx</span><span class="p">,</span><span class="w"> </span><span class="n">torch</span><span class="o">::</span><span class="n">Tensor</span><span class="w"> </span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">torch</span><span class="o">::</span><span class="n">Tensor</span><span class="w"> </span><span class="n">other</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
 
-    <span class="k">if</span> <span class="p">(</span><span class="n">self</span><span class="p">.</span><span class="n">device</span><span class="p">().</span><span class="n">type</span><span class="p">()</span> <span class="o">==</span> <span class="n">DeviceType</span><span class="o">::</span><span class="n">CPU</span><span class="p">)</span> <span class="p">{</span>
-      <span class="k">return</span> <span class="nf">add_cpu</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">other</span><span class="p">);</span>
-    <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">self</span><span class="p">.</span><span class="n">device</span><span class="p">().</span><span class="n">type</span><span class="p">()</span> <span class="o">==</span> <span class="n">DeviceType</span><span class="o">::</span><span class="n">CUDA</span><span class="p">)</span> <span class="p">{</span>
-      <span class="k">return</span> <span class="nf">add_cuda</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">other</span><span class="p">);</span>
-    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-      <span class="n">TORCH_CHECK</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s">&quot;Unsupported device &quot;</span><span class="p">,</span> <span class="n">self</span><span class="p">.</span><span class="n">device</span><span class="p">().</span><span class="n">type</span><span class="p">());</span>
-    <span class="p">}</span>
-  <span class="p">}</span>
-  <span class="p">...</span>
-<span class="p">}</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">.</span><span class="n">device</span><span class="p">().</span><span class="n">type</span><span class="p">()</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">DeviceType</span><span class="o">::</span><span class="n">CPU</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="n">add_cpu</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">other</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">self</span><span class="p">.</span><span class="n">device</span><span class="p">().</span><span class="n">type</span><span class="p">()</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">DeviceType</span><span class="o">::</span><span class="n">CUDA</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="n">add_cuda</span><span class="p">(</span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="n">other</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">      </span><span class="n">TORCH_CHECK</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Unsupported device &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">.</span><span class="n">device</span><span class="p">().</span><span class="n">type</span><span class="p">());</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+<span class="w">  </span><span class="p">...</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
 </pre></div>
 </div>
 <p>So why use the dispatcher?  There are a few reasons:</p>
@@ -683,7 +684,7 @@ you also opt into the fallbacks for all of these operations.</p></li>
 </ol>
 <p>Here are some particular dispatch keys which you may need to define an operator
 for.</p>
-<div class="section" id="autocast">
+<section id="autocast">
 <h3>Autocast<a class="headerlink" href="#autocast" title="Permalink to this headline">¶</a></h3>
 <p>The Autocast dispatch key implements support for
 <a class="reference external" href="https://pytorch.org/docs/stable/amp.html">automatic mixed precision (AMP)</a>.
@@ -695,17 +696,17 @@ Autocast wrappers only have an effect in
 <a class="reference external" href="https://pytorch.org/docs/stable/amp.html#torch.cuda.amp.autocast">autocast-enabled contexts</a>.</p>
 <p>Here’s an autocast wrapper for a hypothetical custom matmul, along with its registration:</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// Autocast-specific helper functions</span>
-<span class="cp">#include</span> <span class="cpf">&lt;ATen/autocast_mode.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;ATen/autocast_mode.h&gt;</span><span class="cp"></span>
 
-<span class="n">Tensor</span> <span class="nf">mymatmul_autocast</span><span class="p">(</span><span class="k">const</span> <span class="n">Tensor</span><span class="o">&amp;</span> <span class="n">self</span><span class="p">,</span> <span class="k">const</span> <span class="n">Tensor</span><span class="o">&amp;</span> <span class="n">other</span><span class="p">)</span> <span class="p">{</span>
-  <span class="n">c10</span><span class="o">::</span><span class="n">impl</span><span class="o">::</span><span class="n">ExcludeDispatchKeyGuard</span> <span class="n">no_autocast</span><span class="p">(</span><span class="n">c10</span><span class="o">::</span><span class="n">DispatchKey</span><span class="o">::</span><span class="n">Autocast</span><span class="p">);</span>
-  <span class="k">return</span> <span class="n">mymatmul</span><span class="p">(</span><span class="n">at</span><span class="o">::</span><span class="n">autocast</span><span class="o">::</span><span class="n">cached_cast</span><span class="p">(</span><span class="n">at</span><span class="o">::</span><span class="n">kHalf</span><span class="p">,</span> <span class="n">self</span><span class="p">),</span>
-                  <span class="n">at</span><span class="o">::</span><span class="n">autocast</span><span class="o">::</span><span class="n">cached_cast</span><span class="p">(</span><span class="n">at</span><span class="o">::</span><span class="n">kHalf</span><span class="p">,</span> <span class="n">other</span><span class="p">));</span>
-<span class="p">}</span>
+<span class="n">Tensor</span><span class="w"> </span><span class="nf">mymatmul_autocast</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">Tensor</span><span class="o">&amp;</span><span class="w"> </span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">Tensor</span><span class="o">&amp;</span><span class="w"> </span><span class="n">other</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="n">c10</span><span class="o">::</span><span class="n">impl</span><span class="o">::</span><span class="n">ExcludeDispatchKeyGuard</span><span class="w"> </span><span class="n">no_autocast</span><span class="p">(</span><span class="n">c10</span><span class="o">::</span><span class="n">DispatchKey</span><span class="o">::</span><span class="n">Autocast</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">mymatmul</span><span class="p">(</span><span class="n">at</span><span class="o">::</span><span class="n">autocast</span><span class="o">::</span><span class="n">cached_cast</span><span class="p">(</span><span class="n">at</span><span class="o">::</span><span class="n">kHalf</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">),</span><span class="w"></span>
+<span class="w">                  </span><span class="n">at</span><span class="o">::</span><span class="n">autocast</span><span class="o">::</span><span class="n">cached_cast</span><span class="p">(</span><span class="n">at</span><span class="o">::</span><span class="n">kHalf</span><span class="p">,</span><span class="w"> </span><span class="n">other</span><span class="p">));</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
 
-<span class="n">TORCH_LIBRARY_IMPL</span><span class="p">(</span><span class="n">myops</span><span class="p">,</span> <span class="n">Autocast</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span> <span class="p">{</span>
-  <span class="n">m</span><span class="p">.</span><span class="n">impl</span><span class="p">(</span><span class="s">&quot;mymatmul&quot;</span><span class="p">,</span> <span class="n">mymatmul_autocast</span><span class="p">);</span>
-<span class="p">}</span>
+<span class="n">TORCH_LIBRARY_IMPL</span><span class="p">(</span><span class="n">myops</span><span class="p">,</span><span class="w"> </span><span class="n">Autocast</span><span class="p">,</span><span class="w"> </span><span class="n">m</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="n">m</span><span class="p">.</span><span class="n">impl</span><span class="p">(</span><span class="s">&quot;mymatmul&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">mymatmul_autocast</span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
 </pre></div>
 </div>
 <p><code class="docutils literal notranslate"><span class="pre">cached_cast(kHalf,</span> <span class="pre">tensor)</span></code> casts <code class="docutils literal notranslate"><span class="pre">tensor</span></code> to <code class="docutils literal notranslate"><span class="pre">float16</span></code> if <code class="docutils literal notranslate"><span class="pre">tensor</span></code> is CUDA and <code class="docutils literal notranslate"><span class="pre">float32</span></code>,
@@ -737,55 +738,55 @@ them to a common precision (unless the implementation supports inputs with diffe
 <p>If your custom op falls into the third category, the <code class="docutils literal notranslate"><span class="pre">promote_type</span></code> template
 helps figure out the widest floating-point type present among input tensors, which is
 the safest choice for the execution type:</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;ATen/autocast_mode.h&gt;</span><span class="cp"></span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;ATen/autocast_mode.h&gt;</span><span class="cp"></span>
 
-<span class="n">Tensor</span> <span class="nf">my_multiple_input_op_autocast</span><span class="p">(</span><span class="k">const</span> <span class="n">Tensor</span><span class="o">&amp;</span> <span class="n">t0</span><span class="p">,</span> <span class="k">const</span> <span class="n">Tensor</span><span class="o">&amp;</span> <span class="n">t1</span><span class="p">)</span> <span class="p">{</span>
-  <span class="n">c10</span><span class="o">::</span><span class="n">impl</span><span class="o">::</span><span class="n">ExcludeDispatchKeyGuard</span> <span class="n">no_autocast</span><span class="p">(</span><span class="n">c10</span><span class="o">::</span><span class="n">DispatchKey</span><span class="o">::</span><span class="n">Autocast</span><span class="p">);</span>
-  <span class="c1">// The required at::kHalf argument is an optimistic initial guess.</span>
-  <span class="k">auto</span> <span class="n">exec_type</span> <span class="o">=</span> <span class="n">at</span><span class="o">::</span><span class="n">autocast</span><span class="o">::</span><span class="n">promote_type</span><span class="p">(</span><span class="n">at</span><span class="o">::</span><span class="n">kHalf</span><span class="p">,</span> <span class="n">t0</span><span class="p">,</span> <span class="n">t1</span><span class="p">);</span>
-  <span class="k">return</span> <span class="n">my_multiple_input_op</span><span class="p">(</span><span class="n">at</span><span class="o">::</span><span class="n">autocast</span><span class="o">::</span><span class="n">cached_cast</span><span class="p">(</span><span class="n">exec_type</span><span class="p">,</span> <span class="n">t0</span><span class="p">),</span>
-                              <span class="n">at</span><span class="o">::</span><span class="n">autocast</span><span class="o">::</span><span class="n">cached_cast</span><span class="p">(</span><span class="n">exec_type</span><span class="p">,</span> <span class="n">t1</span><span class="p">));</span>
-<span class="p">}</span>
+<span class="n">Tensor</span><span class="w"> </span><span class="nf">my_multiple_input_op_autocast</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">Tensor</span><span class="o">&amp;</span><span class="w"> </span><span class="n">t0</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">Tensor</span><span class="o">&amp;</span><span class="w"> </span><span class="n">t1</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="n">c10</span><span class="o">::</span><span class="n">impl</span><span class="o">::</span><span class="n">ExcludeDispatchKeyGuard</span><span class="w"> </span><span class="n">no_autocast</span><span class="p">(</span><span class="n">c10</span><span class="o">::</span><span class="n">DispatchKey</span><span class="o">::</span><span class="n">Autocast</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="c1">// The required at::kHalf argument is an optimistic initial guess.</span>
+<span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">exec_type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">at</span><span class="o">::</span><span class="n">autocast</span><span class="o">::</span><span class="n">promote_type</span><span class="p">(</span><span class="n">at</span><span class="o">::</span><span class="n">kHalf</span><span class="p">,</span><span class="w"> </span><span class="n">t0</span><span class="p">,</span><span class="w"> </span><span class="n">t1</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">my_multiple_input_op</span><span class="p">(</span><span class="n">at</span><span class="o">::</span><span class="n">autocast</span><span class="o">::</span><span class="n">cached_cast</span><span class="p">(</span><span class="n">exec_type</span><span class="p">,</span><span class="w"> </span><span class="n">t0</span><span class="p">),</span><span class="w"></span>
+<span class="w">                              </span><span class="n">at</span><span class="o">::</span><span class="n">autocast</span><span class="o">::</span><span class="n">cached_cast</span><span class="p">(</span><span class="n">exec_type</span><span class="p">,</span><span class="w"> </span><span class="n">t1</span><span class="p">));</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
 </pre></div>
 </div>
 <p>If your custom op is <a class="reference internal" href="#autograd-support"><span class="std std-ref">autograd-enabled</span></a>, you only need to write and register
 an autocast wrapper for the same name onto which the autograd wrapper is registered.
 For example, if you wanted an autocast wrapper for the <code class="docutils literal notranslate"><span class="pre">myadd</span></code> function shown
 in the autograd section, all you’d need is</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">Tensor</span> <span class="nf">myadd_autocast</span><span class="p">(</span><span class="k">const</span> <span class="n">Tensor</span><span class="o">&amp;</span> <span class="n">self</span><span class="p">,</span> <span class="k">const</span> <span class="n">Tensor</span><span class="o">&amp;</span> <span class="n">other</span><span class="p">)</span> <span class="p">{</span>
-  <span class="n">c10</span><span class="o">::</span><span class="n">impl</span><span class="o">::</span><span class="n">ExcludeDispatchKeyGuard</span> <span class="n">no_autocast</span><span class="p">(</span><span class="n">c10</span><span class="o">::</span><span class="n">DispatchKey</span><span class="o">::</span><span class="n">Autocast</span><span class="p">);</span>
-  <span class="k">return</span> <span class="n">myadd</span><span class="p">(</span><span class="n">at</span><span class="o">::</span><span class="n">autocast</span><span class="o">::</span><span class="n">cached_cast</span><span class="p">(</span><span class="o">&lt;</span><span class="n">desired</span> <span class="n">dtype</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">self</span><span class="p">),</span>
-               <span class="n">at</span><span class="o">::</span><span class="n">autocast</span><span class="o">::</span><span class="n">cached_cast</span><span class="p">(</span><span class="o">&lt;</span><span class="n">desired</span> <span class="n">dtype</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">other</span><span class="p">));</span>
-<span class="p">}</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">Tensor</span><span class="w"> </span><span class="nf">myadd_autocast</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">Tensor</span><span class="o">&amp;</span><span class="w"> </span><span class="n">self</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">Tensor</span><span class="o">&amp;</span><span class="w"> </span><span class="n">other</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="n">c10</span><span class="o">::</span><span class="n">impl</span><span class="o">::</span><span class="n">ExcludeDispatchKeyGuard</span><span class="w"> </span><span class="n">no_autocast</span><span class="p">(</span><span class="n">c10</span><span class="o">::</span><span class="n">DispatchKey</span><span class="o">::</span><span class="n">Autocast</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">myadd</span><span class="p">(</span><span class="n">at</span><span class="o">::</span><span class="n">autocast</span><span class="o">::</span><span class="n">cached_cast</span><span class="p">(</span><span class="o">&lt;</span><span class="n">desired</span><span class="w"> </span><span class="n">dtype</span><span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="n">self</span><span class="p">),</span><span class="w"></span>
+<span class="w">               </span><span class="n">at</span><span class="o">::</span><span class="n">autocast</span><span class="o">::</span><span class="n">cached_cast</span><span class="p">(</span><span class="o">&lt;</span><span class="n">desired</span><span class="w"> </span><span class="n">dtype</span><span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="n">other</span><span class="p">));</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
 
-<span class="n">TORCH_LIBRARY_IMPL</span><span class="p">(</span><span class="n">myops</span><span class="p">,</span> <span class="n">Autocast</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span> <span class="p">{</span>
-  <span class="n">m</span><span class="p">.</span><span class="n">impl</span><span class="p">(</span><span class="s">&quot;myadd&quot;</span><span class="p">,</span> <span class="n">myadd_autocast</span><span class="p">);</span>
-<span class="p">}</span>
+<span class="n">TORCH_LIBRARY_IMPL</span><span class="p">(</span><span class="n">myops</span><span class="p">,</span><span class="w"> </span><span class="n">Autocast</span><span class="p">,</span><span class="w"> </span><span class="n">m</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="n">m</span><span class="p">.</span><span class="n">impl</span><span class="p">(</span><span class="s">&quot;myadd&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">myadd_autocast</span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
 </pre></div>
 </div>
 <p>There are no separate gymnastics to make the backward method autocast compatible.
 However, the backward method defined in your custom autograd function will run in the same
 dtype as autocast sets for the forward method, so you should choose a <code class="docutils literal notranslate"><span class="pre">&lt;desired</span> <span class="pre">dtype&gt;</span></code>
 suitable for both your forward and backward methods.</p>
-</div>
-<div class="section" id="batched">
+</section>
+<section id="batched">
 <h3>Batched<a class="headerlink" href="#batched" title="Permalink to this headline">¶</a></h3>
 <p>Batched tensors allow you to write your code in a per-example manner, and then
 have them be automatically batched when run under a <code class="docutils literal notranslate"><span class="pre">vmap</span></code> invocation.  The
 API for writing batching rules is currently under development, but once it is
 stabilized, you can add support for <code class="docutils literal notranslate"><span class="pre">vmap</span></code> for your operators by registering
 a kernel at the Batched dispatch key.</p>
-</div>
-<div class="section" id="tracer">
+</section>
+<section id="tracer">
 <h3>Tracer<a class="headerlink" href="#tracer" title="Permalink to this headline">¶</a></h3>
 <p>The Tracer dispatch key implements support for recording invocations of operators
 into a trace when you run <code class="docutils literal notranslate"><span class="pre">torch.jit.trace</span></code>.  We intend to provide a
 boxed fallback that will implement tracing for arbitrary operations,
 see <a class="reference external" href="https://github.com/pytorch/pytorch/issues/41478">issue #41478</a> to track
 progress.</p>
-</div>
-</div>
-</div>
+</section>
+</section>
+</section>
 
 
              </article>
@@ -868,7 +869,7 @@ progress.</p>
 
 
   
-
+  
      
        <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
          <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
@@ -881,7 +882,6 @@ progress.</p>
          <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
          <script src="../_static/katex_autorenderer.js"></script>
      
-
   
 
   <script type="text/javascript" src="../_static/js/vendor/popper.min.js"></script>

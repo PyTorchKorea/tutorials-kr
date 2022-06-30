@@ -6,7 +6,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
 <meta property="og:title" content="C++에서 TorchScript 모델 로딩하기" />
   
 <meta property="og:type" content="article" />
@@ -391,7 +392,7 @@
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <div class="section" id="c-torchscript">
+  <section id="c-torchscript">
 <h1>C++에서 TorchScript 모델 로딩하기<a class="headerlink" href="#c-torchscript" title="Permalink to this headline">¶</a></h1>
 <p>PyTorch의 이름에서 알 수 있듯이 PyTorch는 Python 프로그래밍 언어를 기본 인터페이스로 하고 있습니다.
 Python은 동적성과 신속한 이터레이션이 필요한 상황에 적합하고 선호되는 언어입니다. 하지만 마찬가지로
@@ -402,7 +403,7 @@ Python은 동적성과 신속한 이터레이션이 필요한 상황에 적합�
 됩니다. 단지 Java, Rust, 또는 Go와 같은 다른 언어들을 바인딩하기 위한 목적일 뿐일지라도 말이죠.
 앞으로 이 튜토리얼에서 저희는 어떻게 PyTorch에서 Python으로 작성된 모델들을 Python 의존성이 전혀
 없는 C++환경에서도 읽고 실행할 수 있는 방식으로 직렬화할 수 있는지 알아보겠습니다.</p>
-<div class="section" id="pytorch-torchscript">
+<section id="pytorch-torchscript">
 <h2>단계 1. PyTorch 모델을 TorchScript 모델로 변환하기<a class="headerlink" href="#pytorch-torchscript" title="Permalink to this headline">¶</a></h2>
 <p><a class="reference external" href="https://pytorch.org/docs/master/jit.html">Torch Script</a> 는 PyTorch 모델을 Python에서
 C++로 변환하는 것을 가능하게 해줍니다. TorchScript는 TorchScript 컴파일러가 이해하고, 컴파일하고,
@@ -421,7 +422,7 @@ API를 사용해 작성된 PyTorch 모델이 있다면, 처음으로 해야할 �
 <p>위 두 방식에 관련된 정보와 둘 중 어떤 방법을 사용해야할지 등에 대한 가이드는 공식 기술문서인 <a class="reference external" href="https://pytorch.org/docs/master/jit.html">Torch Script
 reference</a> 에서 확인하실 수 있습니다.</p>
 </div>
-<div class="section" id="tracing-torchscript">
+<section id="tracing-torchscript">
 <h3>트레이싱(tracing)을 통해 TorchScript로 변환하기<a class="headerlink" href="#tracing-torchscript" title="Permalink to this headline">¶</a></h3>
 <p>PyTorch 모델을 트레이싱을 통해 TorchScript로 변환하기 위해서는, 여러분이 구현한 모델의 인스턴스를
 예제 입력값과 함께 <code class="docutils literal notranslate"><span class="pre">torch.jit.trace</span></code> 함수에 넘겨주어야 합니다. 그러면 이 함수는 <code class="docutils literal notranslate"><span class="pre">torch.jit.ScriptModule</span></code>
@@ -447,8 +448,8 @@ reference</a> 에서 확인하실 수 있습니다.</p>
 <span class="n">Out</span><span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="n">tensor</span><span class="p">([</span><span class="o">-</span><span class="mf">0.2698</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.0381</span><span class="p">,</span>  <span class="mf">0.4023</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.3010</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.0448</span><span class="p">],</span> <span class="n">grad_fn</span><span class="o">=&lt;</span><span class="n">SliceBackward</span><span class="o">&gt;</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="annotation-torchscript">
+</section>
+<section id="annotation-torchscript">
 <h3>어노테이션(annotation)을 통해 TorchScript로 변환하기<a class="headerlink" href="#annotation-torchscript" title="Permalink to this headline">¶</a></h3>
 <p>특정한 환경(가령 모델이 어떤 제어흐름을 사용하고 있는 경우)에서는 여러분의 모델을 어노테이트(annotate)하여
 TorchScript로 바로 작성하는 것이 바람직한 경우가 있습니다. 예를 들어, 아래와 같은 PyTorch 모델이
@@ -491,9 +492,9 @@ TorchScript로 바로 작성하는 것이 바람직한 경우가 있습니다. �
 <p>아직 TorchScript에서 지원하지 않는 Python 기능을 사용하고 있는 메소드들을 여러분의 <code class="docutils literal notranslate"><span class="pre">nn.Module</span></code>
 에서 제외하고 싶다면, 그 메소드들을 <code class="docutils literal notranslate"><span class="pre">&#64;torch.jit.ignore</span></code> 로 어노테이트하면 됩니다.</p>
 <p><code class="docutils literal notranslate"><span class="pre">sm</span></code> 은 직렬화(serialization) 준비가 된 <code class="docutils literal notranslate"><span class="pre">ScriptModule</span></code> 의 인스턴스입니다.</p>
-</div>
-</div>
-<div class="section" id="script">
+</section>
+</section>
+<section id="script">
 <h2>단계 2. Script 모듈을 파일로 직렬화하기<a class="headerlink" href="#script" title="Permalink to this headline">¶</a></h2>
 <p>모델을 트레이싱이나 어노테이팅을 통해 <code class="docutils literal notranslate"><span class="pre">ScriptModule</span></code> 로 변환하였다면, 이제 그것을 파일로 직렬화할
 수도 있습니다. 나중에 C++를 이용해 파일로부터 모듈을 읽어올 수 있고 Python에 어떤 의존성도 없이
@@ -506,60 +507,60 @@ TorchScript로 바로 작성하는 것이 바람직한 경우가 있습니다. �
 <p>이 함수는 <code class="docutils literal notranslate"><span class="pre">traced_resnet_model.pt</span></code> 파일을 작업 디렉토리에 생성할 것입니다. 만약 어노테이션 예시의
 <code class="docutils literal notranslate"><span class="pre">sm</span></code> 을 직렬화하고 싶다면, <code class="docutils literal notranslate"><span class="pre">sm.save(&quot;my_module_model.pt&quot;)</span></code> 를
 호출하면 됩니다. 이로써 우리는 이제 Python의 세계에서 벗어나 C++ 환경에서 작업할 준비를 마쳤습니다.</p>
-</div>
-<div class="section" id="c-script">
+</section>
+<section id="c-script">
 <h2>단계 3. C++에서 Script 모듈 로딩하기<a class="headerlink" href="#c-script" title="Permalink to this headline">¶</a></h2>
 <p>직렬화된 PyTorch 모델을 C++에서 로드하기 위해서는, 어플리케이션이 반드시 <em>LibTorch</em> 라고 불리는
 PyTorch C++ API를 사용해야합니다. LibTorch는 여러 공유 라이브러리들, 헤더 파일들, 그리고 CMake
 빌드 설정파일들을 포함하고 있습니다. CMake는 LibTorch를 쓰기위한 필수 요구사항은 아니지만, 권장되는
 방식이고 향후에도 계속 지원될 예정입니다. 이 튜토리얼에서는 CMake와 LibTorch를 사용하여 직렬화된
 PyTorch 모델을 읽고 실행하는 아주 간단한 C++ 어플리케이션을 만들어보도록 하겠습니다.</p>
-<div class="section" id="c">
+<section id="c">
 <h3>간단한 C++ 어플리케이션<a class="headerlink" href="#c" title="Permalink to this headline">¶</a></h3>
 <p>우선 모듈을 로드하는 코드에 대해 살펴보도록 하겠습니다. 아래의 간단한 코드로 모듈을 쉽게 읽어올 수 있습니다:</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;torch/script.h&gt;</span><span class="c1"> // 필요한 단 하나의 헤더파일.</span><span class="cp"></span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;torch/script.h&gt;</span><span class="c1"> // 필요한 단 하나의 헤더파일.</span><span class="cp"></span>
 
-<span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp"></span>
-<span class="cp">#include</span> <span class="cpf">&lt;memory&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;memory&gt;</span><span class="cp"></span>
 
-<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
-  <span class="k">if</span> <span class="p">(</span><span class="n">argc</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">std</span><span class="o">::</span><span class="n">cerr</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;usage: example-app &lt;path-to-exported-script-module&gt;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
-    <span class="k">return</span> <span class="mi">-1</span><span class="p">;</span>
-  <span class="p">}</span>
+<span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">argc</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="o">*</span><span class="w"> </span><span class="n">argv</span><span class="p">[])</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">argc</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">cerr</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;usage: example-app &lt;path-to-exported-script-module&gt;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
 
 
-  <span class="n">torch</span><span class="o">::</span><span class="n">jit</span><span class="o">::</span><span class="n">script</span><span class="o">::</span><span class="n">Module</span> <span class="k">module</span><span class="p">;</span>
-  <span class="k">try</span> <span class="p">{</span>
-    <span class="c1">// torch::jit::load()을 사용해 ScriptModule을 파일로부터 역직렬화</span>
-    <span class="k">module</span> <span class="o">=</span> <span class="n">torch</span><span class="o">::</span><span class="n">jit</span><span class="o">::</span><span class="n">load</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
-  <span class="p">}</span>
-  <span class="k">catch</span> <span class="p">(</span><span class="k">const</span> <span class="n">c10</span><span class="o">::</span><span class="n">Error</span><span class="o">&amp;</span> <span class="n">e</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">std</span><span class="o">::</span><span class="n">cerr</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;error loading the model</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
-    <span class="k">return</span> <span class="mi">-1</span><span class="p">;</span>
-  <span class="p">}</span>
+<span class="w">  </span><span class="n">torch</span><span class="o">::</span><span class="n">jit</span><span class="o">::</span><span class="n">script</span><span class="o">::</span><span class="n">Module</span><span class="w"> </span><span class="k">module</span><span class="p">;</span><span class="w"></span>
+<span class="w">  </span><span class="k">try</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// torch::jit::load()을 사용해 ScriptModule을 파일로부터 역직렬화</span>
+<span class="w">    </span><span class="k">module</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">torch</span><span class="o">::</span><span class="n">jit</span><span class="o">::</span><span class="n">load</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+<span class="w">  </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">c10</span><span class="o">::</span><span class="n">Error</span><span class="o">&amp;</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">cerr</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;error loading the model</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
 
-  <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;ok</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
-<span class="p">}</span>
+<span class="w">  </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;ok</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
 </pre></div>
 </div>
 <p><code class="docutils literal notranslate"><span class="pre">&lt;torch/script.h&gt;</span></code> 헤더는 예시를 실행하기 위한 모든 LibTorch 라이브러리를 포함하고 있습니다.
 우리의 어플리케이션은 직렬화된 PyTorch <code class="docutils literal notranslate"><span class="pre">ScriptModule</span></code> 의 경로를 유일한 명령행 인자로 입력받고
 이 파일경로를 인자로 받는 <code class="docutils literal notranslate"><span class="pre">torch::jit::load()</span></code> 를 사용해 모듈을 역직렬화합니다. 그 결과로
 <code class="docutils literal notranslate"><span class="pre">torch::jit::script::Module</span></code> 를 돌려받습니다. 이 리턴받은 모듈을 어떻게 사용하는지에 대해서는 곧 살펴보겠습니다.</p>
-</div>
-<div class="section" id="libtorch">
+</section>
+<section id="libtorch">
 <h3>LibTorch 사용 및 어플리케이션 빌드 방법<a class="headerlink" href="#libtorch" title="Permalink to this headline">¶</a></h3>
 <p>위의 코드를 <code class="docutils literal notranslate"><span class="pre">example-app.cpp</span></code> 이라는 파일에 저장하였다고 가정합니다. 위 코드를 빌드하기 위한
 간단한 <code class="docutils literal notranslate"><span class="pre">CMakeLists.txt</span></code> 입니다:</p>
-<div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="nb">cmake_minimum_required</span><span class="p">(</span><span class="s">VERSION</span> <span class="s">3.0</span> <span class="s">FATAL_ERROR</span><span class="p">)</span>
+<div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="nb">cmake_minimum_required</span><span class="p">(</span><span class="s">VERSION</span><span class="w"> </span><span class="s">3.0</span><span class="w"> </span><span class="s">FATAL_ERROR</span><span class="p">)</span>
 <span class="nb">project</span><span class="p">(</span><span class="s">custom_ops</span><span class="p">)</span>
 
-<span class="nb">find_package</span><span class="p">(</span><span class="s">Torch</span> <span class="s">REQUIRED</span><span class="p">)</span>
+<span class="nb">find_package</span><span class="p">(</span><span class="s">Torch</span><span class="w"> </span><span class="s">REQUIRED</span><span class="p">)</span>
 
-<span class="nb">add_executable</span><span class="p">(</span><span class="s">example-app</span> <span class="s">example-app.cpp</span><span class="p">)</span>
-<span class="nb">target_link_libraries</span><span class="p">(</span><span class="s">example-app</span> <span class="s2">&quot;${TORCH_LIBRARIES}&quot;</span><span class="p">)</span>
-<span class="nb">set_property</span><span class="p">(</span><span class="s">TARGET</span> <span class="s">example-app</span> <span class="s">PROPERTY</span> <span class="s">CXX_STANDARD</span> <span class="s">14</span><span class="p">)</span>
+<span class="nb">add_executable</span><span class="p">(</span><span class="s">example-app</span><span class="w"> </span><span class="s">example-app.cpp</span><span class="p">)</span>
+<span class="nb">target_link_libraries</span><span class="p">(</span><span class="s">example-app</span><span class="w"> </span><span class="s2">&quot;${TORCH_LIBRARIES}&quot;</span><span class="p">)</span>
+<span class="nb">set_property</span><span class="p">(</span><span class="s">TARGET</span><span class="w"> </span><span class="s">example-app</span><span class="w"> </span><span class="s">PROPERTY</span><span class="w"> </span><span class="s">CXX_STANDARD</span><span class="w"> </span><span class="s">14</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>예시 어플리케이션을 빌드하기 위해 마지막으로 필요한 것은 LibTorch 배포판입니다. 언제나 가장 최신의
@@ -644,19 +645,19 @@ Scanning dependencies of target example-app
 ok
 </pre></div>
 </div>
-</div>
-</div>
-<div class="section" id="script-c">
+</section>
+</section>
+<section id="script-c">
 <h2>단계 4. Script 모듈을 C++에서 실행하기<a class="headerlink" href="#script-c" title="Permalink to this headline">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">ResNet18</span></code> 을 C++에서 성공적으로 로딩한 뒤, 이제 몇 줄의 코드만 더 추가하면 모듈을 실행할 수 있습니다.
 C++ 어플리케이션의 <code class="docutils literal notranslate"><span class="pre">main()</span></code> 함수에 아래의 코드를 추가하겠습니다.</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// 입력값 벡터를 생성합니다.</span>
-<span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">torch</span><span class="o">::</span><span class="n">jit</span><span class="o">::</span><span class="n">IValue</span><span class="o">&gt;</span> <span class="n">inputs</span><span class="p">;</span>
-<span class="n">inputs</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">torch</span><span class="o">::</span><span class="n">ones</span><span class="p">({</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">224</span><span class="p">,</span> <span class="mi">224</span><span class="p">}));</span>
+<span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">torch</span><span class="o">::</span><span class="n">jit</span><span class="o">::</span><span class="n">IValue</span><span class="o">&gt;</span><span class="w"> </span><span class="n">inputs</span><span class="p">;</span><span class="w"></span>
+<span class="n">inputs</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">torch</span><span class="o">::</span><span class="n">ones</span><span class="p">({</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">224</span><span class="p">,</span><span class="w"> </span><span class="mi">224</span><span class="p">}));</span><span class="w"></span>
 
 <span class="c1">// 모델을 실행한 뒤 리턴값을 텐서로 변환합니다.</span>
-<span class="n">at</span><span class="o">::</span><span class="n">Tensor</span> <span class="n">output</span> <span class="o">=</span> <span class="k">module</span><span class="p">.</span><span class="n">forward</span><span class="p">(</span><span class="n">inputs</span><span class="p">).</span><span class="n">toTensor</span><span class="p">();</span>
-<span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">output</span><span class="p">.</span><span class="n">slice</span><span class="p">(</span><span class="cm">/*dim=*/</span><span class="mi">1</span><span class="p">,</span> <span class="cm">/*start=*/</span><span class="mi">0</span><span class="p">,</span> <span class="cm">/*end=*/</span><span class="mi">5</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="sc">&#39;\n&#39;</span><span class="p">;</span>
+<span class="n">at</span><span class="o">::</span><span class="n">Tensor</span><span class="w"> </span><span class="n">output</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">module</span><span class="p">.</span><span class="n">forward</span><span class="p">(</span><span class="n">inputs</span><span class="p">).</span><span class="n">toTensor</span><span class="p">();</span><span class="w"></span>
+<span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">output</span><span class="p">.</span><span class="n">slice</span><span class="p">(</span><span class="cm">/*dim=*/</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="cm">/*start=*/</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="cm">/*end=*/</span><span class="mi">5</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="sc">&#39;\n&#39;</span><span class="p">;</span><span class="w"></span>
 </pre></div>
 </div>
 <p>첫 두줄은 모델의 입력값을 생성합니다. <code class="docutils literal notranslate"><span class="pre">torch::jit::IValue</span></code> (<code class="docutils literal notranslate"><span class="pre">script::Module</span></code> 메소드들이
@@ -694,8 +695,8 @@ root@4b5a67132e81:/example-app/build# ./example-app traced_resnet_model.pt
 모델에 넘겨주는 입력값들에 대해서도 <code class="docutils literal notranslate"><span class="pre">tensor.to(at::kCUDA)</span></code> 를 통해 CUDA 메모리에 올린 뒤
 사용해야합니다. <code class="docutils literal notranslate"><span class="pre">tensor.to(at::kCUDA)</span></code> 는 CUDA 메모리에 있는 새로운 텐서를 리턴합니다.</p>
 </div>
-</div>
-<div class="section" id="api">
+</section>
+<section id="api">
 <h2>단계 5. API 더 알아보기<a class="headerlink" href="#api" title="Permalink to this headline">¶</a></h2>
 <p>이 튜토리얼이 PyTorch 모델을 Python에서부터 C++로 변환하는 과정을 이해하는데 도움이 되었길 바랍니다.
 본 튜토리얼에서 다룬 개념들로, 여러분은 이제 “즉시 실행” 버전의 PyTorch 모델에서부터 Python에서 컴파일된 <code class="docutils literal notranslate"><span class="pre">ScriptModule</span></code> 로,
@@ -713,8 +714,8 @@ root@4b5a67132e81:/example-app/build# ./example-app traced_resnet_model.pt
 </ul>
 <p>언제나 그렇듯이, 문제를 맞닥뜨리시거나 질문이 있으시면 저희 <a class="reference external" href="https://discuss.pytorch.org/">forum</a> 또는
 <a class="reference external" href="https://github.com/pytorch/pytorch/issues">GitHub issues</a> 에 올려주시면 되겠습니다.</p>
-</div>
-</div>
+</section>
+</section>
 
 
              </article>
@@ -798,7 +799,7 @@ root@4b5a67132e81:/example-app/build# ./example-app traced_resnet_model.pt
 
 
   
-
+  
      
        <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
          <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
@@ -811,7 +812,6 @@ root@4b5a67132e81:/example-app/build# ./example-app traced_resnet_model.pt
          <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
          <script src="../_static/katex_autorenderer.js"></script>
      
-
   
 
   <script type="text/javascript" src="../_static/js/vendor/popper.min.js"></script>

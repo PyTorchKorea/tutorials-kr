@@ -6,7 +6,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
 <meta property="og:title" content="PyTorch로 분산 어플리케이션 개발하기" />
   
 <meta property="og:type" content="article" />
@@ -391,7 +392,7 @@
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <div class="section" id="pytorch">
+  <section id="pytorch">
 <h1>PyTorch로 분산 어플리케이션 개발하기<a class="headerlink" href="#pytorch" title="Permalink to this headline">¶</a></h1>
 <dl class="simple">
 <dt><strong>Author</strong>: <a class="reference external" href="https://seba1511.com">Séb Arnold</a></dt><dd><p><strong>번역</strong>: <a class="reference external" href="https://github.com/9bow">박정환</a></p>
@@ -404,7 +405,7 @@
 <p>이 짧은 튜토리얼에서는 PyTorch의 분산 패키지를 둘러볼 예정입니다.
 여기에서는 어떻게 분산 환경을 설정하는지와 서로 다른 통신 방법을 사용하는지를
 알아보고, 패키지 내부도 일부 살펴보도록 하겠습니다.</p>
-<div class="section" id="setup">
+<section id="setup">
 <h2>설정(Setup)<a class="headerlink" href="#setup" title="Permalink to this headline">¶</a></h2>
 <!--
 * Processes & machines
@@ -461,13 +462,15 @@
 (<a class="reference external" href="#communication-backends">섹션 5.1</a> 참고) 이 튜토리얼의 마지막 부분에 있는
 <code class="docutils literal notranslate"><span class="pre">dist.init_process_group</span></code> 에서 일어나는 놀라운 일을 살펴볼 것이지만, 기본적으로는
 프로세스가 자신의 위치를 공유함으로써 서로 통신할 수 있도록 합니다.</p>
-</div>
-<div class="section" id="point-to-point">
+</section>
+<section id="point-to-point">
 <h2>점-대-점 간(Point-to-Point) 통신<a class="headerlink" href="#point-to-point" title="Permalink to this headline">¶</a></h2>
-<div class="figure align-center" id="id2">
+<figure class="align-center" id="id2">
 <a class="reference internal image-reference" href="../_images/send_recv.png"><img alt="송신과 수신" src="../_images/send_recv.png" style="width: 100%;" /></a>
-<p class="caption"><span class="caption-text">송신과 수신</span><a class="headerlink" href="#id2" title="Permalink to this image">¶</a></p>
-</div>
+<figcaption>
+<p><span class="caption-text">송신과 수신</span><a class="headerlink" href="#id2" title="Permalink to this image">¶</a></p>
+</figcaption>
+</figure>
 <p>하나의 프로세스에서 다른 프로세스로 데이터를 전송하는 것을 점-대-점 간 통신이라고 합니다.
 지점간 통신은  <code class="docutils literal notranslate"><span class="pre">send</span></code> 와 <code class="docutils literal notranslate"><span class="pre">recv</span></code> 함수 또는 즉시 응답하는(<em>immediate</em> counter-parts)
 <code class="docutils literal notranslate"><span class="pre">isend</span></code> 와 <code class="docutils literal notranslate"><span class="pre">irecv</span></code> 를 사용합니다.</p>
@@ -486,7 +489,7 @@
 </pre></div>
 </div>
 <p>위 예제에서 두 프로세스는 값이 0인 Tensor로 시작한 후, 0번 프로세스가 Tensor의 값을
-증가시킨 후 1번 프로세스로 보내서 둘 다 1.0으로 종료됩니다. 이 떄, 프로세스 1은
+증가시킨 후 1번 프로세스로 보내서 둘 다 1.0으로 종료됩니다. 이 때, 프로세스 1은
 수신한 데이터를 저장할 메모리를 할당해두야 합니다.</p>
 <p>또한 <code class="docutils literal notranslate"><span class="pre">send</span></code>/<code class="docutils literal notranslate"><span class="pre">recv</span></code> 는 모두 <strong>블로킹</strong> 입니다: 두 프로세스는 통신이 완료될 때까지
 멈춰있습니다. 반면에 즉시 응답하는 것이 <strong>논-블로킹</strong> 입니다; 스크립트는 실행을
@@ -523,8 +526,8 @@
 <a class="reference external" href="https://research.fb.com/publications/imagenet1kin1h/">페이스북(Facebook)의 대규모 실험</a>
 에서 사용하는 것과 같은 멋진 알고리즘을 구현할 때 사용할 수 있습니다.
 (<a class="reference external" href="#ring-allreduce">섹션 4.1</a> 참고)</p>
-</div>
-<div class="section" id="collective-communication">
+</section>
+<section id="collective-communication">
 <h2>집합 통신(Collective Communication)<a class="headerlink" href="#collective-communication" title="Permalink to this headline">¶</a></h2>
 <table class="docutils align-default">
 <colgroup>
@@ -532,37 +535,49 @@
 <col style="width: 50%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><div class="figure align-center" id="id3">
+<tr class="row-odd"><td><figure class="align-center" id="id3">
 <a class="reference internal image-reference" href="../_images/scatter.png"><img alt="Scatter" src="../_images/scatter.png" style="width: 100%;" /></a>
-<p class="caption"><span class="caption-text">Scatter</span><a class="headerlink" href="#id3" title="Permalink to this image">¶</a></p>
-</div>
+<figcaption>
+<p><span class="caption-text">Scatter</span><a class="headerlink" href="#id3" title="Permalink to this image">¶</a></p>
+</figcaption>
+</figure>
 </td>
-<td><div class="figure align-center" id="id4">
+<td><figure class="align-center" id="id4">
 <a class="reference internal image-reference" href="../_images/gather.png"><img alt="Gather" src="../_images/gather.png" style="width: 100%;" /></a>
-<p class="caption"><span class="caption-text">Gather</span><a class="headerlink" href="#id4" title="Permalink to this image">¶</a></p>
-</div>
+<figcaption>
+<p><span class="caption-text">Gather</span><a class="headerlink" href="#id4" title="Permalink to this image">¶</a></p>
+</figcaption>
+</figure>
 </td>
 </tr>
-<tr class="row-even"><td><div class="figure align-center" id="id5">
+<tr class="row-even"><td><figure class="align-center" id="id5">
 <a class="reference internal image-reference" href="../_images/reduce.png"><img alt="Reduce" src="../_images/reduce.png" style="width: 100%;" /></a>
-<p class="caption"><span class="caption-text">Reduce</span><a class="headerlink" href="#id5" title="Permalink to this image">¶</a></p>
-</div>
+<figcaption>
+<p><span class="caption-text">Reduce</span><a class="headerlink" href="#id5" title="Permalink to this image">¶</a></p>
+</figcaption>
+</figure>
 </td>
-<td><div class="figure align-center" id="id6">
+<td><figure class="align-center" id="id6">
 <a class="reference internal image-reference" href="../_images/all_reduce.png"><img alt="All-Reduce" src="../_images/all_reduce.png" style="width: 100%;" /></a>
-<p class="caption"><span class="caption-text">All-Reduce</span><a class="headerlink" href="#id6" title="Permalink to this image">¶</a></p>
-</div>
+<figcaption>
+<p><span class="caption-text">All-Reduce</span><a class="headerlink" href="#id6" title="Permalink to this image">¶</a></p>
+</figcaption>
+</figure>
 </td>
 </tr>
-<tr class="row-odd"><td><div class="figure align-center" id="id7">
+<tr class="row-odd"><td><figure class="align-center" id="id7">
 <a class="reference internal image-reference" href="../_images/broadcast.png"><img alt="Broadcast" src="../_images/broadcast.png" style="width: 100%;" /></a>
-<p class="caption"><span class="caption-text">Broadcast</span><a class="headerlink" href="#id7" title="Permalink to this image">¶</a></p>
-</div>
+<figcaption>
+<p><span class="caption-text">Broadcast</span><a class="headerlink" href="#id7" title="Permalink to this image">¶</a></p>
+</figcaption>
+</figure>
 </td>
-<td><div class="figure align-center" id="id8">
+<td><figure class="align-center" id="id8">
 <a class="reference internal image-reference" href="../_images/all_gather.png"><img alt="All-Gather" src="../_images/all_gather.png" style="width: 100%;" /></a>
-<p class="caption"><span class="caption-text">All-Gather</span><a class="headerlink" href="#id8" title="Permalink to this image">¶</a></p>
-</div>
+<figcaption>
+<p><span class="caption-text">All-Gather</span><a class="headerlink" href="#id8" title="Permalink to this image">¶</a></p>
+</figcaption>
+</figure>
 </td>
 </tr>
 </tbody>
@@ -582,7 +597,7 @@
     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Rank &#39;</span><span class="p">,</span> <span class="n">rank</span><span class="p">,</span> <span class="s1">&#39; has data &#39;</span><span class="p">,</span> <span class="n">tensor</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 </pre></div>
 </div>
-<p>그룹 내의 모든 Tensor들의 합이 필요하기 떄문에, <code class="docutils literal notranslate"><span class="pre">dist.ReduceOp.SUM</span></code> 을
+<p>그룹 내의 모든 Tensor들의 합이 필요하기 때문에, <code class="docutils literal notranslate"><span class="pre">dist.ReduceOp.SUM</span></code> 을
 리듀스(reduce) 연산자로 사용하였습니다. 일반적으로, 교환 법칙이 허용되는(commutative)
 모든 수학 연산을 연산자로 사용할 수 있습니다. PyTorch는 요소별(element-wise)로
 동작하는 기본적으로 4개의 연산자를 제공합니다.</p>
@@ -610,8 +625,8 @@
 <li><p><code class="docutils literal notranslate"><span class="pre">dist.barrier(group)</span></code>: <cite>group</cite> 내의 모든 프로세스가 이 함수에 진입할 때까지
 <cite>group</cite> 내의 모든 프로세스를 멈춥(block)니다.</p></li>
 </ul>
-</div>
-<div class="section" id="distributed-training">
+</section>
+<section id="distributed-training">
 <h2>분산 학습(Distributed Training)<a class="headerlink" href="#distributed-training" title="Permalink to this headline">¶</a></h2>
 <!--
 * Gloo Backend
@@ -731,7 +746,7 @@ TODO: Custom ring-allreduce
 구현하기 위해서는 <a class="reference external" href="https://seba-1511.github.io/dist_blog">더 많은 트릭</a> 이 필요합니다.
 다시 말씀드리지만, <a class="reference external" href="https://pytorch.org/docs/stable/nn.html#torch.nn.parallel.DistributedDataParallel">테스트되고 최적화된</a>
 것을 사용하십시오.</p>
-<div class="section" id="ring-allreduce">
+<section id="ring-allreduce">
 <h3>사용자 정의 링-올리듀스(Ring-Allreduce)<a class="headerlink" href="#ring-allreduce" title="Permalink to this headline">¶</a></h3>
 <p>추가로 DeepSpeech의 효율적인 링 올리듀스(ring allreduce)를 구현하고 싶다고 가정해보겠습니다.
 이것은 점-대-점 집합 통신(point-to-point collectives)으로 쉽게 구현할 수 있습니다.</p>
@@ -767,9 +782,9 @@ TODO: Custom ring-allreduce
 있는데, 이것은 숙제로 남겨두도록 하겠습니다: DeepSpeech의 구현은 통신 대역폭을
 최적으로 확용하기 위해 변화도 Tensor를 <em>덩어리(chunk)</em> 로 나눕니다.
 (힌트: <a class="reference external" href="https://pytorch.org/docs/stable/torch.html#torch.chunk">torch.chunk</a>)</p>
-</div>
-</div>
-<div class="section" id="advanced-topics">
+</section>
+</section>
+<section id="advanced-topics">
 <h2>고급 주제(Advanced Topics)<a class="headerlink" href="#advanced-topics" title="Permalink to this headline">¶</a></h2>
 <p>이제 <code class="docutils literal notranslate"><span class="pre">torch.distributed</span></code> 보다 진보된 기능들을 살펴볼 준비가 되었습니다.
 다루어야 할 주제들이 많으므로, 이 섹션을 다음과 같이 2개의 하위 섹션으로 나누도록
@@ -779,7 +794,7 @@ TODO: Custom ring-allreduce
 <li><p>초기화 방법: <code class="docutils literal notranslate"><span class="pre">dist.init_process_group()</span></code> 에서 초기 구성 단계를 잘 설정하는 방법을
 이해합니다.</p></li>
 </ol>
-<div class="section" id="communication-backends">
+<section id="communication-backends">
 <h3>통신 백엔드(Communication Backends)<a class="headerlink" href="#communication-backends" title="Permalink to this headline">¶</a></h3>
 <p><code class="docutils literal notranslate"><span class="pre">torch.distributed</span></code> 의 가장 우아한 면 중 하나는 다른 백엔드를 기반으로 추상화하고
 구축하는 기능입니다. 앞에서 언급한 것처럼 현재 PyTorch에는 Gloo, NCLL 및 MPI의
@@ -789,7 +804,7 @@ TODO: Custom ring-allreduce
 에서 찾아보실 수 있습니다.</p>
 <p><strong>Gloo 백엔드</strong></p>
 <p>지금껏 우리는 <a class="reference external" href="https://github.com/facebookincubator/gloo">Gloo backend</a> 를
-광범위하게 사용했습니다. 이것은 미리 컴파일된 PyTOrch 바이너리가 포함되어 있으며
+광범위하게 사용했습니다. 이것은 미리 컴파일된 PyTorch 바이너리가 포함되어 있으며
 Linux(0.2 이상)와 macOS(1.3 이상)을 모두 지원하고 있어 개발 플랫폼으로 매우 편리합니다.
 또한 CPU에서는 모든 저짐-대-지점 및 집합 연산들을, GPU에서는 집합 연산을 지원합니다.
 CUDA Tensor에 대한 집합 연산 구현은 NCCL 백엔드에서 제공하는 것만큼 최적화되어
@@ -847,8 +862,8 @@ CUDA IPC와 GPU Direct 기술을 활용하고 있습니다.</p>
 최적화된 구현체를 제공합니다. 집합 연산에 CUDA Tensor만 사용하는 경우, 동급 최고
 성능을 위해 이 백엔드를 사용하는 것을 고려해보시기 바랍니다. NCCL 백엔드는 미리
 빌드(pre-built)된 바이너리에 CUDA 지원과 함께 포함되어 있습니다.</p>
-</div>
-<div class="section" id="initialization-methods">
+</section>
+<section id="initialization-methods">
 <h3>초기화 방법(Initialization Methods)<a class="headerlink" href="#initialization-methods" title="Permalink to this headline">¶</a></h3>
 <p>마지막으로, 처음 호출했던 함수를 알아보겠습니다: <code class="docutils literal notranslate"><span class="pre">dist.init_process_group(backend,</span> <span class="pre">init_method)</span></code>
 특히 각 프로세스 간의 초기 조정(initial coordination) 단계를 담당하는 다양한 초기화
@@ -907,9 +922,9 @@ CUDA IPC와 GPU Direct 기술을 활용하고 있습니다.</p>
 또는 <a class="reference external" href="https://github.com/pytorch/pytorch/tree/master/test/distributed">테스트</a>
 에서 답을 찾을 수 있었습니다. 또한 튜토리얼 초안에 대해 통찰력있는 의견과 질문에
 답변을 해주신 Soumith Chintala, Adam Paszke 그리고 Natalia Gimelshei께도 감사드립니다.</p>
-</div>
-</div>
-</div>
+</section>
+</section>
+</section>
 
 
              </article>
@@ -992,7 +1007,7 @@ CUDA IPC와 GPU Direct 기술을 활용하고 있습니다.</p>
 
 
   
-
+  
      
        <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
          <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
@@ -1005,7 +1020,6 @@ CUDA IPC와 GPU Direct 기술을 활용하고 있습니다.</p>
          <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
          <script src="../_static/katex_autorenderer.js"></script>
      
-
   
 
   <script type="text/javascript" src="../_static/js/vendor/popper.min.js"></script>

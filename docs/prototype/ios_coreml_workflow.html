@@ -6,7 +6,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
 <meta property="og:title" content="(Prototype) Convert Mobilenetv2 to Core ML" />
   
 <meta property="og:type" content="article" />
@@ -389,15 +390,15 @@
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <div class="section" id="prototype-convert-mobilenetv2-to-core-ml">
+  <section id="prototype-convert-mobilenetv2-to-core-ml">
 <h1>(Prototype) Convert Mobilenetv2 to Core ML<a class="headerlink" href="#prototype-convert-mobilenetv2-to-core-ml" title="Permalink to this headline">¶</a></h1>
 <p><strong>Author</strong>: <a class="reference external" href="https://github.com/xta0">Tao Xu</a></p>
-<div class="section" id="introduction">
+<section id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
 <p>Core ML provides access to powerful and efficient NPUs(Neural Process Unit) on modern iPhone devices. This tutorial shows how to prepare a computer vision model (mobilenetv2) to use the PyTorch Core ML mobile backend.</p>
 <p>Note that this feature is currently in the “prototype” phase and only supports a limited numbers of operators, but we expect to solidify the integration and expand our operator support over time. The APIs are subject to change in the future.</p>
-</div>
-<div class="section" id="environment-setup-macos">
+</section>
+<section id="environment-setup-macos">
 <h2>Environment Setup (MacOS)<a class="headerlink" href="#environment-setup-macos" title="Permalink to this headline">¶</a></h2>
 <p>Let’s start off by creating a new conda environment.</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>conda create --name <span class="m">1</span>.10 <span class="nv">python</span><span class="o">=</span><span class="m">3</span>.8 --yes
@@ -410,8 +411,8 @@ conda activate <span class="m">1</span>.10
 pip3 install <span class="nv">coremltools</span><span class="o">==</span><span class="m">5</span>.0b5
 </pre></div>
 </div>
-</div>
-<div class="section" id="model-preparation">
+</section>
+<section id="model-preparation">
 <h2>Model Preparation<a class="headerlink" href="#model-preparation" title="Permalink to this headline">¶</a></h2>
 <p>To convert a pre-trained mobilenetv2 model to be Core ML compatible, we’re going to use the <code class="docutils literal notranslate"><span class="pre">to_backend()</span></code> API, which is a prototype feature for delegating model executions to some specific backends. The following python code shows how to use it to convert the mobilenetv2 torchscript model.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
@@ -469,8 +470,8 @@ Translating <span class="nv">MIL</span> <span class="o">==</span>&gt; NeuralNetw
 </pre></div>
 </div>
 <p>We can safely ignore the warning above, as we don’t plan to run our model on desktop.</p>
-</div>
-<div class="section" id="ios-app-integration">
+</section>
+<section id="ios-app-integration">
 <h2>iOS app integration<a class="headerlink" href="#ios-app-integration" title="Permalink to this headline">¶</a></h2>
 <p>Now that the model is ready, we can integrate it to our app. We’ll be using the pytorch nightly cocoapods which contains the code for executing the Core ML model. Simply add the following code to your Podfile</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>pod LibTorch-Lite-Nightly
@@ -478,25 +479,25 @@ Translating <span class="nv">MIL</span> <span class="o">==</span>&gt; NeuralNetw
 </div>
 <p>In this tutorial, we’ll be reusing our <a class="reference external" href="https://github.com/pytorch/ios-demo-app/tree/master/HelloWorld-CoreML">HelloWorld</a> project. Feel free to walk through the code there.</p>
 <p>To benchmark the latency, you can simply put the following code before and after the PyTorch <code class="docutils literal notranslate"><span class="pre">forward</span></code> function</p>
-<div class="highlight-objective-c notranslate"><div class="highlight"><pre><span></span><span class="n">caffe2</span><span class="o">::</span><span class="n">Timer</span> <span class="n">t</span><span class="p">;</span>
-<span class="k">auto</span> <span class="n">outputTensor</span> <span class="o">=</span> <span class="n">_impl</span><span class="p">.</span><span class="n">forward</span><span class="p">({</span><span class="n">tensor</span><span class="p">}).</span><span class="n">toTensor</span><span class="p">().</span><span class="n">cpu</span><span class="p">();</span>
-<span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;forward took: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">t</span><span class="p">.</span><span class="n">MilliSeconds</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<div class="highlight-objective-c notranslate"><div class="highlight"><pre><span></span><span class="n">caffe2</span><span class="o">::</span><span class="n">Timer</span><span class="w"> </span><span class="n">t</span><span class="p">;</span><span class="w"></span>
+<span class="k">auto</span><span class="w"> </span><span class="n">outputTensor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">_impl</span><span class="p">.</span><span class="n">forward</span><span class="p">({</span><span class="n">tensor</span><span class="p">}).</span><span class="n">toTensor</span><span class="p">().</span><span class="n">cpu</span><span class="p">();</span><span class="w"></span>
+<span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;forward took: &quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">t</span><span class="p">.</span><span class="n">MilliSeconds</span><span class="p">()</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span><span class="w"></span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="conclusion">
+</section>
+<section id="conclusion">
 <h2>Conclusion<a class="headerlink" href="#conclusion" title="Permalink to this headline">¶</a></h2>
 <p>In this tutorial, we demonstrated how to convert a mobilenetv2 model to a Core ML compatible model. Please be aware of that Core ML feature is still under development, new operators/models will continue to be added. APIs are subject to change in the future versions.</p>
 <p>Thanks for reading! As always, we welcome any feedback, so please create an issue <a class="reference external" href="https://github.com/pytorch/pytorch/issues">here</a> if you have any.</p>
-</div>
-<div class="section" id="learn-more">
+</section>
+<section id="learn-more">
 <h2>Learn More<a class="headerlink" href="#learn-more" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>The <a class="reference external" href="https://pytorch.org/hub/pytorch_vision_mobilenet_v2/">Mobilenetv2</a> from Torchvision</p></li>
 <li><p>Information about <a class="reference external" href="https://developer.apple.com/documentation/coreml">Core ML</a></p></li>
 </ul>
-</div>
-</div>
+</section>
+</section>
 
 
              </article>
@@ -564,7 +565,7 @@ Translating <span class="nv">MIL</span> <span class="o">==</span>&gt; NeuralNetw
 
 
   
-
+  
      
        <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
          <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
@@ -577,7 +578,6 @@ Translating <span class="nv">MIL</span> <span class="o">==</span>&gt; NeuralNetw
          <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
          <script src="../_static/katex_autorenderer.js"></script>
      
-
   
 
   <script type="text/javascript" src="../_static/js/vendor/popper.min.js"></script>

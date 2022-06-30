@@ -6,7 +6,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
 <meta property="og:title" content="모델 매개변수 최적화하기" />
   
 <meta property="og:type" content="article" />
@@ -404,14 +405,14 @@
 <a class="reference external" href="autogradqs_tutorial.html">Autograd</a> ||
 <strong>최적화(Optimization)</strong> ||
 <a class="reference external" href="saveloadrun_tutorial.html">모델 저장하고 불러오기</a></p>
-<div class="section" id="id4">
+<section id="id4">
 <h1>모델 매개변수 최적화하기<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h1>
 <p>이제 모델과 데이터가 준비되었으니, 데이터에 매개변수를 최적화하여 모델을 학습하고, 검증하고, 테스트할 차례입니다.
 모델을 학습하는 과정은 반복적인 과정을 거칩니다; (<em>에폭(epoch)</em>이라고 부르는) 각 반복 단계에서 모델은 출력을 추측하고,
 추측과 정답 사이의 오류(<em>손실(loss)</em>)를 계산하고, (<a class="reference external" href="autograd_tutorial.html">이전 장</a>에서 본 것처럼)
 매개변수에 대한 오류의 도함수(derivative)를 수집한 뒤, 경사하강법을 사용하여 이 파라매터들을 <strong>최적화(optimize)</strong>합니다.
 이 과정에 대한 자세한 설명은 <a class="reference external" href="https://www.youtube.com/watch?v=tIeHLnjs5U8">3Blue1Brown의 역전파</a> 영상을 참고하세요.</p>
-<div class="section" id="pre-requisite">
+<section id="pre-requisite">
 <h2>기본(Pre-requisite) 코드<a class="headerlink" href="#pre-requisite" title="Permalink to this headline">¶</a></h2>
 <p>이전 장인 <a class="reference external" href="data_tutorial.html">Dataset과 DataLoader</a>와 <a class="reference external" href="buildmodel_tutorial.html">신경망 모델 구성하기</a>에서
 코드를 기져왔습니다.</p>
@@ -458,8 +459,8 @@
 <span class="n">model</span> <span class="o">=</span> <span class="n">NeuralNetwork</span><span class="p">()</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="hyperparameter">
+</section>
+<section id="hyperparameter">
 <h2>하이퍼파라매터(Hyperparameter)<a class="headerlink" href="#hyperparameter" title="Permalink to this headline">¶</a></h2>
 <p>하이퍼파라매터(Hyperparameter)는 모델 최적화 과정을 제어할 수 있는 조절 가능한 매개변수입니다.
 서로 다른 하이퍼파라매터 값은 모델 학습과 수렴율(convergence rate)에 영향을 미칠 수 있습니다.
@@ -477,8 +478,8 @@
 <span class="n">epochs</span> <span class="o">=</span> <span class="mi">5</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="optimization-loop">
+</section>
+<section id="optimization-loop">
 <h2>최적화 단계(Optimization Loop)<a class="headerlink" href="#optimization-loop" title="Permalink to this headline">¶</a></h2>
 <p>하이퍼파라매터를 설정한 뒤에는 최적화 단계를 통해 모델을 학습하고 최적화할 수 있습니다.
 최적화 단계의 각 반복(iteration)을 <strong>에폭</strong>이라고 부릅니다.</p>
@@ -491,7 +492,7 @@
 </dl>
 <p>학습 단계(training loop)에서 일어나는 몇 가지 개념들을 간략히 살펴보겠습니다. 최적화 단계(optimization loop)를 보려면
 <a class="reference internal" href="#full-impl-label"><span class="std std-ref">전체 구현</span></a> 부분으로 건너뛰시면 됩니다.</p>
-<div class="section" id="loss-function">
+<section id="loss-function">
 <h3>손실 함수(loss function)<a class="headerlink" href="#loss-function" title="Permalink to this headline">¶</a></h3>
 <p>학습용 데이터를 제공하면, 학습되지 않은 신경망은 정답을 제공하지 않을 확률이 높습니다. <strong>손실 함수(loss function)</strong>는
 획득한 결과와 실제 값 사이의 틀린 정도(degree of dissimilarity)를 측정하며, 학습 중에 이 값을 최소화하려고 합니다.
@@ -505,8 +506,8 @@
 <span class="n">loss_fn</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">CrossEntropyLoss</span><span class="p">()</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="optimizer">
+</section>
+<section id="optimizer">
 <h3>옵티마이저(Optimizer)<a class="headerlink" href="#optimizer" title="Permalink to this headline">¶</a></h3>
 <p>최적화는 각 학습 단계에서 모델의 오류를 줄이기 위해 모델 매개변수를 조정하는 과정입니다. <strong>최적화 알고리즘</strong>은 이 과정이 수행되는 방식(여기에서는 확률적 경사하강법(SGD; Stochastic Gradient Descent))을 정의합니다.
 모든 최적화 절차(logic)는 <code class="docutils literal notranslate"><span class="pre">optimizer</span></code> 객체에 캡슐화(encapsulate)됩니다. 여기서는 SGD 옵티마이저를 사용하고 있으며, PyTorch에는 ADAM이나 RMSProp과 같은 다른 종류의 모델과 데이터에서 더 잘 동작하는
@@ -523,9 +524,9 @@
 </ul>
 </dd>
 </dl>
-</div>
-</div>
-<div class="section" id="full-impl-label">
+</section>
+</section>
+<section id="full-impl-label">
 <span id="id9"></span><h2>전체 구현<a class="headerlink" href="#full-impl-label" title="Permalink to this headline">¶</a></h2>
 <p>최적화 코드를 반복하여 수행하는 <code class="docutils literal notranslate"><span class="pre">train_loop</span></code>와 테스트 데이터로 모델의 성능을 측정하는 <code class="docutils literal notranslate"><span class="pre">test_loop</span></code>를 정의하였습니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">train_loop</span><span class="p">(</span><span class="n">dataloader</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">loss_fn</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">):</span>
@@ -615,128 +616,128 @@ loss: 1.668501  [25600/60000]
 loss: 1.604107  [32000/60000]
 loss: 1.640458  [38400/60000]
 loss: 1.526604  [44800/60000]
-loss: 1.558075  [51200/60000]
-loss: 1.470942  [57600/60000]
+loss: 1.558076  [51200/60000]
+loss: 1.470941  [57600/60000]
 Test Error:
  Accuracy: 60.6%, Avg loss: 1.473576
 
 Epoch 4
 -------------------------------
 loss: 1.546935  [    0/60000]
-loss: 1.524887  [ 6400/60000]
-loss: 1.348418  [12800/60000]
+loss: 1.524886  [ 6400/60000]
+loss: 1.348419  [12800/60000]
 loss: 1.431470  [19200/60000]
-loss: 1.340191  [25600/60000]
+loss: 1.340189  [25600/60000]
 loss: 1.317189  [32000/60000]
-loss: 1.349370  [38400/60000]
-loss: 1.257425  [44800/60000]
+loss: 1.349369  [38400/60000]
+loss: 1.257424  [44800/60000]
 loss: 1.297893  [51200/60000]
-loss: 1.211099  [57600/60000]
+loss: 1.211097  [57600/60000]
 Test Error:
  Accuracy: 63.5%, Avg loss: 1.228582
 
 Epoch 5
 -------------------------------
 loss: 1.309672  [    0/60000]
-loss: 1.299590  [ 6400/60000]
-loss: 1.113937  [12800/60000]
-loss: 1.226607  [19200/60000]
-loss: 1.125740  [25600/60000]
-loss: 1.132318  [32000/60000]
-loss: 1.167729  [38400/60000]
-loss: 1.089451  [44800/60000]
-loss: 1.131196  [51200/60000]
-loss: 1.055024  [57600/60000]
+loss: 1.299588  [ 6400/60000]
+loss: 1.113936  [12800/60000]
+loss: 1.226605  [19200/60000]
+loss: 1.125736  [25600/60000]
+loss: 1.132316  [32000/60000]
+loss: 1.167728  [38400/60000]
+loss: 1.089450  [44800/60000]
+loss: 1.131195  [51200/60000]
+loss: 1.055023  [57600/60000]
 Test Error:
- Accuracy: 64.7%, Avg loss: 1.072795
+ Accuracy: 64.7%, Avg loss: 1.072794
 
 Epoch 6
 -------------------------------
 loss: 1.147470  [    0/60000]
-loss: 1.154462  [ 6400/60000]
-loss: 0.955832  [12800/60000]
-loss: 1.095336  [19200/60000]
-loss: 0.991356  [25600/60000]
-loss: 1.005169  [32000/60000]
-loss: 1.053062  [38400/60000]
-loss: 0.982109  [44800/60000]
-loss: 1.021988  [51200/60000]
-loss: 0.956644  [57600/60000]
+loss: 1.154460  [ 6400/60000]
+loss: 0.955833  [12800/60000]
+loss: 1.095335  [19200/60000]
+loss: 0.991355  [25600/60000]
+loss: 1.005166  [32000/60000]
+loss: 1.053060  [38400/60000]
+loss: 0.982108  [44800/60000]
+loss: 1.021991  [51200/60000]
+loss: 0.956641  [57600/60000]
 Test Error:
  Accuracy: 65.7%, Avg loss: 0.971098
 
 Epoch 7
 -------------------------------
-loss: 1.033702  [    0/60000]
-loss: 1.059257  [ 6400/60000]
+loss: 1.033701  [    0/60000]
+loss: 1.059258  [ 6400/60000]
 loss: 0.846744  [12800/60000]
-loss: 1.007358  [19200/60000]
-loss: 0.905277  [25600/60000]
-loss: 0.914109  [32000/60000]
-loss: 0.977417  [38400/60000]
-loss: 0.912614  [44800/60000]
-loss: 0.946969  [51200/60000]
-loss: 0.890879  [57600/60000]
+loss: 1.007361  [19200/60000]
+loss: 0.905275  [25600/60000]
+loss: 0.914110  [32000/60000]
+loss: 0.977414  [38400/60000]
+loss: 0.912617  [44800/60000]
+loss: 0.946972  [51200/60000]
+loss: 0.890875  [57600/60000]
 Test Error:
- Accuracy: 67.0%, Avg loss: 0.901491
+ Accuracy: 67.0%, Avg loss: 0.901490
 
 Epoch 8
 -------------------------------
-loss: 0.949470  [    0/60000]
-loss: 0.992693  [ 6400/60000]
-loss: 0.768567  [12800/60000]
-loss: 0.945288  [19200/60000]
-loss: 0.846790  [25600/60000]
-loss: 0.846590  [32000/60000]
-loss: 0.923904  [38400/60000]
-loss: 0.866406  [44800/60000]
-loss: 0.893234  [51200/60000]
-loss: 0.843401  [57600/60000]
+loss: 0.949472  [    0/60000]
+loss: 0.992691  [ 6400/60000]
+loss: 0.768568  [12800/60000]
+loss: 0.945291  [19200/60000]
+loss: 0.846789  [25600/60000]
+loss: 0.846589  [32000/60000]
+loss: 0.923901  [38400/60000]
+loss: 0.866407  [44800/60000]
+loss: 0.893232  [51200/60000]
+loss: 0.843394  [57600/60000]
 Test Error:
  Accuracy: 68.3%, Avg loss: 0.851377
 
 Epoch 9
 -------------------------------
 loss: 0.884660  [    0/60000]
-loss: 0.942676  [ 6400/60000]
-loss: 0.710136  [12800/60000]
-loss: 0.899435  [19200/60000]
-loss: 0.804525  [25600/60000]
-loss: 0.795328  [32000/60000]
-loss: 0.883359  [38400/60000]
-loss: 0.834206  [44800/60000]
-loss: 0.853336  [51200/60000]
-loss: 0.807476  [57600/60000]
+loss: 0.942678  [ 6400/60000]
+loss: 0.710138  [12800/60000]
+loss: 0.899434  [19200/60000]
+loss: 0.804528  [25600/60000]
+loss: 0.795329  [32000/60000]
+loss: 0.883360  [38400/60000]
+loss: 0.834207  [44800/60000]
+loss: 0.853341  [51200/60000]
+loss: 0.807475  [57600/60000]
 Test Error:
  Accuracy: 69.5%, Avg loss: 0.813398
 
 Epoch 10
 -------------------------------
-loss: 0.832940  [    0/60000]
-loss: 0.902499  [ 6400/60000]
-loss: 0.664859  [12800/60000]
-loss: 0.863966  [19200/60000]
-loss: 0.772257  [25600/60000]
-loss: 0.755980  [32000/60000]
-loss: 0.850610  [38400/60000]
-loss: 0.810026  [44800/60000]
+loss: 0.832944  [    0/60000]
+loss: 0.902497  [ 6400/60000]
+loss: 0.664862  [12800/60000]
+loss: 0.863964  [19200/60000]
+loss: 0.772260  [25600/60000]
+loss: 0.755983  [32000/60000]
+loss: 0.850609  [38400/60000]
+loss: 0.810029  [44800/60000]
 loss: 0.822286  [51200/60000]
-loss: 0.778493  [57600/60000]
+loss: 0.778496  [57600/60000]
 Test Error:
- Accuracy: 70.6%, Avg loss: 0.783127
+ Accuracy: 70.6%, Avg loss: 0.783130
 
 Done!
 </pre></div>
 </div>
-</div>
-<div class="section" id="id10">
+</section>
+<section id="id10">
 <h2>더 읽어보기<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p><a class="reference external" href="https://pytorch.org/docs/stable/nn.html#loss-functions">Loss Functions</a></p></li>
 <li><p><a class="reference external" href="https://pytorch.org/docs/stable/optim.html">torch.optim</a></p></li>
 <li><p><a class="reference external" href="https://tutorials.pytorch.kr/recipes/recipes/warmstarting_model_using_parameters_from_a_different_model.html">Warmstart Training a Model</a></p></li>
 </ul>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 1 minutes  35.028 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 1 minutes  39.482 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-beginner-basics-optimization-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/0662a149d54bd776924742c96eb6282d/optimization_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">optimization_tutorial.py</span></code></a></p>
@@ -746,8 +747,8 @@ Done!
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
-</div>
-</div>
+</section>
+</section>
 
 
              </article>
@@ -827,7 +828,7 @@ Done!
 
 
   
-
+  
      
        <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
          <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
@@ -840,7 +841,6 @@ Done!
          <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
          <script src="../../_static/katex_autorenderer.js"></script>
      
-
   
 
   <script type="text/javascript" src="../../_static/js/vendor/popper.min.js"></script>

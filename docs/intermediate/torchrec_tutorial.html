@@ -6,7 +6,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
 <meta property="og:title" content="Introduction to TorchRec" />
   
 <meta property="og:type" content="article" />
@@ -390,7 +391,7 @@
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <div class="section" id="introduction-to-torchrec">
+  <section id="introduction-to-torchrec">
 <h1>Introduction to TorchRec<a class="headerlink" href="#introduction-to-torchrec" title="Permalink to this headline">¶</a></h1>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
@@ -412,7 +413,7 @@ its primary API
 called <a class="reference external" href="https://pytorch.org/torchrec/torchrec.distributed.html#torchrec.distributed.model_parallel.DistributedModelParallel"><code class="docutils literal notranslate"><span class="pre">DistributedModelParallel</span></code></a>,
 or DMP. Like PyTorch’s DistributedDataParallel, DMP wraps a model to
 enable distributed training.</p>
-<div class="section" id="installation">
+<section id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
 <p>Requirements: python &gt;= 3.7</p>
 <p>We highly recommend CUDA when using TorchRec. If using CUDA: cuda &gt;= 11.0</p>
@@ -422,12 +423,12 @@ conda install pytorch <span class="nv">cudatoolkit</span><span class="o">=</span
 pip3 install torchrec-nightly
 </pre></div>
 </div>
-</div>
-<div class="section" id="overview">
+</section>
+<section id="overview">
 <h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
 <p>This tutorial will cover three pieces of TorchRec: the <code class="docutils literal notranslate"><span class="pre">nn.module</span></code> <a class="reference external" href="https://pytorch.org/torchrec/torchrec.modules.html#torchrec.modules.embedding_modules.EmbeddingBagCollection"><code class="docutils literal notranslate"><span class="pre">EmbeddingBagCollection</span></code></a>, the <a class="reference external" href="https://pytorch.org/torchrec/torchrec.distributed.html#torchrec.distributed.model_parallel.DistributedModelParallel"><code class="docutils literal notranslate"><span class="pre">DistributedModelParallel</span></code></a> API, and
 the datastructure <a class="reference external" href="https://pytorch.org/torchrec/torchrec.sparse.html#torchrec.sparse.jagged_tensor.JaggedTensor"><code class="docutils literal notranslate"><span class="pre">KeyedJaggedTensor</span></code></a>.</p>
-<div class="section" id="distributed-setup">
+<section id="distributed-setup">
 <h3>Distributed Setup<a class="headerlink" href="#distributed-setup" title="Permalink to this headline">¶</a></h3>
 <p>We setup our environment with torch.distributed. For more info on
 distributed, see this
@@ -451,8 +452,8 @@ GPU.</p>
 <span class="n">dist</span><span class="o">.</span><span class="n">init_process_group</span><span class="p">(</span><span class="n">backend</span><span class="o">=</span><span class="s2">&quot;nccl&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="from-embeddingbag-to-embeddingbagcollection">
+</section>
+<section id="from-embeddingbag-to-embeddingbagcollection">
 <h3>From EmbeddingBag to EmbeddingBagCollection<a class="headerlink" href="#from-embeddingbag-to-embeddingbagcollection" title="Permalink to this headline">¶</a></h3>
 <p>PyTorch represents embeddings through <a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.Embedding.html"><code class="docutils literal notranslate"><span class="pre">torch.nn.Embedding</span></code></a> and <a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.EmbeddingBag.html"><code class="docutils literal notranslate"><span class="pre">torch.nn.EmbeddingBag</span></code></a>.
 EmbeddingBag is a pooled version of Embedding.</p>
@@ -483,8 +484,8 @@ on device “meta”. This will tell EBC to not allocate memory yet.</p>
 <span class="p">)</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="distributedmodelparallel">
+</section>
+<section id="distributedmodelparallel">
 <h3>DistributedModelParallel<a class="headerlink" href="#distributedmodelparallel" title="Permalink to this headline">¶</a></h3>
 <p>Now, we’re ready to wrap our model with <a class="reference external" href="https://pytorch.org/torchrec/torchrec.distributed.html#torchrec.distributed.model_parallel.DistributedModelParallel"><code class="docutils literal notranslate"><span class="pre">DistributedModelParallel</span></code></a> (DMP). Instantiating DMP will:</p>
 <ol class="arabic simple">
@@ -501,8 +502,8 @@ TorchRec will place both on the single GPU.</p>
 <span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">plan</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="query-vanilla-nn-embeddingbag-with-input-and-offsets">
+</section>
+<section id="query-vanilla-nn-embeddingbag-with-input-and-offsets">
 <h3>Query vanilla nn.EmbeddingBag with input and offsets<a class="headerlink" href="#query-vanilla-nn-embeddingbag-with-input-and-offsets" title="Permalink to this headline">¶</a></h3>
 <p>We query <a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.Embedding.html"><code class="docutils literal notranslate"><span class="pre">nn.Embedding</span></code></a> and <a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.EmbeddingBag.html"><code class="docutils literal notranslate"><span class="pre">nn.EmbeddingBag</span></code></a>
 with <code class="docutils literal notranslate"><span class="pre">input</span></code> and <code class="docutils literal notranslate"><span class="pre">offsets</span></code>. Input is a 1-D tensor containing the
@@ -522,8 +523,8 @@ cumulative sum of the number of values to pool per example.</p>
 <span class="n">product_eb</span><span class="p">(</span><span class="nb">input</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="mi">101</span><span class="p">,</span> <span class="mi">202</span><span class="p">,</span> <span class="mi">303</span><span class="p">]),</span> <span class="n">offsets</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]))</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="representing-minibatches-with-keyedjaggedtensor">
+</section>
+<section id="representing-minibatches-with-keyedjaggedtensor">
 <h3>Representing minibatches with KeyedJaggedTensor<a class="headerlink" href="#representing-minibatches-with-keyedjaggedtensor" title="Permalink to this headline">¶</a></h3>
 <p>We need an efficient representation of multiple examples of an arbitrary
 number of entity IDs per feature per example. In order to enable this
@@ -555,8 +556,8 @@ second with none, and the third with one product ID.</p>
 <p>Note that the KJT batch size is
 <code class="docutils literal notranslate"><span class="pre">batch_size</span> <span class="pre">=</span> <span class="pre">len(lengths)//len(keys)</span></code>. In the above example,
 batch_size is 3.</p>
-</div>
-<div class="section" id="putting-it-all-together-querying-our-distributed-model-with-a-kjt-minibatch">
+</section>
+<section id="putting-it-all-together-querying-our-distributed-model-with-a-kjt-minibatch">
 <h3>Putting it all together, querying our distributed model with a KJT minibatch<a class="headerlink" href="#putting-it-all-together-querying-our-distributed-model-with-a-kjt-minibatch" title="Permalink to this headline">¶</a></h3>
 <p>Finally, we can query our model using our minibatch of products and
 users.</p>
@@ -566,16 +567,16 @@ feature) contains a 2D tensor of size 3x64 (batch_size x embedding_dim).</p>
 <span class="nb">print</span><span class="p">(</span><span class="n">pooled_embeddings</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-</div>
-<div class="section" id="more-resources">
+</section>
+</section>
+<section id="more-resources">
 <h2>More resources<a class="headerlink" href="#more-resources" title="Permalink to this headline">¶</a></h2>
 <p>For more information, please see our
 <a class="reference external" href="https://github.com/pytorch/torchrec/tree/main/examples/dlrm">dlrm</a>
 example, which includes multinode training on the criteo terabyte
 dataset, using Meta’s <a class="reference external" href="https://arxiv.org/abs/1906.00091">DLRM</a>.</p>
-</div>
-</div>
+</section>
+</section>
 
 
              </article>
@@ -655,7 +656,7 @@ dataset, using Meta’s <a class="reference external" href="https://arxiv.org/ab
 
 
   
-
+  
      
        <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
          <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
@@ -668,7 +669,6 @@ dataset, using Meta’s <a class="reference external" href="https://arxiv.org/ab
          <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
          <script src="../_static/katex_autorenderer.js"></script>
      
-
   
 
   <script type="text/javascript" src="../_static/js/vendor/popper.min.js"></script>

@@ -6,7 +6,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
 <meta property="og:title" content="안드로이드에서의 이미지 분할 DeepLapV3" />
   
 <meta property="og:type" content="article" />
@@ -391,12 +392,12 @@
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <div class="section" id="deeplapv3">
+  <section id="deeplapv3">
 <h1>안드로이드에서의 이미지 분할 DeepLapV3<a class="headerlink" href="#deeplapv3" title="Permalink to this headline">¶</a></h1>
 <p><strong>저자</strong>: <a class="reference external" href="https://github.com/jeffxtang">Jeff Tang</a></p>
 <p><strong>감수</strong>: <a class="reference external" href="https://github.com/jeremiahschung">Jeremiah Chung</a>
 <strong>번역</strong>: <a class="reference external" href="https://github.com/des00">김현길</a></p>
-<div class="section" id="id2">
+<section id="id2">
 <h2>소개<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
 <p>의미론적 이미지 분할(Semantic image segmentation)은 의미론적 라벨을 사용하여 입력 이미지의 특정 영역을 표시하는 컴퓨터 비전 작업입니다.
 PyTorch의 의미론적 이미지 분할에 사용하는 <a class="reference external" href="https://pytorch.org/hub/pytorch_vision_deeplabv3_resnet101">DeepLabV3 모델</a> 은 <a class="reference external" href="http://host.robots.ox.ac.uk:8080/pascal/VOC/voc2007/segexamples/index.html">20가지 의미론적 클래스</a> 가 있습니다. 예를 들어 자전거, 버스, 차, 개, 사람과 같은 것들의 이미지 영역에 라벨을 달 수 있습니다.
@@ -407,8 +408,8 @@ PyTorch의 의미론적 이미지 분할에 사용하는 <a class="reference ext
 <p class="admonition-title">Note</p>
 <p>이 튜토리얼을 진행하기 앞서 <a class="reference external" href="https://pytorch.org/mobile/android/">안드로이드를 위한 PyTorch 모바일</a> 을 확인하고, PyTorch 안드로이드 예제인 <a class="reference external" href="https://github.com/pytorch/android-demo-app/tree/master/HelloWorldApp">HelloWorld</a> 앱을 실행해 보십시오. 이 튜토리얼은 대게 처음으로 모바일에 배포하는 모델인 이미지 분류 모델을 넘어선 다음 단계를 다루고 있습니다. 이 튜토리얼을 위한 전체 코드는 <a class="reference external" href="https://github.com/pytorch/android-demo-app/tree/master/ImageSegmentation">여기</a> 에서 확인 가능합니다.</p>
 </div>
-</div>
-<div class="section" id="id5">
+</section>
+<section id="id5">
 <h2>학습 목표<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h2>
 <p>이 튜토리얼에서 배울 것들:</p>
 <ol class="arabic simple">
@@ -418,18 +419,18 @@ PyTorch의 의미론적 이미지 분할에 사용하는 <a class="reference ext
 <li><p>모델이 원하는 형식에 맞는 입력값 준비하고 모델에서 결과값 처리하기</p></li>
 <li><p>UI 완성, 리팩토링, 앱 빌드 및 실행해서 이미지 분류 동작 확인하기</p></li>
 </ol>
-</div>
-<div class="section" id="id6">
+</section>
+<section id="id6">
 <h2>요구사항<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>PyTorch 1.6 이나 1.7</p></li>
 <li><p>torchvision 0.7 이나 0.8</p></li>
 <li><p>NDK가 설치된 Android Studio 3.5.1 혹은 그 이후 버전</p></li>
 </ul>
-</div>
-<div class="section" id="id7">
+</section>
+<section id="id7">
 <h2>단계<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="id8">
+<section id="id8">
 <h3>1. DeepLabV3 모델을 안드로이드 배포용으로 변환하기<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
 <p>안드로이드에 모델을 배포하는 첫 단계는 모델을 <a class="reference external" href="https://tutorials.pytorch.kr/beginner/Intro_to_TorchScript_tutorial.html">TorchScript</a> 형식으로 변환하는 것입니다.</p>
 <div class="admonition note">
@@ -448,8 +449,8 @@ PyTorch의 의미론적 이미지 분할에 사용하는 <a class="reference ext
 </pre></div>
 </div>
 <p>생성한 <cite>deeplabv3_scripted.pt</cite> 모델 파일의 크기는 168MB 정도가 되어야 됩니다. 이상적으로는 모델을 안드로이드 앱에 배포하기 전에 크기 감소와 더 빠른 추론을 위해 양자화(Quantization)가 되어야 합니다. 양자화가 무엇인지 알고 싶다면 <a class="reference external" href="../recipes/quantization.html">Quantization Recipe</a> 와 이 안의 참고 링크들을 확인해 주십시오. DeepLabV3에서 어떻게 올바르게 양자화 작업 흐름, 속칭 학습 후(Post Training) <a class="reference external" href="https://tutorials.pytorch.kr/advanced/static_quantization_tutorial.html">Static Quantization</a> 을 적용할 것인지 관련하여 세부사항은 앞으로의 튜토리얼이나 레시피에서 다룰 예정입니다.</p>
-</div>
-<div class="section" id="id9">
+</section>
+<section id="id9">
 <h3>2. 파이썬에서 모델의 예제 입출력 얻기<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
 <p>이제 스크립트된 PyTorch 모델을 얻었으니, 안드로이드에서 모델이 잘 동작하는지 예제를 입력해 테스트를 진행합시다. 첫번째로 모델을 이용해서 추론하고 입출력을 검토하는 파이썬 스크립트를 작성해 봅시다. DeepLabV3의 예시를 들기 위해 첫번째 단계의 코드 <a class="reference external" href="https://pytorch.org/hub/pytorch_vision_deeplabv3_resnet101">DeepLabV3 model hub site</a> 를 재사용합니다. 위의 코드에 아래의 코드 조각을 덧붙입니다:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
@@ -475,40 +476,40 @@ PyTorch의 의미론적 이미지 분할에 사용하는 <a class="reference ext
 </pre></div>
 </div>
 <p>그래서 400x400 크기와 동일한 입력 이미지  <cite>deeplab.jpg</cite> 를 안드로이드의 모델에 입력하면, 모델 출력은 [21, 400, 400]의 크기를 가져야 합니다. 또한, 최소한 실제 입출력 데이터의 시작 부분만이라도 출력해서 확인을 해 봅시다. 아래의 4단계에서는 안드로이드에서 앱을 실행하는데, 이 때 모델의 실제 입출력 값과 비교하기 위함입니다.</p>
-</div>
-<div class="section" id="id11">
+</section>
+<section id="id11">
 <h3>3. 새로운 안드로이드 앱을 만들거나 안드로이드 예제 앱에 변환된 모델을 가져와서 재사용하기<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h3>
 <p>첫번째로 모델을 안드로이드 스튜디오 프로젝트에서 PyTorch Mobile과 함께 쓰기 위해 <a class="reference external" href="../recipes/model_preparation_android.html#add-the-model-and-pytorch-library-on-android">안드로이드 레시피를 위한 모델 준비</a> 를 따라해 봅니다. 이 튜토리얼의 DeepLabV3과 PyTorch HelloWorld Android 예제 내부의 MobileNet v2 둘 다 컴퓨터 비전 모델이기에, <a class="reference external" href="https://github.com/pytorch/android-demo-app/tree/master/HelloWorldApp">HelloWorld 예제 저장소</a> 에서도 손쉽게 모델을 읽고 입출력을 처리하기 위한 코드 수정 방법을 찾을 수 있습니다. 이 단계와 4단계의 목표는 1단계에서 만들어진 <cite>deeplabv3_scripted.pt</cite> 모델이 안드로이드에서 확실하게 동작하는지 확인하는 것입니다.</p>
 <p>이제 2단계에서 사용한 <cite>deeplabv3_scripted.pt</cite> 와 <cite>deeplab.jpg</cite> 를 안드로이드 스튜디오 프로젝트에 더하고 <cite>MainActivity</cite> 내부의 <cite>onCreate</cite> 메소드를 이와 유사하게 수정합니다:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Module</span> <span class="n">module</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
-<span class="k">try</span> <span class="p">{</span>
-  <span class="n">module</span> <span class="o">=</span> <span class="n">Module</span><span class="p">.</span><span class="na">load</span><span class="p">(</span><span class="n">assetFilePath</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="s">&quot;deeplabv3_scripted.pt&quot;</span><span class="p">));</span>
-<span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="n">IOException</span> <span class="n">e</span><span class="p">)</span> <span class="p">{</span>
-  <span class="n">Log</span><span class="p">.</span><span class="na">e</span><span class="p">(</span><span class="s">&quot;ImageSegmentation&quot;</span><span class="p">,</span> <span class="s">&quot;Error loading model!&quot;</span><span class="p">,</span> <span class="n">e</span><span class="p">);</span>
-  <span class="n">finish</span><span class="p">();</span>
-<span class="p">}</span>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Module</span><span class="w"> </span><span class="n">module</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span><span class="w"></span>
+<span class="k">try</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="n">module</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Module</span><span class="p">.</span><span class="na">load</span><span class="p">(</span><span class="n">assetFilePath</span><span class="p">(</span><span class="k">this</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;deeplabv3_scripted.pt&quot;</span><span class="p">));</span><span class="w"></span>
+<span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">IOException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="n">Log</span><span class="p">.</span><span class="na">e</span><span class="p">(</span><span class="s">&quot;ImageSegmentation&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Error loading model!&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">e</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="n">finish</span><span class="p">();</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
 </pre></div>
 </div>
 <p>그 후 <cite>finish()</cite> 라인에 브레이크포인트를 설정하고 빌드 및 앱 실행을 합니다. 브레이크포인트에서 앱이 멈추지 않는다면 안드로이드에서 1단계의 스크립트된 모델을 성공적으로 읽어 들였다는 의미입니다.</p>
-</div>
-<div class="section" id="id14">
+</section>
+<section id="id14">
 <h3>4. 모델 추론을 위한 입출력 처리하기<a class="headerlink" href="#id14" title="Permalink to this headline">¶</a></h3>
 <p>이전 단계에서 모델을 읽어들인 이후 입력값이 잘 동작하는지, 예상한대로 출력값을 생성하는지 확인해 봅시다. DeepLabV3 모델을 위한 입력은 HelloWorld 예제 내부의 MobileNet v2에서 쓰는 이미지와 동일합니다. 그래서 <a class="reference external" href="https://github.com/pytorch/android-demo-app/blob/master/HelloWorldApp/app/src/main/java/org/pytorch/helloworld/MainActivity.java">MainActivity.java</a> HelloWorld 프로젝트의 입력 처리를 위한 코드를 재사용 합니다. <cite>MainActivity.java</cite> 파일의 <a class="reference external" href="https://github.com/pytorch/android-demo-app/blob/master/HelloWorldApp/app/src/main/java/org/pytorch/helloworld/MainActivity.java#L50">50번째 줄</a> 과 73번째 줄 사이의 코드를 아래와 같이 변경합니다:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">final</span> <span class="n">Tensor</span> <span class="n">inputTensor</span> <span class="o">=</span> <span class="n">TensorImageUtils</span><span class="p">.</span><span class="na">bitmapToFloat32Tensor</span><span class="p">(</span><span class="n">bitmap</span><span class="p">,</span>
-        <span class="n">TensorImageUtils</span><span class="p">.</span><span class="na">TORCHVISION_NORM_MEAN_RGB</span><span class="p">,</span>
-        <span class="n">TensorImageUtils</span><span class="p">.</span><span class="na">TORCHVISION_NORM_STD_RGB</span><span class="p">);</span>
-<span class="kd">final</span> <span class="kt">float</span><span class="o">[]</span> <span class="n">inputs</span> <span class="o">=</span> <span class="n">inputTensor</span><span class="p">.</span><span class="na">getDataAsFloatArray</span><span class="p">();</span>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">final</span><span class="w"> </span><span class="n">Tensor</span><span class="w"> </span><span class="n">inputTensor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TensorImageUtils</span><span class="p">.</span><span class="na">bitmapToFloat32Tensor</span><span class="p">(</span><span class="n">bitmap</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="n">TensorImageUtils</span><span class="p">.</span><span class="na">TORCHVISION_NORM_MEAN_RGB</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="n">TensorImageUtils</span><span class="p">.</span><span class="na">TORCHVISION_NORM_STD_RGB</span><span class="p">);</span><span class="w"></span>
+<span class="kd">final</span><span class="w"> </span><span class="kt">float</span><span class="o">[]</span><span class="w"> </span><span class="n">inputs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">inputTensor</span><span class="p">.</span><span class="na">getDataAsFloatArray</span><span class="p">();</span><span class="w"></span>
 
-<span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="p">,</span> <span class="n">IValue</span><span class="o">&gt;</span> <span class="n">outTensors</span> <span class="o">=</span>
-    <span class="n">module</span><span class="p">.</span><span class="na">forward</span><span class="p">(</span><span class="n">IValue</span><span class="p">.</span><span class="na">from</span><span class="p">(</span><span class="n">inputTensor</span><span class="p">)).</span><span class="na">toDictStringKey</span><span class="p">();</span>
+<span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="p">,</span><span class="w"> </span><span class="n">IValue</span><span class="o">&gt;</span><span class="w"> </span><span class="n">outTensors</span><span class="w"> </span><span class="o">=</span><span class="w"></span>
+<span class="w">    </span><span class="n">module</span><span class="p">.</span><span class="na">forward</span><span class="p">(</span><span class="n">IValue</span><span class="p">.</span><span class="na">from</span><span class="p">(</span><span class="n">inputTensor</span><span class="p">)).</span><span class="na">toDictStringKey</span><span class="p">();</span><span class="w"></span>
 
-<span class="c1">// 결과로 출력된 텐서의 키 &quot;out&quot;은 의미론적 마스크(semantic masks)를 포함</span>
-<span class="c1">// 링크 참고 https://pytorch.org/hub/pytorch_vision_deeplabv3_resnet101</span>
-<span class="kd">final</span> <span class="n">Tensor</span> <span class="n">outputTensor</span> <span class="o">=</span> <span class="n">outTensors</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="s">&quot;out&quot;</span><span class="p">).</span><span class="na">toTensor</span><span class="p">();</span>
-<span class="kd">final</span> <span class="kt">float</span><span class="o">[]</span> <span class="n">outputs</span> <span class="o">=</span> <span class="n">outputTensor</span><span class="p">.</span><span class="na">getDataAsFloatArray</span><span class="p">();</span>
+<span class="c1">// 결과로 출력된 텐서의 키 &quot;out&quot;은 의미론적 마스크(semantic masks)를 포함</span><span class="w"></span>
+<span class="c1">// 링크 참고 https://pytorch.org/hub/pytorch_vision_deeplabv3_resnet101</span><span class="w"></span>
+<span class="kd">final</span><span class="w"> </span><span class="n">Tensor</span><span class="w"> </span><span class="n">outputTensor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">outTensors</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="s">&quot;out&quot;</span><span class="p">).</span><span class="na">toTensor</span><span class="p">();</span><span class="w"></span>
+<span class="kd">final</span><span class="w"> </span><span class="kt">float</span><span class="o">[]</span><span class="w"> </span><span class="n">outputs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">outputTensor</span><span class="p">.</span><span class="na">getDataAsFloatArray</span><span class="p">();</span><span class="w"></span>
 
-<span class="kt">int</span> <span class="n">width</span> <span class="o">=</span> <span class="n">bitmap</span><span class="p">.</span><span class="na">getWidth</span><span class="p">();</span>
-<span class="kt">int</span> <span class="n">height</span> <span class="o">=</span> <span class="n">bitmap</span><span class="p">.</span><span class="na">getHeight</span><span class="p">();</span>
+<span class="kt">int</span><span class="w"> </span><span class="n">width</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">bitmap</span><span class="p">.</span><span class="na">getWidth</span><span class="p">();</span><span class="w"></span>
+<span class="kt">int</span><span class="w"> </span><span class="n">height</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">bitmap</span><span class="p">.</span><span class="na">getHeight</span><span class="p">();</span><span class="w"></span>
 </pre></div>
 </div>
 <div class="admonition note">
@@ -523,74 +524,74 @@ PyTorch의 의미론적 이미지 분할에 사용하는 <a class="reference ext
 </div>
 <p>지금까지 했던 모든 것들은 파이썬에서처럼 안드로이드 앱에서도 우리의 흥미를 끄는 모델이 스크립팅되고 정상적으로 동작하는지 확인하는 것입니다.</p>
 <p>일반적인 머신러닝 프로젝트에서 데이터 처리가 가장 힘든 부분인 것처럼, 안드로이드에서 모델을 사용하여 여기까지 밟아온 단계들이 앱 개발 기간 중 대부분은 아니지만 상당히 많은 시간을 차지합니다.</p>
-</div>
-<div class="section" id="ui">
+</section>
+<section id="ui">
 <h3>5. UI 완성, 리팩토링, 앱 빌드 및 실행<a class="headerlink" href="#ui" title="Permalink to this headline">¶</a></h3>
 <p>이제 새 이미지를 처리한 결과를 확인하기 위해 앱과 UI를 완성할 준비가 되었습니다. 결과 처리 코드는 아래와 같아야 되며, 4단계의 코드 끝부분에 추가되어야 합니다:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kt">int</span><span class="o">[]</span> <span class="n">intValues</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">int</span><span class="o">[</span><span class="n">width</span> <span class="o">*</span> <span class="n">height</span><span class="o">]</span><span class="p">;</span>
-<span class="c1">// 크기가 [WIDTH, HEIGHT]인 결과값의 각 원소들을 순회하며</span>
-<span class="c1">// 각기 다른 classnum별로 각기 다른 색을 설정</span>
-<span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">width</span><span class="p">;</span> <span class="n">j</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">k</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">k</span> <span class="o">&lt;</span> <span class="n">height</span><span class="p">;</span> <span class="n">k</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-        <span class="c1">// maxi: 21 CLASSNUM 중에서 가장 높은 확률을 가리키는 인덱스</span>
-        <span class="kt">int</span> <span class="n">maxi</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">maxj</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">maxk</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-        <span class="kt">double</span> <span class="n">maxnum</span> <span class="o">=</span> <span class="o">-</span><span class="mf">100000.0</span><span class="p">;</span>
-        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">CLASSNUM</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">outputs</span><span class="o">[</span><span class="n">i</span><span class="o">*</span><span class="p">(</span><span class="n">width</span><span class="o">*</span><span class="n">height</span><span class="p">)</span> <span class="o">+</span> <span class="n">j</span><span class="o">*</span><span class="n">width</span> <span class="o">+</span> <span class="n">k</span><span class="o">]</span> <span class="o">&gt;</span> <span class="n">maxnum</span><span class="p">)</span> <span class="p">{</span>
-                <span class="n">maxnum</span> <span class="o">=</span> <span class="n">outputs</span><span class="o">[</span><span class="n">i</span><span class="o">*</span><span class="p">(</span><span class="n">width</span><span class="o">*</span><span class="n">height</span><span class="p">)</span> <span class="o">+</span> <span class="n">j</span><span class="o">*</span><span class="n">width</span> <span class="o">+</span> <span class="n">k</span><span class="o">]</span><span class="p">;</span>
-                <span class="n">maxi</span> <span class="o">=</span> <span class="n">i</span><span class="p">;</span> <span class="n">maxj</span> <span class="o">=</span> <span class="n">j</span><span class="p">;</span> <span class="n">maxk</span><span class="o">=</span> <span class="n">k</span><span class="p">;</span>
-            <span class="p">}</span>
-        <span class="p">}</span>
-        <span class="c1">// 사람 (빨강), 개 (초록), 양 (파랑)을 위한 색깔 코드</span>
-        <span class="c1">// 검은색은 배경이나 다른 클래스들을 위한 색</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">maxi</span> <span class="o">==</span> <span class="n">PERSON</span><span class="p">)</span>
-            <span class="n">intValues</span><span class="o">[</span><span class="n">maxj</span><span class="o">*</span><span class="n">width</span> <span class="o">+</span> <span class="n">maxk</span><span class="o">]</span> <span class="o">=</span> <span class="mh">0xFFFF0000</span><span class="p">;</span> <span class="c1">// 빨강</span>
-        <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">maxi</span> <span class="o">==</span> <span class="n">DOG</span><span class="p">)</span>
-            <span class="n">intValues</span><span class="o">[</span><span class="n">maxj</span><span class="o">*</span><span class="n">width</span> <span class="o">+</span> <span class="n">maxk</span><span class="o">]</span> <span class="o">=</span> <span class="mh">0xFF00FF00</span><span class="p">;</span> <span class="c1">// 초록</span>
-        <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">maxi</span> <span class="o">==</span> <span class="n">SHEEP</span><span class="p">)</span>
-            <span class="n">intValues</span><span class="o">[</span><span class="n">maxj</span><span class="o">*</span><span class="n">width</span> <span class="o">+</span> <span class="n">maxk</span><span class="o">]</span> <span class="o">=</span> <span class="mh">0xFF0000FF</span><span class="p">;</span> <span class="c1">// 파랑</span>
-        <span class="k">else</span>
-            <span class="n">intValues</span><span class="o">[</span><span class="n">maxj</span><span class="o">*</span><span class="n">width</span> <span class="o">+</span> <span class="n">maxk</span><span class="o">]</span> <span class="o">=</span> <span class="mh">0xFF000000</span><span class="p">;</span> <span class="c1">// 검은색</span>
-    <span class="p">}</span>
-<span class="p">}</span>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kt">int</span><span class="o">[]</span><span class="w"> </span><span class="n">intValues</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="kt">int</span><span class="o">[</span><span class="n">width</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">height</span><span class="o">]</span><span class="p">;</span><span class="w"></span>
+<span class="c1">// 크기가 [WIDTH, HEIGHT]인 결과값의 각 원소들을 순회하며</span><span class="w"></span>
+<span class="c1">// 각기 다른 classnum별로 각기 다른 색을 설정</span><span class="w"></span>
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">j</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">j</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">width</span><span class="p">;</span><span class="w"> </span><span class="n">j</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">k</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">height</span><span class="p">;</span><span class="w"> </span><span class="n">k</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="c1">// maxi: 21 CLASSNUM 중에서 가장 높은 확률을 가리키는 인덱스</span><span class="w"></span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">maxi</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">maxj</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">maxk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="kt">double</span><span class="w"> </span><span class="n">maxnum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="mf">100000.0</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">CLASSNUM</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">outputs</span><span class="o">[</span><span class="n">i</span><span class="o">*</span><span class="p">(</span><span class="n">width</span><span class="o">*</span><span class="n">height</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">j</span><span class="o">*</span><span class="n">width</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">k</span><span class="o">]</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">maxnum</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="n">maxnum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">outputs</span><span class="o">[</span><span class="n">i</span><span class="o">*</span><span class="p">(</span><span class="n">width</span><span class="o">*</span><span class="n">height</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">j</span><span class="o">*</span><span class="n">width</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">k</span><span class="o">]</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="n">maxi</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="p">;</span><span class="w"> </span><span class="n">maxj</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">j</span><span class="p">;</span><span class="w"> </span><span class="n">maxk</span><span class="o">=</span><span class="w"> </span><span class="n">k</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="p">}</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">        </span><span class="c1">// 사람 (빨강), 개 (초록), 양 (파랑)을 위한 색깔 코드</span><span class="w"></span>
+<span class="w">        </span><span class="c1">// 검은색은 배경이나 다른 클래스들을 위한 색</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">maxi</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">PERSON</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="n">intValues</span><span class="o">[</span><span class="n">maxj</span><span class="o">*</span><span class="n">width</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">maxk</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0xFFFF0000</span><span class="p">;</span><span class="w"> </span><span class="c1">// 빨강</span><span class="w"></span>
+<span class="w">        </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">maxi</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">DOG</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="n">intValues</span><span class="o">[</span><span class="n">maxj</span><span class="o">*</span><span class="n">width</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">maxk</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0xFF00FF00</span><span class="p">;</span><span class="w"> </span><span class="c1">// 초록</span><span class="w"></span>
+<span class="w">        </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">maxi</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">SHEEP</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="n">intValues</span><span class="o">[</span><span class="n">maxj</span><span class="o">*</span><span class="n">width</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">maxk</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0xFF0000FF</span><span class="p">;</span><span class="w"> </span><span class="c1">// 파랑</span><span class="w"></span>
+<span class="w">        </span><span class="k">else</span><span class="w"></span>
+<span class="w">            </span><span class="n">intValues</span><span class="o">[</span><span class="n">maxj</span><span class="o">*</span><span class="n">width</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">maxk</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0xFF000000</span><span class="p">;</span><span class="w"> </span><span class="c1">// 검은색</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
 </pre></div>
 </div>
 <p>위의 코드에서 사용한 상수는 <cite>MainActivity</cite> 클래스의 시작 부분에서 선언했습니다:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">int</span> <span class="n">CLASSNUM</span> <span class="o">=</span> <span class="mi">21</span><span class="p">;</span>
-<span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">int</span> <span class="n">DOG</span> <span class="o">=</span> <span class="mi">12</span><span class="p">;</span>
-<span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">int</span> <span class="n">PERSON</span> <span class="o">=</span> <span class="mi">15</span><span class="p">;</span>
-<span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">int</span> <span class="n">SHEEP</span> <span class="o">=</span> <span class="mi">17</span><span class="p">;</span>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">CLASSNUM</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">21</span><span class="p">;</span><span class="w"></span>
+<span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">DOG</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">12</span><span class="p">;</span><span class="w"></span>
+<span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">PERSON</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">15</span><span class="p">;</span><span class="w"></span>
+<span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">SHEEP</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">17</span><span class="p">;</span><span class="w"></span>
 </pre></div>
 </div>
 <p>여기에서 구현한 것은 width*height인 입력 이미지로 [21, width, height] 크기의 텐서를 출력하는 DeepLabV3 모델에 대한 이해를 바탕으로 구현한 것입니다. width*height인 결과 행렬의 각 원소들은 0에서 20 사이의 값(소개에서 설명한 총 21개의 의미론적 라벨을 표현)을 가지며, 각각의 값은 특정한 색을 가집니다. 여기에서 설명하는 분할에서는 가장 높은 확률을 가지는 클래스의 색깔 코드(color coding)을 사용하고, 데이터셋의 모든 클래스들에 각각의 색깔 코드 설정하도록 확장도 할 수 있습니다.</p>
 <p>결과 처리 이후, <cite>ImageView</cite> 에 결과를 표시하기 전에 RGB <cite>intValues</cite> 행렬을 비트맵 인스턴스 <cite>outputBitmap</cite> 으로 렌더링하고자 아래의 코드를 실행할 필요가 있을 수도 있습니다.</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Bitmap</span> <span class="n">bmpSegmentation</span> <span class="o">=</span> <span class="n">Bitmap</span><span class="p">.</span><span class="na">createScaledBitmap</span><span class="p">(</span><span class="n">bitmap</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="kc">true</span><span class="p">);</span>
-<span class="n">Bitmap</span> <span class="n">outputBitmap</span> <span class="o">=</span> <span class="n">bmpSegmentation</span><span class="p">.</span><span class="na">copy</span><span class="p">(</span><span class="n">bmpSegmentation</span><span class="p">.</span><span class="na">getConfig</span><span class="p">(),</span> <span class="kc">true</span><span class="p">);</span>
-<span class="n">outputBitmap</span><span class="p">.</span><span class="na">setPixels</span><span class="p">(</span><span class="n">intValues</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">outputBitmap</span><span class="p">.</span><span class="na">getWidth</span><span class="p">(),</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span>
-    <span class="n">outputBitmap</span><span class="p">.</span><span class="na">getWidth</span><span class="p">(),</span> <span class="n">outputBitmap</span><span class="p">.</span><span class="na">getHeight</span><span class="p">());</span>
-<span class="n">imageView</span><span class="p">.</span><span class="na">setImageBitmap</span><span class="p">(</span><span class="n">outputBitmap</span><span class="p">);</span>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">Bitmap</span><span class="w"> </span><span class="n">bmpSegmentation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Bitmap</span><span class="p">.</span><span class="na">createScaledBitmap</span><span class="p">(</span><span class="n">bitmap</span><span class="p">,</span><span class="w"> </span><span class="n">width</span><span class="p">,</span><span class="w"> </span><span class="n">height</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">);</span><span class="w"></span>
+<span class="n">Bitmap</span><span class="w"> </span><span class="n">outputBitmap</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">bmpSegmentation</span><span class="p">.</span><span class="na">copy</span><span class="p">(</span><span class="n">bmpSegmentation</span><span class="p">.</span><span class="na">getConfig</span><span class="p">(),</span><span class="w"> </span><span class="kc">true</span><span class="p">);</span><span class="w"></span>
+<span class="n">outputBitmap</span><span class="p">.</span><span class="na">setPixels</span><span class="p">(</span><span class="n">intValues</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">outputBitmap</span><span class="p">.</span><span class="na">getWidth</span><span class="p">(),</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="n">outputBitmap</span><span class="p">.</span><span class="na">getWidth</span><span class="p">(),</span><span class="w"> </span><span class="n">outputBitmap</span><span class="p">.</span><span class="na">getHeight</span><span class="p">());</span><span class="w"></span>
+<span class="n">imageView</span><span class="p">.</span><span class="na">setImageBitmap</span><span class="p">(</span><span class="n">outputBitmap</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 </div>
 <p>이 앱의 UI는 HelloWorld의 UI와 유사하지만 이미지 분류의 결과를 보여주기 위해 <cite>TextView</cite> 를 필요로 하지 않습니다. 코드 저장소에서 볼 수 있는 것처럼 <cite>Segment</cite> and <cite>Restart</cite> 버튼 두 개를 추가할 수도 있습니다. 이 버튼들은 모델 추론을 실행하고 분할 결과를 보다가 원본 이미지로 되돌리기 위해 사용합니다.</p>
 <p>이제 앱을 안드로이드 에뮬레이터나 (가능하다면) 실제 기기에서 실행하면 이런 화면들을 볼 수 있습니다:</p>
 <a class="reference internal image-reference" href="../_images/deeplabv3_android.png"><img alt="../_images/deeplabv3_android.png" src="../_images/deeplabv3_android.png" style="width: 300px;" /></a>
 <a class="reference internal image-reference" href="../_images/deeplabv3_android2.png"><img alt="../_images/deeplabv3_android2.png" src="../_images/deeplabv3_android2.png" style="width: 300px;" /></a>
-</div>
-</div>
-<div class="section" id="id16">
+</section>
+</section>
+<section id="id16">
 <h2>정리<a class="headerlink" href="#id16" title="Permalink to this headline">¶</a></h2>
 <p>이 튜토리얼에서는 사전에 학습된 PyTorch DeepLabV3 모델을 안드로이드에서 사용하기 위한 변환과, 그 모델이 어떻게 안드로이드에서 성공적으로 실행되는지 보았습니다. 여기에서는 모델이 안드로이드에서도 정말 실행이 되는지 각 과정을 확인해 보면서 전체 과정을 이해하는 것에 초점을 두었습니다. 전체 코드는 <a class="reference external" href="https://github.com/pytorch/android-demo-app/tree/master/ImageSegmentation">여기</a> 에서 확인 가능합니다.</p>
 <p>안드로이드에서 양자화나 전이 학습(transfer learning)같은 고급 주제는 앞으로의 데모 앱이나 튜토리얼에서 다룰 예정입니다.</p>
-</div>
-<div class="section" id="id18">
+</section>
+<section id="id18">
 <h2>더 알아보기<a class="headerlink" href="#id18" title="Permalink to this headline">¶</a></h2>
 <ol class="arabic simple">
 <li><p><a class="reference external" href="https://pytorch.org/mobile">PyTorch 모바일 사이트</a></p></li>
 <li><p><a class="reference external" href="https://pytorch.org/hub/pytorch_vision_deeplabv3_resnet101">DeepLabV3 모델</a></p></li>
 <li><p><a class="reference external" href="https://arxiv.org/pdf/1706.05587.pdf">DeepLabV3 논문</a></p></li>
 </ol>
-</div>
-</div>
+</section>
+</section>
 
 
              </article>
@@ -674,7 +675,7 @@ PyTorch의 의미론적 이미지 분할에 사용하는 <a class="reference ext
 
 
   
-
+  
      
        <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
          <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
@@ -687,7 +688,6 @@ PyTorch의 의미론적 이미지 분할에 사용하는 <a class="reference ext
          <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
          <script src="../_static/katex_autorenderer.js"></script>
      
-
   
 
   <script type="text/javascript" src="../_static/js/vendor/popper.min.js"></script>

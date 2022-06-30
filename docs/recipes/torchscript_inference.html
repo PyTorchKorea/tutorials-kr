@@ -6,7 +6,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
 <meta property="og:title" content="TorchScript로 배포하기" />
   
 <meta property="og:type" content="article" />
@@ -393,7 +394,7 @@
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <div class="section" id="torchscript">
+  <section id="torchscript">
 <h1>TorchScript로 배포하기<a class="headerlink" href="#torchscript" title="Permalink to this headline">¶</a></h1>
 <p>이 레시피에서는 다음 내용을 알아봅니다:</p>
 <ul class="simple">
@@ -401,7 +402,7 @@
 <li><p>학습된 모델을 TorchScript 형식으로 내보내기</p></li>
 <li><p>TorchScript 모델을 C++로 불러오고 추론하기</p></li>
 </ul>
-<div class="section" id="id1">
+<section id="id1">
 <h2>요구 사항<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>PyTorch 1.5</p></li>
@@ -411,13 +412,13 @@
 </ul>
 <p>3가지 PyTorch 컴포넌트를 설치하는 방법은 <a href="#id2"><span class="problematic" id="id3">`</span></a>pytorch.org`_에서 확인할 수 있습니다.
 C++ 컴파일러는 당신의 플랫폼에 따라 달라집니다.</p>
-</div>
-<div class="section" id="id4">
+</section>
+<section id="id4">
 <h2>TorchScript란?<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
 <p><strong>TorchScript**는 C++ 같은 고성능 환경에서 실행할 수 있는 PyTorch 모델의 중간 표현(``nn.Module``의 하위 클래스)입니다. Python의 고성능 하위 집합이며 모델 연산의 런타임 최적화를 수행하는 **PyTorch JIT Compiler,</strong> 에서 사용됩니다. TorchScript는 PyTorch 모델에서 스케일 추론을 수행할 때 권장되는 모델 형식입니다. 자세한 내용은 <a href="#id8"><span class="problematic" id="id9">`pytorch.org`_에 있는 `Introduction to TorchScript
 tutorial`_</span></a>, <a class="reference external" href="https://tutorials.pytorch.kr/advanced/cpp_export.html">Loading A TorchScript Model in C++ tutorial</a>, <a class="reference external" href="https://pytorch.org/docs/stable/jit.html">full TorchScript documentation</a> 에서 확인하세요.</p>
-</div>
-<div class="section" id="id5">
+</section>
+<section id="id5">
 <h2>모델 내보내기<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h2>
 <p>사전 학습된 시각 모델을 살펴봅시다. TorchVision의 모든 사전 학습 모델은 TorchScript와 호환됩니다.</p>
 <p>스크립트나 REPL에서 다음의 Python 3 코드를 실행하세요:</p>
@@ -452,54 +453,54 @@ tutorial`_</span></a>, <a class="reference external" href="https://tutorials.pyt
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">r18_scripted</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;r18_scripted.pt&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="c-torchscript">
+</section>
+<section id="c-torchscript">
 <h2>C++로 TorchScript 모델 불러오기<a class="headerlink" href="#c-torchscript" title="Permalink to this headline">¶</a></h2>
 <p>다음과 같은 C++ 파일을 만들고 파일명을 <code class="docutils literal notranslate"><span class="pre">ts-infer.cpp</span></code> 라고 짓습니다.</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;torch/script.h&gt;</span><span class="cp"></span>
-<span class="cp">#include</span> <span class="cpf">&lt;torch/nn/functional/activation.h&gt;</span><span class="cp"></span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;torch/script.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;torch/nn/functional/activation.h&gt;</span><span class="cp"></span>
 
 
-<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">argc</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">std</span><span class="o">::</span><span class="n">cerr</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;usage: ts-infer &lt;path-to-exported-model&gt;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
-        <span class="k">return</span> <span class="mi">-1</span><span class="p">;</span>
-    <span class="p">}</span>
+<span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">argc</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="o">*</span><span class="w"> </span><span class="n">argv</span><span class="p">[])</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">argc</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">std</span><span class="o">::</span><span class="n">cerr</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;usage: ts-infer &lt;path-to-exported-model&gt;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
 
-    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Loading model...</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;Loading model...</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span><span class="w"></span>
 
-    <span class="c1">// ScriptModule을 역직렬화(deserialize) 합니다.</span>
-    <span class="n">torch</span><span class="o">::</span><span class="n">jit</span><span class="o">::</span><span class="n">script</span><span class="o">::</span><span class="n">Module</span> <span class="k">module</span><span class="p">;</span>
-    <span class="k">try</span> <span class="p">{</span>
-        <span class="k">module</span> <span class="o">=</span> <span class="n">torch</span><span class="o">::</span><span class="n">jit</span><span class="o">::</span><span class="n">load</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
-    <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="k">const</span> <span class="n">c10</span><span class="o">::</span><span class="n">Error</span><span class="o">&amp;</span> <span class="n">e</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">std</span><span class="o">::</span><span class="n">cerr</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Error loading model</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
-        <span class="n">std</span><span class="o">::</span><span class="n">cerr</span> <span class="o">&lt;&lt;</span> <span class="n">e</span><span class="p">.</span><span class="n">msg_without_backtrace</span><span class="p">();</span>
-        <span class="k">return</span> <span class="mi">-1</span><span class="p">;</span>
-    <span class="p">}</span>
+<span class="w">    </span><span class="c1">// ScriptModule을 역직렬화(deserialize) 합니다.</span>
+<span class="w">    </span><span class="n">torch</span><span class="o">::</span><span class="n">jit</span><span class="o">::</span><span class="n">script</span><span class="o">::</span><span class="n">Module</span><span class="w"> </span><span class="k">module</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">try</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="k">module</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">torch</span><span class="o">::</span><span class="n">jit</span><span class="o">::</span><span class="n">load</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">c10</span><span class="o">::</span><span class="n">Error</span><span class="o">&amp;</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">std</span><span class="o">::</span><span class="n">cerr</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;Error loading model</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">std</span><span class="o">::</span><span class="n">cerr</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="n">msg_without_backtrace</span><span class="p">();</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
 
-    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Model loaded successfully</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;Model loaded successfully</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span><span class="w"></span>
 
-    <span class="n">torch</span><span class="o">::</span><span class="n">NoGradGuard</span> <span class="n">no_grad</span><span class="p">;</span> <span class="c1">// autograd가 꺼져있는지 확인합니다.</span>
-    <span class="k">module</span><span class="p">.</span><span class="n">eval</span><span class="p">();</span> <span class="c1">// dropout과 학습 단의 레이어 및 함수들을 끕니다.</span>
+<span class="w">    </span><span class="n">torch</span><span class="o">::</span><span class="n">NoGradGuard</span><span class="w"> </span><span class="n">no_grad</span><span class="p">;</span><span class="w"> </span><span class="c1">// autograd가 꺼져있는지 확인합니다.</span>
+<span class="w">    </span><span class="k">module</span><span class="p">.</span><span class="n">eval</span><span class="p">();</span><span class="w"> </span><span class="c1">// dropout과 학습 단의 레이어 및 함수들을 끕니다.</span>
 
-    <span class="c1">// 입력 &quot;이미지&quot;를 생성합니다.</span>
-    <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">torch</span><span class="o">::</span><span class="n">jit</span><span class="o">::</span><span class="n">IValue</span><span class="o">&gt;</span> <span class="n">inputs</span><span class="p">;</span>
-    <span class="n">inputs</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">torch</span><span class="o">::</span><span class="n">rand</span><span class="p">({</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">224</span><span class="p">,</span> <span class="mi">224</span><span class="p">}));</span>
+<span class="w">    </span><span class="c1">// 입력 &quot;이미지&quot;를 생성합니다.</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">torch</span><span class="o">::</span><span class="n">jit</span><span class="o">::</span><span class="n">IValue</span><span class="o">&gt;</span><span class="w"> </span><span class="n">inputs</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">inputs</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">torch</span><span class="o">::</span><span class="n">rand</span><span class="p">({</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">224</span><span class="p">,</span><span class="w"> </span><span class="mi">224</span><span class="p">}));</span><span class="w"></span>
 
-    <span class="c1">// 모델을 실행하고 출력 값을 tensor로 뽑아냅니다.</span>
-    <span class="n">at</span><span class="o">::</span><span class="n">Tensor</span> <span class="n">output</span> <span class="o">=</span> <span class="k">module</span><span class="p">.</span><span class="n">forward</span><span class="p">(</span><span class="n">inputs</span><span class="p">).</span><span class="n">toTensor</span><span class="p">();</span>
+<span class="w">    </span><span class="c1">// 모델을 실행하고 출력 값을 tensor로 뽑아냅니다.</span>
+<span class="w">    </span><span class="n">at</span><span class="o">::</span><span class="n">Tensor</span><span class="w"> </span><span class="n">output</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">module</span><span class="p">.</span><span class="n">forward</span><span class="p">(</span><span class="n">inputs</span><span class="p">).</span><span class="n">toTensor</span><span class="p">();</span><span class="w"></span>
 
-    <span class="k">namespace</span> <span class="n">F</span> <span class="o">=</span> <span class="n">torch</span><span class="o">::</span><span class="n">nn</span><span class="o">::</span><span class="n">functional</span><span class="p">;</span>
-    <span class="n">at</span><span class="o">::</span><span class="n">Tensor</span> <span class="n">output_sm</span> <span class="o">=</span> <span class="n">F</span><span class="o">::</span><span class="n">softmax</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">F</span><span class="o">::</span><span class="n">SoftmaxFuncOptions</span><span class="p">(</span><span class="mi">1</span><span class="p">));</span>
-    <span class="n">std</span><span class="o">::</span><span class="n">tuple</span><span class="o">&lt;</span><span class="n">at</span><span class="o">::</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">at</span><span class="o">::</span><span class="n">Tensor</span><span class="o">&gt;</span> <span class="n">top5_tensor</span> <span class="o">=</span> <span class="n">output_sm</span><span class="p">.</span><span class="n">topk</span><span class="p">(</span><span class="mi">5</span><span class="p">);</span>
-    <span class="n">at</span><span class="o">::</span><span class="n">Tensor</span> <span class="n">top5</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">get</span><span class="o">&lt;</span><span class="mi">1</span><span class="o">&gt;</span><span class="p">(</span><span class="n">top5_tensor</span><span class="p">);</span>
+<span class="w">    </span><span class="k">namespace</span><span class="w"> </span><span class="nn">F</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nn">torch</span><span class="o">::</span><span class="nn">nn</span><span class="o">::</span><span class="nn">functional</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">at</span><span class="o">::</span><span class="n">Tensor</span><span class="w"> </span><span class="n">output_sm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">F</span><span class="o">::</span><span class="n">softmax</span><span class="p">(</span><span class="n">output</span><span class="p">,</span><span class="w"> </span><span class="n">F</span><span class="o">::</span><span class="n">SoftmaxFuncOptions</span><span class="p">(</span><span class="mi">1</span><span class="p">));</span><span class="w"></span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">tuple</span><span class="o">&lt;</span><span class="n">at</span><span class="o">::</span><span class="n">Tensor</span><span class="p">,</span><span class="w"> </span><span class="n">at</span><span class="o">::</span><span class="n">Tensor</span><span class="o">&gt;</span><span class="w"> </span><span class="n">top5_tensor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">output_sm</span><span class="p">.</span><span class="n">topk</span><span class="p">(</span><span class="mi">5</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">at</span><span class="o">::</span><span class="n">Tensor</span><span class="w"> </span><span class="n">top5</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">get</span><span class="o">&lt;</span><span class="mi">1</span><span class="o">&gt;</span><span class="p">(</span><span class="n">top5_tensor</span><span class="p">);</span><span class="w"></span>
 
-    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">top5</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">top5</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span><span class="w"></span>
 
-    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">DONE</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
-    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-<span class="p">}</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;</span><span class="se">\n</span><span class="s">DONE</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
 </pre></div>
 </div>
 <p>이런 것들을 알아보았습니다:</p>
@@ -509,8 +510,8 @@ tutorial`_</span></a>, <a class="reference external" href="https://tutorials.pyt
 <li><p>입력에 대한 추론 수행하기</p></li>
 </ul>
 <p>또한, 이 코드에는 TorchVision에 대한 종속성이 없다는 것에 유의하세요. 저장된 TorchScript 모델에는 학습 가중치와 연산 그래프가 있으며 다른 것은 필요하지 않습니다.</p>
-</div>
-<div class="section" id="c">
+</section>
+<section id="c">
 <h2>C++ 추론 엔진 빌드하고 실행하기<a class="headerlink" href="#c" title="Permalink to this headline">¶</a></h2>
 <p>다음과 같은 <code class="docutils literal notranslate"><span class="pre">CMakeLists.txt</span></code> 파일을 생성합니다:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cmake_minimum_required</span><span class="p">(</span><span class="n">VERSION</span> <span class="mf">3.0</span> <span class="n">FATAL_ERROR</span><span class="p">)</span>
@@ -542,16 +543,16 @@ Model loaded successfully
 DONE
 </pre></div>
 </div>
-</div>
-<div class="section" id="id6">
+</section>
+<section id="id6">
 <h2>중요 참고자료<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p><a class="reference external" href="https://pytorch.org/">pytorch.org</a> 에서 설치 방법과 추가 문서 및 튜토리얼들을 확인할 수 있습니다.</p></li>
 <li><p><a class="reference external" href="https://tutorials.pytorch.kr/beginner/Intro_to_TorchScript_tutorial.html">Introduction to TorchScript tutorial</a> 에서 더 심화된 TorchScript 기초 설명을 확인할 수 있습니다.</p></li>
 <li><p><a class="reference external" href="https://pytorch.org/docs/stable/jit.html">Full TorchScript documentation</a> 에서 전체 TorchScript 언어 및 API를 참조할 수 있습니다.</p></li>
 </ul>
-</div>
-</div>
+</section>
+</section>
 
 
              </article>
@@ -628,7 +629,7 @@ DONE
 
 
   
-
+  
      
        <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
          <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
@@ -641,7 +642,6 @@ DONE
          <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
          <script src="../_static/katex_autorenderer.js"></script>
      
-
   
 
   <script type="text/javascript" src="../_static/js/vendor/popper.min.js"></script>

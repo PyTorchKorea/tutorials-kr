@@ -6,7 +6,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
 <meta property="og:title" content="PyTorch에서 추론(inference)을 위해 모델 저장하기 & 불러오기" />
   
 <meta property="og:type" content="article" />
@@ -397,12 +398,12 @@
 <p class="admonition-title">Note</p>
 <p>Click <a class="reference internal" href="#sphx-glr-download-recipes-recipes-saving-and-loading-models-for-inference-py"><span class="std std-ref">here</span></a> to download the full example code</p>
 </div>
-<div class="sphx-glr-example-title section" id="pytorch-inference">
+<section class="sphx-glr-example-title" id="pytorch-inference">
 <span id="sphx-glr-recipes-recipes-saving-and-loading-models-for-inference-py"></span><h1>PyTorch에서 추론(inference)을 위해 모델 저장하기 &amp; 불러오기<a class="headerlink" href="#pytorch-inference" title="Permalink to this headline">¶</a></h1>
 <p>PyTorch에서는 추론(inference)을 위해 모델을 저장하고 불러오는데 2가지 접근법이
 있습니다. 첫번째는 <code class="docutils literal notranslate"><span class="pre">state_dict</span></code> 를 저장하고 불러오는 것이고, 두번째는 전체
 모델을 저장하는 것입니다.</p>
-<div class="section" id="id1">
+<section id="id1">
 <h2>개요<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
 <p>torch.save() 함수를 사용하여 모델의 <code class="docutils literal notranslate"><span class="pre">state_dict</span></code> 를 저장하면 이후에 모델을
 불러올 때 유연함을 크게 살릴 수 있습니다. 학습된 모델의 매개변수(parameter)만을
@@ -415,15 +416,15 @@
 포함된 파일의 경로를 저장합니다. 이 때문에 작성한 코드가 다른 프로젝트에서
 사용되거나 리팩토링을 거치는 등의 과정에서 동작하지 않을 수 있습니다. 이 레시피에서는
 추론을 위해 모델을 저장하고 불러오는 두 가지 방법 모두를 살펴보겠습니다.</p>
-</div>
-<div class="section" id="id2">
+</section>
+<section id="id2">
 <h2>설정<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
 <p>시작하기 전에 <code class="docutils literal notranslate"><span class="pre">torch</span></code> 가 없다면 설치해야 합니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">torch</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="steps">
+</section>
+<section id="steps">
 <h2>단계(Steps)<a class="headerlink" href="#steps" title="Permalink to this headline">¶</a></h2>
 <ol class="arabic simple">
 <li><p>데이터 불러올 때 필요한 라이브러리들 불러오기</p></li>
@@ -432,7 +433,7 @@
 <li><p><code class="docutils literal notranslate"><span class="pre">state_dict</span></code> 을 통해 모델을 저장하고 불러오기</p></li>
 <li><p>전체 모델을 저장하고 불러오기</p></li>
 </ol>
-<div class="section" id="id3">
+<section id="id3">
 <h3>1. 데이터 불러올 때 필요한 라이브러리들 불러오기<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
 <p>이 레시피에서는 <code class="docutils literal notranslate"><span class="pre">torch</span></code> 와 여기 포함된 <code class="docutils literal notranslate"><span class="pre">torch.nn</span></code> 과 <a href="#id4"><span class="problematic" id="id5">``</span></a>torch.optim` 을
 사용하겠습니다.</p>
@@ -441,8 +442,8 @@
 <span class="kn">import</span> <span class="nn">torch.optim</span> <span class="k">as</span> <span class="nn">optim</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="id6">
+</section>
+<section id="id6">
 <h3>2. 신경망을 구성하고 초기화하기<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
 <p>예를 들기 위해, 이미지를 학습하는 신경망을 만들어보겠습니다. 더 자세한 내용은
 신경망 구성하기 레시피를 참고해주세요.</p>
@@ -469,15 +470,15 @@
 <span class="nb">print</span><span class="p">(</span><span class="n">net</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="id7">
+</section>
+<section id="id7">
 <h3>3. 옵티마이저 초기화하기<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
 <p>모멘텀(momentum)을 갖는 SGD를 사용하겠습니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">optimizer</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">SGD</span><span class="p">(</span><span class="n">net</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span> <span class="n">momentum</span><span class="o">=</span><span class="mf">0.9</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="state-dict">
+</section>
+<section id="state-dict">
 <h3>4. <code class="docutils literal notranslate"><span class="pre">state_dict</span></code> 을 통해 모델을 저장하고 불러오기<a class="headerlink" href="#state-dict" title="Permalink to this headline">¶</a></h3>
 <p>이제 <code class="docutils literal notranslate"><span class="pre">state_dict</span></code> 만 사용하여 모델을 저장하고 불러와보겠습니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># 경로 지정</span>
@@ -501,8 +502,8 @@
 <p>또한, 추론을 실행하기 전에 <code class="docutils literal notranslate"><span class="pre">model.eval()</span></code> 을 호출하여 드롭아웃(dropout)과
 배치 정규화 층(batch normalization layers)을 평가(evaluation) 모드로 바꿔야한다는
 것을 기억하세요. 이것을 빼먹으면 일관성 없는 추론 결과를 얻게 됩니다.</p>
-</div>
-<div class="section" id="id8">
+</section>
+<section id="id8">
 <h3>5. 전체 모델을 저장하고 불러오기<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
 <p>이제 전체 모델에 대해서 똑같이 해보겠습니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># 경로 지정</span>
@@ -520,9 +521,9 @@
 (batch normalization layers)을 평가(evaluation) 모드로 바꿔야한다는
 것을 기억하세요.</p>
 <p>축하합니다! 지금까지 PyTorch에서 추론을위한 모델을 성공적으로 저장하고 불러왔습니다.</p>
-</div>
-</div>
-<div class="section" id="id9">
+</section>
+</section>
+<section id="id9">
 <h2>더 알아보기<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h2>
 <p>다른 레시피를 둘러보고 계속 배워보세요:</p>
 <ul class="simple">
@@ -539,8 +540,8 @@
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
-</div>
-</div>
+</section>
+</section>
 
 
              </article>
@@ -622,7 +623,7 @@
 
 
   
-
+  
      
        <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
          <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
@@ -635,7 +636,6 @@
          <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
          <script src="../../_static/katex_autorenderer.js"></script>
      
-
   
 
   <script type="text/javascript" src="../../_static/js/vendor/popper.min.js"></script>

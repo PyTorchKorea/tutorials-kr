@@ -6,7 +6,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
 <meta property="og:title" content="PyTorch Vulkan Backend User Workflow" />
   
 <meta property="og:type" content="article" />
@@ -389,24 +390,24 @@
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <div class="section" id="pytorch-vulkan-backend-user-workflow">
+  <section id="pytorch-vulkan-backend-user-workflow">
 <h1>PyTorch Vulkan Backend User Workflow<a class="headerlink" href="#pytorch-vulkan-backend-user-workflow" title="Permalink to this headline">¶</a></h1>
 <p><strong>Author</strong>: <a class="reference external" href="https://github.com/IvanKobzarev">Ivan Kobzarev</a></p>
-<div class="section" id="introduction">
+<section id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
 <p>PyTorch 1.7 supports the ability to run model inference on GPUs that support the Vulkan graphics and compute API. The primary target devices are mobile GPUs on Android devices. The Vulkan backend can also be used on Linux, Mac, and Windows desktop builds to use Vulkan devices like Intel integrated GPUs. This feature is in the prototype stage and is subject to change.</p>
-<div class="section" id="building-pytorch-with-vulkan-backend">
+<section id="building-pytorch-with-vulkan-backend">
 <h3>Building PyTorch with Vulkan backend<a class="headerlink" href="#building-pytorch-with-vulkan-backend" title="Permalink to this headline">¶</a></h3>
 <p>Vulkan backend is not included by default. The main switch to include Vulkan backend is cmake option <code class="docutils literal notranslate"><span class="pre">USE_VULKAN</span></code>, that can be set by environment variable <code class="docutils literal notranslate"><span class="pre">USE_VULKAN</span></code>.</p>
 <p>To use PyTorch with Vulkan backend, we need to build it from source with additional settings. Checkout the PyTorch source code from GitHub master branch.</p>
-<div class="section" id="optional-usage-of-vulkan-wrapper">
+<section id="optional-usage-of-vulkan-wrapper">
 <h4>Optional usage of vulkan wrapper<a class="headerlink" href="#optional-usage-of-vulkan-wrapper" title="Permalink to this headline">¶</a></h4>
 <p>By default, Vulkan library will be loaded at runtime using the vulkan_wrapper library. If you specify the environment variable <code class="docutils literal notranslate"><span class="pre">USE_VULKAN_WRAPPER=0</span></code> libvulkan will be linked directly.</p>
-</div>
-<div class="section" id="desktop-build">
+</section>
+<section id="desktop-build">
 <h4>Desktop build<a class="headerlink" href="#desktop-build" title="Permalink to this headline">¶</a></h4>
-</div>
-<div class="section" id="vulkan-sdk">
+</section>
+<section id="vulkan-sdk">
 <h4>Vulkan SDK<a class="headerlink" href="#vulkan-sdk" title="Permalink to this headline">¶</a></h4>
 <p>Download VulkanSDK from <a class="reference external" href="https://vulkan.lunarg.com/sdk/home">https://vulkan.lunarg.com/sdk/home</a> and set environment variable <code class="docutils literal notranslate"><span class="pre">VULKAN_SDK</span></code></p>
 <p>Unpack VulkanSDK to <code class="docutils literal notranslate"><span class="pre">VULKAN_SDK_ROOT</span></code> folder, install VulkanSDK following VulkanSDK instructions for your system.</p>
@@ -433,8 +434,8 @@ sudo python install_vulkan.py
 </pre></div>
 </div>
 <p>At the time of writing of this recipe, the version is 1.8.0a0+41237a4. You might be seeing different numbers depending on when you check out the code from master, but it should be greater than 1.7.0.</p>
-</div>
-<div class="section" id="android-build">
+</section>
+<section id="android-build">
 <h4>Android build<a class="headerlink" href="#android-build" title="Permalink to this headline">¶</a></h4>
 <p>To build LibTorch for android with Vulkan backend for specified <code class="docutils literal notranslate"><span class="pre">ANDROID_ABI</span></code>.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">PYTORCH_ROOT</span>
@@ -446,10 +447,10 @@ sudo python install_vulkan.py
 USE_VULKAN=1 sh ./scripts/build_pytorch_android.sh
 </pre></div>
 </div>
-</div>
-</div>
-</div>
-<div class="section" id="model-preparation">
+</section>
+</section>
+</section>
+<section id="model-preparation">
 <h2>Model preparation<a class="headerlink" href="#model-preparation" title="Permalink to this headline">¶</a></h2>
 <p>Install torchvision, get the default pretrained float model.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">torchvision</span>
@@ -472,11 +473,11 @@ USE_VULKAN=1 sh ./scripts/build_pytorch_android.sh
 </pre></div>
 </div>
 <p>The result model can be used only on Vulkan backend as it contains specific to the Vulkan backend operators.</p>
-</div>
-<div class="section" id="using-vulkan-backend-in-code">
+</section>
+<section id="using-vulkan-backend-in-code">
 <h2>Using Vulkan backend in code<a class="headerlink" href="#using-vulkan-backend-in-code" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="c-api">
+</section>
+<section id="c-api">
 <h2>C++ API<a class="headerlink" href="#c-api" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">at</span><span class="p">::</span><span class="n">is_vulkan_available</span><span class="p">()</span>
 <span class="n">auto</span> <span class="n">tensor</span> <span class="o">=</span> <span class="n">at</span><span class="p">::</span><span class="n">rand</span><span class="p">({</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">},</span> <span class="n">at</span><span class="p">::</span><span class="n">device</span><span class="p">(</span><span class="n">at</span><span class="p">::</span><span class="n">kCPU</span><span class="p">)</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="n">at</span><span class="p">::</span><span class="n">kFloat</span><span class="p">));</span>
@@ -519,14 +520,14 @@ USE_VULKAN=1 sh ./scripts/build_pytorch_android.sh
 </pre></div>
 </div>
 <p>Those operators allow to use torchvision models for image classification on Vulkan backend.</p>
-</div>
-<div class="section" id="python-api">
+</section>
+<section id="python-api">
 <h2>Python API<a class="headerlink" href="#python-api" title="Permalink to this headline">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">torch.is_vulkan_available()</span></code> is exposed to Python API.</p>
 <p><code class="docutils literal notranslate"><span class="pre">tensor.to(device='vulkan')</span></code> works as <code class="docutils literal notranslate"><span class="pre">.vulkan()</span></code> moving tensor to the Vulkan device.</p>
 <p><code class="docutils literal notranslate"><span class="pre">.vulkan()</span></code> at the moment of writing of this tutorial is not exposed to Python API, but it is planned to be there.</p>
-</div>
-<div class="section" id="android-java-api">
+</section>
+<section id="android-java-api">
 <h2>Android Java API<a class="headerlink" href="#android-java-api" title="Permalink to this headline">¶</a></h2>
 <p>For Android API to run model on Vulkan backend we have to specify this during model loading:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">org.pytorch.Device</span><span class="p">;</span>
@@ -539,8 +540,8 @@ USE_VULKAN=1 sh ./scripts/build_pytorch_android.sh
 <p>In this case, all inputs will be transparently copied from CPU to the Vulkan device, and model will be run on Vulkan device, the output will be copied transparently to CPU.</p>
 <p>The example of using Vulkan backend can be found in test application within the PyTorch repository:
 <a class="reference external" href="https://github.com/pytorch/pytorch/blob/master/android/test_app/app/src/main/java/org/pytorch/testapp/MainActivity.java#L133">https://github.com/pytorch/pytorch/blob/master/android/test_app/app/src/main/java/org/pytorch/testapp/MainActivity.java#L133</a></p>
-</div>
-<div class="section" id="building-android-test-app-with-vulkan">
+</section>
+<section id="building-android-test-app-with-vulkan">
 <h2>Building android test app with Vulkan<a class="headerlink" href="#building-android-test-app-with-vulkan" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>cd $PYTORCH_ROOT
 USE_VULKAN=1 sh ./scripts/build_pytorch_android.sh
@@ -560,12 +561,12 @@ gradle -p android test_app:installMbvulkanLocalBaseDebug
 </pre></div>
 </div>
 <p>After successful installation, the application with the name ‘MBQ’ can be launched on the device.</p>
-</div>
-<div class="section" id="testing-models-without-uploading-to-android-device">
+</section>
+<section id="testing-models-without-uploading-to-android-device">
 <h2>Testing models without uploading to android device<a class="headerlink" href="#testing-models-without-uploading-to-android-device" title="Permalink to this headline">¶</a></h2>
 <p>Software implementations of Vulkan (e.g. <a class="reference external" href="https://swiftshader.googlesource.com/SwiftShader">https://swiftshader.googlesource.com/SwiftShader</a> ) can be used to test if a model can be run using PyTorch Vulkan Backend (e.g. check if all model operators are supported).</p>
-</div>
-</div>
+</section>
+</section>
 
 
              </article>
@@ -644,7 +645,7 @@ gradle -p android test_app:installMbvulkanLocalBaseDebug
 
 
   
-
+  
      
        <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
          <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
@@ -657,7 +658,6 @@ gradle -p android test_app:installMbvulkanLocalBaseDebug
          <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
          <script src="../_static/katex_autorenderer.js"></script>
      
-
   
 
   <script type="text/javascript" src="../_static/js/vendor/popper.min.js"></script>

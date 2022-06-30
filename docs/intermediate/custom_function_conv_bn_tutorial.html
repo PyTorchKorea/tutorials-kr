@@ -6,7 +6,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
 <meta property="og:title" content="Fusing Convolution and Batch Norm using Custom Function" />
   
 <meta property="og:type" content="article" />
@@ -395,7 +396,7 @@
 <p class="admonition-title">Note</p>
 <p>Click <a class="reference internal" href="#sphx-glr-download-intermediate-custom-function-conv-bn-tutorial-py"><span class="std std-ref">here</span></a> to download the full example code</p>
 </div>
-<div class="sphx-glr-example-title section" id="fusing-convolution-and-batch-norm-using-custom-function">
+<section class="sphx-glr-example-title" id="fusing-convolution-and-batch-norm-using-custom-function">
 <span id="sphx-glr-intermediate-custom-function-conv-bn-tutorial-py"></span><h1>Fusing Convolution and Batch Norm using Custom Function<a class="headerlink" href="#fusing-convolution-and-batch-norm-using-custom-function" title="Permalink to this headline">¶</a></h1>
 <p>Fusing adjacent convolution and batch norm layers together is typically an
 inference-time optimization to improve run-time. It is usually achieved
@@ -463,7 +464,7 @@ custom functions so we can validate their correctness individually</p>
 <span class="n">torch</span><span class="o">.</span><span class="n">autograd</span><span class="o">.</span><span class="n">gradcheck</span><span class="p">(</span><span class="n">Conv2D</span><span class="o">.</span><span class="n">apply</span><span class="p">,</span> <span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">weight</span><span class="p">))</span>
 </pre></div>
 </div>
-<div class="section" id="backward-formula-implementation-for-batch-norm">
+<section id="backward-formula-implementation-for-batch-norm">
 <h2>Backward Formula Implementation for Batch Norm<a class="headerlink" href="#backward-formula-implementation-for-batch-norm" title="Permalink to this headline">¶</a></h2>
 <p>Batch Norm has two modes: training and eval mode. In training mode
 the sample statistics are a function of the inputs. In eval mode,
@@ -539,8 +540,8 @@ we implement and test only the training mode case.</p>
 <span class="n">torch</span><span class="o">.</span><span class="n">autograd</span><span class="o">.</span><span class="n">gradcheck</span><span class="p">(</span><span class="n">BatchNorm</span><span class="o">.</span><span class="n">apply</span><span class="p">,</span> <span class="p">(</span><span class="n">a</span><span class="p">,),</span> <span class="n">fast_mode</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="fusing-convolution-and-batchnorm">
+</section>
+<section id="fusing-convolution-and-batchnorm">
 <h2>Fusing Convolution and BatchNorm<a class="headerlink" href="#fusing-convolution-and-batchnorm" title="Permalink to this headline">¶</a></h2>
 <p>Now that the bulk of the work has been done, we can combine
 them together. Note that in (1) we only save a single buffer
@@ -620,8 +621,8 @@ exact code as the examples above.</p>
 <span class="n">torch</span><span class="o">.</span><span class="n">autograd</span><span class="o">.</span><span class="n">gradcheck</span><span class="p">(</span><span class="n">FusedConvBN2DFunction</span><span class="o">.</span><span class="n">apply</span><span class="p">,</span> <span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">weight</span><span class="p">))</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="testing-out-our-new-layer">
+</section>
+<section id="testing-out-our-new-layer">
 <h2>Testing out our new Layer<a class="headerlink" href="#testing-out-our-new-layer" title="Permalink to this headline">¶</a></h2>
 <p>Use FusedConvBN to train a basic network
 The code below is after some light modifications to the example here:
@@ -735,8 +736,8 @@ The code below is after some light modifications to the example here:
 <span class="n">test_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="n">dataset2</span><span class="p">,</span> <span class="o">**</span><span class="n">test_kwargs</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="a-comparison-of-memory-usage">
+</section>
+<section id="a-comparison-of-memory-usage">
 <h2>A Comparison of Memory Usage<a class="headerlink" href="#a-comparison-of-memory-usage" title="Permalink to this headline">¶</a></h2>
 <p>If cuda is enabled, print out memory usage for both <cite>fused=True</cite> and <cite>fused=False</cite>
 For an example run on RTX 3070, CuDNN 8.0.5: fused peak memory: 1.56GB,
@@ -779,51 +780,51 @@ allocate one fewer buffer per fused conv-bn pair.</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Train Epoch: 0 [0/60000 (0%)]   Loss: 2.340337
-Train Epoch: 0 [4096/60000 (7%)]        Loss: 8.395391
-Train Epoch: 0 [8192/60000 (13%)]       Loss: 4.977989
-Train Epoch: 0 [12288/60000 (20%)]      Loss: 2.069937
-Train Epoch: 0 [16384/60000 (27%)]      Loss: 2.426080
-Train Epoch: 0 [20480/60000 (33%)]      Loss: 1.993548
-Train Epoch: 0 [24576/60000 (40%)]      Loss: 1.676066
-Train Epoch: 0 [28672/60000 (47%)]      Loss: 1.791474
-Train Epoch: 0 [32768/60000 (53%)]      Loss: 1.680680
-Train Epoch: 0 [36864/60000 (60%)]      Loss: 1.568424
-Train Epoch: 0 [40960/60000 (67%)]      Loss: 1.332698
-Train Epoch: 0 [45056/60000 (73%)]      Loss: 1.079303
-Train Epoch: 0 [49152/60000 (80%)]      Loss: 0.991321
-Train Epoch: 0 [53248/60000 (87%)]      Loss: 0.983313
-Train Epoch: 0 [57344/60000 (93%)]      Loss: 0.857172
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Train Epoch: 0 [0/60000 (0%)]   Loss: 2.348852
+Train Epoch: 0 [4096/60000 (7%)]        Loss: 7.914272
+Train Epoch: 0 [8192/60000 (13%)]       Loss: 3.797001
+Train Epoch: 0 [12288/60000 (20%)]      Loss: 2.163253
+Train Epoch: 0 [16384/60000 (27%)]      Loss: 1.832567
+Train Epoch: 0 [20480/60000 (33%)]      Loss: 1.751949
+Train Epoch: 0 [24576/60000 (40%)]      Loss: 1.624256
+Train Epoch: 0 [28672/60000 (47%)]      Loss: 1.458605
+Train Epoch: 0 [32768/60000 (53%)]      Loss: 1.466291
+Train Epoch: 0 [36864/60000 (60%)]      Loss: 1.353721
+Train Epoch: 0 [40960/60000 (67%)]      Loss: 1.762645
+Train Epoch: 0 [45056/60000 (73%)]      Loss: 1.346592
+Train Epoch: 0 [49152/60000 (80%)]      Loss: 0.909657
+Train Epoch: 0 [53248/60000 (87%)]      Loss: 0.774030
+Train Epoch: 0 [57344/60000 (93%)]      Loss: 0.686818
 
-Test set: Average loss: 0.4905, Accuracy: 8469/10000 (85%)
+Test set: Average loss: 0.5454, Accuracy: 8227/10000 (82%)
 
-Train Epoch: 0 [0/60000 (0%)]   Loss: 2.340595
-Train Epoch: 0 [4096/60000 (7%)]        Loss: 8.392224
-Train Epoch: 0 [8192/60000 (13%)]       Loss: 4.753967
-Train Epoch: 0 [12288/60000 (20%)]      Loss: 2.530096
-Train Epoch: 0 [16384/60000 (27%)]      Loss: 2.018947
-Train Epoch: 0 [20480/60000 (33%)]      Loss: 2.028060
-Train Epoch: 0 [24576/60000 (40%)]      Loss: 1.791550
-Train Epoch: 0 [28672/60000 (47%)]      Loss: 2.133950
-Train Epoch: 0 [32768/60000 (53%)]      Loss: 2.123460
-Train Epoch: 0 [36864/60000 (60%)]      Loss: 1.760473
-Train Epoch: 0 [40960/60000 (67%)]      Loss: 1.536366
-Train Epoch: 0 [45056/60000 (73%)]      Loss: 1.334501
-Train Epoch: 0 [49152/60000 (80%)]      Loss: 1.142004
-Train Epoch: 0 [53248/60000 (87%)]      Loss: 1.053313
-Train Epoch: 0 [57344/60000 (93%)]      Loss: 0.947125
+Train Epoch: 0 [0/60000 (0%)]   Loss: 2.349139
+Train Epoch: 0 [4096/60000 (7%)]        Loss: 7.927087
+Train Epoch: 0 [8192/60000 (13%)]       Loss: 3.628259
+Train Epoch: 0 [12288/60000 (20%)]      Loss: 2.527773
+Train Epoch: 0 [16384/60000 (27%)]      Loss: 1.928945
+Train Epoch: 0 [20480/60000 (33%)]      Loss: 1.762168
+Train Epoch: 0 [24576/60000 (40%)]      Loss: 1.506211
+Train Epoch: 0 [28672/60000 (47%)]      Loss: 1.518429
+Train Epoch: 0 [32768/60000 (53%)]      Loss: 1.296566
+Train Epoch: 0 [36864/60000 (60%)]      Loss: 1.321471
+Train Epoch: 0 [40960/60000 (67%)]      Loss: 1.642297
+Train Epoch: 0 [45056/60000 (73%)]      Loss: 1.183887
+Train Epoch: 0 [49152/60000 (80%)]      Loss: 1.002882
+Train Epoch: 0 [53248/60000 (87%)]      Loss: 0.797862
+Train Epoch: 0 [57344/60000 (93%)]      Loss: 0.759525
 
-Test set: Average loss: 0.5244, Accuracy: 8464/10000 (85%)
+Test set: Average loss: 0.4076, Accuracy: 8801/10000 (88%)
 
 CuDNN version: 7605
 
 Peak memory allocated:
-fused: 7.76GB, unfused: 6.96GB
+fused: 8.83GB, unfused: 6.96GB
 Memory allocated at end of forward pass:
-fused: 6.05GB, unfused: 6.43GB
+fused: 6.05GB, unfused: 6.42GB
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  25.305 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  33.357 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-intermediate-custom-function-conv-bn-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/187aea79daf1552dd05cdde1f4b4e34d/custom_function_conv_bn_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">custom_function_conv_bn_tutorial.py</span></code></a></p>
@@ -833,8 +834,8 @@ fused: 6.05GB, unfused: 6.43GB
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
-</div>
-</div>
+</section>
+</section>
 
 
              </article>
@@ -909,7 +910,7 @@ fused: 6.05GB, unfused: 6.43GB
 
 
   
-
+  
      
        <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
          <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
@@ -922,7 +923,6 @@ fused: 6.05GB, unfused: 6.43GB
          <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
          <script src="../_static/katex_autorenderer.js"></script>
      
-
   
 
   <script type="text/javascript" src="../_static/js/vendor/popper.min.js"></script>

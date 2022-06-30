@@ -6,7 +6,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
 <meta property="og:title" content="PyTorch에서 변화도를 0으로 만들기" />
   
 <meta property="og:type" content="article" />
@@ -397,11 +398,11 @@
 <p class="admonition-title">Note</p>
 <p>Click <a class="reference internal" href="#sphx-glr-download-recipes-recipes-zeroing-out-gradients-py"><span class="std std-ref">here</span></a> to download the full example code</p>
 </div>
-<div class="sphx-glr-example-title section" id="pytorch-0">
+<section class="sphx-glr-example-title" id="pytorch-0">
 <span id="sphx-glr-recipes-recipes-zeroing-out-gradients-py"></span><h1>PyTorch에서 변화도를 0으로 만들기<a class="headerlink" href="#pytorch-0" title="Permalink to this headline">¶</a></h1>
 <p>신경망을 구축할 때는 변화도를 0으로 만들어 주는 것이 좋습니다. 기본적으로
 <code class="docutils literal notranslate"><span class="pre">.backward()</span></code> 를 호출할 때마다 변화도가 버퍼에 쌓이기 때문입니다. (덮어쓰지 않는다는 의미입니다.)</p>
-<div class="section" id="id1">
+<section id="id1">
 <h2>개요<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
 <p>신경망을 학습시킬 때, 경사 하강법을 거쳐 모델 정확도를 높일 수 있습니다. 경사 하강법은 간단히
 설명해 모델의 가중치와 편향을 약간씩 수정하면서 손실(또는 오류)를 최소화하는 과정입니다.</p>
@@ -413,8 +414,8 @@
 시작할 때, 누적되는 변화도를 정확하게 추적하기 위해서는 변화도를 우선 0으로 만들어 주어야 합니다.
 이 레시피에서는 PyTorch 라이브러리를 사용하여 변화도를 0으로 만드는 방법을 배워봅니다.
 PyTorch에 내장된 <code class="docutils literal notranslate"><span class="pre">CIFAR10</span></code> 데이터셋에 대하여 신경망을 훈련시키는 과정을 통해 알아봅시다.</p>
-</div>
-<div class="section" id="id2">
+</section>
+<section id="id2">
 <h2>설정<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
 <p>이 레시피에는 데이터를 학습시키는 내용이 포함되어 있기 때문에, 실행 가능한 노트북 파일이 있다면
 런타임을 GPU 또는 TPU로 전환하는 것이 좋습니다. 시작하기에 앞서, <code class="docutils literal notranslate"><span class="pre">torch</span></code> 와
@@ -423,8 +424,8 @@ PyTorch에 내장된 <code class="docutils literal notranslate"><span class="pre
 <span class="n">pip</span> <span class="n">install</span> <span class="n">torchvision</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="steps">
+</section>
+<section id="steps">
 <h2>단계(Steps)<a class="headerlink" href="#steps" title="Permalink to this headline">¶</a></h2>
 <p>1단계부터 4단계까지는 학습을 위한 데이터와 신경망을 준비하며, 5단계에서 변화도를 0으로
 만들어 줍니다. 이미 준비한 데이터와 신경망이 있다면 5단계로 건너뛰어도 좋습니다.</p>
@@ -435,7 +436,7 @@ PyTorch에 내장된 <code class="docutils literal notranslate"><span class="pre
 <li><p>손실 함수 정의하기</p></li>
 <li><p>신경망을 학습시킬 때 변화도 0으로 만들기</p></li>
 </ol>
-<div class="section" id="import">
+<section id="import">
 <h3>1. 데이터를 불러오기 위해 필요한 모든 라이브러리 import 하기<a class="headerlink" href="#import" title="Permalink to this headline">¶</a></h3>
 <p>이 레시피에서는 데이터셋에 접근하기 위해 <code class="docutils literal notranslate"><span class="pre">torch</span></code> 와 <code class="docutils literal notranslate"><span class="pre">torchvision</span></code> 을 사용합니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
@@ -449,8 +450,8 @@ PyTorch에 내장된 <code class="docutils literal notranslate"><span class="pre
 <span class="kn">import</span> <span class="nn">torchvision.transforms</span> <span class="k">as</span> <span class="nn">transforms</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="id3">
+</section>
+<section id="id3">
 <h3>2. 데이터셋 불러오고 정규화하기<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
 <p>PyTorch는 다양한 내장 데이터셋을 제공합니다. PyTorch에서 데이터 불러오기 레시피를 참고해
 더 많은 정보를 얻을 수 있습니다.</p>
@@ -472,8 +473,8 @@ PyTorch에 내장된 <code class="docutils literal notranslate"><span class="pre
            <span class="s1">&#39;deer&#39;</span><span class="p">,</span> <span class="s1">&#39;dog&#39;</span><span class="p">,</span> <span class="s1">&#39;frog&#39;</span><span class="p">,</span> <span class="s1">&#39;horse&#39;</span><span class="p">,</span> <span class="s1">&#39;ship&#39;</span><span class="p">,</span> <span class="s1">&#39;truck&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="id4">
+</section>
+<section id="id4">
 <h3>3. 신경망 구축하기<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
 <p>컨볼루션 신경망을 정의하겠습니다. 자세한 내용은 신경망 정의하기 레시피를
 참조해주세요.</p>
@@ -497,8 +498,8 @@ PyTorch에 내장된 <code class="docutils literal notranslate"><span class="pre
         <span class="k">return</span> <span class="n">x</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="id5">
+</section>
+<section id="id5">
 <h3>4. 손실 함수과 옵티마이저 정의하기<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
 <p>분류를 위한 Cross-Entropy 손실 함수와 모멘텀을 설정한 SGD 옵티마이저를 사용합니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">net</span> <span class="o">=</span> <span class="n">Net</span><span class="p">()</span>
@@ -506,8 +507,8 @@ PyTorch에 내장된 <code class="docutils literal notranslate"><span class="pre
 <span class="n">optimizer</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">SGD</span><span class="p">(</span><span class="n">net</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span> <span class="n">momentum</span><span class="o">=</span><span class="mf">0.9</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="id6">
+</section>
+<section id="id6">
 <h3>5. 신경망을 학습시키는 동안 변화도를 0으로 만들기<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
 <p>이제부터 흥미로운 부분을 살펴보려고 합니다.
 여기서 할 일은 데이터 이터레이터를 순회하면서, 신경망에 입력을 주고
@@ -544,9 +545,9 @@ PyTorch에 내장된 <code class="docutils literal notranslate"><span class="pre
 이는 옵티마이저에 모든 모델 파라미터가 포함되는 한 <code class="docutils literal notranslate"><span class="pre">optimizer.zero_grad()</span></code> 를
 사용하는 것과 동일합니다. 어떤 것을 사용할 것인지 최선의 선택을 하기 바랍니다.</p>
 <p>축하합니다! 이제 PyTorch에서 변화도를 0으로 만들 수 있습니다.</p>
-</div>
-</div>
-<div class="section" id="id7">
+</section>
+</section>
+<section id="id7">
 <h2>더 알아보기<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h2>
 <p>다른 레시피를 둘러보고 계속 배워보세요:</p>
 <ul class="simple">
@@ -563,8 +564,8 @@ PyTorch에 내장된 <code class="docutils literal notranslate"><span class="pre
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
-</div>
-</div>
+</section>
+</section>
 
 
              </article>
@@ -646,7 +647,7 @@ PyTorch에 내장된 <code class="docutils literal notranslate"><span class="pre
 
 
   
-
+  
      
        <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
          <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
@@ -659,7 +660,6 @@ PyTorch에 내장된 <code class="docutils literal notranslate"><span class="pre
          <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
          <script src="../../_static/katex_autorenderer.js"></script>
      
-
   
 
   <script type="text/javascript" src="../../_static/js/vendor/popper.min.js"></script>

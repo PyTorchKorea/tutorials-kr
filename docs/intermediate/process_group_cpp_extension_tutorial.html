@@ -6,7 +6,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
 <meta property="og:title" content="Customize Process Group Backends Using Cpp Extensions" />
   
 <meta property="og:type" content="article" />
@@ -391,7 +392,7 @@
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <div class="section" id="customize-process-group-backends-using-cpp-extensions">
+  <section id="customize-process-group-backends-using-cpp-extensions">
 <h1>Customize Process Group Backends Using Cpp Extensions<a class="headerlink" href="#customize-process-group-backends-using-cpp-extensions" title="Permalink to this headline">¶</a></h1>
 <p><strong>Author</strong>: <a class="reference external" href="https://github.com/ftian1">Feng Tian</a>, <a class="reference external" href="https://mrshenli.github.io/">Shen Li</a></p>
 <p>Prerequisites:</p>
@@ -407,7 +408,7 @@ backend and plug that into
 <a class="reference external" href="https://pytorch.org/docs/stable/cpp_extension.html">cpp extensions</a>. This is helpful when you need a specialized software
 stack for your hardware, or when you would like to experiment with new
 collective communication algorithms.</p>
-<div class="section" id="basics">
+<section id="basics">
 <h2>Basics<a class="headerlink" href="#basics" title="Permalink to this headline">¶</a></h2>
 <p>PyTorch collective communications power several widely adopted distributed
 training features, including
@@ -438,8 +439,8 @@ on demonstrating the extension APIs, instead of developing a functioning
 communication backend. Hence, the <code class="docutils literal notranslate"><span class="pre">dummy</span></code> backend just covers a subset of the
 APIs (<code class="docutils literal notranslate"><span class="pre">all_reduce</span></code> and <code class="docutils literal notranslate"><span class="pre">all_gather</span></code>), and simply sets the values of tensors
 to 0.</p>
-</div>
-<div class="section" id="step-1-implement-a-subclass-of-processgroup">
+</section>
+<section id="step-1-implement-a-subclass-of-processgroup">
 <h2>Step 1: Implement a Subclass of <code class="docutils literal notranslate"><span class="pre">ProcessGroup</span></code><a class="headerlink" href="#step-1-implement-a-subclass-of-processgroup" title="Permalink to this headline">¶</a></h2>
 <p>This first step is to implement a <code class="docutils literal notranslate"><span class="pre">ProcessGroup</span></code> subclass that overrides
 target collective communication APIs and runs the custom communication algorithm.
@@ -451,96 +452,96 @@ subclass. The two code snippets below present the implementation of <code class=
 <code class="docutils literal notranslate"><span class="pre">dummy.cpp</span></code>. See the <a class="reference external" href="https://github.com/mrshenli/dummy_collectives">dummy collectives</a>
 repository for the full implementation.</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// file name: dummy.hpp</span>
-<span class="cp">#include</span> <span class="cpf">&lt;torch/python.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;torch/python.h&gt;</span><span class="cp"></span>
 
-<span class="cp">#include</span> <span class="cpf">&lt;c10d/ProcessGroup.hpp&gt;</span><span class="cp"></span>
-<span class="cp">#include</span> <span class="cpf">&lt;c10d/Store.hpp&gt;</span><span class="cp"></span>
-<span class="cp">#include</span> <span class="cpf">&lt;c10d/Types.hpp&gt;</span><span class="cp"></span>
-<span class="cp">#include</span> <span class="cpf">&lt;c10d/Utils.hpp&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;c10d/ProcessGroup.hpp&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;c10d/Store.hpp&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;c10d/Types.hpp&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;c10d/Utils.hpp&gt;</span><span class="cp"></span>
 
-<span class="cp">#include</span> <span class="cpf">&lt;pybind11/chrono.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;pybind11/chrono.h&gt;</span><span class="cp"></span>
 
-<span class="k">namespace</span> <span class="n">c10d</span> <span class="p">{</span>
+<span class="k">namespace</span><span class="w"> </span><span class="nn">c10d</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
 
-<span class="k">class</span> <span class="nc">ProcessGroupDummy</span> <span class="o">:</span> <span class="k">public</span> <span class="n">ProcessGroup</span> <span class="p">{</span>
-  <span class="k">public</span><span class="o">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ProcessGroupDummy</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="n">ProcessGroup</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="k">public</span><span class="o">:</span><span class="w"></span>
 
-    <span class="k">class</span> <span class="nc">WorkDummy</span> <span class="o">:</span> <span class="k">public</span> <span class="n">ProcessGroup</span><span class="o">::</span><span class="n">Work</span> <span class="p">{</span>
-      <span class="k">public</span><span class="o">:</span>
-        <span class="n">WorkDummy</span><span class="p">(</span>
-            <span class="n">OpType</span> <span class="n">opType</span><span class="p">,</span>
-            <span class="n">c10</span><span class="o">::</span><span class="n">intrusive_ptr</span><span class="o">&lt;</span><span class="n">c10</span><span class="o">::</span><span class="n">ivalue</span><span class="o">::</span><span class="n">Future</span><span class="o">&gt;</span> <span class="n">future</span><span class="p">)</span> <span class="c1">// future of the output</span>
-            <span class="o">:</span> <span class="n">ProcessGroup</span><span class="o">::</span><span class="n">Work</span><span class="p">(</span>
-                <span class="mi">-1</span><span class="p">,</span> <span class="c1">// rank, only used by recvAnySource, irrelevant in this demo</span>
-                <span class="n">opType</span><span class="p">),</span>
-            <span class="n">future_</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">future</span><span class="p">))</span> <span class="p">{}</span>
-        <span class="c1">// There are several additional helper functions that need to be</span>
-        <span class="c1">// implemented. Please refer to https://github.com/mrshenli/dummy_collectives</span>
-        <span class="c1">// for the full implementation.</span>
+<span class="w">    </span><span class="k">class</span><span class="w"> </span><span class="nc">WorkDummy</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="n">ProcessGroup</span><span class="o">::</span><span class="n">Work</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">      </span><span class="k">public</span><span class="o">:</span><span class="w"></span>
+<span class="w">        </span><span class="n">WorkDummy</span><span class="p">(</span><span class="w"></span>
+<span class="w">            </span><span class="n">OpType</span><span class="w"> </span><span class="n">opType</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="n">c10</span><span class="o">::</span><span class="n">intrusive_ptr</span><span class="o">&lt;</span><span class="n">c10</span><span class="o">::</span><span class="n">ivalue</span><span class="o">::</span><span class="n">Future</span><span class="o">&gt;</span><span class="w"> </span><span class="n">future</span><span class="p">)</span><span class="w"> </span><span class="c1">// future of the output</span>
+<span class="w">            </span><span class="o">:</span><span class="w"> </span><span class="n">ProcessGroup</span><span class="o">::</span><span class="n">Work</span><span class="p">(</span><span class="w"></span>
+<span class="w">                </span><span class="mi">-1</span><span class="p">,</span><span class="w"> </span><span class="c1">// rank, only used by recvAnySource, irrelevant in this demo</span>
+<span class="w">                </span><span class="n">opType</span><span class="p">),</span><span class="w"></span>
+<span class="w">            </span><span class="n">future_</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">future</span><span class="p">))</span><span class="w"> </span><span class="p">{}</span><span class="w"></span>
+<span class="w">        </span><span class="c1">// There are several additional helper functions that need to be</span>
+<span class="w">        </span><span class="c1">// implemented. Please refer to https://github.com/mrshenli/dummy_collectives</span>
+<span class="w">        </span><span class="c1">// for the full implementation.</span>
 
-      <span class="k">private</span><span class="o">:</span>
-        <span class="n">c10</span><span class="o">::</span><span class="n">intrusive_ptr</span><span class="o">&lt;</span><span class="n">c10</span><span class="o">::</span><span class="n">ivalue</span><span class="o">::</span><span class="n">Future</span><span class="o">&gt;</span> <span class="n">future_</span><span class="p">;</span>
-    <span class="p">};</span>
+<span class="w">      </span><span class="k">private</span><span class="o">:</span><span class="w"></span>
+<span class="w">        </span><span class="n">c10</span><span class="o">::</span><span class="n">intrusive_ptr</span><span class="o">&lt;</span><span class="n">c10</span><span class="o">::</span><span class="n">ivalue</span><span class="o">::</span><span class="n">Future</span><span class="o">&gt;</span><span class="w"> </span><span class="n">future_</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">};</span><span class="w"></span>
 
-    <span class="n">ProcessGroupDummy</span><span class="p">(</span><span class="kt">int</span> <span class="n">rank</span><span class="p">,</span> <span class="kt">int</span> <span class="n">size</span><span class="p">);</span>
+<span class="w">    </span><span class="n">ProcessGroupDummy</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">rank</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">size</span><span class="p">);</span><span class="w"></span>
 
-    <span class="n">c10</span><span class="o">::</span><span class="n">intrusive_ptr</span><span class="o">&lt;</span><span class="n">ProcessGroup</span><span class="o">::</span><span class="n">Work</span><span class="o">&gt;</span> <span class="n">allgather</span><span class="p">(</span>
-        <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">at</span><span class="o">::</span><span class="n">Tensor</span><span class="o">&gt;&gt;&amp;</span> <span class="n">outputTensors</span><span class="p">,</span>
-        <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">at</span><span class="o">::</span><span class="n">Tensor</span><span class="o">&gt;&amp;</span> <span class="n">inputTensors</span><span class="p">,</span>
-        <span class="k">const</span> <span class="n">AllgatherOptions</span><span class="o">&amp;</span> <span class="n">opts</span> <span class="o">=</span> <span class="n">AllgatherOptions</span><span class="p">())</span> <span class="k">override</span><span class="p">;</span>
+<span class="w">    </span><span class="n">c10</span><span class="o">::</span><span class="n">intrusive_ptr</span><span class="o">&lt;</span><span class="n">ProcessGroup</span><span class="o">::</span><span class="n">Work</span><span class="o">&gt;</span><span class="w"> </span><span class="n">allgather</span><span class="p">(</span><span class="w"></span>
+<span class="w">        </span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">at</span><span class="o">::</span><span class="n">Tensor</span><span class="o">&gt;&gt;&amp;</span><span class="w"> </span><span class="n">outputTensors</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">at</span><span class="o">::</span><span class="n">Tensor</span><span class="o">&gt;&amp;</span><span class="w"> </span><span class="n">inputTensors</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="k">const</span><span class="w"> </span><span class="n">AllgatherOptions</span><span class="o">&amp;</span><span class="w"> </span><span class="n">opts</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AllgatherOptions</span><span class="p">())</span><span class="w"> </span><span class="k">override</span><span class="p">;</span><span class="w"></span>
 
-    <span class="n">c10</span><span class="o">::</span><span class="n">intrusive_ptr</span><span class="o">&lt;</span><span class="n">ProcessGroup</span><span class="o">::</span><span class="n">Work</span><span class="o">&gt;</span> <span class="n">allreduce</span><span class="p">(</span>
-        <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">at</span><span class="o">::</span><span class="n">Tensor</span><span class="o">&gt;&amp;</span> <span class="n">tensors</span><span class="p">,</span>
-        <span class="k">const</span> <span class="n">AllreduceOptions</span><span class="o">&amp;</span> <span class="n">opts</span> <span class="o">=</span> <span class="n">AllreduceOptions</span><span class="p">())</span> <span class="k">override</span><span class="p">;</span>
+<span class="w">    </span><span class="n">c10</span><span class="o">::</span><span class="n">intrusive_ptr</span><span class="o">&lt;</span><span class="n">ProcessGroup</span><span class="o">::</span><span class="n">Work</span><span class="o">&gt;</span><span class="w"> </span><span class="n">allreduce</span><span class="p">(</span><span class="w"></span>
+<span class="w">        </span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">at</span><span class="o">::</span><span class="n">Tensor</span><span class="o">&gt;&amp;</span><span class="w"> </span><span class="n">tensors</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="k">const</span><span class="w"> </span><span class="n">AllreduceOptions</span><span class="o">&amp;</span><span class="w"> </span><span class="n">opts</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AllreduceOptions</span><span class="p">())</span><span class="w"> </span><span class="k">override</span><span class="p">;</span><span class="w"></span>
 
-    <span class="c1">// The collective communication APIs without a custom implementation</span>
-    <span class="c1">// will error out if invoked by application code.</span>
-<span class="p">};</span>
-<span class="p">}</span> <span class="c1">// namespace c10d</span>
+<span class="w">    </span><span class="c1">// The collective communication APIs without a custom implementation</span>
+<span class="w">    </span><span class="c1">// will error out if invoked by application code.</span>
+<span class="p">};</span><span class="w"></span>
+<span class="p">}</span><span class="w"> </span><span class="c1">// namespace c10d</span>
 </pre></div>
 </div>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// file name: dummy.cpp</span>
-<span class="cp">#include</span> <span class="cpf">&quot;dummy.hpp&quot;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;dummy.hpp&quot;</span><span class="cp"></span>
 
-<span class="k">namespace</span> <span class="n">c10d</span> <span class="p">{</span>
+<span class="k">namespace</span><span class="w"> </span><span class="nn">c10d</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
 
 <span class="c1">// This is a dummy allgather that sets all output tensors to zero</span>
 <span class="c1">// Modify the implementation to conduct real communication asynchronously</span>
-<span class="n">c10</span><span class="o">::</span><span class="n">intrusive_ptr</span><span class="o">&lt;</span><span class="n">ProcessGroup</span><span class="o">::</span><span class="n">Work</span><span class="o">&gt;</span> <span class="n">ProcessGroupDummy</span><span class="o">::</span><span class="n">allgather</span><span class="p">(</span>
-        <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">at</span><span class="o">::</span><span class="n">Tensor</span><span class="o">&gt;&gt;&amp;</span> <span class="n">outputTensors</span><span class="p">,</span>
-        <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">at</span><span class="o">::</span><span class="n">Tensor</span><span class="o">&gt;&amp;</span> <span class="n">inputTensors</span><span class="p">,</span>
-        <span class="k">const</span> <span class="n">AllgatherOptions</span><span class="o">&amp;</span> <span class="cm">/* unused */</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">for</span> <span class="p">(</span><span class="k">auto</span><span class="o">&amp;</span> <span class="nl">outputTensorVec</span> <span class="p">:</span> <span class="n">outputTensors</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">for</span> <span class="p">(</span><span class="k">auto</span><span class="o">&amp;</span> <span class="nl">outputTensor</span> <span class="p">:</span> <span class="n">outputTensorVec</span><span class="p">)</span> <span class="p">{</span>
-            <span class="n">outputTensor</span><span class="p">.</span><span class="n">zero_</span><span class="p">();</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
+<span class="n">c10</span><span class="o">::</span><span class="n">intrusive_ptr</span><span class="o">&lt;</span><span class="n">ProcessGroup</span><span class="o">::</span><span class="n">Work</span><span class="o">&gt;</span><span class="w"> </span><span class="n">ProcessGroupDummy</span><span class="o">::</span><span class="n">allgather</span><span class="p">(</span><span class="w"></span>
+<span class="w">        </span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">at</span><span class="o">::</span><span class="n">Tensor</span><span class="o">&gt;&gt;&amp;</span><span class="w"> </span><span class="n">outputTensors</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">at</span><span class="o">::</span><span class="n">Tensor</span><span class="o">&gt;&amp;</span><span class="w"> </span><span class="n">inputTensors</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="k">const</span><span class="w"> </span><span class="n">AllgatherOptions</span><span class="o">&amp;</span><span class="w"> </span><span class="cm">/* unused */</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="k">auto</span><span class="o">&amp;</span><span class="w"> </span><span class="n">outputTensorVec</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">outputTensors</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="k">auto</span><span class="o">&amp;</span><span class="w"> </span><span class="n">outputTensor</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">outputTensorVec</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">outputTensor</span><span class="p">.</span><span class="n">zero_</span><span class="p">();</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
 
-    <span class="k">auto</span> <span class="n">future</span> <span class="o">=</span> <span class="n">c10</span><span class="o">::</span><span class="n">make_intrusive</span><span class="o">&lt;</span><span class="n">c10</span><span class="o">::</span><span class="n">ivalue</span><span class="o">::</span><span class="n">Future</span><span class="o">&gt;</span><span class="p">(</span>
-        <span class="n">c10</span><span class="o">::</span><span class="n">ListType</span><span class="o">::</span><span class="n">create</span><span class="p">(</span><span class="n">c10</span><span class="o">::</span><span class="n">ListType</span><span class="o">::</span><span class="n">create</span><span class="p">(</span><span class="n">c10</span><span class="o">::</span><span class="n">TensorType</span><span class="o">::</span><span class="n">get</span><span class="p">())));</span>
-    <span class="n">future</span><span class="o">-&gt;</span><span class="n">markCompleted</span><span class="p">(</span><span class="n">c10</span><span class="o">::</span><span class="n">IValue</span><span class="p">(</span><span class="n">outputTensors</span><span class="p">));</span>
-    <span class="k">return</span> <span class="n">c10</span><span class="o">::</span><span class="n">make_intrusive</span><span class="o">&lt;</span><span class="n">WorkDummy</span><span class="o">&gt;</span><span class="p">(</span><span class="n">OpType</span><span class="o">::</span><span class="n">ALLGATHER</span><span class="p">,</span> <span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">future</span><span class="p">));</span>
-<span class="p">}</span>
+<span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">future</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">c10</span><span class="o">::</span><span class="n">make_intrusive</span><span class="o">&lt;</span><span class="n">c10</span><span class="o">::</span><span class="n">ivalue</span><span class="o">::</span><span class="n">Future</span><span class="o">&gt;</span><span class="p">(</span><span class="w"></span>
+<span class="w">        </span><span class="n">c10</span><span class="o">::</span><span class="n">ListType</span><span class="o">::</span><span class="n">create</span><span class="p">(</span><span class="n">c10</span><span class="o">::</span><span class="n">ListType</span><span class="o">::</span><span class="n">create</span><span class="p">(</span><span class="n">c10</span><span class="o">::</span><span class="n">TensorType</span><span class="o">::</span><span class="n">get</span><span class="p">())));</span><span class="w"></span>
+<span class="w">    </span><span class="n">future</span><span class="o">-&gt;</span><span class="n">markCompleted</span><span class="p">(</span><span class="n">c10</span><span class="o">::</span><span class="n">IValue</span><span class="p">(</span><span class="n">outputTensors</span><span class="p">));</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">c10</span><span class="o">::</span><span class="n">make_intrusive</span><span class="o">&lt;</span><span class="n">WorkDummy</span><span class="o">&gt;</span><span class="p">(</span><span class="n">OpType</span><span class="o">::</span><span class="n">ALLGATHER</span><span class="p">,</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">future</span><span class="p">));</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
 
 <span class="c1">// This is a dummy allreduce that sets all output tensors to zero</span>
 <span class="c1">// Modify the implementation to conduct real communication asynchronously</span>
-<span class="n">c10</span><span class="o">::</span><span class="n">intrusive_ptr</span><span class="o">&lt;</span><span class="n">ProcessGroup</span><span class="o">::</span><span class="n">Work</span><span class="o">&gt;</span> <span class="n">ProcessGroupDummy</span><span class="o">::</span><span class="n">allreduce</span><span class="p">(</span>
-        <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">at</span><span class="o">::</span><span class="n">Tensor</span><span class="o">&gt;&amp;</span> <span class="n">tensors</span><span class="p">,</span>
-        <span class="k">const</span> <span class="n">AllreduceOptions</span><span class="o">&amp;</span> <span class="n">opts</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">for</span> <span class="p">(</span><span class="k">auto</span><span class="o">&amp;</span> <span class="nl">tensor</span> <span class="p">:</span> <span class="n">tensors</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">tensor</span><span class="p">.</span><span class="n">zero_</span><span class="p">();</span>
-    <span class="p">}</span>
+<span class="n">c10</span><span class="o">::</span><span class="n">intrusive_ptr</span><span class="o">&lt;</span><span class="n">ProcessGroup</span><span class="o">::</span><span class="n">Work</span><span class="o">&gt;</span><span class="w"> </span><span class="n">ProcessGroupDummy</span><span class="o">::</span><span class="n">allreduce</span><span class="p">(</span><span class="w"></span>
+<span class="w">        </span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">at</span><span class="o">::</span><span class="n">Tensor</span><span class="o">&gt;&amp;</span><span class="w"> </span><span class="n">tensors</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="k">const</span><span class="w"> </span><span class="n">AllreduceOptions</span><span class="o">&amp;</span><span class="w"> </span><span class="n">opts</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="k">auto</span><span class="o">&amp;</span><span class="w"> </span><span class="n">tensor</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">tensors</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">tensor</span><span class="p">.</span><span class="n">zero_</span><span class="p">();</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
 
-    <span class="k">auto</span> <span class="n">future</span> <span class="o">=</span> <span class="n">c10</span><span class="o">::</span><span class="n">make_intrusive</span><span class="o">&lt;</span><span class="n">c10</span><span class="o">::</span><span class="n">ivalue</span><span class="o">::</span><span class="n">Future</span><span class="o">&gt;</span><span class="p">(</span>
-        <span class="n">c10</span><span class="o">::</span><span class="n">ListType</span><span class="o">::</span><span class="n">create</span><span class="p">(</span><span class="n">c10</span><span class="o">::</span><span class="n">TensorType</span><span class="o">::</span><span class="n">get</span><span class="p">()));</span>
-    <span class="n">future</span><span class="o">-&gt;</span><span class="n">markCompleted</span><span class="p">(</span><span class="n">c10</span><span class="o">::</span><span class="n">IValue</span><span class="p">(</span><span class="n">tensors</span><span class="p">));</span>
-    <span class="k">return</span> <span class="n">c10</span><span class="o">::</span><span class="n">make_intrusive</span><span class="o">&lt;</span><span class="n">WorkDummy</span><span class="o">&gt;</span><span class="p">(</span><span class="n">OpType</span><span class="o">::</span><span class="n">ALLGATHER</span><span class="p">,</span> <span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">future</span><span class="p">));</span>
-<span class="p">}</span>
-<span class="p">}</span> <span class="c1">// namespace c10d</span>
+<span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">future</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">c10</span><span class="o">::</span><span class="n">make_intrusive</span><span class="o">&lt;</span><span class="n">c10</span><span class="o">::</span><span class="n">ivalue</span><span class="o">::</span><span class="n">Future</span><span class="o">&gt;</span><span class="p">(</span><span class="w"></span>
+<span class="w">        </span><span class="n">c10</span><span class="o">::</span><span class="n">ListType</span><span class="o">::</span><span class="n">create</span><span class="p">(</span><span class="n">c10</span><span class="o">::</span><span class="n">TensorType</span><span class="o">::</span><span class="n">get</span><span class="p">()));</span><span class="w"></span>
+<span class="w">    </span><span class="n">future</span><span class="o">-&gt;</span><span class="n">markCompleted</span><span class="p">(</span><span class="n">c10</span><span class="o">::</span><span class="n">IValue</span><span class="p">(</span><span class="n">tensors</span><span class="p">));</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">c10</span><span class="o">::</span><span class="n">make_intrusive</span><span class="o">&lt;</span><span class="n">WorkDummy</span><span class="o">&gt;</span><span class="p">(</span><span class="n">OpType</span><span class="o">::</span><span class="n">ALLGATHER</span><span class="p">,</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">future</span><span class="p">));</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"> </span><span class="c1">// namespace c10d</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="step-2-expose-the-extension-python-apis">
+</section>
+<section id="step-2-expose-the-extension-python-apis">
 <h2>Step 2: Expose The Extension Python APIs<a class="headerlink" href="#step-2-expose-the-extension-python-apis" title="Permalink to this headline">¶</a></h2>
 <p>The backend constructors are called
 <a class="reference external" href="https://github.com/pytorch/pytorch/blob/v1.9.0/torch/distributed/distributed_c10d.py#L643-L650">from Python side</a>,
@@ -550,39 +551,39 @@ be done by adding the following methods. In this example, <code class="docutils 
 those are not used in this dummy implementation. However, real-world extensions
 should consider using the <code class="docutils literal notranslate"><span class="pre">store</span></code> to perform rendezvous and supporting the
 <code class="docutils literal notranslate"><span class="pre">timeout</span></code> argument.</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">ProcessGroupDummy</span> <span class="o">:</span> <span class="k">public</span> <span class="n">ProcessGroup</span> <span class="p">{</span>
-    <span class="k">static</span> <span class="n">c10</span><span class="o">::</span><span class="n">intrusive_ptr</span><span class="o">&lt;</span><span class="n">ProcessGroup</span><span class="o">&gt;</span> <span class="n">createProcessGroupDummy</span><span class="p">(</span>
-        <span class="k">const</span> <span class="n">c10</span><span class="o">::</span><span class="n">intrusive_ptr</span><span class="o">&lt;::</span><span class="n">c10d</span><span class="o">::</span><span class="n">Store</span><span class="o">&gt;&amp;</span> <span class="n">store</span><span class="p">,</span>
-        <span class="kt">int</span> <span class="n">rank</span><span class="p">,</span>
-        <span class="kt">int</span> <span class="n">size</span><span class="p">,</span>
-        <span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">chrono</span><span class="o">::</span><span class="n">duration</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;&amp;</span> <span class="n">timeout</span><span class="p">);</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">ProcessGroupDummy</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="n">ProcessGroup</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">static</span><span class="w"> </span><span class="n">c10</span><span class="o">::</span><span class="n">intrusive_ptr</span><span class="o">&lt;</span><span class="n">ProcessGroup</span><span class="o">&gt;</span><span class="w"> </span><span class="n">createProcessGroupDummy</span><span class="p">(</span><span class="w"></span>
+<span class="w">        </span><span class="k">const</span><span class="w"> </span><span class="n">c10</span><span class="o">::</span><span class="n">intrusive_ptr</span><span class="o">&lt;::</span><span class="n">c10d</span><span class="o">::</span><span class="n">Store</span><span class="o">&gt;&amp;</span><span class="w"> </span><span class="n">store</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">rank</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">size</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">chrono</span><span class="o">::</span><span class="n">duration</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;&amp;</span><span class="w"> </span><span class="n">timeout</span><span class="p">);</span><span class="w"></span>
 
-    <span class="k">static</span> <span class="kt">void</span> <span class="n">ProcessGroupDummyConstructor</span><span class="p">()</span> <span class="n">__attribute__</span><span class="p">((</span><span class="n">constructor</span><span class="p">))</span> <span class="p">{</span>
-        <span class="n">py</span><span class="o">::</span><span class="n">object</span> <span class="k">module</span> <span class="o">=</span> <span class="n">py</span><span class="o">::</span><span class="k">module</span><span class="o">::</span><span class="k">import</span><span class="p">(</span><span class="s">&quot;torch.distributed&quot;</span><span class="p">);</span>
-        <span class="n">py</span><span class="o">::</span><span class="n">object</span> <span class="n">register_backend</span> <span class="o">=</span>
-            <span class="k">module</span><span class="p">.</span><span class="n">attr</span><span class="p">(</span><span class="s">&quot;Backend&quot;</span><span class="p">).</span><span class="n">attr</span><span class="p">(</span><span class="s">&quot;register_backend&quot;</span><span class="p">);</span>
-        <span class="c1">// torch.distributed.Backend.register_backend will add `dummy` as a</span>
-        <span class="c1">// new valid backend.</span>
-        <span class="n">register_backend</span><span class="p">(</span><span class="s">&quot;dummy&quot;</span><span class="p">,</span> <span class="n">py</span><span class="o">::</span><span class="n">cpp_function</span><span class="p">(</span><span class="n">createProcessGroupDummy</span><span class="p">));</span>
-    <span class="p">}</span>
-<span class="p">}</span>
+<span class="w">    </span><span class="k">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">ProcessGroupDummyConstructor</span><span class="p">()</span><span class="w"> </span><span class="n">__attribute__</span><span class="p">((</span><span class="n">constructor</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">py</span><span class="o">::</span><span class="n">object</span><span class="w"> </span><span class="k">module</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">py</span><span class="o">::</span><span class="k">module</span><span class="o">::</span><span class="k">import</span><span class="p">(</span><span class="s">&quot;torch.distributed&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="n">py</span><span class="o">::</span><span class="n">object</span><span class="w"> </span><span class="n">register_backend</span><span class="w"> </span><span class="o">=</span><span class="w"></span>
+<span class="w">            </span><span class="k">module</span><span class="p">.</span><span class="n">attr</span><span class="p">(</span><span class="s">&quot;Backend&quot;</span><span class="p">).</span><span class="n">attr</span><span class="p">(</span><span class="s">&quot;register_backend&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="c1">// torch.distributed.Backend.register_backend will add `dummy` as a</span>
+<span class="w">        </span><span class="c1">// new valid backend.</span>
+<span class="w">        </span><span class="n">register_backend</span><span class="p">(</span><span class="s">&quot;dummy&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">py</span><span class="o">::</span><span class="n">cpp_function</span><span class="p">(</span><span class="n">createProcessGroupDummy</span><span class="p">));</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
 </pre></div>
 </div>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">c10</span><span class="o">::</span><span class="n">intrusive_ptr</span><span class="o">&lt;</span><span class="n">ProcessGroup</span><span class="o">&gt;</span> <span class="n">ProcessGroupDummy</span><span class="o">::</span><span class="n">createProcessGroupDummy</span><span class="p">(</span>
-        <span class="k">const</span> <span class="n">c10</span><span class="o">::</span><span class="n">intrusive_ptr</span><span class="o">&lt;::</span><span class="n">c10d</span><span class="o">::</span><span class="n">Store</span><span class="o">&gt;&amp;</span> <span class="cm">/* unused */</span><span class="p">,</span>
-        <span class="kt">int</span> <span class="n">rank</span><span class="p">,</span>
-        <span class="kt">int</span> <span class="n">size</span><span class="p">,</span>
-        <span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">chrono</span><span class="o">::</span><span class="n">duration</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;&amp;</span> <span class="cm">/* unused */</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="n">c10</span><span class="o">::</span><span class="n">make_intrusive</span><span class="o">&lt;</span><span class="n">ProcessGroupDummy</span><span class="o">&gt;</span><span class="p">(</span><span class="n">rank</span><span class="p">,</span> <span class="n">size</span><span class="p">);</span>
-<span class="p">}</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">c10</span><span class="o">::</span><span class="n">intrusive_ptr</span><span class="o">&lt;</span><span class="n">ProcessGroup</span><span class="o">&gt;</span><span class="w"> </span><span class="n">ProcessGroupDummy</span><span class="o">::</span><span class="n">createProcessGroupDummy</span><span class="p">(</span><span class="w"></span>
+<span class="w">        </span><span class="k">const</span><span class="w"> </span><span class="n">c10</span><span class="o">::</span><span class="n">intrusive_ptr</span><span class="o">&lt;::</span><span class="n">c10d</span><span class="o">::</span><span class="n">Store</span><span class="o">&gt;&amp;</span><span class="w"> </span><span class="cm">/* unused */</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">rank</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">size</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">chrono</span><span class="o">::</span><span class="n">duration</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;&amp;</span><span class="w"> </span><span class="cm">/* unused */</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">c10</span><span class="o">::</span><span class="n">make_intrusive</span><span class="o">&lt;</span><span class="n">ProcessGroupDummy</span><span class="o">&gt;</span><span class="p">(</span><span class="n">rank</span><span class="p">,</span><span class="w"> </span><span class="n">size</span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
 
-<span class="n">PYBIND11_MODULE</span><span class="p">(</span><span class="n">TORCH_EXTENSION_NAME</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">m</span><span class="p">.</span><span class="n">def</span><span class="p">(</span><span class="s">&quot;createProcessGroupDummy&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">ProcessGroupDummy</span><span class="o">::</span><span class="n">createProcessGroupDummy</span><span class="p">);</span>
-<span class="p">}</span>
+<span class="n">PYBIND11_MODULE</span><span class="p">(</span><span class="n">TORCH_EXTENSION_NAME</span><span class="p">,</span><span class="w"> </span><span class="n">m</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">m</span><span class="p">.</span><span class="n">def</span><span class="p">(</span><span class="s">&quot;createProcessGroupDummy&quot;</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">ProcessGroupDummy</span><span class="o">::</span><span class="n">createProcessGroupDummy</span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="step-3-build-the-custom-extension">
+</section>
+<section id="step-3-build-the-custom-extension">
 <h2>Step 3: Build The Custom Extension<a class="headerlink" href="#step-3-build-the-custom-extension" title="Permalink to this headline">¶</a></h2>
 <p>Now, the extension source code files are ready. We can then use
 <a class="reference external" href="https://pytorch.org/docs/stable/cpp_extension.html">cpp extensions</a>
@@ -623,8 +624,8 @@ project as a real-world example.</p>
 <span class="p">)</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="step-4-use-the-extension-in-application">
+</section>
+<section id="step-4-use-the-extension-in-application">
 <h2>Step 4: Use The Extension in Application<a class="headerlink" href="#step-4-use-the-extension-in-application" title="Permalink to this headline">¶</a></h2>
 <p>After installation, you can conveniently use the <code class="docutils literal notranslate"><span class="pre">dummy</span></code> backend when calling
 <a class="reference external" href="https://pytorch.org/docs/stable/distributed.html#torch.distributed.init_process_group">init_process_group</a>
@@ -657,8 +658,8 @@ as if it is an builtin backend.</p>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;got RuntimeError as broadcast is not implemented in Dummy ProcessGroup&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-</div>
+</section>
+</section>
 
 
              </article>
@@ -734,7 +735,7 @@ as if it is an builtin backend.</p>
 
 
   
-
+  
      
        <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
          <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
@@ -747,7 +748,6 @@ as if it is an builtin backend.</p>
          <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
          <script src="../_static/katex_autorenderer.js"></script>
      
-
   
 
   <script type="text/javascript" src="../_static/js/vendor/popper.min.js"></script>

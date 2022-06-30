@@ -6,7 +6,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
 <meta property="og:title" content="Real Time Inference on Raspberry Pi 4 (30 fps!)" />
   
 <meta property="og:type" content="article" />
@@ -391,7 +392,7 @@
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <div class="section" id="real-time-inference-on-raspberry-pi-4-30-fps">
+  <section id="real-time-inference-on-raspberry-pi-4-30-fps">
 <h1>Real Time Inference on Raspberry Pi 4 (30 fps!)<a class="headerlink" href="#real-time-inference-on-raspberry-pi-4-30-fps" title="Permalink to this headline">¶</a></h1>
 <p><strong>Author</strong>: <a class="reference external" href="https://github.com/d4l3k">Tristan Rice</a></p>
 <p>PyTorch has out of the box support for Raspberry Pi 4. This tutorial will guide
@@ -400,7 +401,7 @@ classification model in real time (30 fps+) on the CPU.</p>
 <p>This was all tested with Raspberry Pi 4 Model B 4GB but should work with the 2GB
 variant as well as on the 3B with reduced performance.</p>
 <img alt="https://user-images.githubusercontent.com/909104/153093710-bc736b6f-69d9-4a50-a3e8-9f2b2c9e04fd.gif" src="https://user-images.githubusercontent.com/909104/153093710-bc736b6f-69d9-4a50-a3e8-9f2b2c9e04fd.gif" />
-<div class="section" id="prerequisites">
+<section id="prerequisites">
 <h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline">¶</a></h2>
 <p>To follow this tutorial you’ll need a Raspberry Pi 4, a camera for it and all
 the other standard accessories.</p>
@@ -412,8 +413,8 @@ the other standard accessories.</p>
 <li><p>SD card (at least 8gb)</p></li>
 <li><p>SD card read/writer</p></li>
 </ul>
-</div>
-<div class="section" id="raspberry-pi-4-setup">
+</section>
+<section id="raspberry-pi-4-setup">
 <h2>Raspberry Pi 4 Setup<a class="headerlink" href="#raspberry-pi-4-setup" title="Permalink to this headline">¶</a></h2>
 <p>PyTorch only provides pip packages for Arm 64bit (aarch64) so you’ll need to install a 64 bit version of the OS on your Raspberry Pi</p>
 <p>You can download the latest arm64 Raspberry Pi OS from <a class="reference external" href="https://downloads.raspberrypi.org/raspios_arm64/images/">https://downloads.raspberrypi.org/raspios_arm64/images/</a> and install it via rpi-imager.</p>
@@ -424,19 +425,19 @@ the other standard accessories.</p>
 <p>Time to put your sdcard in your Raspberry Pi, connect the camera and boot it up.</p>
 <img alt="https://user-images.githubusercontent.com/909104/152869862-c239c980-b089-4bd5-84eb-0a1e5cf22df2.png" src="https://user-images.githubusercontent.com/909104/152869862-c239c980-b089-4bd5-84eb-0a1e5cf22df2.png" />
 <p>Once that boots and you complete the initial setup you’ll need to edit the <code class="docutils literal notranslate"><span class="pre">/boot/config.txt</span></code> file to enable the camera.</p>
-<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="c1"># This enables the extended features such as the camera.</span>
-<span class="n">start_x</span><span class="o">=</span><span class="mi">1</span>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="c1"># This enables the extended features such as the camera.</span><span class="w"></span>
+<span class="n">start_x</span><span class="o">=</span><span class="mi">1</span><span class="w"></span>
 
-<span class="c1"># This needs to be at least 128M for the camera processing, if it&#39;s bigger you can just leave it as is.</span>
-<span class="n">gpu_mem</span><span class="o">=</span><span class="mi">128</span>
+<span class="c1"># This needs to be at least 128M for the camera processing, if it&#39;s bigger you can just leave it as is.</span><span class="w"></span>
+<span class="n">gpu_mem</span><span class="o">=</span><span class="mi">128</span><span class="w"></span>
 
-<span class="c1"># You need to commment/remove the existing camera_auto_detect line since this causes issues with OpenCV/V4L2 capture.</span>
-<span class="c1">#camera_auto_detect=1</span>
+<span class="c1"># You need to commment/remove the existing camera_auto_detect line since this causes issues with OpenCV/V4L2 capture.</span><span class="w"></span>
+<span class="c1">#camera_auto_detect=1</span><span class="w"></span>
 </pre></div>
 </div>
 <p>And then reboot. After you reboot the video4linux2 device <code class="docutils literal notranslate"><span class="pre">/dev/video0</span></code> should exist.</p>
-</div>
-<div class="section" id="installing-pytorch-and-opencv">
+</section>
+<section id="installing-pytorch-and-opencv">
 <h2>Installing PyTorch and OpenCV<a class="headerlink" href="#installing-pytorch-and-opencv" title="Permalink to this headline">¶</a></h2>
 <p>PyTorch and all the other libraries we need have ARM 64-bit/aarch64 variants so you can just install them via pip and have it work like any other Linux system.</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ pip install torch torchvision torchaudio
@@ -450,8 +451,8 @@ $ pip install numpy --upgrade
 </pre></div>
 </div>
 <img alt="https://user-images.githubusercontent.com/909104/152874271-d7057c2d-80fd-4761-aed4-df6c8b7aa99f.png" src="https://user-images.githubusercontent.com/909104/152874271-d7057c2d-80fd-4761-aed4-df6c8b7aa99f.png" />
-</div>
-<div class="section" id="video-capture">
+</section>
+<section id="video-capture">
 <h2>Video Capture<a class="headerlink" href="#video-capture" title="Permalink to this headline">¶</a></h2>
 <p>For video capture we’re going to be using OpenCV to stream the video frames
 instead of the more common <code class="docutils literal notranslate"><span class="pre">picamera</span></code>. <cite>picamera</cite> isn’t available on 64-bit
@@ -478,8 +479,8 @@ shuffling to get it into the expected RGB format.</p>
 </pre></div>
 </div>
 <p>This data reading and processing takes about <code class="docutils literal notranslate"><span class="pre">3.5</span> <span class="pre">ms</span></code>.</p>
-</div>
-<div class="section" id="image-preprocessing">
+</section>
+<section id="image-preprocessing">
 <h2>Image Preprocessing<a class="headerlink" href="#image-preprocessing" title="Permalink to this headline">¶</a></h2>
 <p>We need to take the frames and transform them into the format the model expects. This is the same processing as you would do on any machine with the standard torchvision transforms.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torchvision</span> <span class="kn">import</span> <span class="n">transforms</span>
@@ -497,8 +498,8 @@ shuffling to get it into the expected RGB format.</p>
 <span class="n">input_batch</span> <span class="o">=</span> <span class="n">input_tensor</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="model-choices">
+</section>
+<section id="model-choices">
 <h2>Model Choices<a class="headerlink" href="#model-choices" title="Permalink to this headline">¶</a></h2>
 <p>There’s a number of models you can choose from to use with different performance
 characteristics. Not all models provide a <code class="docutils literal notranslate"><span class="pre">qnnpack</span></code> pretrained variant so for
@@ -592,8 +593,8 @@ accuracy.</p>
 </tr>
 </tbody>
 </table>
-</div>
-<div class="section" id="mobilenetv2-quantization-and-jit">
+</section>
+<section id="mobilenetv2-quantization-and-jit">
 <h2>MobileNetV2: Quantization and JIT<a class="headerlink" href="#mobilenetv2-quantization-and-jit" title="Permalink to this headline">¶</a></h2>
 <p>For optimal performance we want a model that’s quantized and fused. Quantized
 means that it does the computation using int8 which is much more performant than
@@ -615,8 +616,8 @@ during inference.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">net</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">script</span><span class="p">(</span><span class="n">net</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="putting-it-together">
+</section>
+<section id="putting-it-together">
 <h2>Putting It Together<a class="headerlink" href="#putting-it-together" title="Permalink to this headline">¶</a></h2>
 <p>We can now put all the pieces together and run it:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
@@ -701,8 +702,8 @@ to print the detections.</p>
 <img alt="https://user-images.githubusercontent.com/909104/153092153-d9c08dfe-105b-408a-8e1e-295da8a78c19.jpg" src="https://user-images.githubusercontent.com/909104/153092153-d9c08dfe-105b-408a-8e1e-295da8a78c19.jpg" />
 <p>Detecting a mug:</p>
 <img alt="https://user-images.githubusercontent.com/909104/153092155-4b90002f-a0f3-4267-8d70-e713e7b4d5a0.jpg" src="https://user-images.githubusercontent.com/909104/153092155-4b90002f-a0f3-4267-8d70-e713e7b4d5a0.jpg" />
-</div>
-<div class="section" id="troubleshooting-performance">
+</section>
+<section id="troubleshooting-performance">
 <h2>Troubleshooting: Performance<a class="headerlink" href="#troubleshooting-performance" title="Permalink to this headline">¶</a></h2>
 <p>PyTorch by default will use all of the cores available. If you have anything
 running in the background on the Raspberry Pi it may cause contention with the
@@ -715,8 +716,8 @@ penalty.</p>
 <p>For <code class="docutils literal notranslate"><span class="pre">shufflenet_v2_x1_5</span></code> using <code class="docutils literal notranslate"><span class="pre">2</span> <span class="pre">threads</span></code> instead of <code class="docutils literal notranslate"><span class="pre">4</span> <span class="pre">threads</span></code>
 increases best case latency to <code class="docutils literal notranslate"><span class="pre">72</span> <span class="pre">ms</span></code> from <code class="docutils literal notranslate"><span class="pre">60</span> <span class="pre">ms</span></code> but eliminates the
 latency spikes of <code class="docutils literal notranslate"><span class="pre">128</span> <span class="pre">ms</span></code>.</p>
-</div>
-<div class="section" id="next-steps">
+</section>
+<section id="next-steps">
 <h2>Next Steps<a class="headerlink" href="#next-steps" title="Permalink to this headline">¶</a></h2>
 <p>You can create your own model or fine tune an existing one. If you fine tune on
 one of the models from
@@ -729,8 +730,8 @@ directly deploy with good performance on a Raspberry Pi.</p>
 <li><p><a class="reference external" href="https://pytorch.org/tutorials/beginner/transfer_learning_tutorial.html">Transfer Learning Tutorial</a>
 for how to use transfer learning to fine tune a pre-existing model to your dataset.</p></li>
 </ul>
-</div>
-</div>
+</section>
+</section>
 
 
              </article>
@@ -811,7 +812,7 @@ for how to use transfer learning to fine tune a pre-existing model to your datas
 
 
   
-
+  
      
        <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
          <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
@@ -824,7 +825,6 @@ for how to use transfer learning to fine tune a pre-existing model to your datas
          <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
          <script src="../_static/katex_autorenderer.js"></script>
      
-
   
 
   <script type="text/javascript" src="../_static/js/vendor/popper.min.js"></script>

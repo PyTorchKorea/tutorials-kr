@@ -6,7 +6,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
 <meta property="og:title" content="(prototype) FX Graph Mode Post Training Static Quantization" />
   
 <meta property="og:type" content="article" />
@@ -389,7 +390,7 @@
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <div class="section" id="prototype-fx-graph-mode-post-training-static-quantization">
+  <section id="prototype-fx-graph-mode-post-training-static-quantization">
 <h1>(prototype) FX Graph Mode Post Training Static Quantization<a class="headerlink" href="#prototype-fx-graph-mode-post-training-static-quantization" title="Permalink to this headline">¶</a></h1>
 <p><strong>Author</strong>: <a class="reference external" href="https://github.com/jerryzh168">Jerry Zhang</a></p>
 <p>This tutorial introduces the steps to do post training static quantization in graph mode based on
@@ -416,7 +417,7 @@ tldr; The FX Graph Mode API looks like the following:</p>
 <span class="n">quantized_model</span> <span class="o">=</span> <span class="n">convert_fx</span><span class="p">(</span><span class="n">prepared_model</span><span class="p">)</span>  <span class="c1"># convert the calibrated model to a quantized model</span>
 </pre></div>
 </div>
-<div class="section" id="motivation-of-fx-graph-mode-quantization">
+<section id="motivation-of-fx-graph-mode-quantization">
 <h2>1. Motivation of FX Graph Mode Quantization<a class="headerlink" href="#motivation-of-fx-graph-mode-quantization" title="Permalink to this headline">¶</a></h2>
 <p>Currently PyTorch only has eager mode quantization: <a class="reference external" href="https://tutorials.pytorch.kr/advanced/static_quantization_tutorial.html">Static Quantization with Eager Mode in PyTorch</a>.</p>
 <p>We can see there are multiple manual steps involved in the process, including:</p>
@@ -433,8 +434,8 @@ In graph mode, we can inspect the actual code that’s been executed in forward 
 <li><p>Simple quantization flow, minimal manual steps</p></li>
 <li><p>Unlocks the possibility of doing higher level optimizations like automatic precision selection</p></li>
 </ul>
-</div>
-<div class="section" id="define-helper-functions-and-prepare-dataset">
+</section>
+<section id="define-helper-functions-and-prepare-dataset">
 <h2>2. Define Helper Functions and Prepare Dataset<a class="headerlink" href="#define-helper-functions-and-prepare-dataset" title="Permalink to this headline">¶</a></h2>
 <p>We’ll start by doing the necessary imports, defining some helper functions and prepare the data.
 These steps are identitcal to <a class="reference external" href="https://tutorials.pytorch.kr/advanced/static_quantization_tutorial.html">Static Quantization with Eager Mode in PyTorch</a>.</p>
@@ -596,15 +597,15 @@ These steps are identitcal to <a class="reference external" href="https://tutori
 <span class="n">model_to_quantize</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">float_model</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="set-model-to-eval-mode">
+</section>
+<section id="set-model-to-eval-mode">
 <h2>3. Set model to eval mode<a class="headerlink" href="#set-model-to-eval-mode" title="Permalink to this headline">¶</a></h2>
 <p>For post training quantization, we’ll need to set model to eval mode.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model_to_quantize</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="specify-how-to-quantize-the-model-with-qconfig-dict">
+</section>
+<section id="specify-how-to-quantize-the-model-with-qconfig-dict">
 <h2>4. Specify how to quantize the model with <code class="docutils literal notranslate"><span class="pre">qconfig_dict</span></code><a class="headerlink" href="#specify-how-to-quantize-the-model-with-qconfig-dict" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">qconfig_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;&quot;</span> <span class="p">:</span> <span class="n">default_qconfig</span><span class="p">}</span>
 </pre></div>
@@ -661,8 +662,8 @@ qconfig_dict = {
 <span class="n">qconfig_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;&quot;</span><span class="p">:</span> <span class="n">qconfig</span><span class="p">}</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="prepare-the-model-for-post-training-static-quantization">
+</section>
+<section id="prepare-the-model-for-post-training-static-quantization">
 <h2>5. Prepare the Model for Post Training Static Quantization<a class="headerlink" href="#prepare-the-model-for-post-training-static-quantization" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">prepared_model</span> <span class="o">=</span> <span class="n">prepare_fx</span><span class="p">(</span><span class="n">model_to_quantize</span><span class="p">,</span> <span class="n">qconfig_dict</span><span class="p">)</span>
 </pre></div>
@@ -673,8 +674,8 @@ in appropriate places in the model.</p>
 <span class="nb">print</span><span class="p">(</span><span class="n">prepared_model</span><span class="o">.</span><span class="n">graph</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="calibration">
+</section>
+<section id="calibration">
 <h2>6. Calibration<a class="headerlink" href="#calibration" title="Permalink to this headline">¶</a></h2>
 <p>Calibration function is run after the observers are inserted in the model.
 The purpose for calibration is to run through some sample examples that is representative of the workload
@@ -688,16 +689,16 @@ the statistics of the Tensors and we can later use this information to calculate
 <span class="n">calibrate</span><span class="p">(</span><span class="n">prepared_model</span><span class="p">,</span> <span class="n">data_loader_test</span><span class="p">)</span>  <span class="c1"># run calibration on sample data</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="convert-the-model-to-a-quantized-model">
+</section>
+<section id="convert-the-model-to-a-quantized-model">
 <h2>7. Convert the Model to a Quantized Model<a class="headerlink" href="#convert-the-model-to-a-quantized-model" title="Permalink to this headline">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">convert_fx</span></code> takes a calibrated model and produces a quantized model.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">quantized_model</span> <span class="o">=</span> <span class="n">convert_fx</span><span class="p">(</span><span class="n">prepared_model</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">quantized_model</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="evaluation">
+</section>
+<section id="evaluation">
 <h2>8. Evaluation<a class="headerlink" href="#evaluation" title="Permalink to this headline">¶</a></h2>
 <p>We can now print the size and accuracy of the quantized model.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Size of model before quantization&quot;</span><span class="p">)</span>
@@ -734,8 +735,8 @@ the statistics of the Tensors and we can later use this information to calculate
 <p>If you want to get better accuracy or performance,  try changing the <cite>qconfig_dict</cite>.
 We plan to add support for graph mode in the Numerical Suite so that you can
 easily determine the sensitivity towards quantization of different modules in a model: <a class="reference external" href="https://tutorials.pytorch.kr/prototype/numeric_suite_tutorial.html">PyTorch Numeric Suite Tutorial</a></p>
-</div>
-<div class="section" id="debugging-quantized-model">
+</section>
+<section id="debugging-quantized-model">
 <h2>9. Debugging Quantized Model<a class="headerlink" href="#debugging-quantized-model" title="Permalink to this headline">¶</a></h2>
 <p>We can also print the weight for quantized an un-quantized conv to see the difference,
 we’ll first call fuse explicitly to fuse the conv and bn in the model:
@@ -748,8 +749,8 @@ Note that <code class="docutils literal notranslate"><span class="pre">fuse_fx</
 <span class="nb">print</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">conv1_weight_after_fuse</span> <span class="o">-</span> <span class="n">conv1_weight_after_quant</span><span class="p">)))</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="comparison-with-baseline-float-model-and-eager-mode-quantization">
+</section>
+<section id="comparison-with-baseline-float-model-and-eager-mode-quantization">
 <h2>10. Comparison with Baseline Float Model and Eager Mode Quantization<a class="headerlink" href="#comparison-with-baseline-float-model-and-eager-mode-quantization" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">scripted_float_model_file</span> <span class="o">=</span> <span class="s2">&quot;resnet18_scripted.pth&quot;</span>
 
@@ -795,8 +796,8 @@ so the expectation is that the accuracy and speedup are similar as well.</p>
 <p>As we can see for resnet18 both FX graph mode and eager mode quantized model get similar speed up over the floating point model,
 which is around 2-4x faster than the floating point model. But the actual speedup over floating point model may vary
 depending on model, device, build, input batch sizes, threading etc.</p>
-</div>
-</div>
+</section>
+</section>
 
 
              </article>
@@ -868,7 +869,7 @@ depending on model, device, build, input batch sizes, threading etc.</p>
 
 
   
-
+  
      
        <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
          <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
@@ -881,7 +882,6 @@ depending on model, device, build, input batch sizes, threading etc.</p>
          <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
          <script src="../_static/katex_autorenderer.js"></script>
      
-
   
 
   <script type="text/javascript" src="../_static/js/vendor/popper.min.js"></script>

@@ -6,7 +6,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
 <meta property="og:title" content="Parametrizations Tutorial" />
   
 <meta property="og:type" content="article" />
@@ -395,7 +396,7 @@
 <p class="admonition-title">Note</p>
 <p>Click <a class="reference internal" href="#sphx-glr-download-intermediate-parametrizations-py"><span class="std std-ref">here</span></a> to download the full example code</p>
 </div>
-<div class="sphx-glr-example-title section" id="parametrizations-tutorial">
+<section class="sphx-glr-example-title" id="parametrizations-tutorial">
 <span id="sphx-glr-intermediate-parametrizations-py"></span><h1>Parametrizations Tutorial<a class="headerlink" href="#parametrizations-tutorial" title="Permalink to this headline">¶</a></h1>
 <p><strong>Author</strong>: <a class="reference external" href="https://github.com/lezcano">Mario Lezcano</a></p>
 <p>Regularizing deep-learning models is a surprisingly challenging task.
@@ -428,7 +429,7 @@ In other words, they use a function to constrain the parameters.</p>
 <p>In this tutorial, you will learn how to implement and use this pattern to put
 constraints on your model. Doing so is as easy as writing your own <code class="docutils literal notranslate"><span class="pre">nn.Module</span></code>.</p>
 <p>Requirements: <code class="docutils literal notranslate"><span class="pre">torch&gt;=1.9.0</span></code></p>
-<div class="section" id="implementing-parametrizations-by-hand">
+<section id="implementing-parametrizations-by-hand">
 <h2>Implementing parametrizations by hand<a class="headerlink" href="#implementing-parametrizations-by-hand" title="Permalink to this headline">¶</a></h2>
 <p>Assume that we want to have a square linear layer with symmetric weights, that is,
 with weights <code class="docutils literal notranslate"><span class="pre">X</span></code> such that <code class="docutils literal notranslate"><span class="pre">X</span> <span class="pre">=</span> <span class="pre">Xᵀ</span></code>. One way to do so is
@@ -474,8 +475,8 @@ in.</p></li>
 several times during the forward pass, (imagine the recurrent kernel of an RNN), it
 would compute the same <code class="docutils literal notranslate"><span class="pre">A</span></code> every time that the layer is called.</p></li>
 </ol>
-</div>
-<div class="section" id="introduction-to-parametrizations">
+</section>
+<section id="introduction-to-parametrizations">
 <h2>Introduction to parametrizations<a class="headerlink" href="#introduction-to-parametrizations" title="Permalink to this headline">¶</a></h2>
 <p>Parametrizations can solve all these problems as well as others.</p>
 <p>Let’s start by reimplementing the code above using <code class="docutils literal notranslate"><span class="pre">torch.nn.utils.parametrize</span></code>.
@@ -514,8 +515,8 @@ reversed into the lower-triangular part</p>
 <span class="nb">print</span><span class="p">(</span><span class="n">cnn</span><span class="o">.</span><span class="n">weight</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="inspecting-a-parametrized-module">
+</section>
+<section id="inspecting-a-parametrized-module">
 <h2>Inspecting a parametrized module<a class="headerlink" href="#inspecting-a-parametrized-module" title="Permalink to this headline">¶</a></h2>
 <p>When a module is parametrized, we find that the module has changed in three ways:</p>
 <ol class="arabic simple">
@@ -565,16 +566,16 @@ as our manual implementation</p>
 <span class="nb">print</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">dist</span><span class="p">(</span><span class="n">layer</span><span class="o">.</span><span class="n">weight</span><span class="p">,</span> <span class="n">symmetric</span><span class="p">(</span><span class="n">weight_orig</span><span class="p">)))</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="parametrizations-are-first-class-citizens">
+</section>
+<section id="parametrizations-are-first-class-citizens">
 <h2>Parametrizations are first-class citizens<a class="headerlink" href="#parametrizations-are-first-class-citizens" title="Permalink to this headline">¶</a></h2>
 <p>Since <code class="docutils literal notranslate"><span class="pre">layer.parametrizations</span></code> is an <code class="docutils literal notranslate"><span class="pre">nn.ModuleList</span></code>, it means that the parametrizations
 are properly registered as submodules of the original module. As such, the same rules
 for registering parameters in a module apply to register a parametrization.
 For example, if a parametrization has parameters, these will be moved from CPU
 to CUDA when calling <code class="docutils literal notranslate"><span class="pre">model</span> <span class="pre">=</span> <span class="pre">model.cuda()</span></code>.</p>
-</div>
-<div class="section" id="caching-the-value-of-a-parametrization">
+</section>
+<section id="caching-the-value-of-a-parametrization">
 <h2>Caching the value of a parametrization<a class="headerlink" href="#caching-the-value-of-a-parametrization" title="Permalink to this headline">¶</a></h2>
 <p>Parametrizations come with an inbuilt caching system via the context manager
 <code class="docutils literal notranslate"><span class="pre">parametrize.cached()</span></code></p>
@@ -594,8 +595,8 @@ to CUDA when calling <code class="docutils literal notranslate"><span class="pre
     <span class="n">bar</span> <span class="o">=</span> <span class="n">layer</span><span class="o">.</span><span class="n">weight</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="concatenating-parametrizations">
+</section>
+<section id="concatenating-parametrizations">
 <h2>Concatenating parametrizations<a class="headerlink" href="#concatenating-parametrizations" title="Permalink to this headline">¶</a></h2>
 <p>Concatenating two parametrizations is as easy as registering them on the same tensor.
 We may use this to create more complex parametrizations from simpler ones. For example, the
@@ -641,8 +642,8 @@ Using these two facts, we may reuse the parametrizations before to our advantage
 <span class="nb">print</span><span class="p">((</span><span class="n">torch</span><span class="o">.</span><span class="n">symeig</span><span class="p">(</span><span class="n">X</span><span class="p">)</span><span class="o">.</span><span class="n">eigenvalues</span> <span class="o">&gt;</span> <span class="mf">0.</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">())</span>  <span class="c1"># X is positive definite</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="intializing-parametrizations">
+</section>
+<section id="intializing-parametrizations">
 <h2>Intializing parametrizations<a class="headerlink" href="#intializing-parametrizations" title="Permalink to this headline">¶</a></h2>
 <p>Parametrizations come with a mechanism to initialize them. If we implement a method
 <code class="docutils literal notranslate"><span class="pre">right_inverse</span></code> with signature</p>
@@ -737,8 +738,8 @@ that tensor will be, in fact, pruned</p>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Initialized weight:</span><span class="se">\n</span><span class="si">{</span><span class="n">layer</span><span class="o">.</span><span class="n">weight</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="removing-parametrizations">
+</section>
+<section id="removing-parametrizations">
 <h2>Removing parametrizations<a class="headerlink" href="#removing-parametrizations" title="Permalink to this headline">¶</a></h2>
 <p>We may remove all the parametrizations from a parameter or a buffer in a module
 by using <code class="docutils literal notranslate"><span class="pre">parametrize.remove_parametrizations()</span></code></p>
@@ -783,8 +784,8 @@ the flag <code class="docutils literal notranslate"><span class="pre">leave_para
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
-</div>
-</div>
+</section>
+</section>
 
 
              </article>
@@ -863,7 +864,7 @@ the flag <code class="docutils literal notranslate"><span class="pre">leave_para
 
 
   
-
+  
      
        <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
          <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
@@ -876,7 +877,6 @@ the flag <code class="docutils literal notranslate"><span class="pre">leave_para
          <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
          <script src="../_static/katex_autorenderer.js"></script>
      
-
   
 
   <script type="text/javascript" src="../_static/js/vendor/popper.min.js"></script>

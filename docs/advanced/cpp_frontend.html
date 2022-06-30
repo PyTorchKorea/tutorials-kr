@@ -6,7 +6,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
 <meta property="og:title" content="PyTorch C++ 프론트엔드 사용하기" />
   
 <meta property="og:type" content="article" />
@@ -391,7 +392,7 @@
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <div class="section" id="pytorch-c">
+  <section id="pytorch-c">
 <h1>PyTorch C++ 프론트엔드 사용하기<a class="headerlink" href="#pytorch-c" title="Permalink to this headline">¶</a></h1>
 <p><strong>번역</strong>: <a class="reference external" href="https://github.com/yoosful">유용환</a></p>
 <p>PyTorch C++ 프론트엔드는 PyTorch 머신러닝 프레임워크의 순수 C++
@@ -427,7 +428,7 @@ MNIST 숫자 이미지들을 생성할 것입니다. 개념적으로 쉬운 예�
 확인할 수 있습니다. API 레벨의 문서뿐만 아니라 개괄적인 설명도
 찾을 수 있을 것입니다.</p>
 </div>
-<div class="section" id="id3">
+<section id="id3">
 <h2>동기부여<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
 <p>GAN과 MNIST 숫자로의 설레는 여정을 시작하기에 앞서, 먼저
 파이썬 대신 C++ 프론트엔드를 사용하는 이유에 대해
@@ -473,8 +474,8 @@ C++ 프론트엔드에 대해 자세히 살펴보세요.</p>
 메서드를 사용할 수 있을 것입니다. (다만, 온점을 더블 콜론으로 바꾸는
 것에 유의하세요.)</p>
 </div>
-</div>
-<div class="section" id="id4">
+</section>
+<section id="id4">
 <h2>기본 애플리케이션 작성하기<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
 <p>먼저 최소한의 C++ 애플리케이션을 작성해 우리의 설정과
 빌드 환경이 동일한지 확인하겠습니다. 먼저, C++
@@ -508,25 +509,25 @@ unzip libtorch-shared-with-deps-latest.zip
 <p>다음으로 <code class="docutils literal notranslate"><span class="pre">torch/torch.h</span></code> 를 호출하는 <code class="docutils literal notranslate"><span class="pre">dcgan.cpp</span></code> 라는 이름의 C++
 파일 하나를 작성합시다. 우선은 아래와 같이 3x3 항등 행렬을 출력하기만 하면
 됩니다.</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;torch/torch.h&gt;</span><span class="cp"></span>
-<span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp"></span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;torch/torch.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span><span class="cp"></span>
 
-<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
-  <span class="n">torch</span><span class="o">::</span><span class="n">Tensor</span> <span class="n">tensor</span> <span class="o">=</span> <span class="n">torch</span><span class="o">::</span><span class="n">eye</span><span class="p">(</span><span class="mi">3</span><span class="p">);</span>
-  <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">tensor</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
-<span class="p">}</span>
+<span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="n">torch</span><span class="o">::</span><span class="n">Tensor</span><span class="w"> </span><span class="n">tensor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">torch</span><span class="o">::</span><span class="n">eye</span><span class="p">(</span><span class="mi">3</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">tensor</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
 </pre></div>
 </div>
 <p>이 작은 애플리케이션과 이후 완성할 학습용 스크립트를 빌드하기 위해 우리는 아래의 <code class="docutils literal notranslate"><span class="pre">CMakeLists.txt</span></code> 를
 사용할 것입니다:</p>
-<div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="nb">cmake_minimum_required</span><span class="p">(</span><span class="s">VERSION</span> <span class="s">3.0</span> <span class="s">FATAL_ERROR</span><span class="p">)</span>
+<div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="nb">cmake_minimum_required</span><span class="p">(</span><span class="s">VERSION</span><span class="w"> </span><span class="s">3.0</span><span class="w"> </span><span class="s">FATAL_ERROR</span><span class="p">)</span>
 <span class="nb">project</span><span class="p">(</span><span class="s">dcgan</span><span class="p">)</span>
 
-<span class="nb">find_package</span><span class="p">(</span><span class="s">Torch</span> <span class="s">REQUIRED</span><span class="p">)</span>
+<span class="nb">find_package</span><span class="p">(</span><span class="s">Torch</span><span class="w"> </span><span class="s">REQUIRED</span><span class="p">)</span>
 
-<span class="nb">add_executable</span><span class="p">(</span><span class="s">dcgan</span> <span class="s">dcgan.cpp</span><span class="p">)</span>
-<span class="nb">target_link_libraries</span><span class="p">(</span><span class="s">dcgan</span> <span class="s2">&quot;${TORCH_LIBRARIES}&quot;</span><span class="p">)</span>
-<span class="nb">set_property</span><span class="p">(</span><span class="s">TARGET</span> <span class="s">dcgan</span> <span class="s">PROPERTY</span> <span class="s">CXX_STANDARD</span> <span class="s">14</span><span class="p">)</span>
+<span class="nb">add_executable</span><span class="p">(</span><span class="s">dcgan</span><span class="w"> </span><span class="s">dcgan.cpp</span><span class="p">)</span>
+<span class="nb">target_link_libraries</span><span class="p">(</span><span class="s">dcgan</span><span class="w"> </span><span class="s2">&quot;${TORCH_LIBRARIES}&quot;</span><span class="p">)</span>
+<span class="nb">set_property</span><span class="p">(</span><span class="s">TARGET</span><span class="w"> </span><span class="s">dcgan</span><span class="w"> </span><span class="s">PROPERTY</span><span class="w"> </span><span class="s">CXX_STANDARD</span><span class="w"> </span><span class="s">14</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="admonition note">
@@ -601,15 +602,15 @@ Scanning dependencies of target dcgan
 </pre></div>
 </div>
 <p>제가 보기엔 항등 행렬인 것 같군요!</p>
-</div>
-<div class="section" id="id6">
+</section>
+<section id="id6">
 <h2>신경망 모델 정의하기<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h2>
 <p>이제 기본적인 환경을 설정했으니, 이번 튜토리얼에서 훨씬
 더 흥미로운 부분을 살펴봅시다. 먼저 C++ 프론트엔드에서 모듈을
 정의하고 상호 작용하는 방법에 대해 논의하겠습니다. 기본적인
 소규모 예제 모듈부터 시작하여 C++ 프론트엔드가 제공하는 다양한
 내장 모듈 라이브러리를 사용하여 완성도 있는 GAN을 구현하겠습니다.</p>
-<div class="section" id="api">
+<section id="api">
 <h3>모듈 API 기초<a class="headerlink" href="#api" title="Permalink to this headline">¶</a></h3>
 <p>파이썬 인터페이스와 마찬가지로, C++ 프론트엔드에 기반을 둔 신경망도
 <em>모듈</em> 이라 불리는 재사용 가능한 빌딩 블록으로 구성되어 있습니다. 파이썬에
@@ -630,7 +631,7 @@ Scanning dependencies of target dcgan
 마찬가지로, <code class="docutils literal notranslate"><span class="pre">to(...)</span></code> 와 같은 메서드는 모듈 계층 구조 전체에 대한 메서드입니다.
 예를 들어, <code class="docutils literal notranslate"><span class="pre">to(torch::kCUDA)</span></code> 는 모든 매개변수와 버퍼를 CPU에서 CUDA 메모리로
 이동시킵니다.</p>
-<div class="section" id="id7">
+<section id="id7">
 <h4>모듈 정의 및 매개변수 등록<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h4>
 <p>이 내용을 코드로 구현하기 위해, 파이썬 인터페이스로 작성된 간단한 모듈 하나를
 생각해 봅시다.</p>
@@ -647,18 +648,18 @@ Scanning dependencies of target dcgan
 </pre></div>
 </div>
 <p>이를 C++로 작성하면 다음과 같습니다.</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;torch/torch.h&gt;</span><span class="cp"></span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;torch/torch.h&gt;</span><span class="cp"></span>
 
-<span class="k">struct</span> <span class="nc">Net</span> <span class="o">:</span> <span class="n">torch</span><span class="o">::</span><span class="n">nn</span><span class="o">::</span><span class="n">Module</span> <span class="p">{</span>
-  <span class="n">Net</span><span class="p">(</span><span class="kt">int64_t</span> <span class="n">N</span><span class="p">,</span> <span class="kt">int64_t</span> <span class="n">M</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">W</span> <span class="o">=</span> <span class="n">register_parameter</span><span class="p">(</span><span class="s">&quot;W&quot;</span><span class="p">,</span> <span class="n">torch</span><span class="o">::</span><span class="n">randn</span><span class="p">({</span><span class="n">N</span><span class="p">,</span> <span class="n">M</span><span class="p">}));</span>
-    <span class="n">b</span> <span class="o">=</span> <span class="n">register_parameter</span><span class="p">(</span><span class="s">&quot;b&quot;</span><span class="p">,</span> <span class="n">torch</span><span class="o">::</span><span class="n">randn</span><span class="p">(</span><span class="n">M</span><span class="p">));</span>
-  <span class="p">}</span>
-  <span class="n">torch</span><span class="o">::</span><span class="n">Tensor</span> <span class="n">forward</span><span class="p">(</span><span class="n">torch</span><span class="o">::</span><span class="n">Tensor</span> <span class="n">input</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="n">torch</span><span class="o">::</span><span class="n">addmm</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">input</span><span class="p">,</span> <span class="n">W</span><span class="p">);</span>
-  <span class="p">}</span>
-  <span class="n">torch</span><span class="o">::</span><span class="n">Tensor</span> <span class="n">W</span><span class="p">,</span> <span class="n">b</span><span class="p">;</span>
-<span class="p">};</span>
+<span class="k">struct</span><span class="w"> </span><span class="nc">Net</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">torch</span><span class="o">::</span><span class="n">nn</span><span class="o">::</span><span class="n">Module</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="n">Net</span><span class="p">(</span><span class="kt">int64_t</span><span class="w"> </span><span class="n">N</span><span class="p">,</span><span class="w"> </span><span class="kt">int64_t</span><span class="w"> </span><span class="n">M</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">W</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">register_parameter</span><span class="p">(</span><span class="s">&quot;W&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">torch</span><span class="o">::</span><span class="n">randn</span><span class="p">({</span><span class="n">N</span><span class="p">,</span><span class="w"> </span><span class="n">M</span><span class="p">}));</span><span class="w"></span>
+<span class="w">    </span><span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">register_parameter</span><span class="p">(</span><span class="s">&quot;b&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">torch</span><span class="o">::</span><span class="n">randn</span><span class="p">(</span><span class="n">M</span><span class="p">));</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+<span class="w">  </span><span class="n">torch</span><span class="o">::</span><span class="n">Tensor</span><span class="w"> </span><span class="n">forward</span><span class="p">(</span><span class="n">torch</span><span class="o">::</span><span class="n">Tensor</span><span class="w"> </span><span class="n">input</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">torch</span><span class="o">::</span><span class="n">addmm</span><span class="p">(</span><span class="n">b</span><span class="p">,</span><span class="w"> </span><span class="n">input</span><span class="p">,</span><span class="w"> </span><span class="n">W</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+<span class="w">  </span><span class="n">torch</span><span class="o">::</span><span class="n">Tensor</span><span class="w"> </span><span class="n">W</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="p">;</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
 </pre></div>
 </div>
 <p>파이썬에서와 마찬가지로 모듈 기본 클래스에서 파생한 <code class="docutils literal notranslate"><span class="pre">Net</span></code> 이라는 클래스를
@@ -671,8 +672,8 @@ C++에서는 <code class="docutils literal notranslate"><span class="pre">regist
 <code class="docutils literal notranslate"><span class="pre">torch.nn.Parameter</span></code> 타입인지 감지해 그러한 텐서를 자동으로 등록할 수 있기
 때문에 나타납니다. C++에서는 리플렉션(reflection)이 매우 제한적이므로 보다
 전통적인 (그리하여 덜 마법적인) 방식이 제공됩니다.</p>
-</div>
-<div class="section" id="id8">
+</section>
+<section id="id8">
 <h4>서브모듈 등록 및 모듈 계층 구조 탐색<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h4>
 <p>매개변수 등록과 마찬가지 방법으로 서브모듈을 등록할 수 있습니다.
 파이썬에서 서브모듈은 어떤 모듈의 속성으로 지정될 때 자동으로
@@ -704,17 +705,17 @@ C++에서는 <code class="docutils literal notranslate"><span class="pre">regist
 </div>
 <p>C++에서 <code class="docutils literal notranslate"><span class="pre">torch::nn::Linear</span></code> 등의 모듈을 서브모듈로 등록하려면 이름에서
 유추할 수 있듯이 <code class="docutils literal notranslate"><span class="pre">register_module()</span></code> 메서드를 사용합니다.</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">struct</span> <span class="nc">Net</span> <span class="o">:</span> <span class="n">torch</span><span class="o">::</span><span class="n">nn</span><span class="o">::</span><span class="n">Module</span> <span class="p">{</span>
-  <span class="n">Net</span><span class="p">(</span><span class="kt">int64_t</span> <span class="n">N</span><span class="p">,</span> <span class="kt">int64_t</span> <span class="n">M</span><span class="p">)</span>
-      <span class="o">:</span> <span class="n">linear</span><span class="p">(</span><span class="n">register_module</span><span class="p">(</span><span class="s">&quot;linear&quot;</span><span class="p">,</span> <span class="n">torch</span><span class="o">::</span><span class="n">nn</span><span class="o">::</span><span class="n">Linear</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">M</span><span class="p">)))</span> <span class="p">{</span>
-    <span class="n">another_bias</span> <span class="o">=</span> <span class="n">register_parameter</span><span class="p">(</span><span class="s">&quot;b&quot;</span><span class="p">,</span> <span class="n">torch</span><span class="o">::</span><span class="n">randn</span><span class="p">(</span><span class="n">M</span><span class="p">));</span>
-  <span class="p">}</span>
-  <span class="n">torch</span><span class="o">::</span><span class="n">Tensor</span> <span class="n">forward</span><span class="p">(</span><span class="n">torch</span><span class="o">::</span><span class="n">Tensor</span> <span class="n">input</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="nf">linear</span><span class="p">(</span><span class="n">input</span><span class="p">)</span> <span class="o">+</span> <span class="n">another_bias</span><span class="p">;</span>
-  <span class="p">}</span>
-  <span class="n">torch</span><span class="o">::</span><span class="n">nn</span><span class="o">::</span><span class="n">Linear</span> <span class="n">linear</span><span class="p">;</span>
-  <span class="n">torch</span><span class="o">::</span><span class="n">Tensor</span> <span class="n">another_bias</span><span class="p">;</span>
-<span class="p">};</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">struct</span><span class="w"> </span><span class="nc">Net</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">torch</span><span class="o">::</span><span class="n">nn</span><span class="o">::</span><span class="n">Module</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="n">Net</span><span class="p">(</span><span class="kt">int64_t</span><span class="w"> </span><span class="n">N</span><span class="p">,</span><span class="w"> </span><span class="kt">int64_t</span><span class="w"> </span><span class="n">M</span><span class="p">)</span><span class="w"></span>
+<span class="w">      </span><span class="o">:</span><span class="w"> </span><span class="n">linear</span><span class="p">(</span><span class="n">register_module</span><span class="p">(</span><span class="s">&quot;linear&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">torch</span><span class="o">::</span><span class="n">nn</span><span class="o">::</span><span class="n">Linear</span><span class="p">(</span><span class="n">N</span><span class="p">,</span><span class="w"> </span><span class="n">M</span><span class="p">)))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">another_bias</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">register_parameter</span><span class="p">(</span><span class="s">&quot;b&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">torch</span><span class="o">::</span><span class="n">randn</span><span class="p">(</span><span class="n">M</span><span class="p">));</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+<span class="w">  </span><span class="n">torch</span><span class="o">::</span><span class="n">Tensor</span><span class="w"> </span><span class="n">forward</span><span class="p">(</span><span class="n">torch</span><span class="o">::</span><span class="n">Tensor</span><span class="w"> </span><span class="n">input</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">linear</span><span class="p">(</span><span class="n">input</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">another_bias</span><span class="p">;</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+<span class="w">  </span><span class="n">torch</span><span class="o">::</span><span class="n">nn</span><span class="o">::</span><span class="n">Linear</span><span class="w"> </span><span class="n">linear</span><span class="p">;</span><span class="w"></span>
+<span class="w">  </span><span class="n">torch</span><span class="o">::</span><span class="n">Tensor</span><span class="w"> </span><span class="n">another_bias</span><span class="p">;</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
 </pre></div>
 </div>
 <div class="admonition tip">
@@ -731,12 +732,12 @@ C++에서는 <code class="docutils literal notranslate"><span class="pre">regist
 파이썬에서처럼 모듈 트리의 매개변수에 재귀적으로 액세스할 수
 있다는 것입니다. <code class="docutils literal notranslate"><span class="pre">parameters()</span></code> 를 호출하면 순회가 가능한
 <code class="docutils literal notranslate"><span class="pre">std::vector&lt;torch::Tensor&gt;</span></code> 가 반환됩니다.</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
-  <span class="n">Net</span> <span class="n">net</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">);</span>
-  <span class="k">for</span> <span class="p">(</span><span class="k">const</span> <span class="k">auto</span><span class="o">&amp;</span> <span class="nl">p</span> <span class="p">:</span> <span class="n">net</span><span class="p">.</span><span class="n">parameters</span><span class="p">())</span> <span class="p">{</span>
-    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">p</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
-  <span class="p">}</span>
-<span class="p">}</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="n">Net</span><span class="w"> </span><span class="n">net</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="o">&amp;</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">net</span><span class="p">.</span><span class="n">parameters</span><span class="p">())</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
 </pre></div>
 </div>
 <p>이를 실행한 결과는 다음과 같습니다.</p>
@@ -765,10 +766,10 @@ C++에서는 <code class="docutils literal notranslate"><span class="pre">regist
 <p>파이썬에서와 같이 세 개의 매개변수가 출력됐습니다. 이 매개변수들의 이름을
 확인할 수 있도록 C++ API는 <code class="docutils literal notranslate"><span class="pre">named_parameters()</span></code> 메서드를 제공하며, 이는
 파이썬에서와 같이 <code class="docutils literal notranslate"><span class="pre">Orderdict</span></code> 를 반환합니다.</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">Net</span> <span class="nf">net</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">);</span>
-<span class="k">for</span> <span class="p">(</span><span class="k">const</span> <span class="k">auto</span><span class="o">&amp;</span> <span class="nl">pair</span> <span class="p">:</span> <span class="n">net</span><span class="p">.</span><span class="n">named_parameters</span><span class="p">())</span> <span class="p">{</span>
-  <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">pair</span><span class="p">.</span><span class="n">key</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">pair</span><span class="p">.</span><span class="n">value</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
-<span class="p">}</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">Net</span><span class="w"> </span><span class="nf">net</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">);</span><span class="w"></span>
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="o">&amp;</span><span class="w"> </span><span class="n">pair</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">net</span><span class="p">.</span><span class="n">named_parameters</span><span class="p">())</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">pair</span><span class="p">.</span><span class="n">key</span><span class="p">()</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;: &quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">pair</span><span class="p">.</span><span class="n">value</span><span class="p">()</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
 </pre></div>
 </div>
 <p>마찬가지로 코드를 실행하면 결과는 아래와 같습니다.</p>
@@ -803,15 +804,15 @@ linear.bias: -0.0250
 모듈 계층 구조에 대한 메서드 목록 전체가 포함되어
 있습니다.</p>
 </div>
-</div>
-<div class="section" id="forward">
+</section>
+<section id="forward">
 <h4>순전파(forward) 모드로 네트워크 실행<a class="headerlink" href="#forward" title="Permalink to this headline">¶</a></h4>
 <p>네트워크를 C++로 실행하기 위해서는, 우리가 정의한 <code class="docutils literal notranslate"><span class="pre">forward()</span></code> 메서드를
 호출하기만 하면 됩니다.</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
-  <span class="n">Net</span> <span class="n">net</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">);</span>
-  <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">net</span><span class="p">.</span><span class="n">forward</span><span class="p">(</span><span class="n">torch</span><span class="o">::</span><span class="n">ones</span><span class="p">({</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">}))</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
-<span class="p">}</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="n">Net</span><span class="w"> </span><span class="n">net</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">net</span><span class="p">.</span><span class="n">forward</span><span class="p">(</span><span class="n">torch</span><span class="o">::</span><span class="n">ones</span><span class="p">({</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">}))</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
 </pre></div>
 </div>
 <p>출력은 대략 아래와 같을 것입니다</p>
@@ -821,8 +822,8 @@ linear.bias: -0.0250
 <span class="o">[</span> Variable<span class="o">[</span>CPUFloatType<span class="o">]{</span><span class="m">2</span>,5<span class="o">}</span> <span class="o">]</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="ownership">
+</section>
+<section id="ownership">
 <h4>모듈 오너십 (Ownership)<a class="headerlink" href="#ownership" title="Permalink to this headline">¶</a></h4>
 <p>이제 우리는 C++에서 모듈을 정의하고, 매개변수를 등록하고, 하위 모듈을
 등록하고, <code class="docutils literal notranslate"><span class="pre">parameters()</span></code> 등의 메서드를 통해 모듈 계층을 탐색하고,
@@ -845,33 +846,33 @@ C++ 프론트엔드의 복잡성을 증가시키며 그 설계와 인체공학�
 사례에서 살펴본 가장 단순한 경우로, 모듈 객체가 스택에 할당되고
 함수에 전달될 때 레퍼런스 혹은 포인터로 복사 및 이동(<code class="docutils literal notranslate"><span class="pre">std:move</span></code>)
 시키거나 가져올 수 있습니다.</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">struct</span> <span class="nc">Net</span> <span class="o">:</span> <span class="n">torch</span><span class="o">::</span><span class="n">nn</span><span class="o">::</span><span class="n">Module</span> <span class="p">{</span> <span class="p">};</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">struct</span><span class="w"> </span><span class="nc">Net</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">torch</span><span class="o">::</span><span class="n">nn</span><span class="o">::</span><span class="n">Module</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">};</span><span class="w"></span>
 
-<span class="kt">void</span> <span class="nf">a</span><span class="p">(</span><span class="n">Net</span> <span class="n">net</span><span class="p">)</span> <span class="p">{</span> <span class="p">}</span>
-<span class="kt">void</span> <span class="nf">b</span><span class="p">(</span><span class="n">Net</span><span class="o">&amp;</span> <span class="n">net</span><span class="p">)</span> <span class="p">{</span> <span class="p">}</span>
-<span class="kt">void</span> <span class="nf">c</span><span class="p">(</span><span class="n">Net</span><span class="o">*</span> <span class="n">net</span><span class="p">)</span> <span class="p">{</span> <span class="p">}</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">a</span><span class="p">(</span><span class="n">Net</span><span class="w"> </span><span class="n">net</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">b</span><span class="p">(</span><span class="n">Net</span><span class="o">&amp;</span><span class="w"> </span><span class="n">net</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="n">Net</span><span class="o">*</span><span class="w"> </span><span class="n">net</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
 
-<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
-  <span class="n">Net</span> <span class="n">net</span><span class="p">;</span>
-  <span class="n">a</span><span class="p">(</span><span class="n">net</span><span class="p">);</span>
-  <span class="n">a</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">net</span><span class="p">));</span>
-  <span class="n">b</span><span class="p">(</span><span class="n">net</span><span class="p">);</span>
-  <span class="n">c</span><span class="p">(</span><span class="o">&amp;</span><span class="n">net</span><span class="p">);</span>
-<span class="p">}</span>
+<span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="n">Net</span><span class="w"> </span><span class="n">net</span><span class="p">;</span><span class="w"></span>
+<span class="w">  </span><span class="n">a</span><span class="p">(</span><span class="n">net</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="n">a</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">net</span><span class="p">));</span><span class="w"></span>
+<span class="w">  </span><span class="n">b</span><span class="p">(</span><span class="n">net</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="n">c</span><span class="p">(</span><span class="o">&amp;</span><span class="n">net</span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
 </pre></div>
 </div>
 <p>후자(레퍼런스 시맨틱)의 경우, <code class="docutils literal notranslate"><span class="pre">std::shared_ptr</span></code> 를 사용할 수 있습니다.
 모든 곳에서 <code class="docutils literal notranslate"><span class="pre">shared_ptr</span></code> 를 사용한다는 가정 하에, 레퍼런스 시맨틱의
 장점은 파이썬에서와 같이 모듈이 함수에 전달되고 인자가 선언되는 방식에
 대해 생각할 부담을 덜어준다는 것입니다.</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">struct</span> <span class="nc">Net</span> <span class="o">:</span> <span class="n">torch</span><span class="o">::</span><span class="n">nn</span><span class="o">::</span><span class="n">Module</span> <span class="p">{};</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">struct</span><span class="w"> </span><span class="nc">Net</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">torch</span><span class="o">::</span><span class="n">nn</span><span class="o">::</span><span class="n">Module</span><span class="w"> </span><span class="p">{};</span><span class="w"></span>
 
-<span class="kt">void</span> <span class="nf">a</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">shared_ptr</span><span class="o">&lt;</span><span class="n">Net</span><span class="o">&gt;</span> <span class="n">net</span><span class="p">)</span> <span class="p">{</span> <span class="p">}</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">a</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">shared_ptr</span><span class="o">&lt;</span><span class="n">Net</span><span class="o">&gt;</span><span class="w"> </span><span class="n">net</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
 
-<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
-  <span class="k">auto</span> <span class="n">net</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">Net</span><span class="o">&gt;</span><span class="p">();</span>
-  <span class="n">a</span><span class="p">(</span><span class="n">net</span><span class="p">);</span>
-<span class="p">}</span>
+<span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">net</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">Net</span><span class="o">&gt;</span><span class="p">();</span><span class="w"></span>
+<span class="w">  </span><span class="n">a</span><span class="p">(</span><span class="n">net</span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
 </pre></div>
 </div>
 <p>경험적으로, 동적 언어를 사용하던 연구자들은 비록 밸류 시맨틱이
@@ -880,12 +881,12 @@ C++ 프론트엔드의 복잡성을 증가시키며 그 설계와 인체공학�
 사용자 친화적인 파이썬 API를 유사하게 따르기 위해 shared 오너십에
 의존합니다. 앞서 예시로 들었던 <code class="docutils literal notranslate"><span class="pre">Net</span></code> 의 정의를 축약해서 다시
 살펴봅시다.</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">struct</span> <span class="nc">Net</span> <span class="o">:</span> <span class="n">torch</span><span class="o">::</span><span class="n">nn</span><span class="o">::</span><span class="n">Module</span> <span class="p">{</span>
-  <span class="n">Net</span><span class="p">(</span><span class="kt">int64_t</span> <span class="n">N</span><span class="p">,</span> <span class="kt">int64_t</span> <span class="n">M</span><span class="p">)</span>
-    <span class="o">:</span> <span class="n">linear</span><span class="p">(</span><span class="n">register_module</span><span class="p">(</span><span class="s">&quot;linear&quot;</span><span class="p">,</span> <span class="n">torch</span><span class="o">::</span><span class="n">nn</span><span class="o">::</span><span class="n">Linear</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">M</span><span class="p">)))</span>
-  <span class="p">{</span> <span class="p">}</span>
-  <span class="n">torch</span><span class="o">::</span><span class="n">nn</span><span class="o">::</span><span class="n">Linear</span> <span class="n">linear</span><span class="p">;</span>
-<span class="p">};</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">struct</span><span class="w"> </span><span class="nc">Net</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">torch</span><span class="o">::</span><span class="n">nn</span><span class="o">::</span><span class="n">Module</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="n">Net</span><span class="p">(</span><span class="kt">int64_t</span><span class="w"> </span><span class="n">N</span><span class="p">,</span><span class="w"> </span><span class="kt">int64_t</span><span class="w"> </span><span class="n">M</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">:</span><span class="w"> </span><span class="n">linear</span><span class="p">(</span><span class="n">register_module</span><span class="p">(</span><span class="s">&quot;linear&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">torch</span><span class="o">::</span><span class="n">nn</span><span class="o">::</span><span class="n">Linear</span><span class="p">(</span><span class="n">N</span><span class="p">,</span><span class="w"> </span><span class="n">M</span><span class="p">)))</span><span class="w"></span>
+<span class="w">  </span><span class="p">{</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
+<span class="w">  </span><span class="n">torch</span><span class="o">::</span><span class="n">nn</span><span class="o">::</span><span class="n">Linear</span><span class="w"> </span><span class="n">linear</span><span class="p">;</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
 </pre></div>
 </div>
 <p>하위 모듈인 <code class="docutils literal notranslate"><span class="pre">linear</span></code> 를 사용하기 위해 이를 클래스에 직접 저장하고자
@@ -903,15 +904,15 @@ C++ 프론트엔드의 복잡성을 증가시키며 그 설계와 인체공학�
 모듈의 단순화된 정의를 살펴보겠습니다. (전체 정의는
 <a class="reference external" href="https://github.com/pytorch/pytorch/blob/master/torch/csrc/api/include/torch/nn/modules/linear.h">여기</a> 에서
 확인할 수 있습니다.)</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">struct</span> <span class="nc">LinearImpl</span> <span class="o">:</span> <span class="n">torch</span><span class="o">::</span><span class="n">nn</span><span class="o">::</span><span class="n">Module</span> <span class="p">{</span>
-  <span class="n">LinearImpl</span><span class="p">(</span><span class="kt">int64_t</span> <span class="n">in</span><span class="p">,</span> <span class="kt">int64_t</span> <span class="n">out</span><span class="p">);</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">struct</span><span class="w"> </span><span class="nc">LinearImpl</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">torch</span><span class="o">::</span><span class="n">nn</span><span class="o">::</span><span class="n">Module</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="n">LinearImpl</span><span class="p">(</span><span class="kt">int64_t</span><span class="w"> </span><span class="n">in</span><span class="p">,</span><span class="w"> </span><span class="kt">int64_t</span><span class="w"> </span><span class="n">out</span><span class="p">);</span><span class="w"></span>
 
-  <span class="n">Tensor</span> <span class="nf">forward</span><span class="p">(</span><span class="k">const</span> <span class="n">Tensor</span><span class="o">&amp;</span> <span class="n">input</span><span class="p">);</span>
+<span class="w">  </span><span class="n">Tensor</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">Tensor</span><span class="o">&amp;</span><span class="w"> </span><span class="n">input</span><span class="p">);</span><span class="w"></span>
 
-  <span class="n">Tensor</span> <span class="n">weight</span><span class="p">,</span> <span class="n">bias</span><span class="p">;</span>
-<span class="p">};</span>
+<span class="w">  </span><span class="n">Tensor</span><span class="w"> </span><span class="n">weight</span><span class="p">,</span><span class="w"> </span><span class="n">bias</span><span class="p">;</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
 
-<span class="n">TORCH_MODULE</span><span class="p">(</span><span class="n">Linear</span><span class="p">);</span>
+<span class="n">TORCH_MODULE</span><span class="p">(</span><span class="n">Linear</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 </div>
 <p>요약하자면 이 모듈은 <code class="docutils literal notranslate"><span class="pre">Linear</span></code> 가 아닌 <code class="docutils literal notranslate"><span class="pre">LinearImpl</span></code> 이라고 불립니다. 그리고
@@ -926,15 +927,15 @@ C++ 프론트엔드의 복잡성을 증가시키며 그 설계와 인체공학�
 기본적으로 레퍼런스 시맨틱을 따르지만, <code class="docutils literal notranslate"><span class="pre">std:shared_ptr</span></code> 나
 <code class="docutils literal notranslate"><span class="pre">std::make_shared</span></code> 등을 타이핑할 필요가 없습니다. 우리의 <code class="docutils literal notranslate"><span class="pre">Net</span></code> 예시에서
 모듈 holder API를 사용하면 아래와 같습니다.</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">struct</span> <span class="nc">NetImpl</span> <span class="o">:</span> <span class="n">torch</span><span class="o">::</span><span class="n">nn</span><span class="o">::</span><span class="n">Module</span> <span class="p">{};</span>
-<span class="n">TORCH_MODULE</span><span class="p">(</span><span class="n">Net</span><span class="p">);</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">struct</span><span class="w"> </span><span class="nc">NetImpl</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">torch</span><span class="o">::</span><span class="n">nn</span><span class="o">::</span><span class="n">Module</span><span class="w"> </span><span class="p">{};</span><span class="w"></span>
+<span class="n">TORCH_MODULE</span><span class="p">(</span><span class="n">Net</span><span class="p">);</span><span class="w"></span>
 
-<span class="kt">void</span> <span class="nf">a</span><span class="p">(</span><span class="n">Net</span> <span class="n">net</span><span class="p">)</span> <span class="p">{</span> <span class="p">}</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">a</span><span class="p">(</span><span class="n">Net</span><span class="w"> </span><span class="n">net</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
 
-<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
-  <span class="n">Net</span> <span class="n">net</span><span class="p">;</span>
-  <span class="n">a</span><span class="p">(</span><span class="n">net</span><span class="p">);</span>
-<span class="p">}</span>
+<span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="n">Net</span><span class="w"> </span><span class="n">net</span><span class="p">;</span><span class="w"></span>
+<span class="w">  </span><span class="n">a</span><span class="p">(</span><span class="n">net</span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
 </pre></div>
 </div>
 <p>여기서 언급할 만한 미묘한 문제가 하나 있습니다. 기본 생성자에 의해 만들어진
@@ -952,22 +953,22 @@ API에서 기본 생성자에 의해 만들어진 모듈 holder(<code class="doc
 전달하면 됩니다.</p>
 <p>실제로는 앞에서와 같이 하위 모듈을 사용해 모듈을 <em>이니셜라이저 (initializer) 목록</em> 에
 등록 및 생성하거나,</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">struct</span> <span class="nc">Net</span> <span class="o">:</span> <span class="n">torch</span><span class="o">::</span><span class="n">nn</span><span class="o">::</span><span class="n">Module</span> <span class="p">{</span>
-  <span class="n">Net</span><span class="p">(</span><span class="kt">int64_t</span> <span class="n">N</span><span class="p">,</span> <span class="kt">int64_t</span> <span class="n">M</span><span class="p">)</span>
-    <span class="o">:</span> <span class="n">linear</span><span class="p">(</span><span class="n">register_module</span><span class="p">(</span><span class="s">&quot;linear&quot;</span><span class="p">,</span> <span class="n">torch</span><span class="o">::</span><span class="n">nn</span><span class="o">::</span><span class="n">Linear</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">M</span><span class="p">)))</span>
-  <span class="p">{</span> <span class="p">}</span>
-  <span class="n">torch</span><span class="o">::</span><span class="n">nn</span><span class="o">::</span><span class="n">Linear</span> <span class="n">linear</span><span class="p">;</span>
-<span class="p">};</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">struct</span><span class="w"> </span><span class="nc">Net</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">torch</span><span class="o">::</span><span class="n">nn</span><span class="o">::</span><span class="n">Module</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="n">Net</span><span class="p">(</span><span class="kt">int64_t</span><span class="w"> </span><span class="n">N</span><span class="p">,</span><span class="w"> </span><span class="kt">int64_t</span><span class="w"> </span><span class="n">M</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">:</span><span class="w"> </span><span class="n">linear</span><span class="p">(</span><span class="n">register_module</span><span class="p">(</span><span class="s">&quot;linear&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">torch</span><span class="o">::</span><span class="n">nn</span><span class="o">::</span><span class="n">Linear</span><span class="p">(</span><span class="n">N</span><span class="p">,</span><span class="w"> </span><span class="n">M</span><span class="p">)))</span><span class="w"></span>
+<span class="w">  </span><span class="p">{</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
+<span class="w">  </span><span class="n">torch</span><span class="o">::</span><span class="n">nn</span><span class="o">::</span><span class="n">Linear</span><span class="w"> </span><span class="n">linear</span><span class="p">;</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
 </pre></div>
 </div>
 <p>파이썬 사용자들에게 더 친숙한 방법으로, 먼저 null 포인터로 홀더를 생성한 이후
 생성자에서 값을 지정할 수 있습니다.</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">struct</span> <span class="nc">Net</span> <span class="o">:</span> <span class="n">torch</span><span class="o">::</span><span class="n">nn</span><span class="o">::</span><span class="n">Module</span> <span class="p">{</span>
-  <span class="n">Net</span><span class="p">(</span><span class="kt">int64_t</span> <span class="n">N</span><span class="p">,</span> <span class="kt">int64_t</span> <span class="n">M</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">linear</span> <span class="o">=</span> <span class="n">register_module</span><span class="p">(</span><span class="s">&quot;linear&quot;</span><span class="p">,</span> <span class="n">torch</span><span class="o">::</span><span class="n">nn</span><span class="o">::</span><span class="n">Linear</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">M</span><span class="p">));</span>
-  <span class="p">}</span>
-  <span class="n">torch</span><span class="o">::</span><span class="n">nn</span><span class="o">::</span><span class="n">Linear</span> <span class="n">linear</span><span class="p">{</span><span class="k">nullptr</span><span class="p">};</span> <span class="c1">// construct an empty holder</span>
-<span class="p">};</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">struct</span><span class="w"> </span><span class="nc">Net</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">torch</span><span class="o">::</span><span class="n">nn</span><span class="o">::</span><span class="n">Module</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="n">Net</span><span class="p">(</span><span class="kt">int64_t</span><span class="w"> </span><span class="n">N</span><span class="p">,</span><span class="w"> </span><span class="kt">int64_t</span><span class="w"> </span><span class="n">M</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">linear</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">register_module</span><span class="p">(</span><span class="s">&quot;linear&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">torch</span><span class="o">::</span><span class="n">nn</span><span class="o">::</span><span class="n">Linear</span><span class="p">(</span><span class="n">N</span><span class="p">,</span><span class="w"> </span><span class="n">M</span><span class="p">));</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+<span class="w">  </span><span class="n">torch</span><span class="o">::</span><span class="n">nn</span><span class="o">::</span><span class="n">Linear</span><span class="w"> </span><span class="n">linear</span><span class="p">{</span><span class="k">nullptr</span><span class="p">};</span><span class="w"> </span><span class="c1">// construct an empty holder</span>
+<span class="p">};</span><span class="w"></span>
 </pre></div>
 </div>
 <p>결론적으로 어떤 오너십 모델, 어떤 시맨틱을 사용하면 좋을까요? C++
@@ -981,9 +982,9 @@ API(<code class="docutils literal notranslate"><span class="pre">torch::save</sp
 <code class="docutils literal notranslate"><span class="pre">shared_ptr</span></code>)만을 지원합니다. 따라서 C++ 프론트엔드로 모듈을
 정의할 떄에는 모듈 holder API 방식이 권장되며, 앞으로 본 튜토리얼에서
 이 API를 사용하겠습니다.</p>
-</div>
-</div>
-<div class="section" id="id13">
+</section>
+</section>
+<section id="id13">
 <h3>DCGAN 모듈 정의하기<a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h3>
 <p>이제 이 글에서 해결하려는 머신러닝 태스크를 위한 모듈을 정의하는데
 필요한 배경과 도입부 설명이 끝났습니다. 다시 상기하자면, 우리의 태스크는
@@ -997,7 +998,7 @@ DCGAN은 가장 초기에 발표됐던 제일 간단한 GAN이지만 이 태스�
 <p class="admonition-title">Tip</p>
 <p>이 튜토리얼에 나온 소스 코드 전체는 <a class="reference external" href="https://github.com/pytorch/examples/tree/master/cpp/dcgan">이 저장소</a> 에서 확인할 수 있습니다.</p>
 </div>
-<div class="section" id="id16">
+<section id="id16">
 <h4>GAN이 뭐였죠?<a class="headerlink" href="#id16" title="Permalink to this headline">¶</a></h4>
 <p>GAN은 <em>생성기(generator)</em> 와 <em>판별기(discriminator)</em> 라는
 두 가지 신경망 모델로 구성됩니다. 생성기는 노이즈 분포에서 샘플을 입력받고,
@@ -1015,57 +1016,57 @@ DCGAN은 가장 초기에 발표됐던 제일 간단한 GAN이지만 이 태스�
 이미지 모두에 대해 <code class="docutils literal notranslate"><span class="pre">0.5</span></code> 의 확률을 출력할 것입니다. 최종
 결과물은 노이즈를 입력받아 실제 숫자의 이미지를 출력으로 생성하는
 기계입니다.</p>
-</div>
-<div class="section" id="generator">
+</section>
+<section id="generator">
 <h4>생성기 (Generator) 모듈<a class="headerlink" href="#generator" title="Permalink to this headline">¶</a></h4>
 <p>먼저 일련의 전치된 (transposed) 2D 합성곱, 배치 정규화 및
 ReLU 활성화 유닛으로 구성된 생성기 모듈을 정의하겠습니다.
 모듈의 <code class="docutils literal notranslate"><span class="pre">forward()</span></code> 메서드를 직접 정의하여 모듈 간 입력을
 (함수형으로) 명시적으로 전달합니다.</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">struct</span> <span class="nc">DCGANGeneratorImpl</span> <span class="o">:</span> <span class="n">nn</span><span class="o">::</span><span class="n">Module</span> <span class="p">{</span>
-  <span class="n">DCGANGeneratorImpl</span><span class="p">(</span><span class="kt">int</span> <span class="n">kNoiseSize</span><span class="p">)</span>
-      <span class="o">:</span> <span class="n">conv1</span><span class="p">(</span><span class="n">nn</span><span class="o">::</span><span class="n">ConvTranspose2dOptions</span><span class="p">(</span><span class="n">kNoiseSize</span><span class="p">,</span> <span class="mi">256</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
-                  <span class="p">.</span><span class="n">bias</span><span class="p">(</span><span class="nb">false</span><span class="p">)),</span>
-        <span class="n">batch_norm1</span><span class="p">(</span><span class="mi">256</span><span class="p">),</span>
-        <span class="n">conv2</span><span class="p">(</span><span class="n">nn</span><span class="o">::</span><span class="n">ConvTranspose2dOptions</span><span class="p">(</span><span class="mi">256</span><span class="p">,</span> <span class="mi">128</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
-                  <span class="p">.</span><span class="n">stride</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-                  <span class="p">.</span><span class="n">padding</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-                  <span class="p">.</span><span class="n">bias</span><span class="p">(</span><span class="nb">false</span><span class="p">)),</span>
-        <span class="n">batch_norm2</span><span class="p">(</span><span class="mi">128</span><span class="p">),</span>
-        <span class="n">conv3</span><span class="p">(</span><span class="n">nn</span><span class="o">::</span><span class="n">ConvTranspose2dOptions</span><span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
-                  <span class="p">.</span><span class="n">stride</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-                  <span class="p">.</span><span class="n">padding</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-                  <span class="p">.</span><span class="n">bias</span><span class="p">(</span><span class="nb">false</span><span class="p">)),</span>
-        <span class="n">batch_norm3</span><span class="p">(</span><span class="mi">64</span><span class="p">),</span>
-        <span class="n">conv4</span><span class="p">(</span><span class="n">nn</span><span class="o">::</span><span class="n">ConvTranspose2dOptions</span><span class="p">(</span><span class="mi">64</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
-                  <span class="p">.</span><span class="n">stride</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-                  <span class="p">.</span><span class="n">padding</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-                  <span class="p">.</span><span class="n">bias</span><span class="p">(</span><span class="nb">false</span><span class="p">))</span>
- <span class="p">{</span>
-   <span class="c1">// register_module() is needed if we want to use the parameters() method later on</span>
-   <span class="n">register_module</span><span class="p">(</span><span class="s">&quot;conv1&quot;</span><span class="p">,</span> <span class="n">conv1</span><span class="p">);</span>
-   <span class="n">register_module</span><span class="p">(</span><span class="s">&quot;conv2&quot;</span><span class="p">,</span> <span class="n">conv2</span><span class="p">);</span>
-   <span class="n">register_module</span><span class="p">(</span><span class="s">&quot;conv3&quot;</span><span class="p">,</span> <span class="n">conv3</span><span class="p">);</span>
-   <span class="n">register_module</span><span class="p">(</span><span class="s">&quot;conv4&quot;</span><span class="p">,</span> <span class="n">conv4</span><span class="p">);</span>
-   <span class="n">register_module</span><span class="p">(</span><span class="s">&quot;batch_norm1&quot;</span><span class="p">,</span> <span class="n">batch_norm1</span><span class="p">);</span>
-   <span class="n">register_module</span><span class="p">(</span><span class="s">&quot;batch_norm2&quot;</span><span class="p">,</span> <span class="n">batch_norm2</span><span class="p">);</span>
-   <span class="n">register_module</span><span class="p">(</span><span class="s">&quot;batch_norm3&quot;</span><span class="p">,</span> <span class="n">batch_norm3</span><span class="p">);</span>
- <span class="p">}</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">struct</span><span class="w"> </span><span class="nc">DCGANGeneratorImpl</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">nn</span><span class="o">::</span><span class="n">Module</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="n">DCGANGeneratorImpl</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">kNoiseSize</span><span class="p">)</span><span class="w"></span>
+<span class="w">      </span><span class="o">:</span><span class="w"> </span><span class="n">conv1</span><span class="p">(</span><span class="n">nn</span><span class="o">::</span><span class="n">ConvTranspose2dOptions</span><span class="p">(</span><span class="n">kNoiseSize</span><span class="p">,</span><span class="w"> </span><span class="mi">256</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">)</span><span class="w"></span>
+<span class="w">                  </span><span class="p">.</span><span class="n">bias</span><span class="p">(</span><span class="nb">false</span><span class="p">)),</span><span class="w"></span>
+<span class="w">        </span><span class="n">batch_norm1</span><span class="p">(</span><span class="mi">256</span><span class="p">),</span><span class="w"></span>
+<span class="w">        </span><span class="n">conv2</span><span class="p">(</span><span class="n">nn</span><span class="o">::</span><span class="n">ConvTranspose2dOptions</span><span class="p">(</span><span class="mi">256</span><span class="p">,</span><span class="w"> </span><span class="mi">128</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">)</span><span class="w"></span>
+<span class="w">                  </span><span class="p">.</span><span class="n">stride</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="w"></span>
+<span class="w">                  </span><span class="p">.</span><span class="n">padding</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w"></span>
+<span class="w">                  </span><span class="p">.</span><span class="n">bias</span><span class="p">(</span><span class="nb">false</span><span class="p">)),</span><span class="w"></span>
+<span class="w">        </span><span class="n">batch_norm2</span><span class="p">(</span><span class="mi">128</span><span class="p">),</span><span class="w"></span>
+<span class="w">        </span><span class="n">conv3</span><span class="p">(</span><span class="n">nn</span><span class="o">::</span><span class="n">ConvTranspose2dOptions</span><span class="p">(</span><span class="mi">128</span><span class="p">,</span><span class="w"> </span><span class="mi">64</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">)</span><span class="w"></span>
+<span class="w">                  </span><span class="p">.</span><span class="n">stride</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="w"></span>
+<span class="w">                  </span><span class="p">.</span><span class="n">padding</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w"></span>
+<span class="w">                  </span><span class="p">.</span><span class="n">bias</span><span class="p">(</span><span class="nb">false</span><span class="p">)),</span><span class="w"></span>
+<span class="w">        </span><span class="n">batch_norm3</span><span class="p">(</span><span class="mi">64</span><span class="p">),</span><span class="w"></span>
+<span class="w">        </span><span class="n">conv4</span><span class="p">(</span><span class="n">nn</span><span class="o">::</span><span class="n">ConvTranspose2dOptions</span><span class="p">(</span><span class="mi">64</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">)</span><span class="w"></span>
+<span class="w">                  </span><span class="p">.</span><span class="n">stride</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="w"></span>
+<span class="w">                  </span><span class="p">.</span><span class="n">padding</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w"></span>
+<span class="w">                  </span><span class="p">.</span><span class="n">bias</span><span class="p">(</span><span class="nb">false</span><span class="p">))</span><span class="w"></span>
+<span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">   </span><span class="c1">// register_module() is needed if we want to use the parameters() method later on</span>
+<span class="w">   </span><span class="n">register_module</span><span class="p">(</span><span class="s">&quot;conv1&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">conv1</span><span class="p">);</span><span class="w"></span>
+<span class="w">   </span><span class="n">register_module</span><span class="p">(</span><span class="s">&quot;conv2&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">conv2</span><span class="p">);</span><span class="w"></span>
+<span class="w">   </span><span class="n">register_module</span><span class="p">(</span><span class="s">&quot;conv3&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">conv3</span><span class="p">);</span><span class="w"></span>
+<span class="w">   </span><span class="n">register_module</span><span class="p">(</span><span class="s">&quot;conv4&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">conv4</span><span class="p">);</span><span class="w"></span>
+<span class="w">   </span><span class="n">register_module</span><span class="p">(</span><span class="s">&quot;batch_norm1&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">batch_norm1</span><span class="p">);</span><span class="w"></span>
+<span class="w">   </span><span class="n">register_module</span><span class="p">(</span><span class="s">&quot;batch_norm2&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">batch_norm2</span><span class="p">);</span><span class="w"></span>
+<span class="w">   </span><span class="n">register_module</span><span class="p">(</span><span class="s">&quot;batch_norm3&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">batch_norm3</span><span class="p">);</span><span class="w"></span>
+<span class="w"> </span><span class="p">}</span><span class="w"></span>
 
- <span class="n">torch</span><span class="o">::</span><span class="n">Tensor</span> <span class="n">forward</span><span class="p">(</span><span class="n">torch</span><span class="o">::</span><span class="n">Tensor</span> <span class="n">x</span><span class="p">)</span> <span class="p">{</span>
-   <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">::</span><span class="n">relu</span><span class="p">(</span><span class="n">batch_norm1</span><span class="p">(</span><span class="n">conv1</span><span class="p">(</span><span class="n">x</span><span class="p">)));</span>
-   <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">::</span><span class="n">relu</span><span class="p">(</span><span class="n">batch_norm2</span><span class="p">(</span><span class="n">conv2</span><span class="p">(</span><span class="n">x</span><span class="p">)));</span>
-   <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">::</span><span class="n">relu</span><span class="p">(</span><span class="n">batch_norm3</span><span class="p">(</span><span class="n">conv3</span><span class="p">(</span><span class="n">x</span><span class="p">)));</span>
-   <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">::</span><span class="n">tanh</span><span class="p">(</span><span class="n">conv4</span><span class="p">(</span><span class="n">x</span><span class="p">));</span>
-   <span class="k">return</span> <span class="n">x</span><span class="p">;</span>
- <span class="p">}</span>
+<span class="w"> </span><span class="n">torch</span><span class="o">::</span><span class="n">Tensor</span><span class="w"> </span><span class="n">forward</span><span class="p">(</span><span class="n">torch</span><span class="o">::</span><span class="n">Tensor</span><span class="w"> </span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">   </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">torch</span><span class="o">::</span><span class="n">relu</span><span class="p">(</span><span class="n">batch_norm1</span><span class="p">(</span><span class="n">conv1</span><span class="p">(</span><span class="n">x</span><span class="p">)));</span><span class="w"></span>
+<span class="w">   </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">torch</span><span class="o">::</span><span class="n">relu</span><span class="p">(</span><span class="n">batch_norm2</span><span class="p">(</span><span class="n">conv2</span><span class="p">(</span><span class="n">x</span><span class="p">)));</span><span class="w"></span>
+<span class="w">   </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">torch</span><span class="o">::</span><span class="n">relu</span><span class="p">(</span><span class="n">batch_norm3</span><span class="p">(</span><span class="n">conv3</span><span class="p">(</span><span class="n">x</span><span class="p">)));</span><span class="w"></span>
+<span class="w">   </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">torch</span><span class="o">::</span><span class="n">tanh</span><span class="p">(</span><span class="n">conv4</span><span class="p">(</span><span class="n">x</span><span class="p">));</span><span class="w"></span>
+<span class="w">   </span><span class="k">return</span><span class="w"> </span><span class="n">x</span><span class="p">;</span><span class="w"></span>
+<span class="w"> </span><span class="p">}</span><span class="w"></span>
 
- <span class="n">nn</span><span class="o">::</span><span class="n">ConvTranspose2d</span> <span class="n">conv1</span><span class="p">,</span> <span class="n">conv2</span><span class="p">,</span> <span class="n">conv3</span><span class="p">,</span> <span class="n">conv4</span><span class="p">;</span>
- <span class="n">nn</span><span class="o">::</span><span class="n">BatchNorm2d</span> <span class="n">batch_norm1</span><span class="p">,</span> <span class="n">batch_norm2</span><span class="p">,</span> <span class="n">batch_norm3</span><span class="p">;</span>
-<span class="p">};</span>
-<span class="n">TORCH_MODULE</span><span class="p">(</span><span class="n">DCGANGenerator</span><span class="p">);</span>
+<span class="w"> </span><span class="n">nn</span><span class="o">::</span><span class="n">ConvTranspose2d</span><span class="w"> </span><span class="n">conv1</span><span class="p">,</span><span class="w"> </span><span class="n">conv2</span><span class="p">,</span><span class="w"> </span><span class="n">conv3</span><span class="p">,</span><span class="w"> </span><span class="n">conv4</span><span class="p">;</span><span class="w"></span>
+<span class="w"> </span><span class="n">nn</span><span class="o">::</span><span class="n">BatchNorm2d</span><span class="w"> </span><span class="n">batch_norm1</span><span class="p">,</span><span class="w"> </span><span class="n">batch_norm2</span><span class="p">,</span><span class="w"> </span><span class="n">batch_norm3</span><span class="p">;</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+<span class="n">TORCH_MODULE</span><span class="p">(</span><span class="n">DCGANGenerator</span><span class="p">);</span><span class="w"></span>
 
-<span class="n">DCGANGenerator</span> <span class="nf">generator</span><span class="p">(</span><span class="n">kNoiseSize</span><span class="p">);</span>
+<span class="n">DCGANGenerator</span><span class="w"> </span><span class="nf">generator</span><span class="p">(</span><span class="n">kNoiseSize</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 </div>
 <p>이제 <code class="docutils literal notranslate"><span class="pre">DCGANGenerator</span></code> 의 <code class="docutils literal notranslate"><span class="pre">forward()</span></code> 를 호출해 노이즈 샘플을 이미지에 매핑할 수 있습니다.</p>
@@ -1091,8 +1092,8 @@ C++ 프론트엔드의  모듈은 <code class="docutils literal notranslate"><sp
 의 경우 <code class="docutils literal notranslate"><span class="pre">LinearOptions</span></code> 와 같습니다. 우리는 위의 <code class="docutils literal notranslate"><span class="pre">Conv2d</span></code> 모듈에
 대해 이를 수행한 것입니다.</p>
 </div>
-</div>
-<div class="section" id="discriminator">
+</section>
+<section id="discriminator">
 <h4>판별기(Discriminator) 모듈<a class="headerlink" href="#discriminator" title="Permalink to this headline">¶</a></h4>
 <p>판별기는 마찬가지로 합성곱, 배치 정규화 및 활성화의
 연속입니다. 하지만 이번에 합성곱은 전치되지 않은 기본
@@ -1105,25 +1106,25 @@ Sigmoid가 됩니다. 그런 다음 이렇게 압축된 값을 판별자가
 (생성기 모듈 예시와 같이) 입력이 연속적인 함수를 통해 전달되는 함수형 API와
 전체 모델을 하위 모듈로 포함하는 <cite>Sequential</cite> 모듈을 생성하는 객체 지향형
 API입니다. <cite>Sequential</cite> 을 사용하면 판별기는 대략 다음과 같습니다.</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">nn</span><span class="o">::</span><span class="n">Sequential</span> <span class="n">discriminator</span><span class="p">(</span>
-  <span class="c1">// Layer 1</span>
-  <span class="n">nn</span><span class="o">::</span><span class="n">Conv2d</span><span class="p">(</span>
-      <span class="n">nn</span><span class="o">::</span><span class="n">Conv2dOptions</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">4</span><span class="p">).</span><span class="n">stride</span><span class="p">(</span><span class="mi">2</span><span class="p">).</span><span class="n">padding</span><span class="p">(</span><span class="mi">1</span><span class="p">).</span><span class="n">bias</span><span class="p">(</span><span class="nb">false</span><span class="p">)),</span>
-  <span class="n">nn</span><span class="o">::</span><span class="n">LeakyReLU</span><span class="p">(</span><span class="n">nn</span><span class="o">::</span><span class="n">LeakyReLUOptions</span><span class="p">().</span><span class="n">negative_slope</span><span class="p">(</span><span class="mf">0.2</span><span class="p">)),</span>
-  <span class="c1">// Layer 2</span>
-  <span class="n">nn</span><span class="o">::</span><span class="n">Conv2d</span><span class="p">(</span>
-      <span class="n">nn</span><span class="o">::</span><span class="n">Conv2dOptions</span><span class="p">(</span><span class="mi">64</span><span class="p">,</span> <span class="mi">128</span><span class="p">,</span> <span class="mi">4</span><span class="p">).</span><span class="n">stride</span><span class="p">(</span><span class="mi">2</span><span class="p">).</span><span class="n">padding</span><span class="p">(</span><span class="mi">1</span><span class="p">).</span><span class="n">bias</span><span class="p">(</span><span class="nb">false</span><span class="p">)),</span>
-  <span class="n">nn</span><span class="o">::</span><span class="n">BatchNorm2d</span><span class="p">(</span><span class="mi">128</span><span class="p">),</span>
-  <span class="n">nn</span><span class="o">::</span><span class="n">LeakyReLU</span><span class="p">(</span><span class="n">nn</span><span class="o">::</span><span class="n">LeakyReLUOptions</span><span class="p">().</span><span class="n">negative_slope</span><span class="p">(</span><span class="mf">0.2</span><span class="p">)),</span>
-  <span class="c1">// Layer 3</span>
-  <span class="n">nn</span><span class="o">::</span><span class="n">Conv2d</span><span class="p">(</span>
-      <span class="n">nn</span><span class="o">::</span><span class="n">Conv2dOptions</span><span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="mi">256</span><span class="p">,</span> <span class="mi">4</span><span class="p">).</span><span class="n">stride</span><span class="p">(</span><span class="mi">2</span><span class="p">).</span><span class="n">padding</span><span class="p">(</span><span class="mi">1</span><span class="p">).</span><span class="n">bias</span><span class="p">(</span><span class="nb">false</span><span class="p">)),</span>
-  <span class="n">nn</span><span class="o">::</span><span class="n">BatchNorm2d</span><span class="p">(</span><span class="mi">256</span><span class="p">),</span>
-  <span class="n">nn</span><span class="o">::</span><span class="n">LeakyReLU</span><span class="p">(</span><span class="n">nn</span><span class="o">::</span><span class="n">LeakyReLUOptions</span><span class="p">().</span><span class="n">negative_slope</span><span class="p">(</span><span class="mf">0.2</span><span class="p">)),</span>
-  <span class="c1">// Layer 4</span>
-  <span class="n">nn</span><span class="o">::</span><span class="n">Conv2d</span><span class="p">(</span>
-      <span class="n">nn</span><span class="o">::</span><span class="n">Conv2dOptions</span><span class="p">(</span><span class="mi">256</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">).</span><span class="n">stride</span><span class="p">(</span><span class="mi">1</span><span class="p">).</span><span class="n">padding</span><span class="p">(</span><span class="mi">0</span><span class="p">).</span><span class="n">bias</span><span class="p">(</span><span class="nb">false</span><span class="p">)),</span>
-  <span class="n">nn</span><span class="o">::</span><span class="n">Sigmoid</span><span class="p">());</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">nn</span><span class="o">::</span><span class="n">Sequential</span><span class="w"> </span><span class="nf">discriminator</span><span class="p">(</span><span class="w"></span>
+<span class="w">  </span><span class="c1">// Layer 1</span>
+<span class="w">  </span><span class="n">nn</span><span class="o">::</span><span class="n">Conv2d</span><span class="p">(</span><span class="w"></span>
+<span class="w">      </span><span class="n">nn</span><span class="o">::</span><span class="n">Conv2dOptions</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">64</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">).</span><span class="n">stride</span><span class="p">(</span><span class="mi">2</span><span class="p">).</span><span class="n">padding</span><span class="p">(</span><span class="mi">1</span><span class="p">).</span><span class="n">bias</span><span class="p">(</span><span class="nb">false</span><span class="p">)),</span><span class="w"></span>
+<span class="w">  </span><span class="n">nn</span><span class="o">::</span><span class="n">LeakyReLU</span><span class="p">(</span><span class="n">nn</span><span class="o">::</span><span class="n">LeakyReLUOptions</span><span class="p">().</span><span class="n">negative_slope</span><span class="p">(</span><span class="mf">0.2</span><span class="p">)),</span><span class="w"></span>
+<span class="w">  </span><span class="c1">// Layer 2</span>
+<span class="w">  </span><span class="n">nn</span><span class="o">::</span><span class="n">Conv2d</span><span class="p">(</span><span class="w"></span>
+<span class="w">      </span><span class="n">nn</span><span class="o">::</span><span class="n">Conv2dOptions</span><span class="p">(</span><span class="mi">64</span><span class="p">,</span><span class="w"> </span><span class="mi">128</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">).</span><span class="n">stride</span><span class="p">(</span><span class="mi">2</span><span class="p">).</span><span class="n">padding</span><span class="p">(</span><span class="mi">1</span><span class="p">).</span><span class="n">bias</span><span class="p">(</span><span class="nb">false</span><span class="p">)),</span><span class="w"></span>
+<span class="w">  </span><span class="n">nn</span><span class="o">::</span><span class="n">BatchNorm2d</span><span class="p">(</span><span class="mi">128</span><span class="p">),</span><span class="w"></span>
+<span class="w">  </span><span class="n">nn</span><span class="o">::</span><span class="n">LeakyReLU</span><span class="p">(</span><span class="n">nn</span><span class="o">::</span><span class="n">LeakyReLUOptions</span><span class="p">().</span><span class="n">negative_slope</span><span class="p">(</span><span class="mf">0.2</span><span class="p">)),</span><span class="w"></span>
+<span class="w">  </span><span class="c1">// Layer 3</span>
+<span class="w">  </span><span class="n">nn</span><span class="o">::</span><span class="n">Conv2d</span><span class="p">(</span><span class="w"></span>
+<span class="w">      </span><span class="n">nn</span><span class="o">::</span><span class="n">Conv2dOptions</span><span class="p">(</span><span class="mi">128</span><span class="p">,</span><span class="w"> </span><span class="mi">256</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">).</span><span class="n">stride</span><span class="p">(</span><span class="mi">2</span><span class="p">).</span><span class="n">padding</span><span class="p">(</span><span class="mi">1</span><span class="p">).</span><span class="n">bias</span><span class="p">(</span><span class="nb">false</span><span class="p">)),</span><span class="w"></span>
+<span class="w">  </span><span class="n">nn</span><span class="o">::</span><span class="n">BatchNorm2d</span><span class="p">(</span><span class="mi">256</span><span class="p">),</span><span class="w"></span>
+<span class="w">  </span><span class="n">nn</span><span class="o">::</span><span class="n">LeakyReLU</span><span class="p">(</span><span class="n">nn</span><span class="o">::</span><span class="n">LeakyReLUOptions</span><span class="p">().</span><span class="n">negative_slope</span><span class="p">(</span><span class="mf">0.2</span><span class="p">)),</span><span class="w"></span>
+<span class="w">  </span><span class="c1">// Layer 4</span>
+<span class="w">  </span><span class="n">nn</span><span class="o">::</span><span class="n">Conv2d</span><span class="p">(</span><span class="w"></span>
+<span class="w">      </span><span class="n">nn</span><span class="o">::</span><span class="n">Conv2dOptions</span><span class="p">(</span><span class="mi">256</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">).</span><span class="n">stride</span><span class="p">(</span><span class="mi">1</span><span class="p">).</span><span class="n">padding</span><span class="p">(</span><span class="mi">0</span><span class="p">).</span><span class="n">bias</span><span class="p">(</span><span class="nb">false</span><span class="p">)),</span><span class="w"></span>
+<span class="w">  </span><span class="n">nn</span><span class="o">::</span><span class="n">Sigmoid</span><span class="p">());</span><span class="w"></span>
 </pre></div>
 </div>
 <div class="admonition tip">
@@ -1132,10 +1133,10 @@ API입니다. <cite>Sequential</cite> 을 사용하면 판별기는 대략 다�
 두 번째 하위 모듈의 입력이 되고 세 번째 하위 모듈의 출력은 네 번째 하위 모듈의 입력이
 되고 이후에도 마찬가지입니다.</p>
 </div>
-</div>
-</div>
-</div>
-<div class="section" id="id17">
+</section>
+</section>
+</section>
+<section id="id17">
 <h2>데이터 불러오기<a class="headerlink" href="#id17" title="Permalink to this headline">¶</a></h2>
 <p>이제 생성기와 판별기 모델을 정의했으므로 이러한 모델을 학습시킬
 데이터가 필요합니다. 파이썬과 마찬가지로 C++ 프론트엔드는
@@ -1161,9 +1162,9 @@ API입니다. <cite>Sequential</cite> 을 사용하면 판별기는 대략 다�
 <code class="docutils literal notranslate"><span class="pre">+1</span></code> 사이에 있도록 합니다. (기존 범위는 <code class="docutils literal notranslate"><span class="pre">0</span></code> 과 <code class="docutils literal notranslate"><span class="pre">1</span></code> 사이)
 둘째, 텐서 배치(batch)를 첫 번째 차원을 따라 단일 텐서로 쌓는 이른바
 <code class="docutils literal notranslate"><span class="pre">Stack</span></code> <em>collation</em> 을 적용합니다.</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span> <span class="n">dataset</span> <span class="o">=</span> <span class="n">torch</span><span class="o">::</span><span class="n">data</span><span class="o">::</span><span class="n">datasets</span><span class="o">::</span><span class="n">MNIST</span><span class="p">(</span><span class="s">&quot;./mnist&quot;</span><span class="p">)</span>
-    <span class="p">.</span><span class="n">map</span><span class="p">(</span><span class="n">torch</span><span class="o">::</span><span class="n">data</span><span class="o">::</span><span class="n">transforms</span><span class="o">::</span><span class="n">Normalize</span><span class="o">&lt;&gt;</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">))</span>
-    <span class="p">.</span><span class="n">map</span><span class="p">(</span><span class="n">torch</span><span class="o">::</span><span class="n">data</span><span class="o">::</span><span class="n">transforms</span><span class="o">::</span><span class="n">Stack</span><span class="o">&lt;&gt;</span><span class="p">());</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">dataset</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">torch</span><span class="o">::</span><span class="n">data</span><span class="o">::</span><span class="n">datasets</span><span class="o">::</span><span class="n">MNIST</span><span class="p">(</span><span class="s">&quot;./mnist&quot;</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">map</span><span class="p">(</span><span class="n">torch</span><span class="o">::</span><span class="n">data</span><span class="o">::</span><span class="n">transforms</span><span class="o">::</span><span class="n">Normalize</span><span class="o">&lt;&gt;</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span><span class="w"> </span><span class="mf">0.5</span><span class="p">))</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">map</span><span class="p">(</span><span class="n">torch</span><span class="o">::</span><span class="n">data</span><span class="o">::</span><span class="n">transforms</span><span class="o">::</span><span class="n">Stack</span><span class="o">&lt;&gt;</span><span class="p">());</span><span class="w"></span>
 </pre></div>
 </div>
 <p>MNIST 데이터셋은 학습 바이너리 실행 위치를 기준으로 <code class="docutils literal notranslate"><span class="pre">./mnist</span></code>
@@ -1173,7 +1174,7 @@ API입니다. <cite>Sequential</cite> 을 사용하면 판별기는 대략 다�
 로더를 만들기 위해 <code class="docutils literal notranslate"><span class="pre">torch::data::make_data_loader</span></code> 를 사용합니다.
 이 로더는 올바른 타입(데이터셋 타입, 샘플러 타입 및 기타 구현 세부사항에
 따라 결정됨)의 <code class="docutils literal notranslate"><span class="pre">std::unique_ptr</span></code> 를 반환합니다.</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span> <span class="n">data_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">::</span><span class="n">data</span><span class="o">::</span><span class="n">make_data_loader</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">dataset</span><span class="p">));</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">data_loader</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">torch</span><span class="o">::</span><span class="n">data</span><span class="o">::</span><span class="n">make_data_loader</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">dataset</span><span class="p">));</span><span class="w"></span>
 </pre></div>
 </div>
 <p>데이터 로더에는 많은 옵션이 제공됩니다. 전체 목록은 <a class="reference external" href="https://github.com/pytorch/pytorch/blob/master/torch/csrc/api/include/torch/data/dataloader_options.h">여기</a>
@@ -1184,20 +1185,20 @@ API입니다. <cite>Sequential</cite> 을 사용하면 판별기는 대략 다�
 두 개 생성됩니다. 또한 배치 크기를 기본값 <code class="docutils literal notranslate"><span class="pre">1</span></code> 에서 <code class="docutils literal notranslate"><span class="pre">64</span></code> (<code class="docutils literal notranslate"><span class="pre">kBatchSize</span></code> 값)
 와 같이 더 적당한 값으로 늘려야 합니다. 그러면
 <code class="docutils literal notranslate"><span class="pre">DataLoaderOptions</span></code> 객체를 만들어 적절한 속성을 설정해 보겠습니다.</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span> <span class="n">data_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">::</span><span class="n">data</span><span class="o">::</span><span class="n">make_data_loader</span><span class="p">(</span>
-    <span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">dataset</span><span class="p">),</span>
-    <span class="n">torch</span><span class="o">::</span><span class="n">data</span><span class="o">::</span><span class="n">DataLoaderOptions</span><span class="p">().</span><span class="n">batch_size</span><span class="p">(</span><span class="n">kBatchSize</span><span class="p">).</span><span class="n">workers</span><span class="p">(</span><span class="mi">2</span><span class="p">));</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">data_loader</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">torch</span><span class="o">::</span><span class="n">data</span><span class="o">::</span><span class="n">make_data_loader</span><span class="p">(</span><span class="w"></span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">dataset</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">torch</span><span class="o">::</span><span class="n">data</span><span class="o">::</span><span class="n">DataLoaderOptions</span><span class="p">().</span><span class="n">batch_size</span><span class="p">(</span><span class="n">kBatchSize</span><span class="p">).</span><span class="n">workers</span><span class="p">(</span><span class="mi">2</span><span class="p">));</span><span class="w"></span>
 </pre></div>
 </div>
 <p>이제 데이터 배치를 로드하는 루프를 작성할 수 있습니다. 지금은
 콘솔에만 출력할 것입니다.</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="p">(</span><span class="n">torch</span><span class="o">::</span><span class="n">data</span><span class="o">::</span><span class="n">Example</span><span class="o">&lt;&gt;&amp;</span> <span class="nl">batch</span> <span class="p">:</span> <span class="o">*</span><span class="n">data_loader</span><span class="p">)</span> <span class="p">{</span>
-  <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Batch size: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">batch</span><span class="p">.</span><span class="n">data</span><span class="p">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&quot; | Labels: &quot;</span><span class="p">;</span>
-  <span class="k">for</span> <span class="p">(</span><span class="kt">int64_t</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">batch</span><span class="p">.</span><span class="n">data</span><span class="p">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">batch</span><span class="p">.</span><span class="n">target</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">item</span><span class="o">&lt;</span><span class="kt">int64_t</span><span class="o">&gt;</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s">&quot; &quot;</span><span class="p">;</span>
-  <span class="p">}</span>
-  <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
-<span class="p">}</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">torch</span><span class="o">::</span><span class="n">data</span><span class="o">::</span><span class="n">Example</span><span class="o">&lt;&gt;&amp;</span><span class="w"> </span><span class="n">batch</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="o">*</span><span class="n">data_loader</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;Batch size: &quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">batch</span><span class="p">.</span><span class="n">data</span><span class="p">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot; | Labels: &quot;</span><span class="p">;</span><span class="w"></span>
+<span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int64_t</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">batch</span><span class="p">.</span><span class="n">data</span><span class="p">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span><span class="w"> </span><span class="o">++</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">batch</span><span class="p">.</span><span class="n">target</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">item</span><span class="o">&lt;</span><span class="kt">int64_t</span><span class="o">&gt;</span><span class="p">()</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot; &quot;</span><span class="p">;</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+<span class="w">  </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
 </pre></div>
 </div>
 <p>이 경우 데이터 로더가 반환하는 타입은 <code class="docutils literal notranslate"><span class="pre">torch::data::Example</span></code> 입니다.
@@ -1230,17 +1231,17 @@ Batch size: <span class="m">64</span> <span class="p">|</span> Labels: <span cla
 </pre></div>
 </div>
 <p>즉, MNIST 데이터셋에서 데이터를 성공적으로 로드할 수 있습니다.</p>
-</div>
-<div class="section" id="id20">
+</section>
+<section id="id20">
 <h2>학습 루프 작성하기<a class="headerlink" href="#id20" title="Permalink to this headline">¶</a></h2>
 <p>이제 예제의 알고리즘 부분을 마무리하고 생성기와 판별기 사이에서 일어나는 섬세한
 작용을 구현해 보겠습니다. 먼저 생성기와 판별기 각각을 위해
 총 두 개의 optimizer를 생성하겠습니다. 우리가 사용하는
 optimizer는 <a class="reference external" href="https://arxiv.org/pdf/1412.6980.pdf">Adam</a> 알고리즘을 구현합니다.</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">torch</span><span class="o">::</span><span class="n">optim</span><span class="o">::</span><span class="n">Adam</span> <span class="n">generator_optimizer</span><span class="p">(</span>
-    <span class="n">generator</span><span class="o">-&gt;</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">torch</span><span class="o">::</span><span class="n">optim</span><span class="o">::</span><span class="n">AdamOptions</span><span class="p">(</span><span class="mf">2e-4</span><span class="p">).</span><span class="n">beta1</span><span class="p">(</span><span class="mf">0.5</span><span class="p">));</span>
-<span class="n">torch</span><span class="o">::</span><span class="n">optim</span><span class="o">::</span><span class="n">Adam</span> <span class="n">discriminator_optimizer</span><span class="p">(</span>
-    <span class="n">discriminator</span><span class="o">-&gt;</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">torch</span><span class="o">::</span><span class="n">optim</span><span class="o">::</span><span class="n">AdamOptions</span><span class="p">(</span><span class="mf">5e-4</span><span class="p">).</span><span class="n">beta1</span><span class="p">(</span><span class="mf">0.5</span><span class="p">));</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">torch</span><span class="o">::</span><span class="n">optim</span><span class="o">::</span><span class="n">Adam</span><span class="w"> </span><span class="nf">generator_optimizer</span><span class="p">(</span><span class="w"></span>
+<span class="w">    </span><span class="n">generator</span><span class="o">-&gt;</span><span class="n">parameters</span><span class="p">(),</span><span class="w"> </span><span class="n">torch</span><span class="o">::</span><span class="n">optim</span><span class="o">::</span><span class="n">AdamOptions</span><span class="p">(</span><span class="mf">2e-4</span><span class="p">).</span><span class="n">beta1</span><span class="p">(</span><span class="mf">0.5</span><span class="p">));</span><span class="w"></span>
+<span class="n">torch</span><span class="o">::</span><span class="n">optim</span><span class="o">::</span><span class="n">Adam</span><span class="w"> </span><span class="nf">discriminator_optimizer</span><span class="p">(</span><span class="w"></span>
+<span class="w">    </span><span class="n">discriminator</span><span class="o">-&gt;</span><span class="n">parameters</span><span class="p">(),</span><span class="w"> </span><span class="n">torch</span><span class="o">::</span><span class="n">optim</span><span class="o">::</span><span class="n">AdamOptions</span><span class="p">(</span><span class="mf">5e-4</span><span class="p">).</span><span class="n">beta1</span><span class="p">(</span><span class="mf">0.5</span><span class="p">));</span><span class="w"></span>
 </pre></div>
 </div>
 <div class="admonition note">
@@ -1249,46 +1250,46 @@ optimizer는 <a class="reference external" href="https://arxiv.org/pdf/1412.6980
 </div>
 <p>다음으로, 우리의 학습 루프를 수정해야 합니다. 매 에폭마다 데이터 로더를 반복 실행하는
 바깥 루프를 추가해 다음의 GAN 학습 코드를 작성합니다.</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="p">(</span><span class="kt">int64_t</span> <span class="n">epoch</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">epoch</span> <span class="o">&lt;=</span> <span class="n">kNumberOfEpochs</span><span class="p">;</span> <span class="o">++</span><span class="n">epoch</span><span class="p">)</span> <span class="p">{</span>
-  <span class="kt">int64_t</span> <span class="n">batch_index</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-  <span class="k">for</span> <span class="p">(</span><span class="n">torch</span><span class="o">::</span><span class="n">data</span><span class="o">::</span><span class="n">Example</span><span class="o">&lt;&gt;&amp;</span> <span class="nl">batch</span> <span class="p">:</span> <span class="o">*</span><span class="n">data_loader</span><span class="p">)</span> <span class="p">{</span>
-    <span class="c1">// Train discriminator with real images.</span>
-    <span class="n">discriminator</span><span class="o">-&gt;</span><span class="n">zero_grad</span><span class="p">();</span>
-    <span class="n">torch</span><span class="o">::</span><span class="n">Tensor</span> <span class="n">real_images</span> <span class="o">=</span> <span class="n">batch</span><span class="p">.</span><span class="n">data</span><span class="p">;</span>
-    <span class="n">torch</span><span class="o">::</span><span class="n">Tensor</span> <span class="n">real_labels</span> <span class="o">=</span> <span class="n">torch</span><span class="o">::</span><span class="n">empty</span><span class="p">(</span><span class="n">batch</span><span class="p">.</span><span class="n">data</span><span class="p">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)).</span><span class="n">uniform_</span><span class="p">(</span><span class="mf">0.8</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">);</span>
-    <span class="n">torch</span><span class="o">::</span><span class="n">Tensor</span> <span class="n">real_output</span> <span class="o">=</span> <span class="n">discriminator</span><span class="o">-&gt;</span><span class="n">forward</span><span class="p">(</span><span class="n">real_images</span><span class="p">);</span>
-    <span class="n">torch</span><span class="o">::</span><span class="n">Tensor</span> <span class="n">d_loss_real</span> <span class="o">=</span> <span class="n">torch</span><span class="o">::</span><span class="n">binary_cross_entropy</span><span class="p">(</span><span class="n">real_output</span><span class="p">,</span> <span class="n">real_labels</span><span class="p">);</span>
-    <span class="n">d_loss_real</span><span class="p">.</span><span class="n">backward</span><span class="p">();</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int64_t</span><span class="w"> </span><span class="n">epoch</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"> </span><span class="n">epoch</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">kNumberOfEpochs</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">epoch</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="kt">int64_t</span><span class="w"> </span><span class="n">batch_index</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">torch</span><span class="o">::</span><span class="n">data</span><span class="o">::</span><span class="n">Example</span><span class="o">&lt;&gt;&amp;</span><span class="w"> </span><span class="n">batch</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="o">*</span><span class="n">data_loader</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// Train discriminator with real images.</span>
+<span class="w">    </span><span class="n">discriminator</span><span class="o">-&gt;</span><span class="n">zero_grad</span><span class="p">();</span><span class="w"></span>
+<span class="w">    </span><span class="n">torch</span><span class="o">::</span><span class="n">Tensor</span><span class="w"> </span><span class="n">real_images</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">batch</span><span class="p">.</span><span class="n">data</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">torch</span><span class="o">::</span><span class="n">Tensor</span><span class="w"> </span><span class="n">real_labels</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">torch</span><span class="o">::</span><span class="n">empty</span><span class="p">(</span><span class="n">batch</span><span class="p">.</span><span class="n">data</span><span class="p">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)).</span><span class="n">uniform_</span><span class="p">(</span><span class="mf">0.8</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">torch</span><span class="o">::</span><span class="n">Tensor</span><span class="w"> </span><span class="n">real_output</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">discriminator</span><span class="o">-&gt;</span><span class="n">forward</span><span class="p">(</span><span class="n">real_images</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">torch</span><span class="o">::</span><span class="n">Tensor</span><span class="w"> </span><span class="n">d_loss_real</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">torch</span><span class="o">::</span><span class="n">binary_cross_entropy</span><span class="p">(</span><span class="n">real_output</span><span class="p">,</span><span class="w"> </span><span class="n">real_labels</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">d_loss_real</span><span class="p">.</span><span class="n">backward</span><span class="p">();</span><span class="w"></span>
 
-    <span class="c1">// Train discriminator with fake images.</span>
-    <span class="n">torch</span><span class="o">::</span><span class="n">Tensor</span> <span class="n">noise</span> <span class="o">=</span> <span class="n">torch</span><span class="o">::</span><span class="n">randn</span><span class="p">({</span><span class="n">batch</span><span class="p">.</span><span class="n">data</span><span class="p">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">kNoiseSize</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">});</span>
-    <span class="n">torch</span><span class="o">::</span><span class="n">Tensor</span> <span class="n">fake_images</span> <span class="o">=</span> <span class="n">generator</span><span class="o">-&gt;</span><span class="n">forward</span><span class="p">(</span><span class="n">noise</span><span class="p">);</span>
-    <span class="n">torch</span><span class="o">::</span><span class="n">Tensor</span> <span class="n">fake_labels</span> <span class="o">=</span> <span class="n">torch</span><span class="o">::</span><span class="n">zeros</span><span class="p">(</span><span class="n">batch</span><span class="p">.</span><span class="n">data</span><span class="p">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">));</span>
-    <span class="n">torch</span><span class="o">::</span><span class="n">Tensor</span> <span class="n">fake_output</span> <span class="o">=</span> <span class="n">discriminator</span><span class="o">-&gt;</span><span class="n">forward</span><span class="p">(</span><span class="n">fake_images</span><span class="p">.</span><span class="n">detach</span><span class="p">());</span>
-    <span class="n">torch</span><span class="o">::</span><span class="n">Tensor</span> <span class="n">d_loss_fake</span> <span class="o">=</span> <span class="n">torch</span><span class="o">::</span><span class="n">binary_cross_entropy</span><span class="p">(</span><span class="n">fake_output</span><span class="p">,</span> <span class="n">fake_labels</span><span class="p">);</span>
-    <span class="n">d_loss_fake</span><span class="p">.</span><span class="n">backward</span><span class="p">();</span>
+<span class="w">    </span><span class="c1">// Train discriminator with fake images.</span>
+<span class="w">    </span><span class="n">torch</span><span class="o">::</span><span class="n">Tensor</span><span class="w"> </span><span class="n">noise</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">torch</span><span class="o">::</span><span class="n">randn</span><span class="p">({</span><span class="n">batch</span><span class="p">.</span><span class="n">data</span><span class="p">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span><span class="w"> </span><span class="n">kNoiseSize</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">});</span><span class="w"></span>
+<span class="w">    </span><span class="n">torch</span><span class="o">::</span><span class="n">Tensor</span><span class="w"> </span><span class="n">fake_images</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">generator</span><span class="o">-&gt;</span><span class="n">forward</span><span class="p">(</span><span class="n">noise</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">torch</span><span class="o">::</span><span class="n">Tensor</span><span class="w"> </span><span class="n">fake_labels</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">torch</span><span class="o">::</span><span class="n">zeros</span><span class="p">(</span><span class="n">batch</span><span class="p">.</span><span class="n">data</span><span class="p">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">));</span><span class="w"></span>
+<span class="w">    </span><span class="n">torch</span><span class="o">::</span><span class="n">Tensor</span><span class="w"> </span><span class="n">fake_output</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">discriminator</span><span class="o">-&gt;</span><span class="n">forward</span><span class="p">(</span><span class="n">fake_images</span><span class="p">.</span><span class="n">detach</span><span class="p">());</span><span class="w"></span>
+<span class="w">    </span><span class="n">torch</span><span class="o">::</span><span class="n">Tensor</span><span class="w"> </span><span class="n">d_loss_fake</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">torch</span><span class="o">::</span><span class="n">binary_cross_entropy</span><span class="p">(</span><span class="n">fake_output</span><span class="p">,</span><span class="w"> </span><span class="n">fake_labels</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">d_loss_fake</span><span class="p">.</span><span class="n">backward</span><span class="p">();</span><span class="w"></span>
 
-    <span class="n">torch</span><span class="o">::</span><span class="n">Tensor</span> <span class="n">d_loss</span> <span class="o">=</span> <span class="n">d_loss_real</span> <span class="o">+</span> <span class="n">d_loss_fake</span><span class="p">;</span>
-    <span class="n">discriminator_optimizer</span><span class="p">.</span><span class="n">step</span><span class="p">();</span>
+<span class="w">    </span><span class="n">torch</span><span class="o">::</span><span class="n">Tensor</span><span class="w"> </span><span class="n">d_loss</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">d_loss_real</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">d_loss_fake</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">discriminator_optimizer</span><span class="p">.</span><span class="n">step</span><span class="p">();</span><span class="w"></span>
 
-    <span class="c1">// Train generator.</span>
-    <span class="n">generator</span><span class="o">-&gt;</span><span class="n">zero_grad</span><span class="p">();</span>
-    <span class="n">fake_labels</span><span class="p">.</span><span class="n">fill_</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
-    <span class="n">fake_output</span> <span class="o">=</span> <span class="n">discriminator</span><span class="o">-&gt;</span><span class="n">forward</span><span class="p">(</span><span class="n">fake_images</span><span class="p">);</span>
-    <span class="n">torch</span><span class="o">::</span><span class="n">Tensor</span> <span class="n">g_loss</span> <span class="o">=</span> <span class="n">torch</span><span class="o">::</span><span class="n">binary_cross_entropy</span><span class="p">(</span><span class="n">fake_output</span><span class="p">,</span> <span class="n">fake_labels</span><span class="p">);</span>
-    <span class="n">g_loss</span><span class="p">.</span><span class="n">backward</span><span class="p">();</span>
-    <span class="n">generator_optimizer</span><span class="p">.</span><span class="n">step</span><span class="p">();</span>
+<span class="w">    </span><span class="c1">// Train generator.</span>
+<span class="w">    </span><span class="n">generator</span><span class="o">-&gt;</span><span class="n">zero_grad</span><span class="p">();</span><span class="w"></span>
+<span class="w">    </span><span class="n">fake_labels</span><span class="p">.</span><span class="n">fill_</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">fake_output</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">discriminator</span><span class="o">-&gt;</span><span class="n">forward</span><span class="p">(</span><span class="n">fake_images</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">torch</span><span class="o">::</span><span class="n">Tensor</span><span class="w"> </span><span class="n">g_loss</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">torch</span><span class="o">::</span><span class="n">binary_cross_entropy</span><span class="p">(</span><span class="n">fake_output</span><span class="p">,</span><span class="w"> </span><span class="n">fake_labels</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">g_loss</span><span class="p">.</span><span class="n">backward</span><span class="p">();</span><span class="w"></span>
+<span class="w">    </span><span class="n">generator_optimizer</span><span class="p">.</span><span class="n">step</span><span class="p">();</span><span class="w"></span>
 
-    <span class="n">std</span><span class="o">::</span><span class="n">printf</span><span class="p">(</span>
-        <span class="s">&quot;</span><span class="se">\r</span><span class="s">[%2ld/%2ld][%3ld/%3ld] D_loss: %.4f | G_loss: %.4f&quot;</span><span class="p">,</span>
-        <span class="n">epoch</span><span class="p">,</span>
-        <span class="n">kNumberOfEpochs</span><span class="p">,</span>
-        <span class="o">++</span><span class="n">batch_index</span><span class="p">,</span>
-        <span class="n">batches_per_epoch</span><span class="p">,</span>
-        <span class="n">d_loss</span><span class="p">.</span><span class="n">item</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">(),</span>
-        <span class="n">g_loss</span><span class="p">.</span><span class="n">item</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">());</span>
-  <span class="p">}</span>
-<span class="p">}</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">printf</span><span class="p">(</span><span class="w"></span>
+<span class="w">        </span><span class="s">&quot;</span><span class="se">\r</span><span class="s">[%2ld/%2ld][%3ld/%3ld] D_loss: %.4f | G_loss: %.4f&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="n">epoch</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="n">kNumberOfEpochs</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="o">++</span><span class="n">batch_index</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="n">batches_per_epoch</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="n">d_loss</span><span class="p">.</span><span class="n">item</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">(),</span><span class="w"></span>
+<span class="w">        </span><span class="n">g_loss</span><span class="p">.</span><span class="n">item</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="p">());</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
 </pre></div>
 </div>
 <p>위 코드는 먼저 진짜 (real) 이미지에 대해 판별기를 평가하는데, 이 때
@@ -1343,8 +1344,8 @@ Scanning dependencies of target dcgan
 ...
 </pre></div>
 </div>
-</div>
-<div class="section" id="gpu">
+</section>
+<section id="gpu">
 <h2>GPU로 이동하기<a class="headerlink" href="#gpu" title="Permalink to this headline">¶</a></h2>
 <p>이 스크립트는 CPU에서 잘 동작하지만, 합성곱 연산이 GPU에서 훨씬 빠르다는
 것은 잘 알려진 사실입니다. 어떻게 학습을 GPU로 옮길 수 있을 지에 대해 빠르게 논의해
@@ -1356,29 +1357,29 @@ Scanning dependencies of target dcgan
 텐서 팩토리 함수나 <code class="docutils literal notranslate"><span class="pre">to()</span></code> 메서드에 전달할 수 있습니다. 먼저 CPU device로
 이를 구현해보겠습니다.</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// 학습 스크립트 최상단에 이 코드를 넣으세요.</span>
-<span class="n">torch</span><span class="o">::</span><span class="n">Device</span> <span class="n">device</span><span class="p">(</span><span class="n">torch</span><span class="o">::</span><span class="n">kCPU</span><span class="p">);</span>
+<span class="n">torch</span><span class="o">::</span><span class="n">Device</span><span class="w"> </span><span class="nf">device</span><span class="p">(</span><span class="n">torch</span><span class="o">::</span><span class="n">kCPU</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 </div>
 <p>아래와 같은 새로운 텐서 할당의 경우,</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">torch</span><span class="o">::</span><span class="n">Tensor</span> <span class="n">fake_labels</span> <span class="o">=</span> <span class="n">torch</span><span class="o">::</span><span class="n">zeros</span><span class="p">(</span><span class="n">batch</span><span class="p">.</span><span class="n">data</span><span class="p">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">));</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">torch</span><span class="o">::</span><span class="n">Tensor</span><span class="w"> </span><span class="n">fake_labels</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">torch</span><span class="o">::</span><span class="n">zeros</span><span class="p">(</span><span class="n">batch</span><span class="p">.</span><span class="n">data</span><span class="p">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">));</span><span class="w"></span>
 </pre></div>
 </div>
 <p>마지막 인자로 <code class="docutils literal notranslate"><span class="pre">device</span></code> 를 받도록 수정합니다.</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">torch</span><span class="o">::</span><span class="n">Tensor</span> <span class="n">fake_labels</span> <span class="o">=</span> <span class="n">torch</span><span class="o">::</span><span class="n">zeros</span><span class="p">(</span><span class="n">batch</span><span class="p">.</span><span class="n">data</span><span class="p">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">device</span><span class="p">);</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">torch</span><span class="o">::</span><span class="n">Tensor</span><span class="w"> </span><span class="n">fake_labels</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">torch</span><span class="o">::</span><span class="n">zeros</span><span class="p">(</span><span class="n">batch</span><span class="p">.</span><span class="n">data</span><span class="p">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span><span class="w"> </span><span class="n">device</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 </div>
 <p>MNIST 데이터셋의 텐서처럼 우리가 직접 생성하지 않는 텐서에서는
 명시적으로 <code class="docutils literal notranslate"><span class="pre">to()</span></code> 호출을 삽입해야 합니다. 따라서 아래 코드의 경우,</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">torch</span><span class="o">::</span><span class="n">Tensor</span> <span class="n">real_images</span> <span class="o">=</span> <span class="n">batch</span><span class="p">.</span><span class="n">data</span><span class="p">;</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">torch</span><span class="o">::</span><span class="n">Tensor</span><span class="w"> </span><span class="n">real_images</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">batch</span><span class="p">.</span><span class="n">data</span><span class="p">;</span><span class="w"></span>
 </pre></div>
 </div>
 <p>다음과 같이 변합니다.</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">torch</span><span class="o">::</span><span class="n">Tensor</span> <span class="n">real_images</span> <span class="o">=</span> <span class="n">batch</span><span class="p">.</span><span class="n">data</span><span class="p">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">);</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">torch</span><span class="o">::</span><span class="n">Tensor</span><span class="w"> </span><span class="n">real_images</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">batch</span><span class="p">.</span><span class="n">data</span><span class="p">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 </div>
 <p>또한, 모델 매개변수를 올바른 장치로 옮겨야 합니다.</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">generator</span><span class="o">-&gt;</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">);</span>
-<span class="n">discriminator</span><span class="o">-&gt;</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">);</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">generator</span><span class="o">-&gt;</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">);</span><span class="w"></span>
+<span class="n">discriminator</span><span class="o">-&gt;</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 </div>
 <div class="admonition note">
@@ -1387,7 +1388,7 @@ Scanning dependencies of target dcgan
 </div>
 <p>이제 CPU에서 실행되는 이전의 코드가 보다 명시적으로 바뀌었습니다.
 하지만 이제는 장치를 CUDA 장치로 변경하는 것 또한 매우 쉽습니다.</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">torch</span><span class="o">::</span><span class="n">Device</span> <span class="n">device</span><span class="p">(</span><span class="n">torch</span><span class="o">::</span><span class="n">kCUDA</span><span class="p">)</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">torch</span><span class="o">::</span><span class="n">Device</span><span class="w"> </span><span class="n">device</span><span class="p">(</span><span class="n">torch</span><span class="o">::</span><span class="n">kCUDA</span><span class="p">)</span><span class="w"></span>
 </pre></div>
 </div>
 <p>이제 모든 텐서가 GPU에 존재하며 어떠한 다운스트림 코드 변경 없이도
@@ -1397,19 +1398,19 @@ Scanning dependencies of target dcgan
 별도의 장치 인스턴스(예: CUDA 장치 0과 다른 CUDA 장치 1)를
 전달할 수도 있습니다. 뿐만 아니라, 이러한 설정을 동적으로 수행할 수도
 있어 다음과 같이 학습 스크립트의 휴대성을 높이는 데 종종 유용하게 사용됩니다.</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">torch</span><span class="o">::</span><span class="n">Device</span> <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">::</span><span class="n">kCPU</span><span class="p">;</span>
-<span class="k">if</span> <span class="p">(</span><span class="n">torch</span><span class="o">::</span><span class="n">cuda</span><span class="o">::</span><span class="n">is_available</span><span class="p">())</span> <span class="p">{</span>
-  <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;CUDA is available! Training on GPU.&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
-  <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">::</span><span class="n">kCUDA</span><span class="p">;</span>
-<span class="p">}</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">torch</span><span class="o">::</span><span class="n">Device</span><span class="w"> </span><span class="n">device</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">torch</span><span class="o">::</span><span class="n">kCPU</span><span class="p">;</span><span class="w"></span>
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">torch</span><span class="o">::</span><span class="n">cuda</span><span class="o">::</span><span class="n">is_available</span><span class="p">())</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;CUDA is available! Training on GPU.&quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span><span class="w"></span>
+<span class="w">  </span><span class="n">device</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">torch</span><span class="o">::</span><span class="n">kCUDA</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
 </pre></div>
 </div>
 <p>나아가 아래와 같은 코드도 가능합니다.</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">torch</span><span class="o">::</span><span class="n">Device</span> <span class="n">device</span><span class="p">(</span><span class="n">torch</span><span class="o">::</span><span class="n">cuda</span><span class="o">::</span><span class="n">is_available</span><span class="p">()</span> <span class="o">?</span> <span class="n">torch</span><span class="o">::</span><span class="nl">kCUDA</span> <span class="p">:</span> <span class="n">torch</span><span class="o">::</span><span class="n">kCPU</span><span class="p">);</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">torch</span><span class="o">::</span><span class="n">Device</span><span class="w"> </span><span class="nf">device</span><span class="p">(</span><span class="n">torch</span><span class="o">::</span><span class="n">cuda</span><span class="o">::</span><span class="n">is_available</span><span class="p">()</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="n">torch</span><span class="o">::</span><span class="n">kCUDA</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">torch</span><span class="o">::</span><span class="n">kCPU</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="id21">
+</section>
+<section id="id21">
 <h2>학습 상태 저장 및 복원하기<a class="headerlink" href="#id21" title="Permalink to this headline">¶</a></h2>
 <p>마지막으로 학습 스크립트에 추가해야 할 내용은 모델 매개변수 및
 옵티마이저의 상태, 그리고 생성된 몇 개의 이미지 샘플을
@@ -1423,17 +1424,17 @@ C++ 프론트엔드는 개별 텐서뿐만 아니라 모델 및 옵티마이저 
 <code class="docutils literal notranslate"><span class="pre">torch::nn::Module</span></code> 의 하위 클래스 혹은 우리의 학습 스크립트의 <code class="docutils literal notranslate"><span class="pre">Adam</span></code>
 객체와 같은 옵티마이저 인스턴스가 될 수 있습니다. 모델 및 옵티마이저 상태를
 특정 주기마다 저장하도록 학습 루프를 수정해보겠습니다.</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="p">(</span><span class="n">batch_index</span> <span class="o">%</span> <span class="n">kCheckpointEvery</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-  <span class="c1">// 모델 및 옵티마이저 상태를 저장합니다.</span>
-  <span class="n">torch</span><span class="o">::</span><span class="n">save</span><span class="p">(</span><span class="n">generator</span><span class="p">,</span> <span class="s">&quot;generator-checkpoint.pt&quot;</span><span class="p">);</span>
-  <span class="n">torch</span><span class="o">::</span><span class="n">save</span><span class="p">(</span><span class="n">generator_optimizer</span><span class="p">,</span> <span class="s">&quot;generator-optimizer-checkpoint.pt&quot;</span><span class="p">);</span>
-  <span class="n">torch</span><span class="o">::</span><span class="n">save</span><span class="p">(</span><span class="n">discriminator</span><span class="p">,</span> <span class="s">&quot;discriminator-checkpoint.pt&quot;</span><span class="p">);</span>
-  <span class="n">torch</span><span class="o">::</span><span class="n">save</span><span class="p">(</span><span class="n">discriminator_optimizer</span><span class="p">,</span> <span class="s">&quot;discriminator-optimizer-checkpoint.pt&quot;</span><span class="p">);</span>
-  <span class="c1">// 생성기를 샘플링하고 이미지를 저장합니다.</span>
-  <span class="n">torch</span><span class="o">::</span><span class="n">Tensor</span> <span class="n">samples</span> <span class="o">=</span> <span class="n">generator</span><span class="o">-&gt;</span><span class="n">forward</span><span class="p">(</span><span class="n">torch</span><span class="o">::</span><span class="n">randn</span><span class="p">({</span><span class="mi">8</span><span class="p">,</span> <span class="n">kNoiseSize</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">},</span> <span class="n">device</span><span class="p">));</span>
-  <span class="n">torch</span><span class="o">::</span><span class="n">save</span><span class="p">((</span><span class="n">samples</span> <span class="o">+</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">,</span> <span class="n">torch</span><span class="o">::</span><span class="n">str</span><span class="p">(</span><span class="s">&quot;dcgan-sample-&quot;</span><span class="p">,</span> <span class="n">checkpoint_counter</span><span class="p">,</span> <span class="s">&quot;.pt&quot;</span><span class="p">));</span>
-  <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">-&gt; checkpoint &quot;</span> <span class="o">&lt;&lt;</span> <span class="o">++</span><span class="n">checkpoint_counter</span> <span class="o">&lt;&lt;</span> <span class="sc">&#39;\n&#39;</span><span class="p">;</span>
-<span class="p">}</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">batch_index</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="n">kCheckpointEvery</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="c1">// 모델 및 옵티마이저 상태를 저장합니다.</span>
+<span class="w">  </span><span class="n">torch</span><span class="o">::</span><span class="n">save</span><span class="p">(</span><span class="n">generator</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;generator-checkpoint.pt&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="n">torch</span><span class="o">::</span><span class="n">save</span><span class="p">(</span><span class="n">generator_optimizer</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;generator-optimizer-checkpoint.pt&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="n">torch</span><span class="o">::</span><span class="n">save</span><span class="p">(</span><span class="n">discriminator</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;discriminator-checkpoint.pt&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="n">torch</span><span class="o">::</span><span class="n">save</span><span class="p">(</span><span class="n">discriminator_optimizer</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;discriminator-optimizer-checkpoint.pt&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="c1">// 생성기를 샘플링하고 이미지를 저장합니다.</span>
+<span class="w">  </span><span class="n">torch</span><span class="o">::</span><span class="n">Tensor</span><span class="w"> </span><span class="n">samples</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">generator</span><span class="o">-&gt;</span><span class="n">forward</span><span class="p">(</span><span class="n">torch</span><span class="o">::</span><span class="n">randn</span><span class="p">({</span><span class="mi">8</span><span class="p">,</span><span class="w"> </span><span class="n">kNoiseSize</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">},</span><span class="w"> </span><span class="n">device</span><span class="p">));</span><span class="w"></span>
+<span class="w">  </span><span class="n">torch</span><span class="o">::</span><span class="n">save</span><span class="p">((</span><span class="n">samples</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">1.0</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mf">2.0</span><span class="p">,</span><span class="w"> </span><span class="n">torch</span><span class="o">::</span><span class="n">str</span><span class="p">(</span><span class="s">&quot;dcgan-sample-&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">checkpoint_counter</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;.pt&quot;</span><span class="p">));</span><span class="w"></span>
+<span class="w">  </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;</span><span class="se">\n</span><span class="s">-&gt; checkpoint &quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="o">++</span><span class="n">checkpoint_counter</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="sc">&#39;\n&#39;</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
 </pre></div>
 </div>
 <p>여기서 <code class="docutils literal notranslate"><span class="pre">100</span></code> 배치마다 상태를 저장하려면 <code class="docutils literal notranslate"><span class="pre">kCheckpointEvery</span></code> 를 <code class="docutils literal notranslate"><span class="pre">100</span></code>
@@ -1441,27 +1442,27 @@ C++ 프론트엔드는 개별 텐서뿐만 아니라 모델 및 옵티마이저 
 증가하는 카운터입니다.</p>
 <p>학습 상태를 복원하기 위해 모델 및 옵티마이저를 모두 생성한 후 학습 루프 앞에
 다음 코드를 추가할 수 있습니다.</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">torch</span><span class="o">::</span><span class="n">optim</span><span class="o">::</span><span class="n">Adam</span> <span class="n">generator_optimizer</span><span class="p">(</span>
-    <span class="n">generator</span><span class="o">-&gt;</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">torch</span><span class="o">::</span><span class="n">optim</span><span class="o">::</span><span class="n">AdamOptions</span><span class="p">(</span><span class="mf">2e-4</span><span class="p">).</span><span class="n">beta1</span><span class="p">(</span><span class="mf">0.5</span><span class="p">));</span>
-<span class="n">torch</span><span class="o">::</span><span class="n">optim</span><span class="o">::</span><span class="n">Adam</span> <span class="n">discriminator_optimizer</span><span class="p">(</span>
-    <span class="n">discriminator</span><span class="o">-&gt;</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">torch</span><span class="o">::</span><span class="n">optim</span><span class="o">::</span><span class="n">AdamOptions</span><span class="p">(</span><span class="mf">2e-4</span><span class="p">).</span><span class="n">beta1</span><span class="p">(</span><span class="mf">0.5</span><span class="p">));</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">torch</span><span class="o">::</span><span class="n">optim</span><span class="o">::</span><span class="n">Adam</span><span class="w"> </span><span class="nf">generator_optimizer</span><span class="p">(</span><span class="w"></span>
+<span class="w">    </span><span class="n">generator</span><span class="o">-&gt;</span><span class="n">parameters</span><span class="p">(),</span><span class="w"> </span><span class="n">torch</span><span class="o">::</span><span class="n">optim</span><span class="o">::</span><span class="n">AdamOptions</span><span class="p">(</span><span class="mf">2e-4</span><span class="p">).</span><span class="n">beta1</span><span class="p">(</span><span class="mf">0.5</span><span class="p">));</span><span class="w"></span>
+<span class="n">torch</span><span class="o">::</span><span class="n">optim</span><span class="o">::</span><span class="n">Adam</span><span class="w"> </span><span class="nf">discriminator_optimizer</span><span class="p">(</span><span class="w"></span>
+<span class="w">    </span><span class="n">discriminator</span><span class="o">-&gt;</span><span class="n">parameters</span><span class="p">(),</span><span class="w"> </span><span class="n">torch</span><span class="o">::</span><span class="n">optim</span><span class="o">::</span><span class="n">AdamOptions</span><span class="p">(</span><span class="mf">2e-4</span><span class="p">).</span><span class="n">beta1</span><span class="p">(</span><span class="mf">0.5</span><span class="p">));</span><span class="w"></span>
 
-<span class="k">if</span> <span class="p">(</span><span class="n">kRestoreFromCheckpoint</span><span class="p">)</span> <span class="p">{</span>
-  <span class="n">torch</span><span class="o">::</span><span class="n">load</span><span class="p">(</span><span class="n">generator</span><span class="p">,</span> <span class="s">&quot;generator-checkpoint.pt&quot;</span><span class="p">);</span>
-  <span class="n">torch</span><span class="o">::</span><span class="n">load</span><span class="p">(</span><span class="n">generator_optimizer</span><span class="p">,</span> <span class="s">&quot;generator-optimizer-checkpoint.pt&quot;</span><span class="p">);</span>
-  <span class="n">torch</span><span class="o">::</span><span class="n">load</span><span class="p">(</span><span class="n">discriminator</span><span class="p">,</span> <span class="s">&quot;discriminator-checkpoint.pt&quot;</span><span class="p">);</span>
-  <span class="n">torch</span><span class="o">::</span><span class="n">load</span><span class="p">(</span>
-      <span class="n">discriminator_optimizer</span><span class="p">,</span> <span class="s">&quot;discriminator-optimizer-checkpoint.pt&quot;</span><span class="p">);</span>
-<span class="p">}</span>
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">kRestoreFromCheckpoint</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="n">torch</span><span class="o">::</span><span class="n">load</span><span class="p">(</span><span class="n">generator</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;generator-checkpoint.pt&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="n">torch</span><span class="o">::</span><span class="n">load</span><span class="p">(</span><span class="n">generator_optimizer</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;generator-optimizer-checkpoint.pt&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="n">torch</span><span class="o">::</span><span class="n">load</span><span class="p">(</span><span class="n">discriminator</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;discriminator-checkpoint.pt&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="n">torch</span><span class="o">::</span><span class="n">load</span><span class="p">(</span><span class="w"></span>
+<span class="w">      </span><span class="n">discriminator_optimizer</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;discriminator-optimizer-checkpoint.pt&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
 
-<span class="kt">int64_t</span> <span class="n">checkpoint_counter</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-<span class="k">for</span> <span class="p">(</span><span class="kt">int64_t</span> <span class="n">epoch</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">epoch</span> <span class="o">&lt;=</span> <span class="n">kNumberOfEpochs</span><span class="p">;</span> <span class="o">++</span><span class="n">epoch</span><span class="p">)</span> <span class="p">{</span>
-  <span class="kt">int64_t</span> <span class="n">batch_index</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-  <span class="k">for</span> <span class="p">(</span><span class="n">torch</span><span class="o">::</span><span class="n">data</span><span class="o">::</span><span class="n">Example</span><span class="o">&lt;&gt;&amp;</span> <span class="nl">batch</span> <span class="p">:</span> <span class="o">*</span><span class="n">data_loader</span><span class="p">)</span> <span class="p">{</span>
+<span class="kt">int64_t</span><span class="w"> </span><span class="n">checkpoint_counter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int64_t</span><span class="w"> </span><span class="n">epoch</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"> </span><span class="n">epoch</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">kNumberOfEpochs</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">epoch</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="kt">int64_t</span><span class="w"> </span><span class="n">batch_index</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">torch</span><span class="o">::</span><span class="n">data</span><span class="o">::</span><span class="n">Example</span><span class="o">&lt;&gt;&amp;</span><span class="w"> </span><span class="n">batch</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="o">*</span><span class="n">data_loader</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="id22">
+</section>
+<section id="id22">
 <h2>생성한 이미지 검사하기<a class="headerlink" href="#id22" title="Permalink to this headline">¶</a></h2>
 <p>학습 스크립트가 완성되어 CPU에서든 GPU에서든 GAN을 훈련시킬 준비가
 됐습니다. 학습 과정의 중간 출력을 검사하기 위해
@@ -1527,13 +1528,13 @@ Saved out.png
 </pre></div>
 </div>
 <p>그 결과는 아래와 같을 것입니다.</p>
-<div class="figure align-default">
+<figure class="align-default">
 <img alt="digits" src="../_images/digits.png" />
-</div>
+</figure>
 <p>숫자네요! 만세! 이제 여러분 차례입니다. 숫자가 보다 나아 보이도록
 모델을 개선할 수 있나요?</p>
-</div>
-<div class="section" id="id23">
+</section>
+<section id="id23">
 <h2>결론<a class="headerlink" href="#id23" title="Permalink to this headline">¶</a></h2>
 <p>이 튜토리얼을 통해 PyTorch C++ 프론트엔드에 대한 어느 정도 이해도가 생기셨기
 바랍니다. 필연적으로 PyTorch 같은 머신러닝 라이브러리는 매우 다양하고
@@ -1550,8 +1551,8 @@ Saved out.png
 </div>
 <p>언제나 그렇듯이 어떤 문제가 생기거나 질문이 있으면 저희
 <a class="reference external" href="https://discuss.pytorch.org/">포럼</a> 을 이용하거나 <a class="reference external" href="https://github.com/pytorch/pytorch/issues">Github 이슈</a> 로 연락주세요.</p>
-</div>
-</div>
+</section>
+</section>
 
 
              </article>
@@ -1646,7 +1647,7 @@ Saved out.png
 
 
   
-
+  
      
        <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
          <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
@@ -1659,7 +1660,6 @@ Saved out.png
          <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
          <script src="../_static/katex_autorenderer.js"></script>
      
-
   
 
   <script type="text/javascript" src="../_static/js/vendor/popper.min.js"></script>

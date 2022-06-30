@@ -6,7 +6,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
 <meta property="og:title" content="TorchScript의 동적 병렬 처리(Dynamic Parallelism)" />
   
 <meta property="og:type" content="article" />
@@ -391,7 +392,7 @@
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <div class="section" id="torchscript-dynamic-parallelism">
+  <section id="torchscript-dynamic-parallelism">
 <h1>TorchScript의 동적 병렬 처리(Dynamic Parallelism)<a class="headerlink" href="#torchscript-dynamic-parallelism" title="Permalink to this headline">¶</a></h1>
 <p>이 튜토리얼에서는, TorchScript에서 <em>동적 inter-op 병렬처리</em> 를 하는 구문(syntax)을 소개합니다.
 이 병렬처리에는 다음과 같은 속성이 있습니다:</p>
@@ -399,7 +400,7 @@
 <li><p>동적(dynamic) - 생성된 병렬 작업의 수와 작업 부하는 프로그램의 제어 흐름에 따라 달라질 수 있습니다.</p></li>
 <li><p>inter-op - 병렬 처리는 TorchScript 프로그램 조각을 병렬로 실행하는 것과 관련이 있습니다. 이는 개별 연산자를 분할하고 연산자 작업의 하위 집합을 병렬로 실행하는 방식인 <em>intra-op parallelism</em> 와는 구별됩니다.</p></li>
 </ul>
-<div class="section" id="id1">
+<section id="id1">
 <h2>기본 구문<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
 <p>동적 병렬 처리를 위한 두 가지 중요한 API는 다음과 같습니다:</p>
 <ul class="simple">
@@ -474,8 +475,8 @@ TorchScript에서 빈 컨테이너(container)는 기본적으로 tensor 값을 �
 </div>
 <p>이 예제는 <code class="docutils literal notranslate"><span class="pre">fork()</span></code> 를 사용하여 함수 <code class="docutils literal notranslate"><span class="pre">foo</span></code> 의 인스턴스 100개를 시작하고, 100개의 작업이 완료 될때까지
 대기한 다음, 결과를 합산하여 <code class="docutils literal notranslate"><span class="pre">-100.0</span></code> 을 반환합니다.</p>
-</div>
-<div class="section" id="bidirectional-lstms-ensemble">
+</section>
+<section id="bidirectional-lstms-ensemble">
 <h2>적용된 예시: 양방향(bidirectional) LSTMs의 앙상블(Ensemble)<a class="headerlink" href="#bidirectional-lstms-ensemble" title="Permalink to this headline">¶</a></h2>
 <p>보다 현실적인 예시에 병렬화를 적용하고 어떤 성능을 얻을 수 있는지 살펴봅시다.
 먼저, 양방향 LSTM 계층의 앙상블인
@@ -545,8 +546,8 @@ TorchScript에서 빈 컨테이너(container)는 기본적으로 tensor 값을 �
 </pre></div>
 </div>
 <p>제 컴퓨터에서는 네트워크가 <code class="docutils literal notranslate"><span class="pre">2.05</span></code> 초 만에 실행되었습니다. 훨씬 더 빠르게 할 수 있습니다!</p>
-</div>
-<div class="section" id="forward-backward">
+</section>
+<section id="forward-backward">
 <h2>Forward, Backward 계층 병렬화<a class="headerlink" href="#forward-backward" title="Permalink to this headline">¶</a></h2>
 <p>간단하게 할 수 있는 일로는 <code class="docutils literal notranslate"><span class="pre">BidirectionalRecurrentLSTM</span></code> 내에서 forward, backward 계층들을 병렬화하는 것이 있습니다.
 이 때, 계산 구조는 고정되어 있으므로 우리는 어떤 루프도 필요로 하지 않습니다.
@@ -574,8 +575,8 @@ TorchScript에서 빈 컨테이너(container)는 기본적으로 tensor 값을 �
 이로 인해 두 셀의 실행이 서로 겹칩니다.</p>
 <p>이 간단한 수정 후에 스크립트를 다시 실행하면
 <code class="docutils literal notranslate"><span class="pre">17%</span></code> 향상된 <code class="docutils literal notranslate"><span class="pre">1.71</span></code> 초의 런타임이 나옵니다!</p>
-</div>
-<div class="section" id="aside-visualizing-parallelism">
+</section>
+<section id="aside-visualizing-parallelism">
 <h2>Aside: 병렬화 시각화 (Visualizing Parallelism)<a class="headerlink" href="#aside-visualizing-parallelism" title="Permalink to this headline">¶</a></h2>
 <p>아직 모델 최적화가 끝나지 않았지만 이쯤에서 성능 시각화를 위한 도구를 도입해봅시다.
 한 가지 중요한 도구는 <a class="reference external" href="https://pytorch.org/docs/stable/autograd.html#profiler">PyTorch 프로파일러(profiler)</a> 입니다.</p>
@@ -594,8 +595,8 @@ JSON 파일을 로드하면 다음과 같은 타임라인을 보게 될 겁니�
 보다시피 한 번에 두 개의 <code class="docutils literal notranslate"><span class="pre">lstm</span></code> 을 실행하고 있습니다.
 이것은 양방향(forward, backward) 계층을 병렬화하기 위해
 노력한 결과입니다!</p>
-</div>
-<div class="section" id="id2">
+</section>
+<section id="id2">
 <h2>앙상블에서의 병렬화 모델<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
 <p>이 코드에 더 많은 병렬화 기회가 있다는 것을 눈치챘을지도 모릅니다:
 <code class="docutils literal notranslate"><span class="pre">LSTMEnsemble</span></code> 에 포함된 모델들을 서로 병렬로 실행할 수도 있습니다.
@@ -630,8 +631,8 @@ JSON 파일을 로드하면 다음과 같은 타임라인을 보게 될 겁니�
 <p>또한 Chrome 추적기(tracer)를 다시 사용해 진행 상황을 볼 수 있습니다:</p>
 <img alt="https://i.imgur.com/kA0gyQm.png" src="https://i.imgur.com/kA0gyQm.png" />
 <p>이제 모든 <code class="docutils literal notranslate"><span class="pre">LSTM</span></code> 인스턴스가 완전히 병렬로 실행되는 것을 볼 수 있습니다.</p>
-</div>
-<div class="section" id="id3">
+</section>
+<section id="id3">
 <h2>결론<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
 <p>이 튜토리얼에서 우리는 TorchScript에서 동적(dynamic), inter-op 병렬 처리를 수행하기 위한 기본 API인
 <code class="docutils literal notranslate"><span class="pre">fork()</span></code> 와 <code class="docutils literal notranslate"><span class="pre">wait()</span></code> 에 대해 배웠습니다.
@@ -639,8 +640,8 @@ JSON 파일을 로드하면 다음과 같은 타임라인을 보게 될 겁니�
 <code class="docutils literal notranslate"><span class="pre">Modules</span></code> 의 실행을 병렬화하는 몇 가지 일반적인 사용 패턴도 보았습니다.
 마지막으로, 이 기술을 사용해 모델을 최적화하는 예를 훑어보고, PyTorch에서 사용 가능한
 성능 측정 및 시각화 도구를 살펴보았습니다.</p>
-</div>
-</div>
+</section>
+</section>
 
 
              </article>
@@ -717,7 +718,7 @@ JSON 파일을 로드하면 다음과 같은 타임라인을 보게 될 겁니�
 
 
   
-
+  
      
        <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
          <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
@@ -730,7 +731,6 @@ JSON 파일을 로드하면 다음과 같은 타임라인을 보게 될 겁니�
          <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
          <script src="../_static/katex_autorenderer.js"></script>
      
-
   
 
   <script type="text/javascript" src="../_static/js/vendor/popper.min.js"></script>

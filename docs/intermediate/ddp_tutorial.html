@@ -6,7 +6,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
 <meta property="og:title" content="분산 데이터 병렬 처리 시작하기" />
   
 <meta property="og:type" content="article" />
@@ -391,7 +392,7 @@
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <div class="section" id="id1">
+  <section id="id1">
 <h1>분산 데이터 병렬 처리 시작하기<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h1>
 <p><strong>저자</strong>: <a class="reference external" href="https://mrshenli.github.io/">Shen Li</a></p>
 <p><strong>감수</strong>: <a class="reference external" href="https://github.com/gunandrose4u">Joe Zhu</a></p>
@@ -419,7 +420,7 @@ checkpointing 모델 및 DDP와 모델 병렬 처리의 결합을 포함한 추�
 <p class="admonition-title">Note</p>
 <p>이 튜토리얼의 코드는 8-GPU 서버에서 실행되지만 다른 환경에서도 쉽게 적용할 수 있습니다.</p>
 </div>
-<div class="section" id="dataparallel-distributeddataparallel">
+<section id="dataparallel-distributeddataparallel">
 <h2><code class="docutils literal notranslate"><span class="pre">DataParallel</span></code>과 <code class="docutils literal notranslate"><span class="pre">DistributedDataParallel</span></code> 간의 비교<a class="headerlink" href="#dataparallel-distributeddataparallel" title="Permalink to this headline">¶</a></h2>
 <p>내용에 들어가기에 앞서 복잡성이 증가했음에도 불구하고
 <code class="docutils literal notranslate"><span class="pre">DataParallel</span></code>에 <code class="docutils literal notranslate"><span class="pre">DistributedDataParallel</span></code> 사용을 고려하는 이유를 생각해봅시다.</p>
@@ -436,8 +437,8 @@ DDP를 모델 병렬 처리와 결합하면 각 DDP 작업은 모델 병렬 처�
 <li><p>모델이 여러 대의 기기에 존재해야 하거나 사용 사례가 데이터 병렬화 패러다임에 맞지 않는 경우,
 일반적인 분산 학습 지원을 보려면 <a class="reference external" href="https://pytorch.org/docs/stable/rpc.html">the RPC API</a>를 참조하십시오.</p></li>
 </ul>
-</div>
-<div class="section" id="id3">
+</section>
+<section id="id3">
 <h2>기본적인 사용법<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
 <p>DDP 모듈을 생성하기 전에 우선 작업 그룹을 올바르게 설정해야 합니다. 자세한 내용은
 <a class="reference external" href="https://tutorials.pytorch.kr/intermediate/dist_tuto.html">PYTORCH로 분산 어플리케이션 개발하기</a>에서 확인할 수 있습니다.</p>
@@ -522,8 +523,8 @@ DDP를 모델 병렬 처리와 결합하면 각 DDP 작업은 모델 병렬 처�
 역전파 전달(backward pass)간 수행되며 역전파 계산(backward computation)과 겹치게 됩니다.
 <code class="docutils literal notranslate"><span class="pre">backword()</span></code>가 반환되면 <code class="docutils literal notranslate"><span class="pre">param.grad</span></code>에는 동기화된 변화도 텐서(synchronized gradient tensor)가 포함되어 있습니다.
 기본적으로 DDP는 작업 그룹을 설정하는데 몇 개의 LoCs만이 필요하지만 보다 다양하게 사용하는 경우 주의가 필요합니다.</p>
-</div>
-<div class="section" id="id4">
+</section>
+<section id="id4">
 <h2>비대칭 작업 속도<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
 <p>DDP에서는 생성자, 순전파(forward pass) 및 역전파 전달 호출 지점이 분산 동기화 지점(distribute synchronization point)입니다.
 서로 다른 작업이 동일한 수의 동기화를 시작하고 동일한 순서로 이러한 동기화 지점에 도달하여
@@ -534,8 +535,8 @@ DDP를 모델 병렬 처리와 결합하면 각 DDP 작업은 모델 병렬 처�
 예를 들어, 네트워크 지연, 리소스 경쟁(resource contentions), 예측하지 못한 작업량 급증 등입니다.
 이러한 상황에서 시간 초과를 방지하려면, <a class="reference external" href="https://pytorch.org/docs/stable/distributed.html#torch.distributed.init_process_group">init_process_group</a>를
 호출할 때 충분한 <code class="docutils literal notranslate"><span class="pre">timeout</span></code>값을 전달해야 합니다.</p>
-</div>
-<div class="section" id="id5">
+</section>
+<section id="id5">
 <h2>체크포인트를 저장하고 읽어오기<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h2>
 <p>학습 중에 <code class="docutils literal notranslate"><span class="pre">torch.save</span></code>와 <code class="docutils literal notranslate"><span class="pre">torch.load</span></code> 로 모듈의 체크포인트를 만들고 그 체크포인트로부터 복구하는 것이 일반적입니다.
 더 자세한 내용은 <a class="reference external" href="https://tutorials.pytorch.kr/beginner/saving_loading_models.html">SAVING AND LOADING MODELS</a>를 참고하세요.
@@ -589,8 +590,8 @@ DDP를 사용할 때, 최적의 방법은 모델을 한 작업에만 저장하�
     <span class="n">cleanup</span><span class="p">()</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="ddp">
+</section>
+<section id="ddp">
 <h2>모델 병렬 처리를 활용한 DDP<a class="headerlink" href="#ddp" title="Permalink to this headline">¶</a></h2>
 <p>DDP는 다중 – GPU 모델에서도 작동합니다.
 다중 – GPU 모델을 활용한 DDP는 대용량의 데이터를 가진 대용량 모델을 학습시킬 때 특히 유용합니다.</p>
@@ -644,8 +645,8 @@ DDP를 사용할 때, 최적의 방법은 모델을 한 작업에만 저장하�
     <span class="n">run_demo</span><span class="p">(</span><span class="n">demo_model_parallel</span><span class="p">,</span> <span class="n">world_size</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-</div>
+</section>
+</section>
 
 
              </article>
@@ -721,7 +722,7 @@ DDP를 사용할 때, 최적의 방법은 모델을 한 작업에만 저장하�
 
 
   
-
+  
      
        <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
          <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
@@ -734,7 +735,6 @@ DDP를 사용할 때, 최적의 방법은 모델을 한 작업에만 저장하�
          <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
          <script src="../_static/katex_autorenderer.js"></script>
      
-
   
 
   <script type="text/javascript" src="../_static/js/vendor/popper.min.js"></script>

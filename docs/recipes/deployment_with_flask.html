@@ -6,7 +6,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
 <meta property="og:title" content="Flask로 배포하기" />
   
 <meta property="og:type" content="article" />
@@ -393,7 +394,7 @@
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <div class="section" id="flask">
+  <section id="flask">
 <h1>Flask로 배포하기<a class="headerlink" href="#flask" title="Permalink to this headline">¶</a></h1>
 <p>이 레시피에서는 다음과 같은 내용들을 학습합니다:</p>
 <ul class="simple">
@@ -401,7 +402,7 @@
 <li><p>웹 요청(request)을 모델에 입력하기 위해 PyTorch 텐서(tensor)로 변환하는 방법</p></li>
 <li><p>모델의 결과를 HTTP 응답(response)로 패키징하는 방법</p></li>
 </ul>
-<div class="section" id="id1">
+<section id="id1">
 <h2>필요사항<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
 <p>아래와 같은 패키지들(과 의존성이 있는 패키지들)이 설치된 Python 3 환경이 필요합니다:</p>
 <ul class="simple">
@@ -412,20 +413,20 @@
 <p>선택 사항으로, 일부 예제 파일들(supporting files)을 받기 위해서 git이 필요합니다.</p>
 <p>PyTorch와 TorchVision 설치방법은 <a class="reference external" href="https://pytorch.org">pytorch.org</a> 에서 확인하실 수 있습니다.
 Flask 설치 방법은 <a class="reference external" href="https://flask.palletsprojects.com/en/1.1.x/installation/">Flask 설치 문서</a> 에서 확인하실 수 있습니다.</p>
-</div>
-<div class="section" id="id2">
+</section>
+<section id="id2">
 <h2>Flask란?<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
 <p>Flask는 Python으로 작성된 가벼운 웹 서버입니다. 학습한 PyTorch 모델의 예측을
 위한 웹 API를 편리하게 작성하여, 직접 사용하거나 더 큰 시스템에 포함된 웹 서비스를
 만들 수 있습니다.</p>
-</div>
-<div class="section" id="id3">
+</section>
+<section id="id3">
 <h2>설치 및 예제 파일<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
 <p>이미지를 받아서 ImageNet 데이터셋의 1000개 클래스(class) 중 하나로 예측(map)하는
 웹 서비스를 만들려고 합니다. 이를 위해 테스트할 이미지 파일들이 필요합니다.
 선택 사항으로, 모델이 예측한 클래스 번호(index)를 사람이 읽을 수 있는 클래스 이름으로
 바꾸기 위한 파일을 받을 수도 있습니다.</p>
-<div class="section" id="id4">
+<section id="id4">
 <h3>옵션 1: 예제 파일 모두를 빠르게 받기<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
 <p>TorchServe 저장소에 체크아웃하여 예제 파일 모두를 가져오고(pull), 작업 폴더로
 복사할 수 있습니다. <em>(안내: 이 튜토리얼은 TorchServe에 어떠한 의존성도 갖지 않습니다.
@@ -436,19 +437,19 @@ Flask 설치 방법은 <a class="reference external" href="https://flask.pallets
 </pre></div>
 </div>
 <p>이제 파일들을 받았습니다!</p>
-</div>
-<div class="section" id="id5">
+</section>
+<section id="id5">
 <h3>옵션 2: 이미지 직접 가져오기<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
 <p><code class="docutils literal notranslate"><span class="pre">index_to_name.json</span></code> 파일은 아래 Flask 서비스에서 선택 사항입니다.
 직접 가져온 이미지(물론 3색 JPEG 이미지여야 합니다)도 테스트를 할 수 있습니다.</p>
-</div>
-</div>
-<div class="section" id="id6">
+</section>
+</section>
+<section id="id6">
 <h2>Flask 서비스 구축하기<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h2>
 <p>Flask 서비스를 구성하는 전체 Python 스크립트는 이 레시피의 끝 부분에 있습니다;
 <code class="docutils literal notranslate"><span class="pre">app.py</span></code> 파일에 복사해서 붙여넣을 수 있습니다.
 아래에서 각각의 기능들을 명확히 살펴보기 위해 각 섹션별로 살펴보겠습니다.</p>
-<div class="section" id="import">
+<section id="import">
 <h3>Import<a class="headerlink" href="#import" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torchvision.models</span> <span class="k">as</span> <span class="nn">models</span>
 <span class="kn">import</span> <span class="nn">torchvision.transforms</span> <span class="k">as</span> <span class="nn">transforms</span>
@@ -463,8 +464,8 @@ Flask 설치 방법은 <a class="reference external" href="https://flask.pallets
 <li><p>Pillow (<code class="docutils literal notranslate"><span class="pre">PIL</span></code>) 는 이미지 파일을 처음 불러올 때 사용할 것입니다.</p></li>
 <li><p>물론 <code class="docutils literal notranslate"><span class="pre">flask</span></code> 의 클래스들도 필요합니다.</p></li>
 </ul>
-</div>
-<div class="section" id="pre-processing">
+</section>
+<section id="pre-processing">
 <h3>전처리(Pre-Processing)<a class="headerlink" href="#pre-processing" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">transform_image</span><span class="p">(</span><span class="n">infile</span><span class="p">):</span>
     <span class="n">input_transforms</span> <span class="o">=</span> <span class="p">[</span><span class="n">transforms</span><span class="o">.</span><span class="n">Resize</span><span class="p">(</span><span class="mi">255</span><span class="p">),</span>
@@ -491,8 +492,8 @@ TorchVision transforms(변환) 세트를 구성합니다. (정규화에 대한 �
 (1, 3, 224, 224)이 되었습니다.</p>
 <p>일반적으로 이미지 데이터에 작업을 하지 않더라도, HTTP 요청(request)으로 받은
 입력을 PyTorch에서 사용할 수 있도록 텐서로 변환해야 합니다.</p>
-</div>
-<div class="section" id="inference">
+</section>
+<section id="inference">
 <h3>추론(Inference)<a class="headerlink" href="#inference" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">get_prediction</span><span class="p">(</span><span class="n">input_tensor</span><span class="p">):</span>
     <span class="n">outputs</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">input_tensor</span><span class="p">)</span>
@@ -506,8 +507,8 @@ TorchVision transforms(변환) 세트를 구성합니다. (정규화에 대한 �
 반환합니다. <code class="docutils literal notranslate"><span class="pre">max()</span></code> 를 호출하여 가장 가능성이 높은 클래스를 찾고, ImageNet 클래스
 번호(index)에 해당하는 값을 반환합니다. 마지막으로, <code class="docutils literal notranslate"><span class="pre">item()</span></code> 을 호출하여 텐서에
 포함된 클래스 번호(index)를 추출하여 반환합니다.</p>
-</div>
-<div class="section" id="post-processing">
+</section>
+<section id="post-processing">
 <h3>후처리(Post-Processing)<a class="headerlink" href="#post-processing" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">render_prediction</span><span class="p">(</span><span class="n">prediction_idx</span><span class="p">):</span>
     <span class="n">stridx</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">prediction_idx</span><span class="p">)</span>
@@ -522,9 +523,9 @@ TorchVision transforms(변환) 세트를 구성합니다. (정규화에 대한 �
 <p><code class="docutils literal notranslate"><span class="pre">render_prediction()</span></code> 메소드(method)는 예측된 클래스 번호(index)를 사람이 읽을 수 있는
 클래스 라벨(label)에 매핑합니다. 모델에서 예측 값을 얻은 후에는 후처리를 수행하여
 사람이 소비하거나 다른 소프트웨어에서 사용할 수 있도록 준비하는 것이 일반적입니다.</p>
-</div>
-</div>
-<div class="section" id="flask-app">
+</section>
+</section>
+<section id="flask-app">
 <h2>전체 Flask App 실행<a class="headerlink" href="#flask-app" title="Permalink to this headline">¶</a></h2>
 <p>아래 내용을 <code class="docutils literal notranslate"><span class="pre">app.py</span></code> 파일에 붙여넣습니다:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">io</span>
@@ -616,15 +617,15 @@ TorchVision transforms(변환) 세트를 구성합니다. (정규화에 대한 �
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="s2">&quot;class_id&quot;</span><span class="p">:</span><span class="mi">285</span><span class="p">,</span><span class="s2">&quot;class_name&quot;</span><span class="p">:</span><span class="s2">&quot;Egyptian_cat&quot;</span><span class="p">}</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="id7">
+</section>
+<section id="id7">
 <h2>중요한 자료<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>설치 방법과 더 많은 문서, 튜토리얼을 보시려면 <a class="reference external" href="https://pytorch.org">pytorch.org</a></p></li>
 <li><p><a class="reference external" href="https://flask.palletsprojects.com/en/1.1.x/">Flask 사이트</a> 에는 간단한 Flask 서비스를 설정에 대한 자세한 내용이 포함된 <a href="#id10"><span class="problematic" id="id11">`빠른 시작 가이드(Quickstart guide)`_</span></a> 가 있습니다.</p></li>
 </ul>
-</div>
-</div>
+</section>
+</section>
 
 
              </article>
@@ -711,7 +712,7 @@ TorchVision transforms(변환) 세트를 구성합니다. (정규화에 대한 �
 
 
   
-
+  
      
        <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
          <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
@@ -724,7 +725,6 @@ TorchVision transforms(변환) 세트를 구성합니다. (정규화에 대한 �
          <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
          <script src="../_static/katex_autorenderer.js"></script>
      
-
   
 
   <script type="text/javascript" src="../_static/js/vendor/popper.min.js"></script>

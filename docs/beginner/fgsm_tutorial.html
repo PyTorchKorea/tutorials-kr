@@ -6,7 +6,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
 <meta property="og:title" content="적대적 예제 생성(Adversarial Example Generation)" />
   
 <meta property="og:type" content="article" />
@@ -395,7 +396,7 @@
 <p class="admonition-title">Note</p>
 <p>Click <a class="reference internal" href="#sphx-glr-download-beginner-fgsm-tutorial-py"><span class="std std-ref">here</span></a> to download the full example code</p>
 </div>
-<div class="sphx-glr-example-title section" id="adversarial-example-generation">
+<section class="sphx-glr-example-title" id="adversarial-example-generation">
 <span id="sphx-glr-beginner-fgsm-tutorial-py"></span><h1>적대적 예제 생성(Adversarial Example Generation)<a class="headerlink" href="#adversarial-example-generation" title="Permalink to this headline">¶</a></h1>
 <p><strong>저자:</strong> <a class="reference external" href="https://github.com/inkawhich">Nathan Inkawhich</a>
 <strong>번역:</strong> <a class="reference external" href="https://github.com/bongmo">BONGMO KIM</a></p>
@@ -406,7 +407,7 @@
 이미지에 눈치챌 수 없는 작은 변화(perturbation)를 추가하면 모델 성능이 크게 달라질 수 있다는 사실에 놀랄 수 있습니다.
 이번 튜토리얼에서는 이미지 분류기의 예제를 통해 위 내용에 대해 살펴볼 것입니다.
 특히 우리는 가장 많이 사용되는 공격 방법 중 하나인 FGSM (Fast Gradient Sign Attack)을 이용해 MNIST 분류기를 속여 볼 것입니다.</p>
-<div class="section" id="id1">
+<section id="id1">
 <h2>위협 모델<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
 <p>상황에 따라 다양한 범주의 적대적 공격이 있는데 각각 목표가 다르고 공격자가 알고 있는 정보
 대한 가정도 다릅니다. 그러나 보통 가장 중요한 목표는 입력 데이터에 최소한의 작은 변화를
@@ -421,8 +422,8 @@
 원래 특정 소스 클래스의 이미지를 다른 특정 대상 클래스로 분류하도록 변경하려고 함을 의미합니다.</p>
 <p>이 경우 FGSM 공격은 <em>오분류</em> 를 목표로 하는 화이트 박스 공격입니다.
 이런 배경 정보를 갖고 공격에 대해 자세히 알아 보겠습니다.</p>
-</div>
-<div class="section" id="id2">
+</section>
+<section id="id2">
 <h2>빠른 변화도 부호 공격<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
 <p>공격 방법에 있어 초기 방식이면서 가장 유명한 방식은 <em>빠른 변화도 부호 공격 (FGSM)</em> 이라고 하며
 <a class="reference external" href="https://arxiv.org/abs/1412.6572">적대적 예제에 대한 설명과 활용</a> 에서
@@ -433,9 +434,9 @@
 다시 말해 공격은 입력 데이터에서 계산된 손실 변화도를 사용하고 입력 데이터를 조정하여 손실이 최대가 되게 합니다.
 코드로 넘어가기 전에 유명한 <a class="reference external" href="https://arxiv.org/abs/1412.6572">FGSM</a> 판다 예제를
 보고 몇 가지 표기법을 정리하겠습니다.</p>
-<div class="figure align-default">
+<figure class="align-default">
 <img alt="fgsm_panda_image" src="../_images/fgsm_panda_image.png" />
-</div>
+</figure>
 <p>그림으로부터, <span class="math">\(\mathbf{x}\)</span> 는 원본 입력 이미지가 “판다” 로 올바르게 분류된 것을 의미하고,
 <span class="math">\(y\)</span> 는 <span class="math">\(\mathbf{x}\)</span> 를 위한 정답 라벨이며, <span class="math">\(\mathbf{\theta}\)</span> 는 모델의
 파라미터를, <span class="math">\(J(\mathbf{\theta}, \mathbf{x}, y)\)</span> 는 네트워크의 학습을 위해서 사용되는 손실을 나타냅니다.
@@ -462,12 +463,12 @@
 <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">install_opener</span><span class="p">(</span><span class="n">opener</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="id3">
+</section>
+<section id="id3">
 <h2>구현<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
 <p>이 섹션에서는 튜토리얼의 입력 매개 변수에 대해 설명하고 공격중인 모델을
 정의한 다음 공격을 코딩하고 일부 테스트를 실행합니다.</p>
-<div class="section" id="id4">
+<section id="id4">
 <h3>입력<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
 <p>이 학습서에는 입력이 3 개이며 다음과 같이 정의됩니다:</p>
 <ul class="simple">
@@ -484,13 +485,13 @@
 <li><p><strong>use_cuda</strong> - CUDA 를 사용할지 말지 정하는 이진 플래그.
 본 튜토리얼에서는 CPU 시간이 오래 걸리지 않으므로 CUDA를 지원하는 GPU 의 여부는 중요하지 않습니다.</p></li>
 </ul>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">epsilons</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">.</span><span class="mi">05</span><span class="p">,</span> <span class="o">.</span><span class="mi">1</span><span class="p">,</span> <span class="o">.</span><span class="mi">15</span><span class="p">,</span> <span class="o">.</span><span class="mi">2</span><span class="p">,</span> <span class="o">.</span><span class="mi">25</span><span class="p">,</span> <span class="o">.</span><span class="mi">3</span><span class="p">]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">epsilons</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mf">.05</span><span class="p">,</span> <span class="mf">.1</span><span class="p">,</span> <span class="mf">.15</span><span class="p">,</span> <span class="mf">.2</span><span class="p">,</span> <span class="mf">.25</span><span class="p">,</span> <span class="mf">.3</span><span class="p">]</span>
 <span class="n">pretrained_model</span> <span class="o">=</span> <span class="s2">&quot;data/lenet_mnist_model.pth&quot;</span>
 <span class="n">use_cuda</span><span class="o">=</span><span class="kc">True</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="id5">
+</section>
+<section id="id5">
 <h3>공격을 받는 모델<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
 <p>앞서 말한대로, 공격을 받는 모델은 <a class="reference external" href="https://github.com/pytorch/examples/tree/master/mnist">pytorch/examples/mnist</a>
 와 동일한 MNIST 모델입니다. 본인의 MNIST 모델을 학습 및 저장하는 방식으로 하거나 제공된 모델을 다운로드 해 사용하는 식으로 진행할 수 있습니다.
@@ -537,27 +538,11 @@
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Downloading http://yann.lecun.com/exdb/mnist/train-images-idx3-ubyte.gz
-Downloading http://yann.lecun.com/exdb/mnist/train-images-idx3-ubyte.gz to ../data/MNIST/raw/train-images-idx3-ubyte.gz
-Extracting ../data/MNIST/raw/train-images-idx3-ubyte.gz to ../data/MNIST/raw
-
-Downloading http://yann.lecun.com/exdb/mnist/train-labels-idx1-ubyte.gz
-Downloading http://yann.lecun.com/exdb/mnist/train-labels-idx1-ubyte.gz to ../data/MNIST/raw/train-labels-idx1-ubyte.gz
-Extracting ../data/MNIST/raw/train-labels-idx1-ubyte.gz to ../data/MNIST/raw
-
-Downloading http://yann.lecun.com/exdb/mnist/t10k-images-idx3-ubyte.gz
-Downloading http://yann.lecun.com/exdb/mnist/t10k-images-idx3-ubyte.gz to ../data/MNIST/raw/t10k-images-idx3-ubyte.gz
-Extracting ../data/MNIST/raw/t10k-images-idx3-ubyte.gz to ../data/MNIST/raw
-
-Downloading http://yann.lecun.com/exdb/mnist/t10k-labels-idx1-ubyte.gz
-Downloading http://yann.lecun.com/exdb/mnist/t10k-labels-idx1-ubyte.gz to ../data/MNIST/raw/t10k-labels-idx1-ubyte.gz
-Extracting ../data/MNIST/raw/t10k-labels-idx1-ubyte.gz to ../data/MNIST/raw
-
-CUDA Available:  True
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>CUDA Available:  True
 </pre></div>
 </div>
-</div>
-<div class="section" id="fgsm">
+</section>
+<section id="fgsm">
 <h3>FGSM 공격<a class="headerlink" href="#fgsm" title="Permalink to this headline">¶</a></h3>
 <p>이제 원래 입력을 교란시켜 적대적인 예를 만드는 함수를 정의 할 수 있습니다.
 <code class="docutils literal notranslate"><span class="pre">fgsm_attack</span></code> 함수는 입력 파라미터로 3가지를 가집니다. 첫번째는 원본 <em>이미지</em> ( <span class="math">\(x\)</span> ),
@@ -581,8 +566,8 @@ CUDA Available:  True
     <span class="k">return</span> <span class="n">perturbed_image</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="id6">
+</section>
+<section id="id6">
 <h3>테스팅 함수<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
 <p>마지막으로 본 튜토리얼의 핵심 결과는 <code class="docutils literal notranslate"><span class="pre">테스트</span></code> 함수에서 오게 됩니다.
 이 테스트 기능을 호출 할 때마다 MNIST 테스트 셋에서 전체 테스트 단계를 수행하고 최종 정확도를 보고합니다.
@@ -653,8 +638,8 @@ CUDA Available:  True
     <span class="k">return</span> <span class="n">final_acc</span><span class="p">,</span> <span class="n">adv_examples</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="id7">
+</section>
+<section id="id7">
 <h3>공격 실행<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
 <p>구현의 마지막 부분은 공격을 실행하는 것입니다. 여기서 전체 테스트 스텝을 각 <em>엡실론</em> 값에 실행합니다.
 각 엡실론마다 최종 정확도와 성공적인 일부 적대 사례를 저장하여 다음 섹션에 표시합니다.
@@ -680,11 +665,11 @@ Epsilon: 0.25   Test Accuracy = 2082 / 10000 = 0.2082
 Epsilon: 0.3    Test Accuracy = 869 / 10000 = 0.0869
 </pre></div>
 </div>
-</div>
-</div>
-<div class="section" id="id8">
+</section>
+</section>
+<section id="id8">
 <h2>결과<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="vs">
+<section id="vs">
 <h3>정확도 vs 엡실론<a class="headerlink" href="#vs" title="Permalink to this headline">¶</a></h3>
 <p>첫 번째 결과는 정확도 vs 엡실론 을 도식화 한 것 입니다.
 앞에서 언급했듯이, 엡실론이 증가함에 따라 우리는 테스트 정확도가 감소할 것으로 예상합니다.
@@ -697,7 +682,7 @@ Epsilon: 0.3    Test Accuracy = 869 / 10000 = 0.0869
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">epsilons</span><span class="p">,</span> <span class="n">accuracies</span><span class="p">,</span> <span class="s2">&quot;*-&quot;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">yticks</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mf">0.1</span><span class="p">))</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">.</span><span class="mi">35</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mf">0.05</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">.35</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mf">0.05</span><span class="p">))</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Accuracy vs Epsilon&quot;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Epsilon&quot;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Accuracy&quot;</span><span class="p">)</span>
@@ -705,8 +690,8 @@ Epsilon: 0.3    Test Accuracy = 869 / 10000 = 0.0869
 </pre></div>
 </div>
 <img alt="../_images/sphx_glr_fgsm_tutorial_001.png" class="sphx-glr-single-img" src="../_images/sphx_glr_fgsm_tutorial_001.png" />
-</div>
-<div class="section" id="id9">
+</section>
+<section id="id9">
 <h3>샘플 적대적 예제들<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
 <p>공짜 점심은 없다는 것을 기억하시나요? 이 경우에는 엡실론이 증가할수록 테스트 정확도는 떨어집니다.
 <strong>그러나</strong> 작은 변화는 더 쉽게 인식할 수 있게 됩니다.
@@ -735,9 +720,9 @@ Epsilon: 0.3    Test Accuracy = 869 / 10000 = 0.0869
 </pre></div>
 </div>
 <img alt="../_images/sphx_glr_fgsm_tutorial_002.png" class="sphx-glr-single-img" src="../_images/sphx_glr_fgsm_tutorial_002.png" />
-</div>
-</div>
-<div class="section" id="id10">
+</section>
+</section>
+<section id="id10">
 <h2>다음 단계는?<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h2>
 <p>이번 튜토리얼에서 적대적 머신 러닝에 대한 통찰을 얻을 수 있었기를 바랍니다.
 튜토리얼의 내용으로부터 앞으로 더 많은 것들을 알아나갈 수 있습니다.
@@ -752,7 +737,7 @@ Epsilon: 0.3    Test Accuracy = 869 / 10000 = 0.0869
 그러나 적대적 머신 러닝 분야에 대해서 많은 것을 알기 위한 최고의 방법은 많이 시도해보는 것입니다.
 NIPS 2017 경쟁에서 소개된 다양한 공격 방법을 직접 구현해 보고, FGSM 과 어떤 점이 다른지 연구해 보세요.
 그리고 나서 직접 만든 공격으로부터 모델을 방어해 보세요.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 2 minutes  33.314 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 3 minutes  48.553 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-beginner-fgsm-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/377bf4a7b1761e5f081e057385870d8e/fgsm_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">fgsm_tutorial.py</span></code></a></p>
@@ -762,8 +747,8 @@ NIPS 2017 경쟁에서 소개된 다양한 공격 방법을 직접 구현해 보
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
-</div>
-</div>
+</section>
+</section>
 
 
              </article>
@@ -850,7 +835,7 @@ NIPS 2017 경쟁에서 소개된 다양한 공격 방법을 직접 구현해 보
 
 
   
-
+  
      
        <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
          <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
@@ -863,7 +848,6 @@ NIPS 2017 경쟁에서 소개된 다양한 공격 방법을 직접 구현해 보
          <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
          <script src="../_static/katex_autorenderer.js"></script>
      
-
   
 
   <script type="text/javascript" src="../_static/js/vendor/popper.min.js"></script>

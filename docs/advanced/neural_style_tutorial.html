@@ -6,7 +6,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
 <meta property="og:title" content="PyTorch를 이용하여 뉴럴 변환(Neural Transfer)" />
   
 <meta property="og:type" content="article" />
@@ -393,22 +394,22 @@
 <p class="admonition-title">Note</p>
 <p>Click <a class="reference internal" href="#sphx-glr-download-advanced-neural-style-tutorial-py"><span class="std std-ref">here</span></a> to download the full example code</p>
 </div>
-<div class="sphx-glr-example-title section" id="pytorch-neural-transfer">
+<section class="sphx-glr-example-title" id="pytorch-neural-transfer">
 <span id="sphx-glr-advanced-neural-style-tutorial-py"></span><h1>PyTorch를 이용하여 뉴럴 변환(Neural Transfer)<a class="headerlink" href="#pytorch-neural-transfer" title="Permalink to this headline">¶</a></h1>
 <p><strong>Author</strong>: <a class="reference external" href="https://alexis-jacq.github.io">Alexis Jacq</a></p>
 <p><strong>Edited by</strong>: <a class="reference external" href="https://github.com/winston6">Winston Herring</a></p>
 <p><strong>번역</strong>: <a class="reference external" href="https://github.com/jjeamin">정재민</a></p>
-<div class="section" id="id2">
+<section id="id2">
 <h2>소개<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
 <p>이번 튜토리얼은 Leon A. Gatys, Alexander S. Ecker and Matthias Bethge에 의해 개발된
 <a class="reference external" href="https://arxiv.org/abs/1508.06576">뉴럴 스타일(Neural-Style) 알고리즘</a> 을 구현하는 방법에 대하여 설명합니다.
 뉴럴 스타일(Neural-Style), 또는 뉴럴 변환(Neural-Transfer)을 사용하면 이미지를 새로운 예술적 스타일로 재현할 수 있습니다.
 이 알고리즘은 입력 이미지, Content 이미지, Style 이미지 3개의 이미지를 가져와서 Content 이미지의 Content와 Style 이미지의 예술적 Style을 닮도록 입력을 변환합니다.</p>
-<div class="figure align-default">
+<figure class="align-default">
 <img alt="content1" src="../_images/neuralstyle.png" />
-</div>
-</div>
-<div class="section" id="id3">
+</figure>
+</section>
+<section id="id3">
 <h2>기본 원리<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
 <p>원리는 간단합니다.
 Content(<span class="math">\(D_C\)</span>)와 Style(<span class="math">\(D_S\)</span>)에 대해 하나씩 두 개의 거리를 정의합니다.
@@ -416,8 +417,8 @@ Content(<span class="math">\(D_C\)</span>)와 Style(<span class="math">\(D_S\)</
 그런 다음, 입력으로 사용되는 세 번째 이미지를 가져와서
 Content 이미지로 Content 거리와 Style 이미지로 Style 거리를 최소화하도록 변환합니다.
 이제 필요한 패키지를 가져와서 뉴럴 변환(neural transfer)을 시작할 수 있습니다.</p>
-</div>
-<div class="section" id="id4">
+</section>
+<section id="id4">
 <h2>패키지 불러오기 및 장치 선택<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
 <p>다음은 뉴럴 변환(neural transfer)을 구현하는데 필요한 패키지 목록입니다.</p>
 <ul class="simple">
@@ -453,8 +454,8 @@ GPU에서 실행할 때 훨씬 빨라집니다.
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="id5">
+</section>
+<section id="id5">
 <h2>이미지 불러오기<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h2>
 <p>지금 Style, Content 이미지를 가져올 것입니다. 원본 PIL 이미지는 0과 255 사이의 값을 갖지만,
 텐서로 변환될 때 0에서 1사이로 변환됩니다.
@@ -522,10 +523,10 @@ Content와 Style 이미지를 표시하여 올바르게 가져왔는지 확인�
 <li><img alt="../_images/sphx_glr_neural_style_tutorial_002.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_neural_style_tutorial_002.png" />
 </li>
 </ul>
-</div>
-<div class="section" id="id6">
+</section>
+<section id="id6">
 <h2>손실 함수<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="content-loss">
+<section id="content-loss">
 <h3>콘텐츠 손실(Content Loss)<a class="headerlink" href="#content-loss" title="Permalink to this headline">¶</a></h3>
 <p>Content 손실은 각 계층에 대한 Content 거리의 가중치 버전을 나타냅니다.
 이 함수는 입력 <span class="math">\(X\)</span> 를 처리하는 레이어 <span class="math">\(L\)</span> 의 특징 맵 <span class="math">\(F_{XL}\)</span> 을 가져와서
@@ -560,8 +561,8 @@ Content 거리를 계산하기 위해 Content 이미지(<span class="math">\(F_{
 만약 Content 손실을 PyTorch의 손실 함수로 정의하려면 Pytorch의 autograd 함수를 생성하여
 <code class="docutils literal notranslate"><span class="pre">backward</span></code> 메소드에서 수동으로 기울기를 다시 계산 및 구현 해야 합니다.</p>
 </div>
-</div>
-<div class="section" id="style-loss">
+</section>
+<section id="style-loss">
 <h3>스타일 손실(Style Loss)<a class="headerlink" href="#style-loss" title="Permalink to this headline">¶</a></h3>
 <p>Style 손실 모듈은 Content 손실 모듈과 유사하게 구현됩니다.
 네트워크에서 해당 계층의 Style 손실을 계산하는 역할을 합니다.
@@ -602,9 +603,9 @@ Style 거리는 <span class="math">\(G_{XL}\)</span> 와 <span class="math">\(G_
         <span class="k">return</span> <span class="nb">input</span>
 </pre></div>
 </div>
-</div>
-</div>
-<div class="section" id="id7">
+</section>
+</section>
+<section id="id7">
 <h2>모델 가져오기<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h2>
 <p>이제는 사전 훈련된 신경망을 가져와야 합니다.
 논문에서 사용된 것과 같이 19 계층을 가진 VGG 네트워크를 사용할 것입니다.</p>
@@ -716,8 +717,8 @@ Content 손실과 Style 손실 계층을 감지하는 합성곱 계층 바로 �
 </pre></div>
 </div>
 <img alt="../_images/sphx_glr_neural_style_tutorial_003.png" class="sphx-glr-single-img" src="../_images/sphx_glr_neural_style_tutorial_003.png" />
-</div>
-<div class="section" id="id8">
+</section>
+<section id="id8">
 <h2>경사 하강법<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h2>
 <p>알고리즘 작성자인 Leon Gatys가
 <a class="reference external" href="https://discuss.pytorch.org/t/pytorch-tutorial-for-neural-transfert-of-artistic-style/336/20?u=alexis-jacq">여기</a> 에서 제안했던 것처럼,
@@ -812,25 +813,25 @@ optimizer는 모듈을 재평가하고 손실을 반환하는 “closure” 함�
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Building the style transfer model..
 Optimizing..
 run [50]:
-Style Loss : 4.059378 Content Loss: 4.126655
+Style Loss : 4.016680 Content Loss: 4.143145
 
 run [100]:
-Style Loss : 1.129038 Content Loss: 3.024373
+Style Loss : 1.121266 Content Loss: 3.022525
 
 run [150]:
-Style Loss : 0.713508 Content Loss: 2.644261
+Style Loss : 0.714309 Content Loss: 2.652258
 
 run [200]:
-Style Loss : 0.469054 Content Loss: 2.485375
+Style Loss : 0.481614 Content Loss: 2.494820
 
 run [250]:
-Style Loss : 0.342876 Content Loss: 2.400334
+Style Loss : 0.349934 Content Loss: 2.402996
 
 run [300]:
-Style Loss : 0.261010 Content Loss: 2.348525
+Style Loss : 0.266254 Content Loss: 2.349486
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 1 minutes  9.343 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  35.326 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-advanced-neural-style-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/b3bcd49c4dd9be3a44c6c5d2e2a8b0cd/neural_style_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">neural_style_tutorial.py</span></code></a></p>
@@ -840,8 +841,8 @@ Style Loss : 0.261010 Content Loss: 2.348525
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
-</div>
-</div>
+</section>
+</section>
 
 
              </article>
@@ -914,7 +915,7 @@ Style Loss : 0.261010 Content Loss: 2.348525
 
 
   
-
+  
      
        <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
          <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
@@ -927,7 +928,6 @@ Style Loss : 0.261010 Content Loss: 2.348525
          <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
          <script src="../_static/katex_autorenderer.js"></script>
      
-
   
 
   <script type="text/javascript" src="../_static/js/vendor/popper.min.js"></script>

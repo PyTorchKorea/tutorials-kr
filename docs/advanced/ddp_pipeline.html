@@ -6,7 +6,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
 <meta property="og:title" content="분산 데이터 병렬 처리와 병렬 처리 파이프라인을 사용한 트랜스포머 모델 학습" />
   
 <meta property="og:type" content="article" />
@@ -395,7 +396,7 @@
 <p class="admonition-title">Note</p>
 <p>Click <a class="reference internal" href="#sphx-glr-download-advanced-ddp-pipeline-py"><span class="std std-ref">here</span></a> to download the full example code</p>
 </div>
-<div class="sphx-glr-example-title section" id="sphx-glr-advanced-ddp-pipeline-py">
+<section class="sphx-glr-example-title" id="sphx-glr-advanced-ddp-pipeline-py">
 <span id="id1"></span><h1>분산 데이터 병렬 처리와 병렬 처리 파이프라인을 사용한 트랜스포머 모델 학습<a class="headerlink" href="#sphx-glr-advanced-ddp-pipeline-py" title="Permalink to this headline">¶</a></h1>
 <dl class="simple">
 <dt><strong>Author</strong>: <a class="reference external" href="https://github.com/pritamdamania87">Pritam Damania</a></dt><dd><p><strong>번역</strong>: <a class="reference external" href="https://github.com/spongebob03">백선희</a></p>
@@ -415,7 +416,7 @@
 <li><p><a class="reference external" href="https://tutorials.pytorch.kr/intermediate/ddp_tutorial.html">분산 데이터 병렬 처리 시작하기</a></p></li>
 </ul>
 </div></blockquote>
-<div class="section" id="id3">
+<section id="id3">
 <h2>모델 정의하기<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">PositionalEncoding</span></code> 모듈은 시퀀스에서 토큰의 상대적, 절대적 위치에 대한
 몇몇 정보를 주입합니다.
@@ -507,16 +508,16 @@ GPUs 0, 1에 거쳐 파이프를 구동하고 다른 프로세스는 GPUs 2, 3�
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span><span class="p">(</span><span class="n">inp</span><span class="p">)</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="id4">
+</section>
+<section id="id4">
 <h2>학습을 위한 다중 프로세스 시작<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
 <p>각각 두 개의 GPU에서 자체 파이프라인을 구동하는 두 개의 프로세스를 시작합니다.
 <code class="docutils literal notranslate"><span class="pre">run_worker</span></code> 는 각 프로세스에 실행됩니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">run_worker</span><span class="p">(</span><span class="n">rank</span><span class="p">,</span> <span class="n">world_size</span><span class="p">):</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="id5">
+</section>
+<section id="id5">
 <h2>데이터 로드하고 배치 만들기<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h2>
 <p>학습 프로세스는 <code class="docutils literal notranslate"><span class="pre">torchtext</span></code> 의 Wikitext-2 데이터셋을 사용합니다.
 torchtext 데이터셋에 접근하기 전에, <a class="reference external" href="https://github.com/pytorch/data">https://github.com/pytorch/data</a> 을 참고하여 torchdata를
@@ -586,7 +587,7 @@ torchtext 데이터셋에 접근하기 전에, <a class="reference external" hre
     <span class="n">test_data</span> <span class="o">=</span> <span class="n">batchify</span><span class="p">(</span><span class="n">test_data</span><span class="p">,</span> <span class="n">eval_batch_size</span><span class="p">,</span> <span class="n">rank</span><span class="p">,</span> <span class="n">world_size</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="section" id="id6">
+<section id="id6">
 <h3>입력과 타겟 시퀀스를 생성하기 위한 함수들<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
 <p><code class="docutils literal notranslate"><span class="pre">get_batch()</span></code> 함수는 트랜스포머 모델을 위한 입력과 타겟 시퀀스를
 생성합니다. 이 함수는 소스 데이터를 <code class="docutils literal notranslate"><span class="pre">bptt</span></code> 길이를 가진 덩어리로 세분화합니다.
@@ -607,9 +608,9 @@ torchtext 데이터셋에 접근하기 전에, <a class="reference external" hre
         <span class="k">return</span> <span class="n">data</span><span class="o">.</span><span class="n">t</span><span class="p">(),</span> <span class="n">target</span>
 </pre></div>
 </div>
-</div>
-</div>
-<div class="section" id="id7">
+</section>
+</section>
+<section id="id7">
 <h2>모델 규모와 파이프 초기화<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h2>
 <p>병렬 처리 파이프라인을 활용한 대형 트랜스포머 모델 학습을 보이기 위해,
 트랜스포머 계층 규모를 적절히 확장시킵니다.
@@ -694,8 +695,8 @@ RPC 프레임워크에 의존하기 때문입니다.
     <span class="n">print_with_rank</span><span class="p">(</span><span class="s1">&#39;Total parameters in model: </span><span class="si">{:,}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">get_total_params</span><span class="p">(</span><span class="n">model</span><span class="p">)))</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="id8">
+</section>
+<section id="id8">
 <h2>모델 실행하기<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h2>
 <p>손실(loss)을 추적하기 위해 <a class="reference external" href="https://pytorch.org/docs/master/nn.html?highlight=crossentropyloss#torch.nn.CrossEntropyLoss">CrossEntropyLoss</a> 가
 적용되며, 옵티마이저(optimizer)로서 <a class="reference external" href="https://pytorch.org/docs/master/optim.html?highlight=sgd#torch.optim.SGD">SGD</a>
@@ -790,8 +791,8 @@ RPC 프레임워크에 의존하기 때문입니다.
         <span class="n">scheduler</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="id9">
+</section>
+<section id="id9">
 <h2>평가 데이터셋으로 모델 평가하기<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h2>
 <p>평가 데이터셋에서의 결과를 확인하기 위해 최고의 모델을 적용합니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># In &#39;run_worker&#39;</span>
@@ -809,8 +810,8 @@ RPC 프레임워크에 의존하기 때문입니다.
     <span class="n">mp</span><span class="o">.</span><span class="n">spawn</span><span class="p">(</span><span class="n">run_worker</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">world_size</span><span class="p">,</span> <span class="p">),</span> <span class="n">nprocs</span><span class="o">=</span><span class="n">world_size</span><span class="p">,</span> <span class="n">join</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="output">
+</section>
+<section id="output">
 <h2>Output<a class="headerlink" href="#output" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-py notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">RANK</span> <span class="mi">0</span><span class="p">]:</span> <span class="o">|</span> <span class="n">epoch</span>   <span class="mi">1</span> <span class="o">|</span>    <span class="mi">10</span><span class="o">/</span>   <span class="mi">50</span> <span class="n">batches</span> <span class="o">|</span> <span class="n">lr</span> <span class="mf">5.00</span> <span class="o">|</span> <span class="n">ms</span><span class="o">/</span><span class="n">batch</span> <span class="mf">778.97</span> <span class="o">|</span> <span class="n">loss</span> <span class="mf">43.31</span> <span class="o">|</span> <span class="n">ppl</span> <span class="mf">6432469059895903232.00</span>
 <span class="p">[</span><span class="n">RANK</span> <span class="mi">1</span><span class="p">]:</span> <span class="o">|</span> <span class="n">epoch</span>   <span class="mi">1</span> <span class="o">|</span>    <span class="mi">10</span><span class="o">/</span>   <span class="mi">50</span> <span class="n">batches</span> <span class="o">|</span> <span class="n">lr</span> <span class="mf">5.00</span> <span class="o">|</span> <span class="n">ms</span><span class="o">/</span><span class="n">batch</span> <span class="mf">778.90</span> <span class="o">|</span> <span class="n">loss</span> <span class="mf">44.50</span> <span class="o">|</span> <span class="n">ppl</span> <span class="mf">21245447128217366528.00</span>
@@ -872,8 +873,8 @@ RPC 프레임워크에 의존하기 때문입니다.
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
-</div>
-</div>
+</section>
+</section>
 
 
              </article>
@@ -954,7 +955,7 @@ RPC 프레임워크에 의존하기 때문입니다.
 
 
   
-
+  
      
        <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
          <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
@@ -967,7 +968,6 @@ RPC 프레임워크에 의존하기 때문입니다.
          <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
          <script src="../_static/katex_autorenderer.js"></script>
      
-
   
 
   <script type="text/javascript" src="../_static/js/vendor/popper.min.js"></script>

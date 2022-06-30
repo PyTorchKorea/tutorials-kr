@@ -6,7 +6,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
 <meta property="og:title" content="(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)" />
   
 <meta property="og:type" content="article" />
@@ -391,7 +392,7 @@
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <div class="section" id="quantized-transfer-learning">
+  <section id="quantized-transfer-learning">
 <h1>(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)<a class="headerlink" href="#quantized-transfer-learning" title="Permalink to this headline">¶</a></h1>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
@@ -424,7 +425,7 @@
 그런 다음 특징 추출기(또는 그 일부)를 고정해제(unfreeze)하고 학습률을
 더 작은 수로 설정한 다음 학습을 계속할 수 있습니다.</p>
 <p>이번 파트에서는 첫번째 방법을 사용해 양자화된 모델로 특징을 추출해봅시다.</p>
-<div class="section" id="id2">
+<section id="id2">
 <h2>파트 0. 요구사항<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
 <p>전이 학습(transfer learning)을 시작하기 전에,
 데이터 불러오기 / 시각화와 같은 “요구사항(prerequisites)”을 검토하겠습니다.</p>
@@ -438,7 +439,7 @@
 <span class="n">plt</span><span class="o">.</span><span class="n">ion</span><span class="p">()</span>
 </pre></div>
 </div>
-<div class="section" id="nightly-build">
+<section id="nightly-build">
 <h3>Nightly Build 설치하기<a class="headerlink" href="#nightly-build" title="Permalink to this headline">¶</a></h3>
 <p>PyTorch의 베타(beta)를 사용할 것이므로 최신 버전의 <code class="docutils literal notranslate"><span class="pre">torch</span></code> 와 <code class="docutils literal notranslate"><span class="pre">torchvision</span></code> 을 설치하는 것을 권장합니다.
 로컬(local) 설치에 대한 최신 지침은 <a class="reference external" href="https://pytorch.org/get-started/locally/">여기</a> 에서 찾을 수 있습니다.
@@ -448,8 +449,8 @@ pip install --pre torch torchvision -f https://download.pytorch.org/whl/nightly/
 <span class="c1"># CUDA 지원은 https://download.pytorch.org/whl/nightly/cu101/torch_nightly.html를 사용하세요.</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="id4">
+</section>
+<section id="id4">
 <h3>데이터 불러오기<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -499,8 +500,8 @@ pip install --pre torch torchvision -f https://download.pytorch.org/whl/nightly/
 <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cuda:0&quot;</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="id6">
+</section>
+<section id="id6">
 <h3>일부 이미지 시각화하기<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
 <p>데이터 보강을 이해하기 위해 일부 학습용 이미지를 시각화 해보겠습니다.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torchvision</span>
@@ -530,8 +531,8 @@ pip install --pre torch torchvision -f https://download.pytorch.org/whl/nightly/
 <span class="n">imshow</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="n">class_names</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">classes</span><span class="p">],</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="id7">
+</section>
+<section id="id7">
 <h3>모델 학습을 위한 지원 함수<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
 <p>다음은 모델을 학습하기 위한 일반 함수 입니다.</p>
 <ul class="simple">
@@ -618,8 +619,8 @@ pip install --pre torch torchvision -f https://download.pytorch.org/whl/nightly/
   <span class="k">return</span> <span class="n">model</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="id8">
+</section>
+<section id="id8">
 <h3>모델 예측을 시각화하기 위한 지원 함수<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
 <p>일부 이미지에 대한 예측을 출력하는 일반 함수</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">visualize_model</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">rows</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">cols</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
@@ -651,9 +652,9 @@ pip install --pre torch torchvision -f https://download.pytorch.org/whl/nightly/
     <span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="n">was_training</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-</div>
-<div class="section" id="quantized-feature-extractor">
+</section>
+</section>
+<section id="quantized-feature-extractor">
 <h2>파트 1. 양자화된 특징 추출기(Quantized Feature Extractor)를 기반으로 사용자 지정 분류기 훈련하기<a class="headerlink" href="#quantized-feature-extractor" title="Permalink to this headline">¶</a></h2>
 <p>이번 섹션에서는 “고정된(frozen)” 양자화 특징 추출기를 사용하고 그 위에 사용자 지정 분류기 헤드를
 학습합니다. 부동 소수점 모델과 다르게 양자화된 모델에는 학습 가능한 매개 변수가 없으므로
@@ -730,7 +731,7 @@ requires_grad = False를 설정할 필요가 없습니다. 자세한 내용은 <
 <span class="n">exp_lr_scheduler</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">lr_scheduler</span><span class="o">.</span><span class="n">StepLR</span><span class="p">(</span><span class="n">optimizer_ft</span><span class="p">,</span> <span class="n">step_size</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">gamma</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="section" id="id10">
+<section id="id10">
 <h3>학습과 평가<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h3>
 <p>이 단계는 CPU에서 약 15 ~ 25분 걸립니다. 양자화된 모델은 CPU에서만 실행되기 때문에
 GPU에서는 훈련을 실행할 수 없습니다.</p>
@@ -741,9 +742,9 @@ GPU에서는 훈련을 실행할 수 없습니다.</p>
 <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
 </pre></div>
 </div>
-</div>
-</div>
-<div class="section" id="finetuning">
+</section>
+</section>
+<section id="finetuning">
 <h2>파트 2. 양자화 가능한 모델 미세조정(Finetuning)<a class="headerlink" href="#finetuning" title="Permalink to this headline">¶</a></h2>
 <p>이번 파트에서는 전이학습(Transfer Learning)을 사용하여 특징 추출기(Feature Extractor)를
 미세조정(Finetuning) 합니다. 파트 1과 2 모두에서 특징 추출기는 양자화됩니다. 차이점은 파트 1에서
@@ -791,7 +792,7 @@ GPU에서는 훈련을 실행할 수 없습니다.</p>
 <span class="n">model_ft</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">quantization</span><span class="o">.</span><span class="n">prepare_qat</span><span class="p">(</span><span class="n">model_ft</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="section" id="id11">
+<section id="id11">
 <h3>모델 미세조정<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h3>
 <p>현재 튜토리얼에서는 전체 모델이 미세조정 되었습니다.
 일반적으로 이것은 더 높은 정확도로 이어질 것입니다.
@@ -830,9 +831,9 @@ GPU에서는 훈련을 실행할 수 없습니다.</p>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-</div>
-</div>
-</div>
+</section>
+</section>
+</section>
 
 
              </article>
@@ -919,7 +920,7 @@ GPU에서는 훈련을 실행할 수 없습니다.</p>
 
 
   
-
+  
      
        <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
          <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
@@ -932,7 +933,6 @@ GPU에서는 훈련을 실행할 수 없습니다.</p>
          <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
          <script src="../_static/katex_autorenderer.js"></script>
      
-
   
 
   <script type="text/javascript" src="../_static/js/vendor/popper.min.js"></script>

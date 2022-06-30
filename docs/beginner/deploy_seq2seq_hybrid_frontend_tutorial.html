@@ -6,7 +6,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
 <meta property="og:title" content="Deploying a Seq2Seq Model with TorchScript" />
   
 <meta property="og:type" content="article" />
@@ -393,7 +394,7 @@
 <p class="admonition-title">Note</p>
 <p>Click <a class="reference internal" href="#sphx-glr-download-beginner-deploy-seq2seq-hybrid-frontend-tutorial-py"><span class="std std-ref">here</span></a> to download the full example code</p>
 </div>
-<div class="sphx-glr-example-title section" id="deploying-a-seq2seq-model-with-torchscript">
+<section class="sphx-glr-example-title" id="deploying-a-seq2seq-model-with-torchscript">
 <span id="sphx-glr-beginner-deploy-seq2seq-hybrid-frontend-tutorial-py"></span><h1>Deploying a Seq2Seq Model with TorchScript<a class="headerlink" href="#deploying-a-seq2seq-model-with-torchscript" title="Permalink to this headline">¶</a></h1>
 <p><strong>Author:</strong> <a class="reference external" href="https://github.com/MatthewInkawhich">Matthew Inkawhich</a>
 This tutorial will walk through the process of transitioning a
@@ -406,7 +407,7 @@ document and use a pretrained model that we host. In the latter case,
 you can reference the original Chatbot tutorial for details
 regarding data preprocessing, model theory and definition, and model
 training.</p>
-<div class="section" id="what-is-torchscript">
+<section id="what-is-torchscript">
 <h2>What is TorchScript?<a class="headerlink" href="#what-is-torchscript" title="Permalink to this headline">¶</a></h2>
 <p>During the research and development phase of a deep learning-based
 project, it is advantageous to interact with an <strong>eager</strong>, imperative
@@ -450,11 +451,11 @@ language reference</a>.
 To provide the maximum flexibility, you can also mix tracing and scripting
 modes together to represent your whole program, and these techniques can
 be applied incrementally.</p>
-<div class="figure align-center">
+<figure class="align-center">
 <img alt="workflow" src="../_images/pytorch_workflow.png" />
-</div>
-</div>
-<div class="section" id="acknowledgements">
+</figure>
+</section>
+<section id="acknowledgements">
 <h2>Acknowledgements<a class="headerlink" href="#acknowledgements" title="Permalink to this headline">¶</a></h2>
 <p>This tutorial was inspired by the following sources:</p>
 <ol class="arabic simple">
@@ -465,8 +466,8 @@ be applied incrementally.</p>
 <li><p>FloydHub’s Cornell Movie Corpus preprocessing code:
 <a class="reference external" href="https://github.com/floydhub/textutil-preprocess-cornell-movie-corpus">https://github.com/floydhub/textutil-preprocess-cornell-movie-corpus</a></p></li>
 </ol>
-</div>
-<div class="section" id="prepare-environment">
+</section>
+<section id="prepare-environment">
 <h2>Prepare Environment<a class="headerlink" href="#prepare-environment" title="Permalink to this headline">¶</a></h2>
 <p>First, we will import the required modules and set some constants. If
 you are planning on using your own model, be sure that the
@@ -497,8 +498,8 @@ maximum length output that the model is capable of producing.</p>
 <span class="n">EOS_token</span> <span class="o">=</span> <span class="mi">2</span>  <span class="c1"># End-of-sentence token</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="model-overview">
+</section>
+<section id="model-overview">
 <h2>Model Overview<a class="headerlink" href="#model-overview" title="Permalink to this headline">¶</a></h2>
 <p>As mentioned, the model that we are using is a
 <a class="reference external" href="https://arxiv.org/abs/1409.3215">sequence-to-sequence</a> (seq2seq)
@@ -507,12 +508,12 @@ variable-length sequence, and our output is also a variable length
 sequence that is not necessarily a one-to-one mapping of the input. A
 seq2seq model is comprised of two recurrent neural networks (RNNs) that
 work cooperatively: an <strong>encoder</strong> and a <strong>decoder</strong>.</p>
-<div class="figure align-center">
+<figure class="align-center">
 <img alt="model" src="../_images/seq2seq_ts.png" />
-</div>
+</figure>
 <p>Image source:
 <a class="reference external" href="https://jeddy92.github.io/JEddy92.github.io/ts_seq2seq_intro/">https://jeddy92.github.io/JEddy92.github.io/ts_seq2seq_intro/</a></p>
-<div class="section" id="encoder">
+<section id="encoder">
 <h3>Encoder<a class="headerlink" href="#encoder" title="Permalink to this headline">¶</a></h3>
 <p>The encoder RNN iterates through the input sentence one token
 (e.g. word) at a time, at each time step outputting an “output” vector
@@ -521,8 +522,8 @@ the next time step, while the output vector is recorded. The encoder
 transforms the context it saw at each point in the sequence into a set
 of points in a high-dimensional space, which the decoder will use to
 generate a meaningful output for the given task.</p>
-</div>
-<div class="section" id="decoder">
+</section>
+<section id="decoder">
 <h3>Decoder<a class="headerlink" href="#decoder" title="Permalink to this headline">¶</a></h3>
 <p>The decoder RNN generates the response sentence in a token-by-token
 fashion. It uses the encoder’s context vectors, and internal hidden
@@ -534,9 +535,9 @@ to “pay attention” to certain parts of the input when generating the
 output. For our model, we implement <a class="reference external" href="https://arxiv.org/abs/1508.04025">Luong et
 al.</a>’s “Global attention” module,
 and use it as a submodule in our decode model.</p>
-</div>
-</div>
-<div class="section" id="data-handling">
+</section>
+</section>
+<section id="data-handling">
 <h2>Data Handling<a class="headerlink" href="#data-handling" title="Permalink to this headline">¶</a></h2>
 <p>Although our models conceptually deal with sequences of tokens, in
 reality, they deal with numbers like all machine learning models do. In
@@ -608,8 +609,8 @@ indexes.</p>
     <span class="k">return</span> <span class="p">[</span><span class="n">voc</span><span class="o">.</span><span class="n">word2index</span><span class="p">[</span><span class="n">word</span><span class="p">]</span> <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">sentence</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)]</span> <span class="o">+</span> <span class="p">[</span><span class="n">EOS_token</span><span class="p">]</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="define-encoder">
+</section>
+<section id="define-encoder">
 <h2>Define Encoder<a class="headerlink" href="#define-encoder" title="Permalink to this headline">¶</a></h2>
 <p>We implement our encoder’s RNN with the <code class="docutils literal notranslate"><span class="pre">torch.nn.GRU</span></code> module which we
 feed a batch of sentences (vectors of word embeddings) and it internally
@@ -630,7 +631,7 @@ Note that the <code class="docutils literal notranslate"><span class="pre">forwa
 which contains the length of each sentence in the batch. This input is
 used by the <code class="docutils literal notranslate"><span class="pre">torch.nn.utils.rnn.pack_padded_sequence</span></code> function when
 padding.</p>
-<div class="section" id="torchscript-notes">
+<section id="torchscript-notes">
 <h3>TorchScript Notes:<a class="headerlink" href="#torchscript-notes" title="Permalink to this headline">¶</a></h3>
 <p>Since the encoder’s <code class="docutils literal notranslate"><span class="pre">forward</span></code> function does not contain any
 data-dependent control flow, we will use <strong>tracing</strong> to convert it to
@@ -665,9 +666,9 @@ before we run evaluations.</p>
         <span class="k">return</span> <span class="n">outputs</span><span class="p">,</span> <span class="n">hidden</span>
 </pre></div>
 </div>
-</div>
-</div>
-<div class="section" id="define-decoders-attention-module">
+</section>
+</section>
+<section id="define-decoders-attention-module">
 <h2>Define Decoder’s Attention Module<a class="headerlink" href="#define-decoders-attention-module" title="Permalink to this headline">¶</a></h2>
 <p>Next, we’ll define our attention module (<code class="docutils literal notranslate"><span class="pre">Attn</span></code>). Note that this
 module will be used as a submodule in our decoder model. Luong et
@@ -718,8 +719,8 @@ of the query sentence at a particular time-step of decoding.</p>
         <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">attn_energies</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="define-decoder">
+</section>
+<section id="define-decoder">
 <h2>Define Decoder<a class="headerlink" href="#define-decoder" title="Permalink to this headline">¶</a></h2>
 <p>Similarly to the <code class="docutils literal notranslate"><span class="pre">EncoderRNN</span></code>, we use the <code class="docutils literal notranslate"><span class="pre">torch.nn.GRU</span></code> module for
 our decoder’s RNN. This time, however, we use a unidirectional GRU. It
@@ -787,10 +788,10 @@ to select the next word in the output sequence.</p>
         <span class="k">return</span> <span class="n">output</span><span class="p">,</span> <span class="n">hidden</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="define-evaluation">
+</section>
+<section id="define-evaluation">
 <h2>Define Evaluation<a class="headerlink" href="#define-evaluation" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="greedy-search-decoder">
+<section id="greedy-search-decoder">
 <h3>Greedy Search Decoder<a class="headerlink" href="#greedy-search-decoder" title="Permalink to this headline">¶</a></h3>
 <p>As in the chatbot tutorial, we use a <code class="docutils literal notranslate"><span class="pre">GreedySearchDecoder</span></code> module to
 facilitate the actual decoding process. This module has the trained
@@ -812,8 +813,8 @@ softmax probability to the <code class="docutils literal notranslate"><span clas
 as the <code class="docutils literal notranslate"><span class="pre">decoder_input</span></code> for the next iteration. The decoding process
 terminates either if the <code class="docutils literal notranslate"><span class="pre">decoded_words</span></code> list has reached a length of
 <em>MAX_LENGTH</em> or if the predicted word is the <em>EOS_token</em>.</p>
-</div>
-<div class="section" id="id1">
+</section>
+<section id="id1">
 <h3>TorchScript Notes:<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
 <p>The <code class="docutils literal notranslate"><span class="pre">forward</span></code> method of this module involves iterating over the range
 of <span class="math">\([0, max\_length)\)</span> when decoding an output sequence one word at
@@ -829,10 +830,10 @@ over the diffs between the <code class="docutils literal notranslate"><span clas
 the chatbot tutorial and the implementation that we use in the cell
 below. Note that the lines highlighted in red are lines removed from the
 original implementation and the lines highlighted in green are new.</p>
-<div class="figure align-center">
+<figure class="align-center">
 <img alt="diff" src="../_images/diff.png" />
-</div>
-<div class="section" id="changes">
+</figure>
+<section id="changes">
 <h4>Changes:<a class="headerlink" href="#changes" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
 <li><p>Added <code class="docutils literal notranslate"><span class="pre">decoder_n_layers</span></code> to the constructor arguments</p>
@@ -921,9 +922,9 @@ by multiplying 1 by our SOS_token value stored in the constant
         <span class="k">return</span> <span class="n">all_tokens</span><span class="p">,</span> <span class="n">all_scores</span>
 </pre></div>
 </div>
-</div>
-</div>
-<div class="section" id="evaluating-an-input">
+</section>
+</section>
+<section id="evaluating-an-input">
 <h3>Evaluating an Input<a class="headerlink" href="#evaluating-an-input" title="Permalink to this headline">¶</a></h3>
 <p>Next, we define some functions for evaluating an input. The <code class="docutils literal notranslate"><span class="pre">evaluate</span></code>
 function takes a normalized string sentence, processes it to a tensor of
@@ -988,12 +989,12 @@ an argument, normalizes it, evaluates it, and prints the response.</p>
     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Bot:&#39;</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_words</span><span class="p">))</span>
 </pre></div>
 </div>
-</div>
-</div>
-<div class="section" id="load-pretrained-parameters">
+</section>
+</section>
+<section id="load-pretrained-parameters">
 <h2>Load Pretrained Parameters<a class="headerlink" href="#load-pretrained-parameters" title="Permalink to this headline">¶</a></h2>
 <p>Ok, its time to load our model!</p>
-<div class="section" id="use-hosted-model">
+<section id="use-hosted-model">
 <h3>Use hosted model<a class="headerlink" href="#use-hosted-model" title="Permalink to this headline">¶</a></h3>
 <p>To load the hosted model:</p>
 <ol class="arabic simple">
@@ -1003,8 +1004,8 @@ checkpoint file.</p></li>
 <li><p>Leave the <code class="docutils literal notranslate"><span class="pre">checkpoint</span> <span class="pre">=</span> <span class="pre">torch.load(loadFilename)</span></code> line uncommented,
 as the hosted model was trained on CPU.</p></li>
 </ol>
-</div>
-<div class="section" id="use-your-own-model">
+</section>
+<section id="use-your-own-model">
 <h3>Use your own model<a class="headerlink" href="#use-your-own-model" title="Permalink to this headline">¶</a></h3>
 <p>To load your own pre-trained model:</p>
 <ol class="arabic simple">
@@ -1021,8 +1022,8 @@ CPU, uncomment the
 <code class="docutils literal notranslate"><span class="pre">checkpoint</span> <span class="pre">=</span> <span class="pre">torch.load(loadFilename,</span> <span class="pre">map_location=torch.device('cpu'))</span></code>
 line.</p></li>
 </ol>
-</div>
-<div class="section" id="id2">
+</section>
+<section id="id2">
 <h3>TorchScript Notes:<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
 <p>Notice that we initialize and load parameters into our encoder and
 decoder models as usual. If you are using tracing mode(<cite>torch.jit.trace</cite>)
@@ -1092,11 +1093,11 @@ evaluation (which is the same as we normally do in eager mode).</p>
 Models built and ready to go!
 </pre></div>
 </div>
-</div>
-</div>
-<div class="section" id="convert-model-to-torchscript">
+</section>
+</section>
+<section id="convert-model-to-torchscript">
 <h2>Convert Model to TorchScript<a class="headerlink" href="#convert-model-to-torchscript" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="id3">
+<section id="id3">
 <h3>Encoder<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
 <p>As previously mentioned, to convert the encoder model to TorchScript,
 we use <strong>scripting</strong>. The encoder model takes an input sequence and
@@ -1110,8 +1111,8 @@ next step is to use the <code class="docutils literal notranslate"><span class="
 Notice that the first argument we pass is the module that we want to
 trace, and the second is a tuple of arguments to the module’s
 <code class="docutils literal notranslate"><span class="pre">forward</span></code> method.</p>
-</div>
-<div class="section" id="id4">
+</section>
+<section id="id4">
 <h3>Decoder<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
 <p>We perform the same process for tracing the decoder as we did for the
 encoder. Notice that we call forward on a set of random inputs to the
@@ -1121,8 +1122,8 @@ correct shape, type, and value range. This method is possible because in
 our case we do not have any constraints on the values of the tensors
 because we do not have any operations that could fault on out-of-range
 inputs.</p>
-</div>
-<div class="section" id="greedysearchdecoder">
+</section>
+<section id="greedysearchdecoder">
 <h3>GreedySearchDecoder<a class="headerlink" href="#greedysearchdecoder" title="Permalink to this headline">¶</a></h3>
 <p>Recall that we scripted our searcher module due to the presence of
 data-dependent control flow. In the case of scripting, we do necessary
@@ -1148,9 +1149,9 @@ would initialize an un-scripted variant.</p>
 <span class="n">scripted_searcher</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">script</span><span class="p">(</span><span class="n">GreedySearchDecoder</span><span class="p">(</span><span class="n">traced_encoder</span><span class="p">,</span> <span class="n">traced_decoder</span><span class="p">,</span> <span class="n">decoder</span><span class="o">.</span><span class="n">n_layers</span><span class="p">))</span>
 </pre></div>
 </div>
-</div>
-</div>
-<div class="section" id="print-graphs">
+</section>
+</section>
+<section id="print-graphs">
 <h2>Print Graphs<a class="headerlink" href="#print-graphs" title="Permalink to this headline">¶</a></h2>
 <p>Now that our models are in TorchScript form, we can print the graphs of
 each to ensure that we captured the computational graph appropriately.
@@ -1167,42 +1168,42 @@ graph, we just need to print the <cite>scripted_searcher</cite> graph</p>
       %input_length.1 : Tensor,
       %max_length.1 : int):
   %53 : bool = prim::Constant[value=0]()
-  %42 : bool = prim::Constant[value=1]() # /workspace/ko-latest/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:566:8
-  %18 : int = prim::Constant[value=4]() # /workspace/ko-latest/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:561:68
-  %17 : Device = prim::Constant[value=&quot;cpu&quot;]() # /workspace/ko-latest/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:561:48
+  %42 : bool = prim::Constant[value=1]() # /workspace/tutorials-kr/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:566:8
+  %18 : int = prim::Constant[value=4]() # /workspace/tutorials-kr/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:561:68
+  %17 : Device = prim::Constant[value=&quot;cpu&quot;]() # /workspace/tutorials-kr/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:561:48
   %14 : NoneType = prim::Constant()
-  %12 : int = prim::Constant[value=2]() # /workspace/ko-latest/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:559:41
-  %16 : int = prim::Constant[value=1]() # /workspace/ko-latest/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:561:35
-  %26 : int = prim::Constant[value=0]() # /workspace/ko-latest/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:563:34
+  %12 : int = prim::Constant[value=2]() # /workspace/tutorials-kr/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:559:41
+  %16 : int = prim::Constant[value=1]() # /workspace/tutorials-kr/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:561:35
+  %26 : int = prim::Constant[value=0]() # /workspace/tutorials-kr/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:563:34
   %encoder : __torch__.EncoderRNN = prim::GetAttr[name=&quot;encoder&quot;](%self)
-  %7 : (Tensor, Tensor) = prim::CallMethod[name=&quot;forward&quot;](%encoder, %input_seq.1, %input_length.1) # /workspace/ko-latest/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:557:42
+  %7 : (Tensor, Tensor) = prim::CallMethod[name=&quot;forward&quot;](%encoder, %input_seq.1, %input_length.1) # /workspace/tutorials-kr/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:557:42
   %encoder_outputs.1 : Tensor, %encoder_hidden.1 : Tensor = prim::TupleUnpack(%7)
-  %decoder_hidden.1 : Tensor = aten::slice(%encoder_hidden.1, %26, %14, %12, %16) # /workspace/ko-latest/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:559:25
+  %decoder_hidden.1 : Tensor = aten::slice(%encoder_hidden.1, %26, %14, %12, %16) # /workspace/tutorials-kr/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:559:25
   %20 : int[] = prim::ListConstruct(%16, %16)
-  %23 : Tensor = aten::ones(%20, %18, %14, %17, %14) # /workspace/ko-latest/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:561:24
-  %decoder_input.1 : Tensor = aten::mul(%23, %16) # /workspace/ko-latest/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:561:24
+  %23 : Tensor = aten::ones(%20, %18, %14, %17, %14) # /workspace/tutorials-kr/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:561:24
+  %decoder_input.1 : Tensor = aten::mul(%23, %16) # /workspace/tutorials-kr/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:561:24
   %27 : int[] = prim::ListConstruct(%26)
-  %all_tokens.1 : Tensor = aten::zeros(%27, %18, %14, %17, %14) # /workspace/ko-latest/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:563:21
+  %all_tokens.1 : Tensor = aten::zeros(%27, %18, %14, %17, %14) # /workspace/tutorials-kr/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:563:21
   %33 : int[] = prim::ListConstruct(%26)
-  %all_scores.1 : Tensor = aten::zeros(%33, %14, %14, %17, %14) # /workspace/ko-latest/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:564:21
-  %all_tokens : Tensor, %all_scores : Tensor, %decoder_hidden : Tensor, %decoder_input : Tensor = prim::Loop(%max_length.1, %42, %all_tokens.1, %all_scores.1, %decoder_hidden.1, %decoder_input.1) # /workspace/ko-latest/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:566:8
+  %all_scores.1 : Tensor = aten::zeros(%33, %14, %14, %17, %14) # /workspace/tutorials-kr/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:564:21
+  %all_tokens : Tensor, %all_scores : Tensor, %decoder_hidden : Tensor, %decoder_input : Tensor = prim::Loop(%max_length.1, %42, %all_tokens.1, %all_scores.1, %decoder_hidden.1, %decoder_input.1) # /workspace/tutorials-kr/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:566:8
     block0(%43 : int, %all_tokens.11 : Tensor, %all_scores.11 : Tensor, %decoder_hidden.9 : Tensor, %decoder_input.17 : Tensor):
       %decoder : __torch__.LuongAttnDecoderRNN = prim::GetAttr[name=&quot;decoder&quot;](%self)
-      %48 : (Tensor, Tensor) = prim::CallMethod[name=&quot;forward&quot;](%decoder, %decoder_input.17, %decoder_hidden.9, %encoder_outputs.1) # /workspace/ko-latest/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:568:45
+      %48 : (Tensor, Tensor) = prim::CallMethod[name=&quot;forward&quot;](%decoder, %decoder_input.17, %decoder_hidden.9, %encoder_outputs.1) # /workspace/tutorials-kr/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:568:45
       %decoder_output.1 : Tensor, %decoder_hidden.5 : Tensor = prim::TupleUnpack(%48)
-      %decoder_scores.1 : Tensor, %decoder_input.5 : Tensor = aten::max(%decoder_output.1, %16, %53) # /workspace/ko-latest/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:570:44
+      %decoder_scores.1 : Tensor, %decoder_input.5 : Tensor = aten::max(%decoder_output.1, %16, %53) # /workspace/tutorials-kr/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:570:44
       %61 : Tensor[] = prim::ListConstruct(%all_tokens.11, %decoder_input.5)
-      %all_tokens.5 : Tensor = aten::cat(%61, %26) # /workspace/ko-latest/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:572:25
+      %all_tokens.5 : Tensor = aten::cat(%61, %26) # /workspace/tutorials-kr/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:572:25
       %67 : Tensor[] = prim::ListConstruct(%all_scores.11, %decoder_scores.1)
-      %all_scores.5 : Tensor = aten::cat(%67, %26) # /workspace/ko-latest/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:573:25
-      %decoder_input.13 : Tensor = aten::unsqueeze(%decoder_input.5, %26) # /workspace/ko-latest/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:575:28
+      %all_scores.5 : Tensor = aten::cat(%67, %26) # /workspace/tutorials-kr/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:573:25
+      %decoder_input.13 : Tensor = aten::unsqueeze(%decoder_input.5, %26) # /workspace/tutorials-kr/beginner_source/deploy_seq2seq_hybrid_frontend_tutorial.py:575:28
       -&gt; (%42, %all_tokens.5, %all_scores.5, %decoder_hidden.5, %decoder_input.13)
   %75 : (Tensor, Tensor) = prim::TupleConstruct(%all_tokens, %all_scores)
   return (%75)
 </pre></div>
 </div>
-</div>
-<div class="section" id="run-evaluation">
+</section>
+<section id="run-evaluation">
 <h2>Run Evaluation<a class="headerlink" href="#run-evaluation" title="Permalink to this headline">¶</a></h2>
 <p>Finally, we will run evaluation of the chatbot model using the TorchScript
 models. If converted correctly, the models will behave exactly as they
@@ -1237,8 +1238,8 @@ Bot: in the house .
 Bot: south america .
 </pre></div>
 </div>
-</div>
-<div class="section" id="save-model">
+</section>
+<section id="save-model">
 <h2>Save Model<a class="headerlink" href="#save-model" title="Permalink to this headline">¶</a></h2>
 <p>Now that we have successfully converted our model to TorchScript, we
 will serialize it for use in a non-Python deployment environment. To do
@@ -1249,7 +1250,7 @@ of torch.save(model, PATH).</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">scripted_searcher</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s2">&quot;scripted_chatbot.pth&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  1.111 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.736 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-beginner-deploy-seq2seq-hybrid-frontend-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/b333ee9add2489fe6da06cebde14537a/deploy_seq2seq_hybrid_frontend_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">deploy_seq2seq_hybrid_frontend_tutorial.py</span></code></a></p>
@@ -1259,8 +1260,8 @@ of torch.save(model, PATH).</p>
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
-</div>
-</div>
+</section>
+</section>
 
 
              </article>
@@ -1361,7 +1362,7 @@ of torch.save(model, PATH).</p>
 
 
   
-
+  
      
        <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
          <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
@@ -1374,7 +1375,6 @@ of torch.save(model, PATH).</p>
          <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
          <script src="../_static/katex_autorenderer.js"></script>
      
-
   
 
   <script type="text/javascript" src="../_static/js/vendor/popper.min.js"></script>

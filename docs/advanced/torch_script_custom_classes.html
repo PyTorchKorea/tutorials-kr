@@ -6,7 +6,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
 <meta property="og:title" content="커스텀 C++ 클래스로 TorchScript 확장하기" />
   
 <meta property="og:type" content="article" />
@@ -391,51 +392,51 @@
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <div class="section" id="c-torchscript">
+  <section id="c-torchscript">
 <h1>커스텀 C++ 클래스로 TorchScript 확장하기<a class="headerlink" href="#c-torchscript" title="Permalink to this headline">¶</a></h1>
 <p>이 튜토리얼은 <a class="reference internal" href="torch_script_custom_ops.html"><span class="doc">커스텀 오퍼레이터</span></a> 튜토리얼의 후속이며
 C++ 클래스를 TorchScript와 Python에 동시에 바인딩하기 위해 구축한 API를 소개합니다.
 API는 <a class="reference external" href="https://github.com/pybind/pybind11">pybind11</a> 과
 매우 유사하며 해당 시스템에 익숙하다면 대부분의 개념이 이전됩니다.</p>
-<div class="section" id="c">
+<section id="c">
 <h2>C++에서 클래스 구현 및 바인딩<a class="headerlink" href="#c" title="Permalink to this headline">¶</a></h2>
 <p>이 튜토리얼에서는 멤버 변수에서 지속 상태를 유지하는 간단한 C++ 클래스를 정의할 것입니다.</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// This header is all you need to do the C++ portions of this</span>
 <span class="c1">// tutorial</span>
-<span class="cp">#include</span> <span class="cpf">&lt;torch/script.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;torch/script.h&gt;</span><span class="cp"></span>
 <span class="c1">// This header is what defines the custom class registration</span>
 <span class="c1">// behavior specifically. script.h already includes this, but</span>
 <span class="c1">// we include it here so you know it exists in case you want</span>
 <span class="c1">// to look at the API or implementation.</span>
-<span class="cp">#include</span> <span class="cpf">&lt;torch/custom_class.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;torch/custom_class.h&gt;</span><span class="cp"></span>
 
-<span class="cp">#include</span> <span class="cpf">&lt;string&gt;</span><span class="cp"></span>
-<span class="cp">#include</span> <span class="cpf">&lt;vector&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;string&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;vector&gt;</span><span class="cp"></span>
 
-<span class="k">template</span> <span class="o">&lt;</span><span class="k">class</span> <span class="nc">T</span><span class="o">&gt;</span>
-<span class="k">struct</span> <span class="nc">MyStackClass</span> <span class="o">:</span> <span class="n">torch</span><span class="o">::</span><span class="n">CustomClassHolder</span> <span class="p">{</span>
-  <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">stack_</span><span class="p">;</span>
-  <span class="n">MyStackClass</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">init</span><span class="p">)</span> <span class="o">:</span> <span class="n">stack_</span><span class="p">(</span><span class="n">init</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span> <span class="n">init</span><span class="p">.</span><span class="n">end</span><span class="p">())</span> <span class="p">{}</span>
+<span class="k">template</span><span class="w"> </span><span class="o">&lt;</span><span class="k">class</span><span class="w"> </span><span class="nc">T</span><span class="o">&gt;</span><span class="w"></span>
+<span class="k">struct</span><span class="w"> </span><span class="nc">MyStackClass</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">torch</span><span class="o">::</span><span class="n">CustomClassHolder</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">stack_</span><span class="p">;</span><span class="w"></span>
+<span class="w">  </span><span class="n">MyStackClass</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">init</span><span class="p">)</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">stack_</span><span class="p">(</span><span class="n">init</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span><span class="w"> </span><span class="n">init</span><span class="p">.</span><span class="n">end</span><span class="p">())</span><span class="w"> </span><span class="p">{}</span><span class="w"></span>
 
-  <span class="kt">void</span> <span class="n">push</span><span class="p">(</span><span class="n">T</span> <span class="n">x</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">stack_</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">x</span><span class="p">);</span>
-  <span class="p">}</span>
-  <span class="n">T</span> <span class="n">pop</span><span class="p">()</span> <span class="p">{</span>
-    <span class="k">auto</span> <span class="n">val</span> <span class="o">=</span> <span class="n">stack_</span><span class="p">.</span><span class="n">back</span><span class="p">();</span>
-    <span class="n">stack_</span><span class="p">.</span><span class="n">pop_back</span><span class="p">();</span>
-    <span class="k">return</span> <span class="n">val</span><span class="p">;</span>
-  <span class="p">}</span>
+<span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="n">push</span><span class="p">(</span><span class="n">T</span><span class="w"> </span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">stack_</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">x</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+<span class="w">  </span><span class="n">T</span><span class="w"> </span><span class="n">pop</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">val</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stack_</span><span class="p">.</span><span class="n">back</span><span class="p">();</span><span class="w"></span>
+<span class="w">    </span><span class="n">stack_</span><span class="p">.</span><span class="n">pop_back</span><span class="p">();</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">val</span><span class="p">;</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
 
-  <span class="n">c10</span><span class="o">::</span><span class="n">intrusive_ptr</span><span class="o">&lt;</span><span class="n">MyStackClass</span><span class="o">&gt;</span> <span class="n">clone</span><span class="p">()</span> <span class="k">const</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="n">c10</span><span class="o">::</span><span class="n">make_intrusive</span><span class="o">&lt;</span><span class="n">MyStackClass</span><span class="o">&gt;</span><span class="p">(</span><span class="n">stack_</span><span class="p">);</span>
-  <span class="p">}</span>
+<span class="w">  </span><span class="n">c10</span><span class="o">::</span><span class="n">intrusive_ptr</span><span class="o">&lt;</span><span class="n">MyStackClass</span><span class="o">&gt;</span><span class="w"> </span><span class="n">clone</span><span class="p">()</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">c10</span><span class="o">::</span><span class="n">make_intrusive</span><span class="o">&lt;</span><span class="n">MyStackClass</span><span class="o">&gt;</span><span class="p">(</span><span class="n">stack_</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
 
-  <span class="kt">void</span> <span class="n">merge</span><span class="p">(</span><span class="k">const</span> <span class="n">c10</span><span class="o">::</span><span class="n">intrusive_ptr</span><span class="o">&lt;</span><span class="n">MyStackClass</span><span class="o">&gt;&amp;</span> <span class="n">c</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">for</span> <span class="p">(</span><span class="k">auto</span><span class="o">&amp;</span> <span class="nl">elem</span> <span class="p">:</span> <span class="n">c</span><span class="o">-&gt;</span><span class="n">stack_</span><span class="p">)</span> <span class="p">{</span>
-      <span class="n">push</span><span class="p">(</span><span class="n">elem</span><span class="p">);</span>
-    <span class="p">}</span>
-  <span class="p">}</span>
-<span class="p">};</span>
+<span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="n">merge</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">c10</span><span class="o">::</span><span class="n">intrusive_ptr</span><span class="o">&lt;</span><span class="n">MyStackClass</span><span class="o">&gt;&amp;</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="k">auto</span><span class="o">&amp;</span><span class="w"> </span><span class="n">elem</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">c</span><span class="o">-&gt;</span><span class="n">stack_</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">      </span><span class="n">push</span><span class="p">(</span><span class="n">elem</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
 </pre></div>
 </div>
 <p>몇 가지 주의할 사항이 있습니다:</p>
@@ -463,53 +464,53 @@ API는 <a class="reference external" href="https://github.com/pybind/pybind11">p
 <span class="c1">//   Python and C++ as `torch.classes.my_classes.MyStackClass`. We call</span>
 <span class="c1">//   the first argument the &quot;namespace&quot; and the second argument the</span>
 <span class="c1">//   actual class name.</span>
-<span class="n">TORCH_LIBRARY</span><span class="p">(</span><span class="n">my_classes</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span> <span class="p">{</span>
-  <span class="n">m</span><span class="p">.</span><span class="n">class_</span><span class="o">&lt;</span><span class="n">MyStackClass</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;&gt;</span><span class="p">(</span><span class="s">&quot;MyStackClass&quot;</span><span class="p">)</span>
-    <span class="c1">// The following line registers the contructor of our MyStackClass</span>
-    <span class="c1">// class that takes a single `std::vector&lt;std::string&gt;` argument,</span>
-    <span class="c1">// i.e. it exposes the C++ method `MyStackClass(std::vector&lt;T&gt; init)`.</span>
-    <span class="c1">// Currently, we do not support registering overloaded</span>
-    <span class="c1">// constructors, so for now you can only `def()` one instance of</span>
-    <span class="c1">// `torch::init`.</span>
-    <span class="p">.</span><span class="n">def</span><span class="p">(</span><span class="n">torch</span><span class="o">::</span><span class="n">init</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;&gt;</span><span class="p">())</span>
-    <span class="c1">// The next line registers a stateless (i.e. no captures) C++ lambda</span>
-    <span class="c1">// function as a method. Note that a lambda function must take a</span>
-    <span class="c1">// `c10::intrusive_ptr&lt;YourClass&gt;` (or some const/ref version of that)</span>
-    <span class="c1">// as the first argument. Other arguments can be whatever you want.</span>
-    <span class="p">.</span><span class="n">def</span><span class="p">(</span><span class="s">&quot;top&quot;</span><span class="p">,</span> <span class="p">[](</span><span class="k">const</span> <span class="n">c10</span><span class="o">::</span><span class="n">intrusive_ptr</span><span class="o">&lt;</span><span class="n">MyStackClass</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;&gt;&amp;</span> <span class="n">self</span><span class="p">)</span> <span class="p">{</span>
-      <span class="k">return</span> <span class="n">self</span><span class="o">-&gt;</span><span class="n">stack_</span><span class="p">.</span><span class="n">back</span><span class="p">();</span>
-    <span class="p">})</span>
-    <span class="c1">// The following four lines expose methods of the MyStackClass&lt;std::string&gt;</span>
-    <span class="c1">// class as-is. `torch::class_` will automatically examine the</span>
-    <span class="c1">// argument and return types of the passed-in method pointers and</span>
-    <span class="c1">// expose these to Python and TorchScript accordingly. Finally, notice</span>
-    <span class="c1">// that we must take the *address* of the fully-qualified method name,</span>
-    <span class="c1">// i.e. use the unary `&amp;` operator, due to C++ typing rules.</span>
-    <span class="p">.</span><span class="n">def</span><span class="p">(</span><span class="s">&quot;push&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">MyStackClass</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;::</span><span class="n">push</span><span class="p">)</span>
-    <span class="p">.</span><span class="n">def</span><span class="p">(</span><span class="s">&quot;pop&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">MyStackClass</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;::</span><span class="n">pop</span><span class="p">)</span>
-    <span class="p">.</span><span class="n">def</span><span class="p">(</span><span class="s">&quot;clone&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">MyStackClass</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;::</span><span class="n">clone</span><span class="p">)</span>
-    <span class="p">.</span><span class="n">def</span><span class="p">(</span><span class="s">&quot;merge&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">MyStackClass</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;::</span><span class="n">merge</span><span class="p">)</span>
-  <span class="p">;</span>
-<span class="p">}</span>
+<span class="n">TORCH_LIBRARY</span><span class="p">(</span><span class="n">my_classes</span><span class="p">,</span><span class="w"> </span><span class="n">m</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="n">m</span><span class="p">.</span><span class="n">class_</span><span class="o">&lt;</span><span class="n">MyStackClass</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;&gt;</span><span class="p">(</span><span class="s">&quot;MyStackClass&quot;</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// The following line registers the contructor of our MyStackClass</span>
+<span class="w">    </span><span class="c1">// class that takes a single `std::vector&lt;std::string&gt;` argument,</span>
+<span class="w">    </span><span class="c1">// i.e. it exposes the C++ method `MyStackClass(std::vector&lt;T&gt; init)`.</span>
+<span class="w">    </span><span class="c1">// Currently, we do not support registering overloaded</span>
+<span class="w">    </span><span class="c1">// constructors, so for now you can only `def()` one instance of</span>
+<span class="w">    </span><span class="c1">// `torch::init`.</span>
+<span class="w">    </span><span class="p">.</span><span class="n">def</span><span class="p">(</span><span class="n">torch</span><span class="o">::</span><span class="n">init</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;&gt;</span><span class="p">())</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// The next line registers a stateless (i.e. no captures) C++ lambda</span>
+<span class="w">    </span><span class="c1">// function as a method. Note that a lambda function must take a</span>
+<span class="w">    </span><span class="c1">// `c10::intrusive_ptr&lt;YourClass&gt;` (or some const/ref version of that)</span>
+<span class="w">    </span><span class="c1">// as the first argument. Other arguments can be whatever you want.</span>
+<span class="w">    </span><span class="p">.</span><span class="n">def</span><span class="p">(</span><span class="s">&quot;top&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">[](</span><span class="k">const</span><span class="w"> </span><span class="n">c10</span><span class="o">::</span><span class="n">intrusive_ptr</span><span class="o">&lt;</span><span class="n">MyStackClass</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;&gt;&amp;</span><span class="w"> </span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="n">self</span><span class="o">-&gt;</span><span class="n">stack_</span><span class="p">.</span><span class="n">back</span><span class="p">();</span><span class="w"></span>
+<span class="w">    </span><span class="p">})</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// The following four lines expose methods of the MyStackClass&lt;std::string&gt;</span>
+<span class="w">    </span><span class="c1">// class as-is. `torch::class_` will automatically examine the</span>
+<span class="w">    </span><span class="c1">// argument and return types of the passed-in method pointers and</span>
+<span class="w">    </span><span class="c1">// expose these to Python and TorchScript accordingly. Finally, notice</span>
+<span class="w">    </span><span class="c1">// that we must take the *address* of the fully-qualified method name,</span>
+<span class="w">    </span><span class="c1">// i.e. use the unary `&amp;` operator, due to C++ typing rules.</span>
+<span class="w">    </span><span class="p">.</span><span class="n">def</span><span class="p">(</span><span class="s">&quot;push&quot;</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">MyStackClass</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;::</span><span class="n">push</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">def</span><span class="p">(</span><span class="s">&quot;pop&quot;</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">MyStackClass</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;::</span><span class="n">pop</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">def</span><span class="p">(</span><span class="s">&quot;clone&quot;</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">MyStackClass</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;::</span><span class="n">clone</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="n">def</span><span class="p">(</span><span class="s">&quot;merge&quot;</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">MyStackClass</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;::</span><span class="n">merge</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="cmake-c">
+</section>
+<section id="cmake-c">
 <h2>CMake를 사용하여 C++ 프로젝트로 예제 빌드<a class="headerlink" href="#cmake-c" title="Permalink to this headline">¶</a></h2>
 <p>이제 <a class="reference external" href="https://cmake.org">CMake</a> 빌드 시스템을 사용하여 위의 C++ 코드를 빌드합니다.
 먼저, 지금까지 다룬 모든 C++ code를 <code class="docutils literal notranslate"><span class="pre">class.cpp</span></code> 라는 파일에 넣습니다.
 그런 다음 간단한 <code class="docutils literal notranslate"><span class="pre">CMakeLists.txt</span></code> 파일을 작성하여 동일한 디렉토리에 배치합니다.
 <code class="docutils literal notranslate"><span class="pre">CMakeLists.txt</span></code> 는 다음과 같아야 합니다:</p>
-<div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="nb">cmake_minimum_required</span><span class="p">(</span><span class="s">VERSION</span> <span class="s">3.1</span> <span class="s">FATAL_ERROR</span><span class="p">)</span>
+<div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="nb">cmake_minimum_required</span><span class="p">(</span><span class="s">VERSION</span><span class="w"> </span><span class="s">3.1</span><span class="w"> </span><span class="s">FATAL_ERROR</span><span class="p">)</span>
 <span class="nb">project</span><span class="p">(</span><span class="s">custom_class</span><span class="p">)</span>
 
-<span class="nb">find_package</span><span class="p">(</span><span class="s">Torch</span> <span class="s">REQUIRED</span><span class="p">)</span>
+<span class="nb">find_package</span><span class="p">(</span><span class="s">Torch</span><span class="w"> </span><span class="s">REQUIRED</span><span class="p">)</span>
 
 <span class="c"># Define our library target</span>
-<span class="nb">add_library</span><span class="p">(</span><span class="s">custom_class</span> <span class="s">SHARED</span> <span class="s">class.cpp</span><span class="p">)</span>
-<span class="nb">set</span><span class="p">(</span><span class="s">CMAKE_CXX_STANDARD</span> <span class="s">14</span><span class="p">)</span>
+<span class="nb">add_library</span><span class="p">(</span><span class="s">custom_class</span><span class="w"> </span><span class="s">SHARED</span><span class="w"> </span><span class="s">class.cpp</span><span class="p">)</span>
+<span class="nb">set</span><span class="p">(</span><span class="s">CMAKE_CXX_STANDARD</span><span class="w"> </span><span class="s">14</span><span class="p">)</span>
 <span class="c"># Link against LibTorch</span>
-<span class="nb">target_link_libraries</span><span class="p">(</span><span class="s">custom_class</span> <span class="s2">&quot;${TORCH_LIBRARIES}&quot;</span><span class="p">)</span>
+<span class="nb">target_link_libraries</span><span class="p">(</span><span class="s">custom_class</span><span class="w"> </span><span class="s2">&quot;${TORCH_LIBRARIES}&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>또한 <code class="docutils literal notranslate"><span class="pre">build</span></code> 디렉토리를 만듭니다. 파일 트리는 다음과 같아야 합니다:</p>
@@ -567,8 +568,8 @@ $ make -j
     <span class="n">libcustom_class</span><span class="o">.</span><span class="n">so</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="python-torchscript-c">
+</section>
+<section id="python-torchscript-c">
 <h2>Python 및 TorchScript의 C++ 클래스 사용<a class="headerlink" href="#python-torchscript-c" title="Permalink to this headline">¶</a></h2>
 <p>이제 클래스와 등록이 <code class="docutils literal notranslate"><span class="pre">.so</span></code> 파일로 컴파일되었으므로 해당 <cite>.so</cite> 를 Python에 읽어들이고 사용해 볼 수 있습니다.
 다음은 이를 보여주는 스크립트입니다:</p>
@@ -628,8 +629,8 @@ $ make -j
 
 </pre></div>
 </div>
-</div>
-<div class="section" id="torchscript">
+</section>
+<section id="torchscript">
 <h2>커스텀 클래스를 사용하여 TorchScript 코드 저장, 읽기 및 실행<a class="headerlink" href="#torchscript" title="Permalink to this headline">¶</a></h2>
 <p>libtorch를 사용하여 C++ 프로세스에서 커스텀 등록 C++ 클래스를 사용할 수도 있습니다.
 예를 들어 MyStackClass 클래스에서 메소드를 인스턴스화하고 호출하는 간단한 <code class="docutils literal notranslate"><span class="pre">nn.Module</span></code> 을 정의해 보겠습니다:</p>
@@ -672,44 +673,44 @@ $ make -j
 <p>직렬화된 foo.pt 파일과 위의 <code class="docutils literal notranslate"><span class="pre">custom_class_project</span></code> 소스 트리를 복사했음을 주목하세요.
 커스텀 클래스를 바이너리로 빌드할 수 있도록 <code class="docutils literal notranslate"><span class="pre">custom_class_project</span></code> 를 이 C++ 프로젝트에 의존성으로 추가할 것입니다.</p>
 <p><code class="docutils literal notranslate"><span class="pre">infer.cpp</span></code> 를 다음으로 채우겠습니다:</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;torch/script.h&gt;</span><span class="cp"></span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;torch/script.h&gt;</span><span class="cp"></span>
 
-<span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp"></span>
-<span class="cp">#include</span> <span class="cpf">&lt;memory&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;memory&gt;</span><span class="cp"></span>
 
-<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
-  <span class="n">torch</span><span class="o">::</span><span class="n">jit</span><span class="o">::</span><span class="n">Module</span> <span class="k">module</span><span class="p">;</span>
-  <span class="k">try</span> <span class="p">{</span>
-    <span class="c1">// Deserialize the ScriptModule from a file using torch::jit::load().</span>
-    <span class="k">module</span> <span class="o">=</span> <span class="n">torch</span><span class="o">::</span><span class="n">jit</span><span class="o">::</span><span class="n">load</span><span class="p">(</span><span class="s">&quot;foo.pt&quot;</span><span class="p">);</span>
-  <span class="p">}</span>
-  <span class="k">catch</span> <span class="p">(</span><span class="k">const</span> <span class="n">c10</span><span class="o">::</span><span class="n">Error</span><span class="o">&amp;</span> <span class="n">e</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">std</span><span class="o">::</span><span class="n">cerr</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;error loading the model</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
-    <span class="k">return</span> <span class="mi">-1</span><span class="p">;</span>
-  <span class="p">}</span>
+<span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">argc</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="o">*</span><span class="w"> </span><span class="n">argv</span><span class="p">[])</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="n">torch</span><span class="o">::</span><span class="n">jit</span><span class="o">::</span><span class="n">Module</span><span class="w"> </span><span class="k">module</span><span class="p">;</span><span class="w"></span>
+<span class="w">  </span><span class="k">try</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// Deserialize the ScriptModule from a file using torch::jit::load().</span>
+<span class="w">    </span><span class="k">module</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">torch</span><span class="o">::</span><span class="n">jit</span><span class="o">::</span><span class="n">load</span><span class="p">(</span><span class="s">&quot;foo.pt&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+<span class="w">  </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">c10</span><span class="o">::</span><span class="n">Error</span><span class="o">&amp;</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">cerr</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;error loading the model</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
 
-  <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">c10</span><span class="o">::</span><span class="n">IValue</span><span class="o">&gt;</span> <span class="n">inputs</span> <span class="o">=</span> <span class="p">{</span><span class="s">&quot;foobarbaz&quot;</span><span class="p">};</span>
-  <span class="k">auto</span> <span class="n">output</span> <span class="o">=</span> <span class="k">module</span><span class="p">.</span><span class="n">forward</span><span class="p">(</span><span class="n">inputs</span><span class="p">).</span><span class="n">toString</span><span class="p">();</span>
-  <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">output</span><span class="o">-&gt;</span><span class="n">string</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
-<span class="p">}</span>
+<span class="w">  </span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">c10</span><span class="o">::</span><span class="n">IValue</span><span class="o">&gt;</span><span class="w"> </span><span class="n">inputs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="s">&quot;foobarbaz&quot;</span><span class="p">};</span><span class="w"></span>
+<span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">output</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">module</span><span class="p">.</span><span class="n">forward</span><span class="p">(</span><span class="n">inputs</span><span class="p">).</span><span class="n">toString</span><span class="p">();</span><span class="w"></span>
+<span class="w">  </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">output</span><span class="o">-&gt;</span><span class="n">string</span><span class="p">()</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
 </pre></div>
 </div>
 <p>마찬가지로 CMakeLists.txt 파일을 정의해 보겠습니다:</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">cmake_minimum_required</span><span class="p">(</span><span class="n">VERSION</span> <span class="mf">3.1</span> <span class="n">FATAL_ERROR</span><span class="p">)</span>
-<span class="n">project</span><span class="p">(</span><span class="n">infer</span><span class="p">)</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">cmake_minimum_required</span><span class="p">(</span><span class="n">VERSION</span><span class="w"> </span><span class="mf">3.1</span><span class="w"> </span><span class="n">FATAL_ERROR</span><span class="p">)</span><span class="w"></span>
+<span class="n">project</span><span class="p">(</span><span class="n">infer</span><span class="p">)</span><span class="w"></span>
 
-<span class="n">find_package</span><span class="p">(</span><span class="n">Torch</span> <span class="n">REQUIRED</span><span class="p">)</span>
+<span class="n">find_package</span><span class="p">(</span><span class="n">Torch</span><span class="w"> </span><span class="n">REQUIRED</span><span class="p">)</span><span class="w"></span>
 
-<span class="n">add_subdirectory</span><span class="p">(</span><span class="n">custom_class_project</span><span class="p">)</span>
+<span class="n">add_subdirectory</span><span class="p">(</span><span class="n">custom_class_project</span><span class="p">)</span><span class="w"></span>
 
 <span class="cp"># Define our library target</span>
-<span class="n">add_executable</span><span class="p">(</span><span class="n">infer</span> <span class="n">infer</span><span class="p">.</span><span class="n">cpp</span><span class="p">)</span>
-<span class="n">set</span><span class="p">(</span><span class="n">CMAKE_CXX_STANDARD</span> <span class="mi">14</span><span class="p">)</span>
+<span class="n">add_executable</span><span class="p">(</span><span class="n">infer</span><span class="w"> </span><span class="n">infer</span><span class="p">.</span><span class="n">cpp</span><span class="p">)</span><span class="w"></span>
+<span class="n">set</span><span class="p">(</span><span class="n">CMAKE_CXX_STANDARD</span><span class="w"> </span><span class="mi">14</span><span class="p">)</span><span class="w"></span>
 <span class="cp"># Link against LibTorch</span>
-<span class="n">target_link_libraries</span><span class="p">(</span><span class="n">infer</span> <span class="s">&quot;${TORCH_LIBRARIES}&quot;</span><span class="p">)</span>
+<span class="n">target_link_libraries</span><span class="p">(</span><span class="n">infer</span><span class="w"> </span><span class="s">&quot;${TORCH_LIBRARIES}&quot;</span><span class="p">)</span><span class="w"></span>
 <span class="cp"># This is where we link in our libcustom_class code, making our</span>
 <span class="cp"># custom class available in our binary.</span>
-<span class="n">target_link_libraries</span><span class="p">(</span><span class="n">infer</span> <span class="o">-</span><span class="n">Wl</span><span class="p">,</span><span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">as</span><span class="o">-</span><span class="n">needed</span> <span class="n">custom_class</span><span class="p">)</span>
+<span class="n">target_link_libraries</span><span class="p">(</span><span class="n">infer</span><span class="w"> </span><span class="o">-</span><span class="n">Wl</span><span class="p">,</span><span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">as</span><span class="o">-</span><span class="n">needed</span><span class="w"> </span><span class="n">custom_class</span><span class="p">)</span><span class="w"></span>
 </pre></div>
 </div>
 <p><code class="docutils literal notranslate"><span class="pre">cd</span> <span class="pre">build</span></code>, <code class="docutils literal notranslate"><span class="pre">cmake</span></code>, 및 <code class="docutils literal notranslate"><span class="pre">make</span></code> 에 대한 사용 방법을 알고 있습니다:</p>
@@ -759,8 +760,8 @@ $ make -j
 </pre></div>
 </div>
 <p>대단합니다!</p>
-</div>
-<div class="section" id="ivalues">
+</section>
+<section id="ivalues">
 <h2>커스텀 클래스를 IValues로/에서 이동<a class="headerlink" href="#ivalues" title="Permalink to this headline">¶</a></h2>
 <p>TorchScript 메소드에서 <code class="docutils literal notranslate"><span class="pre">IValue</span></code> 를 가져오거나 반환하기, 또는 C++에서 커스텀 클래스 속성을 인스턴스화하려는
 경우와 같이 커스텀 클래스를 <code class="docutils literal notranslate"><span class="pre">IValue</span></code> 안팎으로 이동해야 할 수도 있습니다.
@@ -780,8 +781,8 @@ T의 생성자를 호출하며 해당 인스턴스를 래핑하고 반환하는 
 포함되어 있는지 확인합니다. <code class="docutils literal notranslate"><span class="pre">isCustomClass()</span></code> 를 호출하여 <code class="docutils literal notranslate"><span class="pre">IValue</span></code> 에 커스텀 클래스가 포함되어 있는지
 수동으로 확인할 수 있습니다.</p></li>
 </ul>
-</div>
-<div class="section" id="id2">
+</section>
+<section id="id2">
 <h2>커스텀 C++ 클래스에 대한 직렬화/역직렬화 방법 정의<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
 <p>커스텀 바인딩 된 C++ 클래스를 속성으로 사용하여 <code class="docutils literal notranslate"><span class="pre">ScriptModule</span></code> 을 저장하려고 하면
 다음 오류가 발생합니다:</p>
@@ -822,40 +823,40 @@ RuntimeError: Cannot serialize custom bound C++ class __torch__.torch.classes.my
 참조하세요.</p>
 </div>
 <p>다음은 직렬화 메소드를 포함하기 위해 <code class="docutils literal notranslate"><span class="pre">MyStackClass</span></code> 등록에 추가할 수 있는 <code class="docutils literal notranslate"><span class="pre">def_pickle</span></code> 호출의 예시입니다:</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span>    <span class="c1">// class_&lt;&gt;::def_pickle allows you to define the serialization</span>
-    <span class="c1">// and deserialization methods for your C++ class.</span>
-    <span class="c1">// Currently, we only support passing stateless lambda functions</span>
-    <span class="c1">// as arguments to def_pickle</span>
-    <span class="p">.</span><span class="n">def_pickle</span><span class="p">(</span>
-          <span class="c1">// __getstate__</span>
-          <span class="c1">// This function defines what data structure should be produced</span>
-          <span class="c1">// when we serialize an instance of this class. The function</span>
-          <span class="c1">// must take a single `self` argument, which is an intrusive_ptr</span>
-          <span class="c1">// to the instance of the object. The function can return</span>
-          <span class="c1">// any type that is supported as a return value of the TorchScript</span>
-          <span class="c1">// custom operator API. In this instance, we&#39;ve chosen to return</span>
-          <span class="c1">// a std::vector&lt;std::string&gt; as the salient data to preserve</span>
-          <span class="c1">// from the class.</span>
-          <span class="p">[](</span><span class="k">const</span> <span class="n">c10</span><span class="o">::</span><span class="n">intrusive_ptr</span><span class="o">&lt;</span><span class="n">MyStackClass</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;&gt;&amp;</span> <span class="n">self</span><span class="p">)</span>
-              <span class="o">-&gt;</span> <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;</span> <span class="p">{</span>
-            <span class="k">return</span> <span class="n">self</span><span class="o">-&gt;</span><span class="n">stack_</span><span class="p">;</span>
-          <span class="p">},</span>
-          <span class="c1">// __setstate__</span>
-          <span class="c1">// This function defines how to create a new instance of the C++</span>
-          <span class="c1">// class when we are deserializing. The function must take a</span>
-          <span class="c1">// single argument of the same type as the return value of</span>
-          <span class="c1">// `__getstate__`. The function must return an intrusive_ptr</span>
-          <span class="c1">// to a new instance of the C++ class, initialized however</span>
-          <span class="c1">// you would like given the serialized state.</span>
-          <span class="p">[](</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;</span> <span class="n">state</span><span class="p">)</span>
-              <span class="o">-&gt;</span> <span class="n">c10</span><span class="o">::</span><span class="n">intrusive_ptr</span><span class="o">&lt;</span><span class="n">MyStackClass</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;&gt;</span> <span class="p">{</span>
-            <span class="c1">// A convenient way to instantiate an object and get an</span>
-            <span class="c1">// intrusive_ptr to it is via `make_intrusive`. We use</span>
-            <span class="c1">// that here to allocate an instance of MyStackClass&lt;std::string&gt;</span>
-            <span class="c1">// and call the single-argument std::vector&lt;std::string&gt;</span>
-            <span class="c1">// constructor with the serialized state.</span>
-            <span class="k">return</span> <span class="n">c10</span><span class="o">::</span><span class="n">make_intrusive</span><span class="o">&lt;</span><span class="n">MyStackClass</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;&gt;</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">state</span><span class="p">));</span>
-          <span class="p">});</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="w">    </span><span class="c1">// class_&lt;&gt;::def_pickle allows you to define the serialization</span>
+<span class="w">    </span><span class="c1">// and deserialization methods for your C++ class.</span>
+<span class="w">    </span><span class="c1">// Currently, we only support passing stateless lambda functions</span>
+<span class="w">    </span><span class="c1">// as arguments to def_pickle</span>
+<span class="w">    </span><span class="p">.</span><span class="n">def_pickle</span><span class="p">(</span><span class="w"></span>
+<span class="w">          </span><span class="c1">// __getstate__</span>
+<span class="w">          </span><span class="c1">// This function defines what data structure should be produced</span>
+<span class="w">          </span><span class="c1">// when we serialize an instance of this class. The function</span>
+<span class="w">          </span><span class="c1">// must take a single `self` argument, which is an intrusive_ptr</span>
+<span class="w">          </span><span class="c1">// to the instance of the object. The function can return</span>
+<span class="w">          </span><span class="c1">// any type that is supported as a return value of the TorchScript</span>
+<span class="w">          </span><span class="c1">// custom operator API. In this instance, we&#39;ve chosen to return</span>
+<span class="w">          </span><span class="c1">// a std::vector&lt;std::string&gt; as the salient data to preserve</span>
+<span class="w">          </span><span class="c1">// from the class.</span>
+<span class="w">          </span><span class="p">[](</span><span class="k">const</span><span class="w"> </span><span class="n">c10</span><span class="o">::</span><span class="n">intrusive_ptr</span><span class="o">&lt;</span><span class="n">MyStackClass</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;&gt;&amp;</span><span class="w"> </span><span class="n">self</span><span class="p">)</span><span class="w"></span>
+<span class="w">              </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="n">self</span><span class="o">-&gt;</span><span class="n">stack_</span><span class="p">;</span><span class="w"></span>
+<span class="w">          </span><span class="p">},</span><span class="w"></span>
+<span class="w">          </span><span class="c1">// __setstate__</span>
+<span class="w">          </span><span class="c1">// This function defines how to create a new instance of the C++</span>
+<span class="w">          </span><span class="c1">// class when we are deserializing. The function must take a</span>
+<span class="w">          </span><span class="c1">// single argument of the same type as the return value of</span>
+<span class="w">          </span><span class="c1">// `__getstate__`. The function must return an intrusive_ptr</span>
+<span class="w">          </span><span class="c1">// to a new instance of the C++ class, initialized however</span>
+<span class="w">          </span><span class="c1">// you would like given the serialized state.</span>
+<span class="w">          </span><span class="p">[](</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;</span><span class="w"> </span><span class="n">state</span><span class="p">)</span><span class="w"></span>
+<span class="w">              </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">c10</span><span class="o">::</span><span class="n">intrusive_ptr</span><span class="o">&lt;</span><span class="n">MyStackClass</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="c1">// A convenient way to instantiate an object and get an</span>
+<span class="w">            </span><span class="c1">// intrusive_ptr to it is via `make_intrusive`. We use</span>
+<span class="w">            </span><span class="c1">// that here to allocate an instance of MyStackClass&lt;std::string&gt;</span>
+<span class="w">            </span><span class="c1">// and call the single-argument std::vector&lt;std::string&gt;</span>
+<span class="w">            </span><span class="c1">// constructor with the serialized state.</span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="n">c10</span><span class="o">::</span><span class="n">make_intrusive</span><span class="o">&lt;</span><span class="n">MyStackClass</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;&gt;</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">state</span><span class="p">));</span><span class="w"></span>
+<span class="w">          </span><span class="p">});</span><span class="w"></span>
 </pre></div>
 </div>
 <div class="admonition note">
@@ -870,22 +871,22 @@ RuntimeError: Cannot serialize custom bound C++ class __torch__.torch.classes.my
 testing
 </pre></div>
 </div>
-</div>
-<div class="section" id="id4">
+</section>
+<section id="id4">
 <h2>바인딩된 C++ 클래스를 사용하거나 반환하는 커스텀 연산자 정의<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
 <p>커스텀 C++ 클래스를 정의한 후에는 해당 클래스를 인수로 사용하거나 커스텀 연산자(예를 들어 free 함수)에서
 반환할 수도 있습니다. 다음과 같은 free 함수가 있다고 가정합니다:</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">c10</span><span class="o">::</span><span class="n">intrusive_ptr</span><span class="o">&lt;</span><span class="n">MyStackClass</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;&gt;</span> <span class="n">manipulate_instance</span><span class="p">(</span><span class="k">const</span> <span class="n">c10</span><span class="o">::</span><span class="n">intrusive_ptr</span><span class="o">&lt;</span><span class="n">MyStackClass</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;&gt;&amp;</span> <span class="n">instance</span><span class="p">)</span> <span class="p">{</span>
-  <span class="n">instance</span><span class="o">-&gt;</span><span class="n">pop</span><span class="p">();</span>
-  <span class="k">return</span> <span class="n">instance</span><span class="p">;</span>
-<span class="p">}</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">c10</span><span class="o">::</span><span class="n">intrusive_ptr</span><span class="o">&lt;</span><span class="n">MyStackClass</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">manipulate_instance</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">c10</span><span class="o">::</span><span class="n">intrusive_ptr</span><span class="o">&lt;</span><span class="n">MyStackClass</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;&gt;&amp;</span><span class="w"> </span><span class="n">instance</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="n">instance</span><span class="o">-&gt;</span><span class="n">pop</span><span class="p">();</span><span class="w"></span>
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">instance</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
 </pre></div>
 </div>
 <p><code class="docutils literal notranslate"><span class="pre">TORCH_LIBRARY</span></code> 블록 내에서 다음 코드를 실행하여 등록할 수 있습니다:</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span>    <span class="n">m</span><span class="p">.</span><span class="n">def</span><span class="p">(</span>
-      <span class="s">&quot;manipulate_instance(__torch__.torch.classes.my_classes.MyStackClass x) -&gt; __torch__.torch.classes.my_classes.MyStackClass Y&quot;</span><span class="p">,</span>
-      <span class="n">manipulate_instance</span>
-    <span class="p">);</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="w">    </span><span class="n">m</span><span class="p">.</span><span class="n">def</span><span class="p">(</span><span class="w"></span>
+<span class="w">      </span><span class="s">&quot;manipulate_instance(__torch__.torch.classes.my_classes.MyStackClass x) -&gt; __torch__.torch.classes.my_classes.MyStackClass Y&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">      </span><span class="n">manipulate_instance</span><span class="w"></span>
+<span class="w">    </span><span class="p">);</span><span class="w"></span>
 </pre></div>
 </div>
 <p>등록 API에 대한 자세한 내용은 <a class="reference external" href="https://tutorials.pytorch.kr/advanced/torch_script_custom_ops.html">커스텀 C++ 연산자로 TorchScript 확장</a> 을
@@ -907,8 +908,8 @@ testing
 블록에 있고 커스텀 클래스 등록이 먼저 오게 하여 이를 시행할 수 있습니다.
 향후 어떤 순서로든 등록할 수 있도록 이 요구사항을 완화할 수 있습니다.</p>
 </div>
-</div>
-<div class="section" id="id6">
+</section>
+<section id="id6">
 <h2>결론<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h2>
 <p>이 튜토리얼에서는 독립된 C++ 프로세스에서 C++ 클래스를 TorchScript 및
 확장 Python에 나타내는 방법, 해당 메소드를 등록하는 방법, Python 및 TorchScript에서
@@ -919,8 +920,8 @@ Python, TorchScript 및 C++ 간의 라인이 원활하게 혼합되어야 하는
 <a class="reference external" href="https://github.com/pytorch/pytorch/issues">GitHub issues</a> 에 올려주시면 되겠습니다.
 또한 <a class="reference external" href="https://pytorch.org/cppdocs/notes/faq.html">자주 묻는 질문(FAQ) 페이지</a> 에
 유용한 정보가 있을 수 있습니다.</p>
-</div>
-</div>
+</section>
+</section>
 
 
              </article>
@@ -999,7 +1000,7 @@ Python, TorchScript 및 C++ 간의 라인이 원활하게 혼합되어야 하는
 
 
   
-
+  
      
        <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
          <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
@@ -1012,7 +1013,6 @@ Python, TorchScript 및 C++ 간의 라인이 원활하게 혼합되어야 하는
          <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
          <script src="../_static/katex_autorenderer.js"></script>
      
-
   
 
   <script type="text/javascript" src="../_static/js/vendor/popper.min.js"></script>

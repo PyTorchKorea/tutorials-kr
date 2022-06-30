@@ -6,7 +6,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
 <meta property="og:title" content="단일 머신을 사용한 모델 병렬화 모범 사례" />
   
 <meta property="og:type" content="article" />
@@ -395,7 +396,7 @@
 <p class="admonition-title">Note</p>
 <p>Click <a class="reference internal" href="#sphx-glr-download-intermediate-model-parallel-tutorial-py"><span class="std std-ref">here</span></a> to download the full example code</p>
 </div>
-<div class="sphx-glr-example-title section" id="sphx-glr-intermediate-model-parallel-tutorial-py">
+<section class="sphx-glr-example-title" id="sphx-glr-intermediate-model-parallel-tutorial-py">
 <span id="id1"></span><h1>단일 머신을 사용한 모델 병렬화 모범 사례<a class="headerlink" href="#sphx-glr-intermediate-model-parallel-tutorial-py" title="Permalink to this headline">¶</a></h1>
 <p><strong>저자</strong> : <a class="reference external" href="https://mrshenli.github.io/">Shen Li</a>
 <strong>번역</strong> : <a class="reference external" href="https://github.com/Justin-A">안상준</a></p>
@@ -418,7 +419,7 @@
 <p>신경망 모델을 여러 서버를 이용하여 학습시키는 병렬 학습 방법에 대해서는 다음 튜토리얼을 참고하세요.
 <a class="reference external" href="rpc_tutorial.html">분산 프레임워크 RPC 시작해보기</a></p>
 </div>
-<div class="section" id="basic-usage">
+<section id="basic-usage">
 <h2>Basic Usage<a class="headerlink" href="#basic-usage" title="Permalink to this headline">¶</a></h2>
 <p>2개의 층으로 이루어진 간단한 신경망 모델을 이용해서 기본적인 내용을 실습해봅시다.
 신경망 모델을 2개의 GPU에 할당하여 실행하기 위해서, 각 1개의 층을 각각 다른 GPU에 할당하고,
@@ -456,8 +457,8 @@
 <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="id3">
+</section>
+<section id="id3">
 <h2>기존에 존재하는 모듈에 모델 병렬 처리 적용해보기<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
 <p>기존에 단일 GPU에 존재하는 모듈을 여러 GPU에 할당하는 것은 단지 몇 줄의 코드를 수정하는 것으로도 쉽게 가능합니다.
 아래에 있는 코드들은 <code class="docutils literal notranslate"><span class="pre">torchvision.models.reset50()</span></code> 모델을 2개 GPU로 분할하는 방법입니다.
@@ -579,9 +580,9 @@
      <span class="s1">&#39;mp_vs_rn.png&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="figure align-default">
+<figure class="align-default">
 <img alt="" src="../_images/mp_vs_rn.png" />
-</div>
+</figure>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># 실험 결과, 모델 병렬 철리하여 학습하는 시간이 단일 GPU로 학습하는 시간보다 약 7% ``4.02/3.75-1=7%``정도</span>
 <span class="c1"># 오래 걸리는 것을 확인할 수 있습니다. 그러므로, 순전파와 역전파를 진행하면서 GPU 간 텐서값들이</span>
 <span class="c1"># 복제되어 이용하는 시간이 약 7%정도 소요되는 것으로 결론지을 수 있습니다. 학습하는 과정 속에서</span>
@@ -592,8 +593,8 @@
 <span class="c1"># 이러한 방법을 통해서 2개의 GPU가 2개로 분할된 데이터를 동시에 처리할 수 있으며 학습 시간을 단축시킬 수 있습니다.</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="id4">
+</section>
+<section id="id4">
 <h2>입력 텐서값을 분할하는 파이프라인을 설계하여 학습 시간을 단축하는 방법에 대한 예제<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
 <p>아래에 있는 실험은, 120개의 이미지로 구성된 1개의 미니 배치 데이터를 20개씩 나누어 진행하는
 과정입니다. 아래의 과정을 실행할 때, PyTorch가 CUDA 연산을 비동기적으로 이용하기 때문에,
@@ -639,9 +640,9 @@
 정상적으로 복사되어 계산되고 있는지 꼭 확인해야 합니다. 만약 복사되는 과정 중에 소스값을 이용하거나,
 GPU의 텐서값을 읽거나 쓰는 것은 올바르게 계산되지 않을 수 있습니다. 위의 예제에서는 소스값 및 GPU
 텐서값을 기본 스트림만 이용하여 진행하므로 추가적인 동기화 과정을 진행할 필요는 없습니다.</p>
-<div class="figure align-default">
+<figure class="align-default">
 <img alt="" src="../_images/mp_vs_rn_vs_pp.png" />
-</div>
+</figure>
 <p>파이프라인을 이용하여 미니 배치 내 데이터를 분할하여 적용하였을 때, ResNet50 신경망 모델의
 학습 시간이 약 49% <code class="docutils literal notranslate"><span class="pre">3.75/2.51-1=49%</span></code> 정도 단축된 것을 이번 실험을 통해 확인할 수 있습니다. 하지만, 이상적으로
 학습 시간이 2배 단축되는 것에 비해 다소 적게 학습 시간이 단축되었습니다. 파이프라인을 이용할 때,
@@ -674,9 +675,9 @@ GPU의 텐서값을 읽거나 쓰는 것은 올바르게 계산되지 않을 수
 <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="figure align-default">
+<figure class="align-default">
 <img alt="" src="../_images/split_size_tradeoff.png" />
-</div>
+</figure>
 <p>실험 결과, <code class="docutils literal notranslate"><span class="pre">split_size</span></code> 매개변수값을 12로 설정하였을 때, 학습 시간이 54% 수준으로
 가장 많이 단축되었습니다. 아직 학습 시간을 더 단축시킬 수 있는 방법은 다양하게 존재합니다.
 예를 들어, 첫 번째 GPU에서 모든 연산과정이 기본으로 설정되어 진행됩니다. 이는 미니배치 분할 과정 중,
@@ -695,7 +696,7 @@ GPU의 텐서값을 읽거나 쓰는 것은 올바르게 계산되지 않을 수
 <span class="sd">&quot;&quot;&quot;</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 4 minutes  7.313 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 4 minutes  17.240 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-intermediate-model-parallel-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/84ab670fda2216116ac8e3ecd5805f0b/model_parallel_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">model_parallel_tutorial.py</span></code></a></p>
@@ -705,8 +706,8 @@ GPU의 텐서값을 읽거나 쓰는 것은 올바르게 계산되지 않을 수
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
-</div>
-</div>
+</section>
+</section>
 
 
              </article>
@@ -780,7 +781,7 @@ GPU의 텐서값을 읽거나 쓰는 것은 올바르게 계산되지 않을 수
 
 
   
-
+  
      
        <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
          <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
@@ -793,7 +794,6 @@ GPU의 텐서값을 읽거나 쓰는 것은 올바르게 계산되지 않을 수
          <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
          <script src="../_static/katex_autorenderer.js"></script>
      
-
   
 
   <script type="text/javascript" src="../_static/js/vendor/popper.min.js"></script>
