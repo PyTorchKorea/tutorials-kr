@@ -111,13 +111,16 @@ docs:
 	rm -rf docs
 	cp -r $(BUILDDIR)/html docs
 	cp CNAME docs/CNAME
+	cp robots.txt docs/robots.txt
 	touch docs/.nojekyll
+	@echo
+	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
 
 html-noplot:
 	$(SPHINXBUILD) -D plot_gallery=0 -b html $(SPHINXOPTS) "$(SOURCEDIR)" "$(BUILDDIR)/html"
 	# bash .jenkins/remove_invisible_code_block_batch.sh "$(BUILDDIR)/html"
 	@echo
-	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
+	@echo "HTML-ONLY build finished. The HTML pages are in $(BUILDDIR)/html."
 
 clean-cache:
 	make clean

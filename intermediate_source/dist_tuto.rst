@@ -109,7 +109,7 @@ PyTorch에 포함된 분산 패키지(예. ``torch.distributed``)는 연구자�
         print('Rank ', rank, ' has data ', tensor[0])
 
 위 예제에서 두 프로세스는 값이 0인 Tensor로 시작한 후, 0번 프로세스가 Tensor의 값을
-증가시킨 후 1번 프로세스로 보내서 둘 다 1.0으로 종료됩니다. 이 떄, 프로세스 1은
+증가시킨 후 1번 프로세스로 보내서 둘 다 1.0으로 종료됩니다. 이 때, 프로세스 1은
 수신한 데이터를 저장할 메모리를 할당해두야 합니다.
 
 또한 ``send``/``recv`` 는 모두 **블로킹** 입니다: 두 프로세스는 통신이 완료될 때까지
@@ -195,7 +195,7 @@ PyTorch에 포함된 분산 패키지(예. ``torch.distributed``)는 연구자�
         dist.all_reduce(tensor, op=dist.ReduceOp.SUM, group=group)
         print('Rank ', rank, ' has data ', tensor[0])
 
-그룹 내의 모든 Tensor들의 합이 필요하기 떄문에, ``dist.ReduceOp.SUM`` 을
+그룹 내의 모든 Tensor들의 합이 필요하기 때문에, ``dist.ReduceOp.SUM`` 을
 리듀스(reduce) 연산자로 사용하였습니다. 일반적으로, 교환 법칙이 허용되는(commutative)
 모든 수학 연산을 연산자로 사용할 수 있습니다. PyTorch는 요소별(element-wise)로
 동작하는 기본적으로 4개의 연산자를 제공합니다.
@@ -425,7 +425,7 @@ PyTorch에는 현재 ``dist.all_reduce(tensor, op, group)`` 외에도 6개의 �
 **Gloo 백엔드**
 
 지금껏 우리는 `Gloo backend <https://github.com/facebookincubator/gloo>`__ 를
-광범위하게 사용했습니다. 이것은 미리 컴파일된 PyTOrch 바이너리가 포함되어 있으며
+광범위하게 사용했습니다. 이것은 미리 컴파일된 PyTorch 바이너리가 포함되어 있으며
 Linux(0.2 이상)와 macOS(1.3 이상)을 모두 지원하고 있어 개발 플랫폼으로 매우 편리합니다.
 또한 CPU에서는 모든 저짐-대-지점 및 집합 연산들을, GPU에서는 집합 연산을 지원합니다.
 CUDA Tensor에 대한 집합 연산 구현은 NCCL 백엔드에서 제공하는 것만큼 최적화되어
