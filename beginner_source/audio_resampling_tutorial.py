@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 """
-Audio Resampling
+오디오 재샘플링
 ==========
 
-Here, we will walk through resampling audio waveforms using ``torchaudio``.
+여기서는 ``torchaudio`` 를 사용하여 오디오 파형의 재샘플링에 대해 살펴보겠습니다.
 
 """
 
-# When running this tutorial in Google Colab, install the required packages
-# with the following.
+# 이번 튜토리얼을 구글 코랩(Google Colab)에서 실행할 때,
+# 필요한 패키지들을 아래와 같이 설치해주세요.
 # !pip install torchaudio librosa
 
 import torch
@@ -20,17 +20,17 @@ print(torch.__version__)
 print(torchaudio.__version__)
 
 ######################################################################
-# Preparing data and utility functions (skip this section)
+# 데이터 및 유용한 함수 준비하기 (이번 섹션 생략)
 # --------------------------------------------------------
 #
 
-#@title Prepare data and utility functions. {display-mode: "form"}
+#@title 데이터 및 유용한 함수 준비하기 {display-mode: "form"}
 #@markdown
-#@markdown You do not need to look into this cell.
-#@markdown Just execute once and you are good to go.
+#@markdown 이 부분을 자세히 보실 필요는 없습니다.
+#@markdown 한번만 실행하면 충분합니다.
 
 #-------------------------------------------------------------------------------
-# Preparation of data and helper functions.
+# 데이터 및 도움 기능 준비
 #-------------------------------------------------------------------------------
 
 import math
@@ -50,9 +50,9 @@ DEFAULT_RESAMPLING_METHOD = 'sinc_interpolation'
 
 
 def _get_log_freq(sample_rate, max_sweep_rate, offset):
-  """Get freqs evenly spaced out in log-scale, between [0, max_sweep_rate // 2]
+  """[0, max_sweep_rate // 2] 사이의 로그 스케일로 균등하게 간격을 두고 주파수를 가져옵니다.
 
-  offset is used to avoid negative infinity `log(offset + x)`.
+  오프셋은 음의 무한대 `log(offset + x)`를 방지하기 위해 사용됩니다.
 
   """
   half = sample_rate // 2
@@ -60,13 +60,13 @@ def _get_log_freq(sample_rate, max_sweep_rate, offset):
   return torch.exp(torch.linspace(start, stop, sample_rate, dtype=torch.double)) - offset
 
 def _get_inverse_log_freq(freq, sample_rate, offset):
-  """Find the time where the given frequency is given by _get_log_freq"""
+  """주어진 주파수가 _get_log_freq 로 주어지는 시간을 찾습니다."""
   half = sample_rate // 2
   return sample_rate * (math.log(1 + freq / offset) / math.log(1 + half / offset))
 
 def _get_freq_ticks(sample_rate, offset, f_max):
-  # Given the original sample rate used for generating the sweep,
-  # find the x-axis value where the log-scale major frequency values fall in
+  # 스윕(sweep) 생성에 사용된 원래 샘플링 비율이 주어지면,
+  # 로그 스케일의 주요 주파수 값이 속하는 x축 값을 찾습니다.
   time, freq = [], []
   for exp in range(2, 5):
     for v in range(1, 10):
@@ -172,34 +172,28 @@ def benchmark_resample(
     return elapsed / iters
 
 ######################################################################
-# To resample an audio waveform from one freqeuncy to another, you can use
-# ``transforms.Resample`` or ``functional.resample``.
-# ``transforms.Resample`` precomputes and caches the kernel used for
-# resampling, while ``functional.resample`` computes it on the fly, so
-# using ``transforms.Resample`` will result in a speedup when resampling
-# multiple waveforms using the same parameters (see Benchmarking section).
+# 오디오 파형을 한 주파수에서 다른 주파수로 재샘플링 하기 위해서
+# ``transforms.Resample`` 또는 ``functional.resample`` 를 사용할 수 있습니다.
+# ``transforms.Resample`` 는 재샘플링에 사용되는 커널을 미리 계산하고 캐시하는 반면
+# ``functional.resample`` 는 그때그때 봐 가며 계산하므로, 동일한 매개변수를 사용하여 
+# 여러 파형을 재샘플링할 때 ``transforms.Resample`` 를 사용하는 것이 속도가 
+# 더 빠릅니다. (벤치마크 섹션 참조)
 #
-# Both resampling methods use `bandlimited sinc
-# interpolation <https://ccrma.stanford.edu/~jos/resample/>`__ to compute
-# signal values at arbitrary time steps. The implementation involves
-# convolution, so we can take advantage of GPU / multithreading for
-# performance improvements. When using resampling in multiple
-# subprocesses, such as data loading with multiple worker processes, your
-# application might create more threads than your system can handle
-# efficiently. Setting ``torch.set_num_threads(1)`` might help in this
-# case.
+# 두 가지 재샘플링 방법 모두 임의의 시간 단계에서 신호 값을 계산하기 위해
+# `대역 제한 싱크 보간(bandlimited sinc interpolation) <https://ccrma.stanford.edu/~jos/resample/>`__
+# 을 사용합니다. 구현에는 합성곱(convolution)이 포함되므로 GPU/멀티 스레딩을 
+# 활용하여 성능을 향상시킬 수 있습니다. 여러 작업자(worker) 프로세스로 데이터를
+# 로딩하는 것과 같이 여러 하위 프로세스에서 재샘플링을 사용할 경우, 프로그램이
+# 시스템에서 효율적으로 처리할 수 있는 것보다 더 많은 스레드를 생성할 수 있습니다.
+# 이 경우 ``torch.set_num_threads(1)`` 를 설정하는 것이 도움이 될 수 있습니다.
 #
-# Because a finite number of samples can only represent a finite number of
-# frequencies, resampling does not produce perfect results, and a variety
-# of parameters can be used to control for its quality and computational
-# speed. We demonstrate these properties through resampling a logarithmic
-# sine sweep, which is a sine wave that increases exponentially in
-# frequency over time.
+# 제한된 수의 샘플은 제한된 수의 주파수만 나타낼 수 있기 때문에, 재샘플링은
+# 완벽환 결과를 생성하지 않으며, 다양한 매개변수를 사용하여 결과의 품질과 계산 속도를
+# 제어할 수 있습니다. 시간이 지남에 따라 주파수가 기하급수적으로 증가하는
+# 사인 파형인 로그 사인 스윕(sweep)을 재샘플링하여 이러한 특성을 입증합니다.
 #
-# The spectrograms below show the frequency representation of the signal,
-# where the x-axis corresponds to the frequency of the original
-# waveform (in log scale), y-axis the frequency of the
-# plotted waveform, and color intensity the amplitude.
+# 아래 스펙트로그램은 신호의 주파수 표현을 보여주고, 여기서 x축은 원래 파형의
+# 주파수(로그 스케일), y축은 표시된 파형의 주파수, 색의 강도는 진폭에 해당합니다.
 #
 
 sample_rate = 48000
@@ -216,19 +210,17 @@ play_audio(waveform, sample_rate)
 
 
 ######################################################################
-# Controling resampling quality with parameters
+# 매개변수를 사용한 재샘플링 품질 제어
 # ---------------------------------------------
 #
-# Lowpass filter width
+# 저역 통과 필터 폭
 # ~~~~~~~~~~~~~~~~~~~~
 #
-# Because the filter used for interpolation extends infinitely, the
-# ``lowpass_filter_width`` parameter is used to control for the width of
-# the filter to use to window the interpolation. It is also referred to as
-# the number of zero crossings, since the interpolation passes through
-# zero at every time unit. Using a larger ``lowpass_filter_width``
-# provides a sharper, more precise filter, but is more computationally
-# expensive.
+# 보간에 사용되는 필터는 무한 확장되므로, ``lowpass_filter_width`` 매개변수는
+# 보간 윈도우에 사용할 필터의 폭을 제어하기 위해 사용됩니다. 보간은 모든 시간
+# 단위에서 0을 통과하기 때문에, 제로 크로싱(zero crossings)의 수라고도 합니다.
+# 더 큰 ``lowpass_filter_width`` 를 사용하면 더 선명하고 정밀한 필터를 제공하지만
+# 계산량이 늘어납니다.
 #
 
 
@@ -243,16 +235,14 @@ plot_sweep(resampled_waveform, resample_rate, title="lowpass_filter_width=128")
 
 
 ######################################################################
-# Rolloff
+# 롤오프(Rolloff)
 # ~~~~~~~
 #
-# The ``rolloff`` parameter is represented as a fraction of the Nyquist
-# frequency, which is the maximal frequency representable by a given
-# finite sample rate. ``rolloff`` determines the lowpass filter cutoff and
-# controls the degree of aliasing, which takes place when frequencies
-# higher than the Nyquist are mapped to lower frequencies. A lower rolloff
-# will therefore reduce the amount of aliasing, but it will also reduce
-# some of the higher frequencies.
+# ``rolloff`` 매개변수는 주어진 제한된 샘플링 비율로 나타낼 수 있는 최대 주파수인
+# 나이퀴스트(Nyquist) 주파수의 분수로 표현됩니다. ``rolloff`` 는 저역 통과 필터의
+# 제한 범위(cutoff)를 결정하고 나이퀴스트보다 높은 주파수가 낮은 주파수로 맵핑될 때
+# 발생하는 노이즈(aliasing)의 정도를 제어합니다. 따라서 낮은 롤오프는 노이즈의 양을
+# 감소시키지만, 일부 높은 주파수 또한 감소시킬 수 있습니다.
 #
 
 
@@ -267,15 +257,14 @@ plot_sweep(resampled_waveform, resample_rate, title="rolloff=0.8")
 
 
 ######################################################################
-# Window function
+# 윈도우 함수
 # ~~~~~~~~~~~~~~~
 #
-# By default, ``torchaudio``’s resample uses the Hann window filter, which is
-# a weighted cosine function. It additionally supports the Kaiser window,
-# which is a near optimal window function that contains an additional
-# ``beta`` parameter that allows for the design of the smoothness of the
-# filter and width of impulse. This can be controlled using the
-# ``resampling_method`` parameter.
+# 기본적으로 ``torchaudio`` 의 재샘플은 가중 코사인 함수인 한(Hann) 윈도우
+# 필터를 사용합니다. 또한 필터의 부드러움(smoothness)과 임펄스(impulse) 폭을
+# 설계할 수 있는 추가 ``beta`` 매개변수를 포함하는 거의 최적의 윈도우 함수인
+# 카이저(Kaiser) 윈도우를 추가로 지원합니다. 이는 ``resampling_method``
+# 매개변수를 사용하여 제어할 수 있습니다.
 #
 
 
@@ -290,11 +279,11 @@ plot_sweep(resampled_waveform, resample_rate, title="Kaiser Window Default")
 
 
 ######################################################################
-# Comparison against librosa
+# librosa와의 비교
 # --------------------------
 #
-# ``torchaudio``’s resample function can be used to produce results similar to
-# that of librosa (resampy)’s kaiser window resampling, with some noise
+# ``torchaudio`` 의 재샘플 함수는 librosa (resampy)의 카이저 윈도우 재샘플링과
+# 유사한 결과를 생성할 수 있으며, 약간의 노이즈가 있습니다.
 #
 
 
@@ -341,25 +330,23 @@ print("torchaudio and librosa kaiser fast MSE:", mse)
 
 
 ######################################################################
-# Performance Benchmarking
+# 성능 벤치마크
 # ------------------------
 #
-# Below are benchmarks for downsampling and upsampling waveforms between
-# two pairs of sampling rates. We demonstrate the performance implications
-# that the ``lowpass_filter_wdith``, window type, and sample rates can
-# have. Additionally, we provide a comparison against ``librosa``\ ’s
-# ``kaiser_best`` and ``kaiser_fast`` using their corresponding parameters
-# in ``torchaudio``.
+# 아래는 두 쌍의 샘플링 비율 사이의 다운샘플링 및 업샘플링 파형에 대한
+# 벤치마크입니다. ``lowpass_filter_wdith``, 윈도우 유형 및 샘플링 비율이
+# 성능에 미칠 수 있는 영향을 보여줍니다. 또한, ``torchaudio`` 의 해당
+# 매개변수를 사용하여 ``librosa`` 의 ``kaiser_best`` 및 ``kaiser_fast`` 와
+# 비교합니다.
 #
-# To elaborate on the results:
+# 결과에 대해 자세히 설명하기 위해:
 #
-# - a larger ``lowpass_filter_width`` results in a larger resampling kernel,
-#   and therefore increases computation time for both the kernel computation
-#   and convolution
-# - using ``kaiser_window`` results in longer computation times than the default
-#   ``sinc_interpolation`` because it is more complex to compute the intermediate
-#   window values - a large GCD between the sample and resample rate will result
-#   in a simplification that allows for a smaller kernel and faster kernel computation.
+# - 더 큰 ``lowpass_filter_width`` 는 더 큰 재샘플링 커널을 생성하므로
+#   커널 계산과 합성곱 모두에 대한 계산 시간을 증가시킵니다.
+# - ``kaiser_window`` 를 사용하면 중간의 윈도우 값을 계산하는 것이 더
+#   복잡하기 때문에 기본 ``sinc_interpolation`` 보다 계산 시간이 더 길어집니다.
+# - 샘플과 재샘플 비율 사이의 큰 GCD는 더 작은 커널과 더 빠른 커널 계산을
+#   가능하게 하도록 단순화할 수 있습니다.
 #
 
 
