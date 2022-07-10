@@ -3,6 +3,9 @@ Distributed Training with Uneven Inputs Using the Join Context Manager
 
 **Author**\ : `Andrew Gu <https://github.com/andwgu>`_
 
+.. note::
+   View the source code for this tutorial in `github <https://github.com/pytorch/tutorials/blob/master/advanced_source/generic_join.rst>`__.
+
 .. note:: ``Join`` is introduced in PyTorch 1.10 as a prototype feature. This
     API is subject to change.
 
@@ -366,7 +369,7 @@ of inputs across all ranks.
         def join_hook(self, **kwargs) -> JoinHook:
             r"""
             Return a join hook that shadows the all-reduce in :meth:`__call__`.
-
+            
             This join hook supports the following keyword arguments:
                 sync_max_count (bool, optional): whether to synchronize the maximum
                     count across all ranks once all ranks join; default is ``False``.
@@ -439,9 +442,9 @@ Some key points to highlight:
 
 
 .. _Join: https://pytorch.org/docs/master/distributed.algorithms.join.html
-.. _Getting Started with Distributed Data Parallel: https://tutorials.pytorch.kr/intermediate/ddp_tutorial.html
-.. _Getting Started with Distributed Data Parallel - Basic Use Case: https://tutorials.pytorch.kr/intermediate/ddp_tutorial.html#basic-use-case
-.. _Shard Optimizer States with ZeroRedundancyOptimizer: https://tutorials.pytorch.kr/recipes/zero_redundancy_optimizer.html
+.. _Getting Started with Distributed Data Parallel: https://pytorch.org/tutorials/intermediate/ddp_tutorial.html
+.. _Getting Started with Distributed Data Parallel - Basic Use Case: https://pytorch.org/tutorials/intermediate/ddp_tutorial.html#basic-use-case
+.. _Shard Optimizer States with ZeroRedundancyOptimizer: https://pytorch.org/tutorials/recipes/zero_redundancy_optimizer.html
 .. _DistributedDataParallel: https://pytorch.org/docs/stable/generated/torch.nn.parallel.DistributedDataParallel.html
 .. _join(): https://pytorch.org/docs/stable/_modules/torch/nn/parallel/distributed.html#DistributedDataParallel.join
 .. _ZeroRedundancyOptimizer: https://pytorch.org/docs/stable/distributed.optim.html

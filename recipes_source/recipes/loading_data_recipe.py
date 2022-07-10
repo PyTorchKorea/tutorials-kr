@@ -68,16 +68,14 @@ import torchaudio
 #
 # ``torchaudio`` 의 YesNo 데이터셋은 한 사람이 히브리어로 yes 혹은
 # no를 녹음한 오디오 클립 60개로 구성되어 있습니다. 오디오 클립 각각의 길이는 단어 8개입니다.
-# (`더 알아보기 <https://www.openslr.org/1/>`__).
+# ( `더 알아보기 <https://www.openslr.org/1/>`__ ).
 #
 # ``torchaudio.datasets.YESNO`` 클래스를 사용하여 YesNo 데이터셋을 생성합니다.
 torchaudio.datasets.YESNO(
-     root,
+     root='./',
      url='http://www.openslr.org/resources/1/waves_yesno.tar.gz',
      folder_in_archive='waves_yesno',
-     download=False,
-     transform=None,
-     target_transform=None)
+     download=True)
 
 ###########################################################################
 # 각각의 데이터 항목 (item)은 튜플 형태 (waveform: 파형, sample_rate: 샘플 속도, labels: 라벨)를 갖습니다.
@@ -87,9 +85,7 @@ torchaudio.datasets.YESNO(
 # 그 외의 매개변수는 선택 사항이며, 위 예시에서 기본값을 확인하실 있습니다. 아래와
 # 같은 매개변수도 사용 가능합니다.
 #
-# * ``download``: 참인 경우, 데이터셋 파일을 인터넷에서 다운받고 root 폴더에 저장합니다. 파일이 이미 존재하면 다시 다운받지 않습니다.
-# * ``transform``: 데이터를 변환하여 학습에 사용할 수 있도록 이어붙이고 비정규화된 형태로 불러오실 수 있습니다. 라이브러리마다 다양한 transformation을 지원하고 있으며, 앞으로도 추가될 예정입니다.
-# * ``target_transform``: 타겟 데이터를 변환하기 위한 함수 혹은 transform입니다.
+# * ``download``: 참(True)인 경우, 데이터셋 파일을 인터넷에서 다운받고 root 폴더에 저장합니다. 파일이 이미 존재하면 다시 다운받지 않습니다.
 #
 # 이제 YesNo 데이터를 확인해봅시다:
 

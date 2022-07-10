@@ -187,11 +187,11 @@ ngpu = 1
 # *celeba* 이라는 폴더를 새로 만들고, 해당 폴더에 해당 zip 파일을 압축해제 해주시면 됩니다.
 # 압축 해제 후, 위에서 정의한 *dataroot* 변수에 방금 만든 *celeba* 폴더의 경로를 넣어주세요.
 # 위의 작업이 끝나면 *celeba* 폴더의 구조는 다음과 같아야 합니다:
-# 
+#
 # ::
-# 
+#
 #    /path/to/celeba
-#        -> img_align_celeba  
+#        -> img_align_celeba
 #            -> 188242.jpg
 #            -> 173822.jpg
 #            -> 284702.jpg
@@ -319,7 +319,7 @@ class Generator(nn.Module):
 # 좋습니다. 이제 우리는 생성자의 인스턴스를 만들고 ``weights_init``
 # 함수를 적용시킬 수 있습니다. 모델의 인스턴스를 출력해서 생성자가
 # 어떻게 구성되어있는지 확인해봅시다.
-# 
+#
 
 # 생성자를 만듭니다
 netG = Generator(ngpu).to(device)
@@ -389,7 +389,7 @@ class Discriminator(nn.Module):
 ######################################################################
 # 이제 우리는 생성자에 한 것처럼 구분자의 인스턴스를 만들고,
 # ``weights_init`` 함수를 적용시킨 다음, 모델의 구조를 출력해볼 수 있습니다.
-# 
+#
 
 # 구분자를 만듭니다
 netD = Discriminator(ngpu).to(device)
@@ -397,7 +397,7 @@ netD = Discriminator(ngpu).to(device)
 # 필요한 경우 multi-gpu를 설정 해주세요
 if (device.type == 'cuda') and (ngpu > 1):
     netD = nn.DataParallel(netD, list(range(ngpu)))
-    
+
 # 모든 가중치의 평균을 0, 분산을 0.02로 초기화 하기 위해
 # weight_init 함수를 적용시킵니다
 netD.apply(weights_init)
@@ -414,7 +414,7 @@ print(netD)
 # 학습을 구체화시킬 시간입니다. 손실함수로는 Binary Cross Entropy loss
 # (`BCELoss <https://pytorch.org/docs/stable/nn.html#torch.nn.BCELoss>`__)
 # 를 사용할겁니다. 해당함수는 아래의 식으로 파이토치에 구현되어 있습니다:
-# 
+#
 # .. math:: \ell(x, y) = L = \{l_1,\dots,l_N\}^\top, \quad l_n = - \left[ y_n \cdot \log x_n + (1 - y_n) \cdot \log (1 - x_n) \right]
 #
 # 이때, 위의 함수가 로그함수 요소를 정의한 방식을 주의깊게 봐주세요 (예. :math:`log(D(x))` 와
@@ -514,7 +514,7 @@ print("Starting Training Loop...")
 for epoch in range(num_epochs):
     # 한 에폭 내에서 배치 반복
     for i, data in enumerate(dataloader, 0):
-        
+
         ############################
         # (1) D 신경망을 업데이트 합니다: log(D(x)) + log(1 - D(G(z)))를 최대화 합니다
         ###########################
@@ -567,23 +567,23 @@ for epoch in range(num_epochs):
         D_G_z2 = output.mean().item()
         # G를 업데이트 합니다
         optimizerG.step()
-        
+
         # 훈련 상태를 출력합니다
         if i % 50 == 0:
             print('[%d/%d][%d/%d]\tLoss_D: %.4f\tLoss_G: %.4f\tD(x): %.4f\tD(G(z)): %.4f / %.4f'
                   % (epoch, num_epochs, i, len(dataloader),
                      errD.item(), errG.item(), D_x, D_G_z1, D_G_z2))
-        
+
         # 이후 그래프를 그리기 위해 손실값들을 저장해둡니다
         G_losses.append(errG.item())
         D_losses.append(errD.item())
-        
+
         # fixed_noise를 통과시킨 G의 출력값을 저장해둡니다
         if (iters % 500 == 0) or ((epoch == num_epochs-1) and (i == len(dataloader)-1)):
             with torch.no_grad():
                 fake = netG(fixed_noise).detach().cpu()
             img_list.append(vutils.make_grid(fake, padding=2, normalize=True))
-            
+
         iters += 1
 
 
@@ -661,5 +661,5 @@ plt.show()
 # -  결과물이 얼마나 더 좋아지는지 확인해보기 위해서 학습시간을 늘려볼 수 있습니다
 # -  다른 데이터셋을 이용해 훈련시켜보거나, 이미지의 사이즈를 다르게 해보거나, 아키텍쳐의 구성을 바꿔볼 수도 있습니다
 # -  `여기 <https://github.com/nashory/gans-awesome-applications>`__ 에서 더욱 멋진 GAN 프로젝트들을 찾을수도 있죠
-# -  `음악 <https://deepmind.com/blog/wavenet-generative-model-raw-audio/>`__ 을 작곡하는 GAN도 만들 수 있습니다
+# -  `음악 <https://www.deepmind.com/blog/wavenet-a-generative-model-for-raw-audio/>`__ 을 작곡하는 GAN도 만들 수 있습니다
 #

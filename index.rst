@@ -3,6 +3,15 @@
 파이토치(PyTorch) 한국어 튜토리얼에 오신 것을 환영합니다!
 =============================================================
 
+아래 튜토리얼들이 새로 추가되었습니다.
+
+* `Introduction to TorchRec <https://pytorch.org/tutorials/intermediate/torchrec_tutorial.html?utm_source=whats_new_tutorials&utm_medium=torchrec>`__
+* `Getting Started with Fully Sharded Data Parallel (FSDP) <https://pytorch.org/tutorials/intermediate/FSDP_tutorial.html?utm_source=whats_new_tutorials&utm_medium=FSDP>`__
+* `Grokking PyTorch Intel CPU Performance from First Principles <https://pytorch.org/tutorials/intermediate/torchserve_with_ipex?utm_source=whats_new_tutorials&utm_medium=torchserve_ipex>`__
+* `Customize Process Group Backends Using Cpp Extensions <https://pytorch.org/tutorials/intermediate/process_group_cpp_extension_tutorial.html?utm_source=whats_new_tutorials&utm_medium=cpp_ext>`__
+* `Forward-mode Automatic Differentiation <https://pytorch.org/tutorials/intermediate/forward_ad_usage.html?utm_source=whats_new_tutorials&utm_medium=forward_ad>`__ (added functorch API capabilities)
+* `Real Time Inference on Raspberry Pi 4 (30 fps!) <https://pytorch.org/tutorials/intermediate/realtime_rpi.html?utm_source=whats_new_tutorials&utm_medium=rpi>`__
+
 .. raw:: html
 
     <div class="tutorials-callout-container">
@@ -359,7 +368,7 @@
    :card_description: This tutorial covers how to run quantized and fused models on a Raspberry Pi 4 at 30 fps.
    :image: _static/img/thumbnails/cropped/realtime_rpi.png
    :link: intermediate/realtime_rpi.html
-   :tags: TorchScript,Model Optimization,Image/Video,Quantization
+   :tags: TorchScript,Model-Optimization,Image/Video,Quantization
 
 .. customcarditem::
    :header: Autograd in C++ Frontend
@@ -474,6 +483,13 @@
    :image: _static/img/thumbnails/cropped/60-min-blitz.png
    :link: advanced/static_quantization_tutorial.html
    :tags: Quantization
+
+.. customcarditem::
+   :header: Grokking PyTorch Intel CPU Performance from First Principles
+   :card_description: A case study on the TorchServe inference framework optimized with Intel® Extension for PyTorch.
+   :image: _static/img/thumbnails/cropped/generic-pytorch-logo.png
+   :link: intermediate/torchserve_with_ipex
+   :tags: Model-Optimization,Production
 
 .. Parallel-and-Distributed-Training
 
@@ -591,6 +607,14 @@
    :image: _static/img/thumbnails/torchrec.png
    :link: intermediate/torchrec_tutorial.html
    :tags: TorchRec,Recommender
+
+.. customcarditem::
+   :header: Exploring TorchRec sharding
+   :card_description: This tutorial covers the sharding schemes of embedding tables by using <code>EmbeddingPlanner</code> and <code>DistributedModelParallel</code> API.
+   :image: _static/img/thumbnails/torchrec.png
+   :link: advanced/sharding.html
+   :tags: TorchRec,Recommender
+
 
 .. End of tutorial card section
 
@@ -831,6 +855,7 @@
    intermediate/dynamic_quantization_bert_tutorial
    intermediate/quantized_transfer_learning_tutorial
    advanced/static_quantization_tutorial
+   intermediate/torchserve_with_ipex
 
 .. toctree::
    :maxdepth: 2
@@ -869,3 +894,4 @@
    :caption: Recommendation Systems
 
    intermediate/torchrec_tutorial
+   advanced/sharding

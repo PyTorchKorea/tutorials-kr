@@ -6,7 +6,7 @@ PyTorch: 새 autograd Function 정의하기
 :math:`y=\sin(x)` 을 예측할 수 있도록, :math:`-\pi` 부터 :math:`\pi` 까지
 유클리드 거리(Euclidean distance)를 최소화하도록 3차 다항식을 학습합니다.
 다항식을 :math:`y=a+bx+cx^2+dx^3` 라고 쓰는 대신 :math:`y=a+b P_3(c+dx)` 로 다항식을 적겠습니다.
-여기서 :math:`P_3(x)=\frac{1}{2}\left(5x^3-3x\right)` 은 3차
+여기서 :math:`P_3(x)=\\frac{1}{2}\\left(5x^3-3x\\right)` 은 3차
 `르장드르 다항식(Legendre polynomial)`_ 입니다.
 
 .. _르장드르 다항식(Legendre polynomial):
@@ -16,7 +16,7 @@ PyTorch: 새 autograd Function 정의하기
 변화도(gradient)를 계산합니다.
 
 아래 구현에서는 :math:`P_3'(x)` 을 수행하기 위해 사용자 정의 autograd Function를 구현합니다.
-수학적으로는 :math:`P_3'(x)=\frac{3}{2}\left(5x^2-1\right)` 입니다.
+수학적으로는 :math:`P_3'(x)=\\frac{3}{2}\\left(5x^2-1\\right)` 입니다.
 """
 import torch
 import math

@@ -3,6 +3,9 @@ PyTorch로 분산 어플리케이션 개발하기
 **Author**: `Séb Arnold <https://seba1511.com>`_
   **번역**: `박정환 <https://github.com/9bow>`_
 
+.. note::
+   이 튜토리얼의 소스 코드는 `GitHub <https://github.com/pytorch/tutorials/blob/master/intermediate_source/dist_tuto.rst>`__ 에서 확인할 수 있습니다.
+
 선수과목(Prerequisites):
 
 -  `PyTorch Distributed Overview <../beginner/dist_overview.html>`__

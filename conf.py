@@ -48,7 +48,7 @@ import pytorch_sphinx_theme
 # -- General configuration ------------------------------------------------
 
 # site base url
-site_url = 'http://tutorials.pytorch.kr/'
+site_url = 'https://tutorials.pytorch.kr/'
 
 # If your documentation needs a minimal Sphinx version, state it here.
 #
@@ -132,7 +132,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'PyTorch Tutorials'
-copyright = '2021, PyTorch & PyTorch Korea Community'
+copyright = '2022, PyTorch & 파이토치 한국 사용자 모임(PyTorch Korea User Group)'
 author = 'PyTorch contributors'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -154,7 +154,7 @@ language = None
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This patterns also effect to html_static_path and html_extra_path
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
+exclude_patterns = ['docs', '.github', '_build', 'Thumbs.db', '.DS_Store']
 exclude_patterns += sphinx_gallery_conf['examples_dirs']
 exclude_patterns += ['*/index.rst']
 exclude_patterns += ['venv']
@@ -203,7 +203,7 @@ html_theme = 'pytorch_sphinx_theme'
 html_theme_path = [pytorch_sphinx_theme.get_html_theme_path()]
 html_logo = '_static/logos/logo-kr-sm-dark.svg'
 html_favicon = '_static/favicon.ico'    # under html_static_path
-html_title = '파이토치 한국어 튜토리얼(PyTorch tutorials in Korean)'
+html_title = '파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)'
 html_theme_options = {
     'pytorch_project': 'tutorials',
     'collapse_navigation': False,

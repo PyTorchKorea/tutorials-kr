@@ -5,7 +5,7 @@
 **Author**: `Adam Paszke <https://github.com/apaszke>`_
   **번역**: `황성수 <https://github.com/adonisues>`_
 
-이 튜토리얼에서는 `OpenAI Gym <https://gym.openai.com/>`__ 의
+이 튜토리얼에서는 `OpenAI Gym <https://www.gymlibrary.ml/>`__ 의
 CartPole-v0 태스크에서 DQN (Deep Q Learning) 에이전트를 학습하는데
 PyTorch를 사용하는 방법을 보여드립니다.
 
@@ -14,7 +14,7 @@ PyTorch를 사용하는 방법을 보여드립니다.
 에이전트는 연결된 막대가 똑바로 서 있도록 카트를 왼쪽이나 오른쪽으로
 움직이는 두 가지 동작 중 하나를 선택해야 합니다.
 다양한 알고리즘과 시각화 기능을 갖춘 공식 순위표를
-`Gym 웹사이트 <https://gym.openai.com/envs/CartPole-v0>`__ 에서 찾을 수 있습니다.
+`Gym 웹사이트 <https://www.gymlibrary.ml/environments/classic_control/cart_pole>`__ 에서 찾을 수 있습니다.
 
 .. figure:: /_static/img/cartpole.gif
    :alt: cartpole
@@ -40,7 +40,7 @@ PyTorch를 사용하는 방법을 보여드립니다.
 **패키지**
 
 먼저 필요한 패키지를 가져옵니다. 첫째, 환경을 위해
-`gym <https://gym.openai.com/docs>`__ 이 필요합니다.
+`gym <https://github.com/openai/gym>`__ 이 필요합니다.
 (`pip install gym` 을 사용하여 설치하십시오).
 또한 PyTorch에서 다음을 사용합니다:
 
