@@ -6,24 +6,23 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
 <meta property="og:title" content="(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)" />
   
 <meta property="og:type" content="article" />
   
-<meta property="og:url" content="http://tutorials.pytorch.kr/intermediate/quantized_transfer_learning_tutorial.html" />
+<meta property="og:url" content="https://tutorials.pytorch.kr/intermediate/quantized_transfer_learning_tutorial.html" />
   
 <meta property="og:description" content="Author: Zafar Takhirov Reviewed by: Raghuraman Krishnamoorthi Edited by: Jessica Lin 번역: 정재민 이 튜토리얼은 Sasank Chilamkurthy 가 작성한 컴퓨터 비전(Vision)을 위한 전이학습(Transfer Learning) 을 기반으로 합니다. 전이학습(Transfer learning)은 다른 데이터셋에 적용하기 위해서 미리 학습된 모델을 사용하는 기술을 말합니다. 전이학습을 사용하는 2가지 주요 방법이 있습니다. 고정 된 특징 추출기로써 Conv..." />
   
-<meta property="og:image" content="http://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
+<meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
   
 <meta property="og:image:alt" content="(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)" />
   
 <meta property="og:ignore_canonical" content="true" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning) &mdash; 파이토치 한국어 튜토리얼(PyTorch tutorials in Korean)</title>
+  <title>(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning) &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
   
 
   
@@ -131,7 +130,7 @@
               
               
                 <div class="version">
-                  1.11.0+cu102
+                  1.12.0+cu102
                 </div>
               
             
@@ -272,6 +271,7 @@
 <li class="toctree-l1"><a class="reference internal" href="dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/static_quantization_tutorial.html">(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torchserve_with_ipex.html">Grokking PyTorch Intel CPU performance from first principles</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul>
@@ -298,6 +298,7 @@
 <p class="caption" role="heading"><span class="caption-text">Recommendation Systems</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="torchrec_tutorial.html">Introduction to TorchRec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/sharding.html">Exploring TorchRec sharding</a></li>
 </ul>
 
             
@@ -386,13 +387,14 @@
           </div>
 
         
+
           
           <div class="rst-content">
           
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <section id="quantized-transfer-learning">
+  <div class="section" id="quantized-transfer-learning">
 <h1>(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)<a class="headerlink" href="#quantized-transfer-learning" title="Permalink to this headline">¶</a></h1>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
@@ -425,7 +427,7 @@
 그런 다음 특징 추출기(또는 그 일부)를 고정해제(unfreeze)하고 학습률을
 더 작은 수로 설정한 다음 학습을 계속할 수 있습니다.</p>
 <p>이번 파트에서는 첫번째 방법을 사용해 양자화된 모델로 특징을 추출해봅시다.</p>
-<section id="id2">
+<div class="section" id="id2">
 <h2>파트 0. 요구사항<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
 <p>전이 학습(transfer learning)을 시작하기 전에,
 데이터 불러오기 / 시각화와 같은 “요구사항(prerequisites)”을 검토하겠습니다.</p>
@@ -439,7 +441,7 @@
 <span class="n">plt</span><span class="o">.</span><span class="n">ion</span><span class="p">()</span>
 </pre></div>
 </div>
-<section id="nightly-build">
+<div class="section" id="nightly-build">
 <h3>Nightly Build 설치하기<a class="headerlink" href="#nightly-build" title="Permalink to this headline">¶</a></h3>
 <p>PyTorch의 베타(beta)를 사용할 것이므로 최신 버전의 <code class="docutils literal notranslate"><span class="pre">torch</span></code> 와 <code class="docutils literal notranslate"><span class="pre">torchvision</span></code> 을 설치하는 것을 권장합니다.
 로컬(local) 설치에 대한 최신 지침은 <a class="reference external" href="https://pytorch.org/get-started/locally/">여기</a> 에서 찾을 수 있습니다.
@@ -449,8 +451,8 @@ pip install --pre torch torchvision -f https://download.pytorch.org/whl/nightly/
 <span class="c1"># CUDA 지원은 https://download.pytorch.org/whl/nightly/cu101/torch_nightly.html를 사용하세요.</span>
 </pre></div>
 </div>
-</section>
-<section id="id4">
+</div>
+<div class="section" id="id4">
 <h3>데이터 불러오기<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -500,8 +502,8 @@ pip install --pre torch torchvision -f https://download.pytorch.org/whl/nightly/
 <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cuda:0&quot;</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-<section id="id6">
+</div>
+<div class="section" id="id6">
 <h3>일부 이미지 시각화하기<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
 <p>데이터 보강을 이해하기 위해 일부 학습용 이미지를 시각화 해보겠습니다.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torchvision</span>
@@ -531,8 +533,8 @@ pip install --pre torch torchvision -f https://download.pytorch.org/whl/nightly/
 <span class="n">imshow</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="p">[</span><span class="n">class_names</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">classes</span><span class="p">],</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-<section id="id7">
+</div>
+<div class="section" id="id7">
 <h3>모델 학습을 위한 지원 함수<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
 <p>다음은 모델을 학습하기 위한 일반 함수 입니다.</p>
 <ul class="simple">
@@ -619,8 +621,8 @@ pip install --pre torch torchvision -f https://download.pytorch.org/whl/nightly/
   <span class="k">return</span> <span class="n">model</span>
 </pre></div>
 </div>
-</section>
-<section id="id8">
+</div>
+<div class="section" id="id8">
 <h3>모델 예측을 시각화하기 위한 지원 함수<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
 <p>일부 이미지에 대한 예측을 출력하는 일반 함수</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">visualize_model</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">rows</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">cols</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
@@ -652,9 +654,9 @@ pip install --pre torch torchvision -f https://download.pytorch.org/whl/nightly/
     <span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="n">was_training</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-</section>
-<section id="quantized-feature-extractor">
+</div>
+</div>
+<div class="section" id="quantized-feature-extractor">
 <h2>파트 1. 양자화된 특징 추출기(Quantized Feature Extractor)를 기반으로 사용자 지정 분류기 훈련하기<a class="headerlink" href="#quantized-feature-extractor" title="Permalink to this headline">¶</a></h2>
 <p>이번 섹션에서는 “고정된(frozen)” 양자화 특징 추출기를 사용하고 그 위에 사용자 지정 분류기 헤드를
 학습합니다. 부동 소수점 모델과 다르게 양자화된 모델에는 학습 가능한 매개 변수가 없으므로
@@ -731,7 +733,7 @@ requires_grad = False를 설정할 필요가 없습니다. 자세한 내용은 <
 <span class="n">exp_lr_scheduler</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">lr_scheduler</span><span class="o">.</span><span class="n">StepLR</span><span class="p">(</span><span class="n">optimizer_ft</span><span class="p">,</span> <span class="n">step_size</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">gamma</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
 </pre></div>
 </div>
-<section id="id10">
+<div class="section" id="id10">
 <h3>학습과 평가<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h3>
 <p>이 단계는 CPU에서 약 15 ~ 25분 걸립니다. 양자화된 모델은 CPU에서만 실행되기 때문에
 GPU에서는 훈련을 실행할 수 없습니다.</p>
@@ -742,9 +744,9 @@ GPU에서는 훈련을 실행할 수 없습니다.</p>
 <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
 </pre></div>
 </div>
-</section>
-</section>
-<section id="finetuning">
+</div>
+</div>
+<div class="section" id="finetuning">
 <h2>파트 2. 양자화 가능한 모델 미세조정(Finetuning)<a class="headerlink" href="#finetuning" title="Permalink to this headline">¶</a></h2>
 <p>이번 파트에서는 전이학습(Transfer Learning)을 사용하여 특징 추출기(Feature Extractor)를
 미세조정(Finetuning) 합니다. 파트 1과 2 모두에서 특징 추출기는 양자화됩니다. 차이점은 파트 1에서
@@ -792,7 +794,7 @@ GPU에서는 훈련을 실행할 수 없습니다.</p>
 <span class="n">model_ft</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">quantization</span><span class="o">.</span><span class="n">prepare_qat</span><span class="p">(</span><span class="n">model_ft</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
-<section id="id11">
+<div class="section" id="id11">
 <h3>모델 미세조정<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h3>
 <p>현재 튜토리얼에서는 전체 모델이 미세조정 되었습니다.
 일반적으로 이것은 더 높은 정확도로 이어질 것입니다.
@@ -831,9 +833,9 @@ GPU에서는 훈련을 실행할 수 없습니다.</p>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-</section>
-</section>
-</section>
+</div>
+</div>
+</div>
 
 
              </article>
@@ -870,7 +872,7 @@ GPU에서는 훈련을 실행할 수 없습니다.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2021, PyTorch &amp; PyTorch Korea Community.
+        &copy; Copyright 2022, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorch Korea User Group).
 
     </p>
   </div>
@@ -883,6 +885,13 @@ GPU에서는 훈련을 실행할 수 없습니다.</p>
 </footer>
 
           </div>
+<script>
+if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.indexOf("/prototype/prototype_index")< 1))
+  {
+    var div = '<div class="admonition note"><p class="admonition-title">Note</p><p><i class="fa fa-flask" aria-hidden="true">&nbsp</i> 이 튜토리얼은 프로토타입(prototype) 기능들에 대해서 설명하고 있습니다. 프로토타입 기능은 일반적으로 피드백 및 테스트용으로, 런타임 플래그 없이는 PyPI나 Conda로 배포되는 바이너리에서는 사용할 수 없습니다.</p></div>'
+    document.getElementById("pytorch-article").insertAdjacentHTML('afterBegin', div)
+  }
+</script>
         </div>
 
         <div class="pytorch-content-right" id="pytorch-content-right">
@@ -946,7 +955,6 @@ GPU에서는 훈련을 실행할 수 없습니다.</p>
       });
   </script>
  
-
 <script>
 //add microsoft link
 
@@ -1025,7 +1033,7 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
 </script>
 
 <script type="text/javascript">
-  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile'];
+  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile', 'Introduction to PyTorch on YouTube', 'Recommendation Systems'];
 </script>
 
 

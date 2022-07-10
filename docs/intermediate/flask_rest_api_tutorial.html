@@ -6,24 +6,23 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
 <meta property="og:title" content="Flask를 사용하여 Python에서 PyTorch를 REST API로 배포하기" />
   
 <meta property="og:type" content="article" />
   
-<meta property="og:url" content="http://tutorials.pytorch.kr/intermediate/flask_rest_api_tutorial.html" />
+<meta property="og:url" content="https://tutorials.pytorch.kr/intermediate/flask_rest_api_tutorial.html" />
   
 <meta property="og:description" content="Author: Avinash Sajjanshetty, 번역: 박정환,. 이 튜토리얼에서는 Flask를 사용하여 PyTorch 모델을 배포하고 모델 추론(inference)을 할 수 있는 REST API를 만들어보겠습니다. 미리 훈련된 DenseNet 121 모델을 배포하여 이미지를 인식해보겠습니다. 이것은 PyTorch 모델을 상용(production)으로 배포하는 튜토리얼 시리즈의 첫번째 편입니다. Flask를 여기에 소개된 것처럼 사용하는 것이 PyTorch 모델을 제공하는 가장 쉬운 방법이지만, 고성능을 요구하는 때에는 ..." />
   
-<meta property="og:image" content="http://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
+<meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
   
 <meta property="og:image:alt" content="Flask를 사용하여 Python에서 PyTorch를 REST API로 배포하기" />
   
 <meta property="og:ignore_canonical" content="true" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Flask를 사용하여 Python에서 PyTorch를 REST API로 배포하기 &mdash; 파이토치 한국어 튜토리얼(PyTorch tutorials in Korean)</title>
+  <title>Flask를 사용하여 Python에서 PyTorch를 REST API로 배포하기 &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
   
 
   
@@ -131,7 +130,7 @@
               
               
                 <div class="version">
-                  1.11.0+cu102
+                  1.12.0+cu102
                 </div>
               
             
@@ -272,6 +271,7 @@
 <li class="toctree-l1"><a class="reference internal" href="dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="quantized_transfer_learning_tutorial.html">(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/static_quantization_tutorial.html">(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torchserve_with_ipex.html">Grokking PyTorch Intel CPU performance from first principles</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul>
@@ -298,6 +298,7 @@
 <p class="caption" role="heading"><span class="caption-text">Recommendation Systems</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="torchrec_tutorial.html">Introduction to TorchRec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/sharding.html">Exploring TorchRec sharding</a></li>
 </ul>
 
             
@@ -386,6 +387,7 @@
           </div>
 
         
+
           
           <div class="rst-content">
           
@@ -396,7 +398,7 @@
 <p class="admonition-title">Note</p>
 <p>Click <a class="reference internal" href="#sphx-glr-download-intermediate-flask-rest-api-tutorial-py"><span class="std std-ref">here</span></a> to download the full example code</p>
 </div>
-<section class="sphx-glr-example-title" id="flask-python-pytorch-rest-api">
+<div class="sphx-glr-example-title section" id="flask-python-pytorch-rest-api">
 <span id="sphx-glr-intermediate-flask-rest-api-tutorial-py"></span><h1>Flask를 사용하여 Python에서 PyTorch를 REST API로 배포하기<a class="headerlink" href="#flask-python-pytorch-rest-api" title="Permalink to this headline">¶</a></h1>
 <dl class="simple">
 <dt><strong>Author</strong>: <a class="reference external" href="https://avi.im">Avinash Sajjanshetty</a></dt><dd><p><strong>번역</strong>: <a class="reference external" href="http://github.com/9bow">박정환</a></p>
@@ -421,7 +423,7 @@
 부터 보시길 추천합니다.</p></li>
 </ul>
 </div></blockquote>
-<section id="api">
+<div class="section" id="api">
 <h2>API 정의<a class="headerlink" href="#api" title="Permalink to this headline">¶</a></h2>
 <p>먼저 API 엔드포인트(endpoint)의 요청(request)와 응답(response)을 정의하는 것부터
 시작해보겠습니다. 새로 만들 API 엔드포인트는 이미지가 포함된 <code class="docutils literal notranslate"><span class="pre">file</span></code> 매개변수를
@@ -430,15 +432,15 @@ HTTP POST로 <code class="docutils literal notranslate"><span class="pre">/predi
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="s2">&quot;class_id&quot;</span><span class="p">:</span> <span class="s2">&quot;n02124075&quot;</span><span class="p">,</span> <span class="s2">&quot;class_name&quot;</span><span class="p">:</span> <span class="s2">&quot;Egyptian_cat&quot;</span><span class="p">}</span>
 </pre></div>
 </div>
-</section>
-<section id="dependencies">
+</div>
+<div class="section" id="dependencies">
 <h2>의존성(Dependencies)<a class="headerlink" href="#dependencies" title="Permalink to this headline">¶</a></h2>
 <p>아래 명령어를 실행하여 필요한 패키지들을 설치합니다:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install Flask==2.0.1 torchvision==0.10.0
 </pre></div>
 </div>
-</section>
-<section id="id2">
+</div>
+<div class="section" id="id2">
 <h2>간단한 웹 서버<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
 <p>Flask의 문서를 참고하여 아래와 같은 코드로 간단한 웹 서버를 구성합니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">Flask</span>
@@ -476,12 +478,12 @@ HTTP POST로 <code class="docutils literal notranslate"><span class="pre">/predi
     <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s1">&#39;class_id&#39;</span><span class="p">:</span> <span class="s1">&#39;IMAGE_NET_XXX&#39;</span><span class="p">,</span> <span class="s1">&#39;class_name&#39;</span><span class="p">:</span> <span class="s1">&#39;Cat&#39;</span><span class="p">})</span>
 </pre></div>
 </div>
-</section>
-<section id="inference">
+</div>
+<div class="section" id="inference">
 <h2>추론(Inference)<a class="headerlink" href="#inference" title="Permalink to this headline">¶</a></h2>
 <p>다음 섹션에서는 추론 코드 작성에 집중하겠습니다. 먼저 이미지를 DenseNet에 공급(feed)할 수
 있도록 준비하는 방법을 살펴본 뒤, 모델로부터 예측 결과를 얻는 방법을 살펴보겠습니다.</p>
-<section id="id3">
+<div class="section" id="id3">
 <h3>이미지 준비하기<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
 <p>DenseNet 모델은 224 x 224의 3채널 RGB 이미지를 필요로 합니다.
 또한 이미지 텐서를 평규 및 표준편차 값으로 정규화합니다. 자세한 내용은
@@ -542,8 +544,8 @@ Tensor를 반환하는지 확인하면 됩니다.  (먼저 <cite>../_static/img/
           [ 1.9254,  2.0997,  2.0823,  ...,  1.9428,  2.2043,  1.9254]]]])
 </pre></div>
 </div>
-</section>
-<section id="prediction">
+</div>
+<div class="section" id="prediction">
 <h3>예측(Prediction)<a class="headerlink" href="#prediction" title="Permalink to this headline">¶</a></h3>
 <p>미리 학습된 DenseNet 121 모델을 사용하여 이미지 분류(class)를 예측합니다.
 <code class="docutils literal notranslate"><span class="pre">torchvision</span></code> 라이브러리의 모델을 사용하여 모델을 읽어오고 추론을 합니다.
@@ -615,9 +617,9 @@ Tensor를 반환하는지 확인하면 됩니다.  (먼저 <cite>../_static/img/
 효율적으로 처리해야 하므로, 일반적으로 요청(request)을 처리하기 전에 모델을
 불러와둡니다.</p>
 </div>
-</section>
-</section>
-<section id="id7">
+</div>
+</div>
+<div class="section" id="id7">
 <h2>모델을 API 서버에 통합하기<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h2>
 <p>마지막으로 위에서 만든 Flask API 서버에 모델을 추가하겠습니다.
 API 서버는 이미지 파일을 받는 것을 가정하고 있으므로, 요청으로부터 파일을 읽도록
@@ -700,8 +702,8 @@ POST 요청을 만들어보겠습니다:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="s2">&quot;class_id&quot;</span><span class="p">:</span> <span class="s2">&quot;n02124075&quot;</span><span class="p">,</span> <span class="s2">&quot;class_name&quot;</span><span class="p">:</span> <span class="s2">&quot;Egyptian_cat&quot;</span><span class="p">}</span>
 </pre></div>
 </div>
-</section>
-<section id="id8">
+</div>
+<div class="section" id="id8">
 <h2>다음 단계<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h2>
 <p>지금까지 만든 서버는 매우 간단하여 상용 프로그램(production application)으로써
 갖춰야할 것들을 모두 갖추지 못했습니다. 따라서, 다음과 같이 개선해볼 수 있습니다:</p>
@@ -732,7 +734,7 @@ UI를 추가할 수도 있습니다. 비슷한 프로젝트의 <a class="referen
 <li><p>마지막으로 이 문서 상단에 링크된, PyTorch 모델을 배포하는 다른 튜토리얼들을
 읽어보는 것을 권장합니다.</p></li>
 </ul>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  6.014 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  1.220 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-intermediate-flask-rest-api-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/b45d95b1d38fe556c77d1ee548809d28/flask_rest_api_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">flask_rest_api_tutorial.py</span></code></a></p>
@@ -742,8 +744,8 @@ UI를 추가할 수도 있습니다. 비슷한 프로젝트의 <a class="referen
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
-</section>
-</section>
+</div>
+</div>
 
 
              </article>
@@ -780,7 +782,7 @@ UI를 추가할 수도 있습니다. 비슷한 프로젝트의 <a class="referen
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2021, PyTorch &amp; PyTorch Korea Community.
+        &copy; Copyright 2022, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorch Korea User Group).
 
     </p>
   </div>
@@ -793,6 +795,13 @@ UI를 추가할 수도 있습니다. 비슷한 프로젝트의 <a class="referen
 </footer>
 
           </div>
+<script>
+if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.indexOf("/prototype/prototype_index")< 1))
+  {
+    var div = '<div class="admonition note"><p class="admonition-title">Note</p><p><i class="fa fa-flask" aria-hidden="true">&nbsp</i> 이 튜토리얼은 프로토타입(prototype) 기능들에 대해서 설명하고 있습니다. 프로토타입 기능은 일반적으로 피드백 및 테스트용으로, 런타임 플래그 없이는 PyPI나 Conda로 배포되는 바이너리에서는 사용할 수 없습니다.</p></div>'
+    document.getElementById("pytorch-article").insertAdjacentHTML('afterBegin', div)
+  }
+</script>
         </div>
 
         <div class="pytorch-content-right" id="pytorch-content-right">
@@ -850,7 +859,6 @@ UI를 추가할 수도 있습니다. 비슷한 프로젝트의 <a class="referen
       });
   </script>
  
-
 <script>
 //add microsoft link
 
@@ -929,7 +937,7 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
 </script>
 
 <script type="text/javascript">
-  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile'];
+  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile', 'Introduction to PyTorch on YouTube', 'Recommendation Systems'];
 </script>
 
 

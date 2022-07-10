@@ -6,24 +6,23 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
 <meta property="og:title" content="Extending TorchScript with Custom C++ Operators" />
   
 <meta property="og:type" content="article" />
   
-<meta property="og:url" content="http://tutorials.pytorch.kr/advanced/torch_script_custom_ops.html" />
+<meta property="og:url" content="https://tutorials.pytorch.kr/advanced/torch_script_custom_ops.html" />
   
 <meta property="og:description" content="The PyTorch 1.0 release introduced a new programming model to PyTorch called TorchScript. TorchScript is a subset of the Python programming language which can be parsed, compiled and optimized by the TorchScript compiler. Further, compiled TorchScript models have the option of being serialized in..." />
   
-<meta property="og:image" content="http://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
+<meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
   
 <meta property="og:image:alt" content="Extending TorchScript with Custom C++ Operators" />
   
 <meta property="og:ignore_canonical" content="true" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Extending TorchScript with Custom C++ Operators &mdash; 파이토치 한국어 튜토리얼(PyTorch tutorials in Korean)</title>
+  <title>Extending TorchScript with Custom C++ Operators &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
   
 
   
@@ -131,7 +130,7 @@
               
               
                 <div class="version">
-                  1.11.0+cu102
+                  1.12.0+cu102
                 </div>
               
             
@@ -272,6 +271,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/quantized_transfer_learning_tutorial.html">(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="static_quantization_tutorial.html">(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/torchserve_with_ipex.html">Grokking PyTorch Intel CPU performance from first principles</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul>
@@ -298,6 +298,7 @@
 <p class="caption" role="heading"><span class="caption-text">Recommendation Systems</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/torchrec_tutorial.html">Introduction to TorchRec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sharding.html">Exploring TorchRec sharding</a></li>
 </ul>
 
             
@@ -386,13 +387,14 @@
           </div>
 
         
+
           
           <div class="rst-content">
           
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <section id="extending-torchscript-with-custom-c-operators">
+  <div class="section" id="extending-torchscript-with-custom-c-operators">
 <h1>Extending TorchScript with Custom C++ Operators<a class="headerlink" href="#extending-torchscript-with-custom-c-operators" title="Permalink to this headline">¶</a></h1>
 <p>The PyTorch 1.0 release introduced a new programming model to PyTorch called
 <a class="reference external" href="https://pytorch.org/docs/master/jit.html">TorchScript</a>. TorchScript is a
@@ -417,7 +419,7 @@ in C++. We will discuss how to work with tensors in C++, how to efficiently
 convert them to third party tensor formats (in this case, OpenCV <code class="docutils literal notranslate"><span class="pre">Mat</span></code>), how
 to register your operator with the TorchScript runtime and finally how to
 compile the operator and use it in Python and C++.</p>
-<section id="implementing-the-custom-operator-in-c">
+<div class="section" id="implementing-the-custom-operator-in-c">
 <h2>Implementing the Custom Operator in C++<a class="headerlink" href="#implementing-the-custom-operator-in-c" title="Permalink to this headline">¶</a></h2>
 <p>For this tutorial, we’ll be exposing the <a class="reference external" href="https://docs.opencv.org/2.4/modules/imgproc/doc/geometric_transformations.html#warpperspective">warpPerspective</a>
 function, which applies a perspective transformation to an image, from OpenCV to
@@ -539,8 +541,8 @@ function. If we returned the <code class="docutils literal notranslate"><span cl
 memory by the time we use it outside the function. Calling <code class="docutils literal notranslate"><span class="pre">.clone()</span></code> returns
 a new tensor with a copy of the original data that the new tensor owns itself.
 It is thus safe to return to the outside world.</p>
-</section>
-<section id="registering-the-custom-operator-with-torchscript">
+</div>
+<div class="section" id="registering-the-custom-operator-with-torchscript">
 <h2>Registering the Custom Operator with TorchScript<a class="headerlink" href="#registering-the-custom-operator-with-torchscript" title="Permalink to this headline">¶</a></h2>
 <p>Now that have implemented our custom operator in C++, we need to <em>register</em> it
 with the TorchScript runtime and compiler. This will allow the TorchScript
@@ -565,8 +567,8 @@ as you like by making multiple calls to <code class="docutils literal notranslat
 it is using template metaprogramming to inspect the type signature of your
 function and translate it into an operator schema which specifies the operators
 type within TorchScript’s type system.</p>
-</section>
-<section id="building-the-custom-operator">
+</div>
+<div class="section" id="building-the-custom-operator">
 <h2>Building the Custom Operator<a class="headerlink" href="#building-the-custom-operator" title="Permalink to this headline">¶</a></h2>
 <p>Now that we have implemented our custom operator in C++ and written its
 registration code, it is time to build the operator into a (shared) library that
@@ -575,7 +577,7 @@ inference in a no-Python environment. There exist multiple ways to build our
 operator, using either pure CMake, or Python alternatives like <code class="docutils literal notranslate"><span class="pre">setuptools</span></code>.
 For brevity, the paragraphs below only discuss the CMake approach. The appendix
 of this tutorial dives into other alternatives.</p>
-<section id="environment-setup">
+<div class="section" id="environment-setup">
 <h3>Environment setup<a class="headerlink" href="#environment-setup" title="Permalink to this headline">¶</a></h3>
 <p>We need an installation of PyTorch and OpenCV.  The easiest and most platform
 independent way to get both is to via Conda:</p>
@@ -583,8 +585,8 @@ independent way to get both is to via Conda:</p>
 <span class="n">conda</span> <span class="n">install</span> <span class="n">opencv</span>
 </pre></div>
 </div>
-</section>
-<section id="building-with-cmake">
+</div>
+<div class="section" id="building-with-cmake">
 <h3>Building with CMake<a class="headerlink" href="#building-with-cmake" title="Permalink to this headline">¶</a></h3>
 <p>To build our custom operator into a shared library using the <a class="reference external" href="https://cmake.org">CMake</a> build system, we need to write a short <code class="docutils literal notranslate"><span class="pre">CMakeLists.txt</span></code>
 file and place it with our previous <code class="docutils literal notranslate"><span class="pre">op.cpp</span></code> file. For this, let’s agree on a
@@ -667,9 +669,9 @@ Python:</p>
 </pre></div>
 </div>
 <p>which is the Python function we will later use to invoke our custom operator.</p>
-</section>
-</section>
-<section id="using-the-torchscript-custom-operator-in-python">
+</div>
+</div>
+<div class="section" id="using-the-torchscript-custom-operator-in-python">
 <h2>Using the TorchScript Custom Operator in Python<a class="headerlink" href="#using-the-torchscript-custom-operator-in-python" title="Permalink to this headline">¶</a></h2>
 <p>Once our custom operator is built into a shared library  we are ready to use
 this operator in our TorchScript models in Python. There are two parts to this:
@@ -726,7 +728,7 @@ first-class citizens when it comes to how and where they can be used in
 TorchScript.  (One difference, however, is that standard library functions
 have custom written Python argument parsing logic that differs from
 <code class="docutils literal notranslate"><span class="pre">torch.ops</span></code> argument parsing.)</p>
-<section id="using-the-custom-operator-with-tracing">
+<div class="section" id="using-the-custom-operator-with-tracing">
 <h3>Using the Custom Operator with Tracing<a class="headerlink" href="#using-the-custom-operator-with-tracing" title="Permalink to this headline">¶</a></h3>
 <p>Let’s start by embedding our operator in a traced function. Recall that for
 tracing, we start with some vanilla Pytorch code:</p>
@@ -787,8 +789,8 @@ our PyTorch trace as if it were <code class="docutils literal notranslate"><span
 </pre></div>
 </div>
 <p>Integrating TorchScript custom ops into traced PyTorch code is as easy as this!</p>
-</section>
-<section id="using-the-custom-operator-with-script">
+</div>
+<div class="section" id="using-the-custom-operator-with-script">
 <h3>Using the Custom Operator with Script<a class="headerlink" href="#using-the-custom-operator-with-script" title="Permalink to this headline">¶</a></h3>
 <p>Besides tracing, another way to arrive at a TorchScript representation of a
 PyTorch program is to directly write your code <em>in</em> TorchScript. TorchScript is
@@ -907,9 +909,9 @@ on it looking like this.</p>
 short, you import the library containing your operator(s) using
 <code class="docutils literal notranslate"><span class="pre">torch.ops.load_library</span></code>, and call your custom op like any other <code class="docutils literal notranslate"><span class="pre">torch</span></code>
 operator from your traced or scripted TorchScript code.</p>
-</section>
-</section>
-<section id="using-the-torchscript-custom-operator-in-c">
+</div>
+</div>
+<div class="section" id="using-the-torchscript-custom-operator-in-c">
 <h2>Using the TorchScript Custom Operator in C++<a class="headerlink" href="#using-the-torchscript-custom-operator-in-c" title="Permalink to this headline">¶</a></h2>
 <p>One useful feature of TorchScript is the ability to serialize a model into an
 on-disk file. This file can be sent over the wire, stored in a file system or,
@@ -1160,8 +1162,8 @@ should arrive at a happy ending:</p>
 </pre></div>
 </div>
 <p>Success! You are now ready to inference away.</p>
-</section>
-<section id="conclusion">
+</div>
+<div class="section" id="conclusion">
 <h2>Conclusion<a class="headerlink" href="#conclusion" title="Permalink to this headline">¶</a></h2>
 <p>This tutorial walked you throw how to implement a custom TorchScript operator in
 C++, how to build it into a shared library, how to use it in Python to define
@@ -1173,8 +1175,8 @@ lines between Python, TorchScript and C++ to blend smoothly.</p>
 <p>As always, if you run into any problems or have questions, you can use our
 <a class="reference external" href="https://discuss.pytorch.org/">forum</a> or <a class="reference external" href="https://github.com/pytorch/pytorch/issues">GitHub issues</a> to get in touch. Also, our
 <a class="reference external" href="https://pytorch.org/cppdocs/notes/faq.html">frequently asked questions (FAQ) page</a> may have helpful information.</p>
-</section>
-<section id="appendix-a-more-ways-of-building-custom-operators">
+</div>
+<div class="section" id="appendix-a-more-ways-of-building-custom-operators">
 <h2>Appendix A: More Ways of Building Custom Operators<a class="headerlink" href="#appendix-a-more-ways-of-building-custom-operators" title="Permalink to this headline">¶</a></h2>
 <p>The section “Building the Custom Operator” explained how to build a custom
 operator into a shared library using CMake. This appendix outlines two further
@@ -1192,7 +1194,7 @@ run it. The second approach relies on the venerable <code class="docutils litera
 involves writing a separate <code class="docutils literal notranslate"><span class="pre">setup.py</span></code> file. This allows more advanced
 configuration as well as integration with other <code class="docutils literal notranslate"><span class="pre">setuptools</span></code>-based projects.
 We will explore both approaches in detail below.</p>
-<section id="building-with-jit-compilation">
+<div class="section" id="building-with-jit-compilation">
 <h3>Building with JIT compilation<a class="headerlink" href="#building-with-jit-compilation" title="Permalink to this headline">¶</a></h3>
 <p>The JIT compilation feature provided by the PyTorch C++ extension toolkit allows
 embedding the compilation of your custom operator directly into your Python
@@ -1284,8 +1286,8 @@ short.</p>
 the cell with the registration multiple times because each execution registers
 a new library and re-registers the custom operator. If you need to re-execute it,
 please restart the Python kernel of your notebook beforehand.</p>
-</section>
-<section id="building-with-setuptools">
+</div>
+<div class="section" id="building-with-setuptools">
 <h3>Building with Setuptools<a class="headerlink" href="#building-with-setuptools" title="Permalink to this headline">¶</a></h3>
 <p>The second approach to building our custom operator exclusively from Python is
 to use <code class="docutils literal notranslate"><span class="pre">setuptools</span></code>. This has the advantage that <code class="docutils literal notranslate"><span class="pre">setuptools</span></code> has a quite
@@ -1358,9 +1360,9 @@ visible to TorchScript:</p>
 <span class="go">&lt;built-in method custom::warp_perspective of PyCapsule object at 0x7ff51c5b7bd0&gt;</span>
 </pre></div>
 </div>
-</section>
-</section>
-</section>
+</div>
+</div>
+</div>
 
 
              </article>
@@ -1397,7 +1399,7 @@ visible to TorchScript:</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2021, PyTorch &amp; PyTorch Korea Community.
+        &copy; Copyright 2022, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorch Korea User Group).
 
     </p>
   </div>
@@ -1410,6 +1412,13 @@ visible to TorchScript:</p>
 </footer>
 
           </div>
+<script>
+if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.indexOf("/prototype/prototype_index")< 1))
+  {
+    var div = '<div class="admonition note"><p class="admonition-title">Note</p><p><i class="fa fa-flask" aria-hidden="true">&nbsp</i> 이 튜토리얼은 프로토타입(prototype) 기능들에 대해서 설명하고 있습니다. 프로토타입 기능은 일반적으로 피드백 및 테스트용으로, 런타임 플래그 없이는 PyPI나 Conda로 배포되는 바이너리에서는 사용할 수 없습니다.</p></div>'
+    document.getElementById("pytorch-article").insertAdjacentHTML('afterBegin', div)
+  }
+</script>
         </div>
 
         <div class="pytorch-content-right" id="pytorch-content-right">
@@ -1476,7 +1485,6 @@ visible to TorchScript:</p>
       });
   </script>
  
-
 <script>
 //add microsoft link
 
@@ -1555,7 +1563,7 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
 </script>
 
 <script type="text/javascript">
-  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile'];
+  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile', 'Introduction to PyTorch on YouTube', 'Recommendation Systems'];
 </script>
 
 

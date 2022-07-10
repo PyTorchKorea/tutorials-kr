@@ -6,24 +6,23 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
 <meta property="og:title" content="nn.Transformer 와 TorchText 로 시퀀스-투-시퀀스(Sequence-to-Sequence) 모델링하기" />
   
 <meta property="og:type" content="article" />
   
-<meta property="og:url" content="http://tutorials.pytorch.kr/beginner/transformer_tutorial.html" />
+<meta property="og:url" content="https://tutorials.pytorch.kr/beginner/transformer_tutorial.html" />
   
 <meta property="og:description" content="이 튜토리얼에서는 nn.Transformer 모듈을 이용하는 시퀀스-투-시퀀스(Sequence-to-Sequence) 모델을 학습하는 방법을 배워보겠습니다. PyTorch 1.2 버젼에는 Attention is All You Need 논문에 기반한 표준 트랜스포머(transformer) 모듈을 포함하고 있습니다. 트랜스포머 모델은 다양한 시퀀스-투-시퀀스 문제들에서 더 병렬화(parallelizable)가 가능하면서도 순환 신경망(RNN; Recurrent Neural Network)과 비교하여 더 나은 성능을 보임이 입증되었..." />
   
-<meta property="og:image" content="http://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
+<meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
   
 <meta property="og:image:alt" content="nn.Transformer 와 TorchText 로 시퀀스-투-시퀀스(Sequence-to-Sequence) 모델링하기" />
   
 <meta property="og:ignore_canonical" content="true" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>nn.Transformer 와 TorchText 로 시퀀스-투-시퀀스(Sequence-to-Sequence) 모델링하기 &mdash; 파이토치 한국어 튜토리얼(PyTorch tutorials in Korean)</title>
+  <title>nn.Transformer 와 TorchText 로 시퀀스-투-시퀀스(Sequence-to-Sequence) 모델링하기 &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
   
 
   
@@ -131,7 +130,7 @@
               
               
                 <div class="version">
-                  1.11.0+cu102
+                  1.12.0+cu102
                 </div>
               
             
@@ -272,6 +271,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/quantized_transfer_learning_tutorial.html">(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/static_quantization_tutorial.html">(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/torchserve_with_ipex.html">Grokking PyTorch Intel CPU performance from first principles</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul>
@@ -298,6 +298,7 @@
 <p class="caption" role="heading"><span class="caption-text">Recommendation Systems</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/torchrec_tutorial.html">Introduction to TorchRec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/sharding.html">Exploring TorchRec sharding</a></li>
 </ul>
 
             
@@ -386,6 +387,7 @@
           </div>
 
         
+
           
           <div class="rst-content">
           
@@ -396,7 +398,7 @@
 <p class="admonition-title">Note</p>
 <p>Click <a class="reference internal" href="#sphx-glr-download-beginner-transformer-tutorial-py"><span class="std std-ref">here</span></a> to download the full example code</p>
 </div>
-<section class="sphx-glr-example-title" id="nn-transformer-torchtext-sequence-to-sequence">
+<div class="sphx-glr-example-title section" id="nn-transformer-torchtext-sequence-to-sequence">
 <span id="sphx-glr-beginner-transformer-tutorial-py"></span><h1>nn.Transformer 와 TorchText 로 시퀀스-투-시퀀스(Sequence-to-Sequence) 모델링하기<a class="headerlink" href="#nn-transformer-torchtext-sequence-to-sequence" title="Permalink to this headline">¶</a></h1>
 <p>이 튜토리얼에서는
 <a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.Transformer.html">nn.Transformer</a> 모듈을
@@ -412,7 +414,7 @@
 단일 컴포넌트 (예. <a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.TransformerEncoder.html">nn.TransformerEncoder</a> )
 로 쉽게 적용 및 구성할 수 있습니다.</p>
 <img alt="../_images/transformer_architecture.jpg" src="../_images/transformer_architecture.jpg" />
-<section id="id1">
+<div class="section" id="id1">
 <h2>모델 정의하기<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
 <p>이 튜토리얼에서, 우리는 <code class="docutils literal notranslate"><span class="pre">nn.TransformerEncoder</span></code> 모델을 언어 모델링(language modeling) 과제에 대해서 학습시킬 것입니다.
 언어 모델링 과제는 주어진 단어 (또는 단어의 시퀀스) 가 다음에 이어지는 단어 시퀀스를 따를 가능성(likelihood)에 대한 확률을 할당하는 것입니다.
@@ -501,8 +503,8 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-<section id="id2">
+</div>
+<div class="section" id="id2">
 <h2>데이터 로드하고 배치 만들기<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
 <p>이 튜토리얼에서는 <code class="docutils literal notranslate"><span class="pre">torchtext</span></code> 를 사용하여 Wikitext-2 데이터셋을 생성합니다.
 torchtext 데이터셋에 접근하기 전에, <a class="reference external" href="https://github.com/pytorch/data">https://github.com/pytorch/data</a> 을 참고하여 torchdata를 설치하시기 바랍니다.
@@ -572,7 +574,7 @@ Wikitext-2에서 보기 드믄 토큰(rare token)은 <cite>&lt;unk&gt;</cite> �
 <span class="n">test_data</span> <span class="o">=</span> <span class="n">batchify</span><span class="p">(</span><span class="n">test_data</span><span class="p">,</span> <span class="n">eval_batch_size</span><span class="p">)</span>
 </pre></div>
 </div>
-<section id="input-target">
+<div class="section" id="input-target">
 <h3>입력(input) 과 타겟(target) 시퀀스를 생성하기 위한 함수들<a class="headerlink" href="#input-target" title="Permalink to this headline">¶</a></h3>
 <p><code class="docutils literal notranslate"><span class="pre">get_batch()</span></code> 함수는 트랜스포머 모델을 위한 입력-타겟 시퀀스 쌍(pair)을 생성합니다.
 이 함수는 소스 데이터를 <code class="docutils literal notranslate"><span class="pre">bptt</span></code> 길이를 가진 덩어리로 세분화 합니다.
@@ -598,9 +600,9 @@ Wikitext-2에서 보기 드믄 토큰(rare token)은 <cite>&lt;unk&gt;</cite> �
     <span class="k">return</span> <span class="n">data</span><span class="p">,</span> <span class="n">target</span>
 </pre></div>
 </div>
-</section>
-</section>
-<section id="instance">
+</div>
+</div>
+<div class="section" id="instance">
 <h2>인스턴스(instance) 초기화하기<a class="headerlink" href="#instance" title="Permalink to this headline">¶</a></h2>
 <p>모델의 하이퍼파라미터(hyperparameter)는 아래와 같이 정의됩니다.
 단어 사이즈는 단어 오브젝트의 길이와 일치 합니다.</p>
@@ -613,8 +615,8 @@ Wikitext-2에서 보기 드믄 토큰(rare token)은 <cite>&lt;unk&gt;</cite> �
 <span class="n">model</span> <span class="o">=</span> <span class="n">TransformerModel</span><span class="p">(</span><span class="n">ntokens</span><span class="p">,</span> <span class="n">emsize</span><span class="p">,</span> <span class="n">nhead</span><span class="p">,</span> <span class="n">d_hid</span><span class="p">,</span> <span class="n">nlayers</span><span class="p">,</span> <span class="n">dropout</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-<section id="id3">
+</div>
+<div class="section" id="id3">
 <h2>모델 실행하기<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
 <p><a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html">CrossEntropyLoss</a> 를
 <a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.optim.SGD.html">SGD</a> (확률적 경사 하강법) 옵티마이저(optimizer)와
@@ -703,61 +705,61 @@ Wikitext-2에서 보기 드믄 토큰(rare token)은 <cite>&lt;unk&gt;</cite> �
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>| epoch   1 |   200/ 2928 batches | lr 5.00 | ms/batch 10.63 | loss  8.20 | ppl  3638.67
-| epoch   1 |   400/ 2928 batches | lr 5.00 | ms/batch 10.46 | loss  6.92 | ppl  1009.18
-| epoch   1 |   600/ 2928 batches | lr 5.00 | ms/batch 10.47 | loss  6.46 | ppl   636.23
-| epoch   1 |   800/ 2928 batches | lr 5.00 | ms/batch 10.46 | loss  6.32 | ppl   555.99
-| epoch   1 |  1000/ 2928 batches | lr 5.00 | ms/batch 10.85 | loss  6.20 | ppl   491.48
-| epoch   1 |  1200/ 2928 batches | lr 5.00 | ms/batch 11.04 | loss  6.16 | ppl   475.42
-| epoch   1 |  1400/ 2928 batches | lr 5.00 | ms/batch 10.45 | loss  6.12 | ppl   456.16
-| epoch   1 |  1600/ 2928 batches | lr 5.00 | ms/batch 10.46 | loss  6.11 | ppl   452.05
-| epoch   1 |  1800/ 2928 batches | lr 5.00 | ms/batch 10.94 | loss  6.03 | ppl   417.38
-| epoch   1 |  2000/ 2928 batches | lr 5.00 | ms/batch 10.72 | loss  6.03 | ppl   417.50
-| epoch   1 |  2200/ 2928 batches | lr 5.00 | ms/batch 10.86 | loss  5.90 | ppl   366.40
-| epoch   1 |  2400/ 2928 batches | lr 5.00 | ms/batch 10.86 | loss  5.98 | ppl   397.26
-| epoch   1 |  2600/ 2928 batches | lr 5.00 | ms/batch 10.75 | loss  5.96 | ppl   386.95
-| epoch   1 |  2800/ 2928 batches | lr 5.00 | ms/batch 10.45 | loss  5.88 | ppl   359.58
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>| epoch   1 |   200/ 2928 batches | lr 5.00 | ms/batch 10.73 | loss  8.11 | ppl  3311.65
+| epoch   1 |   400/ 2928 batches | lr 5.00 | ms/batch 10.60 | loss  6.87 | ppl   962.33
+| epoch   1 |   600/ 2928 batches | lr 5.00 | ms/batch 11.01 | loss  6.44 | ppl   623.29
+| epoch   1 |   800/ 2928 batches | lr 5.00 | ms/batch 11.11 | loss  6.30 | ppl   542.78
+| epoch   1 |  1000/ 2928 batches | lr 5.00 | ms/batch 11.05 | loss  6.19 | ppl   486.94
+| epoch   1 |  1200/ 2928 batches | lr 5.00 | ms/batch 11.03 | loss  6.16 | ppl   471.24
+| epoch   1 |  1400/ 2928 batches | lr 5.00 | ms/batch 11.03 | loss  6.12 | ppl   452.85
+| epoch   1 |  1600/ 2928 batches | lr 5.00 | ms/batch 11.02 | loss  6.11 | ppl   450.11
+| epoch   1 |  1800/ 2928 batches | lr 5.00 | ms/batch 10.78 | loss  6.02 | ppl   412.28
+| epoch   1 |  2000/ 2928 batches | lr 5.00 | ms/batch 10.69 | loss  6.01 | ppl   407.34
+| epoch   1 |  2200/ 2928 batches | lr 5.00 | ms/batch 10.72 | loss  5.89 | ppl   361.21
+| epoch   1 |  2400/ 2928 batches | lr 5.00 | ms/batch 10.60 | loss  5.97 | ppl   392.42
+| epoch   1 |  2600/ 2928 batches | lr 5.00 | ms/batch 10.59 | loss  5.95 | ppl   382.53
+| epoch   1 |  2800/ 2928 batches | lr 5.00 | ms/batch 10.68 | loss  5.89 | ppl   360.13
 -----------------------------------------------------------------------------------------
-| end of epoch   1 | time: 32.71s | valid loss  5.78 | valid ppl   323.92
+| end of epoch   1 | time: 33.25s | valid loss  5.79 | valid ppl   328.23
 -----------------------------------------------------------------------------------------
-| epoch   2 |   200/ 2928 batches | lr 4.75 | ms/batch 10.53 | loss  5.87 | ppl   355.17
-| epoch   2 |   400/ 2928 batches | lr 4.75 | ms/batch 10.45 | loss  5.86 | ppl   351.68
-| epoch   2 |   600/ 2928 batches | lr 4.75 | ms/batch 10.79 | loss  5.68 | ppl   292.83
-| epoch   2 |   800/ 2928 batches | lr 4.75 | ms/batch 10.42 | loss  5.71 | ppl   302.52
-| epoch   2 |  1000/ 2928 batches | lr 4.75 | ms/batch 10.65 | loss  5.66 | ppl   287.44
-| epoch   2 |  1200/ 2928 batches | lr 4.75 | ms/batch 10.48 | loss  5.69 | ppl   294.92
-| epoch   2 |  1400/ 2928 batches | lr 4.75 | ms/batch 10.53 | loss  5.70 | ppl   298.13
-| epoch   2 |  1600/ 2928 batches | lr 4.75 | ms/batch 10.57 | loss  5.72 | ppl   304.10
-| epoch   2 |  1800/ 2928 batches | lr 4.75 | ms/batch 10.63 | loss  5.66 | ppl   287.05
-| epoch   2 |  2000/ 2928 batches | lr 4.75 | ms/batch 10.47 | loss  5.67 | ppl   291.23
-| epoch   2 |  2200/ 2928 batches | lr 4.75 | ms/batch 10.47 | loss  5.55 | ppl   257.10
-| epoch   2 |  2400/ 2928 batches | lr 4.75 | ms/batch 10.47 | loss  5.65 | ppl   283.36
-| epoch   2 |  2600/ 2928 batches | lr 4.75 | ms/batch 10.47 | loss  5.65 | ppl   283.31
-| epoch   2 |  2800/ 2928 batches | lr 4.75 | ms/batch 10.52 | loss  5.58 | ppl   264.57
+| epoch   2 |   200/ 2928 batches | lr 4.75 | ms/batch 10.80 | loss  5.86 | ppl   350.65
+| epoch   2 |   400/ 2928 batches | lr 4.75 | ms/batch 11.04 | loss  5.84 | ppl   344.85
+| epoch   2 |   600/ 2928 batches | lr 4.75 | ms/batch 11.03 | loss  5.67 | ppl   289.05
+| epoch   2 |   800/ 2928 batches | lr 4.75 | ms/batch 11.02 | loss  5.70 | ppl   297.69
+| epoch   2 |  1000/ 2928 batches | lr 4.75 | ms/batch 11.08 | loss  5.65 | ppl   283.01
+| epoch   2 |  1200/ 2928 batches | lr 4.75 | ms/batch 10.58 | loss  5.68 | ppl   292.05
+| epoch   2 |  1400/ 2928 batches | lr 4.75 | ms/batch 10.83 | loss  5.68 | ppl   293.69
+| epoch   2 |  1600/ 2928 batches | lr 4.75 | ms/batch 10.61 | loss  5.70 | ppl   298.89
+| epoch   2 |  1800/ 2928 batches | lr 4.75 | ms/batch 10.60 | loss  5.64 | ppl   281.33
+| epoch   2 |  2000/ 2928 batches | lr 4.75 | ms/batch 11.06 | loss  5.66 | ppl   286.16
+| epoch   2 |  2200/ 2928 batches | lr 4.75 | ms/batch 10.63 | loss  5.54 | ppl   255.79
+| epoch   2 |  2400/ 2928 batches | lr 4.75 | ms/batch 10.63 | loss  5.64 | ppl   281.23
+| epoch   2 |  2600/ 2928 batches | lr 4.75 | ms/batch 10.60 | loss  5.64 | ppl   280.31
+| epoch   2 |  2800/ 2928 batches | lr 4.75 | ms/batch 10.76 | loss  5.57 | ppl   263.19
 -----------------------------------------------------------------------------------------
-| end of epoch   2 | time: 32.31s | valid loss  5.67 | valid ppl   289.15
+| end of epoch   2 | time: 33.18s | valid loss  5.64 | valid ppl   281.85
 -----------------------------------------------------------------------------------------
-| epoch   3 |   200/ 2928 batches | lr 4.51 | ms/batch 10.78 | loss  5.61 | ppl   272.54
-| epoch   3 |   400/ 2928 batches | lr 4.51 | ms/batch 10.42 | loss  5.63 | ppl   278.20
-| epoch   3 |   600/ 2928 batches | lr 4.51 | ms/batch 10.50 | loss  5.42 | ppl   226.58
-| epoch   3 |   800/ 2928 batches | lr 4.51 | ms/batch 10.51 | loss  5.48 | ppl   239.92
-| epoch   3 |  1000/ 2928 batches | lr 4.51 | ms/batch 10.58 | loss  5.44 | ppl   230.78
-| epoch   3 |  1200/ 2928 batches | lr 4.51 | ms/batch 10.46 | loss  5.48 | ppl   239.13
-| epoch   3 |  1400/ 2928 batches | lr 4.51 | ms/batch 10.52 | loss  5.49 | ppl   242.85
-| epoch   3 |  1600/ 2928 batches | lr 4.51 | ms/batch 10.70 | loss  5.52 | ppl   248.92
-| epoch   3 |  1800/ 2928 batches | lr 4.51 | ms/batch 10.70 | loss  5.47 | ppl   237.20
-| epoch   3 |  2000/ 2928 batches | lr 4.51 | ms/batch 10.47 | loss  5.48 | ppl   240.70
-| epoch   3 |  2200/ 2928 batches | lr 4.51 | ms/batch 10.46 | loss  5.35 | ppl   211.41
-| epoch   3 |  2400/ 2928 batches | lr 4.51 | ms/batch 10.47 | loss  5.46 | ppl   234.86
-| epoch   3 |  2600/ 2928 batches | lr 4.51 | ms/batch 10.63 | loss  5.47 | ppl   238.48
-| epoch   3 |  2800/ 2928 batches | lr 4.51 | ms/batch 10.41 | loss  5.41 | ppl   223.86
+| epoch   3 |   200/ 2928 batches | lr 4.51 | ms/batch 10.68 | loss  5.60 | ppl   270.37
+| epoch   3 |   400/ 2928 batches | lr 4.51 | ms/batch 10.60 | loss  5.61 | ppl   272.42
+| epoch   3 |   600/ 2928 batches | lr 4.51 | ms/batch 10.59 | loss  5.42 | ppl   224.83
+| epoch   3 |   800/ 2928 batches | lr 4.51 | ms/batch 10.59 | loss  5.48 | ppl   239.02
+| epoch   3 |  1000/ 2928 batches | lr 4.51 | ms/batch 10.59 | loss  5.43 | ppl   227.92
+| epoch   3 |  1200/ 2928 batches | lr 4.51 | ms/batch 10.59 | loss  5.47 | ppl   236.71
+| epoch   3 |  1400/ 2928 batches | lr 4.51 | ms/batch 10.59 | loss  5.49 | ppl   241.33
+| epoch   3 |  1600/ 2928 batches | lr 4.51 | ms/batch 10.59 | loss  5.51 | ppl   247.97
+| epoch   3 |  1800/ 2928 batches | lr 4.51 | ms/batch 10.58 | loss  5.46 | ppl   234.73
+| epoch   3 |  2000/ 2928 batches | lr 4.51 | ms/batch 10.59 | loss  5.47 | ppl   237.07
+| epoch   3 |  2200/ 2928 batches | lr 4.51 | ms/batch 10.59 | loss  5.35 | ppl   211.00
+| epoch   3 |  2400/ 2928 batches | lr 4.51 | ms/batch 10.59 | loss  5.46 | ppl   235.47
+| epoch   3 |  2600/ 2928 batches | lr 4.51 | ms/batch 10.60 | loss  5.46 | ppl   236.04
+| epoch   3 |  2800/ 2928 batches | lr 4.51 | ms/batch 10.58 | loss  5.41 | ppl   223.12
 -----------------------------------------------------------------------------------------
-| end of epoch   3 | time: 32.37s | valid loss  5.58 | valid ppl   265.03
+| end of epoch   3 | time: 32.57s | valid loss  5.60 | valid ppl   269.11
 -----------------------------------------------------------------------------------------
 </pre></div>
 </div>
-</section>
-<section id="test-dataset">
+</div>
+<div class="section" id="test-dataset">
 <h2>평가 데이터셋(test dataset)으로 모델을 평가하기<a class="headerlink" href="#test-dataset" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">test_loss</span> <span class="o">=</span> <span class="n">evaluate</span><span class="p">(</span><span class="n">best_model</span><span class="p">,</span> <span class="n">test_data</span><span class="p">)</span>
 <span class="n">test_ppl</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">test_loss</span><span class="p">)</span>
@@ -769,11 +771,11 @@ Wikitext-2에서 보기 드믄 토큰(rare token)은 <cite>&lt;unk&gt;</cite> �
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>=========================================================================================
-| End of training | test loss  5.49 | test ppl   242.50
+| End of training | test loss  5.50 | test ppl   245.34
 =========================================================================================
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 1 minutes  50.831 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 1 minutes  47.745 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-beginner-transformer-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/aa3898eb04d468790e00cb42405b1c23/transformer_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">transformer_tutorial.py</span></code></a></p>
@@ -783,8 +785,8 @@ Wikitext-2에서 보기 드믄 토큰(rare token)은 <cite>&lt;unk&gt;</cite> �
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
-</section>
-</section>
+</div>
+</div>
 
 
              </article>
@@ -821,7 +823,7 @@ Wikitext-2에서 보기 드믄 토큰(rare token)은 <cite>&lt;unk&gt;</cite> �
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2021, PyTorch &amp; PyTorch Korea Community.
+        &copy; Copyright 2022, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorch Korea User Group).
 
     </p>
   </div>
@@ -834,6 +836,13 @@ Wikitext-2에서 보기 드믄 토큰(rare token)은 <cite>&lt;unk&gt;</cite> �
 </footer>
 
           </div>
+<script>
+if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.indexOf("/prototype/prototype_index")< 1))
+  {
+    var div = '<div class="admonition note"><p class="admonition-title">Note</p><p><i class="fa fa-flask" aria-hidden="true">&nbsp</i> 이 튜토리얼은 프로토타입(prototype) 기능들에 대해서 설명하고 있습니다. 프로토타입 기능은 일반적으로 피드백 및 테스트용으로, 런타임 플래그 없이는 PyPI나 Conda로 배포되는 바이너리에서는 사용할 수 없습니다.</p></div>'
+    document.getElementById("pytorch-article").insertAdjacentHTML('afterBegin', div)
+  }
+</script>
         </div>
 
         <div class="pytorch-content-right" id="pytorch-content-right">
@@ -889,7 +898,6 @@ Wikitext-2에서 보기 드믄 토큰(rare token)은 <cite>&lt;unk&gt;</cite> �
       });
   </script>
  
-
 <script>
 //add microsoft link
 
@@ -968,7 +976,7 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
 </script>
 
 <script type="text/javascript">
-  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile'];
+  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile', 'Introduction to PyTorch on YouTube', 'Recommendation Systems'];
 </script>
 
 

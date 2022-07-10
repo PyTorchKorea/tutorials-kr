@@ -6,24 +6,23 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
 <meta property="og:title" content="Captum을 사용하여 모델 해석하기" />
   
 <meta property="og:type" content="article" />
   
-<meta property="og:url" content="http://tutorials.pytorch.kr/recipes/recipes/Captum_Recipe.html" />
+<meta property="og:url" content="https://tutorials.pytorch.kr/recipes/recipes/Captum_Recipe.html" />
   
 <meta property="og:description" content="번역: 정재민 Captum을 사용하면 데이터 특징(features)이 모델의 예측 또는 뉴런 활성화에 미치는 영향을 이해하고, 모델의 동작 방식을 알 수 있습니다. 그리고 Integrated Gradients 와 Guided GradCam 과 같은 최첨단의 feature attribution 알고리즘을 적용할 수 있습니다. 이 레시피에서는 Captum을 사용하여 다음을 수행하는 방법을 배웁니다: 이미지 분류기(classifier)의 예측을 해당 이미지의 특징(features)에 표시하기, 속성(attribution) 결과를 시..." />
   
-<meta property="og:image" content="http://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
+<meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
   
 <meta property="og:image:alt" content="Captum을 사용하여 모델 해석하기" />
   
 <meta property="og:ignore_canonical" content="true" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Captum을 사용하여 모델 해석하기 &mdash; 파이토치 한국어 튜토리얼(PyTorch tutorials in Korean)</title>
+  <title>Captum을 사용하여 모델 해석하기 &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
   
 
   
@@ -131,7 +130,7 @@
               
               
                 <div class="version">
-                  1.11.0+cu102
+                  1.12.0+cu102
                 </div>
               
             
@@ -272,6 +271,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/quantized_transfer_learning_tutorial.html">(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../advanced/static_quantization_tutorial.html">(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../intermediate/torchserve_with_ipex.html">Grokking PyTorch Intel CPU performance from first principles</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul>
@@ -298,6 +298,7 @@
 <p class="caption" role="heading"><span class="caption-text">Recommendation Systems</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/torchrec_tutorial.html">Introduction to TorchRec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../advanced/sharding.html">Exploring TorchRec sharding</a></li>
 </ul>
 
             
@@ -388,6 +389,7 @@
           </div>
 
         
+
           
           <div class="rst-content">
           
@@ -398,7 +400,7 @@
 <p class="admonition-title">Note</p>
 <p>Click <a class="reference internal" href="#sphx-glr-download-recipes-recipes-captum-recipe-py"><span class="std std-ref">here</span></a> to download the full example code</p>
 </div>
-<section class="sphx-glr-example-title" id="captum">
+<div class="sphx-glr-example-title section" id="captum">
 <span id="sphx-glr-recipes-recipes-captum-recipe-py"></span><h1>Captum을 사용하여 모델 해석하기<a class="headerlink" href="#captum" title="Permalink to this headline">¶</a></h1>
 <p><strong>번역</strong>: <a class="reference external" href="https://github.com/jjeamin">정재민</a>
 Captum을 사용하면 데이터 특징(features)이 모델의 예측 또는 뉴런 활성화에
@@ -410,7 +412,7 @@ Captum을 사용하면 데이터 특징(features)이 모델의 예측 또는 뉴
 <li><p>이미지 분류기(classifier)의 예측을 해당 이미지의 특징(features)에 표시하기</p></li>
 <li><p>속성(attribution) 결과를 시각화 하기</p></li>
 </ul>
-<section id="id2">
+<div class="section" id="id2">
 <h2>시작하기 전에<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
 <p>Captum이 Python 환경에 설치되어 있는지 확인해야 합니다.
 Captum은 Github에서 <code class="docutils literal notranslate"><span class="pre">pip</span></code> 패키지 또는 <code class="docutils literal notranslate"><span class="pre">conda</span></code> 패키지로 제공됩니다.
@@ -444,8 +446,8 @@ Captum은 샘플 이미지의 어떤 부분이 모델에 의해 만들어진
 <span class="n">input_img</span> <span class="o">=</span> <span class="n">normalize</span><span class="p">(</span><span class="n">center_crop</span><span class="p">(</span><span class="n">img</span><span class="p">))</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-<section id="attribution">
+</div>
+<div class="section" id="attribution">
 <h2>속성(attribution) 계산하기<a class="headerlink" href="#attribution" title="Permalink to this headline">¶</a></h2>
 <p>모델의 top-3 예측 중에는 개와 고양이에 해당하는 클래스 208과 283이 있습니다.</p>
 <p>Captum의 <code class="docutils literal notranslate"><span class="pre">Occlusion</span></code>알고리즘을 사용하여 각 예측을 입력의 해당 부분에 표시합니다.</p>
@@ -480,8 +482,8 @@ Captum은 샘플 이미지의 어떤 부분이 모델에 의해 만들어진
 속성(attribution) 결과를 통합해서 반환하는 <code class="docutils literal notranslate"><span class="pre">attribute(...)</span></code> 메소드를 가지는
 <code class="docutils literal notranslate"><span class="pre">Attribution</span></code> 의 서브클래스 입니다.</p>
 <p>이미지인 경우 속성(attribution) 결과를 시각화 해보겠습니다.</p>
-</section>
-<section id="id3">
+</div>
+<div class="section" id="id3">
 <h2>결과 시각화하기<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
 <p>Captum의 <code class="docutils literal notranslate"><span class="pre">visualization</span></code>유틸리티는 그림과 텍스트 입력 모두에 대한
 속성(attribution) 결과를 시각화 할 수 있는 즉시 사용가능한 방법을 제공합니다.</p>
@@ -519,8 +521,8 @@ Captum은 샘플 이미지의 어떤 부분이 모델에 의해 만들어진
 <p>만약 데이터가 텍스트인 경우 <code class="docutils literal notranslate"><span class="pre">visualization.visualize_text()</span></code> 는
 입력 텍스트 위에 속성(attribution)을 탐색할 수 있는 전용 뷰(view)를 제공합니다.
 <a class="reference external" href="http://captum.ai/tutorials/IMDB_TorchText_Interpret">http://captum.ai/tutorials/IMDB_TorchText_Interpret</a> 에서 자세한 내용을 확인하세요.</p>
-</section>
-<section id="id4">
+</div>
+<div class="section" id="id4">
 <h2>마지막 노트<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
 <p>Captum은 이미지, 텍스트 등을 포함하여 다양한 방식으로 PyTorch에서 대부분의 모델 타입을 처리할 수 있습니다.
 Captum을 사용하면 다음을 수행할 수 있습니다.
@@ -540,8 +542,8 @@ Captum을 사용하면 다음을 수행할 수 있습니다.
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
-</section>
-</section>
+</div>
+</div>
 
 
              </article>
@@ -578,7 +580,7 @@ Captum을 사용하면 다음을 수행할 수 있습니다.
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2021, PyTorch &amp; PyTorch Korea Community.
+        &copy; Copyright 2022, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorch Korea User Group).
 
     </p>
   </div>
@@ -591,6 +593,13 @@ Captum을 사용하면 다음을 수행할 수 있습니다.
 </footer>
 
           </div>
+<script>
+if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.indexOf("/prototype/prototype_index")< 1))
+  {
+    var div = '<div class="admonition note"><p class="admonition-title">Note</p><p><i class="fa fa-flask" aria-hidden="true">&nbsp</i> 이 튜토리얼은 프로토타입(prototype) 기능들에 대해서 설명하고 있습니다. 프로토타입 기능은 일반적으로 피드백 및 테스트용으로, 런타임 플래그 없이는 PyPI나 Conda로 배포되는 바이너리에서는 사용할 수 없습니다.</p></div>'
+    document.getElementById("pytorch-article").insertAdjacentHTML('afterBegin', div)
+  }
+</script>
         </div>
 
         <div class="pytorch-content-right" id="pytorch-content-right">
@@ -642,7 +651,6 @@ Captum을 사용하면 다음을 수행할 수 있습니다.
       });
   </script>
  
-
 <script>
 //add microsoft link
 
@@ -721,7 +729,7 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
 </script>
 
 <script type="text/javascript">
-  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile'];
+  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile', 'Introduction to PyTorch on YouTube', 'Recommendation Systems'];
 </script>
 
 

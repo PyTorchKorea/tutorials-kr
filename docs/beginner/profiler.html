@@ -6,24 +6,23 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
 <meta property="og:title" content="PyTorch 모듈 프로파일링 하기" />
   
 <meta property="og:type" content="article" />
   
-<meta property="og:url" content="http://tutorials.pytorch.kr/beginner/profiler.html" />
+<meta property="og:url" content="https://tutorials.pytorch.kr/beginner/profiler.html" />
   
 <meta property="og:description" content="Author: Suraj Subramanian 번역: 이재복 PyTorch는 코드 내의 다양한 Pytorch 연산에 대한 시간과 메모리 비용을 파악하는 데 유용한 프로파일러(profiler) API를 포함하고 있습니다. 프로파일러는 코드에 쉽게 통합될 수 있으며, 프로파일링 결과는 표로 출력되거나 JSON 형식의 추적(trace) 파일로 반환될 수 있습니다. 프로파일러 API 사용법에 대해 빠르게 살펴보고 싶다면 이 레시피 문서 를 확인하세요. 프로파일러를 이용하여 성능 디버깅하기: 프로파일러는 모델에서 성능의 병목을 파악할 ..." />
   
-<meta property="og:image" content="http://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
+<meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
   
 <meta property="og:image:alt" content="PyTorch 모듈 프로파일링 하기" />
   
 <meta property="og:ignore_canonical" content="true" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>PyTorch 모듈 프로파일링 하기 &mdash; 파이토치 한국어 튜토리얼(PyTorch tutorials in Korean)</title>
+  <title>PyTorch 모듈 프로파일링 하기 &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
   
 
   
@@ -131,7 +130,7 @@
               
               
                 <div class="version">
-                  1.11.0+cu102
+                  1.12.0+cu102
                 </div>
               
             
@@ -272,6 +271,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/quantized_transfer_learning_tutorial.html">(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/static_quantization_tutorial.html">(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/torchserve_with_ipex.html">Grokking PyTorch Intel CPU performance from first principles</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul>
@@ -298,6 +298,7 @@
 <p class="caption" role="heading"><span class="caption-text">Recommendation Systems</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/torchrec_tutorial.html">Introduction to TorchRec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/sharding.html">Exploring TorchRec sharding</a></li>
 </ul>
 
             
@@ -386,6 +387,7 @@
           </div>
 
         
+
           
           <div class="rst-content">
           
@@ -396,7 +398,7 @@
 <p class="admonition-title">Note</p>
 <p>Click <a class="reference internal" href="#sphx-glr-download-beginner-profiler-py"><span class="std std-ref">here</span></a> to download the full example code</p>
 </div>
-<section class="sphx-glr-example-title" id="pytorch">
+<div class="sphx-glr-example-title section" id="pytorch">
 <span id="sphx-glr-beginner-profiler-py"></span><h1>PyTorch 모듈 프로파일링 하기<a class="headerlink" href="#pytorch" title="Permalink to this headline">¶</a></h1>
 <p><strong>Author:</strong> <a class="reference external" href="https://github.com/suraj813">Suraj Subramanian</a></p>
 <p><strong>번역:</strong> <a class="reference external" href="http://github.com/zzaebok">이재복</a></p>
@@ -422,7 +424,7 @@
 <span class="kn">import</span> <span class="nn">torch.autograd.profiler</span> <span class="k">as</span> <span class="nn">profiler</span>
 </pre></div>
 </div>
-<section id="id2">
+<div class="section" id="id2">
 <h2>프로파일러를 이용하여 성능 디버깅하기<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
 <p>프로파일러는 모델에서 성능의 병목을 파악할 때 유용할 수 있습니다.
 이번 예제에서, 두 가지 하위 작업을 수행하는 사용자 정의 모듈을 만들겠습니다:</p>
@@ -452,8 +454,8 @@
         <span class="k">return</span> <span class="n">out</span><span class="p">,</span> <span class="n">hi_idx</span>
 </pre></div>
 </div>
-</section>
-<section id="forward-pass">
+</div>
+<div class="section" id="forward-pass">
 <h2>순전파 단계(forward pass) 프로파일링하기<a class="headerlink" href="#forward-pass" title="Permalink to this headline">¶</a></h2>
 <p>입력과 마스크 텐서, 그리고 모델을 임의로 초기화합니다.</p>
 <p>프로파일러를 실행하기 전, 정확한 성능 벤치마킹을 보장하기 위해 CUDA를 워밍업(warm-up) 시킵니다.
@@ -475,8 +477,8 @@
     <span class="n">out</span><span class="p">,</span> <span class="n">idx</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">mask</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-<section id="id3">
+</div>
+<div class="section" id="id3">
 <h2>프로파일러의 결과 출력하기<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
 <p>최종적으로 프로파일러의 결과를 출력합니다.
 <code class="docutils literal notranslate"><span class="pre">profiler.key_averages</span></code> 는 연산자의 이름에 따라 결과를 집계하는데,
@@ -536,8 +538,8 @@
 <span class="sd">&quot;&quot;&quot;</span>
 </pre></div>
 </div>
-</section>
-<section id="id4">
+</div>
+<div class="section" id="id4">
 <h2>메모리 성능 향상시키기<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
 <p>메모리와 시간 측면에서 가장 비용이 큰 연산은 MASK INDICES 내 <code class="docutils literal notranslate"><span class="pre">forward(10)</span></code> 연산입니다.
 먼저 메모리 소모 문제를 해결해봅시다.
@@ -600,8 +602,8 @@
 </pre></div>
 </div>
 <p>이 연산을 위한 CPU 메모리 사용량이 절반으로 줄었습니다.</p>
-</section>
-<section id="id5">
+</div>
+<div class="section" id="id5">
 <h2>시간 성능 향상시키기<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h2>
 <p>소모된 시간이 조금 줄긴 했지만, 이는 아직도 너무 높은 수치입니다.
 CUDA 에서 CPU 로 행렬을 복사하는 것이 꽤 비용이 큰 연산인 것이 밝혀졌습니다.
@@ -678,8 +680,8 @@ CUDA 에서 CPU 로 행렬을 복사하는 것이 꽤 비용이 큰 연산인 �
 <span class="sd">&quot;&quot;&quot;</span>
 </pre></div>
 </div>
-</section>
-<section id="id6">
+</div>
+<div class="section" id="id6">
 <h2>더 읽을거리<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h2>
 <p>PyTorch 모델에서 시간과 메모리 병목을 분석하기 위해 프로파일러가 어떻게 사용될 수 있는지를 살펴보았습니다.
 아래에 프로파일러에 대한 읽을거리가 더 있습니다:</p>
@@ -698,8 +700,8 @@ CUDA 에서 CPU 로 행렬을 복사하는 것이 꽤 비용이 큰 연산인 �
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
-</section>
-</section>
+</div>
+</div>
 
 
              </article>
@@ -736,7 +738,7 @@ CUDA 에서 CPU 로 행렬을 복사하는 것이 꽤 비용이 큰 연산인 �
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2021, PyTorch &amp; PyTorch Korea Community.
+        &copy; Copyright 2022, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorch Korea User Group).
 
     </p>
   </div>
@@ -749,6 +751,13 @@ CUDA 에서 CPU 로 행렬을 복사하는 것이 꽤 비용이 큰 연산인 �
 </footer>
 
           </div>
+<script>
+if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.indexOf("/prototype/prototype_index")< 1))
+  {
+    var div = '<div class="admonition note"><p class="admonition-title">Note</p><p><i class="fa fa-flask" aria-hidden="true">&nbsp</i> 이 튜토리얼은 프로토타입(prototype) 기능들에 대해서 설명하고 있습니다. 프로토타입 기능은 일반적으로 피드백 및 테스트용으로, 런타임 플래그 없이는 PyPI나 Conda로 배포되는 바이너리에서는 사용할 수 없습니다.</p></div>'
+    document.getElementById("pytorch-article").insertAdjacentHTML('afterBegin', div)
+  }
+</script>
         </div>
 
         <div class="pytorch-content-right" id="pytorch-content-right">
@@ -802,7 +811,6 @@ CUDA 에서 CPU 로 행렬을 복사하는 것이 꽤 비용이 큰 연산인 �
       });
   </script>
  
-
 <script>
 //add microsoft link
 
@@ -881,7 +889,7 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
 </script>
 
 <script type="text/javascript">
-  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile'];
+  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile', 'Introduction to PyTorch on YouTube', 'Recommendation Systems'];
 </script>
 
 

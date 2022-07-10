@@ -6,24 +6,23 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
 <meta property="og:title" content="C++ 프론트엔드의 자동 미분 (autograd)" />
   
 <meta property="og:type" content="article" />
   
-<meta property="og:url" content="http://tutorials.pytorch.kr/advanced/cpp_autograd.html" />
+<meta property="og:url" content="https://tutorials.pytorch.kr/advanced/cpp_autograd.html" />
   
 <meta property="og:description" content="번역: 유용환 autograd 는 PyTorch로 유연하고 역동적인 신경망을 구축하기 위해 필수적인 패키지입니다. PyTorch 파이썬 프론트엔드의 자동 미분 API 대부분은 C++ 프론트엔드에서도 사용할 수 있으며, 파이썬에서 C++로 자동 미분 코드를 쉽게 변환할 수 있습니다. 이 튜토리얼에서는 PyTorch C++ 프론트엔드에서 자동 미분을 수행하는 몇 가지 예를 살펴보겠습니다. 이 튜토리얼은 여러분이 파이썬 프론트엔드의 자동 미분에 대해 기본적으로 이해하고 있다고 가정합니다. 그렇지 않은 경우 먼저 Autograd: A..." />
   
-<meta property="og:image" content="http://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
+<meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
   
 <meta property="og:image:alt" content="C++ 프론트엔드의 자동 미분 (autograd)" />
   
 <meta property="og:ignore_canonical" content="true" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>C++ 프론트엔드의 자동 미분 (autograd) &mdash; 파이토치 한국어 튜토리얼(PyTorch tutorials in Korean)</title>
+  <title>C++ 프론트엔드의 자동 미분 (autograd) &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
   
 
   
@@ -131,7 +130,7 @@
               
               
                 <div class="version">
-                  1.11.0+cu102
+                  1.12.0+cu102
                 </div>
               
             
@@ -272,6 +271,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/quantized_transfer_learning_tutorial.html">(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="static_quantization_tutorial.html">(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/torchserve_with_ipex.html">Grokking PyTorch Intel CPU performance from first principles</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul>
@@ -298,6 +298,7 @@
 <p class="caption" role="heading"><span class="caption-text">Recommendation Systems</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/torchrec_tutorial.html">Introduction to TorchRec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sharding.html">Exploring TorchRec sharding</a></li>
 </ul>
 
             
@@ -386,13 +387,14 @@
           </div>
 
         
+
           
           <div class="rst-content">
           
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <section id="c-autograd">
+  <div class="section" id="c-autograd">
 <h1>C++ 프론트엔드의 자동 미분 (autograd)<a class="headerlink" href="#c-autograd" title="Permalink to this headline">¶</a></h1>
 <p><strong>번역</strong>: <a class="reference external" href="https://github.com/yoosful">유용환</a></p>
 <p><code class="docutils literal notranslate"><span class="pre">autograd</span></code> 는 PyTorch로 유연하고 역동적인 신경망을 구축하기 위해
@@ -401,7 +403,7 @@
 <p>이 튜토리얼에서는 PyTorch C++ 프론트엔드에서 자동 미분을 수행하는 몇 가지 예를 살펴보겠습니다.
 이 튜토리얼은 여러분이 파이썬 프론트엔드의 자동 미분에 대해 기본적으로 이해하고 있다고
 가정합니다. 그렇지 않은 경우 먼저 <a class="reference external" href="https://tutorials.pytorch.kr/beginner/blitz/autograd_tutorial.html">Autograd: Automatic Differentiation</a> 을 읽어보세요.</p>
-<section id="id2">
+<div class="section" id="id2">
 <h2>기초 자동 미분 연산<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
 <p>(<a class="reference external" href="https://tutorials.pytorch.kr/beginner/blitz/autograd_tutorial.html#autograd-automatic-differentiation">이 튜토리얼</a> 의 내용에 기반함)</p>
 <p>텐서를 생성하고 그것의 계산을 추적하기 위해 <code class="docutils literal notranslate"><span class="pre">torch::requires_grad()</span></code> 를 실행해봅시다.</p>
@@ -555,8 +557,8 @@ MulBackward1
 </div>
 <p><code class="docutils literal notranslate"><span class="pre">grad</span></code> / <code class="docutils literal notranslate"><span class="pre">requires_grad</span></code> / <code class="docutils literal notranslate"><span class="pre">is_leaf</span></code> / <code class="docutils literal notranslate"><span class="pre">backward</span></code> / <code class="docutils literal notranslate"><span class="pre">detach</span></code> / <code class="docutils literal notranslate"><span class="pre">detach_</span></code> /
 <code class="docutils literal notranslate"><span class="pre">register_hook</span></code> / <code class="docutils literal notranslate"><span class="pre">retain_grad</span></code> 등 C++ 텐서 자동 미분 API에 대한 자세한 내용은 <a class="reference external" href="https://pytorch.org/cppdocs/api/classat_1_1_tensor.html">해당 C++ API 문서</a> 에서 확인하세요.</p>
-</section>
-<section id="c">
+</div>
+<div class="section" id="c">
 <h2>C++로 고차원 그래디언트 계산하기<a class="headerlink" href="#c" title="Permalink to this headline">¶</a></h2>
 <p>고차원 그래디언트를 사용하는 사례로 그래디언트 패널티 계산이 있습니다.
 <code class="docutils literal notranslate"><span class="pre">torch::autograd::grad</span></code> 를 사용하는 예를 살펴봅시다.</p>
@@ -595,8 +597,8 @@ MulBackward1
 <code class="docutils literal notranslate"><span class="pre">torch::autograd::grad</span></code>
 (<a class="reference external" href="https://pytorch.org/cppdocs/api/function_namespacetorch_1_1autograd_1a1e03c42b14b40c306f9eb947ef842d9c.html">링크</a>) 문서에서
 이 함수들의 사용법에 대해 더 알아보세요.</p>
-</section>
-<section id="id7">
+</div>
+<div class="section" id="id7">
 <h2>C++에서 사용자 지정 자동 미분 함수 사용하기<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h2>
 <p>(<a class="reference external" href="https://pytorch.org/docs/stable/notes/extending.html#extending-torch-autograd">이 튜토리얼</a> 의 내용에 기반함)</p>
 <p><code class="docutils literal notranslate"><span class="pre">torch::autograd</span></code> 에 새로운 기본(elementary) 연산을 추가하려면 각 연산에 대해 새로운 <code class="docutils literal notranslate"><span class="pre">torch::autograd::Function</span></code>
@@ -703,8 +705,8 @@ MulBackward1
 </div>
 <p><code class="docutils literal notranslate"><span class="pre">torch::autograd::Function</span></code> 에 대한 더 많은 내용은
 <a class="reference external" href="https://pytorch.org/cppdocs/api/structtorch_1_1autograd_1_1_function.html">이 문서</a> 에서 확인할 수 있습니다.</p>
-</section>
-<section id="id10">
+</div>
+<div class="section" id="id10">
 <h2>파이썬 자동 미분 코드를 C++로 변환하기<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h2>
 <p>개략적으로 말하면, C++에서 자동 미분을 사용하는 가장 쉬운 방법은 먼저
 파이썬에서 동작하는 자동 미분 코드를 작성한 후, 아래 표를 참고해 C++ 코드로
@@ -767,15 +769,15 @@ MulBackward1
 <p>대부분의 변환된 파이썬 자동 미분 코드가 C++에서도 잘 동작할 것입니다.
 동작하지 않을 경우, <a class="reference external" href="https://github.com/pytorch/pytorch/issues">GitHub issues</a> 에 버그 리포트를 제출해 주시면
 최대한 빨리 고쳐드리겠습니다.</p>
-</section>
-<section id="id25">
+</div>
+<div class="section" id="id25">
 <h2>결론<a class="headerlink" href="#id25" title="Permalink to this headline">¶</a></h2>
 <p>이제 PyTorch의 C++ 자동 미분 API에 대한 개괄적인 이해가 생겼을 것입니다.
 여기서 사용된 코드 예제들은 <a class="reference external" href="https://github.com/pytorch/examples/tree/master/cpp/autograd">여기</a> 에서
 확인할 수 있습니다. 언제나 그렇듯이 어떤 문제가 생기거나 질문이 있으면 저희
 <a class="reference external" href="https://discuss.pytorch.org/">포럼</a> 을 이용하거나 <a class="reference external" href="https://github.com/pytorch/pytorch/issues">Github 이슈</a> 로 연락주세요.</p>
-</section>
-</section>
+</div>
+</div>
 
 
              </article>
@@ -812,7 +814,7 @@ MulBackward1
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2021, PyTorch &amp; PyTorch Korea Community.
+        &copy; Copyright 2022, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorch Korea User Group).
 
     </p>
   </div>
@@ -825,6 +827,13 @@ MulBackward1
 </footer>
 
           </div>
+<script>
+if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.indexOf("/prototype/prototype_index")< 1))
+  {
+    var div = '<div class="admonition note"><p class="admonition-title">Note</p><p><i class="fa fa-flask" aria-hidden="true">&nbsp</i> 이 튜토리얼은 프로토타입(prototype) 기능들에 대해서 설명하고 있습니다. 프로토타입 기능은 일반적으로 피드백 및 테스트용으로, 런타임 플래그 없이는 PyPI나 Conda로 배포되는 바이너리에서는 사용할 수 없습니다.</p></div>'
+    document.getElementById("pytorch-article").insertAdjacentHTML('afterBegin', div)
+  }
+</script>
         </div>
 
         <div class="pytorch-content-right" id="pytorch-content-right">
@@ -877,7 +886,6 @@ MulBackward1
       });
   </script>
  
-
 <script>
 //add microsoft link
 
@@ -956,7 +964,7 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
 </script>
 
 <script type="text/javascript">
-  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile'];
+  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile', 'Introduction to PyTorch on YouTube', 'Recommendation Systems'];
 </script>
 
 

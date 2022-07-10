@@ -6,24 +6,23 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
 <meta property="og:title" content="Text-to-speech with torchaudio" />
   
 <meta property="og:type" content="article" />
   
-<meta property="og:url" content="http://tutorials.pytorch.kr/intermediate/text_to_speech_with_torchaudio.html" />
+<meta property="og:url" content="https://tutorials.pytorch.kr/intermediate/text_to_speech_with_torchaudio.html" />
   
 <meta property="og:description" content="Author: Yao-Yuan Yang, Moto Hira Overview: This tutorial shows how to build text-to-speech pipeline, using the pretrained Tacotron2 in torchaudio. The text-to-speech pipeline goes as follows: 1. Text preprocessing First, the input text is encoded into a list of symbols. In this tutorial, we will ..." />
   
-<meta property="og:image" content="http://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
+<meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
   
 <meta property="og:image:alt" content="Text-to-speech with torchaudio" />
   
 <meta property="og:ignore_canonical" content="true" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Text-to-speech with torchaudio &mdash; 파이토치 한국어 튜토리얼(PyTorch tutorials in Korean)</title>
+  <title>Text-to-speech with torchaudio &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
   
 
   
@@ -131,7 +130,7 @@
               
               
                 <div class="version">
-                  1.11.0+cu102
+                  1.12.0+cu102
                 </div>
               
             
@@ -272,6 +271,7 @@
 <li class="toctree-l1"><a class="reference internal" href="dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="quantized_transfer_learning_tutorial.html">(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/static_quantization_tutorial.html">(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torchserve_with_ipex.html">Grokking PyTorch Intel CPU performance from first principles</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul>
@@ -298,6 +298,7 @@
 <p class="caption" role="heading"><span class="caption-text">Recommendation Systems</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="torchrec_tutorial.html">Introduction to TorchRec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/sharding.html">Exploring TorchRec sharding</a></li>
 </ul>
 
             
@@ -386,6 +387,7 @@
           </div>
 
         
+
           
           <div class="rst-content">
           
@@ -396,14 +398,14 @@
 <p class="admonition-title">Note</p>
 <p>Click <a class="reference internal" href="#sphx-glr-download-intermediate-text-to-speech-with-torchaudio-py"><span class="std std-ref">here</span></a> to download the full example code</p>
 </div>
-<section class="sphx-glr-example-title" id="text-to-speech-with-torchaudio">
+<div class="sphx-glr-example-title section" id="text-to-speech-with-torchaudio">
 <span id="sphx-glr-intermediate-text-to-speech-with-torchaudio-py"></span><h1>Text-to-speech with torchaudio<a class="headerlink" href="#text-to-speech-with-torchaudio" title="Permalink to this headline">¶</a></h1>
 <p><strong>Author</strong>: <a class="reference external" href="https://github.com/yangarbiter">Yao-Yuan Yang</a>, <a class="reference external" href="mailto:moto&#37;&#52;&#48;fb&#46;com">Moto
 Hira</a></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># %matplotlib inline</span>
 </pre></div>
 </div>
-<section id="overview">
+<div class="section" id="overview">
 <h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
 <p>This tutorial shows how to build text-to-speech pipeline, using the
 pretrained Tacotron2 in torchaudio.</p>
@@ -427,8 +429,8 @@ and
 <code class="docutils literal notranslate"><span class="pre">`Nvidia's</span> <span class="pre">WaveGlow</span></code> &lt;<a class="reference external" href="https://pytorch.org/hub/nvidia_deeplearningexamples_tacotron2/">https://pytorch.org/hub/nvidia_deeplearningexamples_tacotron2/</a>&gt;`__.</p>
 <p>The following figure illustrates the whole process.</p>
 <img alt="https://download.pytorch.org/torchaudio/tutorial-assets/tacotron2_tts_pipeline.png" src="https://download.pytorch.org/torchaudio/tutorial-assets/tacotron2_tts_pipeline.png" />
-</section>
-<section id="preparation">
+</div>
+<div class="section" id="preparation">
 <h2>Preparation<a class="headerlink" href="#preparation" title="Permalink to this headline">¶</a></h2>
 <p>First, we install the necessary dependencies. In addition to
 <code class="docutils literal notranslate"><span class="pre">torchaudio</span></code>, <code class="docutils literal notranslate"><span class="pre">DeepPhonemizer</span></code> is required to perform phoneme-based
@@ -449,10 +451,10 @@ encoding.</p>
 <span class="n">device</span> <span class="o">=</span> <span class="s2">&quot;cuda&quot;</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;cpu&quot;</span>
 </pre></div>
 </div>
-</section>
-<section id="text-processing">
+</div>
+<div class="section" id="text-processing">
 <h2>Text Processing<a class="headerlink" href="#text-processing" title="Permalink to this headline">¶</a></h2>
-<section id="character-based-encoding">
+<div class="section" id="character-based-encoding">
 <h3>Character-based encoding<a class="headerlink" href="#character-based-encoding" title="Permalink to this headline">¶</a></h3>
 <p>In this section, we will go through how the character-based encoding
 works.</p>
@@ -498,8 +500,8 @@ batch.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">([</span><span class="n">processor</span><span class="o">.</span><span class="n">tokens</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">processed</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:</span><span class="n">lengths</span><span class="p">[</span><span class="mi">0</span><span class="p">]]])</span>
 </pre></div>
 </div>
-</section>
-<section id="phoneme-based-encoding">
+</div>
+<div class="section" id="phoneme-based-encoding">
 <h3>Phoneme-based encoding<a class="headerlink" href="#phoneme-based-encoding" title="Permalink to this headline">¶</a></h3>
 <p>Phoneme-based encoding is similar to character-based encoding, but it
 uses a symbol table based on phonemes and a G2P (Grapheme-to-Phoneme)
@@ -531,9 +533,9 @@ character-based encoding.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">([</span><span class="n">processor</span><span class="o">.</span><span class="n">tokens</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">processed</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:</span><span class="n">lengths</span><span class="p">[</span><span class="mi">0</span><span class="p">]]])</span>
 </pre></div>
 </div>
-</section>
-</section>
-<section id="spectrogram-generation">
+</div>
+</div>
+<div class="section" id="spectrogram-generation">
 <h2>Spectrogram Generation<a class="headerlink" href="#spectrogram-generation" title="Permalink to this headline">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">Tacotron2</span></code> is the model we use to generate spectrogram from the
 encoded text. For the detail of the model, please refer to <a class="reference external" href="https://arxiv.org/abs/1712.05884">the
@@ -570,14 +572,14 @@ therefor, the process of generating the spectrogram incurs randomness.</p>
   <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-</section>
-<section id="waveform-generation">
+</div>
+<div class="section" id="waveform-generation">
 <h2>Waveform Generation<a class="headerlink" href="#waveform-generation" title="Permalink to this headline">¶</a></h2>
 <p>Once the spectrogram is generated, the last process is to recover the
 waveform from the spectrogram.</p>
 <p><code class="docutils literal notranslate"><span class="pre">torchaudio</span></code> provides vocoders based on <code class="docutils literal notranslate"><span class="pre">GriffinLim</span></code> and
 <code class="docutils literal notranslate"><span class="pre">WaveRNN</span></code>.</p>
-<section id="wavernn">
+<div class="section" id="wavernn">
 <h3>WaveRNN<a class="headerlink" href="#wavernn" title="Permalink to this headline">¶</a></h3>
 <p>Continuing from the previous section, we can instantiate the matching
 WaveRNN model from the same bundle.</p>
@@ -600,8 +602,8 @@ WaveRNN model from the same bundle.</p>
 <span class="n">IPython</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">display</span><span class="p">(</span><span class="n">IPython</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">Audio</span><span class="p">(</span><span class="s2">&quot;output_wavernn.wav&quot;</span><span class="p">))</span>
 </pre></div>
 </div>
-</section>
-<section id="griffin-lim">
+</div>
+<div class="section" id="griffin-lim">
 <h3>Griffin-Lim<a class="headerlink" href="#griffin-lim" title="Permalink to this headline">¶</a></h3>
 <p>Using the Griffin-Lim vocoder is same as WaveRNN. You can instantiate
 the vocode object with <code class="docutils literal notranslate"><span class="pre">get_vocoder</span></code> method and pass the spectrogram.</p>
@@ -622,8 +624,8 @@ the vocode object with <code class="docutils literal notranslate"><span class="p
 <span class="n">IPython</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">display</span><span class="p">(</span><span class="n">IPython</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">Audio</span><span class="p">(</span><span class="s2">&quot;output_griffinlim.wav&quot;</span><span class="p">))</span>
 </pre></div>
 </div>
-</section>
-<section id="waveglow">
+</div>
+<div class="section" id="waveglow">
 <h3>Waveglow<a class="headerlink" href="#waveglow" title="Permalink to this headline">¶</a></h3>
 <p>Waveglow is a vocoder published by Nvidia. The pretrained weight is
 publishe on Torch Hub. One can instantiate the model using <code class="docutils literal notranslate"><span class="pre">torch.hub</span></code>
@@ -650,9 +652,9 @@ module.</p>
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
-</section>
-</section>
-</section>
+</div>
+</div>
+</div>
 
 
              </article>
@@ -689,7 +691,7 @@ module.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2021, PyTorch &amp; PyTorch Korea Community.
+        &copy; Copyright 2022, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorch Korea User Group).
 
     </p>
   </div>
@@ -702,6 +704,13 @@ module.</p>
 </footer>
 
           </div>
+<script>
+if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.indexOf("/prototype/prototype_index")< 1))
+  {
+    var div = '<div class="admonition note"><p class="admonition-title">Note</p><p><i class="fa fa-flask" aria-hidden="true">&nbsp</i> 이 튜토리얼은 프로토타입(prototype) 기능들에 대해서 설명하고 있습니다. 프로토타입 기능은 일반적으로 피드백 및 테스트용으로, 런타임 플래그 없이는 PyPI나 Conda로 배포되는 바이너리에서는 사용할 수 없습니다.</p></div>'
+    document.getElementById("pytorch-article").insertAdjacentHTML('afterBegin', div)
+  }
+</script>
         </div>
 
         <div class="pytorch-content-right" id="pytorch-content-right">
@@ -763,7 +772,6 @@ module.</p>
       });
   </script>
  
-
 <script>
 //add microsoft link
 
@@ -842,7 +850,7 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
 </script>
 
 <script type="text/javascript">
-  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile'];
+  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile', 'Introduction to PyTorch on YouTube', 'Recommendation Systems'];
 </script>
 
 

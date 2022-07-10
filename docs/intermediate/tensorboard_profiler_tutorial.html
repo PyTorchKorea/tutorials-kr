@@ -6,24 +6,23 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
 <meta property="og:title" content="PyTorch Profiler With TensorBoard" />
   
 <meta property="og:type" content="article" />
   
-<meta property="og:url" content="http://tutorials.pytorch.kr/intermediate/tensorboard_profiler_tutorial.html" />
+<meta property="og:url" content="https://tutorials.pytorch.kr/intermediate/tensorboard_profiler_tutorial.html" />
   
 <meta property="og:description" content="This tutorial demonstrates how to use TensorBoard plugin with PyTorch Profiler to detect performance bottlenecks of the model. Introduction: PyTorch 1.8 includes an updated profiler API capable of recording the CPU side operations as well as the CUDA kernel launches on the GPU side. The profiler ..." />
   
-<meta property="og:image" content="http://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
+<meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
   
 <meta property="og:image:alt" content="PyTorch Profiler With TensorBoard" />
   
 <meta property="og:ignore_canonical" content="true" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>PyTorch Profiler With TensorBoard &mdash; 파이토치 한국어 튜토리얼(PyTorch tutorials in Korean)</title>
+  <title>PyTorch Profiler With TensorBoard &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
   
 
   
@@ -131,7 +130,7 @@
               
               
                 <div class="version">
-                  1.11.0+cu102
+                  1.12.0+cu102
                 </div>
               
             
@@ -272,6 +271,7 @@
 <li class="toctree-l1"><a class="reference internal" href="dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="quantized_transfer_learning_tutorial.html">(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/static_quantization_tutorial.html">(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torchserve_with_ipex.html">Grokking PyTorch Intel CPU performance from first principles</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul>
@@ -298,6 +298,7 @@
 <p class="caption" role="heading"><span class="caption-text">Recommendation Systems</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="torchrec_tutorial.html">Introduction to TorchRec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/sharding.html">Exploring TorchRec sharding</a></li>
 </ul>
 
             
@@ -386,6 +387,7 @@
           </div>
 
         
+
           
           <div class="rst-content">
           
@@ -396,11 +398,11 @@
 <p class="admonition-title">Note</p>
 <p>Click <a class="reference internal" href="#sphx-glr-download-intermediate-tensorboard-profiler-tutorial-py"><span class="std std-ref">here</span></a> to download the full example code</p>
 </div>
-<section class="sphx-glr-example-title" id="pytorch-profiler-with-tensorboard">
+<div class="sphx-glr-example-title section" id="pytorch-profiler-with-tensorboard">
 <span id="sphx-glr-intermediate-tensorboard-profiler-tutorial-py"></span><h1>PyTorch Profiler With TensorBoard<a class="headerlink" href="#pytorch-profiler-with-tensorboard" title="Permalink to this headline">¶</a></h1>
 <p>This tutorial demonstrates how to use TensorBoard plugin with PyTorch Profiler
 to detect performance bottlenecks of the model.</p>
-<section id="introduction">
+<div class="section" id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
 <p>PyTorch 1.8 includes an updated profiler API capable of
 recording the CPU side operations as well as the CUDA kernel launches on the GPU side.
@@ -408,15 +410,15 @@ The profiler can visualize this information
 in TensorBoard Plugin and provide analysis of the performance bottlenecks.</p>
 <p>In this tutorial, we will use a simple Resnet model to demonstrate how to
 use TensorBoard plugin to analyze model performance.</p>
-</section>
-<section id="setup">
+</div>
+<div class="section" id="setup">
 <h2>Setup<a class="headerlink" href="#setup" title="Permalink to this headline">¶</a></h2>
 <p>To install <code class="docutils literal notranslate"><span class="pre">torch</span></code> and <code class="docutils literal notranslate"><span class="pre">torchvision</span></code> use the following command:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">torch</span> <span class="n">torchvision</span>
 </pre></div>
 </div>
-</section>
-<section id="steps">
+</div>
+<div class="section" id="steps">
 <h2>Steps<a class="headerlink" href="#steps" title="Permalink to this headline">¶</a></h2>
 <ol class="arabic simple">
 <li><p>Prepare the data and model</p></li>
@@ -426,7 +428,7 @@ use TensorBoard plugin to analyze model performance.</p>
 <li><p>Improve performance with the help of profiler</p></li>
 <li><p>Analyze performance with other advanced features</p></li>
 </ol>
-<section id="prepare-the-data-and-model">
+<div class="section" id="prepare-the-data-and-model">
 <h3>1. Prepare the data and model<a class="headerlink" href="#prepare-the-data-and-model" title="Permalink to this headline">¶</a></h3>
 <p>First, import all necessary libraries:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
@@ -450,7 +452,8 @@ Transform it to the desired format and use DataLoader to load each batch.</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Files already downloaded and verified
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Downloading https://www.cs.toronto.edu/~kriz/cifar-10-python.tar.gz to ./data/cifar-10-python.tar.gz
+Extracting ./data/cifar-10-python.tar.gz to ./data
 </pre></div>
 </div>
 <p>Next, create Resnet model, loss function, and optimizer objects.
@@ -472,8 +475,8 @@ To run on GPU, move model and loss to GPU device.</p>
     <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
 </pre></div>
 </div>
-</section>
-<section id="use-profiler-to-record-execution-events">
+</div>
+<div class="section" id="use-profiler-to-record-execution-events">
 <h3>2. Use profiler to record execution events<a class="headerlink" href="#use-profiler-to-record-execution-events" title="Permalink to this headline">¶</a></h3>
 <p>The profiler is enabled through the context manager and accepts several parameters,
 some of the most useful are:</p>
@@ -532,12 +535,12 @@ clicking a stack frame will navigate to the specific code line.</p></li>
 <span class="n">prof</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
 </pre></div>
 </div>
-</section>
-<section id="run-the-profiler">
+</div>
+<div class="section" id="run-the-profiler">
 <h3>3. Run the profiler<a class="headerlink" href="#run-the-profiler" title="Permalink to this headline">¶</a></h3>
 <p>Run the above code. The profiling result will be saved under <code class="docutils literal notranslate"><span class="pre">./log/resnet18</span></code> directory.</p>
-</section>
-<section id="use-tensorboard-to-view-results-and-analyze-model-performance">
+</div>
+<div class="section" id="use-tensorboard-to-view-results-and-analyze-model-performance">
 <h3>4. Use TensorBoard to view results and analyze model performance<a class="headerlink" href="#use-tensorboard-to-view-results-and-analyze-model-performance" title="Permalink to this headline">¶</a></h3>
 <p>Install PyTorch Profiler TensorBoard Plugin.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">torch_tb_profiler</span>
@@ -619,8 +622,8 @@ you can click the text to get its launching forward operator.</p>
 And during most of this period, the GPU is idle.
 Because this function is loading data and transforming data on host side,
 during which the GPU resource is wasted.</p>
-</section>
-<section id="improve-performance-with-the-help-of-profiler">
+</div>
+<div class="section" id="improve-performance-with-the-help-of-profiler">
 <h3>5. Improve performance with the help of profiler<a class="headerlink" href="#improve-performance-with-the-help-of-profiler" title="Permalink to this headline">¶</a></h3>
 <p>At the bottom of “Overview” page, the suggestion in “Performance Recommendation” hints the bottleneck is DataLoader.
 The PyTorch DataLoader uses single process by default.
@@ -638,8 +641,8 @@ and the time reduction of <code class="docutils literal notranslate"><span class
 <a class="reference internal image-reference" href="../_static/img/profiler_trace_view2.png"><img alt="../_static/img/profiler_trace_view2.png" src="../_static/img/profiler_trace_view2.png" /></a>
 <p>From the above view, we can see that the runtime of <code class="docutils literal notranslate"><span class="pre">enumerate(DataLoader)</span></code> is reduced,
 and the GPU utilization is increased.</p>
-</section>
-<section id="analyze-performance-with-other-advanced-features">
+</div>
+<div class="section" id="analyze-performance-with-other-advanced-features">
 <h3>6. Analyze performance with other advanced features<a class="headerlink" href="#analyze-performance-with-other-advanced-features" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>Memory view</p></li>
@@ -697,9 +700,9 @@ there may be a problem of load balance or this worker may be a straggler.</p>
 <p>If one worker’s “Synchronizing Time” is much shorter than that of other workers’,
 this worker may be a straggler which may have more computation workload than other workers’.</p>
 <p>The “Communication Operations Stats” summarizes the detailed statistics of all communication ops in each worker.</p>
-</section>
-</section>
-<section id="learn-more">
+</div>
+</div>
+<div class="section" id="learn-more">
 <h2>Learn More<a class="headerlink" href="#learn-more" title="Permalink to this headline">¶</a></h2>
 <p>Take a look at the following documents to continue your learning,
 and feel free to open an issue <a class="reference external" href="https://github.com/pytorch/kineto/issues">here</a>.</p>
@@ -707,7 +710,7 @@ and feel free to open an issue <a class="reference external" href="https://githu
 <li><p><a class="reference external" href="https://github.com/pytorch/kineto/tree/master/tb_plugin">Pytorch TensorBoard Profiler github</a></p></li>
 <li><p><a class="reference external" href="https://pytorch.org/docs/master/profiler.html">torch.profiler API</a></p></li>
 </ul>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  23.908 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  37.244 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-intermediate-tensorboard-profiler-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/67e47b6d6793c700666471b688068f72/tensorboard_profiler_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">tensorboard_profiler_tutorial.py</span></code></a></p>
@@ -717,8 +720,8 @@ and feel free to open an issue <a class="reference external" href="https://githu
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
-</section>
-</section>
+</div>
+</div>
 
 
              </article>
@@ -755,7 +758,7 @@ and feel free to open an issue <a class="reference external" href="https://githu
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2021, PyTorch &amp; PyTorch Korea Community.
+        &copy; Copyright 2022, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorch Korea User Group).
 
     </p>
   </div>
@@ -768,6 +771,13 @@ and feel free to open an issue <a class="reference external" href="https://githu
 </footer>
 
           </div>
+<script>
+if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.indexOf("/prototype/prototype_index")< 1))
+  {
+    var div = '<div class="admonition note"><p class="admonition-title">Note</p><p><i class="fa fa-flask" aria-hidden="true">&nbsp</i> 이 튜토리얼은 프로토타입(prototype) 기능들에 대해서 설명하고 있습니다. 프로토타입 기능은 일반적으로 피드백 및 테스트용으로, 런타임 플래그 없이는 PyPI나 Conda로 배포되는 바이너리에서는 사용할 수 없습니다.</p></div>'
+    document.getElementById("pytorch-article").insertAdjacentHTML('afterBegin', div)
+  }
+</script>
         </div>
 
         <div class="pytorch-content-right" id="pytorch-content-right">
@@ -827,7 +837,6 @@ and feel free to open an issue <a class="reference external" href="https://githu
       });
   </script>
  
-
 <script>
 //add microsoft link
 
@@ -906,7 +915,7 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
 </script>
 
 <script type="text/javascript">
-  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile'];
+  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile', 'Introduction to PyTorch on YouTube', 'Recommendation Systems'];
 </script>
 
 

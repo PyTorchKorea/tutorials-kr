@@ -6,24 +6,23 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
 <meta property="og:title" content="Implementing a Parameter Server Using Distributed RPC Framework" />
   
 <meta property="og:type" content="article" />
   
-<meta property="og:url" content="http://tutorials.pytorch.kr/intermediate/rpc_param_server_tutorial.html" />
+<meta property="og:url" content="https://tutorials.pytorch.kr/intermediate/rpc_param_server_tutorial.html" />
   
 <meta property="og:description" content="Author: Rohan Varma Prerequisites: PyTorch Distributed Overview, RPC API documents. This tutorial walks through a simple example of implementing a parameter server using PyTorch’s Distributed RPC framework. The parameter server framework is a paradigm in which a set of servers store parameters, s..." />
   
-<meta property="og:image" content="http://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
+<meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
   
 <meta property="og:image:alt" content="Implementing a Parameter Server Using Distributed RPC Framework" />
   
 <meta property="og:ignore_canonical" content="true" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Implementing a Parameter Server Using Distributed RPC Framework &mdash; 파이토치 한국어 튜토리얼(PyTorch tutorials in Korean)</title>
+  <title>Implementing a Parameter Server Using Distributed RPC Framework &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
   
 
   
@@ -131,7 +130,7 @@
               
               
                 <div class="version">
-                  1.11.0+cu102
+                  1.12.0+cu102
                 </div>
               
             
@@ -272,6 +271,7 @@
 <li class="toctree-l1"><a class="reference internal" href="dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="quantized_transfer_learning_tutorial.html">(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/static_quantization_tutorial.html">(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torchserve_with_ipex.html">Grokking PyTorch Intel CPU performance from first principles</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul class="current">
@@ -298,6 +298,7 @@
 <p class="caption" role="heading"><span class="caption-text">Recommendation Systems</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="torchrec_tutorial.html">Introduction to TorchRec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/sharding.html">Exploring TorchRec sharding</a></li>
 </ul>
 
             
@@ -386,15 +387,20 @@
           </div>
 
         
+
           
           <div class="rst-content">
           
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <section id="implementing-a-parameter-server-using-distributed-rpc-framework">
+  <div class="section" id="implementing-a-parameter-server-using-distributed-rpc-framework">
 <h1>Implementing a Parameter Server Using Distributed RPC Framework<a class="headerlink" href="#implementing-a-parameter-server-using-distributed-rpc-framework" title="Permalink to this headline">¶</a></h1>
 <p><strong>Author</strong>: <a class="reference external" href="https://github.com/rohan-varma">Rohan Varma</a></p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>View the source code for this tutorial in <a class="reference external" href="https://github.com/pytorch/tutorials/blob/master/intermediate_source/rpc_param_server_tutorial.rst">github</a>.</p>
+</div>
 <p>Prerequisites:</p>
 <ul class="simple">
 <li><p><a class="reference external" href="../beginner/dist_overview.html">PyTorch Distributed Overview</a></p></li>
@@ -402,7 +408,7 @@
 </ul>
 <p>This tutorial walks through a simple example of implementing a parameter server using PyTorch’s <a class="reference external" href="https://pytorch.org/docs/stable/rpc.html">Distributed RPC framework</a>. The parameter server framework is a paradigm in which a set of servers store parameters, such as large embedding tables, and several trainers query the parameter servers in order to retrieve the most up to date parameters. These trainers can run a training loop locally and occasionally synchronize with the parameter server to get the latest parameters. For more reading on the parameter server approach, check out <a class="reference external" href="https://www.cs.cmu.edu/~muli/file/parameter_server_osdi14.pdf">this paper</a>.</p>
 <p>Using the Distributed RPC Framework, we’ll build an example where multiple trainers use RPC to communicate with the same parameter server and use <a class="reference external" href="https://pytorch.org/docs/stable/rpc.html#torch.distributed.rpc.RRef">RRef</a> to access states on the remote parameter server instance. Each trainer will launch its dedicated backward pass in a distributed fashion through stitching of the autograd graph across multiple nodes using distributed autograd.</p>
-<p><strong>Note</strong>: This tutorial covers the use of the Distributed RPC Framework, which is useful for splitting a model onto multiple machines, or for implementing a parameter-server training strategy where network trainers fetch parameters hosted on a different machine. If instead you are looking for replicating your model across many GPUs, please see the <a class="reference external" href="https://tutorials.pytorch.kr/intermediate/ddp_tutorial.html">Distributed Data Parallel tutorial</a>. There is also another <a class="reference external" href="https://tutorials.pytorch.kr/intermediate/rpc_tutorial.html">RPC tutorial</a> that covers reinforcement learning and RNN use cases.</p>
+<p><strong>Note</strong>: This tutorial covers the use of the Distributed RPC Framework, which is useful for splitting a model onto multiple machines, or for implementing a parameter-server training strategy where network trainers fetch parameters hosted on a different machine. If instead you are looking for replicating your model across many GPUs, please see the <a class="reference external" href="https://pytorch.org/tutorials/intermediate/ddp_tutorial.html">Distributed Data Parallel tutorial</a>. There is also another <a class="reference external" href="https://pytorch.org/tutorials/intermediate/rpc_tutorial.html">RPC tutorial</a> that covers reinforcement learning and RNN use cases.</p>
 <p>Let’s start with the familiar: importing our required modules and defining a simple ConvNet that will train on the MNIST dataset. The below network is largely adopted from the network defined in the <a class="reference external" href="https://github.com/pytorch/examples/tree/master/mnist">pytorch/examples repo</a>.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">argparse</span>
 <span class="kn">import</span> <span class="nn">os</span>
@@ -749,7 +755,7 @@
 </div>
 <p>To run the example locally, run the following command worker for the server and each worker you wish to spawn, in separate terminal windows: <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">rpc_parameter_server.py</span> <span class="pre">--world_size=WORLD_SIZE</span> <span class="pre">--rank=RANK</span></code>. For example, for a master node with world size of 2, the command would be <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">rpc_parameter_server.py</span> <span class="pre">--world_size=2</span> <span class="pre">--rank=0</span></code>. The trainer can then be launched with the command <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">rpc_parameter_server.py</span> <span class="pre">--world_size=2</span> <span class="pre">--rank=1</span></code> in a separate window, and this will begin training with one server and a single trainer. Note that this tutorial assumes that training occurs using between 0 and 2 GPUs, and this argument can be configured by passing <code class="docutils literal notranslate"><span class="pre">--num_gpus=N</span></code> into the training script.</p>
 <p>You can pass in the command line arguments <code class="docutils literal notranslate"><span class="pre">--master_addr=ADDRESS</span></code> and <code class="docutils literal notranslate"><span class="pre">--master_port=PORT</span></code> to indicate the address and port that the master worker is listening on, for example, to test functionality where trainers and master nodes run on different machines.</p>
-</section>
+</div>
 
 
              </article>
@@ -786,7 +792,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2021, PyTorch &amp; PyTorch Korea Community.
+        &copy; Copyright 2022, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorch Korea User Group).
 
     </p>
   </div>
@@ -799,6 +805,13 @@
 </footer>
 
           </div>
+<script>
+if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.indexOf("/prototype/prototype_index")< 1))
+  {
+    var div = '<div class="admonition note"><p class="admonition-title">Note</p><p><i class="fa fa-flask" aria-hidden="true">&nbsp</i> 이 튜토리얼은 프로토타입(prototype) 기능들에 대해서 설명하고 있습니다. 프로토타입 기능은 일반적으로 피드백 및 테스트용으로, 런타임 플래그 없이는 PyPI나 Conda로 배포되는 바이너리에서는 사용할 수 없습니다.</p></div>'
+    document.getElementById("pytorch-article").insertAdjacentHTML('afterBegin', div)
+  }
+</script>
         </div>
 
         <div class="pytorch-content-right" id="pytorch-content-right">
@@ -844,7 +857,6 @@
       });
   </script>
  
-
 <script>
 //add microsoft link
 
@@ -923,7 +935,7 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
 </script>
 
 <script type="text/javascript">
-  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile'];
+  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile', 'Introduction to PyTorch on YouTube', 'Recommendation Systems'];
 </script>
 
 

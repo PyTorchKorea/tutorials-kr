@@ -6,24 +6,23 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
 <meta property="og:title" content="(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화" />
   
 <meta property="og:type" content="article" />
   
-<meta property="og:url" content="http://tutorials.pytorch.kr/advanced/static_quantization_tutorial.html" />
+<meta property="og:url" content="https://tutorials.pytorch.kr/advanced/static_quantization_tutorial.html" />
   
 <meta property="og:description" content="저자: Raghuraman Krishnamoorthi 편집: Seth Weidman, Jerry Zhang 번역: 김현길, Choi Yoonjeong 이 튜토리얼에서는 어떻게 학습 후 정적 양자화(post-training static quantization)를 하는지 보여주며, 모델의 정확도(accuracy)을 더욱 높이기 위한 두 가지 고급 기술인 채널별 양자화(per-channel quantization)와 양자화 자각 학습(quantization-aware training)도 살펴봅니다. 현재 양자화는 CPU만 지원하기에..." />
   
-<meta property="og:image" content="http://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
+<meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
   
 <meta property="og:image:alt" content="(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화" />
   
 <meta property="og:ignore_canonical" content="true" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화 &mdash; 파이토치 한국어 튜토리얼(PyTorch tutorials in Korean)</title>
+  <title>(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화 &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
   
 
   
@@ -52,7 +51,7 @@
   <link rel="stylesheet" href="../_static/katex-math.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="PyTorch Distributed Overview" href="../beginner/dist_overview.html" />
+    <link rel="next" title="Grokking PyTorch Intel CPU performance from first principles" href="../intermediate/torchserve_with_ipex.html" />
     <link rel="prev" title="(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)" href="../intermediate/quantized_transfer_learning_tutorial.html" /> 
 
   
@@ -131,7 +130,7 @@
               
               
                 <div class="version">
-                  1.11.0+cu102
+                  1.12.0+cu102
                 </div>
               
             
@@ -272,6 +271,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/quantized_transfer_learning_tutorial.html">(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/torchserve_with_ipex.html">Grokking PyTorch Intel CPU performance from first principles</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul>
@@ -298,6 +298,7 @@
 <p class="caption" role="heading"><span class="caption-text">Recommendation Systems</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/torchrec_tutorial.html">Introduction to TorchRec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sharding.html">Exploring TorchRec sharding</a></li>
 </ul>
 
             
@@ -386,13 +387,14 @@
           </div>
 
         
+
           
           <div class="rst-content">
           
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <section id="pytorch-eager-mode">
+  <div class="section" id="pytorch-eager-mode">
 <h1>(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화<a class="headerlink" href="#pytorch-eager-mode" title="Permalink to this headline">¶</a></h1>
 <p><strong>저자</strong>: <a class="reference external" href="https://github.com/raghuramank100">Raghuraman Krishnamoorthi</a>
 <strong>편집</strong>: <a class="reference external" href="https://github.com/SethHWeidman/">Seth Weidman</a>, <a class="reference external" href="https:github.com/jerryzh168">Jerry Zhang</a>
@@ -438,7 +440,7 @@
 <span class="n">torch</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="mi">191009</span><span class="p">)</span>
 </pre></div>
 </div>
-<section id="id3">
+<div class="section" id="id3">
 <h2>1. 모델 아키텍처<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
 <p>처음으로 MobileNetV2 모델 아키텍처를 정의합니다.
 이 모델은 양자화를 위한 몇 가지 중요한 변경사항들이 있습니다:</p>
@@ -604,8 +606,8 @@
                         <span class="n">torch</span><span class="o">.</span><span class="n">quantization</span><span class="o">.</span><span class="n">fuse_modules</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">conv</span><span class="p">,</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">idx</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)],</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-<section id="helper">
+</div>
+<div class="section" id="helper">
 <h2>2. 헬퍼(Helper) 함수<a class="headerlink" href="#helper" title="Permalink to this headline">¶</a></h2>
 <p>다음으로 모델 평가를 위한 헬퍼 함수들을 만듭니다. 코드 대부분은
 <a class="reference external" href="https://github.com/pytorch/examples/blob/master/imagenet/main.py">여기</a> 에서 가져왔습니다.</p>
@@ -682,11 +684,11 @@
     <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s1">&#39;temp.p&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-<section id="dataset-dataloader">
+</div>
+<div class="section" id="dataset-dataloader">
 <h2>3. Dataset과 DataLoader 정의하기<a class="headerlink" href="#dataset-dataloader" title="Permalink to this headline">¶</a></h2>
 <p>마지막 주요 설정 단계로서 학습과 테스트 데이터를 위한 DataLoader를 정의합니다.</p>
-<section id="imagenet">
+<div class="section" id="imagenet">
 <h3>ImageNet 데이터<a class="headerlink" href="#imagenet" title="Permalink to this headline">¶</a></h3>
 <p>전체 ImageNet Dataset을 이용해서 이 튜토리얼의 코드를 실행시키기 위해, 첫번째로 <a class="reference external" href="http://www.image-net.org/download">ImageNet Data</a> 의 지시를 따라 ImageNet을 다운로드합니다. 다운로드한 파일의 압축을 ‘data_path’에 풉니다.</p>
 <p>다운로드받은 데이터를 읽기 위해 아래에 정의된 DataLoader 함수들을 사용합니다.
@@ -770,9 +772,9 @@
 </div>
 <p>전체 모델은 50,000개의 이미지를 가진 eval 데이터셋에서 71.9%의 정확도를 보입니다.</p>
 <p>이 값이 비교를 위한 기준이 될 것입니다. 다음으로 양자화된 모델을 봅시다.</p>
-</section>
-</section>
-<section id="post-training-static-quantization">
+</div>
+</div>
+<div class="section" id="post-training-static-quantization">
 <h2>4. 학습 후 정적 양자화(post-training static quantization)<a class="headerlink" href="#post-training-static-quantization" title="Permalink to this headline">¶</a></h2>
 <p>학습 후 정적 양자화는 동적 양자화처럼 가중치를 float에서 int로 변환하는 것뿐만 아니라
 추가적인 단계도 수행합니다. 네트워크에 데이터 배치의 첫 번째 공급과 다른 활성값들의
@@ -842,8 +844,8 @@ x86 아키텍처에서 양자화를 위한 권장 설정을 그대로 쓰기만 
 <p>단순히 양자화 설정 방법을 변경하는 것만으로도 정확도가 67.3%를 넘을 정도로 향상이 되었습니다!
 그럼에도 이 수치는 위에서 구한 기준값 71.9%에서 4퍼센트나 낮은 수치입니다.
 이제 양자화 자각 학습을 시도해 봅시다.</p>
-</section>
-<section id="quantization-aware-training">
+</div>
+<div class="section" id="quantization-aware-training">
 <h2>5. 양자화 자각 학습(Quantization-aware training)<a class="headerlink" href="#quantization-aware-training" title="Permalink to this headline">¶</a></h2>
 <p>양자화 자각 학습(QAT)은 일반적으로 가장 높은 정확도를 제공하는 양자화 방법입니다.
 모든 가중치화 활성값은 QAT로 인해 학습 도중에 순전파와 역전파를 도중 “가짜 양자화”됩니다.
@@ -940,7 +942,7 @@ Observer를 명시하는 것 대신에 말이죠.</p></li>
 실제 양자화된 연산의 수치를 모델링하기 위해 가짜 양자화를 이용하고 있기 때문입니다.</p></li>
 <li><p>학습 후 양자화 또한 쉽게 흉내낼 수 있습니다.</p></li>
 </ul>
-<section id="id8">
+<div class="section" id="id8">
 <h3>양자화를 통한 속도 향상<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
 <p>마지막으로 위에서 언급한 것들을 확인해 봅시다. 양자화된 모델이 실제로 추론도 더 빠르게 하는 걸까요?
 시험해 봅시다:</p>
@@ -971,17 +973,17 @@ Observer를 명시하는 것 대신에 말이죠.</p></li>
 <p>맥북 프로의 로컬 환경에서 일반적인 모델 실행은 61ms, 양자화된 모델 실행은 20ms가 걸렸습니다.
 이러한 결과는 부동소수점 모델과 양자화된 모델을 비교했을 때,
 양자화된 모델에서 일반적으로 2-4x 속도 향상이 이루어진 것을 보여줍니다.</p>
-</section>
-</section>
-<section id="id9">
+</div>
+</div>
+<div class="section" id="id9">
 <h2>결론<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h2>
 <p>이 튜토리얼에서 학습 후 정적 양자화와 양자화 자각 학습이라는 두 가지 양자화 방법을 살펴봤습니다.
 이 양자화 방법들이 “내부적으로” 어떻게 동작을 하는지와
 PyTorch에서 어떻게 사용할 수 있는지도 보았습니다.</p>
 <p>읽어주셔서 감사합니다. 언제나처럼 어떠한 피드백도 환영이니, 의견이 있다면
 <a class="reference external" href="https://github.com/pytorch/pytorch/issues">여기</a> 에 이슈를 남겨 주세요.</p>
-</section>
-</section>
+</div>
+</div>
 
 
              </article>
@@ -991,7 +993,7 @@ PyTorch에서 어떻게 사용할 수 있는지도 보았습니다.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../beginner/dist_overview.html" class="btn btn-neutral float-right" title="PyTorch Distributed Overview" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
+        <a href="../intermediate/torchserve_with_ipex.html" class="btn btn-neutral float-right" title="Grokking PyTorch Intel CPU performance from first principles" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
       
       
         <a href="../intermediate/quantized_transfer_learning_tutorial.html" class="btn btn-neutral" title="(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
@@ -1018,7 +1020,7 @@ PyTorch에서 어떻게 사용할 수 있는지도 보았습니다.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2021, PyTorch &amp; PyTorch Korea Community.
+        &copy; Copyright 2022, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorch Korea User Group).
 
     </p>
   </div>
@@ -1031,6 +1033,13 @@ PyTorch에서 어떻게 사용할 수 있는지도 보았습니다.</p>
 </footer>
 
           </div>
+<script>
+if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.indexOf("/prototype/prototype_index")< 1))
+  {
+    var div = '<div class="admonition note"><p class="admonition-title">Note</p><p><i class="fa fa-flask" aria-hidden="true">&nbsp</i> 이 튜토리얼은 프로토타입(prototype) 기능들에 대해서 설명하고 있습니다. 프로토타입 기능은 일반적으로 피드백 및 테스트용으로, 런타임 플래그 없이는 PyPI나 Conda로 배포되는 바이너리에서는 사용할 수 없습니다.</p></div>'
+    document.getElementById("pytorch-article").insertAdjacentHTML('afterBegin', div)
+  }
+</script>
         </div>
 
         <div class="pytorch-content-right" id="pytorch-content-right">
@@ -1090,7 +1099,6 @@ PyTorch에서 어떻게 사용할 수 있는지도 보았습니다.</p>
       });
   </script>
  
-
 <script>
 //add microsoft link
 
@@ -1169,7 +1177,7 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
 </script>
 
 <script type="text/javascript">
-  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile'];
+  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile', 'Introduction to PyTorch on YouTube', 'Recommendation Systems'];
 </script>
 
 

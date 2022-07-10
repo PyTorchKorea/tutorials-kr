@@ -6,24 +6,23 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
 <meta property="og:title" content="Torch 사용자를 위한 PyTorch" />
   
 <meta property="og:type" content="article" />
   
-<meta property="og:url" content="http://tutorials.pytorch.kr/beginner/former_torchies_tutorial.html" />
+<meta property="og:url" content="https://tutorials.pytorch.kr/beginner/former_torchies_tutorial.html" />
   
 <meta property="og:description" content="Author: Soumith Chintala, 번역: 박정환,. 이 튜토리얼에서는 아래와 같은 것들을 배워보겠습니다: torch Tensor를 사용해보고, (Lua)Torch와의 주요한 차이를 알아봅니다., autograd 패키지를 사용해봅니다., 신경망을 구성해봅니다.. 합성곱 신경망(ConvNet) 구성하기, 순환 신경망(Recurrent Net) 구성하기. 여러개의 GPU를 사용해봅니다.. Tensor, Autograd, nn 패키지, 멀티-GPU 예제," />
   
-<meta property="og:image" content="http://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
+<meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
   
 <meta property="og:image:alt" content="Torch 사용자를 위한 PyTorch" />
   
 <meta property="og:ignore_canonical" content="true" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Torch 사용자를 위한 PyTorch &mdash; 파이토치 한국어 튜토리얼(PyTorch tutorials in Korean)</title>
+  <title>Torch 사용자를 위한 PyTorch &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
   
 
   
@@ -129,7 +128,7 @@
               
               
                 <div class="version">
-                  1.11.0+cu102
+                  1.12.0+cu102
                 </div>
               
             
@@ -270,6 +269,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/quantized_transfer_learning_tutorial.html">(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/static_quantization_tutorial.html">(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/torchserve_with_ipex.html">Grokking PyTorch Intel CPU performance from first principles</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul>
@@ -296,6 +296,7 @@
 <p class="caption" role="heading"><span class="caption-text">Recommendation Systems</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/torchrec_tutorial.html">Introduction to TorchRec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/sharding.html">Exploring TorchRec sharding</a></li>
 </ul>
 
             
@@ -384,13 +385,14 @@
           </div>
 
         
+
           
           <div class="rst-content">
           
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <section id="torch-pytorch">
+  <div class="section" id="torch-pytorch">
 <h1>Torch 사용자를 위한 PyTorch<a class="headerlink" href="#torch-pytorch" title="Permalink to this headline">¶</a></h1>
 <dl class="simple">
 <dt><strong>Author</strong>: <a class="reference external" href="http://soumith.ch">Soumith Chintala</a></dt><dd><p><strong>번역</strong>: <a class="reference external" href="http://github.com/9bow">박정환</a></p>
@@ -413,35 +415,27 @@
 </ol>
 <div class="toctree-wrapper compound">
 </div>
-<p><div class="sphx-glr-thumbcontainer" tooltip="PyTorch에서의 Tensor는 Torch에서와 거의 동일하게 동작합니다."><figure class="align-default" id="id2">
+<p><div class="sphx-glr-thumbcontainer" tooltip="PyTorch에서의 Tensor는 Torch에서와 거의 동일하게 동작합니다."><div class="figure align-default" id="id2">
 <img alt="../_images/tensor_illustration_flat.png" src="../_images/tensor_illustration_flat.png" />
-<figcaption>
-<p><span class="caption-text"><a class="reference internal" href="former_torchies/tensor_tutorial_old.html#sphx-glr-beginner-former-torchies-tensor-tutorial-old-py"><span class="std std-ref">Tensor</span></a></span><a class="headerlink" href="#id2" title="Permalink to this image">¶</a></p>
-</figcaption>
-</figure>
+<p class="caption"><span class="caption-text"><a class="reference internal" href="former_torchies/tensor_tutorial_old.html#sphx-glr-beginner-former-torchies-tensor-tutorial-old-py"><span class="std std-ref">Tensor</span></a></span><a class="headerlink" href="#id2" title="Permalink to this image">¶</a></p>
+</div>
 </div></p>
-<p><div class="sphx-glr-thumbcontainer" tooltip="Autograd는 자동 미분을 수행하는 torch의 핵심 패키지로, 자동 미분을 위해 테잎(tape) 기반 시스템을 사용합니다."><figure class="align-default" id="id3">
+<p><div class="sphx-glr-thumbcontainer" tooltip="Autograd는 자동 미분을 수행하는 torch의 핵심 패키지로, 자동 미분을 위해 테잎(tape) 기반 시스템을 사용합니다."><div class="figure align-default" id="id3">
 <img alt="../_images/sphx_glr_autograd_tutorial_old_thumb.png" src="../_images/sphx_glr_autograd_tutorial_old_thumb.png" />
-<figcaption>
-<p><span class="caption-text"><a class="reference internal" href="former_torchies/autograd_tutorial_old.html#sphx-glr-beginner-former-torchies-autograd-tutorial-old-py"><span class="std std-ref">Autograd</span></a></span><a class="headerlink" href="#id3" title="Permalink to this image">¶</a></p>
-</figcaption>
-</figure>
+<p class="caption"><span class="caption-text"><a class="reference internal" href="former_torchies/autograd_tutorial_old.html#sphx-glr-beginner-former-torchies-autograd-tutorial-old-py"><span class="std std-ref">Autograd</span></a></span><a class="headerlink" href="#id3" title="Permalink to this image">¶</a></p>
+</div>
 </div></p>
-<p><div class="sphx-glr-thumbcontainer" tooltip="autograd에 완벽히 통합되게 하기 위해 nn 패키지를 재설계하였습니다. 이제 무엇이 변경되었는지 살펴보겠습니다."><figure class="align-default" id="id4">
+<p><div class="sphx-glr-thumbcontainer" tooltip="autograd에 완벽히 통합되게 하기 위해 nn 패키지를 재설계하였습니다. 이제 무엇이 변경되었는지 살펴보겠습니다."><div class="figure align-default" id="id4">
 <img alt="../_images/torch-nn-vs-pytorch-nn1.png" src="../_images/torch-nn-vs-pytorch-nn1.png" />
-<figcaption>
-<p><span class="caption-text"><a class="reference internal" href="former_torchies/nnft_tutorial.html#sphx-glr-beginner-former-torchies-nnft-tutorial-py"><span class="std std-ref">nn 패키지</span></a></span><a class="headerlink" href="#id4" title="Permalink to this image">¶</a></p>
-</figcaption>
-</figure>
+<p class="caption"><span class="caption-text"><a class="reference internal" href="former_torchies/nnft_tutorial.html#sphx-glr-beginner-former-torchies-nnft-tutorial-py"><span class="std std-ref">nn 패키지</span></a></span><a class="headerlink" href="#id4" title="Permalink to this image">¶</a></p>
+</div>
 </div></p>
-<p><div class="sphx-glr-thumbcontainer" tooltip="데이터 병렬 처리(Data Parallelism)는 미니-배치를 여러 개의 더 작은 미니-배치로 자르고 각각의 작은 미니배치를 병렬적으로 연산하는 것입니다."><figure class="align-default" id="id5">
+<p><div class="sphx-glr-thumbcontainer" tooltip="데이터 병렬 처리(Data Parallelism)는 미니-배치를 여러 개의 더 작은 미니-배치로 자르고 각각의 작은 미니배치를 병렬적으로 연산하는 것입니다."><div class="figure align-default" id="id5">
 <img alt="../_images/sphx_glr_parallelism_tutorial_thumb.png" src="../_images/sphx_glr_parallelism_tutorial_thumb.png" />
-<figcaption>
-<p><span class="caption-text"><a class="reference internal" href="former_torchies/parallelism_tutorial.html#sphx-glr-beginner-former-torchies-parallelism-tutorial-py"><span class="std std-ref">멀티-GPU 예제</span></a></span><a class="headerlink" href="#id5" title="Permalink to this image">¶</a></p>
-</figcaption>
-</figure>
+<p class="caption"><span class="caption-text"><a class="reference internal" href="former_torchies/parallelism_tutorial.html#sphx-glr-beginner-former-torchies-parallelism-tutorial-py"><span class="std std-ref">멀티-GPU 예제</span></a></span><a class="headerlink" href="#id5" title="Permalink to this image">¶</a></p>
+</div>
 </div></p>
-<div style='clear:both'></div></section>
+<div style='clear:both'></div></div>
 
 
              </article>
@@ -469,7 +463,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2021, PyTorch &amp; PyTorch Korea Community.
+        &copy; Copyright 2022, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorch Korea User Group).
 
     </p>
   </div>
@@ -482,6 +476,13 @@
 </footer>
 
           </div>
+<script>
+if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.indexOf("/prototype/prototype_index")< 1))
+  {
+    var div = '<div class="admonition note"><p class="admonition-title">Note</p><p><i class="fa fa-flask" aria-hidden="true">&nbsp</i> 이 튜토리얼은 프로토타입(prototype) 기능들에 대해서 설명하고 있습니다. 프로토타입 기능은 일반적으로 피드백 및 테스트용으로, 런타임 플래그 없이는 PyPI나 Conda로 배포되는 바이너리에서는 사용할 수 없습니다.</p></div>'
+    document.getElementById("pytorch-article").insertAdjacentHTML('afterBegin', div)
+  }
+</script>
         </div>
 
         <div class="pytorch-content-right" id="pytorch-content-right">
@@ -527,7 +528,6 @@
       });
   </script>
  
-
 <script>
 //add microsoft link
 
@@ -606,7 +606,7 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
 </script>
 
 <script type="text/javascript">
-  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile'];
+  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile', 'Introduction to PyTorch on YouTube', 'Recommendation Systems'];
 </script>
 
 

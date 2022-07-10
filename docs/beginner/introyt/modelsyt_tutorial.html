@@ -6,24 +6,23 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
 <meta property="og:title" content="Building Models with PyTorch" />
   
 <meta property="og:type" content="article" />
   
-<meta property="og:url" content="http://tutorials.pytorch.kr/beginner/introyt/modelsyt_tutorial.html" />
+<meta property="og:url" content="https://tutorials.pytorch.kr/beginner/introyt/modelsyt_tutorial.html" />
   
 <meta property="og:description" content="Introduction|| Tensors|| Autograd|| Building Models|| TensorBoard Support|| Training Models|| Model Understanding Follow along with the video below or on youtube. torch.nn.Module and torch.nn.Parameter: In this video, we’ll be discussing some of the tools PyTorch makes available for building deep..." />
   
-<meta property="og:image" content="http://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
+<meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
   
 <meta property="og:image:alt" content="Building Models with PyTorch" />
   
 <meta property="og:ignore_canonical" content="true" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Building Models with PyTorch &mdash; 파이토치 한국어 튜토리얼(PyTorch tutorials in Korean)</title>
+  <title>Building Models with PyTorch &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
   
 
   
@@ -131,7 +130,7 @@
               
               
                 <div class="version">
-                  1.11.0+cu102
+                  1.12.0+cu102
                 </div>
               
             
@@ -272,6 +271,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/quantized_transfer_learning_tutorial.html">(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../advanced/static_quantization_tutorial.html">(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../intermediate/torchserve_with_ipex.html">Grokking PyTorch Intel CPU performance from first principles</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul>
@@ -298,6 +298,7 @@
 <p class="caption" role="heading"><span class="caption-text">Recommendation Systems</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/torchrec_tutorial.html">Introduction to TorchRec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../advanced/sharding.html">Exploring TorchRec sharding</a></li>
 </ul>
 
             
@@ -386,6 +387,7 @@
           </div>
 
         
+
           
           <div class="rst-content">
           
@@ -403,12 +405,12 @@
 <a class="reference external" href="tensorboardyt_tutorial.html">TensorBoard Support</a> ||
 <a class="reference external" href="trainingyt.html">Training Models</a> ||
 <a class="reference external" href="captumyt.html">Model Understanding</a></p>
-<section id="building-models-with-pytorch">
+<div class="section" id="building-models-with-pytorch">
 <h1>Building Models with PyTorch<a class="headerlink" href="#building-models-with-pytorch" title="Permalink to this headline">¶</a></h1>
 <p>Follow along with the video below or on <a class="reference external" href="https://www.youtube.com/watch?v=OSqIP-mOWOI">youtube</a>.</p>
 <div style="margin-top:10px; margin-bottom:10px;">
   <iframe width="560" height="315" src="https://www.youtube.com/embed/OSqIP-mOWOI" frameborder="0" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-</div><section id="torch-nn-module-and-torch-nn-parameter">
+</div><div class="section" id="torch-nn-module-and-torch-nn-parameter">
 <h2><code class="docutils literal notranslate"><span class="pre">torch.nn.Module</span></code> and <code class="docutils literal notranslate"><span class="pre">torch.nn.Parameter</span></code><a class="headerlink" href="#torch-nn-module-and-torch-nn-parameter" title="Permalink to this headline">¶</a></h2>
 <p>In this video, we’ll be discussing some of the tools PyTorch makes
 available for building deep learning networks.</p>
@@ -547,15 +549,15 @@ tensor([ 0.0559,  0.0573, -0.0445,  0.0054, -0.0205,  0.0247,  0.0180,  0.0553,
 model, and a <code class="docutils literal notranslate"><span class="pre">forward()</span></code> method where the computation gets done. Note
 that we can print the model, or any of its submodules, to learn about
 its structure.</p>
-</section>
-<section id="common-layer-types">
+</div>
+<div class="section" id="common-layer-types">
 <h2>Common Layer Types<a class="headerlink" href="#common-layer-types" title="Permalink to this headline">¶</a></h2>
-<section id="linear-layers">
+<div class="section" id="linear-layers">
 <h3>Linear Layers<a class="headerlink" href="#linear-layers" title="Permalink to this headline">¶</a></h3>
 <p>The most basic type of neural network layer is a <em>linear</em> or <em>fully
 connected</em> layer. This is a layer where every input influences every
 output of the layer to a degree specified by the layer’s weights. If a
-model has <em>m</em> inputs and <em>n</em> outputs, the weights will be an <em>m*x*n</em>
+model has <em>m</em> inputs and <em>n</em> outputs, the weights will be an <em>m</em> x <em>n</em>
 matrix. For example:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">lin</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
 <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
@@ -601,14 +603,14 @@ common places you’ll see them is in classifier models, which will
 usually have one or more linear layers at the end, where the last layer
 will have <em>n</em> outputs, where <em>n</em> is the number of classes the classifier
 addresses.</p>
-</section>
-<section id="convolutional-layers">
+</div>
+<div class="section" id="convolutional-layers">
 <h3>Convolutional Layers<a class="headerlink" href="#convolutional-layers" title="Permalink to this headline">¶</a></h3>
 <p><em>Convolutional</em> layers are built to handle data with a high degree of
 spatial correlation. They are very commonly used in computer vision,
 where they detect close groupings of features which the compose into
 higher-level features. They pop up in other contexts too - for example,
-in NLP applications, where the a word’s immediate context (that is, the
+in NLP applications, where a word’s immediate context (that is, the
 other words nearby in the sequence) can affect the meaning of a
 sentence.</p>
 <p>We saw convolutional layers in action in LeNet5 in an earlier video:</p>
@@ -693,8 +695,8 @@ every third position) in the input, padding (so you can scan out to the
 edges of the input), and more. See the
 <a class="reference external" href="https://pytorch.org/docs/stable/nn.html#convolution-layers">documentation</a>
 for more information.</p>
-</section>
-<section id="recurrent-layers">
+</div>
+<div class="section" id="recurrent-layers">
 <h3>Recurrent Layers<a class="headerlink" href="#recurrent-layers" title="Permalink to this headline">¶</a></h3>
 <p><em>Recurrent neural networks</em> (or <em>RNNs)</em> are used for sequential data -
 anything from time-series measurements from a scientific instrument to
@@ -749,12 +751,12 @@ embeddings and iterates over it, fielding an output vector of length
 <code class="docutils literal notranslate"><span class="pre">log_softmax()</span></code> to the output of the final layer converts the output
 into a normalized set of estimated probabilities that a given word maps
 to a given tag.</p>
-<p>If you’d like to see this network in action, check out the <a class="reference external" href="https://tutorials.pytorch.kr/beginner/nlp/sequence_models_tutorial.html">Sequence
+<p>If you’d like to see this network in action, check out the <a class="reference external" href="https://pytorch.org/tutorials/beginner/nlp/sequence_models_tutorial.html">Sequence
 Models and LSTM
 Networks</a>
 tutorial on pytorch.org.</p>
-</section>
-<section id="transformers">
+</div>
+<div class="section" id="transformers">
 <h3>Transformers<a class="headerlink" href="#transformers" title="Permalink to this headline">¶</a></h3>
 <p><em>Transformers</em> are multi-purpose networks that have taken over the state
 of the art in NLP with models like BERT. A discussion of transformer
@@ -769,13 +771,13 @@ encapsulate the individual components (<code class="docutils literal notranslate
 <code class="docutils literal notranslate"><span class="pre">TransformerDecoderLayer</span></code>). For details, check out the
 <a class="reference external" href="https://pytorch.org/docs/stable/nn.html#transformer-layers">documentation</a>
 on transformer classes, and the relevant
-<a class="reference external" href="https://tutorials.pytorch.kr/beginner/transformer_tutorial.html">tutorial</a>
+<a class="reference external" href="https://pytorch.org/tutorials/beginner/transformer_tutorial.html">tutorial</a>
 on pytorch.org.</p>
-</section>
-</section>
-<section id="other-layers-and-functions">
+</div>
+</div>
+<div class="section" id="other-layers-and-functions">
 <h2>Other Layers and Functions<a class="headerlink" href="#other-layers-and-functions" title="Permalink to this headline">¶</a></h2>
-<section id="data-manipulation-layers">
+<div class="section" id="data-manipulation-layers">
 <h3>Data Manipulation Layers<a class="headerlink" href="#data-manipulation-layers" title="Permalink to this headline">¶</a></h3>
 <p>There are other layer types that perform important functions in models,
 but don’t participate in the learning process themselves.</p>
@@ -871,8 +873,8 @@ tensor([[[0.0000, 0.0000, 0.3872, 1.3643],
 <p>Above, you can see the effect of dropout on a sample tensor. You can use
 the optional <code class="docutils literal notranslate"><span class="pre">p</span></code> argument to set the probability of an individual
 weight dropping out; if you don’t it defaults to 0.5.</p>
-</section>
-<section id="activation-functions">
+</div>
+<div class="section" id="activation-functions">
 <h3>Activation Functions<a class="headerlink" href="#activation-functions" title="Permalink to this headline">¶</a></h3>
 <p>Activation functions make deep learning possible. A neural network is
 really a program - with many parameters - that <em>simulates a mathematical
@@ -886,14 +888,14 @@ learning model to simulate any function, rather than just linear ones.</p>
 activation functions including ReLU and its many variants, Tanh,
 Hardtanh, sigmoid, and more. It also includes other functions, such as
 Softmax, that are most useful at the output stage of a model.</p>
-</section>
-<section id="loss-functions">
+</div>
+<div class="section" id="loss-functions">
 <h3>Loss Functions<a class="headerlink" href="#loss-functions" title="Permalink to this headline">¶</a></h3>
 <p>Loss functions tell us how far a model’s prediction is from the correct
 answer. PyTorch contains a variety of loss functions, including common
 MSE (mean squared error = L2 norm), Cross Entropy Loss and Negative
 Likelihood Loss (useful for classifiers), and others.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.184 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.304 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-beginner-introyt-modelsyt-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/88355d650eb3d5ee6afedaebb57fb9b3/modelsyt_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">modelsyt_tutorial.py</span></code></a></p>
@@ -903,9 +905,9 @@ Likelihood Loss (useful for classifiers), and others.</p>
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
-</section>
-</section>
-</section>
+</div>
+</div>
+</div>
 
 
              </article>
@@ -942,7 +944,7 @@ Likelihood Loss (useful for classifiers), and others.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2021, PyTorch &amp; PyTorch Korea Community.
+        &copy; Copyright 2022, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorch Korea User Group).
 
     </p>
   </div>
@@ -955,6 +957,13 @@ Likelihood Loss (useful for classifiers), and others.</p>
 </footer>
 
           </div>
+<script>
+if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.indexOf("/prototype/prototype_index")< 1))
+  {
+    var div = '<div class="admonition note"><p class="admonition-title">Note</p><p><i class="fa fa-flask" aria-hidden="true">&nbsp</i> 이 튜토리얼은 프로토타입(prototype) 기능들에 대해서 설명하고 있습니다. 프로토타입 기능은 일반적으로 피드백 및 테스트용으로, 런타임 플래그 없이는 PyPI나 Conda로 배포되는 바이너리에서는 사용할 수 없습니다.</p></div>'
+    document.getElementById("pytorch-article").insertAdjacentHTML('afterBegin', div)
+  }
+</script>
         </div>
 
         <div class="pytorch-content-right" id="pytorch-content-right">
@@ -1016,7 +1025,6 @@ Likelihood Loss (useful for classifiers), and others.</p>
       });
   </script>
  
-
 <script>
 //add microsoft link
 
@@ -1095,7 +1103,7 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
 </script>
 
 <script type="text/javascript">
-  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile'];
+  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile', 'Introduction to PyTorch on YouTube', 'Recommendation Systems'];
 </script>
 
 

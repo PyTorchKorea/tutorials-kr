@@ -6,24 +6,23 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
 <meta property="og:title" content="마리오 게임 RL 에이전트로 학습하기" />
   
 <meta property="og:type" content="article" />
   
-<meta property="og:url" content="http://tutorials.pytorch.kr/intermediate/mario_rl_tutorial.html" />
+<meta property="og:url" content="https://tutorials.pytorch.kr/intermediate/mario_rl_tutorial.html" />
   
 <meta property="og:description" content="저자: Yuansong Feng, Suraj Subramanian, Howard Wang, Steven Guo. 번역: 김태영. 이번 튜토리얼에서는 심층 강화 학습의 기본 사항들에 대해 이야기해보도록 하겠습니다. 마지막에는, 스스로 게임을 할 수 있는 AI 기반 마리오를 ( Double Deep Q-Networks 사용) 구현하게 됩니다. 이 튜토리얼에서는 RL에 대한 사전 지식이 필요하지 않지만, 이러한 링크 를 통해 RL 개념에 친숙해 질 수 있으며, 여기 있는 치트시트 를 활용할 수도 있습니다. 튜토리얼에서 사용하는 전체..." />
   
-<meta property="og:image" content="http://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
+<meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
   
 <meta property="og:image:alt" content="마리오 게임 RL 에이전트로 학습하기" />
   
 <meta property="og:ignore_canonical" content="true" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>마리오 게임 RL 에이전트로 학습하기 &mdash; 파이토치 한국어 튜토리얼(PyTorch tutorials in Korean)</title>
+  <title>마리오 게임 RL 에이전트로 학습하기 &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
   
 
   
@@ -131,7 +130,7 @@
               
               
                 <div class="version">
-                  1.11.0+cu102
+                  1.12.0+cu102
                 </div>
               
             
@@ -272,6 +271,7 @@
 <li class="toctree-l1"><a class="reference internal" href="dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="quantized_transfer_learning_tutorial.html">(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/static_quantization_tutorial.html">(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torchserve_with_ipex.html">Grokking PyTorch Intel CPU performance from first principles</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul>
@@ -298,6 +298,7 @@
 <p class="caption" role="heading"><span class="caption-text">Recommendation Systems</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="torchrec_tutorial.html">Introduction to TorchRec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/sharding.html">Exploring TorchRec sharding</a></li>
 </ul>
 
             
@@ -386,6 +387,7 @@
           </div>
 
         
+
           
           <div class="rst-content">
           
@@ -396,7 +398,7 @@
 <p class="admonition-title">Note</p>
 <p>Click <a class="reference internal" href="#sphx-glr-download-intermediate-mario-rl-tutorial-py"><span class="std std-ref">here</span></a> to download the full example code</p>
 </div>
-<section class="sphx-glr-example-title" id="rl">
+<div class="sphx-glr-example-title section" id="rl">
 <span id="sphx-glr-intermediate-mario-rl-tutorial-py"></span><h1>마리오 게임 RL 에이전트로 학습하기<a class="headerlink" href="#rl" title="Permalink to this headline">¶</a></h1>
 <p>저자: <a class="reference external" href="https://github.com/YuansongFeng">Yuansong Feng</a>, <a class="reference external" href="https://github.com/suraj813">Suraj
 Subramanian</a>, <a class="reference external" href="https://github.com/hw26">Howard
@@ -415,9 +417,9 @@ Guo</a>.</p>
 를 활용할 수도 있습니다. 튜토리얼에서 사용하는 전체 코드는
 <a class="reference external" href="https://github.com/yuansongFeng/MadMario/">여기</a>
 에서 확인 할 수 있습니다.</p>
-<figure class="align-default">
+<div class="figure align-default">
 <img alt="mario" src="../_images/mario.gif" />
-</figure>
+</div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># !pip install gym-super-mario-bros==7.3.0</span>
 
 <span class="kn">import</span> <span class="nn">torch</span>
@@ -441,7 +443,7 @@ Guo</a>.</p>
 <span class="kn">import</span> <span class="nn">gym_super_mario_bros</span>
 </pre></div>
 </div>
-<section id="id1">
+<div class="section" id="id1">
 <h2>강화학습 개념<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
 <p><strong>환경(Environment)</strong> : 에이전트가 상호작용하며 스스로 배우는 세계입니다.</p>
 <p><strong>행동(Action)</strong> <span class="math">\(a\)</span> : 에이전트가 환경에 어떻게 응답하는지 행동을 통해 나타냅니다.
@@ -456,10 +458,10 @@ Guo</a>.</p>
 를 선택합니다. 그리고 각각의 미래의 단계에서 포상의 합을 극대화하는 행동을 선택하도록 합니다.
 <span class="math">\(Q\)</span> 는 상태에서 행동의 “품질”
 을 나타냅니다. 우리는 이 함수를 근사 시키려고 합니다.</p>
-</section>
-<section id="environment">
+</div>
+<div class="section" id="environment">
 <h2>환경(Environment)<a class="headerlink" href="#environment" title="Permalink to this headline">¶</a></h2>
-<section id="id2">
+<div class="section" id="id2">
 <h3>환경 초기화하기<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
 <p>마리오 게임에서 환경은 튜브, 버섯, 그 이외 다른 여러 요소들로 구성되어 있습니다.</p>
 <p>마리오가 행동을 취하면, 환경은 변경된 (다음)상태, 포상 그리고
@@ -484,8 +486,8 @@ Guo</a>.</p>
  {&#39;coins&#39;: 0, &#39;flag_get&#39;: False, &#39;life&#39;: 2, &#39;score&#39;: 0, &#39;stage&#39;: 1, &#39;status&#39;: &#39;small&#39;, &#39;time&#39;: 400, &#39;world&#39;: 1, &#39;x_pos&#39;: 40, &#39;x_pos_screen&#39;: 40, &#39;y_pos&#39;: 79}
 </pre></div>
 </div>
-</section>
-<section id="id3">
+</div>
+<div class="section" id="id3">
 <h3>환경 전처리 과정 거치기<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
 <p><code class="docutils literal notranslate"><span class="pre">다음</span> <span class="pre">상태(next_state)</span></code> 에서 환경 데이터가 에이전트로 반환됩니다.
 앞서 살펴보았듯이, 각각의 상태는 <code class="docutils literal notranslate"><span class="pre">[3,</span> <span class="pre">240,</span> <span class="pre">256]</span></code> 의 배열로 나타내고 있습니다.
@@ -578,12 +580,12 @@ n번째 프레임은 건너뛴 각 프레임에 걸쳐 누적된 포상을
 구성됩니다. 마리오가 행동을 할 때마다,
 환경은 이 구조의 상태로 응답합니다.
 구조는 <code class="docutils literal notranslate"><span class="pre">[4,</span> <span class="pre">84,</span> <span class="pre">84]</span></code> 크기의 3차원 배열로 구성되어 있습니다.</p>
-<figure class="align-default">
+<div class="figure align-default">
 <img alt="picture" src="../_images/mario_env.png" />
-</figure>
-</section>
-</section>
-<section id="agent">
+</div>
+</div>
+</div>
+<div class="section" id="agent">
 <h2>에이전트(Agent)<a class="headerlink" href="#agent" title="Permalink to this headline">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">Mario</span></code> 라는 클래스를 이 게임의 에이전트로 생성합니다.
 마리오는 다음과 같은 기능을 할 수 있어야 합니다.</p>
@@ -618,7 +620,7 @@ n번째 프레임은 건너뛴 각 프레임에 걸쳐 누적된 포상을
 </div>
 <p>이번 섹션에서는 마리오 클래스의 매개변수를 채우고,
 마리오 클래스의 함수들을 정의하겠습니다.</p>
-<section id="act">
+<div class="section" id="act">
 <h3>행동하기(Act)<a class="headerlink" href="#act" title="Permalink to this headline">¶</a></h3>
 <p>주어진 상태에 대해, 에이전트는 최적의 행동을 이용할 것인지
 임의의 행동을 선택하여 분석할 것인지 선택할 수 있습니다.</p>
@@ -678,8 +680,8 @@ n번째 프레임은 건너뛴 각 프레임에 걸쳐 누적된 포상을
         <span class="k">return</span> <span class="n">action_idx</span>
 </pre></div>
 </div>
-</section>
-<section id="cache-recall">
+</div>
+<div class="section" id="cache-recall">
 <h3>캐시(Cache)와 리콜(Recall)하기<a class="headerlink" href="#cache-recall" title="Permalink to this headline">¶</a></h3>
 <p>이 두가지 함수는 마리오의 “메모리” 프로세스 역할을 합니다.</p>
 <p><code class="docutils literal notranslate"><span class="pre">cache()</span></code>: 마리오가 행동을 할 때마다, 그는
@@ -732,8 +734,8 @@ n번째 프레임은 건너뛴 각 프레임에 걸쳐 누적된 포상을
         <span class="k">return</span> <span class="n">state</span><span class="p">,</span> <span class="n">next_state</span><span class="p">,</span> <span class="n">action</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(),</span> <span class="n">reward</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(),</span> <span class="n">done</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
 </pre></div>
 </div>
-</section>
-<section id="learn">
+</div>
+<div class="section" id="learn">
 <h3>학습하기(Learn)<a class="headerlink" href="#learn" title="Permalink to this headline">¶</a></h3>
 <p>마리오는 <a class="reference external" href="https://arxiv.org/pdf/1509.06461">DDQN 알고리즘</a>
 을 사용합니다. DDQN 두개의 ConvNets ( <span class="math">\(Q_{online}\)</span> 과
@@ -745,7 +747,7 @@ n번째 프레임은 건너뛴 각 프레임에 걸쳐 누적된 포상을
 의 매개변수 값) 는 역전파에 의해 값이 업데이트 되지 않도록 고정되었습니다.
 대신, <span class="math">\(\theta_{online}\)</span> 와 주기적으로 동기화를 진행합니다.
 이것에 대해서는 추후에 다루도록 하겠습니다.)</p>
-<section id="id4">
+<div class="section" id="id4">
 <h4>신경망<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h4>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MarioNet</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;작은 cnn 구조</span>
@@ -787,8 +789,8 @@ n번째 프레임은 건너뛴 각 프레임에 걸쳐 누적된 포상을
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-<section id="td-td">
+</div>
+<div class="section" id="td-td">
 <h4>TD 추정 &amp; TD 목표값<a class="headerlink" href="#td-td" title="Permalink to this headline">¶</a></h4>
 <p>학습을 하는데 두 가지 값들이 포함됩니다.</p>
 <p><strong>TD 추정</strong> - 주어진 상태 <span class="math">\(s\)</span> 에서 최적의 예측 <span class="math">\(Q^*\)</span>.</p>
@@ -827,8 +829,8 @@ n번째 프레임은 건너뛴 각 프레임에 걸쳐 누적된 포상을
         <span class="k">return</span> <span class="p">(</span><span class="n">reward</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">done</span><span class="o">.</span><span class="n">float</span><span class="p">())</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">gamma</span> <span class="o">*</span> <span class="n">next_Q</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
 </pre></div>
 </div>
-</section>
-<section id="id5">
+</div>
+<div class="section" id="id5">
 <h4>모델을 업데이트 하기.<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h4>
 <p>마리오가 재생 버퍼에서 입력을 샘플링할 때,  <span class="math">\(TD_t\)</span>
 와 <span class="math">\(TD_e\)</span> 를 계산합니다. 그리고 이 손실을 이용하여 <span class="math">\(Q_{online}\)</span> 역전파하여
@@ -858,8 +860,8 @@ n번째 프레임은 건너뛴 각 프레임에 걸쳐 누적된 포상을
         <span class="bp">self</span><span class="o">.</span><span class="n">net</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">net</span><span class="o">.</span><span class="n">online</span><span class="o">.</span><span class="n">state_dict</span><span class="p">())</span>
 </pre></div>
 </div>
-</section>
-<section id="id6">
+</div>
+<div class="section" id="id6">
 <h4>체크포인트를 저장합니다.<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h4>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Mario</span><span class="p">(</span><span class="n">Mario</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -873,8 +875,8 @@ n번째 프레임은 건너뛴 각 프레임에 걸쳐 누적된 포상을
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;MarioNet saved to </span><span class="si">{</span><span class="n">save_path</span><span class="si">}</span><span class="s2"> at step </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">curr_step</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-<section id="id7">
+</div>
+<div class="section" id="id7">
 <h4>모든 기능을 종합해봅시다.<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h4>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Mario</span><span class="p">(</span><span class="n">Mario</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state_dim</span><span class="p">,</span> <span class="n">action_dim</span><span class="p">,</span> <span class="n">save_dir</span><span class="p">):</span>
@@ -911,9 +913,9 @@ n번째 프레임은 건너뛴 각 프레임에 걸쳐 누적된 포상을
         <span class="k">return</span> <span class="p">(</span><span class="n">td_est</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">(),</span> <span class="n">loss</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-</section>
-<section id="id8">
+</div>
+</div>
+<div class="section" id="id8">
 <h3>기록하기<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">time</span><span class="o">,</span> <span class="nn">datetime</span>
@@ -1022,9 +1024,9 @@ n번째 프레임은 건너뛴 각 프레임에 걸쳐 누적된 포상을
             <span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
 </pre></div>
 </div>
-</section>
-</section>
-<section id="id9">
+</div>
+</div>
+<div class="section" id="id9">
 <h2>게임을 실행시켜봅시다!<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h2>
 <p>이번 예제에서는 10개의 에피소드에 대해 학습 루프를 실행시켰습니다.하지만 마리오가 진정으로
 세계를 학습하기 위해서는 적어도 40000개의 에피소드에 대해 학습을 시킬 것을 제안합니다!</p>
@@ -1079,16 +1081,16 @@ n번째 프레임은 건너뛴 각 프레임에 걸쳐 누적된 포상을
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Using CUDA: True
 
-Episode 0 - Step 40 - Epsilon 0.9999900000487484 - Mean Reward 231.0 - Mean Length 40.0 - Mean Loss 0.0 - Mean Q Value 0.0 - Time Delta 0.372 - Time 2022-06-25T17:14:55
+Episode 0 - Step 315 - Epsilon 0.9999212530908457 - Mean Reward 1015.0 - Mean Length 315.0 - Mean Loss 0.0 - Mean Q Value 0.0 - Time Delta 3.061 - Time 2022-07-11T00:20:57
 </pre></div>
 </div>
-</section>
-<section id="id10">
+</div>
+<div class="section" id="id10">
 <h2>결론<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h2>
 <p>이 튜토리얼에서는 PyTorch를 사용하여 게임 플레이 AI를 훈련하는 방법을 살펴보았습니다. <a class="reference external" href="https://gym.openai.com/">OpenAI gym</a>
 에 있는 어떤 게임이든 동일한 방법으로 AI를 훈련시키고 게임을 진행할 수 있습니다. 이 튜토리얼이 도움이 되었기를 바라며,
 <a class="reference external" href="https://github.com/yuansongFeng/MadMario/">Github 저장소</a> 에서 편하게 저자들에게 연락을 하셔도 됩니다!</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  19.423 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  27.730 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-intermediate-mario-rl-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/38360df5715ca8f0d232e62f3a303840/mario_rl_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">mario_rl_tutorial.py</span></code></a></p>
@@ -1098,8 +1100,8 @@ Episode 0 - Step 40 - Epsilon 0.9999900000487484 - Mean Reward 231.0 - Mean Leng
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
-</section>
-</section>
+</div>
+</div>
 
 
              </article>
@@ -1136,7 +1138,7 @@ Episode 0 - Step 40 - Epsilon 0.9999900000487484 - Mean Reward 231.0 - Mean Leng
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2021, PyTorch &amp; PyTorch Korea Community.
+        &copy; Copyright 2022, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorch Korea User Group).
 
     </p>
   </div>
@@ -1149,6 +1151,13 @@ Episode 0 - Step 40 - Epsilon 0.9999900000487484 - Mean Reward 231.0 - Mean Leng
 </footer>
 
           </div>
+<script>
+if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.indexOf("/prototype/prototype_index")< 1))
+  {
+    var div = '<div class="admonition note"><p class="admonition-title">Note</p><p><i class="fa fa-flask" aria-hidden="true">&nbsp</i> 이 튜토리얼은 프로토타입(prototype) 기능들에 대해서 설명하고 있습니다. 프로토타입 기능은 일반적으로 피드백 및 테스트용으로, 런타임 플래그 없이는 PyPI나 Conda로 배포되는 바이너리에서는 사용할 수 없습니다.</p></div>'
+    document.getElementById("pytorch-article").insertAdjacentHTML('afterBegin', div)
+  }
+</script>
         </div>
 
         <div class="pytorch-content-right" id="pytorch-content-right">
@@ -1218,7 +1227,6 @@ Episode 0 - Step 40 - Epsilon 0.9999900000487484 - Mean Reward 231.0 - Mean Leng
       });
   </script>
  
-
 <script>
 //add microsoft link
 
@@ -1297,7 +1305,7 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
 </script>
 
 <script type="text/javascript">
-  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile'];
+  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile', 'Introduction to PyTorch on YouTube', 'Recommendation Systems'];
 </script>
 
 

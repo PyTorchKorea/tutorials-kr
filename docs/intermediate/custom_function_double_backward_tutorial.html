@@ -6,24 +6,23 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
 <meta property="og:title" content="Double Backward with Custom Functions" />
   
 <meta property="og:type" content="article" />
   
-<meta property="og:url" content="http://tutorials.pytorch.kr/intermediate/custom_function_double_backward_tutorial.html" />
+<meta property="og:url" content="https://tutorials.pytorch.kr/intermediate/custom_function_double_backward_tutorial.html" />
   
 <meta property="og:description" content="It is sometimes useful to run backwards twice through backward graph, for example to compute higher-order gradients. It takes an understanding of autograd and some care to support double backwards, however. Functions that support performing backward a single time are not necessarily equipped to s..." />
   
-<meta property="og:image" content="http://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
+<meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
   
 <meta property="og:image:alt" content="Double Backward with Custom Functions" />
   
 <meta property="og:ignore_canonical" content="true" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Double Backward with Custom Functions &mdash; 파이토치 한국어 튜토리얼(PyTorch tutorials in Korean)</title>
+  <title>Double Backward with Custom Functions &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
   
 
   
@@ -131,7 +130,7 @@
               
               
                 <div class="version">
-                  1.11.0+cu102
+                  1.12.0+cu102
                 </div>
               
             
@@ -272,6 +271,7 @@
 <li class="toctree-l1"><a class="reference internal" href="dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="quantized_transfer_learning_tutorial.html">(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/static_quantization_tutorial.html">(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torchserve_with_ipex.html">Grokking PyTorch Intel CPU performance from first principles</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul>
@@ -298,6 +298,7 @@
 <p class="caption" role="heading"><span class="caption-text">Recommendation Systems</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="torchrec_tutorial.html">Introduction to TorchRec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/sharding.html">Exploring TorchRec sharding</a></li>
 </ul>
 
             
@@ -386,13 +387,14 @@
           </div>
 
         
+
           
           <div class="rst-content">
           
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <section id="double-backward-with-custom-functions">
+  <div class="section" id="double-backward-with-custom-functions">
 <h1>Double Backward with Custom Functions<a class="headerlink" href="#double-backward-with-custom-functions" title="Permalink to this headline">¶</a></h1>
 <p>It is sometimes useful to run backwards twice through backward graph, for
 example to compute higher-order gradients. It takes an understanding of
@@ -416,7 +418,7 @@ compute the backward pass if create_graph is specified</p></li>
 </ul>
 <p>Next, to understand how <cite>save_for_backward</cite> interacts with the above,
 we can explore a couple examples:</p>
-<section id="saving-the-inputs">
+<div class="section" id="saving-the-inputs">
 <h2>Saving the Inputs<a class="headerlink" href="#saving-the-inputs" title="Permalink to this headline">¶</a></h2>
 <p>Consider this simple squaring function. It saves an input tensor
 for backward. Double backward works automatically when autograd
@@ -460,8 +462,8 @@ that requires grad. This allows the gradients to be properly propagated.</p>
 <p>We can see that the gradient wrt to x, is itself a function of x (dout/dx = 2x)
 And the graph of this function has been properly constructed</p>
 <a class="reference internal image-reference" href="https://user-images.githubusercontent.com/13428986/126559699-e04f3cb1-aaf2-4a9a-a83d-b8767d04fbd9.png"><img alt="https://user-images.githubusercontent.com/13428986/126559699-e04f3cb1-aaf2-4a9a-a83d-b8767d04fbd9.png" src="https://user-images.githubusercontent.com/13428986/126559699-e04f3cb1-aaf2-4a9a-a83d-b8767d04fbd9.png" style="width: 400px;" /></a>
-</section>
-<section id="saving-the-outputs">
+</div>
+<div class="section" id="saving-the-outputs">
 <h2>Saving the Outputs<a class="headerlink" href="#saving-the-outputs" title="Permalink to this headline">¶</a></h2>
 <p>A slight variation on the previous example is to save an output
 instead of input. The mechanics are similar because outputs are also
@@ -495,8 +497,8 @@ associated with a grad_fn.</p>
 </pre></div>
 </div>
 <a class="reference internal image-reference" href="https://user-images.githubusercontent.com/13428986/126559780-d141f2ba-1ee8-4c33-b4eb-c9877b27a954.png"><img alt="https://user-images.githubusercontent.com/13428986/126559780-d141f2ba-1ee8-4c33-b4eb-c9877b27a954.png" src="https://user-images.githubusercontent.com/13428986/126559780-d141f2ba-1ee8-4c33-b4eb-c9877b27a954.png" style="width: 332px;" /></a>
-</section>
-<section id="saving-intermediate-results">
+</div>
+<div class="section" id="saving-intermediate-results">
 <h2>Saving Intermediate Results<a class="headerlink" href="#saving-intermediate-results" title="Permalink to this headline">¶</a></h2>
 <p>A more tricky case is when we need to save an intermediate result.
 We demonstrate this case by implementing:</p>
@@ -548,8 +550,8 @@ that computed the intermediate result. This leads to incorrect gradients.</p>
 </pre></div>
 </div>
 <a class="reference internal image-reference" href="https://user-images.githubusercontent.com/13428986/126560494-e48eba62-be84-4b29-8c90-a7f6f40b1438.png"><img alt="https://user-images.githubusercontent.com/13428986/126560494-e48eba62-be84-4b29-8c90-a7f6f40b1438.png" src="https://user-images.githubusercontent.com/13428986/126560494-e48eba62-be84-4b29-8c90-a7f6f40b1438.png" style="width: 460px;" /></a>
-</section>
-<section id="saving-intermediate-results-what-not-to-do">
+</div>
+<div class="section" id="saving-intermediate-results-what-not-to-do">
 <h2>Saving Intermediate Results: What not to do<a class="headerlink" href="#saving-intermediate-results-what-not-to-do" title="Permalink to this headline">¶</a></h2>
 <p>Now we show what happens when we don’t also return our intermediate
 results as outputs: <cite>grad_x</cite> would not even have a  backward graph
@@ -581,8 +583,8 @@ part of the graph!</p>
 </pre></div>
 </div>
 <a class="reference internal image-reference" href="https://user-images.githubusercontent.com/13428986/126565889-13992f01-55bc-411a-8aee-05b721fe064a.png"><img alt="https://user-images.githubusercontent.com/13428986/126565889-13992f01-55bc-411a-8aee-05b721fe064a.png" src="https://user-images.githubusercontent.com/13428986/126565889-13992f01-55bc-411a-8aee-05b721fe064a.png" style="width: 232px;" /></a>
-</section>
-<section id="when-backward-is-not-tracked">
+</div>
+<div class="section" id="when-backward-is-not-tracked">
 <h2>When Backward is not Tracked<a class="headerlink" href="#when-backward-is-not-tracked" title="Permalink to this headline">¶</a></h2>
 <p>Finally, let’s consider an example when it may not be possible for
 autograd to track gradients for a functions backward at all.
@@ -646,8 +648,8 @@ With the first two examples we show situations where double backward
 works out of the box. With the third and fourth examples, we demonstrate
 techniques that enable a backward function to be tracked, when they
 otherwise would not be.</p>
-</section>
-</section>
+</div>
+</div>
 
 
              </article>
@@ -684,7 +686,7 @@ otherwise would not be.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2021, PyTorch &amp; PyTorch Korea Community.
+        &copy; Copyright 2022, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorch Korea User Group).
 
     </p>
   </div>
@@ -697,6 +699,13 @@ otherwise would not be.</p>
 </footer>
 
           </div>
+<script>
+if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.indexOf("/prototype/prototype_index")< 1))
+  {
+    var div = '<div class="admonition note"><p class="admonition-title">Note</p><p><i class="fa fa-flask" aria-hidden="true">&nbsp</i> 이 튜토리얼은 프로토타입(prototype) 기능들에 대해서 설명하고 있습니다. 프로토타입 기능은 일반적으로 피드백 및 테스트용으로, 런타임 플래그 없이는 PyPI나 Conda로 배포되는 바이너리에서는 사용할 수 없습니다.</p></div>'
+    document.getElementById("pytorch-article").insertAdjacentHTML('afterBegin', div)
+  }
+</script>
         </div>
 
         <div class="pytorch-content-right" id="pytorch-content-right">
@@ -749,7 +758,6 @@ otherwise would not be.</p>
       });
   </script>
  
-
 <script>
 //add microsoft link
 
@@ -828,7 +836,7 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
 </script>
 
 <script type="text/javascript">
-  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile'];
+  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile', 'Introduction to PyTorch on YouTube', 'Recommendation Systems'];
 </script>
 
 

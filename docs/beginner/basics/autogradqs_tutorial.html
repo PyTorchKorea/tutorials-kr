@@ -6,24 +6,23 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
 <meta property="og:title" content="torch.autograd를 사용한 자동 미분" />
   
 <meta property="og:type" content="article" />
   
-<meta property="og:url" content="http://tutorials.pytorch.kr/beginner/basics/autogradqs_tutorial.html" />
+<meta property="og:url" content="https://tutorials.pytorch.kr/beginner/basics/autogradqs_tutorial.html" />
   
 <meta property="og:description" content="파이토치(PyTorch) 기본 익히기|| 빠른 시작|| 텐서(Tensor)|| Dataset과 Dataloader|| 변형(Transform)|| 신경망 모델 구성하기|| Autograd|| 최적화(Optimization)|| 모델 저장하고 불러오기 신경망을 학습할 때 가장 자주 사용되는 알고리즘은 역전파 입니다. 이 알고리즘에서, 매개변수(모델 가중치)는 주어진 매개변수에 대한 손실 함수의 변화도(gradient) 에 따라 조정됩니다. 이러한 변화도를 계산하기 위해 PyTorch에는 torch.autograd 라고 불리는 자..." />
   
-<meta property="og:image" content="http://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
+<meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
   
 <meta property="og:image:alt" content="torch.autograd를 사용한 자동 미분" />
   
 <meta property="og:ignore_canonical" content="true" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torch.autograd를 사용한 자동 미분 &mdash; 파이토치 한국어 튜토리얼(PyTorch tutorials in Korean)</title>
+  <title>torch.autograd를 사용한 자동 미분 &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
   
 
   
@@ -131,7 +130,7 @@
               
               
                 <div class="version">
-                  1.11.0+cu102
+                  1.12.0+cu102
                 </div>
               
             
@@ -272,6 +271,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/quantized_transfer_learning_tutorial.html">(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../advanced/static_quantization_tutorial.html">(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../intermediate/torchserve_with_ipex.html">Grokking PyTorch Intel CPU performance from first principles</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul>
@@ -298,6 +298,7 @@
 <p class="caption" role="heading"><span class="caption-text">Recommendation Systems</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/torchrec_tutorial.html">Introduction to TorchRec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../advanced/sharding.html">Exploring TorchRec sharding</a></li>
 </ul>
 
             
@@ -386,6 +387,7 @@
           </div>
 
         
+
           
           <div class="rst-content">
           
@@ -405,7 +407,7 @@
 <strong>Autograd</strong> ||
 <a class="reference external" href="optimization_tutorial.html">최적화(Optimization)</a> ||
 <a class="reference external" href="saveloadrun_tutorial.html">모델 저장하고 불러오기</a></p>
-<section id="torch-autograd">
+<div class="section" id="torch-autograd">
 <h1><code class="docutils literal notranslate"><span class="pre">torch.autograd</span></code>를 사용한 자동 미분<a class="headerlink" href="#torch-autograd" title="Permalink to this headline">¶</a></h1>
 <p>신경망을 학습할 때 가장 자주 사용되는 알고리즘은 <strong>역전파</strong>입니다. 이 알고리즘에서,
 매개변수(모델 가중치)는 주어진 매개변수에 대한 손실 함수의 <strong>변화도(gradient)</strong>에
@@ -424,12 +426,12 @@
 <span class="n">loss</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">binary_cross_entropy_with_logits</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
 </pre></div>
 </div>
-<section id="tensor-function-computational-graph">
+<div class="section" id="tensor-function-computational-graph">
 <h2>Tensor, Function과 연산그래프(Computational graph)<a class="headerlink" href="#tensor-function-computational-graph" title="Permalink to this headline">¶</a></h2>
 <p>이 코드는 다음의 <strong>연산 그래프</strong> 를 정의합니다:</p>
-<figure class="align-default">
+<div class="figure align-default">
 <img alt="" src="../../_images/comp-graph.png" />
-</figure>
+</div>
 <p>이 신경망에서, <code class="docutils literal notranslate"><span class="pre">w</span></code>와 <code class="docutils literal notranslate"><span class="pre">b</span></code>는 최적화를 해야 하는 <strong>매개변수</strong>입니다. 따라서
 이러한 변수들에 대한 손실 함수의 변화도를 계산할 수 있어야 합니다. 이를 위해서 해당 텐서에
 <code class="docutils literal notranslate"><span class="pre">requires_grad</span></code> 속성을 설정합니다.</p>
@@ -449,12 +451,12 @@
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Gradient function for z = &lt;AddBackward0 object at 0x7f4cbc79b640&gt;
-Gradient function for loss = &lt;BinaryCrossEntropyWithLogitsBackward0 object at 0x7f4cbc79b8b0&gt;
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Gradient function for z = &lt;AddBackward0 object at 0x7f7dddaae640&gt;
+Gradient function for loss = &lt;BinaryCrossEntropyWithLogitsBackward0 object at 0x7f7dddaae640&gt;
 </pre></div>
 </div>
-</section>
-<section id="gradient">
+</div>
+<div class="section" id="gradient">
 <h2>변화도(Gradient) 계산하기<a class="headerlink" href="#gradient" title="Permalink to this headline">¶</a></h2>
 <p>신경망에서 매개변수의 가중치를 최적화하려면 매개변수에 대한 손실함수의 도함수(derivative)를
 계산해야 합니다. 즉, <code class="docutils literal notranslate"><span class="pre">x</span></code>와 <code class="docutils literal notranslate"><span class="pre">y</span></code>의 일부 고정값에서 <span class="math">\(\frac{\partial loss}{\partial w}\)</span>와
@@ -486,8 +488,8 @@ tensor([0.0124, 0.3015, 0.2428])
 <code class="docutils literal notranslate"><span class="pre">backward</span></code> 호출 시에 <code class="docutils literal notranslate"><span class="pre">retrain_graph=True</span></code>를 전달해야 합니다.</p></li>
 </ul>
 </div>
-</section>
-<section id="id4">
+</div>
+<div class="section" id="id4">
 <h2>변화도 추적 멈추기<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
 <p>기본적으로, <code class="docutils literal notranslate"><span class="pre">requires_grad=True</span></code>인 모든 텐서들은 연산 기록을 추적하고 변화도 계산을
 지원합니다. 그러나 모델을 학습한 뒤 입력 데이터를 단순히 적용하기만 하는 경우와 같이 <em>순전파</em>
@@ -526,8 +528,8 @@ False
 </ul>
 </dd>
 </dl>
-</section>
-<section id="id5">
+</div>
+<div class="section" id="id5">
 <h2>연산 그래프에 대한 추가 정보<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h2>
 <p>개념적으로, autograd는 데이터(텐서)의 및 실행된 모든 연산들(및 연산 결과가 새로운 텐서인 경우도 포함하여)의
 기록을 <a class="reference external" href="https://pytorch.org/docs/stable/autograd.html#torch.autograd.Function">Function</a> 객체로
@@ -553,8 +555,8 @@ False
 흐름 제어(control flow) 구문들을 사용할 수 있게 되는 것입니다; 매번 반복(iteration)할 때마다 필요하면
 모양(shape)이나 크기(size), 연산(operation)을 바꿀 수 있습니다.</p>
 </div>
-</section>
-<section id="optional-reading-jacobian-product">
+</div>
+<div class="section" id="optional-reading-jacobian-product">
 <h2>선택적으로 읽기(Optional Reading): 텐서 변화도와 야코비안 곱 (Jacobian Product)<a class="headerlink" href="#optional-reading-jacobian-product" title="Permalink to this headline">¶</a></h2>
 <p>대부분의 경우, 스칼라 손실 함수를 가지고 일부 매개변수와 관련한 변화도를 계산해야 합니다.
 그러나 출력 함수가 임의의 텐서인 경우가 있습니다. 이럴 때, PyTorch는 실제 변화도가 아닌
@@ -618,12 +620,12 @@ tensor([[4., 2., 2., 2., 2.],
 신경망 훈련 중의 손실과 같은 스칼라-값 함수의 변화도를 계산하는 유용한 방법입니다.</p>
 </div>
 <hr class="docutils" />
-<section id="id6">
+<div class="section" id="id6">
 <h3>더 읽어보기<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p><a class="reference external" href="https://pytorch.org/docs/stable/notes/autograd.html">Autograd Mechanics</a></p></li>
 </ul>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.189 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.211 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-beginner-basics-autogradqs-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/fbf83d81ea8e82d633984f21bab274cc/autogradqs_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">autogradqs_tutorial.py</span></code></a></p>
@@ -633,9 +635,9 @@ tensor([[4., 2., 2., 2., 2.],
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
-</section>
-</section>
-</section>
+</div>
+</div>
+</div>
 
 
              </article>
@@ -672,7 +674,7 @@ tensor([[4., 2., 2., 2., 2.],
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2021, PyTorch &amp; PyTorch Korea Community.
+        &copy; Copyright 2022, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorch Korea User Group).
 
     </p>
   </div>
@@ -685,6 +687,13 @@ tensor([[4., 2., 2., 2., 2.],
 </footer>
 
           </div>
+<script>
+if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.indexOf("/prototype/prototype_index")< 1))
+  {
+    var div = '<div class="admonition note"><p class="admonition-title">Note</p><p><i class="fa fa-flask" aria-hidden="true">&nbsp</i> 이 튜토리얼은 프로토타입(prototype) 기능들에 대해서 설명하고 있습니다. 프로토타입 기능은 일반적으로 피드백 및 테스트용으로, 런타임 플래그 없이는 PyPI나 Conda로 배포되는 바이너리에서는 사용할 수 없습니다.</p></div>'
+    document.getElementById("pytorch-article").insertAdjacentHTML('afterBegin', div)
+  }
+</script>
         </div>
 
         <div class="pytorch-content-right" id="pytorch-content-right">
@@ -740,7 +749,6 @@ tensor([[4., 2., 2., 2., 2.],
       });
   </script>
  
-
 <script>
 //add microsoft link
 
@@ -819,7 +827,7 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
 </script>
 
 <script type="text/javascript">
-  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile'];
+  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile', 'Introduction to PyTorch on YouTube', 'Recommendation Systems'];
 </script>
 
 

@@ -6,24 +6,23 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
 <meta property="og:title" content="단어 임베딩: 어휘의 의미(Lexical semantics)를 인코딩하기" />
   
 <meta property="og:type" content="article" />
   
-<meta property="og:url" content="http://tutorials.pytorch.kr/beginner/nlp/word_embeddings_tutorial.html" />
+<meta property="og:url" content="https://tutorials.pytorch.kr/beginner/nlp/word_embeddings_tutorial.html" />
   
 <meta property="og:description" content="번역: 임성연 단어 임베딩(word embedding)이란 말뭉치(혹은 코퍼스, corpus) 내 각 단어에 일대일로 대응하는 밀집된 실수 벡터(dense vector)의 집합, 혹은 이 벡터를 구하는 행위를 가리킵니다. 주로 단어를 피처(feature)로 사용하는 자연어 처리 분야에서는 단어를 컴퓨터 친화적인 형태로 바꾸어 주는 작업이 필수적입니다. 컴퓨터가 단어를 바로 이해하기는 상당히 어렵기 때문이죠. 그렇다면, 단어를 어떻게 표현하는 것이 좋을까요? 물론 각 문자에 해당하는 ASCII코드를 사용할 수 있겠지만, ASCI..." />
   
-<meta property="og:image" content="http://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
+<meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
   
 <meta property="og:image:alt" content="단어 임베딩: 어휘의 의미(Lexical semantics)를 인코딩하기" />
   
 <meta property="og:ignore_canonical" content="true" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>단어 임베딩: 어휘의 의미(Lexical semantics)를 인코딩하기 &mdash; 파이토치 한국어 튜토리얼(PyTorch tutorials in Korean)</title>
+  <title>단어 임베딩: 어휘의 의미(Lexical semantics)를 인코딩하기 &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
   
 
   
@@ -129,7 +128,7 @@
               
               
                 <div class="version">
-                  1.11.0+cu102
+                  1.12.0+cu102
                 </div>
               
             
@@ -270,6 +269,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/quantized_transfer_learning_tutorial.html">(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../advanced/static_quantization_tutorial.html">(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../intermediate/torchserve_with_ipex.html">Grokking PyTorch Intel CPU performance from first principles</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul>
@@ -296,6 +296,7 @@
 <p class="caption" role="heading"><span class="caption-text">Recommendation Systems</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/torchrec_tutorial.html">Introduction to TorchRec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../advanced/sharding.html">Exploring TorchRec sharding</a></li>
 </ul>
 
             
@@ -384,6 +385,7 @@
           </div>
 
         
+
           
           <div class="rst-content">
           
@@ -394,7 +396,7 @@
 <p class="admonition-title">Note</p>
 <p>Click <a class="reference internal" href="#sphx-glr-download-beginner-nlp-word-embeddings-tutorial-py"><span class="std std-ref">here</span></a> to download the full example code</p>
 </div>
-<section class="sphx-glr-example-title" id="lexical-semantics">
+<div class="sphx-glr-example-title section" id="lexical-semantics">
 <span id="sphx-glr-beginner-nlp-word-embeddings-tutorial-py"></span><h1>단어 임베딩: 어휘의 의미(Lexical semantics)를 인코딩하기<a class="headerlink" href="#lexical-semantics" title="Permalink to this headline">¶</a></h1>
 <p><strong>번역</strong>: <a class="reference external" href="http://github.com/sylim2357">임성연</a></p>
 <p>단어 임베딩(word embedding)이란 말뭉치(혹은 코퍼스, corpus) 내 각 단어에 일대일로 대응하는 밀집된 실수 벡터(dense vector)의 집합, 혹은 이 벡터를
@@ -444,7 +446,7 @@ ASCII코드는 이 단어가 <em>무엇</em> 인지를 알려줄 뿐, 단어가 
 앞으로는 다음의 언어학적 기본 명제를 가정하도록 합시다. 바로 비슷한 맥락에서 등장하는
 단어들은 서로 의미적 연관성을 가진다는 것입니다. 언어학적으로는 <a class="reference external" href="https://en.wikipedia.org/wiki/Distributional_semantics">분산 의미 가설(distributional
 hypothesis)</a> 이라고도 합니다.</p>
-<section id="id2">
+<div class="section" id="id2">
 <h2>밀집된 단어 임베딩 구하기<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
 <p>어떻게 단어의 의미적 유사도를 인코딩 할 수 있을까요? 다시 말해, 어떻게 해야 단어의 유사도를
 단어 벡터에 반영할 수 있을까요? 단어 데이터에 의미적 속성(attribute)을 부여하는 건 어떤가요?
@@ -489,8 +491,8 @@ hypothesis)</a> 이라고도 합니다.</p>
 <p>요약하자면, <strong>단어 임베딩은 단어의 *의미* 를 표현하는 방법이며, 차후에 임베딩을 사용해서
 풀고자 하는 문제에 유용할 의미 정보를 효율적으로 인코딩한 것입니다.</strong> 품사 태그, 파스 트리(parse tree) 등
 단어의 의미 외에 다른 것도 인코딩 할 수 있습니다! 피처 임베딩의 개념을 잡는 것이 중요합니다.</p>
-</section>
-<section id="id3">
+</div>
+<div class="section" id="id3">
 <h2>파이토치에서 단어 임베딩 하기<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
 <p>실제로 코드와 예시를 보기 전에, 파이토치를 비롯해 딥러닝 관련 프로그래밍을 할 때
 단어 임베딩을 어떻게 사용하는지에 대해 조금 알아봅시다. 맨 위에서 원핫 벡터를
@@ -525,8 +527,8 @@ hypothesis)</a> 이라고도 합니다.</p>
        grad_fn=&lt;EmbeddingBackward0&gt;)
 </pre></div>
 </div>
-</section>
-<section id="n">
+</div>
+<div class="section" id="n">
 <h2>예시: N그램 언어 모델링<a class="headerlink" href="#n" title="Permalink to this headline">¶</a></h2>
 <p>N그램 언어 모델링에선 단어 시퀀스 <span class="math">\(w\)</span> 가 주어졌을 때 아래의 것을 얻고자
 함을 상기해 봅시다.</p>
@@ -624,13 +626,13 @@ hypothesis)</a> 이라고도 합니다.</p>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[([&#39;forty&#39;, &#39;When&#39;], &#39;winters&#39;), ([&#39;winters&#39;, &#39;forty&#39;], &#39;shall&#39;), ([&#39;shall&#39;, &#39;winters&#39;], &#39;besiege&#39;)]
-[524.936192035675, 522.2627863883972, 519.6109485626221, 516.9783027172089, 514.363760471344, 511.76495242118835, 509.18303418159485, 506.6151101589203, 504.06115198135376, 501.5180969238281]
-tensor([ 0.7878,  1.3700, -0.8510,  0.5118,  0.3320,  1.1081,  0.1846, -0.2752,
-        -0.6115,  0.8160], grad_fn=&lt;SelectBackward0&gt;)
+[522.2948489189148, 519.572048664093, 516.8669567108154, 514.181726694107, 511.51544761657715, 508.8654046058655, 506.23036193847656, 503.60945892333984, 501.00308179855347, 498.4094467163086]
+tensor([-0.1931, -0.6867, -0.7400,  0.2290,  0.9887, -2.1412, -0.2244, -0.0654,
+        -1.2897,  0.0585], grad_fn=&lt;SelectBackward0&gt;)
 </pre></div>
 </div>
-</section>
-<section id="continuous-bag-of-words">
+</div>
+<div class="section" id="continuous-bag-of-words">
 <h2>예시: 단어 임베딩 계산하기: Continuous Bag-of-Words<a class="headerlink" href="#continuous-bag-of-words" title="Permalink to this headline">¶</a></h2>
 <p>The Continuous Bag-of-Words (CBOW) 모델은 NLP 딥러닝에서 많이 쓰입니다.
 이 모델은 문장 내에서 주변 단어, 즉 앞 몇 단어와 뒤 몇 단어를 보고 특정
@@ -701,7 +703,7 @@ tensor([ 0.7878,  1.3700, -0.8510,  0.5118,  0.3320,  1.1081,  0.1846, -0.2752,
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[([&#39;are&#39;, &#39;We&#39;, &#39;to&#39;, &#39;study&#39;], &#39;about&#39;), ([&#39;about&#39;, &#39;are&#39;, &#39;study&#39;, &#39;the&#39;], &#39;to&#39;), ([&#39;to&#39;, &#39;about&#39;, &#39;the&#39;, &#39;idea&#39;], &#39;study&#39;), ([&#39;study&#39;, &#39;to&#39;, &#39;idea&#39;, &#39;of&#39;], &#39;the&#39;), ([&#39;the&#39;, &#39;study&#39;, &#39;of&#39;, &#39;a&#39;], &#39;idea&#39;)]
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.792 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.720 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-beginner-nlp-word-embeddings-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/58bdf45884d385ba7031225104b471d3/word_embeddings_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">word_embeddings_tutorial.py</span></code></a></p>
@@ -711,8 +713,8 @@ tensor([ 0.7878,  1.3700, -0.8510,  0.5118,  0.3320,  1.1081,  0.1846, -0.2752,
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
-</section>
-</section>
+</div>
+</div>
 
 
              </article>
@@ -740,7 +742,7 @@ tensor([ 0.7878,  1.3700, -0.8510,  0.5118,  0.3320,  1.1081,  0.1846, -0.2752,
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2021, PyTorch &amp; PyTorch Korea Community.
+        &copy; Copyright 2022, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorch Korea User Group).
 
     </p>
   </div>
@@ -753,6 +755,13 @@ tensor([ 0.7878,  1.3700, -0.8510,  0.5118,  0.3320,  1.1081,  0.1846, -0.2752,
 </footer>
 
           </div>
+<script>
+if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.indexOf("/prototype/prototype_index")< 1))
+  {
+    var div = '<div class="admonition note"><p class="admonition-title">Note</p><p><i class="fa fa-flask" aria-hidden="true">&nbsp</i> 이 튜토리얼은 프로토타입(prototype) 기능들에 대해서 설명하고 있습니다. 프로토타입 기능은 일반적으로 피드백 및 테스트용으로, 런타임 플래그 없이는 PyPI나 Conda로 배포되는 바이너리에서는 사용할 수 없습니다.</p></div>'
+    document.getElementById("pytorch-article").insertAdjacentHTML('afterBegin', div)
+  }
+</script>
         </div>
 
         <div class="pytorch-content-right" id="pytorch-content-right">
@@ -804,7 +813,6 @@ tensor([ 0.7878,  1.3700, -0.8510,  0.5118,  0.3320,  1.1081,  0.1846, -0.2752,
       });
   </script>
  
-
 <script>
 //add microsoft link
 
@@ -883,7 +891,7 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
 </script>
 
 <script type="text/javascript">
-  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile'];
+  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile', 'Introduction to PyTorch on YouTube', 'Recommendation Systems'];
 </script>
 
 

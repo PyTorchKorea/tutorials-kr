@@ -6,24 +6,23 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
 <meta property="og:title" content="Autograd" />
   
 <meta property="og:type" content="article" />
   
-<meta property="og:url" content="http://tutorials.pytorch.kr/beginner/former_torchies/autograd_tutorial_old.html" />
+<meta property="og:url" content="https://tutorials.pytorch.kr/beginner/former_torchies/autograd_tutorial_old.html" />
   
 <meta property="og:description" content="Autograd는 자동 미분을 수행하는 torch의 핵심 패키지로, 자동 미분을 위해 테잎(tape) 기반 시스템을 사용합니다. 순전파(forward) 단계에서 autograd 테잎은 수행하는 모든 연산을 기억합니다. 그리고, 역전파(backward) 단계에서 연산들을 재현(replay)합니다. 연산 기록을 추적하는 Tensor: Autograd에서 requires_grad=True 로 설정된 입력 Tensor 의 연산은 기록됩니다. 역전파 단계 연산 후에, 이 Tensor에 대한 변화도(grdient)는.grad 속성에 누적..." />
   
-<meta property="og:image" content="http://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
+<meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
   
 <meta property="og:image:alt" content="Autograd" />
   
 <meta property="og:ignore_canonical" content="true" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Autograd &mdash; 파이토치 한국어 튜토리얼(PyTorch tutorials in Korean)</title>
+  <title>Autograd &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
   
 
   
@@ -129,7 +128,7 @@
               
               
                 <div class="version">
-                  1.11.0+cu102
+                  1.12.0+cu102
                 </div>
               
             
@@ -270,6 +269,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/quantized_transfer_learning_tutorial.html">(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../advanced/static_quantization_tutorial.html">(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../intermediate/torchserve_with_ipex.html">Grokking PyTorch Intel CPU performance from first principles</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul>
@@ -296,6 +296,7 @@
 <p class="caption" role="heading"><span class="caption-text">Recommendation Systems</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/torchrec_tutorial.html">Introduction to TorchRec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../advanced/sharding.html">Exploring TorchRec sharding</a></li>
 </ul>
 
             
@@ -384,6 +385,7 @@
           </div>
 
         
+
           
           <div class="rst-content">
           
@@ -394,13 +396,13 @@
 <p class="admonition-title">Note</p>
 <p>Click <a class="reference internal" href="#sphx-glr-download-beginner-former-torchies-autograd-tutorial-old-py"><span class="std std-ref">here</span></a> to download the full example code</p>
 </div>
-<section class="sphx-glr-example-title" id="autograd">
+<div class="sphx-glr-example-title section" id="autograd">
 <span id="sphx-glr-beginner-former-torchies-autograd-tutorial-old-py"></span><h1>Autograd<a class="headerlink" href="#autograd" title="Permalink to this headline">¶</a></h1>
 <p>Autograd는 자동 미분을 수행하는 torch의 핵심 패키지로, 자동 미분을 위해
 테잎(tape) 기반 시스템을 사용합니다.</p>
 <p>순전파(forward) 단계에서 autograd 테잎은 수행하는 모든 연산을 기억합니다.
 그리고, 역전파(backward) 단계에서 연산들을 재현(replay)합니다.</p>
-<section id="tensor">
+<div class="section" id="tensor">
 <h2>연산 기록을 추적하는 Tensor<a class="headerlink" href="#tensor" title="Permalink to this headline">¶</a></h2>
 <p>Autograd에서 <code class="docutils literal notranslate"><span class="pre">requires_grad=True</span></code> 로 설정된 입력 <code class="docutils literal notranslate"><span class="pre">Tensor</span></code> 의 연산은
 기록됩니다. 역전파 단계 연산 후에, 이 Tensor에 대한 변화도(grdient)는 <code class="docutils literal notranslate"><span class="pre">.grad</span></code>
@@ -459,8 +461,8 @@
 <span class="nb">print</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">grad_fn</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-<section id="gradient">
+</div>
+<div class="section" id="gradient">
 <h2>변화도(Gradient)<a class="headerlink" href="#gradient" title="Permalink to this headline">¶</a></h2>
 <p>이제 역전파를 한 후 변화도 d(out)/dx를 출력해보겠습니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">out</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
@@ -509,8 +511,8 @@
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
-</section>
-</section>
+</div>
+</div>
 
 
              </article>
@@ -538,7 +540,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2021, PyTorch &amp; PyTorch Korea Community.
+        &copy; Copyright 2022, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorch Korea User Group).
 
     </p>
   </div>
@@ -551,6 +553,13 @@
 </footer>
 
           </div>
+<script>
+if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.indexOf("/prototype/prototype_index")< 1))
+  {
+    var div = '<div class="admonition note"><p class="admonition-title">Note</p><p><i class="fa fa-flask" aria-hidden="true">&nbsp</i> 이 튜토리얼은 프로토타입(prototype) 기능들에 대해서 설명하고 있습니다. 프로토타입 기능은 일반적으로 피드백 및 테스트용으로, 런타임 플래그 없이는 PyPI나 Conda로 배포되는 바이너리에서는 사용할 수 없습니다.</p></div>'
+    document.getElementById("pytorch-article").insertAdjacentHTML('afterBegin', div)
+  }
+</script>
         </div>
 
         <div class="pytorch-content-right" id="pytorch-content-right">
@@ -600,7 +609,6 @@
       });
   </script>
  
-
 <script>
 //add microsoft link
 
@@ -679,7 +687,7 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
 </script>
 
 <script type="text/javascript">
-  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile'];
+  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile', 'Introduction to PyTorch on YouTube', 'Recommendation Systems'];
 </script>
 
 

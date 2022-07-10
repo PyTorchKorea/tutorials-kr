@@ -25,9 +25,14 @@ nn.Transformer와 torchtext로 언어 번역하기
 
 from torchtext.data.utils import get_tokenizer
 from torchtext.vocab import build_vocab_from_iterator
-from torchtext.datasets import Multi30k
+from torchtext.datasets import multi30k, Multi30k
 from typing import Iterable, List
 
+
+# 원본 데이터의 링크가 동작하지 않으므로 데이터셋의 URL을 수정해야 합니다.
+# 더 자세한 내용은 https://github.com/pytorch/text/issues/1756#issuecomment-1163664163 을 참고해주세요.
+multi30k.URL["train"] = "https://raw.githubusercontent.com/neychev/small_DL_repo/master/datasets/Multi30k/training.tar.gz"
+multi30k.URL["valid"] = "https://raw.githubusercontent.com/neychev/small_DL_repo/master/datasets/Multi30k/validation.tar.gz"
 
 SRC_LANGUAGE = 'de'
 TGT_LANGUAGE = 'en'
@@ -39,6 +44,7 @@ vocab_transform = {}
 
 # 출발어(source)와 목적어(target)의 토크나이저(tokenizer)를 생성합니다.
 # 아래 필요 사항(dependency)을 모두 설치해주세요.
+# pip install -U torchdata
 # pip install -U spacy
 # python -m spacy download en_core_web_sm
 # python -m spacy download de_core_news_sm

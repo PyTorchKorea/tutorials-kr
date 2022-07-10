@@ -6,24 +6,23 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
 <meta property="og:title" content="(베타) FX에서 합성곱/배치 정규화(Convolution/Batch Norm) 결합기(Fuser) 만들기" />
   
 <meta property="og:type" content="article" />
   
-<meta property="og:url" content="http://tutorials.pytorch.kr/intermediate/fx_conv_bn_fuser.html" />
+<meta property="og:url" content="https://tutorials.pytorch.kr/intermediate/fx_conv_bn_fuser.html" />
   
 <meta property="og:description" content="저자: Horace He 번역: 오찬희 이 튜토리얼에서는 PyTorch의 구성 가능한 함수의 변환을 위한 툴킷인 FX를 사용하여 다음을 수행하고자 합니다. 데이터 의존성에서 합성곱/배치 정규화 패턴을 찾습니다., 1번에서 발견된 패턴의 경우 배치 정규화 통계를 합성곱 가중치로 결합합니다(folding).. 이 최적화는 추론 모드(즉, mode.eval())의 모델에만 적용된다는 점에 유의하세요. 다음 링크에 있는 결합기를 만들 것입니다. https://github.com/pytorch/pytorch/blob/orig/relea..." />
   
-<meta property="og:image" content="http://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
+<meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
   
 <meta property="og:image:alt" content="(베타) FX에서 합성곱/배치 정규화(Convolution/Batch Norm) 결합기(Fuser) 만들기" />
   
 <meta property="og:ignore_canonical" content="true" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>(베타) FX에서 합성곱/배치 정규화(Convolution/Batch Norm) 결합기(Fuser) 만들기 &mdash; 파이토치 한국어 튜토리얼(PyTorch tutorials in Korean)</title>
+  <title>(베타) FX에서 합성곱/배치 정규화(Convolution/Batch Norm) 결합기(Fuser) 만들기 &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
   
 
   
@@ -131,7 +130,7 @@
               
               
                 <div class="version">
-                  1.11.0+cu102
+                  1.12.0+cu102
                 </div>
               
             
@@ -272,6 +271,7 @@
 <li class="toctree-l1"><a class="reference internal" href="dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="quantized_transfer_learning_tutorial.html">(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/static_quantization_tutorial.html">(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torchserve_with_ipex.html">Grokking PyTorch Intel CPU performance from first principles</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul>
@@ -298,6 +298,7 @@
 <p class="caption" role="heading"><span class="caption-text">Recommendation Systems</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="torchrec_tutorial.html">Introduction to TorchRec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/sharding.html">Exploring TorchRec sharding</a></li>
 </ul>
 
             
@@ -386,6 +387,7 @@
           </div>
 
         
+
           
           <div class="rst-content">
           
@@ -396,7 +398,7 @@
 <p class="admonition-title">Note</p>
 <p>Click <a class="reference internal" href="#sphx-glr-download-intermediate-fx-conv-bn-fuser-py"><span class="std std-ref">here</span></a> to download the full example code</p>
 </div>
-<section class="sphx-glr-example-title" id="fx-convolution-batch-norm-fuser">
+<div class="sphx-glr-example-title section" id="fx-convolution-batch-norm-fuser">
 <span id="sphx-glr-intermediate-fx-conv-bn-fuser-py"></span><h1>(베타) FX에서 합성곱/배치 정규화(Convolution/Batch Norm) 결합기(Fuser) 만들기<a class="headerlink" href="#fx-convolution-batch-norm-fuser" title="Permalink to this headline">¶</a></h1>
 <p><strong>저자</strong>: <a class="reference external" href="https://github.com/chillee">Horace He</a></p>
 <p><strong>번역:</strong> <a class="reference external" href="https://github.com/kozeldark">오찬희</a></p>
@@ -452,7 +454,7 @@
 <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
 </pre></div>
 </div>
-<section id="id2">
+<div class="section" id="id2">
 <h2>합성곱과 배치 정규화 결합하기<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
 <p>PyTorch에서 합성곱과 배치 정규화를 자동으로 결합하려고 할 때 가장 큰 어려움 중 하나는
 PyTorch가 계산 그래프에 쉽게 접근할 수 있는 방법을 제공하지 않는다는 것입니다.
@@ -467,8 +469,8 @@ FX는 호출된 실제 연산을 기호적(symbolically)으로 추적하여 이 
 이는 기본 추상화 수준이지만 전달 기록기(pass writer)에서 구성할 수 있습니다.
 자세한 내용은 다음 링크의 FX 개요에서 확인할 수 있습니다.
 <a class="reference external" href="https://pytorch.org/docs/master/fx.html#module-torch.fx">https://pytorch.org/docs/master/fx.html#module-torch.fx</a></p>
-</section>
-<section id="id3">
+</div>
+<div class="section" id="id3">
 <h2>합성곱과 배치 정규화 결합하기<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
 <p>일부 다른 결합과 달리, 합성곱과 배치 정규화의 결합은 새로운 연산자를 필요로 하지 않습니다.
 대신, 추론 중 배치 정규화는 점별 덧셈과 곱셈으로 구성되므로,
@@ -507,8 +509,8 @@ FX는 호출된 실제 연산을 기호적(symbolically)으로 추적하여 이 
     <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Parameter</span><span class="p">(</span><span class="n">conv_w</span><span class="p">),</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Parameter</span><span class="p">(</span><span class="n">conv_b</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-<section id="fx-pass">
+</div>
+<div class="section" id="fx-pass">
 <h2>FX 결합 전달(pass)<a class="headerlink" href="#fx-pass" title="Permalink to this headline">¶</a></h2>
 <p>이제 합성곱과 배치 정규화를 결합하는 방법뿐만 아니라 계산 그래프도 얻었으므로
 남은 것은 FX 그래프에 절차를 반복하고 원하는 결합을 적용하는 것입니다.</p>
@@ -574,8 +576,8 @@ FX는 호출된 실제 연산을 기호적(symbolically)으로 추적하여 이 
 더 유용한 전달은 다음 링크를 참조하십시오.
 <a class="reference external" href="https://github.com/pytorch/pytorch/blob/master/torch/fx/experimental/fuser.py">https://github.com/pytorch/pytorch/blob/master/torch/fx/experimental/fuser.py</a></p>
 </div>
-</section>
-<section id="fusion-pass">
+</div>
+<div class="section" id="fusion-pass">
 <h2>결합 전달(Fusion pass) 실험하기<a class="headerlink" href="#fusion-pass" title="Permalink to this headline">¶</a></h2>
 <p>이제 아주 작은 초기 모델에 대해 이 결합 전달을 실행해 결과가 동일한지 확인할 수 있습니다.
 또한 결합 모델의 코드를 출력하여 더 이상 배치 정규화가 없는지 확인할 수 있습니다.</p>
@@ -585,8 +587,8 @@ FX는 호출된 실제 연산을 기호적(symbolically)으로 추적하여 이 
 <span class="n">torch</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_allclose</span><span class="p">(</span><span class="n">fused_model</span><span class="p">(</span><span class="n">inp</span><span class="p">),</span> <span class="n">model</span><span class="p">(</span><span class="n">inp</span><span class="p">))</span>
 </pre></div>
 </div>
-</section>
-<section id="resnet18">
+</div>
+<div class="section" id="resnet18">
 <h2>ResNet18에서 결합 벤치마킹하기<a class="headerlink" href="#resnet18" title="Permalink to this headline">¶</a></h2>
 <p>이제 ResNet18과 같은 대형 모델에서 결합 전달을 실험하고
 이 전달이 추론 성능을 얼마나 향상시키는지 확인할 수 있습니다.</p>
@@ -640,8 +642,8 @@ FX는 호출된 실제 연산을 기호적(symbolically)으로 추적하여 이 
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
-</section>
-</section>
+</div>
+</div>
 
 
              </article>
@@ -678,7 +680,7 @@ FX는 호출된 실제 연산을 기호적(symbolically)으로 추적하여 이 
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2021, PyTorch &amp; PyTorch Korea Community.
+        &copy; Copyright 2022, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorch Korea User Group).
 
     </p>
   </div>
@@ -691,6 +693,13 @@ FX는 호출된 실제 연산을 기호적(symbolically)으로 추적하여 이 
 </footer>
 
           </div>
+<script>
+if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.indexOf("/prototype/prototype_index")< 1))
+  {
+    var div = '<div class="admonition note"><p class="admonition-title">Note</p><p><i class="fa fa-flask" aria-hidden="true">&nbsp</i> 이 튜토리얼은 프로토타입(prototype) 기능들에 대해서 설명하고 있습니다. 프로토타입 기능은 일반적으로 피드백 및 테스트용으로, 런타임 플래그 없이는 PyPI나 Conda로 배포되는 바이너리에서는 사용할 수 없습니다.</p></div>'
+    document.getElementById("pytorch-article").insertAdjacentHTML('afterBegin', div)
+  }
+</script>
         </div>
 
         <div class="pytorch-content-right" id="pytorch-content-right">
@@ -743,7 +752,6 @@ FX는 호출된 실제 연산을 기호적(symbolically)으로 추적하여 이 
       });
   </script>
  
-
 <script>
 //add microsoft link
 
@@ -822,7 +830,7 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
 </script>
 
 <script type="text/javascript">
-  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile'];
+  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile', 'Introduction to PyTorch on YouTube', 'Recommendation Systems'];
 </script>
 
 

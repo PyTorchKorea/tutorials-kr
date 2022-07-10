@@ -6,24 +6,23 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
 <meta property="og:title" content="numpy 와 scipy 를 이용한 확장(Extensions) 만들기" />
   
 <meta property="og:type" content="article" />
   
-<meta property="og:url" content="http://tutorials.pytorch.kr/advanced/numpy_extensions_tutorial.html" />
+<meta property="og:url" content="https://tutorials.pytorch.kr/advanced/numpy_extensions_tutorial.html" />
   
 <meta property="og:description" content="Author: Adam Paszke Updated by: Adam Dziedzic 번역: Ajin Jeong 이번 튜토리얼에서는 두 가지 작업을 수행할 것입니다:- 매개 변수가 없는 신경망 계층(layer) 만들기,- 이는 구현의 일부로 numpy 를 호출합니다..,.,- 학습 가능한 가중치가 있는 신경망 계층(layer) 만들기,- 이는 구현의 일부로 Scipy 를 호출합니다..,.. 매개 변수가 없는(Parameter-less) 예시: 이 계층(layer)은 특별히 유용하거나 수학적으로 올바른 작업을 수행하지 않습니다. 이..." />
   
-<meta property="og:image" content="http://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
+<meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
   
 <meta property="og:image:alt" content="numpy 와 scipy 를 이용한 확장(Extensions) 만들기" />
   
 <meta property="og:ignore_canonical" content="true" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>numpy 와 scipy 를 이용한 확장(Extensions) 만들기 &mdash; 파이토치 한국어 튜토리얼(PyTorch tutorials in Korean)</title>
+  <title>numpy 와 scipy 를 이용한 확장(Extensions) 만들기 &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
   
 
   
@@ -129,7 +128,7 @@
               
               
                 <div class="version">
-                  1.11.0+cu102
+                  1.12.0+cu102
                 </div>
               
             
@@ -270,6 +269,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/quantized_transfer_learning_tutorial.html">(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="static_quantization_tutorial.html">(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/torchserve_with_ipex.html">Grokking PyTorch Intel CPU performance from first principles</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul>
@@ -296,6 +296,7 @@
 <p class="caption" role="heading"><span class="caption-text">Recommendation Systems</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/torchrec_tutorial.html">Introduction to TorchRec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sharding.html">Exploring TorchRec sharding</a></li>
 </ul>
 
             
@@ -384,6 +385,7 @@
           </div>
 
         
+
           
           <div class="rst-content">
           
@@ -394,7 +396,7 @@
 <p class="admonition-title">Note</p>
 <p>Click <a class="reference internal" href="#sphx-glr-download-advanced-numpy-extensions-tutorial-py"><span class="std std-ref">here</span></a> to download the full example code</p>
 </div>
-<section class="sphx-glr-example-title" id="numpy-scipy-extensions">
+<div class="sphx-glr-example-title section" id="numpy-scipy-extensions">
 <span id="sphx-glr-advanced-numpy-extensions-tutorial-py"></span><h1>numpy 와 scipy 를 이용한 확장(Extensions) 만들기<a class="headerlink" href="#numpy-scipy-extensions" title="Permalink to this headline">¶</a></h1>
 <p><strong>Author</strong>: <a class="reference external" href="https://github.com/apaszke">Adam Paszke</a></p>
 <p><strong>Updated by</strong>: <a class="reference external" href="https://github.com/adam-dziedzic">Adam Dziedzic</a></p>
@@ -420,7 +422,7 @@
 <span class="kn">from</span> <span class="nn">torch.autograd</span> <span class="kn">import</span> <span class="n">Function</span>
 </pre></div>
 </div>
-<section id="parameter-less">
+<div class="section" id="parameter-less">
 <h2>매개 변수가 없는(Parameter-less) 예시<a class="headerlink" href="#parameter-less" title="Permalink to this headline">¶</a></h2>
 <p>이 계층(layer)은 특별히 유용하거나 수학적으로 올바른 작업을 수행하지 않습니다.</p>
 <p>이름은 대충 BadFFTFunction으로 지었습니다.</p>
@@ -457,28 +459,35 @@
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor([[12.3536, 10.5289,  4.3722, 10.8910,  6.8980],
-        [ 1.8746,  4.6947, 10.5276, 10.0786,  4.5545],
-        [10.2002,  4.8257,  4.4190,  7.0970,  2.9453],
-        [ 3.1246,  9.8767,  2.0875,  7.5567, 10.1488],
-        [ 3.4163,  7.2384,  5.5064,  5.1429,  5.1280],
-        [ 3.1246,  5.6905,  9.0950,  9.4086, 10.1488],
-        [10.2002,  8.9041,  4.8270,  8.3097,  2.9453],
-        [ 1.8746,  6.9833,  9.9815,  3.6099,  4.5545]],
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor([[ 0.1427,  5.5778, 11.1232, 17.8041, 12.2626],
+        [ 9.5936,  4.0079,  4.6988,  6.7813,  3.6823],
+        [ 6.5884, 14.3957, 10.7560,  8.2738, 19.2556],
+        [ 7.7234,  5.7786,  8.3944,  5.8846, 15.3141],
+        [ 2.0789,  5.2201,  4.7461,  2.9303,  3.4912],
+        [ 7.7234,  5.6180,  3.1562,  3.6815, 15.3141],
+        [ 6.5884,  6.1014,  7.9042,  6.9556, 19.2556],
+        [ 9.5936,  5.5033, 10.4785,  1.1310,  3.6823]],
        grad_fn=&lt;BadFFTFunctionBackward&gt;)
-tensor([[-1.0682, -1.5643, -0.7711,  0.1824,  0.2071,  0.2388, -0.4411, -1.0328],
-        [-0.8916,  1.0060, -0.7065, -1.6954, -1.2058,  0.3796, -0.0109, -0.0578],
-        [-1.0857, -1.1805,  0.7109,  0.1410, -0.5758,  1.0281,  1.4765,  0.8145],
-        [-0.4656, -0.5869,  0.4350, -0.8622, -1.4313,  1.3474, -0.8568,  0.3202],
-        [-2.1196, -0.9142,  0.4162, -1.4569, -0.3703,  1.3178, -1.0176,  1.3663],
-        [ 0.6587, -1.1684, -1.3001, -0.4177,  0.7172, -0.6031,  0.3966, -0.7860],
-        [ 0.1465,  1.3624, -0.4310, -0.6471,  0.0829, -0.8448, -0.4006,  1.9614],
-        [ 0.6432, -0.3915,  0.2441, -0.4340, -0.2348, -0.9499, -0.3762,  1.3998]],
-       requires_grad=True)
+tensor([[-1.4709e+00, -6.3109e-01,  1.3298e+00,  2.3514e+00,  5.9798e-01,
+         -1.1601e+00,  2.5796e+00, -9.1742e-01],
+        [-5.1303e-01, -1.2454e-01,  9.4299e-01,  4.1181e-02, -1.0822e+00,
+         -6.6457e-01,  1.6514e+00, -4.5767e-01],
+        [ 1.1881e+00, -8.2682e-01, -6.6985e-01, -1.4528e+00,  5.1185e-01,
+         -8.0868e-01,  1.7740e-03,  1.1327e+00],
+        [-1.1642e+00,  3.2232e-02, -1.8744e+00,  8.7643e-01, -2.9207e-01,
+         -6.5755e-01,  5.5591e-01, -5.4848e-01],
+        [-9.3801e-01,  1.2927e+00, -8.1564e-01,  1.2620e+00, -6.6684e-02,
+         -5.5979e-02,  4.3299e-01, -1.2738e+00],
+        [ 1.3811e+00, -4.1654e-01,  1.2796e+00, -1.1521e+00,  2.3741e-01,
+         -2.0551e+00,  2.4323e+00, -2.3034e+00],
+        [-6.3560e-01, -1.0755e+00, -1.0727e+00,  1.5191e-02, -6.5398e-02,
+          7.0480e-02,  8.0156e-01, -5.9931e-01],
+        [ 1.1470e-01,  9.0640e-01,  2.5264e-01,  1.6878e+00,  1.3140e-01,
+          1.0867e+00,  4.4034e-01,  3.6620e-01]], requires_grad=True)
 </pre></div>
 </div>
-</section>
-<section id="parameterized">
+</div>
+<div class="section" id="parameterized">
 <h2>매개 변수가 있는(Parameterized) 예시<a class="headerlink" href="#parameterized" title="Permalink to this headline">¶</a></h2>
 <p>딥러닝 문헌에서 이 계층(layer)의 실제 연산은 상호 상관(cross-correlation)이지만
 합성곱(convolution)이라고 헷갈리게 부르고 있습니다.
@@ -537,47 +546,47 @@ tensor([[-1.0682, -1.5643, -0.7711,  0.1824,  0.2071,  0.2388, -0.4411, -1.0328]
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Filter and bias:  [Parameter containing:
-tensor([[ 0.1341,  2.0541, -1.7041],
-        [ 0.1243,  1.4397,  0.1074],
-        [ 1.0648,  1.8481, -0.1611]], requires_grad=True), Parameter containing:
-tensor([[-0.3275]], requires_grad=True)]
-Output from the convolution:  tensor([[-7.6755e-01,  9.8846e-01,  5.1845e+00, -2.4828e+00,  4.1061e+00,
-         -2.4557e+00,  3.8485e+00, -2.3501e+00],
-        [-4.7799e+00,  4.0584e+00, -1.8991e+00, -5.8631e+00, -3.4544e+00,
-         -4.4872e+00,  1.2538e+00,  1.4658e+00],
-        [ 3.9016e+00, -8.0319e-01,  6.3861e-01, -3.0114e+00, -2.0570e+00,
-         -2.2311e+00,  3.1453e+00, -1.3578e+00],
-        [-7.1277e-01,  5.5078e+00, -1.4269e+00, -2.2733e+00, -3.1731e+00,
-         -5.2293e+00, -3.2444e+00,  2.1581e+00],
-        [ 1.9234e+00,  2.0284e+00,  3.3373e+00, -2.5436e+00, -3.5968e-01,
-         -4.0191e+00,  1.6008e+00,  1.5100e+00],
-        [-3.9699e+00, -6.1247e-01,  2.9213e-02, -4.7997e-03,  4.5784e+00,
-         -8.9845e+00, -3.4258e+00,  4.1897e+00],
-        [-3.3578e+00,  2.4637e+00, -1.2577e+00,  1.2554e+00, -2.2843e+00,
-          1.6785e-01, -2.0200e+00, -2.5070e+00],
-        [ 1.9461e+00, -9.4277e-01, -2.4514e-01,  4.8828e+00,  1.6353e+00,
-         -5.2199e+00, -7.3334e+00,  4.4572e+00]],
+tensor([[-0.1602, -1.3375,  0.4899],
+        [ 0.0117, -1.8393, -1.1161],
+        [-0.7189, -0.9802,  0.4517]], requires_grad=True), Parameter containing:
+tensor([[-0.0199]], requires_grad=True)]
+Output from the convolution:  tensor([[-6.0479e-01, -6.6172e-01,  5.7668e-01,  7.3642e-01, -1.0404e+00,
+         -2.5380e+00,  7.0431e-01, -3.0432e+00],
+        [ 4.0189e+00, -2.9888e-01,  1.5170e-01,  6.8403e-01,  6.4340e-01,
+         -4.1355e-02,  2.0061e+00, -5.5426e+00],
+        [-9.2383e-01,  4.2150e+00, -7.7942e-01, -1.9131e+00, -1.5988e+00,
+         -3.0727e+00, -9.9906e-01, -6.2175e-01],
+        [ 2.4869e+00, -2.0382e+00, -1.2072e+00, -2.4638e+00,  3.3878e+00,
+         -2.5876e+00, -1.6984e+00,  1.0379e+00],
+        [ 3.3521e+00,  3.0190e+00, -1.6648e+00, -4.4991e-01,  6.2380e+00,
+         -5.3818e+00, -5.1706e-03,  1.8641e+00],
+        [ 8.3524e-01,  2.5572e+00,  3.0948e-01,  2.6738e+00,  3.0596e+00,
+         -4.1210e+00, -1.7525e+00,  9.5410e-01],
+        [-2.9451e+00, -1.7272e+00, -3.1038e+00,  1.2254e+00,  1.3403e+00,
+         -5.1629e-01, -2.3515e-01,  2.7382e+00],
+        [-9.9022e-01,  1.1924e+00,  9.4509e-01,  1.5043e-01, -4.1593e+00,
+          1.5421e+00,  2.0839e+00,  2.3023e+00]],
        grad_fn=&lt;ScipyConv2dFunctionBackward&gt;)
-Gradient for the input map:  tensor([[ 0.0936,  1.3892, -1.7975,  1.6142, -2.3929,  3.3394, -1.9431,  1.7776,
-         -0.1001, -0.9026],
-        [ 0.0287,  0.0191, -0.6201, -1.3931, -2.6688,  5.3662,  0.8070, -0.6718,
-          3.7230, -1.8847],
-        [ 0.7250,  0.8516, -0.4396,  1.0317, -7.1373,  4.9454, -2.9635,  6.4021,
-          0.9367, -0.3685],
-        [-0.4748, -1.4835,  0.0316, -5.3309, -1.8292,  1.6503, -0.9617,  1.3382,
-          7.4479, -2.6903],
-        [-0.0258, -3.7611,  4.2015,  1.2797,  0.8862, -1.4720, -4.4258,  1.5124,
-          4.9201, -1.2501],
-        [-0.5756, -2.6100, -4.7457, -2.7904, -1.4666,  2.7077, -4.8035,  4.1543,
-         -2.0774,  0.7789],
-        [-2.0762, -4.5484, -2.4785, -1.0218,  1.7652, -0.6919,  0.9024,  4.2120,
-          1.7084, -1.4550],
-        [ 0.1817, -2.7170,  1.1670,  0.7175,  2.3099, -0.4727,  2.8499, 10.4465,
-         -3.9620,  1.3970],
-        [-0.2862, -1.4525,  1.3995,  3.2481,  3.7010, -0.7421, -0.0514,  3.2566,
-          0.3821, -0.1972],
-        [-1.1313, -1.4295,  2.4083,  3.7386,  1.9322, -2.6271, -1.0818,  1.7586,
-         -1.5342,  0.1162]])
+Gradient for the input map:  tensor([[-6.6709e-03, -1.2434e-01, -4.5475e-01,  1.2874e+00,  2.0362e+00,
+          7.2406e-01,  5.3141e-01,  7.4434e-01, -9.8842e-01,  2.0831e-01],
+        [-8.3832e-03, -5.7282e-03,  4.0055e-01,  5.7226e-01,  3.2199e+00,
+          3.4890e+00,  6.4686e+00, -1.9396e+00,  8.0274e-01, -3.3750e-01],
+        [-6.3797e-02, -6.4219e-01,  2.7781e+00,  4.9925e+00,  2.8659e+00,
+         -8.8033e-01,  6.4537e+00,  2.1578e+00, -3.0852e+00, -6.1653e-01],
+        [ 1.1052e-01,  1.5087e+00,  2.4574e+00,  2.5282e+00,  5.0612e+00,
+          1.8256e+00,  2.7466e+00, -2.0636e+00,  4.6944e+00,  1.3905e+00],
+        [-2.0347e-01,  1.6992e+00,  4.6616e+00,  3.5024e+00,  5.6251e+00,
+          6.4188e-01,  7.2062e-01, -1.7522e+00, -1.1723e-01, -1.0297e+00],
+        [ 8.2716e-01,  2.2493e+00, -3.7179e-01,  2.7535e+00,  6.2322e+00,
+          8.2966e-01, -6.1872e-01, -7.0798e+00, -2.1370e+00,  1.3610e+00],
+        [-3.1513e-01,  6.0357e-01,  7.8525e-01,  2.5810e-01,  3.7759e+00,
+         -3.0246e+00, -2.6638e+00, -1.8082e+00, -2.2248e+00, -1.3668e+00],
+        [ 8.4025e-01, -4.3326e-02, -6.0940e+00, -3.8165e+00, -1.0286e+00,
+          2.7988e+00, -6.3584e-01, -3.4374e+00, -2.6719e+00, -9.0657e-02],
+        [-6.0745e-01, -2.9021e-01, -3.7362e+00, -1.6683e+00, -2.5320e-01,
+         -3.3608e+00, -3.0979e+00, -2.0743e+00, -8.8610e-01,  2.0207e-01],
+        [ 4.8142e-01, -4.5982e-01, -1.9266e+00, -5.4646e-01, -1.8311e+00,
+         -3.4494e-01, -6.9319e-01, -4.1617e-02,  7.0677e-02,  3.3832e-02]])
 </pre></div>
 </div>
 <p><strong>기울기(gradient) 확인:</strong></p>
@@ -594,7 +603,7 @@ Gradient for the input map:  tensor([[ 0.0936,  1.3892, -1.7975,  1.6142, -2.392
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Are the gradients correct:  True
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.430 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.489 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-advanced-numpy-extensions-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/ee55f2537c08fa13e041e479675a6c2c/numpy_extensions_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">numpy_extensions_tutorial.py</span></code></a></p>
@@ -604,8 +613,8 @@ Gradient for the input map:  tensor([[ 0.0936,  1.3892, -1.7975,  1.6142, -2.392
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
-</section>
-</section>
+</div>
+</div>
 
 
              </article>
@@ -633,7 +642,7 @@ Gradient for the input map:  tensor([[ 0.0936,  1.3892, -1.7975,  1.6142, -2.392
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2021, PyTorch &amp; PyTorch Korea Community.
+        &copy; Copyright 2022, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorch Korea User Group).
 
     </p>
   </div>
@@ -646,6 +655,13 @@ Gradient for the input map:  tensor([[ 0.0936,  1.3892, -1.7975,  1.6142, -2.392
 </footer>
 
           </div>
+<script>
+if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.indexOf("/prototype/prototype_index")< 1))
+  {
+    var div = '<div class="admonition note"><p class="admonition-title">Note</p><p><i class="fa fa-flask" aria-hidden="true">&nbsp</i> 이 튜토리얼은 프로토타입(prototype) 기능들에 대해서 설명하고 있습니다. 프로토타입 기능은 일반적으로 피드백 및 테스트용으로, 런타임 플래그 없이는 PyPI나 Conda로 배포되는 바이너리에서는 사용할 수 없습니다.</p></div>'
+    document.getElementById("pytorch-article").insertAdjacentHTML('afterBegin', div)
+  }
+</script>
         </div>
 
         <div class="pytorch-content-right" id="pytorch-content-right">
@@ -695,7 +711,6 @@ Gradient for the input map:  tensor([[ 0.0936,  1.3892, -1.7975,  1.6142, -2.392
       });
   </script>
  
-
 <script>
 //add microsoft link
 
@@ -774,7 +789,7 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
 </script>
 
 <script type="text/javascript">
-  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile'];
+  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile', 'Introduction to PyTorch on YouTube', 'Recommendation Systems'];
 </script>
 
 

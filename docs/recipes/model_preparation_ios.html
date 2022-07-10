@@ -6,24 +6,23 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
 <meta property="og:title" content="Model Preparation for iOS Recipe" />
   
 <meta property="og:type" content="article" />
   
-<meta property="og:url" content="http://tutorials.pytorch.kr/recipes/model_preparation_ios.html" />
+<meta property="og:url" content="https://tutorials.pytorch.kr/recipes/model_preparation_ios.html" />
   
 <meta property="og:description" content="This recipe demonstrates how to prepare a PyTorch MobileNet v2 image classification model for iOS apps, and how to set up an iOS project to use the mobile-ready model file. Introduction: After a PyTorch model is trained or a pre-trained model is made available, it is normally not ready to be used..." />
   
-<meta property="og:image" content="http://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
+<meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
   
 <meta property="og:image:alt" content="Model Preparation for iOS Recipe" />
   
 <meta property="og:ignore_canonical" content="true" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Model Preparation for iOS Recipe &mdash; 파이토치 한국어 튜토리얼(PyTorch tutorials in Korean)</title>
+  <title>Model Preparation for iOS Recipe &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
   
 
   
@@ -129,7 +128,7 @@
               
               
                 <div class="version">
-                  1.11.0+cu102
+                  1.12.0+cu102
                 </div>
               
             
@@ -270,6 +269,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/quantized_transfer_learning_tutorial.html">(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/static_quantization_tutorial.html">(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/torchserve_with_ipex.html">Grokking PyTorch Intel CPU performance from first principles</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul>
@@ -296,6 +296,7 @@
 <p class="caption" role="heading"><span class="caption-text">Recommendation Systems</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/torchrec_tutorial.html">Introduction to TorchRec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/sharding.html">Exploring TorchRec sharding</a></li>
 </ul>
 
             
@@ -384,28 +385,29 @@
           </div>
 
         
+
           
           <div class="rst-content">
           
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <section id="model-preparation-for-ios-recipe">
+  <div class="section" id="model-preparation-for-ios-recipe">
 <h1>Model Preparation for iOS Recipe<a class="headerlink" href="#model-preparation-for-ios-recipe" title="Permalink to this headline">¶</a></h1>
 <p>This recipe demonstrates how to prepare a PyTorch MobileNet v2 image classification model for iOS apps, and how to set up an iOS project to use the mobile-ready model file.</p>
-<section id="introduction">
+<div class="section" id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
 <p>After a PyTorch model is trained or a pre-trained model is made available, it is normally not ready to be used in mobile apps yet. It needs to be quantized (see <a class="reference external" href="quantization.html">Quantization Recipe</a> for more details), converted to TorchScript so iOS apps can load it and optimized for mobile apps (see <a class="reference external" href="script_optimized.html">Script and Optimize for Mobile Recipe</a>). Furthermore, iOS apps need to be set up correctly to enable the use of PyTorch Mobile libraries, before they can load and use the model for inference.</p>
-</section>
-<section id="pre-requisites">
+</div>
+<div class="section" id="pre-requisites">
 <h2>Pre-requisites<a class="headerlink" href="#pre-requisites" title="Permalink to this headline">¶</a></h2>
 <p>PyTorch 1.6.0 or 1.7.0</p>
 <p>torchvision 0.6.0 or 0.7.0</p>
 <p>Xcode 11 or 12</p>
-</section>
-<section id="steps">
+</div>
+<div class="section" id="steps">
 <h2>Steps<a class="headerlink" href="#steps" title="Permalink to this headline">¶</a></h2>
-<section id="get-pretrained-and-quantized-mobilenet-v2-model">
+<div class="section" id="get-pretrained-and-quantized-mobilenet-v2-model">
 <h3>1. Get Pretrained and Quantized MobileNet v2 Model<a class="headerlink" href="#get-pretrained-and-quantized-mobilenet-v2-model" title="Permalink to this headline">¶</a></h3>
 <p>To get the MobileNet v2 quantized model, simply do:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torchvision</span>
@@ -413,8 +415,8 @@
 <span class="n">model_quantized</span> <span class="o">=</span> <span class="n">torchvision</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">quantization</span><span class="o">.</span><span class="n">mobilenet_v2</span><span class="p">(</span><span class="n">pretrained</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">quantize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-<section id="script-and-optimize-the-model-for-mobile-apps">
+</div>
+<div class="section" id="script-and-optimize-the-model-for-mobile-apps">
 <h3>2. Script and Optimize the Model for Mobile Apps<a class="headerlink" href="#script-and-optimize-the-model-for-mobile-apps" title="Permalink to this headline">¶</a></h3>
 <p>Use either the script or trace method to convert the quantized model to the TorchScript format:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
@@ -438,8 +440,8 @@
 </pre></div>
 </div>
 <p>With the total 7 or 8 (depending on if the script or trace method is called to get the TorchScript format of the model) lines of code in the two steps above, we have a model ready to be added to mobile apps.</p>
-</section>
-<section id="add-the-model-and-pytorch-library-on-ios">
+</div>
+<div class="section" id="add-the-model-and-pytorch-library-on-ios">
 <h3>3. Add the Model and PyTorch Library on iOS<a class="headerlink" href="#add-the-model-and-pytorch-library-on-ios" title="Permalink to this headline">¶</a></h3>
 <p>To use the mobile-ready model <cite>mobilenetv2_quantized.pt</cite> in an iOS app, either create a new Xcode project or in your existing Xcode project, then follow the steps below:</p>
 <ul class="simple">
@@ -456,16 +458,16 @@
 <li><p>Drag and drop the model file <cite>mobilenetv2_quantized.pt</cite> to the project.</p></li>
 </ul>
 <p>After these steps, you can successfully build and run your Xcode project. To actually write code to use the model, refer to the PyTorch Mobile <a class="reference external" href="https://pytorch.org/mobile/ios/#code-walkthrough">iOS Code Walkthrough</a> and two complete ready-to-run sample iOS apps <a class="reference external" href="https://github.com/pytorch/ios-demo-app/tree/master/HelloWorld">HelloWorld</a> and <a class="reference external" href="https://github.com/pytorch/workshops/tree/master/PTMobileWalkthruIOS">iOS Hackathon Example</a>.</p>
-</section>
-</section>
-<section id="learn-more">
+</div>
+</div>
+<div class="section" id="learn-more">
 <h2>Learn More<a class="headerlink" href="#learn-more" title="Permalink to this headline">¶</a></h2>
 <ol class="arabic simple">
 <li><p><a class="reference external" href="https://pytorch.org/mobile">PyTorch Mobile site</a></p></li>
 <li><p><a class="reference external" href="https://tutorials.pytorch.kr/beginner/Intro_to_TorchScript_tutorial.html">Introduction to TorchScript</a></p></li>
 </ol>
-</section>
-</section>
+</div>
+</div>
 
 
              </article>
@@ -493,7 +495,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2021, PyTorch &amp; PyTorch Korea Community.
+        &copy; Copyright 2022, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorch Korea User Group).
 
     </p>
   </div>
@@ -506,6 +508,13 @@
 </footer>
 
           </div>
+<script>
+if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.indexOf("/prototype/prototype_index")< 1))
+  {
+    var div = '<div class="admonition note"><p class="admonition-title">Note</p><p><i class="fa fa-flask" aria-hidden="true">&nbsp</i> 이 튜토리얼은 프로토타입(prototype) 기능들에 대해서 설명하고 있습니다. 프로토타입 기능은 일반적으로 피드백 및 테스트용으로, 런타임 플래그 없이는 PyPI나 Conda로 배포되는 바이너리에서는 사용할 수 없습니다.</p></div>'
+    document.getElementById("pytorch-article").insertAdjacentHTML('afterBegin', div)
+  }
+</script>
         </div>
 
         <div class="pytorch-content-right" id="pytorch-content-right">
@@ -562,7 +571,6 @@
       });
   </script>
  
-
 <script>
 //add microsoft link
 
@@ -641,7 +649,7 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
 </script>
 
 <script type="text/javascript">
-  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile'];
+  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile', 'Introduction to PyTorch on YouTube', 'Recommendation Systems'];
 </script>
 
 

@@ -6,24 +6,23 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
 <meta property="og:title" content="모델 매개변수 최적화하기" />
   
 <meta property="og:type" content="article" />
   
-<meta property="og:url" content="http://tutorials.pytorch.kr/beginner/basics/optimization_tutorial.html" />
+<meta property="og:url" content="https://tutorials.pytorch.kr/beginner/basics/optimization_tutorial.html" />
   
 <meta property="og:description" content="파이토치(PyTorch) 기본 익히기|| 빠른 시작|| 텐서(Tensor)|| Dataset과 Dataloader|| 변형(Transform)|| 신경망 모델 구성하기|| Autograd|| 최적화(Optimization)|| 모델 저장하고 불러오기 이제 모델과 데이터가 준비되었으니, 데이터에 매개변수를 최적화하여 모델을 학습하고, 검증하고, 테스트할 차례입니다. 모델을 학습하는 과정은 반복적인 과정을 거칩니다; ( 에폭(epoch) 이라고 부르는) 각 반복 단계에서 모델은 출력을 추측하고, 추측과 정답 사이의 오류( 손실(l..." />
   
-<meta property="og:image" content="http://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
+<meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
   
 <meta property="og:image:alt" content="모델 매개변수 최적화하기" />
   
 <meta property="og:ignore_canonical" content="true" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>모델 매개변수 최적화하기 &mdash; 파이토치 한국어 튜토리얼(PyTorch tutorials in Korean)</title>
+  <title>모델 매개변수 최적화하기 &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
   
 
   
@@ -131,7 +130,7 @@
               
               
                 <div class="version">
-                  1.11.0+cu102
+                  1.12.0+cu102
                 </div>
               
             
@@ -272,6 +271,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/quantized_transfer_learning_tutorial.html">(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../advanced/static_quantization_tutorial.html">(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../intermediate/torchserve_with_ipex.html">Grokking PyTorch Intel CPU performance from first principles</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul>
@@ -298,6 +298,7 @@
 <p class="caption" role="heading"><span class="caption-text">Recommendation Systems</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/torchrec_tutorial.html">Introduction to TorchRec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../advanced/sharding.html">Exploring TorchRec sharding</a></li>
 </ul>
 
             
@@ -386,6 +387,7 @@
           </div>
 
         
+
           
           <div class="rst-content">
           
@@ -405,14 +407,14 @@
 <a class="reference external" href="autogradqs_tutorial.html">Autograd</a> ||
 <strong>최적화(Optimization)</strong> ||
 <a class="reference external" href="saveloadrun_tutorial.html">모델 저장하고 불러오기</a></p>
-<section id="id4">
+<div class="section" id="id4">
 <h1>모델 매개변수 최적화하기<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h1>
 <p>이제 모델과 데이터가 준비되었으니, 데이터에 매개변수를 최적화하여 모델을 학습하고, 검증하고, 테스트할 차례입니다.
 모델을 학습하는 과정은 반복적인 과정을 거칩니다; (<em>에폭(epoch)</em>이라고 부르는) 각 반복 단계에서 모델은 출력을 추측하고,
 추측과 정답 사이의 오류(<em>손실(loss)</em>)를 계산하고, (<a class="reference external" href="autograd_tutorial.html">이전 장</a>에서 본 것처럼)
 매개변수에 대한 오류의 도함수(derivative)를 수집한 뒤, 경사하강법을 사용하여 이 파라매터들을 <strong>최적화(optimize)</strong>합니다.
 이 과정에 대한 자세한 설명은 <a class="reference external" href="https://www.youtube.com/watch?v=tIeHLnjs5U8">3Blue1Brown의 역전파</a> 영상을 참고하세요.</p>
-<section id="pre-requisite">
+<div class="section" id="pre-requisite">
 <h2>기본(Pre-requisite) 코드<a class="headerlink" href="#pre-requisite" title="Permalink to this headline">¶</a></h2>
 <p>이전 장인 <a class="reference external" href="data_tutorial.html">Dataset과 DataLoader</a>와 <a class="reference external" href="buildmodel_tutorial.html">신경망 모델 구성하기</a>에서
 코드를 기져왔습니다.</p>
@@ -459,8 +461,8 @@
 <span class="n">model</span> <span class="o">=</span> <span class="n">NeuralNetwork</span><span class="p">()</span>
 </pre></div>
 </div>
-</section>
-<section id="hyperparameter">
+</div>
+<div class="section" id="hyperparameter">
 <h2>하이퍼파라매터(Hyperparameter)<a class="headerlink" href="#hyperparameter" title="Permalink to this headline">¶</a></h2>
 <p>하이퍼파라매터(Hyperparameter)는 모델 최적화 과정을 제어할 수 있는 조절 가능한 매개변수입니다.
 서로 다른 하이퍼파라매터 값은 모델 학습과 수렴율(convergence rate)에 영향을 미칠 수 있습니다.
@@ -478,8 +480,8 @@
 <span class="n">epochs</span> <span class="o">=</span> <span class="mi">5</span>
 </pre></div>
 </div>
-</section>
-<section id="optimization-loop">
+</div>
+<div class="section" id="optimization-loop">
 <h2>최적화 단계(Optimization Loop)<a class="headerlink" href="#optimization-loop" title="Permalink to this headline">¶</a></h2>
 <p>하이퍼파라매터를 설정한 뒤에는 최적화 단계를 통해 모델을 학습하고 최적화할 수 있습니다.
 최적화 단계의 각 반복(iteration)을 <strong>에폭</strong>이라고 부릅니다.</p>
@@ -492,7 +494,7 @@
 </dl>
 <p>학습 단계(training loop)에서 일어나는 몇 가지 개념들을 간략히 살펴보겠습니다. 최적화 단계(optimization loop)를 보려면
 <a class="reference internal" href="#full-impl-label"><span class="std std-ref">전체 구현</span></a> 부분으로 건너뛰시면 됩니다.</p>
-<section id="loss-function">
+<div class="section" id="loss-function">
 <h3>손실 함수(loss function)<a class="headerlink" href="#loss-function" title="Permalink to this headline">¶</a></h3>
 <p>학습용 데이터를 제공하면, 학습되지 않은 신경망은 정답을 제공하지 않을 확률이 높습니다. <strong>손실 함수(loss function)</strong>는
 획득한 결과와 실제 값 사이의 틀린 정도(degree of dissimilarity)를 측정하며, 학습 중에 이 값을 최소화하려고 합니다.
@@ -506,8 +508,8 @@
 <span class="n">loss_fn</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">CrossEntropyLoss</span><span class="p">()</span>
 </pre></div>
 </div>
-</section>
-<section id="optimizer">
+</div>
+<div class="section" id="optimizer">
 <h3>옵티마이저(Optimizer)<a class="headerlink" href="#optimizer" title="Permalink to this headline">¶</a></h3>
 <p>최적화는 각 학습 단계에서 모델의 오류를 줄이기 위해 모델 매개변수를 조정하는 과정입니다. <strong>최적화 알고리즘</strong>은 이 과정이 수행되는 방식(여기에서는 확률적 경사하강법(SGD; Stochastic Gradient Descent))을 정의합니다.
 모든 최적화 절차(logic)는 <code class="docutils literal notranslate"><span class="pre">optimizer</span></code> 객체에 캡슐화(encapsulate)됩니다. 여기서는 SGD 옵티마이저를 사용하고 있으며, PyTorch에는 ADAM이나 RMSProp과 같은 다른 종류의 모델과 데이터에서 더 잘 동작하는
@@ -524,9 +526,9 @@
 </ul>
 </dd>
 </dl>
-</section>
-</section>
-<section id="full-impl-label">
+</div>
+</div>
+<div class="section" id="full-impl-label">
 <span id="id9"></span><h2>전체 구현<a class="headerlink" href="#full-impl-label" title="Permalink to this headline">¶</a></h2>
 <p>최적화 코드를 반복하여 수행하는 <code class="docutils literal notranslate"><span class="pre">train_loop</span></code>와 테스트 데이터로 모델의 성능을 측정하는 <code class="docutils literal notranslate"><span class="pre">test_loop</span></code>를 정의하였습니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">train_loop</span><span class="p">(</span><span class="n">dataloader</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">loss_fn</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">):</span>
@@ -616,7 +618,7 @@ loss: 1.668501  [25600/60000]
 loss: 1.604107  [32000/60000]
 loss: 1.640458  [38400/60000]
 loss: 1.526604  [44800/60000]
-loss: 1.558076  [51200/60000]
+loss: 1.558075  [51200/60000]
 loss: 1.470941  [57600/60000]
 Test Error:
  Accuracy: 60.6%, Avg loss: 1.473576
@@ -627,26 +629,26 @@ loss: 1.546935  [    0/60000]
 loss: 1.524886  [ 6400/60000]
 loss: 1.348419  [12800/60000]
 loss: 1.431470  [19200/60000]
-loss: 1.340189  [25600/60000]
-loss: 1.317189  [32000/60000]
+loss: 1.340190  [25600/60000]
+loss: 1.317190  [32000/60000]
 loss: 1.349369  [38400/60000]
-loss: 1.257424  [44800/60000]
+loss: 1.257425  [44800/60000]
 loss: 1.297893  [51200/60000]
-loss: 1.211097  [57600/60000]
+loss: 1.211098  [57600/60000]
 Test Error:
- Accuracy: 63.5%, Avg loss: 1.228582
+ Accuracy: 63.5%, Avg loss: 1.228581
 
 Epoch 5
 -------------------------------
-loss: 1.309672  [    0/60000]
-loss: 1.299588  [ 6400/60000]
+loss: 1.309674  [    0/60000]
+loss: 1.299587  [ 6400/60000]
 loss: 1.113936  [12800/60000]
 loss: 1.226605  [19200/60000]
 loss: 1.125736  [25600/60000]
-loss: 1.132316  [32000/60000]
+loss: 1.132314  [32000/60000]
 loss: 1.167728  [38400/60000]
-loss: 1.089450  [44800/60000]
-loss: 1.131195  [51200/60000]
+loss: 1.089452  [44800/60000]
+loss: 1.131196  [51200/60000]
 loss: 1.055023  [57600/60000]
 Test Error:
  Accuracy: 64.7%, Avg loss: 1.072794
@@ -654,90 +656,90 @@ Test Error:
 Epoch 6
 -------------------------------
 loss: 1.147470  [    0/60000]
-loss: 1.154460  [ 6400/60000]
-loss: 0.955833  [12800/60000]
-loss: 1.095335  [19200/60000]
+loss: 1.154461  [ 6400/60000]
+loss: 0.955831  [12800/60000]
+loss: 1.095336  [19200/60000]
 loss: 0.991355  [25600/60000]
-loss: 1.005166  [32000/60000]
+loss: 1.005167  [32000/60000]
 loss: 1.053060  [38400/60000]
 loss: 0.982108  [44800/60000]
-loss: 1.021991  [51200/60000]
+loss: 1.021988  [51200/60000]
 loss: 0.956641  [57600/60000]
 Test Error:
- Accuracy: 65.7%, Avg loss: 0.971098
+ Accuracy: 65.7%, Avg loss: 0.971097
 
 Epoch 7
 -------------------------------
-loss: 1.033701  [    0/60000]
-loss: 1.059258  [ 6400/60000]
-loss: 0.846744  [12800/60000]
-loss: 1.007361  [19200/60000]
-loss: 0.905275  [25600/60000]
+loss: 1.033703  [    0/60000]
+loss: 1.059256  [ 6400/60000]
+loss: 0.846742  [12800/60000]
+loss: 1.007360  [19200/60000]
+loss: 0.905273  [25600/60000]
 loss: 0.914110  [32000/60000]
-loss: 0.977414  [38400/60000]
-loss: 0.912617  [44800/60000]
-loss: 0.946972  [51200/60000]
-loss: 0.890875  [57600/60000]
+loss: 0.977415  [38400/60000]
+loss: 0.912614  [44800/60000]
+loss: 0.946968  [51200/60000]
+loss: 0.890873  [57600/60000]
 Test Error:
  Accuracy: 67.0%, Avg loss: 0.901490
 
 Epoch 8
 -------------------------------
-loss: 0.949472  [    0/60000]
+loss: 0.949469  [    0/60000]
 loss: 0.992691  [ 6400/60000]
-loss: 0.768568  [12800/60000]
-loss: 0.945291  [19200/60000]
-loss: 0.846789  [25600/60000]
-loss: 0.846589  [32000/60000]
-loss: 0.923901  [38400/60000]
-loss: 0.866407  [44800/60000]
-loss: 0.893232  [51200/60000]
+loss: 0.768567  [12800/60000]
+loss: 0.945292  [19200/60000]
+loss: 0.846786  [25600/60000]
+loss: 0.846591  [32000/60000]
+loss: 0.923902  [38400/60000]
+loss: 0.866405  [44800/60000]
+loss: 0.893225  [51200/60000]
 loss: 0.843394  [57600/60000]
 Test Error:
  Accuracy: 68.3%, Avg loss: 0.851377
 
 Epoch 9
 -------------------------------
-loss: 0.884660  [    0/60000]
+loss: 0.884661  [    0/60000]
 loss: 0.942678  [ 6400/60000]
-loss: 0.710138  [12800/60000]
-loss: 0.899434  [19200/60000]
-loss: 0.804528  [25600/60000]
-loss: 0.795329  [32000/60000]
+loss: 0.710136  [12800/60000]
+loss: 0.899433  [19200/60000]
+loss: 0.804526  [25600/60000]
+loss: 0.795328  [32000/60000]
 loss: 0.883360  [38400/60000]
-loss: 0.834207  [44800/60000]
-loss: 0.853341  [51200/60000]
-loss: 0.807475  [57600/60000]
+loss: 0.834203  [44800/60000]
+loss: 0.853334  [51200/60000]
+loss: 0.807479  [57600/60000]
 Test Error:
- Accuracy: 69.5%, Avg loss: 0.813398
+ Accuracy: 69.5%, Avg loss: 0.813397
 
 Epoch 10
 -------------------------------
-loss: 0.832944  [    0/60000]
-loss: 0.902497  [ 6400/60000]
-loss: 0.664862  [12800/60000]
-loss: 0.863964  [19200/60000]
-loss: 0.772260  [25600/60000]
+loss: 0.832942  [    0/60000]
+loss: 0.902501  [ 6400/60000]
+loss: 0.664860  [12800/60000]
+loss: 0.863966  [19200/60000]
+loss: 0.772258  [25600/60000]
 loss: 0.755983  [32000/60000]
-loss: 0.850609  [38400/60000]
-loss: 0.810029  [44800/60000]
-loss: 0.822286  [51200/60000]
-loss: 0.778496  [57600/60000]
+loss: 0.850612  [38400/60000]
+loss: 0.810030  [44800/60000]
+loss: 0.822278  [51200/60000]
+loss: 0.778497  [57600/60000]
 Test Error:
- Accuracy: 70.6%, Avg loss: 0.783130
+ Accuracy: 70.6%, Avg loss: 0.783129
 
 Done!
 </pre></div>
 </div>
-</section>
-<section id="id10">
+</div>
+<div class="section" id="id10">
 <h2>더 읽어보기<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p><a class="reference external" href="https://pytorch.org/docs/stable/nn.html#loss-functions">Loss Functions</a></p></li>
 <li><p><a class="reference external" href="https://pytorch.org/docs/stable/optim.html">torch.optim</a></p></li>
 <li><p><a class="reference external" href="https://tutorials.pytorch.kr/recipes/recipes/warmstarting_model_using_parameters_from_a_different_model.html">Warmstart Training a Model</a></p></li>
 </ul>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 1 minutes  39.482 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 1 minutes  44.555 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-beginner-basics-optimization-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/0662a149d54bd776924742c96eb6282d/optimization_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">optimization_tutorial.py</span></code></a></p>
@@ -747,8 +749,8 @@ Done!
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
-</section>
-</section>
+</div>
+</div>
 
 
              </article>
@@ -785,7 +787,7 @@ Done!
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2021, PyTorch &amp; PyTorch Korea Community.
+        &copy; Copyright 2022, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorch Korea User Group).
 
     </p>
   </div>
@@ -798,6 +800,13 @@ Done!
 </footer>
 
           </div>
+<script>
+if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.indexOf("/prototype/prototype_index")< 1))
+  {
+    var div = '<div class="admonition note"><p class="admonition-title">Note</p><p><i class="fa fa-flask" aria-hidden="true">&nbsp</i> 이 튜토리얼은 프로토타입(prototype) 기능들에 대해서 설명하고 있습니다. 프로토타입 기능은 일반적으로 피드백 및 테스트용으로, 런타임 플래그 없이는 PyPI나 Conda로 배포되는 바이너리에서는 사용할 수 없습니다.</p></div>'
+    document.getElementById("pytorch-article").insertAdjacentHTML('afterBegin', div)
+  }
+</script>
         </div>
 
         <div class="pytorch-content-right" id="pytorch-content-right">
@@ -854,7 +863,6 @@ Done!
       });
   </script>
  
-
 <script>
 //add microsoft link
 
@@ -933,7 +941,7 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
 </script>
 
 <script type="text/javascript">
-  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile'];
+  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile', 'Introduction to PyTorch on YouTube', 'Recommendation Systems'];
 </script>
 
 

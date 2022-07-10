@@ -6,24 +6,23 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
 <meta property="og:title" content="멀티-GPU 예제" />
   
 <meta property="og:type" content="article" />
   
-<meta property="og:url" content="http://tutorials.pytorch.kr/beginner/former_torchies/parallelism_tutorial.html" />
+<meta property="og:url" content="https://tutorials.pytorch.kr/beginner/former_torchies/parallelism_tutorial.html" />
   
 <meta property="og:description" content="데이터 병렬 처리(Data Parallelism)는 미니-배치를 여러 개의 더 작은 미니-배치로 자르고 각각의 작은 미니배치를 병렬적으로 연산하는 것입니다. 데이터 병렬 처리는 torch.nn.DataParallel 을 사용하여 구현합니다. DataParallel 로 감쌀 수 있는 모듈은 배치 차원(batch dimension)에서 여러 GPU로 병렬 처리할 수 있습니다. DataParallel: CPU 모드인 코드를 바꿀 필요가 없습니다. DataParallel에 대한 문서는 여기 에서 확인하실 수 있습니다. 래핑된 모듈의 ..." />
   
-<meta property="og:image" content="http://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
+<meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
   
 <meta property="og:image:alt" content="멀티-GPU 예제" />
   
 <meta property="og:ignore_canonical" content="true" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>멀티-GPU 예제 &mdash; 파이토치 한국어 튜토리얼(PyTorch tutorials in Korean)</title>
+  <title>멀티-GPU 예제 &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
   
 
   
@@ -129,7 +128,7 @@
               
               
                 <div class="version">
-                  1.11.0+cu102
+                  1.12.0+cu102
                 </div>
               
             
@@ -270,6 +269,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/quantized_transfer_learning_tutorial.html">(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../advanced/static_quantization_tutorial.html">(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../intermediate/torchserve_with_ipex.html">Grokking PyTorch Intel CPU performance from first principles</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul>
@@ -296,6 +296,7 @@
 <p class="caption" role="heading"><span class="caption-text">Recommendation Systems</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/torchrec_tutorial.html">Introduction to TorchRec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../advanced/sharding.html">Exploring TorchRec sharding</a></li>
 </ul>
 
             
@@ -384,6 +385,7 @@
           </div>
 
         
+
           
           <div class="rst-content">
           
@@ -394,14 +396,14 @@
 <p class="admonition-title">Note</p>
 <p>Click <a class="reference internal" href="#sphx-glr-download-beginner-former-torchies-parallelism-tutorial-py"><span class="std std-ref">here</span></a> to download the full example code</p>
 </div>
-<section class="sphx-glr-example-title" id="gpu">
+<div class="sphx-glr-example-title section" id="gpu">
 <span id="sphx-glr-beginner-former-torchies-parallelism-tutorial-py"></span><h1>멀티-GPU 예제<a class="headerlink" href="#gpu" title="Permalink to this headline">¶</a></h1>
 <p>데이터 병렬 처리(Data Parallelism)는 미니-배치를 여러 개의 더 작은 미니-배치로
 자르고 각각의 작은 미니배치를 병렬적으로 연산하는 것입니다.</p>
 <p>데이터 병렬 처리는 <code class="docutils literal notranslate"><span class="pre">torch.nn.DataParallel</span></code> 을 사용하여 구현합니다.
 <code class="docutils literal notranslate"><span class="pre">DataParallel</span></code> 로 감쌀 수 있는 모듈은 배치 차원(batch dimension)에서
 여러 GPU로 병렬 처리할 수 있습니다.</p>
-<section id="dataparallel">
+<div class="section" id="dataparallel">
 <h2>DataParallel<a class="headerlink" href="#dataparallel" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
@@ -466,8 +468,8 @@
     <span class="k">return</span> <span class="n">nn</span><span class="o">.</span><span class="n">parallel</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span> <span class="n">output_device</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-<section id="cpu-gpu">
+</div>
+<div class="section" id="cpu-gpu">
 <h2>모델의 일부는 CPU, 일부는 GPU에서<a class="headerlink" href="#cpu-gpu" title="Permalink to this headline">¶</a></h2>
 <p>일부는 CPU에서, 일부는 GPU에서 신경망을 구현한 짧은 예제를 살펴보겠습니다</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cuda:0&quot;</span><span class="p">)</span>
@@ -507,7 +509,7 @@
 <li><p><a class="reference external" href="https://discuss.pytorch.org/">포럼에서 PyTorch에 대해 얘기하기</a></p></li>
 <li><p><a class="reference external" href="http://pytorch.slack.com/messages/beginner/">Slack에서 다른 사용자와 대화하기</a></p></li>
 </ul>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.148 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.178 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-beginner-former-torchies-parallelism-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/9629e4ec46921a9569d03101ecfddaee/parallelism_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">parallelism_tutorial.py</span></code></a></p>
@@ -517,8 +519,8 @@
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
-</section>
-</section>
+</div>
+</div>
 
 
              </article>
@@ -546,7 +548,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2021, PyTorch &amp; PyTorch Korea Community.
+        &copy; Copyright 2022, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorch Korea User Group).
 
     </p>
   </div>
@@ -559,6 +561,13 @@
 </footer>
 
           </div>
+<script>
+if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.indexOf("/prototype/prototype_index")< 1))
+  {
+    var div = '<div class="admonition note"><p class="admonition-title">Note</p><p><i class="fa fa-flask" aria-hidden="true">&nbsp</i> 이 튜토리얼은 프로토타입(prototype) 기능들에 대해서 설명하고 있습니다. 프로토타입 기능은 일반적으로 피드백 및 테스트용으로, 런타임 플래그 없이는 PyPI나 Conda로 배포되는 바이너리에서는 사용할 수 없습니다.</p></div>'
+    document.getElementById("pytorch-article").insertAdjacentHTML('afterBegin', div)
+  }
+</script>
         </div>
 
         <div class="pytorch-content-right" id="pytorch-content-right">
@@ -608,7 +617,6 @@
       });
   </script>
  
-
 <script>
 //add microsoft link
 
@@ -687,7 +695,7 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
 </script>
 
 <script type="text/javascript">
-  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile'];
+  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile', 'Introduction to PyTorch on YouTube', 'Recommendation Systems'];
 </script>
 
 

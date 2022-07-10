@@ -6,24 +6,23 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
 <meta property="og:title" content="동적 양자화" />
   
 <meta property="og:type" content="article" />
   
-<meta property="og:url" content="http://tutorials.pytorch.kr/recipes/recipes/dynamic_quantization.html" />
+<meta property="og:url" content="https://tutorials.pytorch.kr/recipes/recipes/dynamic_quantization.html" />
   
 <meta property="og:description" content="이 레시피에서는 동적 양자화(dynamic quantization)를 활용하여, LSTM과 유사한 형태의 순환 신경망이 좀 더 빠르게 추론하도록 만드는 방법을 살펴 봅니다. 이를 통해 모델에서 사용하는 가중치의 규모를 줄이고 수행 속도를 빠르게 만들 것입니다. 도입: 우리는 신경망을 설계할 때 여러 트레이드오프(trade-off)를 마주하게 됩니다. 모델을 개발하고 학습할 때 순환 신경망의 레이어나 매개변수의 수를 바꿔볼 수 있을 텐데, 그럴 때면 정확도와 모델의 규모나 응답 속도(또는 처리량) 사이에 트레이드오프가 생기게 됩..." />
   
-<meta property="og:image" content="http://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
+<meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
   
 <meta property="og:image:alt" content="동적 양자화" />
   
 <meta property="og:ignore_canonical" content="true" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>동적 양자화 &mdash; 파이토치 한국어 튜토리얼(PyTorch tutorials in Korean)</title>
+  <title>동적 양자화 &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
   
 
   
@@ -131,7 +130,7 @@
               
               
                 <div class="version">
-                  1.11.0+cu102
+                  1.12.0+cu102
                 </div>
               
             
@@ -272,6 +271,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/quantized_transfer_learning_tutorial.html">(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../advanced/static_quantization_tutorial.html">(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../intermediate/torchserve_with_ipex.html">Grokking PyTorch Intel CPU performance from first principles</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul>
@@ -298,6 +298,7 @@
 <p class="caption" role="heading"><span class="caption-text">Recommendation Systems</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/torchrec_tutorial.html">Introduction to TorchRec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../advanced/sharding.html">Exploring TorchRec sharding</a></li>
 </ul>
 
             
@@ -388,6 +389,7 @@
           </div>
 
         
+
           
           <div class="rst-content">
           
@@ -398,13 +400,13 @@
 <p class="admonition-title">Note</p>
 <p>Click <a class="reference internal" href="#sphx-glr-download-recipes-recipes-dynamic-quantization-py"><span class="std std-ref">here</span></a> to download the full example code</p>
 </div>
-<section class="sphx-glr-example-title" id="sphx-glr-recipes-recipes-dynamic-quantization-py">
+<div class="sphx-glr-example-title section" id="sphx-glr-recipes-recipes-dynamic-quantization-py">
 <span id="id1"></span><h1>동적 양자화<a class="headerlink" href="#sphx-glr-recipes-recipes-dynamic-quantization-py" title="Permalink to this headline">¶</a></h1>
 <p>이 레시피에서는 동적 양자화(dynamic quantization)를 활용하여, LSTM과
 유사한 형태의 순환 신경망이 좀 더 빠르게 추론하도록 만드는 방법을 살펴
 봅니다. 이를 통해 모델에서 사용하는 가중치의 규모를 줄이고 수행 속도를
 빠르게 만들 것입니다.</p>
-<section id="id2">
+<div class="section" id="id2">
 <h2>도입<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
 <p>우리는 신경망을 설계할 때 여러 트레이드오프(trade-off)를 마주하게
 됩니다. 모델을 개발하고 학습할 때 순환 신경망의 레이어나 매개변수의
@@ -416,8 +418,8 @@
 줄 수 있게 될 것입니다.</p>
 <p>여러분이 이를 한 번 시도해 본다면 정확도가 별로 손실되지 않으면서도
 모델의 규모를 상당히 줄이면서 응답 시간도 감소시킬 수 있을 것입니다.</p>
-</section>
-<section id="id3">
+</div>
+<div class="section" id="id3">
 <h2>동적 양자화란 무엇인가?<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
 <p>신경망을 양자화한다는 말의 의미는 가중치나 활성화 함수에서 정밀도가
 낮은 정수 표현을 사용하도록 바꾼다는 것입니다. 이를 통해 모델의 규모를
@@ -465,8 +467,8 @@
 살펴보는 것은 고급 튜토리얼의 내용으로 남겨두겠습니다. 만약 여러분이
 좀 더 엄밀한 내용으로 넘어가고 싶다면 <a class="reference external" href="https://tutorials.pytorch.kr/advanced/dynamic_quantization_tutorial.html">고급 동적 양자화 튜토리얼</a>
 을 참고하시기 바랍니다.</p>
-</section>
-<section id="id4">
+</div>
+<div class="section" id="id4">
 <h2>단계<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
 <p>이 레시피는 다섯 단계로 구성되어 있습니다.</p>
 <ol class="arabic simple">
@@ -481,7 +483,7 @@
 <li><p>정확도 살펴보기 - 이 단계에서는 두 모델을 구동시키고 출력을
 비교합니다.</p></li>
 </ol>
-<section id="id5">
+<div class="section" id="id5">
 <h3>1: 준비<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
 <p>이 단계에서는 이 레시피에서 계속 사용할 몇 줄의 간단한 코드를
 준비합니다.</p>
@@ -533,8 +535,8 @@
 <span class="n">hidden</span> <span class="o">=</span> <span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">lstm_depth</span><span class="p">,</span><span class="n">batch_size</span><span class="p">,</span><span class="n">model_dimension</span><span class="p">),</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">lstm_depth</span><span class="p">,</span><span class="n">batch_size</span><span class="p">,</span><span class="n">model_dimension</span><span class="p">))</span>
 </pre></div>
 </div>
-</section>
-<section id="id6">
+</div>
+<div class="section" id="id6">
 <h3>2: 양자화 수행<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
 <p>이제 재밌는 부분을 살펴보려 합니다. 우선은 양자화 할 모델 객체를 하나
 만들고 그 이름을 float_lstm 으로 둡니다. 우리가 여기서 사용할 함수는</p>
@@ -562,8 +564,8 @@
 <span class="nb">print</span><span class="p">(</span><span class="n">quantized_lstm</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-<section id="id7">
+</div>
+<div class="section" id="id7">
 <h3>3. 모델의 규모 살펴보기<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
 <p>자, 이제 모델을 양자화 했습니다. 그러면 어떤 이득이 있을까요? 우선 첫
 번째는 FP32 모델 매개변수를 INT8 값으로 변환했다는 (그리고 배율 값도
@@ -586,8 +588,8 @@
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{0:.2f}</span><span class="s2"> times smaller&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">f</span><span class="o">/</span><span class="n">q</span><span class="p">))</span>
 </pre></div>
 </div>
-</section>
-<section id="id8">
+</div>
+<div class="section" id="id8">
 <h3>4. 응답 시간 살펴보기<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
 <p>좋은 점 두 번째는 통상적으로 양자화된 모델의 수행 속도가 좀 더
 빠르다는 점입니다. 이는</p>
@@ -608,8 +610,8 @@
 <span class="c1"># %timeit quantized_lstm.forward(inputs,hidden)</span>
 </pre></div>
 </div>
-</section>
-<section id="id9">
+</div>
+<div class="section" id="id9">
 <h3>5: 정확도 살펴보기<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
 <p>우리는 여기서 정확도를 자세히 살펴보진 않을 것입니다. 이는 우리가
 제대로 학습된 네트워크가 아니라 랜덤하게 초기화된 네트워크를 사용하기
@@ -632,9 +634,9 @@
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;mean absolute value of the difference between the output tensors is </span><span class="si">{0:.5f}</span><span class="s1"> or </span><span class="si">{1:.2f}</span><span class="s1"> percent&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mag3</span><span class="p">,</span><span class="n">mag3</span><span class="o">/</span><span class="n">mag1</span><span class="o">*</span><span class="mi">100</span><span class="p">))</span>
 </pre></div>
 </div>
-</section>
-</section>
-<section id="id10">
+</div>
+</div>
+<div class="section" id="id10">
 <h2>좀 더 알아보기<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h2>
 <p>우리는 동적 양자화가 무엇이며 어떤 이점이 있는지 살펴보았고, 간단한
 LSTM 모델을 빠르게 양자화하기 위해 <code class="docutils literal notranslate"><span class="pre">torch.quantization.quantize_dynamic()</span></code>
@@ -646,9 +648,9 @@ LSTM 모델을 빠르게 양자화하기 위해 <code class="docutils literal no
 좀 더 자세한 내용을 알아보고 싶다면 <a class="reference external" href="https://tutorials.pytorch.kr/advanced/dynamic_quantization_tutorial.html">(베타) LSTM 언어 모델 동적 양자화
 튜토리얼</a>
 을 계속 공부해 보시기 바랍니다.</p>
-</section>
-</section>
-<section id="id11">
+</div>
+</div>
+<div class="section" id="id11">
 <h1>참고 자료<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h1>
 <p><a class="reference external" href="https://pytorch.org/docs/stable/quantization.html">양자화 API 문서</a></p>
 <p><a class="reference external" href="https://tutorials.pytorch.kr/intermediate/dynamic_quantization_bert_tutorial.html">(베타) BERT 동적 양자화</a></p>
@@ -664,7 +666,7 @@ LSTM 모델을 빠르게 양자화하기 위해 <code class="docutils literal no
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
-</section>
+</div>
 
 
              </article>
@@ -701,7 +703,7 @@ LSTM 모델을 빠르게 양자화하기 위해 <code class="docutils literal no
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2021, PyTorch &amp; PyTorch Korea Community.
+        &copy; Copyright 2022, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorch Korea User Group).
 
     </p>
   </div>
@@ -714,6 +716,13 @@ LSTM 모델을 빠르게 양자화하기 위해 <code class="docutils literal no
 </footer>
 
           </div>
+<script>
+if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.indexOf("/prototype/prototype_index")< 1))
+  {
+    var div = '<div class="admonition note"><p class="admonition-title">Note</p><p><i class="fa fa-flask" aria-hidden="true">&nbsp</i> 이 튜토리얼은 프로토타입(prototype) 기능들에 대해서 설명하고 있습니다. 프로토타입 기능은 일반적으로 피드백 및 테스트용으로, 런타임 플래그 없이는 PyPI나 Conda로 배포되는 바이너리에서는 사용할 수 없습니다.</p></div>'
+    document.getElementById("pytorch-article").insertAdjacentHTML('afterBegin', div)
+  }
+</script>
         </div>
 
         <div class="pytorch-content-right" id="pytorch-content-right">
@@ -773,7 +782,6 @@ LSTM 모델을 빠르게 양자화하기 위해 <code class="docutils literal no
       });
   </script>
  
-
 <script>
 //add microsoft link
 
@@ -852,7 +860,7 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
 </script>
 
 <script type="text/javascript">
-  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile'];
+  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile', 'Introduction to PyTorch on YouTube', 'Recommendation Systems'];
 </script>
 
 

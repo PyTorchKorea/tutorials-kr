@@ -6,24 +6,23 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
 <meta property="og:title" content="PyTorch에서 추론(inference)을 위해 모델 저장하기 & 불러오기" />
   
 <meta property="og:type" content="article" />
   
-<meta property="og:url" content="http://tutorials.pytorch.kr/recipes/recipes/saving_and_loading_models_for_inference.html" />
+<meta property="og:url" content="https://tutorials.pytorch.kr/recipes/recipes/saving_and_loading_models_for_inference.html" />
   
 <meta property="og:description" content="PyTorch에서는 추론(inference)을 위해 모델을 저장하고 불러오는데 2가지 접근법이 있습니다. 첫번째는 state_dict 를 저장하고 불러오는 것이고, 두번째는 전체 모델을 저장하는 것입니다. 개요: torch.save() 함수를 사용하여 모델의 state_dict 를 저장하면 이후에 모델을 불러올 때 유연함을 크게 살릴 수 있습니다. 학습된 모델의 매개변수(parameter)만을 저장하면되므로 모델 저장 시에 권장하는 방법입니다. 모델 전체를 저장하고 불러올 때에는 Python의 pickle 모듈을 사용하여 전체..." />
   
-<meta property="og:image" content="http://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
+<meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
   
 <meta property="og:image:alt" content="PyTorch에서 추론(inference)을 위해 모델 저장하기 & 불러오기" />
   
 <meta property="og:ignore_canonical" content="true" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>PyTorch에서 추론(inference)을 위해 모델 저장하기 &amp; 불러오기 &mdash; 파이토치 한국어 튜토리얼(PyTorch tutorials in Korean)</title>
+  <title>PyTorch에서 추론(inference)을 위해 모델 저장하기 &amp; 불러오기 &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
   
 
   
@@ -131,7 +130,7 @@
               
               
                 <div class="version">
-                  1.11.0+cu102
+                  1.12.0+cu102
                 </div>
               
             
@@ -272,6 +271,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/quantized_transfer_learning_tutorial.html">(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../advanced/static_quantization_tutorial.html">(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../intermediate/torchserve_with_ipex.html">Grokking PyTorch Intel CPU performance from first principles</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul>
@@ -298,6 +298,7 @@
 <p class="caption" role="heading"><span class="caption-text">Recommendation Systems</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/torchrec_tutorial.html">Introduction to TorchRec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../advanced/sharding.html">Exploring TorchRec sharding</a></li>
 </ul>
 
             
@@ -388,6 +389,7 @@
           </div>
 
         
+
           
           <div class="rst-content">
           
@@ -398,12 +400,12 @@
 <p class="admonition-title">Note</p>
 <p>Click <a class="reference internal" href="#sphx-glr-download-recipes-recipes-saving-and-loading-models-for-inference-py"><span class="std std-ref">here</span></a> to download the full example code</p>
 </div>
-<section class="sphx-glr-example-title" id="pytorch-inference">
+<div class="sphx-glr-example-title section" id="pytorch-inference">
 <span id="sphx-glr-recipes-recipes-saving-and-loading-models-for-inference-py"></span><h1>PyTorch에서 추론(inference)을 위해 모델 저장하기 &amp; 불러오기<a class="headerlink" href="#pytorch-inference" title="Permalink to this headline">¶</a></h1>
 <p>PyTorch에서는 추론(inference)을 위해 모델을 저장하고 불러오는데 2가지 접근법이
 있습니다. 첫번째는 <code class="docutils literal notranslate"><span class="pre">state_dict</span></code> 를 저장하고 불러오는 것이고, 두번째는 전체
 모델을 저장하는 것입니다.</p>
-<section id="id1">
+<div class="section" id="id1">
 <h2>개요<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
 <p>torch.save() 함수를 사용하여 모델의 <code class="docutils literal notranslate"><span class="pre">state_dict</span></code> 를 저장하면 이후에 모델을
 불러올 때 유연함을 크게 살릴 수 있습니다. 학습된 모델의 매개변수(parameter)만을
@@ -416,15 +418,15 @@
 포함된 파일의 경로를 저장합니다. 이 때문에 작성한 코드가 다른 프로젝트에서
 사용되거나 리팩토링을 거치는 등의 과정에서 동작하지 않을 수 있습니다. 이 레시피에서는
 추론을 위해 모델을 저장하고 불러오는 두 가지 방법 모두를 살펴보겠습니다.</p>
-</section>
-<section id="id2">
+</div>
+<div class="section" id="id2">
 <h2>설정<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
 <p>시작하기 전에 <code class="docutils literal notranslate"><span class="pre">torch</span></code> 가 없다면 설치해야 합니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">torch</span>
 </pre></div>
 </div>
-</section>
-<section id="steps">
+</div>
+<div class="section" id="steps">
 <h2>단계(Steps)<a class="headerlink" href="#steps" title="Permalink to this headline">¶</a></h2>
 <ol class="arabic simple">
 <li><p>데이터 불러올 때 필요한 라이브러리들 불러오기</p></li>
@@ -433,7 +435,7 @@
 <li><p><code class="docutils literal notranslate"><span class="pre">state_dict</span></code> 을 통해 모델을 저장하고 불러오기</p></li>
 <li><p>전체 모델을 저장하고 불러오기</p></li>
 </ol>
-<section id="id3">
+<div class="section" id="id3">
 <h3>1. 데이터 불러올 때 필요한 라이브러리들 불러오기<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
 <p>이 레시피에서는 <code class="docutils literal notranslate"><span class="pre">torch</span></code> 와 여기 포함된 <code class="docutils literal notranslate"><span class="pre">torch.nn</span></code> 과 <a href="#id4"><span class="problematic" id="id5">``</span></a>torch.optim` 을
 사용하겠습니다.</p>
@@ -442,8 +444,8 @@
 <span class="kn">import</span> <span class="nn">torch.optim</span> <span class="k">as</span> <span class="nn">optim</span>
 </pre></div>
 </div>
-</section>
-<section id="id6">
+</div>
+<div class="section" id="id6">
 <h3>2. 신경망을 구성하고 초기화하기<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
 <p>예를 들기 위해, 이미지를 학습하는 신경망을 만들어보겠습니다. 더 자세한 내용은
 신경망 구성하기 레시피를 참고해주세요.</p>
@@ -470,15 +472,15 @@
 <span class="nb">print</span><span class="p">(</span><span class="n">net</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-<section id="id7">
+</div>
+<div class="section" id="id7">
 <h3>3. 옵티마이저 초기화하기<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
 <p>모멘텀(momentum)을 갖는 SGD를 사용하겠습니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">optimizer</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">SGD</span><span class="p">(</span><span class="n">net</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span> <span class="n">momentum</span><span class="o">=</span><span class="mf">0.9</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-<section id="state-dict">
+</div>
+<div class="section" id="state-dict">
 <h3>4. <code class="docutils literal notranslate"><span class="pre">state_dict</span></code> 을 통해 모델을 저장하고 불러오기<a class="headerlink" href="#state-dict" title="Permalink to this headline">¶</a></h3>
 <p>이제 <code class="docutils literal notranslate"><span class="pre">state_dict</span></code> 만 사용하여 모델을 저장하고 불러와보겠습니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># 경로 지정</span>
@@ -502,8 +504,8 @@
 <p>또한, 추론을 실행하기 전에 <code class="docutils literal notranslate"><span class="pre">model.eval()</span></code> 을 호출하여 드롭아웃(dropout)과
 배치 정규화 층(batch normalization layers)을 평가(evaluation) 모드로 바꿔야한다는
 것을 기억하세요. 이것을 빼먹으면 일관성 없는 추론 결과를 얻게 됩니다.</p>
-</section>
-<section id="id8">
+</div>
+<div class="section" id="id8">
 <h3>5. 전체 모델을 저장하고 불러오기<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
 <p>이제 전체 모델에 대해서 똑같이 해보겠습니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># 경로 지정</span>
@@ -521,9 +523,9 @@
 (batch normalization layers)을 평가(evaluation) 모드로 바꿔야한다는
 것을 기억하세요.</p>
 <p>축하합니다! 지금까지 PyTorch에서 추론을위한 모델을 성공적으로 저장하고 불러왔습니다.</p>
-</section>
-</section>
-<section id="id9">
+</div>
+</div>
+<div class="section" id="id9">
 <h2>더 알아보기<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h2>
 <p>다른 레시피를 둘러보고 계속 배워보세요:</p>
 <ul class="simple">
@@ -540,8 +542,8 @@
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
-</section>
-</section>
+</div>
+</div>
 
 
              </article>
@@ -578,7 +580,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2021, PyTorch &amp; PyTorch Korea Community.
+        &copy; Copyright 2022, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorch Korea User Group).
 
     </p>
   </div>
@@ -591,6 +593,13 @@
 </footer>
 
           </div>
+<script>
+if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.indexOf("/prototype/prototype_index")< 1))
+  {
+    var div = '<div class="admonition note"><p class="admonition-title">Note</p><p><i class="fa fa-flask" aria-hidden="true">&nbsp</i> 이 튜토리얼은 프로토타입(prototype) 기능들에 대해서 설명하고 있습니다. 프로토타입 기능은 일반적으로 피드백 및 테스트용으로, 런타임 플래그 없이는 PyPI나 Conda로 배포되는 바이너리에서는 사용할 수 없습니다.</p></div>'
+    document.getElementById("pytorch-article").insertAdjacentHTML('afterBegin', div)
+  }
+</script>
         </div>
 
         <div class="pytorch-content-right" id="pytorch-content-right">
@@ -649,7 +658,6 @@
       });
   </script>
  
-
 <script>
 //add microsoft link
 
@@ -728,7 +736,7 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
 </script>
 
 <script type="text/javascript">
-  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile'];
+  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile', 'Introduction to PyTorch on YouTube', 'Recommendation Systems'];
 </script>
 
 

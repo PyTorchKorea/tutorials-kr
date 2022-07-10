@@ -6,24 +6,23 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
 <meta property="og:title" content="Real Time Inference on Raspberry Pi 4 (30 fps!)" />
   
 <meta property="og:type" content="article" />
   
-<meta property="og:url" content="http://tutorials.pytorch.kr/intermediate/realtime_rpi.html" />
+<meta property="og:url" content="https://tutorials.pytorch.kr/intermediate/realtime_rpi.html" />
   
 <meta property="og:description" content="Author: Tristan Rice PyTorch has out of the box support for Raspberry Pi 4. This tutorial will guide you on how to setup a Raspberry Pi 4 for running PyTorch and run a MobileNet v2 classification model in real time (30 fps+) on the CPU. This was all tested with Raspberry Pi 4 Model B 4GB but shou..." />
   
-<meta property="og:image" content="http://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
+<meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
   
 <meta property="og:image:alt" content="Real Time Inference on Raspberry Pi 4 (30 fps!)" />
   
 <meta property="og:ignore_canonical" content="true" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Real Time Inference on Raspberry Pi 4 (30 fps!) &mdash; 파이토치 한국어 튜토리얼(PyTorch tutorials in Korean)</title>
+  <title>Real Time Inference on Raspberry Pi 4 (30 fps!) &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
   
 
   
@@ -131,7 +130,7 @@
               
               
                 <div class="version">
-                  1.11.0+cu102
+                  1.12.0+cu102
                 </div>
               
             
@@ -272,6 +271,7 @@
 <li class="toctree-l1"><a class="reference internal" href="dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="quantized_transfer_learning_tutorial.html">(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/static_quantization_tutorial.html">(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torchserve_with_ipex.html">Grokking PyTorch Intel CPU performance from first principles</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul>
@@ -298,6 +298,7 @@
 <p class="caption" role="heading"><span class="caption-text">Recommendation Systems</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="torchrec_tutorial.html">Introduction to TorchRec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/sharding.html">Exploring TorchRec sharding</a></li>
 </ul>
 
             
@@ -386,13 +387,14 @@
           </div>
 
         
+
           
           <div class="rst-content">
           
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <section id="real-time-inference-on-raspberry-pi-4-30-fps">
+  <div class="section" id="real-time-inference-on-raspberry-pi-4-30-fps">
 <h1>Real Time Inference on Raspberry Pi 4 (30 fps!)<a class="headerlink" href="#real-time-inference-on-raspberry-pi-4-30-fps" title="Permalink to this headline">¶</a></h1>
 <p><strong>Author</strong>: <a class="reference external" href="https://github.com/d4l3k">Tristan Rice</a></p>
 <p>PyTorch has out of the box support for Raspberry Pi 4. This tutorial will guide
@@ -401,7 +403,7 @@ classification model in real time (30 fps+) on the CPU.</p>
 <p>This was all tested with Raspberry Pi 4 Model B 4GB but should work with the 2GB
 variant as well as on the 3B with reduced performance.</p>
 <img alt="https://user-images.githubusercontent.com/909104/153093710-bc736b6f-69d9-4a50-a3e8-9f2b2c9e04fd.gif" src="https://user-images.githubusercontent.com/909104/153093710-bc736b6f-69d9-4a50-a3e8-9f2b2c9e04fd.gif" />
-<section id="prerequisites">
+<div class="section" id="prerequisites">
 <h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline">¶</a></h2>
 <p>To follow this tutorial you’ll need a Raspberry Pi 4, a camera for it and all
 the other standard accessories.</p>
@@ -413,8 +415,8 @@ the other standard accessories.</p>
 <li><p>SD card (at least 8gb)</p></li>
 <li><p>SD card read/writer</p></li>
 </ul>
-</section>
-<section id="raspberry-pi-4-setup">
+</div>
+<div class="section" id="raspberry-pi-4-setup">
 <h2>Raspberry Pi 4 Setup<a class="headerlink" href="#raspberry-pi-4-setup" title="Permalink to this headline">¶</a></h2>
 <p>PyTorch only provides pip packages for Arm 64bit (aarch64) so you’ll need to install a 64 bit version of the OS on your Raspberry Pi</p>
 <p>You can download the latest arm64 Raspberry Pi OS from <a class="reference external" href="https://downloads.raspberrypi.org/raspios_arm64/images/">https://downloads.raspberrypi.org/raspios_arm64/images/</a> and install it via rpi-imager.</p>
@@ -436,8 +438,8 @@ the other standard accessories.</p>
 </pre></div>
 </div>
 <p>And then reboot. After you reboot the video4linux2 device <code class="docutils literal notranslate"><span class="pre">/dev/video0</span></code> should exist.</p>
-</section>
-<section id="installing-pytorch-and-opencv">
+</div>
+<div class="section" id="installing-pytorch-and-opencv">
 <h2>Installing PyTorch and OpenCV<a class="headerlink" href="#installing-pytorch-and-opencv" title="Permalink to this headline">¶</a></h2>
 <p>PyTorch and all the other libraries we need have ARM 64-bit/aarch64 variants so you can just install them via pip and have it work like any other Linux system.</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ pip install torch torchvision torchaudio
@@ -451,8 +453,8 @@ $ pip install numpy --upgrade
 </pre></div>
 </div>
 <img alt="https://user-images.githubusercontent.com/909104/152874271-d7057c2d-80fd-4761-aed4-df6c8b7aa99f.png" src="https://user-images.githubusercontent.com/909104/152874271-d7057c2d-80fd-4761-aed4-df6c8b7aa99f.png" />
-</section>
-<section id="video-capture">
+</div>
+<div class="section" id="video-capture">
 <h2>Video Capture<a class="headerlink" href="#video-capture" title="Permalink to this headline">¶</a></h2>
 <p>For video capture we’re going to be using OpenCV to stream the video frames
 instead of the more common <code class="docutils literal notranslate"><span class="pre">picamera</span></code>. <cite>picamera</cite> isn’t available on 64-bit
@@ -479,8 +481,8 @@ shuffling to get it into the expected RGB format.</p>
 </pre></div>
 </div>
 <p>This data reading and processing takes about <code class="docutils literal notranslate"><span class="pre">3.5</span> <span class="pre">ms</span></code>.</p>
-</section>
-<section id="image-preprocessing">
+</div>
+<div class="section" id="image-preprocessing">
 <h2>Image Preprocessing<a class="headerlink" href="#image-preprocessing" title="Permalink to this headline">¶</a></h2>
 <p>We need to take the frames and transform them into the format the model expects. This is the same processing as you would do on any machine with the standard torchvision transforms.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torchvision</span> <span class="kn">import</span> <span class="n">transforms</span>
@@ -498,8 +500,8 @@ shuffling to get it into the expected RGB format.</p>
 <span class="n">input_batch</span> <span class="o">=</span> <span class="n">input_tensor</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-<section id="model-choices">
+</div>
+<div class="section" id="model-choices">
 <h2>Model Choices<a class="headerlink" href="#model-choices" title="Permalink to this headline">¶</a></h2>
 <p>There’s a number of models you can choose from to use with different performance
 characteristics. Not all models provide a <code class="docutils literal notranslate"><span class="pre">qnnpack</span></code> pretrained variant so for
@@ -593,8 +595,8 @@ accuracy.</p>
 </tr>
 </tbody>
 </table>
-</section>
-<section id="mobilenetv2-quantization-and-jit">
+</div>
+<div class="section" id="mobilenetv2-quantization-and-jit">
 <h2>MobileNetV2: Quantization and JIT<a class="headerlink" href="#mobilenetv2-quantization-and-jit" title="Permalink to this headline">¶</a></h2>
 <p>For optimal performance we want a model that’s quantized and fused. Quantized
 means that it does the computation using int8 which is much more performant than
@@ -616,8 +618,8 @@ during inference.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">net</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">script</span><span class="p">(</span><span class="n">net</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-<section id="putting-it-together">
+</div>
+<div class="section" id="putting-it-together">
 <h2>Putting It Together<a class="headerlink" href="#putting-it-together" title="Permalink to this headline">¶</a></h2>
 <p>We can now put all the pieces together and run it:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
@@ -702,8 +704,8 @@ to print the detections.</p>
 <img alt="https://user-images.githubusercontent.com/909104/153092153-d9c08dfe-105b-408a-8e1e-295da8a78c19.jpg" src="https://user-images.githubusercontent.com/909104/153092153-d9c08dfe-105b-408a-8e1e-295da8a78c19.jpg" />
 <p>Detecting a mug:</p>
 <img alt="https://user-images.githubusercontent.com/909104/153092155-4b90002f-a0f3-4267-8d70-e713e7b4d5a0.jpg" src="https://user-images.githubusercontent.com/909104/153092155-4b90002f-a0f3-4267-8d70-e713e7b4d5a0.jpg" />
-</section>
-<section id="troubleshooting-performance">
+</div>
+<div class="section" id="troubleshooting-performance">
 <h2>Troubleshooting: Performance<a class="headerlink" href="#troubleshooting-performance" title="Permalink to this headline">¶</a></h2>
 <p>PyTorch by default will use all of the cores available. If you have anything
 running in the background on the Raspberry Pi it may cause contention with the
@@ -716,8 +718,8 @@ penalty.</p>
 <p>For <code class="docutils literal notranslate"><span class="pre">shufflenet_v2_x1_5</span></code> using <code class="docutils literal notranslate"><span class="pre">2</span> <span class="pre">threads</span></code> instead of <code class="docutils literal notranslate"><span class="pre">4</span> <span class="pre">threads</span></code>
 increases best case latency to <code class="docutils literal notranslate"><span class="pre">72</span> <span class="pre">ms</span></code> from <code class="docutils literal notranslate"><span class="pre">60</span> <span class="pre">ms</span></code> but eliminates the
 latency spikes of <code class="docutils literal notranslate"><span class="pre">128</span> <span class="pre">ms</span></code>.</p>
-</section>
-<section id="next-steps">
+</div>
+<div class="section" id="next-steps">
 <h2>Next Steps<a class="headerlink" href="#next-steps" title="Permalink to this headline">¶</a></h2>
 <p>You can create your own model or fine tune an existing one. If you fine tune on
 one of the models from
@@ -730,8 +732,8 @@ directly deploy with good performance on a Raspberry Pi.</p>
 <li><p><a class="reference external" href="https://pytorch.org/tutorials/beginner/transfer_learning_tutorial.html">Transfer Learning Tutorial</a>
 for how to use transfer learning to fine tune a pre-existing model to your dataset.</p></li>
 </ul>
-</section>
-</section>
+</div>
+</div>
 
 
              </article>
@@ -768,7 +770,7 @@ for how to use transfer learning to fine tune a pre-existing model to your datas
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2021, PyTorch &amp; PyTorch Korea Community.
+        &copy; Copyright 2022, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorch Korea User Group).
 
     </p>
   </div>
@@ -781,6 +783,13 @@ for how to use transfer learning to fine tune a pre-existing model to your datas
 </footer>
 
           </div>
+<script>
+if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.indexOf("/prototype/prototype_index")< 1))
+  {
+    var div = '<div class="admonition note"><p class="admonition-title">Note</p><p><i class="fa fa-flask" aria-hidden="true">&nbsp</i> 이 튜토리얼은 프로토타입(prototype) 기능들에 대해서 설명하고 있습니다. 프로토타입 기능은 일반적으로 피드백 및 테스트용으로, 런타임 플래그 없이는 PyPI나 Conda로 배포되는 바이너리에서는 사용할 수 없습니다.</p></div>'
+    document.getElementById("pytorch-article").insertAdjacentHTML('afterBegin', div)
+  }
+</script>
         </div>
 
         <div class="pytorch-content-right" id="pytorch-content-right">
@@ -838,7 +847,6 @@ for how to use transfer learning to fine tune a pre-existing model to your datas
       });
   </script>
  
-
 <script>
 //add microsoft link
 
@@ -917,7 +925,7 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
 </script>
 
 <script type="text/javascript">
-  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile'];
+  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile', 'Introduction to PyTorch on YouTube', 'Recommendation Systems'];
 </script>
 
 

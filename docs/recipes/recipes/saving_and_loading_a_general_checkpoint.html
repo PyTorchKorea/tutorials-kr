@@ -6,24 +6,23 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
 <meta property="og:title" content="PyTorch에서 일반적인 체크포인트(checkpoint) 저장하기 & 불러오기" />
   
 <meta property="og:type" content="article" />
   
-<meta property="og:url" content="http://tutorials.pytorch.kr/recipes/recipes/saving_and_loading_a_general_checkpoint.html" />
+<meta property="og:url" content="https://tutorials.pytorch.kr/recipes/recipes/saving_and_loading_a_general_checkpoint.html" />
   
 <meta property="og:description" content="추론(inference) 또는 학습(training)의 재개를 위해 체크포인트(checkpoint) 모델을 저장하고 불러오는 것은 마지막으로 중단했던 부분을 선택하는데 도움을 줄 수 있습니다. 체크포인트를 저장할 때는 단순히 모델의 state_dict 이상의 것을 저장해야 합니다. 모델 학습 중에 갱신되는 퍼버와 매개변수들을 포함하는 옵티마이저(Optimizer)의 state_dict를 함께 저장하는 것이 중요합니다. 이 외에도 중단 시점의 에포크(epoch), 마지막으로 기록된 학습 오차(training loss), 외부 t..." />
   
-<meta property="og:image" content="http://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
+<meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
   
 <meta property="og:image:alt" content="PyTorch에서 일반적인 체크포인트(checkpoint) 저장하기 & 불러오기" />
   
 <meta property="og:ignore_canonical" content="true" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>PyTorch에서 일반적인 체크포인트(checkpoint) 저장하기 &amp; 불러오기 &mdash; 파이토치 한국어 튜토리얼(PyTorch tutorials in Korean)</title>
+  <title>PyTorch에서 일반적인 체크포인트(checkpoint) 저장하기 &amp; 불러오기 &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
   
 
   
@@ -131,7 +130,7 @@
               
               
                 <div class="version">
-                  1.11.0+cu102
+                  1.12.0+cu102
                 </div>
               
             
@@ -272,6 +271,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/quantized_transfer_learning_tutorial.html">(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../advanced/static_quantization_tutorial.html">(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../intermediate/torchserve_with_ipex.html">Grokking PyTorch Intel CPU performance from first principles</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul>
@@ -298,6 +298,7 @@
 <p class="caption" role="heading"><span class="caption-text">Recommendation Systems</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/torchrec_tutorial.html">Introduction to TorchRec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../advanced/sharding.html">Exploring TorchRec sharding</a></li>
 </ul>
 
             
@@ -388,6 +389,7 @@
           </div>
 
         
+
           
           <div class="rst-content">
           
@@ -398,7 +400,7 @@
 <p class="admonition-title">Note</p>
 <p>Click <a class="reference internal" href="#sphx-glr-download-recipes-recipes-saving-and-loading-a-general-checkpoint-py"><span class="std std-ref">here</span></a> to download the full example code</p>
 </div>
-<section class="sphx-glr-example-title" id="pytorch-checkpoint">
+<div class="sphx-glr-example-title section" id="pytorch-checkpoint">
 <span id="sphx-glr-recipes-recipes-saving-and-loading-a-general-checkpoint-py"></span><h1>PyTorch에서 일반적인 체크포인트(checkpoint) 저장하기 &amp; 불러오기<a class="headerlink" href="#pytorch-checkpoint" title="Permalink to this headline">¶</a></h1>
 <p>추론(inference) 또는 학습(training)의 재개를 위해 체크포인트(checkpoint) 모델을
 저장하고 불러오는 것은 마지막으로 중단했던 부분을 선택하는데 도움을 줄 수 있습니다.
@@ -407,7 +409,7 @@
 state_dict를 함께 저장하는 것이 중요합니다. 이 외에도 중단 시점의 에포크(epoch),
 마지막으로 기록된 학습 오차(training loss), 외부 <code class="docutils literal notranslate"><span class="pre">torch.nn.Embedding</span></code> 계층 등,
 알고리즘에 따라 저장하고 싶은 항목들이 있을 것입니다.</p>
-<section id="id1">
+<div class="section" id="id1">
 <h2>개요<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
 <p>여러 체크포인트들을 저장하기 위해서는 사전(dictionary)에 체크포인트들을 구성하고
 <code class="docutils literal notranslate"><span class="pre">torch.save()</span></code> 를 사용하여 사전을 직렬화(serialize)해야 합니다. 일반적인
@@ -416,15 +418,15 @@ PyTorch에서는 이러한 여러 체크포인트들을 저장할 때 <code clas
 torch.load()를 사용하여 사전을 불러옵니다. 이후 원하는대로 저장한 항목들을 사전에
 조회하여 접근할 수 있습니다.</p>
 <p>이 레시피에서는 여러 체크포인트들을 어떻게 저장하고 불러오는지 살펴보겠습니다.</p>
-</section>
-<section id="id2">
+</div>
+<div class="section" id="id2">
 <h2>설정<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
 <p>시작하기 전에 <code class="docutils literal notranslate"><span class="pre">torch</span></code> 가 없다면 설치해야 합니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">torch</span>
 </pre></div>
 </div>
-</section>
-<section id="steps">
+</div>
+<div class="section" id="steps">
 <h2>단계(Steps)<a class="headerlink" href="#steps" title="Permalink to this headline">¶</a></h2>
 <ol class="arabic simple">
 <li><p>데이터 불러올 때 필요한 라이브러리들 불러오기</p></li>
@@ -433,7 +435,7 @@ torch.load()를 사용하여 사전을 불러옵니다. 이후 원하는대로 �
 <li><p>일반적인 체크포인트 저장하기</p></li>
 <li><p>일반적인 체크포인트 불러오기</p></li>
 </ol>
-<section id="id3">
+<div class="section" id="id3">
 <h3>1. 데이터 불러올 때 필요한 라이브러리들 불러오기<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
 <p>이 레시피에서는 <code class="docutils literal notranslate"><span class="pre">torch</span></code> 와 여기 포함된 <code class="docutils literal notranslate"><span class="pre">torch.nn</span></code> 와 <code class="docutils literal notranslate"><span class="pre">torch.optim</span></code> 을
 사용하겠습니다.</p>
@@ -442,8 +444,8 @@ torch.load()를 사용하여 사전을 불러옵니다. 이후 원하는대로 �
 <span class="kn">import</span> <span class="nn">torch.optim</span> <span class="k">as</span> <span class="nn">optim</span>
 </pre></div>
 </div>
-</section>
-<section id="id4">
+</div>
+<div class="section" id="id4">
 <h3>2. 신경망을 구성하고 초기화하기<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
 <p>예를 들어, 이미지를 학습하는 신경망을 만들어보겠습니다. 더 자세한 내용은
 <a class="reference external" href="defining_a_neural_network.html">신경망 구성하기 레시피</a> 를 참고해주세요.</p>
@@ -470,15 +472,15 @@ torch.load()를 사용하여 사전을 불러옵니다. 이후 원하는대로 �
 <span class="nb">print</span><span class="p">(</span><span class="n">net</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-<section id="id6">
+</div>
+<div class="section" id="id6">
 <h3>3. 옵티마이저 초기화하기<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
 <p>모멘텀(momentum)을 갖는 SGD를 사용하겠습니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">optimizer</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">SGD</span><span class="p">(</span><span class="n">net</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span> <span class="n">momentum</span><span class="o">=</span><span class="mf">0.9</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-<section id="id7">
+</div>
+<div class="section" id="id7">
 <h3>4. 일반적인 체크포인트 저장하기<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
 <p>관련된 모든 정보들을 모아서 사전을 구성합니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># 추가 정보</span>
@@ -494,8 +496,8 @@ torch.load()를 사용하여 사전을 불러옵니다. 이후 원하는대로 �
             <span class="p">},</span> <span class="n">PATH</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-<section id="id8">
+</div>
+<div class="section" id="id8">
 <h3>5. 일반적인 체크포인트 불러오기<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
 <p>먼저 모델과 옵티마이저를 초기화한 뒤, 사전을 불러오는 것을 기억하십시오.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">Net</span><span class="p">()</span>
@@ -519,9 +521,9 @@ torch.load()를 사용하여 사전을 불러옵니다. 이후 원하는대로 �
 학습 모드인지 확인(ensure)하세요.</p>
 <p>축하합니다! 지금까지 PyTorch에서 추론 또는 학습 재개를 위해 일반적인 체크포인트를
 저장하고 불러왔습니다.</p>
-</section>
-</section>
-<section id="id9">
+</div>
+</div>
+<div class="section" id="id9">
 <h2>더 알아보기<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h2>
 <p>다른 레시피를 둘러보고 계속 배워보세요:</p>
 <ul class="simple">
@@ -538,8 +540,8 @@ torch.load()를 사용하여 사전을 불러옵니다. 이후 원하는대로 �
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
-</section>
-</section>
+</div>
+</div>
 
 
              </article>
@@ -576,7 +578,7 @@ torch.load()를 사용하여 사전을 불러옵니다. 이후 원하는대로 �
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2021, PyTorch &amp; PyTorch Korea Community.
+        &copy; Copyright 2022, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorch Korea User Group).
 
     </p>
   </div>
@@ -589,6 +591,13 @@ torch.load()를 사용하여 사전을 불러옵니다. 이후 원하는대로 �
 </footer>
 
           </div>
+<script>
+if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.indexOf("/prototype/prototype_index")< 1))
+  {
+    var div = '<div class="admonition note"><p class="admonition-title">Note</p><p><i class="fa fa-flask" aria-hidden="true">&nbsp</i> 이 튜토리얼은 프로토타입(prototype) 기능들에 대해서 설명하고 있습니다. 프로토타입 기능은 일반적으로 피드백 및 테스트용으로, 런타임 플래그 없이는 PyPI나 Conda로 배포되는 바이너리에서는 사용할 수 없습니다.</p></div>'
+    document.getElementById("pytorch-article").insertAdjacentHTML('afterBegin', div)
+  }
+</script>
         </div>
 
         <div class="pytorch-content-right" id="pytorch-content-right">
@@ -647,7 +656,6 @@ torch.load()를 사용하여 사전을 불러옵니다. 이후 원하는대로 �
       });
   </script>
  
-
 <script>
 //add microsoft link
 
@@ -726,7 +734,7 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
 </script>
 
 <script type="text/javascript">
-  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile'];
+  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile', 'Introduction to PyTorch on YouTube', 'Recommendation Systems'];
 </script>
 
 

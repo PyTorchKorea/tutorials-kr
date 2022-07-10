@@ -6,24 +6,23 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
 <meta property="og:title" content="Registering a Dispatched Operator in C++" />
   
 <meta property="og:type" content="article" />
   
-<meta property="og:url" content="http://tutorials.pytorch.kr/advanced/dispatcher.html" />
+<meta property="og:url" content="https://tutorials.pytorch.kr/advanced/dispatcher.html" />
   
 <meta property="og:description" content="The dispatcher is an internal component of PyTorch which is responsible for figuring out what code should actually get run when you call a function like torch::add. This can be nontrivial, because PyTorch operations need to handle a lot of cross-cutting concerns that are “layered” on top of one o..." />
   
-<meta property="og:image" content="http://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
+<meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
   
 <meta property="og:image:alt" content="Registering a Dispatched Operator in C++" />
   
 <meta property="og:ignore_canonical" content="true" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Registering a Dispatched Operator in C++ &mdash; 파이토치 한국어 튜토리얼(PyTorch tutorials in Korean)</title>
+  <title>Registering a Dispatched Operator in C++ &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
   
 
   
@@ -131,7 +130,7 @@
               
               
                 <div class="version">
-                  1.11.0+cu102
+                  1.12.0+cu102
                 </div>
               
             
@@ -272,6 +271,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/quantized_transfer_learning_tutorial.html">(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="static_quantization_tutorial.html">(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/torchserve_with_ipex.html">Grokking PyTorch Intel CPU performance from first principles</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul>
@@ -298,6 +298,7 @@
 <p class="caption" role="heading"><span class="caption-text">Recommendation Systems</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/torchrec_tutorial.html">Introduction to TorchRec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sharding.html">Exploring TorchRec sharding</a></li>
 </ul>
 
             
@@ -386,13 +387,14 @@
           </div>
 
         
+
           
           <div class="rst-content">
           
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <section id="registering-a-dispatched-operator-in-c">
+  <div class="section" id="registering-a-dispatched-operator-in-c">
 <h1>Registering a Dispatched Operator in C++<a class="headerlink" href="#registering-a-dispatched-operator-in-c" title="Permalink to this headline">¶</a></h1>
 <p>The dispatcher is an internal component of PyTorch which is responsible for
 figuring out what code should actually get run when you call a function like
@@ -418,7 +420,7 @@ registration to use the dispatcher to organize various components.  We’ll
 assume that you are familiar with how to
 <a class="reference external" href="torch_script_custom_ops">register an operator</a> and how to write
 a <a class="reference external" href="cpp_autograd">custom autograd function</a>.</p>
-<section id="defining-schema-and-backend-implementations">
+<div class="section" id="defining-schema-and-backend-implementations">
 <h2>Defining schema and backend implementations<a class="headerlink" href="#defining-schema-and-backend-implementations" title="Permalink to this headline">¶</a></h2>
 <p>The general principle behind the dispatcher is that it divides the
 implementation of an operator into multiple kernels, each of which implements
@@ -502,8 +504,8 @@ implemented: the <code class="docutils literal notranslate"><span class="pre">to
 that provides implementations for all basic operators on the XLA dispatch
 key.</p>
 </div>
-</section>
-<section id="for-operators-that-do-not-need-autograd">
+</div>
+<div class="section" id="for-operators-that-do-not-need-autograd">
 <h2>For operators that do not need autograd<a class="headerlink" href="#for-operators-that-do-not-need-autograd" title="Permalink to this headline">¶</a></h2>
 <p>Note: This section only applies to versions of PyTorch <code class="docutils literal notranslate"><span class="pre">&gt;=</span> <span class="pre">1.10</span></code>.</p>
 <p>In the next section, we will discuss how to add autograd support to an operator.
@@ -520,7 +522,7 @@ operators.</p>
 On backward, the <code class="docutils literal notranslate"><span class="pre">NotImplemented</span></code> node raises an error. This can be helpful
 for debugging in larger models where previously it can be hard to pin-point
 exactly where the <code class="docutils literal notranslate"><span class="pre">requires_grad</span></code>-ness is lost during the forward pass.</p>
-<section id="in-place-or-view-ops">
+<div class="section" id="in-place-or-view-ops">
 <h3>In-place or view ops<a class="headerlink" href="#in-place-or-view-ops" title="Permalink to this headline">¶</a></h3>
 <p>To ensure correctness and best possible performance, if your op mutates an input
 in-place or returns a tensor that aliases with one of the inputs, two additional
@@ -547,9 +549,9 @@ ensure that your schema properly reflects this. See
 <a class="reference external" href="https://github.com/pytorch/pytorch/blob/master/aten/src/ATen/native/README.md">here</a>
 for more information on how to annotate the schema.</p></li>
 </ol>
-</section>
-</section>
-<section id="adding-autograd-support">
+</div>
+</div>
+<div class="section" id="adding-autograd-support">
 <span id="autograd-support"></span><h2>Adding autograd support<a class="headerlink" href="#adding-autograd-support" title="Permalink to this headline">¶</a></h2>
 <p>At this point, we have an operator with both CPU and CUDA implementations.  How
 can we add autograd support to it?  As you might guess, we will register an
@@ -640,8 +642,8 @@ backends by using the corresponding backend-specific dispatch key - for example,
 options in more detail, check out the <code class="docutils literal notranslate"><span class="pre">PythonDispatcher</span></code> tool provided in
 <a class="reference external" href="https://github.com/pytorch/pytorch/blob/master/torch/_python_dispatcher.py">torch/_python_dispatcher.py</a>.</p>
 </div>
-</section>
-<section id="going-beyond-autograd">
+</div>
+<div class="section" id="going-beyond-autograd">
 <h2>Going beyond autograd<a class="headerlink" href="#going-beyond-autograd" title="Permalink to this headline">¶</a></h2>
 <p>In some sense, the dispatcher isn’t doing all that much: all it does is
 implement a glorified if-statement, along the lines of this:</p>
@@ -684,7 +686,7 @@ you also opt into the fallbacks for all of these operations.</p></li>
 </ol>
 <p>Here are some particular dispatch keys which you may need to define an operator
 for.</p>
-<section id="autocast">
+<div class="section" id="autocast">
 <h3>Autocast<a class="headerlink" href="#autocast" title="Permalink to this headline">¶</a></h3>
 <p>The Autocast dispatch key implements support for
 <a class="reference external" href="https://pytorch.org/docs/stable/amp.html">automatic mixed precision (AMP)</a>.
@@ -768,25 +770,25 @@ in the autograd section, all you’d need is</p>
 However, the backward method defined in your custom autograd function will run in the same
 dtype as autocast sets for the forward method, so you should choose a <code class="docutils literal notranslate"><span class="pre">&lt;desired</span> <span class="pre">dtype&gt;</span></code>
 suitable for both your forward and backward methods.</p>
-</section>
-<section id="batched">
+</div>
+<div class="section" id="batched">
 <h3>Batched<a class="headerlink" href="#batched" title="Permalink to this headline">¶</a></h3>
 <p>Batched tensors allow you to write your code in a per-example manner, and then
 have them be automatically batched when run under a <code class="docutils literal notranslate"><span class="pre">vmap</span></code> invocation.  The
 API for writing batching rules is currently under development, but once it is
 stabilized, you can add support for <code class="docutils literal notranslate"><span class="pre">vmap</span></code> for your operators by registering
 a kernel at the Batched dispatch key.</p>
-</section>
-<section id="tracer">
+</div>
+<div class="section" id="tracer">
 <h3>Tracer<a class="headerlink" href="#tracer" title="Permalink to this headline">¶</a></h3>
 <p>The Tracer dispatch key implements support for recording invocations of operators
 into a trace when you run <code class="docutils literal notranslate"><span class="pre">torch.jit.trace</span></code>.  We intend to provide a
 boxed fallback that will implement tracing for arbitrary operations,
 see <a class="reference external" href="https://github.com/pytorch/pytorch/issues/41478">issue #41478</a> to track
 progress.</p>
-</section>
-</section>
-</section>
+</div>
+</div>
+</div>
 
 
              </article>
@@ -823,7 +825,7 @@ progress.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2021, PyTorch &amp; PyTorch Korea Community.
+        &copy; Copyright 2022, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorch Korea User Group).
 
     </p>
   </div>
@@ -836,6 +838,13 @@ progress.</p>
 </footer>
 
           </div>
+<script>
+if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.indexOf("/prototype/prototype_index")< 1))
+  {
+    var div = '<div class="admonition note"><p class="admonition-title">Note</p><p><i class="fa fa-flask" aria-hidden="true">&nbsp</i> 이 튜토리얼은 프로토타입(prototype) 기능들에 대해서 설명하고 있습니다. 프로토타입 기능은 일반적으로 피드백 및 테스트용으로, 런타임 플래그 없이는 PyPI나 Conda로 배포되는 바이너리에서는 사용할 수 없습니다.</p></div>'
+    document.getElementById("pytorch-article").insertAdjacentHTML('afterBegin', div)
+  }
+</script>
         </div>
 
         <div class="pytorch-content-right" id="pytorch-content-right">
@@ -895,7 +904,6 @@ progress.</p>
       });
   </script>
  
-
 <script>
 //add microsoft link
 
@@ -974,7 +982,7 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
 </script>
 
 <script type="text/javascript">
-  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile'];
+  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile', 'Introduction to PyTorch on YouTube', 'Recommendation Systems'];
 </script>
 
 

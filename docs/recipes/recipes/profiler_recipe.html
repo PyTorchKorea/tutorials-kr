@@ -6,24 +6,23 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
 <meta property="og:title" content="PyTorch 프로파일러(Profiler)" />
   
 <meta property="og:type" content="article" />
   
-<meta property="og:url" content="http://tutorials.pytorch.kr/recipes/recipes/profiler_recipe.html" />
+<meta property="og:url" content="https://tutorials.pytorch.kr/recipes/recipes/profiler_recipe.html" />
   
 <meta property="og:description" content="이 레시피에서는 어떻게 PyTorch 프로파일러를 사용하는지, 그리고 모델의 연산자들이 소비하는 메모리와 시간을 측정하는 방법을 살펴보겠습니다. 개요: PyTorch는 사용자가 모델 내의 연산 비용이 큰(expensive) 연산자들이 무엇인지 알고싶을 때 유용하게 사용할 수 있는 간단한 프로파일러 API를 포함하고 있습니다. 이 레시피에서는 모델의 성능(performance)을 분석하려고 할 때 어떻게 프로파일러를 사용해야 하는지를 보여주기 위해 간단한 ResNet 모델을 사용하겠습니다. 설정(Setup): torch 와 to..." />
   
-<meta property="og:image" content="http://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
+<meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
   
 <meta property="og:image:alt" content="PyTorch 프로파일러(Profiler)" />
   
 <meta property="og:ignore_canonical" content="true" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>PyTorch 프로파일러(Profiler) &mdash; 파이토치 한국어 튜토리얼(PyTorch tutorials in Korean)</title>
+  <title>PyTorch 프로파일러(Profiler) &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
   
 
   
@@ -131,7 +130,7 @@
               
               
                 <div class="version">
-                  1.11.0+cu102
+                  1.12.0+cu102
                 </div>
               
             
@@ -272,6 +271,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/quantized_transfer_learning_tutorial.html">(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../advanced/static_quantization_tutorial.html">(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../intermediate/torchserve_with_ipex.html">Grokking PyTorch Intel CPU performance from first principles</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul>
@@ -298,6 +298,7 @@
 <p class="caption" role="heading"><span class="caption-text">Recommendation Systems</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/torchrec_tutorial.html">Introduction to TorchRec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../advanced/sharding.html">Exploring TorchRec sharding</a></li>
 </ul>
 
             
@@ -388,6 +389,7 @@
           </div>
 
         
+
           
           <div class="rst-content">
           
@@ -398,22 +400,22 @@
 <p class="admonition-title">Note</p>
 <p>Click <a class="reference internal" href="#sphx-glr-download-recipes-recipes-profiler-recipe-py"><span class="std std-ref">here</span></a> to download the full example code</p>
 </div>
-<section class="sphx-glr-example-title" id="pytorch-profiler">
+<div class="sphx-glr-example-title section" id="pytorch-profiler">
 <span id="sphx-glr-recipes-recipes-profiler-recipe-py"></span><h1>PyTorch 프로파일러(Profiler)<a class="headerlink" href="#pytorch-profiler" title="Permalink to this headline">¶</a></h1>
 <p>이 레시피에서는 어떻게 PyTorch 프로파일러를 사용하는지, 그리고 모델의 연산자들이 소비하는 메모리와 시간을 측정하는 방법을 살펴보겠습니다.</p>
-<section id="id1">
+<div class="section" id="id1">
 <h2>개요<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
 <p>PyTorch는 사용자가 모델 내의 연산 비용이 큰(expensive) 연산자들이 무엇인지 알고싶을 때 유용하게 사용할 수 있는 간단한 프로파일러 API를 포함하고 있습니다.</p>
 <p>이 레시피에서는 모델의 성능(performance)을 분석하려고 할 때 어떻게 프로파일러를 사용해야 하는지를 보여주기 위해 간단한 ResNet 모델을 사용하겠습니다.</p>
-</section>
-<section id="setup">
+</div>
+<div class="section" id="setup">
 <h2>설정(Setup)<a class="headerlink" href="#setup" title="Permalink to this headline">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">torch</span></code> 와 <code class="docutils literal notranslate"><span class="pre">torchvision</span></code> 을 설치하기 위해서 아래의 커맨드를 입력합니다:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">torch</span> <span class="n">torchvision</span>
 </pre></div>
 </div>
-</section>
-<section id="steps">
+</div>
+<div class="section" id="steps">
 <h2>단계(Steps)<a class="headerlink" href="#steps" title="Permalink to this headline">¶</a></h2>
 <ol class="arabic simple">
 <li><p>필요한 라이브러리들 불러오기</p></li>
@@ -422,7 +424,7 @@
 <li><p>프로파일러를 사용하여 메모리 소비 분석하기</p></li>
 <li><p>추적기능 사용하기</p></li>
 </ol>
-<section id="id2">
+<div class="section" id="id2">
 <h3>1. 필요한 라이브러리들 불러오기<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
 <p>이 레시피에서는 <code class="docutils literal notranslate"><span class="pre">torch</span></code> 와 <code class="docutils literal notranslate"><span class="pre">torchvision.models</span></code>,
 그리고 <code class="docutils literal notranslate"><span class="pre">profiler</span></code> 모듈을 사용합니다:</p>
@@ -431,8 +433,8 @@
 <span class="kn">from</span> <span class="nn">torch.profiler</span> <span class="kn">import</span> <span class="n">profile</span><span class="p">,</span> <span class="n">record_function</span><span class="p">,</span> <span class="n">ProfilerActivity</span>
 </pre></div>
 </div>
-</section>
-<section id="resnet">
+</div>
+<div class="section" id="resnet">
 <h3>2. 간단한 ResNet 모델 인스턴스화 하기<a class="headerlink" href="#resnet" title="Permalink to this headline">¶</a></h3>
 <p>ResNet 모델 인스턴스를 만들고 입력값을
 준비합니다 :</p>
@@ -440,8 +442,8 @@
 <span class="n">inputs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">224</span><span class="p">,</span> <span class="mi">224</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-<section id="id3">
+</div>
+<div class="section" id="id3">
 <h3>3. 프로파일러를 사용하여 실행시간 분석하기<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
 <p>PyTorch 프로파일러는 컨텍스트 메니저(context manager)를 통해 활성화되고,
 여러 매개변수를 받을 수 있습니다. 유용한 몇 가지 매개변수는 다음과 같습니다:</p>
@@ -565,8 +567,8 @@ You can choose to sort by the self cpu time by passing
 </pre></div>
 </div>
 <p>Note the occurence of on-device kernels in the output (e.g. <code class="docutils literal notranslate"><span class="pre">sgemm_32x32x32_NN</span></code>).</p>
-</section>
-<section id="id4">
+</div>
+<div class="section" id="id4">
 <h3>4. 프로파일러를 사용하여 메모리 소비 분석하기<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
 <p>PyTorch 프로파일러는 모델의 연산자들을 실행하며 (모델의 텐서들이 사용하며) 할당(또는 해제)한
 메모리의 양도 표시할 수 있습니다.
@@ -619,8 +621,8 @@ You can choose to sort by the self cpu time by passing
 <span class="c1"># Self CPU time total: 53.064ms</span>
 </pre></div>
 </div>
-</section>
-<section id="id5">
+</div>
+<div class="section" id="id5">
 <h3>5. 추적기능 사용하기<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
 <p>프로파일링 결과는 .json 형태의 추적 파일(trace file)로 출력할 수 있습니다:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">resnet18</span><span class="p">()</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span>
@@ -635,8 +637,8 @@ You can choose to sort by the self cpu time by passing
 <p>사용자는 Chrome 브라우저( <code class="docutils literal notranslate"><span class="pre">chrome://tracing</span></code> )에서 추적 파일을 불러와
 프로파일된 일련의 연산자들과 CUDA 커널을 검토해볼 수 있습니다:</p>
 <a class="reference internal image-reference" href="../../_images/trace_img.png"><img alt="../../_images/trace_img.png" src="../../_images/trace_img.png" style="width: 754.0px; height: 124.5px;" /></a>
-</section>
-<section id="examining-stack-traces">
+</div>
+<div class="section" id="examining-stack-traces">
 <h3>6. Examining stack traces<a class="headerlink" href="#examining-stack-traces" title="Permalink to this headline">¶</a></h3>
 <p>Profiler can be used to analyze Python and TorchScript stack traces:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">profile</span><span class="p">(</span>
@@ -671,8 +673,8 @@ You can choose to sort by the self cpu time by passing
 </div>
 <p>Note the two convolutions and the two callsites in <code class="docutils literal notranslate"><span class="pre">torchvision/models/resnet.py</span></code> script.</p>
 <p>(Warning: stack tracing adds an extra profiling overhead.)</p>
-</section>
-<section id="visualizing-data-as-a-flamegraph">
+</div>
+<div class="section" id="visualizing-data-as-a-flamegraph">
 <h3>7. Visualizing data as a flamegraph<a class="headerlink" href="#visualizing-data-as-a-flamegraph" title="Permalink to this headline">¶</a></h3>
 <p>Execution time (<code class="docutils literal notranslate"><span class="pre">self_cpu_time_total</span></code> and <code class="docutils literal notranslate"><span class="pre">self_cuda_time_total</span></code> metrics) and stack traces
 can also be visualized as a flame graph. To do this, first export the raw data using <code class="docutils literal notranslate"><span class="pre">export_stacks</span></code> (requires <code class="docutils literal notranslate"><span class="pre">with_stack=True</span></code>):</p>
@@ -687,8 +689,8 @@ interactive SVG:</p>
 </pre></div>
 </div>
 <a class="reference internal image-reference" href="../../_images/perf_viz.png"><img alt="../../_images/perf_viz.png" src="../../_images/perf_viz.png" style="width: 592.5px; height: 139.5px;" /></a>
-</section>
-<section id="using-profiler-to-analyze-long-running-jobs">
+</div>
+<div class="section" id="using-profiler-to-analyze-long-running-jobs">
 <h3>8. Using profiler to analyze long-running jobs<a class="headerlink" href="#using-profiler-to-analyze-long-running-jobs" title="Permalink to this headline">¶</a></h3>
 <p>PyTorch profiler offers an additional API to handle long-running jobs
 (such as training loops). Tracing all of the execution can be
@@ -761,9 +763,9 @@ The current profiler step is stored in <code class="docutils literal notranslate
         <span class="n">p</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
 </pre></div>
 </div>
-</section>
-</section>
-<section id="id6">
+</div>
+</div>
+<div class="section" id="id6">
 <h2>더 알아보기<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h2>
 <p>다음 레시피와 튜토리얼을 읽으며 학습을 계속해보세요:</p>
 <ul class="simple">
@@ -781,8 +783,8 @@ The current profiler step is stored in <code class="docutils literal notranslate
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
-</section>
-</section>
+</div>
+</div>
 
 
              </article>
@@ -819,7 +821,7 @@ The current profiler step is stored in <code class="docutils literal notranslate
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2021, PyTorch &amp; PyTorch Korea Community.
+        &copy; Copyright 2022, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorch Korea User Group).
 
     </p>
   </div>
@@ -832,6 +834,13 @@ The current profiler step is stored in <code class="docutils literal notranslate
 </footer>
 
           </div>
+<script>
+if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.indexOf("/prototype/prototype_index")< 1))
+  {
+    var div = '<div class="admonition note"><p class="admonition-title">Note</p><p><i class="fa fa-flask" aria-hidden="true">&nbsp</i> 이 튜토리얼은 프로토타입(prototype) 기능들에 대해서 설명하고 있습니다. 프로토타입 기능은 일반적으로 피드백 및 테스트용으로, 런타임 플래그 없이는 PyPI나 Conda로 배포되는 바이너리에서는 사용할 수 없습니다.</p></div>'
+    document.getElementById("pytorch-article").insertAdjacentHTML('afterBegin', div)
+  }
+</script>
         </div>
 
         <div class="pytorch-content-right" id="pytorch-content-right">
@@ -893,7 +902,6 @@ The current profiler step is stored in <code class="docutils literal notranslate
       });
   </script>
  
-
 <script>
 //add microsoft link
 
@@ -972,7 +980,7 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
 </script>
 
 <script type="text/javascript">
-  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile'];
+  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile', 'Introduction to PyTorch on YouTube', 'Recommendation Systems'];
 </script>
 
 

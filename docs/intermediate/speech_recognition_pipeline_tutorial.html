@@ -6,24 +6,23 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
 <meta property="og:title" content="Speech Recognition with Wav2Vec2" />
   
 <meta property="og:type" content="article" />
   
-<meta property="og:url" content="http://tutorials.pytorch.kr/intermediate/speech_recognition_pipeline_tutorial.html" />
+<meta property="og:url" content="https://tutorials.pytorch.kr/intermediate/speech_recognition_pipeline_tutorial.html" />
   
 <meta property="og:description" content="Author: Moto Hira This tutorial shows how to perform speech recognition using using pre-trained models from wav2vec 2.0 [ paper]. Overview ——– The process of speech recognition looks like the following. Extract the acoustic features from audio waveform, Estimate the class of the acoustic features..." />
   
-<meta property="og:image" content="http://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
+<meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
   
 <meta property="og:image:alt" content="Speech Recognition with Wav2Vec2" />
   
 <meta property="og:ignore_canonical" content="true" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Speech Recognition with Wav2Vec2 &mdash; 파이토치 한국어 튜토리얼(PyTorch tutorials in Korean)</title>
+  <title>Speech Recognition with Wav2Vec2 &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
   
 
   
@@ -131,7 +130,7 @@
               
               
                 <div class="version">
-                  1.11.0+cu102
+                  1.12.0+cu102
                 </div>
               
             
@@ -272,6 +271,7 @@
 <li class="toctree-l1"><a class="reference internal" href="dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="quantized_transfer_learning_tutorial.html">(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/static_quantization_tutorial.html">(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torchserve_with_ipex.html">Grokking PyTorch Intel CPU performance from first principles</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul>
@@ -298,6 +298,7 @@
 <p class="caption" role="heading"><span class="caption-text">Recommendation Systems</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="torchrec_tutorial.html">Introduction to TorchRec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/sharding.html">Exploring TorchRec sharding</a></li>
 </ul>
 
             
@@ -386,6 +387,7 @@
           </div>
 
         
+
           
           <div class="rst-content">
           
@@ -396,7 +398,7 @@
 <p class="admonition-title">Note</p>
 <p>Click <a class="reference internal" href="#sphx-glr-download-intermediate-speech-recognition-pipeline-tutorial-py"><span class="std std-ref">here</span></a> to download the full example code</p>
 </div>
-<section class="sphx-glr-example-title" id="speech-recognition-with-wav2vec2">
+<div class="sphx-glr-example-title section" id="speech-recognition-with-wav2vec2">
 <span id="sphx-glr-intermediate-speech-recognition-pipeline-tutorial-py"></span><h1>Speech Recognition with Wav2Vec2<a class="headerlink" href="#speech-recognition-with-wav2vec2" title="Permalink to this headline">¶</a></h1>
 <p><strong>Author</strong>: <a class="reference external" href="mailto:moto&#37;&#52;&#48;fb&#46;com">Moto Hira</a></p>
 <p>This tutorial shows how to perform speech recognition using using
@@ -414,7 +416,7 @@ Overview
 associated information, such as the expected sample rate and class
 labels. They are bundled together and available under
 <code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.pipelines()</span></code> module.</p>
-<section id="preparation">
+<div class="section" id="preparation">
 <h2>Preparation<a class="headerlink" href="#preparation" title="Permalink to this headline">¶</a></h2>
 <p>First we import the necessary packages, and fetch data that we work on.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># %matplotlib inline</span>
@@ -447,13 +449,13 @@ labels. They are bundled together and available under
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>1.11.0+cu102
-0.11.0+cu102
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>1.12.0+cu102
+0.12.0+cu102
 cuda
 </pre></div>
 </div>
-</section>
-<section id="creating-a-pipeline">
+</div>
+<div class="section" id="creating-a-pipeline">
 <h2>Creating a pipeline<a class="headerlink" href="#creating-a-pipeline" title="Permalink to this headline">¶</a></h2>
 <p>First, we will create a Wav2Vec2 model that performs the feature
 extraction and the classification.</p>
@@ -495,8 +497,8 @@ fetch the pre-trained weights and load it into the model.</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;class &#39;torchaudio.models.wav2vec2.model.Wav2Vec2Model&#39;&gt;
 </pre></div>
 </div>
-</section>
-<section id="loading-data">
+</div>
+<div class="section" id="loading-data">
 <h2>Loading data<a class="headerlink" href="#loading-data" title="Permalink to this headline">¶</a></h2>
 <p>We will use the speech data from <a class="reference external" href="https://iqtlabs.github.io/voices/">VOiCES
 dataset</a>, which is licensed under
@@ -522,8 +524,8 @@ using <code class="xref py py-func docutils literal notranslate"><span class="pr
     <span class="n">waveform</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">bundle</span><span class="o">.</span><span class="n">sample_rate</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-<section id="extracting-acoustic-features">
+</div>
+<div class="section" id="extracting-acoustic-features">
 <h2>Extracting acoustic features<a class="headerlink" href="#extracting-acoustic-features" title="Permalink to this headline">¶</a></h2>
 <p>The next step is to extract acoustic features from the audio.</p>
 <div class="admonition note">
@@ -549,8 +551,8 @@ a transformer layer.</p>
 </pre></div>
 </div>
 <img alt="../_images/sphx_glr_speech_recognition_pipeline_tutorial_001.png" class="sphx-glr-single-img" src="../_images/sphx_glr_speech_recognition_pipeline_tutorial_001.png" />
-</section>
-<section id="feature-classification">
+</div>
+<div class="section" id="feature-classification">
 <h2>Feature classification<a class="headerlink" href="#feature-classification" title="Permalink to this headline">¶</a></h2>
 <p>Once the acoustic features are extracted, the next step is to classify
 them into a set of categories.</p>
@@ -578,8 +580,8 @@ probability.</p>
 </div>
 <p>We can see that there are strong indications to certain labels across
 the time line.</p>
-</section>
-<section id="generating-transcripts">
+</div>
+<div class="section" id="generating-transcripts">
 <h2>Generating transcripts<a class="headerlink" href="#generating-transcripts" title="Permalink to this headline">¶</a></h2>
 <p>From the sequence of label probabilities, now we want to generate
 transcripts. The process to generate hypotheses is often called
@@ -639,8 +641,8 @@ The detail of CTC loss is explained
 <a class="reference external" href="https://distill.pub/2017/ctc/">here</a>. In CTC a blank token (ϵ) is a
 special token which represents a repetition of the previous symbol. In
 decoding, these are simply ignored.</p>
-</section>
-<section id="conclusion">
+</div>
+<div class="section" id="conclusion">
 <h2>Conclusion<a class="headerlink" href="#conclusion" title="Permalink to this headline">¶</a></h2>
 <p>In this tutorial, we looked at how to use <code class="xref py py-mod docutils literal notranslate"><span class="pre">torchaudio.pipelines</span></code> to
 perform acoustic feature extraction and speech recognition. Constructing
@@ -649,7 +651,7 @@ a model and getting the emission is as short as two lines.</p>
 <span class="n">emission</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">waveforms</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  12.630 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  12.691 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-intermediate-speech-recognition-pipeline-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/23a2ebda2a728c9470e9af1055e9bc6a/speech_recognition_pipeline_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">speech_recognition_pipeline_tutorial.py</span></code></a></p>
@@ -659,8 +661,8 @@ a model and getting the emission is as short as two lines.</p>
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
-</section>
-</section>
+</div>
+</div>
 
 
              </article>
@@ -697,7 +699,7 @@ a model and getting the emission is as short as two lines.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2021, PyTorch &amp; PyTorch Korea Community.
+        &copy; Copyright 2022, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorch Korea User Group).
 
     </p>
   </div>
@@ -710,6 +712,13 @@ a model and getting the emission is as short as two lines.</p>
 </footer>
 
           </div>
+<script>
+if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.indexOf("/prototype/prototype_index")< 1))
+  {
+    var div = '<div class="admonition note"><p class="admonition-title">Note</p><p><i class="fa fa-flask" aria-hidden="true">&nbsp</i> 이 튜토리얼은 프로토타입(prototype) 기능들에 대해서 설명하고 있습니다. 프로토타입 기능은 일반적으로 피드백 및 테스트용으로, 런타임 플래그 없이는 PyPI나 Conda로 배포되는 바이너리에서는 사용할 수 없습니다.</p></div>'
+    document.getElementById("pytorch-article").insertAdjacentHTML('afterBegin', div)
+  }
+</script>
         </div>
 
         <div class="pytorch-content-right" id="pytorch-content-right">
@@ -764,7 +773,6 @@ a model and getting the emission is as short as two lines.</p>
       });
   </script>
  
-
 <script>
 //add microsoft link
 
@@ -843,7 +851,7 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
 </script>
 
 <script type="text/javascript">
-  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile'];
+  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile', 'Introduction to PyTorch on YouTube', 'Recommendation Systems'];
 </script>
 
 

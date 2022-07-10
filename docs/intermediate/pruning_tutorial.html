@@ -6,24 +6,23 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
 <meta property="og:title" content="가지치기 기법(Pruning) 튜토리얼" />
   
 <meta property="og:type" content="article" />
   
-<meta property="og:url" content="http://tutorials.pytorch.kr/intermediate/pruning_tutorial.html" />
+<meta property="og:url" content="https://tutorials.pytorch.kr/intermediate/pruning_tutorial.html" />
   
 <meta property="og:description" content="저자: Michela Paganini 번역: 안상준 최첨단 딥러닝 모델들은 굉장히 많은 수의 파라미터값들로 구성되기 때문에, 쉽게 배포되기 어렵습니다. 이와 반대로, 생물학적 신경망들은 효율적으로 희소하게 연결된 것으로 알려져 있습니다. 모델의 정확도가 손상되지 않는 범위에서 메모리, 배터리, 하드웨어 소비량을 줄이고, 기기에 경량화된 모델을 배치하며, 개인이 이용하고 있는 기기에서 프라이버시가 보장되기 위해서는 모델에 포함된 파라미터 수를 줄여 압축하는 최적의 기법을 파악하는 것이 중요합니다. 연구 측면에서는, 가지치기 기법..." />
   
-<meta property="og:image" content="http://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
+<meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
   
 <meta property="og:image:alt" content="가지치기 기법(Pruning) 튜토리얼" />
   
 <meta property="og:ignore_canonical" content="true" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>가지치기 기법(Pruning) 튜토리얼 &mdash; 파이토치 한국어 튜토리얼(PyTorch tutorials in Korean)</title>
+  <title>가지치기 기법(Pruning) 튜토리얼 &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
   
 
   
@@ -131,7 +130,7 @@
               
               
                 <div class="version">
-                  1.11.0+cu102
+                  1.12.0+cu102
                 </div>
               
             
@@ -272,6 +271,7 @@
 <li class="toctree-l1"><a class="reference internal" href="dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="quantized_transfer_learning_tutorial.html">(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/static_quantization_tutorial.html">(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torchserve_with_ipex.html">Grokking PyTorch Intel CPU performance from first principles</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul>
@@ -298,6 +298,7 @@
 <p class="caption" role="heading"><span class="caption-text">Recommendation Systems</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="torchrec_tutorial.html">Introduction to TorchRec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/sharding.html">Exploring TorchRec sharding</a></li>
 </ul>
 
             
@@ -386,6 +387,7 @@
           </div>
 
         
+
           
           <div class="rst-content">
           
@@ -396,7 +398,7 @@
 <p class="admonition-title">Note</p>
 <p>Click <a class="reference internal" href="#sphx-glr-download-intermediate-pruning-tutorial-py"><span class="std std-ref">here</span></a> to download the full example code</p>
 </div>
-<section class="sphx-glr-example-title" id="pruning">
+<div class="sphx-glr-example-title section" id="pruning">
 <span id="sphx-glr-intermediate-pruning-tutorial-py"></span><h1>가지치기 기법(Pruning) 튜토리얼<a class="headerlink" href="#pruning" title="Permalink to this headline">¶</a></h1>
 <p><strong>저자</strong>: <a class="reference external" href="https://github.com/mickypaganini">Michela Paganini</a>
 <strong>번역</strong> : <a class="reference external" href="https://github.com/Justin-A">안상준</a></p>
@@ -408,10 +410,10 @@
 연구 측면에서는, 가지치기 기법은 굉장히 많은 수의 파라미터값들로 구성된 모델과
 굉장히 적은 수의 파라미터값들로 구성된 모델 간 학습 역학 차이를 조사하는데 주로 이용되기도 하며,
 하위 신경망 모델과 파라미터값들의 초기화가 운이 좋게 잘 된 케이스를 바탕으로
-(”<a class="reference external" href="https://arxiv.org/abs/1803.03635">lottery tickets</a>”) 신경망 구조를 찾는 기술들에 대해 반대 의견을 제시하기도 합니다.</p>
+(“<a class="reference external" href="https://arxiv.org/abs/1803.03635">lottery tickets</a>”) 신경망 구조를 찾는 기술들에 대해 반대 의견을 제시하기도 합니다.</p>
 <p>이번 튜토리얼에서는, <code class="docutils literal notranslate"><span class="pre">torch.nn.utils.prune</span></code> 을 이용하여 여러분이 설계한 딥러닝 모델에 대해 가지치기 기법을 적용해보는 것을 배워보고,
 심화적으로 여러분의 맞춤형 가지치기 기법을 구현하는 방법에 대해 배워보도록 하겠습니다.</p>
-<section id="id2">
+<div class="section" id="id2">
 <h2>요구사항<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">&quot;torch&gt;=1.4&quot;</span></code></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
@@ -420,8 +422,8 @@
 <span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="nn">F</span>
 </pre></div>
 </div>
-</section>
-<section id="id3">
+</div>
+<div class="section" id="id3">
 <h2>딥러닝 모델 생성<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
 <p>이번 튜토리얼에서는, 얀 르쿤 교수님의 연구진들이 1998년도에 발표한 <code class="docutils literal notranslate"><span class="pre">LeNet</span>
 <span class="pre">&lt;http://yann.lecun.com/exdb/publis/pdf/lecun-98.pdf&gt;</span></code> 의 모델 구조를 이용합니다.</p>
@@ -450,8 +452,8 @@
 <span class="n">model</span> <span class="o">=</span> <span class="n">LeNet</span><span class="p">()</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-<section id="id4">
+</div>
+<div class="section" id="id4">
 <h2>모듈 점검<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
 <p>가지치기 기법이 적용되지 않은 LeNet 모델의 <code class="docutils literal notranslate"><span class="pre">conv1</span></code> 층을 점검해봅시다.
 여기에는 2개의 파라미터값들인 <code class="docutils literal notranslate"><span class="pre">가중치</span></code> 값과 <code class="docutils literal notranslate"><span class="pre">편향</span></code> 값이 포함될 것이며, 버퍼는 존재하지 않을 것입니다.</p>
@@ -500,8 +502,8 @@ tensor([ 0.0723,  0.2556,  0.2164, -0.0235, -0.2613,  0.1387], device=&#39;cuda:
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[]
 </pre></div>
 </div>
-</section>
-<section id="id5">
+</div>
+<div class="section" id="id5">
 <h2>모듈 가지치기 기법 적용 예제<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h2>
 <p>모듈에 대해 가지치기 기법을 적용하기 위해 (이번 예제에서는, LeNet 모델의 <code class="docutils literal notranslate"><span class="pre">conv1</span></code> 층)
 첫 번째로는, <code class="docutils literal notranslate"><span class="pre">torch.nn.utils.prune</span></code> (또는 <code class="docutils literal notranslate"><span class="pre">BasePruningMethod</span></code> 의 서브 클래스로 직접
@@ -641,7 +643,7 @@ tensor([[[[-0.1095, -0.1801,  0.2587],
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>OrderedDict([(1, &lt;torch.nn.utils.prune.RandomUnstructured object at 0x7fadc9a83c70&gt;)])
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>OrderedDict([(4, &lt;torch.nn.utils.prune.RandomUnstructured object at 0x7f7cf0b5bbb0&gt;)])
 </pre></div>
 </div>
 <p>완결성을 위해, 편향값에 대해서도 가지치기 기법을 적용할 수 있으며,
@@ -737,11 +739,11 @@ tensor([ 0.0723,  0.2556,  0.2164, -0.0235, -0.2613,  0.1387], device=&#39;cuda:
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>OrderedDict([(1, &lt;torch.nn.utils.prune.RandomUnstructured object at 0x7fadc9a83c70&gt;), (2, &lt;torch.nn.utils.prune.L1Unstructured object at 0x7fadc9a83fa0&gt;)])
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>OrderedDict([(4, &lt;torch.nn.utils.prune.RandomUnstructured object at 0x7f7cf0b5bbb0&gt;), (5, &lt;torch.nn.utils.prune.L1Unstructured object at 0x7f7cf0b5b8e0&gt;)])
 </pre></div>
 </div>
-</section>
-<section id="id7">
+</div>
+<div class="section" id="id7">
 <h2>가지치기 기법 반복 적용<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h2>
 <p>모듈 내 같은 파라미터값에 대해 가지치기 기법이 여러번 적용될 수 있으며, 다양한 가지치기 기법의 조합이 적용된 것과 동일하게 적용될 수 있습니다.
 새로운 마스크와 이전의 마스크의 결합은 <code class="docutils literal notranslate"><span class="pre">PruningContainer</span></code> 의 <code class="docutils literal notranslate"><span class="pre">compute_mask</span></code> 메소드를 통해 처리할 수 있습니다.</p>
@@ -796,11 +798,11 @@ tensor([ 0.0723,  0.2556,  0.2164, -0.0235, -0.2613,  0.1387], device=&#39;cuda:
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[&lt;torch.nn.utils.prune.RandomUnstructured object at 0x7fadc9a83c70&gt;, &lt;torch.nn.utils.prune.LnStructured object at 0x7fadc81dc250&gt;]
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[&lt;torch.nn.utils.prune.RandomUnstructured object at 0x7f7cf0b5bbb0&gt;, &lt;torch.nn.utils.prune.LnStructured object at 0x7f7cf0b5b820&gt;]
 </pre></div>
 </div>
-</section>
-<section id="id8">
+</div>
+<div class="section" id="id8">
 <h2>가지치기 기법이 적용된 모델의 직렬화<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h2>
 <p>마스크 버퍼들과 가지치기 기법이 적용된 텐서 계산에 사용된 기존의 파라미터를 포함하여 관련된 모든 텐서값들은
 필요한 경우 모델의 <code class="docutils literal notranslate"><span class="pre">state_dict</span></code> 에 저장되기 때문에, 쉽게 직렬화하여 저장할 수 있습니다.</p>
@@ -811,8 +813,8 @@ tensor([ 0.0723,  0.2556,  0.2164, -0.0235, -0.2613,  0.1387], device=&#39;cuda:
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>odict_keys([&#39;conv1.weight_orig&#39;, &#39;conv1.bias_orig&#39;, &#39;conv1.weight_mask&#39;, &#39;conv1.bias_mask&#39;, &#39;conv2.weight&#39;, &#39;conv2.bias&#39;, &#39;fc1.weight&#39;, &#39;fc1.bias&#39;, &#39;fc2.weight&#39;, &#39;fc2.bias&#39;, &#39;fc3.weight&#39;, &#39;fc3.bias&#39;])
 </pre></div>
 </div>
-</section>
-<section id="id9">
+</div>
+<div class="section" id="id9">
 <h2>가지치기 기법의 재-파라미터화 제거<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h2>
 <p>가지치기 기법이 적용된 것을 영구적으로 만들기 위해서, 재-파라미터화 관점의
 <code class="docutils literal notranslate"><span class="pre">weight_orig</span></code> 와 <code class="docutils literal notranslate"><span class="pre">weight_mask</span></code> 값을 제거하고, <code class="docutils literal notranslate"><span class="pre">forward_pre_hook</span></code> 값을 제거합니다.
@@ -972,8 +974,8 @@ tensor([[[[-0.0000, -0.0000,  0.0000],
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[(&#39;bias_mask&#39;, tensor([0., 1., 1., 0., 1., 0.], device=&#39;cuda:0&#39;))]
 </pre></div>
 </div>
-</section>
-<section id="id10">
+</div>
+<div class="section" id="id10">
 <h2>모델 내 여러 파라미터값들에 대하여 가지치기 기법 적용<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h2>
 <p>가지치기 기법을 적용하고 싶은 파라미터값들을 지정함으로써, 이번 예제에서 볼 수 있는 것 처럼,
 신경망 모델 내 여러 텐서값들에 대해서 쉽게 가지치기 기법을 적용할 수 있습니다.</p>
@@ -993,8 +995,8 @@ tensor([[[[-0.0000, -0.0000,  0.0000],
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>dict_keys([&#39;conv1.weight_mask&#39;, &#39;conv2.weight_mask&#39;, &#39;fc1.weight_mask&#39;, &#39;fc2.weight_mask&#39;, &#39;fc3.weight_mask&#39;])
 </pre></div>
 </div>
-</section>
-<section id="id11">
+</div>
+<div class="section" id="id11">
 <h2>전역 범위에 대한 가지치기 기법 적용<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h2>
 <p>지금까지, “지역 변수” 에 대해서만 가지치기 기법을 적용하는 방법을 살펴보았습니다.
 (즉, 가중치 규모, 활성화 정도, 경사값 등의 각 항목의 통계량을 바탕으로 모델 내 텐서값 하나씩 가지치기 기법을 적용하는 방식)
@@ -1079,8 +1081,8 @@ Sparsity in fc3.weight: 7.62%
 Global sparsity: 20.00%
 </pre></div>
 </div>
-</section>
-<section id="torch-nn-utils-prune">
+</div>
+<div class="section" id="torch-nn-utils-prune">
 <h2><code class="docutils literal notranslate"><span class="pre">torch.nn.utils.prune</span></code> 에서 확장된 맞춤형 가지치기 기법<a class="headerlink" href="#torch-nn-utils-prune" title="Permalink to this headline">¶</a></h2>
 <p>맞춤형 가지치기 기법은, 다른 가지치기 기법을 적용하는 것과 같은 방식으로,
 <code class="docutils literal notranslate"><span class="pre">BasePruningMethod</span></code> 의 기본 클래스인 <code class="docutils literal notranslate"><span class="pre">nn.utils.prune</span></code> 모듈을 활용하여 구현할 수 있습니다.
@@ -1146,7 +1148,7 @@ Global sparsity: 20.00%
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor([0., 1., 0., 1., 0., 1., 0., 1., 0., 1.])
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.183 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.387 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-intermediate-pruning-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/ef3541eb2ef78e22efa65b3d6f4ba737/pruning_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">pruning_tutorial.py</span></code></a></p>
@@ -1156,8 +1158,8 @@ Global sparsity: 20.00%
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
-</section>
-</section>
+</div>
+</div>
 
 
              </article>
@@ -1194,7 +1196,7 @@ Global sparsity: 20.00%
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2021, PyTorch &amp; PyTorch Korea Community.
+        &copy; Copyright 2022, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorch Korea User Group).
 
     </p>
   </div>
@@ -1207,6 +1209,13 @@ Global sparsity: 20.00%
 </footer>
 
           </div>
+<script>
+if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.indexOf("/prototype/prototype_index")< 1))
+  {
+    var div = '<div class="admonition note"><p class="admonition-title">Note</p><p><i class="fa fa-flask" aria-hidden="true">&nbsp</i> 이 튜토리얼은 프로토타입(prototype) 기능들에 대해서 설명하고 있습니다. 프로토타입 기능은 일반적으로 피드백 및 테스트용으로, 런타임 플래그 없이는 PyPI나 Conda로 배포되는 바이너리에서는 사용할 수 없습니다.</p></div>'
+    document.getElementById("pytorch-article").insertAdjacentHTML('afterBegin', div)
+  }
+</script>
         </div>
 
         <div class="pytorch-content-right" id="pytorch-content-right">
@@ -1264,7 +1273,6 @@ Global sparsity: 20.00%
       });
   </script>
  
-
 <script>
 //add microsoft link
 
@@ -1343,7 +1351,7 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
 </script>
 
 <script type="text/javascript">
-  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile'];
+  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile', 'Introduction to PyTorch on YouTube', 'Recommendation Systems'];
 </script>
 
 

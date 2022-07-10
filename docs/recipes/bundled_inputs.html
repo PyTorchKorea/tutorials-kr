@@ -6,24 +6,23 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
 <meta property="og:title" content="(beta) Bundling inputs to PyTorch Models" />
   
 <meta property="og:type" content="article" />
   
-<meta property="og:url" content="http://tutorials.pytorch.kr/recipes/bundled_inputs.html" />
+<meta property="og:url" content="https://tutorials.pytorch.kr/recipes/bundled_inputs.html" />
   
 <meta property="og:description" content="Author: Jacob Szwejbka Introduction: This tutorial introduces the steps to use PyTorch’s utility to bundle example or trivial inputs directly into your TorchScript Module. The interface of the model remains unchanged (other than adding a few methods), so it can still be safely deployed to product..." />
   
-<meta property="og:image" content="http://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
+<meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
   
 <meta property="og:image:alt" content="(beta) Bundling inputs to PyTorch Models" />
   
 <meta property="og:ignore_canonical" content="true" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>(beta) Bundling inputs to PyTorch Models &mdash; 파이토치 한국어 튜토리얼(PyTorch tutorials in Korean)</title>
+  <title>(beta) Bundling inputs to PyTorch Models &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
   
 
   
@@ -129,7 +128,7 @@
               
               
                 <div class="version">
-                  1.11.0+cu102
+                  1.12.0+cu102
                 </div>
               
             
@@ -270,6 +269,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/quantized_transfer_learning_tutorial.html">(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/static_quantization_tutorial.html">(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/torchserve_with_ipex.html">Grokking PyTorch Intel CPU performance from first principles</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul>
@@ -296,6 +296,7 @@
 <p class="caption" role="heading"><span class="caption-text">Recommendation Systems</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/torchrec_tutorial.html">Introduction to TorchRec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/sharding.html">Exploring TorchRec sharding</a></li>
 </ul>
 
             
@@ -384,21 +385,22 @@
           </div>
 
         
+
           
           <div class="rst-content">
           
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <section id="beta-bundling-inputs-to-pytorch-models">
+  <div class="section" id="beta-bundling-inputs-to-pytorch-models">
 <h1>(beta) Bundling inputs to PyTorch Models<a class="headerlink" href="#beta-bundling-inputs-to-pytorch-models" title="Permalink to this headline">¶</a></h1>
 <p><strong>Author</strong>: <a class="reference external" href="https://github.com/JacobSzwejbka">Jacob Szwejbka</a></p>
-<section id="introduction">
+<div class="section" id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
 <p>This tutorial introduces the steps to use PyTorch’s utility to bundle example or trivial inputs directly into your TorchScript Module.</p>
 <p>The interface of the model remains unchanged (other than adding a few methods), so it can still be safely deployed to production. The advantage of this standardized interface is that tools that run models can use it instead of having some sort of external file (or worse, document) that tells you how to run the model properly.</p>
-</section>
-<section id="common-case-bundling-an-input-to-a-model-that-only-uses-forward-for-inference">
+</div>
+<div class="section" id="common-case-bundling-an-input-to-a-model-that-only-uses-forward-for-inference">
 <h2>Common case, bundling an input to a model that only uses ‘forward’ for inference<a class="headerlink" href="#common-case-bundling-an-input-to-a-model-that-only-uses-forward-for-inference" title="Permalink to this headline">¶</a></h2>
 <ol class="arabic simple">
 <li><p><strong>Prepare model</strong>: Convert your model to TorchScript through either tracing or scripting</p></li>
@@ -438,8 +440,8 @@
 <span class="nb">print</span><span class="p">(</span><span class="n">bundled_model</span><span class="p">(</span><span class="o">*</span><span class="n">sample_inputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
 </pre></div>
 </div>
-</section>
-<section id="uncommon-case-bundling-and-retrieving-inputs-for-functions-beyond-forward">
+</div>
+<div class="section" id="uncommon-case-bundling-and-retrieving-inputs-for-functions-beyond-forward">
 <h2>Uncommon case, bundling and retrieving inputs for functions beyond ‘forward’<a class="headerlink" href="#uncommon-case-bundling-and-retrieving-inputs-for-functions-beyond-forward" title="Permalink to this headline">¶</a></h2>
 <ol class="arabic simple">
 <li><p><strong>Prepare model</strong>: Convert your model to TorchScript through either tracing or scripting</p></li>
@@ -498,8 +500,8 @@
         <span class="nb">print</span><span class="p">(</span><span class="n">model_function</span><span class="p">(</span><span class="o">*</span><span class="n">sample_input</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
 </pre></div>
 </div>
-</section>
-<section id="inflatable-args">
+</div>
+<div class="section" id="inflatable-args">
 <h2>Inflatable args<a class="headerlink" href="#inflatable-args" title="Permalink to this headline">¶</a></h2>
 <p>Attaching inputs to models can result in nontrivial size increases. Inflatable args are a way to compress and decompress inputs to minimize this impact.</p>
 <div class="admonition note">
@@ -586,14 +588,14 @@
 <span class="p">)</span>
 </pre></div>
 </div>
-</section>
-<section id="learn-more">
+</div>
+<div class="section" id="learn-more">
 <h2>Learn More<a class="headerlink" href="#learn-more" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>To learn more about PyTorch Mobile, please refer to <a class="reference external" href="https://pytorch.org/mobile/home/">PyTorch Mobile Home Page</a></p></li>
 </ul>
-</section>
-</section>
+</div>
+</div>
 
 
              </article>
@@ -621,7 +623,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2021, PyTorch &amp; PyTorch Korea Community.
+        &copy; Copyright 2022, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorch Korea User Group).
 
     </p>
   </div>
@@ -634,6 +636,13 @@
 </footer>
 
           </div>
+<script>
+if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.indexOf("/prototype/prototype_index")< 1))
+  {
+    var div = '<div class="admonition note"><p class="admonition-title">Note</p><p><i class="fa fa-flask" aria-hidden="true">&nbsp</i> 이 튜토리얼은 프로토타입(prototype) 기능들에 대해서 설명하고 있습니다. 프로토타입 기능은 일반적으로 피드백 및 테스트용으로, 런타임 플래그 없이는 PyPI나 Conda로 배포되는 바이너리에서는 사용할 수 없습니다.</p></div>'
+    document.getElementById("pytorch-article").insertAdjacentHTML('afterBegin', div)
+  }
+</script>
         </div>
 
         <div class="pytorch-content-right" id="pytorch-content-right">
@@ -686,7 +695,6 @@
       });
   </script>
  
-
 <script>
 //add microsoft link
 
@@ -765,7 +773,7 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
 </script>
 
 <script type="text/javascript">
-  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile'];
+  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile', 'Introduction to PyTorch on YouTube', 'Recommendation Systems'];
 </script>
 
 

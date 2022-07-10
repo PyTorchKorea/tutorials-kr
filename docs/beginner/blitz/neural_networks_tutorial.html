@@ -6,24 +6,23 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
 <meta property="og:title" content="신경망(Neural Networks)" />
   
 <meta property="og:type" content="article" />
   
-<meta property="og:url" content="http://tutorials.pytorch.kr/beginner/blitz/neural_networks_tutorial.html" />
+<meta property="og:url" content="https://tutorials.pytorch.kr/beginner/blitz/neural_networks_tutorial.html" />
   
 <meta property="og:description" content="신경망은 torch.nn 패키지를 사용하여 생성할 수 있습니다. 지금까지 autograd 를 살펴봤는데요, nn 은 모델을 정의하고 미분하는데 autograd 를 사용합니다. nn.Module 은 계층(layer)과 output 을 반환하는 forward(input) 메서드를 포함하고 있습니다. 숫자 이미지를 분류하는 신경망을 예제로 살펴보겠습니다: convnet convnet, 이는 간단한 순전파 네트워크(Feed-forward network)입니다. 입력(input)을 받아 여러 계층에 차례로 전달한 후, 최종 출력(out..." />
   
-<meta property="og:image" content="http://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
+<meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
   
 <meta property="og:image:alt" content="신경망(Neural Networks)" />
   
 <meta property="og:ignore_canonical" content="true" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>신경망(Neural Networks) &mdash; 파이토치 한국어 튜토리얼(PyTorch tutorials in Korean)</title>
+  <title>신경망(Neural Networks) &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
   
 
   
@@ -131,7 +130,7 @@
               
               
                 <div class="version">
-                  1.11.0+cu102
+                  1.12.0+cu102
                 </div>
               
             
@@ -272,6 +271,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/quantized_transfer_learning_tutorial.html">(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../advanced/static_quantization_tutorial.html">(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../intermediate/torchserve_with_ipex.html">Grokking PyTorch Intel CPU performance from first principles</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul>
@@ -298,6 +298,7 @@
 <p class="caption" role="heading"><span class="caption-text">Recommendation Systems</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/torchrec_tutorial.html">Introduction to TorchRec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../advanced/sharding.html">Exploring TorchRec sharding</a></li>
 </ul>
 
             
@@ -388,6 +389,7 @@
           </div>
 
         
+
           
           <div class="rst-content">
           
@@ -398,7 +400,7 @@
 <p class="admonition-title">Note</p>
 <p>Click <a class="reference internal" href="#sphx-glr-download-beginner-blitz-neural-networks-tutorial-py"><span class="std std-ref">here</span></a> to download the full example code</p>
 </div>
-<section class="sphx-glr-example-title" id="neural-networks">
+<div class="sphx-glr-example-title section" id="neural-networks">
 <span id="sphx-glr-beginner-blitz-neural-networks-tutorial-py"></span><h1>신경망(Neural Networks)<a class="headerlink" href="#neural-networks" title="Permalink to this headline">¶</a></h1>
 <p>신경망은 <code class="docutils literal notranslate"><span class="pre">torch.nn</span></code> 패키지를 사용하여 생성할 수 있습니다.</p>
 <p>지금까지 <code class="docutils literal notranslate"><span class="pre">autograd</span></code> 를 살펴봤는데요, <code class="docutils literal notranslate"><span class="pre">nn</span></code> 은 모델을 정의하고 미분하는데
@@ -406,12 +408,10 @@
 <code class="docutils literal notranslate"><span class="pre">nn.Module</span></code> 은 계층(layer)과 <code class="docutils literal notranslate"><span class="pre">output</span></code> 을 반환하는 <code class="docutils literal notranslate"><span class="pre">forward(input)</span></code>
 메서드를 포함하고 있습니다.</p>
 <p>숫자 이미지를 분류하는 신경망을 예제로 살펴보겠습니다:</p>
-<figure class="align-default" id="id5">
+<div class="figure align-default" id="id5">
 <img alt="convnet" src="../../_images/mnist.png" />
-<figcaption>
-<p><span class="caption-text">convnet</span><a class="headerlink" href="#id5" title="Permalink to this image">¶</a></p>
-</figcaption>
-</figure>
+<p class="caption"><span class="caption-text">convnet</span><a class="headerlink" href="#id5" title="Permalink to this image">¶</a></p>
+</div>
 <p>이는 간단한 순전파 네트워크(Feed-forward network)입니다. 입력(input)을 받아
 여러 계층에 차례로 전달한 후, 최종 출력(output)을 제공합니다.</p>
 <p>신경망의 일반적인 학습 과정은 다음과 같습니다:</p>
@@ -424,7 +424,7 @@
 <li><p>신경망의 가중치를 갱신합니다. 일반적으로 다음과 같은 간단한 규칙을 사용합니다:
 <code class="docutils literal notranslate"><span class="pre">새로운</span> <span class="pre">가중치(weight)</span> <span class="pre">=</span> <span class="pre">가중치(weight)</span> <span class="pre">-</span> <span class="pre">학습률(learning</span> <span class="pre">rate)</span> <span class="pre">*</span> <span class="pre">변화도(gradient)</span></code></p></li>
 </ul>
-<section id="id1">
+<div class="section" id="id1">
 <h2>신경망 정의하기<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
 <p>이제 신경망을 정의해보겠습니다:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
@@ -539,8 +539,8 @@ torch.Size([6, 1, 5, 5])
 </ul>
 </dd>
 </dl>
-</section>
-<section id="loss-function">
+</div>
+<div class="section" id="loss-function">
 <h2>손실 함수 (Loss Function)<a class="headerlink" href="#loss-function" title="Permalink to this headline">¶</a></h2>
 <p>손실 함수는 (output, target)을 한 쌍(pair)의 입력으로 받아, 출력(output)이
 정답(target)으로부터 얼마나 멀리 떨어져있는지 추정하는 값을 계산합니다.</p>
@@ -580,13 +580,13 @@ torch.Size([6, 1, 5, 5])
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;MseLossBackward0 object at 0x7f4cbc7f0310&gt;
-&lt;AddmmBackward0 object at 0x7f4cbc7f0ca0&gt;
-&lt;AccumulateGrad object at 0x7f4cbc7f0ca0&gt;
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;MseLossBackward0 object at 0x7f7cf11fe490&gt;
+&lt;AddmmBackward0 object at 0x7f7cf11fe3a0&gt;
+&lt;AccumulateGrad object at 0x7f7cf11fe3a0&gt;
 </pre></div>
 </div>
-</section>
-<section id="backprop">
+</div>
+<div class="section" id="backprop">
 <h2>역전파(Backprop)<a class="headerlink" href="#backprop" title="Permalink to this headline">¶</a></h2>
 <p>오차(error)를 역전파하기 위해서는 <code class="docutils literal notranslate"><span class="pre">loss.backward()</span></code> 만 해주면 됩니다.
 기존에 계산된 변화도의 값을 누적 시키고 싶지 않다면 기존에 계산된 변화도를 0으로 만드는
@@ -624,8 +624,8 @@ tensor([-0.0177,  0.0242,  0.0262, -0.0143,  0.0194,  0.0152])
 <li><p>신경망의 가중치를 갱신하는 것</p></li>
 </ul>
 </div></blockquote>
-</section>
-<section id="id4">
+</div>
+<div class="section" id="id4">
 <h2>가중치 갱신<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
 <p>실제로 많이 사용되는 가장 단순한 갱신 규칙은 확률적 경사하강법(SGD; Stochastic
 Gradient Descent)입니다:</p>
@@ -660,7 +660,7 @@ Gradient Descent)입니다:</p>
 것에 유의하세요. 이는 <a class="reference internal" href="#backprop">역전파(Backprop)</a> 섹션에서 설명한 것처럼 변화도가
 누적되기 때문입니다.</p>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.130 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.185 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-beginner-blitz-neural-networks-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/fb69edad8880ff72cdc3687bb1dad1e6/neural_networks_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">neural_networks_tutorial.py</span></code></a></p>
@@ -670,8 +670,8 @@ Gradient Descent)입니다:</p>
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
-</section>
-</section>
+</div>
+</div>
 
 
              </article>
@@ -708,7 +708,7 @@ Gradient Descent)입니다:</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2021, PyTorch &amp; PyTorch Korea Community.
+        &copy; Copyright 2022, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorch Korea User Group).
 
     </p>
   </div>
@@ -721,6 +721,13 @@ Gradient Descent)입니다:</p>
 </footer>
 
           </div>
+<script>
+if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.indexOf("/prototype/prototype_index")< 1))
+  {
+    var div = '<div class="admonition note"><p class="admonition-title">Note</p><p><i class="fa fa-flask" aria-hidden="true">&nbsp</i> 이 튜토리얼은 프로토타입(prototype) 기능들에 대해서 설명하고 있습니다. 프로토타입 기능은 일반적으로 피드백 및 테스트용으로, 런타임 플래그 없이는 PyPI나 Conda로 배포되는 바이너리에서는 사용할 수 없습니다.</p></div>'
+    document.getElementById("pytorch-article").insertAdjacentHTML('afterBegin', div)
+  }
+</script>
         </div>
 
         <div class="pytorch-content-right" id="pytorch-content-right">
@@ -772,7 +779,6 @@ Gradient Descent)입니다:</p>
       });
   </script>
  
-
 <script>
 //add microsoft link
 
@@ -851,7 +857,7 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
 </script>
 
 <script type="text/javascript">
-  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile'];
+  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile', 'Introduction to PyTorch on YouTube', 'Recommendation Systems'];
 </script>
 
 

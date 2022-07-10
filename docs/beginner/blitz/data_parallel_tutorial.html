@@ -6,24 +6,23 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
 <meta property="og:title" content="선택 사항: 데이터 병렬 처리 (Data Parallelism)" />
   
 <meta property="og:type" content="article" />
   
-<meta property="og:url" content="http://tutorials.pytorch.kr/beginner/blitz/data_parallel_tutorial.html" />
+<meta property="og:url" content="https://tutorials.pytorch.kr/beginner/blitz/data_parallel_tutorial.html" />
   
 <meta property="og:description" content="글쓴이: Sung Kim and Jenny Kang 번역: ‘정아진 < https://github.com/ajin-jng>’ 이 튜토리얼에서는 DataParallel(데이터 병렬) 을 사용하여 여러 GPU를 사용하는 법을 배우겠습니다. PyTorch를 통해 GPU를 사용하는 것은 매우 쉽습니다. 먼저, 모델을 GPU에 넣습니다: 그 다음으로는 모든 Tensors 를 GPU로 복사합니다: ‘’my_tensor.to(device)’’ 를 호출 시 에는 ‘’my_tensor’’ 를 다시쓰는 대신 ‘’my_tensor’’ 의 또다른 ..." />
   
-<meta property="og:image" content="http://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
+<meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
   
 <meta property="og:image:alt" content="선택 사항: 데이터 병렬 처리 (Data Parallelism)" />
   
 <meta property="og:ignore_canonical" content="true" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>선택 사항: 데이터 병렬 처리 (Data Parallelism) &mdash; 파이토치 한국어 튜토리얼(PyTorch tutorials in Korean)</title>
+  <title>선택 사항: 데이터 병렬 처리 (Data Parallelism) &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
   
 
   
@@ -129,7 +128,7 @@
               
               
                 <div class="version">
-                  1.11.0+cu102
+                  1.12.0+cu102
                 </div>
               
             
@@ -270,6 +269,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/quantized_transfer_learning_tutorial.html">(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../advanced/static_quantization_tutorial.html">(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../intermediate/torchserve_with_ipex.html">Grokking PyTorch Intel CPU performance from first principles</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul>
@@ -296,6 +296,7 @@
 <p class="caption" role="heading"><span class="caption-text">Recommendation Systems</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/torchrec_tutorial.html">Introduction to TorchRec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../advanced/sharding.html">Exploring TorchRec sharding</a></li>
 </ul>
 
             
@@ -384,6 +385,7 @@
           </div>
 
         
+
           
           <div class="rst-content">
           
@@ -394,7 +396,7 @@
 <p class="admonition-title">Note</p>
 <p>Click <a class="reference internal" href="#sphx-glr-download-beginner-blitz-data-parallel-tutorial-py"><span class="std std-ref">here</span></a> to download the full example code</p>
 </div>
-<section class="sphx-glr-example-title" id="data-parallelism">
+<div class="sphx-glr-example-title section" id="data-parallelism">
 <span id="sphx-glr-beginner-blitz-data-parallel-tutorial-py"></span><h1>선택 사항: 데이터 병렬 처리 (Data Parallelism)<a class="headerlink" href="#data-parallelism" title="Permalink to this headline">¶</a></h1>
 <p><strong>글쓴이</strong>: <a class="reference external" href="https://github.com/hunkim">Sung Kim</a> and <a class="reference external" href="https://github.com/jennykang">Jenny Kang</a>
 <strong>번역</strong>: ‘정아진 &lt;<a class="reference external" href="https://github.com/ajin-jng">https://github.com/ajin-jng</a>&gt;’</p>
@@ -435,7 +437,7 @@
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cuda:0&quot;</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<section id="dummy">
+<div class="section" id="dummy">
 <h2>더미(Dummy) 데이터셋<a class="headerlink" href="#dummy" title="Permalink to this headline">¶</a></h2>
 <p>더미(ramdom) 데이터셋을 만들어 봅시다. Getitem 만 구현하면 됩니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">RandomDataset</span><span class="p">(</span><span class="n">Dataset</span><span class="p">):</span>
@@ -454,8 +456,8 @@
                          <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-<section id="id1">
+</div>
+<div class="section" id="id1">
 <h2>간단한 모델<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
 <p>데모를 위해 모델은 입력을 받고 선형 연산을 수행하며 출력을 제공합니다. 그러나 <code class="docutils literal notranslate"><span class="pre">DataParallel</span></code> 의 어떤 모델 (CNN, RNN, Capsule Net 등) 에서든 사용할 수 있습니다.</p>
 <p>우리는 input과 output의 크기를 모니터링하기 위해 모델안에 print 문을 넣었습니다.
@@ -475,8 +477,8 @@
         <span class="k">return</span> <span class="n">output</span>
 </pre></div>
 </div>
-</section>
-<section id="id2">
+</div>
+<div class="section" id="id2">
 <h2>모델과 데이터 병렬의 구현<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
 <p>이것은 이 튜토리얼의 핵심 부분입니다. 먼저, model instance 를 만들고 가지고 있는 GPU가 여러개인지 확인해야합니다.
 만약 다수의 GPU를 보유중이라면, <code class="docutils literal notranslate"><span class="pre">nn.DataParallel</span></code> 을 사용하여 모델을 래핑 (wrapping) 할 수 있습니다.
@@ -494,8 +496,8 @@
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Let&#39;s use 2 GPUs!
 </pre></div>
 </div>
-</section>
-<section id="id3">
+</div>
+<div class="section" id="id3">
 <h2>모델 실행<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
 <p>이제 우리는 입력과 출력 tensor의 크기를 볼 수 있습니다</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">rand_loader</span><span class="p">:</span>
@@ -520,12 +522,12 @@ Outside: input size torch.Size([30, 5]) output_size torch.Size([30, 2])
 Outside: input size torch.Size([10, 5]) output_size torch.Size([10, 2])
 </pre></div>
 </div>
-</section>
-<section id="id4">
+</div>
+<div class="section" id="id4">
 <h2>결과<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
 <p>GPU가 없거나 하나인 경우 30개의 입력과 30개의 출력을 일괄 처리하면 모델이 예상대로 30을 입력받고 30을 출력합니다.
 하지만 만약 당신이 다수의 GPU를 가지고 있다면, 다음과 같은 결과를 얻을 수 있습니다.</p>
-<section id="gpus">
+<div class="section" id="gpus">
 <h3>2 GPUs<a class="headerlink" href="#gpus" title="Permalink to this headline">¶</a></h3>
 <p>2개의 GPU를 갖고 있다면, 다음과 같이 표시될 것 입니다:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span># on 2 GPUs
@@ -544,8 +546,8 @@ Outside: input size torch.Size([30, 5]) output_size torch.Size([30, 2])
 Outside: input size torch.Size([10, 5]) output_size torch.Size([10, 2])
 </pre></div>
 </div>
-</section>
-<section id="id5">
+</div>
+<div class="section" id="id5">
 <h3>3 GPUs<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
 <p>만약 당신이 3개의 GPU를 갖고 있다면, 다음과 같이 표시될 것 입니다:
 .. code:: bash</p>
@@ -570,8 +572,8 @@ In Model: input size torch.Size([2, 5]) output size torch.Size([2, 2])</p>
 </dl>
 <p>Outside: input size torch.Size([10, 5]) output_size torch.Size([10, 2])</p>
 </div></blockquote>
-</section>
-<section id="id6">
+</div>
+<div class="section" id="id6">
 <h3>8 GPUs<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
 <p>만약 당신이 8개의 GPU를 갖고 있다면, 다음과 같이 표시될 것 입니다:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>Let&#39;s use 8 GPUs!
@@ -610,15 +612,15 @@ Outside: input size torch.Size([30, 5]) output_size torch.Size([30, 2])
 Outside: input size torch.Size([10, 5]) output_size torch.Size([10, 2])
 </pre></div>
 </div>
-</section>
-</section>
-<section id="id7">
+</div>
+</div>
+<div class="section" id="id7">
 <h2>요약<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h2>
 <p>DataParallel은 당신의 데이터를 자동으로 분할하고 여러 GPU에 있는 다수의 모델에 작업을 지시합니다. 각 모델이 작업을 완료하면 DataParallel은
 사용자에게 결과를 반환하기 전에 모든 결과물들을 수집하여 병합합니다.</p>
 <p>더 많은 정보를 알고싶다면 아래 주소를 참고하세요.
 <a class="reference external" href="https://tutorials.pytorch.kr/beginner/former_torchies/parallelism_tutorial.html">https://tutorials.pytorch.kr/beginner/former_torchies/parallelism_tutorial.html</a></p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  2.314 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  2.209 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-beginner-blitz-data-parallel-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/e85264945029fe236addcb864bf5f13f/data_parallel_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">data_parallel_tutorial.py</span></code></a></p>
@@ -628,8 +630,8 @@ Outside: input size torch.Size([10, 5]) output_size torch.Size([10, 2])
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
-</section>
-</section>
+</div>
+</div>
 
 
              </article>
@@ -657,7 +659,7 @@ Outside: input size torch.Size([10, 5]) output_size torch.Size([10, 2])
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2021, PyTorch &amp; PyTorch Korea Community.
+        &copy; Copyright 2022, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorch Korea User Group).
 
     </p>
   </div>
@@ -670,6 +672,13 @@ Outside: input size torch.Size([10, 5]) output_size torch.Size([10, 2])
 </footer>
 
           </div>
+<script>
+if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.indexOf("/prototype/prototype_index")< 1))
+  {
+    var div = '<div class="admonition note"><p class="admonition-title">Note</p><p><i class="fa fa-flask" aria-hidden="true">&nbsp</i> 이 튜토리얼은 프로토타입(prototype) 기능들에 대해서 설명하고 있습니다. 프로토타입 기능은 일반적으로 피드백 및 테스트용으로, 런타임 플래그 없이는 PyPI나 Conda로 배포되는 바이너리에서는 사용할 수 없습니다.</p></div>'
+    document.getElementById("pytorch-article").insertAdjacentHTML('afterBegin', div)
+  }
+</script>
         </div>
 
         <div class="pytorch-content-right" id="pytorch-content-right">
@@ -728,7 +737,6 @@ Outside: input size torch.Size([10, 5]) output_size torch.Size([10, 2])
       });
   </script>
  
-
 <script>
 //add microsoft link
 
@@ -807,7 +815,7 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
 </script>
 
 <script type="text/javascript">
-  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile'];
+  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile', 'Introduction to PyTorch on YouTube', 'Recommendation Systems'];
 </script>
 
 

@@ -6,24 +6,23 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
 <meta property="og:title" content="PyTorch Distributed Overview" />
   
 <meta property="og:type" content="article" />
   
-<meta property="og:url" content="http://tutorials.pytorch.kr/beginner/dist_overview.html" />
+<meta property="og:url" content="https://tutorials.pytorch.kr/beginner/dist_overview.html" />
   
 <meta property="og:description" content="Author: Shen Li This is the overview page for the torch.distributed package. The goal of this page is to categorize documents into different topics and briefly describe each of them. If this is your first time building distributed training applications using PyTorch, it is recommended to use this..." />
   
-<meta property="og:image" content="http://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
+<meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
   
 <meta property="og:image:alt" content="PyTorch Distributed Overview" />
   
 <meta property="og:ignore_canonical" content="true" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>PyTorch Distributed Overview &mdash; 파이토치 한국어 튜토리얼(PyTorch tutorials in Korean)</title>
+  <title>PyTorch Distributed Overview &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
   
 
   
@@ -53,7 +52,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="단일 머신을 사용한 모델 병렬화 모범 사례" href="../intermediate/model_parallel_tutorial.html" />
-    <link rel="prev" title="(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화" href="../advanced/static_quantization_tutorial.html" /> 
+    <link rel="prev" title="Grokking PyTorch Intel CPU performance from first principles" href="../intermediate/torchserve_with_ipex.html" /> 
 
   
   <script src="../_static/js/modernizr.min.js"></script>
@@ -131,7 +130,7 @@
               
               
                 <div class="version">
-                  1.11.0+cu102
+                  1.12.0+cu102
                 </div>
               
             
@@ -272,6 +271,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/quantized_transfer_learning_tutorial.html">(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/static_quantization_tutorial.html">(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/torchserve_with_ipex.html">Grokking PyTorch Intel CPU performance from first principles</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul class="current">
@@ -298,6 +298,7 @@
 <p class="caption" role="heading"><span class="caption-text">Recommendation Systems</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/torchrec_tutorial.html">Introduction to TorchRec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/sharding.html">Exploring TorchRec sharding</a></li>
 </ul>
 
             
@@ -386,21 +387,26 @@
           </div>
 
         
+
           
           <div class="rst-content">
           
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <section id="pytorch-distributed-overview">
+  <div class="section" id="pytorch-distributed-overview">
 <h1>PyTorch Distributed Overview<a class="headerlink" href="#pytorch-distributed-overview" title="Permalink to this headline">¶</a></h1>
 <p><strong>Author</strong>: <a class="reference external" href="https://mrshenli.github.io/">Shen Li</a></p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>View the source code for this tutorial in <a class="reference external" href="https://github.com/pytorch/tutorials/blob/master/beginner_source/dist_overview.rst">github</a>.</p>
+</div>
 <p>This is the overview page for the <code class="docutils literal notranslate"><span class="pre">torch.distributed</span></code> package. The goal of
 this page is to categorize documents into different topics and briefly
 describe each of them. If this is your first time building distributed training
 applications using PyTorch, it is recommended to use this document to navigate
 to the technology that can best serve your use case.</p>
-<section id="introduction">
+<div class="section" id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
 <p>As of PyTorch v1.6.0, features in <code class="docutils literal notranslate"><span class="pre">torch.distributed</span></code> can be categorized into
 three main components:</p>
@@ -440,8 +446,8 @@ optimizations offered by DDP. The
 <a class="reference external" href="../intermediate/dist_tuto.html">Writing Distributed Applications with PyTorch</a>
 shows examples of using c10d communication APIs.</p></li>
 </ul>
-</section>
-<section id="data-parallel-training">
+</div>
+<div class="section" id="data-parallel-training">
 <h2>Data Parallel Training<a class="headerlink" href="#data-parallel-training" title="Permalink to this headline">¶</a></h2>
 <p>PyTorch provides several options for data-parallel training. For applications
 that gradually grow from simple to complex and from prototype to production, the
@@ -468,7 +474,7 @@ resources can join and leave dynamically during training.</p></li>
 <p class="admonition-title">Note</p>
 <p>Data-parallel training also works with <a class="reference external" href="https://pytorch.org/docs/stable/notes/amp_examples.html#working-with-multiple-gpus">Automatic Mixed Precision (AMP)</a>.</p>
 </div>
-<section id="torch-nn-dataparallel">
+<div class="section" id="torch-nn-dataparallel">
 <h3><code class="docutils literal notranslate"><span class="pre">torch.nn.DataParallel</span></code><a class="headerlink" href="#torch-nn-dataparallel" title="Permalink to this headline">¶</a></h3>
 <p>The <a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.DataParallel.html">DataParallel</a>
 package enables single-machine multi-GPU parallelism with the lowest coding
@@ -481,8 +487,8 @@ naturally suffers from
 <a class="reference external" href="https://wiki.python.org/moin/GlobalInterpreterLock">GIL</a> contention. To get
 better performance, consider using
 <a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.parallel.DistributedDataParallel.html">DistributedDataParallel</a>.</p>
-</section>
-<section id="torch-nn-parallel-distributeddataparallel">
+</div>
+<div class="section" id="torch-nn-parallel-distributeddataparallel">
 <h3><code class="docutils literal notranslate"><span class="pre">torch.nn.parallel.DistributedDataParallel</span></code><a class="headerlink" href="#torch-nn-parallel-distributeddataparallel" title="Permalink to this headline">¶</a></h3>
 <p>Compared to <a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.DataParallel.html">DataParallel</a>,
 <a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.parallel.DistributedDataParallel.html">DistributedDataParallel</a>
@@ -515,8 +521,8 @@ helps to reduce optimizer memory footprint.</p></li>
 <li><p>The <a class="reference external" href="../advanced/generic_oin.html">Distributed Training with Uneven Inputs Using the Join Context Manager</a>
 tutorial walks through using the generic join context for distributed training with uneven inputs.</p></li>
 </ol>
-</section>
-<section id="torch-distributed-elastic">
+</div>
+<div class="section" id="torch-distributed-elastic">
 <h3>torch.distributed.elastic<a class="headerlink" href="#torch-distributed-elastic" title="Permalink to this headline">¶</a></h3>
 <p>With the growth of the application complexity and scale, failure recovery
 becomes a requirement. Sometimes it is inevitable to hit errors
@@ -529,9 +535,9 @@ throws an exception, it is likely to lead to desynchronization (mismatched
 <code class="docutils literal notranslate"><span class="pre">AllReduce</span></code> operations) which would then cause a crash or hang.
 <a class="reference external" href="https://pytorch.org/docs/stable/distributed.elastic.html">torch.distributed.elastic</a>
 adds fault tolerance and the ability to make use of a dynamic pool of machines (elasticity).</p>
-</section>
-</section>
-<section id="rpc-based-distributed-training">
+</div>
+</div>
+<div class="section" id="rpc-based-distributed-training">
 <h2>RPC-Based Distributed Training<a class="headerlink" href="#rpc-based-distributed-training" title="Permalink to this headline">¶</a></h2>
 <p>Many training paradigms do not fit into data parallelism, e.g.,
 parameter server paradigm, distributed pipeline parallelism, reinforcement
@@ -578,13 +584,13 @@ RL and PS examples similar to those in the above tutorials 1 and 2.</p></li>
 tutorial demonstrates how to combine DDP with RPC to train a model using
 distributed data parallelism combined with distributed model parallelism.</p></li>
 </ol>
-</section>
-<section id="pytorch-distributed-developers">
+</div>
+<div class="section" id="pytorch-distributed-developers">
 <h2>PyTorch Distributed Developers<a class="headerlink" href="#pytorch-distributed-developers" title="Permalink to this headline">¶</a></h2>
 <p>If you’d like to contribute to PyTorch Distributed, please refer to our
 <a class="reference external" href="https://github.com/pytorch/pytorch/blob/master/torch/distributed/CONTRIBUTING.md">Developer Guide</a>.</p>
-</section>
-</section>
+</div>
+</div>
 
 
              </article>
@@ -597,7 +603,7 @@ distributed data parallelism combined with distributed model parallelism.</p></l
         <a href="../intermediate/model_parallel_tutorial.html" class="btn btn-neutral float-right" title="단일 머신을 사용한 모델 병렬화 모범 사례" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
       
       
-        <a href="../advanced/static_quantization_tutorial.html" class="btn btn-neutral" title="(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
+        <a href="../intermediate/torchserve_with_ipex.html" class="btn btn-neutral" title="Grokking PyTorch Intel CPU performance from first principles" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
       
     </div>
   
@@ -621,7 +627,7 @@ distributed data parallelism combined with distributed model parallelism.</p></l
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2021, PyTorch &amp; PyTorch Korea Community.
+        &copy; Copyright 2022, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorch Korea User Group).
 
     </p>
   </div>
@@ -634,6 +640,13 @@ distributed data parallelism combined with distributed model parallelism.</p></l
 </footer>
 
           </div>
+<script>
+if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.indexOf("/prototype/prototype_index")< 1))
+  {
+    var div = '<div class="admonition note"><p class="admonition-title">Note</p><p><i class="fa fa-flask" aria-hidden="true">&nbsp</i> 이 튜토리얼은 프로토타입(prototype) 기능들에 대해서 설명하고 있습니다. 프로토타입 기능은 일반적으로 피드백 및 테스트용으로, 런타임 플래그 없이는 PyPI나 Conda로 배포되는 바이너리에서는 사용할 수 없습니다.</p></div>'
+    document.getElementById("pytorch-article").insertAdjacentHTML('afterBegin', div)
+  }
+</script>
         </div>
 
         <div class="pytorch-content-right" id="pytorch-content-right">
@@ -690,7 +703,6 @@ distributed data parallelism combined with distributed model parallelism.</p></l
       });
   </script>
  
-
 <script>
 //add microsoft link
 
@@ -769,7 +781,7 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
 </script>
 
 <script type="text/javascript">
-  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile'];
+  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile', 'Introduction to PyTorch on YouTube', 'Recommendation Systems'];
 </script>
 
 

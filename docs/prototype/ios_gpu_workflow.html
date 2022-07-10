@@ -6,24 +6,23 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
 <meta property="og:title" content="(Prototype) Use iOS GPU in PyTorch" />
   
 <meta property="og:type" content="article" />
   
-<meta property="og:url" content="http://tutorials.pytorch.kr/prototype/ios_gpu_workflow.html" />
+<meta property="og:url" content="https://tutorials.pytorch.kr/prototype/ios_gpu_workflow.html" />
   
 <meta property="og:description" content="Author: Tao Xu Introduction: This tutorial introduces the steps to run your models on iOS GPU. We’ll be using the mobilenetv2 model as an example. Since the mobile GPU features are currently in the prototype stage, you’ll need to build a custom pytorch binary from source. For the time being, only..." />
   
-<meta property="og:image" content="http://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
+<meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
   
 <meta property="og:image:alt" content="(Prototype) Use iOS GPU in PyTorch" />
   
 <meta property="og:ignore_canonical" content="true" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>(Prototype) Use iOS GPU in PyTorch &mdash; 파이토치 한국어 튜토리얼(PyTorch tutorials in Korean)</title>
+  <title>(Prototype) Use iOS GPU in PyTorch &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
   
 
   
@@ -129,7 +128,7 @@
               
               
                 <div class="version">
-                  1.11.0+cu102
+                  1.12.0+cu102
                 </div>
               
             
@@ -270,6 +269,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/quantized_transfer_learning_tutorial.html">(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/static_quantization_tutorial.html">(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/torchserve_with_ipex.html">Grokking PyTorch Intel CPU performance from first principles</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul>
@@ -296,6 +296,7 @@
 <p class="caption" role="heading"><span class="caption-text">Recommendation Systems</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/torchrec_tutorial.html">Introduction to TorchRec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/sharding.html">Exploring TorchRec sharding</a></li>
 </ul>
 
             
@@ -384,23 +385,24 @@
           </div>
 
         
+
           
           <div class="rst-content">
           
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <section id="prototype-use-ios-gpu-in-pytorch">
+  <div class="section" id="prototype-use-ios-gpu-in-pytorch">
 <h1>(Prototype) Use iOS GPU in PyTorch<a class="headerlink" href="#prototype-use-ios-gpu-in-pytorch" title="Permalink to this headline">¶</a></h1>
 <p><strong>Author</strong>: <a class="reference external" href="https://github.com/xta0">Tao Xu</a></p>
-<section id="introduction">
+<div class="section" id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
 <p>This tutorial introduces the steps to run your models on iOS GPU. We’ll be using the mobilenetv2 model as an example. Since the mobile GPU features are currently in the prototype stage, you’ll need to build a custom pytorch binary from source. For the time being, only a limited number of operators are supported, and certain client side APIs are subject to change in the future versions.</p>
-</section>
-<section id="model-preparation">
+</div>
+<div class="section" id="model-preparation">
 <h2>Model Preparation<a class="headerlink" href="#model-preparation" title="Permalink to this headline">¶</a></h2>
 <p>Since GPUs consume weights in a different order, the first step we need to do is to convert our TorchScript model to a GPU compatible model. This step is also known as “prepacking”.</p>
-<section id="pytorch-with-metal">
+<div class="section" id="pytorch-with-metal">
 <h3>PyTorch with Metal<a class="headerlink" href="#pytorch-with-metal" title="Permalink to this headline">¶</a></h3>
 <p>To do that, we’ll install a pytorch nightly binary that includes the Metal backend. Go ahead run the command below</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>conda install pytorch -c pytorch-nightly
@@ -418,8 +420,8 @@ pip3 install --pre torch -f https://download.pytorch.org/whl/nightly/cpu/torch_n
 <span class="n">torch</span><span class="o">.</span><span class="n">__version__</span> <span class="c1">#1.8.0a0+41237a4</span>
 </pre></div>
 </div>
-</section>
-<section id="metal-compatible-model">
+</div>
+<div class="section" id="metal-compatible-model">
 <h3>Metal Compatible Model<a class="headerlink" href="#metal-compatible-model" title="Permalink to this headline">¶</a></h3>
 <p>The next step is going to be converting the mobilenetv2 torchscript model to a Metal compatible model. We’ll be leveraging the <code class="docutils literal notranslate"><span class="pre">optimize_for_mobile</span></code> API from the <code class="docutils literal notranslate"><span class="pre">torch.utils</span></code> module. As shown below</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
@@ -444,9 +446,9 @@ pip3 install --pre torch -f https://download.pytorch.org/whl/nightly/cpu/torch_n
 </pre></div>
 </div>
 <p>Those are all the ops we need to run the mobilenetv2 model on iOS GPU. Cool! Now that you have the <code class="docutils literal notranslate"><span class="pre">mobilenetv2_metal.pt</span></code> saved on your disk, let’s move on to the iOS part.</p>
-</section>
-</section>
-<section id="use-pytorch-ios-library-with-metal">
+</div>
+</div>
+<div class="section" id="use-pytorch-ios-library-with-metal">
 <h2>Use PyTorch iOS library with Metal<a class="headerlink" href="#use-pytorch-ios-library-with-metal" title="Permalink to this headline">¶</a></h2>
 <p>The PyTorch iOS library with Metal support <code class="docutils literal notranslate"><span class="pre">LibTorch-Lite-Nightly</span></code> is available in Cocoapods. You can read the <a class="reference external" href="https://pytorch.org/mobile/ios/#using-the-nightly-pytorch-ios-libraries-in-cocoapods">Using the Nightly PyTorch iOS Libraries in CocoaPods</a> section from the iOS tutorial for more detail about its usage.</p>
 <p>We also have the <a class="reference external" href="https://github.com/pytorch/ios-demo-app/tree/master/HelloWorld-Metal">HelloWorld-Metal example</a> that shows how to conect all pieces together.</p>
@@ -457,8 +459,8 @@ pip3 install --pre torch -f https://download.pytorch.org/whl/nightly/cpu/torch_n
 </pre></div>
 </div>
 <p>This is because by default Metal uses fp16 rather than fp32 to compute. The precision loss is expected.</p>
-</section>
-<section id="use-libtorch-lite-built-from-source">
+</div>
+<div class="section" id="use-libtorch-lite-built-from-source">
 <h2>Use LibTorch-Lite Built from Source<a class="headerlink" href="#use-libtorch-lite-built-from-source" title="Permalink to this headline">¶</a></h2>
 <p>You can also build a custom LibTorch-Lite from Source and use it to run GPU models on iOS Metal. In this section, we’ll be using the <a class="reference external" href="https://github.com/pytorch/ios-demo-app/tree/master/HelloWorld">HelloWorld example</a> to demonstrate this process.</p>
 <p>First, make sure you have deleted the <strong>build</strong> folder from the “Model Preparation” step in PyTorch root directory. Then run the command below</p>
@@ -488,20 +490,20 @@ pip3 install --pre torch -f https://download.pytorch.org/whl/nightly/cpu/torch_n
 <p>As you can see, we simply just call <code class="docutils literal notranslate"><span class="pre">.metal()</span></code> to move our input tensor from CPU to GPU, and then call <code class="docutils literal notranslate"><span class="pre">.cpu()</span></code> to move the result back. Internally, <code class="docutils literal notranslate"><span class="pre">.metal()</span></code> will copy the input data from the CPU buffer to a GPU buffer with a GPU compatible memory format. When <code class="docutils literal notranslate"><span class="pre">.cpu()</span></code> is invoked, the GPU command buffer will be flushed and synced. After <cite>forward</cite> finished, the final result will then be copied back from the GPU buffer back to a CPU buffer.</p>
 <p>The last step we have to do is to add the <code class="docutils literal notranslate"><span class="pre">Accelerate.framework</span></code> and the <code class="docutils literal notranslate"><span class="pre">MetalPerformanceShaders.framework</span></code> to your xcode project (Open your project via XCode, go to your project target’s “General” tab, locate the “Frameworks, Libraries and Embedded Content” section and click the “+” button).</p>
 <p>If everything works fine, you should be able to see the inference results on your phone.</p>
-</section>
-<section id="conclusion">
+</div>
+<div class="section" id="conclusion">
 <h2>Conclusion<a class="headerlink" href="#conclusion" title="Permalink to this headline">¶</a></h2>
 <p>In this tutorial, we demonstrated how to convert a mobilenetv2 model to a GPU compatible model. We walked through a HelloWorld example to show how to use the C++ APIs to run models on iOS GPU. Please be aware of that GPU feature is still under development, new operators will continue to be added. APIs are subject to change in the future versions.</p>
 <p>Thanks for reading! As always, we welcome any feedback, so please create an issue <a class="reference external" href="https://github.com/pytorch/pytorch/issues">here</a> if you have any.</p>
-</section>
-<section id="learn-more">
+</div>
+<div class="section" id="learn-more">
 <h2>Learn More<a class="headerlink" href="#learn-more" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>The <a class="reference external" href="https://pytorch.org/hub/pytorch_vision_mobilenet_v2/">Mobilenetv2</a> from Torchvision</p></li>
 <li><p>To learn more about how to use <code class="docutils literal notranslate"><span class="pre">optimize_for_mobile</span></code>, please refer to the <a class="reference external" href="https://tutorials.pytorch.kr/recipes/mobile_perf.html">Mobile Perf Recipe</a></p></li>
 </ul>
-</section>
-</section>
+</div>
+</div>
 
 
              </article>
@@ -529,7 +531,7 @@ pip3 install --pre torch -f https://download.pytorch.org/whl/nightly/cpu/torch_n
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2021, PyTorch &amp; PyTorch Korea Community.
+        &copy; Copyright 2022, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorch Korea User Group).
 
     </p>
   </div>
@@ -542,6 +544,13 @@ pip3 install --pre torch -f https://download.pytorch.org/whl/nightly/cpu/torch_n
 </footer>
 
           </div>
+<script>
+if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.indexOf("/prototype/prototype_index")< 1))
+  {
+    var div = '<div class="admonition note"><p class="admonition-title">Note</p><p><i class="fa fa-flask" aria-hidden="true">&nbsp</i> 이 튜토리얼은 프로토타입(prototype) 기능들에 대해서 설명하고 있습니다. 프로토타입 기능은 일반적으로 피드백 및 테스트용으로, 런타임 플래그 없이는 PyPI나 Conda로 배포되는 바이너리에서는 사용할 수 없습니다.</p></div>'
+    document.getElementById("pytorch-article").insertAdjacentHTML('afterBegin', div)
+  }
+</script>
         </div>
 
         <div class="pytorch-content-right" id="pytorch-content-right">
@@ -599,7 +608,6 @@ pip3 install --pre torch -f https://download.pytorch.org/whl/nightly/cpu/torch_n
       });
   </script>
  
-
 <script>
 //add microsoft link
 
@@ -678,7 +686,7 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
 </script>
 
 <script type="text/javascript">
-  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile'];
+  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile', 'Introduction to PyTorch on YouTube', 'Recommendation Systems'];
 </script>
 
 

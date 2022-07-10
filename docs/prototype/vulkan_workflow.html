@@ -6,24 +6,23 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
 <meta property="og:title" content="PyTorch Vulkan Backend User Workflow" />
   
 <meta property="og:type" content="article" />
   
-<meta property="og:url" content="http://tutorials.pytorch.kr/prototype/vulkan_workflow.html" />
+<meta property="og:url" content="https://tutorials.pytorch.kr/prototype/vulkan_workflow.html" />
   
 <meta property="og:description" content="Author: Ivan Kobzarev Introduction: PyTorch 1.7 supports the ability to run model inference on GPUs that support the Vulkan graphics and compute API. The primary target devices are mobile GPUs on Android devices. The Vulkan backend can also be used on Linux, Mac, and Windows desktop builds to use..." />
   
-<meta property="og:image" content="http://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
+<meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
   
 <meta property="og:image:alt" content="PyTorch Vulkan Backend User Workflow" />
   
 <meta property="og:ignore_canonical" content="true" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>PyTorch Vulkan Backend User Workflow &mdash; 파이토치 한국어 튜토리얼(PyTorch tutorials in Korean)</title>
+  <title>PyTorch Vulkan Backend User Workflow &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
   
 
   
@@ -129,7 +128,7 @@
               
               
                 <div class="version">
-                  1.11.0+cu102
+                  1.12.0+cu102
                 </div>
               
             
@@ -270,6 +269,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/quantized_transfer_learning_tutorial.html">(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/static_quantization_tutorial.html">(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/torchserve_with_ipex.html">Grokking PyTorch Intel CPU performance from first principles</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul>
@@ -296,6 +296,7 @@
 <p class="caption" role="heading"><span class="caption-text">Recommendation Systems</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/torchrec_tutorial.html">Introduction to TorchRec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/sharding.html">Exploring TorchRec sharding</a></li>
 </ul>
 
             
@@ -384,30 +385,31 @@
           </div>
 
         
+
           
           <div class="rst-content">
           
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <section id="pytorch-vulkan-backend-user-workflow">
+  <div class="section" id="pytorch-vulkan-backend-user-workflow">
 <h1>PyTorch Vulkan Backend User Workflow<a class="headerlink" href="#pytorch-vulkan-backend-user-workflow" title="Permalink to this headline">¶</a></h1>
 <p><strong>Author</strong>: <a class="reference external" href="https://github.com/IvanKobzarev">Ivan Kobzarev</a></p>
-<section id="introduction">
+<div class="section" id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
 <p>PyTorch 1.7 supports the ability to run model inference on GPUs that support the Vulkan graphics and compute API. The primary target devices are mobile GPUs on Android devices. The Vulkan backend can also be used on Linux, Mac, and Windows desktop builds to use Vulkan devices like Intel integrated GPUs. This feature is in the prototype stage and is subject to change.</p>
-<section id="building-pytorch-with-vulkan-backend">
+<div class="section" id="building-pytorch-with-vulkan-backend">
 <h3>Building PyTorch with Vulkan backend<a class="headerlink" href="#building-pytorch-with-vulkan-backend" title="Permalink to this headline">¶</a></h3>
 <p>Vulkan backend is not included by default. The main switch to include Vulkan backend is cmake option <code class="docutils literal notranslate"><span class="pre">USE_VULKAN</span></code>, that can be set by environment variable <code class="docutils literal notranslate"><span class="pre">USE_VULKAN</span></code>.</p>
 <p>To use PyTorch with Vulkan backend, we need to build it from source with additional settings. Checkout the PyTorch source code from GitHub master branch.</p>
-<section id="optional-usage-of-vulkan-wrapper">
+<div class="section" id="optional-usage-of-vulkan-wrapper">
 <h4>Optional usage of vulkan wrapper<a class="headerlink" href="#optional-usage-of-vulkan-wrapper" title="Permalink to this headline">¶</a></h4>
 <p>By default, Vulkan library will be loaded at runtime using the vulkan_wrapper library. If you specify the environment variable <code class="docutils literal notranslate"><span class="pre">USE_VULKAN_WRAPPER=0</span></code> libvulkan will be linked directly.</p>
-</section>
-<section id="desktop-build">
+</div>
+<div class="section" id="desktop-build">
 <h4>Desktop build<a class="headerlink" href="#desktop-build" title="Permalink to this headline">¶</a></h4>
-</section>
-<section id="vulkan-sdk">
+</div>
+<div class="section" id="vulkan-sdk">
 <h4>Vulkan SDK<a class="headerlink" href="#vulkan-sdk" title="Permalink to this headline">¶</a></h4>
 <p>Download VulkanSDK from <a class="reference external" href="https://vulkan.lunarg.com/sdk/home">https://vulkan.lunarg.com/sdk/home</a> and set environment variable <code class="docutils literal notranslate"><span class="pre">VULKAN_SDK</span></code></p>
 <p>Unpack VulkanSDK to <code class="docutils literal notranslate"><span class="pre">VULKAN_SDK_ROOT</span></code> folder, install VulkanSDK following VulkanSDK instructions for your system.</p>
@@ -434,8 +436,8 @@ sudo python install_vulkan.py
 </pre></div>
 </div>
 <p>At the time of writing of this recipe, the version is 1.8.0a0+41237a4. You might be seeing different numbers depending on when you check out the code from master, but it should be greater than 1.7.0.</p>
-</section>
-<section id="android-build">
+</div>
+<div class="section" id="android-build">
 <h4>Android build<a class="headerlink" href="#android-build" title="Permalink to this headline">¶</a></h4>
 <p>To build LibTorch for android with Vulkan backend for specified <code class="docutils literal notranslate"><span class="pre">ANDROID_ABI</span></code>.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">PYTORCH_ROOT</span>
@@ -447,10 +449,10 @@ sudo python install_vulkan.py
 USE_VULKAN=1 sh ./scripts/build_pytorch_android.sh
 </pre></div>
 </div>
-</section>
-</section>
-</section>
-<section id="model-preparation">
+</div>
+</div>
+</div>
+<div class="section" id="model-preparation">
 <h2>Model preparation<a class="headerlink" href="#model-preparation" title="Permalink to this headline">¶</a></h2>
 <p>Install torchvision, get the default pretrained float model.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">torchvision</span>
@@ -473,11 +475,11 @@ USE_VULKAN=1 sh ./scripts/build_pytorch_android.sh
 </pre></div>
 </div>
 <p>The result model can be used only on Vulkan backend as it contains specific to the Vulkan backend operators.</p>
-</section>
-<section id="using-vulkan-backend-in-code">
+</div>
+<div class="section" id="using-vulkan-backend-in-code">
 <h2>Using Vulkan backend in code<a class="headerlink" href="#using-vulkan-backend-in-code" title="Permalink to this headline">¶</a></h2>
-</section>
-<section id="c-api">
+</div>
+<div class="section" id="c-api">
 <h2>C++ API<a class="headerlink" href="#c-api" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">at</span><span class="p">::</span><span class="n">is_vulkan_available</span><span class="p">()</span>
 <span class="n">auto</span> <span class="n">tensor</span> <span class="o">=</span> <span class="n">at</span><span class="p">::</span><span class="n">rand</span><span class="p">({</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">},</span> <span class="n">at</span><span class="p">::</span><span class="n">device</span><span class="p">(</span><span class="n">at</span><span class="p">::</span><span class="n">kCPU</span><span class="p">)</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="n">at</span><span class="p">::</span><span class="n">kFloat</span><span class="p">));</span>
@@ -520,14 +522,14 @@ USE_VULKAN=1 sh ./scripts/build_pytorch_android.sh
 </pre></div>
 </div>
 <p>Those operators allow to use torchvision models for image classification on Vulkan backend.</p>
-</section>
-<section id="python-api">
+</div>
+<div class="section" id="python-api">
 <h2>Python API<a class="headerlink" href="#python-api" title="Permalink to this headline">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">torch.is_vulkan_available()</span></code> is exposed to Python API.</p>
 <p><code class="docutils literal notranslate"><span class="pre">tensor.to(device='vulkan')</span></code> works as <code class="docutils literal notranslate"><span class="pre">.vulkan()</span></code> moving tensor to the Vulkan device.</p>
 <p><code class="docutils literal notranslate"><span class="pre">.vulkan()</span></code> at the moment of writing of this tutorial is not exposed to Python API, but it is planned to be there.</p>
-</section>
-<section id="android-java-api">
+</div>
+<div class="section" id="android-java-api">
 <h2>Android Java API<a class="headerlink" href="#android-java-api" title="Permalink to this headline">¶</a></h2>
 <p>For Android API to run model on Vulkan backend we have to specify this during model loading:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">org.pytorch.Device</span><span class="p">;</span>
@@ -540,8 +542,8 @@ USE_VULKAN=1 sh ./scripts/build_pytorch_android.sh
 <p>In this case, all inputs will be transparently copied from CPU to the Vulkan device, and model will be run on Vulkan device, the output will be copied transparently to CPU.</p>
 <p>The example of using Vulkan backend can be found in test application within the PyTorch repository:
 <a class="reference external" href="https://github.com/pytorch/pytorch/blob/master/android/test_app/app/src/main/java/org/pytorch/testapp/MainActivity.java#L133">https://github.com/pytorch/pytorch/blob/master/android/test_app/app/src/main/java/org/pytorch/testapp/MainActivity.java#L133</a></p>
-</section>
-<section id="building-android-test-app-with-vulkan">
+</div>
+<div class="section" id="building-android-test-app-with-vulkan">
 <h2>Building android test app with Vulkan<a class="headerlink" href="#building-android-test-app-with-vulkan" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>cd $PYTORCH_ROOT
 USE_VULKAN=1 sh ./scripts/build_pytorch_android.sh
@@ -561,12 +563,12 @@ gradle -p android test_app:installMbvulkanLocalBaseDebug
 </pre></div>
 </div>
 <p>After successful installation, the application with the name ‘MBQ’ can be launched on the device.</p>
-</section>
-<section id="testing-models-without-uploading-to-android-device">
+</div>
+<div class="section" id="testing-models-without-uploading-to-android-device">
 <h2>Testing models without uploading to android device<a class="headerlink" href="#testing-models-without-uploading-to-android-device" title="Permalink to this headline">¶</a></h2>
 <p>Software implementations of Vulkan (e.g. <a class="reference external" href="https://swiftshader.googlesource.com/SwiftShader">https://swiftshader.googlesource.com/SwiftShader</a> ) can be used to test if a model can be run using PyTorch Vulkan Backend (e.g. check if all model operators are supported).</p>
-</section>
-</section>
+</div>
+</div>
 
 
              </article>
@@ -594,7 +596,7 @@ gradle -p android test_app:installMbvulkanLocalBaseDebug
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2021, PyTorch &amp; PyTorch Korea Community.
+        &copy; Copyright 2022, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorch Korea User Group).
 
     </p>
   </div>
@@ -607,6 +609,13 @@ gradle -p android test_app:installMbvulkanLocalBaseDebug
 </footer>
 
           </div>
+<script>
+if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.indexOf("/prototype/prototype_index")< 1))
+  {
+    var div = '<div class="admonition note"><p class="admonition-title">Note</p><p><i class="fa fa-flask" aria-hidden="true">&nbsp</i> 이 튜토리얼은 프로토타입(prototype) 기능들에 대해서 설명하고 있습니다. 프로토타입 기능은 일반적으로 피드백 및 테스트용으로, 런타임 플래그 없이는 PyPI나 Conda로 배포되는 바이너리에서는 사용할 수 없습니다.</p></div>'
+    document.getElementById("pytorch-article").insertAdjacentHTML('afterBegin', div)
+  }
+</script>
         </div>
 
         <div class="pytorch-content-right" id="pytorch-content-right">
@@ -671,7 +680,6 @@ gradle -p android test_app:installMbvulkanLocalBaseDebug
       });
   </script>
  
-
 <script>
 //add microsoft link
 
@@ -750,7 +758,7 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
 </script>
 
 <script type="text/javascript">
-  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile'];
+  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile', 'Introduction to PyTorch on YouTube', 'Recommendation Systems'];
 </script>
 
 

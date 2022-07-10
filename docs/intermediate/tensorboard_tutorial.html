@@ -6,24 +6,23 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
 <meta property="og:title" content="TensorBoard로 모델, 데이터, 학습 시각화하기" />
   
 <meta property="og:type" content="article" />
   
-<meta property="og:url" content="http://tutorials.pytorch.kr/intermediate/tensorboard_tutorial.html" />
+<meta property="og:url" content="https://tutorials.pytorch.kr/intermediate/tensorboard_tutorial.html" />
   
 <meta property="og:description" content="PyTorch로 딥러닝하기: 60분만에 끝장내기 에서는 데이터를 불러오고, nn.Module 의 서브클래스(subclass)로 정의한 모델에 데이터를 공급(feed)하고, 학습 데이터로 모델을 학습하고 테스트 데이터로 테스트를 하는 방법들을 살펴봤습니다. 진행 상황을 살펴보기 위해, 학습이 진행 중일 때 학습이 잘 되고 있는지를 알아보기 위해 몇몇 수치들(statistic)을 출력했습니다. 하지만 더 나은 방법도 있습니다: PyTorch는 신경망 학습 내역을 시각화하는 도구인 TensorBoard와 통합되었습니다. 이 튜토리얼..." />
   
-<meta property="og:image" content="http://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
+<meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
   
 <meta property="og:image:alt" content="TensorBoard로 모델, 데이터, 학습 시각화하기" />
   
 <meta property="og:ignore_canonical" content="true" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>TensorBoard로 모델, 데이터, 학습 시각화하기 &mdash; 파이토치 한국어 튜토리얼(PyTorch tutorials in Korean)</title>
+  <title>TensorBoard로 모델, 데이터, 학습 시각화하기 &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
   
 
   
@@ -131,7 +130,7 @@
               
               
                 <div class="version">
-                  1.11.0+cu102
+                  1.12.0+cu102
                 </div>
               
             
@@ -272,6 +271,7 @@
 <li class="toctree-l1"><a class="reference internal" href="dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="quantized_transfer_learning_tutorial.html">(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/static_quantization_tutorial.html">(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torchserve_with_ipex.html">Grokking PyTorch Intel CPU performance from first principles</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul>
@@ -298,6 +298,7 @@
 <p class="caption" role="heading"><span class="caption-text">Recommendation Systems</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="torchrec_tutorial.html">Introduction to TorchRec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/sharding.html">Exploring TorchRec sharding</a></li>
 </ul>
 
             
@@ -386,13 +387,14 @@
           </div>
 
         
+
           
           <div class="rst-content">
           
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <section id="tensorboard">
+  <div class="section" id="tensorboard">
 <h1>TensorBoard로 모델, 데이터, 학습 시각화하기<a class="headerlink" href="#tensorboard" title="Permalink to this headline">¶</a></h1>
 <p><a class="reference internal" href="../beginner/deep_learning_60min_blitz.html"><span class="doc">PyTorch로 딥러닝하기: 60분만에 끝장내기</span></a> 에서는 데이터를 불러오고, <code class="docutils literal notranslate"><span class="pre">nn.Module</span></code> 의
 서브클래스(subclass)로 정의한 모델에 데이터를 공급(feed)하고, 학습 데이터로 모델을 학습하고
@@ -504,7 +506,7 @@
 <span class="n">optimizer</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">SGD</span><span class="p">(</span><span class="n">net</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span> <span class="n">momentum</span><span class="o">=</span><span class="mf">0.9</span><span class="p">)</span>
 </pre></div>
 </div>
-<section id="id1">
+<div class="section" id="id1">
 <h2>1. TensorBoard 설정<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
 <p>이제 <code class="docutils literal notranslate"><span class="pre">torch.utils</span></code> 의 <code class="docutils literal notranslate"><span class="pre">tensorboard</span></code> 를 불러오고, TensorBoard에 정보를
 제공(write)하는 <code class="docutils literal notranslate"><span class="pre">SummaryWriter</span></code> 를 주요한 객체인 <code class="docutils literal notranslate"><span class="pre">SummaryWriter</span></code> 를 정의하여
@@ -516,8 +518,8 @@ TensorBoard를 설정합니다.</p>
 </pre></div>
 </div>
 <p>위 행(line)은 <code class="docutils literal notranslate"><span class="pre">runs/fashion_mnist_experiment_1</span></code> 폴더를 생성합니다.</p>
-</section>
-<section id="id2">
+</div>
+<div class="section" id="id2">
 <h2>2. TensorBoard에 기록하기<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
 <p>이제 TensorBoard에 이미지(구체적으로는
 <a class="reference external" href="https://pytorch.org/vision/stable/utils.html#torchvision.utils.make_grid">make_grid</a>
@@ -547,8 +549,8 @@ TensorBoard를 설정합니다.</p>
 Jupyter Notebook에서도 가능합니다 - TensorBoard는 대화형 시각화를 만드는데
 특히 뛰어납니다. 다음에 그런 기능들 중 하나를 살펴보고, 튜토리얼의 나머지 부분에서
 몇 가지 기능들을 더 살펴보겠습니다.</p>
-</section>
-<section id="tensorboard-inspect">
+</div>
+<div class="section" id="tensorboard-inspect">
 <h2>3. TensorBoard를 사용하여 모델 살펴보기(inspect)<a class="headerlink" href="#tensorboard-inspect" title="Permalink to this headline">¶</a></h2>
 <p>TensorBoard의 강점 중 하나는 복잡한 모델 구조를 시각화하는 기능입니다.
 지금까지 만든 모델을 시각화해보겠습니다.</p>
@@ -562,8 +564,8 @@ Jupyter Notebook에서도 가능합니다 - TensorBoard는 대화형 시각화�
 대해 자세히 볼 수 있습니다.</p>
 <p>TensorBoard는 이미지 데이터와 같은 고차원 데이터를 저차원 공간에 시각화하는데
 매우 편리한 기능들을 제공합니다; 앞으로 이 내용을 알아보겠습니다.</p>
-</section>
-<section id="tensorboard-projector">
+</div>
+<div class="section" id="tensorboard-projector">
 <h2>4. TensorBoard에 “Projector” 추가하기<a class="headerlink" href="#tensorboard-projector" title="Permalink to this headline">¶</a></h2>
 <p><a class="reference external" href="https://pytorch.org/docs/stable/tensorboard.html#torch.utils.tensorboard.writer.SummaryWriter.add_embedding">add_embedding</a>
 메소드(method)를 통해 고차원 데이터의 저차원 표현(representation)을 시각화할 수 있습니다.</p>
@@ -600,8 +602,8 @@ Jupyter Notebook에서도 가능합니다 - TensorBoard는 대화형 시각화�
 <img alt="../_static/img/tensorboard_projector.png" src="../_static/img/tensorboard_projector.png" />
 <p>지금까지 데이터를 충분히 살펴보았으므로, 이제 학습 과정부터 시작하여 TensorBoard가
 어떻게 모델 학습과 평가(evaluation)를 더 명확히 추적(track)할 수 있는지 살펴보겠습니다.</p>
-</section>
-<section id="id3">
+</div>
+<div class="section" id="id3">
 <h2>5. TensorBoard로 모델 학습 추적하기<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
 <p>이전 예제에서는 단순히 모델 학습 중 손실(running loss)을 2000번 반복할 때마다
 <em>출력</em> 하기만 했습니다. 이제 TensorBoard에 학습 중 손실을 기록하는 것 대신에
@@ -691,8 +693,8 @@ Jupyter Notebook에서도 가능합니다 - TensorBoard는 대화형 시각화�
 살펴봤습니다; 여기서는 TensorBoard를 사용하여 각 분류별 정밀도-재현율(precision-recall)
 곡선( <a class="reference external" href="https://www.scikit-yb.org/en/latest/api/classifier/prcurve.html">여기</a> 에
 좋은 설명이 있습니다)을 그려보겠습니다.</p>
-</section>
-<section id="id4">
+</div>
+<div class="section" id="id4">
 <h2>6. TensorBoard로 학습된 모델 평가하기<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 1. 예측 확률을 test_size x num_classes 텐서로 가져옵니다</span>
 <span class="c1"># 2. 예측 결과를 test_size 텐서로 가져옵니다</span>
@@ -738,8 +740,8 @@ Jupyter Notebook에서도 가능합니다 - TensorBoard는 대화형 시각화�
 <p>여기까지 TensorBoard와 PyTorch의 통합에 대해 소개했습니다. 물론 TensorBoard에서
 제공하는 모든 것들을 Jupyter Notebook에서도 할 수 있지만, TensorBoard를 사용하면
 대화형 시각화가 기본으로 제공됩니다.</p>
-</section>
-</section>
+</div>
+</div>
 
 
              </article>
@@ -776,7 +778,7 @@ Jupyter Notebook에서도 가능합니다 - TensorBoard는 대화형 시각화�
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2021, PyTorch &amp; PyTorch Korea Community.
+        &copy; Copyright 2022, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorch Korea User Group).
 
     </p>
   </div>
@@ -789,6 +791,13 @@ Jupyter Notebook에서도 가능합니다 - TensorBoard는 대화형 시각화�
 </footer>
 
           </div>
+<script>
+if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.indexOf("/prototype/prototype_index")< 1))
+  {
+    var div = '<div class="admonition note"><p class="admonition-title">Note</p><p><i class="fa fa-flask" aria-hidden="true">&nbsp</i> 이 튜토리얼은 프로토타입(prototype) 기능들에 대해서 설명하고 있습니다. 프로토타입 기능은 일반적으로 피드백 및 테스트용으로, 런타임 플래그 없이는 PyPI나 Conda로 배포되는 바이너리에서는 사용할 수 없습니다.</p></div>'
+    document.getElementById("pytorch-article").insertAdjacentHTML('afterBegin', div)
+  }
+</script>
         </div>
 
         <div class="pytorch-content-right" id="pytorch-content-right">
@@ -842,7 +851,6 @@ Jupyter Notebook에서도 가능합니다 - TensorBoard는 대화형 시각화�
       });
   </script>
  
-
 <script>
 //add microsoft link
 
@@ -921,7 +929,7 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
 </script>
 
 <script type="text/javascript">
-  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile'];
+  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile', 'Introduction to PyTorch on YouTube', 'Recommendation Systems'];
 </script>
 
 

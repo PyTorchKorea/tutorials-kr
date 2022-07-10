@@ -6,24 +6,23 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
 <meta property="og:title" content="PyTorch에서 다른 모델의 매개변수를 사용하여 빠르게 모델 시작하기(warmstart)" />
   
 <meta property="og:type" content="article" />
   
-<meta property="og:url" content="http://tutorials.pytorch.kr/recipes/recipes/warmstarting_model_using_parameters_from_a_different_model.html" />
+<meta property="og:url" content="https://tutorials.pytorch.kr/recipes/recipes/warmstarting_model_using_parameters_from_a_different_model.html" />
   
 <meta property="og:description" content="모델을 부분적으로 불러오거나, 혹은 부분적인 모델을 불러오는 것은 학습 전이(Transfer learning)나 복잡한 모델을 새로 학습할 때 자주 접하는 시나리오입니다. 학습된 매개변수를 활용하면 학습 과정을 빠르게 시작(warmstart)할 수 있으며, 그러면 모델을 처음부터 훈련시킬 때보다 훨씬 일찍 수렴하리라 기대할 수 있습니다. 이는 활용할 수 있는 매개변수가 얼마 안 될 때에도 마찬가지입니다. 도입: 일부 키가 누락된 부분적인 state_dict 를 불러올 때든, 아니면 결과를 저장할 모델보다 키가 많은 state_..." />
   
-<meta property="og:image" content="http://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
+<meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
   
 <meta property="og:image:alt" content="PyTorch에서 다른 모델의 매개변수를 사용하여 빠르게 모델 시작하기(warmstart)" />
   
 <meta property="og:ignore_canonical" content="true" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>PyTorch에서 다른 모델의 매개변수를 사용하여 빠르게 모델 시작하기(warmstart) &mdash; 파이토치 한국어 튜토리얼(PyTorch tutorials in Korean)</title>
+  <title>PyTorch에서 다른 모델의 매개변수를 사용하여 빠르게 모델 시작하기(warmstart) &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
   
 
   
@@ -131,7 +130,7 @@
               
               
                 <div class="version">
-                  1.11.0+cu102
+                  1.12.0+cu102
                 </div>
               
             
@@ -272,6 +271,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/quantized_transfer_learning_tutorial.html">(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../advanced/static_quantization_tutorial.html">(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../intermediate/torchserve_with_ipex.html">Grokking PyTorch Intel CPU performance from first principles</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul>
@@ -298,6 +298,7 @@
 <p class="caption" role="heading"><span class="caption-text">Recommendation Systems</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/torchrec_tutorial.html">Introduction to TorchRec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../advanced/sharding.html">Exploring TorchRec sharding</a></li>
 </ul>
 
             
@@ -388,6 +389,7 @@
           </div>
 
         
+
           
           <div class="rst-content">
           
@@ -398,7 +400,7 @@
 <p class="admonition-title">Note</p>
 <p>Click <a class="reference internal" href="#sphx-glr-download-recipes-recipes-warmstarting-model-using-parameters-from-a-different-model-py"><span class="std std-ref">here</span></a> to download the full example code</p>
 </div>
-<section class="sphx-glr-example-title" id="pytorch-warmstart">
+<div class="sphx-glr-example-title section" id="pytorch-warmstart">
 <span id="sphx-glr-recipes-recipes-warmstarting-model-using-parameters-from-a-different-model-py"></span><h1>PyTorch에서 다른 모델의 매개변수를 사용하여 빠르게 모델 시작하기(warmstart)<a class="headerlink" href="#pytorch-warmstart" title="Permalink to this headline">¶</a></h1>
 <p>모델을 부분적으로 불러오거나, 혹은 부분적인 모델을 불러오는 것은
 학습 전이(Transfer learning)나 복잡한 모델을 새로 학습할 때 자주 접하는
@@ -406,22 +408,22 @@
 시작(warmstart)할 수 있으며, 그러면 모델을 처음부터 훈련시킬 때보다 훨씬
 일찍 수렴하리라 기대할 수 있습니다. 이는 활용할 수 있는 매개변수가 얼마 안
 될 때에도 마찬가지입니다.</p>
-<section id="id1">
+<div class="section" id="id1">
 <h2>도입<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
 <p>일부 키가 누락된 부분적인 <code class="docutils literal notranslate"><span class="pre">state_dict</span></code> 를 불러올 때든, 아니면 결과를
 저장할 모델보다 키가 많은 <code class="docutils literal notranslate"><span class="pre">state_dict</span></code> 를 불러올 때든,
 <code class="docutils literal notranslate"><span class="pre">load_state_dict()</span></code> 함수의 인자인 strict 를 False 로 두면 매치되지
 않는 키를 무시하게끔 할 수 있습니다. 이 레시피에서는 다른 모델의
 매개변수를 사용하여 모델을 빠르게 시작하는 실험을 진행해 보려 합니다.</p>
-</section>
-<section id="id2">
+</div>
+<div class="section" id="id2">
 <h2>설정<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
 <p>시작에 앞서서, <code class="docutils literal notranslate"><span class="pre">torch</span></code> 가 준비되어 있지 않다면 설치해야 합니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">torch</span>
 </pre></div>
 </div>
-</section>
-<section id="id3">
+</div>
+<div class="section" id="id3">
 <h2>단계<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
 <ol class="arabic simple">
 <li><p>데이터를 불러오는데 필요한 모든 라이브러리를 import 합니다</p></li>
@@ -429,7 +431,7 @@
 <li><p>모델 A를 저장합니다</p></li>
 <li><p>모델 B로 모델을 불러옵니다</p></li>
 </ol>
-<section id="import">
+<div class="section" id="import">
 <h3>1. 데이터를 불러올 때 필요한 라이브러리 import 하기<a class="headerlink" href="#import" title="Permalink to this headline">¶</a></h3>
 <p>이 레시피에서는 <code class="docutils literal notranslate"><span class="pre">torch</span></code> 와, 그 하위 패키지인 <code class="docutils literal notranslate"><span class="pre">torch.nn</span></code> 및
 <code class="docutils literal notranslate"><span class="pre">torch.optim</span></code> 을 사용하겠습니다.</p>
@@ -438,8 +440,8 @@
 <span class="kn">import</span> <span class="nn">torch.optim</span> <span class="k">as</span> <span class="nn">optim</span>
 </pre></div>
 </div>
-</section>
-<section id="a-b">
+</div>
+<div class="section" id="a-b">
 <h3>2. 신경망 A와 B 정의하고 초기화하기<a class="headerlink" href="#a-b" title="Permalink to this headline">¶</a></h3>
 <p>하나의 예로써 이미지를 학습하는 신경망을 만들어 보려 합니다. 이에 대해
 좀 더 알아보고 싶다면 신경망 정의하기에 대한 레시피를 참고하시기
@@ -488,8 +490,8 @@
 <span class="n">netB</span> <span class="o">=</span> <span class="n">NetB</span><span class="p">()</span>
 </pre></div>
 </div>
-</section>
-<section id="a">
+</div>
+<div class="section" id="a">
 <h3>3. 모델 A 저장하기<a class="headerlink" href="#a" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># 모델을 저장할 경로를 지정해 줍니다</span>
 <span class="n">PATH</span> <span class="o">=</span> <span class="s2">&quot;model.pt&quot;</span>
@@ -497,8 +499,8 @@
 <span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">netA</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span> <span class="n">PATH</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-<section id="b">
+</div>
+<div class="section" id="b">
 <h3>4. 모델 B로 불러오기<a class="headerlink" href="#b" title="Permalink to this headline">¶</a></h3>
 <p>한 레이어의 매개변수를 다른 레이어로 불러오려 하는데 일부 키가 매치되지
 않는 상황이라고 해 봅시다. 그럴 때는 불러오려 하는 state_dict 의
@@ -510,9 +512,9 @@
 <p>모든 키가 성공적으로 매치되었음을 확인할 수 있을 것입니다!</p>
 <p>축하합니다! 여러분은 PyTorch에서 다른 모델의 매개변수를 사용하여
 모델을 빠르게 시작하는 방법에 대해 살펴보았습니다.</p>
-</section>
-</section>
-<section id="id4">
+</div>
+</div>
+<div class="section" id="id4">
 <h2>좀 더 알아보기<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
 <p>계속 공부해 나가면서 다음 두 레시피를 살펴보기를 권합니다.</p>
 <ul class="simple">
@@ -529,8 +531,8 @@
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
-</section>
-</section>
+</div>
+</div>
 
 
              </article>
@@ -567,7 +569,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2021, PyTorch &amp; PyTorch Korea Community.
+        &copy; Copyright 2022, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorch Korea User Group).
 
     </p>
   </div>
@@ -580,6 +582,13 @@
 </footer>
 
           </div>
+<script>
+if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.indexOf("/prototype/prototype_index")< 1))
+  {
+    var div = '<div class="admonition note"><p class="admonition-title">Note</p><p><i class="fa fa-flask" aria-hidden="true">&nbsp</i> 이 튜토리얼은 프로토타입(prototype) 기능들에 대해서 설명하고 있습니다. 프로토타입 기능은 일반적으로 피드백 및 테스트용으로, 런타임 플래그 없이는 PyPI나 Conda로 배포되는 바이너리에서는 사용할 수 없습니다.</p></div>'
+    document.getElementById("pytorch-article").insertAdjacentHTML('afterBegin', div)
+  }
+</script>
         </div>
 
         <div class="pytorch-content-right" id="pytorch-content-right">
@@ -637,7 +646,6 @@
       });
   </script>
  
-
 <script>
 //add microsoft link
 
@@ -716,7 +724,7 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
 </script>
 
 <script type="text/javascript">
-  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile'];
+  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile', 'Introduction to PyTorch on YouTube', 'Recommendation Systems'];
 </script>
 
 

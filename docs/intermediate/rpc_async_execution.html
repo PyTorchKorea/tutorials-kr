@@ -6,24 +6,23 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
 <meta property="og:title" content="Implementing Batch RPC Processing Using Asynchronous Executions" />
   
 <meta property="og:type" content="article" />
   
-<meta property="og:url" content="http://tutorials.pytorch.kr/intermediate/rpc_async_execution.html" />
+<meta property="og:url" content="https://tutorials.pytorch.kr/intermediate/rpc_async_execution.html" />
   
 <meta property="og:description" content="Author: Shen Li Prerequisites: PyTorch Distributed Overview, Getting started with Distributed RPC Framework, Implementing a Parameter Server using Distributed RPC Framework, RPC Asynchronous Execution Decorator. This tutorial demonstrates how to build batch-processing RPC applications with the@rp..." />
   
-<meta property="og:image" content="http://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
+<meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
   
 <meta property="og:image:alt" content="Implementing Batch RPC Processing Using Asynchronous Executions" />
   
 <meta property="og:ignore_canonical" content="true" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Implementing Batch RPC Processing Using Asynchronous Executions &mdash; 파이토치 한국어 튜토리얼(PyTorch tutorials in Korean)</title>
+  <title>Implementing Batch RPC Processing Using Asynchronous Executions &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
   
 
   
@@ -131,7 +130,7 @@
               
               
                 <div class="version">
-                  1.11.0+cu102
+                  1.12.0+cu102
                 </div>
               
             
@@ -272,6 +271,7 @@
 <li class="toctree-l1"><a class="reference internal" href="dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="quantized_transfer_learning_tutorial.html">(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/static_quantization_tutorial.html">(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torchserve_with_ipex.html">Grokking PyTorch Intel CPU performance from first principles</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul class="current">
@@ -298,6 +298,7 @@
 <p class="caption" role="heading"><span class="caption-text">Recommendation Systems</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="torchrec_tutorial.html">Introduction to TorchRec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/sharding.html">Exploring TorchRec sharding</a></li>
 </ul>
 
             
@@ -386,15 +387,20 @@
           </div>
 
         
+
           
           <div class="rst-content">
           
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <section id="implementing-batch-rpc-processing-using-asynchronous-executions">
+  <div class="section" id="implementing-batch-rpc-processing-using-asynchronous-executions">
 <h1>Implementing Batch RPC Processing Using Asynchronous Executions<a class="headerlink" href="#implementing-batch-rpc-processing-using-asynchronous-executions" title="Permalink to this headline">¶</a></h1>
 <p><strong>Author</strong>: <a class="reference external" href="https://mrshenli.github.io/">Shen Li</a></p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>View the source code for this tutorial in <a class="reference external" href="https://github.com/pytorch/tutorials/blob/master/intermediate_source/rpc_async_execution.rst">github</a>.</p>
+</div>
 <p>Prerequisites:</p>
 <ul class="simple">
 <li><p><a class="reference external" href="../beginner/dist_overview.html">PyTorch Distributed Overview</a></p></li>
@@ -411,7 +417,7 @@ same idea as <a class="reference external" href="https://pytorch.org/serve/batch
 <p class="admonition-title">Note</p>
 <p>This tutorial requires PyTorch v1.6.0 or above.</p>
 </div>
-<section id="basics">
+<div class="section" id="basics">
 <h2>Basics<a class="headerlink" href="#basics" title="Permalink to this headline">¶</a></h2>
 <p>Previous tutorials have shown the steps to build distributed training
 applications using <a class="reference external" href="https://pytorch.org/docs/stable/rpc.html">torch.distributed.rpc</a>,
@@ -451,8 +457,8 @@ this tutorial demonstrate how to build distributed batch-updating parameter
 server and batch-processing reinforcement learning applications using the
 <a class="reference external" href="https://pytorch.org/docs/master/rpc.html#torch.distributed.rpc.functions.async_execution">&#64;rpc.functions.async_execution</a>
 decorator.</p>
-</section>
-<section id="batch-updating-parameter-server">
+</div>
+<div class="section" id="batch-updating-parameter-server">
 <h2>Batch-Updating Parameter Server<a class="headerlink" href="#batch-updating-parameter-server" title="Permalink to this headline">¶</a></h2>
 <p>Consider a synchronized parameter server training application with one parameter
 server (PS) and multiple trainers. In this application, the PS holds the
@@ -574,11 +580,11 @@ implement batch RPC applications using the
 <a class="reference external" href="https://pytorch.org/docs/master/rpc.html#torch.distributed.rpc.functions.async_execution">&#64;rpc.functions.async_execution</a>
 decorator. In the next section, we re-implement the reinforcement learning
 example in the previous
-<a class="reference external" href="https://tutorials.pytorch.kr/intermediate/rpc_tutorial.html">Getting started with Distributed RPC Framework</a>
+<a class="reference external" href="https://pytorch.org/tutorials/intermediate/rpc_tutorial.html">Getting started with Distributed RPC Framework</a>
 tutorial using batch processing, and demonstrate its impact on the training
 speed.</p>
-</section>
-<section id="batch-processing-cartpole-solver">
+</div>
+<div class="section" id="batch-processing-cartpole-solver">
 <h2>Batch-Processing CartPole Solver<a class="headerlink" href="#batch-processing-cartpole-solver" title="Permalink to this headline">¶</a></h2>
 <p>This section uses CartPole-v1 from <a class="reference external" href="https://gym.openai.com/">OpenAI Gym</a> as
 an example to show the performance impact of batch processing RPC. Please note
@@ -641,7 +647,7 @@ which will be presented shortly, and this function will be decorated with
 </pre></div>
 </div>
 <p>Compared to the previous tutorial
-<a class="reference external" href="https://tutorials.pytorch.kr/intermediate/rpc_tutorial.html">Getting started with Distributed RPC Framework</a>,
+<a class="reference external" href="https://pytorch.org/tutorials/intermediate/rpc_tutorial.html">Getting started with Distributed RPC Framework</a>,
 observers behave a little differently. Instead of exiting when the environment
 is stopped, it always runs <code class="docutils literal notranslate"><span class="pre">n_steps</span></code> iterations in every episode. When the
 environment returns, the observer simply resets the environment and start over
@@ -873,11 +879,11 @@ same code on both batch and no-batch modes using different numbers of observers,
 ranging from 1 to 10. The figure below plots the execution time of different
 world sizes using default argument values. The results confirmed our expectation
 that batch processing helped to speed up training.</p>
-<figure class="align-default">
+<div class="figure align-default">
 <img alt="" src="../_images/batch.png" />
-</figure>
-</section>
-<section id="learn-more">
+</div>
+</div>
+<div class="section" id="learn-more">
 <h2>Learn More<a class="headerlink" href="#learn-more" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p><a class="reference external" href="https://github.com/pytorch/examples/blob/master/distributed/rpc/batch/parameter_server.py">Batch-Updating Parameter Server Source Code</a></p></li>
@@ -885,8 +891,8 @@ that batch processing helped to speed up training.</p>
 <li><p><a class="reference external" href="https://pytorch.org/docs/master/rpc.html#distributed-autograd-framework">Distributed Autograd</a></p></li>
 <li><p><a class="reference external" href="dist_pipeline_parallel_tutorial.html">Distributed Pipeline Parallelism</a></p></li>
 </ul>
-</section>
-</section>
+</div>
+</div>
 
 
              </article>
@@ -923,7 +929,7 @@ that batch processing helped to speed up training.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2021, PyTorch &amp; PyTorch Korea Community.
+        &copy; Copyright 2022, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorch Korea User Group).
 
     </p>
   </div>
@@ -936,6 +942,13 @@ that batch processing helped to speed up training.</p>
 </footer>
 
           </div>
+<script>
+if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.indexOf("/prototype/prototype_index")< 1))
+  {
+    var div = '<div class="admonition note"><p class="admonition-title">Note</p><p><i class="fa fa-flask" aria-hidden="true">&nbsp</i> 이 튜토리얼은 프로토타입(prototype) 기능들에 대해서 설명하고 있습니다. 프로토타입 기능은 일반적으로 피드백 및 테스트용으로, 런타임 플래그 없이는 PyPI나 Conda로 배포되는 바이너리에서는 사용할 수 없습니다.</p></div>'
+    document.getElementById("pytorch-article").insertAdjacentHTML('afterBegin', div)
+  }
+</script>
         </div>
 
         <div class="pytorch-content-right" id="pytorch-content-right">
@@ -987,7 +1000,6 @@ that batch processing helped to speed up training.</p>
       });
   </script>
  
-
 <script>
 //add microsoft link
 
@@ -1066,7 +1078,7 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
 </script>
 
 <script type="text/javascript">
-  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile'];
+  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile', 'Introduction to PyTorch on YouTube', 'Recommendation Systems'];
 </script>
 
 

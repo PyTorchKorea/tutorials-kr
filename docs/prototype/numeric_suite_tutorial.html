@@ -6,24 +6,23 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
 <meta property="og:title" content="PyTorch Numeric Suite Tutorial" />
   
 <meta property="og:type" content="article" />
   
-<meta property="og:url" content="http://tutorials.pytorch.kr/prototype/numeric_suite_tutorial.html" />
+<meta property="og:url" content="https://tutorials.pytorch.kr/prototype/numeric_suite_tutorial.html" />
   
 <meta property="og:description" content="Introduction: Quantization is good when it works, but it’s difficult to know what’s wrong when it doesn’t satisfy the accuracy we expect. Debugging the accuracy issue of quantization is not easy and time consuming. One important step of debugging is to measure the statistics of the float model an..." />
   
-<meta property="og:image" content="http://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
+<meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
   
 <meta property="og:image:alt" content="PyTorch Numeric Suite Tutorial" />
   
 <meta property="og:ignore_canonical" content="true" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>PyTorch Numeric Suite Tutorial &mdash; 파이토치 한국어 튜토리얼(PyTorch tutorials in Korean)</title>
+  <title>PyTorch Numeric Suite Tutorial &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
   
 
   
@@ -129,7 +128,7 @@
               
               
                 <div class="version">
-                  1.11.0+cu102
+                  1.12.0+cu102
                 </div>
               
             
@@ -270,6 +269,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/quantized_transfer_learning_tutorial.html">(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/static_quantization_tutorial.html">(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/torchserve_with_ipex.html">Grokking PyTorch Intel CPU performance from first principles</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul>
@@ -296,6 +296,7 @@
 <p class="caption" role="heading"><span class="caption-text">Recommendation Systems</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/torchrec_tutorial.html">Introduction to TorchRec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/sharding.html">Exploring TorchRec sharding</a></li>
 </ul>
 
             
@@ -384,6 +385,7 @@
           </div>
 
         
+
           
           <div class="rst-content">
           
@@ -394,18 +396,18 @@
 <p class="admonition-title">Note</p>
 <p>Click <a class="reference internal" href="#sphx-glr-download-prototype-numeric-suite-tutorial-py"><span class="std std-ref">here</span></a> to download the full example code</p>
 </div>
-<section class="sphx-glr-example-title" id="pytorch-numeric-suite-tutorial">
+<div class="sphx-glr-example-title section" id="pytorch-numeric-suite-tutorial">
 <span id="sphx-glr-prototype-numeric-suite-tutorial-py"></span><h1>PyTorch Numeric Suite Tutorial<a class="headerlink" href="#pytorch-numeric-suite-tutorial" title="Permalink to this headline">¶</a></h1>
-<section id="introduction">
+<div class="section" id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
 <p>Quantization is good when it works, but it’s difficult to know what’s wrong when it doesn’t satisfy the accuracy we expect. Debugging the accuracy issue of quantization is not easy and time consuming.</p>
 <p>One important step of debugging is to measure the statistics of the float model and its corresponding quantized model to know where are they differ most. We built a suite of numeric tools called PyTorch Numeric Suite in PyTorch quantization to enable the measurement of the statistics between quantized module and float module to support quantization debugging efforts. Even for the quantized model with good accuracy, PyTorch Numeric Suite can still be used as the profiling tool to better understand the quantization error within the model and provide the guidance for further optimization.</p>
 <p>PyTorch Numeric Suite currently supports models quantized through both static quantization and dynamic quantization with unified APIs.</p>
 <p>In this tutorial we will first use ResNet18 as an example to show how to use PyTorch Numeric Suite to measure the statistics between static quantized model and float model in eager mode. Then we will use LSTM based sequence model as an example to show the usage of PyTorch Numeric Suite for dynamic quantized model.</p>
-</section>
-<section id="numeric-suite-for-static-quantization">
+</div>
+<div class="section" id="numeric-suite-for-static-quantization">
 <h2>Numeric Suite for Static Quantization<a class="headerlink" href="#numeric-suite-for-static-quantization" title="Permalink to this headline">¶</a></h2>
-<section id="setup">
+<div class="section" id="setup">
 <h3>Setup<a class="headerlink" href="#setup" title="Permalink to this headline">¶</a></h3>
 <p>We’ll start by doing the necessary imports:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">absolute_import</span>
@@ -435,8 +437,8 @@
 <span class="n">qmodel</span> <span class="o">=</span> <span class="n">quantize</span><span class="p">(</span><span class="n">float_model</span><span class="p">,</span> <span class="n">default_eval_fn</span><span class="p">,</span> <span class="p">[</span><span class="n">img_data</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-<section id="compare-the-weights-of-float-and-quantized-models">
+</div>
+<div class="section" id="compare-the-weights-of-float-and-quantized-models">
 <h3>1. Compare the weights of float and quantized models<a class="headerlink" href="#compare-the-weights-of-float-and-quantized-models" title="Permalink to this headline">¶</a></h3>
 <p>The first thing we usually want to compare are the weights of quantized model and float model.
 We can call <code class="docutils literal notranslate"><span class="pre">compare_weights()</span></code> from PyTorch Numeric Suite to get a dictionary <code class="docutils literal notranslate"><span class="pre">wt_compare_dict</span></code> with key corresponding to module names and each entry is a dictionary with two keys ‘float’ and ‘quantized’, containing the float and quantized weights.
@@ -483,21 +485,21 @@ layer1.0.conv2.weight tensor(31.1528)
 layer1.1.conv1.weight tensor(32.1438)
 layer1.1.conv2.weight tensor(31.2477)
 layer2.0.conv1.weight tensor(30.9890)
-layer2.0.conv2.weight tensor(28.8232)
+layer2.0.conv2.weight tensor(28.8233)
 layer2.0.downsample.0.weight tensor(31.5558)
-layer2.1.conv1.weight tensor(30.7667)
-layer2.1.conv2.weight tensor(28.4515)
-layer3.0.conv1.weight tensor(30.9245)
-layer3.0.conv2.weight tensor(26.6835)
+layer2.1.conv1.weight tensor(30.7668)
+layer2.1.conv2.weight tensor(28.4516)
+layer3.0.conv1.weight tensor(30.9247)
+layer3.0.conv2.weight tensor(26.6841)
 layer3.0.downsample.0.weight tensor(28.7825)
-layer3.1.conv1.weight tensor(28.9701)
-layer3.1.conv2.weight tensor(25.6780)
-layer4.0.conv1.weight tensor(26.8488)
-layer4.0.conv2.weight tensor(25.8353)
-layer4.0.downsample.0.weight tensor(28.6354)
-layer4.1.conv1.weight tensor(26.8727)
-layer4.1.conv2.weight tensor(28.4300)
-fc._packed_params._packed_params tensor(32.6502)
+layer3.1.conv1.weight tensor(28.9707)
+layer3.1.conv2.weight tensor(25.6784)
+layer4.0.conv1.weight tensor(26.8495)
+layer4.0.conv2.weight tensor(25.8394)
+layer4.0.downsample.0.weight tensor(28.6355)
+layer4.1.conv1.weight tensor(26.8758)
+layer4.1.conv2.weight tensor(28.4319)
+fc._packed_params._packed_params tensor(32.6505)
 </pre></div>
 </div>
 <p>As another example <code class="docutils literal notranslate"><span class="pre">wt_compare_dict</span></code> can also be used to plot the histogram of the weights of floating point and quantized models.</p>
@@ -515,13 +517,13 @@ fc._packed_params._packed_params tensor(32.6502)
 </pre></div>
 </div>
 <img alt="../_images/sphx_glr_numeric_suite_tutorial_001.png" class="sphx-glr-single-img" src="../_images/sphx_glr_numeric_suite_tutorial_001.png" />
-</section>
-<section id="compare-float-point-and-quantized-models-at-corresponding-locations">
+</div>
+<div class="section" id="compare-float-point-and-quantized-models-at-corresponding-locations">
 <h3>2. Compare float point and quantized models at corresponding locations<a class="headerlink" href="#compare-float-point-and-quantized-models-at-corresponding-locations" title="Permalink to this headline">¶</a></h3>
 <p>The second tool allows for comparison of weights and activations between float and quantized models at corresponding locations for the same input as shown in the figure below. Red arrows indicate the locations of the comparison.</p>
-<figure class="align-default">
+<div class="figure align-default">
 <img alt="../_images/compare_output.png" src="../_images/compare_output.png" />
-</figure>
+</div>
 <p>We call <code class="docutils literal notranslate"><span class="pre">compare_model_outputs()</span></code> from PyTorch Numeric Suite to get the activations in float model and quantized model at corresponding locations for the given input data. This API returns a dict with module names being keys. Each entry is itself a dict with two keys ‘float’ and ‘quantized’ containing the activations.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="n">img_data</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
 
@@ -555,36 +557,36 @@ torch.Size([2, 64, 5, 5])
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>conv1.stats tensor(37.3478, grad_fn=&lt;MulBackward0&gt;)
-layer1.0.conv1.stats tensor(30.0273, grad_fn=&lt;MulBackward0&gt;)
-layer1.0.conv2.stats tensor(28.5593, grad_fn=&lt;MulBackward0&gt;)
-layer1.0.add_relu.stats tensor(32.0935, grad_fn=&lt;MulBackward0&gt;)
-layer1.1.conv1.stats tensor(30.0666, grad_fn=&lt;MulBackward0&gt;)
-layer1.1.conv2.stats tensor(26.1460, grad_fn=&lt;MulBackward0&gt;)
-layer1.1.add_relu.stats tensor(29.4279, grad_fn=&lt;MulBackward0&gt;)
-layer2.0.conv1.stats tensor(26.3101, grad_fn=&lt;MulBackward0&gt;)
-layer2.0.conv2.stats tensor(26.2189, grad_fn=&lt;MulBackward0&gt;)
-layer2.0.downsample.0.stats tensor(22.5304, grad_fn=&lt;MulBackward0&gt;)
-layer2.0.add_relu.stats tensor(25.4949, grad_fn=&lt;MulBackward0&gt;)
-layer2.1.conv1.stats tensor(25.5981, grad_fn=&lt;MulBackward0&gt;)
-layer2.1.conv2.stats tensor(24.4645, grad_fn=&lt;MulBackward0&gt;)
-layer2.1.add_relu.stats tensor(25.5642, grad_fn=&lt;MulBackward0&gt;)
-layer3.0.conv1.stats tensor(26.5810, grad_fn=&lt;MulBackward0&gt;)
-layer3.0.conv2.stats tensor(25.9828, grad_fn=&lt;MulBackward0&gt;)
-layer3.0.downsample.0.stats tensor(24.7413, grad_fn=&lt;MulBackward0&gt;)
-layer3.0.add_relu.stats tensor(24.2222, grad_fn=&lt;MulBackward0&gt;)
-layer3.1.conv1.stats tensor(30.5365, grad_fn=&lt;MulBackward0&gt;)
-layer3.1.conv2.stats tensor(26.2066, grad_fn=&lt;MulBackward0&gt;)
-layer3.1.add_relu.stats tensor(24.4905, grad_fn=&lt;MulBackward0&gt;)
-layer4.0.conv1.stats tensor(26.6268, grad_fn=&lt;MulBackward0&gt;)
-layer4.0.conv2.stats tensor(26.3600, grad_fn=&lt;MulBackward0&gt;)
-layer4.0.downsample.0.stats tensor(21.0159, grad_fn=&lt;MulBackward0&gt;)
-layer4.0.add_relu.stats tensor(20.0261, grad_fn=&lt;MulBackward0&gt;)
-layer4.1.conv1.stats tensor(25.6427, grad_fn=&lt;MulBackward0&gt;)
-layer4.1.conv2.stats tensor(17.9981, grad_fn=&lt;MulBackward0&gt;)
-layer4.1.add_relu.stats tensor(17.8435, grad_fn=&lt;MulBackward0&gt;)
-fc.stats tensor(20.1582, grad_fn=&lt;MulBackward0&gt;)
-quant.stats tensor(48.0850)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>conv1.stats tensor(37.4285, grad_fn=&lt;MulBackward0&gt;)
+layer1.0.conv1.stats tensor(30.1784, grad_fn=&lt;MulBackward0&gt;)
+layer1.0.conv2.stats tensor(28.8706, grad_fn=&lt;MulBackward0&gt;)
+layer1.0.add_relu.stats tensor(32.4563, grad_fn=&lt;MulBackward0&gt;)
+layer1.1.conv1.stats tensor(29.9154, grad_fn=&lt;MulBackward0&gt;)
+layer1.1.conv2.stats tensor(26.0099, grad_fn=&lt;MulBackward0&gt;)
+layer1.1.add_relu.stats tensor(29.9368, grad_fn=&lt;MulBackward0&gt;)
+layer2.0.conv1.stats tensor(27.0969, grad_fn=&lt;MulBackward0&gt;)
+layer2.0.conv2.stats tensor(26.8557, grad_fn=&lt;MulBackward0&gt;)
+layer2.0.downsample.0.stats tensor(22.4697, grad_fn=&lt;MulBackward0&gt;)
+layer2.0.add_relu.stats tensor(26.1199, grad_fn=&lt;MulBackward0&gt;)
+layer2.1.conv1.stats tensor(26.3852, grad_fn=&lt;MulBackward0&gt;)
+layer2.1.conv2.stats tensor(24.6303, grad_fn=&lt;MulBackward0&gt;)
+layer2.1.add_relu.stats tensor(26.2676, grad_fn=&lt;MulBackward0&gt;)
+layer3.0.conv1.stats tensor(27.1735, grad_fn=&lt;MulBackward0&gt;)
+layer3.0.conv2.stats tensor(27.0967, grad_fn=&lt;MulBackward0&gt;)
+layer3.0.downsample.0.stats tensor(25.7213, grad_fn=&lt;MulBackward0&gt;)
+layer3.0.add_relu.stats tensor(25.6313, grad_fn=&lt;MulBackward0&gt;)
+layer3.1.conv1.stats tensor(31.9078, grad_fn=&lt;MulBackward0&gt;)
+layer3.1.conv2.stats tensor(25.6556, grad_fn=&lt;MulBackward0&gt;)
+layer3.1.add_relu.stats tensor(25.9609, grad_fn=&lt;MulBackward0&gt;)
+layer4.0.conv1.stats tensor(27.3380, grad_fn=&lt;MulBackward0&gt;)
+layer4.0.conv2.stats tensor(27.2944, grad_fn=&lt;MulBackward0&gt;)
+layer4.0.downsample.0.stats tensor(22.2944, grad_fn=&lt;MulBackward0&gt;)
+layer4.0.add_relu.stats tensor(20.6462, grad_fn=&lt;MulBackward0&gt;)
+layer4.1.conv1.stats tensor(26.1360, grad_fn=&lt;MulBackward0&gt;)
+layer4.1.conv2.stats tensor(17.9653, grad_fn=&lt;MulBackward0&gt;)
+layer4.1.add_relu.stats tensor(18.4979, grad_fn=&lt;MulBackward0&gt;)
+fc.stats tensor(20.9664, grad_fn=&lt;MulBackward0&gt;)
+quant.stats tensor(48.2950)
 </pre></div>
 </div>
 <p>If we want to do the comparison for more than one input data, we can do the following.
@@ -630,17 +632,17 @@ is <code class="docutils literal notranslate"><span class="pre">DEFAULT_NUMERIC_
 <span class="n">act_compare_dict</span> <span class="o">=</span> <span class="n">ns</span><span class="o">.</span><span class="n">get_matching_activations</span><span class="p">(</span><span class="n">float_model</span><span class="p">,</span> <span class="n">qmodel</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-<section id="compare-a-module-in-a-quantized-model-with-its-float-point-equivalent-with-the-same-input-data">
+</div>
+<div class="section" id="compare-a-module-in-a-quantized-model-with-its-float-point-equivalent-with-the-same-input-data">
 <h3>3. Compare a module in a quantized model with its float point equivalent, with the same input data<a class="headerlink" href="#compare-a-module-in-a-quantized-model-with-its-float-point-equivalent-with-the-same-input-data" title="Permalink to this headline">¶</a></h3>
 <p>The third tool allows for comparing a quantized module in a model with its float point counterpart, feeding both of them the same input and comparing their outputs as shown below.</p>
-<figure class="align-default">
+<div class="figure align-default">
 <img alt="../_images/compare_stub.png" src="../_images/compare_stub.png" />
-</figure>
+</div>
 <p>In practice we call prepare_model_with_stubs() to swap the quantized module that we want to compare with the Shadow module, which is illustrated as below:</p>
-<figure class="align-default">
+<div class="figure align-default">
 <img alt="../_images/shadow.png" src="../_images/shadow.png" />
-</figure>
+</div>
 <p>The Shadow module takes quantized module, float module and logger as input, and creates a forward path inside to make the float module to shadow quantized module sharing the same input tensor.</p>
 <p>The logger can be customizable, default logger is <code class="docutils literal notranslate"><span class="pre">ShadowLogger</span></code> and it will save the outputs of the quantized module and float module that can be used to compute the module level quantization error.</p>
 <p>Notice before each call of <code class="docutils literal notranslate"><span class="pre">compare_model_outputs()</span></code> and <code class="docutils literal notranslate"><span class="pre">compare_model_stub()</span></code> we need to have clean float and quantized model. This is because <code class="docutils literal notranslate"><span class="pre">compare_model_outputs()</span></code> and <code class="docutils literal notranslate"><span class="pre">compare_model_stub()</span></code> modify float and quantized model inplace, and it will cause unexpected results if call one right after another.</p>
@@ -687,14 +689,14 @@ torch.Size([64, 3, 3])
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>layer1.0.stats tensor(32.9263)
-layer1.1.stats tensor(34.2490)
-layer2.0.stats tensor(29.3846)
-layer2.1.stats tensor(30.9905)
-layer3.0.stats tensor(28.2118)
-layer3.1.stats tensor(32.3172)
-layer4.0.stats tensor(25.5322)
-layer4.1.stats tensor(23.5168)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>layer1.0.stats tensor(32.7092)
+layer1.1.stats tensor(33.6721)
+layer2.0.stats tensor(28.9065)
+layer2.1.stats tensor(31.6122)
+layer3.0.stats tensor(28.0772)
+layer3.1.stats tensor(31.7582)
+layer4.0.stats tensor(25.5895)
+layer4.1.stats tensor(23.6308)
 </pre></div>
 </div>
 <p>If we want to do the comparison for more than one input data, we can do the following.</p>
@@ -730,12 +732,12 @@ layer4.1.stats tensor(23.5168)
 <span class="n">ob_dict</span> <span class="o">=</span> <span class="n">ns</span><span class="o">.</span><span class="n">get_logger_dict</span><span class="p">(</span><span class="n">qmodel</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-</section>
-<section id="numeric-suite-for-dynamic-quantization">
+</div>
+</div>
+<div class="section" id="numeric-suite-for-dynamic-quantization">
 <h2>Numeric Suite for Dynamic Quantization<a class="headerlink" href="#numeric-suite-for-dynamic-quantization" title="Permalink to this headline">¶</a></h2>
 <p>Numeric Suite APIs are designed in such as way that they work for both dynamic quantized model and static quantized model. We will use a model with both LSTM and Linear modules to demonstrate the usage of Numeric Suite on dynamic quantized model. This model is the same one used in the tutorial of dynamic quantization on LSTM word language model [1].</p>
-<section id="id1">
+<div class="section" id="id1">
 <h3>Setup<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
 <p>First we define the model as below. Notice that within this model only <code class="docutils literal notranslate"><span class="pre">nn.LSTM</span></code> and <code class="docutils literal notranslate"><span class="pre">nn.Linear</span></code> modules will be quantized dynamically and <code class="docutils literal notranslate"><span class="pre">nn.Embedding</span></code> will remain as floating point module after quantization.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">LSTMModel</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
@@ -787,8 +789,8 @@ layer4.1.stats tensor(23.5168)
 <span class="p">)</span>
 </pre></div>
 </div>
-</section>
-<section id="id2">
+</div>
+<div class="section" id="id2">
 <h3>1. Compare the weights of float and quantized models<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
 <p>We first call <code class="docutils literal notranslate"><span class="pre">compare_weights()</span></code> from PyTorch Numeric Suite to get a dictionary <code class="docutils literal notranslate"><span class="pre">wt_compare_dict</span></code> with key corresponding to module names and each entry is a dictionary with two keys ‘float’ and ‘quantized’, containing the float and quantized weights.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">wt_compare_dict</span> <span class="o">=</span> <span class="n">ns</span><span class="o">.</span><span class="n">compare_weights</span><span class="p">(</span><span class="n">float_model</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span> <span class="n">qmodel</span><span class="o">.</span><span class="n">state_dict</span><span class="p">())</span>
@@ -804,17 +806,17 @@ layer4.1.stats tensor(23.5168)
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>encoder.weight tensor(inf)
-rnn._all_weight_values.0.param tensor(48.1232)
-rnn._all_weight_values.1.param tensor(48.1343)
-rnn._all_weight_values.2.param tensor(48.1272)
-rnn._all_weight_values.3.param tensor(48.1333)
-rnn._all_weight_values.4.param tensor(48.1243)
-decoder._packed_params._packed_params tensor(48.1753)
+rnn._all_weight_values.0.param tensor(48.1340)
+rnn._all_weight_values.1.param tensor(48.1507)
+rnn._all_weight_values.2.param tensor(48.1325)
+rnn._all_weight_values.3.param tensor(48.1357)
+rnn._all_weight_values.4.param tensor(48.1175)
+decoder._packed_params._packed_params tensor(48.2044)
 </pre></div>
 </div>
 <p>The Inf value in <code class="docutils literal notranslate"><span class="pre">encoder.weight</span></code> entry above is because encoder module is not quantized and the weights are the same in both floating point and quantized models.</p>
-</section>
-<section id="id3">
+</div>
+<div class="section" id="id3">
 <h3>2. Compare float point and quantized models at corresponding locations<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
 <p>Then we call <code class="docutils literal notranslate"><span class="pre">compare_model_outputs()</span></code> from PyTorch Numeric Suite to get the activations in float model and quantized model at corresponding locations for the given input data. This API returns a dict with module names being keys. Each entry is itself a dict with two keys ‘float’ and ‘quantized’ containing the activations. Notice that this sequence model has two inputs, and we can pass both inputs into <code class="docutils literal notranslate"><span class="pre">compare_model_outputs()</span></code> and <code class="docutils literal notranslate"><span class="pre">compare_model_stub()</span></code>.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">input_</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">ntokens</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">long</span><span class="p">)</span>
@@ -835,12 +837,12 @@ decoder._packed_params._packed_params tensor(48.1753)
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>encoder.stats tensor(inf, grad_fn=&lt;MulBackward0&gt;)
-rnn.stats tensor(56.3422, grad_fn=&lt;MulBackward0&gt;)
-decoder.stats tensor(34.9680, grad_fn=&lt;MulBackward0&gt;)
+rnn.stats tensor(55.1058, grad_fn=&lt;MulBackward0&gt;)
+decoder.stats tensor(35.6194, grad_fn=&lt;MulBackward0&gt;)
 </pre></div>
 </div>
-</section>
-<section id="id4">
+</div>
+<div class="section" id="id4">
 <h3>3. Compare a module in a quantized model with its float point equivalent, with the same input data<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
 <p>Next we call <code class="docutils literal notranslate"><span class="pre">compare_model_stub()</span></code> from PyTorch Numeric Suite to compare LSTM and Linear module with its float point equivalent. This API returns a dict with key corresponding to module names and each entry being a dictionary with two keys ‘float’ and ‘quantized’, containing the output tensors of quantized and its matching float shadow module.</p>
 <p>We reset the model first.</p>
@@ -873,22 +875,22 @@ decoder.stats tensor(34.9680, grad_fn=&lt;MulBackward0&gt;)
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>rnn.stats tensor(56.3104)
-decoder.stats tensor(38.6767)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>rnn.stats tensor(57.0516)
+decoder.stats tensor(40.4963)
 </pre></div>
 </div>
 <p>SQNR of 40 dB is high and this is a situation where we have very good numerical alignment between the floating point and quantized model.</p>
-</section>
-</section>
-<section id="conclusion">
+</div>
+</div>
+<div class="section" id="conclusion">
 <h2>Conclusion<a class="headerlink" href="#conclusion" title="Permalink to this headline">¶</a></h2>
 <p>In this tutorial, we demonstrated how to use PyTorch Numeric Suite to measure and compare the statistics between quantized model and float model in eager mode with unified APIs for both static quantization and dynamic quantization.</p>
 <p>Thanks for reading! As always, we welcome any feedback, so please create an issue <a class="reference external" href="https://github.com/pytorch/pytorch/issues">here</a> if you have any.</p>
-</section>
-<section id="references">
+</div>
+<div class="section" id="references">
 <h2>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
 <p>[1] <a class="reference external" href="https://tutorials.pytorch.kr/advanced/dynamic_quantization_tutorial.html">DYNAMIC QUANTIZATION ON AN LSTM WORD LANGUAGE MODEL</a>.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  2.262 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  2.226 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-prototype-numeric-suite-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/6aefea42cfe1bb0d4cb1b244c3feba1b/numeric_suite_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">numeric_suite_tutorial.py</span></code></a></p>
@@ -898,8 +900,8 @@ decoder.stats tensor(38.6767)
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
-</section>
-</section>
+</div>
+</div>
 
 
              </article>
@@ -927,7 +929,7 @@ decoder.stats tensor(38.6767)
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2021, PyTorch &amp; PyTorch Korea Community.
+        &copy; Copyright 2022, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorch Korea User Group).
 
     </p>
   </div>
@@ -940,6 +942,13 @@ decoder.stats tensor(38.6767)
 </footer>
 
           </div>
+<script>
+if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.indexOf("/prototype/prototype_index")< 1))
+  {
+    var div = '<div class="admonition note"><p class="admonition-title">Note</p><p><i class="fa fa-flask" aria-hidden="true">&nbsp</i> 이 튜토리얼은 프로토타입(prototype) 기능들에 대해서 설명하고 있습니다. 프로토타입 기능은 일반적으로 피드백 및 테스트용으로, 런타임 플래그 없이는 PyPI나 Conda로 배포되는 바이너리에서는 사용할 수 없습니다.</p></div>'
+    document.getElementById("pytorch-article").insertAdjacentHTML('afterBegin', div)
+  }
+</script>
         </div>
 
         <div class="pytorch-content-right" id="pytorch-content-right">
@@ -1004,7 +1013,6 @@ decoder.stats tensor(38.6767)
       });
   </script>
  
-
 <script>
 //add microsoft link
 
@@ -1083,7 +1091,7 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
 </script>
 
 <script type="text/javascript">
-  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile'];
+  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile', 'Introduction to PyTorch on YouTube', 'Recommendation Systems'];
 </script>
 
 

@@ -6,24 +6,23 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
 <meta property="og:title" content="torch.nn 이 실제로 무엇인가요?" />
   
 <meta property="og:type" content="article" />
   
-<meta property="og:url" content="http://tutorials.pytorch.kr/beginner/nn_tutorial.html" />
+<meta property="og:url" content="https://tutorials.pytorch.kr/beginner/nn_tutorial.html" />
   
 <meta property="og:description" content="저자: Jeremy Howard, fast.ai. 도움: Rachel Thomas, Francisco Ingham. 번역: 남상호 이 튜토리얼을 스크립트가 아닌 노트북으로 실행하기를 권장합니다. 노트북 (.ipynb) 파일을 다운 받으시려면, 페이지 상단에 있는 링크를 클릭해주세요. PyTorch 는 여러분이 신경망(neural network)를 생성하고 학습시키는 것을 도와주기 위해서 torch.nn, torch.optim, Dataset, 그리고 DataLoader 와 같은 잘 디자인된 모듈과 클래스들을 제공합니다. 이들의..." />
   
-<meta property="og:image" content="http://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
+<meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
   
 <meta property="og:image:alt" content="torch.nn 이 실제로 무엇인가요?" />
   
 <meta property="og:ignore_canonical" content="true" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torch.nn 이 실제로 무엇인가요? &mdash; 파이토치 한국어 튜토리얼(PyTorch tutorials in Korean)</title>
+  <title>torch.nn 이 실제로 무엇인가요? &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
   
 
   
@@ -131,7 +130,7 @@
               
               
                 <div class="version">
-                  1.11.0+cu102
+                  1.12.0+cu102
                 </div>
               
             
@@ -272,6 +271,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/quantized_transfer_learning_tutorial.html">(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/static_quantization_tutorial.html">(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/torchserve_with_ipex.html">Grokking PyTorch Intel CPU performance from first principles</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul>
@@ -298,6 +298,7 @@
 <p class="caption" role="heading"><span class="caption-text">Recommendation Systems</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/torchrec_tutorial.html">Introduction to TorchRec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/sharding.html">Exploring TorchRec sharding</a></li>
 </ul>
 
             
@@ -386,6 +387,7 @@
           </div>
 
         
+
           
           <div class="rst-content">
           
@@ -396,7 +398,7 @@
 <p class="admonition-title">Note</p>
 <p>Click <a class="reference internal" href="#sphx-glr-download-beginner-nn-tutorial-py"><span class="std std-ref">here</span></a> to download the full example code</p>
 </div>
-<section class="sphx-glr-example-title" id="torch-nn">
+<div class="sphx-glr-example-title section" id="torch-nn">
 <span id="sphx-glr-beginner-nn-tutorial-py"></span><h1><cite>torch.nn</cite> 이 <em>실제로</em> 무엇인가요?<a class="headerlink" href="#torch-nn" title="Permalink to this headline">¶</a></h1>
 <p>저자: Jeremy Howard, <a class="reference external" href="https://www.fast.ai">fast.ai</a>.</p>
 <p>도움: Rachel Thomas, Francisco Ingham.</p>
@@ -420,7 +422,7 @@ MNIST 데이터셋에 대해 기초적인 신경망을 학습시킬 것입니다
 <p><strong>이 튜토리얼은 여러분이 이미 PyTorch를 설치하였고, 그리고 텐서 연산의 기초에 대해 익숙하다고 가정합니다.</strong>
 (만약 여러분이 Numpy 배열(array) 연산에 익숙하다면, 여기에서 사용되는 PyTorch 텐서 연산도
 거의 동일하다는 것을 알게 될 것입니다).</p>
-<section id="mnist">
+<div class="section" id="mnist">
 <h2>MNIST 데이터 준비<a class="headerlink" href="#mnist" title="Permalink to this headline">¶</a></h2>
 <p>우리는 손으로 쓴 숫자(0에서 9 사이)의 흑백 이미지로 구성된 클래식
 <a class="reference external" href="http://deeplearning.net/data/mnist/">MNIST</a> 데이터셋을 사용할 것 입니다.</p>
@@ -492,8 +494,8 @@ torch.Size([50000, 784])
 tensor(0) tensor(9)
 </pre></div>
 </div>
-</section>
-<section id="id4">
+</div>
+<div class="section" id="id4">
 <h2>torch.nn 없이 밑바닥부터 신경망 만들기<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
 <p>PyTorch 텐서 연산만으로 첫 모델을 만들어봅시다.
 여러분이 신경망의 기초에 대해서 이미 익숙하다고 가정합니다.
@@ -547,8 +549,8 @@ PyTorch는 심지어 여러분의 함수를 위해서 빠른 GPU 또는 벡터�
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor([-2.2441, -2.2917, -2.3807, -2.5279, -2.3209, -2.1525, -2.5024, -2.1052,
-        -2.3604, -2.2247], grad_fn=&lt;SelectBackward0&gt;) torch.Size([64, 10])
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor([-2.7487, -2.1945, -1.9249, -2.3364, -2.2501, -1.8049, -3.1197, -2.5764,
+        -2.6589, -2.1046], grad_fn=&lt;SelectBackward0&gt;) torch.Size([64, 10])
 </pre></div>
 </div>
 <p>여러분이 보시듯이, <code class="docutils literal notranslate"><span class="pre">preds</span></code> 텐서(tensor)는 텐서 값 외에도, 또한
@@ -569,7 +571,7 @@ PyTorch는 심지어 여러분의 함수를 위해서 빠른 GPU 또는 벡터�
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor(2.3184, grad_fn=&lt;NegBackward0&gt;)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor(2.3437, grad_fn=&lt;NegBackward0&gt;)
 </pre></div>
 </div>
 <p>또한, 우리 모델의 정확도(accuracy)를 계산하기 위한 함수를 구현합시다.
@@ -586,7 +588,7 @@ PyTorch는 심지어 여러분의 함수를 위해서 빠른 GPU 또는 벡터�
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor(0.0938)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor(0.0469)
 </pre></div>
 </div>
 <p>이제 우리는 훈련 루프(training loop)를 실행할 수 있습니다. 매 반복마다, 우리는 다음을 수행할 것입니다:</p>
@@ -642,11 +644,11 @@ PyTorch의 자동 기울기(Autograd)가 어떻게 연산을 기록하는지
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor(0.0811, grad_fn=&lt;NegBackward0&gt;) tensor(1.)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor(0.0796, grad_fn=&lt;NegBackward0&gt;) tensor(1.)
 </pre></div>
 </div>
-</section>
-<section id="torch-nn-functional">
+</div>
+<div class="section" id="torch-nn-functional">
 <h2>torch.nn.functional 사용하기<a class="headerlink" href="#torch-nn-functional" title="Permalink to this headline">¶</a></h2>
 <p>이제 우리는 코드를 리팩토링(refactoring) 하겠습니다, 그럼으로써 이전과 동일하지만,
 PyTorch의 <code class="docutils literal notranslate"><span class="pre">nn</span></code> 클래스의 장점을 활용하여 더 간결하고 유연하게 만들 것입니다.
@@ -677,11 +679,11 @@ Pytorch는 이 둘을 결합하는 단일 함수인 <code class="docutils litera
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor(0.0811, grad_fn=&lt;NllLossBackward0&gt;) tensor(1.)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor(0.0796, grad_fn=&lt;NllLossBackward0&gt;) tensor(1.)
 </pre></div>
 </div>
-</section>
-<section id="nn-module">
+</div>
+<div class="section" id="nn-module">
 <h2>nn.Module 을 이용하여 리팩토링 하기<a class="headerlink" href="#nn-module" title="Permalink to this headline">¶</a></h2>
 <p>다음으로, 더 명확하고 간결한 훈련 루프를 위해 <code class="docutils literal notranslate"><span class="pre">nn.Module</span></code> 및 <code class="docutils literal notranslate"><span class="pre">nn.Parameter</span></code> 를 사용합니다.
 우리는 <code class="docutils literal notranslate"><span class="pre">nn.Module</span></code> (자체가 클래스이고 상태를 추척할 수 있는) 하위 클래스(subclass)를 만듭니다.
@@ -720,7 +722,7 @@ Pytorch는 이 둘을 결합하는 단일 함수인 <code class="docutils litera
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor(2.3731, grad_fn=&lt;NllLossBackward0&gt;)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor(2.4216, grad_fn=&lt;NllLossBackward0&gt;)
 </pre></div>
 </div>
 <p>이전에는 훈련 루프를 위해 이름 별로 각 매개변수(parameter)의 값을 업데이트하고 다음과 같이
@@ -765,11 +767,11 @@ Pytorch는 이 둘을 결합하는 단일 함수인 <code class="docutils litera
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor(0.0829, grad_fn=&lt;NllLossBackward0&gt;)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor(0.0827, grad_fn=&lt;NllLossBackward0&gt;)
 </pre></div>
 </div>
-</section>
-<section id="nn-linear">
+</div>
+<div class="section" id="nn-linear">
 <h2>nn.Linear 를 이용하여 리팩토링 하기<a class="headerlink" href="#nn-linear" title="Permalink to this headline">¶</a></h2>
 <p>계속해서 코드를 리팩토링 합니다. <code class="docutils literal notranslate"><span class="pre">self.weights</span></code> 및 <code class="docutils literal notranslate"><span class="pre">self.bias</span></code> 를 수동으로 정의 및
 초기화하고, <code class="docutils literal notranslate"><span class="pre">xb</span>&#160; <span class="pre">&#64;</span> <span class="pre">self.weights</span> <span class="pre">+</span> <span class="pre">self.bias</span></code> 를 계산하는 대신에,
@@ -793,7 +795,7 @@ Pytorch 에는 다양한 유형의 코드를 크게 단순화 할 수 있는 미
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor(2.2979, grad_fn=&lt;NllLossBackward0&gt;)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor(2.3490, grad_fn=&lt;NllLossBackward0&gt;)
 </pre></div>
 </div>
 <p>우리는 여전히 이전과 동일한 <code class="docutils literal notranslate"><span class="pre">fit</span></code> 메소드를 사용할 수 있습니다.</p>
@@ -803,11 +805,11 @@ Pytorch 에는 다양한 유형의 코드를 크게 단순화 할 수 있는 미
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor(0.0823, grad_fn=&lt;NllLossBackward0&gt;)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor(0.0804, grad_fn=&lt;NllLossBackward0&gt;)
 </pre></div>
 </div>
-</section>
-<section id="optim">
+</div>
+<div class="section" id="optim">
 <h2>optim 을 이용하여 리팩토링 하기<a class="headerlink" href="#optim" title="Permalink to this headline">¶</a></h2>
 <p>Pytorch에는 다양한 최적화(optimization) 알고리즘을 가진 패키지인 <code class="docutils literal notranslate"><span class="pre">torch.optim</span></code> 도 있습니다.
 각 매개변수를 수동으로 업데이트 하는 대신, 옵티마이저(optimizer)의 <code class="docutils literal notranslate"><span class="pre">step</span></code> 메소드를 사용하여
@@ -853,12 +855,12 @@ Pytorch 에는 다양한 유형의 코드를 크게 단순화 할 수 있는 미
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor(2.2905, grad_fn=&lt;NllLossBackward0&gt;)
-tensor(0.0811, grad_fn=&lt;NllLossBackward0&gt;)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor(2.4036, grad_fn=&lt;NllLossBackward0&gt;)
+tensor(0.0818, grad_fn=&lt;NllLossBackward0&gt;)
 </pre></div>
 </div>
-</section>
-<section id="id7">
+</div>
+<div class="section" id="id7">
 <h2>Dataset 을 이용하여 리팩토링하기<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h2>
 <p>PyTorch 에는 추상 Dataset 클래스가 있습니다. Dataset 은
 <code class="docutils literal notranslate"><span class="pre">__len__</span></code> 함수 (Python의 표준 <code class="docutils literal notranslate"><span class="pre">len</span></code> 함수에 의해 호출됨) 및
@@ -904,11 +906,11 @@ tensor(0.0811, grad_fn=&lt;NllLossBackward0&gt;)
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor(0.0813, grad_fn=&lt;NllLossBackward0&gt;)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor(0.0811, grad_fn=&lt;NllLossBackward0&gt;)
 </pre></div>
 </div>
-</section>
-<section id="id9">
+</div>
+<div class="section" id="id9">
 <h2>DataLoader 를 이용하여 리팩토링하기<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h2>
 <p>Pytorch 의 <code class="docutils literal notranslate"><span class="pre">DataLoader</span></code> 는 배치 관리를 담당합니다.
 여러분들은 모든 <code class="docutils literal notranslate"><span class="pre">Dataset</span></code> 으로부터 <code class="docutils literal notranslate"><span class="pre">DataLoader</span></code> 를 생성할 수 있습니다.
@@ -947,14 +949,14 @@ DataLoader 는 매 미니배치를 자동적으로 제공합니다.</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor(0.0803, grad_fn=&lt;NllLossBackward0&gt;)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor(0.0822, grad_fn=&lt;NllLossBackward0&gt;)
 </pre></div>
 </div>
 <p>Pytorch의 nn.Module, nn.Parameter, Dataset 및 DataLoader 덕분에 이제 훈련 루프가
 훨씬 더 작아지고 이해하기 쉬워졌습니다.
 이제 실제로 효과적인 모델을 만드는 데 필요한 기본 기능을 추가해 보겠습니다.</p>
-</section>
-<section id="validation">
+</div>
+<div class="section" id="validation">
 <h2>검증(validation) 추가하기<a class="headerlink" href="#validation" title="Permalink to this headline">¶</a></h2>
 <p>섹션 1에서, 우리는 훈련 데이터에 사용하기 위해 합리적인 훈련 루프를 설정하려고했습니다.
 실전에서, 여러분들은 과적합(overfitting)을 확인하기 위해서 <strong>항상</strong>
@@ -999,12 +1001,12 @@ DataLoader 는 매 미니배치를 자동적으로 제공합니다.</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>0 tensor(0.2994)
-1 tensor(0.2917)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>0 tensor(0.3462)
+1 tensor(0.2879)
 </pre></div>
 </div>
-</section>
-<section id="fit-get-data">
+</div>
+<div class="section" id="fit-get-data">
 <h2>fit() 와 get_data() 생성하기<a class="headerlink" href="#fit-get-data" title="Permalink to this headline">¶</a></h2>
 <p>이제 우리는 우리만의 작은 리팩토링을 수행할 것입니다.
 훈련 데이터셋과 검증 데이터셋 모두에 대한 손실을 계산하는 유사한 프로세스를 두 번 거치므로,
@@ -1056,14 +1058,14 @@ DataLoader 는 매 미니배치를 자동적으로 제공합니다.</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>0 0.2972115307927132
-1 0.2883791344285011
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>0 0.36110699597597123
+1 0.37618520019054413
 </pre></div>
 </div>
 <p>이러한 기본 3줄의 코드를 사용하여 다양한 모델을 훈련할 수 있습니다.
 컨볼루션 신경망(CNN)을 훈련하는 데 사용할 수 있는지 살펴 보겠습니다!</p>
-</section>
-<section id="cnn">
+</div>
+<div class="section" id="cnn">
 <h2>CNN 으로 넘어가기<a class="headerlink" href="#cnn" title="Permalink to this headline">¶</a></h2>
 <p>이제 3개의 컨볼루션 레이어로 신경망을 구축할 것입니다.
 이전 섹션의 어떤 함수도 모델의 형식에 대해 가정하지 않기 때문에,
@@ -1101,12 +1103,12 @@ DataLoader 는 매 미니배치를 자동적으로 제공합니다.</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>0 0.36971560148000715
-1 0.250745241099596
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>0 0.3998071058988571
+1 0.22806806327700616
 </pre></div>
 </div>
-</section>
-<section id="nn-sequential">
+</div>
+<div class="section" id="nn-sequential">
 <h2>nn.Sequential<a class="headerlink" href="#nn-sequential" title="Permalink to this headline">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">torch.nn</span></code> 에는 코드를 간단히 사용할 수 있는 또 다른 편리한 클래스인
 <a class="reference external" href="https://pytorch.org/docs/stable/nn.html#torch.nn.Sequential">Sequential</a>
@@ -1149,12 +1151,12 @@ DataLoader 는 매 미니배치를 자동적으로 제공합니다.</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>0 0.33431140084266664
-1 0.268098106098175
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>0 0.3610635262727737
+1 0.25870343182086947
 </pre></div>
 </div>
-</section>
-<section id="id11">
+</div>
+<div class="section" id="id11">
 <h2>DataLoader 감싸기<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h2>
 <dl class="simple">
 <dt>우리의 CNN은 상당히 간결하지만, MNIST에서만 작동합니다, 왜냐하면:</dt><dd><ul class="simple">
@@ -1209,12 +1211,12 @@ DataLoader 는 매 미니배치를 자동적으로 제공합니다.</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>0 0.3854581726074219
-1 0.2570021711409092
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>0 0.32956924468278886
+1 0.23986366150379182
 </pre></div>
 </div>
-</section>
-<section id="gpu">
+</div>
+<div class="section" id="gpu">
 <h2>GPU 사용하기<a class="headerlink" href="#gpu" title="Permalink to this headline">¶</a></h2>
 <p>만약 여러분들이 운이 좋아서 CUDA 지원 GPU (대부분의 클라우드 제공 업체에서
 시간당 약 $0.50 에 이용할 수 있습니다) 를 사용할 수 있다면, 코드 실행 속도를 높일 수 있습니다.
@@ -1251,12 +1253,12 @@ DataLoader 는 매 미니배치를 자동적으로 제공합니다.</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>0 0.2614548772752285
-1 0.22968384623527527
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>0 0.2482311580657959
+1 0.1871031902551651
 </pre></div>
 </div>
-</section>
-<section id="id12">
+</div>
+<div class="section" id="id12">
 <h2>마치면서<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h2>
 <p>이제 Pytorch를 사용하여 다양한 유형의 모델을 학습하는 데 사용할 수 있는 일반 데이터 파이프 라인과
 훈련 루프가 있습니다.
@@ -1291,7 +1293,7 @@ DataLoader 는 매 미니배치를 자동적으로 제공합니다.</p>
 <li><p><code class="docutils literal notranslate"><span class="pre">DataLoader</span></code>: 모든 종류의 <code class="docutils literal notranslate"><span class="pre">Dataset</span></code> 을 기반으로 데이터의 배치들을 출력하는 반복자(iterator)를 생성합니다.</p></li>
 </ul>
 </div></blockquote>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  29.982 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  33.567 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-beginner-nn-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/f16255c783f9e487235b8eff6c8792b9/nn_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">nn_tutorial.py</span></code></a></p>
@@ -1301,8 +1303,8 @@ DataLoader 는 매 미니배치를 자동적으로 제공합니다.</p>
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
-</section>
-</section>
+</div>
+</div>
 
 
              </article>
@@ -1339,7 +1341,7 @@ DataLoader 는 매 미니배치를 자동적으로 제공합니다.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2021, PyTorch &amp; PyTorch Korea Community.
+        &copy; Copyright 2022, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorch Korea User Group).
 
     </p>
   </div>
@@ -1352,6 +1354,13 @@ DataLoader 는 매 미니배치를 자동적으로 제공합니다.</p>
 </footer>
 
           </div>
+<script>
+if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.indexOf("/prototype/prototype_index")< 1))
+  {
+    var div = '<div class="admonition note"><p class="admonition-title">Note</p><p><i class="fa fa-flask" aria-hidden="true">&nbsp</i> 이 튜토리얼은 프로토타입(prototype) 기능들에 대해서 설명하고 있습니다. 프로토타입 기능은 일반적으로 피드백 및 테스트용으로, 런타임 플래그 없이는 PyPI나 Conda로 배포되는 바이너리에서는 사용할 수 없습니다.</p></div>'
+    document.getElementById("pytorch-article").insertAdjacentHTML('afterBegin', div)
+  }
+</script>
         </div>
 
         <div class="pytorch-content-right" id="pytorch-content-right">
@@ -1414,7 +1423,6 @@ DataLoader 는 매 미니배치를 자동적으로 제공합니다.</p>
       });
   </script>
  
-
 <script>
 //add microsoft link
 
@@ -1493,7 +1501,7 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
 </script>
 
 <script type="text/javascript">
-  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile'];
+  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile', 'Introduction to PyTorch on YouTube', 'Recommendation Systems'];
 </script>
 
 

@@ -6,24 +6,23 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
 <meta property="og:title" content="(베타) BERT 모델 동적 양자화하기" />
   
 <meta property="og:type" content="article" />
   
-<meta property="og:url" content="http://tutorials.pytorch.kr/intermediate/dynamic_quantization_bert_tutorial.html" />
+<meta property="og:url" content="https://tutorials.pytorch.kr/intermediate/dynamic_quantization_bert_tutorial.html" />
   
 <meta property="og:description" content="Author: Jianyu Huang Reviewed by: Raghuraman Krishnamoorthi Edited by: Jessica Lin 번역: Myungha Kwon 시작하기: 이 튜토리얼에서는 HuggingFace Transformers 예제들을 따라하면서 BERT 모델을 동적으로 양자화할 것입니다. BERT 처럼 유명하면서도 최고 성능을 내는 모델을 어떻게 동적으로 양자화된 모델로 변환하는지 한 단계씩 설명하겠습니다. BERT 또는 Transformer 의 양방향 임베딩 표현(representation) 이라 ..." />
   
-<meta property="og:image" content="http://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
+<meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
   
 <meta property="og:image:alt" content="(베타) BERT 모델 동적 양자화하기" />
   
 <meta property="og:ignore_canonical" content="true" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>(베타) BERT 모델 동적 양자화하기 &mdash; 파이토치 한국어 튜토리얼(PyTorch tutorials in Korean)</title>
+  <title>(베타) BERT 모델 동적 양자화하기 &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
   
 
   
@@ -131,7 +130,7 @@
               
               
                 <div class="version">
-                  1.11.0+cu102
+                  1.12.0+cu102
                 </div>
               
             
@@ -272,6 +271,7 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="quantized_transfer_learning_tutorial.html">(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/static_quantization_tutorial.html">(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torchserve_with_ipex.html">Grokking PyTorch Intel CPU performance from first principles</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul>
@@ -298,6 +298,7 @@
 <p class="caption" role="heading"><span class="caption-text">Recommendation Systems</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="torchrec_tutorial.html">Introduction to TorchRec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/sharding.html">Exploring TorchRec sharding</a></li>
 </ul>
 
             
@@ -386,13 +387,14 @@
           </div>
 
         
+
           
           <div class="rst-content">
           
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <section id="bert">
+  <div class="section" id="bert">
 <h1>(베타) BERT 모델 동적 양자화하기<a class="headerlink" href="#bert" title="Permalink to this headline">¶</a></h1>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
@@ -404,7 +406,7 @@
 <strong>Reviewed by</strong>: <a class="reference external" href="https://github.com/raghuramank100">Raghuraman Krishnamoorthi</a>
 <strong>Edited by</strong>: <a class="reference external" href="https://github.com/jlin27">Jessica Lin</a>
 <strong>번역</strong>: <a class="reference external" href="https://github.com/kwonmha">Myungha Kwon</a></p>
-<section id="id1">
+<div class="section" id="id1">
 <h2>시작하기<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
 <p>이 튜토리얼에서는 <a class="reference external" href="https://github.com/huggingface/transformers">HuggingFace Transformers</a> 예제들을 따라하면서 BERT
 모델을 동적으로 양자화할 것입니다. BERT 처럼 유명하면서도 최고 성능을
@@ -429,10 +431,10 @@ int8 또는 float16 타입의 양자화된 모델로 변환하고, 활성 함수
 기록합니다. MRPC는 아래에 나온 것처럼 문장 쌍을 분류하는 자연어처리 문제에 많이 쓰입니다.</p></li>
 </ul>
 <img alt="../_images/bert.png" src="../_images/bert.png" />
-</section>
-<section id="id3">
+</div>
+<div class="section" id="id3">
 <h2>1. 준비<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
-<section id="pytorch-huggingface-transformers">
+<div class="section" id="pytorch-huggingface-transformers">
 <h3>1.1 PyTorch, HuggingFace Transformers 설치하기<a class="headerlink" href="#pytorch-huggingface-transformers" title="Permalink to this headline">¶</a></h3>
 <p>튜토리얼을 시작하기 위해 먼저 <a class="reference external" href="https://github.com/pytorch/pytorch/#installation">여기</a> 의
 PyTorch 설치 안내와 <a class="reference external" href="https://github.com/huggingface/transformers#installation">HuggingFace 깃허브 저장소</a> 의
@@ -449,8 +451,8 @@ pip install transformers
 yes y <span class="p">|</span> pip install --pre torch -f https://download.pytorch.org/whl/nightly/cu101/torch_nightly.html
 </pre></div>
 </div>
-</section>
-<section id="id6">
+</div>
+<div class="section" id="id6">
 <h3>1.2 필요한 모듈 불러오기<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
 <p>이 단계에서는 이 튜토리얼에 필요한 파이썬 모듈들을 불러오겠습니다.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
@@ -491,8 +493,8 @@ yes y <span class="p">|</span> pip install --pre torch -f https://download.pytor
 <span class="nb">print</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">__config__</span><span class="o">.</span><span class="n">parallel_info</span><span class="p">())</span>
 </pre></div>
 </div>
-</section>
-<section id="id7">
+</div>
+<div class="section" id="id7">
 <h3>1.3 보조 함수 알아보기<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
 <p>보조 함수들은 transformers 라이브러리에 내장돼 있습니다. 우리는 주로
 다음과 같은 보조 함수들을 사용할 것입니다. 하나는 텍스트 예시들을
@@ -519,8 +521,8 @@ F1 점수를 계산하기 위한 함수입니다.</p>
 
 \]</div>
 </div></blockquote>
-</section>
-<section id="id9">
+</div>
+<div class="section" id="id9">
 <h3>1.4 데이터셋 다운로드<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
 <p>MRPC 문제를 풀어보기 전에 <a class="reference external" href="https://gist.github.com/W4ngatang/60c2bdb54d156a41194446737ce03e2e">이 스크립트</a> 를
 실행해 <a class="reference external" href="https://gluebenchmark.com/tasks">GLUE 데이터셋</a> 을 다운로드 받고 <code class="docutils literal notranslate"><span class="pre">glue_data</span></code>
@@ -528,9 +530,9 @@ F1 점수를 계산하기 위한 함수입니다.</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>python download_glue_data.py --data_dir<span class="o">=</span><span class="s1">&#39;glue_data&#39;</span> --tasks<span class="o">=</span><span class="s1">&#39;MRPC&#39;</span>
 </pre></div>
 </div>
-</section>
-</section>
-<section id="id12">
+</div>
+</div>
+<div class="section" id="id12">
 <h2>2. BERT 모델 미세조정하기<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h2>
 <p>BERT 의 사상은 언어 표현을 사전학습하고, 문제에 특화된 매개변수들을
 가능한 적게 사용하면서도, 사전학습된 양방향 표현을 많은 문제들에 맞게
@@ -562,7 +564,7 @@ python ./run_glue.py \
 </div>
 <p>MRPC 문제를 위해 미세조정한 BERT 모델을 <a class="reference external" href="https://download.pytorch.org/tutorial/MRPC.zip">여기</a> 에 업로드 했습니다.
 시간을 아끼려면 모델 파일(~400MB)을 <code class="docutils literal notranslate"><span class="pre">$OUT_DIR</span></code> 에 바로 다운로드할 수 있습니다.</p>
-<section id="id15">
+<div class="section" id="id15">
 <h3>2.1 전역 환경 설정하기<a class="headerlink" href="#id15" title="Permalink to this headline">¶</a></h3>
 <p>이 단계에서는 미세조정한 BERT 모델을 동적 양자화 이전, 이후에 평가하기 위한
 전역 환경 설정을 진행합니다.</p>
@@ -603,8 +605,8 @@ python ./run_glue.py \
 <span class="n">set_seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-<section id="id16">
+</div>
+<div class="section" id="id16">
 <h3>2.2 미세조정한 BERT 모델 불러오기<a class="headerlink" href="#id16" title="Permalink to this headline">¶</a></h3>
 <p><code class="docutils literal notranslate"><span class="pre">configs.output_dir</span></code> 에서 토크나이저와 미세조정한 문장 분류
 BERT 모델(FP32)를 불러옵니다.</p>
@@ -615,8 +617,8 @@ BERT 모델(FP32)를 불러옵니다.</p>
 <span class="n">model</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">configs</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-<section id="id17">
+</div>
+<div class="section" id="id17">
 <h3>2.3 토큰화, 평가 함수 정의하기<a class="headerlink" href="#id17" title="Permalink to this headline">¶</a></h3>
 <p><a class="reference external" href="https://github.com/huggingface/transformers/blob/master/examples/run_glue.py">Huggingface</a>
 의 토큰화 함수와 평가 함수를 사용합니다.</p>
@@ -769,9 +771,9 @@ BERT 모델(FP32)를 불러옵니다.</p>
     <span class="k">return</span> <span class="n">dataset</span>
 </pre></div>
 </div>
-</section>
-</section>
-<section id="id19">
+</div>
+</div>
+<div class="section" id="id19">
 <h2>3. 동적 양자화 적용하기<a class="headerlink" href="#id19" title="Permalink to this headline">¶</a></h2>
 <p>HuggingFace BERT 모델에 동적 양자화를 적용하기 위해
 <code class="docutils literal notranslate"><span class="pre">torch.quantization.quantize_dynamic</span></code> 을 호출합니다. 구체적으로,</p>
@@ -785,7 +787,7 @@ BERT 모델(FP32)를 불러옵니다.</p>
 <span class="nb">print</span><span class="p">(</span><span class="n">quantized_model</span><span class="p">)</span>
 </pre></div>
 </div>
-<section id="id20">
+<div class="section" id="id20">
 <h3>3.1 모델 크기 확인하기<a class="headerlink" href="#id20" title="Permalink to this headline">¶</a></h3>
 <p>먼저 모델 크기를 확인해보겠습니다. 보면, 모델 크기가 상당히 줄어든 것을
 알 수 있습니다(FP32 형식의 모델 크기 : 438MB; INT8 형식의 모델 크기 : 181MB):</p>
@@ -803,8 +805,8 @@ BERT 모델(FP32)를 불러옵니다.</p>
 크기는 4(바이트/FP32) * 30522 * 768 = 90MB 입니다. 양자화를 적용한 결과,
 임베딩 행렬을 제외한 모델의 크기가 350 MB (FP32 모델)에서 90 MB (INT8 모델)로
 줄어들었습니다.</p>
-</section>
-<section id="id21">
+</div>
+<div class="section" id="id21">
 <h3>3.2 추론 정확도와 속도 평가하기<a class="headerlink" href="#id21" title="Permalink to this headline">¶</a></h3>
 <p>다음으로, 기존의 FP32 모델과 동적 양자화를 적용한 INT8 모델들의
 추론 속도와 정확도를 비교해보겟습니다.</p>
@@ -847,8 +849,8 @@ BERT 모델(FP32)를 불러옵니다.</p>
 <code class="docutils literal notranslate"><span class="pre">torch.__config__.parallel_info()</span></code> 를 사용하여 병렬화 설정을 확인할 수
 있습니다. 같은 맥북 프로에서 Native 백엔드로 빌드한 PyTorch를 사용했을 때,
 MRPC 데이터셋을 평가하는데 약 46초가 소요됐습니다.</p>
-</section>
-<section id="id24">
+</div>
+<div class="section" id="id24">
 <h3>3.3 양자화된 모델 직렬화하기<a class="headerlink" href="#id24" title="Permalink to this headline">¶</a></h3>
 <p>나중에 다시 쓸 수 있도록 <cite>torch.jit.save</cite> 을 사용하여 양자화된 모델을 직렬화하고 저장할 수 있습니다.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">input_ids</span> <span class="o">=</span> <span class="n">ids_tensor</span><span class="p">([</span><span class="mi">8</span><span class="p">,</span> <span class="mi">128</span><span class="p">],</span> <span class="mi">2</span><span class="p">)</span>
@@ -863,25 +865,25 @@ MRPC 데이터셋을 평가하는데 약 46초가 소요됐습니다.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">loaded_quantized_model</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;bert_traced_eager_quant.pt&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-</section>
-<section id="id25">
+</div>
+</div>
+<div class="section" id="id25">
 <h2>마치며<a class="headerlink" href="#id25" title="Permalink to this headline">¶</a></h2>
 <p>이 튜토리얼은 BERT처럼 잘 알려진 자연어처리 모델을 동적으로
 양자화하는 방법을 설명합니다. 동적 양자화를 통해 모델의 정확도를 크게
 약화시키지 않으면서도 모델의 크기를 줄일 수 있습니다.</p>
 <p>읽어주셔서 감사합니다. 언제나처럼 어떠한 피드백도 환영이니, 의견이
 있다면 <a class="reference external" href="https://github.com/pytorch/pytorch/issues">여기</a> 에 이슈를 제기해주세요.</p>
-</section>
-<section id="id27">
+</div>
+<div class="section" id="id27">
 <h2>참고 자료<a class="headerlink" href="#id27" title="Permalink to this headline">¶</a></h2>
 <p>[1] J.Devlin, M. Chang, K. Lee and K. Toutanova, <a class="reference external" href="https://arxiv.org/pdf/1810.04805.pdf">BERT: Pre-training of
 Deep Bidirectional Transformers for Language Understanding (2018)</a>.</p>
 <p>[2] <a class="reference external" href="https://github.com/huggingface/transformers">HuggingFace Transformers</a>.</p>
 <p>[3] O. Zafrir, G. Boudoukh, P. Izsak, and M. Wasserblat (2019). <a class="reference external" href="https://arxiv.org/pdf/1910.06188.pdf">Q8BERT:
 Quantized 8bit BERT</a>.</p>
-</section>
-</section>
+</div>
+</div>
 
 
              </article>
@@ -918,7 +920,7 @@ Quantized 8bit BERT</a>.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2021, PyTorch &amp; PyTorch Korea Community.
+        &copy; Copyright 2022, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorch Korea User Group).
 
     </p>
   </div>
@@ -931,6 +933,13 @@ Quantized 8bit BERT</a>.</p>
 </footer>
 
           </div>
+<script>
+if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.indexOf("/prototype/prototype_index")< 1))
+  {
+    var div = '<div class="admonition note"><p class="admonition-title">Note</p><p><i class="fa fa-flask" aria-hidden="true">&nbsp</i> 이 튜토리얼은 프로토타입(prototype) 기능들에 대해서 설명하고 있습니다. 프로토타입 기능은 일반적으로 피드백 및 테스트용으로, 런타임 플래그 없이는 PyPI나 Conda로 배포되는 바이너리에서는 사용할 수 없습니다.</p></div>'
+    document.getElementById("pytorch-article").insertAdjacentHTML('afterBegin', div)
+  }
+</script>
         </div>
 
         <div class="pytorch-content-right" id="pytorch-content-right">
@@ -1000,7 +1009,6 @@ Quantized 8bit BERT</a>.</p>
       });
   </script>
  
-
 <script>
 //add microsoft link
 
@@ -1079,7 +1087,7 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
 </script>
 
 <script type="text/javascript">
-  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile'];
+  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile', 'Introduction to PyTorch on YouTube', 'Recommendation Systems'];
 </script>
 
 

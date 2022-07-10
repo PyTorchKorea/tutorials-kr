@@ -6,24 +6,23 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
 <meta property="og:title" content="예제로 배우는 파이토치(PyTorch)" />
   
 <meta property="og:type" content="article" />
   
-<meta property="og:url" content="http://tutorials.pytorch.kr/beginner/pytorch_with_examples.html" />
+<meta property="og:url" content="https://tutorials.pytorch.kr/beginner/pytorch_with_examples.html" />
   
 <meta property="og:description" content="Author: Justin Johnson 번역: 박정환 이 튜토리얼에서는 PyTorch 의 핵심적인 개념을 예제를 통해 소개합니다. 본질적으로, PyTorch에는 두가지 주요한 특징이 있습니다: NumPy와 유사하지만 GPU 상에서 실행 가능한 n-차원 텐서(Tensor), 신경망을 구성하고 학습하는 과정에서의 자동 미분(Automatic differentiation). 이 튜토리얼에서는 3차 다항식(third order polynomial)을 사용하여 y=\sin(x) 에 근사(fit)하는 문제를 다뤄보겠습니다. 신경망은 4..." />
   
-<meta property="og:image" content="http://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
+<meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
   
 <meta property="og:image:alt" content="예제로 배우는 파이토치(PyTorch)" />
   
 <meta property="og:ignore_canonical" content="true" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>예제로 배우는 파이토치(PyTorch) &mdash; 파이토치 한국어 튜토리얼(PyTorch tutorials in Korean)</title>
+  <title>예제로 배우는 파이토치(PyTorch) &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
   
 
   
@@ -131,7 +130,7 @@
               
               
                 <div class="version">
-                  1.11.0+cu102
+                  1.12.0+cu102
                 </div>
               
             
@@ -272,6 +271,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/quantized_transfer_learning_tutorial.html">(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/static_quantization_tutorial.html">(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/torchserve_with_ipex.html">Grokking PyTorch Intel CPU performance from first principles</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul>
@@ -298,6 +298,7 @@
 <p class="caption" role="heading"><span class="caption-text">Recommendation Systems</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/torchrec_tutorial.html">Introduction to TorchRec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/sharding.html">Exploring TorchRec sharding</a></li>
 </ul>
 
             
@@ -386,13 +387,14 @@
           </div>
 
         
+
           
           <div class="rst-content">
           
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <section id="pytorch">
+  <div class="section" id="pytorch">
 <h1>예제로 배우는 파이토치(PyTorch)<a class="headerlink" href="#pytorch" title="Permalink to this headline">¶</a></h1>
 <p><strong>Author</strong>: <a class="reference external" href="https://github.com/jcjohnson/pytorch-examples">Justin Johnson</a>
 <strong>번역</strong>: <a class="reference external" href="https://github.com/9bow">박정환</a></p>
@@ -448,9 +450,9 @@
 </li>
 </ul>
 </div>
-<section id="tensor">
+<div class="section" id="tensor">
 <h2><a class="toc-backref" href="#id13">텐서(Tensor)</a><a class="headerlink" href="#tensor" title="Permalink to this headline">¶</a></h2>
-<section id="numpy">
+<div class="section" id="numpy">
 <h3><a class="toc-backref" href="#id14">준비 운동: numpy</a><a class="headerlink" href="#numpy" title="Permalink to this headline">¶</a></h3>
 <p>PyTorch를 소개하기 전에, 먼저 NumPy를 사용하여 신경망을 구성해보겠습니다.</p>
 <p>NumPy는 n-차원 배열 객체와 이러한 배열들을 조작하기 위한 다양한 함수들을 제공합니다. NumPy는 과학 분야의
@@ -499,8 +501,8 @@ NumPy는 연산 그래프(computation graph)나 딥러닝, 변화도(gradient)�
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Result: y = </span><span class="si">{</span><span class="n">a</span><span class="si">}</span><span class="s1"> + </span><span class="si">{</span><span class="n">b</span><span class="si">}</span><span class="s1"> x + </span><span class="si">{</span><span class="n">c</span><span class="si">}</span><span class="s1"> x^2 + </span><span class="si">{</span><span class="n">d</span><span class="si">}</span><span class="s1"> x^3&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-<section id="pytorch-tensor">
+</div>
+<div class="section" id="pytorch-tensor">
 <h3><a class="toc-backref" href="#id15">파이토치(PyTorch): 텐서(Tensor)</a><a class="headerlink" href="#pytorch-tensor" title="Permalink to this headline">¶</a></h3>
 <p>NumPy는 훌륭한 프레임워크지만, GPU를 사용하여 수치 연산을 가속화할 수는 없습니다.
 현대의 심층 신경망에서 GPU는 종종 <a class="reference external" href="https://github.com/jcjohnson/cnn-benchmarks">50배 또는 그 이상</a> 의
@@ -561,11 +563,11 @@ PyTorch 텐서를 GPU에서 실행하기 위해서는 단지 적절한 장치를
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Result: y = </span><span class="si">{</span><span class="n">a</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="si">}</span><span class="s1"> + </span><span class="si">{</span><span class="n">b</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="si">}</span><span class="s1"> x + </span><span class="si">{</span><span class="n">c</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="si">}</span><span class="s1"> x^2 + </span><span class="si">{</span><span class="n">d</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="si">}</span><span class="s1"> x^3&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-</section>
-<section id="autograd">
+</div>
+</div>
+<div class="section" id="autograd">
 <h2><a class="toc-backref" href="#id16">Autograd</a><a class="headerlink" href="#autograd" title="Permalink to this headline">¶</a></h2>
-<section id="pytorch-tensor-autograd">
+<div class="section" id="pytorch-tensor-autograd">
 <h3><a class="toc-backref" href="#id17">PyTorch: 텐서(Tensor)와 autograd</a><a class="headerlink" href="#pytorch-tensor-autograd" title="Permalink to this headline">¶</a></h3>
 <p>위의 예제들에서는 신경망의 순전파 단계와 역전파 단계를 직접 구현해보았습니다.
 작은 2계층(2-layer) 신경망에서는 역전파 단계를 직접 구현하는 것이 큰일이 아니지만,
@@ -639,8 +641,8 @@ PyTorch 텐서를 GPU에서 실행하기 위해서는 단지 적절한 장치를
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Result: y = </span><span class="si">{</span><span class="n">a</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="si">}</span><span class="s1"> + </span><span class="si">{</span><span class="n">b</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="si">}</span><span class="s1"> x + </span><span class="si">{</span><span class="n">c</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="si">}</span><span class="s1"> x^2 + </span><span class="si">{</span><span class="n">d</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="si">}</span><span class="s1"> x^3&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-<section id="pytorch-autograd-function">
+</div>
+<div class="section" id="pytorch-autograd-function">
 <h3><a class="toc-backref" href="#id18">PyTorch: 새 autograd Function 정의하기</a><a class="headerlink" href="#pytorch-autograd-function" title="Permalink to this headline">¶</a></h3>
 <p>내부적으로, autograd의 기본(primitive) 연산자는 실제로 텐서를 조작하는 2개의 함수입니다.
 <strong>forward</strong> 함수는 입력 텐서로부터 출력 텐서를 계산합니다.
@@ -741,11 +743,11 @@ PyTorch 텐서를 GPU에서 실행하기 위해서는 단지 적절한 장치를
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Result: y = </span><span class="si">{</span><span class="n">a</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="si">}</span><span class="s1"> + </span><span class="si">{</span><span class="n">b</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="si">}</span><span class="s1"> * P3(</span><span class="si">{</span><span class="n">c</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="si">}</span><span class="s1"> + </span><span class="si">{</span><span class="n">d</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="si">}</span><span class="s1"> x)&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-</section>
-<section id="nn">
+</div>
+</div>
+<div class="section" id="nn">
 <h2><a class="toc-backref" href="#id19"><cite>nn</cite> 모듈</a><a class="headerlink" href="#nn" title="Permalink to this headline">¶</a></h2>
-<section id="pytorch-nn">
+<div class="section" id="pytorch-nn">
 <h3><a class="toc-backref" href="#id20">PyTorch: nn</a><a class="headerlink" href="#pytorch-nn" title="Permalink to this headline">¶</a></h3>
 <p>연산 그래프와 autograd는 복잡한 연산자를 정의하고 도함수(derivative)를 자동으로 계산하는
 매우 강력한 패러다임(paradigm)입니다; 하지만 대규모 신경망에서는 autograd 그 자체만으로는 너무
@@ -827,8 +829,8 @@ PyTorch 텐서를 GPU에서 실행하기 위해서는 단지 적절한 장치를
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Result: y = </span><span class="si">{</span><span class="n">linear_layer</span><span class="o">.</span><span class="n">bias</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="si">}</span><span class="s1"> + </span><span class="si">{</span><span class="n">linear_layer</span><span class="o">.</span><span class="n">weight</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="si">}</span><span class="s1"> x + </span><span class="si">{</span><span class="n">linear_layer</span><span class="o">.</span><span class="n">weight</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="si">}</span><span class="s1"> x^2 + </span><span class="si">{</span><span class="n">linear_layer</span><span class="o">.</span><span class="n">weight</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="si">}</span><span class="s1"> x^3&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-<section id="pytorch-optim">
+</div>
+<div class="section" id="pytorch-optim">
 <h3><a class="toc-backref" href="#id21">PyTorch: optim</a><a class="headerlink" href="#pytorch-optim" title="Permalink to this headline">¶</a></h3>
 <p>지금까지는 <code class="docutils literal notranslate"><span class="pre">torch.no_grad()</span></code> 로 학습 가능한 매개변수를 갖는 텐서들을 직접 조작하여 모델의 가중치(weight)를 갱신하였습니다.
 이것은 확률적 경사하강법(SGD; stochastic gradient descent)와 같은 간단한 최적화 알고리즘에서는 크게 부담이 되지 않지만,
@@ -887,8 +889,8 @@ RMSProp 알고리즘을 사용하겠습니다:</p>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Result: y = </span><span class="si">{</span><span class="n">linear_layer</span><span class="o">.</span><span class="n">bias</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="si">}</span><span class="s1"> + </span><span class="si">{</span><span class="n">linear_layer</span><span class="o">.</span><span class="n">weight</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="si">}</span><span class="s1"> x + </span><span class="si">{</span><span class="n">linear_layer</span><span class="o">.</span><span class="n">weight</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="si">}</span><span class="s1"> x^2 + </span><span class="si">{</span><span class="n">linear_layer</span><span class="o">.</span><span class="n">weight</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="si">}</span><span class="s1"> x^3&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-<section id="pytorch-nn-module">
+</div>
+<div class="section" id="pytorch-nn-module">
 <h3><a class="toc-backref" href="#id22">PyTorch: 사용자 정의 nn.Module</a><a class="headerlink" href="#pytorch-nn-module" title="Permalink to this headline">¶</a></h3>
 <p>때대로 기존 Module의 구성(sequence)보다 더 복잡한 모델을 구성해야 할 때가 있습니다;
 이러한 경우에는 <code class="docutils literal notranslate"><span class="pre">nn.Module</span></code> 의 하위 클래스(subclass)로 새로운 Module을 정의하고,
@@ -952,8 +954,8 @@ RMSProp 알고리즘을 사용하겠습니다:</p>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Result: </span><span class="si">{</span><span class="n">model</span><span class="o">.</span><span class="n">string</span><span class="p">()</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-<section id="pytorch-control-flow-weight-sharing">
+</div>
+<div class="section" id="pytorch-control-flow-weight-sharing">
 <h3><a class="toc-backref" href="#id23">PyTorch: 제어 흐름(Control Flow) + 가중치 공유(Weight Sharing)</a><a class="headerlink" href="#pytorch-control-flow-weight-sharing" title="Permalink to this headline">¶</a></h3>
 <p>동적 그래프와 가중치 공유의 예를 보이기 위해, 매우 이상한 모델을 구현해보겠습니다:
 각 순전파 단계에서 3 ~ 5 사이의 임의의 숫자(random number)를 선택하여 다차항들에서 사용하고,
@@ -1030,84 +1032,68 @@ RMSProp 알고리즘을 사용하겠습니다:</p>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Result: </span><span class="si">{</span><span class="n">model</span><span class="o">.</span><span class="n">string</span><span class="p">()</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-</section>
-<section id="examples-download">
+</div>
+</div>
+<div class="section" id="examples-download">
 <span id="id3"></span><h2><a class="toc-backref" href="#id24">예제 코드</a><a class="headerlink" href="#examples-download" title="Permalink to this headline">¶</a></h2>
 <p>위의 예제들을 여기서 찾아볼 수 있습니다.</p>
-<section id="tensors">
+<div class="section" id="tensors">
 <h3><a class="toc-backref" href="#id25">Tensors</a><a class="headerlink" href="#tensors" title="Permalink to this headline">¶</a></h3>
 <div class="toctree-wrapper compound">
 </div>
-<p><div class="sphx-glr-thumbcontainer" tooltip=":math:`y=\sin(x)` 을 예측할 수 있도록, :math:`-\pi` 부터 :math:`pi` 까지 유클리드 거리(Euclidean distance)를 최소화하도..."><figure class="align-default" id="id5">
+<p><div class="sphx-glr-thumbcontainer" tooltip=":math:`y=\sin(x)` 을 예측할 수 있도록, :math:`-\pi` 부터 :math:`pi` 까지 유클리드 거리(Euclidean distance)를 최소화하도..."><div class="figure align-default" id="id5">
 <img alt="../_images/sphx_glr_polynomial_numpy_thumb.png" src="../_images/sphx_glr_polynomial_numpy_thumb.png" />
-<figcaption>
-<p><span class="caption-text"><a class="reference internal" href="examples_tensor/polynomial_numpy.html#sphx-glr-beginner-examples-tensor-polynomial-numpy-py"><span class="std std-ref">준비 운동: NumPy</span></a></span><a class="headerlink" href="#id5" title="Permalink to this image">¶</a></p>
-</figcaption>
-</figure>
+<p class="caption"><span class="caption-text"><a class="reference internal" href="examples_tensor/polynomial_numpy.html#sphx-glr-beginner-examples-tensor-polynomial-numpy-py"><span class="std std-ref">준비 운동: NumPy</span></a></span><a class="headerlink" href="#id5" title="Permalink to this image">¶</a></p>
+</div>
 </div></p>
-<p><div class="sphx-glr-thumbcontainer" tooltip=":math:`y=\sin(x)` 을 예측할 수 있도록, :math:`-\pi` 부터 :math:`pi` 까지 유클리드 거리(Euclidean distance)를 최소화하도..."><figure class="align-default" id="id6">
+<p><div class="sphx-glr-thumbcontainer" tooltip=":math:`y=\sin(x)` 을 예측할 수 있도록, :math:`-\pi` 부터 :math:`pi` 까지 유클리드 거리(Euclidean distance)를 최소화하도..."><div class="figure align-default" id="id6">
 <img alt="../_images/sphx_glr_polynomial_tensor_thumb.png" src="../_images/sphx_glr_polynomial_tensor_thumb.png" />
-<figcaption>
-<p><span class="caption-text"><a class="reference internal" href="examples_tensor/polynomial_tensor.html#sphx-glr-beginner-examples-tensor-polynomial-tensor-py"><span class="std std-ref">파이토치(PyTorch): 텐서(Tensor)</span></a></span><a class="headerlink" href="#id6" title="Permalink to this image">¶</a></p>
-</figcaption>
-</figure>
+<p class="caption"><span class="caption-text"><a class="reference internal" href="examples_tensor/polynomial_tensor.html#sphx-glr-beginner-examples-tensor-polynomial-tensor-py"><span class="std std-ref">파이토치(PyTorch): 텐서(Tensor)</span></a></span><a class="headerlink" href="#id6" title="Permalink to this image">¶</a></p>
+</div>
 </div></p>
-<div style='clear:both'></div></section>
-<section id="id4">
+<div style='clear:both'></div></div>
+<div class="section" id="id4">
 <h3><a class="toc-backref" href="#id26">Autograd</a><a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
 <div class="toctree-wrapper compound">
 </div>
-<p><div class="sphx-glr-thumbcontainer" tooltip=":math:`y=\sin(x)` 을 예측할 수 있도록, :math:`-\pi` 부터 :math:`\pi` 까지 유클리드 거리(Euclidean distance)를 최소화하..."><figure class="align-default" id="id7">
+<p><div class="sphx-glr-thumbcontainer" tooltip=":math:`y=\sin(x)` 을 예측할 수 있도록, :math:`-\pi` 부터 :math:`\pi` 까지 유클리드 거리(Euclidean distance)를 최소화하..."><div class="figure align-default" id="id7">
 <img alt="../_images/sphx_glr_polynomial_autograd_thumb.png" src="../_images/sphx_glr_polynomial_autograd_thumb.png" />
-<figcaption>
-<p><span class="caption-text"><a class="reference internal" href="examples_autograd/polynomial_autograd.html#sphx-glr-beginner-examples-autograd-polynomial-autograd-py"><span class="std std-ref">PyTorch: 텐서(Tensor)와 autograd</span></a></span><a class="headerlink" href="#id7" title="Permalink to this image">¶</a></p>
-</figcaption>
-</figure>
+<p class="caption"><span class="caption-text"><a class="reference internal" href="examples_autograd/polynomial_autograd.html#sphx-glr-beginner-examples-autograd-polynomial-autograd-py"><span class="std std-ref">PyTorch: 텐서(Tensor)와 autograd</span></a></span><a class="headerlink" href="#id7" title="Permalink to this image">¶</a></p>
+</div>
 </div></p>
-<p><div class="sphx-glr-thumbcontainer" tooltip=":math:`y=\sin(x)` 을 예측할 수 있도록, :math:`-\pi` 부터 :math:`\pi` 까지 유클리드 거리(Euclidean distance)를 최소화하..."><figure class="align-default" id="id8">
+<p><div class="sphx-glr-thumbcontainer" tooltip=":math:`y=\sin(x)` 을 예측할 수 있도록, :math:`-\pi` 부터 :math:`\pi` 까지 유클리드 거리(Euclidean distance)를 최소화하..."><div class="figure align-default" id="id8">
 <img alt="../_images/sphx_glr_polynomial_custom_function_thumb.png" src="../_images/sphx_glr_polynomial_custom_function_thumb.png" />
-<figcaption>
-<p><span class="caption-text"><a class="reference internal" href="examples_autograd/polynomial_custom_function.html#sphx-glr-beginner-examples-autograd-polynomial-custom-function-py"><span class="std std-ref">PyTorch: 새 autograd Function 정의하기</span></a></span><a class="headerlink" href="#id8" title="Permalink to this image">¶</a></p>
-</figcaption>
-</figure>
+<p class="caption"><span class="caption-text"><a class="reference internal" href="examples_autograd/polynomial_custom_function.html#sphx-glr-beginner-examples-autograd-polynomial-custom-function-py"><span class="std std-ref">PyTorch: 새 autograd Function 정의하기</span></a></span><a class="headerlink" href="#id8" title="Permalink to this image">¶</a></p>
+</div>
 </div></p>
-<div style='clear:both'></div></section>
-<section id="nn-module">
+<div style='clear:both'></div></div>
+<div class="section" id="nn-module">
 <h3><a class="toc-backref" href="#id27"><cite>nn</cite> module</a><a class="headerlink" href="#nn-module" title="Permalink to this headline">¶</a></h3>
 <div class="toctree-wrapper compound">
 </div>
-<p><div class="sphx-glr-thumbcontainer" tooltip=":math:`y=\sin(x)` 을 예측할 수 있도록, :math:`-\pi` 부터 :math:`pi` 까지 유클리드 거리(Euclidean distance)를 최소화하도..."><figure class="align-default" id="id9">
+<p><div class="sphx-glr-thumbcontainer" tooltip=":math:`y=\sin(x)` 을 예측할 수 있도록, :math:`-\pi` 부터 :math:`pi` 까지 유클리드 거리(Euclidean distance)를 최소화하도..."><div class="figure align-default" id="id9">
 <img alt="../_images/sphx_glr_polynomial_nn_thumb.png" src="../_images/sphx_glr_polynomial_nn_thumb.png" />
-<figcaption>
-<p><span class="caption-text"><a class="reference internal" href="examples_nn/polynomial_nn.html#sphx-glr-beginner-examples-nn-polynomial-nn-py"><span class="std std-ref">PyTorch: nn</span></a></span><a class="headerlink" href="#id9" title="Permalink to this image">¶</a></p>
-</figcaption>
-</figure>
+<p class="caption"><span class="caption-text"><a class="reference internal" href="examples_nn/polynomial_nn.html#sphx-glr-beginner-examples-nn-polynomial-nn-py"><span class="std std-ref">PyTorch: nn</span></a></span><a class="headerlink" href="#id9" title="Permalink to this image">¶</a></p>
+</div>
 </div></p>
-<p><div class="sphx-glr-thumbcontainer" tooltip=":math:`y=\sin(x)` 을 예측할 수 있도록, :math:`-\pi` 부터 :math:`pi` 까지 유클리드 거리(Euclidean distance)를 최소화하도..."><figure class="align-default" id="id10">
+<p><div class="sphx-glr-thumbcontainer" tooltip=":math:`y=\sin(x)` 을 예측할 수 있도록, :math:`-\pi` 부터 :math:`pi` 까지 유클리드 거리(Euclidean distance)를 최소화하도..."><div class="figure align-default" id="id10">
 <img alt="../_images/sphx_glr_polynomial_optim_thumb.png" src="../_images/sphx_glr_polynomial_optim_thumb.png" />
-<figcaption>
-<p><span class="caption-text"><a class="reference internal" href="examples_nn/polynomial_optim.html#sphx-glr-beginner-examples-nn-polynomial-optim-py"><span class="std std-ref">PyTorch: optim</span></a></span><a class="headerlink" href="#id10" title="Permalink to this image">¶</a></p>
-</figcaption>
-</figure>
+<p class="caption"><span class="caption-text"><a class="reference internal" href="examples_nn/polynomial_optim.html#sphx-glr-beginner-examples-nn-polynomial-optim-py"><span class="std std-ref">PyTorch: optim</span></a></span><a class="headerlink" href="#id10" title="Permalink to this image">¶</a></p>
+</div>
 </div></p>
-<p><div class="sphx-glr-thumbcontainer" tooltip=":math:`y=\sin(x)` 을 예측할 수 있도록, :math:`-\pi` 부터 :math:`pi` 까지 유클리드 거리(Euclidean distance)를 최소화하도..."><figure class="align-default" id="id11">
+<p><div class="sphx-glr-thumbcontainer" tooltip=":math:`y=\sin(x)` 을 예측할 수 있도록, :math:`-\pi` 부터 :math:`pi` 까지 유클리드 거리(Euclidean distance)를 최소화하도..."><div class="figure align-default" id="id11">
 <img alt="../_images/sphx_glr_polynomial_module_thumb.png" src="../_images/sphx_glr_polynomial_module_thumb.png" />
-<figcaption>
-<p><span class="caption-text"><a class="reference internal" href="examples_nn/polynomial_module.html#sphx-glr-beginner-examples-nn-polynomial-module-py"><span class="std std-ref">PyTorch: 사용자 정의 nn.Module</span></a></span><a class="headerlink" href="#id11" title="Permalink to this image">¶</a></p>
-</figcaption>
-</figure>
+<p class="caption"><span class="caption-text"><a class="reference internal" href="examples_nn/polynomial_module.html#sphx-glr-beginner-examples-nn-polynomial-module-py"><span class="std std-ref">PyTorch: 사용자 정의 nn.Module</span></a></span><a class="headerlink" href="#id11" title="Permalink to this image">¶</a></p>
+</div>
 </div></p>
-<p><div class="sphx-glr-thumbcontainer" tooltip="PyTorch 동적 그래프의 강력함을 보여주기 위해, 매우 이상한 모델을 구현해보겠습니다: 각 순전파 단계에서 4 ~ 5 사이의 임의의 숫자를 선택하여 다차항들에서 사용하..."><figure class="align-default" id="id12">
+<p><div class="sphx-glr-thumbcontainer" tooltip="PyTorch 동적 그래프의 강력함을 보여주기 위해, 매우 이상한 모델을 구현해보겠습니다: 각 순전파 단계에서 4 ~ 5 사이의 임의의 숫자를 선택하여 다차항들에서 사용하..."><div class="figure align-default" id="id12">
 <img alt="../_images/sphx_glr_dynamic_net_thumb.png" src="../_images/sphx_glr_dynamic_net_thumb.png" />
-<figcaption>
-<p><span class="caption-text"><a class="reference internal" href="examples_nn/dynamic_net.html#sphx-glr-beginner-examples-nn-dynamic-net-py"><span class="std std-ref">PyTorch: 제어 흐름(Control Flow) + 가중치 공유(Weight Sharing)</span></a></span><a class="headerlink" href="#id12" title="Permalink to this image">¶</a></p>
-</figcaption>
-</figure>
+<p class="caption"><span class="caption-text"><a class="reference internal" href="examples_nn/dynamic_net.html#sphx-glr-beginner-examples-nn-dynamic-net-py"><span class="std std-ref">PyTorch: 제어 흐름(Control Flow) + 가중치 공유(Weight Sharing)</span></a></span><a class="headerlink" href="#id12" title="Permalink to this image">¶</a></p>
+</div>
 </div></p>
-<div style='clear:both'></div></section>
-</section>
-</section>
+<div style='clear:both'></div></div>
+</div>
+</div>
 
 
              </article>
@@ -1144,7 +1130,7 @@ RMSProp 알고리즘을 사용하겠습니다:</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2021, PyTorch &amp; PyTorch Korea Community.
+        &copy; Copyright 2022, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorch Korea User Group).
 
     </p>
   </div>
@@ -1157,6 +1143,13 @@ RMSProp 알고리즘을 사용하겠습니다:</p>
 </footer>
 
           </div>
+<script>
+if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.indexOf("/prototype/prototype_index")< 1))
+  {
+    var div = '<div class="admonition note"><p class="admonition-title">Note</p><p><i class="fa fa-flask" aria-hidden="true">&nbsp</i> 이 튜토리얼은 프로토타입(prototype) 기능들에 대해서 설명하고 있습니다. 프로토타입 기능은 일반적으로 피드백 및 테스트용으로, 런타임 플래그 없이는 PyPI나 Conda로 배포되는 바이너리에서는 사용할 수 없습니다.</p></div>'
+    document.getElementById("pytorch-article").insertAdjacentHTML('afterBegin', div)
+  }
+</script>
         </div>
 
         <div class="pytorch-content-right" id="pytorch-content-right">
@@ -1227,7 +1220,6 @@ RMSProp 알고리즘을 사용하겠습니다:</p>
       });
   </script>
  
-
 <script>
 //add microsoft link
 
@@ -1306,7 +1298,7 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
 </script>
 
 <script type="text/javascript">
-  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile'];
+  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile', 'Introduction to PyTorch on YouTube', 'Recommendation Systems'];
 </script>
 
 

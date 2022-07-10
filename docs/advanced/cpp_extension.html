@@ -6,24 +6,23 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
 <meta property="og:title" content="Custom C++ and CUDA Extensions" />
   
 <meta property="og:type" content="article" />
   
-<meta property="og:url" content="http://tutorials.pytorch.kr/advanced/cpp_extension.html" />
+<meta property="og:url" content="https://tutorials.pytorch.kr/advanced/cpp_extension.html" />
   
 <meta property="og:description" content="Author: Peter Goldsborough PyTorch provides a plethora of operations related to neural networks, arbitrary tensor algebra, data wrangling and other purposes. However, you may still find yourself in need of a more customized operation. For example, you might want to use a novel activation function..." />
   
-<meta property="og:image" content="http://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
+<meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
   
 <meta property="og:image:alt" content="Custom C++ and CUDA Extensions" />
   
 <meta property="og:ignore_canonical" content="true" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Custom C++ and CUDA Extensions &mdash; 파이토치 한국어 튜토리얼(PyTorch tutorials in Korean)</title>
+  <title>Custom C++ and CUDA Extensions &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
   
 
   
@@ -131,7 +130,7 @@
               
               
                 <div class="version">
-                  1.11.0+cu102
+                  1.12.0+cu102
                 </div>
               
             
@@ -272,6 +271,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/quantized_transfer_learning_tutorial.html">(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="static_quantization_tutorial.html">(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/torchserve_with_ipex.html">Grokking PyTorch Intel CPU performance from first principles</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul>
@@ -298,6 +298,7 @@
 <p class="caption" role="heading"><span class="caption-text">Recommendation Systems</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/torchrec_tutorial.html">Introduction to TorchRec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sharding.html">Exploring TorchRec sharding</a></li>
 </ul>
 
             
@@ -386,13 +387,14 @@
           </div>
 
         
+
           
           <div class="rst-content">
           
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <section id="custom-c-and-cuda-extensions">
+  <div class="section" id="custom-c-and-cuda-extensions">
 <h1>Custom C++ and CUDA Extensions<a class="headerlink" href="#custom-c-and-cuda-extensions" title="Permalink to this headline">¶</a></h1>
 <p><strong>Author</strong>: <a class="reference external" href="https://www.goldsborough.me/">Peter Goldsborough</a></p>
 <p>PyTorch provides a plethora of operations related to neural networks, arbitrary
@@ -419,7 +421,7 @@ Nevertheless, once you have defined your operation as a C++ extension, turning
 it into a native PyTorch function is largely a matter of code organization,
 which you can tackle after the fact if you decide to contribute your operation
 upstream.</p>
-<section id="motivation-and-example">
+<div class="section" id="motivation-and-example">
 <h2>Motivation and Example<a class="headerlink" href="#motivation-and-example" title="Permalink to this headline">¶</a></h2>
 <p>The rest of this note will walk through a practical example of writing and using
 a C++ (and CUDA) extension. If you are being chased or someone will fire you if
@@ -510,14 +512,14 @@ LLTM. We’ll begin by writing it in plain C++, using the <a class="reference ex
 backend, and see how easily it lets us translate our Python code. We’ll then
 speed things up even more by moving parts of the model to CUDA kernel to benefit
 from the massive parallelism GPUs provide.</p>
-</section>
-<section id="writing-a-c-extension">
+</div>
+<div class="section" id="writing-a-c-extension">
 <h2>Writing a C++ Extension<a class="headerlink" href="#writing-a-c-extension" title="Permalink to this headline">¶</a></h2>
 <p>C++ extensions come in two flavors: They can be built “ahead of time” with
 <code class="xref py py-mod docutils literal notranslate"><span class="pre">setuptools</span></code>, or “just in time” via
 <code class="xref py py-func docutils literal notranslate"><span class="pre">torch.utils.cpp_extension.load()</span></code>. We’ll begin with the first approach and
 discuss the latter later.</p>
-<section id="building-with-setuptools">
+<div class="section" id="building-with-setuptools">
 <h3>Building with <code class="xref py py-mod docutils literal notranslate"><span class="pre">setuptools</span></code><a class="headerlink" href="#building-with-setuptools" title="Permalink to this headline">¶</a></h3>
 <p>For the “ahead of time” flavor, we build our C++ extension by writing a
 <code class="docutils literal notranslate"><span class="pre">setup.py</span></code> script that uses setuptools to compile our C++ code. For the LLTM, it
@@ -546,8 +548,8 @@ checks and also manages mixed compilation in the case of mixed C++/CUDA
 extensions. And that’s all we really need to know about building C++ extensions
 for now! Let’s now take a look at the implementation of our C++ extension,
 which goes into <code class="docutils literal notranslate"><span class="pre">lltm.cpp</span></code>.</p>
-</section>
-<section id="writing-the-c-op">
+</div>
+<div class="section" id="writing-the-c-op">
 <h3>Writing the C++ Op<a class="headerlink" href="#writing-the-c-op" title="Permalink to this headline">¶</a></h3>
 <p>Let’s start implementing the LLTM in C++! One function we’ll need for the
 backward pass is the derivative of the sigmoid. This is a small enough piece of
@@ -591,7 +593,7 @@ Example use:</p>
 </div>
 <p>Currently open issue for nvcc bug <a class="reference external" href="https://github.com/pytorch/pytorch/issues/69460">here</a>.
 Complete workaround code example <a class="reference external" href="https://github.com/facebookresearch/pytorch3d/commit/cb170ac024a949f1f9614ffe6af1c38d972f7d48">here</a>.</p>
-<section id="forward-pass">
+<div class="section" id="forward-pass">
 <h4>Forward Pass<a class="headerlink" href="#forward-pass" title="Permalink to this headline">¶</a></h4>
 <p>Next we can port our entire forward pass to C++:</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;vector&gt;</span><span class="cp"></span>
@@ -624,8 +626,8 @@ Complete workaround code example <a class="reference external" href="https://git
 <span class="p">}</span><span class="w"></span>
 </pre></div>
 </div>
-</section>
-<section id="backward-pass">
+</div>
+<div class="section" id="backward-pass">
 <h4>Backward Pass<a class="headerlink" href="#backward-pass" title="Permalink to this headline">¶</a></h4>
 <p>The C++ extension API currently does not provide a way of automatically
 generating a backwards function for us. As such, we have to also implement the
@@ -685,9 +687,9 @@ information on this):</p>
 <span class="p">}</span><span class="w"></span>
 </pre></div>
 </div>
-</section>
-</section>
-<section id="binding-to-python">
+</div>
+</div>
+<div class="section" id="binding-to-python">
 <h3>Binding to Python<a class="headerlink" href="#binding-to-python" title="Permalink to this headline">¶</a></h3>
 <p>Once you have your operation written in C++ and ATen, you can use pybind11 to
 bind your C++ functions or classes into Python in a very simple manner.
@@ -706,8 +708,8 @@ script. In this case, the value of <code class="docutils literal notranslate"><s
 This is to avoid having to maintain the name of the extension in two places
 (the build script and your C++ code), as a mismatch between the two can lead to
 nasty and hard to track issues.</p>
-</section>
-<section id="using-your-extension">
+</div>
+<div class="section" id="using-your-extension">
 <h3>Using Your Extension<a class="headerlink" href="#using-your-extension" title="Permalink to this headline">¶</a></h3>
 <p>We are now set to import our extension in PyTorch. At this point, your directory
 structure could look something like this:</p>
@@ -837,7 +839,7 @@ class citizens of PyTorch:</p>
         <span class="k">return</span> <span class="n">LLTMFunction</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bias</span><span class="p">,</span> <span class="o">*</span><span class="n">state</span><span class="p">)</span>
 </pre></div>
 </div>
-<section id="performance-comparison">
+<div class="section" id="performance-comparison">
 <h4>Performance Comparison<a class="headerlink" href="#performance-comparison" title="Permalink to this headline">¶</a></h4>
 <p>Now that we are able to use and call our C++ code from PyTorch, we can run a
 small benchmark to see how much performance we gained from rewriting our op in
@@ -887,8 +889,8 @@ definitely be improved. Also, PyTorch’s automatic differentiation engine can
 automatically parallelize computation graphs, may use a more efficient flow of
 operations overall, and is also implemented in C++, so it’s expected to be
 fast. Nevertheless, this is a good start.</p>
-</section>
-<section id="performance-on-gpu-devices">
+</div>
+<div class="section" id="performance-on-gpu-devices">
 <h4>Performance on GPU Devices<a class="headerlink" href="#performance-on-gpu-devices" title="Permalink to this headline">¶</a></h4>
 <p>A wonderful fact about PyTorch’s <em>ATen</em> backend is that it abstracts the
 computing device you are running on. This means the same code we wrote for CPU
@@ -944,9 +946,9 @@ running on CUDA devices, we again see performance gains. For Python/PyTorch:</p>
 even more performance out of our C++ code by writing custom CUDA kernels, which
 we’ll dive into soon. Before that, let’s discuss another way of building your C++
 extensions.</p>
-</section>
-</section>
-<section id="jit-compiling-extensions">
+</div>
+</div>
+<div class="section" id="jit-compiling-extensions">
 <h3>JIT Compiling Extensions<a class="headerlink" href="#jit-compiling-extensions" title="Permalink to this headline">¶</a></h3>
 <p>Previously, I mentioned there were two ways of building C++ extensions: using
 <code class="xref py py-mod docutils literal notranslate"><span class="pre">setuptools</span></code> or just in time (JIT). Having covered the former, let’s
@@ -985,9 +987,9 @@ we use the Ninja build system to build your sources, re-compilation is
 incremental and thus re-loading the extension when you run your Python module a
 second time is fast and has low overhead if you didn’t change the extension’s
 source files.</p>
-</section>
-</section>
-<section id="writing-a-mixed-c-cuda-extension">
+</div>
+</div>
+<div class="section" id="writing-a-mixed-c-cuda-extension">
 <h2>Writing a Mixed C++/CUDA extension<a class="headerlink" href="#writing-a-mixed-c-cuda-extension" title="Permalink to this headline">¶</a></h2>
 <p>To really take our implementation to the next level, we can hand-write parts of
 our forward and backward passes with custom CUDA kernels. For the LLTM, this has
@@ -1249,7 +1251,7 @@ help.</p>
 pointwise operations entirely in parallel for each individual component in our
 gate matrices. If you imagine having to do this with a giant <code class="docutils literal notranslate"><span class="pre">for</span></code> loop over
 a million elements in serial, you can see why this would be much faster.</p>
-<section id="using-accessors">
+<div class="section" id="using-accessors">
 <h3>Using accessors<a class="headerlink" href="#using-accessors" title="Permalink to this headline">¶</a></h3>
 <p>You can see in the CUDA kernel that we work directly on pointers with the right
 type. Indeed, working directly with high level type agnostic tensors inside cuda
@@ -1459,8 +1461,8 @@ on it:</p>
 <span class="p">}</span><span class="w"></span>
 </pre></div>
 </div>
-</section>
-<section id="integrating-a-c-cuda-operation-with-pytorch">
+</div>
+<div class="section" id="integrating-a-c-cuda-operation-with-pytorch">
 <h3>Integrating a C++/CUDA Operation with PyTorch<a class="headerlink" href="#integrating-a-c-cuda-operation-with-pytorch" title="Permalink to this headline">¶</a></h3>
 <p>Integration of our CUDA-enabled op with PyTorch is again very straightforward.
 If you want to write a <code class="docutils literal notranslate"><span class="pre">setup.py</span></code> script, it could look like this:</p>
@@ -1489,7 +1491,7 @@ simpler:</p>
 <span class="n">lltm</span> <span class="o">=</span> <span class="n">load</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;lltm&#39;</span><span class="p">,</span> <span class="n">sources</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;lltm_cuda.cpp&#39;</span><span class="p">,</span> <span class="s1">&#39;lltm_cuda_kernel.cu&#39;</span><span class="p">])</span>
 </pre></div>
 </div>
-<section id="id4">
+<div class="section" id="id4">
 <h4>Performance Comparison<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h4>
 <p>Our hope was that parallelizing and fusing the pointwise operations of our code
 with CUDA would improve the performance of our LLTM. Let’s see if that holds
@@ -1503,17 +1505,17 @@ version earlier was the CUDA-based C++ code:</p>
 </pre></div>
 </div>
 <p>More performance increases!</p>
-</section>
-</section>
-</section>
-<section id="conclusion">
+</div>
+</div>
+</div>
+<div class="section" id="conclusion">
 <h2>Conclusion<a class="headerlink" href="#conclusion" title="Permalink to this headline">¶</a></h2>
 <p>You should now be equipped with a good overview of PyTorch’s C++ extension
 mechanism as well as a motivation for using them. You can find the code
 examples displayed in this note <a class="reference external" href="https://github.com/pytorch/extension-cpp">here</a>. If you have questions, please use
 <a class="reference external" href="https://discuss.pytorch.org">the forums</a>. Also be sure to check our <a class="reference external" href="https://pytorch.org/cppdocs/notes/faq.html">FAQ</a> in case you run into any issues.</p>
-</section>
-</section>
+</div>
+</div>
 
 
              </article>
@@ -1550,7 +1552,7 @@ examples displayed in this note <a class="reference external" href="https://gith
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2021, PyTorch &amp; PyTorch Korea Community.
+        &copy; Copyright 2022, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorch Korea User Group).
 
     </p>
   </div>
@@ -1563,6 +1565,13 @@ examples displayed in this note <a class="reference external" href="https://gith
 </footer>
 
           </div>
+<script>
+if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.indexOf("/prototype/prototype_index")< 1))
+  {
+    var div = '<div class="admonition note"><p class="admonition-title">Note</p><p><i class="fa fa-flask" aria-hidden="true">&nbsp</i> 이 튜토리얼은 프로토타입(prototype) 기능들에 대해서 설명하고 있습니다. 프로토타입 기능은 일반적으로 피드백 및 테스트용으로, 런타임 플래그 없이는 PyPI나 Conda로 배포되는 바이너리에서는 사용할 수 없습니다.</p></div>'
+    document.getElementById("pytorch-article").insertAdjacentHTML('afterBegin', div)
+  }
+</script>
         </div>
 
         <div class="pytorch-content-right" id="pytorch-content-right">
@@ -1636,7 +1645,6 @@ examples displayed in this note <a class="reference external" href="https://gith
       });
   </script>
  
-
 <script>
 //add microsoft link
 
@@ -1715,7 +1723,7 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
 </script>
 
 <script type="text/javascript">
-  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile'];
+  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile', 'Introduction to PyTorch on YouTube', 'Recommendation Systems'];
 </script>
 
 

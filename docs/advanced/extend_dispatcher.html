@@ -6,24 +6,23 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
 <meta property="og:title" content="Extending dispatcher for a new backend in C++" />
   
 <meta property="og:type" content="article" />
   
-<meta property="og:url" content="http://tutorials.pytorch.kr/advanced/extend_dispatcher.html" />
+<meta property="og:url" content="https://tutorials.pytorch.kr/advanced/extend_dispatcher.html" />
   
 <meta property="og:description" content="In this tutorial we will walk through all necessary steps to extend the dispatcher to add a new device living outside pytorch/pytorch repo and maintain it to keep in sync with native PyTorch devices. Here we’ll assume that you’re familiar with how to register a dispatched operator in C++ and how ..." />
   
-<meta property="og:image" content="http://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
+<meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
   
 <meta property="og:image:alt" content="Extending dispatcher for a new backend in C++" />
   
 <meta property="og:ignore_canonical" content="true" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Extending dispatcher for a new backend in C++ &mdash; 파이토치 한국어 튜토리얼(PyTorch tutorials in Korean)</title>
+  <title>Extending dispatcher for a new backend in C++ &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
   
 
   
@@ -131,7 +130,7 @@
               
               
                 <div class="version">
-                  1.11.0+cu102
+                  1.12.0+cu102
                 </div>
               
             
@@ -272,6 +271,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/quantized_transfer_learning_tutorial.html">(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="static_quantization_tutorial.html">(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/torchserve_with_ipex.html">Grokking PyTorch Intel CPU performance from first principles</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul>
@@ -298,6 +298,7 @@
 <p class="caption" role="heading"><span class="caption-text">Recommendation Systems</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/torchrec_tutorial.html">Introduction to TorchRec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sharding.html">Exploring TorchRec sharding</a></li>
 </ul>
 
             
@@ -386,13 +387,14 @@
           </div>
 
         
+
           
           <div class="rst-content">
           
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <section id="extending-dispatcher-for-a-new-backend-in-c">
+  <div class="section" id="extending-dispatcher-for-a-new-backend-in-c">
 <h1>Extending dispatcher for a new backend in C++<a class="headerlink" href="#extending-dispatcher-for-a-new-backend-in-c" title="Permalink to this headline">¶</a></h1>
 <p>In this tutorial we will walk through all necessary steps to extend the dispatcher to
 add a new device living outside <code class="docutils literal notranslate"><span class="pre">pytorch/pytorch</span></code> repo and maintain it to keep in
@@ -405,7 +407,7 @@ to <a class="reference external" href="dispatcher">register a dispatched operato
 please expect changes to APIs if you decide to follow this tutorial.  We’ll keep this tutorial
 up to date with the latest APIs.</p>
 </div>
-<section id="what-s-a-new-backend">
+<div class="section" id="what-s-a-new-backend">
 <h2>What’s a new backend?<a class="headerlink" href="#what-s-a-new-backend" title="Permalink to this headline">¶</a></h2>
 <p>Adding a new backend to PyTorch requires a lot of developement and maintainence from backend extenders.
 Before adding a new backend, let’s first consider a few common use cases and recommended solutions for them:</p>
@@ -421,8 +423,8 @@ given the layout/representation limitation, follow this tutorial and add a out-o
 <p>In this tutorial we’ll mainly focus on adding a new out-of-tree device below.  Adding out-of-tree support
 for a different tensor layout might share many common steps with devices, but we haven’t seen an example of
 such integrations yet so it might require addtional work from PyTorch to support it.</p>
-</section>
-<section id="get-a-dispatch-key-for-your-backend">
+</div>
+<div class="section" id="get-a-dispatch-key-for-your-backend">
 <h2>Get a dispatch key for your backend<a class="headerlink" href="#get-a-dispatch-key-for-your-backend" title="Permalink to this headline">¶</a></h2>
 <p>PyTorch operators are implemented in C++ and made available in Python frontend through Python bindings.
 The PyTorch dispatcher divides the implementation of an operator into multiple kernels, each of which is
@@ -458,8 +460,8 @@ One example in pytorch repo is <a class="reference external" href="https://githu
 <p>Once the prototype is done and you plan to do regular releases for your backend extension,  please feel free to
 submit a PR to <code class="docutils literal notranslate"><span class="pre">pytorch/pytorch</span></code> to reserve a dedicated dispath key for your backend.</p>
 </div>
-</section>
-<section id="get-the-full-list-of-pytorch-operators">
+</div>
+<div class="section" id="get-the-full-list-of-pytorch-operators">
 <h2>Get the full list of PyTorch operators<a class="headerlink" href="#get-the-full-list-of-pytorch-operators" title="Permalink to this headline">¶</a></h2>
 <p>PyTorch provides a full list of extensible C++ operators in generated file
 <code class="docutils literal notranslate"><span class="pre">build/aten/src/ATen/RegistrationDeclarations.h</span></code>.
@@ -487,8 +489,8 @@ the dispatcher uses to find an operator.</p></li>
 can do, thus implies whether it’s required for backend extenders to implement the kernel.
 More details can be found in <a class="reference internal" href="#register-kernel"><span class="std std-ref">register kernels for the new backend</span></a>.</p></li>
 </ul>
-</section>
-<section id="register-kernels-for-the-new-backend">
+</div>
+<div class="section" id="register-kernels-for-the-new-backend">
 <span id="register-kernel"></span><h2>Register kernels for the new backend<a class="headerlink" href="#register-kernels-for-the-new-backend" title="Permalink to this headline">¶</a></h2>
 <p>To register your kernels to PyTorch dispatcher, you can use the
 <code class="docutils literal notranslate"><span class="pre">TORCH_LIBRARY_IMPL</span></code> API described in
@@ -533,8 +535,8 @@ in the metadata found in their accompanying comments.</p></li>
 </div></blockquote>
 </li>
 </ul>
-</section>
-<section id="autograd-support-for-the-new-backend">
+</div>
+<div class="section" id="autograd-support-for-the-new-backend">
 <h2>Autograd support for the new backend<a class="headerlink" href="#autograd-support-for-the-new-backend" title="Permalink to this headline">¶</a></h2>
 <p>Gradient formulas are mostly purely mathematical and thus are general for all backends.
 PyTorch often registers a kernel to alias dispatch key Autograd, which means it can be used by all backends.</p>
@@ -601,8 +603,8 @@ you’re using PrivateUse1 for your backend):</p>
 </div>
 <p>With this trick you have full control over both training and inference behavior for <code class="docutils literal notranslate"><span class="pre">my_add</span></code> operator in your backend.
 Here’s <a class="reference external" href="https://github.com/pytorch/xla/blob/r1.7/torch_xla/csrc/aten_autograd_ops.h">an example</a> in the <code class="docutils literal notranslate"><span class="pre">pytorch/xla</span></code> repository.</p>
-</section>
-<section id="build-an-extension">
+</div>
+<div class="section" id="build-an-extension">
 <h2>Build an extension<a class="headerlink" href="#build-an-extension" title="Permalink to this headline">¶</a></h2>
 <p>Out-of-tree backend is supported by adding a C++ extension to PyTorch.
 Once you have kernels and registrations ready, you can build a C++ extension by
@@ -633,8 +635,8 @@ writing a <code class="docutils literal notranslate"><span class="pre">setup.py<
 </div>
 <p>See <a class="reference external" href="https://tutorials.pytorch.kr/advanced/cpp_extension.html#building-with-setuptools">our C++ extension tutorial</a>
 for more details.</p>
-</section>
-<section id="custom-operator-support">
+</div>
+<div class="section" id="custom-operator-support">
 <h2>Custom operator support<a class="headerlink" href="#custom-operator-support" title="Permalink to this headline">¶</a></h2>
 <p>Your new backend should work seamlessly with
 <a class="reference external" href="https://pytorch.org/docs/stable/notes/extending.html">customized operators extended in python</a>
@@ -647,16 +649,16 @@ To support these operators, backend extenders will need to write a C++ kernel fo
 register it to the corresponding namespace in the dispatcher similar to supporting PyTorch native operators.
 Alternatively you could also add a customized API in your extension e.g <code class="docutils literal notranslate"><span class="pre">torch_xla.core.functions.nms</span></code> for
 these adhoc requests.</p>
-</section>
-<section id="jit-support">
+</div>
+<div class="section" id="jit-support">
 <h2>JIT support<a class="headerlink" href="#jit-support" title="Permalink to this headline">¶</a></h2>
 <p>As we mentioned in <a class="reference external" href="dispatcher">Registering a Dispatched Operator in C++</a>, kernels registered through <cite>m.impl()</cite> API
 support being called in both unboxed and boxed ways. In other words your customized backend can also work with our
 JIT tracing/scripting frontend just like the in-tree backends like CPU or CUDA do.  You could potentially also write specialized optimization
 passes for your backend on a JIT graph.  But we will not discuss it here since we haven’t finalized the integration point
 in JIT, so the current backend support will focus on the eager frontend for now.</p>
-</section>
-<section id="testing-your-backend-against-native-pytorch-backends">
+</div>
+<div class="section" id="testing-your-backend-against-native-pytorch-backends">
 <h2>Testing your backend against native PyTorch backends<a class="headerlink" href="#testing-your-backend-against-native-pytorch-backends" title="Permalink to this headline">¶</a></h2>
 <p>PyTorch lets tests run on multiple device types using its <a class="reference external" href="https://github.com/pytorch/pytorch/blob/master/torch/testing/_internal/common_device_type.py">generic device type testing framework</a>.
 You can find details about <a class="reference external" href="https://github.com/pytorch/pytorch/blob/5a8198eb3c594aa18352930fd21f3c25bd7b7100/torch/testing/_internal/common_device_type.py#L23">how tests use it</a>
@@ -672,8 +674,8 @@ PyTorch is XLA.  See <a class="reference external" href="https://github.com/pyto
 which contains examples of block listing tests, block listing dtypes, and overriding test precision.</p>
 <p>The generic device type testing framework is actively developed. To request a feature please file an
 issue on PyTorch’s Github.</p>
-</section>
-<section id="backward-compatibility">
+</div>
+<div class="section" id="backward-compatibility">
 <h2>Backward Compatibility<a class="headerlink" href="#backward-compatibility" title="Permalink to this headline">¶</a></h2>
 <p>Currently PyTorch can’t guarantee backward compatibility for registered operators.
 Operators, as well as their schemas, might be added/modified/deleted as needed.  Registered
@@ -684,8 +686,8 @@ to match PyTorch’s new signature.</p>
 releases to minimize interruptions in development.  PyTorch is on a quarterly release cadence.
 Backend extenders should join the <em>#announcement</em> channel at <a class="reference external" href="http://pytorch.slack.com/">pytorch.slack.com</a>
 to get latest updates on releases.</p>
-</section>
-<section id="known-issues-additional-notes">
+</div>
+<div class="section" id="known-issues-additional-notes">
 <h2>Known issues &amp; additional notes<a class="headerlink" href="#known-issues-additional-notes" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Not all test suites are device generic yet. Extensible test classes can be found by searching
@@ -701,8 +703,8 @@ base tensor and vice versa.</p></li>
 Optimizers, e.g. need to carry the states to be updated in backward like torch-xla. Such use cases
 currently can only be done through adding customized API or monkey patching in out-of-tree repository.</p></li>
 </ul>
-</section>
-<section id="future-work">
+</div>
+<div class="section" id="future-work">
 <h2>Future Work<a class="headerlink" href="#future-work" title="Permalink to this headline">¶</a></h2>
 <p>Making every component in PyTorch extensible for an out-of-tree backend seamless
 requires a lot of changes to PyTorch internals.  Here are a few items that we’re
@@ -717,15 +719,15 @@ PyTorch’s codegen as much as possible.</p></li>
 result back to the customized backend. This will allow “full” operator coverage even
 though you don’t have kernels written for every operator.</p></li>
 </ul>
-</section>
-<section id="stay-in-touch">
+</div>
+<div class="section" id="stay-in-touch">
 <h2>Stay in touch<a class="headerlink" href="#stay-in-touch" title="Permalink to this headline">¶</a></h2>
 <p>Please use <a class="reference external" href="https://dev-discuss.pytorch.org/">PyTorch dev discussions</a> for questions and discussions. If you have
 any feature requests or bug reports, please <a class="reference external" href="https://github.com/pytorch/pytorch/issues">file an issue on github</a>.</p>
 <p>If you’re interested in helping in any of the future work items above (e.g adding more <code class="docutils literal notranslate"><span class="pre">Math</span></code>
 kernels for PyTorch operators in C++), please reach out to us through Github or Slack!</p>
-</section>
-</section>
+</div>
+</div>
 
 
              </article>
@@ -762,7 +764,7 @@ kernels for PyTorch operators in C++), please reach out to us through Github or 
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2021, PyTorch &amp; PyTorch Korea Community.
+        &copy; Copyright 2022, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorch Korea User Group).
 
     </p>
   </div>
@@ -775,6 +777,13 @@ kernels for PyTorch operators in C++), please reach out to us through Github or 
 </footer>
 
           </div>
+<script>
+if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.indexOf("/prototype/prototype_index")< 1))
+  {
+    var div = '<div class="admonition note"><p class="admonition-title">Note</p><p><i class="fa fa-flask" aria-hidden="true">&nbsp</i> 이 튜토리얼은 프로토타입(prototype) 기능들에 대해서 설명하고 있습니다. 프로토타입 기능은 일반적으로 피드백 및 테스트용으로, 런타임 플래그 없이는 PyPI나 Conda로 배포되는 바이너리에서는 사용할 수 없습니다.</p></div>'
+    document.getElementById("pytorch-article").insertAdjacentHTML('afterBegin', div)
+  }
+</script>
         </div>
 
         <div class="pytorch-content-right" id="pytorch-content-right">
@@ -835,7 +844,6 @@ kernels for PyTorch operators in C++), please reach out to us through Github or 
       });
   </script>
  
-
 <script>
 //add microsoft link
 
@@ -914,7 +922,7 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
 </script>
 
 <script type="text/javascript">
-  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile'];
+  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile', 'Introduction to PyTorch on YouTube', 'Recommendation Systems'];
 </script>
 
 

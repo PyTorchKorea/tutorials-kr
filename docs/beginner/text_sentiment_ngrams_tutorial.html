@@ -6,24 +6,23 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
 <meta property="og:title" content="torchtext 라이브러리로 텍스트 분류하기" />
   
 <meta property="og:type" content="article" />
   
-<meta property="og:url" content="http://tutorials.pytorch.kr/beginner/text_sentiment_ngrams_tutorial.html" />
+<meta property="og:url" content="https://tutorials.pytorch.kr/beginner/text_sentiment_ngrams_tutorial.html" />
   
 <meta property="og:description" content="번역: 김강민, 김진현 이 튜토리얼에서는 torchtext 라이브러리를 사용하여 어떻게 텍스트 분류 분석을 위한 데이터셋을 만드는지를 살펴보겠습니다. 다음과 같은 내용들을 알게 됩니다: 반복자(iterator)로 가공되지 않은 데이터(raw data)에 접근하기, 가공되지 않은 텍스트 문장들을 모델 학습에 사용할 수 있는 torch.Tensor 로 변환하는 데이터 처리 파이프라인 만들기, torch.utils.data.DataLoader 를 사용하여 데이터를 섞고 반복하기(shuffle and iterate). 기초 데이터셋 ..." />
   
-<meta property="og:image" content="http://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
+<meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
   
 <meta property="og:image:alt" content="torchtext 라이브러리로 텍스트 분류하기" />
   
 <meta property="og:ignore_canonical" content="true" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchtext 라이브러리로 텍스트 분류하기 &mdash; 파이토치 한국어 튜토리얼(PyTorch tutorials in Korean)</title>
+  <title>torchtext 라이브러리로 텍스트 분류하기 &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
   
 
   
@@ -131,7 +130,7 @@
               
               
                 <div class="version">
-                  1.11.0+cu102
+                  1.12.0+cu102
                 </div>
               
             
@@ -272,6 +271,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/quantized_transfer_learning_tutorial.html">(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/static_quantization_tutorial.html">(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/torchserve_with_ipex.html">Grokking PyTorch Intel CPU performance from first principles</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul>
@@ -298,6 +298,7 @@
 <p class="caption" role="heading"><span class="caption-text">Recommendation Systems</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/torchrec_tutorial.html">Introduction to TorchRec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/sharding.html">Exploring TorchRec sharding</a></li>
 </ul>
 
             
@@ -386,6 +387,7 @@
           </div>
 
         
+
           
           <div class="rst-content">
           
@@ -396,7 +398,7 @@
 <p class="admonition-title">Note</p>
 <p>Click <a class="reference internal" href="#sphx-glr-download-beginner-text-sentiment-ngrams-tutorial-py"><span class="std std-ref">here</span></a> to download the full example code</p>
 </div>
-<section class="sphx-glr-example-title" id="torchtext">
+<div class="sphx-glr-example-title section" id="torchtext">
 <span id="sphx-glr-beginner-text-sentiment-ngrams-tutorial-py"></span><h1>torchtext 라이브러리로 텍스트 분류하기<a class="headerlink" href="#torchtext" title="Permalink to this headline">¶</a></h1>
 <p><strong>번역</strong>: <a class="reference external" href="https://github.com/gangsss">김강민</a> , <a class="reference external" href="https://github.com/lewha0">김진현</a></p>
 <p>이 튜토리얼에서는 torchtext 라이브러리를 사용하여 어떻게 텍스트 분류 분석을 위한 데이터셋을 만드는지를 살펴보겠습니다.
@@ -408,7 +410,7 @@
 <li><p><a class="reference external" href="https://pytorch.org/docs/stable/data.html?highlight=dataloader#torch.utils.data.DataLoader">torch.utils.data.DataLoader</a> 를 사용하여 데이터를 섞고 반복하기(shuffle and iterate)</p></li>
 </ul>
 </div></blockquote>
-<section id="raw-data-iterator">
+<div class="section" id="raw-data-iterator">
 <h2>기초 데이터셋 반복자(raw data iterator)에 접근하기<a class="headerlink" href="#raw-data-iterator" title="Permalink to this headline">¶</a></h2>
 <p>torchtext 라이브러리는 가공되지 않은 텍스트 문장들을 만드는(yield) 몇 가지 기초 데이터셋 반복자(raw dataset iterator)를 제공합니다.
 예를 들어, <code class="docutils literal notranslate"><span class="pre">AG_NEWS</span></code> 데이터셋 반복자는 레이블(label)과 문장의 튜플(tuple) 형태로 가공되지 않은 데이터를 만듭니다.</p>
@@ -438,8 +440,8 @@
 <span class="n">building</span> <span class="n">blocks</span> <span class="n">of</span> <span class="n">proteins</span><span class="o">.</span><span class="s1">&#39;)</span>
 </pre></div>
 </div>
-</section>
-<section id="id3">
+</div>
+<div class="section" id="id3">
 <h2>데이터 처리 파이프라인 준비하기<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
 <p>어휘집(vocab), 단어 벡터(word vector), 토크나이저(tokenizer)를 포함하여 torchtext 라이브러리의 가장 기본적인 구성요소를 재검토했습니다.
 이들은 가공되지 않은 텍스트 문자열에 대한 기본적인 데이터 처리 빌딩 블록(data processing building block)입니다.</p>
@@ -480,8 +482,8 @@
 <span class="o">&gt;&gt;&gt;</span> <span class="mi">9</span>
 </pre></div>
 </div>
-</section>
-<section id="batch">
+</div>
+<div class="section" id="batch">
 <h2>데이터 배치(batch)와 반복자 생성하기<a class="headerlink" href="#batch" title="Permalink to this headline">¶</a></h2>
 <p><a class="reference external" href="https://pytorch.org/docs/stable/data.html?highlight=dataloader#torch.utils.data.DataLoader">torch.utils.data.DataLoader</a> 를
 권장합니다. (튜토리얼은 <a class="reference external" href="https://tutorials.pytorch.kr/beginner/data_loading_tutorial.html">여기</a> 있습니다.)
@@ -513,8 +515,8 @@
 <span class="n">dataloader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">train_iter</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">collate_fn</span><span class="o">=</span><span class="n">collate_batch</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-<section id="id4">
+</div>
+<div class="section" id="id4">
 <h2>모델 정의하기<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
 <p>모델은
 <a class="reference external" href="https://pytorch.org/docs/stable/nn.html?highlight=embeddingbag#torch.nn.EmbeddingBag">nn.EmbeddingBag</a>
@@ -547,8 +549,8 @@ tensor들의 시퀀스를 처리할 때 성능 및 메모리 효율성 측면에
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fc</span><span class="p">(</span><span class="n">embedded</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-<section id="id5">
+</div>
+<div class="section" id="id5">
 <h2>인스턴스 생성하기<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">AG_NEWS</span></code> 데이터셋에는 4종류의 레이블이 존재하므로 클래스의 개수도 4개입니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">1</span> <span class="p">:</span> <span class="n">World</span> <span class="p">(</span><span class="n">세계</span><span class="p">)</span>
@@ -567,8 +569,8 @@ tensor들의 시퀀스를 처리할 때 성능 및 메모리 효율성 측면에
 <span class="n">model</span> <span class="o">=</span> <span class="n">TextClassificationModel</span><span class="p">(</span><span class="n">vocab_size</span><span class="p">,</span> <span class="n">emsize</span><span class="p">,</span> <span class="n">num_class</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-<section id="id6">
+</div>
+<div class="section" id="id6">
 <h2>모델을 학습하고 결과를 평가하는 함수 정의하기<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
 
@@ -607,8 +609,8 @@ tensor들의 시퀀스를 처리할 때 성능 및 메모리 효율성 측면에
     <span class="k">return</span> <span class="n">total_acc</span><span class="o">/</span><span class="n">total_count</span>
 </pre></div>
 </div>
-</section>
-<section id="id7">
+</div>
+<div class="section" id="id7">
 <h2>데이터셋을 분할하고 모델 수행하기<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h2>
 <p>원본 <code class="docutils literal notranslate"><span class="pre">AG_NEWS</span></code> 에는 검증용 데이터가 포함되어 있지 않기 때문에, 우리는 학습
 데이터를 학습 및 검증 데이터로 분할하려 합니다. 이때 데이터를 분할하는
@@ -666,70 +668,70 @@ optimizer는 확률적 경사 하강법를 구현해놓은 것입니다. 처음�
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>| epoch   1 |   500/ 1782 batches | accuracy    0.699
-| epoch   1 |  1000/ 1782 batches | accuracy    0.858
-| epoch   1 |  1500/ 1782 batches | accuracy    0.877
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>| epoch   1 |   500/ 1782 batches | accuracy    0.682
+| epoch   1 |  1000/ 1782 batches | accuracy    0.857
+| epoch   1 |  1500/ 1782 batches | accuracy    0.873
 -----------------------------------------------------------
-| end of epoch   1 | time:  8.23s | valid accuracy    0.887
+| end of epoch   1 | time:  8.54s | valid accuracy    0.891
 -----------------------------------------------------------
-| epoch   2 |   500/ 1782 batches | accuracy    0.896
-| epoch   2 |  1000/ 1782 batches | accuracy    0.898
+| epoch   2 |   500/ 1782 batches | accuracy    0.897
+| epoch   2 |  1000/ 1782 batches | accuracy    0.900
 | epoch   2 |  1500/ 1782 batches | accuracy    0.902
 -----------------------------------------------------------
-| end of epoch   2 | time:  8.20s | valid accuracy    0.898
+| end of epoch   2 | time:  8.69s | valid accuracy    0.899
 -----------------------------------------------------------
-| epoch   3 |   500/ 1782 batches | accuracy    0.913
-| epoch   3 |  1000/ 1782 batches | accuracy    0.918
-| epoch   3 |  1500/ 1782 batches | accuracy    0.916
+| epoch   3 |   500/ 1782 batches | accuracy    0.916
+| epoch   3 |  1000/ 1782 batches | accuracy    0.912
+| epoch   3 |  1500/ 1782 batches | accuracy    0.915
 -----------------------------------------------------------
-| end of epoch   3 | time:  8.01s | valid accuracy    0.903
+| end of epoch   3 | time:  8.64s | valid accuracy    0.905
 -----------------------------------------------------------
-| epoch   4 |   500/ 1782 batches | accuracy    0.924
-| epoch   4 |  1000/ 1782 batches | accuracy    0.925
-| epoch   4 |  1500/ 1782 batches | accuracy    0.924
+| epoch   4 |   500/ 1782 batches | accuracy    0.925
+| epoch   4 |  1000/ 1782 batches | accuracy    0.924
+| epoch   4 |  1500/ 1782 batches | accuracy    0.920
 -----------------------------------------------------------
-| end of epoch   4 | time:  8.03s | valid accuracy    0.903
+| end of epoch   4 | time:  8.65s | valid accuracy    0.897
 -----------------------------------------------------------
-| epoch   5 |   500/ 1782 batches | accuracy    0.931
-| epoch   5 |  1000/ 1782 batches | accuracy    0.931
-| epoch   5 |  1500/ 1782 batches | accuracy    0.927
+| epoch   5 |   500/ 1782 batches | accuracy    0.937
+| epoch   5 |  1000/ 1782 batches | accuracy    0.937
+| epoch   5 |  1500/ 1782 batches | accuracy    0.936
 -----------------------------------------------------------
-| end of epoch   5 | time:  7.97s | valid accuracy    0.904
+| end of epoch   5 | time:  8.64s | valid accuracy    0.910
 -----------------------------------------------------------
-| epoch   6 |   500/ 1782 batches | accuracy    0.936
-| epoch   6 |  1000/ 1782 batches | accuracy    0.937
-| epoch   6 |  1500/ 1782 batches | accuracy    0.932
+| epoch   6 |   500/ 1782 batches | accuracy    0.940
+| epoch   6 |  1000/ 1782 batches | accuracy    0.938
+| epoch   6 |  1500/ 1782 batches | accuracy    0.937
 -----------------------------------------------------------
-| end of epoch   6 | time:  8.12s | valid accuracy    0.905
+| end of epoch   6 | time:  8.62s | valid accuracy    0.911
 -----------------------------------------------------------
-| epoch   7 |   500/ 1782 batches | accuracy    0.941
-| epoch   7 |  1000/ 1782 batches | accuracy    0.937
-| epoch   7 |  1500/ 1782 batches | accuracy    0.941
+| epoch   7 |   500/ 1782 batches | accuracy    0.939
+| epoch   7 |  1000/ 1782 batches | accuracy    0.938
+| epoch   7 |  1500/ 1782 batches | accuracy    0.939
 -----------------------------------------------------------
-| end of epoch   7 | time:  7.97s | valid accuracy    0.909
+| end of epoch   7 | time:  8.63s | valid accuracy    0.913
 -----------------------------------------------------------
-| epoch   8 |   500/ 1782 batches | accuracy    0.946
-| epoch   8 |  1000/ 1782 batches | accuracy    0.941
-| epoch   8 |  1500/ 1782 batches | accuracy    0.941
+| epoch   8 |   500/ 1782 batches | accuracy    0.942
+| epoch   8 |  1000/ 1782 batches | accuracy    0.938
+| epoch   8 |  1500/ 1782 batches | accuracy    0.939
 -----------------------------------------------------------
-| end of epoch   8 | time:  9.90s | valid accuracy    0.910
+| end of epoch   8 | time:  8.61s | valid accuracy    0.911
 -----------------------------------------------------------
-| epoch   9 |   500/ 1782 batches | accuracy    0.949
-| epoch   9 |  1000/ 1782 batches | accuracy    0.944
-| epoch   9 |  1500/ 1782 batches | accuracy    0.946
+| epoch   9 |   500/ 1782 batches | accuracy    0.941
+| epoch   9 |  1000/ 1782 batches | accuracy    0.942
+| epoch   9 |  1500/ 1782 batches | accuracy    0.942
 -----------------------------------------------------------
-| end of epoch   9 | time:  8.36s | valid accuracy    0.907
+| end of epoch   9 | time:  8.59s | valid accuracy    0.911
 -----------------------------------------------------------
-| epoch  10 |   500/ 1782 batches | accuracy    0.957
-| epoch  10 |  1000/ 1782 batches | accuracy    0.960
-| epoch  10 |  1500/ 1782 batches | accuracy    0.958
+| epoch  10 |   500/ 1782 batches | accuracy    0.941
+| epoch  10 |  1000/ 1782 batches | accuracy    0.943
+| epoch  10 |  1500/ 1782 batches | accuracy    0.940
 -----------------------------------------------------------
-| end of epoch  10 | time:  8.33s | valid accuracy    0.909
+| end of epoch  10 | time:  8.62s | valid accuracy    0.911
 -----------------------------------------------------------
 </pre></div>
 </div>
-</section>
-<section id="id8">
+</div>
+<div class="section" id="id8">
 <h2>평가 데이터로 모델 평가하기<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h2>
 <p>평가 데이터셋을 통한 결과를 확인합니다…</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Checking the results of test dataset.&#39;</span><span class="p">)</span>
@@ -739,11 +741,11 @@ optimizer는 확률적 경사 하강법를 구현해놓은 것입니다. 처음�
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Checking the results of test dataset.
-test accuracy    0.909
+test accuracy    0.908
 </pre></div>
 </div>
-</section>
-<section id="id9">
+</div>
+<div class="section" id="id9">
 <h2>임의의 뉴스로 평가하기<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h2>
 <p>현재까지 최고의 모델로 골프 뉴스를 테스트해보겠습니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ag_news_label</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="p">:</span> <span class="s2">&quot;World&quot;</span><span class="p">,</span>
@@ -778,7 +780,7 @@ test accuracy    0.909
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>This is a Sports news
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 1 minutes  46.379 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 1 minutes  39.399 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-beginner-text-sentiment-ngrams-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/f003f262713c341f497ab4d8dd9be880/text_sentiment_ngrams_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">text_sentiment_ngrams_tutorial.py</span></code></a></p>
@@ -788,8 +790,8 @@ test accuracy    0.909
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
-</section>
-</section>
+</div>
+</div>
 
 
              </article>
@@ -826,7 +828,7 @@ test accuracy    0.909
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2021, PyTorch &amp; PyTorch Korea Community.
+        &copy; Copyright 2022, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorch Korea User Group).
 
     </p>
   </div>
@@ -839,6 +841,13 @@ test accuracy    0.909
 </footer>
 
           </div>
+<script>
+if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.indexOf("/prototype/prototype_index")< 1))
+  {
+    var div = '<div class="admonition note"><p class="admonition-title">Note</p><p><i class="fa fa-flask" aria-hidden="true">&nbsp</i> 이 튜토리얼은 프로토타입(prototype) 기능들에 대해서 설명하고 있습니다. 프로토타입 기능은 일반적으로 피드백 및 테스트용으로, 런타임 플래그 없이는 PyPI나 Conda로 배포되는 바이너리에서는 사용할 수 없습니다.</p></div>'
+    document.getElementById("pytorch-article").insertAdjacentHTML('afterBegin', div)
+  }
+</script>
         </div>
 
         <div class="pytorch-content-right" id="pytorch-content-right">
@@ -895,7 +904,6 @@ test accuracy    0.909
       });
   </script>
  
-
 <script>
 //add microsoft link
 
@@ -974,7 +982,7 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
 </script>
 
 <script type="text/javascript">
-  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile'];
+  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile', 'Introduction to PyTorch on YouTube', 'Recommendation Systems'];
 </script>
 
 

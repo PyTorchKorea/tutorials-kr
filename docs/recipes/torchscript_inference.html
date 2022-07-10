@@ -6,24 +6,23 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
 <meta property="og:title" content="TorchScript로 배포하기" />
   
 <meta property="og:type" content="article" />
   
-<meta property="og:url" content="http://tutorials.pytorch.kr/recipes/torchscript_inference.html" />
+<meta property="og:url" content="https://tutorials.pytorch.kr/recipes/torchscript_inference.html" />
   
 <meta property="og:description" content="이 레시피에서는 다음 내용을 알아봅니다: TorchScript란?, 학습된 모델을 TorchScript 형식으로 내보내기, TorchScript 모델을 C++로 불러오고 추론하기. 요구 사항: PyTorch 1.5, TorchVision 0.6.0, libtorch 1.5, C++ 컴파일러. 3가지 PyTorch 컴포넌트를 설치하는 방법은` pytorch.org`_에서 확인할 수 있습니다. C++ 컴파일러는 당신의 플랫폼에 따라 달라집니다. TorchScript란?: TorchScript**는 C++ 같은 고성능 환경에서 실행..." />
   
-<meta property="og:image" content="http://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
+<meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
   
 <meta property="og:image:alt" content="TorchScript로 배포하기" />
   
 <meta property="og:ignore_canonical" content="true" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>TorchScript로 배포하기 &mdash; 파이토치 한국어 튜토리얼(PyTorch tutorials in Korean)</title>
+  <title>TorchScript로 배포하기 &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
   
 
   
@@ -131,7 +130,7 @@
               
               
                 <div class="version">
-                  1.11.0+cu102
+                  1.12.0+cu102
                 </div>
               
             
@@ -272,6 +271,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/quantized_transfer_learning_tutorial.html">(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/static_quantization_tutorial.html">(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/torchserve_with_ipex.html">Grokking PyTorch Intel CPU performance from first principles</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul>
@@ -298,6 +298,7 @@
 <p class="caption" role="heading"><span class="caption-text">Recommendation Systems</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/torchrec_tutorial.html">Introduction to TorchRec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/sharding.html">Exploring TorchRec sharding</a></li>
 </ul>
 
             
@@ -388,13 +389,14 @@
           </div>
 
         
+
           
           <div class="rst-content">
           
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <section id="torchscript">
+  <div class="section" id="torchscript">
 <h1>TorchScript로 배포하기<a class="headerlink" href="#torchscript" title="Permalink to this headline">¶</a></h1>
 <p>이 레시피에서는 다음 내용을 알아봅니다:</p>
 <ul class="simple">
@@ -402,7 +404,7 @@
 <li><p>학습된 모델을 TorchScript 형식으로 내보내기</p></li>
 <li><p>TorchScript 모델을 C++로 불러오고 추론하기</p></li>
 </ul>
-<section id="id1">
+<div class="section" id="id1">
 <h2>요구 사항<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>PyTorch 1.5</p></li>
@@ -412,13 +414,13 @@
 </ul>
 <p>3가지 PyTorch 컴포넌트를 설치하는 방법은 <a href="#id2"><span class="problematic" id="id3">`</span></a>pytorch.org`_에서 확인할 수 있습니다.
 C++ 컴파일러는 당신의 플랫폼에 따라 달라집니다.</p>
-</section>
-<section id="id4">
+</div>
+<div class="section" id="id4">
 <h2>TorchScript란?<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
 <p><strong>TorchScript**는 C++ 같은 고성능 환경에서 실행할 수 있는 PyTorch 모델의 중간 표현(``nn.Module``의 하위 클래스)입니다. Python의 고성능 하위 집합이며 모델 연산의 런타임 최적화를 수행하는 **PyTorch JIT Compiler,</strong> 에서 사용됩니다. TorchScript는 PyTorch 모델에서 스케일 추론을 수행할 때 권장되는 모델 형식입니다. 자세한 내용은 <a href="#id8"><span class="problematic" id="id9">`pytorch.org`_에 있는 `Introduction to TorchScript
 tutorial`_</span></a>, <a class="reference external" href="https://tutorials.pytorch.kr/advanced/cpp_export.html">Loading A TorchScript Model in C++ tutorial</a>, <a class="reference external" href="https://pytorch.org/docs/stable/jit.html">full TorchScript documentation</a> 에서 확인하세요.</p>
-</section>
-<section id="id5">
+</div>
+<div class="section" id="id5">
 <h2>모델 내보내기<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h2>
 <p>사전 학습된 시각 모델을 살펴봅시다. TorchVision의 모든 사전 학습 모델은 TorchScript와 호환됩니다.</p>
 <p>스크립트나 REPL에서 다음의 Python 3 코드를 실행하세요:</p>
@@ -453,8 +455,8 @@ tutorial`_</span></a>, <a class="reference external" href="https://tutorials.pyt
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">r18_scripted</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;r18_scripted.pt&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-<section id="c-torchscript">
+</div>
+<div class="section" id="c-torchscript">
 <h2>C++로 TorchScript 모델 불러오기<a class="headerlink" href="#c-torchscript" title="Permalink to this headline">¶</a></h2>
 <p>다음과 같은 C++ 파일을 만들고 파일명을 <code class="docutils literal notranslate"><span class="pre">ts-infer.cpp</span></code> 라고 짓습니다.</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;torch/script.h&gt;</span><span class="cp"></span>
@@ -510,8 +512,8 @@ tutorial`_</span></a>, <a class="reference external" href="https://tutorials.pyt
 <li><p>입력에 대한 추론 수행하기</p></li>
 </ul>
 <p>또한, 이 코드에는 TorchVision에 대한 종속성이 없다는 것에 유의하세요. 저장된 TorchScript 모델에는 학습 가중치와 연산 그래프가 있으며 다른 것은 필요하지 않습니다.</p>
-</section>
-<section id="c">
+</div>
+<div class="section" id="c">
 <h2>C++ 추론 엔진 빌드하고 실행하기<a class="headerlink" href="#c" title="Permalink to this headline">¶</a></h2>
 <p>다음과 같은 <code class="docutils literal notranslate"><span class="pre">CMakeLists.txt</span></code> 파일을 생성합니다:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cmake_minimum_required</span><span class="p">(</span><span class="n">VERSION</span> <span class="mf">3.0</span> <span class="n">FATAL_ERROR</span><span class="p">)</span>
@@ -543,16 +545,16 @@ Model loaded successfully
 DONE
 </pre></div>
 </div>
-</section>
-<section id="id6">
+</div>
+<div class="section" id="id6">
 <h2>중요 참고자료<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p><a class="reference external" href="https://pytorch.org/">pytorch.org</a> 에서 설치 방법과 추가 문서 및 튜토리얼들을 확인할 수 있습니다.</p></li>
 <li><p><a class="reference external" href="https://tutorials.pytorch.kr/beginner/Intro_to_TorchScript_tutorial.html">Introduction to TorchScript tutorial</a> 에서 더 심화된 TorchScript 기초 설명을 확인할 수 있습니다.</p></li>
 <li><p><a class="reference external" href="https://pytorch.org/docs/stable/jit.html">Full TorchScript documentation</a> 에서 전체 TorchScript 언어 및 API를 참조할 수 있습니다.</p></li>
 </ul>
-</section>
-</section>
+</div>
+</div>
 
 
              </article>
@@ -589,7 +591,7 @@ DONE
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2021, PyTorch &amp; PyTorch Korea Community.
+        &copy; Copyright 2022, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorch Korea User Group).
 
     </p>
   </div>
@@ -602,6 +604,13 @@ DONE
 </footer>
 
           </div>
+<script>
+if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.indexOf("/prototype/prototype_index")< 1))
+  {
+    var div = '<div class="admonition note"><p class="admonition-title">Note</p><p><i class="fa fa-flask" aria-hidden="true">&nbsp</i> 이 튜토리얼은 프로토타입(prototype) 기능들에 대해서 설명하고 있습니다. 프로토타입 기능은 일반적으로 피드백 및 테스트용으로, 런타임 플래그 없이는 PyPI나 Conda로 배포되는 바이너리에서는 사용할 수 없습니다.</p></div>'
+    document.getElementById("pytorch-article").insertAdjacentHTML('afterBegin', div)
+  }
+</script>
         </div>
 
         <div class="pytorch-content-right" id="pytorch-content-right">
@@ -655,7 +664,6 @@ DONE
       });
   </script>
  
-
 <script>
 //add microsoft link
 
@@ -734,7 +742,7 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
 </script>
 
 <script type="text/javascript">
-  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile'];
+  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile', 'Introduction to PyTorch on YouTube', 'Recommendation Systems'];
 </script>
 
 

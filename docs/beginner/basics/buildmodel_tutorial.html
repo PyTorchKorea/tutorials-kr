@@ -6,24 +6,23 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
 <meta property="og:title" content="신경망 모델 구성하기" />
   
 <meta property="og:type" content="article" />
   
-<meta property="og:url" content="http://tutorials.pytorch.kr/beginner/basics/buildmodel_tutorial.html" />
+<meta property="og:url" content="https://tutorials.pytorch.kr/beginner/basics/buildmodel_tutorial.html" />
   
 <meta property="og:description" content="파이토치(PyTorch) 기본 익히기|| 빠른 시작|| 텐서(Tensor)|| Dataset과 Dataloader|| 변형(Transform)|| 신경망 모델 구성하기|| Autograd|| 최적화(Optimization)|| 모델 저장하고 불러오기 신경망은 데이터에 대한 연산을 수행하는 계층(layer)/모듈(module)로 구성되어 있습니다. torch.nn 네임스페이스는 신경망을 구성하는데 필요한 모든 구성 요소를 제공합니다. PyTorch의 모든 모듈은 nn.Module 의 하위 클래스(subclass) 입니다. 신경망..." />
   
-<meta property="og:image" content="http://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
+<meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
   
 <meta property="og:image:alt" content="신경망 모델 구성하기" />
   
 <meta property="og:ignore_canonical" content="true" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>신경망 모델 구성하기 &mdash; 파이토치 한국어 튜토리얼(PyTorch tutorials in Korean)</title>
+  <title>신경망 모델 구성하기 &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
   
 
   
@@ -131,7 +130,7 @@
               
               
                 <div class="version">
-                  1.11.0+cu102
+                  1.12.0+cu102
                 </div>
               
             
@@ -272,6 +271,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/quantized_transfer_learning_tutorial.html">(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../advanced/static_quantization_tutorial.html">(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../intermediate/torchserve_with_ipex.html">Grokking PyTorch Intel CPU performance from first principles</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul>
@@ -298,6 +298,7 @@
 <p class="caption" role="heading"><span class="caption-text">Recommendation Systems</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/torchrec_tutorial.html">Introduction to TorchRec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../advanced/sharding.html">Exploring TorchRec sharding</a></li>
 </ul>
 
             
@@ -386,6 +387,7 @@
           </div>
 
         
+
           
           <div class="rst-content">
           
@@ -405,7 +407,7 @@
 <a class="reference external" href="autogradqs_tutorial.html">Autograd</a> ||
 <a class="reference external" href="optimization_tutorial.html">최적화(Optimization)</a> ||
 <a class="reference external" href="saveloadrun_tutorial.html">모델 저장하고 불러오기</a></p>
-<section id="id3">
+<div class="section" id="id3">
 <h1>신경망 모델 구성하기<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h1>
 <p>신경망은 데이터에 대한 연산을 수행하는 계층(layer)/모듈(module)로 구성되어 있습니다.
 <a class="reference external" href="https://pytorch.org/docs/stable/nn.html">torch.nn</a> 네임스페이스는 신경망을 구성하는데 필요한 모든 구성 요소를 제공합니다.
@@ -419,7 +421,7 @@ PyTorch의 모든 모듈은 <a class="reference external" href="https://pytorch.
 <span class="kn">from</span> <span class="nn">torchvision</span> <span class="kn">import</span> <span class="n">datasets</span><span class="p">,</span> <span class="n">transforms</span>
 </pre></div>
 </div>
-<section id="id4">
+<div class="section" id="id4">
 <h2>학습을 위한 장치 얻기<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
 <p>가능한 경우 GPU와 같은 하드웨어 가속기에서 모델을 학습하려고 합니다.
 <a class="reference external" href="https://pytorch.org/docs/stable/notes/cuda.html">torch.cuda</a> 를 사용할 수 있는지
@@ -432,8 +434,8 @@ PyTorch의 모든 모듈은 <a class="reference external" href="https://pytorch.
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Using cuda device
 </pre></div>
 </div>
-</section>
-<section id="id5">
+</div>
+<div class="section" id="id5">
 <h2>클래스 정의하기<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h2>
 <p>신경망 모델을 <code class="docutils literal notranslate"><span class="pre">nn.Module</span></code> 의 하위클래스로 정의하고, <code class="docutils literal notranslate"><span class="pre">__init__</span></code> 에서 신경망 계층들을 초기화합니다.
 <code class="docutils literal notranslate"><span class="pre">nn.Module</span></code> 을 상속받은 모든 클래스는 <code class="docutils literal notranslate"><span class="pre">forward</span></code> 메소드에 입력 데이터에 대한 연산들을 구현합니다.</p>
@@ -490,9 +492,9 @@ PyTorch의 모든 모듈은 <a class="reference external" href="https://pytorch.
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Predicted class: tensor([8], device=&#39;cuda:0&#39;)
 </pre></div>
 </div>
-</section>
+</div>
 <hr class="docutils" />
-<section id="layer">
+<div class="section" id="layer">
 <h2>모델 계층(Layer)<a class="headerlink" href="#layer" title="Permalink to this headline">¶</a></h2>
 <p>FashionMNIST 모델의 계층들을 살펴보겠습니다. 이를 설명하기 위해, 28x28 크기의 이미지 3개로 구성된
 미니배치를 가져와, 신경망을 통과할 때 어떤 일이 발생하는지 알아보겠습니다.</p>
@@ -504,7 +506,7 @@ PyTorch의 모든 모듈은 <a class="reference external" href="https://pytorch.
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>torch.Size([3, 28, 28])
 </pre></div>
 </div>
-<section id="nn-flatten">
+<div class="section" id="nn-flatten">
 <h3>nn.Flatten<a class="headerlink" href="#nn-flatten" title="Permalink to this headline">¶</a></h3>
 <p><a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.Flatten.html">nn.Flatten</a> 계층을 초기화하여
 각 28x28의 2D 이미지를 784 픽셀 값을 갖는 연속된 배열로 변환합니다. (dim=0의 미니배치 차원은 유지됩니다.)</p>
@@ -517,8 +519,8 @@ PyTorch의 모든 모듈은 <a class="reference external" href="https://pytorch.
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>torch.Size([3, 784])
 </pre></div>
 </div>
-</section>
-<section id="nn-linear">
+</div>
+<div class="section" id="nn-linear">
 <h3>nn.Linear<a class="headerlink" href="#nn-linear" title="Permalink to this headline">¶</a></h3>
 <p><a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.Linear.html">선형 계층</a> 은 저장된 가중치(weight)와
 편향(bias)을 사용하여 입력에 선형 변환(linear transformation)을 적용하는 모듈입니다.</p>
@@ -531,8 +533,8 @@ PyTorch의 모든 모듈은 <a class="reference external" href="https://pytorch.
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>torch.Size([3, 20])
 </pre></div>
 </div>
-</section>
-<section id="nn-relu">
+</div>
+<div class="section" id="nn-relu">
 <h3>nn.ReLU<a class="headerlink" href="#nn-relu" title="Permalink to this headline">¶</a></h3>
 <p>비선형 활성화(activation)는 모델의 입력과 출력 사이에 복잡한 관계(mapping)를 만듭니다.
 비선형 활성화는 선형 변환 후에 적용되어 <em>비선형성(nonlinearity)</em> 을 도입하고, 신경망이 다양한 현상을 학습할 수 있도록 돕습니다.</p>
@@ -566,8 +568,8 @@ After ReLU: tensor([[0.0000, 0.4567, 0.0000, 0.0000, 0.2569, 0.0000, 0.2959, 0.0
          0.2692, 0.4581]], grad_fn=&lt;ReluBackward0&gt;)
 </pre></div>
 </div>
-</section>
-<section id="nn-sequential">
+</div>
+<div class="section" id="nn-sequential">
 <h3>nn.Sequential<a class="headerlink" href="#nn-sequential" title="Permalink to this headline">¶</a></h3>
 <p><a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.Sequential.html">nn.Sequential</a> 은 순서를 갖는
 모듈의 컨테이너입니다. 데이터는 정의된 것과 같은 순서로 모든 모듈들을 통해 전달됩니다. 순차 컨테이너(sequential container)를 사용하여
@@ -582,8 +584,8 @@ After ReLU: tensor([[0.0000, 0.4567, 0.0000, 0.0000, 0.2569, 0.0000, 0.2959, 0.0
 <span class="n">logits</span> <span class="o">=</span> <span class="n">seq_modules</span><span class="p">(</span><span class="n">input_image</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-<section id="nn-softmax">
+</div>
+<div class="section" id="nn-softmax">
 <h3>nn.Softmax<a class="headerlink" href="#nn-softmax" title="Permalink to this headline">¶</a></h3>
 <p>신경망의 마지막 선형 계층은 <a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.Softmax.html">nn.Softmax</a> 모듈에 전달될
 ([-infty, infty] 범위의 원시 값(raw value)인) <cite>logits</cite> 를 반환합니다. logits는 모델의 각 분류(class)에 대한 예측 확률을 나타내도록
@@ -592,9 +594,9 @@ After ReLU: tensor([[0.0000, 0.4567, 0.0000, 0.0000, 0.2569, 0.0000, 0.2959, 0.0
 <span class="n">pred_probab</span> <span class="o">=</span> <span class="n">softmax</span><span class="p">(</span><span class="n">logits</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-</section>
-<section id="id12">
+</div>
+</div>
+<div class="section" id="id12">
 <h2>모델 매개변수<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h2>
 <p>신경망 내부의 많은 계층들은 <em>매개변수화(parameterize)</em> 됩니다. 즉, 학습 중에 최적화되는 가중치와 편향과 연관지어집니다.
 <code class="docutils literal notranslate"><span class="pre">nn.Module</span></code> 을 상속하면 모델 객체 내부의 모든 필드들이 자동으로 추적(track)되며, 모델의 <code class="docutils literal notranslate"><span class="pre">parameters()</span></code> 및
@@ -638,14 +640,14 @@ Layer: linear_relu_stack.4.weight | Size: torch.Size([10, 512]) | Values : tenso
 Layer: linear_relu_stack.4.bias | Size: torch.Size([10]) | Values : tensor([-0.0192,  0.0092], device=&#39;cuda:0&#39;, grad_fn=&lt;SliceBackward0&gt;)
 </pre></div>
 </div>
-</section>
+</div>
 <hr class="docutils" />
-<section id="id13">
+<div class="section" id="id13">
 <h2>더 읽어보기<a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p><a class="reference external" href="https://pytorch.org/docs/stable/nn.html">torch.nn API</a></p></li>
 </ul>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.137 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.190 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-beginner-basics-buildmodel-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/ac800c8c4c9c372154788058b1e89246/buildmodel_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">buildmodel_tutorial.py</span></code></a></p>
@@ -655,8 +657,8 @@ Layer: linear_relu_stack.4.bias | Size: torch.Size([10]) | Values : tensor([-0.0
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
-</section>
-</section>
+</div>
+</div>
 
 
              </article>
@@ -693,7 +695,7 @@ Layer: linear_relu_stack.4.bias | Size: torch.Size([10]) | Values : tensor([-0.0
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2021, PyTorch &amp; PyTorch Korea Community.
+        &copy; Copyright 2022, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorch Korea User Group).
 
     </p>
   </div>
@@ -706,6 +708,13 @@ Layer: linear_relu_stack.4.bias | Size: torch.Size([10]) | Values : tensor([-0.0
 </footer>
 
           </div>
+<script>
+if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.indexOf("/prototype/prototype_index")< 1))
+  {
+    var div = '<div class="admonition note"><p class="admonition-title">Note</p><p><i class="fa fa-flask" aria-hidden="true">&nbsp</i> 이 튜토리얼은 프로토타입(prototype) 기능들에 대해서 설명하고 있습니다. 프로토타입 기능은 일반적으로 피드백 및 테스트용으로, 런타임 플래그 없이는 PyPI나 Conda로 배포되는 바이너리에서는 사용할 수 없습니다.</p></div>'
+    document.getElementById("pytorch-article").insertAdjacentHTML('afterBegin', div)
+  }
+</script>
         </div>
 
         <div class="pytorch-content-right" id="pytorch-content-right">
@@ -765,7 +774,6 @@ Layer: linear_relu_stack.4.bias | Size: torch.Size([10]) | Values : tensor([-0.0
       });
   </script>
  
-
 <script>
 //add microsoft link
 
@@ -844,7 +852,7 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
 </script>
 
 <script type="text/javascript">
-  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile'];
+  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile', 'Introduction to PyTorch on YouTube', 'Recommendation Systems'];
 </script>
 
 

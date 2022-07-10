@@ -6,24 +6,23 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
 <meta property="og:title" content="PyTorch에서 state_dict란 무엇인가요?" />
   
 <meta property="og:type" content="article" />
   
-<meta property="og:url" content="http://tutorials.pytorch.kr/recipes/recipes/what_is_state_dict.html" />
+<meta property="og:url" content="https://tutorials.pytorch.kr/recipes/recipes/what_is_state_dict.html" />
   
 <meta property="og:description" content="PyTorch에서 torch.nn.Module 모델의 학습 가능한 매개변수(예. 가중치와 편향)들은 모델의 매개변수에 포함되어 있습니다. (model.parameters()로 접근합니다) state_dict 는 간단히 말해 각 계층을 매개변수 텐서로 매핑되는 Python 사전(dict) 객체입니다. 개요: state_dict 는 PyTorch에서 모델을 저장하거나 불러오는 데 관심이 있다면 필수적인 항목입니다. state_dict 객체는 Python 사전이기 때문에 쉽게 저장, 업데이트, 변경 및 복원할 수 있으며, 이는 Py..." />
   
-<meta property="og:image" content="http://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
+<meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
   
 <meta property="og:image:alt" content="PyTorch에서 state_dict란 무엇인가요?" />
   
 <meta property="og:ignore_canonical" content="true" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>PyTorch에서 state_dict란 무엇인가요? &mdash; 파이토치 한국어 튜토리얼(PyTorch tutorials in Korean)</title>
+  <title>PyTorch에서 state_dict란 무엇인가요? &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
   
 
   
@@ -131,7 +130,7 @@
               
               
                 <div class="version">
-                  1.11.0+cu102
+                  1.12.0+cu102
                 </div>
               
             
@@ -272,6 +271,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/quantized_transfer_learning_tutorial.html">(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../advanced/static_quantization_tutorial.html">(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../intermediate/torchserve_with_ipex.html">Grokking PyTorch Intel CPU performance from first principles</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul>
@@ -298,6 +298,7 @@
 <p class="caption" role="heading"><span class="caption-text">Recommendation Systems</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/torchrec_tutorial.html">Introduction to TorchRec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../advanced/sharding.html">Exploring TorchRec sharding</a></li>
 </ul>
 
             
@@ -388,6 +389,7 @@
           </div>
 
         
+
           
           <div class="rst-content">
           
@@ -398,14 +400,14 @@
 <p class="admonition-title">Note</p>
 <p>Click <a class="reference internal" href="#sphx-glr-download-recipes-recipes-what-is-state-dict-py"><span class="std std-ref">here</span></a> to download the full example code</p>
 </div>
-<section class="sphx-glr-example-title" id="pytorch-state-dict">
+<div class="sphx-glr-example-title section" id="pytorch-state-dict">
 <span id="sphx-glr-recipes-recipes-what-is-state-dict-py"></span><h1>PyTorch에서 state_dict란 무엇인가요?<a class="headerlink" href="#pytorch-state-dict" title="Permalink to this headline">¶</a></h1>
 <p>PyTorch에서 <code class="docutils literal notranslate"><span class="pre">torch.nn.Module</span></code> 모델의 학습 가능한
 매개변수(예. 가중치와 편향)들은 모델의 매개변수에 포함되어 있습니다.
 (model.parameters()로 접근합니다)
 <code class="docutils literal notranslate"><span class="pre">state_dict</span></code> 는 간단히 말해 각 계층을 매개변수 텐서로 매핑되는
 Python 사전(dict) 객체입니다.</p>
-<section id="id1">
+<div class="section" id="id1">
 <h2>개요<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">state_dict</span></code> 는 PyTorch에서 모델을 저장하거나 불러오는 데 관심이
 있다면 필수적인 항목입니다.
@@ -422,15 +424,15 @@ Python 사전(dict) 객체입니다.</p>
 갖습니다.
 레시피에서 <code class="docutils literal notranslate"><span class="pre">state_dict</span></code> 이 간단한 모델에서 어떻게 사용되는지
 살펴보겠습니다.</p>
-</section>
-<section id="id2">
+</div>
+<div class="section" id="id2">
 <h2>설정<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
 <p>시작하기 전에 <code class="docutils literal notranslate"><span class="pre">torch</span></code> 가 없다면 설치해야 합니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">torch</span>
 </pre></div>
 </div>
-</section>
-<section id="steps">
+</div>
+<div class="section" id="steps">
 <h2>단계(Steps)<a class="headerlink" href="#steps" title="Permalink to this headline">¶</a></h2>
 <ol class="arabic simple">
 <li><p>데이터를 불러올 때 필요한 모든 라이브러리 불러오기</p></li>
@@ -438,7 +440,7 @@ Python 사전(dict) 객체입니다.</p>
 <li><p>옵티마이저 초기화하기</p></li>
 <li><p>모델과 옵티마이저의 <code class="docutils literal notranslate"><span class="pre">state_dict</span></code> 접근하기</p></li>
 </ol>
-<section id="id3">
+<div class="section" id="id3">
 <h3>1. 데이터를 불러올 때 필요한 모든 라이브러리 불러오기<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
 <p>이 레시피에서는 <code class="docutils literal notranslate"><span class="pre">torch</span></code> 와 하위 패키지인 <code class="docutils literal notranslate"><span class="pre">torch.nn</span></code> 과 <code class="docutils literal notranslate"><span class="pre">torch.optim</span></code> 을
 사용하겠습니다.</p>
@@ -447,8 +449,8 @@ Python 사전(dict) 객체입니다.</p>
 <span class="kn">import</span> <span class="nn">torch.optim</span> <span class="k">as</span> <span class="nn">optim</span>
 </pre></div>
 </div>
-</section>
-<section id="id4">
+</div>
+<div class="section" id="id4">
 <h3>2. 신경망을 구성하고 초기화하기<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
 <p>예시를 보이기 위해, 이미지를 학습하는 신경망을 만들어보겠습니다.
 더 자세한 내용은 신경망 구성하기 레시피를 참고해주세요.</p>
@@ -475,15 +477,15 @@ Python 사전(dict) 객체입니다.</p>
 <span class="nb">print</span><span class="p">(</span><span class="n">net</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-<section id="id5">
+</div>
+<div class="section" id="id5">
 <h3>3. 옵티마이저 초기화하기<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
 <p>모멘텀(momentum)을 갖는 SGD를 사용하겠습니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">optimizer</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">SGD</span><span class="p">(</span><span class="n">net</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span> <span class="n">momentum</span><span class="o">=</span><span class="mf">0.9</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-<section id="state-dict">
+</div>
+<div class="section" id="state-dict">
 <h3>4. 모델과 옵티마이저의 <code class="docutils literal notranslate"><span class="pre">state_dict</span></code> 접근하기<a class="headerlink" href="#state-dict" title="Permalink to this headline">¶</a></h3>
 <p>이제 모델과 옵티마이저를 구성했으므로 각각의 <code class="docutils literal notranslate"><span class="pre">state_dict</span></code> 속성에
 저장되어 있는 항목을 확인할 수 있습니다.</p>
@@ -503,9 +505,9 @@ Python 사전(dict) 객체입니다.</p>
 <p>이 정보는 향후 모델 및 옵티마이저를 저장하고
 불러오는 것과 관련이 있습니다.</p>
 <p>축하합니다! PyTorch에서 <code class="docutils literal notranslate"><span class="pre">state_dict</span></code> 을 성공적으로 사용하였습니다.</p>
-</section>
-</section>
-<section id="id6">
+</div>
+</div>
+<div class="section" id="id6">
 <h2>더 알아보기<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h2>
 <p>다른 레시피를 둘러보고 계속 배워보세요:</p>
 <ul class="simple">
@@ -522,8 +524,8 @@ Python 사전(dict) 객체입니다.</p>
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
-</section>
-</section>
+</div>
+</div>
 
 
              </article>
@@ -560,7 +562,7 @@ Python 사전(dict) 객체입니다.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2021, PyTorch &amp; PyTorch Korea Community.
+        &copy; Copyright 2022, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorch Korea User Group).
 
     </p>
   </div>
@@ -573,6 +575,13 @@ Python 사전(dict) 객체입니다.</p>
 </footer>
 
           </div>
+<script>
+if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.indexOf("/prototype/prototype_index")< 1))
+  {
+    var div = '<div class="admonition note"><p class="admonition-title">Note</p><p><i class="fa fa-flask" aria-hidden="true">&nbsp</i> 이 튜토리얼은 프로토타입(prototype) 기능들에 대해서 설명하고 있습니다. 프로토타입 기능은 일반적으로 피드백 및 테스트용으로, 런타임 플래그 없이는 PyPI나 Conda로 배포되는 바이너리에서는 사용할 수 없습니다.</p></div>'
+    document.getElementById("pytorch-article").insertAdjacentHTML('afterBegin', div)
+  }
+</script>
         </div>
 
         <div class="pytorch-content-right" id="pytorch-content-right">
@@ -630,7 +639,6 @@ Python 사전(dict) 객체입니다.</p>
       });
   </script>
  
-
 <script>
 //add microsoft link
 
@@ -709,7 +717,7 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
 </script>
 
 <script type="text/javascript">
-  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile'];
+  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile', 'Introduction to PyTorch on YouTube', 'Recommendation Systems'];
 </script>
 
 

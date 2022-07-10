@@ -6,24 +6,23 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
 <meta property="og:title" content="공간 변형 네트워크(Spatial Transformer Networks) 튜토리얼" />
   
 <meta property="og:type" content="article" />
   
-<meta property="og:url" content="http://tutorials.pytorch.kr/intermediate/spatial_transformer_tutorial.html" />
+<meta property="og:url" content="https://tutorials.pytorch.kr/intermediate/spatial_transformer_tutorial.html" />
   
 <meta property="og:description" content="저자: Ghassen HAMROUNI 번역: 황성수, 정신유.. figure:: /_static/img/stn/FSeq.png 이 튜토리얼에서는 공간 변형 네트워크(spatial transformer networks, 이하 STN)이라 불리는 비주얼 어텐션 메커니즘을 이용해 신경망을 증강(augment)시키는 방법에 대해 학습합니다. 이 방법에 대한 자세한 내용은 DeepMind paper 에서 확인할 수 있습니다. STN은 어떠한 공간적 변형(spatial transformation)에도 적용할 수 있는 미분 가능한 어텐션의..." />
   
-<meta property="og:image" content="http://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
+<meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
   
 <meta property="og:image:alt" content="공간 변형 네트워크(Spatial Transformer Networks) 튜토리얼" />
   
 <meta property="og:ignore_canonical" content="true" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>공간 변형 네트워크(Spatial Transformer Networks) 튜토리얼 &mdash; 파이토치 한국어 튜토리얼(PyTorch tutorials in Korean)</title>
+  <title>공간 변형 네트워크(Spatial Transformer Networks) 튜토리얼 &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
   
 
   
@@ -129,7 +128,7 @@
               
               
                 <div class="version">
-                  1.11.0+cu102
+                  1.12.0+cu102
                 </div>
               
             
@@ -270,6 +269,7 @@
 <li class="toctree-l1"><a class="reference internal" href="dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="quantized_transfer_learning_tutorial.html">(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/static_quantization_tutorial.html">(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torchserve_with_ipex.html">Grokking PyTorch Intel CPU performance from first principles</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul>
@@ -296,6 +296,7 @@
 <p class="caption" role="heading"><span class="caption-text">Recommendation Systems</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="torchrec_tutorial.html">Introduction to TorchRec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/sharding.html">Exploring TorchRec sharding</a></li>
 </ul>
 
             
@@ -384,6 +385,7 @@
           </div>
 
         
+
           
           <div class="rst-content">
           
@@ -394,7 +396,7 @@
 <p class="admonition-title">Note</p>
 <p>Click <a class="reference internal" href="#sphx-glr-download-intermediate-spatial-transformer-tutorial-py"><span class="std std-ref">here</span></a> to download the full example code</p>
 </div>
-<section class="sphx-glr-example-title" id="spatial-transformer-networks">
+<div class="sphx-glr-example-title section" id="spatial-transformer-networks">
 <span id="sphx-glr-intermediate-spatial-transformer-tutorial-py"></span><h1>공간 변형 네트워크(Spatial Transformer Networks) 튜토리얼<a class="headerlink" href="#spatial-transformer-networks" title="Permalink to this headline">¶</a></h1>
 <p><strong>저자</strong>: <a class="reference external" href="https://github.com/GHamrouni">Ghassen HAMROUNI</a>
 <strong>번역</strong>: <a class="reference external" href="https://github.com/adonisues">황성수</a> , <a class="reference external" href="https://github.com/SSinyu">정신유</a>
@@ -429,7 +431,7 @@ STN이 가진 장점 중 하나는 아주 작은 수정만으로 기존에 사�
 <span class="n">plt</span><span class="o">.</span><span class="n">ion</span><span class="p">()</span>   <span class="c1"># 대화형 모드</span>
 </pre></div>
 </div>
-<section id="id3">
+<div class="section" id="id3">
 <h2>데이터 불러오기<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
 <p>이 튜토리얼에서는 MNIST 데이터셋을 이용해 실험합니다. 실험에는 STN으로
 증강된 일반적인 CNN을 사용합니다.</p>
@@ -473,8 +475,8 @@ Downloading http://yann.lecun.com/exdb/mnist/t10k-labels-idx1-ubyte.gz to ./MNIS
 Extracting ./MNIST/raw/t10k-labels-idx1-ubyte.gz to ./MNIST/raw
 </pre></div>
 </div>
-</section>
-<section id="spatial-transformer-networks-stn">
+</div>
+<div class="section" id="spatial-transformer-networks-stn">
 <h2>Spatial Transformer Networks(STN) 구성하기<a class="headerlink" href="#spatial-transformer-networks-stn" title="Permalink to this headline">¶</a></h2>
 <p>STN은 다음의 세 가지 주요 구성 요소로 요약됩니다.</p>
 <ul class="simple">
@@ -485,9 +487,9 @@ Extracting ./MNIST/raw/t10k-labels-idx1-ubyte.gz to ./MNIST/raw
 이미지 내 좌표 그리드를 생성합니다.</p></li>
 <li><p>샘플러(sampler)는 공간 변환 파라미터를 입력 이미지에 적용합니다.</p></li>
 </ul>
-<figure class="align-default">
+<div class="figure align-default">
 <img alt="../_images/stn-arch.png" src="../_images/stn-arch.png" />
-</figure>
+</div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>affine_grid 및 grid_sample 모듈이 포함된 최신 버전의 PyTorch가 필요합니다.</p>
@@ -551,8 +553,8 @@ Extracting ./MNIST/raw/t10k-labels-idx1-ubyte.gz to ./MNIST/raw
 <span class="n">model</span> <span class="o">=</span> <span class="n">Net</span><span class="p">()</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-<section id="id4">
+</div>
+<div class="section" id="id4">
 <h2>모델 학습하기<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
 <p>이제 SGD 알고리즘을 이용해 모델을 학습시켜 봅시다. 앞서 구성한 신경망은
 감독 학습 방식(supervised way)으로 분류 문제를 학습합니다. 또한 이 모델은
@@ -600,8 +602,8 @@ end-to-end 방식으로 STN을 자동으로 학습합니다.</p>
                       <span class="mf">100.</span> <span class="o">*</span> <span class="n">correct</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">test_loader</span><span class="o">.</span><span class="n">dataset</span><span class="p">)))</span>
 </pre></div>
 </div>
-</section>
-<section id="stn">
+</div>
+<div class="section" id="stn">
 <h2>STN 결과 시각화하기<a class="headerlink" href="#stn" title="Permalink to this headline">¶</a></h2>
 <p>이제 학습한 비주얼 어텐션 메커니즘의 결과를 살펴보겠습니다.</p>
 <p>학습하는 동안 변환된 결과를 시각화하기 위해 작은 도움(helper) 함수를 정의합니다.</p>
@@ -654,107 +656,107 @@ end-to-end 방식으로 STN을 자동으로 학습합니다.</p>
 <img alt="../_images/sphx_glr_spatial_transformer_tutorial_001.png" class="sphx-glr-single-img" src="../_images/sphx_glr_spatial_transformer_tutorial_001.png" />
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Train Epoch: 1 [0/60000 (0%)]   Loss: 2.339093
-Train Epoch: 1 [32000/60000 (53%)]      Loss: 0.811320
+Train Epoch: 1 [32000/60000 (53%)]      Loss: 0.793598
 
-Test set: Average loss: 0.3886, Accuracy: 8929/10000 (89%)
+Test set: Average loss: 0.3242, Accuracy: 9114/10000 (91%)
 
-Train Epoch: 2 [0/60000 (0%)]   Loss: 0.837041
-Train Epoch: 2 [32000/60000 (53%)]      Loss: 0.304269
+Train Epoch: 2 [0/60000 (0%)]   Loss: 0.705815
+Train Epoch: 2 [32000/60000 (53%)]      Loss: 0.290404
 
-Test set: Average loss: 0.1279, Accuracy: 9613/10000 (96%)
+Test set: Average loss: 0.1362, Accuracy: 9603/10000 (96%)
 
-Train Epoch: 3 [0/60000 (0%)]   Loss: 0.090943
-Train Epoch: 3 [32000/60000 (53%)]      Loss: 0.337877
+Train Epoch: 3 [0/60000 (0%)]   Loss: 0.083659
+Train Epoch: 3 [32000/60000 (53%)]      Loss: 0.293236
 
-Test set: Average loss: 0.0914, Accuracy: 9729/10000 (97%)
+Test set: Average loss: 0.0936, Accuracy: 9719/10000 (97%)
 
-Train Epoch: 4 [0/60000 (0%)]   Loss: 0.157489
-Train Epoch: 4 [32000/60000 (53%)]      Loss: 0.163679
+Train Epoch: 4 [0/60000 (0%)]   Loss: 0.166474
+Train Epoch: 4 [32000/60000 (53%)]      Loss: 0.163375
 
-Test set: Average loss: 0.0775, Accuracy: 9776/10000 (98%)
+Test set: Average loss: 0.0719, Accuracy: 9778/10000 (98%)
 
-Train Epoch: 5 [0/60000 (0%)]   Loss: 0.123063
-Train Epoch: 5 [32000/60000 (53%)]      Loss: 0.117753
+Train Epoch: 5 [0/60000 (0%)]   Loss: 0.139989
+Train Epoch: 5 [32000/60000 (53%)]      Loss: 0.104616
 
-Test set: Average loss: 0.0766, Accuracy: 9780/10000 (98%)
+Test set: Average loss: 0.0843, Accuracy: 9733/10000 (97%)
 
-Train Epoch: 6 [0/60000 (0%)]   Loss: 0.171667
-Train Epoch: 6 [32000/60000 (53%)]      Loss: 0.366471
+Train Epoch: 6 [0/60000 (0%)]   Loss: 0.216602
+Train Epoch: 6 [32000/60000 (53%)]      Loss: 0.374983
 
-Test set: Average loss: 0.0713, Accuracy: 9785/10000 (98%)
+Test set: Average loss: 0.1244, Accuracy: 9639/10000 (96%)
 
-Train Epoch: 7 [0/60000 (0%)]   Loss: 0.154154
-Train Epoch: 7 [32000/60000 (53%)]      Loss: 0.143660
+Train Epoch: 7 [0/60000 (0%)]   Loss: 0.128875
+Train Epoch: 7 [32000/60000 (53%)]      Loss: 0.278545
 
-Test set: Average loss: 0.0568, Accuracy: 9831/10000 (98%)
+Test set: Average loss: 0.0628, Accuracy: 9800/10000 (98%)
 
-Train Epoch: 8 [0/60000 (0%)]   Loss: 0.230514
-Train Epoch: 8 [32000/60000 (53%)]      Loss: 0.315882
+Train Epoch: 8 [0/60000 (0%)]   Loss: 0.232967
+Train Epoch: 8 [32000/60000 (53%)]      Loss: 0.332916
 
-Test set: Average loss: 0.0660, Accuracy: 9798/10000 (98%)
+Test set: Average loss: 0.0583, Accuracy: 9822/10000 (98%)
 
-Train Epoch: 9 [0/60000 (0%)]   Loss: 0.127370
-Train Epoch: 9 [32000/60000 (53%)]      Loss: 0.053753
+Train Epoch: 9 [0/60000 (0%)]   Loss: 0.272218
+Train Epoch: 9 [32000/60000 (53%)]      Loss: 0.077817
 
-Test set: Average loss: 0.0523, Accuracy: 9847/10000 (98%)
+Test set: Average loss: 0.0913, Accuracy: 9733/10000 (97%)
 
-Train Epoch: 10 [0/60000 (0%)]  Loss: 0.119185
-Train Epoch: 10 [32000/60000 (53%)]     Loss: 0.099998
+Train Epoch: 10 [0/60000 (0%)]  Loss: 0.303305
+Train Epoch: 10 [32000/60000 (53%)]     Loss: 0.190434
 
-Test set: Average loss: 0.0695, Accuracy: 9790/10000 (98%)
+Test set: Average loss: 0.0670, Accuracy: 9805/10000 (98%)
 
-Train Epoch: 11 [0/60000 (0%)]  Loss: 0.058257
-Train Epoch: 11 [32000/60000 (53%)]     Loss: 0.339585
+Train Epoch: 11 [0/60000 (0%)]  Loss: 0.054661
+Train Epoch: 11 [32000/60000 (53%)]     Loss: 0.273197
 
-Test set: Average loss: 0.0427, Accuracy: 9867/10000 (99%)
+Test set: Average loss: 0.0528, Accuracy: 9832/10000 (98%)
 
-Train Epoch: 12 [0/60000 (0%)]  Loss: 0.185821
-Train Epoch: 12 [32000/60000 (53%)]     Loss: 0.118427
+Train Epoch: 12 [0/60000 (0%)]  Loss: 0.381647
+Train Epoch: 12 [32000/60000 (53%)]     Loss: 0.042611
 
-Test set: Average loss: 0.0478, Accuracy: 9860/10000 (99%)
+Test set: Average loss: 0.0491, Accuracy: 9856/10000 (99%)
 
-Train Epoch: 13 [0/60000 (0%)]  Loss: 0.111290
-Train Epoch: 13 [32000/60000 (53%)]     Loss: 0.015730
+Train Epoch: 13 [0/60000 (0%)]  Loss: 0.141652
+Train Epoch: 13 [32000/60000 (53%)]     Loss: 0.026040
 
-Test set: Average loss: 0.0414, Accuracy: 9872/10000 (99%)
+Test set: Average loss: 0.0452, Accuracy: 9863/10000 (99%)
 
-Train Epoch: 14 [0/60000 (0%)]  Loss: 0.274407
-Train Epoch: 14 [32000/60000 (53%)]     Loss: 0.285714
+Train Epoch: 14 [0/60000 (0%)]  Loss: 0.279905
+Train Epoch: 14 [32000/60000 (53%)]     Loss: 0.292855
 
-Test set: Average loss: 0.0661, Accuracy: 9796/10000 (98%)
+Test set: Average loss: 0.0545, Accuracy: 9836/10000 (98%)
 
-Train Epoch: 15 [0/60000 (0%)]  Loss: 0.100750
-Train Epoch: 15 [32000/60000 (53%)]     Loss: 0.055974
+Train Epoch: 15 [0/60000 (0%)]  Loss: 0.080706
+Train Epoch: 15 [32000/60000 (53%)]     Loss: 0.047341
 
-Test set: Average loss: 0.0467, Accuracy: 9865/10000 (99%)
+Test set: Average loss: 0.0586, Accuracy: 9819/10000 (98%)
 
-Train Epoch: 16 [0/60000 (0%)]  Loss: 0.224582
-Train Epoch: 16 [32000/60000 (53%)]     Loss: 0.110313
+Train Epoch: 16 [0/60000 (0%)]  Loss: 0.231476
+Train Epoch: 16 [32000/60000 (53%)]     Loss: 0.052251
 
-Test set: Average loss: 0.0410, Accuracy: 9876/10000 (99%)
+Test set: Average loss: 0.0458, Accuracy: 9857/10000 (99%)
 
-Train Epoch: 17 [0/60000 (0%)]  Loss: 0.069946
-Train Epoch: 17 [32000/60000 (53%)]     Loss: 0.117290
+Train Epoch: 17 [0/60000 (0%)]  Loss: 0.052491
+Train Epoch: 17 [32000/60000 (53%)]     Loss: 0.052778
 
-Test set: Average loss: 0.0627, Accuracy: 9814/10000 (98%)
+Test set: Average loss: 0.0679, Accuracy: 9804/10000 (98%)
 
-Train Epoch: 18 [0/60000 (0%)]  Loss: 0.185732
-Train Epoch: 18 [32000/60000 (53%)]     Loss: 0.046079
+Train Epoch: 18 [0/60000 (0%)]  Loss: 0.068049
+Train Epoch: 18 [32000/60000 (53%)]     Loss: 0.048643
 
-Test set: Average loss: 0.0409, Accuracy: 9866/10000 (99%)
+Test set: Average loss: 0.0756, Accuracy: 9784/10000 (98%)
 
-Train Epoch: 19 [0/60000 (0%)]  Loss: 0.099342
-Train Epoch: 19 [32000/60000 (53%)]     Loss: 0.046745
+Train Epoch: 19 [0/60000 (0%)]  Loss: 0.256957
+Train Epoch: 19 [32000/60000 (53%)]     Loss: 0.012120
 
-Test set: Average loss: 0.0529, Accuracy: 9841/10000 (98%)
+Test set: Average loss: 0.0395, Accuracy: 9884/10000 (99%)
 
-Train Epoch: 20 [0/60000 (0%)]  Loss: 0.087063
-Train Epoch: 20 [32000/60000 (53%)]     Loss: 0.154679
+Train Epoch: 20 [0/60000 (0%)]  Loss: 0.109880
+Train Epoch: 20 [32000/60000 (53%)]     Loss: 0.056924
 
-Test set: Average loss: 0.0382, Accuracy: 9881/10000 (99%)
+Test set: Average loss: 0.0426, Accuracy: 9880/10000 (99%)
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 2 minutes  41.654 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 2 minutes  53.599 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-intermediate-spatial-transformer-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/a4f07fecba75b5e84fe9e56cac0c7b71/spatial_transformer_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">spatial_transformer_tutorial.py</span></code></a></p>
@@ -764,8 +766,8 @@ Test set: Average loss: 0.0382, Accuracy: 9881/10000 (99%)
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
-</section>
-</section>
+</div>
+</div>
 
 
              </article>
@@ -793,7 +795,7 @@ Test set: Average loss: 0.0382, Accuracy: 9881/10000 (99%)
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2021, PyTorch &amp; PyTorch Korea Community.
+        &copy; Copyright 2022, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorch Korea User Group).
 
     </p>
   </div>
@@ -806,6 +808,13 @@ Test set: Average loss: 0.0382, Accuracy: 9881/10000 (99%)
 </footer>
 
           </div>
+<script>
+if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.indexOf("/prototype/prototype_index")< 1))
+  {
+    var div = '<div class="admonition note"><p class="admonition-title">Note</p><p><i class="fa fa-flask" aria-hidden="true">&nbsp</i> 이 튜토리얼은 프로토타입(prototype) 기능들에 대해서 설명하고 있습니다. 프로토타입 기능은 일반적으로 피드백 및 테스트용으로, 런타임 플래그 없이는 PyPI나 Conda로 배포되는 바이너리에서는 사용할 수 없습니다.</p></div>'
+    document.getElementById("pytorch-article").insertAdjacentHTML('afterBegin', div)
+  }
+</script>
         </div>
 
         <div class="pytorch-content-right" id="pytorch-content-right">
@@ -857,7 +866,6 @@ Test set: Average loss: 0.0382, Accuracy: 9881/10000 (99%)
       });
   </script>
  
-
 <script>
 //add microsoft link
 
@@ -936,7 +944,7 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
 </script>
 
 <script type="text/javascript">
-  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile'];
+  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile', 'Introduction to PyTorch on YouTube', 'Recommendation Systems'];
 </script>
 
 

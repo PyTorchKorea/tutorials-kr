@@ -6,24 +6,23 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
 <meta property="og:title" content="분산 데이터 병렬 처리 시작하기" />
   
 <meta property="og:type" content="article" />
   
-<meta property="og:url" content="http://tutorials.pytorch.kr/intermediate/ddp_tutorial.html" />
+<meta property="og:url" content="https://tutorials.pytorch.kr/intermediate/ddp_tutorial.html" />
   
 <meta property="og:description" content="저자: Shen Li 감수: Joe Zhu 번역: 조병근 선수과목(Prerequisites): PyTorch 분산 처리 개요, 분산 데이터 병렬 처리 API 문서, 분산 데이터 병렬 처리 문서. 분산 데이터 병렬 처리(DDP)는 여러 기기에서 실행할 수 있는 데이터 병렬 처리를 모듈 수준에서 구현합니다. DDP를 사용하는 어플리케이션은 여러 작업(process)을 생성하고 작업 당 단일 DDP 인스턴스를 생성해야 합니다. DDP는 torch.distributed 패키지의 집합 통신(collective communication)..." />
   
-<meta property="og:image" content="http://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
+<meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
   
 <meta property="og:image:alt" content="분산 데이터 병렬 처리 시작하기" />
   
 <meta property="og:ignore_canonical" content="true" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>분산 데이터 병렬 처리 시작하기 &mdash; 파이토치 한국어 튜토리얼(PyTorch tutorials in Korean)</title>
+  <title>분산 데이터 병렬 처리 시작하기 &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
   
 
   
@@ -131,7 +130,7 @@
               
               
                 <div class="version">
-                  1.11.0+cu102
+                  1.12.0+cu102
                 </div>
               
             
@@ -272,6 +271,7 @@
 <li class="toctree-l1"><a class="reference internal" href="dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="quantized_transfer_learning_tutorial.html">(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/static_quantization_tutorial.html">(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torchserve_with_ipex.html">Grokking PyTorch Intel CPU performance from first principles</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul class="current">
@@ -298,6 +298,7 @@
 <p class="caption" role="heading"><span class="caption-text">Recommendation Systems</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="torchrec_tutorial.html">Introduction to TorchRec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/sharding.html">Exploring TorchRec sharding</a></li>
 </ul>
 
             
@@ -386,17 +387,22 @@
           </div>
 
         
+
           
           <div class="rst-content">
           
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <section id="id1">
+  <div class="section" id="id1">
 <h1>분산 데이터 병렬 처리 시작하기<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h1>
 <p><strong>저자</strong>: <a class="reference external" href="https://mrshenli.github.io/">Shen Li</a></p>
 <p><strong>감수</strong>: <a class="reference external" href="https://github.com/gunandrose4u">Joe Zhu</a></p>
 <p><strong>번역</strong>: <a class="reference external" href="https://github.com/Jo-byung-geun">조병근</a></p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>이 튜토리얼의 소스 코드는 <a class="reference external" href="https://github.com/pytorch/tutorials/blob/master/intermediate_source/ddp_tutorial.rst">GitHub</a> 에서 확인할 수 있습니다.</p>
+</div>
 <p>선수과목(Prerequisites):</p>
 <ul class="simple">
 <li><p><a class="reference external" href="../beginner/dist_overview.html">PyTorch 분산 처리 개요</a></p></li>
@@ -420,7 +426,7 @@ checkpointing 모델 및 DDP와 모델 병렬 처리의 결합을 포함한 추�
 <p class="admonition-title">Note</p>
 <p>이 튜토리얼의 코드는 8-GPU 서버에서 실행되지만 다른 환경에서도 쉽게 적용할 수 있습니다.</p>
 </div>
-<section id="dataparallel-distributeddataparallel">
+<div class="section" id="dataparallel-distributeddataparallel">
 <h2><code class="docutils literal notranslate"><span class="pre">DataParallel</span></code>과 <code class="docutils literal notranslate"><span class="pre">DistributedDataParallel</span></code> 간의 비교<a class="headerlink" href="#dataparallel-distributeddataparallel" title="Permalink to this headline">¶</a></h2>
 <p>내용에 들어가기에 앞서 복잡성이 증가했음에도 불구하고
 <code class="docutils literal notranslate"><span class="pre">DataParallel</span></code>에 <code class="docutils literal notranslate"><span class="pre">DistributedDataParallel</span></code> 사용을 고려하는 이유를 생각해봅시다.</p>
@@ -437,10 +443,10 @@ DDP를 모델 병렬 처리와 결합하면 각 DDP 작업은 모델 병렬 처�
 <li><p>모델이 여러 대의 기기에 존재해야 하거나 사용 사례가 데이터 병렬화 패러다임에 맞지 않는 경우,
 일반적인 분산 학습 지원을 보려면 <a class="reference external" href="https://pytorch.org/docs/stable/rpc.html">the RPC API</a>를 참조하십시오.</p></li>
 </ul>
-</section>
-<section id="id3">
+</div>
+<div class="section" id="id3">
 <h2>기본적인 사용법<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
-<p>DDP 모듈을 생성하기 전에 우선 작업 그룹을 올바르게 설정해야 합니다. 자세한 내용은
+<p>DDP 모듈을 생성하기 전에 반드시 우선 작업 그룹을 올바르게 설정해야 합니다. 자세한 내용은
 <a class="reference external" href="https://tutorials.pytorch.kr/intermediate/dist_tuto.html">PYTORCH로 분산 어플리케이션 개발하기</a>에서 확인할 수 있습니다.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">sys</span>
@@ -523,8 +529,8 @@ DDP를 모델 병렬 처리와 결합하면 각 DDP 작업은 모델 병렬 처�
 역전파 전달(backward pass)간 수행되며 역전파 계산(backward computation)과 겹치게 됩니다.
 <code class="docutils literal notranslate"><span class="pre">backword()</span></code>가 반환되면 <code class="docutils literal notranslate"><span class="pre">param.grad</span></code>에는 동기화된 변화도 텐서(synchronized gradient tensor)가 포함되어 있습니다.
 기본적으로 DDP는 작업 그룹을 설정하는데 몇 개의 LoCs만이 필요하지만 보다 다양하게 사용하는 경우 주의가 필요합니다.</p>
-</section>
-<section id="id4">
+</div>
+<div class="section" id="id4">
 <h2>비대칭 작업 속도<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
 <p>DDP에서는 생성자, 순전파(forward pass) 및 역전파 전달 호출 지점이 분산 동기화 지점(distribute synchronization point)입니다.
 서로 다른 작업이 동일한 수의 동기화를 시작하고 동일한 순서로 이러한 동기화 지점에 도달하여
@@ -535,8 +541,8 @@ DDP를 모델 병렬 처리와 결합하면 각 DDP 작업은 모델 병렬 처�
 예를 들어, 네트워크 지연, 리소스 경쟁(resource contentions), 예측하지 못한 작업량 급증 등입니다.
 이러한 상황에서 시간 초과를 방지하려면, <a class="reference external" href="https://pytorch.org/docs/stable/distributed.html#torch.distributed.init_process_group">init_process_group</a>를
 호출할 때 충분한 <code class="docutils literal notranslate"><span class="pre">timeout</span></code>값을 전달해야 합니다.</p>
-</section>
-<section id="id5">
+</div>
+<div class="section" id="id5">
 <h2>체크포인트를 저장하고 읽어오기<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h2>
 <p>학습 중에 <code class="docutils literal notranslate"><span class="pre">torch.save</span></code>와 <code class="docutils literal notranslate"><span class="pre">torch.load</span></code> 로 모듈의 체크포인트를 만들고 그 체크포인트로부터 복구하는 것이 일반적입니다.
 더 자세한 내용은 <a class="reference external" href="https://tutorials.pytorch.kr/beginner/saving_loading_models.html">SAVING AND LOADING MODELS</a>를 참고하세요.
@@ -545,7 +551,7 @@ DDP를 사용할 때, 최적의 방법은 모델을 한 작업에만 저장하�
 이는 모든 작업이 같은 매개변수로부터 시작되고 변화도는
 역전파 전달로 동기화되므로 옵티마이저(optimizer)는
 매개변수를 동일한 값으로 계속 설정해야 하기 때문에 정확합니다. 이러한 최적화를 사용하는 경우,
-저장이 완료되기 전에 읽어오는 작업을 시작하지 않도록 해야 합니다. 게다가, 모듈을 읽어올 때,
+저장이 완료되기 전에 불러오는 어떠한 작업도 시작하지 않도록 해야 합니다. 더불어, 모듈을 읽어올 때
 작업이 다른 기기에 접근하지 않도록 적절한 <code class="docutils literal notranslate"><span class="pre">map_location</span></code> 인자를 제공해야합니다.
 <code class="docutils literal notranslate"><span class="pre">map_location</span></code>값이 없을 경우, <code class="docutils literal notranslate"><span class="pre">torch.load</span></code>는 먼저 모듈을 CPU에 읽어온 다음 각 매개변수가
 저장된 위치로 복사하여 동일한 장치를 사용하는 동일한 기기에서 모든 작업을 발생시킵니다.
@@ -556,9 +562,6 @@ DDP를 사용할 때, 최적의 방법은 모델을 한 작업에만 저장하�
 
     <span class="n">model</span> <span class="o">=</span> <span class="n">ToyModel</span><span class="p">()</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">rank</span><span class="p">)</span>
     <span class="n">ddp_model</span> <span class="o">=</span> <span class="n">DDP</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">device_ids</span><span class="o">=</span><span class="p">[</span><span class="n">rank</span><span class="p">])</span>
-
-    <span class="n">loss_fn</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">MSELoss</span><span class="p">()</span>
-    <span class="n">optimizer</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">SGD</span><span class="p">(</span><span class="n">ddp_model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.001</span><span class="p">)</span>
 
     <span class="n">CHECKPOINT_PATH</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">gettempdir</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;/model.checkpoint&quot;</span>
     <span class="k">if</span> <span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
@@ -574,10 +577,13 @@ DDP를 사용할 때, 최적의 방법은 모델을 한 작업에만 저장하�
     <span class="n">ddp_model</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span>
         <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">CHECKPOINT_PATH</span><span class="p">,</span> <span class="n">map_location</span><span class="o">=</span><span class="n">map_location</span><span class="p">))</span>
 
+    <span class="n">loss_fn</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">MSELoss</span><span class="p">()</span>
+    <span class="n">optimizer</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">SGD</span><span class="p">(</span><span class="n">ddp_model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.001</span><span class="p">)</span>
+
     <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
     <span class="n">outputs</span> <span class="o">=</span> <span class="n">ddp_model</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
     <span class="n">labels</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">rank</span><span class="p">)</span>
-    <span class="n">loss_fn</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">MSELoss</span><span class="p">()</span>
+
     <span class="n">loss_fn</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
     <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
 
@@ -590,11 +596,11 @@ DDP를 사용할 때, 최적의 방법은 모델을 한 작업에만 저장하�
     <span class="n">cleanup</span><span class="p">()</span>
 </pre></div>
 </div>
-</section>
-<section id="ddp">
+</div>
+<div class="section" id="ddp">
 <h2>모델 병렬 처리를 활용한 DDP<a class="headerlink" href="#ddp" title="Permalink to this headline">¶</a></h2>
-<p>DDP는 다중 – GPU 모델에서도 작동합니다.
-다중 – GPU 모델을 활용한 DDP는 대용량의 데이터를 가진 대용량 모델을 학습시킬 때 특히 유용합니다.</p>
+<p>DDP는 다중 GPU 모델에서도 작동합니다.
+다중 GPU 모델을 활용한 DDP는 대용량의 데이터를 가진 대용량 모델을 학습시킬 때 특히 유용합니다.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">ToyMpModel</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dev0</span><span class="p">,</span> <span class="n">dev1</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">ToyMpModel</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
@@ -645,8 +651,67 @@ DDP를 사용할 때, 최적의 방법은 모델을 한 작업에만 저장하�
     <span class="n">run_demo</span><span class="p">(</span><span class="n">demo_model_parallel</span><span class="p">,</span> <span class="n">world_size</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-</section>
+</div>
+<div class="section" id="initialize-ddp-with-torch-distributed-run-torchrun">
+<h2>Initialize DDP with torch.distributed.run/torchrun<a class="headerlink" href="#initialize-ddp-with-torch-distributed-run-torchrun" title="Permalink to this headline">¶</a></h2>
+<p>We can leverage PyTorch Elastic to simplify the DDP code and initialize the job more easily.
+Let’s still use the Toymodel example and create a file named <code class="docutils literal notranslate"><span class="pre">elastic_ddp.py</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">torch.distributed</span> <span class="k">as</span> <span class="nn">dist</span>
+<span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
+<span class="kn">import</span> <span class="nn">torch.optim</span> <span class="k">as</span> <span class="nn">optim</span>
+
+<span class="kn">from</span> <span class="nn">torch.nn.parallel</span> <span class="kn">import</span> <span class="n">DistributedDataParallel</span> <span class="k">as</span> <span class="n">DDP</span>
+
+<span class="k">class</span> <span class="nc">ToyModel</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ToyModel</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">net1</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">relu</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">net2</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">net2</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">net1</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span>
+
+<span class="k">def</span> <span class="nf">demo_basic</span><span class="p">():</span>
+    <span class="n">dist</span><span class="o">.</span><span class="n">init_process_group</span><span class="p">(</span><span class="s2">&quot;nccl&quot;</span><span class="p">)</span>
+    <span class="n">rank</span> <span class="o">=</span> <span class="n">dist</span><span class="o">.</span><span class="n">get_rank</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Start running basic DDP example on rank </span><span class="si">{</span><span class="n">rank</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+
+    <span class="c1"># create model and move it to GPU with id rank</span>
+    <span class="n">device_id</span> <span class="o">=</span> <span class="n">rank</span> <span class="o">%</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">device_count</span><span class="p">()</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">ToyModel</span><span class="p">()</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device_id</span><span class="p">)</span>
+    <span class="n">ddp_model</span> <span class="o">=</span> <span class="n">DDP</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">device_ids</span><span class="o">=</span><span class="p">[</span><span class="n">device_id</span><span class="p">])</span>
+
+    <span class="n">loss_fn</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">MSELoss</span><span class="p">()</span>
+    <span class="n">optimizer</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">SGD</span><span class="p">(</span><span class="n">ddp_model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.001</span><span class="p">)</span>
+
+    <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+    <span class="n">outputs</span> <span class="o">=</span> <span class="n">ddp_model</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+    <span class="n">labels</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device_id</span><span class="p">)</span>
+    <span class="n">loss_fn</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+    <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">demo_basic</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>One can then run a <a href="#id6"><span class="problematic" id="id7">`torch elastic/torchrun&lt;https://pytorch.org/docs/stable/elastic/quickstart.html&gt;`__</span></a> command
+on all nodes to initialize the DDP job created above:</p>
+<p>We are running the DDP script on two hosts, and each host we run with 8 processes, aka, we
+are running it on 16 GPUs. Note that <code class="docutils literal notranslate"><span class="pre">$MASTER_ADDR</span></code> must be the same across all nodes.</p>
+<p>Here torchrun will launch 8 process and invoke <code class="docutils literal notranslate"><span class="pre">elastic_ddp.py</span></code>
+on each process on the node it is launched on, but user also needs to apply cluster
+management tools like slurm to actually run this command on 2 nodes.</p>
+<p>For example, on a SLURM enabled cluster, we can write a script to run the command above
+and set <code class="docutils literal notranslate"><span class="pre">MASTER_ADDR</span></code> as:</p>
+<p>Then we can just run this script using the SLURM command: <code class="docutils literal notranslate"><span class="pre">srun</span> <span class="pre">--nodes=2</span> <span class="pre">./torchrun_script.sh</span></code>.
+Of course, this is just an example; you can choose your own cluster scheduling tools
+to initiate the torchrun job.</p>
+<p>For more information about Elastic run, one can check this
+<a class="reference external" href="https://pytorch.org/docs/stable/elastic/quickstart.html">quick start document</a> to learn more.</p>
+</div>
+</div>
 
 
              </article>
@@ -683,7 +748,7 @@ DDP를 사용할 때, 최적의 방법은 모델을 한 작업에만 저장하�
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2021, PyTorch &amp; PyTorch Korea Community.
+        &copy; Copyright 2022, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorch Korea User Group).
 
     </p>
   </div>
@@ -696,6 +761,13 @@ DDP를 사용할 때, 최적의 방법은 모델을 한 작업에만 저장하�
 </footer>
 
           </div>
+<script>
+if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.indexOf("/prototype/prototype_index")< 1))
+  {
+    var div = '<div class="admonition note"><p class="admonition-title">Note</p><p><i class="fa fa-flask" aria-hidden="true">&nbsp</i> 이 튜토리얼은 프로토타입(prototype) 기능들에 대해서 설명하고 있습니다. 프로토타입 기능은 일반적으로 피드백 및 테스트용으로, 런타임 플래그 없이는 PyPI나 Conda로 배포되는 바이너리에서는 사용할 수 없습니다.</p></div>'
+    document.getElementById("pytorch-article").insertAdjacentHTML('afterBegin', div)
+  }
+</script>
         </div>
 
         <div class="pytorch-content-right" id="pytorch-content-right">
@@ -708,6 +780,7 @@ DDP를 사용할 때, 최적의 방법은 모델을 한 작업에만 저장하�
 <li><a class="reference internal" href="#id4">비대칭 작업 속도</a></li>
 <li><a class="reference internal" href="#id5">체크포인트를 저장하고 읽어오기</a></li>
 <li><a class="reference internal" href="#ddp">모델 병렬 처리를 활용한 DDP</a></li>
+<li><a class="reference internal" href="#initialize-ddp-with-torch-distributed-run-torchrun">Initialize DDP with torch.distributed.run/torchrun</a></li>
 </ul>
 </li>
 </ul>
@@ -748,7 +821,6 @@ DDP를 사용할 때, 최적의 방법은 모델을 한 작업에만 저장하�
       });
   </script>
  
-
 <script>
 //add microsoft link
 
@@ -827,7 +899,7 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
 </script>
 
 <script type="text/javascript">
-  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile'];
+  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile', 'Introduction to PyTorch on YouTube', 'Recommendation Systems'];
 </script>
 
 

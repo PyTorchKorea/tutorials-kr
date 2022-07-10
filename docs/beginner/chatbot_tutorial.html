@@ -6,24 +6,23 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
 <meta property="og:title" content="챗봇 튜토리얼" />
   
 <meta property="og:type" content="article" />
   
-<meta property="og:url" content="http://tutorials.pytorch.kr/beginner/chatbot_tutorial.html" />
+<meta property="og:url" content="https://tutorials.pytorch.kr/beginner/chatbot_tutorial.html" />
   
 <meta property="og:description" content="Author: Matthew Inkawhich, 번역: 김진현,. 이 튜토리얼에서는 순환(recurrent) 시퀀스 투 시퀀스(sequence-to-sequence) 모델의 재미있고 흥미로운 사용 예를 살펴보려 합니다. 간단한 챗봇을 학습해 볼 텐데, 사용할 데이터는 영화 대본으로 구성된 Cornell Movie-Dialogs(코넬 대학교의 영화 속 대화 말뭉치 데이터 입니다. 대화형 모델은 많은 사람들이 관심을 갖는 인공지능 분야의 연구 주제입니다. 고객 서비스와 관련된 활용, 온라인 헬프데스크 등 여러 상황에서 챗봇을 활용..." />
   
-<meta property="og:image" content="http://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
+<meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
   
 <meta property="og:image:alt" content="챗봇 튜토리얼" />
   
 <meta property="og:ignore_canonical" content="true" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>챗봇 튜토리얼 &mdash; 파이토치 한국어 튜토리얼(PyTorch tutorials in Korean)</title>
+  <title>챗봇 튜토리얼 &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
   
 
   
@@ -129,7 +128,7 @@
               
               
                 <div class="version">
-                  1.11.0+cu102
+                  1.12.0+cu102
                 </div>
               
             
@@ -270,6 +269,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/quantized_transfer_learning_tutorial.html">(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/static_quantization_tutorial.html">(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/torchserve_with_ipex.html">Grokking PyTorch Intel CPU performance from first principles</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul>
@@ -296,6 +296,7 @@
 <p class="caption" role="heading"><span class="caption-text">Recommendation Systems</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/torchrec_tutorial.html">Introduction to TorchRec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/sharding.html">Exploring TorchRec sharding</a></li>
 </ul>
 
             
@@ -384,6 +385,7 @@
           </div>
 
         
+
           
           <div class="rst-content">
           
@@ -394,7 +396,7 @@
 <p class="admonition-title">Note</p>
 <p>Click <a class="reference internal" href="#sphx-glr-download-beginner-chatbot-tutorial-py"><span class="std std-ref">here</span></a> to download the full example code</p>
 </div>
-<section class="sphx-glr-example-title" id="sphx-glr-beginner-chatbot-tutorial-py">
+<div class="sphx-glr-example-title section" id="sphx-glr-beginner-chatbot-tutorial-py">
 <span id="id1"></span><h1>챗봇 튜토리얼<a class="headerlink" href="#sphx-glr-beginner-chatbot-tutorial-py" title="Permalink to this headline">¶</a></h1>
 <dl class="simple">
 <dt><strong>Author:</strong> <a class="reference external" href="https://github.com/MatthewInkawhich">Matthew Inkawhich</a></dt><dd><p><strong>번역</strong>: <a class="reference external" href="https://github.com/lewha0">김진현</a></p>
@@ -419,9 +421,9 @@
 다중 도메인 대화 생성 모델(multi-domain generative conversational models)
 분야에 있어서 큰 진전을 이루었습니다. 우리는 이 튜토리얼을 통해 이러한
 모델을 PyTorch로 구현해보려 합니다.</p>
-<figure class="align-center">
+<div class="figure align-center">
 <img alt="bot" src="../_images/bot.png" />
-</figure>
+</div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span>&gt; hello? (안녕하세요?)
 Bot: hello . (안녕하세요.)
 &gt; where am I? (여긴 어디죠?)
@@ -464,7 +466,7 @@ Bot: goodbye . (안녕히 가세요.)
 <li><p>FloydHub의 코넬 대학교의 영화 말뭉치 데이터 전처리 코드:
 <a class="reference external" href="https://github.com/floydhub/textutil-preprocess-cornell-movie-corpus">https://github.com/floydhub/textutil-preprocess-cornell-movie-corpus</a></p></li>
 </ol>
-<section id="id3">
+<div class="section" id="id3">
 <h2>준비 단계<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
 <p>시작에 앞서, <a class="reference external" href="https://www.cs.cornell.edu/~cristian/Cornell_Movie-Dialogs_Corpus.html">여기</a> 에서
 ZIP 파일 형태의 데이터를 내려받고, 현재 디렉토리 아래에 <code class="docutils literal notranslate"><span class="pre">data/</span></code> 라는
@@ -495,8 +497,8 @@ ZIP 파일 형태의 데이터를 내려받고, 현재 디렉토리 아래에 <c
 <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span> <span class="k">if</span> <span class="n">USE_CUDA</span> <span class="k">else</span> <span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-<section id="id4">
+</div>
+<div class="section" id="id4">
 <h2>데이터 읽기 &amp; 전처리하기<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
 <p>다음 단계는 데이터 파일의 형식을 재조정한 후, 우리가 작업하기 편한
 구조로 읽어들이는 것입니다.</p>
@@ -538,7 +540,7 @@ b&#39;L870 +++$+++ u0 +++$+++ m0 +++$+++ BIANCA +++$+++ I\&#39;m kidding.  You k
 b&#39;L869 +++$+++ u0 +++$+++ m0 +++$+++ BIANCA +++$+++ Like my fear of wearing pastels?\n&#39;
 </pre></div>
 </div>
-<section id="id5">
+<div class="section" id="id5">
 <h3>원하는 형식의 데이터 파일로 만들기<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
 <p>편의를 위해 데이터의 형식을 원하는 형태로 만들려고 합니다. 각 줄에
 <em>질의 문장</em> 과 <em>응답 문장</em> 의 쌍이 탭으로 구분되어 있게끔 하는 것입니다.</p>
@@ -658,8 +660,8 @@ b&quot;Unsolved mystery.  She used to be really popular when she started high sc
 b&#39;Gosh, if only we could find Kat a boyfriend...\tLet me see what I can do.\n&#39;
 </pre></div>
 </div>
-</section>
-<section id="id6">
+</div>
+<div class="section" id="id6">
 <h3>데이터 읽고 정리하기<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
 <p>다음에 해야 할 일은 어휘집을 만들고, 질의/응답 문장 쌍을 메모리로
 읽어들이는 것입니다.</p>
@@ -866,9 +868,9 @@ pairs:
 Trimmed from 64271 pairs to 53165, 0.8272 of total
 </pre></div>
 </div>
-</section>
-</section>
-<section id="id7">
+</div>
+</div>
+<div class="section" id="id7">
 <h2>모델을 위한 데이터 준비하기<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h2>
 <p>상당한 노력을 기울여 데이터를 전처리하고, 잘 정리하여 어휘집 객체와
 문장 쌍의 리스트 형태로 만들어두긴 했지만, 결국 우리가 만들 모델에서
@@ -894,9 +896,9 @@ batch_size)</em> 로 맞춰야 합니다. 이때 <em>max_length</em> 보다 짧�
 후에 첫 번째 차원에 대해 인덱싱하면 배치에 포함된 모든 문장을 시간에
 대해 인덱싱한 결과를 반환하게 됩니다. 우리는 이 뒤집기 작업을
 <code class="docutils literal notranslate"><span class="pre">zeroPadding</span></code> 함수를 이용하여 묵시적으로 수행할 것입니다.</p>
-<figure class="align-center">
+<div class="figure align-center">
 <img alt="batches" src="../_images/seq2seq_batches.png" />
-</figure>
+</div>
 <p><code class="docutils literal notranslate"><span class="pre">inputVar</span></code> 함수는 문장을 텐서로 변환하는, 그리고 궁극적으로는 제로
 패딩하여 올바른 모양으로 맞춘 텐서를 만드는 작업을 수행합니다. 이
 함수는 각 배치에 포함된 시퀀스의 길이(<code class="docutils literal notranslate"><span class="pre">lengths</span></code>)로 구성된 텐서도 같이
@@ -1003,10 +1005,10 @@ mask: tensor([[1, 1, 1, 1, 1],
 max_target_len: 10
 </pre></div>
 </div>
-</section>
-<section id="id8">
+</div>
+<div class="section" id="id8">
 <h2>모델 정의하기<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h2>
-<section id="seq2seq">
+<div class="section" id="seq2seq">
 <h3>Seq2Seq 모델<a class="headerlink" href="#seq2seq" title="Permalink to this headline">¶</a></h3>
 <p>우리 챗봇의 두뇌에 해당하는 모델은 sequence-to-sequence (seq2seq)
 모델입니다. seq2seq 모델의 목표는 가변 길이 시퀀스를 입력으로 받고,
@@ -1020,13 +1022,13 @@ RNN 하나는 <strong>인코더</strong> 로, 가변 길이 입력 시퀀스를 
 담고 있을 것입니다. 두 번째 RNN은 <strong>디코더</strong> 입니다. 디코더는 단어 하나와
 문맥 벡터를 입력으로 받고, 시퀀스의 다음 단어가 무엇일지를 추론하여
 반환하며, 다음 단계에서 사용할 은닉 상태도 같이 반환합니다.</p>
-<figure class="align-center">
+<div class="figure align-center">
 <img alt="model" src="../_images/seq2seq_ts.png" />
-</figure>
+</div>
 <p>그림 출처:
 <a class="reference external" href="https://jeddy92.github.io/JEddy92.github.io/ts_seq2seq_intro/">https://jeddy92.github.io/JEddy92.github.io/ts_seq2seq_intro/</a></p>
-</section>
-<section id="id9">
+</div>
+<div class="section" id="id9">
 <h3>인코더<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
 <p>인코더 RNN은 입력 시퀀스를 토큰 단위로(예를 들어, 단어 단위로) 한번에
 하나씩 살펴보며 진행합니다. 그리고 각 단계마다 “출력” 벡터와 “은닉
@@ -1044,9 +1046,9 @@ Recurrent Unit)이 있습니다. 이는 <a class="reference external" href="http
 출력을 합산합니다. 양방향 GRU를 사용하면 과거와 미래의 문맥을 함께
 인코딩할 수 있다는 장점이 있습니다.</p>
 <p>양방향 RNN:</p>
-<figure class="align-center">
+<div class="figure align-center">
 <a class="reference internal image-reference" href="../_images/RNN-bidirectional.png"><img alt="rnn_bidir" src="../_images/RNN-bidirectional.png" style="width: 70%;" /></a>
-</figure>
+</div>
 <p>그림 출처: <a class="reference external" href="https://colah.github.io/posts/2015-09-NN-Types-FP/">https://colah.github.io/posts/2015-09-NN-Types-FP/</a></p>
 <p><code class="docutils literal notranslate"><span class="pre">embedding</span></code> 레이어가 단어 인덱스를 임의 크기의 피처 공간으로
 인코딩하는 데 사용되었음에 유의하기 바랍니다. 우리의 모델에서는 이
@@ -1112,8 +1114,8 @@ num_directions, batch_size, hidden_size)</em></p></li>
         <span class="k">return</span> <span class="n">outputs</span><span class="p">,</span> <span class="n">hidden</span>
 </pre></div>
 </div>
-</section>
-<section id="id10">
+</div>
+<div class="section" id="id10">
 <h3>디코더<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h3>
 <p>디코더 RNN은 토큰 단위로 응답 문장을 생성하는 역할을 수행합니다. 이때
 인코더의 문맥 벡터를 사용하며, 내부 은닉 상태에 따라 시퀀스의 다음
@@ -1132,9 +1134,9 @@ num_directions, batch_size, hidden_size)</em></p></li>
 결과로 얻게 되는 가중치 합은 인코더의 출력에서 어느 부분에 집중해야
 할지를 알려줍니다. <a class="reference external" href="https://github.com/spro">Sean Robertson</a>
 의 그림에 이러한 내용이 잘 설명되어 있습니다.</p>
-<figure class="align-center">
+<div class="figure align-center">
 <img alt="attn2" src="../_images/attn2.png" />
-</figure>
+</div>
 <p><a class="reference external" href="https://arxiv.org/abs/1508.04025">Luong 등</a> 은 Bahdanau의 기초 연구를
 더욱 발전시킨 ‘전역(global) 어텐션’을 제안했습니다. ‘전역 어텐션’의
 핵심적인 차이점은 인코더의 은닉 상태를 모두 고려한다는 점입니다. 이는
@@ -1145,18 +1147,18 @@ Bahdanau 등의 ‘지역(local) 어텐션’ 방식이 현재 시점에 대한 
 계산할 때 디코더의 이전 단계 상태에 대한 정보를 활용합니다. 또한 Luong 등의
 방법에서는 인코더의 출력과 디코더의 출력에 대한 어텐션 에너지를 계산하는
 방법을 제공하며, 이를 ‘점수 함수(score function)’라 부릅니다.</p>
-<figure class="align-center">
+<div class="figure align-center">
 <a class="reference internal image-reference" href="../_images/scores.png"><img alt="scores" src="../_images/scores.png" style="width: 60%;" /></a>
-</figure>
+</div>
 <p>이때 <span class="math">\(h_t\)</span> 는 목표 디코더의 현재 상태를, <span class="math">\(\bar{h}_s\)</span> 는 인코더의
 모든 상태를 뜻합니다.</p>
 <p>종합해 보면, 전역 어텐션 메커니즘을 다음 그림과 같이 요약할 수 있을
 것입니다. 우리가 ‘어텐션 레이어’를 <code class="docutils literal notranslate"><span class="pre">Attn</span></code> 라는 독립적인 <code class="docutils literal notranslate"><span class="pre">nn.Module</span></code> 로
 구현할 것임에 유의하기 바랍니다. 이 모듈의 출력은 모양이 <em>(batch_size, 1,
 max_length)</em> 인 정규화된 softmax 가중치 텐서입니다.</p>
-<figure class="align-center">
+<div class="figure align-center">
 <a class="reference internal image-reference" href="../_images/global_attn.png"><img alt="global_attn" src="../_images/global_attn.png" style="width: 60%;" /></a>
-</figure>
+</div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Luong 어텐션 레이어</span>
 <span class="k">class</span> <span class="nc">Attn</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">):</span>
@@ -1274,11 +1276,11 @@ num_directions, batch_size, hidden_size)</em></p></li>
         <span class="k">return</span> <span class="n">output</span><span class="p">,</span> <span class="n">hidden</span>
 </pre></div>
 </div>
-</section>
-</section>
-<section id="id11">
+</div>
+</div>
+<div class="section" id="id11">
 <h2>학습 프로시저 정의하기<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h2>
-<section id="masked-loss">
+<div class="section" id="masked-loss">
 <h3>Masked loss<a class="headerlink" href="#masked-loss" title="Permalink to this headline">¶</a></h3>
 <p>우리는 패딩된 시퀀스 배치를 다루기 때문에 손실을 계산할 때 단순히 텐서의
 모든 원소를 고려할 수는 없습니다. 우리는 <code class="docutils literal notranslate"><span class="pre">maskNLLLoss</span></code> 를 정의하여
@@ -1293,8 +1295,8 @@ num_directions, batch_size, hidden_size)</em></p></li>
     <span class="k">return</span> <span class="n">loss</span><span class="p">,</span> <span class="n">nTotal</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
 </pre></div>
 </div>
-</section>
-<section id="id12">
+</div>
+<div class="section" id="id12">
 <h3>한 번의 학습 단계<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h3>
 <p><code class="docutils literal notranslate"><span class="pre">train</span></code> 함수에 학습을 한 단계(입력 배치 한 개에 대한) 진행하는 알고리즘이
 나와 있습니다.</p>
@@ -1315,9 +1317,9 @@ num_directions, batch_size, hidden_size)</em></p></li>
 함수적으로 증가하거나 오버플로를 일으키는(NaN) 경우를 막고, 비용 함수의
 급격한 경사를 피하겠다는 것입니다.</p></li>
 </ul>
-<figure class="align-center">
+<div class="figure align-center">
 <a class="reference internal image-reference" href="../_images/grad_clip.png"><img alt="grad_clip" src="../_images/grad_clip.png" style="width: 60%;" /></a>
-</figure>
+</div>
 <p>그림 출처: Goodfellow 등 저. <em>Deep Learning</em>. 2016. <a class="reference external" href="https://www.deeplearningbook.org/">https://www.deeplearningbook.org/</a></p>
 <p><strong>작업 절차:</strong></p>
 <blockquote>
@@ -1418,8 +1420,8 @@ num_directions, batch_size, hidden_size)</em></p></li>
     <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">print_losses</span><span class="p">)</span> <span class="o">/</span> <span class="n">n_totals</span>
 </pre></div>
 </div>
-</section>
-<section id="id13">
+</div>
+<div class="section" id="id13">
 <h3>학습 단계<a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h3>
 <p>이제 마지막으로 전체 학습 프로시저와 데이터를 하나로 엮을 때가
 되었습니다. <code class="docutils literal notranslate"><span class="pre">trainIters</span></code> 함수는 주어진 모델, optimizer, 데이터 등을
@@ -1481,13 +1483,13 @@ state_dicts (매개변수), optimizer의 state_dicts, 손실, 진행 단계 수
             <span class="p">},</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">_</span><span class="si">{}</span><span class="s1">.tar&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">iteration</span><span class="p">,</span> <span class="s1">&#39;checkpoint&#39;</span><span class="p">)))</span>
 </pre></div>
 </div>
-</section>
-</section>
-<section id="id14">
+</div>
+</div>
+<div class="section" id="id14">
 <h2>평가 정의하기<a class="headerlink" href="#id14" title="Permalink to this headline">¶</a></h2>
 <p>모델을 학습시키고 나면 직접 봇과 대화를 나눠보고 싶어질 것입니다. 그러려면
 먼저 모델이 인코딩된 입력을 어떻게 디코딩할지를 정의해줘야 합니다.</p>
-<section id="id15">
+<div class="section" id="id15">
 <h3>탐욕적 디코딩<a class="headerlink" href="#id15" title="Permalink to this headline">¶</a></h3>
 <p>탐욕적 디코딩(Greedy decoding)은 우리가 학습 단계에서 teacher forcing을
 적용하지 않았을 때 사용한 디코딩 방법입니다. 달리 말하면, 각 단계에 대해
@@ -1550,8 +1552,8 @@ state_dicts (매개변수), optimizer의 state_dicts, 손실, 진행 단계 수
         <span class="k">return</span> <span class="n">all_tokens</span><span class="p">,</span> <span class="n">all_scores</span>
 </pre></div>
 </div>
-</section>
-<section id="id16">
+</div>
+<div class="section" id="id16">
 <h3>내 텍스트 평가하기<a class="headerlink" href="#id16" title="Permalink to this headline">¶</a></h3>
 <p>이제 디코딩 모델을 정의했으니, 문자열로 된 입력 시퀀스를 평가하는 함수를
 작성해볼 수 있을 것입니다. <code class="docutils literal notranslate"><span class="pre">evaluate</span></code> 함수에 입력 시퀀스를 낮은
@@ -1612,9 +1614,9 @@ state_dicts (매개변수), optimizer의 state_dicts, 손실, 진행 단계 수
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Error: Encountered unknown word.&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-</section>
-<section id="id17">
+</div>
+</div>
+<div class="section" id="id17">
 <h2>모델 수행하기<a class="headerlink" href="#id17" title="Permalink to this headline">¶</a></h2>
 <p>마지막으로, 우리의 모델을 수행해 볼 시간입니다!</p>
 <p>우리가 챗봇 모델을 학습할 때든 테스트할 때든, 우리는 각각의 인코더 및
@@ -1677,7 +1679,7 @@ state_dicts (매개변수), optimizer의 state_dicts, 손실, 진행 단계 수
 Models built and ready to go!
 </pre></div>
 </div>
-<section id="id18">
+<div class="section" id="id18">
 <h3>학습 수행하기<a class="headerlink" href="#id18" title="Permalink to this headline">¶</a></h3>
 <p>모델을 학습해보고 싶다면 다음 블록을 수행하면 됩니다.</p>
 <p>먼저 학습 매개변수를 설정하고, optimizer를 초기화한 뒤, 마지막으로 <code class="docutils literal notranslate"><span class="pre">trainIters</span></code>
@@ -5728,8 +5730,8 @@ Iteration: 3999; Percent complete: 100.0%; Average loss: 2.5985
 Iteration: 4000; Percent complete: 100.0%; Average loss: 2.7209
 </pre></div>
 </div>
-</section>
-<section id="id19">
+</div>
+<div class="section" id="id19">
 <h3>평가 수행하기<a class="headerlink" href="#id19" title="Permalink to this headline">¶</a></h3>
 <p>여러분의 모델과 채팅을 해보고 싶다면 다음 블록을 수행하면 됩니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Dropout 레이어를 평가 모드로 설정합니다</span>
@@ -5743,9 +5745,9 @@ Iteration: 4000; Percent complete: 100.0%; Average loss: 2.7209
 <span class="c1"># evaluateInput(encoder, decoder, searcher, voc)</span>
 </pre></div>
 </div>
-</section>
-</section>
-<section id="id20">
+</div>
+</div>
+<div class="section" id="id20">
 <h2>맺음말<a class="headerlink" href="#id20" title="Permalink to this headline">¶</a></h2>
 <p>이번 튜토리얼을 이것으로 마무리하겠습니다. 축하합니다! 여러분은 이제 생성
 챗봇 모델을 만들기 위한 기초 지식을 습득했습니다. 만약 좀 더 관심이 있다면
@@ -5753,7 +5755,7 @@ Iteration: 4000; Percent complete: 100.0%; Average loss: 2.7209
 보면서 챗봇의 행동을 수정해볼 수 있을 것입니다.</p>
 <p>그 외에도 딥러닝의 멋진 활용 예에 대한 PyTorch 튜토리얼이 있으니 한 번
 확인해 보기 바랍니다!</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 4 minutes  8.331 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 4 minutes  3.279 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-beginner-chatbot-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/d90127b0deeb355be3a350521d770206/chatbot_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">chatbot_tutorial.py</span></code></a></p>
@@ -5763,8 +5765,8 @@ Iteration: 4000; Percent complete: 100.0%; Average loss: 2.7209
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
-</section>
-</section>
+</div>
+</div>
 
 
              </article>
@@ -5792,7 +5794,7 @@ Iteration: 4000; Percent complete: 100.0%; Average loss: 2.7209
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2021, PyTorch &amp; PyTorch Korea Community.
+        &copy; Copyright 2022, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorch Korea User Group).
 
     </p>
   </div>
@@ -5805,6 +5807,13 @@ Iteration: 4000; Percent complete: 100.0%; Average loss: 2.7209
 </footer>
 
           </div>
+<script>
+if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.indexOf("/prototype/prototype_index")< 1))
+  {
+    var div = '<div class="admonition note"><p class="admonition-title">Note</p><p><i class="fa fa-flask" aria-hidden="true">&nbsp</i> 이 튜토리얼은 프로토타입(prototype) 기능들에 대해서 설명하고 있습니다. 프로토타입 기능은 일반적으로 피드백 및 테스트용으로, 런타임 플래그 없이는 PyPI나 Conda로 배포되는 바이너리에서는 사용할 수 없습니다.</p></div>'
+    document.getElementById("pytorch-article").insertAdjacentHTML('afterBegin', div)
+  }
+</script>
         </div>
 
         <div class="pytorch-content-right" id="pytorch-content-right">
@@ -5882,7 +5891,6 @@ Iteration: 4000; Percent complete: 100.0%; Average loss: 2.7209
       });
   </script>
  
-
 <script>
 //add microsoft link
 
@@ -5961,7 +5969,7 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
 </script>
 
 <script type="text/javascript">
-  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile'];
+  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile', 'Introduction to PyTorch on YouTube', 'Recommendation Systems'];
 </script>
 
 

@@ -6,24 +6,23 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
 <meta property="og:title" content="모델 저장하기 & 불러오기" />
   
 <meta property="og:type" content="article" />
   
-<meta property="og:url" content="http://tutorials.pytorch.kr/beginner/saving_loading_models.html" />
+<meta property="og:url" content="https://tutorials.pytorch.kr/beginner/saving_loading_models.html" />
   
 <meta property="og:description" content="Author: Matthew Inkawhich, 번역: 박정환,. 이 문서에서는 PyTorch 모델을 저장하고 불러오는 다양한 방법을 제공합니다. 이 문서 전체를 다 읽는 것도 좋은 방법이지만, 필요한 사용 예의 코드만 참고하는 것도 고려해보세요. 모델을 저장하거나 불러올 때는 3가지의 핵심 함수와 익숙해질 필요가 있습니다: torch.save: 직렬화된 객체를 디스크에 저장합니다. 이 함수는 Python의 pickle 을 사용하여 직렬화합니다 이 함수를 사용하여 모든 종류의 객체의 모델, Tensor 및 사전을 저장할 수 있..." />
   
-<meta property="og:image" content="http://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
+<meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
   
 <meta property="og:image:alt" content="모델 저장하기 & 불러오기" />
   
 <meta property="og:ignore_canonical" content="true" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>모델 저장하기 &amp; 불러오기 &mdash; 파이토치 한국어 튜토리얼(PyTorch tutorials in Korean)</title>
+  <title>모델 저장하기 &amp; 불러오기 &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
   
 
   
@@ -129,7 +128,7 @@
               
               
                 <div class="version">
-                  1.11.0+cu102
+                  1.12.0+cu102
                 </div>
               
             
@@ -270,6 +269,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/quantized_transfer_learning_tutorial.html">(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/static_quantization_tutorial.html">(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/torchserve_with_ipex.html">Grokking PyTorch Intel CPU performance from first principles</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul>
@@ -296,6 +296,7 @@
 <p class="caption" role="heading"><span class="caption-text">Recommendation Systems</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/torchrec_tutorial.html">Introduction to TorchRec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/sharding.html">Exploring TorchRec sharding</a></li>
 </ul>
 
             
@@ -384,6 +385,7 @@
           </div>
 
         
+
           
           <div class="rst-content">
           
@@ -394,7 +396,7 @@
 <p class="admonition-title">Note</p>
 <p>Click <a class="reference internal" href="#sphx-glr-download-beginner-saving-loading-models-py"><span class="std std-ref">here</span></a> to download the full example code</p>
 </div>
-<section class="sphx-glr-example-title" id="sphx-glr-beginner-saving-loading-models-py">
+<div class="sphx-glr-example-title section" id="sphx-glr-beginner-saving-loading-models-py">
 <span id="id1"></span><h1>모델 저장하기 &amp; 불러오기<a class="headerlink" href="#sphx-glr-beginner-saving-loading-models-py" title="Permalink to this headline">¶</a></h1>
 <dl class="simple">
 <dt><strong>Author:</strong> <a class="reference external" href="https://github.com/MatthewInkawhich">Matthew Inkawhich</a></dt><dd><p><strong>번역</strong>: <a class="reference external" href="http://github.com/9bow">박정환</a></p>
@@ -427,7 +429,7 @@
 <li><p><a class="reference external" href="#warmstart">다른 모델의 매개변수를 사용하여 빠르게 모델 시작하기(warmstart)</a></p></li>
 <li><p><a class="reference external" href="#device">장치(device)간 모델 저장하기 &amp; 불러오기</a></p></li>
 </ul>
-<section id="state-dict">
+<div class="section" id="state-dict">
 <h2><code class="docutils literal notranslate"><span class="pre">state_dict</span></code> 가 무엇인가요?<a class="headerlink" href="#state-dict" title="Permalink to this headline">¶</a></h2>
 <p>PyTorch에서 <code class="docutils literal notranslate"><span class="pre">torch.nn.Module</span></code> 모델의 학습 가능한 매개변수(예. 가중치와 편향)들은
 모델의 매개변수에 포함되어 있습니다(model.parameters()로 접근합니다).
@@ -439,7 +441,7 @@
 <em>state_dict</em> 를 갖습니다.</p>
 <p><em>state_dict</em> 객체는 Python 사전이기 때문에 쉽게 저장하거나 갱신하거나 바꾸거나
 되살릴 수 있으며, PyTorch 모델과 옵티마이저에 엄청난 모듈성(modularity)을 제공합니다.</p>
-<section id="id3">
+<div class="section" id="id3">
 <h3>예제:<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
 <p><a class="reference internal" href="blitz/cifar10_tutorial.html"><span class="doc">분류기(Classifier) 학습하기</span></a> 튜토리얼에서 사용한 간단한 모델의
 <em>state_dict</em> 를 살펴보도록 하겠습니다.</p>
@@ -498,11 +500,11 @@
 <span class="n">param_groups</span>     <span class="p">[{</span><span class="s1">&#39;lr&#39;</span><span class="p">:</span> <span class="mf">0.001</span><span class="p">,</span> <span class="s1">&#39;momentum&#39;</span><span class="p">:</span> <span class="mf">0.9</span><span class="p">,</span> <span class="s1">&#39;dampening&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;weight_decay&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;nesterov&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;params&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">4675713712</span><span class="p">,</span> <span class="mi">4675713784</span><span class="p">,</span> <span class="mi">4675714000</span><span class="p">,</span> <span class="mi">4675714072</span><span class="p">,</span> <span class="mi">4675714216</span><span class="p">,</span> <span class="mi">4675714288</span><span class="p">,</span> <span class="mi">4675714432</span><span class="p">,</span> <span class="mi">4675714504</span><span class="p">,</span> <span class="mi">4675714648</span><span class="p">,</span> <span class="mi">4675714720</span><span class="p">]}]</span>
 </pre></div>
 </div>
-</section>
-</section>
-<section id="inference">
+</div>
+</div>
+<div class="section" id="inference">
 <h2>추론(inference)를 위해 모델 저장하기 &amp; 불러오기<a class="headerlink" href="#inference" title="Permalink to this headline">¶</a></h2>
-<section id="id4">
+<div class="section" id="id4">
 <h3><code class="docutils literal notranslate"><span class="pre">state_dict</span></code> 저장하기 / 불러오기 (권장)<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
 <p><strong>저장하기:</strong></p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span> <span class="n">PATH</span><span class="p">)</span>
@@ -547,8 +549,8 @@ kwarg로 전달하세요.</p>
 그렇지 않으면, 제일 좋은 성능을 내는 <code class="docutils literal notranslate"><span class="pre">best_model_state</span></code> 은 계속되는 학습 단계에서
 갱신될 것입니다. 결과적으로, 최종 모델의 상태는 과적합(overfit)된 상태가 됩니다.</p>
 </div>
-</section>
-<section id="id5">
+</div>
+<div class="section" id="id5">
 <h3>전체 모델 저장하기/불러오기<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
 <p><strong>저장하기:</strong></p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">PATH</span><span class="p">)</span>
@@ -574,8 +576,8 @@ kwarg로 전달하세요.</p>
 <p>추론을 실행하기 전에는 반드시 <code class="docutils literal notranslate"><span class="pre">model.eval()</span></code> 을 호출하여 드롭아웃 및 배치
 정규화를 평가 모드로 설정하여야 합니다. 이것을 하지 않으면 추론 결과가 일관성
 없게 출력됩니다.</p>
-</section>
-<section id="export-load-model-in-torchscript-format">
+</div>
+<div class="section" id="export-load-model-in-torchscript-format">
 <h3>Export/Load Model in TorchScript Format<a class="headerlink" href="#export-load-model-in-torchscript-format" title="Permalink to this headline">¶</a></h3>
 <p>One common way to do inference with a trained model is to use
 <a class="reference external" href="https://pytorch.org/docs/stable/jit.html">TorchScript</a>, an intermediate
@@ -604,11 +606,11 @@ Failing to do this will yield inconsistent inference results.</p>
 <a class="reference external" href="https://tutorials.pytorch.kr/beginner/Intro_to_TorchScript_tutorial.html">tutorials</a>.
 You will get familiar with the tracing conversion and learn how to
 run a TorchScript module in a <a class="reference external" href="https://tutorials.pytorch.kr/advanced/cpp_export.html">C++ environment</a>.</p>
-</section>
-</section>
-<section id="checkpoint">
+</div>
+</div>
+<div class="section" id="checkpoint">
 <h2>추론 / 학습 재개를 위해 일반 체크포인트(checkpoint) 저장하기 &amp; 불러오기<a class="headerlink" href="#checkpoint" title="Permalink to this headline">¶</a></h2>
-<section id="id6">
+<div class="section" id="id6">
 <h3>저장하기:<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">({</span>
             <span class="s1">&#39;epoch&#39;</span><span class="p">:</span> <span class="n">epoch</span><span class="p">,</span>
@@ -619,8 +621,8 @@ run a TorchScript module in a <a class="reference external" href="https://tutori
             <span class="p">},</span> <span class="n">PATH</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-<section id="id7">
+</div>
+<div class="section" id="id7">
 <h3>불러오기:<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">TheModelClass</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 <span class="n">optimizer</span> <span class="o">=</span> <span class="n">TheOptimizerClass</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -652,11 +654,11 @@ run a TorchScript module in a <a class="reference external" href="https://tutori
 정규화를 평가 모드로 설정하여야 합니다. 이것을 하지 않으면 추론 결과가 일관성
 없게 출력됩니다. 만약 학습을 계속하고 싶다면, <code class="docutils literal notranslate"><span class="pre">model.train()</span></code> 을 호출하여
 학습 모드로 전환되도록 해야 합니다.</p>
-</section>
-</section>
-<section id="multiple">
+</div>
+</div>
+<div class="section" id="multiple">
 <h2>여러개(multiple)의 모델을 하나의 파일에 저장하기<a class="headerlink" href="#multiple" title="Permalink to this headline">¶</a></h2>
-<section id="id8">
+<div class="section" id="id8">
 <h3>저장하기:<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">({</span>
             <span class="s1">&#39;modelA_state_dict&#39;</span><span class="p">:</span> <span class="n">modelA</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span>
@@ -667,8 +669,8 @@ run a TorchScript module in a <a class="reference external" href="https://tutori
             <span class="p">},</span> <span class="n">PATH</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-<section id="id9">
+</div>
+<div class="section" id="id9">
 <h3>불러오기:<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">modelA</span> <span class="o">=</span> <span class="n">TheModelAClass</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 <span class="n">modelB</span> <span class="o">=</span> <span class="n">TheModelBClass</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -702,17 +704,17 @@ run a TorchScript module in a <a class="reference external" href="https://tutori
 정규화를 평가 모드로 설정하여야 합니다. 이것을 하지 않으면 추론 결과가 일관성
 없게 출력됩니다. 만약 학습을 계속하고 싶다면, <code class="docutils literal notranslate"><span class="pre">model.train()</span></code> 을 호출하여
 학습 모드로 설정해야 합니다.</p>
-</section>
-</section>
-<section id="warmstart">
+</div>
+</div>
+<div class="section" id="warmstart">
 <h2>다른 모델의 매개변수를 사용하여 빠르게 모델 시작하기(warmstart)<a class="headerlink" href="#warmstart" title="Permalink to this headline">¶</a></h2>
-<section id="id10">
+<div class="section" id="id10">
 <h3>저장하기:<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">modelA</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span> <span class="n">PATH</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-<section id="id11">
+</div>
+<div class="section" id="id11">
 <h3>불러오기:<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">modelB</span> <span class="o">=</span> <span class="n">TheModelBClass</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 <span class="n">modelB</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">PATH</span><span class="p">),</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -729,11 +731,11 @@ run a TorchScript module in a <a class="reference external" href="https://tutori
 <p>한 계층에서 다른 계층으로 매개변수를 불러오고 싶지만, 일부 키가 일치하지
 않을 때에는 적재하려는 모델의 키와 일치하도록 <em>state_dict</em> 의 매개변수 키의
 이름을 변경하면 됩니다.</p>
-</section>
-</section>
-<section id="device">
+</div>
+</div>
+<div class="section" id="device">
 <h2>장치(device)간 모델 저장하기 &amp; 불러오기<a class="headerlink" href="#device" title="Permalink to this headline">¶</a></h2>
-<section id="gpu-cpu">
+<div class="section" id="gpu-cpu">
 <h3>GPU에서 저장하고 CPU에서 불러오기<a class="headerlink" href="#gpu-cpu" title="Permalink to this headline">¶</a></h3>
 <p><strong>저장하기:</strong></p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span> <span class="n">PATH</span><span class="p">)</span>
@@ -749,8 +751,8 @@ run a TorchScript module in a <a class="reference external" href="https://tutori
 <code class="docutils literal notranslate"><span class="pre">map_location</span></code> 인자에 <code class="docutils literal notranslate"><span class="pre">torch.device('cpu')</span></code> 을 전달합니다.
 이 경우에는 Tensor에 저장된 내용들은 <code class="docutils literal notranslate"><span class="pre">map_location</span></code> 인자를 사용하여 CPU 장치에
 동적으로 재배치됩니다.</p>
-</section>
-<section id="gpu-gpu">
+</div>
+<div class="section" id="gpu-gpu">
 <h3>GPU에서 저장하고 GPU에서 불러오기<a class="headerlink" href="#gpu-gpu" title="Permalink to this headline">¶</a></h3>
 <p><strong>저장하기:</strong></p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span> <span class="n">PATH</span><span class="p">)</span>
@@ -770,8 +772,8 @@ run a TorchScript module in a <a class="reference external" href="https://tutori
 함수를 호출해야 합니다. <code class="docutils literal notranslate"><span class="pre">my_tensor.to(device)</span></code> 를 호출하면 GPU에 <code class="docutils literal notranslate"><span class="pre">my_tensor</span></code>
 의 복사본을 반환하기 때문에, Tensor를 직접 덮어써야 합니다:
 <code class="docutils literal notranslate"><span class="pre">my_tensor</span> <span class="pre">=</span> <span class="pre">my_tensor.to(torch.device('cuda'))</span></code> .</p>
-</section>
-<section id="cpu-gpu">
+</div>
+<div class="section" id="cpu-gpu">
 <h3>CPU에서 저장하고 GPU에서 불러오기<a class="headerlink" href="#cpu-gpu" title="Permalink to this headline">¶</a></h3>
 <p><strong>저장하기:</strong></p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span> <span class="n">PATH</span><span class="p">)</span>
@@ -793,8 +795,8 @@ GPU 장치에 불러와집니다. 다음으로 <code class="docutils literal not
 데이터로 만들어야 합니다. <code class="docutils literal notranslate"><span class="pre">my_tensor.to(device)</span></code> 를 호출하면 GPU에 <code class="docutils literal notranslate"><span class="pre">my_tensor</span></code>
 의 복사본을 반환합니다. 이 동작은 <code class="docutils literal notranslate"><span class="pre">my_tensor</span></code> 를 덮어쓰지 않기 때문에, Tensor를
 직접 덮어써야 합니다: <code class="docutils literal notranslate"><span class="pre">my_tensor</span> <span class="pre">=</span> <span class="pre">my_tensor.to(torch.device('cuda'))</span></code> .</p>
-</section>
-<section id="torch-nn-dataparallel">
+</div>
+<div class="section" id="torch-nn-dataparallel">
 <h3><code class="docutils literal notranslate"><span class="pre">torch.nn.DataParallel</span></code> 모델 저장하기<a class="headerlink" href="#torch-nn-dataparallel" title="Permalink to this headline">¶</a></h3>
 <p><strong>저장하기:</strong></p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">module</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span> <span class="n">PATH</span><span class="p">)</span>
@@ -818,9 +820,9 @@ GPU 장치에 불러와집니다. 다음으로 <code class="docutils literal not
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
-</section>
-</section>
-</section>
+</div>
+</div>
+</div>
 
 
              </article>
@@ -848,7 +850,7 @@ GPU 장치에 불러와집니다. 다음으로 <code class="docutils literal not
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2021, PyTorch &amp; PyTorch Korea Community.
+        &copy; Copyright 2022, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorch Korea User Group).
 
     </p>
   </div>
@@ -861,6 +863,13 @@ GPU 장치에 불러와집니다. 다음으로 <code class="docutils literal not
 </footer>
 
           </div>
+<script>
+if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.indexOf("/prototype/prototype_index")< 1))
+  {
+    var div = '<div class="admonition note"><p class="admonition-title">Note</p><p><i class="fa fa-flask" aria-hidden="true">&nbsp</i> 이 튜토리얼은 프로토타입(prototype) 기능들에 대해서 설명하고 있습니다. 프로토타입 기능은 일반적으로 피드백 및 테스트용으로, 런타임 플래그 없이는 PyPI나 Conda로 배포되는 바이너리에서는 사용할 수 없습니다.</p></div>'
+    document.getElementById("pytorch-article").insertAdjacentHTML('afterBegin', div)
+  }
+</script>
         </div>
 
         <div class="pytorch-content-right" id="pytorch-content-right">
@@ -940,7 +949,6 @@ GPU 장치에 불러와집니다. 다음으로 <code class="docutils literal not
       });
   </script>
  
-
 <script>
 //add microsoft link
 
@@ -1019,7 +1027,7 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
 </script>
 
 <script type="text/javascript">
-  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile'];
+  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile', 'Introduction to PyTorch on YouTube', 'Recommendation Systems'];
 </script>
 
 

@@ -6,24 +6,23 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
 <meta property="og:title" content="Getting Started with Fully Sharded Data Parallel(FSDP)" />
   
 <meta property="og:type" content="article" />
   
-<meta property="og:url" content="http://tutorials.pytorch.kr/intermediate/FSDP_tutorial.html" />
+<meta property="og:url" content="https://tutorials.pytorch.kr/intermediate/FSDP_tutorial.html" />
   
 <meta property="og:description" content="Author: Hamid Shojanazeri, Yanli Zhao, Shen Li Training AI models at a large scale is a challenging task that requires a lot of compute power and resources. It also comes with considerable engineering complexity to handle the training of these very large models. Pytorch FSDP, released in PyTorch ..." />
   
-<meta property="og:image" content="http://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
+<meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
   
 <meta property="og:image:alt" content="Getting Started with Fully Sharded Data Parallel(FSDP)" />
   
 <meta property="og:ignore_canonical" content="true" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Getting Started with Fully Sharded Data Parallel(FSDP) &mdash; 파이토치 한국어 튜토리얼(PyTorch tutorials in Korean)</title>
+  <title>Getting Started with Fully Sharded Data Parallel(FSDP) &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
   
 
   
@@ -131,7 +130,7 @@
               
               
                 <div class="version">
-                  1.11.0+cu102
+                  1.12.0+cu102
                 </div>
               
             
@@ -272,6 +271,7 @@
 <li class="toctree-l1"><a class="reference internal" href="dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="quantized_transfer_learning_tutorial.html">(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/static_quantization_tutorial.html">(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torchserve_with_ipex.html">Grokking PyTorch Intel CPU performance from first principles</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul class="current">
@@ -298,6 +298,7 @@
 <p class="caption" role="heading"><span class="caption-text">Recommendation Systems</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="torchrec_tutorial.html">Introduction to TorchRec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/sharding.html">Exploring TorchRec sharding</a></li>
 </ul>
 
             
@@ -386,30 +387,33 @@
           </div>
 
         
+
           
           <div class="rst-content">
           
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <section id="getting-started-with-fully-sharded-data-parallel-fsdp">
+  <div class="section" id="getting-started-with-fully-sharded-data-parallel-fsdp">
 <h1>Getting Started with Fully Sharded Data Parallel(FSDP)<a class="headerlink" href="#getting-started-with-fully-sharded-data-parallel-fsdp" title="Permalink to this headline">¶</a></h1>
 <p><strong>Author</strong>: <a class="reference external" href="https://github.com/HamidShojanazeri">Hamid Shojanazeri</a>, <a class="reference external" href="https://github.com/zhaojuanmao">Yanli Zhao</a>, <a class="reference external" href="https://mrshenli.github.io/">Shen Li</a></p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>View the source code for this tutorial in <a class="reference external" href="https://github.com/pytorch/tutorials/blob/master/intermediate_source/FSDP_tutorial.rst">github</a>.</p>
+</div>
 <p>Training AI models at a large scale is a challenging task that requires a lot of compute power and resources.
 It also comes with considerable engineering complexity to handle the training of these very large models.
 <a class="reference external" href="https://pytorch.org/blog/introducing-pytorch-fully-sharded-data-parallel-api/">Pytorch FSDP</a>, released in PyTorch 1.11 makes this easier.</p>
 <p>In this tutorial, we show how to use <a class="reference external" href="https://pytorch.org/docs/1.11/fsdp.html">FSDP APIs</a>, for simple MNIST models that can be extended to other larger models such as <a class="reference external" href="https://huggingface.co/blog/zero-deepspeed-fairscale">HuggingFace BERT models</a>,
 <a class="reference external" href="https://pytorch.medium.com/training-a-1-trillion-parameter-model-with-pytorch-fully-sharded-data-parallel-on-aws-3ac13aa96cff">GPT 3 models up to 1T parameters</a> . The sample DDP MNIST code has been borrowed from <a class="reference external" href="https://github.com/yqhu/mnist_examples">here</a>.</p>
-<section id="how-fsdp-works">
+<div class="section" id="how-fsdp-works">
 <h2>How FSDP works<a class="headerlink" href="#how-fsdp-works" title="Permalink to this headline">¶</a></h2>
 <p>In <a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.parallel.DistributedDataParallel.html">DistributedDataParallel</a>, (DDP) training, each process/ worker owns a replica of the model and processes a batch of data, finally it uses all-reduce to sum up gradients over different workers. In DDP the model weights and optimizer states are replicated across all workers. FSDP is a type of data parallelism that shards model parameters, optimizer states and gradients across DDP ranks.</p>
 <p>FSDP GPU memory footprint would be smaller than DDP across all workers. This makes the training of some very large models feasible and helps to fit larger models or batch sizes for our training job. This would come with the cost of increased communication volume. The communication overhead is reduced by internal optimizations like communication and computation overlapping.</p>
-<figure class="align-center" id="id1">
+<div class="figure align-center" id="id1">
 <a class="reference internal image-reference" href="../_images/fsdp_workflow.png"><img alt="FSDP workflow" src="../_images/fsdp_workflow.png" style="width: 100%;" /></a>
-<figcaption>
-<p><span class="caption-text">FSDP Workflow</span><a class="headerlink" href="#id1" title="Permalink to this image">¶</a></p>
-</figcaption>
-</figure>
+<p class="caption"><span class="caption-text">FSDP Workflow</span><a class="headerlink" href="#id1" title="Permalink to this image">¶</a></p>
+</div>
 <p>At high level FDSP works as follow:</p>
 <p><em>In constructor</em></p>
 <ul class="simple">
@@ -417,19 +421,19 @@ It also comes with considerable engineering complexity to handle the training of
 </ul>
 <p><em>In forward path</em></p>
 <ul class="simple">
-<li><p>Run allgather to collect all shards from all ranks to recover the full parameter in this FSDP unit</p></li>
+<li><p>Run all_gather to collect all shards from all ranks to recover the full parameter in this FSDP unit</p></li>
 <li><p>Run forward computation</p></li>
 <li><p>Discard parameter shards it has just collected</p></li>
 </ul>
 <p><em>In backward path</em></p>
 <ul class="simple">
-<li><p>Run allgather to collect all shards from all ranks to recover the full parameter in this FSDP unit</p></li>
+<li><p>Run all_gather to collect all shards from all ranks to recover the full parameter in this FSDP unit</p></li>
 <li><p>Run backward computation</p></li>
 <li><p>Run reduce_scatter to sync gradients</p></li>
 <li><p>Discard parameters.</p></li>
 </ul>
-</section>
-<section id="how-to-use-fsdp">
+</div>
+<div class="section" id="how-to-use-fsdp">
 <h2>How to use FSDP<a class="headerlink" href="#how-to-use-fsdp" title="Permalink to this headline">¶</a></h2>
 <p>Here we use a toy model to run training on MNIST dataset for demonstration purposes. Similarly the APIs and logic can be applied to larger models for training.</p>
 <p><em>Setup</em></p>
@@ -524,7 +528,7 @@ It also comes with considerable engineering complexity to handle the training of
         <span class="n">ddp_loss</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
         <span class="n">ddp_loss</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 
-    <span class="n">dist</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="n">ddp_loss</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="n">dist</span><span class="o">.</span><span class="n">ReduceOp</span><span class="o">.</span><span class="n">SUM</span><span class="p">)</span>
+    <span class="n">dist</span><span class="o">.</span><span class="n">all_reduce</span><span class="p">(</span><span class="n">ddp_loss</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="n">dist</span><span class="o">.</span><span class="n">ReduceOp</span><span class="o">.</span><span class="n">SUM</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Train Epoch: </span><span class="si">{}</span><span class="s1"> </span><span class="se">\t</span><span class="s1">Loss: </span><span class="si">{:.6f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">epoch</span><span class="p">,</span> <span class="n">ddp_loss</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="n">ddp_loss</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
 </pre></div>
@@ -543,7 +547,7 @@ It also comes with considerable engineering complexity to handle the training of
             <span class="n">ddp_loss</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="n">pred</span><span class="o">.</span><span class="n">eq</span><span class="p">(</span><span class="n">target</span><span class="o">.</span><span class="n">view_as</span><span class="p">(</span><span class="n">pred</span><span class="p">))</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
             <span class="n">ddp_loss</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 
-    <span class="n">dist</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="n">ddp_loss</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="n">dist</span><span class="o">.</span><span class="n">ReduceOp</span><span class="o">.</span><span class="n">SUM</span><span class="p">)</span>
+    <span class="n">dist</span><span class="o">.</span><span class="n">all_reduce</span><span class="p">(</span><span class="n">ddp_loss</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="n">dist</span><span class="o">.</span><span class="n">ReduceOp</span><span class="o">.</span><span class="n">SUM</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="n">test_loss</span> <span class="o">=</span> <span class="n">ddp_loss</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="n">ddp_loss</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
@@ -673,12 +677,10 @@ Alternatively, we will look at adding the fsdp_auto_wrap_policy next and will di
 </pre></div>
 </div>
 <p>Following is the peak memory usage from FSDP MNIST training on g4dn.12.xlarge AWS EC2 instance with 4 gpus captured from Pytorch Profiler.</p>
-<figure class="align-center" id="id2">
+<div class="figure align-center" id="id2">
 <a class="reference internal image-reference" href="../_images/FSDP_memory.gif"><img alt="FSDP peak memory" src="../_images/FSDP_memory.gif" style="width: 100%;" /></a>
-<figcaption>
-<p><span class="caption-text">FSDP Peak Memory Usage</span><a class="headerlink" href="#id2" title="Permalink to this image">¶</a></p>
-</figcaption>
-</figure>
+<p class="caption"><span class="caption-text">FSDP Peak Memory Usage</span><a class="headerlink" href="#id2" title="Permalink to this image">¶</a></p>
+</div>
 <p><em>Applying fsdp_auto_wrap_policy</em> in FSDP otherwise, FSDP will put the entire model in one FSDP unit, which will reduce computation efficiency and memory efficiency.
 The way it works is that, suppose your model contains 100 Linear layers. If you do FSDP(model), there will only be one FSDP unit which wraps the entire model.
 In that case, the allgather would collect the full parameters for all 100 linear layers, and hence won’t save CUDA memory for parameter sharding.
@@ -724,12 +726,10 @@ CUDA event elapsed <span class="nb">time</span> on training loop <span class="m"
 </div>
 <p>Following is the peak memory usage from FSDP with auto_wrap policy of MNIST training on g4dn.12.xlarge AWS EC2 instance with 4 gpus captured from Pytorch Profiler.
 It can be observed that the peak memory usage on each device is smaller compared to FSDP without auto wrap policy applied, from ~75 MB to 66 MB.</p>
-<figure class="align-center" id="id3">
+<div class="figure align-center" id="id3">
 <a class="reference internal image-reference" href="../_images/FSDP_autowrap.gif"><img alt="FSDP peak memory" src="../_images/FSDP_autowrap.gif" style="width: 100%;" /></a>
-<figcaption>
-<p><span class="caption-text">FSDP Peak Memory Usage using Auto_wrap policy</span><a class="headerlink" href="#id3" title="Permalink to this image">¶</a></p>
-</figcaption>
-</figure>
+<p class="caption"><span class="caption-text">FSDP Peak Memory Usage using Auto_wrap policy</span><a class="headerlink" href="#id3" title="Permalink to this image">¶</a></p>
+</div>
 <p><em>CPU Off-loading</em>: In case the model is very large that even with FSDP wouldn’t fit into gpus, then CPU offload can be helpful here.</p>
 <p>Currently, only parameter and gradient CPU offload is supported. It can be enabled via passing in cpu_offload=CPUOffload(offload_params=True).</p>
 <p>Note that this currently implicitly enables gradient offloading to CPU in order for params and grads to be on the same device to work with the optimizer. This API is subject to change. Default is None in which case there will be no offloading.</p>
@@ -751,19 +751,17 @@ CUDA event elapsed <span class="nb">time</span> on training loop <span class="m"
 </pre></div>
 </div>
 <p>Following is the peak memory usage from DDP MNIST training on g4dn.12.xlarge AWS EC2 instance with 4 gpus captured from Pytorch profiler.</p>
-<figure class="align-center" id="id4">
+<div class="figure align-center" id="id4">
 <a class="reference internal image-reference" href="../_images/DDP_memory.gif"><img alt="FSDP peak memory" src="../_images/DDP_memory.gif" style="width: 100%;" /></a>
-<figcaption>
-<p><span class="caption-text">DDP Peak Memory Usage using Auto_wrap policy</span><a class="headerlink" href="#id4" title="Permalink to this image">¶</a></p>
-</figcaption>
-</figure>
+<p class="caption"><span class="caption-text">DDP Peak Memory Usage using Auto_wrap policy</span><a class="headerlink" href="#id4" title="Permalink to this image">¶</a></p>
+</div>
 <p>Considering the toy example and tiny MNIST model we defined here, we can observe the difference between peak memory usage of DDP and FSDP.
 In DDP each process holds a replica of the model, so the memory footprint is higher compared to FSDP that shards the model parameter, optimizer states and gradients over DDP ranks.
 The peak memory usage using FSDP with auto_wrap policy is the lowest followed by FSDP and DDP.</p>
 <p>Also, looking at timings, considering the small model and running the training on a single machine, FSDP with/out auto_wrap policy performed almost as fast as DDP.
 This example does not represent most of the real applications, for detailed analysis and comparison between DDP and FSDP please refer to this <a class="reference external" href="https://pytorch.medium.com/6c8da2be180d">blog post</a> .</p>
-</section>
-</section>
+</div>
+</div>
 
 
              </article>
@@ -800,7 +798,7 @@ This example does not represent most of the real applications, for detailed anal
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2021, PyTorch &amp; PyTorch Korea Community.
+        &copy; Copyright 2022, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorch Korea User Group).
 
     </p>
   </div>
@@ -813,6 +811,13 @@ This example does not represent most of the real applications, for detailed anal
 </footer>
 
           </div>
+<script>
+if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.indexOf("/prototype/prototype_index")< 1))
+  {
+    var div = '<div class="admonition note"><p class="admonition-title">Note</p><p><i class="fa fa-flask" aria-hidden="true">&nbsp</i> 이 튜토리얼은 프로토타입(prototype) 기능들에 대해서 설명하고 있습니다. 프로토타입 기능은 일반적으로 피드백 및 테스트용으로, 런타임 플래그 없이는 PyPI나 Conda로 배포되는 바이너리에서는 사용할 수 없습니다.</p></div>'
+    document.getElementById("pytorch-article").insertAdjacentHTML('afterBegin', div)
+  }
+</script>
         </div>
 
         <div class="pytorch-content-right" id="pytorch-content-right">
@@ -862,7 +867,6 @@ This example does not represent most of the real applications, for detailed anal
       });
   </script>
  
-
 <script>
 //add microsoft link
 
@@ -941,7 +945,7 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
 </script>
 
 <script type="text/javascript">
-  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile'];
+  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile', 'Introduction to PyTorch on YouTube', 'Recommendation Systems'];
 </script>
 
 

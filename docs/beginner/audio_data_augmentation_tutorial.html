@@ -6,24 +6,23 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
 <meta property="og:title" content="Audio Data Augmentation" />
   
 <meta property="og:type" content="article" />
   
-<meta property="og:url" content="http://tutorials.pytorch.kr/beginner/audio_data_augmentation_tutorial.html" />
+<meta property="og:url" content="https://tutorials.pytorch.kr/beginner/audio_data_augmentation_tutorial.html" />
   
-<meta property="og:description" content="torchaudio provides a variety of ways to augment audio data. Out: Preparing data and utility functions (skip this section): Applying effects and filtering: torchaudio.sox_effects allows for directly applying filters similar to those available in sox to Tensor objects and file object audio sources..." />
+<meta property="og:description" content="torchaudio provides a variety of ways to augment audio data. In this tutorial, we look into a way to apply effects, filters, RIR (room impulse response) and codecs. At the end, we synthesize noisy speech over phone from clean speech. Out: Preparation: First, we import the modules and download the..." />
   
-<meta property="og:image" content="http://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
+<meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
   
 <meta property="og:image:alt" content="Audio Data Augmentation" />
   
 <meta property="og:ignore_canonical" content="true" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Audio Data Augmentation &mdash; 파이토치 한국어 튜토리얼(PyTorch tutorials in Korean)</title>
+  <title>Audio Data Augmentation &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
   
 
   
@@ -131,7 +130,7 @@
               
               
                 <div class="version">
-                  1.11.0+cu102
+                  1.12.0+cu102
                 </div>
               
             
@@ -272,6 +271,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/quantized_transfer_learning_tutorial.html">(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/static_quantization_tutorial.html">(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/torchserve_with_ipex.html">Grokking PyTorch Intel CPU performance from first principles</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul>
@@ -298,6 +298,7 @@
 <p class="caption" role="heading"><span class="caption-text">Recommendation Systems</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/torchrec_tutorial.html">Introduction to TorchRec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/sharding.html">Exploring TorchRec sharding</a></li>
 </ul>
 
             
@@ -386,6 +387,7 @@
           </div>
 
         
+
           
           <div class="rst-content">
           
@@ -396,14 +398,13 @@
 <p class="admonition-title">Note</p>
 <p>Click <a class="reference internal" href="#sphx-glr-download-beginner-audio-data-augmentation-tutorial-py"><span class="std std-ref">here</span></a> to download the full example code</p>
 </div>
-<section class="sphx-glr-example-title" id="audio-data-augmentation">
+<div class="sphx-glr-example-title section" id="audio-data-augmentation">
 <span id="sphx-glr-beginner-audio-data-augmentation-tutorial-py"></span><h1>Audio Data Augmentation<a class="headerlink" href="#audio-data-augmentation" title="Permalink to this headline">¶</a></h1>
 <p><code class="docutils literal notranslate"><span class="pre">torchaudio</span></code> provides a variety of ways to augment audio data.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># When running this tutorial in Google Colab, install the required packages</span>
-<span class="c1"># with the following.</span>
-<span class="c1"># !pip install torchaudio</span>
-
-<span class="kn">import</span> <span class="nn">torch</span>
+<p>In this tutorial, we look into a way to apply effects, filters,
+RIR (room impulse response) and codecs.</p>
+<p>At the end, we synthesize noisy speech over phone from clean speech.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torchaudio</span>
 <span class="kn">import</span> <span class="nn">torchaudio.functional</span> <span class="k">as</span> <span class="nn">F</span>
 
@@ -412,167 +413,36 @@
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>1.11.0+cu102
-0.11.0+cu102
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>1.12.0+cu102
+0.12.0+cu102
 </pre></div>
 </div>
-<section id="preparing-data-and-utility-functions-skip-this-section">
-<h2>Preparing data and utility functions (skip this section)<a class="headerlink" href="#preparing-data-and-utility-functions-skip-this-section" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#@title Prepare data and utility functions. {display-mode: &quot;form&quot;}</span>
-<span class="c1">#@markdown</span>
-<span class="c1">#@markdown You do not need to look into this cell.</span>
-<span class="c1">#@markdown Just execute once and you are good to go.</span>
-<span class="c1">#@markdown</span>
-<span class="c1">#@markdown In this tutorial, we will use a speech data from [VOiCES dataset](https://iqtlabs.github.io/voices/), which is licensed under Creative Commos BY 4.0.</span>
+<div class="section" id="preparation">
+<h2>Preparation<a class="headerlink" href="#preparation" title="Permalink to this headline">¶</a></h2>
+<p>First, we import the modules and download the audio assets we use in this tutorial.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">math</span>
 
-<span class="c1">#-------------------------------------------------------------------------------</span>
-<span class="c1"># Preparation of data and helper functions.</span>
-<span class="c1">#-------------------------------------------------------------------------------</span>
-
-<span class="kn">import</span> <span class="nn">math</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">requests</span>
-
+<span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">Audio</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">Audio</span><span class="p">,</span> <span class="n">display</span>
 
+<span class="kn">from</span> <span class="nn">torchaudio.utils</span> <span class="kn">import</span> <span class="n">download_asset</span>
 
-<span class="n">_SAMPLE_DIR</span> <span class="o">=</span> <span class="s2">&quot;_sample_data&quot;</span>
-
-<span class="n">SAMPLE_WAV_URL</span> <span class="o">=</span> <span class="s2">&quot;https://pytorch-tutorial-assets.s3.amazonaws.com/steam-train-whistle-daniel_simon.wav&quot;</span>
-<span class="n">SAMPLE_WAV_PATH</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_SAMPLE_DIR</span><span class="p">,</span> <span class="s2">&quot;steam.wav&quot;</span><span class="p">)</span>
-
-<span class="n">SAMPLE_RIR_URL</span> <span class="o">=</span> <span class="s2">&quot;https://pytorch-tutorial-assets.s3.amazonaws.com/VOiCES_devkit/distant-16k/room-response/rm1/impulse/Lab41-SRI-VOiCES-rm1-impulse-mc01-stu-clo.wav&quot;</span>
-<span class="n">SAMPLE_RIR_PATH</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_SAMPLE_DIR</span><span class="p">,</span> <span class="s2">&quot;rir.wav&quot;</span><span class="p">)</span>
-
-<span class="n">SAMPLE_WAV_SPEECH_URL</span> <span class="o">=</span> <span class="s2">&quot;https://pytorch-tutorial-assets.s3.amazonaws.com/VOiCES_devkit/source-16k/train/sp0307/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav&quot;</span>
-<span class="n">SAMPLE_WAV_SPEECH_PATH</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_SAMPLE_DIR</span><span class="p">,</span> <span class="s2">&quot;speech.wav&quot;</span><span class="p">)</span>
-
-<span class="n">SAMPLE_NOISE_URL</span> <span class="o">=</span> <span class="s2">&quot;https://pytorch-tutorial-assets.s3.amazonaws.com/VOiCES_devkit/distant-16k/distractors/rm1/babb/Lab41-SRI-VOiCES-rm1-babb-mc01-stu-clo.wav&quot;</span>
-<span class="n">SAMPLE_NOISE_PATH</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_SAMPLE_DIR</span><span class="p">,</span> <span class="s2">&quot;bg.wav&quot;</span><span class="p">)</span>
-
-<span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">_SAMPLE_DIR</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-
-<span class="k">def</span> <span class="nf">_fetch_data</span><span class="p">():</span>
-  <span class="n">uri</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="p">(</span><span class="n">SAMPLE_WAV_URL</span><span class="p">,</span> <span class="n">SAMPLE_WAV_PATH</span><span class="p">),</span>
-    <span class="p">(</span><span class="n">SAMPLE_RIR_URL</span><span class="p">,</span> <span class="n">SAMPLE_RIR_PATH</span><span class="p">),</span>
-    <span class="p">(</span><span class="n">SAMPLE_WAV_SPEECH_URL</span><span class="p">,</span> <span class="n">SAMPLE_WAV_SPEECH_PATH</span><span class="p">),</span>
-    <span class="p">(</span><span class="n">SAMPLE_NOISE_URL</span><span class="p">,</span> <span class="n">SAMPLE_NOISE_PATH</span><span class="p">),</span>
-  <span class="p">]</span>
-  <span class="k">for</span> <span class="n">url</span><span class="p">,</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">uri</span><span class="p">:</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file_</span><span class="p">:</span>
-      <span class="n">file_</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
-
-<span class="n">_fetch_data</span><span class="p">()</span>
-
-<span class="k">def</span> <span class="nf">_get_sample</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">resample</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-  <span class="n">effects</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="p">[</span><span class="s2">&quot;remix&quot;</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">]</span>
-  <span class="p">]</span>
-  <span class="k">if</span> <span class="n">resample</span><span class="p">:</span>
-    <span class="n">effects</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span>
-      <span class="p">[</span><span class="s2">&quot;lowpass&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">resample</span> <span class="o">//</span> <span class="mi">2</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">],</span>
-      <span class="p">[</span><span class="s2">&quot;rate&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">resample</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">],</span>
-    <span class="p">])</span>
-  <span class="k">return</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">sox_effects</span><span class="o">.</span><span class="n">apply_effects_file</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">effects</span><span class="o">=</span><span class="n">effects</span><span class="p">)</span>
-
-<span class="k">def</span> <span class="nf">get_sample</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">resample</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-  <span class="k">return</span> <span class="n">_get_sample</span><span class="p">(</span><span class="n">SAMPLE_WAV_PATH</span><span class="p">,</span> <span class="n">resample</span><span class="o">=</span><span class="n">resample</span><span class="p">)</span>
-
-<span class="k">def</span> <span class="nf">get_speech_sample</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">resample</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-  <span class="k">return</span> <span class="n">_get_sample</span><span class="p">(</span><span class="n">SAMPLE_WAV_SPEECH_PATH</span><span class="p">,</span> <span class="n">resample</span><span class="o">=</span><span class="n">resample</span><span class="p">)</span>
-
-<span class="k">def</span> <span class="nf">plot_waveform</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Waveform&quot;</span><span class="p">,</span> <span class="n">xlim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ylim</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-  <span class="n">waveform</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
-
-  <span class="n">num_channels</span><span class="p">,</span> <span class="n">num_frames</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">shape</span>
-  <span class="n">time_axis</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">num_frames</span><span class="p">)</span> <span class="o">/</span> <span class="n">sample_rate</span>
-
-  <span class="n">figure</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">num_channels</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-  <span class="k">if</span> <span class="n">num_channels</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-    <span class="n">axes</span> <span class="o">=</span> <span class="p">[</span><span class="n">axes</span><span class="p">]</span>
-  <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_channels</span><span class="p">):</span>
-    <span class="n">axes</span><span class="p">[</span><span class="n">c</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">time_axis</span><span class="p">,</span> <span class="n">waveform</span><span class="p">[</span><span class="n">c</span><span class="p">],</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-    <span class="n">axes</span><span class="p">[</span><span class="n">c</span><span class="p">]</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">num_channels</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-      <span class="n">axes</span><span class="p">[</span><span class="n">c</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Channel </span><span class="si">{</span><span class="n">c</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">xlim</span><span class="p">:</span>
-      <span class="n">axes</span><span class="p">[</span><span class="n">c</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="n">xlim</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">ylim</span><span class="p">:</span>
-      <span class="n">axes</span><span class="p">[</span><span class="n">c</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="n">ylim</span><span class="p">)</span>
-  <span class="n">figure</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
-  <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">block</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-
-<span class="k">def</span> <span class="nf">print_stats</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">src</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-  <span class="k">if</span> <span class="n">src</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="mi">10</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Source:&quot;</span><span class="p">,</span> <span class="n">src</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="mi">10</span><span class="p">)</span>
-  <span class="k">if</span> <span class="n">sample_rate</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Sample Rate:&quot;</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">)</span>
-  <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Shape:&quot;</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">waveform</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
-  <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Dtype:&quot;</span><span class="p">,</span> <span class="n">waveform</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
-  <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; - Max:     </span><span class="si">{</span><span class="n">waveform</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="si">:</span><span class="s2">6.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-  <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; - Min:     </span><span class="si">{</span><span class="n">waveform</span><span class="o">.</span><span class="n">min</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="si">:</span><span class="s2">6.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-  <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; - Mean:    </span><span class="si">{</span><span class="n">waveform</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="si">:</span><span class="s2">6.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-  <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; - Std Dev: </span><span class="si">{</span><span class="n">waveform</span><span class="o">.</span><span class="n">std</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="si">:</span><span class="s2">6.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-  <span class="nb">print</span><span class="p">()</span>
-  <span class="nb">print</span><span class="p">(</span><span class="n">waveform</span><span class="p">)</span>
-  <span class="nb">print</span><span class="p">()</span>
-
-<span class="k">def</span> <span class="nf">plot_specgram</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Spectrogram&quot;</span><span class="p">,</span> <span class="n">xlim</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-  <span class="n">waveform</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
-
-  <span class="n">num_channels</span><span class="p">,</span> <span class="n">num_frames</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">shape</span>
-  <span class="n">time_axis</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">num_frames</span><span class="p">)</span> <span class="o">/</span> <span class="n">sample_rate</span>
-
-  <span class="n">figure</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">num_channels</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-  <span class="k">if</span> <span class="n">num_channels</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-    <span class="n">axes</span> <span class="o">=</span> <span class="p">[</span><span class="n">axes</span><span class="p">]</span>
-  <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_channels</span><span class="p">):</span>
-    <span class="n">axes</span><span class="p">[</span><span class="n">c</span><span class="p">]</span><span class="o">.</span><span class="n">specgram</span><span class="p">(</span><span class="n">waveform</span><span class="p">[</span><span class="n">c</span><span class="p">],</span> <span class="n">Fs</span><span class="o">=</span><span class="n">sample_rate</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">num_channels</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-      <span class="n">axes</span><span class="p">[</span><span class="n">c</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Channel </span><span class="si">{</span><span class="n">c</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">xlim</span><span class="p">:</span>
-      <span class="n">axes</span><span class="p">[</span><span class="n">c</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="n">xlim</span><span class="p">)</span>
-  <span class="n">figure</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
-  <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">block</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-
-<span class="k">def</span> <span class="nf">play_audio</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">):</span>
-  <span class="n">waveform</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
-
-  <span class="n">num_channels</span><span class="p">,</span> <span class="n">num_frames</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">shape</span>
-  <span class="k">if</span> <span class="n">num_channels</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-    <span class="n">display</span><span class="p">(</span><span class="n">Audio</span><span class="p">(</span><span class="n">waveform</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">rate</span><span class="o">=</span><span class="n">sample_rate</span><span class="p">))</span>
-  <span class="k">elif</span> <span class="n">num_channels</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-    <span class="n">display</span><span class="p">(</span><span class="n">Audio</span><span class="p">((</span><span class="n">waveform</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">waveform</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">rate</span><span class="o">=</span><span class="n">sample_rate</span><span class="p">))</span>
-  <span class="k">else</span><span class="p">:</span>
-    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Waveform with more than 2 channels are not supported.&quot;</span><span class="p">)</span>
-
-<span class="k">def</span> <span class="nf">get_rir_sample</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">resample</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">processed</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-  <span class="n">rir_raw</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">=</span> <span class="n">_get_sample</span><span class="p">(</span><span class="n">SAMPLE_RIR_PATH</span><span class="p">,</span> <span class="n">resample</span><span class="o">=</span><span class="n">resample</span><span class="p">)</span>
-  <span class="k">if</span> <span class="ow">not</span> <span class="n">processed</span><span class="p">:</span>
-    <span class="k">return</span> <span class="n">rir_raw</span><span class="p">,</span> <span class="n">sample_rate</span>
-  <span class="n">rir</span> <span class="o">=</span> <span class="n">rir_raw</span><span class="p">[:,</span> <span class="nb">int</span><span class="p">(</span><span class="n">sample_rate</span><span class="o">*</span><span class="mf">1.01</span><span class="p">):</span><span class="nb">int</span><span class="p">(</span><span class="n">sample_rate</span><span class="o">*</span><span class="mf">1.3</span><span class="p">)]</span>
-  <span class="n">rir</span> <span class="o">=</span> <span class="n">rir</span> <span class="o">/</span> <span class="n">torch</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">rir</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-  <span class="n">rir</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">rir</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-  <span class="k">return</span> <span class="n">rir</span><span class="p">,</span> <span class="n">sample_rate</span>
-
-<span class="k">def</span> <span class="nf">get_noise_sample</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">resample</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-  <span class="k">return</span> <span class="n">_get_sample</span><span class="p">(</span><span class="n">SAMPLE_NOISE_PATH</span><span class="p">,</span> <span class="n">resample</span><span class="o">=</span><span class="n">resample</span><span class="p">)</span>
+<span class="n">SAMPLE_WAV</span> <span class="o">=</span> <span class="n">download_asset</span><span class="p">(</span><span class="s2">&quot;tutorial-assets/steam-train-whistle-daniel_simon.wav&quot;</span><span class="p">)</span>
+<span class="n">SAMPLE_RIR</span> <span class="o">=</span> <span class="n">download_asset</span><span class="p">(</span><span class="s2">&quot;tutorial-assets/Lab41-SRI-VOiCES-rm1-impulse-mc01-stu-clo-8000hz.wav&quot;</span><span class="p">)</span>
+<span class="n">SAMPLE_SPEECH</span> <span class="o">=</span> <span class="n">download_asset</span><span class="p">(</span><span class="s2">&quot;tutorial-assets/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042-8000hz.wav&quot;</span><span class="p">)</span>
+<span class="n">SAMPLE_NOISE</span> <span class="o">=</span> <span class="n">download_asset</span><span class="p">(</span><span class="s2">&quot;tutorial-assets/Lab41-SRI-VOiCES-rm1-babb-mc01-stu-clo-8000hz.wav&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-<section id="applying-effects-and-filtering">
+</div>
+<div class="section" id="applying-effects-and-filtering">
 <h2>Applying effects and filtering<a class="headerlink" href="#applying-effects-and-filtering" title="Permalink to this headline">¶</a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">torchaudio.sox_effects</span></code> allows for directly applying filters similar to
+<p><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.sox_effects()</span></code> allows for directly applying filters similar to
 those available in <code class="docutils literal notranslate"><span class="pre">sox</span></code> to Tensor objects and file object audio sources.</p>
 <p>There are two functions for this:</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">torchaudio.sox_effects.apply_effects_tensor</span></code> for applying effects
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.sox_effects.apply_effects_tensor()</span></code> for applying effects
 to Tensor.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">torchaudio.sox_effects.apply_effects_file</span></code> for applying effects to
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.sox_effects.apply_effects_file()</span></code> for applying effects to
 other audio sources.</p></li>
 </ul>
 <p>Both functions accept effect definitions in the form
@@ -583,34 +453,85 @@ implementation does not.</p>
 <p>For the list of available effects, please refer to <a class="reference external" href="http://sox.sourceforge.net/sox.html">the sox
 documentation</a>.</p>
 <p><strong>Tip</strong> If you need to load and resample your audio data on the fly,
-then you can use <code class="docutils literal notranslate"><span class="pre">torchaudio.sox_effects.apply_effects_file</span></code> with
-effect <code class="docutils literal notranslate"><span class="pre">&quot;rate&quot;</span></code>.</p>
-<p><strong>Note</strong> <code class="docutils literal notranslate"><span class="pre">apply_effects_file</span></code> accepts a file-like object or path-like
-object. Similar to <code class="docutils literal notranslate"><span class="pre">torchaudio.load</span></code>, when the audio format cannot be
+then you can use <code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.sox_effects.apply_effects_file()</span></code>
+with effect <code class="docutils literal notranslate"><span class="pre">&quot;rate&quot;</span></code>.</p>
+<p><strong>Note</strong> <code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.sox_effects.apply_effects_file()</span></code> accepts a
+file-like object or path-like object.
+Similar to <code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.load()</span></code>, when the audio format cannot be
 inferred from either the file extension or header, you can provide
 argument <code class="docutils literal notranslate"><span class="pre">format</span></code> to specify the format of the audio source.</p>
 <p><strong>Note</strong> This process is not differentiable.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Load the data</span>
-<span class="n">waveform1</span><span class="p">,</span> <span class="n">sample_rate1</span> <span class="o">=</span> <span class="n">get_sample</span><span class="p">(</span><span class="n">resample</span><span class="o">=</span><span class="mi">16000</span><span class="p">)</span>
+<span class="n">waveform1</span><span class="p">,</span> <span class="n">sample_rate1</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">SAMPLE_WAV</span><span class="p">)</span>
 
 <span class="c1"># Define effects</span>
 <span class="n">effects</span> <span class="o">=</span> <span class="p">[</span>
-  <span class="p">[</span><span class="s2">&quot;lowpass&quot;</span><span class="p">,</span> <span class="s2">&quot;-1&quot;</span><span class="p">,</span> <span class="s2">&quot;300&quot;</span><span class="p">],</span> <span class="c1"># apply single-pole lowpass filter</span>
-  <span class="p">[</span><span class="s2">&quot;speed&quot;</span><span class="p">,</span> <span class="s2">&quot;0.8&quot;</span><span class="p">],</span>  <span class="c1"># reduce the speed</span>
-                     <span class="c1"># This only changes sample rate, so it is necessary to</span>
-                     <span class="c1"># add `rate` effect with original sample rate after this.</span>
-  <span class="p">[</span><span class="s2">&quot;rate&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">sample_rate1</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">],</span>
-  <span class="p">[</span><span class="s2">&quot;reverb&quot;</span><span class="p">,</span> <span class="s2">&quot;-w&quot;</span><span class="p">],</span>  <span class="c1"># Reverbration gives some dramatic feeling</span>
+    <span class="p">[</span><span class="s2">&quot;lowpass&quot;</span><span class="p">,</span> <span class="s2">&quot;-1&quot;</span><span class="p">,</span> <span class="s2">&quot;300&quot;</span><span class="p">],</span>  <span class="c1"># apply single-pole lowpass filter</span>
+    <span class="p">[</span><span class="s2">&quot;speed&quot;</span><span class="p">,</span> <span class="s2">&quot;0.8&quot;</span><span class="p">],</span>  <span class="c1"># reduce the speed</span>
+    <span class="c1"># This only changes sample rate, so it is necessary to</span>
+    <span class="c1"># add `rate` effect with original sample rate after this.</span>
+    <span class="p">[</span><span class="s2">&quot;rate&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">sample_rate1</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;reverb&quot;</span><span class="p">,</span> <span class="s2">&quot;-w&quot;</span><span class="p">],</span>  <span class="c1"># Reverbration gives some dramatic feeling</span>
 <span class="p">]</span>
 
 <span class="c1"># Apply effects</span>
-<span class="n">waveform2</span><span class="p">,</span> <span class="n">sample_rate2</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">sox_effects</span><span class="o">.</span><span class="n">apply_effects_tensor</span><span class="p">(</span>
-    <span class="n">waveform1</span><span class="p">,</span> <span class="n">sample_rate1</span><span class="p">,</span> <span class="n">effects</span><span class="p">)</span>
+<span class="n">waveform2</span><span class="p">,</span> <span class="n">sample_rate2</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">sox_effects</span><span class="o">.</span><span class="n">apply_effects_tensor</span><span class="p">(</span><span class="n">waveform1</span><span class="p">,</span> <span class="n">sample_rate1</span><span class="p">,</span> <span class="n">effects</span><span class="p">)</span>
 
-<span class="n">plot_waveform</span><span class="p">(</span><span class="n">waveform1</span><span class="p">,</span> <span class="n">sample_rate1</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Original&quot;</span><span class="p">,</span> <span class="n">xlim</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mf">.1</span><span class="p">,</span> <span class="mf">3.2</span><span class="p">))</span>
-<span class="n">plot_waveform</span><span class="p">(</span><span class="n">waveform2</span><span class="p">,</span> <span class="n">sample_rate2</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Effects Applied&quot;</span><span class="p">,</span> <span class="n">xlim</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mf">.1</span><span class="p">,</span> <span class="mf">3.2</span><span class="p">))</span>
-<span class="n">print_stats</span><span class="p">(</span><span class="n">waveform1</span><span class="p">,</span> <span class="n">sample_rate</span><span class="o">=</span><span class="n">sample_rate1</span><span class="p">,</span> <span class="n">src</span><span class="o">=</span><span class="s2">&quot;Original&quot;</span><span class="p">)</span>
-<span class="n">print_stats</span><span class="p">(</span><span class="n">waveform2</span><span class="p">,</span> <span class="n">sample_rate</span><span class="o">=</span><span class="n">sample_rate2</span><span class="p">,</span> <span class="n">src</span><span class="o">=</span><span class="s2">&quot;Effects Applied&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">waveform1</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">sample_rate1</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">waveform2</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">sample_rate2</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>torch.Size([2, 109368]) 44100
+torch.Size([2, 136710]) 44100
+</pre></div>
+</div>
+<p>Note that the number of frames and number of channels are different from
+those of the original after the effects are applied. Let’s listen to the
+audio.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">plot_waveform</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Waveform&quot;</span><span class="p">,</span> <span class="n">xlim</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">waveform</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+
+    <span class="n">num_channels</span><span class="p">,</span> <span class="n">num_frames</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">shape</span>
+    <span class="n">time_axis</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">num_frames</span><span class="p">)</span> <span class="o">/</span> <span class="n">sample_rate</span>
+
+    <span class="n">figure</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">num_channels</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">num_channels</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">axes</span> <span class="o">=</span> <span class="p">[</span><span class="n">axes</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_channels</span><span class="p">):</span>
+        <span class="n">axes</span><span class="p">[</span><span class="n">c</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">time_axis</span><span class="p">,</span> <span class="n">waveform</span><span class="p">[</span><span class="n">c</span><span class="p">],</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">axes</span><span class="p">[</span><span class="n">c</span><span class="p">]</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">num_channels</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">axes</span><span class="p">[</span><span class="n">c</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Channel </span><span class="si">{</span><span class="n">c</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">xlim</span><span class="p">:</span>
+            <span class="n">axes</span><span class="p">[</span><span class="n">c</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="n">xlim</span><span class="p">)</span>
+    <span class="n">figure</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">block</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">plot_specgram</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Spectrogram&quot;</span><span class="p">,</span> <span class="n">xlim</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">waveform</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+
+    <span class="n">num_channels</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">shape</span>
+
+    <span class="n">figure</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">num_channels</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">num_channels</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">axes</span> <span class="o">=</span> <span class="p">[</span><span class="n">axes</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_channels</span><span class="p">):</span>
+        <span class="n">axes</span><span class="p">[</span><span class="n">c</span><span class="p">]</span><span class="o">.</span><span class="n">specgram</span><span class="p">(</span><span class="n">waveform</span><span class="p">[</span><span class="n">c</span><span class="p">],</span> <span class="n">Fs</span><span class="o">=</span><span class="n">sample_rate</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">num_channels</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">axes</span><span class="p">[</span><span class="n">c</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Channel </span><span class="si">{</span><span class="n">c</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">xlim</span><span class="p">:</span>
+            <span class="n">axes</span><span class="p">[</span><span class="n">c</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="n">xlim</span><span class="p">)</span>
+    <span class="n">figure</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">block</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="section" id="original">
+<h3>Original:<a class="headerlink" href="#original" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">plot_waveform</span><span class="p">(</span><span class="n">waveform1</span><span class="p">,</span> <span class="n">sample_rate1</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Original&quot;</span><span class="p">,</span> <span class="n">xlim</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">3.2</span><span class="p">))</span>
+<span class="n">plot_specgram</span><span class="p">(</span><span class="n">waveform1</span><span class="p">,</span> <span class="n">sample_rate1</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Original&quot;</span><span class="p">,</span> <span class="n">xlim</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">3.04</span><span class="p">))</span>
+<span class="n">Audio</span><span class="p">(</span><span class="n">waveform1</span><span class="p">,</span> <span class="n">rate</span><span class="o">=</span><span class="n">sample_rate1</span><span class="p">)</span>
 </pre></div>
 </div>
 <ul class="sphx-glr-horizontal">
@@ -619,42 +540,12 @@ argument <code class="docutils literal notranslate"><span class="pre">format</sp
 <li><img alt="../_images/sphx_glr_audio_data_augmentation_tutorial_002.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_audio_data_augmentation_tutorial_002.png" />
 </li>
 </ul>
-<p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>----------
-Source: Original
-----------
-Sample Rate: 16000
-Shape: (1, 39680)
-Dtype: torch.float32
- - Max:      0.507
- - Min:     -0.448
- - Mean:    -0.000
- - Std Dev:  0.122
-
-tensor([[ 0.0007,  0.0076,  0.0122,  ..., -0.0049, -0.0025,  0.0020]])
-
-----------
-Source: Effects Applied
-----------
-Sample Rate: 16000
-Shape: (2, 49600)
-Dtype: torch.float32
- - Max:      0.091
- - Min:     -0.091
- - Mean:    -0.000
- - Std Dev:  0.021
-
-tensor([[0.0000, 0.0000, 0.0000,  ..., 0.0069, 0.0058, 0.0045],
-        [0.0000, 0.0000, 0.0000,  ..., 0.0085, 0.0085, 0.0085]])
-</pre></div>
 </div>
-<p>Note that the number of frames and number of channels are different from
-those of the original after the effects are applied. Let’s listen to the
-audio. Doesn’t it sound more dramatic?</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">plot_specgram</span><span class="p">(</span><span class="n">waveform1</span><span class="p">,</span> <span class="n">sample_rate1</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Original&quot;</span><span class="p">,</span> <span class="n">xlim</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">3.04</span><span class="p">))</span>
-<span class="n">play_audio</span><span class="p">(</span><span class="n">waveform1</span><span class="p">,</span> <span class="n">sample_rate1</span><span class="p">)</span>
+<div class="section" id="effects-applied">
+<h3>Effects applied:<a class="headerlink" href="#effects-applied" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">plot_waveform</span><span class="p">(</span><span class="n">waveform2</span><span class="p">,</span> <span class="n">sample_rate2</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Effects Applied&quot;</span><span class="p">,</span> <span class="n">xlim</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">3.2</span><span class="p">))</span>
 <span class="n">plot_specgram</span><span class="p">(</span><span class="n">waveform2</span><span class="p">,</span> <span class="n">sample_rate2</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Effects Applied&quot;</span><span class="p">,</span> <span class="n">xlim</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">3.04</span><span class="p">))</span>
-<span class="n">play_audio</span><span class="p">(</span><span class="n">waveform2</span><span class="p">,</span> <span class="n">sample_rate2</span><span class="p">)</span>
+<span class="n">Audio</span><span class="p">(</span><span class="n">waveform2</span><span class="p">,</span> <span class="n">rate</span><span class="o">=</span><span class="n">sample_rate2</span><span class="p">)</span>
 </pre></div>
 </div>
 <ul class="sphx-glr-horizontal">
@@ -663,13 +554,10 @@ audio. Doesn’t it sound more dramatic?</p>
 <li><img alt="../_images/sphx_glr_audio_data_augmentation_tutorial_004.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_audio_data_augmentation_tutorial_004.png" />
 </li>
 </ul>
-<p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;IPython.lib.display.Audio object&gt;
-&lt;IPython.lib.display.Audio object&gt;
-</pre></div>
+<p>Doesn’t it sound more dramatic?</p>
 </div>
-</section>
-<section id="simulating-room-reverberation">
+</div>
+<div class="section" id="simulating-room-reverberation">
 <h2>Simulating room reverberation<a class="headerlink" href="#simulating-room-reverberation" title="Permalink to this headline">¶</a></h2>
 <p><a class="reference external" href="https://en.wikipedia.org/wiki/Convolution_reverb">Convolution
 reverb</a> is a
@@ -680,13 +568,10 @@ sound as though it has been uttered in a conference room.</p>
 <p>For this process, we need RIR data. The following data are from the VOiCES
 dataset, but you can record your own — just turn on your microphone
 and clap your hands.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sample_rate</span> <span class="o">=</span> <span class="mi">8000</span>
-
-<span class="n">rir_raw</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">get_rir_sample</span><span class="p">(</span><span class="n">resample</span><span class="o">=</span><span class="n">sample_rate</span><span class="p">)</span>
-
-<span class="n">plot_waveform</span><span class="p">(</span><span class="n">rir_raw</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Room Impulse Response (raw)&quot;</span><span class="p">,</span> <span class="n">ylim</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rir_raw</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">SAMPLE_RIR</span><span class="p">)</span>
+<span class="n">plot_waveform</span><span class="p">(</span><span class="n">rir_raw</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Room Impulse Response (raw)&quot;</span><span class="p">)</span>
 <span class="n">plot_specgram</span><span class="p">(</span><span class="n">rir_raw</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Room Impulse Response (raw)&quot;</span><span class="p">)</span>
-<span class="n">play_audio</span><span class="p">(</span><span class="n">rir_raw</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">)</span>
+<span class="n">Audio</span><span class="p">(</span><span class="n">rir_raw</span><span class="p">,</span> <span class="n">rate</span><span class="o">=</span><span class="n">sample_rate</span><span class="p">)</span>
 </pre></div>
 </div>
 <ul class="sphx-glr-horizontal">
@@ -695,46 +580,28 @@ and clap your hands.</p>
 <li><img alt="../_images/sphx_glr_audio_data_augmentation_tutorial_006.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_audio_data_augmentation_tutorial_006.png" />
 </li>
 </ul>
-<p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;IPython.lib.display.Audio object&gt;
-</pre></div>
-</div>
 <p>First, we need to clean up the RIR. We extract the main impulse, normalize
 the signal power, then flip along the time axis.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rir</span> <span class="o">=</span> <span class="n">rir_raw</span><span class="p">[:,</span> <span class="nb">int</span><span class="p">(</span><span class="n">sample_rate</span><span class="o">*</span><span class="mf">1.01</span><span class="p">):</span><span class="nb">int</span><span class="p">(</span><span class="n">sample_rate</span><span class="o">*</span><span class="mf">1.3</span><span class="p">)]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rir</span> <span class="o">=</span> <span class="n">rir_raw</span><span class="p">[:,</span> <span class="nb">int</span><span class="p">(</span><span class="n">sample_rate</span> <span class="o">*</span> <span class="mf">1.01</span><span class="p">)</span> <span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">sample_rate</span> <span class="o">*</span> <span class="mf">1.3</span><span class="p">)]</span>
 <span class="n">rir</span> <span class="o">=</span> <span class="n">rir</span> <span class="o">/</span> <span class="n">torch</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">rir</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-<span class="n">rir</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">rir</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">RIR</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">rir</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">])</span>
 
-<span class="n">print_stats</span><span class="p">(</span><span class="n">rir</span><span class="p">)</span>
-<span class="n">plot_waveform</span><span class="p">(</span><span class="n">rir</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Room Impulse Response&quot;</span><span class="p">,</span> <span class="n">ylim</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="n">plot_waveform</span><span class="p">(</span><span class="n">rir</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Room Impulse Response&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <img alt="../_images/sphx_glr_audio_data_augmentation_tutorial_007.png" class="sphx-glr-single-img" src="../_images/sphx_glr_audio_data_augmentation_tutorial_007.png" />
-<p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Shape: (1, 2320)
-Dtype: torch.float32
- - Max:      0.395
- - Min:     -0.286
- - Mean:    -0.000
- - Std Dev:  0.021
+<p>Then, we convolve the speech signal with the RIR filter.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">speech</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">SAMPLE_SPEECH</span><span class="p">)</span>
 
-tensor([[-0.0052, -0.0076, -0.0071,  ...,  0.0184,  0.0173,  0.0070]])
+<span class="n">speech_</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">speech</span><span class="p">,</span> <span class="p">(</span><span class="n">RIR</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+<span class="n">augmented</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">conv1d</span><span class="p">(</span><span class="n">speech_</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="n">RIR</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="o">...</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
 </pre></div>
 </div>
-<p>Then, we convolve the speech signal with the RIR filter.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">speech</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">get_speech_sample</span><span class="p">(</span><span class="n">resample</span><span class="o">=</span><span class="n">sample_rate</span><span class="p">)</span>
-
-<span class="n">speech_</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">speech</span><span class="p">,</span> <span class="p">(</span><span class="n">rir</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
-<span class="n">augmented</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">conv1d</span><span class="p">(</span><span class="n">speech_</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="n">rir</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="o">...</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
-
-<span class="n">plot_waveform</span><span class="p">(</span><span class="n">speech</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Original&quot;</span><span class="p">,</span> <span class="n">ylim</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
-<span class="n">plot_waveform</span><span class="p">(</span><span class="n">augmented</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;RIR Applied&quot;</span><span class="p">,</span> <span class="n">ylim</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
-
+<div class="section" id="id1">
+<h3>Original:<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">plot_waveform</span><span class="p">(</span><span class="n">speech</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Original&quot;</span><span class="p">)</span>
 <span class="n">plot_specgram</span><span class="p">(</span><span class="n">speech</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Original&quot;</span><span class="p">)</span>
-<span class="n">play_audio</span><span class="p">(</span><span class="n">speech</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">)</span>
-
-<span class="n">plot_specgram</span><span class="p">(</span><span class="n">augmented</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;RIR Applied&quot;</span><span class="p">)</span>
-<span class="n">play_audio</span><span class="p">(</span><span class="n">augmented</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">)</span>
+<span class="n">Audio</span><span class="p">(</span><span class="n">speech</span><span class="p">,</span> <span class="n">rate</span><span class="o">=</span><span class="n">sample_rate</span><span class="p">)</span>
 </pre></div>
 </div>
 <ul class="sphx-glr-horizontal">
@@ -742,45 +609,51 @@ tensor([[-0.0052, -0.0076, -0.0071,  ...,  0.0184,  0.0173,  0.0070]])
 </li>
 <li><img alt="../_images/sphx_glr_audio_data_augmentation_tutorial_009.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_audio_data_augmentation_tutorial_009.png" />
 </li>
+</ul>
+</div>
+<div class="section" id="rir-applied">
+<h3>RIR applied:<a class="headerlink" href="#rir-applied" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">plot_waveform</span><span class="p">(</span><span class="n">augmented</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;RIR Applied&quot;</span><span class="p">)</span>
+<span class="n">plot_specgram</span><span class="p">(</span><span class="n">augmented</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;RIR Applied&quot;</span><span class="p">)</span>
+<span class="n">Audio</span><span class="p">(</span><span class="n">augmented</span><span class="p">,</span> <span class="n">rate</span><span class="o">=</span><span class="n">sample_rate</span><span class="p">)</span>
+</pre></div>
+</div>
+<ul class="sphx-glr-horizontal">
 <li><img alt="../_images/sphx_glr_audio_data_augmentation_tutorial_010.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_audio_data_augmentation_tutorial_010.png" />
 </li>
 <li><img alt="../_images/sphx_glr_audio_data_augmentation_tutorial_011.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_audio_data_augmentation_tutorial_011.png" />
 </li>
 </ul>
-<p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;IPython.lib.display.Audio object&gt;
-&lt;IPython.lib.display.Audio object&gt;
-</pre></div>
 </div>
-</section>
-<section id="adding-background-noise">
+</div>
+<div class="section" id="adding-background-noise">
 <h2>Adding background noise<a class="headerlink" href="#adding-background-noise" title="Permalink to this headline">¶</a></h2>
 <p>To add background noise to audio data, you can simply add a noise Tensor to
 the Tensor representing the audio data. A common method to adjust the
 intensity of noise is changing the Signal-to-Noise Ratio (SNR).
 [<a class="reference external" href="https://en.wikipedia.org/wiki/Signal-to-noise_ratio">wikipedia</a>]</p>
-<p>begin{align}mathrm{SNR} = frac{<a href="#id1"><span class="problematic" id="id2">P_</span></a>mathrm{signal}}{<a href="#id3"><span class="problematic" id="id4">P_</span></a>mathrm{noise}}end{align}</p>
-<p>begin{align}{mathrm  {SNR_{{dB}}}}=10log _{{10}}left({mathrm  {SNR}}right)end{align}</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sample_rate</span> <span class="o">=</span> <span class="mi">8000</span>
-<span class="n">speech</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">get_speech_sample</span><span class="p">(</span><span class="n">resample</span><span class="o">=</span><span class="n">sample_rate</span><span class="p">)</span>
-<span class="n">noise</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">get_noise_sample</span><span class="p">(</span><span class="n">resample</span><span class="o">=</span><span class="n">sample_rate</span><span class="p">)</span>
-<span class="n">noise</span> <span class="o">=</span> <span class="n">noise</span><span class="p">[:,</span> <span class="p">:</span><span class="n">speech</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
-
-<span class="n">plot_waveform</span><span class="p">(</span><span class="n">noise</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Background noise&quot;</span><span class="p">)</span>
-<span class="n">plot_specgram</span><span class="p">(</span><span class="n">noise</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Background noise&quot;</span><span class="p">)</span>
-<span class="n">play_audio</span><span class="p">(</span><span class="n">noise</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">)</span>
+<p>$$ \mathrm{SNR} = \frac{P_{signal}}{P_{noise}} $$</p>
+<p>$$ \mathrm{SNR_{dB}} = 10 \log _{{10}} \mathrm {SNR} $$</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">speech</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">SAMPLE_SPEECH</span><span class="p">)</span>
+<span class="n">noise</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">SAMPLE_NOISE</span><span class="p">)</span>
+<span class="n">noise</span> <span class="o">=</span> <span class="n">noise</span><span class="p">[:,</span> <span class="p">:</span> <span class="n">speech</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
 
 <span class="n">speech_power</span> <span class="o">=</span> <span class="n">speech</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 <span class="n">noise_power</span> <span class="o">=</span> <span class="n">noise</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
-<span class="k">for</span> <span class="n">snr_db</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">3</span><span class="p">]:</span>
-  <span class="n">snr</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">snr_db</span> <span class="o">/</span> <span class="mi">10</span><span class="p">)</span>
-  <span class="n">scale</span> <span class="o">=</span> <span class="n">snr</span> <span class="o">*</span> <span class="n">noise_power</span> <span class="o">/</span> <span class="n">speech_power</span>
-  <span class="n">noisy_speech</span> <span class="o">=</span> <span class="p">(</span><span class="n">scale</span> <span class="o">*</span> <span class="n">speech</span> <span class="o">+</span> <span class="n">noise</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
-
-  <span class="n">plot_waveform</span><span class="p">(</span><span class="n">noisy_speech</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;SNR: </span><span class="si">{</span><span class="n">snr_db</span><span class="si">}</span><span class="s2"> [dB]&quot;</span><span class="p">)</span>
-  <span class="n">plot_specgram</span><span class="p">(</span><span class="n">noisy_speech</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;SNR: </span><span class="si">{</span><span class="n">snr_db</span><span class="si">}</span><span class="s2"> [dB]&quot;</span><span class="p">)</span>
-  <span class="n">play_audio</span><span class="p">(</span><span class="n">noisy_speech</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">)</span>
+<span class="n">snr_dbs</span> <span class="o">=</span> <span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+<span class="n">noisy_speeches</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">snr_db</span> <span class="ow">in</span> <span class="n">snr_dbs</span><span class="p">:</span>
+    <span class="n">snr</span> <span class="o">=</span> <span class="mi">10</span> <span class="o">**</span> <span class="p">(</span><span class="n">snr_db</span> <span class="o">/</span> <span class="mi">20</span><span class="p">)</span>
+    <span class="n">scale</span> <span class="o">=</span> <span class="n">snr</span> <span class="o">*</span> <span class="n">noise_power</span> <span class="o">/</span> <span class="n">speech_power</span>
+    <span class="n">noisy_speeches</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">scale</span> <span class="o">*</span> <span class="n">speech</span> <span class="o">+</span> <span class="n">noise</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="section" id="background-noise">
+<h3>Background noise:<a class="headerlink" href="#background-noise" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">plot_waveform</span><span class="p">(</span><span class="n">noise</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Background noise&quot;</span><span class="p">)</span>
+<span class="n">plot_specgram</span><span class="p">(</span><span class="n">noise</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Background noise&quot;</span><span class="p">)</span>
+<span class="n">Audio</span><span class="p">(</span><span class="n">noise</span><span class="p">,</span> <span class="n">rate</span><span class="o">=</span><span class="n">sample_rate</span><span class="p">)</span>
 </pre></div>
 </div>
 <ul class="sphx-glr-horizontal">
@@ -788,46 +661,77 @@ intensity of noise is changing the Signal-to-Noise Ratio (SNR).
 </li>
 <li><img alt="../_images/sphx_glr_audio_data_augmentation_tutorial_013.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_audio_data_augmentation_tutorial_013.png" />
 </li>
+</ul>
+</div>
+<div class="section" id="snr-20-db">
+<h3>SNR 20 dB:<a class="headerlink" href="#snr-20-db" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">snr_db</span><span class="p">,</span> <span class="n">noisy_speech</span> <span class="o">=</span> <span class="n">snr_dbs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">noisy_speeches</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">plot_waveform</span><span class="p">(</span><span class="n">noisy_speech</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;SNR: </span><span class="si">{</span><span class="n">snr_db</span><span class="si">}</span><span class="s2"> [dB]&quot;</span><span class="p">)</span>
+<span class="n">plot_specgram</span><span class="p">(</span><span class="n">noisy_speech</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;SNR: </span><span class="si">{</span><span class="n">snr_db</span><span class="si">}</span><span class="s2"> [dB]&quot;</span><span class="p">)</span>
+<span class="n">Audio</span><span class="p">(</span><span class="n">noisy_speech</span><span class="p">,</span> <span class="n">rate</span><span class="o">=</span><span class="n">sample_rate</span><span class="p">)</span>
+</pre></div>
+</div>
+<ul class="sphx-glr-horizontal">
 <li><img alt="../_images/sphx_glr_audio_data_augmentation_tutorial_014.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_audio_data_augmentation_tutorial_014.png" />
 </li>
 <li><img alt="../_images/sphx_glr_audio_data_augmentation_tutorial_015.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_audio_data_augmentation_tutorial_015.png" />
 </li>
+</ul>
+</div>
+<div class="section" id="snr-10-db">
+<h3>SNR 10 dB:<a class="headerlink" href="#snr-10-db" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">snr_db</span><span class="p">,</span> <span class="n">noisy_speech</span> <span class="o">=</span> <span class="n">snr_dbs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">noisy_speeches</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">plot_waveform</span><span class="p">(</span><span class="n">noisy_speech</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;SNR: </span><span class="si">{</span><span class="n">snr_db</span><span class="si">}</span><span class="s2"> [dB]&quot;</span><span class="p">)</span>
+<span class="n">plot_specgram</span><span class="p">(</span><span class="n">noisy_speech</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;SNR: </span><span class="si">{</span><span class="n">snr_db</span><span class="si">}</span><span class="s2"> [dB]&quot;</span><span class="p">)</span>
+<span class="n">Audio</span><span class="p">(</span><span class="n">noisy_speech</span><span class="p">,</span> <span class="n">rate</span><span class="o">=</span><span class="n">sample_rate</span><span class="p">)</span>
+</pre></div>
+</div>
+<ul class="sphx-glr-horizontal">
 <li><img alt="../_images/sphx_glr_audio_data_augmentation_tutorial_016.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_audio_data_augmentation_tutorial_016.png" />
 </li>
 <li><img alt="../_images/sphx_glr_audio_data_augmentation_tutorial_017.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_audio_data_augmentation_tutorial_017.png" />
 </li>
+</ul>
+</div>
+<div class="section" id="snr-3-db">
+<h3>SNR 3 dB:<a class="headerlink" href="#snr-3-db" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">snr_db</span><span class="p">,</span> <span class="n">noisy_speech</span> <span class="o">=</span> <span class="n">snr_dbs</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">noisy_speeches</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+<span class="n">plot_waveform</span><span class="p">(</span><span class="n">noisy_speech</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;SNR: </span><span class="si">{</span><span class="n">snr_db</span><span class="si">}</span><span class="s2"> [dB]&quot;</span><span class="p">)</span>
+<span class="n">plot_specgram</span><span class="p">(</span><span class="n">noisy_speech</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;SNR: </span><span class="si">{</span><span class="n">snr_db</span><span class="si">}</span><span class="s2"> [dB]&quot;</span><span class="p">)</span>
+<span class="n">Audio</span><span class="p">(</span><span class="n">noisy_speech</span><span class="p">,</span> <span class="n">rate</span><span class="o">=</span><span class="n">sample_rate</span><span class="p">)</span>
+</pre></div>
+</div>
+<ul class="sphx-glr-horizontal">
 <li><img alt="../_images/sphx_glr_audio_data_augmentation_tutorial_018.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_audio_data_augmentation_tutorial_018.png" />
 </li>
 <li><img alt="../_images/sphx_glr_audio_data_augmentation_tutorial_019.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_audio_data_augmentation_tutorial_019.png" />
 </li>
 </ul>
-<p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;IPython.lib.display.Audio object&gt;
-&lt;IPython.lib.display.Audio object&gt;
-&lt;IPython.lib.display.Audio object&gt;
-&lt;IPython.lib.display.Audio object&gt;
-</pre></div>
 </div>
-</section>
-<section id="applying-codec-to-tensor-object">
+</div>
+<div class="section" id="applying-codec-to-tensor-object">
 <h2>Applying codec to Tensor object<a class="headerlink" href="#applying-codec-to-tensor-object" title="Permalink to this headline">¶</a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">torchaudio.functional.apply_codec</span></code> can apply codecs to a Tensor object.</p>
+<p><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.functional.apply_codec()</span></code> can apply codecs to
+a Tensor object.</p>
 <p><strong>Note</strong> This process is not differentiable.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">=</span> <span class="n">get_speech_sample</span><span class="p">(</span><span class="n">resample</span><span class="o">=</span><span class="mi">8000</span><span class="p">)</span>
-
-<span class="n">plot_specgram</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Original&quot;</span><span class="p">)</span>
-<span class="n">play_audio</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">SAMPLE_SPEECH</span><span class="p">)</span>
 
 <span class="n">configs</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="p">({</span><span class="s2">&quot;format&quot;</span><span class="p">:</span> <span class="s2">&quot;wav&quot;</span><span class="p">,</span> <span class="s2">&quot;encoding&quot;</span><span class="p">:</span> <span class="s1">&#39;ULAW&#39;</span><span class="p">,</span> <span class="s2">&quot;bits_per_sample&quot;</span><span class="p">:</span> <span class="mi">8</span><span class="p">},</span> <span class="s2">&quot;8 bit mu-law&quot;</span><span class="p">),</span>
-    <span class="p">({</span><span class="s2">&quot;format&quot;</span><span class="p">:</span> <span class="s2">&quot;gsm&quot;</span><span class="p">},</span> <span class="s2">&quot;GSM-FR&quot;</span><span class="p">),</span>
-    <span class="p">({</span><span class="s2">&quot;format&quot;</span><span class="p">:</span> <span class="s2">&quot;mp3&quot;</span><span class="p">,</span> <span class="s2">&quot;compression&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">9</span><span class="p">},</span> <span class="s2">&quot;MP3&quot;</span><span class="p">),</span>
-    <span class="p">({</span><span class="s2">&quot;format&quot;</span><span class="p">:</span> <span class="s2">&quot;vorbis&quot;</span><span class="p">,</span> <span class="s2">&quot;compression&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">},</span> <span class="s2">&quot;Vorbis&quot;</span><span class="p">),</span>
+    <span class="p">{</span><span class="s2">&quot;format&quot;</span><span class="p">:</span> <span class="s2">&quot;wav&quot;</span><span class="p">,</span> <span class="s2">&quot;encoding&quot;</span><span class="p">:</span> <span class="s2">&quot;ULAW&quot;</span><span class="p">,</span> <span class="s2">&quot;bits_per_sample&quot;</span><span class="p">:</span> <span class="mi">8</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">&quot;format&quot;</span><span class="p">:</span> <span class="s2">&quot;gsm&quot;</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">&quot;format&quot;</span><span class="p">:</span> <span class="s2">&quot;vorbis&quot;</span><span class="p">,</span> <span class="s2">&quot;compression&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">},</span>
 <span class="p">]</span>
-<span class="k">for</span> <span class="n">param</span><span class="p">,</span> <span class="n">title</span> <span class="ow">in</span> <span class="n">configs</span><span class="p">:</span>
-  <span class="n">augmented</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">apply_codec</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="o">**</span><span class="n">param</span><span class="p">)</span>
-  <span class="n">plot_specgram</span><span class="p">(</span><span class="n">augmented</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">)</span>
-  <span class="n">play_audio</span><span class="p">(</span><span class="n">augmented</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">)</span>
+<span class="n">waveforms</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">configs</span><span class="p">:</span>
+    <span class="n">augmented</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">apply_codec</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="o">**</span><span class="n">param</span><span class="p">)</span>
+    <span class="n">waveforms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">augmented</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="section" id="id2">
+<h3>Original:<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">plot_waveform</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Original&quot;</span><span class="p">)</span>
+<span class="n">plot_specgram</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Original&quot;</span><span class="p">)</span>
+<span class="n">Audio</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">rate</span><span class="o">=</span><span class="n">sample_rate</span><span class="p">)</span>
 </pre></div>
 </div>
 <ul class="sphx-glr-horizontal">
@@ -835,97 +739,148 @@ intensity of noise is changing the Signal-to-Noise Ratio (SNR).
 </li>
 <li><img alt="../_images/sphx_glr_audio_data_augmentation_tutorial_021.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_audio_data_augmentation_tutorial_021.png" />
 </li>
+</ul>
+</div>
+<div class="section" id="bit-mu-law">
+<h3>8 bit mu-law:<a class="headerlink" href="#bit-mu-law" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">plot_waveform</span><span class="p">(</span><span class="n">waveforms</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;8 bit mu-law&quot;</span><span class="p">)</span>
+<span class="n">plot_specgram</span><span class="p">(</span><span class="n">waveforms</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;8 bit mu-law&quot;</span><span class="p">)</span>
+<span class="n">Audio</span><span class="p">(</span><span class="n">waveforms</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">rate</span><span class="o">=</span><span class="n">sample_rate</span><span class="p">)</span>
+</pre></div>
+</div>
+<ul class="sphx-glr-horizontal">
 <li><img alt="../_images/sphx_glr_audio_data_augmentation_tutorial_022.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_audio_data_augmentation_tutorial_022.png" />
 </li>
 <li><img alt="../_images/sphx_glr_audio_data_augmentation_tutorial_023.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_audio_data_augmentation_tutorial_023.png" />
 </li>
-<li><img alt="../_images/sphx_glr_audio_data_augmentation_tutorial_024.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_audio_data_augmentation_tutorial_024.png" />
-</li>
 </ul>
-<p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;IPython.lib.display.Audio object&gt;
-&lt;IPython.lib.display.Audio object&gt;
-&lt;IPython.lib.display.Audio object&gt;
-&lt;IPython.lib.display.Audio object&gt;
-&lt;IPython.lib.display.Audio object&gt;
+</div>
+<div class="section" id="gsm-fr">
+<h3>GSM-FR:<a class="headerlink" href="#gsm-fr" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">plot_waveform</span><span class="p">(</span><span class="n">waveforms</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;GSM-FR&quot;</span><span class="p">)</span>
+<span class="n">plot_specgram</span><span class="p">(</span><span class="n">waveforms</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;GSM-FR&quot;</span><span class="p">)</span>
+<span class="n">Audio</span><span class="p">(</span><span class="n">waveforms</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">rate</span><span class="o">=</span><span class="n">sample_rate</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-<section id="simulating-a-phone-recoding">
+<ul class="sphx-glr-horizontal">
+<li><img alt="../_images/sphx_glr_audio_data_augmentation_tutorial_024.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_audio_data_augmentation_tutorial_024.png" />
+</li>
+<li><img alt="../_images/sphx_glr_audio_data_augmentation_tutorial_025.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_audio_data_augmentation_tutorial_025.png" />
+</li>
+</ul>
+</div>
+<div class="section" id="vorbis">
+<h3>Vorbis:<a class="headerlink" href="#vorbis" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">plot_waveform</span><span class="p">(</span><span class="n">waveforms</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Vorbis&quot;</span><span class="p">)</span>
+<span class="n">plot_specgram</span><span class="p">(</span><span class="n">waveforms</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Vorbis&quot;</span><span class="p">)</span>
+<span class="n">Audio</span><span class="p">(</span><span class="n">waveforms</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">rate</span><span class="o">=</span><span class="n">sample_rate</span><span class="p">)</span>
+</pre></div>
+</div>
+<ul class="sphx-glr-horizontal">
+<li><img alt="../_images/sphx_glr_audio_data_augmentation_tutorial_026.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_audio_data_augmentation_tutorial_026.png" />
+</li>
+<li><img alt="../_images/sphx_glr_audio_data_augmentation_tutorial_027.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_audio_data_augmentation_tutorial_027.png" />
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="simulating-a-phone-recoding">
 <h2>Simulating a phone recoding<a class="headerlink" href="#simulating-a-phone-recoding" title="Permalink to this headline">¶</a></h2>
 <p>Combining the previous techniques, we can simulate audio that sounds
 like a person talking over a phone in a echoey room with people talking
 in the background.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sample_rate</span> <span class="o">=</span> <span class="mi">16000</span>
-<span class="n">speech</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">get_speech_sample</span><span class="p">(</span><span class="n">resample</span><span class="o">=</span><span class="n">sample_rate</span><span class="p">)</span>
+<span class="n">original_speech</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">SAMPLE_SPEECH</span><span class="p">)</span>
 
-<span class="n">plot_specgram</span><span class="p">(</span><span class="n">speech</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Original&quot;</span><span class="p">)</span>
-<span class="n">play_audio</span><span class="p">(</span><span class="n">speech</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">)</span>
+<span class="n">plot_specgram</span><span class="p">(</span><span class="n">original_speech</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Original&quot;</span><span class="p">)</span>
 
 <span class="c1"># Apply RIR</span>
-<span class="n">rir</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">get_rir_sample</span><span class="p">(</span><span class="n">resample</span><span class="o">=</span><span class="n">sample_rate</span><span class="p">,</span> <span class="n">processed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">speech_</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">speech</span><span class="p">,</span> <span class="p">(</span><span class="n">rir</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
-<span class="n">speech</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">conv1d</span><span class="p">(</span><span class="n">speech_</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="n">rir</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="o">...</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">speech_</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">original_speech</span><span class="p">,</span> <span class="p">(</span><span class="n">RIR</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+<span class="n">rir_applied</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">conv1d</span><span class="p">(</span><span class="n">speech_</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="n">RIR</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="o">...</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
 
-<span class="n">plot_specgram</span><span class="p">(</span><span class="n">speech</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;RIR Applied&quot;</span><span class="p">)</span>
-<span class="n">play_audio</span><span class="p">(</span><span class="n">speech</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">)</span>
+<span class="n">plot_specgram</span><span class="p">(</span><span class="n">rir_applied</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;RIR Applied&quot;</span><span class="p">)</span>
 
 <span class="c1"># Add background noise</span>
 <span class="c1"># Because the noise is recorded in the actual environment, we consider that</span>
 <span class="c1"># the noise contains the acoustic feature of the environment. Therefore, we add</span>
 <span class="c1"># the noise after RIR application.</span>
-<span class="n">noise</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">get_noise_sample</span><span class="p">(</span><span class="n">resample</span><span class="o">=</span><span class="n">sample_rate</span><span class="p">)</span>
-<span class="n">noise</span> <span class="o">=</span> <span class="n">noise</span><span class="p">[:,</span> <span class="p">:</span><span class="n">speech</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+<span class="n">noise</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">SAMPLE_NOISE</span><span class="p">)</span>
+<span class="n">noise</span> <span class="o">=</span> <span class="n">noise</span><span class="p">[:,</span> <span class="p">:</span> <span class="n">rir_applied</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
 
 <span class="n">snr_db</span> <span class="o">=</span> <span class="mi">8</span>
-<span class="n">scale</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">snr_db</span> <span class="o">/</span> <span class="mi">10</span><span class="p">)</span> <span class="o">*</span> <span class="n">noise</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="n">speech</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-<span class="n">speech</span> <span class="o">=</span> <span class="p">(</span><span class="n">scale</span> <span class="o">*</span> <span class="n">speech</span> <span class="o">+</span> <span class="n">noise</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+<span class="n">scale</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">snr_db</span> <span class="o">/</span> <span class="mi">10</span><span class="p">)</span> <span class="o">*</span> <span class="n">noise</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="n">rir_applied</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">bg_added</span> <span class="o">=</span> <span class="p">(</span><span class="n">scale</span> <span class="o">*</span> <span class="n">rir_applied</span> <span class="o">+</span> <span class="n">noise</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
 
-<span class="n">plot_specgram</span><span class="p">(</span><span class="n">speech</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;BG noise added&quot;</span><span class="p">)</span>
-<span class="n">play_audio</span><span class="p">(</span><span class="n">speech</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">)</span>
+<span class="n">plot_specgram</span><span class="p">(</span><span class="n">bg_added</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;BG noise added&quot;</span><span class="p">)</span>
 
 <span class="c1"># Apply filtering and change sample rate</span>
-<span class="n">speech</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">sox_effects</span><span class="o">.</span><span class="n">apply_effects_tensor</span><span class="p">(</span>
-  <span class="n">speech</span><span class="p">,</span>
-  <span class="n">sample_rate</span><span class="p">,</span>
-  <span class="n">effects</span><span class="o">=</span><span class="p">[</span>
-      <span class="p">[</span><span class="s2">&quot;lowpass&quot;</span><span class="p">,</span> <span class="s2">&quot;4000&quot;</span><span class="p">],</span>
-      <span class="p">[</span><span class="s2">&quot;compand&quot;</span><span class="p">,</span> <span class="s2">&quot;0.02,0.05&quot;</span><span class="p">,</span> <span class="s2">&quot;-60,-60,-30,-10,-20,-8,-5,-8,-2,-8&quot;</span><span class="p">,</span> <span class="s2">&quot;-8&quot;</span><span class="p">,</span> <span class="s2">&quot;-7&quot;</span><span class="p">,</span> <span class="s2">&quot;0.05&quot;</span><span class="p">],</span>
-      <span class="p">[</span><span class="s2">&quot;rate&quot;</span><span class="p">,</span> <span class="s2">&quot;8000&quot;</span><span class="p">],</span>
-  <span class="p">],</span>
+<span class="n">filtered</span><span class="p">,</span> <span class="n">sample_rate2</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">sox_effects</span><span class="o">.</span><span class="n">apply_effects_tensor</span><span class="p">(</span>
+    <span class="n">bg_added</span><span class="p">,</span>
+    <span class="n">sample_rate</span><span class="p">,</span>
+    <span class="n">effects</span><span class="o">=</span><span class="p">[</span>
+        <span class="p">[</span><span class="s2">&quot;lowpass&quot;</span><span class="p">,</span> <span class="s2">&quot;4000&quot;</span><span class="p">],</span>
+        <span class="p">[</span>
+            <span class="s2">&quot;compand&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;0.02,0.05&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;-60,-60,-30,-10,-20,-8,-5,-8,-2,-8&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;-8&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;-7&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;0.05&quot;</span><span class="p">,</span>
+        <span class="p">],</span>
+        <span class="p">[</span><span class="s2">&quot;rate&quot;</span><span class="p">,</span> <span class="s2">&quot;8000&quot;</span><span class="p">],</span>
+    <span class="p">],</span>
 <span class="p">)</span>
 
-<span class="n">plot_specgram</span><span class="p">(</span><span class="n">speech</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Filtered&quot;</span><span class="p">)</span>
-<span class="n">play_audio</span><span class="p">(</span><span class="n">speech</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">)</span>
+<span class="n">plot_specgram</span><span class="p">(</span><span class="n">filtered</span><span class="p">,</span> <span class="n">sample_rate2</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Filtered&quot;</span><span class="p">)</span>
 
 <span class="c1"># Apply telephony codec</span>
-<span class="n">speech</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">apply_codec</span><span class="p">(</span><span class="n">speech</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;gsm&quot;</span><span class="p">)</span>
+<span class="n">codec_applied</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">apply_codec</span><span class="p">(</span><span class="n">filtered</span><span class="p">,</span> <span class="n">sample_rate2</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;gsm&quot;</span><span class="p">)</span>
 
-<span class="n">plot_specgram</span><span class="p">(</span><span class="n">speech</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;GSM Codec Applied&quot;</span><span class="p">)</span>
-<span class="n">play_audio</span><span class="p">(</span><span class="n">speech</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">)</span>
+<span class="n">plot_specgram</span><span class="p">(</span><span class="n">codec_applied</span><span class="p">,</span> <span class="n">sample_rate2</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;GSM Codec Applied&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <ul class="sphx-glr-horizontal">
-<li><img alt="../_images/sphx_glr_audio_data_augmentation_tutorial_025.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_audio_data_augmentation_tutorial_025.png" />
-</li>
-<li><img alt="../_images/sphx_glr_audio_data_augmentation_tutorial_026.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_audio_data_augmentation_tutorial_026.png" />
-</li>
-<li><img alt="../_images/sphx_glr_audio_data_augmentation_tutorial_027.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_audio_data_augmentation_tutorial_027.png" />
-</li>
 <li><img alt="../_images/sphx_glr_audio_data_augmentation_tutorial_028.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_audio_data_augmentation_tutorial_028.png" />
 </li>
 <li><img alt="../_images/sphx_glr_audio_data_augmentation_tutorial_029.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_audio_data_augmentation_tutorial_029.png" />
 </li>
+<li><img alt="../_images/sphx_glr_audio_data_augmentation_tutorial_030.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_audio_data_augmentation_tutorial_030.png" />
+</li>
+<li><img alt="../_images/sphx_glr_audio_data_augmentation_tutorial_031.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_audio_data_augmentation_tutorial_031.png" />
+</li>
+<li><img alt="../_images/sphx_glr_audio_data_augmentation_tutorial_032.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_audio_data_augmentation_tutorial_032.png" />
+</li>
 </ul>
-<p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;IPython.lib.display.Audio object&gt;
-&lt;IPython.lib.display.Audio object&gt;
-&lt;IPython.lib.display.Audio object&gt;
-&lt;IPython.lib.display.Audio object&gt;
-&lt;IPython.lib.display.Audio object&gt;
+<div class="section" id="original-speech">
+<h3>Original speech:<a class="headerlink" href="#original-speech" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Audio</span><span class="p">(</span><span class="n">original_speech</span><span class="p">,</span> <span class="n">rate</span><span class="o">=</span><span class="n">sample_rate</span><span class="p">)</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  13.548 seconds)</p>
+</div>
+<div class="section" id="id3">
+<h3>RIR applied:<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Audio</span><span class="p">(</span><span class="n">rir_applied</span><span class="p">,</span> <span class="n">rate</span><span class="o">=</span><span class="n">sample_rate</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="background-noise-added">
+<h3>Background noise added:<a class="headerlink" href="#background-noise-added" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Audio</span><span class="p">(</span><span class="n">bg_added</span><span class="p">,</span> <span class="n">rate</span><span class="o">=</span><span class="n">sample_rate</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="filtered">
+<h3>Filtered:<a class="headerlink" href="#filtered" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Audio</span><span class="p">(</span><span class="n">filtered</span><span class="p">,</span> <span class="n">rate</span><span class="o">=</span><span class="n">sample_rate2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="codec-aplied">
+<h3>Codec aplied:<a class="headerlink" href="#codec-aplied" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Audio</span><span class="p">(</span><span class="n">codec_applied</span><span class="p">,</span> <span class="n">rate</span><span class="o">=</span><span class="n">sample_rate2</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  17.247 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-beginner-audio-data-augmentation-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/382ee257041a0b8faf7974c3946c40a4/audio_data_augmentation_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">audio_data_augmentation_tutorial.py</span></code></a></p>
@@ -935,8 +890,9 @@ in the background.</p>
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
-</section>
-</section>
+</div>
+</div>
+</div>
 
 
              </article>
@@ -973,7 +929,7 @@ in the background.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2021, PyTorch &amp; PyTorch Korea Community.
+        &copy; Copyright 2022, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorch Korea User Group).
 
     </p>
   </div>
@@ -986,6 +942,13 @@ in the background.</p>
 </footer>
 
           </div>
+<script>
+if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.indexOf("/prototype/prototype_index")< 1))
+  {
+    var div = '<div class="admonition note"><p class="admonition-title">Note</p><p><i class="fa fa-flask" aria-hidden="true">&nbsp</i> 이 튜토리얼은 프로토타입(prototype) 기능들에 대해서 설명하고 있습니다. 프로토타입 기능은 일반적으로 피드백 및 테스트용으로, 런타임 플래그 없이는 PyPI나 Conda로 배포되는 바이너리에서는 사용할 수 없습니다.</p></div>'
+    document.getElementById("pytorch-article").insertAdjacentHTML('afterBegin', div)
+  }
+</script>
         </div>
 
         <div class="pytorch-content-right" id="pytorch-content-right">
@@ -993,12 +956,39 @@ in the background.</p>
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
 <li><a class="reference internal" href="#">Audio Data Augmentation</a><ul>
-<li><a class="reference internal" href="#preparing-data-and-utility-functions-skip-this-section">Preparing data and utility functions (skip this section)</a></li>
-<li><a class="reference internal" href="#applying-effects-and-filtering">Applying effects and filtering</a></li>
-<li><a class="reference internal" href="#simulating-room-reverberation">Simulating room reverberation</a></li>
-<li><a class="reference internal" href="#adding-background-noise">Adding background noise</a></li>
-<li><a class="reference internal" href="#applying-codec-to-tensor-object">Applying codec to Tensor object</a></li>
-<li><a class="reference internal" href="#simulating-a-phone-recoding">Simulating a phone recoding</a></li>
+<li><a class="reference internal" href="#preparation">Preparation</a></li>
+<li><a class="reference internal" href="#applying-effects-and-filtering">Applying effects and filtering</a><ul>
+<li><a class="reference internal" href="#original">Original:</a></li>
+<li><a class="reference internal" href="#effects-applied">Effects applied:</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#simulating-room-reverberation">Simulating room reverberation</a><ul>
+<li><a class="reference internal" href="#id1">Original:</a></li>
+<li><a class="reference internal" href="#rir-applied">RIR applied:</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#adding-background-noise">Adding background noise</a><ul>
+<li><a class="reference internal" href="#background-noise">Background noise:</a></li>
+<li><a class="reference internal" href="#snr-20-db">SNR 20 dB:</a></li>
+<li><a class="reference internal" href="#snr-10-db">SNR 10 dB:</a></li>
+<li><a class="reference internal" href="#snr-3-db">SNR 3 dB:</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#applying-codec-to-tensor-object">Applying codec to Tensor object</a><ul>
+<li><a class="reference internal" href="#id2">Original:</a></li>
+<li><a class="reference internal" href="#bit-mu-law">8 bit mu-law:</a></li>
+<li><a class="reference internal" href="#gsm-fr">GSM-FR:</a></li>
+<li><a class="reference internal" href="#vorbis">Vorbis:</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#simulating-a-phone-recoding">Simulating a phone recoding</a><ul>
+<li><a class="reference internal" href="#original-speech">Original speech:</a></li>
+<li><a class="reference internal" href="#id3">RIR applied:</a></li>
+<li><a class="reference internal" href="#background-noise-added">Background noise added:</a></li>
+<li><a class="reference internal" href="#filtered">Filtered:</a></li>
+<li><a class="reference internal" href="#codec-aplied">Codec aplied:</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -1039,7 +1029,6 @@ in the background.</p>
       });
   </script>
  
-
 <script>
 //add microsoft link
 
@@ -1118,7 +1107,7 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
 </script>
 
 <script type="text/javascript">
-  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile'];
+  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile', 'Introduction to PyTorch on YouTube', 'Recommendation Systems'];
 </script>
 
 

@@ -6,24 +6,23 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
 <meta property="og:title" content="TorchText로 언어 번역하기" />
   
 <meta property="og:type" content="article" />
   
-<meta property="og:url" content="http://tutorials.pytorch.kr/beginner/torchtext_translation.html" />
+<meta property="og:url" content="https://tutorials.pytorch.kr/beginner/torchtext_translation.html" />
   
 <meta property="og:description" content="이 튜토리얼에서는 torchtext 를 사용하여 영어와 독일어 문장들이 포함된 잘 알려진 데이터셋을 전처리(preprocess)하고 이를 사용하여 독일어 문장을 영어로 번역하는 시퀀스-투-시퀀스(sequence-to-sequence, seq2seq) 모델을 학습하는 방법을 살펴보겠습니다. 이 튜토리얼은 PyTorch 커뮤니티 멤버인 Ben Trevett 이 작성한 튜토리얼 에 기초하고 있으며 Ben의 허락을 받고 만들었습니다. 몇몇 기존 코드들을 제거하고 튜토리얼을 업데이트하였습니다. 이 튜토리얼을 통해 NLP 모델링을 위해 ..." />
   
-<meta property="og:image" content="http://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
+<meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
   
 <meta property="og:image:alt" content="TorchText로 언어 번역하기" />
   
 <meta property="og:ignore_canonical" content="true" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>TorchText로 언어 번역하기 &mdash; 파이토치 한국어 튜토리얼(PyTorch tutorials in Korean)</title>
+  <title>TorchText로 언어 번역하기 &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
   
 
   
@@ -129,7 +128,7 @@
               
               
                 <div class="version">
-                  1.11.0+cu102
+                  1.12.0+cu102
                 </div>
               
             
@@ -270,6 +269,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/quantized_transfer_learning_tutorial.html">(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/static_quantization_tutorial.html">(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/torchserve_with_ipex.html">Grokking PyTorch Intel CPU performance from first principles</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul>
@@ -296,6 +296,7 @@
 <p class="caption" role="heading"><span class="caption-text">Recommendation Systems</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/torchrec_tutorial.html">Introduction to TorchRec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/sharding.html">Exploring TorchRec sharding</a></li>
 </ul>
 
             
@@ -384,6 +385,7 @@
           </div>
 
         
+
           
           <div class="rst-content">
           
@@ -394,7 +396,7 @@
 <p class="admonition-title">Note</p>
 <p>Click <a class="reference internal" href="#sphx-glr-download-beginner-torchtext-translation-py"><span class="std std-ref">here</span></a> to download the full example code</p>
 </div>
-<section class="sphx-glr-example-title" id="torchtext">
+<div class="sphx-glr-example-title section" id="torchtext">
 <span id="sphx-glr-beginner-torchtext-translation-py"></span><h1>TorchText로 언어 번역하기<a class="headerlink" href="#torchtext" title="Permalink to this headline">¶</a></h1>
 <p>이 튜토리얼에서는 <code class="docutils literal notranslate"><span class="pre">torchtext</span></code> 를 사용하여 영어와 독일어 문장들이 포함된 잘 알려진 데이터셋을 전처리(preprocess)하고
 이를 사용하여 독일어 문장을 영어로 번역하는 시퀀스-투-시퀀스(sequence-to-sequence, seq2seq) 모델을 학습하는 방법을
@@ -469,7 +471,7 @@ Spacy 토크나이저가 쓸 영어와 독일어에 대한 데이터를 다운�
 <span class="n">test_data</span> <span class="o">=</span> <span class="n">data_process</span><span class="p">(</span><span class="n">test_filepaths</span><span class="p">)</span>
 </pre></div>
 </div>
-<section id="dataloader">
+<div class="section" id="dataloader">
 <h2><code class="docutils literal notranslate"><span class="pre">DataLoader</span></code><a class="headerlink" href="#dataloader" title="Permalink to this headline">¶</a></h2>
 <p>마지막으로 사용해 볼 <code class="docutils literal notranslate"><span class="pre">torch</span></code> 에 특화된 기능은 바로 <code class="docutils literal notranslate"><span class="pre">DataLoader</span></code> 로,
 첫 번째 인자로 데이터를 전달받기 때문에 사용하기가 쉽습니다. 문서에서도 볼 수 있듯이,
@@ -508,8 +510,8 @@ Spacy 토크나이저가 쓸 영어와 독일어에 대한 데이터를 다운�
                        <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">collate_fn</span><span class="o">=</span><span class="n">generate_batch</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-<section id="nn-module-optimizer">
+</div>
+<div class="section" id="nn-module-optimizer">
 <h2><code class="docutils literal notranslate"><span class="pre">nn.Module</span></code> 과 <code class="docutils literal notranslate"><span class="pre">Optimizer</span></code> 정의하기<a class="headerlink" href="#nn-module-optimizer" title="Permalink to this headline">¶</a></h2>
 <p>대부분은 <code class="docutils literal notranslate"><span class="pre">torchtext</span></code> 가 알아서 해줍니다 : 데이터셋이 만들어지고 반복자가 정의되면, 이 튜토리얼에서
 우리가 해야 할 일이라고는 그저 <code class="docutils literal notranslate"><span class="pre">nn.Module</span></code> 와 <code class="docutils literal notranslate"><span class="pre">Optimizer</span></code> 를 모델로서 정의하고 훈련시키는 것이 전부입니다.</p>
@@ -857,8 +859,8 @@ Transformer 레이어를 구현한 내용은 <a class="reference external" href=
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;| Test Loss: </span><span class="si">{</span><span class="n">test_loss</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1"> | Test PPL: </span><span class="si">{</span><span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">test_loss</span><span class="p">)</span><span class="si">:</span><span class="s1">7.3f</span><span class="si">}</span><span class="s1"> |&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-<section id="id1">
+</div>
+<div class="section" id="id1">
 <h2>다음 단계<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">torchtext</span></code> 를 사용한 Ben Trevett의 튜토리얼을 <a class="reference external" href="https://github.com/bentrevett/">이곳</a> 에서 확인할 수 있습니다.</p></li>
@@ -874,8 +876,8 @@ Transformer 레이어를 구현한 내용은 <a class="reference external" href=
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
-</section>
-</section>
+</div>
+</div>
 
 
              </article>
@@ -903,7 +905,7 @@ Transformer 레이어를 구현한 내용은 <a class="reference external" href=
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2021, PyTorch &amp; PyTorch Korea Community.
+        &copy; Copyright 2022, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorch Korea User Group).
 
     </p>
   </div>
@@ -916,6 +918,13 @@ Transformer 레이어를 구현한 내용은 <a class="reference external" href=
 </footer>
 
           </div>
+<script>
+if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.indexOf("/prototype/prototype_index")< 1))
+  {
+    var div = '<div class="admonition note"><p class="admonition-title">Note</p><p><i class="fa fa-flask" aria-hidden="true">&nbsp</i> 이 튜토리얼은 프로토타입(prototype) 기능들에 대해서 설명하고 있습니다. 프로토타입 기능은 일반적으로 피드백 및 테스트용으로, 런타임 플래그 없이는 PyPI나 Conda로 배포되는 바이너리에서는 사용할 수 없습니다.</p></div>'
+    document.getElementById("pytorch-article").insertAdjacentHTML('afterBegin', div)
+  }
+</script>
         </div>
 
         <div class="pytorch-content-right" id="pytorch-content-right">
@@ -966,7 +975,6 @@ Transformer 레이어를 구현한 내용은 <a class="reference external" href=
       });
   </script>
  
-
 <script>
 //add microsoft link
 
@@ -1045,7 +1053,7 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
 </script>
 
 <script type="text/javascript">
-  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile'];
+  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile', 'Introduction to PyTorch on YouTube', 'Recommendation Systems'];
 </script>
 
 

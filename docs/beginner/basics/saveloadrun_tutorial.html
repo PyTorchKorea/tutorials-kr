@@ -6,24 +6,23 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
 <meta property="og:title" content="모델 저장하고 불러오기" />
   
 <meta property="og:type" content="article" />
   
-<meta property="og:url" content="http://tutorials.pytorch.kr/beginner/basics/saveloadrun_tutorial.html" />
+<meta property="og:url" content="https://tutorials.pytorch.kr/beginner/basics/saveloadrun_tutorial.html" />
   
 <meta property="og:description" content="파이토치(PyTorch) 기본 익히기|| 빠른 시작|| 텐서(Tensor)|| Dataset과 Dataloader|| 변형(Transform)|| 신경망 모델 구성하기|| Autograd|| 최적화(Optimization)|| 모델 저장하고 불러오기 이번 장에서는 저장하기나 불러오기를 통해 모델의 상태를 유지(persist)하고 모델의 예측을 실행하는 방법을 알아보겠습니다. 모델 가중치 저장하고 불러오기: PyTorch 모델은 학습한 매개변수를 state_dict 라고 불리는 내부 상태 사전(internal state dict..." />
   
-<meta property="og:image" content="http://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
+<meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
   
 <meta property="og:image:alt" content="모델 저장하고 불러오기" />
   
 <meta property="og:ignore_canonical" content="true" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>모델 저장하고 불러오기 &mdash; 파이토치 한국어 튜토리얼(PyTorch tutorials in Korean)</title>
+  <title>모델 저장하고 불러오기 &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
   
 
   
@@ -131,7 +130,7 @@
               
               
                 <div class="version">
-                  1.11.0+cu102
+                  1.12.0+cu102
                 </div>
               
             
@@ -272,6 +271,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/quantized_transfer_learning_tutorial.html">(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../advanced/static_quantization_tutorial.html">(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../intermediate/torchserve_with_ipex.html">Grokking PyTorch Intel CPU performance from first principles</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul>
@@ -298,6 +298,7 @@
 <p class="caption" role="heading"><span class="caption-text">Recommendation Systems</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/torchrec_tutorial.html">Introduction to TorchRec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../advanced/sharding.html">Exploring TorchRec sharding</a></li>
 </ul>
 
             
@@ -386,6 +387,7 @@
           </div>
 
         
+
           
           <div class="rst-content">
           
@@ -405,14 +407,14 @@
 <a class="reference external" href="autogradqs_tutorial.html">Autograd</a> ||
 <a class="reference external" href="optimization_tutorial.html">최적화(Optimization)</a> ||
 <strong>모델 저장하고 불러오기</strong></p>
-<section id="id3">
+<div class="section" id="id3">
 <h1>모델 저장하고 불러오기<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h1>
 <p>이번 장에서는 저장하기나 불러오기를 통해 모델의 상태를 유지(persist)하고 모델의 예측을 실행하는 방법을 알아보겠습니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torchvision.models</span> <span class="k">as</span> <span class="nn">models</span>
 </pre></div>
 </div>
-<section id="id4">
+<div class="section" id="id4">
 <h2>모델 가중치 저장하고 불러오기<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
 <p>PyTorch 모델은 학습한 매개변수를 <code class="docutils literal notranslate"><span class="pre">state_dict</span></code>라고 불리는 내부 상태 사전(internal state dictionary)에 저장합니다.
 이 상태 값들은 <code class="docutils literal notranslate"><span class="pre">torch.save</span></code> 메소드를 사용하여 저장(persist)할 수 있습니다:</p>
@@ -431,8 +433,8 @@
 <p class="admonition-title">Note</p>
 <p>추론(inference)을 하기 전에 <code class="docutils literal notranslate"><span class="pre">model.eval()</span></code> 메소드를 호출하여 드롭아웃(dropout)과 배치 정규화(batch normalization)를 평가 모드(evaluation mode)로 설정해야 합니다. 그렇지 않으면 일관성 없는 추론 결과가 생성됩니다.</p>
 </div>
-</section>
-<section id="id5">
+</div>
+<div class="section" id="id5">
 <h2>모델의 형태를 포함하여 저장하고 불러오기<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h2>
 <p>모델의 가중치를 불러올 때, 신경망의 구조를 정의하기 위해 모델 클래스를 먼저 생성(instantiate)해야 했습니다.
 이 클래스의 구조를 모델과 함께 저장하고 싶으면, (<code class="docutils literal notranslate"><span class="pre">model.state_dict()</span></code>가 아닌) <code class="docutils literal notranslate"><span class="pre">model</span></code> 을 저장 함수에
@@ -448,11 +450,11 @@
 <p class="admonition-title">Note</p>
 <p>이 접근 방식은 Python <a class="reference external" href="https://docs.python.org/3/library/pickle.html">pickle</a> 모듈을 사용하여 모델을 직렬화(serialize)하므로, 모델을 불러올 때 실제 클래스 정의(definition)를 적용(rely on)합니다.</p>
 </div>
-</section>
-<section id="id6">
+</div>
+<div class="section" id="id6">
 <h2>관련 튜토리얼<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h2>
 <p><a class="reference internal" href="../../recipes/recipes/saving_and_loading_a_general_checkpoint.html"><span class="doc">PyTorch에서 일반적인 체크포인트(checkpoint) 저장하기 &amp; 불러오기</span></a></p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  11.493 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  12.472 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-beginner-basics-saveloadrun-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/3648b0dccaebca71b234070fe2124770/saveloadrun_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">saveloadrun_tutorial.py</span></code></a></p>
@@ -462,8 +464,8 @@
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
-</section>
-</section>
+</div>
+</div>
 
 
              </article>
@@ -500,7 +502,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2021, PyTorch &amp; PyTorch Korea Community.
+        &copy; Copyright 2022, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorch Korea User Group).
 
     </p>
   </div>
@@ -513,6 +515,13 @@
 </footer>
 
           </div>
+<script>
+if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.indexOf("/prototype/prototype_index")< 1))
+  {
+    var div = '<div class="admonition note"><p class="admonition-title">Note</p><p><i class="fa fa-flask" aria-hidden="true">&nbsp</i> 이 튜토리얼은 프로토타입(prototype) 기능들에 대해서 설명하고 있습니다. 프로토타입 기능은 일반적으로 피드백 및 테스트용으로, 런타임 플래그 없이는 PyPI나 Conda로 배포되는 바이너리에서는 사용할 수 없습니다.</p></div>'
+    document.getElementById("pytorch-article").insertAdjacentHTML('afterBegin', div)
+  }
+</script>
         </div>
 
         <div class="pytorch-content-right" id="pytorch-content-right">
@@ -563,7 +572,6 @@
       });
   </script>
  
-
 <script>
 //add microsoft link
 
@@ -642,7 +650,7 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
 </script>
 
 <script type="text/javascript">
-  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile'];
+  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile', 'Introduction to PyTorch on YouTube', 'Recommendation Systems'];
 </script>
 
 

@@ -6,24 +6,23 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
 <meta property="og:title" content="Fusing Convolution and Batch Norm using Custom Function" />
   
 <meta property="og:type" content="article" />
   
-<meta property="og:url" content="http://tutorials.pytorch.kr/intermediate/custom_function_conv_bn_tutorial.html" />
+<meta property="og:url" content="https://tutorials.pytorch.kr/intermediate/custom_function_conv_bn_tutorial.html" />
   
 <meta property="og:description" content="Fusing adjacent convolution and batch norm layers together is typically an inference-time optimization to improve run-time. It is usually achieved by eliminating the batch norm layer entirely and updating the weight and bias of the preceding convolution [0]. However, this technique is not applica..." />
   
-<meta property="og:image" content="http://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
+<meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
   
 <meta property="og:image:alt" content="Fusing Convolution and Batch Norm using Custom Function" />
   
 <meta property="og:ignore_canonical" content="true" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Fusing Convolution and Batch Norm using Custom Function &mdash; 파이토치 한국어 튜토리얼(PyTorch tutorials in Korean)</title>
+  <title>Fusing Convolution and Batch Norm using Custom Function &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
   
 
   
@@ -131,7 +130,7 @@
               
               
                 <div class="version">
-                  1.11.0+cu102
+                  1.12.0+cu102
                 </div>
               
             
@@ -272,6 +271,7 @@
 <li class="toctree-l1"><a class="reference internal" href="dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="quantized_transfer_learning_tutorial.html">(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/static_quantization_tutorial.html">(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torchserve_with_ipex.html">Grokking PyTorch Intel CPU performance from first principles</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul>
@@ -298,6 +298,7 @@
 <p class="caption" role="heading"><span class="caption-text">Recommendation Systems</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="torchrec_tutorial.html">Introduction to TorchRec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/sharding.html">Exploring TorchRec sharding</a></li>
 </ul>
 
             
@@ -386,6 +387,7 @@
           </div>
 
         
+
           
           <div class="rst-content">
           
@@ -396,7 +398,7 @@
 <p class="admonition-title">Note</p>
 <p>Click <a class="reference internal" href="#sphx-glr-download-intermediate-custom-function-conv-bn-tutorial-py"><span class="std std-ref">here</span></a> to download the full example code</p>
 </div>
-<section class="sphx-glr-example-title" id="fusing-convolution-and-batch-norm-using-custom-function">
+<div class="sphx-glr-example-title section" id="fusing-convolution-and-batch-norm-using-custom-function">
 <span id="sphx-glr-intermediate-custom-function-conv-bn-tutorial-py"></span><h1>Fusing Convolution and Batch Norm using Custom Function<a class="headerlink" href="#fusing-convolution-and-batch-norm-using-custom-function" title="Permalink to this headline">¶</a></h1>
 <p>Fusing adjacent convolution and batch norm layers together is typically an
 inference-time optimization to improve run-time. It is usually achieved
@@ -464,7 +466,7 @@ custom functions so we can validate their correctness individually</p>
 <span class="n">torch</span><span class="o">.</span><span class="n">autograd</span><span class="o">.</span><span class="n">gradcheck</span><span class="p">(</span><span class="n">Conv2D</span><span class="o">.</span><span class="n">apply</span><span class="p">,</span> <span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">weight</span><span class="p">))</span>
 </pre></div>
 </div>
-<section id="backward-formula-implementation-for-batch-norm">
+<div class="section" id="backward-formula-implementation-for-batch-norm">
 <h2>Backward Formula Implementation for Batch Norm<a class="headerlink" href="#backward-formula-implementation-for-batch-norm" title="Permalink to this headline">¶</a></h2>
 <p>Batch Norm has two modes: training and eval mode. In training mode
 the sample statistics are a function of the inputs. In eval mode,
@@ -540,8 +542,8 @@ we implement and test only the training mode case.</p>
 <span class="n">torch</span><span class="o">.</span><span class="n">autograd</span><span class="o">.</span><span class="n">gradcheck</span><span class="p">(</span><span class="n">BatchNorm</span><span class="o">.</span><span class="n">apply</span><span class="p">,</span> <span class="p">(</span><span class="n">a</span><span class="p">,),</span> <span class="n">fast_mode</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-<section id="fusing-convolution-and-batchnorm">
+</div>
+<div class="section" id="fusing-convolution-and-batchnorm">
 <h2>Fusing Convolution and BatchNorm<a class="headerlink" href="#fusing-convolution-and-batchnorm" title="Permalink to this headline">¶</a></h2>
 <p>Now that the bulk of the work has been done, we can combine
 them together. Note that in (1) we only save a single buffer
@@ -621,8 +623,8 @@ exact code as the examples above.</p>
 <span class="n">torch</span><span class="o">.</span><span class="n">autograd</span><span class="o">.</span><span class="n">gradcheck</span><span class="p">(</span><span class="n">FusedConvBN2DFunction</span><span class="o">.</span><span class="n">apply</span><span class="p">,</span> <span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">weight</span><span class="p">))</span>
 </pre></div>
 </div>
-</section>
-<section id="testing-out-our-new-layer">
+</div>
+<div class="section" id="testing-out-our-new-layer">
 <h2>Testing out our new Layer<a class="headerlink" href="#testing-out-our-new-layer" title="Permalink to this headline">¶</a></h2>
 <p>Use FusedConvBN to train a basic network
 The code below is after some light modifications to the example here:
@@ -736,8 +738,8 @@ The code below is after some light modifications to the example here:
 <span class="n">test_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="n">dataset2</span><span class="p">,</span> <span class="o">**</span><span class="n">test_kwargs</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-<section id="a-comparison-of-memory-usage">
+</div>
+<div class="section" id="a-comparison-of-memory-usage">
 <h2>A Comparison of Memory Usage<a class="headerlink" href="#a-comparison-of-memory-usage" title="Permalink to this headline">¶</a></h2>
 <p>If cuda is enabled, print out memory usage for both <cite>fused=True</cite> and <cite>fused=False</cite>
 For an example run on RTX 3070, CuDNN 8.0.5: fused peak memory: 1.56GB,
@@ -781,50 +783,50 @@ allocate one fewer buffer per fused conv-bn pair.</p>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Train Epoch: 0 [0/60000 (0%)]   Loss: 2.348852
-Train Epoch: 0 [4096/60000 (7%)]        Loss: 7.914272
-Train Epoch: 0 [8192/60000 (13%)]       Loss: 3.797001
-Train Epoch: 0 [12288/60000 (20%)]      Loss: 2.163253
-Train Epoch: 0 [16384/60000 (27%)]      Loss: 1.832567
-Train Epoch: 0 [20480/60000 (33%)]      Loss: 1.751949
-Train Epoch: 0 [24576/60000 (40%)]      Loss: 1.624256
-Train Epoch: 0 [28672/60000 (47%)]      Loss: 1.458605
-Train Epoch: 0 [32768/60000 (53%)]      Loss: 1.466291
-Train Epoch: 0 [36864/60000 (60%)]      Loss: 1.353721
-Train Epoch: 0 [40960/60000 (67%)]      Loss: 1.762645
-Train Epoch: 0 [45056/60000 (73%)]      Loss: 1.346592
-Train Epoch: 0 [49152/60000 (80%)]      Loss: 0.909657
-Train Epoch: 0 [53248/60000 (87%)]      Loss: 0.774030
-Train Epoch: 0 [57344/60000 (93%)]      Loss: 0.686818
+Train Epoch: 0 [4096/60000 (7%)]        Loss: 7.914278
+Train Epoch: 0 [8192/60000 (13%)]       Loss: 3.797705
+Train Epoch: 0 [12288/60000 (20%)]      Loss: 2.163421
+Train Epoch: 0 [16384/60000 (27%)]      Loss: 1.833608
+Train Epoch: 0 [20480/60000 (33%)]      Loss: 1.752641
+Train Epoch: 0 [24576/60000 (40%)]      Loss: 1.595523
+Train Epoch: 0 [28672/60000 (47%)]      Loss: 1.478510
+Train Epoch: 0 [32768/60000 (53%)]      Loss: 1.513791
+Train Epoch: 0 [36864/60000 (60%)]      Loss: 1.465271
+Train Epoch: 0 [40960/60000 (67%)]      Loss: 1.466915
+Train Epoch: 0 [45056/60000 (73%)]      Loss: 1.084765
+Train Epoch: 0 [49152/60000 (80%)]      Loss: 0.945219
+Train Epoch: 0 [53248/60000 (87%)]      Loss: 0.797045
+Train Epoch: 0 [57344/60000 (93%)]      Loss: 0.731174
 
-Test set: Average loss: 0.5454, Accuracy: 8227/10000 (82%)
+Test set: Average loss: 0.5622, Accuracy: 8167/10000 (82%)
 
 Train Epoch: 0 [0/60000 (0%)]   Loss: 2.349139
-Train Epoch: 0 [4096/60000 (7%)]        Loss: 7.927087
-Train Epoch: 0 [8192/60000 (13%)]       Loss: 3.628259
-Train Epoch: 0 [12288/60000 (20%)]      Loss: 2.527773
-Train Epoch: 0 [16384/60000 (27%)]      Loss: 1.928945
-Train Epoch: 0 [20480/60000 (33%)]      Loss: 1.762168
-Train Epoch: 0 [24576/60000 (40%)]      Loss: 1.506211
-Train Epoch: 0 [28672/60000 (47%)]      Loss: 1.518429
-Train Epoch: 0 [32768/60000 (53%)]      Loss: 1.296566
-Train Epoch: 0 [36864/60000 (60%)]      Loss: 1.321471
-Train Epoch: 0 [40960/60000 (67%)]      Loss: 1.642297
-Train Epoch: 0 [45056/60000 (73%)]      Loss: 1.183887
-Train Epoch: 0 [49152/60000 (80%)]      Loss: 1.002882
-Train Epoch: 0 [53248/60000 (87%)]      Loss: 0.797862
-Train Epoch: 0 [57344/60000 (93%)]      Loss: 0.759525
+Train Epoch: 0 [4096/60000 (7%)]        Loss: 7.927094
+Train Epoch: 0 [8192/60000 (13%)]       Loss: 3.627829
+Train Epoch: 0 [12288/60000 (20%)]      Loss: 2.514155
+Train Epoch: 0 [16384/60000 (27%)]      Loss: 1.920819
+Train Epoch: 0 [20480/60000 (33%)]      Loss: 1.766984
+Train Epoch: 0 [24576/60000 (40%)]      Loss: 1.553196
+Train Epoch: 0 [28672/60000 (47%)]      Loss: 1.393572
+Train Epoch: 0 [32768/60000 (53%)]      Loss: 1.342619
+Train Epoch: 0 [36864/60000 (60%)]      Loss: 1.447358
+Train Epoch: 0 [40960/60000 (67%)]      Loss: 1.294420
+Train Epoch: 0 [45056/60000 (73%)]      Loss: 1.068914
+Train Epoch: 0 [49152/60000 (80%)]      Loss: 0.935344
+Train Epoch: 0 [53248/60000 (87%)]      Loss: 0.922165
+Train Epoch: 0 [57344/60000 (93%)]      Loss: 0.787596
 
-Test set: Average loss: 0.4076, Accuracy: 8801/10000 (88%)
+Test set: Average loss: 0.4151, Accuracy: 8662/10000 (87%)
 
 CuDNN version: 7605
 
 Peak memory allocated:
-fused: 8.83GB, unfused: 6.96GB
+fused: 8.82GB, unfused: 8.15GB
 Memory allocated at end of forward pass:
-fused: 6.05GB, unfused: 6.42GB
+fused: 6.05GB, unfused: 6.43GB
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  33.357 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  33.379 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-intermediate-custom-function-conv-bn-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/187aea79daf1552dd05cdde1f4b4e34d/custom_function_conv_bn_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">custom_function_conv_bn_tutorial.py</span></code></a></p>
@@ -834,8 +836,8 @@ fused: 6.05GB, unfused: 6.42GB
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
-</section>
-</section>
+</div>
+</div>
 
 
              </article>
@@ -872,7 +874,7 @@ fused: 6.05GB, unfused: 6.42GB
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2021, PyTorch &amp; PyTorch Korea Community.
+        &copy; Copyright 2022, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorch Korea User Group).
 
     </p>
   </div>
@@ -885,6 +887,13 @@ fused: 6.05GB, unfused: 6.42GB
 </footer>
 
           </div>
+<script>
+if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.indexOf("/prototype/prototype_index")< 1))
+  {
+    var div = '<div class="admonition note"><p class="admonition-title">Note</p><p><i class="fa fa-flask" aria-hidden="true">&nbsp</i> 이 튜토리얼은 프로토타입(prototype) 기능들에 대해서 설명하고 있습니다. 프로토타입 기능은 일반적으로 피드백 및 테스트용으로, 런타임 플래그 없이는 PyPI나 Conda로 배포되는 바이너리에서는 사용할 수 없습니다.</p></div>'
+    document.getElementById("pytorch-article").insertAdjacentHTML('afterBegin', div)
+  }
+</script>
         </div>
 
         <div class="pytorch-content-right" id="pytorch-content-right">
@@ -936,7 +945,6 @@ fused: 6.05GB, unfused: 6.42GB
       });
   </script>
  
-
 <script>
 //add microsoft link
 
@@ -1015,7 +1023,7 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
 </script>
 
 <script type="text/javascript">
-  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile'];
+  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile', 'Introduction to PyTorch on YouTube', 'Recommendation Systems'];
 </script>
 
 

@@ -6,24 +6,23 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
 <meta property="og:title" content="심화 과정 : Bi-LSTM CRF와 동적 결정" />
   
 <meta property="og:type" content="article" />
   
-<meta property="og:url" content="http://tutorials.pytorch.kr/beginner/nlp/advanced_tutorial.html" />
+<meta property="og:url" content="https://tutorials.pytorch.kr/beginner/nlp/advanced_tutorial.html" />
   
 <meta property="og:description" content="동적, 정적 딥 러닝 툴킷(toolkits) 비교: Pytorch는 동적 신경망 툴킷입니다. 다른 동적 신경망 툴킷으로는 Dynet 이 있습니다.(이 툴킷을 예로 든 이유는 사용하는 법이 Pytorch와 비슷하기 때문입니다. Dynet의 예제를 보면 Pytorch로 구현할 때도 도움이 될 것입니다.) 반대로 정적 툴킷들로 Theano, Keras, TensorFlow 등이 있습니다. 주요 차이점은 다음과 같습니다: 정적 툴킷을 쓸 때는 계산 그래프를 한 번만 정의하고, 컴파일 한 후, 데이터를 계산 그래프에 넘깁니다., 동적 ..." />
   
-<meta property="og:image" content="http://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
+<meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
   
 <meta property="og:image:alt" content="심화 과정 : Bi-LSTM CRF와 동적 결정" />
   
 <meta property="og:ignore_canonical" content="true" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>심화 과정 : Bi-LSTM CRF와 동적 결정 &mdash; 파이토치 한국어 튜토리얼(PyTorch tutorials in Korean)</title>
+  <title>심화 과정 : Bi-LSTM CRF와 동적 결정 &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
   
 
   
@@ -129,7 +128,7 @@
               
               
                 <div class="version">
-                  1.11.0+cu102
+                  1.12.0+cu102
                 </div>
               
             
@@ -270,6 +269,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/quantized_transfer_learning_tutorial.html">(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../advanced/static_quantization_tutorial.html">(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../intermediate/torchserve_with_ipex.html">Grokking PyTorch Intel CPU performance from first principles</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul>
@@ -296,6 +296,7 @@
 <p class="caption" role="heading"><span class="caption-text">Recommendation Systems</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/torchrec_tutorial.html">Introduction to TorchRec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../advanced/sharding.html">Exploring TorchRec sharding</a></li>
 </ul>
 
             
@@ -384,6 +385,7 @@
           </div>
 
         
+
           
           <div class="rst-content">
           
@@ -394,9 +396,9 @@
 <p class="admonition-title">Note</p>
 <p>Click <a class="reference internal" href="#sphx-glr-download-beginner-nlp-advanced-tutorial-py"><span class="std std-ref">here</span></a> to download the full example code</p>
 </div>
-<section class="sphx-glr-example-title" id="bi-lstm-crf">
+<div class="sphx-glr-example-title section" id="bi-lstm-crf">
 <span id="sphx-glr-beginner-nlp-advanced-tutorial-py"></span><h1>심화 과정 : Bi-LSTM CRF와 동적 결정<a class="headerlink" href="#bi-lstm-crf" title="Permalink to this headline">¶</a></h1>
-<section id="toolkits">
+<div class="section" id="toolkits">
 <h2>동적, 정적 딥 러닝 툴킷(toolkits) 비교<a class="headerlink" href="#toolkits" title="Permalink to this headline">¶</a></h2>
 <p>Pytorch는 <em>동적</em> 신경망 툴킷입니다. 다른 동적 신경망 툴킷으로는
 <a class="reference external" href="https://github.com/clab/dynet">Dynet</a> 이 있습니다.(이 툴킷을
@@ -432,8 +434,8 @@ NP 구구조라는 뜻이며, 이 문장에서는 “The green cat”) 를 결�
 문제가 없습니다.</p>
 <p>동적 틀킷은 디버깅 하기 더 쉽고, 코드가 기반 언어와 더 비슷합니다
 (Pytorch와 Dynet이 Keras 또는 Theano 보다 Python 코드와 더 비슷합니다).</p>
-</section>
-<section id="bi-lstm-conditional-rnadom-field">
+</div>
+<div class="section" id="bi-lstm-conditional-rnadom-field">
 <h2>Bi-LSTM Conditional Rnadom Field 설명<a class="headerlink" href="#bi-lstm-conditional-rnadom-field" title="Permalink to this headline">¶</a></h2>
 <p>이 영역에서는 개체명 인식을 수행하는 완성된 Bi-LSTM Conditional Random
 Field 예시를 살펴보겠습니다. 위에 나온 LSTM 태거(tagger)는 일반적으로
@@ -484,8 +486,8 @@ tag <span class="math">\(k\)</span> 로의 전이 점수를 의미합니다. 따
 <p>위의 설명이 너무 간단하다고 생각한다면 CRF에 대한 Michael Collins의
 글을 <a class="reference external" href="http://www.cs.columbia.edu/%7Emcollins/crf.pdf">여기</a> 에서
 읽어보세요.</p>
-</section>
-<section id="id1">
+</div>
+<div class="section" id="id1">
 <h2>구현 문서<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
 <p>아래의 예시는 로그 공간에서 분배 함수를 계산하기 위한 순방향 알고리즘과
 복호화하기 위한 비터비 알고리즘을 구현한 것입니다. 역전파
@@ -730,8 +732,8 @@ tag <span class="math">\(k\)</span> 로의 전이 점수를 의미합니다. 따
 (tensor(20.4906), [0, 1, 1, 1, 2, 2, 2, 0, 1, 2, 2])
 </pre></div>
 </div>
-</section>
-<section id="discriminative">
+</div>
+<div class="section" id="discriminative">
 <h2>연습 : 판별적(discriminative) 태깅을 위한 새로운 손실 함수<a class="headerlink" href="#discriminative" title="Permalink to this headline">¶</a></h2>
 <p>사실 복호화 할 때는 비터비 경로 점수로 역전파를 하지 않기 때문에 계산
 그래프를 만들 필요가 없었습니다. 그러나 이미 만들었으니, 비터비 경로
@@ -744,7 +746,7 @@ tag <span class="math">\(k\)</span> 로의 전이 점수를 의미합니다. 따
 예시입니다. 이 모델을 정적 툴킷에서 구현해 보지는 않았는데, 구현이
 가능하지만 덜 직관적일 수 있습니다.</p>
 <p>실제 데이터를 사용해보고 비교해보세요!</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  7.536 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  7.704 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-beginner-nlp-advanced-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/2a7469f7250c4f405b1c4f885994ea69/advanced_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">advanced_tutorial.py</span></code></a></p>
@@ -754,8 +756,8 @@ tag <span class="math">\(k\)</span> 로의 전이 점수를 의미합니다. 따
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
-</section>
-</section>
+</div>
+</div>
 
 
              </article>
@@ -783,7 +785,7 @@ tag <span class="math">\(k\)</span> 로의 전이 점수를 의미합니다. 따
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2021, PyTorch &amp; PyTorch Korea Community.
+        &copy; Copyright 2022, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorch Korea User Group).
 
     </p>
   </div>
@@ -796,6 +798,13 @@ tag <span class="math">\(k\)</span> 로의 전이 점수를 의미합니다. 따
 </footer>
 
           </div>
+<script>
+if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.indexOf("/prototype/prototype_index")< 1))
+  {
+    var div = '<div class="admonition note"><p class="admonition-title">Note</p><p><i class="fa fa-flask" aria-hidden="true">&nbsp</i> 이 튜토리얼은 프로토타입(prototype) 기능들에 대해서 설명하고 있습니다. 프로토타입 기능은 일반적으로 피드백 및 테스트용으로, 런타임 플래그 없이는 PyPI나 Conda로 배포되는 바이너리에서는 사용할 수 없습니다.</p></div>'
+    document.getElementById("pytorch-article").insertAdjacentHTML('afterBegin', div)
+  }
+</script>
         </div>
 
         <div class="pytorch-content-right" id="pytorch-content-right">
@@ -847,7 +856,6 @@ tag <span class="math">\(k\)</span> 로의 전이 점수를 의미합니다. 따
       });
   </script>
  
-
 <script>
 //add microsoft link
 
@@ -926,7 +934,7 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
 </script>
 
 <script type="text/javascript">
-  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile'];
+  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile', 'Introduction to PyTorch on YouTube', 'Recommendation Systems'];
 </script>
 
 

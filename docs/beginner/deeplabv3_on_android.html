@@ -6,24 +6,23 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
 <meta property="og:title" content="안드로이드에서의 이미지 분할 DeepLapV3" />
   
 <meta property="og:type" content="article" />
   
-<meta property="og:url" content="http://tutorials.pytorch.kr/beginner/deeplabv3_on_android.html" />
+<meta property="og:url" content="https://tutorials.pytorch.kr/beginner/deeplabv3_on_android.html" />
   
 <meta property="og:description" content="저자: Jeff Tang 감수: Jeremiah Chung 번역: 김현길 소개: 의미론적 이미지 분할(Semantic image segmentation)은 의미론적 라벨을 사용하여 입력 이미지의 특정 영역을 표시하는 컴퓨터 비전 작업입니다. PyTorch의 의미론적 이미지 분할에 사용하는 DeepLabV3 모델 은 20가지 의미론적 클래스 가 있습니다. 예를 들어 자전거, 버스, 차, 개, 사람과 같은 것들의 이미지 영역에 라벨을 달 수 있습니다. 의미론적 이미지 분할은 자율주행이나 장면 이해(scene understandin..." />
   
-<meta property="og:image" content="http://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
+<meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
   
 <meta property="og:image:alt" content="안드로이드에서의 이미지 분할 DeepLapV3" />
   
 <meta property="og:ignore_canonical" content="true" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>안드로이드에서의 이미지 분할 DeepLapV3 &mdash; 파이토치 한국어 튜토리얼(PyTorch tutorials in Korean)</title>
+  <title>안드로이드에서의 이미지 분할 DeepLapV3 &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
   
 
   
@@ -131,7 +130,7 @@
               
               
                 <div class="version">
-                  1.11.0+cu102
+                  1.12.0+cu102
                 </div>
               
             
@@ -272,6 +271,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/quantized_transfer_learning_tutorial.html">(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/static_quantization_tutorial.html">(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/torchserve_with_ipex.html">Grokking PyTorch Intel CPU performance from first principles</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul>
@@ -298,6 +298,7 @@
 <p class="caption" role="heading"><span class="caption-text">Recommendation Systems</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/torchrec_tutorial.html">Introduction to TorchRec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/sharding.html">Exploring TorchRec sharding</a></li>
 </ul>
 
             
@@ -386,18 +387,19 @@
           </div>
 
         
+
           
           <div class="rst-content">
           
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <section id="deeplapv3">
+  <div class="section" id="deeplapv3">
 <h1>안드로이드에서의 이미지 분할 DeepLapV3<a class="headerlink" href="#deeplapv3" title="Permalink to this headline">¶</a></h1>
 <p><strong>저자</strong>: <a class="reference external" href="https://github.com/jeffxtang">Jeff Tang</a></p>
 <p><strong>감수</strong>: <a class="reference external" href="https://github.com/jeremiahschung">Jeremiah Chung</a>
 <strong>번역</strong>: <a class="reference external" href="https://github.com/des00">김현길</a></p>
-<section id="id2">
+<div class="section" id="id2">
 <h2>소개<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
 <p>의미론적 이미지 분할(Semantic image segmentation)은 의미론적 라벨을 사용하여 입력 이미지의 특정 영역을 표시하는 컴퓨터 비전 작업입니다.
 PyTorch의 의미론적 이미지 분할에 사용하는 <a class="reference external" href="https://pytorch.org/hub/pytorch_vision_deeplabv3_resnet101">DeepLabV3 모델</a> 은 <a class="reference external" href="http://host.robots.ox.ac.uk:8080/pascal/VOC/voc2007/segexamples/index.html">20가지 의미론적 클래스</a> 가 있습니다. 예를 들어 자전거, 버스, 차, 개, 사람과 같은 것들의 이미지 영역에 라벨을 달 수 있습니다.
@@ -408,8 +410,8 @@ PyTorch의 의미론적 이미지 분할에 사용하는 <a class="reference ext
 <p class="admonition-title">Note</p>
 <p>이 튜토리얼을 진행하기 앞서 <a class="reference external" href="https://pytorch.org/mobile/android/">안드로이드를 위한 PyTorch 모바일</a> 을 확인하고, PyTorch 안드로이드 예제인 <a class="reference external" href="https://github.com/pytorch/android-demo-app/tree/master/HelloWorldApp">HelloWorld</a> 앱을 실행해 보십시오. 이 튜토리얼은 대게 처음으로 모바일에 배포하는 모델인 이미지 분류 모델을 넘어선 다음 단계를 다루고 있습니다. 이 튜토리얼을 위한 전체 코드는 <a class="reference external" href="https://github.com/pytorch/android-demo-app/tree/master/ImageSegmentation">여기</a> 에서 확인 가능합니다.</p>
 </div>
-</section>
-<section id="id5">
+</div>
+<div class="section" id="id5">
 <h2>학습 목표<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h2>
 <p>이 튜토리얼에서 배울 것들:</p>
 <ol class="arabic simple">
@@ -419,18 +421,18 @@ PyTorch의 의미론적 이미지 분할에 사용하는 <a class="reference ext
 <li><p>모델이 원하는 형식에 맞는 입력값 준비하고 모델에서 결과값 처리하기</p></li>
 <li><p>UI 완성, 리팩토링, 앱 빌드 및 실행해서 이미지 분류 동작 확인하기</p></li>
 </ol>
-</section>
-<section id="id6">
+</div>
+<div class="section" id="id6">
 <h2>요구사항<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>PyTorch 1.6 이나 1.7</p></li>
 <li><p>torchvision 0.7 이나 0.8</p></li>
 <li><p>NDK가 설치된 Android Studio 3.5.1 혹은 그 이후 버전</p></li>
 </ul>
-</section>
-<section id="id7">
+</div>
+<div class="section" id="id7">
 <h2>단계<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h2>
-<section id="id8">
+<div class="section" id="id8">
 <h3>1. DeepLabV3 모델을 안드로이드 배포용으로 변환하기<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
 <p>안드로이드에 모델을 배포하는 첫 단계는 모델을 <a class="reference external" href="https://tutorials.pytorch.kr/beginner/Intro_to_TorchScript_tutorial.html">TorchScript</a> 형식으로 변환하는 것입니다.</p>
 <div class="admonition note">
@@ -449,8 +451,8 @@ PyTorch의 의미론적 이미지 분할에 사용하는 <a class="reference ext
 </pre></div>
 </div>
 <p>생성한 <cite>deeplabv3_scripted.pt</cite> 모델 파일의 크기는 168MB 정도가 되어야 됩니다. 이상적으로는 모델을 안드로이드 앱에 배포하기 전에 크기 감소와 더 빠른 추론을 위해 양자화(Quantization)가 되어야 합니다. 양자화가 무엇인지 알고 싶다면 <a class="reference external" href="../recipes/quantization.html">Quantization Recipe</a> 와 이 안의 참고 링크들을 확인해 주십시오. DeepLabV3에서 어떻게 올바르게 양자화 작업 흐름, 속칭 학습 후(Post Training) <a class="reference external" href="https://tutorials.pytorch.kr/advanced/static_quantization_tutorial.html">Static Quantization</a> 을 적용할 것인지 관련하여 세부사항은 앞으로의 튜토리얼이나 레시피에서 다룰 예정입니다.</p>
-</section>
-<section id="id9">
+</div>
+<div class="section" id="id9">
 <h3>2. 파이썬에서 모델의 예제 입출력 얻기<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
 <p>이제 스크립트된 PyTorch 모델을 얻었으니, 안드로이드에서 모델이 잘 동작하는지 예제를 입력해 테스트를 진행합시다. 첫번째로 모델을 이용해서 추론하고 입출력을 검토하는 파이썬 스크립트를 작성해 봅시다. DeepLabV3의 예시를 들기 위해 첫번째 단계의 코드 <a class="reference external" href="https://pytorch.org/hub/pytorch_vision_deeplabv3_resnet101">DeepLabV3 model hub site</a> 를 재사용합니다. 위의 코드에 아래의 코드 조각을 덧붙입니다:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
@@ -476,8 +478,8 @@ PyTorch의 의미론적 이미지 분할에 사용하는 <a class="reference ext
 </pre></div>
 </div>
 <p>그래서 400x400 크기와 동일한 입력 이미지  <cite>deeplab.jpg</cite> 를 안드로이드의 모델에 입력하면, 모델 출력은 [21, 400, 400]의 크기를 가져야 합니다. 또한, 최소한 실제 입출력 데이터의 시작 부분만이라도 출력해서 확인을 해 봅시다. 아래의 4단계에서는 안드로이드에서 앱을 실행하는데, 이 때 모델의 실제 입출력 값과 비교하기 위함입니다.</p>
-</section>
-<section id="id11">
+</div>
+<div class="section" id="id11">
 <h3>3. 새로운 안드로이드 앱을 만들거나 안드로이드 예제 앱에 변환된 모델을 가져와서 재사용하기<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h3>
 <p>첫번째로 모델을 안드로이드 스튜디오 프로젝트에서 PyTorch Mobile과 함께 쓰기 위해 <a class="reference external" href="../recipes/model_preparation_android.html#add-the-model-and-pytorch-library-on-android">안드로이드 레시피를 위한 모델 준비</a> 를 따라해 봅니다. 이 튜토리얼의 DeepLabV3과 PyTorch HelloWorld Android 예제 내부의 MobileNet v2 둘 다 컴퓨터 비전 모델이기에, <a class="reference external" href="https://github.com/pytorch/android-demo-app/tree/master/HelloWorldApp">HelloWorld 예제 저장소</a> 에서도 손쉽게 모델을 읽고 입출력을 처리하기 위한 코드 수정 방법을 찾을 수 있습니다. 이 단계와 4단계의 목표는 1단계에서 만들어진 <cite>deeplabv3_scripted.pt</cite> 모델이 안드로이드에서 확실하게 동작하는지 확인하는 것입니다.</p>
 <p>이제 2단계에서 사용한 <cite>deeplabv3_scripted.pt</cite> 와 <cite>deeplab.jpg</cite> 를 안드로이드 스튜디오 프로젝트에 더하고 <cite>MainActivity</cite> 내부의 <cite>onCreate</cite> 메소드를 이와 유사하게 수정합니다:</p>
@@ -491,8 +493,8 @@ PyTorch의 의미론적 이미지 분할에 사용하는 <a class="reference ext
 </pre></div>
 </div>
 <p>그 후 <cite>finish()</cite> 라인에 브레이크포인트를 설정하고 빌드 및 앱 실행을 합니다. 브레이크포인트에서 앱이 멈추지 않는다면 안드로이드에서 1단계의 스크립트된 모델을 성공적으로 읽어 들였다는 의미입니다.</p>
-</section>
-<section id="id14">
+</div>
+<div class="section" id="id14">
 <h3>4. 모델 추론을 위한 입출력 처리하기<a class="headerlink" href="#id14" title="Permalink to this headline">¶</a></h3>
 <p>이전 단계에서 모델을 읽어들인 이후 입력값이 잘 동작하는지, 예상한대로 출력값을 생성하는지 확인해 봅시다. DeepLabV3 모델을 위한 입력은 HelloWorld 예제 내부의 MobileNet v2에서 쓰는 이미지와 동일합니다. 그래서 <a class="reference external" href="https://github.com/pytorch/android-demo-app/blob/master/HelloWorldApp/app/src/main/java/org/pytorch/helloworld/MainActivity.java">MainActivity.java</a> HelloWorld 프로젝트의 입력 처리를 위한 코드를 재사용 합니다. <cite>MainActivity.java</cite> 파일의 <a class="reference external" href="https://github.com/pytorch/android-demo-app/blob/master/HelloWorldApp/app/src/main/java/org/pytorch/helloworld/MainActivity.java#L50">50번째 줄</a> 과 73번째 줄 사이의 코드를 아래와 같이 변경합니다:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">final</span><span class="w"> </span><span class="n">Tensor</span><span class="w"> </span><span class="n">inputTensor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TensorImageUtils</span><span class="p">.</span><span class="na">bitmapToFloat32Tensor</span><span class="p">(</span><span class="n">bitmap</span><span class="p">,</span><span class="w"></span>
@@ -524,8 +526,8 @@ PyTorch의 의미론적 이미지 분할에 사용하는 <a class="reference ext
 </div>
 <p>지금까지 했던 모든 것들은 파이썬에서처럼 안드로이드 앱에서도 우리의 흥미를 끄는 모델이 스크립팅되고 정상적으로 동작하는지 확인하는 것입니다.</p>
 <p>일반적인 머신러닝 프로젝트에서 데이터 처리가 가장 힘든 부분인 것처럼, 안드로이드에서 모델을 사용하여 여기까지 밟아온 단계들이 앱 개발 기간 중 대부분은 아니지만 상당히 많은 시간을 차지합니다.</p>
-</section>
-<section id="ui">
+</div>
+<div class="section" id="ui">
 <h3>5. UI 완성, 리팩토링, 앱 빌드 및 실행<a class="headerlink" href="#ui" title="Permalink to this headline">¶</a></h3>
 <p>이제 새 이미지를 처리한 결과를 확인하기 위해 앱과 UI를 완성할 준비가 되었습니다. 결과 처리 코드는 아래와 같아야 되며, 4단계의 코드 끝부분에 추가되어야 합니다:</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kt">int</span><span class="o">[]</span><span class="w"> </span><span class="n">intValues</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="kt">int</span><span class="o">[</span><span class="n">width</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">height</span><span class="o">]</span><span class="p">;</span><span class="w"></span>
@@ -576,22 +578,22 @@ PyTorch의 의미론적 이미지 분할에 사용하는 <a class="reference ext
 <p>이제 앱을 안드로이드 에뮬레이터나 (가능하다면) 실제 기기에서 실행하면 이런 화면들을 볼 수 있습니다:</p>
 <a class="reference internal image-reference" href="../_images/deeplabv3_android.png"><img alt="../_images/deeplabv3_android.png" src="../_images/deeplabv3_android.png" style="width: 300px;" /></a>
 <a class="reference internal image-reference" href="../_images/deeplabv3_android2.png"><img alt="../_images/deeplabv3_android2.png" src="../_images/deeplabv3_android2.png" style="width: 300px;" /></a>
-</section>
-</section>
-<section id="id16">
+</div>
+</div>
+<div class="section" id="id16">
 <h2>정리<a class="headerlink" href="#id16" title="Permalink to this headline">¶</a></h2>
 <p>이 튜토리얼에서는 사전에 학습된 PyTorch DeepLabV3 모델을 안드로이드에서 사용하기 위한 변환과, 그 모델이 어떻게 안드로이드에서 성공적으로 실행되는지 보았습니다. 여기에서는 모델이 안드로이드에서도 정말 실행이 되는지 각 과정을 확인해 보면서 전체 과정을 이해하는 것에 초점을 두었습니다. 전체 코드는 <a class="reference external" href="https://github.com/pytorch/android-demo-app/tree/master/ImageSegmentation">여기</a> 에서 확인 가능합니다.</p>
 <p>안드로이드에서 양자화나 전이 학습(transfer learning)같은 고급 주제는 앞으로의 데모 앱이나 튜토리얼에서 다룰 예정입니다.</p>
-</section>
-<section id="id18">
+</div>
+<div class="section" id="id18">
 <h2>더 알아보기<a class="headerlink" href="#id18" title="Permalink to this headline">¶</a></h2>
 <ol class="arabic simple">
 <li><p><a class="reference external" href="https://pytorch.org/mobile">PyTorch 모바일 사이트</a></p></li>
 <li><p><a class="reference external" href="https://pytorch.org/hub/pytorch_vision_deeplabv3_resnet101">DeepLabV3 모델</a></p></li>
 <li><p><a class="reference external" href="https://arxiv.org/pdf/1706.05587.pdf">DeepLabV3 논문</a></p></li>
 </ol>
-</section>
-</section>
+</div>
+</div>
 
 
              </article>
@@ -628,7 +630,7 @@ PyTorch의 의미론적 이미지 분할에 사용하는 <a class="reference ext
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2021, PyTorch &amp; PyTorch Korea Community.
+        &copy; Copyright 2022, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorch Korea User Group).
 
     </p>
   </div>
@@ -641,6 +643,13 @@ PyTorch의 의미론적 이미지 분할에 사용하는 <a class="reference ext
 </footer>
 
           </div>
+<script>
+if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.indexOf("/prototype/prototype_index")< 1))
+  {
+    var div = '<div class="admonition note"><p class="admonition-title">Note</p><p><i class="fa fa-flask" aria-hidden="true">&nbsp</i> 이 튜토리얼은 프로토타입(prototype) 기능들에 대해서 설명하고 있습니다. 프로토타입 기능은 일반적으로 피드백 및 테스트용으로, 런타임 플래그 없이는 PyPI나 Conda로 배포되는 바이너리에서는 사용할 수 없습니다.</p></div>'
+    document.getElementById("pytorch-article").insertAdjacentHTML('afterBegin', div)
+  }
+</script>
         </div>
 
         <div class="pytorch-content-right" id="pytorch-content-right">
@@ -701,7 +710,6 @@ PyTorch의 의미론적 이미지 분할에 사용하는 <a class="reference ext
       });
   </script>
  
-
 <script>
 //add microsoft link
 
@@ -780,7 +788,7 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
 </script>
 
 <script type="text/javascript">
-  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile'];
+  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile', 'Introduction to PyTorch on YouTube', 'Recommendation Systems'];
 </script>
 
 

@@ -6,24 +6,23 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
 <meta property="og:title" content="Distributed Training with Uneven Inputs Using the Join Context Manager" />
   
 <meta property="og:type" content="article" />
   
-<meta property="og:url" content="http://tutorials.pytorch.kr/advanced/generic_join.html" />
+<meta property="og:url" content="https://tutorials.pytorch.kr/advanced/generic_join.html" />
   
 <meta property="og:description" content="Author: Andrew Gu In this tutorial, you will see: An overview of the Join context manager., An example of how to use the context manager with DistributedDataParallel., An example of how to use the context manager with both DistributedDataParallel and ZeroRedundancyOptimizer., An example of passin..." />
   
-<meta property="og:image" content="http://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
+<meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
   
 <meta property="og:image:alt" content="Distributed Training with Uneven Inputs Using the Join Context Manager" />
   
 <meta property="og:ignore_canonical" content="true" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Distributed Training with Uneven Inputs Using the Join Context Manager &mdash; 파이토치 한국어 튜토리얼(PyTorch tutorials in Korean)</title>
+  <title>Distributed Training with Uneven Inputs Using the Join Context Manager &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
   
 
   
@@ -131,7 +130,7 @@
               
               
                 <div class="version">
-                  1.11.0+cu102
+                  1.12.0+cu102
                 </div>
               
             
@@ -272,6 +271,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/quantized_transfer_learning_tutorial.html">(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="static_quantization_tutorial.html">(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/torchserve_with_ipex.html">Grokking PyTorch Intel CPU performance from first principles</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul class="current">
@@ -298,6 +298,7 @@
 <p class="caption" role="heading"><span class="caption-text">Recommendation Systems</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/torchrec_tutorial.html">Introduction to TorchRec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sharding.html">Exploring TorchRec sharding</a></li>
 </ul>
 
             
@@ -386,15 +387,20 @@
           </div>
 
         
+
           
           <div class="rst-content">
           
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <section id="distributed-training-with-uneven-inputs-using-the-join-context-manager">
+  <div class="section" id="distributed-training-with-uneven-inputs-using-the-join-context-manager">
 <h1>Distributed Training with Uneven Inputs Using the Join Context Manager<a class="headerlink" href="#distributed-training-with-uneven-inputs-using-the-join-context-manager" title="Permalink to this headline">¶</a></h1>
 <p><strong>Author</strong>: <a class="reference external" href="https://github.com/andwgu">Andrew Gu</a></p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>View the source code for this tutorial in <a class="reference external" href="https://github.com/pytorch/tutorials/blob/master/advanced_source/generic_join.rst">github</a>.</p>
+</div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p><code class="docutils literal notranslate"><span class="pre">Join</span></code> is introduced in PyTorch 1.10 as a prototype feature. This
@@ -411,17 +417,17 @@ API is subject to change.</p>
 <li><p>An example showing how to make a toy class compatible with the context
 manager.</p></li>
 </ul>
-<section id="requirements">
+<div class="section" id="requirements">
 <h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>PyTorch 1.10+</p></li>
-<li><p><a class="reference external" href="https://tutorials.pytorch.kr/intermediate/ddp_tutorial.html">Getting Started with Distributed Data Parallel</a></p></li>
-<li><p><a class="reference external" href="https://tutorials.pytorch.kr/recipes/zero_redundancy_optimizer.html">Shard Optimizer States with ZeroRedundancyOptimizer</a></p></li>
+<li><p><a class="reference external" href="https://pytorch.org/tutorials/intermediate/ddp_tutorial.html">Getting Started with Distributed Data Parallel</a></p></li>
+<li><p><a class="reference external" href="https://pytorch.org/tutorials/recipes/zero_redundancy_optimizer.html">Shard Optimizer States with ZeroRedundancyOptimizer</a></p></li>
 </ul>
-</section>
-<section id="what-is-join">
+</div>
+<div class="section" id="what-is-join">
 <h2>What is <code class="docutils literal notranslate"><span class="pre">Join</span></code>?<a class="headerlink" href="#what-is-join" title="Permalink to this headline">¶</a></h2>
-<p>In <a class="reference external" href="https://tutorials.pytorch.kr/intermediate/ddp_tutorial.html#basic-use-case">Getting Started with Distributed Data Parallel - Basic Use Case</a>, you saw
+<p>In <a class="reference external" href="https://pytorch.org/tutorials/intermediate/ddp_tutorial.html#basic-use-case">Getting Started with Distributed Data Parallel - Basic Use Case</a>, you saw
 the general skeleton for using <a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.parallel.DistributedDataParallel.html">DistributedDataParallel</a> to perform data
 parallel training. This implicitly schedules all-reduces in each backward pass
 to synchronize gradients across ranks. Such <a class="reference external" href="https://pytorch.org/docs/stable/distributed.html">collective communications</a> require participation
@@ -434,8 +440,8 @@ facilitate training with uneven inputs. The context manager allows the ranks
 that exhaust their inputs early (i.e. <em>join</em> early) to shadow the collective
 communications performed by those that have not yet joined. The ways in which
 the communications are shadowed are specified by hooks.</p>
-</section>
-<section id="using-join-with-distributeddataparallel">
+</div>
+<div class="section" id="using-join-with-distributeddataparallel">
 <h2>Using <code class="docutils literal notranslate"><span class="pre">Join</span></code> with <code class="docutils literal notranslate"><span class="pre">DistributedDataParallel</span></code><a class="headerlink" href="#using-join-with-distributeddataparallel" title="Permalink to this headline">¶</a></h2>
 <p>PyTorch’s <a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.parallel.DistributedDataParallel.html">DistributedDataParallel</a> works out-of-the-box with the <code class="docutils literal notranslate"><span class="pre">Join</span></code>
 context manager. Here is an example usage:</p>
@@ -491,8 +497,8 @@ above example, using <code class="docutils literal notranslate"><span class="pre
 participating classes, e.g. <code class="docutils literal notranslate"><span class="pre">DistributedDataParallel</span></code> and
 <a class="reference external" href="https://pytorch.org/docs/stable/distributed.optim.html">ZeroRedundancyOptimizer</a> together.</p>
 </div>
-</section>
-<section id="using-join-with-distributeddataparallel-and-zeroredundancyoptimizer">
+</div>
+<div class="section" id="using-join-with-distributeddataparallel-and-zeroredundancyoptimizer">
 <h2>Using <code class="docutils literal notranslate"><span class="pre">Join</span></code> with <code class="docutils literal notranslate"><span class="pre">DistributedDataParallel</span></code> and <code class="docutils literal notranslate"><span class="pre">ZeroRedundancyOptimizer</span></code><a class="headerlink" href="#using-join-with-distributeddataparallel-and-zeroredundancyoptimizer" title="Permalink to this headline">¶</a></h2>
 <p>The <code class="docutils literal notranslate"><span class="pre">Join</span></code> context manager works not only with a single class but also with
 multiple classes together. PyTorch’s <code class="docutils literal notranslate"><span class="pre">ZeroRedundancyOptimizer</span></code> is also
@@ -527,8 +533,8 @@ previous example to use both <code class="docutils literal notranslate"><span cl
 <p>This will yield the same output as before. The notable change was
 additionally passing in the <code class="docutils literal notranslate"><span class="pre">ZeroRedundancyOptimizer</span></code> instance into
 <code class="docutils literal notranslate"><span class="pre">Join()</span></code>.</p>
-</section>
-<section id="passing-keyword-arguments">
+</div>
+<div class="section" id="passing-keyword-arguments">
 <h2>Passing Keyword Arguments<a class="headerlink" href="#passing-keyword-arguments" title="Permalink to this headline">¶</a></h2>
 <p>Classes may provide keyword arguments that modify their behavior in the context
 manager at run time. For example, <code class="docutils literal notranslate"><span class="pre">DistributedDataParallel</span></code> provides an
@@ -548,15 +554,15 @@ all participating classes. This should not be a limitation since we do
 not expect cases where multiple <code class="docutils literal notranslate"><span class="pre">Joinable</span></code> s need differing settings
 of the same argument. Nonetheless, this is something to keep in mind.</p>
 </div>
-</section>
-<section id="how-does-join-work">
+</div>
+<div class="section" id="how-does-join-work">
 <h2>How Does <code class="docutils literal notranslate"><span class="pre">Join</span></code> Work?<a class="headerlink" href="#how-does-join-work" title="Permalink to this headline">¶</a></h2>
 <p>Now that we have seen some preliminary examples of how to use the <code class="docutils literal notranslate"><span class="pre">Join</span></code>
 context manager, let us delve deeper into how it works. This will provide a
 greater insight into the full capability that it offers and prepare you to make
 your own custom classes compatible. Here, we will go over the <code class="docutils literal notranslate"><span class="pre">Join</span></code> class as
 well as the supporting classes <code class="docutils literal notranslate"><span class="pre">Joinable</span></code> and <code class="docutils literal notranslate"><span class="pre">JoinHook</span></code>.</p>
-<section id="joinable">
+<div class="section" id="joinable">
 <h3><code class="docutils literal notranslate"><span class="pre">Joinable</span></code><a class="headerlink" href="#joinable" title="Permalink to this headline">¶</a></h3>
 <p>To begin, classes compatible with the <code class="docutils literal notranslate"><span class="pre">Join</span></code> context manager must inherit
 from the abstract base class <code class="docutils literal notranslate"><span class="pre">Joinable</span></code>. In particular, a <code class="docutils literal notranslate"><span class="pre">Joinable</span></code> must
@@ -591,8 +597,8 @@ directly use them in the previous examples.</p>
 since it initializes a <code class="docutils literal notranslate"><span class="pre">JoinConfig</span></code> instance, which is used internally by
 the context manager to ensure correctness. This will be saved in each
 <code class="docutils literal notranslate"><span class="pre">Joinable</span></code> as a field <code class="docutils literal notranslate"><span class="pre">_join_config</span></code>.</p>
-</section>
-<section id="joinhook">
+</div>
+<div class="section" id="joinhook">
 <h3><code class="docutils literal notranslate"><span class="pre">JoinHook</span></code><a class="headerlink" href="#joinhook" title="Permalink to this headline">¶</a></h3>
 <p>Next, let us break down the <code class="docutils literal notranslate"><span class="pre">JoinHook</span></code> class. A <code class="docutils literal notranslate"><span class="pre">JoinHook</span></code> provides two
 entry points into a context manager:</p>
@@ -615,8 +621,8 @@ since the joined rank is still responsible for updating and synchronizing its
 shard of the parameters, and the provided <code class="docutils literal notranslate"><span class="pre">DistributedDataParallel</span></code> post-hook
 broadcasts the final updated model from one of the last joining ranks to ensure
 that it is the same across all ranks.</p>
-</section>
-<section id="join">
+</div>
+<div class="section" id="join">
 <h3><code class="docutils literal notranslate"><span class="pre">Join</span></code><a class="headerlink" href="#join" title="Permalink to this headline">¶</a></h3>
 <p>Finally, let us examine how these fit into the <code class="docutils literal notranslate"><span class="pre">Join</span></code> class itself.</p>
 <ul class="simple">
@@ -660,9 +666,9 @@ hooks are iterated over in the same deterministic order. If this appears to
 be a major limitation, we may modify the API to permit a customizable
 ordering.</p>
 </div>
-</section>
-</section>
-<section id="making-a-toy-class-work-with-join">
+</div>
+</div>
+<div class="section" id="making-a-toy-class-work-with-join">
 <h2>Making a Toy Class Work with <code class="docutils literal notranslate"><span class="pre">Join</span></code><a class="headerlink" href="#making-a-toy-class-work-with-join" title="Permalink to this headline">¶</a></h2>
 <p>Since the previous section introduced several concepts, let us see them in
 practice with a toy example. Here, we will implement a class that counts the
@@ -811,8 +817,8 @@ the post-hooks.</p></li>
 <li><p>We pass in the <code class="docutils literal notranslate"><span class="pre">sync_max_count</span></code> keyword argument to the context manager,
 which is then forwarded to <code class="docutils literal notranslate"><span class="pre">Counter</span></code> ‘s join hook.</p></li>
 </ul>
-</section>
-</section>
+</div>
+</div>
 
 
              </article>
@@ -849,7 +855,7 @@ which is then forwarded to <code class="docutils literal notranslate"><span clas
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2021, PyTorch &amp; PyTorch Korea Community.
+        &copy; Copyright 2022, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorch Korea User Group).
 
     </p>
   </div>
@@ -862,6 +868,13 @@ which is then forwarded to <code class="docutils literal notranslate"><span clas
 </footer>
 
           </div>
+<script>
+if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.indexOf("/prototype/prototype_index")< 1))
+  {
+    var div = '<div class="admonition note"><p class="admonition-title">Note</p><p><i class="fa fa-flask" aria-hidden="true">&nbsp</i> 이 튜토리얼은 프로토타입(prototype) 기능들에 대해서 설명하고 있습니다. 프로토타입 기능은 일반적으로 피드백 및 테스트용으로, 런타임 플래그 없이는 PyPI나 Conda로 배포되는 바이너리에서는 사용할 수 없습니다.</p></div>'
+    document.getElementById("pytorch-article").insertAdjacentHTML('afterBegin', div)
+  }
+</script>
         </div>
 
         <div class="pytorch-content-right" id="pytorch-content-right">
@@ -921,7 +934,6 @@ which is then forwarded to <code class="docutils literal notranslate"><span clas
       });
   </script>
  
-
 <script>
 //add microsoft link
 
@@ -1000,7 +1012,7 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
 </script>
 
 <script type="text/javascript">
-  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile'];
+  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile', 'Introduction to PyTorch on YouTube', 'Recommendation Systems'];
 </script>
 
 

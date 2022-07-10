@@ -6,24 +6,23 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
 <meta property="og:title" content="기초부터 시작하는 NLP:  문자-단위 RNN으로 이름 생성하기" />
   
 <meta property="og:type" content="article" />
   
-<meta property="og:url" content="http://tutorials.pytorch.kr/intermediate/char_rnn_generation_tutorial.html" />
+<meta property="og:url" content="https://tutorials.pytorch.kr/intermediate/char_rnn_generation_tutorial.html" />
   
 <meta property="og:description" content="Author: Sean Robertson, 번역: 황성수,. 이 튜토리얼은 3개로 이뤄진 “기초부터 시작하는 NLP”의 2번째 튜토리얼입니다. 첫번째 튜토리얼 </intermediate/char_rnn_classification_tutorial> 에서는 이름의 언어를 분류하기 위해 RNN을 사용했습니다. 이번에는 반대로 언어로 이름을 생성할 예정입니다. 우리는 몇 개의 선형 계층으로 작은 RNN을 직접 만들고 있습니다. 이전 튜토리얼인 이름을 읽은 후 그 언어를 예측하는 것과의 큰 차이점은 언어를 입력하고 한 번에 한 글자를 ..." />
   
-<meta property="og:image" content="http://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
+<meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
   
 <meta property="og:image:alt" content="기초부터 시작하는 NLP:  문자-단위 RNN으로 이름 생성하기" />
   
 <meta property="og:ignore_canonical" content="true" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>기초부터 시작하는 NLP: 문자-단위 RNN으로 이름 생성하기 &mdash; 파이토치 한국어 튜토리얼(PyTorch tutorials in Korean)</title>
+  <title>기초부터 시작하는 NLP: 문자-단위 RNN으로 이름 생성하기 &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
   
 
   
@@ -131,7 +130,7 @@
               
               
                 <div class="version">
-                  1.11.0+cu102
+                  1.12.0+cu102
                 </div>
               
             
@@ -272,6 +271,7 @@
 <li class="toctree-l1"><a class="reference internal" href="dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="quantized_transfer_learning_tutorial.html">(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/static_quantization_tutorial.html">(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torchserve_with_ipex.html">Grokking PyTorch Intel CPU performance from first principles</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul>
@@ -298,6 +298,7 @@
 <p class="caption" role="heading"><span class="caption-text">Recommendation Systems</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="torchrec_tutorial.html">Introduction to TorchRec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/sharding.html">Exploring TorchRec sharding</a></li>
 </ul>
 
             
@@ -386,6 +387,7 @@
           </div>
 
         
+
           
           <div class="rst-content">
           
@@ -396,7 +398,7 @@
 <p class="admonition-title">Note</p>
 <p>Click <a class="reference internal" href="#sphx-glr-download-intermediate-char-rnn-generation-tutorial-py"><span class="std std-ref">here</span></a> to download the full example code</p>
 </div>
-<section class="sphx-glr-example-title" id="nlp-rnn">
+<div class="sphx-glr-example-title section" id="nlp-rnn">
 <span id="sphx-glr-intermediate-char-rnn-generation-tutorial-py"></span><h1>기초부터 시작하는 NLP:  문자-단위 RNN으로 이름 생성하기<a class="headerlink" href="#nlp-rnn" title="Permalink to this headline">¶</a></h1>
 <dl class="simple">
 <dt><strong>Author</strong>: <a class="reference external" href="https://github.com/spro/practical-pytorch">Sean Robertson</a></dt><dd><p><strong>번역</strong>: <a class="reference external" href="https://github.com/adonisues">황성수</a></p>
@@ -450,7 +452,7 @@ Networks</a>
 LSTM에 관한 것이지만 RNN에 관해서도 유익합니다.</p></li>
 </ul>
 <p>이전 튜토리얼도 추천합니다. <a class="reference internal" href="char_rnn_classification_tutorial.html"><span class="doc">기초부터 시작하는 NLP: 문자-단위 RNN으로 이름 분류하기</span></a></p>
-<section id="id2">
+<div class="section" id="id2">
 <h2>데이터 준비<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -507,12 +509,12 @@ LSTM에 관한 것이지만 RNN에 관해서도 유익합니다.</p></li>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span># categories: 18 [&#39;Japanese&#39;, &#39;Korean&#39;, &#39;Polish&#39;, &#39;Portuguese&#39;, &#39;Russian&#39;, &#39;Scottish&#39;, &#39;Spanish&#39;, &#39;Vietnamese&#39;, &#39;Arabic&#39;, &#39;Chinese&#39;, &#39;Czech&#39;, &#39;Dutch&#39;, &#39;English&#39;, &#39;French&#39;, &#39;German&#39;, &#39;Greek&#39;, &#39;Irish&#39;, &#39;Italian&#39;]
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span># categories: 18 [&#39;Arabic&#39;, &#39;Chinese&#39;, &#39;Czech&#39;, &#39;Dutch&#39;, &#39;English&#39;, &#39;French&#39;, &#39;German&#39;, &#39;Greek&#39;, &#39;Irish&#39;, &#39;Italian&#39;, &#39;Japanese&#39;, &#39;Korean&#39;, &#39;Polish&#39;, &#39;Portuguese&#39;, &#39;Russian&#39;, &#39;Scottish&#39;, &#39;Spanish&#39;, &#39;Vietnamese&#39;]
 O&#39;Neal
 </pre></div>
 </div>
-</section>
-<section id="id4">
+</div>
+<div class="section" id="id4">
 <h2>네트워크 생성<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
 <p>이 네트워크는 <a class="reference external" href="#Creating-the-Network">지난 튜토리얼의 RNN</a> 이
 다른 입력들과 연결되는 category tensor를 추가 인자로 가지게 확장합니다.
@@ -528,9 +530,9 @@ category tensor는 문자 입력과 마찬가지로 one-hot 벡터입니다.</p>
 일반적으로 입력을 흐리게 해서 과적합을 막는 데 사용됩니다.
 여기서 우리는 고의로 일부 혼돈을 추가하고 샘플링 다양성을 높이기
 위해 네트워크의 마지막에 이것을 사용합니다.</p>
-<figure class="align-default">
+<div class="figure align-default">
 <img alt="" src="https://i.imgur.com/jzVrf7f.png" />
-</figure>
+</div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
 
@@ -559,10 +561,10 @@ category tensor는 문자 입력과 마찬가지로 one-hot 벡터입니다.</p>
         <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hidden_size</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-<section id="id5">
+</div>
+<div class="section" id="id5">
 <h2>학습<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h2>
-<section id="id6">
+<div class="section" id="id6">
 <h3>학습 준비<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
 <p>제일 먼저 (category, line)의 무작위 쌍을 얻는 함수:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">random</span>
@@ -585,9 +587,9 @@ category tensor는 문자 입력과 마찬가지로 one-hot 벡터입니다.</p>
 <p>각 시간 단계마다 현재 문자에서 다음 문자를 예측하기 때문에,
 문자 쌍은 한 줄(하나의 이름)에서 연속된 문자 그룹입니다. - 예를 들어 <code class="docutils literal notranslate"><span class="pre">&quot;ABCD&lt;EOS&gt;&quot;</span></code> 는
 (“A”, “B”), (“B”, “C”), (“C”, “D”), (“D”, “EOS”) 로 생성합니다.</p>
-<figure class="align-default">
+<div class="figure align-default">
 <img alt="" src="https://i.imgur.com/JH58tXY.png" />
-</figure>
+</div>
 <p>Category(언어) Tensor는 <code class="docutils literal notranslate"><span class="pre">&lt;1</span> <span class="pre">x</span> <span class="pre">n_categories&gt;</span></code> 크기의 <a class="reference external" href="https://en.wikipedia.org/wiki/One-hot">One-hot
 Tensor</a> 입니다.
 학습시에 모든 시간 단계에서 네트워크에 이것을 전달합니다.
@@ -627,8 +629,8 @@ Tensor</a> 입니다.
     <span class="k">return</span> <span class="n">category_tensor</span><span class="p">,</span> <span class="n">input_line_tensor</span><span class="p">,</span> <span class="n">target_line_tensor</span>
 </pre></div>
 </div>
-</section>
-<section id="id7">
+</div>
+<div class="section" id="id7">
 <h3>네트워크 학습<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
 <p>마지막 출력만 사용하는 분류와 달리, 모든 단계에서 예측을 수행하므로
 모든 단계에서 손실을 계산합니다.</p>
@@ -699,30 +701,30 @@ Tensor</a> 입니다.
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>0m 22s (5000 5%) 3.2306
-0m 44s (10000 10%) 3.0183
-1m 6s (15000 15%) 2.6587
-1m 27s (20000 20%) 2.8595
-1m 49s (25000 25%) 2.5882
-2m 11s (30000 30%) 2.5817
-2m 32s (35000 35%) 2.9950
-2m 54s (40000 40%) 2.4839
-3m 15s (45000 45%) 2.3423
-3m 37s (50000 50%) 2.8761
-3m 58s (55000 55%) 2.4806
-4m 20s (60000 60%) 2.8386
-4m 41s (65000 65%) 2.1833
-5m 3s (70000 70%) 2.3296
-5m 25s (75000 75%) 2.4976
-5m 47s (80000 80%) 2.6587
-6m 8s (85000 85%) 1.6812
-6m 30s (90000 90%) 2.4816
-6m 52s (95000 95%) 2.4584
-7m 14s (100000 100%) 1.6480
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>0m 22s (5000 5%) 3.1279
+0m 44s (10000 10%) 2.7118
+1m 6s (15000 15%) 2.8533
+1m 28s (20000 20%) 1.9321
+1m 50s (25000 25%) 2.6992
+2m 12s (30000 30%) 2.5471
+2m 35s (35000 35%) 2.6234
+2m 57s (40000 40%) 2.4574
+3m 19s (45000 45%) 2.8522
+3m 41s (50000 50%) 3.0307
+4m 3s (55000 55%) 1.6972
+4m 26s (60000 60%) 2.2361
+4m 48s (65000 65%) 2.2364
+5m 10s (70000 70%) 1.8834
+5m 32s (75000 75%) 2.5352
+5m 54s (80000 80%) 2.4817
+6m 16s (85000 85%) 1.9146
+6m 38s (90000 90%) 2.1714
+7m 0s (95000 95%) 2.1078
+7m 22s (100000 100%) 2.9283
 </pre></div>
 </div>
-</section>
-<section id="id8">
+</div>
+<div class="section" id="id8">
 <h3>손실 도식화<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
 <p>all_losses를 이용한 손실의 도식화는
 네트워크의 학습 상태를 보여줍니다:</p>
@@ -733,9 +735,9 @@ Tensor</a> 입니다.
 </pre></div>
 </div>
 <img alt="../_images/sphx_glr_char_rnn_generation_tutorial_001.png" class="sphx-glr-single-img" src="../_images/sphx_glr_char_rnn_generation_tutorial_001.png" />
-</section>
-</section>
-<section id="id9">
+</div>
+</div>
+<div class="section" id="id9">
 <h2>네트워크 샘플링<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h2>
 <p>샘플링을 위해서, 네트워크에 하나의 글자를 주고 다음 문자를 물어보고
 이것을 다음 문자로 전달하는 것을 EOS 토큰까지 반복합니다.</p>
@@ -797,22 +799,22 @@ Tensor</a> 입니다.
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Rover
-Uanton
-Shavan
-Gerterr
-Eren
-Rong
-Sander
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Roukov
+Uanikov
+Shilovek
+Gelle
+Erang
+Roure
+Salla
 Para
-Arane
-Chang
-Han
-Iue
+Allan
+Cha
+Ha
+Iua
 </pre></div>
 </div>
-</section>
-<section id="exercises">
+</div>
+<div class="section" id="exercises">
 <h2>Exercises<a class="headerlink" href="#exercises" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Try with a different dataset of category -&gt; line, for example:</p>
@@ -831,7 +833,7 @@ choosing a start letter</p></li>
 </ul>
 </li>
 </ul>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 7 minutes  14.853 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 7 minutes  23.466 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-intermediate-char-rnn-generation-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/322506af160d5e2056afd75de1fd34ee/char_rnn_generation_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">char_rnn_generation_tutorial.py</span></code></a></p>
@@ -841,8 +843,8 @@ choosing a start letter</p></li>
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
-</section>
-</section>
+</div>
+</div>
 
 
              </article>
@@ -879,7 +881,7 @@ choosing a start letter</p></li>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2021, PyTorch &amp; PyTorch Korea Community.
+        &copy; Copyright 2022, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorch Korea User Group).
 
     </p>
   </div>
@@ -892,6 +894,13 @@ choosing a start letter</p></li>
 </footer>
 
           </div>
+<script>
+if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.indexOf("/prototype/prototype_index")< 1))
+  {
+    var div = '<div class="admonition note"><p class="admonition-title">Note</p><p><i class="fa fa-flask" aria-hidden="true">&nbsp</i> 이 튜토리얼은 프로토타입(prototype) 기능들에 대해서 설명하고 있습니다. 프로토타입 기능은 일반적으로 피드백 및 테스트용으로, 런타임 플래그 없이는 PyPI나 Conda로 배포되는 바이너리에서는 사용할 수 없습니다.</p></div>'
+    document.getElementById("pytorch-article").insertAdjacentHTML('afterBegin', div)
+  }
+</script>
         </div>
 
         <div class="pytorch-content-right" id="pytorch-content-right">
@@ -949,7 +958,6 @@ choosing a start letter</p></li>
       });
   </script>
  
-
 <script>
 //add microsoft link
 
@@ -1028,7 +1036,7 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
 </script>
 
 <script type="text/javascript">
-  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile'];
+  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile', 'Introduction to PyTorch on YouTube', 'Recommendation Systems'];
 </script>
 
 

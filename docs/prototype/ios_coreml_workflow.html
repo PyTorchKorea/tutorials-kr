@@ -6,24 +6,23 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
 <meta property="og:title" content="(Prototype) Convert Mobilenetv2 to Core ML" />
   
 <meta property="og:type" content="article" />
   
-<meta property="og:url" content="http://tutorials.pytorch.kr/prototype/ios_coreml_workflow.html" />
+<meta property="og:url" content="https://tutorials.pytorch.kr/prototype/ios_coreml_workflow.html" />
   
 <meta property="og:description" content="Author: Tao Xu Introduction: Core ML provides access to powerful and efficient NPUs(Neural Process Unit) on modern iPhone devices. This tutorial shows how to prepare a computer vision model (mobilenetv2) to use the PyTorch Core ML mobile backend. Note that this feature is currently in the “protot..." />
   
-<meta property="og:image" content="http://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
+<meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
   
 <meta property="og:image:alt" content="(Prototype) Convert Mobilenetv2 to Core ML" />
   
 <meta property="og:ignore_canonical" content="true" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>(Prototype) Convert Mobilenetv2 to Core ML &mdash; 파이토치 한국어 튜토리얼(PyTorch tutorials in Korean)</title>
+  <title>(Prototype) Convert Mobilenetv2 to Core ML &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
   
 
   
@@ -129,7 +128,7 @@
               
               
                 <div class="version">
-                  1.11.0+cu102
+                  1.12.0+cu102
                 </div>
               
             
@@ -270,6 +269,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/quantized_transfer_learning_tutorial.html">(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/static_quantization_tutorial.html">(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/torchserve_with_ipex.html">Grokking PyTorch Intel CPU performance from first principles</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul>
@@ -296,6 +296,7 @@
 <p class="caption" role="heading"><span class="caption-text">Recommendation Systems</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/torchrec_tutorial.html">Introduction to TorchRec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/sharding.html">Exploring TorchRec sharding</a></li>
 </ul>
 
             
@@ -384,21 +385,22 @@
           </div>
 
         
+
           
           <div class="rst-content">
           
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <section id="prototype-convert-mobilenetv2-to-core-ml">
+  <div class="section" id="prototype-convert-mobilenetv2-to-core-ml">
 <h1>(Prototype) Convert Mobilenetv2 to Core ML<a class="headerlink" href="#prototype-convert-mobilenetv2-to-core-ml" title="Permalink to this headline">¶</a></h1>
 <p><strong>Author</strong>: <a class="reference external" href="https://github.com/xta0">Tao Xu</a></p>
-<section id="introduction">
+<div class="section" id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
 <p>Core ML provides access to powerful and efficient NPUs(Neural Process Unit) on modern iPhone devices. This tutorial shows how to prepare a computer vision model (mobilenetv2) to use the PyTorch Core ML mobile backend.</p>
 <p>Note that this feature is currently in the “prototype” phase and only supports a limited numbers of operators, but we expect to solidify the integration and expand our operator support over time. The APIs are subject to change in the future.</p>
-</section>
-<section id="environment-setup-macos">
+</div>
+<div class="section" id="environment-setup-macos">
 <h2>Environment Setup (MacOS)<a class="headerlink" href="#environment-setup-macos" title="Permalink to this headline">¶</a></h2>
 <p>Let’s start off by creating a new conda environment.</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>conda create --name <span class="m">1</span>.10 <span class="nv">python</span><span class="o">=</span><span class="m">3</span>.8 --yes
@@ -411,8 +413,8 @@ conda activate <span class="m">1</span>.10
 pip3 install <span class="nv">coremltools</span><span class="o">==</span><span class="m">5</span>.0b5
 </pre></div>
 </div>
-</section>
-<section id="model-preparation">
+</div>
+<div class="section" id="model-preparation">
 <h2>Model Preparation<a class="headerlink" href="#model-preparation" title="Permalink to this headline">¶</a></h2>
 <p>To convert a pre-trained mobilenetv2 model to be Core ML compatible, we’re going to use the <code class="docutils literal notranslate"><span class="pre">to_backend()</span></code> API, which is a prototype feature for delegating model executions to some specific backends. The following python code shows how to use it to convert the mobilenetv2 torchscript model.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
@@ -470,8 +472,8 @@ Translating <span class="nv">MIL</span> <span class="o">==</span>&gt; NeuralNetw
 </pre></div>
 </div>
 <p>We can safely ignore the warning above, as we don’t plan to run our model on desktop.</p>
-</section>
-<section id="ios-app-integration">
+</div>
+<div class="section" id="ios-app-integration">
 <h2>iOS app integration<a class="headerlink" href="#ios-app-integration" title="Permalink to this headline">¶</a></h2>
 <p>Now that the model is ready, we can integrate it to our app. We’ll be using the pytorch nightly cocoapods which contains the code for executing the Core ML model. Simply add the following code to your Podfile</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>pod LibTorch-Lite-Nightly
@@ -484,20 +486,20 @@ Translating <span class="nv">MIL</span> <span class="o">==</span>&gt; NeuralNetw
 <span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;forward took: &quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">t</span><span class="p">.</span><span class="n">MilliSeconds</span><span class="p">()</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span><span class="w"></span>
 </pre></div>
 </div>
-</section>
-<section id="conclusion">
+</div>
+<div class="section" id="conclusion">
 <h2>Conclusion<a class="headerlink" href="#conclusion" title="Permalink to this headline">¶</a></h2>
 <p>In this tutorial, we demonstrated how to convert a mobilenetv2 model to a Core ML compatible model. Please be aware of that Core ML feature is still under development, new operators/models will continue to be added. APIs are subject to change in the future versions.</p>
 <p>Thanks for reading! As always, we welcome any feedback, so please create an issue <a class="reference external" href="https://github.com/pytorch/pytorch/issues">here</a> if you have any.</p>
-</section>
-<section id="learn-more">
+</div>
+<div class="section" id="learn-more">
 <h2>Learn More<a class="headerlink" href="#learn-more" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>The <a class="reference external" href="https://pytorch.org/hub/pytorch_vision_mobilenet_v2/">Mobilenetv2</a> from Torchvision</p></li>
 <li><p>Information about <a class="reference external" href="https://developer.apple.com/documentation/coreml">Core ML</a></p></li>
 </ul>
-</section>
-</section>
+</div>
+</div>
 
 
              </article>
@@ -525,7 +527,7 @@ Translating <span class="nv">MIL</span> <span class="o">==</span>&gt; NeuralNetw
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2021, PyTorch &amp; PyTorch Korea Community.
+        &copy; Copyright 2022, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorch Korea User Group).
 
     </p>
   </div>
@@ -538,6 +540,13 @@ Translating <span class="nv">MIL</span> <span class="o">==</span>&gt; NeuralNetw
 </footer>
 
           </div>
+<script>
+if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.indexOf("/prototype/prototype_index")< 1))
+  {
+    var div = '<div class="admonition note"><p class="admonition-title">Note</p><p><i class="fa fa-flask" aria-hidden="true">&nbsp</i> 이 튜토리얼은 프로토타입(prototype) 기능들에 대해서 설명하고 있습니다. 프로토타입 기능은 일반적으로 피드백 및 테스트용으로, 런타임 플래그 없이는 PyPI나 Conda로 배포되는 바이너리에서는 사용할 수 없습니다.</p></div>'
+    document.getElementById("pytorch-article").insertAdjacentHTML('afterBegin', div)
+  }
+</script>
         </div>
 
         <div class="pytorch-content-right" id="pytorch-content-right">
@@ -591,7 +600,6 @@ Translating <span class="nv">MIL</span> <span class="o">==</span>&gt; NeuralNetw
       });
   </script>
  
-
 <script>
 //add microsoft link
 
@@ -670,7 +678,7 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
 </script>
 
 <script type="text/javascript">
-  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile'];
+  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile', 'Introduction to PyTorch on YouTube', 'Recommendation Systems'];
 </script>
 
 

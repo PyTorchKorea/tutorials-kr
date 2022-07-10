@@ -6,24 +6,23 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
 <meta property="og:title" content="강화 학습 (DQN) 튜토리얼" />
   
 <meta property="og:type" content="article" />
   
-<meta property="og:url" content="http://tutorials.pytorch.kr/intermediate/reinforcement_q_learning.html" />
+<meta property="og:url" content="https://tutorials.pytorch.kr/intermediate/reinforcement_q_learning.html" />
   
 <meta property="og:description" content="Author: Adam Paszke, 번역: 황성수,. 이 튜토리얼에서는 OpenAI Gym 의 CartPole-v0 태스크에서 DQN (Deep Q Learning) 에이전트를 학습하는데 PyTorch를 사용하는 방법을 보여드립니다. 태스크 에이전트는 연결된 막대가 똑바로 서 있도록 카트를 왼쪽이나 오른쪽으로 움직이는 두 가지 동작 중 하나를 선택해야 합니다. 다양한 알고리즘과 시각화 기능을 갖춘 공식 순위표를 Gym 웹사이트 에서 찾을 수 있습니다. cartpole cartpole, 에이전트가 현재 환경 상태를 관찰하고 행..." />
   
-<meta property="og:image" content="http://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
+<meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
   
 <meta property="og:image:alt" content="강화 학습 (DQN) 튜토리얼" />
   
 <meta property="og:ignore_canonical" content="true" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>강화 학습 (DQN) 튜토리얼 &mdash; 파이토치 한국어 튜토리얼(PyTorch tutorials in Korean)</title>
+  <title>강화 학습 (DQN) 튜토리얼 &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
   
 
   
@@ -131,7 +130,7 @@
               
               
                 <div class="version">
-                  1.11.0+cu102
+                  1.12.0+cu102
                 </div>
               
             
@@ -272,6 +271,7 @@
 <li class="toctree-l1"><a class="reference internal" href="dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="quantized_transfer_learning_tutorial.html">(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/static_quantization_tutorial.html">(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torchserve_with_ipex.html">Grokking PyTorch Intel CPU performance from first principles</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul>
@@ -298,6 +298,7 @@
 <p class="caption" role="heading"><span class="caption-text">Recommendation Systems</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="torchrec_tutorial.html">Introduction to TorchRec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/sharding.html">Exploring TorchRec sharding</a></li>
 </ul>
 
             
@@ -386,6 +387,7 @@
           </div>
 
         
+
           
           <div class="rst-content">
           
@@ -396,26 +398,24 @@
 <p class="admonition-title">Note</p>
 <p>Click <a class="reference internal" href="#sphx-glr-download-intermediate-reinforcement-q-learning-py"><span class="std std-ref">here</span></a> to download the full example code</p>
 </div>
-<section class="sphx-glr-example-title" id="dqn">
+<div class="sphx-glr-example-title section" id="dqn">
 <span id="sphx-glr-intermediate-reinforcement-q-learning-py"></span><h1>강화 학습 (DQN) 튜토리얼<a class="headerlink" href="#dqn" title="Permalink to this headline">¶</a></h1>
 <dl class="simple">
 <dt><strong>Author</strong>: <a class="reference external" href="https://github.com/apaszke">Adam Paszke</a></dt><dd><p><strong>번역</strong>: <a class="reference external" href="https://github.com/adonisues">황성수</a></p>
 </dd>
 </dl>
-<p>이 튜토리얼에서는 <a class="reference external" href="https://gym.openai.com/">OpenAI Gym</a> 의
+<p>이 튜토리얼에서는 <a class="reference external" href="https://www.gymlibrary.ml/">OpenAI Gym</a> 의
 CartPole-v0 태스크에서 DQN (Deep Q Learning) 에이전트를 학습하는데
 PyTorch를 사용하는 방법을 보여드립니다.</p>
 <p><strong>태스크</strong></p>
 <p>에이전트는 연결된 막대가 똑바로 서 있도록 카트를 왼쪽이나 오른쪽으로
 움직이는 두 가지 동작 중 하나를 선택해야 합니다.
 다양한 알고리즘과 시각화 기능을 갖춘 공식 순위표를
-<a class="reference external" href="https://gym.openai.com/envs/CartPole-v0">Gym 웹사이트</a> 에서 찾을 수 있습니다.</p>
-<figure class="align-default" id="id7">
+<a class="reference external" href="https://www.gymlibrary.ml/environments/classic_control/cart_pole">Gym 웹사이트</a> 에서 찾을 수 있습니다.</p>
+<div class="figure align-default" id="id7">
 <img alt="cartpole" src="../_images/cartpole.gif" />
-<figcaption>
-<p><span class="caption-text">cartpole</span><a class="headerlink" href="#id7" title="Permalink to this image">¶</a></p>
-</figcaption>
-</figure>
+<p class="caption"><span class="caption-text">cartpole</span><a class="headerlink" href="#id7" title="Permalink to this image">¶</a></p>
+</div>
 <p>에이전트가 현재 환경 상태를 관찰하고 행동을 선택하면,
 환경이 새로운 상태로 <em>전환</em> 되고 작업의 결과를 나타내는 보상도 반환됩니다.
 이 태스크에서 매 타임스텝 증가마다 보상이 +1이 되고, 만약 막대가 너무 멀리
@@ -431,7 +431,7 @@ PyTorch를 사용하는 방법을 보여드립니다.</p>
 이렇게하면 에이전트가 막대의 속도를 한 이미지에서 고려할 수 있습니다.</p>
 <p><strong>패키지</strong></p>
 <p>먼저 필요한 패키지를 가져옵니다. 첫째, 환경을 위해
-<a class="reference external" href="https://gym.openai.com/docs">gym</a> 이 필요합니다.
+<a class="reference external" href="https://github.com/openai/gym">gym</a> 이 필요합니다.
 (<cite>pip install gym</cite> 을 사용하여 설치하십시오).
 또한 PyTorch에서 다음을 사용합니다:</p>
 <ul class="simple">
@@ -471,7 +471,7 @@ package</a>).</p></li>
 <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<section id="replay-memory">
+<div class="section" id="replay-memory">
 <h2>재현 메모리(Replay Memory)<a class="headerlink" href="#replay-memory" title="Permalink to this headline">¶</a></h2>
 <p>우리는 DQN 학습을 위해 경험 재현 메모리를 사용할 것입니다.
 에이전트가 관찰한 전환(transition)을 저장하고 나중에 이 데이터를
@@ -507,8 +507,8 @@ package</a>).</p></li>
 </pre></div>
 </div>
 <p>이제 모델을 정의합시다. 그러나 먼저 DQN이 무엇인지 간단히 요약해 보겠습니다.</p>
-</section>
-<section id="id2">
+</div>
+<div class="section" id="id2">
 <h2>DQN 알고리즘<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
 <p>우리의 환경은 결정론적이므로 여기에 제시된 모든 방정식은 단순화를 위해
 결정론적으로 공식화됩니다. 강화 학습 자료은 환경에서 확률론적 전환에
@@ -557,7 +557,7 @@ Huber loss 는 오류가 작으면 평균 제곱 오차( mean squared error)와 
   \frac{1}{2}{\delta^2}  & \text{for } |\delta| \le 1, \\
   |\delta| - \frac{1}{2} & \text{otherwise.}
 \end{cases}\]</div>
-<section id="q">
+<div class="section" id="q">
 <h3>Q-네트워크<a class="headerlink" href="#q" title="Permalink to this headline">¶</a></h3>
 <p>우리 모델은 현재와 이전 스크린 패치의 차이를 취하는
 CNN(convolutional neural network) 입니다. 두가지 출력 <span class="math">\(Q(s, \mathrm{left})\)</span> 와
@@ -593,8 +593,8 @@ CNN(convolutional neural network) 입니다. 두가지 출력 <span class="math"
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>
 </pre></div>
 </div>
-</section>
-<section id="id3">
+</div>
+<div class="section" id="id3">
 <h3>입력 추출<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
 <p>아래 코드는 환경에서 렌더링 된 이미지를 추출하고 처리하는 유틸리티입니다.
 이미지 변환을 쉽게 구성할 수 있는 <code class="docutils literal notranslate"><span class="pre">torchvision</span></code> 패키지를 사용합니다.
@@ -643,11 +643,11 @@ CNN(convolutional neural network) 입니다. 두가지 출력 <span class="math"
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-</section>
-</section>
-<section id="id4">
+</div>
+</div>
+<div class="section" id="id4">
 <h2>학습<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
-<section id="id5">
+<div class="section" id="id5">
 <h3>하이퍼 파라미터와 유틸리티<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
 <p>이 셀은 모델과 최적화기를 인스턴스화하고 일부 유틸리티를 정의합니다:</p>
 <ul class="simple">
@@ -727,8 +727,8 @@ CNN(convolutional neural network) 입니다. 두가지 출력 <span class="math"
         <span class="n">display</span><span class="o">.</span><span class="n">display</span><span class="p">(</span><span class="n">plt</span><span class="o">.</span><span class="n">gcf</span><span class="p">())</span>
 </pre></div>
 </div>
-</section>
-<section id="id6">
+</div>
+<div class="section" id="id6">
 <h3>학습 루프<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
 <p>최종적으로 모델 학습을 위한 코드.</p>
 <p>여기서, 최적화의 한 단계를 수행하는 <code class="docutils literal notranslate"><span class="pre">optimize_model</span></code> 함수를 찾을 수 있습니다.
@@ -836,9 +836,9 @@ CNN(convolutional neural network) 입니다. 두가지 출력 <span class="math"
 </pre></div>
 </div>
 <p>다음은 전체 결과 데이터 흐름을 보여주는 다이어그램입니다.</p>
-<figure class="align-default">
+<div class="figure align-default">
 <img alt="../_images/reinforcement_learning_diagram.jpg" src="../_images/reinforcement_learning_diagram.jpg" />
-</figure>
+</div>
 <p>행동은 무작위 또는 정책에 따라 선택되어, gym 환경에서 다음 단계 샘플을 가져옵니다.
 결과를 재현 메모리에 저장하고 모든 반복에서 최적화 단계를 실행합니다.
 최적화는 재현 메모리에서 무작위 배치를 선택하여 새 정책을 학습합니다.
@@ -854,9 +854,9 @@ CNN(convolutional neural network) 입니다. 두가지 출력 <span class="math"
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
-</section>
-</section>
-</section>
+</div>
+</div>
+</div>
 
 
              </article>
@@ -893,7 +893,7 @@ CNN(convolutional neural network) 입니다. 두가지 출력 <span class="math"
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2021, PyTorch &amp; PyTorch Korea Community.
+        &copy; Copyright 2022, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorch Korea User Group).
 
     </p>
   </div>
@@ -906,6 +906,13 @@ CNN(convolutional neural network) 입니다. 두가지 출력 <span class="math"
 </footer>
 
           </div>
+<script>
+if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.indexOf("/prototype/prototype_index")< 1))
+  {
+    var div = '<div class="admonition note"><p class="admonition-title">Note</p><p><i class="fa fa-flask" aria-hidden="true">&nbsp</i> 이 튜토리얼은 프로토타입(prototype) 기능들에 대해서 설명하고 있습니다. 프로토타입 기능은 일반적으로 피드백 및 테스트용으로, 런타임 플래그 없이는 PyPI나 Conda로 배포되는 바이너리에서는 사용할 수 없습니다.</p></div>'
+    document.getElementById("pytorch-article").insertAdjacentHTML('afterBegin', div)
+  }
+</script>
         </div>
 
         <div class="pytorch-content-right" id="pytorch-content-right">
@@ -964,7 +971,6 @@ CNN(convolutional neural network) 입니다. 두가지 출력 <span class="math"
       });
   </script>
  
-
 <script>
 //add microsoft link
 
@@ -1043,7 +1049,7 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
 </script>
 
 <script type="text/javascript">
-  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile'];
+  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile', 'Introduction to PyTorch on YouTube', 'Recommendation Systems'];
 </script>
 
 

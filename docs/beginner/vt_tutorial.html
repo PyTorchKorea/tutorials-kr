@@ -6,24 +6,23 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
 <meta property="og:title" content="배포를 위한 비전 트랜스포머(Vision Transformer) 모델 최적화하기" />
   
 <meta property="og:type" content="article" />
   
-<meta property="og:url" content="http://tutorials.pytorch.kr/beginner/vt_tutorial.html" />
+<meta property="og:url" content="https://tutorials.pytorch.kr/beginner/vt_tutorial.html" />
   
 <meta property="og:description" content="Authors : Jeff Tang, Geeta Chauhan 번역 : 김태영 비전 트랜스포머(Vision Transformer)는 자연어 처리 분야에서 소개된 최고 수준의 결과를 달성한 최신의 어텐션 기반(attention-based) 트랜스포머 모델을 컴퓨터 비전 분야에 적용을 한 모델입니다. FaceBook에서 발표한 Data-efficient Image Transformers는 DeiT 이미지 분류를 위해 ImageNet 데이터셋을 통해 훈련된 비전 트랜스포머 모델입니다. 이번 튜토리얼에서는, DeiT가 무엇인지 그리고..." />
   
-<meta property="og:image" content="http://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
+<meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
   
 <meta property="og:image:alt" content="배포를 위한 비전 트랜스포머(Vision Transformer) 모델 최적화하기" />
   
 <meta property="og:ignore_canonical" content="true" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>배포를 위한 비전 트랜스포머(Vision Transformer) 모델 최적화하기 &mdash; 파이토치 한국어 튜토리얼(PyTorch tutorials in Korean)</title>
+  <title>배포를 위한 비전 트랜스포머(Vision Transformer) 모델 최적화하기 &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
   
 
   
@@ -131,7 +130,7 @@
               
               
                 <div class="version">
-                  1.11.0+cu102
+                  1.12.0+cu102
                 </div>
               
             
@@ -272,6 +271,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/quantized_transfer_learning_tutorial.html">(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/static_quantization_tutorial.html">(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/torchserve_with_ipex.html">Grokking PyTorch Intel CPU performance from first principles</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul>
@@ -298,6 +298,7 @@
 <p class="caption" role="heading"><span class="caption-text">Recommendation Systems</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/torchrec_tutorial.html">Introduction to TorchRec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/sharding.html">Exploring TorchRec sharding</a></li>
 </ul>
 
             
@@ -386,6 +387,7 @@
           </div>
 
         
+
           
           <div class="rst-content">
           
@@ -396,7 +398,7 @@
 <p class="admonition-title">Note</p>
 <p>Click <a class="reference internal" href="#sphx-glr-download-beginner-vt-tutorial-py"><span class="std std-ref">here</span></a> to download the full example code</p>
 </div>
-<section class="sphx-glr-example-title" id="vision-transformer">
+<div class="sphx-glr-example-title section" id="vision-transformer">
 <span id="sphx-glr-beginner-vt-tutorial-py"></span><h1>배포를 위한 비전 트랜스포머(Vision Transformer) 모델 최적화하기<a class="headerlink" href="#vision-transformer" title="Permalink to this headline">¶</a></h1>
 <p>Authors : <a class="reference external" href="https://github.com/jeffxtang">Jeff Tang</a>, <a class="reference external" href="https://github.com/gchauhan/">Geeta Chauhan</a>
 번역 : <a class="reference external" href="https://github.com/Taeyoung96/">김태영</a></p>
@@ -427,7 +429,7 @@ DeiT는 훈련에 더 적은 데이터와 컴퓨팅 자원을 필요로 하는 �
 성공적으로 적용할 수 있음을 보여줍니다.
 DeiT의 좀 더 자세한 내용을 원한다면, <a class="reference external" href="https://github.com/facebookresearch/deit">저장소</a>
 와 <a class="reference external" href="https://arxiv.org/abs/2012.12877">논문</a> 을 참고하시길 바랍니다.</p>
-<section id="id4">
+<div class="section" id="id4">
 <h2>DeiT를 활용한 이미지 분류<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
 <p>DeiT를 사용하여 이미지를 분류하는 방법에 대한 자세한 정보는 DeiT 저장소에 README를 참고하시길 바랍니다.
 빠른 테스트를 위해서, 먼저 필요한 패키지들을
@@ -467,7 +469,7 @@ DeiT의 좀 더 자세한 내용을 원한다면, <a class="reference external" 
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>1.11.0
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>1.12.0+cu102
 269
 </pre></div>
 </div>
@@ -475,8 +477,8 @@ DeiT의 좀 더 자세한 내용을 원한다면, <a class="reference external" 
 클래스 인덱스의 출력은 269여야 하며, 이는 ‘timber wolf, grey wolf, gray wolf, Canis lupus’에 매핑됩니다.</p>
 <p>이제 DeiT 모델을 사용하여 이미지들을 분류할 수 있음을 확인했습니다.
 iOS 및 Android 앱에서 실행할 수 있도록 모델을 수정하는 방법을 살펴보겠습니다.</p>
-</section>
-<section id="id5">
+</div>
+<div class="section" id="id5">
 <h2>DeiT 스크립팅<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h2>
 <p>모바일에서 이 모델을 사용하려면, 우리는 첫번째로 모델 스크립팅이 필요합니다.
 전체적인 개요는 <a class="reference external" href="https://tutorials.pytorch.kr/recipes/script_optimized.html">스크립트 그리고 최적화 레시피</a>
@@ -489,8 +491,8 @@ iOS 및 Android 앱에서 실행할 수 있도록 모델을 수정하는 방법�
 </pre></div>
 </div>
 <p>약 346MB 크기의 스크립팅된 모델 파일 fbdeit_scripted.pt가 생성됩니다.</p>
-</section>
-<section id="id7">
+</div>
+<div class="section" id="id7">
 <h2>DeiT 양자화<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h2>
 <p>추론 정확도를 거의 동일하게 유지하면서 훈련된 모델 크기를 크게 줄이기 위해
 모델에 양자화를 적용할 수 있습니다.
@@ -525,8 +527,8 @@ DeiT에서 사용된 트랜스포머 모델 덕분에,
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>269
 </pre></div>
 </div>
-</section>
-<section id="id11">
+</div>
+<div class="section" id="id11">
 <h2>DeiT 최적화<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h2>
 <p>모바일에 스크립트 되고 양자화된 모델을 사용하기 위한
 마지막 단계는 최적화입니다.</p>
@@ -548,8 +550,8 @@ DeiT에서 사용된 트랜스포머 모델 덕분에,
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>269
 </pre></div>
 </div>
-</section>
-<section id="lite-interpreter">
+</div>
+<div class="section" id="lite-interpreter">
 <h2>라이트 인터프리터(Lite interpreter) 사용<a class="headerlink" href="#lite-interpreter" title="Permalink to this headline">¶</a></h2>
 <p>라이트 인터프리터를 사용하면 얼마나 모델의 사이즈가 작아지고, 추론 시간이 짧아지는지
 결과를 확인해 봅시다. 이제 좀 더 가벼운 버전의 모델을 만들어 봅시다.</p>
@@ -559,8 +561,8 @@ DeiT에서 사용된 트랜스포머 모델 덕분에,
 </div>
 <p>가벼운 모델의 크기는 그렇지 않은 버전의 모델 크기와 비슷하지만,
 모바일에서 가벼운 버전을 실행하면 추론 속도가 빨라질 것으로 예상됩니다.</p>
-</section>
-<section id="id12">
+</div>
+<div class="section" id="id12">
 <h2>추론 속도 비교<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h2>
 <p>네 가지 모델(원본 모델, 스크립트된 모델, 스크립트와 양자화를 적용한 모델,
 스크립트와 양자화를 적용한 후 최적화한 모델)의 추론 속도가 어떻게 다른지 확인해 봅시다.</p>
@@ -584,11 +586,11 @@ DeiT에서 사용된 트랜스포머 모델 덕분에,
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>original model: 162.46ms
-scripted model: 142.29ms
-scripted &amp; quantized model: 171.91ms
-scripted &amp; quantized &amp; optimized model: 122.74ms
-lite model: 132.06ms
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>original model: 146.30ms
+scripted model: 140.50ms
+scripted &amp; quantized model: 162.65ms
+scripted &amp; quantized &amp; optimized model: 131.78ms
+lite model: 128.69ms
 </pre></div>
 </div>
 <p>Google Colab에서 실행 시킨 결과는 다음과 같습니다.</p>
@@ -631,21 +633,21 @@ lite model: 132.06ms
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Model Inference Time Reduction
-0                          original model       162.46ms        0%
-1                          scripted model       142.29ms    12.42%
-2              scripted &amp; quantized model       171.91ms    -5.82%
-3  scripted &amp; quantized &amp; optimized model       122.74ms    24.45%
-4                              lite model       132.06ms    18.71%
+0                          original model       146.30ms        0%
+1                          scripted model       140.50ms     3.97%
+2              scripted &amp; quantized model       162.65ms   -11.17%
+3  scripted &amp; quantized &amp; optimized model       131.78ms     9.93%
+4                              lite model       128.69ms    12.04%
 </pre></div>
 </div>
-<section id="id13">
+<div class="section" id="id13">
 <h3>더 읽을거리<a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p><a class="reference external" href="https://ai.facebook.com/blog/data-efficient-image-transformers-a-promising-new-technique-for-image-classification">Facebook Data-efficient Image Transformers</a></p></li>
 <li><p><a class="reference external" href="https://github.com/pytorch/ios-demo-app/tree/master/ViT4MNIST">Vision Transformer with ImageNet and MNIST on iOS</a></p></li>
 <li><p><a class="reference external" href="https://github.com/pytorch/android-demo-app/tree/master/ViT4MNIST">Vision Transformer with ImageNet and MNIST on Android</a></p></li>
 </ul>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  31.549 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  32.125 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-beginner-vt-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/82714b1145e891e2eba191bec427b2dd/vt_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">vt_tutorial.py</span></code></a></p>
@@ -655,9 +657,9 @@ lite model: 132.06ms
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
-</section>
-</section>
-</section>
+</div>
+</div>
+</div>
 
 
              </article>
@@ -694,7 +696,7 @@ lite model: 132.06ms
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2021, PyTorch &amp; PyTorch Korea Community.
+        &copy; Copyright 2022, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorch Korea User Group).
 
     </p>
   </div>
@@ -707,6 +709,13 @@ lite model: 132.06ms
 </footer>
 
           </div>
+<script>
+if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.indexOf("/prototype/prototype_index")< 1))
+  {
+    var div = '<div class="admonition note"><p class="admonition-title">Note</p><p><i class="fa fa-flask" aria-hidden="true">&nbsp</i> 이 튜토리얼은 프로토타입(prototype) 기능들에 대해서 설명하고 있습니다. 프로토타입 기능은 일반적으로 피드백 및 테스트용으로, 런타임 플래그 없이는 PyPI나 Conda로 배포되는 바이너리에서는 사용할 수 없습니다.</p></div>'
+    document.getElementById("pytorch-article").insertAdjacentHTML('afterBegin', div)
+  }
+</script>
         </div>
 
         <div class="pytorch-content-right" id="pytorch-content-right">
@@ -763,7 +772,6 @@ lite model: 132.06ms
       });
   </script>
  
-
 <script>
 //add microsoft link
 
@@ -842,7 +850,7 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
 </script>
 
 <script type="text/javascript">
-  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile'];
+  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile', 'Introduction to PyTorch on YouTube', 'Recommendation Systems'];
 </script>
 
 

@@ -6,24 +6,23 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
 <meta property="og:title" content="사용자 정의 Dataset, Dataloader, Transforms 작성하기" />
   
 <meta property="og:type" content="article" />
   
-<meta property="og:url" content="http://tutorials.pytorch.kr/beginner/data_loading_tutorial.html" />
+<meta property="og:url" content="https://tutorials.pytorch.kr/beginner/data_loading_tutorial.html" />
   
 <meta property="og:description" content="저자: Sasank Chilamkurthy < https://chsasank.github.io> 번역: 정윤성 < https://github.com/Yunseong-Jeong> 머신러닝 문제를 푸는 과정에서 데이터를 준비하는데 많은 노력이 필요합니다. PyTorch는 데이터를 불러오는 과정을 쉽게해주고, 또 잘 사용한다면 코드의 가독성도 보다 높여줄 수 있는 도구들을 제공합니다. 이 튜토리얼에서 일반적이지 않은 데이터셋으로부터 데이터를 읽어오고 전처리하고 증가하는 방법을 알아보겠습니다. 이번 튜토리얼을 진행하기 위해 아래 패키..." />
   
-<meta property="og:image" content="http://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
+<meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
   
 <meta property="og:image:alt" content="사용자 정의 Dataset, Dataloader, Transforms 작성하기" />
   
 <meta property="og:ignore_canonical" content="true" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>사용자 정의 Dataset, Dataloader, Transforms 작성하기 &mdash; 파이토치 한국어 튜토리얼(PyTorch tutorials in Korean)</title>
+  <title>사용자 정의 Dataset, Dataloader, Transforms 작성하기 &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
   
 
   
@@ -129,7 +128,7 @@
               
               
                 <div class="version">
-                  1.11.0+cu102
+                  1.12.0+cu102
                 </div>
               
             
@@ -270,6 +269,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/quantized_transfer_learning_tutorial.html">(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/static_quantization_tutorial.html">(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/torchserve_with_ipex.html">Grokking PyTorch Intel CPU performance from first principles</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul>
@@ -296,6 +296,7 @@
 <p class="caption" role="heading"><span class="caption-text">Recommendation Systems</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/torchrec_tutorial.html">Introduction to TorchRec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/sharding.html">Exploring TorchRec sharding</a></li>
 </ul>
 
             
@@ -384,6 +385,7 @@
           </div>
 
         
+
           
           <div class="rst-content">
           
@@ -394,7 +396,7 @@
 <p class="admonition-title">Note</p>
 <p>Click <a class="reference internal" href="#sphx-glr-download-beginner-data-loading-tutorial-py"><span class="std std-ref">here</span></a> to download the full example code</p>
 </div>
-<section class="sphx-glr-example-title" id="dataset-dataloader-transforms">
+<div class="sphx-glr-example-title section" id="dataset-dataloader-transforms">
 <span id="sphx-glr-beginner-data-loading-tutorial-py"></span><h1>사용자 정의 Dataset, Dataloader, Transforms 작성하기<a class="headerlink" href="#dataset-dataloader-transforms" title="Permalink to this headline">¶</a></h1>
 <p><strong>저자</strong> : Sasank Chilamkurthy &lt;<a class="reference external" href="https://chsasank.github.io">https://chsasank.github.io</a>&gt;
 <strong>번역</strong> : 정윤성 &lt;<a class="reference external" href="https://github.com/Yunseong-Jeong">https://github.com/Yunseong-Jeong</a>&gt;</p>
@@ -425,9 +427,9 @@ PyTorch는 데이터를 불러오는 과정을 쉽게해주고, 또 잘 사용�
 </pre></div>
 </div>
 <p>다룰 데이터셋은 아래 조건과 같은 랜드마크(landmark)가 있는 얼굴 사진입니다.</p>
-<figure class="align-default">
+<div class="figure align-default">
 <a class="reference internal image-reference" href="../_images/landmarked_face2.png"><img alt="../_images/landmarked_face2.png" src="../_images/landmarked_face2.png" style="width: 400px;" /></a>
-</figure>
+</div>
 <p>각각의 얼굴에 68개의 서로다른 중요 포인트들이 존재합니다.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -484,7 +486,7 @@ First 4 Landmarks: [[32. 65.]
 </pre></div>
 </div>
 <img alt="../_images/sphx_glr_data_loading_tutorial_001.png" class="sphx-glr-single-img" src="../_images/sphx_glr_data_loading_tutorial_001.png" />
-<section id="dataset">
+<div class="section" id="dataset">
 <h2>Dataset 클래스<a class="headerlink" href="#dataset" title="Permalink to this headline">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">torch.utils.data.Dataset</span></code> 은 데이터셋을 나타내는 추상클래스입니다.
 여러분의 데이터셋은 <code class="docutils literal notranslate"><span class="pre">Dataset</span></code> 에 상속하고 아래와 같이 오버라이드 해야합니다.</p>
@@ -567,8 +569,8 @@ First 4 Landmarks: [[32. 65.]
 3 (434, 290, 3) (68, 2)
 </pre></div>
 </div>
-</section>
-<section id="transforms">
+</div>
+<div class="section" id="transforms">
 <h2>Transforms<a class="headerlink" href="#transforms" title="Permalink to this headline">¶</a></h2>
 <p>위에서 볼 수 있었던 한가지 문제점은 샘플들이 다 같은 크기가 아니라는 것입니다.
 대부분의 신경망(neural networks)은 고정된 크기의 이미지라고 가정합니다.
@@ -678,7 +680,7 @@ First 4 Landmarks: [[32. 65.]
 (<a class="reference external" href="https://pytorch.org/docs/stable/notes/faq.html#my-data-loader-workers-return-identical-random-numbers">https://pytorch.org/docs/stable/notes/faq.html#my-data-loader-workers-return-identical-random-numbers</a> 를 참고하세요)
 실제 상황에서는 <cite>torch.randint</cite> 와 같은 PyTorch가 제공하는 난수 생성기를 사용하는 것이 안전합니다.</p>
 </div>
-<section id="compose-transforms">
+<div class="section" id="compose-transforms">
 <h3>Compose transforms<a class="headerlink" href="#compose-transforms" title="Permalink to this headline">¶</a></h3>
 <p>이제, 샘플에 전이(transform)를 적용해 봅시다.</p>
 <p>이미지의 가장 짧은 측면을 256개로 rescale하고,
@@ -705,9 +707,9 @@ First 4 Landmarks: [[32. 65.]
 </pre></div>
 </div>
 <img alt="../_images/sphx_glr_data_loading_tutorial_003.png" class="sphx-glr-single-img" src="../_images/sphx_glr_data_loading_tutorial_003.png" />
-</section>
-</section>
-<section id="id2">
+</div>
+</div>
+<div class="section" id="id2">
 <h2>데이터셋을 이용한 반복작업<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
 <p>전이(transform)를 적용한 dataset을 만들기위해서 만들었던것을 다 집어 넣어 봅시다.</p>
 <p>요약하자면, 데이터셋은 다음과 같이 샘플링 됩니다.</p>
@@ -803,8 +805,8 @@ First 4 Landmarks: [[32. 65.]
 3 torch.Size([4, 3, 224, 224]) torch.Size([4, 68, 2])
 </pre></div>
 </div>
-</section>
-<section id="afterword-torchvision">
+</div>
+<div class="section" id="afterword-torchvision">
 <h2>Afterword: torchvision<a class="headerlink" href="#afterword-torchvision" title="Permalink to this headline">¶</a></h2>
 <p>이번 튜토리얼에서는, 데이터셋 작성과 사용, 전이(transforms), 데이터를 불러오는 방법에 대해서 알아봤습니다.
 <code class="docutils literal notranslate"><span class="pre">torchvision</span></code> 패키지는 몇몇의 일반적인 데이터셋과 전이(transforms)들을 제공합니다.
@@ -845,7 +847,7 @@ training code에 대한 예시를 알고 싶다면,
 :doc:`transfer_learning_tutorial` 문서를 참고해주세요
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  2.064 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  2.152 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-beginner-data-loading-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/6042bacf7948939030769777afe22e55/data_loading_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">data_loading_tutorial.py</span></code></a></p>
@@ -855,8 +857,8 @@ training code에 대한 예시를 알고 싶다면,
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
-</section>
-</section>
+</div>
+</div>
 
 
              </article>
@@ -884,7 +886,7 @@ training code에 대한 예시를 알고 싶다면,
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2021, PyTorch &amp; PyTorch Korea Community.
+        &copy; Copyright 2022, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorch Korea User Group).
 
     </p>
   </div>
@@ -897,6 +899,13 @@ training code에 대한 예시를 알고 싶다면,
 </footer>
 
           </div>
+<script>
+if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.indexOf("/prototype/prototype_index")< 1))
+  {
+    var div = '<div class="admonition note"><p class="admonition-title">Note</p><p><i class="fa fa-flask" aria-hidden="true">&nbsp</i> 이 튜토리얼은 프로토타입(prototype) 기능들에 대해서 설명하고 있습니다. 프로토타입 기능은 일반적으로 피드백 및 테스트용으로, 런타임 플래그 없이는 PyPI나 Conda로 배포되는 바이너리에서는 사용할 수 없습니다.</p></div>'
+    document.getElementById("pytorch-article").insertAdjacentHTML('afterBegin', div)
+  }
+</script>
         </div>
 
         <div class="pytorch-content-right" id="pytorch-content-right">
@@ -951,7 +960,6 @@ training code에 대한 예시를 알고 싶다면,
       });
   </script>
  
-
 <script>
 //add microsoft link
 
@@ -1030,7 +1038,7 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
 </script>
 
 <script type="text/javascript">
-  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile'];
+  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile', 'Introduction to PyTorch on YouTube', 'Recommendation Systems'];
 </script>
 
 

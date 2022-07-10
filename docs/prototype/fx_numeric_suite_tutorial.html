@@ -1,0 +1,1054 @@
+
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+<meta property="og:title" content="PyTorch FX Numeric Suite Core APIs Tutorial" />
+  
+<meta property="og:type" content="article" />
+  
+<meta property="og:url" content="https://tutorials.pytorch.kr/prototype/fx_numeric_suite_tutorial.html" />
+  
+<meta property="og:description" content="Introduction: Quantization is good when it works, but it is difficult to know what is wrong when it does not satisfy the accuracy we expect. Debugging the accuracy issue of quantization is not easy and time-consuming. One important step of debugging is to measure the statistics of the float model..." />
+  
+<meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
+  
+<meta property="og:image:alt" content="PyTorch FX Numeric Suite Core APIs Tutorial" />
+  
+<meta property="og:ignore_canonical" content="true" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>PyTorch FX Numeric Suite Core APIs Tutorial &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!-- <link rel="stylesheet" href="../_static/pygments.css" type="text/css" /> -->
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/katex-math.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+  <!-- Preload the theme fonts -->
+
+<link rel="preload" href="../_static/fonts/FreightSans/freight-sans-book.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../_static/fonts/FreightSans/freight-sans-medium.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../_static/fonts/IBMPlexMono/IBMPlexMono-Medium.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../_static/fonts/FreightSans/freight-sans-bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../_static/fonts/FreightSans/freight-sans-medium-italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../_static/fonts/IBMPlexMono/IBMPlexMono-SemiBold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+
+<!-- Preload the katex fonts -->
+
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Math-Italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size1-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size4-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size2-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size3-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Caligraphic-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.2/css/all.css" integrity="sha384-vSIIfh2YWi9wW0r9iZe7RJPrKwp6bG+s9QZMoITbCckVJqGCCRhc+ccxNcdpHuYu" crossorigin="anonymous">
+</head>
+
+<div class="container-fluid header-holder tutorials-header" id="header-holder">
+  <div class="container">
+    <div class="header-container">
+      <a class="header-logo" href="https://pytorch.kr/" aria-label="PyTorch"></a>
+
+      <div class="main-menu">
+        <ul>
+          <li>
+            <a href="https://pytorch.kr/get-started">시작하기</a>
+          </li>
+
+          <li class="active">
+            <a href="https://tutorials.pytorch.kr/">튜토리얼</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.kr/hub">허브</a>
+          </li>
+
+          <li>
+            <a href="https://discuss.pytorch.kr/">커뮤니티</a>
+          </li>
+        </ul>
+      </div>
+
+      <a class="main-menu-open-button" href="#" data-behavior="open-mobile-menu"></a>
+    </div>
+  </div>
+</div>
+
+<body class="pytorch-body">
+
+   
+
+    
+
+    <div class="table-of-contents-link-wrapper">
+      <span>Table of Contents</span>
+      <a href="#" class="toggle-table-of-contents" data-behavior="toggle-table-of-contents"></a>
+    </div>
+
+    <nav data-toggle="wy-nav-shift" class="pytorch-left-menu" id="pytorch-left-menu">
+      <div class="pytorch-side-scroll">
+        <div class="pytorch-menu pytorch-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          <div class="pytorch-left-menu-search">
+            
+
+            
+              
+              
+                <div class="version">
+                  1.12.0+cu102
+                </div>
+              
+            
+
+            
+
+
+  
+
+
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search Tutorials" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+            
+          </div>
+
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">파이토치(PyTorch) 레시피</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../recipes/recipes_index.html">모든 레시피 보기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="prototype_index.html">모든 프로토타입 레시피 보기</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">파이토치(PyTorch) 시작하기</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/basics/intro.html">파이토치(PyTorch) 기본 익히기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/basics/quickstart_tutorial.html">빠른 시작(Quickstart)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/basics/tensorqs_tutorial.html">텐서(Tensor)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/basics/data_tutorial.html">Dataset과 DataLoader</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/basics/transforms_tutorial.html">변형(Transform)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/basics/buildmodel_tutorial.html">신경망 모델 구성하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/basics/autogradqs_tutorial.html"><code class="docutils literal notranslate"><span class="pre">torch.autograd</span></code>를 사용한 자동 미분</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/basics/optimization_tutorial.html">모델 매개변수 최적화하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/basics/saveloadrun_tutorial.html">모델 저장하고 불러오기</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Introduction to PyTorch on YouTube</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/introyt.html">Introduction to PyTorch - YouTube Series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/introyt1_tutorial.html">Introduction to PyTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/tensors_deeper_tutorial.html">Introduction to PyTorch Tensors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/autogradyt_tutorial.html">The Fundamentals of Autograd</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/modelsyt_tutorial.html">Building Models with PyTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/tensorboardyt_tutorial.html">PyTorch TensorBoard Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/trainingyt.html">Training with PyTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/captumyt.html">Model Understanding with Captum</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">파이토치(PyTorch) 배우기</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/deep_learning_60min_blitz.html">PyTorch로 딥러닝하기: 60분만에 끝장내기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/pytorch_with_examples.html">예제로 배우는 파이토치(PyTorch)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/nn_tutorial.html"><cite>torch.nn</cite> 이 <em>실제로</em> 무엇인가요?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/tensorboard_tutorial.html">TensorBoard로 모델, 데이터, 학습 시각화하기</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">이미지/비디오</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/torchvision_tutorial.html">TorchVision 객체 검출 미세조정(Finetuning) 튜토리얼</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/transfer_learning_tutorial.html">컴퓨터 비전(Vision)을 위한 전이학습(Transfer Learning)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/fgsm_tutorial.html">적대적 예제 생성(Adversarial Example Generation)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/dcgan_faces_tutorial.html">DCGAN 튜토리얼</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/vt_tutorial.html">배포를 위한 비전 트랜스포머(Vision Transformer) 모델 최적화하기</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">오디오</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/audio_io_tutorial.html">Audio I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/audio_resampling_tutorial.html">Audio Resampling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/audio_data_augmentation_tutorial.html">Audio Data Augmentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/audio_datasets_tutorial.html">Audio Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/speech_recognition_pipeline_tutorial.html">Speech Recognition with Wav2Vec2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/speech_command_classification_with_torchaudio_tutorial.html">Speech Command Classification with torchaudio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/text_to_speech_with_torchaudio.html">Text-to-speech with torchaudio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/forced_alignment_with_torchaudio_tutorial.html">Forced Alignment with Wav2Vec2</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">텍스트</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/transformer_tutorial.html">nn.Transformer 와 TorchText 로 시퀀스-투-시퀀스(Sequence-to-Sequence) 모델링하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/char_rnn_classification_tutorial.html">기초부터 시작하는 NLP: 문자-단위 RNN으로 이름 분류하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/char_rnn_generation_tutorial.html">기초부터 시작하는 NLP:  문자-단위 RNN으로 이름 생성하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/seq2seq_translation_tutorial.html">기초부터 시작하는 NLP: Sequence to Sequence 네트워크와 Attention을 이용한 번역</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/text_sentiment_ngrams_tutorial.html">torchtext 라이브러리로 텍스트 분류하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/translation_transformer.html">nn.Transformer와 torchtext로 언어 번역하기</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">강화학습</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/reinforcement_q_learning.html">강화 학습 (DQN) 튜토리얼</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/mario_rl_tutorial.html">마리오 게임 RL 에이전트로 학습하기</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">PyTorch 모델을 프로덕션 환경에 배포하기</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/flask_rest_api_tutorial.html">Flask를 사용하여 Python에서 PyTorch를 REST API로 배포하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/Intro_to_TorchScript_tutorial.html">TorchScript 소개</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_export.html">C++에서 TorchScript 모델 로딩하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/super_resolution_with_onnxruntime.html">(선택) PyTorch 모델을 ONNX으로 변환하고 ONNX 런타임에서 실행하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/realtime_rpi.html">Real Time Inference on Raspberry Pi 4 (30 fps!)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Code Transforms with FX</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/fx_conv_bn_fuser.html">(베타) FX에서 합성곱/배치 정규화(Convolution/Batch Norm) 결합기(Fuser) 만들기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/fx_profiling_tutorial.html">(beta) Building a Simple CPU Performance Profiler with FX</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">프론트엔드 API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/memory_format_tutorial.html">(베타) PyTorch를 사용한 Channels Last 메모리 형식</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/forward_ad_usage.html">Forward-mode Automatic Differentiation (Beta)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_frontend.html">PyTorch C++ 프론트엔드 사용하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/torch-script-parallelism.html">TorchScript의 동적 병렬 처리(Dynamic Parallelism)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_autograd.html">C++ 프론트엔드의 자동 미분 (autograd)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">PyTorch 확장하기</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/custom_function_double_backward_tutorial.html">Double Backward with Custom Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/custom_function_conv_bn_tutorial.html">Fusing Convolution and Batch Norm using Custom Function</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_extension.html">Custom C++ and CUDA Extensions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/torch_script_custom_ops.html">Extending TorchScript with Custom C++ Operators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/torch_script_custom_classes.html">커스텀 C++ 클래스로 TorchScript 확장하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/dispatcher.html">Registering a Dispatched Operator in C++</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/extend_dispatcher.html">Extending dispatcher for a new backend in C++</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">모델 최적화</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/profiler.html">PyTorch 모듈 프로파일링 하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/tensorboard_profiler_tutorial.html">PyTorch Profiler With TensorBoard</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/hyperparameter_tuning_tutorial.html">Hyperparameter tuning with Ray Tune</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/vt_tutorial.html">배포를 위한 비전 트랜스포머(Vision Transformer) 모델 최적화하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/parametrizations.html">Parametrizations Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/pruning_tutorial.html">가지치기 기법(Pruning) 튜토리얼</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/dynamic_quantization_tutorial.html">(베타) LSTM 기반 단어 단위 언어 모델의 동적 양자화</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/quantized_transfer_learning_tutorial.html">(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/static_quantization_tutorial.html">(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/torchserve_with_ipex.html">Grokking PyTorch Intel CPU performance from first principles</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">병렬 및 분산 학습</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/dist_overview.html">PyTorch Distributed Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/model_parallel_tutorial.html">단일 머신을 사용한 모델 병렬화 모범 사례</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/ddp_tutorial.html">분산 데이터 병렬 처리 시작하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/dist_tuto.html">PyTorch로 분산 어플리케이션 개발하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/FSDP_tutorial.html">Getting Started with Fully Sharded Data Parallel(FSDP)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/process_group_cpp_extension_tutorial.html">Customize Process Group Backends Using Cpp Extensions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/rpc_tutorial.html">Getting Started with Distributed RPC Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/rpc_param_server_tutorial.html">Implementing a Parameter Server Using Distributed RPC Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/dist_pipeline_parallel_tutorial.html">Distributed Pipeline Parallelism Using RPC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/rpc_async_execution.html">Implementing Batch RPC Processing Using Asynchronous Executions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/rpc_ddp_tutorial.html">분산 데이터 병렬(DDP)과 분산 RPC 프레임워크 결합</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/pipeline_tutorial.html">파이프라인 병렬화로 트랜스포머 모델 학습시키기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/ddp_pipeline.html">분산 데이터 병렬 처리와 병렬 처리 파이프라인을 사용한 트랜스포머 모델 학습</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/generic_join.html">Distributed Training with Uneven Inputs Using the Join Context Manager</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Mobile</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/deeplabv3_on_ios.html">iOS에서의 이미지 분할 DeepLapV3</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/deeplabv3_on_android.html">안드로이드에서의 이미지 분할 DeepLapV3</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Recommendation Systems</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/torchrec_tutorial.html">Introduction to TorchRec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/sharding.html">Exploring TorchRec sharding</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <div class="pytorch-container">
+      <div class="pytorch-page-level-bar" id="pytorch-page-level-bar">
+        <div class="pytorch-breadcrumbs-wrapper">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="pytorch-breadcrumbs">
+    
+      <li>
+        <a href="../index.html">
+          
+            Tutorials
+          
+        </a> &gt;
+      </li>
+
+        
+      <li>PyTorch FX Numeric Suite Core APIs Tutorial</li>
+    
+    
+      <li class="pytorch-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/prototype/fx_numeric_suite_tutorial.rst.txt" rel="nofollow"><img src="../_static/images/view-page-source-icon.svg"></a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+</div>
+        </div>
+
+        <div class="pytorch-shortcuts-wrapper" id="pytorch-shortcuts-wrapper">
+          Shortcuts
+        </div>
+      </div>
+
+      <section data-toggle="wy-nav-shift" id="pytorch-content-wrap" class="pytorch-content-wrap">
+        <div class="pytorch-content-left">
+
+        
+
+          <div class="pytorch-call-to-action-links">
+            <div id="tutorial-type">prototype/fx_numeric_suite_tutorial</div>
+
+            <div id="google-colab-link">
+              <img class="call-to-action-img" src="../_static/images/pytorch-colab.svg"/>
+              <div class="call-to-action-desktop-view">Run in Google Colab</div>
+              <div class="call-to-action-mobile-view">Colab</div>
+            </div>
+            <div id="download-notebook-link">
+              <img class="call-to-action-notebook-img" src="../_static/images/pytorch-download.svg"/>
+              <div class="call-to-action-desktop-view">Download Notebook</div>
+              <div class="call-to-action-mobile-view">Notebook</div>
+            </div>
+            <div id="github-view-link">
+              <img class="call-to-action-img" src="../_static/images/pytorch-github.svg"/>
+              <div class="call-to-action-desktop-view">View on GitHub</div>
+              <div class="call-to-action-mobile-view">GitHub</div>
+            </div>
+          </div>
+
+        
+
+          
+          <div class="rst-content">
+          
+            <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
+             <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
+              
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">Note</p>
+<p>Click <a class="reference internal" href="#sphx-glr-download-prototype-fx-numeric-suite-tutorial-py"><span class="std std-ref">here</span></a> to download the full example code</p>
+</div>
+<div class="sphx-glr-example-title section" id="pytorch-fx-numeric-suite-core-apis-tutorial">
+<span id="sphx-glr-prototype-fx-numeric-suite-tutorial-py"></span><h1>PyTorch FX Numeric Suite Core APIs Tutorial<a class="headerlink" href="#pytorch-fx-numeric-suite-core-apis-tutorial" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>Quantization is good when it works, but it is difficult to know what is wrong
+when it does not satisfy the accuracy we expect. Debugging the accuracy issue
+of quantization is not easy and time-consuming.</p>
+<p>One important step of debugging is to measure the statistics of the float model
+and its corresponding quantized model to know where they differ most.
+We built a suite of numeric tools called PyTorch FX Numeric Suite Core APIs in
+PyTorch quantization to enable the measurement of the statistics between
+quantized module and float module to support quantization debugging efforts.
+Even for the quantized model with good accuracy, PyTorch FX Numeric Suite Core
+APIs can still be used as the profiling tool to better understand the
+quantization error within the model and provide the guidance for further
+optimization.</p>
+<p>PyTorch FX Numeric Suite Core APIs currently supports models quantized through
+both static quantization and dynamic quantization with unified APIs.</p>
+<p>In this tutorial we will use MobileNetV2 as an example to show how to use
+PyTorch FX Numeric Suite Core APIs to measure the statistics between static
+quantized model and float model.</p>
+<div class="section" id="setup">
+<h3>Setup<a class="headerlink" href="#setup" title="Permalink to this headline">¶</a></h3>
+<p>We’ll start by doing the necessary imports:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Imports and util functions</span>
+
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">torchvision</span>
+<span class="kn">import</span> <span class="nn">torch.quantization</span>
+<span class="kn">import</span> <span class="nn">torch.ao.ns._numeric_suite_fx</span> <span class="k">as</span> <span class="nn">ns</span>
+<span class="kn">import</span> <span class="nn">torch.quantization.quantize_fx</span> <span class="k">as</span> <span class="nn">quantize_fx</span>
+
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">tabulate</span> <span class="kn">import</span> <span class="n">tabulate</span>
+
+<span class="n">torch</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s1">&#39;seaborn-whitegrid&#39;</span><span class="p">)</span>
+
+
+<span class="c1"># a simple line graph</span>
+<span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="n">xdata</span><span class="p">,</span> <span class="n">ydata</span><span class="p">,</span> <span class="n">xlabel</span><span class="p">,</span> <span class="n">ylabel</span><span class="p">,</span> <span class="n">title</span><span class="p">):</span>
+    <span class="n">_</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="n">xlabel</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="n">ylabel</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">axes</span><span class="p">()</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xdata</span><span class="p">,</span> <span class="n">ydata</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Then we load the pretrained float MobileNetV2 model, and quantize it.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># create float model</span>
+<span class="n">mobilenetv2_float</span> <span class="o">=</span> <span class="n">torchvision</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">quantization</span><span class="o">.</span><span class="n">mobilenet_v2</span><span class="p">(</span>
+    <span class="n">pretrained</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">quantize</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+
+<span class="c1"># create quantized model</span>
+<span class="n">qconfig_dict</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;&#39;</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">quantization</span><span class="o">.</span><span class="n">get_default_qconfig</span><span class="p">(</span><span class="s1">&#39;fbgemm&#39;</span><span class="p">),</span>
+    <span class="c1"># adjust the qconfig to make the results more interesting to explore</span>
+    <span class="s1">&#39;module_name&#39;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="c1"># turn off quantization for the first couple of layers</span>
+        <span class="p">(</span><span class="s1">&#39;features.0&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;features.1&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+        <span class="c1"># use MinMaxObserver for `features.17`, this should lead to worse</span>
+        <span class="c1"># weight SQNR</span>
+        <span class="p">(</span><span class="s1">&#39;features.17&#39;</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">quantization</span><span class="o">.</span><span class="n">default_qconfig</span><span class="p">),</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+<span class="c1"># Note: quantization APIs are inplace, so we save a copy of the float model for</span>
+<span class="c1"># later comparison to the quantized model. This is done throughout the</span>
+<span class="c1"># tutorial.</span>
+<span class="n">mobilenetv2_prepared</span> <span class="o">=</span> <span class="n">quantize_fx</span><span class="o">.</span><span class="n">prepare_fx</span><span class="p">(</span>
+    <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">mobilenetv2_float</span><span class="p">),</span> <span class="n">qconfig_dict</span><span class="p">)</span>
+<span class="n">datum</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">224</span><span class="p">,</span> <span class="mi">224</span><span class="p">)</span>
+<span class="n">mobilenetv2_prepared</span><span class="p">(</span><span class="n">datum</span><span class="p">)</span>
+<span class="c1"># Note: there is a long standing issue that we cannot copy.deepcopy a</span>
+<span class="c1"># quantized model. Since quantization APIs are inplace and we need to use</span>
+<span class="c1"># different copies of the quantized model throughout this tutorial, we call</span>
+<span class="c1"># `convert_fx` on a copy, so we have access to the original `prepared_model`</span>
+<span class="c1"># later. This is done throughout the tutorial.</span>
+<span class="n">mobilenetv2_quantized</span> <span class="o">=</span> <span class="n">quantize_fx</span><span class="o">.</span><span class="n">convert_fx</span><span class="p">(</span>
+    <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">mobilenetv2_prepared</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="compare-the-weights-of-float-and-quantized-models">
+<h3>1. Compare the weights of float and quantized models<a class="headerlink" href="#compare-the-weights-of-float-and-quantized-models" title="Permalink to this headline">¶</a></h3>
+<p>The first analysis we can do is comparing the weights of the fp32 model and
+the int8 model by calculating the SQNR between each pair of weights.</p>
+<p>The <cite>extract_weights</cite> API can be used to extract weights from linear,
+convolution and LSTM layers. It works for dynamic quantization as well as
+PTQ/QAT.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Note: when comparing weights in models with Conv-BN for PTQ, we need to</span>
+<span class="c1"># compare weights after Conv-BN fusion for a proper comparison.  Because of</span>
+<span class="c1"># this, we use `prepared_model` instead of `float_model` when comparing</span>
+<span class="c1"># weights.</span>
+
+<span class="c1"># Extract conv and linear weights from corresponding parts of two models, and</span>
+<span class="c1"># save them in `wt_compare_dict`.</span>
+<span class="n">mobilenetv2_wt_compare_dict</span> <span class="o">=</span> <span class="n">ns</span><span class="o">.</span><span class="n">extract_weights</span><span class="p">(</span>
+    <span class="s1">&#39;fp32&#39;</span><span class="p">,</span>  <span class="c1"># string name for model A</span>
+    <span class="n">mobilenetv2_prepared</span><span class="p">,</span>  <span class="c1"># model A</span>
+    <span class="s1">&#39;int8&#39;</span><span class="p">,</span>  <span class="c1"># string name for model B</span>
+    <span class="n">mobilenetv2_quantized</span><span class="p">,</span>  <span class="c1"># model B</span>
+<span class="p">)</span>
+
+<span class="c1"># calculate SQNR between each pair of weights</span>
+<span class="n">ns</span><span class="o">.</span><span class="n">extend_logger_results_with_comparison</span><span class="p">(</span>
+    <span class="n">mobilenetv2_wt_compare_dict</span><span class="p">,</span>  <span class="c1"># results object to modify inplace</span>
+    <span class="s1">&#39;fp32&#39;</span><span class="p">,</span>  <span class="c1"># string name of model A (from previous step)</span>
+    <span class="s1">&#39;int8&#39;</span><span class="p">,</span>  <span class="c1"># string name of model B (from previous step)</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">ao</span><span class="o">.</span><span class="n">ns</span><span class="o">.</span><span class="n">fx</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">compute_sqnr</span><span class="p">,</span>  <span class="c1"># tensor comparison function</span>
+    <span class="s1">&#39;sqnr&#39;</span><span class="p">,</span>  <span class="c1"># the name to use to store the results under</span>
+<span class="p">)</span>
+
+<span class="c1"># massage the data into a format easy to graph and print</span>
+<span class="n">mobilenetv2_wt_to_print</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="p">(</span><span class="n">layer_name</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">mobilenetv2_wt_compare_dict</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+    <span class="n">mobilenetv2_wt_to_print</span><span class="o">.</span><span class="n">append</span><span class="p">([</span>
+        <span class="n">idx</span><span class="p">,</span>
+        <span class="n">layer_name</span><span class="p">,</span>
+        <span class="n">v</span><span class="p">[</span><span class="s1">&#39;weight&#39;</span><span class="p">][</span><span class="s1">&#39;int8&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;prev_node_target_type&#39;</span><span class="p">],</span>
+        <span class="n">v</span><span class="p">[</span><span class="s1">&#39;weight&#39;</span><span class="p">][</span><span class="s1">&#39;int8&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;values&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
+        <span class="n">v</span><span class="p">[</span><span class="s1">&#39;weight&#39;</span><span class="p">][</span><span class="s1">&#39;int8&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;sqnr&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
+    <span class="p">])</span>
+
+<span class="c1"># plot the SQNR between fp32 and int8 weights for each layer</span>
+<span class="n">plot</span><span class="p">(</span>
+    <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">mobilenetv2_wt_to_print</span><span class="p">],</span>
+    <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">mobilenetv2_wt_to_print</span><span class="p">],</span>
+    <span class="s1">&#39;idx&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;sqnr&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;weights, idx to sqnr&#39;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../_images/sphx_glr_fx_numeric_suite_tutorial_001.png" class="sphx-glr-single-img" src="../_images/sphx_glr_fx_numeric_suite_tutorial_001.png" />
+<p>Also print out the SQNR, so we can inspect the layer name and type:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">tabulate</span><span class="p">(</span>
+    <span class="n">mobilenetv2_wt_to_print</span><span class="p">,</span>
+    <span class="n">headers</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;idx&#39;</span><span class="p">,</span> <span class="s1">&#39;layer_name&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="s1">&#39;shape&#39;</span><span class="p">,</span> <span class="s1">&#39;sqnr&#39;</span><span class="p">]</span>
+<span class="p">))</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>idx  layer_name            type                                                       shape                              sqnr
+-----  --------------------  ---------------------------------------------------------  -----------------------------  --------
+    0  features_0_0          torch.nn.intrinsic.modules.fused.ConvReLU2d                torch.Size([32, 3, 3, 3])      inf
+    1  features_1_conv_0_0   torch.nn.intrinsic.modules.fused.ConvReLU2d                torch.Size([32, 1, 3, 3])      inf
+    2  features_1_conv_1     torch.nn.modules.conv.Conv2d                               torch.Size([16, 32, 1, 1])     inf
+    3  features_2_conv_0_0   torch.nn.intrinsic.quantized.modules.conv_relu.ConvReLU2d  torch.Size([96, 16, 1, 1])      45.3583
+    4  features_2_conv_1_0   torch.nn.intrinsic.quantized.modules.conv_relu.ConvReLU2d  torch.Size([96, 1, 3, 3])       46.3591
+    5  features_2_conv_2     torch.nn.quantized.modules.conv.Conv2d                     torch.Size([24, 96, 1, 1])      43.1405
+    6  features_3_conv_0_0   torch.nn.intrinsic.quantized.modules.conv_relu.ConvReLU2d  torch.Size([144, 24, 1, 1])     45.1226
+    7  features_3_conv_1_0   torch.nn.intrinsic.quantized.modules.conv_relu.ConvReLU2d  torch.Size([144, 1, 3, 3])      44.8846
+    8  features_3_conv_2     torch.nn.quantized.modules.conv.Conv2d                     torch.Size([24, 144, 1, 1])     42.2562
+    9  features_4_conv_0_0   torch.nn.intrinsic.quantized.modules.conv_relu.ConvReLU2d  torch.Size([144, 24, 1, 1])     44.7671
+   10  features_4_conv_1_0   torch.nn.intrinsic.quantized.modules.conv_relu.ConvReLU2d  torch.Size([144, 1, 3, 3])      47.5017
+   11  features_4_conv_2     torch.nn.quantized.modules.conv.Conv2d                     torch.Size([32, 144, 1, 1])     42.4501
+   12  features_5_conv_0_0   torch.nn.intrinsic.quantized.modules.conv_relu.ConvReLU2d  torch.Size([192, 32, 1, 1])     44.8431
+   13  features_5_conv_1_0   torch.nn.intrinsic.quantized.modules.conv_relu.ConvReLU2d  torch.Size([192, 1, 3, 3])      44.955
+   14  features_5_conv_2     torch.nn.quantized.modules.conv.Conv2d                     torch.Size([32, 192, 1, 1])     43.0342
+   15  features_6_conv_0_0   torch.nn.intrinsic.quantized.modules.conv_relu.ConvReLU2d  torch.Size([192, 32, 1, 1])     44.7193
+   16  features_6_conv_1_0   torch.nn.intrinsic.quantized.modules.conv_relu.ConvReLU2d  torch.Size([192, 1, 3, 3])      45.2428
+   17  features_6_conv_2     torch.nn.quantized.modules.conv.Conv2d                     torch.Size([32, 192, 1, 1])     42.7734
+   18  features_7_conv_0_0   torch.nn.intrinsic.quantized.modules.conv_relu.ConvReLU2d  torch.Size([192, 32, 1, 1])     44.5686
+   19  features_7_conv_1_0   torch.nn.intrinsic.quantized.modules.conv_relu.ConvReLU2d  torch.Size([192, 1, 3, 3])      47.4552
+   20  features_7_conv_2     torch.nn.quantized.modules.conv.Conv2d                     torch.Size([64, 192, 1, 1])     42.6587
+   21  features_8_conv_0_0   torch.nn.intrinsic.quantized.modules.conv_relu.ConvReLU2d  torch.Size([384, 64, 1, 1])     44.091
+   22  features_8_conv_1_0   torch.nn.intrinsic.quantized.modules.conv_relu.ConvReLU2d  torch.Size([384, 1, 3, 3])      45.0733
+   23  features_8_conv_2     torch.nn.quantized.modules.conv.Conv2d                     torch.Size([64, 384, 1, 1])     42.3311
+   24  features_9_conv_0_0   torch.nn.intrinsic.quantized.modules.conv_relu.ConvReLU2d  torch.Size([384, 64, 1, 1])     44.2334
+   25  features_9_conv_1_0   torch.nn.intrinsic.quantized.modules.conv_relu.ConvReLU2d  torch.Size([384, 1, 3, 3])      45.5776
+   26  features_9_conv_2     torch.nn.quantized.modules.conv.Conv2d                     torch.Size([64, 384, 1, 1])     42.0875
+   27  features_10_conv_0_0  torch.nn.intrinsic.quantized.modules.conv_relu.ConvReLU2d  torch.Size([384, 64, 1, 1])     44.2595
+   28  features_10_conv_1_0  torch.nn.intrinsic.quantized.modules.conv_relu.ConvReLU2d  torch.Size([384, 1, 3, 3])      45.3682
+   29  features_10_conv_2    torch.nn.quantized.modules.conv.Conv2d                     torch.Size([64, 384, 1, 1])     41.3764
+   30  features_11_conv_0_0  torch.nn.intrinsic.quantized.modules.conv_relu.ConvReLU2d  torch.Size([384, 64, 1, 1])     43.9487
+   31  features_11_conv_1_0  torch.nn.intrinsic.quantized.modules.conv_relu.ConvReLU2d  torch.Size([384, 1, 3, 3])      43.7704
+   32  features_11_conv_2    torch.nn.quantized.modules.conv.Conv2d                     torch.Size([96, 384, 1, 1])     41.963
+   33  features_12_conv_0_0  torch.nn.intrinsic.quantized.modules.conv_relu.ConvReLU2d  torch.Size([576, 96, 1, 1])     43.8682
+   34  features_12_conv_1_0  torch.nn.intrinsic.quantized.modules.conv_relu.ConvReLU2d  torch.Size([576, 1, 3, 3])      45.3413
+   35  features_12_conv_2    torch.nn.quantized.modules.conv.Conv2d                     torch.Size([96, 576, 1, 1])     41.8074
+   36  features_13_conv_0_0  torch.nn.intrinsic.quantized.modules.conv_relu.ConvReLU2d  torch.Size([576, 96, 1, 1])     43.9367
+   37  features_13_conv_1_0  torch.nn.intrinsic.quantized.modules.conv_relu.ConvReLU2d  torch.Size([576, 1, 3, 3])      45.3374
+   38  features_13_conv_2    torch.nn.quantized.modules.conv.Conv2d                     torch.Size([96, 576, 1, 1])     40.3783
+   39  features_14_conv_0_0  torch.nn.intrinsic.quantized.modules.conv_relu.ConvReLU2d  torch.Size([576, 96, 1, 1])     43.3986
+   40  features_14_conv_1_0  torch.nn.intrinsic.quantized.modules.conv_relu.ConvReLU2d  torch.Size([576, 1, 3, 3])      47.4357
+   41  features_14_conv_2    torch.nn.quantized.modules.conv.Conv2d                     torch.Size([160, 576, 1, 1])    41.8716
+   42  features_15_conv_0_0  torch.nn.intrinsic.quantized.modules.conv_relu.ConvReLU2d  torch.Size([960, 160, 1, 1])    43.4877
+   43  features_15_conv_1_0  torch.nn.intrinsic.quantized.modules.conv_relu.ConvReLU2d  torch.Size([960, 1, 3, 3])      46.1367
+   44  features_15_conv_2    torch.nn.quantized.modules.conv.Conv2d                     torch.Size([160, 960, 1, 1])    41.2812
+   45  features_16_conv_0_0  torch.nn.intrinsic.quantized.modules.conv_relu.ConvReLU2d  torch.Size([960, 160, 1, 1])    43.5446
+   46  features_16_conv_1_0  torch.nn.intrinsic.quantized.modules.conv_relu.ConvReLU2d  torch.Size([960, 1, 3, 3])      45.7084
+   47  features_16_conv_2    torch.nn.quantized.modules.conv.Conv2d                     torch.Size([160, 960, 1, 1])    41.2971
+   48  features_17_conv_0_0  torch.nn.intrinsic.quantized.modules.conv_relu.ConvReLU2d  torch.Size([960, 160, 1, 1])    33.8474
+   49  features_17_conv_1_0  torch.nn.intrinsic.quantized.modules.conv_relu.ConvReLU2d  torch.Size([960, 1, 3, 3])      34.8042
+   50  features_17_conv_2    torch.nn.quantized.modules.conv.Conv2d                     torch.Size([320, 960, 1, 1])    38.6114
+   51  features_18_0         torch.nn.intrinsic.quantized.modules.conv_relu.ConvReLU2d  torch.Size([1280, 320, 1, 1])   42.8171
+   52  classifier_1          torch.nn.quantized.modules.linear.Linear                   torch.Size([1000, 1280])        42.5315
+</pre></div>
+</div>
+</div>
+<div class="section" id="compare-activations-api">
+<h3>2. Compare activations API<a class="headerlink" href="#compare-activations-api" title="Permalink to this headline">¶</a></h3>
+<p>The second tool allows for comparison of activations between float and
+quantized models at corresponding locations for the same input.</p>
+<div class="figure align-default">
+<img alt="../_images/compare_output.png" src="../_images/compare_output.png" />
+</div>
+<p>The <cite>add_loggers</cite>/<cite>extract_logger_info</cite> API can be used to to extract
+activations from any layer with a <cite>torch.Tensor</cite> return type. It works for
+dynamic quantization as well as PTQ/QAT.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Compare unshadowed activations</span>
+
+<span class="c1"># Create a new copy of the quantized model, because we cannot `copy.deepcopy`</span>
+<span class="c1"># a quantized model.</span>
+<span class="n">mobilenetv2_quantized</span> <span class="o">=</span> <span class="n">quantize_fx</span><span class="o">.</span><span class="n">convert_fx</span><span class="p">(</span>
+    <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">mobilenetv2_prepared</span><span class="p">))</span>
+<span class="n">mobilenetv2_float_ns</span><span class="p">,</span> <span class="n">mobilenetv2_quantized_ns</span> <span class="o">=</span> <span class="n">ns</span><span class="o">.</span><span class="n">add_loggers</span><span class="p">(</span>
+    <span class="s1">&#39;fp32&#39;</span><span class="p">,</span>  <span class="c1"># string name for model A</span>
+    <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">mobilenetv2_prepared</span><span class="p">),</span>  <span class="c1"># model A</span>
+    <span class="s1">&#39;int8&#39;</span><span class="p">,</span>  <span class="c1"># string name for model B</span>
+    <span class="n">mobilenetv2_quantized</span><span class="p">,</span>  <span class="c1"># model B</span>
+    <span class="n">ns</span><span class="o">.</span><span class="n">OutputLogger</span><span class="p">,</span>  <span class="c1"># logger class to use</span>
+<span class="p">)</span>
+
+<span class="c1"># feed data through network to capture intermediate activations</span>
+<span class="n">mobilenetv2_float_ns</span><span class="p">(</span><span class="n">datum</span><span class="p">)</span>
+<span class="n">mobilenetv2_quantized_ns</span><span class="p">(</span><span class="n">datum</span><span class="p">)</span>
+
+<span class="c1"># extract intermediate activations</span>
+<span class="n">mobilenetv2_act_compare_dict</span> <span class="o">=</span> <span class="n">ns</span><span class="o">.</span><span class="n">extract_logger_info</span><span class="p">(</span>
+    <span class="n">mobilenetv2_float_ns</span><span class="p">,</span>  <span class="c1"># model A, with loggers (from previous step)</span>
+    <span class="n">mobilenetv2_quantized_ns</span><span class="p">,</span>  <span class="c1"># model B, with loggers (from previous step)</span>
+    <span class="n">ns</span><span class="o">.</span><span class="n">OutputLogger</span><span class="p">,</span>  <span class="c1"># logger class to extract data from</span>
+    <span class="s1">&#39;int8&#39;</span><span class="p">,</span>  <span class="c1"># string name of model to use for layer names for the output</span>
+<span class="p">)</span>
+
+<span class="c1"># add SQNR comparison</span>
+<span class="n">ns</span><span class="o">.</span><span class="n">extend_logger_results_with_comparison</span><span class="p">(</span>
+    <span class="n">mobilenetv2_act_compare_dict</span><span class="p">,</span>  <span class="c1"># results object to modify inplace</span>
+    <span class="s1">&#39;fp32&#39;</span><span class="p">,</span>  <span class="c1"># string name of model A (from previous step)</span>
+    <span class="s1">&#39;int8&#39;</span><span class="p">,</span>  <span class="c1"># string name of model B (from previous step)</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">ao</span><span class="o">.</span><span class="n">ns</span><span class="o">.</span><span class="n">fx</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">compute_sqnr</span><span class="p">,</span>  <span class="c1"># tensor comparison function</span>
+    <span class="s1">&#39;sqnr&#39;</span><span class="p">,</span>  <span class="c1"># the name to use to store the results under</span>
+<span class="p">)</span>
+
+<span class="c1"># massage the data into a format easy to graph and print</span>
+<span class="n">mobilenet_v2_act_to_print</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="p">(</span><span class="n">layer_name</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">mobilenetv2_act_compare_dict</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+    <span class="n">mobilenet_v2_act_to_print</span><span class="o">.</span><span class="n">append</span><span class="p">([</span>
+        <span class="n">idx</span><span class="p">,</span>
+        <span class="n">layer_name</span><span class="p">,</span>
+        <span class="n">v</span><span class="p">[</span><span class="s1">&#39;node_output&#39;</span><span class="p">][</span><span class="s1">&#39;int8&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;prev_node_target_type&#39;</span><span class="p">],</span>
+        <span class="n">v</span><span class="p">[</span><span class="s1">&#39;node_output&#39;</span><span class="p">][</span><span class="s1">&#39;int8&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;values&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
+        <span class="n">v</span><span class="p">[</span><span class="s1">&#39;node_output&#39;</span><span class="p">][</span><span class="s1">&#39;int8&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;sqnr&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]])</span>
+
+<span class="c1"># plot the SQNR between fp32 and int8 activations for each layer</span>
+<span class="n">plot</span><span class="p">(</span>
+    <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">mobilenet_v2_act_to_print</span><span class="p">],</span>
+    <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">mobilenet_v2_act_to_print</span><span class="p">],</span>
+    <span class="s1">&#39;idx&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;sqnr&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;unshadowed activations, idx to sqnr&#39;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../_images/sphx_glr_fx_numeric_suite_tutorial_002.png" class="sphx-glr-single-img" src="../_images/sphx_glr_fx_numeric_suite_tutorial_002.png" />
+<p>Also print out the SQNR, so we can inspect the layer name and type:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">tabulate</span><span class="p">(</span>
+    <span class="n">mobilenet_v2_act_to_print</span><span class="p">,</span>
+    <span class="n">headers</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;idx&#39;</span><span class="p">,</span> <span class="s1">&#39;layer_name&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="s1">&#39;shape&#39;</span><span class="p">,</span> <span class="s1">&#39;sqnr&#39;</span><span class="p">]</span>
+<span class="p">))</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>idx  layer_name            type                                                       shape                              sqnr
+-----  --------------------  ---------------------------------------------------------  -----------------------------  --------
+    0  features_0_0          torch.nn.intrinsic.modules.fused.ConvReLU2d                torch.Size([1, 32, 112, 112])  inf
+    1  features_1_conv_0_0   torch.nn.intrinsic.modules.fused.ConvReLU2d                torch.Size([1, 32, 112, 112])  inf
+    2  features_1_conv_1     torch.nn.modules.conv.Conv2d                               torch.Size([1, 16, 112, 112])  inf
+    3  features_2_conv_0_0   torch.nn.intrinsic.quantized.modules.conv_relu.ConvReLU2d  torch.Size([1, 96, 112, 112])   28.8309
+    4  features_2_conv_1_0   torch.nn.intrinsic.quantized.modules.conv_relu.ConvReLU2d  torch.Size([1, 96, 56, 56])     24.9368
+    5  features_2_conv_2     torch.nn.quantized.modules.conv.Conv2d                     torch.Size([1, 24, 56, 56])     24.4167
+    6  features_3_conv_0_0   torch.nn.intrinsic.quantized.modules.conv_relu.ConvReLU2d  torch.Size([1, 144, 56, 56])    27.1074
+    7  features_3_conv_1_0   torch.nn.intrinsic.quantized.modules.conv_relu.ConvReLU2d  torch.Size([1, 144, 56, 56])    21.9543
+    8  features_3_conv_2     torch.nn.quantized.modules.conv.Conv2d                     torch.Size([1, 24, 56, 56])     20.6387
+    9  add                   torch._ops.quantized.PyCapsule.add                         torch.Size([1, 24, 56, 56])     19.8779
+   10  features_4_conv_0_0   torch.nn.intrinsic.quantized.modules.conv_relu.ConvReLU2d  torch.Size([1, 144, 56, 56])    21.244
+   11  features_4_conv_1_0   torch.nn.intrinsic.quantized.modules.conv_relu.ConvReLU2d  torch.Size([1, 144, 28, 28])    22.7892
+   12  features_4_conv_2     torch.nn.quantized.modules.conv.Conv2d                     torch.Size([1, 32, 28, 28])     21.5443
+   13  features_5_conv_0_0   torch.nn.intrinsic.quantized.modules.conv_relu.ConvReLU2d  torch.Size([1, 192, 28, 28])    26.0957
+   14  features_5_conv_1_0   torch.nn.intrinsic.quantized.modules.conv_relu.ConvReLU2d  torch.Size([1, 192, 28, 28])    19.1121
+   15  features_5_conv_2     torch.nn.quantized.modules.conv.Conv2d                     torch.Size([1, 32, 28, 28])     16.729
+   16  add_1                 torch._ops.quantized.PyCapsule.add                         torch.Size([1, 32, 28, 28])     19.0073
+   17  features_6_conv_0_0   torch.nn.intrinsic.quantized.modules.conv_relu.ConvReLU2d  torch.Size([1, 192, 28, 28])    22.4615
+   18  features_6_conv_1_0   torch.nn.intrinsic.quantized.modules.conv_relu.ConvReLU2d  torch.Size([1, 192, 28, 28])    18.2326
+   19  features_6_conv_2     torch.nn.quantized.modules.conv.Conv2d                     torch.Size([1, 32, 28, 28])     14.9052
+   20  add_2                 torch._ops.quantized.PyCapsule.add                         torch.Size([1, 32, 28, 28])     18.2546
+   21  features_7_conv_0_0   torch.nn.intrinsic.quantized.modules.conv_relu.ConvReLU2d  torch.Size([1, 192, 28, 28])    20.3349
+   22  features_7_conv_1_0   torch.nn.intrinsic.quantized.modules.conv_relu.ConvReLU2d  torch.Size([1, 192, 14, 14])    25.1257
+   23  features_7_conv_2     torch.nn.quantized.modules.conv.Conv2d                     torch.Size([1, 64, 14, 14])     20.9186
+   24  features_8_conv_0_0   torch.nn.intrinsic.quantized.modules.conv_relu.ConvReLU2d  torch.Size([1, 384, 14, 14])    26.7062
+   25  features_8_conv_1_0   torch.nn.intrinsic.quantized.modules.conv_relu.ConvReLU2d  torch.Size([1, 384, 14, 14])    20.466
+   26  features_8_conv_2     torch.nn.quantized.modules.conv.Conv2d                     torch.Size([1, 64, 14, 14])     22.3811
+   27  add_3                 torch._ops.quantized.PyCapsule.add                         torch.Size([1, 64, 14, 14])     20.5608
+   28  features_9_conv_0_0   torch.nn.intrinsic.quantized.modules.conv_relu.ConvReLU2d  torch.Size([1, 384, 14, 14])    24.6337
+   29  features_9_conv_1_0   torch.nn.intrinsic.quantized.modules.conv_relu.ConvReLU2d  torch.Size([1, 384, 14, 14])    21.0127
+   30  features_9_conv_2     torch.nn.quantized.modules.conv.Conv2d                     torch.Size([1, 64, 14, 14])     19.3615
+   31  add_4                 torch._ops.quantized.PyCapsule.add                         torch.Size([1, 64, 14, 14])     18.2917
+   32  features_10_conv_0_0  torch.nn.intrinsic.quantized.modules.conv_relu.ConvReLU2d  torch.Size([1, 384, 14, 14])    21.7471
+   33  features_10_conv_1_0  torch.nn.intrinsic.quantized.modules.conv_relu.ConvReLU2d  torch.Size([1, 384, 14, 14])    20.1782
+   34  features_10_conv_2    torch.nn.quantized.modules.conv.Conv2d                     torch.Size([1, 64, 14, 14])     17.901
+   35  add_5                 torch._ops.quantized.PyCapsule.add                         torch.Size([1, 64, 14, 14])     17.0778
+   36  features_11_conv_0_0  torch.nn.intrinsic.quantized.modules.conv_relu.ConvReLU2d  torch.Size([1, 384, 14, 14])    20.4463
+   37  features_11_conv_1_0  torch.nn.intrinsic.quantized.modules.conv_relu.ConvReLU2d  torch.Size([1, 384, 14, 14])    21.1711
+   38  features_11_conv_2    torch.nn.quantized.modules.conv.Conv2d                     torch.Size([1, 96, 14, 14])     16.2402
+   39  features_12_conv_0_0  torch.nn.intrinsic.quantized.modules.conv_relu.ConvReLU2d  torch.Size([1, 576, 14, 14])    20.0003
+   40  features_12_conv_1_0  torch.nn.intrinsic.quantized.modules.conv_relu.ConvReLU2d  torch.Size([1, 576, 14, 14])    19.7622
+   41  features_12_conv_2    torch.nn.quantized.modules.conv.Conv2d                     torch.Size([1, 96, 14, 14])     14.2331
+   42  add_6                 torch._ops.quantized.PyCapsule.add                         torch.Size([1, 96, 14, 14])     15.3402
+   43  features_13_conv_0_0  torch.nn.intrinsic.quantized.modules.conv_relu.ConvReLU2d  torch.Size([1, 576, 14, 14])    19.4187
+   44  features_13_conv_1_0  torch.nn.intrinsic.quantized.modules.conv_relu.ConvReLU2d  torch.Size([1, 576, 14, 14])    20.449
+   45  features_13_conv_2    torch.nn.quantized.modules.conv.Conv2d                     torch.Size([1, 96, 14, 14])     14.3788
+   46  add_7                 torch._ops.quantized.PyCapsule.add                         torch.Size([1, 96, 14, 14])     15.0659
+   47  features_14_conv_0_0  torch.nn.intrinsic.quantized.modules.conv_relu.ConvReLU2d  torch.Size([1, 576, 14, 14])    18.2698
+   48  features_14_conv_1_0  torch.nn.intrinsic.quantized.modules.conv_relu.ConvReLU2d  torch.Size([1, 576, 7, 7])      23.5424
+   49  features_14_conv_2    torch.nn.quantized.modules.conv.Conv2d                     torch.Size([1, 160, 7, 7])      17.1604
+   50  features_15_conv_0_0  torch.nn.intrinsic.quantized.modules.conv_relu.ConvReLU2d  torch.Size([1, 960, 7, 7])      20.4648
+   51  features_15_conv_1_0  torch.nn.intrinsic.quantized.modules.conv_relu.ConvReLU2d  torch.Size([1, 960, 7, 7])      20.379
+   52  features_15_conv_2    torch.nn.quantized.modules.conv.Conv2d                     torch.Size([1, 160, 7, 7])      16.138
+   53  add_8                 torch._ops.quantized.PyCapsule.add                         torch.Size([1, 160, 7, 7])      16.394
+   54  features_16_conv_0_0  torch.nn.intrinsic.quantized.modules.conv_relu.ConvReLU2d  torch.Size([1, 960, 7, 7])      19.5766
+   55  features_16_conv_1_0  torch.nn.intrinsic.quantized.modules.conv_relu.ConvReLU2d  torch.Size([1, 960, 7, 7])      19.2316
+   56  features_16_conv_2    torch.nn.quantized.modules.conv.Conv2d                     torch.Size([1, 160, 7, 7])      14.5871
+   57  add_9                 torch._ops.quantized.PyCapsule.add                         torch.Size([1, 160, 7, 7])      15.1467
+   58  features_17_conv_0_0  torch.nn.intrinsic.quantized.modules.conv_relu.ConvReLU2d  torch.Size([1, 960, 7, 7])      16.9515
+   59  features_17_conv_1_0  torch.nn.intrinsic.quantized.modules.conv_relu.ConvReLU2d  torch.Size([1, 960, 7, 7])      26.4096
+   60  features_17_conv_2    torch.nn.quantized.modules.conv.Conv2d                     torch.Size([1, 320, 7, 7])      14.6639
+   61  features_18_0         torch.nn.intrinsic.quantized.modules.conv_relu.ConvReLU2d  torch.Size([1, 1280, 7, 7])     14.4532
+   62  adaptive_avg_pool2d   torch.nn.functional.adaptive_avg_pool2d                    torch.Size([1, 1280, 1, 1])     18.0029
+   63  flatten               torch._VariableFunctionsClass.flatten                      torch.Size([1, 1280])           18.0029
+   64  classifier_0          torch.nn.quantized.modules.dropout.Dropout                 torch.Size([1, 1280])           18.0029
+   65  classifier_1          torch.nn.quantized.modules.linear.Linear                   torch.Size([1, 1000])           19.8965
+</pre></div>
+</div>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  6.975 seconds)</p>
+<div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-prototype-fx-numeric-suite-tutorial-py">
+<div class="sphx-glr-download docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/4dad45b7d91f1fc27bf0e7275082da53/fx_numeric_suite_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">fx_numeric_suite_tutorial.py</span></code></a></p>
+</div>
+<div class="sphx-glr-download docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/97a1ae8eced7b367667f15162fa63f86/fx_numeric_suite_tutorial.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">fx_numeric_suite_tutorial.ipynb</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
+</div>
+</div>
+</div>
+
+
+             </article>
+             
+            </div>
+            <footer>
+  
+
+  
+
+    <hr class="rating-hr hr-top">
+      <div class="rating-container">
+        <div class="rating-prompt">이 튜토리얼이 어떠셨나요?</div>
+        <div class="stars-outer">
+          <i class="far fa-star" title="1 Star" data-behavior="tutorial-rating" data-count="1"></i>
+          <i class="far fa-star" title="2 Stars" data-behavior="tutorial-rating" data-count="2"></i>
+          <i class="far fa-star" title="3 Stars" data-behavior="tutorial-rating" data-count="3"></i>
+          <i class="far fa-star" title="4 Stars" data-behavior="tutorial-rating" data-count="4"></i>
+          <i class="far fa-star" title="5 Stars" data-behavior="tutorial-rating" data-count="5"></i>
+        </div>
+      </div>
+    <hr class="rating-hr hr-bottom"/>
+
+  
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2022, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorch Korea User Group).
+
+    </p>
+  </div>
+    
+      <div>
+        Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+      </div>
+     
+
+</footer>
+
+          </div>
+<script>
+if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.indexOf("/prototype/prototype_index")< 1))
+  {
+    var div = '<div class="admonition note"><p class="admonition-title">Note</p><p><i class="fa fa-flask" aria-hidden="true">&nbsp</i> 이 튜토리얼은 프로토타입(prototype) 기능들에 대해서 설명하고 있습니다. 프로토타입 기능은 일반적으로 피드백 및 테스트용으로, 런타임 플래그 없이는 PyPI나 Conda로 배포되는 바이너리에서는 사용할 수 없습니다.</p></div>'
+    document.getElementById("pytorch-article").insertAdjacentHTML('afterBegin', div)
+  }
+</script>
+        </div>
+
+        <div class="pytorch-content-right" id="pytorch-content-right">
+          <div class="pytorch-right-menu" id="pytorch-right-menu">
+            <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
+              <ul>
+<li><a class="reference internal" href="#">PyTorch FX Numeric Suite Core APIs Tutorial</a><ul>
+<li><a class="reference internal" href="#introduction">Introduction</a><ul>
+<li><a class="reference internal" href="#setup">Setup</a></li>
+<li><a class="reference internal" href="#compare-the-weights-of-float-and-quantized-models">1. Compare the weights of float and quantized models</a></li>
+<li><a class="reference internal" href="#compare-activations-api">2. Compare activations API</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+  
+
+
+  
+  
+     
+       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+         <script src="../_static/jquery.js"></script>
+         <script src="../_static/underscore.js"></script>
+         <script src="../_static/doctools.js"></script>
+         <script src="../_static/clipboard.min.js"></script>
+         <script src="../_static/copybutton.js"></script>
+         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js"></script>
+         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
+         <script src="../_static/katex_autorenderer.js"></script>
+     
+  
+
+  <script type="text/javascript" src="../_static/js/vendor/popper.min.js"></script>
+  <script type="text/javascript" src="../_static/js/vendor/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
+  <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+ 
+<script>
+//add microsoft link
+
+if(window.location.href.indexOf("/beginner/basics/")!= -1)
+{
+  var url="https://docs.microsoft.com/learn/paths/pytorch-fundamentals/?wt.mc_id=aiml-7486-cxa";
+  switch(window.location.pathname.split("/").pop().replace('.html',''))
+  {
+    case"quickstart_tutorial":
+      url="https://docs.microsoft.com/learn/modules/intro-machine-learning-pytorch/9-quickstart?WT.mc_id=aiml-7486-cxa";
+      break;
+    case"tensorqs_tutorial":
+      url="https://docs.microsoft.com/learn/modules/intro-machine-learning-pytorch/2-tensors?WT.mc_id=aiml-7486-cxa";
+      break;
+    case"data_tutorial":
+      url="https://docs.microsoft.com/learn/modules/intro-machine-learning-pytorch/3-data?WT.mc_id=aiml-7486-cxa";
+      break;
+    case"transforms_tutorial":
+      url="https://docs.microsoft.com/learn/modules/intro-machine-learning-pytorch/4-transforms?WT.mc_id=aiml-7486-cxa";
+      break;
+    case"buildmodel_tutorial":
+      url="https://docs.microsoft.com/learn/modules/intro-machine-learning-pytorch/5-model?WT.mc_id=aiml-7486-cxa";
+      break;
+    case"autogradqs_tutorial":
+      url="https://docs.microsoft.com/learn/modules/intro-machine-learning-pytorch/6-autograd?WT.mc_id=aiml-7486-cxa";
+      break;
+    case"optimization_tutorial":
+      url="https://docs.microsoft.com/learn/modules/intro-machine-learning-pytorch/7-optimization?WT.mc_id=aiml-7486-cxa";
+      break;
+    case"saveloadrun_tutorial":
+      url="https://docs.microsoft.com/learn/modules/intro-machine-learning-pytorch/8-inference?WT.mc_id=aiml-7486-cxa";
+    }
+
+    $(".pytorch-call-to-action-links").children().first().before("<a href="+url+' data-behavior="call-to-action-event" data-response="Run in Microsoft Learn" target="_blank"><div id="microsoft-learn-link" style="padding-bottom: 0.625rem;border-bottom: 1px solid #f3f4f7;padding-right: 2.5rem;display: -webkit-box;  display: -ms-flexbox; isplay: flex; -webkit-box-align: center;-ms-flex-align: center;align-items: center;"><img class="call-to-action-img" src="../../_static/images/microsoft-logo.svg"/><div class="call-to-action-desktop-view">Run in Microsoft Learn</div><div class="call-to-action-mobile-view">Learn</div></div></a>')
+  }
+</script>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-LZRD6GXDLF"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-LZRD6GXDLF');   // GA4
+  gtag('config', 'UA-71919972-3');  // UA
+</script>
+
+
+<script>
+  $("[data-behavior='call-to-action-event']").on('click', function(){
+    ga('send', {
+      hitType: 'event',
+      eventCategory: $(this).attr("data-response"),
+      eventAction: 'click',
+      eventLabel: window.location.href
+    });
+
+    gtag('event', 'click', {
+      'event_category': $(this).attr("data-response"),
+      'event_label': $("h1").first().text(),
+      'tutorial_link': window.location.href
+    });
+   });
+
+   $("[data-behavior='tutorial-rating']").on('click', function(){
+    gtag('event', 'click', {
+      'event_category': 'Tutorial Rating',
+      'event_label': $("h1").first().text(),
+      'value': $(this).attr("data-count")
+    });
+   });
+
+   if (location.pathname == "/") {
+     $(".rating-container").hide();
+     $(".hr-bottom").hide();
+   }
+</script>
+
+<script type="text/javascript">
+  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Mobile', 'Introduction to PyTorch on YouTube', 'Recommendation Systems'];
+</script>
+
+
+
+  <!-- Begin Footer -->
+
+  <div class="container-fluid docs-tutorials-resources" id="docs-tutorials-resources">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4 text-center">
+          <h2>PyTorchKorea @ GitHub</h2>
+          <p>파이토치 한국 사용자 모임을 GitHub에서 만나보세요.</p>
+          <a class="with-right-arrow" href="https://github.com/PyTorchKorea" target="_blank">GitHub로 이동</a>
+        </div>
+
+        <div class="col-md-4 text-center">
+          <h2>한국어 튜토리얼</h2>
+          <p>한국어로 번역 중인 PyTorch 튜토리얼입니다.</p>
+          <a class="with-right-arrow" href="https://tutorials.pytorch.kr/">튜토리얼로 이동</a>
+        </div>
+
+        <div class="col-md-4 text-center">
+          <h2>커뮤니티</h2>
+          <p>다른 사용자들과 의견을 나누고, 도와주세요!</p>
+          <a class="with-right-arrow" href="https://discuss.pytorch.kr/">커뮤니티로 이동</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container footer-container">
+      <div class="footer-logo-wrapper">
+        <a href="https://pytorch.kr/" class="footer-logo"></a>
+      </div>
+
+      <div class="footer-links-wrapper">
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title"><a href="https://pytorch.kr/">파이토치 한국 사용자 모임</a></li>
+            <li><a href="https://pytorch.kr//about">사용자 모임 소개</a></li>
+            <li><a href="https://pytorch.kr//about/contributors">기여해주신 분들</a></li>
+            <li><a href="https://pytorch.kr//resources">리소스</a></li>
+            <li><a href="https://pytorch.kr//coc">행동 강령</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="trademark-disclaimer">
+        <ul>
+          <li>파이토치 한국 사용자 모임은 사용자들이 함께 모여 만들어가는 독립적인 커뮤니티로, 모든 활동은 Facebook과 관련이 없습니다. (We're independent user community. All activities are not related to Facebook.)</li>
+          <li><a href="https://pytorch.kr/coc">행동 강령</a>을 지켜주세요. PyTorch, PyTorch 로고 및 모든 관련 표기는 Facebook, Inc의 상표입니다. (Please follow <a href="https://pytorch.kr/coc">code of conduct</a>. PyTorch, the PyTorch logo and all related marks are trademarks of Facebook, Inc.)</li>
+        </ul>
+      </div>
+    </div>
+  </footer>
+
+  <!-- End Footer -->
+
+  <!-- Begin Mobile Menu -->
+
+  <div class="mobile-main-menu">
+    <div class="container-fluid">
+      <div class="container">
+        <div class="mobile-main-menu-header-container">
+          <a class="header-logo" href="https://pytorch.kr/" aria-label="PyTorch"></a>
+          <a class="main-menu-close-button" href="#" data-behavior="close-mobile-menu"></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="mobile-main-menu-links-container">
+      <div class="main-menu">
+        <ul>
+          <li>
+            <a href="https://pytorch.kr/get-started">시작하기</a>
+          </li>
+
+          <li class="active">
+            <a href="https://tutorials.pytorch.kr/">튜토리얼</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.kr/hub">허브</a>
+          </li>
+
+          <li>
+            <a href="https://discuss.pytorch.kr/">커뮤니티</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- End Mobile Menu -->
+
+  <script type="text/javascript" src="../_static/js/vendor/anchor.min.js"></script>
+
+  <script type="text/javascript">
+    $(document).ready(function() {
+      mobileMenu.bind();
+      mobileTOC.bind();
+      pytorchAnchors.bind();
+      sideMenus.bind();
+      scrollToAnchor.bind();
+      highlightNavigation.bind();
+      mainMenuDropdown.bind();
+      filterTags.bind();
+
+      // Add class to links that have code blocks, since we cannot create links in code blocks
+      $("article.pytorch-article a span.pre").each(function(e) {
+        $(this).closest("a").addClass("has-code");
+      });
+    })
+  </script>
+</body>
+</html>
