@@ -21,7 +21,7 @@
 기본(Pre-requisite) 코드
 ------------------------------------------------------------------------------------------
 이전 장인 `Dataset과 DataLoader <data_tutorial.html>`_\ 와 `신경망 모델 구성하기 <buildmodel_tutorial.html>`_\ 에서
-코드를 기져왔습니다.
+코드를 가져왔습니다.
 """
 
 import torch
