@@ -11,16 +11,17 @@ Hira <moto@fb.com>`__
 
 
 ######################################################################
-# Overview
+# 개요
 # --------
 # 
-# This tutorial shows how to build text-to-speech pipeline, using the
-# pretrained Tacotron2 in torchaudio.
+# 이번 튜토리얼에서는 torchaudio의 사전학습된 Tacotron2를 사용하여
+# 텍스트를 스피치로 변환하는 파이프라인을 구축하는 방법을 소개한다.
 # 
-# The text-to-speech pipeline goes as follows: 1. Text preprocessing
+# 텍스트를 스피치로 변환하는 파이프라인은 다음과 같다: 1. 텍스트 전처리
 # 
-# First, the input text is encoded into a list of symbols. In this
-# tutorial, we will use English characters and phonemes as the symbols.
+# 첫째로, 입력된 텍스트는 기호들의 리스트로 변환된다.
+# 이 튜토리얼에서는, 영문자와 음소를 심볼로 사용할 것이다.
+# 
 # 
 # 2. Spectrogram generation
 # 
