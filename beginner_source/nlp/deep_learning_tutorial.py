@@ -57,7 +57,7 @@ print(lin(data))  # yes
 # ~~~~~~~~~
 #
 # 먼저 왜 비선형성이 필요한지 설명하는 다음 사실을 주목하십시오.
-# :math:`f(x) = Ax + b` 와 :math:`g(x) = Cx + d` 두개의 아핀맵이 있다고 가정합니다.
+# :math:`f(x) = Ax + b` 와 :math:`g(x) = Cx + d` 두 개의 아핀맵이 있다고 가정합니다.
 # :math:`f(g(x))` 는 무엇일까요?
 #
 # .. math::  f(g(x)) = A(Cx + d) + b = ACx + (Ad + b)
