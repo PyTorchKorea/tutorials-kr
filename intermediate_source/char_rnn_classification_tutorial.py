@@ -177,7 +177,7 @@ print(lineToTensor('Jones').size())
 # Autograd 전에, Torch에서 RNN(recurrent neural network) 생성은
 # 여러 시간 단계 걸처서 계층의 매개변수를 복제하는 작업을 포함합니다.
 # 계층은 은닉 상태와 변화도(Gradient)를 가지며, 이제 이것들은 그래프 자체에서
-# 완전히 처리되는 됩니다. 이는 feed-forward 계층과
+# 완전히 처리됩니다. 이는 feed-forward 계층과
 # 같은 매우 "순수한" 방법으로 RNN을 구현할 수 있다는 것을 의미합니다.
 #
 # 역자 주 : 여기서는 교육목적으로 nn.RNN 대신 직접 RNN을 사용합니다.
@@ -410,7 +410,7 @@ plt.plot(all_losses)
 #
 # 네트워크가 다른 카테고리에서 얼마나 잘 작동하는지 보기위해
 # 모든 실제 언어(행)가 네트워크에서 어떤 언어로 추측(열)되는지를 나타내는
-# 혼란 행열(confusion matrix)을 만듭니다. 혼란 행렬을 계산하기 위해
+# 혼란 행렬(confusion matrix)을 만듭니다. 혼란 행렬을 계산하기 위해
 # ``evaluate()`` 로 많은 수의 샘플을 네트워크에 실행합니다.
 # ``evaluate()`` 은 ``train ()`` 과 역전파를 빼면 동일합니다.
 #
