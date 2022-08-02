@@ -104,5 +104,6 @@
 |training|학습|이하람||
 |warmstart|빠르게 시작하기|박정환|Warmstarting Model = 빠르게 모델 시작하기|
 |weight|가중치|박정환||
+|wrapper|래퍼|박정환|음차 표기|
 |Dropout|드롭아웃|김태형||
 |Autoencoder|오토인코더|김태형||
