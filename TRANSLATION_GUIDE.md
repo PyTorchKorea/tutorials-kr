@@ -106,4 +106,3 @@
 |weight|가중치|박정환||
 |wrapper|래퍼|박정환|음차 표기|
 |Dropout|드롭아웃|김태형||
-|Autoencoder|오토인코더|김태형||
