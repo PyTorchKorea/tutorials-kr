@@ -52,7 +52,7 @@ for t in range(2000):
     # 갖는 텐서가 됩니다.
     loss.backward()
 
-    # 경사하강법(gradient descent)를 사용하여 가중치를 직접 갱신합니다.
+    # 경사하강법(gradient descent)을 사용하여 가중치를 직접 갱신합니다.
     # torch.no_grad()로 감싸는 이유는, 가중치들이 requires_grad=True 지만
     # autograd에서는 이를 추적하지 않을 것이기 때문입니다.
     with torch.no_grad():
