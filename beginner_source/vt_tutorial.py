@@ -148,7 +148,7 @@ scripted_quantized_model.save("fbdeit_scripted_quantized.pt")
 #
 
 ######################################################################
-# 동일한 추론 결과를 만들기 위해 ``scripted_quantized_model``을
+# 동일한 추론 결과를 만들기 위해 ``scripted_quantized_model`` 을
 # 사용해 봅시다.
 #
 
