@@ -44,7 +44,7 @@ T-shirt/top, Trouser, Pullover, Dress, Coat, Sandal, Shirt, Sneaker, Bag, or Ank
 ------------------------------------------------------------------------------------------
 다른 딥러닝 프레임워크에 익숙하다면, `0. 빠른 시작 <quickstart_tutorial.html>`_ 을 보고 PyTorch의 API들을 빠르게 익히세요.
 
-딥러닝 프레임워크가 처음이라면, 단계별(step-by-step) 가이드의 첫번째인 `1. 텐서(Tensor) <tensor_tutorial.html>`_ 로 이동하세요.
+딥러닝 프레임워크가 처음이라면, 단계별(step-by-step) 가이드의 첫번째인 `1. 텐서(Tensor) <tensorqs_tutorial.html>`_ 로 이동하세요.
 
 
 .. include:: /beginner_source/basics/qs_toc.txt
