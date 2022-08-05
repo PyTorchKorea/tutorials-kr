@@ -105,3 +105,4 @@
 |warmstart|빠르게 시작하기|박정환|Warmstarting Model = 빠르게 모델 시작하기|
 |weight|가중치|박정환||
 |wrapper|래퍼|박정환|음차 표기|
+|breakpoint|브레이크포인트|박예슬|음차 표기|
