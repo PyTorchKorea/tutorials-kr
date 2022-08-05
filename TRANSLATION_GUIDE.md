@@ -104,4 +104,5 @@
 |training|학습|이하람||
 |warmstart|빠르게 시작하기|박정환|Warmstarting Model = 빠르게 모델 시작하기|
 |weight|가중치|박정환||
+|workflow|워크플로|조윤진|[음차 표기](https://www.korean.go.kr/front/onlineQna/onlineQnaView.do?mn_id=216&qna_seq=174476&pageIndex=1)|
 |wrapper|래퍼|박정환|음차 표기|
