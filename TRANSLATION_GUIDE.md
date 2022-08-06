@@ -56,6 +56,7 @@
 |dataset|데이터셋|박정환|음차 표기|
 |deep neural network|심층 신경망|박정환||
 |derivative|도함수|박정환||
+|download|설치|반보영||
 |Drop-out|Drop-out|황성수|번역안함|
 |epoch|에폭|박정환|음차 표기|
 |evaluation mode|평가 모드|박정환||
