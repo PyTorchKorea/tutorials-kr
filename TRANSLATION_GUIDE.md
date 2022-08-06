@@ -52,6 +52,7 @@
 |autograd|Autograd|황성수|번역안함|
 |Batch Normalization|배치 정규화|박정환||
 |bias|편향|이하람||
+|build|빌드|이래은||
 |convolution|합성곱|김현길||
 |dataset|데이터셋|박정환|음차 표기|
 |deep neural network|심층 신경망|박정환||
@@ -79,6 +80,7 @@
 |method|메소드|장효영|[음차 표기](https://terms.tta.or.kr/dictionary/dictionaryView.do?word_seq=090780-1)|
 |mini-batch|미니 배치|박정환|음차 표기|
 |momentum|모멘텀|박정환|음차 표기|
+|nightly build|nightly 빌드|이래은||
 |normalize|정규화|허남규||
 |NumPy|NumPy|박정환|번역하지 않음|
 |One-Hot|One-Hot|황성수|번역안함|
