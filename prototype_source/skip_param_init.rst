@@ -46,16 +46,16 @@
 
 :func:`torch.nn.utils.skip_init` 의 구현(참고 :ref:`Details`) 방법에 따라,
 모듈이 함수와 호환되기 위한 두 가지 요구사항이 있습니다.
-다음의 요구사항을 이행하면 커스텀 모듈의 매개변수 초기화 스킵 기능을 선택할 수 있습니다:
+다음의 요구사항을 이행하면 커스텀 모듈의 매개변수 초기화 스킵 기능을 선택할 수 있습니다.
 
-  1. 모듈을 생성할 때 매개변수와 버퍼로 전달되는 모듈의 생성자 내 `device` keyword argument를 
+  1. 모듈을 생성할 때 매개변수와 버퍼로 전달되는 모듈의 생성자 내 `device` 키워드 인자 (keyword argument)를 
   사용해야 합니다. 
 
   2. 모듈은 초기화를 제외하고 모듈의 생성자 내 매개변수 또는 버퍼 계산을 수행하지 않아야 합니다
-  (i.e. `torch.nn.init`의 함수).
+  (즉, `torch.nn.init`의 함수).
 
-다음 예시는 작성된 매개변수, 버퍼 또는 서브 모듈에 `device` keyword argument를 전달하여 지원하도록 
-모듈이 업데이트된 것을 나타냅니다:
+다음 예시는 작성된 매개변수, 버퍼 또는 서브 모듈에 `device` 키워드 인자 (keyword argument)를 전달하여 지원하도록 
+모듈이 업데이트된 것을 나타냅니다.
 
 ::
 
@@ -67,11 +67,11 @@
         super().__init__()
 
         # ==== 사례 1: 모듈 매개변수를 직접 생성합니다. ====
-        # 생성한 매개변수에 device를 전달합니다.
+        # 생성한 매개변수에 장치 (device)를 전달합니다.
         self.param1 = nn.Parameter(torch.empty((foo, bar), device=device))
         self.register_parameter('param2', nn.Parameter(torch.empty(bar, device=device)))
 
-        # meta 장치 지원을 확실히 하기 위해 모듈의 생성자 내 매개변수에
+        # meta 장치 (device) 지원을 확실히 하기 위해 모듈의 생성자 내 매개변수에
         # torch.nn.init의 ops 외에는 사용하지 마십시오.
         with torch.no_grad():
             nn.init.kaiming_uniform_(self.param1)
@@ -79,8 +79,8 @@
 
 
         # ==== 사례 2: 모듈의 서브 모듈을 생성합니다. ====
-        # 모든 서브 모듈은 device를 재귀적으로 전달해야 합니다.
-        # torch.nn 모듈 예시입니다.
+        # 장치 (device)를 재귀적으로 전달해야 합니다. 모든 서브 모듈 또한 해당 사항을 지원합니다.
+        # torch.nn 에 제공되는 모든 모듈의 예시입니다.
         self.fc = nn.Linear(bar, 5, device=device)
 
         # 컨테이너에도 동일하게 적용합니다.
@@ -91,7 +91,7 @@
 
 
         # ==== 사례 3: 모듈의 버퍼를 생성합니다. ====
-        # 버퍼 tensor 생성하는 동안 device를 전달합니다.
+        # 버퍼 tensor 생성하는 동안 장치 (device)를 전달합니다.
         self.register_buffer('some_buffer', torch.ones(7, device=device))
 
     ...
@@ -105,16 +105,16 @@
 
 ::
 
-    # 1. meta 장치에서 모듈을 초기화합니다; 모든 torch.nn.init ops는 
-    # meta 장치에서 no-op 동작을 합니다.
+    # 1. meta 장치 (device)에서 모듈을 초기화합니다; 모든 torch.nn.init ops는 
+    # meta 장치 (device)에서 no-op 동작을 합니다.
     m = nn.Linear(10, 5, device='meta')
 
-    # 2. 초기화되지 않은(빈) 형태의 모듈을 CPU 장치에 구현합니다.
+    # 2. 초기화되지 않은(빈) 형태의 모듈을 CPU 장치 (device)에 구현합니다.
     # 결과는 초기화되지 않은 매개 변수를 가진 모듈 인스턴스입니다.
     m.to_empty(device='cpu')
 
-모듈은 "meta" 장치로 인스턴스화하여 동작합니다. tensor shape 정보를 가지고 있지만 스토리지는 할당하지 않습니다.
-`torch.nn.init` ops는 meta 장치를 위해 특별히 구현되어 있고 no-op 동작을 합니다.
+모듈은 "meta" 장치 (device)로 인스턴스화하여 동작합니다. tensor shape 정보를 가지고 있지만 스토리지는 할당하지 않습니다.
+`torch.nn.init` ops는 meta 장치 (device)를 위해 특별히 구현되어 있고 no-op 동작을 합니다.
 이에 따라 매개변수 초기화 로직에서 본질적으로 건너뛰게 됩니다.
 
-:ref:`Updating` 에 설명된 대로 이 패턴은 모듈 구성 중 `device` keyword argument를 적절히 지원하는 모듈에서만 작동합니다.
+:ref:`Updating` 에 설명된 대로 이 패턴은 모듈 구성 중 `device` 키워드 인자 (keyword argument)를 적절히 지원하는 모듈에서만 작동합니다.
