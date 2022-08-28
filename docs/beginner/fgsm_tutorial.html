@@ -432,7 +432,7 @@
 이안 갓펠로우가 기고하였습니다.
 이 공격법은 놀랍도록 강력하지만 직관적입니다. 학습 방식, <em>변화도(gradients)</em> 를 활용하여 신경망을 공격하도록
 설계 되었습니다. 아이디어는 간단합니다. 역전파 변화도를 기반으로 가중치를 조정하여 손실을 최소화하기보다는
-공격이 동일한 역전파 변화도를 기반으로 <em>손실을 최대화하하는 방향으로 입력 데이터를 조정</em> 합니다.
+공격이 동일한 역전파 변화도를 기반으로 <em>손실을 최대화하는 방향으로 입력 데이터를 조정</em> 합니다.
 다시 말해 공격은 입력 데이터에서 계산된 손실 변화도를 사용하고 입력 데이터를 조정하여 손실이 최대가 되게 합니다.
 코드로 넘어가기 전에 유명한 <a class="reference external" href="https://arxiv.org/abs/1412.6572">FGSM</a> 판다 예제를
 보고 몇 가지 표기법을 정리하겠습니다.</p>
@@ -495,9 +495,9 @@
 </div>
 <div class="section" id="id5">
 <h3>공격을 받는 모델<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
-<p>앞서 말한대로, 공격을 받는 모델은 <a class="reference external" href="https://github.com/pytorch/examples/tree/master/mnist">pytorch/examples/mnist</a>
+<p>앞서 말한대로, 공격받는 모델은 <a class="reference external" href="https://github.com/pytorch/examples/tree/master/mnist">pytorch/examples/mnist</a>
 와 동일한 MNIST 모델입니다. 본인의 MNIST 모델을 학습 및 저장하는 방식으로 하거나 제공된 모델을 다운로드 해 사용하는 식으로 진행할 수 있습니다.
-여기서 <em>Net</em> 정의 및 테스트 데이터 로더는 MNIST 예제에서 복사 하였습니다.
+여기서 <em>Net</em> 정의 및 테스트 데이터 로더는 MNIST 예제에서 복사하였습니다.
 이 섹션의 목적은 모델과 데이터 로더를 정의한 다음, 모델을 초기화하고 미리 학습된 가중치를 읽어오는 것입니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># LeNet 모델 정의</span>
 <span class="k">class</span> <span class="nc">Net</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
@@ -547,8 +547,8 @@
 <div class="section" id="fgsm">
 <h3>FGSM 공격<a class="headerlink" href="#fgsm" title="Permalink to this headline">¶</a></h3>
 <p>이제 원래 입력을 교란시켜 적대적인 예를 만드는 함수를 정의 할 수 있습니다.
-<code class="docutils literal notranslate"><span class="pre">fgsm_attack</span></code> 함수는 입력 파라미터로 3가지를 가집니다. 첫번째는 원본 <em>이미지</em> ( <span class="math">\(x\)</span> ),
-두번째는 <em>엡실론</em> 으로 픽셀 단위의 작은 변화를 주는 값입니다 ( <span class="math">\(\epsilon\)</span> ).
+<code class="docutils literal notranslate"><span class="pre">fgsm_attack</span></code> 함수는 입력 파라미터로 3가지를 가집니다. 첫 번째는 원본 <em>이미지</em> ( <span class="math">\(x\)</span> ),
+두 번째는 <em>엡실론</em> 으로 픽셀 단위의 작은 변화를 주는 값입니다 ( <span class="math">\(\epsilon\)</span> ).
 마지막은 <em>data_grad</em> 로 입력 영상 ( <span class="math">\(\nabla_{x} J(\mathbf{\theta}, \mathbf{x}, y)\)</span> ) 에 대한 변화도 손실 값입니다.
 아래 식에 따른 작은 변화가 적용된 이미지를 생성합니다.</p>
 <div class="math">
@@ -572,9 +572,9 @@
 <div class="section" id="id6">
 <h3>테스팅 함수<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
 <p>마지막으로 본 튜토리얼의 핵심 결과는 <code class="docutils literal notranslate"><span class="pre">테스트</span></code> 함수에서 오게 됩니다.
-이 테스트 기능을 호출 할 때마다 MNIST 테스트 셋에서 전체 테스트 단계를 수행하고 최종 정확도를 보고합니다.
+이 테스트 기능을 호출할 때마다 MNIST 테스트 셋에서 전체 테스트 단계를 수행하고 최종 정확도를 보고합니다.
 그러나 이 함수에는 <em>엡실론</em> 입력도 필요합니다. 이는 <code class="docutils literal notranslate"><span class="pre">테스트</span></code> 함수가 <span class="math">\(\epsilon\)</span> 크기에 따라 공격자의 공격을 받는 모델의
-정확도을 보고하기 때문입니다. 더 구체적으로 보면 테스트 셋의 각각의 샘플에서 테스트 함수는 입력 데이터에 대한 손실 변화도( <span class="math">\(data\_grad\)</span> )를 계산하고,
+정확도를 보고하기 때문입니다. 더 구체적으로 보면 테스트 셋의 각각의 샘플에서 테스트 함수는 입력 데이터에 대한 손실 변화도( <span class="math">\(data\_grad\)</span> )를 계산하고,
 <code class="docutils literal notranslate"><span class="pre">FGSM</span> <span class="pre">공격</span></code> (<span class="math">\(perturbed\_data\)</span>) 을 받은 작은 변화가 적용된 이미지를 만들고 나서 작은 변화가 적용된 이미지가 적대적인지 확인을 합니다.
 추가로 모델의 정확도를 테스트하기 위해서 테스트 함수는 나중에 시각화하여 볼 수 있도록 성공적으로 얻은 적대적 이미지를 저장하고 반환합니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">test</span><span class="p">(</span> <span class="n">model</span><span class="p">,</span> <span class="n">device</span><span class="p">,</span> <span class="n">test_loader</span><span class="p">,</span> <span class="n">epsilon</span> <span class="p">):</span>
@@ -739,7 +739,7 @@ Epsilon: 0.3    Test Accuracy = 869 / 10000 = 0.0869
 그러나 적대적 머신 러닝 분야에 대해서 많은 것을 알기 위한 최고의 방법은 많이 시도해보는 것입니다.
 NIPS 2017 경쟁에서 소개된 다양한 공격 방법을 직접 구현해 보고, FGSM 과 어떤 점이 다른지 연구해 보세요.
 그리고 나서 직접 만든 공격으로부터 모델을 방어해 보세요.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 3 minutes  22.273 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 4 minutes  32.213 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-beginner-fgsm-tutorial-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/377bf4a7b1761e5f081e057385870d8e/fgsm_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">fgsm_tutorial.py</span></code></a></p>

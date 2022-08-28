@@ -111,12 +111,12 @@ def predict():
 # ~~~~~~~~~~~~~~~~~~~
 #
 # DenseNet 모델은 224 x 224의 3채널 RGB 이미지를 필요로 합니다.
-# 또한 이미지 텐서를 평규 및 표준편차 값으로 정규화합니다. 자세한 내용은
+# 또한 이미지 텐서를 평균 및 표준편차 값으로 정규화합니다. 자세한 내용은
 # `여기 <https://pytorch.org/vision/stable/models.html>`_ 를 참고하세요.
 #
 # ``torchvision`` 라이브러리의 ``transforms`` 를 사용하여 변환 파이프라인
 # (transform pipeline)을 구축합니다. Transforms와 관련한 더 자세한 내용은
-# `여기 <https://pytorch.org/vision/stable/transforms.htm>`_ 에서
+# `여기 <https://pytorch.org/vision/stable/transforms.html>`_ 에서
 # 읽어볼 수 있습니다.
 
 import io
