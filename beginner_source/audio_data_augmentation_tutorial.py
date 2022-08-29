@@ -10,7 +10,7 @@
 이 튜토리얼에서는 효과, 필터,
 공간 임펄스 응답(RIR, Room Impulse Response)과 코덱을 적용하는 방법을 살펴보겠습니다.
 
-끝에서는, 깨끗한 스피치로 부터 휴대폰 너머의 잡음이 낀 음성을 합성하겠습니다. 
+끝에서는, 깨끗한 음성으로 부터 휴대폰 너머의 잡음이 낀 음성을 합성하겠습니다. 
 """
 
 import torch
@@ -44,25 +44,25 @@ SAMPLE_NOISE = download_asset("tutorial-assets/Lab41-SRI-VOiCES-rm1-babb-mc01-st
 # 효과와 필터링 적용하기
 # ------------------------------
 #
-# :py:func:`torchaudio.sox_effects`는 ``sox``와 유사한 필터들을 
+# :py:func:`torchaudio.sox_effects` 는 ``sox`` 와 유사한 필터들을 
 # 텐서 객체들과 파일 객체 오디오 소스들에 즉각 적용 해줍니다.
 #
 # 이 작업에 두가지 함수가 있습니다:
 #
-# -  :py:func:`torchaudio.sox_effects.apply_effects_tensor`는 텐서에
+# -  :py:func:`torchaudio.sox_effects.apply_effects_tensor` 는 텐서에
 #    효과를 적용합니다.
-# -  :py:func:`torchaudio.sox_effects.apply_effects_file`는 다른 오디오 소스들에
+# -  :py:func:`torchaudio.sox_effects.apply_effects_file` 는 다른 오디오 소스들에
 #    효과를 적용합니다.
 #
 # 두 함수들은 효과의 정의를  ``List[List[str]]`` 형태로 받아들입니다.
 # ``sox`` 와 작동하는 방법이 거의 유사합니다. 하지만, 한가지 유의점은
-# ``sox`` 는 자동으로 효과를 추가하지만, ``torchaudio``의 구현은 그렇지 않습니다.  
+# ``sox`` 는 자동으로 효과를 추가하지만, ``torchaudio`` 의 구현은 그렇지 않습니다.  
 #
 # 사용 가능한 효과들의 리스트를 알고싶다면, `the sox
 # documentation <http://sox.sourceforge.net/sox.html>`__. 을 참조해주세요.
 #
-# **Tip** 즉석으로 오디오 데이터 로드와 리 샘플링 하고싶다면, 
-# 효과 ``"rate"`` 와 함께 :py:func:`torchaudio.sox_effects.apply_effects_file`을 사용하세요.
+# **Tip** 즉석으로 오디오 데이터 로드와 다시 샘플링 하고싶다면, 
+# 효과 ``"rate"`` 와 함께 :py:func:`torchaudio.sox_effects.apply_effects_file` 을 사용하세요.
 #
 # **Note** :py:func:`torchaudio.sox_effects.apply_effects_file` 는 파일 형태의 객체 또는 주소 형태의 객체를 받습니다.
 # :py:func:`torchaudio.load` 와 유사하게, 오디오 포맷이
@@ -158,18 +158,18 @@ Audio(waveform2, rate=sample_rate2)
 #
 
 ######################################################################
-# 방 잔향 모의 실험하기.
+# 방 잔향 모의 실험하기
 # -----------------------------
 #
 # `Convolution
 # reverb <https://en.wikipedia.org/wiki/Convolution_reverb>`__ 는
-# 깨끗한 오디오 소리를 다른 환경에서 생성된 것처럼 만들어주는 기술입니다.
+# 깨끗한 오디오를 다른 환경에서 생성된 것처럼 만들어주는 기술입니다.
 #
 # 예를들어, 공간 임펄스 응답 (RIR)을 활용하여, 깨끗한 음성을
 # 마치 회의실에서 발음된 것처럼 만들 수 있습니다.
 #
 # 이 과정을 위해서, RIR 데이터가 필요합니다. 다음 데이터들은 VOiCES 데이터셋에서 왔습니다.
-# 하지만, 직접 녹음할 수도 있습니다. - 직접 마이크를 켜시고, 박수를 치세요.
+# 하지만, 직접 녹음할 수도 있습니다. - 직접 마이크를 켜시고, 박수를 치세요!
 #
 
 rir_raw, sample_rate = torchaudio.load(SAMPLE_RIR)
@@ -342,12 +342,11 @@ plot_specgram(waveforms[2], sample_rate, title="Vorbis")
 Audio(waveforms[2], rate=sample_rate)
 
 ######################################################################
-# Simulating a phone recoding
+# 전화 녹음 모의 실험하기
 # ---------------------------
 #
-# Combining the previous techniques, we can simulate audio that sounds
-# like a person talking over a phone in a echoey room with people talking
-# in the background.
+# 이전 기술들을 혼합하여, 반향있는 방의 사람들이 이야기하는 배경에서 전화 통화하는 
+# 것 처럼 들리는 오디오를 모의 실험할 수 있습니다.
 #
 
 sample_rate = 16000
@@ -355,16 +354,15 @@ original_speech, sample_rate = torchaudio.load(SAMPLE_SPEECH)
 
 plot_specgram(original_speech, sample_rate, title="Original")
 
-# Apply RIR
+# RIR 적용하기
 speech_ = torch.nn.functional.pad(original_speech, (RIR.shape[1] - 1, 0))
 rir_applied = torch.nn.functional.conv1d(speech_[None, ...], RIR[None, ...])[0]
 
 plot_specgram(rir_applied, sample_rate, title="RIR Applied")
 
-# Add background noise
-# Because the noise is recorded in the actual environment, we consider that
-# the noise contains the acoustic feature of the environment. Therefore, we add
-# the noise after RIR application.
+# 배경 잡음 추가하기
+# 잡음이 실제 환경에서 녹음되었기 때문에, 잡음이 환경의 음향 특징을 가지고 있다고 고려했습니다.
+# 따라서, RIR 적용 후에 잡음을 추가했습니다
 noise, _ = torchaudio.load(SAMPLE_NOISE)
 noise = noise[:, : rir_applied.shape[1]]
 
@@ -374,7 +372,7 @@ bg_added = (scale * rir_applied + noise) / 2
 
 plot_specgram(bg_added, sample_rate, title="BG noise added")
 
-# Apply filtering and change sample rate
+# 필터링을 적용하고 샘플 레이트 수정하기
 filtered, sample_rate2 = torchaudio.sox_effects.apply_effects_tensor(
     bg_added,
     sample_rate,
@@ -394,42 +392,42 @@ filtered, sample_rate2 = torchaudio.sox_effects.apply_effects_tensor(
 
 plot_specgram(filtered, sample_rate2, title="Filtered")
 
-# Apply telephony codec
+# 전화 코텍 적용하기
 codec_applied = F.apply_codec(filtered, sample_rate2, format="gsm")
 
 plot_specgram(codec_applied, sample_rate2, title="GSM Codec Applied")
 
 
 ######################################################################
-# Original speech:
+# 기존 음성:
 # ~~~~~~~~~~~~~~~~
 #
 
 Audio(original_speech, rate=sample_rate)
 
 ######################################################################
-# RIR applied:
+# RIR 적용 후:
 # ~~~~~~~~~~~~
 #
 
 Audio(rir_applied, rate=sample_rate)
 
 ######################################################################
-# Background noise added:
+# 배경 잡음 추가 후:
 # ~~~~~~~~~~~~~~~~~~~~~~~
 #
 
 Audio(bg_added, rate=sample_rate)
 
 ######################################################################
-# Filtered:
+# 필터링 적용 후:
 # ~~~~~~~~~
 #
 
 Audio(filtered, rate=sample_rate2)
 
 ######################################################################
-# Codec aplied:
+# 코덱 적용 후:
 # ~~~~~~~~~~~~~
 #
 
