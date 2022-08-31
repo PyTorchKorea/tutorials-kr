@@ -66,6 +66,7 @@
 |Generative|생성 모델|박정환|ToC의 분류명입니다.|
 |Getting Started tutorial|시작하기 튜토리얼|박정환|ToC의 Getting Started를 뜻합니다.|
 |gradient|변화도|박정환||
+|gradient descent|경사하강법|심형준||
 |Hyperparameter|하이퍼파라미터|김태영|음차 표기|
 |Image|이미지|박정환|ToC의 분류명입니다.|
 |in-place|제자리|허남규||
