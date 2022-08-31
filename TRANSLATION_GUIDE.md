@@ -93,6 +93,7 @@
 |rank 0|0-순위|박정환||
 |Read later|더 읽을거리|박정환||
 |recap|요약|박정환||
+|reflection|반영|유연승||
 |resample|리샘플|||
 |resizing|크기 변경|박정환||
 |requirements|요구 사항|장보윤||
