@@ -53,6 +53,7 @@
 |Batch Normalization|배치 정규화|박정환||
 |bias|편향|이하람||
 |convolution|합성곱|김현길||
+|Dropout|드롭아웃|김태형|음차 표기|
 |dataset|데이터셋|박정환|음차 표기|
 |deep neural network|심층 신경망|박정환||
 |derivative|도함수|박정환||
@@ -95,6 +96,7 @@
 |reflection|반영|유연승||
 |resample|리샘플|||
 |resizing|크기 변경|박정환||
+|requirements|요구 사항|장보윤||
 |sampling rate|샘플링 레이트|||
 |scenario|시나리오|박정환|음차 표기|
 |shape|shape|허남규|번역하지 않음|
