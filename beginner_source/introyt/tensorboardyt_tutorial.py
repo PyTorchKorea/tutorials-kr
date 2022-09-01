@@ -7,10 +7,10 @@
 `Training Models <trainingyt.html>`_ ||
 `Model Understanding <captumyt.html>`_
 
-PyTorch TensorBoard Support
+파이토치 텐서보드 지원
 ===========================
 
-Follow along with the video below or on `youtube <https://www.youtube.com/watch?v=6CEld3hZgqc>`__.
+아래 `유튜브 <https://www.youtube.com/watch?v=6CEld3hZgqc>`__를 따라 하세요.
 
 .. raw:: html
 
@@ -18,66 +18,62 @@ Follow along with the video below or on `youtube <https://www.youtube.com/watch?
      <iframe width="560" height="315" src="https://www.youtube.com/embed/6CEld3hZgqc" frameborder="0" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
    </div>
 
-Before You Start
+시작하기 전에
 ----------------
 
-To run this tutorial, you’ll need to install PyTorch, TorchVision,
-Matplotlib, and TensorBoard.
+이 튜토리얼을 진행하기 위해 PyTorch와 TorchVision, Matplotlib, TensorBoard 설치가 필요합니다. 
 
-With ``conda``:
+``conda``로 설치:
 
 ``conda install pytorch torchvision -c pytorch``
 ``conda install matplotlib tensorboard``
 
-With ``pip``:
+``pip``으로 설치:
 
 ``pip install torch torchvision matplotlib tensorboard``
 
-Once the dependencies are installed, restart this notebook in the Python
-environment where you installed them.
+필요한 라이브러리들이 모두 설치되면, 설치된 파이썬 환경에서 노트북(주피터 노트북)을 재실행하세요.
 
 
-Introduction
+소개
 ------------
 
-In this notebook, we’ll be training a variant of LeNet-5 against the
-Fashion-MNIST dataset. Fashion-MNIST is a set of image tiles depicting
-various garments, with ten class labels indicating the type of garment
-depicted.
+이번 튜토리얼에서는, Fashion-MNIST 데이터셋을 활용하여 LeNet-5의 변형모델을 학습시킬 것입니다.
+ Fashion-MNIST는 10개의 클래스의 다양한 옷을 나타내는 이미지셋입니다.
 
 """
 
-# PyTorch model and training necessities
+# 파이토치와 학습에 필요한 라이브러리
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 
-# Image datasets and image manipulation
+# 이미지 데이터셋과 이미지 조작
 import torchvision
 import torchvision.transforms as transforms
 
-# Image display
+# 이미지 표현
 import matplotlib.pyplot as plt
 import numpy as np
 
-# PyTorch TensorBoard support
+# 파이토치가 제공하는 텐서보드
 from torch.utils.tensorboard import SummaryWriter
 
 
 ######################################################################
-# Showing Images in TensorBoard
+# 텐서보드에서 이미지 보기
 # -----------------------------
 #
-# Let’s start by adding sample images from our dataset to TensorBoard:
+# 데이터셋에서 텐서보드로 샘플이미지를 추가하는것으로 시작해 봅시다.:
 #
 
-# Gather datasets and prepare them for consumption
+# 데이터셋 수집 및 데이터셋을 사용할 수 있도록 준비
 transform = transforms.Compose(
     [transforms.ToTensor(),
     transforms.Normalize((0.5,), (0.5,))])
 
-# Store separate training and validations splits in ./data
+# ./data폴더에 학습셋과 검증셋 분할하여 저장
 training_set = torchvision.datasets.FashionMNIST('./data',
     download=True,
     train=True,
@@ -98,11 +94,11 @@ validation_loader = torch.utils.data.DataLoader(validation_set,
                                                 shuffle=False,
                                                 num_workers=2)
 
-# Class labels
+# 클레스 라벨
 classes = ('T-shirt/top', 'Trouser', 'Pullover', 'Dress', 'Coat',
         'Sandal', 'Shirt', 'Sneaker', 'Bag', 'Ankle Boot')
 
-# Helper function for inline image display
+# 이미지를 내부에서 표현할 수 있도록 도와주는 함수
 def matplotlib_imshow(img, one_channel=False):
     if one_channel:
         img = img.mean(dim=0)
@@ -113,50 +109,50 @@ def matplotlib_imshow(img, one_channel=False):
     else:
         plt.imshow(np.transpose(npimg, (1, 2, 0)))
 
-# Extract a batch of 4 images
+# 4개의 이미치 배치 추출
 dataiter = iter(training_loader)
 images, labels = dataiter.next()
 
-# Create a grid from the images and show them
+# 이미지로 부터 4개의 그리드를 생성하고 보여주기
 img_grid = torchvision.utils.make_grid(images)
 matplotlib_imshow(img_grid, one_channel=True)
 
 
 ########################################################################
-# Above, we used TorchVision and Matplotlib to create a visual grid of a
-# minibatch of our input data. Below, we use the ``add_image()`` call on
-# ``SummaryWriter`` to log the image for consumption by TensorBoard, and
-# we also call ``flush()`` to make sure it’s written to disk right away.
+# 위에서 TorchVision과 Matplotlib를 사용해 인풋데이터의 미니배치를 보여주기 위한 그리드를 생성하였습니다.
+# 아래에서는 ``add_image()``를 사용해 텐서보드에 사용된 이미지를 기록하기 위한``SummaryWriter``를 불러옵니다.
+# 또한 디스크에 이미지를 정확하게 쓰기 위한 ``flush()``를 불러옵니다.
 #
 
-# Default log_dir argument is "runs" - but it's good to be specific
-# torch.utils.tensorboard.SummaryWriter is imported above
+# 기본적으로 기록할 디렉터리는 runs이지만 구체적일 수록 좋음
+# torch.utils.tensorboard.SummaryWriter는 위에서 선언됨
 writer = SummaryWriter('runs/fashion_mnist_experiment_1')
 
-# Write image data to TensorBoard log dir
+# 탠서보드 로그 디렉토리에 아마자데이터 쓰기
 writer.add_image('Four Fashion-MNIST Images', img_grid)
 writer.flush()
 
-# To view, start TensorBoard on the command line with:
+# 텐서보드를 시작하고 보기 위해서 아래의 명령어를 입력:
 #   tensorboard --logdir=runs
-# ...and open a browser tab to http://localhost:6006/
+# ...텐서보드를 열기위해 http://localhost:6006/ 로 접속
 
 
 ##########################################################################
-# If you start TensorBoard at the command line and open it in a new
-# browser tab (usually at `localhost:6006 <localhost:6006>`__), you should
-# see the image grid under the IMAGES tab.
-#
-# Graphing Scalars to Visualize Training
+# 만약 명령어로 텐서보드를 시작하고 새로운 브라우저 탭에서 열 경우(보통은 `localhost:6006 <localhost:6006>`__) Images탭에서 이미지 그리드를 볼 수 있습니다. 
+
+# 학습을 시각화하기 위한 스칼라 그래프화
 # --------------------------------------
 #
 # TensorBoard is useful for tracking the progress and efficacy of your
 # training. Below, we’ll run a training loop, track some metrics, and save
 # the data for TensorBoard’s consumption.
-#
+# 텐서보드는 학습의 진행상황과 잘 되고 있는지 추적하기에 유용합니다.
+# 아래에서는 학습을 진행하고 몇가지 매트릭을 추적하고, 텐서보드에 데이터를 저장할 것입니다. 
+
+
 # Let’s define a model to categorize our image tiles, and an optimizer and
 # loss function for training:
-#
+# 학습을 위한 loss함수와 옵티마이저, 이미지를 분류하기 위한 모델을 정의해보시다 :
 
 class Net(nn.Module):
     def __init__(self):
@@ -184,16 +180,15 @@ optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
 
 
 ##########################################################################
-# Now let’s train a single epoch, and evaluate the training vs. validation
-# set losses every 1000 batches:
-#
+# 이제 1에폭을 학습해 보며 1000배치를 학습할 때마다 검증셋 loss를 평가해봅시다. :
+# 
 
 print(len(validation_loader))
-for epoch in range(1):  # loop over the dataset multiple times
+for epoch in range(1):  # 데이터셋을 여러번 반복
     running_loss = 0.0
 
     for i, data in enumerate(training_loader, 0):
-        # basic training loop
+        # 기본 학습 과정
         inputs, labels = data
         optimizer.zero_grad()
         outputs = net(inputs)
@@ -202,23 +197,23 @@ for epoch in range(1):  # loop over the dataset multiple times
         optimizer.step()
 
         running_loss += loss.item()
-        if i % 1000 == 999:    # Every 1000 mini-batches...
+        if i % 1000 == 999:    # 100 미니배치마다 실행
             print('Batch {}'.format(i + 1))
-            # Check against the validation set
+            # 검증셋에 대하여 loss확인
             running_vloss = 0.0
 
-            net.train(False) # Don't need to track gradents for validation
+            net.train(False) # 검증에는 변화도가 필요없음
             for j, vdata in enumerate(validation_loader, 0):
                 vinputs, vlabels = vdata
                 voutputs = net(vinputs)
                 vloss = criterion(voutputs, vlabels)
                 running_vloss += vloss.item()
-            net.train(True) # Turn gradients back on for training
+            net.train(True) # 다음 학습을 위해 변화도를 다시 True로 변경
 
             avg_loss = running_loss / 1000
             avg_vloss = running_vloss / len(validation_loader)
 
-            # Log the running loss averaged per batch
+            # 배치마다 평균 loss 기록
             writer.add_scalars('Training vs. Validation Loss',
                             { 'Training' : avg_loss, 'Validation' : avg_vloss },
                             epoch * len(training_loader) + i)
@@ -230,59 +225,54 @@ writer.flush()
 
 
 #########################################################################
-# Switch to your open TensorBoard and have a look at the SCALARS tab.
+# 텐서보드로 전환해 SCALARS 탭을 보세요.
 #
-# Visualizing Your Model
+# 모델의 시각화
 # ----------------------
 #
-# TensorBoard can also be used to examine the data flow within your model.
-# To do this, call the ``add_graph()`` method with a model and sample
-# input. When you open
+# 텐서보드는 모델 안에서 데이터 흐름을 시험하는데 사용할 수도 있습니다.
+# 그러기 위해서는 모델과 샘플 인풋을 인자로 받는``add_graph()``메소드를 호출하세요.
+# 열기 위해서:
 #
 
-# Again, grab a single mini-batch of images
+# 다시 이미지의 1 미니배치를 가져오기
 dataiter = iter(training_loader)
 images, labels = dataiter.next()
 
-# add_graph() will trace the sample input through your model,
-# and render it as a graph.
+# add_graph() 는 모델을 통해 샘플 인풋을 추적하고, 그래프를 만듬
 writer.add_graph(net, images)
 writer.flush()
 
 
 #########################################################################
-# When you switch over to TensorBoard, you should see a GRAPHS tab.
-# Double-click the “NET” node to see the layers and data flow within your
-# model.
+# 텐서보드로 전환하면 GRAPHS 탭을 볼수 있을 것입니다.
+# 모델의 레이어와 데이터 흐름도를 보기 위해 "NET"항목을 더블클릭하세요.
 #
-# Visualizing Your Dataset with Embeddings
+# 임베딩을 통한 데이터셋 시각화
 # ----------------------------------------
 #
-# The 28-by-28 image tiles we’re using can be modeled as 784-dimensional
-# vectors (28 \* 28 = 784). It can be instructive to project this to a
-# lower-dimensional representation. The ``add_embedding()`` method will
-# project a set of data onto the three dimensions with highest variance,
-# and display them as an interactive 3D chart. The ``add_embedding()``
-# method does this automatically by projecting to the three dimensions
-# with highest variance.
+# 우리가 사용할 28*28 이미지들은 784차원의 벡터로 모델링 될 수 있습니다.(28 \* 28 = 784). 
+# 이것을 낮은 차원에 투영할 수 있습니다.
+# ``add_embedding()``메소드는 데이터를 삼차원에 큰 분산으로 투영하고 3D 차트로 보여줄것입니다.
+# ``add_embedding()``는 데이터를 삼차원에 큰 분산으로 투영함으로서 자동으로 수행해줍니다.
 #
-# Below, we’ll take a sample of our data, and generate such an embedding:
+# 아래에서 우리는 데이터의 샘플을 가지고 이러한 임베딩을 생서할 것입니다.
 #
 
-# Select a random subset of data and corresponding labels
+# 데이터와 해당 레이블들을 랜덤으로 선택 
 def select_n_random(data, labels, n=100):
     assert len(data) == len(labels)
 
     perm = torch.randperm(len(data))
     return data[perm][:n], labels[perm][:n]
 
-# Extract a random subset of data
+# 데이터의 랜덤셋 추출
 images, labels = select_n_random(training_set.data, training_set.targets)
 
-# get the class labels for each image
+# 각 이미지의 클래스 레이블 추출
 class_labels = [classes[label] for label in labels]
 
-# log embeddings
+# 임베딩 기록
 features = images.view(-1, 28 * 28)
 writer.add_embedding(features,
                     metadata=class_labels,
@@ -292,22 +282,18 @@ writer.close()
 
 
 #######################################################################
-# Now if you switch to TensorBoard and select the PROJECTOR tab, you
-# should see a 3D representation of the projection. You can rotate and
-# zoom the model. Examine it at large and small scales, and see whether
-# you can spot patterns in the projected data and the clustering of
-# labels.
+# 이제 텐서보드로 전환하고 PROJECTOR 탭을 선택한다면 투영된 백터의 3D 표현을 볼 수 있습니다. 모델을 확대하고 회전할 수 있습니다.
+# 크고 작은 스케일로 시험해보고 투영화 된 데이터와 군집화된 라벨들에서 패턴을 착을 수 있는지 보세요.
 #
-# For better visibility, it’s recommended to:
+# 더 나은 시각화를 위해 아래를 추천합니다. :
 #
-# - Select “label” from the “Color by” drop-down on the left.
-# - Toggle the Night Mode icon along the top to place the
-#   light-colored images on a dark background.
+# - 왼쪽의 “Color by”로 부터 "label" 선택
+# - 밝은 색의 이미지를 어두운 배경에서 보고싶으면 상단의 야간 모드 아이콘을 전환 
 #
-# Other Resources
+# 다른 자료
 # ---------------
 #
-# For more information, have a look at:
+# 더 많은 정보를 위해 아래를 확인하세요.:
 #
 # - PyTorch documentation on `torch.utils.tensorboard.SummaryWriter <https://pytorch.org/docs/stable/tensorboard.html?highlight=summarywriter>`__
 # - Tensorboard tutorial content in the `PyTorch.org Tutorials <https://tutorials.pytorch.kr/>`__
