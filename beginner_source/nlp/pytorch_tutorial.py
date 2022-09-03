@@ -141,7 +141,7 @@ print(x.view(2, -1))
 
 
 ######################################################################
-# 계산 그래프(Computation Graph) 와 자동미분(Automatic Differentiation)
+# 계산 그래프(Computation Graph) 와 자동 미분(Automatic Differentiation)
 # ================================================
 #
 # 계산 그래프의 개념은 직접 역전파 변화도(gradient)를 쓰지 않아도 되도록 하여
