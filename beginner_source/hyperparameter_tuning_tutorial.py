@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-RAY TUNE을 이용한 HYPERPARAMETER 튜닝
+Ray Tune을 이용한 하이퍼파라미터 튜닝
 ===================================
 **번역**: `심형준 <http://github.com/95hj>`_
 하이퍼파라미터 튜닝은 평균적인 모델과 매우 정확한 모델간의 차이를 만들어 낼 수 있습니다. 
@@ -67,7 +67,7 @@ def load_data(data_dir="./data"):
 # 구성 가능한 신경망
 # ---------------------------
 # 구성 가능한 파라미터만 튜닝이 가능합니다. 
-# 이 예시를 통해 fully connected layers의 계층 크기를 지정할 수 있습니다.
+# 이 예시를 통해 fully connected layer 크기를 지정할 수 있습니다.
 
 
 class Net(nn.Module):
@@ -90,10 +90,10 @@ class Net(nn.Module):
         return x
 
 ######################################################################
-# 훈련 함수
+# 학습 함수
 # ------------------
 # 흥미롭게 하기 위해 `파이토치 문서에서 <https://tutorials.pytorch.kr/beginner/blitz/cifar10_tutorial.html>`_ 
-# 예제에 몇 가지 변경 사항을 소개합니다.
+# 예제에 일부를 변경하여 소개합니다.
 #
 # 훈련 스크립트를 ``train_cifar(config, checkpoint_dir=None, data_dir=None)`` 함수로 래핑합니다. 
 # 짐작할 수 있듯이, ``config`` 매개변수는 훈련할 하이퍼파라미터를 받습니다. ``checkpoint_dir`` 매개변수는 체크포인트를
@@ -110,7 +110,7 @@ class Net(nn.Module):
 #         net.load_state_dict(model_state)
 #         optimizer.load_state_dict(optimizer_state)
 #
-# 옵티마이저의 학습률(learning rate) 또한 구성할 수 있습니다.
+# 또한, 옵티마이저의 학습률(learning rate)을 구성할 수 있습니다.
 #
 # .. code-block:: python
 #
@@ -260,7 +260,7 @@ def train_cifar(config, checkpoint_dir=None, data_dir=None):
     print("Finished Training")
 
 ######################################################################
-# 보다싶이, 대부분의 코드는 원본 예제에서 직접 적용되었습니다.
+# 보다시피, 대부분의 코드는 원본 예제에서 직접 적용되었습니다.
 #
 # Test set 정확도(accuracy)
 # -----------------
@@ -307,10 +307,10 @@ def test_accuracy(net, device="cpu"):
 # 이 예제에서 ``l1`` 과 ``l2`` 파라미터는 4와 256 사이의 2의 거듭제곱이어야 하므로 4, 8, 16, 32, 64, 128, 256입니다. 
 # ``lr`` (학습률)은 0.0001과 0.1 사이에서 균일하게 샘플링 되어아 합니다. 마지막으로, 배치 크기는 2, 4, 8, 16중에서 선택할 수 있습니다.
 #
-#각 시도에서, Ray Tune은 이제 이러한 검색 공간에서 매개변수 조합을 무작위로 샘플링합니다. 
+# 각 시도에서, Ray Tune은 이제 이러한 검색 공간에서 매개변수 조합을 무작위로 샘플링합니다. 
 # 그런 다음 여러 모델을 병렬로 훈련하고 이 중에서 가장 성능이 좋은 모델을 찾습니다. 또한 성능이 좋지 않은 시도를 조기에 종료하는 ``ASHAScheduler`` 를 사용합니다.
 #
-#상수 ``data_dir`` 파라미터를 설정하기 위해 ``functools.partial`` 로 ``train_cifar`` 함수를 래핑합니다. 또한 각 시도에 사용할 수 있는 자원들(resources)을 Ray Tune에 알릴 수 있습니다.
+# 상수 ``data_dir`` 파라미터를 설정하기 위해 ``functools.partial`` 로 ``train_cifar`` 함수를 래핑합니다. 또한 각 시도에 사용할 수 있는 자원들(resources)을 Ray Tune에 알릴 수 있습니다.
 #
 # .. code-block:: python
 #
@@ -391,7 +391,7 @@ if __name__ == "__main__":
 
 
 ######################################################################
-# 코드를 실행하면 결과는 다음과 같을 것입니다.
+# 코드를 실행하면 결과는 다음과 같습니다.
 #
 # ::
 #
