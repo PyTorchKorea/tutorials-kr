@@ -6,8 +6,8 @@ PyTorch는 Raspberry Pi 4에서 바로 사용할 수 있습니다.
 이 튜토리얼은 Raspberry Pi 4에서 PyTorch를 설정하는 방법과 CPU에서 실시간으로 (30 fps+)
 MobileNet v2 분류 모델을 실행하는 방법을 안내합니다.
 
-이 튜토리얼은 모두 Raspberry Pi 4 Model B 4GB를 이용해 테스트 했지만 2GB 모델(variant) 이나 
-성능이 낮은 3B에서도 작동합니다.
+이 튜토리얼은 모두 Raspberry Pi 4 Model B 4GB를 이용해 테스트 했지만 2GB 모델(variant) 이나
+3B에서도 낮은 성능으로 작동합니다.
 
 .. image:: https://user-images.githubusercontent.com/909104/153093710-bc736b6f-69d9-4a50-a3e8-9f2b2c9e04fd.gif
 
@@ -19,7 +19,7 @@ MobileNet v2 분류 모델을 실행하는 방법을 안내합니다.
 
 * `Raspberry Pi 4 Model B 2GB+ <https://www.raspberrypi.com/products/raspberry-pi-4-model-b/>`_
 * `Raspberry Pi 카메라 모듈 <https://www.raspberrypi.com/products/camera-module-v2/>`_
-* 방열판 및 팬 (선택사항이지만 사용하는걸 권장합니다.)
+* 방열판 및 팬 (선택사항이지만 사용하는 걸 권장합니다.)
 * 5V 3A USB-C 전원 공급 장치
 * SD 카드 (최소 8GB)
 * SD 카드 리더기
@@ -87,7 +87,7 @@ PyTorch 및 OpenCV 설치
 ~~~~~~~~~~~
 
 영상 촬영의 경우 더 일반적으로 쓰이는 ``picamera`` 대신 OpenCV를 사용하여 영상 프레임을 스트리밍 할 것입니다.
-`picamera`는 64-bit Raspberry Pi OS에서 사용이 불가능하고 OpenCV보다 훨씬 느립니다.
+`picamera` 는 64-bit Raspberry Pi OS에서 사용이 불가능하고 OpenCV보다 훨씬 느립니다.
 OpenCV는 ``/dev/video0`` 장치에 직접 접근하여 프레임을 가져옵니다.
 
 이 튜토리얼에서 사용하는 모델 (MobileNetV2) 은 ``224x224`` 크기의 이미지를 사용하므로 OpenCV에서 36fps를 직접 요청할 수 있습니다.
@@ -148,7 +148,7 @@ OpenCV는 ``numpy`` 배열을 BGR로 반환하므로 이 배열을 읽고 약간
 Raspberry Pi 4 벤치마크 결과:
 
 +--------------------+------+-----------------------+-----------------------+--------------------+
-| 모델                | FPS  | 전체 시간    (ms/frame) | 모델 시간     (ms/frame) | qnnpack 사전 훈련    |
+| Model              | FPS  |  전체 시간 (ms/frame) |  모델 시간 (ms/frame) |   qnnpack 사전훈련 |
 +====================+======+=======================+=======================+====================+
 | mobilenet_v2       | 33.7 |                  29.7 |                  26.4 | True               |
 +--------------------+------+-----------------------+-----------------------+--------------------+
@@ -179,8 +179,8 @@ MobileNetV2: 양자화 그리고 JIT
 최적의 성능을 위해서는 양자화되고 융합된 모델이 필요합니다.
 양자화되었다는 뜻은 표준 float32 연산보다 훨씬 성능이 좋은 int8을 사용하여 계산하는 것입니다.
 융합되었다는 뜻은 가능한 경우 연속된 작업이 더 성능이 좋은 버전으로 함께 융합되는 것을 말합니다.
-일반적으로 활성화 (``ReLU``)와 같은 것들은 추론(inference)하는 동안 (``Conv2d``) 전에
-레이어에 병합될 수 있습니다.
+일반적으로 활성화 (``ReLU``)와 같은 것들은 추론(inference)하는 동안 이전 레이어 (``Conv2d``)
+에 병합될 수 있습니다.
 
 aarch64 버전의 pytorch는 ``qnnpack`` 엔진을 사용해야 합니다.
 
@@ -240,7 +240,7 @@ aarch64 버전의 pytorch는 ``qnnpack`` 엔진을 사용해야 합니다.
 
     with torch.no_grad():
         while True:
-            # 프레임 읽기
+            # 영상 읽기
             ret, image = cap.read()
             if not ret:
                 raise RuntimeError("failed to read frame")
@@ -257,7 +257,7 @@ aarch64 버전의 pytorch는 ``qnnpack`` 엔진을 사용해야 합니다.
 
             # 모델 실행
             output = net(input_batch)
-            # output으로 무언가를 처리 ...
+            # 출력으로 무언가를 처리 ...
 
             # 모델 성능 기록
             frame_count += 1
