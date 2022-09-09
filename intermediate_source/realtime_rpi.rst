@@ -1,12 +1,13 @@
 Raspberry Pi 4 에서 실시간 추론(Inference) (30fps!)
 ===================================================
 **Author**: `Tristan Rice <https://github.com/d4l3k>`_
+  **번역**: `조윤진 <https://github.com/YunjinJo>`_
 
-PyTorch는 Raspberry Pi 4에서 바로 사용할 수 있습니다. 
+PyTorch는 Raspberry Pi 4에서 별도의 설정 없이 지원합니다.
 이 튜토리얼은 Raspberry Pi 4에서 PyTorch를 설정하는 방법과 CPU에서 실시간으로 (30 fps+)
 MobileNet v2 분류 모델을 실행하는 방법을 안내합니다.
 
-이 튜토리얼은 모두 Raspberry Pi 4 Model B 4GB를 이용해 테스트 했지만 2GB 모델(variant) 이나
+이 튜토리얼은 모두 Raspberry Pi 4 Model B 4GB를 이용해 테스트 했지만 2GB 변형 모델(variant) 이나
 3B에서도 낮은 성능으로 작동합니다.
 
 .. image:: https://user-images.githubusercontent.com/909104/153093710-bc736b6f-69d9-4a50-a3e8-9f2b2c9e04fd.gif
@@ -14,8 +15,7 @@ MobileNet v2 분류 모델을 실행하는 방법을 안내합니다.
 준비물
 ~~~~~~~
 
-이 튜토리얼을 따라하려면 Raspberry Pi 4, 카메라 
-그리고 기타 모든 표준 액세서리가 필요합니다.
+이 튜토리얼을 따라하려면 Raspberry Pi 4, 카메라, 기타 모든 표준 액세서리가 필요합니다.
 
 * `Raspberry Pi 4 Model B 2GB+ <https://www.raspberrypi.com/products/raspberry-pi-4-model-b/>`_
 * `Raspberry Pi 카메라 모듈 <https://www.raspberrypi.com/products/camera-module-v2/>`_
@@ -189,14 +189,14 @@ aarch64 버전의 pytorch는 ``qnnpack`` 엔진을 사용해야 합니다.
     import torch
     torch.backends.quantized.engine = 'qnnpack'
 
-이 예제에서는 torchvision에서 바로 제공하는 미리 양자화 그리고 융합된 버전의 MobileNetV2를 사용합니다.
+이 예제에서는 torchvision에서 바로 사용할 수 있는 미리 양자화(prequantized)와 융합된(fused) 버전의 MobileNetV2를 사용합니다.
 
 .. code:: python
 
     from torchvision import models
     net = models.quantization.mobilenet_v2(pretrained=True, quantize=True)
 
-다음으로 Python 오버헤드를 줄이고 모든 작업을 융합하기 위해 모델을 JIT합니다. JIT 없이는 ~20fps를 제공하지만 JIT은 ~30fps를 제공합니다.
+다음으로 Python 오버헤드를 줄이고 모든 작업을 융합하기 위해 모델을 JIT합니다. JIT 없이는 ~20fps이지만 JIT를 사용하면 ~30fps입니다.
 
 .. code:: python
 
