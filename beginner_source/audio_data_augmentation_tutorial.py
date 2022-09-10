@@ -59,7 +59,7 @@ SAMPLE_NOISE = download_asset("tutorial-assets/Lab41-SRI-VOiCES-rm1-babb-mc01-st
 # ``sox`` 는 자동으로 효과를 추가하지만, ``torchaudio`` 의 구현은 그렇지 않다는 점입니다.
 #
 # 사용 가능한 효과들의 목록을 알고싶다면, `the sox
-# documentation <http://sox.sourceforge.net/sox.html>`__. 을 참조해주세요.
+# documentation <http://sox.sourceforge.net/sox.html>`__ 을 참조해주세요.
 #
 # **Tip** 즉석으로 오디오 데이터 로드와 다시 샘플링 하고싶다면, 
 # 효과 ``"rate"`` 와 함께 :py:func:`torchaudio.sox_effects.apply_effects_file` 을 사용하세요.
@@ -79,7 +79,7 @@ waveform1, sample_rate1 = torchaudio.load(SAMPLE_WAV)
 effects = [
     ["lowpass", "-1", "300"],  # 단극 저주파 통과 필터를 적용합니다.
     ["speed", "0.8"],  # 속도를 감소시킵니다.
-    # 이 부분은 샘플 레이트만 변경하기에, 이것 후에
+    # 이 부분은 샘플 레이트만 변경하기에, 이후에
     # 필수적으로 `rate` 효과를 기존 샘플 레이트로 주어야합니다.
     ["rate", f"{sample_rate1}"],
     ["reverb", "-w"],  # 잔향은 약간의 극적인 느낌을 줍니다.
@@ -392,7 +392,7 @@ filtered, sample_rate2 = torchaudio.sox_effects.apply_effects_tensor(
 
 plot_specgram(filtered, sample_rate2, title="Filtered")
 
-# 전화 코텍 적용하기
+# 전화 코덱 적용하기
 codec_applied = F.apply_codec(filtered, sample_rate2, format="gsm")
 
 plot_specgram(codec_applied, sample_rate2, title="GSM Codec Applied")
