@@ -178,7 +178,7 @@ plot_specgram(rir_raw, sample_rate, title="Room Impulse Response (raw)")
 Audio(rir_raw, rate=sample_rate)
 
 ######################################################################
-# 먼저, RIR을 깨끗하게 만들어줘야합니다. 주요한 충격을 추출하고,
+# 먼저, RIR을 깨끗하게 만들어줘야합니다. 주요한 임펄스를 추출하고,
 # 신호 전력을 정규화 합니다. 그리고 나서 시간축을 뒤집어 줍니다.
 #
 
