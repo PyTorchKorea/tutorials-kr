@@ -10,7 +10,7 @@
 이 튜토리얼에서는 효과, 필터,
 공간 임펄스 응답(RIR, Room Impulse Response)과 코덱을 적용하는 방법을 살펴보겠습니다.
 
-끝에서는, 깨끗한 음성으로 부터 휴대폰 너머의 잡음이 낀 음성을 합성하겠습니다. 
+하단부에서는, 깨끗한 음성으로 부터 휴대폰 너머의 잡음이 낀 음성을 합성하겠습니다. 
 """
 
 import torch
@@ -24,7 +24,7 @@ print(torchaudio.__version__)
 # 준비
 # -----------
 #
-# 먼저, 모듈을 불러오고 튜토리얼에 사용할 오디오 자료들을 다운합니다.
+# 먼저, 모듈을 불러오고 튜토리얼에 사용할 오디오 자료들을 다운로드합니다.
 #
 
 import math
@@ -45,9 +45,9 @@ SAMPLE_NOISE = download_asset("tutorial-assets/Lab41-SRI-VOiCES-rm1-babb-mc01-st
 # ------------------------------
 #
 # :py:func:`torchaudio.sox_effects` 는 ``sox`` 와 유사한 필터들을 
-# 텐서 객체들과 파일 객체 오디오 소스들에 즉각 적용 해줍니다.
+# 텐서 객체들과 파일 객체 오디오 소스들에 직접 적용 해줍니다.
 #
-# 이 작업에 두가지 함수가 있습니다:
+# 이를 위해 두가지 함수가 사용됩니다:
 #
 # -  :py:func:`torchaudio.sox_effects.apply_effects_tensor` 는 텐서에
 #    효과를 적용합니다.
@@ -56,9 +56,9 @@ SAMPLE_NOISE = download_asset("tutorial-assets/Lab41-SRI-VOiCES-rm1-babb-mc01-st
 #
 # 두 함수들은 효과의 정의를  ``List[List[str]]`` 형태로 받아들입니다.
 # ``sox`` 와 작동하는 방법이 거의 유사합니다. 하지만, 한가지 유의점은
-# ``sox`` 는 자동으로 효과를 추가하지만, ``torchaudio`` 의 구현은 그렇지 않습니다.  
+# ``sox`` 는 자동으로 효과를 추가하지만, ``torchaudio`` 의 구현은 그렇지 않다는 점입니다.
 #
-# 사용 가능한 효과들의 리스트를 알고싶다면, `the sox
+# 사용 가능한 효과들의 목록을 알고싶다면, `the sox
 # documentation <http://sox.sourceforge.net/sox.html>`__. 을 참조해주세요.
 #
 # **Tip** 즉석으로 오디오 데이터 로드와 다시 샘플링 하고싶다면, 
@@ -79,10 +79,10 @@ waveform1, sample_rate1 = torchaudio.load(SAMPLE_WAV)
 effects = [
     ["lowpass", "-1", "300"],  # 단극 저주파 통과 필터를 적용합니다.
     ["speed", "0.8"],  # 속도를 감소시킵니다.
-    # 이것은 샘플 레이트만 변경하기에, 이것 후에
+    # 이 부분은 샘플 레이트만 변경하기에, 이것 후에
     # 필수적으로 `rate` 효과를 기존 샘플 레이트로 주어야합니다.
     ["rate", f"{sample_rate1}"],
-    ["reverb", "-w"],  # 잔향은 약간의 극적인 줍니다.
+    ["reverb", "-w"],  # 잔향은 약간의 극적인 느낌을 줍니다.
 ]
 
 # 효과들을 적용합니다.
@@ -189,7 +189,7 @@ RIR = torch.flip(rir, [1])
 plot_waveform(rir, sample_rate, title="Room Impulse Response")
 
 ######################################################################
-# 그 후, RIR 필터와 음성 신호를 컨볼루션 합니다.
+# 그 후, RIR 필터와 음성 신호를 합성곱 합니다.
 #
 
 speech, _ = torchaudio.load(SAMPLE_SPEECH)
@@ -287,7 +287,7 @@ Audio(noisy_speech, rate=sample_rate)
 # 코덱을 텐서 객체에 적용하기
 # -------------------------------
 #
-# :py:func:`torchaudio.functional.apply_codec` 는 텐서 오브젝트에 코댁을 적용합니다.
+# :py:func:`torchaudio.functional.apply_codec` 는 텐서 오브젝트에 코덱을 적용합니다.
 #
 # **Note** 이 과정은 미분 불가능합니다.
 #
