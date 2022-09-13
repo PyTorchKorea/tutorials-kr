@@ -158,7 +158,7 @@ KeyedJaggedTensor로 미니 배치 표현하기
 예제 및 기능별로 객체 ID가 임의의 수인 다양한 예제를 효율적으로 나타내야 합니다. 
 다양한 표현이 가능하도록, TorchRec 데이터구조 |KeyedJaggedTensor|_ (KJT)를 사용합니다.
 
-“product” 와 “user”, 2개의 임베딩 그룹의 컬렉션을 참조하는 방법을 살펴봅니다. 
+“product” 와 “user”, 2개의 EmbeddingBag의 컬렉션을 참조하는 방법을 살펴봅니다. 
 미니배치가 3명의 사용자와 3개의 예제로 구성되어 있다고 가정합니다. 
 첫 번째는 2개의 product ID를 가지고, 두 번째는 아무것도 가지지 않고, 세 번째는 하나의 product ID를 가집니다. 
 
