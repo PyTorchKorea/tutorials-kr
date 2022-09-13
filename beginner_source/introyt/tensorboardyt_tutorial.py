@@ -10,7 +10,7 @@
 파이토치 텐서보드 지원
 ===========================
 
-아래 `유튜브 <https://www.youtube.com/watch?v=6CEld3hZgqc>`__를 따라 하세요.
+아래 `유튜브 <https://www.youtube.com/watch?v=6CEld3hZgqc>`__ 를 따라 하세요.
 
 .. raw:: html
 
@@ -23,14 +23,14 @@
 
 이 튜토리얼을 진행하기 위해 PyTorch와 TorchVision, Matplotlib, TensorBoard 설치가 필요합니다. 
 
-``conda``로 설치:
+ ``conda`` 로 설치:
 
-``conda install pytorch torchvision -c pytorch``
-``conda install matplotlib tensorboard``
+ ``conda install pytorch torchvision -c pytorch`` 
+ ``conda install matplotlib tensorboard`` 
 
-``pip``으로 설치:
+ ``pip`` 으로 설치:
 
-``pip install torch torchvision matplotlib tensorboard``
+ ``pip install torch torchvision matplotlib tensorboard`` 
 
 필요한 라이브러리들이 모두 설치되면, 설치된 파이썬 환경에서 노트북(주피터 노트북)을 재실행하세요.
 
@@ -65,7 +65,7 @@ from torch.utils.tensorboard import SummaryWriter
 # 텐서보드에서 이미지 보기
 # -----------------------------
 #
-# 데이터셋에서 텐서보드로 샘플이미지를 추가하는것으로 시작해 봅시다.:
+# 데이터셋에서 텐서보드로 샘플이미지를 추가하는 것으로 시작해 봅시다:
 #
 
 # 데이터셋 수집 및 데이터셋을 사용할 수 있도록 준비
@@ -113,13 +113,13 @@ def matplotlib_imshow(img, one_channel=False):
 dataiter = iter(training_loader)
 images, labels = dataiter.next()
 
-# 이미지로 부터 4개의 그리드를 생성하고 보여주기
+# 이미지로부터 4개의 그리드를 생성하고 보여주기
 img_grid = torchvision.utils.make_grid(images)
 matplotlib_imshow(img_grid, one_channel=True)
 
 
 ########################################################################
-# 위에서 TorchVision과 Matplotlib를 사용해 인풋데이터의 미니배치를 보여주기 위한 그리드를 생성하였습니다.
+# 위에서 TorchVision과 Matplotlib를 사용해 입력 데이터의 미니배치를 보여주기 위한 그리드를 생성하였습니다.
 # 아래에서는 ``add_image()``를 사용해 텐서보드에 사용된 이미지를 기록하기 위한``SummaryWriter``를 불러옵니다.
 # 또한 디스크에 이미지를 정확하게 쓰기 위한 ``flush()``를 불러옵니다.
 #
@@ -128,13 +128,13 @@ matplotlib_imshow(img_grid, one_channel=True)
 # torch.utils.tensorboard.SummaryWriter는 위에서 선언됨
 writer = SummaryWriter('runs/fashion_mnist_experiment_1')
 
-# 탠서보드 로그 디렉토리에 아마자데이터 쓰기
+# 탠서보드 로그 디렉토리에 이미지 데이터 출력하기
 writer.add_image('Four Fashion-MNIST Images', img_grid)
 writer.flush()
 
 # 텐서보드를 시작하고 보기 위해서 아래의 명령어를 입력:
 #   tensorboard --logdir=runs
-# ...텐서보드를 열기위해 http://localhost:6006/ 로 접속
+# ...텐서보드를 열기 위해 http://localhost:6006/ 로 접속
 
 
 ##########################################################################
@@ -152,7 +152,7 @@ writer.flush()
 
 # Let’s define a model to categorize our image tiles, and an optimizer and
 # loss function for training:
-# 학습을 위한 loss함수와 옵티마이저, 이미지를 분류하기 위한 모델을 정의해보시다 :
+# 학습을 위한 loss함수와 옵티마이저, 이미지를 분류하기 위한 모델을 정의해봅시다 :
 
 class Net(nn.Module):
     def __init__(self):
@@ -231,15 +231,14 @@ writer.flush()
 # ----------------------
 #
 # 텐서보드는 모델 안에서 데이터 흐름을 시험하는데 사용할 수도 있습니다.
-# 그러기 위해서는 모델과 샘플 인풋을 인자로 받는``add_graph()``메소드를 호출하세요.
-# 열기 위해서:
+# 그러기 위해서는, 텐서 보드를 열 때 모델과 샘플 인풋을 인자로 받는 ``add_graph()`` 메소드를 호출하세요.
 #
 
 # 다시 이미지의 1 미니배치를 가져오기
 dataiter = iter(training_loader)
 images, labels = dataiter.next()
 
-# add_graph() 는 모델을 통해 샘플 인풋을 추적하고, 그래프를 만듬
+# add_graph() 는 모델을 통해 샘플 입력을 추적하고, 그래프를 만듬
 writer.add_graph(net, images)
 writer.flush()
 
@@ -253,13 +252,13 @@ writer.flush()
 #
 # 우리가 사용할 28*28 이미지들은 784차원의 벡터로 모델링 될 수 있습니다.(28 \* 28 = 784). 
 # 이것을 낮은 차원에 투영할 수 있습니다.
-# ``add_embedding()``메소드는 데이터를 삼차원에 큰 분산으로 투영하고 3D 차트로 보여줄것입니다.
-# ``add_embedding()``는 데이터를 삼차원에 큰 분산으로 투영함으로서 자동으로 수행해줍니다.
+#  ``add_embedding()`` 메소드는 데이터를 삼차원에 큰 분산으로 투영하고 3D 차트로 보여줄것입니다.
+#  ``add_embedding()`` 는 데이터를 삼차원에 큰 분산으로 투영함으로써 자동으로 수행해줍니다.
 #
-# 아래에서 우리는 데이터의 샘플을 가지고 이러한 임베딩을 생서할 것입니다.
+# 아래에서 우리는 데이터의 샘플을 가지고 이러한 임베딩을 생성할 것입니다.
 #
 
-# 데이터와 해당 레이블들을 랜덤으로 선택 
+# 데이터와 해당 라벨들을 랜덤으로 선택 
 def select_n_random(data, labels, n=100):
     assert len(data) == len(labels)
 
@@ -269,7 +268,7 @@ def select_n_random(data, labels, n=100):
 # 데이터의 랜덤셋 추출
 images, labels = select_n_random(training_set.data, training_set.targets)
 
-# 각 이미지의 클래스 레이블 추출
+# 각 이미지의 클래스 라벨 추출
 class_labels = [classes[label] for label in labels]
 
 # 임베딩 기록
