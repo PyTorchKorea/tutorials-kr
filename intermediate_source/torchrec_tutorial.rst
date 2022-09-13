@@ -14,10 +14,10 @@ TorchRec 소개
      <iframe width="560" height="315" src="https://www.youtube.com/embed/cjgj41dvSeQ" frameborder="0" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
    </div>
 
-추천 시스템을 구축할 때, 제품이나 페이지와 같은 객체를 임베딩으로 표현하고 싶은 경우가 많습니다. 
+추천 시스템을 만들 때, 제품이나 페이지와 같은 객체를 임베딩으로 표현하고 싶은 경우가 많습니다. 
 Meta AI의 `딥러닝 추천 모델 <https://arxiv.org/abs/1906.00091>`__ 또는 DLRM을 예로 들 수 있습니다. 
-엔티티의 수가 증가함에 따라, 임베딩 테이블의 크기가 단일 GPU의 메모리를 초과할 수 있습니다. 
-일반적인 방법은 모델 병렬화의 일종으로, 임베딩 테이블을 여러 디바이스로 샤딩하는 것입니다. 
+객체의 수가 증가함에 따라, 임베딩 테이블의 크기가 단일 GPU의 메모리를 초과할 수 있습니다. 
+일반적인 방법은 모델 병렬화의 일종으로, 임베딩 테이블을 여러 디바이스로 샤딩(shard)하는 것입니다. 
 이를 위해, TorchRec은 |DistributedModelParallel|_ 또는 DMP로 불리는 주요한 API를 소개합니다. 
 PyTorch의 DistributedDataParallel와 같이, DMP는 분산 학습을 가능하게하기 위해 모델을 포장합니다.
 
@@ -40,8 +40,8 @@ TorchRec을 사용할 때는 CUDA를 적극 추천합니다. CUDA를 사용하�
 개요
 ----
 
-이 튜토리얼에서는 TorchRec의 3가지 부분을 다룹니다. 
-그 3가지는 ``nn.module`` |EmbeddingBagCollection|_, |DistributedModelParallel|_ API, 데이터 구조 |KeyedJaggedTensor|_ 입니다.
+이 튜토리얼에서는 TorchRec의 ``nn.module`` |EmbeddingBagCollection|_, |DistributedModelParallel|_ API, 
+데이터 구조 |KeyedJaggedTensor|_ 3가지 내용을 다룹니다.
 
 
 분산 설정
@@ -110,10 +110,10 @@ EmbeddingBag 그룹을 나타내고자 |EmbeddingBagCollection|_ 을 사용합�
 DistributedModelParallel
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-이제 모델을 |DistributedModelParallel|_ (DMP)로 래핑할 준비가 되었습니다. 
+이제 모델을 |DistributedModelParallel|_ (DMP)로 감쌀 준비가 되었습니다. 
 DMP의 인스턴스화는 다음과 같습니다.
 
-1. 모델을 샤딩(shard)하는 방법을 결정합니다. DMP는 이용 가능한 ‘sharders’를 수집하고
+1. 모델을 샤딩하는 방법을 결정합니다. DMP는 이용 가능한 ‘sharders’를 수집하고
    임베딩 테이블을 샤딩하는 최적의 방법 (즉, the EmbeddingBagCollection)의 ‘plan’을 작성합니다.
 2. 모델을 샤딩합니다. 이 과정은 각 임베딩 테이블을 적절한 장치로 메모리를 할당하는 것을 포함합니다. 
 
@@ -127,14 +127,14 @@ TorchRec은 모두 단일 GPU에 배치합니다.
     print(model.plan)
 
 
-입력과 오프셋이 있는 바닐라 nn.EmbeddingBag 질의
+입력과 오프셋이 있는 기본 nn.EmbeddingBag 질의
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ``input`` 과 ``offsets`` 이 있는 |nn.Embedding|_ 과 |nn.EmbeddingBag|_ 를 질의합니다.
 입력은 lookup 값을 포함하는 1-D 텐서입니다. 
 오프셋은 시퀀스가 각 예제에서 가져오는 값의 수의 합인 1-D 텐서입니다.
 
-위의 EmbeddingBag를 만드는 예는 다음과 같습니다.
+위의 EmbeddingBag을 다시 만들어보는 예는 다음과 같습니다.
 
 ::
 
@@ -155,8 +155,8 @@ TorchRec은 모두 단일 GPU에 배치합니다.
 KeyedJaggedTensor로 미니 배치 표현하기
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-예제 및 기능별로 엔티티 ID가 임의의 수인 다양한 예제를 효율적으로 나타내야 합니다. 
-이 “jagged” 표현을 사용하기 위해, TorchRec 데이터구조 |KeyedJaggedTensor|_ (KJT)를 사용합니다.
+예제 및 기능별로 객체 ID가 임의의 수인 다양한 예제를 효율적으로 나타내야 합니다. 
+다양한 표현이 가능하도록, TorchRec 데이터구조 |KeyedJaggedTensor|_ (KJT)를 사용합니다.
 
 “product” 와 “user”, 2개의 임베딩 그룹의 컬렉션을 참조하는 방법을 살펴봅니다. 
 미니배치가 3명의 사용자와 3개의 예제로 구성되어 있다고 가정합니다. 
