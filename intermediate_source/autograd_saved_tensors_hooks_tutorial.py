@@ -38,10 +38,9 @@
 # :math: `b`:로 상정합니다. 
 
 
-# .. math::  \frac{\partial y}{\partial a} = b
-#
-# .. math::  \frac{\partial y}{\partial b} = a
-#
+ .. math::  \frac{\partial y}{\partial a} = b
+ .. math::  \frac{\partial y}{\partial b} = a
+
 
 import torch
 
@@ -51,17 +50,17 @@ y = a * b
 
 #################################################################
 # torchviz를 사용해서, 계산그래프를 시각화 할 수 있습니다. 
-#  .. figure:: https://user-images.githubusercontent.com/8019486/130124513-72e016a3-c36f-42b9-88e2-53baf3e016c5.png
-#    :width: 300
-#    :align: center
+  .. figure:: https://user-images.githubusercontent.com/8019486/130124513-72e016a3-c36f-42b9-88e2-53baf3e016c5.png
+    :width: 300
+    :align: center
 
 
 ######################################################################
 # 이 예제에서 파이토치는 중간 값 :math: `a` 및 :math: `b` 를 저장하여 역방향 동안 기울기를 계산합니다.
 #
-#  .. figure:: https://user-images.githubusercontent.com/8019486/130124538-3da50977-6f0b-46d0-8909-5456ade9b598.png
-#    :width: 300
-#    :align: center
+  .. figure:: https://user-images.githubusercontent.com/8019486/130124538-3da50977-6f0b-46d0-8909-5456ade9b598.png
+    :width: 300
+    :align: center
 
 
 ######################################################################
@@ -81,9 +80,9 @@ x = torch.randn(5, requires_grad=True)
 y = f(f(f(x)))
 
 ######################################################################
-# .. 그림 :: https://user-images.githubusercontent.com/8019486/130124570-f1074098-1bb3-459e-bf5a-03bf6f65b403.png
-#    :너비: 500
-#    :맞춤: 중간
+ .. figure :: https://user-images.githubusercontent.com/8019486/130124570-f1074098-1bb3-459e-bf5a-03bf6f65b403.png
+    :width: 500
+    :align: center
 
 ######################################################################
 # 위의 예제에서 미분(grad)없이 실행하면 범위내의 ``x`` 와 ``y`` 는 유지되지만
