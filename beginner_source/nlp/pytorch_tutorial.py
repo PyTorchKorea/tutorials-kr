@@ -1,15 +1,16 @@
 # -*- coding: utf-8 -*-
 r"""
-Introduction to PyTorch
+PyTorch 소개
 ***********************
+**번역**: `반보영 <https://github.com/2kkeullim>`_
 
-Introduction to Torch's tensor library
+Torch의 tensor 라이브러리 소개
 ======================================
 
-All of deep learning is computations on tensors, which are
-generalizations of a matrix that can be indexed in more than 2
-dimensions. We will see exactly what this means in-depth later. First,
-let's look what we can do with tensors.
+딥러닝은 모두 tensor에 대한 연산으로,
+2차원 이상에서 인덱싱할 수 있는 행렬의 일반화입니다.
+이것이 정확히 무엇을 의미하는지는 나중에 자세히 알아보겠습니다.
+먼저 tensor로 무엇을 할 수 있는지 알아보겠습니다.
 """
 # Author: Robert Guthrie
 
@@ -19,24 +20,24 @@ torch.manual_seed(1)
 
 
 ######################################################################
-# Creating Tensors
+# Tensor 생성하기
 # ~~~~~~~~~~~~~~~~
 #
-# Tensors can be created from Python lists with the torch.tensor()
-# function.
+# torch.tensor() 함수를 사용하여 Python 리스트로부터
+# tensor를 생성할 수 있습니다.
 #
 
-# torch.tensor(data) creates a torch.Tensor object with the given data.
+# torch.tensor(data)를 통해 주어진 데이터로부터 torch.Tensor object를 생성합니다.
 V_data = [1., 2., 3.]
 V = torch.tensor(V_data)
 print(V)
 
-# Creates a matrix
+# 행렬을 생성합니다
 M_data = [[1., 2., 3.], [4., 5., 6]]
 M = torch.tensor(M_data)
 print(M)
 
-# Create a 3D tensor of size 2x2x2.
+# 2x2x2 크기의 3D tensor를 생성합니다.
 T_data = [[[1., 2.], [3., 4.]],
           [[5., 6.], [7., 8.]]]
 T = torch.tensor(T_data)
@@ -44,42 +45,41 @@ print(T)
 
 
 ######################################################################
-# What is a 3D tensor anyway? Think about it like this. If you have a
-# vector, indexing into the vector gives you a scalar. If you have a
-# matrix, indexing into the matrix gives you a vector. If you have a 3D
-# tensor, then indexing into the tensor gives you a matrix!
+# 도대체 3D tensor는 무엇일까요? 이렇게 생각해 보세요.
+# 벡터의 경우, 인덱싱하면 스칼라가 출력됩니다.
+# 행렬의 경우, 인덱싱하면 벡터가 출력됩니다.
+# 3D tensor의 경우, 인덱싱하면 행렬이 출력됩니다!
 #
-# A note on terminology:
-# when I say "tensor" in this tutorial, it refers
-# to any torch.Tensor object. Matrices and vectors are special cases of
-# torch.Tensors, where their dimension is 2 and 1 respectively. When I am
-# talking about 3D tensors, I will explicitly use the term "3D tensor".
+# 용어 노트:
+# 이 튜토리얼에서 "tensor" 라는 용어는 torch.Tensor object를
+# 나타냅니다. 행렬과 벡터는 torch.Tensor의 차원이 2, 1인
+# 특별한 경우입니다. 3D tensor에 대한
+# 용어를 표현할 때는 명백하게 "3D tensor" 라는 용어를 사용할 것입니다.
 #
 
-# Index into V and get a scalar (0 dimensional tensor)
+# V에서 인덱싱하여 스칼라 얻기 (0 차원 tensor)
 print(V[0])
-# Get a Python number from it
-print(V[0].item())
+# 벡터로부터 Python 숫자 얻기
 
-# Index into M and get a vector
+# M에서 인덱싱하여 벡터 얻기
 print(M[0])
 
-# Index into T and get a matrix
+# T에서 인덱싱하여 행렬 얻기
 print(T[0])
 
 
 ######################################################################
-# You can also create tensors of other data types. To create a tensor of integer types, try
-# torch.tensor([[1, 2], [3, 4]]) (where all elements in the list are integers).
-# You can also specify a data type by passing in ``dtype=torch.data_type``.
-# Check the documentation for more data types, but
-# Float and Long will be the most common.
+# 다른 데이터 타입의 tensor를 생성할 수도 있습니다. integer 타입의 tensor는
+# torch.tensor([[1, 2], [3, 4]])으로 만들 수 있습니다. (이 때, 리스트의 모든 원소는 integer)
+# 또한 ``dtype=torch.data_type`` 을 이용해 데이터 타입을 지정할 수도 있습니다.
+# 추가적인 데이터 타입에 대해서는 문서로 확인할 수 있으며,
+# Float와 Long이 가장 일반적입니다.
 #
 
 
 ######################################################################
-# You can create a tensor with random data and the supplied dimensionality
-# with torch.randn()
+# torch.randn() 으로 제공한 차원을 사용해
+# 랜덤 데이터로 tensor를 만들 수 있습니다.
 #
 
 x = torch.randn((3, 4, 5))
@@ -87,10 +87,10 @@ print(x)
 
 
 ######################################################################
-# Operations with Tensors
+# Tensor 를 사용한 연산
 # ~~~~~~~~~~~~~~~~~~~~~~~
 #
-# You can operate on tensors in the ways you would expect.
+# tensor는 원하는 방식으로 연산할 수 있습니다.
 
 x = torch.tensor([1., 2., 3.])
 y = torch.tensor([4., 5., 6.])
@@ -99,103 +99,102 @@ print(z)
 
 
 ######################################################################
-# See `the documentation <https://pytorch.org/docs/torch.html>`__ for a
-# complete list of the massive number of operations available to you. They
-# expand beyond just mathematical operations.
+# `문서 <https://pytorch.org/docs/torch.html>`__ 에서
+# 사용할 수 있는 엄청난 수의 연산들의 전체 목록을 볼 수 있습니다.
+# 해당 연산 목록은 단순한 수학적인 연산을 뛰어넘습니다.
 #
-# One helpful operation that we will make use of later is concatenation.
+# 나중에 사용할 유용한 연산 중 하나는 결합(concatenation)입니다.
 #
 
-# By default, it concatenates along the first axis (concatenates rows)
+# 기본적으로 첫 번째 축을 따라 결합됩니다 (행(row) 결합)
 x_1 = torch.randn(2, 5)
 y_1 = torch.randn(3, 5)
 z_1 = torch.cat([x_1, y_1])
 print(z_1)
 
-# Concatenate columns:
+# 열(column) 결합
 x_2 = torch.randn(2, 3)
 y_2 = torch.randn(2, 5)
-# second arg specifies which axis to concat along
+# 두 번째 인자는 연결할 축을 지정합니다
 z_2 = torch.cat([x_2, y_2], 1)
 print(z_2)
 
-# If your tensors are not compatible, torch will complain.  Uncomment to see the error
+# tensor가 호환되지 않으면 torch가 불평할겁니다. 밑의 명령어를 주석 해제하여 에러를 출력해보세요
 # torch.cat([x_1, x_2])
 
-
 ######################################################################
-# Reshaping Tensors
+# Tensor 구조 바꾸기
 # ~~~~~~~~~~~~~~~~~
 #
-# Use the .view() method to reshape a tensor. This method receives heavy
-# use, because many neural network components expect their inputs to have
-# a certain shape. Often you will need to reshape before passing your data
-# to the component.
+# .view() 메소드를 사용해 tensor의 구조를 바꿔봅시다. 많은 신경망 구성 요소들은
+# 특정한 구조의 입력을 원하기에, 이 메소드는 아주 많이 사용됩니다.
+# 종종 데이터를 구성 요소로 전달하기 전 구조를 바꿔야 하는 경우가
+# 있습니다.
 #
 
 x = torch.randn(2, 3, 4)
 print(x)
-print(x.view(2, 12))  # Reshape to 2 rows, 12 columns
-# Same as above.  If one of the dimensions is -1, its size can be inferred
+print(x.view(2, 12))  # 2열 12행으로 구조 바꾸기
+# 위와 같습니다.  차원 중 하나가 -1인 경우 그 크기를 유추할 수 있습니다
 print(x.view(2, -1))
 
 
 ######################################################################
-# Computation Graphs and Automatic Differentiation
+# 계산 그래프(Computation Graph) 와 자동 미분(Automatic Differentiation)
 # ================================================
 #
-# The concept of a computation graph is essential to efficient deep
-# learning programming, because it allows you to not have to write the
-# back propagation gradients yourself. A computation graph is simply a
-# specification of how your data is combined to give you the output. Since
-# the graph totally specifies what parameters were involved with which
-# operations, it contains enough information to compute derivatives. This
-# probably sounds vague, so let's see what is going on using the
-# fundamental flag ``requires_grad``.
+# 계산 그래프의 개념은 직접 역전파 변화도(gradient)를 쓸 필요가 없게 해주며
+# 효율적인 딥러닝 프로그래밍에 필수적입니다.
+# 계산 그래프는 간단히 말하자면 출력을 내기 위해
+# 어떻게 데이터를 결합했는지에 대한 설명서입니다.
+# 그래프는 어떤 매개변수가 어떤 연산에 관여하는지를 모두 말해주므로
+# 도함수를 계산하기에 충분한 정보를 가집니다.
+# 이 말이 모호할 수 있으니, 핵심 플래그인
+# ``requires_grad`` 를 사용하여 무슨 일이 일어나는지 알아봅시다.
 #
-# First, think from a programmers perspective. What is stored in the
-# torch.Tensor objects we were creating above? Obviously the data and the
-# shape, and maybe a few other things. But when we added two tensors
-# together, we got an output tensor. All this output tensor knows is its
-# data and shape. It has no idea that it was the sum of two other tensors
-# (it could have been read in from a file, it could be the result of some
-# other operation, etc.)
+# 먼저 프로그래머의 관점에서 생각해봅시다. 위에서 우리가 만든
+# torch.Tensor 오브젝트에는 무엇이 저장되어 있을까요? 분명히 데이터와
+# 구조, 몇 가지 다른 것들이 있을 겁니다. 하지만 2개의 tensor를
+# 함께 추가하면 하나의 결과 tensor를 얻게 되는데, 결과 tensor가 아는 것은
+# 자신의 데이터와 구조뿐입니다. 다른 두 tensor의 합이라는 것을 전혀 알지 못합니다
+# (파일에서 읽었을 수도 있고,
+# 다른 연산의 결과일 수도 있음)
 #
-# If ``requires_grad=True``, the Tensor object keeps track of how it was
-# created. Let's see it in action.
+# ``requires_grad=True`` 인 경우, Tensor 객체는 자신이 어떻게 생성되었는지
+# 추적합니다. 한번 봅시다.
 #
 
-# Tensor factory methods have a ``requires_grad`` flag
+# Tensor factory 메소드는 ``requires_grad`` 플래그를 가지고 있습니다
 x = torch.tensor([1., 2., 3], requires_grad=True)
 
-# With requires_grad=True, you can still do all the operations you previously
-# could
+# requires_grad=True 를 사용해도 이전에 할 수 있었던 모든 연산을
+# 여전히 수행할 수 있습니다
 y = torch.tensor([4., 5., 6], requires_grad=True)
 z = x + y
 print(z)
 
-# BUT z knows something extra.
+# 하지만, z는 뭔가를 더 알고 있습니다.
 print(z.grad_fn)
 
 
 ######################################################################
-# So Tensors know what created them. z knows that it wasn't read in from
-# a file, it wasn't the result of a multiplication or exponential or
-# whatever. And if you keep following z.grad_fn, you will find yourself at
-# x and y.
+# 즉 Tensor는 무엇으로 그들이 만들어졌는지 압니다. z는 Tensor가 파일에서
+# 읽히지 않았다는 것을 알고 있으며, 곱셈이나 지수 같은 것의 결과도 아닙니다.
+# 그리고 z.grad_fn 을 계속 따라가다 보면,
+# x와 y를 찾을 수 있습니다.
 #
-# But how does that help us compute a gradient?
+# 그러면 이 정보가 어떻게 변화도를 계산하는데 도움을 줄까요?
 #
 
-# Let's sum up all the entries in z
+# z의 모든 항목을 하나로 더해봅시다.
 s = z.sum()
 print(s)
 print(s.grad_fn)
 
 
 ######################################################################
-# So now, what is the derivative of this sum with respect to the first
-# component of x? In math, we want
+# 그렇다면, x의 첫번째 구성 요소에 대해 이 덧셈의 미분은
+# 무엇일까요? 수학적으로는, 우리가 원하는 것은 다음의 식입니다.
 #
 # .. math::
 #
@@ -203,75 +202,75 @@ print(s.grad_fn)
 #
 #
 #
-# Well, s knows that it was created as a sum of the tensor z. z knows
-# that it was the sum x + y. So
+# 자, s는 자신이 tensor z의 합으로 만들어졌다는 것을 알고 있습니다. z는
+# 자신이 x + y의 합이라는 것을 알고 있습니다. 그래서
 #
 # .. math::  s = \overbrace{x_0 + y_0}^\text{$z_0$} + \overbrace{x_1 + y_1}^\text{$z_1$} + \overbrace{x_2 + y_2}^\text{$z_2$}
 #
-# And so s contains enough information to determine that the derivative
-# we want is 1!
+# 따라서, s는 도함수를 결정하기에 충분한 정보를 가지고 있습니다.
+# 우리가 원하는 도함수의 값은 1 입니다!
 #
-# Of course this glosses over the challenge of how to actually compute
-# that derivative. The point here is that s is carrying along enough
-# information that it is possible to compute it. In reality, the
-# developers of Pytorch program the sum() and + operations to know how to
-# compute their gradients, and run the back propagation algorithm. An
-# in-depth discussion of that algorithm is beyond the scope of this
-# tutorial.
+# 물론 이것은 그 미분을 실제로 계산하는 방법에 대한 도전을
+# 숨깁니다. 여기서 요점은 s가 미분을 계산하기에 충분한
+# 정보를 가지고 다닌다는 겁니다. 실제로 
+# Pytorch 개발자는 sum() 과 + 연산에서
+# 변화도를 계산하는 법을 프로그래밍하고, 역전파 알고리즘을 실행합니다.
+# 이 알고리즘에 대한 깊이있는 설명은 이 튜토리얼의 범위를
+# 벗어납니다.
 #
 
 
 ######################################################################
-# Let's have Pytorch compute the gradient, and see that we were right:
-# (note if you run this block multiple times, the gradient will increment.
-# That is because Pytorch *accumulates* the gradient into the .grad
-# property, since for many models this is very convenient.)
+# Pytorch로 변화도를 계산하고, 맞았는지 확인해 봅시다.
+# (이 블록을 여러번 실행하면 변화도가 증가할 것입니다.
+# 그 이유는 Pytorch가 변화도를 .grad 속성에 *축적* 하기 때문이며, 
+# 이는 많은 모델에서 매우 편리하기 때문입니다.)
 #
 
-# calling .backward() on any variable will run backprop, starting from it.
+# 어떤 변수에서든지 .backward()를 호출하면 해당 변수에서 시작하는 역전파가 실행됩니다.
 s.backward()
 print(x.grad)
 
 
 ######################################################################
-# Understanding what is going on in the block below is crucial for being a
-# successful programmer in deep learning.
+# 딥러닝에서 성공한 프로그래머가 되기 위해서는
+# 아래 블록에서 무슨 일이 일어나고 있는지 이해하는 것이 필수적입니다.
 #
 
 x = torch.randn(2, 2)
 y = torch.randn(2, 2)
-# By default, user created Tensors have ``requires_grad=False``
+# 사용자가 생성한 Tensor는 기본적으로 ``requires_grad=False`` 를 가집니다
 print(x.requires_grad, y.requires_grad)
 z = x + y
-# So you can't backprop through z
+# 그래서 z를 통해 역전파를 할 수 없습니다 
 print(z.grad_fn)
 
-# ``.requires_grad_( ... )`` changes an existing Tensor's ``requires_grad``
-# flag in-place. The input flag defaults to ``True`` if not given.
+# ``.requires_grad_( ... )`` 는 기존 텐서의 ``requires_grad``
+# 플래그를 제자리에서(in-place) 바꿉니다. 입력 플래그가 지정되지 않은 경우 기본값은 ``True`` 입니다.
 x = x.requires_grad_()
 y = y.requires_grad_()
-# z contains enough information to compute gradients, as we saw above
+# z는 위에서 본 것처럼 변화도를 계산하기에 충분한 정보가 포함되어 있습니다
 z = x + y
 print(z.grad_fn)
-# If any input to an operation has ``requires_grad=True``, so will the output
+# 연산에 대한 입력이 ``requires_grad=True`` 인 경우 출력도 마찬가지입니다
 print(z.requires_grad)
 
-# Now z has the computation history that relates itself to x and y
-# Can we just take its values, and **detach** it from its history?
+# 이제 z는 x와 y에 대한 계산 기록을 가지고 있습니다
+# z의 값만 가져가고, 기록에서 **분리** 할 수 있을까요?
 new_z = z.detach()
 
-# ... does new_z have information to backprop to x and y?
-# NO!
+# ... new_z 가 x와 y로의 역전파를 위한 정보를 갖고 있을까요?
+# 아닙니다!
 print(new_z.grad_fn)
-# And how could it? ``z.detach()`` returns a tensor that shares the same storage
-# as ``z``, but with the computation history forgotten. It doesn't know anything
-# about how it was computed.
-# In essence, we have broken the Tensor away from its past history
+# 어떻게 그럴 수가 있을까요? ``z.detach()`` 는 ``z`` 와 동일한 저장공간을 사용하지만
+# 계산 기록은 없는 tensor를 반환합니다. 그 tensor는 자신이 어떻게 계산되었는지
+# 아무것도 알지 못합니다.
+# 본질적으로는 Tensor를 과거 기록으로부터 떼어낸 겁니다
 
 ###############################################################
-# You can also stop autograd from tracking history on Tensors
-# with ``.requires_grad=True`` by wrapping the code block in
-# ``with torch.no_grad():``
+# 또한 코드 블록을 ``with torch.no_grad():`` 로 감싸
+# ``.requires_grad=True`` 인 텐서의 기록을 추적하지 못하게끔
+# autograd를 멈출 수 있습니다.
 print(x.requires_grad)
 print((x ** 2).requires_grad)
 
