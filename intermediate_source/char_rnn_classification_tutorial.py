@@ -184,7 +184,7 @@ print(lineToTensor('Jones').size())
 #
 # 이 RNN 모듈(대부분 `Torch 사용자를 위한 PyTorch 튜토리얼
 # <https://tutorials.pytorch.kr/beginner/former_torchies/
-# nn_tutorial.html#example-2-recurrent-net>`__ 에서 복사함)
+# nnft_tutorial.html#example-2-recurrent-net>`__ 에서 복사함)
 # 은 입력 및 은닉 상태로 작동하는 2개의 선형 계층이며,
 # 출력 다음에 LogSoftmax 계층이 있습니다.
 #
