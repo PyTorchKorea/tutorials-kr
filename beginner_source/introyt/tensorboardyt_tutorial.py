@@ -94,7 +94,7 @@ validation_loader = torch.utils.data.DataLoader(validation_set,
                                                 shuffle=False,
                                                 num_workers=2)
 
-# 클레스 라벨
+# 클래스 라벨
 classes = ('T-shirt/top', 'Trouser', 'Pullover', 'Dress', 'Coat',
         'Sandal', 'Shirt', 'Sneaker', 'Bag', 'Ankle Boot')
 
@@ -234,7 +234,7 @@ writer.flush()
 # 그러기 위해서는, 텐서 보드를 열 때 모델과 샘플 인풋을 인자로 받는 ``add_graph()`` 메소드를 호출하세요.
 #
 
-# 다시 이미지의 1 미니배치를 가져오기
+# 다시 이미지의 한번의 미니배치를 가져오기
 dataiter = iter(training_loader)
 images, labels = dataiter.next()
 
