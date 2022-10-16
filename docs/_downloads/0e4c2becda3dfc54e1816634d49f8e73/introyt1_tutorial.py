@@ -7,10 +7,10 @@
 `Training Models <trainingyt.html>`_ ||
 `Model Understanding <captumyt.html>`_
 
-Introduction to PyTorch
+PyTorch 소개
 =======================
 
-Follow along with the video below or on `youtube <https://www.youtube.com/watch?v=IC0_FRiX-sw>`__.
+아래 영상이나 `youtube <https://www.youtube.com/watch?v=IC0_FRiX-sw>`__ 를 참고하세요.
 
 .. raw:: html
 
@@ -21,17 +21,17 @@ Follow along with the video below or on `youtube <https://www.youtube.com/watch?
 PyTorch Tensors
 ---------------
 
-Follow along with the video beginning at `03:50 <https://www.youtube.com/watch?v=IC0_FRiX-sw&t=230s>`__.
+`03:50 <https://www.youtube.com/watch?v=IC0_FRiX-sw&t=230s>`__ 에 시작하는 영상을 시청하세요.
 
-First, we’ll import pytorch.
+PyTorch를 import할 것입니다. 
 
 """
 
 import torch
 
 ######################################################################
-# Let’s see a few basic tensor manipulations. First, just a few of the
-# ways to create tensors:
+# 몇 가지 기본적인 tensor 조작을 알아보겠습니다.
+# 처음으로, tensor들을 만드는 몇 가지 방법을 살펴보겠습니다:
 # 
 
 z = torch.zeros(5, 3)
@@ -40,12 +40,11 @@ print(z.dtype)
 
 
 #########################################################################
-# Above, we create a 5x3 matrix filled with zeros, and query its datatype
-# to find out that the zeros are 32-bit floating point numbers, which is
-# the default PyTorch.
+# 위에서, 0으로 채워진 5x3 행렬을 만들고, 파이토치의 기본 타입인, 
+# 0으로 채워진 32비트 부동소수점 데이터 타입인지 확인합니다.
 # 
-# What if you wanted integers instead? You can always override the
-# default:
+# 
+# 만약 정수형 데이터 타입을 원한다면 기본값을 재정의할 수 있습니다:
 # 
 
 i = torch.ones((5, 3), dtype=torch.int16)
@@ -53,142 +52,139 @@ print(i)
 
 
 ######################################################################
-# You can see that when we do change the default, the tensor helpfully
-# reports this when printed.
+# dtype의 기본값을 변경하면 tensor가 출력될 때 
+# 데이터 타입을 확인할 수 있습니다.
 # 
-# It’s common to initialize learning weights randomly, often with a
-# specific seed for the PRNG for reproducibility of results:
+# 
+# 학습 가중치를 무작위로 초기화하는 것이 일반적이며, 
+# 종종 결과의 재현성을 위해 PRNG에 대한 특정 시드로 초기화합니다.
 # 
 
 torch.manual_seed(1729)
 r1 = torch.rand(2, 2)
-print('A random tensor:')
+print('랜덤 tensor 값:')
 print(r1)
 
 r2 = torch.rand(2, 2)
-print('\nA different random tensor:')
-print(r2) # new values
+print('\n다른 랜덤 tensor 값:')
+print(r2) # 새로운 2x2 행렬 값
 
 torch.manual_seed(1729)
 r3 = torch.rand(2, 2)
-print('\nShould match r1:')
-print(r3) # repeats values of r1 because of re-seed
+print('\nr1과 일치:')
+print(r3) # 동일한 시드값으로 인해 r1 값이 반복되어 행렬값으로 나옵니다.
 
 
 #######################################################################
-# PyTorch tensors perform arithmetic operations intuitively. Tensors of
-# similar shapes may be added, multiplied, etc. Operations with scalars
-# are distributed over the tensor:
+# PyTorch tensor는 산술 연산을 직관적으로 수행합니다.
+# 유사한 shape의 tensor들이 더하거나 곱하거나 그 외 연산도 가능합니다.
+# 스칼라를 사용한 연산은 tensor에 분산됩니다.
 # 
 
 ones = torch.ones(2, 3)
 print(ones)
 
-twos = torch.ones(2, 3) * 2 # every element is multiplied by 2
+twos = torch.ones(2, 3) * 2 # 모든 원소에 2를 곱합니다.
 print(twos)
 
-threes = ones + twos       # addition allowed because shapes are similar
-print(threes)              # tensors are added element-wise
-print(threes.shape)        # this has the same dimensions as input tensors
+threes = ones + twos       # shape이 비슷하기 때문에 더할 수 있습니다.
+print(threes)              # tensor의 원소별 더한 값이 결과로 나옵니다.
+print(threes.shape)        # 입력 tensor와 동일한 차원을 가지고 있습니다.
 
 r1 = torch.rand(2, 3)
 r2 = torch.rand(3, 2)
-# uncomment this line to get a runtime error
+# 런타임 오류를 발생시키려면 아래 줄의 주석을 해제합니다.
 # r3 = r1 + r2
 
 
 ######################################################################
-# Here’s a small sample of the mathematical operations available:
+# 다음은 사용 가능한 작은 수학 연산 예제 입니다:
 # 
 
-r = (torch.rand(2, 2) - 0.5) * 2 # values between -1 and 1
-print('A random matrix, r:')
+r = (torch.rand(2, 2) - 0.5) * 2 # -1과 1 사이의 값을 가집니다.
+print('랜덤 행렬값, r:')
 print(r)
 
-# Common mathematical operations are supported:
-print('\nAbsolute value of r:')
+# 일반적인 수학적 연산은 다음과 같이 지원됩니다:
+print('\nr의 절대값:')
 print(torch.abs(r))
 
-# ...as are trigonometric functions:
-print('\nInverse sine of r:')
+# 삼각함수를 사용할 수 있습니다:
+print('\nr의 역 사인 함수:')
 print(torch.asin(r))
 
-# ...and linear algebra operations like determinant and singular value decomposition
-print('\nDeterminant of r:')
+# 행렬식 및 특이값 분해와 같은 선형 대수 연산을 사용할 수 있습니다.
+print('\nr의 행렬식:')
 print(torch.det(r))
-print('\nSingular value decomposition of r:')
+print('\nr의 특이값 분해:')
 print(torch.svd(r))
 
-# ...and statistical and aggregate operations:
-print('\nAverage and standard deviation of r:')
+# 통계 및 집합 연산 등을 사용할 수 있습니다:
+print('\nr의 평균 및 표준편차:')
 print(torch.std_mean(r))
-print('\nMaximum value of r:')
+print('\nr의 최대값:')
 print(torch.max(r))
 
 
 ##########################################################################
-# There’s a good deal more to know about the power of PyTorch tensors,
-# including how to set them up for parallel computations on GPU - we’ll be
-# going into more depth in another video.
+# GPU에서 병렬 연산을 위해 설정하는 방법을 포함하여 
+# PyTorch tensor의 강력함에 대해 알아야 할 것이 있습니다.
+# 이 내용은 다른 영상에서 자세히 살펴보겠습니다.
 # 
 # PyTorch Models
 # --------------
 #
-# Follow along with the video beginning at `10:00 <https://www.youtube.com/watch?v=IC0_FRiX-sw&t=600s>`__.
+# PyTorch Model 영상은 `10:00 <https://www.youtube.com/watch?v=IC0_FRiX-sw&t=600s>`__ 
+# 에 시작합니다.
 #
-# Let’s talk about how we can express models in PyTorch
+# PyTorch에서 Model을 표현할 수 있는 방법에 대해 알아보겠습니다.
 #
 
-import torch                     # for all things PyTorch
-import torch.nn as nn            # for torch.nn.Module, the parent object for PyTorch models
-import torch.nn.functional as F  # for the activation function
+import torch                     # PyTorch 모든 모듈 가져오기
+import torch.nn as nn            # torch.nn.Module의 경우 PyTorch model의 부모 객체
+import torch.nn.functional as F  # 활성화 함수 모듈 가져오기
 
 
 #########################################################################
 # .. figure:: /_static/img/mnist.png
 #    :alt: le-net-5 diagram
 #
-# *Figure: LeNet-5*
+# *그림: LeNet-5*
 # 
-# Above is a diagram of LeNet-5, one of the earliest convolutional neural
-# nets, and one of the drivers of the explosion in Deep Learning. It was
-# built to read small images of handwritten numbers (the MNIST dataset),
-# and correctly classify which digit was represented in the image.
+# LeNet-5의 다이어그램은 초기 합성곱 신경망 중 하나이자 딥 러닝에서 
+# 폭발적인 인기를 일으킨 요인중 하나입니다. 손으로 쓴 숫자 
+# 이미지(MNIST 데이터셋)를 읽고 이미지에 어떤 숫자가 표현되었는지 정확하게
+# 분류하기 위해 제작되었습니다.
 # 
-# Here’s the abridged version of how it works:
+# LeNet-5가 어떻게 동작하는지에 대한 간단한 설명은 다음과 같습니다:
 # 
-# -  Layer C1 is a convolutional layer, meaning that it scans the input
-#    image for features it learned during training. It outputs a map of
-#    where it saw each of its learned features in the image. This
-#    “activation map” is downsampled in layer S2.
-# -  Layer C3 is another convolutional layer, this time scanning C1’s
-#    activation map for *combinations* of features. It also puts out an
-#    activation map describing the spatial locations of these feature
-#    combinations, which is downsampled in layer S4.
-# -  Finally, the fully-connected layers at the end, F5, F6, and OUTPUT,
-#    are a *classifier* that takes the final activation map, and
-#    classifies it into one of ten bins representing the 10 digits.
+# -  계층 C1은 합성곱 계층입니다. 즉, 입력 이미지에서 학습 중에 배웠던 특징을 검색합니다.
+#    이미지에서 학습된 각 특징을 위치에 대한 출력 맵을 보여줍니다. 
+#    이 “활성화 맵” 으로 S2 계층에서 다운샘플링됩니다.
+# -  계층 C3는 다른 합성곱 계층으로, 이 시점은 특징들의 *조합* 을 위해 C1 활성화 맵 검색합니다.
+#    또한, 계층 S4에서 다운샘플링된 이러한 특징 조합의 spatial locations을 제공합니다.
+# -  마지막으로, 완전 연결 계층(fully-connected layers)인 F5, F6, OUTPUT은 최종 활성화 맵을
+#    가져와 십진수를 표현하는 10개의 bin 중 하나로 *분류* 하는 분류기입니다.
 # 
-# How do we express this simple neural network in code?
+# 이 간단한 신경망을 코드로 어떻게 표현할 수 있을까요?
 # 
 
 class LeNet(nn.Module):
 
     def __init__(self):
         super(LeNet, self).__init__()
-        # 1 input image channel (black & white), 6 output channels, 3x3 square convolution
-        # kernel
+        # 입력 이미지 채널, 6개의 output 채널, 3x3 정방 합성곱 커널을 사용합니다.
         self.conv1 = nn.Conv2d(1, 6, 3)
         self.conv2 = nn.Conv2d(6, 16, 3)
-        # an affine operation: y = Wx + b
-        self.fc1 = nn.Linear(16 * 6 * 6, 120)  # 6*6 from image dimension
+        # 아핀 변환: y = Wx + b
+        self.fc1 = nn.Linear(16 * 6 * 6, 120)  # 6*6 이미지 차원
         self.fc2 = nn.Linear(120, 84)
         self.fc3 = nn.Linear(84, 10)
 
     def forward(self, x):
-        # Max pooling over a (2, 2) window
+        # 최대 풀링은 (2, 2) 윈도우 크기를 사용합니다.
         x = F.max_pool2d(F.relu(self.conv1(x)), (2, 2))
-        # If the size is a square you can only specify a single number
+        # 크기가 정방 사이즈인 경우, 단일 숫자만 지정할 수 있습니다.
         x = F.max_pool2d(F.relu(self.conv2(x)), 2)
         x = x.view(-1, self.num_flat_features(x))
         x = F.relu(self.fc1(x))
@@ -197,7 +193,7 @@ class LeNet(nn.Module):
         return x
 
     def num_flat_features(self, x):
-        size = x.size()[1:]  # all dimensions except the batch dimension
+        size = x.size()[1:]  # 크기는 배치 차원을 제외한 모든 차원을 가져옵니다.
         num_features = 1
         for s in size:
             num_features *= s
@@ -205,79 +201,71 @@ class LeNet(nn.Module):
 
 
 ############################################################################
-# Looking over this code, you should be able to spot some structural
-# similarities with the diagram above.
+# 코드를 살펴보면 구조적으로 위 다이어그램과 유사점을
+# 발견할 수 있습니다.
 # 
-# This demonstrates the structure of a typical PyTorch model: 
+# 다음은 일반적인 PyTorch 모델의 구조를 보여줍니다: 
 #
-# -  It inherits from ``torch.nn.Module`` - modules may be nested - in fact,
-#    even the ``Conv2d`` and ``Linear`` layer classes inherit from
-#    ``torch.nn.Module``.
-# -  A model will have an ``__init__()`` function, where it instantiates
-#    its layers, and loads any data artifacts it might
-#    need (e.g., an NLP model might load a vocabulary).
-# -  A model will have a ``forward()`` function. This is where the actual
-#    computation happens: An input is passed through the network layers
-#    and various functions to generate an output.
-# -  Other than that, you can build out your model class like any other
-#    Python class, adding whatever properties and methods you need to
-#    support your model’s computation.
+# -  모듈은 중첩될 수 있으며 ``torch.nn.Module`` 에서 상속됩니다. - 실제로,
+#    ``Conv2d`` 와 ``Linear`` 계층 클래스도 ``torch.nn.Module`` 에서
+#    상속됩니다.
+# -  모델은 계층을 인스턴스화하고 필요한 데이터 아티팩트를 로드하는 
+#    ``__init__()`` 함수를 가지고 있습니다. (예를들면 NLP 모델은 어휘를 불러올 수 있)
+# -  모델은 ``forward()`` 함수를 가지고 있다. 여기서 실제 계산이 수행됩니다.
+#    입력은 네트워크 계층 및 다양한 기능들을 통과시켜 결과를 생성합니다.
+# -  그 외에는 다른 파이썬 클래스처럼 모델 클래스를 구성할 수 있습니다.
+#    Python 클래스, 모델의 계산을 지원하는 데 필요한 속성 및 메서드를 추가합니다.
 # 
-# Let’s instantiate this object and run a sample input through it.
+# 자 이제 만든 오브젝트를 인스턴스화하고 샘플 입력을 통해 실행합니다.
 # 
 
 net = LeNet()
-print(net)                         # what does the object tell us about itself?
+print(net)                         # 인스턴스한 객체를 출력하면 어떤 값을 보여줄까요?
 
-input = torch.rand(1, 1, 32, 32)   # stand-in for a 32x32 black & white image
-print('\nImage batch shape:')
+input = torch.rand(1, 1, 32, 32)   # 32x32 크기의 1채널의 흑백 이미지를 만듭니다.
+print('\n이미지 배치 shape:')
 print(input.shape)
 
-output = net(input)                # we don't call forward() directly
-print('\nRaw output:')
+output = net(input)                # 객체로부터 직접 forward() 함수를 호출하지 않습니다.
+print('\n:결과 값')
 print(output)
 print(output.shape)
 
 
 ##########################################################################
-# There are a few important things happening above:
+# 위에서 몇가지 중요한 일들이 일어나고 있습니다.
 # 
-# First, we instantiate the ``LeNet`` class, and we print the ``net``
-# object. A subclass of ``torch.nn.Module`` will report the layers it has
-# created and their shapes and parameters. This can provide a handy
-# overview of a model if you want to get the gist of its processing.
+# 첫째, ``LeNet`` 클래스를 인스턴스화하고 ``net`` 객체를 출력합니다.
+# ``torch.nn.Module`` 의 하위 클래스는 생성된 레이어의 모양과 파라미터를 알려줍니다.
+# 모델의 처리 결과를 얻으려는 경우, 모델의 편리한 기능을 제공할 수 있습니다.
 # 
-# Below that, we create a dummy input representing a 32x32 image with 1
-# color channel. Normally, you would load an image tile and convert it to
-# a tensor of this shape.
+# 아래에서 1 채널과 32x32 이미지크기를 가진 더미 입력을 생성합니다.
+# 일반적으로 배치 이미지를읽어들이고,이미지와 같은 크기의 텐서로 변환합니다.
 # 
-# You may have noticed an extra dimension to our tensor - the *batch
-# dimension.* PyTorch models assume they are working on *batches* of data
-# - for example, a batch of 16 of our image tiles would have the shape
-# ``(16, 1, 32, 32)``. Since we’re only using one image, we create a batch
-# of 1 with shape ``(1, 1, 32, 32)``.
+# tensor 의 추가 차원인 *batch 차원* 을 알아챘을 수 있습니다.
+# PyTorch 모델은 데이터의 *batch* 에 작업한다고 가정합니다. 예를들어 
+# 16개 이미지의 배치는 ``(1, 1, 32, 32)`` 모양을 가질 것입니다.
+# 이 샘플에서는 하나의 이미지만 사용하기 때문에 ``(1, 1, 32, 32)`` 모양을 가진 
+# batch를 만듭니다.
 # 
-# We ask the model for an inference by calling it like a function:
-# ``net(input)``. The output of this call represents the model’s
-# confidence that the input represents a particular digit. (Since this
-# instance of the model hasn’t learned anything yet, we shouldn’t expect
-# to see any signal in the output.) Looking at the shape of ``output``, we
-# can see that it also has a batch dimension, the size of which should
-# always match the input batch dimension. If we had passed in an input
-# batch of 16 instances, ``output`` would have a shape of ``(16, 10)``.
+# 모델을 함수처럼 ``net(input)`` 를 호출하여 추론을 요청합니다:
+# 호출의 결과는 입력 이미지가 특정 숫자를 나타내는 모델의 신뢰도를 나타냅니다.
+# (모델의 인스턴스는 아직 아무것도 학습하지 않았기 때문에 출력에서 좋은 결과를
+# 기대해서는 안 됩니다) ``output`` 결과를 확인해보면 batch 차원을 가지고 있다는 
+# 것을 알 수 있는데, 크기는 항상 입력 batch 차원과 일치해야 합니다.
+# 만약 16개의 인스턴스로 이루어진 입력으로 모델을 통과했다면 ``output`` 는
+# ``(16, 10)`` 의 형태를 가지고 있습니다.
 # 
-# Datasets and Dataloaders
+# Datasets 및 Dataloaders
 # ------------------------
 #
-# Follow along with the video beginning at `14:00 <https://www.youtube.com/watch?v=IC0_FRiX-sw&t=840s>`__.
+# `14:00 <https://www.youtube.com/watch?v=IC0_FRiX-sw&t=840s>`__ 에 시작하는 영상을 시청하세요.
 #
-# Below, we’re going to demonstrate using one of the ready-to-download,
-# open-access datasets from TorchVision, how to transform the images for
-# consumption by your model, and how to use the DataLoader to feed batches
-# of data to your model.
+# 아래 예제에서는 TorchVision에서 바로 다운로드할 수 있는 오픈 데이터셋 중 하나를 
+# 사용하여 모델을 통해 이미지를 변환하는 방법, DataLoader를 사용하여 모델에 데이터 배치를 제공하는 
+# 방법을 학습합니다.
 #
-# The first thing we need to do is transform our incoming images into a
-# PyTorch tensor.
+# 첫 번째 할 일은 들어오는 이미지를 Pytorch tensor로 변환하는 것입니다.
 #
 
 #%matplotlib inline
@@ -292,22 +280,21 @@ transform = transforms.Compose(
 
 
 ##########################################################################
-# Here, we specify two transformations for our input:
+# 여기서는 입력에 대한 두 가지 변환을 지정합니다:
 #
-# -  ``transforms.ToTensor()`` converts images loaded by Pillow into 
-#    PyTorch tensors.
-# -  ``transforms.Normalize()`` adjusts the values of the tensor so
-#    that their average is zero and their standard deviation is 0.5. Most
-#    activation functions have their strongest gradients around x = 0, so
-#    centering our data there can speed learning.
+# -  ``transforms.ToTensor()``는 Pillow 패키지를 사용하여 불러온 이미지를
+#    PyTorch tensor 형태로 변환합니다.
+# -  ``transforms.Normalize()`` 는 tensor의 평균이 0이고 표준 편차가 0.5가 
+#      되도록 tensor의 값을 조정합니다.
+#      대부분의 활성화 함수는 약 x=0에 강한 기울기 값을 가지고 있어 데이터를 
+#      중앙으로 집중화하여 학습 속도를 높일 수 있습니다.
 # 
-# There are many more transforms available, including cropping, centering,
-# rotation, and reflection.
+# transforms 는 cropping, centering, rotation, reflection를 포함하여 더 많은
+# 변환이 가능합니다.
 # 
-# Next, we’ll create an instance of the CIFAR10 dataset. This is a set of
-# 32x32 color image tiles representing 10 classes of objects: 6 of animals
-# (bird, cat, deer, dog, frog, horse) and 4 of vehicles (airplane,
-# automobile, ship, truck):
+# 다음으로 CIFAR10 데이터셋의 인스턴스를 만듭니다. CIFAR10 데이터셋은 동물(새, 
+# 고양이, 사슴, 개, 개구리, 말) 6종과 차량(비행기, 자동차, 배, 트럭) 4종의 
+# 클래스로 이루어진 데이터셋입니다:
 # 
 
 trainset = torchvision.datasets.CIFAR10(root='./data', train=True,
@@ -315,27 +302,25 @@ trainset = torchvision.datasets.CIFAR10(root='./data', train=True,
 
 
 ##########################################################################
-# .. note::
-#      When you run the cell above, it may take a little time for the 
-#      dataset to download.
+# .. 참고::
+#      위 셀을 실행하여 데이터셋이 다운로드시 약간의 시간이 걸릴 수 있습니다.
 # 
-# This is an example of creating a dataset object in PyTorch. Downloadable
-# datasets (like CIFAR-10 above) are subclasses of
-# ``torch.utils.data.Dataset``. ``Dataset`` classes in PyTorch include the
-# downloadable datasets in TorchVision, Torchtext, and TorchAudio, as well
-# as utility dataset classes such as ``torchvision.datasets.ImageFolder``,
-# which will read a folder of labeled images. You can also create your own
-# subclasses of ``Dataset``.
+# PyTorch에서 데이터셋 객체를 만드는 예제입니다. 다운로드 가능한 데이터셋
+# (CIFAR-10과 같은)는 ``torch.utils.data.Dataset`` 의 하위 클래스입니다.
+# PyTorch의 ``Dataset`` 클래스에는 TorchVision, Torchtext 및 TorchAudio 등
+# 다운로드 가능한 데이터셋 뿐 아니라 레이블된 이미지의 폴더를 읽는 
+# ``torchvision.datasets.ImageFolder`` 와 같은 유틸리티 데이터셋 클래스가 
+# 포함됩니다. 또한, ``Dataset`` 의 하위 클래스를 직접 만들 수 있습니다.
 # 
-# When we instantiate our dataset, we need to tell it a few things:
+# 데이터셋을 인스턴스화할 때 몇 가지 파라미터를 선언해야 합니다.
 #
-# -  The filesystem path to where we want the data to go. 
-# -  Whether or not we are using this set for training; most datasets
-#    will be split into training and test subsets.
-# -  Whether we would like to download the dataset if we haven’t already.
-# -  The transformations we want to apply to the data.
+# -  데이터를 저장하려는 파일 시스템 경로입니다. 
+# -  데이터셋을 학습에 사용하는지 여부를 확인하여 대부분의 데이터셋은 
+#    학습 및 테스트 데이터셋으로 분할됩니다.
+# -  데이터셋을 다운로드할지에 대한 여부를 확인합니다.
+# -  데이터에 적용하려는 변환 객체를 넣어줍니다.
 # 
-# Once your dataset is ready, you can give it to the ``DataLoader``:
+# 데이터셋 다운로드가 끝나면 ``DataLoader``에 사용할 수 있습니다:
 # 
 
 trainloader = torch.utils.data.DataLoader(trainset, batch_size=4,
@@ -343,16 +328,16 @@ trainloader = torch.utils.data.DataLoader(trainset, batch_size=4,
 
 
 ##########################################################################
-# A ``Dataset`` subclass wraps access to the data, and is specialized to
-# the type of data it’s serving. The ``DataLoader`` knows *nothing* about
-# the data, but organizes the input tensors served by the ``Dataset`` into
-# batches with the parameters you specify.
+# ``Dataset`` 하위 클래스는 데이터 접근에 대한 클래스를 포함하며, 해당 서브 
+# 클래스가 제공하는 데이터 유형에 특화되어 있습니다.
+# ``DataLoader`` 는 데이터에 대해 *아무것도* 알지 못하지만 
+# ``Dataset`` 이 제공하는 입력 tensor를 사용자가 지정한 파라미터로 구성합니다.
 # 
-# In the example above, we’ve asked a ``DataLoader`` to give us batches of
-# 4 images from ``trainset``, randomizing their order (``shuffle=True``),
-# and we told it to spin up two workers to load data from disk.
+# 위 예제에서 ``DataLoader`` 에서에서 무작위 추출( ``shuffle=True`` )한 4개의 
+# batch 이미지를 ``trainset`` 에서 추출하고 disk에서 데이터를 로드하기 
+# 위해 2개의 workers를 spin up 했습니다.
 # 
-# It’s good practice to visualize the batches your ``DataLoader`` serves:
+# ``DataLoader`` 가 제공하는 batch 이미지를 시각화 하는것은 좋은 연습입니다:
 # 
 
 import matplotlib.pyplot as plt
@@ -362,31 +347,32 @@ classes = ('plane', 'car', 'bird', 'cat',
            'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
 
 def imshow(img):
-    img = img / 2 + 0.5     # unnormalize
+    img = img / 2 + 0.5     # 역정규화
     npimg = img.numpy()
     plt.imshow(np.transpose(npimg, (1, 2, 0)))
 
 
-# get some random training images
+# 무작위로 학습 이미지 추출하기
 dataiter = iter(trainloader)
 images, labels = dataiter.next()
 
-# show images
+# 이미지 보여주기
 imshow(torchvision.utils.make_grid(images))
-# print labels
+# labels 출력하기
 print(' '.join('%5s' % classes[labels[j]] for j in range(4)))
 
 
 ########################################################################
-# Running the above cell should show you a strip of four images, and the
-# correct label for each.
+# 위 셀 스크립트를 실행하면 4개의 이미지와 각 이미지에 대한 정답 label이 
+# 출력됩니다.
 # 
-# Training Your PyTorch Model
+# PyTorch 모델 학습
 # ---------------------------
 #
-# Follow along with the video beginning at `17:10 <https://www.youtube.com/watch?v=IC0_FRiX-sw&t=1030s>`__.
+# `17:10 <https://www.youtube.com/watch?v=IC0_FRiX-sw&t=1030s>`__ 에 시작하는 
+# 영상을 참고하세요.
 #
-# Let’s put all the pieces together, and train a model:
+# 위에서 다뤘던 내용들을 종합하여 모델을 학습시키겠습니다:
 #
 
 #%matplotlib inline
@@ -405,9 +391,9 @@ import numpy as np
 
 
 #########################################################################
-# First, we’ll need training and test datasets. If you haven’t already,
-# run the cell below to make sure the dataset is downloaded. (It may take
-# a minute.)
+# 첫째로, 학습 및 테스트 데이터셋이 필요합니다. 아직 다운로드하지 않은 경우, 
+# 아래 셀을 실행하여 데이터셋이 다운로드 되었는지 확인하세요.(다운로드 시
+# 수 분정도 소요됩니다)
 # 
 
 transform = transforms.Compose(
@@ -429,35 +415,34 @@ classes = ('plane', 'car', 'bird', 'cat',
 
 
 ######################################################################
-# We’ll run our check on the output from ``DataLoader``:
+# ``DataLoader`` 출력을 확인해보겠습니다:
 # 
 
 import matplotlib.pyplot as plt
 import numpy as np
 
-# functions to show an image
+# 아래 함수는 이미지를 시각화하여 보여주는 함수입니다.
 
 
 def imshow(img):
-    img = img / 2 + 0.5     # unnormalize
+    img = img / 2 + 0.5     # 역정규화
     npimg = img.numpy()
     plt.imshow(np.transpose(npimg, (1, 2, 0)))
 
 
-# get some random training images
+# 무작위로 학습 이미지를 가져오기
 dataiter = iter(trainloader)
 images, labels = dataiter.next()
 
-# show images
+# 이미지 시각화하기
 imshow(torchvision.utils.make_grid(images))
-# print labels
+# 정답 label 출력하기
 print(' '.join('%5s' % classes[labels[j]] for j in range(4)))
 
 
 ##########################################################################
-# This is the model we’ll train. If it looks familiar, that’s because it’s
-# a variant of LeNet - discussed earlier in this video - adapted for
-# 3-color images.
+# 이제 모델을 학습시킬 차례입니다. 만약 모델 구조가 익숙하게 보인다면, 
+# 이 모델은 이번 영상에서 앞서 다뤄진 3채널(color) 이미지에 맞게 변형된 LeNet 모델이기 때문입니다.
 # 
 
 class Net(nn.Module):
@@ -484,7 +469,7 @@ net = Net()
 
 
 ######################################################################
-# The last ingredients we need are a loss function and an optimizer:
+# 아래는 마지막으로 학습에 필요한 손실 함수 및 최적화 방법입니다.
 # 
 
 criterion = nn.CrossEntropyLoss()
@@ -492,29 +477,27 @@ optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
 
 
 ##########################################################################
-# The loss function, as discussed earlier in this video, is a measure of
-# how far from our ideal output the model’s prediction was. Cross-entropy
-# loss is a typical loss function for classification models like ours.
+# 손실 함수(loss function)는 데이터 기반으로 모델이 예측한 정답 값이 얼마나 차이가 
+# 나는지를 표현하는 지표입니다. Cross-entropy 손실 함수는 일반적인 분류 모델의 
+# 전형적인 손실 함수입니다.
 # 
-# The **optimizer** is what drives the learning. Here we have created an
-# optimizer that implements *stochastic gradient descent,* one of the more
-# straightforward optimization algorithms. Besides parameters of the
-# algorithm, like the learning rate (``lr``) and momentum, we also pass in
-# ``net.parameters()``, which is a collection of all the learning weights
-# in the model - which is what the optimizer adjusts.
+# **optimizer** 는 학습의 필수요소입니다. 아래 예제에서 간단한 최적화 알고리즘인 
+# *stochastic gradient descent* 를 구현하겠습니다. SGD 알고리짐은 학습 속도인
+# (``lr``) 및 momentum 과 같은 매개 변수 외에도 모델의 모든 학습 가중치 값인 
+# ``net.parameters()`` 를 전달하는데, 이 함수는 최적화를 위해 파라미터를 조정합니다.
 # 
-# Finally, all of this is assembled into the training loop. Go ahead and
-# run this cell, as it will likely take a few minutes to execute:
+# 마지막으로, 모든 것이 학습 loop에 들어갑니다. 이제 아래 셀을 실행하세요.
+# 실행 시 몇 분 정도 걸릴 수 있습니다:
 # 
 
-for epoch in range(2):  # loop over the dataset multiple times
+for epoch in range(2):  # 데이터셋을 여러 번 반복 학습합니다.
 
     running_loss = 0.0
     for i, data in enumerate(trainloader, 0):
-        # get the inputs
+        # 데이터를 통해 이미지와 정답값을 받습니다.
         inputs, labels = data
 
-        # zero the parameter gradients
+        # 초기 기울기 파라미터를 0으로 설정합니다
         optimizer.zero_grad()
 
         # forward + backward + optimize
@@ -523,9 +506,9 @@ for epoch in range(2):  # loop over the dataset multiple times
         loss.backward()
         optimizer.step()
 
-        # print statistics
+        # epoch 및 loss 값을 출력합니다
         running_loss += loss.item()
-        if i % 2000 == 1999:    # print every 2000 mini-batches
+        if i % 2000 == 1999:    # 2000 mini-batches 마다 값을 출력합니다
             print('[%d, %5d] loss: %.3f' %
                   (epoch + 1, i + 1, running_loss / 2000))
             running_loss = 0.0
@@ -534,32 +517,26 @@ print('Finished Training')
 
 
 ########################################################################
-# Here, we are doing only **2 training epochs** (line 1) - that is, two
-# passes over the training dataset. Each pass has an inner loop that
-# **iterates over the training data** (line 4), serving batches of
-# transformed input images and their correct labels.
+# 이 예제에서 **학습 에폭 2번** 만 반복합니다(1번째 ) - 즉, 학습 
+# 데이터셋을 두 번 모델에 통과시킵니다. 각 패스에는 
+# **iterates over the training data** (4번째 라인)의 내부 루프가 있어 
+# 변환된 입력 이미지의 batch와 올바른 레이블을 제공합니다.
 # 
-# **Zeroing the gradients** (line 9) is an important step. Gradients are
-# accumulated over a batch; if we do not reset them for every batch, they
-# will keep accumulating, which will provide incorrect gradient values,
-# making learning impossible.
+# **기울기 값 초기화** (9번째 라인) 은 중요한 단계입니다. 기울기는 batch에 
+# 걸쳐 누적됩니다. 모든 batch에 대해 기울기 값을 재설정하지 않으면 기울기 
+# 값이 계속 누적되어 잘못된 기울기 값을 제공하여 학습이 불가능합니다.
 # 
-# In line 12, we **ask the model for its predictions** on this batch. In
-# the following line (13), we compute the loss - the difference between
-# ``outputs`` (the model prediction) and ``labels`` (the correct output).
+# 12번째 라인에서는 batch 데이터를 **모델에게 예측을 요청** 합니다. 
+# 다음 13번째라인에서 모델의 결과 값과 정답 값 차이인 손실값을 계산합니다.
 # 
-# In line 14, we do the ``backward()`` pass, and calculate the gradients
-# that will direct the learning.
+# 14번째 라인에서는 ``backward()`` 를 통해 모델의 학습 기울기를 계산합니다.
 # 
-# In line 15, the optimizer performs one learning step - it uses the
-# gradients from the ``backward()`` call to nudge the learning weights in
-# the direction it thinks will reduce the loss.
+# 15번째 라인에서는 학습 단계의 최적화를 수행하는데 ``backward()`` 
+# 를 통해 손실 값을 줄일 수 있는 방향으로 학습 가중치들을 조정합니다.
 # 
-# The remainder of the loop does some light reporting on the epoch number,
-# how many training instances have been completed, and what the collected
-# loss is over the training loop.
+# 루프의 나머지 부분은 epoch 횟수, 학습 루프를 통해 수집된 손실 값을 출력합니다.
 # 
-# **When you run the cell above,** you should see something like this:
+# **위 셀을 실행한다면** 다음과 같은 값이 표시됩니다:
 # 
 # ::
 # 
@@ -577,18 +554,18 @@ print('Finished Training')
 #    [2, 12000] loss: 1.267
 #    Finished Training
 # 
-# Note that the loss is monotonically descending, indicating that our
-# model is continuing to improve its performance on the training dataset.
+# 손실 값은 단조롭게 감소하며, 이는 모델이 훈련 데이터셋에서 성능을 
+# 계속 향상시키고 있음을 보여줍니다.
 # 
-# As a final step, we should check that the model is actually doing
-# *general* learning, and not simply “memorizing” the dataset. This is
-# called **overfitting,** and usually indicates that the dataset is too
-# small (not enough examples for general learning), or that the model has
-# more learning parameters than it needs to correctly model the dataset.
+# 마지막 단계로 모델이 단순하게 학습 데이터셋을 “기억” 하는 것이 아니라 
+# 실제로 *일반화* 학습을 잘 수행하고 있는 확인해야 합니다. 이를 
+# **과적합** 이라 부르며 일반적으로 데이터셋이 너무 작거나, 모델이 데이터셋
+# 을 올바르게 모델링하는 데 필요한 것보다 더 많은 학습 파라미터 변수를 
+# 가지고 있음을 보여줍니다. (일반적인 학습에 충분한 예제가 아닙니다)
 # 
-# This is the reason datasets are split into training and test subsets -
-# to test the generality of the model, we ask it to make predictions on
-# data it hasn’t trained on:
+# 위와 같이 데이터셋이 학습 및 테스트 데이터셋으로 분할되는 이유입니다.
+# 모델의 일반성을 테스트하기 위해 학습되지 않은 데이터에 대해 예측하도록 
+# 요청합니다:
 # 
 
 correct = 0
@@ -601,13 +578,13 @@ with torch.no_grad():
         total += labels.size(0)
         correct += (predicted == labels).sum().item()
 
-print('Accuracy of the network on the 10000 test images: %d %%' % (
+print('10000개 테스트 이미지에서 모델 정확도: %d %%' % (
     100 * correct / total))
 
 
 #########################################################################
-# If you followed along, you should see that the model is roughly 50%
-# accurate at this point. That’s not exactly state-of-the-art, but it’s
-# far better than the 10% accuracy we’d expect from a random output. This
-# demonstrates that some general learning did happen in the model.
+# 위 내용을 잘 실습하셨다면 모델의 정확도가 약 50% 정도 나온다는 것을 확인 할 
+# 수 있습니다. 이것은 정확히 최신 기술은 아니지만, 무작위 결과에서 기대할 수 
+# 있는 정확도 보다 10% 정도 좋은 결과를 보여줍니다. 이 결과는 모델에서 
+# 일반적인 학습이 발생했음을 보여줍니다.
 # 
