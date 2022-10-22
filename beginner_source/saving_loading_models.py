@@ -3,7 +3,7 @@
 모델 저장하기 & 불러오기
 =========================
 **Author:** `Matthew Inkawhich <https://github.com/MatthewInkawhich>`_
-  **번역**: `박정환 <http://github.com/9bow>`_
+  **번역**: `박정환 <http://github.com/9bow>`_, `김제필 <http://github.com/garlicvread>`_
 
 이 문서에서는 PyTorch 모델을 저장하고 불러오는 다양한 방법을 제공합니다.
 이 문서 전체를 다 읽는 것도 좋은 방법이지만, 필요한 사용 예의 코드만 참고하는
