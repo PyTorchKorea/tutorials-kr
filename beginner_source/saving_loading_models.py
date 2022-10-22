@@ -18,8 +18,8 @@
 
 2) `torch.load <https://pytorch.org/docs/stable/torch.html?highlight=torch%20load#torch.load>`__:
    `pickle <https://docs.python.org/3/library/pickle.html>`__\ 을 사용하여
-   저장된 객체 파일들을 역직렬화하여 메모리에 올립니다. 이 함수는 데이터를 장치에 불러
-   때도 사용합니다.올
+   저장된 객체 파일들을 역직렬화하여 메모리에 올립니다. 이 함수는 데이터를 장치에 불러올
+   때에도 사용됩니다.
    (`장치 간 모델 저장하기 & 불러오기 <#device>`__ 참고)
 
 3) `torch.nn.Module.load_state_dict <https://pytorch.org/docs/stable/generated/torch.nn.Module.html?highlight=load_state_dict#torch.nn.Module.load_state_dict>`__:
