@@ -237,7 +237,7 @@
 #
 #    model = torch.jit.load('model_scripted.pt')
 #    model.eval()
-#기
+#
 # 추론 실행 전, 드롭아웃 및 배치(batch) 정규화 레이어를 평가 모드로 설정하기 위해 ``model.eval()`` 을 호출해야
 # 합니다. 이 호출 과정이 없으면 일관성 없는 추론 결과가 나타납니다.
 #
