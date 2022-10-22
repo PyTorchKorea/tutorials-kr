@@ -34,7 +34,7 @@
 -  `state_dict가 무엇인가요? <#state-dict>`__
 -  `추론(inference)를 위해 모델 저장하기 & 불러오기 <#inference>`__
 -  `일반 체크포인트(checkpoint) 저장하기 & 불러오기 <#checkpoint>`__
--  `여러개(multiple)의 모델을 하나의 파일에 저장하기 <#multiple>`__
+-  `여러 개(multiple)의 모델을 하나의 파일에 저장하기 <#multiple>`__
 -  `다른 모델의 매개변수를 사용하여 빠르게 모델 시작하기(warmstart) <#warmstart>`__
 -  `장치(device)간 모델 저장하기 & 불러오기 <#device>`__
 
