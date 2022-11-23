@@ -13,14 +13,14 @@
 
 1) `torch.save <https://pytorch.org/docs/stable/torch.html?highlight=save#torch.save>`__:
    직렬화된 객체를 디스크에 저장합니다. 이 함수는 Python의
-   `pickle <https://docs.python.org/3/library/pickle.html>`__ 을 사용하여 직렬화합니다
+   `pickle <https://docs.python.org/3/library/pickle.html>`__ 을 사용하여 직렬화합니다.
    이 함수를 사용하여 모든 종류의 객체의 모델, Tensor 및 사전을 저장할 수 있습니다.
 
 2) `torch.load <https://pytorch.org/docs/stable/torch.html?highlight=torch%20load#torch.load>`__:
    `pickle <https://docs.python.org/3/library/pickle.html>`__\ 을 사용하여
-   저장된 객체 파일들을 역직렬화하여 메모리에 올립니다. 이 함수는 데이터를 장치에
-   불러올 때도 사용합니다.
-   (`장치간 모델 저장하기 & 불러오기 <#device>`__ 참고)
+   저장된 객체 파일들을 역직렬화하여 메모리에 올립니다. 이 함수는 데이터를 장치에 불러올
+   때에도 사용됩니다.
+   (`장치 간 모델 저장하기 & 불러오기 <#device>`__ 참고)
 
 3) `torch.nn.Module.load_state_dict <https://pytorch.org/docs/stable/generated/torch.nn.Module.html?highlight=load_state_dict#torch.nn.Module.load_state_dict>`__:
    역직렬화된 *state_dict* 를 사용하여 모델의 매개변수들을 불러옵니다.
@@ -145,29 +145,29 @@
 #    model.eval()
 #
 # .. note::
-#     PyTorch 버전 1.6에서는 새로운 Zip파일-기반의 파일 포맷을 사용하도록
-#     ``torch.save`` 가 변경되었습니다. ``torch.load`` 는 예전 방식의 파일들을
+#     PyTorch 버전 1.6에서는 ``torch.save`` 가 새로운 Zip파일-기반의 파일
+#     포맷을 사용하도록 변경되었습니다. ``torch.load`` 는 예전 방식의 파일들을
 #     읽어올 수 있도록 하고 있습니다. 어떤 이유에서든 ``torch.save`` 가 예전
 #     방식을 사용하도록 하고 싶다면, ``_use_new_zipfile_serialization=False`` 을
 #     kwarg로 전달하세요.
 #
-# 추론을 위해 모델을 저장할 때는 학습된 모델의 학습된 매개변수만 저장하면 됩니다.
+# 추론을 위해 모델을 저장할 때는 그 모델의 학습된 매개변수만 저장하면 됩니다.
 # ``torch.save()`` 를 사용하여 모델의 *state_dict* 를 저장하는 것이 나중에 모델을
 # 사용할 때 가장 유연하게 사용할 수 있는, 모델 저장 시 권장하는 방법입니다.
 #
 # PyTorch에서는 모델을 저장할 때 ``.pt`` 또는 ``.pth`` 확장자를 사용하는 것이
 # 일반적인 규칙입니다.
 #
-# 추론을 실행하기 전에는 반드시 ``model.eval()`` 을 호출하여 드롭아웃 및 배치
-# 정규화를 평가 모드로 설정하여야 합니다. 이것을 하지 않으면 추론 결과가 일관성
-# 없게 출력됩니다.
+# 추론을 실행하기 전에 반드시 ``model.eval()`` 을 호출하여 드롭아웃 및 배치
+# 정규화를 평가 모드로 설정하여야 합니다. 이 과정을 거치지 않으면 일관성 없는
+# 추론 결과가 출력됩니다.
 #
 # .. Note ::
 #
 #    ``load_state_dict()`` 함수에는 저장된 객체의 경로가 아닌, 사전 객체를
 #    전달해야 하는 것에 유의하세요. 따라서 저장된 *state_dict* 를 ``load_state_dict()``
 #    함수에 전달하기 전에 반드시 역직렬화를 해야 합니다. 예를 들어,
-#    ``model.load_state_dict(PATH)`` 과 같은 식으로는 사용하면 안됩니다.
+#    ``model.load_state_dict(PATH)`` 과 같은 식으로 사용하면 안됩니다.
 #
 # .. Note ::
 #
@@ -192,7 +192,7 @@
 #
 # .. code:: python
 #
-#    # 모델 클래스는 어딘가에 반드시 선언되어 있어야 합니다
+#    # 모델 클래스는 어딘가에 반드시 선언되어 있어야 합니다.
 #    model = torch.load(PATH)
 #    model.eval()
 #
@@ -213,25 +213,23 @@
 # 정규화를 평가 모드로 설정하여야 합니다. 이것을 하지 않으면 추론 결과가 일관성
 # 없게 출력됩니다.
 #
-# Export/Load Model in TorchScript Format
+# TorchScript 포맷으로 모델 내보내기/가져오기
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 #
-# One common way to do inference with a trained model is to use
-# `TorchScript <https://pytorch.org/docs/stable/jit.html>`__, an intermediate
-# representation of a PyTorch model that can be run in Python as well as in a
-# high performance environment like C++. TorchScript is actually the recommended model format
-# for scaled inference and deployment.
+# 훈련된 모델로 추론을 수행하는 일반적인 방법 중 하나는 `TorchScript <https://pytorch.org/docs/stable/jit.html>`__ 를 사용하는 것입니다.
+# TorchScript는 파이썬 환경이나 C++와 같은 고성능 환경에서 실행할 수 있는
+# 파이토치 모델의 중간 표현(IR; Intermediate Representation)입니다.
+# TorchScript는 확장된 추론 및 배포에 권장되는 모델 형식이기도 합니다.
 #
 # .. note::
-#    Using the TorchScript format, you will be able to load the exported model and
-#    run inference without defining the model class.
+#    TorchScript 형식을 사용하면 모델 클래스를 정의하지 않고도 내보낸 모델을 읽어 오거나 추론을 실행할 수 있습니다.
 #
 # **Export:**
 #
 # .. code:: python
 #
-#    model_scripted = torch.jit.script(model) # Export to TorchScript
-#    model_scripted.save('model_scripted.pt') # Save
+#    model_scripted = torch.jit.script(model) # TorchScript 형식으로 내보내기
+#    model_scripted.save('model_scripted.pt') # 저장하기
 #
 # **Load:**
 #
@@ -240,14 +238,14 @@
 #    model = torch.jit.load('model_scripted.pt')
 #    model.eval()
 #
-# Remember that you must call ``model.eval()`` to set dropout and batch
-# normalization layers to evaluation mode before running inference.
-# Failing to do this will yield inconsistent inference results.
+# 추론 실행 전, 드롭아웃 및 배치(batch) 정규화 레이어를 평가 모드로 설정하기 위해 ``model.eval()`` 을 호출해야
+# 합니다. 이 호출 과정이 없으면 일관성 없는 추론 결과가 나타납니다.
 #
-# For more information on TorchScript, feel free to visit the dedicated
-# `tutorials <https://tutorials.pytorch.kr/beginner/Intro_to_TorchScript_tutorial.html>`__.
-# You will get familiar with the tracing conversion and learn how to
-# run a TorchScript module in a `C++ environment <https://tutorials.pytorch.kr/advanced/cpp_export.html>`__.
+# TorchScript에 대한 추가 정보는 전용
+# `자습서 <https://tutorials.pytorch.kr/beginner/Intro_to_TorchScript_tutorial.html>`__ 에서 찾을 수 있습니다.
+# `C++ 환경 <https://tutorials.pytorch.kr/advanced/cpp_export.html>`__ 문서를 참고하여 트레이싱(Tracing) 변환을
+# 수행하는 방법과 C++ 환경에서 TorchScript 모듈을 실행하는 방법을 익힐 수 있습니다.
+
 
 
 ######################################################################
