@@ -88,7 +88,7 @@
 # 준비 단계
 # ---------
 #
-# 시작에 앞서, `여기 <https://www.cs.cornell.edu/~cristian/Cornell_Movie-Dialogs_Corpus.html>`__ 에서
+# 시작에 앞서, `여기 <https://zissou.infosci.cornell.edu/convokit/datasets/movie-corpus/movie-corpus.zip>`__ 에서
 # ZIP 파일 형태의 데이터를 내려받고, 현재 디렉토리 아래에 ``data/`` 라는
 # 디렉토리를 만들어서 내려받은 데이터를 옮겨두시기 바랍니다.
 #
@@ -114,6 +114,7 @@ import codecs
 from io import open
 import itertools
 import math
+import json
 
 
 USE_CUDA = torch.cuda.is_available()
@@ -144,7 +145,7 @@ device = torch.device("cuda" if USE_CUDA else "cpu")
 # 살펴 보겠습니다.
 #
 
-corpus_name = "cornell movie-dialogs corpus"
+corpus_name = "movie-corpus"
 corpus = os.path.join("data", corpus_name)
 
 def printLines(file, n=10):
@@ -153,7 +154,7 @@ def printLines(file, n=10):
     for line in lines[:n]:
         print(line)
 
-printLines(os.path.join(corpus, "movie_lines.txt"))
+printLines(os.path.join(corpus, "utterances.jsonl"))
 
 
 ######################################################################
@@ -163,7 +164,7 @@ printLines(os.path.join(corpus, "movie_lines.txt"))
 # 편의를 위해 데이터의 형식을 원하는 형태로 만들려고 합니다. 각 줄에
 # *질의 문장* 과 *응답 문장* 의 쌍이 탭으로 구분되어 있게끔 하는 것입니다.
 #
-# 다음의 함수를 통해 *movie_lines.txt* 원본 데이터 파일을 파싱하려
+# 다음의 함수를 통해 *utterances.jsonl* 원본 데이터 파일을 파싱하려
 # 합니다.
 #
 # -  ``loadLines`` 는 파일에 포함된 대사를 변환하여 항목(대사 ID ``lineID``,
@@ -176,45 +177,37 @@ printLines(os.path.join(corpus, "movie_lines.txt"))
 #    추출합니다
 #
 
-# 파일에 포함된 대사를 쪼개서 항목에 대한 사전(``dict``) 형태로 변환합니다
-def loadLines(fileName, fields):
+# 파일에 포함된 각 줄을 쪼개서 대사(line)와 대화(conversation)를 생성합니다.
+def loadLinesAndConversations(fileName):
     lines = {}
+    conversations = {}
     with open(fileName, 'r', encoding='iso-8859-1') as f:
         for line in f:
-            values = line.split(" +++$+++ ")
-            # 항목을 추출합니다
+            lineJson = json.loads(line)
+            # 필드를 추출하여 line 객체를 구성합니다
             lineObj = {}
-            for i, field in enumerate(fields):
-                lineObj[field] = values[i]
+            lineObj["lineID"] = lineJson["id"]
+            lineObj["characterID"] = lineJson["speaker"]
+            lineObj["text"] = lineJson["text"]
             lines[lineObj['lineID']] = lineObj
-    return lines
 
+            # 필드를 추출하여 conversation 객체를 구성합니다
+            if lineJson["conversation_id"] not in conversations:
+                convObj = {}
+                convObj["conversationID"] = lineJson["conversation_id"]
+                convObj["movieID"] = lineJson["meta"]["movie_id"]
+                convObj["lines"] = [lineObj]
+            else:
+                convObj = conversations[lineJson["conversation_id"]]
+                convObj["lines"].insert(0, lineObj)
+            conversations[convObj["conversationID"]] = convObj
 
-# 대사의 항목을 *movie_conversations.txt* 를 참고하여 대화 형태로 묶습니다
-def loadConversations(fileName, lines, fields):
-    conversations = []
-    with open(fileName, 'r', encoding='iso-8859-1') as f:
-        for line in f:
-            values = line.split(" +++$+++ ")
-            # 항목을 추출합니다
-            convObj = {}
-            for i, field in enumerate(fields):
-                convObj[field] = values[i]
-            # 문자열을 리스트로 변환합니다(convObj["utteranceIDs"] == "['L598485', 'L598486', ...]")
-            utterance_id_pattern = re.compile('L[0-9]+')
-            lineIds = utterance_id_pattern.findall(convObj["utteranceIDs"])
-            # 대사를 재구성합니다
-            convObj["lines"] = []
-            for lineId in lineIds:
-                convObj["lines"].append(lines[lineId])
-            conversations.append(convObj)
-    return conversations
+    return lines, conversations
 
-
-# conversations에서 문장 쌍을 추출합니다
+# conversation들에서 문장 쌍을 추출합니다
 def extractSentencePairs(conversations):
     qa_pairs = []
-    for conversation in conversations:
+    for conversation in conversations.values():
         # 대화를 이루는 각 대사에 대해 반복문을 수행합니다
         # 대화의 마지막 대사는 (그에 대한 응답이 없으므로) 무시합니다
         for i in range(len(conversation["lines"]) - 1):
@@ -227,29 +220,23 @@ def extractSentencePairs(conversations):
 
 
 ######################################################################
-# 이제 이 함수들을 호출하여 새로운 파일인 *formatted_movie_lines.txt* 를
+# 이제 이 함수들을 호출하여 새로운 파일인 *formatted_utterances.jsonl* 를
 # 만듭니다.
 #
 
 # 새 파일에 대한 경로를 정의합니다
-datafile = os.path.join(corpus, "formatted_movie_lines.txt")
+datafile = os.path.join(corpus, "formatted_utterances.jsonl")
 
 delimiter = '\t'
 # 구분자에 대해 unescape 함수를 호출합니다
 delimiter = str(codecs.decode(delimiter, "unicode_escape"))
 
-# 대사 사전(dict), 대화 리스트(list), 그리고 각 항목의 이름을 초기화합니다
+# 대사 사전(lines dict)과 대화 사전(conversations dict)을 초기화합니다
 lines = {}
-conversations = []
-MOVIE_LINES_FIELDS = ["lineID", "characterID", "movieID", "character", "text"]
-MOVIE_CONVERSATIONS_FIELDS = ["character1ID", "character2ID", "movieID", "utteranceIDs"]
-
-# 대사(lines)를 읽어들여 대화(conversations)로 재구성합니다
-print("\nProcessing corpus...")
-lines = loadLines(os.path.join(corpus, "movie_lines.txt"), MOVIE_LINES_FIELDS)
-print("\nLoading conversations...")
-conversations = loadConversations(os.path.join(corpus, "movie_conversations.txt"),
-                                  lines, MOVIE_CONVERSATIONS_FIELDS)
+conversations = {}
+# 대사와 대화를 불러옵니다
+print("\nProcessing corpus into lines and conversations...")
+lines, conversations = loadLinesAndConversations(os.path.join(corpus, "utterances.jsonl"))
 
 # 결과를 새로운 csv 파일로 저장합니다
 print("\nWriting newly formatted file...")

@@ -5,7 +5,7 @@
 **번역**: `박다정 <https://github.com/dajeongPark-dev>`_
 
 .. note::
-   이 튜토리얼의 소스 코드는 `GitHub <https://github.com/PyTorchKorea/tutorials-kr/blob/master/advanced_source/rpc_ddp_tutorial.rst>`__ 에서 확인할 수 있습니다.
+   |edit| 이 튜토리얼의 소스 코드는 `GitHub <https://github.com/PyTorchKorea/tutorials-kr/blob/master/advanced_source/rpc_ddp_tutorial.rst>`__ 에서 확인하고 변경해 볼 수 있습니다.
 
 이 튜토리얼은 간단한 예제를 사용하여 분산 데이터 병렬 처리(distributed data parallelism)와
 분산 모델 병렬 처리(distributed model parallelism)를 결합하여 간단한 모델 학습시킬 때

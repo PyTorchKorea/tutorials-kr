@@ -132,6 +132,45 @@ Prototype features are not available as part of binary distributions like PyPI o
    :link: ../prototype/vmap_recipe.html
    :tags: vmap
 
+.. NestedTensor
+
+.. customcarditem::
+   :header: Nested Tensor
+   :card_description: Learn about nested tensors, the new way to batch heterogeneous-length data
+   :image: ../_static/img/thumbnails/cropped/generic-pytorch-logo.png
+   :link: ../prototype/nestedtensor.html
+   :tags: NestedTensor
+
+.. MaskedTensor
+
+.. customcarditem::
+   :header: MaskedTensor Overview
+   :card_description: Learn about masked tensors, the source of truth for specified and unspecified values
+   :image: ../_static/img/thumbnails/cropped/generic-pytorch-logo.png
+   :link: ../prototype/maskedtensor_overview.html
+   :tags: MaskedTensor
+
+.. customcarditem::
+   :header: Masked Tensor Sparsity
+   :card_description: Learn about how to leverage sparse layouts (e.g. COO and CSR) in MaskedTensor
+   :image: ../_static/img/thumbnails/cropped/generic-pytorch-logo.png
+   :link: ../prototype/maskedtensor_sparsity.html
+   :tags: MaskedTensor
+
+.. customcarditem::
+   :header: Masked Tensor Advanced Semantics
+   :card_description: Learn more about Masked Tensor's advanced semantics (reductions and comparing vs. NumPy's MaskedArray)
+   :image: ../_static/img/thumbnails/cropped/generic-pytorch-logo.png
+   :link: ../prototype/maskedtensor_advanced_semantics.html
+   :tags: MaskedTensor
+
+.. customcarditem::
+   :header: MaskedTensor: Simplifying Adagrad Sparse Semantics
+   :card_description: See a showcase on how masked tensors can enable sparse semantics and provide for a cleaner dev experience 
+   :image: ../_static/img/thumbnails/cropped/generic-pytorch-logo.png
+   :link: ../prototype/maskedtensor_adagrad.html
+   :tags: MaskedTensor
+   
 .. End of tutorial card section
 
 .. raw:: html
@@ -162,3 +201,8 @@ Prototype features are not available as part of binary distributions like PyPI o
    prototype/torchscript_freezing.html
    prototype/vmap_recipe.html
    prototype/vulkan_workflow.html
+   prototype/nestedtensor.html
+   prototype/maskedtensor_overview.html
+   prototype/maskedtensor_sparsity.html
+   prototype/maskedtensor_advanced_semantics.html
+   prototype/maskedtensor_adagrad.html

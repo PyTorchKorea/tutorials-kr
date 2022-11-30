@@ -38,8 +38,9 @@ PyTorch에서 사용법
      이 튜토리얼은 (텐서를 CUDA로 이동하더라도) GPU에서는 동작하지 않으며 CPU에서만 동작합니다.
 
 """
-import torch, torchvision
-model = torchvision.models.resnet18(pretrained=True)
+import torch
+from torchvision.models import resnet18, ResNet18_Weights
+model = resnet18(weights=ResNet18_Weights.DEFAULT)
 data = torch.rand(1, 3, 64, 64)
 labels = torch.rand(1, 1000)
 
@@ -276,7 +277,7 @@ print(f"Does `b` require gradients?: {b.requires_grad}")
 
 from torch import nn, optim
 
-model = torchvision.models.resnet18(pretrained=True)
+model = resnet18(weights=ResNet18_Weights.DEFAULT)
 
 # 신경망의 모든 매개변수를 고정합니다
 for param in model.parameters():

@@ -104,7 +104,7 @@ def imshow(img):
 
 # 학습용 이미지를 무작위로 가져오기
 dataiter = iter(trainloader)
-images, labels = dataiter.next()
+images, labels = next(dataiter)
 
 # 이미지 보여주기
 imshow(torchvision.utils.make_grid(images))
@@ -208,7 +208,7 @@ torch.save(net.state_dict(), PATH)
 # 첫번째로 시험용 데이터를 좀 보겠습니다.
 
 dataiter = iter(testloader)
-images, labels = dataiter.next()
+images, labels = next(dataiter)
 
 # 이미지를 출력합니다.
 imshow(torchvision.utils.make_grid(images))

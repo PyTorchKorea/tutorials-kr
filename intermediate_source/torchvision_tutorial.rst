@@ -204,7 +204,7 @@ COCO에 대해 미리 학습된 모델에서 시작하여 특정 클래스를 �
    from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
 
    # COCO로 미리 학습된 모델 읽기
-   model = torchvision.models.detection.fasterrcnn_resnet50_fpn(pretrained=True)
+   model = torchvision.models.detection.fasterrcnn_resnet50_fpn(weights="DEFAULT")
 
    # 분류기를 새로운 것으로 교체하는데, num_classes는 사용자가 정의합니다
    num_classes = 2  # 1 클래스(사람) + 배경
@@ -223,7 +223,7 @@ COCO에 대해 미리 학습된 모델에서 시작하여 특정 클래스를 �
    from torchvision.models.detection.rpn import AnchorGenerator
 
    # 분류 목적으로 미리 학습된 모델을 로드하고 특징들만을 리턴하도록 합니다
-   backbone = torchvision.models.mobilenet_v2(pretrained=True).features
+   backbone = torchvision.models.mobilenet_v2(weights="DEFAULT").features
    # Faster RCNN은 백본의 출력 채널 수를 알아야 합니다.
    # mobilenetV2의 경우 1280이므로 여기에 추가해야 합니다.
    backbone.out_channels = 1280
@@ -267,7 +267,7 @@ PennFudan 데이터셋을 위한 인스턴스 분할 모델
 
    def get_model_instance_segmentation(num_classes):
        # COCO 에서 미리 학습된 인스턴스 분할 모델을 읽어옵니다
-       model = torchvision.models.detection.maskrcnn_resnet50_fpn(pretrained=True)
+       model = torchvision.models.detection.maskrcnn_resnet50_fpn(weights="DEFAULT")
 
        # 분류를 위한 입력 특징 차원을 얻습니다
        in_features = model.roi_heads.box_predictor.cls_score.in_features
@@ -304,7 +304,8 @@ PennFudan 데이터셋을 위한 인스턴스 분할 모델
 
    def get_transform(train):
        transforms = []
-       transforms.append(T.ToTensor())
+       transforms.append(T.PILToTensor())
+       transforms.append(T.ConvertImageDtype(torch.float))
        if train:
            # (역자주: 학습시 50% 확률로 학습 영상을 좌우 반전 변환합니다)
            transforms.append(T.RandomHorizontalFlip(0.5))
@@ -318,7 +319,7 @@ PennFudan 데이터셋을 위한 인스턴스 분할 모델
 
 .. code:: python
 
-   model = torchvision.models.detection.fasterrcnn_resnet50_fpn(pretrained=True)
+   model = torchvision.models.detection.fasterrcnn_resnet50_fpn(weights="DEFAULT")
    dataset = PennFudanDataset('PennFudanPed', get_transform(train=True))
    data_loader = torch.utils.data.DataLoader(
     dataset, batch_size=2, shuffle=True, num_workers=4,

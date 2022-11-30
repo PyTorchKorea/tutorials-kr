@@ -68,7 +68,7 @@ PyTorch 및 OpenCV 설치
 .. code:: shell
 
     $ pip install torch torchvision torchaudio
-    $ pip install opencv-contrib-python
+    $ pip install opencv-python
     $ pip install numpy --upgrade
 
 .. image:: https://user-images.githubusercontent.com/909104/152874260-95a7a8bd-0f9b-438a-9c0b-5b67729e233f.png
@@ -142,7 +142,7 @@ OpenCV는 ``numpy`` 배열을 BGR로 반환하므로 이 배열을 읽고 약간
 테스트용으로 그러한 것을 선택할 수 있지만 만약 직접 훈련하고 양자화 하는 경우
 자신의 모델을 사용할 수 있습니다.
 
-이 튜토리얼에서는 좋은 성능과 정확도를 가진 ``mobilenet_v2`` 를 
+이 튜토리얼에서는 좋은 성능과 정확도를 가진 ``mobilenet_v2`` 를
 사용합니다.
 
 Raspberry Pi 4 벤치마크 결과:
@@ -279,8 +279,8 @@ aarch64 버전의 pytorch는 ``qnnpack`` 엔진을 사용해야 합니다.
 
 .. image:: https://user-images.githubusercontent.com/909104/152892630-f094b84b-19ba-48f6-8632-1b954abc59c7.png
 
-처음부터 끝까지 작동하는 것을 확인하기 위해서는 
-클래스의 확률을 계산하고 
+처음부터 끝까지 작동하는 것을 확인하기 위해서는
+클래스의 확률을 계산하고
 `ImageNet 클래스 레이블을 사용하여 <https://gist.github.com/yrevar/942d3a0ac09ec9e5eb3a>`_
 탐지된 것을 출력할 수 있습니다.
 
@@ -326,15 +326,15 @@ PyTorch는 기본적으로 사용 가능한 모든 코어를 사용합니다.
 다음 단계
 ~~~~~~~~~~~
 
-자신만의 모델을 만들거나 기존 모델을 미세 조정(fine tune)할 수 있습니다. 
+자신만의 모델을 만들거나 기존 모델을 미세 조정(fine tune)할 수 있습니다.
 `torchvision.models.quantized
 <https://pytorch.org/vision/stable/models.html#quantized-models>`_
-의 모델 중 하나를 미세 조정하면 대부분의 양자화, 
+의 모델 중 하나를 미세 조정하면 대부분의 양자화,
 융합 작업이 이미 되어있어 Raspberry Pi에서 좋은 성능으로 직접 배포할 수 있습니다.
 
 더보기:
 
 * `Quantization <https://pytorch.org/docs/stable/quantization.html>`_ 자신의 모델을 양자화 및 융합하는 방법에 대한 자세한 정보.
-* 전이학습(Transfer Learning)을 사용하여 데이터셋에 맞게 기존 모델을 미세 조정하는 방법에 대한 전이 학습 튜토리얼 
+* 전이학습(Transfer Learning)을 사용하여 데이터셋에 맞게 기존 모델을 미세 조정하는 방법에 대한 전이 학습 튜토리얼
   `전이학습(Transfer Learning) 튜토리얼 <https://tutorials.pytorch.kr/beginner/transfer_learning_tutorial.html>`_
-  
+

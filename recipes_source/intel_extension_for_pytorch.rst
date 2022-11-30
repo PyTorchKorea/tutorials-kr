@@ -85,21 +85,21 @@ Float32
    import torch.nn as nn
    # Import intel_extension_for_pytorch
    import intel_extension_for_pytorch as ipex
-
+   
    class Model(nn.Module):
        def __init__(self):
            super(Model, self).__init__()
            self.linear = nn.Linear(4, 5)
-
+   
        def forward(self, input):
            return self.linear(input)
-
+   
    model = Model()
    model.set_state_dict(torch.load(PATH))
    optimizer.set_state_dict(torch.load(PATH))
    # Invoke optimize function against the model object and optimizer object
-   model, optimizer = ipex.optimize(model, optimizer, dtype=torch.float32)
-
+   model, optimizer = ipex.optimize(model, optimizer=optimizer)
+   
    for images, label in train_loader():
        # Setting memory_format to torch.channels_last could improve performance with 4D input data. This is optional.
        images = images.to(memory_format=torch.channels_last)
@@ -118,21 +118,21 @@ BFloat16
    import torch.nn as nn
    # Import intel_extension_for_pytorch
    import intel_extension_for_pytorch as ipex
-
+   
    class Model(nn.Module):
        def __init__(self):
            super(Model, self).__init__()
            self.linear = nn.Linear(4, 5)
-
+   
        def forward(self, input):
            return self.linear(input)
-
+   
    model = Model()
    model.set_state_dict(torch.load(PATH))
    optimizer.set_state_dict(torch.load(PATH))
    # Invoke optimize function against the model object and optimizer object with data type set to torch.bfloat16
-   model, optimizer = ipex.optimize(model, optimizer, dtype=torch.bfloat16)
-
+   model, optimizer = ipex.optimize(model, optimizer=optimizer, dtype=torch.bfloat16)
+   
    for images, label in train_loader():
        with torch.cpu.amp.autocast():
            # Setting memory_format to torch.channels_last could improve performance with 4D input data. This is optional.
@@ -155,15 +155,15 @@ Float32
    import torch.nn as nn
    # Import intel_extension_for_pytorch
    import intel_extension_for_pytorch as ipex
-
+   
    class Model(nn.Module):
        def __init__(self):
            super(Model, self).__init__()
            self.linear = nn.Linear(4, 5)
-
+   
        def forward(self, input):
            return self.linear(input)
-
+   
    input = torch.randn(2, 4)
    model = Model()
    model.eval()
@@ -180,15 +180,15 @@ BFloat16
    import torch.nn as nn
    # Import intel_extension_for_pytorch
    import intel_extension_for_pytorch as ipex
-
+   
    class Model(nn.Module):
        def __init__(self):
            super(Model, self).__init__()
            self.linear = nn.Linear(4, 5)
-
+   
        def forward(self, input):
            return self.linear(input)
-
+   
    input = torch.randn(2, 4)
    model = Model()
    model.eval()
@@ -196,7 +196,7 @@ BFloat16
    model = ipex.optimize(model, dtype=torch.bfloat16)
    with torch.cpu.amp.autocast():
        res = model(input)
-
+ 
 Inference - TorchScript Mode
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -214,18 +214,18 @@ Float32
    import torch.nn as nn
    # Import intel_extension_for_pytorch
    import intel_extension_for_pytorch as ipex
-
+   
    # oneDNN graph fusion is enabled by default, uncomment the line below to disable it explicitly
    # ipex.enable_onednn_fusion(False)
-
+   
    class Model(nn.Module):
        def __init__(self):
            super(Model, self).__init__()
            self.linear = nn.Linear(4, 5)
-
+   
        def forward(self, input):
            return self.linear(input)
-
+   
    input = torch.randn(2, 4)
    model = Model()
    model.eval()
@@ -244,18 +244,18 @@ BFloat16
    import torch.nn as nn
    # Import intel_extension_for_pytorch
    import intel_extension_for_pytorch as ipex
-
+   
    # oneDNN graph fusion is enabled by default, uncomment the line below to disable it explicitly
    # ipex.enable_onednn_fusion(False)
-
+   
    class Model(nn.Module):
        def __init__(self):
            super(Model, self).__init__()
            self.linear = nn.Linear(4, 5)
-
+   
        def forward(self, input):
            return self.linear(input)
-
+   
    input = torch.randn(2, 4)
    model = Model()
    model.eval()
@@ -275,7 +275,7 @@ inference workload only, such as service deployment. For regular development,
 please use Python interface. Comparing to usage of libtorch, no specific code
 changes are required, except for converting input data into channels last data
 format. Compilation follows the recommended methodology with CMake. Detailed
-instructions can be found in `PyTorch tutorial <https://tutorials.pytorch.kr/advanced/cpp_export.html#depending-on-libtorch-and-building-the-application>`_.
+instructions can be found in `PyTorch tutorial <https://pytorch.org/tutorials/advanced/cpp_export.html#depending-on-libtorch-and-building-the-application>`_.
 During compilation, Intel optimizations will be activated automatically
 once C++ dynamic library of Intel® Extension for PyTorch* is linked.
 
@@ -286,7 +286,7 @@ once C++ dynamic library of Intel® Extension for PyTorch* is linked.
    #include <torch/script.h>
    #include <iostream>
    #include <memory>
-
+   
    int main(int argc, const char* argv[]) {
        torch::jit::script::Module module;
        try {
@@ -299,9 +299,9 @@ once C++ dynamic library of Intel® Extension for PyTorch* is linked.
        std::vector<torch::jit::IValue> inputs;
        // make sure input data are converted to channels last format
        inputs.push_back(torch::ones({1, 3, 224, 224}).to(c10::MemoryFormat::ChannelsLast));
-
+   
        at::Tensor output = module.forward(inputs).toTensor();
-
+   
        return 0;
    }
 
@@ -311,10 +311,10 @@ once C++ dynamic library of Intel® Extension for PyTorch* is linked.
 
    cmake_minimum_required(VERSION 3.0 FATAL_ERROR)
    project(example-app)
-
+   
    find_package(Torch REQUIRED)
    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS} -Wl,--no-as-needed")
-
+   
    add_executable(example-app example-app.cpp)
    # Link the binary against the C++ dynamic library file of Intel® Extension for PyTorch*
    target_link_libraries(example-app "${TORCH_LIBRARIES}" "${INTEL_EXTENSION_FOR_PYTORCH_PATH}/lib/libintel-ext-pt-cpu.so")

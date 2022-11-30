@@ -7,7 +7,7 @@
 **번역**: `조병근 <https://github.com/Jo-byung-geun>`_
 
 .. note::
-   이 튜토리얼의 소스 코드는 `GitHub <https://github.com/pytorch/tutorials/blob/master/intermediate_source/ddp_tutorial.rst>`__ 에서 확인할 수 있습니다.
+   |edit| 이 튜토리얼의 소스 코드는 `GitHub <https://github.com/pytorch/tutorials/blob/master/intermediate_source/ddp_tutorial.rst>`__ 에서 확인하고 변경해 볼 수 있습니다.
 
 선수과목(Prerequisites):
 

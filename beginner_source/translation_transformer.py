@@ -313,7 +313,7 @@ def train_epoch(model, optimizer):
         optimizer.step()
         losses += loss.item()
 
-    return losses / len(train_dataloader)
+    return losses / len(list(train_dataloader))
 
 
 def evaluate(model):
@@ -337,7 +337,7 @@ def evaluate(model):
         loss = loss_fn(logits.reshape(-1, logits.shape[-1]), tgt_out.reshape(-1))
         losses += loss.item()
 
-    return losses / len(val_dataloader)
+    return losses / len(list(val_dataloader))
 
 ######################################################################
 # 이제 모델 학습을 위한 모든 요소가 준비되었습니다. 학습을 해보겠습니다!

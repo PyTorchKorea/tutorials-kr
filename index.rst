@@ -5,12 +5,10 @@
 
 아래 튜토리얼들이 새로 추가되었습니다.
 
-* `TorchRec 소개 </intermediate/torchrec_tutorial.html?utm_source=whats_new_tutorials&utm_medium=torchrec>`__
-* `Getting Started with Fully Sharded Data Parallel (FSDP) </intermediate/FSDP_tutorial.html?utm_source=whats_new_tutorials&utm_medium=FSDP>`__
+* `PyTorch Distributed Series </beginner/ddp_series_intro.html?utm_source=whats_new_tutorials&utm_medium=ddp_series_intro>`__
+* `Fast Transformer Inference with Better Transformer </beginner/bettertransformer_tutorial.html?utm_source=whats_new_tutorials&utm_medium=bettertransformer>`__
+* `Advanced model training with Fully Sharded Data Parallel (FSDP) </intermediate/FSDP_adavnced_tutorial.html?utm_source=whats_new_tutorials&utm_medium=FSDP_advanced>`__
 * `Grokking PyTorch Intel CPU Performance from First Principles </intermediate/torchserve_with_ipex?utm_source=whats_new_tutorials&utm_medium=torchserve_ipex>`__
-* `Customize Process Group Backends Using Cpp Extensions </intermediate/process_group_cpp_extension_tutorial.html?utm_source=whats_new_tutorials&utm_medium=cpp_ext>`__
-* `Forward-mode Automatic Differentiation </intermediate/forward_ad_usage.html?utm_source=whats_new_tutorials&utm_medium=forward_ad>`__ (added functorch API capabilities)
-* `Raspberry Pi 4 에서 실시간 추론(Inference) (30fps!) </intermediate/realtime_rpi.html?utm_source=whats_new_tutorials&utm_medium=rpi>`__
 
 .. raw:: html
 
@@ -213,6 +211,13 @@
    :tags: Audio
 
 .. Text
+
+.. customcarditem::
+   :header: Fast Transformer Inference with Better Transformer
+   :card_description: Deploy a PyTorch Transformer model using Better Transformer with high performance for inference
+   :image: _static/img/thumbnails/cropped/pytorch-logo.png
+   :link: beginner/bettertransformer_tutorial.html
+   :tags: Production,Text
 
 .. customcarditem::
    :header: nn.Transformer와 TorchText로 시퀀스-투-시퀀스 모델링하기
@@ -491,6 +496,27 @@
    :link: intermediate/torchserve_with_ipex
    :tags: Model-Optimization,Production
 
+.. customcarditem::
+   :header: Grokking PyTorch Intel CPU Performance from First Principles (Part 2)
+   :card_description: A case study on the TorchServe inference framework optimized with Intel® Extension for PyTorch (Part 2).
+   :image: _static/img/thumbnails/cropped/generic-pytorch-logo.png
+   :link: intermediate/torchserve_with_ipex_2
+   :tags: Model-Optimization,Production
+
+.. customcarditem::
+   :header: Introduction to nvFuser
+   :card_description: An introduction to nvFuser
+   :image: _static/img/thumbnails/cropped/generic-pytorch-logo.png
+   :link: intermediate/nvfuser_intro_tutorial.html
+   :tags: Model-Optimization
+
+.. customcarditem::
+   :header: Multi-Objective Neural Architecture Search with Ax
+   :card_description: Learn how to use Ax to search over architectures find optimal tradeoffs between accuracy and latency.
+   :image: _static/img/ax_logo.png
+   :link: intermediate/ax_multiobjective_nas_tutorial.html
+   :tags: Model-Optimization,Best-Practice,Ax,TorchX
+
 .. Parallel-and-Distributed-Training
 
 .. customcarditem::
@@ -498,6 +524,13 @@
    :card_description: Briefly go over all concepts and features in the distributed package. Use this document to find the distributed training technology that can best serve your application.
    :image: _static/img/thumbnails/cropped/PyTorch-Distributed-Overview.png
    :link: beginner/dist_overview.html
+   :tags: Parallel-and-Distributed-Training
+
+.. customcarditem::
+   :header: Distributed Data Parallel in PyTorch - Video Tutorials
+   :card_description: This series of video tutorials walks you through distributed training in PyTorch via DDP.
+   :image: _static/img/thumbnails/cropped/PyTorch-Distributed-Overview.png
+   :link: beginner/ddp_series_intro.html
    :tags: Parallel-and-Distributed-Training
 
 .. customcarditem::
@@ -580,8 +613,15 @@
 .. customcarditem::
    :header: Getting Started with Fully Sharded Data Parallel(FSDP)
    :card_description: Learn how to train models with Fully Sharded Data Parallel package.
-   :image: _static/img/thumbnails/cropped/Getting Started with FSDP.png
+   :image: _static/img/thumbnails/cropped/Getting-Started-with-FSDP.png
    :link: intermediate/FSDP_tutorial.html
+   :tags: Parallel-and-Distributed-Training
+
+.. customcarditem::
+   :header: Advanced Model Training with Fully Sharded Data Parallel (FSDP)
+   :card_description: Explore advanced model training with Fully Sharded Data Parallel package.
+   :image: _static/img/thumbnails/cropped/Getting-Started-with-FSDP.png
+   :link: intermediate/FSDP_adavnced_tutorial.html
    :tags: Parallel-and-Distributed-Training
 
 .. Mobile
@@ -601,6 +641,7 @@
    :tags: Mobile
 
 .. Recommendation Systems
+
 .. customcarditem::
    :header: Introduction to TorchRec
    :card_description: TorchRec is a PyTorch domain library built to provide common sparsity & parallelism primitives needed for large-scale recommender systems.
@@ -615,6 +656,14 @@
    :link: advanced/sharding.html
    :tags: TorchRec,Recommender
 
+.. Multimodality
+
+.. customcarditem::
+   :header: Introduction to TorchMultimodal
+   :card_description: TorchMultimodal is a library that provides models, primitives and examples for training multimodal tasks
+   :image: _static/img/thumbnails/torchrec.png
+   :link: beginner/flava_finetuning_tutorial.html
+   :tags: TorchMultimodal
 
 .. End of tutorial card section
 
@@ -643,8 +692,8 @@
 
 .. customcalloutitem::
    :header: 파이토치(PyTorch) 예제
-   :description: 비전, 텍스트, Reinforcement-Learning 등의 분야에서의 PyTorch 예제 모음
-   :button_link: https://github.com/pytorch/examples
+   :description: 비전, 텍스트, 강화학습 등의 분야에서 기존 코드에 통합하여 사용할 수 있는 PyTorch 예제 모음
+   :button_link: https://pytorch.org/examples?utm_source=examples&utm_medium=examples-landing
    :button_text: Checkout Examples
 
 .. customcalloutitem::
@@ -776,6 +825,7 @@
    :caption: 텍스트
 
    beginner/transformer_tutorial
+   beginner/bettertransformer_tutorial
    intermediate/char_rnn_classification_tutorial
    intermediate/char_rnn_generation_tutorial
    intermediate/seq2seq_translation_tutorial
@@ -856,6 +906,9 @@
    intermediate/quantized_transfer_learning_tutorial
    advanced/static_quantization_tutorial
    intermediate/torchserve_with_ipex
+   intermediate/torchserve_with_ipex_2
+   intermediate/nvfuser_intro_tutorial
+   intermediate/ax_multiobjective_nas_tutorial
 
 .. toctree::
    :maxdepth: 2
@@ -863,11 +916,14 @@
    :hidden:
    :caption: 병렬 및 분산 학습
 
+   distributed/home
    beginner/dist_overview
+   beginner/ddp_series_intro
    intermediate/model_parallel_tutorial
    intermediate/ddp_tutorial
    intermediate/dist_tuto
    intermediate/FSDP_tutorial
+   intermediate/FSDP_adavnced_tutorial
    intermediate/process_group_cpp_extension_tutorial
    intermediate/rpc_tutorial
    intermediate/rpc_param_server_tutorial
@@ -895,3 +951,11 @@
 
    intermediate/torchrec_tutorial
    advanced/sharding
+
+.. toctree::
+   :maxdepth: 2
+   :includehidden:
+   :hidden:
+   :caption: Multimodality
+
+   beginner/flava_finetuning_tutorial

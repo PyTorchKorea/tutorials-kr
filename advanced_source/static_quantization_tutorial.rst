@@ -21,17 +21,18 @@
 
 .. code:: python
 
+    import os
+    import sys
+    import time
     import numpy as np
+
     import torch
     import torch.nn as nn
-    import torchvision
     from torch.utils.data import DataLoader
+
+    import torchvision
     from torchvision import datasets
     import torchvision.transforms as transforms
-    import os
-    import time
-    import sys
-    import torch.quantization
 
     # # warnings 설정
     import warnings
@@ -42,7 +43,7 @@
     )
     warnings.filterwarnings(
         action='default',
-        module=r'torch.quantization'
+        module=r'torch.ao.quantization'
     )
 
     # 반복 가능한 결과를 위한 랜덤 시드 지정하기
@@ -63,7 +64,7 @@
 
 .. code:: python
 
-    from torch.quantization import QuantStub, DeQuantStub
+    from torch.ao.quantization import QuantStub, DeQuantStub
 
     def _make_divisible(v, divisor, min_value=None):
         """
@@ -197,9 +198,7 @@
                     nn.init.zeros_(m.bias)
 
         def forward(self, x):
-
             x = self.quant(x)
-
             x = self.features(x)
             x = x.mean([2, 3])
             x = self.classifier(x)
@@ -211,11 +210,11 @@
         def fuse_model(self):
             for m in self.modules():
                 if type(m) == ConvBNReLU:
-                    torch.quantization.fuse_modules(m, ['0', '1', '2'], inplace=True)
+                    torch.ao.quantization.fuse_modules(m, ['0', '1', '2'], inplace=True)
                 if type(m) == InvertedResidual:
                     for idx in range(len(m.conv)):
                         if type(m.conv[idx]) == nn.Conv2d:
-                            torch.quantization.fuse_modules(m.conv, [str(idx), str(idx + 1)], inplace=True)
+                            torch.ao.quantization.fuse_modules(m.conv, [str(idx), str(idx + 1)], inplace=True)
 
 2. 헬퍼(Helper) 함수
 --------------------
@@ -319,21 +318,19 @@ ImageNet 데이터
         normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
                                          std=[0.229, 0.224, 0.225])
         dataset = torchvision.datasets.ImageNet(
-               data_path, split="train",
-             transforms.Compose([
-                       transforms.RandomResizedCrop(224),
-                       transforms.RandomHorizontalFlip(),
-                       transforms.ToTensor(),
-                       normalize,
-                   ]))
+            data_path, split="train", transform=transforms.Compose([
+                transforms.RandomResizedCrop(224),
+                transforms.RandomHorizontalFlip(),
+                transforms.ToTensor(),
+                normalize,
+            ]))
         dataset_test = torchvision.datasets.ImageNet(
-              data_path, split="val",
-                  transforms.Compose([
-                      transforms.Resize(256),
-                      transforms.CenterCrop(224),
-                      transforms.ToTensor(),
-                      normalize,
-                  ]))
+            data_path, split="val", transform=transforms.Compose([
+                transforms.Resize(256),
+                transforms.CenterCrop(224),
+                transforms.ToTensor(),
+                normalize,
+            ]))
 
         train_sampler = torch.utils.data.RandomSampler(dataset)
         test_sampler = torch.utils.data.SequentialSampler(dataset_test)
@@ -349,8 +346,8 @@ ImageNet 데이터
         return data_loader, data_loader_test
 
 
-다음으로 사전에 학습된 MobileNetV2을 불러옵니다. ``torchvision`` 에서 데이터를 다운로드받을 수 있는 URL은
-`여기 <https://github.com/pytorch/vision/blob/master/torchvision/models/mobilenet.py#L9>`_ 입니다.
+다음으로 사전에 학습된 MobileNetV2을 불러옵니다. 모델을 다운로드 받을 수 있는 URL을
+`여기 <<https://download.pytorch.org/models/mobilenet_v2-b0353104.pth>>`_ 에서 제공합니다.
 
 .. code:: python
 
@@ -425,9 +422,9 @@ ImageNet 데이터
 
     # 양자화 설정 명시
     # 간단한 min/max 범위 추정 및 텐서별 가중치 양자화로 시작
-    myModel.qconfig = torch.quantization.default_qconfig
+    myModel.qconfig = torch.ao.quantization.default_qconfig
     print(myModel.qconfig)
-    torch.quantization.prepare(myModel, inplace=True)
+    torch.ao.quantization.prepare(myModel, inplace=True)
 
     # 첫 번째 보정
     print('Post Training Quantization Prepare: Inserting Observers')
@@ -438,7 +435,7 @@ ImageNet 데이터
     print('Post Training Quantization: Calibration done')
 
     # 양자화된 모델로 변환
-    torch.quantization.convert(myModel, inplace=True)
+    torch.ao.quantization.convert(myModel, inplace=True)
     print('Post Training Quantization: Convert done')
     print('\n Inverted Residual Block: After fusion and quantization, note fused modules: \n\n',myModel.features[1].conv)
 
@@ -462,12 +459,12 @@ x86 아키텍처에서 양자화를 위한 권장 설정을 그대로 쓰기만 
     per_channel_quantized_model = load_model(saved_model_dir + float_model_file)
     per_channel_quantized_model.eval()
     per_channel_quantized_model.fuse_model()
-    per_channel_quantized_model.qconfig = torch.quantization.get_default_qconfig('fbgemm')
+    per_channel_quantized_model.qconfig = torch.ao.quantization.get_default_qconfig('fbgemm')
     print(per_channel_quantized_model.qconfig)
 
-    torch.quantization.prepare(per_channel_quantized_model, inplace=True)
+    torch.ao.quantization.prepare(per_channel_quantized_model, inplace=True)
     evaluate(per_channel_quantized_model,criterion, data_loader, num_calibration_batches)
-    torch.quantization.convert(per_channel_quantized_model, inplace=True)
+    torch.ao.quantization.convert(per_channel_quantized_model, inplace=True)
     top1, top5 = evaluate(per_channel_quantized_model, criterion, data_loader_test, neval_batches=num_eval_batches)
     print('Evaluation accuracy on %d images, %2.2f'%(num_eval_batches * eval_batch_size, top1.avg))
     torch.jit.save(torch.jit.script(per_channel_quantized_model), saved_model_dir + scripted_quantized_model_file)
@@ -538,13 +535,13 @@ x86 아키텍처에서 양자화를 위한 권장 설정을 그대로 쓰기만 
     qat_model.fuse_model()
 
     optimizer = torch.optim.SGD(qat_model.parameters(), lr = 0.0001)
-    qat_model.qconfig = torch.quantization.get_default_qat_qconfig('fbgemm')
+    qat_model.qconfig = torch.ao.quantization.get_default_qat_qconfig('fbgemm')
 
 마지막으로 모델이 양자화 자각 학습을 준비하기 위해 ``prepare_qat`` 로 "가짜 양자화"를 수행합니다.
 
 .. code:: python
 
-    torch.quantization.prepare_qat(qat_model, inplace=True)
+    torch.ao.quantization.prepare_qat(qat_model, inplace=True)
     print('Inverted Residual Block: After preparation for QAT, note fake-quantization modules \n',qat_model.features[1].conv)
 
 높은 정확도의 양자화된 모델을 학습시키기 위해서는 추론 시점에서 정확한 숫자 모델링을 필요로 합니다.
@@ -563,13 +560,13 @@ x86 아키텍처에서 양자화를 위한 권장 설정을 그대로 쓰기만 
         train_one_epoch(qat_model, criterion, optimizer, data_loader, torch.device('cpu'), num_train_batches)
         if nepoch > 3:
             # 양자화 파라미터 고정
-            qat_model.apply(torch.quantization.disable_observer)
+            qat_model.apply(torch.ao.quantization.disable_observer)
         if nepoch > 2:
             # 배치 정규화 평균 및 분산 추정값 고정
             qat_model.apply(torch.nn.intrinsic.qat.freeze_bn_stats)
 
         # 각 에폭 이후 정확도 확인
-        quantized_model = torch.quantization.convert(qat_model.eval(), inplace=False)
+        quantized_model = torch.ao.quantization.convert(qat_model.eval(), inplace=False)
         quantized_model.eval()
         top1, top5 = evaluate(quantized_model,criterion, data_loader_test, neval_batches=num_eval_batches)
         print('Epoch %d :Evaluation accuracy on %d images, %2.2f'%(nepoch, num_eval_batches * eval_batch_size, top1.avg))

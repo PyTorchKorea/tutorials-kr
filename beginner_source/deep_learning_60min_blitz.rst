@@ -21,8 +21,7 @@ PyTorch는 Python 기반의 과학 연산 패키지로 다음 두 가지 목적�
 -  높은 수준에서 PyTorch의 Tensor library와 신경망(Neural Network)를 이해합니다.
 -  이미지를 분류하는 작은 신경망을 학습시킵니다.
 
-.. Note::
-    `torch`_ 와 `torchvision`_ 패키지를 설치했는지 확인하십시오.
+아래 튜토리얼을 실행하기 전에, `torch`_ 와 `torchvision`_ 패키지가 설치되어 있는지 확인하세요.
 
 .. _torch: https://github.com/pytorch/pytorch
 .. _torchvision: https://github.com/pytorch/vision
@@ -36,19 +35,33 @@ PyTorch는 Python 기반의 과학 연산 패키지로 다음 두 가지 목적�
    /beginner/blitz/neural_networks_tutorial
    /beginner/blitz/cifar10_tutorial
 
-.. galleryitem:: /beginner/blitz/tensor_tutorial.py
-    :figure: /_static/img/tensor_illustration_flat.png
+.. grid:: 4
 
-.. galleryitem:: /beginner/blitz/autograd_tutorial.py
-    :figure: /_static/img/autodiff.png
+   .. grid-item-card::  :octicon:`file-code;1em` Tensors
+      :link: blitz/tensor_tutorial.html
 
-.. galleryitem:: /beginner/blitz/neural_networks_tutorial.py
-    :figure: /_static/img/mnist.png
+      In this tutorial, you will learn the basics of PyTorch tensors.
+      +++
+      :octicon:`code;1em` Code
 
-.. galleryitem:: /beginner/blitz/cifar10_tutorial.py
-    :figure: /_static/img/cifar10.png
+   .. grid-item-card::  :octicon:`file-code;1em` A Gentle Introduction to torch.autograd
+      :link: blitz/autograd_tutorial.html
 
+      Learn about autograd.
+      +++
+      :octicon:`code;1em` Code
 
-.. raw:: html
+   .. grid-item-card::  :octicon:`file-code;1em` Neural Networks
+      :link: blitz/neural_networks_tutorial.html
 
-    <div style='clear:both'></div>
+      This tutorial demonstrates how you can train neural networks in PyTorch.
+      +++
+      :octicon:`code;1em` Code
+
+   .. grid-item-card::  :octicon:`file-code;1em` Training a Classifier
+      :link: blitz/cifar10_tutorial.html
+
+      Learn how to train an image classifier in PyTorch by using the
+      CIFAR10 dataset.
+      +++
+      :octicon:`code;1em` Code

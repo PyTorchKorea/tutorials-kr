@@ -114,6 +114,13 @@ Recipes are bite-sized bite-sized, actionable examples of how to use specific Py
    :link: ../recipes/recipes/profiler_recipe.html
    :tags: Basics
 
+.. customcarditem::
+   :header: PyTorch Profiler with Instrumentation and Tracing Technology API (ITT API) support
+   :card_description: Learn how to use PyTorch's profiler with Instrumentation and Tracing Technology API (ITT API) to visualize operators labeling in Intel® VTune™ Profiler GUI
+   :image: ../_static/img/thumbnails/cropped/profiler.png
+   :link: ../recipes/profile_with_itt.html
+   :tags: Basics
+
 .. Customization
 
 .. customcarditem::
@@ -311,6 +318,7 @@ Recipes are bite-sized bite-sized, actionable examples of how to use specific Py
    /recipes/recipes/save_load_across_devices
    /recipes/recipes/zeroing_out_gradients
    /recipes/recipes/profiler_recipe
+   /recipes/recipes/profile_with_itt
    /recipes/recipes/Captum_Recipe
    /recipes/recipes/tensorboard_with_pytorch
    /recipes/recipes/dynamic_quantization

@@ -3,7 +3,7 @@
 PyTorch: 사용자 정의 nn.Module
 ------------------------------------
 
-:math:`y=\sin(x)` 을 예측할 수 있도록, :math:`-\pi` 부터 :math:`pi` 까지
+:math:`y=\sin(x)` 을 예측할 수 있도록, :math:`-\pi` 부터 :math:`\pi` 까지
 유클리드 거리(Euclidean distance)를 최소화하도록 3차 다항식을 학습합니다.
 
 이번에는 사용자가 새롭게 정의한 Module의 하위 클래스(subclass)로 모델을 정의합니다.

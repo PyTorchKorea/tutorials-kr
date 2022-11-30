@@ -76,7 +76,8 @@ print(model)
 # `백그라운드 연산들 <https://github.com/pytorch/pytorch/blob/270111b7b611d174967ed204776985cefca9c144/torch/nn/modules/module.py#L866>`_ 과 함께
 # 모델의 ``forward`` 를 실행합니다. ``model.forward()`` 를 직접 호출하지 마세요!
 #
-# 모델에 입력을 호출하면 각 분류(class)에 대한 원시(raw) 예측값이 있는 10-차원 텐서가 반환됩니다.
+# 모델에 입력을 전달하여 호출하면 2차원 텐서를 반환합니다. 2차원 텐서의 dim=0은 각 분류(class)에 대한 원시(raw) 예측값 10개가,
+# dim=1에는 각 출력의 개별 값들이 해당합니다.
 # 원시 예측값을 ``nn.Softmax`` 모듈의 인스턴스에 통과시켜 예측 확률을 얻습니다.
 
 X = torch.rand(1, 28, 28, device=device)

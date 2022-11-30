@@ -141,7 +141,7 @@ TensorBoard를 설정합니다.
 
     # 임의의 학습 이미지를 가져옵니다
     dataiter = iter(trainloader)
-    images, labels = dataiter.next()
+    images, labels = next(dataiter)
 
     # 이미지 그리드를 만듭니다.
     img_grid = torchvision.utils.make_grid(images)

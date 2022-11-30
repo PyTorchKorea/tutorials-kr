@@ -10,7 +10,7 @@
 이 튜토리얼에서는 효과, 필터,
 공간 임펄스 응답(RIR, Room Impulse Response)과 코덱을 적용하는 방법을 살펴보겠습니다.
 
-하단부에서는, 깨끗한 음성으로 부터 휴대폰 너머의 잡음이 낀 음성을 합성하겠습니다. 
+하단부에서는, 깨끗한 음성으로 부터 휴대폰 너머의 잡음이 낀 음성을 합성하겠습니다.
 """
 
 import torch
@@ -44,7 +44,7 @@ SAMPLE_NOISE = download_asset("tutorial-assets/Lab41-SRI-VOiCES-rm1-babb-mc01-st
 # 효과와 필터링 적용하기
 # ------------------------------
 #
-# :py:func:`torchaudio.sox_effects` 는 ``sox`` 와 유사한 필터들을 
+# :py:func:`torchaudio.sox_effects` 는 ``sox`` 와 유사한 필터들을
 # 텐서 객체들과 파일 객체 오디오 소스들에 직접 적용 해줍니다.
 #
 # 이를 위해 두가지 함수가 사용됩니다:
@@ -61,7 +61,7 @@ SAMPLE_NOISE = download_asset("tutorial-assets/Lab41-SRI-VOiCES-rm1-babb-mc01-st
 # 사용 가능한 효과들의 목록을 알고싶다면, `the sox
 # documentation <http://sox.sourceforge.net/sox.html>`__ 을 참조해주세요.
 #
-# **Tip** 즉석으로 오디오 데이터 로드와 다시 샘플링 하고싶다면, 
+# **Tip** 즉석으로 오디오 데이터 로드와 다시 샘플링 하고싶다면,
 # 효과 ``"rate"`` 와 함께 :py:func:`torchaudio.sox_effects.apply_effects_file` 을 사용하세요.
 #
 # **Note** :py:func:`torchaudio.sox_effects.apply_effects_file` 는 파일 형태의 객체 또는 주소 형태의 객체를 받습니다.
@@ -233,14 +233,14 @@ speech, _ = torchaudio.load(SAMPLE_SPEECH)
 noise, _ = torchaudio.load(SAMPLE_NOISE)
 noise = noise[:, : speech.shape[1]]
 
-speech_power = speech.norm(p=2)
-noise_power = noise.norm(p=2)
+speech_rms = speech.norm(p=2)
+noise_rms = noise.norm(p=2)
 
 snr_dbs = [20, 10, 3]
 noisy_speeches = []
 for snr_db in snr_dbs:
     snr = 10 ** (snr_db / 20)
-    scale = snr * noise_power / speech_power
+    scale = snr * noise_rms / speech_rms
     noisy_speeches.append((scale * speech + noise) / 2)
 
 ######################################################################
@@ -345,7 +345,7 @@ Audio(waveforms[2], rate=sample_rate)
 # 전화 녹음 모의 실험하기
 # ---------------------------
 #
-# 이전 기술들을 혼합하여, 반향있는 방의 사람들이 이야기하는 배경에서 전화 통화하는 
+# 이전 기술들을 혼합하여, 반향있는 방의 사람들이 이야기하는 배경에서 전화 통화하는
 # 것 처럼 들리는 오디오를 모의 실험할 수 있습니다.
 #
 
@@ -367,7 +367,7 @@ noise, _ = torchaudio.load(SAMPLE_NOISE)
 noise = noise[:, : rir_applied.shape[1]]
 
 snr_db = 8
-scale = math.exp(snr_db / 10) * noise.norm(p=2) / rir_applied.norm(p=2)
+scale = (10 ** (snr_db / 20)) * noise.norm(p=2) / rir_applied.norm(p=2)
 bg_added = (scale * rir_applied + noise) / 2
 
 plot_specgram(bg_added, sample_rate, title="BG noise added")
