@@ -3,7 +3,7 @@
 모델 저장하기 & 불러오기
 =========================
 **Author:** `Matthew Inkawhich <https://github.com/MatthewInkawhich>`_
-  **번역**: `박정환 <http://github.com/9bow>`_
+  **번역**: `박정환 <http://github.com/9bow>`_, `김제필 <http://github.com/garlicvread>`_
 
 이 문서에서는 PyTorch 모델을 저장하고 불러오는 다양한 방법을 제공합니다.
 이 문서 전체를 다 읽는 것도 좋은 방법이지만, 필요한 사용 예의 코드만 참고하는
@@ -34,7 +34,7 @@
 -  `state_dict가 무엇인가요? <#state-dict>`__
 -  `추론(inference)를 위해 모델 저장하기 & 불러오기 <#inference>`__
 -  `일반 체크포인트(checkpoint) 저장하기 & 불러오기 <#checkpoint>`__
--  `여러개(multiple)의 모델을 하나의 파일에 저장하기 <#multiple>`__
+-  `여러 개(multiple)의 모델을 하나의 파일에 저장하기 <#multiple>`__
 -  `다른 모델의 매개변수를 사용하여 빠르게 모델 시작하기(warmstart) <#warmstart>`__
 -  `장치(device)간 모델 저장하기 & 불러오기 <#device>`__
 
