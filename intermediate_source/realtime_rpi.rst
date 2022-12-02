@@ -108,7 +108,7 @@ OpenCV는 ``numpy`` 배열을 BGR로 반환하므로 이 배열을 읽고 약간
 .. code:: python
 
     ret, image = cap.read()
-    # convert opencv output from BGR to RGB
+    # opencv 출력을 BGR에서 RGB로 변환합니다.
     image = image[:, :, [2, 1, 0]]
 
 데이터를 읽고 처리하는데 약 ``3.5ms`` 가 걸립니다.
