@@ -3,16 +3,16 @@
 기초부터 시작하는 NLP: 문자-단위 RNN으로 이름 분류하기
 ********************************************************************************
 **Author**: `Sean Robertson <https://github.com/spro/practical-pytorch>`_
-  **번역**: `황성수 <https://github.com/adonisues>`_
+  **번역**: `황성수 <https://github.com/adonisues>`_, `김제필 <https://github.com/garlicvread>`_
 
 
-단어를 분류하기 위해 기초적인 문자-단위 RNN을 구축하고 학습 할 예정입니다.
-이 튜토리얼에서는 (이후 2개 튜토리얼과 함께) NLP 모델링을 위한 데이터 전처리를
-`torchtext` 의 편리한 많은 기능들을 사용하지 않고 어떻게 하는지 "기초부터(from scratch)"
-보여주기 때문에  NLP 모델링을 위한 전처리가 저수준에서 어떻게 진행되는지를 알 수 있습니다.
+단어를 분류하기 위해 기초적인 문자-단위 RNN을 구축하고 학습할 예정입니다.
+이 튜토리얼에서는(이후 2개 튜토리얼과 함께) NLP 모델링을 위해 `torchtext` 의
+수많은 편리한 기능을 사용하지 않고도 어떻게 데이터를 전처리하는지 "기초부터(from scratch)"
+보여주므로 NLP 모델링을 위한 데이터 전처리가 저수준에서 어떻게 진행되는지 알 수 있습니다.
 문자-단위 RNN은 단어를 문자의 연속으로 읽어 들여서 각 단계의 예측과
-"은닉 상태(Hidden State)" 출력하고, 다음 단계에 이전 은닉 상태를 전달합니다.
-단어가 속한 클래스로 출력이 되도록 최종 예측으로 선택합니다.
+"은닉 상태(Hidden State)"를 출력하고, 다음 단계에 이전 단계의 은닉 상태를 전달합니다.
+단어가 속한 클래스로 출력되도록 최종 예측으로 선택합니다.
 
 구체적으로, 18개 언어로 된 수천 개의 성(姓)을 훈련시키고,
 철자에 따라 이름이 어떤 언어인지 예측합니다:
@@ -39,7 +39,7 @@ Pytorch를 설치했고, Python을 알고, Tensor를 이해한다고 가정합�
 -  :doc:`/beginner/pytorch_with_examples` 넓고 깊은 통찰을 위한 자료
 -  :doc:`/beginner/former_torchies_tutorial` 이전 Lua Torch 사용자를 위한 자료
 
-RNN과 작동 방식을 아는 것 또한 유용합니다:
+RNN과 그 작동 방식을 아는 것 또한 유용합니다:
 
 -  `The Unreasonable Effectiveness of Recurrent Neural
    Networks <https://karpathy.github.io/2015/05/21/rnn-effectiveness/>`__
@@ -52,19 +52,19 @@ RNN과 작동 방식을 아는 것 또한 유용합니다:
 ==================
 
 .. note::
-   `여기 <https://download.pytorch.org/tutorial/data.zip>`__ 에서 데이터를 다운 받고,
+   `여기 <https://download.pytorch.org/tutorial/data.zip>`__ 에서 데이터를 다운로드 받고
    현재 디렉토리에 압축을 푸십시오.
 
 ``data/names`` 디렉토리에는 "[Language].txt" 라는 18 개의 텍스트 파일이 있습니다.
-각 파일에는 한 줄에 하나의 이름이 포함되어 있으며 대부분 로마자로 되어 있습니다
+각 파일에는 한 줄에 하나의 이름이 포함되어 있으며 대부분 로마자로 되어 있습니다.
 (그러나, 유니코드에서 ASCII로 변환해야 함).
 
 각 언어 별로 이름 목록 사전 ``{language: [names ...]}`` 을 만듭니다.
 일반 변수 "category" 와 "line" (우리의 경우 언어와 이름)은 이후의 확장성을 위해 사용됩니다.
 
 .. note::
-   역자 주:  "line" 에 입력을 "category"에 클래스를 적용하여 다른 문제에도 활용 할 수 있습니다.
-   여기서는 "line"에 이름(ex. Robert )를 입력으로 "category"에 클래스(ex. english)로 사용합니다.
+   역자 주: "line" 에 입력을 "category"에 클래스를 적용하여 다른 문제에도 활용할 수 있습니다.
+   여기서는 "line"에 이름(ex. Robert)을 입력으로, "category"에 클래스(ex. english)로 사용합니다.
 
 """
 from __future__ import unicode_literals, print_function, division
@@ -111,7 +111,7 @@ n_categories = len(all_categories)
 
 ######################################################################
 # 이제 각 ``category`` (언어)를 ``line`` (이름)에 매핑하는 사전인
-# ``category_lines`` 를 만들었습니다. 나중에 참조 할 수 있도록
+# ``category_lines`` 를 만들었습니다. 나중에 참조할 수 있도록
 # ``all_categories`` (언어 목록)와 ``n_categories`` 도 추적합니다.
 #
 
@@ -122,15 +122,15 @@ print(category_lines['Italian'][:5])
 # 이름을 Tensor로 변경
 # --------------------------
 #
-# 이제 모든 이름을 체계화 했으므로, 이를 활용하기 위해 Tensor로
-# 전환해야 합니다.
+# 이제 모든 이름을 체계화했으므로, 이를 활용하기 위해 Tensor로
+# 변환해야 합니다.
 #
-# 하나의 문자를 표현하기 위해, 크기가 ``<1 x n_letters>`` 인
-# "One-Hot 벡터" 를 사용합니다. One-Hot 벡터는 현재 문자의
-# 주소에만 1을 값으로 가지고 그외에 나머지는 0으로 채워진다.
+# 하나의 문자를 표현하기 위해 크기가 ``<1 x n_letters>`` 인
+# "One-Hot 벡터"를 사용합니다. One-Hot 벡터는 현재 문자의
+# 주소에는 1이, 그 외 나머지 주소에는 0이 채워진 벡터입니다.
 # 예시 ``"b" = <0 1 0 0 0 ...>`` .
 #
-# 단어를 만들기 위해 One-Hot 벡터들을 2 차원 행렬
+# 단어를 만들기 위해 One-Hot 벡터들을 2차원 행렬
 # ``<line_length x 1 x n_letters>`` 에 결합시킵니다.
 #
 # 위에서 보이는 추가적인 1차원은 PyTorch에서 모든 것이 배치(batch)에 있다고 가정하기
@@ -140,9 +140,9 @@ print(category_lines['Italian'][:5])
 '''
 .. NOTE::
 역자 주:  One-Hot 벡터는 언어를 다룰 때 자주 이용되며,
-단어,글자 등을 벡터로 표현 할 때 단어,글자 사이의 상관 관계를 미리 알 수 없을 경우,
+단어, 글자 등을 벡터로 표현할 때 단어, 글자 사이의 상관 관계를 미리 알 수 없을 경우,
 One-Hot으로 표현하여 서로 직교한다고 가정하고 학습을 시작합니다.
-동일하게 상관 관계를 알 수 없는 다른 데이터의 경우에도 One-Hot 벡터를 활용 할 수 있습니다.
+이와 동일하게, 상관 관계를 알 수 없는 다른 데이터의 경우에도 One-Hot 벡터를 활용할 수 있습니다.
 '''
 
 import torch
@@ -151,7 +151,7 @@ import torch
 def letterToIndex(letter):
     return all_letters.find(letter)
 
-# 검증을 위해서 한개의 문자를 <1 x n_letters> Tensor로 변환
+# 검증을 위해서 한 개의 문자를 <1 x n_letters> Tensor로 변환
 def letterToTensor(letter):
     tensor = torch.zeros(1, n_letters)
     tensor[0][letterToIndex(letter)] = 1
@@ -175,17 +175,17 @@ print(lineToTensor('Jones').size())
 # ====================
 #
 # Autograd 전에, Torch에서 RNN(recurrent neural network) 생성은
-# 여러 시간 단계 걸처서 계층의 매개변수를 복제하는 작업을 포함합니다.
+# 여러 시간 단계 걸쳐서 계층의 매개변수를 복제하는 작업을 포함합니다.
 # 계층은 은닉 상태와 변화도(Gradient)를 가지며, 이제 이것들은 그래프 자체에서
 # 완전히 처리됩니다. 이는 feed-forward 계층과
-# 같은 매우 "순수한" 방법으로 RNN을 구현할 수 있다는 것을 의미합니다.
+# 같은 매우 "순수한" 방법으로 RNN을 구현할 수 있음을 의미합니다.
 #
-# 역자 주 : 여기서는 교육목적으로 nn.RNN 대신 직접 RNN을 사용합니다.
+# 역자 주 : 여기서는 교육 목적으로 nn.RNN 대신 직접 RNN을 사용합니다.
 #
 # 이 RNN 모듈(대부분 `Torch 사용자를 위한 PyTorch 튜토리얼
 # <https://tutorials.pytorch.kr/beginner/former_torchies/
-# nnft_tutorial.html#example-2-recurrent-net>`__ 에서 복사함)
-# 은 입력 및 은닉 상태로 작동하는 2개의 선형 계층이며,
+# nnft_tutorial.html#example-2-recurrent-net>`__ 에서 복사함)은
+# 입력 및 은닉 상태로 작동하는 2개의 선형 계층이며,
 # 출력 다음에 LogSoftmax 계층이 있습니다.
 #
 # .. figure:: https://i.imgur.com/Z2xbySO.png
@@ -221,9 +221,9 @@ rnn = RNN(n_letters, n_hidden, n_categories)
 
 ######################################################################
 # 이 네트워크의 한 단계를 실행하려면 입력(현재 문자 Tensor)과
-# 이전의 은닉 상태 (처음에는 0으로 초기화)를 전달해야 합니다.
-# 출력(각 언어의 확률)과 다음 은닉 상태 (다음 단계를 위해 유지)를
-# 돌려 받습니다.
+# 이전의 은닉 상태(처음에는 0으로 초기화)를 전달해야 합니다.
+# 출력(각 언어의 확률)과 다음 은닉 상태(다음 단계를 위해 유지)를
+# 돌려받습니다.
 #
 
 input = letterToTensor('A')
@@ -236,7 +236,7 @@ output, next_hidden = rnn(input, hidden)
 # 효율성을 위해서 매 단계마다 새로운 Tensor를 만들고 싶지 않기 때문에
 # ``letterToTensor`` 대신 ``lineToTensor`` 를 잘라서 사용할
 # 것입니다. 이것은 Tensor의 사전 연산(pre-computing) 배치에 의해
-# 더욱 최적화 될 수 있습니다.
+# 더욱 최적화될 수 있습니다.
 #
 
 input = lineToTensor('Albert')
@@ -248,7 +248,7 @@ print(output)
 
 ######################################################################
 # 보시다시피 출력은 ``<1 x n_categories>`` Tensor이고, 모든 항목은
-# 해당 카테고리의 우도(likelihood) 입니다 (더 높은 것이 더 확률 높음).
+# 해당 카테고리의 우도(likelihood)입니다(더 높은 것이 더 확률 높음).
 #
 
 
@@ -259,16 +259,17 @@ print(output)
 # 학습 준비
 # ----------------------
 #
-# 학습으로 들어가기 전에 몇몇 도움되는 함수를 만들어야합니다.
-# 첫째는 우리가 알아낸 각 카테고리의 우도인 네트워크 출력을 해석하는 것 입니다.
-# 가장 큰 값의 주소를 알기 위해서 ``Tensor.topk`` 를 사용 할 수 있습니다.
+# 학습에 들어가기 전, 몇몇 도움 되는 함수를 만들어야 합니다.
+# 첫째는 우리가 알아낸 각 카테고리의 우도인 네트워크 출력을 해석하는 함수입니다.
+# 가장 큰 값의 주소를 알기 위해서 ``Tensor.topk`` 를 사용할 수 있습니다.
+#
 # 역자 주: 네트워크 출력(각 카테고리의 우도)으로
-# 가장 확률이 높은 카테고리 이름(언어)과 카테고리 번호 반환
+# 가장 확률이 높은 카테고리 이름(언어)과 카테고리 번호를 반환
 #
 
 def categoryFromOutput(output):
-    top_n, top_i = output.topk(1) # 텐서의 가장 큰 값 및 주소
-    category_i = top_i[0].item()     # 텐서에서 정수 값으로 변경
+    top_n, top_i = output.topk(1)  # 텐서의 가장 큰 값 및 주소
+    category_i = top_i[0].item()   # 텐서에서 정수 값으로 변경
     return all_categories[category_i], category_i
 
 print(categoryFromOutput(output))
@@ -299,7 +300,7 @@ for i in range(10):
 # 네트워크 학습
 # --------------------
 #
-# 이제 이 네트워크를 학습하는데 필요한 예시(학습 데이터)들을 보여주고 추정합니다.
+# 이제 이 네트워크를 학습하는 데 필요한 예시(학습 데이터)를 보여주고 추정합니다.
 # 만일 틀렸다면 알려 줍니다.
 #
 # RNN의 마지막 계층이 ``nn.LogSoftmax`` 이므로 손실 함수로
@@ -313,17 +314,17 @@ criterion = nn.NLLLoss()
 # 각 학습 루프는 다음과 같습니다:
 #
 # -  입력과 목표 Tensor 생성
-# -  0 로 초기화된 은닉 상태 생성
-# -  각 문자를 읽기
+# -  0 로 초기화 된 은닉 상태 생성
+# -  각 문자 읽기
 #
-#    -  다음 문자를 위한 은닉 상태 유지
+# -  다음 문자를 위한 은닉 상태 유지
 #
 # -  목표와 최종 출력 비교
 # -  역전파
 # -  출력과 손실 반환
 #
 
-learning_rate = 0.005 # 이것을 너무 높게 설정하면 발산할 수 있고, 너무 낮으면 학습이 되지 않을 수 있습니다.
+learning_rate = 0.005  # 학습률을 너무 높게 설정하면 발산할 수 있고, 너무 낮으면 학습이 되지 않을 수 있습니다.
 
 def train(category_tensor, line_tensor):
     hidden = rnn.initHidden()
@@ -344,8 +345,8 @@ def train(category_tensor, line_tensor):
 
 
 ######################################################################
-# 이제 예시 데이터를 사용하여 실행해야합니다. ``train`` 함수가 출력과 손실을
-# 반환하기 때문에 추측을 화면에 출력하고 도식화를 위한 손실을 추적 할 수
+# 이제 예시 데이터를 사용하여 실행해야 합니다. ``train`` 함수가 출력과 손실을
+# 반환하기 때문에 추측을 화면에 출력하고 도식화를 위한 손실을 추적할 수
 # 있습니다. 1000개의 예시 데이터가 있기 때문에 ``print_every`` 예제만
 # 출력하고, 손실의 평균을 얻습니다.
 #
@@ -394,7 +395,7 @@ for iter in range(1, n_iters + 1):
 # --------------------
 #
 # ``all_losses`` 를 이용한 손실 도식화는
-# 네트워크의 학습을 보여준다:
+# 네트워크의 학습을 보여줍니다:
 #
 
 import matplotlib.pyplot as plt
@@ -408,8 +409,8 @@ plt.plot(all_losses)
 # 결과 평가
 # ======================
 #
-# 네트워크가 다른 카테고리에서 얼마나 잘 작동하는지 보기위해
-# 모든 실제 언어(행)가 네트워크에서 어떤 언어로 추측(열)되는지를 나타내는
+# 네트워크가 다른 카테고리에서 얼마나 잘 작동하는지 보기 위해
+# 모든 실제 언어(행)가 네트워크에서 어떤 언어로 추측(열)되는지 나타내는
 # 혼란 행렬(confusion matrix)을 만듭니다. 혼란 행렬을 계산하기 위해
 # ``evaluate()`` 로 많은 수의 샘플을 네트워크에 실행합니다.
 # ``evaluate()`` 은 ``train ()`` 과 역전파를 빼면 동일합니다.
@@ -428,7 +429,7 @@ def evaluate(line_tensor):
 
     return output
 
-# 예시들 중에 어떤 것이 정확하게 예측되었는지 기록
+# 예시 중 어떤 것이 정확히 예측되었는지 기록
 for i in range(n_confusion):
     category, line, category_tensor, line_tensor = randomTrainingExample()
     output = evaluate(line_tensor)
@@ -459,10 +460,10 @@ plt.show()
 
 
 ######################################################################
-# 주축에서 벗어난 밝은 점을 선택하여 잘못 추측한 언어를 표시
-# 할 수 있습니다. 예를 들어 한국어는 중국어로 이탈리아어로 스페인어로.
-# 그리스어는 매우 잘되는 것으로 영어는 매우 나쁜것으로 보입니다.
-# (다른 언어들과 중첩 때문으로 추정)
+# 주축에서 벗어난 밝은 점을 선택하여 잘못 추측한 언어를 표시할 수 있습니다.
+# 예를 들어 한국어는 중국어로 이탈리아어로 스페인어로.
+# 그리스어는 매우 잘되는 것으로 영어는 매우 나쁜 것으로 보입니다.
+# (다른 언어들과의 중첩 때문으로 추정)
 #
 
 
@@ -494,12 +495,12 @@ predict('Satoshi')
 ######################################################################
 # `실용 PyTorch 저장소
 # <https://github.com/spro/practical-pytorch/tree/master/char-rnn-classification>`__
-# 의 최종 버전 스크립트는 위 코드를 몇개의 파일로 분할했습니다.:
+# 의 최종 버전 스크립트는 위 코드를 몇 개의 파일로 분할했습니다.:
 #
 # -  ``data.py`` (파일 읽기)
 # -  ``model.py`` (RNN 정의)
 # -  ``train.py`` (학습 실행)
-# -  ``predict.py`` (커멘드 라인 인자로 ``predict()`` 실행)
+# -  ``predict.py`` (커맨드 라인 인자로 ``predict()`` 실행)
 # -  ``server.py`` (bottle.py를 사용하여 JSON API로 예측 제공)
 #
 # 학습과 네트워크 저장을 위해 ``train.py`` 실행.
@@ -522,7 +523,7 @@ predict('Satoshi')
 # 연습
 # =========
 #
-# -  "line -> category" 의 다른 데이터 집합으로 시도해보십시오, 예를 들어:
+# -  "line -> category" 의 다른 데이터 집합으로 시도해 보십시오, 예를 들어:
 #
 #    -  단어 -> 언어
 #    -  이름 -> 성별
@@ -531,7 +532,7 @@ predict('Satoshi')
 #
 # -  더 크고 더 나은 모양의 네트워크로 더 나은 결과를 얻으십시오.
 #
-#    -  더많은 선형 계층을 추가해 보십시오
-#    -  ``nn.LSTM`` 과 ``nn.GRU`` 계층을 추가해 보십시오
-#    -  여러 개의 이런 RNN을 상위 수준 네트워크로 결합해 보십시오
+#    -  더 많은 선형 계층을 추가해 보십시오.
+#    -  ``nn.LSTM`` 과 ``nn.GRU`` 계층을 추가해 보십시오.
+#    -  위와 같은 RNN 여러 개를 상위 수준 네트워크로 결합해 보십시오.
 #

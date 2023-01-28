@@ -2,8 +2,8 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<!--[if IE 8]><html class="no-js lt-ie9" lang="ko" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="ko" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
   
@@ -13,7 +13,7 @@
   
 <meta property="og:url" content="https://tutorials.pytorch.kr/intermediate/seq2seq_translation_tutorial.html" />
   
-<meta property="og:description" content="Author: Sean Robertson, 번역: 황성수,. 이 튜토리얼은 “기초부터 시작하는 NLP”의 세번째이자 마지막 편으로, NLP 모델링 작업을 위한 데이터 전처리에 사용할 자체 클래스와 함수들을 작성해보겠습니다. 이 튜토리얼을 마친 뒤에는 torchtext 가 어떻게 지금까지의 튜토리얼들에서의 전처리 과정을 다루는지를 이후 튜토리얼들에서 배울 수 있습니다. 이 프로젝트에서는 신경망이 불어를 영어로 번역하도록 가르칠 예정입니다. … 성공율은 변할 수 있습니다. 하나의 시퀀스를 다른 시퀀스로 바꾸는 두개의 RNN이 함께..." />
+<meta property="og:description" content="Author: Sean Robertson, 번역: 황성수,. 이 튜토리얼은 《기초부터 시작하는 NLP》의 세번째이자 마지막 편으로, NLP 모델링 작업을 위한 데이터 전처리에 사용할 자체 클래스와 함수들을 작성해보겠습니다. 이 튜토리얼을 마친 뒤에는 torchtext 가 어떻게 지금까지의 튜토리얼들에서의 전처리 과정을 다루는지를 이후 튜토리얼들에서 배울 수 있습니다. 이 프로젝트에서는 신경망이 불어를 영어로 번역하도록 가르칠 예정입니다. … 성공율은 변할 수 있습니다. 하나의 시퀀스를 다른 시퀀스로 바꾸는 두개의 RNN이 함께..." />
   
 <meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
   
@@ -45,12 +45,17 @@
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
   <link rel="stylesheet" href="../_static/katex-math.css" type="text/css" />
-    <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" />
+  <link rel="stylesheet" href="../_static/sg_gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sg_gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sg_gallery-dataframe.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sg_gallery-rendered-html.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+    <link rel="index" title="색인" href="../genindex.html" />
+    <link rel="search" title="검색" href="../search.html" />
     <link rel="next" title="torchtext 라이브러리로 텍스트 분류하기" href="../beginner/text_sentiment_ngrams_tutorial.html" />
     <link rel="prev" title="기초부터 시작하는 NLP: 문자-단위 RNN으로 이름 생성하기" href="char_rnn_generation_tutorial.html" /> 
 
@@ -130,7 +135,7 @@
               
               
                 <div class="version">
-                  1.12.0+cu102
+                  1.13.1+cu117
                 </div>
               
             
@@ -165,7 +170,6 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">파이토치(PyTorch) 시작하기</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/basics/intro.html">파이토치(PyTorch) 기본 익히기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/basics/quickstart_tutorial.html">빠른 시작(Quickstart)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/basics/tensorqs_tutorial.html">텐서(Tensor)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/basics/data_tutorial.html">Dataset과 DataLoader</a></li>
@@ -183,8 +187,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/autogradyt_tutorial.html">The Fundamentals of Autograd</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/modelsyt_tutorial.html">Building Models with PyTorch</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/tensorboardyt_tutorial.html">PyTorch TensorBoard Support</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/trainingyt.html">Training with PyTorch</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/captumyt.html">Model Understanding with Captum</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">파이토치(PyTorch) 배우기</span></p>
 <ul>
@@ -211,17 +213,16 @@
 <li class="toctree-l1"><a class="reference internal" href="../beginner/audio_datasets_tutorial.html">Audio Datasets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="speech_recognition_pipeline_tutorial.html">Wav2Vec2를 이용해서 음성 인식하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="speech_command_classification_with_torchaudio_tutorial.html">Speech Command Classification with torchaudio</a></li>
-<li class="toctree-l1"><a class="reference internal" href="text_to_speech_with_torchaudio.html">torchaudio를 사용하여 텍스트에서 음성으로 변환(text-to-speech)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="forced_alignment_with_torchaudio_tutorial.html">Forced Alignment with Wav2Vec2</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">텍스트</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../beginner/transformer_tutorial.html">nn.Transformer 와 TorchText 로 시퀀스-투-시퀀스(Sequence-to-Sequence) 모델링하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/bettertransformer_tutorial.html">Fast Transformer Inference with Better Transformer</a></li>
 <li class="toctree-l1"><a class="reference internal" href="char_rnn_classification_tutorial.html">기초부터 시작하는 NLP: 문자-단위 RNN으로 이름 분류하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="char_rnn_generation_tutorial.html">기초부터 시작하는 NLP:  문자-단위 RNN으로 이름 생성하기</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">기초부터 시작하는 NLP: Sequence to Sequence 네트워크와 Attention을 이용한 번역</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/text_sentiment_ngrams_tutorial.html">torchtext 라이브러리로 텍스트 분류하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/translation_transformer.html">nn.Transformer와 torchtext로 언어 번역하기</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">강화학습</span></p>
 <ul>
@@ -230,15 +231,12 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">PyTorch 모델을 프로덕션 환경에 배포하기</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="flask_rest_api_tutorial.html">Flask를 사용하여 Python에서 PyTorch를 REST API로 배포하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/Intro_to_TorchScript_tutorial.html">TorchScript 소개</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_export.html">C++에서 TorchScript 모델 로딩하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../advanced/super_resolution_with_onnxruntime.html">(선택) PyTorch 모델을 ONNX으로 변환하고 ONNX 런타임에서 실행하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="realtime_rpi.html">Raspberry Pi 4 에서 실시간 추론(Inference) (30fps!)</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Code Transforms with FX</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="fx_conv_bn_fuser.html">(베타) FX에서 합성곱/배치 정규화(Convolution/Batch Norm) 결합기(Fuser) 만들기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="fx_profiling_tutorial.html">(beta) Building a Simple CPU Performance Profiler with FX</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">프론트엔드 API</span></p>
@@ -261,25 +259,28 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">모델 최적화</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/profiler.html">PyTorch 모듈 프로파일링 하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tensorboard_profiler_tutorial.html">PyTorch Profiler With TensorBoard</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/hyperparameter_tuning_tutorial.html">Ray Tune을 이용한 하이퍼파라미터 튜닝</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/vt_tutorial.html">배포를 위한 비전 트랜스포머(Vision Transformer) 모델 최적화하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="parametrizations.html">Parametrizations Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pruning_tutorial.html">가지치기 기법(Pruning) 튜토리얼</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/dynamic_quantization_tutorial.html">(베타) LSTM 기반 단어 단위 언어 모델의 동적 양자화</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="quantized_transfer_learning_tutorial.html">(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/static_quantization_tutorial.html">(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화</a></li>
 <li class="toctree-l1"><a class="reference internal" href="torchserve_with_ipex.html">Grokking PyTorch Intel CPU performance from first principles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torchserve_with_ipex_2.html">Grokking PyTorch Intel CPU performance from first principles (Part 2)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nvfuser_intro_tutorial.html">Getting Started - Accelerate Your Scripts with nvFuser</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ax_multiobjective_nas_tutorial.html">Multi-Objective NAS with Ax</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../distributed/home.html">Distributed and Parallel Training Tutorials</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/dist_overview.html">PyTorch Distributed Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/ddp_series_intro.html">Distributed Data Parallel in PyTorch - Video Tutorials</a></li>
 <li class="toctree-l1"><a class="reference internal" href="model_parallel_tutorial.html">단일 머신을 사용한 모델 병렬화 모범 사례</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ddp_tutorial.html">분산 데이터 병렬 처리 시작하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dist_tuto.html">PyTorch로 분산 어플리케이션 개발하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="FSDP_tutorial.html">Getting Started with Fully Sharded Data Parallel(FSDP)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="FSDP_adavnced_tutorial.html">Advanced Model Training with Fully Sharded Data Parallel (FSDP)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="process_group_cpp_extension_tutorial.html">Customize Process Group Backends Using Cpp Extensions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rpc_tutorial.html">Getting Started with Distributed RPC Framework</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rpc_param_server_tutorial.html">Implementing a Parameter Server Using Distributed RPC Framework</a></li>
@@ -287,7 +288,6 @@
 <li class="toctree-l1"><a class="reference internal" href="rpc_async_execution.html">Implementing Batch RPC Processing Using Asynchronous Executions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/rpc_ddp_tutorial.html">분산 데이터 병렬(DDP)과 분산 RPC 프레임워크 결합</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pipeline_tutorial.html">파이프라인 병렬화로 트랜스포머 모델 학습시키기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../advanced/ddp_pipeline.html">분산 데이터 병렬 처리와 병렬 처리 파이프라인을 사용한 트랜스포머 모델 학습</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/generic_join.html">Distributed Training with Uneven Inputs Using the Join Context Manager</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Mobile</span></p>
@@ -299,6 +299,10 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="torchrec_tutorial.html">TorchRec 소개</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/sharding.html">Exploring TorchRec sharding</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Multimodality</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/flava_finetuning_tutorial.html">TorchMultimodal Tutorial: Finetuning FLAVA</a></li>
 </ul>
 
             
@@ -395,16 +399,17 @@
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
   <div class="sphx-glr-download-link-note admonition note">
-<p class="admonition-title">Note</p>
-<p>Click <a class="reference internal" href="#sphx-glr-download-intermediate-seq2seq-translation-tutorial-py"><span class="std std-ref">here</span></a> to download the full example code</p>
+<p class="admonition-title">참고</p>
+<p>Click <a class="reference internal" href="#sphx-glr-download-intermediate-seq2seq-translation-tutorial-py"><span class="std std-ref">here</span></a>
+to download the full example code</p>
 </div>
 <div class="sphx-glr-example-title section" id="nlp-sequence-to-sequence-attention">
-<span id="sphx-glr-intermediate-seq2seq-translation-tutorial-py"></span><h1>기초부터 시작하는 NLP: Sequence to Sequence 네트워크와 Attention을 이용한 번역<a class="headerlink" href="#nlp-sequence-to-sequence-attention" title="Permalink to this headline">¶</a></h1>
+<span id="sphx-glr-intermediate-seq2seq-translation-tutorial-py"></span><h1>기초부터 시작하는 NLP: Sequence to Sequence 네트워크와 Attention을 이용한 번역<a class="headerlink" href="#nlp-sequence-to-sequence-attention" title="이 제목에 대한 퍼머링크">¶</a></h1>
 <dl class="simple">
 <dt><strong>Author</strong>: <a class="reference external" href="https://github.com/spro/practical-pytorch">Sean Robertson</a></dt><dd><p><strong>번역</strong>: <a class="reference external" href="https://github.com/adonisues">황성수</a></p>
 </dd>
 </dl>
-<p>이 튜토리얼은 “기초부터 시작하는 NLP”의 세번째이자 마지막 편으로, NLP 모델링 작업을
+<p>이 튜토리얼은 《기초부터 시작하는 NLP》의 세번째이자 마지막 편으로, NLP 모델링 작업을
 위한 데이터 전처리에 사용할 자체 클래스와 함수들을 작성해보겠습니다.
 이 튜토리얼을 마친 뒤에는 <cite>torchtext</cite> 가 어떻게 지금까지의 튜토리얼들에서의
 전처리 과정을 다루는지를 이후 튜토리얼들에서 배울 수 있습니다.</p>
@@ -477,7 +482,7 @@ Translate</a></p></li>
 </pre></div>
 </div>
 <div class="section" id="id2">
-<h2>데이터 파일 로딩<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<h2>데이터 파일 로딩<a class="headerlink" href="#id2" title="이 제목에 대한 퍼머링크">¶</a></h2>
 <p>이 프로젝트의 데이터는 수천 개의 영어-프랑스어 번역 쌍입니다.</p>
 <p><a class="reference external" href="https://opendata.stackexchange.com/questions/3888/dataset-of-sentences-translated-into-many-languages">Open Data Stack Exchange</a>
 에 관한 이 질문은 <a class="reference external" href="https://tatoeba.org/eng/downloads">https://tatoeba.org/eng/downloads</a> 에서 다운 로드가 가능한
@@ -491,7 +496,7 @@ Translate</a></p></li>
 </pre></div>
 </div>
 <div class="admonition note">
-<p class="admonition-title">Note</p>
+<p class="admonition-title">참고</p>
 <p><a class="reference external" href="https://download.pytorch.org/tutorial/data.zip">여기</a>
 에서 데이터를 다운 받고 현재 디렉토리에 압축을 푸십시오.</p>
 </div>
@@ -584,8 +589,8 @@ flag to reverse the pairs.</p>
 </div>
 <p><em>많은</em> 예제 문장이 있고 신속하게 학습하기를 원하기 때문에
 비교적 짧고 간단한 문장으로만 데이터 셋을 정리할 것입니다. 여기서
-최대 길이는 10 단어 (종료 문장 부호 포함)이며 “I am” 또는
-“He is” 등의 형태로 번역되는 문장으로 필터링됩니다.(이전에
+최대 길이는 10 단어 (종료 문장 부호 포함)이며 《I am》 또는
+《He is》 등의 형태로 번역되는 문장으로 필터링됩니다.(이전에
 아포스트로피는 대체 됨)</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">MAX_LENGTH</span> <span class="o">=</span> <span class="mi">10</span>
 
@@ -634,7 +639,6 @@ flag to reverse the pairs.</p>
 <span class="nb">print</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">pairs</span><span class="p">))</span>
 </pre></div>
 </div>
-<p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Reading lines...
 Read 135842 sentence pairs
 Trimmed to 10599 sentence pairs
@@ -642,12 +646,12 @@ Counting words...
 Counted words:
 fra 4345
 eng 2803
-[&#39;je vais sortir .&#39;, &#39;i m about to go out .&#39;]
+[&#39;je suis fier de vous les gars .&#39;, &#39;i m proud of you guys .&#39;]
 </pre></div>
 </div>
 </div>
 <div class="section" id="seq2seq">
-<h2>Seq2Seq 모델<a class="headerlink" href="#seq2seq" title="Permalink to this headline">¶</a></h2>
+<h2>Seq2Seq 모델<a class="headerlink" href="#seq2seq" title="이 제목에 대한 퍼머링크">¶</a></h2>
 <p>Recurrent Neural Network(RNN)는 시퀀스에서 작동하고 다음 단계의
 입력으로 자신의 출력을 사용하는 네트워크입니다.</p>
 <p><a class="reference external" href="https://arxiv.org/abs/1409.3215">Sequence to Sequence network</a>, 또는
@@ -662,17 +666,17 @@ network</a> 는 인코더 및
 <p>모든 입력에 해당하는 출력이 있는 단일 RNN의 시퀀스 예측과 달리
 Seq2Seq 모델은 시퀀스 길이와 순서를 자유롭게하기 때문에
 두 언어 사이의 번역에 이상적입니다.</p>
-<p>다음 문장 “Je ne suis pas le chat noir” → “I am not the black cat”
+<p>다음 문장 《Je ne suis pas le chat noir》 → 《I am not the black cat》
 를 살펴 봅시다. 입력 문장의 단어 대부분은 출력 문장에서
-직역(“chat noir” 와 “black cat”)되지만 약간 다른 순서도 있습니다.
-“ne/pas” 구조로 인해 입력 문장에 단어가 하나 더 있습니다.
+직역(《chat noir》 와 《black cat》)되지만 약간 다른 순서도 있습니다.
+《ne/pas》 구조로 인해 입력 문장에 단어가 하나 더 있습니다.
 입력 단어의 시퀀스를 직역해서 정확한 번역을 만드는
 것은 어려울 것입니다.</p>
 <p>Seq2Seq 모델을 사용하면 인코더는 하나의 벡터를 생성합니다.
-이상적인 경우에 입력 시퀀스의 “의미”를 문장의 N 차원 공간에 있는
+이상적인 경우에 입력 시퀀스의 《의미》를 문장의 N 차원 공간에 있는
 단일 지점인 단일 벡터으로 인코딩합니다.</p>
 <div class="section" id="id4">
-<h3>인코더<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<h3>인코더<a class="headerlink" href="#id4" title="이 제목에 대한 퍼머링크">¶</a></h3>
 <p>Seq2Seq 네트워크의 인코더는 입력 문장의 모든 단어에 대해 어떤 값을
 출력하는 RNN입니다. 모든 입력 단어에 대해 인코더는 벡터와
 은닉 상태를 출력하고 다음 입력 단어를 위해 그 은닉 상태를 사용합니다.</p>
@@ -699,11 +703,11 @@ Seq2Seq 모델은 시퀀스 길이와 순서를 자유롭게하기 때문에
 </div>
 </div>
 <div class="section" id="id5">
-<h3>디코더<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
+<h3>디코더<a class="headerlink" href="#id5" title="이 제목에 대한 퍼머링크">¶</a></h3>
 <p>디코더는 인코더 출력 벡터를 받아서 번역을 생성하기 위한 단어 시퀀스를
 출력합니다.</p>
 <div class="section" id="id6">
-<h4>간단한 디코더<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h4>
+<h4>간단한 디코더<a class="headerlink" href="#id6" title="이 제목에 대한 퍼머링크">¶</a></h4>
 <p>가장 간단한 Seq2Seq 디코더는 인코더의 마지막 출력만을 이용합니다.
 이 마지막 출력은 전체 시퀀스에서 문맥을 인코드하기 때문에
 <em>문맥 벡터(context vector)</em> 로 불립니다. 이 문맥 벡터는 디코더의 초기 은닉 상태로
@@ -740,11 +744,11 @@ Seq2Seq 모델은 시퀀스 길이와 순서를 자유롭게하기 때문에
 Attention 메커니즘을 소개 할 것입니다.</p>
 </div>
 <div class="section" id="attention">
-<h4>Attention 디코더<a class="headerlink" href="#attention" title="Permalink to this headline">¶</a></h4>
+<h4>Attention 디코더<a class="headerlink" href="#attention" title="이 제목에 대한 퍼머링크">¶</a></h4>
 <p>문맥 벡터만 인코더와 디코더 사이로 전달 된다면, 단일 벡터가 전체 문장을
 인코딩 해야하는 부담을 가지게 됩니다.</p>
 <p>Attention은 디코더 네트워크가 자기 출력의 모든 단계에서 인코더 출력의
-다른 부분에 “집중” 할 수 있게 합니다. 첫째 <em>Attention 가중치</em> 의 세트를
+다른 부분에 《집중》 할 수 있게 합니다. 첫째 <em>Attention 가중치</em> 의 세트를
 계산합니다. 이것은 가중치 조합을 만들기 위해서 인코더 출력 벡터와
 곱해집니다. 그 결과(코드에서 <code class="docutils literal notranslate"><span class="pre">attn_applied</span></code>)는 입력 시퀀스의
 특정 부분에 관한 정보를 포함해야하고 따라서 디코더가 알맞은 출력
@@ -799,19 +803,19 @@ Attention 메커니즘을 소개 할 것입니다.</p>
 </pre></div>
 </div>
 <div class="admonition note">
-<p class="admonition-title">Note</p>
+<p class="admonition-title">참고</p>
 <p>There are other forms of attention that work around the length
-limitation by using a relative position approach. Read about “local
-attention” in <a class="reference external" href="https://arxiv.org/abs/1508.04025">Effective Approaches to Attention-based Neural Machine
+limitation by using a relative position approach. Read about 《local
+attention》 in <a class="reference external" href="https://arxiv.org/abs/1508.04025">Effective Approaches to Attention-based Neural Machine
 Translation</a>.</p>
 </div>
 </div>
 </div>
 </div>
 <div class="section" id="id7">
-<h2>학습<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h2>
+<h2>학습<a class="headerlink" href="#id7" title="이 제목에 대한 퍼머링크">¶</a></h2>
 <div class="section" id="id8">
-<h3>학습 데이터 준비<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
+<h3>학습 데이터 준비<a class="headerlink" href="#id8" title="이 제목에 대한 퍼머링크">¶</a></h3>
 <p>학습을 위해서, 각 쌍마다 입력 Tensor(입력 문장의 단어 주소)와
 목표 Tensor(목표 문장의 단어 주소)가 필요합니다. 이 벡터들을
 생성하는 동안 두 시퀀스에 EOS 토큰을 추가 합니다.</p>
@@ -833,17 +837,17 @@ Translation</a>.</p>
 </div>
 </div>
 <div class="section" id="id9">
-<h3>모델 학습<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
+<h3>모델 학습<a class="headerlink" href="#id9" title="이 제목에 대한 퍼머링크">¶</a></h3>
 <p>학습을 위해서 인코더에 입력 문장을 넣고 모든 출력과 최신 은닉 상태를
 추적합니다. 그런 다음 디코더에 첫 번째 입력으로 <code class="docutils literal notranslate"><span class="pre">&lt;SOS&gt;</span></code> 토큰과
 인코더의 마지막 은닉 상태가 첫번쩨 은닉 상태로 제공됩니다.</p>
-<p>“Teacher forcing”은 다음 입력으로 디코더의 예측을 사용하는 대신
+<p>《Teacher forcing》은 다음 입력으로 디코더의 예측을 사용하는 대신
 실제 목표 출력을 다음 입력으로 사용하는 컨셉입니다.
-“Teacher forcing”을 사용하면 수렴이 빨리되지만 <a class="reference external" href="http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.378.4095&amp;rep=rep1&amp;type=pdf">학습된 네트워크가
+《Teacher forcing》을 사용하면 수렴이 빨리되지만 <a class="reference external" href="http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.378.4095&amp;rep=rep1&amp;type=pdf">학습된 네트워크가
 잘못 사용될 때 불안정성을 보입니다.</a>.</p>
 <p>Teacher-forced 네트워크의 출력이 일관된 문법으로 읽지만 정확한
 번역과는 거리가 멀다는 것을 볼 수 있습니다. 직관적으로 출력 문법을
-표현하는 법을 배우고 교사가 처음 몇 단어를 말하면 의미를 “선택” 할 수 있지만,
+표현하는 법을 배우고 교사가 처음 몇 단어를 말하면 의미를 《선택》 할 수 있지만,
 번역에서 처음으로 문장을 만드는 법은 잘 배우지 못합니다.</p>
 <p>PyTorch의 autograd 가 제공하는 자유 덕분에 간단한 If 문으로
 Teacher Forcing을 사용할지 아니면 사용하지 않을지를 선택할 수 있습니다.
@@ -970,7 +974,7 @@ Teacher Forcing을 사용할지 아니면 사용하지 않을지를 선택할 �
 </div>
 </div>
 <div class="section" id="id10">
-<h3>결과 도식화<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h3>
+<h3>결과 도식화<a class="headerlink" href="#id10" title="이 제목에 대한 퍼머링크">¶</a></h3>
 <p>matplotlib로 학습 중에 저장된 손실 값 <code class="docutils literal notranslate"><span class="pre">plot_losses</span></code> 의 배열을
 사용하여 도식화합니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
@@ -991,7 +995,7 @@ Teacher Forcing을 사용할지 아니면 사용하지 않을지를 선택할 �
 </div>
 </div>
 <div class="section" id="id11">
-<h2>평가<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h2>
+<h2>평가<a class="headerlink" href="#id11" title="이 제목에 대한 퍼머링크">¶</a></h2>
 <p>평가는 대부분 학습과 동일하지만 목표가 없으므로 각 단계마다 디코더의
 예측을 되돌려 전달합니다.
 단어를 예측할 때마다 그 단어를 출력 문자열에 추가합니다.
@@ -1048,7 +1052,7 @@ Teacher Forcing을 사용할지 아니면 사용하지 않을지를 선택할 �
 </div>
 </div>
 <div class="section" id="id12">
-<h2>학습과 평가<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h2>
+<h2>학습과 평가<a class="headerlink" href="#id12" title="이 제목에 대한 퍼머링크">¶</a></h2>
 <p>이러한 모든 헬퍼 함수를 이용해서 (추가 작업처럼 보이지만 여러 실험을
 더 쉽게 수행 할 수 있음) 실제로 네트워크를 초기화하고 학습을
 시작할 수 있습니다.</p>
@@ -1057,7 +1061,7 @@ Teacher Forcing을 사용할지 아니면 사용하지 않을지를 선택할 �
 네트워크를 사용할 수 있습니다. MacBook CPU에서 약 40분 후에
 합리적인 결과를 얻을 것입니다.</p>
 <div class="admonition note">
-<p class="admonition-title">Note</p>
+<p class="admonition-title">참고</p>
 <p>이 노트북을 실행하면 학습, 커널 중단, 평가를 할 수 있고 나중에
 이어서 학습을 할 수 있습니다. 인코더와 디코더가 초기화 된 행을
 주석 처리하고 <code class="docutils literal notranslate"><span class="pre">trainIters</span></code> 를 다시 실행하십시오.</p>
@@ -1070,76 +1074,72 @@ Teacher Forcing을 사용할지 아니면 사용하지 않을지를 선택할 �
 </pre></div>
 </div>
 <ul class="sphx-glr-horizontal">
-<li><img alt="../_images/sphx_glr_seq2seq_translation_tutorial_001.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_seq2seq_translation_tutorial_001.png" />
-</li>
-<li><img alt="../_images/sphx_glr_seq2seq_translation_tutorial_002.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_seq2seq_translation_tutorial_002.png" />
-</li>
+<li><img src="../_images/sphx_glr_seq2seq_translation_tutorial_001.png" srcset="../_images/sphx_glr_seq2seq_translation_tutorial_001.png" alt="seq2seq translation tutorial" class = "sphx-glr-multi-img"/></li>
+<li><img src="../_images/sphx_glr_seq2seq_translation_tutorial_002.png" srcset="../_images/sphx_glr_seq2seq_translation_tutorial_002.png" alt="seq2seq translation tutorial" class = "sphx-glr-multi-img"/></li>
 </ul>
-<p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>2m 26s (- 34m 10s) (5000 6%) 2.8642
-4m 52s (- 31m 43s) (10000 13%) 2.2953
-7m 10s (- 28m 42s) (15000 20%) 1.9852
-9m 32s (- 26m 14s) (20000 26%) 1.7443
-12m 3s (- 24m 7s) (25000 33%) 1.5356
-14m 23s (- 21m 35s) (30000 40%) 1.3401
-16m 44s (- 19m 7s) (35000 46%) 1.2028
-19m 2s (- 16m 40s) (40000 53%) 1.0896
-21m 25s (- 14m 17s) (45000 60%) 0.9620
-23m 40s (- 11m 50s) (50000 66%) 0.8815
-26m 13s (- 9m 32s) (55000 73%) 0.8158
-28m 45s (- 7m 11s) (60000 80%) 0.7298
-31m 2s (- 4m 46s) (65000 86%) 0.6977
-33m 12s (- 2m 22s) (70000 93%) 0.6195
-35m 27s (- 0m 0s) (75000 100%) 0.5580
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>2m 0s (- 28m 0s) (5000 6%) 2.8522
+3m 54s (- 25m 24s) (10000 13%) 2.2910
+5m 45s (- 23m 1s) (15000 20%) 1.9420
+7m 35s (- 20m 53s) (20000 26%) 1.7084
+9m 32s (- 19m 4s) (25000 33%) 1.5252
+11m 46s (- 17m 40s) (30000 40%) 1.3469
+14m 6s (- 16m 7s) (35000 46%) 1.2237
+16m 31s (- 14m 27s) (40000 53%) 1.1130
+18m 44s (- 12m 29s) (45000 60%) 0.9901
+21m 28s (- 10m 44s) (50000 66%) 0.9164
+23m 39s (- 8m 36s) (55000 73%) 0.8411
+25m 45s (- 6m 26s) (60000 80%) 0.7447
+27m 49s (- 4m 16s) (65000 86%) 0.6895
+29m 57s (- 2m 8s) (70000 93%) 0.6313
+32m 46s (- 0m 0s) (75000 100%) 0.5894
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">evaluateRandomly</span><span class="p">(</span><span class="n">encoder1</span><span class="p">,</span> <span class="n">attn_decoder1</span><span class="p">)</span>
 </pre></div>
 </div>
-<p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&gt; tu es toujours vivante .
-= you re still alive .
-&lt; you re still alive . &lt;EOS&gt;
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&gt; t es remonte .
+= you re psyched .
+&lt; you re psyched . &lt;EOS&gt;
 
-&gt; c est une enfoiree .
-= she s a dog .
-&lt; she s a . . &lt;EOS&gt;
+&gt; j en ai marre de perdre .
+= i m tired of losing .
+&lt; i m tired of losing . &lt;EOS&gt;
 
-&gt; je suis mouille .
-= i m wet .
-&lt; i m wet . &lt;EOS&gt;
+&gt; t es dingue !
+= you re nuts !
+&lt; you re nuts ! &lt;EOS&gt;
 
-&gt; nous sommes observes .
-= we re being watched .
-&lt; we re being watched . &lt;EOS&gt;
+&gt; vous me rendez fou .
+= you re driving me nuts .
+&lt; you re driving me nuts . &lt;EOS&gt;
 
-&gt; il est entre a cette universite .
-= he is enrolled at that university .
-&lt; he is certain that that university . &lt;EOS&gt;
+&gt; nous ne sommes pas vraiment surs .
+= we re not really sure .
+&lt; we re not really sure . &lt;EOS&gt;
 
-&gt; tu n es pas le premier .
-= you re not the first .
-&lt; you re not the first . &lt;EOS&gt;
+&gt; je ne suis pas mauvais .
+= i m not evil .
+&lt; i m not evil . &lt;EOS&gt;
 
-&gt; tu l emportes .
-= you re winning .
-&lt; you re winning . &lt;EOS&gt;
+&gt; je suis mariee .
+= i m married .
+&lt; i m married . &lt;EOS&gt;
 
-&gt; vous etes tres indelicate .
-= you are very insensitive .
-&lt; you are very insensitive . &lt;EOS&gt;
+&gt; elle est mon genre .
+= she s my type .
+&lt; she s my type . &lt;EOS&gt;
 
-&gt; je ne suis pas instituteur .
-= i m not a teacher .
-&lt; i m not teacher . &lt;EOS&gt;
+&gt; je songe a demissionner .
+= i m considering resigning .
+&lt; i m thinking of time . &lt;EOS&gt;
 
-&gt; nous commencons a fatiguer .
-= we re getting tired .
-&lt; we re getting tired . &lt;EOS&gt;
+&gt; tu es tres comprehensif .
+= you re very understanding .
+&lt; you re very understanding . &lt;EOS&gt;
 </pre></div>
 </div>
 <div class="section" id="id13">
-<h3>Attention 시각화<a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h3>
+<h3>Attention 시각화<a class="headerlink" href="#id13" title="이 제목에 대한 퍼머링크">¶</a></h3>
 <p>Attention 메커니즘의 유용한 속성은 하나는 해석 가능성이 높은 출력입니다.
 입력 시퀀스의 특정 인코더 출력에 가중치를 부여하는 데 사용되므로
 각 시간 단계에서 네트워크가 가장 집중되는 위치를 파악할 수 있습니다.</p>
@@ -1150,7 +1150,9 @@ Teacher Forcing을 사용할지 아니면 사용하지 않을지를 선택할 �
 <span class="n">plt</span><span class="o">.</span><span class="n">matshow</span><span class="p">(</span><span class="n">attentions</span><span class="o">.</span><span class="n">numpy</span><span class="p">())</span>
 </pre></div>
 </div>
-<img alt="../_images/sphx_glr_seq2seq_translation_tutorial_003.png" class="sphx-glr-single-img" src="../_images/sphx_glr_seq2seq_translation_tutorial_003.png" />
+<img src="../_images/sphx_glr_seq2seq_translation_tutorial_003.png" srcset="../_images/sphx_glr_seq2seq_translation_tutorial_003.png" alt="seq2seq translation tutorial" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.image.AxesImage object at 0x7ff2f00c9610&gt;
+</pre></div>
+</div>
 <p>더 나은 보기를 위해 축과 라벨을 더하는 추가 작업을 수행합니다:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">showAttention</span><span class="p">(</span><span class="n">input_sentence</span><span class="p">,</span> <span class="n">output_words</span><span class="p">,</span> <span class="n">attentions</span><span class="p">):</span>
     <span class="c1"># colorbar로 그림 설정</span>
@@ -1189,30 +1191,25 @@ Teacher Forcing을 사용할지 아니면 사용하지 않을지를 선택할 �
 </pre></div>
 </div>
 <ul class="sphx-glr-horizontal">
-<li><img alt="../_images/sphx_glr_seq2seq_translation_tutorial_004.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_seq2seq_translation_tutorial_004.png" />
-</li>
-<li><img alt="../_images/sphx_glr_seq2seq_translation_tutorial_005.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_seq2seq_translation_tutorial_005.png" />
-</li>
-<li><img alt="../_images/sphx_glr_seq2seq_translation_tutorial_006.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_seq2seq_translation_tutorial_006.png" />
-</li>
-<li><img alt="../_images/sphx_glr_seq2seq_translation_tutorial_007.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_seq2seq_translation_tutorial_007.png" />
-</li>
+<li><img src="../_images/sphx_glr_seq2seq_translation_tutorial_004.png" srcset="../_images/sphx_glr_seq2seq_translation_tutorial_004.png" alt="seq2seq translation tutorial" class = "sphx-glr-multi-img"/></li>
+<li><img src="../_images/sphx_glr_seq2seq_translation_tutorial_005.png" srcset="../_images/sphx_glr_seq2seq_translation_tutorial_005.png" alt="seq2seq translation tutorial" class = "sphx-glr-multi-img"/></li>
+<li><img src="../_images/sphx_glr_seq2seq_translation_tutorial_006.png" srcset="../_images/sphx_glr_seq2seq_translation_tutorial_006.png" alt="seq2seq translation tutorial" class = "sphx-glr-multi-img"/></li>
+<li><img src="../_images/sphx_glr_seq2seq_translation_tutorial_007.png" srcset="../_images/sphx_glr_seq2seq_translation_tutorial_007.png" alt="seq2seq translation tutorial" class = "sphx-glr-multi-img"/></li>
 </ul>
-<p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>input = elle a cinq ans de moins que moi .
-output = she s five years younger than i am . &lt;EOS&gt;
+output = she s five years younger than . &lt;EOS&gt;
 input = elle est trop petit .
-output = she is too short . &lt;EOS&gt;
+output = she s too loud . &lt;EOS&gt;
 input = je ne crains pas de mourir .
-output = i m not afraid . . &lt;EOS&gt;
+output = i m not scared of dying . &lt;EOS&gt;
 input = c est un jeune directeur plein de talent .
-output = he is very talented young writer . &lt;EOS&gt;
+output = he s a talented young s . . &lt;EOS&gt;
 </pre></div>
 </div>
 </div>
 </div>
 <div class="section" id="id14">
-<h2>연습<a class="headerlink" href="#id14" title="Permalink to this headline">¶</a></h2>
+<h2>연습<a class="headerlink" href="#id14" title="이 제목에 대한 퍼머링크">¶</a></h2>
 <ul class="simple">
 <li><p>다른 데이터 셋을 시도해 보십시오</p>
 <ul>
@@ -1237,16 +1234,16 @@ embedding 을 교체하십시오</p></li>
 </ul>
 </li>
 </ul>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 35 minutes  34.068 seconds)</p>
-<div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-intermediate-seq2seq-translation-tutorial-py">
-<div class="sphx-glr-download docutils container">
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 32 minutes  52.176 seconds)</p>
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-intermediate-seq2seq-translation-tutorial-py">
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/3baf9960a4be104931872ff3ffda07b7/seq2seq_translation_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">seq2seq_translation_tutorial.py</span></code></a></p>
 </div>
-<div class="sphx-glr-download docutils container">
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/032d653a4f5a9c1ec32b9fc7c989ffe1/seq2seq_translation_tutorial.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">seq2seq_translation_tutorial.ipynb</span></code></a></p>
 </div>
 </div>
-<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
 </div>
 </div>
 
@@ -1354,12 +1351,15 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
          <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
          <script src="../_static/jquery.js"></script>
          <script src="../_static/underscore.js"></script>
+         <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
          <script src="../_static/doctools.js"></script>
          <script src="../_static/clipboard.min.js"></script>
          <script src="../_static/copybutton.js"></script>
+         <script src="../_static/translations.js"></script>
          <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js"></script>
          <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
          <script src="../_static/katex_autorenderer.js"></script>
+         <script src="../_static/design-tabs.js"></script>
      
   
 

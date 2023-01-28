@@ -129,7 +129,13 @@ class PositionalEncoding(nn.Module):
 ######################################################################
 # 이 튜토리얼에서는 ``torchtext`` 를 사용하여 Wikitext-2 데이터셋을 생성합니다.
 # torchtext 데이터셋에 접근하기 전에, https://github.com/pytorch/data 을 참고하여 torchdata를 설치하시기 바랍니다.
-# 단어 오브젝트는 훈련 데이터셋(train dataset) 에 의하여 만들어지고, 토큰(token)을 텐서(tensor)로 수치화하는데 사용됩니다.
+# %%
+#  .. code-block:: bash
+#
+#      %%bash
+#      pip install torchdata
+#
+# 어휘(vocab) 객체는 훈련 데이터셋(train dataset) 에 의하여 만들어지고, 토큰(token)을 텐서(tensor)로 수치화하는데 사용됩니다.
 # Wikitext-2에서 보기 드믄 토큰(rare token)은 `<unk>` 로 표현됩니다.
 #
 # 주어진 1D 벡터의 시퀀스 데이터에서, ``batchify()`` 함수는 데이터를 ``batch_size`` 컬럼들로 정렬합니다.
@@ -285,9 +291,9 @@ def train(model: nn.Module) -> None:
     num_batches = len(train_data) // bptt
     for batch, i in enumerate(range(0, train_data.size(0) - 1, bptt)):
         data, targets = get_batch(train_data, i)
-        batch_size = data.size(0)
-        if batch_size != bptt:  # 마지막 배치에만 적용
-            src_mask = src_mask[:batch_size, :batch_size]
+        seq_len = data.size(0)
+        if seq_len != bptt:  # 마지막 배치에만 적용
+            src_mask = src_mask[:seq_len, :seq_len]
         output = model(data, src_mask)
         loss = criterion(output.view(-1, ntokens), targets)
 
@@ -315,12 +321,12 @@ def evaluate(model: nn.Module, eval_data: Tensor) -> float:
     with torch.no_grad():
         for i in range(0, eval_data.size(0) - 1, bptt):
             data, targets = get_batch(eval_data, i)
-            batch_size = data.size(0)
-            if batch_size != bptt:
-                src_mask = src_mask[:batch_size, :batch_size]
+            seq_len = data.size(0)
+            if seq_len != bptt:
+                src_mask = src_mask[:seq_len, :seq_len]
             output = model(data, src_mask)
             output_flat = output.view(-1, ntokens)
-            total_loss += batch_size * criterion(output_flat, targets).item()
+            total_loss += seq_len * criterion(output_flat, targets).item()
     return total_loss / (len(eval_data) - 1)
 
 ######################################################################

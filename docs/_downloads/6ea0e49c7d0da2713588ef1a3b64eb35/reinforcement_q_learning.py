@@ -5,7 +5,7 @@
 **Author**: `Adam Paszke <https://github.com/apaszke>`_
   **번역**: `황성수 <https://github.com/adonisues>`_
 
-이 튜토리얼에서는 `OpenAI Gym <https://www.gymlibrary.ml/>`__ 의
+이 튜토리얼에서는 `OpenAI Gym <https://www.gymlibrary.dev/>`__ 의
 CartPole-v0 태스크에서 DQN (Deep Q Learning) 에이전트를 학습하는데
 PyTorch를 사용하는 방법을 보여드립니다.
 
@@ -14,7 +14,7 @@ PyTorch를 사용하는 방법을 보여드립니다.
 에이전트는 연결된 막대가 똑바로 서 있도록 카트를 왼쪽이나 오른쪽으로
 움직이는 두 가지 동작 중 하나를 선택해야 합니다.
 다양한 알고리즘과 시각화 기능을 갖춘 공식 순위표를
-`Gym 웹사이트 <https://www.gymlibrary.ml/environments/classic_control/cart_pole>`__ 에서 찾을 수 있습니다.
+`Gym 웹사이트 <https://www.gymlibrary.dev/environments/classic_control/cart_pole>`__ 에서 찾을 수 있습니다.
 
 .. figure:: /_static/img/cartpole.gif
    :alt: cartpole
@@ -41,7 +41,11 @@ PyTorch를 사용하는 방법을 보여드립니다.
 
 먼저 필요한 패키지를 가져옵니다. 첫째, 환경을 위해
 `gym <https://github.com/openai/gym>`__ 이 필요합니다.
-(`pip install gym` 을 사용하여 설치하십시오).
+
+.. code-block:: bash
+   %%bash
+   pip3 install gym[classic_control]
+
 또한 PyTorch에서 다음을 사용합니다:
 
 -  신경망 (``torch.nn``)
@@ -69,7 +73,10 @@ import torch.nn.functional as F
 import torchvision.transforms as T
 
 
-env = gym.make('CartPole-v0').unwrapped
+if gym.__version__ < '0.26':
+    env = gym.make('CartPole-v0', new_step_api=True, render_mode='single_rgb_array').unwrapped
+else:
+    env = gym.make('CartPole-v0', render_mode='rgb_array').unwrapped
 
 # matplotlib 설정
 is_ipython = 'inline' in matplotlib.get_backend()
@@ -239,7 +246,7 @@ def get_cart_location(screen_width):
 def get_screen():
     # gym이 요청한 화면은 400x600x3 이지만, 가끔 800x1200x3 처럼 큰 경우가 있습니다.
     # 이것을 Torch order (CHW)로 변환한다.
-    screen = env.render(mode='rgb_array').transpose((2, 0, 1))
+    screen = env.render().transpose((2, 0, 1))
     # 카트는 아래쪽에 있으므로 화면의 상단과 하단을 제거하십시오.
     _, screen_height, screen_width = screen.shape
     screen = screen[:, int(screen_height*0.4):int(screen_height * 0.8)]
@@ -438,7 +445,7 @@ for i_episode in range(num_episodes):
     for t in count():
         # 행동 선택과 수행
         action = select_action(state)
-        _, reward, done, _ = env.step(action.item())
+        _, reward, done, _, _ = env.step(action.item())
         reward = torch.tensor([reward], device=device)
 
         # 새로운 상태 관찰
@@ -461,6 +468,7 @@ for i_episode in range(num_episodes):
             episode_durations.append(t + 1)
             plot_durations()
             break
+
     # 목표 네트워크 업데이트, 모든 웨이트와 바이어스 복사
     if i_episode % TARGET_UPDATE == 0:
         target_net.load_state_dict(policy_net.state_dict())

@@ -2,8 +2,8 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<!--[if IE 8]><html class="no-js lt-ie9" lang="ko" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="ko" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
   
@@ -13,7 +13,7 @@
   
 <meta property="og:url" content="https://tutorials.pytorch.kr/intermediate/fx_profiling_tutorial.html" />
   
-<meta property="og:description" content="Author: James Reed In this tutorial, we are going to use FX to do the following: Capture PyTorch Python code in a way that we can inspect and gather statistics about the structure and execution of the code, Build out a small class that will serve as a simple performance “profiler”, collecting run..." />
+<meta property="og:description" content="Author: James Reed In this tutorial, we are going to use FX to do the following: Capture PyTorch Python code in a way that we can inspect and gather statistics about the structure and execution of the code, Build out a small class that will serve as a simple performance 《profiler》, collecting run..." />
   
 <meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
   
@@ -45,14 +45,19 @@
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
   <link rel="stylesheet" href="../_static/katex-math.css" type="text/css" />
-    <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" />
+  <link rel="stylesheet" href="../_static/sg_gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sg_gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sg_gallery-dataframe.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sg_gallery-rendered-html.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+    <link rel="index" title="색인" href="../genindex.html" />
+    <link rel="search" title="검색" href="../search.html" />
     <link rel="next" title="(베타) PyTorch를 사용한 Channels Last 메모리 형식" href="memory_format_tutorial.html" />
-    <link rel="prev" title="(베타) FX에서 합성곱/배치 정규화(Convolution/Batch Norm) 결합기(Fuser) 만들기" href="fx_conv_bn_fuser.html" /> 
+    <link rel="prev" title="Raspberry Pi 4 에서 실시간 추론(Inference) (30fps!)" href="realtime_rpi.html" /> 
 
   
   <script src="../_static/js/modernizr.min.js"></script>
@@ -130,7 +135,7 @@
               
               
                 <div class="version">
-                  1.12.0+cu102
+                  1.13.1+cu117
                 </div>
               
             
@@ -165,7 +170,6 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">파이토치(PyTorch) 시작하기</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/basics/intro.html">파이토치(PyTorch) 기본 익히기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/basics/quickstart_tutorial.html">빠른 시작(Quickstart)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/basics/tensorqs_tutorial.html">텐서(Tensor)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/basics/data_tutorial.html">Dataset과 DataLoader</a></li>
@@ -183,8 +187,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/autogradyt_tutorial.html">The Fundamentals of Autograd</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/modelsyt_tutorial.html">Building Models with PyTorch</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/tensorboardyt_tutorial.html">PyTorch TensorBoard Support</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/trainingyt.html">Training with PyTorch</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/captumyt.html">Model Understanding with Captum</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">파이토치(PyTorch) 배우기</span></p>
 <ul>
@@ -211,17 +213,16 @@
 <li class="toctree-l1"><a class="reference internal" href="../beginner/audio_datasets_tutorial.html">Audio Datasets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="speech_recognition_pipeline_tutorial.html">Wav2Vec2를 이용해서 음성 인식하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="speech_command_classification_with_torchaudio_tutorial.html">Speech Command Classification with torchaudio</a></li>
-<li class="toctree-l1"><a class="reference internal" href="text_to_speech_with_torchaudio.html">torchaudio를 사용하여 텍스트에서 음성으로 변환(text-to-speech)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="forced_alignment_with_torchaudio_tutorial.html">Forced Alignment with Wav2Vec2</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">텍스트</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/transformer_tutorial.html">nn.Transformer 와 TorchText 로 시퀀스-투-시퀀스(Sequence-to-Sequence) 모델링하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/bettertransformer_tutorial.html">Fast Transformer Inference with Better Transformer</a></li>
 <li class="toctree-l1"><a class="reference internal" href="char_rnn_classification_tutorial.html">기초부터 시작하는 NLP: 문자-단위 RNN으로 이름 분류하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="char_rnn_generation_tutorial.html">기초부터 시작하는 NLP:  문자-단위 RNN으로 이름 생성하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="seq2seq_translation_tutorial.html">기초부터 시작하는 NLP: Sequence to Sequence 네트워크와 Attention을 이용한 번역</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/text_sentiment_ngrams_tutorial.html">torchtext 라이브러리로 텍스트 분류하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/translation_transformer.html">nn.Transformer와 torchtext로 언어 번역하기</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">강화학습</span></p>
 <ul>
@@ -230,15 +231,12 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">PyTorch 모델을 프로덕션 환경에 배포하기</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="flask_rest_api_tutorial.html">Flask를 사용하여 Python에서 PyTorch를 REST API로 배포하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/Intro_to_TorchScript_tutorial.html">TorchScript 소개</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_export.html">C++에서 TorchScript 모델 로딩하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../advanced/super_resolution_with_onnxruntime.html">(선택) PyTorch 모델을 ONNX으로 변환하고 ONNX 런타임에서 실행하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="realtime_rpi.html">Raspberry Pi 4 에서 실시간 추론(Inference) (30fps!)</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Code Transforms with FX</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="fx_conv_bn_fuser.html">(베타) FX에서 합성곱/배치 정규화(Convolution/Batch Norm) 결합기(Fuser) 만들기</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">(beta) Building a Simple CPU Performance Profiler with FX</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">프론트엔드 API</span></p>
@@ -261,25 +259,28 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">모델 최적화</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/profiler.html">PyTorch 모듈 프로파일링 하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tensorboard_profiler_tutorial.html">PyTorch Profiler With TensorBoard</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/hyperparameter_tuning_tutorial.html">Ray Tune을 이용한 하이퍼파라미터 튜닝</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/vt_tutorial.html">배포를 위한 비전 트랜스포머(Vision Transformer) 모델 최적화하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="parametrizations.html">Parametrizations Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pruning_tutorial.html">가지치기 기법(Pruning) 튜토리얼</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/dynamic_quantization_tutorial.html">(베타) LSTM 기반 단어 단위 언어 모델의 동적 양자화</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="quantized_transfer_learning_tutorial.html">(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/static_quantization_tutorial.html">(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화</a></li>
 <li class="toctree-l1"><a class="reference internal" href="torchserve_with_ipex.html">Grokking PyTorch Intel CPU performance from first principles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torchserve_with_ipex_2.html">Grokking PyTorch Intel CPU performance from first principles (Part 2)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nvfuser_intro_tutorial.html">Getting Started - Accelerate Your Scripts with nvFuser</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ax_multiobjective_nas_tutorial.html">Multi-Objective NAS with Ax</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../distributed/home.html">Distributed and Parallel Training Tutorials</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/dist_overview.html">PyTorch Distributed Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/ddp_series_intro.html">Distributed Data Parallel in PyTorch - Video Tutorials</a></li>
 <li class="toctree-l1"><a class="reference internal" href="model_parallel_tutorial.html">단일 머신을 사용한 모델 병렬화 모범 사례</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ddp_tutorial.html">분산 데이터 병렬 처리 시작하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dist_tuto.html">PyTorch로 분산 어플리케이션 개발하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="FSDP_tutorial.html">Getting Started with Fully Sharded Data Parallel(FSDP)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="FSDP_adavnced_tutorial.html">Advanced Model Training with Fully Sharded Data Parallel (FSDP)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="process_group_cpp_extension_tutorial.html">Customize Process Group Backends Using Cpp Extensions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rpc_tutorial.html">Getting Started with Distributed RPC Framework</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rpc_param_server_tutorial.html">Implementing a Parameter Server Using Distributed RPC Framework</a></li>
@@ -287,7 +288,6 @@
 <li class="toctree-l1"><a class="reference internal" href="rpc_async_execution.html">Implementing Batch RPC Processing Using Asynchronous Executions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/rpc_ddp_tutorial.html">분산 데이터 병렬(DDP)과 분산 RPC 프레임워크 결합</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pipeline_tutorial.html">파이프라인 병렬화로 트랜스포머 모델 학습시키기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../advanced/ddp_pipeline.html">분산 데이터 병렬 처리와 병렬 처리 파이프라인을 사용한 트랜스포머 모델 학습</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/generic_join.html">Distributed Training with Uneven Inputs Using the Join Context Manager</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Mobile</span></p>
@@ -299,6 +299,10 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="torchrec_tutorial.html">TorchRec 소개</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/sharding.html">Exploring TorchRec sharding</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Multimodality</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/flava_finetuning_tutorial.html">TorchMultimodal Tutorial: Finetuning FLAVA</a></li>
 </ul>
 
             
@@ -395,17 +399,18 @@
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
   <div class="sphx-glr-download-link-note admonition note">
-<p class="admonition-title">Note</p>
-<p>Click <a class="reference internal" href="#sphx-glr-download-intermediate-fx-profiling-tutorial-py"><span class="std std-ref">here</span></a> to download the full example code</p>
+<p class="admonition-title">참고</p>
+<p>Click <a class="reference internal" href="#sphx-glr-download-intermediate-fx-profiling-tutorial-py"><span class="std std-ref">here</span></a>
+to download the full example code</p>
 </div>
 <div class="sphx-glr-example-title section" id="beta-building-a-simple-cpu-performance-profiler-with-fx">
-<span id="sphx-glr-intermediate-fx-profiling-tutorial-py"></span><h1>(beta) Building a Simple CPU Performance Profiler with FX<a class="headerlink" href="#beta-building-a-simple-cpu-performance-profiler-with-fx" title="Permalink to this headline">¶</a></h1>
+<span id="sphx-glr-intermediate-fx-profiling-tutorial-py"></span><h1>(beta) Building a Simple CPU Performance Profiler with FX<a class="headerlink" href="#beta-building-a-simple-cpu-performance-profiler-with-fx" title="이 제목에 대한 퍼머링크">¶</a></h1>
 <p><strong>Author</strong>: <a class="reference external" href="https://github.com/jamesr66a">James Reed</a></p>
 <p>In this tutorial, we are going to use FX to do the following:</p>
 <ol class="arabic simple">
 <li><p>Capture PyTorch Python code in a way that we can inspect and gather
 statistics about the structure and execution of the code</p></li>
-<li><p>Build out a small class that will serve as a simple performance “profiler”,
+<li><p>Build out a small class that will serve as a simple performance 《profiler》,
 collecting runtime statistics about each part of the model from actual
 runs.</p></li>
 </ol>
@@ -417,6 +422,92 @@ for demonstration purposes.</p>
 
 <span class="n">rn18</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">resnet18</span><span class="p">()</span>
 <span class="n">rn18</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>ResNet(
+  (conv1): Conv2d(3, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)
+  (bn1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+  (relu): ReLU(inplace=True)
+  (maxpool): MaxPool2d(kernel_size=3, stride=2, padding=1, dilation=1, ceil_mode=False)
+  (layer1): Sequential(
+    (0): BasicBlock(
+      (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (relu): ReLU(inplace=True)
+      (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    )
+    (1): BasicBlock(
+      (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (relu): ReLU(inplace=True)
+      (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    )
+  )
+  (layer2): Sequential(
+    (0): BasicBlock(
+      (conv1): Conv2d(64, 128, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (relu): ReLU(inplace=True)
+      (conv2): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (downsample): Sequential(
+        (0): Conv2d(64, 128, kernel_size=(1, 1), stride=(2, 2), bias=False)
+        (1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+    )
+    (1): BasicBlock(
+      (conv1): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (relu): ReLU(inplace=True)
+      (conv2): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    )
+  )
+  (layer3): Sequential(
+    (0): BasicBlock(
+      (conv1): Conv2d(128, 256, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (relu): ReLU(inplace=True)
+      (conv2): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (downsample): Sequential(
+        (0): Conv2d(128, 256, kernel_size=(1, 1), stride=(2, 2), bias=False)
+        (1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+    )
+    (1): BasicBlock(
+      (conv1): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (relu): ReLU(inplace=True)
+      (conv2): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    )
+  )
+  (layer4): Sequential(
+    (0): BasicBlock(
+      (conv1): Conv2d(256, 512, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (relu): ReLU(inplace=True)
+      (conv2): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (downsample): Sequential(
+        (0): Conv2d(256, 512, kernel_size=(1, 1), stride=(2, 2), bias=False)
+        (1): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+    )
+    (1): BasicBlock(
+      (conv1): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn1): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (relu): ReLU(inplace=True)
+      (conv2): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (bn2): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    )
+  )
+  (avgpool): AdaptiveAvgPool2d(output_size=(1, 1))
+  (fc): Linear(in_features=512, out_features=1000, bias=True)
+)
 </pre></div>
 </div>
 <p>Now that we have our model, we want to inspect deeper into its
@@ -433,7 +524,7 @@ how long the regions between the timestamps take.</p>
 <p>That technique is certainly applicable to PyTorch code, however it
 would be nicer if we didn’t have to copy over model code and edit it,
 especially code we haven’t written (like this torchvision model).
-Instead, we are going to use FX to automate this “instrumentation”
+Instead, we are going to use FX to automate this 《instrumentation》
 process without needing to modify any source.</p>
 <p>First, let’s get some imports out of the way (we will be using all
 of these later in the code).</p>
@@ -443,13 +534,13 @@ of these later in the code).</p>
 </pre></div>
 </div>
 <div class="admonition note">
-<p class="admonition-title">Note</p>
+<p class="admonition-title">참고</p>
 <p><code class="docutils literal notranslate"><span class="pre">tabulate</span></code> is an external library that is not a dependency of PyTorch.
 We will be using it to more easily visualize performance data. Please
 make sure you’ve installed it from your favorite Python package source.</p>
 </div>
 <div class="section" id="capturing-the-model-with-symbolic-tracing">
-<h2>Capturing the Model with Symbolic Tracing<a class="headerlink" href="#capturing-the-model-with-symbolic-tracing" title="Permalink to this headline">¶</a></h2>
+<h2>Capturing the Model with Symbolic Tracing<a class="headerlink" href="#capturing-the-model-with-symbolic-tracing" title="이 제목에 대한 퍼머링크">¶</a></h2>
 <p>Next, we are going to use FX’s symbolic tracing mechanism to capture
 the definition of our model in a data structure we can manipulate
 and examine.</p>
@@ -457,7 +548,6 @@ and examine.</p>
 <span class="nb">print</span><span class="p">(</span><span class="n">traced_rn18</span><span class="o">.</span><span class="n">graph</span><span class="p">)</span>
 </pre></div>
 </div>
-<p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>graph():
     %x : torch.Tensor [#users=1] = placeholder[target=x]
     %conv1 : [#users=1] = call_module[target=conv1](args = (%x,), kwargs = {})
@@ -541,7 +631,7 @@ information about the Graph representation and the rest of FX’s APIs ca
 be found at the FX documentation <a class="reference external" href="https://pytorch.org/docs/master/fx.html">https://pytorch.org/docs/master/fx.html</a>.</p>
 </div>
 <div class="section" id="creating-a-profiling-interpreter">
-<h2>Creating a Profiling Interpreter<a class="headerlink" href="#creating-a-profiling-interpreter" title="Permalink to this headline">¶</a></h2>
+<h2>Creating a Profiling Interpreter<a class="headerlink" href="#creating-a-profiling-interpreter" title="이 제목에 대한 퍼머링크">¶</a></h2>
 <p>Next, we are going to create a class that inherits from <code class="docutils literal notranslate"><span class="pre">torch.fx.Interpreter</span></code>.
 Though the <code class="docutils literal notranslate"><span class="pre">GraphModule</span></code> that <code class="docutils literal notranslate"><span class="pre">symbolic_trace</span></code> produces compiles Python code
 that is run when you call a <code class="docutils literal notranslate"><span class="pre">GraphModule</span></code>, an alternative way to run a
@@ -653,7 +743,7 @@ how long the model and each part of the model took during those runs.</p>
 </pre></div>
 </div>
 <div class="admonition note">
-<p class="admonition-title">Note</p>
+<p class="admonition-title">참고</p>
 <p>We use Python’s <code class="docutils literal notranslate"><span class="pre">time.time</span></code> function to pull wall clock
 timestamps and compare them. This is not the most accurate
 way to measure performance, and will only give us a first-
@@ -662,7 +752,7 @@ purpose of demonstration in this tutorial.</p>
 </div>
 </div>
 <div class="section" id="investigating-the-performance-of-resnet18">
-<h2>Investigating the Performance of ResNet18<a class="headerlink" href="#investigating-the-performance-of-resnet18" title="Permalink to this headline">¶</a></h2>
+<h2>Investigating the Performance of ResNet18<a class="headerlink" href="#investigating-the-performance-of-resnet18" title="이 제목에 대한 퍼머링크">¶</a></h2>
 <p>We can now use <code class="docutils literal notranslate"><span class="pre">ProfilingInterpreter</span></code> to inspect the performance
 characteristics of our ResNet18 model;</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">interp</span> <span class="o">=</span> <span class="n">ProfilingInterpreter</span><span class="p">(</span><span class="n">rn18</span><span class="p">)</span>
@@ -670,80 +760,79 @@ characteristics of our ResNet18 model;</p>
 <span class="nb">print</span><span class="p">(</span><span class="n">interp</span><span class="o">.</span><span class="n">summary</span><span class="p">(</span><span class="kc">True</span><span class="p">))</span>
 </pre></div>
 </div>
-<p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Op type        Op                       Average runtime (s)    Pct total runtime
 -------------  ---------------------  ---------------------  -------------------
-call_module    conv1                            0.00722051             8.99949
-call_module    maxpool                          0.00558686             6.96335
-call_module    layer1_0_conv1                   0.00517154             6.4457
-call_module    layer1_0_conv2                   0.00450683             5.61722
-call_module    layer1_1_conv2                   0.00428033             5.33491
-call_module    layer4_1_conv1                   0.00381231             4.75159
-call_module    layer1_1_conv1                   0.00372958             4.64847
-call_module    layer4_0_conv2                   0.00367785             4.58399
-call_module    layer2_0_conv2                   0.00346327             4.31655
-call_module    layer2_1_conv2                   0.00340915             4.24909
-call_module    layer2_1_conv1                   0.00335407             4.18045
-call_module    layer4_1_conv2                   0.00320649             3.99651
-call_module    layer3_1_conv2                   0.00294518             3.67082
-call_module    layer4_0_conv1                   0.00287318             3.58108
-call_module    layer3_1_conv1                   0.00271416             3.38287
-call_module    layer3_0_conv2                   0.00270486             3.37128
-call_module    layer3_0_conv1                   0.00233698             2.91276
-call_module    bn1                              0.00232458             2.89731
-call_module    layer2_0_conv1                   0.00211811             2.63997
-call_module    layer3_0_downsample_0            0.000958204            1.19429
-call_module    layer4_0_downsample_0            0.000771523            0.96161
-call_module    layer2_0_downsample_0            0.000762939            0.950912
-call_function  add                              0.000671387            0.836803
-call_function  add_1                            0.000524282            0.653455
-call_function  add_7                            0.000395298            0.492691
-call_module    layer1_1_bn2                     0.000331402            0.413052
-call_function  add_3                            0.000299215            0.372936
-call_module    relu                             0.000294685            0.36729
-call_module    layer1_0_bn2                     0.000285149            0.355403
-call_function  add_4                            0.000279665            0.348569
-call_module    fc                               0.000271082            0.337871
-call_module    layer1_0_bn1                     0.000215292            0.268336
-call_module    layer1_1_bn1                     0.000197411            0.246049
-call_function  add_6                            0.000172853            0.215441
-call_function  add_5                            0.000171423            0.213658
-call_module    layer2_1_bn2                     0.000170946            0.213064
-call_module    layer2_0_bn1                     0.000169277            0.210984
-call_module    layer4_0_bn2                     0.000153065            0.190777
-call_module    avgpool                          0.00014472             0.180376
-call_module    layer2_1_bn1                     0.000143528            0.17889
-call_module    layer3_0_bn2                     0.000143051            0.178296
-call_module    layer4_1_bn1                     0.000140905            0.175622
-call_module    layer2_0_bn2                     0.000138998            0.173244
-call_module    layer2_0_downsample_1            0.000138283            0.172353
-call_module    layer3_1_bn1                     0.000134468            0.167598
-call_module    layer3_0_bn1                     0.000132799            0.165518
-call_module    layer1_0_relu                    0.000119209            0.14858
-call_function  add_2                            0.000117064            0.145906
-call_module    layer4_0_downsample_1            0.000115633            0.144123
-call_module    layer4_0_bn1                     0.000108957            0.135802
-call_module    layer1_0_relu_1                  0.000106335            0.132533
-call_module    layer3_0_downsample_1            0.000105858            0.131939
-call_module    layer2_0_relu_1                  0.000105381            0.131345
-call_module    layer4_1_bn2                     0.000105381            0.131345
-call_module    layer1_1_relu_1                  0.000104666            0.130453
-call_module    layer3_1_bn2                     0.000101566            0.12659
-call_module    layer1_1_relu                    9.60827e-05            0.119755
-call_module    layer3_0_relu                    9.34601e-05            0.116487
-call_module    layer3_1_relu                    8.13007e-05            0.101332
-call_module    layer4_0_relu_1                  7.82013e-05            0.0974685
-call_module    layer4_0_relu                    7.67708e-05            0.0956855
-call_module    layer4_1_relu                    7.58171e-05            0.0944969
-call_module    layer2_0_relu                    7.41482e-05            0.0924168
-call_module    layer2_1_relu                    6.86646e-05            0.0855821
-call_module    layer3_0_relu_1                  6.67572e-05            0.0832048
-call_module    layer4_1_relu_1                  6.58035e-05            0.0820162
-call_module    layer3_1_relu_1                  6.38962e-05            0.0796389
-call_module    layer2_1_relu_1                  6.1512e-05             0.0766673
-call_function  flatten                          3.8147e-05             0.0475456
-placeholder    x                                1.4782e-05             0.0184239
-output         output                           1.35899e-05            0.0169381
+call_module    maxpool                          0.00720644             7.68879
+call_module    conv1                            0.00707364             7.5471
+call_module    layer1_0_conv2                   0.00527978             5.63317
+call_module    layer4_0_conv2                   0.0051291              5.4724
+call_module    layer1_1_conv2                   0.00491452             5.24346
+call_module    layer1_0_conv1                   0.00479221             5.11297
+call_module    layer4_1_conv1                   0.00469804             5.01249
+call_module    layer4_1_conv2                   0.00461745             4.92651
+call_module    layer1_1_conv1                   0.00448966             4.79016
+call_module    layer2_1_conv2                   0.00417805             4.45769
+call_module    layer2_0_conv2                   0.00416207             4.44065
+call_module    layer3_0_conv2                   0.00371814             3.967
+call_module    layer3_1_conv2                   0.00368404             3.93063
+call_module    layer2_1_conv1                   0.00368261             3.9291
+call_module    layer3_1_conv1                   0.0035665              3.80522
+call_module    layer4_0_conv1                   0.00294185             3.13875
+call_module    bn1                              0.00258136             2.75413
+call_module    layer3_0_conv1                   0.00244308             2.6066
+call_module    layer2_0_conv1                   0.00244141             2.60482
+call_module    layer2_0_downsample_0            0.00105309             1.12358
+call_module    layer4_0_downsample_0            0.000691414            0.737692
+call_function  add_1                            0.000676394            0.721666
+call_module    layer3_0_downsample_0            0.000659227            0.703351
+call_function  add                              0.000606537            0.647134
+call_module    layer1_0_bn2                     0.000386               0.411836
+call_module    relu                             0.000385761            0.411581
+call_function  add_3                            0.000359774            0.383854
+call_module    layer1_1_bn2                     0.000341177            0.364013
+call_module    layer2_0_downsample_1            0.000323772            0.345443
+call_module    layer1_0_bn1                     0.000285864            0.304997
+call_module    fc                               0.000263929            0.281595
+call_function  add_5                            0.000252962            0.269894
+call_module    layer2_1_bn1                     0.000238657            0.254631
+call_module    layer2_1_bn2                     0.000233412            0.249035
+call_function  add_4                            0.000225782            0.240895
+call_module    layer1_1_bn1                     0.000224113            0.239114
+call_module    layer3_1_bn2                     0.000212431            0.22665
+call_module    avgpool                          0.000191212            0.20401
+call_function  add_7                            0.000187397            0.19994
+call_module    layer4_0_downsample_1            0.000177622            0.189511
+call_module    layer2_0_bn2                     0.000172138            0.18366
+call_module    layer2_0_bn1                     0.000169277            0.180607
+call_module    layer4_1_bn2                     0.000165701            0.176792
+call_module    layer3_0_bn1                     0.000165224            0.176283
+call_module    layer1_0_relu                    0.000160456            0.171195
+call_module    layer4_0_bn2                     0.000157833            0.168397
+call_module    layer3_0_bn2                     0.000156641            0.167125
+call_module    layer3_1_bn1                     0.000149488            0.159494
+call_module    layer4_1_bn1                     0.000141859            0.151354
+call_module    layer1_0_relu_1                  0.00014019             0.149573
+call_function  add_2                            0.000137091            0.146267
+call_function  add_6                            0.000133514            0.142451
+call_module    layer3_0_downsample_1            0.0001266              0.135074
+call_module    layer1_1_relu                    0.000124693            0.133039
+call_module    layer1_1_relu_1                  0.000118971            0.126934
+call_module    layer4_0_bn1                     0.000118732            0.12668
+call_module    layer4_1_relu                    0.00011611             0.123881
+call_module    layer3_0_relu                    9.82285e-05            0.104803
+call_module    layer2_0_relu_1                  9.70364e-05            0.103531
+call_module    layer2_0_relu                    9.41753e-05            0.100479
+call_module    layer3_1_relu                    9.41753e-05            0.100479
+call_module    layer4_0_relu_1                  9.34601e-05            0.0997156
+call_module    layer4_0_relu                    9.05991e-05            0.0966631
+call_module    layer2_1_relu                    8.96454e-05            0.0956456
+call_module    layer4_1_relu_1                  8.67844e-05            0.0925931
+call_module    layer2_1_relu_1                  8.55923e-05            0.0913212
+call_module    layer3_1_relu_1                  8.32081e-05            0.0887774
+call_module    layer3_0_relu_1                  8.22544e-05            0.0877599
+call_function  flatten                          6.36578e-05            0.0679185
+placeholder    x                                4.05312e-05            0.043244
+output         output                           2.14577e-05            0.0228939
 </pre></div>
 </div>
 <p>There are two things we should call out here:</p>
@@ -756,7 +845,7 @@ line of thinking and optimize this in the Conv-BN Fusion with FX
 </ul>
 </div>
 <div class="section" id="conclusion">
-<h2>Conclusion<a class="headerlink" href="#conclusion" title="Permalink to this headline">¶</a></h2>
+<h2>Conclusion<a class="headerlink" href="#conclusion" title="이 제목에 대한 퍼머링크">¶</a></h2>
 <p>As we can see, using FX we can easily capture PyTorch programs (even
 ones we don’t have the source code for!) in a machine-interpretable
 format and use that for analysis, such as the performance analysis
@@ -767,16 +856,16 @@ feedback you have about using it. Please feel free to use the
 PyTorch Forums (<a class="reference external" href="https://discuss.pytorch.org/">https://discuss.pytorch.org/</a>) and the issue tracker
 (<a class="reference external" href="https://github.com/pytorch/pytorch/issues">https://github.com/pytorch/pytorch/issues</a>) to provide any feedback
 you might have.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.554 seconds)</p>
-<div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-intermediate-fx-profiling-tutorial-py">
-<div class="sphx-glr-download docutils container">
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.515 seconds)</p>
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-intermediate-fx-profiling-tutorial-py">
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/8c575aa36ad9a61584ec0ddf11cbe84d/fx_profiling_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">fx_profiling_tutorial.py</span></code></a></p>
 </div>
-<div class="sphx-glr-download docutils container">
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/945dab6b984b8789385e32187d4a8964/fx_profiling_tutorial.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">fx_profiling_tutorial.ipynb</span></code></a></p>
 </div>
 </div>
-<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
 </div>
 </div>
 
@@ -791,7 +880,7 @@ you might have.</p>
         <a href="memory_format_tutorial.html" class="btn btn-neutral float-right" title="(베타) PyTorch를 사용한 Channels Last 메모리 형식" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
       
       
-        <a href="fx_conv_bn_fuser.html" class="btn btn-neutral" title="(베타) FX에서 합성곱/배치 정규화(Convolution/Batch Norm) 결합기(Fuser) 만들기" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
+        <a href="realtime_rpi.html" class="btn btn-neutral" title="Raspberry Pi 4 에서 실시간 추론(Inference) (30fps!)" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
       
     </div>
   
@@ -866,12 +955,15 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
          <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
          <script src="../_static/jquery.js"></script>
          <script src="../_static/underscore.js"></script>
+         <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
          <script src="../_static/doctools.js"></script>
          <script src="../_static/clipboard.min.js"></script>
          <script src="../_static/copybutton.js"></script>
+         <script src="../_static/translations.js"></script>
          <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js"></script>
          <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
          <script src="../_static/katex_autorenderer.js"></script>
+         <script src="../_static/design-tabs.js"></script>
      
   
 

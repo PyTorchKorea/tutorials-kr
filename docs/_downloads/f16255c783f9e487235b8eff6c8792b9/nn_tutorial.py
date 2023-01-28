@@ -850,9 +850,9 @@ fit(epochs, model, loss_func, opt, train_dl, valid_dl)
 # 마치면서
 # -----------------
 #
-# 이제 Pytorch를 사용하여 다양한 유형의 모델을 학습하는 데 사용할 수 있는 일반 데이터 파이프 라인과
+# 이제 PyTorch를 사용하여 다양한 유형의 모델을 학습하는 데 사용할 수 있는 일반 데이터 파이프 라인과
 # 훈련 루프가 있습니다.
-# 이제 모델 학습이 얼마나 간단한지 확인하려면 `mnist_sample` 샘플 노트북을 살펴보세요.
+# 이제 모델 학습이 얼마나 간단한지 확인하려면 `mnist_sample 노트북 <https://github.com/fastai/fastai_dev/blob/master/dev_nb/mnist_sample.ipynb>`__ 을 살펴보세요.
 #
 # 물론 데이터 증강(data augmentation), 초매개변수 조정(hyperparameter tuning),
 # 훈련과정 모니터링(monitoring training), 전이 학습(transfer learning) 등과 같이
