@@ -8,7 +8,7 @@
 * `PyTorch Distributed Series </beginner/ddp_series_intro.html?utm_source=whats_new_tutorials&utm_medium=ddp_series_intro>`__
 * `Fast Transformer Inference with Better Transformer </beginner/bettertransformer_tutorial.html?utm_source=whats_new_tutorials&utm_medium=bettertransformer>`__
 * `Advanced model training with Fully Sharded Data Parallel (FSDP) </intermediate/FSDP_adavnced_tutorial.html?utm_source=whats_new_tutorials&utm_medium=FSDP_advanced>`__
-* `Grokking PyTorch Intel CPU Performance from First Principles </intermediate/torchserve_with_ipex?utm_source=whats_new_tutorials&utm_medium=torchserve_ipex>`__
+* `Grokking PyTorch Intel CPU Performance from First Principles </intermediate/torchserve_with_ipex.html?utm_source=whats_new_tutorials&utm_medium=torchserve_ipex>`__
 
 .. raw:: html
 
