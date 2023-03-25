@@ -31,7 +31,7 @@
 있습니다: '비행기(airplane)', '자동차(automobile)', '새(bird)', '고양이(cat)',
 '사슴(deer)', '개(dog)', '개구리(frog)', '말(horse)', '배(ship)', '트럭(truck)'.
 그리고 CIFAR10에 포함된 이미지의 크기는 3x32x32로, 이는 32x32 픽셀 크기의 이미지가
-3개 채널(channel)의 색상로 이뤄져 있다는 것을 뜻합니다.
+3개 채널(channel)의 색상으로 이뤄져 있다는 것을 뜻합니다.
 
 .. figure:: /_static/img/cifar10.png
    :alt: cifar10
