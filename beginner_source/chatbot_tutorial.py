@@ -314,7 +314,7 @@ class Voc:
             len(keep_words), len(self.word2index), len(keep_words) / len(self.word2index)
         ))
 
-        # 사전을 다시 초기화힙니다
+        # 사전을 다시 초기화합니다
         self.word2index = {}
         self.word2count = {}
         self.index2word = {PAD_token: "PAD", SOS_token: "SOS", EOS_token: "EOS"}
