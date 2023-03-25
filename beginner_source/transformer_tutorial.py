@@ -136,7 +136,7 @@ class PositionalEncoding(nn.Module):
 #      pip install torchdata
 #
 # 어휘(vocab) 객체는 훈련 데이터셋(train dataset) 에 의하여 만들어지고, 토큰(token)을 텐서(tensor)로 수치화하는데 사용됩니다.
-# Wikitext-2에서 보기 드믄 토큰(rare token)은 `<unk>` 로 표현됩니다.
+# Wikitext-2에서 보기 드문 토큰(rare token)은 `<unk>` 로 표현됩니다.
 #
 # 주어진 1D 벡터의 시퀀스 데이터에서, ``batchify()`` 함수는 데이터를 ``batch_size`` 컬럼들로 정렬합니다.
 # 만약 데이터가 ``batch_size`` 컬럼으로 나누어 떨어지지 않으면, 데이터를 잘라내서 맞춥니다.
