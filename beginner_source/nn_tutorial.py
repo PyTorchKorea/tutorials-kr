@@ -101,7 +101,7 @@ print(y_train.min(), y_train.max())
 # 여러분이 신경망의 기초에 대해서 이미 익숙하다고 가정합니다.
 # (만약 익숙하지 않다면 `course.fast.ai <https://course.fast.ai>`_ 에서 학습할 수 있습니다).
 #
-# PyTorch는 랜덤 또는 0으로만 이루어진 텐서를 생성하는 메서드를 제공하고,
+# PyTorch는 랜덤 또는 0으로만 이루어진 텐서를 생성하는 메소드를 제공하고,
 # 우리는 간단한 선형 모델의 가중치(weights)와 절편(bias)을 생성하기 위해서 이것을 사용할 것입니다.
 # 이들은 일반적인 텐서에 매우 특별한 한 가지가 추가된 것입니다: 우리는 PyTorch에게 이들이
 # 기울기(gradient)가 필요하다고 알려줍니다.
@@ -110,7 +110,7 @@ print(y_train.min(), y_train.max())
 #
 # 가중치에 대해서는 ``requires_grad`` 를 초기화(initialization) **다음에** 설정합니다,
 # 왜냐하면 우리는 해당 단계가 기울기에 포함되는 것을 원치 않기 때문입니다.
-# (PyTorch에서 ``_`` 다음에 오는 메서드 이름은 연산이 인플레이스(in-place)로 수행되는 것을 의미합니다.)
+# (PyTorch에서 ``_`` 다음에 오는 메소드 이름은 연산이 인플레이스(in-place)로 수행되는 것을 의미합니다.)
 #
 # .. note:: `Xavier initialisation <http://proceedings.mlr.press/v9/glorot10a/glorot10a.pdf>`_
 #    기법을 이용하여 가중치를 초기화 합니다. (1/sqrt(n)을 곱해주는 것을 통해서 초기화).
