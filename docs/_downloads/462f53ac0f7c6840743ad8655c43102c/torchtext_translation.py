@@ -36,14 +36,14 @@ PyTorch 커뮤니티 멤버인 `Ben Trevett <https://github.com/bentrevett>`__ �
 #
 # ::
 #
-#    python -m spacy download en
-#    python -m spacy download de
+#    python -m spacy download en_core_web_sm
+#    python -m spacy download de_core_news_sm
 
 import torchtext
 import torch
 from torchtext.data.utils import get_tokenizer
 from collections import Counter
-from torchtext.vocab import Vocab
+from torchtext.vocab import vocab
 from torchtext.utils import download_from_url, extract_archive
 import io
 
@@ -64,7 +64,7 @@ def build_vocab(filepath, tokenizer):
   with io.open(filepath, encoding="utf8") as f:
     for string_ in f:
       counter.update(tokenizer(string_))
-  return Vocab(counter, specials=['<unk>', '<pad>', '<bos>', '<eos>'])
+  return vocab(counter, specials=['<unk>', '<pad>', '<bos>', '<eos>'])
 
 de_vocab = build_vocab(train_filepaths[0], de_tokenizer)
 en_vocab = build_vocab(train_filepaths[1], en_tokenizer)

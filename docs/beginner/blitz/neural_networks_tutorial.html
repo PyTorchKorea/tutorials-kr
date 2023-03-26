@@ -424,7 +424,7 @@ to download the full example code</p>
 <li><p>학습 가능한 매개변수(또는 가중치(weight))를 갖는 신경망을 정의합니다.</p></li>
 <li><p>데이터셋(dataset) 입력을 반복합니다.</p></li>
 <li><p>입력을 신경망에서 전파(process)합니다.</p></li>
-<li><p>손실(loss; 출력이 정답으로부터 얼마나 떨어져있는지)을 계산합니다.</p></li>
+<li><p>손실(loss; 출력이 정답으로부터 얼마나 떨어져 있는지)을 계산합니다.</p></li>
 <li><p>변화도(gradient)를 신경망의 매개변수들에 역으로 전파합니다.</p></li>
 <li><p>신경망의 가중치를 갱신합니다. 일반적으로 다음과 같은 간단한 규칙을 사용합니다:
 <code class="docutils literal notranslate"><span class="pre">새로운</span> <span class="pre">가중치(weight)</span> <span class="pre">=</span> <span class="pre">가중치(weight)</span> <span class="pre">-</span> <span class="pre">학습률(learning</span> <span class="pre">rate)</span> <span class="pre">*</span> <span class="pre">변화도(gradient)</span></code></p></li>
@@ -496,8 +496,8 @@ torch.Size([6, 1, 5, 5])
 <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor([[ 0.1039,  0.1009, -0.0991, -0.0137,  0.1003,  0.0728, -0.0510, -0.0430,
-          0.0458,  0.0627]], grad_fn=&lt;AddmmBackward0&gt;)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor([[ 0.0058,  0.0300,  0.0290, -0.0523, -0.0008,  0.1015,  0.0143,  0.1167,
+          0.0893, -0.0298]], grad_fn=&lt;AddmmBackward0&gt;)
 </pre></div>
 </div>
 <p>모든 매개변수의 변화도 버퍼(gradient buffer)를 0으로 설정하고, 무작위 값으로
@@ -545,7 +545,7 @@ torch.Size([6, 1, 5, 5])
 <div class="section" id="loss-function">
 <h2>손실 함수 (Loss Function)<a class="headerlink" href="#loss-function" title="이 제목에 대한 퍼머링크">¶</a></h2>
 <p>손실 함수는 (output, target)을 한 쌍(pair)의 입력으로 받아, 출력(output)이
-정답(target)으로부터 얼마나 멀리 떨어져있는지 추정하는 값을 계산합니다.</p>
+정답(target)으로부터 얼마나 멀리 떨어져 있는지 추정하는 값을 계산합니다.</p>
 <p>nn 패키지에는 여러가지의 <a class="reference external" href="http://pytorch.org/docs/nn.html#loss-functions">손실 함수들</a>
 이 존재합니다.
 간단한 손실 함수로는 출력과 대상간의 평균제곱오차(mean-squared error)를 계산하는
@@ -560,10 +560,10 @@ torch.Size([6, 1, 5, 5])
 <span class="nb">print</span><span class="p">(</span><span class="n">loss</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor(0.5317, grad_fn=&lt;MseLossBackward0&gt;)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor(1.0537, grad_fn=&lt;MseLossBackward0&gt;)
 </pre></div>
 </div>
-<p>이제 <code class="docutils literal notranslate"><span class="pre">.grad_fn</span></code> 속성을 사용하여 <code class="docutils literal notranslate"><span class="pre">loss</span></code> 를 역방향에서 따라가다보면,
+<p>이제 <code class="docutils literal notranslate"><span class="pre">.grad_fn</span></code> 속성을 사용하여 <code class="docutils literal notranslate"><span class="pre">loss</span></code> 를 역방향에서 따라가다 보면,
 이러한 모습의 연산 그래프를 볼 수 있습니다:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">input</span> <span class="o">-&gt;</span> <span class="n">conv2d</span> <span class="o">-&gt;</span> <span class="n">relu</span> <span class="o">-&gt;</span> <span class="n">maxpool2d</span> <span class="o">-&gt;</span> <span class="n">conv2d</span> <span class="o">-&gt;</span> <span class="n">relu</span> <span class="o">-&gt;</span> <span class="n">maxpool2d</span>
       <span class="o">-&gt;</span> <span class="n">flatten</span> <span class="o">-&gt;</span> <span class="n">linear</span> <span class="o">-&gt;</span> <span class="n">relu</span> <span class="o">-&gt;</span> <span class="n">linear</span> <span class="o">-&gt;</span> <span class="n">relu</span> <span class="o">-&gt;</span> <span class="n">linear</span>
@@ -574,15 +574,15 @@ torch.Size([6, 1, 5, 5])
 <p>따라서 <code class="docutils literal notranslate"><span class="pre">loss.backward()</span></code> 를 실행할 때, 전체 그래프는 신경망의 매개변수에 대해
 미분되며, 그래프 내의 <code class="docutils literal notranslate"><span class="pre">requires_grad=True</span></code> 인 모든 Tensor는 변화도가
 누적된 <code class="docutils literal notranslate"><span class="pre">.grad</span></code> Tensor를 갖게 됩니다.</p>
-<p>설명을 위해, 역전파의 몇 단계를 따라가보겠습니다:</p>
+<p>설명을 위해, 역전파의 몇 단계를 따라가 보겠습니다:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">loss</span><span class="o">.</span><span class="n">grad_fn</span><span class="p">)</span>  <span class="c1"># MSELoss</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">loss</span><span class="o">.</span><span class="n">grad_fn</span><span class="o">.</span><span class="n">next_functions</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>  <span class="c1"># Linear</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">loss</span><span class="o">.</span><span class="n">grad_fn</span><span class="o">.</span><span class="n">next_functions</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">next_functions</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>  <span class="c1"># ReLU</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;MseLossBackward0 object at 0x7ff29b364dc0&gt;
-&lt;AddmmBackward0 object at 0x7ff29b3642e0&gt;
-&lt;AccumulateGrad object at 0x7ff29b364550&gt;
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;MseLossBackward0 object at 0x7f7690e41880&gt;
+&lt;AddmmBackward0 object at 0x7f7690e41a00&gt;
+&lt;AccumulateGrad object at 0x7f7690e41f70&gt;
 </pre></div>
 </div>
 </div>
@@ -607,7 +607,7 @@ torch.Size([6, 1, 5, 5])
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>conv1.bias.grad before backward
 tensor([0., 0., 0., 0., 0., 0.])
 conv1.bias.grad after backward
-tensor([-0.0022, -0.0019,  0.0106, -0.0052, -0.0061, -0.0054])
+tensor([-0.0107,  0.0067, -0.0061, -0.0058,  0.0121,  0.0073])
 </pre></div>
 </div>
 <p>지금까지 손실 함수를 어떻게 사용하는지를 살펴봤습니다.</p>
@@ -659,7 +659,7 @@ Gradient Descent)입니다:</p>
 것에 유의하세요. 이는 <a class="reference internal" href="#backprop">역전파(Backprop)</a> 섹션에서 설명한 것처럼 변화도가
 누적되기 때문입니다.</p>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.028 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.269 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-beginner-blitz-neural-networks-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/fb69edad8880ff72cdc3687bb1dad1e6/neural_networks_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">neural_networks_tutorial.py</span></code></a></p>

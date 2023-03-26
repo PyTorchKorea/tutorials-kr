@@ -25,7 +25,7 @@
 - 학습 가능한 매개변수(또는 가중치(weight))를 갖는 신경망을 정의합니다.
 - 데이터셋(dataset) 입력을 반복합니다.
 - 입력을 신경망에서 전파(process)합니다.
-- 손실(loss; 출력이 정답으로부터 얼마나 떨어져있는지)을 계산합니다.
+- 손실(loss; 출력이 정답으로부터 얼마나 떨어져 있는지)을 계산합니다.
 - 변화도(gradient)를 신경망의 매개변수들에 역으로 전파합니다.
 - 신경망의 가중치를 갱신합니다. 일반적으로 다음과 같은 간단한 규칙을 사용합니다:
   ``새로운 가중치(weight) = 가중치(weight) - 학습률(learning rate) * 변화도(gradient)``
@@ -132,7 +132,7 @@ out.backward(torch.randn(1, 10))
 # 손실 함수 (Loss Function)
 # -------------------------
 # 손실 함수는 (output, target)을 한 쌍(pair)의 입력으로 받아, 출력(output)이
-# 정답(target)으로부터 얼마나 멀리 떨어져있는지 추정하는 값을 계산합니다.
+# 정답(target)으로부터 얼마나 멀리 떨어져 있는지 추정하는 값을 계산합니다.
 #
 # nn 패키지에는 여러가지의 `손실 함수들 <http://pytorch.org/docs/nn.html#loss-functions>`_
 # 이 존재합니다.
@@ -150,7 +150,7 @@ loss = criterion(output, target)
 print(loss)
 
 ########################################################################
-# 이제 ``.grad_fn`` 속성을 사용하여 ``loss`` 를 역방향에서 따라가다보면,
+# 이제 ``.grad_fn`` 속성을 사용하여 ``loss`` 를 역방향에서 따라가다 보면,
 # 이러한 모습의 연산 그래프를 볼 수 있습니다:
 #
 # ::
@@ -164,7 +164,7 @@ print(loss)
 # 미분되며, 그래프 내의 ``requires_grad=True`` 인 모든 Tensor는 변화도가
 # 누적된 ``.grad`` Tensor를 갖게 됩니다.
 #
-# 설명을 위해, 역전파의 몇 단계를 따라가보겠습니다:
+# 설명을 위해, 역전파의 몇 단계를 따라가 보겠습니다:
 
 print(loss.grad_fn)  # MSELoss
 print(loss.grad_fn.next_functions[0][0])  # Linear

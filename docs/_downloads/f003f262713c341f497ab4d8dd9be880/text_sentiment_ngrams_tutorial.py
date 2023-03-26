@@ -264,7 +264,7 @@ def evaluate(dataloader):
 # 기준(criterion)은 각 클래스에 대해 ``nn.LogSoftmax()`` 와 ``nn.NLLLoss()`` 를
 # 합쳐놓은 방식입니다.
 # `SGD <https://pytorch.org/docs/stable/_modules/torch/optim/sgd.html>`__
-# optimizer는 확률적 경사 하강법를 구현해놓은 것입니다. 처음의 학습률은
+# optimizer는 확률적 경사 하강법을 구현해놓은 것입니다. 처음의 학습률은
 # 5.0으로 두었습니다. 매 에폭을 진행하면서 학습률을 조절할 때는
 # `StepLR <https://pytorch.org/docs/master/_modules/torch/optim/lr_scheduler.html#StepLR>`__
 # 을 사용합니다.
