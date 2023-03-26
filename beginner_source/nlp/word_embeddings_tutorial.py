@@ -245,7 +245,7 @@ for epoch in range(10):
         # tensor.item()을 호출하여 단일원소 텐서에서 숫자를 반환받습니다.
         total_loss += loss.item()
     losses.append(total_loss)
-print(losses)  # 반복할 떄마다 손실이 줄어드는 것을 봅시다!
+print(losses)  # 반복할 때마다 손실이 줄어드는 것을 봅시다!
 
 # "beauty"와 같이 특정 단어에 대한 임베딩을 확인하려면,
 print(model.embeddings.weight[word_to_ix["beauty"]])
