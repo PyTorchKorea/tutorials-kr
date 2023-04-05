@@ -16,7 +16,7 @@
 PyTorch에서는 텐서를 사용하여 모델의 입력(input)과 출력(output), 그리고 모델의 매개변수들을 부호화(encode)합니다.
 
 텐서는 GPU나 다른 하드웨어 가속기에서 실행할 수 있다는 점만 제외하면 `NumPy <https://numpy.org>`_ 의 ndarray와 유사합니다.
-실제로 텐서와 NumPy 배열(array)은 종종 동일한 내부(underly) 메모리를 공유할 수 있어 데이터를 복수할 필요가 없습니다. (:ref:`bridge-to-np-label` 참고)
+실제로 텐서와 NumPy 배열(array)은 종종 동일한 내부(underly) 메모리를 공유할 수 있어 데이터를 복사할 필요가 없습니다. (:ref:`bridge-to-np-label` 참고)
 텐서는 또한 (`Autograd <autogradqs_tutorial.html>`__ 장에서 살펴볼) 자동 미분(automatic differentiation)에 최적화되어 있습니다.
 ndarray에 익숙하다면 Tensor API를 바로 사용할 수 있을 것입니다. 아니라면, 아래 내용을 함께 보시죠!
 """
