@@ -425,15 +425,15 @@ Spacy는 영어 이 외의 다른 언어에 대한 강력한 토큰화 기능을
 다루어야 하기 때문에 Spacy가 가장 적합합니다.</p>
 <p>이 튜토리얼을 실행하려면, 우선 <code class="docutils literal notranslate"><span class="pre">pip</span></code> 나 <code class="docutils literal notranslate"><span class="pre">conda</span></code> 로 <code class="docutils literal notranslate"><span class="pre">spacy</span></code> 를 설치하세요. 그 다음,
 Spacy 토크나이저가 쓸 영어와 독일어에 대한 데이터를 다운로드 받습니다.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">spacy</span> <span class="n">download</span> <span class="n">en</span>
-<span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">spacy</span> <span class="n">download</span> <span class="n">de</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">spacy</span> <span class="n">download</span> <span class="n">en_core_web_sm</span>
+<span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">spacy</span> <span class="n">download</span> <span class="n">de_core_news_sm</span>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torchtext</span>
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">from</span> <span class="nn">torchtext.data.utils</span> <span class="kn">import</span> <span class="n">get_tokenizer</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">Counter</span>
-<span class="kn">from</span> <span class="nn">torchtext.vocab</span> <span class="kn">import</span> <span class="n">Vocab</span><span class="p">,</span> <span class="n">vocab</span>
+<span class="kn">from</span> <span class="nn">torchtext.vocab</span> <span class="kn">import</span> <span class="n">vocab</span>
 <span class="kn">from</span> <span class="nn">torchtext.utils</span> <span class="kn">import</span> <span class="n">download_from_url</span><span class="p">,</span> <span class="n">extract_archive</span>
 <span class="kn">import</span> <span class="nn">io</span>
 
@@ -446,8 +446,8 @@ Spacy 토크나이저가 쓸 영어와 독일어에 대한 데이터를 다운�
 <span class="n">val_filepaths</span> <span class="o">=</span> <span class="p">[</span><span class="n">extract_archive</span><span class="p">(</span><span class="n">download_from_url</span><span class="p">(</span><span class="n">url_base</span> <span class="o">+</span> <span class="n">url</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">url</span> <span class="ow">in</span> <span class="n">val_urls</span><span class="p">]</span>
 <span class="n">test_filepaths</span> <span class="o">=</span> <span class="p">[</span><span class="n">extract_archive</span><span class="p">(</span><span class="n">download_from_url</span><span class="p">(</span><span class="n">url_base</span> <span class="o">+</span> <span class="n">url</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">url</span> <span class="ow">in</span> <span class="n">test_urls</span><span class="p">]</span>
 
-<span class="n">de_tokenizer</span> <span class="o">=</span> <span class="n">get_tokenizer</span><span class="p">(</span><span class="s1">&#39;spacy&#39;</span><span class="p">,</span> <span class="n">language</span><span class="o">=</span><span class="s1">&#39;de&#39;</span><span class="p">)</span>
-<span class="n">en_tokenizer</span> <span class="o">=</span> <span class="n">get_tokenizer</span><span class="p">(</span><span class="s1">&#39;spacy&#39;</span><span class="p">,</span> <span class="n">language</span><span class="o">=</span><span class="s1">&#39;en&#39;</span><span class="p">)</span>
+<span class="n">de_tokenizer</span> <span class="o">=</span> <span class="n">get_tokenizer</span><span class="p">(</span><span class="s1">&#39;spacy&#39;</span><span class="p">,</span> <span class="n">language</span><span class="o">=</span><span class="s1">&#39;de_core_news_sm&#39;</span><span class="p">)</span>
+<span class="n">en_tokenizer</span> <span class="o">=</span> <span class="n">get_tokenizer</span><span class="p">(</span><span class="s1">&#39;spacy&#39;</span><span class="p">,</span> <span class="n">language</span><span class="o">=</span><span class="s1">&#39;en_core_web_sm&#39;</span><span class="p">)</span>
 
 <span class="k">def</span> <span class="nf">build_vocab</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">tokenizer</span><span class="p">):</span>
   <span class="n">counter</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">()</span>
@@ -884,7 +884,7 @@ Transformer 레이어를 구현한 내용은 <a class="reference external" href=
 <li><p><code class="docutils literal notranslate"><span class="pre">torchtext</span></code> 를 사용한 Ben Trevett의 튜토리얼을 <a class="reference external" href="https://github.com/bentrevett/">이곳</a> 에서 확인할 수 있습니다.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">nn.Transformer</span></code> 와 <code class="docutils literal notranslate"><span class="pre">torchtext</span></code> 의 다른 기능들을 이용한 다음 단어 예측을 통한 언어 모델링 튜토리얼을 살펴보세요.</p></li>
 </ul>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  8.788 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  10.709 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-beginner-torchtext-translation-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/462f53ac0f7c6840743ad8655c43102c/torchtext_translation.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">torchtext_translation.py</span></code></a></p>

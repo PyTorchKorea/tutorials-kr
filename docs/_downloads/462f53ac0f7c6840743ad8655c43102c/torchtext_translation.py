@@ -36,14 +36,14 @@ PyTorch 커뮤니티 멤버인 `Ben Trevett <https://github.com/bentrevett>`__ �
 #
 # ::
 #
-#    python -m spacy download en
-#    python -m spacy download de
+#    python -m spacy download en_core_web_sm
+#    python -m spacy download de_core_news_sm
 
 import torchtext
 import torch
 from torchtext.data.utils import get_tokenizer
 from collections import Counter
-from torchtext.vocab import Vocab, vocab
+from torchtext.vocab import vocab
 from torchtext.utils import download_from_url, extract_archive
 import io
 
@@ -56,8 +56,8 @@ train_filepaths = [extract_archive(download_from_url(url_base + url))[0] for url
 val_filepaths = [extract_archive(download_from_url(url_base + url))[0] for url in val_urls]
 test_filepaths = [extract_archive(download_from_url(url_base + url))[0] for url in test_urls]
 
-de_tokenizer = get_tokenizer('spacy', language='de')
-en_tokenizer = get_tokenizer('spacy', language='en')
+de_tokenizer = get_tokenizer('spacy', language='de_core_news_sm')
+en_tokenizer = get_tokenizer('spacy', language='en_core_web_sm')
 
 def build_vocab(filepath, tokenizer):
   counter = Counter()
