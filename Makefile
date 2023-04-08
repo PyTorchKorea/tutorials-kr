@@ -44,6 +44,7 @@ download:
 	mkdir -p beginner_source/data
 	mkdir -p intermediate_source/data
 	mkdir -p prototype_source/data
+	mkdir -p recipes_source/recipe/data
 
 	# transfer learning tutorial data
 	wget -nv -N https://download.pytorch.org/tutorial/hymenoptera_data.zip -P $(DATADIR)
@@ -56,6 +57,7 @@ download:
 	# data loader tutorial
 	wget -nv -N https://download.pytorch.org/tutorial/faces.zip -P $(DATADIR)
 	unzip $(ZIPOPTS) $(DATADIR)/faces.zip -d beginner_source/data/
+	unzip $(ZIPOPTS) $(DATADIR)/faces.zip -d recipes_source/recipe/data/
 
 	wget -nv -N https://download.pytorch.org/models/tutorials/4000_checkpoint.tar -P $(DATADIR)
 	cp $(DATADIR)/4000_checkpoint.tar beginner_source/data/
