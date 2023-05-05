@@ -154,7 +154,7 @@ print(my_cell(x, h))
 # 계산할 때 거꾸로 재생합니다. 이런 방식으로, 프레임워크는 언어의 모든 구문에
 # 대한 미분값을 명시적으로 정의할 필요가 없습니다.
 #
-# .. figure:: https://github.com/pytorch/pytorch/raw/master/docs/source/_static/img/dynamic_graph.gif
+# .. figure:: https://github.com/pytorch/pytorch/raw/main/docs/source/_static/img/dynamic_graph.gif
 #    :alt: 오토그라드가 작동하는 방식
 #
 #    오토그라드가 작동하는 방식
