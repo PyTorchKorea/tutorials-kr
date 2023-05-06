@@ -1,6 +1,6 @@
 """
-nn.Transformer 와 TorchText 로 시퀀스-투-시퀀스(Sequence-to-Sequence) 모델링하기
-=================================================================================
+``nn.Transformer`` 와 torchtext로 시퀀스-투-시퀀스(Sequence-to-Sequence) 모델링하기
+=====================================================================================
 
 이 튜토리얼에서는
 `nn.Transformer <https://pytorch.org/docs/stable/generated/torch.nn.Transformer.html>`__ 모듈을
@@ -42,6 +42,8 @@ PyTorch 1.2 버젼에는 `Attention is All You Need <https://arxiv.org/pdf/1706.
 #
 
 import math
+import os
+from tempfile import TemporaryDirectory
 from typing import Tuple
 
 import torch
@@ -73,12 +75,12 @@ class TransformerModel(nn.Module):
 
     def forward(self, src: Tensor, src_mask: Tensor) -> Tensor:
         """
-        Args:
-            src: Tensor, shape [seq_len, batch_size]
-            src_mask: Tensor, shape [seq_len, seq_len]
+        Arguments:
+            src: Tensor, shape ``[seq_len, batch_size]``
+            src_mask: Tensor, shape ``[seq_len, seq_len]``
 
         Returns:
-            output Tensor of shape [seq_len, batch_size, ntoken]
+            output Tensor of shape ``[seq_len, batch_size, ntoken]``
         """
         src = self.encoder(src) * math.sqrt(self.d_model)
         src = self.pos_encoder(src)
@@ -88,7 +90,7 @@ class TransformerModel(nn.Module):
 
 
 def generate_square_subsequent_mask(sz: int) -> Tensor:
-    """Generates an upper-triangular matrix of -inf, with zeros on diag."""
+    """Generates an upper-triangular matrix of ``-inf``, with zeros on ``diag``."""
     return torch.triu(torch.ones(sz, sz) * float('-inf'), diagonal=1)
 
 
@@ -113,8 +115,8 @@ class PositionalEncoding(nn.Module):
 
     def forward(self, x: Tensor) -> Tensor:
         """
-        Args:
-            x: Tensor, shape [seq_len, batch_size, embedding_dim]
+        Arguments:
+            x: Tensor, shape ``[seq_len, batch_size, embedding_dim]``
         """
         x = x + self.pe[:x.size(0)]
         return self.dropout(x)
@@ -172,7 +174,7 @@ def data_process(raw_text_iter: dataset.IterableDataset) -> Tensor:
     data = [torch.tensor(vocab(tokenizer(item)), dtype=torch.long) for item in raw_text_iter]
     return torch.cat(tuple(filter(lambda t: t.numel() > 0, data)))
 
-# train_iter was "consumed" by the process of building the vocab,
+# ``train_iter`` was "consumed" by the process of building the vocab,
 # so we have to create it again
 train_iter, val_iter, test_iter = WikiText2()
 train_data = data_process(train_iter)
@@ -182,15 +184,15 @@ test_data = data_process(test_iter)
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 def batchify(data: Tensor, bsz: int) -> Tensor:
-    """Divides the data into bsz separate sequences, removing extra elements
+    """Divides the data into ``bsz`` separate sequences, removing extra elements
     that wouldn't cleanly fit.
 
-    Args:
-        data: Tensor, shape [N]
+    Arguments:
+        data: Tensor, shape ``[N]``
         bsz: int, batch size
 
     Returns:
-        Tensor of shape [N // bsz, bsz]
+        Tensor of shape ``[N // bsz, bsz]``
     """
     seq_len = data.size(0) // bsz
     data = data[:seq_len * bsz]
@@ -225,13 +227,13 @@ test_data = batchify(test_data, eval_batch_size)
 bptt = 35
 def get_batch(source: Tensor, i: int) -> Tuple[Tensor, Tensor]:
     """
-    Args:
-        source: Tensor, shape [full_seq_len, batch_size]
+    Arguments:
+        source: Tensor, shape ``[full_seq_len, batch_size]``
         i: int
 
     Returns:
-        tuple (data, target), where data has shape [seq_len, batch_size] and
-        target has shape [seq_len * batch_size]
+        tuple ``(data, target)``, where data has shape ``[seq_len, batch_size]`` and
+        target has shape ``[seq_len * batch_size]``
     """
     seq_len = min(bptt, len(source) - 1 - i)
     data = source[i:i+seq_len]
@@ -247,21 +249,21 @@ def get_batch(source: Tensor, i: int) -> Tuple[Tensor, Tensor]:
 
 ######################################################################
 # 모델의 하이퍼파라미터(hyperparameter)는 아래와 같이 정의됩니다.
-# 단어 사이즈는 단어 오브젝트의 길이와 일치 합니다.
+# 어휘집( ``vocab`` )의 크기는 단어 오브젝트의 길이와 일치 합니다.
 #
 
 ntokens = len(vocab) # 단어 사전(어휘집)의 크기
 emsize = 200 # 임베딩 차원
-d_hid = 200 # nn.TransformerEncoder 에서 피드포워드 네트워크(feedforward network) 모델의 차원
-nlayers = 2 # nn.TransformerEncoder 내부의 nn.TransformerEncoderLayer 개수
-nhead = 2 # nn.MultiheadAttention의 헤드 개수
+d_hid = 200 # ``nn.TransformerEncoder`` 에서 피드포워드 네트워크(feedforward network) 모델의 차원
+nlayers = 2 # ``nn.TransformerEncoder`` 내부의 nn.TransformerEncoderLayer 개수
+nhead = 2 # ``nn.MultiheadAttention`` 의 헤드 개수
 dropout = 0.2 # 드랍아웃(dropout) 확률
 model = TransformerModel(ntokens, emsize, nhead, d_hid, nlayers, dropout).to(device)
 
 
 ######################################################################
 # 모델 실행하기
-# -------------
+# ---------------
 #
 
 
@@ -335,24 +337,27 @@ def evaluate(model: nn.Module, eval_data: Tensor) -> float:
 
 best_val_loss = float('inf')
 epochs = 3
-best_model = None
 
-for epoch in range(1, epochs + 1):
-    epoch_start_time = time.time()
-    train(model)
-    val_loss = evaluate(model, val_data)
-    val_ppl = math.exp(val_loss)
-    elapsed = time.time() - epoch_start_time
-    print('-' * 89)
-    print(f'| end of epoch {epoch:3d} | time: {elapsed:5.2f}s | '
-          f'valid loss {val_loss:5.2f} | valid ppl {val_ppl:8.2f}')
-    print('-' * 89)
+with TemporaryDirectory() as tempdir:
+    best_model_params_path = os.path.join(tempdir, "best_model_params.pt")
 
-    if val_loss < best_val_loss:
-        best_val_loss = val_loss
-        best_model = copy.deepcopy(model)
+    for epoch in range(1, epochs + 1):
+        epoch_start_time = time.time()
+        train(model)
+        val_loss = evaluate(model, val_data)
+        val_ppl = math.exp(val_loss)
+        elapsed = time.time() - epoch_start_time
+        print('-' * 89)
+        print(f'| end of epoch {epoch:3d} | time: {elapsed:5.2f}s | '
+            f'valid loss {val_loss:5.2f} | valid ppl {val_ppl:8.2f}')
+        print('-' * 89)
 
-    scheduler.step()
+        if val_loss < best_val_loss:
+            best_val_loss = val_loss
+            torch.save(model.state_dict(), best_model_params_path)
+
+        scheduler.step()
+    model.load_state_dict(torch.load(best_model_params_path)) # load best model states
 
 
 ######################################################################
@@ -360,7 +365,7 @@ for epoch in range(1, epochs + 1):
 # -------------------------------------------------
 #
 
-test_loss = evaluate(best_model, test_data)
+test_loss = evaluate(model, test_data)
 test_ppl = math.exp(test_loss)
 print('=' * 89)
 print(f'| End of training | test loss {test_loss:5.2f} | '

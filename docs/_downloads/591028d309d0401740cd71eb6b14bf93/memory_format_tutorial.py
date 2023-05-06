@@ -122,7 +122,8 @@ z = x + y
 print(z.stride()) # 결과: (3072, 1, 96, 3)
 
 ######################################################################
-# Conv, Batchnorm 모듈은 Channels last를 지원합니다. (단, CudNN >=7.6 에서만 동작)
+# ```cudnn`` 백엔드를 사용하는 `Conv``, ``Batchnorm`` 모듈은 Channels last를 지원합니다.
+# (단, CudNN >=7.6 에서만 동작)
 # 합성곱(convolution) 모듈은 이진 p-wise 연산자(binary p-wise operator)와는 다르게
 # Channels last가 주된 메모리 형식입니다. 모든 입력은 연속적인 메모리 형식이며,
 # 연산자는 연속된 메모리 형식으로 출력을 생성합니다. 그렇지 않으면, 출력은
@@ -148,10 +149,10 @@ if torch.backends.cudnn.version() >= 7603:
 # 성능 향상
 # -------------------------------------------------------------------------------------------
 # Channels last 메모리 형식 최적화는 GPU와 CPU에서 모두 사용 가능합니다.
-# GPU에서는 정밀도를 줄인(reduced precision ``torch.float16``) 상태에서 Tensor Cores를 지원하는 Nvidia의
+# GPU에서는 정밀도를 줄인(reduced precision ``torch.float16``) 상태에서 Tensor Cores를 지원하는 NVIDIA의
 # 하드웨어에서 가장 의미심장한 성능 향상을 보였습니다. `AMP (Automated Mixed Precision)` 학습 스크립트를
 # 활용하여 연속적인 형식에 비해 Channels last 방식이 22% 이상의 성능 향승을 확인할 수 있었습니다.
-# 이 때, Nvidia가 제공하는 AMP를 사용했습니다. https://github.com/NVIDIA/apex
+# 이 때, NVIDIA가 제공하는 AMP를 사용했습니다. https://github.com/NVIDIA/apex
 #
 # ``python main_amp.py -a resnet50 --b 200 --workers 16 --opt-level O2  ./data``
 
@@ -364,7 +365,7 @@ for (m, attrs) in old_attrs.items():
 # ----------
 # 다음과 같이 여전히 해야 할 일이 많이 남아있습니다:
 #
-# - N1HW와 NC11 Tensors의 모호성 해결하기;
+# - ``N1HW`` 와 ``NC11`` Tensors의 모호성 해결하기;
 # - 분산 학습을 지원하는지 확인하기;
 # - 연산자 범위(operators coverage) 개선(improve)하기
 #

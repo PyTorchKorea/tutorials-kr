@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 DCGAN 튜토리얼
-==============
+================
 
 **저자**: `Nathan Inkawhich <https://github.com/inkawhich>`_
- **번역**: `조민성 <https://github.com/miNept>`_
+**번역**: `조민성 <https://github.com/miNept>`_
 
 """
 
@@ -121,22 +121,22 @@ torch.manual_seed(manualSeed)
 #
 # 몇 가지 설정값들을 정의해봅시다:
 #
-# -  **dataroot** - 데이터셋 폴더의 경로입니다. 데이터셋에 관한건 다음 섹션에서
+# -  ``dataroot`` - 데이터셋 폴더의 경로입니다. 데이터셋에 관한건 다음 섹션에서
 #    더 자세히 설명하겠습니다.
-# -  **workers** - DataLoader에서 데이터를 불러올 때 사용할 쓰레드의 개수입니다.
-# -  **batch_size** - 학습에 사용할 배치 크기입니다. DCGAN에서는 128을 사용했습니다.
-# -  **image_size** - 학습에 사용되는 이미지의 크기입니다.
+# -  ``workers`` - DataLoader에서 데이터를 불러올 때 사용할 쓰레드의 개수입니다.
+# -  ``batch_size`` - 학습에 사용할 배치 크기입니다. DCGAN에서는 128을 사용했습니다.
+# -  ``image_size`` - 학습에 사용되는 이미지의 크기입니다.
 #    본 문서에서는 64x64의 크기를 기본으로 하나, 만일 다른 크기의 이미지를 사용한다면
 #    D와 G의 구조 역시 변경되어야 합니다. 더 자세한 정보를 위해선
 #    `이곳 <https://github.com/pytorch/examples/issues/70>`__ 을 확인해 보세요.
-# -  **nc** - 입력 이미지의 색 채널개수입니다. RGB 이미지이기 때문에 3으로 설정합니다.
-# -  **nz** - 잠재공간 벡터의 원소들 개수입니다.
-# -  **ngf** - 생성자를 통과할때 만들어질 특징 데이터의 채널개수입니다.
-# -  **ndf** - 구분자를 통과할때 만들어질 특징 데이터의 채널개수입니다.
-# -  **num_epochs** - 학습시킬 에폭 수입니다. 오래 학습시키는 것이 대부분 좋은 결과를 보이지만, 당연히도 시간이 오래걸리는 것이 단점입니다.
-# -  **lr** - 모델의 학습률입니다. DCGAN에서 사용된대로 0.0002로 설정합니다.
-# -  **beta1** - Adam 옵티마이저에서 사용할 beta1 하이퍼파라미터 값입니다. 역시나 논문에서 사용한대로 0.5로 설정했습니다.
-# -  **ngpu** - 사용가능한 GPU의 번호입니다. 0으로 두면 CPU에서 학습하고, 0보다 큰 수로 설정하면 각 숫자가 가리키는 GPU로 학습시킵니다.
+# -  ``nc`` - 입력 이미지의 색 채널개수입니다. RGB 이미지이기 때문에 3으로 설정합니다.
+# -  ``nz`` - 잠재공간 벡터의 원소들 개수입니다.
+# -  ``ngf`` - 생성자를 통과할때 만들어질 특징 데이터의 채널개수입니다.
+# -  ``ndf`` - 구분자를 통과할때 만들어질 특징 데이터의 채널개수입니다.
+# -  ``num_epochs`` - 학습시킬 에폭 수입니다. 오래 학습시키는 것이 대부분 좋은 결과를 보이지만, 당연히도 시간이 오래걸리는 것이 단점입니다.
+# -  ``lr`` - 모델의 학습률입니다. DCGAN에서 사용된대로 0.0002로 설정합니다.
+# -  ``beta1`` - Adam 옵티마이저에서 사용할 beta1 하이퍼파라미터 값입니다. 역시나 논문에서 사용한대로 0.5로 설정했습니다.
+# -  ``ngpu`` - 사용가능한 GPU의 번호입니다. 0으로 두면 CPU에서 학습하고, 0보다 큰 수로 설정하면 각 숫자가 가리키는 GPU로 학습시킵니다.
 #
 
 # 데이터셋의 경로
@@ -183,10 +183,10 @@ ngpu = 1
 # 본 튜토리얼에서 사용할 데이터는 `Celeb-A Faces
 # dataset <http://mmlab.ie.cuhk.edu.hk/projects/CelebA.html>`__ 로, 해당 링크를 이용하거나 `Google
 # Drive <https://drive.google.com/drive/folders/0B7EVK8r0v71pTUZsaXdaSnZBZzg>`__ 에서 데이터를 받을 수 있습니다.
-# 데이터를 받으면 *img_align_celeba.zip* 라는 파일을 보게될 겁니다. 다운로드가 끝나면
-# *celeba* 이라는 폴더를 새로 만들고, 해당 폴더에 해당 zip 파일을 압축해제 해주시면 됩니다.
-# 압축 해제 후, 위에서 정의한 *dataroot* 변수에 방금 만든 *celeba* 폴더의 경로를 넣어주세요.
-# 위의 작업이 끝나면 *celeba* 폴더의 구조는 다음과 같아야 합니다:
+# 데이터를 받으면 ``img_align_celeba.zip`` 라는 파일을 보게될 겁니다. 다운로드가 끝나면
+# ``celeba`` 이라는 폴더를 새로 만들고, 해당 폴더에 해당 zip 파일을 압축해제 해주시면 됩니다.
+# 압축 해제 후, 위에서 정의한 ``dataroot`` 변수에 방금 만든 ``celeba`` 폴더의 경로를 넣어주세요.
+# 위의 작업이 끝나면 ``celeba`` 폴더의 구조는 다음과 같아야 합니다:
 #
 # ::
 #
@@ -198,9 +198,10 @@ ngpu = 1
 #            -> 537394.jpg
 #               ...
 #
-# 이 과정들은 프로그램이 정상적으로 구동하기 위해서는 중요한 부분입니다. 이때 celeba 폴더안에 다시 폴더를 두는 이유는,
-# ImageFolder 클래스가 데이터셋의 최상위 폴더에 서브폴더를 요구하기 때문입니다.
-# 이제 데이터셋과 DataLoader의 설정을 끝냈습니다.
+# 이 과정들은 프로그램이 정상적으로 구동하기 위해서는 중요한 부분입니다.
+# 이때 ``celeba`` 폴더 안에 다시 폴더를 두는 이유는,
+# ``ImageFolder`` 클래스가 데이터셋의 최상위 폴더에 서브폴더를 요구하기 때문입니다.
+# 이제 ``Dataset`` 과 ``DataLoader`` 의 설정을 끝냈습니다.
 # 최종적으로 학습 데이터들을 시각화해봅시다.
 #
 
@@ -230,23 +231,23 @@ plt.imshow(np.transpose(vutils.make_grid(real_batch[0].to(device)[:64], padding=
 
 ######################################################################
 # 구현
-# ----
+# ------
 #
 # 모델의 설정값들과 데이터들이 준비되었기 때문에, 드디어 모델의 구현으로
 # 들어갈 수 있을 것 같습니다. 먼저 가중치 초기화에 대해 이야기 해보고,
 # 순서대로 생성자, 구분자, 손실 함수, 학습 방법들을 알아보겠습니다.
 #
 # 가중치 초기화
-# ~~~~~~~~~~~~~~
+# ~~~~~~~~~~~~~~~~
 #
-# DCGAN 논문에서는, 평균이 0이고 분산이 0.02인 정규분포을 이용해,
-# 구분자와 생성자 모두 무작위 초기화를 진행하는 것이 좋다고 합니다.
+# DCGAN 논문에서는, 평균이 0( ``mean=0`` )이고 분산이 0.02( ``stdev=0.02`` )인
+# 정규분포을 시용해, 구분자와 생성자 모두 무작위 초기화를 진행하는 것이 좋다고 합니다.
 # ``weights_init`` 함수는 매개변수로 모델을 입력받아,
 # 모든 합성곱 계층, 전치 합성곱 계층, 배치 정규화 계층을, 위에서 말한 조건대로
 # 가중치들을 다시 초기화 시킵니다. 이 함수는 모델이 만들어지자 마자 바로 적용을
 # 시키게 됩니다.
 
-# netG와 netD에 적용시킬 커스텀 가중치 초기화 함수
+# ``netG`` 와 ``netD`` 에 적용시킬 커스텀 가중치 초기화 함수
 def weights_init(m):
     classname = m.__class__.__name__
     if classname.find('Conv') != -1:
@@ -258,7 +259,7 @@ def weights_init(m):
 
 ######################################################################
 # 생성자
-# ~~~~~~
+# ~~~~~~~~
 #
 # 생성자 :math:`G` 는 잠재 공간 벡터 :math:`z` 를, 데이터 공간으로
 # 변환시키도록 설계되었습니다. 우리에게 데이터라 함은 이미지이기 때문에,
@@ -275,9 +276,9 @@ def weights_init(m):
 # .. figure:: /_static/img/dcgan_generator.png
 #    :alt: dcgan_generator
 #
-# 우리가 설정값 섹션에서 정의한 값들이 (*nz*, *ngf*, 그리고
-# *nc*) 생성자 모델 아키텍쳐에 어떻게 영향을 끼치는지 주목해주세요. *nz* 는 z 입력 벡터의
-# 길이, *ngf* 는 생성자를 통과하는 특징 데이터의 크기, 그리고 *nc* 는 출력 이미지의
+# 우리가 설정값 섹션에서 정의한 값들이 (``nz``, ``ngf``, 그리고
+# ``nc``) 생성자 모델 아키텍쳐에 어떻게 영향을 끼치는지 주목해주세요. ``nz`` 는 z 입력 벡터의
+# 길이, ``ngf`` 는 생성자를 통과하는 특징 데이터의 크기, 그리고 ``nc`` 는 출력 이미지의
 # 채널 개수입니다 (RGB 이미지이기 때문에 3으로 설정을 했습니다).
 # 아래는 생성자의 코드입니다.
 #
@@ -293,22 +294,22 @@ class Generator(nn.Module):
             nn.ConvTranspose2d( nz, ngf * 8, 4, 1, 0, bias=False),
             nn.BatchNorm2d(ngf * 8),
             nn.ReLU(True),
-            # 위의 계층을 통과한 데이터의 크기. (ngf*8) x 4 x 4
+            # 위의 계층을 통과한 데이터의 크기. ``(ngf*8) x 4 x 4``
             nn.ConvTranspose2d(ngf * 8, ngf * 4, 4, 2, 1, bias=False),
             nn.BatchNorm2d(ngf * 4),
             nn.ReLU(True),
-            # 위의 계층을 통과한 데이터의 크기. (ngf*4) x 8 x 8
+            # 위의 계층을 통과한 데이터의 크기. ``(ngf*4) x 8 x 8``
             nn.ConvTranspose2d( ngf * 4, ngf * 2, 4, 2, 1, bias=False),
             nn.BatchNorm2d(ngf * 2),
             nn.ReLU(True),
-            # 위의 계층을 통과한 데이터의 크기. (ngf*2) x 16 x 16
+            # 위의 계층을 통과한 데이터의 크기. ``(ngf*2) x 16 x 16``
             nn.ConvTranspose2d( ngf * 2, ngf, 4, 2, 1, bias=False),
             nn.BatchNorm2d(ngf),
             nn.ReLU(True),
-            # 위의 계층을 통과한 데이터의 크기. (ngf) x 32 x 32
+            # 위의 계층을 통과한 데이터의 크기. ``(ngf) x 32 x 32``
             nn.ConvTranspose2d( ngf, nc, 4, 2, 1, bias=False),
             nn.Tanh()
-            # 위의 계층을 통과한 데이터의 크기. (nc) x 64 x 64
+            # 위의 계층을 통과한 데이터의 크기. ``(nc) x 64 x 64``
         )
 
     def forward(self, input):
@@ -324,12 +325,12 @@ class Generator(nn.Module):
 # 생성자를 만듭니다
 netG = Generator(ngpu).to(device)
 
-# 필요한 경우 multi-gpu를 설정 해주세요
+# 필요한 경우 multi-GPU를 설정 해주세요
 if (device.type == 'cuda') and (ngpu > 1):
     netG = nn.DataParallel(netG, list(range(ngpu)))
 
-# 모든 가중치의 평균을 0, 분산을 0.02로 초기화 하기 위해
-# weight_init 함수를 적용시킵니다
+# 모든 가중치의 평균을 0( ``mean=0`` ), 분산을 0.02( ``stdev=0.02`` )로 초기화하기 위해
+# ``weight_init`` 함수를 적용시킵니다
 netG.apply(weights_init)
 
 # 모델의 구조를 출력합니다
@@ -340,7 +341,7 @@ print(netG)
 # 구분자
 # ~~~~~~
 #
-# 앞서 언급했듯, 구분자 :math:`D`는 입력 이미지가 진짜 이미지인지 (혹은 반대로 가짜 이미지인지)
+# 앞서 언급했듯, 구분자 :math:`D` 는 입력 이미지가 진짜 이미지인지 (혹은 반대로 가짜 이미지인지)
 # 판별하는 전통적인 이진 분류 신경망으로 볼 수 있습니다. 이때 :math:`D` 는
 # 3x64x64 이미지를 입력받아, Conv2d, BatchNorm2d, 그리고 LeakyReLU 계층을 통과시켜
 # 데이터를 가공시키고, 마지막 출력에서 Sigmoid 함수를 이용하여
@@ -362,22 +363,22 @@ class Discriminator(nn.Module):
         super(Discriminator, self).__init__()
         self.ngpu = ngpu
         self.main = nn.Sequential(
-            # 입력 데이터의 크기는 (nc) x 64 x 64 입니다
+            # 입력 데이터의 크기는 ``(nc) x 64 x 64`` 입니다
             nn.Conv2d(nc, ndf, 4, 2, 1, bias=False),
             nn.LeakyReLU(0.2, inplace=True),
-            # 위의 계층을 통과한 데이터의 크기. (ndf) x 32 x 32
+            # 위의 계층을 통과한 데이터의 크기. ``(ndf) x 32 x 32``
             nn.Conv2d(ndf, ndf * 2, 4, 2, 1, bias=False),
             nn.BatchNorm2d(ndf * 2),
             nn.LeakyReLU(0.2, inplace=True),
-            # 위의 계층을 통과한 데이터의 크기. (ndf*2) x 16 x 16
+            # 위의 계층을 통과한 데이터의 크기. ``(ndf*2) x 16 x 16``
             nn.Conv2d(ndf * 2, ndf * 4, 4, 2, 1, bias=False),
             nn.BatchNorm2d(ndf * 4),
             nn.LeakyReLU(0.2, inplace=True),
-            # 위의 계층을 통과한 데이터의 크기. (ndf*4) x 8 x 8
+            # 위의 계층을 통과한 데이터의 크기. ``(ndf*4) x 8 x 8``
             nn.Conv2d(ndf * 4, ndf * 8, 4, 2, 1, bias=False),
             nn.BatchNorm2d(ndf * 8),
             nn.LeakyReLU(0.2, inplace=True),
-            # 위의 계층을 통과한 데이터의 크기. (ndf*8) x 4 x 4
+            # 위의 계층을 통과한 데이터의 크기. ``(ndf*8) x 4 x 4``
             nn.Conv2d(ndf * 8, 1, 4, 1, 0, bias=False),
             nn.Sigmoid()
         )
@@ -394,12 +395,12 @@ class Discriminator(nn.Module):
 # 구분자를 만듭니다
 netD = Discriminator(ngpu).to(device)
 
-# 필요한 경우 multi-gpu를 설정 해주세요
+# 필요한 경우 multi-GPU를 설정 해주세요
 if (device.type == 'cuda') and (ngpu > 1):
     netD = nn.DataParallel(netD, list(range(ngpu)))
 
-# 모든 가중치의 평균을 0, 분산을 0.02로 초기화 하기 위해
-# weight_init 함수를 적용시킵니다
+# 모든 가중치의 평균을 0( ``mean=0`` ), 분산을 0.02( ``stdev=0.02`` )로 초기화하기 위해
+# ``weight_init`` 함수를 적용시킵니다
 netD.apply(weights_init)
 
 # 모델의 구조를 출력합니다
@@ -412,7 +413,7 @@ print(netD)
 #
 # :math:`D` 와 :math:`G` 의 설정을 끝냈으니, 이제 손실함수와 옵티마이저를 정하여
 # 학습을 구체화시킬 시간입니다. 손실함수로는 Binary Cross Entropy loss
-# (`BCELoss <https://pytorch.org/docs/stable/nn.html#torch.nn.BCELoss>`__)
+# (`BCELoss <https://pytorch.org/docs/stable/generated/torch.nn.BCELoss.html#torch.nn.BCELoss>`__)
 # 를 사용할겁니다. 해당함수는 아래의 식으로 파이토치에 구현되어 있습니다:
 #
 # .. math:: \ell(x, y) = L = \{l_1,\dots,l_N\}^\top, \quad l_n = - \left[ y_n \cdot \log x_n + (1 - y_n) \cdot \log (1 - x_n) \right]
@@ -434,7 +435,7 @@ print(netD)
 # 입력하면, 그 출력값을 기반으로 생성자의 상태를 확인 할 수 있습니다.
 #
 
-# BCELoss 함수의 인스턴스를 생성합니다
+# ``BCELoss`` 함수의 인스턴스를 초기화합니다
 criterion = nn.BCELoss()
 
 # 생성자의 학습상태를 확인할 잠재 공간 벡터를 생성합니다
@@ -457,10 +458,10 @@ optimizerG = optim.Adam(netG.parameters(), lr=lr, betas=(beta1, 0.999))
 # 실제 모델을 학습시키는 방법을 알아보겠습니다. 주의를 기울일 것은, GAN을 학습시키는 건
 # 관례적인 기술들의 집합이기 때문에, 잘못된 하이퍼파라미터의 설정은
 # 모델의 학습을 망가뜨릴 수 있습니다. 무엇이 잘못되었는지 알아내는 것 조차도 힘들죠.
-# 그러한 이유로, 본 튜토리얼에서는 Goodfellow의 논문에서 서술된 Algorithm 1을 기반으로,
-# `ganhacks <https://github.com/soumith/ganhacks>`__ 에서 사용된 몇가지 괜찮은 테크닉들을
+# 그러한 이유로, 본 튜토리얼에서는 `Goodfellow’s paper <https://papers.nips.cc/paper/5423-generative-adversarial-nets.pdf>`__
+# 에서 서술된 Algorithm 1을 기반으로, `ganhacks <https://github.com/soumith/ganhacks>`__ 에서 사용된 몇가지 괜찮은 테크닉들을
 # 더할 것입니다. 앞서 몇번 설명했지만, 우리의 의도는 “진짜 혹은 가짜 이미지를 구성”하고,
-# :math:`logD(G(z))` 를 최대화하는 G의 목적함수를 최적화 시키는 겁니다. 학습과정은 크게 두가지로 나눕니다.
+# :math:`log(D(G(z)))` 를 최대화하는 G의 목적함수를 최적화 시키는 겁니다. 학습과정은 크게 두가지로 나눕니다.
 # Part 1은 구분자를, Part 2는 생성자를 업데이트하는 과정입니다.
 #
 # **Part 1 - 구분자의 학습**
@@ -468,7 +469,7 @@ optimizerG = optim.Adam(netG.parameters(), lr=lr, betas=(beta1, 0.999))
 # 구분자의 목적은 주어진 입력값이 진짜인지 가짜인지 판별하는 것임을 상기합시다.
 # Goodfellow의 말을 빌리자면, 구분자는 “변화도(gradient)를 상승(ascending)시키며 훈련”하게 됩니다.
 # 실전적으로 얘기하면, :math:`log(D(x)) + log(1-D(G(z)))` 를 최대화시키는 것과 같습니다.
-# ganhacks에서 미니 배치(mini-batch)를 분리하여 사용한 개념을 가져와서,
+# `ganhacks <https://github.com/soumith/ganhacks>`__ 에서 미니 배치(mini-batch)를 분리하여 사용한 개념을 가져와서,
 # 우리 역시 두가지 스텝으로 분리해 계산을 해보겠습니다. 먼저,
 # 진짜 데이터들로만 이루어진 배치를 만들어 :math:`D` 에 통과시킵니다. 그 출력값으로 (:math:`log(D(x))`) 의 손실값을 계산하고,
 # 역전파 과정에서의 변화도들을 계산합니다. 여기까지가 첫번째 스텝입니다. 두번째 스텝에서는, 오로지 가짜 데이터들로만
@@ -484,11 +485,11 @@ optimizerG = optim.Adam(netG.parameters(), lr=lr, betas=(beta1, 0.999))
 # 위해서는 : Part 1에서 한대로 구분자를 이용해 생성자의 출력값을 판별해주고, *진짜 라벨값* 을 이용해 G의 손실값을 구해줍니다.
 # 그러면 구해진 손실값으로 변화도를 구하고, 최종적으로는 옵티마이저를 이용해 G의 가중치들을 업데이트시켜주면 됩니다.
 # 언뜻 볼때는, 생성자가 만들어낸 *가짜* 이미지에 *진짜* 라벨을 사용하는것이 직관적으로 위배가 될테지만, 이렇게 라벨을
-# 바꿈으로써 :math:`log(x)` 라는 BCELoss의 일부분을 사용할 수 있게 합니다 (앞서 우리는 BCELoss에서 라벨을 이용해 원하는 로그 계산
+# 바꿈으로써 :math:`log(x)` 라는 ``BCELoss`` 의 일부분을 사용할 수 있게 합니다 (앞서 우리는 BCELoss에서 라벨을 이용해 원하는 로그 계산
 # 요소를 고를 수 있음을 알아봤습니다).
 #
 # 마무리로 G의 훈련 상태를 알아보기 위하여, 몇가지 통계적인 수치들과, fixed_noise를 통과시킨
-# 결과를 화면에 출력하는 코드를 추가하겠습니다. 이때 통계적인 수치들이라 함은 :
+# 결과를 화면에 출력하는 코드를 추가하겠습니다. 이때 통계적인 수치들이라 함은:
 #
 # -  **Loss_D** - 진짜 데이터와 가짜 데이터들 모두에서 구해진 손실값. (:math:`log(D(x)) + log(1 - D(G(z)))`).
 # -  **Loss_G** - 생성자의 손실값. :math:`log(D(G(z)))`
@@ -589,7 +590,7 @@ for epoch in range(num_epochs):
 
 ######################################################################
 # 결과
-# ----
+# ------
 #
 # 결과를 알아봅시다. 이 섹션에서는 총 세가지를 확인할겁니다.
 # 첫번째는 G와 D의 손실값들이 어떻게 변했는가, 두번째는 매 에폭마다
@@ -653,7 +654,7 @@ plt.show()
 
 ######################################################################
 # 이제 어디로 여행을 떠나볼까요?
-# ------------------------------
+# --------------------------------
 #
 # 드디어 DCGAN이 끝났습니다! 하지만 더 알아볼 것들이 많이 남아있죠.
 # 무엇을 더 시도해볼 수 있을까요?

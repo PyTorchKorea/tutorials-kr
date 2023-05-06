@@ -5,10 +5,14 @@
 
 아래 튜토리얼들이 새로 추가되었습니다.
 
-* `PyTorch Distributed Series </beginner/ddp_series_intro.html?utm_source=whats_new_tutorials&utm_medium=ddp_series_intro>`__
-* `Fast Transformer Inference with Better Transformer </beginner/bettertransformer_tutorial.html?utm_source=whats_new_tutorials&utm_medium=bettertransformer>`__
-* `Advanced model training with Fully Sharded Data Parallel (FSDP) </intermediate/FSDP_adavnced_tutorial.html?utm_source=whats_new_tutorials&utm_medium=FSDP_advanced>`__
-* `Grokking PyTorch Intel CPU Performance from First Principles </intermediate/torchserve_with_ipex.html?utm_source=whats_new_tutorials&utm_medium=torchserve_ipex>`__
+* `Implementing High Performance Transformers with Scaled Dot Product Attention <https://tutorials.pytorch.kr/intermediate/scaled_dot_product_attention_tutorial.html?utm_source=whats_new_tutorials&utm_medium=scaled_dot_product_attention_tutorial>`__
+* `torch.compile Tutorial <https://tutorials.pytorch.kr/intermediate/torch_compile_tutorial.html?utm_source=whats_new_tutorials&utm_medium=torch_compile>`__
+* `Per Sample Gradients <https://tutorials.pytorch.kr/intermediate/per_sample_grads.html?utm_source=whats_new_tutorials&utm_medium=per_sample_grads>`__
+* `Jacobians, Hessians, hvp, vhp, and more: composing function transforms <https://tutorials.pytorch.kr/intermediate/jacobians_hessians.html?utm_source=whats_new_tutorials&utm_medium=jacobians_hessians>`__
+* `Model Ensembling <https://tutorials.pytorch.kr/intermediate/ensembling.html?utm_source=whats_new_tutorials&utm_medium=ensembling>`__
+* `Neural Tangent Kernels <https://tutorials.pytorch.kr/intermediate/neural_tangent_kernels.html?utm_source=whats_new_tutorials&utm_medium=neural_tangent_kernels>`__
+* `Reinforcement Learning (PPO) with TorchRL Tutorial <https://tutorials.pytorch.kr/intermediate/reinforcement_ppo.html?utm_source=whats_new_tutorials&utm_medium=reinforcement_ppo>`__
+* `Changing Default Device <https://tutorials.pytorch.kr/recipes/recipes/changing_default_device.html?utm_source=whats_new_tutorials&utm_medium=changing_default_device>`__
 
 .. raw:: html
 
@@ -271,6 +275,13 @@
    :tags: Reinforcement-Learning
 
 .. customcarditem::
+   :header: Reinforcement Learning (PPO) with TorchRL
+   :card_description: Learn how to use PyTorch and TorchRL to train a Proximal Policy Optimization agent on the Inverted Pendulum task from Gym.
+   :image: _static/img/invpendulum.gif
+   :link: intermediate/reinforcement_ppo.html
+   :tags: Reinforcement-Learning
+
+.. customcarditem::
    :header: Train a Mario-playing RL Agent
    :card_description: Use PyTorch to train a Double Q-learning agent to play Mario.
    :image: _static/img/mario.gif
@@ -417,6 +428,34 @@
    :link: intermediate/forward_ad_usage.html
    :tags: Frontend-APIs
 
+.. customcarditem::
+   :header: Jacobians, Hessians, hvp, vhp, and more
+   :card_description: Learn how to compute advanced autodiff quantities using torch.func
+   :image: _static/img/thumbnails/cropped/generic-pytorch-logo.png
+   :link: intermediate/jacobians_hessians.html
+   :tags: Frontend-APIs
+
+.. customcarditem::
+   :header: Model Ensembling
+   :card_description: Learn how to ensemble models using torch.vmap
+   :image: _static/img/thumbnails/cropped/generic-pytorch-logo.png
+   :link: intermediate/ensembling.html
+   :tags: Frontend-APIs
+
+.. customcarditem::
+   :header: Per-Sample-Gradients
+   :card_description: Learn how to compute per-sample-gradients using torch.func
+   :image: _static/img/thumbnails/cropped/generic-pytorch-logo.png
+   :link: intermediate/per_sample_grads.html
+   :tags: Frontend-APIs
+
+.. customcarditem::
+   :header: Neural Tangent Kernels
+   :card_description: Learn how to compute neural tangent kernels using torch.func
+   :image: _static/img/thumbnails/cropped/generic-pytorch-logo.png
+   :link: intermediate/neural_tangent_kernels.html
+   :tags: Frontend-APIs
+
 .. Model Optimization
 
 .. customcarditem::
@@ -441,11 +480,11 @@
    :tags: Model-Optimization,Best-Practice
 
 .. customcarditem::
-    :header: Optimizing Vision Transformer Model
-    :card_description: Learn how to use Facebook Data-efficient Image Transformers DeiT and script and optimize it for mobile.
-    :image: _static/img/thumbnails/cropped/mobile.png
-    :link: beginner/vt_tutorial.html
-    :tags: Model-Optimization,Best-Practice,Mobile
+   :header: Optimizing Vision Transformer Model
+   :card_description: Learn how to use Facebook Data-efficient Image Transformers DeiT and script and optimize it for mobile.
+   :image: _static/img/thumbnails/cropped/mobile.png
+   :link: beginner/vt_tutorial.html
+   :tags: Model-Optimization,Best-Practice,Mobile
 
 .. customcarditem::
    :header: Parametrizations Tutorial
@@ -504,18 +543,25 @@
    :tags: Model-Optimization,Production
 
 .. customcarditem::
-   :header: Introduction to nvFuser
-   :card_description: An introduction to nvFuser
-   :image: _static/img/thumbnails/cropped/generic-pytorch-logo.png
-   :link: intermediate/nvfuser_intro_tutorial.html
-   :tags: Model-Optimization
-
-.. customcarditem::
    :header: Multi-Objective Neural Architecture Search with Ax
    :card_description: Learn how to use Ax to search over architectures find optimal tradeoffs between accuracy and latency.
    :image: _static/img/ax_logo.png
    :link: intermediate/ax_multiobjective_nas_tutorial.html
    :tags: Model-Optimization,Best-Practice,Ax,TorchX
+
+.. customcarditem::
+   :header: torch.compile Tutorial
+   :card_description: Speed up your models with minimal code changes using torch.compile, the latest PyTorch compiler solution.
+   :image: _static/img/thumbnails/cropped/generic-pytorch-logo.png
+   :link: intermediate/torch_compile_tutorial.html
+   :tags: Model-Optimization
+
+.. customcarditem::
+   :header: (beta) Implementing High-Performance Transformers with SCALED DOT PRODUCT ATTENTION
+   :card_description: This tutorial explores the new torch.nn.functional.scaled_dot_product_attention and how it can be used to construct Transformer components.
+   :image: _static/img/thumbnails/cropped/pytorch-logo.png
+   :link: intermediate/scaled_dot_product_attention_tutorial.html
+   :tags: Model-Optimization,Attention,Transformer
 
 .. Parallel-and-Distributed-Training
 
@@ -840,6 +886,7 @@
    :caption: 강화학습
 
    intermediate/reinforcement_q_learning
+   intermediate/reinforcement_ppo
    intermediate/mario_rl_tutorial
 
 .. toctree::
@@ -871,6 +918,10 @@
 
    intermediate/memory_format_tutorial
    intermediate/forward_ad_usage
+   intermediate/jacobians_hessians
+   intermediate/ensembling
+   intermediate/per_sample_grads
+   intermediate/neural_tangent_kernels.py
    advanced/cpp_frontend
    advanced/torch-script-parallelism
    advanced/cpp_autograd
@@ -909,6 +960,8 @@
    intermediate/torchserve_with_ipex_2
    intermediate/nvfuser_intro_tutorial
    intermediate/ax_multiobjective_nas_tutorial
+   intermediate/torch_compile_tutorial
+   intermediate/scaled_dot_product_attention_tutorial
 
 .. toctree::
    :maxdepth: 2
@@ -938,7 +991,7 @@
    :maxdepth: 2
    :includehidden:
    :hidden:
-   :caption: Mobile
+   :caption: 모바일
 
    beginner/deeplabv3_on_ios
    beginner/deeplabv3_on_android
@@ -947,7 +1000,7 @@
    :maxdepth: 2
    :includehidden:
    :hidden:
-   :caption: Recommendation Systems
+   :caption: 추천 시스템
 
    intermediate/torchrec_tutorial
    advanced/sharding

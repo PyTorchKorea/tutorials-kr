@@ -3,7 +3,7 @@
 모델 저장하기 & 불러오기
 =========================
 **Author:** `Matthew Inkawhich <https://github.com/MatthewInkawhich>`_
-  **번역**: `박정환 <http://github.com/9bow>`_
+  **번역**: `박정환 <http://github.com/9bow>`_, `김제필 <http://github.com/garlicvread>`_
 
 이 문서에서는 PyTorch 모델을 저장하고 불러오는 다양한 방법을 제공합니다.
 이 문서 전체를 다 읽는 것도 좋은 방법이지만, 필요한 사용 예의 코드만 참고하는
@@ -34,7 +34,7 @@
 -  `state_dict가 무엇인가요? <#state-dict>`__
 -  `추론(inference)를 위해 모델 저장하기 & 불러오기 <#inference>`__
 -  `일반 체크포인트(checkpoint) 저장하기 & 불러오기 <#checkpoint>`__
--  `여러개(multiple)의 모델을 하나의 파일에 저장하기 <#multiple>`__
+-  `여러 개(multiple)의 모델을 하나의 파일에 저장하기 <#multiple>`__
 -  `다른 모델의 매개변수를 사용하여 빠르게 모델 시작하기(warmstart) <#warmstart>`__
 -  `장치(device)간 모델 저장하기 & 불러오기 <#device>`__
 
@@ -148,8 +148,8 @@
 #     PyTorch 버전 1.6에서는 ``torch.save`` 가 새로운 Zip파일-기반의 파일
 #     포맷을 사용하도록 변경되었습니다. ``torch.load`` 는 예전 방식의 파일들을
 #     읽어올 수 있도록 하고 있습니다. 어떤 이유에서든 ``torch.save`` 가 예전
-#     방식을 사용하도록 하고 싶다면, ``_use_new_zipfile_serialization=False`` 을
-#     kwarg로 전달하세요.
+#     방식을 사용하도록 하고 싶다면, ``kwarg`` 매개변수로
+#     ``_use_new_zipfile_serialization=False`` 을 전달하세요.
 #
 # 추론을 위해 모델을 저장할 때는 그 모델의 학습된 매개변수만 저장하면 됩니다.
 # ``torch.save()`` 를 사용하여 모델의 *state_dict* 를 저장하는 것이 나중에 모델을
@@ -471,7 +471,7 @@
 #    # 모델에서 사용하는 input Tensor들은 input = input.to(device) 을 호출해야 합니다.
 #
 # CPU에서 학습한 모델을 GPU에서 불러올 때는 ``torch.load()`` 함수의
-# ``map_location`` 인자에 *cuda:device_id* 을 설정합니다. 이렇게 하면 모델이 해당
+# ``map_location`` 인자에 ``cuda:device_id`` 을 설정합니다. 이렇게 하면 모델이 해당
 # GPU 장치에 불러와집니다. 다음으로 ``model.to(torch.device('cuda'))`` 을 호출하여
 # 모델의 매개변수 Tensor들을 CUDA Tensor들로 변환해야 합니다. 마지막으로 모든
 # 모델 입력에 ``.to(torch.device('cuda'))`` 을 사용하여 CUDA 최적화된 모델을 위한

@@ -2,6 +2,7 @@
 """
 가지치기 기법(Pruning) 튜토리얼
 =====================================
+
 **저자**: `Michela Paganini <https://github.com/mickypaganini>`_
 **번역** : `안상준 <https://github.com/Justin-A>`_
 
@@ -15,7 +16,7 @@
 하위 신경망 모델과 파라미터값들의 초기화가 운이 좋게 잘 된 케이스를 바탕으로
 ("`lottery tickets <https://arxiv.org/abs/1803.03635>`_") 신경망 구조를 찾는 기술들에 대해 반대 의견을 제시하기도 합니다.
 
-이번 튜토리얼에서는, ``torch.nn.utils.prune`` 을 이용하여 여러분이 설계한 딥러닝 모델에 대해 가지치기 기법을 적용해보는 것을 배워보고,
+이번 튜토리얼에서는, ``torch.nn.utils.prune`` 을 사용하여 여러분이 설계한 딥러닝 모델에 대해 가지치기 기법을 적용해보는 것을 배워보고,
 심화적으로 여러분의 맞춤형 가지치기 기법을 구현하는 방법에 대해 배워보도록 하겠습니다.
 
 요구사항
@@ -31,8 +32,8 @@ import torch.nn.functional as F
 ######################################################################
 # 딥러닝 모델 생성
 # -----------------------
-# 이번 튜토리얼에서는, 얀 르쿤 교수님의 연구진들이 1998년도에 발표한 ``LeNet
-# <http://yann.lecun.com/exdb/publis/pdf/lecun-98.pdf>`` 의 모델 구조를 이용합니다.
+# 이번 튜토리얼에서는, 얀 르쿤 교수님의 연구진들이 1998년도에 발표한 `LeNet
+# <http://yann.lecun.com/exdb/publis/pdf/lecun-98.pdf>`_ 의 모델 구조를 이용합니다.
 
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -41,9 +42,9 @@ class LeNet(nn.Module):
     def __init__(self):
         super(LeNet, self).__init__()
         # 1개 채널 수의 이미지를 입력값으로 이용하여 6개 채널 수의 출력값을 계산하는 방식
-        # Convolution 연산을 진행하는 커널(필터)의 크기는 3x3 을 이용
-        self.conv1 = nn.Conv2d(1, 6, 3)
-        self.conv2 = nn.Conv2d(6, 16, 3)
+        # Convolution 연산을 진행하는 커널(필터)의 크기는 5x5 을 이용
+        self.conv1 = nn.Conv2d(1, 6, 5)
+        self.conv2 = nn.Conv2d(6, 16, 5)
         self.fc1 = nn.Linear(16 * 5 * 5, 120)  # Convolution 연산 결과 5x5 크기의 16 채널 수의 이미지
         self.fc2 = nn.Linear(120, 84)
         self.fc3 = nn.Linear(84, 10)

@@ -106,13 +106,13 @@ Before you get started, you need to have a Python environment with:
 To install Captum in an Anaconda or pip virtual environment, use the
 appropriate command for your environment below:
 
-With ``conda``:
+With ``conda``::
 
-``conda install pytorch torchvision captum -c pytorch``
+    conda install pytorch torchvision captum -c pytorch
 
-With ``pip``:
+With ``pip``::
 
-``pip install torch torchvision captum``
+    pip install torch torchvision captum
 
 Restart this notebook in the environment you set up, and you’re ready to
 go!
@@ -155,7 +155,7 @@ from matplotlib.colors import LinearSegmentedColormap
 # now.
 # 
 
-model = models.resnet101(pretrained=True)
+model = models.resnet101(weights='IMAGENET1K_V1')
 model = model.eval()
 
 
@@ -289,7 +289,7 @@ _ = viz.visualize_image_attr(np.transpose(attributions_ig.squeeze().cpu().detach
 # Gradient-based attribution methods help to understand the model in terms
 # of directly computing out the output changes with respect to the input.
 # *Perturbation-based attribution* methods approach this more directly, by
-# introducing changes to the output to measure the effect on the output.
+# introducing changes to the input to measure the effect on the output.
 # `Occlusion <https://captum.ai/api/occlusion.html>`__ is one such method.
 # It involves replacing sections of the input image, and examining the
 # effect on the output signal.

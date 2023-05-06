@@ -26,14 +26,14 @@ import torchvision.models as models
 # PyTorch 모델은 학습한 매개변수를 ``state_dict``\ 라고 불리는 내부 상태 사전(internal state dictionary)에 저장합니다.
 # 이 상태 값들은 ``torch.save`` 메소드를 사용하여 저장(persist)할 수 있습니다:
 
-model = models.vgg16(pretrained=True)
+model = models.vgg16(weights='IMAGENET1K_V1')
 torch.save(model.state_dict(), 'model_weights.pth')
 
 ##########################
 # 모델 가중치를 불러오기 위해서는, 먼저 동일한 모델의 인스턴스(instance)를 생성한 다음에 ``load_state_dict()`` 메소드를 사용하여
 # 매개변수들을 불러옵니다.
 
-model = models.vgg16() # 기본 가중치를 불러오지 않으므로 pretrained=True를 지정하지 않습니다.
+model = models.vgg16() # 여기서는 ``weights`` 를 지정하지 않았으므로, 학습되지 않은 모델을 생성합니다.
 model.load_state_dict(torch.load('model_weights.pth'))
 model.eval()
 

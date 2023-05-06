@@ -82,10 +82,16 @@ for X, y in test_dataloader:
 # ------------------------------------------------------------------------------------------
 # PyTorch에서 신경망 모델은 `nn.Module <https://pytorch.org/docs/stable/generated/torch.nn.Module.html>`_ 을
 # 상속받는 클래스(class)를 생성하여 정의합니다. ``__init__`` 함수에서 신경망의 계층(layer)들을 정의하고 ``forward`` 함수에서
-# 신경망에 데이터를 어떻게 전달할지 지정합니다. 가능한 경우 GPU로 신경망을 이동시켜 연산을 가속(accelerate)합니다.
+# 신경망에 데이터를 어떻게 전달할지 지정합니다. 가능한 경우 GPU 또는 MPS로 신경망을 이동시켜 연산을 가속(accelerate)합니다.
 
-# 학습에 사용할 CPU나 GPU 장치를 얻습니다.
-device = "cuda" if torch.cuda.is_available() else "cpu"
+# 학습에 사용할 CPU나 GPU, MPS 장치를 얻습니다.
+device = (
+    "cuda"
+    if torch.cuda.is_available()
+    else "mps"
+    if torch.backends.mps.is_available()
+    else "cpu"
+)
 print(f"Using {device} device")
 
 # 모델을 정의합니다.
@@ -148,7 +154,7 @@ def train(dataloader, model, loss_fn, optimizer):
         optimizer.step()
 
         if batch % 100 == 0:
-            loss, current = loss.item(), batch * len(X)
+            loss, current = loss.item(), (batch + 1) * len(X)
             print(f"loss: {loss:>7f}  [{current:>5d}/{size:>5d}]")
 
 ##############################################################################
@@ -205,7 +211,7 @@ print("Saved PyTorch Model State to model.pth")
 #
 # 모델을 불러오는 과정에는 모델 구조를 다시 만들고 상태 사전을 모델에 불러오는 과정이 포함됩니다.
 
-model = NeuralNetwork()
+model = NeuralNetwork().to(device)
 model.load_state_dict(torch.load("model.pth"))
 
 #############################################################
@@ -227,6 +233,7 @@ classes = [
 model.eval()
 x, y = test_data[0][0], test_data[0][1]
 with torch.no_grad():
+    x = x.to(device)
     pred = model(x)
     predicted, actual = classes[pred[0].argmax(0)], classes[y]
     print(f'Predicted: "{predicted}", Actual: "{actual}"')

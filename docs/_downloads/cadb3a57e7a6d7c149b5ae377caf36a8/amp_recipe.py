@@ -7,11 +7,11 @@ Automatic Mixed Precision
 `torch.cuda.amp <https://pytorch.org/docs/stable/amp.html>`_ provides convenience methods for mixed precision,
 where some operations use the ``torch.float32`` (``float``) datatype and other operations
 use ``torch.float16`` (``half``). Some ops, like linear layers and convolutions,
-are much faster in ``float16``. Other ops, like reductions, often require the dynamic
+are much faster in ``float16`` or ``bfloat16``. Other ops, like reductions, often require the dynamic
 range of ``float32``.  Mixed precision tries to match each op to its appropriate datatype,
 which can reduce your network's runtime and memory footprint.
 
-Ordinarily, "automatic mixed precision training" uses `torch.cuda.amp.autocast <https://pytorch.org/docs/stable/amp.html#torch.cuda.amp.autocast>`_ and
+Ordinarily, "automatic mixed precision training" uses `torch.autocast <https://pytorch.org/docs/stable/amp.html#torch.autocast>`_ and
 `torch.cuda.amp.GradScaler <https://pytorch.org/docs/stable/amp.html#torch.cuda.amp.GradScaler>`_ together.
 
 This recipe measures the performance of a simple network in default precision,
@@ -19,7 +19,7 @@ then walks through adding ``autocast`` and ``GradScaler`` to run the same networ
 mixed precision with improved performance.
 
 You may download and run this recipe as a standalone Python script.
-The only requirements are Pytorch 1.6+ and a CUDA-capable GPU.
+The only requirements are PyTorch 1.6 or later and a CUDA-capable GPU.
 
 Mixed precision primarily benefits Tensor Core-enabled architectures (Volta, Turing, Ampere).
 This recipe should show significant (2-3X) speedup on those architectures.
@@ -105,7 +105,7 @@ end_timer_and_print("Default precision:")
 ##########################################################
 # Adding autocast
 # ---------------
-# Instances of `torch.cuda.amp.autocast <https://pytorch.org/docs/stable/amp.html#autocasting>`_
+# Instances of `torch.autocast <https://pytorch.org/docs/stable/amp.html#autocasting>`_
 # serve as context managers that allow regions of your script to run in mixed precision.
 #
 # In these regions, CUDA ops run in a dtype chosen by autocast
@@ -116,7 +116,7 @@ end_timer_and_print("Default precision:")
 for epoch in range(0): # 0 epochs, this section is for illustration only
     for input, target in zip(data, targets):
         # Runs the forward pass under autocast.
-        with torch.cuda.amp.autocast():
+        with torch.autocast(device_type='cuda', dtype=torch.float16):
             output = net(input)
             # output is float16 because linear layers autocast to float16.
             assert output.dtype is torch.float16
@@ -151,7 +151,7 @@ scaler = torch.cuda.amp.GradScaler()
 
 for epoch in range(0): # 0 epochs, this section is for illustration only
     for input, target in zip(data, targets):
-        with torch.cuda.amp.autocast():
+        with torch.autocast(device_type='cuda', dtype=torch.float16):
             output = net(input)
             loss = loss_fn(output, target)
 
@@ -184,7 +184,7 @@ scaler = torch.cuda.amp.GradScaler(enabled=use_amp)
 start_timer()
 for epoch in range(epochs):
     for input, target in zip(data, targets):
-        with torch.cuda.amp.autocast(enabled=use_amp):
+        with torch.autocast(device_type='cuda', dtype=torch.float16, enabled=use_amp):
             output = net(input)
             loss = loss_fn(output, target)
         scaler.scale(loss).backward()
@@ -202,7 +202,7 @@ end_timer_and_print("Mixed precision:")
 
 for epoch in range(0): # 0 epochs, this section is for illustration only
     for input, target in zip(data, targets):
-        with torch.cuda.amp.autocast():
+        with torch.autocast(device_type='cuda', dtype=torch.float16):
             output = net(input)
             loss = loss_fn(output, target)
         scaler.scale(loss).backward()
@@ -310,7 +310,7 @@ scaler.load_state_dict(checkpoint["scaler"])
 # 1. Disable ``autocast`` or ``GradScaler`` individually (by passing ``enabled=False`` to their constructor) and see if infs/NaNs persist.
 # 2. If you suspect part of your network (e.g., a complicated loss function) overflows , run that forward region in ``float32``
 #    and see if infs/NaNs persist.
-#    `The autocast docstring <https://pytorch.org/docs/stable/amp.html#torch.cuda.amp.autocast>`_'s last code snippet
+#    `The autocast docstring <https://pytorch.org/docs/stable/amp.html#torch.autocast>`_'s last code snippet
 #    shows forcing a subregion to run in ``float32`` (by locally disabling autocast and casting the subregion's inputs).
 #
 # Type mismatch error (may manifest as CUDNN_STATUS_BAD_PARAM)

@@ -83,6 +83,7 @@ print('First 4 Landmarks: {}'.format(landmarks[:4]))
 # 이미지와 랜드마크(landmark)를 보여주는 간단한 함수를 작성해보고,
 # 실제로 적용해보겠습니다.
 #
+
 def show_landmarks(image, landmarks):
     """Show image with landmarks"""
     """ 랜드마크(landmark)와 이미지를 보여줍니다. """
@@ -123,7 +124,7 @@ class FaceLandmarksDataset(Dataset):
 
     def __init__(self, csv_file, root_dir, transform=None):
         """
-        Args:
+        Arguments:
             csv_file (string): csv 파일의 경로
             root_dir (string): 모든 이미지가 존재하는 디렉토리 경로
             transform (callable, optional): 샘플에 적용될 Optional transform
@@ -181,7 +182,7 @@ for i in range(len(face_dataset)):
 
 ######################################################################
 # Transforms
-# ----------
+# ------------
 #
 # 위에서 볼 수 있었던 한가지 문제점은 샘플들이 다 같은 크기가 아니라는 것입니다.
 # 대부분의 신경망(neural networks)은 고정된 크기의 이미지라고 가정합니다.
@@ -291,7 +292,7 @@ class ToTensor(object):
 # .. note::
 #     위 예시에서, `RandomCrop` 은 외부 라이브러리의 난수 생성기(random number generator; 이 경우, Numpy의 `np.random.int` )를
 #     사용하고 있습니다. 이는 `DataLoader` 가 예상치 못한 동작을 하도록 할 수 있습니다.
-#     (https://pytorch.org/docs/stable/notes/faq.html#my-data-loader-workers-return-identical-random-numbers 를 참고하세요)
+#     (`여기 <https://pytorch.org/docs/stable/notes/faq.html#my-data-loader-workers-return-identical-random-numbers>`_ 를 참고하세요)
 #     실제 상황에서는 `torch.randint` 와 같은 PyTorch가 제공하는 난수 생성기를 사용하는 것이 안전합니다.
 
 ######################################################################
@@ -398,7 +399,7 @@ def show_landmarks_batch(sample_batched):
         plt.title('Batch from dataloader')
 
 # Windows를 사용 중이라면, 다음 줄의 주석을 제거하고 for 반복문을 들여쓰기합니다.
-# "num_workers"를 0으로 변경해야 할 수도 있습니다.
+# ``num_workers`` 를 0으로 변경해야 할 수도 있습니다.
 
 # if __name__ == '__main__':
 for i_batch, sample_batched in enumerate(dataloader):
@@ -416,7 +417,7 @@ for i_batch, sample_batched in enumerate(dataloader):
 
 ######################################################################
 # Afterword: torchvision
-# ----------------------
+# ------------------------
 #
 # 이번 튜토리얼에서는, 데이터셋 작성과 사용, 전이(transforms), 데이터를 불러오는 방법에 대해서 알아봤습니다.
 # ``torchvision`` 패키지는 몇몇의 일반적인 데이터셋과 전이(transforms)들을 제공합니다.
@@ -438,21 +439,21 @@ for i_batch, sample_batched in enumerate(dataloader):
 # 비슷하게, ``RandomHorizontalFlip`` , ``Scale`` 과 같이  ``PIL.Image`` 에서 작동하는
 # 일반적인 전이(transforms)도 사용가능합니다. 이와 같이 데이터로더(dataloader)를 사용할 수 있습니다: ::
 #
-#   import torch
-#   from torchvision import transforms, datasets
+#    import torch
+#    from torchvision import transforms, datasets
 #
-#   data_transform = transforms.Compose([
-#           transforms.RandomSizedCrop(224),
-#           transforms.RandomHorizontalFlip(),
-#           transforms.ToTensor(),
-#           transforms.Normalize(mean=[0.485, 0.456, 0.406],
-#                                std=[0.229, 0.224, 0.225])
-#       ])
-#   hymenoptera_dataset = datasets.ImageFolder(root='hymenoptera_data/train',
-#                                              transform=data_transform)
-#   dataset_loader = torch.utils.data.DataLoader(hymenoptera_dataset,
-#                                                batch_size=4, shuffle=True,
-#                                                num_workers=4)
+#    data_transform = transforms.Compose([
+#            transforms.RandomSizedCrop(224),
+#            transforms.RandomHorizontalFlip(),
+#            transforms.ToTensor(),
+#            transforms.Normalize(mean=[0.485, 0.456, 0.406],
+#                                 std=[0.229, 0.224, 0.225])
+#        ])
+#    hymenoptera_dataset = datasets.ImageFolder(root='hymenoptera_data/train',
+#                                               transform=data_transform)
+#    dataset_loader = torch.utils.data.DataLoader(hymenoptera_dataset,
+#                                                 batch_size=4, shuffle=True,
+#                                                 num_workers=4)
 #
 #  training code에 대한 예시를 알고 싶다면,
 #  :doc:`transfer_learning_tutorial` 문서를 참고해주세요

@@ -166,7 +166,7 @@ class TextClassificationModel(nn.Module):
 
     def __init__(self, vocab_size, embed_dim, num_class):
         super(TextClassificationModel, self).__init__()
-        self.embedding = nn.EmbeddingBag(vocab_size, embed_dim, sparse=True)
+        self.embedding = nn.EmbeddingBag(vocab_size, embed_dim, sparse=False)
         self.fc = nn.Linear(embed_dim, num_class)
         self.init_weights()
 
@@ -183,7 +183,7 @@ class TextClassificationModel(nn.Module):
 
 ######################################################################
 # 인스턴스 생성하기
-# -----------------
+# -------------------
 #
 # ``AG_NEWS`` 데이터셋에는 4종류의 레이블이 존재하므로 클래스의 개수도 4개입니다.
 #
@@ -208,7 +208,7 @@ model = TextClassificationModel(vocab_size, emsize, num_class).to(device)
 
 ######################################################################
 # 모델을 학습하고 결과를 평가하는 함수 정의하기
-# ---------------------------------------------
+# -----------------------------------------------
 #
 
 
@@ -251,7 +251,7 @@ def evaluate(dataloader):
 
 ######################################################################
 # 데이터셋을 분할하고 모델 수행하기
-# ---------------------------------
+# -----------------------------------
 #
 # 원본 ``AG_NEWS`` 에는 검증용 데이터가 포함되어 있지 않기 때문에, 우리는 학습
 # 데이터를 학습 및 검증 데이터로 분할하려 합니다. 이때 데이터를 분할하는
@@ -331,7 +331,7 @@ print('test accuracy {:8.3f}'.format(accu_test))
 
 ######################################################################
 # 임의의 뉴스로 평가하기
-# ----------------------
+# ------------------------
 #
 # 현재까지 최고의 모델로 골프 뉴스를 테스트해보겠습니다.
 #

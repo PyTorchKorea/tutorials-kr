@@ -130,7 +130,7 @@ out.backward(torch.randn(1, 10))
 #   -  신경망의 가중치를 갱신하는 것
 #
 # 손실 함수 (Loss Function)
-# -------------------------
+# ---------------------------
 # 손실 함수는 (output, target)을 한 쌍(pair)의 입력으로 받아, 출력(output)이
 # 정답(target)으로부터 얼마나 멀리 떨어져 있는지 추정하는 값을 계산합니다.
 #
@@ -172,7 +172,7 @@ print(loss.grad_fn.next_functions[0][0].next_functions[0][0])  # ReLU
 
 ########################################################################
 # 역전파(Backprop)
-# ----------------
+# ------------------
 # 오차(error)를 역전파하기 위해서는 ``loss.backward()`` 만 해주면 됩니다.
 # 기존에 계산된 변화도의 값을 누적 시키고 싶지 않다면 기존에 계산된 변화도를 0으로 만드는
 # 작업이 필요합니다.
@@ -210,7 +210,10 @@ print(net.conv1.bias.grad)
 # 실제로 많이 사용되는 가장 단순한 갱신 규칙은 확률적 경사하강법(SGD; Stochastic
 # Gradient Descent)입니다:
 #
-#      ``새로운 가중치(weight) = 가중치(weight) - 학습률(learning rate) * 변화도(gradient)``
+# .. code:: python
+#
+#     # 새로운 가중치 = 가중치 - 학습률 * 변화도
+#     weight = weight - learning_rate * gradient
 #
 # 간단한 Python 코드로 이를 구현해볼 수 있습니다:
 #
@@ -223,18 +226,21 @@ print(net.conv1.bias.grad)
 # 신경망을 구성할 때 SGD, Nesterov-SGD, Adam, RMSProp 등과 같은 다양한 갱신 규칙을
 # 사용하고 싶을 수 있습니다. 이를 위해서 ``torch.optim`` 라는 작은 패키지에 이러한
 # 방법들을 모두 구현해두었습니다. 사용법은 매우 간단합니다:
-
-import torch.optim as optim
-
-# Optimizer를 생성합니다.
-optimizer = optim.SGD(net.parameters(), lr=0.01)
-
-# 학습 과정(training loop)은 다음과 같습니다:
-optimizer.zero_grad()   # 변화도 버퍼를 0으로
-output = net(input)
-loss = criterion(output, target)
-loss.backward()
-optimizer.step()    # 업데이트 진행
+#
+# .. code:: python
+#
+#     import torch.optim as optim
+#
+#     # Optimizer를 생성합니다.
+#     optimizer = optim.SGD(net.parameters(), lr=0.01)
+#
+#     # 학습 과정(training loop)은 다음과 같습니다:
+#     optimizer.zero_grad()   # 변화도 버퍼를 0으로
+#     output = net(input)
+#     loss = criterion(output, target)
+#     loss.backward()
+#     optimizer.step()    # 업데이트 진행
+#
 
 
 ###############################################################
