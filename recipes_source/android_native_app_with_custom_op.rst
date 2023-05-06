@@ -1,5 +1,5 @@
 PyTorch 사전 빌드된 라이브러리를 사용하는 네이티브 Android 애플리케이션 만들기
-==============================================================================
+================================================================================
 
 **저자**: `Ivan Kobzarev <https://github.com/IvanKobzarev>`_
 
@@ -64,7 +64,7 @@ Gradle은 JDK가 필요하기에, JDK를 설치하고 환경 변수 ``JAVA_HOME`
 
 
 사용자 지정 C++ 연산자로 TorchScript Model 준비하기
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 TorchScript는 사용자 정의 C++ 연산자를 사용하는 것을 허용하며, 사용자 정의 연산 관련된 세부사항은
 `the dedicated tutorial <https://tutorials.pytorch.kr/advanced/torch_script_custom_ops.html>`_ 여기에서 읽을 수 있습니다.
@@ -144,7 +144,7 @@ Ubuntu:
   apt-get install libopencv-dev
 
 Android 애플리케이션 만들기
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ``compute.pt`` 를 만들었으면 Android 애플리케이션 내에서 이 TorchScript 모델을 사용하겠습니다. Java API를 이용해서 Android상에서 일반적인 TorchScript 모델(사용자 지정 연산자 없이)을 사용하고자 한다면 `여기 <https://pytorch.org/mobile/android/>`_ 를 살펴 보십시오. 이 예제에서는 사용자 지정 연산자(``my_ops.warp_perspective``)를 사용해서 위와 같은 방밥을 사용할 수 없습니다. 기본 TorchScript 실행이 이 사용자 지정 연산자를 찾지 못하기 때문입니다.
 
@@ -158,14 +158,14 @@ Android 애플리케이션을 ``NativeApp`` 폴더 내에서 생성해 봅시다
   cd NativeApp
 
 Android 애플리케이션 빌드 설정하기
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Android 애플리케이션 빌드는 메인 gradle 부분과 네이티브 빌드 Cmake 부분으로 이루어집니다.
 여기 나열된 목록은 전체 파일 목록입니다. 그래서 전체 구조를 새로이 만들고자 한다면
 코드를 별도로 추가하지 않아도 결과로 나온 Android 애플리케이션을 빌드하고 설치할 수 있습니다.
 
 Gradle 빌드 설정하기
--------------------
+----------------------
 이러한 gradle 설정 파일울 추가해야 합니다: build.gradle, gradle.properties, settings.gradle.
 추가적인 Android Gradle 빌드 설정은 `여기 <https://developer.android.com/studio/build>`_ 에서 찾을 수 있습니다.
 
@@ -332,7 +332,7 @@ Pytorch_android aar은 ``headers`` 폴더 안에 LibTorch 헤더를 포함하고
 
 
 네이티브 빌드 CMake 설정하기
---------------------------
+------------------------------
 
 네이티브 빌드는 ``NativeApp/app/CMakeLists.txt`` 에서 설정합니다:
 
@@ -453,10 +453,10 @@ Android 애플리케이션 매니페스트(Manifest)
 
 
 소스코드
--------
+----------
 
 Java 코드
----------
+-----------
 
 이제 MainActivity를 아래 파일에서 구현할 준비가 되었습니다
 
@@ -543,7 +543,7 @@ Java 코드
 ``NativePeer#loadAndForwardModel`` 은 ``native`` 로 선언이 되어 있는데, Java를 위한 정의는 아닙니다. 이 메소드를 호출하면 JNI를 통해 ``NativeApp/app/src/main/cpp/pytorch_nativeapp.cpp`` 내부에 있는 ``libpytorch_nativeapp.so`` 의 C++ 메소드를 다시 가져옵니다.
 
 네이티브 코드
--------------
+----------------
 
 이제 애플리케이션의 네이티브 부분을 작성할 준비가 되었습니다.
 

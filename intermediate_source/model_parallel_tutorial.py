@@ -2,6 +2,7 @@
 """
 단일 머신을 사용한 모델 병렬화 모범 사례
 ===================================================
+
 **저자** : `Shen Li <https://mrshenli.github.io/>`_
 **번역** : `안상준 <https://github.com/Justin-A>`_
 
@@ -27,7 +28,7 @@
    `분산 프레임워크 RPC 시작해보기 <rpc_tutorial.html>`__
 
 Basic Usage
------------
+-------------
 """
 
 ######################################################################
@@ -239,11 +240,11 @@ class PipelineParallelResNet50(ModelParallelResNet50):
         ret = []
 
         for s_next in splits:
-            # A. s_prev는 두 번째 GPU에서 실행됩니다.
+            # A. ``s_prev`` 는 두 번째 GPU( ``cuda:1`` )에서 실행됩니다.
             s_prev = self.seq2(s_prev)
             ret.append(self.fc(s_prev.view(s_prev.size(0), -1)))
 
-            # B. s_next는 A.와 동시에 진행되면서 첫 번째 GPU에서 실행됩니다.
+            # B. ``s_next`` 는 A와 동시에 진행되면서 첫 번째 GPU( ``cuda:0`` )에서 실행됩니다.
             s_prev = self.seq1(s_next).to('cuda:1')
 
         s_prev = self.seq2(s_prev)

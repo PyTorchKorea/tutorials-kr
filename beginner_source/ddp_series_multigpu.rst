@@ -15,13 +15,13 @@ Authors: `Suraj Subramanian <https://github.com/suraj813>`__
       -  How to migrate a single-GPU training script to multi-GPU via DDP
       -  Setting up the distributed process group
       -  Saving and loading models in a distributed setup
-      
+
       .. grid:: 1
 
          .. grid-item::
 
             :octicon:`code-square;1.0em;` View the code used in this tutorial on `GitHub <https://github.com/pytorch/examples/blob/main/distributed/ddp-tutorial-series/multigpu.py>`__
-      
+
    .. grid-item-card:: :octicon:`list-unordered;1em;` Prerequisites
 
       * High-level overview of `how DDP works  <ddp_series_theory.html>`__
@@ -40,11 +40,11 @@ In the `previous tutorial <ddp_series_theory.html>`__, we got a high-level overv
 In this tutorial, we start with a single-GPU training script and migrate that to running it on 4 GPUs on a single node.
 Along the way, we will talk through important concepts in distributed training while implementing them in our code.
 
-.. note:: 
-   If your model contains any ``BatchNorm`` layer, it needs to be converted to ``SyncBatchNorm`` to sync the running stats of ``BatchNorm`` 
+.. note::
+   If your model contains any ``BatchNorm`` layers, it needs to be converted to ``SyncBatchNorm`` to sync the running stats of ``BatchNorm``
    layers across replicas.
 
-   Use the helper function 
+   Use the helper function
    `torch.nn.SyncBatchNorm.convert_sync_batchnorm(model) <https://pytorch.org/docs/stable/generated/torch.nn.SyncBatchNorm.html#torch.nn.SyncBatchNorm.convert_sync_batchnorm>`__ to convert all ``BatchNorm`` layers in the model to ``SyncBatchNorm``.
 
 
@@ -57,7 +57,7 @@ Imports
 ~~~~~~~
 -  ``torch.multiprocessing`` is a PyTorch wrapper around Python's native
    multiprocessing
--  The dsitributed process group contains all the processes that can
+-  The distributed process group contains all the processes that can
    communicate and synchronize with each other.
 
 .. code:: diff
@@ -65,7 +65,7 @@ Imports
    import torch
    import torch.nn.functional as F
    from utils import MyTrainDataset
-    
+
    + import torch.multiprocessing as mp
    + from torch.utils.data.distributed import DistributedSampler
    + from torch.nn.parallel import DistributedDataParallel as DDP
@@ -83,6 +83,8 @@ Constructing the process group
    initializes the distributed process group.
 -  Read more about `choosing a DDP
    backend <https://pytorch.org/docs/stable/distributed.html#which-backend-to-use>`__
+-  `set_device <https://pytorch.org/docs/stable/generated/torch.cuda.set_device.html?highlight=set_device#torch.cuda.set_device>`__
+   sets the default GPU for each process. This is important to prevent hangs or excessive memory utilization on `GPU:0`
 
 .. code:: diff
 
@@ -95,6 +97,7 @@ Constructing the process group
    +   os.environ["MASTER_ADDR"] = "localhost"
    +   os.environ["MASTER_PORT"] = "12355"
    +   init_process_group(backend="nccl", rank=rank, world_size=world_size)
+   +   torch.cuda.set_device(rank)
 
 
 Constructing the DDP model
@@ -123,7 +126,7 @@ Distributing input data
    +   sampler=DistributedSampler(train_dataset),
    )
 
--  Calling the ``set_epoch()`` method on the ``DistributedSampler`` at the beginning of each epoch is necessary to make shuffling work 
+-  Calling the ``set_epoch()`` method on the ``DistributedSampler`` at the beginning of each epoch is necessary to make shuffling work
    properly across multiple epochs. Otherwise, the same ordering will be used in each epoch.
 
 .. code:: diff
@@ -138,10 +141,10 @@ Distributing input data
 
 Saving model checkpoints
 ~~~~~~~~~~~~~~~~~~~~~~~~
--  We only need to save model checkpoints from one process. Without this 
+-  We only need to save model checkpoints from one process. Without this
    condition, each process would save its copy of the identical mode. Read
    more on saving and loading models with
-   DDP `here <https://pytorch.org/tutorials/intermediate/ddp_tutorial.html#save-and-load-checkpoints>`__  
+   DDP `here <https://tutorials.pytorch.kr/intermediate/ddp_tutorial.html#save-and-load-checkpoints>`__
 
 .. code:: diff
 
@@ -156,7 +159,7 @@ Saving model checkpoints
 .. warning::
    `Collective calls <https://pytorch.org/docs/stable/distributed.html#collective-functions>`__ are functions that run on all the distributed processes,
    and they are used to gather certain states or values to a specific process. Collective calls require all ranks to run the collective code.
-   In this example, `_save_checkpoint` should not have any collective calls because it is only run on the ``rank:0`` process. 
+   In this example, `_save_checkpoint` should not have any collective calls because it is only run on the ``rank:0`` process.
    If you need to make any collective calls, it should be before the ``if self.gpu_id == 0`` check.
 
 
@@ -167,7 +170,7 @@ Running the distributed training job
    ``world_size``.
 -  ``rank`` is auto-allocated by DDP when calling
    `mp.spawn <https://pytorch.org/docs/stable/multiprocessing.html#spawning-subprocesses>`__.
--  ``world_size`` is the number of processes across the training job. For GPU training, 
+-  ``world_size`` is the number of processes across the training job. For GPU training,
    this corresponds to the number of GPUs in use, and each process works on a dedicated GPU.
 
 .. code:: diff
@@ -177,11 +180,11 @@ Running the distributed training job
    +  ddp_setup(rank, world_size)
       dataset, model, optimizer = load_train_objs()
       train_data = prepare_dataloader(dataset, batch_size=32)
-   -  trainer = Trainer(model, dataset, optimizer, device, save_every)
-   +  trainer = Trainer(model, dataset, optimizer, rank, save_every)
+   -  trainer = Trainer(model, train_data, optimizer, device, save_every)
+   +  trainer = Trainer(model, train_data, optimizer, rank, save_every)
       trainer.train(total_epochs)
    +  destroy_process_group()
-    
+
    if __name__ == "__main__":
       import sys
       total_epochs = int(sys.argv[1])
@@ -198,6 +201,6 @@ Further Reading
 
 -  `Fault Tolerant distributed training <ddp_series_fault_tolerance.html>`__  (next tutorial in this series)
 -  `Intro to DDP <ddp_series_theory.html>`__ (previous tutorial in this series)
--  `Getting Started with DDP <https://pytorch.org/tutorials/intermediate/ddp_tutorial.html>`__ 
+-  `Getting Started with DDP <https://tutorials.pytorch.kr/intermediate/ddp_tutorial.html>`__
 -  `Process Group
    initialization <https://pytorch.org/docs/stable/distributed.html#tcp-initialization>`__

@@ -22,7 +22,7 @@ Meta AI의 `딥러닝 추천 모델 <https://arxiv.org/abs/1906.00091>`__ 또는
 PyTorch의 DistributedDataParallel와 같이, DMP는 분산 학습을 가능하게하기 위해 모델을 포장합니다.
 
 설치
-----
+-----
 
 요구 사항: python >= 3.7
 
@@ -38,17 +38,17 @@ TorchRec을 사용할 때는 CUDA를 적극 추천합니다. (CUDA를 사용하�
 
 
 개요
-----
+-----
 
 이 튜토리얼에서는 TorchRec의 ``nn.module`` |EmbeddingBagCollection|_, |DistributedModelParallel|_ API,
 데이터 구조 |KeyedJaggedTensor|_ 3가지 내용을 다룹니다.
 
 
 분산 설정
-~~~~~~~
+~~~~~~~~~~
 
 torch.distributed를 사용하여 환경을 설정합니다. 분산에 대한 자세한 내용은 이
-`튜토리얼 <https://pytorch.org/tutorials/beginner/dist_overview.html>`__ 을 참고하세요.
+`튜토리얼 <https://tutorials.pytorch.kr/beginner/dist_overview.html>`__ 을 참고하세요.
 
 여기서는 1개의 colab GPU에 대응하는 1개의 랭크(colab 프로세스)를 사용합니다.
 
@@ -72,7 +72,7 @@ torch.distributed를 사용하여 환경을 설정합니다. 분산에 대한 �
 
 
 EmbeddingBag에서 EmbeddingBagCollection으로
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 PyTorch는 |torch.nn.Embedding|_ 와 |torch.nn.EmbeddingBag|_ 를 통해 임베딩을 나타냅니다.
 EmbeddingBag은 임베딩의 풀(pool) 버전입니다.
@@ -108,7 +108,7 @@ EmbeddingBag 그룹을 나타내고자 |EmbeddingBagCollection|_ 을 사용합�
 
 
 DistributedModelParallel
-~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 이제 모델을 |DistributedModelParallel|_ (DMP)로 감쌀 준비가 되었습니다.
 DMP의 인스턴스화는 다음과 같습니다.
@@ -128,7 +128,7 @@ TorchRec은 모두 단일 GPU에 배치합니다.
 
 
 입력과 오프셋이 있는 기본 nn.EmbeddingBag 질의
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ``input`` 과 ``offsets`` 이 있는 |nn.Embedding|_ 과 |nn.EmbeddingBag|_ 를 질의합니다.
 입력은 lookup 값을 포함하는 1-D 텐서입니다.
@@ -153,7 +153,7 @@ TorchRec은 모두 단일 GPU에 배치합니다.
 
 
 KeyedJaggedTensor로 미니 배치 표현하기
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 예제 및 기능별로 객체 ID가 임의의 수인 다양한 예제를 효율적으로 나타내야 합니다.
 다양한 표현이 가능하도록, TorchRec 데이터구조 |KeyedJaggedTensor|_ (KJT)를 사용합니다.
@@ -191,7 +191,7 @@ KJT 배치 크기는 ``batch_size = len(lengths)//len(keys)`` 인 것을 눈여�
 
 
 총정리하여, KJT 미니배치를 사용하여 분산 모델 질의하기
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 마지막으로 제품과 사용자의 미니배치를 사용하여 모델을 질의합니다.
 
@@ -206,7 +206,7 @@ KJT 배치 크기는 ``batch_size = len(lengths)//len(keys)`` 인 것을 눈여�
 
 
 추가 자료
----------
+------------
 
 자세한 내용은
 `dlrm <https://github.com/pytorch/torchrec/tree/main/examples/dlrm>`__

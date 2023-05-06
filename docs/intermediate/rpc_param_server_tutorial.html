@@ -6,39 +6,39 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="ko" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+
 <meta property="og:title" content="Implementing a Parameter Server Using Distributed RPC Framework" />
-  
+
 <meta property="og:type" content="article" />
-  
+
 <meta property="og:url" content="https://tutorials.pytorch.kr/intermediate/rpc_param_server_tutorial.html" />
-  
+
 <meta property="og:description" content="Author: Rohan Varma Prerequisites: PyTorch Distributed Overview, RPC API documents. This tutorial walks through a simple example of implementing a parameter server using PyTorch’s Distributed RPC framework. The parameter server framework is a paradigm in which a set of servers store parameters, s..." />
-  
+
 <meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
-  
+
 <meta property="og:image:alt" content="Implementing a Parameter Server Using Distributed RPC Framework" />
-  
+
 <meta property="og:ignore_canonical" content="true" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
+
   <title>Implementing a Parameter Server Using Distributed RPC Framework &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
-  
 
-  
-  
+
+
+
     <link rel="shortcut icon" href="../_static/favicon.ico"/>
-  
-  
-  
 
-  
 
-  
-  
-    
 
-  
+
+
+
+
+
+
+
+
 
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!-- <link rel="stylesheet" href="../_static/pygments.css" type="text/css" /> -->
@@ -57,9 +57,9 @@
     <link rel="index" title="색인" href="../genindex.html" />
     <link rel="search" title="검색" href="../search.html" />
     <link rel="next" title="Distributed Pipeline Parallelism Using RPC" href="dist_pipeline_parallel_tutorial.html" />
-    <link rel="prev" title="Getting Started with Distributed RPC Framework" href="rpc_tutorial.html" /> 
+    <link rel="prev" title="Getting Started with Distributed RPC Framework" href="rpc_tutorial.html" />
 
-  
+
   <script src="../_static/js/modernizr.min.js"></script>
 
   <!-- Preload the theme fonts -->
@@ -116,9 +116,9 @@
 
 <body class="pytorch-body">
 
-   
 
-    
+
+
 
     <div class="table-of-contents-link-wrapper">
       <span>Table of Contents</span>
@@ -129,21 +129,21 @@
       <div class="pytorch-side-scroll">
         <div class="pytorch-menu pytorch-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           <div class="pytorch-left-menu-search">
-            
 
-            
-              
-              
+
+
+
+
                 <div class="version">
                   1.13.1+cu117
                 </div>
-              
-            
-
-            
 
 
-  
+
+
+
+
+
 
 
 <div role="search">
@@ -154,15 +154,15 @@
   </form>
 </div>
 
-            
+
           </div>
 
-          
-            
-            
-              
-            
-            
+
+
+
+
+
+
               <p class="caption" role="heading"><span class="caption-text">파이토치(PyTorch) 레시피</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../recipes/recipes_index.html">모든 레시피 보기</a></li>
@@ -305,8 +305,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../beginner/flava_finetuning_tutorial.html">TorchMultimodal Tutorial: Finetuning FLAVA</a></li>
 </ul>
 
-            
-          
+
+
         </div>
       </div>
     </nav>
@@ -314,7 +314,7 @@
     <div class="pytorch-container">
       <div class="pytorch-page-level-bar" id="pytorch-page-level-bar">
         <div class="pytorch-breadcrumbs-wrapper">
-          
+
 
 
 
@@ -333,30 +333,30 @@
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="pytorch-breadcrumbs">
-    
+
       <li>
         <a href="../index.html">
-          
+
             Tutorials
-          
+
         </a> &gt;
       </li>
 
-        
+
       <li>Implementing a Parameter Server Using Distributed RPC Framework</li>
-    
-    
+
+
       <li class="pytorch-breadcrumbs-aside">
-        
-            
+
+
             <a href="../_sources/intermediate/rpc_param_server_tutorial.rst.txt" rel="nofollow"><img src="../_static/images/view-page-source-icon.svg"></a>
-          
-        
+
+
       </li>
-    
+
   </ul>
 
-  
+
 </div>
         </div>
 
@@ -368,7 +368,7 @@
       <section data-toggle="wy-nav-shift" id="pytorch-content-wrap" class="pytorch-content-wrap">
         <div class="pytorch-content-left">
 
-        
+
 
           <div class="pytorch-call-to-action-links">
             <div id="tutorial-type">intermediate/rpc_param_server_tutorial</div>
@@ -390,14 +390,14 @@
             </div>
           </div>
 
-        
 
-          
+
+
           <div class="rst-content">
-          
+
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
-              
+
   <div class="section" id="implementing-a-parameter-server-using-distributed-rpc-framework">
 <h1>Implementing a Parameter Server Using Distributed RPC Framework<a class="headerlink" href="#implementing-a-parameter-server-using-distributed-rpc-framework" title="이 제목에 대한 퍼머링크">¶</a></h1>
 <p><strong>Author</strong>: <a class="reference external" href="https://github.com/rohan-varma">Rohan Varma</a></p>
@@ -412,7 +412,7 @@
 </ul>
 <p>This tutorial walks through a simple example of implementing a parameter server using PyTorch’s <a class="reference external" href="https://pytorch.org/docs/stable/rpc.html">Distributed RPC framework</a>. The parameter server framework is a paradigm in which a set of servers store parameters, such as large embedding tables, and several trainers query the parameter servers in order to retrieve the most up to date parameters. These trainers can run a training loop locally and occasionally synchronize with the parameter server to get the latest parameters. For more reading on the parameter server approach, check out <a class="reference external" href="https://www.cs.cmu.edu/~muli/file/parameter_server_osdi14.pdf">this paper</a>.</p>
 <p>Using the Distributed RPC Framework, we’ll build an example where multiple trainers use RPC to communicate with the same parameter server and use <a class="reference external" href="https://pytorch.org/docs/stable/rpc.html#torch.distributed.rpc.RRef">RRef</a> to access states on the remote parameter server instance. Each trainer will launch its dedicated backward pass in a distributed fashion through stitching of the autograd graph across multiple nodes using distributed autograd.</p>
-<p><strong>Note</strong>: This tutorial covers the use of the Distributed RPC Framework, which is useful for splitting a model onto multiple machines, or for implementing a parameter-server training strategy where network trainers fetch parameters hosted on a different machine. If instead you are looking for replicating your model across many GPUs, please see the <a class="reference external" href="https://pytorch.org/tutorials/intermediate/ddp_tutorial.html">Distributed Data Parallel tutorial</a>. There is also another <a class="reference external" href="https://pytorch.org/tutorials/intermediate/rpc_tutorial.html">RPC tutorial</a> that covers reinforcement learning and RNN use cases.</p>
+<p><strong>Note</strong>: This tutorial covers the use of the Distributed RPC Framework, which is useful for splitting a model onto multiple machines, or for implementing a parameter-server training strategy where network trainers fetch parameters hosted on a different machine. If instead you are looking for replicating your model across many GPUs, please see the <a class="reference external" href="https://tutorials.pytorch.kr/intermediate/ddp_tutorial.html">Distributed Data Parallel tutorial</a>. There is also another <a class="reference external" href="https://tutorials.pytorch.kr/intermediate/rpc_tutorial.html">RPC tutorial</a> that covers reinforcement learning and RNN use cases.</p>
 <p>Let’s start with the familiar: importing our required modules and defining a simple ConvNet that will train on the MNIST dataset. The below network is largely adopted from the network defined in the <a class="reference external" href="https://github.com/pytorch/examples/tree/master/mnist">pytorch/examples repo</a>.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">argparse</span>
 <span class="kn">import</span> <span class="nn">os</span>
@@ -763,21 +763,21 @@
 
 
              </article>
-             
+
             </div>
             <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="dist_pipeline_parallel_tutorial.html" class="btn btn-neutral float-right" title="Distributed Pipeline Parallelism Using RPC" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
-      
-      
-        <a href="rpc_tutorial.html" class="btn btn-neutral" title="Getting Started with Distributed RPC Framework" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
-      
-    </div>
-  
 
-  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+
+        <a href="dist_pipeline_parallel_tutorial.html" class="btn btn-neutral float-right" title="Distributed Pipeline Parallelism Using RPC" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
+
+
+        <a href="rpc_tutorial.html" class="btn btn-neutral" title="Getting Started with Distributed RPC Framework" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
+
+    </div>
+
+
+
     <hr class="community-hr hr-top" />
     <div class="community-container">
       <div class="community-prompt">더 궁금하시거나 개선할 내용이 있으신가요? 커뮤니티에 참여해보세요!</div>
@@ -797,7 +797,7 @@
       </div>
     </div>
     <hr class="rating-hr hr-bottom"/>
-  
+
 
   <div role="contentinfo">
     <p>
@@ -805,11 +805,11 @@
 
     </p>
   </div>
-    
+
       <div>
         Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
       </div>
-     
+
 
 </footer>
 
@@ -836,12 +836,12 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
       </section>
     </div>
 
-  
 
 
-  
-  
-     
+
+
+
+
        <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
          <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
          <script src="../_static/jquery.js"></script>
@@ -855,8 +855,8 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
          <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
          <script src="../_static/katex_autorenderer.js"></script>
          <script src="../_static/design-tabs.js"></script>
-     
-  
+
+
 
   <script type="text/javascript" src="../_static/js/vendor/popper.min.js"></script>
   <script type="text/javascript" src="../_static/js/vendor/bootstrap.min.js"></script>
@@ -868,7 +868,7 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
           SphinxRtdTheme.Navigation.enable(true);
       });
   </script>
- 
+
 <script>
 //add microsoft link
 

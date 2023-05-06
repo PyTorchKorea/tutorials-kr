@@ -7,8 +7,8 @@
 
 ######################################################################
 # Before working through this tutorial, please review the MaskedTensor
-# `Overview <https://pytorch.org/tutorials/prototype/maskedtensor_overview.html>`__ and
-# `Sparsity <https://pytorch.org/tutorials/prototype/maskedtensor_sparsity.html>`__ tutorials.
+# `Overview <https://tutorials.pytorch.kr/prototype/maskedtensor_overview.html>`__ and
+# `Sparsity <https://tutorials.pytorch.kr/prototype/maskedtensor_sparsity.html>`__ tutorials.
 #
 # Introduction and Motivation
 # ---------------------------
@@ -212,7 +212,7 @@ print("param2:\n", param2)
 # ---------------
 #
 # To continue learning more, you can find our final review (for now) on
-# `MaskedTensor Advanced Semantics <https://pytorch.org/tutorials/prototype/maskedtensor_advanced_semantics.html>`__
+# `MaskedTensor Advanced Semantics <https://tutorials.pytorch.kr/prototype/maskedtensor_advanced_semantics.html>`__
 # to see some of the differences in design decisions between :class:`MaskedTensor` and NumPy's MaskedArray, as well
 # as reduction semantics.
 #

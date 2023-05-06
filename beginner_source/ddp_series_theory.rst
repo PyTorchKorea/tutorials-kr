@@ -19,7 +19,7 @@ Authors: `Suraj Subramanian <https://github.com/suraj813>`__
 
    .. grid-item-card:: :octicon:`list-unordered;1em;` Prerequisites
 
-      * Familiarity with `basic non-distributed training  <https://pytorch.org/tutorials/beginner/basics/quickstart_tutorial.html>`__ in PyTorch
+      * Familiarity with `basic non-distributed training  <https://tutorials.pytorch.kr/beginner/basics/quickstart_tutorial.html>`__ in PyTorch
 
 Follow along with the video below or on `youtube <https://www.youtube.com/watch/Cvdhwx-OBBo>`__.
 
@@ -40,7 +40,7 @@ algorithm <https://tech.preferred.jp/en/blog/technologies-behind-distributed-dee
 Why you should prefer DDP over DataParallel (DP)
 -------------------------------------------------
 
-`DataParallel <https://pytorch.org/docs/stable/generated/torch.nn.DataParallel.html>`__ 
+`DataParallel <https://pytorch.org/docs/stable/generated/torch.nn.DataParallel.html>`__
 is an older approach to data parallelism. DP is trivially simple (with just one extra line of code) but it is much less performant.
 DDP improves upon the architecture in a few ways:
 
@@ -54,8 +54,8 @@ DDP improves upon the architecture in a few ways:
 |                                       | machines                     |
 +---------------------------------------+------------------------------+
 | Slower; uses multithreading on a      | Faster (no GIL contention)   |
-| single process and runs into GIL      | because it uses              |
-| contention                            | multiprocessing              |
+| single process and runs into Global   | because it uses              |
+| Interpreter Lock (GIL) contention     | multiprocessing              |
 +---------------------------------------+------------------------------+
 
 Further Reading

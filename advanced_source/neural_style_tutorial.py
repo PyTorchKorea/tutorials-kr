@@ -1,6 +1,6 @@
 """
-PyTorch를 이용하여 뉴럴 변환(Neural Transfer)
-=============================
+PyTorch를 이용한 뉴럴 변환(Neural Transfer)
+==========================================================
 
 
 **Author**: `Alexis Jacq <https://alexis-jacq.github.io>`_
@@ -140,7 +140,7 @@ imshow(content_img, title='Content Image')
 # 손실 함수
 # --------------
 # 콘텐츠 손실(Content Loss)
-# ~~~~~~~~~~~~
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 # Content 손실은 각 계층에 대한 Content 거리의 가중치 버전을 나타냅니다.
 # 이 함수는 입력 :math:`X` 를 처리하는 레이어 :math:`L` 의 특징 맵 :math:`F_{XL}` 을 가져와서
@@ -179,7 +179,7 @@ class ContentLoss(nn.Module):
 
 ######################################################################
 # 스타일 손실(Style Loss)
-# ~~~~~~~~~~
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 # Style 손실 모듈은 Content 손실 모듈과 유사하게 구현됩니다.
 # 네트워크에서 해당 계층의 Style 손실을 계산하는 역할을 합니다.
@@ -256,7 +256,7 @@ cnn = models.vgg19(pretrained=True).features.to(device).eval()
 cnn_normalization_mean = torch.tensor([0.485, 0.456, 0.406]).to(device)
 cnn_normalization_std = torch.tensor([0.229, 0.224, 0.225]).to(device)
 
-# 입력 이미지를 정규화하는 모듈을 생성하여 쉽게 nn.Sequential에 넣을 수 있습니다.
+# 입력 이미지를 정규화하는 모듈을 생성하여 쉽게 ``nn.Sequential`` 에 넣을 수 있습니다.
 class Normalization(nn.Module):
     def __init__(self, mean, std):
         super(Normalization, self).__init__()
@@ -267,14 +267,14 @@ class Normalization(nn.Module):
         self.std = torch.tensor(std).view(-1, 1, 1)
 
     def forward(self, img):
-        # img 정규화
+        # ``img`` 정규화
         return (img - self.mean) / self.std
 
 
 ######################################################################
 # ``Sequential`` 모듈은 순서가 있는 하위 모듈의 리스트가 포함됩니다.
 # 예를 들어, ``vgg19.features`` 은 올바른 순서로 정렬 된
-# 시퀀스(Conv2d, ReLU, MaxPool2d, Conv2d, ReLU…)가 포함되어 있습니다.
+# 시퀀스( ``Conv2d``, ``ReLU``, ``MaxPool2d``, ``Conv2d``, ``ReLU``…)가 포함되어 있습니다.
 # Content 손실과 Style 손실 계층을 감지하는 합성곱 계층 바로 뒤에 추가해야합니다.
 # 이렇게 하기 위해서는 Content 손실과 Style 손실 모듈이
 # 올바르게 삽입된 새로운 ``Sequential`` 모듈을 만들어야 합니다.
@@ -295,8 +295,8 @@ def get_style_model_and_losses(cnn, normalization_mean, normalization_std,
     content_losses = []
     style_losses = []
 
-    # cnn이 nn.Sequential이라고 가정하고,
-    # 순차적으로 활성화되어야 하는 모듈에 새로운 nn.Sequential을 만듭니다.
+    # ``cnn`` 이 ``nn.Sequential`` 이라고 가정하고,
+    # 순차적으로 활성화되어야 하는 모듈에 새로운 ``nn.Sequential`` 을 만듭니다.
     model = nn.Sequential(normalization)
 
     i = 0  # conv를 볼 때마다 증가
@@ -306,7 +306,7 @@ def get_style_model_and_losses(cnn, normalization_mean, normalization_std,
             name = 'conv_{}'.format(i)
         elif isinstance(layer, nn.ReLU):
             name = 'relu_{}'.format(i)
-            # in-place 버전은 아래에 삽입한 Content 손실과 Style 손실와 잘 어울리지 않습니다.
+            # 아래에 추가한 ``ContentLoss`` 와 ``StyleLoss`` 는 in-place 버전에서는 잘 동작하지 않습니다.
             # 그래서 여기서는 out-of-place로 대체합니다.
             layer = nn.ReLU(inplace=False)
         elif isinstance(layer, nn.MaxPool2d):
@@ -347,8 +347,11 @@ def get_style_model_and_losses(cnn, normalization_mean, normalization_std,
 #
 
 input_img = content_img.clone()
-# 만약 화이트 노이즈(white noise)을 사용하려면 아래 주석을 제거하세요
-# input_img = torch.randn(content_img.data.size(), device=device)
+# 만약 화이트 노이즈(white noise)을 사용하려면 아래 주석을 제거하세요:
+#
+# ::
+#
+#    input_img = torch.randn(content_img.data.size(), device=device)
 
 # 그림에 원본 입력 이미지를 추가합니다.
 plt.figure()

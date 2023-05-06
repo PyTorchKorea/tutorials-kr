@@ -110,7 +110,7 @@ torch_model.eval()
 # 특정 차원을 동적 차원으로 지정하지 않는 이상, ONNX로 변환된 그래프의 경우 입력값의 크기는 모든 차원에 대해 고정됩니다.
 # 예시에서는 모델이 항상 배치 사이즈 1을 사용하도록 변환하였지만, ``torch.onnx.export()`` 의 ``dynamic_axes`` 인자의
 # 첫번째 차원은 동적 차원으로 지정합니다. 따라서 변환된 모델은 임의의 batch_size에 대해 [batch_size, 1, 224, 224] 사이즈
-# 입력값을 받을 수 있습니다. 
+# 입력값을 받을 수 있습니다.
 #
 # PyTorch의 변환 인터페이스에 대해 더 자세히 알고 싶다면
 # `torch.onnx 문서 <https://pytorch.org/docs/master/onnx.html>`__ 를 참고해주세요.
@@ -137,8 +137,8 @@ torch.onnx.export(torch_model,               # 실행될 모델
 #
 # ONNX 런타임에서의 모델 결과값을 확인하기 전에 먼저 ONNX API를 사용해 ONNX 모델을 확인해보도록 하겠습니다.
 # 먼저, ``onnx.load("super_resolution.onnx")`` 는 저장된 모델을 읽어온 후
-# 머신러닝 모델을 취합하여 저장하고 있는 상위 파일 컨테이너인 onnx.ModelProto를 리턴합니다.
-# onnx.ModelProto에 대해 더 자세한 것은 `onnx.proto 기술문서 <https://github.com/onnx/onnx/blob/master/onnx/onnx.proto>`__ 에서
+# 머신러닝 모델을 취합하여 저장하고 있는 상위 파일 컨테이너인 ``onnx.ModelProto`` 를 리턴합니다.
+# ``onnx.ModelProto`` 에 대해 더 자세한 것은 `onnx.proto 기술문서 <https://github.com/onnx/onnx/blob/master/onnx/onnx.proto>`__ 에서
 # 확인하실 수 있습니다.
 # ``onnx.checker.check_model(onnx_model)`` 는 모델의 구조를 확인하고
 # 모델이 유효한 스키마(valid schema)를 가지고 있는지를 체크합니다.
@@ -182,7 +182,7 @@ print("Exported model has been tested with ONNXRuntime, and the result looks goo
 
 
 ######################################################################
-# 이제 PyTorch와 ONNX 런타임에서 연산된 결과값이 서로 일치하는지 오차범위 (rtol=1e-03, atol=1e-05)
+# 이제 PyTorch와 ONNX 런타임에서 연산된 결과값이 서로 일치하는지 오차범위( ``rtol=1e-03`` 와 ``atol=1e-05``)
 # 이내에서 확인해야 합니다.
 # 만약 결과가 일치하지 않는다면 ONNX 변환기에 문제가 있는 것이니 저희에게 알려주시기 바랍니다.
 #

@@ -137,9 +137,9 @@ def fused_gelu(x):
 # Support for ``channels_last`` is experimental, but it's expected to work for
 # standard computer vision models (e.g. ResNet-50, SSD). To convert models to
 # ``channels_last`` format follow
-# `Channels Last Memory Format Tutorial <https://pytorch.org/tutorials/intermediate/memory_format_tutorial.html>`_.
+# `Channels Last Memory Format Tutorial <https://tutorials.pytorch.kr/intermediate/memory_format_tutorial.html>`_.
 # The tutorial includes a section on
-# `converting existing models <https://pytorch.org/tutorials/intermediate/memory_format_tutorial.html#converting-existing-models>`_.
+# `converting existing models <https://tutorials.pytorch.kr/intermediate/memory_format_tutorial.html#converting-existing-models>`_.
 
 ###############################################################################
 # Checkpoint intermediate buffers
@@ -363,7 +363,7 @@ torch.backends.cudnn.benchmark = True
 #   * native PyTorch AMP is available starting from PyTorch 1.6:
 #     `documentation <https://pytorch.org/docs/stable/amp.html>`_,
 #     `examples <https://pytorch.org/docs/stable/notes/amp_examples.html#amp-examples>`_,
-#     `tutorial <https://pytorch.org/tutorials/recipes/recipes/amp_recipe.html>`_
+#     `tutorial <https://tutorials.pytorch.kr/recipes/recipes/amp_recipe.html>`_
 #
 #
 

@@ -7,7 +7,7 @@
 
 ######################################################################
 # Before working on this tutorial, please make sure to review our
-# `MaskedTensor Overview tutorial <https://pytorch.org/tutorials/prototype/maskedtensor_overview.html>`.
+# `MaskedTensor Overview tutorial <https://tutorials.pytorch.kr/prototype/maskedtensor_overview.html>`.
 #
 # Introduction
 # ------------
@@ -117,7 +117,7 @@ mt.sin()
 # ^^^^^^
 # `Binary operators <https://pytorch.org/docs/master/masked.html#unary-operators>`__ are also supported, but the
 # input masks from the two masked tensors must match. For more information on why this decision was made, please
-# find our `MaskedTensor: Advanced Semantics tutorial <https://pytorch.org/tutorials/prototype/maskedtensor_advanced_semantics.html>`__.
+# find our `MaskedTensor: Advanced Semantics tutorial <https://tutorials.pytorch.kr/prototype/maskedtensor_advanced_semantics.html>`__.
 #
 # Please find an example below:
 #
@@ -310,6 +310,6 @@ print("mt data:\n", mt.get_data())
 # ---------------
 #
 # To continue learning more, you can find our
-# `Efficiently writing "sparse" semantics for Adagrad with MaskedTensor tutorial <https://pytorch.org/tutorials/prototype/maskedtensor_adagrad.html>`__
+# `Efficiently writing "sparse" semantics for Adagrad with MaskedTensor tutorial <https://tutorials.pytorch.kr/prototype/maskedtensor_adagrad.html>`__
 # to see an example of how MaskedTensor can simplify existing workflows with native masking semantics.
 #

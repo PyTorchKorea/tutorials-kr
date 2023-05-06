@@ -328,6 +328,6 @@ print("torch.nanmean via maskedtensor:\n", torch.mean(masked_tensor(x, ~torch.is
 # ===============
 #
 # To continue learning more, you can find our
-# `MaskedTensor Sparsity tutorial <https://pytorch.org/tutorials/prototype/maskedtensor_sparsity.html>`__
+# `MaskedTensor Sparsity tutorial <https://tutorials.pytorch.kr/prototype/maskedtensor_sparsity.html>`__
 # to see how MaskedTensor enables sparsity and the different storage formats we currently support.
 #

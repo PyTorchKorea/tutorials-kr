@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-numpy 와 scipy 를 이용한 확장(Extensions) 만들기
+NumPy와 SciPy를 사용한 확장(Extension) 만들기
 =====================================================
+
 **Author**: `Adam Paszke <https://github.com/apaszke>`_
 
 **Updated by**: `Adam Dziedzic <https://github.com/adam-dziedzic>`_
@@ -11,7 +12,7 @@ numpy 와 scipy 를 이용한 확장(Extensions) 만들기
 이번 튜토리얼에서는 두 가지 작업을 수행할 것입니다:
 
 1. 매개 변수가 없는 신경망 계층(layer) 만들기
-    - 이는 구현의 일부로 **numpy** 를 호출합니다.
+    - 이는 구현의 일부로 **NumPy** 를 호출합니다.
 
 2. 학습 가능한 가중치가 있는 신경망 계층(layer) 만들기
     - 이는 구현의 일부로 **Scipy** 를 호출합니다.
@@ -26,7 +27,7 @@ from torch.autograd import Function
 #
 # 이 계층(layer)은 특별히 유용하거나 수학적으로 올바른 작업을 수행하지 않습니다.
 #
-# 이름은 대충 BadFFTFunction으로 지었습니다.
+# 이름은 대충 ``BadFFTFunction`` 으로 지었습니다.
 #
 # **계층(layer) 구현**
 
@@ -46,7 +47,7 @@ class BadFFTFunction(Function):
         result = irfft2(numpy_go)
         return grad_output.new(result)
 
-# 이 계층에는 매개 변수가 없으므로 nn.Module 클래스가 아닌 함수로 간단히 선언할 수 있습니다.
+# 이 계층에는 매개 변수가 없으므로 ``nn.Module`` 클래스가 아닌 함수로 간단히 선언할 수 있습니다.
 
 
 def incorrect_fft(input):

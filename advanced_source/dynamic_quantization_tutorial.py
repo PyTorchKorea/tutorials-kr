@@ -72,7 +72,7 @@ class LSTMModel(nn.Module):
 
 ######################################################################
 # 2. 텍스트 데이터 불러오기
-# ------------------------
+# ---------------------------
 #
 # 다음으로, 단어 단위 언어 모델 예제의 `전처리 <https://github.com/pytorch/examples/blob/master/word_language_model/data.py>`_
 # 과정을 따라 `Wikitext-2 데이터셋 <https://www.google.com/search?q=wikitext+2+data>`_ 을 `Corpus` 인스턴스에 불러옵니다.
@@ -195,11 +195,11 @@ eval_batch_size = 1
 
 # 테스트 데이터셋 만들기
 def batchify(data, bsz):
-    # 데이터셋을 bsz 부분으로 얼마나 깔끔하게 나눌 수 있는지 계산합니다.
+    # 데이터셋을 ``bsz`` 부분으로 얼마나 깔끔하게 나눌 수 있는지 계산합니다.
     nbatch = data.size(0) // bsz
     # 깔끔하게 맞지 않는 추가적인 부분(나머지들)을 잘라냅니다.
     data = data.narrow(0, 0, nbatch * bsz)
-    # 데이터에 대하여 bsz 배치들로 동등하게 나눕니다.
+    # 데이터에 대하여 ``bsz`` 묶음(batch)들로 동등하게 나눕니다.
     return data.view(bsz, -1).t().contiguous()
 
 test_data = batchify(corpus.test, eval_batch_size)

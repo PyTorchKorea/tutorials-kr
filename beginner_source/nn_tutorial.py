@@ -2,16 +2,14 @@
 """
 `torch.nn` 이 *실제로* 무엇인가요?
 =====================================
-저자: Jeremy Howard, `fast.ai <https://www.fast.ai>`_.
 
-도움: Rachel Thomas, Francisco Ingham.
+**저자**: Jeremy Howard, `fast.ai <https://www.fast.ai>`_.  Rachel Thomas, Francisco Ingham에 감사합니다.
 
-번역: `남상호 <https://github.com/namdori61>`_
-
+**번역**: `남상호 <https://github.com/namdori61>`_
 """
 
 ###############################################################################
-# 이 튜토리얼을 스크립트가 아닌 노트북으로 실행하기를 권장합니다. 노트북 (.ipynb) 파일을 다운 받으시려면,
+# 이 튜토리얼을 스크립트가 아닌 노트북으로 실행하기를 권장합니다. 노트북 (``.ipynb``) 파일을 다운 받으시려면,
 # 페이지 상단에 있는 링크를 클릭해주세요.
 #
 # PyTorch 는 여러분이 신경망(neural network)를 생성하고 학습시키는 것을 도와주기 위해서
@@ -30,7 +28,7 @@
 # 이것이 어떻게 코드를 더 간결하고 유연하게 만드는지 보여줄 것입니다.
 #
 # **이 튜토리얼은 여러분이 이미 PyTorch를 설치하였고, 그리고 텐서 연산의 기초에 대해 익숙하다고 가정합니다.**
-# (만약 여러분이 Numpy 배열(array) 연산에 익숙하다면, 여기에서 사용되는 PyTorch 텐서 연산도
+# (만약 여러분이 NumPy 배열(array) 연산에 익숙하다면, 여기에서 사용되는 PyTorch 텐서 연산도
 # 거의 동일하다는 것을 알게 될 것입니다).
 #
 # MNIST 데이터 준비
@@ -61,7 +59,7 @@ if not (PATH / FILENAME).exists():
         (PATH / FILENAME).open("wb").write(content)
 
 ###############################################################################
-# 이 데이터셋은 numpy 배열 포맷이고, 데이터를 직렬화하기 위한
+# 이 데이터셋은 NumPy 배열 포맷이고, 데이터를 직렬화하기 위한
 # python 전용 포맷 pickle 을 이용하여 저장되어 있습니다.
 
 import pickle
@@ -81,7 +79,7 @@ pyplot.imshow(x_train[0].reshape((28, 28)), cmap="gray")
 print(x_train.shape)
 
 ###############################################################################
-# PyTorch는 numpy 배열 보다는 ``torch.tensor`` 를 사용하므로, 우리는 데이터를 변환해야 합니다.
+# PyTorch는 NumPy 배열 보다는 ``torch.tensor`` 를 사용하므로, 우리는 데이터를 변환해야 합니다.
 
 import torch
 
@@ -94,8 +92,8 @@ print(x_train.shape)
 print(y_train.min(), y_train.max())
 
 ###############################################################################
-# torch.nn 없이 밑바닥부터 신경망 만들기
-# ---------------------------------------------
+# ()``torch.nn`` 없이) 밑바닥부터 신경망 만들기
+# -----------------------------------------------
 #
 # PyTorch 텐서 연산만으로 첫 모델을 만들어봅시다.
 # 여러분이 신경망의 기초에 대해서 이미 익숙하다고 가정합니다.
@@ -113,7 +111,7 @@ print(y_train.min(), y_train.max())
 # (PyTorch에서 ``_`` 다음에 오는 메소드 이름은 연산이 인플레이스(in-place)로 수행되는 것을 의미합니다.)
 #
 # .. note:: `Xavier initialisation <http://proceedings.mlr.press/v9/glorot10a/glorot10a.pdf>`_
-#    기법을 이용하여 가중치를 초기화 합니다. (1/sqrt(n)을 곱해주는 것을 통해서 초기화).
+#    기법을 이용하여 가중치를 초기화 합니다. (``1/sqrt(n)`` 을 곱해서 초기화).
 
 import math
 
@@ -242,8 +240,8 @@ for epoch in range(epochs):
 print(loss_func(model(xb), yb), accuracy(model(xb), yb))
 
 ###############################################################################
-# torch.nn.functional 사용하기
-# ------------------------------
+# ``torch.nn.functional`` 사용하기
+# -----------------------------------
 #
 # 이제 우리는 코드를 리팩토링(refactoring) 하겠습니다, 그럼으로써 이전과 동일하지만,
 # PyTorch의 ``nn`` 클래스의 장점을 활용하여 더 간결하고 유연하게 만들 것입니다.
@@ -260,7 +258,7 @@ print(loss_func(model(xb), yb), accuracy(model(xb), yb))
 # 앞으로 보시겠지만 일반적으로 라이브러리의 다른 부분을 사용하여 더 잘 처리 할 수 있습니다.)
 #
 # 만약 여러분들이 음의 로그 우도 손실과 로그 소프트맥스 (log softmax) 활성화 함수를 사용하는 경우,
-# Pytorch는 이 둘을 결합하는 단일 함수인 ``F.cross_entropy`` 를 제공합니다.
+# PyTorch는 이 둘을 결합하는 단일 함수인 ``F.cross_entropy`` 를 제공합니다.
 # 따라서 모델에서 활성화 함수를 제거할 수도 있습니다.
 
 import torch.nn.functional as F
@@ -277,8 +275,8 @@ def model(xb):
 print(loss_func(model(xb), yb), accuracy(model(xb), yb))
 
 ###############################################################################
-# nn.Module 을 이용하여 리팩토링 하기
-# --------------------------------------
+# ``nn.Module`` 을 이용하여 리팩토링 하기
+# -----------------------------------------
 # 다음으로, 더 명확하고 간결한 훈련 루프를 위해 ``nn.Module`` 및 ``nn.Parameter`` 를 사용합니다.
 # 우리는 ``nn.Module`` (자체가 클래스이고 상태를 추척할 수 있는) 하위 클래스(subclass)를 만듭니다.
 # 이 경우에는, 포워드(forward) 단계에 대한 가중치, 절편, 그리고 메소드(method) 등을 유지하는
@@ -311,7 +309,7 @@ model = Mnist_Logistic()
 ###############################################################################
 # 이제 우리는 이전과 동일한 방식으로 손실을 계산할 수 있습니다.
 # 여기서 ``nn.Module`` 오브젝트들은 마치 함수처럼 사용됩니다 (즉, 이들은 *호출가능* 합니다),
-# 그러나 배후에서 Pytorch 는 우리의 ``forward`` 메소드를 자동으로 호출합니다.
+# 그러나 배후에서 PyTorch 는 우리의 ``forward`` 메소드를 자동으로 호출합니다.
 
 print(loss_func(model(xb), yb))
 
@@ -321,11 +319,11 @@ print(loss_func(model(xb), yb))
 #
 # ::
 #
-#   with torch.no_grad():
-#       weights -= weights.grad * lr
-#       bias -= bias.grad * lr
-#       weights.grad.zero_()
-#       bias.grad.zero_()
+#    with torch.no_grad():
+#        weights -= weights.grad * lr
+#        bias -= bias.grad * lr
+#        weights.grad.zero_()
+#        bias.grad.zero_()
 #
 #
 # 이제 우리는 model.parameters() 및 model.zero_grad() (모두
@@ -334,9 +332,9 @@ print(loss_func(model(xb), yb))
 #
 # ::
 #
-#   with torch.no_grad():
-#       for p in model.parameters(): p -= p.grad * lr
-#       model.zero_grad()
+#    with torch.no_grad():
+#        for p in model.parameters(): p -= p.grad * lr
+#        model.zero_grad()
 #
 #
 # 이제 이것을 나중에 다시 실행할 수 있도록 ``fit`` 함수로 작은 훈련 루프를 감쌀 것입니다.
@@ -365,15 +363,15 @@ fit()
 print(loss_func(model(xb), yb))
 
 ###############################################################################
-# nn.Linear 를 이용하여 리팩토링 하기
-# ------------------------------------
+# ``nn.Linear`` 를 사용하여 리팩토링 하기
+# -----------------------------------------
 #
 # 계속해서 코드를 리팩토링 합니다. ``self.weights`` 및 ``self.bias`` 를 수동으로 정의 및
 # 초기화하고, ``xb  @ self.weights + self.bias`` 를 계산하는 대신에,
-# 위의 모든 것을 해줄 Pytorch 클래스인
+# 위의 모든 것을 해줄 PyTorch 클래스인
 # `nn.Linear <https://pytorch.org/docs/stable/nn.html#linear-layers>`_ 를 선형
 # 레이어로 사용합니다.
-# Pytorch 에는 다양한 유형의 코드를 크게 단순화 할 수 있는 미리 정의된 레이어가 있고 이는 또한
+# PyTorch 에는 다양한 유형의 코드를 크게 단순화 할 수 있는 미리 정의된 레이어가 있고 이는 또한
 # 종종 기존 코드보다 속도를 빠르게 합니다.
 
 class Mnist_Logistic(nn.Module):
@@ -398,10 +396,10 @@ fit()
 print(loss_func(model(xb), yb))
 
 ###############################################################################
-# optim 을 이용하여 리팩토링 하기
+# ``torch.optim`` 을 이용하여 리팩토링 하기
 # ---------------------------------
 #
-# Pytorch에는 다양한 최적화(optimization) 알고리즘을 가진 패키지인 ``torch.optim`` 도 있습니다.
+# PyTorch에는 다양한 최적화(optimization) 알고리즘을 가진 패키지인 ``torch.optim`` 도 있습니다.
 # 각 매개변수를 수동으로 업데이트 하는 대신, 옵티마이저(optimizer)의 ``step`` 메소드를 사용하여
 # 업데이트를 진행할 수 있습니다.
 #
@@ -409,16 +407,16 @@ print(loss_func(model(xb), yb))
 #
 # ::
 #
-#   with torch.no_grad():
-#       for p in model.parameters(): p -= p.grad * lr
-#       model.zero_grad()
+#    with torch.no_grad():
+#        for p in model.parameters(): p -= p.grad * lr
+#        model.zero_grad()
 #
 # 대신에 이렇게 말이죠:
 #
 # ::
 #
-#   opt.step()
-#   opt.zero_grad()
+#    opt.step()
+#    opt.zero_grad()
 #
 # (``optim.zero_grad()`` 는 기울기를 0으로 재설정 해줍니다. 다음 미니 배치에 대한
 # 기울기를 계산하기 전에 호출해야 합니다.)
@@ -476,7 +474,7 @@ from torch.utils.data import TensorDataset
 train_ds = TensorDataset(x_train, y_train)
 
 ###############################################################################
-# 이전에는 x 및 y 값의 미니 배치를 별도로 반복해야했습니다:
+# 이전에는 ``x`` 및 ``y`` 값의 미니 배치를 별도로 반복해야 했습니다:
 #
 # ::
 #
@@ -484,7 +482,7 @@ train_ds = TensorDataset(x_train, y_train)
 #     yb = y_train[start_i:end_i]
 #
 #
-# 이제 이 두 단계를 함께 수행 할 수 있습니다:
+# 이제 이 두 단계를 함께 수행할 수 있습니다:
 #
 # ::
 #
@@ -506,14 +504,14 @@ for epoch in range(epochs):
 print(loss_func(model(xb), yb))
 
 ###############################################################################
-# DataLoader 를 이용하여 리팩토링하기
+# ``DataLoader`` 를 사용하여 리팩토링하기
 # -----------------------------------
 #
-# Pytorch 의 ``DataLoader`` 는 배치 관리를 담당합니다.
+# PyTorch 의 ``DataLoader`` 는 배치 관리를 담당합니다.
 # 여러분들은 모든 ``Dataset`` 으로부터 ``DataLoader`` 를 생성할 수 있습니다.
 # ``DataLoader`` 는 배치들에 대해서 반복하기 쉽게 만들어줍니다.
 # ``train_ds[i*bs : i*bs+bs]`` 를 사용하는 대신,
-# DataLoader 는 매 미니배치를 자동적으로 제공합니다.
+# ``DataLoader`` 는 매 미니배치를 자동적으로 제공합니다.
 
 from torch.utils.data import DataLoader
 
@@ -521,20 +519,20 @@ train_ds = TensorDataset(x_train, y_train)
 train_dl = DataLoader(train_ds, batch_size=bs)
 
 ###############################################################################
-# 이전에는 루프가 다음과 같이 배치 (xb, yb)를 반복했습니다:
+# 이전에는 루프가 다음과 같이 배치 ``(xb, yb)`` 를 반복했습니다:
 #
 # ::
 #
-#       for i in range((n-1)//bs + 1):
-#           xb,yb = train_ds[i*bs : i*bs+bs]
-#           pred = model(xb)
+#     for i in range((n-1)//bs + 1):
+#         xb,yb = train_ds[i*bs : i*bs+bs]
+#         pred = model(xb)
 #
 # 이제 (xb, yb)가 DataLoader 에서 자동으로 로드되므로 루프가 훨씬 깨끗해졌습니다:
 #
 # ::
 #
-#       for xb,yb in train_dl:
-#           pred = model(xb)
+#     for xb,yb in train_dl:
+#         pred = model(xb)
 
 model, opt = get_model()
 
@@ -550,7 +548,7 @@ for epoch in range(epochs):
 print(loss_func(model(xb), yb))
 
 ###############################################################################
-# Pytorch의 nn.Module, nn.Parameter, Dataset 및 DataLoader 덕분에 이제 훈련 루프가
+# PyTorch의 nn.Module, nn.Parameter, Dataset 및 DataLoader 덕분에 이제 훈련 루프가
 # 훨씬 더 작아지고 이해하기 쉬워졌습니다.
 # 이제 실제로 효과적인 모델을 만드는 데 필요한 기본 기능을 추가해 보겠습니다.
 #
@@ -673,11 +671,11 @@ fit(epochs, model, loss_func, opt, train_dl, valid_dl)
 # 이전 섹션의 어떤 함수도 모델의 형식에 대해 가정하지 않기 때문에,
 # 별도의 수정없이 CNN을 학습하는 데 사용할 수 있습니다.
 #
-# Pytorch 의 사전정의된
+# Pytorch의 사전정의된
 # `Conv2d <https://pytorch.org/docs/stable/nn.html#torch.nn.Conv2d>`_ 클래스를
 # 컨볼루션 레이어로 사용합니다. 3개의 컨볼루션 레이어로 CNN을 정의합니다.
 # 각 컨볼루션 뒤에는 ReLU가 있습니다. 마지막으로 평균 풀링(average pooling)을 수행합니다.
-# (``view`` 는 PyTorch의 numpy ``reshape`` 버전입니다.)
+# (``view`` 는 PyTorch의 NumPy ``reshape`` 버전입니다.)
 
 class Mnist_CNN(nn.Module):
     def __init__(self):
@@ -707,8 +705,8 @@ opt = optim.SGD(model.parameters(), lr=lr, momentum=0.9)
 fit(epochs, model, loss_func, opt, train_dl, valid_dl)
 
 ###############################################################################
-# nn.Sequential
-# ------------------------
+# ``nn.Sequential`` 사용하기
+# ----------------------------
 #
 # ``torch.nn`` 에는 코드를 간단히 사용할 수 있는 또 다른 편리한 클래스인
 # `Sequential <https://pytorch.org/docs/stable/nn.html#torch.nn.Sequential>`_
@@ -753,7 +751,7 @@ opt = optim.SGD(model.parameters(), lr=lr, momentum=0.9)
 fit(epochs, model, loss_func, opt, train_dl, valid_dl)
 
 ###############################################################################
-# DataLoader 감싸기
+# ``DataLoader`` 감싸기
 # -----------------------------
 #
 # 우리의 CNN은 상당히 간결하지만, MNIST에서만 작동합니다, 왜냐하면:
@@ -813,7 +811,7 @@ fit(epochs, model, loss_func, opt, train_dl, valid_dl)
 #
 # 만약 여러분들이 운이 좋아서 CUDA 지원 GPU (대부분의 클라우드 제공 업체에서
 # 시간당 약 $0.50 에 이용할 수 있습니다) 를 사용할 수 있다면, 코드 실행 속도를 높일 수 있습니다.
-# 먼저 GPU가 Pytorch에서 작동하는지 확인합니다:
+# 먼저 GPU가 PyTorch에서 작동하는지 확인합니다:
 
 print(torch.cuda.is_available())
 
@@ -864,7 +862,7 @@ fit(epochs, model, loss_func, opt, train_dl, valid_dl)
 # 그리고 ``DataLoader`` 의 각 예제를 통해 설명하겠다고 이야기했었습니다.
 # 이제 위의 내용들을 요약해보겠습니다:
 #
-#  - **torch.nn**
+#  - ``torch.nn``:
 #
 #    + ``Module``: 함수처럼 동작하지만, 또한 상태(state) (예를 들어, 신경망의 레이어 가중치)를
 #      포함할 수 있는 호출 가능한 오브젝트를 생성합니다.
@@ -877,6 +875,6 @@ fit(epochs, model, loss_func, opt, train_dl, valid_dl)
 #      상태를 저장하지않는(non-stateful) 버전의 레이어를 포함합니다.
 #  - ``torch.optim``: 역전파 단계에서 ``Parameter`` 의 가중치를 업데이트하는,
 #    ``SGD`` 와 같은 옵티마이저를 포함합니다.
-#  - ``Dataset``: ``TensorDataset`` 과 같이 Pytorch와 함께 제공되는 클래스를 포함하여 ``__len__`` 및
+#  - ``Dataset``: ``TensorDataset`` 과 같이 PyTorch와 함께 제공되는 클래스를 포함하여 ``__len__`` 및
 #    ``__getitem__`` 이 있는 객체의 추상 인터페이스
 #  - ``DataLoader``: 모든 종류의 ``Dataset`` 을 기반으로 데이터의 배치들을 출력하는 반복자(iterator)를 생성합니다.

@@ -44,16 +44,20 @@ FaceBook에서 발표한 Data-efficient Image Transformers는 `DeiT <https://ai.
 # DeiT를 활용한 이미지 분류
 # -------------------------------
 #
-# DeiT를 사용하여 이미지를 분류하는 방법에 대한 자세한 정보는 DeiT 저장소에 README를 참고하시길 바랍니다.
+# DeiT를 사용하여 이미지를 분류하는 방법에 대한 자세한 정보는 DeiT 저장소의 ``README.md`` 를 참고하시길 바랍니다.
 # 빠른 테스트를 위해서, 먼저 필요한 패키지들을
 # 설치합니다:
 #
-# pip install torch torchvision timm pandas requests
+# .. code-block:: python
+#
+#    pip install torch torchvision timm pandas requests
 
 #######################################################
 # Google Colab에서는 아래와 같이 실행합니다:
-
-# !pip install timm pandas requests
+#
+# .. code-block:: python
+#
+#    !pip install timm pandas requests
 
 #############################
 # 그런 다음 아래 스크립트를 실행합니다:
@@ -89,7 +93,7 @@ print(clsidx.item())
 
 ######################################################################
 # ImageNet 목록에 따라 `라벨(labels) 파일 <https://gist.github.com/yrevar/942d3a0ac09ec9e5eb3a>`_
-# 클래스 인덱스의 출력은 269여야 하며, 이는 ‘timber wolf, grey wolf, gray wolf, Canis lupus’에 매핑됩니다.
+# 클래스 인덱스의 출력은 269여야 하며, 이는 ``timber wolf, grey wolf, gray wolf, Canis lupus`` 에 매핑됩니다.
 #
 # 이제 DeiT 모델을 사용하여 이미지들을 분류할 수 있음을 확인했습니다.
 # iOS 및 Android 앱에서 실행할 수 있도록 모델을 수정하는 방법을 살펴보겠습니다.
@@ -112,7 +116,7 @@ scripted_model.save("fbdeit_scripted.pt")
 
 
 ######################################################################
-# 약 346MB 크기의 스크립팅된 모델 파일 fbdeit_scripted.pt가 생성됩니다.
+# 약 346MB 크기의 스크립팅된 모델 파일 ``fbdeit_scripted.pt`` 가 생성됩니다.
 #
 #
 
@@ -131,8 +135,10 @@ scripted_model.save("fbdeit_scripted.pt")
 # 아래의 코드를 실행시켜 봅시다.
 #
 
+# 서버 추론을 위해 'x86'을, 모바일 추론을 위해 ``qnnpack`` 을 사용합니다.
+# (이전의 'fbgemm' 또한 여전히 사용 가능하지만, 'x86'을 기본으로 사용하는 것을 권장합니다.)
 # 서버 추론을 위해 'fbgemm'을, 모바일 추론을 위해 'qnnpack'을 사용해 봅시다.
-backend = "fbgemm" # 이 주피터 노트북에서는 양자화된 모델의 더 느린 추론 속도를 일으키는 qnnpack으로 대체되었습니다.
+backend = "x86" # 이 주피터 노트북에서는 양자화된 모델의 더 느린 추론 속도를 일으키는 ``qnnpack`` 으로 대체되었습니다.
 model.qconfig = torch.quantization.get_default_qconfig(backend)
 torch.backends.quantized.engine = backend
 
@@ -142,7 +148,7 @@ scripted_quantized_model.save("fbdeit_scripted_quantized.pt")
 
 
 ######################################################################
-# fbdeit_quantized_scripted.pt 모델의 스크립팅과 양자화가 적용된 버전이 만들어졌습니다.
+# ``fbdeit_quantized_scripted.pt`` 모델의 스크립팅과 양자화가 적용된 버전이 만들어졌습니다.
 # 모델의 크기는 단지 89MB 입니다.
 # 양자화가 적용되지 않은 모델의 크기인 346MB보다 74%나 감소했습니다!
 #
@@ -170,7 +176,7 @@ optimized_scripted_quantized_model.save("fbdeit_optimized_scripted_quantized.pt"
 
 
 ######################################################################
-# 생성된 fbdeit_optimized_scripted_quantized.pt 파일은
+# 생성된 ``fbdeit_optimized_scripted_quantized.pt`` 파일은
 # 양자화되고 스크립트되지만 최적화되지 않은 모델과 크기가 거의 같습니다.
 # 추론 결과는 동일하게 유지됩니다.
 #

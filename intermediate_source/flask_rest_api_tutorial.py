@@ -158,8 +158,8 @@ with open("../_static/img/sample_file.jpeg", 'rb') as f:
 
 from torchvision import models
 
-# 이미 학습된 가중치를 사용하기 위해 `pretrained` 에 `True` 값을 전달합니다:
-model = models.densenet121(pretrained=True)
+# 이미 학습된 가중치를 사용하기 위해 `weights` 에 `IMAGENET1K_V1` 값을 전달합니다:
+model = models.densenet121(weights='IMAGENET1K_V1')
 # 모델을 추론에만 사용할 것이므로, `eval` 모드로 변경합니다:
 model.eval()
 
@@ -262,7 +262,7 @@ with open("../_static/img/sample_file.jpeg", 'rb') as f:
 #
 #   app = Flask(__name__)
 #   imagenet_class_index = json.load(open('<PATH/TO/.json/FILE>/imagenet_class_index.json'))
-#   model = models.densenet121(pretrained=True)
+#   model = models.densenet121(weights='IMAGENET1K_V1')
 #   model.eval()
 #
 #
@@ -310,10 +310,10 @@ with open("../_static/img/sample_file.jpeg", 'rb') as f:
 #
 # .. code-block:: python
 #
-#   import requests
+#    import requests
 #
-#   resp = requests.post("http://localhost:5000/predict",
-#                        files={"file": open('<PATH/TO/.jpg/FILE>/cat.jpg','rb')})
+#    resp = requests.post("http://localhost:5000/predict",
+#                         files={"file": open('<PATH/TO/.jpg/FILE>/cat.jpg','rb')})
 
 #######################################################################
 # `resp.json()` 을 호출하면 다음과 같은 결과를 출력합니다:

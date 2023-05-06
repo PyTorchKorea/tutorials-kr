@@ -1,5 +1,5 @@
 """
-nn.Transformer와 torchtext로 언어 번역하기
+``nn.Transformer`` 와 torchtext로 언어 번역하기
 ======================================================
 
 이 튜토리얼에서는,
@@ -41,13 +41,17 @@ TGT_LANGUAGE = 'en'
 token_transform = {}
 vocab_transform = {}
 
-
+###################################################################################
 # 출발어(source)와 목적어(target)의 토크나이저(tokenizer)를 생성합니다.
 # 아래 필요 사항(dependency)을 모두 설치해주세요.
-# pip install -U torchdata
-# pip install -U spacy
-# python -m spacy download en_core_web_sm
-# python -m spacy download de_core_news_sm
+#
+# .. code-block:: python
+#
+#    pip install -U torchdata
+#    pip install -U spacy
+#    python -m spacy download en_core_web_sm
+#    python -m spacy download de_core_news_sm
+
 token_transform[SRC_LANGUAGE] = get_tokenizer('spacy', language='de_core_news_sm')
 token_transform[TGT_LANGUAGE] = get_tokenizer('spacy', language='en_core_web_sm')
 
@@ -73,9 +77,9 @@ for ln in [SRC_LANGUAGE, TGT_LANGUAGE]:
                                                     specials=special_symbols,
                                                     special_first=True)
 
-# UNK_IDX를 기본 인덱스로 설정합니다. 이 인덱스는 토큰을 찾지 못하는 경우에 반환됩니다.
+# ``UNK_IDX`` 를 기본 인덱스로 설정합니다. 이 인덱스는 토큰을 찾지 못하는 경우에 반환됩니다.
 # 만약 기본 인덱스를 설정하지 않으면 어휘집(Vocabulary)에서 토큰을 찾지 못하는 경우
-# RuntimeError가 발생합니다.
+# ``RuntimeError`` 가 발생합니다.
 for ln in [SRC_LANGUAGE, TGT_LANGUAGE]:
     vocab_transform[ln].set_default_index(UNK_IDX)
 
@@ -183,7 +187,7 @@ class Seq2SeqTransformer(nn.Module):
 
 
 ######################################################################
-# 학습하는 동안, 모델이 예측하는 동안 정답(이후 출현하는 단어)을 보지 못하도록 하는
+# 학습하는 동안, 모델이 예측할 때 정답(이후 출현하는 단어)을 보지 못하도록 하는
 # 후속 단어 마스크(subsequent word mask)가 필요합니다. 또한, 출발어와 도착어의 패딩(padding) 토큰들
 # 또한 숨겨야 합니다. 아래에 두 가지 모두를 처리할 함수를 정의해보겠습니다.
 #

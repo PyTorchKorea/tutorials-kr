@@ -2,6 +2,7 @@
 """
 기초부터 시작하는 NLP: 문자-단위 RNN으로 이름 분류하기
 ********************************************************************************
+
 **Author**: `Sean Robertson <https://github.com/spro/practical-pytorch>`_
   **번역**: `황성수 <https://github.com/adonisues>`_, `김제필 <https://github.com/garlicvread>`_
 
@@ -55,7 +56,7 @@ RNN과 그 작동 방식을 아는 것 또한 유용합니다:
    `여기 <https://download.pytorch.org/tutorial/data.zip>`__ 에서 데이터를 다운로드 받고
    현재 디렉토리에 압축을 푸십시오.
 
-``data/names`` 디렉토리에는 "[Language].txt" 라는 18 개의 텍스트 파일이 있습니다.
+``data/names`` 디렉토리에는 ``[Language].txt`` 라는 18 개의 텍스트 파일이 있습니다.
 각 파일에는 한 줄에 하나의 이름이 포함되어 있으며 대부분 로마자로 되어 있습니다.
 (그러나, 유니코드에서 ASCII로 변환해야 함).
 
@@ -186,7 +187,7 @@ print(lineToTensor('Jones').size())
 # <https://tutorials.pytorch.kr/beginner/former_torchies/
 # nnft_tutorial.html#example-2-recurrent-net>`__ 에서 복사함)은
 # 입력 및 은닉 상태로 작동하는 2개의 선형 계층이며,
-# 출력 다음에 LogSoftmax 계층이 있습니다.
+# 출력 다음에 ``LogSoftmax`` 계층이 있습니다.
 #
 # .. figure:: https://i.imgur.com/Z2xbySO.png
 #    :alt:
@@ -378,7 +379,7 @@ for iter in range(1, n_iters + 1):
     output, loss = train(category_tensor, line_tensor)
     current_loss += loss
 
-    # iter 숫자, 손실, 이름, 추측 화면 출력
+    # ``iter`` 숫자, 손실, 이름, 추측 화면 출력
     if iter % print_every == 0:
         guess, guess_i = categoryFromOutput(output)
         correct = '✓' if guess == category else '✗ (%s)' % category
@@ -501,7 +502,7 @@ predict('Satoshi')
 # -  ``model.py`` (RNN 정의)
 # -  ``train.py`` (학습 실행)
 # -  ``predict.py`` (커맨드 라인 인자로 ``predict()`` 실행)
-# -  ``server.py`` (bottle.py를 사용하여 JSON API로 예측 제공)
+# -  ``server.py`` (``bottle.py`` 를 사용하여 JSON API로 예측 제공)
 #
 # 학습과 네트워크 저장을 위해 ``train.py`` 실행.
 #

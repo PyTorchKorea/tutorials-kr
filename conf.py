@@ -30,7 +30,7 @@
 import os
 import sys
 sys.path.insert(0, os.path.abspath('.'))
-sys.path.insert(0, os.path.abspath('./.build'))
+sys.path.insert(0, os.path.abspath('./.build'))     # pytorch/tutorials의 .jenkins/ 의 일부 파일들을 .build/ 에 복사하여 사용
 import pytorch_sphinx_theme
 import torch
 import glob
@@ -38,7 +38,7 @@ import shutil
 from custom_directives import IncludeDirective, GalleryItemDirective, CustomGalleryItemDirective, CustomCalloutItemDirective, CustomCardItemDirective
 import distutils.file_util
 import re
-from validate_tutorials_built import NOT_RUN
+from get_sphinx_filenames import SPHINX_SHOULD_RUN
 
 import plotly.io as pio
 pio.renderers.default = 'sphinx_gallery'
@@ -80,6 +80,8 @@ extensions = [
 
 intersphinx_mapping = {
     "torch": ("https://pytorch.org/docs/stable/", None),
+    "tensordict": ("https://pytorch-labs.github.io/tensordict/", None),
+    "torchrl": ("https://pytorch.org/rl/", None),
     "torchaudio": ("https://pytorch.org/audio/stable/", None),
     "torchtext": ("https://pytorch.org/text/stable/", None),
     "torchvision": ("https://pytorch.org/vision/stable/", None),
@@ -107,10 +109,12 @@ sphinx_gallery_conf = {
     'examples_dirs': ['beginner_source', 'intermediate_source',
                       'advanced_source', 'recipes_source', 'prototype_source'],
     'gallery_dirs': ['beginner', 'intermediate', 'advanced', 'recipes', 'prototype'],
-    'filename_pattern': '.py',
-    'ignore_pattern': re.compile(f"({'|'.join(NOT_RUN)}).py$"),
+    'filename_pattern': re.compile(SPHINX_SHOULD_RUN),
     'promote_jupyter_magic': True,
-    'backreferences_dir': None
+    'backreferences_dir': None,
+    'first_notebook_cell': ("# Google Colab에서 노트북을 실행하실 때에는 \n"
+                            "# https://tutorials.pytorch.kr/beginner/colab 를 참고하세요.\n"
+                            "%matplotlib inline")
 }
 
 if os.getenv('GALLERY_PATTERN'):
@@ -153,7 +157,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'PyTorch Tutorials'
-copyright = '2022, PyTorch & 파이토치 한국 사용자 모임(PyTorch Korea User Group)'
+copyright = '2018-2023, PyTorch & 파이토치 한국 사용자 모임(PyTorch Korea User Group)'
 author = 'PyTorch contributors'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -230,6 +234,7 @@ html_theme_options = {
     'collapse_navigation': False,
     'display_version': True,
     'logo_only': False,
+    'navigation_with_keys': True,
 }
 
 

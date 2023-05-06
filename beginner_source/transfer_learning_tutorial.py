@@ -2,6 +2,7 @@
 """
 컴퓨터 비전(Vision)을 위한 전이학습(Transfer Learning)
 =======================================================
+
 **Author**: `Sasank Chilamkurthy <https://chsasank.github.io>`_
   **번역**: `박정환 <http://github.com/9bow>`_
 
@@ -103,7 +104,7 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 # 데이터 증가를 이해하기 위해 일부 학습용 이미지를 시각화해보겠습니다.
 
 def imshow(inp, title=None):
-    """Imshow for Tensor."""
+    """tensor를 입력받아 일반적인 이미지로 보여줍니다."""
     inp = inp.numpy().transpose((1, 2, 0))
     mean = np.array([0.485, 0.456, 0.406])
     std = np.array([0.229, 0.224, 0.225])
@@ -126,7 +127,7 @@ imshow(out, title=[class_names[x] for x in classes])
 
 ######################################################################
 # 모델 학습하기
-# --------------
+# ---------------
 #
 # 이제 모델을 학습하기 위한 일반 함수를 작성해보겠습니다. 여기서는 다음 내용들을
 # 설명합니다:
@@ -240,15 +241,15 @@ def visualize_model(model, num_images=6):
 
 ######################################################################
 # 합성곱 신경망 미세조정(finetuning)
-# ----------------------------------
+# ------------------------------------
 #
 # 미리 학습한 모델을 불러온 후 마지막의 완전히 연결된 계층을 초기화합니다.
 #
 
-model_ft = models.resnet18(pretrained=True)
+model_ft = models.resnet18(weights='IMAGENET1K_V1')
 num_ftrs = model_ft.fc.in_features
 # 여기서 각 출력 샘플의 크기는 2로 설정합니다.
-# 또는, nn.Linear(num_ftrs, len (class_names))로 일반화할 수 있습니다.
+# 또는, ``nn.Linear(num_ftrs, len (class_names))`` 로 일반화할 수 있습니다.
 model_ft.fc = nn.Linear(num_ftrs, 2)
 
 model_ft = model_ft.to(device)
@@ -290,7 +291,7 @@ visualize_model(model_ft)
 # 에서 확인할 수 있습니다.
 #
 
-model_conv = torchvision.models.resnet18(pretrained=True)
+model_conv = torchvision.models.resnet18(weights='IMAGENET1K_V1')
 for param in model_conv.parameters():
     param.requires_grad = False
 

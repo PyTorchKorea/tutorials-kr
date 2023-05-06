@@ -4,14 +4,14 @@ Customize Process Group Backends Using Cpp Extensions
 **Author**: `Feng Tian <https://github.com/ftian1>`__, `Shen Li <https://mrshenli.github.io/>`__, `Min Si <https://minsii.github.io/>`__
 
 .. note::
-   |edit| View and edit this tutorial in `github <https://github.com/pytorch/tutorials/blob/master/intermediate_source/process_group_cpp_extension_tutorial.rst>`__.
+   |edit| View and edit this tutorial in `github <https://github.com/pytorch/tutorials/blob/main/intermediate_source/process_group_cpp_extension_tutorial.rst>`__.
 
 Prerequisites:
 
 -  `PyTorch Distributed Overview <../beginner/dist_overview.html>`__
 -  `PyTorch Collective Communication Package <https://pytorch.org/docs/stable/distributed.html>`__
 -  `PyTorch Cpp Extension <https://pytorch.org/docs/stable/cpp_extension.html>`__
--  `Writing Distributed Applications with PyTorch <https://pytorch.org/tutorials/intermediate/dist_tuto.html>`__
+-  `Writing Distributed Applications with PyTorch <https://tutorials.pytorch.kr/intermediate/dist_tuto.html>`__
 
 This tutorial demonstrates how to implement a custom ``ProcessGroup``
 backend and plug that into
@@ -101,7 +101,7 @@ repository for the full implementation.
         // The collective communication APIs without a custom implementation
         // will error out if invoked by application code.
     };
-    
+
     class WorkDummy : public Work {
       public:
         WorkDummy(

@@ -217,7 +217,7 @@
                             torch.ao.quantization.fuse_modules(m.conv, [str(idx), str(idx + 1)], inplace=True)
 
 2. 헬퍼(Helper) 함수
---------------------
+----------------------
 
 다음으로 모델 평가를 위한 헬퍼 함수들을 만듭니다. 코드 대부분은
 `여기 <https://github.com/pytorch/examples/blob/master/imagenet/main.py>`_ 에서 가져왔습니다.
@@ -302,7 +302,7 @@
 마지막 주요 설정 단계로서 학습과 테스트 데이터를 위한 DataLoader를 정의합니다.
 
 ImageNet 데이터
-^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^
 
 전체 ImageNet Dataset을 이용해서 이 튜토리얼의 코드를 실행시키기 위해, 첫번째로 `ImageNet Data <http://www.image-net.org/download>`_ 의 지시를 따라 ImageNet을 다운로드합니다. 다운로드한 파일의 압축을 'data_path'에 풉니다.
 
@@ -398,7 +398,7 @@ ImageNet 데이터
 이 값이 비교를 위한 기준이 될 것입니다. 다음으로 양자화된 모델을 봅시다.
 
 4. 학습 후 정적 양자화(post-training static quantization)
---------------------------------------------------------
+-----------------------------------------------------------
 
 학습 후 정적 양자화는 동적 양자화처럼 가중치를 float에서 int로 변환하는 것뿐만 아니라
 추가적인 단계도 수행합니다. 네트워크에 데이터 배치의 첫 번째 공급과 다른 활성값들의
@@ -459,7 +459,8 @@ x86 아키텍처에서 양자화를 위한 권장 설정을 그대로 쓰기만 
     per_channel_quantized_model = load_model(saved_model_dir + float_model_file)
     per_channel_quantized_model.eval()
     per_channel_quantized_model.fuse_model()
-    per_channel_quantized_model.qconfig = torch.ao.quantization.get_default_qconfig('fbgemm')
+    # 이전의 'fbgemm' 또한 여전히 사용 가능하지만, 'x86'을 기본으로 사용하는 것을 권장합니다.
+    per_channel_quantized_model.qconfig = torch.ao.quantization.get_default_qconfig('x86')
     print(per_channel_quantized_model.qconfig)
 
     torch.ao.quantization.prepare(per_channel_quantized_model, inplace=True)
@@ -475,7 +476,7 @@ x86 아키텍처에서 양자화를 위한 권장 설정을 그대로 쓰기만 
 이제 양자화 자각 학습을 시도해 봅시다.
 
 5. 양자화 자각 학습(Quantization-aware training)
--------------------------------------------------
+---------------------------------------------------
 
 양자화 자각 학습(QAT)은 일반적으로 가장 높은 정확도를 제공하는 양자화 방법입니다.
 모든 가중치화 활성값은 QAT로 인해 학습 도중에 순전파와 역전파를 도중 "가짜 양자화"됩니다.
@@ -535,7 +536,8 @@ x86 아키텍처에서 양자화를 위한 권장 설정을 그대로 쓰기만 
     qat_model.fuse_model()
 
     optimizer = torch.optim.SGD(qat_model.parameters(), lr = 0.0001)
-    qat_model.qconfig = torch.ao.quantization.get_default_qat_qconfig('fbgemm')
+    # 이전의 'fbgemm' 또한 여전히 사용 가능하지만, 'x86'을 기본으로 사용하는 것을 권장합니다.
+    qat_model.qconfig = torch.ao.quantization.get_default_qat_qconfig('x86')
 
 마지막으로 모델이 양자화 자각 학습을 준비하기 위해 ``prepare_qat`` 로 "가짜 양자화"를 수행합니다.
 

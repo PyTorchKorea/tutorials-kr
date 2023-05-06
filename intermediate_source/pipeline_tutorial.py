@@ -129,16 +129,17 @@ class PositionalEncoding(nn.Module):
 # 알파벳을 길이가 6인 4개의 시퀀스로 나눌 수 있습니다:
 #
 # .. math::
-#   \begin{bmatrix}
-#   \text{A} & \text{B} & \text{C} & \ldots & \text{X} & \text{Y} & \text{Z}
-#   \end{bmatrix}
-#   \Rightarrow
-#   \begin{bmatrix}
-#   \begin{bmatrix}\text{A} \\ \text{B} \\ \text{C} \\ \text{D} \\ \text{E} \\ \text{F}\end{bmatrix} &
-#   \begin{bmatrix}\text{G} \\ \text{H} \\ \text{I} \\ \text{J} \\ \text{K} \\ \text{L}\end{bmatrix} &
-#   \begin{bmatrix}\text{M} \\ \text{N} \\ \text{O} \\ \text{P} \\ \text{Q} \\ \text{R}\end{bmatrix} &
-#   \begin{bmatrix}\text{S} \\ \text{T} \\ \text{U} \\ \text{V} \\ \text{W} \\ \text{X}\end{bmatrix}
-#   \end{bmatrix}
+#
+#    \begin{bmatrix}
+#    \text{A} & \text{B} & \text{C} & \ldots & \text{X} & \text{Y} & \text{Z}
+#    \end{bmatrix}
+#    \Rightarrow
+#    \begin{bmatrix}
+#    \begin{bmatrix}\text{A} \\ \text{B} \\ \text{C} \\ \text{D} \\ \text{E} \\ \text{F}\end{bmatrix} &
+#    \begin{bmatrix}\text{G} \\ \text{H} \\ \text{I} \\ \text{J} \\ \text{K} \\ \text{L}\end{bmatrix} &
+#    \begin{bmatrix}\text{M} \\ \text{N} \\ \text{O} \\ \text{P} \\ \text{Q} \\ \text{R}\end{bmatrix} &
+#    \begin{bmatrix}\text{S} \\ \text{T} \\ \text{U} \\ \text{V} \\ \text{W} \\ \text{X}\end{bmatrix}
+#    \end{bmatrix}
 #
 # 이 열들은 모델에 의해서 독립적으로 취급되며, 이는
 # ``G`` 와 ``F`` 의 의존성이 학습될 수 없다는 것을 의미하지만, 더 효율적인
@@ -167,11 +168,11 @@ test_data = data_process(test_iter)
 device = torch.device("cuda")
 
 def batchify(data, bsz):
-    # 데이터셋을 bsz 파트들로 나눕니다.
+    # 데이터셋을 ``bsz`` 파트들로 나눕니다.
     nbatch = data.size(0) // bsz
     # 깔끔하게 나누어 떨어지지 않는 추가적인 부분(나머지)은 잘라냅니다.
     data = data.narrow(0, 0, nbatch * bsz)
-    # 데이터를 bsz 배치들로 동일하게 나눕니다.
+    # 데이터를 ``bsz`` 배치들로 동일하게 나눕니다.
     data = data.view(bsz, -1).t().contiguous()
     return data.to(device)
 
@@ -238,9 +239,9 @@ def get_batch(source, i):
 
 ntokens = len(vocab) # 단어 사전(어휘집)의 크기
 emsize = 4096 # 임베딩 차원
-nhid = 4096 # nn.TransformerEncoder 에서 순전파(feedforward) 신경망 모델의 차원
-nlayers = 12 # nn.TransformerEncoder 내부의 nn.TransformerEncoderLayer 개수
-nhead = 16 # multiheadattention 모델의 헤드 개수
+nhid = 4096 # ``nn.TransformerEncoder`` 에서 순전파(feedforward) 신경망 모델의 차원
+nlayers = 12 # ``nn.TransformerEncoder`` 내부의 ``nn.TransformerEncoderLayer`` 개수
+nhead = 16 # Multihead Attention 모델의 헤드 개수
 dropout = 0.2 # dropout 값
 
 from torch.distributed import rpc
@@ -296,7 +297,7 @@ print ('Total parameters in model: {:,}'.format(get_total_params(model)))
 
 ######################################################################
 # 모델 실행하기
-# -------------
+# ---------------
 #
 
 
@@ -397,7 +398,7 @@ for epoch in range(1, epochs + 1):
 
 ######################################################################
 # 평가 데이터셋으로 모델 평가하기
-# -------------------------------
+# ---------------------------------
 #
 
 

@@ -3,13 +3,13 @@ Distributed Pipeline Parallelism Using RPC
 **Author**: `Shen Li <https://mrshenli.github.io/>`_
 
 .. note::
-   |edit| View and edit this tutorial in `github <https://github.com/pytorch/tutorials/blob/master/intermediate_source/dist_pipeline_parallel_tutorial.rst>`__.
+   |edit| View and edit this tutorial in `github <https://github.com/pytorch/tutorials/blob/main/intermediate_source/dist_pipeline_parallel_tutorial.rst>`__.
 
 Prerequisites:
 
 -  `PyTorch Distributed Overview <../beginner/dist_overview.html>`__
--  `Single-Machine Model Parallel Best Practices <https://pytorch.org/tutorials/intermediate/model_parallel_tutorial.html>`__
--  `Getting started with Distributed RPC Framework <https://pytorch.org/tutorials/intermediate/rpc_tutorial.html>`__
+-  `Single-Machine Model Parallel Best Practices <https://tutorials.pytorch.kr/intermediate/model_parallel_tutorial.html>`__
+-  `Getting started with Distributed RPC Framework <https://tutorials.pytorch.kr/intermediate/rpc_tutorial.html>`__
 -  RRef helper functions:
    `RRef.rpc_sync() <https://pytorch.org/docs/master/rpc.html#torch.distributed.rpc.RRef.rpc_sync>`__,
    `RRef.rpc_async() <https://pytorch.org/docs/master/rpc.html#torch.distributed.rpc.RRef.rpc_async>`__, and

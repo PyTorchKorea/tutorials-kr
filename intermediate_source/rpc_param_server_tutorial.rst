@@ -5,7 +5,7 @@ Implementing a Parameter Server Using Distributed RPC Framework
 **Author**\ : `Rohan Varma <https://github.com/rohan-varma>`_
 
 .. note::
-   |edit| View and edit this tutorial in `github <https://github.com/pytorch/tutorials/blob/master/intermediate_source/rpc_param_server_tutorial.rst>`__.
+   |edit| View and edit this tutorial in `github <https://github.com/pytorch/tutorials/blob/main/intermediate_source/rpc_param_server_tutorial.rst>`__.
 
 Prerequisites:
 
@@ -16,7 +16,7 @@ This tutorial walks through a simple example of implementing a parameter server 
 
 Using the Distributed RPC Framework, we'll build an example where multiple trainers use RPC to communicate with the same parameter server and use `RRef <https://pytorch.org/docs/stable/rpc.html#torch.distributed.rpc.RRef>`_ to access states on the remote parameter server instance. Each trainer will launch its dedicated backward pass in a distributed fashion through stitching of the autograd graph across multiple nodes using distributed autograd.
 
-**Note**\ : This tutorial covers the use of the Distributed RPC Framework, which is useful for splitting a model onto multiple machines, or for implementing a parameter-server training strategy where network trainers fetch parameters hosted on a different machine. If instead you are looking for replicating your model across many GPUs, please see the `Distributed Data Parallel tutorial <https://pytorch.org/tutorials/intermediate/ddp_tutorial.html>`_. There is also another `RPC tutorial <https://pytorch.org/tutorials/intermediate/rpc_tutorial.html>`_ that covers reinforcement learning and RNN use cases.
+**Note**\ : This tutorial covers the use of the Distributed RPC Framework, which is useful for splitting a model onto multiple machines, or for implementing a parameter-server training strategy where network trainers fetch parameters hosted on a different machine. If instead you are looking for replicating your model across many GPUs, please see the `Distributed Data Parallel tutorial <https://tutorials.pytorch.kr/intermediate/ddp_tutorial.html>`_. There is also another `RPC tutorial <https://tutorials.pytorch.kr/intermediate/rpc_tutorial.html>`_ that covers reinforcement learning and RNN use cases.
 
 Let's start with the familiar: importing our required modules and defining a simple ConvNet that will train on the MNIST dataset. The below network is largely adopted from the network defined in the `pytorch/examples repo <https://github.com/pytorch/examples/tree/master/mnist>`_.
 

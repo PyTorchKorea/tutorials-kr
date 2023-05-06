@@ -6,14 +6,14 @@
 """
 
 ######################################################################
-# 
+#
 # Before working on this tutorial, please make sure to review our
-# `MaskedTensor Overview tutorial <https://pytorch.org/tutorials/prototype/maskedtensor_overview.html>`.
+# `MaskedTensor Overview tutorial <https://tutorials.pytorch.kr/prototype/maskedtensor_overview.html>`.
 #
 # The purpose of this tutorial is to help users understand how some of the advanced semantics work
 # and how they came to be. We will focus on two particular ones:
 #
-# *. Differences between MaskedTensor and `NumPy's MaskedArray <https://numpy.org/doc/stable/reference/maskedarray.html>`__  
+# *. Differences between MaskedTensor and `NumPy's MaskedArray <https://numpy.org/doc/stable/reference/maskedarray.html>`__
 # *. Reduction semantics
 #
 # Preparation
@@ -89,7 +89,7 @@ print("mt2 (t0 + t1):\n", mt2)
 # Reduction Semantics
 # -------------------
 #
-# Recall in `MaskedTensor's Overview tutorial <https://pytorch.org/tutorials/prototype/maskedtensor_overview.html>`__
+# Recall in `MaskedTensor's Overview tutorial <https://tutorials.pytorch.kr/prototype/maskedtensor_overview.html>`__
 # we discussed "Implementing missing torch.nan* ops". Those are examples of reductions -- operators that remove one
 # (or more) dimensions from a Tensor and then aggregate the result. In this section, we will use reduction semantics
 # to motivate our strict requirements around matching masks from above.
@@ -167,4 +167,4 @@ mt1 = masked_tensor(data1, ~mask1)
 # the associative property amongst binary operations), which in turn can necessitate the user
 # to be more intentional with their code at times, but we believe this to be the better move.
 # If you have any thoughts on this, please `let us know <https://github.com/pytorch/pytorch/issues>`__!
-# 
+#

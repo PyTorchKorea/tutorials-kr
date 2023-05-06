@@ -108,7 +108,7 @@ Recipes are bite-sized bite-sized, actionable examples of how to use specific Py
    :tags: Basics
 
 .. customcarditem::
-   :header: Pytorch 프로파일러
+   :header: PyTorch 프로파일러
    :card_description: PyTorch의 프로파일러를 사용하여 연산 시간과 메모리 소비량을 측정하는 방법을 알아봅니다.
    :image: ../_static/img/thumbnails/cropped/profiler.png
    :link: ../recipes/recipes/profiler_recipe.html
@@ -121,10 +121,17 @@ Recipes are bite-sized bite-sized, actionable examples of how to use specific Py
    :link: ../recipes/profile_with_itt.html
    :tags: Basics
 
+.. customcarditem::
+   :header: Reasoning about Shapes in PyTorch
+   :card_description: Learn how to use the meta device to reason about shapes in your model.
+   :image: ../_static/img/thumbnails/cropped/generic-pytorch-logo.png
+   :link: ../recipes/recipes/reasoning_about_shapes.html
+   :tags: Basics
+
 .. Customization
 
 .. customcarditem::
-   :header: 사용자 정의 데이터셋, Transforms & Dataloader
+   :header: 사용자 정의 데이터셋, Transforms & DataLoader
    :card_description: PyTorch 데이터셋 API를 이용하여 어떻게 쉽게 사용자 정의 데이터셋과 dataloader를 만드는지 알아봅니다.
    :image: ../_static/img/thumbnails/cropped/custom-datasets-transforms-and-dataloaders.png
    :link: ../recipes/recipes/custom_dataset_transforms_loader.html

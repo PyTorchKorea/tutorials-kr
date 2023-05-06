@@ -27,7 +27,7 @@ Learn DDP
 
      .. grid-item-card:: :octicon:`file-code;1em`
         DDP Intro Video Tutorials
-        :link: https://pytorch.org/tutorials/beginner/ddp_series_intro.html?utm_source=distr_landing&utm_medium=ddp_series_intro
+        :link: https://tutorials.pytorch.kr/beginner/ddp_series_intro.html?utm_source=distr_landing&utm_medium=ddp_series_intro
         :link-type: url
 
         A step-by-step video series on how to get started with
@@ -37,7 +37,7 @@ Learn DDP
 
      .. grid-item-card:: :octicon:`file-code;1em`
         Getting Started with Distributed Data Parallel
-        :link: https://pytorch.org/tutorials/intermediate/ddp_tutorial.html?utm_source=distr_landing&utm_medium=intermediate_ddp_tutorial
+        :link: https://tutorials.pytorch.kr/intermediate/ddp_tutorial.html?utm_source=distr_landing&utm_medium=intermediate_ddp_tutorial
         :link-type: url
 
         This tutorial provides a short and gentle intro to the PyTorch
@@ -48,10 +48,10 @@ Learn DDP
      .. grid-item-card:: :octicon:`file-code;1em`
         Distributed Training with Uneven Inputs Using
         the Join Context Manager
-        :link: https://pytorch.org/tutorials/advanced/generic_join.html?utm_source=distr_landing&utm_medium=generic_join
+        :link: https://tutorials.pytorch.kr/advanced/generic_join.html?utm_source=distr_landing&utm_medium=generic_join
         :link-type: url
 
-        This tutorial describes the Join context manager and 
+        This tutorial describes the Join context manager and
         demonstrates it's use with DistributedData Parallel.
         +++
         :octicon:`code;1em` Code
@@ -65,7 +65,7 @@ Learn FSDP
 
      .. grid-item-card:: :octicon:`file-code;1em`
         Getting Started with FSDP
-        :link: https://pytorch.org/tutorials/intermediate/FSDP_tutorial.html?utm_source=distr_landing&utm_medium=FSDP_getting_started
+        :link: https://tutorials.pytorch.kr/intermediate/FSDP_tutorial.html?utm_source=distr_landing&utm_medium=FSDP_getting_started
         :link-type: url
 
         This tutorial demonstrates how you can perform distributed training
@@ -75,7 +75,7 @@ Learn FSDP
 
      .. grid-item-card:: :octicon:`file-code;1em`
         FSDP Advanced
-        :link: https://pytorch.org/tutorials/intermediate/FSDP_adavnced_tutorial.html?utm_source=distr_landing&utm_medium=FSDP_advanced
+        :link: https://tutorials.pytorch.kr/intermediate/FSDP_adavnced_tutorial.html?utm_source=distr_landing&utm_medium=FSDP_advanced
         :link-type: url
 
         In this tutorial, you will learn how to fine-tune a HuggingFace (HF) T5
@@ -92,7 +92,7 @@ Learn RPC
 
      .. grid-item-card:: :octicon:`file-code;1em`
         Getting Started with Distributed RPC Framework
-        :link: https://pytorch.org/tutorials/intermediate/rpc_tutorial.html?utm_source=distr_landing&utm_medium=rpc_getting_started
+        :link: https://tutorials.pytorch.kr/intermediate/rpc_tutorial.html?utm_source=distr_landing&utm_medium=rpc_getting_started
         :link-type: url
 
         This tutorial demonstrates how to get started with RPC-based distributed
@@ -102,7 +102,7 @@ Learn RPC
 
      .. grid-item-card:: :octicon:`file-code;1em`
         Implementing a Parameter Server Using Distributed RPC Framework
-        :link: https://pytorch.org/tutorials/intermediate/rpc_param_server_tutorial.html?utm_source=distr_landing&utm_medium=rpc_param_server_tutorial
+        :link: https://tutorials.pytorch.kr/intermediate/rpc_param_server_tutorial.html?utm_source=distr_landing&utm_medium=rpc_param_server_tutorial
         :link-type: url
 
         This tutorial walks you through a simple example of implementing a
@@ -112,7 +112,7 @@ Learn RPC
 
      .. grid-item-card:: :octicon:`file-code;1em`
         Implementing Batch RPC Processing Using Asynchronous Executions
-        :link: https://pytorch.org/tutorials/intermediate/rpc_async_execution.html?utm_source=distr_landing&utm_medium=rpc_async_execution
+        :link: https://tutorials.pytorch.kr/intermediate/rpc_async_execution.html?utm_source=distr_landing&utm_medium=rpc_async_execution
         :link-type: url
 
         In this tutorial you will build batch-processing RPC applications
@@ -124,7 +124,7 @@ Learn RPC
 
      .. grid-item-card:: :octicon:`file-code;1em`
         Combining Distributed DataParallel with Distributed RPC Framework
-        :link: https://pytorch.org/tutorials/advanced/rpc_ddp_tutorial.html?utm_source=distr_landing&utm_medium=rpc_plus_ddp
+        :link: https://tutorials.pytorch.kr/advanced/rpc_ddp_tutorial.html?utm_source=distr_landing&utm_medium=rpc_plus_ddp
         :link-type: url
 
         In this tutorial you will learn how to combine distributed data
@@ -141,7 +141,7 @@ Custom Extensions
 
      .. grid-item-card:: :octicon:`file-code;1em`
         Customize Process Group Backends Using Cpp Extensions
-        :link: https://pytorch.org/tutorials/intermediate/process_group_cpp_extension_tutorial.html?utm_source=distr_landing&utm_medium=custom_extensions_cpp
+        :link: https://tutorials.pytorch.kr/intermediate/process_group_cpp_extension_tutorial.html?utm_source=distr_landing&utm_medium=custom_extensions_cpp
         :link-type: url
 
         In this tutorial you will learn to implement a custom `ProcessGroup`

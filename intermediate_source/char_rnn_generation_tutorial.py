@@ -2,6 +2,7 @@
 """
 기초부터 시작하는 NLP:  문자-단위 RNN으로 이름 생성하기
 ********************************************************************************
+
 **Author**: `Sean Robertson <https://github.com/spro/practical-pytorch>`_
   **번역**: `황성수 <https://github.com/adonisues>`_
 
@@ -229,7 +230,7 @@ def inputTensor(line):
         tensor[li][0][all_letters.find(letter)] = 1
     return tensor
 
-# 목표를 위한 두번째 문자 부터 마지막(EOS) 까지의 LongTensor
+# 목표를 위한 두번째 문자 부터 마지막(EOS)까지의 ``LongTensor``
 def targetTensor(line):
     letter_indexes = [all_letters.find(line[li]) for li in range(1, len(line))]
     letter_indexes.append(n_letters - 1) # EOS
@@ -315,7 +316,7 @@ n_iters = 100000
 print_every = 5000
 plot_every = 500
 all_losses = []
-total_loss = 0 # plot_every 마다 초기화
+total_loss = 0 # ``plot_every`` 마다 초기화
 
 start = time.time()
 
@@ -421,6 +422,6 @@ samples('Chinese', 'CHI')
 #    choosing a start letter
 # -  Get better results with a bigger and/or better shaped network
 #
-#    -  Try the nn.LSTM and nn.GRU layers
-#    -  상위 수준 네트워크로 여러 개의 이런 RNN을  결합해 보십시오
+#    -  Try the ``nn.LSTM`` and ``nn.GRU`` layers
+#    -  상위 수준 네트워크로 여러 개의 이런 RNN을 결합해 보십시오
 #

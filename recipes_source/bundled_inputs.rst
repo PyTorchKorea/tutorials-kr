@@ -4,14 +4,16 @@
 **Author**: `Jacob Szwejbka <https://github.com/JacobSzwejbka>`_
 
 Introduction
-------------
+--------------
 
 This tutorial introduces the steps to use PyTorch's utility to bundle example or trivial inputs directly into your TorchScript Module.
 
 The interface of the model remains unchanged (other than adding a few methods), so it can still be safely deployed to production. The advantage of this standardized interface is that tools that run models can use it instead of having some sort of external file (or worse, document) that tells you how to run the model properly.
 
 Common case, bundling an input to a model that only uses 'forward' for inference
+
 -------------------
+
 1. **Prepare model**: Convert your model to TorchScript through either tracing or scripting
 
 .. code:: python
@@ -53,7 +55,9 @@ Common case, bundling an input to a model that only uses 'forward' for inference
 
 
 Uncommon case, bundling and retrieving inputs for functions beyond 'forward'
+
 -------------------
+
 1. **Prepare model**: Convert your model to TorchScript through either tracing or scripting
 
 .. code:: python
@@ -194,5 +198,5 @@ Inflatable args are composed of 2 parts, the deflated (compressed) argument, and
 
 
 Learn More
-----------
+------------
 - To learn more about PyTorch Mobile, please refer to `PyTorch Mobile Home Page <https://pytorch.org/mobile/home/>`_

@@ -289,10 +289,10 @@ print(random.choice(pairs))
 # Seq2Seq 모델은 시퀀스 길이와 순서를 자유롭게하기 때문에
 # 두 언어 사이의 번역에 이상적입니다.
 #
-# 다음 문장 "Je ne suis pas le chat noir" → "I am not the black cat"
+# 다음 문장 ``Je ne suis pas le chat noir`` → ``I am not the black cat``
 # 를 살펴 봅시다. 입력 문장의 단어 대부분은 출력 문장에서
-# 직역("chat noir" 와 "black cat")되지만 약간 다른 순서도 있습니다.
-# "ne/pas" 구조로 인해 입력 문장에 단어가 하나 더 있습니다.
+# 직역(``chat noir`` 와 ``black cat``)되지만 약간 다른 순서도 있습니다.
+# ``ne/pas`` 구조로 인해 입력 문장에 단어가 하나 더 있습니다.
 # 입력 단어의 시퀀스를 직역해서 정확한 번역을 만드는
 # 것은 어려울 것입니다.
 #
@@ -820,7 +820,7 @@ evaluateAndShowAttention("c est un jeune directeur plein de talent .")
 #    -  채팅 → 응답
 #    -  질문 → 답변
 #
-# -  word2vec 또는 GloVe 같은 미리 학습된 word embedding 으로
+# -  ``word2vec`` 또는 ``GloVe`` 같은 미리 학습된 word embedding 으로
 #    embedding 을 교체하십시오
 #
 # -  더 많은 레이어, 은닉 유닛, 더 많은 문장을 사용하십시오.

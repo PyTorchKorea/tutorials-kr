@@ -13,7 +13,7 @@
 ==========================================================================
 
 이제 모델과 데이터가 준비되었으니, 데이터에 매개변수를 최적화하여 모델을 학습하고, 검증하고, 테스트할 차례입니다.
-모델을 학습하는 과정은 반복적인 과정을 거칩니다; (*에폭(epoch)*\ 이라고 부르는) 각 반복 단계에서 모델은 출력을 추측하고,
+모델을 학습하는 과정은 반복적인 과정을 거칩니다; 각 반복 단계에서 모델은 출력을 추측하고,
 추측과 정답 사이의 오류(\ *손실(loss)*\ )를 계산하고, (`이전 장 <autograd_tutorial.html>`_\ 에서 본 것처럼)
 매개변수에 대한 오류의 도함수(derivative)를 수집한 뒤, 경사하강법을 사용하여 이 파라미터들을 **최적화(optimize)**\ 합니다.
 이 과정에 대한 자세한 설명은 `3Blue1Brown의 역전파 <https://www.youtube.com/watch?v=tIeHLnjs5U8>`__ 영상을 참고하세요.
@@ -160,7 +160,7 @@ def train_loop(dataloader, model, loss_fn, optimizer):
         optimizer.step()
 
         if batch % 100 == 0:
-            loss, current = loss.item(), batch * len(X)
+            loss, current = loss.item(), (batch + 1) * len(X)
             print(f"loss: {loss:>7f}  [{current:>5d}/{size:>5d}]")
 
 

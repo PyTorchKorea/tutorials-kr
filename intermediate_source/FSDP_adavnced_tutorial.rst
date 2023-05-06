@@ -10,10 +10,10 @@ Wright <https://github.com/lessw2020>`__, `Rohan Varma
 This tutorial introduces more advanced features of Fully Sharded Data Parallel
 (FSDP) as part of the PyTorch 1.12 release. To get familiar with FSDP, please
 refer to the `FSDP getting started tutorial
-<https://pytorch.org/tutorials/intermediate/FSDP_tutorial.html>`__.
+<https://tutorials.pytorch.kr/intermediate/FSDP_tutorial.html>`__.
 
 In this tutorial, we fine-tune a HuggingFace (HF) T5 model with FSDP for text
-summarization as a working example. 
+summarization as a working example.
 
 The example uses Wikihow and for simplicity, we will showcase the training on a
 single node, P4dn instance with 8 A100 GPUs. We will soon have a blog post on
@@ -24,7 +24,7 @@ FSDP is a production ready package with focus on ease of use, performance, and
 long-term support.  One of the main benefits of FSDP is reducing the memory
 footprint on each GPU. This enables training of larger models with lower total
 memory vs DDP, and leverages the overlap of computation and communication to
-train models efficiently. 
+train models efficiently.
 This reduced memory pressure can be leveraged to either train larger models or
 increase batch size, potentially helping overall training throughput.  You can
 read more about PyTorch FSDP `here
@@ -61,7 +61,7 @@ At a high level FDSP works as follow:
 
 * Run `all_gather` to collect all shards from all ranks to recover the full
   parameter in this FSDP unit Run backward computation
-* Discard non-owned parameters to free memory. 
+* Discard non-owned parameters to free memory.
 * Run reduce_scatter to sync gradients
 
 
@@ -86,7 +86,7 @@ We will install PyTorch nightlies, as some of the features such as activation
 checkpointing is available in nightlies and will be added in next PyTorch
 release after 1.12.
 
-.. code-block:: bash 
+.. code-block:: bash
 
     pip3 install --pre torch torchvision torchaudio -f https://download.pytorch.org/whl/nightly/cu113/torch_nightly.html
 
@@ -154,7 +154,7 @@ Next, we add the following code snippets to a Python script “T5_training.py”
     import tqdm
     from datetime import datetime
 
-1.4 Distributed training setup. 
+1.4 Distributed training setup.
 Here we use two helper functions to initialize the processes for distributed
 training,  and then to clean up after training completion.  In this tutorial, we
 are going to use torch elastic, using `torchrun
@@ -191,13 +191,13 @@ metrics.
         date_of_run = datetime.now().strftime("%Y-%m-%d-%I:%M:%S_%p")
         print(f"--> current date and time of run = {date_of_run}")
         return date_of_run
-   
+
     def format_metrics_to_gb(item):
         """quick function to format numbers to gigabyte and round to 4 digit precision"""
         metric_num = item / g_gigabyte
         metric_num = round(metric_num, ndigits=4)
         return metric_num
-    
+
 
 2.2 Define a train function:
 
@@ -275,7 +275,7 @@ metrics.
 
 .. code-block:: python
 
-    
+
     def fsdp_main(args):
 
         model, tokenizer = setup_model("t5-base")
@@ -292,7 +292,7 @@ metrics.
 
 
         #wikihow(tokenizer, type_path, num_samples, input_length, output_length, print_text=False)
-        train_dataset = wikihow(tokenizer, 'train', 1500, 512, 150, False) 
+        train_dataset = wikihow(tokenizer, 'train', 1500, 512, 150, False)
         val_dataset = wikihow(tokenizer, 'validation', 300, 512, 150, False)
 
         sampler1 = DistributedSampler(train_dataset, rank=rank, num_replicas=world_size, shuffle=True)
@@ -430,7 +430,7 @@ metrics.
 
 .. code-block:: python
 
-    
+
     if __name__ == '__main__':
         # Training settings
         parser = argparse.ArgumentParser(description='PyTorch T5 FSDP Example')
@@ -463,7 +463,7 @@ metrics.
 
 To run the the training using torchrun:
 
-.. code-block:: bash 
+.. code-block:: bash
 
     torchrun --nnodes 1 --nproc_per_node 4  T5_training.py
 
@@ -473,7 +473,7 @@ Transformer Wrapping Policy
 ---------------------------
 
 As discussed in the `previous tutorial
-<https://pytorch.org/tutorials/intermediate/FSDP_tutorial.html>`__,
+<https://tutorials.pytorch.kr/intermediate/FSDP_tutorial.html>`__,
 auto_wrap_policy is one of the FSDP features that make it easy to automatically
 shard a given model and put the model, optimizer and gradient shards into
 distinct FSDP units.
@@ -487,7 +487,7 @@ communication efficient.  In PyTorch 1.12, FSDP added this support and now we
 have a wrapping policy for transfomers.
 
 It can be created as follows, where the T5Block represents the T5 transformer
-layer class (holding MHSA and FFN).  
+layer class (holding MHSA and FFN).
 
 
 .. code-block:: python
@@ -499,7 +499,7 @@ layer class (holding MHSA and FFN).
             },
         )
     torch.cuda.set_device(local_rank)
-  
+
 
     model = FSDP(model,
         fsdp_auto_wrap_policy=t5_auto_wrap_policy)
@@ -519,10 +519,10 @@ it can result in significant slowdowns.
 To check if BFloat16 is natively supported, you can use the following :
 
 .. code-block:: python
-    
+
     bf16_ready = (
         torch.version.cuda
-        and torch.cuda.is_bf16_supported() 
+        and torch.cuda.is_bf16_supported()
         and LooseVersion(torch.version.cuda) >= "11.0"
         and dist.is_nccl_available()
         and nccl.version() >= (2, 10)
@@ -571,7 +571,7 @@ with the following policy:
 .. code-block:: bash
 
     grad_bf16 = MixedPrecision(reduce_dtype=torch.bfloat16)
-    
+
 
 In 2.4 we just add the relevant mixed precision policy to the FSDP wrapper:
 
@@ -604,9 +604,9 @@ CPU-based initialization:
             auto_wrap_policy=t5_auto_wrap_policy,
             mixed_precision=bfSixteen,
             device_id=torch.cuda.current_device())
-     
 
-    
+
+
 Sharding Strategy
 -----------------
 FSDP sharding strategy by default is set to fully shard the model parameters,
@@ -627,7 +627,7 @@ instead of "ShardingStrategy.FULL_SHARD" to the FSDP initialization  as follows:
             sharding_strategy=ShardingStrategy.SHARD_GRAD_OP # ZERO2)
 
 This will reduce the communication overhead in FSDP, in this case, it holds full
-parameters after forward and through the backwards pass. 
+parameters after forward and through the backwards pass.
 
 This saves an all_gather during backwards so there is less communication at the
 cost of a higher memory footprint. Note that full model params are freed at the
@@ -652,12 +652,12 @@ wrapper in 2.4 as follows:
             mixed_precision=bfSixteen,
             device_id=torch.cuda.current_device(),
             backward_prefetch = BackwardPrefetch.BACKWARD_PRE)
-            
+
 `backward_prefetch` has two modes, `BACKWARD_PRE` and `BACKWARD_POST`.
 `BACKWARD_POST` means that the next FSDP unit's params will not be requested
 until the current FSDP unit processing is complete, thus minimizing memory
 overhead.  In some cases, using `BACKWARD_PRE` can increase model training speed
-up to 2-10%, with even higher speed improvements noted for larger models. 
+up to 2-10%, with even higher speed improvements noted for larger models.
 
 Model Checkpoint Saving, by streaming to the Rank0 CPU
 ------------------------------------------------------
@@ -696,7 +696,7 @@ Pytorch 1.12 and used HF T5 as the running example.  Using the proper wrapping
 policy especially for transformer models, along with mixed precision and
 backward prefetch should speed up your training runs. Also, features such as
 initializing the model on device, and checkpoint saving via streaming to CPU
-should help to avoid OOM error in dealing with large models. 
+should help to avoid OOM error in dealing with large models.
 
 We are actively working to add new features to FSDP for the next release. If
 you have feedback, feature requests, questions or are encountering issues

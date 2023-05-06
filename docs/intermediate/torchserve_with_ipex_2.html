@@ -6,39 +6,39 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="ko" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+
 <meta property="og:title" content="Grokking PyTorch Intel CPU performance from first principles (Part 2)" />
-  
+
 <meta property="og:type" content="article" />
-  
+
 <meta property="og:url" content="https://tutorials.pytorch.kr/intermediate/torchserve_with_ipex_2.html" />
-  
+
 <meta property="og:description" content="Authors: Min Jean Cho, Jing Xu, Mark Saroufim In the Grokking PyTorch Intel CPU Performance From First Principles tutorial , we have introduced how to tune CPU runtime configurations, how to profile them, and how to integrate them into TorchServe for optimized CPU performance. In this tutorial, w..." />
-  
+
 <meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
-  
+
 <meta property="og:image:alt" content="Grokking PyTorch Intel CPU performance from first principles (Part 2)" />
-  
+
 <meta property="og:ignore_canonical" content="true" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
+
   <title>Grokking PyTorch Intel CPU performance from first principles (Part 2) &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
-  
 
-  
-  
+
+
+
     <link rel="shortcut icon" href="../_static/favicon.ico"/>
-  
-  
-  
 
-  
 
-  
-  
-    
 
-  
+
+
+
+
+
+
+
+
 
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!-- <link rel="stylesheet" href="../_static/pygments.css" type="text/css" /> -->
@@ -57,9 +57,9 @@
     <link rel="index" title="색인" href="../genindex.html" />
     <link rel="search" title="검색" href="../search.html" />
     <link rel="next" title="Getting Started - Accelerate Your Scripts with nvFuser" href="nvfuser_intro_tutorial.html" />
-    <link rel="prev" title="Grokking PyTorch Intel CPU performance from first principles" href="torchserve_with_ipex.html" /> 
+    <link rel="prev" title="Grokking PyTorch Intel CPU performance from first principles" href="torchserve_with_ipex.html" />
 
-  
+
   <script src="../_static/js/modernizr.min.js"></script>
 
   <!-- Preload the theme fonts -->
@@ -116,9 +116,9 @@
 
 <body class="pytorch-body">
 
-   
 
-    
+
+
 
     <div class="table-of-contents-link-wrapper">
       <span>Table of Contents</span>
@@ -129,21 +129,21 @@
       <div class="pytorch-side-scroll">
         <div class="pytorch-menu pytorch-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           <div class="pytorch-left-menu-search">
-            
 
-            
-              
-              
+
+
+
+
                 <div class="version">
                   1.13.1+cu117
                 </div>
-              
-            
-
-            
 
 
-  
+
+
+
+
+
 
 
 <div role="search">
@@ -154,15 +154,15 @@
   </form>
 </div>
 
-            
+
           </div>
 
-          
-            
-            
-              
-            
-            
+
+
+
+
+
+
               <p class="caption" role="heading"><span class="caption-text">파이토치(PyTorch) 레시피</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../recipes/recipes_index.html">모든 레시피 보기</a></li>
@@ -305,8 +305,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../beginner/flava_finetuning_tutorial.html">TorchMultimodal Tutorial: Finetuning FLAVA</a></li>
 </ul>
 
-            
-          
+
+
         </div>
       </div>
     </nav>
@@ -314,7 +314,7 @@
     <div class="pytorch-container">
       <div class="pytorch-page-level-bar" id="pytorch-page-level-bar">
         <div class="pytorch-breadcrumbs-wrapper">
-          
+
 
 
 
@@ -333,30 +333,30 @@
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="pytorch-breadcrumbs">
-    
+
       <li>
         <a href="../index.html">
-          
+
             Tutorials
-          
+
         </a> &gt;
       </li>
 
-        
+
       <li>Grokking PyTorch Intel CPU performance from first principles (Part 2)</li>
-    
-    
+
+
       <li class="pytorch-breadcrumbs-aside">
-        
-            
+
+
             <a href="../_sources/intermediate/torchserve_with_ipex_2.rst.txt" rel="nofollow"><img src="../_static/images/view-page-source-icon.svg"></a>
-          
-        
+
+
       </li>
-    
+
   </ul>
 
-  
+
 </div>
         </div>
 
@@ -368,7 +368,7 @@
       <section data-toggle="wy-nav-shift" id="pytorch-content-wrap" class="pytorch-content-wrap">
         <div class="pytorch-content-left">
 
-        
+
 
           <div class="pytorch-call-to-action-links">
             <div id="tutorial-type">intermediate/torchserve_with_ipex_2</div>
@@ -390,18 +390,18 @@
             </div>
           </div>
 
-        
 
-          
+
+
           <div class="rst-content">
-          
+
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
-              
+
   <div class="section" id="grokking-pytorch-intel-cpu-performance-from-first-principles-part-2">
 <h1>Grokking PyTorch Intel CPU performance from first principles (Part 2)<a class="headerlink" href="#grokking-pytorch-intel-cpu-performance-from-first-principles-part-2" title="이 제목에 대한 퍼머링크">¶</a></h1>
 <p>Authors: <a class="reference external" href="https://github.com/min-jean-cho">Min Jean Cho</a>, <a class="reference external" href="https://github.com/jingxu10">Jing Xu</a>, <a class="reference external" href="https://github.com/msaroufim">Mark Saroufim</a></p>
-<p>In the <a class="reference external" href="https://pytorch.org/tutorials/intermediate/torchserve_with_ipex.html">Grokking PyTorch Intel CPU Performance From First Principles</a> tutorial
+<p>In the <a class="reference external" href="https://tutorials.pytorch.kr/intermediate/torchserve_with_ipex.html">Grokking PyTorch Intel CPU Performance From First Principles</a> tutorial
 , we have introduced how to tune CPU runtime configurations, how to profile them, and how to integrate them into <a class="reference external" href="https://github.com/pytorch/serve">TorchServe</a> for optimized CPU performance.</p>
 <p>In this tutorial, we will demonstrate boosting performance with memory allocator via the <a class="reference external" href="https://github.com/intel/intel-extension-for-pytorch/blob/master/docs/tutorials/performance_tuning/launch_script.md">Intel® Extension for PyTorch* Launcher</a>
 , and optimized kernels on CPU via <a class="reference external" href="https://github.com/intel/intel-extension-for-pytorch">Intel® Extension for PyTorch*</a>
@@ -430,7 +430,7 @@
 </div>
 <div class="section" id="intel-vtune-profiler-s-instrumentation-and-tracing-technology-itt">
 <h3>Intel® VTune™ Profiler’s Instrumentation and Tracing Technology (ITT)<a class="headerlink" href="#intel-vtune-profiler-s-instrumentation-and-tracing-technology-itt" title="이 제목에 대한 퍼머링크">¶</a></h3>
-<p>The ITT APIs of Intel® VTune Profiler is a useful tool to annotate a region of your workload for tracing to profile and visualize at a finer granularity of your annotation – OP/function/sub-function granularity. By annotating at the granularity of your PyTorch model’s OPs, Intel® VTune Profiler’s ITT enables op-level profiling. Intel® VTune Profiler’s ITT has been integrated into <a class="reference external" href="https://pytorch.org/tutorials/beginner/introyt/autogradyt_tutorial.html#autograd-profiler">PyTorch Autograd Profiler</a>. <sup>1</sup></p>
+<p>The ITT APIs of Intel® VTune Profiler is a useful tool to annotate a region of your workload for tracing to profile and visualize at a finer granularity of your annotation – OP/function/sub-function granularity. By annotating at the granularity of your PyTorch model’s OPs, Intel® VTune Profiler’s ITT enables op-level profiling. Intel® VTune Profiler’s ITT has been integrated into <a class="reference external" href="https://tutorials.pytorch.kr/beginner/introyt/autogradyt_tutorial.html#autograd-profiler">PyTorch Autograd Profiler</a>. <sup>1</sup></p>
 <ol class="arabic simple">
 <li><p>The feature has to be explicitly enabled by <em>with torch.autograd.profiler.emit_itt()</em>.</p></li>
 </ol>
@@ -787,21 +787,21 @@
 
 
              </article>
-             
+
             </div>
             <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="nvfuser_intro_tutorial.html" class="btn btn-neutral float-right" title="Getting Started - Accelerate Your Scripts with nvFuser" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
-      
-      
-        <a href="torchserve_with_ipex.html" class="btn btn-neutral" title="Grokking PyTorch Intel CPU performance from first principles" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
-      
-    </div>
-  
 
-  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+
+        <a href="nvfuser_intro_tutorial.html" class="btn btn-neutral float-right" title="Getting Started - Accelerate Your Scripts with nvFuser" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
+
+
+        <a href="torchserve_with_ipex.html" class="btn btn-neutral" title="Grokking PyTorch Intel CPU performance from first principles" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
+
+    </div>
+
+
+
     <hr class="community-hr hr-top" />
     <div class="community-container">
       <div class="community-prompt">더 궁금하시거나 개선할 내용이 있으신가요? 커뮤니티에 참여해보세요!</div>
@@ -821,7 +821,7 @@
       </div>
     </div>
     <hr class="rating-hr hr-bottom"/>
-  
+
 
   <div role="contentinfo">
     <p>
@@ -829,11 +829,11 @@
 
     </p>
   </div>
-    
+
       <div>
         Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
       </div>
-     
+
 
 </footer>
 
@@ -901,12 +901,12 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
       </section>
     </div>
 
-  
 
 
-  
-  
-     
+
+
+
+
        <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
          <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
          <script src="../_static/jquery.js"></script>
@@ -920,8 +920,8 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
          <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
          <script src="../_static/katex_autorenderer.js"></script>
          <script src="../_static/design-tabs.js"></script>
-     
-  
+
+
 
   <script type="text/javascript" src="../_static/js/vendor/popper.min.js"></script>
   <script type="text/javascript" src="../_static/js/vendor/bootstrap.min.js"></script>
@@ -933,7 +933,7 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
           SphinxRtdTheme.Navigation.enable(true);
       });
   </script>
- 
+
 <script>
 //add microsoft link
 

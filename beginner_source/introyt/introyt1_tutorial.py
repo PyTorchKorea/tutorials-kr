@@ -173,11 +173,11 @@ class LeNet(nn.Module):
 
     def __init__(self):
         super(LeNet, self).__init__()
-        # 입력 이미지 채널, 6개의 output 채널, 3x3 정방 합성곱 커널을 사용합니다.
-        self.conv1 = nn.Conv2d(1, 6, 3)
-        self.conv2 = nn.Conv2d(6, 16, 3)
+        # 입력 이미지 채널, 6개의 output 채널, 5x5 정방 합성곱 커널을 사용합니다.
+        self.conv1 = nn.Conv2d(1, 6, 5)
+        self.conv2 = nn.Conv2d(6, 16, 5)
         # 아핀 변환: y = Wx + b
-        self.fc1 = nn.Linear(16 * 6 * 6, 120)  # 6*6 이미지 차원
+        self.fc1 = nn.Linear(16 * 5 * 5, 120)  # 5x5 이미지 차원
         self.fc2 = nn.Linear(120, 84)
         self.fc3 = nn.Linear(84, 10)
 

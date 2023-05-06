@@ -1,5 +1,29 @@
+Google Colab에서 튜토리얼 실행하기
+=====================================
+
+Google Colab에서 튜토리얼을 실행할 때, 튜토리얼이 제대로 동작하기
+위해서 충족해야 하는 추가적인 추가 요구 사항과 종속성(dependancy)이
+있을 수 있습니다. 이 섹션에서는 Google Colab에서 파이토치(PyTorch) 튜토리얼을
+성공적으로 실행하기 위해 다양한 설정을 구성하는 방법에 대해 설명합니다.
+
+Google Colab의 PyTorch 버전
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+공개(release)된지 얼마되지 않은 PyTorch 버전을 사용하는 튜토리얼을 실행하는 경우,
+해당 버전이 아직 Google Colab에 반영되지 않았을 수 있습니다.
+필요한 ``torch`` 와 호환되는 도메인 라이브러리(domain library)가 설치되어 있는지
+확인하려면 ``!pip list`` 를 실행하세요.
+
+만약 필요한 PyTorch 버전보다 낮은 버전이 설치되어 있는 경우,
+다음 명령어를 실행하여 제거한 뒤, 다시 설치하세요:
+
+.. code-block:: python
+   !pip3 uninstall --yes torch torchaudio torchvision torchtext torchdata
+   !pip3 install torch torchaudio torchvision torchtext torchdata
+
+
 Colab에서 Google Drive의 튜토리얼 데이터 사용하기
-====================================================
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 사용자가 Google Colab에서 튜토리얼과 관련된 노트북을 열 수 있도록 하는 새로운
 기능이 튜토리얼에 추가되었습니다. 이 때, 보다 복잡한 튜토리얼을 실행하려면

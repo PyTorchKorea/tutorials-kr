@@ -6,39 +6,39 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="ko" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+
 <meta property="og:title" content="Grokking PyTorch Intel CPU performance from first principles" />
-  
+
 <meta property="og:type" content="article" />
-  
+
 <meta property="og:url" content="https://tutorials.pytorch.kr/intermediate/torchserve_with_ipex.html" />
-  
+
 <meta property="og:description" content="A case study on the TorchServe inference framework optimized with Intel® Extension for PyTorch*. Authors: Min Jean Cho, Mark Saroufim Reviewers: Ashok Emani, Jiong Gong Getting a strong out-of-box performance for deep learning on CPUs can be tricky but it’s much easier if you’re aware of the main..." />
-  
+
 <meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
-  
+
 <meta property="og:image:alt" content="Grokking PyTorch Intel CPU performance from first principles" />
-  
+
 <meta property="og:ignore_canonical" content="true" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
+
   <title>Grokking PyTorch Intel CPU performance from first principles &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
-  
 
-  
-  
+
+
+
     <link rel="shortcut icon" href="../_static/favicon.ico"/>
-  
-  
-  
 
-  
 
-  
-  
-    
 
-  
+
+
+
+
+
+
+
+
 
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!-- <link rel="stylesheet" href="../_static/pygments.css" type="text/css" /> -->
@@ -57,9 +57,9 @@
     <link rel="index" title="색인" href="../genindex.html" />
     <link rel="search" title="검색" href="../search.html" />
     <link rel="next" title="Grokking PyTorch Intel CPU performance from first principles (Part 2)" href="torchserve_with_ipex_2.html" />
-    <link rel="prev" title="(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화" href="../advanced/static_quantization_tutorial.html" /> 
+    <link rel="prev" title="(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화" href="../advanced/static_quantization_tutorial.html" />
 
-  
+
   <script src="../_static/js/modernizr.min.js"></script>
 
   <!-- Preload the theme fonts -->
@@ -116,9 +116,9 @@
 
 <body class="pytorch-body">
 
-   
 
-    
+
+
 
     <div class="table-of-contents-link-wrapper">
       <span>Table of Contents</span>
@@ -129,21 +129,21 @@
       <div class="pytorch-side-scroll">
         <div class="pytorch-menu pytorch-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           <div class="pytorch-left-menu-search">
-            
 
-            
-              
-              
+
+
+
+
                 <div class="version">
                   1.13.1+cu117
                 </div>
-              
-            
-
-            
 
 
-  
+
+
+
+
+
 
 
 <div role="search">
@@ -154,15 +154,15 @@
   </form>
 </div>
 
-            
+
           </div>
 
-          
-            
-            
-              
-            
-            
+
+
+
+
+
+
               <p class="caption" role="heading"><span class="caption-text">파이토치(PyTorch) 레시피</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../recipes/recipes_index.html">모든 레시피 보기</a></li>
@@ -305,8 +305,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../beginner/flava_finetuning_tutorial.html">TorchMultimodal Tutorial: Finetuning FLAVA</a></li>
 </ul>
 
-            
-          
+
+
         </div>
       </div>
     </nav>
@@ -314,7 +314,7 @@
     <div class="pytorch-container">
       <div class="pytorch-page-level-bar" id="pytorch-page-level-bar">
         <div class="pytorch-breadcrumbs-wrapper">
-          
+
 
 
 
@@ -333,30 +333,30 @@
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="pytorch-breadcrumbs">
-    
+
       <li>
         <a href="../index.html">
-          
+
             Tutorials
-          
+
         </a> &gt;
       </li>
 
-        
+
       <li>Grokking PyTorch Intel CPU performance from first principles</li>
-    
-    
+
+
       <li class="pytorch-breadcrumbs-aside">
-        
-            
+
+
             <a href="../_sources/intermediate/torchserve_with_ipex.rst.txt" rel="nofollow"><img src="../_static/images/view-page-source-icon.svg"></a>
-          
-        
+
+
       </li>
-    
+
   </ul>
 
-  
+
 </div>
         </div>
 
@@ -368,7 +368,7 @@
       <section data-toggle="wy-nav-shift" id="pytorch-content-wrap" class="pytorch-content-wrap">
         <div class="pytorch-content-left">
 
-        
+
 
           <div class="pytorch-call-to-action-links">
             <div id="tutorial-type">intermediate/torchserve_with_ipex</div>
@@ -390,14 +390,14 @@
             </div>
           </div>
 
-        
 
-          
+
+
           <div class="rst-content">
-          
+
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
-              
+
   <div class="section" id="grokking-pytorch-intel-cpu-performance-from-first-principles">
 <h1>Grokking PyTorch Intel CPU performance from first principles<a class="headerlink" href="#grokking-pytorch-intel-cpu-performance-from-first-principles" title="이 제목에 대한 퍼머링크">¶</a></h1>
 <p>A case study on the TorchServe inference framework optimized with <a class="reference external" href="https://github.com/intel/intel-extension-for-pytorch">Intel® Extension for PyTorch*</a>.</p>
@@ -440,7 +440,7 @@
 <p><em>GEMM (General Matrix Multiply)</em> run on fused-multiply-add (FMA) or dot-product (DP) execution units which will be bottlenecked and cause delays in thread waiting/<em>spinning at synchronization</em> barrier when <em>hyperthreading</em> is enabled - because using logical cores causes insufficient concurrency for all working threads as each logical thread <em>contends for the same core resources</em>. Instead, if we use 1 thread per physical core, we avoid this contention. So we generally recommend <em>avoiding logical cores</em> by setting CPU <em>thread affinity</em> to physical cores via <em>core pinning</em>.</p>
 <p>Multi-socket systems have <em>Non-Uniform Memory Access (NUMA)</em> which is a shared memory architecture that describes the placement of main memory modules with respect to processors. But if a process is not NUMA-aware, slow <em>remote memory</em> is frequently accessed when <em>threads migrate</em> cross socket via <em>Intel Ultra Path Interconnect (UPI)</em> during run time. We address this problem by setting CPU <em>thread affinity</em> to a specific socket via <em>core pinning</em>.</p>
 <p>Knowing these principles in mind, proper CPU runtime configuration can significantly boost out-of-box performance.</p>
-<p>In this blog, we’ll walk you through the important runtime configurations you should be aware of from <a class="reference external" href="https://pytorch.org/tutorials/recipes/recipes/tuning_guide.html#cpu-specific-optimizations">CPU Performance Tuning Guide</a>, explain how they work, how to profile them and how to integrate them within a model serving framework like <a class="reference external" href="https://github.com/pytorch/serve">TorchServe</a> via an easy to use <a class="reference external" href="https://github.com/intel/intel-extension-for-pytorch/blob/master/docs/tutorials/performance_tuning/launch_script.md">launch script</a> which we’ve <a class="reference external" href="https://github.com/pytorch/serve/pull/1354">integrated</a> <sup>1</sup> natively.</p>
+<p>In this blog, we’ll walk you through the important runtime configurations you should be aware of from <a class="reference external" href="https://tutorials.pytorch.kr/recipes/recipes/tuning_guide.html#cpu-specific-optimizations">CPU Performance Tuning Guide</a>, explain how they work, how to profile them and how to integrate them within a model serving framework like <a class="reference external" href="https://github.com/pytorch/serve">TorchServe</a> via an easy to use <a class="reference external" href="https://github.com/intel/intel-extension-for-pytorch/blob/master/docs/tutorials/performance_tuning/launch_script.md">launch script</a> which we’ve <a class="reference external" href="https://github.com/pytorch/serve/pull/1354">integrated</a> <sup>1</sup> natively.</p>
 <p>We’ll explain all of these ideas <strong>visually</strong> from <strong>first principles</strong> with lots of <strong>profiles</strong> and show you how we applied our learnings to make out of the box CPU performance on TorchServe better.</p>
 <ol class="arabic simple">
 <li><p>The feature has to be explicitly enabled by setting <em>cpu_launcher_enable=true</em> in <em>config.properties</em>.</p></li>
@@ -700,7 +700,7 @@
 <p>These principles can be automatically configured via an easy to use launch script which has already been integrated into TorchServe.</p>
 <p>For interested readers, please check out the following documents:</p>
 <ul class="simple">
-<li><p><a class="reference external" href="https://pytorch.org/tutorials/recipes/recipes/tuning_guide.html#cpu-specific-optimizations">CPU specific optimizations</a></p></li>
+<li><p><a class="reference external" href="https://tutorials.pytorch.kr/recipes/recipes/tuning_guide.html#cpu-specific-optimizations">CPU specific optimizations</a></p></li>
 <li><p><a class="reference external" href="https://www.intel.com/content/www/us/en/developer/articles/technical/how-to-get-better-performance-on-pytorchcaffe2-with-intel-acceleration.html">Maximize Performance of Intel® Software Optimization for PyTorch* on CPU</a></p></li>
 <li><p><a class="reference external" href="https://intel.github.io/intel-extension-for-pytorch/tutorials/performance_tuning/tuning_guide.html">Performance Tuning Guide</a></p></li>
 <li><p><a class="reference external" href="https://intel.github.io/intel-extension-for-pytorch/tutorials/performance_tuning/launch_script.html">Launch Script Usage Guide</a></p></li>
@@ -719,21 +719,21 @@
 
 
              </article>
-             
+
             </div>
             <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="torchserve_with_ipex_2.html" class="btn btn-neutral float-right" title="Grokking PyTorch Intel CPU performance from first principles (Part 2)" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
-      
-      
-        <a href="../advanced/static_quantization_tutorial.html" class="btn btn-neutral" title="(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
-      
-    </div>
-  
 
-  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+
+        <a href="torchserve_with_ipex_2.html" class="btn btn-neutral float-right" title="Grokking PyTorch Intel CPU performance from first principles (Part 2)" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
+
+
+        <a href="../advanced/static_quantization_tutorial.html" class="btn btn-neutral" title="(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
+
+    </div>
+
+
+
     <hr class="community-hr hr-top" />
     <div class="community-container">
       <div class="community-prompt">더 궁금하시거나 개선할 내용이 있으신가요? 커뮤니티에 참여해보세요!</div>
@@ -753,7 +753,7 @@
       </div>
     </div>
     <hr class="rating-hr hr-bottom"/>
-  
+
 
   <div role="contentinfo">
     <p>
@@ -761,11 +761,11 @@
 
     </p>
   </div>
-    
+
       <div>
         Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
       </div>
-     
+
 
 </footer>
 
@@ -802,12 +802,12 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
       </section>
     </div>
 
-  
 
 
-  
-  
-     
+
+
+
+
        <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
          <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
          <script src="../_static/jquery.js"></script>
@@ -821,8 +821,8 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
          <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
          <script src="../_static/katex_autorenderer.js"></script>
          <script src="../_static/design-tabs.js"></script>
-     
-  
+
+
 
   <script type="text/javascript" src="../_static/js/vendor/popper.min.js"></script>
   <script type="text/javascript" src="../_static/js/vendor/bootstrap.min.js"></script>
@@ -834,7 +834,7 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
           SphinxRtdTheme.Navigation.enable(true);
       });
   </script>
- 
+
 <script>
 //add microsoft link
 

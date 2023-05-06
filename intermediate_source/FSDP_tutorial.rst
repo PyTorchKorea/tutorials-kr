@@ -4,7 +4,7 @@ Getting Started with Fully Sharded Data Parallel(FSDP)
 **Author**: `Hamid Shojanazeri <https://github.com/HamidShojanazeri>`__, `Yanli Zhao <https://github.com/zhaojuanmao>`__, `Shen Li <https://mrshenli.github.io/>`__
 
 .. note::
-   |edit| View and edit this tutorial in `github <https://github.com/pytorch/tutorials/blob/master/intermediate_source/FSDP_tutorial.rst>`__.
+   |edit| View and edit this tutorial in `github <https://github.com/pytorch/tutorials/blob/main/intermediate_source/FSDP_tutorial.rst>`__.
 
 Training AI models at a large scale is a challenging task that requires a lot of compute power and resources. 
 It also comes with considerable engineering complexity to handle the training of these very large models.
@@ -249,7 +249,7 @@ We add the following code snippets to a python script “FSDP_mnist.py”.
 
         if args.save_model:
             # use a barrier to make sure training is done on all ranks
-            dist_barrier()
+            dist.barrier()
             # state_dict for FSDP model is only available on Nightlies for now
             states = model.state_dict()
             if rank == 0:

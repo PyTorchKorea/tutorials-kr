@@ -268,10 +268,6 @@ print(f"Does `b` require gradients?: {b.requires_grad}")
 # 이러한 매개변수의 변화도가 필요하지 않다는 것을 미리 알고 있으면, 신경망 모델의 일부를 "고정(freeze)"하는 것이 유용합니다.
 # (이렇게 하면 autograd 연산량을 줄임으로써 성능 상의 이득을 제공합니다.)
 #
-# DAG에서 제외하는 것이 중요한 또 다른 일반적인 사례(usecase)는
-# `미리 학습된 모델을 미세조정 <https://tutorials.pytorch.kr/beginner/finetuning_torchvision_models_tutorial.html>`__
-# 하는 경우입니다.
-#
 # 미세조정(finetuning)을 하는 과정에서, 새로운 정답(label)을 예측할 수 있도록 모델의 대부분을 고정한 뒤 일반적으로 분류 계층(classifier layer)만 변경합니다.
 # 이를 설명하기 위해 간단한 예제를 살펴보겠습니다. 이전과 마찬가지로 이미 학습된 resnet18 모델을 불러온 뒤 모든 매개변수를 고정합니다.
 

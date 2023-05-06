@@ -4,7 +4,7 @@ PyTorch로 분산 어플리케이션 개발하기
   **번역**: `박정환 <https://github.com/9bow>`_
 
 .. note::
-   |edit| 이 튜토리얼의 소스 코드는 `GitHub <https://github.com/pytorch/tutorials/blob/master/intermediate_source/dist_tuto.rst>`__ 에서 확인하고 변경해 볼 수 있습니다.
+   |edit| 이 튜토리얼의 소스 코드는 `GitHub <https://github.com/pytorch/tutorials/blob/main/intermediate_source/dist_tuto.rst>`__ 에서 확인하고 변경해 볼 수 있습니다.
 
 선수과목(Prerequisites):
 
@@ -416,7 +416,7 @@ PyTorch에는 현재 ``dist.all_reduce(tensor, op, group)`` 외에도 6개의 �
    이해합니다.
 
 통신 백엔드(Communication Backends)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ``torch.distributed`` 의 가장 우아한 면 중 하나는 다른 백엔드를 기반으로 추상화하고
 구축하는 기능입니다. 앞에서 언급한 것처럼 현재 PyTorch에는 Gloo, NCLL 및 MPI의

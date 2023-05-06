@@ -137,9 +137,9 @@ def fused_gelu(x):
 # Support for ``channels_last`` is experimental, but it's expected to work for
 # standard computer vision models (e.g. ResNet-50, SSD). To convert models to
 # ``channels_last`` format follow
-# `Channels Last Memory Format Tutorial <https://pytorch.org/tutorials/intermediate/memory_format_tutorial.html>`_.
+# `Channels Last Memory Format Tutorial <https://tutorials.pytorch.kr/intermediate/memory_format_tutorial.html>`_.
 # The tutorial includes a section on
-# `converting existing models <https://pytorch.org/tutorials/intermediate/memory_format_tutorial.html#converting-existing-models>`_.
+# `converting existing models <https://tutorials.pytorch.kr/intermediate/memory_format_tutorial.html#converting-existing-models>`_.
 
 ###############################################################################
 # Checkpoint intermediate buffers
@@ -240,7 +240,7 @@ def fused_gelu(x):
 # Use oneDNN Graph with TorchScript for inference
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # oneDNN Graph can significantly boost inference performance. It fuses some compute-intensive operations such as convolution, matmul with their neighbor operations.
-# Currently, it's supported as an experimental feature for Float32 data-type.
+# In PyTorch 2.0, it is supported as a beta feature for Float32 & BFloat16 data-types.
 # oneDNN Graph receives the model’s graph and identifies candidates for operator-fusion with respect to the shape of the example input.
 # A model should be JIT-traced using an example input.
 # Speed-up would then be observed after a couple of warm-up iterations for inputs with the same shape as the example input.
@@ -250,7 +250,7 @@ def fused_gelu(x):
 torch.jit.enable_onednn_fusion(True)
 
 ###############################################################################
-# Using the oneDNN Graph API requires just one extra line of code.
+# Using the oneDNN Graph API requires just one extra line of code for inference with Float32.
 # If you are using oneDNN Graph, please avoid calling ``torch.jit.optimize_for_inference``.
 
 # sample input should be of the same shape as expected inputs
@@ -272,6 +272,24 @@ with torch.no_grad():
     traced_model(*sample_input)
     # speedup would be observed after warmup runs
     traced_model(*sample_input)
+
+###############################################################################
+# While the JIT fuser for oneDNN Graph also supports inference with BFloat16 datatype,
+# performance benefit with oneDNN Graph is only exhibited by machines with AVX512_BF16 ISA.
+# The following code snippets serves as an example of using BFloat16 datatype for inference with oneDNN Graph:
+
+# AMP for JIT mode is enabled by default, and is divergent with its eager mode counterpart
+torch._C._jit_set_autocast_mode(False)
+
+with torch.no_grad(), torch.cpu.amp.autocast(cache_enabled=False, dtype=torch.bfloat16):
+    model = torch.jit.trace(model, (example_input))
+    model = torch.jit.freeze(model)
+    # a couple of warmup runs
+    model(example_input)
+    model(example_input)
+    # speedup would be observed in subsequent runs.
+    model(example_input)
+
 
 ###############################################################################
 # Train a model on CPU with PyTorch DistributedDataParallel(DDP) functionality
@@ -363,7 +381,7 @@ torch.backends.cudnn.benchmark = True
 #   * native PyTorch AMP is available starting from PyTorch 1.6:
 #     `documentation <https://pytorch.org/docs/stable/amp.html>`_,
 #     `examples <https://pytorch.org/docs/stable/notes/amp_examples.html#amp-examples>`_,
-#     `tutorial <https://pytorch.org/tutorials/recipes/recipes/amp_recipe.html>`_
+#     `tutorial <https://tutorials.pytorch.kr/recipes/recipes/amp_recipe.html>`_
 #
 #
 

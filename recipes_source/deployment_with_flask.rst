@@ -65,7 +65,7 @@ Flask 서비스를 구성하는 전체 Python 스크립트는 이 레시피의 �
 아래에서 각각의 기능들을 명확히 살펴보기 위해 각 섹션별로 살펴보겠습니다.
 
 Import
-~~~~~~~
+~~~~~~~~
 
 ::
 
@@ -258,6 +258,6 @@ TorchVision transforms(변환) 세트를 구성합니다. (정규화에 대한 �
 .. _pytorch.kr: https://pytorch.kr
 .. _pytorch.org: https://pytorch.org
 .. _Flask 사이트: https://flask.palletsprojects.com/en/1.1.x/
-.. _빠른 시작 가이드(Quick Start guide): https://flask.palletsprojects.com/en/1.1.x/quickstart/
+.. _빠른 시작 가이드(Quickstart guide): https://flask.palletsprojects.com/en/1.1.x/quickstart/
 .. _torchvision.models: https://pytorch.org/vision/stable/models.html
 .. _Flask 설치 문서: https://flask.palletsprojects.com/en/1.1.x/installation/

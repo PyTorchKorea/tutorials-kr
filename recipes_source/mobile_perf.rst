@@ -2,7 +2,8 @@ PyTorch 모바일 성능 레시피
 =========================
 
 소개
-----
+------
+
 전부는 아니지만, 모바일 기기에서의 애플리케이션과 ML 모델 추론 사용 사례에
 성능(지연시간)은 매우 중대한 사항입니다.
 
@@ -16,14 +17,14 @@ CPU 백엔드에서 모델을 실행합니다.
 
 
 모델 준비
---------
+----------
 
 모바일 기기에서 실행 시간을 줄이는데 도움이 될(성능은 높이고, 지연시간은 줄이는)
 모델의 최적화를 위한 준비부터 시작합니다.
 
 
 설정
-^^^^
+^^^^^^
 
 첫번째로 적어도 버전이 1.5.0 이상인 PyTorch를 conda나 pip으로 설치합니다.
 
@@ -69,7 +70,7 @@ CPU 백엔드에서 모델을 실행합니다.
 
 
 1. ``torch.quantization.fuse_modules`` 이용하여 연산자 결합(fuse)하기
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 fuse_modules은 양자화 패키지 내부에 있다는 것을 혼동하지 마십시오.
 fuse_modules은 모든 ``torch.nn.Module`` 에서 동작합니다.
@@ -90,7 +91,7 @@ fuse_modules은 모든 ``torch.nn.Module`` 에서 동작합니다.
 
 
 2. 모델 양자화하기
-^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^
 
 PyTorch 양자화에 대한 내용은
 `the dedicated tutorial <https://pytorch.org/blog/introduction-to-quantization-on-pytorch/>`_ 에서 찾을 수 있습니다.
@@ -115,7 +116,7 @@ PyTorch 양자화에 대한 내용은
 
 
 3. torch.utils.mobile_optimizer 사용하기
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Torch mobile_optimizer 패키지는 스크립트된 모델을 이용해서 몇 가지 최적화를 수행하고,
 이러한 최적화는 conv2d와 선형 연산에 도움이 됩니다.
@@ -152,7 +153,7 @@ Channels Last(NHWC) 메모리 형식은 PyTorch 1.4.0에서 도입되었습니�
 이 변환은 입력이 Channels Last 메모리 형식이면 비용이 들지 않습니다. 결국에는 모든 연산자가 Channels Last 메모리 형식을 유지하면서 작업을 합니다.
 
 5. Android - 순방향 전달을 위한 텐서 재사용하기
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 레시피에서 이 부분은 Android에만 해당합니다.
 
@@ -199,8 +200,73 @@ Channels Last(NHWC) 메모리 형식은 PyTorch 1.4.0에서 도입되었습니�
 멤버 변수 ``mModule`` , ``mInputTensorBuffer`` , ``mInputTensor`` 는 단 한 번 초기화를 하고
 버퍼는 ``org.pytorch.torchvision.TensorImageUtils.imageYUV420CenterCropToFloatBuffer`` 를 이용해서 다시 채워집니다.
 
+6. 로딩 시간 최적화
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**PyTorch 1.13 이상부터 사용 가능**
+
+파이토치 모바일은 로딩 속도가 더 빠른 FlatBuffer(플랫버퍼) 기반 파일 형식도 지원합니다.
+FlatBuffer와 Pickle(피클) 기반 모델 파일은 모두 동일한 ``_load_for_lite_interpreter`` (Python)
+또는 ``_load_for_mobile`` (C++) API로 불러올 수 있습니다.
+
+FlatBuffer 형식을 사용하려면 ``model._save_for_lite_interpreter('path/to/file.ptl')`` 식으로
+모델 파일을 생성하는 대신, 다음 명령을 실행하면 됩니다:
+
+다음을 사용하여 저장
+
+::
+
+  model._save_for_lite_interpreter('path/to/file.ptl', _use_flatbuffer=True)
+
+인수 ``_use_flatbuffer`` 를 추가로 사용하여 zip 파일 대신 FlatBuffer 파일을
+만듭니다. 이렇게 생성된 파일은 불러오는 속도가 더 빨라집니다.
+
+예를 들어 ResNet-50을 사용하고 다음 스크립트를 실행합니다:
+
+::
+
+  import torch
+  from torch.jit import mobile
+  import time
+  model = torch.hub.load('pytorch/vision:v0.10.0', 'deeplabv3_resnet50', pretrained=True)
+  model.eval()
+  jit_model = torch.jit.script(model)
+
+  jit_model._save_for_lite_interpreter('/tmp/jit_model.ptl')
+  jit_model._save_for_lite_interpreter('/tmp/jit_model.ff', _use_flatbuffer=True)
+
+  import timeit
+  print('Load ptl file:')
+  print(timeit.timeit('from torch.jit import mobile; mobile._load_for_lite_interpreter("/tmp/jit_model.ptl")',
+                         number=20))
+  print('Load flatbuffer file:')
+  print(timeit.timeit('from torch.jit import mobile; mobile._load_for_lite_interpreter("/tmp/jit_model.ff")',
+                         number=20))
+
+
+
+다음과 같은 결과를 얻을 수 있습니다:
+
+::
+
+  Load ptl file:
+  0.5387594579999999
+  Load flatbuffer file:
+  0.038842832999999466
+
+실제 모바일 기기에서는 속도 향상 폭이 더 작겠지만, 그럼에도 로딩 시간이
+3배에서 6배까지 단축되는 효과를 기대할 수 있습니다.
+
+### FlatBuffer 기반 모바일 모델을 사용하지 않는 이유
+
+그러나, FlatBuffer 형식에는 고려해야 할 몇 가지 제한 사항이 있습니다:
+
+* PyTorch 1.13 이상에서만 사용할 수 있습니다. 따라서, 이전 버전의 PyTorch로 컴파일된
+  클라이언트 장치에서는 불러오지 못할 수 있습니다.
+* Flatbuffer 라이브러리는 파일 크기에 대해 4GB의 제한을 두고 있습니다. 따라서
+  대용량 모델에는 적합하지 않습니다.
+
 벤치마킹
--------
+----------
 
 벤치마킹(최적화가 사용 사례에 도움이 되었는지 확인)하는 최고의 방법은 최적화를 하고 싶은 특정한 사용 사례를 측정하는 것입니다. 성능 측정 행위가 환경에 따라 달라질 수 있기 때문입니다.
 
@@ -209,7 +275,7 @@ PyTorch 배포판은 모델 순방향 전달을 실행하는 방식을 사용해
 
 
 Android - 벤치마킹 설정
-^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
 레시피에서 이 부분은 Android에만 해당합니다.
 
@@ -246,7 +312,7 @@ speedbenchark_torch 바이너리와 모델을 폰으로 푸시합니다:
 
 
 iOS - 벤치마킹 설정
-^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^
 
 iOS의 경우 , 벤치마킹의 도구로 `TestApp <https://github.com/pytorch/pytorch/tree/master/ios/TestApp>`_ 을 사용합니다.
 

@@ -1,10 +1,10 @@
-# PyTorch 한국어 튜토리얼
+# 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)
 
 ## 소개
 
 PyTorch에서 제공하는 튜토리얼의 한국어 번역을 위한 저장소입니다.\
 번역의 결과물은 [https://tutorials.pytorch.kr](https://tutorials.pytorch.kr)에서 확인하실 수 있습니다. (번역을 진행하며 **비정기적으로** 반영합니다.)\
-현재 버전의 번역 / 변경 관련 이슈는 [#615 이슈](https://github.com/PyTorchKorea/tutorials-kr/issues/615)를 참고해주세요.
+현재 버전의 번역 / 변경 관련 이슈는 [#660 이슈](https://github.com/PyTorchKorea/tutorials-kr/issues/660)를 참고해주세요.
 
 ## 기여하기
 
@@ -22,7 +22,7 @@ PyTorch에서 제공하는 튜토리얼의 한국어 번역을 위한 저장소�
 
 ## 원문
 
-현재 PyTorch v1.13 튜토리얼([pytorch/tutorials@db34a77](https://github.com/pytorch/tutorials/commit/db34a779242f1a71346db4a9e5d6ac962a8d9b77) 기준) 번역이 진행 중입니다.
+현재 PyTorch v2.0 튜토리얼([pytorch/tutorials@9efe789b](https://github.com/pytorch/tutorials/commit/9efe789bfc3763ec359b60f12b5e6dda4e6d5db0) 기준) 번역이 진행 중입니다.
 
 최신 버전의 튜토리얼(공식, 영어)은 [PyTorch tutorials 사이트](https://pytorch.org/tutorials) 및 [PyTorch tutorials 저장소](https://github.com/pytorch/tutorials)를 참고해주세요.
 
@@ -46,5 +46,5 @@ v1.0 이후 번역은 별도 저장소로 관리하지 않습니다. [이 저장
 빌드 방법은 [기여하기 문서의 `2-5. (내 컴퓨터에서) 결과 확인하기`](https://github.com/PyTorchKorea/tutorials-kr/blob/master/CONTRIBUTING.md#2-5-내-컴퓨터에서-결과-확인하기) 부분을 참고해주세요.
 
 ---
-This is a project to translate [pytorch/tutorials@db34a77](https://github.com/pytorch/tutorials/commit/db34a779242f1a71346db4a9e5d6ac962a8d9b77) into Korean.
+This is a project to translate [pytorch/tutorials@9efe789b](https://github.com/pytorch/tutorials/commit/9efe789bfc3763ec359b60f12b5e6dda4e6d5db0) into Korean.
 For the latest version, please visit to the [official PyTorch tutorials repo](https://github.com/pytorch/tutorials).

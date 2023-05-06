@@ -35,28 +35,28 @@
 #    :align: center
 #    :alt: bot
 #
-# .. code:: python
+# .. code-block:: python
 #
-#   > hello? (안녕하세요?)
-#   Bot: hello . (안녕하세요.)
-#   > where am I? (여긴 어디죠?)
-#   Bot: you re in a hospital . (병원입니다.)
-#   > who are you? (당신은 누구시죠?)
-#   Bot: i m a lawyer . (변호사입니다.)
-#   > how are you doing? (어떻게 지내세요?)
-#   Bot: i m fine . (잘 지냅니다.)
-#   > are you my friend? (당신은 제 친구인가요?)
-#   Bot: no . (아뇨.)
-#   > you're under arrest (당신을 체포하겠습니다)
-#   Bot: i m trying to help you ! (난 당신을 도우려 하는 겁니다!)
-#   > i'm just kidding (농담이었어요)
-#   Bot: i m sorry . (미안하네요.)
-#   > where are you from? (어디서 오셨어요?)
-#   Bot: san francisco . (샌프란시스코요.)
-#   > it's time for me to leave (전 이제 가봐야겠네요)
-#   Bot: i know . (알겠습니다.)
-#   > goodbye (안녕히 계세요)
-#   Bot: goodbye . (안녕히 가세요.)
+#    > hello? (안녕하세요?)
+#    Bot: hello . (안녕하세요.)
+#    > where am I? (여긴 어디죠?)
+#    Bot: you re in a hospital . (병원입니다.)
+#    > who are you? (당신은 누구시죠?)
+#    Bot: i m a lawyer . (변호사입니다.)
+#    > how are you doing? (어떻게 지내세요?)
+#    Bot: i m fine . (잘 지냅니다.)
+#    > are you my friend? (당신은 제 친구인가요?)
+#    Bot: no . (아뇨.)
+#    > you're under arrest (당신을 체포하겠습니다)
+#    Bot: i m trying to help you ! (난 당신을 도우려 하는 겁니다!)
+#    > i'm just kidding (농담이었어요)
+#    Bot: i m sorry . (미안하네요.)
+#    > where are you from? (어디서 오셨어요?)
+#    Bot: san francisco . (샌프란시스코요.)
+#    > it's time for me to leave (전 이제 가봐야겠네요)
+#    Bot: i know . (알겠습니다.)
+#    > goodbye (안녕히 계세요)
+#    Bot: goodbye . (안녕히 가세요.)
 #
 # **이 튜토리얼의 핵심 내용**
 #
@@ -86,7 +86,7 @@
 
 ######################################################################
 # 준비 단계
-# ---------
+# -----------
 #
 # 시작에 앞서, `여기 <https://zissou.infosci.cornell.edu/convokit/datasets/movie-corpus/movie-corpus.zip>`__ 에서
 # ZIP 파일 형태의 데이터를 내려받고, 현재 디렉토리 아래에 ``data/`` 라는
@@ -123,7 +123,7 @@ device = torch.device("cuda" if USE_CUDA else "cpu")
 
 ######################################################################
 # 데이터 읽기 & 전처리하기
-# ------------------------
+# --------------------------
 #
 # 다음 단계는 데이터 파일의 형식을 재조정한 후, 우리가 작업하기 편한
 # 구조로 읽어들이는 것입니다.
@@ -159,21 +159,21 @@ printLines(os.path.join(corpus, "utterances.jsonl"))
 
 ######################################################################
 # 원하는 형식의 데이터 파일로 만들기
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 # 편의를 위해 데이터의 형식을 원하는 형태로 만들려고 합니다. 각 줄에
 # *질의 문장* 과 *응답 문장* 의 쌍이 탭으로 구분되어 있게끔 하는 것입니다.
 #
-# 다음의 함수를 통해 *utterances.jsonl* 원본 데이터 파일을 파싱하려
+# 다음의 함수를 통해 ``utterances.jsonl`` 원본 데이터 파일을 파싱하려
 # 합니다.
 #
 # -  ``loadLines`` 는 파일에 포함된 대사를 변환하여 항목(대사 ID ``lineID``,
 #    인물 ID ``characterID``, 영화 ID ``movieID``, 인물 ``character``, 대사
 #    내용 ``text``)에 대한 사전 형태로 변환합니다
 # -  ``loadConversations`` 는 ``loadLines`` 를 통해 읽어들인
-#    대사(``lines``)의 항목(``fields``)를 *movie_conversations.txt* 에 나와
+#    대사( ``lines`` )의 항목( ``fields`` )를 *movie_conversations.txt* 에 나와
 #    있는 내용에 맞춰 대화 형태로 묶습니다
-# -  ``extractSentencePairs`` 는 대화(``conversations``)에서 문장 쌍을
+# -  ``extractSentencePairs`` 는 대화( ``conversations`` )에서 문장 쌍을
 #    추출합니다
 #
 
@@ -220,12 +220,12 @@ def extractSentencePairs(conversations):
 
 
 ######################################################################
-# 이제 이 함수들을 호출하여 새로운 파일인 *formatted_utterances.jsonl* 를
+# 이제 이 함수들을 호출하여 새로운 파일인 ``formatted_movie_lines.txt`` 를
 # 만듭니다.
 #
 
 # 새 파일에 대한 경로를 정의합니다
-datafile = os.path.join(corpus, "formatted_utterances.jsonl")
+datafile = os.path.join(corpus, "formatted_movie_lines.txt")
 
 delimiter = '\t'
 # 구분자에 대해 unescape 함수를 호출합니다
@@ -252,7 +252,7 @@ printLines(datafile)
 
 ######################################################################
 # 데이터 읽고 정리하기
-# ~~~~~~~~~~~~~~~~~~~~
+# ~~~~~~~~~~~~~~~~~~~~~~
 #
 # 다음에 해야 할 일은 어휘집을 만들고, 질의/응답 문장 쌍을 메모리로
 # 읽어들이는 것입니다.
@@ -265,9 +265,9 @@ printLines(datafile)
 # 이를 위해 우리는 ``Voc`` 라는 클래스를 만들어 단어에서 인덱스로의
 # 매핑, 인덱스에서 단어로의 역 매핑, 각 단어의 등장 횟수, 전체 단어 수
 # 등을 관리하려 합니다. 이 클래스는 어휘집에 새로운 단어를 추가하는
-# 메서드(``addWord``), 문장에 등장하는 모든 단어를 추가하는
-# 메서드(``addSentence``), 그리고 자주 등장하지 않는 단어를 정리하는
-# 메서드(``trim``)를 제공합니다. 단어를 정리하는 내용에 대해서는 뒤에서
+# 메서드( ``addWord``), 문장에 등장하는 모든 단어를 추가하는
+# 메서드( ``addSentence``), 그리고 자주 등장하지 않는 단어를 정리하는
+# 메서드( ``trim``)를 제공합니다. 단어를 정리하는 내용에 대해서는 뒤에서
 # 좀 더 자세히 살펴보겠습니다.
 #
 
@@ -332,7 +332,7 @@ class Voc:
 # 합니다. 다음에는 모든 글자를 소문자로 변환하고, 알파벳도 아니고 기본적인
 # 문장 부호도 아닌 글자는 제거합니다(정규화, ``normalizeString``).
 # 마지막으로는 학습할 때의 편의성을 위해서, 길이가 일정 기준을 초과하는,
-# 즉 ``MAX_LENGTH`` 보다 긴 문장을 제거합니다(``filterPairs``).
+# 즉 ``MAX_LENGTH`` 보다 긴 문장을 제거합니다( ``filterPairs``).
 #
 
 MAX_LENGTH = 10  # 고려할 문장의 최대 길이
@@ -369,7 +369,7 @@ def filterPair(p):
     # EOS 토큰을 위해 입력 시퀀스의 마지막 단어를 보존해야 합니다
     return len(p[0].split(' ')) < MAX_LENGTH and len(p[1].split(' ')) < MAX_LENGTH
 
-# 조건식 filterPair에 따라 pairs를 필터링합니다
+# 조건식 ``filterPair`` 에 따라 pairs를 필터링합니다
 def filterPairs(pairs):
     return [pair for pair in pairs if filterPair(pair)]
 
@@ -446,7 +446,7 @@ pairs = trimRareWords(voc, pairs, MIN_COUNT)
 
 ######################################################################
 # 모델을 위한 데이터 준비하기
-# ---------------------------
+# -----------------------------
 #
 # 상당한 노력을 기울여 데이터를 전처리하고, 잘 정리하여 어휘집 객체와
 # 문장 쌍의 리스트 형태로 만들어두긴 했지만, 결국 우리가 만들 모델에서
@@ -464,7 +464,7 @@ pairs = trimRareWords(voc, pairs, MIN_COUNT)
 # 점에 유의해야 한다는 것을 뜻합니다. 같은 배치 안에서 크기가 다른
 # 문장을 처리하기 위해서는 배치용 입력 텐서의 모양을 *(max_length,
 # batch_size)* 로 맞춰야 합니다. 이때 *max_length* 보다 짧은 문장에
-# 대해서는 *EOS 토큰* 뒤에 제로 토큰을 덧붙이면 됩니다.
+# 대해서는 *EOS_token* 뒤에 제로 토큰을 덧붙이면 됩니다.
 #
 # 영어로 된 문장을 텐서로 변환하기 위해 단순히 그에 대응하는 인덱스를
 # 사용하고(``indexesFromSentence``) 제로 토큰을 패딩한다고 해봅시다.
@@ -489,7 +489,7 @@ pairs = trimRareWords(voc, pairs, MIN_COUNT)
 # ``outputVar`` 함수는 ``inputVar`` 와 비슷한 작업을 수행하지만, ``lengths``
 # 텐서를 반환하는 대신에 이진 마스크로 구성된 텐서와 목표 문장의 최대
 # 길이를 같이 반환합니다. 이진 마스크 텐서는 출력에 해당하는 목표 텐서와
-# 그 모양이 같지만, 패딩 토큰(*PAD_token*)에 해당하는 경우에는 값이 0이며
+# 그 모양이 같지만, 패딩 토큰( *PAD_token* )에 해당하는 경우에는 값이 0이며
 # 나머지 경우의 값은 1입니다.
 #
 # ``batch2TrainData`` 는 단순히 여러 쌍을 입력으로 받아서, 앞서 설명한
@@ -558,10 +558,10 @@ print("max_target_len:", max_target_len)
 
 ######################################################################
 # 모델 정의하기
-# -------------
+# ---------------
 #
 # Seq2Seq 모델
-# ~~~~~~~~~~~~
+# ~~~~~~~~~~~~~~
 #
 # 우리 챗봇의 두뇌에 해당하는 모델은 sequence-to-sequence (seq2seq)
 # 모델입니다. seq2seq 모델의 목표는 가변 길이 시퀀스를 입력으로 받고,
@@ -588,7 +588,7 @@ print("max_target_len:", max_target_len)
 
 ######################################################################
 # 인코더
-# ~~~~~~
+# ~~~~~~~
 #
 # 인코더 RNN은 입력 시퀀스를 토큰 단위로(예를 들어, 단어 단위로) 한번에
 # 하나씩 살펴보며 진행합니다. 그리고 각 단계마다 "출력" 벡터와 "은닉
@@ -627,7 +627,7 @@ print("max_target_len:", max_target_len)
 # ``nn.utils.rnn.pack_padded_sequence`` 와
 # ``nn.utils.rnn.pad_packed_sequence`` 를 통해 수행할 수 있습니다.
 #
-# **계산 그래프:**
+# **연산 그래프:**
 #
 #    1) 단어 인덱스를 임베딩으로 변환합니다.
 #    2) RNN 모듈을 위한 패딩된 배치 시퀀스를 패킹합니다.
@@ -788,7 +788,7 @@ class Attn(nn.Module):
 # 제공하려 합니다. 이는 임베딩된 단어 텐서와 GRU 출력의 모양이 둘 다
 # *(1, batch_size, hidden_size)* 라는 의미입니다.
 #
-# **계산 그래프:**
+# **연산 그래프:**
 #
 #    1) 현재의 입력 단어에 대한 임베딩을 구합니다.
 #    2) 무방향 GRU로 포워드 패스를 수행합니다.
@@ -861,10 +861,10 @@ class LuongAttnDecoderRNN(nn.Module):
 
 ######################################################################
 # 학습 프로시저 정의하기
-# ----------------------
+# ------------------------
 #
 # Masked loss
-# ~~~~~~~~~~~
+# ~~~~~~~~~~~~~
 #
 # 우리는 패딩된 시퀀스 배치를 다루기 때문에 손실을 계산할 때 단순히 텐서의
 # 모든 원소를 고려할 수는 없습니다. 우리는 ``maskNLLLoss`` 를 정의하여
@@ -883,7 +883,7 @@ def maskNLLLoss(inp, target, mask):
 
 ######################################################################
 # 한 번의 학습 단계
-# ~~~~~~~~~~~~~~~~~
+# ~~~~~~~~~~~~~~~~~~~
 #
 # ``train`` 함수에 학습을 한 단계(입력 배치 한 개에 대한) 진행하는 알고리즘이
 # 나와 있습니다.
@@ -927,7 +927,7 @@ def maskNLLLoss(inp, target, mask):
 #
 # .. warning::
 #
-#   PyTorch의 RNN 모듈(``RNN``, ``LSTM``, ``GRU``)은 전체 입력 시퀀스(또는
+#   PyTorch의 RNN 모듈( ``RNN``, ``LSTM``, ``GRU`` )은 전체 입력 시퀀스(또는
 #   시퀀스의 배치)를 단순히 넣어주기만 하면 다른 비순환 레이어처럼 사용할 수
 #   있습니다. 우리는 ``encoder`` 에서 ``GRU`` 레이어를 이런 식으로 사용합니다.
 #   그 안이 실제로 어떻게 되어 있는지를 살펴보면, 매 시간 단계마다 은닉 상태를
@@ -951,7 +951,7 @@ def train(input_variable, lengths, target_variable, mask, max_target_len, encode
     input_variable = input_variable.to(device)
     target_variable = target_variable.to(device)
     mask = mask.to(device)
-    # Lengths for rnn packing should always be on the cpu
+    # RNN 패킹의 길이는 항상 CPU에 위치해야 합니다
     lengths = lengths.to("cpu")
 
     # 변수를 초기화합니다
@@ -1016,7 +1016,7 @@ def train(input_variable, lengths, target_variable, mask, max_target_len, encode
 
 ######################################################################
 # 학습 단계
-# ~~~~~~~~~
+# ~~~~~~~~~~~
 #
 # 이제 마지막으로 전체 학습 프로시저와 데이터를 하나로 엮을 때가
 # 되었습니다. ``trainIters`` 함수는 주어진 모델, optimizer, 데이터 등을
@@ -1025,7 +1025,7 @@ def train(input_variable, lengths, target_variable, mask, max_target_len, encode
 # 함수에 옮겨 놓았기 때문입니다.
 #
 # 한 가지 주의할 점은 우리가 모델을 저장하려 할 때, 인코더와 디코더의
-# state_dicts (매개변수), optimizer의 state_dicts, 손실, 진행 단계 수
+# ``state_dicts`` (매개변수), optimizer의 ``state_dicts``, 손실, 진행 단계 수
 # 등을 tarball로 만들어 저장한다는 점입니다. 모델을 이러한 방식으로
 # 저장하면 checkpoint에 대해 아주 높은 수준의 유연성을 확보할 수 있게
 # 됩니다. Checkpoint를 불러오고 나면, 우리는 모델 매개변수를 이용하여
@@ -1083,13 +1083,13 @@ def trainIters(model_name, voc, pairs, encoder, decoder, encoder_optimizer, deco
 
 ######################################################################
 # 평가 정의하기
-# -------------
+# ---------------
 #
 # 모델을 학습시키고 나면 직접 봇과 대화를 나눠보고 싶어질 것입니다. 그러려면
 # 먼저 모델이 인코딩된 입력을 어떻게 디코딩할지를 정의해줘야 합니다.
 #
 # 탐욕적 디코딩
-# ~~~~~~~~~~~~~
+# ~~~~~~~~~~~~~~~
 #
 # 탐욕적 디코딩(Greedy decoding)은 우리가 학습 단계에서 teacher forcing을
 # 적용하지 않았을 때 사용한 디코딩 방법입니다. 달리 말하면, 각 단계에 대해
@@ -1098,12 +1098,12 @@ def trainIters(model_name, voc, pairs, encoder, decoder, encoder_optimizer, deco
 #
 # 우리는 탐욕적 디코딩 연산을 수행할 수 있도록 ``GreedySearchDecoder``
 # 클래스를 만들었습니다. 수행 과정에서 이 클래스의 인스턴스는 모양이
-# *(input_seq length, 1)* 인 입력 시퀀스(``input_seq``), 조종할 입력
-# 길이(``input_length``) 텐서, 그리고 응답 문장 길이의 제한을 나타내는
+# *(input_seq length, 1)* 인 입력 시퀀스( ``input_seq`` ), 조종할 입력
+# 길이( ``input_length`` ) 텐서, 그리고 응답 문장 길이의 제한을 나타내는
 # ``max_length`` 를 입력으로 받습니다. 입력 시퀀서는 다음과 같은 계산 그래프에
 # 의해 평가됩니다.
 #
-# **계산 그래프:**
+# **연산 그래프:**
 #
 #    1) 인코더 모델로 입력을 포워드 패스합니다.
 #    2) 인코더의 마지막 은닉 레이어가 디코더의 첫 번째 은닉 레이어의 입력이 되도록 준비합니다.
@@ -1150,7 +1150,7 @@ class GreedySearchDecoder(nn.Module):
 
 ######################################################################
 # 내 텍스트 평가하기
-# ~~~~~~~~~~~~~~~~~~
+# ~~~~~~~~~~~~~~~~~~~~
 #
 # 이제 디코딩 모델을 정의했으니, 문자열로 된 입력 시퀀스를 평가하는 함수를
 # 작성해볼 수 있을 것입니다. ``evaluate`` 함수에 입력 시퀀스를 낮은
@@ -1231,8 +1231,8 @@ def evaluateInput(encoder, decoder, searcher, voc):
 # 모델을 설정합니다
 model_name = 'cb_model'
 attn_model = 'dot'
-#attn_model = 'general'
-#attn_model = 'concat'
+#``attn_model = 'general'``
+#``attn_model = 'concat'``
 hidden_size = 500
 encoder_n_layers = 2
 decoder_n_layers = 2
@@ -1242,12 +1242,17 @@ batch_size = 64
 # 불러올 checkpoint를 설정합니다. 처음부터 시작할 때는 None으로 둡니다.
 loadFilename = None
 checkpoint_iter = 4000
-#loadFilename = os.path.join(save_dir, model_name, corpus_name,
-#                            '{}-{}_{}'.format(encoder_n_layers, decoder_n_layers, hidden_size),
-#                            '{}_checkpoint.tar'.format(checkpoint_iter))
 
+#############################################################
+# checkpoint로부터 불러오는 샘플 코드:
+#
+# .. code-block:: python
+#
+#    loadFilename = os.path.join(save_dir, model_name, corpus_name,
+#                        '{}-{}_{}'.format(encoder_n_layers, decoder_n_layers, hidden_size),
+#                        '{}_checkpoint.tar'.format(checkpoint_iter))
 
-# loadFilename이 제공되는 경우에는 모델을 불러옵니다
+# ``loadFilename`` 이 존재하는 경우에는 모델을 불러옵니다
 if loadFilename:
     # 모델을 학습할 때와 같은 기기에서 불러오는 경우
     checkpoint = torch.load(loadFilename)
@@ -1309,7 +1314,7 @@ if loadFilename:
     encoder_optimizer.load_state_dict(encoder_optimizer_sd)
     decoder_optimizer.load_state_dict(decoder_optimizer_sd)
 
-# cuda가 있다면 cuda를 설정합니다
+# CUDA가 있으면 CUDA를 설정합니다
 for state in encoder_optimizer.state.values():
     for k, v in state.items():
         if isinstance(v, torch.Tensor):
@@ -1329,12 +1334,12 @@ trainIters(model_name, voc, pairs, encoder, decoder, encoder_optimizer, decoder_
 
 ######################################################################
 # 평가 수행하기
-# ~~~~~~~~~~~~~
+# ~~~~~~~~~~~~~~~
 #
 # 여러분의 모델과 채팅을 해보고 싶다면 다음 블록을 수행하면 됩니다.
 #
 
-# Dropout 레이어를 평가 모드로 설정합니다
+# Dropout 레이어를 평가( ``eval`` ) 모드로 설정합니다
 encoder.eval()
 decoder.eval()
 
@@ -1347,7 +1352,7 @@ searcher = GreedySearchDecoder(encoder, decoder)
 
 ######################################################################
 # 맺음말
-# ------
+# --------
 #
 # 이번 튜토리얼을 이것으로 마무리하겠습니다. 축하합니다! 여러분은 이제 생성
 # 챗봇 모델을 만들기 위한 기초 지식을 습득했습니다. 만약 좀 더 관심이 있다면

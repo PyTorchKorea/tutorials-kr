@@ -3,12 +3,8 @@
 마리오 게임 RL 에이전트로 학습하기
 ===============================
 
-저자: `Yuansong Feng <https://github.com/YuansongFeng>`__, `Suraj
-Subramanian <https://github.com/suraj813>`__, `Howard
-Wang <https://github.com/hw26>`__, `Steven
-Guo <https://github.com/GuoYuzhang>`__.
-
-번역: `김태영 <https://github.com/Taeyoung96>`__.
+**저자**: `Yuansong Feng <https://github.com/YuansongFeng>`__, `Suraj Subramanian <https://github.com/suraj813>`__, `Howard Wang <https://github.com/hw26>`__, `Steven Guo <https://github.com/GuoYuzhang>`__.
+**번역**: `김태영 <https://github.com/Taeyoung96>`__.
 
 이번 튜토리얼에서는 심층 강화 학습의 기본 사항들에 대해 이야기해보도록 하겠습니다.
 마지막에는, 스스로 게임을 할 수 있는 AI 기반 마리오를
@@ -307,9 +303,9 @@ class Mario:
     주어진 상태에서, 입실론-그리디 행동(epsilon-greedy action)을 선택하고, 스텝의 값을 업데이트 합니다.
 
     입력값:
-    state(LazyFrame): 현재 상태에서의 단일 상태(observation)값을 말합니다. 차원은 (state_dim)입니다.
+    state (``LazyFrame``): 현재 상태에서의 단일 상태(observation)값을 말합니다. 차원은 (state_dim)입니다.
     출력값:
-    action_idx (int): Mario가 수행할 행동을 나타내는 정수 값입니다.
+    ``action_idx`` (int): Mario가 수행할 행동을 나타내는 정수 값입니다.
     """
         # 임의의 행동을 선택하기
         if np.random.rand() < self.exploration_rate:
@@ -333,7 +329,7 @@ class Mario:
 
 ######################################################################
 # 캐시(Cache)와 리콜(Recall)하기
-# ------------------------------
+# --------------------------------
 #
 # 이 두가지 함수는 마리오의 “메모리” 프로세스 역할을 합니다.
 #
@@ -358,11 +354,11 @@ class Mario(Mario):  # 연속성을 위한 하위 클래스입니다.
         Store the experience to self.memory (replay buffer)
 
         입력값:
-        state (LazyFrame),
-        next_state (LazyFrame),
-        action (int),
-        reward (float),
-        done (bool))
+        state (``LazyFrame``),
+        next_state (``LazyFrame``),
+        action (``int``),
+        reward (``float``),
+        done(``bool``))
         """
         def first_if_tuple(x):
             return x[0] if isinstance(x, tuple) else x
@@ -407,7 +403,7 @@ class Mario(Mario):  # 연속성을 위한 하위 클래스입니다.
 
 
 class MarioNet(nn.Module):
-    """작은 cnn 구조
+    """작은 CNN 구조
   입력 -> (conv2d + relu) x 3 -> flatten -> (dense + relu) x 2 -> 출력
   """
 
@@ -504,7 +500,7 @@ class Mario(Mario):
 
 
 ######################################################################
-# 모델을 업데이트 하기.
+# 모델 업데이트
 # ~~~~~~~~~~~~~~~~~~~~~~
 #
 # 마리오가 재생 버퍼에서 입력을 샘플링할 때,  :math:`TD_t`
@@ -547,8 +543,8 @@ class Mario(Mario):
 
 
 ######################################################################
-# 체크포인트를 저장합니다.
-# ~~~~~~~~~~~~~~~~~~~~~~~
+# 체크포인트 저장
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 
 
@@ -565,7 +561,7 @@ class Mario(Mario):
 
 
 ######################################################################
-# 모든 기능을 종합해봅시다.
+# 모든 기능을 합치기
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 
@@ -719,7 +715,7 @@ class MetricLogger:
 
 ######################################################################
 # 게임을 실행시켜봅시다!
-# """""""""""""""""""
+# """""""""""""""""""""""""
 #
 # 이번 예제에서는 10개의 에피소드에 대해 학습 루프를 실행시켰습니다.하지만 마리오가 진정으로
 # 세계를 학습하기 위해서는 적어도 40000개의 에피소드에 대해 학습을 시킬 것을 제안합니다!

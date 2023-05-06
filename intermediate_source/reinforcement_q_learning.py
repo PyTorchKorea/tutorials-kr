@@ -2,24 +2,26 @@
 """
 강화 학습 (DQN) 튜토리얼
 =====================================
-**Author**: `Adam Paszke <https://github.com/apaszke>`_
-  **번역**: `황성수 <https://github.com/adonisues>`_
 
-이 튜토리얼에서는 `OpenAI Gym <https://www.gymlibrary.dev/>`__ 의
-CartPole-v0 태스크에서 DQN (Deep Q Learning) 에이전트를 학습하는데
+**Author**: `Adam Paszke <https://github.com/apaszke>`_, `Mark Towers <https://github.com/pseudo-rnd-thoughts>`_
+  **번역**: `황성수 <https://github.com/adonisues>`_, `박정환 <https://github.com/9bow>`_
+
+이 튜토리얼에서는 `Gymnasium <https://www.gymnasium.farama.org>`__ 의
+CartPole-v1 태스크에서 DQN (Deep Q Learning) 에이전트를 학습하는데
 PyTorch를 사용하는 방법을 보여드립니다.
 
 **태스크**
 
 에이전트는 연결된 막대가 똑바로 서 있도록 카트를 왼쪽이나 오른쪽으로
 움직이는 두 가지 동작 중 하나를 선택해야 합니다.
-다양한 알고리즘과 시각화 기능을 갖춘 공식 순위표를
-`Gym 웹사이트 <https://www.gymlibrary.dev/environments/classic_control/cart_pole>`__ 에서 찾을 수 있습니다.
+환경 설정과 다른 더 까다로운 환경에 대한 자세한 내용은
+`Gymnasium 웹사이트 <https://gymnasium.farama.org/environments/classic_control/cart_pole/>`__
+에서 찾아볼 수 있습니다.
 
 .. figure:: /_static/img/cartpole.gif
-   :alt: cartpole
+   :alt: CartPole
 
-   cartpole
+   CartPole
 
 에이전트가 현재 환경 상태를 관찰하고 행동을 선택하면,
 환경이 새로운 상태로 *전환* 되고 작업의 결과를 나타내는 보상도 반환됩니다.
@@ -28,21 +30,21 @@ PyTorch를 사용하는 방법을 보여드립니다.
 이것은 더 좋은 시나리오가 더 오랫동안 더 많은 보상을 축적하는 것을 의미합니다.
 
 카트폴 태스크는 에이전트에 대한 입력이 환경 상태(위치, 속도 등)를 나타내는
-4개의 실제 값이 되도록 설계되었습니다. 그러나 신경망은 순수하게 그 장면을 보고
-태스크를 해결할 수 있습니다 따라서 카트 중심의 화면 패치를 입력으로 사용합니다.
-이 때문에 우리의 결과는 공식 순위표의 결과와 직접적으로 비교할 수 없습니다.
-우리의 태스크는 훨씬 더 어렵습니다.
-불행히도 모든 프레임을 렌더링해야되므로 이것은 학습 속도를 늦추게됩니다.
+4개의 실제 값이 되도록 설계되었습니다. 스케일링 없이 이 4개의 입력을 받아
+각 동작에 대해 하나씩, 총 2개의 출력을 가진 완전히 연결된 작은 신경망에 통과시킵니다.
+신경망은 주어진 입력에 대해, 각 동작에 대한 예상값을 예측하도록 훈련됩니다.
+가장 높은 예측값을 갖는 동작이 선택됩니다.
 
-엄밀히 말하면, 현재 스크린 패치와 이전 스크린 패치 사이의 차이로 상태를 표시할 것입니다.
-이렇게하면 에이전트가 막대의 속도를 한 이미지에서 고려할 수 있습니다.
 
 **패키지**
 
-먼저 필요한 패키지를 가져옵니다. 첫째, 환경을 위해
-`gym <https://github.com/openai/gym>`__ 이 필요합니다.
+먼저 필요한 패키지를 가져옵니다. 첫째, 환경 구성을 위해
+pip를 사용해 설치한 `gymnasium <https://gymnasium.farama.org/>`__ 이 필요합니다.
+이는 OpenAI Gym로부터 파생(fork)된 것으로, Gym v0.19부터 같은 팀에서 유지보수를 하고 있습니다.
+Google Colab에서 이 튜토리얼을 실행하고 있다면, 다음을 실행해 설치할 수 있습니다:
 
 .. code-block:: bash
+
    %%bash
    pip3 install gym[classic_control]
 
@@ -56,27 +58,20 @@ PyTorch를 사용하는 방법을 보여드립니다.
 
 """
 
-import gym
+import gymnasium as gym
 import math
 import random
-import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
 from collections import namedtuple, deque
 from itertools import count
-from PIL import Image
 
 import torch
 import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
-import torchvision.transforms as T
 
-
-if gym.__version__ < '0.26':
-    env = gym.make('CartPole-v0', new_step_api=True, render_mode='single_rgb_array').unwrapped
-else:
-    env = gym.make('CartPole-v0', render_mode='rgb_array').unwrapped
+env = gym.make("CartPole-v1")
 
 # matplotlib 설정
 is_ipython = 'inline' in matplotlib.get_backend()
@@ -114,7 +109,7 @@ Transition = namedtuple('Transition',
 class ReplayMemory(object):
 
     def __init__(self, capacity):
-        self.memory = deque([],maxlen=capacity)
+        self.memory = deque([], maxlen=capacity)
 
     def push(self, *args):
         """transition 저장"""
@@ -141,9 +136,11 @@ class ReplayMemory(object):
 # 극대화하려는 정책(policy)을 학습하는 것입니다.
 # :math:`R_{t_0} = \sum_{t=t_0}^{\infty} \gamma^{t - t_0} r_t`, 여기서
 # :math:`R_{t_0}` 는 *반환(return)* 입니다. 할인 상수,
-# :math:`\gamma`, 는 :math:`0` 과 :math:`1` 의 상수이고 합계가
-# 수렴되도록 보장합니다. 에이전트에게 불확실한 먼 미래의 보상이
-# 가까운 미래의 것에 비해 덜 중요하게 만들고, 이것은 상당히 합리적입니다.
+# :math:`\gamma`, 는 :math:`0` 과 :math:`1` 의 상수여야 합니다.
+# :math:`\gamma` 가 낮을수록 에이전트에게는 불확실한 먼 미래의 보상은
+# 상당히 확신할 수 있는 가까운 미래의 보상보다 덜 중요해집니다.
+# 또한, 에이전트가 시간적으로 가까운 시점의 보상을, 동일한 양의 먼 미래의
+# 보상보다 먼저 수집하도록 장려합니다.
 #
 # Q-learning의 주요 아이디어는 만일 함수 :math:`Q^*: State \times Action \rightarrow \mathbb{R}` 를
 # 가지고 있다면 반환이 어떻게 될지 알려줄 수 있고,
@@ -165,7 +162,7 @@ class ReplayMemory(object):
 # 평등(equality)의 두 측면 사이의 차이는
 # 시간차 오류(temporal difference error), :math:`\delta` 입니다.:
 #
-# .. math:: \delta = Q(s, a) - (r + \gamma \max_a Q(s', a))
+# .. math:: \delta = Q(s, a) - (r + \gamma \max_a' Q(s', a))
 #
 # 오류를 최소화하기 위해서 `Huber
 # loss <https://en.wikipedia.org/wiki/Huber_loss>`__ 를 사용합니다.
@@ -189,92 +186,25 @@ class ReplayMemory(object):
 # ^^^^^^^^^^^
 #
 # 우리 모델은 현재와 이전 스크린 패치의 차이를 취하는
-# CNN(convolutional neural network) 입니다. 두가지 출력 :math:`Q(s, \mathrm{left})` 와
+# 순연결(feed-forward) 신경망입니다. 두가지 출력 :math:`Q(s, \mathrm{left})` 와
 # :math:`Q(s, \mathrm{right})` 가 있습니다. (여기서 :math:`s` 는 네트워크의 입력입니다)
 # 결과적으로 네트워크는 주어진 현재 입력에서 각 행동의 *기대값* 을 예측하려고 합니다.
 #
 
 class DQN(nn.Module):
 
-    def __init__(self, h, w, outputs):
+    def __init__(self, n_observations, n_actions):
         super(DQN, self).__init__()
-        self.conv1 = nn.Conv2d(3, 16, kernel_size=5, stride=2)
-        self.bn1 = nn.BatchNorm2d(16)
-        self.conv2 = nn.Conv2d(16, 32, kernel_size=5, stride=2)
-        self.bn2 = nn.BatchNorm2d(32)
-        self.conv3 = nn.Conv2d(32, 32, kernel_size=5, stride=2)
-        self.bn3 = nn.BatchNorm2d(32)
-
-        # Linear 입력의 연결 숫자는 conv2d 계층의 출력과 입력 이미지의 크기에
-        # 따라 결정되기 때문에 따로 계산을 해야합니다.
-        def conv2d_size_out(size, kernel_size = 5, stride = 2):
-            return (size - (kernel_size - 1) - 1) // stride  + 1
-        convw = conv2d_size_out(conv2d_size_out(conv2d_size_out(w)))
-        convh = conv2d_size_out(conv2d_size_out(conv2d_size_out(h)))
-        linear_input_size = convw * convh * 32
-        self.head = nn.Linear(linear_input_size, outputs)
+        self.layer1 = nn.Linear(n_observations, 128)
+        self.layer2 = nn.Linear(128, 128)
+        self.layer3 = nn.Linear(128, n_actions)
 
     # 최적화 중에 다음 행동을 결정하기 위해서 하나의 요소 또는 배치를 이용해 호촐됩니다.
     # ([[left0exp,right0exp]...]) 를 반환합니다.
     def forward(self, x):
-        x = x.to(device)
-        x = F.relu(self.bn1(self.conv1(x)))
-        x = F.relu(self.bn2(self.conv2(x)))
-        x = F.relu(self.bn3(self.conv3(x)))
-        return self.head(x.view(x.size(0), -1))
-
-
-######################################################################
-# 입력 추출
-# ^^^^^^^^^^^^^^^^
-#
-# 아래 코드는 환경에서 렌더링 된 이미지를 추출하고 처리하는 유틸리티입니다.
-# 이미지 변환을 쉽게 구성할 수 있는 ``torchvision`` 패키지를 사용합니다.
-# 셀(cell)을 실행하면 추출한 예제 패치가 표시됩니다.
-#
-
-resize = T.Compose([T.ToPILImage(),
-                    T.Resize(40, interpolation=Image.CUBIC),
-                    T.ToTensor()])
-
-
-def get_cart_location(screen_width):
-    world_width = env.x_threshold * 2
-    scale = screen_width / world_width
-    return int(env.state[0] * scale + screen_width / 2.0)  # MIDDLE OF CART
-
-def get_screen():
-    # gym이 요청한 화면은 400x600x3 이지만, 가끔 800x1200x3 처럼 큰 경우가 있습니다.
-    # 이것을 Torch order (CHW)로 변환한다.
-    screen = env.render().transpose((2, 0, 1))
-    # 카트는 아래쪽에 있으므로 화면의 상단과 하단을 제거하십시오.
-    _, screen_height, screen_width = screen.shape
-    screen = screen[:, int(screen_height*0.4):int(screen_height * 0.8)]
-    view_width = int(screen_width * 0.6)
-    cart_location = get_cart_location(screen_width)
-    if cart_location < view_width // 2:
-        slice_range = slice(view_width)
-    elif cart_location > (screen_width - view_width // 2):
-        slice_range = slice(-view_width, None)
-    else:
-        slice_range = slice(cart_location - view_width // 2,
-                            cart_location + view_width // 2)
-    # 카트를 중심으로 정사각형 이미지가 되도록 가장자리를 제거하십시오.
-    screen = screen[:, :, slice_range]
-    # float 으로 변환하고,  rescale 하고, torch tensor 로 변환하십시오.
-    # (이것은 복사를 필요로하지 않습니다)
-    screen = np.ascontiguousarray(screen, dtype=np.float32) / 255
-    screen = torch.from_numpy(screen)
-    # 크기를 수정하고 배치 차원(BCHW)을 추가하십시오.
-    return resize(screen).unsqueeze(0)
-
-
-env.reset()
-plt.figure()
-plt.imshow(get_screen().cpu().squeeze(0).permute(1, 2, 0).numpy(),
-           interpolation='none')
-plt.title('Example extracted screen')
-plt.show()
+        x = F.relu(self.layer1(x))
+        x = F.relu(self.layer2(x))
+        return self.layer3(x)
 
 
 ######################################################################
@@ -295,28 +225,32 @@ plt.show()
 #    포함 된 셀 밑에 있으며, 매 에피소드마다 업데이트됩니다.
 #
 
+# BATCH_SIZE는 리플레이 버퍼에서 샘플링된 트랜지션의 수입니다.
+# GAMMA는 이전 섹션에서 언급한 할인 계수입니다.
+# EPS_START는 엡실론의 시작 값입니다.
+# EPS_END는 엡실론의 최종 값입니다.
+# EPS_DECAY는 엡실론의 지수 감쇠(exponential decay) 속도 제어하며, 높을수록 감쇠 속도가 느립니다.
+# TAU는 목표 네트워크의 업데이트 속도입니다.
+# LR은 ``AdamW`` 옵티마이저의 학습율(learning rate)입니다.
 BATCH_SIZE = 128
-GAMMA = 0.999
+GAMMA = 0.99
 EPS_START = 0.9
 EPS_END = 0.05
-EPS_DECAY = 200
-TARGET_UPDATE = 10
-
-# AI gym에서 반환된 형태를 기반으로 계층을 초기화 하도록 화면의 크기를
-# 가져옵니다. 이 시점에 일반적으로 3x40x90 에 가깝습니다.
-# 이 크기는 get_screen()에서 고정, 축소된 렌더 버퍼의 결과입니다.
-init_screen = get_screen()
-_, _, screen_height, screen_width = init_screen.shape
+EPS_DECAY = 1000
+TAU = 0.005
+LR = 1e-4
 
 # gym 행동 공간에서 행동의 숫자를 얻습니다.
 n_actions = env.action_space.n
+# 상태 관측 횟수를 얻습니다.
+state, info = env.reset()
+n_observations = len(state)
 
-policy_net = DQN(screen_height, screen_width, n_actions).to(device)
-target_net = DQN(screen_height, screen_width, n_actions).to(device)
+policy_net = DQN(n_observations, n_actions).to(device)
+target_net = DQN(n_observations, n_actions).to(device)
 target_net.load_state_dict(policy_net.state_dict())
-target_net.eval()
 
-optimizer = optim.RMSprop(policy_net.parameters())
+optimizer = optim.AdamW(policy_net.parameters(), lr=LR, amsgrad=True)
 memory = ReplayMemory(10000)
 
 
@@ -336,17 +270,20 @@ def select_action(state):
             # 기대 보상이 더 큰 행동을 선택할 수 있습니다.
             return policy_net(state).max(1)[1].view(1, 1)
     else:
-        return torch.tensor([[random.randrange(n_actions)]], device=device, dtype=torch.long)
+        return torch.tensor([[env.action_space.sample()]], device=device, dtype=torch.long)
 
 
 episode_durations = []
 
 
-def plot_durations():
-    plt.figure(2)
-    plt.clf()
+def plot_durations(show_result=False):
+    plt.figure(1)
     durations_t = torch.tensor(episode_durations, dtype=torch.float)
-    plt.title('Training...')
+    if show_result:
+        plt.title('Result')
+    else:
+        plt.clf()
+        plt.title('Training...')
     plt.xlabel('Episode')
     plt.ylabel('Duration')
     plt.plot(durations_t.numpy())
@@ -358,8 +295,11 @@ def plot_durations():
 
     plt.pause(0.001)  # 도표가 업데이트되도록 잠시 멈춤
     if is_ipython:
-        display.clear_output(wait=True)
-        display.display(plt.gcf())
+        if not show_result:
+            display.display(plt.gcf())
+            display.clear_output(wait=True)
+        else:
+            display.display(plt.gcf())
 
 
 ######################################################################
@@ -374,9 +314,9 @@ def plot_durations():
 # 그것들을 손실로 합칩니다. 우리가 설정한 정의에 따르면 만약 :math:`s` 가
 # 마지막 상태라면 :math:`V(s) = 0` 입니다.
 # 또한 안정성 추가 위한 :math:`V(s_{t+1})` 계산을 위해 목표 네트워크를 사용합니다.
-# 목표 네트워크는 대부분의 시간 동결 상태로 유지되지만, 가끔 정책
-# 네트워크의 가중치로 업데이트됩니다.
-# 이것은 대개 설정한 스텝 숫자이지만 단순화를 위해 에피소드를 사용합니다.
+# 대상 네트워크는 이전에 정의한 하이퍼파라미터 ``TAU`` 에 의해 제어되는
+# `소프트 업데이트 <https://arxiv.org/pdf/1509.02971.pdf>`__
+# 로 모든 단계에서 업데이트됩니다.
 #
 
 def optimize_model():
@@ -407,7 +347,8 @@ def optimize_model():
     # max(1)[0]으로 최고의 보상을 선택하십시오.
     # 이것은 마스크를 기반으로 병합되어 기대 상태 값을 갖거나 상태가 최종인 경우 0을 갖습니다.
     next_state_values = torch.zeros(BATCH_SIZE, device=device)
-    next_state_values[non_final_mask] = target_net(non_final_next_states).max(1)[0].detach()
+    with torch.no_grad():
+        next_state_values[non_final_mask] = target_net(non_final_next_states).max(1)[0]
     # 기대 Q 값 계산
     expected_state_action_values = (next_state_values * GAMMA) + reward_batch
 
@@ -418,43 +359,46 @@ def optimize_model():
     # 모델 최적화
     optimizer.zero_grad()
     loss.backward()
-    for param in policy_net.parameters():
-        param.grad.data.clamp_(-1, 1)
+    # 변화도 클리핑 바꿔치기
+    torch.nn.utils.clip_grad_value_(policy_net.parameters(), 100)
     optimizer.step()
 
 
 ######################################################################
 #
 # 아래에서 주요 학습 루프를 찾을 수 있습니다. 처음으로 환경을
-# 재설정하고 ``상태`` Tensor를 초기화합니다. 그런 다음 행동을
-# 샘플링하고, 그것을 실행하고, 다음 화면과 보상(항상 1)을 관찰하고,
+# 재설정하고 초기 ``state`` Tensor를 얻습니다. 그런 다음 행동을
+# 샘플링하고, 그것을 실행하고, 다음 상태와 보상(항상 1)을 관찰하고,
 # 모델을 한 번 최적화합니다. 에피소드가 끝나면 (모델이 실패)
 # 루프를 다시 시작합니다.
 #
-# 아래에서 `num_episodes` 는 작게 설정됩니다. 노트북을 다운받고
-# 의미있는 개선을 위해서 300 이상의 더 많은 에피소드를 실행해 보십시오.
+# 아래에서 `num_episodes` 는 GPU를 사용할 수 있는 경우 600으로,
+# 그렇지 않은 경우 50개의 에피소드를 설정하여 학습이 너무 오래 걸리지는 않습니다.
+# 하지만 50개의 에피소드만으로는 CartPole에서 좋은 성능을 관찰하기에는 충분치 않습니다.
+# 600개의 학습 에피소드 내에서 모델이 지속적으로 500개의 스텝을 달성하는 것을
+# 볼 수 있어야 합니다. RL 에이전트 학습 과정에는 노이즈가 많을 수 있으므로,
+# 수렴(convergence)이 관찰되지 않으면 학습을 재시작하는 것이 더 나은 결과를 얻을 수 있습니다.
 #
 
-num_episodes = 50
+if torch.cuda.is_available():
+    num_episodes = 600
+else:
+    num_episodes = 50
+
 for i_episode in range(num_episodes):
     # 환경과 상태 초기화
-    env.reset()
-    last_screen = get_screen()
-    current_screen = get_screen()
-    state = current_screen - last_screen
+    state, info = env.reset()
+    state = torch.tensor(state, dtype=torch.float32, device=device).unsqueeze(0)
     for t in count():
-        # 행동 선택과 수행
         action = select_action(state)
-        _, reward, done, _, _ = env.step(action.item())
+        observation, reward, terminated, truncated, _ = env.step(action.item())
         reward = torch.tensor([reward], device=device)
+        done = terminated or truncated
 
-        # 새로운 상태 관찰
-        last_screen = current_screen
-        current_screen = get_screen()
-        if not done:
-            next_state = current_screen - last_screen
-        else:
+        if terminated:
             next_state = None
+        else:
+            next_state = torch.tensor(observation, dtype=torch.float32, device=device).unsqueeze(0)
 
         # 메모리에 변이 저장
         memory.push(state, action, next_state, reward)
@@ -464,18 +408,22 @@ for i_episode in range(num_episodes):
 
         # (정책 네트워크에서) 최적화 한단계 수행
         optimize_model()
+
+        # 목표 네트워크의 가중치를 소프트 업데이트
+        # θ′ ← τ θ + (1 −τ )θ′
+        target_net_state_dict = target_net.state_dict()
+        policy_net_state_dict = policy_net.state_dict()
+        for key in policy_net_state_dict:
+            target_net_state_dict[key] = policy_net_state_dict[key]*TAU + target_net_state_dict[key]*(1-TAU)
+        target_net.load_state_dict(target_net_state_dict)
+
         if done:
             episode_durations.append(t + 1)
             plot_durations()
             break
 
-    # 목표 네트워크 업데이트, 모든 웨이트와 바이어스 복사
-    if i_episode % TARGET_UPDATE == 0:
-        target_net.load_state_dict(policy_net.state_dict())
-
 print('Complete')
-env.render()
-env.close()
+plot_durations(show_result=True)
 plt.ioff()
 plt.show()
 
@@ -487,6 +435,6 @@ plt.show()
 # 행동은 무작위 또는 정책에 따라 선택되어, gym 환경에서 다음 단계 샘플을 가져옵니다.
 # 결과를 재현 메모리에 저장하고 모든 반복에서 최적화 단계를 실행합니다.
 # 최적화는 재현 메모리에서 무작위 배치를 선택하여 새 정책을 학습합니다.
-# "이전" target_net은 최적화에서 기대 Q 값을 계산하는 데에도 사용되고,
-# 최신 상태를 유지하기 위해 가끔 업데이트됩니다.
+# "이전"의 target_net은 최적화에서 기대 Q 값을 계산하는 데에도 사용됩니다.
+# 목표 네트워크 가중치의 소프트 업데이트는 매 단계(step)마다 수행됩니다.
 #

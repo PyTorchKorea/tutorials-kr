@@ -22,7 +22,7 @@
 
 ######################################################################
 # 모델 정의하기
-# -------------
+# ---------------
 #
 
 ######################################################################
@@ -77,7 +77,7 @@ class PositionalEncoding(nn.Module):
 # ``nn.TransformerEncoderLayer`` 의 절반은 한 GPU에 두고
 # 나머지 절반은 다른 GPU에 있도록 모델을 분할합니다. 이를 위해서 ``Encoder`` 와
 # ``Decoder`` 섹션을 분리된 모듈로 빼낸 다음, 원본 트랜스포머 모듈을
-# 나타내는 nn.Sequential을 빌드 합니다.
+# 나타내는 ``nn.Sequential`` 을 빌드 합니다.
 
 
 if sys.platform == 'win32':
@@ -122,7 +122,7 @@ class Decoder(nn.Module):
 
 ######################################################################
 # 학습을 위한 다중 프로세스 시작
-# ------------------------------
+# --------------------------------
 #
 
 
@@ -135,7 +135,7 @@ def run_worker(rank, world_size):
 
 ######################################################################
 # 데이터 로드하고 배치 만들기
-# ---------------------------
+# -----------------------------
 #
 
 ######################################################################
@@ -149,16 +149,17 @@ def run_worker(rank, world_size):
 # 알파벳을 길이가 6인 4개의 시퀀스로 나눌 수 있습니다:
 #
 # .. math::
-#   \begin{bmatrix}
-#   \text{A} & \text{B} & \text{C} & \ldots & \text{X} & \text{Y} & \text{Z}
-#   \end{bmatrix}
-#   \Rightarrow
-#   \begin{bmatrix}
-#   \begin{bmatrix}\text{A} \\ \text{B} \\ \text{C} \\ \text{D} \\ \text{E} \\ \text{F}\end{bmatrix} &
-#   \begin{bmatrix}\text{G} \\ \text{H} \\ \text{I} \\ \text{J} \\ \text{K} \\ \text{L}\end{bmatrix} &
-#   \begin{bmatrix}\text{M} \\ \text{N} \\ \text{O} \\ \text{P} \\ \text{Q} \\ \text{R}\end{bmatrix} &
-#   \begin{bmatrix}\text{S} \\ \text{T} \\ \text{U} \\ \text{V} \\ \text{W} \\ \text{X}\end{bmatrix}
-#   \end{bmatrix}
+#
+#     \begin{bmatrix}
+#    \text{A} & \text{B} & \text{C} & \ldots & \text{X} & \text{Y} & \text{Z}
+#    \end{bmatrix}
+#    \Rightarrow
+#    \begin{bmatrix}
+#    \begin{bmatrix}\text{A} \\ \text{B} \\ \text{C} \\ \text{D} \\ \text{E} \\ \text{F}\end{bmatrix} &
+#    \begin{bmatrix}\text{G} \\ \text{H} \\ \text{I} \\ \text{J} \\ \text{K} \\ \text{L}\end{bmatrix} &
+#    \begin{bmatrix}\text{M} \\ \text{N} \\ \text{O} \\ \text{P} \\ \text{Q} \\ \text{R}\end{bmatrix} &
+#    \begin{bmatrix}\text{S} \\ \text{T} \\ \text{U} \\ \text{V} \\ \text{W} \\ \text{X}\end{bmatrix}
+#    \end{bmatrix}
 #
 # 이 열들은 모델에 의해서 독립적으로 취급되며, 이는
 # ``G`` 와 ``F`` 의 의존성이 학습될 수 없다는 것을 의미하지만, 더 효율적인
@@ -190,11 +191,11 @@ def run_worker(rank, world_size):
     device = torch.device(2 * rank)
 
     def batchify(data, bsz, rank, world_size, is_train=False):
-        # Divide the dataset into bsz parts.
+        # Divide the dataset into ``bsz`` parts.
         nbatch = data.size(0) // bsz
         # Trim off any extra elements that wouldn't cleanly fit (remainders).
         data = data.narrow(0, 0, nbatch * bsz)
-        # Evenly divide the data across the bsz batches.
+        # Evenly divide the data across the ``bsz`` batches.
         data = data.view(bsz, -1).t().contiguous()
         # Divide the data across the ranks only for training data.
         if is_train:
@@ -211,7 +212,7 @@ def run_worker(rank, world_size):
 
 ######################################################################
 # 입력과 타겟 시퀀스를 생성하기 위한 함수들
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 
 
@@ -240,7 +241,7 @@ def run_worker(rank, world_size):
 
 ######################################################################
 # 모델 규모와 파이프 초기화
-# -------------------------
+# ---------------------------
 #
 
 
@@ -264,9 +265,9 @@ def run_worker(rank, world_size):
 # In 'run_worker'
     ntokens = len(vocab) # the size of vocabulary
     emsize = 4096 # embedding dimension
-    nhid = 4096 # the dimension of the feedforward network model in nn.TransformerEncoder
-    nlayers = 8 # the number of nn.TransformerEncoderLayer in nn.TransformerEncoder
-    nhead = 16 # the number of heads in the multiheadattention models
+    nhid = 4096 # the dimension of the feedforward network model in ``nn.TransformerEncoder``
+    nlayers = 8 # the number of ``nn.TransformerEncoderLayer`` in ``nn.TransformerEncoder``
+    nhead = 16 # the number of heads in the Multihead Attention models
     dropout = 0.2 # the dropout value
 
     from torch.distributed import rpc
@@ -332,7 +333,7 @@ def run_worker(rank, world_size):
 
 ######################################################################
 # 모델 실행하기
-# -------------
+# ---------------
 #
 
 
@@ -435,7 +436,7 @@ def run_worker(rank, world_size):
 
 ######################################################################
 # 평가 데이터셋으로 모델 평가하기
-# -------------------------------
+# ---------------------------------
 #
 # 평가 데이터셋에서의 결과를 확인하기 위해 최고의 모델을 적용합니다.
 
@@ -454,7 +455,7 @@ if __name__=="__main__":
     mp.spawn(run_worker, args=(world_size, ), nprocs=world_size, join=True)
 ######################################################################
 # Output
-# ------
+# --------
 #
 
 

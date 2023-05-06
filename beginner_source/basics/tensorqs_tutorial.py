@@ -142,6 +142,7 @@ print(t1)
 # **산술 연산(Arithmetic operations)**
 
 # 두 텐서 간의 행렬 곱(matrix multiplication)을 계산합니다. y1, y2, y3은 모두 같은 값을 갖습니다.
+# ``tensor.T`` 는 텐서의 전치(transpose)를 반환합니다.
 y1 = tensor @ tensor.T
 y2 = tensor.matmul(tensor.T)
 

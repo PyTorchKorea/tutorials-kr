@@ -6,39 +6,39 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="ko" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+
 <meta property="og:title" content="(prototype) FX Graph Mode Post Training Static Quantization" />
-  
+
 <meta property="og:type" content="article" />
-  
+
 <meta property="og:url" content="https://tutorials.pytorch.kr/prototype/fx_graph_mode_ptq_static.html" />
-  
+
 <meta property="og:description" content="Author: Jerry Zhang This tutorial introduces the steps to do post training static quantization in graph mode based on torch.fx. The advantage of FX graph mode quantization is that we can perform quantization fully automatically on the model although there might some effort required to make the mo..." />
-  
+
 <meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
-  
+
 <meta property="og:image:alt" content="(prototype) FX Graph Mode Post Training Static Quantization" />
-  
+
 <meta property="og:ignore_canonical" content="true" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
+
   <title>(prototype) FX Graph Mode Post Training Static Quantization &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
-  
 
-  
-  
+
+
+
     <link rel="shortcut icon" href="../_static/favicon.ico"/>
-  
-  
-  
 
-  
 
-  
-  
-    
 
-  
+
+
+
+
+
+
+
+
 
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!-- <link rel="stylesheet" href="../_static/pygments.css" type="text/css" /> -->
@@ -55,9 +55,9 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
     <link rel="index" title="색인" href="../genindex.html" />
-    <link rel="search" title="검색" href="../search.html" /> 
+    <link rel="search" title="검색" href="../search.html" />
 
-  
+
   <script src="../_static/js/modernizr.min.js"></script>
 
   <!-- Preload the theme fonts -->
@@ -114,9 +114,9 @@
 
 <body class="pytorch-body">
 
-   
 
-    
+
+
 
     <div class="table-of-contents-link-wrapper">
       <span>Table of Contents</span>
@@ -127,21 +127,21 @@
       <div class="pytorch-side-scroll">
         <div class="pytorch-menu pytorch-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           <div class="pytorch-left-menu-search">
-            
 
-            
-              
-              
+
+
+
+
                 <div class="version">
                   1.13.1+cu117
                 </div>
-              
-            
-
-            
 
 
-  
+
+
+
+
+
 
 
 <div role="search">
@@ -152,15 +152,15 @@
   </form>
 </div>
 
-            
+
           </div>
 
-          
-            
-            
-              
-            
-            
+
+
+
+
+
+
               <p class="caption" role="heading"><span class="caption-text">파이토치(PyTorch) 레시피</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../recipes/recipes_index.html">모든 레시피 보기</a></li>
@@ -303,8 +303,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../beginner/flava_finetuning_tutorial.html">TorchMultimodal Tutorial: Finetuning FLAVA</a></li>
 </ul>
 
-            
-          
+
+
         </div>
       </div>
     </nav>
@@ -312,7 +312,7 @@
     <div class="pytorch-container">
       <div class="pytorch-page-level-bar" id="pytorch-page-level-bar">
         <div class="pytorch-breadcrumbs-wrapper">
-          
+
 
 
 
@@ -331,30 +331,30 @@
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="pytorch-breadcrumbs">
-    
+
       <li>
         <a href="../index.html">
-          
+
             Tutorials
-          
+
         </a> &gt;
       </li>
 
-        
+
       <li>(prototype) FX Graph Mode Post Training Static Quantization</li>
-    
-    
+
+
       <li class="pytorch-breadcrumbs-aside">
-        
-            
+
+
             <a href="../_sources/prototype/fx_graph_mode_ptq_static.rst.txt" rel="nofollow"><img src="../_static/images/view-page-source-icon.svg"></a>
-          
-        
+
+
       </li>
-    
+
   </ul>
 
-  
+
 </div>
         </div>
 
@@ -366,7 +366,7 @@
       <section data-toggle="wy-nav-shift" id="pytorch-content-wrap" class="pytorch-content-wrap">
         <div class="pytorch-content-left">
 
-        
+
 
           <div class="pytorch-call-to-action-links">
             <div id="tutorial-type">prototype/fx_graph_mode_ptq_static</div>
@@ -388,14 +388,14 @@
             </div>
           </div>
 
-        
 
-          
+
+
           <div class="rst-content">
-          
+
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
-              
+
   <div class="section" id="prototype-fx-graph-mode-post-training-static-quantization">
 <h1>(prototype) FX Graph Mode Post Training Static Quantization<a class="headerlink" href="#prototype-fx-graph-mode-post-training-static-quantization" title="이 제목에 대한 퍼머링크">¶</a></h1>
 <p><strong>Author</strong>: <a class="reference external" href="https://github.com/jerryzh168">Jerry Zhang</a></p>
@@ -404,7 +404,7 @@
 The advantage of FX graph mode quantization is that we can perform quantization fully automatically on the model
 although there might some effort required to make the model compatible with FX Graph Mode Quantizatiion (symbolically traceable with <code class="docutils literal notranslate"><span class="pre">torch.fx</span></code>),
 we’ll have a separate tutorial to show how to make the part of the model we want to quantize compatibble with FX Graph Mode Quantization.
-We also have a tutorial for <a class="reference external" href="https://pytorch.org/tutorials/prototype/fx_graph_mode_ptq_dynamic.html">FX Graph Mode Post Training Dynamic Quantization</a>.
+We also have a tutorial for <a class="reference external" href="https://tutorials.pytorch.kr/prototype/fx_graph_mode_ptq_dynamic.html">FX Graph Mode Post Training Dynamic Quantization</a>.
 tldr; The FX Graph Mode API looks like the following:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">from</span> <span class="nn">torch.ao.quantization</span> <span class="kn">import</span> <span class="n">get_default_qconfig</span>
@@ -424,7 +424,7 @@ tldr; The FX Graph Mode API looks like the following:</p>
 </div>
 <div class="section" id="motivation-of-fx-graph-mode-quantization">
 <h2>1. Motivation of FX Graph Mode Quantization<a class="headerlink" href="#motivation-of-fx-graph-mode-quantization" title="이 제목에 대한 퍼머링크">¶</a></h2>
-<p>Currently PyTorch only has eager mode quantization: <a class="reference external" href="https://pytorch.org/tutorials/advanced/static_quantization_tutorial.html">Static Quantization with Eager Mode in PyTorch</a>.</p>
+<p>Currently PyTorch only has eager mode quantization: <a class="reference external" href="https://tutorials.pytorch.kr/advanced/static_quantization_tutorial.html">Static Quantization with Eager Mode in PyTorch</a>.</p>
 <p>We can see there are multiple manual steps involved in the process, including:</p>
 <ul class="simple">
 <li><p>Explicitly quantize and dequantize activations, this is time consuming when floating point and quantized operations are mixed in a model.</p></li>
@@ -443,7 +443,7 @@ In graph mode, we can inspect the actual code that’s been executed in forward 
 <div class="section" id="define-helper-functions-and-prepare-dataset">
 <h2>2. Define Helper Functions and Prepare Dataset<a class="headerlink" href="#define-helper-functions-and-prepare-dataset" title="이 제목에 대한 퍼머링크">¶</a></h2>
 <p>We’ll start by doing the necessary imports, defining some helper functions and prepare the data.
-These steps are identitcal to <a class="reference external" href="https://pytorch.org/tutorials/advanced/static_quantization_tutorial.html">Static Quantization with Eager Mode in PyTorch</a>.</p>
+These steps are identitcal to <a class="reference external" href="https://tutorials.pytorch.kr/advanced/static_quantization_tutorial.html">Static Quantization with Eager Mode in PyTorch</a>.</p>
 <p>To run the code in this tutorial using the entire ImageNet dataset, first download imagenet by following the instructions at here <a class="reference external" href="http://www.image-net.org/download">ImageNet Data</a>. Unzip the downloaded file into the 〈data_path〉 folder.</p>
 <p>Download the <a class="reference external" href="https://download.pytorch.org/models/resnet18-f37072fd.pth">torchvision resnet18 model</a> and rename it to
 <code class="docutils literal notranslate"><span class="pre">data/resnet18_pretrained_float.pth</span></code>.</p>
@@ -737,7 +737,7 @@ the statistics of the Tensors and we can later use this information to calculate
 </div>
 <p>If you want to get better accuracy or performance,  try changing the <cite>qconfig_dict</cite>.
 We plan to add support for graph mode in the Numerical Suite so that you can
-easily determine the sensitivity towards quantization of different modules in a model: <a class="reference external" href="https://pytorch.org/tutorials/prototype/numeric_suite_tutorial.html">PyTorch Numeric Suite Tutorial</a></p>
+easily determine the sensitivity towards quantization of different modules in a model: <a class="reference external" href="https://tutorials.pytorch.kr/prototype/numeric_suite_tutorial.html">PyTorch Numeric Suite Tutorial</a></p>
 </div>
 <div class="section" id="debugging-quantized-model">
 <h2>9. Debugging Quantized Model<a class="headerlink" href="#debugging-quantized-model" title="이 제목에 대한 퍼머링크">¶</a></h2>
@@ -804,12 +804,12 @@ depending on model, device, build, input batch sizes, threading etc.</p>
 
 
              </article>
-             
+
             </div>
             <footer>
-  
 
-  
+
+
     <hr class="community-hr hr-top" />
     <div class="community-container">
       <div class="community-prompt">더 궁금하시거나 개선할 내용이 있으신가요? 커뮤니티에 참여해보세요!</div>
@@ -829,7 +829,7 @@ depending on model, device, build, input batch sizes, threading etc.</p>
       </div>
     </div>
     <hr class="rating-hr hr-bottom"/>
-  
+
 
   <div role="contentinfo">
     <p>
@@ -837,11 +837,11 @@ depending on model, device, build, input batch sizes, threading etc.</p>
 
     </p>
   </div>
-    
+
       <div>
         Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
       </div>
-     
+
 
 </footer>
 
@@ -880,12 +880,12 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
       </section>
     </div>
 
-  
 
 
-  
-  
-     
+
+
+
+
        <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
          <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
          <script src="../_static/jquery.js"></script>
@@ -899,8 +899,8 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
          <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
          <script src="../_static/katex_autorenderer.js"></script>
          <script src="../_static/design-tabs.js"></script>
-     
-  
+
+
 
   <script type="text/javascript" src="../_static/js/vendor/popper.min.js"></script>
   <script type="text/javascript" src="../_static/js/vendor/bootstrap.min.js"></script>
@@ -912,7 +912,7 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
           SphinxRtdTheme.Navigation.enable(true);
       });
   </script>
- 
+
 <script>
 //add microsoft link
 
