@@ -64,7 +64,7 @@ loss.backward() # 역전파 단계(backward pass)
 
 ############################################################
 # 다음으로, 옵티마이저(optimizer)를 불러옵니다.
-# 이 예제에서는 학습율(learning rate) 0.1과 `모멘텀(momentum) <https://towardsdatascience.com/stochastic-gradient-descent-with-momentum-a84097641a5d>`__
+# 이 예제에서는 학습률(learning rate) 0.1과 `모멘텀(momentum) <https://towardsdatascience.com/stochastic-gradient-descent-with-momentum-a84097641a5d>`__
 # 0.9를 갖는 SGD입니다. 옵티마이저(optimizer)에 모델의 모든 매개변수를 등록합니다.
 #
 
