@@ -372,7 +372,7 @@ plt.plot(all_losses)
 
 max_length = 20
 
-# 카테고리와 시작 문자로 부터 샘플링 하기
+# 카테고리와 시작 문자로부터 샘플링 하기
 def sample(category, start_letter='A'):
     with torch.no_grad():  # 샘플링에서 히스토리를 추적할 필요 없음
         category_tensor = categoryTensor(category)
