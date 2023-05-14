@@ -266,7 +266,7 @@ exp_lr_scheduler = lr_scheduler.StepLR(optimizer_ft, step_size=7, gamma=0.1)
 # 학습 및 평가하기
 # ^^^^^^^^^^^^^^^^^^
 #
-# CPU에서는 15-25분 가량, GPU에서는 1분도 이내의 시간이 걸립니다.
+# CPU에서는 15-25분 가량, GPU에서는 1분 이내의 시간이 걸립니다.
 #
 
 model_ft = train_model(model_ft, criterion, optimizer_ft, exp_lr_scheduler,
