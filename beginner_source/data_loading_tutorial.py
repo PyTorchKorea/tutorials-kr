@@ -196,7 +196,7 @@ for i in range(len(face_dataset)):
 # - ``ToTensor``: numpy 이미지에서 torch 이미지로 변경합니다.
 #   (축변환이 필요합니다)
 #
-# 간단한 함수 대신에 호출할 수 있는 클래스로 작성합니다.
+# 간단한 함수 대신에 호출 할 수 있는 클래스로 작성 합니다.
 # 이렇게 한다면, 클래스가 호출 될 때마다 전이(Transform)의 매개변수가 전달 되지 않아도 됩니다.
 # 이와 같이, ``__call__`` 함수를 구현해야 합니다.
 # 필요하다면, ``__init__`` 함수도 구현해야 합니다. 다음과 같이 전이(transform)를 사용할 수 있습니다.
@@ -305,7 +305,7 @@ class ToTensor(object):
 # 그후에 무작위로 224개를 자른다고 가정합시다.
 # 다시 말해, ``Rescale`` 과 ``RandomCrop`` 을 사용해봅시다.
 #
-# ``torchvision.transforms.Compose`` 는 위의 두작업을 하는 간단한 호출할 수 있는 클래스입니다.
+# ``torchvision.transforms.Compose`` 는 위의 두 작업을 하는 간단한 호출할 수 있는 클래스입니다.
 #
 
 scale = Rescale(256)
@@ -367,7 +367,7 @@ for i in range(len(transformed_dataset)):
 #
 # -  데이터를 묶는 과정
 # -  데이터를 섞는 과정
-# -  병렬처리 과정에서 ``multiprocessing`` 을 사용할때 데이터를 불러오는 것
+# -  병렬처리 과정에서 ``multiprocessing`` 을 사용할 때 데이터를 불러오는 것
 #
 # ``torch.utils.data.DataLoder`` 는 위와 같은 기능을 모두 제공해주는 반복자(iterator)입니다.
 # 사용되는 매개변수(Parameters)는 명확해야 합니다.
@@ -398,7 +398,7 @@ def show_landmarks_batch(sample_batched):
 
         plt.title('Batch from dataloader')
 
-# Windows를 사용 중이라면, 다음 줄의 주석을 제거하고 for 반복문을 들여쓰기합니다.
+# Windows를 사용 중이라면, 다음 줄의 주석을 제거하고 for 반복문을 들여쓰기 합니다.
 # ``num_workers`` 를 0으로 변경해야 할 수도 있습니다.
 
 # if __name__ == '__main__':
@@ -437,7 +437,7 @@ for i_batch, sample_batched in enumerate(dataloader):
 #
 # 여기서'ants', 'bees'는 class labels입니다.
 # 비슷하게, ``RandomHorizontalFlip`` , ``Scale`` 과 같이  ``PIL.Image`` 에서 작동하는
-# 일반적인 전이(transforms)도 사용가능합니다. 이와 같이 데이터로더(dataloader)를 사용할 수 있습니다: ::
+# 일반적인 전이(transforms)도 사용 가능합니다. 이와 같이 데이터로더(dataloader)를 사용할 수 있습니다: ::
 #
 #    import torch
 #    from torchvision import transforms, datasets
