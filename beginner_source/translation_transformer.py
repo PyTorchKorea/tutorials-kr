@@ -96,7 +96,7 @@ for ln in [SRC_LANGUAGE, TGT_LANGUAGE]:
 # 이러한 임베딩은 입력 토큰의 위치 정보(position information)를 모델에 전달하기 위해
 # 위치 인코딩(positional encoding)을 추가합니다.
 # 두번째 부분은 실제 `Transformer <https://pytorch.org/docs/stable/generated/torch.nn.Transformer.html>`__ 모델입니다.
-# 마지막으로 Transformer 모델의 출력을 선형 계층에 통과시켜 도착어의 각 토큰에 대한 정규화되지 않은
+# 마지막으로 Transformer 모델의 출력을 선형 계층에 통과시켜 도착어의 각 토큰에 대해 정규화되지 않은
 # 확률(un-normalized probability)로 제공합니다.
 #
 
