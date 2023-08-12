@@ -52,6 +52,7 @@
 |autograd|Autograd|황성수|번역안함|
 |Batch Normalization|배치 정규화|박정환||
 |bias|편향|이하람||
+|coldstart|콜드스타트|안창배||
 |convolution|합성곱|김현길||
 |Dropout|드롭아웃|김태형|음차 표기|
 |dataset|데이터셋|박정환|음차 표기|
@@ -106,6 +107,6 @@
 |Text|텍스트|박정환|ToC의 분류명입니다.|
 |track (computation) history|연산 기록을 추적하다|박정환||
 |training|학습|이하람||
-|warmstart|빠르게 시작하기|박정환|Warmstarting Model = 빠르게 모델 시작하기|
+|warmstart|웜스타트|박정환|음차 표기|
 |weight|가중치|박정환||
 |wrapper|래퍼|박정환|음차 표기|
