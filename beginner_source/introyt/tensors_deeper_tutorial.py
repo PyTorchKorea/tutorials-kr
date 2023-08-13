@@ -9,6 +9,8 @@
 
 Introduction to PyTorch Tensors
 ===============================
+번역:
+`이상윤 <https://github.com/falconlee236>`_
 
 Follow along with the video below or on `youtube <https://www.youtube.com/watch?v=r7QDUPb2dCM>`__.
 
