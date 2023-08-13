@@ -71,7 +71,7 @@ PyTorch의 의미론적 이미지 분할에 사용하는 `DeepLabV3 모델 <http
 2. 파이썬에서 모델의 예제 입출력 얻기
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-이제 스크립트된 PyTorch 모델을 얻었으니, 안드로이드에서 모델이 잘 동작하는지 예제를 입력해 테스트를 진행합시다. 첫번째로 모델을 이용해서 추론하고 입출력을 검토하는 파이썬 스크립트를 작성해 봅시다. DeepLabV3의 예시를 들기 위해 첫번째 단계의 코드 `DeepLabV3 model hub site <https://pytorch.org/hub/pytorch_vision_deeplabv3_resnet101>`_ 를 재사용합니다. 위의 코드에 아래의 코드 조각을 덧붙입니다:
+이제 스크립트된 PyTorch 모델을 얻었으니, 안드로이드에서 모델이 잘 동작하는지 예제를 입력해 테스트를 진행합시다. 첫 번째로 모델을 이용해서 추론하고 입출력을 검토하는 파이썬 스크립트를 작성해 봅시다. DeepLabV3의 예시를 들기 위해 첫 번째 단계의 코드 `DeepLabV3 model hub site <https://pytorch.org/hub/pytorch_vision_deeplabv3_resnet101>`_ 를 재사용합니다. 위의 코드에 아래의 코드 조각을 덧붙입니다:
 
 ::
 
@@ -103,7 +103,7 @@ PyTorch의 의미론적 이미지 분할에 사용하는 `DeepLabV3 모델 <http
 3. 새로운 안드로이드 앱을 만들거나 안드로이드 예제 앱에 변환된 모델을 가져와서 재사용하기
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-첫번째로 모델을 안드로이드 스튜디오 프로젝트에서 PyTorch Mobile과 함께 쓰기 위해 `안드로이드 레시피를 위한 모델 준비 <../recipes/model_preparation_android.html#add-the-model-and-pytorch-library-on-android>`_ 를 따라해 봅니다. 이 튜토리얼의 DeepLabV3과 PyTorch HelloWorld Android 예제 내부의 MobileNet v2 둘 다 컴퓨터 비전 모델이기에, `HelloWorld 예제 저장소 <https://github.com/pytorch/android-demo-app/tree/master/HelloWorldApp>`_ 에서도 손쉽게 모델을 읽고 입출력을 처리하기 위한 코드 수정 방법을 찾을 수 있습니다. 이 단계와 4단계의 목표는 1단계에서 만들어진 `deeplabv3_scripted.pt` 모델이 안드로이드에서 확실하게 동작하는지 확인하는 것입니다.
+첫 번째로 모델을 안드로이드 스튜디오 프로젝트에서 PyTorch Mobile과 함께 쓰기 위해 `안드로이드 레시피를 위한 모델 준비 <../recipes/model_preparation_android.html#add-the-model-and-pytorch-library-on-android>`_ 를 따라해 봅니다. 이 튜토리얼의 DeepLabV3과 PyTorch HelloWorld Android 예제 내부의 MobileNet v2 둘 다 컴퓨터 비전 모델이기에, `HelloWorld 예제 저장소 <https://github.com/pytorch/android-demo-app/tree/master/HelloWorldApp>`_ 에서도 손쉽게 모델을 읽고 입출력을 처리하기 위한 코드 수정 방법을 찾을 수 있습니다. 이 단계와 4단계의 목표는 1단계에서 만들어진 `deeplabv3_scripted.pt` 모델이 안드로이드에서 확실하게 동작하는지 확인하는 것입니다.
 
 이제 2단계에서 사용한 `deeplabv3_scripted.pt` 와 `deeplab.jpg` 를 안드로이드 스튜디오 프로젝트에 더하고 `MainActivity` 내부의 `onCreate` 메소드를 이와 유사하게 수정합니다:
 
