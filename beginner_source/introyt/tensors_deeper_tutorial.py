@@ -20,7 +20,7 @@ Follow along with the video below or on `youtube <https://www.youtube.com/watch?
      <iframe width="560" height="315" src="https://www.youtube.com/embed/r7QDUPb2dCM" frameborder="0" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
    </div>
 
-Tensors are the central data abstraction in PyTorch. This interactive
+텐서는 Pytorch에서 중요한 추상 데이터 자료형입니다. This interactive
 notebook provides an in-depth introduction to the ``torch.Tensor``
 class.
 
