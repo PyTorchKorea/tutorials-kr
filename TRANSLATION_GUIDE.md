@@ -45,6 +45,7 @@
 |영문|한글|작성자|추가 설명|
 |---|---|:---:|---|
 |Acknowledgements|감사의 말|박정환||
+|activation|활성화|조형서||
 |API endpoint|API 엔드포인트|박정환|음차 표기|
 |argument|인자|박정환||
 |Audio|오디오|박정환|ToC의 분류명입니다.|
@@ -82,6 +83,7 @@
 |method|메소드|장효영|[음차 표기](https://terms.tta.or.kr/dictionary/dictionaryView.do?word_seq=090780-1)|
 |mini-batch|미니 배치|박정환|음차 표기|
 |momentum|모멘텀|박정환|음차 표기|
+|network|네트워크|조형서|음차 표기|
 |normalize|정규화|허남규||
 |NumPy|NumPy|박정환|번역하지 않음|
 |One-Hot|One-Hot|황성수|번역안함|
