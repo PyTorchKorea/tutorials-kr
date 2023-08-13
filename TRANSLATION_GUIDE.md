@@ -58,6 +58,7 @@
 |deep neural network|심층 신경망|박정환||
 |derivative|도함수|박정환||
 |Drop-out|Drop-out|황성수|번역안함|
+|emission|출력|김규진||
 |epoch|에폭|박정환|음차 표기|
 |evaluation mode|평가 모드|박정환||
 |feature|특징|백선희||
