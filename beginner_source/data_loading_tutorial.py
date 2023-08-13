@@ -44,7 +44,7 @@ plt.ion()   # 반응형 모드
 # .. figure:: /_static/img/landmarked_face2.png
 #    :width: 400
 #
-# 각각의 얼굴에 68개의 서로다른 중요 포인트들이 존재합니다.
+# 각각의 얼굴에 68개의 서로 다른 중요 포인트들이 존재합니다.
 #
 # .. note::
 #     이 `링크 <https://download.pytorch.org/tutorial/faces.zip>`_ 를 통해 데이터셋을 다운로드 해주세요.
@@ -104,7 +104,7 @@ plt.show()
 # ``torch.utils.data.Dataset`` 은 데이터셋을 나타내는 추상클래스입니다.
 # 여러분의 데이터셋은 ``Dataset`` 에 상속하고 아래와 같이 오버라이드 해야합니다.
 #
-# -  ``len(dataset)`` 에서 호출되는 ``__len__`` 은 데이터셋의 크기를 리턴해야합니다.
+# -  ``len(dataset)`` 에서 호출되는 ``__len__`` 은 데이터셋의 크기를 리턴해야 합니다.
 # -  ``dataset[i]`` 에서 호출되는 ``__getitem__`` 은
 #    :math:`i`\ 번째 샘플을 찾는데 사용됩니다.
 #
@@ -196,7 +196,7 @@ for i in range(len(face_dataset)):
 # - ``ToTensor``: numpy 이미지에서 torch 이미지로 변경합니다.
 #   (축변환이 필요합니다)
 #
-# 간단한 함수대신에 호출 할 수 있는 클래스로 작성 합니다.
+# 간단한 함수 대신에 호출 할 수 있는 클래스로 작성 합니다.
 # 이렇게 한다면, 클래스가 호출 될 때마다 전이(Transform)의 매개변수가 전달 되지 않아도 됩니다.
 # 이와 같이, ``__call__`` 함수를 구현해야 합니다.
 # 필요하다면, ``__init__`` 함수도 구현해야 합니다. 다음과 같이 전이(transform)를 사용할 수 있습니다.
@@ -303,9 +303,9 @@ class ToTensor(object):
 #
 # 이미지의 가장 짧은 측면을 256개로 rescale하고,
 # 그후에 무작위로 224개를 자른다고 가정합시다.
-# 다시말해, ``Rescale`` 과 ``RandomCrop`` 을 사용해봅시다.
+# 다시 말해, ``Rescale`` 과 ``RandomCrop`` 을 사용해봅시다.
 #
-# ``torchvision.transforms.Compose`` 는 위의 두작업을 하는 간단한 호출할 수 있는 클래스입니다.
+# ``torchvision.transforms.Compose`` 는 위의 두 작업을 하는 간단한 호출할 수 있는 클래스입니다.
 #
 
 scale = Rescale(256)
@@ -331,13 +331,13 @@ plt.show()
 # 데이터셋을 이용한 반복작업
 # -----------------------------
 #
-# 전이(transform)를 적용한 dataset을 만들기위해서 만들었던것을 다 집어 넣어 봅시다.
+# 전이(transform)를 적용한 dataset을 만들기 위해서 만들었던 것을 다 집어넣어 봅시다.
 #
 # 요약하자면, 데이터셋은 다음과 같이 샘플링 됩니다.
 #
-# -  이미지는 파일 전체를 메모리에 올리지않고 필요할때마다 불러와서 읽습니다.
+# -  이미지는 파일 전체를 메모리에 올리지 않고 필요할 때마다 불러와서 읽습니다.
 # -  그 후에 읽은 이미지에 Transform을 적용합니다.
-# -  transfroms 중 하나가 랜덤이기 때문에, 데이터는 샘플링때 증가합니다.
+# -  transfroms 중 하나가 랜덤이기 때문에, 데이터는 샘플링 때 증가합니다.
 #
 #
 # 우리는 이제 이전에 사용하던 것 처럼 ``for i in range`` 를 사용해서
@@ -367,7 +367,7 @@ for i in range(len(transformed_dataset)):
 #
 # -  데이터를 묶는 과정
 # -  데이터를 섞는 과정
-# -  병렬처리 과정에서 ``multiprocessing`` 을 사용할때 데이터를 불러오는 것
+# -  병렬처리 과정에서 ``multiprocessing`` 을 사용할 때 데이터를 불러오는 것
 #
 # ``torch.utils.data.DataLoder`` 는 위와 같은 기능을 모두 제공해주는 반복자(iterator)입니다.
 # 사용되는 매개변수(Parameters)는 명확해야 합니다.
@@ -398,7 +398,7 @@ def show_landmarks_batch(sample_batched):
 
         plt.title('Batch from dataloader')
 
-# Windows를 사용 중이라면, 다음 줄의 주석을 제거하고 for 반복문을 들여쓰기합니다.
+# Windows를 사용 중이라면, 다음 줄의 주석을 제거하고 for 반복문을 들여쓰기 합니다.
 # ``num_workers`` 를 0으로 변경해야 할 수도 있습니다.
 
 # if __name__ == '__main__':
@@ -422,7 +422,7 @@ for i_batch, sample_batched in enumerate(dataloader):
 # 이번 튜토리얼에서는, 데이터셋 작성과 사용, 전이(transforms), 데이터를 불러오는 방법에 대해서 알아봤습니다.
 # ``torchvision`` 패키지는 몇몇의 일반적인 데이터셋과 전이(transforms)들을 제공합니다.
 # 클래스들을 따로 작성하지 않아도 될 것입니다.
-# torchvision에서의 사용가능한 일반적인 데이터셋 중 하나는 ``ImageFolder`` 입니다.
+# torchvision에서의 사용 가능한 일반적인 데이터셋 중 하나는 ``ImageFolder`` 입니다.
 # 이것은 다음과 같은 방식으로 구성되어 있다고 가정합니다: ::
 #
 #     root/ants/xxx.png
@@ -437,7 +437,7 @@ for i_batch, sample_batched in enumerate(dataloader):
 #
 # 여기서'ants', 'bees'는 class labels입니다.
 # 비슷하게, ``RandomHorizontalFlip`` , ``Scale`` 과 같이  ``PIL.Image`` 에서 작동하는
-# 일반적인 전이(transforms)도 사용가능합니다. 이와 같이 데이터로더(dataloader)를 사용할 수 있습니다: ::
+# 일반적인 전이(transforms)도 사용 가능합니다. 이와 같이 데이터로더(dataloader)를 사용할 수 있습니다: ::
 #
 #    import torch
 #    from torchvision import transforms, datasets
@@ -456,4 +456,4 @@ for i_batch, sample_batched in enumerate(dataloader):
 #                                                 num_workers=4)
 #
 #  training code에 대한 예시를 알고 싶다면,
-#  :doc:`transfer_learning_tutorial` 문서를 참고해주세요
+#  :doc:`transfer_learning_tutorial` 문서를 참고해 주세요.
