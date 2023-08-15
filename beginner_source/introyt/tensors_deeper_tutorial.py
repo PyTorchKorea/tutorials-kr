@@ -33,10 +33,10 @@ import math
 
 
 #########################################################################
-# Creating Tensors
+# Tensor 생성하기
 # ----------------
-# 
-# The simplest way to create a tensor is with the ``torch.empty()`` call:
+#
+# tensor를 생성하는 가장 간단한 방법은 ``torch.empty()`` 를 호출하는 것입니다:
 # 
 
 x = torch.empty(3, 4)
