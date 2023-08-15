@@ -80,9 +80,8 @@ print(random)
 
 
 #########################################################################
-# The factory methods all do just what you’d expect - we have a tensor
-# full of zeros, another full of ones, and another with random values
-# between 0 and 1.
+# 이 메소드들은 우리가 기대하던 것들을 모두 수행합니다 - 0으로 모두 채워진 tensor,
+# 1로 모두 채워진 tensor 그리고 0과 1사이의 무작위 값으로 채워진 tensor를 얻었습니다.
 # 
 # Random Tensors and Seeding
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~
