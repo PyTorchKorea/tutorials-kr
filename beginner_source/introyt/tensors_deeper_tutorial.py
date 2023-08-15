@@ -116,13 +116,12 @@ print(random4)
 # 보다 자세한 정보는 다음 문서를 참고하세요 `PyTorch documentation on
 # reproducibility <https://pytorch.org/docs/stable/notes/randomness.html>`__.
 # 
-# Tensor Shapes
+# Tensor의 모양
 # ~~~~~~~~~~~~~
 # 
-# Often, when you’re performing operations on two or more tensors, they
-# will need to be of the same *shape* - that is, having the same number of
-# dimensions and the same number of cells in each dimension. For that, we
-# have the ``torch.*_like()`` methods:
+# 두개 혹은 그 이상의 tensor에 대한 연산을 수행할 때, tensor들은 같은 모양을 필요로 합니다
+# - 다시 말해서 차원의 개수가 같아야 하고, 각 차원마다 원소의 수가 같아야 합니다.
+# 그러기 위해서는 ``torch.*_like()`` 함수를 사용합니다.
 # 
 
 x = torch.empty(2, 2, 3)
