@@ -83,16 +83,13 @@ print(random)
 # 이 메소드들은 우리가 기대하던 것들을 모두 수행합니다 - 0으로 모두 채워진 tensor,
 # 1로 모두 채워진 tensor 그리고 0과 1사이의 무작위 값으로 채워진 tensor를 얻었습니다.
 # 
-# Random Tensors and Seeding
+# 무작위 Tensor들과 Seed사용하기
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~
 # 
-# Speaking of the random tensor, did you notice the call to
-# ``torch.manual_seed()`` immediately preceding it? Initializing tensors,
-# such as a model’s learning weights, with random values is common but
-# there are times - especially in research settings - where you’ll want
-# some assurance of the reproducibility of your results. Manually setting
-# your random number generator’s seed is the way to do this. Let’s look
-# more closely:
+# 무작위 tensor에 대해 말하자면, 바로 앞에서 호출하는 ``torch.manual_seed()`` 를 눈치채셨나요?
+# 특히 연구 환경에서 연구 결과의 재현 가능성에 대한 확신을 얻고 싶을때,
+# 모델의 학습 가중치와 같은 무작위 값을 가진 tensor로 초기화 하는 것은 흔하거나 종종 일어나는 일입니다.
+# 직접 무작위 난수 생성기의 seed를 설정하는 것이 다음 방법입니다. 다음 코드를 보며 더 자세히 알아봅시다:
 # 
 
 torch.manual_seed(1729)
