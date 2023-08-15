@@ -146,10 +146,9 @@ print(rand_like_x)
 
 
 #########################################################################
-# The first new thing in the code cell above is the use of the ``.shape``
-# property on a tensor. This property contains a list of the extent of
-# each dimension of a tensor - in our case, ``x`` is a three-dimensional
-# tensor with shape 2 x 2 x 3.
+# 위쪽의 코드 셀에 있는 것들 중에 첫 번째는 tensor에 있는 ``.shape`` 속성을 사용했습니다.
+# 이 속성은 tesnor의 각 차원 크기에 대한 리스트를 포함합니다
+# - 이 경우에, ``x`` 는 모양이 2 x 2 x 3 인 3차원 tensor입니다.
 # 
 # Below that, we call the ``.empty_like()``, ``.zeros_like()``,
 # ``.ones_like()``, and ``.rand_like()`` methods. Using the ``.shape``
