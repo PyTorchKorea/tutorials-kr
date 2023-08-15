@@ -113,7 +113,7 @@ print(random4)
 # 무작위 난수 생성기의 seed를 수동으로 설정하면 난수가 재 설정되어 대부분의 환경에서
 # 무작위 숫자에 의존하는 동일한 계산이 이루어지고 동일한 결과를 제공합니다.
 # 
-# For more information, see the `PyTorch documentation on
+# 보다 자세한 정보는 다음 문서를 참고하세요 `PyTorch documentation on
 # reproducibility <https://pytorch.org/docs/stable/notes/randomness.html>`__.
 # 
 # Tensor Shapes
