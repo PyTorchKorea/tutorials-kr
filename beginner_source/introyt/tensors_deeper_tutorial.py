@@ -108,10 +108,10 @@ print(random4)
 
 
 ############################################################################
-# What you should see above is that ``random1`` and ``random3`` carry
-# identical values, as do ``random2`` and ``random4``. Manually setting
-# the RNG’s seed resets it, so that identical computations depending on
-# random number should, in most settings, provide identical results.
+# ``random1`` 과 ``random3`` 그리고 ``random2`` 과 ``random4`` ,
+# 이 각각 서로 동일한 결과가 나온다는 것을 볼 수 있습니다.
+# 무작위 난수 생성기의 seed를 수동으로 설정하면 난수가 재 설정되어 대부분의 환경에서
+# 무작위 숫자에 의존하는 동일한 계산이 이루어지고 동일한 결과를 제공합니다.
 # 
 # For more information, see the `PyTorch documentation on
 # reproducibility <https://pytorch.org/docs/stable/notes/randomness.html>`__.
