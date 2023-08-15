@@ -62,9 +62,10 @@ print(x)
 # -  이와 마찬가지로 2차원 tensor는 주로 *matrix* 라고 합니다.
 # -  2차원보다 큰 차원을 가진 것들은 일반적으로 그냥 tensor라고 합니다.
 # 
-# More often than not, you’ll want to initialize your tensor with some
-# value. Common cases are all zeros, all ones, or random values, and the
-# ``torch`` module provides factory methods for all of these:
+# 코딩 하면서 주로 tensor를 몇가지 값으로 초기화하고 싶을수가 있습니다.
+# 일반적인 경우로는 모두 0으로 초기화 하거나, 모두 1로 초기화 하거나,
+# 혹운 모두 무작위 값으로 초기화 할때가 있는데,
+# 이때 ``torch`` 모듈은 이 모든 경우를 위한 메소드를 제공합니다:
 # 
 
 zeros = torch.zeros(2, 3)
