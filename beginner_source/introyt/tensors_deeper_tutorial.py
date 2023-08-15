@@ -45,19 +45,16 @@ print(x)
 
 
 ##########################################################################
-# Let’s unpack what we just did:
+# 방금 무엇을 한 것인지 들여다봅시다:
 # 
-# -  We created a tensor using one of the numerous factory methods
-#    attached to the ``torch`` module.
-# -  The tensor itself is 2-dimensional, having 3 rows and 4 columns.
-# -  The type of the object returned is ``torch.Tensor``, which is an
-#    alias for ``torch.FloatTensor``; by default, PyTorch tensors are
-#    populated with 32-bit floating point numbers. (More on data types
-#    below.)
-# -  You will probably see some random-looking values when printing your
-#    tensor. The ``torch.empty()`` call allocates memory for the tensor,
-#    but does not initialize it with any values - so what you’re seeing is
-#    whatever was in memory at the time of allocation.
+# -  ``torch`` 모듈에 있는 수많은 메소드 중 하나를 사용해서 tesnor를 만들었습니다.
+# -  이 tensor는 3개의 행과 4개의 열을 가진 2차원 tensor입니다.
+# -  객체가 반환한 type은 ``torch.Tensor`` 이며 이는 ``torch.FloatTensor`` 의 별칭입니다.
+#    기본적으로 Pytorch tensor는 32-bit 부동 소숫점 표현 실수로 채워집니다.
+#    (아래에서 더 많은 데이터 자료형을 소개합니다)
+# -  생성한 tensor를 출력하면 아마 무작위 값을 볼 수 있을 것 입니다.
+#    ``torch.empty()`` 는 tensor를 위한 메모리를 할당해 주지만 임의의 값으로 초기화하지는 않습니다
+#    - 그렇기 때문에 할당 당시에 메모리가 가지고 있는 값을 보는 것입니다.
 # 
 # A brief note about tensors and their number of dimensions, and
 # terminology:
