@@ -22,9 +22,9 @@ Pytorch Tensor 소개
 
 | 텐서는 Pytorch에서 중요한 추상 데이터 자료형입니다.
 | 이 interactive notebook은 ``torch.Tensor`` 클래스에 대한 심층적인 소개를 제공합니다.
-
-First things first, let’s import the PyTorch module. We’ll also add
-Python’s math module to facilitate some of the examples.
+|
+| 먼저 가장 중요한 것은 Pytorch 모듈을 import 하는 것입니다.
+| 또한 몇가지 예제에 사용할 math 모듈도 import 합니다.
 
 """
 
