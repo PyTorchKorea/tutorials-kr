@@ -56,15 +56,11 @@ print(x)
 #    ``torch.empty()`` 는 tensor를 위한 메모리를 할당해 주지만 임의의 값으로 초기화하지는 않습니다
 #    - 그렇기 때문에 할당 당시에 메모리가 가지고 있는 값을 보는 것입니다.
 # 
-# A brief note about tensors and their number of dimensions, and
-# terminology:
+# 간략하게 tensor와 tensor의 차원 수, 그리고 각 tensor의 용어에 대해 알아봅시다:
 # 
-# -  You will sometimes see a 1-dimensional tensor called a
-#    *vector.* 
-# -  Likewise, a 2-dimensional tensor is often referred to as a
-#    *matrix.* 
-# -  Anything with more than two dimensions is generally just
-#    called a tensor.
+# -  때로는 1차원 tensor를 보게 될것인데 이는 *vector* 라고 합니다.
+# -  이와 마찬가지로 2차원 tensor는 주로 *matrix* 라고 합니다.
+# -  2차원보다 큰 차원을 가진 것들은 일반적으로 그냥 tensor라고 합니다.
 # 
 # More often than not, you’ll want to initialize your tensor with some
 # value. Common cases are all zeros, all ones, or random values, and the
