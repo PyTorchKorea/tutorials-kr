@@ -169,10 +169,9 @@ print(more_integers)
 
 
 ######################################################################
-# Using ``torch.tensor()`` is the most straightforward way to create a
-# tensor if you already have data in a Python tuple or list. As shown
-# above, nesting the collections will result in a multi-dimensional
-# tensor.
+# ``torch.tensor()`` 는 이미 Python tuple이나 list 형태로 이루어진 데이터를
+# 가지고 있는 경우 tensor를 만들기 가장 쉬운 방법입니다.
+# 위에서 본것 처럼 중접된 형태의 collection 자료형은 다차원 tensor가 결과로 나옵니다.
 # 
 # .. note::
 #      ``torch.tensor()`` creates a copy of the data.
