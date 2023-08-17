@@ -193,15 +193,16 @@ print(c)
 
 
 ##########################################################################
-# The simplest way to set the underlying data type of a tensor is with an
-# optional argument at creation time. In the first line of the cell above,
-# we set ``dtype=torch.int16`` for the tensor ``a``. When we print ``a``,
-# we can see that it’s full of ``1`` rather than ``1.`` - Python’s subtle
-# cue that this is an integer type rather than floating point.
+# tensor의 자료형을 설정하는 가장 단순한 방식은 생성할 때 선택적 인자를 사용하는 것 입니다.
+# 위에있는 cell의 첫번째 줄을 보면, tensor ``a`` 를
+# ``dtype=torch.int16`` 자료형으로 설정했습니다. ``a`` 를 출력할 때,
+# ``1.`` 대신에 ``1`` 로 가득찬 모습을 볼 수 있습니다
+# - 파이썬에서 아랫 점이 없으면 실수 부동 소수점이 아닌 정수 자료형을 의미합니다.
 # 
-# Another thing to notice about printing ``a`` is that, unlike when we
-# left ``dtype`` as the default (32-bit floating point), printing the
-# tensor also specifies its ``dtype``.
+# ``a`` 를 출력할때 또 한가지 주목할 점은,
+# ``dtype`` 을 기본값 (32-bit 부동 소수점)
+# 으로 남길 때와 다르게 tensor를 출력하는 경우
+# 각 tensor의 ``dtype`` 을 명시한다는 것입니다.
 # 
 # You may have also spotted that we went from specifying the tensor’s
 # shape as a series of integer arguments, to grouping those arguments in a
