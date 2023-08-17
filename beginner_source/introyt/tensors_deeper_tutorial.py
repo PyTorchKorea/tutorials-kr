@@ -204,11 +204,10 @@ print(c)
 # 으로 남길 때와 다르게 tensor를 출력하는 경우
 # 각 tensor의 ``dtype`` 을 명시한다는 것입니다.
 # 
-# You may have also spotted that we went from specifying the tensor’s
-# shape as a series of integer arguments, to grouping those arguments in a
-# tuple. This is not strictly necessary - PyTorch will take a series of
-# initial, unlabeled integer arguments as a tensor shape - but when adding
-# the optional arguments, it can make your intent more readable.
+# tensor의 형태를 정수형 인자의 나열, 즉 이 인자를 tuple 자료형 형태로
+# 묶는다는 것을 발견할 수 있습니다. 이것은 반드시 필요한 것은 아닙니다
+# - Pytorch에서는 첫번째 인수로 tensor 형태라는 값을 의미하는 라벨이 없는 정수 인자를 여러개를 받습니다 -
+# 하지만 선택 인수를 추가했을 때, 이 방식은 코드를 더 읽기 쉽게 만들 수 있습니다.
 # 
 # The other way to set the datatype is with the ``.to()`` method. In the
 # cell above, we create a random floating point tensor ``b`` in the usual
