@@ -227,11 +227,11 @@ print(c)
 # -  ``torch.double``
 # -  ``torch.bfloat``
 # 
-# Math & Logic with PyTorch Tensors
+# Pytorch Tensor에서 산술 & 논리 연산
 # ---------------------------------
 # 
-# Now that you know some of the ways to create a tensor… what can you do
-# with them?
+# 지금까지 tensor를 생성하는 몇가지 방식을 알아봤습니다…
+# 이것을 가지고 무엇을 할 수 있을까요?
 # 
 # Let’s look at basic arithmetic first, and how tensors interact with
 # simple scalars:
