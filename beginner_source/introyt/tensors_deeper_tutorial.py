@@ -174,7 +174,7 @@ print(more_integers)
 # 위에서 본것 처럼 중접된 형태의 collection 자료형은 다차원 tensor가 결과로 나옵니다.
 # 
 # .. note::
-#      ``torch.tensor()`` creates a copy of the data.
+#      ``torch.tensor()`` 는 데이터의 복사본을 생성합니다.
 # 
 # Tensor Data Types
 # ~~~~~~~~~~~~~~~~~
