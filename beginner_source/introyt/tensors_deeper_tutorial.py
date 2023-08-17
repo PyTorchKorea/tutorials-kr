@@ -154,8 +154,8 @@ print(rand_like_x)
 # ``.ones_like()``, and ``.rand_like()`` 메소드를 호출 합니다.
 # ``.shape`` 속성을 통해서, 위의 메소드들이 동일한 차원값을 반환한다는 것을 검증할 수 있습니다.
 # 
-# The last way to create a tensor that will cover is to specify its data
-# directly from a PyTorch collection:
+# 여기서 다루는 tensor를 생성하는 마지막 방법은 PyTorch collection
+# 형식의 데이터를 직접적으로 명시하는 것 입니다:
 # 
 
 some_constants = torch.tensor([[3.1415926, 2.71828], [1.61803, 0.0072897]])
