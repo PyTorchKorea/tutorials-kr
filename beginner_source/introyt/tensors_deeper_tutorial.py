@@ -209,11 +209,10 @@ print(c)
 # - Pytorch에서는 첫번째 인수로 tensor 형태라는 값을 의미하는 라벨이 없는 정수 인자를 여러개를 받습니다 -
 # 하지만 선택 인수를 추가했을 때, 이 방식은 코드를 더 읽기 쉽게 만들 수 있습니다.
 # 
-# The other way to set the datatype is with the ``.to()`` method. In the
-# cell above, we create a random floating point tensor ``b`` in the usual
-# way. Following that, we create ``c`` by converting ``b`` to a 32-bit
-# integer with the ``.to()`` method. Note that ``c`` contains all the same
-# values as ``b``, but truncated to integers.
+# 자료형을 설정하는 다른 방밥은 ``.to()`` 메소드랑 함께 사용하는 것 입니다.
+# 위쪽 셀에서 평범한 방식으로 무작위 실수 자료형 tensor ``b`` 를 생성합니다.
+# 이어서 ``.to()`` 메소드를 사용해서 ``b`` 를 32-bit 정수 자료형으로 변환한 ``c`` 를 생성합니다.
+# ``c`` 는 모든 ``b`` 의 값과 같은 값을 가지고 있지만 소숫점 아래 자리를 버린다는 점이 다릅니다.
 # 
 # Available data types include:
 # 
