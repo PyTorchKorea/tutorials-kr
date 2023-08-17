@@ -116,10 +116,10 @@ print(random4)
 # 보다 자세한 정보는 다음 문서를 참고하세요 `PyTorch documentation on
 # reproducibility <https://pytorch.org/docs/stable/notes/randomness.html>`__.
 # 
-# Tensor의 모양
+# Tensor의 형태
 # ~~~~~~~~~~~~~
 # 
-# 두개 혹은 그 이상의 tensor에 대한 연산을 수행할 때, tensor들은 같은 모양을 필요로 합니다
+# 두개 혹은 그 이상의 tensor에 대한 연산을 수행할 때, tensor들은 같은 형태를 필요로 합니다
 # - 다시 말해서 차원의 개수가 같아야 하고, 각 차원마다 원소의 수가 같아야 합니다.
 # 그러기 위해서는 ``torch.*_like()`` 함수를 사용합니다.
 # 
@@ -148,7 +148,7 @@ print(rand_like_x)
 #########################################################################
 # 위쪽의 코드 셀에 있는 것들 중에 첫 번째는 tensor에 있는 ``.shape`` 속성을 사용했습니다.
 # 이 속성은 tesnor의 각 차원 크기에 대한 리스트를 포함합니다
-# - 이 경우에, ``x`` 는 모양이 2 x 2 x 3 인 3차원 tensor입니다.
+# - 이 경우에, ``x`` 는 형태가 2 x 2 x 3 인 3차원 tensor입니다.
 # 
 # 그 아래에는 ``.empty_like()``, ``.zeros_like()``,
 # ``.ones_like()``, and ``.rand_like()`` 메소드를 호출 합니다.
