@@ -150,10 +150,9 @@ print(rand_like_x)
 # 이 속성은 tesnor의 각 차원 크기에 대한 리스트를 포함합니다
 # - 이 경우에, ``x`` 는 모양이 2 x 2 x 3 인 3차원 tensor입니다.
 # 
-# Below that, we call the ``.empty_like()``, ``.zeros_like()``,
-# ``.ones_like()``, and ``.rand_like()`` methods. Using the ``.shape``
-# property, we can verify that each of these methods returns a tensor of
-# identical dimensionality and extent.
+# 그 아래에는 ``.empty_like()``, ``.zeros_like()``,
+# ``.ones_like()``, and ``.rand_like()`` 메소드를 호출 합니다.
+# ``.shape`` 속성을 통해서, 위의 메소드들이 동일한 차원값을 반환한다는 것을 검증할 수 있습니다.
 # 
 # The last way to create a tensor that will cover is to specify its data
 # directly from a PyTorch collection:
