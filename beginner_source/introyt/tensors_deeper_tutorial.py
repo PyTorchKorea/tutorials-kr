@@ -176,10 +176,10 @@ print(more_integers)
 # .. note::
 #      ``torch.tensor()`` 는 데이터의 복사본을 생성합니다.
 # 
-# Tensor Data Types
+# Tensor 자료형
 # ~~~~~~~~~~~~~~~~~
 # 
-# Setting the datatype of a tensor is possible a couple of ways:
+# tensor의 자료형을 설정하는 것은 다양한 방식이 가능합니다.
 # 
 
 a = torch.ones((2, 3), dtype=torch.int16)
