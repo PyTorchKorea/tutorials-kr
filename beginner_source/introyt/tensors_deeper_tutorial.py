@@ -258,8 +258,7 @@ print(sqrt2s)
 # ``threes`` 변수를 생성하는 줄에서 처럼
 # 일반적인 연산자 우선순위 규칙과 함께 연산자를 연결할 수 있습니다.
 # 
-# Similar operations between two tensors also behave like you’d
-# intuitively expect:
+# 두 tensor 사이 유사한 연산도 직관적으로 예상할 수 있는 방식으로 동작합니다:
 # 
 
 powers2 = twos ** torch.tensor([[1, 2], [3, 4]])
