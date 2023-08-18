@@ -233,8 +233,8 @@ print(c)
 # 지금까지 tensor를 생성하는 몇가지 방식을 알아봤습니다…
 # 이것을 가지고 무엇을 할 수 있을까요?
 # 
-# Let’s look at basic arithmetic first, and how tensors interact with
-# simple scalars:
+# 먼저 기본적인 산술 연산을 알아보고,
+# 그 다음 tensor가 단순 스칼라 값과 어떻게 상호작용 하는지 알아봅시다:
 # 
 
 ones = torch.zeros(2, 2) + 1
