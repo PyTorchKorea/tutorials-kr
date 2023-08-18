@@ -251,12 +251,12 @@ print(sqrt2s)
 
 
 ##########################################################################
-# As you can see above, arithmetic operations between tensors and scalars,
-# such as addition, subtraction, multiplication, division, and
-# exponentiation are distributed over every element of the tensor. Because
-# the output of such an operation will be a tensor, you can chain them
-# together with the usual operator precedence rules, as in the line where
-# we create ``threes``.
+# 위에서 볼 수 있듯이 tensor들과 스칼라 값 사이 산술연산,
+# 예를 들면 덧셈, 뺄셈, 곱셈, 나눗셈 그리고 거듭제곱은
+# tensor의 각 원소에 나눠서 계산을 합니다.
+# 이러한 연산의 결과는 tensor가 될 것이기 때문에,
+# ``threes`` 변수를 생성하는 줄에서 처럼
+# 일반적인 연산자 우선순위 규칙과 함께 연산자를 연결할 수 있습니다.
 # 
 # Similar operations between two tensors also behave like you’d
 # intuitively expect:
