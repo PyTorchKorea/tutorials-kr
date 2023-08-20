@@ -298,8 +298,8 @@ print(dozens)
 #      만약 NumPy의 ndarrays에서 사용하는 broadcasting 문법에 익숙하다면,
 #      여기서도 같은 규칙이 적용된다는 것을 확인할 수 있습니다.
 # 
-# The exception to the same-shapes rule is *tensor broadcasting.* Here’s
-# an example:
+# tensor는 같은 형태끼리만 연산이 가능하다는 규칙의 예외가 바로 *tensor broadcasting* 입니다.
+# 다음은 그 예시입니다:
 # 
 
 rand = torch.rand(2, 4)
