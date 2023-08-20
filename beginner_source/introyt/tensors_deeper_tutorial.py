@@ -288,9 +288,8 @@ print(dozens)
 
 
 ##########################################################################
-# In the general case, you cannot operate on tensors of different shape
-# this way, even in a case like the cell above, where the tensors have an
-# identical number of elements.
+# 일반적인 경우에, 다른 형태의 tensor를 이러한 방식으로 연산할 수 없습니다.
+# 심지어 위에 있는 cell에 있는 경우처럼 tensor가 서로 같은 개수의 원소를 가지고 있는 경우에도 연산할 수 없습니다.
 # 
 # In Brief: Tensor Broadcasting
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
