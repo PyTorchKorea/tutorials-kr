@@ -295,8 +295,8 @@ print(dozens)
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # 
 # .. note::
-#      If you are familiar with broadcasting semantics in NumPy
-#      ndarrays, you’ll find the same rules apply here.
+#      만약 NumPy의 ndarrays에서 사용하는 broadcasting 문법에 익숙하다면,
+#      여기서도 같은 규칙이 적용된다는 것을 확인할 수 있습니다.
 # 
 # The exception to the same-shapes rule is *tensor broadcasting.* Here’s
 # an example:
