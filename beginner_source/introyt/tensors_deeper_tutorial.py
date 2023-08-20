@@ -276,7 +276,7 @@ print(dozens)
 # 만약 서로 다른 형태를 가진 tensor끼리 이진 연산을 수행한다면 무슨 일이 일어날까요?
 # 
 # .. note::
-#      The following cell throws a run-time error. This is intentional.
+#      다음 cell은 run-time error가 발생합니다. 이것은 의도한 것입니다.
 #
 # ::
 #
