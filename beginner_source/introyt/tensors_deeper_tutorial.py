@@ -272,9 +272,8 @@ print(dozens)
 
 
 ##########################################################################
-# It’s important to note here that all of the tensors in the previous code
-# cell were of identical shape. What happens when we try to perform a
-# binary operation on tensors if dissimilar shape?
+# 여기서 주목해야할 점은 이전 코드 cell에 있는 모든 tensor는 동일한 형태를 가져야 한다는 것 입니다.
+# 만약 서로 다른 형태를 가진 tensor끼리 이진 연산을 수행한다면 무슨 일이 일어날까요?
 # 
 # .. note::
 #      The following cell throws a run-time error. This is intentional.
