@@ -310,8 +310,8 @@ print(doubled)
 
 
 #########################################################################
-# What’s the trick here? How is it we got to multiply a 2x4 tensor by a
-# 1x4 tensor?
+# 여기서 무슨 트릭이 사용되고 있는 것일까요?
+# 어떻게 2x4 tensor에 1x4 tensor를 곱한 값을 얻을 수 있을까요?
 # 
 # Broadcasting is a way to perform an operation between tensors that have
 # similarities in their shapes. In the example above, the one-row,
