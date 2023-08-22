@@ -313,10 +313,9 @@ print(doubled)
 # 여기서 무슨 트릭이 사용되고 있는 것일까요?
 # 어떻게 2x4 tensor에 1x4 tensor를 곱한 값을 얻을 수 있을까요?
 # 
-# Broadcasting is a way to perform an operation between tensors that have
-# similarities in their shapes. In the example above, the one-row,
-# four-column tensor is multiplied by *both rows* of the two-row,
-# four-column tensor.
+# Broadcasting은 서로 비슷한 형태를 가진 tensor사이 연산을 수행하는 방법입니다.
+# 위의 예시를 보면, 행의 값이 1이고, 열의 값이 4인 tensor가
+# 행의 값이 2이고, 열의 값이 4인 tensor의 *모든 행* 에 곱하게 됩니다.
 # 
 # This is an important operation in Deep Learning. The common example is
 # multiplying a tensor of learning weights by a *batch* of input tensors,
