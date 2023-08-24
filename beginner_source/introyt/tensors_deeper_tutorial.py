@@ -465,20 +465,20 @@ print(torch.svd(m3))       # 특이값 분해
 # 이런 연산을 위해, 대부분의 수학 함수들은 tensor 내부의 값을
 # 변경할 수 있는 함수 이름 맨 뒤에 밑줄 (``_``)이 추가된 버전을 가지고 있습니다.
 # 
-# For example:
+# 예시:
 # 
 
 a = torch.tensor([0, math.pi / 4, math.pi / 2, 3 * math.pi / 4])
 print('a:')
 print(a)
-print(torch.sin(a))   # this operation creates a new tensor in memory
-print(a)              # a has not changed
+print(torch.sin(a))   # 이 연산은 메모리에 새로운 tensor를 생성합니다.
+print(a)              # a는 변하지 않습니다.
 
 b = torch.tensor([0, math.pi / 4, math.pi / 2, 3 * math.pi / 4])
 print('\nb:')
 print(b)
-print(torch.sin_(b))  # note the underscore
-print(b)              # b has changed
+print(torch.sin_(b))  # 밑줄에 주목하세요.
+print(b)              # b가 변합니다.
 
 
 #######################################################################
