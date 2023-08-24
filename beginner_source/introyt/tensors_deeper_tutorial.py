@@ -377,11 +377,11 @@ print(d)
 #
 #    a =     torch.ones(4, 3, 2)
 #
-#    b = a * torch.rand(4, 3)    # dimensions must match last-to-first
+#    b = a * torch.rand(4, 3)    # 차원은 반드시 맨 뒤 원소부터 맨 앞 원소로 차례대로 맞춰야 합니다.
 #
-#    c = a * torch.rand(   2, 3) # both 3rd & 2nd dims different
+#    c = a * torch.rand(   2, 3) # 세번째와 두번째 차원 모두 서로 다릅니다.
 #
-#    d = a * torch.rand((0, ))   # can't broadcast with an empty tensor
+#    d = a * torch.rand((0, ))   # 비어있는 tensor는 broadcast 할 수 없습니다.
 #
 
 
