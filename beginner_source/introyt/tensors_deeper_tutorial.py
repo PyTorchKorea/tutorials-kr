@@ -344,13 +344,13 @@ print(doubled)
 
 a =     torch.ones(4, 3, 2)
 
-b = a * torch.rand(   3, 2) # 3rd & 2nd dims identical to a, dim 1 absent
+b = a * torch.rand(   3, 2) # 세번째와 두번째 차원이 a랑 동일하고, 첫번째 차원은 존재하지 않습니다.
 print(b)
 
-c = a * torch.rand(   3, 1) # 3rd dim = 1, 2nd dim identical to a
+c = a * torch.rand(   3, 1) # 세번째 차원 = 1이고, 두번째 차원은 a랑 동일합니다.
 print(c)
 
-d = a * torch.rand(   1, 2) # 3rd dim identical to a, 2nd dim = 1
+d = a * torch.rand(   1, 2) # 세번째 차원이 a랑 동일하고, 두번째 차원 = 1입니다.
 print(d)
 
 
