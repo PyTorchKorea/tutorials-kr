@@ -448,10 +448,11 @@ print(torch.svd(m3))       # 특이값 분해
 
 
 ##################################################################################
-# This is a small sample of operations. For more details and the full inventory of
-# math functions, have a look at the
-# `documentation <https://pytorch.org/docs/stable/torch.html#math-operations>`__.
-# 
+# 이것은 수많은 연산의 일부분입니다.
+# 더 자세한 내용이나 수학 함수의 전체적인 목록은, 다음
+# `documentation <https://pytorch.org/docs/stable/torch.html#math-operations>`__
+# 를 읽어주세요.
+#
 # Altering Tensors in Place
 # ~~~~~~~~~~~~~~~~~~~~~~~~~
 # 
