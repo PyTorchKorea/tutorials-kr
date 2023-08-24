@@ -460,11 +460,10 @@ print(torch.svd(m3))       # 특이값 분해
 # ``c = a * b`` ( ``a`` 와 ``b`` 는 tensor)연산을 수행할 때,
 # 새로운 tensor ``c`` 는 다른 tensor와 구별되는 메모리 영역을 차지하게 됩니다.
 # 
-# There are times, though, that you may wish to alter a tensor in place -
-# for example, if you’re doing an element-wise computation where you can
-# discard intermediate values. For this, most of the math functions have a
-# version with an appended underscore (``_``) that will alter a tensor in
-# place.
+# 그럼에도 불구하고 tensor의 값을 변경하고 싶은 순간이 있을 수 있습니다 -
+# 예를 들어, 중간 연산 결과 값을 버릴 수 있는 각 원소 단위 연산을 수행하는 경우가 있습니다.
+# 이런 연산을 위해, 대부분의 수학 함수들은 tensor 내부의 값을
+# 변경할 수 있는 함수 이름 맨 뒤에 밑줄 (``_``)이 추가된 버전을 가지고 있습니다.
 # 
 # For example:
 # 
