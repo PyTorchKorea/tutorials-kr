@@ -364,9 +364,9 @@ print(d)
 # -  ``d`` 에 대해서, 연산이 이전과 반대로 모든 layer와 열에 대해서 수행합니다
 #    - 이재 모든 *행* 이 동일합니다.
 # 
-# For more information on broadcasting, see the `PyTorch
+# broadcasting에 대한 더 많은 정보는, `PyTorch
 # documentation <https://pytorch.org/docs/stable/notes/broadcasting.html>`__
-# on the topic.
+# 에 있는 주제를 참고하세요.
 # 
 # Here are some examples of attempts at broadcasting that will fail:
 # 
