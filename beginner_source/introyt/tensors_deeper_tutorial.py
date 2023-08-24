@@ -368,10 +368,10 @@ print(d)
 # documentation <https://pytorch.org/docs/stable/notes/broadcasting.html>`__
 # 에 있는 주제를 참고하세요.
 # 
-# Here are some examples of attempts at broadcasting that will fail:
+# 다음 예시는 broadcasting 시도가 실패한 사례입니다:
 # 
 # .. note::
-#       The following cell throws a run-time error. This is intentional.
+#       다음 cell은 run-time error가 발생합니다. 이것은 의도한 것입니다.
 #
 # ::
 #
