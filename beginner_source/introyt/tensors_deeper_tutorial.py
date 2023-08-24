@@ -482,7 +482,7 @@ print(b)              # b가 변합니다.
 
 
 #######################################################################
-# For arithmetic operations, there are functions that behave similarly:
+# 산술 연산에서, 비슷한 행동을 하는 함수가 있습니다:
 # 
 
 a = torch.ones(2, 2)
