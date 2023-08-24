@@ -323,21 +323,20 @@ print(doubled)
 # 위의 (2, 4) \* (1, 4) tensor연산의 결과가 (2, 4)형태 tensor인 것처럼 -
 # 동일한 형태의 학습 가중치 tesnor를 반환하는 것입니다.
 # 
-# The rules for broadcasting are:
+# Broadcasting의 규칙은 다음과 같습니다:
 # 
-# -  Each tensor must have at least one dimension - no empty tensors.
+# -  각 tensor는 최소한 1차원 이상을 반드시 가지고 있어야 합니다 - 빈 tensor는 사용할 수 없습니다.
 # 
-# -  Comparing the dimension sizes of the two tensors, *going from last to
-#    first:*
+# -  두 tensor의 각 차원 크기 원소가 다음 조건을 만족하는지 확인하며 비교합니다. *이때 비교 순서는 맨 뒤에서부터 맨 앞으로 입니다;*
+#
+#    -  각 차원이 서로 동일합니다, *또는*
 # 
-#    -  Each dimension must be equal, *or*
+#    -  각 차원중의 하나의 크기가 반드시 1입니다, *또는*
 # 
-#    -  One of the dimensions must be of size 1, *or*
+#    -  tensor들 중 하나의 차원이 존재하지 않습니다.
 # 
-#    -  The dimension does not exist in one of the tensors
-# 
-# Tensors of identical shape, of course, are trivially “broadcastable”, as
-# you saw earlier.
+# 이전에 봤던 것처럼,
+# 물론 동일한 형태를 가진 Tensor들은 자명하게 “broadcastable” 합니다.
 # 
 # Here are some examples of situations that honor the above rules and
 # allow broadcasting:
