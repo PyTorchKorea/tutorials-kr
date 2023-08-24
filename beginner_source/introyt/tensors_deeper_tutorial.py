@@ -386,13 +386,13 @@ print(d)
 
 
 ###########################################################################
-# More Math with Tensors
+# Tensor를 사용하는 다양한 연산들
 # ~~~~~~~~~~~~~~~~~~~~~~
 # 
-# PyTorch tensors have over three hundred operations that can be performed
-# on them.
+# PyTorch tensor는 tensor들 끼리 수행할 수 있는 300개 이상의
+# 연산을 가지고 있습니다.
 # 
-# Here is a small sample from some of the major categories of operations:
+# 다음 작은 예시는 주로 사용하는 연산 종류 몇개를 보여줍니다:
 # 
 
 # common functions
