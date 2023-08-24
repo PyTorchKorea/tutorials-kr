@@ -501,11 +501,10 @@ print(b)
 
 
 ##########################################################################
-# Note that these in-place arithmetic functions are methods on the
-# ``torch.Tensor`` object, not attached to the ``torch`` module like many
-# other functions (e.g., ``torch.sin()``). As you can see from
-# ``a.add_(b)``, *the calling tensor is the one that gets changed in
-# place.*
+# 이러한 내부의 값을 변경하는 산술 함수는 다른 많은 함수들
+# (e.g., ``torch.sin()``)처럼 ``torch`` 모듈의 메소드가 아니라
+# ``torch.Tensor`` 객체의 메소드인 점에 주목해야 합니다.
+# ``a.add_(b)`` 와 같은 경우처럼, *메소드를 호출하는 tensor는 값이 변경됩니다.*
 # 
 # There is another option for placing the result of a computation in an
 # existing, allocated tensor. Many of the methods and functions we’ve seen
