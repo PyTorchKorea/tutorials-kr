@@ -338,8 +338,8 @@ print(doubled)
 # 이전에 봤던 것처럼,
 # 물론 동일한 형태를 가진 Tensor들은 자명하게 “broadcastable” 합니다.
 # 
-# Here are some examples of situations that honor the above rules and
-# allow broadcasting:
+# 다음 예제는 위의 규칙을 준수하고
+# broadcasting을 허용하는 몇가지 상황입니다.
 # 
 
 a =     torch.ones(4, 3, 2)
