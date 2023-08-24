@@ -395,7 +395,7 @@ print(d)
 # 다음 작은 예시는 주로 사용하는 연산 종류 몇개를 보여줍니다:
 # 
 
-# common functions
+# 공용 함수
 a = torch.rand(2, 4) * 2 - 1
 print('Common functions:')
 print(torch.abs(a))
@@ -403,7 +403,7 @@ print(torch.ceil(a))
 print(torch.floor(a))
 print(torch.clamp(a, -0.5, 0.5))
 
-# trigonometric functions and their inverses
+# 삼각 함수들 역 삼각 함수
 angles = torch.tensor([0, math.pi / 4, math.pi / 2, 3 * math.pi / 4])
 sines = torch.sin(angles)
 inverses = torch.asin(sines)
@@ -412,39 +412,39 @@ print(angles)
 print(sines)
 print(inverses)
 
-# bitwise operations
+# 비트 연산
 print('\nBitwise XOR:')
 b = torch.tensor([1, 5, 11])
 c = torch.tensor([2, 7, 10])
 print(torch.bitwise_xor(b, c))
 
-# comparisons:
+# 비교 연산:
 print('\nBroadcasted, element-wise equality comparison:')
 d = torch.tensor([[1., 2.], [3., 4.]])
-e = torch.ones(1, 2)  # many comparison ops support broadcasting!
-print(torch.eq(d, e)) # returns a tensor of type bool
+e = torch.ones(1, 2)  # 많은 비교 연산자들은 broadcasting을 지원합니다!
+print(torch.eq(d, e)) # bool 자료형을 가진 tensor를 반환합니다.
 
-# reductions:
+# 차원 감소 연산:
 print('\nReduction ops:')
-print(torch.max(d))        # returns a single-element tensor
-print(torch.max(d).item()) # extracts the value from the returned tensor
-print(torch.mean(d))       # average
-print(torch.std(d))        # standard deviation
-print(torch.prod(d))       # product of all numbers
-print(torch.unique(torch.tensor([1, 2, 1, 2, 1, 2]))) # filter unique elements
+print(torch.max(d))        # 단일 원소 tensor를 반환합니다.
+print(torch.max(d).item()) # 반환한 tensor로부터 값을 추출합니다.
+print(torch.mean(d))       # 평균
+print(torch.std(d))        # 표준 편차
+print(torch.prod(d))       # 모든 숫자의 곱
+print(torch.unique(torch.tensor([1, 2, 1, 2, 1, 2]))) # 중복되지 않은 값들을 걸러냅니다.
 
-# vector and linear algebra operations
-v1 = torch.tensor([1., 0., 0.])         # x unit vector
-v2 = torch.tensor([0., 1., 0.])         # y unit vector
-m1 = torch.rand(2, 2)                   # random matrix
-m2 = torch.tensor([[3., 0.], [0., 3.]]) # three times identity matrix
+# 벡터와 선형 대수 연산
+v1 = torch.tensor([1., 0., 0.])         # x축 단위 벡터
+v2 = torch.tensor([0., 1., 0.])         # y축 단위 벡터
+m1 = torch.rand(2, 2)                   # 무작위 행렬
+m2 = torch.tensor([[3., 0.], [0., 3.]]) # 단위 행렬에 3을 곱한 결과
 
 print('\nVectors & Matrices:')
-print(torch.cross(v2, v1)) # negative of z unit vector (v1 x v2 == -v2 x v1)
+print(torch.cross(v2, v1)) # z축 단위 벡터의 음수값 (v1 x v2 == -v2 x v1)
 print(m1)
 m3 = torch.matmul(m1, m2)
-print(m3)                  # 3 times m1
-print(torch.svd(m3))       # singular value decomposition
+print(m3)                  # m1 행렬을 3번 곱한 결과
+print(torch.svd(m3))       # 특이값 분해
 
 
 ##################################################################################
