@@ -453,12 +453,12 @@ print(torch.svd(m3))       # 특이값 분해
 # `documentation <https://pytorch.org/docs/stable/torch.html#math-operations>`__
 # 를 읽어주세요.
 #
-# Altering Tensors in Place
+# Tensor들의 값을 변경하기
 # ~~~~~~~~~~~~~~~~~~~~~~~~~
 # 
-# Most binary operations on tensors will return a third, new tensor. When
-# we say ``c = a * b`` (where ``a`` and ``b`` are tensors), the new tensor
-# ``c`` will occupy a region of memory distinct from the other tensors.
+# 대부분 tensor들의 이진 연산은 제3자의 새로운 tensor를 생성합니다.
+# ``c = a * b`` ( ``a`` 와 ``b`` 는 tensor)연산을 수행할 때,
+# 새로운 tensor ``c`` 는 다른 tensor와 구별되는 메모리 영역을 차지하게 됩니다.
 # 
 # There are times, though, that you may wish to alter a tensor in place -
 # for example, if you’re doing an element-wise computation where you can
