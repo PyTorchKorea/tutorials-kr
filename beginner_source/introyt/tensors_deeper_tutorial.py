@@ -317,11 +317,11 @@ print(doubled)
 # 위의 예시를 보면, 행의 값이 1이고, 열의 값이 4인 tensor가
 # 행의 값이 2이고, 열의 값이 4인 tensor의 *모든 행* 에 곱하게 됩니다.
 # 
-# This is an important operation in Deep Learning. The common example is
-# multiplying a tensor of learning weights by a *batch* of input tensors,
-# applying the operation to each instance in the batch separately, and
-# returning a tensor of identical shape - just like our (2, 4) \* (1, 4)
-# example above returned a tensor of shape (2, 4).
+# 이것은 딥러닝에서 중요한 연산입니다.
+# 일반적인 예시는 학습 가중치 tensor에 입력 tensor의 *배치* 를 곱하고,
+# 배치의 각 인스턴스에 곱하기 연산을 개별적으로 적용한 이후
+# 위의 (2, 4) \* (1, 4) tensor연산의 결과가 (2, 4)형태 tensor인 것처럼 -
+# 동일한 형태의 학습 가중치 tesnor를 반환하는 것입니다.
 # 
 # The rules for broadcasting are:
 # 
