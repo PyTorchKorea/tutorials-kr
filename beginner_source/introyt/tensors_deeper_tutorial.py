@@ -355,14 +355,14 @@ print(d)
 
 
 #############################################################################
-# Look closely at the values of each tensor above: 
+# 위의 예시에 있는 각 tensor의 값을 자세히 살펴봅시다:
 #
-# -  The multiplication operation that created ``b`` was 
-#    broadcast over every “layer” of ``a``.
-# -  For ``c``, the operation was broadcast over ever layer and row of
-#    ``a`` - every 3-element column is identical. 
-# -  For ``d``, we switched it around - now every *row* is identical,
-#    across layers and columns.
+# -  ``b`` 를 만드는 곱셈 연산은
+#    ``a`` 의 모든 “layer” 에 broadcast 되었습니다.
+# -  ``c`` 에 대해서, 연산은 ``a`` 의 모든 layer와 행에 대해서 broadcast 되었습니다
+#    - 모든 열은 3개의 원소값 모두 동일합니다.
+# -  ``d`` 에 대해서, 연산이 이전과 반대로 모든 layer와 열에 대해서 수행합니다
+#    - 이재 모든 *행* 이 동일합니다.
 # 
 # For more information on broadcasting, see the `PyTorch
 # documentation <https://pytorch.org/docs/stable/notes/broadcasting.html>`__
