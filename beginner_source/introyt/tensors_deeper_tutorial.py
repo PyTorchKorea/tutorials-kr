@@ -587,7 +587,7 @@ print(b)               # ...하지만 여전히 b는 이전 값을 가지고 있
 # 이 경우를 위해서는 source tensor에 ``.detach()`` 메소드를 사용할 수 있습니다:
 # 
 
-a = torch.rand(2, 2, requires_grad=True) # turn on autograd
+a = torch.rand(2, 2, requires_grad=True) # autograd를 켭니다.
 print(a)
 
 b = a.clone()
