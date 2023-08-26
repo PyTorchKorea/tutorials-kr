@@ -546,8 +546,8 @@ print(b)       # ...b의 값이 바뀝니다.
 
 
 ######################################################################
-# But what if you want a separate copy of the data to work on? The
-# ``clone()`` method is there for you:
+# 하지만 만약 우리가 작업할 별도의 데이터 복사본을 원하면 어떻게 해야할까요?
+# ``clone()`` 메소드가 당신이 찾던 해답이 될 것입니다:
 # 
 
 a = torch.ones(2, 2)
