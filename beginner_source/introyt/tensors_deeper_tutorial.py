@@ -613,10 +613,11 @@ print(a)
 # -  ``c`` 를 출력합니다. 계산 히스토리가 없다는 것을 확인할 수 있고,
 #    ``requires_grad=True`` 옵션이 없다는 것 또한 확인할 수 있습니다.
 # 
-# The ``detach()`` method *detaches the tensor from its computation
-# history.* It says, “do whatever comes next as if autograd was off.” It
-# does this *without* changing ``a`` - you can see that when we print
-# ``a`` again at the end, it retains its ``requires_grad=True`` property.
+# ``detach()`` 메소드는 *tensor의 계산 히스토리로 부터 tensor를 떼어냅니다.*
+# 이 메소드의 의미는 “메소드 뒤에 어떤 것이든 와도 autograd를 끈 것처럼 작동하라.“ 라는 뜻입니다.
+# ``a`` 를 변경하지 *않고* 이 메소드를 수행합니다 -
+# 마지막에 ``a`` 를 다시 출력할 때, 여전히 ``a`` 가 가진 ``requires_grad=True``
+# 속성이 남아 있다는 것을 확인할 수 있습니다.
 # 
 # Moving to GPU
 # -------------
