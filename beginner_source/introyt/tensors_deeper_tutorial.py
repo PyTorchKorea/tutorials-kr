@@ -566,13 +566,13 @@ print(b)               # ...하지만 여전히 b는 이전 값을 가지고 있
 # **이 부분은 autograd와 관련된 동영상에서 더 깊이 다룰 것 입니다.**
 # 하지만 만약 자세한 내용을 간단히 알고 싶다면 계속 설명하겠습니다.
 # 
-# *In many cases, this will be what you want.* For example, if your model
-# has multiple computation paths in its ``forward()`` method, and *both*
-# the original tensor and its clone contribute to the model’s output, then
-# to enable model learning you want autograd turned on for both tensors.
-# If your source tensor has autograd enabled (which it generally will if
-# it’s a set of learning weights or derived from a computation involving
-# the weights), then you’ll get the result you want.
+# *대부분의 경우에서 이것이 바로 여러분이 원하는 것입니다.*
+# 예를 들어, 만약 여러분의 모델이 그 모델의 ``forward()`` 메소드에 여러 갈래의 계산 경로가 있고
+# 원본 tensor와 그것의 복제본 *모두* 가 모델의 결과 값에 기여를 한다면,
+# 두 tensor에 대한 autograd를 설정하는 모델 학습을 활성화 합니다.
+# 만약 여러분의 source tensor가 autograd를 사용할 수 있다면
+# (일반적으로 학습 가중치의 집합이거나, 가중치를 포함하는 계산에서 파생된 경우),
+# 여러분이 원하는 결과를 얻을 수 있습니다.
 # 
 # On the other hand, if you’re doing a computation where *neither* the
 # original tensor nor its clone need to track gradients, then as long as
