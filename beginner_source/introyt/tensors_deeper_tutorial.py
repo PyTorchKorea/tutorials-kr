@@ -578,13 +578,13 @@ print(b)               # ...하지만 여전히 b는 이전 값을 가지고 있
 # source tensor의 autograd가 꺼져있다면
 # clone을 사용할 수 있습니다.
 # 
-# *There is a third case,* though: Imagine you’re performing a computation
-# in your model’s ``forward()`` function, where gradients are turned on
-# for everything by default, but you want to pull out some values
-# mid-stream to generate some metrics. In this case, you *don’t* want the
-# cloned copy of your source tensor to track gradients - performance is
-# improved with autograd’s history tracking turned off. For this, you can
-# use the ``.detach()`` method on the source tensor:
+# 그러나 *세번째 경우* 가 있습니다:
+# 기본적으로 변화도가 모든 것을 위해 켜져있지만 일부 지표를 생성하기 위해서
+# 스트림 중간에서 일부 값을 생성하고 싶어 하는
+# 여러분 모델의 ``forward()`` 함수에서 계산을 수행한다고 상상해 보세요.
+# 이 경우에는 변화도를 추적하기 위해서 source tensor의 복제본을 원하지 *않을* 수 있습니다
+# - 성능이 autograd의 히스토리 추적 기능을 끄면서 향상됩니다.
+# 이 경우를 위해서는 source tensor에 ``.detach()`` 메소드를 사용할 수 있습니다:
 # 
 
 a = torch.rand(2, 2, requires_grad=True) # turn on autograd
