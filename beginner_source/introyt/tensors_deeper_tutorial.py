@@ -561,10 +561,10 @@ print(b)               # ...하지만 여전히 b는 이전 값을 가지고 있
 
 
 #########################################################################
-# **There is an important thing to be aware of when using ``clone()``.**
-# If your source tensor has autograd, enabled then so will the clone.
-# **This will be covered more deeply in the video on autograd,** but if
-# you want the light version of the details, continue on.
+# **``clone()`` 메소드를 사용할 때 알아야할 중요한 점이 있습니다.**
+# 만약 source tensor가 autograd를 가진다면 clone이 가능합니다.
+# **이 부분은 autograd와 관련된 동영상에서 더 깊이 다룰 것 입니다.**
+# 하지만 만약 자세한 내용을 간단히 알고 싶다면 계속 설명하겠습니다.
 # 
 # *In many cases, this will be what you want.* For example, if your model
 # has multiple computation paths in its ``forward()`` method, and *both*
