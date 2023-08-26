@@ -609,9 +609,9 @@ print(a)
 # -  ``a`` 를 복제하고 그것을 ``b`` 라고 라벨을 붙입니다. ``b`` 를 출력할 때,
 #    그것의 계산 히스토리가 추적되고 있다는 것을 확인할 수 있습니다 -
 #    ``a`` 의 autograd 설정에 내장되어 있는 기능이며, 이 설정은 계산 히스토리에 추가합니다.
-# -  We clone ``a`` into ``c``, but we call ``detach()`` first.
-# -  Printing ``c``, we see no computation history, and no
-#    ``requires_grad=True``.
+# -  ``a`` 를 ``c`` 에 복제를 하지만 ``detach()`` 를 먼저 호출을 합니다.
+# -  ``c`` 를 출력합니다. 계산 히스토리가 없다는 것을 확인할 수 있고,
+#    ``requires_grad=True`` 옵션이 없다는 것 또한 확인할 수 있습니다.
 # 
 # The ``detach()`` method *detaches the tensor from its computation
 # history.* It says, “do whatever comes next as if autograd was off.” It
