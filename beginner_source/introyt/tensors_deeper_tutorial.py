@@ -600,11 +600,10 @@ print(a)
 
 
 #########################################################################
-# What’s happening here?
+# 여기서 무슨 일이 일어나는걸까요?
 # 
-# -  We create ``a`` with ``requires_grad=True`` turned on. **We haven’t
-#    covered this optional argument yet, but will during the unit on
-#    autograd.**
+# -  ``a`` 를  ``requires_grad=True`` 옵션을 킨 상태로 생성합니다.
+#    **아직 이 선택적 인수를 다루지 않았지만, autograd 단원 동안만 다룰 것입니다.**
 # -  When we print ``a``, it informs us that the property
 #    ``requires_grad=True`` - this means that autograd and computation
 #    history tracking are turned on.
