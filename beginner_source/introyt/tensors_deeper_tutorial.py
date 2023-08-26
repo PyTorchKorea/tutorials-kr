@@ -506,12 +506,11 @@ print(b)
 # ``torch.Tensor`` 객체의 메소드인 점에 주목해야 합니다.
 # ``a.add_(b)`` 와 같은 경우처럼, *메소드를 호출하는 tensor는 값이 변경됩니다.*
 # 
-# There is another option for placing the result of a computation in an
-# existing, allocated tensor. Many of the methods and functions we’ve seen
-# so far - including creation methods! - have an ``out`` argument that
-# lets you specify a tensor to receive the output. If the ``out`` tensor
-# is the correct shape and ``dtype``, this can happen without a new memory
-# allocation:
+# 이미 존재하고 있는 메모리에 할당된 tensor에 계산 결과값을 저장하는 또 다른 옵션이 있습니다.
+# tensor를 생성하는 메소드 뿐만 아니라 지금까지 이 문서에서 봤던 수많은 함수나 메소드는
+# 결과 값을 받는 특정 tensor를 명시하는 ``out`` 이라는 인수를 가지고 있습니다.
+# 만약 ``out`` tensor가 알맞는 형태와 ``dtype`` 을 가지고 있다면,
+# 새로운 메모리 할당 없이 결과값이 저장됩니다:
 # 
 
 a = torch.rand(2, 2)
