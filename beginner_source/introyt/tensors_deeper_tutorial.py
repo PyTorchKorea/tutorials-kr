@@ -531,11 +531,11 @@ assert id(c) == old_id  # 하지만 여전히 같은 객체네요!
 
 
 ##########################################################################
-# Copying Tensors
+# Tensor를 복사하기
 # ---------------
 # 
-# As with any object in Python, assigning a tensor to a variable makes the
-# variable a *label* of the tensor, and does not copy it. For example:
+# 파이썬의 다른 객체와 마찬가지로 변수에 tensor를 할당하는 것은
+# 변수가 tensor의 *label* 이 되고 값을 복사하지 않습니다. 다음 예시를 보시죠:
 # 
 
 a = torch.ones(2, 2)
