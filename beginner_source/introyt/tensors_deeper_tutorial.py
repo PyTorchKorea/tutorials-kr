@@ -604,9 +604,8 @@ print(a)
 # 
 # -  ``a`` 를  ``requires_grad=True`` 옵션을 킨 상태로 생성합니다.
 #    **아직 이 선택적 인수를 다루지 않았지만, autograd 단원 동안만 다룰 것입니다.**
-# -  When we print ``a``, it informs us that the property
-#    ``requires_grad=True`` - this means that autograd and computation
-#    history tracking are turned on.
+# -  ``a`` 를 출력할때, ``requires_grad=True`` 속성을 가지고 있다고 알려줍니다 -
+#    이 뜻은 autograd와 계산 히스토리 추적 기능을 켠다는 것입니다.
 # -  We clone ``a`` and label it ``b``. When we print ``b``, we can see
 #    that it’s tracking its computation history - it has inherited
 #    ``a``\ ’s autograd settings, and added to the computation history.
