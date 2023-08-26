@@ -553,11 +553,11 @@ print(b)       # ...b의 값이 바뀝니다.
 a = torch.ones(2, 2)
 b = a.clone()
 
-assert b is not a      # different objects in memory...
-print(torch.eq(a, b))  # ...but still with the same contents!
+assert b is not a      # 메모리 상의 다른 객체입니다...
+print(torch.eq(a, b))  # ...하지만 여전히 같은 값을 가지고 있네요!
 
-a[0][1] = 561          # a changes...
-print(b)               # ...but b is still all ones
+a[0][1] = 561          # a가 변경되었습니다...
+print(b)               # ...하지만 여전히 b는 이전 값을 가지고 있네요.
 
 
 #########################################################################
