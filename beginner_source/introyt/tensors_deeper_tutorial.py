@@ -574,9 +574,9 @@ print(b)               # ...하지만 여전히 b는 이전 값을 가지고 있
 # (일반적으로 학습 가중치의 집합이거나, 가중치를 포함하는 계산에서 파생된 경우),
 # 여러분이 원하는 결과를 얻을 수 있습니다.
 # 
-# On the other hand, if you’re doing a computation where *neither* the
-# original tensor nor its clone need to track gradients, then as long as
-# the source tensor has autograd turned off, you’re good to go.
+# 반면에 원본 tensor나 그것의 복제본 *모두* 가 변화도를 추적할 필요가 없다면,
+# source tensor의 autograd가 꺼져있다면
+# clone을 사용할 수 있습니다.
 # 
 # *There is a third case,* though: Imagine you’re performing a computation
 # in your model’s ``forward()`` function, where gradients are turned on
