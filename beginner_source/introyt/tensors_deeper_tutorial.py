@@ -520,14 +520,14 @@ old_id = id(c)
 
 print(c)
 d = torch.matmul(a, b, out=c)
-print(c)                # contents of c have changed
+print(c)                # c의 값이 변경되었습니다.
 
-assert c is d           # test c & d are same object, not just containing equal values
-assert id(c) == old_id  # make sure that our new c is the same object as the old one
+assert c is d           # c와 d가 서로 단순히 같은 값을 가지는지가 아니라 같은 객체인지 테스트합니다.
+assert id(c) == old_id  # 새로운 c는 이전 객체와 확실히 같은 객체입니다.
 
-torch.rand(2, 2, out=c) # works for creation too!
-print(c)                # c has changed again
-assert id(c) == old_id  # still the same object!
+torch.rand(2, 2, out=c) # 다시 한번 생성해봅시다!
+print(c)                # c의 값이 다시 바뀌었습니다.
+assert id(c) == old_id  # 하지만 여전히 같은 객체네요!
 
 
 ##########################################################################
