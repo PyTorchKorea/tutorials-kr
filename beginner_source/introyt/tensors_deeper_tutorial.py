@@ -453,7 +453,7 @@ print(torch.svd(m3))       # 특이값 분해
 # `documentation <https://pytorch.org/docs/stable/torch.html#math-operations>`__
 # 를 읽어주세요.
 #
-# Tensor들의 값을 변경하기
+# Tensor의 값을 변경하기
 # ~~~~~~~~~~~~~~~~~~~~~~~~~
 # 
 # 대부분 tensor들의 이진 연산은 제3자의 새로운 tensor를 생성합니다.
