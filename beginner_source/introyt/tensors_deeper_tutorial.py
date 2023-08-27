@@ -619,7 +619,7 @@ print(a)
 # 마지막에 ``a`` 를 다시 출력할 때, 여전히 ``a`` 가 가진 ``requires_grad=True``
 # 속성이 남아 있다는 것을 확인할 수 있습니다.
 # 
-# Moving to GPU
+# GPU 환경으로 이동하기
 # -------------
 # 
 # One of the major advantages of PyTorch is its robust acceleration on
