@@ -661,10 +661,10 @@ else:
 
 
 ##########################################################################
-# By default, new tensors are created on the CPU, so we have to specify
-# when we want to create our tensor on the GPU with the optional
-# ``device`` argument. You can see when we print the new tensor, PyTorch
-# informs us which device it’s on (if it’s not on CPU).
+# 기본적으로 새로운 tensor는 CPU에 생성됩니다. 따라서 tensor를 GPU에 생성하고 싶을 때
+# ``device`` 선택 인수를 반드시 명시해줘야 합니다.
+# 새로운 tensor를 출력할 때, (만약 CPU에 존재하지 않는다면)
+# Pytorch는 어느 장치에 객체가 있는지 알려준다는 것을 확인할 수 있습니다.
 # 
 # You can query the number of GPUs with ``torch.cuda.device_count()``. If
 # you have more than one GPU, you can specify them by index:
