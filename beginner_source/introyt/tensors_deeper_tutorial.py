@@ -666,9 +666,9 @@ else:
 # 새로운 tensor를 출력할 때, (만약 CPU에 존재하지 않는다면)
 # Pytorch는 어느 장치에 객체가 있는지 알려준다는 것을 확인할 수 있습니다.
 # 
-# You can query the number of GPUs with ``torch.cuda.device_count()``. If
-# you have more than one GPU, you can specify them by index:
-# ``device='cuda:0'``, ``device='cuda:1'``, etc.
+# ``torch.cuda.device_count()`` 를 사용해서 GPU의 개수를 조회할 수 있습니다.
+# 만약 1개보다 많은 GPU를 가지고 있다면, 각 GPU를 인덱스로 지정할 수 있습니다:
+# ``device='cuda:0'``, ``device='cuda:1'``, 와 같이 말이죠.
 # 
 # As a coding practice, specifying our devices everywhere with string
 # constants is pretty fragile. In an ideal world, your code would perform
