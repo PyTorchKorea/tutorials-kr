@@ -670,11 +670,9 @@ else:
 # 만약 1개보다 많은 GPU를 가지고 있다면, 각 GPU를 인덱스로 지정할 수 있습니다:
 # ``device='cuda:0'``, ``device='cuda:1'``, 와 같이 말이죠.
 # 
-# As a coding practice, specifying our devices everywhere with string
-# constants is pretty fragile. In an ideal world, your code would perform
-# robustly whether you’re on CPU or GPU hardware. You can do this by
-# creating a device handle that can be passed to your tensors instead of a
-# string:
+# 코딩을 할때, 어디에서나 장치 이름을 문자열 상수로 지정하는 것은 상당히 유지보수에 취약합니다.
+# CPU 하드웨어나 GPU 하드웨어 어떤것을 사용하는지에 관계없이 여러분의 코드는 잘 작동해야 합니다.
+# 문자열 대신에 tensor를 저장할 장치 핸들러를 생성하는 것으로 유지보수가 쉬운 코드를 작성할 수 있습니다:
 # 
 
 if torch.cuda.is_available():
