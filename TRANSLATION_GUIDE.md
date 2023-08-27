@@ -69,6 +69,7 @@
 |Hyperparameter|하이퍼파라미터|김태영|음차 표기|
 |Image|이미지|박정환|ToC의 분류명입니다.|
 |in-place|제자리|허남규||
+|initialization|초기화|김지호||
 |instance|인스턴스|박정환|음차 표기|
 |instantiate|생성하다|박정환||
 |interpreter|인터프리터|이종법|음차 표기|
@@ -92,6 +93,7 @@
 |placeholder|플레이스홀더|박정환|음차 표기|
 |plotting|도식화|황성수||
 |Production (environment, use)|Production|허남규|번역하지 않음|
+|pruning|가지치기|김지호||
 |rank 0|0-순위|박정환||
 |Read later|더 읽을거리|박정환||
 |recap|요약|박정환||
