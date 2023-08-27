@@ -695,10 +695,9 @@ y = y.to(my_device)
 
 
 ##########################################################################
-# It is important to know that in order to do computation involving two or
-# more tensors, *all of the tensors must be on the same device*. The
-# following code will throw a runtime error, regardless of whether you
-# have a GPU device available:
+# 2개 혹은 그 이상의 tensor를 포함한 계산을 하기 위해서는
+# *모든 tensor가 같은 장치에 있어야 한다* 는 것을 아는 것이 중요합니다.
+# 다음 코드는 GPU 장치가 사용가능 하다는 것과 관계없이 runtime error를 발생할 것입니다:
 # 
 # ::
 # 
