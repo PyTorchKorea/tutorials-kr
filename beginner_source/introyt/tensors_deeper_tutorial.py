@@ -622,11 +622,10 @@ print(a)
 # GPU 환경으로 이동하기
 # -------------
 # 
-# One of the major advantages of PyTorch is its robust acceleration on
-# CUDA-compatible Nvidia GPUs. (“CUDA” stands for *Compute Unified Device
-# Architecture*, which is Nvidia’s platform for parallel computing.) So
-# far, everything we’ve done has been on CPU. How do we move to the faster
-# hardware?
+# Pytorch의 주된 장점중 하나는 CUDA가 호환되는 Nvidia GPU에서의 강력한 성능 가속화입니다.
+# (“CUDA” 는 *Compute Unified Device Architecture* 의 약자이며,
+# 병렬 컴퓨팅을 위한 Nvidia의 플랫폼입니다.)
+# 지금까지 모든 작업을 CPU에서 처리했습니다. 어떻게 더 빠른 하드웨어로 이동할 수 있을까요?
 # 
 # First, we should check whether a GPU is available, with the
 # ``is_available()`` method.
