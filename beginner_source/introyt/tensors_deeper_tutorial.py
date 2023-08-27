@@ -649,8 +649,8 @@ else:
 # (평소에는 “GPU가 접근 가능한 메모리로 데이터를 이동한다“
 # 를 “데이터를 GPU로 옮긴다“ 라고 줄여서 말합니다.)
 # 
-# There are multiple ways to get your data onto your target device. You
-# may do it at creation time:
+# 목적 장치에서 데이터를 가져오는 다양한 방법이 있습니다.
+# 객체를 생성할 때 데이터를 가져올 수 있습니다:
 # 
 
 if torch.cuda.is_available():
