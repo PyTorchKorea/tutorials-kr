@@ -641,13 +641,13 @@ else:
 
 
 ##########################################################################
-# Once we’ve determined that one or more GPUs is available, we need to put
-# our data someplace where the GPU can see it. Your CPU does computation
-# on data in your computer’s RAM. Your GPU has dedicated memory attached
-# to it. Whenever you want to perform a computation on a device, you must
-# move *all* the data needed for that computation to memory accessible by
-# that device. (Colloquially, “moving the data to memory accessible by the
-# GPU” is shorted to, “moving the data to the GPU”.)
+# 일단 1개 혹은 그 이상의 GPU가 사용가능하다는 것을 확인했다면,
+# 데이터를 GPU가 확인할 수 있는 어떤 공간에 저장할 필요가 있습니다.
+# CPU는 컴퓨터의 RAM에서 데이터를 이용해서 계산을 수행합니다.
+# GPU는 전용 메모리가 연결되어 있습니다. 해당 장치에서 계산을 수행하고 싶을 때마다
+# 계산에 필요한 *모든* 데이터를 GPU장치가 접근가능한 메모리로 이동해야 합니다.
+# (평소에는 “GPU가 접근 가능한 메모리로 데이터를 이동한다“
+# 를 “데이터를 GPU로 옮긴다“ 라고 줄여서 말합니다.)
 # 
 # There are multiple ways to get your data onto your target device. You
 # may do it at creation time:
