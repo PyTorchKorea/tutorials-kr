@@ -703,7 +703,7 @@ y = y.to(my_device)
 # 
 #    x = torch.rand(2, 2)
 #    y = torch.rand(2, 2, device='gpu')
-#    z = x + y  # 오륲가 발생할 것입니다.
+#    z = x + y  # 오류가 발생할 것입니다.
 # 
 
 
