@@ -686,10 +686,8 @@ print(x)
 
 
 #########################################################################
-# If you have an existing tensor living on one device, you can move it to
-# another with the ``to()`` method. The following line of code creates a
-# tensor on CPU, and moves it to whichever device handle you acquired in
-# the previous cell.
+# 만약 한 장치에 tensor가 있을 때, ``to()`` 메소드를 사용해서 다른 장치로 이동할 수 있습니다.
+# 다음 코드는 CPU에 tensor를 생성하고, 이전 cell에서 얻은 장치 핸들러로 tensor를 이동합니다.
 # 
 
 y = torch.rand(2, 2)
