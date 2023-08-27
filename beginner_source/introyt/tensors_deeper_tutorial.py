@@ -627,13 +627,11 @@ print(a)
 # 병렬 컴퓨팅을 위한 Nvidia의 플랫폼입니다.)
 # 지금까지 모든 작업을 CPU에서 처리했습니다. 어떻게 더 빠른 하드웨어로 이동할 수 있을까요?
 # 
-# First, we should check whether a GPU is available, with the
-# ``is_available()`` method.
+# 먼저 ``is_available()`` 메소드를 사용해서 GPU가 사용가능한지 아닌지 확인해야 합니다.
 # 
 # .. note::
-#      If you do not have a CUDA-compatible GPU and CUDA drivers
-#      installed, the executable cells in this section will not execute any
-#      GPU-related code.
+#      만약 CUDA가 호환되는 GPU가 없고 CUDA 드라이버가 설치되어있지 않다면
+#      이 섹션에서의 실행 가능한 cell은 어떤 GPU와 관련된 코드도 실행할 수 없습니다.
 # 
 
 if torch.cuda.is_available():
