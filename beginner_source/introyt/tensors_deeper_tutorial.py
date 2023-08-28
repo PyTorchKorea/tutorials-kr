@@ -735,9 +735,9 @@ print(b.shape)
 
 
 ##########################################################################
-# The ``unsqueeze()`` method adds a dimension of extent 1.
-# ``unsqueeze(0)`` adds it as a new zeroth dimension - now you have a
-# batch of one!
+# ``unsqueeze()`` 메소드는 차원을 하나 추가합니다.
+# ``unsqueeze(0)`` 는 새로운 0번째 차원을 추가합니다
+# - 이제 한 배치를 가지게 되었습니다!
 # 
 # So if that’s *un*\ squeezing? What do we mean by squeezing? We’re taking
 # advantage of the fact that any dimension of extent 1 *does not* change
