@@ -755,8 +755,8 @@ print(c)
 # 이 뜻은 입력으로 단일 배치가 들어왔을 때,
 # ``(1, 20)`` 의 형태를 가진 출력 값을 얻는다는 것 입니다.
 # 
-# What if you want to do some *non-batched* computation with that output -
-# something that’s just expecting a 20-element vector?
+# 만약 그저 20개의 원소를 가진 벡터와 같이
+# - *배치 형태가 아닌* 연산 결과를 얻고 싶으면 어떻게 해야할까요?
 # 
 
 a = torch.rand(1, 20)
