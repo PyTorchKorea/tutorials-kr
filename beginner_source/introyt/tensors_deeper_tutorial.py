@@ -796,9 +796,8 @@ print(d.shape)
 #    c = a * torch.rand(   3, 1) # 3번째 차원 = 1, 2번째 차원은 다음 코드랑 동일합니다.
 #    print(c)
 # 
-# The net effect of that was to broadcast the operation over dimensions 0
-# and 2, causing the random, 3 x 1 tensor to be multiplied element-wise by
-# every 3-element column in ``a``.
+# broadcast의 순수한 효과는 차원 0과 차원 2에 대한 연산을 broadcast해서
+# 무작위 3 x 1 형태의 tensor를 ``a`` 의 원소 개수가 3인 모든 열에 곱하는 것이였습니다.
 # 
 # What if the random vector had just been 3-element vector? We’d lose the
 # ability to do the broadcast, because the final dimensions would not
