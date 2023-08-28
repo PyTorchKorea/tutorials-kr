@@ -824,15 +824,14 @@ print(batch_me.shape)
 
 
 ##########################################################################
-# Sometimes you’ll want to change the shape of a tensor more radically,
-# while still preserving the number of elements and their contents. One
-# case where this happens is at the interface between a convolutional
-# layer of a model and a linear layer of the model - this is common in
-# image classification models. A convolution kernel will yield an output
-# tensor of shape *features x width x height,* but the following linear
-# layer expects a 1-dimensional input. ``reshape()`` will do this for you,
-# provided that the dimensions you request yield the same number of
-# elements as the input tensor has:
+# 때로는 원소의 개수와 원소의 값을 여전히 유지하면서
+# tensor의 형태를 한번에 바꾸고 싶을 때가 있습니다.
+# 모델의 합성곱 계층과 선형 계층 사이 인터페이스에서 이러한 상황이 발생합니다
+# - 이 상황은 이미지 분류 모델에서 흔히 일어나는 일입니다.
+# 합성곱 커널은 *특성의 수 x 너비 x 높이* 형태의 tensor를 출력 값으로 생성하지만
+# 이후에 있는 선형 계층은 입력 값으로 1차원을 기대합니다.
+# 여러분이 요청한 차원에 입력 tensor가 가진 원소와 같은 개수를 생성하는
+# ``reshape()`` 를 여러분을 위해서 제공합니다:
 # 
 
 output3d = torch.rand(6, 20, 20)
