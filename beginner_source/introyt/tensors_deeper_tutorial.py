@@ -846,12 +846,11 @@ print(torch.reshape(output3d, (6 * 20 * 20,)).shape)
 
 ###############################################################################
 # .. note::
-#      The ``(6 * 20 * 20,)`` argument in the final line of the cell
-#      above is because PyTorch expects a **tuple** when specifying a
-#      tensor shape - but when the shape is the first argument of a method, it
-#      lets us cheat and just use a series of integers. Here, we had to add the
-#      parentheses and comma to convince the method that this is really a
-#      one-element tuple.
+#      위에 있는 cell의 마지막 줄에 있는 인수 ``(6 * 20 * 20,)`` 는
+#      Pytorch는 tensor 형태를 나타낼 때 **tuple** 을 기대하기 때문입니다.
+#      하지만 형태가 메소드의 첫번째 인수라면 - 연속된 정수라고 속여서 사용할 수 있습니다.
+#      여기에서는 메소드에게 이 인수가 진짜 1개 원소를 가진 튜플이라고 알려주기 위해서
+#      편의상 소괄호와 콤마를 추가해야 합니다.
 # 
 # When it can, ``reshape()`` will return a *view* on the tensor to be
 # changed - that is, a separate tensor object looking at the same
