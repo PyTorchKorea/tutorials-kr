@@ -813,8 +813,8 @@ print(a * c)             # broadcasting이 다시 작동합니다!
 
 
 ######################################################################
-# The ``squeeze()`` and ``unsqueeze()`` methods also have in-place
-# versions, ``squeeze_()`` and ``unsqueeze_()``:
+# ``squeeze()`` 와 ``unsqueeze()`` 메소드는 tensor 자체의 값을 변경하는
+# ``squeeze_()`` 와 ``unsqueeze_()`` 또한 가지고 있습니다.
 # 
 
 batch_me = torch.rand(3, 226, 226)
