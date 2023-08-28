@@ -786,14 +786,14 @@ print(d.shape)
 # ``squeeze()`` 와 ``unsqueeze()`` 를 호출하는 것은 오직 차원의 크기가 1일때만 작동합니다.
 # 왜냐하면 이 경우가 아니면 tensor의 원소 개수가 바뀌기 때문입니다.
 # 
-# Another place you might use ``unsqueeze()`` is to ease broadcasting.
-# Recall the example above where we had the following code:
+# ``unsqueeze()`` 는 broadcasting을 쉽게 하는 경우에도 사용합니다.
+# 다음 코드를 보고 이전 예시를 떠올려 보세요:
 # 
 # ::
 # 
 #    a =     torch.ones(4, 3, 2)
 # 
-#    c = a * torch.rand(   3, 1) # 3rd dim = 1, 2nd dim identical to a
+#    c = a * torch.rand(   3, 1) # 3번째 차원 = 1, 2번째 차원은 다음 코드랑 동일합니다.
 #    print(c)
 # 
 # The net effect of that was to broadcast the operation over dimensions 0
