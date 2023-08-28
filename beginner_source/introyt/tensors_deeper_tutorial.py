@@ -840,7 +840,7 @@ print(output3d.shape)
 input1d = output3d.reshape(6 * 20 * 20)
 print(input1d.shape)
 
-# can also call it as a method on the torch module:
+# torch 모듈에 있는 메소드에 대해서도 호출할 수 있습니다.
 print(torch.reshape(output3d, (6 * 20 * 20,)).shape)
 
 
