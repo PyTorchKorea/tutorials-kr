@@ -852,11 +852,11 @@ print(torch.reshape(output3d, (6 * 20 * 20,)).shape)
 #      여기에서는 메소드에게 이 인수가 진짜 1개 원소를 가진 튜플이라고 알려주기 위해서
 #      편의상 소괄호와 콤마를 추가해야 합니다.
 # 
-# When it can, ``reshape()`` will return a *view* on the tensor to be
-# changed - that is, a separate tensor object looking at the same
-# underlying region of memory. *This is important:* That means any change
-# made to the source tensor will be reflected in the view on that tensor,
-# unless you ``clone()`` it.
+# ``reshape()`` 는 tensor를 바라보는 *관점* 을 변경합니다.
+# - 즉, 메모리의 같은 지역을 바라보는 서로 다른 관점을 가진 tensor 객체라는 뜻입니다.
+# *이 내용은 정말 중요합니다:* source tensor에 어떠한 변화가 있으면
+# ``clone()`` 을 사용하지 않는 한, 해당 tensor를 바라보고 있는 다른 객체 또한
+# 값이 변한다는 뜻 입니다.
 # 
 # There *are* conditions, beyond the scope of this introduction, where
 # ``reshape()`` has to return a tensor carrying a copy of the data. For
