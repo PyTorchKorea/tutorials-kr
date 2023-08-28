@@ -780,11 +780,11 @@ print(d.shape)
 # 추가적인 차원을 가졌기 때문에
 # ``a`` 를 출력하는 것에서 “추가” 대괄호 집합 ``[]`` 을 볼 수 있습니다.
 # 
-# You may only ``squeeze()`` dimensions of extent 1. See above where we
-# try to squeeze a dimension of size 2 in ``c``, and get back the same
-# shape we started with. Calls to ``squeeze()`` and ``unsqueeze()`` can
-# only act on dimensions of extent 1 because to do otherwise would change
-# the number of elements in the tensor.
+# 오직 차원의 값이 1인 경우에만 ``squeeze()`` 를 사용할 수 있습니다.
+# ``c`` 에서 크기가 2인 차원을 squeeze 하려고 하는 위 예시를 보면,
+# 처음 그 형태로 다시 돌아온다는 사실을 알 수 있습니다.
+# ``squeeze()`` 와 ``unsqueeze()`` 를 호출하는 것은 오직 차원의 크기가 1일때만 작동합니다.
+# 왜냐하면 이 경우가 아니면 tensor의 원소 개수가 바뀌기 때문입니다.
 # 
 # Another place you might use ``unsqueeze()`` is to ease broadcasting.
 # Recall the example above where we had the following code:
