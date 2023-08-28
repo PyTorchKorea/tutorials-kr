@@ -806,10 +806,10 @@ print(d.shape)
 # 
 
 a = torch.ones(4, 3, 2)
-b = torch.rand(   3)     # trying to multiply a * b will give a runtime error
-c = b.unsqueeze(1)       # change to a 2-dimensional tensor, adding new dim at the end
+b = torch.rand(   3)     # a * b를 시도하는 것은 runtime error가 발생합니다.
+c = b.unsqueeze(1)       # 끝에 새로운 차원을 추가해서 2차원 tensor로 바꿉니다.
 print(c.shape)
-print(a * c)             # broadcasting works again!
+print(a * c)             # broadcasting이 다시 작동합니다!
 
 
 ######################################################################
