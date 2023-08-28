@@ -720,11 +720,11 @@ y = y.to(my_device)
 # 차원의 개수를 변경할 필요가 있는 한가지 경우는 모델의 입력에 단일 인스턴스를 전달할 때 입니다.
 # PyTorch 모델은 일반적으로 입력에 *배치* 가 들어오기를 기대합니다.
 # 
-# For example, imagine having a model that works on 3 x 226 x 226 images -
-# a 226-pixel square with 3 color channels. When you load and transform
-# it, you’ll get a tensor of shape ``(3, 226, 226)``. Your model, though,
-# is expecting input of shape ``(N, 3, 226, 226)``, where ``N`` is the
-# number of images in the batch. So how do you make a batch of one?
+# 예를 들어, 3개의 색깔 채널을 가진 226픽셀 정사각형 이미지인 3 x 226 x 226 개 데이터와
+# 함께 작동하는 모델을 가지고 있다고 상상해보세요.
+# 이미지를 불러오고 tensor로 변환하면 ``(3, 226, 226)`` 형태를 가진 tensor가 됩니다.
+# 그럼에도 불구하고 이 모델은 ``(N, 3, 226, 226)`` 형태를 가진 tensor를 입력으로 기대합니다.
+# 이때 ``N`` 은 배치에 포함된 이미지의 개수입니다. 그렇다면 어떻게 한 배치를 만들 수 있을까요?
 # 
 
 a = torch.rand(3, 226, 226)
