@@ -8,14 +8,16 @@ Finetuning Torchvision Models
 
 
 ######################################################################
-# 이 튜토리얼에서는 1000개의 클래스의 ImageNet 데이터셋에서
-# 사전 학습된 `torchvision 모델 <https://pytorch.org/docs/stable/torchvision/models.html>`__, 을 미세 조정하고
-# 특징을 추출하는 방법에 대해 자세히 살펴보겠습니다. 
-# 여러 최신 CNN 아키텍처로 작업하는 방법을 심도 있게 살펴보고,
-# PyTorch 모델을 미세 조정할 수 있는 직관력을 키울 것입니다.
-# 각 모델의 아키텍처가 다르기 때문에 모든 시나리오에서 작동하는 
-# 상용구 형식의 미세 조정 코드는 없습니다. 
-# 오히려, 연구자가 기존의 아키텍처를 살펴보고 각 모델에 맞게 커스텀 조정을 해야합니다.
+# In this tutorial we will take a deeper look at how to finetune and
+# feature extract the `torchvision
+# models <https://pytorch.org/docs/stable/torchvision/models.html>`__, all
+# of which have been pretrained on the 1000-class Imagenet dataset. This
+# tutorial will give an indepth look at how to work with several modern
+# CNN architectures, and will build an intuition for finetuning any
+# PyTorch model. Since each model architecture is different, there is no
+# boilerplate finetuning code that will work in all scenarios. Rather, the
+# researcher must look at the existing architecture and make custom
+# adjustments for each model.
 
 # 
 # In this document we will perform two types of transfer learning:
