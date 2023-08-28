@@ -739,9 +739,9 @@ print(b.shape)
 # ``unsqueeze(0)`` 는 새로운 0번째 차원을 추가합니다
 # - 이제 한 배치를 가지게 되었습니다!
 # 
-# So if that’s *un*\ squeezing? What do we mean by squeezing? We’re taking
-# advantage of the fact that any dimension of extent 1 *does not* change
-# the number of elements in the tensor.
+# 이게 *un*\ squeezing이면, squeezing은 무슨 뜻 일까요?
+# 여기서는 차원을 하나 확장해도 tensor에 있는 원소의 개수는 변하지
+# *않는다* 는 사실을 이용하고 있습니다.
 # 
 
 c = torch.rand(1, 1, 1, 1, 1)
