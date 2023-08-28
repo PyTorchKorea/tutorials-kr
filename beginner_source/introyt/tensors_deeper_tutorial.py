@@ -775,10 +775,10 @@ print(d.shape)
 
 
 #########################################################################
-# You can see from the shapes that our 2-dimensional tensor is now
-# 1-dimensional, and if you look closely at the output of the cell above
-# you’ll see that printing ``a`` shows an “extra” set of square brackets
-# ``[]`` due to having an extra dimension.
+# 결과로 나온 형태로 부터 2차원 tensor가 이제 1차원으로 바뀐 것을 볼 수 있고,
+# 위에 있는 cell의 결과를 자세히 보면
+# 추가적인 차원을 가졌기 때문에
+# ``a`` 를 출력하는 것에서 “추가” 대괄호 집합 ``[]`` 을 볼 수 있습니다.
 # 
 # You may only ``squeeze()`` dimensions of extent 1. See above where we
 # try to squeeze a dimension of size 2 in ``c``, and get back the same
