@@ -708,11 +708,11 @@ y = y.to(my_device)
 
 
 ###########################################################################
-# Manipulating Tensor Shapes
+# Tensor의 형태 다루기
 # --------------------------
 # 
-# Sometimes, you’ll need to change the shape of your tensor. Below, we’ll
-# look at a few common cases, and how to handle them.
+# 때로는 tensor의 형태를 변환할 필요가 있습니다.
+# 아래에 있는 몇가지 흔한 경우와 함께 tensor의 형태를 다루는 방법에 대해 알아볼 것 입니다.
 # 
 # Changing the Number of Dimensions
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
