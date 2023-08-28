@@ -799,10 +799,10 @@ print(d.shape)
 # broadcast의 순수한 효과는 차원 0과 차원 2에 대한 연산을 broadcast해서
 # 무작위 3 x 1 형태의 tensor를 ``a`` 의 원소 개수가 3인 모든 열에 곱하는 것이였습니다.
 # 
-# What if the random vector had just been 3-element vector? We’d lose the
-# ability to do the broadcast, because the final dimensions would not
-# match up according to the broadcasting rules. ``unsqueeze()`` comes to
-# the rescue:
+# 만약 무작위 벡터가 오직 3개의 원소만을 가지면 어떻게 될까요?
+# broadcast를 할 능력을 잃어버리게 됩니다, 왜냐하면 마지막 차원이
+# broadcasting 규칙에 맞지 않기 때문입니다.
+# 하지만 ``unsqueeze()`` 가 도와줍니다:
 # 
 
 a = torch.ones(4, 3, 2)
