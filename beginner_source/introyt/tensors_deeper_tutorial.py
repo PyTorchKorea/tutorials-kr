@@ -858,9 +858,9 @@ print(torch.reshape(output3d, (6 * 20 * 20,)).shape)
 # ``clone()`` 을 사용하지 않는 한, 해당 tensor를 바라보고 있는 다른 객체 또한
 # 값이 변한다는 뜻 입니다.
 # 
-# There *are* conditions, beyond the scope of this introduction, where
-# ``reshape()`` has to return a tensor carrying a copy of the data. For
-# more information, see the
+# 해당 소개의 범위를 벗어난 조건 *들* 이 있습니다.
+# 그것은 ``reshape()`` 가 data의 복사본을 가진 tensor를 반환 해야 한다는 것 입니다.
+# 더 많은 정보는 다음 문서를 참고하세요
 # `docs <https://pytorch.org/docs/stable/torch.html#torch.reshape>`__.
 # 
 
