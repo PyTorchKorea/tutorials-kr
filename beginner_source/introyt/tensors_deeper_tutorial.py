@@ -749,11 +749,11 @@ print(c)
 
 
 ##########################################################################
-# Continuing the example above, let’s say the model’s output is a
-# 20-element vector for each input. You would then expect the output to
-# have shape ``(N, 20)``, where ``N`` is the number of instances in the
-# input batch. That means that for our single-input batch, we’ll get an
-# output of shape ``(1, 20)``.
+# 위의 예제에 이어서 각 입력 값에 대한 모델의 출력 값이 20개의 원소를 가진 vector라고 생각해봅시다.
+# 그렇다면 ``N`` 이 입력 배치에 있는 인스턴스의 개수라고 할때,
+# 출력 값의 형태는 ``(N, 20)`` 라고 기대할 수 있습니다.
+# 이 뜻은 입력으로 단일 배치가 들어왔을 때,
+# ``(1, 20)`` 의 형태를 가진 출력 값을 얻는다는 것 입니다.
 # 
 # What if you want to do some *non-batched* computation with that output -
 # something that’s just expecting a 20-element vector?
