@@ -714,12 +714,11 @@ y = y.to(my_device)
 # 때로는 tensor의 형태를 변환할 필요가 있습니다.
 # 아래에 있는 몇가지 흔한 경우와 함께 tensor의 형태를 다루는 방법에 대해 알아볼 것 입니다.
 # 
-# Changing the Number of Dimensions
+# 차원의 개수 변경하기
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # 
-# One case where you might need to change the number of dimensions is
-# passing a single instance of input to your model. PyTorch models
-# generally expect *batches* of input.
+# 차원의 개수를 변경할 필요가 있는 한가지 경우는 모델의 입력에 단일 인스턴스를 전달할 때 입니다.
+# PyTorch 모델은 일반적으로 입력에 *배치* 가 들어오기를 기대합니다.
 # 
 # For example, imagine having a model that works on 3 x 226 x 226 images -
 # a 226-pixel square with 3 color channels. When you load and transform
