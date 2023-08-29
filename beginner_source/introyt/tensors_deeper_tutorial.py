@@ -905,9 +905,9 @@ print(numpy_rand)
 
 
 ##########################################################################
-# It is important to know that these converted objects are using *the same
-# underlying memory* as their source objects, meaning that changes to one
-# are reflected in the other:
+# 이러한 변환된 객체들은 해당 객체의 source 객체가 위치한
+# *메모리의 같은 공간* 을 사용한다는 점을 아는 것이 중요합니다.
+# 이것은 한 객체가 변하면 다른 것에 영향을 준다는 의미입니다:
 # 
 
 numpy_array[1, 1] = 23
