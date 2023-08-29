@@ -873,11 +873,12 @@ print(torch.reshape(output3d, (6 * 20 * 20,)).shape)
 # 문법은 Numpy와 호환 가능하다고 말했었습니다
 # - 하지만 PyTorch와 NumPy 사이 유사성은 우리가 생각한 것 보다 더욱 깊습니다.
 # 
-# If you have existing ML or scientific code with data stored in NumPy
-# ndarrays, you may wish to express that same data as PyTorch tensors,
-# whether to take advantage of PyTorch’s GPU acceleration, or its
-# efficient abstractions for building ML models. It’s easy to switch
-# between ndarrays and PyTorch tensors:
+# 만약 NumPy의 ndarrays에 저장되어 있는 데이터를 사용하는
+# 머신러닝 혹은 과학 분야와 관련된 코드를 가지고 있다면,
+# 같은 데이터를 Pytorch의 GPU 가속을 사용할 수 있고
+# 머신러닝 모델을 만드는데 필요한 효과적인 추상화를 제공하는
+# PyTorch tensor로 표현하고 싶을 수 있습니다.
+# ndarray와 PyTorch tensor끼리 바꾸는 것은 쉽습니다:
 # 
 
 import numpy as np
