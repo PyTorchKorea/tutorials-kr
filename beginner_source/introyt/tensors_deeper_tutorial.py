@@ -891,11 +891,10 @@ print(pytorch_tensor)
 
 
 ##########################################################################
-# PyTorch creates a tensor of the same shape and containing the same data
-# as the NumPy array, going so far as to keep NumPy’s default 64-bit float
-# data type.
+# PyTorch는 NumPy array와 같은 shape의 tensor를 생성하고, 같은 데이터를 포함합니다.
+# 심지어 NumPy의 기본적인 64비트 실수 데이터 자료형을 유지합니다.
 # 
-# The conversion can just as easily go the other way:
+# PyTorch에서 NumPy로 변환은 다른 방식을 사용해서 쉽게 할 수 있습니다:
 # 
 
 pytorch_rand = torch.rand(2, 3)
