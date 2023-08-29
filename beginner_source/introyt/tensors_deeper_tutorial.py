@@ -866,12 +866,12 @@ print(torch.reshape(output3d, (6 * 20 * 20,)).shape)
 
 
 #######################################################################
-# NumPy Bridge
+# NumPy로 변환
 # ------------
 # 
-# In the section above on broadcasting, it was mentioned that PyTorch’s
-# broadcast semantics are compatible with NumPy’s - but the kinship
-# between PyTorch and NumPy goes even deeper than that.
+# 위에 있는 broadcasting 부분에서, PyTorch의 broadcast
+# 문법은 Numpy와 호환 가능하다고 말했었습니다
+# - 하지만 PyTorch와 NumPy 사이 유사성은 우리가 생각한 것 보다 더욱 깊습니다.
 # 
 # If you have existing ML or scientific code with data stored in NumPy
 # ndarrays, you may wish to express that same data as PyTorch tensors,
