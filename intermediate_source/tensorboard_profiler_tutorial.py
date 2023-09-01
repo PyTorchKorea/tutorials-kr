@@ -1,22 +1,22 @@
 """
-PyTorch Profiler With TensorBoard
+텐서보드를 이용한 파이토치 프로파일러
 ====================================
-This tutorial demonstrates how to use TensorBoard plugin with PyTorch Profiler
-to detect performance bottlenecks of the model.
+이 튜토리얼에서는 파이토치(PyTorch) 프로파일러(profiler)와 함께 텐서보드(TensorBoard) 플러그인(plugin)을 사용하여
+모델의 성능 병목 현상을 탐지하는 방법을 보여 줍니다.
 
-Introduction
+소개
 ------------
-PyTorch 1.8 includes an updated profiler API capable of
-recording the CPU side operations as well as the CUDA kernel launches on the GPU side.
-The profiler can visualize this information
-in TensorBoard Plugin and provide analysis of the performance bottlenecks.
+파이토치 1.8에는 GPU에서 CUDA 커널(kernel) 실행 뿐만 아니라
+CPU 작업을 기록할 수 있는 업데이트된 프로파일러 API가 포함되어 있습니다.
+프로파일러는 텐서보드 플러그인에서 이런 정보를 시각화하고
+성능 병목 현상에 대한 분석을 제공할 수 있습니다.
 
-In this tutorial, we will use a simple Resnet model to demonstrate how to
-use TensorBoard plugin to analyze model performance.
+이 튜토리얼에서는 간단한 Resnet 모델을 사용하여 
+텐서보드 플러그인을 활용한 모델 성능 분석 방법을 보여드리겠습니다.
 
-Setup
+준비
 -----
-To install ``torch`` and ``torchvision`` use the following command:
+아래 명령어를 실행하여 ``torch``와 ``torchvision``을 설치합니다:
 
 ::
 
@@ -27,20 +27,20 @@ To install ``torch`` and ``torchvision`` use the following command:
 
 
 ######################################################################
-# Steps
+# 과정
 # -----
 #
-# 1. Prepare the data and model
-# 2. Use profiler to record execution events
-# 3. Run the profiler
-# 4. Use TensorBoard to view results and analyze model performance
-# 5. Improve performance with the help of profiler
-# 6. Analyze performance with other advanced features
+# 1. 데이터 및 모델 준비
+# 2. 프로파일러를 사용하여 실행 이벤트(execution events) 기록
+# 3. 프로파일러 실행
+# 4. 텐서보드를 사용하여 결과 출력 및 모델 성능 분석
+# 5. 프로파일러의 도움으로 성능 개선
+# 6. 다른 고급 기능으로 성능 분석
 #
-# 1. Prepare the data and model
+# 1. 데이터 및 모델 준비
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-# First, import all necessary libraries:
+# 먼저 필요한 라이브러리를 모두 불러옵니다:
 #
 
 import torch
@@ -53,8 +53,8 @@ import torchvision.models
 import torchvision.transforms as T
 
 ######################################################################
-# Then prepare the input data. For this tutorial, we use the CIFAR10 dataset.
-# Transform it to the desired format and use ``DataLoader`` to load each batch.
+# 이후 입력 데이터를 준비합니다. 이 튜토리얼의 경우 CIFAR10 데이터셋을 사용합니다.
+# 원하는 형식으로 변환하고 ``DataLoader``를 사용하여 각 배치(batch)를 로드합니다.
 
 transform = T.Compose(
     [T.Resize(224),
@@ -64,8 +64,8 @@ train_set = torchvision.datasets.CIFAR10(root='./data', train=True, download=Tru
 train_loader = torch.utils.data.DataLoader(train_set, batch_size=32, shuffle=True)
 
 ######################################################################
-# Next, create Resnet model, loss function, and optimizer objects.
-# To run on GPU, move model and loss to GPU device.
+# 그런 다음 Resnet 모델, 손실 함수 및 옵티마이저 객체를 생성합니다. 
+# GPU에서 실행하기 위해 모델 및 손실을 GPU 장지로 이동합니다.
 
 device = torch.device("cuda:0")
 model = torchvision.models.resnet18(weights='IMAGENET1K_V1').cuda(device)
@@ -75,7 +75,7 @@ model.train()
 
 
 ######################################################################
-# Define the training step for each batch of input data.
+# 각 입력 데이터 배치에 대한 학습 단계를 정의합니다.
 
 def train(data):
     inputs, labels = data[0].to(device=device), data[1].to(device=device)
@@ -87,37 +87,37 @@ def train(data):
 
 
 ######################################################################
-# 2. Use profiler to record execution events
+# 2. 프로파일러를 사용하여 실행 이벤트 기록
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-# The profiler is enabled through the context manager and accepts several parameters,
-# some of the most useful are:
+# 프로파일러는 컨텍스트(context) 관리자를 통해 활성화되고 몇 가지 매개 변수를 사용할 수 있으며,
+# 가장 유용한 것은 아래와 같습니다:
 #
-# - ``schedule`` - callable that takes step (int) as a single parameter
-#   and returns the profiler action to perform at each step.
+# - ``schedule`` - 단계 (int)를 단일 매개 변수로 받아들이고,
+#   각 단계에서 수행할 프로파일러 작업을 반환하는 호출 가능한 함수입니다.
 #
-#   In this example with ``wait=1, warmup=1, active=3, repeat=2``,
-#   profiler will skip the first step/iteration,
-#   start warming up on the second,
-#   record the following three iterations,
-#   after which the trace will become available and on_trace_ready (when set) is called.
-#   In total, the cycle repeats twice. Each cycle is called a "span" in TensorBoard plugin.
+#   이 예시에서는 ``wait=1, warmup=1, active=3, repeat=2``로 설정되어 있으며,
+#   프로파일러는 첫 번째 단계/반복(step/iteration)을 건너뜁니다.
+#   두 번째부터 워밍업(warming up)을 시작하면,
+#   다음 세 번의 반복을 기록하고,
+#   그 후 트레이스(trace)를 사용할 수 있게 되고 on_trace_ready (설정된 경우)가 호출됩니다.
+#   전체적으로 이 주기가 두 번 반복됩니다. 텐서보드 플러그인에서 각 주기는 "span"이라고 합니다.
 #
-#   During ``wait`` steps, the profiler is disabled.
-#   During ``warmup`` steps, the profiler starts tracing but the results are discarded.
-#   This is for reducing the profiling overhead.
-#   The overhead at the beginning of profiling is high and easy to bring skew to the profiling result.
-#   During ``active`` steps, the profiler works and records events.
-# - ``on_trace_ready`` - callable that is called at the end of each cycle;
-#   In this example we use ``torch.profiler.tensorboard_trace_handler`` to generate result files for TensorBoard.
-#   After profiling, result files will be saved into the ``./log/resnet18`` directory.
-#   Specify this directory as a ``logdir`` parameter to analyze profile in TensorBoard.
-# - ``record_shapes`` - whether to record shapes of the operator inputs.
-# - ``profile_memory`` - Track tensor memory allocation/deallocation. Note, for old version of pytorch with version
-#   before 1.10, if you suffer long profiling time, please disable it or upgrade to new version.
-# - ``with_stack`` - Record source information (file and line number) for the ops.
-#   If the TensorBoard is launched in VS Code (`reference <https://code.visualstudio.com/docs/datascience/pytorch-support#_tensorboard-integration>`_),
-#   clicking a stack frame will navigate to the specific code line.
+#   ``wait`` 단계인 동안 프로파일러는 비활성화됩니다.
+#   ``warmup`` 단계인 동안엔 프로파일러가 추적(tracing)을 시작하지만 결과는 무시됩니다.
+#   이는 프로파일링 오버헤드(overhead)를 줄이기 위함입니다.
+#   프로파일링을 시작할 때 오버헤드는 크고 프로파일링 결과에 왜곡을 가져오기 쉽습니다.
+#   ``active`` 단계에선 프로파일러가 작동하며 이벤트를 기록합니다.
+# - ``on_trace_ready`` - 각 주기 마지막에 호출되는 함수입니다;
+#   이 예시에서는 ``torch.profiler.tensorboard_trace_handler``를 사용하여 텐서보드의 결과 파일을 생성합니다.
+#   프로파일링 후 결과 파일은 ``./log/resnet18`` 디렉토리(directory)에 저장됩니다.
+#   텐서보드에서 프로파일(profile)을 분석하려면 이 디렉토리를 ``logdir`` 매개 변수로 지정해야 합니다.
+# - ``record_shapes`` - 연산자 입력의 모양을 기록할지 여부를 나타냅니다.
+# - ``profile_memory`` - 트랙 텐서 메모리(Track tensor memory) 할당/할당 해제 여부를 나타냅니다. 주의, 1.10 이전 버전의 파이토치를 사용하는 경우
+#   프로파일링 시간이 길다면 이 기능을 비활성화하거나 새 버전으로 업그레이드해 주세요.
+# - ``with_stack`` - ops에 대한 소스 정보(파일 및 라인 번호)를 기록 여부를 나타냅니다.
+#   VS Code에서 텐서보드가 실행되는 경우 (`참고 <https://code.visualstudio.com/docs/datascience/pytorch-support#_tensorboard-integration>`_),
+#   스택 프레임(stack frame)을 클릭하면 특정 코드 라인으로 이동합니다.
 
 with torch.profiler.profile(
         schedule=torch.profiler.schedule(wait=1, warmup=1, active=3, repeat=2),
@@ -130,10 +130,10 @@ with torch.profiler.profile(
         if step >= (1 + 1 + 3) * 2:
             break
         train(batch_data)
-        prof.step()  # Need to call this at the end of each step to notify profiler of steps' boundary.
+        prof.step()  # 각 단계의 끝에서 호출하여 프로파일러에게 단계의 경계를 알려야 합니다.
 
 ######################################################################
-# Alternatively, the following non-context manager start/stop is supported as well.
+# 또한, 비컨텍스트(non-context) 관리자는 시작/정지도 지원됩니다.
 prof = torch.profiler.profile(
         schedule=torch.profiler.schedule(wait=1, warmup=1, active=3, repeat=2),
         on_trace_ready=torch.profiler.tensorboard_trace_handler('./log/resnet18'),
@@ -148,17 +148,17 @@ for step, batch_data in enumerate(train_loader):
 prof.stop()
 
 ######################################################################
-# 3. Run the profiler
+# 3. 프로파일러 실행
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-# Run the above code. The profiling result will be saved under ``./log/resnet18`` directory.
+# 위 코드를 실행합니다. 프로파일링 결과는 ``./log/resnet18`` 디렉토리에 저장됩니다.
 
 
 ######################################################################
-# 4. Use TensorBoard to view results and analyze model performance
+# 4. 텐서보드를 사용하여 결과 출력 및 모델 성능 분석
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#
-# Install PyTorch Profiler TensorBoard Plugin.
+# 
+# 파이토치 프로파일러 텐서보드 플러그인을 설치합니다.
 #
 # ::
 #
@@ -166,7 +166,7 @@ prof.stop()
 #
 
 ######################################################################
-# Launch the TensorBoard.
+# 텐서보드를 실행합니다.
 #
 # ::
 #
@@ -174,7 +174,7 @@ prof.stop()
 #
 
 ######################################################################
-# Open the TensorBoard profile URL in Google Chrome browser or Microsoft Edge browser.
+# 구글 크롬(Google Chrome) 브라우저 또는 마이크로소프트 엣지(Microsoft Edge) 브라우저에서 텐서보드 프로파일(profile) URL 열기
 #
 # ::
 #
@@ -182,110 +182,110 @@ prof.stop()
 #
 
 ######################################################################
-# You could see Profiler plugin page as shown below.
+# 아래와 같이 프로파일러 플러그인 페이지를 볼 수 있습니다.
 #
 # - Overview
 # .. image:: ../../_static/img/profiler_overview1.png
 #    :scale: 25 %
 #
-# The overview shows a high-level summary of model performance.
+# 개요에는 모델 성능에 대한 대략적인 요약이 표시됩니다.
 #
-# The "GPU Summary" panel shows the GPU configuration, GPU usage and Tensor Cores usage.
-# In this example, the GPU Utilization is low.
-# The details of these metrics are `here <https://github.com/pytorch/kineto/blob/main/tb_plugin/docs/gpu_utilization.md>`_.
+# "GPU 요약(GPU Summary)" 패널에는 GPU 구성, GPU 사용량 및 Tensor 코어 사용량이 표시됩니다.
+# 이 예제에서는 GPU 사용량이 낮습니다.
+# 이러한 측정 지표(metrics)에 대한 자세한 내용은 `다음 <https://github.com/pytorch/kineto/blob/main/tb_plugin/docs/gpu_utilization.md>`_과 같습니다.
 #
-# The "Step Time Breakdown" shows distribution of time spent in each step over different categories of execution.
-# In this example, you can see the ``DataLoader`` overhead is significant.
+# "단계 시간 세분화(Step Time Breakdown)"는 각 단계에서 수행된 시가느이 분포를 보여줍니다.
+# 이 예제에서는 ``DataLoader`` 오버헤드(overhead)가 상당한 것을 볼 수 있습니다.
 #
-# The bottom "Performance Recommendation" uses the profiling data
-# to automatically highlight likely bottlenecks,
-# and gives you actionable optimization suggestions.
+# 하단의 "성능 권장사항(Performance Recommendation)"은 프로파일링 데이터를 사용하여
+# 발생 가능한 병목 현상을 자동으로 강조하고,
+# 실행 가능한 최적화 제안을 제공합니다.
 #
-# You can change the view page in left "Views" dropdown list.
+# 왼쪽 "보기(Views)" 드롭다운(dropdown) 목록에서 보기 페이지를 변경할 수 있습니다.
 #
 # .. image:: ../../_static/img/profiler_views_list.png
 #    :alt:
 #
 #
-# - Operator view
-# The operator view displays the performance of every PyTorch operator
-# that is executed either on the host or device.
+# - 연산 보기(Operator view)
+# 연산 보기(operator view)는 호스트 또는 장치에서 실행되는
+# 모든 파이토치 연산자의 성능을 표시합니다.
 #
 # .. image:: ../../_static/img/profiler_operator_view.png
 #    :scale: 25 %
-# The "Self" duration does not include its child operators’ time.
-# The "Total" duration includes its child operators’ time.
+# "셀프(Self)" 기간에는 하위 연산의 시간이 포함되지 않습니다.
+# "전체(Total)" 기간에는 하위 연산의 시간이 포함됩니다.
 #
-# - View call stack
-# Click the ``View Callstack`` of an operator, the operators with same name but different call stacks will be shown.
-# Then click a ``View Callstack`` in this sub-table, the call stack frames will be shown.
+# - 호출 스택 보기(View call stack)
+# 연산자의 ``View Callstack``를 클릭하면, 이름은 같지만 서로 다른 연산자가 표시됩니다.
+# 하위 테이블의 ``View Callstack``를 클릭하면, 호출 스택 프레임(call stack frames)이 표시됩니다.
 #
 # .. image:: ../../_static/img/profiler_callstack.png
 #    :scale: 25 %
 #
-# If the TensorBoard is launched inside VS Code
-# (`Launch Guide <https://devblogs.microsoft.com/python/python-in-visual-studio-code-february-2021-release/#tensorboard-integration>`_),
-# clicking a call stack frame will navigate to the specific code line.
+# VS Code 내부에서 텐서보드가 실행되는 경우
+# (`실행 가이드 <https://devblogs.microsoft.com/python/python-in-visual-studio-code-february-2021-release/#tensorboard-integration>`_),
+# 호출 스택 프레임(call stack frame)을 클릭하면 특정 코드 라인으로 이동합니다.
 #
 # .. image:: ../../_static/img/profiler_vscode.png
 #    :scale: 25 %
 #
 #
-# - Kernel view
-# The GPU kernel view shows all kernels’ time spent on GPU.
+# - 커널 보기(Kernel view)
+# GPU 커널 보기(GPU kernel view)는 모든 커널(kernel)이 GPU에 소비한 시간을 보여줍니다.
 #
 # .. image:: ../../_static/img/profiler_kernel_view.png
 #    :scale: 25 %
-# Tensor Cores Used:
-# Whether this kernel uses Tensor Cores.
+# 사용된 Tensor 코어:
+# 이 커널(kernel)이 tensor 코어를 사용하는지 여부룰 나타냅니다.
 #
-# Mean Blocks per SM:
-# Blocks per SM = Blocks of this kernel / SM number of this GPU.
-# If this number is less than 1, it indicates the GPU multiprocessors are not fully utilized.
-# "Mean Blocks per SM" is weighted average of all runs of this kernel name, using each run’s duration as weight.
+# SM당 평균 블럭 수:
+# SM당 블럭 수 = 커널(kernel)의 블럭 / GPU의 SM 수.
+# 이 수치가 1보다 작으면 GPU 멀티프로세서가 완전히 사용되지 않음을 나타냅니다.
+# "SM당 평균 블럭 수(Mean Blocks per SM)"는 이 커널 이름의 모든 실행에 대한 가중 평균이고, 각 실행 기간을 가중치로 사용하였습니다.
 #
-# Mean Est. Achieved Occupancy:
-# Est. Achieved Occupancy is defined in this column’s tooltip.
-# For most cases such as memory bandwidth bounded kernels, the higher the better.
-# "Mean Est. Achieved Occupancy" is weighted average of all runs of this kernel name,
-# using each run’s duration as weight.
+# 평균 예상 달성 점유율(Mean Est. Achieved Occupancy):
+# 예산 달성 점유율(Est. Achieved Occupancy)은 열의 툴팁(column's tooltip)에 정의되어 있습니다.
+# 메모리 대역폭 경계 커널과 같은 대부분의 경우, 높을수록 좋습니다.
+# "평균 예상 달성 점유율(Mean Est. Achieved Occupancy)"은 커널 이름의 모든 실행에 대한 가중 평균이며,
+# 각 실행의 지속 시간을 가중치로 사용합니다.
 #
-# - Trace view
-# The trace view shows timeline of profiled operators and GPU kernels.
-# You can select it to see details as below.
+# - 트레이스 보기(Trace view)
+# 트레이스 보기는 프로파일된 연산자와 GPU 커널의 타임라인을 보여줍니다.
+# 아래와 같이 선택하여 세부 정보를 확인할 수 있습니다.
 #
 # .. image:: ../../_static/img/profiler_trace_view1.png
 #    :scale: 25 %
 #
-# You can move the graph and zoom in/out with the help of right side toolbar.
-# And keyboard can also be used to zoom and move around inside the timeline.
-# The ‘w’ and ‘s’ keys zoom in centered around the mouse,
-# and the ‘a’ and ‘d’ keys move the timeline left and right.
-# You can hit these keys multiple times until you see a readable representation.
+# 오른쪽 도구 모음을 사용하여 그래프를 이동하고 확대/축소할 수 있습니다.
+# 또한 키보드를 사용하여 타임라인 안에서 확대/이동할 수 있습니다.
+# 'w'및 's' 키는 마우스 중심으로 확대되며,
+# 'a'와 'd' 키는 타임라인을 좌우로 이동합니다.
+# 읽을 수 있는 표현이 보일 때까지 이 키를 여러 번 누를 수 있습니다.
 #
-# If a backward operator's "Incoming Flow" field is with value "forward correspond to backward",
-# you can click the text to get its launching forward operator.
+# 역방향 연산자(backward operator)의 "Incoming Flow" 필드가 "forward correspond to backward" 값인 경우,
+# 텍스트를 클릭하여 시작되는 전진 연산자(forward operator)를 가져올 수 있습니다.
 #
 # .. image:: ../../_static/img/profiler_trace_view_fwd_bwd.png
 #    :scale: 25 %
 #
-# In this example, we can see the event prefixed with ``enumerate(DataLoader)`` costs a lot of time.
-# And during most of this period, the GPU is idle.
-# Because this function is loading data and transforming data on host side,
-# during which the GPU resource is wasted.
+# 이 예시에서는 ``enumerate(DataLoader)``로 접두사가 붙은 이벤트에 많은 시간이 소요되는 것을 확인할 수 있습니다.
+# 그리고 대부분의 기간 동안 GPU는 쉬는 상태입니다.
+# 이 기능은 호스트 측에서 데이터를 로드하고 데이터를 변환하는 기능이기 때문에,
+# GPU 리소스가 낭비됩니다.
 
 
 ######################################################################
-# 5. Improve performance with the help of profiler
+# 5. 프로파일러의 도움으로 성능 개선
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-# At the bottom of "Overview" page, the suggestion in "Performance Recommendation" hints the bottleneck is ``DataLoader``.
-# The PyTorch ``DataLoader`` uses single process by default.
-# User could enable multi-process data loading by setting the parameter ``num_workers``.
-# `Here <https://pytorch.org/docs/stable/data.html#single-and-multi-process-data-loading>`_ is more details.
+# "개요(Overview)" 페이지 하단의 "성능 추천(Performance Recommendation)" 제안은 병목 현상이 " ``DataLoader``임을 암시합니다.
+# 파이토치 ``DataLoader``는 기본적으로 단일 프로세스를 사용합니다.
+# 사용자는 매개 변수 ``num_workers``를 설정하여 다중 프로세스 데이터 로드를 활성화할 수 있습니다.
+# 자세한 내용은 `여기 <https://pytorch.org/docs/stable/data.html#single-and-multi-process-data-loading>`_에 있습니다.
 #
-# In this example, we follow the "Performance Recommendation" and set ``num_workers`` as below,
-# pass a different name such as ``./log/resnet18_4workers`` to ``tensorboard_trace_handler``, and run it again.
+# 이 예시에서 "성능 권장사항(Performance Recommendation)"에 따라 아래와 같이 ``num_workers``를 설정하고,
+# ``./log/resnet18_4workers``와 같은 다른 이름을 ``tensorboard_trace_handler``로 전달한 후 다시 실행합니다.
 #
 # ::
 #
@@ -293,78 +293,78 @@ prof.stop()
 #
 
 ######################################################################
-# Then let’s choose the recently profiled run in left "Runs" dropdown list.
+# 그런 다음 왼쪽 "실행(Runs)" 드롭다운(dropdown) 목록에서 최근 프로파일된 실행을 선택합니다.
 #
 # .. image:: ../../_static/img/profiler_overview2.png
 #    :scale: 25 %
 #
-# From the above view, we can find the step time is reduced to about 76ms comparing with previous run's 132ms,
-# and the time reduction of ``DataLoader`` mainly contributes.
+# 위의 보기(view)에서 이전 실행인 132ms에 비해 단계(step) 시간이 약 76ms로 감소하고,
+# ``DataLoader``의 시간 감소가 주로 기여한다는 것을 알 수 있습니다.
 #
 # .. image:: ../../_static/img/profiler_trace_view2.png
 #    :scale: 25 %
 #
-# From the above view, we can see that the runtime of ``enumerate(DataLoader)`` is reduced,
-# and the GPU utilization is increased.
+# 위의 보기(view)에서 ``enumerate(DataLoader)``의 런타임이 감소하고,
+# GPU 활용도가 증가하는 것을 알 수 있습니다.
 
 ######################################################################
-# 6. Analyze performance with other advanced features
+# 6. 다른 고급 기능으로 성능 분석
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-# - Memory view
-# To profile memory, ``profile_memory`` must be set to ``True`` in arguments of ``torch.profiler.profile``.
+# - 메모리 보기(Memory view)
+# 메모리 프로파일을 설정하려면 ``torch.profiler.profile`` 인수에서 ``profile_memory``를 ``True``로 설정해야 합니다.
 #
-# You can try it by using existing example on Azure
+# Azure의 기존 예제를 사용해 볼 수 있습니다.
 #
 # ::
 #
 #     pip install azure-storage-blob
 #     tensorboard --logdir=https://torchtbprofiler.blob.core.windows.net/torchtbprofiler/demo/memory_demo_1_10
 #
-# The profiler records all memory allocation/release events and allocator's internal state during profiling.
-# The memory view consists of three components as shown in the following.
+# 프로파일러는 프로파일링 중에 모든 메모리 할당/해제 이벤트와 할당자의 내부 상태를 기록합니다.
+# 메모리 보기(memory view)는 다음과 같이 세 가지 구성 요소로 구성됩니다.
 #
 # .. image:: ../../_static/img/profiler_memory_view.png
 #    :scale: 25 %
 #
-# The components are memory curve graph, memory events table and memory statistics table, from top to bottom, respectively.
+# 구성 요소는 각각 메모리 곡선 그래프, 메모리 이벤트 테이블 및 메모리 통계 테이블입니다.
 #
-# The memory type could be selected in "Device" selection box.
-# For example, "GPU0" means the following table only shows each operator's memory usage on GPU 0, not including CPU or other GPUs.
+# 메모리 유형은 "장치(Device)" 선택 상자에서 선택할 수 있습니다.
+# 예를 들어, 다음 표에서 "GPU0"은 GPU 0에서의 각 연산자의 메로리 사용량만 보여주고, CPU 또는 다른 GPU를 포함하지 않는다는 것을 의미합니다.
 #
-# The memory curve shows the trends of memory consumption. The "Allocated" curve shows the total memory that is actually
-# in use, e.g., tensors. In PyTorch, caching mechanism is employed in CUDA allocator and some other allocators. The
-# "Reserved" curve shows the total memory that is reserved by the allocator. You can left click and drag on the graph
-# to select events in the desired range:
+# 메모리 곡선은 메모리 소비의 추세를 보여줍니다. "Allocated"곡선은 실제 사용 중인 총 메모리를
+# 보여줍니다, e.g., tensors. 파이토치에서 캐싱 메커니즘(caching mechanism)은 CUDA 할당기 및 일부 다른 할당기에 사용됩니다.
+# "Reserved" 곡선은 할당자에 의해 예약된 총 메모리를 보여줍니다. 그래프를 좌클릭하고 끌어서
+# 원하는 범위의 이벤트를 선택할 수 있습니다:
 #
 # .. image:: ../../_static/img/profiler_memory_curve_selecting.png
 #    :scale: 25 %
 #
-# After selection, the three components will be updated for the restricted time range, so that you can gain more
-# information about it. By repeating this process, you can zoom into a very fine-grained detail. Right click on the graph
-# will reset the graph to the initial state.
+# 선택한 후에는 세 가지 구성 요소가 제한된 범위에 맞게 업데이트되어
+# 자세한 정보를 얻을 수 있습니다. 이 프로세스를 반복하면, 매우 세분화된 세부 정보를 확대할 수 있습니다. 그래프를 우클릭하면
+# 그래프가 초기 상태로 재설정됩니다.
 #
 # .. image:: ../../_static/img/profiler_memory_curve_single.png
 #    :scale: 25 %
 #
-# In the memory events table, the allocation and release events are paired into one entry. The "operator" column shows
-# the immediate ATen operator that is causing the allocation. Notice that in PyTorch, ATen operators commonly use
-# ``aten::empty`` to allocate memory. For example, ``aten::ones`` is implemented as ``aten::empty`` followed by an
-# ``aten::fill_``. Solely display the operator name as ``aten::empty`` is of little help. It will be shown as
-# ``aten::ones (aten::empty)`` in this special case. The "Allocation Time", "Release Time" and "Duration"
-# columns' data might be missing if the event occurs outside of the time range. 
+# 메모리 이벤트 테이블에서 할당 및 해제 이벤트는 하나의 항목으로 쌍으로 구성됩니다. "operator" 열에는
+# 할당을 발생시키는 즉시 ATen 연산자가 표시됩니다. 파이토치에서 ATen 연산자는 일반적으로
+# ``aten::empty``를 사용하여 메모리를 할당합니다. 예를 들어, ``aten::ones``은 ``aten::empty`` 다음에
+# ``aten::fill_``로 구현됩니다. 연산자 이름만 ``aten::empty``로 표시해도 별 도움이 되지 않습니다. 이 특수한 경우에는
+# ``aten::ones (aten::empty)``로 표시됩니다. "할당 시간(Allocation Time)", "해제 시간(Release Time)" 및 "기간(Duration)"은
+# 이벤트가 시간 범위를 벗어나는 경우 열의 데이터가 누락될 수 있습니다. 
 #
-# In the memory statistics table, the "Size Increase" column sums up all allocation size and minus all the memory
-# release size, that is, the net increase of memory usage after this operator. The "Self Size Increase" column is
-# similar to "Size Increase", but it does not count children operators' allocation. With regards to ATen operators'
-# implementation detail, some operators might call other operators, so memory allocations can happen at any level of the
-# call stack. That says, "Self Size Increase" only count the memory usage increase at current level of call stack.
-# Finally, the "Allocation Size" column sums up all allocation without considering the memory release.
+# 메모리 통계 테이블에서, "크기 증가(Size Increase)" 열은 모든 할당 크기를 합산하고 모든 메모리 릴리스(release)
+# 크기를 뺀 값, 즉, 이 연산자 이후의 메모리 사용량 순 증가 값입니다. "자체 크기 증가(Self Size Increase)" 열은
+# "크기 증가(Size Increase)"와 유사 하지만, 하위 연산자의 할당은 계산하지 않습니다. ATen 연산자의 구현 세부 사항과
+# 관련하여, 일부 연산자는 다른 연산자를 호출할 수 있으므로, 메모리 할당은 콜 스택의 모든 수준에서
+# 발생할 수 있습니다. 즉, "자체 크기 증가(Self Size Increase)"는 현재 수준의 콜 스택에서 메모리 사용량 증가만을 계산합니다.
+# 마지막으로, "할당 크기(Allocation Size)" 열은 메모리 릴리스를 고려하지 않고 모든 할당을 합산합니다.
 #
-# - Distributed view
-# The plugin now supports distributed view on profiling DDP with NCCL/GLOO as backend.
+# - 분산 보기(Distributed view)
+# 이제 플러그인은 NCCL/GLOO를 백엔드로 사용하는 DDP 프로파일링에 대한 분산 보기를 지원합니다.
 #
-# You can try it by using existing example on Azure:
+# Azure의 기존 예제를 사용해 볼 수 있습니다:
 #
 # ::
 #
@@ -374,26 +374,26 @@ prof.stop()
 # .. image:: ../../_static/img/profiler_distributed_view.png
 #    :scale: 25 %
 #
-# The "Computation/Communication Overview" shows computation/communication ratio and their overlapping degree.
-# From this view, User can figure out load balance issue among workers.
-# For example, if the computation + overlapping time of one worker is much larger than others,
-# there may be a problem of load balance or this worker may be a straggler.
+# "컴퓨팅/커뮤니케이션 개요(Computation/Communication Overview)"에는 컴퓨팅/커뮤니케이션 비율과 중복 정도가 표시됩니다.
+# 이 보기에서, 사용자는 작업자 간의 로드 밸런싱 문제를 파악할 수 있습니다.
+# 예를 들어, 한 작업자의 연산 + 중첨 시간이 다른 작업자보다 훨씬 큰 경우,
+# 로드 밸런싱에 문제가 있거나 이 작업자가 스트래글러(straggler)일 수 있습니다.
 #
-# The "Synchronizing/Communication Overview" shows the efficiency of communication.
-# "Data Transfer Time" is the time for actual data exchanging.
-# "Synchronizing Time" is the time for waiting and synchronizing with other workers.
+# "동기화/통신 개요(Synchronizing/Communication Overview)"는 통신의 효율성을 보여줍니다.
+# "데이터 교환 시간(Data Transfer Time)"은 실제 데이터를 교환하는 시간입니다.
+# "동기화 시간(Synchronizing Time)"은 다른 작업자와 대기 및 동기화하는 시간입니다.
 #
-# If one worker’s "Synchronizing Time" is much shorter than that of other workers’,
-# this worker may be a straggler which may have more computation workload than other workers’.
+# 한 작업자의 "동기화 시간(Synchronizing Time)"이 다른 작업자 보다 훨씬 짧다면’,
+# 이 작업자는 다른 작업자보다 더 많은 계산 작업량을 가질 수 있는 스트래글러일 수 있습니다’.
 #
-# The "Communication Operations Stats" summarizes the detailed statistics of all communication ops in each worker.
+# "통신 작업 통계(Communication Operations Stats)"는 각 작업자의 모든 통신 작업에 대한 세부 통계를 요약합니다.
 
 ######################################################################
-# Learn More
+# 더 배우기
 # ----------
 #
-# Take a look at the following documents to continue your learning,
-# and feel free to open an issue `here <https://github.com/pytorch/kineto/issues>`_.
+# 학습을 계속하려면 다음 문서를 참조하시고,
+# `여기 <https://github.com/pytorch/kineto/issues>`_에서 자유롭게 이슈를 열어보세요.
 #
 # -  `Pytorch TensorBoard Profiler github <https://github.com/pytorch/kineto/tree/master/tb_plugin>`_
 # -  `torch.profiler API <https://pytorch.org/docs/master/profiler.html>`_
