@@ -13,44 +13,28 @@ Cpp 확장을 사용하여 프로세스 그룹 백엔드 사용자 정의
 -  `PyTorch Cpp Extension <https://pytorch.org/docs/stable/cpp_extension.html>`__
 -  `Writing Distributed Applications with PyTorch <https://tutorials.pytorch.kr/intermediate/dist_tuto.html>`__
 
-이 튜토리얼은 `cpp 확장 <https://pytorch.org/docs/stable/cpp_extension.html>`__ 을 사용하여 사용자 정의 ProcessGroup 백엔드를 구현하고 이를 `파이토치 분산 패키지 <https://pytorch.org/docs/stable/distributed.html>`__ 에 연결하는 방법을 보여줍니다.
+이 튜토리얼은 `cpp 확장 <https://pytorch.org/docs/stable/cpp_extension.html>`__을 사용하여 사용자 정의 ProcessGroup 백엔드를 구현하고 이를 `파이토치 분산 패키지 <https://pytorch.org/docs/stable/distributed.html>`__에 연결하는 방법을 보여줍니다.
 이것은 하드웨어에 특화된 소프트웨어 스택이 필요한 경우나 새로운 집합 통신 알고리즘을 실험하고자 할 때 유용합니다.
 
 
-Basics
+기초
 ------
 
-PyTorch collective communications power several widely adopted distributed
-training features, including
-`DistributedDataParallel <https://pytorch.org/docs/stable/generated/torch.nn.parallel.DistributedDataParallel.html>`__,
-`ZeroRedundancyOptimizer <https://pytorch.org/docs/stable/distributed.optim.html#torch.distributed.optim.ZeroRedundancyOptimizer>`__,
-`FullyShardedDataParallel <https://github.com/pytorch/pytorch/blob/master/torch/distributed/_fsdp/fully_sharded_data_parallel.py>`__.
-In order to make the same collective communication API work with
-different communication backends, the distributed package abstracts collective
-communication operations into a
+파이토치 집합 통신은 
+`분산 데이터 병렬(DistributedDataParallel) <https://pytorch.org/docs/stable/generated/torch.nn.parallel.DistributedDataParallel.html>`__,
+`제로 리던던시 최적화기(ZeroRedundancyOptimizer) <https://pytorch.org/docs/stable/distributed.optim.html#torch.distributed.optim.ZeroRedundancyOptimizer>`__,
+`완전 공유 데이터 병렬(FullyShardedDataParallel) <https://github.com/pytorch/pytorch/blob/master/torch/distributed/_fsdp/fully_sharded_data_parallel.py>`__을 포함한 널리 사용되는 분산 훈련 기능을 지원합니다.
+동일한 집합 통신 API를 다양한 통신 백엔드에서 작동하도록 하기 위해 분산 패키지는 집합 통신 작업을 
 `ProcessGroup <https://github.com/pytorch/pytorch/blob/release/1.10/torch/csrc/distributed/c10d/ProcessGroup.hpp>`__
-class. Different backends can
-then be implemented as subclasses of ``ProcessGroup`` using preferred
-third-party libraries. PyTorch distributed comes with three default backends,
-``ProcessGroupNCCL``, ``ProcessGroupGloo``, and ``ProcessGroupMPI``. However,
-beyond these three backends, there are also other communication libraries
-(e.g., `UCC <https://github.com/openucx/ucc>`__,
-`OneCCL <https://github.com/oneapi-src/oneCCL>`__), different types of hardware
-(e.g., `TPU <https://cloud.google.com/tpu>`__,
-`Trainum <https://aws.amazon.com/machine-learning/trainium/>`__), and emerging
-communication algorithms (e.g.,
-`Herring <https://www.amazon.science/publications/herring-rethinking-the-parameter-server-at-scale-for-the-cloud>`__,
-`Reduction Server <https://cloud.google.com/blog/topics/developers-practitioners/optimize-training-performance-reduction-server-vertex-ai>`__).
-Therefore, the distributed package exposes extension APIs to allow customizing
-collective communication backends.
+클래스로 추상화합니다. 이후에는 원하는 서드파티 라이브러리를 사용하여 ``ProcessGroup``의 하위 클래스로 다양한 백엔드를 구현할 수 있습니다.
+파이토치 분산에는 세 가지 기본 백엔드인 ``ProcessGroupNCCL``, ``ProcessGroupGloo``, 그리고 ``ProcessGroupMPI``가 포함되어 있습니다.
+그러나 그러나 이 세 가지 백엔드 외에도 다른 통신 라이브러리(예: `UCC <https://github.com/openucx/ucc>`__, `OneCCL <https://github.com/oneapi-src/oneCCL>`__), 다른 유형의 하드웨어(예: `TPU <https://cloud.google.com/tpu>`__, `Trainum <https://aws.amazon.com/machine-learning/trainium/>`__), 
+그리고 새로운 통신 알고리즘(예: `Herring <https://www.amazon.science/publications/herring-rethinking-the-parameter-server-at-scale-for-the-cloud>`__, `Reduction Server <https://cloud.google.com/blog/topics/developers-practitioners/optimize-training-performance-reduction-server-vertex-ai>`__)도 있습니다.
+따라서 분산 패키지는 집합 통신 백엔드를 사용자 지정할 수 있도록 확장 API를 노출합니다.
 
 
-The 4 steps below show how to implement a dummy ``ProcessGroup`` backend
-and use that in Python application code. Please note that this tutorial focuses
-on demonstrating the extension APIs, instead of developing a functioning
-communication backend. Hence, the ``dummy`` backend just covers a subset of the
-APIs (``all_reduce`` and ``all_gather``), and simply sets the values of tensors
-to 0.
+아래의 4단계는 더미 ``ProcessGroup`` 백엔드를 구현하고 파이썬 응용 프로그램 코드에서 사용하는 방법을 보여줍니다.
+이 튜토리얼은 작동하는 통신 백엔드를 개발하는 대신 확장 API를 설명하는 데 중점을 둡니다. 따라서 ``dummy`` 백엔드는 API의 일부 (``all_reduce`` 및 ``all_gather``)를 다루며 텐서의 값을 단순히 0으로 설정합니다.
 
 
 Step 1: Implement a Subclass of ``ProcessGroup``
