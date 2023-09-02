@@ -4,7 +4,7 @@ Cpp 확장을 사용하여 프로세스 그룹 백엔드 사용자 정의
 **저자**: `Feng Tian <https://github.com/ftian1>`__, `Shen Li <https://mrshenli.github.io/>`__, `Min Si <https://minsii.github.io/>`__
 
 .. note::
-   |edit| 이 튜토리얼의 소스 코드는 `github <https://github.com/pytorch/tutorials/blob/main/intermediate_source/process_group_cpp_extension_tutorial.rst>`__에서 확인하고 변경해 볼 수 있습니다..
+   |edit| 이 튜토리얼의 소스 코드는 `github <https://github.com/pytorch/tutorials/blob/main/intermediate_source/process_group_cpp_extension_tutorial.rst>`__ 에서 확인하고 변경해 볼 수 있습니다..
 
 선수과목(Prerequisites):
 
@@ -13,7 +13,7 @@ Cpp 확장을 사용하여 프로세스 그룹 백엔드 사용자 정의
 -  `PyTorch Cpp Extension <https://pytorch.org/docs/stable/cpp_extension.html>`__
 -  `Writing Distributed Applications with PyTorch <https://tutorials.pytorch.kr/intermediate/dist_tuto.html>`__
 
-이 튜토리얼은 `cpp 확장 <https://pytorch.org/docs/stable/cpp_extension.html>`__을 사용하여 사용자 정의 ProcessGroup 백엔드를 구현하고 이를 `파이토치 분산 패키지 <https://pytorch.org/docs/stable/distributed.html>`__에 연결하는 방법을 보여줍니다.
+이 튜토리얼은 `cpp 확장 <https://pytorch.org/docs/stable/cpp_extension.html>`__ 을 사용하여 사용자 정의 ProcessGroup 백엔드를 구현하고 이를 `파이토치 분산 패키지 <https://pytorch.org/docs/stable/distributed.html>`__ 에 연결하는 방법을 보여줍니다.
 이것은 하드웨어에 특화된 소프트웨어 스택이 필요한 경우나 새로운 집합 통신 알고리즘을 실험하고자 할 때 유용합니다.
 
 
@@ -23,7 +23,7 @@ Cpp 확장을 사용하여 프로세스 그룹 백엔드 사용자 정의
 파이토치 집합 통신은 
 `분산 데이터 병렬(DistributedDataParallel) <https://pytorch.org/docs/stable/generated/torch.nn.parallel.DistributedDataParallel.html>`__,
 `제로 리던던시 최적화기(ZeroRedundancyOptimizer) <https://pytorch.org/docs/stable/distributed.optim.html#torch.distributed.optim.ZeroRedundancyOptimizer>`__,
-`완전 공유 데이터 병렬(FullyShardedDataParallel) <https://github.com/pytorch/pytorch/blob/master/torch/distributed/_fsdp/fully_sharded_data_parallel.py>`__을 포함한 널리 사용되는 분산 훈련 기능을 지원합니다.
+`완전 공유 데이터 병렬(FullyShardedDataParallel) <https://github.com/pytorch/pytorch/blob/master/torch/distributed/_fsdp/fully_sharded_data_parallel.py>`__ 을 포함한 널리 사용되는 분산 훈련 기능을 지원합니다.
 동일한 집합 통신 API를 다양한 통신 백엔드에서 작동하도록 하기 위해 분산 패키지는 집합 통신 작업을 
 `ProcessGroup <https://github.com/pytorch/pytorch/blob/release/1.10/torch/csrc/distributed/c10d/ProcessGroup.hpp>`__
 클래스로 추상화합니다. 이후에는 원하는 서드파티 라이브러리를 사용하여 ``ProcessGroup``의 하위 클래스로 다양한 백엔드를 구현할 수 있습니다.
@@ -139,7 +139,7 @@ Cpp 확장을 사용하여 프로세스 그룹 백엔드 사용자 정의
 단계 2: 확장 파이썬 API 노출
 ----------------------------------------
 
-백엔드 생성자는 `파이썬 측 <https://github.com/pytorch/pytorch/blob/v1.9.0/torch/distributed/distributed_c10d.py#L643-L650>`__에서 
+백엔드 생성자는 `파이썬 측 <https://github.com/pytorch/pytorch/blob/v1.9.0/torch/distributed/distributed_c10d.py#L643-L650>`__ 에서 
 호출되므로 확장 기능도 파이썬에 생성자 API를 노출해야 합니다.
 다음 메서드를 추가함으로써 이 작업을 수행할 수 있습니다. 
 이 예제에서는 ``store``와 ``timeout``이 사용되지 않으므로 ``ProcessGroupDummy`` 인스턴스화 메서드에서 무시됩니다.
@@ -181,7 +181,7 @@ Cpp 확장을 사용하여 프로세스 그룹 백엔드 사용자 정의
 단계 3: 사용자 정의 확장 빌드
 ----------------------------------
 
-이제 확장 소스 코드 파일이 준비되었습니다. 그런 다음 `cpp 확장 <https://pytorch.org/docs/stable/cpp_extension.html>`__을 사용하여 빌드할 수 있습니다.
+이제 확장 소스 코드 파일이 준비되었습니다. 그런 다음 `cpp 확장 <https://pytorch.org/docs/stable/cpp_extension.html>`__ 을 사용하여 빌드할 수 있습니다.
 이를 위해 경로와 명령을 준비하는 ``setup.py`` 파일을 생성하고, ``python setup.py install``을 호출하여 확장을 설치합니다.
 
 확장이 서드파티 라이브러리에 의존하는 경우, cpp 확장 API에 ``libraries_dirs`` 및 ``libraries`` 지정할 수도 있습니다. 실제 예제로 `torch ucc <https://github.com/openucx/torch-ucc>`__ 프로젝트를 참조하십시오.
@@ -221,7 +221,7 @@ Cpp 확장을 사용하여 프로세스 그룹 백엔드 사용자 정의
 단계 4: 응용 프로그램에서 확장 기능 사용
 ----------------------------------------
 
-설치 후 `init_process_group <https://pytorch.org/docs/stable/distributed.html#torch.distributed.init_process_group>`__을 호출할 때 ``더미`` 백엔드를 내장된 백엔드처럼 편리하게 사용할 수 있습니다.
+설치 후 `init_process_group <https://pytorch.org/docs/stable/distributed.html#torch.distributed.init_process_group>`__ 을 호출할 때 ``더미`` 백엔드를 내장된 백엔드처럼 편리하게 사용할 수 있습니다.
 
 .. code-block:: python
 
