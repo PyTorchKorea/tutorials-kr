@@ -136,17 +136,14 @@ Cpp 확장을 사용하여 프로세스 그룹 백엔드 사용자 정의
     }
     } // namespace c10d
 
-Step 2: Expose The Extension Python APIs
+단계 2: 확장 파이썬 API 노출
 ----------------------------------------
 
-The backend constructors are called
-`from Python side <https://github.com/pytorch/pytorch/blob/v1.9.0/torch/distributed/distributed_c10d.py#L643-L650>`__,
-so the extension also needs to expose the constructor APIs to Python. This can
-be done by adding the following methods. In this example, ``store`` and
-``timeout`` are ignored by the ``ProcessGroupDummy`` instantiation method, as
-those are not used in this dummy implementation. However, real-world extensions
-should consider using the ``store`` to perform rendezvous and supporting the
-``timeout`` argument.
+백엔드 생성자는 `파이썬 측 <https://github.com/pytorch/pytorch/blob/v1.9.0/torch/distributed/distributed_c10d.py#L643-L650>`__에서 
+호출되므로 확장 기능도 파이썬에 생성자 API를 노출해야 합니다.
+다음 메서드를 추가함으로써 이 작업을 수행할 수 있습니다. 
+이 예제에서는 ``store``와 ``timeout``이 사용되지 않으므로 ``ProcessGroupDummy`` 인스턴스화 메서드에서 무시됩니다.
+그러나 실제 확장 기능은 랑데뷰를 수행하고 ``timeout`` 인수를 지원하기 위해 ``store``을 고려해야 합니다.
 
 .. code-block:: cpp
 
@@ -161,8 +158,7 @@ should consider using the ``store`` to perform rendezvous and supporting the
             py::object module = py::module::import("torch.distributed");
             py::object register_backend =
                 module.attr("Backend").attr("register_backend");
-            // torch.distributed.Backend.register_backend will add `dummy` as a
-            // new valid backend.
+            // torch.distributed.Backend.register_backend는 '더미'를 새 유효한 백엔드로 추가합니다.
             register_backend("dummy", py::cpp_function(createProcessGroupDummy));
         }
     }
