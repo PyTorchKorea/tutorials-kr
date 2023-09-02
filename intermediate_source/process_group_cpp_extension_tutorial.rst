@@ -178,22 +178,17 @@ Cpp 확장을 사용하여 프로세스 그룹 백엔드 사용자 정의
     }
 
 
-Step 3: Build The Custom Extension
+단계 3: 사용자 정의 확장 빌드
 ----------------------------------
 
-Now, the extension source code files are ready. We can then use
-`cpp extensions <https://pytorch.org/docs/stable/cpp_extension.html>`__
-to build it. To do that, create a ``setup.py`` file that prepares the paths and
-commands. Then call ``python setup.py install`` to install the extension.
+이제 확장 소스 코드 파일이 준비되었습니다. 그런 다음 `cpp 확장 <https://pytorch.org/docs/stable/cpp_extension.html>`__을 사용하여 빌드할 수 있습니다.
+이를 위해 경로와 명령을 준비하는 ``setup.py`` 파일을 생성하고, ``python setup.py install``을 호출하여 확장을 설치합니다.
 
-If the extension depends on third-party libraries, you can also specify
-``libraries_dirs`` and ``libraries`` to the cpp extension APIs. See the
-`torch ucc <https://github.com/openucx/torch-ucc>`__
-project as a real-world example.
+확장이 서드파티 라이브러리에 의존하는 경우, cpp 확장 API에 ``libraries_dirs`` 및 ``libraries`` 지정할 수도 있습니다. 실제 예제로 `torch ucc <https://github.com/openucx/torch-ucc>`__ 프로젝트를 참조하십시오.
 
 .. code-block:: python
 
-    # file name: setup.py
+    # 파일 이름: setup.py
     import os
     import sys
     import torch
