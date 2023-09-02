@@ -1,24 +1,20 @@
-Customize Process Group Backends Using Cpp Extensions
+Cpp 확장을 사용하여 프로세스 그룹 백엔드 사용자 정의
 =====================================================
 
-**Author**: `Feng Tian <https://github.com/ftian1>`__, `Shen Li <https://mrshenli.github.io/>`__, `Min Si <https://minsii.github.io/>`__
+**저자**: `Feng Tian <https://github.com/ftian1>`__, `Shen Li <https://mrshenli.github.io/>`__, `Min Si <https://minsii.github.io/>`__
 
 .. note::
-   |edit| View and edit this tutorial in `github <https://github.com/pytorch/tutorials/blob/main/intermediate_source/process_group_cpp_extension_tutorial.rst>`__.
+   |edit| 이 튜토리얼의 소스 코드는 `github <https://github.com/pytorch/tutorials/blob/main/intermediate_source/process_group_cpp_extension_tutorial.rst>`__에서 확인하고 변경해 볼 수 있습니다..
 
-Prerequisites:
+선수과목(Prerequisites):
 
 -  `PyTorch Distributed Overview <../beginner/dist_overview.html>`__
 -  `PyTorch Collective Communication Package <https://pytorch.org/docs/stable/distributed.html>`__
 -  `PyTorch Cpp Extension <https://pytorch.org/docs/stable/cpp_extension.html>`__
 -  `Writing Distributed Applications with PyTorch <https://tutorials.pytorch.kr/intermediate/dist_tuto.html>`__
 
-This tutorial demonstrates how to implement a custom ``ProcessGroup``
-backend and plug that into
-`PyTorch distributed package <https://pytorch.org/docs/stable/distributed.html>`__ using
-`cpp extensions <https://pytorch.org/docs/stable/cpp_extension.html>`__. This is helpful when you need a specialized software
-stack for your hardware, or when you would like to experiment with new
-collective communication algorithms.
+이 튜토리얼은 `cpp 확장 <https://pytorch.org/docs/stable/cpp_extension.html>`__ 을 사용하여 사용자 정의 ProcessGroup 백엔드를 구현하고 이를 `파이토치 분산 패키지 <https://pytorch.org/docs/stable/distributed.html>`__ 에 연결하는 방법을 보여줍니다.
+이것은 하드웨어에 특화된 소프트웨어 스택이 필요한 경우나 새로운 집합 통신 알고리즘을 실험하고자 할 때 유용합니다.
 
 
 Basics
