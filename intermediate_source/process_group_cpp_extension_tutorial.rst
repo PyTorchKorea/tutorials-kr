@@ -37,22 +37,17 @@ Cpp 확장을 사용하여 프로세스 그룹 백엔드 사용자 정의
 이 튜토리얼은 작동하는 통신 백엔드를 개발하는 대신 확장 API를 설명하는 데 중점을 둡니다. 따라서 ``dummy`` 백엔드는 API의 일부 (``all_reduce`` 및 ``all_gather``)를 다루며 텐서의 값을 단순히 0으로 설정합니다.
 
 
-Step 1: Implement a Subclass of ``ProcessGroup``
+단계 1: ``ProcessGroup``의 하위 클래스 구현
 ------------------------------------------------
 
-This first step is to implement a ``ProcessGroup`` subclass that overrides
-target collective communication APIs and runs the custom communication algorithm.
-The extension also needs to implement a ``Work`` subclass, which
-serves as a future of communication results and allows asynchronous execution in
-application code. If the extension uses third-party libraries, it can
-include the headers and call into the library APIs from the ``ProcessGroupDummy``
-subclass. The two code snippets below present the implementation of ``dummy.h`` and
-``dummy.cpp``. See the `dummy collectives <https://github.com/mrshenli/dummy_collectives>`__
-repository for the full implementation.
+첫 번째 단계는 대상 집합 통신 API를 재정의하고 사용자 정의 통신 알고리즘을 실행하는 ``ProcessGroup`` 하위 클래스를 구현하는 것입니다.
+확장 기능은 통신 결과의 미래 역할을 하는 ``Work`` 하위 클래스를 구현해야 하며, 이는 응용 프로그램 코드에서 비동기 실행을 허용합니다.
+확장 기능이 서드파티 라이브러리를 사용하는 경우, 해당 확장 기능은 ``ProcessGroupDummy`` 하위 클래스에서 헤더를 포함하고 라이브러리 API를 호출할 수 있습니다.
+아래의 두 코드는 ``dummy.h`` 및 ``dummy.cpp``의 구현을 보여줍니다. 전체 구현은 `더미 집합(dummy collectives) <https://github.com/mrshenli/dummy_collectives>`__ 리포지토리에서 확인하실 수 있습니다.
 
 .. code-block:: cpp
 
-    // file name: dummy.hpp
+    // 파일 이름: dummy.hpp
     #include <torch/python.h>
 
     #include <torch/csrc/distributed/c10d/ProcessGroup.hpp>
@@ -78,8 +73,8 @@ repository for the full implementation.
             std::vector<at::Tensor>& tensors,
             const AllreduceOptions& opts = AllreduceOptions()) override;
 
-        // The collective communication APIs without a custom implementation
-        // will error out if invoked by application code.
+        // 사용자 정의 구현이 없는 상태에서의 집합 통신 API는
+        // 응용 프로그램 코드에서 호출되면 오류가 발생합니다.
     };
 
     class WorkDummy : public Work {
@@ -88,12 +83,11 @@ repository for the full implementation.
           OpType opType,
           c10::intrusive_ptr<c10::ivalue::Future> future) // future of the output
           : Work(
-              -1, // rank, only used by recvAnySource, irrelevant in this demo
+              -1, // 랭크, recvAnySource에서만 사용되며 이 데모에서는 관련이 없습니다.
               opType),
           future_(std::move(future)) {}
-        // There are several additional helper functions that need to be
-        // implemented. Please refer to https://github.com/mrshenli/dummy_collectives
-        // for the full implementation.
+        // 추가적으로 구현해야 하는 여러 도우미 함수들이 있습니다. 
+        // 전체 구현에 대한 자세한 내용은 https://github.com/mrshenli/dummy_collectives 를 참조하세요.
 
       private:
         c10::intrusive_ptr<c10::ivalue::Future> future_;
@@ -103,13 +97,13 @@ repository for the full implementation.
 
 .. code-block:: cpp
 
-    // file name: dummy.cpp
+    // 파일 이름: dummy.cpp
     #include "dummy.hpp"
 
     namespace c10d {
 
-    // This is a dummy allgather that sets all output tensors to zero
-    // Modify the implementation to conduct real communication asynchronously
+    // 이것은 모든 출력 텐서를 0으로 설정하는 더미 allgather입니다. 
+    // 실제 통신을 비동기적으로 수행하도록 구현을 수정하세요.
     c10::intrusive_ptr<Work> ProcessGroupDummy::allgather(
             std::vector<std::vector<at::Tensor>>& outputTensors,
             std::vector<at::Tensor>& inputTensors,
@@ -126,8 +120,8 @@ repository for the full implementation.
         return c10::make_intrusive<WorkDummy>(OpType::ALLGATHER, std::move(future));
     }
 
-    // This is a dummy allreduce that sets all output tensors to zero
-    // Modify the implementation to conduct real communication asynchronously
+    // 이것은 모든 출력 텐서를 0으로 설정하는 더미 allgather입니다. 
+    // 실제 통신을 비동기적으로 수행하도록 구현을 수정하세요.
     c10::intrusive_ptr<Work> ProcessGroupDummy::allreduce(
             std::vector<at::Tensor>& tensors,
             const AllreduceOptions& opts) {
