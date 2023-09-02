@@ -218,20 +218,17 @@ Cpp 확장을 사용하여 프로세스 그룹 백엔드 사용자 정의
         cmdclass={'build_ext': cpp_extension.BuildExtension}
     )
 
-Step 4: Use The Extension in Application
+단계 4: 응용 프로그램에서 확장 기능 사용
 ----------------------------------------
 
-After installation, you can conveniently use the ``dummy`` backend when calling
-`init_process_group <https://pytorch.org/docs/stable/distributed.html#torch.distributed.init_process_group>`__
-as if it is an builtin backend.
+설치 후 `init_process_group <https://pytorch.org/docs/stable/distributed.html#torch.distributed.init_process_group>`__을 호출할 때 ``더미`` 백엔드를 내장된 백엔드처럼 편리하게 사용할 수 있습니다.
 
 .. code-block:: python
 
     import os
 
     import torch
-    # importing dummy_collectives makes torch.distributed recognize `dummy`
-    # as a valid backend.
+    # dummy_collectives를 import하면 torch.distributed가 `더미`를 유효한 백엔드로 인식합니다.
     import dummy_collectives
 
     import torch.distributed as dist
