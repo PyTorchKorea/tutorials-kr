@@ -87,7 +87,7 @@ print(x)
 
 
 ######################################################################
-# Tensor 를 사용한 연산
+# Tensor를 사용한 연산
 # ~~~~~~~~~~~~~~~~~~~~~~~
 #
 # tensor는 원하는 방식으로 연산할 수 있습니다.
@@ -106,7 +106,7 @@ print(z)
 # 나중에 사용할 유용한 연산 중 하나는 결합(concatenation)입니다.
 #
 
-# 기본적으로 첫 번째 축을 따라 결합됩니다 (행(row) 결합)
+# 기본적으로 첫 번째 축을 따라 결합됩니다. (행(row) 결합)
 x_1 = torch.randn(2, 5)
 y_1 = torch.randn(3, 5)
 z_1 = torch.cat([x_1, y_1])
@@ -119,7 +119,7 @@ y_2 = torch.randn(2, 5)
 z_2 = torch.cat([x_2, y_2], 1)
 print(z_2)
 
-# tensor가 호환되지 않으면 torch가 불평할겁니다. 밑의 명령어를 주석 해제하여 에러를 출력해보세요
+# tensor가 호환되지 않으면 torch가 불평할겁니다. 밑의 명령어를 주석 해제하여 에러를 출력해보세요.
 # torch.cat([x_1, x_2])
 
 ######################################################################
@@ -135,7 +135,7 @@ print(z_2)
 x = torch.randn(2, 3, 4)
 print(x)
 print(x.view(2, 12))  # 2열 12행으로 구조 바꾸기
-# 위와 같습니다.  차원 중 하나가 -1인 경우 그 크기를 유추할 수 있습니다
+# 위와 같습니다.  차원 중 하나가 -1인 경우 그 크기를 유추할 수 있습니다.
 print(x.view(2, -1))
 
 
@@ -164,11 +164,11 @@ print(x.view(2, -1))
 # 추적합니다. 한번 봅시다.
 #
 
-# Tensor factory 메소드는 ``requires_grad`` 플래그를 가지고 있습니다
+# Tensor factory 메소드는 ``requires_grad`` 플래그를 가지고 있습니다.
 x = torch.tensor([1., 2., 3], requires_grad=True)
 
 # requires_grad=True 를 사용해도 이전에 할 수 있었던 모든 연산을
-# 여전히 수행할 수 있습니다
+# 여전히 수행할 수 있습니다.
 y = torch.tensor([4., 5., 6], requires_grad=True)
 z = x + y
 print(z)
@@ -239,23 +239,23 @@ print(x.grad)
 
 x = torch.randn(2, 2)
 y = torch.randn(2, 2)
-# 사용자가 생성한 Tensor는 기본적으로 ``requires_grad=False`` 를 가집니다
+# 사용자가 생성한 Tensor는 기본적으로 ``requires_grad=False`` 를 가집니다.
 print(x.requires_grad, y.requires_grad)
 z = x + y
-# 그래서 z를 통해 역전파를 할 수 없습니다 
+# 그래서 z를 통해 역전파를 할 수 없습니다.
 print(z.grad_fn)
 
 # ``.requires_grad_( ... )`` 는 기존 텐서의 ``requires_grad``
 # 플래그를 제자리에서(in-place) 바꿉니다. 입력 플래그가 지정되지 않은 경우 기본값은 ``True`` 입니다.
 x = x.requires_grad_()
 y = y.requires_grad_()
-# z는 위에서 본 것처럼 변화도를 계산하기에 충분한 정보가 포함되어 있습니다
+# z는 위에서 본 것처럼 변화도를 계산하기에 충분한 정보가 포함되어 있습니다.
 z = x + y
 print(z.grad_fn)
-# 연산에 대한 입력이 ``requires_grad=True`` 인 경우 출력도 마찬가지입니다
+# 연산에 대한 입력이 ``requires_grad=True`` 인 경우 출력도 마찬가지입니다.
 print(z.requires_grad)
 
-# 이제 z는 x와 y에 대한 계산 기록을 가지고 있습니다
+# 이제 z는 x와 y에 대한 계산 기록을 가지고 있습니다.
 # z의 값만 가져가고, 기록에서 **분리** 할 수 있을까요?
 new_z = z.detach()
 
@@ -265,11 +265,11 @@ print(new_z.grad_fn)
 # 어떻게 그럴 수가 있을까요? ``z.detach()`` 는 ``z`` 와 동일한 저장공간을 사용하지만
 # 계산 기록은 없는 tensor를 반환합니다. 그 tensor는 자신이 어떻게 계산되었는지
 # 아무것도 알지 못합니다.
-# 본질적으로는 Tensor를 과거 기록으로부터 떼어낸 겁니다
+# 본질적으로는 tensor를 과거 기록으로부터 떼어낸 겁니다.
 
 ###############################################################
 # 또한 코드 블록을 ``with torch.no_grad():`` 로 감싸
-# ``.requires_grad=True`` 인 텐서의 기록을 추적하지 못하게끔
+# ``.requires_grad=True`` 인 tensor의 기록을 추적하지 못하게끔
 # autograd를 멈출 수 있습니다.
 print(x.requires_grad)
 print((x ** 2).requires_grad)
