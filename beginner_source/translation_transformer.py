@@ -95,8 +95,8 @@ for ln in [SRC_LANGUAGE, TGT_LANGUAGE]:
 # 이 계층은 입력 인덱스의 텐서를 입력 임베딩의 해당하는 텐서로 변환합니다.
 # 이러한 임베딩은 입력 토큰의 위치 정보(position information)를 모델에 전달하기 위해
 # 위치 인코딩(positional encoding)을 추가합니다.
-# 두번째 부분은 실제 `Transformer <https://pytorch.org/docs/stable/generated/torch.nn.Transformer.html>`__ 모델입니다.
-# 마지막으로 Transformer 모델의 출력을 선형 계층에 통과시켜 도착어의 각 토큰에 대한 정규화되지 않은
+# 두 번째 부분은 실제 `Transformer <https://pytorch.org/docs/stable/generated/torch.nn.Transformer.html>`__ 모델입니다.
+# 마지막으로 Transformer 모델의 출력을 선형 계층에 통과시켜 도착어의 각 토큰의 정규화되지 않은
 # 확률(un-normalized probability)로 제공합니다.
 #
 
@@ -188,8 +188,8 @@ class Seq2SeqTransformer(nn.Module):
 
 ######################################################################
 # 학습하는 동안, 모델이 예측할 때 정답(이후 출현하는 단어)을 보지 못하도록 하는
-# 후속 단어 마스크(subsequent word mask)가 필요합니다. 또한, 출발어와 도착어의 패딩(padding) 토큰들
-# 또한 숨겨야 합니다. 아래에 두 가지 모두를 처리할 함수를 정의해보겠습니다.
+# 후속 단어 마스크(subsequent word mask)가 필요합니다. 또한, 출발어와 도착어의
+# 패딩(padding) 토큰들도 숨겨야 합니다. 아래에 두 가지 모두를 처리할 함수를 정의해보겠습니다.
 #
 
 
