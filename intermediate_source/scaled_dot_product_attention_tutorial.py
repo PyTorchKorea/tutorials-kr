@@ -322,15 +322,13 @@ print(prof.key_averages().table(sort_by="cuda_time_total", row_limit=10))
 
 
 ######################################################################
-# Conclusion
-# ==========
+# 결론
+# ===
 #
-# In this tutorial, we have demonstrated the basic usage of
-# ``torch.nn.functional.scaled_dot_product_attention``. We have shown how
-# the ``sdp_kernel`` context manager can be used to assert a certain
-# implementation is used on GPU. As well, we built a simple
-# ``CausalSelfAttention`` module that works with ``NestedTensor`` and is torch
-# compilable. In the process we have shown how to the profiling tools can
-# be used to explore the performance characteristics of a user defined
-# module.
+# 이 튜토리얼에서, ``torch.nn.functional.scaled_dot_product_attention``의 기본적인
+# 사용법을 살펴봤습니다. ``sdp_kernel`` 컨텍스트 매니저로 GPU가 특정 구현을
+# 사용하도록 할 수 있다는 것을 보았습니다. 또한, 간단한 ``NestedTensor``에서 작동하고
+# 컴파일 가능한 ``CausalSelfAttention``모듈을 만들었습니다.
+# 이 과정에서 프로파일링 도구를 사용하여 유저가 정의한 모듈의 성능 특성을 어떻게
+# 확인할 수 있는지도 살펴봤습니다.
 #
