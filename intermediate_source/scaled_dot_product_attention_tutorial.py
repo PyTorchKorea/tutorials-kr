@@ -244,15 +244,14 @@ with sdp_kernel(**backend_map[SDPBackend.FLASH_ATTENTION]):
 
 
 ######################################################################
-# Using SDPA with ``torch.compile``
-# =================================
+# ``torch.compile``과 함께 SDPA 사용하기
+# ===================================
 #
-# With the release of PyTorch 2.0, a new feature called
-# ``torch.compile()`` has been introduced, which can provide
-# significant performance improvements over eager mode.
-# Scaled dot product attention is fully composable with ``torch.compile()``.
-# To demonstrate this, let's compile the ``CausalSelfAttention`` module using
-# ``torch.compile()`` and observe the resulting performance improvements.
+# PyTorch 2.0 릴리즈와 함께 ``torch.compile()``이라는 새로운 기능이 추가되었는데,
+# 이는 eager mode보다 상당한 성능 향상을 제공할 수 있습니다.
+# Scaled dot product attention은 ``torch.compile()``로 완전히 구성할 수 있습니다.
+# 이를 확인하기 위해 ``torch.compile()``을 통해 ``CausalSelfAttention`` 모듈을 컴파일하고
+# 결과적으로 얻어지는 성능 향상을 알아봅시다.
 #
 
 batch_size = 32
@@ -272,12 +271,11 @@ print(
 
 ######################################################################
 #
-# The exact execution time is dependent on machine, however the results for mine:
-# The non compiled module runs in  166.616 microseconds
-# The compiled module runs in  166.726 microseconds
-# That is not what we were expecting. Let's dig a little deeper.
-# PyTorch comes with an amazing built-in profiler that you can use to
-# inspect the performance characteristics of your code.
+# 정확한 실행 시간은 환경에 따라 다르지만, 다음은 저자의 결과입니다.
+# 컴파일 되지 않은 모듈은 실행에 166.616ms 가 소요되었습니다.
+# 컴파일 된 모듈은 실행에 166.726ms 가 소요되었습니다.
+# 이는 우리의 예상과는 다릅니다. 좀 더 자세히 알아봅시다.
+# PyTorch는 코드의 성능 특성을 점검할 수 있는 놀라운 내장(built-in) 프로파일러를 제공합니다.
 #
 
 from torch.profiler import profile, record_function, ProfilerActivity
@@ -298,7 +296,7 @@ with profile(activities=activities, record_shapes=False) as prof:
             compiled_model(x)
 print(prof.key_averages().table(sort_by="cuda_time_total", row_limit=10))
 
-# For even more insights, you can export the trace and use ``chrome://tracing`` to view the results
+# 더 많은 정보를 얻기 위해 추적(trace)를 내보내고 ``chrome://tracing``을 사용하여 결과를 확인해보세요.
 # ::
 #
 #    prof.export_chrome_trace("compiled_causal_attention_trace.json").
@@ -307,20 +305,19 @@ print(prof.key_averages().table(sort_by="cuda_time_total", row_limit=10))
 
 
 ######################################################################
-# The previous code snippet generates a report of the top 10 PyTorch functions
-# that consumed the most GPU execution time, for both the compiled and non-compiled module.
-# The analysis reveals that the majority of time spent on the GPU is concentrated
-# on the same set of functions for both modules.
-# The reason for this here is that ``torch.compile`` is very good at removing the
-# framework overhead associated with PyTorch. If your model is launching
-# large, efficient CUDA kernels, which in this case ``CausaulSelfAttention``
-# is, then the overhead of PyTorch can be hidden.
+# 이전 코드 조각(snippet)은 컴파일 된 모듈과 컴파일되지 않은 모듈 모두에 대해
+# 가장 많은 GPU 실행 시간을 차지한 상위 10개의 PyTorch 함수에 대한 보고서를 생성합니다.
+# 분석 결과, 두 모듈 모두 GPU에서 소요된 시간의 대부분이
+# 동일한 함수들에 집중되어 있음을 보여줍니다.
+# PyTorch가 프레임워크 오버헤드를 제거하는 데 매우 탁월한 ``torch.compile``를
+# 제공하기 때문입니다. ``CausaulSelfAttention`` 같은 경우처럼 크고, 효율적인 CUDA 커널을
+# 사용하는 모델에서 PyTorch 오버헤드는 작아질 것입니다.
 #
-# In reality, your module does not normally consist of a singular
-# ``CausalSelfAttention`` block. When experimenting with `Andrej Karpathy NanoGPT <https://github.com/karpathy/nanoGPT>`__ repository, compiling
-# the module took the time per train step from: ``6090.49ms`` to
-# ``3273.17ms``! This was done on commit: ``ae3a8d5`` of NanoGPT training on
-# the Shakespeare dataset.
+# 사실, 모듈은 보통 ``CausalSelfAttention`` 블럭 하나만으로 구성되지 않습니다.
+# `Andrej Karpathy NanoGPT <https://github.com/karpathy/nanoGPT>`__ 저장소에서 실험한 경우,
+# 모듈을 컴파일 하는 것은 학습의 각 단계별 소요 시간을 ``6090.49ms``에서 ``3273.17ms``로
+# 줄일 수 있었습니다. 이 실험은 NanoGPT 저장소의 ``ae3a8d5`` 커밋에서 Shakespeare
+# 데이터셋을 사용하여 진행되었습니다.
 #
 
 
