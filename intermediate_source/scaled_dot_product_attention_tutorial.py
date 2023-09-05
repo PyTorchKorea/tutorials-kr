@@ -52,19 +52,15 @@ F.scaled_dot_product_attention(query, key, value)
 
 
 ######################################################################
-# Explicit Dispatcher Control
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# 명시적 Dispatcher 제어
+# ~~~~~~~~~~~~~~~~~~~~
 #
-# While the function will implicitly dispatch to one of the three
-# implementations, the user can also explicitly control the dispatch via
-# the use of a context manager. This context manager allows users to
-# explicitly disable certain implementations. If a user wants to ensure
-# the function is indeed using the fastest implementation for their
-# specific inputs, the context manager can be used to sweep through
-# measuring performance.
-#
+# 이 함수는 암시적으로 세 가지 구현 중 하나를 사용합니다. 하지만 컨텍스트 매니저를
+# 사용하면 명시적으로 어떤 구현을 사용할 지 제어할 수 있습니다. 컨텍스트 매니저를 통해
+# 특정 구현을 명시적으로 비활성화 할 수 있습니다. 특정 입력에 대한 가장 빠른 구현을 찾고자
+# 한다면, 컨텍스트 매니저로 모든 구현의 성능을 측정해볼 수 있습니다.
 
-# Lets define a helpful benchmarking function:
+# 벤치마크 함수를 정의합니다
 import torch.utils.benchmark as benchmark
 def benchmark_torch_function_in_microseconds(f, *args, **kwargs):
     t0 = benchmark.Timer(
@@ -72,7 +68,7 @@ def benchmark_torch_function_in_microseconds(f, *args, **kwargs):
     )
     return t0.blocked_autorange().mean * 1e6
 
-# Lets define the hyper-parameters of our input
+# 입력의 하이퍼파라미터를 정의합니다
 batch_size = 32
 max_sequence_len = 1024
 num_heads = 32
@@ -86,7 +82,7 @@ value = torch.rand(batch_size, num_heads, max_sequence_len, embed_dimension, dev
 
 print(f"The default implementation runs in {benchmark_torch_function_in_microseconds(F.scaled_dot_product_attention, query, key, value):.3f} microseconds")
 
-# Lets explore the speed of each of the 3 implementations
+# 세 가지 구현의 속도를 측정합니다
 from torch.backends.cuda import sdp_kernel, SDPBackend
 
 # Helpful arguments mapper
