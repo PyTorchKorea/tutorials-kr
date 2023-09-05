@@ -185,10 +185,10 @@ print(model)
 # ``NestedTensor`` 및 Dense tensor 지원
 # ------------------------------------
 #
-# SDPA는 ``NestedTensor``와 Dense tensor 입력을 모두 지원합니다.
-# ``NestedTensors``는 입력이 가변 길이 시퀀스로 구성된 배치인 경우에
-# 배치 내 시퀀스의 최대 길이에 맞춰 각 시퀀스를 패딩할 필요가 없습니다. ``NestedTensors``에 대한 자세한 내용은
-# `torch.nested <https://pytorch.org/docs/stable/nested.html>`__와 `NestedTensors 튜토리얼 <https://tutorials.pytorch.kr/prototype/nestedtensor.html>`__을 참고하세요.
+# SDPA는 ``NestedTensor`` 와 Dense tensor 입력을 모두 지원합니다.
+# ``NestedTensors`` 는 입력이 가변 길이 시퀀스로 구성된 배치인 경우에
+# 배치 내 시퀀스의 최대 길이에 맞춰 각 시퀀스를 패딩할 필요가 없습니다. ``NestedTensors`` 에 대한 자세한 내용은
+# `torch.nested <https://pytorch.org/docs/stable/nested.html>`__ 와 `NestedTensors 튜토리얼 <https://tutorials.pytorch.kr/prototype/nestedtensor.html>`__ 을 참고하세요.
 #
 
 import random
@@ -232,7 +232,7 @@ def generate_rand_batch(
 random_nt, _ = generate_rand_batch(32, 512, embed_dimension, pad_percentage=0.5, dtype=dtype, device=device)
 random_dense, _ = generate_rand_batch(32, 512, embed_dimension, pad_percentage=None, dtype=dtype, device=device)
 
-# 현재 퓨즈드(fused) 구현은 ``NestedTensor``로 학습하는 것을 지원하지 않습니다.
+# 현재 퓨즈드(fused) 구현은 ``NestedTensor`` 로 학습하는 것을 지원하지 않습니다.
 model.eval()
 
 with sdp_kernel(**backend_map[SDPBackend.FLASH_ATTENTION]):
@@ -244,13 +244,13 @@ with sdp_kernel(**backend_map[SDPBackend.FLASH_ATTENTION]):
 
 
 ######################################################################
-# ``torch.compile``과 함께 SDPA 사용하기
-# ===================================
+# ``torch.compile`` 과 함께 SDPA 사용하기
+# =====================================
 #
-# PyTorch 2.0 릴리즈와 함께 ``torch.compile()``이라는 새로운 기능이 추가되었는데,
+# PyTorch 2.0 릴리즈와 함께 ``torch.compile()`` 라는 새로운 기능이 추가되었는데,
 # 이는 eager mode보다 상당한 성능 향상을 제공할 수 있습니다.
-# Scaled dot product attention은 ``torch.compile()``로 완전히 구성할 수 있습니다.
-# 이를 확인하기 위해 ``torch.compile()``을 통해 ``CausalSelfAttention`` 모듈을 컴파일하고
+# Scaled dot product attention은 ``torch.compile()`` 로 완전히 구성할 수 있습니다.
+# 이를 확인하기 위해 ``torch.compile()`` 을 통해 ``CausalSelfAttention`` 모듈을 컴파일하고
 # 결과적으로 얻어지는 성능 향상을 알아봅시다.
 #
 
@@ -309,13 +309,13 @@ print(prof.key_averages().table(sort_by="cuda_time_total", row_limit=10))
 # 가장 많은 GPU 실행 시간을 차지한 상위 10개의 PyTorch 함수에 대한 보고서를 생성합니다.
 # 분석 결과, 두 모듈 모두 GPU에서 소요된 시간의 대부분이
 # 동일한 함수들에 집중되어 있음을 보여줍니다.
-# PyTorch가 프레임워크 오버헤드를 제거하는 데 매우 탁월한 ``torch.compile``를
+# PyTorch가 프레임워크 오버헤드를 제거하는 데 매우 탁월한 ``torch.compile`` 를
 # 제공하기 때문입니다. ``CausaulSelfAttention`` 같은 경우처럼 크고, 효율적인 CUDA 커널을
 # 사용하는 모델에서 PyTorch 오버헤드는 작아질 것입니다.
 #
 # 사실, 모듈은 보통 ``CausalSelfAttention`` 블럭 하나만으로 구성되지 않습니다.
 # `Andrej Karpathy NanoGPT <https://github.com/karpathy/nanoGPT>`__ 저장소에서 실험한 경우,
-# 모듈을 컴파일 하는 것은 학습의 각 단계별 소요 시간을 ``6090.49ms``에서 ``3273.17ms``로
+# 모듈을 컴파일 하는 것은 학습의 각 단계별 소요 시간을 ``6090.49ms`` 에서 ``3273.17ms`` 로
 # 줄일 수 있었습니다. 이 실험은 NanoGPT 저장소의 ``ae3a8d5`` 커밋에서 Shakespeare
 # 데이터셋을 사용하여 진행되었습니다.
 #
@@ -323,12 +323,12 @@ print(prof.key_averages().table(sort_by="cuda_time_total", row_limit=10))
 
 ######################################################################
 # 결론
-# ===
+# ====
 #
-# 이 튜토리얼에서, ``torch.nn.functional.scaled_dot_product_attention``의 기본적인
+# 이 튜토리얼에서, ``torch.nn.functional.scaled_dot_product_attention`` 의 기본적인
 # 사용법을 살펴봤습니다. ``sdp_kernel`` 컨텍스트 매니저로 GPU가 특정 구현을
-# 사용하도록 할 수 있다는 것을 보았습니다. 또한, 간단한 ``NestedTensor``에서 작동하고
-# 컴파일 가능한 ``CausalSelfAttention``모듈을 만들었습니다.
+# 사용하도록 할 수 있다는 것을 보았습니다. 또한, 간단한 ``NestedTensor`` 에서 작동하고
+# 컴파일 가능한 ``CausalSelfAttention`` 모듈을 만들었습니다.
 # 이 과정에서 프로파일링 도구를 사용하여 유저가 정의한 모듈의 성능 특성을 어떻게
 # 확인할 수 있는지도 살펴봤습니다.
 #
