@@ -125,9 +125,8 @@ with sdp_kernel(**backend_map[SDPBackend.EFFICIENT_ATTENTION]):
 # Causal Self Attention
 # ~~~~~~~~~~~~~~~~~~~~~
 #
-# Below is an example implementation of a multi-headed causal self
-# attention block inspired by
-# `Andrej Karpathy NanoGPT <https://github.com/karpathy/nanoGPT>`__ repository.
+# 아래는 multi-head causal self attention 블록의 구현 예시입니다.
+# `Andrej Karpathy NanoGPT <https://github.com/karpathy/nanoGPT>`__ 저장소를 참고했습니다.
 #
 
 class CausalSelfAttention(nn.Module):
@@ -183,12 +182,13 @@ print(model)
 
 
 #####################################################################
-# ``NestedTensor`` and Dense tensor support
-# -----------------------------------------
+# ``NestedTensor`` 및 Dense tensor 지원
+# ------------------------------------
 #
-# SDPA supports both ``NestedTensor`` and Dense tensor inputs. ``NestedTensors`` handle the case where the input is a batch of variable length sequences
-# without needing to pad each sequence to the maximum length in the batch. For more information about ``NestedTensors`` see
-# `torch.nested <https://pytorch.org/docs/stable/nested.html>`__ and `NestedTensors Tutorial <https://tutorials.pytorch.kr/prototype/nestedtensor.html>`__.
+# SDPA는 ``NestedTensor``와 Dense tensor 입력을 모두 지원합니다.
+# ``NestedTensors``는 입력이 가변 길이 시퀀스로 구성된 배치인 경우에
+# 배치 내 시퀀스의 최대 길이에 맞춰 각 시퀀스를 패딩할 필요가 없습니다. ``NestedTensors``에 대한 자세한 내용은
+# `torch.nested <https://pytorch.org/docs/stable/nested.html>`__와 `NestedTensors 튜토리얼 <https://tutorials.pytorch.kr/prototype/nestedtensor.html>`__을 참고하세요.
 #
 
 import random
@@ -232,7 +232,7 @@ def generate_rand_batch(
 random_nt, _ = generate_rand_batch(32, 512, embed_dimension, pad_percentage=0.5, dtype=dtype, device=device)
 random_dense, _ = generate_rand_batch(32, 512, embed_dimension, pad_percentage=None, dtype=dtype, device=device)
 
-# Currently the fused implementations don't support ``NestedTensor`` for training
+# 현재 퓨즈드(fused) 구현은 ``NestedTensor``로 학습하는 것을 지원하지 않습니다.
 model.eval()
 
 with sdp_kernel(**backend_map[SDPBackend.FLASH_ATTENTION]):
