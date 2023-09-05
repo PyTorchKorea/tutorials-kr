@@ -1,29 +1,29 @@
 """
-(Beta) Implementing High-Performance Transformers with Scaled Dot Product Attention (SDPA)
-==========================================================================================
+(Beta) Scaled Dot Product Attention (SDPA)로 고성능 트랜스포머(Transformers) 구현하기
+=================================================================================
 
 
 **Author:** `Driss Guessous <https://github.com/drisspg>`_
+**번역** : `이강희 <https://github.com/khleexv>`_
 """
 
 ######################################################################
-# Summary
-# ~~~~~~~~
+# 요약
+# ~~~~
 #
-# In this tutorial, we want to highlight a new ``torch.nn.functional`` function
-# that can be helpful for implementing transformer architectures. The
-# function is named ``torch.nn.functional.scaled_dot_product_attention``.
-# For detailed description of the function, see the `PyTorch documentation <https://pytorch.org/docs/master/generated/torch.nn.functional.scaled_dot_product_attention.html#torch.nn.functional.scaled_dot_product_attention>`__.
-# This function has already been incorporated into ``torch.nn.MultiheadAttention`` and ``torch.nn.TransformerEncoderLayer``.
+# 이 튜토리얼에서, 트랜스포머(Transformer) 아키텍처 구현에 도움이 되는 새로운
+# ``torch.nn.functional`` 모듈의 함수를 소개합니다. 이 함수의 이름은 ``torch.nn.functional.scaled_dot_product_attention``
+# 입니다. 함수에 대한 자세한 설명은 `PyTorch 문서 <https://pytorch.org/docs/master/generated/torch.nn.functional.scaled_dot_product_attention.html#torch.nn.functional.scaled_dot_product_attention>`__
+# 를 참고하세요. 이 함수는 이미 ``torch.nn.MultiheadAttention`` 과 ``torch.nn.TransformerEncoderLayer``
+# 에서 사용되고 있습니다.
 #
-# Overview
-# ~~~~~~~~~
-# At a high level, this PyTorch function calculates the
-# scaled dot product attention (SDPA) between query, key, and value according to
-# the definition found in the paper `Attention is all you
-# need <https://arxiv.org/abs/1706.03762>`__. While this function can
-# be written in PyTorch using existing functions, a fused implementation can provide
-# large performance benefits over a naive implementation.
+# 개요
+# ~~~~
+# 높은 수준에서 이 PyTorch 함수는 쿼리(query), 키(key), 값(value) 사이의
+# scaled dot product attention (SDPA)을 계산합니다.
+# 이 함수의 정의는 `Attention is all you need <https://arxiv.org/abs/1706.03762>`__
+# 논문에서 찾을 수 있습니다. 이 함수는 기존 함수를 사용하여 PyTorch로 작성할 수 있지만,
+# 퓨즈드(fused) 구현은 단순한 구현보다 큰 성능 이점을 제공할 수 있습니다.
 #
 # Fused implementations
 # ~~~~~~~~~~~~~~~~~~~~~~
