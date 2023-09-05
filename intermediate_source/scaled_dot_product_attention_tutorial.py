@@ -25,11 +25,12 @@
 # 논문에서 찾을 수 있습니다. 이 함수는 기존 함수를 사용하여 PyTorch로 작성할 수 있지만,
 # 퓨즈드(fused) 구현은 단순한 구현보다 큰 성능 이점을 제공할 수 있습니다.
 #
-# Fused implementations
+# 퓨즈드(Fused) 구현
 # ~~~~~~~~~~~~~~~~~~~~~~
 #
-# For CUDA tensor inputs, the function will dispatch into one of the following
-# implementations:
+# 이 함수는 CUDA 텐서 입력을 다음 중 하나의 구현을 사용합니다.
+#
+# 구현:
 #
 # * `FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness <https://arxiv.org/abs/2205.14135>`__
 # * `Memory-Efficient Attention <https://github.com/facebookresearch/xformers>`__
@@ -37,7 +38,7 @@
 #
 # .. note::
 #
-#   This tutorial requires PyTorch 2.0.0 or later.
+#   이 튜토리얼은 PyTorch 버전 2.0.0 이상이 필요합니다.
 #
 
 import torch
@@ -45,7 +46,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
-# Example Usage:
+# 사용 예시:
 query, key, value = torch.randn(2, 3, 8, device=device), torch.randn(2, 3, 8, device=device), torch.randn(2, 3, 8, device=device)
 F.scaled_dot_product_attention(query, key, value)
 
