@@ -111,15 +111,14 @@ with sdp_kernel(**backend_map[SDPBackend.EFFICIENT_ATTENTION]):
 
 
 ######################################################################
-# Hardware dependence
-# ~~~~~~~~~~~~~~~~~~~
+# 하드웨어 의존성
+# ~~~~~~~~~~~~~
 #
-# Depending on what machine you ran the above cell on and what hardware is
-# available, your results might be different.
-# - If you don’t have a GPU and are running on CPU then the context manager
-# will have no effect and all three runs should return similar timings.
-# - Depending on what compute capability your graphics card supports
-# flash attention or memory efficient might have failed.
+# 위 셀을 어떤 머신에서 실행했는지와 사용 가능한 하드웨어에 따라 결과가 다를 수 있습니다.
+# - GPU가 없고 CPU에서 실행 중이라면 컨텍스트 매니저는 효과가 없고 세 가지 실행 모두
+# 유사한 시간을 반환할 것입니다.
+# - 그래픽 카드가 지원하는 컴퓨팅 능력에 따라 flash attention 또는
+# memory efficient 구현이 동작하지 않을 수 있습니다.
 
 
 ######################################################################
