@@ -1,36 +1,33 @@
 # -*- coding: utf-8 -*-
 """
-TorchMultimodal Tutorial: Finetuning FLAVA
+TorchMultimodal 튜토리얼: FLAVA 미세조정
 ============================================
 """
 
 ######################################################################
-# Multimodal AI has recently become very popular owing to its ubiquitous
-# nature, from use cases like image captioning and visual search to more
-# recent applications like image generation from text. **TorchMultimodal
-# is a library powered by Pytorch consisting of building blocks and end to
-# end examples, aiming to enable and accelerate research in
-# multimodality**.
-# 
-# In this tutorial, we will demonstrate how to use a **pretrained SoTA
-# model called** `FLAVA <https://arxiv.org/pdf/2112.04482.pdf>`__ **from
-# TorchMultimodal library to finetune on a multimodal task i.e. visual
-# question answering** (VQA). The model consists of two unimodal transformer
-# based encoders for text and image and a multimodal encoder to combine
-# the two embeddings. It is pretrained using contrastive, image text matching and 
-# text, image and multimodal masking losses.
+# 멀티 모달 AI는 최근에 이미지 캡셔닝, 시각적 검색부터 텍스트로부터 이미지를 생성같은
+# 최근의 응용까지 그 사용이 빠르게 확산되고 있습니다. **TorchMultimodal은 PyTorch를
+# 기반으로 하는 라이브러리로, 다중 모달 연구를 가능하게 하고 가속화하기 위한 빌딩 블록과
+# end-to-end 예제들을 제공합니다**.
+#
+# 본 튜토리얼에서는 **사전 훈련된 SoTA 모델인** `FLAVA <https://arxiv.org/pdf/2112.04482.pdf>`__ **를 
+# TorchMultimodal 라이브러리에서 사용하여 멀티 모달 작업인 시각적 질의 응답**(VQA)에 미세조정하는 방법을 보여 드리겠습니다.
+# 이 모델은 텍스트와 이미지를 위한 두 개의 단일 모달 트랜스포머 기반 인코더와
+# 두 임베딩을 결합하는 다중 모달 인코더로 구성되어 있습니다.
+# 이 모델은 대조적, 이미지-텍스트 매칭, 그리고 텍스트, 이미지 및 다중 모달 마스킹 손실을 사용하여 사전 훈련되었습니다.
+
 
 
 ######################################################################
-# Installation
+# 설치
 # -----------------
-# We will use TextVQA dataset and ``bert tokenizer`` from Hugging Face for this
-# tutorial. So you need to install datasets and transformers in addition to TorchMultimodal.
+# 이 튜토리얼을 위해서는 TextVQA 데이터셋과 Hugging Face의 ``bert 토크나이저``를 사용할 것입니다.
+# 따라서 TorchMultimodal 외에도 datasets과 transformers를 설치해야 합니다.
 #
 # .. note::
-#
-#    When running this tutorial in Google Colab, install the required packages by
-#    creating a new cell and running the following commands:
+#    
+#    이 튜토리얼을 Google Colab에서 실행할 경우, 새로운 셀을 만들고 다음의 명령어를 실행하여
+#    필요한 패키지를 설치하세요:
 #
 #    .. code-block::
 #
@@ -40,10 +37,10 @@ TorchMultimodal Tutorial: Finetuning FLAVA
 #
 
 ######################################################################
-# Steps
+# 단계
 # -----
 #
-# 1. Download the Hugging Face dataset to a directory on your computer by running the following command:
+# 1. 다음 명령어를 실행하여 Hugging Face 데이터셋을 컴퓨터의 디렉토리에 다운로드하세요:
 #
 #    .. code-block::
 #
@@ -51,21 +48,16 @@ TorchMultimodal Tutorial: Finetuning FLAVA
 #       tar xf vocab.tar.gz
 #
 #    .. note:: 
-#       If you are running this tutorial in Google Colab, run these commands
-#       in a new cell and prepend these commands with an exclamation mark (!)
+#       이 튜토리얼을 Google Colab에서 실행하는 경우, 새 셀에서 이 명령어를 실행하고 명령어 앞에 느낌표 (!)를 붙이세요.
 #
 #
-# 2. For this tutorial, we treat VQA as a classification task where
-#    the inputs are images and question (text) and the output is an answer class. 
-#    So we need to download the vocab file with answer classes and create the answer to
-#    label mapping.
+# 2. 본 튜토리얼에서는 VQA를 이미지와 질문(텍스트)이 입력되고 출력이 답변 클래스인 분류 작업으로 취급합니다.
+#    따라서 답변 클래스와 레이블 매핑을 생성할 단어장 파일을 다운로드해야 합니다.
 #
-#    We also load the `textvqa
-#    dataset <https://arxiv.org/pdf/1904.08920.pdf>`__ containing 34602 training samples
-#    (images,questions and answers) from Hugging Face
+#    또한 Hugging Face에서 `textvqa 데이터셋 <https://arxiv.org/pdf/1904.08920.pdf>`__을 불러오는데, 
+#    이 데이터셋은 34602개의 훈련 샘플(이미지, 질문, 답변)을 포함하고 있습니다.
 #
-# We see there are 3997 answer classes including a class representing
-# unknown answers.
+# 3997개의 답변 클래스가 있음을 확인할 수 있으며, 이에는 알 수 없는 답변을 나타내는 클래스도 포함되어 있습니다.
 #
 
 with open("data/vocabs/answers_textvqa_more_than_1.txt") as f:
@@ -81,7 +73,7 @@ from datasets import load_dataset
 dataset = load_dataset("textvqa")
 
 ######################################################################
-# Lets display a sample entry from the dataset:
+# 데이터셋에서 샘플 엔트리를 표시해 봅시다:
 #
 
 import matplotlib.pyplot as plt
@@ -95,12 +87,10 @@ plt.show()
 
 
 ######################################################################
-# 3. Next, we write the transform function to convert the image and text into
-# Tensors consumable by our model - For images, we use the transforms from
-# torchvision to convert to Tensor and resize to uniform sizes - For text,
-# we tokenize (and pad) them using the ``BertTokenizer`` from Hugging Face -
-# For answers (i.e. labels), we take the most frequently occurring answer
-# as the label to train with:
+# 3. 다음으로, 이미지와 텍스트를 모델에서 사용할 수 있는 텐서로 변환하기 위한 변환 함수를 작성합니다.
+# - 이미지의 경우, torchvision의 변환을 사용하여 텐서로 변환하고 일정한 크기로 조정합니다.
+# - 텍스트의 경우, Hugging Face의 ``BertTokenizer``를 사용하여 토큰화(및 패딩)합니다.
+# - 답변(즉, 레이블)의 경우, 가장 빈번하게 나타나는 답변을 훈련 레이블로 사용합니다:
 #
 
 import torch
@@ -133,16 +123,12 @@ dataset.set_transform(transform)
 
 
 ######################################################################
-# 4. Finally, we import the ``flava_model_for_classification`` from
-# ``torchmultimodal``. It loads the pretrained FLAVA checkpoint by default and
-# includes a classification head.
+# 4. 마지막으로, ``torchmultimodal``에서 ``flava_model_for_classification``을 가져옵니다.
+# 이것은 기본적으로 사전 훈련된 FLAVA 체크포인트를 로드하고 분류 헤드를 포함합니다.
 #
-# The model forward function passes the image through the visual encoder
-# and the question through the text encoder. The image and question
-# embeddings are then passed through the multimodal encoder. The final
-# embedding corresponding to the CLS token is passed through a MLP head
-# which finally gives the probability distribution over each possible
-# answers.
+# 모델의 순방향 함수는 이미지를 시각 인코더에 통과시키고 질문을 텍스트 인코더에 통과시킵니다.
+# 이미지와 질문의 임베딩은 그 후 멀티 모달 인코더를 통과합니다.
+# 최종 임베딩은 CLS 토큰에 해당하며, 이는 MLP 헤드를 통과하여 각 가능한 답변에 대한 확률 분포를 제공합니다.
 #
 
 from torchmultimodal.models.flava.model import flava_model_for_classification
@@ -150,8 +136,8 @@ model = flava_model_for_classification(num_classes=len(vocab))
 
 
 ######################################################################
-# 5. We put together the dataset and model in a toy training loop to
-# demonstrate how to train the model for 3 iterations:
+# 5. 데이터셋과 모델을 함께 모아 3회 반복을 위한 간단한 훈련 루프를 작성하여 
+# 모델 훈련 방법을 보여줍니다:
 #
 
 from torch import nn
@@ -177,14 +163,12 @@ for _ in range(epochs):
 
 
 ######################################################################
-# Conclusion
+# 결론
 # -------------------
 #
-# This tutorial introduced the basics around how to finetune on a
-# multimodal task using FLAVA from TorchMultimodal. Please also check out
-# other examples from the library like
-# `MDETR <https://github.com/facebookresearch/multimodal/tree/main/torchmultimodal/models/mdetr>`__
-# which is a multimodal model for object detection and
-# `Omnivore <https://github.com/facebookresearch/multimodal/blob/main/torchmultimodal/models/omnivore.py>`__
-# which is multitask model spanning image, video and 3d classification.
+# 이 튜토리얼에서는 TorchMultimodal의 FLAVA를 사용하여 멀티 모달 작업에 미세 조정하는
+# 기본적인 방식을 소개했습니다. 객체 탐지를 위한 멀티 모달 모델인 `MDETR <https://github.com/facebookresearch/multimodal/tree/main/torchmultimodal/models/mdetr>`__과
+# 이미지, 비디오, 3D 분류를 포괄하는 다작업 모델 `Omnivore <https://github.com/facebookresearch/multimodal/blob/main/torchmultimodal/models/omnivore.py>`__
+# 같은 라이브러리의 다른 예제들도 확인해 보세요.
+# 
 #
