@@ -62,8 +62,9 @@ PyTorch에 포함된 분산 패키지(예. ``torch.distributed``)는 연구자�
     if __name__ == "__main__":
         size = 2
         processes = []
+        mp.set_start_method("spawn")
         for rank in range(size):
-            p = Process(target=init_process, args=(rank, size, run))
+            p = mp.Process(target=init_process, args=(rank, size, run))
             p.start()
             processes.append(p)
 
