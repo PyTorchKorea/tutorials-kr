@@ -8,36 +8,34 @@ Finetuning Torchvision Models
 
 
 ######################################################################
-# In this tutorial we will take a deeper look at how to finetune and
-# feature extract the `torchvision
-# models <https://pytorch.org/docs/stable/torchvision/models.html>`__, all
-# of which have been pretrained on the 1000-class Imagenet dataset. This
-# tutorial will give an indepth look at how to work with several modern
-# CNN architectures, and will build an intuition for finetuning any
-# PyTorch model. Since each model architecture is different, there is no
-# boilerplate finetuning code that will work in all scenarios. Rather, the
-# researcher must look at the existing architecture and make custom
-# adjustments for each model.
+# 이 튜토리얼에서는 1000개의 클래스의 ImageNet 데이터셋에서
+# 사전 학습된 `torchvision 모델 <https://pytorch.org/docs/stable/torchvision/models.html>`__, 을 미세 조정하고
+# 특징을 추출하는 방법에 대해 자세히 살펴보겠습니다. 
+# 여러 최신 CNN 아키텍처로 작업하는 방법을 심도 있게 살펴보고,
+# PyTorch 모델을 미세 조정할 수 있는 직관력을 키울 것입니다.
+# 각 모델의 아키텍처가 다르기 때문에 모든 시나리오에서 작동하는 
+# 상용구 형식의 미세 조정 코드는 없습니다. 
+# 오히려, 연구자가 기존의 아키텍처를 살펴보고 각 모델에 맞게 커스텀 조정을 해야합니다.
+
 # 
-# In this document we will perform two types of transfer learning:
-# finetuning and feature extraction. In **finetuning**, we start with a
-# pretrained model and update *all* of the model’s parameters for our new
-# task, in essence retraining the whole model. In **feature extraction**,
-# we start with a pretrained model and only update the final layer weights
-# from which we derive predictions. It is called feature extraction
-# because we use the pretrained CNN as a fixed feature-extractor, and only
-# change the output layer. For more technical information about transfer
-# learning see `here <https://cs231n.github.io/transfer-learning/>`__ and
-# `here <https://ruder.io/transfer-learning/>`__.
-# 
-# In general both transfer learning methods follow the same few steps:
-# 
-# -  Initialize the pretrained model
-# -  Reshape the final layer(s) to have the same number of outputs as the
-#    number of classes in the new dataset
-# -  Define for the optimization algorithm which parameters we want to
-#    update during training
-# -  Run the training step
+# 이 문서에서는 두 가지 유형의 전이 학습을 수행합니다: 미세 조정과 특징 추출입니다.
+# **미세 조정** 에서는 , 사전 학습된 모델로 시작해
+# 새로운 작업을 위해 모델의 매개변수 *모두* 를 업데이트 하여 본질적으로 전체 모델을 재학습합니다.
+# **특징 추출**에서는, 사전 학습된 모델로 시작해
+# 예측을 도출하는 최종 레이어의 가중치만 업데이트합니다.
+# 사전 학습된 CNN을 고정된 특징 추출기(classifier)로 사용하고
+# 출력 레이어만 변경하기 때문에 이를 특징 추출이라고 합니다.
+# 전송(transfer)에 대한 자세한 기술 정보는 
+#  `여기 <https://cs231n.github.io/transfer-learning/>`__ 와
+# `여기 <https://ruder.io/transfer-lea를 재구성합니다.
+#
+# 일반적으로 두 전이 학습 방법 모두 몇 가지 단계를 동일하게 따릅니다:
+#
+# - 사전 훈련된 모델을 초기화합니다.
+# - 최종 레이어를 재구성하여 새 데이터 집합의 클래스 수와 동일한 수의 출력을 갖도록 합니다.
+# - 새 데이터셋의 클래스 수와 동일한 출력 수를 갖도록 최종 레이어를 재구성합니다.
+# -  훈련 중에 업데이트할 매개변수를 최적화 알고리즘에 맞게 정의합니다.
+# -  학습 단계를 실행합니다.
 # 
 
 from __future__ import print_function 
@@ -57,80 +55,78 @@ print("Torchvision Version: ",torchvision.__version__)
 
 
 ######################################################################
-# Inputs
+# 입력
 # ------
 # 
-# Here are all of the parameters to change for the run. We will use the
-# *hymenoptera_data* dataset which can be downloaded
-# `here <https://download.pytorch.org/tutorial/hymenoptera_data.zip>`__.
-# This dataset contains two classes, **bees** and **ants**, and is
-# structured such that we can use the
+# 실행을 위해 변경할 모든 매개변수는 다음과 같습니다. 
+# *hymenoptera_data* 데이터셋을 `여기 <https://download.pytorch.org/tutorial/hymenoptera_data.zip>`__ 에서 
+# 다운받아 사용하겠습니다. 이 데이터셋에는
+# **벌** 과 **개미** 라는 두 개의 클래스가 포함되어 있으며
+# 사용자 정의 데이터셋을 직접 작성하지 않고
 # `ImageFolder <https://pytorch.org/docs/stable/torchvision/datasets.html#torchvision.datasets.ImageFolder>`__
-# dataset, rather than writing our own custom dataset. Download the data
-# and set the ``data_dir`` input to the root directory of the dataset. The
-# ``model_name`` input is the name of the model you wish to use and must
-# be selected from this list:
+# 데이터셋을 사용할 수 있도록 구조화되어 있습니다. 
+# 데이터를 다운로드하고 ``data_dir`` 입력을 데이터셋의 루트(root) 디렉토리로 설정합니다.
+# ``model_name`` 입력은 사용하려는 모델의 이름이며
+# 아래의 목록에서 선택해야 합니다:
 # 
 # ::
 # 
 #    [resnet, alexnet, vgg, squeezenet, densenet, inception]
 # 
-# The other inputs are as follows: ``num_classes`` is the number of
-# classes in the dataset, ``batch_size`` is the batch size used for
-# training and may be adjusted according to the capability of your
-# machine, ``num_epochs`` is the number of training epochs we want to run,
-# and ``feature_extract`` is a boolean that defines if we are finetuning
-# or feature extracting. If ``feature_extract = False``, the model is
-# finetuned and all model parameters are updated. If
-# ``feature_extract = True``, only the last layer parameters are updated,
-# the others remain fixed.
-# 
+# 다른 입력은 다음과 같습니다: ``num_classes`` 은 데이터셋의 클래스 수,
+# ``batch_size`` 는 훈련에 사용되는 배치 크기로
+# 모델의 성능에 따라 조정할 수 있으며,
+# ``num_epochs`` 는 실행하려는 훈련 에폭 수,
+# ``feature_extract`` 는 미세 조정 또는 특징 추출 여부를 정의하는 부울(boolean)입니다.
+# ``feature_extract = False``이면 모델이 미세 조정되고
+# 모든 모델의 매개변수가 업데이트됩니다.
+# ``feature_extract = True``인 경우 마지막 레이어의 매개변수만 업데이트되고
+# 다른 매개변수는 고정된 상태로 유지됩니다.
 
-# Top level data directory. Here we assume the format of the directory conforms 
-#   to the ImageFolder structure
+# 최상위 데이터 디렉토리입니다. 여기서는 디렉토리 형식이
+# ImageFolder 구조를 따른다고 가정합니다.
 data_dir = "./data/hymenoptera_data"
 
-# Models to choose from [resnet, alexnet, vgg, squeezenet, densenet, inception]
+# [resnet, alexnet, vgg, squeezenet, densenet, inception] 이 중 모델을 선택합니다.
 model_name = "squeezenet"
 
-# Number of classes in the dataset
+# 데이터 집합의 클래스 수
 num_classes = 2
 
-# Batch size for training (change depending on how much memory you have)
+# 훈련을 위한 배치 크기 (메모리 용량에 따라 변경됩니다.)
 batch_size = 8
 
-# Number of epochs to train for 
+# 훈련할 에폭 수
 num_epochs = 15
 
-# Flag for feature extracting. When False, we finetune the whole model, 
-#   when True we only update the reshaped layer params
+# 특징 추출을 위한 플래그(flag)입니다. False일 경우, 전체 모델을 미세 조정하고
+# True일 경우 재형성된 레이어어의 매개변수만 업데이트합니다.
 feature_extract = True
 
 
 ######################################################################
-# Helper Functions
+# 도우미 함수(Helper Functions)
 # ----------------
 # 
-# Before we write the code for adjusting the models, lets define a few
-# helper functions.
+# 모델을 조정하는 코드를 작성하기 전에 
+# 몇 가지 도우미 함수(Helper Functions)를 정의해 보겠습니다.
 # 
-# Model Training and Validation Code
+# 모델 훈련 및 검증 코드
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # 
-# The ``train_model`` function handles the training and validation of a
-# given model. As input, it takes a PyTorch model, a dictionary of
-# dataloaders, a loss function, an optimizer, a specified number of epochs
-# to train and validate for, and a boolean flag for when the model is an
-# Inception model. The *is_inception* flag is used to accomodate the
-# *Inception v3* model, as that architecture uses an auxiliary output and
-# the overall model loss respects both the auxiliary output and the final
-# output, as described
-# `here <https://discuss.pytorch.org/t/how-to-optimize-inception-model-with-auxiliary-classifiers/7958>`__.
-# The function trains for the specified number of epochs and after each
-# epoch runs a full validation step. It also keeps track of the best
-# performing model (in terms of validation accuracy), and at the end of
-# training returns the best performing model. After each epoch, the
-# training and validation accuracies are printed.
+# ``train_model`` 함수는 주어진 모델의 학습과 검증을 처리합니다.
+# 이 함수는 PyTorch 모델, 데이터로더(dataloader) 딕셔너리, 손실 함수,
+# 옵티마이저, 훈련 및 검증을 위해 정해진 에폭 수, 
+# 그리고 Inception 모델일 때를 나타내는 부울 플래그(boolean flag)를 입력으로 받습니다. 
+# 이 아키텍처는 보조(auxiliary) 출력을 사용하고, 전체 모델 손실은
+# `여기 <https://discuss.pytorch.org/t/how-to-optimize-inception-model-with-auxiliary-classifiers/7958>`__. 에 설명된 대로
+# 보조(auxiliary) 출력과 최종 출력을 모두 존중하므로
+# *is_inception* 플래그(flag)는 *Inception v3* 모델을 수용하는 데 사용됩니다.
+# 이 함수는 지정된 에폭 수 동안 학습하고
+# 각 에폭이 끝난 후 전체 검증 단계를 실행합니다.
+# 또한, 검증 정확도 측면에서 가장 성능이 좋은 모델을 추적하고 
+# 학습이 끝나면 해당 모델을 반환합니다.
+# 각 에폭이 끝나면 훈련 및 검증 정확도를 볼 수 있습니다.
 # 
 
 def train_model(model, dataloaders, criterion, optimizer, num_epochs=25, is_inception=False):
@@ -145,33 +141,33 @@ def train_model(model, dataloaders, criterion, optimizer, num_epochs=25, is_ince
         print('Epoch {}/{}'.format(epoch, num_epochs - 1))
         print('-' * 10)
 
-        # Each epoch has a training and validation phase
+        # 각 에폭은 학습 단계와 검증 단계를 갖습니다.
         for phase in ['train', 'val']:
             if phase == 'train':
-                model.train()  # Set model to training mode
+                model.train()  # 학습 모드로 모델 설정
             else:
-                model.eval()   # Set model to evaluate mode
+                model.eval()   # 평가 모드로 모델 설정
 
             running_loss = 0.0
             running_corrects = 0
 
-            # Iterate over data.
+            # 데이터를 반복
             for inputs, labels in dataloaders[phase]:
                 inputs = inputs.to(device)
                 labels = labels.to(device)
 
-                # zero the parameter gradients
+                # 매개변수 경사도를 0으로 설정
                 optimizer.zero_grad()
 
-                # forward
-                # track history if only in train
+                # 순방향
+                # 훈련 하는 동안만 기록을 추적합니다.
                 with torch.set_grad_enabled(phase == 'train'):
-                    # Get model outputs and calculate loss
-                    # Special case for inception because in training it has an auxiliary output. In train
-                    #   mode we calculate the loss by summing the final output and the auxiliary output
-                    #   but in testing we only consider the final output.
+                    # 모델의 출력을 가져오고 손실을 계산합니다.
+                    # 학습 시 보조(auxiliary) 출력이 있는 inception의 특별한 경우입니다.
+                    #   학습 모드에서는 최종 출력과 보조(auxiliary) 출력을 합산해 손실을 계산하지만
+                    #   테스트에서는 최종 출력만 고려합니다.
                     if is_inception and phase == 'train':
-                        # From https://discuss.pytorch.org/t/how-to-optimize-inception-model-with-auxiliary-classifiers/7958
+                        # https://discuss.pytorch.org/t/how-to-optimize-inception-model-with-auxiliary-classifiers/7958 에서
                         outputs, aux_outputs = model(inputs)
                         loss1 = criterion(outputs, labels)
                         loss2 = criterion(aux_outputs, labels)
@@ -182,12 +178,12 @@ def train_model(model, dataloaders, criterion, optimizer, num_epochs=25, is_ince
 
                     _, preds = torch.max(outputs, 1)
 
-                    # backward + optimize only if in training phase
+                    # 학습 단계인 경우 역전파 + 최적화
                     if phase == 'train':
                         loss.backward()
                         optimizer.step()
 
-                # statistics
+                # 통계
                 running_loss += loss.item() * inputs.size(0)
                 running_corrects += torch.sum(preds == labels.data)
 
@@ -196,7 +192,7 @@ def train_model(model, dataloaders, criterion, optimizer, num_epochs=25, is_ince
 
             print('{} Loss: {:.4f} Acc: {:.4f}'.format(phase, epoch_loss, epoch_acc))
 
-            # deep copy the model
+            # 모델을 깊은 복사(deep copy)함
             if phase == 'val' and epoch_acc > best_acc:
                 best_acc = epoch_acc
                 best_model_wts = copy.deepcopy(model.state_dict())
@@ -215,17 +211,17 @@ def train_model(model, dataloaders, criterion, optimizer, num_epochs=25, is_ince
 
 
 ######################################################################
-# Set Model Parameters’ .requires_grad attribute
+# 모델 매개변수의 .requires_grad 속성 설
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # 
-# This helper function sets the ``.requires_grad`` attribute of the
-# parameters in the model to False when we are feature extracting. By
-# default, when we load a pretrained model all of the parameters have
-# ``.requires_grad=True``, which is fine if we are training from scratch
-# or finetuning. However, if we are feature extracting and only want to
-# compute gradients for the newly initialized layer then we want all of
-# the other parameters to not require gradients. This will make more sense
-# later.
+# 이 도우미 함수(Helper Functions)는 특징 추출 시 
+# 모델에 있는 매개변수의 ``.requires_grad`` 속성을 False로 설정합니다.
+# 기본적으로, 사전 학습된 모델을 로드할 때 모든 매개변수가
+# ``.requires_grad=True``로 설정되어 있으므로
+# 처음부터 학습하거나 미세 조정하는 경우라면 괜찮습니다.
+# 그러나 특징 추출 중이고 새로 초기화된 레이어에 대한 경사도만 계산하려는 경우
+# 다른 모든 매개변수에는 경사도가 필요하지 않아야 합니다.
+# 이것은 나중에 더 이해를 할 수 있을 것입니다.
 # 
 
 def set_parameter_requires_grad(model, feature_extracting):
@@ -235,53 +231,52 @@ def set_parameter_requires_grad(model, feature_extracting):
 
 
 ######################################################################
-# Initialize and Reshape the Networks
+# 네트워크 초기화 및 재구성하기
 # -----------------------------------
 # 
-# Now to the most interesting part. Here is where we handle the reshaping
-# of each network. Note, this is not an automatic procedure and is unique
-# to each model. Recall, the final layer of a CNN model, which is often
-# times an FC layer, has the same number of nodes as the number of output
-# classes in the dataset. Since all of the models have been pretrained on
-# Imagenet, they all have output layers of size 1000, one node for each
-# class. The goal here is to reshape the last layer to have the same
-# number of inputs as before, AND to have the same number of outputs as
-# the number of classes in the dataset. In the following sections we will
-# discuss how to alter the architecture of each model individually. But
-# first, there is one important detail regarding the difference between
-# finetuning and feature-extraction.
+# 이제 가장 흥미로운 부분입니다. 
+# 여기서는 각 네트워크의 재구성을 처리합니다.
+# 이 절차는 자동(automatic) 절차가 아니며 각 모델마다 고유합니다.
+# CNN 모델의 최종 레이어(FC layer라고도 불림)는
+# 데이터셋의 출력 클래스 수와 동일한 수의 노드를 가지고 있습니다.
+# 모든 모델은 이미 ImageNet에서 사전 학습 되었기 때문에
+# 각 클래스당 하나의 노드씩 1000 크기의 출력 레이어를 가지고 있습니다.
+# 여기서의 목표는 이전과 동일한 수의 입력을 갖고,
+# 데이터셋의 클래스 수와 동일한 수의 출력을 갖도록 마지막 레이어를 재구성하는 것입니다. 
+# 다음 섹션에서는 각 모델의 아키텍처를
+# 개별적으로 변경하는 방법에 대해 설명하겠습니다.
+# 하지만 먼저, 미세 조정과 특징 추출의 차이점에 대한
+# 한 가지 중요한 세부 사항이 있습니다.
 # 
-# When feature extracting, we only want to update the parameters of the
-# last layer, or in other words, we only want to update the parameters for
-# the layer(s) we are reshaping. Therefore, we do not need to compute the
-# gradients of the parameters that we are not changing, so for efficiency
-# we set the .requires_grad attribute to False. This is important because
-# by default, this attribute is set to True. Then, when we initialize the
-# new layer and by default the new parameters have ``.requires_grad=True``
-# so only the new layer’s parameters will be updated. When we are
-# finetuning we can leave all of the .required_grad’s set to the default
-# of True.
+# 특징 추출 시 마지막 레이어의 매개변수만 업데이트 하고 싶을 때
+# 다시 말해, 재구성하는 레이어의 매개변수만 업데이트를 하고 싶은 경우가 있습니다.
+# 이런 경우에는 변경하지 않는 매개변수의 경사도를 계산할 필요가 없으므로
+# 효율성을 위해 .requires_grad 속성을 False로 설정합니다.
+# 기본적으로 이 속성은 True로 설정되어 있기 때문에 이 설정은 중요합니다.
+# 그런 다음 새 레이어를 초기화할 때 기본적으로 새 매개변수에는 ``.requires_grad=True``가 있으므로
+# 새 레이어의 매개변수만 업데이트됩니다.
+# 미세 조정할 때는 모든 .requires_grad를 기본값인 True로 설정할 수 있습니다.
 # 
-# Finally, notice that inception_v3 requires the input size to be
-# (299,299), whereas all of the other models expect (224,224).
+# 마지막으로, inception_v3는 입력 크기를 (299,299)로 요구하지만,
+# 다른 모든 모델은 (224,224)를 기대한다는 점을 기억하세요.
 # 
 # Resnet
 # ~~~~~~
 # 
-# Resnet was introduced in the paper `Deep Residual Learning for Image
-# Recognition <https://arxiv.org/abs/1512.03385>`__. There are several
-# variants of different sizes, including Resnet18, Resnet34, Resnet50,
-# Resnet101, and Resnet152, all of which are available from torchvision
-# models. Here we use Resnet18, as our dataset is small and only has two
-# classes. When we print the model, we see that the last layer is a fully
-# connected layer as shown below:
+# Resnet은 'Deep Residual Learning for Image Recognition
+# <https://arxiv.org/abs/1512.03385>`__. 논문에서 소개되었습니다.
+# Resnet18, Resnet34, Resnet50, Resnet101, and Resnet152 등 다양한 크기의 여러 가지 변형이 있으며
+# 모두 torchvision 모델에서 사용할 수 있습니다.
+# 여기서는 데이터셋이 작고 클래스가 두 개 뿐인 Resnet18을 사용합니다.
+# 모델을 출력하면 아래 그림과 같이 
+# 마지막 레이어가 완전히 연결된 레이어임을 알 수 있습니다:
 # 
 # ::
 # 
 #    (fc): Linear(in_features=512, out_features=1000, bias=True) 
 # 
-# Thus, we must reinitialize ``model.fc`` to be a Linear layer with 512
-# input features and 2 output features with:
+# 입력 특징이 512개, 출력 특징이 2개인 선형 레이어가 되도록 
+# ``model.fc``를 다시 초기화해야 합니다:
 # 
 # ::
 # 
@@ -290,12 +285,12 @@ def set_parameter_requires_grad(model, feature_extracting):
 # Alexnet
 # ~~~~~~~
 # 
-# Alexnet was introduced in the paper `ImageNet Classification with Deep
+# Alexnet은 `ImageNet Classification with Deep
 # Convolutional Neural
-# Networks <https://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks.pdf>`__
-# and was the first very successful CNN on the ImageNet dataset. When we
-# print the model architecture, we see the model output comes from the 6th
-# layer of the classifier
+# Networks <https://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks.pdf>`__ 논문에 소개된 바 있으며
+# ImageNet 데이터셋에서 최초로 매우 성공적인 CNN을 구현한 바 있습니다.
+# 모델의 아키텍처를 프린트하면 모델 출력이 
+# 분류기(classifier)의 6번 째 레이어에서 나오는 것을 볼 수 있습니다.
 # 
 # ::
 # 
@@ -304,7 +299,7 @@ def set_parameter_requires_grad(model, feature_extracting):
 #        (6): Linear(in_features=4096, out_features=1000, bias=True)
 #     ) 
 # 
-# To use the model with our dataset we reinitialize this layer as
+# 데이터셋과 함께 모델을 사용하려면 이 레이어를 다음과 같이 다시 초기화합니다.
 # 
 # ::
 # 
@@ -313,11 +308,12 @@ def set_parameter_requires_grad(model, feature_extracting):
 # VGG
 # ~~~
 # 
-# VGG was introduced in the paper `Very Deep Convolutional Networks for
-# Large-Scale Image Recognition <https://arxiv.org/pdf/1409.1556.pdf>`__.
-# Torchvision offers eight versions of VGG with various lengths and some
-# that have batch normalizations layers. Here we use VGG-11 with batch
-# normalization. The output layer is similar to Alexnet, i.e.
+# VGG는 `Very Deep Convolutional Networks for
+# Large-Scale Image Recognition <https://arxiv.org/pdf/1409.1556.pdf>`__. 논문에서 소개되었습니다.
+# Torchvision 다양한 길이와 배치 정규화 레이어가 있는
+# 8가지 버전의 VGG를 제공합니다.
+# 여기서는 배치 정규화 기능이 있는 VGG-11을 사용합니다.
+# 출력 레이어는 Alexnet과 유사합니다.
 # 
 # ::
 # 
@@ -326,7 +322,7 @@ def set_parameter_requires_grad(model, feature_extracting):
 #        (6): Linear(in_features=4096, out_features=1000, bias=True)
 #     )
 # 
-# Therefore, we use the same technique to modify the output layer
+# 따라서 동일한 기술을 사용해 출력 레이어를 수정합니다.
 # 
 # ::
 # 
@@ -335,12 +331,14 @@ def set_parameter_requires_grad(model, feature_extracting):
 # Squeezenet
 # ~~~~~~~~~~
 # 
-# The Squeeznet architecture is described in the paper `SqueezeNet:
+# Squeeznet 아키텍처는 `SqueezeNet:
 # AlexNet-level accuracy with 50x fewer parameters and <0.5MB model
-# size <https://arxiv.org/abs/1602.07360>`__ and uses a different output
-# structure than any of the other models shown here. Torchvision has two
-# versions of Squeezenet, we use version 1.0. The output comes from a 1x1
-# convolutional layer which is the 1st layer of the classifier:
+# size <https://arxiv.org/abs/1602.07360>`__ 논문에 설명되어 있고,
+# AlexNet 수준의 정확도를 제공하면서 
+# 여기에 표시된 모델들과는 다른 출력 구조를 사용합니다.
+# Torchvision에는 두 가지 버전의 Squeezenet이 있고 여기서는 1.0 버전을 사용합니다.
+# 출력은 분류기(classifier)의 첫 번째 레이어인 
+# 1x1 컨볼루션 레이어에서 나옵니다:
 # 
 # ::
 # 
@@ -351,8 +349,8 @@ def set_parameter_requires_grad(model, feature_extracting):
 #        (3): AvgPool2d(kernel_size=13, stride=1, padding=0)
 #     ) 
 # 
-# To modify the network, we reinitialize the Conv2d layer to have an
-# output feature map of depth 2 as
+# 네트워크를 수정하기 위해 Conv2d 레이어를 다시 초기화하여
+# 깊이 2의 특징 맵을 다음과 같이 출력합니다. 
 # 
 # ::
 # 
@@ -361,17 +359,19 @@ def set_parameter_requires_grad(model, feature_extracting):
 # Densenet
 # ~~~~~~~~
 # 
-# Densenet was introduced in the paper `Densely Connected Convolutional
-# Networks <https://arxiv.org/abs/1608.06993>`__. Torchvision has four
-# variants of Densenet but here we only use Densenet-121. The output layer
-# is a linear layer with 1024 input features:
+# Densenet `Densely Connected Convolutional
+# Networks <https://arxiv.org/abs/1608.06993>`__. 논문에서 소개되었습니다.
+# Torchvision에는 4가지의 변형 Densenet이 있지만
+# 여기서는 Densenet-121만 사용합니다.
+# 출력 레이는 1024개의 입력 특징을 가진 선형 레이어 입니다:
 # 
 # ::
 # 
 #    (classifier): Linear(in_features=1024, out_features=1000, bias=True) 
 # 
-# To reshape the network, we reinitialize the classifier’s linear layer as
-# 
+# 네트워크를 재구성하기 위해 분류기(classifier)의 선형 레이어를
+# 다음과 같이 다시 초기화합니다.
+#
 # ::
 # 
 #    model.classifier = nn.Linear(1024, num_classes)
@@ -379,14 +379,15 @@ def set_parameter_requires_grad(model, feature_extracting):
 # Inception v3
 # ~~~~~~~~~~~~
 # 
-# Finally, Inception v3 was first described in `Rethinking the Inception
+# 마지막으로 Inception v3은은 `Rethinking the Inception
 # Architecture for Computer
-# Vision <https://arxiv.org/pdf/1512.00567v1.pdf>`__. This network is
-# unique because it has two output layers when training. The second output
-# is known as an auxiliary output and is contained in the AuxLogits part
-# of the network. The primary output is a linear layer at the end of the
-# network. Note, when testing we only consider the primary output. The
-# auxiliary output and primary output of the loaded model are printed as:
+# Vision <https://arxiv.org/pdf/1512.00567v1.pdf>`__. 에서 처음 설명했습니다.
+# 이 네트워크는 학습 시 두 개의 출력 레이어가 있다는 점이 독특합니다.
+# 두 번째 출력은 보조(axuiliary) 출력으로 알려져 있으며
+# 네트워크의 AuxLogits 부분에 포함되어 있습니다.
+# 기본 출력은 네트워크 끝에 있는 선형 레이어이며
+# 테스트할 때는 기본 출력만 고려합니다.
+# 로드된 모델의 보조(auxiliary) 출력과 기본 출력은 다음과 같이 프린트됩니다:
 # 
 # ::
 # 
@@ -397,23 +398,23 @@ def set_parameter_requires_grad(model, feature_extracting):
 #     ...
 #    (fc): Linear(in_features=2048, out_features=1000, bias=True)
 # 
-# To finetune this model we must reshape both layers. This is accomplished
-# with the following
+# 이 모델을 미세 조정하려면 두 레이어를 
+# 다음과 같이 모두 재구성해야 합니다.
 # 
 # ::
 # 
 #    model.AuxLogits.fc = nn.Linear(768, num_classes)
 #    model.fc = nn.Linear(2048, num_classes)
 # 
-# Notice, many of the models have similar output structures, but each must
-# be handled slightly differently. Also, check out the printed model
-# architecture of the reshaped network and make sure the number of output
-# features is the same as the number of classes in the dataset.
+# 많은 모델이 비슷한 출력 구조를 가지고 있지만,
+# 각각은 약간 다르게 처리되어야 합니다.
+# 또한, 재구성된 네트워크의 출력 모델 구조를 확인하고
+# 출력 기능의 수가 데이터셋의 클래스 수와 동일한지 확인해야 합니다.
 # 
 
 def initialize_model(model_name, num_classes, feature_extract, use_pretrained=True):
-    # Initialize these variables which will be set in this if statement. Each of these
-    #   variables is model specific.
+    # 이 if 문에서 설정할 변수를 초기화 합니다.
+    # 각 변수는 모델에 따라 다릅니다.
     model_ft = None
     input_size = 0
 
@@ -468,10 +469,10 @@ def initialize_model(model_name, num_classes, feature_extract, use_pretrained=Tr
         """
         model_ft = models.inception_v3(pretrained=use_pretrained)
         set_parameter_requires_grad(model_ft, feature_extract)
-        # Handle the auxilary net
+        # 보조 네트워크(auxilary net) 처리
         num_ftrs = model_ft.AuxLogits.fc.in_features
         model_ft.AuxLogits.fc = nn.Linear(num_ftrs, num_classes)
-        # Handle the primary net
+        # 기본 네트워크(primary net) 처리
         num_ftrs = model_ft.fc.in_features
         model_ft.fc = nn.Linear(num_ftrs,num_classes)
         input_size = 299
@@ -482,25 +483,25 @@ def initialize_model(model_name, num_classes, feature_extract, use_pretrained=Tr
     
     return model_ft, input_size
 
-# Initialize the model for this run
+# 실행을 위한 모델 초기화
 model_ft, input_size = initialize_model(model_name, num_classes, feature_extract, use_pretrained=True)
 
-# Print the model we just instantiated
+# 방금 인스턴스화한 모델 프린트
 print(model_ft) 
 
 
 ######################################################################
-# Load Data
+# 데이터 로드
 # ---------
 # 
-# Now that we know what the input size must be, we can initialize the data
-# transforms, image datasets, and the dataloaders. Notice, the models were
-# pretrained with the hard-coded normalization values, as described
-# `here <https://pytorch.org/docs/master/torchvision/models.html>`__.
-# 
+# 입력 크기를 알았으니 이제 데이터 전이(transform), 이미지 데이터셋,
+# 그리고 데이터로더(dataloader)를 초기화할 수 있습니다.
+# `여기 <https://pytorch.org/docs/master/torchvision/models.html>`__. 에서 설명된 대로
+# 모델은 하드코딩(hard-coded)된 정규화 값으로 사전 학습되었습니다.
+#
 
-# Data augmentation and normalization for training
-# Just normalization for validation
+# 학습을 위한 데이터 증강 및 정규화
+# 검증을 위한 정규화만 수행
 data_transforms = {
     'train': transforms.Compose([
         transforms.RandomResizedCrop(input_size),
@@ -518,43 +519,46 @@ data_transforms = {
 
 print("Initializing Datasets and Dataloaders...")
 
-# Create training and validation datasets
+# 학습 및 검증 데이터셋 생성
 image_datasets = {x: datasets.ImageFolder(os.path.join(data_dir, x), data_transforms[x]) for x in ['train', 'val']}
-# Create training and validation dataloaders
+# 학습 및 검증 데이터로더(dataloader) 생성
 dataloaders_dict = {x: torch.utils.data.DataLoader(image_datasets[x], batch_size=batch_size, shuffle=True, num_workers=4) for x in ['train', 'val']}
 
-# Detect if we have a GPU available
+# 사용 가능한 GPU 탐지 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 
 ######################################################################
-# Create the Optimizer
+# 옵티마이저 생성
 # --------------------
 # 
-# Now that the model structure is correct, the final step for finetuning
-# and feature extracting is to create an optimizer that only updates the
-# desired parameters. Recall that after loading the pretrained model, but
-# before reshaping, if ``feature_extract=True`` we manually set all of the
-# parameter’s ``.requires_grad`` attributes to False. Then the
-# reinitialized layer’s parameters have ``.requires_grad=True`` by
-# default. So now we know that *all parameters that have
-# .requires_grad=True should be optimized.* Next, we make a list of such
-# parameters and input this list to the SGD algorithm constructor.
+# 이제 모델 구조가 정확해졌으니, 미세 조정 및 특징 추출을 위한 마지막 단계는
+# 원하는 매개변수만 업데이트하는 옵티마이저를 생성하는 것입니다.
+# 사전 학습된 모델을 로드한 후 구조를 재조정하기 전에
+# ``feature_extract=True``인 경우 매개변수의 
+# 모든 ``.requires_grad`` 속성을 일일이 False로 설정한 것을 기억하세요.
+# 그러면 재초기화된 레이어의 파라미터는
+# 기본적으로 ``.requires_grad=True``를 갖습니다.
+# 이제 *.requires_grad=True인 모든 매개변수가 
+# 최적화되어야 한다는 것을 알았습니다.* 
+# 다음으로 이러한 매개변수 목록을 만들고
+# 이 목록을 SGD 알고리즘 생성자(constructor)에 입력합니다.
 # 
-# To verify this, check out the printed parameters to learn. When
-# finetuning, this list should be long and include all of the model
-# parameters. However, when feature extracting this list should be short
-# and only include the weights and biases of the reshaped layers.
+# 이를 확인하려면 프린트된 매개변수를 확인하여 학습하세요.
+# 미세 조정할 때 이 목록은 길어야 하며 
+# 모든 모델의 매개변수를 포함해야 합니다.
+# 하지만, 특징을 추출할 때는 이 목록이 짧아야 하며
+# 재구성된 레이어의 가중치와 편향(bias)만 포함해야 합니다.
 # 
 
-# Send the model to GPU
+# GPU로 모델 전송
 model_ft = model_ft.to(device)
 
-# Gather the parameters to be optimized/updated in this run. If we are
-#  finetuning we will be updating all parameters. However, if we are 
-#  doing feature extract method, we will only update the parameters
-#  that we have just initialized, i.e. the parameters with requires_grad
-#  is True.
+# 이 실행에서 최적화/업데이트할 매개변수를 수집합니다.
+#  미세 조정을 하는 경우 모든 매개변수를 업데이트합니다.
+#  하지만, 특징 추출 방법을 사용하는 경우에는
+#  방금 초기화한 매개변수, 즉 requires_grad가 Ture인 매개변수만 업데이트합니다.
+
 params_to_update = model_ft.parameters()
 print("Params to learn:")
 if feature_extract:
@@ -568,50 +572,48 @@ else:
         if param.requires_grad == True:
             print("\t",name)
 
-# Observe that all parameters are being optimized
+# 모든 매개변수가 최적화되고 있는지 확인합니다.
 optimizer_ft = optim.SGD(params_to_update, lr=0.001, momentum=0.9)
 
 
 ######################################################################
-# Run Training and Validation Step
+# 학습 및 검증 단계 실행
 # --------------------------------
 # 
-# Finally, the last step is to setup the loss for the model, then run the
-# training and validation function for the set number of epochs. Notice,
-# depending on the number of epochs this step may take a while on a CPU.
-# Also, the default learning rate is not optimal for all of the models, so
-# to achieve maximum accuracy it would be necessary to tune for each model
-# separately.
+# 마지막 단계는 모델에 대한 손실을 설정한 다음
+# 설정된 에폭 수에 대해 학습 및 검증 함수(validation function)를 실행하는 것입니다.
+# 이 단계는 에폭 수에 따라 CPU에서는 시간이 걸릴 수 있습니다.
+# 또한, 기본 학습률은 모든 모델에 최적이 아니므로
+# 최대 정확도를 얻으려면 각 모델에 대해 개별적으로 조정해야 합니다.
 # 
 
-# Setup the loss fxn
+# 손실 함수 설정
 criterion = nn.CrossEntropyLoss()
 
-# Train and evaluate
+# 학습 및 평가
 model_ft, hist = train_model(model_ft, dataloaders_dict, criterion, optimizer_ft, num_epochs=num_epochs, is_inception=(model_name=="inception"))
 
 
 ######################################################################
-# Comparison with Model Trained from Scratch
+# 처음부터 학습된 모델과의 비교
 # ------------------------------------------
 # 
-# Just for fun, lets see how the model learns if we do not use transfer
-# learning. The performance of finetuning vs. feature extracting depends
-# largely on the dataset but in general both transfer learning methods
-# produce favorable results in terms of training time and overall accuracy
-# versus a model trained from scratch.
+# 재미로, 전이 학습을 사용하지 않을 경우
+# 모델이 어떻게 학습하는지 살펴봅시다.
+# 미세 조정과 특징 추출의 성능은 데이터셋에 따라 크게 다르지만
+# 일반적으로 두 전이 학습 방법은 처음부터 학습한 모델에 비해
+# 학습 시간 및 전반적인 정확도 측면에서 유리한 결과를 제공합니다.
 # 
 
-# Initialize the non-pretrained version of the model used for this run
+# 이 실행에 사용된 모델의 사전 학습되지 않은 버전을 초기화합니다.
 scratch_model,_ = initialize_model(model_name, num_classes, feature_extract=False, use_pretrained=False)
 scratch_model = scratch_model.to(device)
 scratch_optimizer = optim.SGD(scratch_model.parameters(), lr=0.001, momentum=0.9)
 scratch_criterion = nn.CrossEntropyLoss()
 _,scratch_hist = train_model(scratch_model, dataloaders_dict, scratch_criterion, scratch_optimizer, num_epochs=num_epochs, is_inception=(model_name=="inception"))
 
-# Plot the training curves of validation accuracy vs. number 
-#  of training epochs for the transfer learning method and
-#  the model trained from scratch
+# 전이 학습 방법과 처음부터 학습된 모델에 대한
+# 검증 정확도 vs. 학습 에폭 수에 대한 학습 곡선을 표시합니다.
 ohist = []
 shist = []
 
@@ -630,20 +632,19 @@ plt.show()
 
 
 ######################################################################
-# Final Thoughts and Where to Go Next
+# 최종 생각과 앞으로의 방향
 # -----------------------------------
 # 
-# Try running some of the other models and see how good the accuracy gets.
-# Also, notice that feature extracting takes less time because in the
-# backward pass we do not have to calculate most of the gradients. There
-# are many places to go from here. You could:
+# 다른 모델 몇 가지를 실행해보고 정확도가 얼마나 좋아지는지 확인해 보세요.
+# 또한, 역방향 패스에서는 대부분의 변화도를 계산할 필요가 없기 때문에
+# 특징 추출에 시간이 덜 걸린다는 점에 주목하세요. 
+# 여기에서 할 수 있는 것은 많으며 다음과 같이 할 수 있습니다:
 # 
-# -  Run this code with a harder dataset and see some more benefits of
-#    transfer learning
-# -  Using the methods described here, use transfer learning to update a
-#    different model, perhaps in a new domain (i.e. NLP, audio, etc.)
-# -  Once you are happy with a model, you can export it as an ONNX model,
-#    or trace it using the hybrid frontend for more speed and optimization
-#    opportunities.
-# 
+# -  더 어려운 데이터 집합으로 이 코드를 실행하고 
+#    전이 학습의 몇 가지 이점을 더 확인해 보세요.
+# -  여기에 설명된 방법을 사용하거나 전이 학습을 사용하여
+#    새로운 domain(예: NLP, 오디오 등)에서 다른 모델을 업데이트합니다.
+# -  모델이 만족하면 ONNX 모델로 내보내거나 하이브리드 프론트엔드를 사용해
+#    더 빠른 속도와 최적화 기회를 얻을 수 있습니다. 
+
 
