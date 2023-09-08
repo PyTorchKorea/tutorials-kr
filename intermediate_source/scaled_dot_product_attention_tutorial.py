@@ -310,7 +310,7 @@ print(prof.key_averages().table(sort_by="cuda_time_total", row_limit=10))
 # 분석 결과, 두 모듈 모두 GPU에서 소요된 시간의 대부분이
 # 동일한 함수들에 집중되어 있음을 보여줍니다.
 # PyTorch가 프레임워크 오버헤드를 제거하는 데 매우 탁월한 ``torch.compile`` 를
-# 제공하기 때문입니다. ``CausaulSelfAttention`` 같은 경우처럼 크고, 효율적인 CUDA 커널을
+# 제공하기 때문입니다. ``CausalSelfAttention`` 같은 경우처럼 크고, 효율적인 CUDA 커널을
 # 사용하는 모델에서 PyTorch 오버헤드는 작아질 것입니다.
 #
 # 사실, 모듈은 보통 ``CausalSelfAttention`` 블럭 하나만으로 구성되지 않습니다.
