@@ -2,7 +2,7 @@
 Finetuning Torchvision Models
 =============================
 
-**Author:** `Nathan Inkawhich <https://github.com/inkawhich>`__
+**Author:** `송채영 <https://github.com/dudtheheaven>`__
 
 """
 
