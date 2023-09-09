@@ -1,8 +1,10 @@
 """
 Finetuning Torchvision Models
+Torchvision 모델의 미세 조정(Finetuning)
+
 =============================
 
-**Author:** `송채영 <https://github.com/dudtheheaven>`__
+**번역**: `송채영 <https://github.com/dudtheheaven>`__
 
 """
 
