@@ -403,7 +403,7 @@ print(torch.ceil(a))
 print(torch.floor(a))
 print(torch.clamp(a, -0.5, 0.5))
 
-# 삼각 함수들 역 삼각 함수
+# 삼각 함수와 그 역함수들
 angles = torch.tensor([0, math.pi / 4, math.pi / 2, 3 * math.pi / 4])
 sines = torch.sin(angles)
 inverses = torch.asin(sines)
