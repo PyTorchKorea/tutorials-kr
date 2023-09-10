@@ -65,7 +65,7 @@ train_loader = torch.utils.data.DataLoader(train_set, batch_size=32, shuffle=Tru
 
 ######################################################################
 # 그런 다음 Resnet 모델, 손실 함수 및 옵티마이저 객체를 생성합니다. 
-# GPU에서 실행하기 위해 모델 및 손실을 GPU 장지로 이동합니다.
+# GPU에서 실행하기 위해 모델 및 손실을 GPU 장치로 이동합니다.
 
 device = torch.device("cuda:0")
 model = torchvision.models.resnet18(weights='IMAGENET1K_V1').cuda(device)
@@ -194,7 +194,7 @@ prof.stop()
 # 이 예제에서는 GPU 사용량이 낮습니다.
 # 이러한 측정 지표(metrics)에 대한 자세한 내용은 `다음 <https://github.com/pytorch/kineto/blob/main/tb_plugin/docs/gpu_utilization.md>`_과 같습니다.
 #
-# "단계 시간 세분화(Step Time Breakdown)"는 각 단계에서 수행된 시가느이 분포를 보여줍니다.
+# "단계 시간 세분화(Step Time Breakdown)"는 각 단계에서 수행된 시간의 분포를 보여줍니다.
 # 이 예제에서는 ``DataLoader`` 오버헤드(overhead)가 상당한 것을 볼 수 있습니다.
 #
 # 하단의 "성능 권장사항(Performance Recommendation)"은 프로파일링 데이터를 사용하여
@@ -322,7 +322,7 @@ prof.stop()
 #     tensorboard --logdir=https://torchtbprofiler.blob.core.windows.net/torchtbprofiler/demo/memory_demo_1_10
 #
 # 프로파일러는 프로파일링 중에 모든 메모리 할당/해제 이벤트와 할당자의 내부 상태를 기록합니다.
-# 메모리 보기(memory view)는 다음과 같이 세 가지 구성 요소로 구성됩니다.
+# 메모리 보기(memory view)는 다음과 같이 세 가지 요소로 구성됩니다.
 #
 # .. image:: ../../_static/img/profiler_memory_view.png
 #    :scale: 25 %
@@ -376,17 +376,17 @@ prof.stop()
 #
 # "컴퓨팅/커뮤니케이션 개요(Computation/Communication Overview)"에는 컴퓨팅/커뮤니케이션 비율과 중복 정도가 표시됩니다.
 # 이 보기에서, 사용자는 작업자 간의 로드 밸런싱 문제를 파악할 수 있습니다.
-# 예를 들어, 한 작업자의 연산 + 중첨 시간이 다른 작업자보다 훨씬 큰 경우,
+# 예를 들어, 한 작업자의 연산 + 중복 시간이 다른 작업자보다 훨씬 큰 경우,
 # 로드 밸런싱에 문제가 있거나 이 작업자가 스트래글러(straggler)일 수 있습니다.
 #
-# "동기화/통신 개요(Synchronizing/Communication Overview)"는 통신의 효율성을 보여줍니다.
+# "동기화/커뮤니케이션 개요(Synchronizing/Communication Overview)"는 통신의 효율성을 보여줍니다.
 # "데이터 교환 시간(Data Transfer Time)"은 실제 데이터를 교환하는 시간입니다.
 # "동기화 시간(Synchronizing Time)"은 다른 작업자와 대기 및 동기화하는 시간입니다.
 #
 # 한 작업자의 "동기화 시간(Synchronizing Time)"이 다른 작업자 보다 훨씬 짧다면’,
 # 이 작업자는 다른 작업자보다 더 많은 계산 작업량을 가질 수 있는 스트래글러일 수 있습니다’.
 #
-# "통신 작업 통계(Communication Operations Stats)"는 각 작업자의 모든 통신 작업에 대한 세부 통계를 요약합니다.
+# "커뮤니케이션 작업 통계(Communication Operations Stats)"는 각 작업자의 모든 통신 작업에 대한 세부 통계를 요약합니다.
 
 ######################################################################
 # 더 배우기
