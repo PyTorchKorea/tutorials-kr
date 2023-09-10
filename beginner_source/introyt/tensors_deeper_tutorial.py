@@ -20,10 +20,10 @@ Pytorch Tensor 소개
      <iframe width="560" height="315" src="https://www.youtube.com/embed/r7QDUPb2dCM" frameborder="0" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
    </div>
 
-Tensor는 Pytorch에서 중요한 추상 데이터 자료형입니다. 이 interactive
+Tensor는 PyTorch에서 중요한 추상 데이터 자료형입니다. 이 interactive
 notebook은 ``torch.Tensor`` 클래스에 대한 심층적인 소개를 제공합니다.
 
-먼저 가장 중요한 것은 Pytorch 모듈을 import 하는 것입니다. 또한 몇 가지
+먼저 가장 중요한 것은 PyTorch 모듈을 import 하는 것입니다. 또한 몇 가지
 예제에 사용할 math 모듈도 import 합니다.
 
 """
@@ -50,7 +50,7 @@ print(x)
 # -  ``torch`` 모듈에 있는 수많은 메소드 중 하나를 사용해서 tesnor를 만들었습니다.
 # -  이 tensor는 3개의 행과 4개의 열을 가진 2차원 tensor입니다.
 # -  객체가 반환한 type은 ``torch.Tensor`` 이며 이는 ``torch.FloatTensor`` 의 별칭입니다.
-#    기본적으로 Pytorch tensor는 32-bit 부동 소수점 표현 실수로 채워 집니다.
+#    기본적으로 PyTorch tensor는 32-bit 부동 소수점 표현 실수로 채워 집니다.
 #    (아래에서 더 많은 데이터 자료형을 소개합니다)
 # -  생성한 tensor를 출력하면 아마 무작위 값을 볼 수 있을 것 입니다.
 #    ``torch.empty()`` 는 tensor를 위한 메모리를 할당해 주지만 임의의 값으로 초기화하지는 않습니다
@@ -206,7 +206,7 @@ print(c)
 # 
 # tensor의 shape를 정수형 인자의 나열, 즉 이 인자를 tuple 자료형 형태로
 # 묶는다는 것을 발견할 수 있습니다. 이것은 반드시 필요한 것은 아닙니다
-# - Pytorch에서는 첫 번째 인수로 tensor shape라는 값을 의미하는 라벨이 없는 정수 인자를 여러개를 받습니다 -
+# - PyTorch에서는 첫 번째 인수로 tensor shape라는 값을 의미하는 라벨이 없는 정수 인자를 여러개를 받습니다 -
 # 하지만 선택 인수를 추가했을 때, 이 방식은 코드를 더 읽기 쉽게 만들 수 있습니다.
 # 
 # 자료형을 설정하는 다른 방법은 ``.to()`` 메소드랑 함께 사용하는 것 입니다.
@@ -227,7 +227,7 @@ print(c)
 # -  ``torch.double``
 # -  ``torch.bfloat``
 # 
-# Pytorch Tensor에서 산술 & 논리 연산
+# PyTorch Tensor에서 산술 & 논리 연산
 # ---------------------------------
 # 
 # 지금까지 tensor를 생성하는 몇 가지 방식을 알아봤습니다…
@@ -622,7 +622,7 @@ print(a)
 # GPU 환경으로 이동하기
 # -------------
 # 
-# Pytorch의 주된 장점중 하나는 CUDA가 호환되는 Nvidia GPU에서의 강력한 성능 가속화입니다.
+# PyTorch의 주된 장점중 하나는 CUDA가 호환되는 Nvidia GPU에서의 강력한 성능 가속화입니다.
 # (“CUDA” 는 *Compute Unified Device Architecture* 의 약자이며,
 # 병렬 컴퓨팅을 위한 Nvidia의 플랫폼입니다.)
 # 지금까지 모든 작업을 CPU에서 처리했습니다. 어떻게 더 빠른 하드웨어로 이동할 수 있을까요?
@@ -664,7 +664,7 @@ else:
 # 기본적으로 새로운 tensor는 CPU에 생성됩니다. 따라서 tensor를 GPU에 생성하고 싶을 때
 # ``device`` 선택 인수를 반드시 명시해줘야 합니다.
 # 새로운 tensor를 출력할 때, (만약 CPU에 존재하지 않는다면)
-# Pytorch는 어느 장치에 객체가 있는지 알려준다는 것을 확인할 수 있습니다.
+# PyTorch는 어느 장치에 객체가 있는지 알려준다는 것을 확인할 수 있습니다.
 # 
 # ``torch.cuda.device_count()`` 를 사용해서 GPU의 개수를 조회할 수 있습니다.
 # 만약 1개보다 많은 GPU를 가지고 있다면, 각 GPU를 인덱스로 지정할 수 있습니다:
@@ -847,7 +847,7 @@ print(torch.reshape(output3d, (6 * 20 * 20,)).shape)
 ###############################################################################
 # .. note::
 #      위에 있는 cell의 마지막 줄에 있는 인수 ``(6 * 20 * 20,)`` 는
-#      Pytorch는 tensor shape를 나타낼 때 **tuple** 을 기대하기 때문입니다.
+#      PyTorch는 tensor shape를 나타낼 때 **tuple** 을 기대하기 때문입니다.
 #      하지만 shape가 메소드의 첫번째 인수라면 - 연속된 정수라고 속여서 사용할 수 있습니다.
 #      여기에서는 메소드에게 이 인수가 진짜 1개 원소를 가진 튜플이라고 알려주기 위해서
 #      편의상 소괄호와 콤마를 추가해야 합니다.
@@ -875,7 +875,7 @@ print(torch.reshape(output3d, (6 * 20 * 20,)).shape)
 # 
 # 만약 NumPy의 ndarrays에 저장되어 있는 데이터를 사용하는
 # 머신 러닝 혹은 과학 분야와 관련된 코드를 가지고 있다면,
-# 같은 데이터를 Pytorch의 GPU 가속을 사용할 수 있고
+# 같은 데이터를 PyTorch의 GPU 가속을 사용할 수 있고
 # 머신 러닝 모델을 만드는데 필요한 효과적인 추상화를 제공하는
 # PyTorch tensor로 표현하고 싶을 수 있습니다.
 # ndarray와 PyTorch tensor끼리 바꾸는 것은 쉽습니다:
