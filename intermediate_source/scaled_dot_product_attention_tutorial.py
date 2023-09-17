@@ -3,8 +3,8 @@
 =================================================================================
 
 
-**Author:** `Driss Guessous <https://github.com/drisspg>`_
-**번역** : `이강희 <https://github.com/khleexv>`_
+**저자:** `Driss Guessous <https://github.com/drisspg>`_
+**번역:** `이강희 <https://github.com/khleexv>`_
 """
 
 ######################################################################
