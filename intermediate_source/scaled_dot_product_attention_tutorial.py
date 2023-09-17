@@ -25,7 +25,7 @@
 # 논문에서 찾을 수 있습니다. 이 함수는 기존 함수를 사용하여 PyTorch로 작성할 수 있지만,
 # 퓨즈드(fused) 구현은 단순한 구현보다 큰 성능 이점을 제공할 수 있습니다.
 #
-# 퓨즈드(Fused) 구현
+# 퓨즈드 구현
 # ~~~~~~~~~~~~~~~~~~~~~~
 #
 # 이 함수는 CUDA 텐서 입력을 다음 중 하나의 구현을 사용합니다.
@@ -232,7 +232,7 @@ def generate_rand_batch(
 random_nt, _ = generate_rand_batch(32, 512, embed_dimension, pad_percentage=0.5, dtype=dtype, device=device)
 random_dense, _ = generate_rand_batch(32, 512, embed_dimension, pad_percentage=None, dtype=dtype, device=device)
 
-# 현재 퓨즈드(fused) 구현은 ``NestedTensor`` 로 학습하는 것을 지원하지 않습니다.
+# 현재 퓨즈드 구현은 ``NestedTensor`` 로 학습하는 것을 지원하지 않습니다.
 model.eval()
 
 with sdp_kernel(**backend_map[SDPBackend.FLASH_ATTENTION]):
