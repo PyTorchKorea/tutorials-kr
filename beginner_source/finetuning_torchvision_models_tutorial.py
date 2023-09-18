@@ -2,7 +2,7 @@
 Torchvision 모델의 미세 조정(Finetuning)
 =============================
 
-**Author**: `송채영 <https://github.com/dudtheheaven>`__
+**번역**: `송채영 <https://github.com/dudtheheaven>`__
 
 """
 
@@ -106,7 +106,7 @@ feature_extract = True
 
 ######################################################################
 # 도우미 함수(Helper Functions)
-# ----------------
+# ----------------------------
 # 
 # 모델을 조정하는 코드를 작성하기 전에 
 # 몇 가지 도우미 함수(Helper Functions)를 정의해 보겠습니다.
@@ -205,7 +205,7 @@ def train_model(model, dataloaders, criterion, optimizer, num_epochs=25, is_ince
     print('Training complete in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
     print('Best val Acc: {:4f}'.format(best_acc))
 
-    # load best model weights
+    # 최고의 모델 가중치 불러오기
     model.load_state_dict(best_model_wts)
     return model, val_acc_history
 
@@ -216,7 +216,7 @@ def train_model(model, dataloaders, criterion, optimizer, num_epochs=25, is_ince
 # 
 # 이 도우미 함수(Helper Functions)는 특징 추출 시 
 # 모델에 있는 매개변수의 ``.requires_grad`` 속성을 False로 설정합니다.
-# 기본적으로, 사전 학습된 모델을 로드할 때 모든 매개변수가
+# 기본적으로, 사전 학습된 모델을 읽어들일 때 모든 매개변수가
 # ``.requires_grad=True``로 설정되어 있으므로
 # 처음부터 학습하거나 미세 조정하는 경우라면 괜찮습니다.
 # 그러나 특징 추출 중이고 새로 초기화된 레이어에 대한 경사도만 계산하려는 경우
@@ -387,7 +387,7 @@ def set_parameter_requires_grad(model, feature_extracting):
 # 네트워크의 AuxLogits 부분에 포함되어 있습니다.
 # 기본 출력은 네트워크 끝에 있는 선형 레이어이며
 # 테스트할 때는 기본 출력만 고려합니다.
-# 로드된 모델의 보조(auxiliary) 출력과 기본 출력은 다음과 같이 프린트됩니다:
+# 읽어들인 모델의 보조(auxiliary) 출력과 기본 출력은 다음과 같이 프린트됩니다:
 # 
 # ::
 # 
@@ -472,7 +472,7 @@ def initialize_model(model_name, num_classes, feature_extract, use_pretrained=Tr
         # 보조 네트워크(auxilary net) 처리
         num_ftrs = model_ft.AuxLogits.fc.in_features
         model_ft.AuxLogits.fc = nn.Linear(num_ftrs, num_classes)
-        # 기본 네트워크(primary net) 처리
+        # 주 네트워크(primary net) 처리
         num_ftrs = model_ft.fc.in_features
         model_ft.fc = nn.Linear(num_ftrs,num_classes)
         input_size = 299
@@ -491,7 +491,7 @@ print(model_ft)
 
 
 ######################################################################
-# 데이터 로드
+# 데이터 읽어들이기
 # ---------
 # 
 # 입력 크기를 알았으니 이제 데이터 전이(transform), 이미지 데이터셋,
@@ -534,7 +534,7 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 # 
 # 이제 모델 구조가 정확해졌으니, 미세 조정 및 특징 추출을 위한 마지막 단계는
 # 원하는 매개변수만 업데이트하는 옵티마이저를 생성하는 것입니다.
-# 사전 학습된 모델을 로드한 후 구조를 재조정하기 전에
+# 사전 학습된 모델을 읽어들인 후 구조를 재조정하기 전에
 # ``feature_extract=True``인 경우 매개변수의 
 # 모든 ``.requires_grad`` 속성을 일일이 False로 설정한 것을 기억하세요.
 # 그러면 재초기화된 레이어의 파라미터는
