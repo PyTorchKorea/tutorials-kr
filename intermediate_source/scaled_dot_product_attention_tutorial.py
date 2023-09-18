@@ -19,7 +19,7 @@
 #
 # 개요
 # ~~~~
-# 높은 수준에서 이 PyTorch 함수는 쿼리(query), 키(key), 값(value) 사이의
+# 고수준에서, 이 PyTorch 함수는 쿼리(query), 키(key), 값(value) 사이의
 # scaled dot product attention (SDPA)을 계산합니다.
 # 이 함수의 정의는 `Attention is all you need <https://arxiv.org/abs/1706.03762>`__
 # 논문에서 찾을 수 있습니다. 이 함수는 기존 함수를 사용하여 PyTorch로 작성할 수 있지만,
@@ -28,7 +28,7 @@
 # 퓨즈드 구현
 # ~~~~~~~~~~~~~~~~~~~~~~
 #
-# 이 함수는 CUDA 텐서 입력을 다음 중 하나의 구현을 사용합니다.
+# 이 함수는 CUDA tensor 입력을 다음 중 하나의 구현을 사용합니다.
 #
 # 구현:
 #
