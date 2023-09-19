@@ -1,8 +1,7 @@
 """
 PyTorch의 Shape들에 대한 추론
 =================================
-번역:
-`이영섭 <https://github.com/0seob>`_
+번역: `이영섭 <https://github.com/0seob>`_
 
 일반적으로 PyTorch로 모델을 작성할 때 특정 계층의 매개변수는 이전 계층의 출력 shape에 따라 달라집니다.
 예를 들어, ``nn.Linear`` 계층의 ``in_features`` 는 입력의 ``size(-1)`` 와 일치해야 합니다.
