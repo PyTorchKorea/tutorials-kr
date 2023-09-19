@@ -24,7 +24,7 @@ Pytorch에서의 LSTM
 ~~~~~~~~~~~~~~~~~
 
 예제를 시작하기 전에, 몇 가지 사항을 유의하세요. 
-Pytorch에서의 LSTM은 모든 입력이 3D 텐서 일 것으로 예상합니다. 
+Pytorch에서의 LSTM은 모든 입력이 3D Tensor 일 것으로 예상합니다. 
 이러한 텐서 축의 의미는 중요합니다. 
 첫 번째 축은 시퀀스 자체이고, 두 번째 축은 미니 배치의 인스턴스를 인덱싱하며, 
 세 번째 축은 입력 요소를 인덱싱합니다. 
@@ -193,11 +193,11 @@ with torch.no_grad():
 
 for epoch in range(300):  # 다시 말하지만, 일반적으로 300에폭을 수행하지는 않습니다. 이건 토이 데이터이기 때문입니다.
     for sentence, tags in training_data:
-        # 1단계, Pytorch는 변화도(gradients)를 축적한다는 것을 기억하세요. 
+        # 1단계, Pytorch는 변화도를 축적한다는 것을 기억하세요. 
         # 각 인스턴스 전에 이를 지워줘야 합니다. 
         model.zero_grad()
 
-        # 2단계, 네트워크에 맞게 인풋을 준비시킵니다. 
+        # 2단계, 네트워크에 맞게 입력을 준비시킵니다. 
         # 즉, 입력들을 단어 인덱스들의 텐서로 변환합니다. 
         sentence_in = prepare_sequence(sentence, word_to_ix)
         targets = prepare_sequence(tags, tag_to_ix)
