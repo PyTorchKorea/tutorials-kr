@@ -73,7 +73,7 @@ def fw_hook(module, input, output):
     print(f"Shape of output to {module} is {output.shape}.")
 
 
-# torch.device context manager(with 구문) 내부에서 생성된 모든 텐서는 
+# torch.device context manager(with 구문) 내부에서 생성된 모든 tensor는 
 # meta 디바이스 내부에 존재합니다.
 with torch.device("meta"):
     net = Net()
