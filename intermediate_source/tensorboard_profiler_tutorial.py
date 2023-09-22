@@ -33,7 +33,7 @@ CPU 작업을 기록할 수 있는 업데이트된 프로파일러 API가 포함
 # 1. 데이터 및 모델 준비
 # 2. 프로파일러를 사용하여 실행 이벤트(execution events) 기록
 # 3. 프로파일러 실행
-# 4. 텐서보드를 사용하여 결과 출력 및 모델 성능 분석
+# 4. 텐서보드를 사용하여 결과 확인 및 모델 성능 분석
 # 5. 프로파일러의 도움으로 성능 개선
 # 6. 다른 고급 기능으로 성능 분석
 #
@@ -93,14 +93,14 @@ def train(data):
 # 프로파일러는 컨텍스트(context) 관리자를 통해 활성화되고 몇 가지 매개 변수를 사용할 수 있으며,
 # 가장 유용한 것은 아래와 같습니다:
 #
-# - ``schedule`` - 단계 (int)를 단일 매개 변수로 받아들이고,
+# - ``schedule`` - step (int)을 단일 매개 변수로 받아들이고,
 #   각 단계에서 수행할 프로파일러 작업을 반환하는 호출 가능한 함수입니다.
 #
 #   이 예시에서는 ``wait=1, warmup=1, active=3, repeat=2``로 설정되어 있으며,
 #   프로파일러는 첫 번째 단계/반복(step/iteration)을 건너뜁니다.
 #   두 번째부터 워밍업(warming up)을 시작하면,
 #   다음 세 번의 반복을 기록하고,
-#   그 후 트레이스(trace)를 사용할 수 있게 되고 on_trace_ready (설정된 경우)가 호출됩니다.
+#   그 후 추적(trace)을 사용할 수 있게 되고 on_trace_ready (설정된 경우)가 호출됩니다.
 #   전체적으로 이 주기가 두 번 반복됩니다. 텐서보드 플러그인에서 각 주기는 "span"이라고 합니다.
 #
 #   ``wait`` 단계인 동안 프로파일러는 비활성화됩니다.
@@ -112,7 +112,7 @@ def train(data):
 #   이 예시에서는 ``torch.profiler.tensorboard_trace_handler``를 사용하여 텐서보드의 결과 파일을 생성합니다.
 #   프로파일링 후 결과 파일은 ``./log/resnet18`` 디렉토리(directory)에 저장됩니다.
 #   텐서보드에서 프로파일(profile)을 분석하려면 이 디렉토리를 ``logdir`` 매개 변수로 지정해야 합니다.
-# - ``record_shapes`` - 연산자 입력의 모양을 기록할지 여부를 나타냅니다.
+# - ``record_shapes`` - 연산자 입력의 shape을 기록할지 여부를 나타냅니다.
 # - ``profile_memory`` - 트랙 텐서 메모리(Track tensor memory) 할당/할당 해제 여부를 나타냅니다. 주의, 1.10 이전 버전의 파이토치를 사용하는 경우
 #   프로파일링 시간이 길다면 이 기능을 비활성화하거나 새 버전으로 업그레이드해 주세요.
 # - ``with_stack`` - ops에 대한 소스 정보(파일 및 라인 번호)를 기록 여부를 나타냅니다.
@@ -133,7 +133,7 @@ with torch.profiler.profile(
         prof.step()  # 각 단계의 끝에서 호출하여 프로파일러에게 단계의 경계를 알려야 합니다.
 
 ######################################################################
-# 또한, 비컨텍스트(non-context) 관리자는 시작/정지도 지원됩니다.
+# 또한, non-context 관리자는 시작/정지도 지원됩니다.
 prof = torch.profiler.profile(
         schedule=torch.profiler.schedule(wait=1, warmup=1, active=3, repeat=2),
         on_trace_ready=torch.profiler.tensorboard_trace_handler('./log/resnet18'),
@@ -174,7 +174,7 @@ prof.stop()
 #
 
 ######################################################################
-# 구글 크롬(Google Chrome) 브라우저 또는 마이크로소프트 엣지(Microsoft Edge) 브라우저에서 텐서보드 프로파일(profile) URL 열기
+# 구글 크롬(Google Chrome) 브라우저 또는 마이크로소프트 엣지(Microsoft Edge) 브라우저에서 텐서보드 프로파일(profile) URL을 접속합니다.
 #
 # ::
 #
@@ -245,13 +245,13 @@ prof.stop()
 # "SM당 평균 블럭 수(Mean Blocks per SM)"는 이 커널 이름의 모든 실행에 대한 가중 평균이고, 각 실행 기간을 가중치로 사용하였습니다.
 #
 # 평균 예상 달성 점유율(Mean Est. Achieved Occupancy):
-# 예산 달성 점유율(Est. Achieved Occupancy)은 열의 툴팁(column's tooltip)에 정의되어 있습니다.
+# 예상 달성 점유율(Est. Achieved Occupancy)은 열의 툴팁(column's tooltip)에 정의되어 있습니다.
 # 메모리 대역폭 경계 커널과 같은 대부분의 경우, 높을수록 좋습니다.
 # "평균 예상 달성 점유율(Mean Est. Achieved Occupancy)"은 커널 이름의 모든 실행에 대한 가중 평균이며,
 # 각 실행의 지속 시간을 가중치로 사용합니다.
 #
-# - 트레이스 보기(Trace view)
-# 트레이스 보기는 프로파일된 연산자와 GPU 커널의 타임라인을 보여줍니다.
+# - 추적 보기(Trace view)
+# 추적 보기는 프로파일된 연산자와 GPU 커널의 타임라인을 보여줍니다.
 # 아래와 같이 선택하여 세부 정보를 확인할 수 있습니다.
 #
 # .. image:: ../../_static/img/profiler_trace_view1.png
@@ -377,14 +377,14 @@ prof.stop()
 # "컴퓨팅/커뮤니케이션 개요(Computation/Communication Overview)"에는 컴퓨팅/커뮤니케이션 비율과 중복 정도가 표시됩니다.
 # 이 보기에서, 사용자는 작업자 간의 로드 밸런싱 문제를 파악할 수 있습니다.
 # 예를 들어, 한 작업자의 연산 + 중복 시간이 다른 작업자보다 훨씬 큰 경우,
-# 로드 밸런싱에 문제가 있거나 이 작업자가 스트래글러(straggler)일 수 있습니다.
+# 로드 밸런싱에 문제가 있거나 이 작업자가 낙오자(straggler)일 수 있습니다.
 #
 # "동기화/커뮤니케이션 개요(Synchronizing/Communication Overview)"는 통신의 효율성을 보여줍니다.
 # "데이터 교환 시간(Data Transfer Time)"은 실제 데이터를 교환하는 시간입니다.
 # "동기화 시간(Synchronizing Time)"은 다른 작업자와 대기 및 동기화하는 시간입니다.
 #
 # 한 작업자의 "동기화 시간(Synchronizing Time)"이 다른 작업자 보다 훨씬 짧다면’,
-# 이 작업자는 다른 작업자보다 더 많은 계산 작업량을 가질 수 있는 스트래글러일 수 있습니다’.
+# 이 작업자는 다른 작업자보다 더 많은 계산 작업량을 가질 수 있는 낙오자(straggler)일 수 있습니다’.
 #
 # "커뮤니케이션 작업 통계(Communication Operations Stats)"는 각 작업자의 모든 통신 작업에 대한 세부 통계를 요약합니다.
 
