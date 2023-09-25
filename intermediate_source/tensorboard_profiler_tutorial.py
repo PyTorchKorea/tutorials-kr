@@ -119,7 +119,7 @@ def train(data):
 # - ``profile_memory`` - Track tensor memory 할당/할당 해제 여부를 나타냅니다. 주의, 1.10 이전 버전의 파이토치를 사용하는 경우
 #   프로파일링 시간이 길다면 이 기능을 비활성화하거나 새 버전으로 업그레이드해 주세요.
 # - ``with_stack`` - ops에 대한 소스 정보(파일 및 라인 번호)를 기록 여부를 나타냅니다.
-#   VS Code에서 텐서보드가 실행되는 경우 (`참고 <https://code.visualstudio.com/docs/datascience/pytorch-support#_tensorboard-integration>`_),
+#   VS Code에서 텐서보드가 실행되는 경우 (`참고 <https://code.visualstudio.com/docs/datascience/pytorch-support#_tensorboard-integration>`__),
 #   스택 프레임(stack frame)을 클릭하면 특정 코드 라인으로 이동합니다.
 
 with torch.profiler.profile(
@@ -195,7 +195,7 @@ prof.stop()
 #
 # "GPU 요약(GPU Summary)" 패널에는 GPU 구성, GPU 사용량 및 Tensor 코어 사용량이 표시됩니다.
 # 이 예제에서는 GPU 사용량이 낮습니다.
-# 이러한 측정 지표(metrics)에 대한 자세한 내용은 `다음 <https://github.com/pytorch/kineto/blob/main/tb_plugin/docs/gpu_utilization.md>`_과 같습니다.
+# 이러한 측정 지표(metrics)에 대한 자세한 내용은 `여기 <https://github.com/pytorch/kineto/blob/main/tb_plugin/docs/gpu_utilization.md>`__ 에서 확인해주세요.
 #
 # "단계 시간 세분화(Step Time Breakdown)"는 각 단계에서 수행된 시간의 분포를 보여줍니다.
 # 이 예제에서는 ``DataLoader`` 오버헤드(overhead)가 상당한 것을 볼 수 있습니다.
@@ -227,7 +227,7 @@ prof.stop()
 #    :scale: 25 %
 #
 # VS Code 내부에서 텐서보드가 실행되는 경우
-# (`실행 가이드 <https://devblogs.microsoft.com/python/python-in-visual-studio-code-february-2021-release/#tensorboard-integration>`_),
+# (`실행 가이드 <https://devblogs.microsoft.com/python/python-in-visual-studio-code-february-2021-release/#tensorboard-integration>`__),
 # 호출 스택 프레임(call stack frame)을 클릭하면 특정 코드 라인으로 이동합니다.
 #
 # .. image:: ../../_static/img/profiler_vscode.png
@@ -285,7 +285,7 @@ prof.stop()
 # "개요(Overview)" 페이지 하단의 "성능 추천(Performance Recommendation)" 제안은 병목 현상이 " ``DataLoader``임을 암시합니다.
 # 파이토치 ``DataLoader``는 기본적으로 단일 프로세스를 사용합니다.
 # 사용자는 매개변수 ``num_workers``를 설정하여 다중 프로세스 데이터 로드를 활성화할 수 있습니다.
-# 자세한 내용은 `여기 <https://pytorch.org/docs/stable/data.html#single-and-multi-process-data-loading>`_에 있습니다.
+# 자세한 내용은 `여기 <https://pytorch.org/docs/stable/data.html#single-and-multi-process-data-loading>`__ 에 있습니다.
 #
 # 이 예시에서 "성능 권장사항(Performance Recommendation)"에 따라 아래와 같이 ``num_workers``를 설정하고,
 # ``./log/resnet18_4workers``와 같은 다른 이름을 ``tensorboard_trace_handler``로 전달한 후 다시 실행합니다.
@@ -396,7 +396,7 @@ prof.stop()
 # ----------
 #
 # 학습을 계속하려면 다음 문서를 참조하시고,
-# `여기 <https://github.com/pytorch/kineto/issues>`_에서 자유롭게 이슈를 열어보세요.
+# `여기 <https://github.com/pytorch/kineto/issues>`__ 에서 자유롭게 이슈를 열어보세요.
 #
-# -  `Pytorch TensorBoard Profiler github <https://github.com/pytorch/kineto/tree/master/tb_plugin>`_
-# -  `torch.profiler API <https://pytorch.org/docs/master/profiler.html>`_
+# -  `Pytorch TensorBoard Profiler github <https://github.com/pytorch/kineto/tree/master/tb_plugin>`__
+# -  `torch.profiler API <https://pytorch.org/docs/master/profiler.html>`__
