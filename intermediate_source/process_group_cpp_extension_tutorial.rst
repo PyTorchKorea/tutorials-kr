@@ -1,7 +1,8 @@
 Cpp 확장을 사용하여 프로세스 그룹 백엔드 사용자 정의
 =====================================================
 
-**저자**: `Feng Tian <https://github.com/ftian1>`__, `Shen Li <https://mrshenli.github.io/>`__, `Min Si <https://minsii.github.io/>`__
+**Author**: `Feng Tian <https://github.com/ftian1>`__, `Shen Li <https://mrshenli.github.io/>`__, `Min Si <https://minsii.github.io/>`__
+**번역**: `박재윤 <https://github.com/jenner9212>`_
 
 .. note::
    |edit| 이 튜토리얼의 소스 코드는 `github <https://github.com/pytorch/tutorials/blob/main/intermediate_source/process_group_cpp_extension_tutorial.rst>`__ 에서 확인하고 변경해 볼 수 있습니다..
@@ -28,22 +29,22 @@ Cpp 확장을 사용하여 프로세스 그룹 백엔드 사용자 정의
 `ProcessGroup <https://github.com/pytorch/pytorch/blob/release/1.10/torch/csrc/distributed/c10d/ProcessGroup.hpp>`__
 클래스로 추상화합니다. 이후에는 원하는 서드파티 라이브러리를 사용하여 ``ProcessGroup``의 하위 클래스로 다양한 백엔드를 구현할 수 있습니다.
 파이토치 분산에는 세 가지 기본 백엔드인 ``ProcessGroupNCCL``, ``ProcessGroupGloo``, 그리고 ``ProcessGroupMPI``가 포함되어 있습니다.
-그러나 그러나 이 세 가지 백엔드 외에도 다른 통신 라이브러리(예: `UCC <https://github.com/openucx/ucc>`__, `OneCCL <https://github.com/oneapi-src/oneCCL>`__), 다른 유형의 하드웨어(예: `TPU <https://cloud.google.com/tpu>`__, `Trainum <https://aws.amazon.com/machine-learning/trainium/>`__), 
+그러나 이 세 가지 백엔드 외에도 다른 통신 라이브러리(예: `UCC <https://github.com/openucx/ucc>`__, `OneCCL <https://github.com/oneapi-src/oneCCL>`__), 다른 유형의 하드웨어(예: `TPU <https://cloud.google.com/tpu>`__, `Trainum <https://aws.amazon.com/machine-learning/trainium/>`__), 
 그리고 새로운 통신 알고리즘(예: `Herring <https://www.amazon.science/publications/herring-rethinking-the-parameter-server-at-scale-for-the-cloud>`__, `Reduction Server <https://cloud.google.com/blog/topics/developers-practitioners/optimize-training-performance-reduction-server-vertex-ai>`__)도 있습니다.
 따라서 분산 패키지는 집합 통신 백엔드를 사용자 지정할 수 있도록 확장 API를 노출합니다.
 
 
 아래의 4단계는 더미 ``ProcessGroup`` 백엔드를 구현하고 파이썬 응용 프로그램 코드에서 사용하는 방법을 보여줍니다.
-이 튜토리얼은 작동하는 통신 백엔드를 개발하는 대신 확장 API를 설명하는 데 중점을 둡니다. 따라서 ``dummy`` 백엔드는 API의 일부 (``all_reduce`` 및 ``all_gather``)를 다루며 텐서의 값을 단순히 0으로 설정합니다.
+이 튜토리얼은 작동하는 통신 백엔드를 개발하는 대신 확장 API를 설명하는 데 중점을 둡니다. 따라서 ``dummy`` 백엔드는 API의 일부 (``all_reduce`` 및 ``all_gather``)를 다루며 tensor의 값을 단순히 0으로 설정합니다.
 
 
 단계 1: ``ProcessGroup``의 하위 클래스 구현
 ------------------------------------------------
 
 첫 번째 단계는 대상 집합 통신 API를 재정의하고 사용자 정의 통신 알고리즘을 실행하는 ``ProcessGroup`` 하위 클래스를 구현하는 것입니다.
-확장 기능은 통신 결과의 미래 역할을 하는 ``Work`` 하위 클래스를 구현해야 하며, 이는 응용 프로그램 코드에서 비동기 실행을 허용합니다.
+확장 기능은 통신 결과의 미래 역할을 하는 ``Work`` 하위 클래스를 구현해야 하며, 이는 응용 프로그램 코드ㄹ에서 비동기 실행을 허용합니다.
 확장 기능이 서드파티 라이브러리를 사용하는 경우, 해당 확장 기능은 ``ProcessGroupDummy`` 하위 클래스에서 헤더를 포함하고 라이브러리 API를 호출할 수 있습니다.
-아래의 두 코드는 ``dummy.h`` 및 ``dummy.cpp``의 구현을 보여줍니다. 전체 구현은 `더미 집합(dummy collectives) <https://github.com/mrshenli/dummy_collectives>`__ 리포지토리에서 확인하실 수 있습니다.
+아래의 두 코드는 ``dummy.h`` 및 ``dummy.cpp``의 구현을 보여줍니다. 전체 구현은 `더미 집합(dummy collectives) <https://github.com/mrshenli/dummy_collectives>`__ 저장소에서 확인하실 수 있습니다.
 
 .. code-block:: cpp
 
@@ -102,7 +103,7 @@ Cpp 확장을 사용하여 프로세스 그룹 백엔드 사용자 정의
 
     namespace c10d {
 
-    // 이것은 모든 출력 텐서를 0으로 설정하는 더미 allgather입니다. 
+    // 이것은 모든 출력 tensor를 0으로 설정하는 더미 allgather입니다. 
     // 실제 통신을 비동기적으로 수행하도록 구현을 수정하세요.
     c10::intrusive_ptr<Work> ProcessGroupDummy::allgather(
             std::vector<std::vector<at::Tensor>>& outputTensors,
@@ -120,7 +121,7 @@ Cpp 확장을 사용하여 프로세스 그룹 백엔드 사용자 정의
         return c10::make_intrusive<WorkDummy>(OpType::ALLGATHER, std::move(future));
     }
 
-    // 이것은 모든 출력 텐서를 0으로 설정하는 더미 allgather입니다. 
+    // 이것은 모든 출력 tensor를 0으로 설정하는 더미 allgather입니다. 
     // 실제 통신을 비동기적으로 수행하도록 구현을 수정하세요.
     c10::intrusive_ptr<Work> ProcessGroupDummy::allreduce(
             std::vector<at::Tensor>& tensors,
