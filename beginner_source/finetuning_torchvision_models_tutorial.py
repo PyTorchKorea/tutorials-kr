@@ -120,7 +120,7 @@ feature_extract = True
 # 옵티마이저, 훈련 및 검증을 위해 정해진 에폭 수, 
 # 그리고 Inception 모델일 때를 나타내는 부울 플래그(boolean flag)를 입력으로 받습니다. 
 # 이 아키텍처는 보조(auxiliary) 출력을 사용하고, 전체 모델 손실은
-# `여기 <https://discuss.pytorch.org/t/how-to-optimize-inception-model-with-auxiliary-classifiers/7958>`__. 에 설명된 대로
+# `여기 <https://discuss.pytorch.org/t/how-to-optimize-inception-model-with-auxiliary-classifiers/7958>`__ 에 설명된 대로
 # 보조(auxiliary) 출력과 최종 출력을 모두 존중하므로
 # *is_inception* 플래그(flag)는 *Inception v3* 모델을 수용하는 데 사용됩니다.
 # 이 함수는 지정된 에폭 수 동안 학습하고
@@ -265,7 +265,7 @@ def set_parameter_requires_grad(model, feature_extracting):
 # ~~~~~~
 # 
 # Resnet은 'Deep Residual Learning for Image Recognition
-# <https://arxiv.org/abs/1512.03385>`__. 논문에서 소개되었습니다.
+# <https://arxiv.org/abs/1512.03385>`__ 논문에서 소개되었습니다.
 # Resnet18, Resnet34, Resnet50, Resnet101, and Resnet152 등 다양한 크기의 여러 가지 변형이 있으며
 # 모두 torchvision 모델에서 사용할 수 있습니다.
 # 여기서는 데이터셋이 작고 클래스가 두 개 뿐인 Resnet18을 사용합니다.
@@ -361,7 +361,7 @@ def set_parameter_requires_grad(model, feature_extracting):
 # ~~~~~~~~
 # 
 # Densenet `Densely Connected Convolutional
-# Networks <https://arxiv.org/abs/1608.06993>`__. 논문에서 소개되었습니다.
+# Networks <https://arxiv.org/abs/1608.06993>`__ 논문에서 소개되었습니다.
 # Torchvision에는 4가지의 변형 Densenet이 있지만
 # 여기서는 Densenet-121만 사용합니다.
 # 출력 레이는 1024개의 입력 특징을 가진 선형 레이어 입니다.
@@ -382,7 +382,7 @@ def set_parameter_requires_grad(model, feature_extracting):
 # 
 # 마지막으로 Inception v3은 `Rethinking the Inception
 # Architecture for Computer
-# Vision <https://arxiv.org/pdf/1512.00567v1.pdf>`__. 에서 처음 설명했습니다.
+# Vision <https://arxiv.org/pdf/1512.00567v1.pdf>`__ 에서 처음 설명했습니다.
 # 이 네트워크는 학습 시 두 개의 출력 레이어가 있다는 점이 독특합니다.
 # 두 번째 출력은 보조(axuiliary) 출력으로 알려져 있으며
 # 네트워크의 AuxLogits 부분에 포함되어 있습니다.
@@ -497,7 +497,7 @@ print(model_ft)
 # 
 # 입력 크기를 알았으니 이제 데이터 전이(transform), 이미지 데이터셋,
 # 그리고 데이터로더(dataloader)를 초기화할 수 있습니다.
-# `여기 <https://pytorch.org/docs/master/torchvision/models.html>`__. 에서 설명된 대로
+# `여기 <https://pytorch.org/docs/master/torchvision/models.html>`__ 에서 설명된 대로
 # 모델은 하드코딩(hard-coded)된 정규화 값으로 사전 학습되었습니다.
 #
 
