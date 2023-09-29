@@ -30,7 +30,7 @@ Torchvision 모델의 미세 조정(Finetuning)
 #  `여기 <https://cs231n.github.io/transfer-learning/>`__ 와
 # `여기 <https://ruder.io/transfer-learning/>`__를 재구성합니다.
 #
-# 일반적으로 두 전이 학습 방법 모두 몇 가지 단계를 동일하게 따릅니다:
+# 일반적으로 두 전이 학습 방법 모두 몇 가지 단계를 동일하게 따릅니다.
 #
 # - 사전 훈련된 모델을 초기화합니다.
 # - 최종 레이어를 재구성하여 새 데이터 집합의 클래스 수와 동일한 수의 출력을 갖도록 합니다.
@@ -68,13 +68,13 @@ print("Torchvision Version: ",torchvision.__version__)
 # 데이터셋을 사용할 수 있도록 구조화되어 있습니다. 
 # 데이터를 다운로드하고 ``data_dir`` 입력을 데이터셋의 루트(root) 디렉토리로 설정합니다.
 # ``model_name`` 입력은 사용하려는 모델의 이름이며
-# 아래의 목록에서 선택해야 합니다:
+# 아래의 목록에서 선택해야 합니다.
 # 
 # ::
 # 
 #    [resnet, alexnet, vgg, squeezenet, densenet, inception]
 # 
-# 다른 입력은 다음과 같습니다: ``num_classes`` 은 데이터셋의 클래스 수,
+# 다른 입력은 다음과 같습니다. ``num_classes`` 은 데이터셋의 클래스 수,
 # ``batch_size`` 는 훈련에 사용되는 배치 크기로
 # 모델의 성능에 따라 조정할 수 있으며,
 # ``num_epochs`` 는 실행하려는 훈련 에폭 수,
@@ -237,7 +237,7 @@ def set_parameter_requires_grad(model, feature_extracting):
 # 
 # 이제 가장 흥미로운 부분입니다. 
 # 여기서는 각 네트워크의 재구성을 처리합니다.
-# 이 절차는 자동(automatic) 절차가 아니며 각 모델마다 고유합니다.
+# 이 절차는 자동 절차가 아니며 각 모델마다 고유합니다.
 # CNN 모델의 최종 레이어(FC layer라고도 불림)는
 # 데이터셋의 출력 클래스 수와 동일한 수의 노드를 가지고 있습니다.
 # 모든 모델은 이미 ImageNet에서 사전 학습 되었기 때문에
@@ -270,14 +270,14 @@ def set_parameter_requires_grad(model, feature_extracting):
 # 모두 torchvision 모델에서 사용할 수 있습니다.
 # 여기서는 데이터셋이 작고 클래스가 두 개 뿐인 Resnet18을 사용합니다.
 # 모델을 출력하면 아래 그림과 같이 
-# 마지막 레이어가 완전히 연결된 레이어임을 알 수 있습니다:
+# 마지막 레이어가 완전히 연결된 레이어임을 알 수 있습니다.
 # 
 # ::
 # 
 #    (fc): Linear(in_features=512, out_features=1000, bias=True) 
 # 
 # 입력 특징이 512개, 출력 특징이 2개인 선형 레이어가 되도록 
-# ``model.fc``를 다시 초기화해야 합니다:
+# ``model.fc``를 다시 초기화해야 합니다.
 # 
 # ::
 # 
@@ -310,7 +310,7 @@ def set_parameter_requires_grad(model, feature_extracting):
 # ~~~
 # 
 # VGG는 `Very Deep Convolutional Networks for
-# Large-Scale Image Recognition <https://arxiv.org/pdf/1409.1556.pdf>`__. 논문에서 소개되었습니다.
+# Large-Scale Image Recognition <https://arxiv.org/pdf/1409.1556.pdf>`__ 논문에서 소개되었습니다.
 # Torchvision 다양한 길이와 배치 정규화 레이어가 있는
 # 8가지 버전의 VGG를 제공합니다.
 # 여기서는 배치 정규화 기능이 있는 VGG-11을 사용합니다.
@@ -339,7 +339,7 @@ def set_parameter_requires_grad(model, feature_extracting):
 # 여기에 표시된 모델들과는 다른 출력 구조를 사용합니다.
 # Torchvision에는 두 가지 버전의 Squeezenet이 있고 여기서는 1.0 버전을 사용합니다.
 # 출력은 분류기(classifier)의 첫 번째 레이어인 
-# 1x1 컨볼루션 레이어에서 나옵니다:
+# 1x1 합성곱 레이어에서 나옵니다.
 # 
 # ::
 # 
@@ -364,7 +364,7 @@ def set_parameter_requires_grad(model, feature_extracting):
 # Networks <https://arxiv.org/abs/1608.06993>`__. 논문에서 소개되었습니다.
 # Torchvision에는 4가지의 변형 Densenet이 있지만
 # 여기서는 Densenet-121만 사용합니다.
-# 출력 레이는 1024개의 입력 특징을 가진 선형 레이어 입니다:
+# 출력 레이는 1024개의 입력 특징을 가진 선형 레이어 입니다.
 # 
 # ::
 # 
@@ -388,7 +388,7 @@ def set_parameter_requires_grad(model, feature_extracting):
 # 네트워크의 AuxLogits 부분에 포함되어 있습니다.
 # 기본 출력은 네트워크 끝에 있는 선형 레이어이며
 # 테스트할 때는 기본 출력만 고려합니다.
-# 읽어 들인 모델의 보조(auxiliary) 출력과 기본 출력은 다음과 같이 프린트됩니다:
+# 읽어 들인 모델의 보조(auxiliary) 출력과 기본 출력은 다음과 같이 프린트됩니다.
 # 
 # ::
 # 
@@ -639,7 +639,7 @@ plt.show()
 # 다른 모델 몇 가지를 실행해보고 정확도가 얼마나 좋아지는지 확인해 보세요.
 # 또한, 역방향 패스에서는 대부분의 변화도를 계산할 필요가 없기 때문에
 # 특징 추출에 시간이 덜 걸린다는 점에 주목하세요. 
-# 여기에서 할 수 있는 것은 많으며 다음과 같이 할 수 있습니다:
+# 여기에서 할 수 있는 것은 많으며 다음과 같이 할 수 있습니다.
 # 
 # -  더 어려운 데이터 집합으로 이 코드를 실행하고 
 #    전이 학습의 몇 가지 이점을 더 확인해 보세요.
