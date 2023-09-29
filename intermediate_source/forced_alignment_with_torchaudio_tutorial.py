@@ -2,8 +2,8 @@
 wav2vec2을 이용한 강제 정렬
 ==============================
 
-**Author**: `Moto Hira <moto@meta.com>`__
-**번역**: `김규진 <http://github.com/kimgyujin/>`_
+**Author**: `Moto Hira <moto@meta.com>`_
+ **번역**: `김규진 <http://github.com/kimgyujin/>`_
 
 이번 튜토리얼에서는 `CTC-Segmentation of Large Corpora for German End-to-end Speech Recognition <https://arxiv.org/abs/2007.09127>`__ 에서 
 설명한 CTC 분할 알고리즘을 이용하여 torchaudio를 가지고 정답 스크립트를 음성에 맞추는 방법에 대해 설명합니다.
