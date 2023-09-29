@@ -35,8 +35,8 @@ Torchvision 모델의 미세 조정(Finetuning)
 # - 사전 훈련된 모델을 초기화합니다.
 # - 최종 레이어를 재구성하여 새 데이터 집합의 클래스 수와 동일한 수의 출력을 갖도록 합니다.
 # - 새 데이터셋의 클래스 수와 동일한 출력 수를 갖도록 최종 레이어를 재구성합니다.
-# -  훈련 중에 업데이트할 매개변수를 최적화 알고리즘에 맞게 정의합니다.
-# -  학습 단계를 실행합니다.
+# - 훈련 중에 업데이트할 매개변수를 최적화 알고리즘에 맞게 정의합니다.
+# - 학습 단계를 실행합니다.
 # 
 
 from __future__ import print_function 
@@ -380,7 +380,7 @@ def set_parameter_requires_grad(model, feature_extracting):
 # Inception v3
 # ~~~~~~~~~~~~
 # 
-# 마지막으로 Inception v3은은 `Rethinking the Inception
+# 마지막으로 Inception v3은 `Rethinking the Inception
 # Architecture for Computer
 # Vision <https://arxiv.org/pdf/1512.00567v1.pdf>`__. 에서 처음 설명했습니다.
 # 이 네트워크는 학습 시 두 개의 출력 레이어가 있다는 점이 독특합니다.
