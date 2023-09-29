@@ -212,7 +212,7 @@ def train_model(model, dataloaders, criterion, optimizer, num_epochs=25, is_ince
 
 
 ######################################################################
-# 모델 매개변수의 .requires_grad 속성 설
+# 모델 매개변수의 .requires_grad 속성 설정
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # 
 # 이 도우미 함수(Helper Functions)는 특징 추출 시 
