@@ -4,7 +4,8 @@ wav2vec2을 이용한 강제 정렬
 
 **Author**: `Moto Hira <moto@meta.com>`__
 
-이번 튜토리얼에서는 `CTC-Segmentation of Large Corpora for German End-to-end Speech Recognition <https://arxiv.org/abs/2007.09127>`__ 에서 설명한 CTC 분할 알고리즘을 이용하여 torchaudio를 가지고 정답 스크립트를 음성에 맞추는 방법에 대해 설명합니다.
+이번 튜토리얼에서는 `CTC-Segmentation of Large Corpora for German End-to-end Speech Recognition <https://arxiv.org/abs/2007.09127>`__ 에서 
+설명한 CTC 분할 알고리즘을 이용하여 torchaudio를 가지고 정답 스크립트를 음성에 맞추는 방법에 대해 설명합니다.
 
 .. note::
    이 튜토리얼은 원래 Wav2Vec2의 사용 사례를 설명하기 위해 작성되었습니다.
@@ -15,7 +16,7 @@ wav2vec2을 이용한 강제 정렬
 
    만약 본인만의 코퍼스에 대해 강제 정렬하려는 경우, :py:class:`torchaudio.pipelines.Wav2Vec2FABundle` 를 사용하는 것을 추천합니다.
    이는 강제 정렬을 위해 특별히 훈련된 사전 훈련 모델과 함께 :py:func:`~torchaudio.functional.forced_align` 및 여러 함수를 결합하여 사용할 수 있게 합니다. 
-   사용법에 대한 자세한 내용은 다국적 데이터를 위한 강제 정렬을 설명하는 `Forced alignment for multilingual data <forced_alignment_for_multilingual_data_tutorial.html>`__ 를 참조하세요.
+   사용법에 대한 자세한 내용은 다국어 데이터를 위한 강제 정렬을 설명하는 `Forced alignment for multilingual data <forced_alignment_for_multilingual_data_tutorial.html>`__ 를 참조하세요.
 
 """
 
@@ -36,7 +37,7 @@ print(device)
 #
 # 정렬 과정은 다음과 같습니다.
 #
-# 1. 오디오로부터 프레임별 라벨 확률을 추정한다.
+# 1. 오디오 파형으로부터 프레임별 라벨 확률을 추정한다.
 # 2. 각 시간 별로 정렬된 라벨의 확률을 나타내는 trellis 행렬을 생성한다.
 # 3. trellis 행렬로부터 가장 가능성이 높은 경로를 찾는다.
 #
