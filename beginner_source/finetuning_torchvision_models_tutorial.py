@@ -290,8 +290,8 @@ def set_parameter_requires_grad(model, feature_extracting):
 # Convolutional Neural
 # Networks <https://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks.pdf>`__ 논문에 소개된 바 있으며
 # ImageNet 데이터셋에서 최초로 매우 성공적인 CNN을 구현한 바 있습니다.
-# 모델의 아키텍처를 프린트하면 모델 출력이 
-# 분류기(classifier)의 6번 째 레이어에서 나오는 것을 볼 수 있습니다.
+# 모델의 아키텍처를 출력하면 모델 출력이 
+# 분류기(classifier)의 6번째 레이어에서 나오는 것을 볼 수 있습니다.
 # 
 # ::
 # 
@@ -388,7 +388,7 @@ def set_parameter_requires_grad(model, feature_extracting):
 # 네트워크의 AuxLogits 부분에 포함되어 있습니다.
 # 기본 출력은 네트워크 끝에 있는 선형 레이어이며
 # 테스트할 때는 기본 출력만 고려합니다.
-# 읽어 들인 모델의 보조(auxiliary) 출력과 기본 출력은 다음과 같이 프린트됩니다.
+# 읽어 들인 모델의 보조(auxiliary) 출력과 기본 출력은 다음과 같이 출력됩니다.
 # 
 # ::
 # 
@@ -487,13 +487,13 @@ def initialize_model(model_name, num_classes, feature_extract, use_pretrained=Tr
 # 실행을 위한 모델 초기화
 model_ft, input_size = initialize_model(model_name, num_classes, feature_extract, use_pretrained=True)
 
-# 방금 인스턴스화한 모델 프린트
+# 방금 인스턴스화한 모델 출력
 print(model_ft) 
 
 
 ######################################################################
 # 데이터 읽어 들이기
-# ---------
+# ------------------
 # 
 # 입력 크기를 알았으니 이제 데이터 전이(transform), 이미지 데이터셋,
 # 그리고 데이터로더(dataloader)를 초기화할 수 있습니다.
@@ -545,7 +545,7 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 # 다음으로 이러한 매개변수 목록을 만들고
 # 이 목록을 SGD 알고리즘 생성자(constructor)에 입력합니다.
 # 
-# 이를 확인하려면 프린트된 매개변수를 확인하여 학습하세요.
+# 이를 확인하려면 출력된 매개변수를 확인하여 학습하세요.
 # 미세 조정할 때 이 목록은 길어야 하며 
 # 모든 모델의 매개변수를 포함해야 합니다.
 # 하지만, 특징을 추출할 때는 이 목록이 짧아야 하며
