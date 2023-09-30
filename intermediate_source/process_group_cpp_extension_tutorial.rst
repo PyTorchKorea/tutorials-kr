@@ -160,7 +160,7 @@ Cpp 확장을 사용하여 프로세스 그룹 백엔드 사용자 정의
             py::object module = py::module::import("torch.distributed");
             py::object register_backend =
                 module.attr("Backend").attr("register_backend");
-            // torch.distributed.Backend.register_backend는 '더미'를 새 유효한 백엔드로 추가합니다.
+            // torch.distributed.Backend.register_backend는 '더미'를 새로운 유효한 백엔드로 추가합니다.
             register_backend("dummy", py::cpp_function(createProcessGroupDummy));
         }
     }
