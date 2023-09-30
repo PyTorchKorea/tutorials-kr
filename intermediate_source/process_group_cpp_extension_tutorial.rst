@@ -2,10 +2,11 @@ Cpp 확장을 사용하여 프로세스 그룹 백엔드 사용자 정의
 =====================================================
 
 **Author**: `Feng Tian <https://github.com/ftian1>`__, `Shen Li <https://mrshenli.github.io/>`__, `Min Si <https://minsii.github.io/>`__
+
 **번역**: `박재윤 <https://github.com/jenner9212>`_
 
 .. note::
-   |edit| 이 튜토리얼의 소스 코드는 `github <https://github.com/pytorch/tutorials/blob/main/intermediate_source/process_group_cpp_extension_tutorial.rst>`__ 에서 확인하고 변경해 볼 수 있습니다..
+   |edit| 이 튜토리얼의 소스 코드는 `github <https://github.com/pytorch/tutorials/blob/main/intermediate_source/process_group_cpp_extension_tutorial.rst>`__ 에서 확인하고 변경해 볼 수 있습니다.
 
 선수과목(Prerequisites):
 
@@ -27,8 +28,8 @@ Cpp 확장을 사용하여 프로세스 그룹 백엔드 사용자 정의
 `완전 공유 데이터 병렬(FullyShardedDataParallel) <https://github.com/pytorch/pytorch/blob/master/torch/distributed/_fsdp/fully_sharded_data_parallel.py>`__ 을 포함한 널리 사용되는 분산 훈련 기능을 지원합니다.
 동일한 집합 통신 API를 다양한 통신 백엔드에서 작동하도록 하기 위해 분산 패키지는 집합 통신 작업을 
 `ProcessGroup <https://github.com/pytorch/pytorch/blob/release/1.10/torch/csrc/distributed/c10d/ProcessGroup.hpp>`__
-클래스로 추상화합니다. 이후에는 원하는 서드파티 라이브러리를 사용하여 ``ProcessGroup``의 하위 클래스로 다양한 백엔드를 구현할 수 있습니다.
-파이토치 분산에는 세 가지 기본 백엔드인 ``ProcessGroupNCCL``, ``ProcessGroupGloo``, 그리고 ``ProcessGroupMPI``가 포함되어 있습니다.
+클래스로 추상화합니다. 이후에는 원하는 서드파티 라이브러리를 사용하여 ``ProcessGroup`` 의 하위 클래스로 다양한 백엔드를 구현할 수 있습니다.
+파이토치 분산에는 세 가지 기본 백엔드인 ``ProcessGroupNCCL``, ``ProcessGroupGloo``, 그리고 ``ProcessGroupMPI`` 가 포함되어 있습니다.
 그러나 이 세 가지 백엔드 외에도 다른 통신 라이브러리(예: `UCC <https://github.com/openucx/ucc>`__, `OneCCL <https://github.com/oneapi-src/oneCCL>`__), 다른 유형의 하드웨어(예: `TPU <https://cloud.google.com/tpu>`__, `Trainum <https://aws.amazon.com/machine-learning/trainium/>`__), 
 그리고 새로운 통신 알고리즘(예: `Herring <https://www.amazon.science/publications/herring-rethinking-the-parameter-server-at-scale-for-the-cloud>`__, `Reduction Server <https://cloud.google.com/blog/topics/developers-practitioners/optimize-training-performance-reduction-server-vertex-ai>`__)도 있습니다.
 따라서 분산 패키지는 집합 통신 백엔드를 사용자 지정할 수 있도록 확장 API를 노출합니다.
@@ -38,13 +39,13 @@ Cpp 확장을 사용하여 프로세스 그룹 백엔드 사용자 정의
 이 튜토리얼은 작동하는 통신 백엔드를 개발하는 대신 확장 API를 설명하는 데 중점을 둡니다. 따라서 ``dummy`` 백엔드는 API의 일부 (``all_reduce`` 및 ``all_gather``)를 다루며 tensor의 값을 단순히 0으로 설정합니다.
 
 
-단계 1: ``ProcessGroup``의 하위 클래스 구현
+단계 1: ``ProcessGroup`` 의 하위 클래스 구현
 ------------------------------------------------
 
 첫 번째 단계는 대상 집합 통신 API를 재정의하고 사용자 정의 통신 알고리즘을 실행하는 ``ProcessGroup`` 하위 클래스를 구현하는 것입니다.
 확장 기능은 미래 통신 결과를 제공하는 ``Work`` 하위 클래스를 구현해야 하며, 이는 응용 프로그램 코드에서 비동기 실행을 허용합니다.
 확장 기능이 서드파티 라이브러리를 사용하는 경우, 해당 확장 기능은 ``ProcessGroupDummy`` 하위 클래스에서 헤더를 포함하고 라이브러리 API를 호출할 수 있습니다.
-아래의 두 코드는 ``dummy.h`` 및 ``dummy.cpp``의 구현을 보여줍니다. 전체 구현은 `더미 집합(dummy collectives) <https://github.com/mrshenli/dummy_collectives>`__ 저장소에서 확인하실 수 있습니다.
+아래의 두 코드는 ``dummy.h`` 및 ``dummy.cpp`` 의 구현을 보여줍니다. 전체 구현은 `더미 집합(dummy collectives) <https://github.com/mrshenli/dummy_collectives>`__ 저장소에서 확인하실 수 있습니다.
 
 .. code-block:: cpp
 
@@ -143,7 +144,7 @@ Cpp 확장을 사용하여 프로세스 그룹 백엔드 사용자 정의
 백엔드 생성자는 `파이썬 측 <https://github.com/pytorch/pytorch/blob/v1.9.0/torch/distributed/distributed_c10d.py#L643-L650>`__ 에서 
 호출되므로 확장 기능도 파이썬에 생성자 API를 노출해야 합니다.
 다음 메서드를 추가함으로써 이 작업을 수행할 수 있습니다. 
-이 예제에서는 ``store``와 ``timeout``이 사용되지 않으므로 ``ProcessGroupDummy`` 인스턴스화 메서드에서 무시됩니다.
+이 예제에서는 ``store`` 와 ``timeout`` 이 사용되지 않으므로 ``ProcessGroupDummy`` 인스턴스화 메서드에서 무시됩니다.
 그러나 실제 확장 기능은 랑데뷰를 수행하고 ``timeout`` 인수를 지원하기 위해 ``store`` 사용을 고려해야 합니다.
 
 .. code-block:: cpp
@@ -183,7 +184,7 @@ Cpp 확장을 사용하여 프로세스 그룹 백엔드 사용자 정의
 ----------------------------------
 
 이제 확장 소스 코드 파일이 준비되었습니다. 그런 다음 `cpp 확장 <https://pytorch.org/docs/stable/cpp_extension.html>`__ 을 사용하여 빌드할 수 있습니다.
-이를 위해 경로와 명령을 준비하는 ``setup.py`` 파일을 생성하고, ``python setup.py install``을 호출하여 확장을 설치합니다.
+이를 위해 경로와 명령을 준비하는 ``setup.py`` 파일을 생성하고, ``python setup.py install`` 을 호출하여 확장을 설치합니다.
 
 확장이 서드파티 라이브러리에 의존하는 경우, cpp 확장 API에 ``libraries_dirs`` 및 ``libraries`` 지정할 수도 있습니다. 실제 예제로 `torch ucc <https://github.com/openucx/torch-ucc>`__ 프로젝트를 참조하십시오.
 
