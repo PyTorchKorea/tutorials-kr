@@ -36,7 +36,7 @@ output = rn18(input)
 # 이 기술은 확실히 파이토치 코드에 적용 가능하지만 모델 코드를 복사하고 편집할 필요가 없다면,
 # 특히 자신이 작성하지 않은 코드라면(이 torchvision 모델처럼) 더 좋을 것입니다. 
 # FX를 사용하여 소스 코드를 수정할 필요 없이
-# 이 "계측(instrumentation)" 프로세스를 자동화할 것입니다.
+# 이 ``계측(instrumentation)`` 프로세스를 자동화할 것입니다.
 
 ######################################################################
 # 첫번째로, 다음의 방식처럼 몇몇 라이브러리를 불러옵니다
@@ -54,9 +54,9 @@ from torch.fx import Interpreter
 
 ######################################################################
 # 
-# 상징적 추적(Symbolic Tracing)을 이용하여 모델 포착하기
+# Symbolic Tracing을 이용하여 모델 포착하기
 # -----------------------------------------
-# 다음으로, FX의 상징적 추적 메커니증을 활용하여 우리가 조작하고 
+# 다음으로, FX의 Symbolic Tracing 메커니증을 활용하여 우리가 조작하고 
 # 조사할 수 있는 자료구조에서 우리 모델의 정의를 포착할 것입니다.
 
 traced_rn18 = torch.fx.symbolic_trace(rn18)
@@ -90,16 +90,16 @@ print(traced_rn18.graph)
 
 class ProfilingInterpreter(Interpreter):
     def __init__(self, mod : torch.nn.Module):
-        # 사용자가 자신의 모델을 상징적으로 추적하도록 하는 것보다는,
+        # 사용자가 자신의 모델을 Symbolic Tracing하도록 하는 것보다는,
         # 우리는 그것을 constructor에서 할 것입니다. 결과적으로
-        # 사용자는 상징적 추적 API에 대한 걱정 없이 ``Module``을
+        # 사용자는 Symbolic Tracing API에 대한 걱정 없이 ``Module``을
         # 통과할 수 있습니다
         gm = torch.fx.symbolic_trace(mod)
         super().__init__(gm)
 
         # 우리는 여기에 두 가지를 저장할 것입니다:
         #
-        # 1. "mod"의 총 실행 시간 목록. 즉, 인터프리터가 호출될 
+        # 1. ``mod`` 의 총 실행 시간 목록. 즉, 인터프리터가 호출될 
         #    때마다 ``mod(...)`` 시간을 저장합니다.
         self.total_runtime_sec : List[float] = []
         # 2. 노드가 실행되는 데 걸린 시간(초) 목록에 대한 ``노드`` 의 맵입니다. 
@@ -178,7 +178,7 @@ class ProfilingInterpreter(Interpreter):
 
 ######################################################################
 # .. note::
-#       Python의 "time.time" 함수를 사용하여 벽시계의 타임스탬프를
+#       Python의 ``time.time`` 함수를 사용하여 벽시계의 타임스탬프를
 #       당겨서 비교합니다. 이것은 성능을 측정하는 가장 정확한 방법은 아니며
 #       1차적인 근사값만 제공합니다. 이 간단한 기법은 이 튜토리얼에서 시연할
 #       목적으로만 사용합니다.
@@ -210,8 +210,7 @@ print(interp.summary(True))
 # 분석에 사용할 수 있습니다. FX는 PyTorch 프로그램과 함께 작업할 수 있는
 # 흥미로운 가능성의 세계를 엽니다.
 #
-# 마지막으로, FX는 여전히 베타 버전이기 때문에, 여러분이 이것을 사용해보시면서
-# 어떤 피드백도 기꺼이 귀기울일 것입니다. 
-# 파이토치 포럼(https://discuss.pytorch.org/)이나 이슈 트래커
-# (https://github.com/pytorch/pytorch/issues)를 통해 
+# 마지막으로, FX는 여전히 베타 버전이기 때문에, 여러분이 이것을 사용해보시면서 어떤
+# 피드백도 기꺼이 귀기울일 것입니다. 파이토치 포럼(https://discuss.pytorch.org/)
+# 이나 이슈 트래커(https://github.com/pytorch/pytorch/issues)를 통해 
 # 여러분들이 생각하시는 어떤 피드백이라도 제보해주시길 바랍니다.
