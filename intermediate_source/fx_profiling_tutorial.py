@@ -56,7 +56,7 @@ from torch.fx import Interpreter
 # 
 # Symbolic Tracing을 이용하여 모델 포착하기
 # -----------------------------------------
-# 다음으로, FX의 Symbolic Tracing 메커니증을 활용하여 우리가 조작하고 
+# 다음으로, FX의 Symbolic Tracing 메커니즘을 활용하여 우리가 조작하고 
 # 조사할 수 있는 자료구조에서 우리 모델의 정의를 포착할 것입니다.
 
 traced_rn18 = torch.fx.symbolic_trace(rn18)
@@ -199,7 +199,7 @@ print(interp.summary(True))
 # * ``MaxPool2d`` 은 가장 많은 시간이 걸립니다. 이것은 잘 알려져있는 이슈입니다:
 #   https://github.com/pytorch/pytorch/issues/51393
 # * BatchNorm2d 또한 상당한 시간이 걸립니다. FX 튜토리얼
-#   <https://tutorials.pytorch.kr/intermediate/fx_conv_bn_fuser.html>`_.
+#   `<https://tutorials.pytorch.kr/intermediate/fx_conv_bn_fuser.html>`_.
 #   의 Conv-BN Fusion에서 좀더 생각할 시간을 갖고 최적화할 수 있습니다.
 #
 #
