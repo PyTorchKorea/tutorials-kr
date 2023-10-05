@@ -109,11 +109,11 @@ def train(data):
 #   ``wait`` 단계인 동안 프로파일러는 비활성화됩니다.
 #   ``warmup`` 단계인 동안엔 프로파일러가 추적(tracing)을 시작하지만 결과는 무시됩니다.
 #   이는 프로파일링 과부하(overhead)를 줄이기 위함입니다.
-#   프로파일링을 시작할 때 오버헤드는 크고 프로파일링 결과에 왜곡을 가져오기 쉽습니다.
+#   프로파일링을 시작할 때 과부하는 크고 프로파일링 결과에 왜곡을 가져오기 쉽습니다.
 #   ``active`` 단계에선 프로파일러가 작동하며 이벤트를 기록합니다.
 # - ``on_trace_ready`` - 각 주기 마지막에 호출되는 함수입니다;
 #   이 예시에서는 ``torch.profiler.tensorboard_trace_handler``를 사용하여 텐서보드의 결과 파일을 생성합니다.
-#   프로파일링 후 결과 파일은 ``./log/resnet18`` 디렉토리(directory)에 저장됩니다.
+#   프로파일링 후 결과 파일은 ``./log/resnet18`` 디렉토리에 저장됩니다.
 #   텐서보드에서 프로파일(profile)을 분석하려면 이 디렉토리를 ``logdir`` 매개변수로 지정해야 합니다.
 # - ``record_shapes`` - 연산자 입력의 shape을 기록할지 여부를 나타냅니다.
 # - ``profile_memory`` - Track tensor memory 할당/할당 해제 여부를 나타냅니다. 주의, 1.10 이전 버전의 파이토치를 사용하는 경우
@@ -177,7 +177,7 @@ prof.stop()
 #
 
 ######################################################################
-# 구글 크롬(Google Chrome) 브라우저 또는 마이크로소프트 엣지(Microsoft Edge) 브라우저에서 텐서보드 프로파일(profile) URL을 접속합니다.
+# 구글 크롬(Google Chrome) 브라우저 또는 마이크로소프트 엣지(Microsoft Edge) 브라우저에서 텐서보드 프로파일(profile) URL에 접속합니다.
 #
 # ::
 #
@@ -198,7 +198,7 @@ prof.stop()
 # 이러한 측정 지표(metrics)에 대한 자세한 내용은 `여기 <https://github.com/pytorch/kineto/blob/main/tb_plugin/docs/gpu_utilization.md>`__ 에서 확인해주세요.
 #
 # "단계 시간 세분화(Step Time Breakdown)"는 각 단계에서 수행된 시간의 분포를 보여줍니다.
-# 이 예제에서는 ``DataLoader`` 오버헤드(overhead)가 상당한 것을 볼 수 있습니다.
+# 이 예제에서는 ``DataLoader`` 과부하가 상당한 것을 볼 수 있습니다.
 #
 # 하단의 "성능 권장사항(Performance Recommendation)"은 프로파일링 데이터를 사용하여
 # 발생 가능한 병목 현상을 자동으로 강조하고,
@@ -211,7 +211,7 @@ prof.stop()
 #
 #
 # - 연산 보기(Operator view)
-# 연산 보기(operator view)는 호스트 또는 장치에서 실행되는
+# 연산 보기는 호스트 또는 장치에서 실행되는
 # 모든 파이토치 연산자의 성능을 표시합니다.
 #
 # .. image:: ../../_static/img/profiler_operator_view.png
@@ -386,7 +386,7 @@ prof.stop()
 # "데이터 교환 시간(Data Transfer Time)"은 실제 데이터를 교환하는 시간입니다.
 # "동기화 시간(Synchronizing Time)"은 다른 작업자와 대기 및 동기화하는 시간입니다.
 #
-# 한 작업자의 "동기화 시간(Synchronizing Time)"이 다른 작업자 보다 훨씬 짧다면’,
+# 한 작업자의 "동기화 시간"이 다른 작업자 보다 훨씬 짧다면’,
 # 이 작업자는 다른 작업자보다 더 많은 계산 작업량을 가질 수 있는 낙오자(straggler)일 수 있습니다’.
 #
 # "커뮤니케이션 작업 통계(Communication Operations Stats)"는 각 작업자의 모든 통신 작업에 대한 세부 통계를 요약합니다.
