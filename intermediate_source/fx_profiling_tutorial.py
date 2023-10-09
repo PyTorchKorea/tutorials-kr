@@ -107,7 +107,7 @@ class ProfilingInterpreter(Interpreter):
         self.runtimes_sec : Dict[torch.fx.Node, List[float]] = {}
 
     ######################################################################
-    # 다음으로, 우리의 첫 번째 매서드인 ``run()`` 을 덮여씌웁니다. ``Interpreter`` 의 ``run``
+    # 다음으로, 우리의 첫 번째 매서드인 ``run()`` 을 덮여 씌웁니다. ``Interpreter`` 의 ``run``
     # 매서드는 모델 실행을 위한 최상위 진입점입니다. 모델의 총 런타임을 기록할 수 있도록
     # 이 매서드를 가로채고자 할 것입니다.
 
