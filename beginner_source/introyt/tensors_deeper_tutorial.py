@@ -7,10 +7,10 @@
 `Training Models <trainingyt.html>`_ ||
 `Model Understanding <captumyt.html>`_
 
-Introduction to PyTorch Tensors
+PyTorch Tensors 소개
 ===============================
 
-Follow along with the video below or on `youtube <https://www.youtube.com/watch?v=r7QDUPb2dCM>`__.
+아래 영상이나 `유튜브<https://www.youtube.com/watch?v=r7QDUPb2dCM>`__를 통해 따라할 수 있습니다.
 
 .. raw:: html
 
@@ -18,12 +18,11 @@ Follow along with the video below or on `youtube <https://www.youtube.com/watch?
      <iframe width="560" height="315" src="https://www.youtube.com/embed/r7QDUPb2dCM" frameborder="0" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
    </div>
 
-Tensors are the central data abstraction in PyTorch. This interactive
-notebook provides an in-depth introduction to the ``torch.Tensor``
-class.
+파이토치의 핵심 데이터 추상화는 텐서(Tensor)입니다.이 상호작용하는 노트북은 
+``torch.Tensor`` 클래스에 대한 심층적인 소개를 제공합니다.
 
-First things first, let’s import the PyTorch module. We’ll also add
-Python’s math module to facilitate some of the examples.
+우선, 파이토치 모듈을 가져오겠습니다. 
+몇 가지 예제를 수행하기 위해 파이썬의 math 모듈도 추가합니다.
 
 """
 
@@ -32,10 +31,10 @@ import math
 
 
 #########################################################################
-# Creating Tensors
+# 텐서 생성하기
 # ----------------
 # 
-# The simplest way to create a tensor is with the ``torch.empty()`` call:
+# 가장 간단한 방법은 ``torch.empty()``호출을 사용하여 텐서를 생성하는 것입니다:
 # 
 
 x = torch.empty(3, 4)
@@ -44,34 +43,32 @@ print(x)
 
 
 ##########################################################################
-# Let’s unpack what we just did:
+# 위에서 한 작업을 살펴봅시다:
 # 
-# -  We created a tensor using one of the numerous factory methods
-#    attached to the ``torch`` module.
-# -  The tensor itself is 2-dimensional, having 3 rows and 4 columns.
-# -  The type of the object returned is ``torch.Tensor``, which is an
-#    alias for ``torch.FloatTensor``; by default, PyTorch tensors are
-#    populated with 32-bit floating point numbers. (More on data types
-#    below.)
-# -  You will probably see some random-looking values when printing your
-#    tensor. The ``torch.empty()`` call allocates memory for the tensor,
-#    but does not initialize it with any values - so what you’re seeing is
-#    whatever was in memory at the time of allocation.
+# -  ``torch``모듈에 첨부된 다양한 팩토리 메서드 중 하나를 사용하여 텐서를 생성했습니다.
+# -  텐서 자체는 2차원이며, 3행4열을 가지고 있습니다
+# -  반환된 객체의 유형은 ``torch.Tensor``이며,이는 ``torch.FloatTensor``의 별칭입니다; 
+#    기본적으로 PyTorch 텐서는 32비트 부동 소수점 숫자로 채워집니다.
+#    (자세한 내용은 아래의 데이터 유형 참조)
+#    
+#    
+# -  텐서를 출력할 때 일부 무작위 값이 표시될 수 있습니다. 
+#    ``torch.empty()`` 호출은 텐서에 메모리를 할당하지만 초기값으로 어떤 값도 초기화하지 않습니다. 
+#    따라서 보이는 것은 할당 시점의 메모리 내용입니다.
+#    
 # 
-# A brief note about tensors and their number of dimensions, and
-# terminology:
+# 텐서 및 차원 수, 용어에 대한 간단한 참고:
 # 
-# -  You will sometimes see a 1-dimensional tensor called a
-#    *vector.* 
-# -  Likewise, a 2-dimensional tensor is often referred to as a
-#    *matrix.* 
-# -  Anything with more than two dimensions is generally just
-#    called a tensor.
 # 
-# More often than not, you’ll want to initialize your tensor with some
-# value. Common cases are all zeros, all ones, or random values, and the
-# ``torch`` module provides factory methods for all of these:
+# -  1차원 텐서는 종종 *벡터*로 불립니다.
+# -  마찬가지로 2차원 텐서는 *행렬*로 자주 언급됩니다. 
+# -  두 개 이상의 차원을 갖는 것은 일반적으로 텐서로 불립니다.
 # 
+# 텐서를 어떤 값으로 초기화하는 것이 좋습니다.
+# 일반적인 경우로는 모두 0, 모두 1 또는 무작위 값입니다. 
+# ``torch`` 모듈은 이러한 모든 경우에 대한 팩토리 메서드를 제공합니다:
+#
+
 
 zeros = torch.zeros(2, 3)
 print(zeros)
@@ -85,21 +82,17 @@ print(random)
 
 
 #########################################################################
-# The factory methods all do just what you’d expect - we have a tensor
-# full of zeros, another full of ones, and another with random values
-# between 0 and 1.
+# 팩토리 메서드는 모두 예상대로 작동합니다.
+# 0으로 가득 찬 텐서, 1로 가득 찬 텐서 및 0에서 1 사이의 무작위 값으로 채워진 텐서가 있습니다.
 # 
-# Random Tensors and Seeding
+# 무작위 텐서 및 시드 설정
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~
 # 
-# Speaking of the random tensor, did you notice the call to
-# ``torch.manual_seed()`` immediately preceding it? Initializing tensors,
-# such as a model’s learning weights, with random values is common but
-# there are times - especially in research settings - where you’ll want
-# some assurance of the reproducibility of your results. Manually setting
-# your random number generator’s seed is the way to do this. Let’s look
-# more closely:
-# 
+# 무작위 텐서에 대해 말할 때, 해당 이전에 나온 ``torch.manual_seed()`` 호출에 주목했나요? 
+# 모델의 학습 가중치와 같은 무작위 값으로 텐서를 초기화하는 것은 일반적이지만 연구 환경에서는
+# 결과의 재현성을 보장할 필요가 있을 때가 있습니다. 무작위 수 생성기의 시드를 수동으로 설정하는 것이 
+# 이를 달성하는 방법입니다:
+#
 
 torch.manual_seed(1729)
 random1 = torch.rand(2, 3)
@@ -117,21 +110,17 @@ print(random4)
 
 
 ############################################################################
-# What you should see above is that ``random1`` and ``random3`` carry
-# identical values, as do ``random2`` and ``random4``. Manually setting
-# the RNG’s seed resets it, so that identical computations depending on
-# random number should, in most settings, provide identical results.
+# 위에서 볼 수 있듯이 ``random1``과 ``random3``은 동일한 값이며, 
+# ``random2``와 ``random4``도 동일한 값을 가집니다. RNG(랜덤 넘버 생성기)의 시드를
+# 수동으로 설정하면 동일한 결과를 제공하므로, 대부분의 환경에서 동일한 결과를 제공해야 하는 경우에 유용합니다. 
 # 
-# For more information, see the `PyTorch documentation on
-# reproducibility <https://pytorch.org/docs/stable/notes/randomness.html>`__.
+# 더 많은 정보는, `PyTorch 재현성 문서 <https://pytorch.org/docs/stable/notes/randomness.html>`__를 참조하세요.
 # 
-# Tensor Shapes
+# 텐서 형태
 # ~~~~~~~~~~~~~
 # 
-# Often, when you’re performing operations on two or more tensors, they
-# will need to be of the same *shape* - that is, having the same number of
-# dimensions and the same number of cells in each dimension. For that, we
-# have the ``torch.*_like()`` methods:
+# 두 개 이상의 텐서에서 연산을 수행할 때 종종 동일한 모양이어야 합니다. 
+# 즉, 각 차원마다 동일한 수의 셀을 가져야 합니다. 이를 위해 ``torch.*_like()`` 메서드를 사용합니다:
 # 
 
 x = torch.empty(2, 2, 3)
@@ -156,18 +145,14 @@ print(rand_like_x)
 
 
 #########################################################################
-# The first new thing in the code cell above is the use of the ``.shape``
-# property on a tensor. This property contains a list of the extent of
-# each dimension of a tensor - in our case, ``x`` is a three-dimensional
-# tensor with shape 2 x 2 x 3.
+# 위 코드 셀에서 처음 나타난 새로운 것은 텐서의 ``.shape`` 속성을 사용한 것입니다.
+# 이 속성은 텐서의 각 차원의 범위를 나타내는 리스트를 포함하고 있습니다.
+# 여기서 ``x``는 shape가 2 x 2 x 3인 3차원 텐서입니다.
 # 
-# Below that, we call the ``.empty_like()``, ``.zeros_like()``,
-# ``.ones_like()``, and ``.rand_like()`` methods. Using the ``.shape``
-# property, we can verify that each of these methods returns a tensor of
-# identical dimensionality and extent.
-# 
-# The last way to create a tensor that will cover is to specify its data
-# directly from a PyTorch collection:
+# 그 아래에서는 ``.empty_like()``, ``.zeros_like()``, ``.ones_like()``, 그리고 ``.rand_like()`` 메서드를 호출합니다.
+# ``.shape`` 속성을 사용하여 각 메서드가 동일한 차원 및 범위의 텐서를 반환하는지 확인할 수 있습니다.
+#
+# 마지막으로, PyTorch 컬렉션에서 직접 데이터를 지정하여 텐서를 만드는 마지막 방법을 살펴보겠습니다: 
 # 
 
 some_constants = torch.tensor([[3.1415926, 2.71828], [1.61803, 0.0072897]])
@@ -181,18 +166,16 @@ print(more_integers)
 
 
 ######################################################################
-# Using ``torch.tensor()`` is the most straightforward way to create a
-# tensor if you already have data in a Python tuple or list. As shown
-# above, nesting the collections will result in a multi-dimensional
-# tensor.
+# ``torch.tensor()``를 사용하는 것은 이미 Python 튜플이나 리스트에 데이터가 있는 경우
+# 텐서를 만드는 가장 간단한 방법입니다. 위의 예시에서 볼 수 있듯이 컬렉션을 중첩하면 다차원 텐서가 생성됩니다.
 # 
-# .. note::
-#      ``torch.tensor()`` creates a copy of the data.
+# .. 참고::
+#      ``torch.tensor()``는 데이터의 복사본을 만듭니다.
 # 
-# Tensor Data Types
+# 텐서의 데이터 유형
 # ~~~~~~~~~~~~~~~~~
 # 
-# Setting the datatype of a tensor is possible a couple of ways:
+# 텐서의 데이터 유형을 설정하는 것은 몇 가지 방법이 있습니다:
 # 
 
 a = torch.ones((2, 3), dtype=torch.int16)
@@ -206,29 +189,25 @@ print(c)
 
 
 ##########################################################################
-# The simplest way to set the underlying data type of a tensor is with an
-# optional argument at creation time. In the first line of the cell above,
-# we set ``dtype=torch.int16`` for the tensor ``a``. When we print ``a``,
-# we can see that it’s full of ``1`` rather than ``1.`` - Python’s subtle
-# cue that this is an integer type rather than floating point.
+# 텐서의 기본 데이터 유형을 설정하는 가장 간단한 방법은 생성 시 선택적 인자를 사용하는 것입니다. 
+# 위 코드 셀의 첫 줄에서는 텐서 ``a``의 데이터 유형으로 ``dtype = torch.int16``을 설정했습니다.
+# ``a``를 출력하면 ``1``로 가득 찬 것이 아니라 ``1``로 채워진 텐서를 확인할 수 있습니다.
+# -부동소수점(floating point)이 아닌 정수 타입임을 나타내는 파이썬의 미묘한 신호가 있습니다.
 # 
-# Another thing to notice about printing ``a`` is that, unlike when we
-# left ``dtype`` as the default (32-bit floating point), printing the
-# tensor also specifies its ``dtype``.
+# ``a``를 출력할 때 주목해야 할 또 다른 점은 (32비트 부동 소수점으로 유지했을 때처럼) 
+# 텐서의 ``dtype``도 지정된다는 것입니다.
 # 
-# You may have also spotted that we went from specifying the tensor’s
-# shape as a series of integer arguments, to grouping those arguments in a
-# tuple. This is not strictly necessary - PyTorch will take a series of
-# initial, unlabeled integer arguments as a tensor shape - but when adding
-# the optional arguments, it can make your intent more readable.
+# 아마도 당신은 텐서의 모양을 정의하는 방법을 정수 인수의 시리즈로 지정하는 것에서
+# 튜플로 이를 그룹화하는 것으로 변경한 것을 주목했을 것입니다. 이것은 엄격히 필수적인 것은 아닙니다
+# - PyTorch는 초기에 레이블이 없는 정수 인수의 시리즈를 텐서 모양으로 사용할 수 있습니다- 
+# 그러나 선택적 인수를 추가할 때 이를 튜플로 그룹화하면 의도를 더 명확하게 전달할 수 있습니다.
 # 
-# The other way to set the datatype is with the ``.to()`` method. In the
-# cell above, we create a random floating point tensor ``b`` in the usual
-# way. Following that, we create ``c`` by converting ``b`` to a 32-bit
-# integer with the ``.to()`` method. Note that ``c`` contains all the same
-# values as ``b``, but truncated to integers.
+# 또한 텐서 데이터 유형을 설정하는 다른 방법은 ``.to()`` 메서드를 사용하는 것입니다.
+# 위 코드에서는 일반적인 방법으로 랜덤 부동 소수점 텐서 ``b``를 만든 다음 
+# ``.to()`` 메서드를 사용하여 ``c``를 32비트 정수로 변환했습니다.
+# ``c``는 ``b``의 모든 값이 정수로 변환된 것을 포함하고 있습니다.
 # 
-# Available data types include:
+# 사용 가능한 데이터 유형은 다음과 같습니다:
 # 
 # -  ``torch.bool``
 # -  ``torch.int8``
@@ -241,14 +220,12 @@ print(c)
 # -  ``torch.double``
 # -  ``torch.bfloat``
 # 
-# Math & Logic with PyTorch Tensors
+# PyTorch 텐서로 수학 및 논리 연산
 # ---------------------------------
 # 
-# Now that you know some of the ways to create a tensor… what can you do
-# with them?
-# 
-# Let’s look at basic arithmetic first, and how tensors interact with
-# simple scalars:
+# 이제 텐서를 만드는 몇 가지 방법을 알았으니 이제 그것들로 무엇을 할 수 있는지 살펴보겠습니다.
+#
+# 먼저 기본적인 산술을 살펴보고, 텐서가 간단한 스칼라와 상호 작용하는 방법을 알아보겠습니다.
 # 
 
 ones = torch.zeros(2, 2) + 1
@@ -265,15 +242,12 @@ print(sqrt2s)
 
 
 ##########################################################################
-# As you can see above, arithmetic operations between tensors and scalars,
-# such as addition, subtraction, multiplication, division, and
-# exponentiation are distributed over every element of the tensor. Because
-# the output of such an operation will be a tensor, you can chain them
-# together with the usual operator precedence rules, as in the line where
-# we create ``threes``.
+# 위에서 볼 수 있듯이 텐서와 스칼라 간의 산술 연산(덧셈, 뺄셈, 곱셈, 나눗셈 및 거듭제곱)은
+# 텐서의 각 요소에 분산됩니다. 이러한 연산의 출력도 텐서이므로,
+# 연산을 일반적인 연산자 우선순위 규칙을 사용하여 연결할 수 있습니다.
+# 예를 들어 우리가 ``threes``를 만드는 라인에서처럼요.
 # 
-# Similar operations between two tensors also behave like you’d
-# intuitively expect:
+# 두 개의 텐서 간의 유사한 연산도 직관적으로 예상한 대로 동작합니다:
 # 
 
 powers2 = twos ** torch.tensor([[1, 2], [3, 4]])
@@ -287,12 +261,11 @@ print(dozens)
 
 
 ##########################################################################
-# It’s important to note here that all of the tensors in the previous code
-# cell were of identical shape. What happens when we try to perform a
-# binary operation on tensors if dissimilar shape?
+# 모든 텐서가 동일한 모양이라는 점에 유의하는 것이 중요합니다. 
+# 모양이 다른 두 텐서에서의 이항연산은  어떨까요?
 # 
-# .. note::
-#      The following cell throws a run-time error. This is intentional.
+# .. 참고::
+#       다음 셀은 런타임 오류를 발생시킵니다. 이는 의도된 동작입니다.
 #
 # ::
 #
@@ -304,19 +277,16 @@ print(dozens)
 
 
 ##########################################################################
-# In the general case, you cannot operate on tensors of different shape
-# this way, even in a case like the cell above, where the tensors have an
-# identical number of elements.
+# 일반적으로 텐서의 모양이 다른 경우에는 이러한 방식으로 연산을 수행할 수 없습니다. 
+# 이는 텐서가 동일한 요소 수를 가지더라도 모양이 다르기 때문입니다.
 # 
-# In Brief: Tensor Broadcasting
+# 간단 요약: 텐서 브로드캐스팅
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # 
-# .. note::
-#      If you are familiar with broadcasting semantics in NumPy
-#      ndarrays, you’ll find the same rules apply here.
+# .. 참고::
+#      만약 NumPy ndarrays의 브로드캐스팅 의미론에 익숙하다면, 여기서도 동일한 규칙이 적용됩니다.
 # 
-# The exception to the same-shapes rule is *tensor broadcasting.* Here’s
-# an example:
+# 동일한 모양 규칙에 대한 예외는 *텐서 브로드캐스팅*입니다. 다음은 예시입니다:
 # 
 
 rand = torch.rand(2, 4)
@@ -327,94 +297,83 @@ print(doubled)
 
 
 #########################################################################
-# What’s the trick here? How is it we got to multiply a 2x4 tensor by a
-# 1x4 tensor?
+# 여기서 어떤 마술이 일어났을까요? 어떻게 2x4 텐서를 1x4 텐서로 곱할 수 있었을까요?
 # 
-# Broadcasting is a way to perform an operation between tensors that have
-# similarities in their shapes. In the example above, the one-row,
-# four-column tensor is multiplied by *both rows* of the two-row,
-# four-column tensor.
+# 브로드캐스팅은 모양이 유사한 텐서 간의 연산을 수행하는 방법입니다.
+# 위의 예에서 1행 4열 텐서는 2행 4열 텐서의 *각 행*에 대해 곱셈이 수행되었습니다.
 # 
-# This is an important operation in Deep Learning. The common example is
-# multiplying a tensor of learning weights by a *batch* of input tensors,
-# applying the operation to each instance in the batch separately, and
-# returning a tensor of identical shape - just like our (2, 4) \* (1, 4)
-# example above returned a tensor of shape (2, 4).
+# 이것은 딥 러닝에서 중요한 작업 중 하나입니다. 
+# 일반적인 예는 학습 가중치 텐서를 입력 텐서의 *배치*와 곱하는 것입니다.
+# 이 작업은 배치의 각 인스턴스에 대해 연산을 적용하고 동일한 모양의 텐서를 반환합니다. 
+# -위의 (2, 4) \* (1, 4) 예제처럼 (2, 4) 모양의 텐서를 반환합니다.
 # 
-# The rules for broadcasting are:
+# 브로드캐스팅의 규칙은 다음과 같습니다:
 # 
-# -  Each tensor must have at least one dimension - no empty tensors.
+# -  각 텐서는 적어도 하나의 차원을 가져야 합니다. 빈 텐서는 허용되지 않습니다.
 # 
-# -  Comparing the dimension sizes of the two tensors, *going from last to
-#    first:*
+# -  두 텐서의 차원 크기를 *마지막부터 처음까지* 비교합니다.
 # 
-#    -  Each dimension must be equal, *or*
+#    -  각 차원이 동일하거나
+#
+#    -  두 텐서 중 하나의 차원 크기가 1이거나
 # 
-#    -  One of the dimensions must be of size 1, *or*
+#    -  특정 차원이 한 텐서에만 존재하면서 다른 텐서에는 해당 차원이 존재하지 않아야 합니다.
 # 
-#    -  The dimension does not exist in one of the tensors
+# 이전에 보았던 브로드캐스팅 규칙을 준수하면 다음과 같은 상황에서 "브로드캐스팅"이 가능합니다.
 # 
-# Tensors of identical shape, of course, are trivially “broadcastable”, as
-# you saw earlier.
-# 
-# Here are some examples of situations that honor the above rules and
-# allow broadcasting:
+# 다음은 위의 규칙을 따르며 브로드캐스팅이 가능한 상황의 몇 가지 예제입니다:
 # 
 
 a =     torch.ones(4, 3, 2)
 
-b = a * torch.rand(   3, 2) # 3rd & 2nd dims identical to a, dim 1 absent
+b = a * torch.rand(   3, 2) # 3번째 및 2번째 차원이 a와 동일하고 1번째 차원이 없음
 print(b)
 
-c = a * torch.rand(   3, 1) # 3rd dim = 1, 2nd dim identical to a
+c = a * torch.rand(   3, 1) # 3번째 차원이 1이고 2번째 차원이 a와 동일함
 print(c)
 
-d = a * torch.rand(   1, 2) # 3rd dim identical to a, 2nd dim = 1
+d = a * torch.rand(   1, 2) # 3번째 차원이 a와 동일하고 2번째 차원이 1임
 print(d)
 
 
 #############################################################################
-# Look closely at the values of each tensor above: 
+# 위 코드에서 각 텐서의 값에 주목해봅시다:
 #
-# -  The multiplication operation that created ``b`` was 
-#    broadcast over every “layer” of ``a``.
-# -  For ``c``, the operation was broadcast over ever layer and row of
-#    ``a`` - every 3-element column is identical. 
-# -  For ``d``, we switched it around - now every *row* is identical,
-#    across layers and columns.
+# -  ``b``는 ``a``의 각 "레이어"에 대해 곱셈이 브로드캐스트되었습니다.
+# -  ``c``는 ``a``의 각 레이어 및 행에 대해 브로드캐스트되었습니다.
+#    각 3개의 요소로 구성된 열은 동일합니다.
+# -  d의 경우 행과 열을 바꾸었습니다. 이제 각 행이 레이어 및 열을 통해 동일합니다.
 # 
-# For more information on broadcasting, see the `PyTorch
-# documentation <https://pytorch.org/docs/stable/notes/broadcasting.html>`__
-# on the topic.
+# 브로드캐스팅에 관한 더 자세한 내용은`PyTorch
+# 문서 <https://pytorch.org/docs/stable/notes/broadcasting.html>`__를 참조하세요.
 # 
-# Here are some examples of attempts at broadcasting that will fail:
+# 다음은 브로드캐스팅을 시도하면 실패하는 몇 가지 예제입니다:
 # 
-# .. note::
-#       The following cell throws a run-time error. This is intentional.
+# .. 참고::
+#       아래 셀은 런타임 오류를 발생시킵니다. 이것은 의도된 것입니다.
 #
 # ::
 #
 #    a =     torch.ones(4, 3, 2)
 #
-#    b = a * torch.rand(4, 3)    # dimensions must match last-to-first
+#    b = a * torch.rand(4, 3)    # 차원이 마지막에서 처음으로 일치해야 함
 #
-#    c = a * torch.rand(   2, 3) # both 3rd & 2nd dims different
+#    c = a * torch.rand(2, 3)    # 3번째 및 2번째 차원이 다름
 #
-#    d = a * torch.rand((0, ))   # can't broadcast with an empty tensor
+#    d = a * torch.rand((0, ))   # 빈 텐서로는 브로드캐스트할 수 없음
 #
 
 
 ###########################################################################
-# More Math with Tensors
+# 텐서와 더 많은 수학
 # ~~~~~~~~~~~~~~~~~~~~~~
 # 
-# PyTorch tensors have over three hundred operations that can be performed
-# on them.
+# 더 많은 수학 연산에 대한 정보는 PyTorch 텐서의 300가지가 넘는 작업에 대한 문서를 참조하십시오.
 # 
-# Here is a small sample from some of the major categories of operations:
+# 다음은 주요 작업 범주 중 일부에서 가져온 작은 샘플입니다:
 # 
 
-# common functions
+# 일반 함수
 a = torch.rand(2, 4) * 2 - 1
 print('Common functions:')
 print(torch.abs(a))
@@ -422,7 +381,7 @@ print(torch.ceil(a))
 print(torch.floor(a))
 print(torch.clamp(a, -0.5, 0.5))
 
-# trigonometric functions and their inverses
+# 삼각함수와 역함수
 angles = torch.tensor([0, math.pi / 4, math.pi / 2, 3 * math.pi / 4])
 sines = torch.sin(angles)
 inverses = torch.asin(sines)
@@ -431,77 +390,74 @@ print(angles)
 print(sines)
 print(inverses)
 
-# bitwise operations
+# 비트연산
 print('\nBitwise XOR:')
 b = torch.tensor([1, 5, 11])
 c = torch.tensor([2, 7, 10])
 print(torch.bitwise_xor(b, c))
 
-# comparisons:
+# 비교:
 print('\nBroadcasted, element-wise equality comparison:')
 d = torch.tensor([[1., 2.], [3., 4.]])
-e = torch.ones(1, 2)  # many comparison ops support broadcasting!
-print(torch.eq(d, e)) # returns a tensor of type bool
+e = torch.ones(1, 2)  # 많은 비교연산이 브로드 캐스팅을 지원!
+print(torch.eq(d, e)) # 불리언 타입의 텐서를 반환
 
-# reductions:
+# 축소:
 print('\nReduction ops:')
-print(torch.max(d))        # returns a single-element tensor
-print(torch.max(d).item()) # extracts the value from the returned tensor
-print(torch.mean(d))       # average
-print(torch.std(d))        # standard deviation
-print(torch.prod(d))       # product of all numbers
-print(torch.unique(torch.tensor([1, 2, 1, 2, 1, 2]))) # filter unique elements
+print(torch.max(d))        # 단일 원소 텐서를 반환
+print(torch.max(d).item()) # 반환된 텐서에서 값을 추출
+print(torch.mean(d))       # 평균
+print(torch.std(d))        # 표준 편차
+print(torch.prod(d))       # 모든 숫자의 곱
+print(torch.unique(torch.tensor([1, 2, 1, 2, 1, 2]))) # 고유 요소 필터링
 
-# vector and linear algebra operations
-v1 = torch.tensor([1., 0., 0.])         # x unit vector
-v2 = torch.tensor([0., 1., 0.])         # y unit vector
-m1 = torch.rand(2, 2)                   # random matrix
-m2 = torch.tensor([[3., 0.], [0., 3.]]) # three times identity matrix
+# 벡터및 선형 대수 연산
+v1 = torch.tensor([1., 0., 0.])         # x 단위 벡터
+v2 = torch.tensor([0., 1., 0.])         # y 단위 벡터
+m1 = torch.rand(2, 2)                   # 랜덤 행렬
+m2 = torch.tensor([[3., 0.], [0., 3.]]) # 단위 행렬의 3배
 
 print('\nVectors & Matrices:')
-print(torch.cross(v2, v1)) # negative of z unit vector (v1 x v2 == -v2 x v1)
+print(torch.cross(v2, v1)) # z 단위 벡터의 음수 (v1 x v2 == -v2 x v1)
 print(m1)
 m3 = torch.matmul(m1, m2)
-print(m3)                  # 3 times m1
-print(torch.svd(m3))       # singular value decomposition
+print(m3)                  # m1의 3배
+print(torch.svd(m3))       # 특이값 분해
 
 
 ##################################################################################
-# This is a small sample of operations. For more details and the full inventory of
-# math functions, have a look at the
-# `documentation <https://pytorch.org/docs/stable/torch.html#math-operations>`__.
+#  이것은 작은 작업 샘플입니다. 자세한 내용 및 수학 함수의 전체 목록은
+# `문서 <https://pytorch.org/docs/stable/torch.html#math-operations>`__를 참조하세요.
 # 
-# Altering Tensors in Place
+# 텐서를 제자리에서 변경하기
 # ~~~~~~~~~~~~~~~~~~~~~~~~~
 # 
-# Most binary operations on tensors will return a third, new tensor. When
-# we say ``c = a * b`` (where ``a`` and ``b`` are tensors), the new tensor
-# ``c`` will occupy a region of memory distinct from the other tensors.
+# 텐서에 대한 대부분의 이항 연산은 세 번째 새로운 텐서를 반환합니다. 
+# 예를 들어 ``c = a * b`` (여기서 ``a``와 ``b``는 텐서입니다)라고 할 때 
+# 새로운 텐서 ``c``는 다른 텐서와 다른 메모리 영역을 차지합니다.
 # 
-# There are times, though, that you may wish to alter a tensor in place -
-# for example, if you’re doing an element-wise computation where you can
-# discard intermediate values. For this, most of the math functions have a
-# version with an appended underscore (``_``) that will alter a tensor in
-# place.
+# 그러나 때때로 중간 값을 버릴 수 있는 원소별 계산을 수행할 때
+# 텐서를 제자리에서 변경하고 싶을 수 있습니다. 이 경우 대부분의 
+# 수학 함수에는 밑줄 (``_``)이 추가된 버전이 있어 텐서를 제자리에서 변경합니다.
 # 
-# For example:
+# 예시:
 # 
 
 a = torch.tensor([0, math.pi / 4, math.pi / 2, 3 * math.pi / 4])
 print('a:')
 print(a)
-print(torch.sin(a))   # this operation creates a new tensor in memory
-print(a)              # a has not changed
+print(torch.sin(a))   # 이 연산은 메모리에 새로운 텐서를 생성합니다.
+print(a)              # a는 변경되지 않았습니다.
 
 b = torch.tensor([0, math.pi / 4, math.pi / 2, 3 * math.pi / 4])
 print('\nb:')
 print(b)
-print(torch.sin_(b))  # note the underscore
-print(b)              # b has changed
+print(torch.sin_(b))  # 밑줄에 주목하세요.
+print(b)              # b가 변경되었습니다.
 
 
 #######################################################################
-# For arithmetic operations, there are functions that behave similarly:
+# 산술 연산에 대한 제자리 변경 함수:
 # 
 
 a = torch.ones(2, 2)
@@ -520,18 +476,13 @@ print(b)
 
 
 ##########################################################################
-# Note that these in-place arithmetic functions are methods on the
-# ``torch.Tensor`` object, not attached to the ``torch`` module like many
-# other functions (e.g., ``torch.sin()``). As you can see from
-# ``a.add_(b)``, *the calling tensor is the one that gets changed in
-# place.*
+# 이러한 제자리 산술 함수는 ``torch.Tensor`` 객체의 메서드이며, 
+# ``torch.sin()``과 같이 ``torch`` 모듈에 연결되어 있지 않습니다.
+# ``a.add_(b)``에서 볼 수 있듯이 호출한 텐서가 제자리에서 변경됩니다.
 # 
-# There is another option for placing the result of a computation in an
-# existing, allocated tensor. Many of the methods and functions we’ve seen
-# so far - including creation methods! - have an ``out`` argument that
-# lets you specify a tensor to receive the output. If the ``out`` tensor
-# is the correct shape and ``dtype``, this can happen without a new memory
-# allocation:
+# 다른 옵션으로는 기존에 할당된 텐서에 계산 결과를 넣을 수 있는 out 인수가 있습니다.
+# -지금까지 본 메서드와 함수 중 많은 것들에 존재, 생성 메서드 포함!-
+# 여러분이 제공한 out 텐서가 올바른 모양과 dtype이면 새로운 메모리 할당 없이 수행됩니다:
 # 
 
 a = torch.rand(2, 2)
@@ -541,74 +492,69 @@ old_id = id(c)
 
 print(c)
 d = torch.matmul(a, b, out=c)
-print(c)                # contents of c have changed
+print(c)                # c의 내용이 변경되었습니다.
 
-assert c is d           # test c & d are same object, not just containing equal values
-assert id(c) == old_id  # make sure that our new c is the same object as the old one
+assert c is d           # c와 d가 동일한 객체인지 확인합니다. 
+assert id(c) == old_id  # 새로운 c가 이전것과 동일한 객체인지 확인합니다. 
 
-torch.rand(2, 2, out=c) # works for creation too!
-print(c)                # c has changed again
-assert id(c) == old_id  # still the same object!
+torch.rand(2, 2, out=c) # 생성에도 사용 가능합니다!
+print(c)                # c가 다시 변경되었습니다.
+assert id(c) == old_id  # 여전히 동일한 객체입니다!
 
 
 ##########################################################################
-# Copying Tensors
+# 텐서 복사하기
 # ---------------
 # 
-# As with any object in Python, assigning a tensor to a variable makes the
-# variable a *label* of the tensor, and does not copy it. For example:
+# Python의 모든 객체와 마찬가지로 텐서를 변수에 할당하면 
+# 변수는 텐서의 *레이블*이 되며 복사되지 않습니다. 예를 들어:
 # 
 
 a = torch.ones(2, 2)
 b = a
 
-a[0][1] = 561  # we change a...
-print(b)       # ...and b is also altered
+a[0][1] = 561  # a를 변경합니다...
+print(b)       # ...그리고 b도 변경됩니다.
 
 
 ######################################################################
-# But what if you want a separate copy of the data to work on? The
-# ``clone()`` method is there for you:
+# 그러나 데이터에 대한 별도의 복사본이 필요한 경우 clone() 메서드를 사용할 수 있습니다:
 # 
 
 a = torch.ones(2, 2)
 b = a.clone()
 
-assert b is not a      # different objects in memory...
-print(torch.eq(a, b))  # ...but still with the same contents!
+assert b is not a      # 메모리라서 다른 객체...
+print(torch.eq(a, b))  # ...하지만 여전히 동일한 내용!
 
-a[0][1] = 561          # a changes...
-print(b)               # ...but b is still all ones
+a[0][1] = 561          # a를 변경합니다...
+print(b)               # ...하지만 b는 여전히 모두 1 !
 
 
 #########################################################################
-# **There is an important thing to be aware of when using ``clone()``.**
-# If your source tensor has autograd, enabled then so will the clone.
-# **This will be covered more deeply in the video on autograd,** but if
-# you want the light version of the details, continue on.
+# **``clone()``를 사용할 때 주의할 점이 있습니다.**
+# 원본 텐서에 autograd가 활성화되어 있으면 클론도 마찬가지로 활성화됩니다.
+# **이에 대한 자세한 내용은 autograd에 관한 비디오에서 자세히 다루겠지만,** 
+# 간략한 내용을 원한다면 계속 읽어보세요.
 # 
-# *In many cases, this will be what you want.* For example, if your model
-# has multiple computation paths in its ``forward()`` method, and *both*
-# the original tensor and its clone contribute to the model’s output, then
-# to enable model learning you want autograd turned on for both tensors.
-# If your source tensor has autograd enabled (which it generally will if
-# it’s a set of learning weights or derived from a computation involving
-# the weights), then you’ll get the result you want.
+# *대부분의 경우에는* 이것이 원하는 동작일 것입니다. 
+# 예를 들어 모델이 ``forward()`` 메서드에서 여러 계산 경로를 가지고 있고
+# 원본 텐서와 해당 클론이 모델의 출력에 기여하는 경우 모델 학습을 활성화하려면 
+# 두 텐서에 대해 autograd를 활성화해야 합니다.
+# 원본 텐서가 autograd가 활성화된 경우(이는 일반적으로 학습 가중치 집합이거나 
+# 가중치를 사용한 계산에서 파생된 경우) 원하는 결과를 얻을 수 있습니다.
 # 
-# On the other hand, if you’re doing a computation where *neither* the
-# original tensor nor its clone need to track gradients, then as long as
-# the source tensor has autograd turned off, you’re good to go.
+# 반면에 원본 텐서나 그 클론이 그라디언트를 추적할 필요가 없는 계산을 수행하는 경우, 
+# 원본 텐서의 autograd가 비활성화되어 있으면 원하는 결과를 얻을 수 있습니다.
 # 
-# *There is a third case,* though: Imagine you’re performing a computation
-# in your model’s ``forward()`` function, where gradients are turned on
-# for everything by default, but you want to pull out some values
-# mid-stream to generate some metrics. In this case, you *don’t* want the
-# cloned copy of your source tensor to track gradients - performance is
-# improved with autograd’s history tracking turned off. For this, you can
-# use the ``.detach()`` method on the source tensor:
+# 그러나 세 번째 경우도 있습니다. 모델의 ``forward()`` 함수에서 기본적으로 모든 것에 대해
+# 그라디언트가 활성화된 상태에서 중간에 몇 가지 값을 추출하여 몇 가지 메트릭을 생성하려는 경우입니다.
+# 이 경우 원본 텐서의 클론이 그라디언트를 추적하지 않아야 합니다.
+# autograd의 히스토리 추적이 비활성화된 상태에서 성능이 향상되기 때문입니다. 
+# 이를 위해 소스 텐서에 ``.detach()`` 메서드를 사용할 수 있습니다:
 # 
 
-a = torch.rand(2, 2, requires_grad=True) # turn on autograd
+a = torch.rand(2, 2, requires_grad=True) # autograd 활성화
 print(a)
 
 b = a.clone()
@@ -621,42 +567,35 @@ print(a)
 
 
 #########################################################################
-# What’s happening here?
+# 이 경우 무엇이 발생할까요?
 # 
-# -  We create ``a`` with ``requires_grad=True`` turned on. **We haven’t
-#    covered this optional argument yet, but will during the unit on
-#    autograd.**
-# -  When we print ``a``, it informs us that the property
-#    ``requires_grad=True`` - this means that autograd and computation
-#    history tracking are turned on.
-# -  We clone ``a`` and label it ``b``. When we print ``b``, we can see
-#    that it’s tracking its computation history - it has inherited
-#    ``a``\ ’s autograd settings, and added to the computation history.
-# -  We clone ``a`` into ``c``, but we call ``detach()`` first.
-# -  Printing ``c``, we see no computation history, and no
-#    ``requires_grad=True``.
+# -  autograd를 활성화한 상태로(``requires_grad=True``) ``a``를 생성합니다. 
+#    **아직 이 선택적 인수에 대해 다루지 않았지만 autograd 단원에서 설명하겠습니다.**
+# -  ``a``를 클론하여 ``b``에 레이블을 붙입니다. ``b``를 출력하면 계산 히스토리를 추적하고 있음을 알 수 있습니다.
+#    ``a``의 autograd 설정을 상속받았고 계산 히스토리에 추가되었습니다.
+# -  우리는 ``a``를 클론하고 ``b``에 레이블을 붙입니다. ``b``를 출력하면
+#    계산 히스토리를 추적하고 있음을 알 수 있습니다.
+#    이는 a의 autograd 설정을 상속받았고 계산 히스토리에 추가되었습니다.
+# -  ``a``를 ``c``로 클론하는데, 먼저 ``detach()``를 호출합니다.
+# -  ``c``를 출력하면 계산 히스토리가 없고 ``requires_grad=True``도 없음을 확인할 수 있습니다.
 # 
-# The ``detach()`` method *detaches the tensor from its computation
-# history.* It says, “do whatever comes next as if autograd was off.” It
-# does this *without* changing ``a`` - you can see that when we print
-# ``a`` again at the end, it retains its ``requires_grad=True`` property.
+# ``detach()`` 메서드는 텐서를 그 계산 히스토리에서 분리합니다. 
+# 이는 "다음에 오는 것은 autograd가 꺼진 것처럼 처리하라"고 말합니다. 
+# 이 작업은 ``a``를 변경하지 않고 수행됩니다.
+# 끝에서 ``a``를 다시 출력할 때 ``requires_grad=True`` 속성이 유지되는 것을 확인할 수 있습니다.
 # 
-# Moving to GPU
+# GPU로 이동하기
 # -------------
 # 
-# One of the major advantages of PyTorch is its robust acceleration on
-# CUDA-compatible Nvidia GPUs. (“CUDA” stands for *Compute Unified Device
-# Architecture*, which is Nvidia’s platform for parallel computing.) So
-# far, everything we’ve done has been on CPU. How do we move to the faster
-# hardware?
+# PyTorch의 주요 장점 중 하나는 CUDA 호환 Nvidia GPU에서의 강력한 가속입니다. 
+# ("CUDA"는 Nvidia의 병렬 컴퓨팅 플랫폼인 Compute Unified Device Architecture의 약자입니다.) 
+# 지금까지 수행한 모든 작업은 CPU에서 이루어졌습니다. 더 빠른 하드웨어로 어떻게 전환할까요?
 # 
-# First, we should check whether a GPU is available, with the
-# ``is_available()`` method.
+# 먼저 GPU가 사용 가능한지 확인해야 합니다. ``is_available()`` 메서드를 사용하여 확인할 수 있습니다.
 # 
-# .. note::
-#      If you do not have a CUDA-compatible GPU and CUDA drivers
-#      installed, the executable cells in this section will not execute any
-#      GPU-related code.
+# .. 참고::
+#      만약 CUDA 호환 GPU 및 CUDA 드라이버가 설치되어 있지 않다면,
+#      이 섹션의 실행 가능한 셀은 어떠한 GPU 관련 코드도 실행하지 않습니다.
 # 
 
 if torch.cuda.is_available():
@@ -666,16 +605,12 @@ else:
 
 
 ##########################################################################
-# Once we’ve determined that one or more GPUs is available, we need to put
-# our data someplace where the GPU can see it. Your CPU does computation
-# on data in your computer’s RAM. Your GPU has dedicated memory attached
-# to it. Whenever you want to perform a computation on a device, you must
-# move *all* the data needed for that computation to memory accessible by
-# that device. (Colloquially, “moving the data to memory accessible by the
-# GPU” is shorted to, “moving the data to the GPU”.)
+# GPU가 사용 가능한지 여부를 확인한 후에는 GPU에서 볼 수 있는 위치로 데이터를 이동해야 합니다.
+# CPU는 컴퓨터의 RAM에서 데이터를 처리합니다. GPU에는 그에 전용된 메모리가 있습니다.
+# 장치에서 계산을 수행하려면 해당 계산에 필요한 *모든* 데이터를 해당 장치에서 액세스 가능한 메모리로 이동해야 합니다.
+# (구어적으로 "데이터를 GPU에서 액세스 가능한 메모리로 이동"은 "데이터를 GPU로 이동"으로 줄여 말합니다.)
 # 
-# There are multiple ways to get your data onto your target device. You
-# may do it at creation time:
+# 데이터를 대상 장치로 이동하는 여러 가지 방법이 있습니다. 생성 시에 수행할 수 있습니다.
 # 
 
 if torch.cuda.is_available():
@@ -686,20 +621,16 @@ else:
 
 
 ##########################################################################
-# By default, new tensors are created on the CPU, so we have to specify
-# when we want to create our tensor on the GPU with the optional
-# ``device`` argument. You can see when we print the new tensor, PyTorch
-# informs us which device it’s on (if it’s not on CPU).
+# 기본적으로 새로운 텐서는 CPU에서 생성되므로 우리는 생성 시에 텐서를 GPU에 생성하려면 
+# 선택적인 ``device`` 인자를 지정해야 합니다. 새로운 텐서를 출력할 때 PyTorch는 텐서가
+# 어느 장치에 있는지 알려줍니다 (CPU가 아닌 경우).
 # 
-# You can query the number of GPUs with ``torch.cuda.device_count()``. If
-# you have more than one GPU, you can specify them by index:
-# ``device='cuda:0'``, ``device='cuda:1'``, etc.
+# ``torch.cuda.device_count()``를 사용하여 GPU의 수를 조회할 수 있습니다. 
+# 여러 개의 GPU가 있다면 인덱스로 지정할 수 있습니다: ``device='cuda:0'``, ``device='cuda:1'`` 등.
 # 
-# As a coding practice, specifying our devices everywhere with string
-# constants is pretty fragile. In an ideal world, your code would perform
-# robustly whether you’re on CPU or GPU hardware. You can do this by
-# creating a device handle that can be passed to your tensors instead of a
-# string:
+# 코딩적 관행으로 문자열 상수를 사용하여 모든 위치에 장치를 지정하는 것은 상당히 취약합니다.
+# 이상적으로 코드는 CPU 또는 GPU 하드웨어에 관계없이 견고하게 수행되어야 합니다. 
+# 이를 위해 텐서에 문자열 대신 전달할 수 있는 장치 핸들을 생성할 수 있습니다.
 # 
 
 if torch.cuda.is_available():
@@ -713,10 +644,8 @@ print(x)
 
 
 #########################################################################
-# If you have an existing tensor living on one device, you can move it to
-# another with the ``to()`` method. The following line of code creates a
-# tensor on CPU, and moves it to whichever device handle you acquired in
-# the previous cell.
+# 기존 텐서가 특정 장치에 있으면 to() 메서드를 사용하여 다른 장치로 이동할 수 있습니다. 
+# 다음 코드 라인은 CPU에서 텐서를 생성하고, 이전 셀에서 얻은 장치 핸들로 이동합니다.
 # 
 
 y = torch.rand(2, 2)
@@ -724,38 +653,34 @@ y = y.to(my_device)
 
 
 ##########################################################################
-# It is important to know that in order to do computation involving two or
-# more tensors, *all of the tensors must be on the same device*. The
-# following code will throw a runtime error, regardless of whether you
-# have a GPU device available:
+# 두 개 이상의 텐서를 사용한 계산을 수행하려면 *모든 텐서가 동일한 장치*에 있어야 합니다.
+# 다음 코드는 GPU 장치가 있는지 여부에 상관없이 런타임 오류가 발생합니다:
 # 
 # ::
 # 
 #    x = torch.rand(2, 2)
 #    y = torch.rand(2, 2, device='gpu')
-#    z = x + y  # exception will be thrown
+#    z = x + y  # 오류가 발생합니다.
 # 
 
 
 ###########################################################################
-# Manipulating Tensor Shapes
+# 텐서 모양 조작하기
 # --------------------------
 # 
-# Sometimes, you’ll need to change the shape of your tensor. Below, we’ll
-# look at a few common cases, and how to handle them.
+# 때로는 텐서의 모양을 변경해야 할 필요가 있습니다.
+# 아래에서는 몇 가지 일반적인 경우와 그에 대한 처리 방법을 살펴보겠습니다.
 # 
-# Changing the Number of Dimensions
+# 차원의 수 변경
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # 
-# One case where you might need to change the number of dimensions is
-# passing a single instance of input to your model. PyTorch models
-# generally expect *batches* of input.
+# 차원의 수를 변경해야 할 경우 중 하나는 모델에 단일 입력 인스턴스를 전달하는 경우입니다.
+# 일반적으로 PyTorch 모델은 입력 *배치*를 예상합니다.
 # 
-# For example, imagine having a model that works on 3 x 226 x 226 images -
-# a 226-pixel square with 3 color channels. When you load and transform
-# it, you’ll get a tensor of shape ``(3, 226, 226)``. Your model, though,
-# is expecting input of shape ``(N, 3, 226, 226)``, where ``N`` is the
-# number of images in the batch. So how do you make a batch of one?
+# 예를 들어 3 x 226 x 226 이미지에서 작동하는 모델이 있다고 가정해봅시다.
+# 226 픽셀 정사각형에 3개의 색상 채널이 있습니다. 이를로드하고 변환하면 ``(3, 226, 226)`` 모양의 텐서가 생성됩니다.
+# 그러나 모델은 입력 배치의 모양인 ``(N, 3, 226, 226)``을 예상합니다. 
+# 여기서 ``N``은 배치의 이미지 수입니다. 그렇다면 어떻게 배치를 하나로 만들 수 있을까요?
 # 
 
 a = torch.rand(3, 226, 226)
@@ -766,13 +691,11 @@ print(b.shape)
 
 
 ##########################################################################
-# The ``unsqueeze()`` method adds a dimension of extent 1.
-# ``unsqueeze(0)`` adds it as a new zeroth dimension - now you have a
-# batch of one!
+# ``unsqueeze()`` 메서드는 크기가 1인 차원을 추가합니다. ``unsqueeze(0)``은 새로운 0번째 차원으로 추가됩니다.
+# 이제 하나의 배치가 있습니다!
 # 
-# So if that’s *un*\ squeezing? What do we mean by squeezing? We’re taking
-# advantage of the fact that any dimension of extent 1 *does not* change
-# the number of elements in the tensor.
+# 그럼 *un*squeezing이라는 것은 무엇을 의미할까요? 
+# 우리는 크기가 1인 어떤 차원이 텐서의 요소 수를 변경하지 않는다는 사실을 활용하고 있습니다.
 # 
 
 c = torch.rand(1, 1, 1, 1, 1)
@@ -780,14 +703,11 @@ print(c)
 
 
 ##########################################################################
-# Continuing the example above, let’s say the model’s output is a
-# 20-element vector for each input. You would then expect the output to
-# have shape ``(N, 20)``, where ``N`` is the number of instances in the
-# input batch. That means that for our single-input batch, we’ll get an
-# output of shape ``(1, 20)``.
+# 위의 예제를 계속 진행하면 모델의 출력이 각 입력에 대해 20개의 요소를 가진 벡터일 때입니다.
+# 그러면 출력은 (``N``,``20``) 모양을 가질 것으로 예상됩니다.
+# 이는 단일 입력 배치의 경우 (``1``, ``20``) 모양의 출력을 얻을 것입니다.
 # 
-# What if you want to do some *non-batched* computation with that output -
-# something that’s just expecting a 20-element vector?
+# 만약 해당 출력으로 배치 처리되지 않는 연산을 수행하고 싶다면, 그냥 20개 요소의 벡터를 예상하는 경우 어떻게 할까요?
 # 
 
 a = torch.rand(1, 20)
@@ -806,47 +726,41 @@ print(d.shape)
 
 
 #########################################################################
-# You can see from the shapes that our 2-dimensional tensor is now
-# 1-dimensional, and if you look closely at the output of the cell above
-# you’ll see that printing ``a`` shows an “extra” set of square brackets
-# ``[]`` due to having an extra dimension.
+# 모양에서 볼 수 있듯이 2차원 텐서가 이제 1차원이 되었고 위의 셀의 출력을 자세히 살펴보면
+# 추가 차원 때문에 "여분"의 대괄호 ``[]``가 나타난 것을 볼 수 있습니다.
 # 
-# You may only ``squeeze()`` dimensions of extent 1. See above where we
-# try to squeeze a dimension of size 2 in ``c``, and get back the same
-# shape we started with. Calls to ``squeeze()`` and ``unsqueeze()`` can
-# only act on dimensions of extent 1 because to do otherwise would change
-# the number of elements in the tensor.
+# ``squeeze()`` 메서드는 extent 1의 차원만 압축할 수 있습니다.
+# ``c``에서 크기 2의 차원을 압축하려고 시도한 경우 처음에 시작한 것과 동일한 모양이 반환됩니다. 
+# ``squeeze()`` 및 ``unsqueeze()`` 호출은 텐서의 원소 수를 변경하면 안 되기 때문에 
+# extent 1의 차원에만 작용할 수 있습니다.
 # 
-# Another place you might use ``unsqueeze()`` is to ease broadcasting.
-# Recall the example above where we had the following code:
-# 
-# ::
+# ``unsqueeze()``를 사용하는 또 다른 경우는 브로드캐스팅을 용이하게 하는 것입니다. 
+# 위에서 다음 코드가 있는 예제를 상기하십시오:
+#
+#::
 # 
 #    a =     torch.ones(4, 3, 2)
 # 
 #    c = a * torch.rand(   3, 1) # 3rd dim = 1, 2nd dim identical to a
 #    print(c)
 # 
-# The net effect of that was to broadcast the operation over dimensions 0
-# and 2, causing the random, 3 x 1 tensor to be multiplied element-wise by
-# every 3-element column in ``a``.
+# 그 결과는 0 및 2 차원을 따라 작업을 브로드캐스트하여 랜덤 3 x 1 텐서가 
+# ``a``의 각 3-element 열과 element-wise로 곱해지는 것입니다.
 # 
-# What if the random vector had just been 3-element vector? We’d lose the
-# ability to do the broadcast, because the final dimensions would not
-# match up according to the broadcasting rules. ``unsqueeze()`` comes to
-# the rescue:
+# 만약 랜덤 벡터가 3-element 벡터였다면 어떨까요? 
+# 우리는 브로드캐스트를 수행할 수 없게 되며 최종 차원이 브로드캐스팅 규칙에 따라
+# 일치하지 않게 됩니다. ``unsqueeze()``가 도움이 됩니다.
 # 
 
 a = torch.ones(4, 3, 2)
-b = torch.rand(   3)     # trying to multiply a * b will give a runtime error
-c = b.unsqueeze(1)       # change to a 2-dimensional tensor, adding new dim at the end
+b = torch.rand(   3)     # a * b를 곱하려고 하면 런타임 오류가 발생합니다
+c = b.unsqueeze(1)       # 새로운 차원을 추가하여 2차원 텐서로 변경
 print(c.shape)
-print(a * c)             # broadcasting works again!
+print(a * c)             # 브로드캐스팅이 다시 작동합니다!
 
 
 ######################################################################
-# The ``squeeze()`` and ``unsqueeze()`` methods also have in-place
-# versions, ``squeeze_()`` and ``unsqueeze_()``:
+# ``squeeze()`` 및 ``unsqueeze()`` 메서드에는 ``squeeze_()`` 및 ``unsqueeze_()``의 인플레이스 버전도 있습니다:
 # 
 
 batch_me = torch.rand(3, 226, 226)
@@ -856,15 +770,12 @@ print(batch_me.shape)
 
 
 ##########################################################################
-# Sometimes you’ll want to change the shape of a tensor more radically,
-# while still preserving the number of elements and their contents. One
-# case where this happens is at the interface between a convolutional
-# layer of a model and a linear layer of the model - this is common in
-# image classification models. A convolution kernel will yield an output
-# tensor of shape *features x width x height,* but the following linear
-# layer expects a 1-dimensional input. ``reshape()`` will do this for you,
-# provided that the dimensions you request yield the same number of
-# elements as the input tensor has:
+# 때로는 텐서의 모양을 더 철저하게 변경하고 여전히 요소 수와 그 내용을 유지하려고 할 때가 있습니다.
+# 이는 모델의 합성곱 레이어와 모델의 선형 레이어 간의 인터페이스에서 발생하는 경우입니다.
+# 이것은 이미지 분류 모델에서 흔합니다.
+# 컨볼루션 커널은 feature x width x height 형태의 출력 텐서를 생성할 것이지만
+# 다음 선형 레이어는 1차원 입력을 예상합니다.
+# ``reshape()``는 요청한 차원이 입력 텐서와 동일한 요소 수를 생성하는 경우에 이 작업을 수행할 것입니다.
 # 
 
 output3d = torch.rand(6, 20, 20)
@@ -878,40 +789,32 @@ print(torch.reshape(output3d, (6 * 20 * 20,)).shape)
 
 
 ###############################################################################
-# .. note::
-#      The ``(6 * 20 * 20,)`` argument in the final line of the cell
-#      above is because PyTorch expects a **tuple** when specifying a
-#      tensor shape - but when the shape is the first argument of a method, it
-#      lets us cheat and just use a series of integers. Here, we had to add the
-#      parentheses and comma to convince the method that this is really a
-#      one-element tuple.
+# .. 참고::
+#      위의 셀의 마지막 줄에서 ``(6 * 20 * 20,)`` 인수는 PyTorch가 텐서 모양을 지정할 때 
+#      **튜플**을 예상하기 때문입니다. 
+#      그러나 모양이 메서드의 첫 번째 인수일 때, 
+#      메서드가 튜플로 인식되기를 속이기 위해 괄호와 쉼표를 추가해야 합니다.
 # 
-# When it can, ``reshape()`` will return a *view* on the tensor to be
-# changed - that is, a separate tensor object looking at the same
-# underlying region of memory. *This is important:* That means any change
-# made to the source tensor will be reflected in the view on that tensor,
-# unless you ``clone()`` it.
+# ``reshape()``가 가능한 경우 텐서를 변경하려고하는 텐서의 보기를 반환할 것입니다.
+# 즉, 동일한 기본 메모리 영역을 바라보는 별도의 텐서 객체입니다. 이는 중요합니다.
+# 이것은 소스 텐서에 대한 모든 변경 사항이 해당 텐서의 보기에 반영된다는 것을 의미합니다.
+# 그 텐서를 ``clone()``하지 않는 한 메모리 영역의 변경이 보기에 반영됩니다.
 # 
-# There *are* conditions, beyond the scope of this introduction, where
-# ``reshape()`` has to return a tensor carrying a copy of the data. For
-# more information, see the
-# `docs <https://pytorch.org/docs/stable/torch.html#torch.reshape>`__.
+# 이 소개의 범위를 벗어나는 ``reshape()``가 데이터의 복사를 반환해야 하는 조건도 있습니다.
+# 자세한 내용은`문서 <https://pytorch.org/docs/stable/torch.html#torch.reshape>`__를 참조하세요.
 # 
 
 
 #######################################################################
-# NumPy Bridge
+# NumPy 브리지
 # ------------
 # 
-# In the section above on broadcasting, it was mentioned that PyTorch’s
-# broadcast semantics are compatible with NumPy’s - but the kinship
-# between PyTorch and NumPy goes even deeper than that.
+# 브로드캐스팅에 관한 이전 섹션에서 PyTorch의 브로드캐스트 의미론이 NumPy와 호환된다고 언급되었지만
+# PyTorch와 NumPy 간의 친화성은 그것 이상입니다.
 # 
-# If you have existing ML or scientific code with data stored in NumPy
-# ndarrays, you may wish to express that same data as PyTorch tensors,
-# whether to take advantage of PyTorch’s GPU acceleration, or its
-# efficient abstractions for building ML models. It’s easy to switch
-# between ndarrays and PyTorch tensors:
+# NumPy ndarray에 저장된 기존 ML 또는 과학적 코드가 있다면 PyTorch 텐서로 동일한 데이터를 표현하고 싶을 수 있습니다.
+# 이는 PyTorch의 GPU 가속 또는 ML 모델을 구축하는 효율적인 추상화를 활용하기 위함일 수 있습니다.
+# ndarray와 PyTorch 텐서 간에 쉽게 전환할 수 있습니다:
 # 
 
 import numpy as np
@@ -924,11 +827,10 @@ print(pytorch_tensor)
 
 
 ##########################################################################
-# PyTorch creates a tensor of the same shape and containing the same data
-# as the NumPy array, going so far as to keep NumPy’s default 64-bit float
-# data type.
+# PyTorch는 NumPy 배열과 동일한 데이터를 포함하며 NumPy의 기본 64비트 부동 소수점
+# 데이터 유형까지 유지하는 동일한 모양의 텐서를 생성합니다.
 # 
-# The conversion can just as easily go the other way:
+# 변환은 반대로 쉽게 진행될 수 있습니다.
 # 
 
 pytorch_rand = torch.rand(2, 3)
@@ -939,9 +841,8 @@ print(numpy_rand)
 
 
 ##########################################################################
-# It is important to know that these converted objects are using *the same
-# underlying memory* as their source objects, meaning that changes to one
-# are reflected in the other:
+# 이러한 변환된 객체가 소스 객체와 동일한 기본 메모리를 사용한다는 것을 알아야 합니다.
+# 따라서 하나를 변경하면 다른 하나에 반영된다는 의미입니다.
 # 
 
 numpy_array[1, 1] = 23
