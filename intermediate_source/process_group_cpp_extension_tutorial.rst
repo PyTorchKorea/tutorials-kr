@@ -1,78 +1,55 @@
-Customize Process Group Backends Using Cpp Extensions
+Cpp 확장을 사용하여 프로세스 그룹 백엔드 사용자 정의
 =====================================================
 
 **Author**: `Feng Tian <https://github.com/ftian1>`__, `Shen Li <https://mrshenli.github.io/>`__, `Min Si <https://minsii.github.io/>`__
 
-.. note::
-   |edit| View and edit this tutorial in `github <https://github.com/pytorch/tutorials/blob/main/intermediate_source/process_group_cpp_extension_tutorial.rst>`__.
+**번역**: `박재윤 <https://github.com/jenner9212>`_
 
-Prerequisites:
+.. note::
+   |edit| 이 튜토리얼의 소스 코드는 `github <https://github.com/pytorch/tutorials/blob/main/intermediate_source/process_group_cpp_extension_tutorial.rst>`__ 에서 확인하고 변경해 볼 수 있습니다.
+
+선수과목(Prerequisites):
 
 -  `PyTorch Distributed Overview <../beginner/dist_overview.html>`__
 -  `PyTorch Collective Communication Package <https://pytorch.org/docs/stable/distributed.html>`__
 -  `PyTorch Cpp Extension <https://pytorch.org/docs/stable/cpp_extension.html>`__
 -  `Writing Distributed Applications with PyTorch <https://tutorials.pytorch.kr/intermediate/dist_tuto.html>`__
 
-This tutorial demonstrates how to implement a custom ``ProcessGroup``
-backend and plug that into
-`PyTorch distributed package <https://pytorch.org/docs/stable/distributed.html>`__ using
-`cpp extensions <https://pytorch.org/docs/stable/cpp_extension.html>`__. This is helpful when you need a specialized software
-stack for your hardware, or when you would like to experiment with new
-collective communication algorithms.
+이 튜토리얼은 `cpp 확장 <https://pytorch.org/docs/stable/cpp_extension.html>`__ 을 사용하여 사용자 정의 ProcessGroup 백엔드를 구현하고 이를 `파이토치 분산 패키지 <https://pytorch.org/docs/stable/distributed.html>`__ 에 연결하는 방법을 보여줍니다.
+이것은 하드웨어에 특화된 소프트웨어 스택이 필요한 경우나 새로운 집합 통신 알고리즘을 실험하고자 할 때 유용합니다.
 
 
-Basics
+기초
 ------
 
-PyTorch collective communications power several widely adopted distributed
-training features, including
-`DistributedDataParallel <https://pytorch.org/docs/stable/generated/torch.nn.parallel.DistributedDataParallel.html>`__,
-`ZeroRedundancyOptimizer <https://pytorch.org/docs/stable/distributed.optim.html#torch.distributed.optim.ZeroRedundancyOptimizer>`__,
-`FullyShardedDataParallel <https://github.com/pytorch/pytorch/blob/master/torch/distributed/_fsdp/fully_sharded_data_parallel.py>`__.
-In order to make the same collective communication API work with
-different communication backends, the distributed package abstracts collective
-communication operations into a
+파이토치 집합 통신은 
+`분산 데이터 병렬(DistributedDataParallel) <https://pytorch.org/docs/stable/generated/torch.nn.parallel.DistributedDataParallel.html>`__,
+`제로 리던던시 최적화기(ZeroRedundancyOptimizer) <https://pytorch.org/docs/stable/distributed.optim.html#torch.distributed.optim.ZeroRedundancyOptimizer>`__,
+`완전 공유 데이터 병렬(FullyShardedDataParallel) <https://github.com/pytorch/pytorch/blob/master/torch/distributed/_fsdp/fully_sharded_data_parallel.py>`__ 을 포함한 널리 사용되는 분산 훈련 기능을 지원합니다.
+동일한 집합 통신 API를 다양한 통신 백엔드에서 작동하도록 하기 위해 분산 패키지는 집합 통신 작업을 
 `ProcessGroup <https://github.com/pytorch/pytorch/blob/release/1.10/torch/csrc/distributed/c10d/ProcessGroup.hpp>`__
-class. Different backends can
-then be implemented as subclasses of ``ProcessGroup`` using preferred
-third-party libraries. PyTorch distributed comes with three default backends,
-``ProcessGroupNCCL``, ``ProcessGroupGloo``, and ``ProcessGroupMPI``. However,
-beyond these three backends, there are also other communication libraries
-(e.g., `UCC <https://github.com/openucx/ucc>`__,
-`OneCCL <https://github.com/oneapi-src/oneCCL>`__), different types of hardware
-(e.g., `TPU <https://cloud.google.com/tpu>`__,
-`Trainum <https://aws.amazon.com/machine-learning/trainium/>`__), and emerging
-communication algorithms (e.g.,
-`Herring <https://www.amazon.science/publications/herring-rethinking-the-parameter-server-at-scale-for-the-cloud>`__,
-`Reduction Server <https://cloud.google.com/blog/topics/developers-practitioners/optimize-training-performance-reduction-server-vertex-ai>`__).
-Therefore, the distributed package exposes extension APIs to allow customizing
-collective communication backends.
+클래스로 추상화합니다. 이후에는 원하는 서드파티 라이브러리를 사용하여 ``ProcessGroup`` 의 하위 클래스로 다양한 백엔드를 구현할 수 있습니다.
+파이토치 분산에는 세 가지 기본 백엔드인 ``ProcessGroupNCCL``, ``ProcessGroupGloo``, 그리고 ``ProcessGroupMPI`` 가 포함되어 있습니다.
+그러나 이 세 가지 백엔드 외에도 다른 통신 라이브러리(예: `UCC <https://github.com/openucx/ucc>`__, `OneCCL <https://github.com/oneapi-src/oneCCL>`__), 다른 유형의 하드웨어(예: `TPU <https://cloud.google.com/tpu>`__, `Trainum <https://aws.amazon.com/machine-learning/trainium/>`__), 
+그리고 새로운 통신 알고리즘(예: `Herring <https://www.amazon.science/publications/herring-rethinking-the-parameter-server-at-scale-for-the-cloud>`__, `Reduction Server <https://cloud.google.com/blog/topics/developers-practitioners/optimize-training-performance-reduction-server-vertex-ai>`__)도 있습니다.
+따라서 분산 패키지는 집합 통신 백엔드를 사용자 지정할 수 있도록 확장 API를 노출합니다.
 
 
-The 4 steps below show how to implement a dummy ``ProcessGroup`` backend
-and use that in Python application code. Please note that this tutorial focuses
-on demonstrating the extension APIs, instead of developing a functioning
-communication backend. Hence, the ``dummy`` backend just covers a subset of the
-APIs (``all_reduce`` and ``all_gather``), and simply sets the values of tensors
-to 0.
+아래의 4단계는 더미 ``ProcessGroup`` 백엔드를 구현하고 파이썬 응용 프로그램 코드에서 사용하는 방법을 보여줍니다.
+이 튜토리얼은 작동하는 통신 백엔드를 개발하는 대신 확장 API를 설명하는 데 중점을 둡니다. 따라서 ``dummy`` 백엔드는 API의 일부 (``all_reduce`` 및 ``all_gather``)를 다루며 tensor의 값을 단순히 0으로 설정합니다.
 
 
-Step 1: Implement a Subclass of ``ProcessGroup``
+단계 1: ``ProcessGroup`` 의 하위 클래스 구현
 ------------------------------------------------
 
-This first step is to implement a ``ProcessGroup`` subclass that overrides
-target collective communication APIs and runs the custom communication algorithm.
-The extension also needs to implement a ``Work`` subclass, which
-serves as a future of communication results and allows asynchronous execution in
-application code. If the extension uses third-party libraries, it can
-include the headers and call into the library APIs from the ``ProcessGroupDummy``
-subclass. The two code snippets below present the implementation of ``dummy.h`` and
-``dummy.cpp``. See the `dummy collectives <https://github.com/mrshenli/dummy_collectives>`__
-repository for the full implementation.
+첫 번째 단계는 대상 집합 통신 API를 재정의하고 사용자 정의 통신 알고리즘을 실행하는 ``ProcessGroup`` 하위 클래스를 구현하는 것입니다.
+확장 기능은 미래(future) 통신 결과를 제공하는 ``Work`` 하위 클래스를 구현해야 하며, 이는 응용 프로그램 코드에서 비동기 실행을 허용합니다.
+확장 기능이 서드파티 라이브러리를 사용하는 경우, 해당 확장 기능은 ``ProcessGroupDummy`` 하위 클래스에서 헤더를 포함하고 라이브러리 API를 호출할 수 있습니다.
+아래의 두 코드는 ``dummy.h`` 및 ``dummy.cpp`` 의 구현을 보여줍니다. 전체 구현은 `더미 집합(dummy collectives) <https://github.com/mrshenli/dummy_collectives>`__ 저장소에서 확인하실 수 있습니다.
 
 .. code-block:: cpp
 
-    // file name: dummy.hpp
+    // 파일 이름: dummy.hpp
     #include <torch/python.h>
 
     #include <torch/csrc/distributed/c10d/ProcessGroup.hpp>
@@ -98,8 +75,8 @@ repository for the full implementation.
             std::vector<at::Tensor>& tensors,
             const AllreduceOptions& opts = AllreduceOptions()) override;
 
-        // The collective communication APIs without a custom implementation
-        // will error out if invoked by application code.
+        // 사용자 정의 구현이 없는 상태에서의 집합 통신 API는
+        // 응용 프로그램 코드에서 호출되면 오류가 발생합니다.
     };
 
     class WorkDummy : public Work {
@@ -108,12 +85,11 @@ repository for the full implementation.
           OpType opType,
           c10::intrusive_ptr<c10::ivalue::Future> future) // future of the output
           : Work(
-              -1, // rank, only used by recvAnySource, irrelevant in this demo
+              -1, // 랭크, recvAnySource에서만 사용되며 이 데모에서는 관련이 없습니다.
               opType),
           future_(std::move(future)) {}
-        // There are several additional helper functions that need to be
-        // implemented. Please refer to https://github.com/mrshenli/dummy_collectives
-        // for the full implementation.
+        // 추가적으로 구현해야 하는 여러 도우미 함수들이 있습니다. 
+        // 전체 구현에 대한 자세한 내용은 https://github.com/mrshenli/dummy_collectives 를 참조하세요.
 
       private:
         c10::intrusive_ptr<c10::ivalue::Future> future_;
@@ -123,13 +99,13 @@ repository for the full implementation.
 
 .. code-block:: cpp
 
-    // file name: dummy.cpp
+    // 파일 이름: dummy.cpp
     #include "dummy.hpp"
 
     namespace c10d {
 
-    // This is a dummy allgather that sets all output tensors to zero
-    // Modify the implementation to conduct real communication asynchronously
+    // 이것은 모든 출력 tensor를 0으로 설정하는 더미 allgather입니다. 
+    // 실제 통신을 비동기적으로 수행하도록 구현을 수정하세요.
     c10::intrusive_ptr<Work> ProcessGroupDummy::allgather(
             std::vector<std::vector<at::Tensor>>& outputTensors,
             std::vector<at::Tensor>& inputTensors,
@@ -146,8 +122,8 @@ repository for the full implementation.
         return c10::make_intrusive<WorkDummy>(OpType::ALLGATHER, std::move(future));
     }
 
-    // This is a dummy allreduce that sets all output tensors to zero
-    // Modify the implementation to conduct real communication asynchronously
+    // 이것은 모든 출력 tensor를 0으로 설정하는 더미 allgather입니다. 
+    // 실제 통신을 비동기적으로 수행하도록 구현을 수정하세요.
     c10::intrusive_ptr<Work> ProcessGroupDummy::allreduce(
             std::vector<at::Tensor>& tensors,
             const AllreduceOptions& opts) {
@@ -162,17 +138,14 @@ repository for the full implementation.
     }
     } // namespace c10d
 
-Step 2: Expose The Extension Python APIs
+단계 2: 확장 파이썬 API 노출
 ----------------------------------------
 
-The backend constructors are called
-`from Python side <https://github.com/pytorch/pytorch/blob/v1.9.0/torch/distributed/distributed_c10d.py#L643-L650>`__,
-so the extension also needs to expose the constructor APIs to Python. This can
-be done by adding the following methods. In this example, ``store`` and
-``timeout`` are ignored by the ``ProcessGroupDummy`` instantiation method, as
-those are not used in this dummy implementation. However, real-world extensions
-should consider using the ``store`` to perform rendezvous and supporting the
-``timeout`` argument.
+백엔드 생성자는 `파이썬 측 <https://github.com/pytorch/pytorch/blob/v1.9.0/torch/distributed/distributed_c10d.py#L643-L650>`__ 에서 
+호출되므로 확장 기능도 파이썬에 생성자 API를 노출해야 합니다.
+다음 메서드를 추가함으로써 이 작업을 수행할 수 있습니다. 
+이 예제에서는 ``store`` 와 ``timeout`` 이 사용되지 않으므로 ``ProcessGroupDummy`` 인스턴스화 메서드에서 무시됩니다.
+그러나 실제 확장 기능은 랑데뷰를 수행하고 ``timeout`` 인수를 지원하기 위해 ``store`` 사용을 고려해야 합니다.
 
 .. code-block:: cpp
 
@@ -187,8 +160,7 @@ should consider using the ``store`` to perform rendezvous and supporting the
             py::object module = py::module::import("torch.distributed");
             py::object register_backend =
                 module.attr("Backend").attr("register_backend");
-            // torch.distributed.Backend.register_backend will add `dummy` as a
-            // new valid backend.
+            // torch.distributed.Backend.register_backend는 '더미'를 새로운 유효한 백엔드로 추가합니다.
             register_backend("dummy", py::cpp_function(createProcessGroupDummy));
         }
     }
@@ -208,22 +180,17 @@ should consider using the ``store`` to perform rendezvous and supporting the
     }
 
 
-Step 3: Build The Custom Extension
+단계 3: 사용자 정의 확장 빌드
 ----------------------------------
 
-Now, the extension source code files are ready. We can then use
-`cpp extensions <https://pytorch.org/docs/stable/cpp_extension.html>`__
-to build it. To do that, create a ``setup.py`` file that prepares the paths and
-commands. Then call ``python setup.py install`` to install the extension.
+이제 확장 소스 코드 파일이 준비되었습니다. 그런 다음 `cpp 확장 <https://pytorch.org/docs/stable/cpp_extension.html>`__ 을 사용하여 빌드할 수 있습니다.
+이를 위해 경로와 명령을 준비하는 ``setup.py`` 파일을 생성하고, ``python setup.py install`` 을 호출하여 확장을 설치합니다.
 
-If the extension depends on third-party libraries, you can also specify
-``libraries_dirs`` and ``libraries`` to the cpp extension APIs. See the
-`torch ucc <https://github.com/openucx/torch-ucc>`__
-project as a real-world example.
+확장이 서드파티 라이브러리에 의존하는 경우, cpp 확장 API에 ``libraries_dirs`` 및 ``libraries`` 지정할 수도 있습니다. 실제 예제로 `torch ucc <https://github.com/openucx/torch-ucc>`__ 프로젝트를 참조하십시오.
 
 .. code-block:: python
 
-    # file name: setup.py
+    # 파일 이름: setup.py
     import os
     import sys
     import torch
@@ -253,20 +220,17 @@ project as a real-world example.
         cmdclass={'build_ext': cpp_extension.BuildExtension}
     )
 
-Step 4: Use The Extension in Application
+단계 4: 응용 프로그램에서 확장 기능 사용
 ----------------------------------------
 
-After installation, you can conveniently use the ``dummy`` backend when calling
-`init_process_group <https://pytorch.org/docs/stable/distributed.html#torch.distributed.init_process_group>`__
-as if it is an builtin backend.
+설치 후 `init_process_group <https://pytorch.org/docs/stable/distributed.html#torch.distributed.init_process_group>`__ 을 호출할 때 ``더미`` 백엔드를 내장된 백엔드처럼 편리하게 사용할 수 있습니다.
 
 .. code-block:: python
 
     import os
 
     import torch
-    # importing dummy_collectives makes torch.distributed recognize `dummy`
-    # as a valid backend.
+    # dummy_collectives를 import하면 torch.distributed가 `더미`를 유효한 백엔드로 인식합니다.
     import dummy_collectives
 
     import torch.distributed as dist
