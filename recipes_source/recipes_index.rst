@@ -122,8 +122,8 @@ Recipes are bite-sized bite-sized, actionable examples of how to use specific Py
    :tags: Basics
 
 .. customcarditem::
-   :header: Reasoning about Shapes in PyTorch
-   :card_description: Learn how to use the meta device to reason about shapes in your model.
+   :header: PyTorch의 Shape에 대한 추론
+   :card_description: meta 디바이스를 사용하여 모델의 shape을 추론하는 방법을 알아봅니다.
    :image: ../_static/img/thumbnails/cropped/generic-pytorch-logo.png
    :link: ../recipes/recipes/reasoning_about_shapes.html
    :tags: Basics
