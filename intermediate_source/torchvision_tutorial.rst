@@ -142,7 +142,7 @@ PennFudan 데이터셋을 위한 코드를 작성해 보겠습니다.
            labels = torch.ones((num_objs,), dtype=torch.int64)
            masks = torch.as_tensor(masks, dtype=torch.uint8)
 
-           image_id = torch.tensor([idx])
+           image_id = idx
            area = (boxes[:, 3] - boxes[:, 1]) * (boxes[:, 2] - boxes[:, 0])
            # 모든 인스턴스는 군중(crowd) 상태가 아님을 가정합니다
            iscrowd = torch.zeros((num_objs,), dtype=torch.int64)
@@ -305,7 +305,7 @@ PennFudan 데이터셋을 위한 인스턴스 분할 모델
    def get_transform(train):
        transforms = []
        transforms.append(T.PILToTensor())
-       transforms.append(T.ConvertImageDtype(torch.float))
+       transforms.append(T.ToDtype(torch.float, scale = True))
        if train:
            # (역자주: 학습시 50% 확률로 학습 영상을 좌우 반전 변환합니다)
            transforms.append(T.RandomHorizontalFlip(0.5))
