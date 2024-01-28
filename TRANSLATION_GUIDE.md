@@ -64,6 +64,7 @@
 |feature|특징|백선희||
 |feed data through model|데이터를 모델에 제공|||
 |Feed-forward network|순전파 신경망|박정환||
+|freezing|동결|김지호||
 |Generative|생성 모델|박정환|ToC의 분류명입니다.|
 |Getting Started tutorial|시작하기 튜토리얼|박정환|ToC의 Getting Started를 뜻합니다.|
 |gradient|변화도|박정환||
