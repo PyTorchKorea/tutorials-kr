@@ -11,7 +11,7 @@
 모델 앙상블은 여러 모델의 예측값을 함께 결합하는 것을 의미합니다.
 일반적으로 이 작업은 일부 입력값에 대해 각 모델을 개별적으로 실행한 다음 예측을 결합하는 방식으로 실행됩니다.
 하지만 동일한 아키텍처로 모델을 실행하는 경우, ``torch.vmap`` 을 활용하여 함께 결합할 수 있습니다.
-``vmap`` 은 입력 텐서의 여러 차원에 걸쳐 함수를 매핑하는 함수 변환입니다. 이 함수의
+``vmap`` 은 입력 tensor의 여러 차원에 걸쳐 함수를 매핑하는 함수 변환입니다. 이 함수의
 사용 사례 중 하나는 for 문을 제거하고 벡터화를 통해 속도를 높이는 것입니다.
 
 간단한 MLP 앙상블을 활용하여 이를 수행하는 방법을 살펴보겠습니다.
@@ -85,7 +85,6 @@ predictions2 = [model(minibatch) for model in models]
 # 예를 들어, ``model[i].fc1.weight`` 의 shape은 ``[784, 128]`` 입니다.
 # 이 10개의 모델 각각에 대해 ``.fc1.weight`` 를 쌓아 ``[10, 784, 128]`` shape의 큰 가중치를 생성할 수 있습니다.
 #
-#
 # 파이토치에서는 이를 위해 ``torch.func.stack_module_state`` 라는 함수를 제공하고 있습니다.
 #
 from torch.func import stack_module_state
@@ -93,14 +92,14 @@ from torch.func import stack_module_state
 params, buffers = stack_module_state(models)
 
 ######################################################################
-# 다음으로, ``vmap`` 에 대한 함수를 정의해야 합니다. 이 함수는 파라미터, 버퍼 그리고 입력값이 주어지면 모델을 실행합니다.
+# 다음으로, ``vmap`` 에 대한 함수를 정의해야 합니다. 이 함수는 파라미터, 버퍼, 입력값이 주어지면 모델을 실행합니다.
 # 여기서는 ``torch.func.functional_call`` 을 활용하겠습니다.
 
 from torch.func import functional_call
 import copy
 
 # 모델 중 하나의 "stateless" 버전을 구축합니다.
-# "stateless"는 매개변수가 메타 텐서이며 저장소가 없다는 것을 의미합니다.
+# "stateless"는 매개변수가 메타 tensor이며 저장소가 없다는 것을 의미합니다.
 base_model = copy.deepcopy(models[0])
 base_model = base_model.to('meta')
 
