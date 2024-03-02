@@ -482,7 +482,7 @@ optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
 # 전형적인 손실 함수입니다.
 #
 # **optimizer** 는 학습의 필수요소입니다. 아래 예제에서 간단한 최적화 알고리즘인
-# *stochastic gradient descent* 를 구현하겠습니다. SGD 알고리짐은 학습 속도인
+# *stochastic gradient descent* 를 구현하겠습니다. SGD 알고리즘은 학습 속도인
 # (``lr``) 및 momentum 과 같은 매개 변수 외에도 모델의 모든 학습 가중치 값인
 # ``net.parameters()`` 를 전달하는데, 이 함수는 최적화를 위해 파라미터를 조정합니다.
 #

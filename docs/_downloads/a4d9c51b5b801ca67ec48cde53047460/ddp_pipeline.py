@@ -64,7 +64,7 @@ class PositionalEncoding(nn.Module):
 # 이번 튜토리얼에서는, 트랜스포머 모델을 두 개의 GPU에 걸쳐서 나누고
 # 병렬 처리 파이프라인으로 학습시켜 보겠습니다. 추가로,
 # `분산 데이터 병렬 처리 <https://pytorch.org/docs/stable/generated/torch.nn.parallel.DistributedDataParallel.html>`__
-# 를 사용하여 이 파이프라인의 두 복제를 훈련시킵니다. 한 프로세스는
+# 를 사용하여 이 파이프라인의 두 복제본(replica)을 훈련시킵니다. 한 프로세스는
 # GPUs 0, 1에 거쳐 파이프를 구동하고 다른 프로세스는 GPUs 2, 3에서 파이프를 구동합니다. 그 다음, 이 두
 # 프로세스는 분산 데이터 병렬처리로 두 복제본(replica)을 학습시킵니다.
 # 모델은 바로 `nn.Transformer 와 TorchText 로 시퀀스-투-시퀀스(Sequence-to-Sequence) 모델링하기

@@ -7,7 +7,7 @@
   **번역**: `황성수 <https://github.com/adonisues>`_
 
 이 튜토리얼은 3개로 이뤄진 "기초부터 시작하는 NLP"의 2번째 튜토리얼입니다.
-`첫번째 튜토리얼 </intermediate/char_rnn_classification_tutorial>`
+`첫번째 튜토리얼 </intermediate/char_rnn_classification_tutorial>`_
 에서는 이름의 언어를 분류하기 위해 RNN을 사용했습니다.
 이번에는 반대로 언어로 이름을 생성할 예정입니다.
 
@@ -372,7 +372,7 @@ plt.plot(all_losses)
 
 max_length = 20
 
-# 카테고리와 시작 문자로 부터 샘플링 하기
+# 카테고리와 시작 문자로부터 샘플링 하기
 def sample(category, start_letter='A'):
     with torch.no_grad():  # 샘플링에서 히스토리를 추적할 필요 없음
         category_tensor = categoryTensor(category)

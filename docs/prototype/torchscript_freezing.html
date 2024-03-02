@@ -7,22 +7,22 @@
 <head>
   <meta charset="utf-8">
   
-<meta property="og:title" content="Model Freezing in TorchScript" />
+<meta property="og:title" content="TorchScript로 모델 동결하기" />
   
 <meta property="og:type" content="article" />
   
 <meta property="og:url" content="https://tutorials.pytorch.kr/prototype/torchscript_freezing.html" />
   
-<meta property="og:description" content="In this tutorial, we introduce the syntax for model freezing in TorchScript. Freezing is the process of inlining Pytorch module parameters and attributes values into the TorchScript internal representation. Parameter and attribute values are treated as final values and they cannot be modified in ..." />
+<meta property="og:description" content="번역 : 김지호 이 튜토리얼에서는, TorchScript로 모델 동결 하는 문법을 소개합니다. 동결은 파이토치 모듈의 매개변수와 속성 값들을 TorchScript 내부 표현으로 인라이닝(inlining)하는 과정입니다. 매개변수와 속성 값들은 최종 값으로 처리되며 동결된 모듈에서 수정될 수 없습니다. 기본 문법: 모델 동결은 아래 API를 사용하여 호출할 수 있습니다: torch.jit.freeze(mod : ScriptModule, names : str[]) -> SciptModule 입력 모듈은 스크립팅(scripting)..." />
   
 <meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
   
-<meta property="og:image:alt" content="Model Freezing in TorchScript" />
+<meta property="og:image:alt" content="TorchScript로 모델 동결하기" />
   
 <meta property="og:ignore_canonical" content="true" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Model Freezing in TorchScript &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
+  <title>TorchScript로 모델 동결하기 &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
   
 
   
@@ -133,7 +133,7 @@
               
               
                 <div class="version">
-                  2.0.0+cu117
+                  2.0.1
                 </div>
               
             
@@ -182,7 +182,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/introyt.html">PyTorch 소개 - YouTube 시리즈</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/introyt1_tutorial.html">PyTorch 소개</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/tensors_deeper_tutorial.html">Introduction to PyTorch Tensors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/tensors_deeper_tutorial.html">Pytorch Tensor 소개</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/autogradyt_tutorial.html">The Fundamentals of Autograd</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/modelsyt_tutorial.html">Building Models with PyTorch</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/tensorboardyt_tutorial.html">PyTorch TensorBoard Support</a></li>
@@ -214,7 +214,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../beginner/audio_datasets_tutorial.html">Audio Datasets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/speech_recognition_pipeline_tutorial.html">Speech Recognition with Wav2Vec2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/text_to_speech_with_torchaudio.html">Text-to-speech with Tacotron2</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/forced_alignment_with_torchaudio_tutorial.html">Forced Alignment with Wav2Vec2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/forced_alignment_with_torchaudio_tutorial.html">wav2vec2을 이용한 강제 정렬</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">텍스트</span></p>
 <ul>
@@ -269,7 +269,7 @@
 <p class="caption" role="heading"><span class="caption-text">모델 최적화</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/profiler.html">PyTorch 모듈 프로파일링 하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/tensorboard_profiler_tutorial.html">PyTorch Profiler With TensorBoard</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/tensorboard_profiler_tutorial.html">텐서보드를 이용한 파이토치 프로파일러</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/hyperparameter_tuning_tutorial.html">Ray Tune을 이용한 하이퍼파라미터 튜닝</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/vt_tutorial.html">배포를 위한 비전 트랜스포머(Vision Transformer) 모델 최적화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/parametrizations.html">Parametrizations Tutorial</a></li>
@@ -283,9 +283,9 @@
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/nvfuser_intro_tutorial.html">Getting Started - Accelerate Your Scripts with nvFuser</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/ax_multiobjective_nas_tutorial.html">Multi-Objective NAS with Ax</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/torch_compile_tutorial.html">torch.compile Tutorial</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/scaled_dot_product_attention_tutorial.html">(Beta) Implementing High-Performance Transformers with Scaled Dot Product Attention (SDPA)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/scaled_dot_product_attention_tutorial.html#using-sdpa-with-torch-compile">Using SDPA with <code class="docutils literal notranslate"><span class="pre">torch.compile</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/scaled_dot_product_attention_tutorial.html#conclusion">Conclusion</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/scaled_dot_product_attention_tutorial.html">(Beta) Scaled Dot Product Attention (SDPA)로 고성능 트랜스포머(Transformers) 구현하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/scaled_dot_product_attention_tutorial.html#torch-compile-sdpa"><code class="docutils literal notranslate"><span class="pre">torch.compile</span></code> 과 함께 SDPA 사용하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/scaled_dot_product_attention_tutorial.html#id6">결론</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul>
@@ -297,7 +297,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/dist_tuto.html">PyTorch로 분산 어플리케이션 개발하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/FSDP_tutorial.html">Getting Started with Fully Sharded Data Parallel(FSDP)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/FSDP_adavnced_tutorial.html">Advanced Model Training with Fully Sharded Data Parallel (FSDP)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/process_group_cpp_extension_tutorial.html">Customize Process Group Backends Using Cpp Extensions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/process_group_cpp_extension_tutorial.html">Cpp 확장을 사용하여 프로세스 그룹 백엔드 사용자 정의</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/rpc_tutorial.html">Getting Started with Distributed RPC Framework</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/rpc_param_server_tutorial.html">Implementing a Parameter Server Using Distributed RPC Framework</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/dist_pipeline_parallel_tutorial.html">Distributed Pipeline Parallelism Using RPC</a></li>
@@ -360,7 +360,7 @@
       </li>
 
         
-      <li>Model Freezing in TorchScript</li>
+      <li>TorchScript로 모델 동결하기</li>
     
     
       <li class="pytorch-breadcrumbs-aside">
@@ -420,22 +420,22 @@
 <p>Click <a class="reference internal" href="#sphx-glr-download-prototype-torchscript-freezing-py"><span class="std std-ref">here</span></a>
 to download the full example code</p>
 </div>
-<div class="sphx-glr-example-title section" id="model-freezing-in-torchscript">
-<span id="sphx-glr-prototype-torchscript-freezing-py"></span><h1>Model Freezing in TorchScript<a class="headerlink" href="#model-freezing-in-torchscript" title="이 제목에 대한 퍼머링크">¶</a></h1>
-<p>In this tutorial, we introduce the syntax for <em>model freezing</em> in TorchScript.
-Freezing is the process of inlining Pytorch module parameters and attributes
-values into the TorchScript internal representation. Parameter and attribute
-values are treated as final values and they cannot be modified in the resulting
-Frozen module.</p>
-<div class="section" id="basic-syntax">
-<h2>Basic Syntax<a class="headerlink" href="#basic-syntax" title="이 제목에 대한 퍼머링크">¶</a></h2>
-<p>Model freezing can be invoked using API below:</p>
+<div class="sphx-glr-example-title section" id="torchscript">
+<span id="sphx-glr-prototype-torchscript-freezing-py"></span><h1>TorchScript로 모델 동결하기<a class="headerlink" href="#torchscript" title="이 제목에 대한 퍼머링크">¶</a></h1>
+<p>번역 : <a class="reference external" href="https://github.com/jiho3004/">김지호</a></p>
+<p>이 튜토리얼에서는, TorchScript로 <em>모델 동결</em> 하는 문법을 소개합니다.
+동결은 파이토치 모듈의 매개변수와 속성 값들을 TorchScript 내부 표현으로 인라이닝(inlining)하는 과정입니다.
+매개변수와 속성 값들은 최종 값으로 처리되며 동결된 모듈에서 수정될 수 없습니다.</p>
+<div class="section" id="id2">
+<h2>기본 문법<a class="headerlink" href="#id2" title="이 제목에 대한 퍼머링크">¶</a></h2>
+<p>모델 동결은 아래 API를 사용하여 호출할 수 있습니다:</p>
 <blockquote>
 <div><p><code class="docutils literal notranslate"><span class="pre">torch.jit.freeze(mod</span> <span class="pre">:</span> <span class="pre">ScriptModule,</span> <span class="pre">names</span> <span class="pre">:</span> <span class="pre">str[])</span> <span class="pre">-&gt;</span> <span class="pre">SciptModule</span></code></p>
 </div></blockquote>
-<p>Note the input module can either be the result of scripting or tracing.
-See <a class="reference external" href="https://tutorials.pytorch.kr/beginner/Intro_to_TorchScript_tutorial.html">https://tutorials.pytorch.kr/beginner/Intro_to_TorchScript_tutorial.html</a></p>
-<p>Next, we demonstrate how freezing works using an example:</p>
+<p>입력 모듈은 스크립팅(scripting) 혹은 추적(tracing)을 사용한 결과입니다.
+<a class="reference external" href="https://tutorials.pytorch.kr/beginner/Intro_to_TorchScript_tutorial.html">TorchScript 소개 튜토리얼</a>
+을 참조하세요.</p>
+<p>다음으로, 예제를 통해 동결이 어떤 방식으로 동작하는지 확인합니다:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span><span class="o">,</span> <span class="nn">time</span>
 
 <span class="k">class</span> <span class="nc">Net</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
@@ -474,17 +474,15 @@ See <a class="reference external" href="https://tutorials.pytorch.kr/beginner/In
 
 <span class="k">try</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">fnet</span><span class="o">.</span><span class="n">conv1</span><span class="o">.</span><span class="n">bias</span><span class="p">)</span>
-    <span class="c1"># without exception handling, prints:</span>
+    <span class="c1"># 예외 처리가 없을 시 &#39;conv1&#39; 이라는 이름과 함께 다음을 출력합니다.</span>
     <span class="c1"># RuntimeError: __torch__.z.___torch_mangle_3.Net does not have a field</span>
-    <span class="c1"># with name &#39;conv1&#39;</span>
 <span class="k">except</span> <span class="ne">RuntimeError</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;field &#39;conv1&#39; is inlined. It does not exist in &#39;fnet&#39;&quot;</span><span class="p">)</span>
 
 <span class="k">try</span><span class="p">:</span>
     <span class="n">fnet</span><span class="o">.</span><span class="n">version</span><span class="p">()</span>
-    <span class="c1"># without exception handling, prints:</span>
+    <span class="c1"># 예외 처리가 없을 시 &#39;version&#39; 이라는 이름과 함께 다음을 출력합니다.</span>
     <span class="c1"># RuntimeError: __torch__.z.___torch_mangle_3.Net does not have a field</span>
-    <span class="c1"># with name &#39;version&#39;</span>
 <span class="k">except</span> <span class="ne">RuntimeError</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;method &#39;version&#39; is not deleted in fnet. Only &#39;forward&#39; is preserved&quot;</span><span class="p">)</span>
 
@@ -524,27 +522,25 @@ See <a class="reference external" href="https://tutorials.pytorch.kr/beginner/In
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Frozen    - Inference time: </span><span class="si">{0:5.2f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">end</span><span class="o">-</span><span class="n">start</span><span class="p">),</span> <span class="n">flush</span> <span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>On my machine, I measured the time:</p>
+<p>개인 머신에서 시간을 측정한 결과입니다:</p>
 <ul class="simple">
 <li><p>Scripted - Warm up time:  0.0107</p></li>
 <li><p>Frozen   - Warm up time:  0.0048</p></li>
 <li><p>Scripted - Inference:  1.35</p></li>
 <li><p>Frozen   - Inference time:  1.17</p></li>
 </ul>
-<p>In our example, warm up time measures the first two runs. The frozen model
-is 50% faster than the scripted model. On some more complex models, we
-observed even higher speed up of warm up time. freezing achieves this speed up
-because it is doing some the work TorchScript has to do when the first couple
-runs are initiated.</p>
-<p>Inference time measures inference execution time after the model is warmed up.
-Although we observed significant variation in execution time, the
-frozen model is often about 15% faster than the scripted model. When input is larger,
-we observe a smaller speed up because the execution is dominated by tensor operations.</p>
+<p>이 예제에서, 워밍업 시간은 최초 두 번 실행할 때 측정합니다.
+동결된 모델이 스크립트된 모델보다 50% 더 빠릅니다.
+보다 복잡한 모델에서는 워밍업 시간이 더욱 빨라집니다.
+최초 두 번의 실행을 초기화할 때 TorchScript가 해야 할 일의 일부를 동결이 하고 있기 때문에 속도 개선이 일어납니다.</p>
+<p>추론 시간은 모델이 워밍업되고 난 뒤, 추론 시 실행 시간을 측정합니다.
+실행 시간에 많은 편차가 있기는 하지만, 대개 동결된 모델이 스크립트된 모델보다 약 15% 더 빠릅니다.
+실행 시간은 tensor 연산에 의해 지배되기 때문에 입력의 크기가 더 커지면 속도 개선 정도는 더 작아집니다.</p>
 </div>
-<div class="section" id="conclusion">
-<h2>Conclusion<a class="headerlink" href="#conclusion" title="이 제목에 대한 퍼머링크">¶</a></h2>
-<p>In this tutorial, we learned about model freezing. Freezing is a useful technique to
-optimize models for inference and it also can significantly reduce TorchScript warmup time.</p>
+<div class="section" id="id4">
+<h2>결론<a class="headerlink" href="#id4" title="이 제목에 대한 퍼머링크">¶</a></h2>
+<p>이 튜토리얼에서는 모델 동결에 대해 배웠습니다.
+동결은 추론 시 모델 최적화를 할 수 있는 유용한 기법이며 TorchScript 워밍업 시간을 크게 줄입니다.</p>
 <p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.000 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-prototype-torchscript-freezing-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
@@ -615,9 +611,9 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
           <div class="pytorch-right-menu" id="pytorch-right-menu">
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
-<li><a class="reference internal" href="#">Model Freezing in TorchScript</a><ul>
-<li><a class="reference internal" href="#basic-syntax">Basic Syntax</a></li>
-<li><a class="reference internal" href="#conclusion">Conclusion</a></li>
+<li><a class="reference internal" href="#">TorchScript로 모델 동결하기</a><ul>
+<li><a class="reference internal" href="#id2">기본 문법</a></li>
+<li><a class="reference internal" href="#id4">결론</a></li>
 </ul>
 </li>
 </ul>
