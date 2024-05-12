@@ -128,6 +128,22 @@ html-noplot:
 	@echo
 	@echo "HTML-ONLY build finished. The HTML pages are in $(BUILDDIR)/html."
 
+serve:
+	@echo "---------------------------------------------------------------------------------"
+	@echo "* Open your browser and visit http://localhost:8000/                            *"
+	@echo "* If you're using Codespace, click on the 'Ports' tab and then 'Open Browser'   *"
+	@echo "*               or try https://$(CODESPACE_NAME)-8000.preview.app.github.dev/   *"
+	@echo "---------------------------------------------------------------------------------"
+	cd $(BUILDDIR)/html && python -m http.server
+
+serve-docs:
+	make docs
+	make serve
+
+serve-noplot:
+	make html-noplot
+	make serve
+
 clean-cache:
 	make clean
 	rm -rf advanced beginner intermediate recipes
