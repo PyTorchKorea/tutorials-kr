@@ -17,7 +17,7 @@
 -  `분산 데이터 병렬 처리 문서 <https://pytorch.org/docs/master/notes/ddp.html>`__
 
 
-`분산 데이터 병렬 처리 <https://pytorch.org/docs/stable/nn.html#torch.nn.parallel.DistributedDataParallel>`__\(DDP)는
+`분산 데이터 병렬 처리 DistributedDataParallel <https://pytorch.org/docs/stable/nn.html#module-torch.nn.parallel>`__\(DDP)는
 여러 기기에서 실행할 수 있는 데이터 병렬 처리를 모듈 수준에서 구현합니다.
 DDP를 사용하는 어플리케이션은 여러 작업(process)을 생성하고 작업 당 단일 DDP 인스턴스를 생성해야 합니다.
 DDP는 `torch.distributed <https://tutorials.pytorch.kr/intermediate/dist_tuto.html>`__
@@ -38,7 +38,7 @@ checkpointing 모델 및 DDP와 모델 병렬 처리의 결합을 포함한 추�
     이 튜토리얼의 코드는 8-GPU 서버에서 실행되지만 다른 환경에서도 쉽게 적용할 수 있습니다.
 
 ``DataParallel``\과 ``DistributedDataParallel`` 간의 비교
-----------------------------------------------------------
+----------------------------------------------------------===
 
 내용에 들어가기에 앞서 복잡성이 증가했음에도 불구하고
 ``DataParallel``\에 ``DistributedDataParallel`` 사용을 고려하는 이유를 생각해봅시다.
@@ -58,7 +58,7 @@ checkpointing 모델 및 DDP와 모델 병렬 처리의 결합을 포함한 추�
 
 
 기본적인 사용법
----------------
+-------------------
 
 DDP 모듈을 생성하기 전에 반드시 우선 작업 그룹을 올바르게 설정해야 합니다. 자세한 내용은
 `PYTORCH로 분산 어플리케이션 개발하기 <https://tutorials.pytorch.kr/intermediate/dist_tuto.html>`__\에서 확인할 수 있습니다.
@@ -162,7 +162,7 @@ DDP에서는 생성자, 순전파(forward pass) 및 역전파 전달 호출 지�
 호출할 때 충분한 ``timeout``\값을 전달해야 합니다.
 
 체크포인트를 저장하고 읽어오기
-------------------------------
+----------------------------------
 
 학습 중에 ``torch.save``\와 ``torch.load`` 로 모듈의 체크포인트를 만들고 그 체크포인트로부터 복구하는 것이 일반적입니다.
 더 자세한 내용은 `SAVING AND LOADING MODELS <https://tutorials.pytorch.kr/beginner/saving_loading_models.html>`__\를 참고하세요.
@@ -251,8 +251,8 @@ DDP는 다중 GPU 모델에서도 작동합니다.
         setup(rank, world_size)
 
         # 작업을 위한 mp_model 및 장치 설정
-        dev0 = (rank * 2) % world_size
-        dev1 = (rank * 2 + 1) % world_size
+        dev0 = rank * 2
+        dev1 = rank * 2 + 1
         mp_model = ToyMpModel(dev0, dev1)
         ddp_mp_model = DDP(mp_model)
 
@@ -278,7 +278,7 @@ DDP는 다중 GPU 모델에서도 작동합니다.
         run_demo(demo_model_parallel, world_size)
 
 Initialize DDP with torch.distributed.run/torchrun
---------------------------------------------------------------------
+---------------------------------------------------
 
 We can leverage PyTorch Elastic to simplify the DDP code and initialize the job more easily.
 Let's still use the Toymodel example and create a file named ``elastic_ddp.py``.
@@ -302,6 +302,7 @@ Let's still use the Toymodel example and create a file named ``elastic_ddp.py``.
         def forward(self, x):
             return self.net2(self.relu(self.net1(x)))
 
+
     def demo_basic():
         dist.init_process_group("nccl")
         rank = dist.get_rank()
@@ -320,14 +321,16 @@ Let's still use the Toymodel example and create a file named ``elastic_ddp.py``.
         labels = torch.randn(20, 5).to(device_id)
         loss_fn(outputs, labels).backward()
         optimizer.step()
+        dist.destroy_process_group()
 
     if __name__ == "__main__":
         demo_basic()
 
-One can then run a `torch elastic/torchrun<https://pytorch.org/docs/stable/elastic/quickstart.html>`__ command
+One can then run a `torch elastic/torchrun <https://pytorch.org/docs/stable/elastic/quickstart.html>`__ command
 on all nodes to initialize the DDP job created above:
 
 .. code:: bash
+
     torchrun --nnodes=2 --nproc_per_node=8 --rdzv_id=100 --rdzv_backend=c10d --rdzv_endpoint=$MASTER_ADDR:29400 elastic_ddp.py
 
 We are running the DDP script on two hosts, and each host we run with 8 processes, aka, we
@@ -341,7 +344,9 @@ For example, on a SLURM enabled cluster, we can write a script to run the comman
 and set ``MASTER_ADDR`` as:
 
 .. code:: bash
+
     export MASTER_ADDR=$(scontrol show hostname ${SLURM_NODELIST} | head -n 1)
+
 
 Then we can just run this script using the SLURM command: ``srun --nodes=2 ./torchrun_script.sh``.
 Of course, this is just an example; you can choose your own cluster scheduling tools

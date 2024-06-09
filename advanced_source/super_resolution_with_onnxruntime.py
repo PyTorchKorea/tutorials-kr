@@ -1,23 +1,38 @@
 """
 (선택) PyTorch 모델을 ONNX으로 변환하고 ONNX 런타임에서 실행하기
 ========================================================================
-이 튜토리얼에서는 어떻게 PyTorch에서 정의된 모델을 ONNX 형식으로 변환하고 또 어떻게 그 변환된 모델을
-ONNX 런타임에서 실행할 수 있는지에 대해 알아보도록 하겠습니다.
-ONNX 런타임은 ONNX 모델을 위한 엔진으로서 성능에 초점을 맞추고 있고 여러 다양한 플랫폼과 하드웨어(윈도우,
-리눅스, 맥을 비롯한 플랫폼 뿐만 아니라 CPU, GPU 등의 하드웨어)에서 효율적인 추론을 가능하게 합니다.
-ONNX 런타임은 `여기
-<https://cloudblogs.microsoft.com/opensource/2019/05/22/onnx-runtime-machine-learning-inferencing-0-4-release>`__ 에서
-설명된 것과 같이 여러 모델들의 성능을 상당히 높일 수 있다는 점이 증명되었습니다.
-이 튜토리얼을 진행하기 위해서는 `ONNX <https://github.com/onnx/onnx>`__
-와 `ONNX Runtime <https://github.com/microsoft/onnxruntime>`__ 설치가 필요합니다.
-ONNX와 ONNX 런타임의 바이너리 빌드를 ``pip install onnx onnxruntime`` 를 통해 받을 수 있습니다.
-ONNX 런타임은 버전 3.5에서 3.7까지의 Python과 호환됩니다.
-``참고``: 본 튜토리얼은 PyTorch의 master 브랜치를 필요로하며 `링크 <https://github.com/pytorch/pytorch#from-source>`__ 에서
-설치할 수 있습니다.
+
+.. Note::
+    PyTorch 2.1부터 ONNX Exporter에는 두 가지 버전이 존재합니다.
+    * ``torch.onnx.dynamo_export`` 는 PyTorch 2.0과 함께 출시된 TorchDynamo 기술 기반의 최신(이지만 아직 베타 버전의) ONNX Exporter입니다.
+    * ``torch.onnx.export`` 는 PyuTorch 1.2.0부터 지원 중인 TorchScript 백엔드에 기반한 ONNX Exporter입니다.
+
+이 튜토리얼에서는 TorchScript 기반의 ONNX Exporter인 ``torch.onnx.export`` 를 사용하여
+PyTorch에서 정의한 모델을 어떻게 ONNX 형식으로 변환하는지를 살펴보도록 하겠습니다.
+
+이렇게 변환된 모델은 ONNX 런타임(Runtime)에서 실행됩니다.
+ONNX 런타임은 다양한 플랫폼과 하드웨어(윈도우즈, 리눅스, 맥 및 CPU, GPU 모두)에서
+효율적으로 추론하는, 성능에 초점을 맞춘 ONNX 모델을 위한 엔진입니다.
+
+`여기 <https://cloudblogs.microsoft.com/opensource/2019/05/22/onnx-runtime-machine-learning-inferencing-0-4-release>`__
+에서 설명한 것처럼 ONNX 런타임을 활용하면 여러 모델들의 성능을
+상당히 높일 수 있다는 것이 증명되었습니다.
+
+이 튜토리얼의 진행을 위해 `ONNX <https://github.com/onnx/onnx>`__
+및 `ONNX 런타임(Runtime) <https://github.com/microsoft/onnxruntime>`__ 의 설치가 필요합니다.
+
+ONNX 및 ONNX 런타임은 다음과 같이 설치할 수 있습니다:
+
+.. code-block:: bash
+
+   %%bash
+   pip install onnx onnxruntime
+
+ONNX 런타임은 최신 버전의 PyTorch 런타임을 사용하는 것을 권장합니다.
+
 """
 
 # 필요한 import문
-import io
 import numpy as np
 
 from torch import nn
@@ -166,7 +181,7 @@ onnx.checker.check_model(onnx_model)
 
 import onnxruntime
 
-ort_session = onnxruntime.InferenceSession("super_resolution.onnx")
+ort_session = onnxruntime.InferenceSession("super_resolution.onnx", providers=["CPUExecutionProvider"])
 
 def to_numpy(tensor):
     return tensor.detach().cpu().numpy() if tensor.requires_grad else tensor.cpu().numpy()

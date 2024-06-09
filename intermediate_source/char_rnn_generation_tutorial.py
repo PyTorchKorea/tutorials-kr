@@ -3,15 +3,15 @@
 기초부터 시작하는 NLP:  문자-단위 RNN으로 이름 생성하기
 ********************************************************************************
 
-**Author**: `Sean Robertson <https://github.com/spro/practical-pytorch>`_
+**Author**: `Sean Robertson <https://github.com/spro>`_
   **번역**: `황성수 <https://github.com/adonisues>`_
 
 이 튜토리얼은 3개로 이뤄진 "기초부터 시작하는 NLP"의 2번째 튜토리얼입니다.
-`첫번째 튜토리얼 </intermediate/char_rnn_classification_tutorial>`_
-에서는 이름의 언어를 분류하기 위해 RNN을 사용했습니다.
-이번에는 반대로 언어로 이름을 생성할 예정입니다.
+첫번째 튜토리얼인 :doc:`/intermediate/char_rnn_classification_tutorial`
+에서는 RNN을 사용하여 주어진 이름이 어떠한 언어인지를 분류했습니다.
+이번에는 반대로 언어로부터 이름을 생성할 예정입니다.
 
-::
+.. code-block:: sh
 
     > python sample.py Russian RUS
     Rovakov
@@ -272,7 +272,7 @@ def train(category_tensor, input_line_tensor, target_line_tensor):
 
     rnn.zero_grad()
 
-    loss = 0
+    loss = torch.Tensor([0]) # 또는 그냥 ``loss = 0`` 을 사용해도 됩니다.
 
     for i in range(input_line_tensor.size(0)):
         output, hidden = rnn(category_tensor, input_line_tensor[i], hidden)

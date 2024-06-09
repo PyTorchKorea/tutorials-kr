@@ -33,13 +33,17 @@ sys.path.insert(0, os.path.abspath('.'))
 sys.path.insert(0, os.path.abspath('./.build'))     # pytorch/tutorials의 .jenkins/ 의 일부 파일들을 .build/ 에 복사하여 사용
 import pytorch_sphinx_theme
 import torch
+import numpy
+import gc
 import glob
+import random
 import shutil
 from custom_directives import IncludeDirective, GalleryItemDirective, CustomGalleryItemDirective, CustomCalloutItemDirective, CustomCardItemDirective
 import distutils.file_util
 import re
 from get_sphinx_filenames import SPHINX_SHOULD_RUN
-
+import pandocfilters
+import pypandoc
 import plotly.io as pio
 pio.renderers.default = 'sphinx_gallery'
 
@@ -80,7 +84,7 @@ extensions = [
 
 intersphinx_mapping = {
     "torch": ("https://pytorch.org/docs/stable/", None),
-    "tensordict": ("https://pytorch-labs.github.io/tensordict/", None),
+    "tensordict": ("https://pytorch.github.io/tensordict/", None),
     "torchrl": ("https://pytorch.org/rl/", None),
     "torchaudio": ("https://pytorch.org/audio/stable/", None),
     "torchtext": ("https://pytorch.org/text/stable/", None),
@@ -105,6 +109,14 @@ sitemap_url_scheme = "{lang}{link}"
 
 # -- Sphinx-gallery configuration --------------------------------------------
 
+def reset_seeds(gallery_conf, fname):
+    torch.cuda.empty_cache()
+    torch.manual_seed(42)
+    torch.set_default_device(None)
+    random.seed(10)
+    numpy.random.seed(10)
+    gc.collect()
+
 sphinx_gallery_conf = {
     'examples_dirs': ['beginner_source', 'intermediate_source',
                       'advanced_source', 'recipes_source', 'prototype_source'],
@@ -114,7 +126,21 @@ sphinx_gallery_conf = {
     'backreferences_dir': None,
     'first_notebook_cell': ("# Google Colab에서 노트북을 실행하실 때에는 \n"
                             "# https://tutorials.pytorch.kr/beginner/colab 를 참고하세요.\n"
-                            "%matplotlib inline")
+                            "%matplotlib inline"),
+    # TODO: check before configuring build container
+    #       reveiw below files before configuring build container
+    #           - .ci/docker/Dockerfile
+    #           - .ci/docker/common/install_base.sh
+    #           - .ci/docker/common/install_docs_reqs.sh
+    #           - .github/workflows/docker-build.yml
+    #           - .github/workflows/build-tutorials.yml
+    # TODO: review below files before building documentation & exporting to epub/pdf using pandoc
+    #           - .jenkins/build.sh
+    'reset_modules': (reset_seeds),
+    'ignore_pattern': r'_torch_export_nightly_tutorial.py',
+    'pypandoc': {'extra_args': ['--mathjax', '--toc'],
+                 'filters': ['.build/custom_pandoc_filter.py'],
+    },
 }
 
 if os.getenv('GALLERY_PATTERN'):
@@ -156,8 +182,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = 'PyTorch Tutorials'
-copyright = '2018-2023, PyTorch & 파이토치 한국 사용자 모임(PyTorch Korea User Group)'
+project = 'PyTorch Tutorials KR'
+copyright = '2018-2024, PyTorch & 파이토치 한국 사용자 모임(PyTorch Korea User Group)'
 author = 'PyTorch contributors'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -296,7 +322,8 @@ texinfo_documents = [
 
 html_css_files = [
         'https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css',
-        'css/custom.css'
+        'css/custom.css',
+        'css/custom2.css',
     ]
 
 def setup(app):

@@ -149,7 +149,7 @@ print(-2*b == b.grad)
 
 
 ######################################################################
-# 선택적으로 읽기(Optional Reading) - ``autograd`` 를 사용한 벡터 미적분(calculus)
+# 선택적 읽기(Optional Reading) - ``autograd`` 를 사용한 벡터 미적분(calculus)
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 #
 # 수학적으로, 벡터 함수 :math:`\vec{y}=f(\vec{x})` 에서 :math:`\vec{x}` 에
@@ -258,7 +258,7 @@ y = torch.rand(5, 5)
 z = torch.rand((5, 5), requires_grad=True)
 
 a = x + y
-print(f"Does `a` require gradients? : {a.requires_grad}")
+print(f"Does `a` require gradients?: {a.requires_grad}")
 b = x + z
 print(f"Does `b` require gradients?: {b.requires_grad}")
 
@@ -309,5 +309,6 @@ optimizer = optim.SGD(model.parameters(), lr=1e-2, momentum=0.9)
 # 더 읽어보기:
 # ~~~~~~~~~~~~~~~~~~~
 #
-# -  `In-place operations & Multithreaded Autograd <https://pytorch.org/docs/stable/notes/autograd.html>`__
-# -  `Example implementation of reverse-mode autodiff <https://colab.research.google.com/drive/1VpeE6UvEPRz9HmsHh1KS0XxXjYu533EC>`__
+# - `In-place operations & Multithreaded Autograd <https://pytorch.org/docs/stable/notes/autograd.html>`__
+# - `Example implementation of reverse-mode autodiff <https://colab.research.google.com/drive/1VpeE6UvEPRz9HmsHh1KS0XxXjYu533EC>`__
+# - `Video: PyTorch Autograd Explained - In-depth Tutorial <https://www.youtube.com/watch?v=MswxJw-8PvE>`__

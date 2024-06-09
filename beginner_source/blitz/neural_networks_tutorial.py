@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 신경망(Neural Networks)
-=======================
+==========================
 
 신경망은 ``torch.nn`` 패키지를 사용하여 생성할 수 있습니다.
 
@@ -52,6 +52,34 @@ class Net(nn.Module):
         self.fc1 = nn.Linear(16 * 5 * 5, 120)  # 5*5은 이미지 차원에 해당
         self.fc2 = nn.Linear(120, 84)
         self.fc3 = nn.Linear(84, 10)
+
+    def forward(self, input):
+        # 합성곱(Convolution) 레이어 c1: 입력 이미지 채널 1, 출력 채널 6,
+        # 5x5 정사각 합성곱, 활성 함수로 RELU 사용 및 (N, 6, 28, 28)의 크기를
+        # 갖는 Tensor를 출력 (N은 배치 크기)
+        c1 = F.relu(self.conv1(input))
+        # 서브샘플링(Subsampling) 레이어 s2: 2x2 격자, 순전히 기능적인 레이어로,
+        # 이 레이어는 어떠한 매개변수도 가지지 않고 (N, 6, 14, 14) Tensor를 출력
+        s2 = F.max_pool2d(c1, (2, 2))
+        # 합성곱(Convolution) 레이어 c3: 입력 채널 6, 출력 채널 16,
+        # 5x5 정사각 합성곱, 활성 함수로 RELU 사용 및 (N, 16, 10, 10)의 크기를
+        # 갖는 Tensor를 출력
+        c3 = F.relu(self.conv2(s2))
+        # 서브샘플링(Subsampling) 레이어 s4: 2x2 격자, 순전히 기능적인 레이어로,
+        # 이 레이어는 어떠한 매개변수도 가지지 않고 (N, 16, 5, 5) Tensor를 출력
+        s4 = F.max_pool2d(c3, 2)
+        # 평탄화(flatten) 연산: 순전히 기능적으로 동작하며, (N, 400) Tensor를 출력
+        s4 = torch.flatten(s4, 1)
+        # 완전히 연결된 레이어 f5: (N, 400) Tensor를 입력으로 받아서
+        # (N, 120) Tensor를 출력하며, 활성 함수로 RELU 사용
+        f5 = F.relu(self.fc1(s4))
+        # 완전히 연결된 레이어 f6: (N, 120) Tensor를 입력으로 받아서
+        # (N, 84) Tensor를 출력하며, 활성 함수로 RELU 사용
+        f6 = F.relu(self.fc2(f5))
+        # 가우시안 레이어 출력: (N, 84) Tensor를 입력으로 받아서
+        # (N, 10) Tensor를 출력
+        output = self.fc3(f6)
+        return output
 
     def forward(self, x):
         # (2, 2) 크기 윈도우에 대해 맥스 풀링(max pooling)
@@ -153,7 +181,7 @@ print(loss)
 # 이제 ``.grad_fn`` 속성을 사용하여 ``loss`` 를 역방향에서 따라가다 보면,
 # 이러한 모습의 연산 그래프를 볼 수 있습니다:
 #
-# ::
+# .. code-block:: sh
 #
 #     input -> conv2d -> relu -> maxpool2d -> conv2d -> relu -> maxpool2d
 #           -> flatten -> linear -> relu -> linear -> relu -> linear
@@ -172,7 +200,7 @@ print(loss.grad_fn.next_functions[0][0].next_functions[0][0])  # ReLU
 
 ########################################################################
 # 역전파(Backprop)
-# ------------------
+# -----------------------
 # 오차(error)를 역전파하기 위해서는 ``loss.backward()`` 만 해주면 됩니다.
 # 기존에 계산된 변화도의 값을 누적 시키고 싶지 않다면 기존에 계산된 변화도를 0으로 만드는
 # 작업이 필요합니다.

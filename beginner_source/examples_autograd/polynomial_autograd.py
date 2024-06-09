@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 PyTorch: 텐서(Tensor)와 autograd
---------------------------------
+-----------------------------------
 
 :math:`y=\sin(x)` 을 예측할 수 있도록, :math:`-\pi` 부터 :math:`\pi` 까지
 유클리드 거리(Euclidean distance)를 최소화하도록 3차 다항식을 학습합니다.
@@ -16,23 +16,23 @@ import torch
 import math
 
 dtype = torch.float
-device = torch.device("cpu")
-# device = torch.device("cuda:0") # GPU에서 실행하려면 이 주석을 제거하세요
+device = "cuda" if torch.cuda.is_available() else "cpu"
+torch.set_default_device(device)
 
 # 입력값과 출력값을 갖는 텐서들을 생성합니다.
 # requires_grad=False가 기본값으로 설정되어 역전파 단계 중에 이 텐서들에 대한 변화도를
 # 계산할 필요가 없음을 나타냅니다.
-x = torch.linspace(-math.pi, math.pi, 2000, device=device, dtype=dtype)
+x = torch.linspace(-math.pi, math.pi, 2000, dtype=dtype)
 y = torch.sin(x)
 
 # 가중치를 갖는 임의의 텐서를 생성합니다. 3차 다항식이므로 4개의 가중치가 필요합니다:
 # y = a + b x + c x^2 + d x^3
 # requires_grad=True로 설정하여 역전파 단계 중에 이 텐서들에 대한 변화도를 계산할 필요가
 # 있음을 나타냅니다.
-a = torch.randn((), device=device, dtype=dtype, requires_grad=True)
-b = torch.randn((), device=device, dtype=dtype, requires_grad=True)
-c = torch.randn((), device=device, dtype=dtype, requires_grad=True)
-d = torch.randn((), device=device, dtype=dtype, requires_grad=True)
+a = torch.randn((), dtype=dtype, requires_grad=True)
+b = torch.randn((), dtype=dtype, requires_grad=True)
+c = torch.randn((), dtype=dtype, requires_grad=True)
+d = torch.randn((), dtype=dtype, requires_grad=True)
 
 learning_rate = 1e-6
 for t in range(2000):

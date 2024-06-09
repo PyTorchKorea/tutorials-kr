@@ -1,10 +1,11 @@
 Raspberry Pi 4 에서 실시간 추론(Inference) (30fps!)
-===================================================
-**저자**: `Tristan Rice <https://github.com/d4l3k>`_
+=======================================================
+
+**Author**: `Tristan Rice <https://github.com/d4l3k>`_
   **번역**: `조윤진 <https://github.com/YunjinJo>`_
 
-PyTorch는 Raspberry Pi 4에서 별도의 설정 없이 지원합니다.
-이 튜토리얼은 Raspberry Pi 4에서 PyTorch를 설정하는 방법과 CPU에서 실시간으로 (30 fps+)
+파이토치(PyTorch)는 라즈베리 파이 4(Raspberry Pi 4)에서 별도의 설정 없이도 동작합니다.
+이 튜토리얼은 Raspberry Pi 4에서 PyTorch를 설정하는 방법과 CPU에서 실시간(30fps 이상)으로
 MobileNet v2 분류 모델을 실행하는 방법을 안내합니다.
 
 이 튜토리얼은 모두 Raspberry Pi 4 Model B 4GB를 이용해 테스트 했지만 2GB 변형 모델(variant) 이나
@@ -13,7 +14,7 @@ MobileNet v2 분류 모델을 실행하는 방법을 안내합니다.
 .. image:: https://user-images.githubusercontent.com/909104/153093710-bc736b6f-69d9-4a50-a3e8-9f2b2c9e04fd.gif
 
 준비물
-~~~~~~~
+~~~~~~~~~~
 
 이 튜토리얼을 따라하려면 Raspberry Pi 4, 카메라, 기타 모든 표준 액세서리가 필요합니다.
 
@@ -61,7 +62,7 @@ SD 카드를 Raspberry Pi 에 넣고 카메라를 연결하고 부팅합니다.
 이후 재부팅 합니다. 재부팅이 완료된 후 video4linux2 장치 ``/dev/video0`` 가 존재해야 합니다.
 
 PyTorch 및 OpenCV 설치
-~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 이 튜토리얼에서 필요한 PyTorch와 다른 모든 라이브러리는 ARM 64-bit/aarch64 용(variants)이 있으므로 pip를 통해 설치하면 다른 Linux 장치처럼 작동합니다.
 
@@ -174,7 +175,7 @@ Raspberry Pi 4 벤치마크 결과:
 +--------------------+------+-----------------------+-----------------------+--------------------+
 
 MobileNetV2: 양자화 그리고 JIT
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 최적의 성능을 위해서는 양자화되고 융합된 모델이 필요합니다.
 양자화되었다는 뜻은 표준 float32 연산보다 훨씬 성능이 좋은 int8을 사용하여 계산하는 것입니다.
@@ -307,7 +308,7 @@ aarch64 버전의 pytorch는 ``qnnpack`` 엔진을 사용해야 합니다.
 
 
 문제 해결: 성능
-~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
 
 PyTorch는 기본적으로 사용 가능한 모든 코어를 사용합니다.
 만약 Raspberry Pi의 백그라운드에서 돌아가고 있는 것이 있다면 모델 추론에서 경합(contention)이 발생하여
@@ -324,9 +325,9 @@ PyTorch는 기본적으로 사용 가능한 모든 코어를 사용합니다.
 ``128ms`` 의 대기 시간 스파이크를 제거합니다.
 
 다음 단계
-~~~~~~~~~~~
+~~~~~~~~~~~~~~
 
-자신만의 모델을 만들거나 기존 모델을 미세 조정(fine tune)할 수 있습니다.
+자신만의 모델을 만들거나 기존 모델을 미세 조정(finetune)할 수 있습니다.
 `torchvision.models.quantized
 <https://pytorch.org/vision/stable/models.html#quantized-models>`_
 의 모델 중 하나를 미세 조정하면 대부분의 양자화,

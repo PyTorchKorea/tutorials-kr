@@ -16,7 +16,7 @@ PyTorch의 의미론적 이미지 분할에 사용하는 `DeepLabV3 모델 <http
 이 튜토리얼에서는 iOS에서 PyTorch DeepLabV3 모델을 준비하고 실행하는 단계별 가이드를 제공합니다. 사용하고자 하는 모델을 준비하는 시작 단계에서부터 iOS 앱에서 모델을 사용하는 마지막 단계까지 모두 살펴봅니다.
 또한 iOS에서 여러분이 선호하는 사전에 학습된(pre-trained) PyTorch 모델을 사용하는 방법과 여러 함정들을 피하는 실용적이며 보편적인 팁도 다룰 예정입니다.
 
-.. note:: 이 튜토리얼을 진행하기 앞서 `iOS를 위한 PyTorch 모바일 <https://pytorch.org/mobile/ios/>`_ 을 확인하고, PyTorch iOS 예제인 `HelloWorld <https://github.com/pytorch/ios-demo-app/tree/master/HelloWorld>`_ 앱을 실행해 보십시오. 이 튜토리얼은 대게 처음으로 모바일에 배포하는 모델인 이미지 분류 모델을 넘어선 다음 단계를 다루고 있습니다. 이 튜토리얼을 위한 전체 코드는 `여기 <https://github.com/pytorch/ios-demo-app/tree/master/ImageSegmentation>`_ 에서 확인 가능합니다.
+.. note:: 이 튜토리얼을 진행하기 앞서 `iOS를 위한 PyTorch 모바일 <https://pytorch.org/mobile/ios/>`_ 을 확인하고, PyTorch iOS 예제인 `Hello World <https://github.com/pytorch/ios-demo-app/tree/master/HelloWorld>`_ 앱을 실행해 보십시오. 이 튜토리얼은 대게 처음으로 모바일에 배포하는 모델인 이미지 분류 모델을 넘어선 다음 단계를 다루고 있습니다. 이 튜토리얼을 위한 전체 코드는 `여기 <https://github.com/pytorch/ios-demo-app/tree/master/ImageSegmentation>`_ 에서 확인 가능합니다.
 
 학습 목표
 -------------------
@@ -105,7 +105,7 @@ iOS에 모델을 배포하는 첫 단계는 모델을 `TorchScript <https://tuto
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 첫번째로 모델을 Xcode 프로젝트에서 PyTorch Mobile과 함께 쓰기 위해 `iOS 레시피를 위한 모델 준비 <../recipes/model_preparation_ios.html#add-the-model-and-pytorch-library-on-ios>`_ 의 단계 3을 따라합니다.
-이 튜토리얼의 DeepLabV3 모델과 PyTorch HelloWorld iOS 예제 내부의 MobileNet v2 모델 둘 다 컴퓨터 비전 모델이기에, `HelloWorld 예제 저장소 <https://github.com/pytorch/ios-demo-app/tree/master/HelloWorld>`_ 를 모델을 읽어 들이고 입출력을 처리하는 본보기로 삼아 시작할 수도 있습니다.
+이 튜토리얼의 DeepLabV3 모델과 PyTorch Hello World iOS 예제 내부의 MobileNet v2 모델 둘 다 컴퓨터 비전 모델이기에, `Hello World 예제 저장소 <https://github.com/pytorch/ios-demo-app/tree/master/HelloWorld>`_ 를 모델을 읽어 들이고 입출력을 처리하는 본보기로 삼아 시작할 수도 있습니다.
 
 이제 단계 2에서 사용한 `deeplabv3_scripted.pt` 와 `deeplab.jpg` 를 Xcode 프로젝트에 추가하고 `ViewController.swift` 를 이와 유사하게 수정합니다:
 
@@ -134,7 +134,7 @@ iOS에 모델을 배포하는 첫 단계는 모델을 `TorchScript <https://tuto
 4. 모델 추론을 위한 입출력 처리하기
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-이전 단계에서 모델을 읽어들인 이후 입력값이 잘 동작하는지, 예상한대로 출력값을 생성하는지 확인해 봅시다. DeepLabV3 모델을 위한 입력은 HelloWorld 예제 내부의 MobileNet v2에서 쓰는 이미지와 동일합니다. 그래서 `TorchModule.mm <https://github.com/pytorch/ios-demo-app/blob/master/HelloWorld/HelloWorld/HelloWorld/TorchBridge/TorchModule.mm>`_ HelloWorld 프로젝트의 입력 처리를 위한 코드를 재사용 합니다. `TorchModule.mm` 안의 `predictImage` 메소드 구현을 아래와 같이 변경합니다:
+이전 단계에서 모델을 읽어들인 이후 입력값이 잘 동작하는지, 예상한대로 출력값을 생성하는지 확인해 봅시다. DeepLabV3 모델을 위한 입력은 Hello World 예제 내부의 MobileNet v2에서 쓰는 이미지와 동일합니다. 그래서 `TorchModule.mm <https://github.com/pytorch/ios-demo-app/blob/master/HelloWorld/HelloWorld/HelloWorld/TorchBridge/TorchModule.mm>`_ Hello World 프로젝트의 입력 처리를 위한 코드를 재사용 합니다. `TorchModule.mm` 안의 `predictImage` 메소드 구현을 아래와 같이 변경합니다:
 
 .. code-block:: objective-c
 
@@ -226,7 +226,7 @@ iOS에 모델을 배포하는 첫 단계는 모델을 `TorchScript <https://tuto
 
 결과 처리 이후, `UIImageView` 에 표시하기 위해 RGB `buffer` 를  `UIImage` 인스턴스로 변환하는 헬퍼 함수를 호출해야 할 수도 있습니다. 코드 저장소 내부의 `UIImageHelper.mm` 에 정의된 예제 코드인 `convertRGBBufferToUIImage` 를 참조할 수도 있습니다.
 
-이 앱의 UI는 HelloWorld의 UI와 유사하지만 이미지 분류의 결과를 보여주기 위해 `UITextView` 를 필요로 하지 않습니다. 코드 저장소에서 볼 수 있는 것처럼 `Segment` and `Restart` 버튼 두 개를 추가할 수도 있습니다. 이 버튼들은 모델 추론을 실행하고 분할 결과를 보다가 원본 이미지로 되돌리기 위해 사용합니다.
+이 앱의 UI는 Hello World의 UI와 유사하지만 이미지 분류의 결과를 보여주기 위해 `UITextView` 를 필요로 하지 않습니다. 코드 저장소에서 볼 수 있는 것처럼 `Segment` and `Restart` 버튼 두 개를 추가할 수도 있습니다. 이 버튼들은 모델 추론을 실행하고 분할 결과를 보다가 원본 이미지로 되돌리기 위해 사용합니다.
 
 앱을 실행하기 전 마지막 단계는 모든 조각들을 하나로 합치는 것입니다. `predictImage` 를 사용하기 위해 `ViewController.swift` 를 변경하십시오. `predictImage` 는 저장소에서 리팩토링되어 `segmentImage` 로 변경됩니다. 그리고 저장소에 있는 `ViewController.swift` 의 헬퍼 함수를 예제 코드에서 본 것과 같이 수정하세요. 버튼에 액션을 연결하면 바로 실행할 수 있습니다.
 

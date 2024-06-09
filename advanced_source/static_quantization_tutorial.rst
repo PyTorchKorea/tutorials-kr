@@ -59,8 +59,8 @@
 - 신경망의 처음과 끝에 ``QuantStub`` 및 ``DeQuantStub`` 삽입
 - ReLU를 ReLU6로 교체
 
-알림: `여기 <https://github.com/pytorch/vision/blob/master/torchvision/models/mobilenet.py>`_ 에서
-이 코드를 가져왔습니다.
+알림: 이 코드는 `여기 <https://github.com/pytorch/vision/blob/main/torchvision/models/mobilenetv2.py>`_
+에서 가져왔습니다.
 
 .. code:: python
 
@@ -207,14 +207,15 @@
 
         # 양자화 전에 Conv+BN과 Conv+BN+Relu 모듈 결합(fusion)
         # 이 연산은 숫자를 변경하지 않음
-        def fuse_model(self):
+        def fuse_model(self, is_qat=False):
+            fuse_modules = torch.ao.quantization.fuse_modules_qat if is_qat else torch.ao.quantization.fuse_modules
             for m in self.modules():
                 if type(m) == ConvBNReLU:
-                    torch.ao.quantization.fuse_modules(m, ['0', '1', '2'], inplace=True)
+                    fuse_modules(m, ['0', '1', '2'], inplace=True)
                 if type(m) == InvertedResidual:
                     for idx in range(len(m.conv)):
                         if type(m.conv[idx]) == nn.Conv2d:
-                            torch.ao.quantization.fuse_modules(m.conv, [str(idx), str(idx + 1)], inplace=True)
+                            fuse_modules(m.conv, [str(idx), str(idx + 1)], inplace=True)
 
 2. 헬퍼(Helper) 함수
 ----------------------
@@ -426,16 +427,19 @@ ImageNet 데이터
     print(myModel.qconfig)
     torch.ao.quantization.prepare(myModel, inplace=True)
 
-    # 첫 번째 보정
+    # 첫 번째 보정(calibrate)
     print('Post Training Quantization Prepare: Inserting Observers')
     print('\n Inverted Residual Block:After observer insertion \n\n', myModel.features[1].conv)
 
-    # 학습 세트로 보정
+    # 학습 데이터셋으로 보정(calibrate)
     evaluate(myModel, criterion, data_loader, neval_batches=num_calibration_batches)
     print('Post Training Quantization: Calibration done')
 
     # 양자화된 모델로 변환
     torch.ao.quantization.convert(myModel, inplace=True)
+    # 모델을 보정해야 한다(calibrate the model)는 사용자 경고(user warning)가 표시될 수 있지만 무시해도 됩니다.
+    # 이 경고는 각 모델 실행 시 모든 모듈이 실행되는 것이 아니기 때문에 일부 모듈이 보정되지 않을 수
+    # 있다는 경고입니다.
     print('Post Training Quantization: Convert done')
     print('\n Inverted Residual Block: After fusion and quantization, note fused modules: \n\n',myModel.features[1].conv)
 
@@ -533,7 +537,7 @@ x86 아키텍처에서 양자화를 위한 권장 설정을 그대로 쓰기만 
 .. code:: python
 
     qat_model = load_model(saved_model_dir + float_model_file)
-    qat_model.fuse_model()
+    qat_model.fuse_model(is_qat=True)
 
     optimizer = torch.optim.SGD(qat_model.parameters(), lr = 0.0001)
     # 이전의 'fbgemm' 또한 여전히 사용 가능하지만, 'x86'을 기본으로 사용하는 것을 권장합니다.

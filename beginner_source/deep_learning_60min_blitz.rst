@@ -21,11 +21,11 @@ PyTorch는 Python 기반의 과학 연산 패키지로 다음 두 가지 목적�
 -  높은 수준에서 PyTorch의 Tensor library와 신경망(Neural Network)를 이해합니다.
 -  이미지를 분류하는 작은 신경망을 학습시킵니다.
 
-아래 튜토리얼을 실행하기 전에, `torch`_ 와 `torchvision`_ 패키지가 설치되어 있는지 확인하세요.
+아래 튜토리얼을 실행하기 전에, `torch`_, `torchvision`_, 그리고 `matplotlib`_  패키지가 설치되어 있는지 확인하세요.
 
 .. _torch: https://github.com/pytorch/pytorch
 .. _torchvision: https://github.com/pytorch/vision
-
+.. _matplotlib: https://github.com/matplotlib/matplotlib
 
 .. toctree::
    :hidden:

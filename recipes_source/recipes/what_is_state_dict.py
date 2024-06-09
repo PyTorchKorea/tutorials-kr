@@ -27,7 +27,7 @@ Python 사전(dict) 객체입니다.
 ----------
 시작하기 전에 ``torch`` 가 없다면 설치해야 합니다.
 
-::
+.. code-block:: sh
 
    pip install torch
 

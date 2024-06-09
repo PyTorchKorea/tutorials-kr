@@ -1210,9 +1210,6 @@ C++ 프론트엔드는 개별 텐서뿐만 아니라 모델 및 옵티마이저 
 
 .. code-block:: python
 
-  from __future__ import print_function
-  from __future__ import unicode_literals
-
   import argparse
 
   import matplotlib.pyplot as plt

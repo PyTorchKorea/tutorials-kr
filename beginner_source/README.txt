@@ -23,4 +23,4 @@ Beginner Tutorials
 
 6. transformer_translation.py
 	Language Translation with Transformers
-	https://tutorials.pytorch.kr/beginner/transformer_tutorial.html
+	https://tutorials.pytorch.kr/beginner/translation_transformer.html

@@ -129,7 +129,7 @@ print(z.stride()) # 결과: (3072, 1, 96, 3)
 # 연산자는 연속된 메모리 형식으로 출력을 생성합니다. 그렇지 않으면, 출력은
 # channels last 메모리 형식입니다.
 
-if torch.backends.cudnn.version() >= 7603:
+if torch.backends.cudnn.is_available() and torch.backends.cudnn.version() >= 7603:
     model = torch.nn.Conv2d(8, 4, 3).cuda().half()
     model = model.to(memory_format=torch.channels_last) # 모듈 인자들은 Channels last로 변환이 필요합니다
 

@@ -15,7 +15,7 @@ PyTorch로 분산 어플리케이션 개발하기
 알아보고, 패키지 내부도 일부 살펴보도록 하겠습니다.
 
 설정(Setup)
-------------
+---------------
 
 .. raw:: html
 
@@ -277,7 +277,7 @@ PyTorch에는 현재 ``dist.all_reduce(tensor, op, group)`` 외에도 6개의 �
         def __init__(self, data, sizes=[0.7, 0.2, 0.1], seed=1234):
             self.data = data
             self.partitions = []
-            rng = Random()
+            rng = Random()  # from random import Random
             rng.seed(seed)
             data_len = len(data)
             indexes = [x for x in range(0, data_len)]
@@ -303,7 +303,7 @@ PyTorch에는 현재 ``dist.all_reduce(tensor, op, group)`` 외에도 6개의 �
                                      transforms.Normalize((0.1307,), (0.3081,))
                                  ]))
         size = dist.get_world_size()
-        bsz = 128 / float(size)
+        bsz = 128 // size
         partition_sizes = [1.0 / size for _ in range(size)]
         partition = DataPartitioner(dataset, partition_sizes)
         partition = partition.use(dist.get_rank())

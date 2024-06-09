@@ -31,9 +31,9 @@ TorchScript에 대한 소개입니다.
 
 """
 
-import torch  # This is all you need to use both PyTorch and TorchScript!
+import torch  # PyTorch와 TorchScript를 사용하기 위해 필요한건 이것이 전부입니다!
 print(torch.__version__)
-
+torch.manual_seed(191009)  # 재현을 위해 시드값(seed)을 설정합니다.
 
 ######################################################################
 # PyTorch 모델 작성의 기초
@@ -113,7 +113,7 @@ print(my_cell(x, h))
 # 모델을 간결하고 읽기 쉽게 작성할 수 있습니다.
 #
 # 여러분은 출력된 내용에서 ``grad_fn`` 을 확인하셨을 것입니다. 이것은
-# `오토그라드(autograd) <https://tutorials.pytorch.kr/beginner/blitz/autograd_tutorial.html>`__
+# `Autograd <https://tutorials.pytorch.kr/beginner/blitz/autograd_tutorial.html>`__
 # 라 불리는 PyTorch의 자동 미분 방법의 세부 정보입니다. 요컨데, 이 시스템은
 # 잠재적으로 복잡한 프로그램을 통해 미분을 계산할 수 있게 합니다. 이 디자인은
 # 모델 제작에 엄청난 유연성을 제공합니다.
@@ -155,9 +155,9 @@ print(my_cell(x, h))
 # 대한 미분값을 명시적으로 정의할 필요가 없습니다.
 #
 # .. figure:: https://github.com/pytorch/pytorch/raw/main/docs/source/_static/img/dynamic_graph.gif
-#    :alt: 오토그라드가 작동하는 방식
+#    :alt: Autograd가 동작하는 방식 방식
 #
-#    오토그라드가 작동하는 방식
+#    Autograd가 작동하는 방식
 #
 
 
@@ -295,7 +295,7 @@ print(scripted_cell.code)
 
 # 새로운 입력
 x, h = torch.rand(3, 4), torch.rand(3, 4)
-traced_cell(x, h)
+print(scripted_cell(x, h))
 
 
 ######################################################################
@@ -373,6 +373,7 @@ print(loaded.code)
 #
 # 더 읽을거리
 # ~~~~~~~~~~~~~~~
+#
 # 튜토리얼을 완료했습니다! 관련 데모를 보려면 TorchScript를 사용하여 기계 번역
 # 모델을 변환하기 위한 NeurIPS 데모를 확인하십시오:
 # https://colab.research.google.com/drive/1HiICg6jRkBnr5hvK2-VnMi88Vi9pUzEJ

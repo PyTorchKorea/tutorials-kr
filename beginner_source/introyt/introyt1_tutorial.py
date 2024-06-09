@@ -276,7 +276,7 @@ import torchvision.transforms as transforms
 
 transform = transforms.Compose(
     [transforms.ToTensor(),
-     transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+     transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2470, 0.2435, 0.2616))])
 
 
 ##########################################################################
@@ -284,10 +284,29 @@ transform = transforms.Compose(
 #
 # -  ``transforms.ToTensor()``는 Pillow 패키지를 사용하여 불러온 이미지를
 #    PyTorch tensor 형태로 변환합니다.
-# -  ``transforms.Normalize()`` 는 tensor의 평균이 0이고 표준 편차가 0.5가
+# -  ``transforms.Normalize()`` 는 tensor의 평균이 0이고 표준 편차가 1.0이
 #      되도록 tensor의 값을 조정합니다.
-#      대부분의 활성화 함수는 약 x=0에 강한 기울기 값을 가지고 있어 데이터를
+#      대부분의 활성화 함수는 x = 0 부근에서 강한 기울기 값을 가지고 있어 데이터를
 #      중앙으로 집중화하여 학습 속도를 높일 수 있습니다.
+#
+# 변환(trnasform)에 전달되는 값들은 각각 데이터셋에 있는 이미지들의 RGB 채널별
+# 평균값(mean)들(첫번째 튜플)과 표준편차(standard deviation)들(두번째 튜플)입니다.
+# 아래 몇 줄의 코드를 실행하여 직접 이 값을 계산해 볼 수 있습니다:
+#          ```
+#           from torch.utils.data import ConcatDataset
+#           transform = transforms.Compose([transforms.ToTensor()])
+#           trainset = torchvision.datasets.CIFAR10(root='./data', train=True,
+#                                        download=True, transform=transform)
+#
+#           #stack all train images together into a tensor of shape
+#           #(50000, 3, 32, 32)
+#           x = torch.stack([sample[0] for sample in ConcatDataset([trainset])])
+#
+#           #get the mean of each channel
+#           mean = torch.mean(x, dim=(0,2,3)) #tensor([0.4914, 0.4822, 0.4465])
+#           std = torch.std(x, dim=(0,2,3)) #tensor([0.2470, 0.2435, 0.2616])
+#
+#          ```
 #
 # transforms 는 cropping, centering, rotation, reflection를 포함하여 더 많은
 # 변환이 가능합니다.
@@ -536,9 +555,9 @@ print('Finished Training')
 #
 # 루프의 나머지 부분은 epoch 횟수, 학습 루프를 통해 수집된 손실 값을 출력합니다.
 #
-# **위 셀을 실행한다면** 다음과 같은 값이 표시됩니다:
+# **위 셀을 실행하면** 다음과 같은 출력이 나타날 것입니다:
 #
-# ::
+# .. code-block:: sh
 #
 #    [1,  2000] loss: 2.235
 #    [1,  4000] loss: 1.940

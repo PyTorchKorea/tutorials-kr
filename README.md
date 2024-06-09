@@ -4,7 +4,7 @@
 
 PyTorch에서 제공하는 튜토리얼의 한국어 번역을 위한 저장소입니다.\
 번역의 결과물은 [https://tutorials.pytorch.kr](https://tutorials.pytorch.kr)에서 확인하실 수 있습니다. (번역을 진행하며 **비정기적으로** 반영합니다.)\
-현재 버전의 번역 / 변경 관련 이슈는 [#660 이슈](https://github.com/PyTorchKorea/tutorials-kr/issues/660)를 참고해주세요.
+현재 버전의 번역 / 변경 관련 이슈는 [#799 이슈](https://github.com/PyTorchKorea/tutorials-kr/issues/799)를 참고해주세요.
 
 ## 기여하기
 
@@ -22,7 +22,7 @@ PyTorch에서 제공하는 튜토리얼의 한국어 번역을 위한 저장소�
 
 ## 원문
 
-현재 PyTorch v2.0 튜토리얼([pytorch/tutorials@9efe789b](https://github.com/pytorch/tutorials/commit/9efe789bfc3763ec359b60f12b5e6dda4e6d5db0) 기준) 번역이 진행 중입니다.
+현재 PyTorch v2.0 튜토리얼([pytorch/tutorials@6537199](https://github.com/pytorch/tutorials/commit/653719940f7c4d908811da415f190465d8c3189d) 기준) 번역이 진행 중입니다.
 
 최신 버전의 튜토리얼(공식, 영어)은 [PyTorch tutorials 사이트](https://pytorch.org/tutorials) 및 [PyTorch tutorials 저장소](https://github.com/pytorch/tutorials)를 참고해주세요.
 
@@ -45,6 +45,11 @@ v1.0 이후 번역은 별도 저장소로 관리하지 않습니다. [이 저장
 해당 릴리즈의 문서를 내려받으신 후 빌드하시면 해당 버전의 문서를 확인하실 수 있습니다. \
 빌드 방법은 [기여하기 문서의 `2-5. (내 컴퓨터에서) 결과 확인하기`](https://github.com/PyTorchKorea/tutorials-kr/blob/master/CONTRIBUTING.md#2-5-내-컴퓨터에서-결과-확인하기) 부분을 참고해주세요.
 
+## 라이선스 (License)
+
+파이토치 한국어 튜토리얼의 라이선스는 [원본 튜토리얼의 라이선스인 BSD-3항](https://github.com/pytorch/tutorials/blob/main/LICENSE)을 따릅니다. \
+자세한 내용은 [LICENSE 파일](https://github.com/PyTorchKorea/tutorials-kr/blob/master/LICENSE)을 참조해주세요.
+
 ---
-This is a project to translate [pytorch/tutorials@9efe789b](https://github.com/pytorch/tutorials/commit/9efe789bfc3763ec359b60f12b5e6dda4e6d5db0) into Korean.
+This is a project to translate [pytorch/tutorials@6537199](https://github.com/pytorch/tutorials/commit/653719940f7c4d908811da415f190465d8c3189d) into Korean.
 For the latest version, please visit to the [official PyTorch tutorials repo](https://github.com/pytorch/tutorials).

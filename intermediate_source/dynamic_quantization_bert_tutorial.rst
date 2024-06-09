@@ -58,7 +58,7 @@ PyTorch 설치 안내와 `HuggingFace 깃허브 저장소 <https://github.com/hu
 .. code:: shell
 
    pip install sklearn
-   pip install transformers
+   pip install transformers==4.29.2
 
 
 PyTorch의 베타 기능들을 사용할 것이므로, 가장 최신 버전의 torch와 torchvision을 설치하는 것을 권해드립니다.
@@ -238,6 +238,7 @@ MRPC 문제를 위해 미세조정한 BERT 모델을 `여기 <https://download.p
         np.random.seed(seed)
         torch.manual_seed(seed)
     set_seed(42)
+
 
 
 2.2 미세조정한 BERT 모델 불러오기
@@ -513,6 +514,10 @@ MRPC 데이터셋을 평가하는데 약 46초가 소요됐습니다.
 나중에 다시 쓸 수 있도록 `torch.jit.save` 을 사용하여 양자화된 모델을 직렬화하고 저장할 수 있습니다.
 
 .. code:: python
+
+    def ids_tensor(shape, vocab_size):
+        #  Creates a random int32 tensor of the shape within the vocab size
+        return torch.randint(0, vocab_size, shape=shape, dtype=torch.int, device='cpu')
 
     input_ids = ids_tensor([8, 128], 2)
     token_type_ids = ids_tensor([8, 128], 2)

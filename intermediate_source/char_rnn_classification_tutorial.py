@@ -3,14 +3,17 @@
 기초부터 시작하는 NLP: 문자-단위 RNN으로 이름 분류하기
 ********************************************************************************
 
-**Author**: `Sean Robertson <https://github.com/spro/practical-pytorch>`_
+**Author**: `Sean Robertson <https://github.com/spro>`_
   **번역**: `황성수 <https://github.com/adonisues>`_, `김제필 <https://github.com/garlicvread>`_
 
 
-단어를 분류하기 위해 기초적인 문자-단위 RNN을 구축하고 학습할 예정입니다.
-이 튜토리얼에서는(이후 2개 튜토리얼과 함께) NLP 모델링을 위해 `torchtext` 의
-수많은 편리한 기능을 사용하지 않고도 어떻게 데이터를 전처리하는지 "기초부터(from scratch)"
-보여주므로 NLP 모델링을 위한 데이터 전처리가 저수준에서 어떻게 진행되는지 알 수 있습니다.
+여기에서는 단어를 분류하기 위해 기초적인 문자-단위의 순환 신경망(RNN, Recurrent Nueral Network)을
+구축하고 학습할 예정입니다. 이 튜토리얼 및 이후 2개 튜토리얼인 :doc:`/intermediate/char_rnn_generation_tutorial`
+및 :doc:`/intermediate/seq2seq_translation_tutorial` 에서는 자연어 처리(NLP, Natural Language Processing)
+분야에서 어떻게 데이터를 전처리하고 NLP 모델을 구축하는지를 밑바닥부터(from scratch) 설명합니다.
+이를 위해 이 튜토리얼 시리즈에서는 `torchtext` 의 수많은 편리한 기능들을 사용하지 않고
+NLP 모델링을 위한 데이터 전처리가 밑바닥(low-level)에서 어떻게 진행되는지 알 수 있습니다.
+
 문자-단위 RNN은 단어를 문자의 연속으로 읽어 들여서 각 단계의 예측과
 "은닉 상태(Hidden State)"를 출력하고, 다음 단계에 이전 단계의 은닉 상태를 전달합니다.
 단어가 속한 클래스로 출력되도록 최종 예측으로 선택합니다.
@@ -18,7 +21,7 @@
 구체적으로, 18개 언어로 된 수천 개의 성(姓)을 훈련시키고,
 철자에 따라 이름이 어떤 언어인지 예측합니다:
 
-::
+.. code-block:: sh
 
     $ python predict.py Hinton
     (-0.47) Scottish
@@ -31,14 +34,16 @@
     (-2.68) Dutch
 
 
-**추천 자료:**
+준비 과정
+===========================
 
-Pytorch를 설치했고, Python을 알고, Tensor를 이해한다고 가정합니다:
+이 튜토리얼을 시작하기 전, PyTorch를 이미 설치했으며, Python 프로그래밍 언어와
+Tensor에 대한 기본적인 이해를 하고 계셔야 합니다:
 
--  https://pytorch.org/ 설치 안내
--  :doc:`/beginner/deep_learning_60min_blitz` PyTorch 시작하기
--  :doc:`/beginner/pytorch_with_examples` 넓고 깊은 통찰을 위한 자료
--  :doc:`/beginner/former_torchies_tutorial` 이전 Lua Torch 사용자를 위한 자료
+-  https://pytorch.kr/ 에서 설치 안내를 찾을 수 있으며,
+-  :doc:`/beginner/deep_learning_60min_blitz` 를 통해 PyTorch의 일반적인 내용과 Tensor에 대해 익힐 수 있습니다.
+-  :doc:`/beginner/pytorch_with_examples` 는 넓고 깊은 개요(overview)를 제공하며,
+-  :doc:`/beginner/former_torchies_tutorial` 이전 Lua Torch 사용자를 위한 자료입니다.
 
 RNN과 그 작동 방식을 아는 것 또한 유용합니다:
 
@@ -138,13 +143,12 @@ print(category_lines['Italian'][:5])
 # 때문에 발생합니다. 여기서는 배치 크기 1을 사용하고 있습니다.
 #
 
-'''
-.. NOTE::
-역자 주:  One-Hot 벡터는 언어를 다룰 때 자주 이용되며,
-단어, 글자 등을 벡터로 표현할 때 단어, 글자 사이의 상관 관계를 미리 알 수 없을 경우,
-One-Hot으로 표현하여 서로 직교한다고 가정하고 학습을 시작합니다.
-이와 동일하게, 상관 관계를 알 수 없는 다른 데이터의 경우에도 One-Hot 벡터를 활용할 수 있습니다.
-'''
+# .. note::
+#    역자 주: One-Hot 벡터는 언어 및 범주형 데이터를 다룰 때 주로 사용하며,
+#    단어, 글자 등을 벡터로 표현할 때 단어, 글자 사이의 상관 관계를 미리 알 수 없을 경우,
+#    One-Hot으로 표현하여 서로 직교한다고 가정하고 학습을 시작합니다.
+#    이와 동일하게, 상관 관계를 알 수 없는 다른 데이터의 경우에도 One-Hot 벡터를 활용할 수 있습니다.
+#
 
 import torch
 
@@ -181,20 +185,15 @@ print(lineToTensor('Jones').size())
 # 완전히 처리됩니다. 이는 feed-forward 계층과
 # 같은 매우 "순수한" 방법으로 RNN을 구현할 수 있음을 의미합니다.
 #
-# 역자 주 : 여기서는 교육 목적으로 nn.RNN 대신 직접 RNN을 사용합니다.
+# .. note::
+#    역자 주: 여기서는 학습 목적으로 nn.RNN 대신 직접 RNN을 사용합니다.
 #
-# 이 RNN 모듈(대부분 `Torch 사용자를 위한 PyTorch 튜토리얼
-# <https://tutorials.pytorch.kr/beginner/former_torchies/
-# nnft_tutorial.html#example-2-recurrent-net>`__ 에서 복사함)은
-# 입력 및 은닉 상태로 작동하는 2개의 선형 계층이며,
-# 출력 다음에 ``LogSoftmax`` 계층이 있습니다.
-#
-# .. figure:: https://i.imgur.com/Z2xbySO.png
-#    :alt:
-#
+# 이 RNN 모듈은 "기본(vanilla)적인 RNN"을 구현하며, 입력과 은닉 상태(hidden state),
+# 그리고 출력 뒤 동작하는 ``LogSoftmax`` 계층이 있는 3개의 선형 계층만을 가집니다.
 #
 
 import torch.nn as nn
+import torch.nn.functional as F
 
 class RNN(nn.Module):
     def __init__(self, input_size, hidden_size, output_size):
@@ -202,14 +201,14 @@ class RNN(nn.Module):
 
         self.hidden_size = hidden_size
 
-        self.i2h = nn.Linear(input_size + hidden_size, hidden_size)
-        self.i2o = nn.Linear(input_size + hidden_size, output_size)
+        self.i2h = nn.Linear(input_size, hidden_size)
+        self.h2h = nn.Linear(hidden_size, hidden_size)
+        self.h2o = nn.Linear(hidden_size, output_size)
         self.softmax = nn.LogSoftmax(dim=1)
 
     def forward(self, input, hidden):
-        combined = torch.cat((input, hidden), 1)
-        hidden = self.i2h(combined)
-        output = self.i2o(combined)
+        hidden = F.tanh(self.i2h(input) + self.h2h(hidden))
+        output = self.h2o(hidden)
         output = self.softmax(output)
         return output, hidden
 
@@ -257,15 +256,17 @@ print(output)
 #
 # 학습
 # ========
+#
 # 학습 준비
 # ----------------------
 #
-# 학습에 들어가기 전, 몇몇 도움 되는 함수를 만들어야 합니다.
-# 첫째는 우리가 알아낸 각 카테고리의 우도인 네트워크 출력을 해석하는 함수입니다.
+# 학습에 들어가기 전, 몇몇 도움이 되는 함수(helper function)를 만들어야 합니다.
+# 첫째는 우리가 알아낸 각 카테고리의 우도(likelihood)인 네트워크 출력을 해석하는 함수입니다.
 # 가장 큰 값의 주소를 알기 위해서 ``Tensor.topk`` 를 사용할 수 있습니다.
 #
-# 역자 주: 네트워크 출력(각 카테고리의 우도)으로
-# 가장 확률이 높은 카테고리 이름(언어)과 카테고리 번호를 반환
+# .. note::
+#    역자 주: 네트워크 출력(각 카테고리의 우도, likelihood)으로 가장 확률이 높은
+#    카테고리의 이름(언어)과 카테고리 번호를 반환합니다.
 #
 
 def categoryFromOutput(output):
@@ -504,19 +505,19 @@ predict('Satoshi')
 # -  ``predict.py`` (커맨드 라인 인자로 ``predict()`` 실행)
 # -  ``server.py`` (``bottle.py`` 를 사용하여 JSON API로 예측 제공)
 #
-# 학습과 네트워크 저장을 위해 ``train.py`` 실행.
+# ``train.py`` 를 실행하면 학습 및 신경망을 저장합니다.
 #
-# 이름으로 예측을 보기 위해 ``predict.py`` 실행:
+# ``predict.py`` 를 실행하면 이름으로부터 예측을 실행합니다:
 #
-# ::
+# .. code-block:: sh
 #
 #     $ python predict.py Hazaki
 #     (-0.42) Japanese
 #     (-1.39) Polish
 #     (-3.51) Czech
 #
-# ``server.py`` 를 실행하고 예측의 JSON 출력을 얻기 위해
-# http://localhost:5533/Yourname 방문.
+# ``server.py`` 를 실행하고 http://localhost:5533/Yourname 을 방문하면
+# 예측 값에 대한 JSON 출력을 확인할 수 있습니다.
 #
 
 

@@ -1,6 +1,6 @@
 분산 데이터 병렬(DDP)과 분산 RPC 프레임워크 결합
 =================================================================
-**저자**: `Pritam Damania <https://github.com/pritamdamania87>`__ and `Yi Wang <https://github.com/SciPioneer>`__
+**저자**: `Pritam Damania <https://github.com/pritamdamania87>`__ and `Yi Wang <https://github.com/wayi1>`__
 
 **번역**: `박다정 <https://github.com/dajeongPark-dev>`_
 

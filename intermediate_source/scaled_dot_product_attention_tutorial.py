@@ -2,9 +2,9 @@
 (Beta) Scaled Dot Product Attention (SDPA)로 고성능 트랜스포머(Transformers) 구현하기
 =================================================================================
 
+**Author:** `Driss Guessous <https://github.com/drisspg>`_
+  **번역:** `이강희 <https://github.com/khleexv>`_
 
-**저자:** `Driss Guessous <https://github.com/drisspg>`_
-**번역:** `이강희 <https://github.com/khleexv>`_
 """
 
 ######################################################################
@@ -53,7 +53,7 @@ F.scaled_dot_product_attention(query, key, value)
 
 ######################################################################
 # 명시적 Dispatcher 제어
-# ~~~~~~~~~~~~~~~~~~~~
+# ~~~~~~~~~~~~~~~~~~~~~~~~
 #
 # 이 함수는 암시적으로 세 가지 구현 중 하나를 사용합니다. 하지만 컨텍스트 매니저를
 # 사용하면 명시적으로 어떤 구현을 사용할 지 제어할 수 있습니다. 컨텍스트 매니저를 통해
@@ -83,36 +83,31 @@ value = torch.rand(batch_size, num_heads, max_sequence_len, embed_dimension, dev
 print(f"The default implementation runs in {benchmark_torch_function_in_microseconds(F.scaled_dot_product_attention, query, key, value):.3f} microseconds")
 
 # 세 가지 구현의 속도를 측정합니다
-from torch.backends.cuda import sdp_kernel, SDPBackend
-
-# Helpful arguments mapper
-backend_map = {
-    SDPBackend.MATH: {"enable_math": True, "enable_flash": False, "enable_mem_efficient": False},
-    SDPBackend.FLASH_ATTENTION: {"enable_math": False, "enable_flash": True, "enable_mem_efficient": False},
-    SDPBackend.EFFICIENT_ATTENTION: {
-        "enable_math": False, "enable_flash": False, "enable_mem_efficient": True}
-}
-
-with sdp_kernel(**backend_map[SDPBackend.MATH]):
-    print(f"The math implementation runs in {benchmark_torch_function_in_microseconds(F.scaled_dot_product_attention, query, key, value):.3f} microseconds")
+from torch.nn.attention import SDPBackend, sdpa_kernel
 
 
-with sdp_kernel(**backend_map[SDPBackend.FLASH_ATTENTION]):
+with sdpa_kernel(SDPBackend.MATH):
+    math_time=benchmark_torch_function_in_microseconds(F.scaled_dot_product_attention, query, key, value)
+    print(f"The math implementation runs in {math_time:.3f} microseconds")
+
+with sdpa_kernel(SDPBackend.FLASH_ATTENTION):
     try:
-        print(f"The flash attention implementation runs in {benchmark_torch_function_in_microseconds(F.scaled_dot_product_attention, query, key, value):.3f} microseconds")
+        flash_time=benchmark_torch_function_in_microseconds(F.scaled_dot_product_attention, query, key, value)
+        print(f"The flash attention implementation runs in {flash_time:.3f} microseconds")
     except RuntimeError:
         print("FlashAttention is not supported. See warnings for reasons.")
 
-with sdp_kernel(**backend_map[SDPBackend.EFFICIENT_ATTENTION]):
+with sdpa_kernel(SDPBackend.EFFICIENT_ATTENTION):
     try:
-        print(f"The memory efficient implementation runs in {benchmark_torch_function_in_microseconds(F.scaled_dot_product_attention, query, key, value):.3f} microseconds")
+        efficient_time=benchmark_torch_function_in_microseconds(F.scaled_dot_product_attention, query, key, value)
+        print(f"The memory efficient implementation runs in {efficient_time:.3f} microseconds")
     except RuntimeError:
         print("EfficientAttention is not supported. See warnings for reasons.")
 
 
 ######################################################################
 # 하드웨어 의존성
-# ~~~~~~~~~~~~~
+# ~~~~~~~~~~~~~~~~~~
 #
 # 위 셀을 어떤 머신에서 실행했는지와 사용 가능한 하드웨어에 따라 결과가 다를 수 있습니다.
 # - GPU가 없고 CPU에서 실행 중이라면 컨텍스트 매니저는 효과가 없고 세 가지 실행 모두
@@ -123,7 +118,7 @@ with sdp_kernel(**backend_map[SDPBackend.EFFICIENT_ATTENTION]):
 
 ######################################################################
 # Causal Self Attention
-# ~~~~~~~~~~~~~~~~~~~~~
+# ~~~~~~~~~~~~~~~~~~~~~~~~
 #
 # 아래는 multi-head causal self attention 블록의 구현 예시입니다.
 # `Andrej Karpathy NanoGPT <https://github.com/karpathy/nanoGPT>`__ 저장소를 참고했습니다.
@@ -232,10 +227,10 @@ def generate_rand_batch(
 random_nt, _ = generate_rand_batch(32, 512, embed_dimension, pad_percentage=0.5, dtype=dtype, device=device)
 random_dense, _ = generate_rand_batch(32, 512, embed_dimension, pad_percentage=None, dtype=dtype, device=device)
 
-# 현재 퓨즈드 구현은 ``NestedTensor`` 로 학습하는 것을 지원하지 않습니다.
+# 현재 퓨즈드(fused) 구현은 ``NestedTensor`` 로 학습하는 것을 지원하지 않습니다.
 model.eval()
 
-with sdp_kernel(**backend_map[SDPBackend.FLASH_ATTENTION]):
+with sdpa_kernel(SDPBackend.FLASH_ATTENTION):
     try:
         print(f"Random NT runs in {benchmark_torch_function_in_microseconds(model, random_nt):.3f} microseconds")
         print(f"Random Dense runs in {benchmark_torch_function_in_microseconds(model, random_dense):.3f} microseconds")
@@ -245,7 +240,7 @@ with sdp_kernel(**backend_map[SDPBackend.FLASH_ATTENTION]):
 
 ######################################################################
 # ``torch.compile`` 과 함께 SDPA 사용하기
-# =====================================
+# ============================================
 #
 # PyTorch 2.0 릴리즈와 함께 ``torch.compile()`` 라는 새로운 기능이 추가되었는데,
 # 이는 eager mode보다 상당한 성능 향상을 제공할 수 있습니다.
@@ -296,8 +291,11 @@ with profile(activities=activities, record_shapes=False) as prof:
             compiled_model(x)
 print(prof.key_averages().table(sort_by="cuda_time_total", row_limit=10))
 
+######################################################################
+#
 # 더 많은 정보를 얻기 위해 추적(trace)를 내보내고 ``chrome://tracing``을 사용하여 결과를 확인해보세요.
-# ::
+#
+# .. code-block:: python
 #
 #    prof.export_chrome_trace("compiled_causal_attention_trace.json").
 
@@ -320,13 +318,81 @@ print(prof.key_averages().table(sort_by="cuda_time_total", row_limit=10))
 # 데이터셋을 사용하여 진행되었습니다.
 #
 
+######################################################################
+# SDPA를 ``atteition.bias`` 하위 클래스와 사용하기
+# ====================================================
+#
+# PyTorch 2.3부터 텐서 하위 클래스를 포함하는 새로운 서브모듈을 추가했습니다.
+# 추가된 모듈의 이름은 ``torch.nn.attention.bias`` 이며, ``torch.nn.functional.scaled_dot_product_attention``
+# 와 함께 사용할 수 있도록 설계되었습니다. 또한, 인과적 어텐션 변형(Causal Attention Variants)을 생성하기
+# 위한 다음 2가지 기능(utilities)을 포함하고 있습니다:
+#
+# - ``torch.nn.attention.bias.causal_upper_left``
+# - ``torch.nn.attention.bias.causal_lower_right``
+#
+# .. note::
+#    현재 ``torch.nn.functional.scaled_dot_product_attention`` 의 ``is_causal`` 인자(argument)는
+#    ``torch.nn.attention.bias.causal_upper_left`` 를 사용하는 것과 동일합니다.
+#
+
+from torch.nn.attention.bias import causal_lower_right, causal_upper_left
+
+batch_size = 32
+sequence_length_q = 2
+sequence_length_kv = 10
+num_heads = 16
+embed_dimension = 32
+
+dtype = torch.float16
+
+query = torch.rand(batch_size, num_heads, sequence_length_q, embed_dimension, device=device, dtype=dtype)
+key = torch.rand(batch_size, num_heads, sequence_length_kv, embed_dimension, device=device, dtype=dtype)
+value = torch.rand(batch_size, num_heads, sequence_length_kv, embed_dimension, device=device, dtype=dtype)
+
+upper_left_bias = causal_upper_left(sequence_length_q, sequence_length_kv)
+lower_right_bias = causal_lower_right(sequence_length_q, sequence_length_kv)
+
+print(type(upper_left_bias))
+print(type(lower_right_bias))
+
+assert type(upper_left_bias) == type(lower_right_bias)
+assert issubclass(type(upper_left_bias), torch.Tensor)
+
+# 위의 출력에서 볼 수 있듯, 두 객체는 같은 타입인 ``torch.nn.attention.bias.CausalBias`` 이며,
+# ``torch.Tensor`` 의 하위 클래스(subclass)입니다.
+
+# 각 텐서들이 어떻게 생겼는지 살펴보겠습니다.
+print(upper_left_bias)
+print(lower_right_bias)
+
+# Upper Left Bias는 인과적 어텐션 마스크(causal attention mask)를 어텐션 점수 행렬(attention scores matrix)의 왼쪽 상단에 정렬합니다.
+# 이는 어텐션 점수 행렬이 정사각형이 아닌 경우에만 영향을 미치며, 이는 디코딩 상황에서 일반적인 경우입니다.
+# 이 개념을 다른 방식으로 생각하는 방법은, upper left bias를 사용할 때는 쿼리(query)의 0번째 토큰이 키(key)의 0번째 토큰과 정렬된다고
+# 생각하는 것입니다. 즉, 어텐션 점수 행렬(attention score matrix)이 2차원이라고 가정할 때, ``attn_score[0][0]`` 이 쿼리의 0번째 토큰과
+# 키의 0번째 토큰 사이의 어텐션 점수인 것입니다.
+# Lower Right Bias의 경우에는 쿼리(query)의 마지막 토큰이 키(key)의 마지막 토큰과 정렬되도록 쿼리(query)의 시퀀스를 정렬합니다.
+# 예를 들어, ``attn_score[-1][-1]`` 은 쿼리와 키의 길이가 서로 다르더라도 쿼리의 마지막 토큰과 키의 마지막 토큰이 같은 위치에 있기 때문에
+# 모두 True입니다.
+
+# SDPA와 함께 사용하기 위한 객체들입니다.
+out_upper_left = F.scaled_dot_product_attention(query, key, value, upper_left_bias)
+out_lower_right = F.scaled_dot_product_attention(query, key, value, lower_right_bias)
+out_is_causal = F.scaled_dot_product_attention(query, key, value, is_causal=True)
+
+assert torch.allclose(out_upper_left, out_is_causal)
+assert not torch.allclose(out_upper_left, out_lower_right)
+
+# 아래 어텐션 편향(attention bias)들은 torch.compile과 호환됩니다.
+compiled_sdpa = torch.compile(F.scaled_dot_product_attention, fullgraph=True)
+out_upper_left = compiled_sdpa(query, key, value, upper_left_bias)
 
 ######################################################################
+#
 # 결론
-# ====
+# =======
 #
 # 이 튜토리얼에서, ``torch.nn.functional.scaled_dot_product_attention`` 의 기본적인
-# 사용법을 살펴봤습니다. ``sdp_kernel`` 컨텍스트 매니저로 GPU가 특정 구현을
+# 사용법을 살펴봤습니다. ``sdpa_kernel`` 컨텍스트 매니저로 GPU가 특정 구현을
 # 사용하도록 할 수 있다는 것을 보았습니다. 또한, 간단한 ``NestedTensor`` 에서 작동하고
 # 컴파일 가능한 ``CausalSelfAttention`` 모듈을 만들었습니다.
 # 이 과정에서 프로파일링 도구를 사용하여 유저가 정의한 모듈의 성능 특성을 어떻게

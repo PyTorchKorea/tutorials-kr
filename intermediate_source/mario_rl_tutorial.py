@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 마리오 게임 RL 에이전트로 학습하기
-===============================
+=====================================
 
-**저자**: `Yuansong Feng <https://github.com/YuansongFeng>`__, `Suraj Subramanian <https://github.com/suraj813>`__, `Howard Wang <https://github.com/hw26>`__, `Steven Guo <https://github.com/GuoYuzhang>`__.
-**번역**: `김태영 <https://github.com/Taeyoung96>`__.
+**Authors**: `Yuansong Feng <https://github.com/YuansongFeng>`__, `Suraj Subramanian <https://github.com/suraj813>`__, `Howard Wang <https://github.com/hw26>`__, `Steven Guo <https://github.com/GuoYuzhang>`__.
+   **번역**: `김태영 <https://github.com/Taeyoung96>`__.
 
 이번 튜토리얼에서는 심층 강화 학습의 기본 사항들에 대해 이야기해보도록 하겠습니다.
 마지막에는, 스스로 게임을 할 수 있는 AI 기반 마리오를
@@ -33,6 +33,9 @@
 #
 #      %%bash
 #      pip install gym-super-mario-bros==7.4.0
+#      pip install tensordict==0.3.0
+#      pip install torchrl==0.3.0
+#
 
 import torch
 from torch import nn
@@ -41,7 +44,7 @@ from PIL import Image
 import numpy as np
 from pathlib import Path
 from collections import deque
-import random, datetime, os, copy
+import random, datetime, os
 
 # Gym은 강화학습을 위한 OpenAI 툴킷입니다.
 import gym
@@ -54,6 +57,8 @@ from nes_py.wrappers import JoypadSpace
 # OpenAI Gym에서의 슈퍼 마리오 환경 세팅
 import gym_super_mario_bros
 
+from tensordict import TensorDict
+from torchrl.data import TensorDictReplayBuffer, LazyMemmapStorage
 
 ######################################################################
 # 강화학습 개념
@@ -110,7 +115,7 @@ print(f"{next_state.shape},\n {reward},\n {done},\n {info}")
 
 ######################################################################
 # 환경 전처리 과정 거치기
-# ------------------------
+# ---------------------------
 #
 # ``다음 상태(next_state)`` 에서 환경 데이터가 에이전트로 반환됩니다.
 # 앞서 살펴보았듯이, 각각의 상태는 ``[3, 240, 256]`` 의 배열로 나타내고 있습니다.
@@ -192,7 +197,7 @@ class ResizeObservation(gym.ObservationWrapper):
 
     def observation(self, observation):
         transforms = T.Compose(
-            [T.Resize(self.shape), T.Normalize(0, 255)]
+            [T.Resize(self.shape, antialias=True), T.Normalize(0, 255)]
         )
         observation = transforms(observation).squeeze(0)
         return observation
@@ -268,7 +273,7 @@ class Mario:
 
 ######################################################################
 # 행동하기(Act)
-# --------------
+# -----------------
 #
 # 주어진 상태에 대해, 에이전트는 최적의 행동을 이용할 것인지
 # 임의의 행동을 선택하여 분석할 것인지 선택할 수 있습니다.
@@ -346,7 +351,7 @@ class Mario:
 class Mario(Mario):  # 연속성을 위한 하위 클래스입니다.
     def __init__(self, state_dim, action_dim, save_dir):
         super().__init__(state_dim, action_dim, save_dir)
-        self.memory = deque(maxlen=100000)
+        self.memory = TensorDictReplayBuffer(storage=LazyMemmapStorage(100000, device=torch.device("cpu")))
         self.batch_size = 32
 
     def cache(self, state, next_state, action, reward, done):
@@ -365,20 +370,21 @@ class Mario(Mario):  # 연속성을 위한 하위 클래스입니다.
         state = first_if_tuple(state).__array__()
         next_state = first_if_tuple(next_state).__array__()
 
-        state = torch.tensor(state, device=self.device)
-        next_state = torch.tensor(next_state, device=self.device)
-        action = torch.tensor([action], device=self.device)
-        reward = torch.tensor([reward], device=self.device)
-        done = torch.tensor([done], device=self.device)
+        state = torch.tensor(state)
+        next_state = torch.tensor(next_state)
+        action = torch.tensor([action])
+        reward = torch.tensor([reward])
+        done = torch.tensor([done])
 
-        self.memory.append((state, next_state, action, reward, done,))
+        # self.memory.append((state, next_state, action, reward, done,))
+        self.memory.add(TensorDict({"state": state, "next_state": next_state, "action": action, "reward": reward, "done": done}, batch_size=[]))
 
     def recall(self):
         """
         메모리에서 일련의 경험들을 검색합니다.
         """
-        batch = random.sample(self.memory, self.batch_size)
-        state, next_state, action, reward, done = map(torch.stack, zip(*batch))
+        batch = self.memory.sample(self.batch_size).to(self.device)
+        state, next_state, action, reward, done = (batch.get(key) for key in ("state", "next_state", "action", "reward", "done"))
         return state, next_state, action.squeeze(), reward.squeeze(), done.squeeze()
 
 
@@ -389,7 +395,7 @@ class Mario(Mario):  # 연속성을 위한 하위 클래스입니다.
 # 마리오는 `DDQN 알고리즘 <https://arxiv.org/pdf/1509.06461>`__
 # 을 사용합니다. DDQN 두개의 ConvNets ( :math:`Q_{online}` 과
 # :math:`Q_{target}` ) 을 사용하고, 독립적으로 최적의 행동-가치 함수에
-# 근사 시키려고 합니다.
+# 근사시키려고 합니다.
 #
 # 구현을 할 때, 특징 생성기에서 ``특징들`` 을 :math:`Q_{online}` 와 :math:`Q_{target}`
 # 에 공유합니다. 그러나 각각의 FC 분류기는
@@ -416,7 +422,23 @@ class MarioNet(nn.Module):
         if w != 84:
             raise ValueError(f"Expecting input width: 84, got: {w}")
 
-        self.online = nn.Sequential(
+        self.online = self.__build_cnn(c, output_dim)
+
+        self.target = self.__build_cnn(c, output_dim)
+        self.target.load_state_dict(self.online.state_dict())
+
+        # Q_target 매개변수 값은 고정시킵니다.
+        for p in self.target.parameters():
+            p.requires_grad = False
+
+    def forward(self, input, model):
+        if model == "online":
+            return self.online(input)
+        elif model == "target":
+            return self.target(input)
+
+    def __build_cnn(self, c, output_dim):
+        return nn.Sequential(
             nn.Conv2d(in_channels=c, out_channels=32, kernel_size=8, stride=4),
             nn.ReLU(),
             nn.Conv2d(in_channels=32, out_channels=64, kernel_size=4, stride=2),
@@ -428,18 +450,6 @@ class MarioNet(nn.Module):
             nn.ReLU(),
             nn.Linear(512, output_dim),
         )
-
-        self.target = copy.deepcopy(self.online)
-
-        # Q_target 매개변수 값은 고정시킵니다.
-        for p in self.target.parameters():
-            p.requires_grad = False
-
-    def forward(self, input, model):
-        if model == "online":
-            return self.online(input)
-        elif model == "target":
-            return self.target(input)
 
 
 ######################################################################
@@ -707,17 +717,18 @@ class MetricLogger:
                 f"{datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%S'):>20}\n"
             )
 
-        for metric in ["ep_rewards", "ep_lengths", "ep_avg_losses", "ep_avg_qs"]:
-            plt.plot(getattr(self, f"moving_avg_{metric}"))
-            plt.savefig(getattr(self, f"{metric}_plot"))
+        for metric in ["ep_lengths", "ep_avg_losses", "ep_avg_qs", "ep_rewards"]:
             plt.clf()
+            plt.plot(getattr(self, f"moving_avg_{metric}"), label=f"moving_avg_{metric}")
+            plt.legend()
+            plt.savefig(getattr(self, f"{metric}_plot"))
 
 
 ######################################################################
 # 게임을 실행시켜봅시다!
 # """""""""""""""""""""""""
 #
-# 이번 예제에서는 10개의 에피소드에 대해 학습 루프를 실행시켰습니다.하지만 마리오가 진정으로
+# 이번 예제에서는 40개의 에피소드에 대해 학습 루프를 실행시켰습니다.하지만 마리오가 진정으로
 # 세계를 학습하기 위해서는 적어도 40000개의 에피소드에 대해 학습을 시킬 것을 제안합니다!
 #
 use_cuda = torch.cuda.is_available()
@@ -731,7 +742,7 @@ mario = Mario(state_dim=(4, 84, 84), action_dim=env.action_space.n, save_dir=sav
 
 logger = MetricLogger(save_dir)
 
-episodes = 10
+episodes = 40
 for e in range(episodes):
 
     state = env.reset()
@@ -763,7 +774,7 @@ for e in range(episodes):
 
     logger.log_episode()
 
-    if e % 20 == 0:
+    if (e % 20 == 0) or (e == episodes - 1):
         logger.record(episode=e, epsilon=mario.exploration_rate, step=mario.curr_step)
 
 

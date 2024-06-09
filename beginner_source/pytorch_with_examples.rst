@@ -1,12 +1,13 @@
 예제로 배우는 파이토치(PyTorch)
-************************************
-**Author**: `Justin Johnson <https://github.com/jcjohnson/pytorch-examples>`_
-**번역**: `박정환 <https://github.com/9bow>`_
+====================================
 
-.. Note::
-    이 튜토리얼은 다소 오래된 PyTorch 튜토리얼입니다.
-    `기본 다지기 <https://tutorials.pytorch.kr/beginner/basics/intro.html>`_ 에서
-    입문자를 위한 최신의 내용을 보실 수 있습니다.
+**Author**: `Justin Johnson <https://github.com/jcjohnson/pytorch-examples>`_
+  **번역**: `박정환 <https://github.com/9bow>`_
+
+.. note::
+   이 튜토리얼은 다소 오래된 PyTorch 튜토리얼입니다.
+   `기본 다지기 <https://tutorials.pytorch.kr/beginner/basics/intro.html>`_ 에서
+   입문자를 위한 최신의 내용을 보실 수 있습니다.
 
 이 튜토리얼에서는 `PyTorch <https://github.com/pytorch/pytorch>`__ 의 핵심적인 개념을
 예제를 통해 소개합니다.
@@ -20,14 +21,15 @@
 신경망은 4개의 매개변수를 가지며, 정답과 신경망이 예측한 결과 사이의 유클리드 거리(Euclidean distance)를
 최소화하여 임의의 값을 근사할 수 있도록 경사하강법(gradient descent)을 사용하여 학습하겠습니다.
 
-.. Note::
-    각각의 예제들은 :ref:`이 문서의 마지막 <examples-download>` 에서 살펴볼 수 있습니다.
+.. note::
+   각각의 예제들은 :ref:`이 문서의 마지막 <examples-download>`
+   부분에서 살펴볼 수 있습니다.
 
 .. contents:: Table of Contents
-	:local:
+   :local:
 
 텐서(Tensor)
-=============
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 준비 운동: numpy
 -------------------------------------------------------------------------------
@@ -66,7 +68,7 @@ PyTorch 텐서를 GPU에서 실행하기 위해서는 단지 적절한 장치를
 
 
 Autograd
-=========
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 PyTorch: 텐서(Tensor)와 autograd
 -------------------------------------------------------------------------------
@@ -113,10 +115,10 @@ PyTorch에서 ``torch.autograd.Function`` 의 하위클래스(subclass)를 정�
 
 .. includenodoc:: /beginner/examples_autograd/polynomial_custom_function.py
 
-`nn` 모듈
-======================
+``nn`` 모듈
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-PyTorch: nn
+PyTorch: ``nn``
 -------------------------------------------------------------------------------
 
 연산 그래프와 autograd는 복잡한 연산자를 정의하고 도함수(derivative)를 자동으로 계산하는
@@ -146,17 +148,17 @@ PyTorch: optim
 
 지금까지는 ``torch.no_grad()`` 로 학습 가능한 매개변수를 갖는 텐서들을 직접 조작하여 모델의 가중치(weight)를 갱신하였습니다.
 이것은 확률적 경사하강법(SGD; stochastic gradient descent)와 같은 간단한 최적화 알고리즘에서는 크게 부담이 되지 않지만,
-실제로 신경망을 학습할 때는 AdaGrad, RMSProp, Adam 등과 같은 더 정교한 옵티마이저(optimizer)를 사용하곤 합니다.
+실제로 신경망을 학습할 때는 ``AdaGrad``, ``RMSProp``, ``Adam`` 등과 같은 더 정교한 옵티마이저(optimizer)를 사용하곤 합니다.
 
 PyTorch의 ``optim`` 패키지는 최적화 알고리즘에 대한 아이디어를 추상화하고 일반적으로 사용하는 최적화 알고리즘의 구현체(implementation)를
 제공합니다.
 
 이 예제에서는 지금까지와 같이 ``nn`` 패키지를 사용하여 모델을 정의하지만, 모델을 최적화할 때는 ``optim`` 패키지가 제공하는
-RMSProp 알고리즘을 사용하겠습니다:
+``RMSProp`` 알고리즘을 사용하겠습니다:
 
 .. includenodoc:: /beginner/examples_nn/polynomial_optim.py
 
-PyTorch: 사용자 정의 nn.Module
+PyTorch: 사용자 정의 ``nn`` 모듈
 -------------------------------------------------------------------------------
 
 때대로 기존 Module의 구성(sequence)보다 더 복잡한 모델을 구성해야 할 때가 있습니다;
@@ -185,7 +187,7 @@ PyTorch: 제어 흐름(Control Flow) + 가중치 공유(Weight Sharing)
 .. _examples-download:
 
 예제 코드
-=============
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 위의 예제들을 여기서 찾아볼 수 있습니다.
 
@@ -226,7 +228,7 @@ Autograd
 
     <div style='clear:both'></div>
 
-`nn` module
+``nn`` 모듈
 -------------------------------------------------------------------------------
 
 .. toctree::

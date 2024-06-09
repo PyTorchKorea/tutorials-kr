@@ -25,7 +25,7 @@ torch.save() 함수를 사용하여 모델의 ``state_dict`` 를 저장하면 �
 시작하기 전에 ``torch`` 가 없다면 설치해야 합니다.
 
 
-::
+.. code-block:: sh
 
    pip install torch
 
@@ -146,7 +146,7 @@ model.eval()
 
 
 ######################################################################
-# 여기서도 또한 model.eval()을 실행하여 드롭아웃(dropout)과 배치 정규화 층
+# 여기서도 또한 ``model.eval()`` 을 실행하여 드롭아웃(dropout)과 배치 정규화 층
 # (batch normalization layers)을 평가(evaluation) 모드로 바꿔야한다는
 # 것을 기억하세요.
 #

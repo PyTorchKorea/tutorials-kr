@@ -35,12 +35,12 @@ Captum을 사용하여 모델 해석하기
 # 특정한 예측에 도움을 주는지 보여줍니다.
 
 import torchvision
-from torchvision import transforms
+from torchvision import models, transforms
 from PIL import Image
 import requests
 from io import BytesIO
 
-model = torchvision.models.resnet18(pretrained=True).eval()
+model = torchvision.models.resnet18(weights=models.ResNet18_Weights.IMAGENET1K_V1).eval()
 
 response = requests.get("https://image.freepik.com/free-photo/two-beautiful-puppies-cat-dog_58409-6024.jpg")
 img = Image.open(BytesIO(response.content))
@@ -52,7 +52,7 @@ center_crop = transforms.Compose([
 
 normalize = transforms.Compose([
     transforms.ToTensor(),               # 이미지를 0에서 1사이의 값을 가진 Tensor로 변환
-    transforms.Normalize(                # 0을 중심으로 하는 imagenet 픽셀의 rgb 분포를 따르는 정규화
+    transforms.Normalize(                # 0을 중심으로 하는 imagenet 픽셀의 RGB 분포를 따르는 정규화
      mean=[0.485, 0.456, 0.406],
      std=[0.229, 0.224, 0.225]
     )
@@ -62,7 +62,7 @@ input_img = normalize(center_crop(img)).unsqueeze(0)
 
 ######################################################################
 # 속성(attribution) 계산하기
-# ---------------------
+# -------------------------------
 
 
 ######################################################################
@@ -154,7 +154,7 @@ _ = viz.visualize_image_attr_multiple(attribution_cat,
 
 ######################################################################
 # 마지막 노트
-# -----------
+# ---------------
 #
 
 

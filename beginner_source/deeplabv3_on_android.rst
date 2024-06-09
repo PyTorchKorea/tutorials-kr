@@ -16,7 +16,7 @@ PyTorch의 의미론적 이미지 분할에 사용하는 `DeepLabV3 모델 <http
 이 튜토리얼에서는 안드로이드에서 PyTorch DeepLabV3 모델을 준비하고 실행하는 단계별 가이드를 제공합니다. 사용하고자 하는 모델을 준비하는 시작 단계에서부터 안드로이드 앱에서 모델을 사용하는 마지막 단계까지 모두 살펴봅니다.
 또한 안드로이드에서 여러분이 선호하는 사전에 학습된(pre-trained) PyTorch 모델을 사용하는 방법과 여러 함정들을 피하는 실용적이며 보편적인 팁도 다룰 예정입니다.
 
-.. note:: 이 튜토리얼을 진행하기 앞서 `안드로이드를 위한 PyTorch 모바일 <https://pytorch.org/mobile/android/>`_ 을 확인하고, PyTorch 안드로이드 예제인 `HelloWorld <https://github.com/pytorch/android-demo-app/tree/master/HelloWorldApp>`_ 앱을 실행해 보십시오. 이 튜토리얼은 대게 처음으로 모바일에 배포하는 모델인 이미지 분류 모델을 넘어선 다음 단계를 다루고 있습니다. 이 튜토리얼을 위한 전체 코드는 `여기 <https://github.com/pytorch/android-demo-app/tree/master/ImageSegmentation>`_ 에서 확인 가능합니다.
+.. note:: 이 튜토리얼을 진행하기 앞서 `안드로이드를 위한 PyTorch 모바일 <https://pytorch.org/mobile/android/>`_ 을 확인하고, PyTorch 안드로이드 예제인 `Hello World <https://github.com/pytorch/android-demo-app/tree/master/HelloWorldApp>`_ 앱을 실행해 보십시오. 이 튜토리얼은 대게 처음으로 모바일에 배포하는 모델인 이미지 분류 모델을 넘어선 다음 단계를 다루고 있습니다. 이 튜토리얼을 위한 전체 코드는 `여기 <https://github.com/pytorch/android-demo-app/tree/master/ImageSegmentation>`_ 에서 확인 가능합니다.
 
 학습 목표
 ---------
@@ -103,7 +103,7 @@ PyTorch의 의미론적 이미지 분할에 사용하는 `DeepLabV3 모델 <http
 3. 새로운 안드로이드 앱을 만들거나 안드로이드 예제 앱에 변환된 모델을 가져와서 재사용하기
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-첫 번째로 모델을 안드로이드 스튜디오 프로젝트에서 PyTorch Mobile과 함께 쓰기 위해 `안드로이드 레시피를 위한 모델 준비 <../recipes/model_preparation_android.html#add-the-model-and-pytorch-library-on-android>`_ 를 따라해 봅니다. 이 튜토리얼의 DeepLabV3과 PyTorch HelloWorld Android 예제 내부의 MobileNet v2 둘 다 컴퓨터 비전 모델이기에, `HelloWorld 예제 저장소 <https://github.com/pytorch/android-demo-app/tree/master/HelloWorldApp>`_ 에서도 손쉽게 모델을 읽고 입출력을 처리하기 위한 코드 수정 방법을 찾을 수 있습니다. 이 단계와 4단계의 목표는 1단계에서 만들어진 `deeplabv3_scripted.pt` 모델이 안드로이드에서 확실하게 동작하는지 확인하는 것입니다.
+첫 번째로 모델을 안드로이드 스튜디오 프로젝트에서 PyTorch Mobile과 함께 쓰기 위해 `안드로이드 레시피를 위한 모델 준비 <../recipes/model_preparation_android.html#add-the-model-and-pytorch-library-on-android>`_ 를 따라해 봅니다. 이 튜토리얼의 DeepLabV3과 PyTorch Hello World Android 예제 내부의 MobileNet v2 둘 다 컴퓨터 비전 모델이기에, `Hello World 예제 저장소 <https://github.com/pytorch/android-demo-app/tree/master/HelloWorldApp>`_ 에서도 손쉽게 모델을 읽고 입출력을 처리하기 위한 코드 수정 방법을 찾을 수 있습니다. 이 단계와 4단계의 목표는 1단계에서 만들어진 `deeplabv3_scripted.pt` 모델이 안드로이드에서 확실하게 동작하는지 확인하는 것입니다.
 
 이제 2단계에서 사용한 `deeplabv3_scripted.pt` 와 `deeplab.jpg` 를 안드로이드 스튜디오 프로젝트에 더하고 `MainActivity` 내부의 `onCreate` 메소드를 이와 유사하게 수정합니다:
 
@@ -122,7 +122,7 @@ PyTorch의 의미론적 이미지 분할에 사용하는 `DeepLabV3 모델 <http
 4. 모델 추론을 위한 입출력 처리하기
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-이전 단계에서 모델을 읽어들인 이후 입력값이 잘 동작하는지, 예상한대로 출력값을 생성하는지 확인해 봅시다. DeepLabV3 모델을 위한 입력은 HelloWorld 예제 내부의 MobileNet v2에서 쓰는 이미지와 동일합니다. 그래서 `MainActivity.java <https://github.com/pytorch/android-demo-app/blob/master/HelloWorldApp/app/src/main/java/org/pytorch/helloworld/MainActivity.java>`_ HelloWorld 프로젝트의 입력 처리를 위한 코드를 재사용 합니다. `MainActivity.java` 파일의 `50번째 줄 <https://github.com/pytorch/android-demo-app/blob/master/HelloWorldApp/app/src/main/java/org/pytorch/helloworld/MainActivity.java#L50>`_ 과 73번째 줄 사이의 코드를 아래와 같이 변경합니다:
+이전 단계에서 모델을 읽어들인 이후 입력값이 잘 동작하는지, 예상한대로 출력값을 생성하는지 확인해 봅시다. DeepLabV3 모델을 위한 입력은 Hello World 예제 내부의 MobileNet v2에서 쓰는 이미지와 동일합니다. 그래서 `MainActivity.java <https://github.com/pytorch/android-demo-app/blob/master/HelloWorldApp/app/src/main/java/org/pytorch/helloworld/MainActivity.java>`_ Hello World 프로젝트의 입력 처리를 위한 코드를 재사용 합니다. `MainActivity.java` 파일의 `50번째 줄 <https://github.com/pytorch/android-demo-app/blob/master/HelloWorldApp/app/src/main/java/org/pytorch/helloworld/MainActivity.java#L50>`_ 과 73번째 줄 사이의 코드를 아래와 같이 변경합니다:
 
 .. code-block:: java
 
@@ -211,7 +211,7 @@ PyTorch의 의미론적 이미지 분할에 사용하는 `DeepLabV3 모델 <http
         outputBitmap.getWidth(), outputBitmap.getHeight());
     imageView.setImageBitmap(outputBitmap);
 
-이 앱의 UI는 HelloWorld의 UI와 유사하지만 이미지 분류의 결과를 보여주기 위해 `TextView` 를 필요로 하지 않습니다. 코드 저장소에서 볼 수 있는 것처럼 `Segment` and `Restart` 버튼 두 개를 추가할 수도 있습니다. 이 버튼들은 모델 추론을 실행하고 분할 결과를 보다가 원본 이미지로 되돌리기 위해 사용합니다.
+이 앱의 UI는 Hello World의 UI와 유사하지만 이미지 분류의 결과를 보여주기 위해 `TextView` 를 필요로 하지 않습니다. 코드 저장소에서 볼 수 있는 것처럼 `Segment` and `Restart` 버튼 두 개를 추가할 수도 있습니다. 이 버튼들은 모델 추론을 실행하고 분할 결과를 보다가 원본 이미지로 되돌리기 위해 사용합니다.
 
 이제 앱을 안드로이드 에뮬레이터나 (가능하다면) 실제 기기에서 실행하면 이런 화면들을 볼 수 있습니다:
 

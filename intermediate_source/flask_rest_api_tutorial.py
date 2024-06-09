@@ -2,6 +2,7 @@
 """
 Flask를 사용하여 Python에서 PyTorch를 REST API로 배포하기
 ===========================================================
+
 **Author**: `Avinash Sajjanshetty <https://avi.im>`_
   **번역**: `박정환 <http://github.com/9bow>`_
 
@@ -16,11 +17,9 @@ Flask를 사용하여 Python에서 PyTorch를 REST API로 배포하기
 편입니다. Flask를 여기에 소개된 것처럼 사용하는 것이 PyTorch 모델을 제공하는
 가장 쉬운 방법이지만, 고성능을 요구하는 때에는 적합하지 않습니다. 그에 대해서는:
 
-    - TorchScript에 이미 익숙하다면, 바로 `Loading a TorchScript Model in C++ <https://tutorials.pytorch.kr/advanced/cpp_export.html>`_
-      를 읽어보세요.
+    - TorchScript에 이미 익숙하다면, 바로 `Loading a TorchScript Model in C++ <https://tutorials.pytorch.kr/advanced/cpp_export.html>`_ 문서부터 읽어보세요.
 
-    - TorchScript가 무엇인지 알아보는 것이 필요하다면 `TorchScript 소개 <https://tutorials.pytorch.kr/beginner/Intro_to_TorchScript_tutorial.html>`_
-      부터 보시길 추천합니다.
+    - TorchScript가 무엇인지 알아보는 것이 필요하다면 `TorchScript 소개 <https://tutorials.pytorch.kr/beginner/Intro_to_TorchScript_tutorial.html>`_ 부터 읽어보시는 것을 추천합니다.
 """
 
 
@@ -33,7 +32,7 @@ Flask를 사용하여 Python에서 PyTorch를 REST API로 배포하기
 # HTTP POST로 ``/predict`` 에 요청합니다. 응답은 JSON 형태이며 다음과 같은 예측 결과를
 # 포함합니다:
 #
-# ::
+# .. code-block:: sh
 #
 #     {"class_id": "n02124075", "class_name": "Egyptian_cat"}
 #
@@ -45,7 +44,7 @@ Flask를 사용하여 Python에서 PyTorch를 REST API로 배포하기
 #
 # 아래 명령어를 실행하여 필요한 패키지들을 설치합니다:
 #
-# ::
+# .. code-block:: sh
 #
 #     $ pip install Flask==2.0.1 torchvision==0.10.0
 
@@ -63,29 +62,6 @@ app = Flask(__name__)
 
 @app.route('/')
 def hello():
-    return 'Hello World!'
-
-###############################################################################
-# 위 코드를 ``app.py`` 라는 파일명으로 저장한 후, 아래와 같이 Flask 개발 서버를
-# 실행합니다:
-#
-# ::
-#
-#     $ FLASK_ENV=development FLASK_APP=app.py flask run
-
-###############################################################################
-# 웹 브라우저로 ``http://localhost:5000/`` 에 접속하면, ``Hello World!`` 가
-# 표시됩니다.
-
-###############################################################################
-# API 정의에 맞게 위 코드를 조금 수정해보겠습니다. 먼저, 메소드의 이름을
-# ``predict`` 로 변경합니다. 엔드포인트의 경로(path)도 ``/predict`` 로 변경합니다.
-# 이미지 파일은 HTTP POST 요청을 통해서 보내지기 때문에, POST 요청에만 허용하도록
-# 합니다:
-
-
-@app.route('/predict', methods=['POST'])
-def predict():
     return 'Hello World!'
 
 ###############################################################################
@@ -134,7 +110,6 @@ def transform_image(image_bytes):
     image = Image.open(io.BytesIO(image_bytes))
     return my_transforms(image).unsqueeze(0)
 
-
 ######################################################################
 # 위 메소드는 이미지를 byte 단위로 읽은 후, 일련의 변환을 적용하고 Tensor를
 # 반환합니다. 위 메소드를 테스트하기 위해서는 이미지를 byte 모드로 읽은 후
@@ -169,7 +144,6 @@ def get_prediction(image_bytes):
     outputs = model.forward(tensor)
     _, y_hat = outputs.max(1)
     return y_hat
-
 
 ######################################################################
 # ``y_hat`` Tensor는 예측된 분류 ID의 인덱스를 포함합니다. 하지만 사람이 읽을 수
@@ -212,16 +186,6 @@ with open("../_static/img/sample_file.jpeg", 'rb') as f:
 # 배열의 첫번째 항목은 ImageNet 분류 ID이고, 두번째 항목은 사람이 읽을 수 있는
 # 이름입니다.
 #
-# .. Note ::
-#    ``model`` 변수가 ``get_prediction`` 메소드 내부에 있지 않은 것을 눈치채셨나요?
-#    왜 모델이 전역 변수일까요? 모델을 읽어오는 것은 메모리와 계산 측면에서 비싼
-#    연산일 수 있습니다. 만약 ``get_prediction`` 메소드 내부에서 모델을 불러온다면,
-#    메소드가 호출될 때마다 불필요하게 불러오게 됩니다. 초당 수천번의 요청을 받을
-#    지도 모르는 웹 서버를 구축하고 있기 때문에, 매번 추론을 할 때마다 모델을
-#    중복으로 불러오는데 시간을 낭비해서는 안됩니다. 따라서, 모델은 메모리에
-#    딱 한번만 불러옵니다. 상용 시스템(production system)에서는 대량의 요청을
-#    효율적으로 처리해야 하므로, 일반적으로 요청(request)을 처리하기 전에 모델을
-#    불러와둡니다.
 
 ######################################################################
 # 모델을 API 서버에 통합하기
@@ -244,66 +208,68 @@ with open("../_static/img/sample_file.jpeg", 'rb') as f:
 #            img_bytes = file.read()
 #            class_id, class_name = get_prediction(image_bytes=img_bytes)
 #            return jsonify({'class_id': class_id, 'class_name': class_name})
-
+#
+#
 ######################################################################
-# ``app.py`` 파일은 이제 완성되었습니다. 아래가 정식 버전(full version)입니다;
-# 아래 <PATH/TO/.json/FILE> 경로를 json 파일을 저장해둔 경로로 바꾸면 동작합니다:
+# ``app.py`` 파일은 이제 완성되었습니다. 아래가 전체 코드입니다;
+# 아래 `<PATH/TO/.json/FILE>` 의 경로를 json 파일을 저장해둔 경로로 바꾸면 동작합니다:
 #
 # .. code-block:: python
 #
-#   import io
-#   import json
+#    import io
+#    import json
 #
-#   from torchvision import models
-#   import torchvision.transforms as transforms
-#   from PIL import Image
-#   from flask import Flask, jsonify, request
-#
-#
-#   app = Flask(__name__)
-#   imagenet_class_index = json.load(open('<PATH/TO/.json/FILE>/imagenet_class_index.json'))
-#   model = models.densenet121(weights='IMAGENET1K_V1')
-#   model.eval()
+#    from torchvision import models
+#    import torchvision.transforms as transforms
+#    from PIL import Image
+#    from flask import Flask, jsonify, request
 #
 #
-#   def transform_image(image_bytes):
-#       my_transforms = transforms.Compose([transforms.Resize(255),
-#                                           transforms.CenterCrop(224),
-#                                           transforms.ToTensor(),
-#                                           transforms.Normalize(
-#                                               [0.485, 0.456, 0.406],
-#                                               [0.229, 0.224, 0.225])])
-#       image = Image.open(io.BytesIO(image_bytes))
-#       return my_transforms(image).unsqueeze(0)
+#    app = Flask(__name__)
+#    imagenet_class_index = json.load(open('<PATH/TO/.json/FILE>/imagenet_class_index.json'))
+#    model = models.densenet121(weights='IMAGENET1K_V1')
+#    model.eval()
 #
 #
-#   def get_prediction(image_bytes):
-#       tensor = transform_image(image_bytes=image_bytes)
-#       outputs = model.forward(tensor)
-#       _, y_hat = outputs.max(1)
-#       predicted_idx = str(y_hat.item())
-#       return imagenet_class_index[predicted_idx]
+#    def transform_image(image_bytes):
+#        my_transforms = transforms.Compose([transforms.Resize(255),
+#                                            transforms.CenterCrop(224),
+#                                            transforms.ToTensor(),
+#                                            transforms.Normalize(
+#                                                [0.485, 0.456, 0.406],
+#                                                [0.229, 0.224, 0.225])])
+#        image = Image.open(io.BytesIO(image_bytes))
+#        return my_transforms(image).unsqueeze(0)
 #
 #
-#   @app.route('/predict', methods=['POST'])
-#   def predict():
-#       if request.method == 'POST':
-#           file = request.files['file']
-#           img_bytes = file.read()
-#           class_id, class_name = get_prediction(image_bytes=img_bytes)
-#           return jsonify({'class_id': class_id, 'class_name': class_name})
+#    def get_prediction(image_bytes):
+#        tensor = transform_image(image_bytes=image_bytes)
+#        outputs = model.forward(tensor)
+#        _, y_hat = outputs.max(1)
+#        predicted_idx = str(y_hat.item())
+#        return imagenet_class_index[predicted_idx]
 #
 #
-#   if __name__ == '__main__':
-#       app.run()
-
+#    @app.route('/predict', methods=['POST'])
+#    def predict():
+#        if request.method == 'POST':
+#            file = request.files['file']
+#            img_bytes = file.read()
+#            class_id, class_name = get_prediction(image_bytes=img_bytes)
+#            return jsonify({'class_id': class_id, 'class_name': class_name})
+#
+#
+#    if __name__ == '__main__':
+#        app.run()
+#
+#
 ######################################################################
 # 이제 웹 서버를 테스트해보겠습니다! 다음과 같이 실행해보세요:
 #
-# ::
+# .. code-block:: sh
 #
-#     $ FLASK_ENV=development FLASK_APP=app.py flask run
-
+#    FLASK_ENV=development FLASK_APP=app.py flask run
+#
 #######################################################################
 # `requests <https://pypi.org/project/requests/>`_ 라이브러리를 사용하여
 # POST 요청을 만들어보겠습니다:
@@ -318,7 +284,7 @@ with open("../_static/img/sample_file.jpeg", 'rb') as f:
 #######################################################################
 # `resp.json()` 을 호출하면 다음과 같은 결과를 출력합니다:
 #
-# ::
+# .. code-block:: sh
 #
 #     {"class_id": "n02124075", "class_name": "Egyptian_cat"}
 #

@@ -122,11 +122,40 @@ Recipes are bite-sized bite-sized, actionable examples of how to use specific Py
    :tags: Basics
 
 .. customcarditem::
+   :header: Torch Compile IPEX Backend
+   :card_description: Learn how to use torch.compile IPEX backend
+   :image: ../_static/img/thumbnails/cropped/generic-pytorch-logo.png
+   :link: ../recipes/torch_compile_backend_ipex.html
+   :tags: Basics
+
+.. customcarditem::
    :header: PyTorch의 Shape에 대한 추론
    :card_description: meta 디바이스를 사용하여 모델의 shape을 추론하는 방법을 알아봅니다.
    :image: ../_static/img/thumbnails/cropped/generic-pytorch-logo.png
    :link: ../recipes/recipes/reasoning_about_shapes.html
    :tags: Basics
+
+.. customcarditem::
+   :header: Tips for Loading an nn.Module from a Checkpoint
+   :card_description: Learn tips for loading an nn.Module from a checkpoint.
+   :image: ../_static/img/thumbnails/cropped/generic-pytorch-logo.png
+   :link: ../recipes/recipes/module_load_state_dict_tips.html
+   :tags: Basics
+
+.. customcarditem::
+   :header: (beta) Using TORCH_LOGS to observe torch.compile
+   :card_description: Learn how to use the torch logging APIs to observe the compilation process.
+   :image: ../_static/img/thumbnails/cropped/generic-pytorch-logo.png
+   :link: ../recipes/torch_logs.html
+   :tags: Basics
+
+.. customcarditem::
+   :header: Extension points in nn.Module for loading state_dict and tensor subclasses
+   :card_description: New extension points in nn.Module.
+   :image: ../_static/img/thumbnails/cropped/generic-pytorch-logo.png
+   :link: ../recipes/recipes/swap_tensors.html
+   :tags: Basics
+
 
 .. Customization
 
@@ -258,6 +287,45 @@ Recipes are bite-sized bite-sized, actionable examples of how to use specific Py
    :link: ../recipes/recipes/tuning_guide.html
    :tags: Model-Optimization
 
+.. customcarditem::
+   :header: PyTorch Inference Performance Tuning on AWS Graviton Processors
+   :card_description: Tips for achieving the best inference performance on AWS Graviton CPUs
+   :image: ../_static/img/thumbnails/cropped/generic-pytorch-logo.png
+   :link: ../recipes/inference_tuning_on_aws_graviton.html
+   :tags: Model-Optimization
+
+.. Leverage Advanced Matrix Extensions
+.. customcarditem::
+   :header: Leverage Intel® Advanced Matrix Extensions
+   :card_description: Learn to leverage Intel® Advanced Matrix Extensions.
+   :image: ../_static/img/thumbnails/cropped/generic-pytorch-logo.png
+   :link: ../recipes/amx.html
+   :tags: Model-Optimization
+
+.. (beta) Compiling the Optimizer with torch.compile
+.. customcarditem::
+   :header: (beta) Compiling the Optimizer with torch.compile
+   :card_description: Speed up the optimizer using torch.compile
+   :image: ../_static/img/thumbnails/cropped/generic-pytorch-logo.png
+   :link: ../recipes/compiling_optimizer.html
+   :tags: Model-Optimization
+
+.. (beta) Running the compiled optimizer with an LR Scheduler
+.. customcarditem::
+   :header: (beta) Running the compiled optimizer with an LR Scheduler
+   :card_description: Speed up training with LRScheduler and torch.compiled optimizer
+   :image: ../_static/img/thumbnails/cropped/generic-pytorch-logo.png
+   :link: ../recipes/compiling_optimizer_lr_scheduler.html
+   :tags: Model-Optimization
+
+.. Using User-Defined Triton Kernels with ``torch.compile``
+.. customcarditem::
+   :header: Using User-Defined Triton Kernels with ``torch.compile``
+   :card_description: Learn how to use user-defined kernels with ``torch.compile``
+   :image: ../_static/img/thumbnails/cropped/generic-pytorch-logo.png
+   :link: ../recipes/torch_compile_user_defined_triton_kernel_tutorial.html
+   :tags: Model-Optimization
+
 .. Intel(R) Extension for PyTorch*
 
 .. customcarditem::
@@ -276,6 +344,14 @@ Recipes are bite-sized bite-sized, actionable examples of how to use specific Py
    :tags: Quantization,Model-Optimization
 
 .. Distributed Training
+
+.. customcarditem::
+   :header: Getting Started with DeviceMesh
+   :card_description: Learn how to use DeviceMesh
+   :image: ../_static/img/thumbnails/cropped/profiler.png
+   :link: ../recipes/distributed_device_mesh.html
+   :tags: Distributed-Training
+
 .. customcarditem::
    :header: Shard Optimizer States with ZeroRedundancyOptimizer
    :card_description: How to use ZeroRedundancyOptimizer to reduce memory consumption.
@@ -297,6 +373,21 @@ Recipes are bite-sized bite-sized, actionable examples of how to use specific Py
    :link: ../recipes/distributed_optim_torchscript.html
    :tags: Distributed-Training,TorchScript
 
+.. customcarditem::
+   :header: Getting Started with Distributed Checkpoint (DCP)
+   :card_description: Learn how to checkpoint distributed models with Distributed Checkpoint package.
+   :image: ../_static/img/thumbnails/cropped/Getting-Started-with-DCP.png
+   :link: ../recipes/distributed_checkpoint_recipe.html
+   :tags: Distributed-Training
+
+.. TorchServe
+.. customcarditem::
+   :header: Deploying a PyTorch Stable Diffusion model as a Vertex AI Endpoint
+   :card_description: Learn how to deploy model in Vertex AI with TorchServe
+   :image: ../_static/img/thumbnails/cropped/generic-pytorch-logo.png
+   :link: ../recipes/torchserve_vertexai_tutorial.html
+   :tags: Production
+
 .. End of tutorial card section
 
 .. raw:: html
@@ -317,6 +408,7 @@ Recipes are bite-sized bite-sized, actionable examples of how to use specific Py
 
    /recipes/recipes/loading_data_recipe
    /recipes/recipes/defining_a_neural_network
+   /recipes/torch_logs
    /recipes/recipes/what_is_state_dict
    /recipes/recipes/saving_and_loading_models_for_inference
    /recipes/recipes/saving_and_loading_a_general_checkpoint
@@ -332,6 +424,8 @@ Recipes are bite-sized bite-sized, actionable examples of how to use specific Py
    /recipes/recipes/amp_recipe
    /recipes/recipes/tuning_guide
    /recipes/recipes/intel_extension_for_pytorch
+   /recipes/compiling_optimizer
+   /recipes/torch_compile_backend_ipex
    /recipes/torchscript_inference
    /recipes/deployment_with_flask
    /recipes/distributed_rpc_profiling

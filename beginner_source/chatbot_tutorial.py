@@ -95,11 +95,6 @@
 # 그 다음에는, 몇 가지 필요한 도구들을 import 하겠습니다.
 #
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
-
 import torch
 from torch.jit import script, trace
 import torch.nn as nn

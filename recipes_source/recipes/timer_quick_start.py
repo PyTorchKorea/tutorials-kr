@@ -9,16 +9,14 @@ API 기반으로, 몇몇 PyTorch 특화된 기능(modification)을 제공합니�
 내장 `Timer` 클래스에 익숙하실 필요는 없지만, 성능 측정(work)의 기본적인
 내용들에는 익숙하다고 가정하겠습니다.
 
-보다 종합적인 성능 튜닝 튜토리얼은 다음 링크를 참고해주세요:
-
-    https://tutorials.pytorch.kr/recipes/recipes/benchmark.html
+보다 종합적인 성능 튜닝에 대한 튜토리얼은 :doc:`/recipes/recipes/benchmark` 를 참고해주세요.
 
 
 **목차:**
     1. `Timer 정의하기 <#id1>`__
-    2. `실제 시간(wall time): \`Timer.blocked_autorange(...)\` <#wall-time-timer-blocked-autorange>`__
+    2. `실제 시간(wall time): Timer.blocked_autorange(...) <#wall-time-timer-blocked-autorange>`__
     3. `C++ 코드조각(snippet) <#c-snippet>`__
-    4. `명령어 실행 횟수(instruction counts): \`Timer.collect_callgrind(...)\` <#instruction-counts-timer-collect-callgrind>`__
+    4. `명령어 실행 횟수(instruction counts): Timer.collect_callgrind(...) <#instruction-counts-timer-collect-callgrind>`__
     5. `명령어 실행 횟수: 더 깊이 파보기 <#id2>`__
     6. `Callgrind를 사용한 A/B 테스트 <#callgrind-a-b>`__
     7. `마무리 <#id3>`__
@@ -46,9 +44,9 @@ timer = Timer(
         y = torch.ones((128,))
     """,
 
-    # 또는, `globals` 를 사용하여 외부 범위(outer scope)에서 사용하는 변수들을
+    # 또는, ``globals`` 를 사용하여 외부 범위(outer scope)에서 사용하는 변수들을
     # 전달할 수 있습니다
-    # -------------------------------------------------------------------------
+    #
     # globals={
     #     "x": torch.ones((128,)),
     #     "y": torch.ones((128,)),
@@ -59,15 +57,15 @@ timer = Timer(
 )
 
 ###############################################################################
-# 2. 실제 실행 시간(wall time): `Timer.blocked_autorange(...)`
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# 2. 실제 실행 시간(wall time): Timer.blocked_autorange(...)
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 # 이 메서드(method)는 몇 번이나 반복할지 적절한 횟수를 고르거나, 쓰레드의 수를
 # 변경(fix)하거나,결과를 편하게 표현하는 방법을 제공하는 등, 세부적인 사항들을
 # 처리(handle)합니다.
 #
 
-# Measurement 객체는 여러번 반복하여 측정한 결과를 저장하고, 다양한 편의 기능
+# ``Measurement`` 객체는 여러번 반복하여 측정한 결과를 저장하고, 다양한 편의 기능
 # (utility feature)을 제공합니다.
 from torch.utils.benchmark import Measurement
 
@@ -127,12 +125,12 @@ print(cpp_timer.blocked_autorange(min_run_time=1))
 #
 
 ###############################################################################
-# 4. 명령어 실행 횟수(instruction counts): `Timer.collect_callgrind(...)`
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# 4. 명령어 실행 횟수(instruction counts): Timer.collect_callgrind(...)
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-# 더 자세한 정보를 제공하기 위해, `Timer.collect_callgrind` 는
+# 더 자세한 정보를 제공하기 위해, ``Timer.collect_callgrind`` 는
 # 명령어 실행 횟수(instruction count)를 수집하는
-# `Callgrind <https://valgrind.org/docs/manual/cl-manual.html>` 를 감싸고(wrap) 있습니다.
+# `Callgrind <https://valgrind.org/docs/manual/cl-manual.html>`__ 를 감싸고(wrap) 있습니다.
 # 이는 코드 조각(snippet)이 어떻게 실행되는지에 대해 세분화되고 결정적인(deterministic)
 # 통찰을 제공하므로 유용합니다.
 #
@@ -162,13 +160,13 @@ print(stats)
 # 5. 명령어 실행 횟수: 더 깊이 파보기
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-# CallgrindStats의 문자열 표현은 Measurement의 그것과 유사합니다.
+# ``CallgrindStats`` 의 문자열 표현은 ``Measurement`` 의 것과 유사합니다.
 # `Noisy symbol` 은 Python의 개념입니다. (CPython 인터프리터(interpreter)에서는
 # 불필요하다(noisy)고 알려진 호출들을 제외합니다)
 #
 # 일단 더 자세한 분석을 위해, 특정 호출(call)을 살펴보겠습니다.
-# `CallgrindStats.stats()` 은 이를 더 쉽게해주는 FunctionCounts 객체를 반환합니다.
-# 개념적으로, FunctionCounts는 각 쌍(pair)이 `(명령어 호출 횟수, 파일 경로 및 함수 이름)`
+# ``CallgrindStats.stats()`` 은 이를 더 쉽게해주는 ``FunctionCounts`` 객체를 반환합니다.
+# 개념적으로, ``FunctionCounts`` 는 각 쌍(pair)이 `(명령어 호출 횟수, 파일 경로 및 함수 이름)`
 # 인 형태로 구성된, 유용한 메서드(utility method)가 있는 쌍(pair)의 튜플(tuple)로
 # 생각할 수 있습니다.
 #
@@ -176,13 +174,17 @@ print(stats)
 #   일반적으로 절대경로(absolute path)는 신경쓰지 않습니다. 예를 들어, 곱하기 호출의
 #   전체 경로와 함수 이름은 이런 식일 것입니다:
 #
-#       /the/prefix/to/your/pytorch/install/dir/pytorch/build/aten/src/ATen/core/TensorMethods.cpp:at::Tensor::mul(at::Tensor const&) const [/the/path/to/your/conda/install/miniconda3/envs/ab_ref/lib/python3.7/site-packages/torch/lib/libtorch_cpu.so]
+# .. code-block:: sh
+#
+#    /the/prefix/to/your/pytorch/install/dir/pytorch/build/aten/src/ATen/core/TensorMethods.cpp:at::Tensor::mul(at::Tensor const&) const [/the/path/to/your/conda/install/miniconda3/envs/ab_ref/lib/python3.7/site-packages/torch/lib/libtorch_cpu.so]
 #
 #   실제로 우리가 관심을 갖는 정보들은 이런 식으로 표현이 가능합니다:
 #
-#       build/aten/src/ATen/core/TensorMethods.cpp:at::Tensor::mul(at::Tensor const&) const
+# .. code-block:: sh
 #
-#   CallgrindStats.as_standardized()는 파일 경로의 의미없는 부분(low signal portion)뿐만
+#    build/aten/src/ATen/core/TensorMethods.cpp:at::Tensor::mul(at::Tensor const&) const
+#
+#   ``CallgrindStats.as_standardized()`` 는 파일 경로의 의미없는 부분(low signal portion)뿐만
 #   아니라, 공유 객체(shared object)들도 제거(strip)하는데 최선을 다하므로, 대부분의 경우
 #   사용하는 것을 권합니다.
 #
@@ -210,7 +212,7 @@ print(inclusive_stats[:10])
 #
 
 ###############################################################################
-# 이 외에도 요약해야 할 내용들이 많습니다. `FunctionCounts.transform` 메소드를
+# 이 외에도 요약해야 할 내용들이 많습니다. ``FunctionCounts.transform`` 메소드를
 # 사용하여 함수 경로의 일부를 자르고, 호출된 함수를 제거(discard)합니다.
 # 그렇게 하면 중복(collision, 예. `foo.h` 에 같이 매핑된 `foo.h:a()` 와 `foo.h:b()` )된
 # 횟수는 더해집니다.
@@ -251,8 +253,8 @@ print(inclusive_stats.transform(group_by_file)[:10])
 #
 
 ###############################################################################
-# 6. Callgrind를 사용한 A/B 테스트
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# 6. `Callgrind` 를 사용한 A/B 테스트
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 # 명령어 실행 횟수 측정의 가장 유용한 기능 중 하나는 성능을 분석할 때
 # 중요한 것으로, 연산을 세밀하게 비교할 수 있다는 것입니다.
@@ -274,9 +276,9 @@ broadcasting_stats = Timer(
 ###############################################################################
 # 종종 서로 다른 두 환경에서 A/B 테스트를 진행하고 싶을 때가 있습니다. (예.
 # PR을 테스트하거나, 컴파일 플래그(flag) 실험 등)
-# 이는 CallgrindStats와 FunctionCounts, Measurement는 모두 pickle화(picklalbe)가
-# 가능하기 때문에 매우 간단합니다. 각 환경에서 측정한 결과들을 저장하고, 단일
-# 프로세스에서 불러와서 분석하기만 하면 됩니다.
+# 이는 ``CallgrindStats`` 와 ``FunctionCounts``, ``Measurement`` 는 모두
+# pickle화(picklalbe)가 가능하기 때문에 매우 간단합니다. 각 환경에서 측정한
+# 결과들을 저장하고, 단일 프로세스에서 불러와서 분석하기만 하면 됩니다.
 #
 
 import pickle
@@ -327,8 +329,8 @@ print(delta.transform(extract_fn_name))
 
 ###############################################################################
 # 브로드캐스팅했던 버전은 호출당(샘플 당 100번의 실행을 수집하였음을 기억하세요)
-# 580번, 대략 10%만큼 명령어가 더 실행되었습니다. TensorIterator 호출이 제법 많으므로
-# 조금 더 깊이 살펴보겠습니다. FunctionCounts.filter를 사용하여 이를 쉽게 수행할 수
+# 580번, 대략 10%만큼 명령어가 더 실행되었습니다. ``TensorIterator`` 호출이 제법 많으므로
+# 조금 더 깊이 살펴보겠습니다. ``FunctionCounts.filter`` 를 사용하여 이를 쉽게 수행할 수
 # 있습니다.
 #
 
@@ -379,15 +381,15 @@ print(delta.transform(extract_fn_name).filter(lambda fn: "TensorIterator" in fn)
 # 8. 각주
 # ~~~~~~~~~~~~
 #
-#   - 묵시적(implied) `import torch`
-#       `globals` 가 "torch"를 포함하지 않으면, Timer가 자동으로 불러옵니다.
-#       즉, `Timer("torch.empty(())")` 가 동작합니다. (다른 불러오기(import)
+#   - 묵시적(implied) ``import torch```
+#       `globals` 가 "torch"를 포함하지 않으면, ``Timer`` 가 자동으로 불러옵니다.
+#       즉, ``Timer("torch.empty(())")`` 가 동작합니다. (다른 불러오기(import)
 #       는 반드시 `setup` 에 포함되어 있어야 합니다 -
-#       예. `Timer("np.zeros(())", "import numpy as np")` )
+#       예. ``Timer("np.zeros(())", "import numpy as np")`` )
 #
-#   - REL_WITH_DEB_INFO
-#       실행되는 PyTorch 내부에 대한 전체 정보를 제공하기 위해, Callgrind는
+#   - ``REL_WITH_DEB_INFO``
+#       실행되는 PyTorch 내부에 대한 전체 정보를 제공하기 위해, ``Callgrind`` 는
 #       C++ 디버그 심볼(debug symbol)에 접근해야 합니다. 이를 위해 PyTorch를
-#       빌드할 때 REL_WITH_DEB_INFO=1 을 설정해야 합니다. 그렇지 않으면
-#       함수 호출이 불투명(opaque)해집니다. (이런 경우 CallgrindStats가
+#       빌드할 때 ``REL_WITH_DEB_INFO=1`` 을 설정해야 합니다. 그렇지 않으면
+#       함수 호출이 불투명(opaque)해집니다. (이런 경우 ``CallgrindStats`` 가
 #       디버그 심볼 누락을 경고합니다.)

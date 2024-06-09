@@ -18,7 +18,7 @@ GAN이나 시퀀스-투-시퀀스(sequence-to-sequence model), 앙상블 모델(
 ---------
 시작하기 전에 ``torch`` 가 없다면 설치해야 합니다.
 
-::
+.. code-block:: sh
 
    pip install torch
 

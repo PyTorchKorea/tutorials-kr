@@ -6,11 +6,11 @@ Pytorch를 사용해 신경망 정의하기
 PyTorch에서, 신경망은 ``torch.nn`` 패키지를 사용해 구성할 수 있습니다.
 
 소개
------
+-------
 PyTorch는 ``torch.nn`` 을 포함하여 신경망을 만들고 훈련시키는 것을 도울 수 있도록 섬세하게 만들어진 모듈과 클래스들을 제공합니다.
 ``nn.Moduel`` 은 계층, 그리고 ``output`` 을 반환하는 ``forward(input)`` 메소드를 포함하고 있습니다.
 
-이 레시피에서, `MNIST dataset <https://pytorch.org/docs/stable/torchvision/datasets.html#mnist>`__ 을 사용하여 신경망을 정의하기 위해 ``torch.nn`` 을 사용할 예정입니다.
+이 레시피에서, `MNIST dataset <https://pytorch.org/vision/stable/generated/torchvision.datasets.MNIST.html#torchvision.datasets.MNIST>`__ 을 사용하여 신경망을 정의하기 위해 ``torch.nn`` 을 사용할 예정입니다.
 
 설치
 -----
