@@ -462,12 +462,12 @@ but it also aligns more with the existing semantics in PyTorch as a whole.</p>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;npm0 + npm1:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">npm0</span> <span class="o">+</span> <span class="n">npm1</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-pytb notranslate"><div class="highlight"><pre><span></span><span class="gt">Traceback (most recent call last):</span>
-  File <span class="nb">&quot;/workspace/tutorials-kr/prototype_source/maskedtensor_advanced_semantics.py&quot;</span>, line <span class="m">48</span>, in <span class="n">&lt;module&gt;</span>
-<span class="w">    </span><span class="n">npm0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">masked_array</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="p">(</span><span class="o">~</span><span class="n">mask</span><span class="p">)</span><span class="o">.</span><span class="n">numpy</span><span class="p">())</span>
-  File <span class="nb">&quot;/opt/conda/lib/python3.10/site-packages/torch/utils/_device.py&quot;</span>, line <span class="m">62</span>, in <span class="n">__torch_function__</span>
-<span class="w">    </span><span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-<span class="gr">TypeError</span>: <span class="n">can&#39;t convert cuda:0 device type tensor to numpy. Use Tensor.cpu() to copy the tensor to host memory first.</span>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>npm0:
+ [0.0 1.0 -- 3.0 --]
+npm1:
+ [-- -- 2.0 -- 4.0]
+npm0 + npm1:
+ [-- -- -- -- --]
 </pre></div>
 </div>
 <p>Meanwhile, MaskedTensor does not support addition or binary operators with masks that don’t match –
@@ -483,6 +483,17 @@ to understand why, please find the <a class="reference internal" href="#reductio
     <span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;mt0 + mt1 failed. Error: &quot;</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
 </pre></div>
 </div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>mt0:
+ MaskedTensor(
+  [  0.0000,   1.0000,       --,   3.0000,       --]
+)
+mt1:
+ MaskedTensor(
+  [      --,       --,   2.0000,       --,   4.0000]
+)
+mt0 + mt1 failed. Error:  Input masks must match. If you need support for this, please open an issue on Github.
+</pre></div>
+</div>
 <p>However, if this behavior is desired, MaskedTensor does support these semantics by giving access to the data and masks
 and conveniently converting a MaskedTensor to a Tensor with masked values filled in using <code class="xref py py-func docutils literal notranslate"><span class="pre">to_tensor()</span></code>.
 For example:</p>
@@ -493,6 +504,16 @@ For example:</p>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;t0:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">t0</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;t1:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">t1</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;mt2 (t0 + t1):</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">mt2</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>t0:
+ tensor([0., 1., 0., 3., 0.])
+t1:
+ tensor([0., 0., 2., 0., 4.])
+mt2 (t0 + t1):
+ MaskedTensor(
+  [      --,       --,       --,       --,       --]
+)
 </pre></div>
 </div>
 <p>Note that the mask is <cite>mt0.get_mask() &amp; mt1.get_mask()</cite> since <code class="xref py py-class docutils literal notranslate"><span class="pre">MaskedTensor</span></code>’s mask is the inverse of NumPy’s.</p>
@@ -514,12 +535,52 @@ to motivate our strict requirements around matching masks from above.</p>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;mt:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">mt</span><span class="p">)</span>
 </pre></div>
 </div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>data:
+ tensor([[ 0.,  1.,  2.,  3.],
+        [ 4.,  5.,  6.,  7.],
+        [ 8.,  9., 10., 11.]])
+mask:
+ tensor([[False, False,  True, False],
+        [ True,  True,  True,  True],
+        [ True, False, False, False]])
+mt:
+ MaskedTensor(
+  [
+    [      --,       --,   2.0000,       --],
+    [  4.0000,   5.0000,   6.0000,   7.0000],
+    [  8.0000,       --,       --,       --]
+  ]
+)
+</pre></div>
+</div>
 <p>Now, the different reductions (all on dim=1):</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;torch.sum:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">mt</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;torch.mean:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">mt</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;torch.prod:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">mt</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;torch.amin:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">amin</span><span class="p">(</span><span class="n">mt</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;torch.amax:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">amax</span><span class="p">(</span><span class="n">mt</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>torch.sum:
+ MaskedTensor(
+  [  2.0000,  22.0000,   8.0000]
+)
+torch.mean:
+ MaskedTensor(
+  [  2.0000,   5.5000,   8.0000]
+)
+torch.prod:
+ MaskedTensor(
+  [  2.0000, 840.0000,   8.0000]
+)
+torch.amin:
+ MaskedTensor(
+  [  2.0000,   4.0000,   8.0000]
+)
+torch.amax:
+ MaskedTensor(
+  [  2.0000,   7.0000,   8.0000]
+)
 </pre></div>
 </div>
 <p>Of note, the value under a masked out element is not guaranteed to have any specific value, especially if the
@@ -538,9 +599,21 @@ In other words, why don’t we use the same semantics as <code class="docutils l
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;npm1:&quot;</span><span class="p">,</span> <span class="n">npm1</span><span class="p">)</span>
 </pre></div>
 </div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>npm0: [[-- -- 2.0 3.0 4.0]
+ [5.0 6.0 7.0 -- --]]
+npm1: [[10.0 11.0 12.0 -- --]
+ [-- -- 17.0 18.0 19.0]]
+</pre></div>
+</div>
 <p>Now, let’s try addition:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;(npm0 + npm1).sum(0):</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">npm0</span> <span class="o">+</span> <span class="n">npm1</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;npm0.sum(0) + npm1.sum(0):</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">npm0</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">npm1</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>(npm0 + npm1).sum(0):
+ [-- -- 38.0 -- --]
+npm0.sum(0) + npm1.sum(0):
+ [15.0 17.0 38.0 21.0 23.0]
 </pre></div>
 </div>
 <p>Sum and addition should clearly be associative, but with NumPy’s semantics, they are not,
@@ -555,6 +628,9 @@ like shown below), but the user must now be more explicit with their intentions.
 <span class="p">(</span><span class="n">mt0</span><span class="o">.</span><span class="n">to_tensor</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">mt1</span><span class="o">.</span><span class="n">to_tensor</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 </pre></div>
 </div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor([15., 17., 38., 21., 23.])
+</pre></div>
+</div>
 </div>
 <div class="section" id="conclusion">
 <h2>Conclusion<a class="headerlink" href="#conclusion" title="이 제목에 대한 퍼머링크">¶</a></h2>
@@ -564,7 +640,7 @@ In general, MaskedTensor is designed to avoid ambiguity and confusing semantics 
 the associative property amongst binary operations), which in turn can necessitate the user
 to be more intentional with their code at times, but we believe this to be the better move.
 If you have any thoughts on this, please <a class="reference external" href="https://github.com/pytorch/pytorch/issues">let us know</a>!</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.004 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.021 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-prototype-maskedtensor-advanced-semantics-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/d58dcaa8f603e286a2501a4e2a87d1b7/maskedtensor_advanced_semantics.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">maskedtensor_advanced_semantics.py</span></code></a></p>
