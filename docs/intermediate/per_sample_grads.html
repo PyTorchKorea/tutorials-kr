@@ -51,13 +51,13 @@
   <link rel="stylesheet" href="../_static/sg_gallery-binder.css" type="text/css" />
   <link rel="stylesheet" href="../_static/sg_gallery-dataframe.css" type="text/css" />
   <link rel="stylesheet" href="../_static/sg_gallery-rendered-html.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sphinx-design.5ea377869091fd0449014c60fc090103.min.css" type="text/css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
     <link rel="index" title="색인" href="../genindex.html" />
     <link rel="search" title="검색" href="../search.html" />
     <link rel="next" title="PyTorch C++ 프론트엔드 사용하기" href="../advanced/cpp_frontend.html" />
-    <link rel="prev" title="Model ensembling" href="ensembling.html" /> 
+    <link rel="prev" title="모델 앙상블" href="ensembling.html" /> 
 
   
   <script src="../_static/js/modernizr.min.js"></script>
@@ -252,7 +252,7 @@
 <li class="toctree-l1"><a class="reference internal" href="memory_format_tutorial.html">(베타) PyTorch를 사용한 Channels Last 메모리 형식</a></li>
 <li class="toctree-l1"><a class="reference internal" href="forward_ad_usage.html">Forward-mode Automatic Differentiation (Beta)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="jacobians_hessians.html">Jacobians, Hessians, hvp, vhp, and more: composing function transforms</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ensembling.html">Model ensembling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ensembling.html">모델 앙상블</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Per-sample-gradients</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_frontend.html">PyTorch C++ 프론트엔드 사용하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/torch-script-parallelism.html">TorchScript의 동적 병렬 처리(Dynamic Parallelism)</a></li>
@@ -321,7 +321,7 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Multimodality</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/flava_finetuning_tutorial.html">TorchMultimodal Tutorial: Finetuning FLAVA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/flava_finetuning_tutorial.html">TorchMultimodal 튜토리얼: FLAVA 미세조정</a></li>
 </ul>
 
             
@@ -580,6 +580,12 @@ results of hand processing each one individually:</p>
     <span class="k">assert</span> <span class="n">torch</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">per_sample_grad</span><span class="p">,</span> <span class="n">ft_per_sample_grad</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mf">3e-3</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">)</span>
 </pre></div>
 </div>
+<div class="sphx-glr-script-out highlight-pytb notranslate"><div class="highlight"><pre><span></span><span class="gt">Traceback (most recent call last):</span>
+  File <span class="nb">&quot;/workspace/tutorials-kr/intermediate_source/per_sample_grads.py&quot;</span>, line <span class="m">173</span>, in <span class="n">&lt;module&gt;</span>
+<span class="w">    </span><span class="k">assert</span> <span class="n">torch</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">per_sample_grad</span><span class="p">,</span> <span class="n">ft_per_sample_grad</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mf">3e-3</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">)</span>
+<span class="gr">AssertionError</span>
+</pre></div>
+</div>
 <p>A quick note: there are limitations around what types of functions can be
 transformed by <code class="docutils literal notranslate"><span class="pre">vmap</span></code>. The best functions to transform are ones that are pure
 functions: a function where the outputs are only determined by the inputs,
@@ -617,17 +623,6 @@ some results on our build machines:</p>
 <span class="n">get_perf</span><span class="p">(</span><span class="n">with_vmap_timing</span><span class="p">,</span> <span class="s2">&quot;vmap&quot;</span><span class="p">,</span> <span class="n">no_vmap_timing</span><span class="p">,</span> <span class="s2">&quot;no vmap&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Per-sample-grads without vmap &lt;torch.utils.benchmark.utils.common.Measurement object at 0x7fcfd170e220&gt;
-compute_sample_grads(data, targets)
-  41.37 ms
-  1 measurement, 100 runs , 1 thread
-Per-sample-grads with vmap &lt;torch.utils.benchmark.utils.common.Measurement object at 0x7fcfb426dd30&gt;
-ft_compute_sample_grad(params, buffers, data, targets)
-  1.51 ms
-  1 measurement, 100 runs , 1 thread
-Performance delta: 2635.7103 percent improvement with vmap
-</pre></div>
-</div>
 <p>There are other optimized solutions (like in <a class="reference external" href="https://github.com/pytorch/opacus">https://github.com/pytorch/opacus</a>)
 to computing per-sample-gradients in PyTorch that also perform better than
 the naive method. But it’s cool that composing <code class="docutils literal notranslate"><span class="pre">vmap</span></code> and <code class="docutils literal notranslate"><span class="pre">grad</span></code> give us a
@@ -638,7 +633,7 @@ though, like if we haven’t implemented the <code class="docutils literal notra
 operation or if the underlying kernels weren’t optimized for older hardware
 (GPUs). If you see any of these cases, please let us know by opening an issue
 at on GitHub.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  4.477 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.291 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-intermediate-per-sample-grads-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/bb0e78bec4d7a6e9b86b2e285cd06671/per_sample_grads.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">per_sample_grads.py</span></code></a></p>
@@ -662,7 +657,7 @@ at on GitHub.</p>
         <a href="../advanced/cpp_frontend.html" class="btn btn-neutral float-right" title="PyTorch C++ 프론트엔드 사용하기" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
       
       
-        <a href="ensembling.html" class="btn btn-neutral" title="Model ensembling" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
+        <a href="ensembling.html" class="btn btn-neutral" title="모델 앙상블" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
       
     </div>
   

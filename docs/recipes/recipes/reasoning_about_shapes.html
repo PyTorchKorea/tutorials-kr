@@ -51,7 +51,7 @@
   <link rel="stylesheet" href="../../_static/sg_gallery-binder.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/sg_gallery-dataframe.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/sg_gallery-rendered-html.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/sphinx-design.5ea377869091fd0449014c60fc090103.min.css" type="text/css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/css/custom.css" type="text/css" />
     <link rel="index" title="색인" href="../../genindex.html" />
@@ -250,7 +250,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/memory_format_tutorial.html">(베타) PyTorch를 사용한 Channels Last 메모리 형식</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/forward_ad_usage.html">Forward-mode Automatic Differentiation (Beta)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/jacobians_hessians.html">Jacobians, Hessians, hvp, vhp, and more: composing function transforms</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../intermediate/ensembling.html">Model ensembling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../intermediate/ensembling.html">모델 앙상블</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/per_sample_grads.html">Per-sample-gradients</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../advanced/cpp_frontend.html">PyTorch C++ 프론트엔드 사용하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../advanced/torch-script-parallelism.html">TorchScript의 동적 병렬 처리(Dynamic Parallelism)</a></li>
@@ -319,7 +319,7 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Multimodality</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../beginner/flava_finetuning_tutorial.html">TorchMultimodal Tutorial: Finetuning FLAVA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../beginner/flava_finetuning_tutorial.html">TorchMultimodal 튜토리얼: FLAVA 미세조정</a></li>
 </ul>
 
             
@@ -442,7 +442,7 @@ to download the full example code</p>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor(..., device=&#39;meta&#39;, size=(2, 5, 9, 9), grad_fn=&lt;ConvolutionBackward0&gt;)
-Time taken: 0.00010297400876879692
+Time taken: 0.00026673078536987305
 </pre></div>
 </div>
 <p>데이터가 구체화되지 않기 때문에 임의로 큰 입력을 전달해도 shape 계산에 소요되는 시간이
@@ -458,7 +458,7 @@ Time taken: 0.00010297400876879692
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor(..., device=&#39;meta&#39;, size=(1024, 5, 65535, 65535),
        grad_fn=&lt;ConvolutionBackward0&gt;)
-Time taken: 7.789701339788735e-05
+Time taken: 0.000128990039229393
 </pre></div>
 </div>
 <p>다음과 같은 임의의 네트워크를 가정합니다:</p>
@@ -504,24 +504,45 @@ Time taken: 7.789701339788735e-05
 <span class="n">out</span> <span class="o">=</span> <span class="n">net</span><span class="p">(</span><span class="n">inp</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Shape of output to Conv2d(3, 6, kernel_size=(5, 5), stride=(1, 1)) is torch.Size([1024, 6, 28, 28]).
-Shape of output to MaxPool2d(kernel_size=2, stride=2, padding=0, dilation=1, ceil_mode=False) is torch.Size([1024, 6, 14, 14]).
-Shape of output to Conv2d(6, 16, kernel_size=(5, 5), stride=(1, 1)) is torch.Size([1024, 16, 10, 10]).
-Shape of output to MaxPool2d(kernel_size=2, stride=2, padding=0, dilation=1, ceil_mode=False) is torch.Size([1024, 16, 5, 5]).
-Shape of output to Linear(in_features=400, out_features=120, bias=True) is torch.Size([1024, 120]).
-Shape of output to Linear(in_features=120, out_features=84, bias=True) is torch.Size([1024, 84]).
-Shape of output to Linear(in_features=84, out_features=10, bias=True) is torch.Size([1024, 10]).
-Shape of output to Net(
-  (conv1): Conv2d(3, 6, kernel_size=(5, 5), stride=(1, 1))
-  (pool): MaxPool2d(kernel_size=2, stride=2, padding=0, dilation=1, ceil_mode=False)
-  (conv2): Conv2d(6, 16, kernel_size=(5, 5), stride=(1, 1))
-  (fc1): Linear(in_features=400, out_features=120, bias=True)
-  (fc2): Linear(in_features=120, out_features=84, bias=True)
-  (fc3): Linear(in_features=84, out_features=10, bias=True)
-) is torch.Size([1024, 10]).
+<div class="sphx-glr-script-out highlight-pytb notranslate"><div class="highlight"><pre><span></span><span class="gt">Traceback (most recent call last):</span>
+  File <span class="nb">&quot;/workspace/tutorials-kr/recipes_source/recipes/reasoning_about_shapes.py&quot;</span>, line <span class="m">85</span>, in <span class="n">&lt;module&gt;</span>
+<span class="w">    </span><span class="n">out</span> <span class="o">=</span> <span class="n">net</span><span class="p">(</span><span class="n">inp</span><span class="p">)</span>
+  File <span class="nb">&quot;/opt/conda/lib/python3.10/site-packages/torch/nn/modules/module.py&quot;</span>, line <span class="m">1538</span>, in <span class="n">_call_impl</span>
+<span class="w">    </span><span class="n">result</span> <span class="o">=</span> <span class="n">forward_call</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+  File <span class="nb">&quot;/workspace/tutorials-kr/recipes_source/recipes/reasoning_about_shapes.py&quot;</span>, line <span class="m">59</span>, in <span class="n">forward</span>
+<span class="w">    </span><span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pool</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conv1</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span>
+  File <span class="nb">&quot;/opt/conda/lib/python3.10/site-packages/torch/nn/functional.py&quot;</span>, line <span class="m">1453</span>, in <span class="n">relu</span>
+<span class="w">    </span><span class="k">return</span> <span class="n">handle_torch_function</span><span class="p">(</span><span class="n">relu</span><span class="p">,</span> <span class="p">(</span><span class="nb">input</span><span class="p">,),</span> <span class="nb">input</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="n">inplace</span><span class="p">)</span>
+  File <span class="nb">&quot;/opt/conda/lib/python3.10/site-packages/torch/overrides.py&quot;</span>, line <span class="m">1534</span>, in <span class="n">handle_torch_function</span>
+<span class="w">    </span><span class="n">result</span> <span class="o">=</span> <span class="n">mode</span><span class="o">.</span><span class="n">__torch_function__</span><span class="p">(</span><span class="n">public_api</span><span class="p">,</span> <span class="n">types</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
+  File <span class="nb">&quot;/opt/conda/lib/python3.10/site-packages/torch/utils/_device.py&quot;</span>, line <span class="m">62</span>, in <span class="n">__torch_function__</span>
+<span class="w">    </span><span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+  File <span class="nb">&quot;/opt/conda/lib/python3.10/site-packages/torch/nn/functional.py&quot;</span>, line <span class="m">1457</span>, in <span class="n">relu</span>
+<span class="w">    </span><span class="n">result</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
+  File <span class="nb">&quot;/opt/conda/lib/python3.10/site-packages/torch/_refs/nn/functional/__init__.py&quot;</span>, line <span class="m">134</span>, in <span class="n">_fn</span>
+<span class="w">    </span><span class="k">return</span> <span class="n">fn</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+  File <span class="nb">&quot;/opt/conda/lib/python3.10/site-packages/torch/_prims_common/wrappers.py&quot;</span>, line <span class="m">220</span>, in <span class="n">_fn</span>
+<span class="w">    </span><span class="n">result</span> <span class="o">=</span> <span class="n">fn</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+  File <span class="nb">&quot;/opt/conda/lib/python3.10/site-packages/torch/_prims_common/wrappers.py&quot;</span>, line <span class="m">130</span>, in <span class="n">_fn</span>
+<span class="w">    </span><span class="n">result</span> <span class="o">=</span> <span class="n">fn</span><span class="p">(</span><span class="o">**</span><span class="n">bound</span><span class="o">.</span><span class="n">arguments</span><span class="p">)</span>
+  File <span class="nb">&quot;/opt/conda/lib/python3.10/site-packages/torch/_refs/nn/functional/__init__.py&quot;</span>, line <span class="m">258</span>, in <span class="n">relu</span>
+<span class="w">    </span><span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">le</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span>
+  File <span class="nb">&quot;/opt/conda/lib/python3.10/site-packages/torch/_prims_common/wrappers.py&quot;</span>, line <span class="m">220</span>, in <span class="n">_fn</span>
+<span class="w">    </span><span class="n">result</span> <span class="o">=</span> <span class="n">fn</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+  File <span class="nb">&quot;/opt/conda/lib/python3.10/site-packages/torch/_prims_common/wrappers.py&quot;</span>, line <span class="m">130</span>, in <span class="n">_fn</span>
+<span class="w">    </span><span class="n">result</span> <span class="o">=</span> <span class="n">fn</span><span class="p">(</span><span class="o">**</span><span class="n">bound</span><span class="o">.</span><span class="n">arguments</span><span class="p">)</span>
+  File <span class="nb">&quot;/opt/conda/lib/python3.10/site-packages/torch/_refs/__init__.py&quot;</span>, line <span class="m">1806</span>, in <span class="n">where</span>
+<span class="w">    </span><span class="n">pred</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">_maybe_broadcast</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+  File <span class="nb">&quot;/opt/conda/lib/python3.10/site-packages/torch/_refs/__init__.py&quot;</span>, line <span class="m">369</span>, in <span class="n">_maybe_broadcast</span>
+<span class="w">    </span><span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">__maybe_broadcast</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">common_shape</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">args</span><span class="p">)</span>
+  File <span class="nb">&quot;/opt/conda/lib/python3.10/site-packages/torch/_refs/__init__.py&quot;</span>, line <span class="m">369</span>, in <span class="n">&lt;genexpr&gt;</span>
+<span class="w">    </span><span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">__maybe_broadcast</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">common_shape</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">args</span><span class="p">)</span>
+  File <span class="nb">&quot;/opt/conda/lib/python3.10/site-packages/torch/_refs/__init__.py&quot;</span>, line <span class="m">361</span>, in <span class="n">__maybe_broadcast</span>
+<span class="w">    </span><span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="n">common_shape</span><span class="p">)</span>
+<span class="gr">ValueError</span>: <span class="n">expected a tensor object</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.009 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.015 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-recipes-recipes-reasoning-about-shapes-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/9f4fb47ef3d58524029d86df50e90a08/reasoning_about_shapes.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">reasoning_about_shapes.py</span></code></a></p>
