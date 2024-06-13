@@ -52,7 +52,10 @@ class DataParallelModel(nn.Module):
 
 class MyDataParallel(nn.DataParallel):
     def __getattr__(self, name):
-        return getattr(self.module, name)
+        try:
+            return super().__getattr__(name)
+        except AttributeError:
+            return getattr(self.module, name)
 
 ########################################################################
 # **DataParallel이 구현된 기본형(Primitive):**

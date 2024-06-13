@@ -1,27 +1,29 @@
 """
 텐서보드를 이용한 파이토치 프로파일러
-====================================
+========================================
 
-**번역**: `손동우 <https://github.com/dnd-qodqks>`__.
+**번역**: `손동우 <https://github.com/dnd-qodqks>`__
 
 이 튜토리얼에서는 파이토치(PyTorch) 프로파일러(profiler)와 함께 텐서보드(TensorBoard) 플러그인(plugin)을 사용하여
 모델의 성능 병목 현상을 탐지하는 방법을 보여 줍니다.
 
 소개
 ------------
-파이토치 1.8에는 GPU에서 CUDA 커널(kernel) 실행 뿐만 아니라
+
+파이토치(PyTorch) 1.8부터 GPU에서 CUDA 커널(kernel) 실행 뿐만 아니라
 CPU 작업을 기록할 수 있는 업데이트된 프로파일러 API가 포함되어 있습니다.
 프로파일러는 텐서보드 플러그인에서 이런 정보를 시각화하고
 성능 병목 현상에 대한 분석을 제공할 수 있습니다.
 
-이 튜토리얼에서는 간단한 Resnet 모델을 사용하여 
+이 튜토리얼에서는 간단한 Resnet 모델을 사용하여
 텐서보드 플러그인을 활용한 모델 성능 분석 방법을 보여드리겠습니다.
 
 준비
 -----
+
 아래 명령어를 실행하여 ``torch``와 ``torchvision``을 설치합니다:
 
-::
+.. code-block::
 
    pip install torch torchvision
 
@@ -39,6 +41,7 @@ CPU 작업을 기록할 수 있는 업데이트된 프로파일러 API가 포함
 # 4. 텐서보드를 사용하여 결과 확인 및 모델 성능 분석
 # 5. 프로파일러의 도움으로 성능 개선
 # 6. 다른 고급 기능으로 성능 분석
+# 7. 추가 연습: AMD GPU에서 PyTorch 프로파일링
 #
 # 1. 데이터 및 모델 준비
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -67,7 +70,7 @@ train_set = torchvision.datasets.CIFAR10(root='./data', train=True, download=Tru
 train_loader = torch.utils.data.DataLoader(train_set, batch_size=32, shuffle=True)
 
 ######################################################################
-# 그런 다음 Resnet 모델, 손실 함수 및 옵티마이저 객체를 생성합니다. 
+# 그런 다음 Resnet 모델, 손실 함수 및 옵티마이저 객체를 생성합니다.
 # GPU에서 실행하기 위해 모델 및 손실을 GPU 장치로 이동합니다.
 
 device = torch.device("cuda:0")
@@ -99,12 +102,12 @@ def train(data):
 # - ``schedule`` - step (int)을 단일 매개변수로 받아들이고,
 #   각 단계에서 수행할 프로파일러 작업을 반환하는 호출 가능한 함수입니다.
 #
-#   이 예시에서는 ``wait=1, warmup=1, active=3, repeat=2``로 설정되어 있으며,
+#   이 예시에서는 ``wait=1, warmup=1, active=3, repeat=1`` 로 설정되어 있으며,
 #   프로파일러는 첫 번째 단계/반복(step/iteration)을 건너뜁니다.
 #   두 번째부터 워밍업(warming up)을 시작하면,
 #   다음 세 번의 반복을 기록하고,
 #   그 후 추적(trace)을 사용할 수 있게 되고 on_trace_ready (설정된 경우)가 호출됩니다.
-#   전체적으로 이 주기가 두 번 반복됩니다. 텐서보드 플러그인에서 각 주기는 "span"이라고 합니다.
+#   전체적으로 이 주기가 한 번 반복됩니다. 텐서보드 플러그인에서 각 주기는 "span"이라고 합니다.
 #
 #   ``wait`` 단계인 동안 프로파일러는 비활성화됩니다.
 #   ``warmup`` 단계인 동안엔 프로파일러가 추적(tracing)을 시작하지만 결과는 무시됩니다.
@@ -119,38 +122,40 @@ def train(data):
 # - ``profile_memory`` - Track tensor memory 할당/할당 해제 여부를 나타냅니다. 주의, 1.10 이전 버전의 파이토치를 사용하는 경우
 #   프로파일링 시간이 길다면 이 기능을 비활성화하거나 새 버전으로 업그레이드해 주세요.
 # - ``with_stack`` - ops에 대한 소스 정보(파일 및 라인 번호)를 기록 여부를 나타냅니다.
-#   VS Code에서 텐서보드가 실행되는 경우 (`참고 <https://code.visualstudio.com/docs/datascience/pytorch-support#_tensorboard-integration>`__),
+#   만약 VS Code에서 텐서보드를 실행하는 경우 (`참고 <https://code.visualstudio.com/docs/datascience/pytorch-support#_tensorboard-integration>`__),
 #   스택 프레임(stack frame)을 클릭하면 특정 코드 라인으로 이동합니다.
 
 with torch.profiler.profile(
-        schedule=torch.profiler.schedule(wait=1, warmup=1, active=3, repeat=2),
+        schedule=torch.profiler.schedule(wait=1, warmup=1, active=3, repeat=1),
         on_trace_ready=torch.profiler.tensorboard_trace_handler('./log/resnet18'),
         record_shapes=True,
         profile_memory=True,
         with_stack=True
 ) as prof:
     for step, batch_data in enumerate(train_loader):
-        if step >= (1 + 1 + 3) * 2:
+        prof.step()  # 각 단계에서 호출하여 프로파일러에게 단계의 경계를 알려야 합니다.
+        if step >= 1 + 1 + 3:
             break
         train(batch_data)
-        prof.step()  # 각 단계의 끝에서 호출하여 프로파일러에게 단계의 경계를 알려야 합니다.
 
 ######################################################################
-# 또한, non-context 관리자는 시작/정지도 지원됩니다.
+#
+# 또한, 다음의 non-context 관리자(manager)는 시작(start)/정지(stop) 기능도 지원됩니다.
 prof = torch.profiler.profile(
-        schedule=torch.profiler.schedule(wait=1, warmup=1, active=3, repeat=2),
+        schedule=torch.profiler.schedule(wait=1, warmup=1, active=3, repeat=1),
         on_trace_ready=torch.profiler.tensorboard_trace_handler('./log/resnet18'),
         record_shapes=True,
         with_stack=True)
 prof.start()
 for step, batch_data in enumerate(train_loader):
-    if step >= (1 + 1 + 3) * 2:
+    prof.step()
+    if step >= 1 + 1 + 3:
         break
     train(batch_data)
-    prof.step()
 prof.stop()
 
 ######################################################################
+#
 # 3. 프로파일러 실행
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
@@ -158,40 +163,49 @@ prof.stop()
 
 
 ######################################################################
+#
 # 4. 텐서보드를 사용하여 결과 확인 및 모델 성능 분석
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# 
+#
+# .. note::
+#    텐서보드 플러그인(Tensorboard Plugin) 지원이 중단되었으므로, 아래 기능들 중 일부는
+#    이전처럼 동작하지 않을 수 있습니다. 이에 대한 대안으로 `HTA <https://github.com/pytorch/kineto/tree/main#holistic-trace-analysis>`_
+#    를 사용할 수 있습니다.
+#
 # 파이토치 프로파일러 텐서보드 플러그인을 설치합니다.
 #
-# ::
+# .. code-block::
 #
 #     pip install torch_tb_profiler
 #
 
 ######################################################################
+#
 # 텐서보드를 실행합니다.
 #
-# ::
+# .. code-block::
 #
 #     tensorboard --logdir=./log
 #
 
 ######################################################################
-# 구글 크롬(Google Chrome) 브라우저 또는 마이크로소프트 엣지(Microsoft Edge) 브라우저에서 텐서보드 프로파일(profile) URL에 접속합니다.
 #
-# ::
+# 구글 크롬(Google Chrome) 브라우저 또는 마이크로소프트 엣지(Microsoft Edge) 브라우저에서 텐서보드 프로파일(profile) URL에 접속합니다. (**Safari 브라우저는 지원하지 않습니다.**)
+#
+# .. code-block::
 #
 #     http://localhost:6006/#pytorch_profiler
 #
 
 ######################################################################
+#
 # 아래와 같이 프로파일러 플러그인 페이지를 볼 수 있습니다.
 #
-# - Overview
+# - 개요(Overview)
 # .. image:: ../../_static/img/profiler_overview1.png
 #    :scale: 25 %
 #
-# 개요에는 모델 성능에 대한 대략적인 요약이 표시됩니다.
+# 개요 페이지에는 모델 성능에 대한 대략적인 요약이 표시됩니다.
 #
 # "GPU 요약(GPU Summary)" 패널에는 GPU 구성, GPU 사용량 및 Tensor 코어 사용량이 표시됩니다.
 # 이 예제에서는 GPU 사용량이 낮습니다.
@@ -216,6 +230,7 @@ prof.stop()
 #
 # .. image:: ../../_static/img/profiler_operator_view.png
 #    :scale: 25 %
+#
 # "셀프(Self)" 기간에는 하위 연산의 시간이 포함되지 않습니다.
 # "전체(Total)" 기간에는 하위 연산의 시간이 포함됩니다.
 #
@@ -233,12 +248,12 @@ prof.stop()
 # .. image:: ../../_static/img/profiler_vscode.png
 #    :scale: 25 %
 #
-#
 # - 커널 보기(Kernel view)
 # GPU 커널 보기(GPU kernel view)는 모든 커널(kernel)이 GPU에 소비한 시간을 보여줍니다.
 #
 # .. image:: ../../_static/img/profiler_kernel_view.png
 #    :scale: 25 %
+#
 # 사용된 Tensor 코어:
 # 이 커널(kernel)이 tensor 코어를 사용하는지 여부룰 나타냅니다.
 #
@@ -279,6 +294,7 @@ prof.stop()
 
 
 ######################################################################
+#
 # 5. 프로파일러의 도움으로 성능 개선
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
@@ -290,12 +306,13 @@ prof.stop()
 # 이 예시에서 "성능 권장사항(Performance Recommendation)"에 따라 아래와 같이 ``num_workers``를 설정하고,
 # ``./log/resnet18_4workers``와 같은 다른 이름을 ``tensorboard_trace_handler``로 전달한 후 다시 실행합니다.
 #
-# ::
+# .. code-block::
 #
 #     train_loader = torch.utils.data.DataLoader(train_set, batch_size=32, shuffle=True, num_workers=4)
 #
 
 ######################################################################
+#
 # 그런 다음 왼쪽 "실행(Runs)" 드롭다운(dropdown) 목록에서 최근 프로파일된 실행을 선택합니다.
 #
 # .. image:: ../../_static/img/profiler_overview2.png
@@ -311,6 +328,7 @@ prof.stop()
 # GPU 활용도가 증가하는 것을 알 수 있습니다.
 
 ######################################################################
+#
 # 6. 다른 고급 기능으로 성능 분석
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
@@ -319,7 +337,7 @@ prof.stop()
 #
 # Azure의 기존 예제를 사용해 볼 수 있습니다.
 #
-# ::
+# .. code-block::
 #
 #     pip install azure-storage-blob
 #     tensorboard --logdir=https://torchtbprofiler.blob.core.windows.net/torchtbprofiler/demo/memory_demo_1_10
@@ -355,7 +373,7 @@ prof.stop()
 # ``aten::empty``를 사용하여 메모리를 할당합니다. 예를 들어, ``aten::ones``은 ``aten::empty`` 다음에
 # ``aten::fill_``로 구현됩니다. 연산자 이름만 ``aten::empty``로 표시해도 별 도움이 되지 않습니다. 이 특수한 경우에는
 # ``aten::ones (aten::empty)``로 표시됩니다. "할당 시간(Allocation Time)", "해제 시간(Release Time)" 및 "기간(Duration)"은
-# 이벤트가 시간 범위를 벗어나는 경우 열의 데이터가 누락될 수 있습니다. 
+# 이벤트가 시간 범위를 벗어나는 경우 열의 데이터가 누락될 수 있습니다.
 #
 # 메모리 통계 테이블에서, "크기 증가(Size Increase)" 열은 모든 할당 크기를 합산하고 모든 메모리 릴리스(release)
 # 크기를 뺀 값, 즉, 이 연산자 이후의 메모리 사용량 순 증가 값입니다. "자체 크기 증가(Self Size Increase)" 열은
@@ -369,7 +387,7 @@ prof.stop()
 #
 # Azure의 기존 예제를 사용해 볼 수 있습니다:
 #
-# ::
+# .. code-block::
 #
 #     pip install azure-storage-blob
 #     tensorboard --logdir=https://torchtbprofiler.blob.core.windows.net/torchtbprofiler/demo/distributed_bert
@@ -392,11 +410,112 @@ prof.stop()
 # "커뮤니케이션 작업 통계(Communication Operations Stats)"는 각 작업자의 모든 통신 작업에 대한 세부 통계를 요약합니다.
 
 ######################################################################
-# 더 배우기
-# ----------
+#
+# 7. 추가 연습: AMD GPU에서 PyTorch 프로파일링
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#
+#
+# The AMD ROCm Platform is an open-source software stack designed for GPU computation, consisting of drivers, development tools, and APIs.
+# We can run the above mentioned steps on AMD GPUs. In this section, we will use Docker to install the ROCm base development image
+# before installing PyTorch.
+
+
+######################################################################
+#
+# For the purpose of example, let's create a directory called ``profiler_tutorial``, and save the code in **Step 1** as ``test_cifar10.py`` in this directory.
+#
+# .. code-block::
+#
+#      mkdir ~/profiler_tutorial
+#      cd profiler_tutorial
+#      vi test_cifar10.py
+
+
+######################################################################
+#
+# At the time of this writing, the Stable(``2.1.1``) Linux version of PyTorch on ROCm Platform is `ROCm 5.6 <https://pytorch.org/get-started/locally/>`_.
+#
+#
+# - Obtain a base Docker image with the correct user-space ROCm version installed from `Docker Hub <https://hub.docker.com/repository/docker/rocm/dev-ubuntu-20.04>`_.
+#
+# It is ``rocm/dev-ubuntu-20.04:5.6``.
+#
+# - Start the ROCm base Docker container:
+#
+#
+# .. code-block::
+#
+#     docker run -it --network=host --device=/dev/kfd --device=/dev/dri --group-add=video --ipc=host --cap-add=SYS_PTRACE --security-opt seccomp=unconfined --shm-size 8G -v ~/profiler_tutorial:/profiler_tutorial rocm/dev-ubuntu-20.04:5.6
+#
+#
+# - Inside the container, install any dependencies needed for installing the wheels package.
+#
+# .. code-block::
+#
+#     sudo apt update
+#     sudo apt install libjpeg-dev python3-dev -y
+#     pip3 install wheel setuptools
+#     sudo apt install python-is-python3
+#
+#
+# - Install the wheels:
+#
+# .. code-block::
+#
+#     pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/rocm5.6
+#
+#
+# - Install the ``torch_tb_profiler``, and then, run the Python file ``test_cifar10.py``:
+#
+# .. code-block::
+#
+#     pip install torch_tb_profiler
+#     cd /profiler_tutorial
+#     python test_cifar10.py
+#
+#
+# Now, we have all the data needed to view in TensorBoard:
+#
+# .. code-block::
+#
+#      tensorboard --logdir=./log
+#
+# Choose different views as described in **Step 4**. For example, below is the **Operator** View:
+#
+# .. image:: ../../_static/img/profiler_rocm_tensorboard_operartor_view.png
+#    :scale: 25 %
+
+
+######################################################################
+#
+# At the time this section is written, **Trace** view does not work and it displays nothing. You can work around by typing ``chrome://tracing`` in your Chrome Browser.
+#
+#
+# - Copy the ``trace.json`` file under ``~/profiler_tutorial/log/resnet18`` directory to the Windows.
+# You may need to copy the file by using ``scp`` if the file is located in a remote location.
+#
+# - Click **Load** button to load the trace JSON file from the ``chrome://tracing`` page in the browser.
+#
+# .. image:: ../../_static/img/profiler_rocm_chrome_trace_view.png
+#    :scale: 25 %
+
+
+######################################################################
+#
+# As mentioned previously, you can move the graph and zoom in and out.
+# You can also use keyboard to zoom and move around inside the timeline.
+# The ``w`` and ``s`` keys zoom in centered around the mouse,
+# and the ``a`` and ``d`` keys move the timeline left and right.
+# You can hit these keys multiple times until you see a readable representation.
+
+######################################################################
+#
+# 더 알아보기
+# --------------
 #
 # 학습을 계속하려면 다음 문서를 참조하시고,
 # `여기 <https://github.com/pytorch/kineto/issues>`__ 에서 자유롭게 이슈를 열어보세요.
 #
-# -  `Pytorch TensorBoard Profiler github <https://github.com/pytorch/kineto/tree/master/tb_plugin>`__
-# -  `torch.profiler API <https://pytorch.org/docs/master/profiler.html>`__
+# -  `PyTorch TensorBoard Profiler Github <https://github.com/pytorch/kineto/tree/master/tb_plugin>`_
+# -  `torch.profiler API <https://pytorch.org/docs/master/profiler.html>`_
+# -  `HTA <https://github.com/pytorch/kineto/tree/main#holistic-trace-analysis>`_

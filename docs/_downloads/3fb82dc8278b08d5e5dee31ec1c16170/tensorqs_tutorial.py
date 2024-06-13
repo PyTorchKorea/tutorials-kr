@@ -132,7 +132,7 @@ print(tensor)
 
 ######################################################################
 # **텐서 합치기** ``torch.cat`` 을 사용하여 주어진 차원에 따라 일련의 텐서를 연결할 수 있습니다.
-# ``torch.cat`` 과 미묘하게 다른 또 다른 텐서 결합 연산인
+# ``torch.cat`` 과 미묘하게 다른 텐서 결합 연산자(tensor joining operator)인
 # `torch.stack <https://pytorch.org/docs/stable/generated/torch.stack.html>`__ 도 참고해보세요.
 t1 = torch.cat([tensor, tensor, tensor], dim=1)
 print(t1)

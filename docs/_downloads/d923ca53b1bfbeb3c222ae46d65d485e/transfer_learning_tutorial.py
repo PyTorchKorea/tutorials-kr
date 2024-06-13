@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 컴퓨터 비전(Vision)을 위한 전이학습(Transfer Learning)
-=======================================================
+==========================================================
 
 **Author**: `Sasank Chilamkurthy <https://chsasank.github.io>`_
   **번역**: `박정환 <http://github.com/9bow>`_
@@ -33,8 +33,6 @@
 # License: BSD
 # Author: Sasank Chilamkurthy
 
-from __future__ import print_function, division
-
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -46,14 +44,15 @@ from torchvision import datasets, models, transforms
 import matplotlib.pyplot as plt
 import time
 import os
-import copy
+from PIL import Image
+from tempfile import TemporaryDirectory
 
 cudnn.benchmark = True
 plt.ion()   # 대화형 모드
 
 ######################################################################
 # 데이터 불러오기
-# ---------------
+# ------------------
 #
 # 데이터를 불러오기 위해 torchvision과 torch.utils.data 패키지를 사용하겠습니다.
 #
@@ -142,73 +141,77 @@ imshow(out, title=[class_names[x] for x in classes])
 def train_model(model, criterion, optimizer, scheduler, num_epochs=25):
     since = time.time()
 
-    best_model_wts = copy.deepcopy(model.state_dict())
-    best_acc = 0.0
+    # Create a temporary directory to save training checkpoints
+    with TemporaryDirectory() as tempdir:
+        best_model_params_path = os.path.join(tempdir, 'best_model_params.pt')
 
-    for epoch in range(num_epochs):
-        print(f'Epoch {epoch}/{num_epochs - 1}')
-        print('-' * 10)
+        torch.save(model.state_dict(), best_model_params_path)
+        best_acc = 0.0
 
-        # 각 에폭(epoch)은 학습 단계와 검증 단계를 갖습니다.
-        for phase in ['train', 'val']:
-            if phase == 'train':
-                model.train()  # 모델을 학습 모드로 설정
-            else:
-                model.eval()   # 모델을 평가 모드로 설정
+        for epoch in range(num_epochs):
+            print(f'Epoch {epoch}/{num_epochs - 1}')
+            print('-' * 10)
 
-            running_loss = 0.0
-            running_corrects = 0
+            # 각 에폭(epoch)은 학습 단계와 검증 단계를 갖습니다.
+            for phase in ['train', 'val']:
+                if phase == 'train':
+                    model.train()  # 모델을 학습 모드로 설정
+                else:
+                    model.eval()   # 모델을 평가 모드로 설정
 
-            # 데이터를 반복
-            for inputs, labels in dataloaders[phase]:
-                inputs = inputs.to(device)
-                labels = labels.to(device)
+                running_loss = 0.0
+                running_corrects = 0
 
-                # 매개변수 경사도를 0으로 설정
-                optimizer.zero_grad()
+                # 데이터를 반복
+                for inputs, labels in dataloaders[phase]:
+                    inputs = inputs.to(device)
+                    labels = labels.to(device)
 
-                # 순전파
-                # 학습 시에만 연산 기록을 추적
-                with torch.set_grad_enabled(phase == 'train'):
-                    outputs = model(inputs)
-                    _, preds = torch.max(outputs, 1)
-                    loss = criterion(outputs, labels)
+                    # 매개변수 경사도를 0으로 설정
+                    optimizer.zero_grad()
 
-                    # 학습 단계인 경우 역전파 + 최적화
-                    if phase == 'train':
-                        loss.backward()
-                        optimizer.step()
+                    # 순전파
+                    # 학습 시에만 연산 기록을 추적
+                    with torch.set_grad_enabled(phase == 'train'):
+                        outputs = model(inputs)
+                        _, preds = torch.max(outputs, 1)
+                        loss = criterion(outputs, labels)
 
-                # 통계
-                running_loss += loss.item() * inputs.size(0)
-                running_corrects += torch.sum(preds == labels.data)
-            if phase == 'train':
-                scheduler.step()
+                        # 학습 단계인 경우 역전파 + 최적화
+                        if phase == 'train':
+                            loss.backward()
+                            optimizer.step()
 
-            epoch_loss = running_loss / dataset_sizes[phase]
-            epoch_acc = running_corrects.double() / dataset_sizes[phase]
+                    # 통계
+                    running_loss += loss.item() * inputs.size(0)
+                    running_corrects += torch.sum(preds == labels.data)
+                if phase == 'train':
+                    scheduler.step()
 
-            print(f'{phase} Loss: {epoch_loss:.4f} Acc: {epoch_acc:.4f}')
+                epoch_loss = running_loss / dataset_sizes[phase]
+                epoch_acc = running_corrects.double() / dataset_sizes[phase]
 
-            # 모델을 깊은 복사(deep copy)함
-            if phase == 'val' and epoch_acc > best_acc:
-                best_acc = epoch_acc
-                best_model_wts = copy.deepcopy(model.state_dict())
+                print(f'{phase} Loss: {epoch_loss:.4f} Acc: {epoch_acc:.4f}')
 
-        print()
+                # 모델을 깊은 복사(deep copy)함
+                if phase == 'val' and epoch_acc > best_acc:
+                    best_acc = epoch_acc
+                    torch.save(model.state_dict(), best_model_params_path)
 
-    time_elapsed = time.time() - since
-    print(f'Training complete in {time_elapsed // 60:.0f}m {time_elapsed % 60:.0f}s')
-    print(f'Best val Acc: {best_acc:4f}')
+            print()
 
-    # 가장 나은 모델 가중치를 불러옴
-    model.load_state_dict(best_model_wts)
+        time_elapsed = time.time() - since
+        print(f'Training complete in {time_elapsed // 60:.0f}m {time_elapsed % 60:.0f}s')
+        print(f'Best val Acc: {best_acc:4f}')
+
+        # 가장 나은 모델 가중치를 불러오기
+        model.load_state_dict(torch.load(best_model_params_path))
     return model
 
 
 ######################################################################
 # 모델 예측값 시각화하기
-# ^^^^^^^^^^^^^^^^^^^^^^^
+# ^^^^^^^^^^^^^^^^^^^^^^^^^^
 #
 # 일부 이미지에 대한 예측값을 보여주는 일반화된 함수입니다.
 #
@@ -326,6 +329,46 @@ model_conv = train_model(model_conv, criterion, optimizer_conv,
 #
 
 visualize_model(model_conv)
+
+plt.ioff()
+plt.show()
+
+
+######################################################################
+# 다른 이미지들에 대한 추론
+# --------------------------------
+#
+# 학습된 모델을 사용하여 사용자 지정 이미지에 대해 예측하고,
+# 예측된 클래스 레이블을 이미지와 함께 시각화합니다.
+#
+
+def visualize_model_predictions(model,img_path):
+    was_training = model.training
+    model.eval()
+
+    img = Image.open(img_path)
+    img = data_transforms['val'](img)
+    img = img.unsqueeze(0)
+    img = img.to(device)
+
+    with torch.no_grad():
+        outputs = model(img)
+        _, preds = torch.max(outputs, 1)
+
+        ax = plt.subplot(2,2,1)
+        ax.axis('off')
+        ax.set_title(f'Predicted: {class_names[preds[0]]}')
+        imshow(img.cpu().data[0])
+
+        model.train(mode=was_training)
+
+######################################################################
+#
+
+visualize_model_predictions(
+    model_conv,
+    img_path='data/hymenoptera_data/val/bees/72100438_73de9f17af.jpg'
+)
 
 plt.ioff()
 plt.show()

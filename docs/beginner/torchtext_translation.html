@@ -6,20 +6,16 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="ko" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
-<meta property="og:title" content="TorchText로 언어 번역하기" />
-  
+  <meta property="og:title" content="TorchText로 언어 번역하기" />
 <meta property="og:type" content="article" />
-  
 <meta property="og:url" content="https://tutorials.pytorch.kr/beginner/torchtext_translation.html" />
-  
+<meta property="og:site_name" content="PyTorch Tutorials KR" />
 <meta property="og:description" content="이 튜토리얼에서는 torchtext 를 사용하여 영어와 독일어 문장들이 포함된 잘 알려진 데이터셋을 전처리(preprocess)하고 이를 사용하여 독일어 문장을 영어로 번역하는 시퀀스-투-시퀀스(sequence-to-sequence, seq2seq) 모델을 학습하는 방법을 살펴보겠습니다. 이 튜토리얼은 PyTorch 커뮤니티 멤버인 Ben Trevett 이 작성한 튜토리얼 에 기초하고 있으며 Ben의 허락을 받고 만들었습니다. 몇몇 기존 코드들을 제거하고 튜토리얼을 업데이트하였습니다. 이 튜토리얼을 통해 NLP 모델링을 위해 ..." />
-  
 <meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
-  
-<meta property="og:image:alt" content="TorchText로 언어 번역하기" />
-  
+<meta property="og:image:alt" content="PyTorch Tutorials KR" />
+<meta name="description" content="이 튜토리얼에서는 torchtext 를 사용하여 영어와 독일어 문장들이 포함된 잘 알려진 데이터셋을 전처리(preprocess)하고 이를 사용하여 독일어 문장을 영어로 번역하는 시퀀스-투-시퀀스(sequence-to-sequence, seq2seq) 모델을 학습하는 방법을 살펴보겠습니다. 이 튜토리얼은 PyTorch 커뮤니티 멤버인 Ben Trevett 이 작성한 튜토리얼 에 기초하고 있으며 Ben의 허락을 받고 만들었습니다. 몇몇 기존 코드들을 제거하고 튜토리얼을 업데이트하였습니다. 이 튜토리얼을 통해 NLP 모델링을 위해 ..." />
 <meta property="og:ignore_canonical" content="true" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>TorchText로 언어 번역하기 &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
@@ -45,7 +41,7 @@
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css" type="text/css" />
   <link rel="stylesheet" href="../_static/katex-math.css" type="text/css" />
   <link rel="stylesheet" href="../_static/sg_gallery.css" type="text/css" />
   <link rel="stylesheet" href="../_static/sg_gallery-binder.css" type="text/css" />
@@ -54,6 +50,7 @@
   <link rel="stylesheet" href="../_static/sphinx-design.5ea377869091fd0449014c60fc090103.min.css" type="text/css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/custom2.css" type="text/css" />
     <link rel="index" title="색인" href="../genindex.html" />
     <link rel="search" title="검색" href="../search.html" /> 
 
@@ -133,7 +130,7 @@
               
               
                 <div class="version">
-                  2.0.1
+                  2.3.1+cu121
                 </div>
               
             
@@ -198,11 +195,12 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">이미지/비디오</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/torchvision_tutorial.html">TorchVision 객체 검출 미세조정(Finetuning) 튜토리얼</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/torchvision_tutorial.html">TorchVision Object Detection Finetuning Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="transfer_learning_tutorial.html">컴퓨터 비전(Vision)을 위한 전이학습(Transfer Learning)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="fgsm_tutorial.html">적대적 예제 생성(Adversarial Example Generation)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dcgan_faces_tutorial.html">DCGAN 튜토리얼</a></li>
-<li class="toctree-l1"><a class="reference internal" href="vt_tutorial.html">배포를 위한 비전 트랜스포머(Vision Transformer) 모델 최적화하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vt_tutorial.html">배포를 위해 비전 트랜스포머(Vision Transformer) 모델 최적화하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/tiatoolbox_tutorial.html">Whole Slide Image Classification Using PyTorch and TIAToolbox</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">오디오</span></p>
 <ul>
@@ -218,27 +216,39 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">텍스트</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="transformer_tutorial.html"><code class="docutils literal notranslate"><span class="pre">nn.Transformer</span></code> 와 torchtext로 시퀀스-투-시퀀스(Sequence-to-Sequence) 모델링하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bettertransformer_tutorial.html">Fast Transformer Inference with Better Transformer</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/char_rnn_classification_tutorial.html">기초부터 시작하는 NLP: 문자-단위 RNN으로 이름 분류하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/char_rnn_generation_tutorial.html">기초부터 시작하는 NLP:  문자-단위 RNN으로 이름 생성하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/seq2seq_translation_tutorial.html">기초부터 시작하는 NLP: Sequence to Sequence 네트워크와 Attention을 이용한 번역</a></li>
 <li class="toctree-l1"><a class="reference internal" href="text_sentiment_ngrams_tutorial.html">torchtext 라이브러리로 텍스트 분류하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="translation_transformer.html"><code class="docutils literal notranslate"><span class="pre">nn.Transformer</span></code> 와 torchtext로 언어 번역하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torchtext_custom_dataset_tutorial.html">Preprocess custom text dataset using Torchtext</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">백엔드</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="onnx/intro_onnx.html">Introduction to ONNX</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">강화학습</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/reinforcement_q_learning.html">강화 학습 (DQN) 튜토리얼</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/reinforcement_ppo.html">Reinforcement Learning (PPO) with TorchRL Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/mario_rl_tutorial.html">마리오 게임 RL 에이전트로 학습하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/pendulum.html">Pendulum: Writing your environment and transforms with TorchRL</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">PyTorch 모델을 프로덕션 환경에 배포하기</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="onnx/intro_onnx.html">Introduction to ONNX</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/flask_rest_api_tutorial.html">Flask를 사용하여 Python에서 PyTorch를 REST API로 배포하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Intro_to_TorchScript_tutorial.html">TorchScript 소개</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_export.html">C++에서 TorchScript 모델 로딩하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/super_resolution_with_onnxruntime.html">(선택) PyTorch 모델을 ONNX으로 변환하고 ONNX 런타임에서 실행하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/realtime_rpi.html">Raspberry Pi 4 에서 실시간 추론(Inference) (30fps!)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">PyTorch 프로파일링</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="profiler.html">PyTorch 모듈 프로파일링하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hta_intro_tutorial.html">Introduction to Holistic Trace Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hta_trace_diff_tutorial.html">Trace Diff using Holistic Trace Analysis</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Code Transforms with FX</span></p>
 <ul>
@@ -265,13 +275,14 @@
 <li class="toctree-l1"><a class="reference internal" href="../advanced/torch_script_custom_classes.html">커스텀 C++ 클래스로 TorchScript 확장하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/dispatcher.html">Registering a Dispatched Operator in C++</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/extend_dispatcher.html">Extending dispatcher for a new backend in C++</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/privateuseone.html">Facilitating New Backend Integration by PrivateUse1</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">모델 최적화</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="profiler.html">PyTorch 모듈 프로파일링 하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="profiler.html">PyTorch 모듈 프로파일링하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/tensorboard_profiler_tutorial.html">텐서보드를 이용한 파이토치 프로파일러</a></li>
-<li class="toctree-l1"><a class="reference internal" href="hyperparameter_tuning_tutorial.html">Ray Tune을 이용한 하이퍼파라미터 튜닝</a></li>
-<li class="toctree-l1"><a class="reference internal" href="vt_tutorial.html">배포를 위한 비전 트랜스포머(Vision Transformer) 모델 최적화하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hyperparameter_tuning_tutorial.html">Ray Tune을 사용한 하이퍼파라미터 튜닝</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vt_tutorial.html">배포를 위해 비전 트랜스포머(Vision Transformer) 모델 최적화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/parametrizations.html">Parametrizations Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/pruning_tutorial.html">가지치기 기법(Pruning) 튜토리얼</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/dynamic_quantization_tutorial.html">(베타) LSTM 기반 단어 단위 언어 모델의 동적 양자화</a></li>
@@ -282,10 +293,13 @@
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/torchserve_with_ipex_2.html">Grokking PyTorch Intel CPU performance from first principles (Part 2)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/nvfuser_intro_tutorial.html">Getting Started - Accelerate Your Scripts with nvFuser</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/ax_multiobjective_nas_tutorial.html">Multi-Objective NAS with Ax</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/torch_compile_tutorial.html">torch.compile Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/torch_compile_tutorial.html">Introduction to <code class="docutils literal notranslate"><span class="pre">torch.compile</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/inductor_debug_cpu.html">Inductor CPU backend debugging and profiling</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/scaled_dot_product_attention_tutorial.html">(Beta) Scaled Dot Product Attention (SDPA)로 고성능 트랜스포머(Transformers) 구현하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/scaled_dot_product_attention_tutorial.html#torch-compile-sdpa"><code class="docutils literal notranslate"><span class="pre">torch.compile</span></code> 과 함께 SDPA 사용하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/scaled_dot_product_attention_tutorial.html#id6">결론</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/scaled_dot_product_attention_tutorial.html#sdpa-atteition-bias">SDPA를 <code class="docutils literal notranslate"><span class="pre">atteition.bias</span></code> 하위 클래스와 사용하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/scaled_dot_product_attention_tutorial.html#id8">결론</a></li>
+<li class="toctree-l1"><a class="reference internal" href="knowledge_distillation_tutorial.html">Knowledge Distillation Tutorial</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul>
@@ -297,20 +311,24 @@
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/dist_tuto.html">PyTorch로 분산 어플리케이션 개발하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/FSDP_tutorial.html">Getting Started with Fully Sharded Data Parallel(FSDP)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/FSDP_adavnced_tutorial.html">Advanced Model Training with Fully Sharded Data Parallel (FSDP)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/process_group_cpp_extension_tutorial.html">Cpp 확장을 사용하여 프로세스 그룹 백엔드 사용자 정의</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/TP_tutorial.html">Large Scale Transformer model training with Tensor Parallel (TP)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/process_group_cpp_extension_tutorial.html">Cpp 확장을 사용한 프로세스 그룹 백엔드 사용자 정의</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/rpc_tutorial.html">Getting Started with Distributed RPC Framework</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/rpc_param_server_tutorial.html">Implementing a Parameter Server Using Distributed RPC Framework</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/dist_pipeline_parallel_tutorial.html">Distributed Pipeline Parallelism Using RPC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/rpc_async_execution.html">Implementing Batch RPC Processing Using Asynchronous Executions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/rpc_ddp_tutorial.html">분산 데이터 병렬(DDP)과 분산 RPC 프레임워크 결합</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/pipeline_tutorial.html">파이프라인 병렬화로 트랜스포머 모델 학습시키기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/ddp_pipeline.html">분산 데이터 병렬 처리와 병렬 처리 파이프라인을 사용한 트랜스포머 모델 학습</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/generic_join.html">Distributed Training with Uneven Inputs Using the Join Context Manager</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">모바일</span></p>
+<p class="caption" role="heading"><span class="caption-text">Edge with ExecuTorch</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="deeplabv3_on_ios.html">iOS에서의 이미지 분할 DeepLapV3</a></li>
-<li class="toctree-l1"><a class="reference internal" href="deeplabv3_on_android.html">안드로이드에서의 이미지 분할 DeepLapV3</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/executorch/stable/tutorials/export-to-executorch-tutorial.html">Exporting to ExecuTorch Tutorial</a></li>
+<li class="toctree-l1"><a class="reference external" href=" https://pytorch.org/executorch/stable/running-a-model-cpp-tutorial.html">Running an ExecuTorch Model in C++ Tutorial</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/executorch/stable/tutorials/sdk-integration-tutorial.html">Using the ExecuTorch SDK to Profile a Model</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/executorch/stable/demo-apps-ios.html">Building an ExecuTorch iOS Demo App</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/executorch/stable/demo-apps-android.html">Building an ExecuTorch Android Demo App</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/executorch/stable/examples-end-to-end-to-lower-model-to-delegate.html">Lowering a Model as a Delegate</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">추천 시스템</span></p>
 <ul>
@@ -502,74 +520,74 @@ Spacy 토크나이저가 쓸 영어와 독일어에 대한 데이터를 다운�
 <span class="w">    </span><span class="n">de_tensor_</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="n">de_vocab</span><span class="p">[</span><span class="n">token</span><span class="p">]</span> <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">de_tokenizer</span><span class="p">(</span><span class="n">raw_de</span><span class="p">)],</span>
   File <span class="nb">&quot;/workspace/tutorials-kr/beginner_source/torchtext_translation.py&quot;</span>, line <span class="m">77</span>, in <span class="n">&lt;listcomp&gt;</span>
 <span class="w">    </span><span class="n">de_tensor_</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="n">de_vocab</span><span class="p">[</span><span class="n">token</span><span class="p">]</span> <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">de_tokenizer</span><span class="p">(</span><span class="n">raw_de</span><span class="p">)],</span>
-  File <span class="nb">&quot;/opt/conda/lib/python3.10/site-packages/torchtext/vocab/vocab.py&quot;</span>, line <span class="m">65</span>, in <span class="n">__getitem__</span>
+  File <span class="nb">&quot;/usr/local/lib/python3.10/dist-packages/torchtext/vocab/vocab.py&quot;</span>, line <span class="m">65</span>, in <span class="n">__getitem__</span>
 <span class="w">    </span><span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">vocab</span><span class="p">[</span><span class="n">token</span><span class="p">]</span>
 <span class="gr">RuntimeError</span>: <span class="n">Token Eisfischerhütte not found and default index is not set</span>
-<span class="x">Exception raised from __getitem__ at /opt/conda/conda-bld/torchtext_1682366561607/work/torchtext/csrc/vocab.cpp:43 (most recent call first):</span>
-<span class="x">frame #0: c10::Error::Error(c10::SourceLocation, std::string) + 0x57 (0x7fbd7e00e4d7 in /opt/conda/lib/python3.10/site-packages/torch/lib/libc10.so)</span>
-<span class="x">frame #1: c10::detail::torchCheckFail(char const*, char const*, unsigned int, std::string const&amp;) + 0x64 (0x7fbd7dfd836b in /opt/conda/lib/python3.10/site-packages/torch/lib/libc10.so)</span>
-<span class="x">frame #2: torchtext::Vocab::__getitem__(c10::basic_string_view&lt;char&gt; const&amp;) const + 0x384 (0x7fbd55e98de4 in /opt/conda/lib/python3.10/site-packages/torchtext/lib/libtorchtext.so)</span>
-<span class="x">frame #3: &lt;unknown function&gt; + 0x1e3d7 (0x7fbd55d7a3d7 in /opt/conda/lib/python3.10/site-packages/torchtext/_torchtext.so)</span>
-<span class="x">frame #4: &lt;unknown function&gt; + 0x3bde7 (0x7fbd55d97de7 in /opt/conda/lib/python3.10/site-packages/torchtext/_torchtext.so)</span>
-<span class="x">frame #5: /opt/conda/bin/python() [0x4fc887]</span>
-<span class="x">frame #6: _PyObject_MakeTpCall + 0x25b (0x4f631b in /opt/conda/bin/python)</span>
-<span class="x">frame #7: /opt/conda/bin/python() [0x5083df]</span>
-<span class="x">frame #8: /opt/conda/bin/python() [0x5416fb]</span>
-<span class="x">frame #9: /opt/conda/bin/python() [0x5414d8]</span>
-<span class="x">frame #10: _PyEval_EvalFrameDefault + 0xb9e (0x4edd1e in /opt/conda/bin/python)</span>
-<span class="x">frame #11: /opt/conda/bin/python() [0x541673]</span>
-<span class="x">frame #12: /opt/conda/bin/python() [0x5414d8]</span>
-<span class="x">frame #13: _PyEval_EvalFrameDefault + 0xb9e (0x4edd1e in /opt/conda/bin/python)</span>
-<span class="x">frame #14: _PyFunction_Vectorcall + 0x6f (0x4fcccf in /opt/conda/bin/python)</span>
-<span class="x">frame #15: _PyEval_EvalFrameDefault + 0x31f (0x4ed49f in /opt/conda/bin/python)</span>
-<span class="x">frame #16: _PyFunction_Vectorcall + 0x6f (0x4fcccf in /opt/conda/bin/python)</span>
-<span class="x">frame #17: _PyEval_EvalFrameDefault + 0x31f (0x4ed49f in /opt/conda/bin/python)</span>
-<span class="x">frame #18: /opt/conda/bin/python() [0x592592]</span>
-<span class="x">frame #19: PyEval_EvalCode + 0x87 (0x5924d7 in /opt/conda/bin/python)</span>
-<span class="x">frame #20: /opt/conda/bin/python() [0x5999cd]</span>
-<span class="x">frame #21: /opt/conda/bin/python() [0x4fceb4]</span>
-<span class="x">frame #22: _PyEval_EvalFrameDefault + 0x31f (0x4ed49f in /opt/conda/bin/python)</span>
-<span class="x">frame #23: _PyObject_FastCallDictTstate + 0xcd (0x4f57ed in /opt/conda/bin/python)</span>
-<span class="x">frame #24: _PyObject_Call_Prepend + 0x66 (0x5067d6 in /opt/conda/bin/python)</span>
-<span class="x">frame #25: /opt/conda/bin/python() [0x5ccc83]</span>
-<span class="x">frame #26: _PyObject_MakeTpCall + 0x25b (0x4f631b in /opt/conda/bin/python)</span>
-<span class="x">frame #27: _PyEval_EvalFrameDefault + 0x4dde (0x4f1f5e in /opt/conda/bin/python)</span>
-<span class="x">frame #28: _PyFunction_Vectorcall + 0x6f (0x4fcccf in /opt/conda/bin/python)</span>
-<span class="x">frame #29: _PyEval_EvalFrameDefault + 0x31f (0x4ed49f in /opt/conda/bin/python)</span>
-<span class="x">frame #30: _PyFunction_Vectorcall + 0x6f (0x4fcccf in /opt/conda/bin/python)</span>
-<span class="x">frame #31: _PyEval_EvalFrameDefault + 0x31f (0x4ed49f in /opt/conda/bin/python)</span>
-<span class="x">frame #32: _PyFunction_Vectorcall + 0x6f (0x4fcccf in /opt/conda/bin/python)</span>
-<span class="x">frame #33: _PyEval_EvalFrameDefault + 0x31f (0x4ed49f in /opt/conda/bin/python)</span>
-<span class="x">frame #34: _PyFunction_Vectorcall + 0x6f (0x4fcccf in /opt/conda/bin/python)</span>
-<span class="x">frame #35: _PyEval_EvalFrameDefault + 0x31f (0x4ed49f in /opt/conda/bin/python)</span>
-<span class="x">frame #36: _PyFunction_Vectorcall + 0x6f (0x4fcccf in /opt/conda/bin/python)</span>
-<span class="x">frame #37: _PyEval_EvalFrameDefault + 0x31f (0x4ed49f in /opt/conda/bin/python)</span>
-<span class="x">frame #38: _PyFunction_Vectorcall + 0x6f (0x4fcccf in /opt/conda/bin/python)</span>
-<span class="x">frame #39: _PyEval_EvalFrameDefault + 0x13b3 (0x4ee533 in /opt/conda/bin/python)</span>
-<span class="x">frame #40: _PyFunction_Vectorcall + 0x6f (0x4fcccf in /opt/conda/bin/python)</span>
-<span class="x">frame #41: _PyEval_EvalFrameDefault + 0x2b79 (0x4efcf9 in /opt/conda/bin/python)</span>
-<span class="x">frame #42: _PyFunction_Vectorcall + 0x6f (0x4fcccf in /opt/conda/bin/python)</span>
-<span class="x">frame #43: _PyEval_EvalFrameDefault + 0x731 (0x4ed8b1 in /opt/conda/bin/python)</span>
-<span class="x">frame #44: _PyFunction_Vectorcall + 0x6f (0x4fcccf in /opt/conda/bin/python)</span>
-<span class="x">frame #45: _PyEval_EvalFrameDefault + 0x731 (0x4ed8b1 in /opt/conda/bin/python)</span>
-<span class="x">frame #46: _PyObject_FastCallDictTstate + 0xcd (0x4f57ed in /opt/conda/bin/python)</span>
-<span class="x">frame #47: /opt/conda/bin/python() [0x505ede]</span>
-<span class="x">frame #48: _PyObject_MakeTpCall + 0x2ab (0x4f636b in /opt/conda/bin/python)</span>
-<span class="x">frame #49: _PyEval_EvalFrameDefault + 0x4dde (0x4f1f5e in /opt/conda/bin/python)</span>
-<span class="x">frame #50: _PyFunction_Vectorcall + 0x6f (0x4fcccf in /opt/conda/bin/python)</span>
-<span class="x">frame #51: _PyEval_EvalFrameDefault + 0x31f (0x4ed49f in /opt/conda/bin/python)</span>
-<span class="x">frame #52: _PyFunction_Vectorcall + 0x6f (0x4fcccf in /opt/conda/bin/python)</span>
-<span class="x">frame #53: _PyEval_EvalFrameDefault + 0x731 (0x4ed8b1 in /opt/conda/bin/python)</span>
-<span class="x">frame #54: _PyFunction_Vectorcall + 0x6f (0x4fcccf in /opt/conda/bin/python)</span>
-<span class="x">frame #55: _PyEval_EvalFrameDefault + 0x4b26 (0x4f1ca6 in /opt/conda/bin/python)</span>
-<span class="x">frame #56: _PyFunction_Vectorcall + 0x6f (0x4fcccf in /opt/conda/bin/python)</span>
-<span class="x">frame #57: _PyEval_EvalFrameDefault + 0x31f (0x4ed49f in /opt/conda/bin/python)</span>
-<span class="x">frame #58: _PyFunction_Vectorcall + 0x6f (0x4fcccf in /opt/conda/bin/python)</span>
-<span class="x">frame #59: _PyEval_EvalFrameDefault + 0x31f (0x4ed49f in /opt/conda/bin/python)</span>
-<span class="x">frame #60: /opt/conda/bin/python() [0x592592]</span>
-<span class="x">frame #61: PyEval_EvalCode + 0x87 (0x5924d7 in /opt/conda/bin/python)</span>
-<span class="x">frame #62: /opt/conda/bin/python() [0x5c32c7]</span>
-<span class="x">frame #63: /opt/conda/bin/python() [0x5be400]</span>
+<span class="x">Exception raised from __getitem__ at /__w/text/text/pytorch/text/torchtext/csrc/vocab.cpp:43 (most recent call first):</span>
+<span class="x">frame #0: c10::Error::Error(c10::SourceLocation, std::string) + 0x57 (0x7525c9c50897 in /usr/local/lib/python3.10/dist-packages/torch/lib/libc10.so)</span>
+<span class="x">frame #1: c10::detail::torchCheckFail(char const*, char const*, unsigned int, std::string const&amp;) + 0x64 (0x7525c9c00b25 in /usr/local/lib/python3.10/dist-packages/torch/lib/libc10.so)</span>
+<span class="x">frame #2: torchtext::Vocab::__getitem__(c10::basic_string_view&lt;char&gt; const&amp;) const + 0x384 (0x7525091730c4 in /usr/local/lib/python3.10/dist-packages/torchtext/lib/libtorchtext.so)</span>
+<span class="x">frame #3: &lt;unknown function&gt; + 0x1e263 (0x752509059263 in /usr/local/lib/python3.10/dist-packages/torchtext/_torchtext.so)</span>
+<span class="x">frame #4: &lt;unknown function&gt; + 0x3e757 (0x752509079757 in /usr/local/lib/python3.10/dist-packages/torchtext/_torchtext.so)</span>
+<span class="x">frame #5: /usr/bin/python3.10() [0x53bd79]</span>
+<span class="x">frame #6: _PyObject_MakeTpCall + 0x164 (0x629d24 in /usr/bin/python3.10)</span>
+<span class="x">frame #7: /usr/bin/python3.10() [0x549c2e]</span>
+<span class="x">frame #8: /usr/bin/python3.10() [0x5dd586]</span>
+<span class="x">frame #9: PyObject_GetItem + 0x3b (0x55501b in /usr/bin/python3.10)</span>
+<span class="x">frame #10: _PyEval_EvalFrameDefault + 0xb90 (0x5aa4a0 in /usr/bin/python3.10)</span>
+<span class="x">frame #11: /usr/bin/python3.10() [0x5dd329]</span>
+<span class="x">frame #12: PyObject_GetItem + 0x3b (0x55501b in /usr/bin/python3.10)</span>
+<span class="x">frame #13: _PyEval_EvalFrameDefault + 0xb90 (0x5aa4a0 in /usr/bin/python3.10)</span>
+<span class="x">frame #14: _PyFunction_Vectorcall + 0x250 (0x628d60 in /usr/bin/python3.10)</span>
+<span class="x">frame #15: _PyEval_EvalFrameDefault + 0x30b (0x5a9c1b in /usr/bin/python3.10)</span>
+<span class="x">frame #16: _PyFunction_Vectorcall + 0x250 (0x628d60 in /usr/bin/python3.10)</span>
+<span class="x">frame #17: _PyEval_EvalFrameDefault + 0x30b (0x5a9c1b in /usr/bin/python3.10)</span>
+<span class="x">frame #18: /usr/bin/python3.10() [0x5a8bf1]</span>
+<span class="x">frame #19: PyEval_EvalCode + 0x7f (0x6d77cf in /usr/bin/python3.10)</span>
+<span class="x">frame #20: /usr/bin/python3.10() [0x6462e1]</span>
+<span class="x">frame #21: /usr/bin/python3.10() [0x53b03f]</span>
+<span class="x">frame #22: _PyEval_EvalFrameDefault + 0x30b (0x5a9c1b in /usr/bin/python3.10)</span>
+<span class="x">frame #23: _PyFunction_Vectorcall + 0x250 (0x628d60 in /usr/bin/python3.10)</span>
+<span class="x">frame #24: _PyObject_FastCallDictTstate + 0x59 (0x62b899 in /usr/bin/python3.10)</span>
+<span class="x">frame #25: _PyObject_Call_Prepend + 0x5a (0x62b9ca in /usr/bin/python3.10)</span>
+<span class="x">frame #26: /usr/bin/python3.10() [0x6e8da7]</span>
+<span class="x">frame #27: _PyObject_MakeTpCall + 0x1fc (0x629dbc in /usr/bin/python3.10)</span>
+<span class="x">frame #28: _PyEval_EvalFrameDefault + 0x50d9 (0x5ae9e9 in /usr/bin/python3.10)</span>
+<span class="x">frame #29: _PyFunction_Vectorcall + 0x250 (0x628d60 in /usr/bin/python3.10)</span>
+<span class="x">frame #30: _PyEval_EvalFrameDefault + 0x30b (0x5a9c1b in /usr/bin/python3.10)</span>
+<span class="x">frame #31: _PyFunction_Vectorcall + 0x250 (0x628d60 in /usr/bin/python3.10)</span>
+<span class="x">frame #32: _PyEval_EvalFrameDefault + 0x30b (0x5a9c1b in /usr/bin/python3.10)</span>
+<span class="x">frame #33: _PyFunction_Vectorcall + 0x250 (0x628d60 in /usr/bin/python3.10)</span>
+<span class="x">frame #34: _PyEval_EvalFrameDefault + 0x30b (0x5a9c1b in /usr/bin/python3.10)</span>
+<span class="x">frame #35: _PyFunction_Vectorcall + 0x250 (0x628d60 in /usr/bin/python3.10)</span>
+<span class="x">frame #36: _PyEval_EvalFrameDefault + 0x30b (0x5a9c1b in /usr/bin/python3.10)</span>
+<span class="x">frame #37: _PyFunction_Vectorcall + 0x250 (0x628d60 in /usr/bin/python3.10)</span>
+<span class="x">frame #38: _PyEval_EvalFrameDefault + 0x30b (0x5a9c1b in /usr/bin/python3.10)</span>
+<span class="x">frame #39: _PyFunction_Vectorcall + 0x250 (0x628d60 in /usr/bin/python3.10)</span>
+<span class="x">frame #40: _PyEval_EvalFrameDefault + 0x13c5 (0x5aacd5 in /usr/bin/python3.10)</span>
+<span class="x">frame #41: _PyFunction_Vectorcall + 0x250 (0x628d60 in /usr/bin/python3.10)</span>
+<span class="x">frame #42: PyObject_Call + 0x1aa (0x628a3a in /usr/bin/python3.10)</span>
+<span class="x">frame #43: _PyEval_EvalFrameDefault + 0x2c0b (0x5ac51b in /usr/bin/python3.10)</span>
+<span class="x">frame #44: _PyFunction_Vectorcall + 0x250 (0x628d60 in /usr/bin/python3.10)</span>
+<span class="x">frame #45: _PyEval_EvalFrameDefault + 0x715 (0x5aa025 in /usr/bin/python3.10)</span>
+<span class="x">frame #46: _PyFunction_Vectorcall + 0x250 (0x628d60 in /usr/bin/python3.10)</span>
+<span class="x">frame #47: _PyEval_EvalFrameDefault + 0x715 (0x5aa025 in /usr/bin/python3.10)</span>
+<span class="x">frame #48: /usr/bin/python3.10() [0x5d5c13]</span>
+<span class="x">frame #49: /usr/bin/python3.10() [0x5e2a9d]</span>
+<span class="x">frame #50: _PyObject_MakeTpCall + 0x164 (0x629d24 in /usr/bin/python3.10)</span>
+<span class="x">frame #51: _PyEval_EvalFrameDefault + 0x50d9 (0x5ae9e9 in /usr/bin/python3.10)</span>
+<span class="x">frame #52: _PyFunction_Vectorcall + 0x250 (0x628d60 in /usr/bin/python3.10)</span>
+<span class="x">frame #53: _PyEval_EvalFrameDefault + 0x30b (0x5a9c1b in /usr/bin/python3.10)</span>
+<span class="x">frame #54: _PyFunction_Vectorcall + 0x250 (0x628d60 in /usr/bin/python3.10)</span>
+<span class="x">frame #55: _PyEval_EvalFrameDefault + 0x715 (0x5aa025 in /usr/bin/python3.10)</span>
+<span class="x">frame #56: _PyFunction_Vectorcall + 0x250 (0x628d60 in /usr/bin/python3.10)</span>
+<span class="x">frame #57: _PyEval_EvalFrameDefault + 0x4cf3 (0x5ae603 in /usr/bin/python3.10)</span>
+<span class="x">frame #58: _PyFunction_Vectorcall + 0x250 (0x628d60 in /usr/bin/python3.10)</span>
+<span class="x">frame #59: _PyEval_EvalFrameDefault + 0x30b (0x5a9c1b in /usr/bin/python3.10)</span>
+<span class="x">frame #60: _PyFunction_Vectorcall + 0x250 (0x628d60 in /usr/bin/python3.10)</span>
+<span class="x">frame #61: _PyEval_EvalFrameDefault + 0x30b (0x5a9c1b in /usr/bin/python3.10)</span>
+<span class="x">frame #62: /usr/bin/python3.10() [0x5a8bf1]</span>
+<span class="x">frame #63: PyEval_EvalCode + 0x7f (0x6d77cf in /usr/bin/python3.10)</span>
 </pre></div>
 </div>
 </div>
@@ -968,7 +986,7 @@ Transformer 레이어를 구현한 내용은 <a class="reference external" href=
 <li><p><code class="docutils literal notranslate"><span class="pre">torchtext</span></code> 를 사용한 Ben Trevett의 튜토리얼을 <a class="reference external" href="https://github.com/bentrevett/">이곳</a> 에서 확인할 수 있습니다.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">nn.Transformer</span></code> 와 <code class="docutils literal notranslate"><span class="pre">torchtext</span></code> 의 다른 기능들을 이용한 다음 단어 예측을 통한 언어 모델링 튜토리얼을 살펴보세요.</p></li>
 </ul>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  8.310 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  4.110 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-beginner-torchtext-translation-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/462f53ac0f7c6840743ad8655c43102c/torchtext_translation.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">torchtext_translation.py</span></code></a></p>
@@ -1012,7 +1030,7 @@ Transformer 레이어를 구현한 내용은 <a class="reference external" href=
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018-2023, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorch Korea User Group).
+        &copy; Copyright 2018-2024, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorch Korea User Group).
 
     </p>
   </div>
@@ -1068,8 +1086,8 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
          <script src="../_static/clipboard.min.js"></script>
          <script src="../_static/copybutton.js"></script>
          <script src="../_static/translations.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
+         <script src="../_static/katex.min.js"></script>
+         <script src="../_static/auto-render.min.js"></script>
          <script src="../_static/katex_autorenderer.js"></script>
          <script src="../_static/design-tabs.js"></script>
      
@@ -1087,8 +1105,10 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
   </script>
  
 <script>
-//add microsoft link
+// Helper function to make it easier to call dataLayer.push()
+function gtag(){window.dataLayer.push(arguments);}
 
+//add microsoft link
 if(window.location.href.indexOf("/beginner/basics/")!= -1)
 {
   var url="https://docs.microsoft.com/learn/paths/pytorch-fundamentals/?wt.mc_id=aiml-7486-cxa";
@@ -1153,7 +1173,8 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
     gtag('event', 'click', {
       'event_category': 'Tutorial Rating',
       'event_label': $("h1").first().text(),
-      'value': $(this).attr("data-count")
+      'value': $(this).attr("data-count"),
+      'customEvent:Rating': $(this).attr("data-count") // send to GA custom dimension customEvent:Rating.
     });
    });
 
@@ -1164,7 +1185,7 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
 </script>
 
 <script type="text/javascript">
-  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', '모바일', 'Introduction to PyTorch on YouTube', '추천 시스템', 'Multimodality'];
+  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', 'Introduction to PyTorch on YouTube', '이미지/비디오', '오디오', '텍스트', '백엔드', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'PyTorch 프로파일링', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Edge with ExecuTorch', '추천 시스템', 'Multimodality'];
 </script>
 
 

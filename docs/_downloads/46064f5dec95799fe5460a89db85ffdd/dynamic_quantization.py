@@ -8,7 +8,7 @@
 빠르게 만들 것입니다.
 
 도입
-----
+--------
 
 우리는 신경망을 설계할 때 여러 트레이드오프(trade-off)를 마주하게
 됩니다. 모델을 개발하고 학습할 때 순환 신경망의 레이어나 매개변수의
@@ -22,8 +22,8 @@
 여러분이 이를 한 번 시도해 본다면 정확도가 별로 손실되지 않으면서도
 모델의 규모를 상당히 줄이면서 응답 시간도 감소시킬 수 있을 것입니다.
 
-동적 양자화란 무엇인가?
------------------------
+동적 양자화란 무엇인가요?
+----------------------------
 
 신경망을 양자화한다는 말의 의미는 가중치나 활성화 함수에서 정밀도가
 낮은 정수 표현을 사용하도록 바꾼다는 것입니다. 이를 통해 모델의 규모를
@@ -85,7 +85,7 @@
 
 
 단계
-----
+-------
 
 이 레시피는 다섯 단계로 구성되어 있습니다.
 
@@ -106,7 +106,7 @@
 
 
 1: 준비
-~~~~~~~
+~~~~~~~~~~
 이 단계에서는 이 레시피에서 계속 사용할 몇 줄의 간단한 코드를
 준비합니다.
 
@@ -125,14 +125,13 @@ import copy
 import os
 import time
 
-
-# 설명을 위해 아주 아주 간단한 LSTM을 정의합니다
-# 여기서는 레이어가 하나 뿐이고 사전 작업이나 사후 작업이 없는
-# nn.LSTM을 감싸서 사용합니다
-# 이는 Robert Guthrie 의
-# https://tutorials.pytorch.kr/beginner/nlp/sequence_models_tutorial.html 과
-# https://tutorials.pytorch.kr/advanced/dynamic_quantization_tutorial.html 에서
-# 영감을 받은 부분입니다
+######################################################################
+# 설명을 위해 매우 간단한 LSTM을 하나 정의하겠습니다
+# ``nn.LSTM`` 를 감싼 레이어를 하나만 사용하고,
+# 전처리(preprocessing)나 후처리(postprocessing)는 없습니다.
+# 이는 Robert Guthrie 의 :doc:`/beginner/nlp/sequence_models_tutorial` 과
+# :doc:`/advanced/dynamic_quantization_tutorial` 에서
+# 영감을 받아 만들었습니다.
 
 class lstm_for_demonstration(nn.Module):
   """기초적인 LSTM모델로, 단순히 nn.LSTM 를 감싼 것입니다.
@@ -166,16 +165,10 @@ hidden = (torch.randn(lstm_depth,batch_size,model_dimension), torch.randn(lstm_d
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 # 이제 재밌는 부분을 살펴보려 합니다. 우선은 양자화 할 모델 객체를 하나
-# 만들고 그 이름을 float\_lstm 으로 둡니다. 우리가 여기서 사용할 함수는
-#
-# ::
-#
-#     torch.quantization.quantize_dynamic()
-#
-# 입니다 (`관련 문서 참고
-# <https://pytorch.org/docs/stable/quantization.html#torch.quantization.quantize_dynamic>`__).
-# 이 함수는 모델과, 만약 등장한다면 양자화하고 싶은 서브모듈의 목록,
-# 그리고 우리가 사용하려 하는 자료형을 입력으로 받습니다. 이 함수는
+# 만들고 그 이름을 ``float\_lstm`` 이라고 하겠습니다. 또한,
+# `torch.quantization.quantize_dynamic <https://pytorch.org/docs/stable/quantization.html#torch.quantization.quantize_dynamic>`__
+# 함수를 사용할 것입니다. 이 함수는 모델과 양자화하고 싶은 서브모듈의 목록,
+# 그리고 양자화하려는 자료형을 입력으로 받습니다. 이 함수는
 # 원본 모델을 양자화한 버전을 새로운 모듈의 형태로 반환합니다.
 #
 # 이게 내용의 전부입니다.
@@ -199,7 +192,7 @@ print(quantized_lstm)
 
 ######################################################################
 # 3. 모델의 규모 살펴보기
-# ~~~~~~~~~~~~~~~~~~~~~~~
+# ~~~~~~~~~~~~~~~~~~~~~~~~~
 # 자, 이제 모델을 양자화 했습니다. 그러면 어떤 이득이 있을까요? 우선 첫
 # 번째는 FP32 모델 매개변수를 INT8 값으로 변환했다는 (그리고 배율 값도
 # 구했다는) 점입니다. 이는 우리가 값을 저장하고 다루는 데에 필요한 데이터의
@@ -225,7 +218,7 @@ print("{0:.2f} times smaller".format(f/q))
 
 ######################################################################
 # 4. 응답 시간 살펴보기
-# ~~~~~~~~~~~~~~~~~~~~~
+# ~~~~~~~~~~~~~~~~~~~~~~~
 # 좋은 점 두 번째는 통상적으로 양자화된 모델의 수행 속도가 좀 더
 # 빠르다는 점입니다. 이는
 #
@@ -239,14 +232,17 @@ print("{0:.2f} times smaller".format(f/q))
 # 성립하는 특징이지만, 모델의 구조나 작업을 수행할 하드웨어의 특성 등
 # 여러 가지 요소에 따라 그때 그때 다를 수 있습니다.
 #
-
+#
 # 성능 비교하기
-print("Floating point FP32")
-# %timeit float_lstm.forward(inputs, hidden)
-
-print("Quantized INT8")
-# %timeit quantized_lstm.forward(inputs,hidden)
-
+#
+# .. code-block:: python
+#
+#    print("Floating point FP32")
+#    %timeit float_lstm.forward(inputs, hidden)
+#
+#    print("Quantized INT8")
+#    %timeit quantized_lstm.forward(inputs,hidden)
+#
 
 ######################################################################
 # 5: 정확도 살펴보기
@@ -277,7 +273,7 @@ print('mean absolute value of the difference between the output tensors is {0:.5
 
 ######################################################################
 # 좀 더 알아보기
-# --------------
+# ----------------
 # 우리는 동적 양자화가 무엇이며 어떤 이점이 있는지 살펴보았고, 간단한
 # LSTM 모델을 빠르게 양자화하기 위해 ``torch.quantization.quantize_dynamic()``
 # 함수를 사용했습니다.
@@ -287,25 +283,14 @@ print('mean absolute value of the difference between the output tensors is {0:.5
 # 방문하여 보시기 바랍니다
 #
 # 이 레시피에서는 이러한 내용을 빠르게, 그리고 고수준에서 살펴 보았습니다.
-# 좀 더 자세한 내용을 알아보고 싶다면 `(베타) LSTM 언어 모델 동적 양자화
-# 튜토리얼 <https://tutorials.pytorch.kr/advanced/dynamic\_quantization\_tutorial.html>`_
+# 좀 더 자세한 내용을 알아보고 싶다면 :doc:`/advanced/dynamic\_quantization\_tutorial`
 # 을 계속 공부해 보시기 바랍니다.
 #
 # 참고 자료
-# =========
-# 문서
-# ~~~~
+# ----------------
 #
-# `양자화 API 문서 <https://pytorch.org/docs/stable/quantization.html>`_
-#
-# 튜토리얼
-# ~~~~~~~~
-#
-# `(베타) BERT 동적 양자화 <https://tutorials.pytorch.kr/intermediate/dynamic\_quantization\_bert\_tutorial.html>`_
-#
-# `(베타) LSTM 언어 모델 동적 양자화 <https://tutorials.pytorch.kr/advanced/dynamic\_quantization\_tutorial.html>`_
-#
-# 블로그 글
-# ~~~~~~~~~
-# `PyTorch에서 양자화 수행하기 입문서 <https://pytorch.org/blog/introduction-to-quantization-on-pytorch/>`_
+# * `Quantization API Documentaion <https://pytorch.org/docs/stable/quantization.html>`_
+# * :doc:`/intermediate/dynamic\_quantization\_bert\_tutorial`
+# * :doc:`advanced/dynamic\_quantization\_tutorial`
+# * `Introduction to Quantization on PyTorch <https://pytorch.org/blog/introduction-to-quantization-on-pytorch/>`_
 #

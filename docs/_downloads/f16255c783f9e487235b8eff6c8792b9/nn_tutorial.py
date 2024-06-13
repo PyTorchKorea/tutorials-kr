@@ -76,6 +76,11 @@ from matplotlib import pyplot
 import numpy as np
 
 pyplot.imshow(x_train[0].reshape((28, 28)), cmap="gray")
+# Colab이 아닌 경우에만 ``pyplot.show()``
+try:
+    import google.colab
+except ImportError:
+    pyplot.show()
 print(x_train.shape)
 
 ###############################################################################
@@ -92,8 +97,8 @@ print(x_train.shape)
 print(y_train.min(), y_train.max())
 
 ###############################################################################
-# ()``torch.nn`` 없이) 밑바닥부터 신경망 만들기
-# -----------------------------------------------
+# (``torch.nn`` 없이) 밑바닥부터 신경망 만들기
+# -------------------------------------------------
 #
 # PyTorch 텐서 연산만으로 첫 모델을 만들어봅시다.
 # 여러분이 신경망의 기초에 대해서 이미 익숙하다고 가정합니다.
@@ -317,7 +322,7 @@ print(loss_func(model(xb), yb))
 # 이전에는 훈련 루프를 위해 이름 별로 각 매개변수(parameter)의 값을 업데이트하고 다음과 같이
 # 각 매개 변수에 대한 기울기들을 개별적으로 수동으로 0으로 제거해야 했습니다:
 #
-# ::
+# .. code-block:: python
 #
 #    with torch.no_grad():
 #        weights -= weights.grad * lr
@@ -330,7 +335,7 @@ print(loss_func(model(xb), yb))
 # ``nn.Module`` 에 대해 PyTorch에 의해 정의됨)를 활용하여 이러한 단계를 더 간결하게
 # 만들고, 특히 더 복잡한 모델에 대해서 일부 매개변수를 잊어 버리는 오류를 덜 발생시킬 수 있습니다:
 #
-# ::
+# .. code-block:: python
 #
 #    with torch.no_grad():
 #        for p in model.parameters(): p -= p.grad * lr
@@ -405,7 +410,7 @@ print(loss_func(model(xb), yb))
 #
 # 이렇게 하면 이전에 수동으로 코딩한 최적화 단계를 대체할 수 있습니다:
 #
-# ::
+# .. code-block:: python
 #
 #    with torch.no_grad():
 #        for p in model.parameters(): p -= p.grad * lr
@@ -413,7 +418,7 @@ print(loss_func(model(xb), yb))
 #
 # 대신에 이렇게 말이죠:
 #
-# ::
+# .. code-block:: python
 #
 #    opt.step()
 #    opt.zero_grad()
@@ -476,7 +481,7 @@ train_ds = TensorDataset(x_train, y_train)
 ###############################################################################
 # 이전에는 ``x`` 및 ``y`` 값의 미니 배치를 별도로 반복해야 했습니다:
 #
-# ::
+# .. code-block:: python
 #
 #     xb = x_train[start_i:end_i]
 #     yb = y_train[start_i:end_i]
@@ -484,7 +489,7 @@ train_ds = TensorDataset(x_train, y_train)
 #
 # 이제 이 두 단계를 함께 수행할 수 있습니다:
 #
-# ::
+# .. code-block:: python
 #
 #     xb,yb = train_ds[i*bs : i*bs+bs]
 #
@@ -521,7 +526,7 @@ train_dl = DataLoader(train_ds, batch_size=bs)
 ###############################################################################
 # 이전에는 루프가 다음과 같이 배치 ``(xb, yb)`` 를 반복했습니다:
 #
-# ::
+# .. code-block:: python
 #
 #     for i in range((n-1)//bs + 1):
 #         xb,yb = train_ds[i*bs : i*bs+bs]
@@ -529,7 +534,7 @@ train_dl = DataLoader(train_ds, batch_size=bs)
 #
 # 이제 (xb, yb)가 DataLoader 에서 자동으로 로드되므로 루프가 훨씬 깨끗해졌습니다:
 #
-# ::
+# .. code-block:: python
 #
 #     for xb,yb in train_dl:
 #         pred = model(xb)
@@ -774,8 +779,7 @@ class WrappedDataLoader:
         return len(self.dl)
 
     def __iter__(self):
-        batches = iter(self.dl)
-        for b in batches:
+        for b in self.dl:
             yield (self.func(*b))
 
 train_dl, valid_dl = get_data(train_ds, valid_ds, bs)

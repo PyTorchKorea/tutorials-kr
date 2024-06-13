@@ -66,7 +66,6 @@
 # 이제 본 튜토리얼의 동기가 명확해지길 바라며, 구현으로 넘어가 보겠습니다.
 #
 
-from __future__ import print_function
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -74,13 +73,6 @@ import torch.optim as optim
 from torchvision import datasets, transforms
 import numpy as np
 import matplotlib.pyplot as plt
-
-# NOTE: 아래는 MNIST 데이터셋을 내려받을 때 "User-agent" 관련한 제한을 푸는 코드입니다.
-#       더 자세한 내용은 https://github.com/pytorch/vision/issues/3497 을 참고해주세요.
-from six.moves import urllib
-opener = urllib.request.build_opener()
-opener.addheaders = [('User-agent', 'Mozilla/5.0')]
-urllib.request.install_opener(opener)
 
 
 ######################################################################
@@ -91,7 +83,7 @@ urllib.request.install_opener(opener)
 # 정의한 다음 공격을 코딩하고 일부 테스트를 실행합니다.
 #
 # 입력
-# ~~~~~~
+# ~~~~~~~~~~~~~~
 #
 # 이 학습서에는 입력이 3 개이며 다음과 같이 정의됩니다:
 #
@@ -102,7 +94,7 @@ urllib.request.install_opener(opener)
 #
 # - ``pretrained_model`` - `pytorch/examples/mnist <https://github.com/pytorch/examples/tree/master/mnist>`__
 #    를 통해 미리 학습된 MNIST 모델의 경로.
-#    튜토리얼을 간편하게 하려면 `여기 <https://drive.google.com/drive/folders/1fn83DF14tWmit0RTKWRhPq5uVXt73e0h?usp=sharing>`__ 에서 미리 학습된 모델을 다운로드하세요.
+#    튜토리얼을 간편하게 하려면 `여기 <https://drive.google.com/file/d/1HJV2nUHJqclXQ8flKvcWmjZ-OU5DGatl/view?usp=drive_link>`__ 에서 미리 학습된 모델을 다운로드하세요.
 #
 # -  ``use_cuda`` - CUDA 를 사용할지 말지 정하는 이진 플래그.
 #    본 튜토리얼에서는 CPU 시간이 오래 걸리지 않으므로 CUDA를 지원하는 GPU 의 여부는 중요하지 않습니다.
@@ -111,11 +103,12 @@ urllib.request.install_opener(opener)
 epsilons = [0, .05, .1, .15, .2, .25, .3]
 pretrained_model = "data/lenet_mnist_model.pth"
 use_cuda=True
-
+# 재현을 위해 랜덤 시드(seed)를 설정합니다.
+torch.manual_seed(42)
 
 ######################################################################
 # 공격을 받는 모델
-# ~~~~~~~~~~~~~~~~~~
+# ~~~~~~~~~~~~~~~~~~~~~
 #
 # 앞서 말한대로, 공격받는 모델은 `pytorch/examples/mnist <https://github.com/pytorch/examples/tree/master/mnist>`__
 # 와 동일한 MNIST 모델입니다. 본인의 MNIST 모델을 학습 및 저장하는 방식으로 하거나 제공된 모델을 다운로드 해 사용하는 식으로 진행할 수 있습니다.
@@ -127,37 +120,45 @@ use_cuda=True
 class Net(nn.Module):
     def __init__(self):
         super(Net, self).__init__()
-        self.conv1 = nn.Conv2d(1, 10, kernel_size=5)
-        self.conv2 = nn.Conv2d(10, 20, kernel_size=5)
-        self.conv2_drop = nn.Dropout2d()
-        self.fc1 = nn.Linear(320, 50)
-        self.fc2 = nn.Linear(50, 10)
+        self.conv1 = nn.Conv2d(1, 32, 3, 1)
+        self.conv2 = nn.Conv2d(32, 64, 3, 1)
+        self.dropout1 = nn.Dropout(0.25)
+        self.dropout2 = nn.Dropout(0.5)
+        self.fc1 = nn.Linear(9216, 128)
+        self.fc2 = nn.Linear(128, 10)
 
     def forward(self, x):
-        x = F.relu(F.max_pool2d(self.conv1(x), 2))
-        x = F.relu(F.max_pool2d(self.conv2_drop(self.conv2(x)), 2))
-        x = x.view(-1, 320)
-        x = F.relu(self.fc1(x))
-        x = F.dropout(x, training=self.training)
+        x = self.conv1(x)
+        x = F.relu(x)
+        x = self.conv2(x)
+        x = F.relu(x)
+        x = F.max_pool2d(x, 2)
+        x = self.dropout1(x)
+        x = torch.flatten(x, 1)
+        x = self.fc1(x)
+        x = F.relu(x)
+        x = self.dropout2(x)
         x = self.fc2(x)
-        return F.log_softmax(x, dim=1)
+        output = F.log_softmax(x, dim=1)
+        return output
 
 # MNIST 테스트 데이터셋과 데이터로더 선언
 test_loader = torch.utils.data.DataLoader(
     datasets.MNIST('../data', train=False, download=True, transform=transforms.Compose([
             transforms.ToTensor(),
+            transforms.Normalize((0.1307,), (0.3081,)),
             ])),
         batch_size=1, shuffle=True)
 
 # 어떤 디바이스를 사용할지 정의
 print("CUDA Available: ",torch.cuda.is_available())
-device = torch.device("cuda" if (use_cuda and torch.cuda.is_available()) else "cpu")
+device = torch.device("cuda" if use_cuda and torch.cuda.is_available() else "cpu")
 
 # 모델 초기화하기
 model = Net().to(device)
 
 # 미리 학습된 모델 읽어오기
-model.load_state_dict(torch.load(pretrained_model, map_location='cpu'))
+model.load_state_dict(torch.load(pretrained_model, map_location=device))
 
 # 모델을 평가 모드로 설정하기. 드롭아웃 레이어들을 위해 사용됨
 model.eval()
@@ -189,6 +190,24 @@ def fgsm_attack(image, epsilon, data_grad):
     perturbed_image = torch.clamp(perturbed_image, 0, 1)
     # 작은 변화가 적용된 이미지를 리턴합니다
     return perturbed_image
+
+# 텐서를 원래 스케일로 복원
+def denorm(batch, mean=[0.1307], std=[0.3081]):
+    """
+    텐서 묶음(batch)을 원래 스케일로 변환합니다.
+    Args:
+        batch (torch.Tensor): 정규화된 텐서 배치(batch)
+        mean (torch.Tensor or list): 정규화시 사용했던 평균(mean)
+        std (torch.Tensor or list): 정규화시 사용했던 표준편차(standard deviation)
+    Returns:
+        torch.Tensor: 정규화가 적용되지 않은 텐서 묶음(batch)
+    """
+    if isinstance(mean, list):
+        mean = torch.tensor(mean).to(device)
+    if isinstance(std, list):
+        std = torch.tensor(std).to(device)
+
+    return batch * std.view(1, -1, 1, 1) + mean.view(1, -1, 1, 1)
 
 
 ######################################################################
@@ -238,18 +257,24 @@ def test( model, device, test_loader, epsilon ):
         # 변화도 값을 모읍니다
         data_grad = data.grad.data
 
+        # 데이터를 원래 스케일로 복원합니다
+        data_denorm = denorm(data)
+
         # FGSM 공격을 호출합니다
-        perturbed_data = fgsm_attack(data, epsilon, data_grad)
+        perturbed_data = fgsm_attack(data_denorm, epsilon, data_grad)
+
+        # 정규화를 다시 적용합니다
+        perturbed_data_normalized = transforms.Normalize((0.1307,), (0.3081,))(perturbed_data)
 
         # 작은 변화가 적용된 이미지에 대해 재분류합니다
-        output = model(perturbed_data)
+        output = model(perturbed_data_normalized)
 
         # 올바른지 확인합니다
         final_pred = output.max(1, keepdim=True)[1] # 로그 확률의 최대값을 가지는 인덱스를 얻습니다
         if final_pred.item() == target.item():
             correct += 1
             # 0 엡실론 예제에 대해서 저장합니다
-            if (epsilon == 0) and (len(adv_examples) < 5):
+            if epsilon == 0 and len(adv_examples) < 5:
                 adv_ex = perturbed_data.squeeze().detach().cpu().numpy()
                 adv_examples.append( (init_pred.item(), final_pred.item(), adv_ex) )
         else:
@@ -260,7 +285,7 @@ def test( model, device, test_loader, epsilon ):
 
     # 해당 엡실론에서의 최종 정확도를 계산합니다
     final_acc = correct/float(len(test_loader))
-    print("Epsilon: {}\tTest Accuracy = {} / {} = {}".format(epsilon, correct, len(test_loader), final_acc))
+    print(f"Epsilon: {epsilon}\tTest Accuracy = {correct} / {len(test_loader)} = {final_acc}")
 
     # 정확도와 적대적 예제를 리턴합니다
     return final_acc, adv_examples
@@ -337,9 +362,9 @@ for i in range(len(epsilons)):
         plt.xticks([], [])
         plt.yticks([], [])
         if j == 0:
-            plt.ylabel("Eps: {}".format(epsilons[i]), fontsize=14)
+            plt.ylabel(f"Eps: {epsilons[i]}", fontsize=14)
         orig,adv,ex = examples[i][j]
-        plt.title("{} -> {}".format(orig, adv))
+        plt.title(f"{orig} -> {adv}")
         plt.imshow(ex, cmap="gray")
 plt.tight_layout()
 plt.show()
@@ -363,4 +388,8 @@ plt.show()
 # 그러나 적대적 머신 러닝 분야에 대해서 많은 것을 알기 위한 최고의 방법은 많이 시도해보는 것입니다.
 # NIPS 2017 경쟁에서 소개된 다양한 공격 방법을 직접 구현해 보고, FGSM 과 어떤 점이 다른지 연구해 보세요.
 # 그리고 나서 직접 만든 공격으로부터 모델을 방어해 보세요.
+#
+# 그 외에도 다른 방향으로는, 사용 가능한 자원이 있다면 위의 각 ``epsilon test()`` 루프에서
+# 한 번에 하나씩 공격을 처리하는 대신 일괄(batch), 병렬(parallel) 또는 분산(distributed)으로
+# 작업을 처리하도록 코드를 변경해 보세요.
 #

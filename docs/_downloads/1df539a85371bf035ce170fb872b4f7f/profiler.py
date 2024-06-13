@@ -1,11 +1,11 @@
 """
-PyTorch 모듈 프로파일링 하기
----------------------------
+PyTorch 모듈 프로파일링하기
+--------------------------------
+
 **Author:** `Suraj Subramanian <https://github.com/suraj813>`_
+  **번역:** `이재복 <http://github.com/zzaebok>`_
 
-**번역:** `이재복 <http://github.com/zzaebok>`_
-
-PyTorch는 코드 내의 다양한 Pytorch 연산에 대한 시간과 메모리 비용을 파악하는 데 유용한 프로파일러(profiler) API를 포함하고 있습니다.
+PyTorch는 코드 내의 다양한 Pytorch 연산에 대한 시간과 메모리 비용을 파악하는데 유용한 프로파일러(profiler) API를 포함하고 있습니다.
 프로파일러는 코드에 쉽게 통합될 수 있으며, 프로파일링 결과는 표로 출력되거나 JSON 형식의 추적(trace) 파일로 반환될 수 있습니다.
 
 .. note::
@@ -18,7 +18,9 @@ PyTorch는 코드 내의 다양한 Pytorch 연산에 대한 시간과 메모리 
     Pytorch 1.8은 미래의 릴리즈에서 기존의 프로파일러 API를 대체할 새로운 API를 소개하고 있습니다.
     새로운 API를 `이 페이지 <https://pytorch.org/docs/master/profiler.html>`__ 에서 확인하세요.
 
-프로파일러 API 사용법에 대해 빠르게 살펴보고 싶다면 `이 레시피 문서 <https://tutorials.pytorch.kr/recipes/recipes/profiler_recipe.html>`__ 를 확인하세요.
+프로파일러 API 사용법에 대해 빠르게 알아보고 싶다면
+`이 레시피 문서 <https://tutorials.pytorch.kr/recipes/recipes/profiler_recipe.html>`__ 를
+살펴보세요.
 
 
 --------------
@@ -76,7 +78,7 @@ class MyModule(nn.Module):
 # 모델의 순전파 단계를 ``profiler.profile`` 컨텍스트 매니저를 통해 감쌉니다.
 # ``with_stack=True`` 인자는 연산의 추적(trace) 파일 내부에 파일과 줄번호를 덧붙입니다.
 #
-# .. WARNING::
+# .. warning::
 #     ``with_stack=True`` 는 추가적인 오버헤드를 발생시키기 때문에 코드를 분석할 때에 사용하는 것이 바람직합니다.
 #     성능을 벤치마킹한다면 이를 제거하는 것을 잊지 마십시오.
 #
@@ -106,7 +108,7 @@ with profiler.profile(with_stack=True, profile_memory=True) as prof:
 # 결과 표는 ``sort_by`` 인자 (유효한 정렬 키는 `docs <https://pytorch.org/docs/stable/autograd.html#profiler>`__ 에서
 # 확인하세요) 를 넘겨줌으로써 정렬될 수 있습니다.
 #
-# .. Note::
+# .. note::
 #   notebook에서 프로파일러를 실행할 때 스택 추적(stacktrace)에서 파일명 대신
 #   ``<ipython-input-18-193a910735e8>(13): forward`` 와 같은 항목을 볼 수 있습니다.
 #   이는 ``<notebook-cell>(line number): calling-function`` 의 형식에 대응됩니다.

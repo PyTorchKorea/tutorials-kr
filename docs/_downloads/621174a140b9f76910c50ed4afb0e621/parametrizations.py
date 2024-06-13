@@ -227,7 +227,7 @@ class CayleyMap(nn.Module):
 
     def forward(self, X):
         # (I + X)(I - X)^{-1}
-        return torch.solve(self.Id + X, self.Id - X).solution
+        return torch.linalg.solve(self.Id - X, self.Id + X)
 
 layer = nn.Linear(3, 3)
 parametrize.register_parametrization(layer, "weight", Skew())
@@ -255,7 +255,7 @@ parametrize.register_parametrization(layer_spd, "weight", Symmetric())
 parametrize.register_parametrization(layer_spd, "weight", MatrixExponential())
 X = layer_spd.weight
 print(torch.dist(X, X.T))                        # X is symmetric
-print((torch.symeig(X).eigenvalues > 0.).all())  # X is positive definite
+print((torch.linalg.eigvalsh(X) > 0.).all())  # X is positive definite
 
 ###############################################################################
 # Initializing parametrizations
@@ -301,13 +301,13 @@ class CayleyMap(nn.Module):
     def forward(self, X):
         # Assume X skew-symmetric
         # (I + X)(I - X)^{-1}
-        return torch.solve(self.Id + X, self.Id - X).solution
+        return torch.linalg.solve(self.Id - X, self.Id + X)
 
     def right_inverse(self, A):
         # Assume A orthogonal
         # See https://en.wikipedia.org/wiki/Cayley_transform#Matrix_map
-        # (X - I)(X + I)^{-1}
-        return torch.solve(X - self.Id, self.Id + X).solution
+        # (A - I)(A + I)^{-1}
+        return torch.linalg.solve(A + self.Id, self.Id - A)
 
 layer_orthogonal = nn.Linear(3, 3)
 parametrize.register_parametrization(layer_orthogonal, "weight", Skew())

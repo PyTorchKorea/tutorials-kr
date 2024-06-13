@@ -1,13 +1,15 @@
 """
-배포를 위한 비전 트랜스포머(Vision Transformer) 모델 최적화하기
-=================================================================
-Authors : `Jeff Tang <https://github.com/jeffxtang>`_, `Geeta Chauhan <https://github.com/gchauhan/>`_
-번역 : `김태영 <https://github.com/Taeyoung96/>`_
+배포를 위해 비전 트랜스포머(Vision Transformer) 모델 최적화하기
+====================================================================
+
+**Authors**: `Jeff Tang <https://github.com/jeffxtang>`_, `Geeta Chauhan <https://github.com/gchauhan/>`_
+   **번역**: `김태영 <https://github.com/Taeyoung96/>`_
 
 비전 트랜스포머(Vision Transformer)는 자연어 처리 분야에서 소개된
 최고 수준의 결과를 달성한 최신의 어텐션 기반(attention-based) 트랜스포머 모델을
 컴퓨터 비전 분야에 적용을 한 모델입니다.
-FaceBook에서 발표한 Data-efficient Image Transformers는 `DeiT <https://ai.facebook.com/blog/data-efficient-image-transformers-a-promising-new-technique-for-image-classification>`_
+Facebook에서 발표한 Data-efficient Image Transformers는
+`DeiT <https://ai.facebook.com/blog/data-efficient-image-transformers-a-promising-new-technique-for-image-classification>`_
 이미지 분류를 위해 ImageNet 데이터셋을 통해 훈련된
 비전 트랜스포머 모델입니다.
 
@@ -237,7 +239,7 @@ print("lite model: {:.2f}ms".format(prof5.self_cpu_time_total/1000))
 ######################################################################
 # Google Colab에서 실행 시킨 결과는 다음과 같습니다.
 #
-# ::
+# .. code-block:: sh
 #
 #    original model: 1236.69ms
 #    scripted model: 1226.72ms

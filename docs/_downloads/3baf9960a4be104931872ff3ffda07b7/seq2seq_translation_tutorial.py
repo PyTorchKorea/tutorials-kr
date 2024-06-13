@@ -2,7 +2,8 @@
 """
 기초부터 시작하는 NLP: Sequence to Sequence 네트워크와 Attention을 이용한 번역
 ********************************************************************************
-**Author**: `Sean Robertson <https://github.com/spro/practical-pytorch>`_
+
+**Author**: `Sean Robertson <https://github.com/spro>`_
   **번역**: `황성수 <https://github.com/adonisues>`_
 
 이 튜토리얼은 "기초부터 시작하는 NLP"의 세번째이자 마지막 편으로, NLP 모델링 작업을
@@ -12,7 +13,7 @@
 
 이 프로젝트에서는 신경망이 불어를 영어로 번역하도록 가르칠 예정입니다.
 
-::
+.. code-block:: sh
 
     [KEY: > input, = target, < output]
 
@@ -32,9 +33,9 @@
     = you re too skinny .
     < you re all alone .
 
-... 성공율은 변할 수 있습니다.
+... 성공율은 달라질 수 있습니다.
 
-하나의 시퀀스를 다른 시퀀스로 바꾸는 두개의 RNN이 함께 동작하는
+하나의 시퀀스를 다른 시퀀스로 바꾸는 두 개의 RNN이 함께 동작하는
 `sequence to sequence network <https://arxiv.org/abs/1409.3215>`__ 의 간단하지만 강력한 아이디어가
 이것(번역)을 가능하게 합니다. 인코더 네트워크는 입력 시퀀스를 벡터로 압축하고,
 디코더 네트워크는 해당 벡터를 새로운 시퀀스로 펼칩니다.
@@ -71,11 +72,11 @@ Sequence to Sequence 네트워크와 동작 방법에 관해서 아는 것은 �
 각각 인코더, 디코더 모델과 비슷한 컨센을 가지기 때문에 도움이 됩니다.
 
 **요구 사항**
+
 """
 from __future__ import unicode_literals, print_function, division
 from io import open
 import unicodedata
-import string
 import re
 import random
 
@@ -84,11 +85,15 @@ import torch.nn as nn
 from torch import optim
 import torch.nn.functional as F
 
+import numpy as np
+from torch.utils.data import TensorDataset, DataLoader, RandomSampler
+
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 ######################################################################
-# 데이터 파일 로딩
-# ==================
+#
+# 데이터 파일 불러오기
+# ========================
 #
 # 이 프로젝트의 데이터는 수천 개의 영어-프랑스어 번역 쌍입니다.
 #
@@ -102,11 +107,11 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 # 계속하기 전에 ``data/eng-fra.txt`` 로 다운로드하십시오.
 # 이 파일은 탭으로 구분된 번역 쌍 목록입니다:
 #
-# ::
+# .. code-block:: sh
 #
 #     I am cold.    J'ai froid.
 #
-# .. Note::
+# .. note::
 #    `여기 <https://download.pytorch.org/tutorial/data.zip>`_
 #    에서 데이터를 다운 받고 현재 디렉토리에 압축을 푸십시오.
 
@@ -173,13 +178,11 @@ def unicodeToAscii(s):
     )
 
 # 소문자, 다듬기, 그리고 문자가 아닌 문자 제거
-
-
 def normalizeString(s):
     s = unicodeToAscii(s.lower().strip())
     s = re.sub(r"([.!?])", r" \1", s)
-    s = re.sub(r"[^a-zA-Z.!?]+", r" ", s)
-    return s
+    s = re.sub(r"[^a-zA-Z!?]+", r" ", s)
+    return s.strip()
 
 
 ######################################################################
@@ -230,7 +233,6 @@ eng_prefixes = (
     "they are", "they re "
 )
 
-
 def filterPair(p):
     return len(p[0].split(' ')) < MAX_LENGTH and \
         len(p[1].split(' ')) < MAX_LENGTH and \
@@ -269,6 +271,7 @@ print(random.choice(pairs))
 
 
 ######################################################################
+#
 # Seq2Seq 모델
 # =================
 #
@@ -316,23 +319,21 @@ print(random.choice(pairs))
 #
 
 class EncoderRNN(nn.Module):
-    def __init__(self, input_size, hidden_size):
+    def __init__(self, input_size, hidden_size, dropout_p=0.1):
         super(EncoderRNN, self).__init__()
         self.hidden_size = hidden_size
 
         self.embedding = nn.Embedding(input_size, hidden_size)
-        self.gru = nn.GRU(hidden_size, hidden_size)
+        self.gru = nn.GRU(hidden_size, hidden_size, batch_first=True)
+        self.dropout = nn.Dropout(dropout_p)
 
-    def forward(self, input, hidden):
-        embedded = self.embedding(input).view(1, 1, -1)
-        output = embedded
-        output, hidden = self.gru(output, hidden)
+    def forward(self, input):
+        embedded = self.dropout(self.embedding(input))
+        output, hidden = self.gru(embedded)
         return output, hidden
 
-    def initHidden(self):
-        return torch.zeros(1, 1, self.hidden_size, device=device)
-
 ######################################################################
+#
 # 디코더
 # -----------
 #
@@ -342,6 +343,7 @@ class EncoderRNN(nn.Module):
 
 
 ######################################################################
+#
 # 간단한 디코더
 # ^^^^^^^^^^^^^^
 #
@@ -362,22 +364,38 @@ class EncoderRNN(nn.Module):
 class DecoderRNN(nn.Module):
     def __init__(self, hidden_size, output_size):
         super(DecoderRNN, self).__init__()
-        self.hidden_size = hidden_size
-
         self.embedding = nn.Embedding(output_size, hidden_size)
-        self.gru = nn.GRU(hidden_size, hidden_size)
+        self.gru = nn.GRU(hidden_size, hidden_size, batch_first=True)
         self.out = nn.Linear(hidden_size, output_size)
-        self.softmax = nn.LogSoftmax(dim=1)
 
-    def forward(self, input, hidden):
-        output = self.embedding(input).view(1, 1, -1)
+    def forward(self, encoder_outputs, encoder_hidden, target_tensor=None):
+        batch_size = encoder_outputs.size(0)
+        decoder_input = torch.empty(batch_size, 1, dtype=torch.long, device=device).fill_(SOS_token)
+        decoder_hidden = encoder_hidden
+        decoder_outputs = []
+
+        for i in range(MAX_LENGTH):
+            decoder_output, decoder_hidden  = self.forward_step(decoder_input, decoder_hidden)
+            decoder_outputs.append(decoder_output)
+
+            if target_tensor is not None:
+                # Teacher forcing 포함: 목표를 다음 입력으로 전달
+                decoder_input = target_tensor[:, i].unsqueeze(1) # Teacher forcing
+            else:
+                # Teacher forcing 미포함: 자신의 예측을 다음 입력으로 사용
+                _, topi = decoder_output.topk(1)
+                decoder_input = topi.squeeze(-1).detach()  # 입력으로 사용할 부분을 히스토리에서 분리
+
+        decoder_outputs = torch.cat(decoder_outputs, dim=1)
+        decoder_outputs = F.log_softmax(decoder_outputs, dim=-1)
+        return decoder_outputs, decoder_hidden, None   # 학습 루프의 일관성 유지를 위해 `None` 을 추가로 반환
+
+    def forward_step(self, input, hidden):
+        output = self.embedding(input)
         output = F.relu(output)
         output, hidden = self.gru(output, hidden)
-        output = self.softmax(self.out(output[0]))
+        output = self.out(output)
         return output, hidden
-
-    def initHidden(self):
-        return torch.zeros(1, 1, self.hidden_size, device=device)
 
 ######################################################################
 # 이 모델의 결과를 학습하고 관찰하는 것을 권장하지만,
@@ -387,6 +405,7 @@ class DecoderRNN(nn.Module):
 
 
 ######################################################################
+#
 # Attention 디코더
 # ^^^^^^^^^^^^^^^^^
 #
@@ -414,49 +433,95 @@ class DecoderRNN(nn.Module):
 #    :alt:
 #
 #
+# 부가적 어텐션(Additive Attention)이라고도 알려진 바다나우 어텐션(Bahdanau
+# Attention)은 기계 번역 작업과 같은 시퀀스-투-시퀀스 모델에서 일반적으로
+# 사용하는 어텐션 기법(mechanism)입니다. 이 어텐션 기법은 Bahdanau et al.의 논문인
+# `Neural Machine Translation by Jointly Learning to Align and Translate <https://arxiv.org/pdf/1409.0473.pdf>`__
+# 에서 소개되었습니다. 이 어텐션 기법은 학습된 정렬 모델(learned alignment model)을
+# 사용하여 인코더와 디코더의 은닉 상태(hidden state) 간의 어텐션 점수를 계산합니다.
+# 이는 정렬된 어텐션 점수를 계산하기 위해 feed-forward 신경망을 사용합니다.
+#
+# 또는, 디코더의 은닉 상태와 인코더의 은닉 상태 사이의 어텐션 점수를 Dot-Product로
+# 계산하는 루옹 어텐션(Luong Attention)과 같은 다른 어텐션 기법들을 사용할 수도 있습니다.
+# 이는 바다나우 어텐션(Bahdanau Attention)에서 사용하는 비선형 변환(non-linear transformation)을
+# 사용하지는 않습니다.
+#
+# 이 튜토리얼에서는 바다나우 어텐션(Bahdanau Attention)을 사용할 것입니다. 하지만 이를
+# 루옹 어텐션(Luong Attention) 기법으로 변경해보는 것도 좋은 연습이 될 것입니다.
+
+class BahdanauAttention(nn.Module):
+    def __init__(self, hidden_size):
+        super(BahdanauAttention, self).__init__()
+        self.Wa = nn.Linear(hidden_size, hidden_size)
+        self.Ua = nn.Linear(hidden_size, hidden_size)
+        self.Va = nn.Linear(hidden_size, 1)
+
+    def forward(self, query, keys):
+        scores = self.Va(torch.tanh(self.Wa(query) + self.Ua(keys)))
+        scores = scores.squeeze(2).unsqueeze(1)
+
+        weights = F.softmax(scores, dim=-1)
+        context = torch.bmm(weights, keys)
+
+        return context, weights
 
 class AttnDecoderRNN(nn.Module):
-    def __init__(self, hidden_size, output_size, dropout_p=0.1, max_length=MAX_LENGTH):
+    def __init__(self, hidden_size, output_size, dropout_p=0.1):
         super(AttnDecoderRNN, self).__init__()
-        self.hidden_size = hidden_size
-        self.output_size = output_size
-        self.dropout_p = dropout_p
-        self.max_length = max_length
+        self.embedding = nn.Embedding(output_size, hidden_size)
+        self.attention = BahdanauAttention(hidden_size)
+        self.gru = nn.GRU(2 * hidden_size, hidden_size, batch_first=True)
+        self.out = nn.Linear(hidden_size, output_size)
+        self.dropout = nn.Dropout(dropout_p)
 
-        self.embedding = nn.Embedding(self.output_size, self.hidden_size)
-        self.attn = nn.Linear(self.hidden_size * 2, self.max_length)
-        self.attn_combine = nn.Linear(self.hidden_size * 2, self.hidden_size)
-        self.dropout = nn.Dropout(self.dropout_p)
-        self.gru = nn.GRU(self.hidden_size, self.hidden_size)
-        self.out = nn.Linear(self.hidden_size, self.output_size)
+    def forward(self, encoder_outputs, encoder_hidden, target_tensor=None):
+        batch_size = encoder_outputs.size(0)
+        decoder_input = torch.empty(batch_size, 1, dtype=torch.long, device=device).fill_(SOS_token)
+        decoder_hidden = encoder_hidden
+        decoder_outputs = []
+        attentions = []
 
-    def forward(self, input, hidden, encoder_outputs):
-        embedded = self.embedding(input).view(1, 1, -1)
-        embedded = self.dropout(embedded)
+        for i in range(MAX_LENGTH):
+            decoder_output, decoder_hidden, attn_weights = self.forward_step(
+                decoder_input, decoder_hidden, encoder_outputs
+            )
+            decoder_outputs.append(decoder_output)
+            attentions.append(attn_weights)
 
-        attn_weights = F.softmax(
-            self.attn(torch.cat((embedded[0], hidden[0]), 1)), dim=1)
-        attn_applied = torch.bmm(attn_weights.unsqueeze(0),
-                                 encoder_outputs.unsqueeze(0))
+            if target_tensor is not None:
+                # Teacher forcing 포함: 목표를 다음 입력으로 전달
+                decoder_input = target_tensor[:, i].unsqueeze(1) # Teacher forcing
+            else:
+                # Teacher forcing 미포함: 자신의 예측을 다음 입력으로 사용
+                _, topi = decoder_output.topk(1)
+                decoder_input = topi.squeeze(-1).detach()  # 입력으로 사용할 부분을 히스토리에서 분리
 
-        output = torch.cat((embedded[0], attn_applied[0]), 1)
-        output = self.attn_combine(output).unsqueeze(0)
+        decoder_outputs = torch.cat(decoder_outputs, dim=1)
+        decoder_outputs = F.log_softmax(decoder_outputs, dim=-1)
+        attentions = torch.cat(attentions, dim=1)
 
-        output = F.relu(output)
-        output, hidden = self.gru(output, hidden)
+        return decoder_outputs, decoder_hidden, attentions
 
-        output = F.log_softmax(self.out(output[0]), dim=1)
+
+    def forward_step(self, input, hidden, encoder_outputs):
+        embedded =  self.dropout(self.embedding(input))
+
+        query = hidden.permute(1, 0, 2)
+        context, attn_weights = self.attention(query, encoder_outputs)
+        input_gru = torch.cat((embedded, context), dim=2)
+
+        output, hidden = self.gru(input_gru, hidden)
+        output = self.out(output)
+
         return output, hidden, attn_weights
-
-    def initHidden(self):
-        return torch.zeros(1, 1, self.hidden_size, device=device)
 
 
 ######################################################################
-# .. note:: There are other forms of attention that work around the length
-#   limitation by using a relative position approach. Read about "local
-#   attention" in `Effective Approaches to Attention-based Neural Machine
-#   Translation <https://arxiv.org/abs/1508.04025>`__.
+# .. note::
+#    길이 제한을 해결하기 위해 상대적 위치 접근(relative position approach)
+#    방식을 사용하는 다른 형태의 어텐션 방식들도 있습니다.
+#    `Effective Approaches to Attention-based Neural Machine Translation <https://arxiv.org/abs/1508.04025>`__
+#    에서 "local attention" 에 대해 읽어보세요.
 #
 # 학습
 # ========
@@ -472,20 +537,41 @@ class AttnDecoderRNN(nn.Module):
 def indexesFromSentence(lang, sentence):
     return [lang.word2index[word] for word in sentence.split(' ')]
 
-
 def tensorFromSentence(lang, sentence):
     indexes = indexesFromSentence(lang, sentence)
     indexes.append(EOS_token)
-    return torch.tensor(indexes, dtype=torch.long, device=device).view(-1, 1)
-
+    return torch.tensor(indexes, dtype=torch.long, device=device).view(1, -1)
 
 def tensorsFromPair(pair):
     input_tensor = tensorFromSentence(input_lang, pair[0])
     target_tensor = tensorFromSentence(output_lang, pair[1])
     return (input_tensor, target_tensor)
 
+def get_dataloader(batch_size):
+    input_lang, output_lang, pairs = prepareData('eng', 'fra', True)
+
+    n = len(pairs)
+    input_ids = np.zeros((n, MAX_LENGTH), dtype=np.int32)
+    target_ids = np.zeros((n, MAX_LENGTH), dtype=np.int32)
+
+    for idx, (inp, tgt) in enumerate(pairs):
+        inp_ids = indexesFromSentence(input_lang, inp)
+        tgt_ids = indexesFromSentence(output_lang, tgt)
+        inp_ids.append(EOS_token)
+        tgt_ids.append(EOS_token)
+        input_ids[idx, :len(inp_ids)] = inp_ids
+        target_ids[idx, :len(tgt_ids)] = tgt_ids
+
+    train_data = TensorDataset(torch.LongTensor(input_ids).to(device),
+                               torch.LongTensor(target_ids).to(device))
+
+    train_sampler = RandomSampler(train_data)
+    train_dataloader = DataLoader(train_data, sampler=train_sampler, batch_size=batch_size)
+    return input_lang, output_lang, train_dataloader
+
 
 ######################################################################
+#
 # 모델 학습
 # ------------------
 #
@@ -509,59 +595,31 @@ def tensorsFromPair(pair):
 # 더 많이 사용하려면 ``teacher_forcing_ratio`` 를 확인하십시오.
 #
 
-teacher_forcing_ratio = 0.5
+def train_epoch(dataloader, encoder, decoder, encoder_optimizer,
+          decoder_optimizer, criterion):
 
+    total_loss = 0
+    for data in dataloader:
+        input_tensor, target_tensor = data
 
-def train(input_tensor, target_tensor, encoder, decoder, encoder_optimizer, decoder_optimizer, criterion, max_length=MAX_LENGTH):
-    encoder_hidden = encoder.initHidden()
+        encoder_optimizer.zero_grad()
+        decoder_optimizer.zero_grad()
 
-    encoder_optimizer.zero_grad()
-    decoder_optimizer.zero_grad()
+        encoder_outputs, encoder_hidden = encoder(input_tensor)
+        decoder_outputs, _, _ = decoder(encoder_outputs, encoder_hidden, target_tensor)
 
-    input_length = input_tensor.size(0)
-    target_length = target_tensor.size(0)
+        loss = criterion(
+            decoder_outputs.view(-1, decoder_outputs.size(-1)),
+            target_tensor.view(-1)
+        )
+        loss.backward()
 
-    encoder_outputs = torch.zeros(max_length, encoder.hidden_size, device=device)
+        encoder_optimizer.step()
+        decoder_optimizer.step()
 
-    loss = 0
+        total_loss += loss.item()
 
-    for ei in range(input_length):
-        encoder_output, encoder_hidden = encoder(
-            input_tensor[ei], encoder_hidden)
-        encoder_outputs[ei] = encoder_output[0, 0]
-
-    decoder_input = torch.tensor([[SOS_token]], device=device)
-
-    decoder_hidden = encoder_hidden
-
-    use_teacher_forcing = True if random.random() < teacher_forcing_ratio else False
-
-    if use_teacher_forcing:
-        # Teacher forcing 포함: 목표를 다음 입력으로 전달
-        for di in range(target_length):
-            decoder_output, decoder_hidden, decoder_attention = decoder(
-                decoder_input, decoder_hidden, encoder_outputs)
-            loss += criterion(decoder_output, target_tensor[di])
-            decoder_input = target_tensor[di]  # Teacher forcing
-
-    else:
-        # Teacher forcing 미포함: 자신의 예측을 다음 입력으로 사용
-        for di in range(target_length):
-            decoder_output, decoder_hidden, decoder_attention = decoder(
-                decoder_input, decoder_hidden, encoder_outputs)
-            topv, topi = decoder_output.topk(1)
-            decoder_input = topi.squeeze().detach()  # 입력으로 사용할 부분을 히스토리에서 분리
-
-            loss += criterion(decoder_output, target_tensor[di])
-            if decoder_input.item() == EOS_token:
-                break
-
-    loss.backward()
-
-    encoder_optimizer.step()
-    decoder_optimizer.step()
-
-    return loss.item() / target_length
+    return total_loss / len(dataloader)
 
 
 ######################################################################
@@ -572,12 +630,10 @@ def train(input_tensor, target_tensor, encoder, decoder, encoder_optimizer, deco
 import time
 import math
 
-
 def asMinutes(s):
     m = math.floor(s / 60)
     s -= m * 60
     return '%dm %ds' % (m, s)
-
 
 def timeSince(since, percent):
     now = time.time()
@@ -599,35 +655,29 @@ def timeSince(since, percent):
 # (예제의 %, 현재까지의 예상 시간)과 평균 손실을 출력합니다.
 #
 
-def trainIters(encoder, decoder, n_iters, print_every=1000, plot_every=100, learning_rate=0.01):
+def train(train_dataloader, encoder, decoder, n_epochs, learning_rate=0.001,
+               print_every=100, plot_every=100):
     start = time.time()
     plot_losses = []
-    print_loss_total = 0  # print_every 마다 초기화
-    plot_loss_total = 0  # plot_every 마다 초기화
+    print_loss_total = 0  # Reset every print_every
+    plot_loss_total = 0  # Reset every plot_every
 
-    encoder_optimizer = optim.SGD(encoder.parameters(), lr=learning_rate)
-    decoder_optimizer = optim.SGD(decoder.parameters(), lr=learning_rate)
-    training_pairs = [tensorsFromPair(random.choice(pairs))
-                      for i in range(n_iters)]
+    encoder_optimizer = optim.Adam(encoder.parameters(), lr=learning_rate)
+    decoder_optimizer = optim.Adam(decoder.parameters(), lr=learning_rate)
     criterion = nn.NLLLoss()
 
-    for iter in range(1, n_iters + 1):
-        training_pair = training_pairs[iter - 1]
-        input_tensor = training_pair[0]
-        target_tensor = training_pair[1]
-
-        loss = train(input_tensor, target_tensor, encoder,
-                     decoder, encoder_optimizer, decoder_optimizer, criterion)
+    for epoch in range(1, n_epochs + 1):
+        loss = train_epoch(train_dataloader, encoder, decoder, encoder_optimizer, decoder_optimizer, criterion)
         print_loss_total += loss
         plot_loss_total += loss
 
-        if iter % print_every == 0:
+        if epoch % print_every == 0:
             print_loss_avg = print_loss_total / print_every
             print_loss_total = 0
-            print('%s (%d %d%%) %.4f' % (timeSince(start, iter / n_iters),
-                                         iter, iter / n_iters * 100, print_loss_avg))
+            print('%s (%d %d%%) %.4f' % (timeSince(start, epoch / n_epochs),
+                                        epoch, epoch / n_epochs * 100, print_loss_avg))
 
-        if iter % plot_every == 0:
+        if epoch % plot_every == 0:
             plot_loss_avg = plot_loss_total / plot_every
             plot_losses.append(plot_loss_avg)
             plot_loss_total = 0
@@ -636,6 +686,7 @@ def trainIters(encoder, decoder, n_iters, print_every=1000, plot_every=100, lear
 
 
 ######################################################################
+#
 # 결과 도식화
 # ----------------
 #
@@ -648,17 +699,17 @@ plt.switch_backend('agg')
 import matplotlib.ticker as ticker
 import numpy as np
 
-
 def showPlot(points):
     plt.figure()
     fig, ax = plt.subplots()
-    # 주기적인 간격에 이 locator가 tick을 설정
+    # 주기적인 간격으로 이 locator가 tick을 설정
     loc = ticker.MultipleLocator(base=0.2)
     ax.yaxis.set_major_locator(loc)
     plt.plot(points)
 
 
 ######################################################################
+#
 # 평가
 # ==========
 #
@@ -669,45 +720,29 @@ def showPlot(points):
 # 나중에 도식화를 위해서 디코더의 Attention 출력을 저장합니다.
 #
 
-def evaluate(encoder, decoder, sentence, max_length=MAX_LENGTH):
+def evaluate(encoder, decoder, sentence, input_lang, output_lang):
     with torch.no_grad():
         input_tensor = tensorFromSentence(input_lang, sentence)
-        input_length = input_tensor.size()[0]
-        encoder_hidden = encoder.initHidden()
 
-        encoder_outputs = torch.zeros(max_length, encoder.hidden_size, device=device)
+        encoder_outputs, encoder_hidden = encoder(input_tensor)
+        decoder_outputs, decoder_hidden, decoder_attn = decoder(encoder_outputs, encoder_hidden)
 
-        for ei in range(input_length):
-            encoder_output, encoder_hidden = encoder(input_tensor[ei],
-                                                     encoder_hidden)
-            encoder_outputs[ei] += encoder_output[0, 0]
-
-        decoder_input = torch.tensor([[SOS_token]], device=device)  # SOS
-
-        decoder_hidden = encoder_hidden
+        _, topi = decoder_outputs.topk(1)
+        decoded_ids = topi.squeeze()
 
         decoded_words = []
-        decoder_attentions = torch.zeros(max_length, max_length)
-
-        for di in range(max_length):
-            decoder_output, decoder_hidden, decoder_attention = decoder(
-                decoder_input, decoder_hidden, encoder_outputs)
-            decoder_attentions[di] = decoder_attention.data
-            topv, topi = decoder_output.data.topk(1)
-            if topi.item() == EOS_token:
+        for idx in decoded_ids:
+            if idx.item() == EOS_token:
                 decoded_words.append('<EOS>')
                 break
-            else:
-                decoded_words.append(output_lang.index2word[topi.item()])
-
-            decoder_input = topi.squeeze().detach()
-
-        return decoded_words, decoder_attentions[:di + 1]
+            decoded_words.append(output_lang.index2word[idx.item()])
+    return decoded_words, decoder_attn
 
 
 ######################################################################
-# 학습 세트에 있는 임의의 문장을 평가하고
-# 입력, 목표 및 출력을 출력하여 주관적인 품질 판단을 내릴 수 있습니다:
+#
+# 학습 세트에 있는 임의의 문장으로 평가한 다음, 입력(input), 목표(target)
+# 및 출력(output) 값들을 표시하여 주관적으로 품질에 대해 판단해볼 수 있습니다:
 #
 
 def evaluateRandomly(encoder, decoder, n=10):
@@ -715,7 +750,7 @@ def evaluateRandomly(encoder, decoder, n=10):
         pair = random.choice(pairs)
         print('>', pair[0])
         print('=', pair[1])
-        output_words, attentions = evaluate(encoder, decoder, pair[0])
+        output_words, _ = evaluate(encoder, decoder, pair[0], input_lang, output_lang)
         output_sentence = ' '.join(output_words)
         print('<', output_sentence)
         print('')
@@ -740,16 +775,24 @@ def evaluateRandomly(encoder, decoder, n=10):
 #    주석 처리하고 ``trainIters`` 를 다시 실행하십시오.
 #
 
-hidden_size = 256
-encoder1 = EncoderRNN(input_lang.n_words, hidden_size).to(device)
-attn_decoder1 = AttnDecoderRNN(hidden_size, output_lang.n_words, dropout_p=0.1).to(device)
+hidden_size = 128
+batch_size = 32
 
-trainIters(encoder1, attn_decoder1, 75000, print_every=5000)
+input_lang, output_lang, train_dataloader = get_dataloader(batch_size)
+
+encoder = EncoderRNN(input_lang.n_words, hidden_size).to(device)
+decoder = AttnDecoderRNN(hidden_size, output_lang.n_words).to(device)
+
+train(train_dataloader, encoder, decoder, 80, print_every=5, plot_every=5)
 
 ######################################################################
 #
+#
+# 드롭아웃(dropout) 레이어들을 평가 (``eval``) 모드로 설정합니다.
 
-evaluateRandomly(encoder1, attn_decoder1)
+encoder.eval()
+decoder.eval()
+evaluateRandomly(encoder, decoder)
 
 
 ######################################################################
@@ -760,24 +803,15 @@ evaluateRandomly(encoder1, attn_decoder1)
 # 입력 시퀀스의 특정 인코더 출력에 가중치를 부여하는 데 사용되므로
 # 각 시간 단계에서 네트워크가 가장 집중되는 위치를 파악할 수 있습니다.
 #
-# Attention 출력을 행렬로 표시하기 위해 ``plt.matshow(attentions)`` 를
-# 간단하게 실행할 수 있습니다. 열은 입력 단계와 행이 출력 단계입니다:
-#
-
-output_words, attentions = evaluate(
-    encoder1, attn_decoder1, "je suis trop froid .")
-plt.matshow(attentions.numpy())
-
-
-######################################################################
-# 더 나은 보기를 위해 축과 라벨을 더하는 추가 작업을 수행합니다:
+# Attention 출력을 행렬로 표시하기 위해서는 ``plt.matshow(attentions)`` 을
+# 그냥 실행해도 됩니다. 하지만 좀 더 나은 시각화를 위해 축(axis)과 라벨(label)을
+# 추가하는 약간의 작업을 더 해보겠습니다:
 #
 
 def showAttention(input_sentence, output_words, attentions):
-    # colorbar로 그림 설정
     fig = plt.figure()
     ax = fig.add_subplot(111)
-    cax = ax.matshow(attentions.numpy(), cmap='bone')
+    cax = ax.matshow(attentions.cpu().numpy(), cmap='bone')
     fig.colorbar(cax)
 
     # 축 설정
@@ -793,20 +827,19 @@ def showAttention(input_sentence, output_words, attentions):
 
 
 def evaluateAndShowAttention(input_sentence):
-    output_words, attentions = evaluate(
-        encoder1, attn_decoder1, input_sentence)
+    output_words, attentions = evaluate(encoder, decoder, input_sentence, input_lang, output_lang)
     print('input =', input_sentence)
     print('output =', ' '.join(output_words))
-    showAttention(input_sentence, output_words, attentions)
+    showAttention(input_sentence, output_words, attentions[0, :len(output_words), :])
 
 
-evaluateAndShowAttention("elle a cinq ans de moins que moi .")
+evaluateAndShowAttention('il n est pas aussi grand que son pere')
 
-evaluateAndShowAttention("elle est trop petit .")
+evaluateAndShowAttention('je suis trop fatigue pour conduire')
 
-evaluateAndShowAttention("je ne crains pas de mourir .")
+evaluateAndShowAttention('je suis desole si c est une question idiote')
 
-evaluateAndShowAttention("c est un jeune directeur plein de talent .")
+evaluateAndShowAttention('je suis reellement fiere de vous')
 
 
 ######################################################################

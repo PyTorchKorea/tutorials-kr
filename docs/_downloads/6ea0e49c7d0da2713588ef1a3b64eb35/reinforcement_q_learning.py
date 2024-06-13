@@ -6,7 +6,7 @@
 **Author**: `Adam Paszke <https://github.com/apaszke>`_, `Mark Towers <https://github.com/pseudo-rnd-thoughts>`_
   **번역**: `황성수 <https://github.com/adonisues>`_, `박정환 <https://github.com/9bow>`_
 
-이 튜토리얼에서는 `Gymnasium <https://www.gymnasium.farama.org>`__ 의
+이 튜토리얼에서는 `Gymnasium <https://gymnasium.farama.org>`__ 의
 CartPole-v1 태스크에서 DQN (Deep Q Learning) 에이전트를 학습하는데
 PyTorch를 사용하는 방법을 보여드립니다.
 
@@ -268,7 +268,7 @@ def select_action(state):
             # t.max (1)은 각 행의 가장 큰 열 값을 반환합니다.
             # 최대 결과의 두번째 열은 최대 요소의 주소값이므로,
             # 기대 보상이 더 큰 행동을 선택할 수 있습니다.
-            return policy_net(state).max(1)[1].view(1, 1)
+            return policy_net(state).max(1).indices.view(1, 1)
     else:
         return torch.tensor([[env.action_space.sample()]], device=device, dtype=torch.long)
 
@@ -344,11 +344,11 @@ def optimize_model():
 
     # 모든 다음 상태를 위한 V(s_{t+1}) 계산
     # non_final_next_states의 행동들에 대한 기대값은 "이전" target_net을 기반으로 계산됩니다.
-    # max(1)[0]으로 최고의 보상을 선택하십시오.
+    # max(1).values로 최고의 보상을 선택하십시오.
     # 이것은 마스크를 기반으로 병합되어 기대 상태 값을 갖거나 상태가 최종인 경우 0을 갖습니다.
     next_state_values = torch.zeros(BATCH_SIZE, device=device)
     with torch.no_grad():
-        next_state_values[non_final_mask] = target_net(non_final_next_states).max(1)[0]
+        next_state_values[non_final_mask] = target_net(non_final_next_states).max(1).values
     # 기대 Q 값 계산
     expected_state_action_values = (next_state_values * GAMMA) + reward_batch
 

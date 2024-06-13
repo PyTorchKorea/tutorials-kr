@@ -1,10 +1,11 @@
 """
 TorchScript로 모델 동결하기
 =============================
+
 번역 : `김지호 <https://github.com/jiho3004/>`_
 
-이 튜토리얼에서는, TorchScript로 *모델 동결* 하는 문법을 소개합니다. 
-동결은 파이토치 모듈의 매개변수와 속성 값들을 TorchScript 내부 표현으로 인라이닝(inlining)하는 과정입니다. 
+이 튜토리얼에서는, TorchScript로 *모델 동결* 하는 문법을 소개합니다.
+동결은 파이토치 모듈의 매개변수와 속성 값들을 TorchScript 내부 표현으로 인라이닝(inlining)하는 과정입니다.
 매개변수와 속성 값들은 최종 값으로 처리되며 동결된 모듈에서 수정될 수 없습니다.
 
 기본 문법
@@ -12,9 +13,9 @@ TorchScript로 모델 동결하기
 
 모델 동결은 아래 API를 사용하여 호출할 수 있습니다:
 
- ``torch.jit.freeze(mod : ScriptModule, names : str[]) -> SciptModule``
+ ``torch.jit.freeze(mod : ScriptModule, names : str[]) -> ScriptModule``
 
-입력 모듈은 스크립팅(scripting) 혹은 추적(tracing)을 사용한 결과입니다. 
+입력 모듈은 스크립팅(scripting) 혹은 추적(tracing)을 사용한 결과입니다.
 `TorchScript 소개 튜토리얼 <https://tutorials.pytorch.kr/beginner/Intro_to_TorchScript_tutorial.html>`_
 을 참조하세요.
 
@@ -118,7 +119,7 @@ print("Frozen    - Inference time: {0:5.2f}".format(end-start), flush =True)
 # 이 예제에서, 워밍업 시간은 최초 두 번 실행할 때 측정합니다.
 # 동결된 모델이 스크립트된 모델보다 50% 더 빠릅니다.
 # 보다 복잡한 모델에서는 워밍업 시간이 더욱 빨라집니다.
-# 최초 두 번의 실행을 초기화할 때 TorchScript가 해야 할 일의 일부를 동결이 하고 있기 때문에 속도 개선이 일어납니다. 
+# 최초 두 번의 실행을 초기화할 때 TorchScript가 해야 할 일의 일부를 동결이 하고 있기 때문에 속도 개선이 일어납니다.
 #
 # 추론 시간은 모델이 워밍업되고 난 뒤, 추론 시 실행 시간을 측정합니다.
 # 실행 시간에 많은 편차가 있기는 하지만, 대개 동결된 모델이 스크립트된 모델보다 약 15% 더 빠릅니다.
@@ -127,5 +128,6 @@ print("Frozen    - Inference time: {0:5.2f}".format(end-start), flush =True)
 ###############################################################
 # 결론
 # -----------
+#
 # 이 튜토리얼에서는 모델 동결에 대해 배웠습니다.
 # 동결은 추론 시 모델 최적화를 할 수 있는 유용한 기법이며 TorchScript 워밍업 시간을 크게 줄입니다.

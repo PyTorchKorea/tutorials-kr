@@ -66,11 +66,11 @@ import torchaudio
 # 2. 데이터에 접근하기
 # -----------------------------------------------------------------
 #
-# ``torchaudio`` 의 YesNo 데이터셋은 한 사람이 히브리어로 yes 혹은
+# ``torchaudio`` 의 ``yesno`` 데이터셋은 한 사람이 히브리어로 yes 혹은
 # no를 녹음한 오디오 클립 60개로 구성되어 있습니다. 오디오 클립 각각의 길이는 단어 8개입니다.
 # ( `더 알아보기 <https://www.openslr.org/1/>`__ ).
 #
-# ``torchaudio.datasets.YESNO`` 클래스를 사용하여 YesNo 데이터셋을 생성합니다.
+# ``torchaudio.datasets.YESNO`` 클래스를 사용하여 ``yesno`` 데이터셋을 생성합니다.
 torchaudio.datasets.YESNO(
      root='./',
      url='http://www.openslr.org/resources/1/waves_yesno.tar.gz',
@@ -80,20 +80,20 @@ torchaudio.datasets.YESNO(
 ###########################################################################
 # 각각의 데이터 항목 (item)은 튜플 형태 (waveform: 파형, sample_rate: 샘플 속도, labels: 라벨)를 갖습니다.
 #
-# YesNo 데이터셋을 불러올 때 ``root`` 매개변수는 꼭 지정해주셔야 합니다. ``root`` 는
+# ``yesno`` 데이터셋을 불러올 때 ``root`` 매개변수는 꼭 지정해주셔야 합니다. ``root`` 는
 # 학습(training) 및 테스트(testing) 데이터셋이 존재하는 위치를 가르켜야 합니다.
 # 그 외의 매개변수는 선택 사항이며, 위 예시에서 기본값을 확인하실 있습니다. 아래와
 # 같은 매개변수도 사용 가능합니다.
 #
 # * ``download``: 참(True)인 경우, 데이터셋 파일을 인터넷에서 다운받고 root 폴더에 저장합니다. 파일이 이미 존재하면 다시 다운받지 않습니다.
 #
-# 이제 YesNo 데이터를 확인해봅시다:
+# 이제 ``yesno`` 데이터를 확인해봅시다:
 
-# YesNo 안에 각각의 데이터 항목은 튜플 형태 (파형, 샘플 속도, 라벨)를 가지며,
+# ``yesno`` 안에 각각의 데이터 항목은 튜플 형태 (파형, 샘플 속도, 라벨)를 가지며,
 # 이때 labels는 0(no)과 1(yes)을 담은 리스트 형태로 되어 있습니다.
 yesno_data = torchaudio.datasets.YESNO('./', download=True)
 
-# 실제 데이터에 접근해서 yesno_data의 형태를 확인합니다. 세 번째 항목을 예시로 살펴봅니다.
+# 실제 데이터에 접근해서 ``yesno_data`` 의 형태를 확인합니다. 세 번째 항목을 예시로 살펴봅니다.
 n = 3
 waveform, sample_rate, labels = yesno_data[n]
 print("Waveform: {}\nSample rate: {}\nLabels: {}".format(waveform, sample_rate, labels))

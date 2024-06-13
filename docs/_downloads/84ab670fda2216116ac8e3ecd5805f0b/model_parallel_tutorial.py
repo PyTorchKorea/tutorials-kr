@@ -3,8 +3,8 @@
 단일 머신을 사용한 모델 병렬화 모범 사례
 ===================================================
 
-**저자** : `Shen Li <https://mrshenli.github.io/>`_
-**번역** : `안상준 <https://github.com/Justin-A>`_
+**Author**: `Shen Li <https://mrshenli.github.io/>`_
+  **번역**: `안상준 <https://github.com/Justin-A>`_
 
 모델 병렬 처리는 분산 학습 기술에 범용적으로 사용되고 있습니다.
 이전 튜토리얼들에서는 여러 GPU를 사용하여 신경망 모델을 학습 시킬 때 어떻게

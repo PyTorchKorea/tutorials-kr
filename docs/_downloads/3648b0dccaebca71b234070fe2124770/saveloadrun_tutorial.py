@@ -62,3 +62,4 @@ model = torch.load('model.pth')
 # 관련 튜토리얼
 # -----------------
 # :doc:`/recipes/recipes/saving_and_loading_a_general_checkpoint`
+# :doc:`/recipes/recipes/module_load_state_dict_tips`

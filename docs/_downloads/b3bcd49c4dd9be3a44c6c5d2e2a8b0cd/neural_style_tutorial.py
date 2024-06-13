@@ -43,8 +43,6 @@ PyTorch를 이용한 뉴럴 변환(Neural Transfer)
 # -  ``torchvision.models`` (미리 학습된 모델 불러오기 및 학습)
 # -  ``copy`` (모델을 복사; 시스템 패키지)
 
-from __future__ import print_function
-
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -54,7 +52,7 @@ from PIL import Image
 import matplotlib.pyplot as plt
 
 import torchvision.transforms as transforms
-import torchvision.models as models
+from torchvision.models import vgg19, VGG19_Weights
 
 import copy
 
@@ -68,6 +66,7 @@ import copy
 # 또한 ``.to(device)`` 메소드는 텐서 또는 모듈을 원하는 장치로 이동하는데 사용됩니다.
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+torch.set_default_device(device)
 
 ######################################################################
 # 이미지 불러오기
@@ -242,7 +241,7 @@ class StyleLoss(nn.Module):
 # 일부 계층은 훈련하는 중 평가와 다른 동작을 하므로, 네트워크를 ``.eval()`` 를 사용해 평가 모드로 설정해야합니다.
 #
 
-cnn = models.vgg19(pretrained=True).features.to(device).eval()
+cnn = vgg19(weights=VGG19_Weights.DEFAULT).features.eval()
 
 
 
@@ -253,8 +252,8 @@ cnn = models.vgg19(pretrained=True).features.to(device).eval()
 # 이미지를 네트워크로 입력하기 전에 정규화하는데 사용합니다.
 #
 
-cnn_normalization_mean = torch.tensor([0.485, 0.456, 0.406]).to(device)
-cnn_normalization_std = torch.tensor([0.229, 0.224, 0.225]).to(device)
+cnn_normalization_mean = torch.tensor([0.485, 0.456, 0.406])
+cnn_normalization_std = torch.tensor([0.229, 0.224, 0.225])
 
 # 입력 이미지를 정규화하는 모듈을 생성하여 쉽게 ``nn.Sequential`` 에 넣을 수 있습니다.
 class Normalization(nn.Module):
@@ -289,7 +288,7 @@ def get_style_model_and_losses(cnn, normalization_mean, normalization_std,
                                content_layers=content_layers_default,
                                style_layers=style_layers_default):
     # 모듈 정규화
-    normalization = Normalization(normalization_mean, normalization_std).to(device)
+    normalization = Normalization(normalization_mean, normalization_std)
 
     # Content / Style 손실이 반복적으로 접근할 수 있도록 하기 위해
     content_losses = []
@@ -345,8 +344,10 @@ def get_style_model_and_losses(cnn, normalization_mean, normalization_std,
 ######################################################################
 # 다음으로 입력 이미지를 선택합니다. Content 이미지 사본이나 백색 잡음을 사용할 수 있습니다.
 #
+# .. code-block:: python
+#
+#    input_img = torch.randn(content_img.data.size())
 
-input_img = content_img.clone()
 # 만약 화이트 노이즈(white noise)을 사용하려면 아래 주석을 제거하세요:
 #
 # ::
@@ -398,6 +399,9 @@ def run_style_transfer(cnn, normalization_mean, normalization_std,
     # 모델의 매개변수를 제외한 입력을 최적화해야 하므로
     # 이에 맞춰서 requires_grad 값을 갱신합니다.
     input_img.requires_grad_(True)
+    # 또한, 모델을 평가(eval) 모드로 전환하여
+    # 드롭아웃(dropout) 및 배치 정규화(batch normalization)와 같은 특정 레이어가 올바르게 동작하도록 합니다.
+    model.eval()
     model.requires_grad_(False)
 
     optimizer = get_input_optimizer(input_img)

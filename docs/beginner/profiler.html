@@ -6,23 +6,19 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="ko" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
-<meta property="og:title" content="PyTorch 모듈 프로파일링 하기" />
-  
+  <meta property="og:title" content="PyTorch 모듈 프로파일링하기" />
 <meta property="og:type" content="article" />
-  
 <meta property="og:url" content="https://tutorials.pytorch.kr/beginner/profiler.html" />
-  
-<meta property="og:description" content="Author: Suraj Subramanian 번역: 이재복 PyTorch는 코드 내의 다양한 Pytorch 연산에 대한 시간과 메모리 비용을 파악하는 데 유용한 프로파일러(profiler) API를 포함하고 있습니다. 프로파일러는 코드에 쉽게 통합될 수 있으며, 프로파일링 결과는 표로 출력되거나 JSON 형식의 추적(trace) 파일로 반환될 수 있습니다. 프로파일러 API 사용법에 대해 빠르게 살펴보고 싶다면 이 레시피 문서 를 확인하세요. 프로파일러를 이용하여 성능 디버깅하기: 프로파일러는 모델에서 성능의 병목을 파악할 ..." />
-  
+<meta property="og:site_name" content="PyTorch Tutorials KR" />
+<meta property="og:description" content="Author: Suraj Subramanian, 번역: 이재복,. PyTorch는 코드 내의 다양한 Pytorch 연산에 대한 시간과 메모리 비용을 파악하는데 유용한 프로파일러(profiler) API를 포함하고 있습니다. 프로파일러는 코드에 쉽게 통합될 수 있으며, 프로파일링 결과는 표로 출력되거나 JSON 형식의 추적(trace) 파일로 반환될 수 있습니다. 프로파일러 API 사용법에 대해 빠르게 알아보고 싶다면 이 레시피 문서 를 살펴보세요. 프로파일러를 이용하여 성능 디버깅하기: 프로파일러는 모델에서 성능의 병목을 파악..." />
 <meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
-  
-<meta property="og:image:alt" content="PyTorch 모듈 프로파일링 하기" />
-  
+<meta property="og:image:alt" content="PyTorch Tutorials KR" />
+<meta name="description" content="Author: Suraj Subramanian, 번역: 이재복,. PyTorch는 코드 내의 다양한 Pytorch 연산에 대한 시간과 메모리 비용을 파악하는데 유용한 프로파일러(profiler) API를 포함하고 있습니다. 프로파일러는 코드에 쉽게 통합될 수 있으며, 프로파일링 결과는 표로 출력되거나 JSON 형식의 추적(trace) 파일로 반환될 수 있습니다. 프로파일러 API 사용법에 대해 빠르게 알아보고 싶다면 이 레시피 문서 를 살펴보세요. 프로파일러를 이용하여 성능 디버깅하기: 프로파일러는 모델에서 성능의 병목을 파악..." />
 <meta property="og:ignore_canonical" content="true" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>PyTorch 모듈 프로파일링 하기 &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
+  <title>PyTorch 모듈 프로파일링하기 &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
   
 
   
@@ -45,7 +41,7 @@
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css" type="text/css" />
   <link rel="stylesheet" href="../_static/katex-math.css" type="text/css" />
   <link rel="stylesheet" href="../_static/sg_gallery.css" type="text/css" />
   <link rel="stylesheet" href="../_static/sg_gallery-binder.css" type="text/css" />
@@ -54,10 +50,11 @@
   <link rel="stylesheet" href="../_static/sphinx-design.5ea377869091fd0449014c60fc090103.min.css" type="text/css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/custom2.css" type="text/css" />
     <link rel="index" title="색인" href="../genindex.html" />
     <link rel="search" title="검색" href="../search.html" />
-    <link rel="next" title="텐서보드를 이용한 파이토치 프로파일러" href="../intermediate/tensorboard_profiler_tutorial.html" />
-    <link rel="prev" title="Extending dispatcher for a new backend in C++" href="../advanced/extend_dispatcher.html" /> 
+    <link rel="next" title="Introduction to Holistic Trace Analysis" href="hta_intro_tutorial.html" />
+    <link rel="prev" title="Raspberry Pi 4 에서 실시간 추론(Inference) (30fps!)" href="../intermediate/realtime_rpi.html" /> 
 
   
   <script src="../_static/js/modernizr.min.js"></script>
@@ -135,7 +132,7 @@
               
               
                 <div class="version">
-                  2.0.1
+                  2.3.1+cu121
                 </div>
               
             
@@ -200,11 +197,12 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">이미지/비디오</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/torchvision_tutorial.html">TorchVision 객체 검출 미세조정(Finetuning) 튜토리얼</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/torchvision_tutorial.html">TorchVision Object Detection Finetuning Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="transfer_learning_tutorial.html">컴퓨터 비전(Vision)을 위한 전이학습(Transfer Learning)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="fgsm_tutorial.html">적대적 예제 생성(Adversarial Example Generation)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dcgan_faces_tutorial.html">DCGAN 튜토리얼</a></li>
-<li class="toctree-l1"><a class="reference internal" href="vt_tutorial.html">배포를 위한 비전 트랜스포머(Vision Transformer) 모델 최적화하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vt_tutorial.html">배포를 위해 비전 트랜스포머(Vision Transformer) 모델 최적화하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/tiatoolbox_tutorial.html">Whole Slide Image Classification Using PyTorch and TIAToolbox</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">오디오</span></p>
 <ul>
@@ -220,27 +218,39 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">텍스트</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="transformer_tutorial.html"><code class="docutils literal notranslate"><span class="pre">nn.Transformer</span></code> 와 torchtext로 시퀀스-투-시퀀스(Sequence-to-Sequence) 모델링하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bettertransformer_tutorial.html">Fast Transformer Inference with Better Transformer</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/char_rnn_classification_tutorial.html">기초부터 시작하는 NLP: 문자-단위 RNN으로 이름 분류하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/char_rnn_generation_tutorial.html">기초부터 시작하는 NLP:  문자-단위 RNN으로 이름 생성하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/seq2seq_translation_tutorial.html">기초부터 시작하는 NLP: Sequence to Sequence 네트워크와 Attention을 이용한 번역</a></li>
 <li class="toctree-l1"><a class="reference internal" href="text_sentiment_ngrams_tutorial.html">torchtext 라이브러리로 텍스트 분류하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="translation_transformer.html"><code class="docutils literal notranslate"><span class="pre">nn.Transformer</span></code> 와 torchtext로 언어 번역하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torchtext_custom_dataset_tutorial.html">Preprocess custom text dataset using Torchtext</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">백엔드</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="onnx/intro_onnx.html">Introduction to ONNX</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">강화학습</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/reinforcement_q_learning.html">강화 학습 (DQN) 튜토리얼</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/reinforcement_ppo.html">Reinforcement Learning (PPO) with TorchRL Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/mario_rl_tutorial.html">마리오 게임 RL 에이전트로 학습하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/pendulum.html">Pendulum: Writing your environment and transforms with TorchRL</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">PyTorch 모델을 프로덕션 환경에 배포하기</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="onnx/intro_onnx.html">Introduction to ONNX</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/flask_rest_api_tutorial.html">Flask를 사용하여 Python에서 PyTorch를 REST API로 배포하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Intro_to_TorchScript_tutorial.html">TorchScript 소개</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_export.html">C++에서 TorchScript 모델 로딩하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/super_resolution_with_onnxruntime.html">(선택) PyTorch 모델을 ONNX으로 변환하고 ONNX 런타임에서 실행하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/realtime_rpi.html">Raspberry Pi 4 에서 실시간 추론(Inference) (30fps!)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">PyTorch 프로파일링</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">PyTorch 모듈 프로파일링하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hta_intro_tutorial.html">Introduction to Holistic Trace Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hta_trace_diff_tutorial.html">Trace Diff using Holistic Trace Analysis</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Code Transforms with FX</span></p>
 <ul>
@@ -267,13 +277,14 @@
 <li class="toctree-l1"><a class="reference internal" href="../advanced/torch_script_custom_classes.html">커스텀 C++ 클래스로 TorchScript 확장하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/dispatcher.html">Registering a Dispatched Operator in C++</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/extend_dispatcher.html">Extending dispatcher for a new backend in C++</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/privateuseone.html">Facilitating New Backend Integration by PrivateUse1</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">모델 최적화</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">PyTorch 모듈 프로파일링 하기</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">PyTorch 모듈 프로파일링하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/tensorboard_profiler_tutorial.html">텐서보드를 이용한 파이토치 프로파일러</a></li>
-<li class="toctree-l1"><a class="reference internal" href="hyperparameter_tuning_tutorial.html">Ray Tune을 이용한 하이퍼파라미터 튜닝</a></li>
-<li class="toctree-l1"><a class="reference internal" href="vt_tutorial.html">배포를 위한 비전 트랜스포머(Vision Transformer) 모델 최적화하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hyperparameter_tuning_tutorial.html">Ray Tune을 사용한 하이퍼파라미터 튜닝</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vt_tutorial.html">배포를 위해 비전 트랜스포머(Vision Transformer) 모델 최적화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/parametrizations.html">Parametrizations Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/pruning_tutorial.html">가지치기 기법(Pruning) 튜토리얼</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/dynamic_quantization_tutorial.html">(베타) LSTM 기반 단어 단위 언어 모델의 동적 양자화</a></li>
@@ -284,10 +295,13 @@
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/torchserve_with_ipex_2.html">Grokking PyTorch Intel CPU performance from first principles (Part 2)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/nvfuser_intro_tutorial.html">Getting Started - Accelerate Your Scripts with nvFuser</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/ax_multiobjective_nas_tutorial.html">Multi-Objective NAS with Ax</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/torch_compile_tutorial.html">torch.compile Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/torch_compile_tutorial.html">Introduction to <code class="docutils literal notranslate"><span class="pre">torch.compile</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/inductor_debug_cpu.html">Inductor CPU backend debugging and profiling</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/scaled_dot_product_attention_tutorial.html">(Beta) Scaled Dot Product Attention (SDPA)로 고성능 트랜스포머(Transformers) 구현하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/scaled_dot_product_attention_tutorial.html#torch-compile-sdpa"><code class="docutils literal notranslate"><span class="pre">torch.compile</span></code> 과 함께 SDPA 사용하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/scaled_dot_product_attention_tutorial.html#id6">결론</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/scaled_dot_product_attention_tutorial.html#sdpa-atteition-bias">SDPA를 <code class="docutils literal notranslate"><span class="pre">atteition.bias</span></code> 하위 클래스와 사용하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/scaled_dot_product_attention_tutorial.html#id8">결론</a></li>
+<li class="toctree-l1"><a class="reference internal" href="knowledge_distillation_tutorial.html">Knowledge Distillation Tutorial</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul>
@@ -299,20 +313,24 @@
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/dist_tuto.html">PyTorch로 분산 어플리케이션 개발하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/FSDP_tutorial.html">Getting Started with Fully Sharded Data Parallel(FSDP)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/FSDP_adavnced_tutorial.html">Advanced Model Training with Fully Sharded Data Parallel (FSDP)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/process_group_cpp_extension_tutorial.html">Cpp 확장을 사용하여 프로세스 그룹 백엔드 사용자 정의</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/TP_tutorial.html">Large Scale Transformer model training with Tensor Parallel (TP)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/process_group_cpp_extension_tutorial.html">Cpp 확장을 사용한 프로세스 그룹 백엔드 사용자 정의</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/rpc_tutorial.html">Getting Started with Distributed RPC Framework</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/rpc_param_server_tutorial.html">Implementing a Parameter Server Using Distributed RPC Framework</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/dist_pipeline_parallel_tutorial.html">Distributed Pipeline Parallelism Using RPC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/rpc_async_execution.html">Implementing Batch RPC Processing Using Asynchronous Executions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/rpc_ddp_tutorial.html">분산 데이터 병렬(DDP)과 분산 RPC 프레임워크 결합</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/pipeline_tutorial.html">파이프라인 병렬화로 트랜스포머 모델 학습시키기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/ddp_pipeline.html">분산 데이터 병렬 처리와 병렬 처리 파이프라인을 사용한 트랜스포머 모델 학습</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/generic_join.html">Distributed Training with Uneven Inputs Using the Join Context Manager</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">모바일</span></p>
+<p class="caption" role="heading"><span class="caption-text">Edge with ExecuTorch</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="deeplabv3_on_ios.html">iOS에서의 이미지 분할 DeepLapV3</a></li>
-<li class="toctree-l1"><a class="reference internal" href="deeplabv3_on_android.html">안드로이드에서의 이미지 분할 DeepLapV3</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/executorch/stable/tutorials/export-to-executorch-tutorial.html">Exporting to ExecuTorch Tutorial</a></li>
+<li class="toctree-l1"><a class="reference external" href=" https://pytorch.org/executorch/stable/running-a-model-cpp-tutorial.html">Running an ExecuTorch Model in C++ Tutorial</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/executorch/stable/tutorials/sdk-integration-tutorial.html">Using the ExecuTorch SDK to Profile a Model</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/executorch/stable/demo-apps-ios.html">Building an ExecuTorch iOS Demo App</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/executorch/stable/demo-apps-android.html">Building an ExecuTorch Android Demo App</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/executorch/stable/examples-end-to-end-to-lower-model-to-delegate.html">Lowering a Model as a Delegate</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">추천 시스템</span></p>
 <ul>
@@ -362,7 +380,7 @@
       </li>
 
         
-      <li>PyTorch 모듈 프로파일링 하기</li>
+      <li>PyTorch 모듈 프로파일링하기</li>
     
     
       <li class="pytorch-breadcrumbs-aside">
@@ -423,10 +441,12 @@
 to download the full example code</p>
 </div>
 <div class="sphx-glr-example-title section" id="pytorch">
-<span id="sphx-glr-beginner-profiler-py"></span><h1>PyTorch 모듈 프로파일링 하기<a class="headerlink" href="#pytorch" title="이 제목에 대한 퍼머링크">¶</a></h1>
-<p><strong>Author:</strong> <a class="reference external" href="https://github.com/suraj813">Suraj Subramanian</a></p>
-<p><strong>번역:</strong> <a class="reference external" href="http://github.com/zzaebok">이재복</a></p>
-<p>PyTorch는 코드 내의 다양한 Pytorch 연산에 대한 시간과 메모리 비용을 파악하는 데 유용한 프로파일러(profiler) API를 포함하고 있습니다.
+<span id="sphx-glr-beginner-profiler-py"></span><h1>PyTorch 모듈 프로파일링하기<a class="headerlink" href="#pytorch" title="이 제목에 대한 퍼머링크">¶</a></h1>
+<dl class="simple">
+<dt><strong>Author:</strong> <a class="reference external" href="https://github.com/suraj813">Suraj Subramanian</a></dt><dd><p><strong>번역:</strong> <a class="reference external" href="http://github.com/zzaebok">이재복</a></p>
+</dd>
+</dl>
+<p>PyTorch는 코드 내의 다양한 Pytorch 연산에 대한 시간과 메모리 비용을 파악하는데 유용한 프로파일러(profiler) API를 포함하고 있습니다.
 프로파일러는 코드에 쉽게 통합될 수 있으며, 프로파일링 결과는 표로 출력되거나 JSON 형식의 추적(trace) 파일로 반환될 수 있습니다.</p>
 <div class="admonition note">
 <p class="admonition-title">참고</p>
@@ -440,7 +460,9 @@ to download the full example code</p>
 <p>Pytorch 1.8은 미래의 릴리즈에서 기존의 프로파일러 API를 대체할 새로운 API를 소개하고 있습니다.
 새로운 API를 <a class="reference external" href="https://pytorch.org/docs/master/profiler.html">이 페이지</a> 에서 확인하세요.</p>
 </div>
-<p>프로파일러 API 사용법에 대해 빠르게 살펴보고 싶다면 <a class="reference external" href="https://tutorials.pytorch.kr/recipes/recipes/profiler_recipe.html">이 레시피 문서</a> 를 확인하세요.</p>
+<p>프로파일러 API 사용법에 대해 빠르게 알아보고 싶다면
+<a class="reference external" href="https://tutorials.pytorch.kr/recipes/recipes/profiler_recipe.html">이 레시피 문서</a> 를
+살펴보세요.</p>
 <hr class="docutils" />
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -735,10 +757,10 @@ CUDA 에서 CPU 로 행렬을 복사하는 것이 꽤 비용이 큰 연산인 �
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../intermediate/tensorboard_profiler_tutorial.html" class="btn btn-neutral float-right" title="텐서보드를 이용한 파이토치 프로파일러" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
+        <a href="hta_intro_tutorial.html" class="btn btn-neutral float-right" title="Introduction to Holistic Trace Analysis" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
       
       
-        <a href="../advanced/extend_dispatcher.html" class="btn btn-neutral" title="Extending dispatcher for a new backend in C++" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
+        <a href="../intermediate/realtime_rpi.html" class="btn btn-neutral" title="Raspberry Pi 4 에서 실시간 추론(Inference) (30fps!)" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
       
     </div>
   
@@ -767,7 +789,7 @@ CUDA 에서 CPU 로 행렬을 복사하는 것이 꽤 비용이 큰 연산인 �
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018-2023, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorch Korea User Group).
+        &copy; Copyright 2018-2024, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorch Korea User Group).
 
     </p>
   </div>
@@ -793,7 +815,7 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
           <div class="pytorch-right-menu" id="pytorch-right-menu">
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
-<li><a class="reference internal" href="#">PyTorch 모듈 프로파일링 하기</a><ul>
+<li><a class="reference internal" href="#">PyTorch 모듈 프로파일링하기</a><ul>
 <li><a class="reference internal" href="#id2">프로파일러를 이용하여 성능 디버깅하기</a></li>
 <li><a class="reference internal" href="#forward-pass">순전파 단계(forward pass) 프로파일링하기</a></li>
 <li><a class="reference internal" href="#id3">프로파일러의 결과 출력하기</a></li>
@@ -825,8 +847,8 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
          <script src="../_static/clipboard.min.js"></script>
          <script src="../_static/copybutton.js"></script>
          <script src="../_static/translations.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
+         <script src="../_static/katex.min.js"></script>
+         <script src="../_static/auto-render.min.js"></script>
          <script src="../_static/katex_autorenderer.js"></script>
          <script src="../_static/design-tabs.js"></script>
      
@@ -844,8 +866,10 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
   </script>
  
 <script>
-//add microsoft link
+// Helper function to make it easier to call dataLayer.push()
+function gtag(){window.dataLayer.push(arguments);}
 
+//add microsoft link
 if(window.location.href.indexOf("/beginner/basics/")!= -1)
 {
   var url="https://docs.microsoft.com/learn/paths/pytorch-fundamentals/?wt.mc_id=aiml-7486-cxa";
@@ -910,7 +934,8 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
     gtag('event', 'click', {
       'event_category': 'Tutorial Rating',
       'event_label': $("h1").first().text(),
-      'value': $(this).attr("data-count")
+      'value': $(this).attr("data-count"),
+      'customEvent:Rating': $(this).attr("data-count") // send to GA custom dimension customEvent:Rating.
     });
    });
 
@@ -921,7 +946,7 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
 </script>
 
 <script type="text/javascript">
-  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', '모바일', 'Introduction to PyTorch on YouTube', '추천 시스템', 'Multimodality'];
+  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', 'Introduction to PyTorch on YouTube', '이미지/비디오', '오디오', '텍스트', '백엔드', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'PyTorch 프로파일링', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Edge with ExecuTorch', '추천 시스템', 'Multimodality'];
 </script>
 
 

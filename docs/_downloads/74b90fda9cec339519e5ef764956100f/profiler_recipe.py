@@ -14,7 +14,7 @@ PyTorch는 사용자가 모델 내의 연산 비용이 큰(expensive) 연산자�
 ``torch`` 와 ``torchvision`` 을 설치하기 위해서 아래의 커맨드를 입력합니다:
 
 
-::
+.. code-block:: sh
 
    pip install torch torchvision
 
@@ -31,6 +31,8 @@ PyTorch는 사용자가 모델 내의 연산 비용이 큰(expensive) 연산자�
 # 3. 프로파일러를 사용하여 실행시간 분석하기
 # 4. 프로파일러를 사용하여 메모리 소비 분석하기
 # 5. 추적기능 사용하기
+# 6. Examining stack traces
+# 7. Using profiler to analyze long-running jobs
 #
 # 1. 필요한 라이브러리들 불러오기
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -101,7 +103,9 @@ print(prof.key_averages().table(sort_by="cpu_time_total", row_limit=10))
 
 ######################################################################
 # (몇몇 열을 제외하고) 출력값이 이렇게 보일 것입니다:
-
+#
+# .. code-block:: sh
+#
 # ---------------------------------  ------------  ------------  ------------  ------------
 #                              Name      Self CPU     CPU total  CPU time avg    # of Calls
 # ---------------------------------  ------------  ------------  ------------  ------------
@@ -117,9 +121,10 @@ print(prof.key_averages().table(sort_by="cpu_time_total", row_limit=10))
 #                      aten::select       1.668ms       2.292ms       8.988us           255
 # ---------------------------------  ------------  ------------  ------------  ------------
 # Self CPU time total: 57.549ms
+#
 
 ######################################################################
-# 예상했던 대로, 대부분의 시간이 합성곱(convolution) 연산(특히 MKL-DNN을 지원하도록
+# 예상했던 대로, 대부분의 시간이 합성곱(convolution) 연산(특히 ``MKL-DNN`` 을 지원하도록
 # 컴파일된 PyTorch의 경우에는 ``mkldnn_convolution`` )에서 소요되는 것을 확인할 수 있습니다.
 # (결과 열들 중) Self CPU time과 CPU time의 차이에 유의해야 합니다 -
 # 연산자는 다른 연산자들을 호출할 수 있으며, Self CPU time에는 하위(child) 연산자 호출에서 발생한
@@ -133,22 +138,27 @@ print(prof.key_averages().table(sort_by="cpu_time_total", row_limit=10))
 
 print(prof.key_averages(group_by_input_shape=True).table(sort_by="cpu_time_total", row_limit=10))
 
-# (몇몇 열은 제외하였습니다)
-# ---------------------------------  ------------  -------------------------------------------
-#                              Name     CPU total                                 Input Shapes
-# ---------------------------------  ------------  -------------------------------------------
-#                   model_inference      57.503ms                                           []
-#                      aten::conv2d       8.008ms      [5,64,56,56], [64,64,3,3], [], ..., []]
-#                 aten::convolution       7.956ms     [[5,64,56,56], [64,64,3,3], [], ..., []]
-#                aten::_convolution       7.909ms     [[5,64,56,56], [64,64,3,3], [], ..., []]
-#          aten::mkldnn_convolution       7.834ms     [[5,64,56,56], [64,64,3,3], [], ..., []]
-#                      aten::conv2d       6.332ms    [[5,512,7,7], [512,512,3,3], [], ..., []]
-#                 aten::convolution       6.303ms    [[5,512,7,7], [512,512,3,3], [], ..., []]
-#                aten::_convolution       6.273ms    [[5,512,7,7], [512,512,3,3], [], ..., []]
-#          aten::mkldnn_convolution       6.233ms    [[5,512,7,7], [512,512,3,3], [], ..., []]
-#                      aten::conv2d       4.751ms  [[5,256,14,14], [256,256,3,3], [], ..., []]
-# ---------------------------------  ------------  -------------------------------------------
-# Self CPU time total: 57.549ms
+########################################################################################
+# (몇몇 열을 제외하고) 출력값이 이렇게 보일 것입니다:
+#
+# .. code-block:: sh
+#
+#    ---------------------------------  ------------  -------------------------------------------
+#                                 Name     CPU total                                 Input Shapes
+#    ---------------------------------  ------------  -------------------------------------------
+#                      model_inference      57.503ms                                           []
+#                         aten::conv2d       8.008ms      [5,64,56,56], [64,64,3,3], [], ..., []]
+#                    aten::convolution       7.956ms     [[5,64,56,56], [64,64,3,3], [], ..., []]
+#                   aten::_convolution       7.909ms     [[5,64,56,56], [64,64,3,3], [], ..., []]
+#             aten::mkldnn_convolution       7.834ms     [[5,64,56,56], [64,64,3,3], [], ..., []]
+#                         aten::conv2d       6.332ms    [[5,512,7,7], [512,512,3,3], [], ..., []]
+#                    aten::convolution       6.303ms    [[5,512,7,7], [512,512,3,3], [], ..., []]
+#                   aten::_convolution       6.273ms    [[5,512,7,7], [512,512,3,3], [], ..., []]
+#             aten::mkldnn_convolution       6.233ms    [[5,512,7,7], [512,512,3,3], [], ..., []]
+#                         aten::conv2d       4.751ms  [[5,256,14,14], [256,256,3,3], [], ..., []]
+#    ---------------------------------  ------------  -------------------------------------------
+#    Self CPU time total: 57.549ms
+#
 
 ######################################################################
 # Note the occurence of ``aten::convolution`` twice with different input shapes.
@@ -171,24 +181,26 @@ print(prof.key_averages().table(sort_by="cuda_time_total", row_limit=10))
 
 ######################################################################
 # The resulting table output:
-
-# (omitting some columns)
-# -------------------------------------------------------  ------------  ------------
-#                                                    Name     Self CUDA    CUDA total
-# -------------------------------------------------------  ------------  ------------
-#                                         model_inference       0.000us      11.666ms
-#                                            aten::conv2d       0.000us      10.484ms
-#                                       aten::convolution       0.000us      10.484ms
-#                                      aten::_convolution       0.000us      10.484ms
-#                              aten::_convolution_nogroup       0.000us      10.484ms
-#                                       aten::thnn_conv2d       0.000us      10.484ms
-#                               aten::thnn_conv2d_forward      10.484ms      10.484ms
-# void at::native::im2col_kernel<float>(long, float co...       3.844ms       3.844ms
-#                                       sgemm_32x32x32_NN       3.206ms       3.206ms
-#                                   sgemm_32x32x32_NN_vec       3.093ms       3.093ms
-# -------------------------------------------------------  ------------  ------------
-# Self CPU time total: 23.015ms
-# Self CUDA time total: 11.666ms
+#
+# .. code-block:: sh
+#
+#    -------------------------------------------------------  ------------  ------------
+#                                                       Name     Self CUDA    CUDA total
+#    -------------------------------------------------------  ------------  ------------
+#                                            model_inference       0.000us      11.666ms
+#                                               aten::conv2d       0.000us      10.484ms
+#                                          aten::convolution       0.000us      10.484ms
+#                                         aten::_convolution       0.000us      10.484ms
+#                                 aten::_convolution_nogroup       0.000us      10.484ms
+#                                          aten::thnn_conv2d       0.000us      10.484ms
+#                                  aten::thnn_conv2d_forward      10.484ms      10.484ms
+#    void at::native::im2col_kernel<float>(long, float co...       3.844ms       3.844ms
+#                                          sgemm_32x32x32_NN       3.206ms       3.206ms
+#                                      sgemm_32x32x32_NN_vec       3.093ms       3.093ms
+#    -------------------------------------------------------  ------------  ------------
+#    Self CPU time total: 23.015ms
+#    Self CUDA time total: 11.666ms
+#
 
 ######################################################################
 # Note the occurence of on-device kernels in the output (e.g. ``sgemm_32x32x32_NN``).
@@ -214,7 +226,11 @@ with profile(activities=[ProfilerActivity.CPU],
 
 print(prof.key_averages().table(sort_by="self_cpu_memory_usage", row_limit=10))
 
+#############################################################################
 # (몇몇 열은 제외하였습니다)
+#
+# .. code-block:: sh
+#
 # ---------------------------------  ------------  ------------  ------------
 #                              Name       CPU Mem  Self CPU Mem    # of Calls
 # ---------------------------------  ------------  ------------  ------------
@@ -230,10 +246,15 @@ print(prof.key_averages().table(sort_by="self_cpu_memory_usage", row_limit=10))
 #                          aten::eq          60 b          30 b             2
 # ---------------------------------  ------------  ------------  ------------
 # Self CPU time total: 53.064ms
+#
 
 print(prof.key_averages().table(sort_by="cpu_memory_usage", row_limit=10))
 
-# (몇몇 열은 제외하였습니다)
+#############################################################################
+# (몇몇 열을 제외하고) 출력값이 이렇게 보일 것입니다:
+#
+# .. code-block:: sh
+#
 # ---------------------------------  ------------  ------------  ------------
 #                              Name       CPU Mem  Self CPU Mem    # of Calls
 # ---------------------------------  ------------  ------------  ------------
@@ -254,7 +275,7 @@ print(prof.key_averages().table(sort_by="cpu_memory_usage", row_limit=10))
 # 5. 추적기능 사용하기
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-# 프로파일링 결과는 .json 형태의 추적 파일(trace file)로 출력할 수 있습니다:
+# 프로파일링 결과는 ``.json`` 형태의 추적 파일(trace file)로 출력할 수 있습니다:
 
 model = models.resnet18().cuda()
 inputs = torch.randn(5, 3, 224, 224).cuda()
@@ -286,57 +307,36 @@ with profile(
 # Print aggregated stats
 print(prof.key_averages(group_by_stack_n=5).table(sort_by="self_cuda_time_total", row_limit=2))
 
-# (omitting some columns)
-# -------------------------  -----------------------------------------------------------
-#                      Name  Source Location
-# -------------------------  -----------------------------------------------------------
-# aten::thnn_conv2d_forward  .../torch/nn/modules/conv.py(439): _conv_forward
-#                            .../torch/nn/modules/conv.py(443): forward
-#                            .../torch/nn/modules/module.py(1051): _call_impl
-#                            .../site-packages/torchvision/models/resnet.py(63): forward
-#                            .../torch/nn/modules/module.py(1051): _call_impl
+#################################################################################
+# The output might look like this (omitting some columns):
 #
-# aten::thnn_conv2d_forward  .../torch/nn/modules/conv.py(439): _conv_forward
-#                            .../torch/nn/modules/conv.py(443): forward
-#                            .../torch/nn/modules/module.py(1051): _call_impl
-#                            .../site-packages/torchvision/models/resnet.py(59): forward
-#                            .../torch/nn/modules/module.py(1051): _call_impl
+# .. code-block:: sh
 #
-# -------------------------  -----------------------------------------------------------
-# Self CPU time total: 34.016ms
-# Self CUDA time total: 11.659ms
+#    -------------------------  -----------------------------------------------------------
+#                         Name  Source Location
+#    -------------------------  -----------------------------------------------------------
+#    aten::thnn_conv2d_forward  .../torch/nn/modules/conv.py(439): _conv_forward
+#                               .../torch/nn/modules/conv.py(443): forward
+#                               .../torch/nn/modules/module.py(1051): _call_impl
+#                               .../site-packages/torchvision/models/resnet.py(63): forward
+#                               .../torch/nn/modules/module.py(1051): _call_impl
+#    aten::thnn_conv2d_forward  .../torch/nn/modules/conv.py(439): _conv_forward
+#                               .../torch/nn/modules/conv.py(443): forward
+#                               .../torch/nn/modules/module.py(1051): _call_impl
+#                               .../site-packages/torchvision/models/resnet.py(59): forward
+#                               .../torch/nn/modules/module.py(1051): _call_impl
+#    -------------------------  -----------------------------------------------------------
+#    Self CPU time total: 34.016ms
+#    Self CUDA time total: 11.659ms
+#
 
 ######################################################################
-# Note the two convolutions and the two callsites in ``torchvision/models/resnet.py`` script.
+# Note the two convolutions and the two call sites in ``torchvision/models/resnet.py`` script.
 #
 # (Warning: stack tracing adds an extra profiling overhead.)
 
-
 ######################################################################
-# 7. Visualizing data as a flamegraph
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#
-# Execution time (``self_cpu_time_total`` and ``self_cuda_time_total`` metrics) and stack traces
-# can also be visualized as a flame graph. To do this, first export the raw data using ``export_stacks`` (requires ``with_stack=True``):
-
-prof.export_stacks("/tmp/profiler_stacks.txt", "self_cuda_time_total")
-
-######################################################################
-# We recommend using e.g. `Flamegraph tool <https://github.com/brendangregg/FlameGraph>`_ to generate an
-# interactive SVG:
-
-# git clone https://github.com/brendangregg/FlameGraph
-# cd FlameGraph
-# ./flamegraph.pl --title "CUDA time" --countname "us." /tmp/profiler_stacks.txt > perf_viz.svg
-
-######################################################################
-#
-# .. image:: ../../_static/img/perf_viz.png
-#    :scale: 25 %
-
-
-######################################################################
-# 8. Using profiler to analyze long-running jobs
+# 7. Using profiler to analyze long-running jobs
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 # PyTorch profiler offers an additional API to handle long-running jobs

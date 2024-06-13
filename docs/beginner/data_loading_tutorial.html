@@ -6,20 +6,16 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="ko" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
-<meta property="og:title" content="사용자 정의 Dataset, Dataloader, Transforms 작성하기" />
-  
+  <meta property="og:title" content="사용자 정의 Dataset, Dataloader, Transforms 작성하기" />
 <meta property="og:type" content="article" />
-  
 <meta property="og:url" content="https://tutorials.pytorch.kr/beginner/data_loading_tutorial.html" />
-  
-<meta property="og:description" content="저자: Sasank Chilamkurthy < https://chsasank.github.io> 번역: 정윤성 < https://github.com/Yunseong-Jeong> 머신러닝 문제를 푸는 과정에서 데이터를 준비하는데 많은 노력이 필요합니다. PyTorch는 데이터를 불러오는 과정을 쉽게해주고, 또 잘 사용한다면 코드의 가독성도 보다 높여줄 수 있는 도구들을 제공합니다. 이 튜토리얼에서 일반적이지 않은 데이터셋으로부터 데이터를 읽어오고 전처리하고 증가하는 방법을 알아보겠습니다. 이번 튜토리얼을 진행하기 위해 아래 패키..." />
-  
+<meta property="og:site_name" content="PyTorch Tutorials KR" />
+<meta property="og:description" content="저자: Sasank Chilamkurthy 번역: 정윤성, 박정환 머신러닝 문제를 푸는 과정에서 데이터를 준비하는데 많은 노력이 필요합니다. PyTorch는 데이터를 불러오는 과정을 쉽게해주고, 또 잘 사용한다면 코드의 가독성도 보다 높여줄 수 있는 도구들을 제공합니다. 이 튜토리얼에서 일반적이지 않은 데이터셋으로부터 데이터를 읽어오고 전처리하고 증가하는 방법을 알아보겠습니다. 이번 튜토리얼을 진행하기 위해 아래 패키지들을 설치해주세요. scikit-image: 이미지 I/O 와 변형을 위해 필요합니다., pandas: CSV..." />
 <meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
-  
-<meta property="og:image:alt" content="사용자 정의 Dataset, Dataloader, Transforms 작성하기" />
-  
+<meta property="og:image:alt" content="PyTorch Tutorials KR" />
+<meta name="description" content="저자: Sasank Chilamkurthy 번역: 정윤성, 박정환 머신러닝 문제를 푸는 과정에서 데이터를 준비하는데 많은 노력이 필요합니다. PyTorch는 데이터를 불러오는 과정을 쉽게해주고, 또 잘 사용한다면 코드의 가독성도 보다 높여줄 수 있는 도구들을 제공합니다. 이 튜토리얼에서 일반적이지 않은 데이터셋으로부터 데이터를 읽어오고 전처리하고 증가하는 방법을 알아보겠습니다. 이번 튜토리얼을 진행하기 위해 아래 패키지들을 설치해주세요. scikit-image: 이미지 I/O 와 변형을 위해 필요합니다., pandas: CSV..." />
 <meta property="og:ignore_canonical" content="true" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>사용자 정의 Dataset, Dataloader, Transforms 작성하기 &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
@@ -45,7 +41,7 @@
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css" type="text/css" />
   <link rel="stylesheet" href="../_static/katex-math.css" type="text/css" />
   <link rel="stylesheet" href="../_static/sg_gallery.css" type="text/css" />
   <link rel="stylesheet" href="../_static/sg_gallery-binder.css" type="text/css" />
@@ -54,6 +50,7 @@
   <link rel="stylesheet" href="../_static/sphinx-design.5ea377869091fd0449014c60fc090103.min.css" type="text/css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/custom2.css" type="text/css" />
     <link rel="index" title="색인" href="../genindex.html" />
     <link rel="search" title="검색" href="../search.html" /> 
 
@@ -133,7 +130,7 @@
               
               
                 <div class="version">
-                  2.0.1
+                  2.3.1+cu121
                 </div>
               
             
@@ -198,11 +195,12 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">이미지/비디오</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/torchvision_tutorial.html">TorchVision 객체 검출 미세조정(Finetuning) 튜토리얼</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/torchvision_tutorial.html">TorchVision Object Detection Finetuning Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="transfer_learning_tutorial.html">컴퓨터 비전(Vision)을 위한 전이학습(Transfer Learning)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="fgsm_tutorial.html">적대적 예제 생성(Adversarial Example Generation)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dcgan_faces_tutorial.html">DCGAN 튜토리얼</a></li>
-<li class="toctree-l1"><a class="reference internal" href="vt_tutorial.html">배포를 위한 비전 트랜스포머(Vision Transformer) 모델 최적화하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vt_tutorial.html">배포를 위해 비전 트랜스포머(Vision Transformer) 모델 최적화하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/tiatoolbox_tutorial.html">Whole Slide Image Classification Using PyTorch and TIAToolbox</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">오디오</span></p>
 <ul>
@@ -218,27 +216,39 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">텍스트</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="transformer_tutorial.html"><code class="docutils literal notranslate"><span class="pre">nn.Transformer</span></code> 와 torchtext로 시퀀스-투-시퀀스(Sequence-to-Sequence) 모델링하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bettertransformer_tutorial.html">Fast Transformer Inference with Better Transformer</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/char_rnn_classification_tutorial.html">기초부터 시작하는 NLP: 문자-단위 RNN으로 이름 분류하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/char_rnn_generation_tutorial.html">기초부터 시작하는 NLP:  문자-단위 RNN으로 이름 생성하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/seq2seq_translation_tutorial.html">기초부터 시작하는 NLP: Sequence to Sequence 네트워크와 Attention을 이용한 번역</a></li>
 <li class="toctree-l1"><a class="reference internal" href="text_sentiment_ngrams_tutorial.html">torchtext 라이브러리로 텍스트 분류하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="translation_transformer.html"><code class="docutils literal notranslate"><span class="pre">nn.Transformer</span></code> 와 torchtext로 언어 번역하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torchtext_custom_dataset_tutorial.html">Preprocess custom text dataset using Torchtext</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">백엔드</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="onnx/intro_onnx.html">Introduction to ONNX</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">강화학습</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/reinforcement_q_learning.html">강화 학습 (DQN) 튜토리얼</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/reinforcement_ppo.html">Reinforcement Learning (PPO) with TorchRL Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/mario_rl_tutorial.html">마리오 게임 RL 에이전트로 학습하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/pendulum.html">Pendulum: Writing your environment and transforms with TorchRL</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">PyTorch 모델을 프로덕션 환경에 배포하기</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="onnx/intro_onnx.html">Introduction to ONNX</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/flask_rest_api_tutorial.html">Flask를 사용하여 Python에서 PyTorch를 REST API로 배포하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Intro_to_TorchScript_tutorial.html">TorchScript 소개</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_export.html">C++에서 TorchScript 모델 로딩하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/super_resolution_with_onnxruntime.html">(선택) PyTorch 모델을 ONNX으로 변환하고 ONNX 런타임에서 실행하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/realtime_rpi.html">Raspberry Pi 4 에서 실시간 추론(Inference) (30fps!)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">PyTorch 프로파일링</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="profiler.html">PyTorch 모듈 프로파일링하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hta_intro_tutorial.html">Introduction to Holistic Trace Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hta_trace_diff_tutorial.html">Trace Diff using Holistic Trace Analysis</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Code Transforms with FX</span></p>
 <ul>
@@ -265,13 +275,14 @@
 <li class="toctree-l1"><a class="reference internal" href="../advanced/torch_script_custom_classes.html">커스텀 C++ 클래스로 TorchScript 확장하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/dispatcher.html">Registering a Dispatched Operator in C++</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/extend_dispatcher.html">Extending dispatcher for a new backend in C++</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/privateuseone.html">Facilitating New Backend Integration by PrivateUse1</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">모델 최적화</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="profiler.html">PyTorch 모듈 프로파일링 하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="profiler.html">PyTorch 모듈 프로파일링하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/tensorboard_profiler_tutorial.html">텐서보드를 이용한 파이토치 프로파일러</a></li>
-<li class="toctree-l1"><a class="reference internal" href="hyperparameter_tuning_tutorial.html">Ray Tune을 이용한 하이퍼파라미터 튜닝</a></li>
-<li class="toctree-l1"><a class="reference internal" href="vt_tutorial.html">배포를 위한 비전 트랜스포머(Vision Transformer) 모델 최적화하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hyperparameter_tuning_tutorial.html">Ray Tune을 사용한 하이퍼파라미터 튜닝</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vt_tutorial.html">배포를 위해 비전 트랜스포머(Vision Transformer) 모델 최적화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/parametrizations.html">Parametrizations Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/pruning_tutorial.html">가지치기 기법(Pruning) 튜토리얼</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/dynamic_quantization_tutorial.html">(베타) LSTM 기반 단어 단위 언어 모델의 동적 양자화</a></li>
@@ -282,10 +293,13 @@
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/torchserve_with_ipex_2.html">Grokking PyTorch Intel CPU performance from first principles (Part 2)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/nvfuser_intro_tutorial.html">Getting Started - Accelerate Your Scripts with nvFuser</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/ax_multiobjective_nas_tutorial.html">Multi-Objective NAS with Ax</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/torch_compile_tutorial.html">torch.compile Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/torch_compile_tutorial.html">Introduction to <code class="docutils literal notranslate"><span class="pre">torch.compile</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/inductor_debug_cpu.html">Inductor CPU backend debugging and profiling</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/scaled_dot_product_attention_tutorial.html">(Beta) Scaled Dot Product Attention (SDPA)로 고성능 트랜스포머(Transformers) 구현하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/scaled_dot_product_attention_tutorial.html#torch-compile-sdpa"><code class="docutils literal notranslate"><span class="pre">torch.compile</span></code> 과 함께 SDPA 사용하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/scaled_dot_product_attention_tutorial.html#id6">결론</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/scaled_dot_product_attention_tutorial.html#sdpa-atteition-bias">SDPA를 <code class="docutils literal notranslate"><span class="pre">atteition.bias</span></code> 하위 클래스와 사용하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/scaled_dot_product_attention_tutorial.html#id8">결론</a></li>
+<li class="toctree-l1"><a class="reference internal" href="knowledge_distillation_tutorial.html">Knowledge Distillation Tutorial</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul>
@@ -297,20 +311,24 @@
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/dist_tuto.html">PyTorch로 분산 어플리케이션 개발하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/FSDP_tutorial.html">Getting Started with Fully Sharded Data Parallel(FSDP)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/FSDP_adavnced_tutorial.html">Advanced Model Training with Fully Sharded Data Parallel (FSDP)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/process_group_cpp_extension_tutorial.html">Cpp 확장을 사용하여 프로세스 그룹 백엔드 사용자 정의</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/TP_tutorial.html">Large Scale Transformer model training with Tensor Parallel (TP)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/process_group_cpp_extension_tutorial.html">Cpp 확장을 사용한 프로세스 그룹 백엔드 사용자 정의</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/rpc_tutorial.html">Getting Started with Distributed RPC Framework</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/rpc_param_server_tutorial.html">Implementing a Parameter Server Using Distributed RPC Framework</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/dist_pipeline_parallel_tutorial.html">Distributed Pipeline Parallelism Using RPC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/rpc_async_execution.html">Implementing Batch RPC Processing Using Asynchronous Executions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/rpc_ddp_tutorial.html">분산 데이터 병렬(DDP)과 분산 RPC 프레임워크 결합</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/pipeline_tutorial.html">파이프라인 병렬화로 트랜스포머 모델 학습시키기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/ddp_pipeline.html">분산 데이터 병렬 처리와 병렬 처리 파이프라인을 사용한 트랜스포머 모델 학습</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/generic_join.html">Distributed Training with Uneven Inputs Using the Join Context Manager</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">모바일</span></p>
+<p class="caption" role="heading"><span class="caption-text">Edge with ExecuTorch</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="deeplabv3_on_ios.html">iOS에서의 이미지 분할 DeepLapV3</a></li>
-<li class="toctree-l1"><a class="reference internal" href="deeplabv3_on_android.html">안드로이드에서의 이미지 분할 DeepLapV3</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/executorch/stable/tutorials/export-to-executorch-tutorial.html">Exporting to ExecuTorch Tutorial</a></li>
+<li class="toctree-l1"><a class="reference external" href=" https://pytorch.org/executorch/stable/running-a-model-cpp-tutorial.html">Running an ExecuTorch Model in C++ Tutorial</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/executorch/stable/tutorials/sdk-integration-tutorial.html">Using the ExecuTorch SDK to Profile a Model</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/executorch/stable/demo-apps-ios.html">Building an ExecuTorch iOS Demo App</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/executorch/stable/demo-apps-android.html">Building an ExecuTorch Android Demo App</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/executorch/stable/examples-end-to-end-to-lower-model-to-delegate.html">Lowering a Model as a Delegate</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">추천 시스템</span></p>
 <ul>
@@ -422,8 +440,8 @@ to download the full example code</p>
 </div>
 <div class="sphx-glr-example-title section" id="dataset-dataloader-transforms">
 <span id="sphx-glr-beginner-data-loading-tutorial-py"></span><h1>사용자 정의 Dataset, Dataloader, Transforms 작성하기<a class="headerlink" href="#dataset-dataloader-transforms" title="이 제목에 대한 퍼머링크">¶</a></h1>
-<p><strong>저자</strong> : Sasank Chilamkurthy &lt;<a class="reference external" href="https://chsasank.github.io">https://chsasank.github.io</a>&gt;
-<strong>번역</strong> : 정윤성 &lt;<a class="reference external" href="https://github.com/Yunseong-Jeong">https://github.com/Yunseong-Jeong</a>&gt;</p>
+<p><strong>저자</strong> : <a class="reference external" href="https://chsasank.github.io">Sasank Chilamkurthy</a>
+<strong>번역</strong> : <a class="reference external" href="https://github.com/Yunseong-Jeong">정윤성</a>, <a class="reference external" href="http://github.com/9bow">박정환</a></p>
 <p>머신러닝 문제를 푸는 과정에서 데이터를 준비하는데 많은 노력이 필요합니다.
 PyTorch는 데이터를 불러오는 과정을 쉽게해주고, 또 잘 사용한다면 코드의 가독성도 보다 높여줄 수 있는 도구들을
 제공합니다. 이 튜토리얼에서 일반적이지 않은 데이터셋으로부터 데이터를 읽어오고
@@ -433,8 +451,7 @@ PyTorch는 데이터를 불러오는 과정을 쉽게해주고, 또 잘 사용�
 <li><p><code class="docutils literal notranslate"><span class="pre">scikit-image</span></code>: 이미지 I/O 와 변형을 위해 필요합니다.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">pandas</span></code>: CSV 파일 파싱을 보다 쉽게 해줍니다.</p></li>
 </ul>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">division</span>
-<span class="kn">import</span> <span class="nn">os</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">from</span> <span class="nn">skimage</span> <span class="kn">import</span> <span class="n">io</span><span class="p">,</span> <span class="n">transform</span>
@@ -450,7 +467,7 @@ PyTorch는 데이터를 불러오는 과정을 쉽게해주고, 또 잘 사용�
 <span class="n">plt</span><span class="o">.</span><span class="n">ion</span><span class="p">()</span>   <span class="c1"># 반응형 모드</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;contextlib.ExitStack object at 0x7fb92c206500&gt;
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;contextlib.ExitStack object at 0x7789ec183b50&gt;
 </pre></div>
 </div>
 <p>다룰 데이터셋은 아래 조건과 같은 랜드마크(landmark)가 있는 얼굴 사진입니다.</p>
@@ -466,10 +483,10 @@ PyTorch는 데이터를 불러오는 과정을 쉽게해주고, 또 잘 사용�
 <a class="reference external" href="https://blog.dlib.net/2014/08/real-time-face-pose-estimation.html">dlib의 pose estimation</a> 을
 적용한 데이터셋입니다.</p>
 </div>
-<p>데이터셋은 아래와 같은 특징을 가진 CSV 파일이 포함되어 있습니다.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">image_name</span><span class="p">,</span><span class="n">part_0_x</span><span class="p">,</span><span class="n">part_0_y</span><span class="p">,</span><span class="n">part_1_x</span><span class="p">,</span><span class="n">part_1_y</span><span class="p">,</span><span class="n">part_2_x</span><span class="p">,</span> <span class="o">...</span> <span class="p">,</span><span class="n">part_67_x</span><span class="p">,</span><span class="n">part_67_y</span>
-<span class="mi">0805</span><span class="n">personali01</span><span class="o">.</span><span class="n">jpg</span><span class="p">,</span><span class="mi">27</span><span class="p">,</span><span class="mi">83</span><span class="p">,</span><span class="mi">27</span><span class="p">,</span><span class="mi">98</span><span class="p">,</span> <span class="o">...</span> <span class="mi">84</span><span class="p">,</span><span class="mi">134</span>
-<span class="mi">1084239450</span><span class="n">_e76e00b7e7</span><span class="o">.</span><span class="n">jpg</span><span class="p">,</span><span class="mi">70</span><span class="p">,</span><span class="mi">236</span><span class="p">,</span><span class="mi">71</span><span class="p">,</span><span class="mi">257</span><span class="p">,</span> <span class="o">...</span> <span class="p">,</span><span class="mi">128</span><span class="p">,</span><span class="mi">312</span>
+<p>데이터셋은 아래와 같은 식으로 작성된 <code class="docutils literal notranslate"><span class="pre">.csv</span></code> 파일에 포함되어 있습니다:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>image_name,part_0_x,part_0_y,part_1_x,part_1_y,part_2_x,<span class="w"> </span>...<span class="w"> </span>,part_67_x,part_67_y
+0805personali01.jpg,27,83,27,98,<span class="w"> </span>...<span class="w"> </span><span class="m">84</span>,134
+1084239450_e76e00b7e7.jpg,70,236,71,257,<span class="w"> </span>...<span class="w"> </span>,128,312
 </pre></div>
 </div>
 <p>이제 CSV에서 이미지 이름과 그에 해당하는 데이터(annotation)을 가져와 보겠습니다. 예시로 person-7.jpg가 있는
@@ -480,8 +497,7 @@ PyTorch는 데이터를 불러오는 과정을 쉽게해주고, 또 잘 사용�
 <span class="n">n</span> <span class="o">=</span> <span class="mi">65</span>
 <span class="n">img_name</span> <span class="o">=</span> <span class="n">landmarks_frame</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">n</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
 <span class="n">landmarks</span> <span class="o">=</span> <span class="n">landmarks_frame</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">n</span><span class="p">,</span> <span class="mi">1</span><span class="p">:]</span>
-<span class="n">landmarks</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">landmarks</span><span class="p">)</span>
-<span class="n">landmarks</span> <span class="o">=</span> <span class="n">landmarks</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;float&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">landmarks</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">landmarks</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Image name: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">img_name</span><span class="p">))</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Landmarks shape: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">landmarks</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
@@ -527,7 +543,7 @@ First 4 Landmarks: [[32. 65.]
 메모리를 효율적으로 사용합니다.</p>
 <p>데이터셋의 샘플은  <code class="docutils literal notranslate"><span class="pre">{'image':</span> <span class="pre">image,</span> <span class="pre">'landmarks':</span> <span class="pre">landmarks}</span></code> 의 사전 형태를 갖습니다.
 선택적 인자인 <code class="docutils literal notranslate"><span class="pre">transform</span></code> 을 통해 필요한 전처리 과정을 샘플에 적용할 수 있습니다.
-다음 장에서 전이 <code class="docutils literal notranslate"><span class="pre">transform</span></code> 의 유용성에 대해 알아보겠습니다.</p>
+다음 장에서 변형 <code class="docutils literal notranslate"><span class="pre">transform</span></code> 의 유용성에 대해 알아보겠습니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">FaceLandmarksDataset</span><span class="p">(</span><span class="n">Dataset</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Face Landmarks dataset.&quot;&quot;&quot;</span>
 
@@ -553,8 +569,7 @@ First 4 Landmarks: [[32. 65.]
                                 <span class="bp">self</span><span class="o">.</span><span class="n">landmarks_frame</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
         <span class="n">image</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">img_name</span><span class="p">)</span>
         <span class="n">landmarks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">landmarks_frame</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="mi">1</span><span class="p">:]</span>
-        <span class="n">landmarks</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">landmarks</span><span class="p">])</span>
-        <span class="n">landmarks</span> <span class="o">=</span> <span class="n">landmarks</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;float&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">landmarks</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">landmarks</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
         <span class="n">sample</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;image&#39;</span><span class="p">:</span> <span class="n">image</span><span class="p">,</span> <span class="s1">&#39;landmarks&#39;</span><span class="p">:</span> <span class="n">landmarks</span><span class="p">}</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">:</span>
@@ -570,9 +585,7 @@ First 4 Landmarks: [[32. 65.]
 
 <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
 
-<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">face_dataset</span><span class="p">)):</span>
-    <span class="n">sample</span> <span class="o">=</span> <span class="n">face_dataset</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">sample</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">face_dataset</span><span class="p">):</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">sample</span><span class="p">[</span><span class="s1">&#39;image&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">sample</span><span class="p">[</span><span class="s1">&#39;landmarks&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
 
     <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
@@ -595,31 +608,38 @@ First 4 Landmarks: [[32. 65.]
 </div>
 <div class="section" id="transforms">
 <h2>Transforms<a class="headerlink" href="#transforms" title="이 제목에 대한 퍼머링크">¶</a></h2>
-<p>위에서 볼 수 있었던 한가지 문제점은 샘플들이 다 같은 크기가 아니라는 것입니다.
-대부분의 신경망(neural networks)은 고정된 크기의 이미지라고 가정합니다.
-그러므로 우리는 신경망에 주기 전에 처리할 과정을 작성해야 합니다.</p>
-<p>3가지의 transforms 을 만들어 봅시다:</p>
+<p>위에서 볼 수 있었던 한 가지 문제는 샘플들의 크기가 같지 않다는 것입니다.
+대부분의 신경망(neural networks)은 고정된 크기의 이미지를 입력으로 받는 것을 가정하고 있습니다.
+그러므로 몇 가지 전처리 코드를 작성하도록 하겠습니다.</p>
+<p>다음의 3가지의 변형(transforms)을 만들어 보겠습니다:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">Rescale</span></code>: 이미지의 크기를 조절합니다.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">RandomCrop</span></code>: 이미지를 무작위로 자릅니다.
-이것을 data augmentation이라 합니다.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">ToTensor</span></code>: numpy 이미지에서 torch 이미지로 변경합니다.
-(축변환이 필요합니다)</p></li>
+<li><dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">RandomCrop</span></code>: 이미지를 무작위로 자릅니다.</dt><dd><p>이것을 데이터 증강(data augmentation)이라 합니다.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">ToTensor</span></code>: NumPy 이미지에서 torch 이미지로 변경합니다.</dt><dd><p>(축 교환(axes swap)이 필요합니다)</p>
+</dd>
+</dl>
+</li>
 </ul>
-<p>간단한 함수 대신에 호출 할 수 있는 클래스로 작성 합니다.
-이렇게 한다면, 클래스가 호출 될 때마다 전이(Transform)의 매개변수가 전달 되지 않아도 됩니다.
-이와 같이, <code class="docutils literal notranslate"><span class="pre">__call__</span></code> 함수를 구현해야 합니다.
-필요하다면, <code class="docutils literal notranslate"><span class="pre">__init__</span></code> 함수도 구현해야 합니다. 다음과 같이 전이(transform)를 사용할 수 있습니다.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tsfm</span> <span class="o">=</span> <span class="n">Transform</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+<p>이러한 변형 과정을 간단한 함수들로 작성하는 대신, 호출 가능한 클래스로 작성하도록 하겠습니다.
+이렇게 하면 클래스가 호출될 때마다 매번 변형(Transform)의 매개변수를 전달하지 않아도 됩니다.
+<code class="docutils literal notranslate"><span class="pre">__call__</span></code> 함수만 구현하면 이렇게 할 수 있으며, 필요 시에는 <code class="docutils literal notranslate"><span class="pre">__init__</span></code> 함수까지도 구현해야 할 수 있습니다.
+그런 다음 다음과 같이 변형(transform)를 사용할 수 있습니다:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">tsfm</span> <span class="o">=</span> <span class="n">Transform</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
 <span class="n">transformed_sample</span> <span class="o">=</span> <span class="n">tsfm</span><span class="p">(</span><span class="n">sample</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>아래에서는 이미지와 랜드마크(landmark)들을 어떻게 적용하는지 살펴보도록 하겠습니다.</p>
+<p>이러한 변환 과정을 이미지와 랜드마크(landmark)들에 어떻게 적용하는지를
+살펴보도록 하겠습니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Rescale</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;주어진 크기로 샘플크기를 조정합니다.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        output_size(tuple or int) : 원하는 출력 크기가</span>
+<span class="sd">        output_size(tuple or int) : 원하는 출력의 크기.</span>
 <span class="sd">            tuple인 경우 해당 tuple(output_size)이 결과물(output)의 크기가 되고,</span>
 <span class="sd">            int라면 비율을 유지하면서, 길이가 작은 쪽이 output_size가 됩니다.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -644,17 +664,19 @@ First 4 Landmarks: [[32. 65.]
 
         <span class="n">img</span> <span class="o">=</span> <span class="n">transform</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="p">(</span><span class="n">new_h</span><span class="p">,</span> <span class="n">new_w</span><span class="p">))</span>
 
+        <span class="c1"># 이미지의 경우 x와 y가 각각 axis 1과 0이기 때문에,</span>
+        <span class="c1"># 랜드마크의 경우 h와 w가 바뀌어야 합니다.</span>
         <span class="n">landmarks</span> <span class="o">=</span> <span class="n">landmarks</span> <span class="o">*</span> <span class="p">[</span><span class="n">new_w</span> <span class="o">/</span> <span class="n">w</span><span class="p">,</span> <span class="n">new_h</span> <span class="o">/</span> <span class="n">h</span><span class="p">]</span>
 
         <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;image&#39;</span><span class="p">:</span> <span class="n">img</span><span class="p">,</span> <span class="s1">&#39;landmarks&#39;</span><span class="p">:</span> <span class="n">landmarks</span><span class="p">}</span>
 
 
 <span class="k">class</span> <span class="nc">RandomCrop</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;샘플데이터를 무작위로 자릅니다.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;샘플 데이터를 무작위로 자릅니다.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        output_size (tuple or int): 줄이고자 하는 크기입니다.</span>
-<span class="sd">                        int라면, 정사각형으로 나올 것 입니다.</span>
+<span class="sd">        output_size (tuple or int): 원하는 출력의 크기.</span>
+<span class="sd">            int 값 입력 시 정사각형으로 잘립니다.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_size</span><span class="p">):</span>
@@ -671,8 +693,8 @@ First 4 Landmarks: [[32. 65.]
         <span class="n">h</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span>
         <span class="n">new_h</span><span class="p">,</span> <span class="n">new_w</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_size</span>
 
-        <span class="n">top</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">h</span> <span class="o">-</span> <span class="n">new_h</span><span class="p">)</span>
-        <span class="n">left</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">w</span> <span class="o">-</span> <span class="n">new_w</span><span class="p">)</span>
+        <span class="n">top</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">h</span> <span class="o">-</span> <span class="n">new_h</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">left</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">w</span> <span class="o">-</span> <span class="n">new_w</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
 
         <span class="n">image</span> <span class="o">=</span> <span class="n">image</span><span class="p">[</span><span class="n">top</span><span class="p">:</span> <span class="n">top</span> <span class="o">+</span> <span class="n">new_h</span><span class="p">,</span>
                       <span class="n">left</span><span class="p">:</span> <span class="n">left</span> <span class="o">+</span> <span class="n">new_w</span><span class="p">]</span>
@@ -683,14 +705,14 @@ First 4 Landmarks: [[32. 65.]
 
 
 <span class="k">class</span> <span class="nc">ToTensor</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;numpy array를 tensor(torch)로 변환 시켜줍니다.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;NumPy의 ndarray 형태의 샘플을 Torch Tensor로 변환합니다.&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">):</span>
         <span class="n">image</span><span class="p">,</span> <span class="n">landmarks</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="s1">&#39;image&#39;</span><span class="p">],</span> <span class="n">sample</span><span class="p">[</span><span class="s1">&#39;landmarks&#39;</span><span class="p">]</span>
 
-        <span class="c1"># swap color axis because</span>
-        <span class="c1"># numpy image: H x W x C</span>
-        <span class="c1"># torch image: C x H x W</span>
+        <span class="c1"># NumPy 이미지와 Torch 이미지의 색상 축(axis)을 교환해야 합니다:</span>
+        <span class="c1"># NumPy 이미지의 모양은 H x W x C 이고,</span>
+        <span class="c1"># Torch 이미지의 모양은 C x H x W 이기 때문입니다.</span>
         <span class="n">image</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">transpose</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
         <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;image&#39;</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">image</span><span class="p">),</span>
                 <span class="s1">&#39;landmarks&#39;</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">landmarks</span><span class="p">)}</span>
@@ -705,17 +727,16 @@ First 4 Landmarks: [[32. 65.]
 </div>
 <div class="section" id="compose-transforms">
 <h3>Compose transforms<a class="headerlink" href="#compose-transforms" title="이 제목에 대한 퍼머링크">¶</a></h3>
-<p>이제, 샘플에 전이(transform)를 적용해 봅시다.</p>
-<p>이미지의 가장 짧은 측면을 256개로 rescale하고,
-그후에 무작위로 224개를 자른다고 가정합시다.
-다시 말해, <code class="docutils literal notranslate"><span class="pre">Rescale</span></code> 과 <code class="docutils literal notranslate"><span class="pre">RandomCrop</span></code> 을 사용해봅시다.</p>
-<p><code class="docutils literal notranslate"><span class="pre">torchvision.transforms.Compose</span></code> 는 위의 두 작업을 하는 간단한 호출할 수 있는 클래스입니다.</p>
+<p>이제, 샘플에 변형(transform)를 적용해보겠습니다.</p>
+<p>먼저 이미지 중 짧은 쪽의 크기를 256으로 변환(rescale)하고, 그런 다음 224 크기의 정방형으로 무작위로 자르도록 하겠습니다.
+이를 위해 <code class="docutils literal notranslate"><span class="pre">Rescale</span></code> 과 <code class="docutils literal notranslate"><span class="pre">RandomCrop</span></code> 을 사용합니다.
+<code class="docutils literal notranslate"><span class="pre">torchvision.transforms.Compose</span></code> 클래스를 사용하여 위의 작업들을 간단하게 할 수 있습니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">scale</span> <span class="o">=</span> <span class="n">Rescale</span><span class="p">(</span><span class="mi">256</span><span class="p">)</span>
 <span class="n">crop</span> <span class="o">=</span> <span class="n">RandomCrop</span><span class="p">(</span><span class="mi">128</span><span class="p">)</span>
 <span class="n">composed</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">Compose</span><span class="p">([</span><span class="n">Rescale</span><span class="p">(</span><span class="mi">256</span><span class="p">),</span>
                                <span class="n">RandomCrop</span><span class="p">(</span><span class="mi">224</span><span class="p">)])</span>
 
-<span class="c1"># Apply each of the above transforms on sample.</span>
+<span class="c1"># 각 변형들을 샘플에 적용합니다.</span>
 <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
 <span class="n">sample</span> <span class="o">=</span> <span class="n">face_dataset</span><span class="p">[</span><span class="mi">65</span><span class="p">]</span>
 <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">tsfrm</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">([</span><span class="n">scale</span><span class="p">,</span> <span class="n">crop</span><span class="p">,</span> <span class="n">composed</span><span class="p">]):</span>
@@ -733,7 +754,7 @@ First 4 Landmarks: [[32. 65.]
 </div>
 <div class="section" id="id3">
 <h2>데이터셋을 이용한 반복작업<a class="headerlink" href="#id3" title="이 제목에 대한 퍼머링크">¶</a></h2>
-<p>전이(transform)를 적용한 dataset을 만들기 위해서 만들었던 것을 다 집어넣어 봅시다.</p>
+<p>변형(transform)를 적용한 dataset을 만들기 위해서 만들었던 것을 다 집어넣어 봅시다.</p>
 <p>요약하자면, 데이터셋은 다음과 같이 샘플링 됩니다.</p>
 <ul class="simple">
 <li><p>이미지는 파일 전체를 메모리에 올리지 않고 필요할 때마다 불러와서 읽습니다.</p></li>
@@ -750,9 +771,7 @@ First 4 Landmarks: [[32. 65.]
                                                <span class="n">ToTensor</span><span class="p">()</span>
                                            <span class="p">]))</span>
 
-<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">transformed_dataset</span><span class="p">)):</span>
-    <span class="n">sample</span> <span class="o">=</span> <span class="n">transformed_dataset</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">sample</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">transformed_dataset</span><span class="p">):</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">sample</span><span class="p">[</span><span class="s1">&#39;image&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">size</span><span class="p">(),</span> <span class="n">sample</span><span class="p">[</span><span class="s1">&#39;landmarks&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">size</span><span class="p">())</span>
 
     <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
@@ -765,25 +784,25 @@ First 4 Landmarks: [[32. 65.]
 3 torch.Size([3, 224, 224]) torch.Size([68, 2])
 </pre></div>
 </div>
-<p>그러나, 데이터 상에서 반복하는 <code class="docutils literal notranslate"><span class="pre">for</span></code> 문은 많은 특징(features)를 놓칠 수 있습니다.
-특히, 아래와 같은 것을 놓칠 수 있습니다:</p>
+<p>하지만 단순한 <code class="docutils literal notranslate"><span class="pre">for</span></code> 루프를 반복하여 사용하는 경우 많은 기능들을 놓치게 됩니다.
+특히, 다음과 같은 과정들을 놓치고 있습니다:</p>
 <ul class="simple">
-<li><p>데이터를 묶는 과정</p></li>
-<li><p>데이터를 섞는 과정</p></li>
-<li><p>병렬처리 과정에서 <code class="docutils literal notranslate"><span class="pre">multiprocessing</span></code> 을 사용할 때 데이터를 불러오는 것</p></li>
+<li><p>데이터를 묶는 과정(batching)</p></li>
+<li><p>데이터를 섞는 과정(shuffling)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">multiprocessing</span></code> 워커를 사용하여 데이터를 병렬로 불러오기</p></li>
 </ul>
 <p><code class="docutils literal notranslate"><span class="pre">torch.utils.data.DataLoder</span></code> 는 위와 같은 기능을 모두 제공해주는 반복자(iterator)입니다.
-사용되는 매개변수(Parameters)는 명확해야 합니다.
-<code class="docutils literal notranslate"><span class="pre">collate_fn</span></code> 는 흥미로운 매개변수(Parameters) 중 하나입니다.
-<code class="docutils literal notranslate"><span class="pre">collate_fn</span></code> 을 이용하여 샘플들을 정확하게 배치하는 방법을 명시할 수 있습니다.
-그러나, 대부분의 경우에 대해서 정확하게 작동해야 합니다.</p>
+여기에 사용되는 매개변수(parameter)들은 명확해야 합니다.
+관심있게 살펴볼 매개변수 중 하나느 <code class="docutils literal notranslate"><span class="pre">collate_fn</span></code> 입니다.
+<code class="docutils literal notranslate"><span class="pre">collate_fn</span></code> 을 사용하여 샘플들을 어떻게 일괄적으로 처리해야 하는지를 지정할 수 있습니다.
+하지만 대부분의 경우에는 기본 함수가 잘 동작합니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dataloader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">transformed_dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
                         <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
 
-<span class="c1"># 배치하는 과정을 보여주는 함수입니다.</span>
+<span class="c1"># 데이터 묶음(batching) 과정을 보여주는 헬퍼 함수(helper function)</span>
 <span class="k">def</span> <span class="nf">show_landmarks_batch</span><span class="p">(</span><span class="n">sample_batched</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Show image with landmarks for a batch of samples.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;샘플 묶음(batch)에 대해 랜드마크가 표시된 이미지 보여주기&quot;&quot;&quot;</span>
     <span class="n">images_batch</span><span class="p">,</span> <span class="n">landmarks_batch</span> <span class="o">=</span> \
             <span class="n">sample_batched</span><span class="p">[</span><span class="s1">&#39;image&#39;</span><span class="p">],</span> <span class="n">sample_batched</span><span class="p">[</span><span class="s1">&#39;landmarks&#39;</span><span class="p">]</span>
     <span class="n">batch_size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">images_batch</span><span class="p">)</span>
@@ -800,15 +819,15 @@ First 4 Landmarks: [[32. 65.]
 
         <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Batch from dataloader&#39;</span><span class="p">)</span>
 
-<span class="c1"># Windows를 사용 중이라면, 다음 줄의 주석을 제거하고 for 반복문을 들여쓰기 합니다.</span>
-<span class="c1"># ``num_workers`` 를 0으로 변경해야 할 수도 있습니다.</span>
+<span class="c1"># 만약 Windows를 사용 중이라면, 다음 줄의 주석을 제거하고 for 반복문을 들여쓰기 해주세요.</span>
+<span class="c1"># 또한, 위쪽의 ``num_workers`` 값을 0으로 변경해야 할 수도 있습니다.</span>
 
 <span class="c1"># if __name__ == &#39;__main__&#39;:</span>
 <span class="k">for</span> <span class="n">i_batch</span><span class="p">,</span> <span class="n">sample_batched</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">dataloader</span><span class="p">):</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">i_batch</span><span class="p">,</span> <span class="n">sample_batched</span><span class="p">[</span><span class="s1">&#39;image&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">size</span><span class="p">(),</span>
           <span class="n">sample_batched</span><span class="p">[</span><span class="s1">&#39;landmarks&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">size</span><span class="p">())</span>
 
-    <span class="c1"># observe 4th batch and stop.</span>
+    <span class="c1"># 4번째 배치까지 살펴보고 멈추겠습니다.</span>
     <span class="k">if</span> <span class="n">i_batch</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
         <span class="n">show_landmarks_batch</span><span class="p">(</span><span class="n">sample_batched</span><span class="p">)</span>
@@ -827,26 +846,26 @@ First 4 Landmarks: [[32. 65.]
 </div>
 <div class="section" id="afterword-torchvision">
 <h2>Afterword: torchvision<a class="headerlink" href="#afterword-torchvision" title="이 제목에 대한 퍼머링크">¶</a></h2>
-<p>이번 튜토리얼에서는, 데이터셋 작성과 사용, 전이(transforms), 데이터를 불러오는 방법에 대해서 알아봤습니다.
-<code class="docutils literal notranslate"><span class="pre">torchvision</span></code> 패키지는 몇몇의 일반적인 데이터셋과 전이(transforms)들을 제공합니다.
+<p>이번 튜토리얼에서는, 데이터셋 작성과 사용, 변형(transforms), 데이터를 불러오는 방법에 대해서 알아봤습니다.
+<code class="docutils literal notranslate"><span class="pre">torchvision</span></code> 패키지는 몇몇의 일반적인 데이터셋과 변형(transforms)들을 제공합니다.
 클래스들을 따로 작성하지 않아도 될 것입니다.
 torchvision에서의 사용 가능한 일반적인 데이터셋 중 하나는 <code class="docutils literal notranslate"><span class="pre">ImageFolder</span></code> 입니다.
-이것은 다음과 같은 방식으로 구성되어 있다고 가정합니다:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">root</span><span class="o">/</span><span class="n">ants</span><span class="o">/</span><span class="n">xxx</span><span class="o">.</span><span class="n">png</span>
-<span class="n">root</span><span class="o">/</span><span class="n">ants</span><span class="o">/</span><span class="n">xxy</span><span class="o">.</span><span class="n">jpeg</span>
-<span class="n">root</span><span class="o">/</span><span class="n">ants</span><span class="o">/</span><span class="n">xxz</span><span class="o">.</span><span class="n">png</span>
-<span class="o">.</span>
-<span class="o">.</span>
-<span class="o">.</span>
-<span class="n">root</span><span class="o">/</span><span class="n">bees</span><span class="o">/</span><span class="mf">123.</span><span class="n">jpg</span>
-<span class="n">root</span><span class="o">/</span><span class="n">bees</span><span class="o">/</span><span class="n">nsdf3</span><span class="o">.</span><span class="n">png</span>
-<span class="n">root</span><span class="o">/</span><span class="n">bees</span><span class="o">/</span><span class="n">asd932_</span><span class="o">.</span><span class="n">png</span>
+예를 들어 다음과 같은 방식으로 구성된 데이터셋이 있다고 가정해보겠습니다:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>root/ants/xxx.png
+root/ants/xxy.jpeg
+root/ants/xxz.png
+.
+.
+.
+root/bees/123.jpg
+root/bees/nsdf3.png
+root/bees/asd932_.png
 </pre></div>
 </div>
-<p>여기서’ants〉, 〈bees’는 class labels입니다.
-비슷하게, <code class="docutils literal notranslate"><span class="pre">RandomHorizontalFlip</span></code> , <code class="docutils literal notranslate"><span class="pre">Scale</span></code> 과 같이  <code class="docutils literal notranslate"><span class="pre">PIL.Image</span></code> 에서 작동하는
-일반적인 전이(transforms)도 사용 가능합니다. 이와 같이 데이터로더(dataloader)를 사용할 수 있습니다:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  import torch
+<p>여기서’ants’와 〈bees’는 class labels입니다.
+비슷한 방식으로 <code class="docutils literal notranslate"><span class="pre">RandomHorizontalFlip</span></code> 이나 <code class="docutils literal notranslate"><span class="pre">Scale</span></code> 과 같이  <code class="docutils literal notranslate"><span class="pre">PIL.Image</span></code> 에서 동작하는
+일반적인 변형들(transforms)도 사용 가능합니다. 다음과 같은 방식으로 DataLoader에서 사용할 수 있습니다:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>  import torch
   from torchvision import transforms, datasets
 
   data_transform = transforms.Compose([
@@ -866,7 +885,7 @@ training code에 대한 예시를 알고 싶다면,
 :doc:`transfer_learning_tutorial` 문서를 참고해 주세요.
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  1.907 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  1.086 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-beginner-data-loading-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/6042bacf7948939030769777afe22e55/data_loading_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">data_loading_tutorial.py</span></code></a></p>
@@ -910,7 +929,7 @@ training code에 대한 예시를 알고 싶다면,
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018-2023, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorch Korea User Group).
+        &copy; Copyright 2018-2024, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorch Korea User Group).
 
     </p>
   </div>
@@ -969,8 +988,8 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
          <script src="../_static/clipboard.min.js"></script>
          <script src="../_static/copybutton.js"></script>
          <script src="../_static/translations.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
+         <script src="../_static/katex.min.js"></script>
+         <script src="../_static/auto-render.min.js"></script>
          <script src="../_static/katex_autorenderer.js"></script>
          <script src="../_static/design-tabs.js"></script>
      
@@ -988,8 +1007,10 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
   </script>
  
 <script>
-//add microsoft link
+// Helper function to make it easier to call dataLayer.push()
+function gtag(){window.dataLayer.push(arguments);}
 
+//add microsoft link
 if(window.location.href.indexOf("/beginner/basics/")!= -1)
 {
   var url="https://docs.microsoft.com/learn/paths/pytorch-fundamentals/?wt.mc_id=aiml-7486-cxa";
@@ -1054,7 +1075,8 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
     gtag('event', 'click', {
       'event_category': 'Tutorial Rating',
       'event_label': $("h1").first().text(),
-      'value': $(this).attr("data-count")
+      'value': $(this).attr("data-count"),
+      'customEvent:Rating': $(this).attr("data-count") // send to GA custom dimension customEvent:Rating.
     });
    });
 
@@ -1065,7 +1087,7 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
 </script>
 
 <script type="text/javascript">
-  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', '모바일', 'Introduction to PyTorch on YouTube', '추천 시스템', 'Multimodality'];
+  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', 'Introduction to PyTorch on YouTube', '이미지/비디오', '오디오', '텍스트', '백엔드', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'PyTorch 프로파일링', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Edge with ExecuTorch', '추천 시스템', 'Multimodality'];
 </script>
 
 

@@ -10,7 +10,20 @@ torchtext 라이브러리로 텍스트 분류하기
    - 반복자(iterator)로 가공되지 않은 데이터(raw data)에 접근하기
    - 가공되지 않은 텍스트 문장들을 모델 학습에 사용할 수 있는 ``torch.Tensor`` 로 변환하는 데이터 처리 파이프라인 만들기
    - `torch.utils.data.DataLoader <https://pytorch.org/docs/stable/data.html?highlight=dataloader#torch.utils.data.DataLoader>`__ 를 사용하여 데이터를 섞고 반복하기(shuffle and iterate)
+
+
+사전 요구 사항
+~~~~~~~~~~~~~~~~
+
+이 튜토리얼을 실행하기 위해서는 먼저 2.x 버전의 최신 ``portalocker`` 패키지가 설치되어 있어야 합니다.
+예를 들어, Colab 환경에서는 다음과 같이 스크립트 맨 위에 다음 줄을 추가하여 설치할 수 있습니다:
+
+.. code-block:: bash
+
+    !pip install -U portalocker>=2.0.0`
+
 """
+
 
 ######################################################################
 # 기초 데이터셋 반복자(raw data iterator)에 접근하기
@@ -25,10 +38,11 @@ torchtext 라이브러리로 텍스트 분류하기
 
 import torch
 from torchtext.datasets import AG_NEWS
-train_iter = iter(AG_NEWS(split='train'))
+
+train_iter = iter(AG_NEWS(split="train"))
 
 ######################################################################
-# ::
+# .. code-block:: sh
 #
 #     next(train_iter)
 #     >>> (3, "Fears for T N pension after talks Unions representing workers at Turner
@@ -64,12 +78,14 @@ train_iter = iter(AG_NEWS(split='train'))
 from torchtext.data.utils import get_tokenizer
 from torchtext.vocab import build_vocab_from_iterator
 
-tokenizer = get_tokenizer('basic_english')
-train_iter = AG_NEWS(split='train')
+tokenizer = get_tokenizer("basic_english")
+train_iter = AG_NEWS(split="train")
+
 
 def yield_tokens(data_iter):
     for _, text in data_iter:
         yield tokenizer(text)
+
 
 vocab = build_vocab_from_iterator(yield_tokens(train_iter), specials=["<unk>"])
 vocab.set_default_index(vocab["<unk>"])
@@ -77,7 +93,7 @@ vocab.set_default_index(vocab["<unk>"])
 ######################################################################
 # 어휘집 블록(vocabulary block)은 토큰 목록을 정수로 변환합니다.
 #
-# ::
+# .. code-block:: sh
 #
 #     vocab(['here', 'is', 'an', 'example'])
 #     >>> [475, 21, 30, 5297]
@@ -93,7 +109,7 @@ label_pipeline = lambda x: int(x) - 1
 # 텍스트 파이프라인은 어휘집에 정의된 룩업 테이블(순람표; lookup table)에 기반하여 텍스트 문장을 정수 목록으로 변환합니다.
 # 레이블(label) 파이프라인은 레이블을 정수로 변환합니다. 예를 들어,
 #
-# ::
+# .. code-block:: sh
 #
 #     text_pipeline('here is the an example')
 #     >>> [475, 21, 2, 30, 5297]
@@ -123,23 +139,27 @@ label_pipeline = lambda x: int(x) - 1
 
 
 from torch.utils.data import DataLoader
+
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
 
 def collate_batch(batch):
     label_list, text_list, offsets = [], [], [0]
-    for (_label, _text) in batch:
-         label_list.append(label_pipeline(_label))
-         processed_text = torch.tensor(text_pipeline(_text), dtype=torch.int64)
-         text_list.append(processed_text)
-         offsets.append(processed_text.size(0))
+    for _label, _text in batch:
+        label_list.append(label_pipeline(_label))
+        processed_text = torch.tensor(text_pipeline(_text), dtype=torch.int64)
+        text_list.append(processed_text)
+        offsets.append(processed_text.size(0))
     label_list = torch.tensor(label_list, dtype=torch.int64)
     offsets = torch.tensor(offsets[:-1]).cumsum(dim=0)
     text_list = torch.cat(text_list)
     return label_list.to(device), text_list.to(device), offsets.to(device)
 
-train_iter = AG_NEWS(split='train')
-dataloader = DataLoader(train_iter, batch_size=8, shuffle=False, collate_fn=collate_batch)
 
+train_iter = AG_NEWS(split="train")
+dataloader = DataLoader(
+    train_iter, batch_size=8, shuffle=False, collate_fn=collate_batch
+)
 
 ######################################################################
 # 모델 정의하기
@@ -159,11 +179,9 @@ dataloader = DataLoader(train_iter, batch_size=8, shuffle=False, collate_fn=coll
 # .. image:: ../_static/img/text_sentiment_ngrams_model.png
 #
 
-
 from torch import nn
 
 class TextClassificationModel(nn.Module):
-
     def __init__(self, vocab_size, embed_dim, num_class):
         super(TextClassificationModel, self).__init__()
         self.embedding = nn.EmbeddingBag(vocab_size, embed_dim, sparse=False)
@@ -187,7 +205,7 @@ class TextClassificationModel(nn.Module):
 #
 # ``AG_NEWS`` 데이터셋에는 4종류의 레이블이 존재하므로 클래스의 개수도 4개입니다.
 #
-# ::
+# .. code-block:: sh
 #
 #    1 : World (세계)
 #    2 : Sports (스포츠)
@@ -199,7 +217,7 @@ class TextClassificationModel(nn.Module):
 # 클래스의 개수는 레이블의 개수와 같습니다.
 #
 
-train_iter = AG_NEWS(split='train')
+train_iter = AG_NEWS(split="train")
 num_class = len(set([label for (label, text) in train_iter]))
 vocab_size = len(vocab)
 emsize = 64
@@ -230,9 +248,12 @@ def train(dataloader):
         total_count += label.size(0)
         if idx % log_interval == 0 and idx > 0:
             elapsed = time.time() - start_time
-            print('| epoch {:3d} | {:5d}/{:5d} batches '
-                  '| accuracy {:8.3f}'.format(epoch, idx, len(dataloader),
-                                              total_acc/total_count))
+            print(
+                "| epoch {:3d} | {:5d}/{:5d} batches "
+                "| accuracy {:8.3f}".format(
+                    epoch, idx, len(dataloader), total_acc / total_count
+                )
+            )
             total_acc, total_count = 0, 0
             start_time = time.time()
 
@@ -246,7 +267,7 @@ def evaluate(dataloader):
             loss = criterion(predicted_label, label)
             total_acc += (predicted_label.argmax(1) == label).sum().item()
             total_count += label.size(0)
-    return total_acc/total_count
+    return total_acc / total_count
 
 
 ######################################################################
@@ -273,9 +294,9 @@ def evaluate(dataloader):
 from torch.utils.data.dataset import random_split
 from torchtext.data.functional import to_map_style_dataset
 # Hyperparameters
-EPOCHS = 10 # epoch
+EPOCHS = 10  # epoch
 LR = 5  # learning rate
-BATCH_SIZE = 64 # batch size for training
+BATCH_SIZE = 64  # batch size for training
 
 criterion = torch.nn.CrossEntropyLoss()
 optimizer = torch.optim.SGD(model.parameters(), lr=LR)
@@ -285,30 +306,36 @@ train_iter, test_iter = AG_NEWS()
 train_dataset = to_map_style_dataset(train_iter)
 test_dataset = to_map_style_dataset(test_iter)
 num_train = int(len(train_dataset) * 0.95)
-split_train_, split_valid_ = \
-    random_split(train_dataset, [num_train, len(train_dataset) - num_train])
+split_train_, split_valid_ = random_split(
+    train_dataset, [num_train, len(train_dataset) - num_train]
+)
 
-train_dataloader = DataLoader(split_train_, batch_size=BATCH_SIZE,
-                              shuffle=True, collate_fn=collate_batch)
-valid_dataloader = DataLoader(split_valid_, batch_size=BATCH_SIZE,
-                              shuffle=True, collate_fn=collate_batch)
-test_dataloader = DataLoader(test_dataset, batch_size=BATCH_SIZE,
-                             shuffle=True, collate_fn=collate_batch)
+train_dataloader = DataLoader(
+    split_train_, batch_size=BATCH_SIZE, shuffle=True, collate_fn=collate_batch
+)
+valid_dataloader = DataLoader(
+    split_valid_, batch_size=BATCH_SIZE, shuffle=True, collate_fn=collate_batch
+)
+test_dataloader = DataLoader(
+    test_dataset, batch_size=BATCH_SIZE, shuffle=True, collate_fn=collate_batch
+)
 
 for epoch in range(1, EPOCHS + 1):
     epoch_start_time = time.time()
     train(train_dataloader)
     accu_val = evaluate(valid_dataloader)
     if total_accu is not None and total_accu > accu_val:
-      scheduler.step()
+        scheduler.step()
     else:
-       total_accu = accu_val
-    print('-' * 59)
-    print('| end of epoch {:3d} | time: {:5.2f}s | '
-          'valid accuracy {:8.3f} '.format(epoch,
-                                           time.time() - epoch_start_time,
-                                           accu_val))
-    print('-' * 59)
+        total_accu = accu_val
+    print("-" * 59)
+    print(
+        "| end of epoch {:3d} | time: {:5.2f}s | "
+        "valid accuracy {:8.3f} ".format(
+            epoch, time.time() - epoch_start_time, accu_val
+        )
+    )
+    print("-" * 59)
 
 
 
@@ -322,11 +349,9 @@ for epoch in range(1, EPOCHS + 1):
 ######################################################################
 # 평가 데이터셋을 통한 결과를 확인합니다...
 
-print('Checking the results of test dataset.')
+print("Checking the results of test dataset.")
 accu_test = evaluate(test_dataloader)
-print('test accuracy {:8.3f}'.format(accu_test))
-
-
+print("test accuracy {:8.3f}".format(accu_test))
 
 
 ######################################################################
@@ -336,16 +361,14 @@ print('test accuracy {:8.3f}'.format(accu_test))
 # 현재까지 최고의 모델로 골프 뉴스를 테스트해보겠습니다.
 #
 
-ag_news_label = {1: "World",
-                 2: "Sports",
-                 3: "Business",
-                 4: "Sci/Tec"}
+ag_news_label = {1: "World", 2: "Sports", 3: "Business", 4: "Sci/Tec"}
 
 def predict(text, text_pipeline):
     with torch.no_grad():
         text = torch.tensor(text_pipeline(text))
         output = model(text, torch.tensor([0]))
         return output.argmax(1).item() + 1
+
 
 ex_text_str = "MEMPHIS, Tenn. – Four days ago, Jon Rahm was \
     enduring the season’s worst weather conditions on Sunday at The \
@@ -361,5 +384,4 @@ ex_text_str = "MEMPHIS, Tenn. – Four days ago, Jon Rahm was \
 
 model = model.to("cpu")
 
-print("This is a %s news" %ag_news_label[predict(ex_text_str, text_pipeline)])
-
+print("This is a %s news" % ag_news_label[predict(ex_text_str, text_pipeline)])

@@ -6,20 +6,16 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="ko" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
-<meta property="og:title" content="기초부터 시작하는 NLP: Sequence to Sequence 네트워크와 Attention을 이용한 번역" />
-  
+  <meta property="og:title" content="기초부터 시작하는 NLP: Sequence to Sequence 네트워크와 Attention을 이용한 번역" />
 <meta property="og:type" content="article" />
-  
 <meta property="og:url" content="https://tutorials.pytorch.kr/intermediate/seq2seq_translation_tutorial.html" />
-  
-<meta property="og:description" content="Author: Sean Robertson, 번역: 황성수,. 이 튜토리얼은 《기초부터 시작하는 NLP》의 세번째이자 마지막 편으로, NLP 모델링 작업을 위한 데이터 전처리에 사용할 자체 클래스와 함수들을 작성해보겠습니다. 이 튜토리얼을 마친 뒤에는 torchtext 가 어떻게 지금까지의 튜토리얼들에서의 전처리 과정을 다루는지를 이후 튜토리얼들에서 배울 수 있습니다. 이 프로젝트에서는 신경망이 불어를 영어로 번역하도록 가르칠 예정입니다. … 성공율은 변할 수 있습니다. 하나의 시퀀스를 다른 시퀀스로 바꾸는 두개의 RNN이 함께..." />
-  
+<meta property="og:site_name" content="PyTorch Tutorials KR" />
+<meta property="og:description" content="Author: Sean Robertson, 번역: 황성수,. 이 튜토리얼은 《기초부터 시작하는 NLP》의 세번째이자 마지막 편으로, NLP 모델링 작업을 위한 데이터 전처리에 사용할 자체 클래스와 함수들을 작성해보겠습니다. 이 튜토리얼을 마친 뒤에는 torchtext 가 어떻게 지금까지의 튜토리얼들에서의 전처리 과정을 다루는지를 이후 튜토리얼들에서 배울 수 있습니다. 이 프로젝트에서는 신경망이 불어를 영어로 번역하도록 가르칠 예정입니다. … 성공율은 달라질 수 있습니다. 하나의 시퀀스를 다른 시퀀스로 바꾸는 두 개의 RNN이 ..." />
 <meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
-  
-<meta property="og:image:alt" content="기초부터 시작하는 NLP: Sequence to Sequence 네트워크와 Attention을 이용한 번역" />
-  
+<meta property="og:image:alt" content="PyTorch Tutorials KR" />
+<meta name="description" content="Author: Sean Robertson, 번역: 황성수,. 이 튜토리얼은 《기초부터 시작하는 NLP》의 세번째이자 마지막 편으로, NLP 모델링 작업을 위한 데이터 전처리에 사용할 자체 클래스와 함수들을 작성해보겠습니다. 이 튜토리얼을 마친 뒤에는 torchtext 가 어떻게 지금까지의 튜토리얼들에서의 전처리 과정을 다루는지를 이후 튜토리얼들에서 배울 수 있습니다. 이 프로젝트에서는 신경망이 불어를 영어로 번역하도록 가르칠 예정입니다. … 성공율은 달라질 수 있습니다. 하나의 시퀀스를 다른 시퀀스로 바꾸는 두 개의 RNN이 ..." />
 <meta property="og:ignore_canonical" content="true" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>기초부터 시작하는 NLP: Sequence to Sequence 네트워크와 Attention을 이용한 번역 &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
@@ -45,7 +41,7 @@
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css" type="text/css" />
   <link rel="stylesheet" href="../_static/katex-math.css" type="text/css" />
   <link rel="stylesheet" href="../_static/sg_gallery.css" type="text/css" />
   <link rel="stylesheet" href="../_static/sg_gallery-binder.css" type="text/css" />
@@ -54,6 +50,7 @@
   <link rel="stylesheet" href="../_static/sphinx-design.5ea377869091fd0449014c60fc090103.min.css" type="text/css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/custom2.css" type="text/css" />
     <link rel="index" title="색인" href="../genindex.html" />
     <link rel="search" title="검색" href="../search.html" />
     <link rel="next" title="torchtext 라이브러리로 텍스트 분류하기" href="../beginner/text_sentiment_ngrams_tutorial.html" />
@@ -135,7 +132,7 @@
               
               
                 <div class="version">
-                  2.0.1
+                  2.3.1+cu121
                 </div>
               
             
@@ -200,11 +197,12 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">이미지/비디오</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="torchvision_tutorial.html">TorchVision 객체 검출 미세조정(Finetuning) 튜토리얼</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torchvision_tutorial.html">TorchVision Object Detection Finetuning Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/transfer_learning_tutorial.html">컴퓨터 비전(Vision)을 위한 전이학습(Transfer Learning)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/fgsm_tutorial.html">적대적 예제 생성(Adversarial Example Generation)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/dcgan_faces_tutorial.html">DCGAN 튜토리얼</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/vt_tutorial.html">배포를 위한 비전 트랜스포머(Vision Transformer) 모델 최적화하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/vt_tutorial.html">배포를 위해 비전 트랜스포머(Vision Transformer) 모델 최적화하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tiatoolbox_tutorial.html">Whole Slide Image Classification Using PyTorch and TIAToolbox</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">오디오</span></p>
 <ul>
@@ -220,27 +218,39 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">텍스트</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../beginner/transformer_tutorial.html"><code class="docutils literal notranslate"><span class="pre">nn.Transformer</span></code> 와 torchtext로 시퀀스-투-시퀀스(Sequence-to-Sequence) 모델링하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/bettertransformer_tutorial.html">Fast Transformer Inference with Better Transformer</a></li>
 <li class="toctree-l1"><a class="reference internal" href="char_rnn_classification_tutorial.html">기초부터 시작하는 NLP: 문자-단위 RNN으로 이름 분류하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="char_rnn_generation_tutorial.html">기초부터 시작하는 NLP:  문자-단위 RNN으로 이름 생성하기</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">기초부터 시작하는 NLP: Sequence to Sequence 네트워크와 Attention을 이용한 번역</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/text_sentiment_ngrams_tutorial.html">torchtext 라이브러리로 텍스트 분류하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/translation_transformer.html"><code class="docutils literal notranslate"><span class="pre">nn.Transformer</span></code> 와 torchtext로 언어 번역하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/torchtext_custom_dataset_tutorial.html">Preprocess custom text dataset using Torchtext</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">백엔드</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/onnx/intro_onnx.html">Introduction to ONNX</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">강화학습</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="reinforcement_q_learning.html">강화 학습 (DQN) 튜토리얼</a></li>
 <li class="toctree-l1"><a class="reference internal" href="reinforcement_ppo.html">Reinforcement Learning (PPO) with TorchRL Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="mario_rl_tutorial.html">마리오 게임 RL 에이전트로 학습하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/pendulum.html">Pendulum: Writing your environment and transforms with TorchRL</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">PyTorch 모델을 프로덕션 환경에 배포하기</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/onnx/intro_onnx.html">Introduction to ONNX</a></li>
 <li class="toctree-l1"><a class="reference internal" href="flask_rest_api_tutorial.html">Flask를 사용하여 Python에서 PyTorch를 REST API로 배포하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/Intro_to_TorchScript_tutorial.html">TorchScript 소개</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_export.html">C++에서 TorchScript 모델 로딩하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/super_resolution_with_onnxruntime.html">(선택) PyTorch 모델을 ONNX으로 변환하고 ONNX 런타임에서 실행하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="realtime_rpi.html">Raspberry Pi 4 에서 실시간 추론(Inference) (30fps!)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">PyTorch 프로파일링</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/profiler.html">PyTorch 모듈 프로파일링하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/hta_intro_tutorial.html">Introduction to Holistic Trace Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/hta_trace_diff_tutorial.html">Trace Diff using Holistic Trace Analysis</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Code Transforms with FX</span></p>
 <ul>
@@ -267,13 +277,14 @@
 <li class="toctree-l1"><a class="reference internal" href="../advanced/torch_script_custom_classes.html">커스텀 C++ 클래스로 TorchScript 확장하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/dispatcher.html">Registering a Dispatched Operator in C++</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/extend_dispatcher.html">Extending dispatcher for a new backend in C++</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/privateuseone.html">Facilitating New Backend Integration by PrivateUse1</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">모델 최적화</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/profiler.html">PyTorch 모듈 프로파일링 하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/profiler.html">PyTorch 모듈 프로파일링하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tensorboard_profiler_tutorial.html">텐서보드를 이용한 파이토치 프로파일러</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/hyperparameter_tuning_tutorial.html">Ray Tune을 이용한 하이퍼파라미터 튜닝</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/vt_tutorial.html">배포를 위한 비전 트랜스포머(Vision Transformer) 모델 최적화하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/hyperparameter_tuning_tutorial.html">Ray Tune을 사용한 하이퍼파라미터 튜닝</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/vt_tutorial.html">배포를 위해 비전 트랜스포머(Vision Transformer) 모델 최적화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="parametrizations.html">Parametrizations Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pruning_tutorial.html">가지치기 기법(Pruning) 튜토리얼</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/dynamic_quantization_tutorial.html">(베타) LSTM 기반 단어 단위 언어 모델의 동적 양자화</a></li>
@@ -284,10 +295,13 @@
 <li class="toctree-l1"><a class="reference internal" href="torchserve_with_ipex_2.html">Grokking PyTorch Intel CPU performance from first principles (Part 2)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="nvfuser_intro_tutorial.html">Getting Started - Accelerate Your Scripts with nvFuser</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ax_multiobjective_nas_tutorial.html">Multi-Objective NAS with Ax</a></li>
-<li class="toctree-l1"><a class="reference internal" href="torch_compile_tutorial.html">torch.compile Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_compile_tutorial.html">Introduction to <code class="docutils literal notranslate"><span class="pre">torch.compile</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="inductor_debug_cpu.html">Inductor CPU backend debugging and profiling</a></li>
 <li class="toctree-l1"><a class="reference internal" href="scaled_dot_product_attention_tutorial.html">(Beta) Scaled Dot Product Attention (SDPA)로 고성능 트랜스포머(Transformers) 구현하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="scaled_dot_product_attention_tutorial.html#torch-compile-sdpa"><code class="docutils literal notranslate"><span class="pre">torch.compile</span></code> 과 함께 SDPA 사용하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="scaled_dot_product_attention_tutorial.html#id6">결론</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scaled_dot_product_attention_tutorial.html#sdpa-atteition-bias">SDPA를 <code class="docutils literal notranslate"><span class="pre">atteition.bias</span></code> 하위 클래스와 사용하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scaled_dot_product_attention_tutorial.html#id8">결론</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/knowledge_distillation_tutorial.html">Knowledge Distillation Tutorial</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul>
@@ -299,20 +313,24 @@
 <li class="toctree-l1"><a class="reference internal" href="dist_tuto.html">PyTorch로 분산 어플리케이션 개발하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="FSDP_tutorial.html">Getting Started with Fully Sharded Data Parallel(FSDP)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="FSDP_adavnced_tutorial.html">Advanced Model Training with Fully Sharded Data Parallel (FSDP)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="process_group_cpp_extension_tutorial.html">Cpp 확장을 사용하여 프로세스 그룹 백엔드 사용자 정의</a></li>
+<li class="toctree-l1"><a class="reference internal" href="TP_tutorial.html">Large Scale Transformer model training with Tensor Parallel (TP)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="process_group_cpp_extension_tutorial.html">Cpp 확장을 사용한 프로세스 그룹 백엔드 사용자 정의</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rpc_tutorial.html">Getting Started with Distributed RPC Framework</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rpc_param_server_tutorial.html">Implementing a Parameter Server Using Distributed RPC Framework</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dist_pipeline_parallel_tutorial.html">Distributed Pipeline Parallelism Using RPC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rpc_async_execution.html">Implementing Batch RPC Processing Using Asynchronous Executions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/rpc_ddp_tutorial.html">분산 데이터 병렬(DDP)과 분산 RPC 프레임워크 결합</a></li>
-<li class="toctree-l1"><a class="reference internal" href="pipeline_tutorial.html">파이프라인 병렬화로 트랜스포머 모델 학습시키기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/ddp_pipeline.html">분산 데이터 병렬 처리와 병렬 처리 파이프라인을 사용한 트랜스포머 모델 학습</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/generic_join.html">Distributed Training with Uneven Inputs Using the Join Context Manager</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">모바일</span></p>
+<p class="caption" role="heading"><span class="caption-text">Edge with ExecuTorch</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/deeplabv3_on_ios.html">iOS에서의 이미지 분할 DeepLapV3</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/deeplabv3_on_android.html">안드로이드에서의 이미지 분할 DeepLapV3</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/executorch/stable/tutorials/export-to-executorch-tutorial.html">Exporting to ExecuTorch Tutorial</a></li>
+<li class="toctree-l1"><a class="reference external" href=" https://pytorch.org/executorch/stable/running-a-model-cpp-tutorial.html">Running an ExecuTorch Model in C++ Tutorial</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/executorch/stable/tutorials/sdk-integration-tutorial.html">Using the ExecuTorch SDK to Profile a Model</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/executorch/stable/demo-apps-ios.html">Building an ExecuTorch iOS Demo App</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/executorch/stable/demo-apps-android.html">Building an ExecuTorch Android Demo App</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/executorch/stable/examples-end-to-end-to-lower-model-to-delegate.html">Lowering a Model as a Delegate</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">추천 시스템</span></p>
 <ul>
@@ -425,7 +443,7 @@ to download the full example code</p>
 <div class="sphx-glr-example-title section" id="nlp-sequence-to-sequence-attention">
 <span id="sphx-glr-intermediate-seq2seq-translation-tutorial-py"></span><h1>기초부터 시작하는 NLP: Sequence to Sequence 네트워크와 Attention을 이용한 번역<a class="headerlink" href="#nlp-sequence-to-sequence-attention" title="이 제목에 대한 퍼머링크">¶</a></h1>
 <dl class="simple">
-<dt><strong>Author</strong>: <a class="reference external" href="https://github.com/spro/practical-pytorch">Sean Robertson</a></dt><dd><p><strong>번역</strong>: <a class="reference external" href="https://github.com/adonisues">황성수</a></p>
+<dt><strong>Author</strong>: <a class="reference external" href="https://github.com/spro">Sean Robertson</a></dt><dd><p><strong>번역</strong>: <a class="reference external" href="https://github.com/adonisues">황성수</a></p>
 </dd>
 </dl>
 <p>이 튜토리얼은 《기초부터 시작하는 NLP》의 세번째이자 마지막 편으로, NLP 모델링 작업을
@@ -433,27 +451,27 @@ to download the full example code</p>
 이 튜토리얼을 마친 뒤에는 <cite>torchtext</cite> 가 어떻게 지금까지의 튜토리얼들에서의
 전처리 과정을 다루는지를 이후 튜토리얼들에서 배울 수 있습니다.</p>
 <p>이 프로젝트에서는 신경망이 불어를 영어로 번역하도록 가르칠 예정입니다.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>[KEY: &gt; input, = target, &lt; output]
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="o">[</span>KEY:<span class="w"> </span>&gt;<span class="w"> </span>input,<span class="w"> </span><span class="o">=</span><span class="w"> </span>target,<span class="w"> </span>&lt;<span class="w"> </span>output<span class="o">]</span>
 
-&gt; il est en train de peindre un tableau .
-= he is painting a picture .
-&lt; he is painting a picture .
+&gt;<span class="w"> </span>il<span class="w"> </span>est<span class="w"> </span>en<span class="w"> </span>train<span class="w"> </span>de<span class="w"> </span>peindre<span class="w"> </span>un<span class="w"> </span>tableau<span class="w"> </span>.
+<span class="o">=</span><span class="w"> </span>he<span class="w"> </span>is<span class="w"> </span>painting<span class="w"> </span>a<span class="w"> </span>picture<span class="w"> </span>.
+&lt;<span class="w"> </span>he<span class="w"> </span>is<span class="w"> </span>painting<span class="w"> </span>a<span class="w"> </span>picture<span class="w"> </span>.
 
-&gt; pourquoi ne pas essayer ce vin delicieux ?
-= why not try that delicious wine ?
-&lt; why not try that delicious wine ?
+&gt;<span class="w"> </span>pourquoi<span class="w"> </span>ne<span class="w"> </span>pas<span class="w"> </span>essayer<span class="w"> </span>ce<span class="w"> </span>vin<span class="w"> </span>delicieux<span class="w"> </span>?
+<span class="o">=</span><span class="w"> </span>why<span class="w"> </span>not<span class="w"> </span>try<span class="w"> </span>that<span class="w"> </span>delicious<span class="w"> </span>wine<span class="w"> </span>?
+&lt;<span class="w"> </span>why<span class="w"> </span>not<span class="w"> </span>try<span class="w"> </span>that<span class="w"> </span>delicious<span class="w"> </span>wine<span class="w"> </span>?
 
-&gt; elle n est pas poete mais romanciere .
-= she is not a poet but a novelist .
-&lt; she not not a poet but a novelist .
+&gt;<span class="w"> </span>elle<span class="w"> </span>n<span class="w"> </span>est<span class="w"> </span>pas<span class="w"> </span>poete<span class="w"> </span>mais<span class="w"> </span>romanciere<span class="w"> </span>.
+<span class="o">=</span><span class="w"> </span>she<span class="w"> </span>is<span class="w"> </span>not<span class="w"> </span>a<span class="w"> </span>poet<span class="w"> </span>but<span class="w"> </span>a<span class="w"> </span>novelist<span class="w"> </span>.
+&lt;<span class="w"> </span>she<span class="w"> </span>not<span class="w"> </span>not<span class="w"> </span>a<span class="w"> </span>poet<span class="w"> </span>but<span class="w"> </span>a<span class="w"> </span>novelist<span class="w"> </span>.
 
-&gt; vous etes trop maigre .
-= you re too skinny .
-&lt; you re all alone .
+&gt;<span class="w"> </span>vous<span class="w"> </span>etes<span class="w"> </span>trop<span class="w"> </span>maigre<span class="w"> </span>.
+<span class="o">=</span><span class="w"> </span>you<span class="w"> </span>re<span class="w"> </span>too<span class="w"> </span>skinny<span class="w"> </span>.
+&lt;<span class="w"> </span>you<span class="w"> </span>re<span class="w"> </span>all<span class="w"> </span>alone<span class="w"> </span>.
 </pre></div>
 </div>
-<p>… 성공율은 변할 수 있습니다.</p>
-<p>하나의 시퀀스를 다른 시퀀스로 바꾸는 두개의 RNN이 함께 동작하는
+<p>… 성공율은 달라질 수 있습니다.</p>
+<p>하나의 시퀀스를 다른 시퀀스로 바꾸는 두 개의 RNN이 함께 동작하는
 <a class="reference external" href="https://arxiv.org/abs/1409.3215">sequence to sequence network</a> 의 간단하지만 강력한 아이디어가
 이것(번역)을 가능하게 합니다. 인코더 네트워크는 입력 시퀀스를 벡터로 압축하고,
 디코더 네트워크는 해당 벡터를 새로운 시퀀스로 펼칩니다.</p>
@@ -488,7 +506,6 @@ Translate</a></p></li>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">unicode_literals</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">division</span>
 <span class="kn">from</span> <span class="nn">io</span> <span class="kn">import</span> <span class="nb">open</span>
 <span class="kn">import</span> <span class="nn">unicodedata</span>
-<span class="kn">import</span> <span class="nn">string</span>
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">random</span>
 
@@ -497,11 +514,14 @@ Translate</a></p></li>
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">optim</span>
 <span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="nn">F</span>
 
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">TensorDataset</span><span class="p">,</span> <span class="n">DataLoader</span><span class="p">,</span> <span class="n">RandomSampler</span>
+
 <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="section" id="id2">
-<h2>데이터 파일 로딩<a class="headerlink" href="#id2" title="이 제목에 대한 퍼머링크">¶</a></h2>
+<h2>데이터 파일 불러오기<a class="headerlink" href="#id2" title="이 제목에 대한 퍼머링크">¶</a></h2>
 <p>이 프로젝트의 데이터는 수천 개의 영어-프랑스어 번역 쌍입니다.</p>
 <p><a class="reference external" href="https://opendata.stackexchange.com/questions/3888/dataset-of-sentences-translated-into-many-languages">Open Data Stack Exchange</a>
 에 관한 이 질문은 <a class="reference external" href="https://tatoeba.org/eng/downloads">https://tatoeba.org/eng/downloads</a> 에서 다운 로드가 가능한
@@ -511,7 +531,7 @@ Translate</a></p></li>
 <p>영어-프랑스어 쌍이 너무 커서 저장소에 포함 할 수 없기 때문에
 계속하기 전에 <code class="docutils literal notranslate"><span class="pre">data/eng-fra.txt</span></code> 로 다운로드하십시오.
 이 파일은 탭으로 구분된 번역 쌍 목록입니다:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">I</span> <span class="n">am</span> <span class="n">cold</span><span class="o">.</span>    <span class="n">J</span><span class="s1">&#39;ai froid.</span>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>I am cold.    J&#39;ai froid.
 </pre></div>
 </div>
 <div class="admonition note">
@@ -571,13 +591,11 @@ ASCII로 변환하고, 모든 문자를 소문자로 만들고, 대부분의 구
     <span class="p">)</span>
 
 <span class="c1"># 소문자, 다듬기, 그리고 문자가 아닌 문자 제거</span>
-
-
 <span class="k">def</span> <span class="nf">normalizeString</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
     <span class="n">s</span> <span class="o">=</span> <span class="n">unicodeToAscii</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
     <span class="n">s</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;([.!?])&quot;</span><span class="p">,</span> <span class="sa">r</span><span class="s2">&quot; \1&quot;</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
-    <span class="n">s</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;[^a-zA-Z.!?]+&quot;</span><span class="p">,</span> <span class="sa">r</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">s</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;[^a-zA-Z!?]+&quot;</span><span class="p">,</span> <span class="sa">r</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">s</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
 </pre></div>
 </div>
 <p>To read the data file we will split the file into lines, and then split
@@ -622,7 +640,6 @@ flag to reverse the pairs.</p>
     <span class="s2">&quot;they are&quot;</span><span class="p">,</span> <span class="s2">&quot;they re &quot;</span>
 <span class="p">)</span>
 
-
 <span class="k">def</span> <span class="nf">filterPair</span><span class="p">(</span><span class="n">p</span><span class="p">):</span>
     <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">))</span> <span class="o">&lt;</span> <span class="n">MAX_LENGTH</span> <span class="ow">and</span> \
         <span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">))</span> <span class="o">&lt;</span> <span class="n">MAX_LENGTH</span> <span class="ow">and</span> \
@@ -660,12 +677,12 @@ flag to reverse the pairs.</p>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Reading lines...
 Read 135842 sentence pairs
-Trimmed to 10599 sentence pairs
+Trimmed to 11445 sentence pairs
 Counting words...
 Counted words:
-fra 4345
-eng 2803
-[&#39;vous etes allemands n est ce pas ?&#39;, &#39;you re germans aren t you ?&#39;]
+fra 4601
+eng 2991
+[&#39;tu preches une convaincue&#39;, &#39;you re preaching to the choir&#39;]
 </pre></div>
 </div>
 </div>
@@ -703,21 +720,18 @@ Seq2Seq 모델은 시퀀스 길이와 순서를 자유롭게하기 때문에
 <img alt="" src="../_images/encoder-network.png" />
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">EncoderRNN</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_size</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_size</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">,</span> <span class="n">dropout_p</span><span class="o">=</span><span class="mf">0.1</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">EncoderRNN</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">hidden_size</span> <span class="o">=</span> <span class="n">hidden_size</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">embedding</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Embedding</span><span class="p">(</span><span class="n">input_size</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">gru</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">GRU</span><span class="p">(</span><span class="n">hidden_size</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gru</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">GRU</span><span class="p">(</span><span class="n">hidden_size</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">,</span> <span class="n">batch_first</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="n">dropout_p</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">,</span> <span class="n">hidden</span><span class="p">):</span>
-        <span class="n">embedded</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">embedding</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-        <span class="n">output</span> <span class="o">=</span> <span class="n">embedded</span>
-        <span class="n">output</span><span class="p">,</span> <span class="n">hidden</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gru</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">hidden</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+        <span class="n">embedded</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">embedding</span><span class="p">(</span><span class="nb">input</span><span class="p">))</span>
+        <span class="n">output</span><span class="p">,</span> <span class="n">hidden</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gru</span><span class="p">(</span><span class="n">embedded</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">output</span><span class="p">,</span> <span class="n">hidden</span>
-
-    <span class="k">def</span> <span class="nf">initHidden</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hidden_size</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -740,22 +754,38 @@ Seq2Seq 모델은 시퀀스 길이와 순서를 자유롭게하기 때문에
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">DecoderRNN</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">,</span> <span class="n">output_size</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">DecoderRNN</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">hidden_size</span> <span class="o">=</span> <span class="n">hidden_size</span>
-
         <span class="bp">self</span><span class="o">.</span><span class="n">embedding</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Embedding</span><span class="p">(</span><span class="n">output_size</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">gru</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">GRU</span><span class="p">(</span><span class="n">hidden_size</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gru</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">GRU</span><span class="p">(</span><span class="n">hidden_size</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">,</span> <span class="n">batch_first</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">out</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">hidden_size</span><span class="p">,</span> <span class="n">output_size</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">softmax</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">LogSoftmax</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">,</span> <span class="n">hidden</span><span class="p">):</span>
-        <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">embedding</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">encoder_outputs</span><span class="p">,</span> <span class="n">encoder_hidden</span><span class="p">,</span> <span class="n">target_tensor</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">batch_size</span> <span class="o">=</span> <span class="n">encoder_outputs</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">decoder_input</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">long</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span><span class="o">.</span><span class="n">fill_</span><span class="p">(</span><span class="n">SOS_token</span><span class="p">)</span>
+        <span class="n">decoder_hidden</span> <span class="o">=</span> <span class="n">encoder_hidden</span>
+        <span class="n">decoder_outputs</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">MAX_LENGTH</span><span class="p">):</span>
+            <span class="n">decoder_output</span><span class="p">,</span> <span class="n">decoder_hidden</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">forward_step</span><span class="p">(</span><span class="n">decoder_input</span><span class="p">,</span> <span class="n">decoder_hidden</span><span class="p">)</span>
+            <span class="n">decoder_outputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">decoder_output</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">target_tensor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># Teacher forcing 포함: 목표를 다음 입력으로 전달</span>
+                <span class="n">decoder_input</span> <span class="o">=</span> <span class="n">target_tensor</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="c1"># Teacher forcing</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Teacher forcing 미포함: 자신의 예측을 다음 입력으로 사용</span>
+                <span class="n">_</span><span class="p">,</span> <span class="n">topi</span> <span class="o">=</span> <span class="n">decoder_output</span><span class="o">.</span><span class="n">topk</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                <span class="n">decoder_input</span> <span class="o">=</span> <span class="n">topi</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span>  <span class="c1"># 입력으로 사용할 부분을 히스토리에서 분리</span>
+
+        <span class="n">decoder_outputs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">decoder_outputs</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">decoder_outputs</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">log_softmax</span><span class="p">(</span><span class="n">decoder_outputs</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">decoder_outputs</span><span class="p">,</span> <span class="n">decoder_hidden</span><span class="p">,</span> <span class="kc">None</span>   <span class="c1"># 학습 루프의 일관성 유지를 위해 `None` 을 추가로 반환</span>
+
+    <span class="k">def</span> <span class="nf">forward_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">,</span> <span class="n">hidden</span><span class="p">):</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">embedding</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
         <span class="n">output</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
         <span class="n">output</span><span class="p">,</span> <span class="n">hidden</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gru</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">hidden</span><span class="p">)</span>
-        <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">out</span><span class="p">(</span><span class="n">output</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">out</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">output</span><span class="p">,</span> <span class="n">hidden</span>
-
-    <span class="k">def</span> <span class="nf">initHidden</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hidden_size</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>이 모델의 결과를 학습하고 관찰하는 것을 권장하지만,
@@ -784,49 +814,92 @@ Attention 메커니즘을 소개 할 것입니다.</p>
 <div class="figure align-default">
 <img alt="" src="../_images/attention-decoder-network.png" />
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">AttnDecoderRNN</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">,</span> <span class="n">output_size</span><span class="p">,</span> <span class="n">dropout_p</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="n">MAX_LENGTH</span><span class="p">):</span>
+<p>부가적 어텐션(Additive Attention)이라고도 알려진 바다나우 어텐션(Bahdanau
+Attention)은 기계 번역 작업과 같은 시퀀스-투-시퀀스 모델에서 일반적으로
+사용하는 어텐션 기법(mechanism)입니다. 이 어텐션 기법은 Bahdanau et al.의 논문인
+<a class="reference external" href="https://arxiv.org/pdf/1409.0473.pdf">Neural Machine Translation by Jointly Learning to Align and Translate</a>
+에서 소개되었습니다. 이 어텐션 기법은 학습된 정렬 모델(learned alignment model)을
+사용하여 인코더와 디코더의 은닉 상태(hidden state) 간의 어텐션 점수를 계산합니다.
+이는 정렬된 어텐션 점수를 계산하기 위해 feed-forward 신경망을 사용합니다.</p>
+<p>또는, 디코더의 은닉 상태와 인코더의 은닉 상태 사이의 어텐션 점수를 Dot-Product로
+계산하는 루옹 어텐션(Luong Attention)과 같은 다른 어텐션 기법들을 사용할 수도 있습니다.
+이는 바다나우 어텐션(Bahdanau Attention)에서 사용하는 비선형 변환(non-linear transformation)을
+사용하지는 않습니다.</p>
+<p>이 튜토리얼에서는 바다나우 어텐션(Bahdanau Attention)을 사용할 것입니다. 하지만 이를
+루옹 어텐션(Luong Attention) 기법으로 변경해보는 것도 좋은 연습이 될 것입니다.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">BahdanauAttention</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">BahdanauAttention</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Wa</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">hidden_size</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Ua</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">hidden_size</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Va</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">hidden_size</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">,</span> <span class="n">keys</span><span class="p">):</span>
+        <span class="n">scores</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Va</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">tanh</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Wa</span><span class="p">(</span><span class="n">query</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">Ua</span><span class="p">(</span><span class="n">keys</span><span class="p">)))</span>
+        <span class="n">scores</span> <span class="o">=</span> <span class="n">scores</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">weights</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">scores</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">context</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">bmm</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">keys</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">context</span><span class="p">,</span> <span class="n">weights</span>
+
+<span class="k">class</span> <span class="nc">AttnDecoderRNN</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">,</span> <span class="n">output_size</span><span class="p">,</span> <span class="n">dropout_p</span><span class="o">=</span><span class="mf">0.1</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">AttnDecoderRNN</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">hidden_size</span> <span class="o">=</span> <span class="n">hidden_size</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">output_size</span> <span class="o">=</span> <span class="n">output_size</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dropout_p</span> <span class="o">=</span> <span class="n">dropout_p</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">max_length</span> <span class="o">=</span> <span class="n">max_length</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">embedding</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Embedding</span><span class="p">(</span><span class="n">output_size</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">attention</span> <span class="o">=</span> <span class="n">BahdanauAttention</span><span class="p">(</span><span class="n">hidden_size</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gru</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">GRU</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">hidden_size</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">,</span> <span class="n">batch_first</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">out</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">hidden_size</span><span class="p">,</span> <span class="n">output_size</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="n">dropout_p</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">embedding</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Embedding</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hidden_size</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">attn</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hidden_size</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_length</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">attn_combine</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hidden_size</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hidden_size</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dropout_p</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">gru</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">GRU</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hidden_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hidden_size</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">out</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hidden_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_size</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">encoder_outputs</span><span class="p">,</span> <span class="n">encoder_hidden</span><span class="p">,</span> <span class="n">target_tensor</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">batch_size</span> <span class="o">=</span> <span class="n">encoder_outputs</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">decoder_input</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">long</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span><span class="o">.</span><span class="n">fill_</span><span class="p">(</span><span class="n">SOS_token</span><span class="p">)</span>
+        <span class="n">decoder_hidden</span> <span class="o">=</span> <span class="n">encoder_hidden</span>
+        <span class="n">decoder_outputs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">attentions</span> <span class="o">=</span> <span class="p">[]</span>
 
-    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">,</span> <span class="n">hidden</span><span class="p">,</span> <span class="n">encoder_outputs</span><span class="p">):</span>
-        <span class="n">embedded</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">embedding</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-        <span class="n">embedded</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span><span class="p">(</span><span class="n">embedded</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">MAX_LENGTH</span><span class="p">):</span>
+            <span class="n">decoder_output</span><span class="p">,</span> <span class="n">decoder_hidden</span><span class="p">,</span> <span class="n">attn_weights</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">forward_step</span><span class="p">(</span>
+                <span class="n">decoder_input</span><span class="p">,</span> <span class="n">decoder_hidden</span><span class="p">,</span> <span class="n">encoder_outputs</span>
+            <span class="p">)</span>
+            <span class="n">decoder_outputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">decoder_output</span><span class="p">)</span>
+            <span class="n">attentions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">attn_weights</span><span class="p">)</span>
 
-        <span class="n">attn_weights</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">attn</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="n">embedded</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">hidden</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="mi">1</span><span class="p">)),</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-        <span class="n">attn_applied</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">bmm</span><span class="p">(</span><span class="n">attn_weights</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
-                                 <span class="n">encoder_outputs</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">target_tensor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># Teacher forcing 포함: 목표를 다음 입력으로 전달</span>
+                <span class="n">decoder_input</span> <span class="o">=</span> <span class="n">target_tensor</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="c1"># Teacher forcing</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Teacher forcing 미포함: 자신의 예측을 다음 입력으로 사용</span>
+                <span class="n">_</span><span class="p">,</span> <span class="n">topi</span> <span class="o">=</span> <span class="n">decoder_output</span><span class="o">.</span><span class="n">topk</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                <span class="n">decoder_input</span> <span class="o">=</span> <span class="n">topi</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span>  <span class="c1"># 입력으로 사용할 부분을 히스토리에서 분리</span>
 
-        <span class="n">output</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="n">embedded</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">attn_applied</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">attn_combine</span><span class="p">(</span><span class="n">output</span><span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">decoder_outputs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">decoder_outputs</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">decoder_outputs</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">log_softmax</span><span class="p">(</span><span class="n">decoder_outputs</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">attentions</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">attentions</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
-        <span class="n">output</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
-        <span class="n">output</span><span class="p">,</span> <span class="n">hidden</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gru</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">hidden</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">decoder_outputs</span><span class="p">,</span> <span class="n">decoder_hidden</span><span class="p">,</span> <span class="n">attentions</span>
 
-        <span class="n">output</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">log_softmax</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">out</span><span class="p">(</span><span class="n">output</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">forward_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">,</span> <span class="n">hidden</span><span class="p">,</span> <span class="n">encoder_outputs</span><span class="p">):</span>
+        <span class="n">embedded</span> <span class="o">=</span>  <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">embedding</span><span class="p">(</span><span class="nb">input</span><span class="p">))</span>
+
+        <span class="n">query</span> <span class="o">=</span> <span class="n">hidden</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">context</span><span class="p">,</span> <span class="n">attn_weights</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">attention</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">encoder_outputs</span><span class="p">)</span>
+        <span class="n">input_gru</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="n">embedded</span><span class="p">,</span> <span class="n">context</span><span class="p">),</span> <span class="n">dim</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+        <span class="n">output</span><span class="p">,</span> <span class="n">hidden</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gru</span><span class="p">(</span><span class="n">input_gru</span><span class="p">,</span> <span class="n">hidden</span><span class="p">)</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">out</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+
         <span class="k">return</span> <span class="n">output</span><span class="p">,</span> <span class="n">hidden</span><span class="p">,</span> <span class="n">attn_weights</span>
-
-    <span class="k">def</span> <span class="nf">initHidden</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hidden_size</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="admonition note">
 <p class="admonition-title">참고</p>
-<p>There are other forms of attention that work around the length
-limitation by using a relative position approach. Read about 《local
-attention》 in <a class="reference external" href="https://arxiv.org/abs/1508.04025">Effective Approaches to Attention-based Neural Machine
-Translation</a>.</p>
+<p>길이 제한을 해결하기 위해 상대적 위치 접근(relative position approach)
+방식을 사용하는 다른 형태의 어텐션 방식들도 있습니다.
+<a class="reference external" href="https://arxiv.org/abs/1508.04025">Effective Approaches to Attention-based Neural Machine Translation</a>
+에서 《local attention》 에 대해 읽어보세요.</p>
 </div>
 </div>
 </div>
@@ -841,17 +914,37 @@ Translation</a>.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">indexesFromSentence</span><span class="p">(</span><span class="n">lang</span><span class="p">,</span> <span class="n">sentence</span><span class="p">):</span>
     <span class="k">return</span> <span class="p">[</span><span class="n">lang</span><span class="o">.</span><span class="n">word2index</span><span class="p">[</span><span class="n">word</span><span class="p">]</span> <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">sentence</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)]</span>
 
-
 <span class="k">def</span> <span class="nf">tensorFromSentence</span><span class="p">(</span><span class="n">lang</span><span class="p">,</span> <span class="n">sentence</span><span class="p">):</span>
     <span class="n">indexes</span> <span class="o">=</span> <span class="n">indexesFromSentence</span><span class="p">(</span><span class="n">lang</span><span class="p">,</span> <span class="n">sentence</span><span class="p">)</span>
     <span class="n">indexes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">EOS_token</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">indexes</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">long</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-
+    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">indexes</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">long</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
 
 <span class="k">def</span> <span class="nf">tensorsFromPair</span><span class="p">(</span><span class="n">pair</span><span class="p">):</span>
     <span class="n">input_tensor</span> <span class="o">=</span> <span class="n">tensorFromSentence</span><span class="p">(</span><span class="n">input_lang</span><span class="p">,</span> <span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
     <span class="n">target_tensor</span> <span class="o">=</span> <span class="n">tensorFromSentence</span><span class="p">(</span><span class="n">output_lang</span><span class="p">,</span> <span class="n">pair</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
     <span class="k">return</span> <span class="p">(</span><span class="n">input_tensor</span><span class="p">,</span> <span class="n">target_tensor</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">get_dataloader</span><span class="p">(</span><span class="n">batch_size</span><span class="p">):</span>
+    <span class="n">input_lang</span><span class="p">,</span> <span class="n">output_lang</span><span class="p">,</span> <span class="n">pairs</span> <span class="o">=</span> <span class="n">prepareData</span><span class="p">(</span><span class="s1">&#39;eng&#39;</span><span class="p">,</span> <span class="s1">&#39;fra&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">pairs</span><span class="p">)</span>
+    <span class="n">input_ids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n</span><span class="p">,</span> <span class="n">MAX_LENGTH</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+    <span class="n">target_ids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n</span><span class="p">,</span> <span class="n">MAX_LENGTH</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="p">(</span><span class="n">inp</span><span class="p">,</span> <span class="n">tgt</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">pairs</span><span class="p">):</span>
+        <span class="n">inp_ids</span> <span class="o">=</span> <span class="n">indexesFromSentence</span><span class="p">(</span><span class="n">input_lang</span><span class="p">,</span> <span class="n">inp</span><span class="p">)</span>
+        <span class="n">tgt_ids</span> <span class="o">=</span> <span class="n">indexesFromSentence</span><span class="p">(</span><span class="n">output_lang</span><span class="p">,</span> <span class="n">tgt</span><span class="p">)</span>
+        <span class="n">inp_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">EOS_token</span><span class="p">)</span>
+        <span class="n">tgt_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">EOS_token</span><span class="p">)</span>
+        <span class="n">input_ids</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="p">:</span><span class="nb">len</span><span class="p">(</span><span class="n">inp_ids</span><span class="p">)]</span> <span class="o">=</span> <span class="n">inp_ids</span>
+        <span class="n">target_ids</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="p">:</span><span class="nb">len</span><span class="p">(</span><span class="n">tgt_ids</span><span class="p">)]</span> <span class="o">=</span> <span class="n">tgt_ids</span>
+
+    <span class="n">train_data</span> <span class="o">=</span> <span class="n">TensorDataset</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">LongTensor</span><span class="p">(</span><span class="n">input_ids</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">),</span>
+                               <span class="n">torch</span><span class="o">.</span><span class="n">LongTensor</span><span class="p">(</span><span class="n">target_ids</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">))</span>
+
+    <span class="n">train_sampler</span> <span class="o">=</span> <span class="n">RandomSampler</span><span class="p">(</span><span class="n">train_data</span><span class="p">)</span>
+    <span class="n">train_dataloader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">train_data</span><span class="p">,</span> <span class="n">sampler</span><span class="o">=</span><span class="n">train_sampler</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">input_lang</span><span class="p">,</span> <span class="n">output_lang</span><span class="p">,</span> <span class="n">train_dataloader</span>
 </pre></div>
 </div>
 </div>
@@ -871,59 +964,31 @@ Translation</a>.</p>
 <p>PyTorch의 autograd 가 제공하는 자유 덕분에 간단한 If 문으로
 Teacher Forcing을 사용할지 아니면 사용하지 않을지를 선택할 수 있습니다.
 더 많이 사용하려면 <code class="docutils literal notranslate"><span class="pre">teacher_forcing_ratio</span></code> 를 확인하십시오.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">teacher_forcing_ratio</span> <span class="o">=</span> <span class="mf">0.5</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">train_epoch</span><span class="p">(</span><span class="n">dataloader</span><span class="p">,</span> <span class="n">encoder</span><span class="p">,</span> <span class="n">decoder</span><span class="p">,</span> <span class="n">encoder_optimizer</span><span class="p">,</span>
+          <span class="n">decoder_optimizer</span><span class="p">,</span> <span class="n">criterion</span><span class="p">):</span>
 
+    <span class="n">total_loss</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">dataloader</span><span class="p">:</span>
+        <span class="n">input_tensor</span><span class="p">,</span> <span class="n">target_tensor</span> <span class="o">=</span> <span class="n">data</span>
 
-<span class="k">def</span> <span class="nf">train</span><span class="p">(</span><span class="n">input_tensor</span><span class="p">,</span> <span class="n">target_tensor</span><span class="p">,</span> <span class="n">encoder</span><span class="p">,</span> <span class="n">decoder</span><span class="p">,</span> <span class="n">encoder_optimizer</span><span class="p">,</span> <span class="n">decoder_optimizer</span><span class="p">,</span> <span class="n">criterion</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="n">MAX_LENGTH</span><span class="p">):</span>
-    <span class="n">encoder_hidden</span> <span class="o">=</span> <span class="n">encoder</span><span class="o">.</span><span class="n">initHidden</span><span class="p">()</span>
+        <span class="n">encoder_optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+        <span class="n">decoder_optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
 
-    <span class="n">encoder_optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
-    <span class="n">decoder_optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+        <span class="n">encoder_outputs</span><span class="p">,</span> <span class="n">encoder_hidden</span> <span class="o">=</span> <span class="n">encoder</span><span class="p">(</span><span class="n">input_tensor</span><span class="p">)</span>
+        <span class="n">decoder_outputs</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">decoder</span><span class="p">(</span><span class="n">encoder_outputs</span><span class="p">,</span> <span class="n">encoder_hidden</span><span class="p">,</span> <span class="n">target_tensor</span><span class="p">)</span>
 
-    <span class="n">input_length</span> <span class="o">=</span> <span class="n">input_tensor</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-    <span class="n">target_length</span> <span class="o">=</span> <span class="n">target_tensor</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span>
+            <span class="n">decoder_outputs</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">decoder_outputs</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)),</span>
+            <span class="n">target_tensor</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
 
-    <span class="n">encoder_outputs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">max_length</span><span class="p">,</span> <span class="n">encoder</span><span class="o">.</span><span class="n">hidden_size</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">encoder_optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+        <span class="n">decoder_optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
 
-    <span class="n">loss</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">total_loss</span> <span class="o">+=</span> <span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
 
-    <span class="k">for</span> <span class="n">ei</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">input_length</span><span class="p">):</span>
-        <span class="n">encoder_output</span><span class="p">,</span> <span class="n">encoder_hidden</span> <span class="o">=</span> <span class="n">encoder</span><span class="p">(</span>
-            <span class="n">input_tensor</span><span class="p">[</span><span class="n">ei</span><span class="p">],</span> <span class="n">encoder_hidden</span><span class="p">)</span>
-        <span class="n">encoder_outputs</span><span class="p">[</span><span class="n">ei</span><span class="p">]</span> <span class="o">=</span> <span class="n">encoder_output</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
-
-    <span class="n">decoder_input</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([[</span><span class="n">SOS_token</span><span class="p">]],</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
-
-    <span class="n">decoder_hidden</span> <span class="o">=</span> <span class="n">encoder_hidden</span>
-
-    <span class="n">use_teacher_forcing</span> <span class="o">=</span> <span class="kc">True</span> <span class="k">if</span> <span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">teacher_forcing_ratio</span> <span class="k">else</span> <span class="kc">False</span>
-
-    <span class="k">if</span> <span class="n">use_teacher_forcing</span><span class="p">:</span>
-        <span class="c1"># Teacher forcing 포함: 목표를 다음 입력으로 전달</span>
-        <span class="k">for</span> <span class="n">di</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">target_length</span><span class="p">):</span>
-            <span class="n">decoder_output</span><span class="p">,</span> <span class="n">decoder_hidden</span><span class="p">,</span> <span class="n">decoder_attention</span> <span class="o">=</span> <span class="n">decoder</span><span class="p">(</span>
-                <span class="n">decoder_input</span><span class="p">,</span> <span class="n">decoder_hidden</span><span class="p">,</span> <span class="n">encoder_outputs</span><span class="p">)</span>
-            <span class="n">loss</span> <span class="o">+=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">decoder_output</span><span class="p">,</span> <span class="n">target_tensor</span><span class="p">[</span><span class="n">di</span><span class="p">])</span>
-            <span class="n">decoder_input</span> <span class="o">=</span> <span class="n">target_tensor</span><span class="p">[</span><span class="n">di</span><span class="p">]</span>  <span class="c1"># Teacher forcing</span>
-
-    <span class="k">else</span><span class="p">:</span>
-        <span class="c1"># Teacher forcing 미포함: 자신의 예측을 다음 입력으로 사용</span>
-        <span class="k">for</span> <span class="n">di</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">target_length</span><span class="p">):</span>
-            <span class="n">decoder_output</span><span class="p">,</span> <span class="n">decoder_hidden</span><span class="p">,</span> <span class="n">decoder_attention</span> <span class="o">=</span> <span class="n">decoder</span><span class="p">(</span>
-                <span class="n">decoder_input</span><span class="p">,</span> <span class="n">decoder_hidden</span><span class="p">,</span> <span class="n">encoder_outputs</span><span class="p">)</span>
-            <span class="n">topv</span><span class="p">,</span> <span class="n">topi</span> <span class="o">=</span> <span class="n">decoder_output</span><span class="o">.</span><span class="n">topk</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-            <span class="n">decoder_input</span> <span class="o">=</span> <span class="n">topi</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span>  <span class="c1"># 입력으로 사용할 부분을 히스토리에서 분리</span>
-
-            <span class="n">loss</span> <span class="o">+=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">decoder_output</span><span class="p">,</span> <span class="n">target_tensor</span><span class="p">[</span><span class="n">di</span><span class="p">])</span>
-            <span class="k">if</span> <span class="n">decoder_input</span><span class="o">.</span><span class="n">item</span><span class="p">()</span> <span class="o">==</span> <span class="n">EOS_token</span><span class="p">:</span>
-                <span class="k">break</span>
-
-    <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
-
-    <span class="n">encoder_optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
-    <span class="n">decoder_optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
-
-    <span class="k">return</span> <span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span> <span class="o">/</span> <span class="n">target_length</span>
+    <span class="k">return</span> <span class="n">total_loss</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataloader</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>이것은 현재 시간과 진행률%을 고려해 경과된 시간과 남은 예상
@@ -931,12 +996,10 @@ Teacher Forcing을 사용할지 아니면 사용하지 않을지를 선택할 �
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">import</span> <span class="nn">math</span>
 
-
 <span class="k">def</span> <span class="nf">asMinutes</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
     <span class="n">m</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">s</span> <span class="o">/</span> <span class="mi">60</span><span class="p">)</span>
     <span class="n">s</span> <span class="o">-=</span> <span class="n">m</span> <span class="o">*</span> <span class="mi">60</span>
     <span class="k">return</span> <span class="s1">&#39;</span><span class="si">%d</span><span class="s1">m </span><span class="si">%d</span><span class="s1">s&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
-
 
 <span class="k">def</span> <span class="nf">timeSince</span><span class="p">(</span><span class="n">since</span><span class="p">,</span> <span class="n">percent</span><span class="p">):</span>
     <span class="n">now</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
@@ -955,35 +1018,29 @@ Teacher Forcing을 사용할지 아니면 사용하지 않을지를 선택할 �
 </ul>
 <p>그런 다음 우리는 여러 번 <code class="docutils literal notranslate"><span class="pre">train</span></code> 을 호출하며 때로는 진행률
 (예제의 %, 현재까지의 예상 시간)과 평균 손실을 출력합니다.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">trainIters</span><span class="p">(</span><span class="n">encoder</span><span class="p">,</span> <span class="n">decoder</span><span class="p">,</span> <span class="n">n_iters</span><span class="p">,</span> <span class="n">print_every</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">plot_every</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.01</span><span class="p">):</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">train</span><span class="p">(</span><span class="n">train_dataloader</span><span class="p">,</span> <span class="n">encoder</span><span class="p">,</span> <span class="n">decoder</span><span class="p">,</span> <span class="n">n_epochs</span><span class="p">,</span> <span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span>
+               <span class="n">print_every</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">plot_every</span><span class="o">=</span><span class="mi">100</span><span class="p">):</span>
     <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
     <span class="n">plot_losses</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="n">print_loss_total</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># print_every 마다 초기화</span>
-    <span class="n">plot_loss_total</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># plot_every 마다 초기화</span>
+    <span class="n">print_loss_total</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># Reset every print_every</span>
+    <span class="n">plot_loss_total</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># Reset every plot_every</span>
 
-    <span class="n">encoder_optimizer</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">SGD</span><span class="p">(</span><span class="n">encoder</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="n">learning_rate</span><span class="p">)</span>
-    <span class="n">decoder_optimizer</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">SGD</span><span class="p">(</span><span class="n">decoder</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="n">learning_rate</span><span class="p">)</span>
-    <span class="n">training_pairs</span> <span class="o">=</span> <span class="p">[</span><span class="n">tensorsFromPair</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">pairs</span><span class="p">))</span>
-                      <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_iters</span><span class="p">)]</span>
+    <span class="n">encoder_optimizer</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">encoder</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="n">learning_rate</span><span class="p">)</span>
+    <span class="n">decoder_optimizer</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">decoder</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="n">learning_rate</span><span class="p">)</span>
     <span class="n">criterion</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">NLLLoss</span><span class="p">()</span>
 
-    <span class="k">for</span> <span class="nb">iter</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_iters</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
-        <span class="n">training_pair</span> <span class="o">=</span> <span class="n">training_pairs</span><span class="p">[</span><span class="nb">iter</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
-        <span class="n">input_tensor</span> <span class="o">=</span> <span class="n">training_pair</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">target_tensor</span> <span class="o">=</span> <span class="n">training_pair</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-
-        <span class="n">loss</span> <span class="o">=</span> <span class="n">train</span><span class="p">(</span><span class="n">input_tensor</span><span class="p">,</span> <span class="n">target_tensor</span><span class="p">,</span> <span class="n">encoder</span><span class="p">,</span>
-                     <span class="n">decoder</span><span class="p">,</span> <span class="n">encoder_optimizer</span><span class="p">,</span> <span class="n">decoder_optimizer</span><span class="p">,</span> <span class="n">criterion</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_epochs</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="n">loss</span> <span class="o">=</span> <span class="n">train_epoch</span><span class="p">(</span><span class="n">train_dataloader</span><span class="p">,</span> <span class="n">encoder</span><span class="p">,</span> <span class="n">decoder</span><span class="p">,</span> <span class="n">encoder_optimizer</span><span class="p">,</span> <span class="n">decoder_optimizer</span><span class="p">,</span> <span class="n">criterion</span><span class="p">)</span>
         <span class="n">print_loss_total</span> <span class="o">+=</span> <span class="n">loss</span>
         <span class="n">plot_loss_total</span> <span class="o">+=</span> <span class="n">loss</span>
 
-        <span class="k">if</span> <span class="nb">iter</span> <span class="o">%</span> <span class="n">print_every</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">epoch</span> <span class="o">%</span> <span class="n">print_every</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">print_loss_avg</span> <span class="o">=</span> <span class="n">print_loss_total</span> <span class="o">/</span> <span class="n">print_every</span>
             <span class="n">print_loss_total</span> <span class="o">=</span> <span class="mi">0</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> (</span><span class="si">%d</span><span class="s1"> </span><span class="si">%d%%</span><span class="s1">) </span><span class="si">%.4f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">timeSince</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="nb">iter</span> <span class="o">/</span> <span class="n">n_iters</span><span class="p">),</span>
-                                         <span class="nb">iter</span><span class="p">,</span> <span class="nb">iter</span> <span class="o">/</span> <span class="n">n_iters</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span> <span class="n">print_loss_avg</span><span class="p">))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> (</span><span class="si">%d</span><span class="s1"> </span><span class="si">%d%%</span><span class="s1">) </span><span class="si">%.4f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">timeSince</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">epoch</span> <span class="o">/</span> <span class="n">n_epochs</span><span class="p">),</span>
+                                        <span class="n">epoch</span><span class="p">,</span> <span class="n">epoch</span> <span class="o">/</span> <span class="n">n_epochs</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span> <span class="n">print_loss_avg</span><span class="p">))</span>
 
-        <span class="k">if</span> <span class="nb">iter</span> <span class="o">%</span> <span class="n">plot_every</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">epoch</span> <span class="o">%</span> <span class="n">plot_every</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">plot_loss_avg</span> <span class="o">=</span> <span class="n">plot_loss_total</span> <span class="o">/</span> <span class="n">plot_every</span>
             <span class="n">plot_losses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">plot_loss_avg</span><span class="p">)</span>
             <span class="n">plot_loss_total</span> <span class="o">=</span> <span class="mi">0</span>
@@ -1001,11 +1058,10 @@ Teacher Forcing을 사용할지 아니면 사용하지 않을지를 선택할 �
 <span class="kn">import</span> <span class="nn">matplotlib.ticker</span> <span class="k">as</span> <span class="nn">ticker</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
-
 <span class="k">def</span> <span class="nf">showPlot</span><span class="p">(</span><span class="n">points</span><span class="p">):</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
     <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
-    <span class="c1"># 주기적인 간격에 이 locator가 tick을 설정</span>
+    <span class="c1"># 주기적인 간격으로 이 locator가 tick을 설정</span>
     <span class="n">loc</span> <span class="o">=</span> <span class="n">ticker</span><span class="o">.</span><span class="n">MultipleLocator</span><span class="p">(</span><span class="n">base</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">set_major_locator</span><span class="p">(</span><span class="n">loc</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">points</span><span class="p">)</span>
@@ -1020,50 +1076,33 @@ Teacher Forcing을 사용할지 아니면 사용하지 않을지를 선택할 �
 단어를 예측할 때마다 그 단어를 출력 문자열에 추가합니다.
 만약 EOS 토큰을 예측하면 거기에서 멈춥니다.
 나중에 도식화를 위해서 디코더의 Attention 출력을 저장합니다.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="n">encoder</span><span class="p">,</span> <span class="n">decoder</span><span class="p">,</span> <span class="n">sentence</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="n">MAX_LENGTH</span><span class="p">):</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="n">encoder</span><span class="p">,</span> <span class="n">decoder</span><span class="p">,</span> <span class="n">sentence</span><span class="p">,</span> <span class="n">input_lang</span><span class="p">,</span> <span class="n">output_lang</span><span class="p">):</span>
     <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
         <span class="n">input_tensor</span> <span class="o">=</span> <span class="n">tensorFromSentence</span><span class="p">(</span><span class="n">input_lang</span><span class="p">,</span> <span class="n">sentence</span><span class="p">)</span>
-        <span class="n">input_length</span> <span class="o">=</span> <span class="n">input_tensor</span><span class="o">.</span><span class="n">size</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">encoder_hidden</span> <span class="o">=</span> <span class="n">encoder</span><span class="o">.</span><span class="n">initHidden</span><span class="p">()</span>
 
-        <span class="n">encoder_outputs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">max_length</span><span class="p">,</span> <span class="n">encoder</span><span class="o">.</span><span class="n">hidden_size</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">encoder_outputs</span><span class="p">,</span> <span class="n">encoder_hidden</span> <span class="o">=</span> <span class="n">encoder</span><span class="p">(</span><span class="n">input_tensor</span><span class="p">)</span>
+        <span class="n">decoder_outputs</span><span class="p">,</span> <span class="n">decoder_hidden</span><span class="p">,</span> <span class="n">decoder_attn</span> <span class="o">=</span> <span class="n">decoder</span><span class="p">(</span><span class="n">encoder_outputs</span><span class="p">,</span> <span class="n">encoder_hidden</span><span class="p">)</span>
 
-        <span class="k">for</span> <span class="n">ei</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">input_length</span><span class="p">):</span>
-            <span class="n">encoder_output</span><span class="p">,</span> <span class="n">encoder_hidden</span> <span class="o">=</span> <span class="n">encoder</span><span class="p">(</span><span class="n">input_tensor</span><span class="p">[</span><span class="n">ei</span><span class="p">],</span>
-                                                     <span class="n">encoder_hidden</span><span class="p">)</span>
-            <span class="n">encoder_outputs</span><span class="p">[</span><span class="n">ei</span><span class="p">]</span> <span class="o">+=</span> <span class="n">encoder_output</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
-
-        <span class="n">decoder_input</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([[</span><span class="n">SOS_token</span><span class="p">]],</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>  <span class="c1"># SOS</span>
-
-        <span class="n">decoder_hidden</span> <span class="o">=</span> <span class="n">encoder_hidden</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">topi</span> <span class="o">=</span> <span class="n">decoder_outputs</span><span class="o">.</span><span class="n">topk</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">decoded_ids</span> <span class="o">=</span> <span class="n">topi</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
 
         <span class="n">decoded_words</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="n">decoder_attentions</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">max_length</span><span class="p">,</span> <span class="n">max_length</span><span class="p">)</span>
-
-        <span class="k">for</span> <span class="n">di</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_length</span><span class="p">):</span>
-            <span class="n">decoder_output</span><span class="p">,</span> <span class="n">decoder_hidden</span><span class="p">,</span> <span class="n">decoder_attention</span> <span class="o">=</span> <span class="n">decoder</span><span class="p">(</span>
-                <span class="n">decoder_input</span><span class="p">,</span> <span class="n">decoder_hidden</span><span class="p">,</span> <span class="n">encoder_outputs</span><span class="p">)</span>
-            <span class="n">decoder_attentions</span><span class="p">[</span><span class="n">di</span><span class="p">]</span> <span class="o">=</span> <span class="n">decoder_attention</span><span class="o">.</span><span class="n">data</span>
-            <span class="n">topv</span><span class="p">,</span> <span class="n">topi</span> <span class="o">=</span> <span class="n">decoder_output</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">topk</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">topi</span><span class="o">.</span><span class="n">item</span><span class="p">()</span> <span class="o">==</span> <span class="n">EOS_token</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">decoded_ids</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">idx</span><span class="o">.</span><span class="n">item</span><span class="p">()</span> <span class="o">==</span> <span class="n">EOS_token</span><span class="p">:</span>
                 <span class="n">decoded_words</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;&lt;EOS&gt;&#39;</span><span class="p">)</span>
                 <span class="k">break</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">decoded_words</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">output_lang</span><span class="o">.</span><span class="n">index2word</span><span class="p">[</span><span class="n">topi</span><span class="o">.</span><span class="n">item</span><span class="p">()])</span>
-
-            <span class="n">decoder_input</span> <span class="o">=</span> <span class="n">topi</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span>
-
-        <span class="k">return</span> <span class="n">decoded_words</span><span class="p">,</span> <span class="n">decoder_attentions</span><span class="p">[:</span><span class="n">di</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="n">decoded_words</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">output_lang</span><span class="o">.</span><span class="n">index2word</span><span class="p">[</span><span class="n">idx</span><span class="o">.</span><span class="n">item</span><span class="p">()])</span>
+    <span class="k">return</span> <span class="n">decoded_words</span><span class="p">,</span> <span class="n">decoder_attn</span>
 </pre></div>
 </div>
-<p>학습 세트에 있는 임의의 문장을 평가하고
-입력, 목표 및 출력을 출력하여 주관적인 품질 판단을 내릴 수 있습니다:</p>
+<p>학습 세트에 있는 임의의 문장으로 평가한 다음, 입력(input), 목표(target)
+및 출력(output) 값들을 표시하여 주관적으로 품질에 대해 판단해볼 수 있습니다:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">evaluateRandomly</span><span class="p">(</span><span class="n">encoder</span><span class="p">,</span> <span class="n">decoder</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
         <span class="n">pair</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">pairs</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;&gt;&#39;</span><span class="p">,</span> <span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;=&#39;</span><span class="p">,</span> <span class="n">pair</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-        <span class="n">output_words</span><span class="p">,</span> <span class="n">attentions</span> <span class="o">=</span> <span class="n">evaluate</span><span class="p">(</span><span class="n">encoder</span><span class="p">,</span> <span class="n">decoder</span><span class="p">,</span> <span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">output_words</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">evaluate</span><span class="p">(</span><span class="n">encoder</span><span class="p">,</span> <span class="n">decoder</span><span class="p">,</span> <span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">input_lang</span><span class="p">,</span> <span class="n">output_lang</span><span class="p">)</span>
         <span class="n">output_sentence</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_words</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;&lt;&#39;</span><span class="p">,</span> <span class="n">output_sentence</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
@@ -1085,76 +1124,91 @@ Teacher Forcing을 사용할지 아니면 사용하지 않을지를 선택할 �
 이어서 학습을 할 수 있습니다. 인코더와 디코더가 초기화 된 행을
 주석 처리하고 <code class="docutils literal notranslate"><span class="pre">trainIters</span></code> 를 다시 실행하십시오.</p>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">hidden_size</span> <span class="o">=</span> <span class="mi">256</span>
-<span class="n">encoder1</span> <span class="o">=</span> <span class="n">EncoderRNN</span><span class="p">(</span><span class="n">input_lang</span><span class="o">.</span><span class="n">n_words</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
-<span class="n">attn_decoder1</span> <span class="o">=</span> <span class="n">AttnDecoderRNN</span><span class="p">(</span><span class="n">hidden_size</span><span class="p">,</span> <span class="n">output_lang</span><span class="o">.</span><span class="n">n_words</span><span class="p">,</span> <span class="n">dropout_p</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">hidden_size</span> <span class="o">=</span> <span class="mi">128</span>
+<span class="n">batch_size</span> <span class="o">=</span> <span class="mi">32</span>
 
-<span class="n">trainIters</span><span class="p">(</span><span class="n">encoder1</span><span class="p">,</span> <span class="n">attn_decoder1</span><span class="p">,</span> <span class="mi">75000</span><span class="p">,</span> <span class="n">print_every</span><span class="o">=</span><span class="mi">5000</span><span class="p">)</span>
+<span class="n">input_lang</span><span class="p">,</span> <span class="n">output_lang</span><span class="p">,</span> <span class="n">train_dataloader</span> <span class="o">=</span> <span class="n">get_dataloader</span><span class="p">(</span><span class="n">batch_size</span><span class="p">)</span>
+
+<span class="n">encoder</span> <span class="o">=</span> <span class="n">EncoderRNN</span><span class="p">(</span><span class="n">input_lang</span><span class="o">.</span><span class="n">n_words</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+<span class="n">decoder</span> <span class="o">=</span> <span class="n">AttnDecoderRNN</span><span class="p">(</span><span class="n">hidden_size</span><span class="p">,</span> <span class="n">output_lang</span><span class="o">.</span><span class="n">n_words</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+
+<span class="n">train</span><span class="p">(</span><span class="n">train_dataloader</span><span class="p">,</span> <span class="n">encoder</span><span class="p">,</span> <span class="n">decoder</span><span class="p">,</span> <span class="mi">80</span><span class="p">,</span> <span class="n">print_every</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">plot_every</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
 </pre></div>
 </div>
 <ul class="sphx-glr-horizontal">
 <li><img src="../_images/sphx_glr_seq2seq_translation_tutorial_001.png" srcset="../_images/sphx_glr_seq2seq_translation_tutorial_001.png" alt="seq2seq translation tutorial" class = "sphx-glr-multi-img"/></li>
 <li><img src="../_images/sphx_glr_seq2seq_translation_tutorial_002.png" srcset="../_images/sphx_glr_seq2seq_translation_tutorial_002.png" alt="seq2seq translation tutorial" class = "sphx-glr-multi-img"/></li>
 </ul>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>1m 56s (- 27m 12s) (5000 6%) 2.8778
-3m 46s (- 24m 32s) (10000 13%) 2.2885
-5m 35s (- 22m 20s) (15000 20%) 1.9265
-7m 23s (- 20m 19s) (20000 26%) 1.6840
-9m 14s (- 18m 29s) (25000 33%) 1.5010
-11m 6s (- 16m 39s) (30000 40%) 1.3355
-12m 55s (- 14m 46s) (35000 46%) 1.1854
-14m 44s (- 12m 53s) (40000 53%) 1.0435
-16m 33s (- 11m 2s) (45000 60%) 0.9649
-18m 22s (- 9m 11s) (50000 66%) 0.8709
-20m 14s (- 7m 21s) (55000 73%) 0.7698
-22m 4s (- 5m 31s) (60000 80%) 0.6771
-23m 58s (- 3m 41s) (65000 86%) 0.6411
-25m 50s (- 1m 50s) (70000 93%) 0.5757
-27m 40s (- 0m 0s) (75000 100%) 0.5466
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Reading lines...
+Read 135842 sentence pairs
+Trimmed to 11445 sentence pairs
+Counting words...
+Counted words:
+fra 4601
+eng 2991
+0m 25s (- 6m 20s) (5 6%) 1.5304
+0m 50s (- 5m 53s) (10 12%) 0.6776
+1m 15s (- 5m 27s) (15 18%) 0.3528
+1m 40s (- 5m 2s) (20 25%) 0.1946
+2m 5s (- 4m 37s) (25 31%) 0.1205
+2m 31s (- 4m 11s) (30 37%) 0.0841
+2m 56s (- 3m 46s) (35 43%) 0.0639
+3m 21s (- 3m 21s) (40 50%) 0.0521
+3m 46s (- 2m 56s) (45 56%) 0.0452
+4m 11s (- 2m 31s) (50 62%) 0.0395
+4m 36s (- 2m 5s) (55 68%) 0.0377
+5m 2s (- 1m 40s) (60 75%) 0.0349
+5m 27s (- 1m 15s) (65 81%) 0.0324
+5m 52s (- 0m 50s) (70 87%) 0.0316
+6m 17s (- 0m 25s) (75 93%) 0.0298
+6m 42s (- 0m 0s) (80 100%) 0.0291
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">evaluateRandomly</span><span class="p">(</span><span class="n">encoder1</span><span class="p">,</span> <span class="n">attn_decoder1</span><span class="p">)</span>
+<p>드롭아웃(dropout) 레이어들을 평가 (<code class="docutils literal notranslate"><span class="pre">eval</span></code>) 모드로 설정합니다.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">encoder</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+<span class="n">decoder</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+<span class="n">evaluateRandomly</span><span class="p">(</span><span class="n">encoder</span><span class="p">,</span> <span class="n">decoder</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&gt; je suis content que ca vous rende heureuse .
-= i m glad that makes you happy .
-&lt; i m glad that makes you happy . &lt;EOS&gt;
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&gt; il est si mignon !
+= he s so cute
+&lt; he s so cute &lt;EOS&gt;
 
-&gt; je vois loin .
-= i m farsighted .
-&lt; i m better . &lt;EOS&gt;
+&gt; je vais me baigner
+= i m going to take a bath
+&lt; i m going to take a bath &lt;EOS&gt;
 
-&gt; nous avons toutes peur .
-= we re all afraid .
-&lt; we re all afraid . &lt;EOS&gt;
+&gt; c est un travailleur du batiment
+= he s a construction worker
+&lt; he s a construction worker &lt;EOS&gt;
 
-&gt; je suis a court d idees .
-= i m out of ideas .
-&lt; i m out of ideas . &lt;EOS&gt;
+&gt; je suis representant de commerce pour notre societe
+= i m a salesman for our company
+&lt; i m a salesman for our company &lt;EOS&gt;
 
-&gt; tu es suffisante .
-= you re conceited .
-&lt; you re conceited . &lt;EOS&gt;
+&gt; vous etes grande
+= you re big
+&lt; you are big &lt;EOS&gt;
 
-&gt; vous etes tres contraries .
-= you re very upset .
-&lt; you re very upset . &lt;EOS&gt;
+&gt; tu n es pas normale
+= you re not normal
+&lt; you re not normal &lt;EOS&gt;
 
-&gt; je vis en ville .
-= i m living in the city .
-&lt; i m living the town . &lt;EOS&gt;
+&gt; je n en ai pas encore fini avec vous
+= i m not done with you yet
+&lt; i m not done with you yet &lt;EOS&gt;
 
-&gt; vous etes hors de controle .
-= you re out of control .
-&lt; you re out out . &lt;EOS&gt;
+&gt; je suis desole pour ce malentendu
+= i m sorry about my mistake
+&lt; i m sorry about my mistake &lt;EOS&gt;
 
-&gt; nous en avons termine .
-= we re done .
-&lt; we re all . &lt;EOS&gt;
+&gt; nous ne sommes pas impressionnes
+= we re not impressed
+&lt; we re not impressed &lt;EOS&gt;
 
-&gt; tu es juste fatigue .
-= you re just tired .
-&lt; you re just tired . &lt;EOS&gt;
+&gt; tu as la confiance de tous
+= you are trusted by every one of us
+&lt; you are trusted by every one of us &lt;EOS&gt;
 </pre></div>
 </div>
 <div class="section" id="id13">
@@ -1162,22 +1216,13 @@ Teacher Forcing을 사용할지 아니면 사용하지 않을지를 선택할 �
 <p>Attention 메커니즘의 유용한 속성은 하나는 해석 가능성이 높은 출력입니다.
 입력 시퀀스의 특정 인코더 출력에 가중치를 부여하는 데 사용되므로
 각 시간 단계에서 네트워크가 가장 집중되는 위치를 파악할 수 있습니다.</p>
-<p>Attention 출력을 행렬로 표시하기 위해 <code class="docutils literal notranslate"><span class="pre">plt.matshow(attentions)</span></code> 를
-간단하게 실행할 수 있습니다. 열은 입력 단계와 행이 출력 단계입니다:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">output_words</span><span class="p">,</span> <span class="n">attentions</span> <span class="o">=</span> <span class="n">evaluate</span><span class="p">(</span>
-    <span class="n">encoder1</span><span class="p">,</span> <span class="n">attn_decoder1</span><span class="p">,</span> <span class="s2">&quot;je suis trop froid .&quot;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">matshow</span><span class="p">(</span><span class="n">attentions</span><span class="o">.</span><span class="n">numpy</span><span class="p">())</span>
-</pre></div>
-</div>
-<img src="../_images/sphx_glr_seq2seq_translation_tutorial_003.png" srcset="../_images/sphx_glr_seq2seq_translation_tutorial_003.png" alt="seq2seq translation tutorial" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.image.AxesImage object at 0x7fb0fc99e8f0&gt;
-</pre></div>
-</div>
-<p>더 나은 보기를 위해 축과 라벨을 더하는 추가 작업을 수행합니다:</p>
+<p>Attention 출력을 행렬로 표시하기 위해서는 <code class="docutils literal notranslate"><span class="pre">plt.matshow(attentions)</span></code> 을
+그냥 실행해도 됩니다. 하지만 좀 더 나은 시각화를 위해 축(axis)과 라벨(label)을
+추가하는 약간의 작업을 더 해보겠습니다:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">showAttention</span><span class="p">(</span><span class="n">input_sentence</span><span class="p">,</span> <span class="n">output_words</span><span class="p">,</span> <span class="n">attentions</span><span class="p">):</span>
-    <span class="c1"># colorbar로 그림 설정</span>
     <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
     <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">)</span>
-    <span class="n">cax</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">matshow</span><span class="p">(</span><span class="n">attentions</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;bone&#39;</span><span class="p">)</span>
+    <span class="n">cax</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">matshow</span><span class="p">(</span><span class="n">attentions</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;bone&#39;</span><span class="p">)</span>
     <span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">cax</span><span class="p">)</span>
 
     <span class="c1"># 축 설정</span>
@@ -1193,36 +1238,35 @@ Teacher Forcing을 사용할지 아니면 사용하지 않을지를 선택할 �
 
 
 <span class="k">def</span> <span class="nf">evaluateAndShowAttention</span><span class="p">(</span><span class="n">input_sentence</span><span class="p">):</span>
-    <span class="n">output_words</span><span class="p">,</span> <span class="n">attentions</span> <span class="o">=</span> <span class="n">evaluate</span><span class="p">(</span>
-        <span class="n">encoder1</span><span class="p">,</span> <span class="n">attn_decoder1</span><span class="p">,</span> <span class="n">input_sentence</span><span class="p">)</span>
+    <span class="n">output_words</span><span class="p">,</span> <span class="n">attentions</span> <span class="o">=</span> <span class="n">evaluate</span><span class="p">(</span><span class="n">encoder</span><span class="p">,</span> <span class="n">decoder</span><span class="p">,</span> <span class="n">input_sentence</span><span class="p">,</span> <span class="n">input_lang</span><span class="p">,</span> <span class="n">output_lang</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;input =&#39;</span><span class="p">,</span> <span class="n">input_sentence</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;output =&#39;</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_words</span><span class="p">))</span>
-    <span class="n">showAttention</span><span class="p">(</span><span class="n">input_sentence</span><span class="p">,</span> <span class="n">output_words</span><span class="p">,</span> <span class="n">attentions</span><span class="p">)</span>
+    <span class="n">showAttention</span><span class="p">(</span><span class="n">input_sentence</span><span class="p">,</span> <span class="n">output_words</span><span class="p">,</span> <span class="n">attentions</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:</span><span class="nb">len</span><span class="p">(</span><span class="n">output_words</span><span class="p">),</span> <span class="p">:])</span>
 
 
-<span class="n">evaluateAndShowAttention</span><span class="p">(</span><span class="s2">&quot;elle a cinq ans de moins que moi .&quot;</span><span class="p">)</span>
+<span class="n">evaluateAndShowAttention</span><span class="p">(</span><span class="s1">&#39;il n est pas aussi grand que son pere&#39;</span><span class="p">)</span>
 
-<span class="n">evaluateAndShowAttention</span><span class="p">(</span><span class="s2">&quot;elle est trop petit .&quot;</span><span class="p">)</span>
+<span class="n">evaluateAndShowAttention</span><span class="p">(</span><span class="s1">&#39;je suis trop fatigue pour conduire&#39;</span><span class="p">)</span>
 
-<span class="n">evaluateAndShowAttention</span><span class="p">(</span><span class="s2">&quot;je ne crains pas de mourir .&quot;</span><span class="p">)</span>
+<span class="n">evaluateAndShowAttention</span><span class="p">(</span><span class="s1">&#39;je suis desole si c est une question idiote&#39;</span><span class="p">)</span>
 
-<span class="n">evaluateAndShowAttention</span><span class="p">(</span><span class="s2">&quot;c est un jeune directeur plein de talent .&quot;</span><span class="p">)</span>
+<span class="n">evaluateAndShowAttention</span><span class="p">(</span><span class="s1">&#39;je suis reellement fiere de vous&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <ul class="sphx-glr-horizontal">
+<li><img src="../_images/sphx_glr_seq2seq_translation_tutorial_003.png" srcset="../_images/sphx_glr_seq2seq_translation_tutorial_003.png" alt="seq2seq translation tutorial" class = "sphx-glr-multi-img"/></li>
 <li><img src="../_images/sphx_glr_seq2seq_translation_tutorial_004.png" srcset="../_images/sphx_glr_seq2seq_translation_tutorial_004.png" alt="seq2seq translation tutorial" class = "sphx-glr-multi-img"/></li>
 <li><img src="../_images/sphx_glr_seq2seq_translation_tutorial_005.png" srcset="../_images/sphx_glr_seq2seq_translation_tutorial_005.png" alt="seq2seq translation tutorial" class = "sphx-glr-multi-img"/></li>
 <li><img src="../_images/sphx_glr_seq2seq_translation_tutorial_006.png" srcset="../_images/sphx_glr_seq2seq_translation_tutorial_006.png" alt="seq2seq translation tutorial" class = "sphx-glr-multi-img"/></li>
-<li><img src="../_images/sphx_glr_seq2seq_translation_tutorial_007.png" srcset="../_images/sphx_glr_seq2seq_translation_tutorial_007.png" alt="seq2seq translation tutorial" class = "sphx-glr-multi-img"/></li>
 </ul>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>input = elle a cinq ans de moins que moi .
-output = she is two years younger than me . &lt;EOS&gt;
-input = elle est trop petit .
-output = she is too short . &lt;EOS&gt;
-input = je ne crains pas de mourir .
-output = i m not scared to die . &lt;EOS&gt;
-input = c est un jeune directeur plein de talent .
-output = he s a very young man . . &lt;EOS&gt;
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>input = il n est pas aussi grand que son pere
+output = he is not as tall as his father &lt;EOS&gt;
+input = je suis trop fatigue pour conduire
+output = i m too tired to drive &lt;EOS&gt;
+input = je suis desole si c est une question idiote
+output = i m sorry if this is a stupid question &lt;EOS&gt;
+input = je suis reellement fiere de vous
+output = i m really proud of you guys &lt;EOS&gt;
 </pre></div>
 </div>
 </div>
@@ -1253,7 +1297,7 @@ embedding 을 교체하십시오</p></li>
 </ul>
 </li>
 </ul>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 27 minutes  46.819 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 6 minutes  47.536 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-intermediate-seq2seq-translation-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/3baf9960a4be104931872ff3ffda07b7/seq2seq_translation_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">seq2seq_translation_tutorial.py</span></code></a></p>
@@ -1306,7 +1350,7 @@ embedding 을 교체하십시오</p></li>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018-2023, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorch Korea User Group).
+        &copy; Copyright 2018-2024, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorch Korea User Group).
 
     </p>
   </div>
@@ -1333,7 +1377,7 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
 <li><a class="reference internal" href="#">기초부터 시작하는 NLP: Sequence to Sequence 네트워크와 Attention을 이용한 번역</a><ul>
-<li><a class="reference internal" href="#id2">데이터 파일 로딩</a></li>
+<li><a class="reference internal" href="#id2">데이터 파일 불러오기</a></li>
 <li><a class="reference internal" href="#seq2seq">Seq2Seq 모델</a><ul>
 <li><a class="reference internal" href="#id4">인코더</a></li>
 <li><a class="reference internal" href="#id5">디코더</a><ul>
@@ -1380,8 +1424,8 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
          <script src="../_static/clipboard.min.js"></script>
          <script src="../_static/copybutton.js"></script>
          <script src="../_static/translations.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
+         <script src="../_static/katex.min.js"></script>
+         <script src="../_static/auto-render.min.js"></script>
          <script src="../_static/katex_autorenderer.js"></script>
          <script src="../_static/design-tabs.js"></script>
      
@@ -1399,8 +1443,10 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
   </script>
  
 <script>
-//add microsoft link
+// Helper function to make it easier to call dataLayer.push()
+function gtag(){window.dataLayer.push(arguments);}
 
+//add microsoft link
 if(window.location.href.indexOf("/beginner/basics/")!= -1)
 {
   var url="https://docs.microsoft.com/learn/paths/pytorch-fundamentals/?wt.mc_id=aiml-7486-cxa";
@@ -1465,7 +1511,8 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
     gtag('event', 'click', {
       'event_category': 'Tutorial Rating',
       'event_label': $("h1").first().text(),
-      'value': $(this).attr("data-count")
+      'value': $(this).attr("data-count"),
+      'customEvent:Rating': $(this).attr("data-count") // send to GA custom dimension customEvent:Rating.
     });
    });
 
@@ -1476,7 +1523,7 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
 </script>
 
 <script type="text/javascript">
-  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', '모바일', 'Introduction to PyTorch on YouTube', '추천 시스템', 'Multimodality'];
+  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', 'Introduction to PyTorch on YouTube', '이미지/비디오', '오디오', '텍스트', '백엔드', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'PyTorch 프로파일링', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Edge with ExecuTorch', '추천 시스템', 'Multimodality'];
 </script>
 
 

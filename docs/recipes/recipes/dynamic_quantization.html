@@ -6,20 +6,16 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="ko" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
-<meta property="og:title" content="동적 양자화" />
-  
+  <meta property="og:title" content="동적 양자화" />
 <meta property="og:type" content="article" />
-  
 <meta property="og:url" content="https://tutorials.pytorch.kr/recipes/recipes/dynamic_quantization.html" />
-  
+<meta property="og:site_name" content="PyTorch Tutorials KR" />
 <meta property="og:description" content="이 레시피에서는 동적 양자화(dynamic quantization)를 활용하여, LSTM과 유사한 형태의 순환 신경망이 좀 더 빠르게 추론하도록 만드는 방법을 살펴 봅니다. 이를 통해 모델에서 사용하는 가중치의 규모를 줄이고 수행 속도를 빠르게 만들 것입니다. 도입: 우리는 신경망을 설계할 때 여러 트레이드오프(trade-off)를 마주하게 됩니다. 모델을 개발하고 학습할 때 순환 신경망의 레이어나 매개변수의 수를 바꿔볼 수 있을 텐데, 그럴 때면 정확도와 모델의 규모나 응답 속도(또는 처리량) 사이에 트레이드오프가 생기게 됩..." />
-  
 <meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
-  
-<meta property="og:image:alt" content="동적 양자화" />
-  
+<meta property="og:image:alt" content="PyTorch Tutorials KR" />
+<meta name="description" content="이 레시피에서는 동적 양자화(dynamic quantization)를 활용하여, LSTM과 유사한 형태의 순환 신경망이 좀 더 빠르게 추론하도록 만드는 방법을 살펴 봅니다. 이를 통해 모델에서 사용하는 가중치의 규모를 줄이고 수행 속도를 빠르게 만들 것입니다. 도입: 우리는 신경망을 설계할 때 여러 트레이드오프(trade-off)를 마주하게 됩니다. 모델을 개발하고 학습할 때 순환 신경망의 레이어나 매개변수의 수를 바꿔볼 수 있을 텐데, 그럴 때면 정확도와 모델의 규모나 응답 속도(또는 처리량) 사이에 트레이드오프가 생기게 됩..." />
 <meta property="og:ignore_canonical" content="true" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>동적 양자화 &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
@@ -45,7 +41,7 @@
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/katex-math.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/sg_gallery.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/sg_gallery-binder.css" type="text/css" />
@@ -54,6 +50,7 @@
   <link rel="stylesheet" href="../../_static/sphinx-design.5ea377869091fd0449014c60fc090103.min.css" type="text/css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/css/custom.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/custom2.css" type="text/css" />
     <link rel="index" title="색인" href="../../genindex.html" />
     <link rel="search" title="검색" href="../../search.html" />
     <link rel="next" title="Automatic Mixed Precision" href="amp_recipe.html" />
@@ -135,7 +132,7 @@
               
               
                 <div class="version">
-                  2.0.1
+                  2.3.1+cu121
                 </div>
               
             
@@ -200,11 +197,12 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">이미지/비디오</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../intermediate/torchvision_tutorial.html">TorchVision 객체 검출 미세조정(Finetuning) 튜토리얼</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../intermediate/torchvision_tutorial.html">TorchVision Object Detection Finetuning Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../beginner/transfer_learning_tutorial.html">컴퓨터 비전(Vision)을 위한 전이학습(Transfer Learning)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../beginner/fgsm_tutorial.html">적대적 예제 생성(Adversarial Example Generation)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../beginner/dcgan_faces_tutorial.html">DCGAN 튜토리얼</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../beginner/vt_tutorial.html">배포를 위한 비전 트랜스포머(Vision Transformer) 모델 최적화하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../beginner/vt_tutorial.html">배포를 위해 비전 트랜스포머(Vision Transformer) 모델 최적화하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../intermediate/tiatoolbox_tutorial.html">Whole Slide Image Classification Using PyTorch and TIAToolbox</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">오디오</span></p>
 <ul>
@@ -220,27 +218,39 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">텍스트</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../beginner/transformer_tutorial.html"><code class="docutils literal notranslate"><span class="pre">nn.Transformer</span></code> 와 torchtext로 시퀀스-투-시퀀스(Sequence-to-Sequence) 모델링하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../beginner/bettertransformer_tutorial.html">Fast Transformer Inference with Better Transformer</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/char_rnn_classification_tutorial.html">기초부터 시작하는 NLP: 문자-단위 RNN으로 이름 분류하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/char_rnn_generation_tutorial.html">기초부터 시작하는 NLP:  문자-단위 RNN으로 이름 생성하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/seq2seq_translation_tutorial.html">기초부터 시작하는 NLP: Sequence to Sequence 네트워크와 Attention을 이용한 번역</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../beginner/text_sentiment_ngrams_tutorial.html">torchtext 라이브러리로 텍스트 분류하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../beginner/translation_transformer.html"><code class="docutils literal notranslate"><span class="pre">nn.Transformer</span></code> 와 torchtext로 언어 번역하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../beginner/torchtext_custom_dataset_tutorial.html">Preprocess custom text dataset using Torchtext</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">백엔드</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../beginner/onnx/intro_onnx.html">Introduction to ONNX</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">강화학습</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/reinforcement_q_learning.html">강화 학습 (DQN) 튜토리얼</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/reinforcement_ppo.html">Reinforcement Learning (PPO) with TorchRL Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/mario_rl_tutorial.html">마리오 게임 RL 에이전트로 학습하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../advanced/pendulum.html">Pendulum: Writing your environment and transforms with TorchRL</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">PyTorch 모델을 프로덕션 환경에 배포하기</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../beginner/onnx/intro_onnx.html">Introduction to ONNX</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/flask_rest_api_tutorial.html">Flask를 사용하여 Python에서 PyTorch를 REST API로 배포하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../beginner/Intro_to_TorchScript_tutorial.html">TorchScript 소개</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../advanced/cpp_export.html">C++에서 TorchScript 모델 로딩하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../advanced/super_resolution_with_onnxruntime.html">(선택) PyTorch 모델을 ONNX으로 변환하고 ONNX 런타임에서 실행하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/realtime_rpi.html">Raspberry Pi 4 에서 실시간 추론(Inference) (30fps!)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">PyTorch 프로파일링</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../beginner/profiler.html">PyTorch 모듈 프로파일링하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../beginner/hta_intro_tutorial.html">Introduction to Holistic Trace Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../beginner/hta_trace_diff_tutorial.html">Trace Diff using Holistic Trace Analysis</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Code Transforms with FX</span></p>
 <ul>
@@ -267,13 +277,14 @@
 <li class="toctree-l1"><a class="reference internal" href="../../advanced/torch_script_custom_classes.html">커스텀 C++ 클래스로 TorchScript 확장하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../advanced/dispatcher.html">Registering a Dispatched Operator in C++</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../advanced/extend_dispatcher.html">Extending dispatcher for a new backend in C++</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../advanced/privateuseone.html">Facilitating New Backend Integration by PrivateUse1</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">모델 최적화</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../beginner/profiler.html">PyTorch 모듈 프로파일링 하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../beginner/profiler.html">PyTorch 모듈 프로파일링하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/tensorboard_profiler_tutorial.html">텐서보드를 이용한 파이토치 프로파일러</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../beginner/hyperparameter_tuning_tutorial.html">Ray Tune을 이용한 하이퍼파라미터 튜닝</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../beginner/vt_tutorial.html">배포를 위한 비전 트랜스포머(Vision Transformer) 모델 최적화하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../beginner/hyperparameter_tuning_tutorial.html">Ray Tune을 사용한 하이퍼파라미터 튜닝</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../beginner/vt_tutorial.html">배포를 위해 비전 트랜스포머(Vision Transformer) 모델 최적화하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/parametrizations.html">Parametrizations Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/pruning_tutorial.html">가지치기 기법(Pruning) 튜토리얼</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../advanced/dynamic_quantization_tutorial.html">(베타) LSTM 기반 단어 단위 언어 모델의 동적 양자화</a></li>
@@ -284,10 +295,13 @@
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/torchserve_with_ipex_2.html">Grokking PyTorch Intel CPU performance from first principles (Part 2)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/nvfuser_intro_tutorial.html">Getting Started - Accelerate Your Scripts with nvFuser</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/ax_multiobjective_nas_tutorial.html">Multi-Objective NAS with Ax</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../intermediate/torch_compile_tutorial.html">torch.compile Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../intermediate/torch_compile_tutorial.html">Introduction to <code class="docutils literal notranslate"><span class="pre">torch.compile</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../intermediate/inductor_debug_cpu.html">Inductor CPU backend debugging and profiling</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/scaled_dot_product_attention_tutorial.html">(Beta) Scaled Dot Product Attention (SDPA)로 고성능 트랜스포머(Transformers) 구현하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/scaled_dot_product_attention_tutorial.html#torch-compile-sdpa"><code class="docutils literal notranslate"><span class="pre">torch.compile</span></code> 과 함께 SDPA 사용하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../intermediate/scaled_dot_product_attention_tutorial.html#id6">결론</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../intermediate/scaled_dot_product_attention_tutorial.html#sdpa-atteition-bias">SDPA를 <code class="docutils literal notranslate"><span class="pre">atteition.bias</span></code> 하위 클래스와 사용하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../intermediate/scaled_dot_product_attention_tutorial.html#id8">결론</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../beginner/knowledge_distillation_tutorial.html">Knowledge Distillation Tutorial</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">병렬 및 분산 학습</span></p>
 <ul>
@@ -299,20 +313,24 @@
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/dist_tuto.html">PyTorch로 분산 어플리케이션 개발하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/FSDP_tutorial.html">Getting Started with Fully Sharded Data Parallel(FSDP)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/FSDP_adavnced_tutorial.html">Advanced Model Training with Fully Sharded Data Parallel (FSDP)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../intermediate/process_group_cpp_extension_tutorial.html">Cpp 확장을 사용하여 프로세스 그룹 백엔드 사용자 정의</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../intermediate/TP_tutorial.html">Large Scale Transformer model training with Tensor Parallel (TP)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../intermediate/process_group_cpp_extension_tutorial.html">Cpp 확장을 사용한 프로세스 그룹 백엔드 사용자 정의</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/rpc_tutorial.html">Getting Started with Distributed RPC Framework</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/rpc_param_server_tutorial.html">Implementing a Parameter Server Using Distributed RPC Framework</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/dist_pipeline_parallel_tutorial.html">Distributed Pipeline Parallelism Using RPC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../intermediate/rpc_async_execution.html">Implementing Batch RPC Processing Using Asynchronous Executions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../advanced/rpc_ddp_tutorial.html">분산 데이터 병렬(DDP)과 분산 RPC 프레임워크 결합</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../intermediate/pipeline_tutorial.html">파이프라인 병렬화로 트랜스포머 모델 학습시키기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../advanced/ddp_pipeline.html">분산 데이터 병렬 처리와 병렬 처리 파이프라인을 사용한 트랜스포머 모델 학습</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../advanced/generic_join.html">Distributed Training with Uneven Inputs Using the Join Context Manager</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">모바일</span></p>
+<p class="caption" role="heading"><span class="caption-text">Edge with ExecuTorch</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../beginner/deeplabv3_on_ios.html">iOS에서의 이미지 분할 DeepLapV3</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../beginner/deeplabv3_on_android.html">안드로이드에서의 이미지 분할 DeepLapV3</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/executorch/stable/tutorials/export-to-executorch-tutorial.html">Exporting to ExecuTorch Tutorial</a></li>
+<li class="toctree-l1"><a class="reference external" href=" https://pytorch.org/executorch/stable/running-a-model-cpp-tutorial.html">Running an ExecuTorch Model in C++ Tutorial</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/executorch/stable/tutorials/sdk-integration-tutorial.html">Using the ExecuTorch SDK to Profile a Model</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/executorch/stable/demo-apps-ios.html">Building an ExecuTorch iOS Demo App</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/executorch/stable/demo-apps-android.html">Building an ExecuTorch Android Demo App</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/executorch/stable/examples-end-to-end-to-lower-model-to-delegate.html">Lowering a Model as a Delegate</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">추천 시스템</span></p>
 <ul>
@@ -444,7 +462,7 @@ to download the full example code</p>
 모델의 규모를 상당히 줄이면서 응답 시간도 감소시킬 수 있을 것입니다.</p>
 </div>
 <div class="section" id="id3">
-<h2>동적 양자화란 무엇인가?<a class="headerlink" href="#id3" title="이 제목에 대한 퍼머링크">¶</a></h2>
+<h2>동적 양자화란 무엇인가요?<a class="headerlink" href="#id3" title="이 제목에 대한 퍼머링크">¶</a></h2>
 <p>신경망을 양자화한다는 말의 의미는 가중치나 활성화 함수에서 정밀도가
 낮은 정수 표현을 사용하도록 바꾼다는 것입니다. 이를 통해 모델의 규모를
 줄일 수 있으며, CPU나 GPU에서 수행하는 수치 연산의 처리량도 높일 수
@@ -522,17 +540,15 @@ to download the full example code</p>
 <span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">time</span>
-
-
-<span class="c1"># 설명을 위해 아주 아주 간단한 LSTM을 정의합니다</span>
-<span class="c1"># 여기서는 레이어가 하나 뿐이고 사전 작업이나 사후 작업이 없는</span>
-<span class="c1"># nn.LSTM을 감싸서 사용합니다</span>
-<span class="c1"># 이는 Robert Guthrie 의</span>
-<span class="c1"># https://tutorials.pytorch.kr/beginner/nlp/sequence_models_tutorial.html 과</span>
-<span class="c1"># https://tutorials.pytorch.kr/advanced/dynamic_quantization_tutorial.html 에서</span>
-<span class="c1"># 영감을 받은 부분입니다</span>
-
-<span class="k">class</span> <span class="nc">lstm_for_demonstration</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+</pre></div>
+</div>
+<p>설명을 위해 매우 간단한 LSTM을 하나 정의하겠습니다
+<code class="docutils literal notranslate"><span class="pre">nn.LSTM</span></code> 를 감싼 레이어를 하나만 사용하고,
+전처리(preprocessing)나 후처리(postprocessing)는 없습니다.
+이는 Robert Guthrie 의 <a class="reference internal" href="../../beginner/nlp/sequence_models_tutorial.html"><span class="doc">시퀀스 모델과 LSTM 네트워크</span></a> 과
+<a class="reference internal" href="../../advanced/dynamic_quantization_tutorial.html"><span class="doc">(베타) LSTM 기반 단어 단위 언어 모델의 동적 양자화</span></a> 에서
+영감을 받아 만들었습니다.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">lstm_for_demonstration</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
 <span class="w">  </span><span class="sd">&quot;&quot;&quot;기초적인 LSTM모델로, 단순히 nn.LSTM 를 감싼 것입니다.</span>
 <span class="sd">     설명용 예시 이외의 용도로 사용하기에는 적합하지 않습니다.</span>
 <span class="sd">  &quot;&quot;&quot;</span>
@@ -563,13 +579,10 @@ to download the full example code</p>
 <div class="section" id="id6">
 <h3>2: 양자화 수행<a class="headerlink" href="#id6" title="이 제목에 대한 퍼머링크">¶</a></h3>
 <p>이제 재밌는 부분을 살펴보려 합니다. 우선은 양자화 할 모델 객체를 하나
-만들고 그 이름을 float_lstm 으로 둡니다. 우리가 여기서 사용할 함수는</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">torch</span><span class="o">.</span><span class="n">quantization</span><span class="o">.</span><span class="n">quantize_dynamic</span><span class="p">()</span>
-</pre></div>
-</div>
-<p>입니다 (<a class="reference external" href="https://pytorch.org/docs/stable/quantization.html#torch.quantization.quantize_dynamic">관련 문서 참고</a>).
-이 함수는 모델과, 만약 등장한다면 양자화하고 싶은 서브모듈의 목록,
-그리고 우리가 사용하려 하는 자료형을 입력으로 받습니다. 이 함수는
+만들고 그 이름을 <code class="docutils literal notranslate"><span class="pre">float\_lstm</span></code> 이라고 하겠습니다. 또한,
+<a class="reference external" href="https://pytorch.org/docs/stable/quantization.html#torch.quantization.quantize_dynamic">torch.quantization.quantize_dynamic</a>
+함수를 사용할 것입니다. 이 함수는 모델과 양자화하고 싶은 서브모듈의 목록,
+그리고 양자화하려는 자료형을 입력으로 받습니다. 이 함수는
 원본 모델을 양자화한 버전을 새로운 모듈의 형태로 반환합니다.</p>
 <p>이게 내용의 전부입니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># 부동소수점 실수를 사용하는 객체입니다</span>
@@ -626,12 +639,12 @@ to download the full example code</p>
 속도가 더 빠릅니다. 이는 좀 더 복잡한 네트워크에 대해서도 대체로
 성립하는 특징이지만, 모델의 구조나 작업을 수행할 하드웨어의 특성 등
 여러 가지 요소에 따라 그때 그때 다를 수 있습니다.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># 성능 비교하기</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Floating point FP32&quot;</span><span class="p">)</span>
-<span class="c1"># %timeit float_lstm.forward(inputs, hidden)</span>
+<p>성능 비교하기</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Floating point FP32&quot;</span><span class="p">)</span>
+<span class="o">%</span><span class="n">timeit</span> <span class="n">float_lstm</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">hidden</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Quantized INT8&quot;</span><span class="p">)</span>
-<span class="c1"># %timeit quantized_lstm.forward(inputs,hidden)</span>
+<span class="o">%</span><span class="n">timeit</span> <span class="n">quantized_lstm</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span><span class="n">hidden</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -669,17 +682,17 @@ LSTM 모델을 빠르게 양자화하기 위해 <code class="docutils literal no
 <a class="reference external" href="https://tutorials.pytorch.kr/advanced/dynamic_quantization_tutorial.html">(beta) Dynamic Quantization on an LSTM Word Language Model Tutorial</a>
 방문하여 보시기 바랍니다</p>
 <p>이 레시피에서는 이러한 내용을 빠르게, 그리고 고수준에서 살펴 보았습니다.
-좀 더 자세한 내용을 알아보고 싶다면 <a class="reference external" href="https://tutorials.pytorch.kr/advanced/dynamic_quantization_tutorial.html">(베타) LSTM 언어 모델 동적 양자화
-튜토리얼</a>
+좀 더 자세한 내용을 알아보고 싶다면 <a class="reference internal" href="../../advanced/dynamic_quantization_tutorial.html"><span class="doc">(베타) LSTM 기반 단어 단위 언어 모델의 동적 양자화</span></a>
 을 계속 공부해 보시기 바랍니다.</p>
 </div>
-</div>
 <div class="section" id="id11">
-<h1>참고 자료<a class="headerlink" href="#id11" title="이 제목에 대한 퍼머링크">¶</a></h1>
-<p><a class="reference external" href="https://pytorch.org/docs/stable/quantization.html">양자화 API 문서</a></p>
-<p><a class="reference external" href="https://tutorials.pytorch.kr/intermediate/dynamic_quantization_bert_tutorial.html">(베타) BERT 동적 양자화</a></p>
-<p><a class="reference external" href="https://tutorials.pytorch.kr/advanced/dynamic_quantization_tutorial.html">(베타) LSTM 언어 모델 동적 양자화</a></p>
-<p><a class="reference external" href="https://pytorch.org/blog/introduction-to-quantization-on-pytorch/">PyTorch에서 양자화 수행하기 입문서</a></p>
+<h2>참고 자료<a class="headerlink" href="#id11" title="이 제목에 대한 퍼머링크">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://pytorch.org/docs/stable/quantization.html">Quantization API Documentaion</a></p></li>
+<li><p><a class="reference internal" href="../../intermediate/dynamic_quantization_bert_tutorial.html"><span class="doc">(베타) BERT 모델 동적 양자화하기</span></a></p></li>
+<li><p><span class="xref std std-doc">advanced/dynamic_quantization_tutorial</span></p></li>
+<li><p><a class="reference external" href="https://pytorch.org/blog/introduction-to-quantization-on-pytorch/">Introduction to Quantization on PyTorch</a></p></li>
+</ul>
 <p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.000 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-recipes-recipes-dynamic-quantization-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
@@ -690,6 +703,7 @@ LSTM 모델을 빠르게 양자화하기 위해 <code class="docutils literal no
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</div>
 </div>
 
 
@@ -732,7 +746,7 @@ LSTM 모델을 빠르게 양자화하기 위해 <code class="docutils literal no
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018-2023, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorch Korea User Group).
+        &copy; Copyright 2018-2024, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorch Korea User Group).
 
     </p>
   </div>
@@ -760,7 +774,7 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
               <ul>
 <li><a class="reference internal" href="#">동적 양자화</a><ul>
 <li><a class="reference internal" href="#id2">도입</a></li>
-<li><a class="reference internal" href="#id3">동적 양자화란 무엇인가?</a></li>
+<li><a class="reference internal" href="#id3">동적 양자화란 무엇인가요?</a></li>
 <li><a class="reference internal" href="#id4">단계</a><ul>
 <li><a class="reference internal" href="#id5">1: 준비</a></li>
 <li><a class="reference internal" href="#id6">2: 양자화 수행</a></li>
@@ -770,9 +784,9 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
 </ul>
 </li>
 <li><a class="reference internal" href="#id10">좀 더 알아보기</a></li>
+<li><a class="reference internal" href="#id11">참고 자료</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#id11">참고 자료</a></li>
 </ul>
 
             </div>
@@ -796,8 +810,8 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
          <script src="../../_static/clipboard.min.js"></script>
          <script src="../../_static/copybutton.js"></script>
          <script src="../../_static/translations.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
+         <script src="../../_static/katex.min.js"></script>
+         <script src="../../_static/auto-render.min.js"></script>
          <script src="../../_static/katex_autorenderer.js"></script>
          <script src="../../_static/design-tabs.js"></script>
      
@@ -815,8 +829,10 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
   </script>
  
 <script>
-//add microsoft link
+// Helper function to make it easier to call dataLayer.push()
+function gtag(){window.dataLayer.push(arguments);}
 
+//add microsoft link
 if(window.location.href.indexOf("/beginner/basics/")!= -1)
 {
   var url="https://docs.microsoft.com/learn/paths/pytorch-fundamentals/?wt.mc_id=aiml-7486-cxa";
@@ -881,7 +897,8 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
     gtag('event', 'click', {
       'event_category': 'Tutorial Rating',
       'event_label': $("h1").first().text(),
-      'value': $(this).attr("data-count")
+      'value': $(this).attr("data-count"),
+      'customEvent:Rating': $(this).attr("data-count") // send to GA custom dimension customEvent:Rating.
     });
    });
 
@@ -892,7 +909,7 @@ if(window.location.href.indexOf("/beginner/basics/")!= -1)
 </script>
 
 <script type="text/javascript">
-  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', '이미지/비디오', '오디오', '텍스트', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', '모바일', 'Introduction to PyTorch on YouTube', '추천 시스템', 'Multimodality'];
+  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', 'Introduction to PyTorch on YouTube', '이미지/비디오', '오디오', '텍스트', '백엔드', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'PyTorch 프로파일링', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Edge with ExecuTorch', '추천 시스템', 'Multimodality'];
 </script>
 
 
