@@ -54,7 +54,7 @@
 |Batch Normalization|배치 정규화|박정환||
 |bias|편향|이하람||
 |convolution|합성곱|김현길||
-|communication volumne|통신량|박정은||
+|communication volume|통신량|박정은||
 |Dropout|드롭아웃|김태형|음차 표기|
 |dataset|데이터셋|박정환|음차 표기|
 |deep neural network|심층 신경망|박정환||
