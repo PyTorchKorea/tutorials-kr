@@ -68,6 +68,7 @@
 |Generative|생성 모델|박정환|ToC의 분류명입니다.|
 |Getting Started tutorial|시작하기 튜토리얼|박정환|ToC의 Getting Started를 뜻합니다.|
 |gradient|변화도|박정환||
+|Gradient descent|경사하강법|이진혁|
 |Hyperparameter|하이퍼파라미터|김태영|음차 표기|
 |Image|이미지|박정환|ToC의 분류명입니다.|
 |in-place|제자리|허남규||
@@ -94,6 +95,7 @@
 |parameter|매개변수|박정환||
 |placeholder|플레이스홀더|박정환|음차 표기|
 |plotting|도식화|황성수||
+|pooling|풀링|이진혁|음차 표기|
 |Production (environment, use)|Production|허남규|번역하지 않음|
 |pruning|가지치기|김지호||
 |rank 0|0-순위|박정환||
