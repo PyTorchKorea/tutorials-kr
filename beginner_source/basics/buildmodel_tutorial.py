@@ -34,7 +34,7 @@ from torchvision import datasets, transforms
 #
 # 가능한 경우 GPU 또는 MPS와 같은 하드웨어 가속기에서 모델을 학습하려고 합니다.
 # `torch.cuda <https://pytorch.org/docs/stable/notes/cuda.html>`_ 또는 `torch.backends.mps <https://pytorch.org/docs/stable/notes/mps.html>`_
-# 가 사용 가능한지 확인해보고, 그렇지 않으면 CPU를 계속 사용합니다.
+# 가 사용 가능한지 확인해 보고, 그렇지 않으면 CPU를 계속 사용합니다.
 
 device = (
     "cuda"
