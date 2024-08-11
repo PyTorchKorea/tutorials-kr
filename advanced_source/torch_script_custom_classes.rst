@@ -111,7 +111,7 @@ CMake를 사용하여 C++ 프로젝트로 예제 빌드
 Python 및 TorchScript의 C++ 클래스 사용
 --------------------------------------
 
-이제 클래스와 등록이 ``.so`` 파일로 컴파일되었으므로 해당 `.so` 를 Python에 읽어들이고 사용해 볼 수 있습니다.
+이제 클래스와 등록이 ``.so`` 파일로 컴파일 되었으므로 해당 `.so` 를 Python에 읽어들이고 사용해 볼 수 있습니다.
 다음은 이를 보여주는 스크립트입니다:
 
 .. literalinclude:: ../advanced_source/torch_script_custom_classes/custom_class_project/custom_test.py
