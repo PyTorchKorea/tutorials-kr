@@ -8,7 +8,7 @@ Raspberry Pi 4 에서 실시간 추론(Inference) (30fps!)
 이 튜토리얼은 Raspberry Pi 4에서 PyTorch를 설정하는 방법과 CPU에서 실시간(30fps 이상)으로
 MobileNet v2 분류 모델을 실행하는 방법을 안내합니다.
 
-이 튜토리얼은 모두 Raspberry Pi 4 Model B 4GB를 이용해 테스트 했지만 2GB 변형 모델(variant) 이나
+이 튜토리얼은 모두 Raspberry Pi 4 Model B 4GB를 이용해 테스트했지만 2GB 변형 모델(variant) 이나
 3B에서도 낮은 성능으로 작동합니다.
 
 .. image:: https://user-images.githubusercontent.com/909104/153093710-bc736b6f-69d9-4a50-a3e8-9f2b2c9e04fd.gif
@@ -16,7 +16,7 @@ MobileNet v2 분류 모델을 실행하는 방법을 안내합니다.
 준비물
 ~~~~~~~~~~
 
-이 튜토리얼을 따라하려면 Raspberry Pi 4, 카메라, 기타 모든 표준 액세서리가 필요합니다.
+이 튜토리얼을 따라 하려면 Raspberry Pi 4, 카메라, 기타 모든 표준 액세서리가 필요합니다.
 
 * `Raspberry Pi 4 Model B 2GB+ <https://www.raspberrypi.com/products/raspberry-pi-4-model-b/>`_
 * `Raspberry Pi 카메라 모듈 <https://www.raspberrypi.com/products/camera-module-v2/>`_
@@ -29,7 +29,7 @@ MobileNet v2 분류 모델을 실행하는 방법을 안내합니다.
 Raspberry Pi 4 설정
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-PyTorch는 Arm 64비트(aarch64)용 pip 패키지만 제공하므로 Raspberry Pi 에 64비트 버전의 OS를 설치해야 합니다.
+PyTorch는 Arm 64비트(aarch64)용 pip 패키지만 제공하므로 Raspberry Pi에 64비트 버전의 OS를 설치해야 합니다.
 
 https://downloads.raspberrypi.org/raspios_arm64/images/ 에서 최신 arm64 Raspberry Pi OS를 다운로드 후 rpi-imager를 통해 설치합니다.
 
