@@ -20,7 +20,6 @@ ONNX와 어떤 도구들이 지원되는지는 `onnx.ai <https://onnx.ai/>`_ 를
 이번 튜토리얼에서는 4가지 중심 사항들을 소개해드리겠습니다:
 
 
-#. `Download (or train) PyTorch style transfer models`_
 #. `PyTorch style transfer 모델 다운로드 (또는 학습시키기)`_
 #. `PyTorch 모델을 ONNX 모델로 변환하기`_
 #. `ONNX 모델을 CoreML 모델로 변환하기`_
