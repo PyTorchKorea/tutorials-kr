@@ -27,7 +27,7 @@ C++에서 클래스 구현 및 바인딩
 - 두 번째로 주목해야 할 점은 커스텀 클래스가 ``torch::CustomClassHolder`` 에서 상속되어야 한다는 것입니다.
   이렇게 하면 커스텀 클래스에 참조 계수를 저장할 공간이 있습니다.
 
-이제 이 클래스를 어떻게 TorchScript에서 사용가능하게 하는지 살펴보겠습니다.
+이제 이 클래스를 어떻게 TorchScript에서 사용 가능하게 하는지 살펴보겠습니다.
 이런 과정은 클래스를 *바인딩* 한다고 합니다:
 
 .. literalinclude:: ../advanced_source/torch_script_custom_classes/custom_class_project/class.cpp
