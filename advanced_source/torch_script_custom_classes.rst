@@ -130,8 +130,7 @@ libtorch를 사용하여 C++ 프로세스에서 커스텀 등록 C++ 클래스�
 파일 시스템의 foo.pt는 방금 정의한 직렬화된 TorchScript 프로그램을 포함합니다.
 
 이제 이 모델과 필요한 .so 파일을 읽어들이는 방법을 보여주기 위해 새 CMake 프로젝트를 정의하겠습니다.
-이 작업을 수행하는 방법에 대한 자세한 내용은 `C++에서 TorchScript 모델 로딩하기 <https://tutorials.pytorch.kr/advanced/cpp_export.html>`_ 를
-참조하세요.
+이 작업을 수행하는 방법에 대한 자세한 내용은 `C++에서 TorchScript 모델 로딩하기 <https://tutorials.pytorch.kr/advanced/cpp_export.html>`_ 를 참조하세요.
 
 이전과 유사하게 다음을 포함하는 파일 구조를 생성해 보겠습니다::
 
