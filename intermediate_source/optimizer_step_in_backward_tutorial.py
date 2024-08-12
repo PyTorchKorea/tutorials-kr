@@ -1,31 +1,31 @@
 """
 
-How to save memory by fusing the optimizer step into the backward pass
+옵티마이저 단계를 역전파 과정에 합쳐서 메모리 절약하기
 ======================================================================
 
-Hello there! This tutorial aims to showcase one way of reducing the
-memory footprint of a training loop by reducing the memory taken by
-the *gradients*. Say you have a model and you're interested in ways to
-optimize memory to avoid ``Out of Memory`` (OOM) errors or simply to ooze
-more out of your GPU. Well, you _might_ be in luck (if gradients take up
-a portion of your memory and you do not need to do gradient accumulation).
-We will explore the following:
+안녕하세요! 이 튜토리얼에서는 *변화도(gradient)*가 차지하는 메모리를 줄임으로써 
+학습 단계(training loop)에서의 메모리 사용량을 줄이는 한 가지 방법을 소개합니다.
+모델을 갖고 있는 상황에서 메모리 부족(Out of Memory, OOM) 오류를 방지하고 싶거나,
+GPU의 성능을 최대한 활용하고 싶은 경우 이 방법이 도움이 될 수 있습니다.
+(변화도가 메모리의 일부를 차지하고 있으며, 변화도 누적이 필요하지 않은 경우라면 말입니다.)
 
-1. What takes up memory during your training or finetuning loop,
-2. How to capture and visualize memory snapshots to determine the bottleneck,
-3. The new ``Tensor.register_post_accumulate_grad_hook(hook)`` API, and finally,
-4. How everything fits together in 10 lines to achieve memory savings.
+아래 내용을 다룹니다:
 
-To run this tutorial, you will need:
+1. 학습 또는 미세조정(finetuning) 단계 중 메모리를 차지하는 요소들,
+2. 메모리 스냅샷을 캡처하고 시각화하여 병목 현상을 파악하는 방법,
+3. 새로운 ``Tensor.register_post_accumulate_grad_hook(hook)`` API, 그리고
+4. 단 10줄의 코드로 메모리 절약하는 법.
 
-*  PyTorch 2.1.0 or newer with ``torchvision``
-*  1 CUDA GPU if you'd like to run the memory visualizations locally.
-   Otherwise, this technique would benefit similarly on any device.
+이 튜토리얼을 실행하려면 다음이 필요합니다:
 
-Let us start by importing the required modules and models. We will use a
-vision transformer model from torchvision, but feel free to substitute
-with your own model. We will also use ``torch.optim.Adam`` as our optimizer,
-but, again, feel free to substitute with your own optimizer.
+*  ``torchvision``이 포함된 PyTorch 2.1.0 혹은 그 이상의 버전
+*  메모리 시각화를 로컬에서 실행하려면 CUDA GPU 1개
+   메모리 시각화를 제외하면 이 기법은 모든 장치에서 유사한 이점을 제공합니다.
+
+먼저 필요한 모듈과 모델을 import하겠습니다. 
+예시에서는 torchvision의 비전 트랜스포머 모델을 사용하지만, 원하는 모델로 대체해도 좋습니다.
+또 예시에서는 옵티마이저로 ``torch.optim.Adam``을 사용하지만, 마찬가지로 원하는 옵티마이저로 대체해도 됩니다.
+
 
 """
 
