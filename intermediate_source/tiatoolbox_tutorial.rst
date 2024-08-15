@@ -1,44 +1,45 @@
-Whole Slide Image Classification Using PyTorch and TIAToolbox
+Pytorch와 TIAToolbox를 사용한 전체 슬라이드 이미지(Whole Slide Image) 분류
 =============================================================
+**번역**: `박주환 <https://github.com/jkworldchampion>`_
 
 .. tip::
-   To get the most of this tutorial, we suggest using this
-   `Colab Version <https://colab.research.google.com/github/pytorch/tutorials/blob/main/_static/tiatoolbox_tutorial.ipynb>`_. This will allow you to experiment with the information presented below.
+   이 튜토리얼을 최대한 활용하려면, 이 `Colab 버전 <https://colab.research.google.com/github/pytorch/tutorials/blob/main/_static/tiatoolbox_tutorial.ipynb>`_ 을 
+   사용하는 것을 권장합니다. 이를 통해 아래의 자료를 실험해 볼 수 있습니다.
 
 
-Introduction
+개요
 ------------
 
-In this tutorial, we will show how to classify Whole Slide Images (WSIs)
-using PyTorch deep learning models with help from TIAToolbox. A WSI
-is an image of a sample of human tissue taken through a surgery or biopsy and
-scanned using specialized scanners. They are used by pathologists and
-computational pathology researchers to `study diseases such as cancer at the microscopic
-level <https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7522141/>`__ in
-order to understand for example tumor growth and help improve treatment
-for patients.
+본 튜토리얼에서는 TIAToolbox를 사용한 PyTorch 모델을 통해 전체 슬라이드
+이미지들(Whole Slide Images, WSIs)을 분류하는 방법을 알아보겠습니다. WSI란
+수술이나 생검을 통해 채취된 인간 조직 샘플의 이미지이며, 이러한 이미지는
+전문 스캐너를 사용해 스캔 됩니다. 이 데이터는 병리학자와 전산 병리학자들이
+종양 성장에 대한 이해를 높이고 환자 치료를 개선하기 위해
+`암과 같은 질병을 미시적 수준에서 연구 <https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7522141/>`__
+하는데 사용됩니다.
 
-What makes WSIs challenging to process is their enormous size. For
-example, a typical slide image has in the order of `100,000x100,000
-pixels <https://doi.org/10.1117%2F12.912388>`__ where each pixel can
-correspond to about 0.25x0.25 microns on the slide. This introduces
-challenges in loading and processing such images, not to mention
-hundreds or even thousands of WSIs in a single study (larger studies
-produce better results)!
+WSIs를 처리하는 것이 어려운 이유는 엄청난 크기 때문입니다. 예컨대,
+일반적인 슬라이드 이미지가 `100,000x100,000
+픽셀 <https://doi.org/10.1117%2F12.912388>`__ 정도의 크기를 가지며,
+각 픽셀은 슬라이드 상에서 약 0.25x0.25 마이크로미터에 해당합니다.
+이 때문에 이미지를 로드하고 처리하는 데 어려움을 야기하며, 한 연구에서
+수백 개나 수천 개의 WSIs가 포함되는 경우는 말할 것도 없습니다
+(더 큰 연구가 더 나은 결과를 제공합니다)!
 
-Conventional image processing pipelines are not suitable for WSI
-processing so we need better tools. This is where
-`TIAToolbox <https://github.com/TissueImageAnalytics/tiatoolbox>`__ can
-help as it brings a set of useful tools to import and process tissue
-slides in a fast and computationally efficient manner. Typically, WSIs
-are saved in a pyramid structure with multiple copies of the same image
-at various magnification levels optimized for visualization. The level 0
-(or the bottom level) of the pyramid contains the image at the highest
-magnification or zoom level, whereas the higher levels in the pyramid
-have a lower resolution copy of the base image. The pyramid structure is
-sketched below.
+전통적인 이미지 처리 파이프라인은 WSIs 처리에
+적합하지 않으므로 더 나은 도구가 필요합니다.
+이때, `TIAToolbox <https://github.com/TissueImageAnalytics/tiatoolbox>`__ 가
+도움이 될 수 있는데, 이는 조직 슬라이드(tissue slides)를 빠르고
+효율적으로 처리할 수 있는 유용한 도구들을 제공합니다.
+일반적으로 WSIs는 시각화에 최적화된
+다양한 배율에서 동일한 이미지의 여러 복사본이 피라미드 구조로 저장됩니다.
+피라미드의 레벨 0(또는 가장 아래 단계)에는 가장 높은
+배율 또는 줌 수준의 이미지를 포함하며,
+피라미드의 상위 단계로 갈수록 기본 이미지의 저 해상도 사본이 있습니다.
+하단에 피라미드의 구조가 그려져 있습니다.
 
-|WSI pyramid stack| *WSI pyramid stack
+
+|WSI pyramid stack| *WSI 피라미드 stack
 (*\ `source <https://tia-toolbox.readthedocs.io/en/latest/_autosummary/tiatoolbox.wsicore.wsireader.WSIReader.html#>`__\ *)*
 
 TIAToolbox allows us to automate common downstream analysis tasks such
