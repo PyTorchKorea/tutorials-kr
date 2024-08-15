@@ -102,6 +102,8 @@
 |resample|리샘플|||
 |resizing|크기 변경|박정환||
 |requirements|요구 사항|장보윤||
+|sample|샘플|박주환|음차 표기|
+|sampling|샘플링|박주환|음차 표기|
 |sampling rate|샘플링 레이트|||
 |scenario|시나리오|박정환|음차 표기|
 |shape|shape|허남규|번역하지 않음|
