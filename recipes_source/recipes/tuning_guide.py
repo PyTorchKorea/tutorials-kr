@@ -1,7 +1,7 @@
 """
-Performance Tuning Guide
+성능 최적화 가이드
 *************************
-**Author**: `Szymon Migacz <https://github.com/szmigacz>`_
+**저자**: `Szymon Migacz <https://github.com/szmigacz>`_
 
 Performance Tuning Guide is a set of optimizations and best practices which can
 accelerate training and inference of deep learning models in PyTorch. Presented
