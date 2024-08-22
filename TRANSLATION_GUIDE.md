@@ -52,6 +52,8 @@
 |augmentation|증강|이재복||
 |autograd|Autograd|황성수|번역안함|
 |Batch Normalization|배치 정규화|박정환||
+|backward pass |역전파|김재현||
+|backpropagation |역전파|김재현||
 |bias|편향|이하람||
 |convolution|합성곱|김현길||
 |Dropout|드롭아웃|김태형|음차 표기|
@@ -95,6 +97,7 @@
 |placeholder|플레이스홀더|박정환|음차 표기|
 |plotting|도식화|황성수||
 |Production (environment, use)|Production|허남규|번역하지 않음|
+|preprocessing |전처리|김재현||
 |pruning|가지치기|김지호||
 |rank 0|0-순위|박정환||
 |Read later|더 읽을거리|박정환||
@@ -113,3 +116,4 @@
 |warmstart|빠르게 시작하기|박정환|Warmstarting Model = 빠르게 모델 시작하기|
 |weight|가중치|박정환||
 |wrapper|래퍼|박정환|음차 표기|
+
