@@ -37,21 +37,21 @@ model = models.vit_l_16(weights='DEFAULT').cuda()
 optimizer = torch.optim.Adam(model.parameters())
 
 ###############################################################################
-# Now let's define our typical training loop. You should use real images when
-# training, but for the purposes of this tutorial, we are passing in fake
-# inputs and not worrying about loading any actual data.
+# 이제 일반적인 훈련 루프를 정의해봅시다. 실제 학습 시에는 실제 이미지를 사용해야 
+# 하지만, 이 튜토리얼에서는 가짜 입력 데이터를 사용하며 
+# 실제 데이터를 로드하는 것에 대해서는 신경 쓰지 않을 것입니다.
 
 IMAGE_SIZE = 224
 
 def train(model, optimizer):
-  # create our fake image input: tensor shape is batch_size, channels, height, width
+  # 가짜 이미지 입력값 생성: 텐서의 형태는 batch_size, channels, height, width
   fake_image = torch.rand(1, 3, IMAGE_SIZE, IMAGE_SIZE).cuda()
 
-  # call our forward and backward
+  # 순전파(forward)와 역전파(backward) 호출
   loss = model.forward(fake_image)
   loss.sum().backward()
 
-  # optimizer update
+  # 옵티마이저 업데이트
   optimizer.step()
   optimizer.zero_grad()
 
