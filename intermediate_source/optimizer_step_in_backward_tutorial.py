@@ -12,7 +12,7 @@ GPU의 성능을 최대한 활용하고 싶은 경우 이 방법이 도움이 �
 아래 내용을 다룹니다:
 
 1. 학습 또는 미세조정(finetuning) 단계 중 메모리를 차지하는 요소들,
-2. 메모리 스냅숏(snapshot)을 캡처하고 시각화하여 병목 현상을 파악하는 방법,
+2. 메모리 스냅샷(snapshot)을 캡처하고 시각화하여 병목 현상을 파악하는 방법,
 3. 새로운 ``Tensor.register_post_accumulate_grad_hook(hook)`` API, 그리고
 4. 이 모든 것을 감안한 단 10줄의 코드로 메모리를 절약하는 법.
 
@@ -69,30 +69,30 @@ def train(model, optimizer):
 #  * 중간 텐서들(Intermediate tensors), 계산 도중 할당됩니다. 
 #    보통 크기가 작고 일시적이므로 지금은 신경 쓰지 않겠습니다.
 #
-# Capturing and visualizing memory snapshots
+# 메모리 스냅샷 캡처 및 시각화
 # """"""""""""""""""""""""""""""""""""""""""
-# Let's get us a memory snapshot! As your code runs, consider what you may expect
-# the CUDA memory timeline to look like.
+# 이제 메모리 스냅샷을 가져와 봅시다! 코드를 실행되는 동안,
+# CUDA 메모리 타임라인이 어떤 모습일지 한 번 예상해 보세요.
 
-# tell CUDA to start recording memory allocations
+# CUDA에 메모리 할당 기록을 시작하도록 지시
 torch.cuda.memory._record_memory_history(enabled='all')
 
-# train 3 steps
+# 학습 3회 실시
 for _ in range(3):
   train(model, optimizer)
 
-# save a snapshot of the memory allocations
+# 메모리 할당 스냅샷을 저장
 s = torch.cuda.memory._snapshot()
 with open(f"snapshot.pickle", "wb") as f:
     dump(s, f)
 
-# tell CUDA to stop recording memory allocations now
+# CUDA에 메모리 할당 기록을 중지하도록 지시
 torch.cuda.memory._record_memory_history(enabled=None)
 
 ###############################################################################
-# Now open up the snapshot in the CUDA Memory Visualizer at
-# https://pytorch.org/memory_viz by dragging and dropping the
-# ``snapshot.pickle`` file. Does the memory timeline match your expectations?
+# 이제 CUDA 메모리 시각화 도구(CUDA Memory Visualizer)에서 스냅샷을 열어보세요.
+# https://pytorch.org/memory_viz 로 들어가서 ``snapshot.pickle`` 파일을 드래그 앤
+# 드롭하여 업로드할 수 있습니다. 메모리 타임라인이 예상과 일치하나요?
 # 
 # .. figure:: /_static/img/optim_step_in_bwd/snapshot.jpg
 #    :alt: snapshot.png loaded into CUDA Memory Visualizer
