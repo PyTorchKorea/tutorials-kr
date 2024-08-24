@@ -56,18 +56,18 @@ def train(model, optimizer):
   optimizer.zero_grad()
 
 ###############################################################################
-# Memory usage during training
+# 학습 중의 메모리 사용량
 # """"""""""""""""""""""""""""
-# We are about to look at some memory snapshots, so we should be prepared to
-# analyze them properly. Typically, training memory consists of:
+# 이제 메모리 스냅샷을 확인하려고 하므로, 이를 적절히 분석할 준비를 해야 합니다.
+# 일반적으로 학습 메모리는 다음으로 구성됩니다:
 #
-#  * Model parameters (size P)
-#  * Activations that are saved for the backward pass (size A)
-#  * Gradients, which are the same size as the model parameters, so size G = P.
-#  * Optimizer state, which is proportional to the size of the parameters. In
-#    this case, the state for Adam requires 2x the model parameters, so size O = 2P.
-#  * Intermediate tensors, which are allocated throughout the compute. We will
-#    not worry about them for now as they are usually small and ephemeral.
+#  * 모델 파라미터 (크기 P)
+#  * 역전파 단계를 위해 저장된 활성화 값들(activations) (크기 A)
+#  * 변화도, 모델 파라미터와 같은 크기이므로 크기 G = P.
+#  * 옵티마이저 상태, 파라미터 크기에 비례함. 예시의 경우, 
+#    Adam의 상태는 모델 파라미터의 2배가 필요하므로 크기 O = 2P.
+#  * 중간 텐서들(Intermediate tensors), 계산 도중 할당됩니다. 
+#    보통 크기가 작고 일시적이므로 지금은 신경 쓰지 않겠습니다.
 #
 # Capturing and visualizing memory snapshots
 # """"""""""""""""""""""""""""""""""""""""""
