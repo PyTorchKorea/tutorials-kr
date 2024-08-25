@@ -4,14 +4,14 @@
 ======================================================================
 
 안녕하세요! 이 튜토리얼에서는 *변화도(gradient)* 가 차지하는 메모리를 줄임으로써 
-학습 단계(training loop)에서의 메모리 사용량을 줄이는 한 가지 방법을 소개합니다.
+학습 루프(training loop)에서의 메모리 사용량을 줄이는 한 가지 방법을 소개합니다.
 모델이 있는 상황에서 메모리 부족(Out of Memory, OOM) 오류를 방지하고 싶거나,
 GPU의 성능을 최대한 활용하고 싶은 경우 이 방법이 도움이 될 수 있습니다.
 (변화도가 메모리의 일부(partition)를 차지하고 있으며, 변화도 누적(accumulation)이 필요하지 않은 경우라면 말입니다.)
 
 아래 내용을 다룹니다:
 
-1. 학습 또는 미세조정(finetuning) 단계 중 메모리를 차지하는 요소들,
+1. 학습 또는 미세조정(finetuning) 루프 중 메모리를 차지하는 요소들,
 2. 메모리 스냅샷(snapshot)을 캡처하고 시각화하여 병목 현상을 파악하는 방법,
 3. 새로운 ``Tensor.register_post_accumulate_grad_hook(hook)`` API, 그리고
 4. 이 모든 것을 감안한 단 10줄의 코드로 메모리를 절약하는 법.
@@ -37,7 +37,7 @@ model = models.vit_l_16(weights='DEFAULT').cuda()
 optimizer = torch.optim.Adam(model.parameters())
 
 ###############################################################################
-# 이제 일반적인 훈련 루프를 정의해봅시다. 실제 학습 시에는 실제 이미지를 사용해야 
+# 이제 일반적인 학습 루프를 정의해봅시다. 실제 학습 시에는 실제 이미지를 사용해야 
 # 하지만, 이 튜토리얼에서는 가짜 입력 데이터를 사용하며 
 # 실제 데이터를 로드하는 것에 대해서는 신경 쓰지 않을 것입니다.
 
@@ -66,7 +66,7 @@ def train(model, optimizer):
 #  * 변화도, 모델 파라미터와 같은 크기이므로 크기 G = P.
 #  * 옵티마이저 상태, 파라미터 크기에 비례함. 예시의 경우, 
 #    Adam의 상태는 모델 파라미터의 2배가 필요하므로 크기 O = 2P.
-#  * 중간 텐서들(Intermediate tensors), 계산 도중 할당됩니다. 
+#  * 중간 텐서(Intermediate tensors), 계산 도중 할당됩니다. 
 #    보통 크기가 작고 일시적이므로 지금은 신경 쓰지 않겠습니다.
 #
 # 메모리 스냅샷 캡처 및 시각화
@@ -97,21 +97,21 @@ torch.cuda.memory._record_memory_history(enabled=None)
 # .. figure:: /_static/img/optim_step_in_bwd/snapshot.jpg
 #    :alt: snapshot.png loaded into CUDA Memory Visualizer
 # 
-# The model parameters have already been loaded in memory before the training
-# step, so we see a chunk of memory devoted to the weights right off the bat.
-# As we start our forward pass, memory is allocated gradually for the activations,
-# or the tensors we are saving to be able to compute gradients in the backward pass.
-# Once we start the backward pass, the activations are gradually freed while memory
-# of the gradients starts building up.
+# 모델 파라미터는 이미 학습 루프 이전에 메모리에 로드되었으므로,
+# 처음부터 가중치(weights)에 할당된 메모리 덩어리가 보입니다.
+# 순전파를 시작하면, 메모리는 활성화값을 위해 점차 할당됩니다.
+# 이 활성화값은 역전파 단계에서 변화도를 계산하기 위해 저장하는 텐서입니다.
+# 역전파를 시작하면, 활성화 값이 점차 해제되면서 변화도가 차지하는 메모리가
+# 쌓이기 시작합니다.
 # 
-# Lastly, as the optimizer kicks in, its state will be lazily initialized, so we 
-# should see the optimizer state memory gradually increase during the optimizer
-# step of the first training loop only. In future loops, the optimizer memory
-# will remain and be updated in-place. The memory for the gradients is then
-# freed accordingly at the end of every training loop when ``zero_grad`` is called.
+# 마지막으로 옵티마이저가 작동하면, 옵티마이저의 상태는 지연 초기화(lazily 
+# initialized)되므로, 첫 번째 학습 루프의 옵티마이저 단계 동안만 옵티마이저 
+# 상태 메모리가 점차 증가하는 것을 볼 수 있습니다. 이후의 루프에서는, 옵티마이저 
+# 메모리가 그대로 유지되고, 제자리에서 업데이트됩니다. 변화도가 차지하는 메모리는 
+# 매번 학습 루프가 끝날 때 ``zero_grad`` 가 호출되면 적절히 해제됩니다.
 # 
-# Where is the memory bottleneck in this training loop? Or, in other words,
-# where is the peak memory?
+# 이 학습 루프에서 메모리 병목 현상이 발생하는 지점은 어디일까요? 즉, 메모리 
+# 사용이 가장 높은 지점은 어디일까요?
 # 
 # The peak memory usage is during the optimizer step! Note the memory then
 # consists of ~1.2GB of parameters, ~1.2GB of gradients, and ~2.4GB=2*1.2GB of
