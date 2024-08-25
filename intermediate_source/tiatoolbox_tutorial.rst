@@ -6,14 +6,14 @@ Pytorch와 TIAToolbox를 사용한 전체 슬라이드 이미지(Whole Slide Ima
    이 튜토리얼을 최대한 활용하려면, 이 `Colab 버전 <https://colab.research.google.com/github/pytorch/tutorials/blob/main/_static/tiatoolbox_tutorial.ipynb>`_ 을 
    사용하는 것을 권장합니다. 이를 통해 아래의 자료를 실험해 볼 수 있습니다.
 
-
 개요
 ------------
 
-본 튜토리얼에서는 TIAToolbox를 사용한 PyTorch 모델을 통해 전체 슬라이드
-이미지들(Whole Slide Images, WSIs)을 분류하는 방법을 알아보겠습니다. WSI란
-수술이나 생검을 통해 채취된 인간 조직 샘플의 이미지이며, 이러한 이미지는
-전문 스캐너를 사용해 스캔 됩니다. 이 데이터는 병리학자와 전산 병리학자들이
+본 튜토리얼에서는 TIAToolbox를 사용한 PyTorch 모델을 통해
+전체 슬라이드 이미지들(Whole Slide Images, WSIs)을 분류하는
+방법을 알아보겠습니다. WSI란 수술이나 생검을 통해 채취된 인간 
+조직 샘플의 이미지이며, 이러한 이미지는 전문 스캐너를 사용해 
+스캔 됩니다. 이 데이터는 병리학자와 전산 병리학자들이
 종양 성장에 대한 이해를 높이고 환자 치료를 개선하기 위해
 `암과 같은 질병을 미시적 수준에서 연구 <https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7522141/>`__
 하는데 사용됩니다.
@@ -38,29 +38,28 @@ WSIs를 처리하는 것이 어려운 이유는 엄청난 크기 때문입니다
 피라미드의 상위 단계로 갈수록 기본 이미지의 저 해상도 사본이 있습니다.
 하단에 피라미드의 구조가 그려져 있습니다.
 
-
 |WSI pyramid stack| *WSI 피라미드 stack
 (*\ `source <https://tia-toolbox.readthedocs.io/en/latest/_autosummary/tiatoolbox.wsicore.wsireader.WSIReader.html#>`__\ *)*
 
-TIAToolbox allows us to automate common downstream analysis tasks such
-as `tissue
-classification <https://doi.org/10.1016/j.media.2022.102685>`__. In this
-tutorial we show how you can: 1. Load WSI images using
-TIAToolbox; and 2. Use different PyTorch models to classify slides at
-the patch-level. In this tutorial, we will provide an example of using
-TorchVision ``ResNet18`` model and custom
-`HistoEncoder` <https://github.com/jopo666/HistoEncoder>`__ model.
+TIAToolbox를 사용하면 `조직
+분류 <https://doi.org/10.1016/j.media.2022.102685>`__ 와 같은 일반적인
+후속 분석 작업을 자동화할 수 있습니다. 본 튜토리얼에서는 다음을 수행하는
+방법을 보여줍니다: 1. TIAToolbox를 사용하여 WSI(Whole Slide Image)를
+이미지를 로드하는 방법 2. 서로 다른 Pytorch 모델을 사용하여 슬라이드를
+패치 레벨(patch-level)에서 분류하는 방법. 본 튜토리얼에서는 TorchVision의
+``ResNet18`` 모델과 커스텀(custom) `HistoEncoder <https://github.com/jopo666/HistoEncoder>`__
+모델을 사용하는 예제를 제공합니다.
 
-Let’s get started!
+시작해보자!
 
 .. |WSI pyramid stack| image:: ../_static/img/tiatoolbox_tutorial/read_bounds_tissue.webp
 
 
-Setting up the environment
+환경설정
 --------------------------
 
-To run the examples provided in this tutorial, the following packages
-are required as prerequisites.
+본 튜토리얼에서 제공하는 예제를 실행하려면, 다음과 같은 패키지(packages)
+요구사항이 있습니다.
 
 1. OpenJpeg
 2. OpenSlide
@@ -68,12 +67,12 @@ are required as prerequisites.
 4. TIAToolbox
 5. HistoEncoder (for a custom model example)
 
-Please run the following command in your terminal to install these
-packages:
+이 패키지들을 설치하기 위해 터미널(terminal)에 아래의
+명령어를 실행해주세요:
 
 
-`apt-get -y -qq install libopenjp2-7-dev libopenjp2-tools openslide-tools libpixman-1-dev` 
-`pip install -q 'tiatoolbox<1.5' histoencoder && echo "Installation is done."`
+- `apt-get -y -qq install libopenjp2-7-dev libopenjp2-tools openslide-tools libpixman-1-dev`  
+- `pip install -q 'tiatoolbox<1.5' histoencoder && echo "Installation is done."`
 
 
 Alternatively, you can run ``brew install openjpeg openslide`` to
