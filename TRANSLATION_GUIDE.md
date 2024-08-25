@@ -53,7 +53,6 @@
 |autograd|Autograd|황성수|번역안함|
 |Batch Normalization|배치 정규화|박정환||
 |bias|편향|이하람||
-|buffer|버퍼|송호준|음차 표기|
 |convolution|합성곱|김현길||
 |Dropout|드롭아웃|김태형|음차 표기|
 |dataset|데이터셋|박정환|음차 표기|
