@@ -66,7 +66,7 @@ def train(model, optimizer):
 #  * 변화도, 모델 파라미터와 같은 크기이므로 크기 G = P.
 #  * 옵티마이저 상태, 파라미터 크기에 비례함. 예시의 경우, 
 #    Adam의 상태는 모델 파라미터의 2배가 필요하므로 크기 O = 2P.
-#  * 중간 텐서(Intermediate tensors), 계산 도중 할당됩니다. 
+#  * 중간 단계(Intermediate) tensor, 계산 도중 할당됩니다. 
 #    보통 크기가 작고 일시적이므로 지금은 신경 쓰지 않겠습니다.
 #
 # 메모리 스냅샷 캡처 및 시각화
@@ -113,38 +113,38 @@ torch.cuda.memory._record_memory_history(enabled=None)
 # 이 학습 루프에서 메모리 병목 현상이 발생하는 지점은 어디일까요? 즉, 메모리 
 # 사용이 가장 높은 지점은 어디일까요?
 # 
-# The peak memory usage is during the optimizer step! Note the memory then
-# consists of ~1.2GB of parameters, ~1.2GB of gradients, and ~2.4GB=2*1.2GB of
-# the optimizer state as expected. The last ~1.2GB comes from Adam optimizer
-# requiring memory for intermediates, totaling to ~6GB of peak memory.
-# Technically, you can remove the need for the last 1.2GB for optimizer
-# intermediates if you set ``Adam(model.parameters(), foreach=False)`` which
-# would trade off runtime for memory. If switching off the ``foreach`` runtime
-# optimization is sufficient in memory savings for you, nice, but please
-# read on if you're curious how this tutorial can help you do better!
-# With the technique we will soon introduce, we will reduce peak memory by
-# removing the need for the ~1.2GB of **gradients memory** as well as **optimizer
-# intermediates memory**. Now, what would you expect the new peak memory to be?
-# The answer will be revealed in the `next` snapshot.
-#
-# DISCLAIMER: This technique is **not** for all
-# """""""""""""""""""""""""""""""""""""""""""""
-# Before we get too excited, we have to consider whether this technique is applicable
-# for `your` use case. This is NOT a silver bullet! The technique of fusing the 
-# optimizer step into the backward only targets reducing *gradient* memory (and as a side effect also optimizer intermediates
-# memory). Thus, the more sizable the memory taken up by the gradients, the more
-# tantamount the memory reduction. In our example above, the gradients eat up 20% 
-# of the memory pie, which is quite sizable!
-#
-# This may not be the case for you, for example, if your weights are already tiny,
-# (say, due to applying LoRa,) then the gradients do not take much space in your
-# training loop and the wins are way less exciting. In that case, you should
-# first try other techniques like activations checkpointing, distributed
-# training, quantization, or reducing the batch size. Then, when the gradients
-# are part of the bottleneck again, come back to this tutorial!
+# 메모리 사용량이 가장 높은 지점은 옵티마이저 단계입니다! 이때의 메모리는 예상대로
+# ~1.2GB 의 파라미터, ~1.2GB의 변화도, 그리고 ~2.4GB=2*1.2GB 의 옵티마이저 상태로
+# 구성됩니다. 마지막 ~1.2GB는 Adam 옵티마이저가 중간 단계에 필요로 하는 메모리로,
+# 합쳐서 총 ~6GB에 달합니다.
+# 사실, ``Adam(model.parameters(), foreach=False)`` 로 설정하면 옵티마이저 중간
+# 메모리인 마지막 1.2GB를 제거할 수 있는데, 이는 메모리 대신 실행 시간을 희생하는 
+# 방식입니다. 만약 이 ``foreach`` 최적화만으로도 충분히 필요한만큼 메모리가 절약되었다면
+# 잘 된 일이지만, 더 나은 방법에 대해 알고싶다면 이 튜토리얼을 계속 읽어보세요!
 # 
-# Still here? Cool, let's introduce our new ``register_post_accumulate_grad_hook(hook)``
-# API on Tensor.
+# 이제 곧 소개할 방법을 사용한다면, ~1.2GB의 **변화도 메모리** 와 **옵티마이저 중간 
+# 단계 메모리** 가 필요없게 되어 최대 메모리 사용량을 낮출 수 있습니다.
+# 그렇다면, 새로운 최대 메모리 사용량은 얼마가 될까요?
+# 정답은 `다음` 스냅샷에서 공개됩니다.
+#
+# 주의 사항: 이 방법은 모든 경우에 적합한 것은 **아님**
+# """""""""""""""""""""""""""""""""""""""""""""
+# 너무 흥분하기 전에, 먼저 이 방법이 `당신` 의 사용 사례에 적합한지 고려해야 합니다.
+# 이 방법은 결코 만능 해결책이 아닙니다! 옵티마이저 단계를 역전파 과정에 합치는 이 
+# 방법은 *변화도* 메모리의 감소만을 목표로 합니다 (그리고 부수적으로 옵티마이저 중간 
+# 단계 메모리도 줄입니다). 따라서 변화도가 차지하는 메모리가 클수록, 메모리 절감 
+# 효과가 더욱 커집니다. 위의 예시에서 변화도는 메모리 총량의 20%를 차지하는데, 이는 
+# 꽤나 큰 비율이죠!
+#
+# 그러나 경우에 따라 이러한 상황에 해당하지 않을 수 있습니다. 예를 들어, 이미 
+# 가중치가 매우 작다면 (LoRa 적용 등의 이유로), 변화도가 학습 루프에서 공간을 많이 
+# 차지하지 않을 것이고, 그렇다면 이 방법의 이점이 그다지 크지 않을 수 있습니다.
+# 이런 경우에는 먼저 활성화 체크포인팅, 분산 학습, 양자화, 배치 크기 축소와 같은 
+# 다른 기술을 시도해 보세요. 그런 다음, 변화도가 다시 병목의 일부가 될 때 
+# 이 튜토리얼로 돌아오세요!
+# 
+# 아직 여기에 계신가요? 좋습니다, 이제 Tensor의 새로운 ``register_post_accumulate_grad_hook(hook)``
+# API를 소개하겠습니다.
 #
 # ``Tensor.register_post_accumulate_grad_hook(hook)`` API and our technique
 # """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
