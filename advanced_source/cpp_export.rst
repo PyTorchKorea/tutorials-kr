@@ -17,7 +17,7 @@ Python은 동적성과 신속한 이터레이션이 필요한 상황에 적합�
 <https://pytorch.org/docs/master/jit.html>`_ 는 PyTorch 모델을 Python에서
 C++로 변환하는 것을 가능하게 해줍니다. TorchScript는 TorchScript 컴파일러가 이해하고, 컴파일하고,
 직렬화할 수 있는 PyTorch 모델의 한 표현방식입니다. 만약 기본적인 "즉시 실행"[역자 주: eager execution]
-API를 사용해 작성된 PyTorch 모델이 있다면, 처음으로 해야할 일은 이 모델을 TorchScript 모델로 변환하는
+API를 사용해 작성된 PyTorch 모델이 있다면, 처음으로 해야 할 일은 이 모델을 TorchScript 모델로 변환하는
 것입니다. 아래에 설명되어 있듯이, 대부분의 경우에 이 과정은 매우 간단합니다. 이미 TorchScript 모듈을 가지고 있다면,
 이 섹션을 건너뛰어도 좋습니다.
 
@@ -268,7 +268,7 @@ page <https://pytorch.org/>`_ 로부터 받으실 수 있습니다. 가장 최�
   [100%] Built target example-app
 
 이제 trace된 ``ResNet18`` 모델인 ``traced_resnet_model.pt`` 경로를 ``example-app`` 바이너리에
-입력했다면, "ok" 메시지를 확인할 수 있을 것입니다. 만약이 예제에 ``my_module_model.pt`` 를
+입력했다면, "ok" 메시지를 확인할 수 있을 것입니다. 만약 이 예제에 ``my_module_model.pt`` 를
 인자로 넘겼다면, 입력값이 호환되지 않는 모양이라는 에러메시지가 출력됩니다. ``my_module_model.pt`` 는
 4D가 아닌 1D 텐서를 받도록 되어있기 때문입니다.
 
@@ -307,7 +307,7 @@ C++ 어플리케이션의 ``main()`` 함수에 아래의 코드를 추가하겠�
 
 마지막 줄에서 출력값의 첫 다섯 값들을 프린트합니다. 이번 튜토리얼의 앞부분에서 Python 모델에 동일한
 입력값을 넘겨주었기 때문에, 이 부분에서도 출력값은 같을 것이라고 예상할 수 있습니다. 그럼 어플리케이션을
-다시 컴파일하고 같은 직렬화된 모델에 대해 실행해보겠습니다:
+다시 컴파일하고 같은 직렬화된 모델에 대해 실행해 보겠습니다:
 
 .. code-block:: sh
 
