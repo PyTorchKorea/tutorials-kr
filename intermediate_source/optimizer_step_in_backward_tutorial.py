@@ -104,11 +104,11 @@ torch.cuda.memory._record_memory_history(enabled=None)
 # 역전파를 시작하면, 활성화 값이 점차 해제되면서 변화도가 차지하는 메모리가
 # 쌓이기 시작합니다.
 # 
-# Lastly, as the optimizer kicks in, its state will be lazily initialized, so we 
-# should see the optimizer state memory gradually increase during the optimizer
-# step of the first training loop only. In future loops, the optimizer memory
-# will remain and be updated in-place. The memory for the gradients is then
-# freed accordingly at the end of every training loop when ``zero_grad`` is called.
+# 마지막으로 옵티마이저가 작동하면, 옵티마이저의 상태는 지연 초기화(lazily 
+# initialized)되므로, 첫 번째 학습 루프의 옵티마이저 단계 동안만 옵티마이저 
+# 상태 메모리가 점차 증가하는 것을 볼 수 있습니다. 이후의 루프에서는, 옵티마이저 
+# 메모리가 그대로 유지되고, 제자리에서 업데이트됩니다. 변화도가 차지하는 메모리는 
+# 매번 학습 루프가 끝날 때 ``zero_grad`` 가 호출되면 적절히 해제됩니다.
 # 
 # Where is the memory bottleneck in this training loop? Or, in other words,
 # where is the peak memory?
