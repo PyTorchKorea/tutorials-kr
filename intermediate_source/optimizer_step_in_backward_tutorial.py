@@ -1,17 +1,17 @@
 """
 
-옵티마이저 단계를 역전파 과정에 합쳐서 메모리 절약하기
+옵티마이저 단계를 backward 과정에 합쳐서 메모리 절약하기
 ======================================================================
 
 안녕하세요! 이 튜토리얼에서는 *변화도(gradient)* 가 차지하는 메모리를
 줄임으로써 학습 루프(training loop)에서의 메모리 사용량을 줄이는 한 가지
-방법을 소개합니다. 모델이 있는 상황에서 메모리 부족(Out of Memory, OOM)
-오류를 방지하고 싶거나, GPU의 성능을 최대한 활용하고 싶은 경우 이 방법이 
-도움이 될 수 있습니다. (변화도가 메모리의 일부(partition)를 차지하고 있으며,
-변화도 누적(accumulation)이 필요하지 않은 경우라면 말입니다)
-이 튜토리얼은 다음 내용을 다룹니다:
+방법을 소개합니다. 모델이 있는 상황에서 메모리 최적화를 통해 메모리 
+부족(Out of Memory, OOM) 오류를 방지하고 싶거나, GPU의 성능을 최대한 
+활용하고 싶은 경우 이 방법이 도움이 될 수 있습니다. (변화도가 메모리의 
+일부(partition)를 차지하고 있으며, 변화도 누적(accumulation)이 필요하지 
+않은 경우라면 말입니다) 이 튜토리얼은 다음 내용을 다룹니다:
 
-1. 학습 또는 미세 조정(finetuning) 루프 중 메모리를 차지하는 요소들,
+1. 학습 또는 미세 조정(finetuning) 루프에서 메모리를 차지하는 요소는 어떤 것들인지,
 2. 메모리 스냅샷(snapshot)을 캡처하고 시각화하여 병목 현상을 파악하는 방법,
 3. 새로운 ``Tensor.register_post_accumulate_grad_hook(hook)`` API, 그리고
 4. 이 모든 것을 감안한 단 10줄의 코드로 메모리를 절약하는 방법.
@@ -47,7 +47,7 @@ def train(model, optimizer):
   # 가짜 이미지 입력값 생성: tensor의 형태는 batch_size, channels, height, width
   fake_image = torch.rand(1, 3, IMAGE_SIZE, IMAGE_SIZE).cuda()
 
-  # 순전파(forward)와 역전파(backward) 호출
+  # forward와 backward 호출
   loss = model.forward(fake_image)
   loss.sum().backward()
 
@@ -61,11 +61,11 @@ def train(model, optimizer):
 # 이제 메모리 스냅샷을 확인하려고 하므로, 이를 적절히 분석할 준비를 해야 합니다.
 # 일반적으로 학습 메모리는 다음으로 구성됩니다:
 #
-#  * 모델 파라미터 (크기 P)
-#  * 역전파 단계를 위해 저장된 활성화 값(activations) (크기 A)
-#  * 변화도, 모델 파라미터와 같은 크기이므로 크기 G = P.
-#  * 옵티마이저 상태, 파라미터 크기에 비례함. 예시의 경우, 
-#    Adam의 상태는 모델 파라미터의 2배가 필요하므로 크기 O = 2P.
+#  * 모델 매개변수 (크기 P)
+#  * backward 단계를 위해 저장된 활성화 값(activations) (크기 A)
+#  * 변화도, 모델 매개변수와 같은 크기이므로 크기 G = P.
+#  * 옵티마이저 상태, 매개변수 크기에 비례함. 예시의 경우, 
+#    Adam의 상태는 모델 매개변수의 2배가 필요하므로 크기 O = 2P.
 #  * 중간 단계(Intermediate) tensor, 계산 도중 할당됩니다. 
 #    보통 크기가 작고 일시적이므로 지금은 신경 쓰지 않겠습니다.
 #
@@ -97,11 +97,11 @@ torch.cuda.memory._record_memory_history(enabled=None)
 # .. figure:: /_static/img/optim_step_in_bwd/snapshot.jpg
 #    :alt: snapshot.png loaded into CUDA Memory Visualizer
 # 
-# 모델 파라미터는 이미 학습 루프 이전에 메모리에 로드되었으므로,
+# 모델 매개변수는 이미 학습 루프 이전에 메모리에 로드되었으므로,
 # 처음부터 가중치(weights)에 할당된 메모리 덩어리가 보입니다.
-# 순전파를 시작하면, 메모리는 활성화 값을 위해 점차 할당됩니다.
-# 이 활성화 값은 역전파 단계에서 변화도를 계산하기 위해 저장하는 tensor입니다.
-# 역전파를 시작하면, 활성화 값이 점차 해제되면서 변화도가 차지하는 메모리가
+# forward를 시작하면, 메모리는 활성화 값을 위해 점차 할당됩니다.
+# 이 활성화 값은 backward 단계에서 변화도를 계산하기 위해 저장하는 tensor입니다.
+# backward를 시작하면, 활성화 값이 점차 해제되면서 변화도가 차지하는 메모리가
 # 쌓이기 시작합니다.
 # 
 # 마지막으로 옵티마이저가 작동하면, 옵티마이저의 상태는 지연(lazily) 초기화되므로,
@@ -114,7 +114,7 @@ torch.cuda.memory._record_memory_history(enabled=None)
 # 사용이 가장 높은 지점은 어디일까요?
 # 
 # 메모리 사용량이 가장 높은 지점은 옵티마이저 단계입니다! 이때의 메모리는 예상대로
-# ~1.2GB 의 파라미터, ~1.2GB의 변화도, 그리고 ~2.4GB=2*1.2GB 의 옵티마이저 상태로
+# ~1.2GB 의 매개변수, ~1.2GB의 변화도, 그리고 ~2.4GB=2*1.2GB 의 옵티마이저 상태로
 # 구성됩니다. 마지막 ~1.2GB는 Adam 옵티마이저가 중간 단계에 필요로 하는 메모리로,
 # 합쳐서 총 ~6GB에 달합니다.
 # 사실, ``Adam(model.parameters(), foreach=False)`` 로 설정하면 옵티마이저 중간
@@ -131,15 +131,15 @@ torch.cuda.memory._record_memory_history(enabled=None)
 # """""""""""""""""""""""""""""""""""""""""""""
 # 너무 흥분하기 전에, 먼저 이 방법이 `당신` 의 사용 사례에 적합한지 고려해야 합니다.
 # 이 방법은 결코 만능 해결책이 아닙니다! 
-# 옵티마이저 단계를 역전파 과정에 합치는 이 방법은 *변화도* 메모리의 감소만을 목표로 
+# 옵티마이저 단계를 backward 과정에 합치는 이 방법은 *변화도* 메모리의 감소만을 목표로 
 # 합니다 (그리고 부수적으로 옵티마이저 중간 단계 메모리도 줄입니다). 
-# 따라서 변화도가 차지하는 메모리가 클수록, 메모리 절감 효과가 더욱 커집니다. 
+# 따라서 변화도가 차지하는 메모리가 클수록, 메모리 절약 효과가 더욱 커집니다. 
 # 위의 예시에서 변화도는 메모리 총량의 20%를 차지하는데, 이는 꽤나 큰 비율이죠!
 #
 # 그러나 때에 따라 이러한 상황에 해당하지 않을 수 있습니다. 예를 들어, 이미 
 # 가중치가 매우 작다면 (LoRa 적용 등의 이유로), 변화도가 학습 루프에서 공간을 많이 
 # 차지하지 않을 것이고, 그렇다면 이 방법의 이점이 그다지 크지 않을 수 있습니다.
-# 이런 경우에는 먼저 활성화 체크포인팅, 분산 학습, 양자화, 배치 크기 축소와 같은 
+# 이런 경우에는 먼저 활성화 값 체크포인팅, 분산 학습, 양자화, 배치 크기 축소와 같은 
 # 다른 기술을 시도해 보세요. 그런 다음, 변화도가 다시 병목의 일부가 될 때 
 # 이 튜토리얼로 돌아오세요!
 # 
@@ -149,11 +149,11 @@ torch.cuda.memory._record_memory_history(enabled=None)
 # ``Tensor.register_post_accumulate_grad_hook(hook)`` API와 우리가 사용할 방법
 # """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 # 이 방법은 ``backward()`` 동안 변화도를 저장하지 않아도 된다는 점에 의존합니다. 
-# 대신, 기울기가 누적되면 즉시 해당 파라미터에 대해 옵티마이저를 적용하고, 해당 
+# 대신, 기울기가 누적되면 즉시 해당 매개변수에 대해 옵티마이저를 적용하고, 해당 
 # 변화도를 완전히 제거합니다! 이렇게 하면 옵티마이저 단계를 위해 큰 변화도 버퍼를 
 # 유지할 필요가 없어집니다.
 #
-# 그렇다면 옵티마이저를 더 즉시(eagerly) 적용하는 동작을 어떻게하면 활성화할 수 있을까요? 2.1 
+# 그렇다면 옵티마이저를 더 즉시(eagerly) 적용하는 동작을 어떻게 하면 활성화할 수 있을까요? 2.1 
 # 릴리스에서 새로 추가된 API인 :func:`torch.Tensor.register_post_accumulate_grad_hook`
 # 을 사용하면, Tensor의 ``.grad``  필드(field)가 누적된 후에 훅(hook)을 추가할 수 있습니다.
 # 우리는 이 훅에 옵티마이저 단계를 캡슐화(encapsulate)할 것입니다. 어떻게요?
@@ -168,8 +168,8 @@ torch.cuda.memory._record_memory_history(enabled=None)
 #    model = models.vit_l_16(weights='DEFAULT').cuda()
 #    optimizer = torch.optim.Adam(model.parameters())
 
-# *단일* 옵티마이저 대신, 각 파라미터마다 하나씩 ``dict`` 형태로
-# 옵티마이저를 설정하여 훅에서 참조할 수 있도록 하겠습니다.
+# *단일* 옵티마이저 대신, 각 매개변수마다 하나씩 옵티마이저를 만들고 ``딕셔너리``
+# 하나에 저장하여 훅에서 참조할 수 있도록 하겠습니다.
 optimizer_dict = {p: torch.optim.Adam([p], foreach=False) for p in model.parameters()}
 
 # 옵티마이저의 ``step()`` 및 ``zero_grad()`` 를 호출할 훅을 정의합니다.
@@ -177,17 +177,17 @@ def optimizer_hook(parameter) -> None:
   optimizer_dict[parameter].step()
   optimizer_dict[parameter].zero_grad()
 
-# 모든 파라미터에 훅을 등록합니다.
+# 모든 매개변수에 훅을 등록합니다.
 for p in model.parameters():
    p.register_post_accumulate_grad_hook(optimizer_hook)
 
-# 이전의 ``train()`` 함수 기억하시나요? 옵티마이저가 역전파에 합쳐졌으므로, 
+# 이전의 ``train()`` 함수 기억하시나요? 옵티마이저가 backward에 합쳐졌으므로, 
 # 옵티마이저의 step 및 zero_grad 호출을 제거할 수 있습니다.
 def train(model):
   # 가짜 이미지 입력값 생성: tensor의 형태는 batch_size, channels, height, width
   fake_image = torch.rand(1, 3, IMAGE_SIZE, IMAGE_SIZE).cuda()
 
-  # 순전파와 역전파 호출
+  # forward와 backward 호출
   loss = model.forward(fake_image)
   loss.sum().backward()
 
@@ -203,10 +203,10 @@ def train(model):
 # 조작하는 경우에는 더욱 그렇습니다. 
 # 그러한 상황에서 이 API를 사용하려면 더 복잡할 것이고, 더 많은 구성 요소를 
 # 전역(global) 상태로 이동시켜야 할 수도 있지만, 불가능하지는 않을 것입니다.
-# 그렇긴 하지만, PyTorch의 다음 단계는 이 API를 LRScheduler나 기존의 다른 
-# 기능들과 보다 쉽게 통합할 수 있도록 이 API를 개선하는 것입니다.
+# 그렇긴 하지만, 조만간 언젠가 PyTorch가 이 API를 LRScheduler나 기존의 다른
+# 기능들과 더 쉽게 통합할 수 있도록 이 API를 개선하길 바라 봅니다.
 # 
-# 다시 돌아와서 이 방법이 써볼 만한 가치가 있다는 설득을 이어나가 보겠습니다.
+# 다시 돌아와서, 이 방법이 써볼 만한 가치가 있다는 설득을 이어 나가 보겠습니다.
 # 우리의 친구, 메모리 스냅샷을 살펴보겠습니다.
 
 # 이전의 옵티마이저 메모리를 삭제하여 다음 메모리 스냅샷을 위한 깨끗한 상태를 
@@ -235,34 +235,34 @@ torch.cuda.memory._record_memory_history(enabled=None)
 #    :alt: snapshot.png loaded into CUDA Memory Visualizer
 #
 # 몇 가지 주요 관찰 사항:
-#  1. 더 이상 옵티마이저 단계가 없습니다! 맞아요... 역전파 과정에 합쳤었죠.
-#  2. 마찬가지로, 역전파 단계가 더 길어지고 중간 단계를 위한 임시 메모리 할당이 더 
+#  1. 더 이상 옵티마이저 단계가 없습니다! 맞아요... backward 과정에 합쳐졌죠.
+#  2. 마찬가지로, backward 과정이 더 길어지고 중간 단계를 위한 임시 메모리 할당이 더 
 #     많아졌습니다. 이는 예상된 결과인데, 옵티마이저 단계가 중간 단계를 필요로 하기 
 #     때문입니다.
 #  3. 가장 중요한 점! 최대 메모리 사용량이 낮아졌습니다! 이제 ~4GB 정도입니다 
-#     (예상했던 수치와 얼추 비슷하기를 바랍니다). 
+#     (예상하셨던 수치와 얼추 비슷하길 바랍니다). 
 # 
-# Note that there is no longer any big chunk of memory allocated for the gradients
-# compared to before, accounting for ~1.2GB of memory savings. Instead, we've freed
-# each gradient very quickly after they've been computed by moving the optimizer 
-# step as far ahead as we can. Woohoo! By the way, the other ~1.2GB of memory savings
-# comes from breaking apart the optimizer into per-parameter optimizers, so the
-# intermediates have proportionally shrunk. This detail is `less important` than
-# the gradient memory savings, as you can get optimizer intermediates savings
-# from just turning ``foreach=False`` without this technique.
+# 더 이상 변화도를 위해 할당된 큰 메모리 덩어리가 없다는 점에 주목하세요.
+# 이에 따라 이전과 비교해 보았을 때 ~1.2GB 의 메모리 절약이 이루어졌습니다. 대신, 
+# 변화도가 계산되자마자 매우 빠르게 해제되었는데, 이는 가능한 한 옵티마이저 단계를 
+# 앞당겼기 때문입니다. 야호! 참고로, 나머지 ~1.2GB 의 메모리 절약은 옵티마이저를 
+# 매개변수별 옵티마이저로 나누면서 중간 단계의 메모리 사용량이 줄어든 덕분입니다. 
+# 하지만 이것은 기울기 메모리 절약보다는 `덜 중요한` 부분인데, 왜냐하면 중간 단계의 
+# 메모리 절약은 이 기술 없이도 ``foreach=False`` 옵션을 수정해 주는 것만으로 
+# 달성할 수 있기 때문입니다.
 # 
-# You may be correctly wondering: if we saved 2.4GB of memory, why is the peak memory
-# NOT 6GB - 2.4GB = 3.6GB? Well, the peak has moved! The peak is now near the start
-# of the backward step, when we still have activations in memory, where before, the peak
-# was during the optimizer step when the activations had been freed. The ~0.4GB difference
-# accounting for ~4.0GB - ~3.6GB is thus due to the activations memory. One can then
-# imagine that this technique can be coupled with activations checkpointing for more
-# memory wins.
+# 이런 의문이 생길 수 있습니다: 2.4GB의 메모리가 절약되었다면, 왜 최대 메모리 사용량이 
+# 6GB - 2.4GB = 3.6GB가 아닌가요? 아, 그건 최대 메모리 사용량의 시점이 바뀌었기 때문입니다!
+# 최대 메모리 사용량은 이제 backward 과정의 시작 부분으로 이동했습니다. 이제는 이 시점에 
+# 메모리에 활성화 값이 남아있으며, 이전에는 옵티마이저 단계에서 활성화 값이 해제된 후 최대 
+# 메모리 사용량이 발생했습니다. ~4.0GB와 ~3.6GB 간의 ~0.4GB의 차이는 바로 이 활성화 값의 
+# 메모리 때문입니다. 따라서 이 기술을 활성화 값 체크포인팅과 함께 사용하면 더 큰 메모리 
+# 절약을 이룰 수 있을 것입니다.
 #
-# Conclusion
+# 결론
 # """"""""""
-# In this tutorial, we learned about the memory saving technique of
-# fusing the optimizer into the backward step through the new
-# ``Tensor.register_post_accumulate_grad_hook()`` API and *when* to apply this
-# technique (when gradients memory is significant). Along the way, we also learned
-# about memory snapshots, which are generally useful in memory optimization.
+# 이번 튜토리얼에서는 새로운 ``Tensor.register_post_accumulate_grad_hook()`` 
+# API를 사용하여 옵티마이저를 backward 단계에 합치는 메모리 절약 기술과 이를 *언제* 
+# 적용해야 하는지(변화도 메모리 양이 상당한 경우)에 대해 배웠습니다. 또한 메모리 
+# 최적화에 일반적으로 유용한 메모리 스냅샷에 대해서도 학습했습니다.
+# 
