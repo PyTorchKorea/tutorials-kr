@@ -11,7 +11,7 @@
 변화도 누적(accumulation)이 필요하지 않은 경우라면 말입니다)
 이 튜토리얼은 다음 내용을 다룹니다:
 
-1. 학습 또는 미세조정(finetuning) 루프 중 메모리를 차지하는 요소들,
+1. 학습 또는 미세 조정(finetuning) 루프 중 메모리를 차지하는 요소들,
 2. 메모리 스냅샷(snapshot)을 캡처하고 시각화하여 병목 현상을 파악하는 방법,
 3. 새로운 ``Tensor.register_post_accumulate_grad_hook(hook)`` API, 그리고
 4. 이 모든 것을 감안한 단 10줄의 코드로 메모리를 절약하는 방법.
@@ -196,51 +196,51 @@ def train(model):
   # optimizer.zero_grad()
 
 ########################################################################
-# That took about 10 lines of changes in our sample model, which is neat.
-# However, for real models, it could be a fairly intrusive change to switch
-# out the optimizer for an optimizer dictionary, especially for those who use
-# ``LRScheduler``s or manipulate optimizer configuration throughout the
-# training epochs. Working out this API with those changes will be more
-# involved and will likely require moving more configuration into global
-# state but should not be impossible. That said, a next step for PyTorch
-# is to make this API easier to adopt with LRSchedulers and other features
-# you are already used to.
+# 샘플 모델에서는 약 10줄의 코드 변경으로 끝났습니다. 깔끔하네요.
+# 하지만 실제 모델에서는 옵티마이저를 옵티마이저 딕셔너리로 교체하는 것이 
+# 꽤나 거슬리는 변경이 될 수 있습니다. 
+# 특히 ``LRScheduler`` 를 사용하거나 학습 에폭 동안 옵티마이저 구성을 
+# 조작하는 경우에는 더욱 그렇습니다. 
+# 그러한 상황에서 이 API를 사용하려면 더 복잡할 것이고, 더 많은 구성 요소를 
+# 전역(global) 상태로 이동시켜야 할 수도 있지만, 불가능하지는 않을 것입니다.
+# 그렇긴 하지만, PyTorch의 다음 단계는 이 API를 LRScheduler나 기존의 다른 
+# 기능들과 보다 쉽게 통합할 수 있도록 이 API를 개선하는 것입니다.
 # 
-# But let me get back to convincing you that this technique is worth it.
-# We will consult our friend, the memory snapshot.
+# 다시 돌아와서 이 방법이 써볼 만한 가치가 있다는 설득을 이어나가 보겠습니다.
+# 우리의 친구, 메모리 스냅샷을 살펴보겠습니다.
 
-# delete optimizer memory from before to get a clean slate for the next
-# memory snapshot
+# 이전의 옵티마이저 메모리를 삭제하여 다음 메모리 스냅샷을 위한 깨끗한 상태를 
+# 만듭니다.
 del optimizer
 
-# tell CUDA to start recording memory allocations
+# CUDA에 메모리 할당 기록을 시작하도록 지시
 torch.cuda.memory._record_memory_history(enabled='all')
 
-# train 3 steps. note that we no longer pass the optimizer into train()
+# 학습 3회 실시. 이제 더 이상 train() 함수에 옵티마이저를 전달하지 않는다는 점에 유의하세요. 
 for _ in range(3):
   train(model)
 
-# save a snapshot of the memory allocations
+# 메모리 할당 스냅샷을 저장
 s = torch.cuda.memory._snapshot()
 with open(f"snapshot-opt-in-bwd.pickle", "wb") as f:
     dump(s, f)
 
-# tell CUDA to stop recording memory allocations now
+# CUDA에 메모리 할당 기록을 중지하도록 지시
 torch.cuda.memory._record_memory_history(enabled=None)
 
 ###############################################################################
-# Yes, take some time to drag your snapshot into the CUDA Memory Visualizer.
+# 좋아요, CUDA Memory Visualizer에 스냅샷을 드래그 앤 드롭해 봅시다.
 # 
 # .. figure:: /_static/img/optim_step_in_bwd/snapshot_opt_in_bwd.jpg
 #    :alt: snapshot.png loaded into CUDA Memory Visualizer
 #
-# Several major observations:
-#  1. There is no more optimizer step! Right...we fused that into the backward.
-#  2. Likewise, the backward drags longer and there are more random allocations
-#     for intermediates. This is expected, as the optimizer step requires 
-#     intermediates.
-#  3. Most importantly! The peak memory is lower! It is now ~4GB (which I
-#     hope maps closely to your earlier expectation). 
+# 몇 가지 주요 관찰 사항:
+#  1. 더 이상 옵티마이저 단계가 없습니다! 맞아요... 역전파 과정에 합쳤었죠.
+#  2. 마찬가지로, 역전파 단계가 더 길어지고 중간 단계를 위한 임시 메모리 할당이 더 
+#     많아졌습니다. 이는 예상된 결과인데, 옵티마이저 단계가 중간 단계를 필요로 하기 
+#     때문입니다.
+#  3. 가장 중요한 점! 최대 메모리 사용량이 낮아졌습니다! 이제 ~4GB 정도입니다 
+#     (예상했던 수치와 얼추 비슷하기를 바랍니다). 
 # 
 # Note that there is no longer any big chunk of memory allocated for the gradients
 # compared to before, accounting for ~1.2GB of memory savings. Instead, we've freed
