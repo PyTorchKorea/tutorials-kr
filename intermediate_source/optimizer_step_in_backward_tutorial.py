@@ -11,7 +11,7 @@
 변화도 누적(accumulation)이 필요하지 않은 경우라면 말입니다)
 이 튜토리얼은 다음 내용을 다룹니다:
 
-1. 학습 또는 미세조정(finetuning) 루프 중 메모리를 차지하는 요소들,
+1. 학습 또는 미세조정(finetuning) 단계 중 메모리를 차지하는 요소들,
 2. 메모리 스냅샷(snapshot)을 캡처하고 시각화하여 병목 현상을 파악하는 방법,
 3. 새로운 ``Tensor.register_post_accumulate_grad_hook(hook)`` API, 그리고
 4. 이 모든 것을 감안한 단 10줄의 코드로 메모리를 절약하는 법.
@@ -97,35 +97,35 @@ torch.cuda.memory._record_memory_history(enabled=None)
 # .. figure:: /_static/img/optim_step_in_bwd/snapshot.jpg
 #    :alt: snapshot.png loaded into CUDA Memory Visualizer
 # 
-# 모델 파라미터는 이미 학습 루프 이전에 메모리에 로드되었으므로,
-# 처음부터 가중치(weights)에 할당된 메모리 덩어리가 보입니다.
-# 순전파를 시작하면, 메모리는 활성화 값을 위해 점차 할당됩니다.
-# 이 활성화 값은 역전파 단계에서 변화도를 계산하기 위해 저장하는 tensor입니다.
-# 역전파를 시작하면, 활성화 값이 점차 해제되면서 변화도가 차지하는 메모리가
-# 쌓이기 시작합니다.
-#
-# 마지막으로 옵티마이저가 작동하면, 옵티마이저의 상태는 지연 초기화(lazily 
-# initialized)되므로, 첫 번째 학습 루프의 옵티마이저 단계 동안만 옵티마이저 
-# 상태 메모리가 점차 증가하는 것을 볼 수 있습니다. 이후의 루프에서는, 옵티마이저 
-# 메모리가 그대로 유지되고, 제자리에서 업데이트됩니다. 변화도가 차지하는 메모리는 
-# 매번 학습 루프가 끝날 때 ``zero_grad`` 가 호출되면 적절히 해제됩니다.
+# The model parameters have already been loaded in memory before the training
+# step, so we see a chunk of memory devoted to the weights right off the bat.
+# As we start our forward pass, memory is allocated gradually for the activations,
+# or the tensors we are saving to be able to compute gradients in the backward pass.
+# Once we start the backward pass, the activations are gradually freed while memory
+# of the gradients starts building up.
+# 
+# Lastly, as the optimizer kicks in, its state will be lazily initialized, so we 
+# should see the optimizer state memory gradually increase during the optimizer
+# step of the first training loop only. In future loops, the optimizer memory
+# will remain and be updated in-place. The memory for the gradients is then
+# freed accordingly at the end of every training loop when ``zero_grad`` is called.
 # 
 # 이 학습 루프에서 메모리 병목 현상이 발생하는 지점은 어디일까요? 즉, 메모리 
 # 사용이 가장 높은 지점은 어디일까요?
 # 
-# 메모리 사용량이 가장 높은 지점은 옵티마이저 단계입니다! 이때의 메모리는 예상대로
-# ~1.2GB 의 파라미터, ~1.2GB의 변화도, 그리고 ~2.4GB=2*1.2GB 의 옵티마이저 상태로
-# 구성됩니다. 마지막 ~1.2GB는 Adam 옵티마이저가 중간 단계에 필요로 하는 메모리로,
-# 합쳐서 총 ~6GB에 달합니다.
-# 사실, ``Adam(model.parameters(), foreach=False)`` 로 설정하면 옵티마이저 중간
-# 메모리인 마지막 1.2GB를 제거할 수 있는데, 이는 메모리 대신 실행 시간을 희생하는 
-# 방식입니다. 만약 이 ``foreach`` 최적화만으로도 충분히 필요한만큼 메모리가 절약되었다면
-# 잘된 일이지만, 더 나은 방법에 대해 알고 싶다면 이 튜토리얼을 계속 읽어보세요!
-# 
-# 이제 곧 소개할 방법을 사용한다면, ~1.2GB의 **변화도 메모리** 와 **옵티마이저 중간 
-# 단계 메모리** 가 필요 없게 되어 최대 메모리 사용량을 낮출 수 있습니다.
-# 그렇다면, 새로운 최대 메모리 사용량은 얼마가 될까요?
-# 정답은 `다음` 스냅샷에서 공개됩니다.
+# The peak memory usage is during the optimizer step! Note the memory then
+# consists of ~1.2GB of parameters, ~1.2GB of gradients, and ~2.4GB=2*1.2GB of
+# the optimizer state as expected. The last ~1.2GB comes from Adam optimizer
+# requiring memory for intermediates, totaling to ~6GB of peak memory.
+# Technically, you can remove the need for the last 1.2GB for optimizer
+# intermediates if you set ``Adam(model.parameters(), foreach=False)`` which
+# would trade off runtime for memory. If switching off the ``foreach`` runtime
+# optimization is sufficient in memory savings for you, nice, but please
+# read on if you're curious how this tutorial can help you do better!
+# With the technique we will soon introduce, we will reduce peak memory by
+# removing the need for the ~1.2GB of **gradients memory** as well as **optimizer
+# intermediates memory**. Now, what would you expect the new peak memory to be?
+# The answer will be revealed in the `next` snapshot.
 #
 # 주의 사항: 이 방법은 모든 경우에 적합한 것은 **아님**
 # """""""""""""""""""""""""""""""""""""""""""""
