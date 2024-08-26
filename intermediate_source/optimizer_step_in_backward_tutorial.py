@@ -97,12 +97,12 @@ torch.cuda.memory._record_memory_history(enabled=None)
 # .. figure:: /_static/img/optim_step_in_bwd/snapshot.jpg
 #    :alt: snapshot.png loaded into CUDA Memory Visualizer
 # 
-# The model parameters have already been loaded in memory before the training
-# step, so we see a chunk of memory devoted to the weights right off the bat.
-# As we start our forward pass, memory is allocated gradually for the activations,
-# or the tensors we are saving to be able to compute gradients in the backward pass.
-# Once we start the backward pass, the activations are gradually freed while memory
-# of the gradients starts building up.
+# 모델 파라미터는 이미 학습 루프 이전에 메모리에 로드되었으므로,
+# 처음부터 가중치(weights)에 할당된 메모리 덩어리가 보입니다.
+# 순전파를 시작하면, 메모리는 활성화 값을 위해 점차 할당됩니다.
+# 이 활성화 값은 역전파 단계에서 변화도를 계산하기 위해 저장하는 tensor입니다.
+# 역전파를 시작하면, 활성화 값이 점차 해제되면서 변화도가 차지하는 메모리가
+# 쌓이기 시작합니다.
 # 
 # Lastly, as the optimizer kicks in, its state will be lazily initialized, so we 
 # should see the optimizer state memory gradually increase during the optimizer
