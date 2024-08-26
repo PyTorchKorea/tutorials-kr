@@ -127,24 +127,24 @@ torch.cuda.memory._record_memory_history(enabled=None)
 # 그렇다면, 새로운 최대 메모리 사용량은 얼마가 될까요?
 # 정답은 `다음` 스냅샷에서 공개됩니다.
 #
-# DISCLAIMER: This technique is **not** for all
+# 주의 사항: 이 방법은 모든 경우에 적합한 것은 **아님**
 # """""""""""""""""""""""""""""""""""""""""""""
-# Before we get too excited, we have to consider whether this technique is applicable
-# for `your` use case. This is NOT a silver bullet! The technique of fusing the 
-# optimizer step into the backward only targets reducing *gradient* memory (and as a side effect also optimizer intermediates
-# memory). Thus, the more sizable the memory taken up by the gradients, the more
-# tantamount the memory reduction. In our example above, the gradients eat up 20% 
-# of the memory pie, which is quite sizable!
+# 너무 흥분하기 전에, 먼저 이 방법이 `당신` 의 사용 사례에 적합한지 고려해야 합니다.
+# 이 방법은 결코 만능 해결책이 아닙니다! 
+# 옵티마이저 단계를 역전파 과정에 합치는 이 방법은 *변화도* 메모리의 감소만을 목표로 
+# 합니다 (그리고 부수적으로 옵티마이저 중간 단계 메모리도 줄입니다). 
+# 따라서 변화도가 차지하는 메모리가 클수록, 메모리 절감 효과가 더욱 커집니다. 
+# 위의 예시에서 변화도는 메모리 총량의 20%를 차지하는데, 이는 꽤나 큰 비율이죠!
 #
-# This may not be the case for you, for example, if your weights are already tiny,
-# (say, due to applying LoRa,) then the gradients do not take much space in your
-# training loop and the wins are way less exciting. In that case, you should
-# first try other techniques like activations checkpointing, distributed
-# training, quantization, or reducing the batch size. Then, when the gradients
-# are part of the bottleneck again, come back to this tutorial!
+# 그러나 때에 따라 이러한 상황에 해당하지 않을 수 있습니다. 예를 들어, 이미 
+# 가중치가 매우 작다면 (LoRa 적용 등의 이유로), 변화도가 학습 루프에서 공간을 많이 
+# 차지하지 않을 것이고, 그렇다면 이 방법의 이점이 그다지 크지 않을 수 있습니다.
+# 이런 경우에는 먼저 활성화 체크포인팅, 분산 학습, 양자화, 배치 크기 축소와 같은 
+# 다른 기술을 시도해 보세요. 그런 다음, 변화도가 다시 병목의 일부가 될 때 
+# 이 튜토리얼로 돌아오세요!
 # 
-# Still here? Cool, let's introduce our new ``register_post_accumulate_grad_hook(hook)``
-# API on Tensor.
+# 아직 여기에 계신가요? 좋습니다, 이제 Tensor의 새로운 ``register_post_accumulate_grad_hook(hook)``
+# API를 소개하겠습니다.
 #
 # ``Tensor.register_post_accumulate_grad_hook(hook)`` API and our technique
 # """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
