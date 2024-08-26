@@ -110,22 +110,22 @@ torch.cuda.memory._record_memory_history(enabled=None)
 # 메모리가 그대로 유지되고, 제자리에서 업데이트됩니다. 변화도가 차지하는 메모리는 
 # 매번 학습 루프가 끝날 때 ``zero_grad`` 가 호출되면 적절히 해제됩니다.
 # 
-# Where is the memory bottleneck in this training loop? Or, in other words,
-# where is the peak memory?
+# 이 학습 루프에서 메모리 병목 현상이 발생하는 지점은 어디일까요? 즉, 메모리 
+# 사용이 가장 높은 지점은 어디일까요?
 # 
-# The peak memory usage is during the optimizer step! Note the memory then
-# consists of ~1.2GB of parameters, ~1.2GB of gradients, and ~2.4GB=2*1.2GB of
-# the optimizer state as expected. The last ~1.2GB comes from Adam optimizer
-# requiring memory for intermediates, totaling to ~6GB of peak memory.
-# Technically, you can remove the need for the last 1.2GB for optimizer
-# intermediates if you set ``Adam(model.parameters(), foreach=False)`` which
-# would trade off runtime for memory. If switching off the ``foreach`` runtime
-# optimization is sufficient in memory savings for you, nice, but please
-# read on if you're curious how this tutorial can help you do better!
-# With the technique we will soon introduce, we will reduce peak memory by
-# removing the need for the ~1.2GB of **gradients memory** as well as **optimizer
-# intermediates memory**. Now, what would you expect the new peak memory to be?
-# The answer will be revealed in the `next` snapshot.
+# 메모리 사용량이 가장 높은 지점은 옵티마이저 단계입니다! 이때의 메모리는 예상대로
+# ~1.2GB 의 파라미터, ~1.2GB의 변화도, 그리고 ~2.4GB=2*1.2GB 의 옵티마이저 상태로
+# 구성됩니다. 마지막 ~1.2GB는 Adam 옵티마이저가 중간 단계에 필요로 하는 메모리로,
+# 합쳐서 총 ~6GB에 달합니다.
+# 사실, ``Adam(model.parameters(), foreach=False)`` 로 설정하면 옵티마이저 중간
+# 메모리인 마지막 1.2GB를 제거할 수 있는데, 이는 메모리 대신 실행 시간을 희생하는 
+# 방식입니다. 만약 이 ``foreach`` 최적화만으로도 충분히 필요한만큼 메모리가 절약되었다면
+# 잘된 일이지만, 더 나은 방법에 대해 알고 싶다면 이 튜토리얼을 계속 읽어보세요!
+# 
+# 이제 곧 소개할 방법을 사용한다면, ~1.2GB의 **변화도 메모리** 와 **옵티마이저 중간 
+# 단계 메모리** 가 필요 없게 되어 최대 메모리 사용량을 낮출 수 있습니다.
+# 그렇다면, 새로운 최대 메모리 사용량은 얼마가 될까요?
+# 정답은 `다음` 스냅샷에서 공개됩니다.
 #
 # DISCLAIMER: This technique is **not** for all
 # """""""""""""""""""""""""""""""""""""""""""""
