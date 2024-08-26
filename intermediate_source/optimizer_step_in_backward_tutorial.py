@@ -14,7 +14,7 @@
 1. 학습 또는 미세조정(finetuning) 루프 중 메모리를 차지하는 요소들,
 2. 메모리 스냅샷(snapshot)을 캡처하고 시각화하여 병목 현상을 파악하는 방법,
 3. 새로운 ``Tensor.register_post_accumulate_grad_hook(hook)`` API, 그리고
-4. 이 모든 것을 감안한 단 10줄의 코드로 메모리를 절약하는 법.
+4. 이 모든 것을 감안한 단 10줄의 코드로 메모리를 절약하는 방법.
 
 이 튜토리얼을 실행하기 위해 필요한 것:
 
@@ -62,7 +62,7 @@ def train(model, optimizer):
 # 일반적으로 학습 메모리는 다음으로 구성됩니다:
 #
 #  * 모델 파라미터 (크기 P)
-#  * 역전파 단계를 위해 저장된 활성화 값들(activations) (크기 A)
+#  * 역전파 단계를 위해 저장된 활성화 값(activations) (크기 A)
 #  * 변화도, 모델 파라미터와 같은 크기이므로 크기 G = P.
 #  * 옵티마이저 상태, 파라미터 크기에 비례함. 예시의 경우, 
 #    Adam의 상태는 모델 파라미터의 2배가 필요하므로 크기 O = 2P.
@@ -104,11 +104,11 @@ torch.cuda.memory._record_memory_history(enabled=None)
 # 역전파를 시작하면, 활성화 값이 점차 해제되면서 변화도가 차지하는 메모리가
 # 쌓이기 시작합니다.
 # 
-# 마지막으로 옵티마이저가 작동하면, 옵티마이저의 상태는 지연 초기화(lazily 
-# initialized)되므로, 첫 번째 학습 루프의 옵티마이저 단계 동안만 옵티마이저 
-# 상태 메모리가 점차 증가하는 것을 볼 수 있습니다. 이후의 루프에서는, 옵티마이저 
-# 메모리가 그대로 유지되고, 제자리에서 업데이트됩니다. 변화도가 차지하는 메모리는 
-# 매번 학습 루프가 끝날 때 ``zero_grad`` 가 호출되면 적절히 해제됩니다.
+# 마지막으로 옵티마이저가 작동하면, 옵티마이저의 상태는 지연(lazily) 초기화되므로,
+# 첫 번째 학습 루프의 옵티마이저 단계 동안만 옵티마이저 상태 메모리가 점차 
+# 증가하는 것을 볼 수 있습니다. 이후의 루프에서는, 옵티마이저 메모리가 그대로 
+# 유지되고, 제자리에서 업데이트됩니다. 변화도가 차지하는 메모리는 매번 학습 루프가
+# 끝날 때 ``zero_grad`` 가 호출되면 적절히 해제됩니다.
 # 
 # 이 학습 루프에서 메모리 병목 현상이 발생하는 지점은 어디일까요? 즉, 메모리 
 # 사용이 가장 높은 지점은 어디일까요?
@@ -119,8 +119,8 @@ torch.cuda.memory._record_memory_history(enabled=None)
 # 합쳐서 총 ~6GB에 달합니다.
 # 사실, ``Adam(model.parameters(), foreach=False)`` 로 설정하면 옵티마이저 중간
 # 메모리인 마지막 1.2GB를 제거할 수 있는데, 이는 메모리 대신 실행 시간을 희생하는 
-# 방식입니다. 만약 이 ``foreach`` 최적화만으로도 충분히 필요한만큼 메모리가 절약되었다면
-# 잘된 일이지만, 
+# 방식입니다. 만약 이 ``foreach`` 최적화만으로도 충분히 필요한만큼 메모리가 
+# 절약되었다면 잘된 일이지만, 
 # 더 나은 방법에 대해 알고 싶다면 이 튜토리얼을 계속 읽어보세요!
 # 이제 곧 소개할 방법을 사용한다면, ~1.2GB의 **변화도 메모리** 와 **옵티마이저 중간 
 # 단계 메모리** 가 필요 없게 되어 최대 메모리 사용량을 낮출 수 있습니다.
@@ -146,52 +146,52 @@ torch.cuda.memory._record_memory_history(enabled=None)
 # 아직 여기에 계신가요? 좋습니다, 이제 Tensor의 새로운 ``register_post_accumulate_grad_hook(hook)``
 # API를 소개하겠습니다.
 #
-# ``Tensor.register_post_accumulate_grad_hook(hook)`` API and our technique
+# ``Tensor.register_post_accumulate_grad_hook(hook)`` API와 우리가 사용할 방법
 # """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-# Our technique relies on not having to save the gradients during ``backward()``. Instead,
-# once a gradient has been accumulated, we will immediately apply the optimizer to
-# the corresponding parameter and drop that gradient entirely! This removes the need
-# for holding onto a big buffer of gradients until the optimizer step.
+# 이 방법은 ``backward()`` 동안 변화도를 저장하지 않아도 된다는 점에 의존합니다. 
+# 대신, 기울기가 누적되면 즉시 해당 파라미터에 대해 옵티마이저를 적용하고, 해당 
+# 변화도를 완전히 제거합니다! 이렇게 하면 옵티마이저 단계를 위해 큰 변화도 버퍼를 
+# 유지할 필요가 없어집니다.
 #
-# So how can we unlock the behavior of applying the optimizer more eagerly? In our 2.1
-# release, we've added a new API :func:`torch.Tensor.register_post_accumulate_grad_hook`
-# that would allow us to add a hook onto a Tensor once its ``.grad`` field has been
-# accumulated. We will encapsulate the optimizer step into this hook. How?
+# 그렇다면 옵티마이저를 더 즉시(eagerly) 적용하는 동작을 어떻게하면 활성화할 수 있을까요? 2.1 
+# 릴리스에서 새로 추가된 API인 :func:`torch.Tensor.register_post_accumulate_grad_hook`
+# 을 사용하면, Tensor의 ``.grad``  필드(field)가 누적된 후에 훅(hook)을 추가할 수 있습니다.
+# 우리는 이 훅에 옵티마이저 단계를 캡슐화(encapsulate)할 것입니다. 어떻게요?
 # 
-# How everything fits together in 10 lines
+# 이 모든 것을 단 10줄의 코드로
 # """"""""""""""""""""""""""""""""""""""""
-# Remember our model and optimizer setup from the beginning? I'll leave them commented
-# out below so we don't spend resources rerunning the code.
+# 초반에 사용했던 모델과 옵티마이저 설정을 기억하시나요? 코드 재실행에 리소스를 
+# 낭비하지 않도록 아래에 주석으로 남겨두겠습니다.
 #
 # .. code-block:: python
 #
 #    model = models.vit_l_16(weights='DEFAULT').cuda()
 #    optimizer = torch.optim.Adam(model.parameters())
 
-# Instead of having just *one* optimizer, we will have a ``dict`` of optimizers
-# for every parameter so we could reference them in our hook.
+# *단일* 옵티마이저 대신, 각 파라미터마다 하나씩 ``dict`` 형태로
+# 옵티마이저를 설정하여 훅에서 참조할 수 있도록 하겠습니다.
 optimizer_dict = {p: torch.optim.Adam([p], foreach=False) for p in model.parameters()}
 
-# Define our hook, which will call the optimizer ``step()`` and ``zero_grad()``
+# 옵티마이저의 ``step()`` 및 ``zero_grad()`` 를 호출할 훅을 정의합니다.
 def optimizer_hook(parameter) -> None:
   optimizer_dict[parameter].step()
   optimizer_dict[parameter].zero_grad()
 
-# Register the hook onto every parameter
+# 모든 파라미터에 훅을 등록합니다.
 for p in model.parameters():
    p.register_post_accumulate_grad_hook(optimizer_hook)
 
-# Now remember our previous ``train()`` function? Since the optimizer has been
-# fused into the backward, we can remove the optimizer step and zero_grad calls.
+# 이전의 ``train()`` 함수 기억하시나요? 옵티마이저가 역전파에 합쳐졌으므로, 
+# 옵티마이저의 step 및 zero_grad 호출을 제거할 수 있습니다.
 def train(model):
-  # create our fake image input: tensor shape is batch_size, channels, height, width
+  # 가짜 이미지 입력값 생성: tensor의 형태는 batch_size, channels, height, width
   fake_image = torch.rand(1, 3, IMAGE_SIZE, IMAGE_SIZE).cuda()
 
-  # call our forward and backward
+  # 순전파와 역전파 호출
   loss = model.forward(fake_image)
   loss.sum().backward()
 
-  # optimizer update --> no longer needed!
+  # 옵티마이저 업데이트 --> 이제 필요 없습니다!
   # optimizer.step()
   # optimizer.zero_grad()
 
