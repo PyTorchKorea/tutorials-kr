@@ -1,7 +1,7 @@
 Intel® Extension for PyTorch* 백엔드
 =====================================
 
-`torch.compile`을 통해 더 원할한 작동을 위해, Intel® Extension for PyTorch는 ``ipex``라는 백엔드를 구현했습니다. 이 백엔드는 Intel 플랫폼에서 하드웨어 자원 사용 효율성을 개선하여 성능을 향상시키는 것을 목표로 합니다. `ipex` 백엔드는 모델 컴파일을 위한 Intel® Extension for PyTorch에 설계된 추가 커스터마이징을 통해 구현되었습니다.
+`torch.compile`을 통해 더 원활한 작동을 위해, Intel® Extension for PyTorch는 ``ipex``라는 백엔드를 구현했습니다. 이 백엔드는 Intel 플랫폼에서 하드웨어 자원 사용 효율성을 개선하여 성능을 향상시키는 것을 목표로 합니다. `ipex` 백엔드는 모델 컴파일을 위한 Intel® Extension for PyTorch에 설계된 추가 커스터마이징을 통해 구현되었습니다.
 
 사용 예시
 ~~~~~~~~~~~~~
@@ -43,7 +43,7 @@ FP32 학습
    #################### 코드 변경 부분 ####################
    import intel_extension_for_pytorch as ipex
 
-   # 선택적으로 다음 API를 호출하여 프런트엔드 최적화를 적용합니다.
+   # 선택적으로 다음 API를 호출하여 프론트엔드 최적화를 적용합니다.
    model, optimizer = ipex.optimize(model, optimizer=optimizer)
 
    compile_model = torch.compile(model, backend="ipex")
@@ -127,7 +127,7 @@ FP32 추론
    #################### code changes ####################
    import intel_extension_for_pytorch as ipex
    
-   # 선택적으로 다음 API를 호출하여 프런트엔드 최적화를 적용합니다.
+   # 선택적으로 다음 API를 호출하여 프론트엔드 최적화를 적용합니다.
    model = ipex.optimize(model, weights_prepack=False)
 
    compile_model = torch.compile(model, backend="ipex")
