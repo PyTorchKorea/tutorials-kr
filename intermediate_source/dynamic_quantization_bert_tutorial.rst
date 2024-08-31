@@ -16,19 +16,19 @@
 -----------------------
 
 이 튜토리얼에서는 `HuggingFace Transformers
-<https://github.com/huggingface/transformers>`_ 예제들을 따라하면서 BERT
-모델을 동적으로 양자화할 것입니다. BERT 처럼 유명하면서도 최고 성능을
+<https://github.com/huggingface/transformers>`_ 예제들을 따라 하면서 BERT
+모델을 동적으로 양자화할 것입니다. BERT처럼 유명하면서도 최고 성능을
 내는 모델을 어떻게 동적으로 양자화된 모델로 변환하는지 한 단계씩 설명하겠습니다.
 
--  BERT 또는 Transformer 의 양방향 임베딩 표현(representation) 이라 불리는 방법은
+-  BERT 또는 Transformer의 양방향 임베딩 표현(representation)이라 불리는 방법은
    질의응답, 문장 분류 등의 여러 자연어 처리 분야(문제)에서 최고 성능을 달성한
    새로운 언어 표현 사전학습 방법입니다. 원 논문은 `여기 <https://arxiv.org/pdf/1810.04805.pdf>`_
    에서 읽을 수 있습니다.
 
 -  PyTorch에서 지원하는 동적 양자화 기능은 부동소수점 모델의 가중치를 정적인
    int8 또는 float16 타입의 양자화된 모델로 변환하고, 활성 함수 부분은
-   동적으로 양자화합니다. 가중치가 int8 타입으로 양자화 됐을 때, 활성 함수 부분은
-   배치마다 int8 타입으로 동적으로 양자화 됩니다. PyTorch에는 지정된 모듈을
+   동적으로 양자화합니다. 가중치가 int8 타입으로 양자화됐을 때, 활성 함수 부분은
+   배치마다 int8 타입으로 동적으로 양자화됩니다. PyTorch에는 지정된 모듈을
    동적이면서 가중치만 갖도록 양자화된 형태로 변환하고, 양자화된 모델을 만들어내는
    `torch.quantization.quantize_dynamic API <https://pytorch.org/docs/stable/quantization.html#torch.quantization.quantize_dynamic>`_ 가 있습니다.
 
