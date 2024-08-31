@@ -1,40 +1,37 @@
-Introduction to Holistic Trace Analysis
+전체론적 추적 분석 소개
 =======================================
 
-**Author:** `Anupam Bhatnagar <https://github.com/anupambhatnagar>`_
+**저자:** `Anupam Bhatnagar <https://github.com/anupambhatnagar>`_
 
-In this tutorial, we demonstrate how to use Holistic Trace Analysis (HTA) to
-analyze traces from a distributed training job. To get started follow the steps
-below.
+이 튜토리얼에서는 분산 학습 작업의 추적을 분석하기 위해 전체론적 추적 분석(Holistic Trace Analysis, HTA)을 사용하는 방법을 보여줍니다. 시작하려면 아래 단계를 따르세요.
 
-Installing HTA
+HTA 설치하기
 ~~~~~~~~~~~~~~
 
-We recommend using a Conda environment to install HTA. To install Anaconda, see
-`the official Anaconda documentation <https://docs.anaconda.com/anaconda/install/index.html>`_.
+HTA를 설치하기 위해 Conda 환경을 사용하는 것을 권장합니다. Anaconda를 설치하려면 `공식 Anaconda 문서 <https://docs.anaconda.com/anaconda/install/index.html>`_를 참조하세요.
 
-1. Install HTA using pip:
+1. pip를 사용하여 HTA 설치:
 
    .. code-block:: python
 
       pip install HolisticTraceAnalysis
 
-2. (Optional and recommended) Set up a Conda environment:
+2. (선택사항이지만 권장) Conda 환경 설정:
 
    .. code-block:: python
 
-      # create the environment env_name
+      # env_name 환경 생성
       conda create -n env_name
 
-      # activate the environment
+      # 환경 활성화
       conda activate env_name
 
-      # When you are done, deactivate the environment by running ``conda deactivate``
+      # 작업이 끝나면 ``conda deactivate``를 실행하여 환경을 비활성화하세요
 
-Getting Started
+시작하기
 ~~~~~~~~~~~~~~~
 
-Launch a Jupyter notebook and set the ``trace_dir`` variable to the location of the traces.
+Jupyter 노트북을 실행하고 `trace_dir` 변수를 추적 파일이 있는 위치로 설정하세요.
 
 .. code-block:: python
 
@@ -43,21 +40,16 @@ Launch a Jupyter notebook and set the ``trace_dir`` variable to the location of 
    analyzer = TraceAnalysis(trace_dir=trace_dir)
 
 
-Temporal Breakdown
+시간적 분석
 ------------------
 
-To effectively utilize the GPUs, it is crucial to understand how they are spending
-time for a specific job. Are they primarily engaged in computation, communication,
-memory events, or are they idle? The temporal breakdown feature provides a detailed
-analysis of the time spent in these three categories.
+GPU를 효과적으로 활용하기 위해서는 특정 작업에 대해 GPU가 시간을 어떻게 사용하고 있는지 이해하는 것이 중요합니다. GPU가 주로 계산, 통신, 메모리 이벤트에 사용되고 있는지, 아니면 유휴 상태인지? 시간적 분석 기능은 이 세 가지 범주에서 사용된 시간에 대한 상세한 분석을 제공합니다.
 
-* Idle time - GPU is idle.
-* Compute time - GPU is being used for matrix multiplications or vector operations.
-* Non-compute time - GPU is being used for communication or memory events.
+* 유휴 시간 - GPU가 유휴 상태입니다.
+* 계산 시간 - GPU가 행렬 곱셈이나 벡터 연산에 사용되고 있습니다.
+* 비계산 시간 - GPU가 통신이나 메모리 이벤트에 사용되고 있습니다.
 
-To achieve high training efficiency, the code should maximize compute time and
-minimize idle time and non-compute time. The following function generates a
-dataframe that provides a detailed breakdown of the temporal usage for each rank.
+높은 학습 효율성을 달성하기 위해서는 코드가 계산 시간을 최대화하고 유휴 시간과 비계산 시간을 최소화해야 합니다. 다음 함수는 각 랭크에 대한 시간 사용의 상세한 분석을 제공하는 데이터프레임을 생성합니다.
 
 .. code-block:: python
 
@@ -67,48 +59,27 @@ dataframe that provides a detailed breakdown of the temporal usage for each rank
 
 .. image:: ../_static/img/hta/temporal_breakdown_df.png
 
-When the ``visualize`` argument is set to ``True`` in the `get_temporal_breakdown
-<https://hta.readthedocs.io/en/latest/source/api/trace_analysis_api.html#hta.trace_analysis.TraceAnalysis.get_temporal_breakdown>`_
-function it also generates a bar graph representing the breakdown by rank.
+`get_temporal_breakdown <https://hta.readthedocs.io/en/latest/source/api/trace_analysis_api.html#hta.trace_analysis.TraceAnalysis.get_temporal_breakdown>`_ 함수에서 `visualize` 인수를 `True`로 설정하면 랭크별 분석을 나타내는 막대 그래프도 생성됩니다.
 
 .. image:: ../_static/img/hta/temporal_breakdown_plot.png
 
 
-Idle Time Breakdown
+유휴 시간 분석
 -------------------
 
-Gaining insight into the amount of time the GPU spends idle and the
-reasons behind it can help guide optimization strategies. A GPU is
-considered idle when no kernel is running on it. We have developed an
-algorithm to categorize the `Idle` time into three distinct categories:
+GPU가 유휴 상태로 보내는 시간과 그 이유에 대한 통찰을 얻으면 최적화 전략을 수립하는 데 도움이 될 수 있습니다. GPU에서 실행 중인 커널이 없을 때 GPU는 유휴 상태로 간주됩니다. 우리는 `유휴` 시간을 세 가지 뚜렷한 범주로 분류하는 알고리즘을 개발했습니다:
 
-* **Host wait:** refers to the idle time on the GPU that is caused by
-  the CPU not enqueuing kernels quickly enough to keep the GPU fully utilized.
-  These types of inefficiencies can be addressed by examining the CPU
-  operators that are contributing to the slowdown, increasing the batch
-  size and applying operator fusion.
+* **호스트 대기:** CPU가 GPU를 완전히 활용하기 위해 충분히 빠르게 커널을 대기열에 넣지 않아 발생하는 GPU의 유휴 시간을 말합니다. 이러한 유형의 비효율성은 속도 저하에 기여하는 CPU 연산자를 검사하고, 배치 크기를 늘리고, 연산자 융합을 적용하여 해결할 수 있습니다.
 
-* **Kernel wait:** This refers to brief overhead associated with launching
-  consecutive kernels on the GPU. The idle time attributed to this category
-  can be minimized by using CUDA Graph optimizations.
+* **커널 대기:** GPU에서 연속적인 커널을 실행하는 것과 관련된 간단한 오버헤드를 말합니다. 이 범주에 속하는 유휴 시간은 CUDA 그래프 최적화를 사용하여 최소화할 수 있습니다.
 
-* **Other wait:** This category includes idle time that cannot currently
-  be attributed due to insufficient information. The likely causes include
-  synchronization among CUDA streams using CUDA events and delays in launching
-  kernels.
+* **기타 대기:** 현재 정보가 부족하여 귀속시킬 수 없는 유휴 시간이 이 범주에 포함됩니다. 가능한 원인으로는 CUDA 이벤트를 사용한 CUDA 스트림 간의 동기화와 커널 실행 지연 등이 있습니다.
 
-The host wait time can be interpreted as the time when the GPU is stalling due
-to the CPU. To attribute the idle time as kernel wait we use the following
-heuristic:
+호스트 대기 시간은 CPU로 인해 GPU가 정체되는 시간으로 해석할 수 있습니다. 유휴 시간을 커널 대기로 귀속시키기 위해 우리는 다음과 같은 휴리스틱을 사용합니다:
 
-   | **gap between consecutive kernels < threshold**
+   | **연속적인 커널 사이의 간격 < 임계값**
 
-The default threshold value is 30 nanoseconds and can be configured using the
-``consecutive_kernel_delay`` argument. By default, the idle time breakdown is
-computed for rank 0 only. In order to calculate the breakdown for other ranks,
-use the ``ranks`` argument in the `get_idle_time_breakdown
-<https://hta.readthedocs.io/en/latest/source/api/trace_analysis_api.html#hta.trace_analysis.TraceAnalysis.get_idle_time_breakdown>`_
-function. The idle time breakdown can be generated as follows:
+기본 임계값은 30 나노초이며 `consecutive_kernel_delay` 인수를 사용하여 구성할 수 있습니다. 기본적으로 유휴 시간 분석은 랭크 0에 대해서만 계산됩니다. 다른 랭크에 대해 분석을 계산하려면 `get_idle_time_breakdown <https://hta.readthedocs.io/en/latest/source/api/trace_analysis_api.html#hta.trace_analysis.TraceAnalysis.get_idle_time_breakdown>`_ 함수에서 `ranks` 인수를 사용하세요. 유휴 시간 분석은 다음과 같이 생성할 수 있습니다:
 
 .. code-block:: python
 
@@ -117,47 +88,38 @@ function. The idle time breakdown can be generated as follows:
 
 .. image:: ../_static/img/hta/idle_time_breakdown_percentage.png
 
-The function returns a tuple of dataframes. The first dataframe contains the
-idle time by category on each stream for each rank.
+이 함수는 데이터프레임 튜플을 반환합니다. 첫 번째 데이터프레임은 각 랭크의 각 스트림에 대한 유휴 시간 범주별 시간을 포함합니다.
 
 .. image:: ../_static/img/hta/idle_time.png
    :scale: 100%
    :align: center
 
-The second dataframe is generated when ``show_idle_interval_stats`` is set to
-``True``. It contains the summary statistics of the idle time for each stream
-on each rank.
+두 번째 데이터프레임은 `show_idle_interval_stats`가 `True`로 설정되었을 때 생성됩니다. 이 데이터프레임은 각 랭크의 각 스트림에 대한 유휴 시간의 요약 통계를 포함합니다.
 
 .. image:: ../_static/img/hta/idle_time_summary.png
    :scale: 100%
 
 .. tip::
 
-   By default, the idle time breakdown presents the percentage of each of the
-   idle time categories. Setting the ``visualize_pctg`` argument to ``False``,
-   the function renders with absolute time on the y-axis.
+   기본적으로 유휴 시간 분석은 각 유휴 시간 범주의 백분율을 표시합니다. `visualize_pctg` 인수를 `False`로 설정하면 함수는 y축에 절대 시간을 표시합니다.
 
 
-Kernel Breakdown
+커널 분석
 ----------------
 
-The kernel breakdown feature breaks down the time spent for each kernel type,
-such as communication (COMM), computation (COMP), and memory (MEM), across all
-ranks and presents the proportion of time spent in each category. Here is the
-percentage of time spent in each category as a pie chart:
+커널 분석 기능은 모든 랭크에서 통신(COMM), 계산(COMP), 메모리(MEM)와 같은 각 커널 유형에 대해 사용된 시간을 분석하고 각 범주에서 사용된 시간의 비율을 제시합니다. 다음은 각 범주에서 사용된 시간의 백분율을 원형 차트로 나타낸 것입니다:
 
 .. image:: ../_static/img/hta/kernel_type_breakdown.png
    :align: center
 
-The kernel breakdown can be calculated as follows:
+커널 분석은 다음과 같이 계산할 수 있습니다:
 
 .. code-block:: python
 
    analyzer = TraceAnalysis(trace_dir = "/path/to/trace/folder")
    kernel_type_metrics_df, kernel_metrics_df = analyzer.get_gpu_kernel_breakdown()
 
-The first dataframe returned by the function contains the raw values used to
-generate the pie chart.
+함수가 반환하는 첫 번째 데이터프레임은 원형 차트를 생성하는 데 사용된 원래 값을 포함합니다.
 
 Kernel Duration Distribution
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
