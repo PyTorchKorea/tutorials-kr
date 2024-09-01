@@ -114,7 +114,7 @@ print(my_cell(x, h))
 #
 # 여러분은 출력된 내용에서 ``grad_fn`` 을 확인하셨을 것입니다. 이것은
 # `Autograd <https://tutorials.pytorch.kr/beginner/blitz/autograd_tutorial.html>`__
-# 라 불리는 PyTorch의 자동 미분 방법의 세부 정보입니다. 요컨데, 이 시스템은
+# 라 불리는 PyTorch의 자동 미분 방법의 세부 정보입니다. 요컨대, 이 시스템은
 # 잠재적으로 복잡한 프로그램을 통해 미분을 계산할 수 있게 합니다. 이 디자인은
 # 모델 제작에 엄청난 유연성을 제공합니다.
 #
