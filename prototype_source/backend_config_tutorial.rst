@@ -2,20 +2,19 @@
 ==========================================
 **Author**: `Andrew Or <https://github.com/andrewor14>`_
 
-The BackendConfig API enables developers to integrate their backends
-with PyTorch quantization. It is currently only supported in FX graph
-mode quantization, but support may be extended to other modes of
-quantization in the future. In this tutorial, we will demonstrate how to
-use this API to customize quantization support for specific backends.
-For more information on the motivation and implementation details behind
-BackendConfig, please refer to this
+BackendConfig API를 통해 백엔드 환경에서 PyTorch 양자화를 사용할 수 있습니다.
+기존 환경에서는 FX 그래프 모드 양자화 만을 사용할 수 있지만 
+추후에는 다른 모드 또한 지원 할 예정입니다.
+본 튜토리얼에서는 특정 백엔드 환경에서 양자화 기능을 커스터마이징하기 위해 
+BackendConfig API를 사용하는 방법에 대해 다룹니다.
+BackendConfig가 만들어진 동기와 구현 방법에 대한 세부정보를 알고 싶으시다면
+아래 사이트를 참고하세요.
 `README <https://github.com/pytorch/pytorch/tree/master/torch/ao/quantization/backend_config>`__.
 
-Suppose we are a backend developer and we wish to integrate our backend
-with PyTorch's quantization APIs. Our backend consists of two ops only:
-quantized linear and quantized conv-relu. In this section, we will walk
-through how to achieve this by quantizing an example model using a custom
-BackendConfig through `prepare_fx` and `convert_fx`.
+여러분이 PyTorch의 양자화 API를 백엔드 환경에서 사용하고 싶어하는 백엔드 개발자라고 가정해봅시다.
+백엔드 환경에서 사용할 수 있는 선택지는 양자화된 선형(Linear) 연산자와 합성곱(Convolution) ReLU 연산자가 있습니다.
+이번 장에서는 `prepare_fx`와 `convert_fx`를 통해 커스텀 BackendConfig를 만들고,
+이를 활용하여 예시 모델을 양자화하여 백엔드 환경을 구축하는 방법에 대해 살펴보겠습니다.
 
 .. code:: ipython3
 
@@ -36,32 +35,30 @@ BackendConfig through `prepare_fx` and `convert_fx`.
     )
     from torch.ao.quantization.quantize_fx import prepare_fx, convert_fx
 
-1. Derive reference pattern for each quantized operator
+1. 양자화된 연산자를 위한 참조 패턴 유도하기
 --------------------------------------------------------
 
-For quantized linear, suppose our backend expects the reference pattern
-`[dequant - fp32_linear - quant]` and lowers it into a single quantized
-linear op. The way to achieve this is to first insert quant-dequant ops
-before and after the float linear op, such that we produce the following
-reference model::
+양자화된 선형연산자를 위해 백엔드 환경에서는 `[dequant - fp32_linear - quant]` 참조 패턴을
+하나의 양자화된 선형 연산자로 변환하여 사용한다고 가정합시다.
+이를 위해 우선 quant-dequant연산자를 부동소수점 선형 연산자 앞 뒤로 삽입하여
+아래와 같은 추론 모델을 만들 수 있습니다.::
 
   quant1 - [dequant1 - fp32_linear - quant2] - dequant2
 
-Similarly, for quantized conv-relu, we wish to produce the following
-reference model, where the reference pattern in the square brackets will
-be lowered into a single quantized conv-relu op::
+이와 유사하게 양자화된 합성곱 ReLU 연산자를 만들기 위해서는
+대괄호 안에 있는 참조패턴을 하나의 양자화된 합성곱 ReLU 연산자로 변환하여 사용합니다.::
 
   quant1 - [dequant1 - fp32_conv_relu - quant2] - dequant2
 
-2. Set DTypeConfigs with backend constraints
+2. 백엔드 환경 제약조건을 DTypeConfig로 설정하기
 ---------------------------------------------
 
-In the reference patterns above, the input dtype specified in the
-DTypeConfig will be passed as the dtype argument to quant1, while the
-output dtype will be passed as the dtype argument to quant2. If the output
-dtype is fp32, as in the case of dynamic quantization, then the output
-quant-dequant pair will not be inserted. This example also shows how to
-specify restrictions on quantization and scale ranges on a particular dtype.
+앞서 언급한 추론 패턴에서 DTypeConfig에 명시된 입력값의 데이터 타입은 
+quant1 변수의 데이터 타입 인자로, 출력값의 데이터 타입은 quant2 변수의 
+데이터 타입 인자로 전달됩니다. 동적 양자화(dynamic quantization)의 경우, 
+출력값의 데이터 타입이 fp32일 경우 출력값의 quant-dequant 쌍은 삽입되지 않습니다.
+아래 예제 코드에서 양자화 시 필요한 제약조건을 나타내고
+특정 데이터 타입의 범위를 지정하는 방법을 확인할 수 있습니다.
 
 .. code:: ipython3
 
@@ -79,15 +76,13 @@ specify restrictions on quantization and scale ranges on a particular dtype.
         weight_dtype=torch.qint8,
         bias_dtype=torch.float)
 
-3. Set up fusion for conv-relu
+3. 합성곱 ReLU 결합(fusion)하기
 -------------------------------
 
-Note that the original user model contains separate conv and relu ops,
-so we need to first fuse the conv and relu ops into a single conv-relu
-op (`fp32_conv_relu`), and then quantize this op similar to how the linear
-op is quantized. We can set up fusion by defining a function that accepts
-3 arguments, where the first is whether or not this is for QAT, and the
-remaining arguments refer to the individual items of the fused pattern.
+초기 사용자 모델에서는 합성곱 연산자와 ReLU 연산자가 분리되어 있습니다.
+따라서 먼저 합성곱 연산자와 ReLU 연산자를 결합하여 하나의 합성곱-ReLU연산자를 만든 후
+선형 연산자를 양자화한 것과 유사하게 합성곱-ReLU 연산자를 양자화를 진행합니다.
+
 
 .. code:: ipython3
 
@@ -95,19 +90,18 @@ remaining arguments refer to the individual items of the fused pattern.
        """Return a fused ConvReLU2d from individual conv and relu modules."""
        return torch.ao.nn.intrinsic.ConvReLU2d(conv, relu)
 
-4. Define the BackendConfig
+4. BackendConfig 정의하기
 ----------------------------
 
-Now we have all the necessary pieces, so we go ahead and define our
-BackendConfig. Here we use different observers (will be renamed) for
-the input and output for the linear op, so the quantization params
-passed to the two quantize ops (quant1 and quant2) will be different.
-This is commonly the case for weighted ops like linear and conv.
+이제 필요한 것은 모두 준비가 되었으니 BackendConfig를 정의해봅시다.
+선형 연산자의 입력값과 출력값에 대해 서로 다른 observer(명칭은 추후 변경 예정)를 사용합니다.
+이를 통해 양자화 파라미터가 서로 다른 양자화 연산자(quant1과 quant2)를 거치며
+이와 같은 방식은 선형 연산이나 합성곱 연산과 같이 가중치를 사용하는 연산에서 
+일반적으로 사용합니다.
 
-For the conv-relu op, the observation type is the same. However, we
-need two BackendPatternConfigs to support this op, one for fusion
-and one for quantization. For both conv-relu and linear, we use the
-DTypeConfig defined above.
+합성곱-ReLU 연산자의 경우 observation의 타입은 동일합니다.
+하지만 BackendPatternConfig의 경우 결합과 양자화에 사용하기 위해 2개가 필요합니다.
+합성곱-ReLU와 선형 연산자에는 앞서 정의한 DTypeConfig를 활용합니다.
 
 .. code:: ipython3
 
@@ -141,35 +135,32 @@ DTypeConfig defined above.
         .set_backend_pattern_config(conv_relu_config) \
         .set_backend_pattern_config(fused_conv_relu_config)
 
-5. Set up QConfigMapping that satisfies the backend constraints
+5. 백엔드 환경 제약조건을 충족하기 위해 QConfigMapping 설정하기
 ----------------------------------------------------------------
 
-In order to use the ops defined above, the user must define a QConfig
-that satisfies the constraints specified in the DTypeConfig. For more
-detail, see the documentation for `DTypeConfig <https://pytorch.org/docs/stable/generated/torch.ao.quantization.backend_config.DTypeConfig.html>`__.
-We will then use this QConfig for all the modules used in the patterns
-we wish to quantize.
+앞서 정의한 연산자를 사용하기 위해서는 DTypeConfig의 제약조건을 만족하는 
+QConfig를 정의해야합니다. 자세한 내용은 `DTypeConfig <https://pytorch.org/docs/stable/generated/torch.ao.quantization.backend_config.DTypeConfig.html>`__을 참고하세요.
+그리고 양자화하려는 패턴들에 사용되는 모든 모듈에 QConfig를 사용합니다.
 
 .. code:: ipython3
 
-    # Note: Here we use a quant_max of 127, but this could be up to 255 (see `quint8_with_constraints`)
+    # 주의 : quant_max 값은 127이지만 추후 255까지 늘어날 수 있습니다.(`quint8_with_constraints`를 참고하세요)
     activation_observer = MinMaxObserver.with_args(quant_min=0, quant_max=127, eps=2 ** -12)
     qconfig = QConfig(activation=activation_observer, weight=default_weight_observer)
 
-    # Note: All individual items of a fused pattern, e.g. Conv2d and ReLU in
-    # (Conv2d, ReLU), must have the same QConfig
+    # 주의 : (Conv2d, ReLU) 내부 Conv2d와 ReLU와 같은 결합된 패턴의 모든 개별 요소들은
+    # 반드시 같은 QConfig여야합니다.
     qconfig_mapping = QConfigMapping() \
         .set_object_type(torch.nn.Linear, qconfig) \
         .set_object_type(torch.nn.Conv2d, qconfig) \
         .set_object_type(torch.nn.BatchNorm2d, qconfig) \
         .set_object_type(torch.nn.ReLU, qconfig)
 
-6. Quantize the model through prepare and convert
+6. 사전 처리(prepare)와 변환(convert)을 통한 모델 양자화
 --------------------------------------------------
 
-Finally, we quantize the model by passing the BackendConfig we defined
-into prepare and convert. This produces a quantized linear module and
-a fused quantized conv-relu module.
+마지막으로 앞서 정의한 BackendConfig를 prepare과 convert를 거쳐 양자화합니다.
+이를 통해 양자화된 선형 모듈과 결합된 합성곱-ReLU 모델을 만들 수 있습니다.
 
 .. code:: ipython3
 
@@ -218,16 +209,16 @@ a fused quantized conv-relu module.
         sigmoid = self.sigmoid(dequantize_2);  dequantize_2 = None
         return sigmoid
 
-(7. Experiment with faulty BackendConfig setups)
+(7. 오류가 있는 BackendConfig 설정 실험하기)
 -------------------------------------------------
 
-As an experiment, here we modify the model to use conv-bn-relu
-instead of conv-relu, but use the same BackendConfig, which doesn't
-know how to quantize conv-bn-relu. As a result, only linear is
-quantized, but conv-bn-relu is neither fused nor quantized.
+실험의 일환으로 합성곱-ReLU 연산자 대신 합성곱-배치정규화-ReLU(conv-bn-relu) 모델을 이용합니다.
+이 때 BackendConfig는 이전과 동일한 것을 사용하며 합성곱-배치정규화-ReLU 양자화 관련된 정보는 없습니다.
+실험 결과, 선형 모델의 경우 양자화가 성공적으로 진행되었지만 합성곱-배치정규화-ReLU의 경우
+결합과 양자화 모두 이루어지지 않았습니다.
 
 .. code:: ipython3
-    # Only linear is quantized, since there's no rule for fusing conv-bn-relu
+    # 합성곱-배치정규화-ReLU와 관련된 정보가 없기 때문에 선형 모델 만 양자화되었습니다.
     example_inputs = (torch.rand(1, 3, 10, 10, dtype=torch.float),)
     model = MyModel(use_bn=True)
     prepared = prepare_fx(model, qconfig_mapping, example_inputs, backend_config=backend_config)
@@ -258,9 +249,8 @@ quantized, but conv-bn-relu is neither fused nor quantized.
         sigmoid = self.sigmoid(relu);  relu = None
         return sigmoid
 
-As another experiment, here we use the default QConfigMapping that
-doesn't satisfy the dtype constraints specified in the backend. As
-a result, nothing is quantized since the QConfigs are simply ignored.
+백엔드 환경에 데이터 타입 제약조건을 만족하지 않는 기본 QConfigMapping을 이용하여 또 다른 실험을 진행했습니다.
+실혐 결과 QConfig가 무시되어 어떤 모델도 양자화 되지 않았습니다.
 
 .. code:: ipython3
     # Nothing is quantized or fused, since backend constraints are not satisfied
@@ -291,36 +281,33 @@ a result, nothing is quantized since the QConfigs are simply ignored.
         return sigmoid
 
 
-Built-in BackendConfigs
+기본 BackendConfig
 -----------------------
 
-PyTorch quantization supports a few built-in native BackendConfigs under
-the ``torch.ao.quantization.backend_config`` namespace:
+PyTorch 양자화는 ``torch.ao.quantization.backend_config`` 네임스페이스 하위
+여러 기본 BackendConfig를 지원합니다.
 
 - `get_fbgemm_backend_config <https://github.com/pytorch/pytorch/blob/master/torch/ao/quantization/backend_config/fbgemm.py>`__:
-  for server target settings
+  서버 세팅용 BackendConfig
 - `get_qnnpack_backend_config <https://github.com/pytorch/pytorch/blob/master/torch/ao/quantization/backend_config/qnnpack.py>`__:
-  for mobile and edge device target settings, also supports XNNPACK
-  quantized ops
+  모바일 및 엣지 장비, XNNPack 양자화 연산자 지원 BackendConfig
 - `get_native_backend_config <https://github.com/pytorch/pytorch/blob/master/torch/ao/quantization/backend_config/native.py>`__
-  (default): a BackendConfig that supports a union of the operator
-  patterns supported in the FBGEMM and QNNPACK BackendConfigs
+  (기본값): FBGEMM과 QNNPACK BackendConfig 내에서 제공되는 연산자 패턴을
+  지원하는 BackendConfig
 
-There are also other BackendConfigs under development (e.g. for
-TensorRT and x86), but these are still mostly experimental at the
-moment. If the user wishes to integrate a new, custom backend with
-PyTorch’s quantization API, they may define their own BackendConfigs
-using the same set of APIs used to define the natively supported
-ones as in the example above.
+그 밖에 다른 BackendConfig(TensorRT, x86 등)가 개발 중이지만
+아직 실험 단계에 머물러 있습니다. 새로운 커스텀 백엔드 환경에서
+PyTorch 양자화 API를 사용하기 원한다면 예제 코드에 정의된 
+API 코드를 바탕으로 자체적인 BackendConfig를 정의할 수 있습니다.
 
-Further Reading
+참고자료
 ---------------
 
-How BackendConfig is used in FX graph mode quantization:
+FX 그래프 모드 양자화에서 BackendConfig를 사용하는 법:
 https://github.com/pytorch/pytorch/blob/master/torch/ao/quantization/fx/README.md
 
-Motivation and implementation details behind BackendConfig:
+BackendConfig가 만들어진 동기와 구현 방법
 https://github.com/pytorch/pytorch/blob/master/torch/ao/quantization/backend_config/README.md
 
-Early design of BackendConfig:
+BackendConfig의 초기 설계:
 https://github.com/pytorch/rfcs/blob/master/RFC-0019-Extending-PyTorch-Quantization-to-Custom-Backends.md
