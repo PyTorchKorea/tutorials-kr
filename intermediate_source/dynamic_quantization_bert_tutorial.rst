@@ -68,7 +68,7 @@ PyTorch의 베타 기능들을 사용할 것이므로, 가장 최신 버전의 t
 
 .. code:: shell
 
-   yes y | pip uninstall torch tochvision
+   yes y | pip uninstall torch torchvision
    yes y | pip install --pre torch -f https://download.pytorch.org/whl/nightly/cu101/torch_nightly.html
 
 
@@ -259,7 +259,7 @@ BERT 모델(FP32)를 불러옵니다.
 2.3 토큰화, 평가 함수 정의하기
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-`Huggingface <https://github.com/huggingface/transformers/blob/master/examples/run_glue.py>`_
+`HuggingFace <https://github.com/huggingface/transformers/blob/master/examples/run_glue.py>`_
 의 토큰화 함수와 평가 함수를 사용합니다.
 
 .. code:: python
