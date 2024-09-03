@@ -44,28 +44,27 @@ Authors: `Suraj Subramanian <https://github.com/suraj813>`__
 ``데이터 병렬 DataParallel`` (DP) 보다 DDP가 나은 이유
 ----------------------------------------------------
 
-`DataParallel <https://pytorch.org/docs/stable/generated/torch.nn.DataParallel.html>`__
-is an older approach to data parallelism. DP is trivially simple (with just one extra line of code) but it is much less performant.
-DDP improves upon the architecture in a few ways:
+`DP <https://pytorch.org/docs/stable/generated/torch.nn.DataParallel.html>`__ 는 데이터 병렬 처리의 이전 접근 방식입니다.
+DP 는 간단하지만, (한 줄만 추가하면 됨) 성능은 훨씬 떨어집니다. DDP는 아래와 같은 방식으로 아키텍처를 개선합니다.
 
 +---------------------------------------+------------------------------+
 | ``DataParallel``                      | ``DistributedDataParallel``  |
 +=======================================+==============================+
-| More overhead; model is replicated    | Model is replicated only     |
-| and destroyed at each forward pass    | once                         |
+| 작업 부하가 큼; 전파될 때마다                | 모델이 한 번만 복제됨             |
+| 모델이 복제 및 삭제됨                      |                              |
 +---------------------------------------+------------------------------+
-| Only supports single-node parallelism | Supports scaling to multiple |
-|                                       | machines                     |
+| 단일 노드 병렬 처리만 가능                  | 여러 머신으로 확장 가능            |
+|                                       |                              |
 +---------------------------------------+------------------------------+
-| Slower; uses multithreading on a      | Faster (no GIL contention)   |
-| single process and runs into Global   | because it uses              |
-| Interpreter Lock (GIL) contention     | multiprocessing              |
+| 느림; 단일 프로세스에서 멀티 스레딩            | 빠름 (no GIL contention)     |
+| (multithreading)을 사용하기 때문에 Global  | 멀티 프로세싱을 사용하기 때문에 GIL |
+| Interpreter Lock (GIL) 충돌이 발생       | 충돌 없음                      |
 +---------------------------------------+------------------------------+
 
-Further Reading
+읽을거리
 ---------------
 
--  `Multi-GPU training with DDP <ddp_series_multigpu.html>`__ (next tutorial in this series)
+-  `Multi-GPU training with DDP <ddp_series_multigpu.html>`__ (이 시리즈의 다음 튜토리얼)
 -  `DDP
    API <https://pytorch.org/docs/stable/generated/torch.nn.parallel.DistributedDataParallel.html>`__
 -  `DDP Internal
