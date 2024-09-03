@@ -145,7 +145,7 @@ else:
 # ``torch.autograd.Function``, JIT inductor, AOT inductor가 지원됩니다. 이 기능들을 
 # 조합하여 복잡하고 고성능인 모델을 구축할 수 있습니다.
 # 
-# 그러나, 알아두어야 할 몇 가지 제한 사항이 있습니다:
+# 그러나 알아두어야 할 몇 가지 제한 사항이 있습니다:
 # 
 # * **Tensor Subclasses:** 현재로서는 Tensor 하위 클래스 및 기타 고급 기능은 지원되지 않습니다.
 #
