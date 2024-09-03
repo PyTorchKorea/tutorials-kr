@@ -23,7 +23,7 @@ Authors: `Suraj Subramanian <https://github.com/suraj813>`__
 
       * 파이토치 `비분산 학습  <https://tutorials.pytorch.kr/beginner/basics/quickstart_tutorial.html>`__ 에 익숙할 것
 
-아래의 영상이나 `유투브 영상 youtube <https://www.youtube.com/watch/Cvdhwx-OBBo>`__을 따라 진행하세요.
+아래의 영상이나 `유투브 영상 youtube <https://www.youtube.com/watch/Cvdhwx-OBBo>`__ 을 따라 진행하세요.
 
 .. raw:: html
 
@@ -47,20 +47,17 @@ Authors: `Suraj Subramanian <https://github.com/suraj813>`__
 `DP <https://pytorch.org/docs/stable/generated/torch.nn.DataParallel.html>`__ 는 데이터 병렬 처리의 이전 접근 방식입니다.
 DP 는 간단하지만, (한 줄만 추가하면 됨) 성능은 훨씬 떨어집니다. DDP는 아래와 같은 방식으로 아키텍처를 개선합니다.
 
-+-------------------------------------+------------------------------+
-| ``DataParallel``                    | ``DistributedDataParallel``  |
-+=====================================+==============================+
-| 작업 부하가 큼; 전파될 때마다       | 모델이 한 번만 복제됨         |
-| 모델이 복제 및 삭제됨               |                              |
-+-------------------------------------+------------------------------+
-| 단일 노드 병렬 처리만 가능          | 여러 머신으로 확장 가능       |
-|                                     |                              |
-+-------------------------------------+------------------------------+
-| 느림; 단일 프로세스에서 멀티 스레딩  | 빠름 (no GIL contention)      |
-| (multithreading)을 사용하기 때문에  | 멀티 프로세싱을 사용하기 때문에 GIL  |
-| Global Interpreter Lock (GIL)       | 충돌 없음                    |
-| 충돌이 발생                        |                              |
-+-------------------------------------+------------------------------+
+.. list-table::
+   :header-rows: 1
+
+   * - ``DataParallel``
+     - ``DistributedDataParallel``
+   * - 작업 부하가 큼; 전파될 때마다 모델이 복제 및 삭제됨
+     - 모델이 한 번만 복제됨
+   * - 단일 노드 병렬 처리만 가능
+     - 여러 머신으로 확장 가능
+   * - 느림; 단일 프로세스에서 멀티 스레딩을 사용하기 때문에 Global Interpreter Lock (GIL) 충돌이 발생
+     - 빠름; 멀티 프로세싱을 사용하기 때문에 GIL 충돌 없음
 
 
 읽을거리
