@@ -12,16 +12,16 @@ Authors: `Suraj Subramanian <https://github.com/suraj813>`__
 
 .. grid:: 2
 
-   .. grid-item-card:: :octicon:`mortar-board;1em;` What you will learn
+   .. grid-item-card:: :octicon:`mortar-board;1em;` 이 장에서 배우는 것
 
-      *  How DDP works under the hood
-      *  What is ``DistributedSampler``
-      *  How gradients are synchronized across GPUs
+      *  DDP 의 내부 작동 원리
+      *  ``DistributedSampler`` 이란 무엇인가?
+      *  GPU 간 기울기들이 동기화되는 방법
 
 
-   .. grid-item-card:: :octicon:`list-unordered;1em;` Prerequisites
+   .. grid-item-card:: :octicon:`list-unordered;1em;` 필요 사항
 
-      * Familiarity with `basic non-distributed training  <https://tutorials.pytorch.kr/beginner/basics/quickstart_tutorial.html>`__ in PyTorch
+      * 파이토치 `비분산 학습  <https://tutorials.pytorch.kr/beginner/basics/quickstart_tutorial.html>`__ 에 익숙할 것
 
 아래의 영상이나 `유투브 영상 youtube <https://www.youtube.com/watch/Cvdhwx-OBBo>`__을 따라 진행하세요.
 
