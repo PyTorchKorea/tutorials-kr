@@ -212,7 +212,7 @@ print("Saved PyTorch Model State to model.pth")
 # 모델을 불러오는 과정에는 모델 구조를 다시 만들고 상태 사전을 모델에 불러오는 과정이 포함됩니다.
 
 model = NeuralNetwork().to(device)
-model.load_state_dict(torch.load("model.pth"))
+model.load_state_dict(torch.load("model.pth", weights_only=True))
 
 #############################################################
 # 이제 이 모델을 사용해서 예측을 할 수 있습니다.
