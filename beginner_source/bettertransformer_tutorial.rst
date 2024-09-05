@@ -1,59 +1,59 @@
-Fast Transformer Inference with Better Transformer
+Better Transformer를 이용한 고속 트랜스포머 추론
 ===============================================================
 
-**Author**: `Michael Gschwind <https://github.com/mikekgfb>`__
+**저자**: `마이클 그쉬빈드 <https://github.com/mikekgfb>`__
 
-This tutorial introduces Better Transformer (BT) as part of the PyTorch 1.12 release. 
-In this tutorial, we show how to use Better Transformer for production 
-inference with torchtext.  Better Transformer is a production ready fastpath to
-accelerate deployment of Transformer models with high performance on CPU and GPU.
-The fastpath feature works transparently for models based either directly on 
-PyTorch core ``nn.module`` or with torchtext.  
+ 
+이 튜토리얼에서는 PyTorch 1.12 릴리스의 일부로 Better Transformer (BT)를 소개합니다.
+여기서는 torchtext를 사용한 Production 추론에 Better Transformer를 적용하는 방법을 보여줍니다.
+Better Transformer는 CPU와 GPU에서 고성능으로 트랜스포머 모델의 배포를 가속화하기 위한 Production으로 바로 적용가능한 fastpath입니다.
+이 fastpath 기능은 PyTorch 코어 nn.module을 직접 기반으로 하거나 torchtext를 사용하는 모델에 대해 이해하기 쉽고 명확하게 작동합니다.
 
-Models which can be accelerated by Better Transformer fastpath execution are those
-using the following PyTorch core ``torch.nn.module`` classes ``TransformerEncoder``, 
-``TransformerEncoderLayer``, and ``MultiHeadAttention``.  In addition, torchtext has 
-been updated to use the core library modules to benefit from fastpath acceleration.
-(Additional modules may be enabled with fastpath execution in the future.)
+Better Transformer fastpath로 가속화될 수 있는 모델은 PyTorch 코어 torch.nn.module 클래스인 TransformerEncoder, TransformerEncoderLayer, 
+그리고 MultiHeadAttention을 사용하는 모델입니다. 
+또한, torchtext는 fastpath 가속화의 이점을 얻기 위해 코어 라이브러리 모듈들을 사용하도록 업데이트되었습니다. 
+(추후 더 많은 모듈이 fastpath 실행을 지원할 수 있습니다.)
 
-Better Transformer offers two types of acceleration:
 
-* Native multihead attention (MHA) implementation for CPU and GPU to improve overall execution efficiency.  
-* Exploiting sparsity in NLP inference.  Because of variable input lengths, input
-  tokens may contain a large number of padding tokens for which processing may be
-  skipped, delivering significant speedups.
+Better Transformer는 두 가지 유형의 가속화를 제공합니다:
 
-Fastpath execution is subject to some criteria. Most importantly, the model 
-must be executed in inference mode and operate on input tensors that do not collect 
-gradient tape information (e.g., running with torch.no_grad). 
+* CPU와 GPU에 대한 Native multihead attention(MHA) 구현으로 전반적인 실행 효율성을 향상시킵니다.
+* NLP 추론에서의 sparsity를 활용합니다. 가변 길이 입력(variable input lengths)으로 인해 입력 토큰에 많은 수의
+  패딩 토큰이 포함될 수 있는데, 이러한 토큰들의 처리를 건너뛰어 상당한 속도 향상을 제공합니다.
 
-To follow this example in Google Colab, `click here 
+Fastpath 실행은 몇 가지 기준을 충족해야 합니다. 가장 중요한 건, 모델이 추론 모드에서 실행되어야 하며 
+gradient tape 정보를 수집하지 않는 입력 텐서에 대해 작동해야 한다는 것입니다(예: torch.no_grad를 사용하여 실행).
+
+이 예제를 Google Colab에서 따라하려면, `여기를 클릭
 <https://colab.research.google.com/drive/1KZnMJYhYkOMYtNIX5S3AGIYnjyG0AojN?usp=sharing>`__.
 
-Better Transformer Features in This Tutorial
+
+
+이 튜토리얼에서 Better Transformer의 기능들
 --------------------------------------------
 
-* Load pretrained models (created before PyTorch version 1.12 without Better Transformer)
-* Run and benchmark inference on CPU with and without BT fastpath (native MHA only)
-* Run and benchmark inference on (configurable) DEVICE with and without BT fastpath (native MHA only)
-* Enable sparsity support
-* Run and benchmark inference on (configurable) DEVICE with and without BT fastpath (native MHA + sparsity)
+* 사전 훈련된 모델 로드 (Better Transformer 없이 PyTorch 버전 1.12 이전에 생성된 모델)
+* CPU에서 BT fastpath를 사용한 경우와 사용하지 않은 경우의 추론의 실행 및 벤치마크 (네이티브 MHA만 해당)
+* (구성 가능한)디바이스에서 BT fastpath를 사용한 경우와 사용하지 않은 경우의 추론의 실행 및 벤치마크 (네이티브 MHA만 해당)
+* sparsity 지원 활성화
+* (구성 가능한) 디바이스에서 BT fastpath를 사용한 경우와 사용하지 않은 경우의 추론의 실행 및 벤치마크 (네이티브 MHA + 희소성)
 
-Additional Information
+
+
+추가적인 정보들
 -----------------------
-Additional information about Better Transformer may be found in the PyTorch.Org blog  
-`A Better Transformer for Fast Transformer Inference
+더 나은 트랜스포머에 대한 추가 정보는 PyTorch.Org 블로그에서 확인할 수 있습니다.  
+`고속 트랜스포머 추론을 위한 Better Transformer 
 <https://pytorch.org/blog/a-better-transformer-for-fast-transformer-encoder-inference//>`__.
 
 
 
-1. Setup
+1. 설정
 
-1.1 Load pretrained models
+1.1 사전 훈련된 모델 로드
 
-We download the XLM-R model from the predefined torchtext models by following the instructions in
-`torchtext.models <https://pytorch.org/text/main/models.html>`__.  We also set the DEVICE to execute 
-on-accelerator tests.  (Enable GPU execution for your environment as appropriate.)
+`torchtext.models <https://pytorch.org/text/main/models.html>`__ 의 지침에 따라 미리 정의된 torchtext 모델에서 XLM-R 모델을 다운로드합니다.
+또한 가속기 상에서의 테스트를 실행하기 위해 DEVICE를 설정합니다. (필요에 따라 사용 환경에 맞게 GPU 실행을 활성화면 됩니다.)
 
 .. code-block:: python 
 
@@ -74,9 +74,9 @@ on-accelerator tests.  (Enable GPU execution for your environment as appropriate
     model = xlmr_large.get_model(head=classifier_head)
     transform = xlmr_large.transform()
 
-1.2 Dataset Setup
+1.2 데이터셋 설정
 
-We set up two types of inputs: a small input batch and a big input batch with sparsity.
+두 가지 유형의 입력을 설정하겠습니다. 작은 입력 배치와 sparsity를 가진 큰 입력 배치입니다.
 
 .. code-block:: python
 
@@ -104,7 +104,7 @@ We set up two types of inputs: a small input batch and a big input batch with sp
     St. Petersburg, used only by the elite."""
     ]
 
-Next, we select either the small or large input batch, preprocess the inputs and test the model. 
+다음으로, 작은 입력 배치 또는 큰 입력 배치 중 하나를 선택하고, 입력을 전처리한 후 모델을 테스트합니다.
 
 .. code-block:: python
 
@@ -114,23 +114,23 @@ Next, we select either the small or large input batch, preprocess the inputs and
     output = model(model_input)
     output.shape
 
-Finally, we set the benchmark iteration count:
+마지막으로, 벤치마크 반복 횟수를 설정합니다.
 
 .. code-block:: python
 
     ITERATIONS=10
 
-2. Execution
+2. 실행
 
-2.1  Run and benchmark inference on CPU with and without BT fastpath (native MHA only)
+2.1   CPU에서 BT fastpath를 사용한 경우와 사용하지 않은 경우의 추론의 실행 및 벤치마크 (네이티브 MHA만 해당)
 
-We run the model on CPU, and collect profile information:  
+CPU에서 모델을 실행하고 프로파일 정보를 수집합니다:
 
-* The first run uses traditional ("slow path") execution.
-* The second run enables BT fastpath execution by putting the model in inference mode using `model.eval()` and disables gradient collection with `torch.no_grad()`.
+* 첫 번째 실행은 전통적인 실행('slow path')을 사용합니다.
+* 두 번째 실행은 model.eval()을 사용하여 모델을 추론 모드로 설정하고 torch.no_grad()로 변화도(gradient) 수집을 비활성화하여 BT fastpath 실행을 활성화합니다.
 
-You can see an improvement (whose magnitude will depend on the CPU model) when the model is executing on CPU.  Notice that the fastpath profile shows most of the execution time
-in the native `TransformerEncoderLayer` implementation `aten::_transformer_encoder_layer_fwd`.
+CPU에서 모델을 실행할 때 성능이 향상된 것을 볼 수 있을 겁니다.(향상 정도는 CPU 모델에 따라 다릅니다)
+fastpath 프로파일에서 대부분의 실행 시간이 네이티브 `TransformerEncoderLayer`의 저수준 연산을 구현한 `aten::_transformer_encoder_layer_fwd`에 소요되는 것을 주목하세요:
 
 .. code-block:: python
 
@@ -152,29 +152,28 @@ in the native `TransformerEncoderLayer` implementation `aten::_transformer_encod
     print(prof)
 
 
-2.2  Run and benchmark inference on (configurable) DEVICE with and without BT fastpath (native MHA only)
+2.2 (구성 가능한)디바이스에서 BT fastpath를 사용한 경우와 사용하지 않은 경우의 추론의 실행 및 벤치마크 (네이티브 MHA만 해당)
 
-We check the BT sparsity setting:
+BT sparsity 설정을 확인해보겠습니다.
 
 .. code-block:: python
 
     model.encoder.transformer.layers.enable_nested_tensor
     
 
-We disable the BT sparsity:
+이번엔 BT sparsity을 비활성화합니다.
 
 .. code-block:: python
 
     model.encoder.transformer.layers.enable_nested_tensor=False    
     
  
-We run the model on DEVICE, and collect profile information for native MHA execution on DEVICE:  
+DEVICE에서 모델을 실행하고, DEVICE에서의 네이티브 MHA 실행에 대한 프로파일 정보를 수집합니다:
 
-* The first run uses traditional ("slow path") execution.
-* The second run enables BT fastpath execution by putting the model in inference mode using `model.eval()`
-  and disables gradient collection with `torch.no_grad()`.
+* 첫 번째 실행은 전통적인 ('slow path') 실행을 사용합니다.
+* 두 번째 실행은 model.eval()을 사용하여 모델을 추론 모드로 설정하고 torch.no_grad()로 변화도(gradient) 수집을 비활성화하여 BT fastpath 실행을 활성화합니다.
 
-When executing on a GPU, you should see a significant speedup, in particular for the small input batch setting:
+GPU에서 실행할 때, 특히 작은 입력 배치로 설정한 경우 속도가 크게 향상되는 것을 볼 수 있을 겁니다.
 
 .. code-block:: python
 
@@ -199,20 +198,20 @@ When executing on a GPU, you should see a significant speedup, in particular for
     print(prof)
     
 
-2.3 Run and benchmark inference on (configurable) DEVICE with and without BT fastpath (native MHA + sparsity)
+2.3 (구성 가능한) 디바이스에서 BT fastpath를 사용한 경우와 사용하지 않은 경우의 추론의 실행 및 벤치마크 (네이티브 MHA + 희소성)
 
-We enable sparsity support:
+sparsity 지원을 활성화합니다.
 
 .. code-block:: python
 
     model.encoder.transformer.layers.enable_nested_tensor = True
 
-We run the model on DEVICE, and collect profile information for native MHA and sparsity support execution on DEVICE:  
+DEVICE에서 모델을 실행하고, DEVICE에서의 네이티브 MHA와 sparsity 지원 실행에 대한 프로파일 정보를 수집합니다:
 
-* The first run uses traditional ("slow path") execution.
-* The second run enables BT fastpath execution by putting the model in inference mode using `model.eval()` and disables gradient collection with `torch.no_grad()`.
+* 첫 번째 실행은 전통적인 ('slow path') 실행을 사용합니다.
+* 두 번째 실행은 model.eval()을 사용하여 모델을 추론 모드로 설정하고 torch.no_grad()로 변화도(gradient) 수집을 비활성화하여 BT fastpath 실행을 활성화합니다.
 
-When executing on a GPU, you should see a significant speedup, in particular for the large input batch setting which includes sparsity:
+GPU에서 실행할 때, 특히 sparsity를 포함하는 큰 입력 배치 설정에서 상당한 속도 향상을 볼 수 있을 겁니다.
 
 .. code-block:: python
 
@@ -237,15 +236,10 @@ When executing on a GPU, you should see a significant speedup, in particular for
     print(prof)
 
 
-Summary
+요약
 -------
-
-In this tutorial, we have introduced fast transformer inference with 
-Better Transformer fastpath execution in torchtext using PyTorch core 
-Better Transformer support for Transformer Encoder models.  We have 
-demonstrated the use of Better Transformer with models trained prior to 
-the availability of BT fastpath execution.  We have demonstrated and 
-benchmarked the use of both BT fastpath execution modes, native MHA execution
-and BT sparsity acceleration. 
-
-
+ 
+이 튜토리얼에서는 torchtext에서 PyTorch 코어의 트랜스포머 인코더 모델을 위한 Better Transformer 지원을 활용하여, 
+Better Transformer를 이용한 고속 트랜스포머 추론을 소개했습니다. 
+BT fastpath 실행이 가능해지기 이전에 훈련된 모델에서 Better Transformer의 사용을 시연했습니다. 
+또한 BT fastpath 실행의 두 가지 모드인 네이티브 MHA 실행과 BT sparsity 가속화의 사용을 시연 및 벤치마크를 해보았습니다.
