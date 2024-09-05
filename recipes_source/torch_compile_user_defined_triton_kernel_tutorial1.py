@@ -7,13 +7,13 @@
 """
 
 ######################################################################
-# 사용자 정의 트리톤(Triton) 커널을 사용하면 모델의 특정 부분의 계산을 최적화할 수 있습니다.
-# 이 커널들은 트리톤(Triton)의 언어로 작성된 것으로 설계되었습니다.
-# 사용자 정의 트리톤(Triton)을 사용하여 하드웨어 성능을 최고로 향상시킵니다.
+# 사용자 정의 Triton 커널을 사용하면 모델의 특정 부분의 계산을 최적화할 수 있습니다.
+# 이 커널들은 Triton의 언어로 작성된 것으로 설계되었습니다.
+# 사용자 정의 Triton을 사용하여 하드웨어 성능을 최고로 향상시킵니다.
 # ``torch.compile``를 사용하는 커널은 이러한 최적화된 계산을 통합할 수 있습니다.
 # PyTorch 모델을 통해 상당한 성능 향상을 실현할 수 있습니다.
 #
-# 이 레시피는 사용자 정의 트리톤(Triton) 커널을  ``torch.compile``과 함께 사용할 수 있는 방법을 보여줍니다.
+# 이 레시피는 사용자 정의 Triton 커널을  ``torch.compile``과 함께 사용할 수 있는 방법을 보여줍니다.
 #
 # 전제조건
 # -------------------
@@ -23,7 +23,7 @@
 #
 #   * `torch.compiler API 설명서 <https://pytorch.org/docs/stable/torch.compiler.html#torch-compiler>`__
 #   * `torch.compile 소개 <https://tutorials.pytorch.kr/intermediate/torch_compile_tutorial.html>`__
-#   * `트리톤(Triton) 언어 문서 <https://triton-lang.org/main/index.html>`__
+#   * `Triton 언어 문서 <https://triton-lang.org/main/index.html>`__
 #
 # * PyTorch 2.3 이상
 # * Triton을 지원하는 GPU
@@ -36,7 +36,7 @@ from torch.utils._triton import has_triton
 # 기본 사용법
 # --------------------
 #
-# 이 예에서는 트리톤 문서의 간단한 벡터 덧셈 커널을 사용합니다.
+# 이 예에서는 Triton 문서의 간단한 벡터 덧셈 커널을 사용합니다.
 # ``torch.compile``과 함께.
 # 참고, `Triton 문서를 참고하세요 <https://triton-lang.org/main/getting-started/tutorials/01-vector-add.html>`__.
 #
