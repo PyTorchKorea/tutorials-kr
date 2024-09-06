@@ -121,132 +121,82 @@ GPU가 유휴 상태로 보내는 시간과 그 이유에 대한 통찰을 얻�
 
 함수가 반환하는 첫 번째 데이터프레임은 원형 차트를 생성하는 데 사용된 원래 값을 포함합니다.
 
-Kernel Duration Distribution
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+커널 기간 분포
+^^^^^^^^^^^^^^^
 
-The second dataframe returned by `get_gpu_kernel_breakdown
-<https://hta.readthedocs.io/en/latest/source/api/trace_analysis_api.html#hta.trace_analysis.TraceAnalysis.get_gpu_kernel_breakdown>`_
-contains duration summary statistics for each kernel. In particular, this
-includes the count, min, max, average, standard deviation, sum, and kernel type
-for each kernel on each rank.
+`get_gpu_kernel_breakdown <https://hta.readthedocs.io/en/latest/source/api/trace_analysis_api.html#hta.trace_analysis.TraceAnalysis.get_gpu_kernel_breakdown>`_ 함수가 반환하는 두 번째 데이터프레임에는 각 커널에 대한 기간 요약 통계가 포함되어 있습니다. 특히, 이는 각 커널에 대해 랭크별로 카운트, 최소, 최대, 평균, 표준 편차, 합계, 그리고 커널 유형을 포함합니다.
 
 .. image:: ../_static/img/hta/kernel_metrics_df.png
    :align: center
 
-Using this data HTA creates many visualizations to identify performance
-bottlenecks.
+이 데이터를 사용하여 HTA는 성능 병목 현상을 식별하기 위한 여러 시각화를 생성합니다.
 
-#. Pie charts of the top kernels for each kernel type for each rank.
+1. 각 랭크별로 각 커널 유형에 대한 상위 커널의 원형 차트.
 
-#. Bar graphs of the average duration across all ranks for each of the top
-   kernels and for each kernel type.
+2. 상위 커널 및 각 커널 유형에 대해 모든 랭크에 걸친 평균 기간의 막대 그래프.
 
 .. image:: ../_static/img/hta/pie_charts.png
 
-.. tip::
+모든 이미지는 plotly를 사용하여 생성됩니다. 그래프 위에 마우스를 올리면 우측 상단에 모드 바가 나타나며, 이를 통해 확대, 이동, 선택 및 그래프 다운로드가 가능합니다.
 
-   All images are generated using plotly. Hovering on the graph shows the
-   mode bar on the top right which allows the user to zoom, pan, select, and
-   download the graph.
-
-The pie charts above show the top 5 computation, communication, and memory
-kernels. Similar pie charts are generated for each rank. The pie charts can be
-configured to show the top k kernels using the ``num_kernels`` argument passed
-to the `get_gpu_kernel_breakdown` function. Additionally, the
-``duration_ratio`` argument can be used to tune the percentage of time that
-needs to be analyzed. If both ``num_kernels`` and ``duration_ratio`` are
-specified, then ``num_kernels`` takes precedence.
+위의 원형 차트는 상위 5개의 계산, 통신, 메모리 커널을 보여줍니다. 각 랭크에 대해 유사한 원형 차트가 생성됩니다. 원형 차트는 `get_gpu_kernel_breakdown` 함수에 전달된 `num_kernels` 인자를 사용하여 상위 k개의 커널을 보여주도록 설정할 수 있습니다. 또한, `duration_ratio` 인자를 사용하여 분석될 시간의 비율을 조정할 수 있습니다. `num_kernels`와 `duration_ratio` 모두 지정된 경우, `num_kernels`가 우선합니다.
 
 .. image:: ../_static/img/hta/comm_across_ranks.png
 
-The bar graph above shows the average duration of the NCCL AllReduce kernel
-across all the ranks. The black lines indicate the minimum and maximum time
-taken on each rank.
+위의 막대 그래프는 모든 랭크에 걸친 NCCL AllReduce 커널의 평균 기간을 보여줍니다. 검은 선은 각 랭크에서의 최소 및 최대 시간을 나타냅니다.
 
 .. warning::
-   When using jupyter-lab set the "image_renderer" argument value to
-   "jupyterlab" otherwise the graphs will not render in the notebook.
+   jupyter-lab을 사용할 때 "image_renderer" 인자의 값을 "jupyterlab"으로 설정해야 노트북에서 그래프가 렌더링됩니다.
 
-For a detailed walkthrough of this feature see the `gpu_kernel_breakdown
-notebook
-<https://github.com/facebookresearch/HolisticTraceAnalysis/blob/main/examples/kernel_breakdown_demo.ipynb>`_
-in the examples folder of the repo.
+이 기능에 대한 자세한 설명은 저장소의 예제 폴더에 있는 `gpu_kernel_breakdown notebook <https://github.com/facebookresearch/HolisticTraceAnalysis/blob/main/examples/kernel_breakdown_demo.ipynb>`_을 참조하세요.
 
 
-Communication Computation Overlap
----------------------------------
+통신 계산 오버랩
+-----------------
 
-In distributed training, a significant amount of time is spent in communication
-and synchronization events between GPUs. To achieve high GPU efficiency (such as
-TFLOPS/GPU), it is crucial to keep the GPU oversubscribed with computation
-kernels. In other words, the GPU should not be blocked due to unresolved data
-dependencies. One way to measure the extent to which computation is blocked by
-data dependencies is to calculate the communication computation overlap. Higher
-GPU efficiency is observed if communication events overlap computation events.
-Lack of communication and computation overlap will lead to the GPU being idle,
-resulting in low efficiency.
-To sum up, a higher communication computation overlap is desirable. To calculate
-the overlap percentage for each rank, we measure the following ratio:
+분산 학습에서 상당한 시간이 GPU 간의 통신 및 동기화 이벤트에 소비됩니다. 높은 GPU 효율성(TFLOPS/GPU)을 달성하기 위해서는 GPU가 계산 커널로 과도하게 할당된 상태를 유지하는 것이 중요합니다. 즉, GPU는 해결되지 않은 데이터 의존성으로 인해 차단되어서는 안 됩니다. 계산이 데이터 의존성에 의해 차단되는 정도를 측정하는 한 가지 방법은 통신 계산 오버랩을 계산하는 것입니다. 통신 이벤트가 계산 이벤트와 겹칠 때 더 높은 GPU 효율성이 관찰됩니다. 통신과 계산의 오버랩이 부족하면 GPU가 유휴 상태가 되어 낮은 효율성으로 이어집니다.
+요약하자면, 더 높은 통신 계산 오버랩이 바람직합니다. 각 랭크에 대한 오버랩 비율을 계산하기 위해 다음 비율을 측정합니다:
 
-  | **(time spent in computation while communicating) / (time spent in communication)**
+  | **(통신 중에 소비된 계산 시간) / (통신에 소비된 시간)**
 
-The communication computation overlap can be calculated as follows:
+통신 계산 오버랩은 다음과 같이 계산할 수 있습니다:
 
 .. code-block:: python
 
-   analyzer = TraceAnalysis(trace_dir = "/path/to/trace/folder")
+   analyzer = TraceAnalysis(trace_dir="/path/to/trace/folder")
    overlap_df = analyzer.get_comm_comp_overlap()
 
-The function returns a dataframe containing the overlap percentage
-for each rank.
+이 함수는 각 랭크에 대한 오버랩 비율을 포함하는 데이터프레임을 반환합니다.
 
 .. image:: ../_static/img/hta/overlap_df.png
    :align: center
    :scale: 50%
 
-When the ``visualize`` argument is set to True, the `get_comm_comp_overlap
-<https://hta.readthedocs.io/en/latest/source/api/trace_analysis_api.html#hta.trace_analysis.TraceAnalysis.get_comm_comp_overlap>`_
-function also generates a bar graph representing the overlap by rank.
+``visualize`` 인자가 True로 설정되면, `get_comm_comp_overlap <https://hta.readthedocs.io/en/latest/source/api/trace_analysis_api.html#hta.trace_analysis.TraceAnalysis.get_comm_comp_overlap>`_ 함수는 또한 랭크별 오버랩을 나타내는 막대 그래프를 생성합니다.
 
 .. image:: ../_static/img/hta/overlap_plot.png
 
-
-Augmented Counters
+증강된 카운터
 ------------------
 
-Memory Bandwidth & Queue Length Counters
+메모리 대역폭 & 큐 길이 카운터
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Memory bandwidth counters measure the memory copy bandwidth used while copying
-the data from H2D, D2H and D2D by memory copy (memcpy) and memory set (memset)
-events. HTA also computes the number of outstanding operations on each CUDA
-stream. We refer to this as **queue length**. When the queue length on a stream
-is 1024 or larger new events cannot be scheduled on that stream and the CPU
-will stall until the events on the GPU stream have processed.
+메모리 대역폭 카운터는 메모리 복사(memcpy) 및 메모리 설정(memset) 이벤트에 의해 데이터를 H2D, D2H 및 D2D로 복사할 때 사용된 메모리 복사 대역폭을 측정합니다. HTA는 또한 각 CUDA 스트림에서 진행 중인 작업의 수를 계산합니다. 우리는 이를 **큐 길이**라고 부릅니다. 스트림의 큐 길이가 1024 이상일 때, 그 스트림에 새로운 이벤트가 스케줄될 수 없으며, GPU 스트림의 이벤트가 처리될 때까지 CPU는 정지됩니다.
 
-The `generate_trace_with_counters
-<https://hta.readthedocs.io/en/latest/source/api/trace_analysis_api.html#hta.trace_analysis.TraceAnalysis.generate_trace_with_counters>`_
-API outputs a new trace file with the memory bandwidth and queue length
-counters. The new trace file contains tracks which indicate the memory
-bandwidth used by memcpy/memset operations and tracks for the queue length on
-each stream. By default, these counters are generated using the rank 0
-trace file, and the new file contains the suffix ``_with_counters`` in its name.
-Users have the option to generate the counters for multiple ranks by using the
-``ranks`` argument in the ``generate_trace_with_counters`` API.
+`generate_trace_with_counters <https://hta.readthedocs.io/en/latest/source/api/trace_analysis_api.html#hta.trace_analysis.TraceAnalysis.generate_trace_with_counters>`_ API는 메모리 대역폭 및 큐 길이 카운터가 포함된 새로운 추적 파일을 출력합니다. 새로운 추적 파일에는 memcpy/memset 작업에 의해 사용된 메모리 대역폭을 나타내는 트랙과 각 스트림의 큐 길이를 나타내는 트랙이 포함됩니다. 기본적으로, 이러한 카운터는 랭크 0 추적 파일을 사용하여 생성되며, 새 파일의 이름에는 ``_with_counters``라는 접미사가 포함됩니다. 사용자는 `generate_trace_with_counters` API의 `ranks` 인수를 사용하여 여러 랭크에 대한 카운터를 생성할 수 있습니다.
 
 .. code-block:: python
 
-  analyzer = TraceAnalysis(trace_dir = "/path/to/trace/folder")
+  analyzer = TraceAnalysis(trace_dir="/path/to/trace/folder")
   analyzer.generate_trace_with_counters()
 
-A screenshot of the generated trace file with augmented counters.
+증강된 카운터가 포함된 생성된 추적 파일의 스크린샷.
 
 .. image:: ../_static/img/hta/mem_bandwidth_queue_length.png
    :scale: 100%
 
-HTA also provides a summary of the memory copy bandwidth and queue length
-counters as well as the time series of the counters for the profiled portion of
-the code using the following API:
+HTA는 또한 다음 API를 사용하여 프로파일된 코드 부분에 대한 메모리 복사 대역폭 및 큐 길이 카운터의 요약과 시계열을 제공합니다:
 
 * `get_memory_bw_summary <https://hta.readthedocs.io/en/latest/source/api/trace_analysis_api.html#hta.trace_analysis.TraceAnalysis.get_memory_bw_summary>`_
 
@@ -256,97 +206,74 @@ the code using the following API:
 
 * `get_queue_length_time_series <https://hta.readthedocs.io/en/latest/source/api/trace_analysis_api.html#hta.trace_analysis.TraceAnalysis.get_queue_length_time_series>`_
 
-To view the summary and time series, use:
+요약 및 시계열을 보기 위해 다음을 사용하세요:
 
 .. code-block:: python
 
-  # generate summary
+  # 요약 생성
   mem_bw_summary = analyzer.get_memory_bw_summary()
   queue_len_summary = analyzer.get_queue_length_summary()
 
-  # get time series
+  # 시계열 가져오기
   mem_bw_series = analyzer.get_memory_bw_time_series()
   queue_len_series = analyzer.get_queue_length_series()
 
-The summary contains the count, min, max, mean, standard deviation, 25th, 50th,
-and 75th percentile.
+요약에는 카운트, 최소, 최대, 평균, 표준 편차, 25번째, 50번째, 75번째 백분위수가 포함됩니다.
 
 .. image:: ../_static/img/hta/queue_length_summary.png
    :scale: 100%
    :align: center
 
-The time series only contains the points when a value changes. Once a value is
-observed the time series stays constant until the next update. The memory
-bandwidth and queue length time series functions return a dictionary whose key
-is the rank and the value is the time series for that rank. By default, the
-time series is computed for rank 0 only.
+시계열은 값이 변경될 때만 포인트를 포함합니다. 일단 값이 관찰되면 다음 업데이트까지 시계열은 일정하게 유지됩니다. 메모리 대역폭 및 큐 길이 시계열 함수는 키가 랭크이고 값이 그 랭크에 대한 시계열인 딕셔너리를 반환합니다. 기본적으로, 시계열은 랭크 0에 대해서만 계산됩니다.
 
-CUDA Kernel Launch Statistics
+CUDA 커널 실행 통계
 -----------------------------
 
 .. image:: ../_static/img/hta/cuda_kernel_launch.png
 
-For each event launched on the GPU, there is a corresponding scheduling event on
-the CPU, such as ``CudaLaunchKernel``, ``CudaMemcpyAsync``, ``CudaMemsetAsync``.
-These events are linked by a common correlation ID in the trace - see the figure
-above. This feature computes the duration of the CPU runtime event, its corresponding GPU
-kernel and the launch delay, for example, the difference between GPU kernel starting and
-CPU operator ending. The kernel launch info can be generated as follows:
+GPU에서 실행된 각 이벤트에는 `CudaLaunchKernel`, `CudaMemcpyAsync`, `CudaMemsetAsync`와 같은 CPU에서의 대응하는 스케줄링 이벤트가 있습니다. 이러한 이벤트는 추적에서 공통의 상관 ID로 연결됩니다 - 위의 그림을 참조하세요. 이 기능은 CPU 런타임 이벤트의 지속 시간, 해당 GPU 커널 및 실행 지연을 계산합니다. 예를 들어, GPU 커널 시작과 CPU 오퍼레이터 종료 간의 차이입니다. 커널 실행 정보는 다음과 같이 생성할 수 있습니다:
 
 .. code-block:: python
 
   analyzer = TraceAnalysis(trace_dir="/path/to/trace/dir")
   kernel_info_df = analyzer.get_cuda_kernel_launch_stats()
 
-A screenshot of the generated dataframe is given below.
+생성된 데이터프레임의 스크린샷은 아래에 있습니다.
 
 .. image:: ../_static/img/hta/cuda_kernel_launch_stats.png
    :scale: 100%
    :align: center
 
-The duration of the CPU op, GPU kernel, and the launch delay allow us to find
-the following:
+CPU 오퍼레이션의 지속 시간, GPU 커널, 그리고 실행 지연을 통해 다음을 찾을 수 있습니다:
 
-* **Short GPU kernels** - GPU kernels with duration less than the corresponding
-  CPU runtime event.
+* **짧은 GPU 커널** - GPU 커널의 지속 시간이 해당 CPU 런타임 이벤트보다 짧은 경우.
 
-* **Runtime event outliers** - CPU runtime events with excessive duration.
+* **런타임 이벤트 이상치** - 과도한 지속 시간을 가진 CPU 런타임 이벤트.
 
-* **Launch delay outliers** - GPU kernels which take too long to be scheduled.
+* **실행 지연 이상치** - 스케줄되기까지 너무 오래 걸리는 GPU 커널.
 
-HTA generates distribution plots for each of the aforementioned three categories.
+HTA는 위에서 언급한 세 가지 카테고리 각각에 대한 분포 플롯을 생성합니다.
 
-**Short GPU kernels**
+**짧은 GPU 커널**
 
-Typically, the launch time on the CPU side ranges from 5-20 microseconds. In some
-cases, the GPU execution time is lower than the launch time itself. The graph
-below helps us to find how frequently such instances occur in the code.
+일반적으로 CPU 측에서의 실행 시간은 5-20 마이크로초 범위입니다. 어떤 경우에는 GPU 실행 시간이 실행 시간보다 더 짧습니다. 아래 그래프는 이러한 사례가 코드에서 얼마나 자주 발생하는지 찾는 데 도움이 됩니다.
 
 .. image:: ../_static/img/hta/short_gpu_kernels.png
 
+**런타임 이벤트 이상치**
 
-**Runtime event outliers**
-
-The runtime outliers depend on the cutoff used to classify the outliers, hence
-the `get_cuda_kernel_launch_stats
-<https://hta.readthedocs.io/en/latest/source/api/trace_analysis_api.html#hta.trace_analysis.TraceAnalysis.get_cuda_kernel_launch_stats>`_
-API provides the ``runtime_cutoff`` argument to configure the value.
+런타임 이상치는 이상치를 분류하는 데 사용된 컷오프에 따라 다릅니다, 따라서 `get_cuda_kernel_launch_stats <https://hta.readthedocs.io/en/latest/source/api/trace_analysis_api.html#hta.trace_analysis.TraceAnalysis.get_cuda_kernel_launch_stats>`_ API는 값을 구성하기 위한 `runtime_cutoff` 인수를 제공합니다.
 
 .. image:: ../_static/img/hta/runtime_outliers.png
 
-**Launch delay outliers**
+**실행 지연 이상치**
 
-The launch delay outliers depend on the cutoff used to classify the outliers,
-hence the `get_cuda_kernel_launch_stats` API provides the
-``launch_delay_cutoff`` argument to configure the value.
+실행 지연 이상치는 이상치를 분류하는 데 사용된 컷오프에 따라 다릅니다, 따라서 `get_cuda_kernel_launch_stats` API는 값을 구성하기 위한 `launch_delay_cutoff` 인수를 제공합니다.
 
 .. image:: ../_static/img/hta/launch_delay_outliers.png
 
-
-Conclusion
+결론
 ~~~~~~~~~~
 
-In this tutorial, you have learned how to install and use HTA,
-a performance tool that enables you analyze bottlenecks in your distributed
-training workflows. To learn how you can use the HTA tool to perform trace
-diff analysis, see `Trace Diff using Holistic Trace Analysis <https://tutorials.pytorch.kr/beginner/hta_trace_diff_tutorial.html>`__.
+
+이 튜토리얼에서 HTA를 설치하고 사용하는 방법을 배웠습니다. HTA는 분산 학습 워크플로우에서 병목 현상을 분석할 수 있게 해주는 성능 도구입니다. HTA 도구를 사용하여 트레이스 비교 분석을 수행하는 방법에 대해 더 배우려면, `Trace Diff using Holistic Trace Analysis <https://tutorials.pytorch.kr/beginner/hta_trace_diff_tutorial.html>`__를 참조하세요.
