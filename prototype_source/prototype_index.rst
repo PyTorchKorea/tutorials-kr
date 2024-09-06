@@ -1,4 +1,4 @@
-PyTorch Prototype Recipes
+파이토치 프로토타입 레시피
 ---------------------------------------------
 Prototype features are not available as part of binary distributions like PyPI or Conda (except maybe behind run-time flags). To test these features we would, depending on the feature, recommend building from master or using the nightly wheels that are made available on `pytorch.org <https://pytorch.org>`_.
 
