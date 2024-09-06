@@ -269,34 +269,34 @@ writer.flush()
 # “NET” 노드를 더블 클릭하여 모델 내 계층과 데이터 흐름을
 # 확인하세요.
 #
-# Visualizing Your Dataset with Embeddings
+# 임베딩으로 데이터셋 시각화하기
 # ----------------------------------------
 #
-# The 28-by-28 image tiles we’re using can be modeled as 784-dimensional
-# vectors (28 \* 28 = 784). It can be instructive to project this to a
-# lower-dimensional representation. The ``add_embedding()`` method will
-# project a set of data onto the three dimensions with highest variance,
-# and display them as an interactive 3D chart. The ``add_embedding()``
-# method does this automatically by projecting to the three dimensions
-# with highest variance.
+# 우리가 사용하는 28x28 이미지 타일은 784차원의
+# 벡터(28 \* 28 = 784)가 될 수 있습니다. 더 낮은 차원으로 투영하는 쪽이
+# 유리할 수 있죠. ``add_embedding()`` 메소드는 
+# 가장 분산이 높은 세 차원으로 데이터 세트를 투영하고,
+# 상호작용 가능한 3D 차트로 시각화해 줄 것입니다. ``add_embedding()``
+# 메소드는 가장 높은 분산을 가진 세 차원에 자동적으로 
+# 투영하여 이를 수행합니다.
 #
-# Below, we’ll take a sample of our data, and generate such an embedding:
+# 아래에서 데이터 샘플을 가져와 임베딩을 생성할 것입니다:
 #
 
-# Select a random subset of data and corresponding labels
+# 데이터의 랜덤 서브셋과 대응하는 레이블을 선택
 def select_n_random(data, labels, n=100):
     assert len(data) == len(labels)
 
     perm = torch.randperm(len(data))
     return data[perm][:n], labels[perm][:n]
 
-# Extract a random subset of data
+# 데이터의 랜덤 서브셋 추출
 images, labels = select_n_random(training_set.data, training_set.targets)
 
-# get the class labels for each image
+# 각 이미지별 클래스 레이블 얻기(get)
 class_labels = [classes[label] for label in labels]
 
-# log embeddings
+# 로그 임베딩
 features = images.view(-1, 28 * 28)
 writer.add_embedding(features,
                     metadata=class_labels,
@@ -306,24 +306,24 @@ writer.close()
 
 
 #######################################################################
-# Now if you switch to TensorBoard and select the PROJECTOR tab, you
-# should see a 3D representation of the projection. You can rotate and
-# zoom the model. Examine it at large and small scales, and see whether
-# you can spot patterns in the projected data and the clustering of
-# labels.
+# 이제 TensorBoard로 전환하여 PROJECTOR 탭을 선택하면,
+# 3D로 표현된 투영이 보일 것입니다. 그 모델을 회전하거나
+# 확대할 수 있습니다. 크거나 작은 규모(scale)로 그것을 살펴보며,
+# 투영된 데이터와 레이블의 클러스터링에서 패턴을 발견할 수 있는지
+# 보세요.
 #
-# For better visibility, it’s recommended to:
+# 가시성을 높이려면, 다음을 권장합니다:
 #
-# - Select “label” from the “Color by” drop-down on the left.
-# - Toggle the Night Mode icon along the top to place the
-#   light-colored images on a dark background.
+# - 좌측에 있는 “Color by” 드롭다운에서 “label”을 선택하세요.
+# - 상단에 있는 야간 모드 아이콘을 전환(toggle)하여
+#   밝은 색상 이미지를 어두운 배경 위에 배치할 수 있습니다.
 #
-# Other Resources
+# 기타 자료
 # ---------------
 #
-# For more information, have a look at:
+# 더 알고 싶다면 여기를 참조하세요:
 #
-# - PyTorch documentation on `torch.utils.tensorboard.SummaryWriter <https://pytorch.org/docs/stable/tensorboard.html?highlight=summarywriter>`__
-# - Tensorboard tutorial content in the `PyTorch.org Tutorials <https://tutorials.pytorch.kr/>`__
-# - For more information about TensorBoard, see the `TensorBoard
-#   documentation <https://www.tensorflow.org/tensorboard>`__
+# - `torch.utils.tensorboard.SummaryWriter <https://pytorch.org/docs/stable/tensorboard.html?highlight=summarywriter>`_\에 대한 PyTorch 문서
+# - `PyTorch.org Tutorials <https://tutorials.pytorch.kr/>`_\에 있는 Tensorboard 튜토리얼 콘텐츠
+# - TensorBoard에 대한 보다 더 자세한 내용은 `TensorBoard
+#   documentation <https://www.tensorflow.org/tensorboard>`_\을 참고하세요.
