@@ -7,10 +7,12 @@
 `Training Models <trainingyt.html>`_ ||
 `Model Understanding <captumyt.html>`_
 
-PyTorch TensorBoard Support
+PyTorch TensorBoard 지원
 ===========================
 
-Follow along with the video below or on `youtube <https://www.youtube.com/watch?v=6CEld3hZgqc>`__.
+**번역**: `박정은 <https://github.com/Angela-Park-JE/>`_
+
+아래 영상이나 `youtube <https://www.youtube.com/watch?v=6CEld3hZgqc>`_\를 참고하세요.
 
 .. raw:: html
 
@@ -18,36 +20,36 @@ Follow along with the video below or on `youtube <https://www.youtube.com/watch?
      <iframe width="560" height="315" src="https://www.youtube.com/embed/6CEld3hZgqc" frameborder="0" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
    </div>
 
-Before You Start
+시작하기에 앞서
 ----------------
 
-To run this tutorial, you’ll need to install PyTorch, TorchVision,
-Matplotlib, and TensorBoard.
+이 튜토리얼을 실행하기 위해서 PyTorch, TorchVision, 
+Matplotlib 그리고 TensorBoard를 설치해야 합니다.
 
-With ``conda``:
+``conda`` 사용 시:
 
 .. code-block:: sh
 
     conda install pytorch torchvision -c pytorch
     conda install matplotlib tensorboard
 
-With ``pip``:
+``pip`` 사용 시:
 
 .. code-block:: sh
 
     pip install torch torchvision matplotlib tensorboard
 
-Once the dependencies are installed, restart this notebook in the Python
-environment where you installed them.
+한번 종속된 모듈을 설치하고 나서, 
+설치한 환경에서 이 노트북을 다시 시작합니다.
 
 
-Introduction
+개요
 ------------
 
-In this notebook, we’ll be training a variant of LeNet-5 against the
-Fashion-MNIST dataset. Fashion-MNIST is a set of image tiles depicting
-various garments, with ten class labels indicating the type of garment
-depicted.
+이 notebook에서는 Fashion-MNIST 데이터셋에 대해 
+변형된 LeNet-5를 학습시킬 것입니다.
+Fashion-MNIST는 의류의 종류를 나타내는 10개의 클래스 레이블을 포함하는 
+다양한 의류의 타일 이미지 세트입니다.
 
 """
 
