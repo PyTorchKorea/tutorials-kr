@@ -160,15 +160,15 @@ writer.flush()
 # 그것을 새 브라우저 탭(보통 `localhost:6006 <localhost:6006>`__)에서 열었다면, 
 # IMAGES 탭에서 이미지 격자를 확인할 수 있을 것입니다.
 #
-# Graphing Scalars to Visualize Training
+# 훈련 시각화를 위한 스칼라 그래프 그리기
 # --------------------------------------
 #
-# TensorBoard is useful for tracking the progress and efficacy of your
-# training. Below, we’ll run a training loop, track some metrics, and save
-# the data for TensorBoard’s consumption.
+# TensorBoard는 훈련 진행 과정과 효과를 추적하기에 
+# 유용합니다. 아래에서 훈련 루프를 실행하고 몇몇 지표를 추적하며 
+# TensorBoard에서 사용할 데이터를 저장할 것입니다.
 #
-# Let’s define a model to categorize our image tiles, and an optimizer and
-# loss function for training:
+# 이미지 타일을 분류할 모델과 옵티마이저 
+# 그리고 훈련의 손실 함수를 정의해 봅시다:
 #
 
 class Net(nn.Module):
@@ -197,16 +197,16 @@ optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
 
 
 ##########################################################################
-# Now let’s train a single epoch, and evaluate the training vs. validation
-# set losses every 1000 batches:
+# 이제 단일 에폭을 훈련하고, 매 1000 배치마다 훈련 셋과 검증 셋의
+# 손실을 평가해 봅니다:
 #
 
 print(len(validation_loader))
-for epoch in range(1):  # loop over the dataset multiple times
+for epoch in range(1):  # 데이터셋을 여러 번 반복
     running_loss = 0.0
 
     for i, data in enumerate(training_loader, 0):
-        # basic training loop
+        # 기본 훈련 루프
         inputs, labels = data
         optimizer.zero_grad()
         outputs = net(inputs)
@@ -215,24 +215,24 @@ for epoch in range(1):  # loop over the dataset multiple times
         optimizer.step()
 
         running_loss += loss.item()
-        if i % 1000 == 999:    # Every 1000 mini-batches...
+        if i % 1000 == 999:    # 매 1000 미니 배치마다...
             print('Batch {}'.format(i + 1))
-            # Check against the validation set
+            # 검증 셋과 비교
             running_vloss = 0.0
 
-            # In evaluation mode some model specific operations can be omitted eg. dropout layer
-            net.train(False) # Switching to evaluation mode, eg. turning off regularisation
+            # 평가 모드에서는 일부 모델의 특정 작업을 생략할 수 있습니다 예시: 드롭아웃 레이어
+            net.train(False) # 평가 모드로 전환, 예시: 정규화(regularisation) 끄기
             for j, vdata in enumerate(validation_loader, 0):
                 vinputs, vlabels = vdata
                 voutputs = net(vinputs)
                 vloss = criterion(voutputs, vlabels)
                 running_vloss += vloss.item()
-            net.train(True) # Switching back to training mode, eg. turning on regularisation
+            net.train(True) # 훈련 모드로 돌아가기, 예시: 정규화 켜기
 
             avg_loss = running_loss / 1000
             avg_vloss = running_vloss / len(validation_loader)
 
-            # Log the running loss averaged per batch
+            # 배치별 평균 실행 손실을 기록
             writer.add_scalars('Training vs. Validation Loss',
                             { 'Training' : avg_loss, 'Validation' : avg_vloss },
                             epoch * len(training_loader) + i)
@@ -244,30 +244,30 @@ writer.flush()
 
 
 #########################################################################
-# Switch to your open TensorBoard and have a look at the SCALARS tab.
+# 열린 TensorBoard로 전환하여 SCALARS탭을 살펴보세요.
 #
-# Visualizing Your Model
+# 모델 시각화하기
 # ----------------------
 #
-# TensorBoard can also be used to examine the data flow within your model.
-# To do this, call the ``add_graph()`` method with a model and sample
-# input:
+# TensorBoard는 모델 내 데이터 흐름을 검사하는 데에도 유용합니다.
+# 이를 위해, 모델과 샘플 입력을 이용해 ``add_graph()`` 메소드를
+# 호출합니다:
 #
 
-# Again, grab a single mini-batch of images
+# 다시, 이미지의 미니 배치 하나를 가져옵니다.
 dataiter = iter(training_loader)
 images, labels = next(dataiter)
 
-# add_graph() will trace the sample input through your model,
-# and render it as a graph.
+# add_graph()는 샘플 입력이 모델을 통과하는 과정을 추적하고,
+# 이를 그래프로 시각화합니다.
 writer.add_graph(net, images)
 writer.flush()
 
 
 #########################################################################
-# When you switch over to TensorBoard, you should see a GRAPHS tab.
-# Double-click the “NET” node to see the layers and data flow within your
-# model.
+# TensorBoard로 전환하면, GRAPHS 탭이 보일 것입니다.
+# “NET” 노드를 더블 클릭하여 모델 내 계층과 데이터 흐름을
+# 확인하세요.
 #
 # Visualizing Your Dataset with Embeddings
 # ----------------------------------------
