@@ -7,7 +7,7 @@
 `Training Models <trainingyt.html>`_ ||
 `Model Understanding <captumyt.html>`_
 
-Building Models with PyTorch
+파이토치로 모델 만들기
 ============================
 
 Follow along with the video below or on `youtube <https://www.youtube.com/watch?v=OSqIP-mOWOI>`__.
