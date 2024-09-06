@@ -10,7 +10,7 @@
 파이토치로 모델 만들기
 ============================
 
-Follow along with the video below or on `youtube <https://www.youtube.com/watch?v=OSqIP-mOWOI>`__.
+아래 비디오를 따라 하거나 또는 `youtube <https://www.youtube.com/watch?v=OSqIP-mOWOI>`__에서 확인하세요.
 
 .. raw:: html
 
