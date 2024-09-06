@@ -53,44 +53,44 @@ Fashion-MNIST는 의류의 종류를 나타내는 10개의 클래스 레이블�
 
 """
 
-# PyTorch model and training necessities
+# PyTorch 모델과 훈련 필수 요소
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 
-# Image datasets and image manipulation
+# 이미지 데이터셋과 이미지 조작
 import torchvision
 import torchvision.transforms as transforms
 
-# Image display
+# 이미지 시각화
 import matplotlib.pyplot as plt
 import numpy as np
 
-# PyTorch TensorBoard support
+# PyTorch TensorBoard 지원
 from torch.utils.tensorboard import SummaryWriter
 
-# In case you are using an environment that has TensorFlow installed,
-# such as Google Colab, uncomment the following code to avoid
-# a bug with saving embeddings to your TensorBoard directory
+# 만약 Google Colab처럼 TensorFlow가 설치된 환경을 사용 중이라면 
+# 아래의 코드를 주석 해제하여 
+# TensorBoard 디렉터리에 임베딩을 저장할 때의 버그를 방지하세요.
 
 # import tensorflow as tf
 # import tensorboard as tb
 # tf.io.gfile = tb.compat.tensorflow_stub.io.gfile
 
 ######################################################################
-# Showing Images in TensorBoard
+# TensorBoard에서 이미지 나타내기
 # -----------------------------
 #
-# Let’s start by adding sample images from our dataset to TensorBoard:
+# 먼저, 데이터셋에서 TensorBoard로 샘플 이미지를 추가합니다:
 #
 
-# Gather datasets and prepare them for consumption
+# 데이터셋을 모아서 사용 가능하도록 준비하기
 transform = transforms.Compose(
     [transforms.ToTensor(),
     transforms.Normalize((0.5,), (0.5,))])
 
-# Store separate training and validations splits in ./data
+# 훈련과 검증으로 분할하여 각각 ./data에 저장하기
 training_set = torchvision.datasets.FashionMNIST('./data',
     download=True,
     train=True,
@@ -111,54 +111,54 @@ validation_loader = torch.utils.data.DataLoader(validation_set,
                                                 shuffle=False,
                                                 num_workers=2)
 
-# Class labels
+# 클래스 레이블
 classes = ('T-shirt/top', 'Trouser', 'Pullover', 'Dress', 'Coat',
         'Sandal', 'Shirt', 'Sneaker', 'Bag', 'Ankle Boot')
 
-# Helper function for inline image display
+# 인라인 이미지 시각화를 위한 함수
 def matplotlib_imshow(img, one_channel=False):
     if one_channel:
         img = img.mean(dim=0)
-    img = img / 2 + 0.5     # unnormalize
+    img = img / 2 + 0.5     # 비정규화(unnormalize)
     npimg = img.numpy()
     if one_channel:
         plt.imshow(npimg, cmap="Greys")
     else:
         plt.imshow(np.transpose(npimg, (1, 2, 0)))
 
-# Extract a batch of 4 images
+# 4개의 이미지로부터 배치 하나를 추출하기
 dataiter = iter(training_loader)
 images, labels = next(dataiter)
 
-# Create a grid from the images and show them
+# 이미지를 나타내기 위한 격자 생성
 img_grid = torchvision.utils.make_grid(images)
 matplotlib_imshow(img_grid, one_channel=True)
 
 
 ########################################################################
-# Above, we used TorchVision and Matplotlib to create a visual grid of a
-# minibatch of our input data. Below, we use the ``add_image()`` call on
-# ``SummaryWriter`` to log the image for consumption by TensorBoard, and
-# we also call ``flush()`` to make sure it’s written to disk right away.
+# 위에서 TorchVision과 Matplotlib을 사용하여 
+# 입력 데이터의 미니 배치를 시각적으로 배열한 격자를 만들었습니다. 아래에서는 TensorBoard에서 사용될 
+# 이미지를 기록하기 위해 ``SummaryWriter`` 의 ``add_image()`` 를 호출하고, 
+# 또한 ``flush()`` 를 호출하여 이미지가 즉시 디스크에 기록되도록 합니다.
 #
 
-# Default log_dir argument is "runs" - but it's good to be specific
-# torch.utils.tensorboard.SummaryWriter is imported above
+# log_dir 인수 기본값은 "runs"입니다 - 하지만 구체적으로 정하는 것이 좋습니다.
+# 위에서 torch.utils.tensorboard.SummaryWriter를 가져왔습니다.
 writer = SummaryWriter('runs/fashion_mnist_experiment_1')
 
-# Write image data to TensorBoard log dir
+# TensorBoard 로그 디렉터리에 이미지 데이터 쓰기(write)
 writer.add_image('Four Fashion-MNIST Images', img_grid)
 writer.flush()
 
-# To view, start TensorBoard on the command line with:
+# 눈으로 보기 위해서는 커맨드 라인에서 TensorBoard를 시작하세요:
 #   tensorboard --logdir=runs
-# ...and open a browser tab to http://localhost:6006/
+# ...그런 다음 브라우저에서 http://localhost:6006/ 를 열어보세요.
 
 
 ##########################################################################
-# If you start TensorBoard at the command line and open it in a new
-# browser tab (usually at `localhost:6006 <localhost:6006>`__), you should
-# see the image grid under the IMAGES tab.
+# 만약 TensorBoard를 커맨드 라인에서 구동시켜 
+# 그것을 새 브라우저 탭(보통 `localhost:6006 <localhost:6006>`__)에서 열었다면, 
+# IMAGES 탭에서 이미지 격자를 확인할 수 있을 것입니다.
 #
 # Graphing Scalars to Visualize Training
 # --------------------------------------
