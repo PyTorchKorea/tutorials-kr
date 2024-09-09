@@ -53,7 +53,7 @@ torch.save(model, 'model.pth')
 ########################
 # 다음과 같이 모델을 불러올 수 있습니다:
 
-model = torch.load('model.pth')
+model = torch.load('model.pth', weights_only=False),
 
 ########################
 # .. note:: 이 접근 방식은 Python `pickle <https://docs.python.org/3/library/pickle.html>`_ 모듈을 사용하여 모델을 직렬화(serialize)하므로, 모델을 불러올 때 실제 클래스 정의(definition)를 적용(rely on)합니다.
