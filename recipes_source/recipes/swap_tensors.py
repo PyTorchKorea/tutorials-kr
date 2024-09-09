@@ -168,12 +168,12 @@ torch.__future__.set_swap_module_params_on_conversion(False)
 #
 # 다음 예제에서는 ``MyQuantizedLinearWeight`` 서브클래스를 사용하여
 # 위에서 정의된 기능을 사용하여
-# 선형 레이어의 가중치에 사용자 정의 양자화 방식을 적용하는 방법을 보여줍니다.
 # ``state_dict``를 로드할 때.
+# 선형 레이어의 가중치에 사용자 정의 양자화 방식을 적용하는 방법을 보여줍니다.
 #
-# ``module_load``에 대한 ``__torch_function__`` 핸들러는 호출됩니다.
+# ``module_load``에 대한 ``__torch_function__`` 
 # ``self`` 또는 ``other`` (이 경우 ``param`` 또는
-# ``state_dict[param_key]``)가 ``MyQuantizedLinearWeight`` 서브클래스인 경우.
+# ``state_dict[param_key]``)가 ``MyQuantizedLinearWeight`` 서브클래스인 경우  핸들러는 호출됩니다.
 #
 # ``state_dict``가 일반 텐서를 포함하고 있다고 가정하고,
 # 모듈이 ``MyQuantizedLinearWeight`` 파라미터를 포함하고 있으며,
@@ -233,9 +233,9 @@ print(f"m.state_dict() after load_state_dict():\n {m.state_dict()}")
 # 시나리오에 따라 ``module_load``에 대한 ``__torch_function__`` 핸들러를 정의할 수 있습니다.
 # 필요에 따라 변환을 적용합니다.
 #
-# Conclusion
+# 결론
 # ----------
 # 이번 레시피에서는 ``swap_tensors``와 ``nn.Module``에서 파라미터의 참조를 보존하는 것의 중요성에 대해 배웠습니다.
 # ``nn.Module``에서 파라미터의 참조를 보존하는 것과 
-# 제어되는 두 가지 새로운 확장 지점을 사용하는 방법에 대해서도 배웠습니다.
 # ``torch.__future__.set_swap_module_params_on_conversion``에 의해
+# 제어되는 두 가지 새로운 확장 지점을 사용하는 방법에 대해서도 배웠습니다.
