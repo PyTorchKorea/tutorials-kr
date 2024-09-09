@@ -52,7 +52,7 @@ torch.save(model, 'model.pth')
 
 ########################
 # 다음과 같이 모델을 불러올 수 있습니다:
-#
+# 
 # `Saving and loading torch.nn.Modules <pytorch.org/docs/main/notes/serialization.html#saving-and-loading-torch-nn-modules>`__에서 설명한 것처럼,
 # ``state_dict``를 저장하는 것이 가장 좋은 방법으로 간주됩니다.
 # 하지만 아래에서는 ``weights_only=False``를 사용하는데,
