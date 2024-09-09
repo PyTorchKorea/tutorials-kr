@@ -52,6 +52,11 @@ torch.save(model, 'model.pth')
 
 ########################
 # 다음과 같이 모델을 불러올 수 있습니다:
+#
+# `Saving and loading torch.nn.Modules <pytorch.org/docs/main/notes/serialization.html#saving-and-loading-torch-nn-modules>`__에서 설명한 것처럼,
+# ``state_dict``를 저장하는 것이 가장 좋은 방법으로 간주됩니다.
+# 하지만 아래에서는 ``weights_only=False``를 사용하는데,
+# 이는 모델을 로드하는 것을 포함하기 때문이며, ``torch.save``의 레거시 사용 사례입니다.
 
 model = torch.load('model.pth', weights_only=False),
 
