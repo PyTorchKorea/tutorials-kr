@@ -173,7 +173,7 @@ torch.__future__.set_swap_module_params_on_conversion(False)
 #
 # ``module_load``에 대한 ``__torch_function__`` 
 # ``self`` 또는 ``other`` (이 경우 ``param`` 또는
-# ``state_dict[param_key]``)가 ``MyQuantizedLinearWeight`` 서브클래스인 경우  핸들러는 호출됩니다.
+# ``state_dict[param_key]``)가 ``MyQuantizedLinearWeight`` 서브클래스인 경우  핸들러가 호출됩니다.
 #
 # ``state_dict``가 일반 텐서를 포함하고 있다고 가정하고,
 # 모듈이 ``MyQuantizedLinearWeight`` 파라미터를 포함하고 있으며,
