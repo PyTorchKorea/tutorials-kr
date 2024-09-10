@@ -337,14 +337,12 @@ print(maxpool_layer(my_tensor))
 
 
 #########################################################################
-# If you look closely at the values above, you’ll see that each of the
-# values in the maxpooled output is the maximum value of each quadrant of
-# the 6x6 input.
+# 위의 값을 자세히 보면, 맥스풀링된 출력의 각 값이 6x6 입력의 각 사분면에서 
+# 최대값이라는 것을 알 수 있습니다.
 #
-# **Normalization layers** re-center and normalize the output of one layer
-# before feeding it to another. Centering and scaling the intermediate
-# tensors has a number of beneficial effects, such as letting you use
-# higher learning rates without exploding/vanishing gradients.
+# **정규화 레이어**는 한 레이어의 출력을 다른 레이어에 전달하기 전에 다시 중심화하고 
+# 정규화합니다. 중간 텐서를 중심화하고 스케일링하는 것은 기울기 폭발/소실 없이 더 
+# 높은 학습률을 사용할 수 있게 하는 등 여러 가지 유익한 효과를 제공합니다.
 #
 
 my_tensor = torch.rand(1, 4, 4) * 20 + 5
