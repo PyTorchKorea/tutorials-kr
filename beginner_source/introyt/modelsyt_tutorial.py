@@ -361,27 +361,25 @@ print(normed_tensor.mean())
 
 
 ##########################################################################
-# Running the cell above, we’ve added a large scaling factor and offset to
-# an input tensor; you should see the input tensor’s ``mean()`` somewhere
-# in the neighborhood of 15. After running it through the normalization
-# layer, you can see that the values are smaller, and grouped around zero
-# - in fact, the mean should be very small (> 1e-8).
+# 위의 셀을 실행하면 입력 텐서에 큰 스케일링 요소와 오프셋을 추가했습니다.
+# 입력 텐서의 ``mean()`` 값이 약 15에 가까운 것을 볼 수 있습니다.
+# 이를 정규화 레이어를 통해 실행하면 값들이 더 작아지고 0 주위로 그룹화됩니다.
+# 실제로 평균은 매우 작아야 합니다 (> 1e-8).
 #
-# This is beneficial because many activation functions (discussed below)
-# have their strongest gradients near 0, but sometimes suffer from
-# vanishing or exploding gradients for inputs that drive them far away
-# from zero. Keeping the data centered around the area of steepest
-# gradient will tend to mean faster, better learning and higher feasible
-# learning rates.
+# 이는 유익한데, 왜냐하면 많은 활성화 함수들(아래에서 논의)은 0 근처에서
+# 가장 강한 기울기를 갖지만, 때때로 입력이 0에서 멀리 떨어지게 하는 경우
+# 기울기 소실 또는 폭발 문제가 발생할 수 있기 때문입니다.
+# 데이터를 가장 가파른 기울기 주변에 유지하면 일반적으로 더 빠르고,
+# 더 나은 학습과 더 높은 학습률이 가능합니다.
 #
-# **Dropout layers** are a tool for encouraging *sparse representations*
-# in your model - that is, pushing it to do inference with less data.
+# **드롭아웃 레이어**는 모델 내에서 *희소 표현*을 장려하기 위한 도구입니다.
+# 즉, 더 적은 데이터로 추론을 수행하도록 모델을 푸시하는 것입니다.
 #
-# Dropout layers work by randomly setting parts of the input tensor
-# *during training* - dropout layers are always turned off for inference.
-# This forces the model to learn against this masked or reduced dataset.
-# For example:
-#
+# 드롭아웃 레이어는 학습 중에 입력 텐서의 일부를 무작위로 설정하여 작동합니다
+# - 드롭아웃 레이어는 항상 추론 시에는 꺼져 있습니다.
+# 이는 모델이 이 마스킹되거나 축소된 데이터셋을 학습하도록 강제합니다.
+# 예를 들어:
+# 
 
 my_tensor = torch.rand(1, 4, 4)
 
