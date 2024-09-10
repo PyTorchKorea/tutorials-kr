@@ -391,32 +391,29 @@ print(dropout(my_tensor))
 
 
 ##########################################################################
-# Above, you can see the effect of dropout on a sample tensor. You can use
-# the optional ``p`` argument to set the probability of an individual
-# weight dropping out; if you don’t it defaults to 0.5.
+# 위에서 드롭아웃이 샘플 텐서에 미치는 효과를 볼 수 있습니다. 개별 가중치가 
+# 드롭아웃될 확률을 설정하기 위해 선택적으로 `p` 인수를 사용할 수 있으며, 
+# 설정하지 않으면 기본값은 0.5입니다.
 #
-# Activation Functions
+# 활성화 함수
 # ~~~~~~~~~~~~~~~~~~~~
 #
-# Activation functions make deep learning possible. A neural network is
-# really a program - with many parameters - that *simulates a mathematical
-# function*. If all we did was multiple tensors by layer weights
-# repeatedly, we could only simulate *linear functions;* further, there
-# would be no point to having many layers, as the whole network would
-# reduce could be reduced to a single matrix multiplication. Inserting
-# *non-linear* activation functions between layers is what allows a deep
-# learning model to simulate any function, rather than just linear ones.
+# 활성화 함수는 딥러닝을 가능하게 만듭니다. 신경망은 사실 많은 파라미터를 
+# 가진 *수학적 함수를 시뮬레이션*하는 프로그램입니다. 만약 우리가 텐서를 
+# 레이어 가중치로 반복적으로 곱하기만 한다면, *선형 함수*만을 시뮬레이션할 
+# 수 있을 뿐입니다. 게다가, 모든 레이어를 하나의 행렬 곱셈으로 축소할 수 
+# 있기 때문에 여러 레이어를 가질 필요가 없을 것입니다. 레이어 사이에 
+# *비선형* 활성화 함수를 삽입하는 것이 딥러닝 모델이 단순히 선형 함수가 
+# 아닌 어떤 함수든 시뮬레이션할 수 있게 하는 요소입니다.
 #
-# ``torch.nn.Module`` has objects encapsulating all of the major
-# activation functions including ReLU and its many variants, Tanh,
-# Hardtanh, sigmoid, and more. It also includes other functions, such as
-# Softmax, that are most useful at the output stage of a model.
+# `torch.nn.Module`은 ReLU 및 그 변형들, Tanh, Hardtanh, sigmoid 등의 
+# 주요 활성화 함수를 캡슐화한 객체를 포함하고 있습니다. 또한, 모델의 출력 
+# 단계에서 가장 유용한 Softmax와 같은 다른 함수들도 포함하고 있습니다.
 #
-# Loss Functions
+# 손실 함수
 # ~~~~~~~~~~~~~~
 #
-# Loss functions tell us how far a model’s prediction is from the correct
-# answer. PyTorch contains a variety of loss functions, including common
-# MSE (mean squared error = L2 norm), Cross Entropy Loss and Negative
-# Likelihood Loss (useful for classifiers), and others.
+# 손실 함수는 모델의 예측이 정답과 얼마나 차이가 나는지를 알려줍니다. 
+# PyTorch에는 일반적인 MSE (평균 제곱 오차 = L2 노름), 교차 엔트로피 
+# 손실, 그리고 분류기에 유용한 음의 가능도 손실 등 다양한 손실 함수가 포함되어 있습니다.
 #
