@@ -40,7 +40,7 @@ Matplotlib 그리고 TensorBoard를 설치해야 합니다.
     pip install torch torchvision matplotlib tensorboard
 
 한번 종속된 모듈을 설치하고 나서, 
-설치한 환경에서 이 노트북을 다시 시작합니다.
+설치한 환경에서 이 notebook을 다시 시작합니다.
 
 
 개요
