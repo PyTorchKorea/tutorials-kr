@@ -1,7 +1,7 @@
 PyTorch를 이용한 NLP를 위한 딥러닝
 **********************************
-**저자** : `Robert Guthrie <https://github.com/rguthrie3/DeepLearningForNLPInPytorch>`_
-**번역** : `오수연 <github.com/oh5221>`_
+**저자**: `Robert Guthrie <https://github.com/rguthrie3/DeepLearningForNLPInPytorch>`_
+**번역**: `오수연 <github.com/oh5221>`_
 
 이 튜토리얼은 PyTorch를 사용한 딥러닝 프로그램의 주요 아이디어에 대해
 차근차근 살펴볼 것입니다. 많은 개념들(계산 그래프 추상화 및
