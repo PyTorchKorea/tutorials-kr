@@ -1,9 +1,10 @@
-전체론적 추적 분석 소개
+전체론적(Holistic Trace Analysis) 추적 분석 소개
 =======================================
 
-**저자:** `Anupam Bhatnagar <https://github.com/anupambhatnagar>`_
+**저자:** `Anupam Bhatnagar <https://github.com/anupambhatnagar>`_ **번역**: `Jaeseong Park <https://github.com/jaeseong98>`_
 
-이 튜토리얼에서는 분산 학습 작업의 추적을 분석하기 위해 전체론적 추적 분석(Holistic Trace Analysis, HTA)을 사용하는 방법을 보여줍니다. 시작하려면 아래 단계를 따르세요.
+이 튜토리얼에서는 분산 학습 작업의 추적을 분석하기 위해 전체론적 추적 분석(Holistic Trace Analysis, HTA)을 사용하는 방법을 보여줍니다. 
+시작하려면 아래 단계를 따르세요.
 
 HTA 설치하기
 ~~~~~~~~~~~~~~
@@ -31,7 +32,7 @@ HTA를 설치하기 위해 Conda 환경을 사용하는 것을 권장합니다. 
 시작하기
 ~~~~~~~~~~~~~~~
 
-Jupyter 노트북을 실행하고 `trace_dir` 변수를 추적 파일이 있는 위치로 설정하세요.
+Jupyter 노트북을 실행하고 ``trace_dir`` 변수를 추적 파일이 있는 위치로 설정하세요.
 
 .. code-block:: python
 
@@ -59,7 +60,7 @@ GPU를 효과적으로 활용하기 위해서는 특정 작업에 대해 GPU가 
 
 .. image:: ../_static/img/hta/temporal_breakdown_df.png
 
-`get_temporal_breakdown <https://hta.readthedocs.io/en/latest/source/api/trace_analysis_api.html#hta.trace_analysis.TraceAnalysis.get_temporal_breakdown>`_ 함수에서 `visualize` 인수를 `True`로 설정하면 랭크별 분석을 나타내는 막대 그래프도 생성됩니다.
+`get_temporal_breakdown <https://hta.readthedocs.io/en/latest/source/api/trace_analysis_api.html#hta.trace_analysis.TraceAnalysis.get_temporal_breakdown>`_ 함수에서 ``visualize`` 인수를 ``True``로 설정하면 랭크별 분석을 나타내는 막대 그래프도 생성됩니다.
 
 .. image:: ../_static/img/hta/temporal_breakdown_plot.png
 
@@ -79,7 +80,7 @@ GPU가 유휴 상태로 보내는 시간과 그 이유에 대한 통찰을 얻�
 
    | **연속적인 커널 사이의 간격 < 임계값**
 
-기본 임계값은 30 나노초이며 `consecutive_kernel_delay` 인수를 사용하여 구성할 수 있습니다. 기본적으로 유휴 시간 분석은 랭크 0에 대해서만 계산됩니다. 다른 랭크에 대해 분석을 계산하려면 `get_idle_time_breakdown <https://hta.readthedocs.io/en/latest/source/api/trace_analysis_api.html#hta.trace_analysis.TraceAnalysis.get_idle_time_breakdown>`_ 함수에서 `ranks` 인수를 사용하세요. 유휴 시간 분석은 다음과 같이 생성할 수 있습니다:
+기본 임계값은 30 나노초이며 ``consecutive_kernel_delay`` 인수를 사용하여 구성할 수 있습니다. 기본적으로 유휴 시간 분석은 랭크 0에 대해서만 계산됩니다. 다른 랭크에 대해 분석을 계산하려면 `get_idle_time_breakdown <https://hta.readthedocs.io/en/latest/source/api/trace_analysis_api.html#hta.trace_analysis.TraceAnalysis.get_idle_time_breakdown>`_ 함수에서 ``ranks`` 인수를 사용하세요. 유휴 시간 분석은 다음과 같이 생성할 수 있습니다:
 
 .. code-block:: python
 
