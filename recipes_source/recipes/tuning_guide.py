@@ -4,27 +4,27 @@
 **저자**: `Szymon Migacz <https://github.com/szmigacz>`_
 **역자**: `오왕택 <https://github.com/ohkingtaek>`_
 
-성능 튜닝 가이드는 PyTorch에서 딥러닝 모델의 학습이나 추론 속도를 향상시킬 수 있는 최적화 기법들과 같은 좋은 예시를 소개합니다.
-제시된 기법들은 몇 줄의 코드만 변경해서 구현 가능하며, 모든 도메인의 다양한 딥러닝 모델에 적용할 수 있습니다.
+성능 튜닝 가이드는 PyTorch에서 딥러닝 모델의 학습이나 추론 속도를 향상시킬 수 있는 최적화 기법과 같은 좋은 예시를 소개합니다.
+제시된 기법은 몇 줄의 코드만 변경해서 구현 가능하며, 모든 도메인의 다양한 딥러닝 모델에 적용할 수 있습니다.
 
-일반적인 최적화 기법들
+일반적인 최적화 기법
 ---------------------
 """
 
 ###############################################################################
-# 비동기식으로 데이터 가져오기 및 데이터 증강을 활성화하는 방법
+# 비동기식으로 데이터 가져오기 및 데이터 증강법
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # `torch.utils.data.DataLoader <https://pytorch.org/docs/stable/data.html#torch.utils.data.DataLoader>`_
 # 는 각각 워커의 subprocess에서 비동기식 데이터 로딩과 데이터 증강을 지원합니다. 
 # ``DataLoader`` 의 num_worker 기본 설정은 ``num_worker=0`` 으로, 이는 데이터 로딩이 
-# 동기적으로 이루어지며 메인 프로세스에서 실행됨을 의미합니다. 결론은 메인 학습 프로세스는 데이터를 
+# 동기적으로 이루어지며 메인 프로세스에서 실행됨을 의미합니다. 결과적으로 메인 학습 프로세스는 데이터를 
 # 사용할 수 있을 때까지 기다려야 실행할 수 있습니다.
 #
 # ``num_workers > 0`` 으로 설정하면 비동기식 데이터 로딩과 학습과 데이터 로딩의 동시 처리가 
 # 가능해집니다. ``num_workers`` 값은 작업량, CPU, GPU, 학습 데이터의 위치에 따라 조정해야 
 # 합니다.
 #
-# ``DataLoader`` 는 ``pin_memory`` 인자를 받으며, 기본값은 ``False`` 입니다. GPU를 
+# ``DataLoader`` 는 ``pin_memory`` 인자를 받으며 기본값은 ``False`` 입니다. GPU를 
 # 사용하는 경우 ``pin_memory=True`` 로 설정하는 것이 좋습니다. 이는 ``DataLoader`` 가 
 # 고정된 메모리를 사용하게 되고, 호스트에서 GPU로 더 빠르고 비동기적인 메모리 복사를 가능하게 합니다.
 
@@ -40,7 +40,7 @@
 # 는 함수 데코레이터로도 사용할 수 있습니다.
 
 ###############################################################################
-# 합성곱 계층 이후에 바로 배치 정규화 계층이 오는 경우, 편향을 비활성화하는 방법
+# 합성곱 계층 이후에 바로 배치 정규화 계층이 오는 경우에 편향을 비활성화하는 방법
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # `torch.nn.Conv2d() <https://pytorch.org/docs/stable/generated/torch.nn.Conv2d.html#torch.nn.Conv2d>`_ 
 # 함수에는 기본적으로 ``bias`` 매개변수가 ``True`` 로 설정되어 있습니다 (이는 
@@ -49,15 +49,15 @@
 # `Conv3d <https://pytorch.org/docs/stable/generated/torch.nn.Conv3d.html#torch.nn.Conv3d>`_
 # 에서도 동일합니다).
 #
-# 만약 ``nn.Conv2d`` 계층 바로 뒤에 ``nn.BatchNorm2d`` 계층이 이어진다면, 합성곱 계층에서 
+# ``nn.Conv2d`` 계층 바로 뒤에 ``nn.BatchNorm2d`` 계층이 이어진다면 합성곱 계층에서 
 # 편향은 필요하지 않으므로 ``nn.Conv2d(..., bias=False, ...)`` 로 설정하세요. 
 # ``BatchNorm2d`` 의 첫 단계에서 평균을 빼주기 때문에 필요하지 않으며, 이는 편향의 효과를 
 # 상쇄시킵니다.
 #
-# 이 원리는 1차원 및 3차원 합성곱에서도 동일하게 적용되며, ``BatchNorm`` (또는 다른 정규화 
+# 이 원리는 1차원 및 3차원 합성곱에서도 동일하게 적용되며 ``BatchNorm`` (또는 다른 정규화 
 # 계층)이 합성곱의 편향과 동일한 차원을 정규화할 경우에 해당됩니다.
 #
-# `torchvision <https://github.com/pytorch/vision>`_ 에서 제공하는 모델들은 
+# `torchvision <https://github.com/pytorch/vision>`_ 에서 제공하는 모델은 
 # 이미 이 최적화를 구현하고 있습니다.
 
 ###############################################################################
@@ -78,7 +78,7 @@ for param in model.parameters():
 # 두 번째 코드는 각 개별 매개변수의 메모리를 0으로 초기화하지 않으며, 
 # 이후의 역전파 과정에서 변화도를 저장할 때 더하기 대신 대입 연산을 사용하여 메모리 연산 수를 줄입니다.
 #
-# 변화도를 0으로 설정하는 것과 ``None`` 으로 설정하는 것은 약간의 수치적 차이가 있으므로, 자세한 
+# 변화도를 0으로 설정하는 것과 ``None`` 으로 설정하는 것은 약간의 수치적 차이가 있으므로 자세한 
 # 내용은 
 # `torch.optim <https://pytorch.org/docs/master/optim.html#torch.optim.Optimizer.zero_grad>`_
 # 를 참조하세요.
@@ -92,21 +92,21 @@ for param in model.parameters():
 # 행렬에서 element-wise 덧셈, 곱셈 같은 연산과 `sin()` , `cos()` , `sigmoid()` 같은 수학 
 # 함수 등의 point-wise 연산들은 하나의 커널로 결합할 수 있습니다. 이러한 결합은 메모리 접근과 커널 
 # 실행 시간을 줄이는 데 도움이 됩니다. 일반적으로 point-wise 연산은 메모리에 바인딩됩니다.
-# PyTorch의 eager-mode에서는 각 연산마다 커널을 실행하므로, 메모리에서 데이터를 불러와 연산을 
-# 수행하고 (종종 가장 시간이 적게 걸리는 단계), 결과를 다시 메모리에 쓰는 과정이 필요합니다.
+# PyTorch의 eager-mode에서는 각 연산마다 커널을 실행하므로 메모리에서 데이터를 불러와 연산을 
+# 수행하고 (종종 가장 시간이 적게 걸리는 단계) 결과를 다시 메모리에 쓰는 과정이 필요합니다.
 #
 # 결합된 연산자를 사용하면 여러 point-wise 연산을 위해 단 하나의 커널만 실행되고, 데이터는 한 
 # 번만 로드되고 저장됩니다. 특히 이러한 효율적인 방법은 활성화 함수, 옵티마이저, 직접 수정한 RNN 셀 
 # 등에서 유용합니다.
 #
 # PyTorch 2에서는 TorchInductor라는 컴파일러를 통해 자동으로 커널을 결합하는 compile-mode를 
-# 도입했습니다. TorchInductor는 단순한 element-wise 연산뿐만 아니라, 최적의 성능을 위해 
+# 도입했습니다. TorchInductor는 단순한 element-wise 연산뿐만 아니라 최적의 성능을 위해 
 # point-wise 연산과 축소(reduction) 연산을 고급 결합할 수 있는 기능을 제공하여 성능을 
 # 최적화합니다.
 #
 # 가장 간단한 경우, 연산 결합은 함수 정의에 
 # `torch.compile <https://pytorch.org/docs/stable/generated/torch.compile.html>`_ 
-# 데코레이터를 적용하여 활성화할 수 있습니다. 예:
+# 데코레이터를 적용하여 활성화할 수 있습니다. 예시:
 
 @torch.compile
 def gelu(x):
@@ -126,7 +126,7 @@ def gelu(x):
 # `AMP <https://pytorch.org/docs/stable/amp.html>`_
 # 와 함께 사용할 수 있도록 설계되었습니다.
 #
-# ``channels_last`` 기능은 아직 실험 단계에 있지만, 표준 컴퓨터 비전 모델(예: ResNet-50, 
+# ``channels_last`` 기능은 아직 실험 단계에 있지만 표준 컴퓨터 비전 모델(예시: ResNet-50, 
 # SSD)에서는 동작할 것으로 예상됩니다. 모델을 ``channels_last`` 형식으로 변환하는 방법에 대해서는 
 # `(베타) PyTorch를 사용한 Channels Last 메모리 형식 <https://tutorials.pytorch.kr/intermediate/memory_format_tutorial.html>`_
 # 을 참조하세요. 튜토리얼에는
@@ -138,13 +138,13 @@ def gelu(x):
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # 버퍼 체크포인트 저장은 모델 학습 중 메모리 용량 부담을 완화하기 위한 기법입니다. 역전파에서 앞부분의 
 # 변화도를 계산하기 위해 모든 계층의 입력을 저장하는 대신, 일부 계층의 입력만 저장하고 나머지는
-# 역전파 중에 재계산합니다. 메모리 요구 사항이 줄어들어 배치 크기를 증가시킬 수 있으며, 이는 활용도를 
-# 개선할 수 있습니다.
+# 역전파 중에 재계산합니다. 메모리 요구 사항이 줄어들어 배치 크기를 증가시킬 수 있으며, 이는 활용 
+# 효율을 개선할 수 있습니다.
 #
 # 체크포인트 저장할 대상은 신중하게 선택해야 합니다. 가장 좋은 방법은 재계산 비용이 적은 대규모 
-# 레이어의 출력을 저장하지 않는 것입니다. 예를 들어, 활성화 함수(예: ``ReLU`` , ``Sigmoid`` , 
-# ``Tanh`` ), up/down 샘플링, 그리고 적은 축적 뎁스를 가진 행렬-벡터 연산 등이 체크포인트 저장 
-# 대상으로 적합합니다.
+# 레이어의 출력을 저장하지 않는 것입니다. 예를 들어, 활성화 함수(예시: ``ReLU`` , ``Sigmoid`` 
+# , ``Tanh`` ), up/down 샘플링, 작은 누적 깊이(accumulation depth)를 가진 행렬-벡터 연산 
+# 등이 체크포인트 저장 대상으로 적합합니다.
 #
 # PyTorch는 자동으로 체크포인트 저장 및 재계산을 수행하는 
 # `torch.utils.checkpoint <https://pytorch.org/docs/stable/checkpoint.html>`_ 
@@ -153,7 +153,7 @@ def gelu(x):
 ###############################################################################
 # 디버깅 API 비활성화
 # ~~~~~~~~~~~~~~~~~~~~~~
-# 많은 PyTorch API는 디버깅을 위해 설계되었으며, 정규 학습 실행 시에는 비활성화해야 합니다.
+# 많은 PyTorch API는 디버깅을 위해 설계되었으며 정규 학습 실행 시에는 비활성화해야 합니다.
 #
 # * 이상탐지 (anomaly detection):
 #   `torch.autograd.detect_anomaly <https://pytorch.org/docs/stable/autograd.html#torch.autograd.detect_anomaly>`_
@@ -201,7 +201,7 @@ def gelu(x):
 # ``OMP_NUM_THREADS`` 는 계산 속도를 높이는 가장 간단한 환경 변수입니다. 이는 OpenMP 계산에 
 # 사용되는 스레드 수를 결정합니다.
 # CPU 친화도 설정은 작업이 여러 코어에 분배되는 방식을 제어합니다. 이는 통신 오버헤드와 캐시 라인 
-# 무효화 오버헤드 또는 페이지 스레싱 등에 영향을 미치므로, CPU 친화도를 적절히 설정하면 성능 향상이 
+# 무효화 오버헤드 또는 페이지 스레싱 등에 영향을 미치므로 CPU 친화도를 적절히 설정하면 성능 향상이 
 # 가능합니다. ``GOMP_CPU_AFFINITY`` 와 ``KMP_AFFINITY`` 는 OpenMP 스레드를 물리적 처리 
 # 장치에 바인딩하는 방법을 결정합니다. 자세한 정보는 
 # `여기 <https://intel.github.io/intel-extension-for-pytorch/cpu/latest/tutorials/performance_tuning/tuning_guide.html>`_
@@ -215,7 +215,7 @@ def gelu(x):
 #    export OMP_NUM_THREADS=N
 
 ###############################################################################
-# 일반적으로, GNU OpenMP 구현에서 CPU 친화도를 설정하기 위해 다음 환경 변수를 사용합니다. 
+# 일반적으로 GNU OpenMP 구현에서 CPU 친화도를 설정하기 위해 다음 환경 변수를 사용합니다. 
 # ``OMP_PROC_BIND`` 는 스레드가 프로세서 간에 이동할 수 있는지 여부를 지정합니다. 이를 CLOSE로 
 # 설정하면 OpenMP 스레드가 기본 스레드에 가까운 위치 파티션에 유지됩니다. ``OMP_SCHEDULE`` 는 
 # OpenMP 스레드가 어떻게 스케줄링 되는지를 결정합니다. ``GOMP_CPU_AFFINITY`` 는 스레드를 특정 
@@ -243,7 +243,7 @@ def gelu(x):
 # GNU OpenMP의 CPU 친화도 설정과 유사하게, ``libiomp`` 에서도 CPU 친화도 설정을 제어하는 환경 
 # 변수가 제공됩니다. ``KMP_AFFINITY`` 는 OpenMP 스레드를 물리적 처리 장치에 바인딩합니다. 
 # ``KMP_BLOCKTIME`` 은 스레드가 병렬 영역의 실행을 완료한 후 대기해야 하는 시간을 ms 단위로 
-# 설정합니다. 대부분의 경우, ``KMP_BLOCKTIME`` 을 1 또는 0으로 설정하면 좋은 성능을 얻을 수 
+# 설정합니다. 대부분의 경우 ``KMP_BLOCKTIME`` 을 1 또는 0으로 설정하면 좋은 성능을 얻을 수 
 # 있습니다. 다음 명령어는 Intel OpenMP 런타임 라이브러리에서의 일반적인 설정입니다.
 #
 # .. code-block:: sh
@@ -260,7 +260,7 @@ def gelu(x):
 # 을 구현한 것으로, 단편화 방지와 확장 가능한 동시성 지원에 중점을 둡니다. 
 # `TCMalloc <https://google.github.io/tcmalloc/overview.html>`_ 은 또한 프로그램 
 # 실행 속도를 높이기 위한 몇 가지 최적화를 제공합니다. 그 중 하나는 메모리를 캐시에 보관하여 자주 
-# 사용되는 객체에 대한 접근 속도를 높이는 것입니다. 이러한 캐시를 할당 해제 후에도 유지하면, 나중에 
+# 사용되는 객체에 대한 접근 속도를 높이는 것입니다. 이러한 캐시를 할당 해제 후에도 유지하면 나중에 
 # 메모리가 다시 할당될 때 비용이 많이 드는 시스템 호출을 피하는 데 도움이 됩니다. 이들 중 하나를 
 # 사용하려면 환경 변수 ``LD_PRELOAD`` 를 설정하십시오.
 #
@@ -276,7 +276,7 @@ def gelu(x):
 # 데이터 유형에 대해 베타 기능으로 지원됩니다. oneDNN Graph는 모델의 그래프를 받아서 예제 입력의 
 # 모양을 고려하여 연산자 결합 후보를 식별합니다. 모델은 예제 입력을 사용하여 JIT-traced 되어야 
 # 합니다. 동일한 모양의 입력에 대해 몇 번의 워밍업 후 속도가 향상될 수 있습니다. 아래의 예제 
-# 코드는 resnet50에 대한 것이지만, 사용자가 원하는 모델에서도 oneDNN Graph를 사용할 수 있습니다.
+# 코드는 resnet50에 대한 것이지만 사용자가 원하는 모델에서도 oneDNN Graph를 사용할 수 있습니다.
 
 # oneDNN Graph를 사용하려면 이 추가 코드 한 줄로 충분합니다.
 torch.jit.enable_onednn_fusion(True)
@@ -295,7 +295,7 @@ traced_model = torch.jit.trace(model, sample_input)
 traced_model = torch.jit.freeze(traced_model)
 
 ###############################################################################
-# 모델이 sample_input을 사용해 JIT-traced되면, 몇 번의 워밍업 후 추론에 사용할 수 있습니다.
+# 모델이 sample_input을 사용해 JIT-traced되면 몇 번의 워밍업 후 추론에 사용할 수 있습니다.
 
 with torch.no_grad():
     # 몇 번의 워밍업
@@ -307,15 +307,15 @@ with torch.no_grad():
 ###############################################################################
 # oneDNN Graph용 JIT fuser는 ``BFloat16`` 데이터 타입을 사용한 추론도 지원하지만, oneDNN 
 # Graph의 성능 이점은 AVX512_BF16 명령어 세트 아키텍처(ISA)의 머신에서 나타납니다. 
-# 다음 코드 예시는 oneDNN Graph를 사용해 ``BFloat16`` 데이터 타입으로 추론하는 예시입니다:
+# 다음 코드 예시는 oneDNN Graph를 사용해 ``BFloat16`` 데이터 타입으로 추론하는 예시입니다.
 
-# JIT 모드의 AMP는 기본적으로 활성화되어 있으며, eager 모드와 다르게 작동합니다.
+# JIT 모드의 AMP는 기본적으로 활성화되어 있으며 eager 모드와 다르게 작동합니다.
 torch._C._jit_set_autocast_mode(False)
 
 with torch.no_grad(), torch.cpu.amp.autocast(cache_enabled=False, dtype=torch.bfloat16):
     # CNN 기반 비전 모델의 Conv-BatchNorm folding은 AMP를 사용할 때 ``torch.fx.experimental.optimization.fuse``를 통해 동작해야 합니다.
     import torch.fx.experimental.optimization as optimization
-    # AMP를 사용하지 않는 경우, optimization.fuse를 호출할 필요는 없습니다.
+    # AMP를 사용하지 않는 경우 optimization.fuse를 호출할 필요는 없습니다.
     model = optimization.fuse(model)
     model = torch.jit.trace(model, (example_input))
     model = torch.jit.freeze(model)
@@ -329,14 +329,14 @@ with torch.no_grad(), torch.cpu.amp.autocast(cache_enabled=False, dtype=torch.bf
 ###############################################################################
 # PyTorch ``DistributedDataParallel`` (DDP) 기능을 사용해 CPU에서 모델 학습하는 방법
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# DLRM과 같은 소규모 모델 또는 메모리에 바인딩 된 모델의 경우, CPU에서 학습하는 것도 좋은 선택입니다. 
+# DLRM과 같은 소규모 모델 또는 메모리에 바인딩 된 모델의 경우 CPU에서 학습하는 것도 좋은 선택입니다. 
 # 다중 소켓을 가진 머신에서는 분산 학습이 고효율의 하드웨어 자원 사용을 통해 학습 과정을 가속화합니다. 
 # `Torch-ccl <https://github.com/intel/torch-ccl>`_ 은 Intel(R)의 ``oneCCL`` 
 # (집합 통신 라이브러리)로 최적화되어 효율적인 분산 딥러닝 학습을 위해 ``allreduce`` , 
 # ``allgather`` , ``alltoall`` 과 같은 집합 연산을 구현합니다. Torch-ccl은 PyTorch C10D 
 # ``ProcessGroup`` API를 구현하며, 외부 ``ProcessGroup`` 으로 동적으로 로드할 수 있습니다. 
-# PyTorch DDP 모듈에서 구현된 최적화를 통해, ``torch-ccl`` 은 통신 연산을 가속화합니다. 통신 
-# 커널의 최적화 외에도, ``torch-ccl`` 은 계산과 통신을 동시에 수행하는 기능을 제공합니다.
+# PyTorch DDP 모듈에서 구현된 최적화를 통해 ``torch-ccl`` 은 통신 연산을 가속화합니다. 통신 
+# 커널의 최적화 외에도 ``torch-ccl`` 은 계산과 통신을 동시에 수행하는 기능을 제공합니다.
 
 ###############################################################################
 # GPU 전용 최적화 방법
@@ -346,10 +346,10 @@ with torch.no_grad(), torch.cpu.amp.autocast(cache_enabled=False, dtype=torch.bf
 # cuDNN auto-tuner 활성화하기
 # ~~~~~~~~~~~~~~~~~~~~~~~~~
 # `NVIDIA cuDNN <https://developer.nvidia.com/cudnn>`_ 은 합성곱을 계산하기 위해 여러 
-# 알고리즘을 지원합니다. Autotuner는 짧은 벤치마크를 실행하고, 주어진 하드웨어와 입력 크기에 대해 
+# 알고리즘을 지원합니다. Autotuner는 짧은 벤치마크를 실행하고 주어진 하드웨어와 입력 크기에 대해 
 # 최상의 성능을 가진 커널을 선택합니다.
 #
-# 합성곱 신경망 (다른 유형은 현재 지원되지 않음)의 경우, 학습하기 전에 cuDNN autotuner를 
+# 합성곱 신경망 (다른 유형은 현재 지원되지 않음)의 경우 학습하기 전에 cuDNN autotuner를 
 # 활성화하려면 다음과 같이 설정하십시오:
 
 torch.backends.cudnn.benchmark = True
@@ -369,7 +369,7 @@ torch.backends.cudnn.benchmark = True
 # CPU가 GPU 같은 가속기보다 최대한 앞서 실행될 수 있도록 불필요한 동기화를 피하여 가속기의 작업 큐에 
 # 많은 작업이 포함되도록 하십시오.
 #
-# 가능하면 동기화를 요구하는 작업을 피하십시오. 예를 들어:
+# 가능하면 동기화를 요구하는 작업을 피하십시오. 예시:
 #
 # * ``print(cuda_tensor)``
 # * ``cuda_tensor.item()``
@@ -377,13 +377,13 @@ torch.backends.cudnn.benchmark = True
 #   ``tensor.to(device)`` 호출
 # * ``cuda_tensor.nonzero()``
 # * CUDA tensor에서 수행된 연산 결과에 의존하는 파이썬 제어 흐름
-#   예: ``if (cuda_tensor != 0).all()``
+#   예시: ``if (cuda_tensor != 0).all()``
 #
 
 ###############################################################################
 # 대상 장치에서 직접 tensor 생성하는 방법
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# ``torch.rand(size).cuda()`` 를 호출하여 무작위 tensor를 생성하는 대신, tensor를 직접 
+# ``torch.rand(size).cuda()`` 를 호출하여 무작위 tensor를 생성하는 대신에 tensor를 직접 
 # 장치에서 생성합니다.
 # ``torch.rand(size, device='cuda')``
 #
@@ -410,7 +410,7 @@ torch.backends.cudnn.benchmark = True
 #     <https://docs.nvidia.com/deeplearning/performance/index.html#optimizing-performance>`_
 #     에서 자세한 정보와 레이어 유형에 따른 가이드라인을 참조하세요.
 #   * 레이어 크기가 고정되지 않고 다른 매개변수에서 유도되는 경우에도 명시적으로 패딩할 수 있습니다. 
-#     (예: NLP 모델의 어휘 크기 등).
+#     (예시: NLP 모델의 어휘 크기 등).
 #
 # * AMP 활성화하기
 #
@@ -427,10 +427,10 @@ torch.backends.cudnn.benchmark = True
 ###############################################################################
 # 가변 입력 길이에 대비하여 메모리 미리 할당하기
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# 음성 인식 또는 NLP 모델은 종종 가변 시퀀스 길이를 가진 tensor들을 입력으로 학습됩니다. 가변 길이는 
+# 음성 인식 또는 NLP 모델은 종종 가변 시퀀스 길이를 가진 tensor를 입력으로 학습됩니다. 가변 길이는 
 # PyTorch 캐싱 할당기에서 문제를 일으킬 수 있으며, 성능 저하 또는 예기치 않은 메모리 부족 오류를 
 # 초래할 수 있습니다. 짧은 시퀀스 길이의 배치가 더 긴 시퀀스 길이의 배치로 이어지면, PyTorch는 
-# 이전 반복의 중간 버퍼를 해제하고 새 버퍼를 재할당해야 합니다. 이 과정은 시간이 많이 소요되며, 캐싱 
+# 이전 반복의 중간 버퍼를 해제하고 새 버퍼를 재할당해야 합니다. 이 과정은 시간이 많이 소요되며 캐싱 
 # 할당기에서 조각화(fragmentation)를 일으켜 메모리 부족 오류를 유발할 수 있습니다.
 #
 # 일반적인 해결 방법은 미리 할당(preallocation)을 구현하는 것입니다. 
@@ -474,20 +474,20 @@ torch.backends.cudnn.benchmark = True
 # ``DistributedDataParallel`` 은 특정 반복에 대해 변화도 all-reduce를 비활성화하는
 # `no_sync() <https://pytorch.org/docs/stable/generated/torch.nn.parallel.DistributedDataParallel.html#torch.nn.parallel.DistributedDataParallel.no_sync>`_
 # 컨텍스트 관리자를 제공합니다.
-# ``no_sync()`` 는 변화도 축적의 첫 ``N-1`` 반복에 적용되어야 하며, 마지막 반복은 기본 실행을 
+# ``no_sync()`` 는 변화도 축적의 첫 ``N-1`` 반복에 적용되어야 하며 마지막 반복은 기본 실행을 
 # 따르고 필요한 변화도 all-reduce를 수행해야 합니다.
 
 ###############################################################################
-# ``DistributedDataParallel(find_unused_parameters=True)`` 를 사용할 때 모델 생성자와 실제 실행 중인 것의 레이어 순서를 일치시키는 방법
+# ``DistributedDataParallel(find_unused_parameters=True)`` 를 사용할 때 생성자와 실행 레이어 순서를 일치시키는 방법
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # `torch.nn.parallel.DistributedDataParallel <https://pytorch.org/docs/stable/generated/torch.nn.parallel.DistributedDataParallel.html#torch.nn.parallel.DistributedDataParallel>`_
 # 은 ``find_unused_parameters=True`` 와 함께 모델 생성자에서의 레이어와 파라미터 순서를 
 # 사용하여 ``DistributedDataParallel`` 변화도 all-reduce를 위한 버킷을 만듭니다. 
 # ``DistributedDataParallel`` 은 all-reduce를 역전파와 겹치게 수행합니다. 특정 버킷에 대한 
-# all-reduce는 주어진 버킷의 모든 파라미터에 대한 변화도가 모두 준비되었을 때 비동기적으로 트리거됩니다.
+# all-reduce는 주어진 버킷의 모든 파라미터에 대한 변화도가 모두 준비되었을 때 비동기적으로 작동됩니다.
 #
-# 최대로 겹치게 하려면, 모델 생성자에서의 순서가 실제 실행 중인 순서와 대략적으로 일치해야 합니다. 
-# 순서가 맞지 않으면, 전체 버킷에 대한 all-reduce는 마지막으로 도착하는 변화도를 기다리게 되며, 
+# 최대로 겹치게 하려면 모델 생성자에서의 순서가 실제 실행 중인 순서와 대략적으로 일치해야 합니다. 
+# 순서가 맞지 않으면 전체 버킷에 대한 all-reduce는 마지막으로 도착하는 변화도를 기다리게 되며, 
 # 이는 역전파와 all-reduce 간의 겹침을 줄일 수 있고, all-reduce가 노출되어 학습 속도가 느려질 수 
 # 있습니다.
 #
@@ -497,11 +497,11 @@ torch.backends.cudnn.benchmark = True
 # 파라미터의 순서를 재조정할 필요가 없습니다.
 
 ###############################################################################
-# 분산 설정에서 작업 로드 밸런싱하는 방법
+# 분산 설정에서 작업 부하를 분산하는 방법
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# 작업 부하 불균형은 일반적으로 순차적인 데이터를 처리하는 모델(예: 음성 인식, 번역, 언어 모델 등)에서 
-# 발생할 수 있습니다. 하나의 장치가 나머지 장치들보다 긴 시퀀스 길이를 가진 데이터 배치를 받으면, 모든 
-# 장치가 마지막으로 작업을 끝내는 워커를 기다리게 됩니다. 역전파는 
+# 작업 부하 불균형은 일반적으로 순차적인 데이터를 처리하는 모델(예시: 음성 인식, 번역, 언어 모델 등)
+# 에서 발생할 수 있습니다. 하나의 장치가 나머지 장치들보다 긴 시퀀스 길이를 가진 데이터 배치를 받으면,
+# 모든 장치가 마지막으로 작업을 끝내는 워커를 기다리게 됩니다. 역전파는 
 # `DistributedDataParallel <https://pytorch.org/docs/stable/generated/torch.nn.parallel.DistributedDataParallel.html#torch.nn.parallel.DistributedDataParallel>`_
 # 백엔드와 함께 분산 설정에서 암묵적인 동기화 지점으로 작용합니다.
 #
