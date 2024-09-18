@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-Automatic Mixed Precision
-*************************
-**Author**: `Michael Carilli <https://github.com/mcarilli>`_
+자동 혼합 정밀도(Automatic Mixed Precision) 가이드
+*********************************************
+**저자**: `Michael Carilli <https://github.com/mcarilli>`_
 
 `torch.cuda.amp <https://pytorch.org/docs/stable/amp.html>`_ provides convenience methods for mixed precision,
 where some operations use the ``torch.float32`` (``float``) datatype and other operations
