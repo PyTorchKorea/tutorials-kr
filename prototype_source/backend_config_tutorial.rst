@@ -91,7 +91,7 @@ quant1 변수의 데이터 타입 인자로, 출력값의 데이터 타입은 qu
        """Return a fused ConvReLU2d from individual conv and relu modules."""
        return torch.ao.nn.intrinsic.ConvReLU2d(conv, relu)
 
-1. BackendConfig 정의하기
+4. BackendConfig 정의하기
 ----------------------------
 
 이제 필요한 것은 모두 준비가 되었으니 BackendConfig를 정의해봅시다.
