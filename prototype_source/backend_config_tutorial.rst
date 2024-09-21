@@ -1,6 +1,6 @@
 (prototype) PyTorch BackendConfig Tutorial
 ==========================================
-**Author**: `Andrew Or <https://github.com/andrewor14>`_
+**번역**: `장승호 <https://github.com/jason9865>`_
 
 BackendConfig API를 통해 백엔드 환경에서 PyTorch 양자화를 사용할 수 있습니다.
 기존 환경에서는 FX 그래프 모드 양자화 만을 사용할 수 있지만 
@@ -39,7 +39,7 @@ BackendConfig가 만들어진 동기와 구현 방법에 대한 세부정보를 
 --------------------------------------------------------
 
 양자화된 선형연산자를 위해 백엔드 환경에서는 `[dequant - fp32_linear - quant]` 참조 패턴을
-하나의 양자화된 선형 연산자로 변환하여 사용한다고 가정합시다.
+양자화된 단일 선형 연산자로 축소하여 사용한다고 가정합시다.
 이를 위해 우선 quant-dequant연산자를 부동소수점 선형 연산자 앞 뒤로 삽입하여
 아래와 같은 추론 모델을 만들 수 있습니다.::
 
@@ -82,7 +82,8 @@ quant1 변수의 데이터 타입 인자로, 출력값의 데이터 타입은 qu
 초기 사용자 모델에서는 합성곱 연산자와 ReLU 연산자가 분리되어 있습니다.
 따라서 먼저 합성곱 연산자와 ReLU 연산자를 결합하여 하나의 합성곱-ReLU연산자를 만든 후
 선형 연산자를 양자화한 것과 유사하게 합성곱-ReLU 연산자를 양자화를 진행합니다.
-
+이 때 3개의 인자를 갖는 함수를 정의합니다. 첫번째 인자는 QAT이 적용되는지 여부를 나타내며
+나머지 2개의 인자는 결합된 패턴의 개별 요소(여기서는 합성곱 연산자와 ReLU)를 가리킵니다.
 
 .. code:: ipython3
 
@@ -90,12 +91,12 @@ quant1 변수의 데이터 타입 인자로, 출력값의 데이터 타입은 qu
        """Return a fused ConvReLU2d from individual conv and relu modules."""
        return torch.ao.nn.intrinsic.ConvReLU2d(conv, relu)
 
-4. BackendConfig 정의하기
+1. BackendConfig 정의하기
 ----------------------------
 
 이제 필요한 것은 모두 준비가 되었으니 BackendConfig를 정의해봅시다.
 선형 연산자의 입력값과 출력값에 대해 서로 다른 observer(명칭은 추후 변경 예정)를 사용합니다.
-이를 통해 양자화 파라미터가 서로 다른 양자화 연산자(quant1과 quant2)를 거치며
+이를 통해 양자화 매개변수가 서로 다른 양자화 연산자(quant1과 quant2)를 거치며
 이와 같은 방식은 선형 연산이나 합성곱 연산과 같이 가중치를 사용하는 연산에서 
 일반적으로 사용합니다.
 
