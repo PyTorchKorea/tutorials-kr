@@ -69,4 +69,4 @@ IPython.display.Audio(waveform, rate=sample_rate)
 i = 5
 waveform, sample_rate, label = dataset[i]
 plot_specgram(waveform, sample_rate, title=f"Sample {i}: {label}")
-IPython.display.Audio(waveform, rate=sample_rate) 
+IPython.display.Audio(waveform, rate=sample_rate)
