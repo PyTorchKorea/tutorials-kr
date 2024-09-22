@@ -7,10 +7,10 @@
 `Training Models <trainingyt.html>`_ ||
 `Model Understanding <captumyt.html>`_
 
-Building Models with PyTorch
+파이토치로 모델 만들기
 ============================
 
-Follow along with the video below or on `youtube <https://www.youtube.com/watch?v=OSqIP-mOWOI>`__.
+아래 비디오를 따라 하거나 또는 `youtube <https://www.youtube.com/watch?v=OSqIP-mOWOI>`__에서 확인하세요.
 
 .. raw:: html
 
@@ -337,14 +337,12 @@ print(maxpool_layer(my_tensor))
 
 
 #########################################################################
-# If you look closely at the values above, you’ll see that each of the
-# values in the maxpooled output is the maximum value of each quadrant of
-# the 6x6 input.
+# 위의 값을 자세히 보면, 맥스풀링된 출력의 각 값이 6x6 입력의 각 사분면에서 
+# 최대값이라는 것을 알 수 있습니다.
 #
-# **Normalization layers** re-center and normalize the output of one layer
-# before feeding it to another. Centering and scaling the intermediate
-# tensors has a number of beneficial effects, such as letting you use
-# higher learning rates without exploding/vanishing gradients.
+# **정규화 레이어**는 한 레이어의 출력을 다른 레이어에 전달하기 전에 다시 중심화하고 
+# 정규화합니다. 중간 텐서를 중심화하고 스케일링하는 것은 기울기 폭발/소실 없이 더 
+# 높은 학습률을 사용할 수 있게 하는 등 여러 가지 유익한 효과를 제공합니다.
 #
 
 my_tensor = torch.rand(1, 4, 4) * 20 + 5
@@ -361,27 +359,25 @@ print(normed_tensor.mean())
 
 
 ##########################################################################
-# Running the cell above, we’ve added a large scaling factor and offset to
-# an input tensor; you should see the input tensor’s ``mean()`` somewhere
-# in the neighborhood of 15. After running it through the normalization
-# layer, you can see that the values are smaller, and grouped around zero
-# - in fact, the mean should be very small (> 1e-8).
+# 위의 셀을 실행하면 입력 텐서에 큰 스케일링 요소와 오프셋을 추가했습니다.
+# 입력 텐서의 ``mean()`` 값이 약 15에 가까운 것을 볼 수 있습니다.
+# 이를 정규화 레이어를 통해 실행하면 값들이 더 작아지고 0 주위로 그룹화됩니다.
+# 실제로 평균은 매우 작아야 합니다 (> 1e-8).
 #
-# This is beneficial because many activation functions (discussed below)
-# have their strongest gradients near 0, but sometimes suffer from
-# vanishing or exploding gradients for inputs that drive them far away
-# from zero. Keeping the data centered around the area of steepest
-# gradient will tend to mean faster, better learning and higher feasible
-# learning rates.
+# 이는 유익한데, 왜냐하면 많은 활성화 함수들(아래에서 논의)은 0 근처에서
+# 가장 강한 기울기를 갖지만, 때때로 입력이 0에서 멀리 떨어지게 하는 경우
+# 기울기 소실 또는 폭발 문제가 발생할 수 있기 때문입니다.
+# 데이터를 가장 가파른 기울기 주변에 유지하면 일반적으로 더 빠르고,
+# 더 나은 학습과 더 높은 학습률이 가능합니다.
 #
-# **Dropout layers** are a tool for encouraging *sparse representations*
-# in your model - that is, pushing it to do inference with less data.
+# **드롭아웃 레이어**는 모델 내에서 *희소 표현*을 장려하기 위한 도구입니다.
+# 즉, 더 적은 데이터로 추론을 수행하도록 모델을 푸시하는 것입니다.
 #
-# Dropout layers work by randomly setting parts of the input tensor
-# *during training* - dropout layers are always turned off for inference.
-# This forces the model to learn against this masked or reduced dataset.
-# For example:
-#
+# 드롭아웃 레이어는 학습 중에 입력 텐서의 일부를 무작위로 설정하여 작동합니다
+# - 드롭아웃 레이어는 항상 추론 시에는 꺼져 있습니다.
+# 이는 모델이 이 마스킹되거나 축소된 데이터셋을 학습하도록 강제합니다.
+# 예를 들어:
+# 
 
 my_tensor = torch.rand(1, 4, 4)
 
@@ -391,32 +387,29 @@ print(dropout(my_tensor))
 
 
 ##########################################################################
-# Above, you can see the effect of dropout on a sample tensor. You can use
-# the optional ``p`` argument to set the probability of an individual
-# weight dropping out; if you don’t it defaults to 0.5.
+# 위에서 드롭아웃이 샘플 텐서에 미치는 효과를 볼 수 있습니다. 개별 가중치가 
+# 드롭아웃될 확률을 설정하기 위해 선택적으로 `p` 인수를 사용할 수 있으며, 
+# 설정하지 않으면 기본값은 0.5입니다.
 #
-# Activation Functions
+# 활성화 함수
 # ~~~~~~~~~~~~~~~~~~~~
 #
-# Activation functions make deep learning possible. A neural network is
-# really a program - with many parameters - that *simulates a mathematical
-# function*. If all we did was multiple tensors by layer weights
-# repeatedly, we could only simulate *linear functions;* further, there
-# would be no point to having many layers, as the whole network would
-# reduce could be reduced to a single matrix multiplication. Inserting
-# *non-linear* activation functions between layers is what allows a deep
-# learning model to simulate any function, rather than just linear ones.
+# 활성화 함수는 딥러닝을 가능하게 만듭니다. 신경망은 사실 많은 파라미터를 
+# 가진 *수학적 함수를 시뮬레이션*하는 프로그램입니다. 만약 우리가 텐서를 
+# 레이어 가중치로 반복적으로 곱하기만 한다면, *선형 함수*만을 시뮬레이션할 
+# 수 있을 뿐입니다. 게다가, 모든 레이어를 하나의 행렬 곱셈으로 축소할 수 
+# 있기 때문에 여러 레이어를 가질 필요가 없을 것입니다. 레이어 사이에 
+# *비선형* 활성화 함수를 삽입하는 것이 딥러닝 모델이 단순히 선형 함수가 
+# 아닌 어떤 함수든 시뮬레이션할 수 있게 하는 요소입니다.
 #
-# ``torch.nn.Module`` has objects encapsulating all of the major
-# activation functions including ReLU and its many variants, Tanh,
-# Hardtanh, sigmoid, and more. It also includes other functions, such as
-# Softmax, that are most useful at the output stage of a model.
+# `torch.nn.Module`은 ReLU 및 그 변형들, Tanh, Hardtanh, sigmoid 등의 
+# 주요 활성화 함수를 캡슐화한 객체를 포함하고 있습니다. 또한, 모델의 출력 
+# 단계에서 가장 유용한 Softmax와 같은 다른 함수들도 포함하고 있습니다.
 #
-# Loss Functions
+# 손실 함수
 # ~~~~~~~~~~~~~~
 #
-# Loss functions tell us how far a model’s prediction is from the correct
-# answer. PyTorch contains a variety of loss functions, including common
-# MSE (mean squared error = L2 norm), Cross Entropy Loss and Negative
-# Likelihood Loss (useful for classifiers), and others.
+# 손실 함수는 모델의 예측이 정답과 얼마나 차이가 나는지를 알려줍니다. 
+# PyTorch에는 일반적인 MSE (평균 제곱 오차 = L2 노름), 교차 엔트로피 
+# 손실, 그리고 분류기에 유용한 음의 가능도 손실 등 다양한 손실 함수가 포함되어 있습니다.
 #
