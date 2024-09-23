@@ -157,13 +157,13 @@ DDP 모델 구축
 .. warning::
    `집합 콜(Collective Calls) <https://pytorch.org/docs/stable/distributed.html#collective-functions>`__ 은 모든 분산 프로세스에서 동작하는 함수(functions)이며,
    특정 프로세스의 특정한 상태나 값을 모으기 위해 사용됩니다. 집합 콜은 집합 코드(collective code)를 실행하기 위해 모든 랭크(rank)를 필요로 합니다.
-   이 예제에서는, `_save_checkpoint` 오로지 ``rank:0`` 프로세스에서만 실행되기 때문에, 어떠한 집합 콜도 가지고 있으면 안 됩니다.
+   이 예제에서, `_save_checkpoint`는 오로지 ``rank:0`` 프로세스에서만 실행되기 때문에, 어떠한 집합 콜도 가지고 있으면 안 됩니다.
    만약 집합 콜을 만들어야 된다면, ``if self.gpu_id == 0`` 확인 이전에 만들어져야 합니다.
 
 분산 학습 작업의 실행
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
--  (``device`` 를 대신할) 새로운 인자값 ``rank`` 와 ``world_size`` 를 도입합니다.
+-  새로운 인자값 ``rank`` (``device`` 를 대체)와 ``world_size`` 를 도입합니다.
 -  ``rank`` 는 `mp.spawn <https://pytorch.org/docs/stable/multiprocessing.html#spawning-subprocesses>`__ 을 호출할 때 
    DDP에 의해 자동적으로 할당됩니다.
 -  ``world_size`` 는 학습 작업에 이용되는 프로세스의 개수입니다. GPU를 이용한 학습의 경우에는,
