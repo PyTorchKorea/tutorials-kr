@@ -50,7 +50,7 @@
 |argument|인자|박정환||
 |Audio|오디오|박정환|ToC의 분류명입니다.|
 |augmentation|증강|이재복||
-|autograd|Autograd|황성수|번역안함|
+|autograd|Autograd|황성수|번역하지 않음|
 |Batch Normalization|배치 정규화|박정환||
 |bias|편향|이하람||
 |convolution|합성곱|김현길||
@@ -58,7 +58,8 @@
 |dataset|데이터셋|박정환|음차 표기|
 |deep neural network|심층 신경망|박정환||
 |derivative|도함수|박정환||
-|Drop-out|Drop-out|황성수|번역안함|
+|Drop-out|Drop-out|황성수|번역하지 않음|
+|fastpath|fastpath|이진혁|번역하지 않음|
 |epoch|에폭|박정환|음차 표기|
 |evaluation mode|평가 모드|박정환||
 |Fine-tuning|미세 조정|오왕택||
@@ -69,6 +70,7 @@
 |Generative|생성 모델|박정환|ToC의 분류명입니다.|
 |Getting Started tutorial|시작하기 튜토리얼|박정환|ToC의 Getting Started를 뜻합니다.|
 |gradient|변화도|박정환||
+|gradient tape|gradient tape|이진혁|번역하지 않음|
 |Hyperparameter|하이퍼파라미터|김태영|음차 표기|
 |Image|이미지|박정환|ToC의 분류명입니다.|
 |in-place|제자리|허남규||
@@ -88,7 +90,7 @@
 |momentum|모멘텀|박정환|음차 표기|
 |normalize|정규화|허남규||
 |NumPy|NumPy|박정환|번역하지 않음|
-|One-Hot|One-Hot|황성수|번역안함|
+|One-Hot|One-Hot|황성수|번역하지 않음|
 |Optimizer|옵티마이저|박정환|음차 표기|
 |output|출력|박정환||
 |over-fitting|과적합|황성수||
@@ -96,6 +98,7 @@
 |placeholder|플레이스홀더|박정환|음차 표기|
 |plotting|도식화|황성수||
 |Production (environment, use)|Production|허남규|번역하지 않음|
+|profile|프로파일|이진혁|음차 표기|
 |pruning|가지치기|김지호||
 |rank 0|0-순위|박정환||
 |Read later|더 읽을거리|박정환||
@@ -107,10 +110,12 @@
 |scenario|시나리오|박정환|음차 표기|
 |shape|shape|허남규|번역하지 않음|
 |size|크기|박정환||
+|sparsity|sparsity|이진혁|번역하지 않음|
 |Tensor / Tensors|Tensor|박정환|번역하지 않음|
 |Text|텍스트|박정환|ToC의 분류명입니다.|
 |track (computation) history|연산 기록을 추적하다|박정환||
 |training|학습|이하람||
+|variable length input|가변 길이 입력|이진혁|음차 표기|
 |warmstart|빠르게 시작하기|박정환|Warmstarting Model = 빠르게 모델 시작하기|
 |weight|가중치|박정환||
 |wrapper|래퍼|박정환|음차 표기|
