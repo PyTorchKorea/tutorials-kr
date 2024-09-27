@@ -1,6 +1,6 @@
-PyTorch Recipes
+파이토치 레시피
 ---------------------------------------------
-Recipes are bite-sized bite-sized, actionable examples of how to use specific PyTorch features, different from our full-length tutorials.
+레시피는 전체 길이의 튜토리얼과 달리, PyTorch의 특정 기능을 사용하는 간단하고 바로 적용 가능한 예제들입니다.
 
 .. raw:: html
 
