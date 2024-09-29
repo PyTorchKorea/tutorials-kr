@@ -1,15 +1,16 @@
 종합적 분석을 이용한 트레이스 차이 분석
 ========================================
 
-**Author:** `Anupam Bhatnagar <https://github.com/anupambhatnagar>`_
+**저자:** `Anupam Bhatnagar <https://github.com/anupambhatnagar>`_
+**번역:** `이진혁 <https://github.com/uddk6215>__`
 
 때때로 사용자들은 코드 변경으로 인한 PyTorch 연산자와 CUDA 커널의 변화를 식별해야 할 필요가 있습니다. 
-이러한 요구를 지원하기 위해 HTA는 트레이스 비교 기능을 제공합니다. 이 기능을 통해 사용자는 두 세트의 트레이스 파일을 입력할 수 있는데, 
+이를 위해 HTA는 트레이스 비교 기능을 제공합니다. 이 기능을 통해 사용자는 두 세트의 트레이스 파일을 입력할 수 있는데, 
 A/B 테스트와 유사하게, 첫 번째 세트는 대조군으로, 두 번째 세트는 실험군으로 간주할 수 있습니다.
 TraceDiff 클래스는 트레이스 간의 차이를 비교하고 이러한 차이를 시각화하는 기능을 제공합니다. 
 특히, 사용자는 각 그룹에서 추가되거나 제거된 연산자와 커널을 찾을 수 있으며, 각 연산자/커널의 빈도와 누적 소요 시간도 확인할 수 있습니다.
 
-`TraceDiff <https://hta.readthedocs.io/en/latest/source/api/trace_diff_api.html>`_ 클래스는 다음과 같은 메서드를 가지고 있습니다.
+`TraceDiff <https://hta.readthedocs.io/en/latest/source/api/trace_diff_api.html>`_ 클래스는 다음과 같은 메소드를 가지고 있습니다.
 TraceDiff 클래스의 메서드:
 
 * `compare_traces <https://hta.readthedocs.io/en/latest/source/api/trace_diff_api.html#hta.trace_diff.TraceDiff.compare_traces>`_:
