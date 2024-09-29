@@ -39,16 +39,16 @@ Matplotlib 그리고 TensorBoard를 설치해야 합니다.
 
     pip install torch torchvision matplotlib tensorboard
 
-한번 종속된 모듈을 설치하고 나서, 
+한번 의존성이 있는 모듈을 설치하고 나서, 
 설치한 환경에서 이 notebook을 다시 시작합니다.
 
 
 개요
 ------------
 
-이 notebook에서는 Fashion-MNIST 데이터셋에 대해 
-변형된 LeNet-5를 학습시킬 것입니다.
-Fashion-MNIST는 의류의 종류를 나타내는 10개의 클래스 레이블을 포함하는 
+이 notebook에서는 변형된 LeNet-5를 
+Fashion-MNIST 데이터셋으로 학습시킬 것입니다.
+Fashion-MNIST는 의복의 종류를 나타내는 10개의 클래스 레이블을 포함하는 
 다양한 의류의 타일 이미지 세트입니다.
 
 """
@@ -202,7 +202,7 @@ optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
 #
 
 print(len(validation_loader))
-for epoch in range(1):  # 데이터셋을 여러 번 반복
+for epoch in range(1):  # 데이터 셋을 여러 번 반복(필요 시 횟수를 조정합니다.)
     running_loss = 0.0
 
     for i, data in enumerate(training_loader, 0):
@@ -274,7 +274,7 @@ writer.flush()
 #
 # 우리가 사용하는 28x28 이미지 타일은 784차원의
 # 벡터(28 \* 28 = 784)가 될 수 있습니다. 더 낮은 차원으로 투영하는 쪽이
-# 유리할 수 있죠. ``add_embedding()`` 메소드는 
+# 유리할 수 있습니다. ``add_embedding()`` 메소드는 
 # 가장 분산이 높은 세 차원으로 데이터 세트를 투영하고,
 # 상호작용 가능한 3D 차트로 시각화해 줄 것입니다. ``add_embedding()``
 # 메소드는 가장 높은 분산을 가진 세 차원에 자동적으로 
@@ -283,7 +283,7 @@ writer.flush()
 # 아래에서 데이터 샘플을 가져와 임베딩을 생성할 것입니다:
 #
 
-# 데이터의 랜덤 서브셋과 대응하는 레이블을 선택
+# 데이터의 랜덤 부분집합과 대응하는 레이블을 선택
 def select_n_random(data, labels, n=100):
     assert len(data) == len(labels)
 
