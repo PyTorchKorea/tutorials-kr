@@ -1,33 +1,34 @@
-`Introduction <../beginner/ddp_series_intro.html>`__ \|\| `What is DDP <../beginner/ddp_series_theory.html>`__ \|\| `Single-Node
-Multi-GPU Training <../beginner/ddp_series_multigpu.html>`__ \|\| `Fault
-Tolerance <../beginner/ddp_series_fault_tolerance.html>`__ \|\| **Multi-Node
-training** \|\| `minGPT Training <ddp_series_minGPT.html>`__
+`소개 <../beginner/ddp_series_intro.html>`__ \|\| `분산 데이터 병렬 처리 (DDP) 란 무엇인가? <../beginner/ddp_series_theory.html>`__ \|\| `단일
+노드 다중-GPU 학습 <../beginner/ddp_series_multigpu.html>`__ \|\| `결함
+내성 <../beginner/ddp_series_fault_tolerance.html>`__ \|\| **다중 노드 (Multinode)
+학습** \|\| `minGPT 학습 <ddp_series_minGPT.html>`__
 
-Multinode Training
+멀티노드(Multinode) 학습
 ==================
 
-Authors: `Suraj Subramanian <https://github.com/suraj813>`__
+저자: `Suraj Subramanian <https://github.com/suraj813>`__
+번역: `박지은 <https://github.com/rumjie>`__
 
 .. grid:: 2
 
-   .. grid-item-card:: :octicon:`mortar-board;1em;` What you will learn
+   .. grid-item-card:: :octicon:`mortar-board;1em;` 이 장에서 배우는 것
 
-      -  Launching multinode training jobs with ``torchrun``
-      -  Code changes (and things to keep in mind) when moving from single-node to multinode training.
+      - ``torchrun`` 으로 멀티노드 학습 시작하기
+      - 싱글노드에서 멀티노드 학습으로 옮기기 위한 코드 변경 (및 염두에 두어야 하는 것들)
 
       .. grid:: 1
 
          .. grid-item::
 
-            :octicon:`code-square;1.0em;` View the code used in this tutorial on `GitHub <https://github.com/pytorch/examples/blob/main/distributed/ddp-tutorial-series/multinode.py>`__
+            :octicon:`code-square;1.0em;` 이 튜토리얼에 사용된 코드 참고 - `GitHub <https://github.com/pytorch/examples/blob/main/distributed/ddp-tutorial-series/multinode.py>`__
 
-   .. grid-item-card:: :octicon:`list-unordered;1em;` Prerequisites
+   .. grid-item-card:: :octicon:`list-unordered;1em;` 필요 사항
 
-      -  Familiarity with `multi-GPU training <../beginner/ddp_series_multigpu.html>`__ and `torchrun <../beginner/ddp_series_fault_tolerance.html>`__ 
-      -  2 or more TCP-reachable GPU machines (this tutorial uses AWS p3.2xlarge instances)
-      -  PyTorch `installed <https://pytorch.org/get-started/locally/>`__ with CUDA on all machines
+      - `다중 GPU 학습 <../beginner/ddp_series_multigpu.html>`__ 과 `torchrun <../beginner/ddp_series_fault_tolerance.html>`__ 에 익숙할 것
+      - 2개 이상의 TCP 접근이 가능한 GPU 머신 (본 튜토리얼에서는 AWS p3.2xlarge를 사용함)
+      - 모든 머신에 CUDA가 설치된 `파이토치 <https://pytorch.org/get-started/locally/>`__  
 
-Follow along with the video below or on `youtube <https://www.youtube.com/watch/KaAJtI1T2x4>`__. 
+아래의 영상이나 `유튜브 영상 <https://www.youtube.com/watch/KaAJtI1T2x4>`__ 을 따라 진행하세요. 
 
 .. raw:: html
 
@@ -35,14 +36,14 @@ Follow along with the video below or on `youtube <https://www.youtube.com/watch/
      <iframe width="560" height="315" src="https://www.youtube.com/embed/KaAJtI1T2x4" frameborder="0" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
    </div>
 
-Multinode training involves deploying a training job across several
-machines. There are two ways to do this:
+멀티노드 학습은 여러 대의 머신에 학습 작업을 실행하는 것입니다. 
+실행의 두 가지 방법은 아래와 같습니다.
 
--  running a ``torchrun`` command on each machine with identical rendezvous arguments, or
--  deploying it on a compute cluster using a workload manager (like SLURM)
+-  각 머신에서 동일한 rendezvous 인수로 ``torchrun`` 명령어를 실행하기 
+-  SLURM 과 같은 워크로드 매니저 를 사용하여 컴퓨터 클러스터에 배포하기
 
-In this video we will go over the (minimal) code changes required to move from single-node multigpu to
-multinode training, and run our training script in both of the above ways.
+이 영상에서는 싱글노드 다중 GPU 로부터 멀티노드 학습으로 옮기기 위한 (최소한의) 코드 변경을 다루고, 
+위에서 언급한 두 가지 방법의 학습 스크립트를 실행할 것입니다. 
 
 Note that multinode training is bottlenecked by inter-node communication latencies. Running a training job
 on 4 GPUs on a single node will be faster than running it on 4 nodes with 1 GPU each.
