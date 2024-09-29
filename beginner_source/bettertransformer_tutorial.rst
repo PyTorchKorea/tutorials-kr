@@ -2,11 +2,13 @@ Better Transformer를 이용한 고속 트랜스포머 추론
 ===============================================================
 
 **저자**: `마이클 그쉬빈드 <https://github.com/mikekgfb>`__
+**번역**: `이진혁 <https://github.com/uddk6215>`__
 
  
-이 튜토리얼에서는 PyTorch 1.12 릴리스의 일부로 Better Transformer (BT)를 소개합니다.
-여기서는 torchtext를 사용한 Production 추론에 Better Transformer를 적용하는 방법을 보여줍니다.
-Better Transformer는 CPU와 GPU에서 고성능으로 트랜스포머 모델의 배포를 가속화하기 위한 Production으로 바로 적용가능한 fastpath입니다.
+이 튜토리얼에서는 PyTorch 1.12 버전의 일부로 Better Transformer (BT)를 소개합니다.
+여기서는 torchtext를 사용해 상용화된 제품 수준의 추론에서 Better Transformer를 적용하는 방법을 보여줍니다.
+Better Transformer는 상용 제품 수준으로 바로 적용가능한 fastpath입니다.
+이는, CPU와 GPU에서 고성능으로 더 빠르게 Transformer 모델을 배포할 수 있게끔 해줍니다.
 이 fastpath 기능은 PyTorch 코어 nn.module을 직접 기반으로 하거나 torchtext를 사용하는 모델에 대해 이해하기 쉽고 명확하게 작동합니다.
 
 Better Transformer fastpath로 가속화될 수 있는 모델은 PyTorch 코어 torch.nn.module 클래스인 TransformerEncoder, TransformerEncoderLayer, 
@@ -50,7 +52,7 @@ gradient tape 정보를 수집하지 않는 입력 텐서에 대해 작동해야
 
 1. 설정
 
-1.1 사전 훈련된 모델 로드
+1.1 사전 훈련된 모델 불러오기
 
 `torchtext.models <https://pytorch.org/text/main/models.html>`__ 의 지침에 따라 미리 정의된 torchtext 모델에서 XLM-R 모델을 다운로드합니다.
 또한 가속기 상에서의 테스트를 실행하기 위해 DEVICE를 설정합니다. (필요에 따라 사용 환경에 맞게 GPU 실행을 활성화면 됩니다.)
