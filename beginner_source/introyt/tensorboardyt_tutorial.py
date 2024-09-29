@@ -290,7 +290,7 @@ def select_n_random(data, labels, n=100):
     perm = torch.randperm(len(data))
     return data[perm][:n], labels[perm][:n]
 
-# 데이터의 랜덤 서브셋 추출
+# 데이터의 랜덤 부분집합 추출
 images, labels = select_n_random(training_set.data, training_set.targets)
 
 # 각 이미지별 클래스 레이블 얻기(get)
