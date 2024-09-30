@@ -326,4 +326,4 @@ writer.close()
 # - `torch.utils.tensorboard.SummaryWriter <https://pytorch.org/docs/stable/tensorboard.html?highlight=summarywriter>`_\에 대한 PyTorch 문서
 # - `PyTorch.org Tutorials <https://tutorials.pytorch.kr/>`_\에 있는 Tensorboard 튜토리얼 콘텐츠
 # - TensorBoard에 대한 보다 더 자세한 내용은 `TensorBoard
-#   문서 <https://www.tensorflow.org/tensorboard>`_\을 참고하세요.
+#   문서 <https://www.tensorflow.org/tensorboard>`_\를 참고하세요.
