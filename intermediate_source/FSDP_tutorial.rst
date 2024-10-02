@@ -1,24 +1,33 @@
-Getting Started with Fully Sharded Data Parallel(FSDP)
+Fully Sharded Data Parallel(FSDP) 시작하기
 ======================================================
 
-**Author**: `Hamid Shojanazeri <https://github.com/HamidShojanazeri>`__, `Yanli Zhao <https://github.com/zhaojuanmao>`__, `Shen Li <https://mrshenli.github.io/>`__
+**저자**: `Hamid Shojanazeri <https://github.com/HamidShojanazeri>`__, `Yanli Zhao <https://github.com/zhaojuanmao>`__, `Shen Li <https://mrshenli.github.io/>`__
+**번역:** `이진혁 <https://github.com/uddk6215>__`
 
 .. note::
-   |edit| View and edit this tutorial in `github <https://github.com/pytorch/tutorials/blob/main/intermediate_source/FSDP_tutorial.rst>`__.
+   |edit| 이 튜토리얼을 `github <https://github.com/pytorch/tutorials/blob/main/intermediate_source/FSDP_tutorial.rst>`__에서 보고 수정할 수 있습니다.
 
-Training AI models at a large scale is a challenging task that requires a lot of compute power and resources. 
-It also comes with considerable engineering complexity to handle the training of these very large models.
-`PyTorch FSDP <https://pytorch.org/blog/introducing-pytorch-fully-sharded-data-parallel-api/>`__, released in PyTorch 1.11 makes this easier.
+대규모 AI 모델을 학습하는 것은 많은 컴퓨팅 파워와 리소스를 필요로 하는 어려운 작업입니다.
+또한 이러한 대규모 모델의 학습을 위해서는 엔지니어링 측면에서 상당한 복잡성이 따릅니다.
+PyTorch 1.11에서 출시된 `PyTorch FSDP <https://pytorch.org/blog/introducing-pytorch-fully-sharded-data-parallel-api/>`__는 이러한 작업을 더 쉽게 만들어줍니다.
 
-In this tutorial, we show how to use `FSDP APIs <https://pytorch.org/docs/stable/fsdp.html>`__, for simple MNIST models that can be extended to other larger models such as `HuggingFace BERT models <https://huggingface.co/blog/zero-deepspeed-fairscale>`__, 
-`GPT 3 models up to 1T parameters <https://pytorch.medium.com/training-a-1-trillion-parameter-model-with-pytorch-fully-sharded-data-parallel-on-aws-3ac13aa96cff>`__ . The sample DDP MNIST code has been borrowed from `here <https://github.com/yqhu/mnist_examples>`__. 
+이 튜토리얼에서는 간단한 MNIST 모델에 `FSDP APIs <https://pytorch.org/docs/stable/fsdp.html>`__를 사용하는 방법을 보여줍니다. 
+이 방법은 `HuggingFace BERT models <https://huggingface.co/blog/zero-deepspeed-fairscale>`__이나 최대 1조 개의 매개변수를 가진
+`GPT 3 models up to 1T parameters <https://pytorch.medium.com/training-a-1-trillion-parameter-model-with-pytorch-fully-sharded-data-parallel-on-aws-3ac13aa96cff>`__
+같은 더 큰 모델로 확장될 수 있습니다. 
+예제로 사용된 DDP MNIST 코드는 `here <https://github.com/yqhu/mnist_examples>`__에서 가져왔습니다.
 
 
-How FSDP works
+FSDP의 작동 방식
 --------------
-In `DistributedDataParallel <https://pytorch.org/docs/stable/generated/torch.nn.parallel.DistributedDataParallel.html>`__, (DDP) training, each process/ worker owns a replica of the model and processes a batch of data, finally it uses all-reduce to sum up gradients over different workers. In DDP the model weights and optimizer states are replicated across all workers. FSDP is a type of data parallelism that shards model parameters, optimizer states and gradients across DDP ranks. 
+`DistributedDataParallel <https://pytorch.org/docs/stable/generated/torch.nn.parallel.DistributedDataParallel.html>`__ (DDP) 학습에서는,
+각 process/ worker가 모델의 복제본을 소유하고 데이터 배치를 처리한 후, 최종적으로 all-reduce를 사용하여 서로 다른  worker들의 변화도를 합산합니다. 
+DDP에서는 모델 가중치와 옵티마이저 상태가 모든 worker들에 걸쳐 복제됩니다. 
+FSDP는 모델 파라미터, 옵티마이저 상태, 변화도를 DDP rank들에 걸쳐 샤딩하는 데이터 병렬 처리 방식입니다.
 
-When training with FSDP, the GPU memory footprint is smaller than when training with DDP across all workers. This makes the training of some very large models feasible by allowing larger models or batch sizes to fit on device. This comes with the cost of increased communication volume. The communication overhead is reduced by internal optimizations like overlapping communication and computation.
+FSDP로 학습할 때, GPU 메모리 사용량은 모든 work들에 걸쳐 DDP로 학습할 때보다 작습니다. 
+이로 인해 더 큰 모델이나 배치 크기를 디바이스에 맞출 수 있어 매우 큰 모델의 학습이 가능해집니다. 
+다만 이는 통신량 증가라는 비용을 수반합니다. 이 때 발생하는 오버헤드는 통신과 계산을 중첩하는 등의 내부 최적화를 통해 줄어듭니다.
 
 .. figure:: /_static/img/distributed/fsdp_workflow.png
    :width: 100%
@@ -27,26 +36,29 @@ When training with FSDP, the GPU memory footprint is smaller than when training 
 
    FSDP Workflow
 
-At a high level FSDP works as follow:
+FSDP는 고수준에서 다음과 같이 작동합니다.
 
-*In constructor*
+*생성자에서*
 
-* Shard model parameters and each rank only keeps its own shard
+* 모델 파라미터들을 샤딩하고 각 랭크는 자신의 샤드만 유지합니다.
 
-*In forward path*
+*순전파 경로에서*
 
-* Run all_gather to collect all shards from all ranks to recover the full parameter in this FSDP unit
-* Run forward computation
-* Discard parameter shards it has just collected
+* all_gather를 실행하여 모든 랭크로부터 모든 샤드를 수집해 이 FSDP 유닛의 전체 파라미터를 복원합니다.
+* 순전파 연산을 실행합니다.
+* 방금 수집한 파라미터 샤드를 폐기합니다.
 
-*In backward path*
+*역전파 경로에서*
 
-* Run all_gather to collect all shards from all ranks to recover the full parameter in this FSDP unit
-* Run backward computation
-* Run reduce_scatter to sync gradients
-* Discard parameters. 
+* all_gather를 실행하여 모든 랭크로부터 모든 샤드를 수집해 이 FSDP 유닛의 전체 파라미터를 복원합니다.
+* 역전파 연산을 실행합니다.
+* reduce_scatter를 실행하여 변화도를 동기화합니다.
+* 파라미터를 폐기합니다.
 
-One way to view FSDP's sharding is to decompose the DDP gradient all-reduce into reduce-scatter and all-gather. Specifically, during the backward pass, FSDP reduces and scatters gradients, ensuring that each rank possesses a shard of the gradients. Then it updates the corresponding shard of the parameters in the optimizer step. Finally, in the subsequent forward pass, it performs an all-gather operation to collect and combine the updated parameter shards.
+FSDP의 샤딩을 쉽게 이해하는 한 가지 방법은 DDP에서 수행되는 변화도에 대한 all-reduce연산을 reduce-scatter와 all-gather 2개로 분해하는 것입니다. 
+구체적으로는, 역전파 과정에서 FSDP는 변화도를 축소하고 분산시켜 각 랭크가 변화도의 샤드를 소유하도록 합니다. 
+그런 다음 옵티마이저 단계에서 매개변수의 해당 샤드를 업데이트합니다. 
+마지막으로, 후속 순전파에서 all-gather 연산을 수행하여 갱신된 매개변수가 담긴 샤드를 수집하고 결합합니다.
 
 .. figure:: /_static/img/distributed/fsdp_sharding.png
    :width: 100%
@@ -55,26 +67,28 @@ One way to view FSDP's sharding is to decompose the DDP gradient all-reduce into
 
    FSDP Allreduce
 
-How to use FSDP
+FSDP 사용 방법
 ---------------
-Here we use a toy model to run training on the MNIST dataset for demonstration purposes. The APIs and logic can be applied to training larger models as well. 
+여기서는 시연 목적으로 MNIST 데이터셋으로 훈련을 수행할 간단한 예제 모델을 사용해보겠습니다. 이 API들과 로직은 더 큰 모델의 학습에도 적용될 수 있습니다.
 
-*Setup*
+*설정*
 
-1.1 Install PyTorch along with Torchvision
+1.1 PyTorch와 Torchvision 설치
 
-See the `Get Started guide <https://pytorch.org/get-started/locally/>`__ for information on installation.
+설치에 대한 정보는 `Get Started guide <https://pytorch.org/get-started/locally/>`__ 를 참조바랍니다.
+다음 코드 snippet들을 "FSDP_mnist.py"라는 Python 스크립트에 추가합니다.
 
-We add the following code snippets to a python script “FSDP_mnist.py”.
-
-1.2  Import necessary packages
+1.2  필요한 패키지 임포트
 
 .. note::
-    This tutorial is intended for PyTorch versions 1.12 and later. If you are using an earlier version, replace all instances of `size_based_auto_wrap_policy` with `default_auto_wrap_policy`.
+    This tutorial is intended for PyTorch versions 1.12 and later. 
+    If you are using an earlier version, replace all instances of `size_based_auto_wrap_policy` with `default_auto_wrap_policy`.
+    이 튜토리얼은 PyTorch 버전 1.12 이상을 대상으로 합니다.
+    이전 버전을 사용하고 있다면, 모든 `size_based_auto_wrap_policy`의 인스턴스를 `default_auto_wrap_policy`로 교체하시기 바랍니다.
 
 .. code-block:: python
 
-    # Based on: https://github.com/pytorch/examples/blob/master/mnist/main.py
+    # 출처: https://github.com/pytorch/examples/blob/master/mnist/main.py
     import os
     import argparse
     import functools
@@ -192,7 +206,7 @@ We add the following code snippets to a python script “FSDP_mnist.py”.
             test_loss = ddp_loss[0] / ddp_loss[2]
             print('Test set: Average loss: {:.4f}, Accuracy: {}/{} ({:.2f}%)\n'.format(
                 test_loss, int(ddp_loss[1]), int(ddp_loss[2]),
-                100. * ddp_loss[1] / ddp_loss[2]))
+                1.   * ddp_loss[1] / ddp_loss[2]))
 
 2.4 Define a distributed train function that wraps the model in FSDP
 
