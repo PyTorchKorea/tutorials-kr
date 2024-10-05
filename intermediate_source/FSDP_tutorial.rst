@@ -2,7 +2,7 @@ Fully Sharded Data Parallel(FSDP) 시작하기
 ======================================================
 
 **저자**: `Hamid Shojanazeri <https://github.com/HamidShojanazeri>`__, `Yanli Zhao <https://github.com/zhaojuanmao>`__, `Shen Li <https://mrshenli.github.io/>`__
-**번역:** `이진혁 <https://github.com/uddk6215>__`
+**번역:**: `이진혁 <https://github.com/uddk6215>__`
 
 .. note::
    |edit| 이 튜토리얼을 `github <https://github.com/pytorch/tutorials/blob/main/intermediate_source/FSDP_tutorial.rst>`__에서 보고 수정할 수 있습니다.
@@ -21,7 +21,7 @@ PyTorch 1.11에서 출시된 `PyTorch FSDP <https://pytorch.org/blog/introducing
 FSDP의 작동 방식
 --------------
 `DistributedDataParallel <https://pytorch.org/docs/stable/generated/torch.nn.parallel.DistributedDataParallel.html>`__ (DDP) 학습에서는,
-각 process/ worker가 모델의 복제본을 소유하고 데이터 배치를 처리한 후, 최종적으로 all-reduce를 사용하여 서로 다른  worker들의 변화도를 합산합니다. 
+각 process/ worker가 모델의 복제본을 소유하고 데이터 배치를 처리한 후, 최종적으로 all-reduce를 사용하여 서로 다른 worker들의 변화도를 합산합니다. 
 DDP에서는 모델 가중치와 옵티마이저 상태가 모든 worker들에 걸쳐 복제됩니다. 
 FSDP는 모델 파라미터, 옵티마이저 상태, 변화도를 DDP rank들에 걸쳐 샤딩하는 데이터 병렬 처리 방식입니다.
 
@@ -81,10 +81,9 @@ FSDP 사용 방법
 1.2  필요한 패키지 임포트
 
 .. note::
-    This tutorial is intended for PyTorch versions 1.12 and later. 
-    If you are using an earlier version, replace all instances of `size_based_auto_wrap_policy` with `default_auto_wrap_policy`.
+
     이 튜토리얼은 PyTorch 버전 1.12 이상을 대상으로 합니다.
-    이전 버전을 사용하고 있다면, 모든 `size_based_auto_wrap_policy`의 인스턴스를 `default_auto_wrap_policy`로 교체하시기 바랍니다.
+    이전 버전을 사용하고 있다면, `size_based_auto_wrap_policy`의 모든 인스턴스를 `default_auto_wrap_policy`로 교체하시기 바랍니다.
 
 .. code-block:: python
 
@@ -116,7 +115,9 @@ FSDP 사용 방법
         wrap,
     )
 
-1.3 Distributed training setup. As we mentioned FSDP is a type of data parallelism which requires a distributed training environment, so here we use two helper functions to initialize the processes for distributed training and clean up.
+1.3 분산 학습 설정
+앞서 언급했듯이 FSDP는 분산 학습 환경이 필요한 데이터 병렬화의 한 유형입니다. 
+따라서 여기서는 분산 학습을 위한 process를 초기화하고 정리하는 두 가지 함수를 사용합니다.
 
 .. code-block:: python
 
@@ -130,7 +131,7 @@ FSDP 사용 방법
     def cleanup():
         dist.destroy_process_group()
 
-2.1  Define our toy model for handwritten digit classification. 
+2.1  손글씨 숫자 분류를 위한 예제 모델을 정의
 
 .. code-block:: python
 
@@ -160,7 +161,7 @@ FSDP 사용 방법
             output = F.log_softmax(x, dim=1)
             return output
 
-2.2 Define a train function 
+2.2 학습 함수 정의
 
 .. code-block:: python
 
@@ -183,7 +184,7 @@ FSDP 사용 방법
         if rank == 0:
             print('Train Epoch: {} \tLoss: {:.6f}'.format(epoch, ddp_loss[0] / ddp_loss[1]))
 
-2.3 Define a validation function 
+2.3 검증 함수 정의
 
 .. code-block:: python
 
@@ -208,9 +209,8 @@ FSDP 사용 방법
                 test_loss, int(ddp_loss[1]), int(ddp_loss[2]),
                 1.   * ddp_loss[1] / ddp_loss[2]))
 
-2.4 Define a distributed train function that wraps the model in FSDP
-
-**Note: to save the FSDP model, we need to call the state_dict on each rank then on Rank 0 save the overall states.**
+2.4 모델을 FSDP로 래핑하는 분산 학습 함수 정의
+**주의: FSDP 모델을 저장하기 위해서는 각 랭크에서 state_dict를 호출한 다음, 랭크 0에서 전체 상태를 저장해야 합니다.**
 
 .. code-block:: python
 
@@ -269,7 +269,7 @@ FSDP 사용 방법
             print(f"{model}")
 
         if args.save_model:
-            # use a barrier to make sure training is done on all ranks
+            # 모든 랭크에서 학습이 완료되었는지 확인하기 위해 barrier를 사용합니다.
             dist.barrier()
             states = model.state_dict()
             if rank == 0:
@@ -279,7 +279,7 @@ FSDP 사용 방법
 
 
 
-2.5 Finally, parse the arguments and set the main function
+2.5 마지막으로, 인자를 파싱하고 메인 함수를 설정
 
 .. code-block:: python
 
@@ -313,7 +313,7 @@ FSDP 사용 방법
             join=True)
 
 
-We have recorded cuda events to measure the time of FSDP model specifics. The CUDA event time was 110.85 seconds.
+ FSDP 모델의 특정 시간(학습 루프의 실행 시간)을 측정하기 위해 CUDA 이벤트를 기록했습니다. 전체 CUDA 이벤트 시간은 110.85 초였습니다.
 
 .. code-block:: bash
 
@@ -321,8 +321,8 @@ We have recorded cuda events to measure the time of FSDP model specifics. The CU
 
     CUDA event elapsed time on training loop 40.67462890625sec
 
-Wrapping the model with FSDP, the model will look as follows, we can see the model has been wrapped in one FSDP unit.
-Alternatively, we will look at adding the fsdp_auto_wrap_policy next and will discuss the differences. 
+FSDP로 모델을 래핑하면, 모델은 다음과 같이 보일 것입니다. 모델이 하나의 FSDP 유닛으로 래핑된 것을 볼 수 있습니다.
+다음으로, fsdp_auto_wrap_policy를 추가하는 것을 살펴보고 차이점에 대해 논의할 것입니다.
 
 .. code-block:: bash
 
@@ -339,8 +339,7 @@ Alternatively, we will look at adding the fsdp_auto_wrap_policy next and will di
     )
  )
 
-The following is the peak memory usage from FSDP MNIST training on g4dn.12.xlarge AWS EC2 instance with 4 GPUs captured from PyTorch Profiler. 
-
+다음은 PyTorch Profiler로 캡처한 g4dn.12.xlarge AWS EC2 인스턴스의 4개 GPU에서 FSDP MNIST 학습 시 최대 메모리 사용량입니다.
 
 .. figure:: /_static/img/distributed/FSDP_memory.gif
    :width: 100%
@@ -349,19 +348,24 @@ The following is the peak memory usage from FSDP MNIST training on g4dn.12.xlarg
 
    FSDP Peak Memory Usage
 
-Applying *fsdp_auto_wrap_policy* in FSDP otherwise, FSDP will put the entire model in one FSDP unit, which will reduce computation efficiency and memory efficiency. 
-The way it works is that, suppose your model contains 100 Linear layers. If you do FSDP(model), there will only be one FSDP unit which wraps the entire model. 
-In that case, the allgather would collect the full parameters for all 100 linear layers, and hence won't save CUDA memory for parameter sharding.
-Also, there is only one blocking allgather call for the all 100 linear layers, there will not be communication and computation overlapping between layers. 
+FSDP에 *fsdp_auto_wrap_policy* 를 적용하지 않으면, FSDP는 전체 모델을 하나의 FSDP 유닛에 넣게 되어 계산 효율성과 메모리 효율성이 감소합니다.
+작동 방식은 다음과 같습니다. 예를 들어, 모델에 100개의 Linear 층이 있다고 가정해 봅시다. FSDP(model)을 실행하면, 전체 모델을 감싸는 하나의 FSDP 유닛만 생성됩니다.
+이 경우, allgather 연산이 100개 모든 선형 층의 전체 매개변수를 수집하게 되어, 매개변수 값 샤딩을 통한 CUDA 메모리 절약 효과가 없어집니다.
+또한, 100개의 선형 층 전체에 대해 하나의 대규모 allgather 연산만 수행되므로, 층 간 통신과 계산을 동시에 처리할 수 없습니다.
 
-To avoid that, you can pass in an fsdp_auto_wrap_policy, which will seal the current FSDP unit and start a new one automatically when the specified condition is met (e.g., size limit).
-In that way you will have multiple FSDP units, and only one FSDP unit needs to collect full parameters at a time. E.g., suppose you have 5 FSDP units, and each wraps 20 linear layers.
-Then, in the forward, the 1st FSDP unit will allgather parameters for the first 20 linear layers, do computation, discard the parameters and then move on to the next 20 linear layers. So, at any point in time, each rank only materializes parameters/grads for 20 linear layers instead of 100.
+이러한 문제를 피하기 위해, fsdp_auto_wrap_policy를 사용할 수 있습니다. 해당 방식은 지정된 조건(예: 크기 제한)이 충족되면 
+현재 FSDP 유닛 단위를 마무리하고 새로운 단위를 자동으로 시작합니다.
+
+이렇게 하면 여러 개의 FSDP 유닛 단위가 생기고, 한 번에 하나의 FSDP 유닛 단위만 전체 매개변수를 수집하면 됩니다. 
+예를 들어, 5개의 FSDP 유닛 단위가 있다 가정하고 각 단위가 20개의 선형 층을 포함한다고 가정해 봅시다. 
+그러면 순전파 과정에서 첫 번째 FSDP 단위는 처음 20개 선형 층의 매개변수들만 모으고, 계산을 수행한 후 이 매개변수들을 버리고 다음 20개 층으로 넘어갑니다.
+이런 방식으로, 어느 시점에서도 각 rank(GPU)는 100개가 아닌 20개의 선형 층의 매개변수와 변화도 값만 실제로 메모리에 유지하게 됩니다
 
 
-To do so in 2.4 we define the auto_wrap_policy and pass it to FSDP wrapper, in the following example, my_auto_wrap_policy defines that a layer could be wrapped or sharded by FSDP if the number of parameters in this layer is larger than 100.
-If the number of parameters in this layer is smaller than 100, it will be wrapped with other small layers together by FSDP. 
-Finding an optimal auto wrap policy is challenging, PyTorch will add auto tuning for this config in the future. Without an auto tuning tool, it is good to profile your workflow using different auto wrap policies experimentally and find the optimal one.
+2.4에서 이를 구현하기 위해 auto_wrap_policy를 정의하고 FSDP 래퍼에 전달하고, 다음 예시에서 my_auto_wrap_policy는 층의 매개변수 수가 100개보다 크면 
+해당 층을 FSDP로 래핑하거나 샤딩할 수 있다고 정의합니다. 층의 매개변수 수가 100개 미만이면 FSDP에 의해 다른 작은 층들과 함께 래핑됩니다.
+최적의 auto wrap policy를 찾는 것은 어려운 과제입니다. PyTorch는 향후 이 설정을 위한 자동 튜닝 기능을 추가할 예정입니다. 
+자동 튜닝 도구 없이는 다양한 auto wrap policy들을 실험적으로 사용하여 워크플로우를 프로파일링하고 최적의 것을 찾는 것이 좋습니다.
 
 .. code-block:: python
 
@@ -374,7 +378,7 @@ Finding an optimal auto wrap policy is challenging, PyTorch will add auto tuning
     model = FSDP(model,
         fsdp_auto_wrap_policy=my_auto_wrap_policy)
 
-Applying the fsdp_auto_wrap_policy, the model would be as follows:
+fsdp_auto_wrap_policy를 적용하면, 모델은 다음과 같은 구조를 가지게 됩니다.
 
 .. code-block:: bash
 
@@ -401,25 +405,29 @@ Applying the fsdp_auto_wrap_policy, the model would be as follows:
 
     CUDA event elapsed time on training loop 41.89130859375sec
 
-The following is the peak memory usage from FSDP with auto_wrap policy of MNIST training on a g4dn.12.xlarge AWS EC2 instance with 4 GPUs captured from PyTorch Profiler. 
-It can be observed that the peak memory usage on each device is smaller compared to FSDP without auto wrap policy applied, from ~75 MB to 66 MB.
+다음은 auto_wrap policy를 적용하여 FSDP를 사용한 MNIST 학습의 최대 메모리 사용량입니다. 이는 PyTorch Profiler로 캡처한 4개의 GPU가 있는 g4dn.12.xlarge AWS EC2 인스턴스에서 측정되었습니다.
+auto_wrap policy를 적용하지 않은 FSDP와 비교했을 때, 각 디바이스의 최대 메모리 사용량이 약 75MB에서 66MB로 감소한 것을 관찰할 수 있었습니다.
 
 .. figure:: /_static/img/distributed/FSDP_autowrap.gif
    :width: 100%
    :align: center
    :alt: FSDP peak memory
 
-   FSDP Peak Memory Usage using Auto_wrap policy
+   Auto_wrap policy를 사용한 FSDP의 최대 메모리 사용량
 
-*CPU Off-loading*: In case the model is very large that even with FSDP wouldn't fit into GPUs, then CPU offload can be helpful here. 
+*CPU 오프로딩*: FSDP를 사용해도 모델이 너무 커서 GPU에 맞지 않는 경우, CPU 오프로딩이 도움이 될 수 있습니다.
 
-Currently, only parameter and gradient CPU offload is supported. It can be enabled via passing in cpu_offload=CPUOffload(offload_params=True).
+현재는 매개변수와 변화도 값의 CPU 오프로딩만 지원됩니다. cpu_offload=CPUOffload(offload_params=True)를 전달하여 활성화할 수 있습니다.
 
-Note that this currently implicitly enables gradient offloading to CPU in order for params and grads to be on the same device to work with the optimizer. This API is subject to change. The default is None in which case there will be no offloading.
+매개변수와 변화도 값이 옵티마이저와 함께 작동하기 위해 같은 디바이스에 있어야 하므로, 현재는 암묵적으로 변화도 값의 CPU 오프로딩도 활성화됩니다.
 
-Using this feature may slow down the training considerably, due to frequent copying of tensors from host to device, but it could help improve memory efficiency and train larger scale models. 
+이 API는 변경될 수 있습니다. 기본값은 None이며, 이 경우 오프로딩이 수행되지 않습니다.
 
-In 2.4 we just add it to the FSDP wrapper
+이 기능을 사용하면 호스트와 디바이스 간 텐서의 빈번한 복사로 인해 학습 속도가 상당히 느려질 수 있지만, 
+
+메모리 효율성을 개선하고 더 큰 규모의 모델을 학습하는 데 도움이 될 수 있습니다.
+
+2.4에서는 이를 FSDP 래퍼에 추가하기만 하면 됩니다.
 
 
 .. code-block:: python
@@ -429,7 +437,7 @@ In 2.4 we just add it to the FSDP wrapper
         cpu_offload=CPUOffload(offload_params=True))
 
 
-Compare it with DDP, if in 2.4 we just normally wrap the model in DPP, saving the changes in “DDP_mnist.py”.
+DDP와 비교해보겠습니다. 2.4에서 모델을 평범하게 DDP로 래핑하고, 변경 사항을 'DDP_mnist.py'에 저장한다면 다음과 같습니다.
 
 .. code-block:: python
 
@@ -443,19 +451,18 @@ Compare it with DDP, if in 2.4 we just normally wrap the model in DPP, saving th
 
     CUDA event elapsed time on training loop 39.77766015625sec
 
-The following is the peak memory usage from DDP MNIST training on g4dn.12.xlarge AWS EC2 instance with 4 GPUs captured from PyTorch profiler. 
+다음은 PyTorch 프로파일러로 캡처한, 4개의 GPU로 g4dn.12.xlarge AWS EC2 인스턴스에서 DDP를 사용하여 MNIST를 학습시킨 모델의 최대 메모리 사용량입니다.
 
 .. figure:: /_static/img/distributed/DDP_memory.gif
    :width: 100%
    :align: center
    :alt: FSDP peak memory
 
-   DDP Peak Memory Usage using Auto_wrap policy
+   Auto_wrap policy를 사용한 DDP의 최대 메모리 사용량
 
+여기서 정의한 간단한 예제와 작은 MNIST 모델을 고려할 때, DDP와 FSDP의 최대 메모리 사용량 차이를 관찰할 수 있습니다.
+DDP에서는 각 process가 모델의 복제본을 가지고 있어, 모델 매개변수, 옵티마이저 상태, 그리고 변화도를 DDP 랭크에 걸쳐 샤딩하는 FSDP에 비해 메모리 사용량이 더 높습니다.
+auto_wrap policy를 사용한 FSDP의 최대 메모리 사용량이 가장 낮고, 그 다음으로 FSDP, 마지막으로 DDP 순입니다.
 
-Considering the toy example and tiny MNIST model we defined here, we can observe the difference between peak memory usage of DDP and FSDP. 
-In DDP each process holds a replica of the model, so the memory footprint is higher compared to FSDP which shards the model parameters, optimizer states and gradients over DDP ranks.
-The peak memory usage using FSDP with auto_wrap policy is the lowest followed by FSDP and DDP. 
-
-Also, looking at timings, considering the small model and running the training on a single machine, FSDP with and without auto_wrap policy performed almost as fast as DDP.
-This example does not represent most of the real applications, for detailed analysis and comparison between DDP and FSDP please refer to this `blog post  <https://pytorch.medium.com/6c8da2be180d>`__ .
+또한, 전체 학습 과정의 실행 시간을 보면, 작은 모델과 단일 머신에서 학습시키는 것을 고려할 때는, auto_wrap policy를 사용 여부에 관계없이 FSDP는 DDP와 거의 비슷한 속도로 수행되었습니다.
+이 예제는 대부분의 실제 애플리케이션을 대표하지 않습니다. DDP와 FSDP 사이의 자세한 분석과 비교는 이 `blog post  <https://pytorch.medium.com/6c8da2be180d>`__ 를 참조바랍니다.
