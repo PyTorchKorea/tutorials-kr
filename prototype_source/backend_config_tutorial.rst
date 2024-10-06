@@ -1,5 +1,6 @@
 (prototype) PyTorch BackendConfig Tutorial
 ==========================================
+**저자**: `Andrew Or <https://github.com/andrewor14>`_
 **번역**: `장승호 <https://github.com/jason9865>`_
 
 BackendConfig API를 통해 백엔드 환경에서 PyTorch 양자화를 사용할 수 있습니다.
@@ -136,7 +137,7 @@ quant1 변수의 데이터 타입 인자로, 출력값의 데이터 타입은 qu
         .set_backend_pattern_config(conv_relu_config) \
         .set_backend_pattern_config(fused_conv_relu_config)
 
-5. 백엔드 환경 제약조건을 충족하기 위해 QConfigMapping 설정하기
+5. 백엔드 환경 제약조건을 만족시키는 QConfigMapping 설정하기
 ----------------------------------------------------------------
 
 앞서 정의한 연산자를 사용하기 위해서는 DTypeConfig의 제약조건을 만족하는 
