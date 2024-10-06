@@ -15,7 +15,7 @@ DDP를 이용한 다중 GPU 훈련
 .. grid:: 2
 
    .. grid-item-card:: :octicon:`mortar-board;1em;` 여기에서 배우는 것
-      
+
       -  DDP를 이용하여 단일 GPU 학습 스크립트를 다중 GPU 학습 스크립트로 바꾸는 법
       -  분산 프로세스 그룹(distributed process group)을 설정하는 법
       -  분산 환경에서 모델을 저장 및 읽어오는 법
