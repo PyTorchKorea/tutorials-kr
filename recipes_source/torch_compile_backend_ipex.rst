@@ -153,7 +153,7 @@ BF16 추론
    model.eval()
    data = torch.rand(1, 3, 224, 224)
 
-   #################### code changes ####################
+   #################### 코드 변경 부분 ####################
    import intel_extension_for_pytorch as ipex
 
    # 선택적으로 다음 API를 호출하여, 프론트엔드 최적화를 적용합니다.
