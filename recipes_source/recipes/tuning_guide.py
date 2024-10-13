@@ -330,7 +330,7 @@ with torch.no_grad(), torch.cpu.amp.autocast(cache_enabled=False, dtype=torch.bf
 # PyTorch ``DistributedDataParallel`` (DDP) 기능을 사용해 CPU에서 모델 학습하는 방법
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # DLRM과 같은 소규모 모델 또는 메모리에 바인딩 된 모델의 경우 CPU에서 학습하는 것도 좋은 선택입니다. 
-# 다중 소켓을 가진 머신에서는 분산 학습이 고효율의 하드웨어 자원 사용을 통해 학습 과정을 가속화합니다. 
+# 여러 소켓을 가진 머신에서는, 분산 학습으로 고효율의 하드웨어 자원을 사용하여 학습 과정을 가속할 수 있습니다. 
 # `Torch-ccl <https://github.com/intel/torch-ccl>`_ 은 Intel(R)의 ``oneCCL`` 
 # (집합 통신 라이브러리)로 최적화되어 효율적인 분산 딥러닝 학습을 위해 ``allreduce`` , 
 # ``allgather`` , ``alltoall`` 과 같은 집합 연산을 구현합니다. Torch-ccl은 PyTorch C10D 
@@ -359,7 +359,7 @@ torch.backends.cudnn.benchmark = True
 #   있습니다. 자세한 내용은 
 #   `PyTorch: Reproducibility <https://pytorch.org/docs/stable/notes/randomness.html?highlight=determinism>`_
 #   를 참조하세요.
-# * 입력 크기가 매우 가변적인 경우처럼 드문 상황에서는, 각 입력 크기에 대해 알고리즘 선택과 관련된 
+# * 드문 상황에서, 예를 들면 입력 크기가 가변적인 경우, 각 입력 크기에 대해 알고리즘 선택과 관련된 
 #   오버헤드를 피하기 위해 autotuner를 비활성화하고 합성곱 신경망을 실행하는 것이 더 나을 수 있습니다.
 #
 
