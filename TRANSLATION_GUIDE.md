@@ -53,6 +53,7 @@
 |autograd|Autograd|황성수|번역안함|
 |Batch Normalization|배치 정규화|박정환||
 |bias|편향|이하람||
+|CUDA|CUDA|박지은|번역안함|
 |convolution|합성곱|김현길||
 |Dropout|드롭아웃|김태형|음차 표기|
 |dataset|데이터셋|박정환|음차 표기|
@@ -71,6 +72,7 @@
 |Getting Started tutorial|시작하기 튜토리얼|박정환|ToC의 Getting Started를 뜻합니다.|
 |gradient|변화도|박정환||
 |Hyperparameter|하이퍼파라미터|김태영|음차 표기|
+|inference|추론|박지은||
 |Image|이미지|박정환|ToC의 분류명입니다.|
 |in-place|제자리|허남규||
 |initialization|초기화|김지호||
