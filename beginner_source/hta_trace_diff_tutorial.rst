@@ -11,7 +11,7 @@ TraceDiff 클래스는 트레이스 간의 차이를 비교하고 이러한 차�
 특히, 사용자는 각 그룹에서 추가되거나 제거된 연산자와 커널을 찾을 수 있으며, 각 연산자/커널의 빈도와 누적 소요 시간도 확인할 수 있습니다.
 
 `TraceDiff <https://hta.readthedocs.io/en/latest/source/api/trace_diff_api.html>`_ 클래스는 다음과 같은 메소드를 가지고 있습니다.
-TraceDiff 클래스의 메서드:
+TraceDiff 클래스의 메소드:
 
 * `compare_traces <https://hta.readthedocs.io/en/latest/source/api/trace_diff_api.html#hta.trace_diff.TraceDiff.compare_traces>`_:
   두 세트의 트레이스에서 CPU 연산자와 GPU 커널의 빈도와 총 지속 시간을 비교합니다.
@@ -30,7 +30,7 @@ TraceDiff 클래스의 메서드:
 
 * `visualize_duration_diff <https://hta.readthedocs.io/en/latest/source/api/trace_diff_api.html#hta.trace_diff.TraceDiff.visualize_duration_diff>`_
 
-마지막 두 메서드는 compare_traces 메서드의 출력을 사용하여 CPU 연산자와 GPU 커널의 
+마지막 두 메소드는 compare_traces 메소드의 출력을 사용하여 CPU 연산자와 GPU 커널의 
 빈도 및 지속 시간의 다양한 변화를 시각화하는 데 사용할 수 있습니다.
 
 예를 들어, 빈도가 증가한 상위 10개의 연산자는 다음과 같이 계산할 수 있습니다.
