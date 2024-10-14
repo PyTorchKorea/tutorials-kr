@@ -1,8 +1,8 @@
 Intel® Extension for PyTorch* 백엔드
 =====================================
 
-**저자**: `Hamid Shojanazeri <https://github.com/jingxu10>__`
-**번역:**: `김재현 <https://github.com/jh941213>__`
+**저자**: `Hamid Shojanazeri <https://github.com/jingxu10>`_
+**번역:**: `김재현 <https://github.com/jh941213>`_
 
 - `torch.compile` 과 더 잘 작동하도록, Intel® Extension for PyTorch는 ``ipex`` 라는 백엔드를 구현했습니다.    
 - 이 백엔드는 Intel 플랫폼에서 하드웨어 자원 사용 효율성을 개선하여 성능을 향상시키는 것을 목표로 합니다.  
@@ -47,7 +47,6 @@ FP32 학습
 
    #################### 코드 변경 부분 ####################
    import intel_extension_for_pytorch as ipex
-
    # 선택적으로 다음 API를 호출하여, 프론트엔드 최적화를 적용합니다.
    model, optimizer = ipex.optimize(model, optimizer=optimizer)
 
@@ -99,7 +98,6 @@ BF16 학습
 
    #################### 코드 변경 부분 ####################
    import intel_extension_for_pytorch as ipex
-
    # 선택적으로 다음 API를 호출하여, 프론트엔드 최적화를 적용합니다.
    model, optimizer = ipex.optimize(model, dtype=torch.bfloat16, optimizer=optimizer)
 
@@ -131,7 +129,6 @@ FP32 추론
 
    #################### 코드 변경 부분 ####################
    import intel_extension_for_pytorch as ipex
-   
    # 선택적으로 다음 API를 호출하여, 프론트엔드 최적화를 적용합니다.
    model = ipex.optimize(model, weights_prepack=False)
 
@@ -158,7 +155,6 @@ BF16 추론
 
    #################### 코드 변경 부분 ####################
    import intel_extension_for_pytorch as ipex
-
    # 선택적으로 다음 API를 호출하여, 프론트엔드 최적화를 적용합니다.
    model = ipex.optimize(model, dtype=torch.bfloat16, weights_prepack=False)
 
