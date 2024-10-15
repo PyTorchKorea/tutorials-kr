@@ -3,6 +3,7 @@
 (beta) 반구조적 (2:4) 희소성을 통한 BERT 가속화
 =============================================
 **저자**: `Jesse Cai <https://github.com/jcaip>`_
+**번역**: `구경선 <https://github.com/kookyungseon>__`
 
 """
 
@@ -37,7 +38,7 @@
 # -  PyTorch >= 2.1.
 # -  반구조적 희소성을 지원하는 NVIDIA GPU(Compute Capability 8.0+)
 #
-# 이 튜토리얼은 반구조적 희소성 및 일반적인 희소성에 대한 초보자를 위해 설계되었습니다. 
+# 이 튜토리얼은 초보자에게 반구조적 희소성 및 일반적인 희소성을 맞춤 설명합니다.
 # 이미 2:4 희소 모델을 보유한 사용자에게는 ``to_sparse_semi_structured``를 사용하여 
 # 추론을 위한 ``nn.Linear`` 레이어를 가속화하는 것이 매우 간단합니다. 다음은 그 예시입니다:
 # 
@@ -83,7 +84,7 @@ with torch.inference_mode():
 # 그러나 희소성의 구체적인 구현은 까다롭습니다. 매개변수를 0으로 만드는 것만으로는 
 # 기본적으로 모델의 지연 시간 / 메모리 오버헤드에 영향을 미치지 않습니다.
 # 
-# 그 이유는 밀집 텐서(dense tensor)가 여전히 가지치기된(0인) 요소를 포함하고 있으며, 
+# 그 이유는 dense tensor가 여전히 가지치기된(0인) 요소를 포함하고 있으며, 
 # 밀집 행렬 곱셈 커널이 이러한 요소에 대해 계속 연산을 수행하기 때문입니다. 성능 향상을 
 # 실현하려면, 밀집 커널을 가지치기된 요소의 계산을 건너뛰는 희소 커널로 교체해야 합니다.
 # 
@@ -99,16 +100,16 @@ with torch.inference_mode():
 #    Image sourced from `NVIDIA blog post <https://developer.nvidia.com/blog/structured-sparsity-in-the-nvidia-ampere-architecture-and-applications-in-search-engines/>`_ on semi-structured sparsity.
 # 
 # 희소 레이아웃에는 각기 다른 장점과 단점을 가진 여러 가지가 있습니다. 2:4 반구조적 
-# 희소 레이아웃은 두 가지 이유로 특히 흥미롭습니다:
+# 희소 레이아웃은 흥미로운 두 가지 이유가 있습니다:
 # 
 # * 이전의 희소 형식과 달리 반구조적 희소성은 GPU에서 효율적으로 가속되도록 설계되었습니다. 
 #   2020년 NVIDIA는 Ampere 아키텍처를 통해 반구조적 희소성을 위한 하드웨어 지원을 도입했으며, 
 #   CUTLASS `cuSPARSELt <https://docs.nvidia.com/cuda/cusparselt/index.html>`__ 
 #   cuSPARSELt를 통해 빠른 희소 커널도 출시했습니다.
 # 
-# * 동시에 반구조적 희소성은 다른 희소 형식에 비해 모델 정확도에 미치는 영향이 덜한 경향이 
-#   있습니다. 특히 더 발전된 가지치기 및 미세 조정 방법을 고려할 때 그렇습니다. NVIDIA는 
-#   그들의 `백서 <https://arxiv.org/abs/2104.08378>`_
+# * 동시에 반구조적 희소성은 다른 희소 형식에 비해 모델 정확도에 미치는 영향이 덜한 경향이 있습니다.
+#   특히 더 발전된 가지치기 및 미세 조정 방법을 고려할 때 그렇습니다. 
+#   NVIDIA가 공개한 `백서 <https://arxiv.org/abs/2104.08378>`_
 #   에서 2:4 희소성을 목표로 한 단순한 크기 기준 가지치기(magnitude pruning) 후 모델을 
 #   재학습하면 거의 동일한 모델 정확도를 달성할 수 있음을 보여주었습니다.
 # 
@@ -136,7 +137,7 @@ with torch.inference_mode():
 # 반구조적 희소성은 워크플로 관점에서 추가적인 장점이 있습니다. 희소성 수준이 50%로 고정되어 
 # 있어 모델을 희소화하는 문제를 두 가지 별개의 하위 문제로 분해하기가 더 쉽습니다:
 # 
-# - 정확도 - 2:4 희소 가중치 세트를 찾아 모델의 정확도 저하를 최소화할 수 있는 방법은 무엇인가?
+# - 정확도 - 2:4 희소 가중치 세트를 찾아 모델의 정확도 저하를 최소화할 수 있는 방법은 무엇인가요?
 #
 # - 성능: 추론 및 메모리 오버헤드를 줄이기 위해 2:4 희소 가중치를 어떻게 가속화할 수 있는가?
 #
@@ -369,7 +370,7 @@ def measure_execution_time(model, batch_sizes, dataset):
 # 모델과 토크나이저를 로드한 후, 데이터셋을 설정하면서 시작하겠습니다.
 # 
 
-# 모델 로드
+# 모델 불러오기
 model_name = "bert-base-cased"
 tokenizer = transformers.AutoTokenizer.from_pretrained(model_name)
 model = transformers.AutoModelForQuestionAnswering.from_pretrained(model_name)
@@ -487,7 +488,7 @@ sparse_config = [
 
 
 ######################################################################
-# 모델을 가지치기하는 첫 번째 단계는 모델의 가중치를 마스킹하기 위한 파라미터화를 삽입하는 것입니다. 
+# 모델의 매개변수화는 첫 번째 단계는 모델의 가중치를 마스킹하기 위한 파라미터화를 삽입하는 것입니다. 
 # 이는 준비 단계에서 수행됩니다. 이렇게 하면 ``.weight``에 접근할 때마다 대신 ``mask * weight``를 
 # 얻게 됩니다.
 # 
