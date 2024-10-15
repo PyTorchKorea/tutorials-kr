@@ -1,8 +1,8 @@
 """
 nn.Module에서 ``load_state_dict`` 및 tensor 서브클래스의 확장 포인트
 ===============================================================================
-**저자:** `Mikayla Gawarecki <https://github.com/mikaylagawarecki>`_
-**번역:** `구경선 <https://github.com/kookyungseon>`__
+**저자**: `Mikayla Gawarecki <https://github.com/mikaylagawarecki>`_
+**번역**: `구경선 <https://github.com/kookyungseon>`__
 
 이 레시피는 새로운 유틸리티 함수 ``torch.utils.swap_tensors``
 뿐만 아니라 이를 통합한 두 가지 새로운 확장 지점을 소개합니다
