@@ -1,7 +1,8 @@
 """
-nn.Module에서 ``load_state_dict`` 및 텐서 서브클래스의 확장 포인트
+nn.Module에서 ``load_state_dict`` 및 tensor 서브클래스의 확장 포인트
 ===============================================================================
 **저자:** `Mikayla Gawarecki <https://github.com/mikaylagawarecki>`_
+**번역:** `구경선 <https://github.com/kookyungseon>`__
 
 이 레시피는 새로운 유틸리티 함수 ``torch.utils.swap_tensors``
 뿐만 아니라 이를 통합한 두 가지 새로운 확장 지점을 소개합니다
@@ -35,13 +36,13 @@ print(f"After swapping, t1: {t1}, t2: {t2}")
 #
 # ``nn.Module``에의 적용
 # ----------------------------
-# 이 유틸리티는 모듈 외부의 파이썬 객체가 모듈의 파라미터에 대한
+# 이 유틸리티는 모듈 외부의 파이썬 객체가 모듈의 매개변수에 대한
 # 참조를 보유하고 있을 때 ``nn.Module``에 관련이 있습니다. 만약 ``nn.Module``
-# 이 파라미터를 제자리에 수정하면, 파라미터에 대한 참조를 보유한 객체는
-# 변경 사항을 볼 수 없습니다. 고전적인 예로는 ``nn.Module``의 파라미터에 대한
+# 이 매개변수를 제자리에 수정하면, 매개변수에 대한 참조를 보유한 객체는
+# 변경 사항을 볼 수 없습니다. 고전적인 예로는 ``nn.Module``의 매개변수에 대한
 # 참조를 보유하는 옵티마이저가 있습니다. 이로 인해 ``optimizer.step()``이
 # 오류 없이 실행되지만, ``nn.Module``의 가중치는 업데이트되지 않는
-# 무성의 정확성 문제를 초래할 수 있습니다.
+# 조용한 정확성 문제를 초래할 수 있습니다.
 
 mod = torch.nn.Linear(1, 2, bias=False)
 optimizer = torch.optim.SGD(mod.parameters())
@@ -52,14 +53,14 @@ print(f"weight in mod: {mod.weight}")
 print(f"weight in optimizer: {optimizer.param_groups[0]['params']}")
 
 ################################################################################
-# ``nn.Module.to()`` 및 관련 메서드
+# ``nn.Module.to()`` 및 메서드
 # --------------------------------------
 # 여기에는 모듈의 디바이스를 변경하는 메서드(예: ``nn.Module.cpu()``),
 # 모듈의 ``dtype``을 변경하는 메서드(예: ``nn.Module.float()``)
 # 뿐만 아니라 모듈을 구체화할 수 있게 해주는 메서드
 # (예: ``nn.Module.to_empty()``)가 포함됩니다.
 #
-# 처음에는 이러한 메서드가 모듈의 파라미터를 제자리에서 수정할 수 있다는 것이
+# 처음에는 이러한 메서드가 모듈의 매개변수를 제자리에서 수정할 수 있다는 것이
 # 직관적이지 않을 수 있습니다. 기존의 접근 방식은 PyTorch 초기부터 사용된
 # 복잡한 해킹 방법을 사용했습니다.
 #
@@ -123,12 +124,12 @@ print(f"m.weight.elem.dtype: {m.weight.elem.dtype}")
 print(f"m.bias.dtype: {m.bias.dtype}")
 
 ################################################################################
-# 이를 위해 글로벌 구성을 도입합니다
+# 이를 위해 전역 구성을 도입합니다
 # ``torch.__future__.set_swap_module_params_on_conversion``을 사용할 것입니다.
 # 이 구성은 ``swap_tensors``를 사용하여 모듈의 매개변수를 교환하며,
 # ``.data`` 설정 대신 참조를 보존합니다. 이 구성이 설정되면,
 # 변환 과정에서 ``swap_tensors``가 사용되며, 이를 통해
-# 페이로드의 ``dtype``이 올바르게 변환되도록 보장합니다.
+# 페이로드(payload)의 ``dtype``이 올바르게 변환되도록 보장합니다.
 
 torch.__future__.set_swap_module_params_on_conversion(True)
 m = nn.Linear(3, 5, dtype=torch.float32)
@@ -145,7 +146,7 @@ torch.__future__.set_swap_module_params_on_conversion(False)
 # ``nn.Module.load_state_dict()``
 # --------------------------------
 # ``load_state_dict()``에 전달된 ``assign`` 키워드 인수의 값에 따라,
-# ``state_dict``를 로드하는 두 가지 방법이 있습니다:
+# ``state_dict``를 읽어드리는 두 가지 방법이 있습니다:
 #
 # * ``assign=False``: ``module.param``의 속성을 보존하고, ``state_dict['param_name']``의
 #   값만 가져옵니다.
@@ -176,7 +177,7 @@ torch.__future__.set_swap_module_params_on_conversion(False)
 # ``state_dict[param_key]``)가 ``MyQuantizedLinearWeight`` 서브클래스인 경우  핸들러가 호출됩니다.
 #
 # ``state_dict``가 일반 텐서를 포함하고 있다고 가정하고,
-# 모듈이 ``MyQuantizedLinearWeight`` 파라미터를 포함하고 있으며,
+# 모듈이 ``MyQuantizedLinearWeight`` 매개변수를 포함하고 있으며,
 # ``state_dict``의 텐서가 서브클래스로 변환되기를 원합니다. 그럼,
 # 우리는 ``torch.Tensor.module_load``에 대한 ``__torch_function__`` 핸들러를 다음과 같이 정의할 수 있습니다:
 # 다음과 같이:
@@ -196,8 +197,8 @@ def custom_torch_function(cls, func, types, args=(), kwargs=None):
 MyQuantizedLinearWeight.__torch_function__ = custom_torch_function
 
 #################################################################################
-# 먼저, 메타 디바이스에서 모델의 스켈레톤을 생성하여 저장소를 실체화하는 것을 피합시다.
-# 저장소를 실체화하지 않습니다. 우리는 모듈의 모든 가중치를
+# 먼저, 메타 디바이스에서 모델 골격을 생성하여 저장소를 실체화하는 것을 피합시다.
+# 저장소를 실체화하지 않습니다.
 # `MyQuantizedLinearWeight` 서브클래스로 변환하면서 바이어스는 그대로 유지합니다.
 
 def fn(m):
@@ -212,7 +213,7 @@ with torch.device("meta"):
     m.apply(fn)
 
 #################################################################################
-# 그러면 ``state_dict``를 로드할 수 있습니다. 바이어스의 경우 ``assign=True``를 사용하는데,
+# 그러면 ``state_dict``를 로드할 수 있습니다. 편향(bias)의 경우 ``assign=True``를 사용하는데,
 # 바이어스의 경우, ``state_dict``에 있는 텐서의 속성을 유지하고자 합니다.
 # ``state_dict``에 있는 텐서의 속성을 유지하기 위해서입니다 (예를 들어, 로드 후 바이어스가 ``meta`` 디바이스에 있지 않도록).
 
@@ -235,7 +236,7 @@ print(f"m.state_dict() after load_state_dict():\n {m.state_dict()}")
 #
 # 결론
 # ----------
-# 이번 레시피에서는 ``swap_tensors``와 ``nn.Module``에서 파라미터의 참조를 보존하는 것의 중요성에 대해 배웠습니다.
-# ``nn.Module``에서 파라미터의 참조를 보존하는 것과 
+# 이번 레시피에서는 ``swap_tensors``와 ``nn.Module``에서 매개변수의 참조를 보존하는 것의 중요성에 대해 배웠습니다.
+# ``nn.Module``에서 매개변수의 참조를 보존하는 것과 
 # ``torch.__future__.set_swap_module_params_on_conversion``에 의해
 # 제어되는 두 가지 새로운 확장 지점을 사용하는 방법에 대해서도 배웠습니다.
