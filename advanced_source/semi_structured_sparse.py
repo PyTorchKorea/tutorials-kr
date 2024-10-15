@@ -1,52 +1,46 @@
 # -*- coding: utf-8 -*-
 """
-(beta) Accelerating BERT with semi-structured (2:4) sparsity
-=====================================================
-**Author**: `Jesse Cai <https://github.com/jcaip>`_
+(beta) 반구조적 (2:4) 희소성을 통한 BERT 가속화
+=============================================
+**저자**: `Jesse Cai <https://github.com/jcaip>`_
+**번역**: `이채운 <https://github.com/dlcodns>`_
 
 """
 
 ####################################################################
-# Overview
-# --------
-#
-# Like other forms of sparsity, **semi-structured sparsity** is a model
-# optimization technique that seeks to reduce the memory overhead and
-# latency of a neural network at the expense of some model accuracy. It is
-# also known as **fine-grained structured sparsity** or **2:4 structured
-# sparsity**.
-#
-# Semi-structured sparsity derives its name from its unique sparsity
-# pattern, where n out of every 2n elements are pruned. We most often see
-# n=2, hence 2:4 sparsity Semi-structured sparsity is particularly
-# interesting because it can be efficiently accelerated on GPUs and
-# doesn’t degrade model accuracy as much as other sparsity patterns.
+# 개요
+# ----
 # 
-# With the introduction of
-# `semi-structured sparsity support <https://pytorch.org/docs/2.1/sparse.html#sparse-semi-structured-tensors>`_,
-# it is possible to prune and accelerate a semi-structured sparse model
-# without leaving PyTorch. We will explain this process in this tutorial.
+# 다른 형태의 희소성(sparsity)처럼, **반구조적 희소성**은 신경망의 메모리 오버헤드와 지연 시간을 
+# 줄이기 위한 모델 최적화 기법으로, 일부 모델 정확도는 희생하게 됩니다. 이 방법은 
+# **세분화된 구조적 희소성** 또는 **2:4 구조적 희소성**으로도 알려져 있습니다.
+# 
+# 반구조적 희소성은 고유한 희소성 패턴에서 유래하며, 여기서 2n개의 요소 중 n개의 요소가 
+# 가지치기(prune)됩니다. 일반적으로 n=2인 경우가 많아 2:4 희소성이라고 부릅니다. 
+# 반구조적 희소성은 GPU에서 효율적으로 가속화될 수 있고, 다른 희소성 패턴만큼 모델 
+# 정확도를 저하시키지 않기 때문에 특히 흥미롭습니다.
+# 
+# `반구조적 희소성 지원 <https://pytorch.org/docs/2.1/sparse.html#sparse-semi-structured-tensors>`_,
+# 이 도입되면서, PyTorch를 벗어나지 않고도 반구조적 희소 모델을 가지치기하고 가속화할 
+# 수 있습니다. 이 튜토리얼에서는 이 과정을 설명할 것입니다.
 #
 # .. image:: ../../_static/img/pruning_flow.jpg
 # 
-# By the end of this tutorial, we will have sparsified a BERT
-# question-answering model to be 2:4 sparse, fine-tuning it to recover
-# nearly all F1 loss (86.92 dense vs 86.48 sparse). Finally, we will
-# accelerate this 2:4 sparse model for inference, yielding a 1.3x speedup.
+# 튜토리얼이 끝나면 BERT 질문-응답 모델을 2:4 희소화하여 거의 모든 F1 손실을 회복한 
+# 상태(86.92의 밀집 모델 vs 86.48의 희소 모델)로 미세 조정할 것입니다. 마지막으로 
+# 이 2:4 희소 모델을 추론을 위해 가속화하여 1.3배 속도 향상을 달성할 것입니다.
 # 
 
 #####################################################
-# Requirements
-# ------------
+# 요구사항
+# --------
 #
 # -  PyTorch >= 2.1.
-# -  A NVIDIA GPU with semi-structured sparsity support (Compute
-#    Capability 8.0+).
+# -  반구조적 희소성을 지원하는 NVIDIA GPU(Compute Capability 8.0+)
 #
-# This tutorial is designed for beginners to semi-structured sparsity and
-# sparsity in general. For users with existing 2:4 sparse models,
-# accelerating ``nn.Linear`` layers for inference with
-# ``to_sparse_semi_structured`` is quite straightforward. Here is an example: 
+# 이 튜토리얼은 초보자에게 반구조적 희소성 및 일반적인 희소성을 맞춤 설명합니다.
+# 이미 2:4 희소 모델을 보유한 사용자에게는 ``to_sparse_semi_structured``를 사용하여 
+# 추론을 위한 ``nn.Linear`` 레이어를 가속화하는 것이 매우 간단합니다. 다음은 그 예시입니다:
 # 
 
 import torch
@@ -54,7 +48,7 @@ from torch.sparse import to_sparse_semi_structured, SparseSemiStructuredTensor
 from torch.utils.benchmark import Timer
 SparseSemiStructuredTensor._FORCE_CUTLASS = True
 
-# mask Linear weight to be 2:4 sparse
+# Linear 가중치를 2:4 희소성으로 마스킹
 mask = torch.Tensor([0, 0, 1, 1]).tile((3072, 2560)).cuda().bool()
 linear = torch.nn.Linear(10240, 3072).half().cuda().eval()
 linear.weight = torch.nn.Parameter(mask * linear.weight)
@@ -67,7 +61,7 @@ with torch.inference_mode():
                     globals={"linear": linear,
                              "x": x}).blocked_autorange().median * 1e3
 
-    # accelerate via SparseSemiStructuredTensor
+    # SparseSemiStructuredTensor를 통해 가속화
     linear.weight = torch.nn.Parameter(to_sparse_semi_structured(linear.weight))
 
     sparse_output = linear(x)
@@ -75,65 +69,55 @@ with torch.inference_mode():
                     globals={"linear": linear,
                              "x": x}).blocked_autorange().median * 1e3
 
-    # sparse and dense matmul are numerically equivalent
-    # On an A100 80GB, we see: `Dense: 0.870ms Sparse: 0.630ms | Speedup: 1.382x`
+    # 희소 및 밀집 행렬 곱셈은 수치적으로 동일함
+    # A100 80GB에서, 다음과 같은 결과를 확인: `Dense: 0.870ms Sparse: 0.630ms | Speedup: 1.382x`
     assert torch.allclose(sparse_output, dense_output, atol=1e-3)
     print(f"Dense: {dense_t:.3f}ms Sparse: {sparse_t:.3f}ms | Speedup: {(dense_t / sparse_t):.3f}x")
 
 
 ######################################################################
-# What problem does semi-structured sparsity solve?
-# -------------------------------------------------
+# 반구조적 희소성은 어떤 문제를 해결하는가?
+# --------------------------------------
 # 
-# The general motivation behind sparsity is simple: if there are zeros in
-# your network, you can optimize efficiency by not storing or computing those
-# parameters. However, the specifics of sparsity are tricky. Zeroing out
-# parameters doesn’t affect the latency / memory overhead of our model out
-# of the box.
+# 희소성의 일반적인 목적은 간단합니다: 네트워크 내에 0이 있는 경우, 
+# 해당 매개변수를 저장하거나 계산하지 않음으로써 효율성을 최적화할 수 있습니다. 
+# 그러나 희소성의 구체적인 구현은 까다롭습니다. 매개변수를 0으로 만드는 것만으로는 
+# 기본적으로 모델의 지연 시간 / 메모리 오버헤드에 영향을 미치지 않습니다.
 # 
-# This is because the dense tensor still contains the pruned (zero)
-# elements, which the dense matrix multiplication kernel will still
-# operate on this elements. In order to realize performance gains, we need
-# to swap out dense kernels for sparse kernels, which skip calculation
-# involving pruned elements.
+# 그 이유는 dense tensor가 여전히 가지치기된(0인) 요소를 포함하고 있으며, 
+# 밀집 행렬 곱셈 커널이 이러한 요소에 대해 계속 연산을 수행하기 때문입니다. 성능 향상을 
+# 실현하려면, 밀집 커널을 가지치기된 요소의 계산을 건너뛰는 희소 커널로 교체해야 합니다.
 # 
-# To do this, these kernels work on sparse matrices, which do not store
-# the pruned elements and store the specified elements in a compressed
-# format.
+# 이를 위해, 희소 커널은 가지치기된 요소를 저장하지 않고, 지정된 요소를 압축된 형식으로 
+# 저장하는 희소 행렬을 사용합니다.
 # 
-# For semi-structured sparsity, we store exactly half of the original
-# parameters along with some compressed metadata about how the elements
-# were arranged.
+# 반구조적 희소성의 경우, 원래 매개변수의 정확히 절반과 요소가 어떻게 
+# 배열되었는지에 대한 압축된 메타데이터를 저장합니다.
 # 
 # .. image:: https://developer-blogs.nvidia.com/wp-content/uploads/2023/06/2-4-structured-sparsity-pattern.png
 #    :align: center :width: 80%
 # 
 #    Image sourced from `NVIDIA blog post <https://developer.nvidia.com/blog/structured-sparsity-in-the-nvidia-ampere-architecture-and-applications-in-search-engines/>`_ on semi-structured sparsity.
 # 
-# There are many different sparse layouts, each with their own benefits
-# and drawbacks. The 2:4 semi-structured sparse layout is particularly
-# interesting for two reasons:
+# 희소 레이아웃에는 각기 다른 장점과 단점을 가진 여러 가지가 있습니다. 2:4 반구조적 
+# 희소 레이아웃은 흥미로운 두 가지 이유가 있습니다.
 # 
-# * Unlike previous sparse formats,
-#   semi-structured sparsity was designed to be efficiently accelerated on
-#   GPUs. In 2020, NVIDIA introduced hardware support for semi-structured
-#   sparsity with their Ampere architecture, and have also released fast
-#   sparse kernels via
-#   CUTLASS `cuSPARSELt <https://docs.nvidia.com/cuda/cusparselt/index.html>`__.
+# * 이전의 희소 형식과 달리 반구조적 희소성은 GPU에서 효율적으로 가속되도록 설계되었습니다. 
+#   2020년 NVIDIA는 Ampere 아키텍처를 통해 반구조적 희소성을 위한 하드웨어 지원을 도입했으며, 
+#   CUTLASS `cuSPARSELt <https://docs.nvidia.com/cuda/cusparselt/index.html>`__ 
+#   cuSPARSELt를 통해 빠른 희소 커널도 출시했습니다.
 # 
-# * At the same time, semi-structured sparsity tends to have a milder
-#   impact on model accuracy compared to other sparse formats, especially
-#   when accounting for more advanced pruning / fine-tuning methods. NVIDIA
-#   has shown in their `white paper <https://arxiv.org/abs/2104.08378>`_
-#   that a simple paradigm of magnitude pruning once to be 2:4 sparse and
-#   then retraining the model yields nearly identical model accuracies.
+# * 동시에 반구조적 희소성은 다른 희소 형식에 비해 모델 정확도에 미치는 영향이 덜한 경향이 있습니다.
+#   특히 더 발전된 가지치기 및 미세 조정 방법을 고려할 때 그렇습니다. 
+#   NVIDIA가 공개한 `백서 <https://arxiv.org/abs/2104.08378>`_
+#   에서 2:4 희소성을 목표로 한 단순한 크기 기준 가지치기(magnitude pruning) 후 모델을 
+#   재학습하면 거의 동일한 모델 정확도를 달성할 수 있음을 보여주었습니다.
 # 
-# Semi-structured exists in a sweet spot, providing a 2x (theoretical)
-# speedup at a much lower sparsity level (50%), while still being granular
-# enough to preserve model accuracy.
+# 반구조적 희소성은 이론적으로 2배의 속도 향상을 제공하면서도 희소성 수준이 낮고(50%), 모델 
+# 정확도를 유지하기에 충분히 세밀한 적절한 균형점을 제공합니다.
 # 
 # +---------------------+-------------+--------+------------+-------------+
-# | Network             | Data Set    | Metric | Dense FP16 | Sparse FP16 |
+# | 네트워크             | 데이터 세트  | 메트릭 | Dense FP16 | Sparse FP16 |
 # +=====================+=============+========+============+=============+
 # | ResNet-50           | ImageNet    | Top-1  | 76.1       | 76.2        |
 # +---------------------+-------------+--------+------------+-------------+
@@ -150,16 +134,12 @@ with torch.inference_mode():
 # | BERT-Large          | SQuAD v1.1  | F1     | 91.9       | 91.9        |
 # +---------------------+-------------+--------+------------+-------------+
 # 
-# Semi-structured sparsity has an additional advantage from a workflow
-# perspective. Because the sparsity level is fixed at 50%, it is easier to
-# decompose the problem of sparsifying a model into two distinct
-# subproblems:
+# 반구조적 희소성은 워크플로 관점에서 추가적인 장점이 있습니다. 희소성 수준이 50%로 고정되어 
+# 있어 모델을 희소화하는 문제를 두 가지 별개의 하위 문제로 분해하기가 더 쉽습니다.
 # 
-# - Accuracy - How can we find a set of 2:4 sparse weights that minimize
-#   the accuracy degradation of our model?
+# - 정확도 - 2:4 희소 가중치 세트를 찾아 모델의 정확도 저하를 최소화할 수 있는 방법은 무엇인가요?
 #
-# - Performance - How can we accelerate our 2:4 sparse weights for
-#   inference and reduced memory overhead?
+# - 성능: 추론 및 메모리 오버헤드를 줄이기 위해 2:4 희소 가중치를 어떻게 가속화할 수 있는가?
 #
 
 ##################################################################### 
@@ -172,22 +152,21 @@ with torch.inference_mode():
 #       0 & 0 & 1 & 1 \\
 #       \end{bmatrix}
 # 
-# The natural handoff point between these two problems are zeroed-out
-# dense tensors. Our inference solution is designed to compress and
-# accelerate tensors in this format. We anticipate many users coming up
-# with custom masking solution, as this is an active area of research.
+# 이 두 문제 사이의 자연스러운 연결점은 0으로 된 밀집 텐서입니다. 우리의 추론 솔루션은 이러한 형식의 
+# 텐서를 압축하고 가속하도록 설계되었습니다. 이는 활발한 연구 분야이기 때문에 많은 사용자가 맞춤형 마스킹 
+# 솔루션을 고안할 것으로 예상됩니다.
 # 
-# Now that we’ve learned a little more about semi-structured sparsity,
-# let’s apply it to a BERT model trained on a question answering task,
-# SQuAD.
+# 반구조적 희소성에 대해 조금 더 배웠으니, 이제 질문 응답 작업인 SQuAD에 대해 학습된 BERT 모델에 이를 
+# 적용해 봅시다.
 # 
-# Intro & Setup
-# -------------
+# 소개 & 설정
+# -----------
 # 
-# Let’s start by importing all the packages we need.
+# 필요한 모든 패키지를 불러오는 것으로 시작하겠습니다.
 # 
 
-# If you are running this in Google Colab, run:
+# 만약 Google Colab에서 실행 중이라면, 다음 명령어를 실행하세요:
+
 # .. code-block: python
 # 
 #    !pip install datasets transformers evaluate accelerate pandas
@@ -206,16 +185,16 @@ from torch.sparse import to_sparse_semi_structured, SparseSemiStructuredTensor
 from torch.ao.pruning import WeightNormSparsifier
 import transformers
 
-# force CUTLASS use if ``cuSPARSELt`` is not available
+# ``cuSPARSELt``가 사용 불가능한 경우, 강제로 CUTLASS를 사용합니다.
 SparseSemiStructuredTensor._FORCE_CUTLASS = True
 torch.manual_seed(100)
 
 
 ######################################################################
-# We’ll also need to define some helper functions that are specific to the
-# dataset / task at hand. These were adapted from
-# `this <https://huggingface.co/learn/nlp-course/chapter7/7?fw=pt>`__
-# Hugging Face course as a reference.
+# 우리가 다루고 있는 데이터셋/작업에 특화된 몇 가지 보조 함수도 
+# 정의해야 합니다. 이러한 함수들은 Hugging Face 코스의 
+# `이 자료 <https://huggingface.co/learn/nlp-course/chapter7/7?fw=pt>`__
+# 를 참고하여 수정되었습니다.
 # 
 
 def preprocess_validation_function(examples, tokenizer):
@@ -264,21 +243,20 @@ def preprocess_train_function(examples, tokenizer):
         end_char = start_char + len(answer["text"][0])
         sequence_ids = inputs.sequence_ids(i)
 
-        # Find the start and end of the context
+        # 문맥의 시작과 끝을 찾기
         idx = 0
         while sequence_ids[idx] != 1:
             idx += 1
         context_start = idx
         while sequence_ids[idx] == 1:
             idx += 1
-        context_end = idx - 1
 
-        # If the answer is not fully inside the context, label it (0, 0)
+        # 답변이 문맥 안에 완전히 포함되지 않는 경우, (0, 0)으로 레이블 지정
         if offset[context_start][0] > end_char or offset[context_end][1] < start_char:
             start_positions.append(0)
             end_positions.append(0)
         else:
-            # Otherwise it's the start and end token positions
+            # 그렇지 않으면 시작 및 끝 토큰 위치를 지정
             idx = context_start
             while idx <= context_end and offset[idx][0] <= start_char:
                 idx += 1
@@ -304,13 +282,13 @@ def compute_metrics(start_logits, end_logits, features, examples):
         example_to_features[feature["example_id"]].append(idx)
 
     predicted_answers = []
-    # for example in ``tqdm`` (examples):
+    # 예를 들어 ``tqdm``(examples)에서:
     for example in examples:
         example_id = example["id"]
         context = example["context"]
         answers = []
 
-        # Loop through all features associated with that example
+        # 해당 예제와 관련된 모든 특성(feature)을 반복
         for feature_index in example_to_features[example_id]:
             start_logit = start_logits[feature_index]
             end_logit = end_logits[feature_index]
@@ -320,11 +298,11 @@ def compute_metrics(start_logits, end_logits, features, examples):
             end_indexes = np.argsort(end_logit)[-1 : -n_best - 1 : -1].tolist()
             for start_index in start_indexes:
                 for end_index in end_indexes:
-                    # Skip answers that are not fully in the context
+                    # 문맥에 완전히 포함되지 않은 답변은 건너뜀
                     if offsets[start_index] is None or offsets[end_index] is None:
                         continue
-                    # Skip answers with a length that is either < 0
-                    # or > max_answer_length
+                    # 길이가 0보다 작거나
+                    # max_answer_length보다 큰 답변은 건너뜀
                     if (
                         end_index < start_index
                         or end_index - start_index + 1 > max_answer_length
@@ -339,7 +317,7 @@ def compute_metrics(start_logits, end_logits, features, examples):
                     }
                     answers.append(answer)
 
-        # Select the answer with the best score
+        # 가장 높은 점수를 가진 답변을 선택
         if len(answers) > 0:
             best_answer = max(answers, key=lambda x: x["logit_score"])
             predicted_answers.append(
@@ -355,8 +333,7 @@ def compute_metrics(start_logits, end_logits, features, examples):
 
 
 ######################################################################
-# Now that those are defined, we just need one additional helper function,
-# which will help us benchmark our model.
+# 이제 이러한 함수들이 정의되었으므로, 모델의 벤치마크를 도와줄 추가적인 보조 함수 하나만 더 필요합니다.
 # 
 
 def measure_execution_time(model, batch_sizes, dataset):
@@ -390,18 +367,17 @@ def measure_execution_time(model, batch_sizes, dataset):
 
 
 ######################################################################
-# We will get started by loading our model and tokenizer, and then setting
-# up our dataset.
+# 모델과 토크나이저를 로드한 후, 데이터셋을 설정하면서 시작하겠습니다.
 # 
 
-# load model
+# 모델 불러오기
 model_name = "bert-base-cased"
 tokenizer = transformers.AutoTokenizer.from_pretrained(model_name)
 model = transformers.AutoModelForQuestionAnswering.from_pretrained(model_name)
 print(f"Loading tokenizer: {model_name}")
 print(f"Loading model: {model_name}")
 
-# set up train and val dataset
+# 학습 및 검증 데이터셋 설정
 squad_dataset = datasets.load_dataset("squad")
 tokenized_squad_dataset = {}
 tokenized_squad_dataset["train"] = squad_dataset["train"].map(
@@ -416,15 +392,13 @@ data_collator = transformers.DataCollatorWithPadding(tokenizer=tokenizer)
 
 
 ######################################################################
-# Establishing a baseline
+# 기준 성능 설정
 # =======================
 # 
-# Next, we’ll train a quick baseline of our model on SQuAD. This task asks
-# our model to identify spans, or segments of text, in a given context
-# (Wikipedia articles) that answer a given question. Running the following
-# code gives me an F1 score of 86.9. This is quite close to the reported
-# NVIDIA score and the difference is likely due to BERT-base
-# vs. BERT-large or fine-tuning hyperparameters.
+# 다음으로, SQuAD 데이터셋에서 모델의 빠른 기준 성능을 학습시켜 보겠습니다. 이 작업은 모델이 주어진 
+# 문맥(위키피디아 기사)에서 주어진 질문에 대한 답변이 되는 텍스트의 범위 또는 구간을 식별하도록 
+# 요구합니다. 다음 코드를 실행하면 F1 점수는 86.9가 나옵니다. 이는 보고된 NVIDIA 점수와 매우 가깝고, 
+# 차이는 아마도 BERT-base와 BERT-large 또는 미세 조정 하이퍼파라미터 때문일 것입니다.
 # 
 
 training_args = transformers.TrainingArguments(
@@ -434,7 +408,7 @@ training_args = transformers.TrainingArguments(
     per_device_train_batch_size=32,
     per_device_eval_batch_size=256,
     logging_steps=50, 
-    # Limit max steps for tutorial runners. Delete the below line to see the reported accuracy numbers. 
+    # 튜토리얼 실행을 위한 최대 단계 제한. 보고된 정확도 수치를 보려면 아래 줄을 삭제하세요.
     max_steps=500,
     report_to=None,
 )
@@ -450,9 +424,9 @@ trainer = transformers.Trainer(
 
 trainer.train()
 
-# batch sizes to compare for eval
+# 평가를 위한 비교 배치 크기
 batch_sizes = [4, 16, 64, 256]
-# 2:4 sparsity require fp16, so we cast here for a fair comparison
+# 2:4 희소성은 fp16을 필요로 하므로, 공정한 비교를 위해 여기에서 캐스팅함
 with torch.autocast("cuda"):
     with torch.no_grad():
         predictions = trainer.predict(tokenized_squad_dataset["validation"])
@@ -478,37 +452,34 @@ df.plot.line(x='step', y='loss', title="Loss vs. # steps", ylabel="loss")
 
 
 ######################################################################
-# Pruning BERT to be 2:4 sparse
+# BERT를 2:4 희소성으로 가지치기
 # -----------------------------
 # 
-# Now that we have our baseline, it’s time we prune BERT. There are many
-# different pruning strategies, but one of the most common is **magnitude
-# pruning**, which seeks to remove the weights with the lowest L1 norm.
-# Magnitude pruning was used by NVIDIA in all their results and is a
-# common baseline.
+# 이제 기준 성능을 설정했으니, BERT를 가지치기할 차례입니다. 가지치기에는 여러 가지 전략이 있지만, 
+# 가장 일반적인 방법 중 하나는 **크기 기반 가지치기**로, 이는 L1 norm이 가장 
+# 낮은 가중치를 제거하는 방법입니다. NVIDIA는 모든 결과에서 크기 기반 가지치기를 사용했으며, 이는 
+# 일반적인 기준 방법입니다.
 # 
-# To do this, we will use the ``torch.ao.pruning`` package, which contains
-# a weight-norm (magnitude) sparsifier. These sparsifiers work by applying
-# mask parametrizations to the weight tensors in a model. This lets them
-# simulate sparsity by masking out the pruned weights.
+# 이를 위해 우리는 ``torch.ao.pruning`` 패키지를 사용할 것입니다. 이 패키지에는 가중치-norm 희소화 
+# 도구가 포함되어 있습니다. 이러한 희소화 도구는 모델의 가중치 텐서에 마스크 매개변수화를 적용하여 
+# 작동합니다. 이를 통해 가지치기된 가중치를 마스킹하여 희소성을 시뮬레이션할 수 있습니다.
 # 
-# We’ll also have to decide what layers of the model to apply sparsity to,
-# which in this case is all of the ``nn.Linear`` layers, except for the
-# task-specific head outputs. That’s because semi-structured sparsity has
-# `shape constraints <https://pytorch.org/docs/2.1/sparse.html#constructing-sparse-semi-structured-tensors>`_,
-# and the task-specific ``nn.Linear`` layers do not satisfy them.
+# 또한, 모델의 어느 레이어에 희소성을 적용할지 결정해야 합니다. 이 경우에는 각각의 테스크 헤드 출력을 
+# 제외한 모든 ``nn.Linear`` 레이어에 적용합니다. 이는 반구조적 희소성(semi-structured sparsity)이 
+# `형상 제약 <https://pytorch.org/docs/2.1/sparse.html#constructing-sparse-semi-structured-tensors>`_
+# 을 가지기 때문이며, 각각의 task ``nn.Linear`` 레이어는 이러한 제약을 충족하지 않기 때문입니다.
 # 
 
 sparsifier = WeightNormSparsifier(
-    # apply sparsity to all blocks
+    # 모든 블록에 희소성 적용
     sparsity_level=1.0,
-    # shape of 4 elements is a block
+    # 4개의 요소가 하나의 블록의 형태
     sparse_block_shape=(1, 4),
-    # two zeros for every block of 4
+    # 4개의 블록마다 두 개의 0이 포함됨
     zeros_per_block=2
 )
 
-# add to config if ``nn.Linear`` and in the BERT model.
+# BERT 모델에 ``nn.Linear``가 있는 경우 설정에 추가
 sparse_config = [
     {"tensor_fqn": f"{fqn}.weight"}
     for fqn, module in model.named_modules()
@@ -517,26 +488,22 @@ sparse_config = [
 
 
 ######################################################################
-# The first step for pruning the model is to insert parametrizations for
-# masking the weights of the model. This is done by the prepare step.
-# Anytime we try to access the ``.weight`` we will get ``mask * weight``
-# instead.
+# 모델의 매개변수화는 첫 번째 단계는 모델의 가중치를 마스킹하기 위한 매개변수화를 삽입하는 것입니다. 
+# 이는 준비 단계에서 수행됩니다. 이렇게 하면 ``.weight``에 접근할 때마다 대신 ``mask * weight``를 
+# 얻게 됩니다.
 # 
 
-# Prepare the model, insert fake-sparsity parametrizations for training
+# 모델을 준비하고, 학습을 위한 가짜 희소성 매개변수수화를 삽입합니다.
 sparsifier.prepare(model, sparse_config)
 print(model.bert.encoder.layer[0].output)
 
 
 ######################################################################
-# Then, we’ll take a single pruning step. All pruners implement a
-# ``update_mask()`` method that updates the mask with the logic being
-# determined by the pruner implementation. The step method calls this
-# ``update_mask`` functions for the weights specified in the sparse
-# config.
+# 그 다음, 단일 가지치기 단계를 수행합니다. 모든 가지치기 도구(pruner)는 가지치기 도구의 구현 
+# 논리에 따라 마스크를 업데이트하는 ``update_mask()`` 메서드를 구현합니다. 이 단계 메서드는 
+# 희소성 설정(sparse config)에서 지정된 가중치에 대해 이 ``update_mask`` 함수를 호출합니다.
 # 
-# We will also evaluate the model to show the accuracy degradation of
-# zero-shot pruning, or pruning without fine-tuning / retraining.
+# 또한 모델을 평가하여 미세 조정/재학습 없이 가지치기(zero-shot) 또는 가지치기의 정확도 저하를 보여줄 것입니다.
 # 
 
 sparsifier.step()
@@ -552,11 +519,10 @@ print("pruned eval metrics:", pruned)
 
 
 ######################################################################
-# In this state, we can start fine-tuning the model, updating the elements
-# that wouldn’t be pruned to better account for the accuracy loss. Once
-# we’ve reached a satisfied state, we can call ``squash_mask`` to fuse the
-# mask and the weight together. This will remove the parametrizations and
-# we are left with a zeroed-out 2:4 dense model.
+# 이 상태에서 모델을 미세 조정(fine-tuning)하여 가지치기되지 않는 요소들을 업데이트하고, 정확도 손실을 
+# 보완할 수 있습니다. 만족할 만한 상태에 도달하면, ``squash_mask``를 호출하여 마스크와 
+# 가중치를 하나로 결합할 수 있습니다. 이렇게 하면 매개변수화가 제거되고, 0으로 된 2:4 밀집 
+# 모델이 남게 됩니다.
 # 
 
 trainer.train()
@@ -569,15 +535,14 @@ df.plot.line(x='step', y=["loss", "sparse_loss"], title="Loss vs. # steps", ylab
 
 
 ######################################################################
-# Accelerating 2:4 sparse models for inference
+# 추론을 위한 2:4 희소 모델 가속화
 # --------------------------------------------
 # 
-# Now that we have a model in this format, we can accelerate it for
-# inference just like in the QuickStart Guide.
+# 이제 이 형식의 모델을 얻었으므로, QuickStart 가이드에서처럼 추론을 위해 가속할 수 있습니다.
 # 
 
 model = model.cuda().half()
-# accelerate for sparsity
+# 희소성을 위해 가속화
 for fqn, module in model.named_modules():
     if isinstance(module, nn.Linear) and "layer" in fqn:
         module.weight = nn.Parameter(to_sparse_semi_structured(module.weight))
@@ -601,51 +566,47 @@ print("sparse perf metrics: ", sparse_perf)
 
 
 ######################################################################
-# Retraining our model after magnitude pruning has recovered nearly all of
-# the F1 that has been lost when the model was pruned. At the same time we
-# have achieved a 1.28x speedup for ``bs=16``. Note that not all shapes are
-# amenable to performance improvements. When batch sizes are small and
-# limited time is spent in compute sparse kernels may be slower than their
-# dense counterparts.
+# 크기 기반 가지치기 후 모델을 재학습한 결과, 가지치기 시 손실되었던 F1 
+# 점수의 거의 대부분이 회복되었습니다. 동시에 ``bs=16``의 배치 크기에서 1.28배의 속도 향상을 
+# 달성했습니다. 하지만 모든 형상이 성능 향상에 적합한 것은 아닙니다. 배치 크기가 작고 계산에 
+# 사용되는 시간이 제한적일 때는 희소 커널이 밀집 커널보다 더 느릴 수 있습니다.
 # 
-# Because semi-structured sparsity is implemented as a tensor subclass, it
-# is compatible with ``torch.compile``. When composed with
-# ``to_sparse_semi_structured``, we are able to achieve a total 2x speedup
-# on BERT.
+# 반구조적 희소성(semi-structured sparsity)은 텐서의 하위 클래스(subclass)로 구현되어 있기 때문에, 
+# ``torch.compile``과 호환됩니다. ``to_sparse_semi_structured``와 함께 사용하면 BERT에서 총 
+# 2배의 속도 향상을 얻을 수 있습니다.
 #
 # .. table::
 #
-#     +--------------------+--------+--------------+-----------------+-----------+
-#     | Metrics            | fp16   | 2:4 sparse   | delta / speedup | compiled  |
-#     +====================+========+==============+=================+===========+
-#     | Exact Match (%)    | 78.53  | 78.44        | -0.09           |           |
-#     +--------------------+--------+--------------+-----------------+-----------+
-#     | F1 (%)             | 86.93  | 86.49        | -0.44           |           |
-#     +--------------------+--------+--------------+-----------------+-----------+
-#     | Time (bs=4)        | 11.10  | 15.54        | 0.71x           | no        |
-#     +--------------------+--------+--------------+-----------------+-----------+
-#     | Time (bs=16)       | 19.35  | 15.74        | 1.23x           | no        |
-#     +--------------------+--------+--------------+-----------------+-----------+
-#     | Time (bs=64)       | 72.71  | 59.41        | 1.22x           | no        |
-#     +--------------------+--------+--------------+-----------------+-----------+
-#     | Time (bs=256)      | 286.65 | 247.63       | 1.14x           | no        |
-#     +--------------------+--------+--------------+-----------------+-----------+
-#     | Time (bs=4)        | 7.59   | 7.46         | 1.02x           | yes       |
-#     +--------------------+--------+--------------+-----------------+-----------+
-#     | Time (bs=16)       | 11.47  | 9.68         | 1.18x           | yes       |
-#     +--------------------+--------+--------------+-----------------+-----------+
-#     | Time (bs=64)       | 41.57  | 36.92        | 1.13x           | yes       |
-#     +--------------------+--------+--------------+-----------------+-----------+
-#     | Time (bs=256)      | 159.22 | 142.23       | 1.12x           | yes       |
-#     +--------------------+--------+--------------+-----------------+-----------+
+#     +--------------------+--------+--------------+-------------------+-----------+
+#     | Metrics            | fp16   | 2:4 희소성    | 변화 / 속도 증가율 | 컴파일됨   |
+#     +====================+========+==============+===================+===========+
+#     | 정확도 일치  (%)    | 78.53  | 78.44        | -0.09             |           |
+#     +--------------------+--------+--------------+-------------------+-----------+
+#     | F1 (%)             | 86.93  | 86.49        | -0.44             |           |
+#     +--------------------+--------+--------------+-------------------+-----------+
+#     | Time (bs=4)        | 11.10  | 15.54        | 0.71x             | no        |
+#     +--------------------+--------+--------------+-------------------+-----------+
+#     | Time (bs=16)       | 19.35  | 15.74        | 1.23x             | no        |
+#     +--------------------+--------+--------------+-------------------+-----------+
+#     | Time (bs=64)       | 72.71  | 59.41        | 1.22x             | no        |
+#     +--------------------+--------+--------------+-------------------+-----------+
+#     | Time (bs=256)      | 286.65 | 247.63       | 1.14x             | no        |
+#     +--------------------+--------+--------------+-------------------+-----------+
+#     | Time (bs=4)        | 7.59   | 7.46         | 1.02x             | yes       |
+#     +--------------------+--------+--------------+-------------------+-----------+
+#     | Time (bs=16)       | 11.47  | 9.68         | 1.18x             | yes       |
+#     +--------------------+--------+--------------+-------------------+-----------+
+#     | Time (bs=64)       | 41.57  | 36.92        | 1.13x             | yes       |
+#     +--------------------+--------+--------------+-------------------+-----------+
+#     | Time (bs=256)      | 159.22 | 142.23       | 1.12x             | yes       |
+#     +--------------------+--------+--------------+-------------------+-----------+
 # 
-# Conclusion
+# 결론
 # ==========
 # 
-# In this tutorial, we have shown how to prune BERT to be 2:4 sparse and
-# how to accelerate a 2:4 sparse model for inference. By taking advantage
-# of our ``SparseSemiStructuredTensor`` subclass, we were able to achieve a
-# 1.3x speedup over the fp16 baseline, and up to 2x with
-# ``torch.compile``. We also demonstrated the benefits of 2:4 sparsity by
-# fine-tuning BERT to recover any lost F1 (86.92 dense vs 86.48 sparse).
+# 이 튜토리얼에서는 BERT를 2:4 희소성으로 가지치기하는 방법과 2:4 희소 모델을 추론용으로 가속하는 
+# 방법을 보여주었습니다. ``SparseSemiStructuredTensor`` 하위 클래스를 활용하여 fp16 기준 성능에 
+# 비해 1.3배의 속도 향상을 달성했으며, ``torch.compile``을 사용하면 최대 2배까지 속도 향상을 이룰 
+# 수 있었습니다. 또한, BERT를 미세 조정하여 손실된 F1 점수(밀집 모델: 86.92 vs 희소 모델: 86.48)를 
+# 회복하는 과정에서 2:4 희소성의 이점을 입증했습니다.
 # 
