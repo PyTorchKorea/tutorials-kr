@@ -3,7 +3,7 @@
 (beta) 반구조적 (2:4) 희소성을 통한 BERT 가속화
 =============================================
 **저자**: `Jesse Cai <https://github.com/jcaip>`_
-**번역**: `구경선 <https://github.com/kookyungseon>__`
+**번역**: `이채운 <https://github.com/dlcodns>`_
 
 """
 
