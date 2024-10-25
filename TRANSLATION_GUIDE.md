@@ -84,7 +84,7 @@
 |loss|손실|박정환||
 |matrix|행렬|박정환||
 |mean-squared error|평균제곱오차|허남규||
-|MelScale|MelScale|||
+|MelScale|MelScale|멜 스케일|최갑주|음성/오디오 처리에서 사용되는 주파수 변환 척도|
 |memory footprint|메모리 전체 사용량|최흥준|
 |method|메소드|장효영|[음차 표기](https://terms.tta.or.kr/dictionary/dictionaryView.do?word_seq=090780-1)|
 |mini-batch|미니 배치|박정환|음차 표기|
