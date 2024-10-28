@@ -36,13 +36,13 @@ print(f"After swapping, t1: {t1}, t2: {t2}")
 #
 # ``nn.Module``에의 적용
 # ----------------------------
-# 이 유틸리티는 모듈 외부의 파이썬 객체가 모듈의 매개변수에 대한
-# 참조를 보유하고 있을 때 ``nn.Module``에 관련이 있습니다. 만약 ``nn.Module``
-# 이 매개변수를 제자리에 수정하면, 매개변수에 대한 참조를 보유한 객체는
-# 변경 사항을 볼 수 없습니다. 고전적인 예로는 ``nn.Module``의 매개변수에 대한
-# 참조를 보유하는 옵티마이저가 있습니다. 이로 인해 ``optimizer.step()``이
-# 오류 없이 실행되지만, ``nn.Module``의 가중치는 업데이트되지 않는
-# 조용한 정확성 문제를 초래할 수 있습니다.
+# 이 유틸리티는 파이썬 오브젝트가 외부에 있을 때 "n.Module"과 관련이 있습니다.
+# 모듈의 매개 변수에 대한 참조가 있습니다. "n.Module"인 경우
+# 매개 변수 중 하나를 잘못 수정합니다.
+# 매개 변수에는 변경 사항이 표시되지 않습니다. 이에 대한 전형적인 예는 다음과 같습니다.
+# 옵티마이저, "n.Module"의 매개 변수에 대한 참조를 보유합니다.
+# 이로 인해 "optimizer.step()"이 다음을 수행하는 무성 정확성 문제가 발생합니다.
+# 오류 없이 실행되지만 "n.Module"의 가중치는 업데이트되지 않습니다.
 
 mod = torch.nn.Linear(1, 2, bias=False)
 optimizer = torch.optim.SGD(mod.parameters())
@@ -176,9 +176,9 @@ torch.__future__.set_swap_module_params_on_conversion(False)
 # ``self`` 또는 ``other`` (이 경우 ``param`` 또는
 # ``state_dict[param_key]``)가 ``MyQuantizedLinearWeight`` 서브클래스인 경우  핸들러가 호출됩니다.
 #
-# ``state_dict``가 일반 텐서를 포함하고 있다고 가정하고,
+# ``state_dict``가 일반 tensor를 포함하고 있다고 가정하고,
 # 모듈이 ``MyQuantizedLinearWeight`` 매개변수를 포함하고 있으며,
-# ``state_dict``의 텐서가 서브클래스로 변환되기를 원합니다. 그럼,
+# ``state_dict``의 tensor가 서브클래스로 변환되기를 원합니다. 그럼,
 # 우리는 ``torch.Tensor.module_load``에 대한 ``__torch_function__`` 핸들러를 다음과 같이 정의할 수 있습니다:
 # 다음과 같이:
 
@@ -199,7 +199,7 @@ MyQuantizedLinearWeight.__torch_function__ = custom_torch_function
 #################################################################################
 # 먼저, 메타 디바이스에서 모델 골격을 생성하여 저장소를 실체화하는 것을 피합시다.
 # 저장소를 실체화하지 않습니다.
-# `MyQuantizedLinearWeight` 서브클래스로 변환하면서 바이어스는 그대로 유지합니다.
+# `MyQuantizedLinearWeight` 서브클래스로 변환하면서 편향은 그대로 유지합니다.
 
 def fn(m):
     if isinstance(m, nn.Linear):
@@ -214,8 +214,8 @@ with torch.device("meta"):
 
 #################################################################################
 # 그러면 ``state_dict``를 로드할 수 있습니다. 편향(bias)의 경우 ``assign=True``를 사용하는데,
-# 바이어스의 경우, ``state_dict``에 있는 텐서의 속성을 유지하고자 합니다.
-# ``state_dict``에 있는 텐서의 속성을 유지하기 위해서입니다 (예를 들어, 로드 후 바이어스가 ``meta`` 디바이스에 있지 않도록).
+# 바이어스의 경우, ``state_dict``에 있는 tensor의 속성을 유지하고자 합니다.
+# ``state_dict``에 있는 tensor의 속성을 유지하기 위해서입니다 (예를 들어, 로드 후 바이어스가 ``meta`` 디바이스에 있지 않도록).
 
 torch.__future__.set_swap_module_params_on_conversion(True)
 print(f"Before: id(weight)={id(m.weight)}, id(bias)={id(m.bias)}")
@@ -229,8 +229,8 @@ print(f"m.state_dict() after load_state_dict():\n {m.state_dict()}")
 #################################################################################
 # 위의 예제는 ``nn.Module.load_state_dict()``에서 새로운 확장 지점을 사용하는 방법을 보여주는 간단한 예제입니다.
 # ``nn.Module.load_state_dict()``에서 새로운 확장 지점을 사용하는 방법을 보여줍니다. 또한 다른 시나리오를 상상할 수도 있습니다.
-# 예를 들어, ``state_dict``에 텐서 서브클래스가 있고 모듈에 일반 ``nn.Parameters``/ 
-# 또는 텐서가 있거나 둘 다 텐서 서브클래스일 때 등 다양한 시나리오를 상상할 수 있습니다. 사용에 따라
+# 예를 들어, ``state_dict``에 tensor 서브클래스가 있고 모듈에 일반 ``nn.Parameters``/ 
+# 또는 tensor가 있거나 둘 다 tensor 서브클래스일 때 등 다양한 시나리오를 상상할 수 있습니다. 사용에 따라
 # 시나리오에 따라 ``module_load``에 대한 ``__torch_function__`` 핸들러를 정의할 수 있습니다.
 # 필요에 따라 변환을 적용합니다.
 #
