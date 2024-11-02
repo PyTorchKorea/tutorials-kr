@@ -7,7 +7,7 @@ Fully Sharded Data Parallel(FSDP) 시작하기
 .. note::
    |edit| 이 튜토리얼을 `github <https://github.com/pytorch/tutorials/blob/main/intermediate_source/FSDP_tutorial.rst>`__에서 보고 수정할 수 있습니다.
 
-대규모 AI 모델을 학습하는 것은 많은 컴퓨팅 파워와 리소스를 필요로 하는 어려운 작업입니다.
+대규모 AI 모델을 학습하는 것은 많은 컴퓨팅 파워와 자원을 필요로 하는 어려운 작업입니다.
 또한 이러한 대규모 모델의 학습을 위해서는 엔지니어링 측면에서 상당한 복잡성이 따릅니다.
 PyTorch 1.11에서 출시된 `PyTorch FSDP <https://pytorch.org/blog/introducing-pytorch-fully-sharded-data-parallel-api/>`__는 이러한 작업을 더 쉽게 만들어줍니다.
 
@@ -23,11 +23,11 @@ FSDP의 작동 방식
 `DistributedDataParallel <https://pytorch.org/docs/stable/generated/torch.nn.parallel.DistributedDataParallel.html>`__ (DDP) 학습에서는,
 각 process/ worker가 모델의 복제본을 소유하고 데이터 배치를 처리한 후, 최종적으로 all-reduce를 사용하여 서로 다른 worker들의 변화도를 합산합니다. 
 DDP에서는 모델 가중치와 옵티마이저 상태가 모든 worker들에 걸쳐 복제됩니다. 
-FSDP는 모델 파라미터, 옵티마이저 상태, 변화도를 DDP rank들에 걸쳐 샤딩하는 데이터 병렬 처리 방식입니다.
+FSDP는 모델 매개변수, 옵티마이저 상태, 변화도를 DDP rank들에 걸쳐 샤딩하는 데이터 병렬 처리 방식입니다.
 
 FSDP로 학습할 때, GPU 메모리 사용량은 모든 work들에 걸쳐 DDP로 학습할 때보다 작습니다. 
 이로 인해 더 큰 모델이나 배치 크기를 디바이스에 맞출 수 있어 매우 큰 모델의 학습이 가능해집니다. 
-다만 이는 통신량 증가라는 비용을 수반합니다. 이 때 발생하는 오버헤드는 통신과 계산을 중첩하는 등의 내부 최적화를 통해 줄어듭니다.
+다만 이는 통신량 증가라는 비용을 수반합니다. 이 때 발생하는 통신 오버헤드는 통신과 계산을 중첩하는 등의 내부 최적화를 통해 줄어듭니다.
 
 .. figure:: /_static/img/distributed/fsdp_workflow.png
    :width: 100%
@@ -40,20 +40,20 @@ FSDP는 고수준에서 다음과 같이 작동합니다.
 
 *생성자에서*
 
-* 모델 파라미터들을 샤딩하고 각 랭크는 자신의 샤드만 유지합니다.
+* 모델 매개변수들을 샤딩하고 각 랭크는 자신의 샤드만 유지합니다.
 
 *순전파 경로에서*
 
-* all_gather를 실행하여 모든 랭크로부터 모든 샤드를 수집해 이 FSDP 유닛의 전체 파라미터를 복원합니다.
+* all_gather를 실행하여 모든 랭크로부터 모든 샤드를 수집해 이 FSDP 유닛의 전체 매개변수를 복원합니다.
 * 순전파 연산을 실행합니다.
-* 방금 수집한 파라미터 샤드를 폐기합니다.
+* 방금 수집한 매개변수 샤드를 버립니다.
 
 *역전파 경로에서*
 
-* all_gather를 실행하여 모든 랭크로부터 모든 샤드를 수집해 이 FSDP 유닛의 전체 파라미터를 복원합니다.
+* all_gather를 실행하여 모든 랭크로부터 모든 샤드를 수집해 이 FSDP 유닛의 전체 매개변수를 복원합니다.
 * 역전파 연산을 실행합니다.
 * reduce_scatter를 실행하여 변화도를 동기화합니다.
-* 파라미터를 폐기합니다.
+* 매개변수들을 버립니다.
 
 FSDP의 샤딩을 쉽게 이해하는 한 가지 방법은 DDP에서 수행되는 변화도에 대한 all-reduce연산을 reduce-scatter와 all-gather 2개로 분해하는 것입니다. 
 구체적으로는, 역전파 과정에서 FSDP는 변화도를 축소하고 분산시켜 각 랭크가 변화도의 샤드를 소유하도록 합니다. 
