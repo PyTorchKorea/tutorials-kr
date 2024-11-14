@@ -13,21 +13,21 @@ PyTorch를 활용한 자연어 처리를 위한 딥러닝
 학습 과정에서 가중치가 어떻게 변화하는지 확인할 수 있도록 작은 차원의 테스트 예제들을 몇 가지 생성했습니다. 실제 데이터로 시도해보고 싶으시다면, 이 노트북의 모든 모델을 그대로 가져가서 여러분의 데이터에 적용해보실 수 있습니다.
 
 1. pytorch_tutorial.py
-	파이토치 입문
+	파이토치 소개
 	https://tutorials.pytorch.kr/beginner/nlp/pytorch_tutorial.html
 
 2. deep_learning_tutorial.py
-	PyTorch를 활용한 딥러닝
+	딥러닝 소개
 	https://tutorials.pytorch.kr/beginner/nlp/deep_learning_tutorial.html
 
 3. word_embeddings_tutorial.py
-	단어 임베딩: 어휘의 의미 표현
+	단어 임베딩 소개
 	https://tutorials.pytorch.kr/beginner/nlp/word_embeddings_tutorial.html
 
 4. sequence_models_tutorial.py
-	순차 모델과 LSTM(장단기 메모리) 네트워크
+	순차 모델 소개
 	https://tutorials.pytorch.kr/beginner/nlp/sequence_models_tutorial.html
 
 5. advanced_tutorial.py
-	고급: 동적 의사결정과 양방향 LSTM CRF
+	고급 소개
 	https://tutorials.pytorch.kr/beginner/nlp/advanced_tutorial.html
