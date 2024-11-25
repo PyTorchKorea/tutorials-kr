@@ -53,7 +53,7 @@ print(f"weight in mod: {mod.weight}")
 print(f"weight in optimizer: {optimizer.param_groups[0]['params']}")
 
 ################################################################################
-# ``nn.Module.to()`` 및 메서드
+# ``nn.Module.to()`` 및 관련 메서드
 # --------------------------------------
 # 여기에는 모듈의 디바이스를 변경하는 메서드(예: ``nn.Module.cpu()``),
 # 모듈의 ``dtype``을 변경하는 메서드(예: ``nn.Module.float()``)
@@ -178,9 +178,9 @@ torch.__future__.set_swap_module_params_on_conversion(False)
 #
 # ``state_dict``가 일반 tensor를 포함하고 있다고 가정하고,
 # 모듈이 ``MyQuantizedLinearWeight`` 매개변수를 포함하고 있으며,
-# ``state_dict``의 tensor가 서브클래스로 변환되기를 원합니다. 그럼,
-# 우리는 ``torch.Tensor.module_load``에 대한 ``__torch_function__`` 핸들러를 다음과 같이 정의할 수 있습니다:
-# 다음과 같이:
+# ``state_dict``의 tensor가 서브클래스로 변환되기를 원합니다.
+# 따라서 ``torch.Tensor.module_load``에 대한 ``__torch_function__`` 핸들러를 
+# 다음처럼 정의합니다.
 
 @classmethod
 def custom_torch_function(cls, func, types, args=(), kwargs=None):
@@ -197,8 +197,7 @@ def custom_torch_function(cls, func, types, args=(), kwargs=None):
 MyQuantizedLinearWeight.__torch_function__ = custom_torch_function
 
 #################################################################################
-# 먼저, 메타 디바이스에서 모델 골격을 생성하여 저장소를 실체화하는 것을 피합시다.
-# 저장소를 실체화하지 않습니다.
+# 먼저, 메타 디바이스에서 모델 골격을 생성할 때 저장소 실체화를 피하면서 진행합니다.
 # `MyQuantizedLinearWeight` 서브클래스로 변환하면서 편향은 그대로 유지합니다.
 
 def fn(m):
