@@ -1,6 +1,8 @@
 PyTorch C++ API에서 CUDA 그래프 사용하기
 ===========================================
 
+**번역**: `장효영 <https://github.com/hyoyoung>`_
+
 .. note::
    |edit| 이 튜토리얼을 여기서 보고 편집하세요 `GitHub <https://github.com/pytorch/tutorials/blob/main/advanced_source/cpp_cuda_graphs.rst>`__. 전체 소스 코드는 여기에 있습니다 `GitHub <https://github.com/pytorch/tutorials/blob/main/advanced_source/cpp_cuda_graphs>`__.
 
