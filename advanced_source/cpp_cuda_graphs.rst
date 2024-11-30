@@ -1,41 +1,41 @@
-Using CUDA Graphs in PyTorch C++ API
-====================================
+PyTorch C++ API에서 CUDA 그래프 사용하기
+===========================================
+
+**번역**: `장효영 <https://github.com/hyoyoung>`_
 
 .. note::
-   |edit| View and edit this tutorial in `GitHub <https://github.com/pytorch/tutorials/blob/main/advanced_source/cpp_cuda_graphs.rst>`__. The full source code is available on `GitHub <https://github.com/pytorch/tutorials/blob/main/advanced_source/cpp_cuda_graphs>`__.
+   |edit| 이 튜토리얼을 여기서 보고 편집하세요 `GitHub <https://github.com/pytorch/tutorials/blob/main/advanced_source/cpp_cuda_graphs.rst>`__. 전체 소스 코드는 여기에 있습니다 `GitHub <https://github.com/pytorch/tutorials/blob/main/advanced_source/cpp_cuda_graphs>`__.
 
-Prerequisites:
+선수 지식:
 
--  `Using the PyTorch C++ Frontend <../advanced_source/cpp_frontend.html>`__
+-  `PyTorch C++ 프론트엔드 사용하기 <../advanced_source/cpp_frontend.html>`__
 -  `CUDA semantics <https://pytorch.org/docs/master/notes/cuda.html>`__
--  Pytorch 2.0 or later
--  CUDA 11 or later
+-  Pytorch 2.0 이상
+-  CUDA 11 이상
 
-NVIDIA’s CUDA Graphs have been a part of CUDA Toolkit library since the
-release of `version 10 <https://developer.nvidia.com/blog/cuda-graphs/>`_.
-They are capable of greatly reducing the CPU overhead increasing the
-performance of applications.
+NVIDIA의 CUDA 그래프는 버전 10 릴리즈 이후로 CUDA 툴킷 라이브러리의 일부였습니다
+ `version 10 <https://developer.nvidia.com/blog/cuda-graphs/>`_.
+CPU 과부하를 크게 줄여 애플리케이션의 성능을 향상시킵니다.
 
-In this tutorial, we will be focusing on using CUDA Graphs for `C++
-frontend of PyTorch <https://tutorials.pytorch.kr/advanced/cpp_frontend.html>`_.
-The C++ frontend is mostly utilized in production and deployment applications which
-are important parts of PyTorch use cases. Since `the first appearance
-<https://pytorch.org/blog/accelerating-pytorch-with-cuda-graphs/>`_
-the CUDA Graphs won users’ and developer’s hearts for being a very performant
-and at the same time simple-to-use tool. In fact, CUDA Graphs are used by default
-in ``torch.compile`` of PyTorch 2.0 to boost the productivity of training and inference.
+이 튜토리얼에서는, CUDA 그래프 사용에 초점을 맞출 것입니다
+`PyTorch C++ 프론트엔드 사용하기 <https://tutorials.pytorch.kr/advanced/cpp_frontend.html>`_.
+C++ 프론트엔드는 파이토치 사용 사례의 중요한 부분인데, 주로 제품 및 배포 애플리케이션에서 활용됩니다.
+`첫번째 등장 <https://pytorch.org/blog/accelerating-pytorch-with-cuda-graphs/>`_
+이후로 CUDA 그래프는 매우 성능이 좋고 사용하기 쉬워서, 사용자와 개발자의 마음을 사로잡았습니다.
+실제로, CUDA 그래프는 파이토치 2.0의 ``torch.compile`` 에서 기본적으로 사용되며,
+훈련과 추론 시에 생산성을 높여줍니다.
 
-We would like to demonstrate CUDA Graphs usage on PyTorch’s `MNIST
-example <https://github.com/pytorch/examples/tree/main/cpp/mnist>`_.
-The usage of CUDA Graphs in LibTorch (C++ Frontend) is very similar to its
-`Python counterpart <https://pytorch.org/docs/main/notes/cuda.html#cuda-graphs>`_
-but with some differences in syntax and functionality.
+파이토치에서 CUDA 그래프 사용법을 보여드리고자 합니다 `MNIST
+예제 <https://github.com/pytorch/examples/tree/main/cpp/mnist>`_.
+LibTorch(C++ 프론트엔드)에서의 CUDA 그래프 사용법은 다음과 매우 유사하지만
+`Python 사용예제 <https://pytorch.org/docs/main/notes/cuda.html#cuda-graphs>`_
+약간의 구문과 기능의 차이가 있습니다.
 
-Getting Started
+시작하기
 ---------------
 
-The main training loop consists of the several steps and depicted in the
-following code chunk:
+주요 훈련 루프는 여러 단계로 구성되어 있으며
+다음 코드 모음에 설명되어 있습니다.
 
 .. code-block:: cpp
 
@@ -49,12 +49,12 @@ following code chunk:
     optimizer.step();
   }
 
-The example above includes a forward pass, a backward pass, and weight updates.
+위의 예시에는 순전파, 역전파, 가중치 업데이트가 포함되어 있습니다.
 
-In this tutorial, we will be applying CUDA Graph on all the compute steps through the whole-network
-graph capture. But before doing so, we need to slightly modify the source code. What we need
-to do is preallocate tensors for reusing them in the main training loop. Here is an example
-implementation:
+이 튜토리얼에서는 전체 네트워크 그래프 캡처를 통해 모든 계산 단계에 CUDA 그래프를 적용합니다.
+ 하지만 그 전에 약간의 소스 코드 수정이 필요합니다. 우리가 해야 할 일은 주 훈련 루프에서
+tensor를 재사용할 수 있도록 tensor를 미리 할당하는 것입니다.
+다음은 구현 예시입니다.
 
 .. code-block:: cpp
 
@@ -74,7 +74,7 @@ implementation:
     training_step(model, optimizer, data, targets, output, loss);
   }
 
-Where ``training_step`` simply consists of forward and backward passes with corresponding optimizer calls:
+여기서 ``training_step``은 단순히 해당 옵티마이저 호출과 함께 순전파 및 역전파로 구성됩니다
 
 .. code-block:: cpp
 
@@ -92,7 +92,7 @@ Where ``training_step`` simply consists of forward and backward passes with corr
     optimizer.step();
   }
 
-PyTorch’s CUDA Graphs API is relying on Stream Capture which in our case would be used like this:
+파이토치의 CUDA 그래프 API는 스트림 캡처에 의존하고 있으며, 이 경우 다음처럼 사용됩니다
 
 .. code-block:: cpp
 
@@ -104,9 +104,9 @@ PyTorch’s CUDA Graphs API is relying on Stream Capture which in our case would
   training_step(model, optimizer, data, targets, output, loss);
   graph.capture_end();
 
-Before the actual graph capture, it is important to run several warm-up iterations on side stream to
-prepare CUDA cache as well as CUDA libraries (like CUBLAS and CUDNN) that will be used during
-the training:
+실제 그래프 캡처 전에, 사이드 스트림에서 여러 번의 워밍업 반복을 실행하여
+CUDA 캐시뿐만 아니라 훈련 중에 사용할
+CUDA 라이브러리(CUBLAS와 CUDNN같은)를 준비하는 것이 중요합니다.
 
 .. code-block:: cpp
 
@@ -116,13 +116,13 @@ the training:
     training_step(model, optimizer, data, targets, output, loss);
   }
 
-After the successful graph capture, we can replace ``training_step(model, optimizer, data, targets, output, loss);``
-call via ``graph.replay();`` to do the training step.
+그래프 캡처에 성공하면 ``training_step(model, optimizer, data, target, output, loss);`` 호출을
+``graph.replay()``로 대체하여 학습 단계를 진행할 수 있습니다.
 
-Training Results
+훈련 결과
 ----------------
 
-Taking the code for a spin we can see the following output from ordinary non-graphed training:
+코드를 한 번 살펴보면 그래프가 아닌 일반 훈련에서 다음과 같은 결과를 볼 수 있습니다
 
 .. code-block:: shell
 
@@ -152,7 +152,7 @@ Taking the code for a spin we can see the following output from ordinary non-gra
   user    0m44.018s
   sys    0m1.116s
 
-While the training with the CUDA Graph produces the following output:
+CUDA 그래프를 사용한 훈련은 다음과 같은 출력을 생성합니다
 
 .. code-block:: shell
 
@@ -182,12 +182,11 @@ While the training with the CUDA Graph produces the following output:
   user    0m7.048s
   sys    0m0.619s
 
-Conclusion
+결론
 ----------
-
-As we can see, just by applying a CUDA Graph on the `MNIST example
-<https://github.com/pytorch/examples/tree/main/cpp/mnist>`_ we were able to gain the performance
-by more than six times for training. This kind of large performance improvement was achievable due to
-the small model size. In case of larger models with heavy GPU usage, the CPU overhead is less impactful
-so the improvement will be smaller. Nevertheless, it is always advantageous to use CUDA Graphs to
-gain the performance of GPUs.
+위 예시에서 볼 수 있듯이, 바로 `MNIST 예제
+<https://github.com/pytorch/examples/tree/main/cpp/mnist>`_ 에  CUDA 그래프를 적용하는 것만으로도
+훈련 성능을 6배 이상 향상시킬 수 있었습니다.
+이렇게 큰 성능 향상이 가능했던 것은 모델 크기가 작았기 때문입니다.
+GPU 사용량이 많은 대형 모델의 경우 CPU 과부하의 영향이 적기 때문에 개선 효과가 더 작을 수 있습니다.
+그런 경우라도, GPU의 성능을 이끌어내려면 CUDA 그래프를 사용하는 것이 항상 유리합니다.

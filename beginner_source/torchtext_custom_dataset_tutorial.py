@@ -26,6 +26,7 @@ with Neural Networks <https://github.com/bentrevett/pytorch-seq2seq/blob/master/
 * 문장에 변환 적용하기
 * 버킷 배치 처리
 
+
 영어에서 독일어 번역을 수행할 수 있는 모델을 훈련하기 위해 데이터셋을 준비해야 한다고 가정해 보겠습니다.
 `Tatoeba Project <https://tatoeba.org/en>`_가 제공하는 탭으로 구분된 독일어-영어 문장 쌍을 사용하겠습니다.
 이 데이터는 `다운로드 링크 <https://www.manythings.org/anki/deu-eng.zip>`__ 에서 받을 수 있습니다.
