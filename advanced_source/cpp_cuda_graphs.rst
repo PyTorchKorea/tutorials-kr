@@ -27,7 +27,7 @@ C++ 프론트엔드는 파이토치 사용 사례의 중요한 부분인데, 주
 
 파이토치에서 CUDA 그래프 사용법을 보여드리고자 합니다 `MNIST
 예제 <https://github.com/pytorch/examples/tree/main/cpp/mnist>`_.
-LibTorch(C++ 프론트엔드)에서의 CUDA 그래프 사용법은 다음과 매우 유사지만
+LibTorch(C++ 프론트엔드)에서의 CUDA 그래프 사용법은 다음과 매우 유사하지만
 `Python 사용예제 <https://pytorch.org/docs/main/notes/cuda.html#cuda-graphs>`_
 약간의 구문과 기능의 차이가 있습니다.
 
