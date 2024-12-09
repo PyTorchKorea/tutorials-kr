@@ -3,15 +3,9 @@
 TorchText를 사용하여 사용자 정의 글 데이터셋 전처리하기
 ==========================================================
 
-**번역**: `Anupam Sharma <https://anp-scp.github.io/>`_
-**저자**: `장효영 <https://github.com/hyoyoung>`_
+**저자**: `Anupam Sharma <https://anp-scp.github.io/>`_
+**번역**: `장효영 <https://github.com/hyoyoung>`_
 
-This tutorial illustrates the usage of torchtext on a dataset that is not built-in. In the tutorial,
-we will preprocess a dataset that can be further utilized to train a sequence-to-sequence
-model for machine translation (something like, in this tutorial: `Sequence to Sequence Learning
-with Neural Networks <https://github.com/bentrevett/pytorch-seq2seq/blob/master/1%20-%20Sequence%\
-20to%20Sequence%20Learning%20with%20Neural%20Networks.ipynb>`_) but without using legacy version
-of torchtext.
 이 튜토리얼에서는 기본 제공되지 않는 데이터셋에서 Torchtext를 사용하는 방법을 설명합니다.
 튜토리얼 안에서는 기계 번역을 위한 시퀀스 간 모델을 훈련하는 데 추가로 활용할 수 있는 데이터셋를 전처리 할 것입니다.
 (이 튜토리얼과 비슷합니다: `Sequence to Sequence Learning
