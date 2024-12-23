@@ -59,34 +59,26 @@
    학습 시 중요한 로직에 ``순위`` 를 사용하지 마십시오. ``torchrun``의 실패 혹은 멤버십의 변경으로 인해 재시작되면 해당 프로세스에서
    같은 ``로컬 순위`` 와 ``순위`` 가 유지된다는 보장이 없습니다.
 
-Heteregeneous Scaling
+이질적 스케일링
 ~~~~~~~~~~~~~~~~~~~~~~
-Torchrun supports *heteregenous scaling* i.e. each of your multinode machines can have different number of 
-GPUs participating in the training job. In the video, I deployed the code on 2 machines where one machine has 4 GPUs and the
-other used only 2 GPUs.
+Torchrun 은 *이질적 스케일링* 을 지원합니다. 예를 들어, 각각의 멀티노드 머신이 학습에 참여하는
+GPU의 개수가 달라질 수 있습니다. 이 비디오에서는 2 대의 머신에 코드를 배포하여 한 개의 머신에는 4개, 
+다른 한 개의 머신에는 2개의 GPU를 사용합니다. 
 
-
-Troubleshooting
+문제 해결
 ~~~~~~~~~~~~~~~~~~
 
--  Ensure that your nodes are able to communicate with each other over
-   TCP.
--  Set env variable ``NCCL_DEBUG`` to ``INFO`` (using
-   ``export NCCL_DEBUG=INFO``) to print verbose logs that can help
-   diagnose the issue.
--  Sometimes you might need to explicitly set the network interface for
-   the distributed backend (``export NCCL_SOCKET_IFNAME=eth0``). Read
-   more about this
-   `here <https://pytorch.org/docs/stable/distributed.html#choosing-the-network-interface-to-use>`__.
+-  노드들이 TCP를 통해 서로 통신이 가능한지 확인하세요. 
+-  환경 변수 ``NCCL_DEBUG`` 를 ``INFO`` 로 설정하여 (명령어: 
+   ``export NCCL_DEBUG=INFO``) 이슈를 확인할 수 있는 상세 로그를 출력하세요.
+-  분산 백엔드를 위해 명시적인 네트워크 인터페이스 설정이 필요할 수도 있습니다. (``export NCCL_SOCKET_IFNAME=eth0``). 
+   이 `링크 <https://pytorch.org/docs/stable/distributed.html#choosing-the-network-interface-to-use>`__. 를 참조하세요. 
 
-
-Further Reading
+읽을거리
 ---------------
--  `Training a GPT model with DDP <ddp_series_minGPT.html>`__  (next tutorial in this series)
--  `Fault Tolerant distributed training <../beginner/ddp_series_fault_tolerance.html>`__ (previous tutorial in this series)
+-  `DDP 로 GPT 모델 학습시키기 <ddp_series_minGPT.html>`__  (이 시리즈의 다음 튜토리얼)
+-  `결함 내성 분산 학습 <../beginner/ddp_series_fault_tolerance.html>`__ (이 시리즈의 이전 튜토리얼)
 -  `torchrun <https://pytorch.org/docs/stable/elastic/run.html>`__
--  `Rendezvous
-   arguments <https://pytorch.org/docs/stable/elastic/run.html#note-on-rendezvous-backend>`__
--  `Setting up a cluster on
-   AWS <https://github.com/pytorch/examples/blob/main/distributed/ddp-tutorial-series/slurm/setup_pcluster_slurm.md>`__
--  `Slurm docs <https://slurm.schedmd.com/>`__
+-  `랑데부 인자 <https://pytorch.org/docs/stable/elastic/run.html#note-on-rendezvous-backend>`__
+-  `AWS 에서 클러스터 셋팅하기 <https://github.com/pytorch/examples/blob/main/distributed/ddp-tutorial-series/slurm/setup_pcluster_slurm.md>`__
+-  `Slurm 문서 <https://slurm.schedmd.com/>`__
