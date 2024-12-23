@@ -45,20 +45,19 @@
 이 영상에서는 싱글노드 다중 GPU 로부터 멀티노드 학습으로 옮기기 위한 (최소한의) 코드 변경을 다루고, 
 위에서 언급한 두 가지 방법의 학습 스크립트를 실행할 것입니다. 
 
-Note that multinode training is bottlenecked by inter-node communication latencies. Running a training job
-on 4 GPUs on a single node will be faster than running it on 4 nodes with 1 GPU each.
+멀티노드 학습은 노드 간 통신 지연으로 인해 병목 현상이 발생한다는 점을 유의하십시오. 싱글노드에서 4개의 GPU를 사용한 학습 작업이 
+4개의 노드에서 1개의 GPU를 사용한 것보다 빠를 것입니다. 
 
-Local and Global ranks
+로컬 순위와 글로벌 순위 Local and Global ranks
 ~~~~~~~~~~~~~~~~~~~~~~~~
-In single-node settings, we were tracking the 
-``gpu_id`` of each device running our training process. ``torchrun`` tracks this value in an environment variable ``LOCAL_RANK``
-which uniquely identifies each GPU-process on a node. For a unique identifier across all the nodes, ``torchrun`` provides another variable
+싱글노드를 설정할 때, 학습 프로세스의 각 장치의
+ ``gpu_id`` 가 기록되고 있었습니다. ``torchrun`` 은 이 값을 환경 변수 ``LOCAL_RANK`` 로 기록하고,
+이는 노드에서 각각의 고유한 GPU 프로세스를 식별하기 위한 값입니다. For a unique identifier across all the nodes, ``torchrun`` provides another variable
 ``RANK`` which refers to the global rank of a process.
 
-.. warning::
-   Do not use ``RANK`` for critical logic in your training job. When ``torchrun`` restarts processes after a failure or membership changes, there is no guarantee
-   that the processes will hold the same ``LOCAL_RANK`` and ``RANKS``. 
- 
+.. 주의사항::
+   학습 시 중요한 로직에 ``순위`` 를 사용하지 마십시오. ``torchrun``의 실패 혹은 멤버십의 변경으로 인해 재시작되면 해당 프로세스에서
+   같은 ``로컬 순위`` 와 ``순위`` 가 유지된다는 보장이 없습니다.
 
 Heteregeneous Scaling
 ~~~~~~~~~~~~~~~~~~~~~~
