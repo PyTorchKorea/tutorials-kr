@@ -85,7 +85,7 @@ plt.ion()   # 반응형 모드 설정
 #
 
 
-landmarks_frame = pd.read_csv('faces/face_landmarks.csv')
+landmarks_frame = pd.read_csv('data/faces/face_landmarks.csv')
 
 n = 65
 img_name = landmarks_frame.iloc[n, 0]

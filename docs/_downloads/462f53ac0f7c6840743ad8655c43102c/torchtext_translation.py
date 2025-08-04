@@ -69,6 +69,9 @@ def build_vocab(filepath, tokenizer):
 de_vocab = build_vocab(train_filepaths[0], de_tokenizer)
 en_vocab = build_vocab(train_filepaths[1], en_tokenizer)
 
+de_vocab.set_default_index(de_vocab["<unk>"])
+en_vocab.set_default_index(en_vocab["<unk>"])
+
 def data_process(filepaths):
   raw_de_iter = iter(io.open(filepaths[0], encoding="utf8"))
   raw_en_iter = iter(io.open(filepaths[1], encoding="utf8"))
@@ -382,7 +385,7 @@ print(f'The model has {count_parameters(model):,} trainable parameters')
 # 참고 : 언어 번역의 성능 점수를 기록하려면, ``nn.CrossEntropyLoss`` 함수가 단순한
 # 패딩을 추가하는 부분을 무시할 수 있도록 해당 색인들을 알려줘야 합니다.
 
-PAD_IDX = en_vocab.stoi['<pad>']
+PAD_IDX = en_vocab['<pad>']
 
 criterion = nn.CrossEntropyLoss(ignore_index=PAD_IDX)
 

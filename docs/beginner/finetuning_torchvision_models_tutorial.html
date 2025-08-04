@@ -6,42 +6,42 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="ko" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta property="og:title" content="Torchvision 모델 미세조정하기" />
+  <meta property="og:title" content="Torchvision 모델의 미세 조정(Finetuning)" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://tutorials.pytorch.kr/beginner/finetuning_torchvision_models_tutorial.html" />
 <meta property="og:site_name" content="PyTorch Tutorials KR" />
-<meta property="og:description" content="이 튜토리얼은 https://tutorials.pytorch.kr/intermediate/torchvision_tutorial.html 로 옮겨졌습니다. 3초 뒤에 자동으로 이동합니다." />
+<meta property="og:description" content="Author: Nathan Inkawhich 번역: 송채영 이 튜토리얼에서는 1000개의 클래스의 ImageNet 데이터셋에서 사전 학습된 torchvision 모델, 을 미세 조정하고 특징을 추출하는 방법에 대해 자세히 살펴보겠습니다. 여러 최신 CNN 아키텍처로 작업하는 방법을 심도 있게 살펴보고, PyTorch 모델을 미세 조정할 수 있는 직관력을 키울 것입니다. 각 모델의 아키텍처가 다르기 때문에 모든 시나리오에서 작동하는 상용구 형식의 미세 조정 코드는 없습니다. 오히려, 연구자가 기존의 아키텍처를 살펴보고 각 모델에..." />
 <meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
 <meta property="og:image:alt" content="PyTorch Tutorials KR" />
-<meta name="description" content="이 튜토리얼은 https://tutorials.pytorch.kr/intermediate/torchvision_tutorial.html 로 옮겨졌습니다. 3초 뒤에 자동으로 이동합니다." />
+<meta name="description" content="Author: Nathan Inkawhich 번역: 송채영 이 튜토리얼에서는 1000개의 클래스의 ImageNet 데이터셋에서 사전 학습된 torchvision 모델, 을 미세 조정하고 특징을 추출하는 방법에 대해 자세히 살펴보겠습니다. 여러 최신 CNN 아키텍처로 작업하는 방법을 심도 있게 살펴보고, PyTorch 모델을 미세 조정할 수 있는 직관력을 키울 것입니다. 각 모델의 아키텍처가 다르기 때문에 모든 시나리오에서 작동하는 상용구 형식의 미세 조정 코드는 없습니다. 오히려, 연구자가 기존의 아키텍처를 살펴보고 각 모델에..." />
 <meta property="og:ignore_canonical" content="true" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Torchvision 모델의 미세 조정(Finetuning) &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
+  
 
-  <title>Torchvision 모델 미세조정하기 &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
-
-
-
-
+  
+  
     <link rel="shortcut icon" href="../_static/favicon.ico"/>
+  
+  
+  
 
+  
 
+  
+  
+    
 
-
-
-
-
-
-
-
-
+  
 
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!-- <link rel="stylesheet" href="../_static/pygments.css" type="text/css" /> -->
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css" type="text/css" />
   <link rel="stylesheet" href="../_static/katex-math.css" type="text/css" />
   <link rel="stylesheet" href="../_static/sg_gallery.css" type="text/css" />
   <link rel="stylesheet" href="../_static/sg_gallery-binder.css" type="text/css" />
@@ -52,9 +52,9 @@
   <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/custom2.css" type="text/css" />
     <link rel="index" title="색인" href="../genindex.html" />
-    <link rel="search" title="검색" href="../search.html" />
+    <link rel="search" title="검색" href="../search.html" /> 
 
-
+  
   <script src="../_static/js/modernizr.min.js"></script>
 
   <!-- Preload the theme fonts -->
@@ -111,9 +111,9 @@
 
 <body class="pytorch-body">
 
+   
 
-
-
+    
 
     <div class="table-of-contents-link-wrapper">
       <span>Table of Contents</span>
@@ -124,21 +124,21 @@
       <div class="pytorch-side-scroll">
         <div class="pytorch-menu pytorch-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           <div class="pytorch-left-menu-search">
+            
 
-
-
-
-
+            
+              
+              
                 <div class="version">
-                  2.3.1+cu121
+                  2.3.1
                 </div>
+              
+            
+
+            
 
 
-
-
-
-
-
+  
 
 
 <div role="search">
@@ -149,15 +149,15 @@
   </form>
 </div>
 
-
+            
           </div>
 
-
-
-
-
-
-
+          
+            
+            
+              
+            
+            
               <p class="caption" role="heading"><span class="caption-text">파이토치(PyTorch) 레시피</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../recipes/recipes_index.html">모든 레시피 보기</a></li>
@@ -182,7 +182,7 @@
 <li class="toctree-l1"><a class="reference internal" href="introyt/tensors_deeper_tutorial.html">Pytorch Tensor 소개</a></li>
 <li class="toctree-l1"><a class="reference internal" href="introyt/autogradyt_tutorial.html">The Fundamentals of Autograd</a></li>
 <li class="toctree-l1"><a class="reference internal" href="introyt/modelsyt_tutorial.html">Building Models with PyTorch</a></li>
-<li class="toctree-l1"><a class="reference internal" href="introyt/tensorboardyt_tutorial.html">PyTorch TensorBoard Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="introyt/tensorboardyt_tutorial.html">PyTorch TensorBoard 지원</a></li>
 <li class="toctree-l1"><a class="reference internal" href="introyt/trainingyt.html">Training with PyTorch</a></li>
 <li class="toctree-l1"><a class="reference internal" href="introyt/captumyt.html">Model Understanding with Captum</a></li>
 </ul>
@@ -200,7 +200,7 @@
 <li class="toctree-l1"><a class="reference internal" href="fgsm_tutorial.html">적대적 예제 생성(Adversarial Example Generation)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dcgan_faces_tutorial.html">DCGAN 튜토리얼</a></li>
 <li class="toctree-l1"><a class="reference internal" href="vt_tutorial.html">배포를 위해 비전 트랜스포머(Vision Transformer) 모델 최적화하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/tiatoolbox_tutorial.html">Whole Slide Image Classification Using PyTorch and TIAToolbox</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/tiatoolbox_tutorial.html">Pytorch와 TIAToolbox를 사용한 전체 슬라이드 이미지(Whole Slide Image) 분류</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">오디오</span></p>
 <ul>
@@ -209,20 +209,20 @@
 <li class="toctree-l1"><a class="reference internal" href="audio_data_augmentation_tutorial.html">Audio Data Augmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="audio_datasets_tutorial.html">Audio Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="audio_datasets_tutorial.html">오디오 데이터셋</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/speech_recognition_pipeline_tutorial.html">Speech Recognition with Wav2Vec2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/text_to_speech_with_torchaudio.html">Text-to-speech with Tacotron2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/forced_alignment_with_torchaudio_tutorial.html">wav2vec2을 이용한 강제 정렬</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">텍스트</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="bettertransformer_tutorial.html">Fast Transformer Inference with Better Transformer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bettertransformer_tutorial.html">Better Transformer를 이용한 고속 트랜스포머 추론</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/char_rnn_classification_tutorial.html">기초부터 시작하는 NLP: 문자-단위 RNN으로 이름 분류하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/char_rnn_generation_tutorial.html">기초부터 시작하는 NLP:  문자-단위 RNN으로 이름 생성하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/seq2seq_translation_tutorial.html">기초부터 시작하는 NLP: Sequence to Sequence 네트워크와 Attention을 이용한 번역</a></li>
 <li class="toctree-l1"><a class="reference internal" href="text_sentiment_ngrams_tutorial.html">torchtext 라이브러리로 텍스트 분류하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="translation_transformer.html"><code class="docutils literal notranslate"><span class="pre">nn.Transformer</span></code> 와 torchtext로 언어 번역하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="torchtext_custom_dataset_tutorial.html">Preprocess custom text dataset using Torchtext</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torchtext_custom_dataset_tutorial.html">TorchText를 사용하여 사용자 정의 글 데이터셋 전처리하기</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">백엔드</span></p>
 <ul>
@@ -247,8 +247,8 @@
 <p class="caption" role="heading"><span class="caption-text">PyTorch 프로파일링</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="profiler.html">PyTorch 모듈 프로파일링하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="hta_intro_tutorial.html">Introduction to Holistic Trace Analysis</a></li>
-<li class="toctree-l1"><a class="reference internal" href="hta_trace_diff_tutorial.html">Trace Diff using Holistic Trace Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hta_intro_tutorial.html">전체론적(Holistic Trace Analysis) 추적 분석 소개</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hta_trace_diff_tutorial.html">종합적 분석을 이용한 트레이스 차이 분석</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Code Transforms with FX</span></p>
 <ul>
@@ -305,11 +305,11 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../distributed/home.html">Distributed and Parallel Training Tutorials</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dist_overview.html">PyTorch Distributed Overview</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ddp_series_intro.html">Distributed Data Parallel in PyTorch - Video Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ddp_series_intro.html">PyTorch의 분산 데이터 병렬 처리 - 비디오 튜토리얼</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/model_parallel_tutorial.html">단일 머신을 사용한 모델 병렬화 모범 사례</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/ddp_tutorial.html">분산 데이터 병렬 처리 시작하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/dist_tuto.html">PyTorch로 분산 어플리케이션 개발하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/FSDP_tutorial.html">Getting Started with Fully Sharded Data Parallel(FSDP)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/FSDP_tutorial.html">Fully Sharded Data Parallel(FSDP) 시작하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/FSDP_adavnced_tutorial.html">Advanced Model Training with Fully Sharded Data Parallel (FSDP)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/TP_tutorial.html">Large Scale Transformer model training with Tensor Parallel (TP)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/process_group_cpp_extension_tutorial.html">Cpp 확장을 사용한 프로세스 그룹 백엔드 사용자 정의</a></li>
@@ -340,8 +340,8 @@
 <li class="toctree-l1"><a class="reference internal" href="flava_finetuning_tutorial.html">TorchMultimodal 튜토리얼: FLAVA 미세조정</a></li>
 </ul>
 
-
-
+            
+          
         </div>
       </div>
     </nav>
@@ -349,7 +349,7 @@
     <div class="pytorch-container">
       <div class="pytorch-page-level-bar" id="pytorch-page-level-bar">
         <div class="pytorch-breadcrumbs-wrapper">
-
+          
 
 
 
@@ -368,30 +368,30 @@
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="pytorch-breadcrumbs">
-
+    
       <li>
         <a href="../index.html">
-
+          
             Tutorials
-
+          
         </a> &gt;
       </li>
 
-
-      <li>Torchvision 모델 미세조정하기</li>
-
-
+        
+      <li>Torchvision 모델의 미세 조정(Finetuning)</li>
+    
+    
       <li class="pytorch-breadcrumbs-aside">
-
-
+        
+            
             <a href="../_sources/beginner/finetuning_torchvision_models_tutorial.rst.txt" rel="nofollow"><img src="../_static/images/view-page-source-icon.svg"></a>
-
-
+          
+        
       </li>
-
+    
   </ul>
 
-
+  
 </div>
         </div>
 
@@ -403,7 +403,7 @@
       <section data-toggle="wy-nav-shift" id="pytorch-content-wrap" class="pytorch-content-wrap">
         <div class="pytorch-content-left">
 
-
+        
 
           <div class="pytorch-call-to-action-links">
             <div id="tutorial-type">beginner/finetuning_torchvision_models_tutorial</div>
@@ -425,28 +425,882 @@
             </div>
           </div>
 
+        
 
-
-
+          
           <div class="rst-content">
-
+          
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
+              
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">참고</p>
+<p>Click <a class="reference internal" href="#sphx-glr-download-beginner-finetuning-torchvision-models-tutorial-py"><span class="std std-ref">here</span></a>
+to download the full example code</p>
+</div>
+<div class="sphx-glr-example-title section" id="torchvision-finetuning">
+<span id="sphx-glr-beginner-finetuning-torchvision-models-tutorial-py"></span><h1>Torchvision 모델의 미세 조정(Finetuning)<a class="headerlink" href="#torchvision-finetuning" title="이 제목에 대한 퍼머링크">¶</a></h1>
+<p><strong>Author:</strong> <a class="reference external" href="https://github.com/inkawhich">Nathan Inkawhich</a>
+<strong>번역</strong>: <a class="reference external" href="https://github.com/dudtheheaven">송채영</a></p>
+<p>이 튜토리얼에서는 1000개의 클래스의 ImageNet 데이터셋에서
+사전 학습된 <a class="reference external" href="https://pytorch.org/docs/stable/torchvision/models.html">torchvision 모델</a>, 을 미세 조정하고
+특징을 추출하는 방법에 대해 자세히 살펴보겠습니다.
+여러 최신 CNN 아키텍처로 작업하는 방법을 심도 있게 살펴보고,
+PyTorch 모델을 미세 조정할 수 있는 직관력을 키울 것입니다.
+각 모델의 아키텍처가 다르기 때문에 모든 시나리오에서 작동하는
+상용구 형식의 미세 조정 코드는 없습니다.
+오히려, 연구자가 기존의 아키텍처를 살펴보고 각 모델에 맞게 커스텀 조정을 해야합니다.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#</span>
+<span class="c1"># 이 문서에서는 두 가지 유형의 전이 학습을 수행합니다. 미세 조정과 특징 추출입니다.</span>
+<span class="c1"># **미세 조정** 에서는, 사전 학습된 모델로 시작해</span>
+<span class="c1"># 새로운 작업을 위해 모델의 매개변수 *모두* 를 업데이트 하여 본질적으로 전체 모델을 재학습합니다.</span>
+<span class="c1"># **특징 추출**에서는, 사전 학습된 모델로 시작해</span>
+<span class="c1"># 예측을 도출하는 최종 레이어의 가중치만 업데이트합니다.</span>
+<span class="c1"># 사전 학습된 CNN을 고정된 특징 추출기(feature-extractor)로 사용하고</span>
+<span class="c1"># 출력 레이어만 변경하기 때문에 이를 특징 추출이라고 합니다.</span>
+<span class="c1"># 전송(transfer)에 대한 자세한 기술 정보는</span>
+<span class="c1">#  `여기 &lt;https://cs231n.github.io/transfer-learning/&gt;`__ 와</span>
+<span class="c1"># `여기 &lt;https://ruder.io/transfer-learning/&gt;`__를 재구성합니다.</span>
+<span class="c1">#</span>
+<span class="c1"># 일반적으로 두 전이 학습 방법 모두 몇 가지 단계를 동일하게 따릅니다.</span>
+<span class="c1">#</span>
+<span class="c1"># - 사전 훈련된 모델을 초기화합니다.</span>
+<span class="c1"># - 최종 레이어를 재구성하여 새 데이터 집합의 클래스 수와 동일한 수의 출력을 갖도록 합니다.</span>
+<span class="c1"># - 새 데이터셋의 클래스 수와 동일한 출력 수를 갖도록 최종 레이어를 재구성합니다.</span>
+<span class="c1"># - 훈련 중에 업데이트할 매개변수를 최적화 알고리즘에 맞게 정의합니다.</span>
+<span class="c1"># - 학습 단계를 실행합니다.</span>
+<span class="c1">#</span>
 
-  <div class="section" id="torchvision">
-<h1>Torchvision 모델 미세조정하기<a class="headerlink" href="#torchvision" title="이 제목에 대한 퍼머링크">¶</a></h1>
-<p>이 튜토리얼은 <a class="reference external" href="https://tutorials.pytorch.kr/intermediate/torchvision_tutorial.html">https://tutorials.pytorch.kr/intermediate/torchvision_tutorial.html</a> 로 옮겨졌습니다.</p>
-<p>3초 뒤에 자동으로 이동합니다.</p>
-<meta http-equiv="Refresh" content="3; url='https://tutorials.pytorch.kr/intermediate/torchvision_tutorial.html'" /></div>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
+<span class="kn">import</span> <span class="nn">torch.optim</span> <span class="k">as</span> <span class="nn">optim</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">torchvision</span>
+<span class="kn">from</span> <span class="nn">torchvision</span> <span class="kn">import</span> <span class="n">datasets</span><span class="p">,</span> <span class="n">models</span><span class="p">,</span> <span class="n">transforms</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;PyTorch Version: &quot;</span><span class="p">,</span><span class="n">torch</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Torchvision Version: &quot;</span><span class="p">,</span><span class="n">torchvision</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>PyTorch Version:  2.3.1
+Torchvision Version:  0.18.1
+</pre></div>
+</div>
+<div class="section" id="id1">
+<h2>입력<a class="headerlink" href="#id1" title="이 제목에 대한 퍼머링크">¶</a></h2>
+<p>실행을 위해 변경할 모든 매개변수는 다음과 같습니다.
+<em>hymenoptera_data</em> 데이터셋을 <a class="reference external" href="https://download.pytorch.org/tutorial/hymenoptera_data.zip">여기</a> 에서
+다운받아 사용하겠습니다. 이 데이터셋에는
+<strong>벌</strong> 과 <strong>개미</strong> 라는 두 개의 클래스가 포함되어 있으며
+사용자 정의 데이터셋을 직접 작성하지 않고
+<a class="reference external" href="https://pytorch.org/docs/stable/torchvision/datasets.html#torchvision.datasets.ImageFolder">ImageFolder</a>
+데이터셋을 사용할 수 있도록 구조화되어 있습니다.
+데이터를 다운로드하고 <code class="docutils literal notranslate"><span class="pre">data_dir</span></code> 입력을 데이터셋의 루트(root) 디렉토리로 설정합니다.
+<code class="docutils literal notranslate"><span class="pre">model_name</span></code> 입력은 사용하려는 모델의 이름이며
+아래의 목록에서 선택해야 합니다.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">resnet</span><span class="p">,</span> <span class="n">alexnet</span><span class="p">,</span> <span class="n">vgg</span><span class="p">,</span> <span class="n">squeezenet</span><span class="p">,</span> <span class="n">densenet</span><span class="p">,</span> <span class="n">inception</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>다른 입력은 다음과 같습니다. <code class="docutils literal notranslate"><span class="pre">num_classes</span></code> 은 데이터셋의 클래스 수,
+<code class="docutils literal notranslate"><span class="pre">batch_size</span></code> 는 훈련에 사용되는 배치 크기로
+모델의 성능에 따라 조정할 수 있으며,
+<code class="docutils literal notranslate"><span class="pre">num_epochs</span></code> 는 실행하려는 훈련 에폭 수,
+<code class="docutils literal notranslate"><span class="pre">feature_extract</span></code> 는 미세 조정 또는 특징 추출 여부를 정의하는 부울(boolean)입니다.
+<a href="#id2"><span class="problematic" id="id3">``</span></a>feature_extract = False``이면 모델이 미세 조정되고
+모든 모델의 매개변수가 업데이트됩니다.
+<a href="#id4"><span class="problematic" id="id5">``</span></a>feature_extract = True``인 경우 마지막 레이어의 매개변수만 업데이트되고
+다른 매개변수는 고정된 상태로 유지됩니다.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># 최상위 데이터 디렉토리입니다. 여기서는 디렉토리 형식이</span>
+<span class="c1"># ImageFolder 구조를 따른다고 가정합니다.</span>
+<span class="n">data_dir</span> <span class="o">=</span> <span class="s2">&quot;./data/hymenoptera_data&quot;</span>
+
+<span class="c1"># [resnet, alexnet, vgg, squeezenet, densenet, inception] 이 중 모델을 선택합니다.</span>
+<span class="n">model_name</span> <span class="o">=</span> <span class="s2">&quot;squeezenet&quot;</span>
+
+<span class="c1"># 데이터 집합의 클래스 수</span>
+<span class="n">num_classes</span> <span class="o">=</span> <span class="mi">2</span>
+
+<span class="c1"># 훈련을 위한 배치 크기 (메모리 용량에 따라 변경됩니다.)</span>
+<span class="n">batch_size</span> <span class="o">=</span> <span class="mi">8</span>
+
+<span class="c1"># 훈련할 에폭 수</span>
+<span class="n">num_epochs</span> <span class="o">=</span> <span class="mi">15</span>
+
+<span class="c1"># 특징 추출을 위한 플래그(flag)입니다. False일 경우, 전체 모델을 미세 조정하고</span>
+<span class="c1"># True일 경우 재형성된 레이어어의 매개변수만 업데이트합니다.</span>
+<span class="n">feature_extract</span> <span class="o">=</span> <span class="kc">True</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="helper-functions">
+<h2>도우미 함수(Helper Functions)<a class="headerlink" href="#helper-functions" title="이 제목에 대한 퍼머링크">¶</a></h2>
+<p>모델을 조정하는 코드를 작성하기 전에
+몇 가지 도우미 함수(Helper Functions)를 정의해 보겠습니다.</p>
+<div class="section" id="id6">
+<h3>모델 훈련 및 검증 코드<a class="headerlink" href="#id6" title="이 제목에 대한 퍼머링크">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">train_model</span></code> 함수는 주어진 모델의 학습과 검증을 처리합니다.
+이 함수는 PyTorch 모델, 데이터로더(dataloader) 딕셔너리, 손실 함수,
+옵티마이저, 훈련 및 검증을 위해 정해진 에폭 수,
+그리고 Inception 모델일 때를 나타내는 부울 플래그(boolean flag)를 입력으로 받습니다.
+이 아키텍처는 보조(auxiliary) 출력을 사용하고, 전체 모델 손실은
+<a class="reference external" href="https://discuss.pytorch.org/t/how-to-optimize-inception-model-with-auxiliary-classifiers/7958">여기</a> 에 설명된 대로
+보조(auxiliary) 출력과 최종 출력을 모두 존중하므로
+<em>is_inception</em> 플래그(flag)는 <em>Inception v3</em> 모델을 수용하는 데 사용됩니다.
+이 함수는 지정된 에폭 수 동안 학습하고
+각 에폭이 끝난 후 전체 검증 단계를 실행합니다.
+또한, 검증 정확도 측면에서 가장 성능이 좋은 모델을 추적하고
+학습이 끝나면 해당 모델을 반환합니다.
+각 에폭이 끝나면 훈련 및 검증 정확도를 볼 수 있습니다.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">train_model</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">dataloaders</span><span class="p">,</span> <span class="n">criterion</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">num_epochs</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="n">is_inception</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="n">since</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+    <span class="n">val_acc_history</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="n">best_model_wts</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">state_dict</span><span class="p">())</span>
+    <span class="n">best_acc</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+    <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_epochs</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Epoch </span><span class="si">{}</span><span class="s1">/</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">epoch</span><span class="p">,</span> <span class="n">num_epochs</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;-&#39;</span> <span class="o">*</span> <span class="mi">10</span><span class="p">)</span>
+
+        <span class="c1"># 각 에폭은 학습 단계와 검증 단계를 갖습니다.</span>
+        <span class="k">for</span> <span class="n">phase</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;train&#39;</span><span class="p">,</span> <span class="s1">&#39;val&#39;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">phase</span> <span class="o">==</span> <span class="s1">&#39;train&#39;</span><span class="p">:</span>
+                <span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>  <span class="c1"># 학습 모드로 모델 설정</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>   <span class="c1"># 평가 모드로 모델 설정</span>
+
+            <span class="n">running_loss</span> <span class="o">=</span> <span class="mf">0.0</span>
+            <span class="n">running_corrects</span> <span class="o">=</span> <span class="mi">0</span>
+
+            <span class="c1"># 데이터를 반복</span>
+            <span class="k">for</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">labels</span> <span class="ow">in</span> <span class="n">dataloaders</span><span class="p">[</span><span class="n">phase</span><span class="p">]:</span>
+                <span class="n">inputs</span> <span class="o">=</span> <span class="n">inputs</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+                <span class="n">labels</span> <span class="o">=</span> <span class="n">labels</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+
+                <span class="c1"># 매개변수 경사도를 0으로 설정</span>
+                <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+
+                <span class="c1"># 순방향</span>
+                <span class="c1"># 훈련 하는 동안만 기록을 추적합니다.</span>
+                <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">set_grad_enabled</span><span class="p">(</span><span class="n">phase</span> <span class="o">==</span> <span class="s1">&#39;train&#39;</span><span class="p">):</span>
+                    <span class="c1"># 모델의 출력을 가져오고 손실을 계산합니다.</span>
+                    <span class="c1"># 학습 시 보조(auxiliary) 출력이 있는 inception의 특별한 경우입니다.</span>
+                    <span class="c1">#   학습 모드에서는 최종 출력과 보조(auxiliary) 출력을 합산해 손실을 계산하지만</span>
+                    <span class="c1">#   테스트에서는 최종 출력만 고려합니다.</span>
+                    <span class="k">if</span> <span class="n">is_inception</span> <span class="ow">and</span> <span class="n">phase</span> <span class="o">==</span> <span class="s1">&#39;train&#39;</span><span class="p">:</span>
+                        <span class="c1"># https://discuss.pytorch.org/t/how-to-optimize-inception-model-with-auxiliary-classifiers/7958 에서</span>
+                        <span class="n">outputs</span><span class="p">,</span> <span class="n">aux_outputs</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
+                        <span class="n">loss1</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
+                        <span class="n">loss2</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">aux_outputs</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
+                        <span class="n">loss</span> <span class="o">=</span> <span class="n">loss1</span> <span class="o">+</span> <span class="mf">0.4</span><span class="o">*</span><span class="n">loss2</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">outputs</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
+                        <span class="n">loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
+
+                    <span class="n">_</span><span class="p">,</span> <span class="n">preds</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+                    <span class="c1"># 학습 단계인 경우 역전파 + 최적화</span>
+                    <span class="k">if</span> <span class="n">phase</span> <span class="o">==</span> <span class="s1">&#39;train&#39;</span><span class="p">:</span>
+                        <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+                        <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+
+                <span class="c1"># 통계</span>
+                <span class="n">running_loss</span> <span class="o">+=</span> <span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span> <span class="o">*</span> <span class="n">inputs</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                <span class="n">running_corrects</span> <span class="o">+=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">preds</span> <span class="o">==</span> <span class="n">labels</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+
+            <span class="n">epoch_loss</span> <span class="o">=</span> <span class="n">running_loss</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataloaders</span><span class="p">[</span><span class="n">phase</span><span class="p">]</span><span class="o">.</span><span class="n">dataset</span><span class="p">)</span>
+            <span class="n">epoch_acc</span> <span class="o">=</span> <span class="n">running_corrects</span><span class="o">.</span><span class="n">double</span><span class="p">()</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataloaders</span><span class="p">[</span><span class="n">phase</span><span class="p">]</span><span class="o">.</span><span class="n">dataset</span><span class="p">)</span>
+
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> Loss: </span><span class="si">{:.4f}</span><span class="s1"> Acc: </span><span class="si">{:.4f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">phase</span><span class="p">,</span> <span class="n">epoch_loss</span><span class="p">,</span> <span class="n">epoch_acc</span><span class="p">))</span>
+
+            <span class="c1"># 모델을 깊은 복사(deep copy)함</span>
+            <span class="k">if</span> <span class="n">phase</span> <span class="o">==</span> <span class="s1">&#39;val&#39;</span> <span class="ow">and</span> <span class="n">epoch_acc</span> <span class="o">&gt;</span> <span class="n">best_acc</span><span class="p">:</span>
+                <span class="n">best_acc</span> <span class="o">=</span> <span class="n">epoch_acc</span>
+                <span class="n">best_model_wts</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">state_dict</span><span class="p">())</span>
+            <span class="k">if</span> <span class="n">phase</span> <span class="o">==</span> <span class="s1">&#39;val&#39;</span><span class="p">:</span>
+                <span class="n">val_acc_history</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">epoch_acc</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">()</span>
+
+    <span class="n">time_elapsed</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">since</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Training complete in </span><span class="si">{:.0f}</span><span class="s1">m </span><span class="si">{:.0f}</span><span class="s1">s&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">time_elapsed</span> <span class="o">//</span> <span class="mi">60</span><span class="p">,</span> <span class="n">time_elapsed</span> <span class="o">%</span> <span class="mi">60</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Best val Acc: </span><span class="si">{:4f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">best_acc</span><span class="p">))</span>
+
+    <span class="c1"># 최고의 모델 가중치 불러오기</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">best_model_wts</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">model</span><span class="p">,</span> <span class="n">val_acc_history</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="requires-grad">
+<h3>모델 매개변수의 .requires_grad 속성 설정<a class="headerlink" href="#requires-grad" title="이 제목에 대한 퍼머링크">¶</a></h3>
+<p>이 도우미 함수(Helper Functions)는 특징 추출 시
+모델에 있는 매개변수의 <code class="docutils literal notranslate"><span class="pre">.requires_grad</span></code> 속성을 False로 설정합니다.
+기본적으로, 사전 학습된 모델을 읽어 들일 때 모든 매개변수가
+<a href="#id7"><span class="problematic" id="id8">``</span></a>.requires_grad=True``로 설정되어 있으므로
+처음부터 학습하거나 미세 조정하는 경우라면 괜찮습니다.
+그러나 특징 추출 중이고 새로 초기화된 레이어에 대한 경사도만 계산하려는 경우
+다른 모든 매개변수에는 경사도가 필요하지 않아야 합니다.
+이것은 나중에 더 이해를 할 수 있을 것입니다.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">set_parameter_requires_grad</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">feature_extracting</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">feature_extracting</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">():</span>
+            <span class="n">param</span><span class="o">.</span><span class="n">requires_grad</span> <span class="o">=</span> <span class="kc">False</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="id9">
+<h2>네트워크 초기화 및 재구성하기<a class="headerlink" href="#id9" title="이 제목에 대한 퍼머링크">¶</a></h2>
+<p>이제 가장 흥미로운 부분입니다.
+여기서는 각 네트워크의 재구성을 처리합니다.
+이 절차는 자동 절차가 아니며 각 모델마다 고유합니다.
+CNN 모델의 최종 레이어(FC layer라고도 불림)는
+데이터셋의 출력 클래스 수와 동일한 수의 노드를 가지고 있습니다.
+모든 모델은 이미 ImageNet에서 사전 학습 되었기 때문에
+각 클래스당 하나의 노드씩 1000 크기의 출력 레이어를 가지고 있습니다.
+여기서의 목표는 이전과 동일한 수의 입력을 갖고,
+데이터셋의 클래스 수와 동일한 수의 출력을 갖도록 마지막 레이어를 재구성하는 것입니다.
+다음 섹션에서는 각 모델의 아키텍처를
+개별적으로 변경하는 방법에 대해 설명하겠습니다.
+하지만 먼저, 미세 조정과 특징 추출의 차이점에 대한
+한 가지 중요한 세부 사항이 있습니다.</p>
+<p>특징 추출 시 마지막 레이어의 매개변수만 업데이트 하고 싶을 때
+다시 말해, 재구성하는 레이어의 매개변수만 업데이트를 하고 싶은 경우가 있습니다.
+이런 경우에는 변경하지 않는 매개변수의 경사도를 계산할 필요가 없으므로
+효율성을 위해 .requires_grad 속성을 False로 설정합니다.
+기본적으로 이 속성은 True로 설정되어 있기 때문에 이 설정은 중요합니다.
+그런 다음 새 레이어를 초기화할 때 기본적으로 새 매개변수에는 <a href="#id10"><span class="problematic" id="id11">``</span></a>.requires_grad=True``가 있으므로
+새 레이어의 매개변수만 업데이트됩니다.
+미세 조정할 때는 모든 .requires_grad를 기본값인 True로 설정할 수 있습니다.</p>
+<p>마지막으로, inception_v3는 입력 크기를 (299,299)로 요구하지만,
+다른 모든 모델은 (224,224)를 기대한다는 점을 기억하세요.</p>
+<div class="section" id="resnet">
+<h3>Resnet<a class="headerlink" href="#resnet" title="이 제목에 대한 퍼머링크">¶</a></h3>
+<p>Resnet은 〈Deep Residual Learning for Image Recognition
+&lt;<a class="reference external" href="https://arxiv.org/abs/1512.03385">https://arxiv.org/abs/1512.03385</a>&gt;`__ 논문에서 소개되었습니다.
+Resnet18, Resnet34, Resnet50, Resnet101, and Resnet152 등 다양한 크기의 여러 가지 변형이 있으며
+모두 torchvision 모델에서 사용할 수 있습니다.
+여기서는 데이터셋이 작고 클래스가 두 개 뿐인 Resnet18을 사용합니다.
+모델을 출력하면 아래 그림과 같이
+마지막 레이어가 완전히 연결된 레이어임을 알 수 있습니다.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">fc</span><span class="p">):</span> <span class="n">Linear</span><span class="p">(</span><span class="n">in_features</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span> <span class="n">out_features</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>입력 특징이 512개, 출력 특징이 2개인 선형 레이어가 되도록
+<a href="#id12"><span class="problematic" id="id13">``</span></a>model.fc``를 다시 초기화해야 합니다.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">fc</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="alexnet">
+<h3>Alexnet<a class="headerlink" href="#alexnet" title="이 제목에 대한 퍼머링크">¶</a></h3>
+<p>Alexnet은 <a class="reference external" href="https://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks.pdf">ImageNet Classification with Deep
+Convolutional Neural
+Networks</a> 논문에 소개된 바 있으며
+ImageNet 데이터셋에서 최초로 매우 성공적인 CNN을 구현한 바 있습니다.
+모델의 아키텍처를 출력하면 모델 출력이
+분류기(classifier)의 6번째 레이어에서 나오는 것을 볼 수 있습니다.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">classifier</span><span class="p">):</span> <span class="n">Sequential</span><span class="p">(</span>
+    <span class="o">...</span>
+    <span class="p">(</span><span class="mi">6</span><span class="p">):</span> <span class="n">Linear</span><span class="p">(</span><span class="n">in_features</span><span class="o">=</span><span class="mi">4096</span><span class="p">,</span> <span class="n">out_features</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+ <span class="p">)</span>
+</pre></div>
+</div>
+<p>데이터셋과 함께 모델을 사용하려면 이 레이어를 다음과 같이 다시 초기화합니다.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">classifier</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">4096</span><span class="p">,</span><span class="n">num_classes</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="vgg">
+<h3>VGG<a class="headerlink" href="#vgg" title="이 제목에 대한 퍼머링크">¶</a></h3>
+<p>VGG는 <a class="reference external" href="https://arxiv.org/pdf/1409.1556.pdf">Very Deep Convolutional Networks for
+Large-Scale Image Recognition</a> 논문에서 소개되었습니다.
+Torchvision 다양한 길이와 배치 정규화 레이어가 있는
+8가지 버전의 VGG를 제공합니다.
+여기서는 배치 정규화 기능이 있는 VGG-11을 사용합니다.
+출력 레이어는 Alexnet과 유사합니다.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">classifier</span><span class="p">):</span> <span class="n">Sequential</span><span class="p">(</span>
+    <span class="o">...</span>
+    <span class="p">(</span><span class="mi">6</span><span class="p">):</span> <span class="n">Linear</span><span class="p">(</span><span class="n">in_features</span><span class="o">=</span><span class="mi">4096</span><span class="p">,</span> <span class="n">out_features</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+ <span class="p">)</span>
+</pre></div>
+</div>
+<p>따라서 동일한 기술을 사용해 출력 레이어를 수정합니다.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">classifier</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">4096</span><span class="p">,</span><span class="n">num_classes</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="squeezenet">
+<h3>Squeezenet<a class="headerlink" href="#squeezenet" title="이 제목에 대한 퍼머링크">¶</a></h3>
+<p>Squeeznet 아키텍처는 <a class="reference external" href="https://arxiv.org/abs/1602.07360">SqueezeNet:
+AlexNet-level accuracy with 50x fewer parameters and &lt;0.5MB model
+size</a> 논문에 설명되어 있고,
+AlexNet 수준의 정확도를 제공하면서
+여기에 표시된 모델들과는 다른 출력 구조를 사용합니다.
+Torchvision에는 두 가지 버전의 Squeezenet이 있고 여기서는 1.0 버전을 사용합니다.
+출력은 분류기(classifier)의 첫 번째 레이어인
+1x1 합성곱 레이어에서 나옵니다.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">classifier</span><span class="p">):</span> <span class="n">Sequential</span><span class="p">(</span>
+    <span class="p">(</span><span class="mi">0</span><span class="p">):</span> <span class="n">Dropout</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+    <span class="p">(</span><span class="mi">1</span><span class="p">):</span> <span class="n">Conv2d</span><span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="mi">1000</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">stride</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="p">(</span><span class="mi">2</span><span class="p">):</span> <span class="n">ReLU</span><span class="p">(</span><span class="n">inplace</span><span class="p">)</span>
+    <span class="p">(</span><span class="mi">3</span><span class="p">):</span> <span class="n">AvgPool2d</span><span class="p">(</span><span class="n">kernel_size</span><span class="o">=</span><span class="mi">13</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+ <span class="p">)</span>
+</pre></div>
+</div>
+<p>네트워크를 수정하기 위해 Conv2d 레이어를 다시 초기화하여
+깊이 2의 특징 맵을 다음과 같이 출력합니다.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">classifier</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="n">stride</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="densenet">
+<h3>Densenet<a class="headerlink" href="#densenet" title="이 제목에 대한 퍼머링크">¶</a></h3>
+<p>Densenet <a class="reference external" href="https://arxiv.org/abs/1608.06993">Densely Connected Convolutional
+Networks</a> 논문에서 소개되었습니다.
+Torchvision에는 4가지의 변형 Densenet이 있지만
+여기서는 Densenet-121만 사용합니다.
+출력 레이는 1024개의 입력 특징을 가진 선형 레이어 입니다.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">classifier</span><span class="p">):</span> <span class="n">Linear</span><span class="p">(</span><span class="n">in_features</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span> <span class="n">out_features</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>네트워크를 재구성하기 위해 분류기(classifier)의 선형 레이어를
+다음과 같이 다시 초기화합니다.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">classifier</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">1024</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="inception-v3">
+<h3>Inception v3<a class="headerlink" href="#inception-v3" title="이 제목에 대한 퍼머링크">¶</a></h3>
+<p>마지막으로 Inception v3은 <a class="reference external" href="https://arxiv.org/pdf/1512.00567v1.pdf">Rethinking the Inception
+Architecture for Computer
+Vision</a> 에서 처음 설명했습니다.
+이 네트워크는 학습 시 두 개의 출력 레이어가 있다는 점이 독특합니다.
+두 번째 출력은 보조(axuiliary) 출력으로 알려져 있으며
+네트워크의 AuxLogits 부분에 포함되어 있습니다.
+기본 출력은 네트워크 끝에 있는 선형 레이어이며
+테스트할 때는 기본 출력만 고려합니다.
+읽어 들인 모델의 보조(auxiliary) 출력과 기본 출력은 다음과 같이 출력됩니다.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">AuxLogits</span><span class="p">):</span> <span class="n">InceptionAux</span><span class="p">(</span>
+    <span class="o">...</span>
+    <span class="p">(</span><span class="n">fc</span><span class="p">):</span> <span class="n">Linear</span><span class="p">(</span><span class="n">in_features</span><span class="o">=</span><span class="mi">768</span><span class="p">,</span> <span class="n">out_features</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+ <span class="p">)</span>
+ <span class="o">...</span>
+<span class="p">(</span><span class="n">fc</span><span class="p">):</span> <span class="n">Linear</span><span class="p">(</span><span class="n">in_features</span><span class="o">=</span><span class="mi">2048</span><span class="p">,</span> <span class="n">out_features</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>이 모델을 미세 조정하려면 두 레이어를
+다음과 같이 모두 재구성해야 합니다.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">AuxLogits</span><span class="o">.</span><span class="n">fc</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">768</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">fc</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">2048</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>많은 모델이 비슷한 출력 구조를 가지고 있지만,
+각각은 약간 다르게 처리되어야 합니다.
+또한, 재구성된 네트워크의 출력 모델 구조를 확인하고
+출력 기능의 수가 데이터셋의 클래스 수와 동일한지 확인해야 합니다.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">initialize_model</span><span class="p">(</span><span class="n">model_name</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">,</span> <span class="n">feature_extract</span><span class="p">,</span> <span class="n">use_pretrained</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="c1"># 이 if 문에서 설정할 변수를 초기화 합니다.</span>
+    <span class="c1"># 각 변수는 모델에 따라 다릅니다.</span>
+    <span class="n">model_ft</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">input_size</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">if</span> <span class="n">model_name</span> <span class="o">==</span> <span class="s2">&quot;resnet&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Resnet18</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">model_ft</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">resnet18</span><span class="p">(</span><span class="n">pretrained</span><span class="o">=</span><span class="n">use_pretrained</span><span class="p">)</span>
+        <span class="n">set_parameter_requires_grad</span><span class="p">(</span><span class="n">model_ft</span><span class="p">,</span> <span class="n">feature_extract</span><span class="p">)</span>
+        <span class="n">num_ftrs</span> <span class="o">=</span> <span class="n">model_ft</span><span class="o">.</span><span class="n">fc</span><span class="o">.</span><span class="n">in_features</span>
+        <span class="n">model_ft</span><span class="o">.</span><span class="n">fc</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">num_ftrs</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">)</span>
+        <span class="n">input_size</span> <span class="o">=</span> <span class="mi">224</span>
+
+    <span class="k">elif</span> <span class="n">model_name</span> <span class="o">==</span> <span class="s2">&quot;alexnet&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Alexnet</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">model_ft</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">alexnet</span><span class="p">(</span><span class="n">pretrained</span><span class="o">=</span><span class="n">use_pretrained</span><span class="p">)</span>
+        <span class="n">set_parameter_requires_grad</span><span class="p">(</span><span class="n">model_ft</span><span class="p">,</span> <span class="n">feature_extract</span><span class="p">)</span>
+        <span class="n">num_ftrs</span> <span class="o">=</span> <span class="n">model_ft</span><span class="o">.</span><span class="n">classifier</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span><span class="o">.</span><span class="n">in_features</span>
+        <span class="n">model_ft</span><span class="o">.</span><span class="n">classifier</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">num_ftrs</span><span class="p">,</span><span class="n">num_classes</span><span class="p">)</span>
+        <span class="n">input_size</span> <span class="o">=</span> <span class="mi">224</span>
+
+    <span class="k">elif</span> <span class="n">model_name</span> <span class="o">==</span> <span class="s2">&quot;vgg&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; VGG11_bn</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">model_ft</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">vgg11_bn</span><span class="p">(</span><span class="n">pretrained</span><span class="o">=</span><span class="n">use_pretrained</span><span class="p">)</span>
+        <span class="n">set_parameter_requires_grad</span><span class="p">(</span><span class="n">model_ft</span><span class="p">,</span> <span class="n">feature_extract</span><span class="p">)</span>
+        <span class="n">num_ftrs</span> <span class="o">=</span> <span class="n">model_ft</span><span class="o">.</span><span class="n">classifier</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span><span class="o">.</span><span class="n">in_features</span>
+        <span class="n">model_ft</span><span class="o">.</span><span class="n">classifier</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">num_ftrs</span><span class="p">,</span><span class="n">num_classes</span><span class="p">)</span>
+        <span class="n">input_size</span> <span class="o">=</span> <span class="mi">224</span>
+
+    <span class="k">elif</span> <span class="n">model_name</span> <span class="o">==</span> <span class="s2">&quot;squeezenet&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Squeezenet</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">model_ft</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">squeezenet1_0</span><span class="p">(</span><span class="n">pretrained</span><span class="o">=</span><span class="n">use_pretrained</span><span class="p">)</span>
+        <span class="n">set_parameter_requires_grad</span><span class="p">(</span><span class="n">model_ft</span><span class="p">,</span> <span class="n">feature_extract</span><span class="p">)</span>
+        <span class="n">model_ft</span><span class="o">.</span><span class="n">classifier</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="n">stride</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+        <span class="n">model_ft</span><span class="o">.</span><span class="n">num_classes</span> <span class="o">=</span> <span class="n">num_classes</span>
+        <span class="n">input_size</span> <span class="o">=</span> <span class="mi">224</span>
+
+    <span class="k">elif</span> <span class="n">model_name</span> <span class="o">==</span> <span class="s2">&quot;densenet&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Densenet</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">model_ft</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">densenet121</span><span class="p">(</span><span class="n">pretrained</span><span class="o">=</span><span class="n">use_pretrained</span><span class="p">)</span>
+        <span class="n">set_parameter_requires_grad</span><span class="p">(</span><span class="n">model_ft</span><span class="p">,</span> <span class="n">feature_extract</span><span class="p">)</span>
+        <span class="n">num_ftrs</span> <span class="o">=</span> <span class="n">model_ft</span><span class="o">.</span><span class="n">classifier</span><span class="o">.</span><span class="n">in_features</span>
+        <span class="n">model_ft</span><span class="o">.</span><span class="n">classifier</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">num_ftrs</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">)</span>
+        <span class="n">input_size</span> <span class="o">=</span> <span class="mi">224</span>
+
+    <span class="k">elif</span> <span class="n">model_name</span> <span class="o">==</span> <span class="s2">&quot;inception&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Inception v3</span>
+<span class="sd">        Be careful, expects (299,299) sized images and has auxiliary output</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">model_ft</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">inception_v3</span><span class="p">(</span><span class="n">pretrained</span><span class="o">=</span><span class="n">use_pretrained</span><span class="p">)</span>
+        <span class="n">set_parameter_requires_grad</span><span class="p">(</span><span class="n">model_ft</span><span class="p">,</span> <span class="n">feature_extract</span><span class="p">)</span>
+        <span class="c1"># 보조 네트워크(auxilary net) 처리</span>
+        <span class="n">num_ftrs</span> <span class="o">=</span> <span class="n">model_ft</span><span class="o">.</span><span class="n">AuxLogits</span><span class="o">.</span><span class="n">fc</span><span class="o">.</span><span class="n">in_features</span>
+        <span class="n">model_ft</span><span class="o">.</span><span class="n">AuxLogits</span><span class="o">.</span><span class="n">fc</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">num_ftrs</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">)</span>
+        <span class="c1"># 주 네트워크(primary net) 처리</span>
+        <span class="n">num_ftrs</span> <span class="o">=</span> <span class="n">model_ft</span><span class="o">.</span><span class="n">fc</span><span class="o">.</span><span class="n">in_features</span>
+        <span class="n">model_ft</span><span class="o">.</span><span class="n">fc</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">num_ftrs</span><span class="p">,</span><span class="n">num_classes</span><span class="p">)</span>
+        <span class="n">input_size</span> <span class="o">=</span> <span class="mi">299</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Invalid model name, exiting...&quot;</span><span class="p">)</span>
+        <span class="n">exit</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">model_ft</span><span class="p">,</span> <span class="n">input_size</span>
+
+<span class="c1"># 실행을 위한 모델 초기화</span>
+<span class="n">model_ft</span><span class="p">,</span> <span class="n">input_size</span> <span class="o">=</span> <span class="n">initialize_model</span><span class="p">(</span><span class="n">model_name</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">,</span> <span class="n">feature_extract</span><span class="p">,</span> <span class="n">use_pretrained</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># 방금 인스턴스화한 모델 출력</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">model_ft</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Downloading: &quot;https://download.pytorch.org/models/squeezenet1_0-b66bff10.pth&quot; to /root/.cache/torch/hub/checkpoints/squeezenet1_0-b66bff10.pth
+
+  0%|          | 0.00/4.78M [00:00&lt;?, ?B/s]
+ 86%|########6 | 4.12M/4.78M [00:00&lt;00:00, 43.0MB/s]
+100%|##########| 4.78M/4.78M [00:00&lt;00:00, 44.8MB/s]
+SqueezeNet(
+  (features): Sequential(
+    (0): Conv2d(3, 96, kernel_size=(7, 7), stride=(2, 2))
+    (1): ReLU(inplace=True)
+    (2): MaxPool2d(kernel_size=3, stride=2, padding=0, dilation=1, ceil_mode=True)
+    (3): Fire(
+      (squeeze): Conv2d(96, 16, kernel_size=(1, 1), stride=(1, 1))
+      (squeeze_activation): ReLU(inplace=True)
+      (expand1x1): Conv2d(16, 64, kernel_size=(1, 1), stride=(1, 1))
+      (expand1x1_activation): ReLU(inplace=True)
+      (expand3x3): Conv2d(16, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (expand3x3_activation): ReLU(inplace=True)
+    )
+    (4): Fire(
+      (squeeze): Conv2d(128, 16, kernel_size=(1, 1), stride=(1, 1))
+      (squeeze_activation): ReLU(inplace=True)
+      (expand1x1): Conv2d(16, 64, kernel_size=(1, 1), stride=(1, 1))
+      (expand1x1_activation): ReLU(inplace=True)
+      (expand3x3): Conv2d(16, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (expand3x3_activation): ReLU(inplace=True)
+    )
+    (5): Fire(
+      (squeeze): Conv2d(128, 32, kernel_size=(1, 1), stride=(1, 1))
+      (squeeze_activation): ReLU(inplace=True)
+      (expand1x1): Conv2d(32, 128, kernel_size=(1, 1), stride=(1, 1))
+      (expand1x1_activation): ReLU(inplace=True)
+      (expand3x3): Conv2d(32, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (expand3x3_activation): ReLU(inplace=True)
+    )
+    (6): MaxPool2d(kernel_size=3, stride=2, padding=0, dilation=1, ceil_mode=True)
+    (7): Fire(
+      (squeeze): Conv2d(256, 32, kernel_size=(1, 1), stride=(1, 1))
+      (squeeze_activation): ReLU(inplace=True)
+      (expand1x1): Conv2d(32, 128, kernel_size=(1, 1), stride=(1, 1))
+      (expand1x1_activation): ReLU(inplace=True)
+      (expand3x3): Conv2d(32, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (expand3x3_activation): ReLU(inplace=True)
+    )
+    (8): Fire(
+      (squeeze): Conv2d(256, 48, kernel_size=(1, 1), stride=(1, 1))
+      (squeeze_activation): ReLU(inplace=True)
+      (expand1x1): Conv2d(48, 192, kernel_size=(1, 1), stride=(1, 1))
+      (expand1x1_activation): ReLU(inplace=True)
+      (expand3x3): Conv2d(48, 192, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (expand3x3_activation): ReLU(inplace=True)
+    )
+    (9): Fire(
+      (squeeze): Conv2d(384, 48, kernel_size=(1, 1), stride=(1, 1))
+      (squeeze_activation): ReLU(inplace=True)
+      (expand1x1): Conv2d(48, 192, kernel_size=(1, 1), stride=(1, 1))
+      (expand1x1_activation): ReLU(inplace=True)
+      (expand3x3): Conv2d(48, 192, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (expand3x3_activation): ReLU(inplace=True)
+    )
+    (10): Fire(
+      (squeeze): Conv2d(384, 64, kernel_size=(1, 1), stride=(1, 1))
+      (squeeze_activation): ReLU(inplace=True)
+      (expand1x1): Conv2d(64, 256, kernel_size=(1, 1), stride=(1, 1))
+      (expand1x1_activation): ReLU(inplace=True)
+      (expand3x3): Conv2d(64, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (expand3x3_activation): ReLU(inplace=True)
+    )
+    (11): MaxPool2d(kernel_size=3, stride=2, padding=0, dilation=1, ceil_mode=True)
+    (12): Fire(
+      (squeeze): Conv2d(512, 64, kernel_size=(1, 1), stride=(1, 1))
+      (squeeze_activation): ReLU(inplace=True)
+      (expand1x1): Conv2d(64, 256, kernel_size=(1, 1), stride=(1, 1))
+      (expand1x1_activation): ReLU(inplace=True)
+      (expand3x3): Conv2d(64, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (expand3x3_activation): ReLU(inplace=True)
+    )
+  )
+  (classifier): Sequential(
+    (0): Dropout(p=0.5, inplace=False)
+    (1): Conv2d(512, 2, kernel_size=(1, 1), stride=(1, 1))
+    (2): ReLU(inplace=True)
+    (3): AdaptiveAvgPool2d(output_size=(1, 1))
+  )
+)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="id14">
+<h2>데이터 읽어 들이기<a class="headerlink" href="#id14" title="이 제목에 대한 퍼머링크">¶</a></h2>
+<p>입력 크기를 알았으니 이제 데이터 전이(transform), 이미지 데이터셋,
+그리고 데이터로더(dataloader)를 초기화할 수 있습니다.
+<a class="reference external" href="https://pytorch.org/docs/master/torchvision/models.html">여기</a> 에서 설명된 대로
+모델은 하드코딩(hard-coded)된 정규화 값으로 사전 학습되었습니다.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># 학습을 위한 데이터 증강 및 정규화</span>
+<span class="c1"># 검증을 위한 정규화만 수행</span>
+<span class="n">data_transforms</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;train&#39;</span><span class="p">:</span> <span class="n">transforms</span><span class="o">.</span><span class="n">Compose</span><span class="p">([</span>
+        <span class="n">transforms</span><span class="o">.</span><span class="n">RandomResizedCrop</span><span class="p">(</span><span class="n">input_size</span><span class="p">),</span>
+        <span class="n">transforms</span><span class="o">.</span><span class="n">RandomHorizontalFlip</span><span class="p">(),</span>
+        <span class="n">transforms</span><span class="o">.</span><span class="n">ToTensor</span><span class="p">(),</span>
+        <span class="n">transforms</span><span class="o">.</span><span class="n">Normalize</span><span class="p">([</span><span class="mf">0.485</span><span class="p">,</span> <span class="mf">0.456</span><span class="p">,</span> <span class="mf">0.406</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.229</span><span class="p">,</span> <span class="mf">0.224</span><span class="p">,</span> <span class="mf">0.225</span><span class="p">])</span>
+    <span class="p">]),</span>
+    <span class="s1">&#39;val&#39;</span><span class="p">:</span> <span class="n">transforms</span><span class="o">.</span><span class="n">Compose</span><span class="p">([</span>
+        <span class="n">transforms</span><span class="o">.</span><span class="n">Resize</span><span class="p">(</span><span class="n">input_size</span><span class="p">),</span>
+        <span class="n">transforms</span><span class="o">.</span><span class="n">CenterCrop</span><span class="p">(</span><span class="n">input_size</span><span class="p">),</span>
+        <span class="n">transforms</span><span class="o">.</span><span class="n">ToTensor</span><span class="p">(),</span>
+        <span class="n">transforms</span><span class="o">.</span><span class="n">Normalize</span><span class="p">([</span><span class="mf">0.485</span><span class="p">,</span> <span class="mf">0.456</span><span class="p">,</span> <span class="mf">0.406</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.229</span><span class="p">,</span> <span class="mf">0.224</span><span class="p">,</span> <span class="mf">0.225</span><span class="p">])</span>
+    <span class="p">]),</span>
+<span class="p">}</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Initializing Datasets and Dataloaders...&quot;</span><span class="p">)</span>
+
+<span class="c1"># 학습 및 검증 데이터셋 생성</span>
+<span class="n">image_datasets</span> <span class="o">=</span> <span class="p">{</span><span class="n">x</span><span class="p">:</span> <span class="n">datasets</span><span class="o">.</span><span class="n">ImageFolder</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="n">x</span><span class="p">),</span> <span class="n">data_transforms</span><span class="p">[</span><span class="n">x</span><span class="p">])</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;train&#39;</span><span class="p">,</span> <span class="s1">&#39;val&#39;</span><span class="p">]}</span>
+<span class="c1"># 학습 및 검증 데이터로더(dataloader) 생성</span>
+<span class="n">dataloaders_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="n">image_datasets</span><span class="p">[</span><span class="n">x</span><span class="p">],</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;train&#39;</span><span class="p">,</span> <span class="s1">&#39;val&#39;</span><span class="p">]}</span>
+
+<span class="c1"># 사용 가능한 GPU 탐지</span>
+<span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cuda:0&quot;</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Initializing Datasets and Dataloaders...
+</pre></div>
+</div>
+</div>
+<div class="section" id="id15">
+<h2>옵티마이저 생성<a class="headerlink" href="#id15" title="이 제목에 대한 퍼머링크">¶</a></h2>
+<p>이제 모델 구조가 정확해졌으니, 미세 조정 및 특징 추출을 위한 마지막 단계는
+원하는 매개변수만 업데이트하는 옵티마이저를 생성하는 것입니다.
+사전 학습된 모델을 읽어 들인 후 구조를 재조정하기 전에
+<code class="docutils literal notranslate"><span class="pre">feature_extract=True``인</span> <span class="pre">경우</span> <span class="pre">매개변수의</span>
+<span class="pre">모든</span> <span class="pre">``.requires_grad</span></code> 속성을 일일이 False로 설정한 것을 기억하세요.
+그러면 재초기화된 레이어의 파라미터는
+기본적으로 <a href="#id16"><span class="problematic" id="id17">``</span></a>.requires_grad=True``를 갖습니다.
+이제 <em>.requires_grad=True인 모든 매개변수가
+최적화되어야 한다는 것을 알았습니다.</em>
+다음으로 이러한 매개변수 목록을 만들고
+이 목록을 SGD 알고리즘 생성자(constructor)에 입력합니다.</p>
+<p>이를 확인하려면 출력된 매개변수를 확인하여 학습하세요.
+미세 조정할 때 이 목록은 길어야 하며
+모든 모델의 매개변수를 포함해야 합니다.
+하지만, 특징을 추출할 때는 이 목록이 짧아야 하며
+재구성된 레이어의 가중치와 편향(bias)만 포함해야 합니다.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># GPU로 모델 전송</span>
+<span class="n">model_ft</span> <span class="o">=</span> <span class="n">model_ft</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+
+<span class="c1"># 이 실행에서 최적화/업데이트할 매개변수를 수집합니다.</span>
+<span class="c1">#  미세 조정을 하는 경우 모든 매개변수를 업데이트합니다.</span>
+<span class="c1">#  하지만, 특징 추출 방법을 사용하는 경우에는</span>
+<span class="c1">#  방금 초기화한 매개변수, 즉 requires_grad가 Ture인 매개변수만 업데이트합니다.</span>
+
+<span class="n">params_to_update</span> <span class="o">=</span> <span class="n">model_ft</span><span class="o">.</span><span class="n">parameters</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Params to learn:&quot;</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">feature_extract</span><span class="p">:</span>
+    <span class="n">params_to_update</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">name</span><span class="p">,</span><span class="n">param</span> <span class="ow">in</span> <span class="n">model_ft</span><span class="o">.</span><span class="n">named_parameters</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">param</span><span class="o">.</span><span class="n">requires_grad</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">params_to_update</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">param</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">,</span><span class="n">name</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">name</span><span class="p">,</span><span class="n">param</span> <span class="ow">in</span> <span class="n">model_ft</span><span class="o">.</span><span class="n">named_parameters</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">param</span><span class="o">.</span><span class="n">requires_grad</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">,</span><span class="n">name</span><span class="p">)</span>
+
+<span class="c1"># 모든 매개변수가 최적화되고 있는지 확인합니다.</span>
+<span class="n">optimizer_ft</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">SGD</span><span class="p">(</span><span class="n">params_to_update</span><span class="p">,</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span> <span class="n">momentum</span><span class="o">=</span><span class="mf">0.9</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Params to learn:
+         classifier.1.weight
+         classifier.1.bias
+</pre></div>
+</div>
+</div>
+<div class="section" id="id18">
+<h2>학습 및 검증 단계 실행<a class="headerlink" href="#id18" title="이 제목에 대한 퍼머링크">¶</a></h2>
+<p>마지막 단계는 모델에 대한 손실을 설정한 다음
+설정된 에폭 수에 대해 학습 및 검증 함수(validation function)를 실행하는 것입니다.
+이 단계는 에폭 수에 따라 CPU에서는 시간이 걸릴 수 있습니다.
+또한, 기본 학습률은 모든 모델에 최적이 아니므로
+최대 정확도를 얻으려면 각 모델에 대해 개별적으로 조정해야 합니다.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># 손실 함수 설정</span>
+<span class="n">criterion</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">CrossEntropyLoss</span><span class="p">()</span>
+
+<span class="c1"># 학습 및 평가</span>
+<span class="n">model_ft</span><span class="p">,</span> <span class="n">hist</span> <span class="o">=</span> <span class="n">train_model</span><span class="p">(</span><span class="n">model_ft</span><span class="p">,</span> <span class="n">dataloaders_dict</span><span class="p">,</span> <span class="n">criterion</span><span class="p">,</span> <span class="n">optimizer_ft</span><span class="p">,</span> <span class="n">num_epochs</span><span class="o">=</span><span class="n">num_epochs</span><span class="p">,</span> <span class="n">is_inception</span><span class="o">=</span><span class="p">(</span><span class="n">model_name</span><span class="o">==</span><span class="s2">&quot;inception&quot;</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Epoch 0/14
+----------
+train Loss: 0.5613 Acc: 0.7049
+val Loss: 0.3792 Acc: 0.9085
+
+Epoch 1/14
+----------
+train Loss: 0.2825 Acc: 0.8648
+val Loss: 0.3737 Acc: 0.9281
+
+Epoch 2/14
+----------
+train Loss: 0.2135 Acc: 0.9016
+val Loss: 0.3755 Acc: 0.9085
+
+Epoch 3/14
+----------
+train Loss: 0.1670 Acc: 0.9098
+val Loss: 0.3579 Acc: 0.9281
+
+Epoch 4/14
+----------
+train Loss: 0.1574 Acc: 0.9221
+val Loss: 0.3883 Acc: 0.9216
+
+Epoch 5/14
+----------
+train Loss: 0.1882 Acc: 0.9139
+val Loss: 0.3399 Acc: 0.9150
+
+Epoch 6/14
+----------
+train Loss: 0.1591 Acc: 0.9262
+val Loss: 0.3393 Acc: 0.9281
+
+Epoch 7/14
+----------
+train Loss: 0.1466 Acc: 0.9385
+val Loss: 0.3476 Acc: 0.9216
+
+Epoch 8/14
+----------
+train Loss: 0.1566 Acc: 0.9508
+val Loss: 0.3375 Acc: 0.9346
+
+Epoch 9/14
+----------
+train Loss: 0.1060 Acc: 0.9672
+val Loss: 0.3541 Acc: 0.9346
+
+Epoch 10/14
+----------
+train Loss: 0.1417 Acc: 0.9344
+val Loss: 0.3652 Acc: 0.9216
+
+Epoch 11/14
+----------
+train Loss: 0.1202 Acc: 0.9426
+val Loss: 0.3794 Acc: 0.9216
+
+Epoch 12/14
+----------
+train Loss: 0.1291 Acc: 0.9549
+val Loss: 0.3599 Acc: 0.9150
+
+Epoch 13/14
+----------
+train Loss: 0.1573 Acc: 0.9385
+val Loss: 0.3634 Acc: 0.9281
+
+Epoch 14/14
+----------
+train Loss: 0.1280 Acc: 0.9631
+val Loss: 0.3776 Acc: 0.9281
+
+Training complete in 0m 17s
+Best val Acc: 0.934641
+</pre></div>
+</div>
+</div>
+<div class="section" id="id19">
+<h2>처음부터 학습된 모델과의 비교<a class="headerlink" href="#id19" title="이 제목에 대한 퍼머링크">¶</a></h2>
+<p>재미로, 전이 학습을 사용하지 않을 경우
+모델이 어떻게 학습하는지 살펴봅시다.
+미세 조정과 특징 추출의 성능은 데이터셋에 따라 크게 다르지만
+일반적으로 두 전이 학습 방법은 처음부터 학습한 모델에 비해
+학습 시간 및 전반적인 정확도 측면에서 유리한 결과를 제공합니다.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># 이 실행에 사용된 모델의 사전 학습되지 않은 버전을 초기화합니다.</span>
+<span class="n">scratch_model</span><span class="p">,</span><span class="n">_</span> <span class="o">=</span> <span class="n">initialize_model</span><span class="p">(</span><span class="n">model_name</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">,</span> <span class="n">feature_extract</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">use_pretrained</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">scratch_model</span> <span class="o">=</span> <span class="n">scratch_model</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+<span class="n">scratch_optimizer</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">SGD</span><span class="p">(</span><span class="n">scratch_model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span> <span class="n">momentum</span><span class="o">=</span><span class="mf">0.9</span><span class="p">)</span>
+<span class="n">scratch_criterion</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">CrossEntropyLoss</span><span class="p">()</span>
+<span class="n">_</span><span class="p">,</span><span class="n">scratch_hist</span> <span class="o">=</span> <span class="n">train_model</span><span class="p">(</span><span class="n">scratch_model</span><span class="p">,</span> <span class="n">dataloaders_dict</span><span class="p">,</span> <span class="n">scratch_criterion</span><span class="p">,</span> <span class="n">scratch_optimizer</span><span class="p">,</span> <span class="n">num_epochs</span><span class="o">=</span><span class="n">num_epochs</span><span class="p">,</span> <span class="n">is_inception</span><span class="o">=</span><span class="p">(</span><span class="n">model_name</span><span class="o">==</span><span class="s2">&quot;inception&quot;</span><span class="p">))</span>
+
+<span class="c1"># 전이 학습 방법과 처음부터 학습된 모델에 대한</span>
+<span class="c1"># 검증 정확도 vs. 학습 에폭 수에 대한 학습 곡선을 표시합니다.</span>
+<span class="n">ohist</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">shist</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="n">ohist</span> <span class="o">=</span> <span class="p">[</span><span class="n">h</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span> <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">hist</span><span class="p">]</span>
+<span class="n">shist</span> <span class="o">=</span> <span class="p">[</span><span class="n">h</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span> <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">scratch_hist</span><span class="p">]</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Validation Accuracy vs. Number of Training Epochs&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Training Epochs&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Validation Accuracy&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">num_epochs</span><span class="o">+</span><span class="mi">1</span><span class="p">),</span><span class="n">ohist</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;Pretrained&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">num_epochs</span><span class="o">+</span><span class="mi">1</span><span class="p">),</span><span class="n">shist</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;Scratch&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span><span class="mf">1.</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_epochs</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img src="../_images/sphx_glr_finetuning_torchvision_models_tutorial_001.png" srcset="../_images/sphx_glr_finetuning_torchvision_models_tutorial_001.png" alt="Validation Accuracy vs. Number of Training Epochs" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Epoch 0/14
+----------
+train Loss: 0.7152 Acc: 0.5246
+val Loss: 0.6931 Acc: 0.4575
+
+Epoch 1/14
+----------
+train Loss: 0.6931 Acc: 0.5410
+val Loss: 0.6931 Acc: 0.4575
+
+Epoch 2/14
+----------
+train Loss: 0.6932 Acc: 0.4713
+val Loss: 0.6931 Acc: 0.4575
+
+Epoch 3/14
+----------
+train Loss: 0.6930 Acc: 0.5328
+val Loss: 0.6931 Acc: 0.4575
+
+Epoch 4/14
+----------
+train Loss: 0.6929 Acc: 0.5082
+val Loss: 0.6931 Acc: 0.4575
+
+Epoch 5/14
+----------
+train Loss: 0.6924 Acc: 0.5000
+val Loss: 0.6931 Acc: 0.4575
+
+Epoch 6/14
+----------
+train Loss: 0.6931 Acc: 0.4959
+val Loss: 0.6931 Acc: 0.4575
+
+Epoch 7/14
+----------
+train Loss: 0.6930 Acc: 0.4877
+val Loss: 0.6931 Acc: 0.4575
+
+Epoch 8/14
+----------
+train Loss: 0.6901 Acc: 0.5205
+val Loss: 0.6918 Acc: 0.5948
+
+Epoch 9/14
+----------
+train Loss: 0.6997 Acc: 0.4959
+val Loss: 0.6931 Acc: 0.4575
+
+Epoch 10/14
+----------
+train Loss: 0.6931 Acc: 0.5041
+val Loss: 0.6931 Acc: 0.4575
+
+Epoch 11/14
+----------
+train Loss: 0.6931 Acc: 0.5041
+val Loss: 0.6931 Acc: 0.4575
+
+Epoch 12/14
+----------
+train Loss: 0.6931 Acc: 0.5041
+val Loss: 0.6931 Acc: 0.4575
+
+Epoch 13/14
+----------
+train Loss: 0.6931 Acc: 0.5041
+val Loss: 0.6931 Acc: 0.4575
+
+Epoch 14/14
+----------
+train Loss: 0.6931 Acc: 0.5041
+val Loss: 0.6931 Acc: 0.4575
+
+Training complete in 0m 19s
+Best val Acc: 0.594771
+</pre></div>
+</div>
+</div>
+<div class="section" id="id20">
+<h2>최종 생각과 앞으로의 방향<a class="headerlink" href="#id20" title="이 제목에 대한 퍼머링크">¶</a></h2>
+<p>다른 모델 몇 가지를 실행해보고 정확도가 얼마나 좋아지는지 확인해 보세요.
+또한, 역방향 패스에서는 대부분의 변화도를 계산할 필요가 없기 때문에
+특징 추출에 시간이 덜 걸린다는 점에 주목하세요.
+여기에서 할 수 있는 것은 많으며 다음과 같이 할 수 있습니다.</p>
+<ul class="simple">
+<li><p>더 어려운 데이터 집합으로 이 코드를 실행하고
+전이 학습의 몇 가지 이점을 더 확인해 보세요.</p></li>
+<li><p>여기에 설명된 방법을 사용하거나 전이 학습을 사용하여
+새로운 domain(예: NLP, 오디오 등)에서 다른 모델을 업데이트합니다.</p></li>
+<li><p>모델이 만족하면 ONNX 모델로 내보내거나 하이브리드 프론트엔드를 사용해
+더 빠른 속도와 최적화 기회를 얻을 수 있습니다.</p></li>
+</ul>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  36.411 seconds)</p>
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-beginner-finetuning-torchvision-models-tutorial-py">
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/6a05c032f283b687694821232af906a7/finetuning_torchvision_models_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">finetuning_torchvision_models_tutorial.py</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/a578ec7a4897bae05854d7036ad0ad1d/finetuning_torchvision_models_tutorial.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">finetuning_torchvision_models_tutorial.ipynb</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</div>
+</div>
 
 
              </article>
-
+             
             </div>
             <footer>
+  
 
-
-
+  
     <hr class="community-hr hr-top" />
     <div class="community-container">
       <div class="community-prompt">더 궁금하시거나 개선할 내용이 있으신가요? 커뮤니티에 참여해보세요!</div>
@@ -466,7 +1320,7 @@
       </div>
     </div>
     <hr class="rating-hr hr-bottom"/>
-
+  
 
   <div role="contentinfo">
     <p>
@@ -474,11 +1328,11 @@
 
     </p>
   </div>
-
+    
       <div>
         Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
       </div>
-
+     
 
 </footer>
 
@@ -496,7 +1350,29 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
           <div class="pytorch-right-menu" id="pytorch-right-menu">
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
-<li><a class="reference internal" href="#">Torchvision 모델 미세조정하기</a></li>
+<li><a class="reference internal" href="#">Torchvision 모델의 미세 조정(Finetuning)</a><ul>
+<li><a class="reference internal" href="#id1">입력</a></li>
+<li><a class="reference internal" href="#helper-functions">도우미 함수(Helper Functions)</a><ul>
+<li><a class="reference internal" href="#id6">모델 훈련 및 검증 코드</a></li>
+<li><a class="reference internal" href="#requires-grad">모델 매개변수의 .requires_grad 속성 설정</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id9">네트워크 초기화 및 재구성하기</a><ul>
+<li><a class="reference internal" href="#resnet">Resnet</a></li>
+<li><a class="reference internal" href="#alexnet">Alexnet</a></li>
+<li><a class="reference internal" href="#vgg">VGG</a></li>
+<li><a class="reference internal" href="#squeezenet">Squeezenet</a></li>
+<li><a class="reference internal" href="#densenet">Densenet</a></li>
+<li><a class="reference internal" href="#inception-v3">Inception v3</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id14">데이터 읽어 들이기</a></li>
+<li><a class="reference internal" href="#id15">옵티마이저 생성</a></li>
+<li><a class="reference internal" href="#id18">학습 및 검증 단계 실행</a></li>
+<li><a class="reference internal" href="#id19">처음부터 학습된 모델과의 비교</a></li>
+<li><a class="reference internal" href="#id20">최종 생각과 앞으로의 방향</a></li>
+</ul>
+</li>
 </ul>
 
             </div>
@@ -505,12 +1381,12 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
       </section>
     </div>
 
+  
 
 
-
-
-
-
+  
+  
+     
        <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
          <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
          <script src="../_static/jquery.js"></script>
@@ -524,8 +1400,8 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
          <script src="../_static/auto-render.min.js"></script>
          <script src="../_static/katex_autorenderer.js"></script>
          <script src="../_static/design-tabs.js"></script>
-
-
+     
+  
 
   <script type="text/javascript" src="../_static/js/vendor/popper.min.js"></script>
   <script type="text/javascript" src="../_static/js/vendor/bootstrap.min.js"></script>
@@ -537,11 +1413,8 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
           SphinxRtdTheme.Navigation.enable(true);
       });
   </script>
-
+ 
 <script>
-// Helper function to make it easier to call dataLayer.push()
-function gtag(){window.dataLayer.push(arguments);}
-
 //add microsoft link
 if(window.location.href.indexOf("/beginner/basics/")!= -1)
 {

@@ -5,7 +5,7 @@
 .. Note::
     PyTorch 2.1부터 ONNX Exporter에는 두 가지 버전이 존재합니다.
     * ``torch.onnx.dynamo_export`` 는 PyTorch 2.0과 함께 출시된 TorchDynamo 기술 기반의 최신(이지만 아직 베타 버전의) ONNX Exporter입니다.
-    * ``torch.onnx.export`` 는 PyuTorch 1.2.0부터 지원 중인 TorchScript 백엔드에 기반한 ONNX Exporter입니다.
+    * ``torch.onnx.export`` 는 PyTorch 1.2.0부터 지원 중인 TorchScript 백엔드에 기반한 ONNX Exporter입니다.
 
 이 튜토리얼에서는 TorchScript 기반의 ONNX Exporter인 ``torch.onnx.export`` 를 사용하여
 PyTorch에서 정의한 모델을 어떻게 ONNX 형식으로 변환하는지를 살펴보도록 하겠습니다.

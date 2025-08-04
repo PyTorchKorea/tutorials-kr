@@ -6,42 +6,42 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="ko" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta property="og:title" content="Multi GPU training with DDP" />
+  <meta property="og:title" content="DDP를 이용한 다중 GPU 훈련" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://tutorials.pytorch.kr/beginner/ddp_series_multigpu.html" />
 <meta property="og:site_name" content="PyTorch Tutorials KR" />
-<meta property="og:description" content="Introduction|| What is DDP|| Single-Node Multi-GPU Training|| Fault Tolerance|| Multi-Node training|| minGPT Training Authors: Suraj Subramanian What you will learn How to migrate a single-GPU training script to multi-GPU via DDP, Setting up the distributed process group, Saving and loading model..." />
+<meta property="og:description" content="Introduction|| What is DDP|| Single-Node Multi-GPU Training|| Fault Tolerance|| Multi-Node training|| minGPT Training 저자: Suraj Subramanian 역자: Nathan Kim 여기에서 배우는 것 DDP를 이용하여 단일 GPU 학습 스크립트를 다중 GPU 학습 스크립트로 바꾸는 법, 분산 프로세스 그룹(distributed process group)을 설정하는 법, 분산 환경에서 모델을 저장 및 읽어오는 법. 이 튜토리얼에서 사..." />
 <meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
 <meta property="og:image:alt" content="PyTorch Tutorials KR" />
-<meta name="description" content="Introduction|| What is DDP|| Single-Node Multi-GPU Training|| Fault Tolerance|| Multi-Node training|| minGPT Training Authors: Suraj Subramanian What you will learn How to migrate a single-GPU training script to multi-GPU via DDP, Setting up the distributed process group, Saving and loading model..." />
+<meta name="description" content="Introduction|| What is DDP|| Single-Node Multi-GPU Training|| Fault Tolerance|| Multi-Node training|| minGPT Training 저자: Suraj Subramanian 역자: Nathan Kim 여기에서 배우는 것 DDP를 이용하여 단일 GPU 학습 스크립트를 다중 GPU 학습 스크립트로 바꾸는 법, 분산 프로세스 그룹(distributed process group)을 설정하는 법, 분산 환경에서 모델을 저장 및 읽어오는 법. 이 튜토리얼에서 사..." />
 <meta property="og:ignore_canonical" content="true" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>DDP를 이용한 다중 GPU 훈련 &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
+  
 
-  <title>Multi GPU training with DDP &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
-
-
-
-
+  
+  
     <link rel="shortcut icon" href="../_static/favicon.ico"/>
+  
+  
+  
 
+  
 
+  
+  
+    
 
-
-
-
-
-
-
-
-
+  
 
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!-- <link rel="stylesheet" href="../_static/pygments.css" type="text/css" /> -->
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css" type="text/css" />
   <link rel="stylesheet" href="../_static/katex-math.css" type="text/css" />
   <link rel="stylesheet" href="../_static/sg_gallery.css" type="text/css" />
   <link rel="stylesheet" href="../_static/sg_gallery-binder.css" type="text/css" />
@@ -52,9 +52,9 @@
   <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/custom2.css" type="text/css" />
     <link rel="index" title="색인" href="../genindex.html" />
-    <link rel="search" title="검색" href="../search.html" />
+    <link rel="search" title="검색" href="../search.html" /> 
 
-
+  
   <script src="../_static/js/modernizr.min.js"></script>
 
   <!-- Preload the theme fonts -->
@@ -111,9 +111,9 @@
 
 <body class="pytorch-body">
 
+   
 
-
-
+    
 
     <div class="table-of-contents-link-wrapper">
       <span>Table of Contents</span>
@@ -124,21 +124,21 @@
       <div class="pytorch-side-scroll">
         <div class="pytorch-menu pytorch-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           <div class="pytorch-left-menu-search">
+            
 
-
-
-
-
+            
+              
+              
                 <div class="version">
-                  2.3.1+cu121
+                  2.3.1
                 </div>
+              
+            
+
+            
 
 
-
-
-
-
-
+  
 
 
 <div role="search">
@@ -149,15 +149,15 @@
   </form>
 </div>
 
-
+            
           </div>
 
-
-
-
-
-
-
+          
+            
+            
+              
+            
+            
               <p class="caption" role="heading"><span class="caption-text">파이토치(PyTorch) 레시피</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../recipes/recipes_index.html">모든 레시피 보기</a></li>
@@ -182,7 +182,7 @@
 <li class="toctree-l1"><a class="reference internal" href="introyt/tensors_deeper_tutorial.html">Pytorch Tensor 소개</a></li>
 <li class="toctree-l1"><a class="reference internal" href="introyt/autogradyt_tutorial.html">The Fundamentals of Autograd</a></li>
 <li class="toctree-l1"><a class="reference internal" href="introyt/modelsyt_tutorial.html">Building Models with PyTorch</a></li>
-<li class="toctree-l1"><a class="reference internal" href="introyt/tensorboardyt_tutorial.html">PyTorch TensorBoard Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="introyt/tensorboardyt_tutorial.html">PyTorch TensorBoard 지원</a></li>
 <li class="toctree-l1"><a class="reference internal" href="introyt/trainingyt.html">Training with PyTorch</a></li>
 <li class="toctree-l1"><a class="reference internal" href="introyt/captumyt.html">Model Understanding with Captum</a></li>
 </ul>
@@ -200,7 +200,7 @@
 <li class="toctree-l1"><a class="reference internal" href="fgsm_tutorial.html">적대적 예제 생성(Adversarial Example Generation)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dcgan_faces_tutorial.html">DCGAN 튜토리얼</a></li>
 <li class="toctree-l1"><a class="reference internal" href="vt_tutorial.html">배포를 위해 비전 트랜스포머(Vision Transformer) 모델 최적화하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/tiatoolbox_tutorial.html">Whole Slide Image Classification Using PyTorch and TIAToolbox</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/tiatoolbox_tutorial.html">Pytorch와 TIAToolbox를 사용한 전체 슬라이드 이미지(Whole Slide Image) 분류</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">오디오</span></p>
 <ul>
@@ -209,20 +209,20 @@
 <li class="toctree-l1"><a class="reference internal" href="audio_data_augmentation_tutorial.html">Audio Data Augmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="audio_datasets_tutorial.html">Audio Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="audio_datasets_tutorial.html">오디오 데이터셋</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/speech_recognition_pipeline_tutorial.html">Speech Recognition with Wav2Vec2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/text_to_speech_with_torchaudio.html">Text-to-speech with Tacotron2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/forced_alignment_with_torchaudio_tutorial.html">wav2vec2을 이용한 강제 정렬</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">텍스트</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="bettertransformer_tutorial.html">Fast Transformer Inference with Better Transformer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bettertransformer_tutorial.html">Better Transformer를 이용한 고속 트랜스포머 추론</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/char_rnn_classification_tutorial.html">기초부터 시작하는 NLP: 문자-단위 RNN으로 이름 분류하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/char_rnn_generation_tutorial.html">기초부터 시작하는 NLP:  문자-단위 RNN으로 이름 생성하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/seq2seq_translation_tutorial.html">기초부터 시작하는 NLP: Sequence to Sequence 네트워크와 Attention을 이용한 번역</a></li>
 <li class="toctree-l1"><a class="reference internal" href="text_sentiment_ngrams_tutorial.html">torchtext 라이브러리로 텍스트 분류하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="translation_transformer.html"><code class="docutils literal notranslate"><span class="pre">nn.Transformer</span></code> 와 torchtext로 언어 번역하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="torchtext_custom_dataset_tutorial.html">Preprocess custom text dataset using Torchtext</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torchtext_custom_dataset_tutorial.html">TorchText를 사용하여 사용자 정의 글 데이터셋 전처리하기</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">백엔드</span></p>
 <ul>
@@ -247,8 +247,8 @@
 <p class="caption" role="heading"><span class="caption-text">PyTorch 프로파일링</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="profiler.html">PyTorch 모듈 프로파일링하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="hta_intro_tutorial.html">Introduction to Holistic Trace Analysis</a></li>
-<li class="toctree-l1"><a class="reference internal" href="hta_trace_diff_tutorial.html">Trace Diff using Holistic Trace Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hta_intro_tutorial.html">전체론적(Holistic Trace Analysis) 추적 분석 소개</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hta_trace_diff_tutorial.html">종합적 분석을 이용한 트레이스 차이 분석</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Code Transforms with FX</span></p>
 <ul>
@@ -305,11 +305,11 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../distributed/home.html">Distributed and Parallel Training Tutorials</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dist_overview.html">PyTorch Distributed Overview</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ddp_series_intro.html">Distributed Data Parallel in PyTorch - Video Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ddp_series_intro.html">PyTorch의 분산 데이터 병렬 처리 - 비디오 튜토리얼</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/model_parallel_tutorial.html">단일 머신을 사용한 모델 병렬화 모범 사례</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/ddp_tutorial.html">분산 데이터 병렬 처리 시작하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/dist_tuto.html">PyTorch로 분산 어플리케이션 개발하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/FSDP_tutorial.html">Getting Started with Fully Sharded Data Parallel(FSDP)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/FSDP_tutorial.html">Fully Sharded Data Parallel(FSDP) 시작하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/FSDP_adavnced_tutorial.html">Advanced Model Training with Fully Sharded Data Parallel (FSDP)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/TP_tutorial.html">Large Scale Transformer model training with Tensor Parallel (TP)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/process_group_cpp_extension_tutorial.html">Cpp 확장을 사용한 프로세스 그룹 백엔드 사용자 정의</a></li>
@@ -340,8 +340,8 @@
 <li class="toctree-l1"><a class="reference internal" href="flava_finetuning_tutorial.html">TorchMultimodal 튜토리얼: FLAVA 미세조정</a></li>
 </ul>
 
-
-
+            
+          
         </div>
       </div>
     </nav>
@@ -349,7 +349,7 @@
     <div class="pytorch-container">
       <div class="pytorch-page-level-bar" id="pytorch-page-level-bar">
         <div class="pytorch-breadcrumbs-wrapper">
-
+          
 
 
 
@@ -368,30 +368,30 @@
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="pytorch-breadcrumbs">
-
+    
       <li>
         <a href="../index.html">
-
+          
             Tutorials
-
+          
         </a> &gt;
       </li>
 
-
-      <li>Multi GPU training with DDP</li>
-
-
+        
+      <li>DDP를 이용한 다중 GPU 훈련</li>
+    
+    
       <li class="pytorch-breadcrumbs-aside">
-
-
+        
+            
             <a href="../_sources/beginner/ddp_series_multigpu.rst.txt" rel="nofollow"><img src="../_static/images/view-page-source-icon.svg"></a>
-
-
+          
+        
       </li>
-
+    
   </ul>
 
-
+  
 </div>
         </div>
 
@@ -403,7 +403,7 @@
       <section data-toggle="wy-nav-shift" id="pytorch-content-wrap" class="pytorch-content-wrap">
         <div class="pytorch-content-left">
 
-
+        
 
           <div class="pytorch-call-to-action-links">
             <div id="tutorial-type">beginner/ddp_series_multigpu</div>
@@ -425,39 +425,40 @@
             </div>
           </div>
 
+        
 
-
-
+          
           <div class="rst-content">
-
+          
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
-
+              
   <p><a class="reference external" href="ddp_series_intro.html">Introduction</a> ||
 <a class="reference external" href="ddp_series_theory.html">What is DDP</a> ||
 <strong>Single-Node Multi-GPU Training</strong> ||
 <a class="reference external" href="ddp_series_fault_tolerance.html">Fault Tolerance</a> ||
 <a class="reference external" href="../intermediate/ddp_series_multinode.html">Multi-Node training</a> ||
 <a class="reference external" href="../intermediate/ddp_series_minGPT.html">minGPT Training</a></p>
-<div class="section" id="multi-gpu-training-with-ddp">
-<h1>Multi GPU training with DDP<a class="headerlink" href="#multi-gpu-training-with-ddp" title="이 제목에 대한 퍼머링크">¶</a></h1>
-<p>Authors: <a class="reference external" href="https://github.com/suraj813">Suraj Subramanian</a></p>
+<div class="section" id="ddp-gpu">
+<h1>DDP를 이용한 다중 GPU 훈련<a class="headerlink" href="#ddp-gpu" title="이 제목에 대한 퍼머링크">¶</a></h1>
+<p>저자: <a class="reference external" href="https://github.com/suraj813">Suraj Subramanian</a>
+역자: <a class="reference external" href="https://github.com/NK590">Nathan Kim</a></p>
 <div class="sd-container-fluid sd-sphinx-override sd-mb-4 docutils">
 <div class="sd-row sd-row-cols-2 sd-row-cols-xs-2 sd-row-cols-sm-2 sd-row-cols-md-2 sd-row-cols-lg-2 docutils">
 <div class="sd-col sd-d-flex-row docutils">
 <div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm docutils">
 <div class="sd-card-body docutils">
 <div class="sd-card-title sd-font-weight-bold docutils">
-<svg version="1.1" width="1.0em" height="1.0em" class="sd-octicon sd-octicon-mortar-board" viewBox="0 0 16 16" aria-hidden="true"><path d="M7.693 1.066a.747.747 0 0 1 .614 0l7.25 3.25a.75.75 0 0 1 0 1.368L13 6.831v2.794c0 1.024-.81 1.749-1.66 2.173-.893.447-2.075.702-3.34.702-.278 0-.55-.012-.816-.036a.75.75 0 0 1 .133-1.494c.22.02.45.03.683.03 1.082 0 2.025-.221 2.67-.543.69-.345.83-.682.83-.832V7.503L8.307 8.934a.747.747 0 0 1-.614 0L4 7.28v1.663c.296.105.575.275.812.512.438.438.688 1.059.688 1.796v3a.75.75 0 0 1-.75.75h-3a.75.75 0 0 1-.75-.75v-3c0-.737.25-1.358.688-1.796.237-.237.516-.407.812-.512V6.606L.443 5.684a.75.75 0 0 1 0-1.368ZM2.583 5 8 7.428 13.416 5 8 2.572ZM2.5 11.25v2.25H4v-2.25c0-.388-.125-.611-.25-.735a.697.697 0 0 0-.5-.203.707.707 0 0 0-.5.203c-.125.124-.25.347-.25.735Z"></path></svg> What you will learn</div>
+<svg version="1.1" width="1.0em" height="1.0em" class="sd-octicon sd-octicon-mortar-board" viewBox="0 0 16 16" aria-hidden="true"><path d="M7.693 1.066a.747.747 0 0 1 .614 0l7.25 3.25a.75.75 0 0 1 0 1.368L13 6.831v2.794c0 1.024-.81 1.749-1.66 2.173-.893.447-2.075.702-3.34.702-.278 0-.55-.012-.816-.036a.75.75 0 0 1 .133-1.494c.22.02.45.03.683.03 1.082 0 2.025-.221 2.67-.543.69-.345.83-.682.83-.832V7.503L8.307 8.934a.747.747 0 0 1-.614 0L4 7.28v1.663c.296.105.575.275.812.512.438.438.688 1.059.688 1.796v3a.75.75 0 0 1-.75.75h-3a.75.75 0 0 1-.75-.75v-3c0-.737.25-1.358.688-1.796.237-.237.516-.407.812-.512V6.606L.443 5.684a.75.75 0 0 1 0-1.368ZM2.583 5 8 7.428 13.416 5 8 2.572ZM2.5 11.25v2.25H4v-2.25c0-.388-.125-.611-.25-.735a.697.697 0 0 0-.5-.203.707.707 0 0 0-.5.203c-.125.124-.25.347-.25.735Z"></path></svg> 여기에서 배우는 것</div>
 <ul class="simple">
-<li><p class="sd-card-text">How to migrate a single-GPU training script to multi-GPU via DDP</p></li>
-<li><p class="sd-card-text">Setting up the distributed process group</p></li>
-<li><p class="sd-card-text">Saving and loading models in a distributed setup</p></li>
+<li><p class="sd-card-text">DDP를 이용하여 단일 GPU 학습 스크립트를 다중 GPU 학습 스크립트로 바꾸는 법</p></li>
+<li><p class="sd-card-text">분산 프로세스 그룹(distributed process group)을 설정하는 법</p></li>
+<li><p class="sd-card-text">분산 환경에서 모델을 저장 및 읽어오는 법</p></li>
 </ul>
 <div class="sd-container-fluid sd-sphinx-override sd-mb-4 docutils">
 <div class="sd-row sd-row-cols-1 sd-row-cols-xs-1 sd-row-cols-sm-1 sd-row-cols-md-1 sd-row-cols-lg-1 docutils">
 <div class="sd-col sd-d-flex-column docutils">
-<p class="sd-card-text"><svg version="1.1" width="1.0em" height="1.0em" class="sd-octicon sd-octicon-code-square" viewBox="0 0 16 16" aria-hidden="true"><path d="M0 1.75C0 .784.784 0 1.75 0h12.5C15.216 0 16 .784 16 1.75v12.5A1.75 1.75 0 0 1 14.25 16H1.75A1.75 1.75 0 0 1 0 14.25Zm1.75-.25a.25.25 0 0 0-.25.25v12.5c0 .138.112.25.25.25h12.5a.25.25 0 0 0 .25-.25V1.75a.25.25 0 0 0-.25-.25Zm7.47 3.97a.75.75 0 0 1 1.06 0l2 2a.75.75 0 0 1 0 1.06l-2 2a.749.749 0 0 1-1.275-.326.749.749 0 0 1 .215-.734L10.69 8 9.22 6.53a.75.75 0 0 1 0-1.06ZM6.78 6.53 5.31 8l1.47 1.47a.749.749 0 0 1-.326 1.275.749.749 0 0 1-.734-.215l-2-2a.75.75 0 0 1 0-1.06l2-2a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042Z"></path></svg> View the code used in this tutorial on <a class="reference external" href="https://github.com/pytorch/examples/blob/main/distributed/ddp-tutorial-series/multigpu.py">GitHub</a></p>
+<p class="sd-card-text"><svg version="1.1" width="1.0em" height="1.0em" class="sd-octicon sd-octicon-code-square" viewBox="0 0 16 16" aria-hidden="true"><path d="M0 1.75C0 .784.784 0 1.75 0h12.5C15.216 0 16 .784 16 1.75v12.5A1.75 1.75 0 0 1 14.25 16H1.75A1.75 1.75 0 0 1 0 14.25Zm1.75-.25a.25.25 0 0 0-.25.25v12.5c0 .138.112.25.25.25h12.5a.25.25 0 0 0 .25-.25V1.75a.25.25 0 0 0-.25-.25Zm7.47 3.97a.75.75 0 0 1 1.06 0l2 2a.75.75 0 0 1 0 1.06l-2 2a.749.749 0 0 1-1.275-.326.749.749 0 0 1 .215-.734L10.69 8 9.22 6.53a.75.75 0 0 1 0-1.06ZM6.78 6.53 5.31 8l1.47 1.47a.749.749 0 0 1-.326 1.275.749.749 0 0 1-.734-.215l-2-2a.75.75 0 0 1 0-1.06l2-2a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042Z"></path></svg> 이 튜토리얼에서 사용된 코드는 <a class="reference external" href="https://github.com/pytorch/examples/blob/main/distributed/ddp-tutorial-series/multigpu.py">GitHub</a> 에서 확인 가능</p>
 </div>
 </div>
 </div>
@@ -468,39 +469,36 @@
 <div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm docutils">
 <div class="sd-card-body docutils">
 <div class="sd-card-title sd-font-weight-bold docutils">
-<svg version="1.1" width="1.0em" height="1.0em" class="sd-octicon sd-octicon-list-unordered" viewBox="0 0 16 16" aria-hidden="true"><path d="M5.75 2.5h8.5a.75.75 0 0 1 0 1.5h-8.5a.75.75 0 0 1 0-1.5Zm0 5h8.5a.75.75 0 0 1 0 1.5h-8.5a.75.75 0 0 1 0-1.5Zm0 5h8.5a.75.75 0 0 1 0 1.5h-8.5a.75.75 0 0 1 0-1.5ZM2 14a1 1 0 1 1 0-2 1 1 0 0 1 0 2Zm1-6a1 1 0 1 1-2 0 1 1 0 0 1 2 0ZM2 4a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg> Prerequisites</div>
+<svg version="1.1" width="1.0em" height="1.0em" class="sd-octicon sd-octicon-list-unordered" viewBox="0 0 16 16" aria-hidden="true"><path d="M5.75 2.5h8.5a.75.75 0 0 1 0 1.5h-8.5a.75.75 0 0 1 0-1.5Zm0 5h8.5a.75.75 0 0 1 0 1.5h-8.5a.75.75 0 0 1 0-1.5Zm0 5h8.5a.75.75 0 0 1 0 1.5h-8.5a.75.75 0 0 1 0-1.5ZM2 14a1 1 0 1 1 0-2 1 1 0 0 1 0 2Zm1-6a1 1 0 1 1-2 0 1 1 0 0 1 2 0ZM2 4a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg> 들어가기 앞서 준비할 것</div>
 <ul class="simple">
-<li><p class="sd-card-text">High-level overview of <a class="reference external" href="ddp_series_theory.html">how DDP works</a></p></li>
-<li><p class="sd-card-text">A machine with multiple GPUs (this tutorial uses an AWS p3.8xlarge instance)</p></li>
-<li><p class="sd-card-text">PyTorch <a class="reference external" href="https://pytorch.org/get-started/locally/">installed</a> with CUDA</p></li>
+<li><p class="sd-card-text"><a class="reference external" href="ddp_series_theory.html">DDP가 어떻게 동작하는지</a> 에 대한 전반적인 이해도</p></li>
+<li><p class="sd-card-text">다중 GPU를 가진 하드웨어 (이 튜토리얼에서는 AWS p3.8xlarge 인스턴스를 이용함)</p></li>
+<li><p class="sd-card-text">CUDA 환경에서 <a class="reference external" href="https://pytorch.org/get-started/locally/">설치된 PyTorch</a></p></li>
 </ul>
 </div>
 </div>
 </div>
 </div>
 </div>
-<p>Follow along with the video below or on <a class="reference external" href="https://www.youtube.com/watch/-LAtx9Q6DA8">youtube</a>.</p>
+<p>아래의 비디오 혹은 <a class="reference external" href="https://www.youtube.com/watch/-LAtx9Q6DA8">유튜브</a> 도 참고해주세요.</p>
 <div style="margin-top:10px; margin-bottom:10px;">
   <iframe width="560" height="315" src="https://www.youtube.com/embed/-LAtx9Q6DA8" frameborder="0" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-</div><p>In the <a class="reference external" href="ddp_series_theory.html">previous tutorial</a>, we got a high-level overview of how DDP works; now we see how to use DDP in code.
-In this tutorial, we start with a single-GPU training script and migrate that to running it on 4 GPUs on a single node.
-Along the way, we will talk through important concepts in distributed training while implementing them in our code.</p>
+</div><p><a class="reference external" href="ddp_series_theory.html">이전 튜토리얼</a> 에서, DDP가 어떻게 동작하는지에 대해 전반적으로 알아보았으므로, 이제 실제로 DDP를 어떻게 사용하는지 코드를 볼 차례입니다.
+이 튜토리얼에서는, 먼저 단일 GPU 학습 스크립트에서 시작하여, 단일 노드를 가진 4개의 GPU에서 동작하게 만들 것입니다.
+이 과정에서, 분산 훈련(distributed training)에 대한 중요한 개념들을 직접 코드로 구현하면서 다루게 될 것입니다.</p>
 <div class="admonition note">
 <p class="admonition-title">참고</p>
-<p>If your model contains any <code class="docutils literal notranslate"><span class="pre">BatchNorm</span></code> layers, it needs to be converted to <code class="docutils literal notranslate"><span class="pre">SyncBatchNorm</span></code> to sync the running stats of <code class="docutils literal notranslate"><span class="pre">BatchNorm</span></code>
-layers across replicas.</p>
-<p>Use the helper function
-<a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.SyncBatchNorm.html#torch.nn.SyncBatchNorm.convert_sync_batchnorm">torch.nn.SyncBatchNorm.convert_sync_batchnorm(model)</a> to convert all <code class="docutils literal notranslate"><span class="pre">BatchNorm</span></code> layers in the model to <code class="docutils literal notranslate"><span class="pre">SyncBatchNorm</span></code>.</p>
+<p>만약 당신의 모델이 <code class="docutils literal notranslate"><span class="pre">BatchNorm</span></code> 레이어를 가지고 있다면, 해당 레이어 간 동작 상황의 동기화를 위해 이걸 모두 <code class="docutils literal notranslate"><span class="pre">SyncBatchNorm</span></code> 으로 바꿀 필요가 있습니다.</p>
+<p>도움 함수(helper function)
+<a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.SyncBatchNorm.html#torch.nn.SyncBatchNorm.convert_sync_batchnorm">torch.nn.SyncBatchNorm.convert_sync_batchnorm(model)</a> 를 이용하여 모델 안의 <code class="docutils literal notranslate"><span class="pre">BatchNorm</span></code> 레이어를 <code class="docutils literal notranslate"><span class="pre">SyncBatchNorm</span></code> 레이어로 바꿔주세요.</p>
 </div>
-<p>Diff for <a class="reference external" href="https://github.com/pytorch/examples/blob/main/distributed/ddp-tutorial-series/single_gpu.py">single_gpu.py</a> v/s <a class="reference external" href="https://github.com/pytorch/examples/blob/main/distributed/ddp-tutorial-series/multigpu.py">multigpu.py</a></p>
-<p>These are the changes you typically make to a single-GPU training script to enable DDP.</p>
-<div class="section" id="imports">
-<h2>Imports<a class="headerlink" href="#imports" title="이 제목에 대한 퍼머링크">¶</a></h2>
+<p><a class="reference external" href="https://github.com/pytorch/examples/blob/main/distributed/ddp-tutorial-series/single_gpu.py">single_gpu.py</a> 와 <a class="reference external" href="https://github.com/pytorch/examples/blob/main/distributed/ddp-tutorial-series/multigpu.py">multigpu.py</a> 의 차이</p>
+<p>위 코드의 차이를 비교하면서 일반적으로 단일 GPU 학습 스크립트에서 DDP를 적용하는 법을 알 수 있습니다.</p>
+<div class="section" id="id1">
+<h2>임포트<a class="headerlink" href="#id1" title="이 제목에 대한 퍼머링크">¶</a></h2>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">torch.multiprocessing</span></code> is a PyTorch wrapper around Python’s native
-multiprocessing</p></li>
-<li><p>The distributed process group contains all the processes that can
-communicate and synchronize with each other.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">torch.multiprocessing</span></code> 은 Python의 네이티브 멀티프로세싱 모듈의 래퍼(wrapper)입니다.</p></li>
+<li><p>분산 프로세스 그룹(distributed process group)은 서로 정보 교환이 가능하고 동기화가 가능한 모든 프로세스들을 포함합니다.</p></li>
 </ul>
 <div class="highlight-diff notranslate"><div class="highlight"><pre><span></span>import torch
 import torch.nn.functional as F
@@ -514,18 +512,15 @@ from utils import MyTrainDataset
 </pre></div>
 </div>
 </div>
-<div class="section" id="constructing-the-process-group">
-<h2>Constructing the process group<a class="headerlink" href="#constructing-the-process-group" title="이 제목에 대한 퍼머링크">¶</a></h2>
+<div class="section" id="id2">
+<h2>프로세스 그룹 구성<a class="headerlink" href="#id2" title="이 제목에 대한 퍼머링크">¶</a></h2>
 <ul class="simple">
-<li><p>First, before initializing the group process, call <a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.cuda.set_device.html?highlight=set_device#torch.cuda.set_device">set_device</a>,
-which sets the default GPU for each process. This is important to prevent hangs or excessive memory utilization on <cite>GPU:0</cite></p></li>
-<li><p>The process group can be initialized by TCP (default) or from a
-shared file-system. Read more on <a class="reference external" href="https://pytorch.org/docs/stable/distributed.html#tcp-initialization">process group
-initialization</a></p></li>
-<li><p><a class="reference external" href="https://pytorch.org/docs/stable/distributed.html?highlight=init_process_group#torch.distributed.init_process_group">init_process_group</a>
-initializes the distributed process group.</p></li>
-<li><p>Read more about <a class="reference external" href="https://pytorch.org/docs/stable/distributed.html#which-backend-to-use">choosing a DDP
-backend</a></p></li>
+<li><p>먼저, 그룹 프로세스를 초기화하기 전에, <a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.cuda.set_device.html?highlight=set_device#torch.cuda.set_device">set_device</a> 를 호출하여
+각각의 프로세스에 GPU를 할당해주세요. 이 과정은 <cite>GPU:0</cite> 에 과도한 메모리 사용 혹은 멈춤 현상을 방지하기 위해 중요합니다.</p></li>
+<li><p>이 프로세스 그룹은 TCP(기본) 혹은 공유 파일 시스템 등을 통하여 초기화될 수 있습니다.
+자세한 내용은 <a class="reference external" href="https://pytorch.org/docs/stable/distributed.html#tcp-initialization">프로세스 그룹 초기화</a> 를 참고해주세요.</p></li>
+<li><p><a class="reference external" href="https://pytorch.org/docs/stable/distributed.html?highlight=init_process_group#torch.distributed.init_process_group">init_process_group</a> 으로 분산 프로세스 그룹을 초기화시킵니다.</p></li>
+<li><p>추가적인 내용은 <a class="reference external" href="https://pytorch.org/docs/stable/distributed.html#which-backend-to-use">DDP 백엔드 선택</a> 을 참고해주세요.</p></li>
 </ul>
 <div class="highlight-diff notranslate"><div class="highlight"><pre><span></span><span class="gi">+ def ddp_setup(rank: int, world_size: int):</span>
 <span class="gi">+   &quot;&quot;&quot;</span>
@@ -540,20 +535,20 @@ backend</a></p></li>
 </pre></div>
 </div>
 </div>
-<div class="section" id="constructing-the-ddp-model">
-<h2>Constructing the DDP model<a class="headerlink" href="#constructing-the-ddp-model" title="이 제목에 대한 퍼머링크">¶</a></h2>
+<div class="section" id="ddp">
+<h2>DDP 모델 구축<a class="headerlink" href="#ddp" title="이 제목에 대한 퍼머링크">¶</a></h2>
 <div class="highlight-diff notranslate"><div class="highlight"><pre><span></span><span class="gd">- self.model = model.to(gpu_id)</span>
 <span class="gi">+ self.model = DDP(model, device_ids=[gpu_id])</span>
 </pre></div>
 </div>
 </div>
-<div class="section" id="distributing-input-data">
-<h2>Distributing input data<a class="headerlink" href="#distributing-input-data" title="이 제목에 대한 퍼머링크">¶</a></h2>
+<div class="section" id="id3">
+<h2>입력 데이터 분산<a class="headerlink" href="#id3" title="이 제목에 대한 퍼머링크">¶</a></h2>
 <ul class="simple">
 <li><p><a class="reference external" href="https://pytorch.org/docs/stable/data.html?highlight=distributedsampler#torch.utils.data.distributed.DistributedSampler">DistributedSampler</a>
-chunks the input data across all distributed processes.</p></li>
-<li><p>Each process will receive an input batch of 32 samples; the effective
-batch size is <code class="docutils literal notranslate"><span class="pre">32</span> <span class="pre">*</span> <span class="pre">nprocs</span></code>, or 128 when using 4 GPUs.</p></li>
+를 이용하여 모든 분산 프로세스에 입력 데이터를 나눕니다.</p></li>
+<li><p>각각의 프로세스는 32개 샘플 크기의 입력 배치를 받습니다.
+이상적인 배치 크기는 <code class="docutils literal notranslate"><span class="pre">32</span> <span class="pre">*</span> <span class="pre">nprocs</span></code>, 혹은 4개의 GPU를 사용할 때 128입니다.</p></li>
 </ul>
 <div class="highlight-diff notranslate"><div class="highlight"><pre><span></span>train_data = torch.utils.data.DataLoader(
 <span class="w"> </span>   dataset=train_dataset,
@@ -565,8 +560,8 @@ batch size is <code class="docutils literal notranslate"><span class="pre">32</s
 </pre></div>
 </div>
 <ul class="simple">
-<li><p>Calling the <code class="docutils literal notranslate"><span class="pre">set_epoch()</span></code> method on the <code class="docutils literal notranslate"><span class="pre">DistributedSampler</span></code> at the beginning of each epoch is necessary to make shuffling work
-properly across multiple epochs. Otherwise, the same ordering will be used in each epoch.</p></li>
+<li><p>매 에폭(epoch)의 시작마다 <code class="docutils literal notranslate"><span class="pre">DistributedSampler</span></code> 의 <code class="docutils literal notranslate"><span class="pre">set_epoch()</span></code> 메소드를 호출하는 것은 다수의 에폭에서 순서를 적절히 섞기 위해 필수적입니다.
+이를 사용하지 않을 경우, 매 에폭마다 같은 순서가 사용됩니다.</p></li>
 </ul>
 <div class="highlight-diff notranslate"><div class="highlight"><pre><span></span>def _run_epoch(self, epoch):
 <span class="w"> </span>   b_sz = len(next(iter(self.train_data))[0])
@@ -577,13 +572,13 @@ properly across multiple epochs. Otherwise, the same ordering will be used in ea
 </pre></div>
 </div>
 </div>
-<div class="section" id="saving-model-checkpoints">
-<h2>Saving model checkpoints<a class="headerlink" href="#saving-model-checkpoints" title="이 제목에 대한 퍼머링크">¶</a></h2>
+<div class="section" id="checkpoints">
+<h2>모델 체크포인트(checkpoints) 저장<a class="headerlink" href="#checkpoints" title="이 제목에 대한 퍼머링크">¶</a></h2>
 <ul class="simple">
-<li><p>We only need to save model checkpoints from one process. Without this
-condition, each process would save its copy of the identical mode. Read
-more on saving and loading models with
-DDP <a class="reference external" href="https://tutorials.pytorch.kr/intermediate/ddp_tutorial.html#save-and-load-checkpoints">here</a></p></li>
+<li><p>모델 체크포인트를 저장할 때, 하나의 프로세스에 대해서만 체크포인트를 저장하면 됩니다. 이렇게 하지 않으면,
+각각의 프로세스가 모두 동일한 상태를 저장하게 될 것입니다.
+<a class="reference external" href="https://tutorials.pytorch.kr/intermediate/ddp_tutorial.html#save-and-load-checkpoints">여기</a> 에서
+DDP 환경에서 모델의 저장과 읽어오기 등에 대해 자세한 내용을 확인할 수 있습니다.</p></li>
 </ul>
 <div class="highlight-diff notranslate"><div class="highlight"><pre><span></span><span class="gd">- ckp = self.model.state_dict()</span>
 <span class="gi">+ ckp = self.model.module.state_dict()</span>
@@ -596,21 +591,20 @@ DDP <a class="reference external" href="https://tutorials.pytorch.kr/intermediat
 </div>
 <div class="admonition warning">
 <p class="admonition-title">경고</p>
-<p><a class="reference external" href="https://pytorch.org/docs/stable/distributed.html#collective-functions">Collective calls</a> are functions that run on all the distributed processes,
-and they are used to gather certain states or values to a specific process. Collective calls require all ranks to run the collective code.
-In this example, <cite>_save_checkpoint</cite> should not have any collective calls because it is only run on the <code class="docutils literal notranslate"><span class="pre">rank:0</span></code> process.
-If you need to make any collective calls, it should be before the <code class="docutils literal notranslate"><span class="pre">if</span> <span class="pre">self.gpu_id</span> <span class="pre">==</span> <span class="pre">0</span></code> check.</p>
+<p><a class="reference external" href="https://pytorch.org/docs/stable/distributed.html#collective-functions">집합 콜(Collective Calls)</a> 은 모든 분산 프로세스에서 동작하는 함수(functions)이며,
+특정 프로세스의 특정한 상태나 값을 모으기 위해 사용됩니다. 집합 콜은 집합 코드(collective code)를 실행하기 위해 모든 랭크(rank)를 필요로 합니다.
+이 예제에서, <cite>_save_checkpoint`는 오로지 ``rank:0`</cite> 프로세스에서만 실행되기 때문에, 어떠한 집합 콜도 가지고 있으면 안 됩니다.
+만약 집합 콜을 만들어야 된다면, <code class="docutils literal notranslate"><span class="pre">if</span> <span class="pre">self.gpu_id</span> <span class="pre">==</span> <span class="pre">0</span></code> 확인 이전에 만들어져야 합니다.</p>
 </div>
 </div>
-<div class="section" id="running-the-distributed-training-job">
-<h2>Running the distributed training job<a class="headerlink" href="#running-the-distributed-training-job" title="이 제목에 대한 퍼머링크">¶</a></h2>
+<div class="section" id="id4">
+<h2>분산 학습 작업의 실행<a class="headerlink" href="#id4" title="이 제목에 대한 퍼머링크">¶</a></h2>
 <ul class="simple">
-<li><p>Include new arguments <code class="docutils literal notranslate"><span class="pre">rank</span></code> (replacing <code class="docutils literal notranslate"><span class="pre">device</span></code>) and
-<code class="docutils literal notranslate"><span class="pre">world_size</span></code>.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">rank</span></code> is auto-allocated by DDP when calling
-<a class="reference external" href="https://pytorch.org/docs/stable/multiprocessing.html#spawning-subprocesses">mp.spawn</a>.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">world_size</span></code> is the number of processes across the training job. For GPU training,
-this corresponds to the number of GPUs in use, and each process works on a dedicated GPU.</p></li>
+<li><p>새로운 인자값 <code class="docutils literal notranslate"><span class="pre">rank</span></code> (<code class="docutils literal notranslate"><span class="pre">device</span></code> 를 대체)와 <code class="docutils literal notranslate"><span class="pre">world_size</span></code> 를 도입합니다.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rank</span></code> 는 <a class="reference external" href="https://pytorch.org/docs/stable/multiprocessing.html#spawning-subprocesses">mp.spawn</a> 을 호출할 때
+DDP에 의해 자동적으로 할당됩니다.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">world_size</span></code> 는 학습 작업에 이용되는 프로세스의 개수입니다. GPU를 이용한 학습의 경우에는,
+이 값은 현재 사용중인 GPU의 개수 및 한 GPU에 할당된 프로세스의 개수에 해당합니다.</p></li>
 </ul>
 <div class="highlight-diff notranslate"><div class="highlight"><pre><span></span><span class="gd">- def main(device, total_epochs, save_every):</span>
 <span class="gi">+ def main(rank, world_size, total_epochs, save_every):</span>
@@ -632,14 +626,13 @@ if __name__ == &quot;__main__&quot;:
 <span class="gi">+  mp.spawn(main, args=(world_size, total_epochs, save_every,), nprocs=world_size)</span>
 </pre></div>
 </div>
-<div class="section" id="further-reading">
-<h3>Further Reading<a class="headerlink" href="#further-reading" title="이 제목에 대한 퍼머링크">¶</a></h3>
+<div class="section" id="id5">
+<h3>더 읽을거리<a class="headerlink" href="#id5" title="이 제목에 대한 퍼머링크">¶</a></h3>
 <ul class="simple">
-<li><p><a class="reference external" href="ddp_series_fault_tolerance.html">Fault Tolerant distributed training</a>  (next tutorial in this series)</p></li>
-<li><p><a class="reference external" href="ddp_series_theory.html">Intro to DDP</a> (previous tutorial in this series)</p></li>
-<li><p><a class="reference external" href="https://tutorials.pytorch.kr/intermediate/ddp_tutorial.html">Getting Started with DDP</a></p></li>
-<li><p><a class="reference external" href="https://pytorch.org/docs/stable/distributed.html#tcp-initialization">Process Group
-initialization</a></p></li>
+<li><p><a class="reference external" href="ddp_series_fault_tolerance.html">결함 허용(fault tolerant) 분산 시스템</a>  (본 시리즈의 다음 튜토리얼)</p></li>
+<li><p><a class="reference external" href="ddp_series_theory.html">DDP 입문</a> (본 시리즈의 이전 튜토리얼)</p></li>
+<li><p><a class="reference external" href="https://tutorials.pytorch.kr/intermediate/ddp_tutorial.html">분산 데이터 병렬 처리(DDP) 시작하기</a></p></li>
+<li><p><a class="reference external" href="https://pytorch.org/docs/stable/distributed.html#tcp-initialization">프로세스 그룹 초기화</a></p></li>
 </ul>
 </div>
 </div>
@@ -647,12 +640,12 @@ initialization</a></p></li>
 
 
              </article>
-
+             
             </div>
             <footer>
+  
 
-
-
+  
     <hr class="community-hr hr-top" />
     <div class="community-container">
       <div class="community-prompt">더 궁금하시거나 개선할 내용이 있으신가요? 커뮤니티에 참여해보세요!</div>
@@ -672,7 +665,7 @@ initialization</a></p></li>
       </div>
     </div>
     <hr class="rating-hr hr-bottom"/>
-
+  
 
   <div role="contentinfo">
     <p>
@@ -680,11 +673,11 @@ initialization</a></p></li>
 
     </p>
   </div>
-
+    
       <div>
         Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
       </div>
-
+     
 
 </footer>
 
@@ -702,14 +695,14 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
           <div class="pytorch-right-menu" id="pytorch-right-menu">
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
-<li><a class="reference internal" href="#">Multi GPU training with DDP</a><ul>
-<li><a class="reference internal" href="#imports">Imports</a></li>
-<li><a class="reference internal" href="#constructing-the-process-group">Constructing the process group</a></li>
-<li><a class="reference internal" href="#constructing-the-ddp-model">Constructing the DDP model</a></li>
-<li><a class="reference internal" href="#distributing-input-data">Distributing input data</a></li>
-<li><a class="reference internal" href="#saving-model-checkpoints">Saving model checkpoints</a></li>
-<li><a class="reference internal" href="#running-the-distributed-training-job">Running the distributed training job</a><ul>
-<li><a class="reference internal" href="#further-reading">Further Reading</a></li>
+<li><a class="reference internal" href="#">DDP를 이용한 다중 GPU 훈련</a><ul>
+<li><a class="reference internal" href="#id1">임포트</a></li>
+<li><a class="reference internal" href="#id2">프로세스 그룹 구성</a></li>
+<li><a class="reference internal" href="#ddp">DDP 모델 구축</a></li>
+<li><a class="reference internal" href="#id3">입력 데이터 분산</a></li>
+<li><a class="reference internal" href="#checkpoints">모델 체크포인트(checkpoints) 저장</a></li>
+<li><a class="reference internal" href="#id4">분산 학습 작업의 실행</a><ul>
+<li><a class="reference internal" href="#id5">더 읽을거리</a></li>
 </ul>
 </li>
 </ul>
@@ -722,12 +715,12 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
       </section>
     </div>
 
+  
 
 
-
-
-
-
+  
+  
+     
        <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
          <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
          <script src="../_static/jquery.js"></script>
@@ -741,8 +734,8 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
          <script src="../_static/auto-render.min.js"></script>
          <script src="../_static/katex_autorenderer.js"></script>
          <script src="../_static/design-tabs.js"></script>
-
-
+     
+  
 
   <script type="text/javascript" src="../_static/js/vendor/popper.min.js"></script>
   <script type="text/javascript" src="../_static/js/vendor/bootstrap.min.js"></script>
@@ -754,11 +747,8 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
           SphinxRtdTheme.Navigation.enable(true);
       });
   </script>
-
+ 
 <script>
-// Helper function to make it easier to call dataLayer.push()
-function gtag(){window.dataLayer.push(arguments);}
-
 //add microsoft link
 if(window.location.href.indexOf("/beginner/basics/")!= -1)
 {

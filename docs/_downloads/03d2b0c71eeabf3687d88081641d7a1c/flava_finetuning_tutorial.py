@@ -74,7 +74,7 @@ print(len(vocab))
 print(vocab[:5])
 
 from datasets import load_dataset
-dataset = load_dataset("textvqa")
+dataset = load_dataset("facebook/textvqa")
 
 ######################################################################
 # 데이터셋에서 샘플 엔트리를 표시해 봅시다:

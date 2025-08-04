@@ -6,42 +6,42 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="ko" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta property="og:title" content="(prototype) Accelerating BERT with semi-structured (2:4) sparsity" />
+  <meta property="og:title" content="(프로토타입) 반정형적 (2:4) 희소성(semi-structured (2:4) sparsity)을 이용한 BERT 가속화하기" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://tutorials.pytorch.kr/prototype/semi_structured_sparse.html" />
 <meta property="og:site_name" content="PyTorch Tutorials KR" />
-<meta property="og:description" content="Author: Jesse Cai Like other forms of sparsity, semi-structured sparsity is a model optimization technique that seeks to reduce the memory overhead and latency of a neural network at the expense of some model accuracy. It is also known as fine-grained structured sparsity or 2:4 structured sparsit..." />
+<meta property="og:description" content="저자: Jesse Cai 번역: Dabin Kang 다른 형태의 희소성처럼, 반정형적 희소성(semi-structured sparsity)**은 메모리 오버헤드와 지연 시간을 줄이기 위한 모델 최적화 기법으로, 일부 모델 정확도를 희생하면서 이점을 얻습니다. 반정형적 희소성은 **fine-grained structured sparsity 또는** 2:4 structured sparsity**라고도 불립니다. 반정형적 희소성은 2n개의 요소 중 n개의 요소가 제거되는 독특한 희소성 패턴에서 그 이름을 따왔습니다. 가장 일반적으로..." />
 <meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
 <meta property="og:image:alt" content="PyTorch Tutorials KR" />
-<meta name="description" content="Author: Jesse Cai Like other forms of sparsity, semi-structured sparsity is a model optimization technique that seeks to reduce the memory overhead and latency of a neural network at the expense of some model accuracy. It is also known as fine-grained structured sparsity or 2:4 structured sparsit..." />
+<meta name="description" content="저자: Jesse Cai 번역: Dabin Kang 다른 형태의 희소성처럼, 반정형적 희소성(semi-structured sparsity)**은 메모리 오버헤드와 지연 시간을 줄이기 위한 모델 최적화 기법으로, 일부 모델 정확도를 희생하면서 이점을 얻습니다. 반정형적 희소성은 **fine-grained structured sparsity 또는** 2:4 structured sparsity**라고도 불립니다. 반정형적 희소성은 2n개의 요소 중 n개의 요소가 제거되는 독특한 희소성 패턴에서 그 이름을 따왔습니다. 가장 일반적으로..." />
 <meta property="og:ignore_canonical" content="true" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>(프로토타입) 반정형적 (2:4) 희소성(semi-structured (2:4) sparsity)을 이용한 BERT 가속화하기 &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
+  
 
-  <title>(prototype) Accelerating BERT with semi-structured (2:4) sparsity &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
-
-
-
-
+  
+  
     <link rel="shortcut icon" href="../_static/favicon.ico"/>
+  
+  
+  
 
+  
 
+  
+  
+    
 
-
-
-
-
-
-
-
-
+  
 
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!-- <link rel="stylesheet" href="../_static/pygments.css" type="text/css" /> -->
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css" type="text/css" />
   <link rel="stylesheet" href="../_static/katex-math.css" type="text/css" />
   <link rel="stylesheet" href="../_static/sg_gallery.css" type="text/css" />
   <link rel="stylesheet" href="../_static/sg_gallery-binder.css" type="text/css" />
@@ -52,9 +52,9 @@
   <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/custom2.css" type="text/css" />
     <link rel="index" title="색인" href="../genindex.html" />
-    <link rel="search" title="검색" href="../search.html" />
+    <link rel="search" title="검색" href="../search.html" /> 
 
-
+  
   <script src="../_static/js/modernizr.min.js"></script>
 
   <!-- Preload the theme fonts -->
@@ -111,9 +111,9 @@
 
 <body class="pytorch-body">
 
+   
 
-
-
+    
 
     <div class="table-of-contents-link-wrapper">
       <span>Table of Contents</span>
@@ -124,21 +124,21 @@
       <div class="pytorch-side-scroll">
         <div class="pytorch-menu pytorch-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           <div class="pytorch-left-menu-search">
+            
 
-
-
-
-
+            
+              
+              
                 <div class="version">
-                  2.3.1+cu121
+                  2.3.1
                 </div>
+              
+            
+
+            
 
 
-
-
-
-
-
+  
 
 
 <div role="search">
@@ -149,15 +149,15 @@
   </form>
 </div>
 
-
+            
           </div>
 
-
-
-
-
-
-
+          
+            
+            
+              
+            
+            
               <p class="caption" role="heading"><span class="caption-text">파이토치(PyTorch) 레시피</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../recipes/recipes_index.html">모든 레시피 보기</a></li>
@@ -182,7 +182,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/tensors_deeper_tutorial.html">Pytorch Tensor 소개</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/autogradyt_tutorial.html">The Fundamentals of Autograd</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/modelsyt_tutorial.html">Building Models with PyTorch</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/tensorboardyt_tutorial.html">PyTorch TensorBoard Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/tensorboardyt_tutorial.html">PyTorch TensorBoard 지원</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/trainingyt.html">Training with PyTorch</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/captumyt.html">Model Understanding with Captum</a></li>
 </ul>
@@ -200,7 +200,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../beginner/fgsm_tutorial.html">적대적 예제 생성(Adversarial Example Generation)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/dcgan_faces_tutorial.html">DCGAN 튜토리얼</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/vt_tutorial.html">배포를 위해 비전 트랜스포머(Vision Transformer) 모델 최적화하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/tiatoolbox_tutorial.html">Whole Slide Image Classification Using PyTorch and TIAToolbox</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/tiatoolbox_tutorial.html">Pytorch와 TIAToolbox를 사용한 전체 슬라이드 이미지(Whole Slide Image) 분류</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">오디오</span></p>
 <ul>
@@ -209,20 +209,20 @@
 <li class="toctree-l1"><a class="reference internal" href="../beginner/audio_data_augmentation_tutorial.html">Audio Data Augmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/audio_datasets_tutorial.html">Audio Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/audio_datasets_tutorial.html">오디오 데이터셋</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/speech_recognition_pipeline_tutorial.html">Speech Recognition with Wav2Vec2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/text_to_speech_with_torchaudio.html">Text-to-speech with Tacotron2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/forced_alignment_with_torchaudio_tutorial.html">wav2vec2을 이용한 강제 정렬</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">텍스트</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/bettertransformer_tutorial.html">Fast Transformer Inference with Better Transformer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/bettertransformer_tutorial.html">Better Transformer를 이용한 고속 트랜스포머 추론</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/char_rnn_classification_tutorial.html">기초부터 시작하는 NLP: 문자-단위 RNN으로 이름 분류하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/char_rnn_generation_tutorial.html">기초부터 시작하는 NLP:  문자-단위 RNN으로 이름 생성하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/seq2seq_translation_tutorial.html">기초부터 시작하는 NLP: Sequence to Sequence 네트워크와 Attention을 이용한 번역</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/text_sentiment_ngrams_tutorial.html">torchtext 라이브러리로 텍스트 분류하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/translation_transformer.html"><code class="docutils literal notranslate"><span class="pre">nn.Transformer</span></code> 와 torchtext로 언어 번역하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/torchtext_custom_dataset_tutorial.html">Preprocess custom text dataset using Torchtext</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/torchtext_custom_dataset_tutorial.html">TorchText를 사용하여 사용자 정의 글 데이터셋 전처리하기</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">백엔드</span></p>
 <ul>
@@ -247,8 +247,8 @@
 <p class="caption" role="heading"><span class="caption-text">PyTorch 프로파일링</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/profiler.html">PyTorch 모듈 프로파일링하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/hta_intro_tutorial.html">Introduction to Holistic Trace Analysis</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/hta_trace_diff_tutorial.html">Trace Diff using Holistic Trace Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/hta_intro_tutorial.html">전체론적(Holistic Trace Analysis) 추적 분석 소개</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/hta_trace_diff_tutorial.html">종합적 분석을 이용한 트레이스 차이 분석</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Code Transforms with FX</span></p>
 <ul>
@@ -305,11 +305,11 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../distributed/home.html">Distributed and Parallel Training Tutorials</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/dist_overview.html">PyTorch Distributed Overview</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/ddp_series_intro.html">Distributed Data Parallel in PyTorch - Video Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/ddp_series_intro.html">PyTorch의 분산 데이터 병렬 처리 - 비디오 튜토리얼</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/model_parallel_tutorial.html">단일 머신을 사용한 모델 병렬화 모범 사례</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/ddp_tutorial.html">분산 데이터 병렬 처리 시작하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/dist_tuto.html">PyTorch로 분산 어플리케이션 개발하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/FSDP_tutorial.html">Getting Started with Fully Sharded Data Parallel(FSDP)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/FSDP_tutorial.html">Fully Sharded Data Parallel(FSDP) 시작하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/FSDP_adavnced_tutorial.html">Advanced Model Training with Fully Sharded Data Parallel (FSDP)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/TP_tutorial.html">Large Scale Transformer model training with Tensor Parallel (TP)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/process_group_cpp_extension_tutorial.html">Cpp 확장을 사용한 프로세스 그룹 백엔드 사용자 정의</a></li>
@@ -340,8 +340,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../beginner/flava_finetuning_tutorial.html">TorchMultimodal 튜토리얼: FLAVA 미세조정</a></li>
 </ul>
 
-
-
+            
+          
         </div>
       </div>
     </nav>
@@ -349,7 +349,7 @@
     <div class="pytorch-container">
       <div class="pytorch-page-level-bar" id="pytorch-page-level-bar">
         <div class="pytorch-breadcrumbs-wrapper">
-
+          
 
 
 
@@ -368,30 +368,30 @@
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="pytorch-breadcrumbs">
-
+    
       <li>
         <a href="../index.html">
-
+          
             Tutorials
-
+          
         </a> &gt;
       </li>
 
-
-      <li>(prototype) Accelerating BERT with semi-structured (2:4) sparsity</li>
-
-
+        
+      <li>(프로토타입) 반정형적 (2:4) 희소성(semi-structured (2:4) sparsity)을 이용한 BERT 가속화하기</li>
+    
+    
       <li class="pytorch-breadcrumbs-aside">
-
-
+        
+            
             <a href="../_sources/prototype/semi_structured_sparse.rst.txt" rel="nofollow"><img src="../_static/images/view-page-source-icon.svg"></a>
-
-
+          
+        
       </li>
-
+    
   </ul>
 
-
+  
 </div>
         </div>
 
@@ -403,7 +403,7 @@
       <section data-toggle="wy-nav-shift" id="pytorch-content-wrap" class="pytorch-content-wrap">
         <div class="pytorch-content-left">
 
-
+        
 
           <div class="pytorch-call-to-action-links">
             <div id="tutorial-type">prototype/semi_structured_sparse</div>
@@ -425,42 +425,43 @@
             </div>
           </div>
 
+        
 
-
-
+          
           <div class="rst-content">
-
+          
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
-
-  <div class="section" id="prototype-accelerating-bert-with-semi-structured-2-4-sparsity">
-<h1>(prototype) Accelerating BERT with semi-structured (2:4) sparsity<a class="headerlink" href="#prototype-accelerating-bert-with-semi-structured-2-4-sparsity" title="이 제목에 대한 퍼머링크">¶</a></h1>
-<p><strong>Author</strong>: <a class="reference external" href="https://github.com/jcaip">Jesse Cai</a></p>
-<p>Like other forms of sparsity, <strong>semi-structured sparsity</strong> is a model optimization technique that seeks to reduce the memory overhead and latency of a neural network at the expense of some model accuracy.
-It is also known as <strong>fine-grained structured sparsity</strong> or <strong>2:4 structured sparsity</strong>.</p>
-<p>Semi-structured sparsity derives its name from its unique sparsity pattern, where n out of every 2n elements are pruned. We most often see n=2, hence 2:4 sparsity
-Semi-structured sparsity is particularly interesting because it can be efficiently accelerated on GPUs and doesn’t degrade model accuracy as much as other sparsity patterns.</p>
-<p>With the introduction of <a class="reference external" href="https://pytorch.org/docs/2.1/sparse.html#sparse-semi-structured-tensors">semi-structured sparsity support</a>, it is possible to prune and accelerate a semi-structured sparse model without leaving PyTorch.
-We will explain this process in this tutorial.</p>
+              
+  <div class="section" id="semi-structured-2-4-sparsity-bert">
+<h1>(프로토타입) 반정형적 (2:4) 희소성(semi-structured (2:4) sparsity)을 이용한 BERT 가속화하기<a class="headerlink" href="#semi-structured-2-4-sparsity-bert" title="이 제목에 대한 퍼머링크">¶</a></h1>
+<p><strong>저자</strong>: <a class="reference external" href="https://github.com/jcaip">Jesse Cai</a>
+<strong>번역</strong>: <a class="reference external" href="https://github.com/dabinishere">Dabin Kang</a></p>
+<p>다른 형태의 희소성처럼, <strong>반정형적 희소성(semi-structured sparsity)**은 메모리 오버헤드와 지연 시간을 줄이기 위한 모델 최적화 기법으로, 일부 모델 정확도를 희생하면서 이점을 얻습니다.
+반정형적 희소성은 **fine-grained structured sparsity</strong> 또는 <a href="#id1"><span class="problematic" id="id2">**</span></a>2:4 structured sparsity**라고도 불립니다.</p>
+<p>반정형적 희소성은 2n개의 요소 중 n개의 요소가 제거되는 독특한 희소성 패턴에서 그 이름을 따왔습니다. 가장 일반적으로 n=2가 적용되므로 2:4 희소성이라고 불립니다.
+반정형적 희소성은 특히 GPU에서 효율적으로 가속화될 수 있고, 다른 희소성 패턴보다 모델의 정확도를 덜 저하시키기 때문에 흥미롭습니다.</p>
+<p><a href="#id3"><span class="problematic" id="id4">`</span></a>반정형적 희소성 지원 &lt;<a class="reference external" href="https://pytorch.org/docs/2.1/sparse.html#sparse-semi-structured-tensors">https://pytorch.org/docs/2.1/sparse.html#sparse-semi-structured-tensors</a>&gt;`_으로, PyTorch 환경에서 반정형적 희소 모델을 가지치기하고 가속화할 수 있습니다.
+이 튜토리얼에서 그 과정을 설명하겠습니다.</p>
 <img alt="../_static/img/pruning_flow.jpg" src="../_static/img/pruning_flow.jpg" />
-<p>By the end of this tutorial, we will have sparsified a BERT question-answering model to be 2:4 sparse, fine-tuning it to recover nearly all F1 loss (86.92 dense vs 86.48 sparse).
-Finally, we will accelerate this 2:4 sparse model for inference, yielding a 1.3x speedup.</p>
-<div class="section" id="requirements">
-<h2>Requirements<a class="headerlink" href="#requirements" title="이 제목에 대한 퍼머링크">¶</a></h2>
+<p>이 튜토리얼을 끝내면, 2:4 희소성으로 가지치기하고, 거의 모든 F1 손실(밀집 86.92 vs 희소 86.48)을 복구하도록 미세 조정한 BERT 질문-답변 모델이 완성됩니다.
+마지막으로, 이 2:4 희소 모델을 추론 단계에서 가속화하여 1.3배의 속도 향상을 달성할 것입니다.</p>
+<div class="section" id="id5">
+<h2>요구 사항<a class="headerlink" href="#id5" title="이 제목에 대한 퍼머링크">¶</a></h2>
 <ul class="simple">
 <li><p>PyTorch &gt;= 2.1.</p></li>
-<li><p>A NVIDIA GPU with semi-structured sparsity support (Compute Capability 8.0+).</p></li>
+<li><p>반정형적 희소성을 지원하는 NVIDIA GPU (Compute Capability 8.0+).</p></li>
 </ul>
 <div class="admonition note">
 <p class="admonition-title">참고</p>
-<p>This tutorial is designed for beginners to semi-structured sparsity / sparsity in general.
-For users with existing 2:4 sparse models, accelerating <code class="docutils literal notranslate"><span class="pre">nn.Linear</span></code> layers for inference with <code class="docutils literal notranslate"><span class="pre">to_sparse_semi_structured</span></code> is as easy as:</p>
+<p>이 튜토리얼은 반정형적 희소성 또는 일반적인 희소성에 익숙하지 않은 초보자를 위해 설계되었습니다.
+기존 2:4 희소 모델이 있다면, <code class="docutils literal notranslate"><span class="pre">to_sparse_semi_structured``를</span> <span class="pre">사용하여</span> <span class="pre">``nn.Linear</span></code> 레이어를 추론을 위해 가속화하면 간단합니다 :</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">from</span> <span class="nn">torch.sparse</span> <span class="kn">import</span> <span class="n">to_sparse_semi_structured</span><span class="p">,</span> <span class="n">SparseSemiStructuredTensor</span>
 <span class="kn">from</span> <span class="nn">torch.utils.benchmark</span> <span class="kn">import</span> <span class="n">Timer</span>
 <span class="n">SparseSemiStructuredTensor</span><span class="o">.</span><span class="n">_FORCE_CUTLASS</span> <span class="o">=</span> <span class="kc">True</span>
 
-<span class="c1"># mask Linear weight to be 2:4 sparse</span>
+<span class="c1"># 2:4 희소성을 가지도록 Linear 가중치에 마스크 적용</span>
 <span class="n">mask</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">tile</span><span class="p">((</span><span class="mi">3072</span><span class="p">,</span> <span class="mi">2560</span><span class="p">))</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span><span class="o">.</span><span class="n">bool</span><span class="p">()</span>
 <span class="n">linear</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">10240</span><span class="p">,</span> <span class="mi">3072</span><span class="p">)</span><span class="o">.</span><span class="n">half</span><span class="p">()</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
 <span class="n">linear</span><span class="o">.</span><span class="n">weight</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Parameter</span><span class="p">(</span><span class="n">mask</span> <span class="o">*</span> <span class="n">linear</span><span class="o">.</span><span class="n">weight</span><span class="p">)</span>
@@ -473,7 +474,7 @@ For users with existing 2:4 sparse models, accelerating <code class="docutils li
                     <span class="nb">globals</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;linear&quot;</span><span class="p">:</span> <span class="n">linear</span><span class="p">,</span>
                              <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="n">x</span><span class="p">})</span><span class="o">.</span><span class="n">blocked_autorange</span><span class="p">()</span><span class="o">.</span><span class="n">median</span> <span class="o">*</span> <span class="mf">1e3</span>
 
-    <span class="c1"># accelerate via SparseSemiStructuredTensor</span>
+    <span class="c1"># SparseSemiStructuredTensor로 가속화</span>
     <span class="n">linear</span><span class="o">.</span><span class="n">weight</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Parameter</span><span class="p">(</span><span class="n">to_sparse_semi_structured</span><span class="p">(</span><span class="n">linear</span><span class="o">.</span><span class="n">weight</span><span class="p">))</span>
 
     <span class="n">sparse_output</span> <span class="o">=</span> <span class="n">linear</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
@@ -481,32 +482,32 @@ For users with existing 2:4 sparse models, accelerating <code class="docutils li
                     <span class="nb">globals</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;linear&quot;</span><span class="p">:</span> <span class="n">linear</span><span class="p">,</span>
                              <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="n">x</span><span class="p">})</span><span class="o">.</span><span class="n">blocked_autorange</span><span class="p">()</span><span class="o">.</span><span class="n">median</span> <span class="o">*</span> <span class="mf">1e3</span>
 
-    <span class="c1"># sparse and dense matmul are numerically equivalent</span>
+    <span class="c1"># 희소성과 밀집 행렬 곱셈(dense matmul)은 수치적으로 동일</span>
     <span class="k">assert</span> <span class="n">torch</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">sparse_output</span><span class="p">,</span> <span class="n">dense_output</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Dense: </span><span class="si">{</span><span class="n">dense_t</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">ms Sparse: </span><span class="si">{</span><span class="n">sparse_t</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">ms | Speedup: </span><span class="si">{</span><span class="p">(</span><span class="n">dense_t</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">sparse_t</span><span class="p">)</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">x&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>On an A100 80GB, we see: <cite>Dense: 0.870ms Sparse: 0.630ms | Speedup: 1.382x</cite></p>
+<p>A100 80GB에서의 결과 : <cite>Dense: 0.870ms Sparse: 0.630ms | Speedup: 1.382x</cite></p>
 </div>
 </div>
-<div class="section" id="what-problem-does-semi-structured-sparsity-solve">
-<h2>What problem does semi-structured sparsity solve?<a class="headerlink" href="#what-problem-does-semi-structured-sparsity-solve" title="이 제목에 대한 퍼머링크">¶</a></h2>
-<p>The general motivation behind sparsity is simple: if there are zeros in your network, you can avoid storing / doing compute with those parameters.
-However, the specifics of sparsity are tricky. Zeroing out parameters doesn’t affect the latency / memory overhead of our model out of the box.</p>
-<p>This is because the dense tensor still contains the pruned (zero) elements, which the dense matrix multiplication kernel will still operate on this elements.
-In order to realize performance gains, we need to swap out dense kernels for sparse kernels, which skip calculation involving pruned elements.</p>
-<p>To do this, these kernels work on sparse matrices, which do not store the pruned elements and store the specified elements in a compressed format.</p>
-<p>For semi-structured sparsity, we store exactly half of the original parameters along with some compressed metadata about how the elements were arranged.</p>
-<p>There are many different sparse layouts, each with their own benefits and drawbacks. The 2:4 semi-structured sparse layout is particularly interesting for two reasons:
-1. Unlike previous sparse formats, semi-structured sparsity was designed to be efficiently accelerated on GPUs.</p>
+<div class="section" id="id6">
+<h2>반정형적 희소성이 해결하는 문제는 무엇인가?<a class="headerlink" href="#id6" title="이 제목에 대한 퍼머링크">¶</a></h2>
+<p>희소성의 일반적인 동기는 간단합니다: 네트워크에 0이 있는 경우 해당 매개변수를 저장하거나 계산하지 않도록 할 수 있습니다.
+하지만 희소성의 구체적인 내용은 까다롭습니다. 매개변수를 0으로 만들면 별도의 과정 없이는 모델의 지연 시간이나 메모리 오버헤드에 영향을 미치지 않습니다.</p>
+<p>이는 밀집 tensor에 여전히 가지치기된(제로) 요소가 포함되어 있어, 밀집 행렬 곱셈 커널이 여전히 이러한 요소를 계산하기 때문입니다.
+성능 향상을 얻으려면, 가지치기된 요소 계산을 건너뛰는 희소 커널로 밀집 커널을 교체해야 합니다.</p>
+<p>이를 위해 이러한 커널은 가지치기된 요소를 저장하지 않고 지정된 요소를 압축된 형식으로 저장하는 희소 행렬에서 작동합니다.</p>
+<p>반정형적 희소성에서는 원래 매개변수의 정확히 절반을 압축된 메타데이터와 함께 저장하여 요소가 어떻게 배열되었는지에 대한 정보를 제공합니다.</p>
+<p>각기 다른 장단점을 가진 여러 가지 희소성 구조들이 있습니다. 특히 2:4 반정형적 희소 레이아웃은 두 가지 이유로 흥미롭습니다:
+1. 이전의 희소 형식과 달리 반정형적 희소성은 GPU에서 효율적으로 가속화되도록 설계되었습니다.</p>
 <blockquote>
-<div><p>In 2020, NVIDIA introduced hardware support for semi-structured sparsity with their Ampere architecture, and have also released fast sparse kernels via CUTLASS/<a class="reference external" href="https://docs.nvidia.com/cuda/cusparselt/index.html">cuSPARSELt</a>.</p>
+<div><p>2020년, NVIDIA는 Ampere 아키텍처와 함께 반정형적 희소성을 지원하는 하드웨어를 도입했으며, CUTLASS/<a href="#id7"><span class="problematic" id="id8">`</span></a>cuSPARSELt &lt;<a class="reference external" href="https://docs.nvidia.com/cuda/cusparselt/index.html">https://docs.nvidia.com/cuda/cusparselt/index.html</a>&gt;`_를 통해 빠른 희소 커널도 출시했습니다.</p>
 </div></blockquote>
 <ol class="arabic simple" start="2">
-<li><p>At the same time, semi-structured sparsity tends to have a milder impact on model accuracy compared to other sparse formats, especially when accounting for more advanced pruning / fine-tuning methods.
-NVIDIA has shown in their <a class="reference external" href="https://arxiv.org/abs/2104.08378">white paper</a> that a simple paradigm of magnitude pruning once to be 2:4 sparse and then retraining the model yields nearly identical model accuracies.</p></li>
+<li><p>동시에, 특히 더 발전된 가지치기 및 미세 조정 방법을 고려할 때, 반정형적 희소성은 다른 희소 형식에 비해 모델 정확도에 미치는 영향이 적습니다.
+NVIDIA는 <a href="#id9"><span class="problematic" id="id10">`</span></a>white paper &lt;<a class="reference external" href="https://arxiv.org/abs/2104.08378">https://arxiv.org/abs/2104.08378</a>&gt;`_에서 2:4 희소성을 위한 크기 기반 가지치기와 재학습하는 단순한 패러다임을 통해 거의 동일한 모델 정확도를 얻을 수 있음을 보여주었습니다.</p></li>
 </ol>
-<p>Semi-structured exists in a sweet spot, providing a 2x (theoretical) speedup at a much lower sparsity level (50%), while still being granular enough to preserve model accuracy.</p>
+<p>반정형적 희소성은 50%라는 낮은 희소성 수준에서 2배의 이론적인 속도 향상을 제공하며, 모델 정확도를 유지할 수 있을 만큼 충분히 세밀합니다.</p>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 31%" />
@@ -568,11 +569,11 @@ NVIDIA has shown in their <a class="reference external" href="https://arxiv.org/
 </tr>
 </tbody>
 </table>
-<p>Semi-structured sparsity has an additional advantage from a workflow perspective.
-Because the sparsity level is fixed at 50%, it is easier to decompose the problem of sparsifying a model into two distinct subproblems:</p>
+<p>반정형적 희소성은 워크플로우 관점에서도 추가적인 이점이 있습니다.
+희소성 수준이 50%로 고정되어 있어 모델을 희소화하는 문제를 두 가지 하위 문제로 분리하기가 더 쉬워집니다:</p>
 <ul class="simple">
-<li><p>Accuracy - How can we find a set of 2:4 sparse weights that minimize the accuracy degradation of our model?</p></li>
-<li><p>Performance - How can we accelerate our 2:4 sparse weights for inference and reduced memory overhead?</p></li>
+<li><p>정확도 - 모델의 정확도 저하를 최소화할 수 있는 2:4 희소 가중치 세트를 어떻게 찾을 수 있을까요?</p></li>
+<li><p>성능 - 추론을 위해 2:4 희소 가중치를 어떻게 가속화하고 메모리 오버헤드를 줄일 수 있을까요?</p></li>
 </ul>
 <div class="math">
 \[\begin{bmatrix}
@@ -583,13 +584,13 @@ Because the sparsity level is fixed at 50%, it is easier to decompose the proble
 \end{bmatrix}
 
 \]</div>
-<p>The natural handoff point between these two problems are zeroed-out dense tensors. Our inference solution is designed to compress and accelerate tensors in this format.
-We anticipate many users coming up with custom masking solution, as this is an active area of research.</p>
-<p>Now that we’ve learned a little more about semi-structured sparsity, let’s apply it to a BERT model trained on a question answering task, SQuAD.</p>
+<p>이 두 문제 사이의 자연스러운 핸드오프(handoff) 포인트는 0으로 된 밀집 tensor입니다. 이 형식의 tensor를 압축하고 가속화하도록 추론을 설계했습니다.
+활발한 연구분야인 만큼 많은 사용자가 맞춤형 마스킹 해결책을 고안할 것으로 예상합니다.</p>
+<p>이제 반정형적 희소성에 대해 조금 더 배웠으니, 질문 답변 작업인 SQuAD에서 학습된 BERT 모델에 이를 적용해 봅시다.</p>
 </div>
-<div class="section" id="intro-setup">
-<h2>Intro &amp; Setup<a class="headerlink" href="#intro-setup" title="이 제목에 대한 퍼머링크">¶</a></h2>
-<p>Let’s start by importing all the packages we need.</p>
+<div class="section" id="id11">
+<h2>소개 &amp; 설정<a class="headerlink" href="#id11" title="이 제목에 대한 퍼머링크">¶</a></h2>
+<p>우선 필요한 모든 패키지를 불러옵시다.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">collections</span>
 <span class="kn">import</span> <span class="nn">datasets</span>
 <span class="kn">import</span> <span class="nn">evaluate</span>
@@ -601,13 +602,13 @@ We anticipate many users coming up with custom masking solution, as this is an a
 <span class="kn">from</span> <span class="nn">torch.ao.pruning</span> <span class="kn">import</span> <span class="n">WeightNormSparsifier</span>
 <span class="kn">import</span> <span class="nn">transformers</span>
 
-<span class="c1"># force CUTLASS use if cuSPARSELt is not available</span>
+<span class="c1"># cuSPARSELt가 사용 불가능한 경우 CUTLASS 사용을 강제</span>
 <span class="n">SparseSemiStructuredTensor</span><span class="o">.</span><span class="n">_FORCE_CUTLASS</span> <span class="o">=</span> <span class="kc">True</span>
 <span class="n">torch</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>We’ll also need to define some helper functions that are specific to the dataset / task at hand.
-These were adapted from <a class="reference external" href="https://huggingface.co/learn/nlp-course/chapter7/7?fw=pt">this</a> huggingface course as a reference.</p>
+<p>또한 데이터셋과 작업에 특정한 몇 가지 함수를 직접 정의해야 합니다.
+<a class="reference external" href="https://huggingface.co/learn/nlp-course/chapter7/7?fw=pt">이</a> huggingface 코스에서 참조했습니다.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">preprocess_validation_function</span><span class="p">(</span><span class="n">examples</span><span class="p">,</span> <span class="n">tokenizer</span><span class="p">):</span>
     <span class="n">inputs</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="p">(</span>
         <span class="p">[</span><span class="n">q</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="n">examples</span><span class="p">[</span><span class="s2">&quot;question&quot;</span><span class="p">]],</span>
@@ -654,7 +655,7 @@ These were adapted from <a class="reference external" href="https://huggingface.
         <span class="n">end_char</span> <span class="o">=</span> <span class="n">start_char</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">answer</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
         <span class="n">sequence_ids</span> <span class="o">=</span> <span class="n">inputs</span><span class="o">.</span><span class="n">sequence_ids</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
 
-        <span class="c1"># Find the start and end of the context</span>
+        <span class="c1"># 문맥의 시작과 끝 찾기</span>
         <span class="n">idx</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">while</span> <span class="n">sequence_ids</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">idx</span> <span class="o">+=</span> <span class="mi">1</span>
@@ -663,12 +664,12 @@ These were adapted from <a class="reference external" href="https://huggingface.
             <span class="n">idx</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="n">context_end</span> <span class="o">=</span> <span class="n">idx</span> <span class="o">-</span> <span class="mi">1</span>
 
-        <span class="c1"># If the answer is not fully inside the context, label it (0, 0)</span>
+        <span class="c1"># 답변이 문맥 내에 완전히 포함되지 않으면 (0, 0)으로 라벨링하기</span>
         <span class="k">if</span> <span class="n">offset</span><span class="p">[</span><span class="n">context_start</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">end_char</span> <span class="ow">or</span> <span class="n">offset</span><span class="p">[</span><span class="n">context_end</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">start_char</span><span class="p">:</span>
             <span class="n">start_positions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
             <span class="n">end_positions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="c1"># Otherwise it&#39;s the start and end token positions</span>
+            <span class="c1"># 그렇지 않으면 시작 및 끝 토큰 위치로 라벨링하기</span>
             <span class="n">idx</span> <span class="o">=</span> <span class="n">context_start</span>
             <span class="k">while</span> <span class="n">idx</span> <span class="o">&lt;=</span> <span class="n">context_end</span> <span class="ow">and</span> <span class="n">offset</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">start_char</span><span class="p">:</span>
                 <span class="n">idx</span> <span class="o">+=</span> <span class="mi">1</span>
@@ -700,7 +701,7 @@ These were adapted from <a class="reference external" href="https://huggingface.
         <span class="n">context</span> <span class="o">=</span> <span class="n">example</span><span class="p">[</span><span class="s2">&quot;context&quot;</span><span class="p">]</span>
         <span class="n">answers</span> <span class="o">=</span> <span class="p">[]</span>
 
-        <span class="c1"># Loop through all features associated with that example</span>
+        <span class="c1"># 해당 예제와 연관된 모든 특징 반복하기</span>
         <span class="k">for</span> <span class="n">feature_index</span> <span class="ow">in</span> <span class="n">example_to_features</span><span class="p">[</span><span class="n">example_id</span><span class="p">]:</span>
             <span class="n">start_logit</span> <span class="o">=</span> <span class="n">start_logits</span><span class="p">[</span><span class="n">feature_index</span><span class="p">]</span>
             <span class="n">end_logit</span> <span class="o">=</span> <span class="n">end_logits</span><span class="p">[</span><span class="n">feature_index</span><span class="p">]</span>
@@ -710,11 +711,11 @@ These were adapted from <a class="reference external" href="https://huggingface.
             <span class="n">end_indexes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">end_logit</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span> <span class="p">:</span> <span class="o">-</span><span class="n">n_best</span> <span class="o">-</span> <span class="mi">1</span> <span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
             <span class="k">for</span> <span class="n">start_index</span> <span class="ow">in</span> <span class="n">start_indexes</span><span class="p">:</span>
                 <span class="k">for</span> <span class="n">end_index</span> <span class="ow">in</span> <span class="n">end_indexes</span><span class="p">:</span>
-                    <span class="c1"># Skip answers that are not fully in the context</span>
+                    <span class="c1"># 문맥 내에 완전히 포함되지 않은 답변 건너뛰기</span>
                     <span class="k">if</span> <span class="n">offsets</span><span class="p">[</span><span class="n">start_index</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">offsets</span><span class="p">[</span><span class="n">end_index</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                         <span class="k">continue</span>
-                    <span class="c1"># Skip answers with a length that is either &lt; 0</span>
-                    <span class="c1"># or &gt; max_answer_length</span>
+                    <span class="c1"># 길이가 &lt; 0 이거나</span>
+                    <span class="c1"># 또는 &gt; 최대 답변 길이(max_answer_length)인 답변 건너뛰기</span>
                     <span class="k">if</span> <span class="p">(</span>
                         <span class="n">end_index</span> <span class="o">&lt;</span> <span class="n">start_index</span>
                         <span class="ow">or</span> <span class="n">end_index</span> <span class="o">-</span> <span class="n">start_index</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">&gt;</span> <span class="n">max_answer_length</span>
@@ -729,7 +730,7 @@ These were adapted from <a class="reference external" href="https://huggingface.
                     <span class="p">}</span>
                     <span class="n">answers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">answer</span><span class="p">)</span>
 
-        <span class="c1"># Select the answer with the best score</span>
+        <span class="c1"># 가장 높은 점수를 가진 답변 선택</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">answers</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">best_answer</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">answers</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="s2">&quot;logit_score&quot;</span><span class="p">])</span>
             <span class="n">predicted_answers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
@@ -744,7 +745,7 @@ These were adapted from <a class="reference external" href="https://huggingface.
     <span class="k">return</span> <span class="n">metric</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="n">predictions</span><span class="o">=</span><span class="n">predicted_answers</span><span class="p">,</span> <span class="n">references</span><span class="o">=</span><span class="n">theoretical_answers</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Now that those are defined, we just need one additional helper function, which will help us benchmark our model.</p>
+<p>이제 함수들을 정의했으니, 모델의 실행 시간을 측정하는 추가적인 함수가 필요합니다.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">measure_execution_time</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">batch_sizes</span><span class="p">,</span> <span class="n">dataset</span><span class="p">):</span>
     <span class="n">dataset_for_model</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">remove_columns</span><span class="p">([</span><span class="s2">&quot;example_id&quot;</span><span class="p">,</span> <span class="s2">&quot;offset_mapping&quot;</span><span class="p">])</span>
     <span class="n">dataset_for_model</span><span class="o">.</span><span class="n">set_format</span><span class="p">(</span><span class="s2">&quot;torch&quot;</span><span class="p">)</span>
@@ -765,15 +766,15 @@ These were adapted from <a class="reference external" href="https://huggingface.
     <span class="k">return</span> <span class="n">batch_size_to_time_sec</span>
 </pre></div>
 </div>
-<p>We will get started by loading our model and tokenizer, and then setting up our dataset.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># load model</span>
+<p>모델과 토크나이저를 로드하고 데이터셋을 설정하는 것으로 시작해 봅시다.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 모델 불러오기</span>
 <span class="n">model_name</span> <span class="o">=</span> <span class="s2">&quot;bert-base-cased&quot;</span>
 <span class="n">tokenizer</span> <span class="o">=</span> <span class="n">transformers</span><span class="o">.</span><span class="n">AutoTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">model_name</span><span class="p">)</span>
 <span class="n">model</span> <span class="o">=</span> <span class="n">transformers</span><span class="o">.</span><span class="n">AutoModelForQuestionAnswering</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">model_name</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Loading tokenizer: </span><span class="si">{</span><span class="n">model_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Loading model: </span><span class="si">{</span><span class="n">model_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-<span class="c1"># set up train and val dataset</span>
+<span class="c1"># 학습 및 검증 데이터셋 설정</span>
 <span class="n">squad_dataset</span> <span class="o">=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">load_dataset</span><span class="p">(</span><span class="s2">&quot;squad&quot;</span><span class="p">)</span>
 <span class="n">tokenized_squad_dataset</span> <span class="o">=</span> <span class="p">{}</span>
 <span class="n">tokenized_squad_dataset</span><span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">squad_dataset</span><span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
@@ -787,8 +788,8 @@ These were adapted from <a class="reference external" href="https://huggingface.
 <span class="n">data_collator</span> <span class="o">=</span> <span class="n">transformers</span><span class="o">.</span><span class="n">DataCollatorWithPadding</span><span class="p">(</span><span class="n">tokenizer</span><span class="o">=</span><span class="n">tokenizer</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Next, we’ll train a quick baseline of our model on SQuAD. This task asks our model to identify spans, or segments of text, in a given context (Wikipedia articles) that answer a given question.
-Running the following code gives me an F1 score of 86.9. This is quite close to the reported NVIDIA score and the difference is likely due to BERT-base vs. BERT-large or fine-tuning hyperparams.</p>
+<p>다음으로, SQuAD에 대한 모델의 간단한 기본 학습을 해봅시다. 이 작업은 주어진 질문에 대한 답변을 포함하는 문맥(Wikipedia articles)에서 텍스트의 일부를 식별하는 것입니다.
+다음 코드를 실행하면 F1 점수 86.9를 얻을 수 있습니다. 이는 NVIDIA의 보고된 점수와 매우 유사하며, 차이는 BERT-base와 BERT-large 또는 미세 조정 하이퍼파라미터 때문일 가능성이 큽니다.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">training_args</span> <span class="o">=</span> <span class="n">transformers</span><span class="o">.</span><span class="n">TrainingArguments</span><span class="p">(</span>
     <span class="s2">&quot;trainer&quot;</span><span class="p">,</span>
     <span class="n">num_train_epochs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
@@ -808,9 +809,9 @@ Running the following code gives me an F1 score of 86.9. This is quite close to 
 
 <span class="n">trainer</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
 
-<span class="c1"># batch sizes to compare for eval</span>
+<span class="c1"># 평가를 위해 비교할 배치 크기</span>
 <span class="n">batch_sizes</span> <span class="o">=</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">256</span><span class="p">]</span>
-<span class="c1"># 2:4 sparsity require fp16, so we cast here for a fair comparison</span>
+<span class="c1"># 2:4 희소성은 fp16이 필요하므로 공정한 비교를 위해 여기서 형 변환</span>
 <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">autocast</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span><span class="p">):</span>
     <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">inference_mode</span><span class="p">():</span>
         <span class="n">predictions</span> <span class="o">=</span> <span class="n">trainer</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">tokenized_squad_dataset</span><span class="p">[</span><span class="s2">&quot;validation&quot;</span><span class="p">])</span>
@@ -834,24 +835,24 @@ Running the following code gives me an F1 score of 86.9. This is quite close to 
 </pre></div>
 </div>
 </div>
-<div class="section" id="pruning-bert-to-be-2-4-sparse">
-<h2>Pruning BERT to be 2:4 sparse<a class="headerlink" href="#pruning-bert-to-be-2-4-sparse" title="이 제목에 대한 퍼머링크">¶</a></h2>
-<p>Now that we have our baseline, it’s time we prune BERT. There are many different pruning strategies, but one of the most common is <strong>magnitude pruning</strong>, which seeks to remove the weights
-with the lowest L1 norm. Magnitude pruning was used by NVIDIA in all their results and is a common baseline.</p>
-<p>To do this, we will use the <code class="docutils literal notranslate"><span class="pre">torch.ao.pruning</span></code> package, which contains a weight-norm (magnitude) sparsifier.
-These sparsifiers work by applying mask parameterizations to the weight tensors in a model. This lets them simulate sparsity by masking out the pruned weights.</p>
-<p>We’ll also have to decide what layers of the model to apply sparsity to, which in this case is all of the <cite>nn.Linear</cite> layers, except for the task-specific head outputs.
-That’s because semi-structured sparsity has <a class="reference external" href="https://pytorch.org/docs/2.1/sparse.html#constructing-sparse-semi-structured-tensors">shape constraints</a>, and the task-specific nn.Linear layers do not satisfy them.</p>
+<div class="section" id="bert-2-4">
+<h2>BERT를 2:4 희소성으로 가지치기<a class="headerlink" href="#bert-2-4" title="이 제목에 대한 퍼머링크">¶</a></h2>
+<p>이제 기본 학습이 완료되었으니, BERT를 가지치기할 차례입니다. 가지치기 전략은 여러 가지가 있지만, 가장 일반적인 것은 <a href="#id13"><span class="problematic" id="id14">**</span></a>크기 기반 가지치기(magnitude pruning)**로, 가장 낮은 L1 norm으로 가중치를 제거합니다.
+NVIDIA는 모든 결과에서 크기 기반 가지치기를 사용했으며, 이는 일반적인 기준입니다.</p>
+<p>이를 위해 <code class="docutils literal notranslate"><span class="pre">torch.ao.pruning</span></code> 패키지를 사용하여 가중치-단위 (크기) 희소화를 적용할 것입니다.
+이 희소화는 모델의 가중치 tensor에 마스크 매개변수를 적용합니다. 즉, 가지치기된 가중치를 마스킹하여 제거하면서 희소성을 시뮬레이션합니다.</p>
+<p>또한, 어떤 레이어에 희소성을 적용할지 결정해야 하는데, 이 경우에는 작업 특화 헤드 출력 레이어를 제외한 모든 <cite>nn.Linear</cite> 레이어입니다.
+이는 반정형적 희소성이 <a href="#id15"><span class="problematic" id="id16">`</span></a>형태 제약 &lt;<a class="reference external" href="https://pytorch.org/docs/2.1/sparse.html#constructing-sparse-semi-structured-tensors">https://pytorch.org/docs/2.1/sparse.html#constructing-sparse-semi-structured-tensors</a>&gt;`_이 있기 때문이며, 작업 특화 nn.Linear 레이어는 이러한 제약을 만족하지 못합니다.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">sparsifier</span> <span class="o">=</span> <span class="n">WeightNormSparsifier</span><span class="p">(</span>
-    <span class="c1"># apply sparsity to all blocks</span>
+    <span class="c1"># 모든 블록에 희소성을 적용</span>
     <span class="n">sparsity_level</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
-    <span class="c1"># shape of 4 elemens is a block</span>
+    <span class="c1"># 4개 요소의 블록 형태</span>
     <span class="n">sparse_block_shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
-    <span class="c1"># two zeros for every block of 4</span>
+    <span class="c1"># 4 블록당 두 개의 0</span>
     <span class="n">zeros_per_block</span><span class="o">=</span><span class="mi">2</span>
 <span class="p">)</span>
 
-<span class="c1"># add to config if nn.Linear and in the BERT model.</span>
+<span class="c1"># BERT 모델에서 nn.Linear가 존재하는 경우 설정에 추가</span>
 <span class="n">sparse_config</span> <span class="o">=</span> <span class="p">[</span>
     <span class="p">{</span><span class="s2">&quot;tensor_fqn&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">fqn</span><span class="si">}</span><span class="s2">.weight&quot;</span><span class="p">}</span>
     <span class="k">for</span> <span class="n">fqn</span><span class="p">,</span> <span class="n">module</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">named_modules</span><span class="p">()</span>
@@ -859,9 +860,9 @@ That’s because semi-structured sparsity has <a class="reference external" href
 <span class="p">]</span>
 </pre></div>
 </div>
-<p>The first step for pruning the model is to insert paramterizations for masking the weights of the model. This is done by the prepare step.
-Anytime we try to access the <code class="docutils literal notranslate"><span class="pre">.weight</span></code> we will get <code class="docutils literal notranslate"><span class="pre">mask</span> <span class="pre">*</span> <span class="pre">weight</span></code> instead.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Prepare the model, insert fake-sparsity parameterizations for training</span>
+<p>모델을 가지치기하기 위한 첫 번째 단계는 가중치 마스킹을 위한 매개변수를 삽입하는 단계입니다. 이 단계는 준비 단계로 마무리됩니다.
+<a href="#id17"><span class="problematic" id="id18">``</span></a>.weight``에 접근할 때마다 <a href="#id19"><span class="problematic" id="id20">``</span></a>mask * weight``를 얻게 됩니다.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 모델 준비, 학습을 위한 가짜-희소성(fake-sparsity) 매개변수 삽입</span>
 <span class="n">sparsifier</span><span class="o">.</span><span class="n">prepare</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">sparse_config</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">bert</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">layer</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">output</span><span class="p">)</span>
 
@@ -879,9 +880,9 @@ Anytime we try to access the <code class="docutils literal notranslate"><span cl
 <span class="c1"># )</span>
 </pre></div>
 </div>
-<p>Then, we’ll take a single pruning step. All pruners implement a <code class="docutils literal notranslate"><span class="pre">update_mask()</span></code> method that updates the mask with the logic being determined by the pruner implementation.
-The step method calls this <code class="docutils literal notranslate"><span class="pre">update_mask</span></code> functions for the weights specified in the sparse config.</p>
-<p>We will also evaluate the model to show the accuracy degradation of zero-shot pruning, or pruning without fine-tuning / retraining.</p>
+<p>그 다음 가지치기 단계를 한 번 실행합니다. 모든 가지치기는 <code class="docutils literal notranslate"><span class="pre">update_mask()</span></code> 메소드를 구현하여 가지치기 구현 논리에 따라 마스크를 업데이트합니다.
+step 메소드는 희소 구성에서 지정된 가중치에 대해 이 <code class="docutils literal notranslate"><span class="pre">update_mask</span></code> 함수를 호출합니다.</p>
+<p>또한, 미세 조정이나 재학습 없이 가지치기되거나 학습 없이 가지치기된 모델의 정확도 저하를 보여주기 위해 모델을 평가할 것입니다.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">sparsifier</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
 <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">autocast</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span><span class="p">):</span>
     <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">inference_mode</span><span class="p">():</span>
@@ -895,8 +896,8 @@ The step method calls this <code class="docutils literal notranslate"><span clas
 <span class="c1"># pruned eval metrics: {&#39;exact_match&#39;: 40.59602649006622, &#39;f1&#39;: 56.51610004515979}</span>
 </pre></div>
 </div>
-<p>In this state, we can start fine-tuning the model, updating the elements that wouldn’t be pruned to better account for the accuracy loss.
-Once we’ve reached a satisfied state, we can call <code class="docutils literal notranslate"><span class="pre">squash_mask</span></code> to fuse the mask and the weight together. This will remove the parameterizations and we are left with a zeroed-out 2:4 dense model.</p>
+<p>이 상태에서 모델을 미세 조정하여 가지치기되지 않을 요소를 업데이트하고, 정확도 손실을 더 잘 반영하도록 합니다.
+만족할 만한 상태에 도달하면 <a href="#id21"><span class="problematic" id="id22">``</span></a>squash_mask``를 호출하여 마스크와 가중치를 함께 융합할 수 있습니다. 이렇게 하면 매개변수가 제거되고, 2:4로 밀집된 0이 있는 모델이 남게 됩니다.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">trainer</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
 <span class="n">sparsifier</span><span class="o">.</span><span class="n">squash_mask</span><span class="p">()</span>
 <span class="n">torch</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">edgeitems</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
@@ -914,11 +915,11 @@ Once we’ve reached a satisfied state, we can call <code class="docutils litera
 <span class="c1">#        [ 0.0000,  0.0225, -0.0395, -0.0000,  ..., -0.0000,  0.0684, -0.0344, -0.0000]], device=&#39;cuda:0&#39;, requires_grad=True)</span>
 </pre></div>
 </div>
-<p>Accelerating 2:4 sparse models for inference
+<p>2:4 희소 모델을 추론 단계에서 가속화하기
 ——–i————————————
-Now that we have a model in this format, we can accelerate it for inference just like in the QuickStart Guide.</p>
+이제 모델이 준비되었으므로 QuickStart Guide에서처럼 추론 단계에서 가속화할 수 있습니다.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span><span class="o">.</span><span class="n">half</span><span class="p">()</span>
-<span class="c1"># accelerate for sparsity</span>
+<span class="c1"># 희소성으로 가속화</span>
 <span class="k">for</span> <span class="n">fqn</span><span class="p">,</span> <span class="n">module</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">named_modules</span><span class="p">():</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">)</span> <span class="ow">and</span> <span class="s2">&quot;layer&quot;</span> <span class="ow">in</span> <span class="n">fqn</span><span class="p">:</span>
         <span class="n">module</span><span class="o">.</span><span class="n">weight</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Parameter</span><span class="p">(</span><span class="n">to_sparse_semi_structured</span><span class="p">(</span><span class="n">module</span><span class="o">.</span><span class="n">weight</span><span class="p">))</span>
@@ -944,10 +945,10 @@ Now that we have a model in this format, we can accelerate it for inference just
 <span class="c1"># sparse perf metrics:  {4: 12.621004460379481, 16: 15.368514601141214, 64: 58.702805917710066, 256: 244.19364519417286}</span>
 </pre></div>
 </div>
-<p>Retraining our model after magnitude pruning has recovered nearly all of the F1 that has been lost when the model was pruned. At the same time we have achieved a 1.28x speedup for bs=16.
-Note that not all shapes are amenable to performance improvements. When batch sizes are small and limited time is spent in compute sparse kernels may be slower than their dense counterparts.</p>
-<table class="docutils align-default" id="id1">
-<caption><span class="caption-text">results</span><a class="headerlink" href="#id1" title="이 표에 대한 퍼머링크">¶</a></caption>
+<p>크기 기반 가지치기(magnitude pruning) 후 모델을 다시 학습하여 가지치기 후 모델에서 손실된 F1의 대부분을 복구할 수 있었습니다. 동시에 bs=16에서 1.28배의 속도 향상을 달성했습니다.
+성능 개선에 적합하지 않은 형태도 있습니다. 배치 크기가 작고 계산 시간이 제한적일 때 희소 커널이 밀집 커널보다 느릴 수 있습니다.</p>
+<table class="docutils align-default" id="id24">
+<caption><span class="caption-text">results</span><a class="headerlink" href="#id24" title="이 표에 대한 퍼머링크">¶</a></caption>
 <colgroup>
 <col style="width: 28%" />
 <col style="width: 23%" />
@@ -995,22 +996,22 @@ Note that not all shapes are amenable to performance improvements. When batch si
 </tbody>
 </table>
 </div>
-<div class="section" id="conclusion">
-<h2>Conclusion<a class="headerlink" href="#conclusion" title="이 제목에 대한 퍼머링크">¶</a></h2>
-<p>In this tutorial, we have shown how to prune BERT to be 2:4 sparse and how to accelerate a 2:4 sparse model for inference.
-By taking advantage of our SparseSemiStructuredTensor subclass, we were able to achieve a 1.3x speedup over the fp16 baseline.
-We also demonstrated the benefits of 2:4 sparsity by fine-tuning BERT to recover any lost F1 (86.92 dense vs 86.48 sparse).</p>
+<div class="section" id="id23">
+<h2>결론<a class="headerlink" href="#id23" title="이 제목에 대한 퍼머링크">¶</a></h2>
+<p>이 튜토리얼에서는 BERT를 2:4 희소성으로 가지치기하고, 2:4 희소 모델을 추론 단계에서 가속화하는 방법을 보여주었습니다.
+SparseSemiStructuredTensor 하위 클래스를 활용하여 fp16 기본값 대비 1.3배 속도 향상을 달성할 수 있었습니다.
+또한 BERT를 미세 조정하여 손실된 F1(밀집 86.92 vs 희소 86.48)을 복구할 수 있음을 입증했습니다.</p>
 </div>
 </div>
 
 
              </article>
-
+             
             </div>
             <footer>
+  
 
-
-
+  
     <hr class="community-hr hr-top" />
     <div class="community-container">
       <div class="community-prompt">더 궁금하시거나 개선할 내용이 있으신가요? 커뮤니티에 참여해보세요!</div>
@@ -1030,7 +1031,7 @@ We also demonstrated the benefits of 2:4 sparsity by fine-tuning BERT to recover
       </div>
     </div>
     <hr class="rating-hr hr-bottom"/>
-
+  
 
   <div role="contentinfo">
     <p>
@@ -1038,11 +1039,11 @@ We also demonstrated the benefits of 2:4 sparsity by fine-tuning BERT to recover
 
     </p>
   </div>
-
+    
       <div>
         Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
       </div>
-
+     
 
 </footer>
 
@@ -1060,12 +1061,12 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
           <div class="pytorch-right-menu" id="pytorch-right-menu">
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
-<li><a class="reference internal" href="#">(prototype) Accelerating BERT with semi-structured (2:4) sparsity</a><ul>
-<li><a class="reference internal" href="#requirements">Requirements</a></li>
-<li><a class="reference internal" href="#what-problem-does-semi-structured-sparsity-solve">What problem does semi-structured sparsity solve?</a></li>
-<li><a class="reference internal" href="#intro-setup">Intro &amp; Setup</a></li>
-<li><a class="reference internal" href="#pruning-bert-to-be-2-4-sparse">Pruning BERT to be 2:4 sparse</a></li>
-<li><a class="reference internal" href="#conclusion">Conclusion</a></li>
+<li><a class="reference internal" href="#">(프로토타입) 반정형적 (2:4) 희소성(semi-structured (2:4) sparsity)을 이용한 BERT 가속화하기</a><ul>
+<li><a class="reference internal" href="#id5">요구 사항</a></li>
+<li><a class="reference internal" href="#id6">반정형적 희소성이 해결하는 문제는 무엇인가?</a></li>
+<li><a class="reference internal" href="#id11">소개 &amp; 설정</a></li>
+<li><a class="reference internal" href="#bert-2-4">BERT를 2:4 희소성으로 가지치기</a></li>
+<li><a class="reference internal" href="#id23">결론</a></li>
 </ul>
 </li>
 </ul>
@@ -1076,12 +1077,12 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
       </section>
     </div>
 
+  
 
 
-
-
-
-
+  
+  
+     
        <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
          <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
          <script src="../_static/jquery.js"></script>
@@ -1095,8 +1096,8 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
          <script src="../_static/auto-render.min.js"></script>
          <script src="../_static/katex_autorenderer.js"></script>
          <script src="../_static/design-tabs.js"></script>
-
-
+     
+  
 
   <script type="text/javascript" src="../_static/js/vendor/popper.min.js"></script>
   <script type="text/javascript" src="../_static/js/vendor/bootstrap.min.js"></script>
@@ -1108,11 +1109,8 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
           SphinxRtdTheme.Navigation.enable(true);
       });
   </script>
-
+ 
 <script>
-// Helper function to make it easier to call dataLayer.push()
-function gtag(){window.dataLayer.push(arguments);}
-
 //add microsoft link
 if(window.location.href.indexOf("/beginner/basics/")!= -1)
 {

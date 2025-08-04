@@ -6,42 +6,42 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="ko" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta property="og:title" content="Getting Started with Fully Sharded Data Parallel(FSDP)" />
+  <meta property="og:title" content="Fully Sharded Data Parallel(FSDP) 시작하기" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://tutorials.pytorch.kr/intermediate/FSDP_tutorial.html" />
 <meta property="og:site_name" content="PyTorch Tutorials KR" />
-<meta property="og:description" content="Author: Hamid Shojanazeri, Yanli Zhao, Shen Li Training AI models at a large scale is a challenging task that requires a lot of compute power and resources. It also comes with considerable engineering complexity to handle the training of these very large models. PyTorch FSDP, released in PyTorch ..." />
+<meta property="og:description" content="저자: Hamid Shojanazeri, Yanli Zhao, Shen Li 번역:: 이진혁 <https://github.com/uddk6215>__ 대규모 AI 모델을 학습하는 것은 많은 컴퓨팅 파워와 자원을 필요로 하는 어려운 작업입니다. 또한 이러한 대규모 모델의 학습을 위해서는 엔지니어링 측면에서 상당한 복잡성이 따릅니다. PyTorch 1.11에서 출시된` PyTorch FSDP < https://pytorch.org/blog/introducing-pytorch-fully-sharded-data-parallel-api..." />
 <meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
 <meta property="og:image:alt" content="PyTorch Tutorials KR" />
-<meta name="description" content="Author: Hamid Shojanazeri, Yanli Zhao, Shen Li Training AI models at a large scale is a challenging task that requires a lot of compute power and resources. It also comes with considerable engineering complexity to handle the training of these very large models. PyTorch FSDP, released in PyTorch ..." />
+<meta name="description" content="저자: Hamid Shojanazeri, Yanli Zhao, Shen Li 번역:: 이진혁 <https://github.com/uddk6215>__ 대규모 AI 모델을 학습하는 것은 많은 컴퓨팅 파워와 자원을 필요로 하는 어려운 작업입니다. 또한 이러한 대규모 모델의 학습을 위해서는 엔지니어링 측면에서 상당한 복잡성이 따릅니다. PyTorch 1.11에서 출시된` PyTorch FSDP < https://pytorch.org/blog/introducing-pytorch-fully-sharded-data-parallel-api..." />
 <meta property="og:ignore_canonical" content="true" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Fully Sharded Data Parallel(FSDP) 시작하기 &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
+  
 
-  <title>Getting Started with Fully Sharded Data Parallel(FSDP) &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
-
-
-
-
+  
+  
     <link rel="shortcut icon" href="../_static/favicon.ico"/>
+  
+  
+  
 
+  
 
+  
+  
+    
 
-
-
-
-
-
-
-
-
+  
 
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!-- <link rel="stylesheet" href="../_static/pygments.css" type="text/css" /> -->
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css" type="text/css" />
   <link rel="stylesheet" href="../_static/katex-math.css" type="text/css" />
   <link rel="stylesheet" href="../_static/sg_gallery.css" type="text/css" />
   <link rel="stylesheet" href="../_static/sg_gallery-binder.css" type="text/css" />
@@ -54,9 +54,9 @@
     <link rel="index" title="색인" href="../genindex.html" />
     <link rel="search" title="검색" href="../search.html" />
     <link rel="next" title="Advanced Model Training with Fully Sharded Data Parallel (FSDP)" href="FSDP_adavnced_tutorial.html" />
-    <link rel="prev" title="PyTorch로 분산 어플리케이션 개발하기" href="dist_tuto.html" />
+    <link rel="prev" title="PyTorch로 분산 어플리케이션 개발하기" href="dist_tuto.html" /> 
 
-
+  
   <script src="../_static/js/modernizr.min.js"></script>
 
   <!-- Preload the theme fonts -->
@@ -113,9 +113,9 @@
 
 <body class="pytorch-body">
 
+   
 
-
-
+    
 
     <div class="table-of-contents-link-wrapper">
       <span>Table of Contents</span>
@@ -126,21 +126,21 @@
       <div class="pytorch-side-scroll">
         <div class="pytorch-menu pytorch-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           <div class="pytorch-left-menu-search">
+            
 
-
-
-
-
+            
+              
+              
                 <div class="version">
-                  2.3.1+cu121
+                  2.3.1
                 </div>
+              
+            
+
+            
 
 
-
-
-
-
-
+  
 
 
 <div role="search">
@@ -151,15 +151,15 @@
   </form>
 </div>
 
-
+            
           </div>
 
-
-
-
-
-
-
+          
+            
+            
+              
+            
+            
               <p class="caption" role="heading"><span class="caption-text">파이토치(PyTorch) 레시피</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../recipes/recipes_index.html">모든 레시피 보기</a></li>
@@ -184,7 +184,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/tensors_deeper_tutorial.html">Pytorch Tensor 소개</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/autogradyt_tutorial.html">The Fundamentals of Autograd</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/modelsyt_tutorial.html">Building Models with PyTorch</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/tensorboardyt_tutorial.html">PyTorch TensorBoard Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/tensorboardyt_tutorial.html">PyTorch TensorBoard 지원</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/trainingyt.html">Training with PyTorch</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/captumyt.html">Model Understanding with Captum</a></li>
 </ul>
@@ -202,7 +202,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../beginner/fgsm_tutorial.html">적대적 예제 생성(Adversarial Example Generation)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/dcgan_faces_tutorial.html">DCGAN 튜토리얼</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/vt_tutorial.html">배포를 위해 비전 트랜스포머(Vision Transformer) 모델 최적화하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tiatoolbox_tutorial.html">Whole Slide Image Classification Using PyTorch and TIAToolbox</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tiatoolbox_tutorial.html">Pytorch와 TIAToolbox를 사용한 전체 슬라이드 이미지(Whole Slide Image) 분류</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">오디오</span></p>
 <ul>
@@ -211,20 +211,20 @@
 <li class="toctree-l1"><a class="reference internal" href="../beginner/audio_data_augmentation_tutorial.html">Audio Data Augmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/audio_datasets_tutorial.html">Audio Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/audio_datasets_tutorial.html">오디오 데이터셋</a></li>
 <li class="toctree-l1"><a class="reference internal" href="speech_recognition_pipeline_tutorial.html">Speech Recognition with Wav2Vec2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="text_to_speech_with_torchaudio.html">Text-to-speech with Tacotron2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="forced_alignment_with_torchaudio_tutorial.html">wav2vec2을 이용한 강제 정렬</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">텍스트</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/bettertransformer_tutorial.html">Fast Transformer Inference with Better Transformer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/bettertransformer_tutorial.html">Better Transformer를 이용한 고속 트랜스포머 추론</a></li>
 <li class="toctree-l1"><a class="reference internal" href="char_rnn_classification_tutorial.html">기초부터 시작하는 NLP: 문자-단위 RNN으로 이름 분류하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="char_rnn_generation_tutorial.html">기초부터 시작하는 NLP:  문자-단위 RNN으로 이름 생성하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="seq2seq_translation_tutorial.html">기초부터 시작하는 NLP: Sequence to Sequence 네트워크와 Attention을 이용한 번역</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/text_sentiment_ngrams_tutorial.html">torchtext 라이브러리로 텍스트 분류하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/translation_transformer.html"><code class="docutils literal notranslate"><span class="pre">nn.Transformer</span></code> 와 torchtext로 언어 번역하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/torchtext_custom_dataset_tutorial.html">Preprocess custom text dataset using Torchtext</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/torchtext_custom_dataset_tutorial.html">TorchText를 사용하여 사용자 정의 글 데이터셋 전처리하기</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">백엔드</span></p>
 <ul>
@@ -249,8 +249,8 @@
 <p class="caption" role="heading"><span class="caption-text">PyTorch 프로파일링</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/profiler.html">PyTorch 모듈 프로파일링하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/hta_intro_tutorial.html">Introduction to Holistic Trace Analysis</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/hta_trace_diff_tutorial.html">Trace Diff using Holistic Trace Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/hta_intro_tutorial.html">전체론적(Holistic Trace Analysis) 추적 분석 소개</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/hta_trace_diff_tutorial.html">종합적 분석을 이용한 트레이스 차이 분석</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Code Transforms with FX</span></p>
 <ul>
@@ -307,11 +307,11 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../distributed/home.html">Distributed and Parallel Training Tutorials</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/dist_overview.html">PyTorch Distributed Overview</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/ddp_series_intro.html">Distributed Data Parallel in PyTorch - Video Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/ddp_series_intro.html">PyTorch의 분산 데이터 병렬 처리 - 비디오 튜토리얼</a></li>
 <li class="toctree-l1"><a class="reference internal" href="model_parallel_tutorial.html">단일 머신을 사용한 모델 병렬화 모범 사례</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ddp_tutorial.html">분산 데이터 병렬 처리 시작하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dist_tuto.html">PyTorch로 분산 어플리케이션 개발하기</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Getting Started with Fully Sharded Data Parallel(FSDP)</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Fully Sharded Data Parallel(FSDP) 시작하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="FSDP_adavnced_tutorial.html">Advanced Model Training with Fully Sharded Data Parallel (FSDP)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="TP_tutorial.html">Large Scale Transformer model training with Tensor Parallel (TP)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="process_group_cpp_extension_tutorial.html">Cpp 확장을 사용한 프로세스 그룹 백엔드 사용자 정의</a></li>
@@ -342,8 +342,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../beginner/flava_finetuning_tutorial.html">TorchMultimodal 튜토리얼: FLAVA 미세조정</a></li>
 </ul>
 
-
-
+            
+          
         </div>
       </div>
     </nav>
@@ -351,7 +351,7 @@
     <div class="pytorch-container">
       <div class="pytorch-page-level-bar" id="pytorch-page-level-bar">
         <div class="pytorch-breadcrumbs-wrapper">
-
+          
 
 
 
@@ -370,30 +370,30 @@
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="pytorch-breadcrumbs">
-
+    
       <li>
         <a href="../index.html">
-
+          
             Tutorials
-
+          
         </a> &gt;
       </li>
 
-
-      <li>Getting Started with Fully Sharded Data Parallel(FSDP)</li>
-
-
+        
+      <li>Fully Sharded Data Parallel(FSDP) 시작하기</li>
+    
+    
       <li class="pytorch-breadcrumbs-aside">
-
-
+        
+            
             <a href="../_sources/intermediate/FSDP_tutorial.rst.txt" rel="nofollow"><img src="../_static/images/view-page-source-icon.svg"></a>
-
-
+          
+        
       </li>
-
+    
   </ul>
 
-
+  
 </div>
         </div>
 
@@ -405,7 +405,7 @@
       <section data-toggle="wy-nav-shift" id="pytorch-content-wrap" class="pytorch-content-wrap">
         <div class="pytorch-content-left">
 
-
+        
 
           <div class="pytorch-call-to-action-links">
             <div id="tutorial-type">intermediate/FSDP_tutorial</div>
@@ -427,71 +427,84 @@
             </div>
           </div>
 
+        
 
-
-
+          
           <div class="rst-content">
-
+          
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
-
-  <div class="section" id="getting-started-with-fully-sharded-data-parallel-fsdp">
-<h1>Getting Started with Fully Sharded Data Parallel(FSDP)<a class="headerlink" href="#getting-started-with-fully-sharded-data-parallel-fsdp" title="이 제목에 대한 퍼머링크">¶</a></h1>
-<p><strong>Author</strong>: <a class="reference external" href="https://github.com/HamidShojanazeri">Hamid Shojanazeri</a>, <a class="reference external" href="https://github.com/zhaojuanmao">Yanli Zhao</a>, <a class="reference external" href="https://mrshenli.github.io/">Shen Li</a></p>
+              
+  <div class="section" id="fully-sharded-data-parallel-fsdp">
+<h1>Fully Sharded Data Parallel(FSDP) 시작하기<a class="headerlink" href="#fully-sharded-data-parallel-fsdp" title="이 제목에 대한 퍼머링크">¶</a></h1>
+<p><strong>저자</strong>: <a class="reference external" href="https://github.com/HamidShojanazeri">Hamid Shojanazeri</a>, <a class="reference external" href="https://github.com/zhaojuanmao">Yanli Zhao</a>, <a class="reference external" href="https://mrshenli.github.io/">Shen Li</a>
+<strong>번역:</strong>: <cite>이진혁 &lt;https://github.com/uddk6215&gt;__</cite></p>
 <div class="admonition note">
 <p class="admonition-title">참고</p>
-<p><a class="reference internal" href="../_images/pencil-16.png"><img alt="edit" src="../_images/pencil-16.png" style="width: 16px; height: 16px;" /></a> View and edit this tutorial in <a class="reference external" href="https://github.com/pytorch/tutorials/blob/main/intermediate_source/FSDP_tutorial.rst">github</a>.</p>
+<p><a class="reference internal" href="../_images/pencil-16.png"><img alt="edit" src="../_images/pencil-16.png" style="width: 16px; height: 16px;" /></a> 이 튜토리얼을 <a href="#id1"><span class="problematic" id="id2">`</span></a>github &lt;<a class="reference external" href="https://github.com/pytorch/tutorials/blob/main/intermediate_source/FSDP_tutorial.rst">https://github.com/pytorch/tutorials/blob/main/intermediate_source/FSDP_tutorial.rst</a>&gt;`__에서 보고 수정할 수 있습니다.</p>
 </div>
-<p>Training AI models at a large scale is a challenging task that requires a lot of compute power and resources.
-It also comes with considerable engineering complexity to handle the training of these very large models.
-<a class="reference external" href="https://pytorch.org/blog/introducing-pytorch-fully-sharded-data-parallel-api/">PyTorch FSDP</a>, released in PyTorch 1.11 makes this easier.</p>
-<p>In this tutorial, we show how to use <a class="reference external" href="https://pytorch.org/docs/stable/fsdp.html">FSDP APIs</a>, for simple MNIST models that can be extended to other larger models such as <a class="reference external" href="https://huggingface.co/blog/zero-deepspeed-fairscale">HuggingFace BERT models</a>,
-<a class="reference external" href="https://pytorch.medium.com/training-a-1-trillion-parameter-model-with-pytorch-fully-sharded-data-parallel-on-aws-3ac13aa96cff">GPT 3 models up to 1T parameters</a> . The sample DDP MNIST code has been borrowed from <a class="reference external" href="https://github.com/yqhu/mnist_examples">here</a>.</p>
-<div class="section" id="how-fsdp-works">
-<h2>How FSDP works<a class="headerlink" href="#how-fsdp-works" title="이 제목에 대한 퍼머링크">¶</a></h2>
-<p>In <a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.parallel.DistributedDataParallel.html">DistributedDataParallel</a>, (DDP) training, each process/ worker owns a replica of the model and processes a batch of data, finally it uses all-reduce to sum up gradients over different workers. In DDP the model weights and optimizer states are replicated across all workers. FSDP is a type of data parallelism that shards model parameters, optimizer states and gradients across DDP ranks.</p>
-<p>When training with FSDP, the GPU memory footprint is smaller than when training with DDP across all workers. This makes the training of some very large models feasible by allowing larger models or batch sizes to fit on device. This comes with the cost of increased communication volume. The communication overhead is reduced by internal optimizations like overlapping communication and computation.</p>
-<div class="figure align-center" id="id1">
+<p>대규모 AI 모델을 학습하는 것은 많은 컴퓨팅 파워와 자원을 필요로 하는 어려운 작업입니다.
+또한 이러한 대규모 모델의 학습을 위해서는 엔지니어링 측면에서 상당한 복잡성이 따릅니다.
+PyTorch 1.11에서 출시된 <a href="#id3"><span class="problematic" id="id4">`</span></a>PyTorch FSDP &lt;<a class="reference external" href="https://pytorch.org/blog/introducing-pytorch-fully-sharded-data-parallel-api/">https://pytorch.org/blog/introducing-pytorch-fully-sharded-data-parallel-api/</a>&gt;`__는 이러한 작업을 더 쉽게 만들어줍니다.</p>
+<p>이 튜토리얼에서는 간단한 MNIST 모델에 <a class="reference external" href="https://pytorch.medium.com/training-a-1-trillion-parameter-model-with-pytorch-fully-sharded-data-parallel-on-aws-3ac13aa96cff">FSDP APIs &lt;https://pytorch.org/docs/stable/fsdp.html&gt;`__를 사용하는 방법을 보여줍니다.
+이 방법은 `HuggingFace BERT models &lt;https://huggingface.co/blog/zero-deepspeed-fairscale&gt;`__이나 최대 1조 개의 매개변수를 가진
+`GPT 3 models up to 1T parameters</a>
+같은 더 큰 모델로 확장될 수 있습니다.
+예제로 사용된 DDP MNIST 코드는 <a href="#id5"><span class="problematic" id="id6">`</span></a>here &lt;<a class="reference external" href="https://github.com/yqhu/mnist_examples">https://github.com/yqhu/mnist_examples</a>&gt;`__에서 가져왔습니다.</p>
+<div class="section" id="fsdp">
+<h2>FSDP의 작동 방식<a class="headerlink" href="#fsdp" title="이 제목에 대한 퍼머링크">¶</a></h2>
+<p><a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.parallel.DistributedDataParallel.html">DistributedDataParallel</a> (DDP) 학습에서는,
+각 process/ worker가 모델의 복제본을 소유하고 데이터 배치를 처리한 후, 최종적으로 all-reduce를 사용하여 서로 다른 worker들의 변화도를 합산합니다.
+DDP에서는 모델 가중치와 옵티마이저 상태가 모든 worker들에 걸쳐 복제됩니다.
+FSDP는 모델 매개변수, 옵티마이저 상태, 변화도를 DDP rank들에 걸쳐 샤딩하는 데이터 병렬 처리 방식입니다.</p>
+<p>FSDP로 학습할 때, GPU 메모리 사용량은 모든 work들에 걸쳐 DDP로 학습할 때보다 작습니다.
+이로 인해 더 큰 모델이나 배치 크기를 디바이스에 맞출 수 있어 매우 큰 모델의 학습이 가능해집니다.
+다만 이는 통신량 증가라는 비용을 수반합니다. 이 때 발생하는 통신 오버헤드는 통신과 계산을 중첩하는 등의 내부 최적화를 통해 줄어듭니다.</p>
+<div class="figure align-center" id="id12">
 <a class="reference internal image-reference" href="../_images/fsdp_workflow.png"><img alt="FSDP workflow" src="../_images/fsdp_workflow.png" style="width: 100%;" /></a>
-<p class="caption"><span class="caption-text">FSDP Workflow</span><a class="headerlink" href="#id1" title="이 이미지에 대한 퍼머링크">¶</a></p>
+<p class="caption"><span class="caption-text">FSDP Workflow</span><a class="headerlink" href="#id12" title="이 이미지에 대한 퍼머링크">¶</a></p>
 </div>
-<p>At a high level FSDP works as follow:</p>
-<p><em>In constructor</em></p>
+<p>FSDP는 고수준에서 다음과 같이 작동합니다.</p>
+<p><em>생성자에서</em></p>
 <ul class="simple">
-<li><p>Shard model parameters and each rank only keeps its own shard</p></li>
+<li><p>모델 매개변수들을 샤딩하고 각 랭크는 자신의 샤드만 유지합니다.</p></li>
 </ul>
-<p><em>In forward path</em></p>
+<p><em>순전파 경로에서</em></p>
 <ul class="simple">
-<li><p>Run all_gather to collect all shards from all ranks to recover the full parameter in this FSDP unit</p></li>
-<li><p>Run forward computation</p></li>
-<li><p>Discard parameter shards it has just collected</p></li>
+<li><p>all_gather를 실행하여 모든 랭크로부터 모든 샤드를 수집해 이 FSDP 유닛의 전체 매개변수를 복원합니다.</p></li>
+<li><p>순전파 연산을 실행합니다.</p></li>
+<li><p>방금 수집한 매개변수 샤드를 버립니다.</p></li>
 </ul>
-<p><em>In backward path</em></p>
+<p><em>역전파 경로에서</em></p>
 <ul class="simple">
-<li><p>Run all_gather to collect all shards from all ranks to recover the full parameter in this FSDP unit</p></li>
-<li><p>Run backward computation</p></li>
-<li><p>Run reduce_scatter to sync gradients</p></li>
-<li><p>Discard parameters.</p></li>
+<li><p>all_gather를 실행하여 모든 랭크로부터 모든 샤드를 수집해 이 FSDP 유닛의 전체 매개변수를 복원합니다.</p></li>
+<li><p>역전파 연산을 실행합니다.</p></li>
+<li><p>reduce_scatter를 실행하여 변화도를 동기화합니다.</p></li>
+<li><p>매개변수들을 버립니다.</p></li>
 </ul>
-<p>One way to view FSDP’s sharding is to decompose the DDP gradient all-reduce into reduce-scatter and all-gather. Specifically, during the backward pass, FSDP reduces and scatters gradients, ensuring that each rank possesses a shard of the gradients. Then it updates the corresponding shard of the parameters in the optimizer step. Finally, in the subsequent forward pass, it performs an all-gather operation to collect and combine the updated parameter shards.</p>
-<div class="figure align-center" id="id2">
+<p>FSDP의 샤딩을 쉽게 이해하는 한 가지 방법은 DDP에서 수행되는 변화도에 대한 all-reduce연산을 reduce-scatter와 all-gather 2개로 분해하는 것입니다.
+구체적으로는, 역전파 과정에서 FSDP는 변화도를 축소하고 분산시켜 각 랭크가 변화도의 샤드를 소유하도록 합니다.
+그런 다음 옵티마이저 단계에서 매개변수의 해당 샤드를 업데이트합니다.
+마지막으로, 후속 순전파에서 all-gather 연산을 수행하여 갱신된 매개변수가 담긴 샤드를 수집하고 결합합니다.</p>
+<div class="figure align-center" id="id13">
 <a class="reference internal image-reference" href="../_images/fsdp_sharding.png"><img alt="FSDP allreduce" src="../_images/fsdp_sharding.png" style="width: 100%;" /></a>
-<p class="caption"><span class="caption-text">FSDP Allreduce</span><a class="headerlink" href="#id2" title="이 이미지에 대한 퍼머링크">¶</a></p>
+<p class="caption"><span class="caption-text">FSDP Allreduce</span><a class="headerlink" href="#id13" title="이 이미지에 대한 퍼머링크">¶</a></p>
 </div>
 </div>
-<div class="section" id="how-to-use-fsdp">
-<h2>How to use FSDP<a class="headerlink" href="#how-to-use-fsdp" title="이 제목에 대한 퍼머링크">¶</a></h2>
-<p>Here we use a toy model to run training on the MNIST dataset for demonstration purposes. The APIs and logic can be applied to training larger models as well.</p>
-<p><em>Setup</em></p>
-<p>1.1 Install PyTorch along with Torchvision</p>
-<p>See the <a class="reference external" href="https://pytorch.org/get-started/locally/">Get Started guide</a> for information on installation.</p>
-<p>We add the following code snippets to a python script “FSDP_mnist.py”.</p>
-<p>1.2  Import necessary packages</p>
+<div class="section" id="id7">
+<h2>FSDP 사용 방법<a class="headerlink" href="#id7" title="이 제목에 대한 퍼머링크">¶</a></h2>
+<p>여기서는 시연 목적으로 MNIST 데이터셋으로 훈련을 수행할 간단한 예제 모델을 사용해보겠습니다. 이 API들과 로직은 더 큰 모델의 학습에도 적용될 수 있습니다.</p>
+<p><em>설정</em></p>
+<p>1.1 PyTorch와 Torchvision 설치</p>
+<p>설치에 대한 정보는 <a class="reference external" href="https://pytorch.org/get-started/locally/">Get Started guide</a> 를 참조바랍니다.
+다음 코드 snippet들을 《FSDP_mnist.py》라는 Python 스크립트에 추가합니다.</p>
+<p>1.2  필요한 패키지 임포트</p>
 <div class="admonition note">
 <p class="admonition-title">참고</p>
-<p>This tutorial is intended for PyTorch versions 1.12 and later. If you are using an earlier version, replace all instances of <cite>size_based_auto_wrap_policy</cite> with <cite>default_auto_wrap_policy</cite>.</p>
+<p>이 튜토리얼은 PyTorch 버전 1.12 이상을 대상으로 합니다.
+이전 버전을 사용하고 있다면, <a href="#id8"><span class="problematic" id="id9">`</span></a>size_based_auto_wrap_policy`의 모든 인스턴스를 <a href="#id10"><span class="problematic" id="id11">`</span></a>default_auto_wrap_policy`로 교체하시기 바랍니다.</p>
 </div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Based on: https://github.com/pytorch/examples/blob/master/mnist/main.py</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 출처: https://github.com/pytorch/examples/blob/master/mnist/main.py</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">argparse</span>
 <span class="kn">import</span> <span class="nn">functools</span>
@@ -520,7 +533,9 @@ It also comes with considerable engineering complexity to handle the training of
 <span class="p">)</span>
 </pre></div>
 </div>
-<p>1.3 Distributed training setup. As we mentioned FSDP is a type of data parallelism which requires a distributed training environment, so here we use two helper functions to initialize the processes for distributed training and clean up.</p>
+<p>1.3 분산 학습 설정
+앞서 언급했듯이 FSDP는 분산 학습 환경이 필요한 데이터 병렬화의 한 유형입니다.
+따라서 여기서는 분산 학습을 위한 process를 초기화하고 정리하는 두 가지 함수를 사용합니다.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="n">rank</span><span class="p">,</span> <span class="n">world_size</span><span class="p">):</span>
     <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;MASTER_ADDR&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;localhost&#39;</span>
     <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;MASTER_PORT&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;12355&#39;</span>
@@ -532,7 +547,7 @@ It also comes with considerable engineering complexity to handle the training of
     <span class="n">dist</span><span class="o">.</span><span class="n">destroy_process_group</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>2.1  Define our toy model for handwritten digit classification.</p>
+<p>2.1  손글씨 숫자 분류를 위한 예제 모델을 정의</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Net</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">Net</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
@@ -560,7 +575,7 @@ It also comes with considerable engineering complexity to handle the training of
         <span class="k">return</span> <span class="n">output</span>
 </pre></div>
 </div>
-<p>2.2 Define a train function</p>
+<p>2.2 학습 함수 정의</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">train</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">rank</span><span class="p">,</span> <span class="n">world_size</span><span class="p">,</span> <span class="n">train_loader</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">epoch</span><span class="p">,</span> <span class="n">sampler</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
     <span class="n">ddp_loss</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">rank</span><span class="p">)</span>
@@ -581,7 +596,7 @@ It also comes with considerable engineering complexity to handle the training of
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Train Epoch: </span><span class="si">{}</span><span class="s1"> </span><span class="se">\t</span><span class="s1">Loss: </span><span class="si">{:.6f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">epoch</span><span class="p">,</span> <span class="n">ddp_loss</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="n">ddp_loss</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
 </pre></div>
 </div>
-<p>2.3 Define a validation function</p>
+<p>2.3 검증 함수 정의</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">test</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">rank</span><span class="p">,</span> <span class="n">world_size</span><span class="p">,</span> <span class="n">test_loader</span><span class="p">):</span>
     <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
     <span class="n">correct</span> <span class="o">=</span> <span class="mi">0</span>
@@ -601,11 +616,11 @@ It also comes with considerable engineering complexity to handle the training of
         <span class="n">test_loss</span> <span class="o">=</span> <span class="n">ddp_loss</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="n">ddp_loss</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Test set: Average loss: </span><span class="si">{:.4f}</span><span class="s1">, Accuracy: </span><span class="si">{}</span><span class="s1">/</span><span class="si">{}</span><span class="s1"> (</span><span class="si">{:.2f}</span><span class="s1">%)</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
             <span class="n">test_loss</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">ddp_loss</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">ddp_loss</span><span class="p">[</span><span class="mi">2</span><span class="p">]),</span>
-            <span class="mf">100.</span> <span class="o">*</span> <span class="n">ddp_loss</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="n">ddp_loss</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+            <span class="mf">1.</span>   <span class="o">*</span> <span class="n">ddp_loss</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="n">ddp_loss</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
 </pre></div>
 </div>
-<p>2.4 Define a distributed train function that wraps the model in FSDP</p>
-<p><strong>Note: to save the FSDP model, we need to call the state_dict on each rank then on Rank 0 save the overall states.</strong></p>
+<p>2.4 모델을 FSDP로 감싸는 분산 학습 함수 정의
+<strong>주의: FSDP 모델을 저장하기 위해서는 각 랭크에서 state_dict를 호출한 다음, 랭크 0에서 전체 상태를 저장해야 합니다.</strong></p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">fsdp_main</span><span class="p">(</span><span class="n">rank</span><span class="p">,</span> <span class="n">world_size</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
     <span class="n">setup</span><span class="p">(</span><span class="n">rank</span><span class="p">,</span> <span class="n">world_size</span><span class="p">)</span>
 
@@ -661,7 +676,7 @@ It also comes with considerable engineering complexity to handle the training of
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">model</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">save_model</span><span class="p">:</span>
-        <span class="c1"># use a barrier to make sure training is done on all ranks</span>
+        <span class="c1"># 모든 랭크에서 학습이 완료되었는지 확인하기 위해 barrier를 사용합니다.</span>
         <span class="n">dist</span><span class="o">.</span><span class="n">barrier</span><span class="p">()</span>
         <span class="n">states</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">state_dict</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
@@ -670,45 +685,47 @@ It also comes with considerable engineering complexity to handle the training of
     <span class="n">cleanup</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>2.5 Finally, parse the arguments and set the main function</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
-    <span class="c1"># Training settings</span>
-    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s1">&#39;PyTorch MNIST Example&#39;</span><span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--batch-size&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s1">&#39;N&#39;</span><span class="p">,</span>
-                        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;input batch size for training (default: 64)&#39;</span><span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--test-batch-size&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s1">&#39;N&#39;</span><span class="p">,</span>
-                        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;input batch size for testing (default: 1000)&#39;</span><span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--epochs&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s1">&#39;N&#39;</span><span class="p">,</span>
-                        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;number of epochs to train (default: 14)&#39;</span><span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--lr&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s1">&#39;LR&#39;</span><span class="p">,</span>
-                        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;learning rate (default: 1.0)&#39;</span><span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--gamma&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s1">&#39;M&#39;</span><span class="p">,</span>
-                        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Learning rate step gamma (default: 0.7)&#39;</span><span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--no-cuda&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;disables CUDA training&#39;</span><span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--seed&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s1">&#39;S&#39;</span><span class="p">,</span>
-                        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;random seed (default: 1)&#39;</span><span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--save-model&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;For Saving the current Model&#39;</span><span class="p">)</span>
-    <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+<p>2.5 마지막으로, 인자를 파싱하고 메인 함수를 설정</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>   <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+       <span class="c1"># Training settings</span>
+       <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s1">&#39;PyTorch MNIST Example&#39;</span><span class="p">)</span>
+       <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--batch-size&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s1">&#39;N&#39;</span><span class="p">,</span>
+                           <span class="n">help</span><span class="o">=</span><span class="s1">&#39;input batch size for training (default: 64)&#39;</span><span class="p">)</span>
+       <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--test-batch-size&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s1">&#39;N&#39;</span><span class="p">,</span>
+                           <span class="n">help</span><span class="o">=</span><span class="s1">&#39;input batch size for testing (default: 1000)&#39;</span><span class="p">)</span>
+       <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--epochs&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s1">&#39;N&#39;</span><span class="p">,</span>
+                           <span class="n">help</span><span class="o">=</span><span class="s1">&#39;number of epochs to train (default: 14)&#39;</span><span class="p">)</span>
+       <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--lr&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s1">&#39;LR&#39;</span><span class="p">,</span>
+                           <span class="n">help</span><span class="o">=</span><span class="s1">&#39;learning rate (default: 1.0)&#39;</span><span class="p">)</span>
+       <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--gamma&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s1">&#39;M&#39;</span><span class="p">,</span>
+                           <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Learning rate step gamma (default: 0.7)&#39;</span><span class="p">)</span>
+       <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--no-cuda&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                           <span class="n">help</span><span class="o">=</span><span class="s1">&#39;disables CUDA training&#39;</span><span class="p">)</span>
+       <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--seed&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s1">&#39;S&#39;</span><span class="p">,</span>
+                           <span class="n">help</span><span class="o">=</span><span class="s1">&#39;random seed (default: 1)&#39;</span><span class="p">)</span>
+       <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--save-model&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                           <span class="n">help</span><span class="o">=</span><span class="s1">&#39;For Saving the current Model&#39;</span><span class="p">)</span>
+       <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
 
-    <span class="n">torch</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">seed</span><span class="p">)</span>
+       <span class="n">torch</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">seed</span><span class="p">)</span>
 
-    <span class="n">WORLD_SIZE</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">device_count</span><span class="p">()</span>
-    <span class="n">mp</span><span class="o">.</span><span class="n">spawn</span><span class="p">(</span><span class="n">fsdp_main</span><span class="p">,</span>
-        <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">WORLD_SIZE</span><span class="p">,</span> <span class="n">args</span><span class="p">),</span>
-        <span class="n">nprocs</span><span class="o">=</span><span class="n">WORLD_SIZE</span><span class="p">,</span>
-        <span class="n">join</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+       <span class="n">WORLD_SIZE</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">device_count</span><span class="p">()</span>
+       <span class="n">mp</span><span class="o">.</span><span class="n">spawn</span><span class="p">(</span><span class="n">fsdp_main</span><span class="p">,</span>
+           <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">WORLD_SIZE</span><span class="p">,</span> <span class="n">args</span><span class="p">),</span>
+           <span class="n">nprocs</span><span class="o">=</span><span class="n">WORLD_SIZE</span><span class="p">,</span>
+           <span class="n">join</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+
+<span class="n">FSDP</span> <span class="n">모델의</span> <span class="n">특정</span> <span class="n">시간</span><span class="p">(</span><span class="n">학습</span> <span class="n">루프의</span> <span class="n">실행</span> <span class="n">시간</span><span class="p">)</span><span class="n">을</span> <span class="n">측정하기</span> <span class="n">위해</span> <span class="n">CUDA</span> <span class="n">이벤트를</span> <span class="n">기록했습니다</span><span class="o">.</span> <span class="n">전체</span> <span class="n">CUDA</span> <span class="n">이벤트</span> <span class="n">시간은</span> <span class="mf">110.85</span> <span class="n">초였습니다</span><span class="o">.</span>
 </pre></div>
 </div>
-<p>We have recorded cuda events to measure the time of FSDP model specifics. The CUDA event time was 110.85 seconds.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>FSDP_mnist.py
 
 CUDA<span class="w"> </span>event<span class="w"> </span>elapsed<span class="w"> </span><span class="nb">time</span><span class="w"> </span>on<span class="w"> </span>training<span class="w"> </span>loop<span class="w"> </span><span class="m">40</span>.67462890625sec
 </pre></div>
 </div>
-<p>Wrapping the model with FSDP, the model will look as follows, we can see the model has been wrapped in one FSDP unit.
-Alternatively, we will look at adding the fsdp_auto_wrap_policy next and will discuss the differences.</p>
+<p>FSDP로 모델을 감싸면, 모델은 다음과 같이 보일 것입니다. 모델이 하나의 FSDP 유닛으로 래핑된 것을 볼 수 있습니다.
+다음으로, fsdp_auto_wrap_policy를 추가하는 것을 살펴보고 차이점에 대해 논의할 것입니다.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="w">   </span>FullyShardedDataParallel<span class="o">(</span>
 <span class="w">   </span><span class="o">(</span>_fsdp_wrapped_module<span class="o">)</span>:<span class="w"> </span>FlattenParamsWrapper<span class="o">(</span>
 <span class="w">       </span><span class="o">(</span>_fpw_module<span class="o">)</span>:<span class="w"> </span>Net<span class="o">(</span>
@@ -723,21 +740,25 @@ Alternatively, we will look at adding the fsdp_auto_wrap_policy next and will di
 <span class="o">)</span>
 </pre></div>
 </div>
-<p>The following is the peak memory usage from FSDP MNIST training on g4dn.12.xlarge AWS EC2 instance with 4 GPUs captured from PyTorch Profiler.</p>
-<div class="figure align-center" id="id3">
+<p>다음은 PyTorch Profiler로 캡처한 g4dn.12.xlarge AWS EC2 인스턴스의 4개 GPU에서 FSDP MNIST 학습 시 최대 메모리 사용량입니다.</p>
+<div class="figure align-center" id="id14">
 <a class="reference internal image-reference" href="../_images/FSDP_memory.gif"><img alt="FSDP peak memory" src="../_images/FSDP_memory.gif" style="width: 100%;" /></a>
-<p class="caption"><span class="caption-text">FSDP Peak Memory Usage</span><a class="headerlink" href="#id3" title="이 이미지에 대한 퍼머링크">¶</a></p>
+<p class="caption"><span class="caption-text">FSDP Peak Memory Usage</span><a class="headerlink" href="#id14" title="이 이미지에 대한 퍼머링크">¶</a></p>
 </div>
-<p>Applying <em>fsdp_auto_wrap_policy</em> in FSDP otherwise, FSDP will put the entire model in one FSDP unit, which will reduce computation efficiency and memory efficiency.
-The way it works is that, suppose your model contains 100 Linear layers. If you do FSDP(model), there will only be one FSDP unit which wraps the entire model.
-In that case, the allgather would collect the full parameters for all 100 linear layers, and hence won’t save CUDA memory for parameter sharding.
-Also, there is only one blocking allgather call for the all 100 linear layers, there will not be communication and computation overlapping between layers.</p>
-<p>To avoid that, you can pass in an fsdp_auto_wrap_policy, which will seal the current FSDP unit and start a new one automatically when the specified condition is met (e.g., size limit).
-In that way you will have multiple FSDP units, and only one FSDP unit needs to collect full parameters at a time. E.g., suppose you have 5 FSDP units, and each wraps 20 linear layers.
-Then, in the forward, the 1st FSDP unit will allgather parameters for the first 20 linear layers, do computation, discard the parameters and then move on to the next 20 linear layers. So, at any point in time, each rank only materializes parameters/grads for 20 linear layers instead of 100.</p>
-<p>To do so in 2.4 we define the auto_wrap_policy and pass it to FSDP wrapper, in the following example, my_auto_wrap_policy defines that a layer could be wrapped or sharded by FSDP if the number of parameters in this layer is larger than 100.
-If the number of parameters in this layer is smaller than 100, it will be wrapped with other small layers together by FSDP.
-Finding an optimal auto wrap policy is challenging, PyTorch will add auto tuning for this config in the future. Without an auto tuning tool, it is good to profile your workflow using different auto wrap policies experimentally and find the optimal one.</p>
+<p>FSDP에 <em>fsdp_auto_wrap_policy</em> 를 적용하지 않으면, FSDP는 전체 모델을 하나의 FSDP 유닛에 넣게 되어 계산 효율성과 메모리 효율성이 감소합니다.
+작동 방식은 다음과 같습니다. 예를 들어, 모델에 100개의 Linear 층이 있다고 가정해 봅시다. FSDP(model)을 실행하면, 전체 모델을 감싸는 하나의 FSDP 유닛만 생성됩니다.
+이 경우, allgather 연산이 100개 모든 선형 층의 전체 매개변수를 수집하게 되어, 매개변수 값 샤딩을 통한 CUDA 메모리 절약 효과가 없어집니다.
+또한, 100개의 선형 층 전체에 대해 하나의 대규모 allgather 연산만 수행되므로, 층 간 통신과 계산을 동시에 처리할 수 없습니다.</p>
+<p>이러한 문제를 피하기 위해, fsdp_auto_wrap_policy를 사용할 수 있습니다. 해당 방식은 지정된 조건(예: 크기 제한)이 충족되면
+현재 FSDP 유닛 단위를 마무리하고 새로운 단위를 자동으로 시작합니다.</p>
+<p>이렇게 하면 여러 개의 FSDP 유닛 단위가 생기고, 한 번에 하나의 FSDP 유닛 단위만 전체 매개변수를 수집하면 됩니다.
+예를 들어, 5개의 FSDP 유닛 단위가 있다 가정하고 각 단위가 20개의 선형 층을 포함한다고 가정해 봅시다.
+그러면 순전파 과정에서 첫 번째 FSDP 단위는 처음 20개 선형 층의 매개변수들만 모으고, 계산을 수행한 후 이 매개변수들을 버리고 다음 20개 층으로 넘어갑니다.
+이런 방식으로, 어느 시점에서도 각 rank(GPU)는 100개가 아닌 20개의 선형 층의 매개변수와 변화도 값만 실제로 메모리에 유지하게 됩니다</p>
+<p>2.4에서 이를 구현하기 위해 auto_wrap_policy를 정의하고 FSDP 래퍼에 전달하고, 다음 예시에서 my_auto_wrap_policy는 층의 매개변수 수가 100개보다 크면
+해당 층을 FSDP로 래핑하거나 샤딩할 수 있다고 정의합니다. 층의 매개변수 수가 100개 미만이면 FSDP에 의해 다른 작은 층들과 함께 래핑됩니다.
+최적의 auto wrap policy를 찾는 것은 어려운 과제입니다. PyTorch는 향후 이 설정을 위한 자동 튜닝 기능을 추가할 예정입니다.
+자동 튜닝 도구 없이는 다양한 auto wrap policy들을 실험적으로 사용하여 워크플로우를 프로파일링하고 최적의 것을 찾는 것이 좋습니다.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">my_auto_wrap_policy</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span>
         <span class="n">size_based_auto_wrap_policy</span><span class="p">,</span> <span class="n">min_num_params</span><span class="o">=</span><span class="mi">20000</span>
     <span class="p">)</span>
@@ -748,7 +769,7 @@ Finding an optimal auto wrap policy is challenging, PyTorch will add auto tuning
     <span class="n">fsdp_auto_wrap_policy</span><span class="o">=</span><span class="n">my_auto_wrap_policy</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Applying the fsdp_auto_wrap_policy, the model would be as follows:</p>
+<p>fsdp_auto_wrap_policy를 적용하면, 모델은 다음과 같은 구조를 가지게 됩니다.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="w">  </span>FullyShardedDataParallel<span class="o">(</span>
 <span class="o">(</span>_fsdp_wrapped_module<span class="o">)</span>:<span class="w"> </span>FlattenParamsWrapper<span class="o">(</span>
 <span class="w">  </span><span class="o">(</span>_fpw_module<span class="o">)</span>:<span class="w"> </span>Net<span class="o">(</span>
@@ -771,23 +792,25 @@ Finding an optimal auto wrap policy is challenging, PyTorch will add auto tuning
 CUDA<span class="w"> </span>event<span class="w"> </span>elapsed<span class="w"> </span><span class="nb">time</span><span class="w"> </span>on<span class="w"> </span>training<span class="w"> </span>loop<span class="w"> </span><span class="m">41</span>.89130859375sec
 </pre></div>
 </div>
-<p>The following is the peak memory usage from FSDP with auto_wrap policy of MNIST training on a g4dn.12.xlarge AWS EC2 instance with 4 GPUs captured from PyTorch Profiler.
-It can be observed that the peak memory usage on each device is smaller compared to FSDP without auto wrap policy applied, from ~75 MB to 66 MB.</p>
-<div class="figure align-center" id="id4">
+<p>다음은 auto_wrap policy를 적용하여 FSDP를 사용한 MNIST 학습의 최대 메모리 사용량입니다. 이는 PyTorch Profiler로 캡처한 4개의 GPU가 있는 g4dn.12.xlarge AWS EC2 인스턴스에서 측정되었습니다.
+auto_wrap policy를 적용하지 않은 FSDP와 비교했을 때, 각 디바이스의 최대 메모리 사용량이 약 75MB에서 66MB로 감소한 것을 관찰할 수 있었습니다.</p>
+<div class="figure align-center" id="id15">
 <a class="reference internal image-reference" href="../_images/FSDP_autowrap.gif"><img alt="FSDP peak memory" src="../_images/FSDP_autowrap.gif" style="width: 100%;" /></a>
-<p class="caption"><span class="caption-text">FSDP Peak Memory Usage using Auto_wrap policy</span><a class="headerlink" href="#id4" title="이 이미지에 대한 퍼머링크">¶</a></p>
+<p class="caption"><span class="caption-text">Auto_wrap policy를 사용한 FSDP의 최대 메모리 사용량</span><a class="headerlink" href="#id15" title="이 이미지에 대한 퍼머링크">¶</a></p>
 </div>
-<p><em>CPU Off-loading</em>: In case the model is very large that even with FSDP wouldn’t fit into GPUs, then CPU offload can be helpful here.</p>
-<p>Currently, only parameter and gradient CPU offload is supported. It can be enabled via passing in cpu_offload=CPUOffload(offload_params=True).</p>
-<p>Note that this currently implicitly enables gradient offloading to CPU in order for params and grads to be on the same device to work with the optimizer. This API is subject to change. The default is None in which case there will be no offloading.</p>
-<p>Using this feature may slow down the training considerably, due to frequent copying of tensors from host to device, but it could help improve memory efficiency and train larger scale models.</p>
-<p>In 2.4 we just add it to the FSDP wrapper</p>
+<p><em>CPU 오프로딩</em>: FSDP를 사용해도 모델이 너무 커서 GPU에 맞지 않는 경우, CPU 오프로딩이 도움이 될 수 있습니다.</p>
+<p>현재는 매개변수와 변화도 값의 CPU 오프로딩만 지원됩니다. cpu_offload=CPUOffload(offload_params=True)를 전달하여 활성화할 수 있습니다.</p>
+<p>매개변수와 변화도 값이 옵티마이저와 함께 작동하기 위해 같은 디바이스에 있어야 하므로, 현재는 암묵적으로 변화도 값의 CPU 오프로딩도 활성화됩니다.</p>
+<p>이 API는 변경될 수 있습니다. 기본값은 None이며, 이 경우 오프로딩이 수행되지 않습니다.</p>
+<p>이 기능을 사용하면 호스트와 디바이스 간 tensor의 빈번한 복사로 인해 학습 속도가 상당히 느려질 수 있지만,</p>
+<p>메모리 효율성을 개선하고 더 큰 규모의 모델을 학습하는 데 도움이 될 수 있습니다.</p>
+<p>2.4에서는 이를 FSDP 래퍼에 추가하기만 하면 됩니다.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">FSDP</span><span class="p">(</span><span class="n">model</span><span class="p">,</span>
     <span class="n">fsdp_auto_wrap_policy</span><span class="o">=</span><span class="n">my_auto_wrap_policy</span><span class="p">,</span>
     <span class="n">cpu_offload</span><span class="o">=</span><span class="n">CPUOffload</span><span class="p">(</span><span class="n">offload_params</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
 </pre></div>
 </div>
-<p>Compare it with DDP, if in 2.4 we just normally wrap the model in DPP, saving the changes in “DDP_mnist.py”.</p>
+<p>DDP와 비교해보겠습니다. 2.4에서 모델을 평범하게 DDP로 래핑하고, 변경 사항을 〈DDP_mnist.py’에 저장한다면 다음과 같습니다.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">Net</span><span class="p">()</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">rank</span><span class="p">)</span>
 <span class="n">model</span> <span class="o">=</span> <span class="n">DDP</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
 </pre></div>
@@ -797,36 +820,36 @@ It can be observed that the peak memory usage on each device is smaller compared
 CUDA<span class="w"> </span>event<span class="w"> </span>elapsed<span class="w"> </span><span class="nb">time</span><span class="w"> </span>on<span class="w"> </span>training<span class="w"> </span>loop<span class="w"> </span><span class="m">39</span>.77766015625sec
 </pre></div>
 </div>
-<p>The following is the peak memory usage from DDP MNIST training on g4dn.12.xlarge AWS EC2 instance with 4 GPUs captured from PyTorch profiler.</p>
-<div class="figure align-center" id="id5">
+<p>다음은 PyTorch 프로파일러로 캡처한, 4개의 GPU로 g4dn.12.xlarge AWS EC2 인스턴스에서 DDP를 사용하여 MNIST를 학습시킨 모델의 최대 메모리 사용량입니다.</p>
+<div class="figure align-center" id="id16">
 <a class="reference internal image-reference" href="../_images/DDP_memory.gif"><img alt="FSDP peak memory" src="../_images/DDP_memory.gif" style="width: 100%;" /></a>
-<p class="caption"><span class="caption-text">DDP Peak Memory Usage using Auto_wrap policy</span><a class="headerlink" href="#id5" title="이 이미지에 대한 퍼머링크">¶</a></p>
+<p class="caption"><span class="caption-text">Auto_wrap policy를 사용한 DDP의 최대 메모리 사용량</span><a class="headerlink" href="#id16" title="이 이미지에 대한 퍼머링크">¶</a></p>
 </div>
-<p>Considering the toy example and tiny MNIST model we defined here, we can observe the difference between peak memory usage of DDP and FSDP.
-In DDP each process holds a replica of the model, so the memory footprint is higher compared to FSDP which shards the model parameters, optimizer states and gradients over DDP ranks.
-The peak memory usage using FSDP with auto_wrap policy is the lowest followed by FSDP and DDP.</p>
-<p>Also, looking at timings, considering the small model and running the training on a single machine, FSDP with and without auto_wrap policy performed almost as fast as DDP.
-This example does not represent most of the real applications, for detailed analysis and comparison between DDP and FSDP please refer to this <a class="reference external" href="https://pytorch.medium.com/6c8da2be180d">blog post</a> .</p>
+<p>여기서 정의한 간단한 예제와 작은 MNIST 모델을 고려할 때, DDP와 FSDP의 최대 메모리 사용량 차이를 관찰할 수 있습니다.
+DDP에서는 각 process가 모델의 복제본을 가지고 있어, 모델 매개변수, 옵티마이저 상태, 그리고 변화도를 DDP 랭크에 걸쳐 샤딩하는 FSDP에 비해 메모리 사용량이 더 높습니다.
+auto_wrap policy를 사용한 FSDP의 최대 메모리 사용량이 가장 낮고, 그 다음으로 FSDP, 마지막으로 DDP 순입니다.</p>
+<p>또한, 전체 학습 과정의 실행 시간을 보면, 작은 모델과 단일 머신에서 학습시키는 것을 고려할 때는, auto_wrap policy를 사용 여부에 관계없이 FSDP는 DDP와 거의 비슷한 속도로 수행되었습니다.
+이 예제는 대부분의 실제 애플리케이션을 대표하지 않습니다. DDP와 FSDP 사이의 자세한 분석과 비교는 이 <a class="reference external" href="https://pytorch.medium.com/6c8da2be180d">blog post</a> 를 참조바랍니다.</p>
 </div>
 </div>
 
 
              </article>
-
+             
             </div>
             <footer>
-
+  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-
+      
         <a href="FSDP_adavnced_tutorial.html" class="btn btn-neutral float-right" title="Advanced Model Training with Fully Sharded Data Parallel (FSDP)" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
-
-
+      
+      
         <a href="dist_tuto.html" class="btn btn-neutral" title="PyTorch로 분산 어플리케이션 개발하기" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
-
+      
     </div>
+  
 
-
-
+  
     <hr class="community-hr hr-top" />
     <div class="community-container">
       <div class="community-prompt">더 궁금하시거나 개선할 내용이 있으신가요? 커뮤니티에 참여해보세요!</div>
@@ -846,7 +869,7 @@ This example does not represent most of the real applications, for detailed anal
       </div>
     </div>
     <hr class="rating-hr hr-bottom"/>
-
+  
 
   <div role="contentinfo">
     <p>
@@ -854,11 +877,11 @@ This example does not represent most of the real applications, for detailed anal
 
     </p>
   </div>
-
+    
       <div>
         Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
       </div>
-
+     
 
 </footer>
 
@@ -876,9 +899,9 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
           <div class="pytorch-right-menu" id="pytorch-right-menu">
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
-<li><a class="reference internal" href="#">Getting Started with Fully Sharded Data Parallel(FSDP)</a><ul>
-<li><a class="reference internal" href="#how-fsdp-works">How FSDP works</a></li>
-<li><a class="reference internal" href="#how-to-use-fsdp">How to use FSDP</a></li>
+<li><a class="reference internal" href="#">Fully Sharded Data Parallel(FSDP) 시작하기</a><ul>
+<li><a class="reference internal" href="#fsdp">FSDP의 작동 방식</a></li>
+<li><a class="reference internal" href="#id7">FSDP 사용 방법</a></li>
 </ul>
 </li>
 </ul>
@@ -889,12 +912,12 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
       </section>
     </div>
 
+  
 
 
-
-
-
-
+  
+  
+     
        <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
          <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
          <script src="../_static/jquery.js"></script>
@@ -908,8 +931,8 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
          <script src="../_static/auto-render.min.js"></script>
          <script src="../_static/katex_autorenderer.js"></script>
          <script src="../_static/design-tabs.js"></script>
-
-
+     
+  
 
   <script type="text/javascript" src="../_static/js/vendor/popper.min.js"></script>
   <script type="text/javascript" src="../_static/js/vendor/bootstrap.min.js"></script>
@@ -921,11 +944,8 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
           SphinxRtdTheme.Navigation.enable(true);
       });
   </script>
-
+ 
 <script>
-// Helper function to make it easier to call dataLayer.push()
-function gtag(){window.dataLayer.push(arguments);}
-
 //add microsoft link
 if(window.location.href.indexOf("/beginner/basics/")!= -1)
 {

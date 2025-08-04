@@ -6,42 +6,42 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="ko" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta property="og:title" content="(beta) Accelerating BERT with semi-structured (2:4) sparsity" />
+  <meta property="og:title" content="(beta) 반구조적 (2:4) 희소성을 통한 BERT 가속화" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://tutorials.pytorch.kr/advanced/semi_structured_sparse.html" />
 <meta property="og:site_name" content="PyTorch Tutorials KR" />
-<meta property="og:description" content="Author: Jesse Cai Overview: Like other forms of sparsity, semi-structured sparsity is a model optimization technique that seeks to reduce the memory overhead and latency of a neural network at the expense of some model accuracy. It is also known as fine-grained structured sparsity or 2:4 structur..." />
+<meta property="og:description" content="저자: Jesse Cai 번역: 이채운 개요: 다른 형태의 희소성(sparsity)처럼, 반구조적 희소성**은 신경망의 메모리 오버헤드와 지연 시간을 줄이기 위한 모델 최적화 기법으로, 일부 모델 정확도는 희생하게 됩니다. 이 방법은 **세분화된 구조적 희소성 또는** 2:4 구조적 희소성**으로도 알려져 있습니다. 반구조적 희소성은 고유한 희소성 패턴에서 유래하며, 여기서 2n개의 요소 중 n개의 요소가 가지치기(prune)됩니다. 일반적으로 n=2인 경우가 많아 2:4 희소성이라고 부릅니다. 반구조적 희소성은 GPU에서 효..." />
 <meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
 <meta property="og:image:alt" content="PyTorch Tutorials KR" />
-<meta name="description" content="Author: Jesse Cai Overview: Like other forms of sparsity, semi-structured sparsity is a model optimization technique that seeks to reduce the memory overhead and latency of a neural network at the expense of some model accuracy. It is also known as fine-grained structured sparsity or 2:4 structur..." />
+<meta name="description" content="저자: Jesse Cai 번역: 이채운 개요: 다른 형태의 희소성(sparsity)처럼, 반구조적 희소성**은 신경망의 메모리 오버헤드와 지연 시간을 줄이기 위한 모델 최적화 기법으로, 일부 모델 정확도는 희생하게 됩니다. 이 방법은 **세분화된 구조적 희소성 또는** 2:4 구조적 희소성**으로도 알려져 있습니다. 반구조적 희소성은 고유한 희소성 패턴에서 유래하며, 여기서 2n개의 요소 중 n개의 요소가 가지치기(prune)됩니다. 일반적으로 n=2인 경우가 많아 2:4 희소성이라고 부릅니다. 반구조적 희소성은 GPU에서 효..." />
 <meta property="og:ignore_canonical" content="true" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>(beta) 반구조적 (2:4) 희소성을 통한 BERT 가속화 &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
+  
 
-  <title>(beta) Accelerating BERT with semi-structured (2:4) sparsity &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
-
-
-
-
+  
+  
     <link rel="shortcut icon" href="../_static/favicon.ico"/>
+  
+  
+  
 
+  
 
+  
+  
+    
 
-
-
-
-
-
-
-
-
+  
 
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!-- <link rel="stylesheet" href="../_static/pygments.css" type="text/css" /> -->
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css" type="text/css" />
   <link rel="stylesheet" href="../_static/katex-math.css" type="text/css" />
   <link rel="stylesheet" href="../_static/sg_gallery.css" type="text/css" />
   <link rel="stylesheet" href="../_static/sg_gallery-binder.css" type="text/css" />
@@ -52,9 +52,9 @@
   <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/custom2.css" type="text/css" />
     <link rel="index" title="색인" href="../genindex.html" />
-    <link rel="search" title="검색" href="../search.html" />
+    <link rel="search" title="검색" href="../search.html" /> 
 
-
+  
   <script src="../_static/js/modernizr.min.js"></script>
 
   <!-- Preload the theme fonts -->
@@ -111,9 +111,9 @@
 
 <body class="pytorch-body">
 
+   
 
-
-
+    
 
     <div class="table-of-contents-link-wrapper">
       <span>Table of Contents</span>
@@ -124,21 +124,21 @@
       <div class="pytorch-side-scroll">
         <div class="pytorch-menu pytorch-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           <div class="pytorch-left-menu-search">
+            
 
-
-
-
-
+            
+              
+              
                 <div class="version">
-                  2.3.1+cu121
+                  2.3.1
                 </div>
+              
+            
+
+            
 
 
-
-
-
-
-
+  
 
 
 <div role="search">
@@ -149,15 +149,15 @@
   </form>
 </div>
 
-
+            
           </div>
 
-
-
-
-
-
-
+          
+            
+            
+              
+            
+            
               <p class="caption" role="heading"><span class="caption-text">파이토치(PyTorch) 레시피</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../recipes/recipes_index.html">모든 레시피 보기</a></li>
@@ -182,7 +182,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/tensors_deeper_tutorial.html">Pytorch Tensor 소개</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/autogradyt_tutorial.html">The Fundamentals of Autograd</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/modelsyt_tutorial.html">Building Models with PyTorch</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/tensorboardyt_tutorial.html">PyTorch TensorBoard Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/tensorboardyt_tutorial.html">PyTorch TensorBoard 지원</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/trainingyt.html">Training with PyTorch</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/captumyt.html">Model Understanding with Captum</a></li>
 </ul>
@@ -200,7 +200,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../beginner/fgsm_tutorial.html">적대적 예제 생성(Adversarial Example Generation)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/dcgan_faces_tutorial.html">DCGAN 튜토리얼</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/vt_tutorial.html">배포를 위해 비전 트랜스포머(Vision Transformer) 모델 최적화하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/tiatoolbox_tutorial.html">Whole Slide Image Classification Using PyTorch and TIAToolbox</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/tiatoolbox_tutorial.html">Pytorch와 TIAToolbox를 사용한 전체 슬라이드 이미지(Whole Slide Image) 분류</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">오디오</span></p>
 <ul>
@@ -209,20 +209,20 @@
 <li class="toctree-l1"><a class="reference internal" href="../beginner/audio_data_augmentation_tutorial.html">Audio Data Augmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/audio_datasets_tutorial.html">Audio Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/audio_datasets_tutorial.html">오디오 데이터셋</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/speech_recognition_pipeline_tutorial.html">Speech Recognition with Wav2Vec2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/text_to_speech_with_torchaudio.html">Text-to-speech with Tacotron2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/forced_alignment_with_torchaudio_tutorial.html">wav2vec2을 이용한 강제 정렬</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">텍스트</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/bettertransformer_tutorial.html">Fast Transformer Inference with Better Transformer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/bettertransformer_tutorial.html">Better Transformer를 이용한 고속 트랜스포머 추론</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/char_rnn_classification_tutorial.html">기초부터 시작하는 NLP: 문자-단위 RNN으로 이름 분류하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/char_rnn_generation_tutorial.html">기초부터 시작하는 NLP:  문자-단위 RNN으로 이름 생성하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/seq2seq_translation_tutorial.html">기초부터 시작하는 NLP: Sequence to Sequence 네트워크와 Attention을 이용한 번역</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/text_sentiment_ngrams_tutorial.html">torchtext 라이브러리로 텍스트 분류하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/translation_transformer.html"><code class="docutils literal notranslate"><span class="pre">nn.Transformer</span></code> 와 torchtext로 언어 번역하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/torchtext_custom_dataset_tutorial.html">Preprocess custom text dataset using Torchtext</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/torchtext_custom_dataset_tutorial.html">TorchText를 사용하여 사용자 정의 글 데이터셋 전처리하기</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">백엔드</span></p>
 <ul>
@@ -247,8 +247,8 @@
 <p class="caption" role="heading"><span class="caption-text">PyTorch 프로파일링</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/profiler.html">PyTorch 모듈 프로파일링하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/hta_intro_tutorial.html">Introduction to Holistic Trace Analysis</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/hta_trace_diff_tutorial.html">Trace Diff using Holistic Trace Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/hta_intro_tutorial.html">전체론적(Holistic Trace Analysis) 추적 분석 소개</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/hta_trace_diff_tutorial.html">종합적 분석을 이용한 트레이스 차이 분석</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Code Transforms with FX</span></p>
 <ul>
@@ -305,11 +305,11 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../distributed/home.html">Distributed and Parallel Training Tutorials</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/dist_overview.html">PyTorch Distributed Overview</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/ddp_series_intro.html">Distributed Data Parallel in PyTorch - Video Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/ddp_series_intro.html">PyTorch의 분산 데이터 병렬 처리 - 비디오 튜토리얼</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/model_parallel_tutorial.html">단일 머신을 사용한 모델 병렬화 모범 사례</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/ddp_tutorial.html">분산 데이터 병렬 처리 시작하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/dist_tuto.html">PyTorch로 분산 어플리케이션 개발하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/FSDP_tutorial.html">Getting Started with Fully Sharded Data Parallel(FSDP)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/FSDP_tutorial.html">Fully Sharded Data Parallel(FSDP) 시작하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/FSDP_adavnced_tutorial.html">Advanced Model Training with Fully Sharded Data Parallel (FSDP)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/TP_tutorial.html">Large Scale Transformer model training with Tensor Parallel (TP)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/process_group_cpp_extension_tutorial.html">Cpp 확장을 사용한 프로세스 그룹 백엔드 사용자 정의</a></li>
@@ -340,8 +340,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../beginner/flava_finetuning_tutorial.html">TorchMultimodal 튜토리얼: FLAVA 미세조정</a></li>
 </ul>
 
-
-
+            
+          
         </div>
       </div>
     </nav>
@@ -349,7 +349,7 @@
     <div class="pytorch-container">
       <div class="pytorch-page-level-bar" id="pytorch-page-level-bar">
         <div class="pytorch-breadcrumbs-wrapper">
-
+          
 
 
 
@@ -368,30 +368,30 @@
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="pytorch-breadcrumbs">
-
+    
       <li>
         <a href="../index.html">
-
+          
             Tutorials
-
+          
         </a> &gt;
       </li>
 
-
-      <li>(beta) Accelerating BERT with semi-structured (2:4) sparsity</li>
-
-
+        
+      <li>(beta) 반구조적 (2:4) 희소성을 통한 BERT 가속화</li>
+    
+    
       <li class="pytorch-breadcrumbs-aside">
-
-
+        
+            
             <a href="../_sources/advanced/semi_structured_sparse.rst.txt" rel="nofollow"><img src="../_static/images/view-page-source-icon.svg"></a>
-
-
+          
+        
       </li>
-
+    
   </ul>
 
-
+  
 </div>
         </div>
 
@@ -403,7 +403,7 @@
       <section data-toggle="wy-nav-shift" id="pytorch-content-wrap" class="pytorch-content-wrap">
         <div class="pytorch-content-left">
 
-
+        
 
           <div class="pytorch-call-to-action-links">
             <div id="tutorial-type">advanced/semi_structured_sparse</div>
@@ -425,61 +425,55 @@
             </div>
           </div>
 
+        
 
-
-
+          
           <div class="rst-content">
-
+          
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
-
+              
   <div class="sphx-glr-download-link-note admonition note">
 <p class="admonition-title">참고</p>
 <p>Click <a class="reference internal" href="#sphx-glr-download-advanced-semi-structured-sparse-py"><span class="std std-ref">here</span></a>
 to download the full example code</p>
 </div>
-<div class="sphx-glr-example-title section" id="beta-accelerating-bert-with-semi-structured-2-4-sparsity">
-<span id="sphx-glr-advanced-semi-structured-sparse-py"></span><h1>(beta) Accelerating BERT with semi-structured (2:4) sparsity<a class="headerlink" href="#beta-accelerating-bert-with-semi-structured-2-4-sparsity" title="이 제목에 대한 퍼머링크">¶</a></h1>
-<p><strong>Author</strong>: <a class="reference external" href="https://github.com/jcaip">Jesse Cai</a></p>
-<div class="section" id="overview">
-<h2>Overview<a class="headerlink" href="#overview" title="이 제목에 대한 퍼머링크">¶</a></h2>
-<p>Like other forms of sparsity, <strong>semi-structured sparsity</strong> is a model
-optimization technique that seeks to reduce the memory overhead and
-latency of a neural network at the expense of some model accuracy. It is
-also known as <strong>fine-grained structured sparsity</strong> or <strong>2:4 structured
-sparsity</strong>.</p>
-<p>Semi-structured sparsity derives its name from its unique sparsity
-pattern, where n out of every 2n elements are pruned. We most often see
-n=2, hence 2:4 sparsity Semi-structured sparsity is particularly
-interesting because it can be efficiently accelerated on GPUs and
-doesn’t degrade model accuracy as much as other sparsity patterns.</p>
-<p>With the introduction of
-<a class="reference external" href="https://pytorch.org/docs/2.1/sparse.html#sparse-semi-structured-tensors">semi-structured sparsity support</a>,
-it is possible to prune and accelerate a semi-structured sparse model
-without leaving PyTorch. We will explain this process in this tutorial.</p>
+<div class="sphx-glr-example-title section" id="beta-2-4-bert">
+<span id="sphx-glr-advanced-semi-structured-sparse-py"></span><h1>(beta) 반구조적 (2:4) 희소성을 통한 BERT 가속화<a class="headerlink" href="#beta-2-4-bert" title="이 제목에 대한 퍼머링크">¶</a></h1>
+<p><strong>저자</strong>: <a class="reference external" href="https://github.com/jcaip">Jesse Cai</a>
+<strong>번역</strong>: <a class="reference external" href="https://github.com/dlcodns">이채운</a></p>
+<div class="section" id="id2">
+<h2>개요<a class="headerlink" href="#id2" title="이 제목에 대한 퍼머링크">¶</a></h2>
+<p>다른 형태의 희소성(sparsity)처럼, <strong>반구조적 희소성**은 신경망의 메모리 오버헤드와 지연 시간을
+줄이기 위한 모델 최적화 기법으로, 일부 모델 정확도는 희생하게 됩니다. 이 방법은
+**세분화된 구조적 희소성</strong> 또는 <a href="#id3"><span class="problematic" id="id4">**</span></a>2:4 구조적 희소성**으로도 알려져 있습니다.</p>
+<p>반구조적 희소성은 고유한 희소성 패턴에서 유래하며, 여기서 2n개의 요소 중 n개의 요소가
+가지치기(prune)됩니다. 일반적으로 n=2인 경우가 많아 2:4 희소성이라고 부릅니다.
+반구조적 희소성은 GPU에서 효율적으로 가속화될 수 있고, 다른 희소성 패턴만큼 모델
+정확도를 저하시키지 않기 때문에 특히 흥미롭습니다.</p>
+<p><a class="reference external" href="https://pytorch.org/docs/2.1/sparse.html#sparse-semi-structured-tensors">반구조적 희소성 지원</a>,
+이 도입되면서, PyTorch를 벗어나지 않고도 반구조적 희소 모델을 가지치기하고 가속화할
+수 있습니다. 이 튜토리얼에서는 이 과정을 설명할 것입니다.</p>
 <img alt="../_static/img/pruning_flow.jpg" src="../_static/img/pruning_flow.jpg" />
-<p>By the end of this tutorial, we will have sparsified a BERT
-question-answering model to be 2:4 sparse, fine-tuning it to recover
-nearly all F1 loss (86.92 dense vs 86.48 sparse). Finally, we will
-accelerate this 2:4 sparse model for inference, yielding a 1.3x speedup.</p>
+<p>튜토리얼이 끝나면 BERT 질문-응답 모델을 2:4 희소화하여 거의 모든 F1 손실을 회복한
+상태(86.92의 밀집 모델 vs 86.48의 희소 모델)로 미세 조정할 것입니다. 마지막으로
+이 2:4 희소 모델을 추론을 위해 가속화하여 1.3배 속도 향상을 달성할 것입니다.</p>
 </div>
-<div class="section" id="requirements">
-<h2>Requirements<a class="headerlink" href="#requirements" title="이 제목에 대한 퍼머링크">¶</a></h2>
+<div class="section" id="id6">
+<h2>요구사항<a class="headerlink" href="#id6" title="이 제목에 대한 퍼머링크">¶</a></h2>
 <ul class="simple">
 <li><p>PyTorch &gt;= 2.1.</p></li>
-<li><p>A NVIDIA GPU with semi-structured sparsity support (Compute
-Capability 8.0+).</p></li>
+<li><p>반구조적 희소성을 지원하는 NVIDIA GPU(Compute Capability 8.0+)</p></li>
 </ul>
-<p>This tutorial is designed for beginners to semi-structured sparsity and
-sparsity in general. For users with existing 2:4 sparse models,
-accelerating <code class="docutils literal notranslate"><span class="pre">nn.Linear</span></code> layers for inference with
-<code class="docutils literal notranslate"><span class="pre">to_sparse_semi_structured</span></code> is quite straightforward. Here is an example:</p>
+<p>이 튜토리얼은 초보자에게 반구조적 희소성 및 일반적인 희소성을 맞춤 설명합니다.
+이미 2:4 희소 모델을 보유한 사용자에게는 <code class="docutils literal notranslate"><span class="pre">to_sparse_semi_structured``를</span> <span class="pre">사용하여</span>
+<span class="pre">추론을</span> <span class="pre">위한</span> <span class="pre">``nn.Linear</span></code> 레이어를 가속화하는 것이 매우 간단합니다. 다음은 그 예시입니다:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">from</span> <span class="nn">torch.sparse</span> <span class="kn">import</span> <span class="n">to_sparse_semi_structured</span><span class="p">,</span> <span class="n">SparseSemiStructuredTensor</span>
 <span class="kn">from</span> <span class="nn">torch.utils.benchmark</span> <span class="kn">import</span> <span class="n">Timer</span>
 <span class="n">SparseSemiStructuredTensor</span><span class="o">.</span><span class="n">_FORCE_CUTLASS</span> <span class="o">=</span> <span class="kc">True</span>
 
-<span class="c1"># mask Linear weight to be 2:4 sparse</span>
+<span class="c1"># Linear 가중치를 2:4 희소성으로 마스킹</span>
 <span class="n">mask</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">tile</span><span class="p">((</span><span class="mi">3072</span><span class="p">,</span> <span class="mi">2560</span><span class="p">))</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span><span class="o">.</span><span class="n">bool</span><span class="p">()</span>
 <span class="n">linear</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">10240</span><span class="p">,</span> <span class="mi">3072</span><span class="p">)</span><span class="o">.</span><span class="n">half</span><span class="p">()</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
 <span class="n">linear</span><span class="o">.</span><span class="n">weight</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Parameter</span><span class="p">(</span><span class="n">mask</span> <span class="o">*</span> <span class="n">linear</span><span class="o">.</span><span class="n">weight</span><span class="p">)</span>
@@ -492,7 +486,7 @@ accelerating <code class="docutils literal notranslate"><span class="pre">nn.Lin
                     <span class="nb">globals</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;linear&quot;</span><span class="p">:</span> <span class="n">linear</span><span class="p">,</span>
                              <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="n">x</span><span class="p">})</span><span class="o">.</span><span class="n">blocked_autorange</span><span class="p">()</span><span class="o">.</span><span class="n">median</span> <span class="o">*</span> <span class="mf">1e3</span>
 
-    <span class="c1"># accelerate via SparseSemiStructuredTensor</span>
+    <span class="c1"># SparseSemiStructuredTensor를 통해 가속화</span>
     <span class="n">linear</span><span class="o">.</span><span class="n">weight</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Parameter</span><span class="p">(</span><span class="n">to_sparse_semi_structured</span><span class="p">(</span><span class="n">linear</span><span class="o">.</span><span class="n">weight</span><span class="p">))</span>
 
     <span class="n">sparse_output</span> <span class="o">=</span> <span class="n">linear</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
@@ -500,124 +494,66 @@ accelerating <code class="docutils literal notranslate"><span class="pre">nn.Lin
                     <span class="nb">globals</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;linear&quot;</span><span class="p">:</span> <span class="n">linear</span><span class="p">,</span>
                              <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="n">x</span><span class="p">})</span><span class="o">.</span><span class="n">blocked_autorange</span><span class="p">()</span><span class="o">.</span><span class="n">median</span> <span class="o">*</span> <span class="mf">1e3</span>
 
-    <span class="c1"># sparse and dense matmul are numerically equivalent</span>
-    <span class="c1"># On an A100 80GB, we see: `Dense: 0.870ms Sparse: 0.630ms | Speedup: 1.382x`</span>
+    <span class="c1"># 희소 및 밀집 행렬 곱셈은 수치적으로 동일함</span>
+    <span class="c1"># A100 80GB에서, 다음과 같은 결과를 확인: `Dense: 0.870ms Sparse: 0.630ms | Speedup: 1.382x`</span>
     <span class="k">assert</span> <span class="n">torch</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">sparse_output</span><span class="p">,</span> <span class="n">dense_output</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Dense: </span><span class="si">{</span><span class="n">dense_t</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">ms Sparse: </span><span class="si">{</span><span class="n">sparse_t</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">ms | Speedup: </span><span class="si">{</span><span class="p">(</span><span class="n">dense_t</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">sparse_t</span><span class="p">)</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">x&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Dense: 1.579ms Sparse: 1.335ms | Speedup: 1.183x
+<div class="sphx-glr-script-out highlight-pytb notranslate"><div class="highlight"><pre><span></span><span class="gt">Traceback (most recent call last):</span>
+  File <span class="nb">&quot;/workspace/tutorials-kr/advanced_source/semi_structured_sparse.py&quot;</span>, line <span class="m">67</span>, in <span class="n">&lt;module&gt;</span>
+<span class="w">    </span><span class="n">sparse_output</span> <span class="o">=</span> <span class="n">linear</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+  File <span class="nb">&quot;/opt/conda/lib/python3.10/site-packages/torch/nn/modules/module.py&quot;</span>, line <span class="m">1532</span>, in <span class="n">_wrapped_call_impl</span>
+<span class="w">    </span><span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_call_impl</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+  File <span class="nb">&quot;/opt/conda/lib/python3.10/site-packages/torch/nn/modules/module.py&quot;</span>, line <span class="m">1541</span>, in <span class="n">_call_impl</span>
+<span class="w">    </span><span class="k">return</span> <span class="n">forward_call</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+  File <span class="nb">&quot;/opt/conda/lib/python3.10/site-packages/torch/nn/modules/linear.py&quot;</span>, line <span class="m">116</span>, in <span class="n">forward</span>
+<span class="w">    </span><span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">linear</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bias</span><span class="p">)</span>
+  File <span class="nb">&quot;/opt/conda/lib/python3.10/site-packages/torch/sparse/semi_structured.py&quot;</span>, line <span class="m">199</span>, in <span class="n">__torch_dispatch__</span>
+<span class="w">    </span><span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">SPARSE_DISPATCH</span><span class="p">[</span><span class="n">func</span><span class="o">.</span><span class="n">_overloadpacket</span><span class="p">](</span><span class="n">func</span><span class="p">,</span> <span class="n">types</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
+  File <span class="nb">&quot;/opt/conda/lib/python3.10/site-packages/torch/sparse/_semi_structured_ops.py&quot;</span>, line <span class="m">160</span>, in <span class="n">semi_sparse_linear</span>
+<span class="w">    </span><span class="n">res</span> <span class="o">=</span> <span class="n">semi_sparse_addmm</span><span class="p">(</span>
+  File <span class="nb">&quot;/opt/conda/lib/python3.10/site-packages/torch/sparse/_semi_structured_ops.py&quot;</span>, line <span class="m">145</span>, in <span class="n">semi_sparse_addmm</span>
+<span class="w">    </span><span class="n">result</span> <span class="o">=</span> <span class="n">B_t</span><span class="o">.</span><span class="n">_mm</span><span class="p">(</span><span class="n">A_padded</span><span class="o">.</span><span class="n">t</span><span class="p">(),</span> <span class="n">bias</span><span class="o">=</span><span class="n">bias</span><span class="p">)</span><span class="o">.</span><span class="n">t</span><span class="p">()</span>
+  File <span class="nb">&quot;/opt/conda/lib/python3.10/site-packages/torch/sparse/semi_structured.py&quot;</span>, line <span class="m">439</span>, in <span class="n">_mm</span>
+<span class="w">    </span><span class="n">res</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">_sparse_semi_structured_linear</span><span class="p">(</span>
+<span class="gr">RuntimeError</span>: <span class="n">_sparse_semi_structured_linear: Supported only on GPUs with compute capability 8.x</span>
 </pre></div>
 </div>
 </div>
-<div class="section" id="what-problem-does-semi-structured-sparsity-solve">
-<h2>What problem does semi-structured sparsity solve?<a class="headerlink" href="#what-problem-does-semi-structured-sparsity-solve" title="이 제목에 대한 퍼머링크">¶</a></h2>
-<p>The general motivation behind sparsity is simple: if there are zeros in
-your network, you can optimize efficiency by not storing or computing those
-parameters. However, the specifics of sparsity are tricky. Zeroing out
-parameters doesn’t affect the latency / memory overhead of our model out
-of the box.</p>
-<p>This is because the dense tensor still contains the pruned (zero)
-elements, which the dense matrix multiplication kernel will still
-operate on this elements. In order to realize performance gains, we need
-to swap out dense kernels for sparse kernels, which skip calculation
-involving pruned elements.</p>
-<p>To do this, these kernels work on sparse matrices, which do not store
-the pruned elements and store the specified elements in a compressed
-format.</p>
-<p>For semi-structured sparsity, we store exactly half of the original
-parameters along with some compressed metadata about how the elements
-were arranged.</p>
-<p>There are many different sparse layouts, each with their own benefits
-and drawbacks. The 2:4 semi-structured sparse layout is particularly
-interesting for two reasons:</p>
+<div class="section" id="id7">
+<h2>반구조적 희소성은 어떤 문제를 해결하는가?<a class="headerlink" href="#id7" title="이 제목에 대한 퍼머링크">¶</a></h2>
+<p>희소성의 일반적인 목적은 간단합니다: 네트워크 내에 0이 있는 경우,
+해당 매개변수를 저장하거나 계산하지 않음으로써 효율성을 최적화할 수 있습니다.
+그러나 희소성의 구체적인 구현은 까다롭습니다. 매개변수를 0으로 만드는 것만으로는
+기본적으로 모델의 지연 시간 / 메모리 오버헤드에 영향을 미치지 않습니다.</p>
+<p>그 이유는 dense tensor가 여전히 가지치기된(0인) 요소를 포함하고 있으며,
+밀집 행렬 곱셈 커널이 이러한 요소에 대해 계속 연산을 수행하기 때문입니다. 성능 향상을
+실현하려면, 밀집 커널을 가지치기된 요소의 계산을 건너뛰는 희소 커널로 교체해야 합니다.</p>
+<p>이를 위해, 희소 커널은 가지치기된 요소를 저장하지 않고, 지정된 요소를 압축된 형식으로
+저장하는 희소 행렬을 사용합니다.</p>
+<p>반구조적 희소성의 경우, 원래 매개변수의 정확히 절반과 요소가 어떻게
+배열되었는지에 대한 압축된 메타데이터를 저장합니다.</p>
+<p>희소 레이아웃에는 각기 다른 장점과 단점을 가진 여러 가지가 있습니다. 2:4 반구조적
+희소 레이아웃은 흥미로운 두 가지 이유가 있습니다.</p>
 <ul class="simple">
-<li><p>Unlike previous sparse formats,
-semi-structured sparsity was designed to be efficiently accelerated on
-GPUs. In 2020, NVIDIA introduced hardware support for semi-structured
-sparsity with their Ampere architecture, and have also released fast
-sparse kernels via
-CUTLASS <a class="reference external" href="https://docs.nvidia.com/cuda/cusparselt/index.html">cuSPARSELt</a>.</p></li>
-<li><p>At the same time, semi-structured sparsity tends to have a milder
-impact on model accuracy compared to other sparse formats, especially
-when accounting for more advanced pruning / fine-tuning methods. NVIDIA
-has shown in their <a class="reference external" href="https://arxiv.org/abs/2104.08378">white paper</a>
-that a simple paradigm of magnitude pruning once to be 2:4 sparse and
-then retraining the model yields nearly identical model accuracies.</p></li>
+<li><p>이전의 희소 형식과 달리 반구조적 희소성은 GPU에서 효율적으로 가속되도록 설계되었습니다.
+2020년 NVIDIA는 Ampere 아키텍처를 통해 반구조적 희소성을 위한 하드웨어 지원을 도입했으며,
+CUTLASS <a class="reference external" href="https://docs.nvidia.com/cuda/cusparselt/index.html">cuSPARSELt</a>
+cuSPARSELt를 통해 빠른 희소 커널도 출시했습니다.</p></li>
+<li><p>동시에 반구조적 희소성은 다른 희소 형식에 비해 모델 정확도에 미치는 영향이 덜한 경향이 있습니다.
+특히 더 발전된 가지치기 및 미세 조정 방법을 고려할 때 그렇습니다.
+NVIDIA가 공개한 <a class="reference external" href="https://arxiv.org/abs/2104.08378">백서</a>
+에서 2:4 희소성을 목표로 한 단순한 크기 기준 가지치기(magnitude pruning) 후 모델을
+재학습하면 거의 동일한 모델 정확도를 달성할 수 있음을 보여주었습니다.</p></li>
 </ul>
-<p>Semi-structured exists in a sweet spot, providing a 2x (theoretical)
-speedup at a much lower sparsity level (50%), while still being granular
-enough to preserve model accuracy.</p>
-<table class="docutils align-default">
-<colgroup>
-<col style="width: 31%" />
-<col style="width: 19%" />
-<col style="width: 12%" />
-<col style="width: 18%" />
-<col style="width: 19%" />
-</colgroup>
-<thead>
-<tr class="row-odd"><th class="head"><p>Network</p></th>
-<th class="head"><p>Data Set</p></th>
-<th class="head"><p>Metric</p></th>
-<th class="head"><p>Dense FP16</p></th>
-<th class="head"><p>Sparse FP16</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>ResNet-50</p></td>
-<td><p>ImageNet</p></td>
-<td><p>Top-1</p></td>
-<td><p>76.1</p></td>
-<td><p>76.2</p></td>
-</tr>
-<tr class="row-odd"><td><p>ResNeXt-101_32x8d</p></td>
-<td><p>ImageNet</p></td>
-<td><p>Top-1</p></td>
-<td><p>79.3</p></td>
-<td><p>79.3</p></td>
-</tr>
-<tr class="row-even"><td><p>Xception</p></td>
-<td><p>ImageNet</p></td>
-<td><p>Top-1</p></td>
-<td><p>79.2</p></td>
-<td><p>79.2</p></td>
-</tr>
-<tr class="row-odd"><td><p>SSD-RN50</p></td>
-<td><p>COCO2017</p></td>
-<td><p>bbAP</p></td>
-<td><p>24.8</p></td>
-<td><p>24.8</p></td>
-</tr>
-<tr class="row-even"><td><p>MaskRCNN-RN50</p></td>
-<td><p>COCO2017</p></td>
-<td><p>bbAP</p></td>
-<td><p>37.9</p></td>
-<td><p>37.9</p></td>
-</tr>
-<tr class="row-odd"><td><p>FairSeq Transformer</p></td>
-<td><p>EN-DE WMT14</p></td>
-<td><p>BLEU</p></td>
-<td><p>28.2</p></td>
-<td><p>28.5</p></td>
-</tr>
-<tr class="row-even"><td><p>BERT-Large</p></td>
-<td><p>SQuAD v1.1</p></td>
-<td><p>F1</p></td>
-<td><p>91.9</p></td>
-<td><p>91.9</p></td>
-</tr>
-</tbody>
-</table>
-<p>Semi-structured sparsity has an additional advantage from a workflow
-perspective. Because the sparsity level is fixed at 50%, it is easier to
-decompose the problem of sparsifying a model into two distinct
-subproblems:</p>
+<p>반구조적 희소성은 이론적으로 2배의 속도 향상을 제공하면서도 희소성 수준이 낮고(50%), 모델
+정확도를 유지하기에 충분히 세밀한 적절한 균형점을 제공합니다.</p>
+<p>반구조적 희소성은 워크플로 관점에서 추가적인 장점이 있습니다. 희소성 수준이 50%로 고정되어
+있어 모델을 희소화하는 문제를 두 가지 별개의 하위 문제로 분해하기가 더 쉽습니다.</p>
 <ul class="simple">
-<li><p>Accuracy - How can we find a set of 2:4 sparse weights that minimize
-the accuracy degradation of our model?</p></li>
-<li><p>Performance - How can we accelerate our 2:4 sparse weights for
-inference and reduced memory overhead?</p></li>
+<li><p>정확도 - 2:4 희소 가중치 세트를 찾아 모델의 정확도 저하를 최소화할 수 있는 방법은 무엇인가요?</p></li>
+<li><p>성능: 추론 및 메모리 오버헤드를 줄이기 위해 2:4 희소 가중치를 어떻게 가속화할 수 있는가?</p></li>
 </ul>
 <div class="math">
 \[\begin{bmatrix}
@@ -626,18 +562,17 @@ inference and reduced memory overhead?</p></li>
    1 & 0 & 0 & 0 \\
    0 & 0 & 1 & 1 \\
    \end{bmatrix}\]</div>
-<p>The natural handoff point between these two problems are zeroed-out
-dense tensors. Our inference solution is designed to compress and
-accelerate tensors in this format. We anticipate many users coming up
-with custom masking solution, as this is an active area of research.</p>
-<p>Now that we’ve learned a little more about semi-structured sparsity,
-let’s apply it to a BERT model trained on a question answering task,
-SQuAD.</p>
+<p>이 두 문제 사이의 자연스러운 연결점은 0으로 된 밀집 텐서입니다. 우리의 추론 솔루션은 이러한 형식의
+텐서를 압축하고 가속하도록 설계되었습니다. 이는 활발한 연구 분야이기 때문에 많은 사용자가 맞춤형 마스킹
+솔루션을 고안할 것으로 예상됩니다.</p>
+<p>반구조적 희소성에 대해 조금 더 배웠으니, 이제 질문 응답 작업인 SQuAD에 대해 학습된 BERT 모델에 이를
+적용해 봅시다.</p>
 </div>
-<div class="section" id="intro-setup">
-<h2>Intro &amp; Setup<a class="headerlink" href="#intro-setup" title="이 제목에 대한 퍼머링크">¶</a></h2>
-<p>Let’s start by importing all the packages we need.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># If you are running this in Google Colab, run:</span>
+<div class="section" id="id9">
+<h2>소개 &amp; 설정<a class="headerlink" href="#id9" title="이 제목에 대한 퍼머링크">¶</a></h2>
+<p>필요한 모든 패키지를 불러오는 것으로 시작하겠습니다.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># 만약 Google Colab에서 실행 중이라면, 다음 명령어를 실행하세요:</span>
+
 <span class="c1"># .. code-block: python</span>
 <span class="c1">#</span>
 <span class="c1">#    !pip install datasets transformers evaluate accelerate pandas</span>
@@ -656,18 +591,15 @@ SQuAD.</p>
 <span class="kn">from</span> <span class="nn">torch.ao.pruning</span> <span class="kn">import</span> <span class="n">WeightNormSparsifier</span>
 <span class="kn">import</span> <span class="nn">transformers</span>
 
-<span class="c1"># force CUTLASS use if ``cuSPARSELt`` is not available</span>
+<span class="c1"># ``cuSPARSELt``가 사용 불가능한 경우, 강제로 CUTLASS를 사용합니다.</span>
 <span class="n">SparseSemiStructuredTensor</span><span class="o">.</span><span class="n">_FORCE_CUTLASS</span> <span class="o">=</span> <span class="kc">True</span>
 <span class="n">torch</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;torch._C.Generator object at 0x752518a55130&gt;
-</pre></div>
-</div>
-<p>We’ll also need to define some helper functions that are specific to the
-dataset / task at hand. These were adapted from
-<a class="reference external" href="https://huggingface.co/learn/nlp-course/chapter7/7?fw=pt">this</a>
-Hugging Face course as a reference.</p>
+<p>우리가 다루고 있는 데이터셋/작업에 특화된 몇 가지 보조 함수도
+정의해야 합니다. 이러한 함수들은 Hugging Face 코스의
+<a class="reference external" href="https://huggingface.co/learn/nlp-course/chapter7/7?fw=pt">이 자료</a>
+를 참고하여 수정되었습니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">preprocess_validation_function</span><span class="p">(</span><span class="n">examples</span><span class="p">,</span> <span class="n">tokenizer</span><span class="p">):</span>
     <span class="n">inputs</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="p">(</span>
         <span class="p">[</span><span class="n">q</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="n">examples</span><span class="p">[</span><span class="s2">&quot;question&quot;</span><span class="p">]],</span>
@@ -714,21 +646,20 @@ Hugging Face course as a reference.</p>
         <span class="n">end_char</span> <span class="o">=</span> <span class="n">start_char</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">answer</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
         <span class="n">sequence_ids</span> <span class="o">=</span> <span class="n">inputs</span><span class="o">.</span><span class="n">sequence_ids</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
 
-        <span class="c1"># Find the start and end of the context</span>
+        <span class="c1"># 문맥의 시작과 끝을 찾기</span>
         <span class="n">idx</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">while</span> <span class="n">sequence_ids</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">idx</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="n">context_start</span> <span class="o">=</span> <span class="n">idx</span>
         <span class="k">while</span> <span class="n">sequence_ids</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">idx</span> <span class="o">+=</span> <span class="mi">1</span>
-        <span class="n">context_end</span> <span class="o">=</span> <span class="n">idx</span> <span class="o">-</span> <span class="mi">1</span>
 
-        <span class="c1"># If the answer is not fully inside the context, label it (0, 0)</span>
+        <span class="c1"># 답변이 문맥 안에 완전히 포함되지 않는 경우, (0, 0)으로 레이블 지정</span>
         <span class="k">if</span> <span class="n">offset</span><span class="p">[</span><span class="n">context_start</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">end_char</span> <span class="ow">or</span> <span class="n">offset</span><span class="p">[</span><span class="n">context_end</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">start_char</span><span class="p">:</span>
             <span class="n">start_positions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
             <span class="n">end_positions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="c1"># Otherwise it&#39;s the start and end token positions</span>
+            <span class="c1"># 그렇지 않으면 시작 및 끝 토큰 위치를 지정</span>
             <span class="n">idx</span> <span class="o">=</span> <span class="n">context_start</span>
             <span class="k">while</span> <span class="n">idx</span> <span class="o">&lt;=</span> <span class="n">context_end</span> <span class="ow">and</span> <span class="n">offset</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">start_char</span><span class="p">:</span>
                 <span class="n">idx</span> <span class="o">+=</span> <span class="mi">1</span>
@@ -754,13 +685,13 @@ Hugging Face course as a reference.</p>
         <span class="n">example_to_features</span><span class="p">[</span><span class="n">feature</span><span class="p">[</span><span class="s2">&quot;example_id&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
 
     <span class="n">predicted_answers</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="c1"># for example in ``tqdm`` (examples):</span>
+    <span class="c1"># 예를 들어 ``tqdm``(examples)에서:</span>
     <span class="k">for</span> <span class="n">example</span> <span class="ow">in</span> <span class="n">examples</span><span class="p">:</span>
         <span class="n">example_id</span> <span class="o">=</span> <span class="n">example</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span>
         <span class="n">context</span> <span class="o">=</span> <span class="n">example</span><span class="p">[</span><span class="s2">&quot;context&quot;</span><span class="p">]</span>
         <span class="n">answers</span> <span class="o">=</span> <span class="p">[]</span>
 
-        <span class="c1"># Loop through all features associated with that example</span>
+        <span class="c1"># 해당 예제와 관련된 모든 특성(feature)을 반복</span>
         <span class="k">for</span> <span class="n">feature_index</span> <span class="ow">in</span> <span class="n">example_to_features</span><span class="p">[</span><span class="n">example_id</span><span class="p">]:</span>
             <span class="n">start_logit</span> <span class="o">=</span> <span class="n">start_logits</span><span class="p">[</span><span class="n">feature_index</span><span class="p">]</span>
             <span class="n">end_logit</span> <span class="o">=</span> <span class="n">end_logits</span><span class="p">[</span><span class="n">feature_index</span><span class="p">]</span>
@@ -770,11 +701,11 @@ Hugging Face course as a reference.</p>
             <span class="n">end_indexes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">end_logit</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span> <span class="p">:</span> <span class="o">-</span><span class="n">n_best</span> <span class="o">-</span> <span class="mi">1</span> <span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
             <span class="k">for</span> <span class="n">start_index</span> <span class="ow">in</span> <span class="n">start_indexes</span><span class="p">:</span>
                 <span class="k">for</span> <span class="n">end_index</span> <span class="ow">in</span> <span class="n">end_indexes</span><span class="p">:</span>
-                    <span class="c1"># Skip answers that are not fully in the context</span>
+                    <span class="c1"># 문맥에 완전히 포함되지 않은 답변은 건너뜀</span>
                     <span class="k">if</span> <span class="n">offsets</span><span class="p">[</span><span class="n">start_index</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">offsets</span><span class="p">[</span><span class="n">end_index</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                         <span class="k">continue</span>
-                    <span class="c1"># Skip answers with a length that is either &lt; 0</span>
-                    <span class="c1"># or &gt; max_answer_length</span>
+                    <span class="c1"># 길이가 0보다 작거나</span>
+                    <span class="c1"># max_answer_length보다 큰 답변은 건너뜀</span>
                     <span class="k">if</span> <span class="p">(</span>
                         <span class="n">end_index</span> <span class="o">&lt;</span> <span class="n">start_index</span>
                         <span class="ow">or</span> <span class="n">end_index</span> <span class="o">-</span> <span class="n">start_index</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">&gt;</span> <span class="n">max_answer_length</span>
@@ -789,7 +720,7 @@ Hugging Face course as a reference.</p>
                     <span class="p">}</span>
                     <span class="n">answers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">answer</span><span class="p">)</span>
 
-        <span class="c1"># Select the answer with the best score</span>
+        <span class="c1"># 가장 높은 점수를 가진 답변을 선택</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">answers</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">best_answer</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">answers</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="s2">&quot;logit_score&quot;</span><span class="p">])</span>
             <span class="n">predicted_answers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
@@ -804,8 +735,7 @@ Hugging Face course as a reference.</p>
     <span class="k">return</span> <span class="n">metric</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="n">predictions</span><span class="o">=</span><span class="n">predicted_answers</span><span class="p">,</span> <span class="n">references</span><span class="o">=</span><span class="n">theoretical_answers</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Now that those are defined, we just need one additional helper function,
-which will help us benchmark our model.</p>
+<p>이제 이러한 함수들이 정의되었으므로, 모델의 벤치마크를 도와줄 추가적인 보조 함수 하나만 더 필요합니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">measure_execution_time</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">batch_sizes</span><span class="p">,</span> <span class="n">dataset</span><span class="p">):</span>
     <span class="n">dataset_for_model</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">remove_columns</span><span class="p">([</span><span class="s2">&quot;example_id&quot;</span><span class="p">,</span> <span class="s2">&quot;offset_mapping&quot;</span><span class="p">])</span>
     <span class="n">dataset_for_model</span><span class="o">.</span><span class="n">set_format</span><span class="p">(</span><span class="s2">&quot;torch&quot;</span><span class="p">)</span>
@@ -835,16 +765,15 @@ which will help us benchmark our model.</p>
     <span class="k">return</span> <span class="n">batch_size_to_time_sec</span>
 </pre></div>
 </div>
-<p>We will get started by loading our model and tokenizer, and then setting
-up our dataset.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># load model</span>
+<p>모델과 토크나이저를 로드한 후, 데이터셋을 설정하면서 시작하겠습니다.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># 모델 불러오기</span>
 <span class="n">model_name</span> <span class="o">=</span> <span class="s2">&quot;bert-base-cased&quot;</span>
 <span class="n">tokenizer</span> <span class="o">=</span> <span class="n">transformers</span><span class="o">.</span><span class="n">AutoTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">model_name</span><span class="p">)</span>
 <span class="n">model</span> <span class="o">=</span> <span class="n">transformers</span><span class="o">.</span><span class="n">AutoModelForQuestionAnswering</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">model_name</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Loading tokenizer: </span><span class="si">{</span><span class="n">model_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Loading model: </span><span class="si">{</span><span class="n">model_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-<span class="c1"># set up train and val dataset</span>
+<span class="c1"># 학습 및 검증 데이터셋 설정</span>
 <span class="n">squad_dataset</span> <span class="o">=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">load_dataset</span><span class="p">(</span><span class="s2">&quot;squad&quot;</span><span class="p">)</span>
 <span class="n">tokenized_squad_dataset</span> <span class="o">=</span> <span class="p">{}</span>
 <span class="n">tokenized_squad_dataset</span><span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">squad_dataset</span><span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
@@ -858,271 +787,14 @@ up our dataset.</p>
 <span class="n">data_collator</span> <span class="o">=</span> <span class="n">transformers</span><span class="o">.</span><span class="n">DataCollatorWithPadding</span><span class="p">(</span><span class="n">tokenizer</span><span class="o">=</span><span class="n">tokenizer</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Loading tokenizer: bert-base-cased
-Loading model: bert-base-cased
-
-
-Downloading readme:   0%|          | 0.00/7.62k [00:00&lt;?, ?B/s]
-Downloading readme: 100%|##########| 7.62k/7.62k [00:00&lt;00:00, 29.6MB/s]
-
-
-Downloading data files:   0%|          | 0/2 [00:00&lt;?, ?it/s]
-
-
-Downloading data:   0%|          | 0.00/14.5M [00:00&lt;?, ?B/s]
-
-
-Downloading data:  29%|##9       | 4.19M/14.5M [00:00&lt;00:01, 7.47MB/s]
-
-
-Downloading data:  87%|########7 | 12.6M/14.5M [00:01&lt;00:00, 12.1MB/s]
-Downloading data: 100%|##########| 14.5M/14.5M [00:01&lt;00:00, 12.3MB/s]
-
-
-Downloading data files:  50%|#####     | 1/2 [00:01&lt;00:01,  1.17s/it]
-
-
-Downloading data:   0%|          | 0.00/1.82M [00:00&lt;?, ?B/s]
-
-
-Downloading data: 100%|##########| 1.82M/1.82M [00:00&lt;00:00, 4.43MB/s]
-Downloading data: 100%|##########| 1.82M/1.82M [00:00&lt;00:00, 4.41MB/s]
-
-
-Downloading data files: 100%|##########| 2/2 [00:01&lt;00:00,  1.37it/s]
-Downloading data files: 100%|##########| 2/2 [00:01&lt;00:00,  1.26it/s]
-
-
-Extracting data files:   0%|          | 0/2 [00:00&lt;?, ?it/s]
-Extracting data files: 100%|##########| 2/2 [00:00&lt;00:00, 1360.68it/s]
-
-
-Generating train split:   0%|          | 0/87599 [00:00&lt;?, ? examples/s]
-
-Generating train split:  80%|#######9  | 70000/87599 [00:00&lt;00:00, 525364.06 examples/s]
-Generating train split: 100%|##########| 87599/87599 [00:00&lt;00:00, 519395.63 examples/s]
-
-
-Generating validation split:   0%|          | 0/10570 [00:00&lt;?, ? examples/s]
-Generating validation split: 100%|##########| 10570/10570 [00:00&lt;00:00, 461829.59 examples/s]
-
-
-Map:   0%|          | 0/87599 [00:00&lt;?, ? examples/s]
-
-Map:   1%|1         | 1000/87599 [00:00&lt;00:24, 3590.65 examples/s]
-
-Map:   2%|2         | 2000/87599 [00:00&lt;00:22, 3727.91 examples/s]
-
-Map:   3%|3         | 3000/87599 [00:00&lt;00:22, 3794.16 examples/s]
-
-Map:   5%|4         | 4000/87599 [00:01&lt;00:21, 3836.65 examples/s]
-
-Map:   6%|5         | 5000/87599 [00:01&lt;00:21, 3837.95 examples/s]
-
-Map:   7%|6         | 6000/87599 [00:01&lt;00:21, 3849.21 examples/s]
-
-Map:   8%|7         | 7000/87599 [00:01&lt;00:21, 3824.32 examples/s]
-
-Map:   9%|9         | 8000/87599 [00:02&lt;00:20, 3857.91 examples/s]
-
-Map:  10%|#         | 9000/87599 [00:02&lt;00:20, 3812.49 examples/s]
-
-Map:  11%|#1        | 10000/87599 [00:02&lt;00:20, 3818.68 examples/s]
-
-Map:  13%|#2        | 11000/87599 [00:02&lt;00:19, 3851.63 examples/s]
-
-Map:  14%|#3        | 12000/87599 [00:03&lt;00:19, 3843.48 examples/s]
-
-Map:  15%|#4        | 13000/87599 [00:03&lt;00:19, 3852.96 examples/s]
-
-Map:  16%|#5        | 14000/87599 [00:03&lt;00:19, 3858.53 examples/s]
-
-Map:  17%|#7        | 15000/87599 [00:03&lt;00:18, 3870.46 examples/s]
-
-Map:  18%|#8        | 16000/87599 [00:04&lt;00:18, 3895.14 examples/s]
-
-Map:  19%|#9        | 17000/87599 [00:04&lt;00:18, 3876.38 examples/s]
-
-Map:  21%|##        | 18000/87599 [00:04&lt;00:17, 3907.30 examples/s]
-
-Map:  22%|##1       | 19000/87599 [00:04&lt;00:17, 3903.84 examples/s]
-
-Map:  23%|##2       | 20000/87599 [00:05&lt;00:17, 3885.01 examples/s]
-
-Map:  24%|##3       | 21000/87599 [00:05&lt;00:17, 3882.53 examples/s]
-
-Map:  25%|##5       | 22000/87599 [00:05&lt;00:16, 3874.77 examples/s]
-
-Map:  26%|##6       | 23000/87599 [00:05&lt;00:16, 3891.04 examples/s]
-
-Map:  27%|##7       | 24000/87599 [00:06&lt;00:23, 2657.66 examples/s]
-
-Map:  29%|##8       | 25000/87599 [00:06&lt;00:21, 2931.69 examples/s]
-
-Map:  30%|##9       | 26000/87599 [00:07&lt;00:19, 3147.10 examples/s]
-
-Map:  31%|###       | 27000/87599 [00:07&lt;00:18, 3287.04 examples/s]
-
-Map:  32%|###1      | 28000/87599 [00:07&lt;00:17, 3412.81 examples/s]
-
-Map:  33%|###3      | 29000/87599 [00:07&lt;00:16, 3497.09 examples/s]
-
-Map:  34%|###4      | 30000/87599 [00:08&lt;00:16, 3572.27 examples/s]
-
-Map:  35%|###5      | 31000/87599 [00:08&lt;00:15, 3621.61 examples/s]
-
-Map:  37%|###6      | 32000/87599 [00:08&lt;00:15, 3636.44 examples/s]
-
-Map:  38%|###7      | 33000/87599 [00:09&lt;00:14, 3666.31 examples/s]
-
-Map:  39%|###8      | 34000/87599 [00:09&lt;00:14, 3678.30 examples/s]
-
-Map:  40%|###9      | 35000/87599 [00:09&lt;00:14, 3661.75 examples/s]
-
-Map:  41%|####1     | 36000/87599 [00:09&lt;00:14, 3674.69 examples/s]
-
-Map:  42%|####2     | 37000/87599 [00:10&lt;00:13, 3682.14 examples/s]
-
-Map:  43%|####3     | 38000/87599 [00:10&lt;00:13, 3687.98 examples/s]
-
-Map:  45%|####4     | 39000/87599 [00:10&lt;00:13, 3674.53 examples/s]
-
-Map:  46%|####5     | 40000/87599 [00:10&lt;00:12, 3680.78 examples/s]
-
-Map:  47%|####6     | 41000/87599 [00:11&lt;00:12, 3680.18 examples/s]
-
-Map:  48%|####7     | 42000/87599 [00:11&lt;00:12, 3682.52 examples/s]
-
-Map:  49%|####9     | 43000/87599 [00:11&lt;00:12, 3716.24 examples/s]
-
-Map:  50%|#####     | 44000/87599 [00:11&lt;00:11, 3729.28 examples/s]
-
-Map:  51%|#####1    | 45000/87599 [00:12&lt;00:11, 3706.22 examples/s]
-
-Map:  53%|#####2    | 46000/87599 [00:12&lt;00:11, 3702.44 examples/s]
-
-Map:  54%|#####3    | 47000/87599 [00:12&lt;00:10, 3692.61 examples/s]
-
-Map:  55%|#####4    | 48000/87599 [00:13&lt;00:10, 3697.94 examples/s]
-
-Map:  56%|#####5    | 49000/87599 [00:13&lt;00:10, 3689.44 examples/s]
-
-Map:  57%|#####7    | 50000/87599 [00:14&lt;00:14, 2570.26 examples/s]
-
-Map:  58%|#####8    | 51000/87599 [00:14&lt;00:12, 2824.70 examples/s]
-
-Map:  59%|#####9    | 52000/87599 [00:14&lt;00:11, 3029.65 examples/s]
-
-Map:  61%|######    | 53000/87599 [00:14&lt;00:10, 3204.52 examples/s]
-
-Map:  62%|######1   | 54000/87599 [00:15&lt;00:10, 3340.91 examples/s]
-
-Map:  63%|######2   | 55000/87599 [00:15&lt;00:09, 3445.44 examples/s]
-
-Map:  64%|######3   | 56000/87599 [00:15&lt;00:09, 3506.73 examples/s]
-
-Map:  65%|######5   | 57000/87599 [00:15&lt;00:08, 3552.01 examples/s]
-
-Map:  66%|######6   | 58000/87599 [00:16&lt;00:08, 3588.71 examples/s]
-
-Map:  67%|######7   | 59000/87599 [00:16&lt;00:07, 3608.72 examples/s]
-
-Map:  68%|######8   | 60000/87599 [00:16&lt;00:07, 3639.52 examples/s]
-
-Map:  70%|######9   | 61000/87599 [00:17&lt;00:07, 3649.30 examples/s]
-
-Map:  71%|#######   | 62000/87599 [00:17&lt;00:07, 3648.32 examples/s]
-
-Map:  72%|#######1  | 63000/87599 [00:17&lt;00:06, 3664.40 examples/s]
-
-Map:  73%|#######3  | 64000/87599 [00:17&lt;00:06, 3637.43 examples/s]
-
-Map:  74%|#######4  | 65000/87599 [00:18&lt;00:06, 3643.25 examples/s]
-
-Map:  75%|#######5  | 66000/87599 [00:18&lt;00:05, 3631.49 examples/s]
-
-Map:  76%|#######6  | 67000/87599 [00:18&lt;00:05, 3637.27 examples/s]
-
-Map:  78%|#######7  | 68000/87599 [00:18&lt;00:05, 3658.15 examples/s]
-
-Map:  79%|#######8  | 69000/87599 [00:19&lt;00:05, 3645.90 examples/s]
-
-Map:  80%|#######9  | 70000/87599 [00:19&lt;00:04, 3618.59 examples/s]
-
-Map:  81%|########1 | 71000/87599 [00:19&lt;00:04, 3612.92 examples/s]
-
-Map:  82%|########2 | 72000/87599 [00:20&lt;00:04, 3612.02 examples/s]
-
-Map:  83%|########3 | 73000/87599 [00:20&lt;00:04, 3620.30 examples/s]
-
-Map:  84%|########4 | 74000/87599 [00:20&lt;00:03, 3618.82 examples/s]
-
-Map:  86%|########5 | 75000/87599 [00:20&lt;00:03, 3622.39 examples/s]
-
-Map:  87%|########6 | 76000/87599 [00:21&lt;00:04, 2549.34 examples/s]
-
-Map:  88%|########7 | 77000/87599 [00:21&lt;00:03, 2800.48 examples/s]
-
-Map:  89%|########9 | 78000/87599 [00:22&lt;00:03, 3017.44 examples/s]
-
-Map:  90%|######### | 79000/87599 [00:22&lt;00:02, 3190.44 examples/s]
-
-Map:  91%|#########1| 80000/87599 [00:22&lt;00:02, 3317.50 examples/s]
-
-Map:  92%|#########2| 81000/87599 [00:22&lt;00:01, 3406.95 examples/s]
-
-Map:  94%|#########3| 82000/87599 [00:23&lt;00:01, 3464.97 examples/s]
-
-Map:  95%|#########4| 83000/87599 [00:23&lt;00:01, 3486.66 examples/s]
-
-Map:  96%|#########5| 84000/87599 [00:23&lt;00:01, 3533.03 examples/s]
-
-Map:  97%|#########7| 85000/87599 [00:24&lt;00:00, 3560.50 examples/s]
-
-Map:  98%|#########8| 86000/87599 [00:24&lt;00:00, 3597.68 examples/s]
-
-Map:  99%|#########9| 87000/87599 [00:24&lt;00:00, 3611.61 examples/s]
-
-Map: 100%|##########| 87599/87599 [00:24&lt;00:00, 3602.26 examples/s]
-Map: 100%|##########| 87599/87599 [00:30&lt;00:00, 2827.22 examples/s]
-
-
-Map:   0%|          | 0/10570 [00:00&lt;?, ? examples/s]
-
-Map:   9%|9         | 1000/10570 [00:00&lt;00:02, 4300.94 examples/s]
-
-Map:  19%|#8        | 2000/10570 [00:00&lt;00:01, 4638.20 examples/s]
-
-Map:  28%|##8       | 3000/10570 [00:00&lt;00:01, 4709.76 examples/s]
-
-Map:  38%|###7      | 4000/10570 [00:00&lt;00:01, 4722.79 examples/s]
-
-Map:  47%|####7     | 5000/10570 [00:01&lt;00:01, 4361.73 examples/s]
-
-Map:  57%|#####6    | 6000/10570 [00:01&lt;00:01, 4393.55 examples/s]
-
-Map:  66%|######6   | 7000/10570 [00:01&lt;00:00, 4449.92 examples/s]
-
-Map:  76%|#######5  | 8000/10570 [00:01&lt;00:00, 4448.65 examples/s]
-
-Map:  85%|########5 | 9000/10570 [00:02&lt;00:00, 4446.55 examples/s]
-
-Map:  95%|#########4| 10000/10570 [00:02&lt;00:00, 4463.21 examples/s]
-
-Map: 100%|##########| 10570/10570 [00:02&lt;00:00, 4465.92 examples/s]
-Map: 100%|##########| 10570/10570 [00:02&lt;00:00, 3848.95 examples/s]
-</pre></div>
 </div>
 </div>
-</div>
-<div class="section" id="establishing-a-baseline">
-<h1>Establishing a baseline<a class="headerlink" href="#establishing-a-baseline" title="이 제목에 대한 퍼머링크">¶</a></h1>
-<p>Next, we’ll train a quick baseline of our model on SQuAD. This task asks
-our model to identify spans, or segments of text, in a given context
-(Wikipedia articles) that answer a given question. Running the following
-code gives me an F1 score of 86.9. This is quite close to the reported
-NVIDIA score and the difference is likely due to BERT-base
-vs. BERT-large or fine-tuning hyperparameters.</p>
+<div class="section" id="id10">
+<h1>기준 성능 설정<a class="headerlink" href="#id10" title="이 제목에 대한 퍼머링크">¶</a></h1>
+<p>다음으로, SQuAD 데이터셋에서 모델의 빠른 기준 성능을 학습시켜 보겠습니다. 이 작업은 모델이 주어진
+문맥(위키피디아 기사)에서 주어진 질문에 대한 답변이 되는 텍스트의 범위 또는 구간을 식별하도록
+요구합니다. 다음 코드를 실행하면 F1 점수는 86.9가 나옵니다. 이는 보고된 NVIDIA 점수와 매우 가깝고,
+차이는 아마도 BERT-base와 BERT-large 또는 미세 조정 하이퍼파라미터 때문일 것입니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">training_args</span> <span class="o">=</span> <span class="n">transformers</span><span class="o">.</span><span class="n">TrainingArguments</span><span class="p">(</span>
     <span class="s2">&quot;trainer&quot;</span><span class="p">,</span>
     <span class="n">num_train_epochs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
@@ -1130,7 +802,7 @@ vs. BERT-large or fine-tuning hyperparameters.</p>
     <span class="n">per_device_train_batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span>
     <span class="n">per_device_eval_batch_size</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span>
     <span class="n">logging_steps</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
-    <span class="c1"># Limit max steps for tutorial runners. Delete the below line to see the reported accuracy numbers.</span>
+    <span class="c1"># 튜토리얼 실행을 위한 최대 단계 제한. 보고된 정확도 수치를 보려면 아래 줄을 삭제하세요.</span>
     <span class="n">max_steps</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
     <span class="n">report_to</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span>
@@ -1146,9 +818,9 @@ vs. BERT-large or fine-tuning hyperparameters.</p>
 
 <span class="n">trainer</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
 
-<span class="c1"># batch sizes to compare for eval</span>
+<span class="c1"># 평가를 위한 비교 배치 크기</span>
 <span class="n">batch_sizes</span> <span class="o">=</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">256</span><span class="p">]</span>
-<span class="c1"># 2:4 sparsity require fp16, so we cast here for a fair comparison</span>
+<span class="c1"># 2:4 희소성은 fp16을 필요로 하므로, 공정한 비교를 위해 여기에서 캐스팅함</span>
 <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">autocast</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span><span class="p">):</span>
     <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
         <span class="n">predictions</span> <span class="o">=</span> <span class="n">trainer</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">tokenized_squad_dataset</span><span class="p">[</span><span class="s2">&quot;validation&quot;</span><span class="p">])</span>
@@ -1173,165 +845,29 @@ vs. BERT-large or fine-tuning hyperparameters.</p>
 <span class="n">df</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;step&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;loss&#39;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Loss vs. # steps&quot;</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s2">&quot;loss&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-pytb notranslate"><div class="highlight"><pre><span></span><span class="gt">Traceback (most recent call last):</span>
-  File <span class="nb">&quot;/workspace/tutorials-kr/advanced_source/semi_structured_sparse.py&quot;</span>, line <span class="m">466</span>, in <span class="n">&lt;module&gt;</span>
-<span class="w">    </span><span class="n">fp16_time</span> <span class="o">=</span> <span class="n">measure_execution_time</span><span class="p">(</span>
-  File <span class="nb">&quot;/workspace/tutorials-kr/advanced_source/semi_structured_sparse.py&quot;</span>, line <span class="m">384</span>, in <span class="n">measure_execution_time</span>
-<span class="w">    </span><span class="n">p50</span> <span class="o">=</span> <span class="n">timer</span><span class="o">.</span><span class="n">blocked_autorange</span><span class="p">()</span><span class="o">.</span><span class="n">median</span> <span class="o">*</span> <span class="mi">1000</span>
-  File <span class="nb">&quot;/usr/local/lib/python3.10/dist-packages/torch/utils/benchmark/utils/timer.py&quot;</span>, line <span class="m">372</span>, in <span class="n">blocked_autorange</span>
-<span class="w">    </span><span class="n">number</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_estimate_block_size</span><span class="p">(</span><span class="n">min_run_time</span><span class="p">)</span>
-  File <span class="nb">&quot;/usr/local/lib/python3.10/dist-packages/torch/utils/benchmark/utils/timer.py&quot;</span>, line <span class="m">319</span>, in <span class="n">_estimate_block_size</span>
-<span class="w">    </span><span class="n">time_taken</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_timeit</span><span class="p">(</span><span class="n">number</span><span class="p">)</span>
-  File <span class="nb">&quot;/usr/local/lib/python3.10/dist-packages/torch/utils/benchmark/utils/timer.py&quot;</span>, line <span class="m">264</span>, in <span class="n">_timeit</span>
-<span class="w">    </span><span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_timer</span><span class="o">.</span><span class="n">timeit</span><span class="p">(</span><span class="n">number</span><span class="p">),</span> <span class="mf">1e-9</span><span class="p">)</span>
-  File <span class="nb">&quot;/usr/lib/python3.10/timeit.py&quot;</span>, line <span class="m">178</span>, in <span class="n">timeit</span>
-<span class="w">    </span><span class="n">timing</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inner</span><span class="p">(</span><span class="n">it</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">timer</span><span class="p">)</span>
-  File <span class="nb">&quot;&lt;timeit-src&gt;&quot;</span>, line <span class="m">6</span>, in <span class="n">inner</span>
-  File <span class="nb">&quot;/usr/local/lib/python3.10/dist-packages/torch/nn/modules/module.py&quot;</span>, line <span class="m">1532</span>, in <span class="n">_wrapped_call_impl</span>
-<span class="w">    </span><span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_call_impl</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-  File <span class="nb">&quot;/usr/local/lib/python3.10/dist-packages/torch/nn/modules/module.py&quot;</span>, line <span class="m">1541</span>, in <span class="n">_call_impl</span>
-<span class="w">    </span><span class="k">return</span> <span class="n">forward_call</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-  File <span class="nb">&quot;/usr/local/lib/python3.10/dist-packages/torch/_dynamo/eval_frame.py&quot;</span>, line <span class="m">451</span>, in <span class="n">_fn</span>
-<span class="w">    </span><span class="k">return</span> <span class="n">fn</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-  File <span class="nb">&quot;/usr/local/lib/python3.10/dist-packages/torch/nn/modules/module.py&quot;</span>, line <span class="m">1532</span>, in <span class="n">_wrapped_call_impl</span>
-<span class="w">    </span><span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_call_impl</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-  File <span class="nb">&quot;/usr/local/lib/python3.10/dist-packages/torch/nn/modules/module.py&quot;</span>, line <span class="m">1541</span>, in <span class="n">_call_impl</span>
-<span class="w">    </span><span class="k">return</span> <span class="n">forward_call</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-  File <span class="nb">&quot;/usr/local/lib/python3.10/dist-packages/torch/_dynamo/convert_frame.py&quot;</span>, line <span class="m">921</span>, in <span class="n">catch_errors</span>
-<span class="w">    </span><span class="k">return</span> <span class="n">callback</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">cache_entry</span><span class="p">,</span> <span class="n">hooks</span><span class="p">,</span> <span class="n">frame_state</span><span class="p">,</span> <span class="n">skip</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-  File <span class="nb">&quot;/usr/local/lib/python3.10/dist-packages/torch/_dynamo/convert_frame.py&quot;</span>, line <span class="m">400</span>, in <span class="n">_convert_frame_assert</span>
-<span class="w">    </span><span class="k">return</span> <span class="n">_compile</span><span class="p">(</span>
-  File <span class="nb">&quot;/usr/lib/python3.10/contextlib.py&quot;</span>, line <span class="m">79</span>, in <span class="n">inner</span>
-<span class="w">    </span><span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">)</span>
-  File <span class="nb">&quot;/usr/local/lib/python3.10/dist-packages/torch/_dynamo/convert_frame.py&quot;</span>, line <span class="m">676</span>, in <span class="n">_compile</span>
-<span class="w">    </span><span class="n">guarded_code</span> <span class="o">=</span> <span class="n">compile_inner</span><span class="p">(</span><span class="n">code</span><span class="p">,</span> <span class="n">one_graph</span><span class="p">,</span> <span class="n">hooks</span><span class="p">,</span> <span class="n">transform</span><span class="p">)</span>
-  File <span class="nb">&quot;/usr/local/lib/python3.10/dist-packages/torch/_dynamo/utils.py&quot;</span>, line <span class="m">262</span>, in <span class="n">time_wrapper</span>
-<span class="w">    </span><span class="n">r</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-  File <span class="nb">&quot;/usr/local/lib/python3.10/dist-packages/torch/_dynamo/convert_frame.py&quot;</span>, line <span class="m">535</span>, in <span class="n">compile_inner</span>
-<span class="w">    </span><span class="n">out_code</span> <span class="o">=</span> <span class="n">transform_code_object</span><span class="p">(</span><span class="n">code</span><span class="p">,</span> <span class="n">transform</span><span class="p">)</span>
-  File <span class="nb">&quot;/usr/local/lib/python3.10/dist-packages/torch/_dynamo/bytecode_transformation.py&quot;</span>, line <span class="m">1036</span>, in <span class="n">transform_code_object</span>
-<span class="w">    </span><span class="n">transformations</span><span class="p">(</span><span class="n">instructions</span><span class="p">,</span> <span class="n">code_options</span><span class="p">)</span>
-  File <span class="nb">&quot;/usr/local/lib/python3.10/dist-packages/torch/_dynamo/convert_frame.py&quot;</span>, line <span class="m">165</span>, in <span class="n">_fn</span>
-<span class="w">    </span><span class="k">return</span> <span class="n">fn</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-  File <span class="nb">&quot;/usr/local/lib/python3.10/dist-packages/torch/_dynamo/convert_frame.py&quot;</span>, line <span class="m">500</span>, in <span class="n">transform</span>
-<span class="w">    </span><span class="n">tracer</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
-  File <span class="nb">&quot;/usr/local/lib/python3.10/dist-packages/torch/_dynamo/symbolic_convert.py&quot;</span>, line <span class="m">2149</span>, in <span class="n">run</span>
-<span class="w">    </span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
-  File <span class="nb">&quot;/usr/local/lib/python3.10/dist-packages/torch/_dynamo/symbolic_convert.py&quot;</span>, line <span class="m">810</span>, in <span class="n">run</span>
-<span class="w">    </span><span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
-  File <span class="nb">&quot;/usr/local/lib/python3.10/dist-packages/torch/_dynamo/symbolic_convert.py&quot;</span>, line <span class="m">773</span>, in <span class="n">step</span>
-<span class="w">    </span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inst</span><span class="o">.</span><span class="n">opname</span><span class="p">)(</span><span class="n">inst</span><span class="p">)</span>
-  File <span class="nb">&quot;/usr/local/lib/python3.10/dist-packages/torch/_dynamo/symbolic_convert.py&quot;</span>, line <span class="m">2268</span>, in <span class="n">RETURN_VALUE</span>
-<span class="w">    </span><span class="bp">self</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">compile_subgraph</span><span class="p">(</span>
-  File <span class="nb">&quot;/usr/local/lib/python3.10/dist-packages/torch/_dynamo/output_graph.py&quot;</span>, line <span class="m">1001</span>, in <span class="n">compile_subgraph</span>
-<span class="w">    </span><span class="bp">self</span><span class="o">.</span><span class="n">compile_and_call_fx_graph</span><span class="p">(</span><span class="n">tx</span><span class="p">,</span> <span class="n">pass2</span><span class="o">.</span><span class="n">graph_output_vars</span><span class="p">(),</span> <span class="n">root</span><span class="p">)</span>
-  File <span class="nb">&quot;/usr/lib/python3.10/contextlib.py&quot;</span>, line <span class="m">79</span>, in <span class="n">inner</span>
-<span class="w">    </span><span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">)</span>
-  File <span class="nb">&quot;/usr/local/lib/python3.10/dist-packages/torch/_dynamo/output_graph.py&quot;</span>, line <span class="m">1178</span>, in <span class="n">compile_and_call_fx_graph</span>
-<span class="w">    </span><span class="n">compiled_fn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">call_user_compiler</span><span class="p">(</span><span class="n">gm</span><span class="p">)</span>
-  File <span class="nb">&quot;/usr/local/lib/python3.10/dist-packages/torch/_dynamo/utils.py&quot;</span>, line <span class="m">262</span>, in <span class="n">time_wrapper</span>
-<span class="w">    </span><span class="n">r</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-  File <span class="nb">&quot;/usr/local/lib/python3.10/dist-packages/torch/_dynamo/output_graph.py&quot;</span>, line <span class="m">1251</span>, in <span class="n">call_user_compiler</span>
-<span class="w">    </span><span class="k">raise</span> <span class="n">BackendCompilerFailed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">compiler_fn</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="n">with_traceback</span><span class="p">(</span>
-  File <span class="nb">&quot;/usr/local/lib/python3.10/dist-packages/torch/_dynamo/output_graph.py&quot;</span>, line <span class="m">1232</span>, in <span class="n">call_user_compiler</span>
-<span class="w">    </span><span class="n">compiled_fn</span> <span class="o">=</span> <span class="n">compiler_fn</span><span class="p">(</span><span class="n">gm</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">example_inputs</span><span class="p">())</span>
-  File <span class="nb">&quot;/usr/local/lib/python3.10/dist-packages/torch/_dynamo/repro/after_dynamo.py&quot;</span>, line <span class="m">117</span>, in <span class="n">debug_wrapper</span>
-<span class="w">    </span><span class="n">compiled_gm</span> <span class="o">=</span> <span class="n">compiler_fn</span><span class="p">(</span><span class="n">gm</span><span class="p">,</span> <span class="n">example_inputs</span><span class="p">)</span>
-  File <span class="nb">&quot;/usr/local/lib/python3.10/dist-packages/torch/_dynamo/repro/after_dynamo.py&quot;</span>, line <span class="m">117</span>, in <span class="n">debug_wrapper</span>
-<span class="w">    </span><span class="n">compiled_gm</span> <span class="o">=</span> <span class="n">compiler_fn</span><span class="p">(</span><span class="n">gm</span><span class="p">,</span> <span class="n">example_inputs</span><span class="p">)</span>
-  File <span class="nb">&quot;/usr/local/lib/python3.10/dist-packages/torch/__init__.py&quot;</span>, line <span class="m">1731</span>, in <span class="n">__call__</span>
-<span class="w">    </span><span class="k">return</span> <span class="n">compile_fx</span><span class="p">(</span><span class="n">model_</span><span class="p">,</span> <span class="n">inputs_</span><span class="p">,</span> <span class="n">config_patches</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">)</span>
-  File <span class="nb">&quot;/usr/lib/python3.10/contextlib.py&quot;</span>, line <span class="m">79</span>, in <span class="n">inner</span>
-<span class="w">    </span><span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">)</span>
-  File <span class="nb">&quot;/usr/local/lib/python3.10/dist-packages/torch/_inductor/compile_fx.py&quot;</span>, line <span class="m">1330</span>, in <span class="n">compile_fx</span>
-<span class="w">    </span><span class="k">return</span> <span class="n">aot_autograd</span><span class="p">(</span>
-  File <span class="nb">&quot;/usr/local/lib/python3.10/dist-packages/torch/_dynamo/backends/common.py&quot;</span>, line <span class="m">58</span>, in <span class="n">compiler_fn</span>
-<span class="w">    </span><span class="n">cg</span> <span class="o">=</span> <span class="n">aot_module_simplified</span><span class="p">(</span><span class="n">gm</span><span class="p">,</span> <span class="n">example_inputs</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-  File <span class="nb">&quot;/usr/local/lib/python3.10/dist-packages/torch/_functorch/aot_autograd.py&quot;</span>, line <span class="m">903</span>, in <span class="n">aot_module_simplified</span>
-<span class="w">    </span><span class="n">compiled_fn</span> <span class="o">=</span> <span class="n">create_aot_dispatcher_function</span><span class="p">(</span>
-  File <span class="nb">&quot;/usr/local/lib/python3.10/dist-packages/torch/_dynamo/utils.py&quot;</span>, line <span class="m">262</span>, in <span class="n">time_wrapper</span>
-<span class="w">    </span><span class="n">r</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-  File <span class="nb">&quot;/usr/local/lib/python3.10/dist-packages/torch/_functorch/aot_autograd.py&quot;</span>, line <span class="m">628</span>, in <span class="n">create_aot_dispatcher_function</span>
-<span class="w">    </span><span class="n">compiled_fn</span> <span class="o">=</span> <span class="n">compiler_fn</span><span class="p">(</span><span class="n">flat_fn</span><span class="p">,</span> <span class="n">fake_flat_args</span><span class="p">,</span> <span class="n">aot_config</span><span class="p">,</span> <span class="n">fw_metadata</span><span class="o">=</span><span class="n">fw_metadata</span><span class="p">)</span>
-  File <span class="nb">&quot;/usr/local/lib/python3.10/dist-packages/torch/_functorch/_aot_autograd/runtime_wrappers.py&quot;</span>, line <span class="m">443</span>, in <span class="n">aot_wrapper_dedupe</span>
-<span class="w">    </span><span class="k">return</span> <span class="n">compiler_fn</span><span class="p">(</span><span class="n">flat_fn</span><span class="p">,</span> <span class="n">leaf_flat_args</span><span class="p">,</span> <span class="n">aot_config</span><span class="p">,</span> <span class="n">fw_metadata</span><span class="o">=</span><span class="n">fw_metadata</span><span class="p">)</span>
-  File <span class="nb">&quot;/usr/local/lib/python3.10/dist-packages/torch/_functorch/_aot_autograd/runtime_wrappers.py&quot;</span>, line <span class="m">648</span>, in <span class="n">aot_wrapper_synthetic_base</span>
-<span class="w">    </span><span class="k">return</span> <span class="n">compiler_fn</span><span class="p">(</span><span class="n">flat_fn</span><span class="p">,</span> <span class="n">flat_args</span><span class="p">,</span> <span class="n">aot_config</span><span class="p">,</span> <span class="n">fw_metadata</span><span class="o">=</span><span class="n">fw_metadata</span><span class="p">)</span>
-  File <span class="nb">&quot;/usr/local/lib/python3.10/dist-packages/torch/_functorch/_aot_autograd/jit_compile_runtime_wrappers.py&quot;</span>, line <span class="m">119</span>, in <span class="n">aot_dispatch_base</span>
-<span class="w">    </span><span class="n">compiled_fw</span> <span class="o">=</span> <span class="n">compiler</span><span class="p">(</span><span class="n">fw_module</span><span class="p">,</span> <span class="n">updated_flat_args</span><span class="p">)</span>
-  File <span class="nb">&quot;/usr/local/lib/python3.10/dist-packages/torch/_dynamo/utils.py&quot;</span>, line <span class="m">262</span>, in <span class="n">time_wrapper</span>
-<span class="w">    </span><span class="n">r</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-  File <span class="nb">&quot;/usr/local/lib/python3.10/dist-packages/torch/_inductor/compile_fx.py&quot;</span>, line <span class="m">1257</span>, in <span class="n">fw_compiler_base</span>
-<span class="w">    </span><span class="k">return</span> <span class="n">inner_compile</span><span class="p">(</span>
-  File <span class="nb">&quot;/usr/local/lib/python3.10/dist-packages/torch/_dynamo/repro/after_aot.py&quot;</span>, line <span class="m">83</span>, in <span class="n">debug_wrapper</span>
-<span class="w">    </span><span class="n">inner_compiled_fn</span> <span class="o">=</span> <span class="n">compiler_fn</span><span class="p">(</span><span class="n">gm</span><span class="p">,</span> <span class="n">example_inputs</span><span class="p">)</span>
-  File <span class="nb">&quot;/usr/local/lib/python3.10/dist-packages/torch/_inductor/debug.py&quot;</span>, line <span class="m">304</span>, in <span class="n">inner</span>
-<span class="w">    </span><span class="k">return</span> <span class="n">fn</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-  File <span class="nb">&quot;/usr/lib/python3.10/contextlib.py&quot;</span>, line <span class="m">79</span>, in <span class="n">inner</span>
-<span class="w">    </span><span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">)</span>
-  File <span class="nb">&quot;/usr/lib/python3.10/contextlib.py&quot;</span>, line <span class="m">79</span>, in <span class="n">inner</span>
-<span class="w">    </span><span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">)</span>
-  File <span class="nb">&quot;/usr/local/lib/python3.10/dist-packages/torch/_dynamo/utils.py&quot;</span>, line <span class="m">262</span>, in <span class="n">time_wrapper</span>
-<span class="w">    </span><span class="n">r</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-  File <span class="nb">&quot;/usr/local/lib/python3.10/dist-packages/torch/_inductor/compile_fx.py&quot;</span>, line <span class="m">438</span>, in <span class="n">compile_fx_inner</span>
-<span class="w">    </span><span class="n">compiled_graph</span> <span class="o">=</span> <span class="n">fx_codegen_and_compile</span><span class="p">(</span>
-  File <span class="nb">&quot;/usr/local/lib/python3.10/dist-packages/torch/_inductor/compile_fx.py&quot;</span>, line <span class="m">714</span>, in <span class="n">fx_codegen_and_compile</span>
-<span class="w">    </span><span class="n">compiled_fn</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">compile_to_fn</span><span class="p">()</span>
-  File <span class="nb">&quot;/usr/local/lib/python3.10/dist-packages/torch/_inductor/graph.py&quot;</span>, line <span class="m">1307</span>, in <span class="n">compile_to_fn</span>
-<span class="w">    </span><span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">compile_to_module</span><span class="p">()</span><span class="o">.</span><span class="n">call</span>
-  File <span class="nb">&quot;/usr/local/lib/python3.10/dist-packages/torch/_dynamo/utils.py&quot;</span>, line <span class="m">262</span>, in <span class="n">time_wrapper</span>
-<span class="w">    </span><span class="n">r</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-  File <span class="nb">&quot;/usr/local/lib/python3.10/dist-packages/torch/_inductor/graph.py&quot;</span>, line <span class="m">1254</span>, in <span class="n">compile_to_module</span>
-<span class="w">    </span><span class="n">mod</span> <span class="o">=</span> <span class="n">PyCodeCache</span><span class="o">.</span><span class="n">load_by_key_path</span><span class="p">(</span>
-  File <span class="nb">&quot;/usr/local/lib/python3.10/dist-packages/torch/_inductor/codecache.py&quot;</span>, line <span class="m">2160</span>, in <span class="n">load_by_key_path</span>
-<span class="w">    </span><span class="n">exec</span><span class="p">(</span><span class="n">code</span><span class="p">,</span> <span class="n">mod</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span> <span class="n">mod</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">)</span>
-  File <span class="nb">&quot;/tmp/torchinductor_root/qx/cqxpwpmbylgebn7m6itljuad5qjyvmgcmjlnag65ak2eiyu32npq.py&quot;</span>, line <span class="m">800</span>, in <span class="n">&lt;module&gt;</span>
-<span class="w">    </span><span class="n">async_compile</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="nb">globals</span><span class="p">())</span>
-  File <span class="nb">&quot;/usr/local/lib/python3.10/dist-packages/torch/_inductor/codecache.py&quot;</span>, line <span class="m">2715</span>, in <span class="n">wait</span>
-<span class="w">    </span><span class="n">scope</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
-  File <span class="nb">&quot;/usr/local/lib/python3.10/dist-packages/torch/_inductor/codecache.py&quot;</span>, line <span class="m">2522</span>, in <span class="n">result</span>
-<span class="w">    </span><span class="bp">self</span><span class="o">.</span><span class="n">future</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
-  File <span class="nb">&quot;/usr/lib/python3.10/concurrent/futures/_base.py&quot;</span>, line <span class="m">458</span>, in <span class="n">result</span>
-<span class="w">    </span><span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_result</span><span class="p">()</span>
-  File <span class="nb">&quot;/usr/lib/python3.10/concurrent/futures/_base.py&quot;</span>, line <span class="m">403</span>, in <span class="n">__get_result</span>
-<span class="w">    </span><span class="k">raise</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exception</span>
-<span class="gr">torch._dynamo.exc.BackendCompilerFailed</span>: <span class="n">backend=&#39;inductor&#39; raised:</span>
-<span class="x">CalledProcessError: Command &#39;[&#39;/usr/bin/gcc&#39;, &#39;/tmp/tmpkfpm1erd/main.c&#39;, &#39;-O3&#39;, &#39;-I/usr/local/lib/python3.10/dist-packages/triton/common/../third_party/cuda/include&#39;, &#39;-I/usr/include/python3.10&#39;, &#39;-I/tmp/tmpkfpm1erd&#39;, &#39;-shared&#39;, &#39;-fPIC&#39;, &#39;-lcuda&#39;, &#39;-o&#39;, &#39;/tmp/tmpkfpm1erd/triton_.cpython-310-x86_64-linux-gnu.so&#39;, &#39;-L/lib/x86_64-linux-gnu&#39;, &#39;-L/lib/x86_64-linux-gnu&#39;]&#39; returned non-zero exit status 1.</span>
-
-<span class="x">Set TORCH_LOGS=&quot;+dynamo&quot; and TORCHDYNAMO_VERBOSE=1 for more information</span>
-
-
-<span class="x">You can suppress this exception and fall back to eager by setting:</span>
-<span class="x">    import torch._dynamo</span>
-<span class="x">    torch._dynamo.config.suppress_errors = True</span>
-</pre></div>
-</div>
-<div class="section" id="pruning-bert-to-be-2-4-sparse">
-<h2>Pruning BERT to be 2:4 sparse<a class="headerlink" href="#pruning-bert-to-be-2-4-sparse" title="이 제목에 대한 퍼머링크">¶</a></h2>
-<p>Now that we have our baseline, it’s time we prune BERT. There are many
-different pruning strategies, but one of the most common is <strong>magnitude
-pruning</strong>, which seeks to remove the weights with the lowest L1 norm.
-Magnitude pruning was used by NVIDIA in all their results and is a
-common baseline.</p>
-<p>To do this, we will use the <code class="docutils literal notranslate"><span class="pre">torch.ao.pruning</span></code> package, which contains
-a weight-norm (magnitude) sparsifier. These sparsifiers work by applying
-mask parametrizations to the weight tensors in a model. This lets them
-simulate sparsity by masking out the pruned weights.</p>
-<p>We’ll also have to decide what layers of the model to apply sparsity to,
-which in this case is all of the <code class="docutils literal notranslate"><span class="pre">nn.Linear</span></code> layers, except for the
-task-specific head outputs. That’s because semi-structured sparsity has
-<a class="reference external" href="https://pytorch.org/docs/2.1/sparse.html#constructing-sparse-semi-structured-tensors">shape constraints</a>,
-and the task-specific <code class="docutils literal notranslate"><span class="pre">nn.Linear</span></code> layers do not satisfy them.</p>
+<div class="section" id="bert-2-4">
+<h2>BERT를 2:4 희소성으로 가지치기<a class="headerlink" href="#bert-2-4" title="이 제목에 대한 퍼머링크">¶</a></h2>
+<p>이제 기준 성능을 설정했으니, BERT를 가지치기할 차례입니다. 가지치기에는 여러 가지 전략이 있지만,
+가장 일반적인 방법 중 하나는 <a href="#id11"><span class="problematic" id="id12">**</span></a>크기 기반 가지치기**로, 이는 L1 norm이 가장
+낮은 가중치를 제거하는 방법입니다. NVIDIA는 모든 결과에서 크기 기반 가지치기를 사용했으며, 이는
+일반적인 기준 방법입니다.</p>
+<p>이를 위해 우리는 <code class="docutils literal notranslate"><span class="pre">torch.ao.pruning</span></code> 패키지를 사용할 것입니다. 이 패키지에는 가중치-norm 희소화
+도구가 포함되어 있습니다. 이러한 희소화 도구는 모델의 가중치 텐서에 마스크 매개변수화를 적용하여
+작동합니다. 이를 통해 가지치기된 가중치를 마스킹하여 희소성을 시뮬레이션할 수 있습니다.</p>
+<p>또한, 모델의 어느 레이어에 희소성을 적용할지 결정해야 합니다. 이 경우에는 각각의 테스크 헤드 출력을
+제외한 모든 <code class="docutils literal notranslate"><span class="pre">nn.Linear</span></code> 레이어에 적용합니다. 이는 반구조적 희소성(semi-structured sparsity)이
+<a class="reference external" href="https://pytorch.org/docs/2.1/sparse.html#constructing-sparse-semi-structured-tensors">형상 제약</a>
+을 가지기 때문이며, 각각의 task <code class="docutils literal notranslate"><span class="pre">nn.Linear</span></code> 레이어는 이러한 제약을 충족하지 않기 때문입니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sparsifier</span> <span class="o">=</span> <span class="n">WeightNormSparsifier</span><span class="p">(</span>
-    <span class="c1"># apply sparsity to all blocks</span>
+    <span class="c1"># 모든 블록에 희소성 적용</span>
     <span class="n">sparsity_level</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
-    <span class="c1"># shape of 4 elements is a block</span>
+    <span class="c1"># 4개의 요소가 하나의 블록의 형태</span>
     <span class="n">sparse_block_shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
-    <span class="c1"># two zeros for every block of 4</span>
+    <span class="c1"># 4개의 블록마다 두 개의 0이 포함됨</span>
     <span class="n">zeros_per_block</span><span class="o">=</span><span class="mi">2</span>
 <span class="p">)</span>
 
-<span class="c1"># add to config if ``nn.Linear`` and in the BERT model.</span>
+<span class="c1"># BERT 모델에 ``nn.Linear``가 있는 경우 설정에 추가</span>
 <span class="n">sparse_config</span> <span class="o">=</span> <span class="p">[</span>
     <span class="p">{</span><span class="s2">&quot;tensor_fqn&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">fqn</span><span class="si">}</span><span class="s2">.weight&quot;</span><span class="p">}</span>
     <span class="k">for</span> <span class="n">fqn</span><span class="p">,</span> <span class="n">module</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">named_modules</span><span class="p">()</span>
@@ -1339,22 +875,18 @@ and the task-specific <code class="docutils literal notranslate"><span class="pr
 <span class="p">]</span>
 </pre></div>
 </div>
-<p>The first step for pruning the model is to insert parametrizations for
-masking the weights of the model. This is done by the prepare step.
-Anytime we try to access the <code class="docutils literal notranslate"><span class="pre">.weight</span></code> we will get <code class="docutils literal notranslate"><span class="pre">mask</span> <span class="pre">*</span> <span class="pre">weight</span></code>
-instead.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Prepare the model, insert fake-sparsity parametrizations for training</span>
+<p>모델의 매개변수화는 첫 번째 단계는 모델의 가중치를 마스킹하기 위한 매개변수화를 삽입하는 것입니다.
+이는 준비 단계에서 수행됩니다. 이렇게 하면 <a href="#id14"><span class="problematic" id="id15">``</span></a>.weight``에 접근할 때마다 대신 <a href="#id16"><span class="problematic" id="id17">``</span></a>mask * weight``를
+얻게 됩니다.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># 모델을 준비하고, 학습을 위한 가짜 희소성 매개변수수화를 삽입합니다.</span>
 <span class="n">sparsifier</span><span class="o">.</span><span class="n">prepare</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">sparse_config</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">bert</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">layer</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">output</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Then, we’ll take a single pruning step. All pruners implement a
-<code class="docutils literal notranslate"><span class="pre">update_mask()</span></code> method that updates the mask with the logic being
-determined by the pruner implementation. The step method calls this
-<code class="docutils literal notranslate"><span class="pre">update_mask</span></code> functions for the weights specified in the sparse
-config.</p>
-<p>We will also evaluate the model to show the accuracy degradation of
-zero-shot pruning, or pruning without fine-tuning / retraining.</p>
+<p>그 다음, 단일 가지치기 단계를 수행합니다. 모든 가지치기 도구(pruner)는 가지치기 도구의 구현
+논리에 따라 마스크를 업데이트하는 <code class="docutils literal notranslate"><span class="pre">update_mask()</span></code> 메서드를 구현합니다. 이 단계 메서드는
+희소성 설정(sparse config)에서 지정된 가중치에 대해 이 <code class="docutils literal notranslate"><span class="pre">update_mask</span></code> 함수를 호출합니다.</p>
+<p>또한 모델을 평가하여 미세 조정/재학습 없이 가지치기(zero-shot) 또는 가지치기의 정확도 저하를 보여줄 것입니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sparsifier</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
 <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">autocast</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span><span class="p">):</span>
     <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
@@ -1367,11 +899,10 @@ zero-shot pruning, or pruning without fine-tuning / retraining.</p>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;pruned eval metrics:&quot;</span><span class="p">,</span> <span class="n">pruned</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>In this state, we can start fine-tuning the model, updating the elements
-that wouldn’t be pruned to better account for the accuracy loss. Once
-we’ve reached a satisfied state, we can call <code class="docutils literal notranslate"><span class="pre">squash_mask</span></code> to fuse the
-mask and the weight together. This will remove the parametrizations and
-we are left with a zeroed-out 2:4 dense model.</p>
+<p>이 상태에서 모델을 미세 조정(fine-tuning)하여 가지치기되지 않는 요소들을 업데이트하고, 정확도 손실을
+보완할 수 있습니다. 만족할 만한 상태에 도달하면, <a href="#id18"><span class="problematic" id="id19">``</span></a>squash_mask``를 호출하여 마스크와
+가중치를 하나로 결합할 수 있습니다. 이렇게 하면 매개변수화가 제거되고, 0으로 된 2:4 밀집
+모델이 남게 됩니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">trainer</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
 <span class="n">sparsifier</span><span class="o">.</span><span class="n">squash_mask</span><span class="p">()</span>
 <span class="n">torch</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">edgeitems</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
@@ -1382,12 +913,11 @@ we are left with a zeroed-out 2:4 dense model.</p>
 </pre></div>
 </div>
 </div>
-<div class="section" id="accelerating-2-4-sparse-models-for-inference">
-<h2>Accelerating 2:4 sparse models for inference<a class="headerlink" href="#accelerating-2-4-sparse-models-for-inference" title="이 제목에 대한 퍼머링크">¶</a></h2>
-<p>Now that we have a model in this format, we can accelerate it for
-inference just like in the QuickStart Guide.</p>
+<div class="section" id="id20">
+<h2>추론을 위한 2:4 희소 모델 가속화<a class="headerlink" href="#id20" title="이 제목에 대한 퍼머링크">¶</a></h2>
+<p>이제 이 형식의 모델을 얻었으므로, QuickStart 가이드에서처럼 추론을 위해 가속할 수 있습니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span><span class="o">.</span><span class="n">half</span><span class="p">()</span>
-<span class="c1"># accelerate for sparsity</span>
+<span class="c1"># 희소성을 위해 가속화</span>
 <span class="k">for</span> <span class="n">fqn</span><span class="p">,</span> <span class="n">module</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">named_modules</span><span class="p">():</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">)</span> <span class="ow">and</span> <span class="s2">&quot;layer&quot;</span> <span class="ow">in</span> <span class="n">fqn</span><span class="p">:</span>
         <span class="n">module</span><span class="o">.</span><span class="n">weight</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Parameter</span><span class="p">(</span><span class="n">to_sparse_semi_structured</span><span class="p">(</span><span class="n">module</span><span class="o">.</span><span class="n">weight</span><span class="p">))</span>
@@ -1410,106 +940,23 @@ inference just like in the QuickStart Guide.</p>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;sparse perf metrics: &quot;</span><span class="p">,</span> <span class="n">sparse_perf</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Retraining our model after magnitude pruning has recovered nearly all of
-the F1 that has been lost when the model was pruned. At the same time we
-have achieved a 1.28x speedup for <code class="docutils literal notranslate"><span class="pre">bs=16</span></code>. Note that not all shapes are
-amenable to performance improvements. When batch sizes are small and
-limited time is spent in compute sparse kernels may be slower than their
-dense counterparts.</p>
-<p>Because semi-structured sparsity is implemented as a tensor subclass, it
-is compatible with <code class="docutils literal notranslate"><span class="pre">torch.compile</span></code>. When composed with
-<code class="docutils literal notranslate"><span class="pre">to_sparse_semi_structured</span></code>, we are able to achieve a total 2x speedup
-on BERT.</p>
-<table class="docutils align-default">
-<colgroup>
-<col style="width: 29%" />
-<col style="width: 11%" />
-<col style="width: 20%" />
-<col style="width: 24%" />
-<col style="width: 16%" />
-</colgroup>
-<thead>
-<tr class="row-odd"><th class="head"><p>Metrics</p></th>
-<th class="head"><p>fp16</p></th>
-<th class="head"><p>2:4 sparse</p></th>
-<th class="head"><p>delta / speedup</p></th>
-<th class="head"><p>compiled</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>Exact Match (%)</p></td>
-<td><p>78.53</p></td>
-<td><p>78.44</p></td>
-<td><p>-0.09</p></td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><p>F1 (%)</p></td>
-<td><p>86.93</p></td>
-<td><p>86.49</p></td>
-<td><p>-0.44</p></td>
-<td></td>
-</tr>
-<tr class="row-even"><td><p>Time (bs=4)</p></td>
-<td><p>11.10</p></td>
-<td><p>15.54</p></td>
-<td><p>0.71x</p></td>
-<td><p>no</p></td>
-</tr>
-<tr class="row-odd"><td><p>Time (bs=16)</p></td>
-<td><p>19.35</p></td>
-<td><p>15.74</p></td>
-<td><p>1.23x</p></td>
-<td><p>no</p></td>
-</tr>
-<tr class="row-even"><td><p>Time (bs=64)</p></td>
-<td><p>72.71</p></td>
-<td><p>59.41</p></td>
-<td><p>1.22x</p></td>
-<td><p>no</p></td>
-</tr>
-<tr class="row-odd"><td><p>Time (bs=256)</p></td>
-<td><p>286.65</p></td>
-<td><p>247.63</p></td>
-<td><p>1.14x</p></td>
-<td><p>no</p></td>
-</tr>
-<tr class="row-even"><td><p>Time (bs=4)</p></td>
-<td><p>7.59</p></td>
-<td><p>7.46</p></td>
-<td><p>1.02x</p></td>
-<td><p>yes</p></td>
-</tr>
-<tr class="row-odd"><td><p>Time (bs=16)</p></td>
-<td><p>11.47</p></td>
-<td><p>9.68</p></td>
-<td><p>1.18x</p></td>
-<td><p>yes</p></td>
-</tr>
-<tr class="row-even"><td><p>Time (bs=64)</p></td>
-<td><p>41.57</p></td>
-<td><p>36.92</p></td>
-<td><p>1.13x</p></td>
-<td><p>yes</p></td>
-</tr>
-<tr class="row-odd"><td><p>Time (bs=256)</p></td>
-<td><p>159.22</p></td>
-<td><p>142.23</p></td>
-<td><p>1.12x</p></td>
-<td><p>yes</p></td>
-</tr>
-</tbody>
-</table>
+<p>크기 기반 가지치기 후 모델을 재학습한 결과, 가지치기 시 손실되었던 F1
+점수의 거의 대부분이 회복되었습니다. 동시에 <a href="#id21"><span class="problematic" id="id22">``</span></a>bs=16``의 배치 크기에서 1.28배의 속도 향상을
+달성했습니다. 하지만 모든 형상이 성능 향상에 적합한 것은 아닙니다. 배치 크기가 작고 계산에
+사용되는 시간이 제한적일 때는 희소 커널이 밀집 커널보다 더 느릴 수 있습니다.</p>
+<p>반구조적 희소성(semi-structured sparsity)은 텐서의 하위 클래스(subclass)로 구현되어 있기 때문에,
+<a href="#id23"><span class="problematic" id="id24">``</span></a>torch.compile``과 호환됩니다. <a href="#id25"><span class="problematic" id="id26">``</span></a>to_sparse_semi_structured``와 함께 사용하면 BERT에서 총
+2배의 속도 향상을 얻을 수 있습니다.</p>
 </div>
 </div>
-<div class="section" id="conclusion">
-<h1>Conclusion<a class="headerlink" href="#conclusion" title="이 제목에 대한 퍼머링크">¶</a></h1>
-<p>In this tutorial, we have shown how to prune BERT to be 2:4 sparse and
-how to accelerate a 2:4 sparse model for inference. By taking advantage
-of our <code class="docutils literal notranslate"><span class="pre">SparseSemiStructuredTensor</span></code> subclass, we were able to achieve a
-1.3x speedup over the fp16 baseline, and up to 2x with
-<code class="docutils literal notranslate"><span class="pre">torch.compile</span></code>. We also demonstrated the benefits of 2:4 sparsity by
-fine-tuning BERT to recover any lost F1 (86.92 dense vs 86.48 sparse).</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 7 minutes  48.616 seconds)</p>
+<div class="section" id="id27">
+<h1>결론<a class="headerlink" href="#id27" title="이 제목에 대한 퍼머링크">¶</a></h1>
+<p>이 튜토리얼에서는 BERT를 2:4 희소성으로 가지치기하는 방법과 2:4 희소 모델을 추론용으로 가속하는
+방법을 보여주었습니다. <code class="docutils literal notranslate"><span class="pre">SparseSemiStructuredTensor</span></code> 하위 클래스를 활용하여 fp16 기준 성능에
+비해 1.3배의 속도 향상을 달성했으며, <a href="#id28"><span class="problematic" id="id29">``</span></a>torch.compile``을 사용하면 최대 2배까지 속도 향상을 이룰
+수 있었습니다. 또한, BERT를 미세 조정하여 손실된 F1 점수(밀집 모델: 86.92 vs 희소 모델: 86.48)를
+회복하는 과정에서 2:4 희소성의 이점을 입증했습니다.</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  1.553 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-advanced-semi-structured-sparse-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/5508d56677e1ebd9b3560596e7e41f57/semi_structured_sparse.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">semi_structured_sparse.py</span></code></a></p>
@@ -1523,12 +970,12 @@ fine-tuning BERT to recover any lost F1 (86.92 dense vs 86.48 sparse).</p>
 
 
              </article>
-
+             
             </div>
             <footer>
+  
 
-
-
+  
     <hr class="community-hr hr-top" />
     <div class="community-container">
       <div class="community-prompt">더 궁금하시거나 개선할 내용이 있으신가요? 커뮤니티에 참여해보세요!</div>
@@ -1548,7 +995,7 @@ fine-tuning BERT to recover any lost F1 (86.92 dense vs 86.48 sparse).</p>
       </div>
     </div>
     <hr class="rating-hr hr-bottom"/>
-
+  
 
   <div role="contentinfo">
     <p>
@@ -1556,11 +1003,11 @@ fine-tuning BERT to recover any lost F1 (86.92 dense vs 86.48 sparse).</p>
 
     </p>
   </div>
-
+    
       <div>
         Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
       </div>
-
+     
 
 </footer>
 
@@ -1578,19 +1025,19 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
           <div class="pytorch-right-menu" id="pytorch-right-menu">
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
-<li><a class="reference internal" href="#">(beta) Accelerating BERT with semi-structured (2:4) sparsity</a><ul>
-<li><a class="reference internal" href="#overview">Overview</a></li>
-<li><a class="reference internal" href="#requirements">Requirements</a></li>
-<li><a class="reference internal" href="#what-problem-does-semi-structured-sparsity-solve">What problem does semi-structured sparsity solve?</a></li>
-<li><a class="reference internal" href="#intro-setup">Intro &amp; Setup</a></li>
+<li><a class="reference internal" href="#">(beta) 반구조적 (2:4) 희소성을 통한 BERT 가속화</a><ul>
+<li><a class="reference internal" href="#id2">개요</a></li>
+<li><a class="reference internal" href="#id6">요구사항</a></li>
+<li><a class="reference internal" href="#id7">반구조적 희소성은 어떤 문제를 해결하는가?</a></li>
+<li><a class="reference internal" href="#id9">소개 &amp; 설정</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#establishing-a-baseline">Establishing a baseline</a><ul>
-<li><a class="reference internal" href="#pruning-bert-to-be-2-4-sparse">Pruning BERT to be 2:4 sparse</a></li>
-<li><a class="reference internal" href="#accelerating-2-4-sparse-models-for-inference">Accelerating 2:4 sparse models for inference</a></li>
+<li><a class="reference internal" href="#id10">기준 성능 설정</a><ul>
+<li><a class="reference internal" href="#bert-2-4">BERT를 2:4 희소성으로 가지치기</a></li>
+<li><a class="reference internal" href="#id20">추론을 위한 2:4 희소 모델 가속화</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#conclusion">Conclusion</a></li>
+<li><a class="reference internal" href="#id27">결론</a></li>
 </ul>
 
             </div>
@@ -1599,12 +1046,12 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
       </section>
     </div>
 
+  
 
 
-
-
-
-
+  
+  
+     
        <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
          <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
          <script src="../_static/jquery.js"></script>
@@ -1618,8 +1065,8 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
          <script src="../_static/auto-render.min.js"></script>
          <script src="../_static/katex_autorenderer.js"></script>
          <script src="../_static/design-tabs.js"></script>
-
-
+     
+  
 
   <script type="text/javascript" src="../_static/js/vendor/popper.min.js"></script>
   <script type="text/javascript" src="../_static/js/vendor/bootstrap.min.js"></script>
@@ -1631,11 +1078,8 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
           SphinxRtdTheme.Navigation.enable(true);
       });
   </script>
-
+ 
 <script>
-// Helper function to make it easier to call dataLayer.push()
-function gtag(){window.dataLayer.push(arguments);}
-
 //add microsoft link
 if(window.location.href.indexOf("/beginner/basics/")!= -1)
 {

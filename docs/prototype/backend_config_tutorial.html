@@ -10,38 +10,38 @@
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://tutorials.pytorch.kr/prototype/backend_config_tutorial.html" />
 <meta property="og:site_name" content="PyTorch Tutorials KR" />
-<meta property="og:description" content="Author: Andrew Or The BackendConfig API enables developers to integrate their backends with PyTorch quantization. It is currently only supported in FX graph mode quantization, but support may be extended to other modes of quantization in the future. In this tutorial, we will demonstrate how to us..." />
+<meta property="og:description" content="저자: Andrew Or 번역: 장승호 BackendConfig API를 통해 백엔드 환경에서 PyTorch 양자화를 사용할 수 있습니다. 기존 환경에서는 FX 그래프 모드 양자화 만을 사용할 수 있지만 추후에는 다른 모드 또한 지원 할 예정입니다. 본 튜토리얼에서는 특정 백엔드 환경에서 양자화 기능을 커스터마이징하기 위해 BackendConfig API를 사용하는 방법에 대해 다룹니다. BackendConfig가 만들어진 동기와 구현 방법에 대한 세부정보를 알고 싶으시다면 아래 사이트를 참고하세요. README. 여러분이 P..." />
 <meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
 <meta property="og:image:alt" content="PyTorch Tutorials KR" />
-<meta name="description" content="Author: Andrew Or The BackendConfig API enables developers to integrate their backends with PyTorch quantization. It is currently only supported in FX graph mode quantization, but support may be extended to other modes of quantization in the future. In this tutorial, we will demonstrate how to us..." />
+<meta name="description" content="저자: Andrew Or 번역: 장승호 BackendConfig API를 통해 백엔드 환경에서 PyTorch 양자화를 사용할 수 있습니다. 기존 환경에서는 FX 그래프 모드 양자화 만을 사용할 수 있지만 추후에는 다른 모드 또한 지원 할 예정입니다. 본 튜토리얼에서는 특정 백엔드 환경에서 양자화 기능을 커스터마이징하기 위해 BackendConfig API를 사용하는 방법에 대해 다룹니다. BackendConfig가 만들어진 동기와 구현 방법에 대한 세부정보를 알고 싶으시다면 아래 사이트를 참고하세요. README. 여러분이 P..." />
 <meta property="og:ignore_canonical" content="true" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+  
   <title>(prototype) PyTorch BackendConfig Tutorial &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
+  
 
-
-
-
+  
+  
     <link rel="shortcut icon" href="../_static/favicon.ico"/>
+  
+  
+  
 
+  
 
+  
+  
+    
 
-
-
-
-
-
-
-
-
+  
 
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!-- <link rel="stylesheet" href="../_static/pygments.css" type="text/css" /> -->
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css" type="text/css" />
   <link rel="stylesheet" href="../_static/katex-math.css" type="text/css" />
   <link rel="stylesheet" href="../_static/sg_gallery.css" type="text/css" />
   <link rel="stylesheet" href="../_static/sg_gallery-binder.css" type="text/css" />
@@ -52,9 +52,9 @@
   <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/custom2.css" type="text/css" />
     <link rel="index" title="색인" href="../genindex.html" />
-    <link rel="search" title="검색" href="../search.html" />
+    <link rel="search" title="검색" href="../search.html" /> 
 
-
+  
   <script src="../_static/js/modernizr.min.js"></script>
 
   <!-- Preload the theme fonts -->
@@ -111,9 +111,9 @@
 
 <body class="pytorch-body">
 
+   
 
-
-
+    
 
     <div class="table-of-contents-link-wrapper">
       <span>Table of Contents</span>
@@ -124,21 +124,21 @@
       <div class="pytorch-side-scroll">
         <div class="pytorch-menu pytorch-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           <div class="pytorch-left-menu-search">
+            
 
-
-
-
-
+            
+              
+              
                 <div class="version">
-                  2.3.1+cu121
+                  2.3.1
                 </div>
+              
+            
+
+            
 
 
-
-
-
-
-
+  
 
 
 <div role="search">
@@ -149,15 +149,15 @@
   </form>
 </div>
 
-
+            
           </div>
 
-
-
-
-
-
-
+          
+            
+            
+              
+            
+            
               <p class="caption" role="heading"><span class="caption-text">파이토치(PyTorch) 레시피</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../recipes/recipes_index.html">모든 레시피 보기</a></li>
@@ -182,7 +182,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/tensors_deeper_tutorial.html">Pytorch Tensor 소개</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/autogradyt_tutorial.html">The Fundamentals of Autograd</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/modelsyt_tutorial.html">Building Models with PyTorch</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/tensorboardyt_tutorial.html">PyTorch TensorBoard Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/tensorboardyt_tutorial.html">PyTorch TensorBoard 지원</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/trainingyt.html">Training with PyTorch</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/captumyt.html">Model Understanding with Captum</a></li>
 </ul>
@@ -200,7 +200,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../beginner/fgsm_tutorial.html">적대적 예제 생성(Adversarial Example Generation)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/dcgan_faces_tutorial.html">DCGAN 튜토리얼</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/vt_tutorial.html">배포를 위해 비전 트랜스포머(Vision Transformer) 모델 최적화하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/tiatoolbox_tutorial.html">Whole Slide Image Classification Using PyTorch and TIAToolbox</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/tiatoolbox_tutorial.html">Pytorch와 TIAToolbox를 사용한 전체 슬라이드 이미지(Whole Slide Image) 분류</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">오디오</span></p>
 <ul>
@@ -209,20 +209,20 @@
 <li class="toctree-l1"><a class="reference internal" href="../beginner/audio_data_augmentation_tutorial.html">Audio Data Augmentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/audio_datasets_tutorial.html">Audio Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/audio_datasets_tutorial.html">오디오 데이터셋</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/speech_recognition_pipeline_tutorial.html">Speech Recognition with Wav2Vec2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/text_to_speech_with_torchaudio.html">Text-to-speech with Tacotron2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/forced_alignment_with_torchaudio_tutorial.html">wav2vec2을 이용한 강제 정렬</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">텍스트</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/bettertransformer_tutorial.html">Fast Transformer Inference with Better Transformer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/bettertransformer_tutorial.html">Better Transformer를 이용한 고속 트랜스포머 추론</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/char_rnn_classification_tutorial.html">기초부터 시작하는 NLP: 문자-단위 RNN으로 이름 분류하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/char_rnn_generation_tutorial.html">기초부터 시작하는 NLP:  문자-단위 RNN으로 이름 생성하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/seq2seq_translation_tutorial.html">기초부터 시작하는 NLP: Sequence to Sequence 네트워크와 Attention을 이용한 번역</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/text_sentiment_ngrams_tutorial.html">torchtext 라이브러리로 텍스트 분류하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/translation_transformer.html"><code class="docutils literal notranslate"><span class="pre">nn.Transformer</span></code> 와 torchtext로 언어 번역하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/torchtext_custom_dataset_tutorial.html">Preprocess custom text dataset using Torchtext</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/torchtext_custom_dataset_tutorial.html">TorchText를 사용하여 사용자 정의 글 데이터셋 전처리하기</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">백엔드</span></p>
 <ul>
@@ -247,8 +247,8 @@
 <p class="caption" role="heading"><span class="caption-text">PyTorch 프로파일링</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/profiler.html">PyTorch 모듈 프로파일링하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/hta_intro_tutorial.html">Introduction to Holistic Trace Analysis</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/hta_trace_diff_tutorial.html">Trace Diff using Holistic Trace Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/hta_intro_tutorial.html">전체론적(Holistic Trace Analysis) 추적 분석 소개</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/hta_trace_diff_tutorial.html">종합적 분석을 이용한 트레이스 차이 분석</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Code Transforms with FX</span></p>
 <ul>
@@ -305,11 +305,11 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../distributed/home.html">Distributed and Parallel Training Tutorials</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/dist_overview.html">PyTorch Distributed Overview</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/ddp_series_intro.html">Distributed Data Parallel in PyTorch - Video Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/ddp_series_intro.html">PyTorch의 분산 데이터 병렬 처리 - 비디오 튜토리얼</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/model_parallel_tutorial.html">단일 머신을 사용한 모델 병렬화 모범 사례</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/ddp_tutorial.html">분산 데이터 병렬 처리 시작하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/dist_tuto.html">PyTorch로 분산 어플리케이션 개발하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/FSDP_tutorial.html">Getting Started with Fully Sharded Data Parallel(FSDP)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/FSDP_tutorial.html">Fully Sharded Data Parallel(FSDP) 시작하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/FSDP_adavnced_tutorial.html">Advanced Model Training with Fully Sharded Data Parallel (FSDP)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/TP_tutorial.html">Large Scale Transformer model training with Tensor Parallel (TP)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/process_group_cpp_extension_tutorial.html">Cpp 확장을 사용한 프로세스 그룹 백엔드 사용자 정의</a></li>
@@ -340,8 +340,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../beginner/flava_finetuning_tutorial.html">TorchMultimodal 튜토리얼: FLAVA 미세조정</a></li>
 </ul>
 
-
-
+            
+          
         </div>
       </div>
     </nav>
@@ -349,7 +349,7 @@
     <div class="pytorch-container">
       <div class="pytorch-page-level-bar" id="pytorch-page-level-bar">
         <div class="pytorch-breadcrumbs-wrapper">
-
+          
 
 
 
@@ -368,30 +368,30 @@
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="pytorch-breadcrumbs">
-
+    
       <li>
         <a href="../index.html">
-
+          
             Tutorials
-
+          
         </a> &gt;
       </li>
 
-
+        
       <li>(prototype) PyTorch BackendConfig Tutorial</li>
-
-
+    
+    
       <li class="pytorch-breadcrumbs-aside">
-
-
+        
+            
             <a href="../_sources/prototype/backend_config_tutorial.rst.txt" rel="nofollow"><img src="../_static/images/view-page-source-icon.svg"></a>
-
-
+          
+        
       </li>
-
+    
   </ul>
 
-
+  
 </div>
         </div>
 
@@ -403,7 +403,7 @@
       <section data-toggle="wy-nav-shift" id="pytorch-content-wrap" class="pytorch-content-wrap">
         <div class="pytorch-content-left">
 
-
+        
 
           <div class="pytorch-call-to-action-links">
             <div id="tutorial-type">prototype/backend_config_tutorial</div>
@@ -425,30 +425,30 @@
             </div>
           </div>
 
+        
 
-
-
+          
           <div class="rst-content">
-
+          
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
-
+              
   <div class="section" id="prototype-pytorch-backendconfig-tutorial">
 <h1>(prototype) PyTorch BackendConfig Tutorial<a class="headerlink" href="#prototype-pytorch-backendconfig-tutorial" title="이 제목에 대한 퍼머링크">¶</a></h1>
-<p><strong>Author</strong>: <a class="reference external" href="https://github.com/andrewor14">Andrew Or</a></p>
-<p>The BackendConfig API enables developers to integrate their backends
-with PyTorch quantization. It is currently only supported in FX graph
-mode quantization, but support may be extended to other modes of
-quantization in the future. In this tutorial, we will demonstrate how to
-use this API to customize quantization support for specific backends.
-For more information on the motivation and implementation details behind
-BackendConfig, please refer to this
+<p><strong>저자</strong>: <a class="reference external" href="https://github.com/andrewor14">Andrew Or</a>
+<strong>번역</strong>: <a class="reference external" href="https://github.com/jason9865">장승호</a></p>
+<p>BackendConfig API를 통해 백엔드 환경에서 PyTorch 양자화를 사용할 수 있습니다.
+기존 환경에서는 FX 그래프 모드 양자화 만을 사용할 수 있지만
+추후에는 다른 모드 또한 지원 할 예정입니다.
+본 튜토리얼에서는 특정 백엔드 환경에서 양자화 기능을 커스터마이징하기 위해
+BackendConfig API를 사용하는 방법에 대해 다룹니다.
+BackendConfig가 만들어진 동기와 구현 방법에 대한 세부정보를 알고 싶으시다면
+아래 사이트를 참고하세요.
 <a class="reference external" href="https://github.com/pytorch/pytorch/tree/master/torch/ao/quantization/backend_config">README</a>.</p>
-<p>Suppose we are a backend developer and we wish to integrate our backend
-with PyTorch’s quantization APIs. Our backend consists of two ops only:
-quantized linear and quantized conv-relu. In this section, we will walk
-through how to achieve this by quantizing an example model using a custom
-BackendConfig through <cite>prepare_fx</cite> and <cite>convert_fx</cite>.</p>
+<p>여러분이 PyTorch의 양자화 API를 백엔드 환경에서 사용하고 싶어하는 백엔드 개발자라고 가정해봅시다.
+백엔드 환경에서 사용할 수 있는 선택지는 양자화된 선형(Linear) 연산자와 합성곱(Convolution) ReLU 연산자가 있습니다.
+이번 장에서는 <a href="#id2"><span class="problematic" id="id3">`</span></a>prepare_fx`와 <a href="#id4"><span class="problematic" id="id5">`</span></a>convert_fx`를 통해 커스텀 BackendConfig를 만들고,
+이를 활용하여 예시 모델을 양자화하여 백엔드 환경을 구축하는 방법에 대해 살펴보겠습니다.</p>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">from</span> <span class="nn">torch.ao.quantization</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">default_weight_observer</span><span class="p">,</span>
@@ -467,31 +467,29 @@ BackendConfig through <cite>prepare_fx</cite> and <cite>convert_fx</cite>.</p>
 <span class="kn">from</span> <span class="nn">torch.ao.quantization.quantize_fx</span> <span class="kn">import</span> <span class="n">prepare_fx</span><span class="p">,</span> <span class="n">convert_fx</span>
 </pre></div>
 </div>
-<div class="section" id="derive-reference-pattern-for-each-quantized-operator">
-<h2>1. Derive reference pattern for each quantized operator<a class="headerlink" href="#derive-reference-pattern-for-each-quantized-operator" title="이 제목에 대한 퍼머링크">¶</a></h2>
-<p>For quantized linear, suppose our backend expects the reference pattern
-<cite>[dequant - fp32_linear - quant]</cite> and lowers it into a single quantized
-linear op. The way to achieve this is to first insert quant-dequant ops
-before and after the float linear op, such that we produce the following
-reference model:</p>
+<div class="section" id="id6">
+<h2>1. 양자화된 연산자를 위한 참조 패턴 유도하기<a class="headerlink" href="#id6" title="이 제목에 대한 퍼머링크">¶</a></h2>
+<p>양자화된 선형연산자를 위해 백엔드 환경에서는 <cite>[dequant - fp32_linear - quant]</cite> 참조 패턴을
+양자화된 단일 선형 연산자로 축소하여 사용한다고 가정합시다.
+이를 위해 우선 quant-dequant연산자를 부동소수점 선형 연산자 앞 뒤로 삽입하여
+아래와 같은 추론 모델을 만들 수 있습니다.:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">quant1</span> <span class="o">-</span> <span class="p">[</span><span class="n">dequant1</span> <span class="o">-</span> <span class="n">fp32_linear</span> <span class="o">-</span> <span class="n">quant2</span><span class="p">]</span> <span class="o">-</span> <span class="n">dequant2</span>
 </pre></div>
 </div>
-<p>Similarly, for quantized conv-relu, we wish to produce the following
-reference model, where the reference pattern in the square brackets will
-be lowered into a single quantized conv-relu op:</p>
+<p>이와 유사하게 양자화된 합성곱 ReLU 연산자를 만들기 위해서는
+대괄호 안에 있는 참조패턴을 하나의 양자화된 합성곱 ReLU 연산자로 변환하여 사용합니다.:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">quant1</span> <span class="o">-</span> <span class="p">[</span><span class="n">dequant1</span> <span class="o">-</span> <span class="n">fp32_conv_relu</span> <span class="o">-</span> <span class="n">quant2</span><span class="p">]</span> <span class="o">-</span> <span class="n">dequant2</span>
 </pre></div>
 </div>
 </div>
-<div class="section" id="set-dtypeconfigs-with-backend-constraints">
-<h2>2. Set DTypeConfigs with backend constraints<a class="headerlink" href="#set-dtypeconfigs-with-backend-constraints" title="이 제목에 대한 퍼머링크">¶</a></h2>
-<p>In the reference patterns above, the input dtype specified in the
-DTypeConfig will be passed as the dtype argument to quant1, while the
-output dtype will be passed as the dtype argument to quant2. If the output
-dtype is fp32, as in the case of dynamic quantization, then the output
-quant-dequant pair will not be inserted. This example also shows how to
-specify restrictions on quantization and scale ranges on a particular dtype.</p>
+<div class="section" id="dtypeconfig">
+<h2>2. 백엔드 환경 제약조건을 DTypeConfig로 설정하기<a class="headerlink" href="#dtypeconfig" title="이 제목에 대한 퍼머링크">¶</a></h2>
+<p>앞서 언급한 추론 패턴에서 DTypeConfig에 명시된 입력값의 데이터 타입은
+quant1 변수의 데이터 타입 인자로, 출력값의 데이터 타입은 quant2 변수의
+데이터 타입 인자로 전달됩니다. 동적 양자화(dynamic quantization)의 경우,
+출력값의 데이터 타입이 fp32일 경우 출력값의 quant-dequant 쌍은 삽입되지 않습니다.
+아래 예제 코드에서 양자화 시 필요한 제약조건을 나타내고
+특정 데이터 타입의 범위를 지정하는 방법을 확인할 수 있습니다.</p>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">quint8_with_constraints</span> <span class="o">=</span> <span class="n">DTypeWithConstraints</span><span class="p">(</span>
     <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">quint8</span><span class="p">,</span>
     <span class="n">quant_min_lower_bound</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
@@ -508,31 +506,29 @@ specify restrictions on quantization and scale ranges on a particular dtype.</p>
 </pre></div>
 </div>
 </div>
-<div class="section" id="set-up-fusion-for-conv-relu">
-<h2>3. Set up fusion for conv-relu<a class="headerlink" href="#set-up-fusion-for-conv-relu" title="이 제목에 대한 퍼머링크">¶</a></h2>
-<p>Note that the original user model contains separate conv and relu ops,
-so we need to first fuse the conv and relu ops into a single conv-relu
-op (<cite>fp32_conv_relu</cite>), and then quantize this op similar to how the linear
-op is quantized. We can set up fusion by defining a function that accepts
-3 arguments, where the first is whether or not this is for QAT, and the
-remaining arguments refer to the individual items of the fused pattern.</p>
+<div class="section" id="relu-fusion">
+<h2>3. 합성곱 ReLU 결합(fusion)하기<a class="headerlink" href="#relu-fusion" title="이 제목에 대한 퍼머링크">¶</a></h2>
+<p>초기 사용자 모델에서는 합성곱 연산자와 ReLU 연산자가 분리되어 있습니다.
+따라서 먼저 합성곱 연산자와 ReLU 연산자를 결합하여 하나의 합성곱-ReLU연산자를 만든 후
+선형 연산자를 양자화한 것과 유사하게 합성곱-ReLU 연산자를 양자화를 진행합니다.
+이 때 3개의 인자를 갖는 함수를 정의합니다. 첫번째 인자는 QAT이 적용되는지 여부를 나타내며
+나머지 2개의 인자는 결합된 패턴의 개별 요소(여기서는 합성곱 연산자와 ReLU)를 가리킵니다.</p>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">fuse_conv2d_relu</span><span class="p">(</span><span class="n">is_qat</span><span class="p">,</span> <span class="n">conv</span><span class="p">,</span> <span class="n">relu</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Return a fused ConvReLU2d from individual conv and relu modules.&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">ao</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">intrinsic</span><span class="o">.</span><span class="n">ConvReLU2d</span><span class="p">(</span><span class="n">conv</span><span class="p">,</span> <span class="n">relu</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
-<div class="section" id="define-the-backendconfig">
-<h2>4. Define the BackendConfig<a class="headerlink" href="#define-the-backendconfig" title="이 제목에 대한 퍼머링크">¶</a></h2>
-<p>Now we have all the necessary pieces, so we go ahead and define our
-BackendConfig. Here we use different observers (will be renamed) for
-the input and output for the linear op, so the quantization params
-passed to the two quantize ops (quant1 and quant2) will be different.
-This is commonly the case for weighted ops like linear and conv.</p>
-<p>For the conv-relu op, the observation type is the same. However, we
-need two BackendPatternConfigs to support this op, one for fusion
-and one for quantization. For both conv-relu and linear, we use the
-DTypeConfig defined above.</p>
+<div class="section" id="backendconfig">
+<h2>4. BackendConfig 정의하기<a class="headerlink" href="#backendconfig" title="이 제목에 대한 퍼머링크">¶</a></h2>
+<p>이제 필요한 것은 모두 준비가 되었으니 BackendConfig를 정의해봅시다.
+선형 연산자의 입력값과 출력값에 대해 서로 다른 observer(명칭은 추후 변경 예정)를 사용합니다.
+이를 통해 양자화 매개변수가 서로 다른 양자화 연산자(quant1과 quant2)를 거치며
+이와 같은 방식은 선형 연산이나 합성곱 연산과 같이 가중치를 사용하는 연산에서
+일반적으로 사용합니다.</p>
+<p>합성곱-ReLU 연산자의 경우 observation의 타입은 동일합니다.
+하지만 BackendPatternConfig의 경우 결합과 양자화에 사용하기 위해 2개가 필요합니다.
+합성곱-ReLU와 선형 연산자에는 앞서 정의한 DTypeConfig를 활용합니다.</p>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">linear_config</span> <span class="o">=</span> <span class="n">BackendPatternConfig</span><span class="p">()</span> \
     <span class="o">.</span><span class="n">set_pattern</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">)</span> \
     <span class="o">.</span><span class="n">set_observation_type</span><span class="p">(</span><span class="n">ObservationType</span><span class="o">.</span><span class="n">OUTPUT_USE_DIFFERENT_OBSERVER_AS_INPUT</span><span class="p">)</span> \
@@ -565,19 +561,17 @@ DTypeConfig defined above.</p>
 </pre></div>
 </div>
 </div>
-<div class="section" id="set-up-qconfigmapping-that-satisfies-the-backend-constraints">
-<h2>5. Set up QConfigMapping that satisfies the backend constraints<a class="headerlink" href="#set-up-qconfigmapping-that-satisfies-the-backend-constraints" title="이 제목에 대한 퍼머링크">¶</a></h2>
-<p>In order to use the ops defined above, the user must define a QConfig
-that satisfies the constraints specified in the DTypeConfig. For more
-detail, see the documentation for <a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.ao.quantization.backend_config.DTypeConfig.html">DTypeConfig</a>.
-We will then use this QConfig for all the modules used in the patterns
-we wish to quantize.</p>
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Note: Here we use a quant_max of 127, but this could be up to 255 (see `quint8_with_constraints`)</span>
+<div class="section" id="qconfigmapping">
+<h2>5. 백엔드 환경 제약조건을 만족시키는 QConfigMapping 설정하기<a class="headerlink" href="#qconfigmapping" title="이 제목에 대한 퍼머링크">¶</a></h2>
+<p>앞서 정의한 연산자를 사용하기 위해서는 DTypeConfig의 제약조건을 만족하는
+QConfig를 정의해야합니다. 자세한 내용은 <a href="#id7"><span class="problematic" id="id8">`</span></a>DTypeConfig &lt;<a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.ao.quantization.backend_config.DTypeConfig.html">https://pytorch.org/docs/stable/generated/torch.ao.quantization.backend_config.DTypeConfig.html</a>&gt;`__을 참고하세요.
+그리고 양자화하려는 패턴들에 사용되는 모든 모듈에 QConfig를 사용합니다.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 주의 : quant_max 값은 127이지만 추후 255까지 늘어날 수 있습니다.(`quint8_with_constraints`를 참고하세요)</span>
 <span class="n">activation_observer</span> <span class="o">=</span> <span class="n">MinMaxObserver</span><span class="o">.</span><span class="n">with_args</span><span class="p">(</span><span class="n">quant_min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">quant_max</span><span class="o">=</span><span class="mi">127</span><span class="p">,</span> <span class="n">eps</span><span class="o">=</span><span class="mi">2</span> <span class="o">**</span> <span class="o">-</span><span class="mi">12</span><span class="p">)</span>
 <span class="n">qconfig</span> <span class="o">=</span> <span class="n">QConfig</span><span class="p">(</span><span class="n">activation</span><span class="o">=</span><span class="n">activation_observer</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="n">default_weight_observer</span><span class="p">)</span>
 
-<span class="c1"># Note: All individual items of a fused pattern, e.g. Conv2d and ReLU in</span>
-<span class="c1"># (Conv2d, ReLU), must have the same QConfig</span>
+<span class="c1"># 주의 : (Conv2d, ReLU) 내부 Conv2d와 ReLU와 같은 결합된 패턴의 모든 개별 요소들은</span>
+<span class="c1"># 반드시 같은 QConfig여야합니다.</span>
 <span class="n">qconfig_mapping</span> <span class="o">=</span> <span class="n">QConfigMapping</span><span class="p">()</span> \
     <span class="o">.</span><span class="n">set_object_type</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">,</span> <span class="n">qconfig</span><span class="p">)</span> \
     <span class="o">.</span><span class="n">set_object_type</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">,</span> <span class="n">qconfig</span><span class="p">)</span> \
@@ -586,11 +580,10 @@ we wish to quantize.</p>
 </pre></div>
 </div>
 </div>
-<div class="section" id="quantize-the-model-through-prepare-and-convert">
-<h2>6. Quantize the model through prepare and convert<a class="headerlink" href="#quantize-the-model-through-prepare-and-convert" title="이 제목에 대한 퍼머링크">¶</a></h2>
-<p>Finally, we quantize the model by passing the BackendConfig we defined
-into prepare and convert. This produces a quantized linear module and
-a fused quantized conv-relu module.</p>
+<div class="section" id="prepare-convert">
+<h2>6. 사전 처리(prepare)와 변환(convert)을 통한 모델 양자화<a class="headerlink" href="#prepare-convert" title="이 제목에 대한 퍼머링크">¶</a></h2>
+<p>마지막으로 앞서 정의한 BackendConfig를 prepare과 convert를 거쳐 양자화합니다.
+이를 통해 양자화된 선형 모듈과 결합된 합성곱-ReLU 모델을 만들 수 있습니다.</p>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MyModel</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">use_bn</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
@@ -637,12 +630,12 @@ a fused quantized conv-relu module.</p>
 </pre></div>
 </div>
 </div>
-<div class="section" id="experiment-with-faulty-backendconfig-setups">
-<h2>(7. Experiment with faulty BackendConfig setups)<a class="headerlink" href="#experiment-with-faulty-backendconfig-setups" title="이 제목에 대한 퍼머링크">¶</a></h2>
-<p>As an experiment, here we modify the model to use conv-bn-relu
-instead of conv-relu, but use the same BackendConfig, which doesn’t
-know how to quantize conv-bn-relu. As a result, only linear is
-quantized, but conv-bn-relu is neither fused nor quantized.</p>
+<div class="section" id="id9">
+<h2>(7. 오류가 있는 BackendConfig 설정 실험하기)<a class="headerlink" href="#id9" title="이 제목에 대한 퍼머링크">¶</a></h2>
+<p>실험의 일환으로 합성곱-ReLU 연산자 대신 합성곱-배치정규화-ReLU(conv-bn-relu) 모델을 이용합니다.
+이 때 BackendConfig는 이전과 동일한 것을 사용하며 합성곱-배치정규화-ReLU 양자화 관련된 정보는 없습니다.
+실험 결과, 선형 모델의 경우 양자화가 성공적으로 진행되었지만 합성곱-배치정규화-ReLU의 경우
+결합과 양자화 모두 이루어지지 않았습니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">converted</span><span class="p">)</span>
 
 <span class="go">GraphModule(</span>
@@ -666,9 +659,8 @@ quantized, but conv-bn-relu is neither fused nor quantized.</p>
 <span class="go">    return sigmoid</span>
 </pre></div>
 </div>
-<p>As another experiment, here we use the default QConfigMapping that
-doesn’t satisfy the dtype constraints specified in the backend. As
-a result, nothing is quantized since the QConfigs are simply ignored.</p>
+<p>백엔드 환경에 데이터 타입 제약조건을 만족하지 않는 기본 QConfigMapping을 이용하여 또 다른 실험을 진행했습니다.
+실혐 결과 QConfig가 무시되어 어떤 모델도 양자화 되지 않았습니다.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">converted</span><span class="p">)</span>
 
 <span class="go">GraphModule(</span>
@@ -689,46 +681,43 @@ a result, nothing is quantized since the QConfigs are simply ignored.</p>
 </pre></div>
 </div>
 </div>
-<div class="section" id="built-in-backendconfigs">
-<h2>Built-in BackendConfigs<a class="headerlink" href="#built-in-backendconfigs" title="이 제목에 대한 퍼머링크">¶</a></h2>
-<p>PyTorch quantization supports a few built-in native BackendConfigs under
-the <code class="docutils literal notranslate"><span class="pre">torch.ao.quantization.backend_config</span></code> namespace:</p>
+<div class="section" id="id10">
+<h2>기본 BackendConfig<a class="headerlink" href="#id10" title="이 제목에 대한 퍼머링크">¶</a></h2>
+<p>PyTorch 양자화는 <code class="docutils literal notranslate"><span class="pre">torch.ao.quantization.backend_config</span></code> 네임스페이스 하위
+여러 기본 BackendConfig를 지원합니다.</p>
 <ul class="simple">
 <li><p><a class="reference external" href="https://github.com/pytorch/pytorch/blob/master/torch/ao/quantization/backend_config/fbgemm.py">get_fbgemm_backend_config</a>:
-for server target settings</p></li>
+서버 세팅용 BackendConfig</p></li>
 <li><p><a class="reference external" href="https://github.com/pytorch/pytorch/blob/master/torch/ao/quantization/backend_config/qnnpack.py">get_qnnpack_backend_config</a>:
-for mobile and edge device target settings, also supports XNNPACK
-quantized ops</p></li>
+모바일 및 엣지 장비, XNNPack 양자화 연산자 지원 BackendConfig</p></li>
 <li><p><a class="reference external" href="https://github.com/pytorch/pytorch/blob/master/torch/ao/quantization/backend_config/native.py">get_native_backend_config</a>
-(default): a BackendConfig that supports a union of the operator
-patterns supported in the FBGEMM and QNNPACK BackendConfigs</p></li>
+(기본값): FBGEMM과 QNNPACK BackendConfig 내에서 제공되는 연산자 패턴을
+지원하는 BackendConfig</p></li>
 </ul>
-<p>There are also other BackendConfigs under development (e.g. for
-TensorRT and x86), but these are still mostly experimental at the
-moment. If the user wishes to integrate a new, custom backend with
-PyTorch’s quantization API, they may define their own BackendConfigs
-using the same set of APIs used to define the natively supported
-ones as in the example above.</p>
+<p>그 밖에 다른 BackendConfig(TensorRT, x86 등)가 개발 중이지만
+아직 실험 단계에 머물러 있습니다. 새로운 커스텀 백엔드 환경에서
+PyTorch 양자화 API를 사용하기 원한다면 예제 코드에 정의된
+API 코드를 바탕으로 자체적인 BackendConfig를 정의할 수 있습니다.</p>
 </div>
-<div class="section" id="further-reading">
-<h2>Further Reading<a class="headerlink" href="#further-reading" title="이 제목에 대한 퍼머링크">¶</a></h2>
-<p>How BackendConfig is used in FX graph mode quantization:
+<div class="section" id="id11">
+<h2>참고자료<a class="headerlink" href="#id11" title="이 제목에 대한 퍼머링크">¶</a></h2>
+<p>FX 그래프 모드 양자화에서 BackendConfig를 사용하는 법:
 <a class="reference external" href="https://github.com/pytorch/pytorch/blob/master/torch/ao/quantization/fx/README.md">https://github.com/pytorch/pytorch/blob/master/torch/ao/quantization/fx/README.md</a></p>
-<p>Motivation and implementation details behind BackendConfig:
+<p>BackendConfig가 만들어진 동기와 구현 방법
 <a class="reference external" href="https://github.com/pytorch/pytorch/blob/master/torch/ao/quantization/backend_config/README.md">https://github.com/pytorch/pytorch/blob/master/torch/ao/quantization/backend_config/README.md</a></p>
-<p>Early design of BackendConfig:
+<p>BackendConfig의 초기 설계:
 <a class="reference external" href="https://github.com/pytorch/rfcs/blob/master/RFC-0019-Extending-PyTorch-Quantization-to-Custom-Backends.md">https://github.com/pytorch/rfcs/blob/master/RFC-0019-Extending-PyTorch-Quantization-to-Custom-Backends.md</a></p>
 </div>
 </div>
 
 
              </article>
-
+             
             </div>
             <footer>
+  
 
-
-
+  
     <hr class="community-hr hr-top" />
     <div class="community-container">
       <div class="community-prompt">더 궁금하시거나 개선할 내용이 있으신가요? 커뮤니티에 참여해보세요!</div>
@@ -748,7 +737,7 @@ ones as in the example above.</p>
       </div>
     </div>
     <hr class="rating-hr hr-bottom"/>
-
+  
 
   <div role="contentinfo">
     <p>
@@ -756,11 +745,11 @@ ones as in the example above.</p>
 
     </p>
   </div>
-
+    
       <div>
         Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
       </div>
-
+     
 
 </footer>
 
@@ -779,15 +768,15 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
 <li><a class="reference internal" href="#">(prototype) PyTorch BackendConfig Tutorial</a><ul>
-<li><a class="reference internal" href="#derive-reference-pattern-for-each-quantized-operator">1. Derive reference pattern for each quantized operator</a></li>
-<li><a class="reference internal" href="#set-dtypeconfigs-with-backend-constraints">2. Set DTypeConfigs with backend constraints</a></li>
-<li><a class="reference internal" href="#set-up-fusion-for-conv-relu">3. Set up fusion for conv-relu</a></li>
-<li><a class="reference internal" href="#define-the-backendconfig">4. Define the BackendConfig</a></li>
-<li><a class="reference internal" href="#set-up-qconfigmapping-that-satisfies-the-backend-constraints">5. Set up QConfigMapping that satisfies the backend constraints</a></li>
-<li><a class="reference internal" href="#quantize-the-model-through-prepare-and-convert">6. Quantize the model through prepare and convert</a></li>
-<li><a class="reference internal" href="#experiment-with-faulty-backendconfig-setups">(7. Experiment with faulty BackendConfig setups)</a></li>
-<li><a class="reference internal" href="#built-in-backendconfigs">Built-in BackendConfigs</a></li>
-<li><a class="reference internal" href="#further-reading">Further Reading</a></li>
+<li><a class="reference internal" href="#id6">1. 양자화된 연산자를 위한 참조 패턴 유도하기</a></li>
+<li><a class="reference internal" href="#dtypeconfig">2. 백엔드 환경 제약조건을 DTypeConfig로 설정하기</a></li>
+<li><a class="reference internal" href="#relu-fusion">3. 합성곱 ReLU 결합(fusion)하기</a></li>
+<li><a class="reference internal" href="#backendconfig">4. BackendConfig 정의하기</a></li>
+<li><a class="reference internal" href="#qconfigmapping">5. 백엔드 환경 제약조건을 만족시키는 QConfigMapping 설정하기</a></li>
+<li><a class="reference internal" href="#prepare-convert">6. 사전 처리(prepare)와 변환(convert)을 통한 모델 양자화</a></li>
+<li><a class="reference internal" href="#id9">(7. 오류가 있는 BackendConfig 설정 실험하기)</a></li>
+<li><a class="reference internal" href="#id10">기본 BackendConfig</a></li>
+<li><a class="reference internal" href="#id11">참고자료</a></li>
 </ul>
 </li>
 </ul>
@@ -798,12 +787,12 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
       </section>
     </div>
 
+  
 
 
-
-
-
-
+  
+  
+     
        <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
          <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
          <script src="../_static/jquery.js"></script>
@@ -817,8 +806,8 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
          <script src="../_static/auto-render.min.js"></script>
          <script src="../_static/katex_autorenderer.js"></script>
          <script src="../_static/design-tabs.js"></script>
-
-
+     
+  
 
   <script type="text/javascript" src="../_static/js/vendor/popper.min.js"></script>
   <script type="text/javascript" src="../_static/js/vendor/bootstrap.min.js"></script>
@@ -830,11 +819,8 @@ if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.i
           SphinxRtdTheme.Navigation.enable(true);
       });
   </script>
-
+ 
 <script>
-// Helper function to make it easier to call dataLayer.push()
-function gtag(){window.dataLayer.push(arguments);}
-
 //add microsoft link
 if(window.location.href.indexOf("/beginner/basics/")!= -1)
 {

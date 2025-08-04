@@ -38,6 +38,8 @@ Introduction to ``torch.compile``
 import torch
 import warnings
 
+torch.set_float32_matmul_precision('high')
+
 gpu_ok = False
 if torch.cuda.is_available():
     device_cap = torch.cuda.get_device_capability()
