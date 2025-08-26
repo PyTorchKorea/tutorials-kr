@@ -3,17 +3,11 @@
 TorchText를 사용하여 사용자 정의 글 데이터셋 전처리하기
 ==========================================================
 
-**번역**: `Anupam Sharma <https://anp-scp.github.io/>`_
-**저자**: `장효영 <https://github.com/hyoyoung>`_
+**저자**: `Anupam Sharma <https://anp-scp.github.io/>`_
+**번역**: `장효영 <https://github.com/hyoyoung>`_
 
-This tutorial illustrates the usage of torchtext on a dataset that is not built-in. In the tutorial,
-we will preprocess a dataset that can be further utilized to train a sequence-to-sequence
-model for machine translation (something like, in this tutorial: `Sequence to Sequence Learning
-with Neural Networks <https://github.com/bentrevett/pytorch-seq2seq/blob/master/1%20-%20Sequence%\
-20to%20Sequence%20Learning%20with%20Neural%20Networks.ipynb>`_) but without using legacy version
-of torchtext.
 이 튜토리얼에서는 기본 제공되지 않는 데이터셋에서 Torchtext를 사용하는 방법을 설명합니다.
-튜토리얼 안에서는 기계 번역을 위한 시퀀스 간 모델을 훈련하는 데 추가로 활용할 수 있는 데이터셋를 전처리 할 것입니다.
+튜토리얼 안에서는 기계 번역을 위한 시퀀스 간 모델을 훈련하는 데 추가로 활용할 수 있는 데이터셋을 전처리 할 것입니다.
 (이 튜토리얼과 비슷합니다: `Sequence to Sequence Learning
 with Neural Networks <https://github.com/bentrevett/pytorch-seq2seq/blob/master/1%20-%20Sequence%\
 20to%20Sequence%20Learning%20with%20Neural%20Networks.ipynb>`_)
@@ -89,7 +83,7 @@ data_pipe = data_pipe.parse_csv(skip_lines=0, delimiter='\t', as_tuple=True)
 # 3. 4번째 줄에서 해당 파일을 파싱하는 함수를 호출합니다.
 #    해당 함수는 탭으로 구분된 파일의 각각 줄(row)이 있는 반복 가능한 튜플 객체를 리턴합니다.
 #
-# DataPipe는 다양한 동작을 수행할수 있는 데이터 셋 객체와 비슷하게 생각할 수 있습니다.
+# DataPipe는 다양한 동작을 수행할수 있는 데이터셋 객체와 비슷하게 생각할 수 있습니다.
 # DataPipe에 관한 자세한 내용은 `해당 튜토리얼 <https://pytorch.org/data/beta/dp_tutorial.html>`_ 을 확인하세요.
 #
 # 반복가능한 객체가 아래와 같은 문장 쌍을 지녔는지 확인할 수 있습니다.
@@ -100,7 +94,7 @@ for sample in data_pipe:
 
 # %%
 # 한 쌍의 문장과 함께 속성 세부 사항이 같이 있다는 점을 눈여겨 보십시요.
-# 속성 세부 정보를 제거할수 있는 작은 함수를 작성해봅시다.
+# 속성 세부 정보를 제거할 수 있는 작은 함수를 작성해봅시다.
 
 def removeAttribution(row):
     """
@@ -143,13 +137,12 @@ print(deTokenize("Haben Sie einen guten Tag!!!"))
 # %%
 # 어휘 구축하기
 # -----------------------
-# Let us consider an English sentence as the source and a German sentence as the target.
 # 영어 문장을 소스로, 독일어 문장을 타겟으로 생각해 봅시다
 #
 # 어휘는 데이터셋에 있는 고유한 단어의 집합으로 간주할 수 있습니다
 # 이제 소스와 타겟 모두에 대한 어휘를 구축하겠습니다
 #
-# 반복자의 튜플 요소에서 토큰을 가져오는 함수를 정의해 보겠습니다
+# 반복자의 튜플 요소에서 토큰을 가져오는 함수를 정의해 보겠습니다.
 
 
 def getTokens(data_iter, place):
