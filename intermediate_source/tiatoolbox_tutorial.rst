@@ -3,7 +3,7 @@ Pytorch와 TIAToolbox를 사용한 전체 슬라이드 이미지(Whole Slide Ima
 **번역**: `박주환 <https://github.com/jkworldchampion>`_
 
 .. tip::
-   이 튜토리얼을 최대한 활용하려면, 이 `Colab 버전 <https://colab.research.google.com/github/pytorch/tutorials/blob/main/_static/tiatoolbox_tutorial.ipynb>`_ 을 
+   이 튜토리얼을 최대한 활용하려면, 이 `Colab 버전 <https://colab.research.google.com/github/pytorch/tutorials/blob/main/_static/tiatoolbox_tutorial.ipynb>`_ 을
    사용하는 것을 권장합니다. 이를 통해 아래의 자료를 실험해 볼 수 있습니다.
 
 개요
@@ -71,7 +71,7 @@ TIAToolbox를 사용하면 `조직
 명령어를 실행해주세요:
 
 
-- `apt-get -y -qq install libopenjp2-7-dev libopenjp2-tools openslide-tools libpixman-1-dev`  
+- `apt-get -y -qq install libopenjp2-7-dev libopenjp2-tools openslide-tools libpixman-1-dev`
 - `pip install -q 'tiatoolbox<1.5' histoencoder && echo "Installation is done."`
 
 
@@ -149,7 +149,7 @@ TIAToolbox를 사용하면 `조직
 적절한 정리를 보장하기 위해(예컨대, 비정상 종료), 이번 실행에서
 다운로드되거나 생성된 모든 파일은 ``global_save_dir`` 이라는
 하나의 디렉토리에 저장되며, 이 디렉토리는 “./tmp/”로 설정됩니다.
-유지보수를 쉽게 하기 위해 디렉토리 이름은 이 한 곳에서만 설정되므로, 
+유지보수를 쉽게 하기 위해 디렉토리 이름은 이 한 곳에서만 설정되므로,
 필요하면 간편하게 변경할 수 있습니다.
 
 
@@ -220,7 +220,7 @@ TIAToolbox를 사용하면 `조직
 ----------------
 
 패치 목록과 해당되는 라벨 목록을 생성합니다.
-예를 들어, ``label_list`` 의 첫 번째 라벨은 
+예를 들어, ``label_list`` 의 첫 번째 라벨은
 ``patch_list`` 의 첫 번째 이미지 패치의 클래스를 나타냅니다.
 
 
@@ -325,8 +325,8 @@ TIAToolbox를 사용하면 `조직
 이미지 패치 분류
 ----------------------
 
-먼저 ``patch`` 모드를 사용하여 디지털 슬라이드 내의 
-각 패치에 대한 예측을 구하는 방법을 시연한 후, ``wsi`` 모드를 사용하여 
+먼저 ``patch`` 모드를 사용하여 디지털 슬라이드 내의
+각 패치에 대한 예측을 구하는 방법을 시연한 후, ``wsi`` 모드를 사용하여
 큰(large) 슬라이드에 대해 예측을 수행하는 방법을 보여줍니다.
 
 
@@ -335,7 +335,7 @@ TIAToolbox를 사용하면 `조직
 
 PatchPredictor 클래스는 PyTorch로 작성된 CNN 기반 분류기를 실행합니다
 
-- ``모델`` 은 ``tiatoolbox.models.abc.ModelABC`` `(문서) 
+- ``모델`` 은 ``tiatoolbox.models.abc.ModelABC`` `(문서)
    <https://tia-toolbox.readthedocs.io/en/latest/_autosummary/tiatoolbox.models.models_abc.ModelABC.html>`__
    클래스 구조를 따르는 모든 PyTorch로 훈련된 모델을 사용할 수 있습니다.
    이에 대한 자세한 내용은 `고급 모델 기술에 관한 예제 노트북(notebook)
@@ -346,7 +346,7 @@ PatchPredictor 클래스는 PyTorch로 작성된 CNN 기반 분류기를 실행�
    로드된 네트워크에 적합한 형식으로 되어 있는지 확인해줍니다.
 -  또한, ``사전 학습된 모델(pretrained_model)`` 을 문자열 인수로
    전달할 수 있습니다. 이는 예측을 수행할 CNN 모델을 지정하며, 해당 모델은
-   `여기 <https://tia-toolbox.readthedocs.io/en/latest/usage.html?highlight=pretrained%20models#tiatoolbox.models.architecture.get_pretrained_model>`__
+   `여기 <https://tia-toolbox.readthedocs.io/en/stable/_autosummary/tiatoolbox.models.architecture.get_pretrained_model.html#tiatoolbox.models.architecture.get_pretrained_model>`__
    나열된 모델 중 하나이어야 합니다.
    명령어는 다음과 같습니다:
    ``predictor = PatchPredictor(pretrained_model='resnet18-kather100k', pretrained_weights=weights_path, batch_size=32)`` .
@@ -363,11 +363,11 @@ PatchPredictor 클래스는 PyTorch로 작성된 CNN 기반 분류기를 실행�
 
 
     # TIAToolbox에서 사전 학습된 PyTorch 모델 가져오기
-    predictor = PatchPredictor(pretrained_model='resnet18-kather100k', batch_size=32) 
+    predictor = PatchPredictor(pretrained_model='resnet18-kather100k', batch_size=32)
 
     # 사용자는 아래 스크립트를 통해 원하는 PyTorch 모델 아키텍처를 불러올 수 있습니다.
     model = vanilla.CNNModel(backbone="resnet18", num_classes=9) # torchvision.models.resnet18에서 모델 불러오기
-    model.load_state_dict(torch.load(weights_path, map_location="cpu"), strict=True)
+    model.load_state_dict(torch.load(weights_path, map_location="cpu", weights_only=True), strict=True)
     def preproc_func(img):
         img = PIL.Image.fromarray(img)
         img = transforms.ToTensor()(img)
@@ -380,7 +380,7 @@ PatchPredictor 클래스는 PyTorch로 작성된 CNN 기반 분류기를 실행�
 패치 라벨 예측하기
 ~~~~~~~~~~~~~~~~~~~~
 
-예측기(predictor) 객체를 생성한 후 ``patch`` 모드를 사용하여 ``predict`` 메소드를 호출합니다. 
+예측기(predictor) 객체를 생성한 후 ``patch`` 모드를 사용하여 ``predict`` 메소드를 호출합니다.
 그런 다음, 분류 정확도와 오차 행렬(confusion matrix)을 계산합니다.
 
 
@@ -565,8 +565,8 @@ PatchPredictor 클래스는 PyTorch로 작성된 CNN 기반 분류기를 실행�
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ``IOPatchPredictorConfig`` 클래스를 소개합니다. 이 클래스는 모델 예측 엔진을
-위한 이미지 읽기 및 예측 결과 쓰기 구성 설정을 지정합니다. 
-이 설정은 분류기(classifier)에게 WSI 피라미드의 어느 레벨을 읽고, 
+위한 이미지 읽기 및 예측 결과 쓰기 구성 설정을 지정합니다.
+이 설정은 분류기(classifier)에게 WSI 피라미드의 어느 레벨을 읽고,
 데이터를 처리하며, 출력을 생성해야 하는지 알려주는 데
 필수적입니다.
 
@@ -613,13 +613,13 @@ PatchPredictor 클래스는 PyTorch로 작성된 CNN 기반 분류기를 실행�
    로 설정할 수 있습니다.
 -  ``ioconfig``: ``IOPatchPredictorConfig`` 클래스를 사용하여 IO
    구성 정보를 설정합니다.
--  ``resolution`` 과 ``unit`` (아래에 표시되지 않음): 추출할 패치의 WSI 레벨 
+-  ``resolution`` 과 ``unit`` (아래에 표시되지 않음): 추출할 패치의 WSI 레벨
    또는 마이크론당 픽셀 해상도를 지정합니다.
    이는 ``ioconfig`` 대신 사용할 수 있습니다.
-   여기서 WSI 레벨은 ``'baseline'`` 으로 지정하며, 
+   여기서 WSI 레벨은 ``'baseline'`` 으로 지정하며,
    이는 일반적으로 레벨 0에
    이 경우 이미지는 하나의 레벨만 가지고 있습니다.
-   더 자세한 내용은 `문서 <https://tia-toolbox.readthedocs.io/en/latest/usage.html?highlight=WSIReader.read_rect#tiatoolbox.wsicore.wsireader.WSIReader.read_rect>`__ 에서
+   더 자세한 내용은 `문서 <https://tia-toolbox.readthedocs.io/en/stable/_autosummary/tiatoolbox.wsicore.wsireader.WSIReader.html#tiatoolbox.wsicore.wsireader.WSIReader.read_rect>`__ 에서
    확인할 수 있습니다.
 -  ``masks``: ``imgs`` 리스트에 있는 WSI의 마스크 경로 리스트입니다.
    이 마스크는 원본 WSI에서 패치를 추출하고자 하는 영역을
@@ -659,10 +659,10 @@ PatchPredictor 클래스는 PyTorch로 작성된 CNN 기반 분류기를 실행�
 
 
 ``wsi_output`` 을 시각화하여 예측 모델이 전체 슬라이드 이미지(WSI)에서
-어떻게 작동하는지 확인할 수 있습니다. 먼저 패치 예측 결과를 병합한 후, 
+어떻게 작동하는지 확인할 수 있습니다. 먼저 패치 예측 결과를 병합한 후,
 이를 원본 이미지 위에 오버레이로 시각화해야 합니다. 이전과 마찬가지로
 ``merge_predictions`` 메소드를 사용하여 패치 예측을 병합합니다.
-이때, 1.25x 만큼 확대된 예측 맵을 생성하기 위해 
+이때, 1.25x 만큼 확대된 예측 맵을 생성하기 위해
 ``resolution=1.25, units='power'`` 로 매개변수를 설정합니다.
 만약 더 높은/낮은 해상도 (더 큰/작은) 예측 맵을 원한다면,
 이 매개변수를 적절히 변경해야 합니다.
@@ -743,7 +743,7 @@ PatchPredictor 클래스는 PyTorch로 작성된 CNN 기반 분류기를 실행�
 이 부분에서는 TIAToolbox 외부에 존재하는 사전 학습된
 PyTorch 모델에서 특징을 추출하는 방법을 TIAToolbox에서
 제공하는 WSI 추론 엔진을 사용하여 보여줍니다. 이를 설명하기 위해,
-HistoEncoder라는 병리학적 이미지에 특화된 모델을 사용할 것입니다. 
+HistoEncoder라는 병리학적 이미지에 특화된 모델을 사용할 것입니다.
 HistoEncoder는 조직학 이미지에서 특징을 추출하도록 자가 지도 학습 방식(self-supervised)
 으로 학습되었습니다. 이 모델은 다음에서 사용할 수 있습니다:
 
@@ -960,7 +960,7 @@ WSI 썸네일에 오버레이하여 특징들이 서로 다른 조직 영역으�
 예측 맵과 자가 지도 학습(self-supervised) 인코더를 통해 특징을
 추출한 특징 맵이 WSI에서 조직 유형에 대한 유사한 정보를 포착하고
 있음을 확인할 수 있습니다. 이는 모델이 예상대로 작동하고 있음을 확인할
-수 있는 좋은 검증 방법입니다. 또한, HistoEncoder 모델이 추출한 
+수 있는 좋은 검증 방법입니다. 또한, HistoEncoder 모델이 추출한
 특징들이 조직 유형 간의 차이를 잘 포착하고 있으며, 따라서 이 특징들이
 조직학적으로 중요한 정보를 인코딩하고 있음을 보여줍니다.
 
@@ -971,8 +971,8 @@ WSI 썸네일에 오버레이하여 특징들이 서로 다른 조직 영역으�
 이 노트북에서는 ``PatchPredictor`` 와
 ``DeepFeatureExtractor`` 클래스의 ``predict`` 메소드를 사용하여
 큰 타일(tiles)과 WSI의 패치에 대해 라벨을 예측하거나 특징을 추출하는 방법을 보여줍니다.
-또한, 패치 예측 결과를 병합하고 입력 이미지/WSI에 예측 맵을 
-오버레이로 시각화하는 ``merge_predictions`` 와 ``overlay_prediction_mask`` 
+또한, 패치 예측 결과를 병합하고 입력 이미지/WSI에 예측 맵을
+오버레이로 시각화하는 ``merge_predictions`` 와 ``overlay_prediction_mask``
 보조 함수도 소개합니다.
 
 모든 과정은 TIAToolbox 내에서 이루어지며,

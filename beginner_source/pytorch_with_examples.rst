@@ -129,7 +129,7 @@ PyTorch: ``nn``
 이 중 일부는 학습 도중 최적화가 될 **학습 가능한 매개변수** 를 갖고 있습니다.
 
 텐서플로우(Tensorflow)에서는, `Keras <https://github.com/fchollet/keras>`__ 와
-`TensorFlow-Slim <https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/slim>`__,
+`TensorFlow-Slim <https://github.com/google-research/tf-slim>`__,
 `TFLearn <http://tflearn.org/>`__ 같은 패키지들이 연산 그래프를 고수준(high-level)으로 추상화(abstraction)하여
 제공하므로 신경망을 구축하는데 유용합니다.
 

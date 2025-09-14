@@ -4,7 +4,7 @@
 **저자:** `Anupam Bhatnagar <https://github.com/anupambhatnagar>`_
 **번역**: `Jaeseong Park <https://github.com/jaeseong98>`_
 
-이 튜토리얼에서는 분산 학습 작업의 추적을 분석하기 위해 전체론적 추적 분석(Holistic Trace Analysis, HTA)을 사용하는 방법을 보여줍니다. 
+이 튜토리얼에서는 분산 학습 작업의 추적을 분석하기 위해 전체론적 추적 분석(Holistic Trace Analysis, HTA)을 사용하는 방법을 보여줍니다.
 시작하려면 아래 단계를 따르세요.
 
 HTA 설치하기
@@ -45,8 +45,8 @@ Jupyter 노트북을 실행하고 ``trace_dir`` 변수를 추적 파일이 있�
 시간적 분석
 ------------------
 
-GPU를 효과적으로 활용하기 위해서는 특정 작업에 대해 GPU가 시간을 어떻게 사용하고 있는지 이해하는 것이 중요합니다. 
-GPU가 주로 계산, 통신, 메모리 이벤트에 사용되고 있는지, 아니면 유휴 상태인지? 
+GPU를 효과적으로 활용하기 위해서는 특정 작업에 대해 GPU가 시간을 어떻게 사용하고 있는지 이해하는 것이 중요합니다.
+GPU가 주로 계산, 통신, 메모리 이벤트에 사용되고 있는지, 아니면 유휴 상태인지?
 시간적 분석 기능은 이 세 가지 범주에서 사용된 시간에 대한 상세한 분석을 제공합니다.
 
 * 유휴 시간 - GPU가 유휴 상태입니다.
@@ -280,4 +280,4 @@ HTA는 위에서 언급한 세 가지 카테고리 각각에 대한 분포 플�
 ~~~~~~~~~~
 
 
-이 튜토리얼에서 HTA를 설치하고 사용하는 방법을 배웠습니다. HTA는 분산 학습 워크플로우에서 병목 현상을 분석할 수 있게 해주는 성능 도구입니다. HTA 도구를 사용하여 트레이스 비교 분석을 수행하는 방법에 대해 더 배우려면, `Trace Diff using Holistic Trace Analysis <https://tutorials.pytorch.kr/beginner/hta_trace_diff_tutorial.html>`__를 참조하세요.
+이 튜토리얼에서 HTA를 설치하고 사용하는 방법을 배웠습니다. HTA는 분산 학습 워크플로우에서 병목 현상을 분석할 수 있게 해주는 성능 도구입니다. HTA 도구를 사용하여 트레이스 비교 분석을 수행하는 방법에 대해 더 배우려면, `Trace Diff using Holistic Trace Analysis <https://tutorials.pytorch.kr/beginner/hta_trace_diff_tutorial.html>`__ 를 참조하세요.

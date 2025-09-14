@@ -4,7 +4,7 @@ Distributed Training with Uneven Inputs Using the Join Context Manager
 **Author**\ : `Andrew Gu <https://github.com/andwgu>`_
 
 .. note::
-   |edit| View and edit this tutorial in `github <https://github.com/pytorch/tutorials/blob/main/advanced_source/generic_join.rst>`__.
+   |edit| View and edit this tutorial in `github <https://github.com/pytorchkorea/tutorials-kr/blob/main/advanced_source/generic_join.rst>`__.
 
 .. note:: ``Join`` is introduced in PyTorch 1.10 as a prototype feature. This
     API is subject to change.
@@ -446,5 +446,5 @@ Some key points to highlight:
 .. _Getting Started with Distributed Data Parallel - Basic Use Case: https://tutorials.pytorch.kr/intermediate/ddp_tutorial.html#basic-use-case
 .. _Shard Optimizer States with ZeroRedundancyOptimizer: https://tutorials.pytorch.kr/recipes/zero_redundancy_optimizer.html
 .. _DistributedDataParallel: https://pytorch.org/docs/stable/generated/torch.nn.parallel.DistributedDataParallel.html
-.. _join(): https://pytorch.org/docs/stable/_modules/torch/nn/parallel/distributed.html#DistributedDataParallel.join
+.. _join(): https://docs.pytorch.org/docs/stable/generated/torch.nn.parallel.DistributedDataParallel.html#torch.nn.parallel.DistributedDataParallel.join
 .. _ZeroRedundancyOptimizer: https://pytorch.org/docs/stable/distributed.optim.html

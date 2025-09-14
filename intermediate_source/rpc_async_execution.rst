@@ -3,7 +3,7 @@ Implementing Batch RPC Processing Using Asynchronous Executions
 **Author**: `Shen Li <https://mrshenli.github.io/>`_
 
 .. note::
-   |edit| View and edit this tutorial in `github <https://github.com/pytorch/tutorials/blob/main/intermediate_source/rpc_async_execution.rst>`__.
+   |edit| View and edit this tutorial in `github <https://github.com/pytorchkorea/tutorials-kr/blob/main/intermediate_source/rpc_async_execution.rst>`__.
 
 Prerequisites:
 
@@ -15,8 +15,7 @@ Prerequisites:
 This tutorial demonstrates how to build batch-processing RPC applications with
 the `@rpc.functions.async_execution <https://pytorch.org/docs/master/rpc.html#torch.distributed.rpc.functions.async_execution>`__
 decorator, which helps to speed up training by reducing the number of blocked
-RPC threads and consolidating CUDA operations on the callee. This shares the
-same idea as `Batch Inference with TorchServe <https://pytorch.org/serve/batch_inference_with_ts.html>`__.
+RPC threads and consolidating CUDA operations on the callee.
 
 .. note:: This tutorial requires PyTorch v1.6.0 or above.
 
@@ -199,7 +198,7 @@ speed.
 Batch-Processing CartPole Solver
 --------------------------------
 
-This section uses CartPole-v1 from `OpenAI Gym <https://gym.openai.com/>`__ as
+This section uses CartPole-v1 from OpenAI Gym as
 an example to show the performance impact of batch processing RPC. Please note
 that since the goal is to demonstrate the usage of
 `@rpc.functions.async_execution <https://pytorch.org/docs/master/rpc.html#torch.distributed.rpc.functions.async_execution>`__
@@ -522,4 +521,3 @@ Learn More
 -  `Batch-Updating Parameter Server Source Code <https://github.com/pytorch/examples/blob/master/distributed/rpc/batch/parameter_server.py>`__
 -  `Batch-Processing CartPole Solver <https://github.com/pytorch/examples/blob/master/distributed/rpc/batch/reinforce.py>`__
 -  `Distributed Autograd <https://pytorch.org/docs/master/rpc.html#distributed-autograd-framework>`__
--  `Distributed Pipeline Parallelism <dist_pipeline_parallel_tutorial.html>`__

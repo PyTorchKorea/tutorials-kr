@@ -287,7 +287,7 @@
 
     def load_model(model_file):
         model = MobileNetV2()
-        state_dict = torch.load(model_file)
+        state_dict = torch.load(model_file, weights_only=True)
         model.load_state_dict(state_dict)
         model.to('cpu')
         return model

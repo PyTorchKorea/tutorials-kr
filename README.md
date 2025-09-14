@@ -4,7 +4,7 @@
 
 PyTorch에서 제공하는 튜토리얼의 한국어 번역을 위한 저장소입니다.\
 번역의 결과물은 [https://tutorials.pytorch.kr](https://tutorials.pytorch.kr)에서 확인하실 수 있습니다. (번역을 진행하며 **비정기적으로** 반영합니다.)\
-현재 버전의 번역 / 변경 관련 이슈는 [#799 이슈](https://github.com/PyTorchKorea/tutorials-kr/issues/799)를 참고해주세요.
+현재 버전의 번역 / 변경 관련 이슈는 [#972 이슈](https://github.com/PyTorchKorea/tutorials-kr/issues/972)를 참고해주세요.
 
 ## 기여하기
 
@@ -22,7 +22,7 @@ PyTorch에서 제공하는 튜토리얼의 한국어 번역을 위한 저장소�
 
 ## 원문
 
-현재 PyTorch v2.0 튜토리얼([pytorch/tutorials@6537199](https://github.com/pytorch/tutorials/commit/653719940f7c4d908811da415f190465d8c3189d) 기준) 번역이 진행 중입니다.
+현재 PyTorch v2.8 튜토리얼([pytorch/tutorials@c4d9d93](https://github.com/pytorch/tutorials/commit/c4d9d935655cf754c90d5ce7f37024afc015f054) 기준) 번역이 진행 중입니다.
 
 최신 버전의 튜토리얼(공식, 영어)은 [PyTorch tutorials 사이트](https://pytorch.org/tutorials) 및 [PyTorch tutorials 저장소](https://github.com/pytorch/tutorials)를 참고해주세요.
 
@@ -51,5 +51,5 @@ v1.0 이후 번역은 별도 저장소로 관리하지 않습니다. [이 저장
 자세한 내용은 [LICENSE 파일](https://github.com/PyTorchKorea/tutorials-kr/blob/master/LICENSE)을 참조해주세요.
 
 ---
-This is a project to translate [pytorch/tutorials@6537199](https://github.com/pytorch/tutorials/commit/653719940f7c4d908811da415f190465d8c3189d) into Korean.
+This is a project to translate [pytorch/tutorials@c4d9d93](https://github.com/pytorch/tutorials/commit/c4d9d935655cf754c90d5ce7f37024afc015f054) into Korean.
 For the latest version, please visit to the [official PyTorch tutorials repo](https://github.com/pytorch/tutorials).

@@ -7,7 +7,7 @@
 PyTorch의 분산 데이터 병렬 처리 - 비디오 튜토리얼
 =====================================================
 
-저자: `Suraj Subramanian <https://github.com/suraj813>`__
+저자: `Suraj Subramanian <https://github.com/subramen>`__
 번역: `송호준 <https://github.com/hojunking>`_
 
 아래 비디오를 보거나 `YouTube <https://www.youtube.com/watch/-K3bZYHYHEA>`__에서도 보실 수 있습니다.

@@ -5,7 +5,7 @@ Cpp 확장을 사용한 프로세스 그룹 백엔드 사용자 정의
   **번역**: `박재윤 <https://github.com/jenner9212>`_
 
 .. note::
-   |edit| 이 튜토리얼의 소스 코드는 `github <https://github.com/pytorch/tutorials/blob/main/intermediate_source/process_group_cpp_extension_tutorial.rst>`__ 에서 확인하고 변경해 볼 수 있습니다.
+   |edit| 이 튜토리얼의 소스 코드는 `github <https://github.com/pytorchkorea/tutorials-kr/blob/main/intermediate_source/process_group_cpp_extension_tutorial.rst>`__ 에서 확인하고 변경해 볼 수 있습니다.
 
 선수과목(Prerequisites):
 
@@ -25,9 +25,8 @@ Cpp 확장을 사용한 프로세스 그룹 백엔드 사용자 정의
 ------
 
 파이토치(PyTorch)의 집합 통신(collective communications)은
-`분산 데이터 병렬(DistributedDataParallel) <https://pytorch.org/docs/stable/generated/torch.nn.parallel.DistributedDataParallel.html>`__,
-`제로 리던던시 최적화기(ZeroRedundancyOptimizer) <https://pytorch.org/docs/stable/distributed.optim.html#torch.distributed.optim.ZeroRedundancyOptimizer>`__,
-`완전 공유 데이터 병렬(FullyShardedDataParallel) <https://github.com/pytorch/pytorch/blob/master/torch/distributed/_fsdp/fully_sharded_data_parallel.py>`__
+`분산 데이터 병렬(DistributedDataParallel) <https://pytorch.org/docs/stable/generated/torch.nn.parallel.DistributedDataParallel.html>`__ 및
+`제로 리던던시 최적화기(ZeroRedundancyOptimizer) <https://pytorch.org/docs/stable/distributed.optim.html#torch.distributed.optim.ZeroRedundancyOptimizer>`__
 등을 포함하여, 널리 사용되는 분산 학습 기능을 지원합니다.
 동일한 집합 통신 API를 다양한 통신 백엔드에서 작동하도록 하기 위해 분산 패키지는 집합 통신 작업을
 `Backend <https://github.com/pytorch/pytorch/blob/main/torch/csrc/distributed/c10d/Backend.hpp>`__

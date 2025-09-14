@@ -57,12 +57,9 @@ TensorBoard로 모델, 데이터, 학습 시각화하기
         transform=transform)
 
     # dataloaders
-    trainloader = torch.utils.data.DataLoader(trainset, batch_size=4,
-                                            shuffle=True, num_workers=2)
+    trainloader = torch.utils.data.DataLoader(trainset, batch_size=4, shuffle=True)
 
-
-    testloader = torch.utils.data.DataLoader(testset, batch_size=4,
-                                            shuffle=False, num_workers=2)
+    testloader = torch.utils.data.DataLoader(testset, batch_size=4, shuffle=False)
 
     # 분류 결과를 위한 상수
     classes = ('T-shirt/top', 'Trouser', 'Pullover', 'Dress', 'Coat',
@@ -156,7 +153,7 @@ TensorBoard를 설정합니다.
 
 ::
 
-    tensorboard --logdir=runs
+    PYTHONWARNINGS="ignore:pkg_resources is deprecated as an API:UserWarning" tensorboard --logdir=runs
 
 를 실행하고, `http://localhost:6006 <http://localhost:6006>`_ 을 열어보면
 다음과 같은 화면이 나타납니다.

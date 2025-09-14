@@ -19,8 +19,8 @@ Inductor CPU backend debugging and profiling
 #
 # Meanwhile, you may also find related tutorials about ``torch.compile``
 # around `basic usage <https://tutorials.pytorch.kr/intermediate/torch_compile_tutorial.html>`_,
-# comprehensive `troubleshooting <https://pytorch.org/docs/stable/dynamo/troubleshooting.html>`_
-# and GPU-specific knowledge like `GPU performance profiling <https://github.com/pytorch/pytorch/blob/main/docs/source/compile/profiling_torch_compile.rst>`_.
+# comprehensive `troubleshooting <https://pytorch.org/docs/stable/torch.compiler_troubleshooting.html>`_
+# and GPU-specific knowledge like `GPU performance profiling <https://pytorch.org/docs/stable/torch.compiler_inductor_profiling.html>`_.
 #
 # We will start debugging with a motivating example that triggers compilation issues and accuracy problems
 # by demonstrating the process of debugging to pinpoint the problems.
@@ -87,9 +87,9 @@ def neg1(x):
 # +-----------------------------+----------------------------------------------------------------+
 # | ``fx_graph_transformed.py`` | Transformed FX graph, after pattern match                      |
 # +-----------------------------+----------------------------------------------------------------+
-# | ``ir_post_fusion.txt``      | Inductor IR before fusion                                      |
+# | ``ir_pre_fusion.txt``       | Inductor IR before fusion                                      |
 # +-----------------------------+----------------------------------------------------------------+
-# | ``ir_pre_fusion.txt``       | Inductor IR after fusion                                       |
+# | ``ir_post_fusion.txt``      | Inductor IR after fusion                                       |
 # +-----------------------------+----------------------------------------------------------------+
 # | ``output_code.py``          | Generated Python code for graph, with C++/Triton kernels       |
 # +-----------------------------+----------------------------------------------------------------+
@@ -110,7 +110,8 @@ def forward1(self, arg0_1, arg1_1):
 # C++ kernel in ``output_code``:
 #
 
-from torch._inductor.codecache import AsyncCompile
+import torch
+from torch._inductor.async_compile import AsyncCompile
 async_compile = AsyncCompile()
 
 cpp_fused_cat_maximum_neg_0 = async_compile.cpp('''
@@ -342,7 +343,7 @@ def forward2(self, arg0_1):
     return (neg,)
 
 ######################################################################
-# For more usage details about Minifier, please refer to `Troubleshooting <https://pytorch.org/docs/stable/dynamo/troubleshooting.html>`_.
+# For more usage details about Minifier, please refer to `Troubleshooting <https://pytorch.org/docs/stable/torch.compiler_troubleshooting.html>`_.
 
 
 ######################################################################

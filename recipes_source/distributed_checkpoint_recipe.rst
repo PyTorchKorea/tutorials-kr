@@ -4,7 +4,7 @@ Getting Started with Distributed Checkpoint (DCP)
 **Author**: `Iris Zhang <https://github.com/wz337>`__, `Rodrigo Kumpera <https://github.com/kumpera>`__, `Chien-Chin Huang <https://github.com/fegin>`__, `Lucas Pasqualin <https://github.com/lucasllc>`__
 
 .. note::
-   |edit| View and edit this tutorial in `github <https://github.com/pytorch/tutorials/blob/main/recipes_source/distributed_checkpoint_recipe.rst>`__.
+   |edit| View and edit this tutorial in `github <https://github.com/pytorchkorea/tutorials-kr/blob/main/recipes_source/distributed_checkpoint_recipe.rst>`__.
 
 
 Prerequisites:
@@ -33,6 +33,7 @@ DCP is different from :func:`torch.save` and :func:`torch.load` in a few signifi
 
 * It produces multiple files per checkpoint, with at least one per rank.
 * It operates in place, meaning that the model should allocate its data first and DCP uses that storage instead.
+* DCP offers special handling of Stateful objects (formally defined in `torch.distributed.checkpoint.stateful`), automatically calling both `state_dict` and `load_state_dict` methods if they are defined.
 
 .. note::
   The code in this tutorial runs on an 8-GPU server, but it can be easily
@@ -58,12 +59,42 @@ Now, let's create a toy module, wrap it with FSDP, feed it with some dummy input
     import torch.multiprocessing as mp
     import torch.nn as nn
 
-    from torch.distributed.fsdp import FullyShardedDataParallel as FSDP
-    from torch.distributed.checkpoint.state_dict import get_state_dict
-    from torch.distributed.fsdp.fully_sharded_data_parallel import StateDictType
+    from torch.distributed.fsdp import fully_shard
+    from torch.distributed.checkpoint.state_dict import get_state_dict, set_state_dict
+    from torch.distributed.checkpoint.stateful import Stateful
 
     CHECKPOINT_DIR = "checkpoint"
 
+
+    class AppState(Stateful):
+        """This is a useful wrapper for checkpointing the Application State. Since this object is compliant
+        with the Stateful protocol, DCP will automatically call state_dict/load_stat_dict as needed in the
+        dcp.save/load APIs.
+
+        Note: We take advantage of this wrapper to hande calling distributed state dict methods on the model
+        and optimizer.
+        """
+
+        def __init__(self, model, optimizer=None):
+            self.model = model
+            self.optimizer = optimizer
+
+        def state_dict(self):
+            # this line automatically manages FSDP FQN's, as well as sets the default state dict type to FSDP.SHARDED_STATE_DICT
+            model_state_dict, optimizer_state_dict = get_state_dict(self.model, self.optimizer)
+            return {
+                "model": model_state_dict,
+                "optim": optimizer_state_dict
+            }
+
+        def load_state_dict(self, state_dict):
+            # sets our state dicts on the model and optimizer, now that we've loaded
+            set_state_dict(
+                self.model,
+                self.optimizer,
+                model_state_dict=state_dict["model"],
+                optim_state_dict=state_dict["optim"]
+            )
 
     class ToyModel(nn.Module):
         def __init__(self):
@@ -95,7 +126,7 @@ Now, let's create a toy module, wrap it with FSDP, feed it with some dummy input
 
         # create a model and move it to GPU with id rank
         model = ToyModel().to(rank)
-        model = FSDP(model)
+        model = fully_shard(model)
 
         loss_fn = nn.MSELoss()
         optimizer = torch.optim.Adam(model.parameters(), lr=0.1)
@@ -104,14 +135,8 @@ Now, let's create a toy module, wrap it with FSDP, feed it with some dummy input
         model(torch.rand(8, 16, device="cuda")).sum().backward()
         optimizer.step()
 
-        # this line automatically manages FSDP FQN's, as well as sets the default state dict type to FSDP.SHARDED_STATE_DICT
-        model_state_dict, optimizer_state_dict = get_state_dict(model, optimizer)
-        state_dict = {
-            "model": model_state_dict,
-            "optimizer": optimizer_state_dict
-        }
-        dcp.save(state_dict,checkpoint_id=CHECKPOINT_DIR)
-
+        state_dict = { "app": AppState(model, optimizer) }
+        dcp.save(state_dict, checkpoint_id=CHECKPOINT_DIR)
 
         cleanup()
 
@@ -126,7 +151,7 @@ Now, let's create a toy module, wrap it with FSDP, feed it with some dummy input
             join=True,
         )
 
-Please go ahead and check the `checkpoint` directory. You should see 8 checkpoint files as shown below.
+Please go ahead and check the `checkpoint` directory. You should see checkpoint files corresponding to the number of files as shown below. For example, if you have 8 devices, you should see 8 files.
 
 .. figure:: /_static/img/distributed/distributed_checkpoint_generated_files.png
    :width: 100%
@@ -152,14 +177,45 @@ The reason that we need the ``state_dict`` prior to loading is:
     import torch
     import torch.distributed as dist
     import torch.distributed.checkpoint as dcp
+    from torch.distributed.checkpoint.stateful import Stateful
     from torch.distributed.checkpoint.state_dict import get_state_dict, set_state_dict
     import torch.multiprocessing as mp
     import torch.nn as nn
 
-    from torch.distributed.fsdp import FullyShardedDataParallel as FSDP
+    from torch.distributed.fsdp import fully_shard
 
     CHECKPOINT_DIR = "checkpoint"
 
+
+    class AppState(Stateful):
+        """This is a useful wrapper for checkpointing the Application State. Since this object is compliant
+        with the Stateful protocol, DCP will automatically call state_dict/load_stat_dict as needed in the
+        dcp.save/load APIs.
+
+        Note: We take advantage of this wrapper to hande calling distributed state dict methods on the model
+        and optimizer.
+        """
+
+        def __init__(self, model, optimizer=None):
+            self.model = model
+            self.optimizer = optimizer
+
+        def state_dict(self):
+            # this line automatically manages FSDP FQN's, as well as sets the default state dict type to FSDP.SHARDED_STATE_DICT
+            model_state_dict, optimizer_state_dict = get_state_dict(self.model, self.optimizer)
+            return {
+                "model": model_state_dict,
+                "optim": optimizer_state_dict
+            }
+
+        def load_state_dict(self, state_dict):
+            # sets our state dicts on the model and optimizer, now that we've loaded
+            set_state_dict(
+                self.model,
+                self.optimizer,
+                model_state_dict=state_dict["model"],
+                optim_state_dict=state_dict["optim"]
+            )
 
     class ToyModel(nn.Module):
         def __init__(self):
@@ -191,24 +247,14 @@ The reason that we need the ``state_dict`` prior to loading is:
 
         # create a model and move it to GPU with id rank
         model = ToyModel().to(rank)
-        model = FSDP(model)
+        model = fully_shard(model)
 
-        # generates the state dict we will load into
-        model_state_dict, optimizer_state_dict = get_state_dict(model, optimizer)
-        state_dict = {
-            "model": model_state_dict,
-            "optimizer": optimizer_state_dict
-        }
+        optimizer = torch.optim.Adam(model.parameters(), lr=0.1)
+
+        state_dict = { "app": AppState(model, optimizer)}
         dcp.load(
             state_dict=state_dict,
             checkpoint_id=CHECKPOINT_DIR,
-        )
-        # sets our state dicts on the model and optimizer, now that we've loaded
-        set_state_dict(
-            model,
-            optimizer,
-            model_state_dict=model_state_dict,
-            optim_state_dict=optimizer_state_dict
         )
 
         cleanup()
@@ -236,7 +282,7 @@ the intent is to save or load in "non-distributed" style, meaning entirely in th
     import os
 
     import torch
-    import torch.distributed.checkpoint as DCP
+    import torch.distributed.checkpoint as dcp
     import torch.nn as nn
 
 
@@ -271,6 +317,42 @@ the intent is to save or load in "non-distributed" style, meaning entirely in th
     if __name__ == "__main__":
         print(f"Running basic DCP checkpoint loading example.")
         run_checkpoint_load_example()
+
+
+Formats
+----------
+One drawback not yet mentioned is that DCP saves checkpoints in a format which is inherently different then those generated using torch.save.
+Since this can be an issue when users wish to share models with users used to the torch.save format, or in general just want to add format flexibility
+to their applications. For this case, we provide the ``format_utils`` module in ``torch.distributed.checkpoint.format_utils``.
+
+A command line utility is provided for the users convenience, which follows the following format:
+
+.. code-block:: bash
+
+    python -m torch.distributed.checkpoint.format_utils <mode> <checkpoint location> <location to write formats to>
+
+In the command above, ``mode`` is one of ``torch_to_dcp`` or ``dcp_to_torch``.
+
+
+Alternatively, methods are also provided for users who may wish to convert checkpoints directly.
+
+.. code-block:: python
+
+    import os
+
+    import torch
+    import torch.distributed.checkpoint as DCP
+    from torch.distributed.checkpoint.format_utils import dcp_to_torch_save, torch_save_to_dcp
+
+    CHECKPOINT_DIR = "checkpoint"
+    TORCH_SAVE_CHECKPOINT_DIR = "torch_save_checkpoint.pth"
+
+    # convert dcp model to torch.save (assumes checkpoint was generated as above)
+    dcp_to_torch_save(CHECKPOINT_DIR, TORCH_SAVE_CHECKPOINT_DIR)
+
+    # converts the torch.save model back to DCP
+    torch_save_to_dcp(TORCH_SAVE_CHECKPOINT_DIR, f"{CHECKPOINT_DIR}_new")
+
 
 
 Conclusion

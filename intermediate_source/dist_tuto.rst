@@ -4,7 +4,7 @@ PyTorch로 분산 어플리케이션 개발하기
   **번역**: `박정환 <https://github.com/9bow>`_
 
 .. note::
-   |edit| 이 튜토리얼의 소스 코드는 `GitHub <https://github.com/pytorch/tutorials/blob/main/intermediate_source/dist_tuto.rst>`__ 에서 확인하고 변경해 볼 수 있습니다.
+   |edit| 이 튜토리얼의 소스 코드는 `GitHub <https://github.com/pytorchkorea/tutorials-kr/blob/main/intermediate_source/dist_tuto.rst>`__ 에서 확인하고 변경해 볼 수 있습니다.
 
 선수과목(Prerequisites):
 
@@ -35,7 +35,7 @@ PyTorch에 포함된 분산 패키지(예. ``torch.distributed``)는 연구자�
 연산 클러스터에 접근하는 경우에는 시스템 관리자에게 확인하거나 선호하는 코디네이션
 도구(coordination tool)를 사용하시면 됩니다. (예. `pdsh <https://linux.die.net/man/1/pdsh>`__,
 `clustershell <https://cea-hpc.github.io/clustershell/>`__, 또는
-`others <https://slurm.schedmd.com/>`__) 이 튜토리얼에서는 다음 템플릿을 사용하여
+`slurm <https://slurm.schedmd.com/>`__). 이 튜토리얼에서는 다음 템플릿을 사용하여
 단일 기기에서 여러 프로세스를 생성(fork)하겠습니다.
 
 .. code:: python
@@ -43,6 +43,7 @@ PyTorch에 포함된 분산 패키지(예. ``torch.distributed``)는 연구자�
     """run.py:"""
     #!/usr/bin/env python
     import os
+    import sys
     import torch
     import torch.distributed as dist
     import torch.multiprocessing as mp
@@ -60,11 +61,15 @@ PyTorch에 포함된 분산 패키지(예. ``torch.distributed``)는 연구자�
 
 
     if __name__ == "__main__":
-        size = 2
+        world_size = 2
         processes = []
-        mp.set_start_method("spawn")
-        for rank in range(size):
-            p = mp.Process(target=init_process, args=(rank, size, run))
+        if "google.colab" in sys.modules:
+            print("Running in Google Colab")
+            mp.get_context("spawn")
+        else:
+            mp.set_start_method("spawn")
+        for rank in range(world_size):
+            p = mp.Process(target=init_process, args=(rank, world_size, run))
             p.start()
             processes.append(p)
 
@@ -94,7 +99,7 @@ PyTorch에 포함된 분산 패키지(예. ``torch.distributed``)는 연구자�
 
 
 하나의 프로세스에서 다른 프로세스로 데이터를 전송하는 것을 점-대-점 간 통신이라고 합니다.
-지점간 통신은  ``send`` 와 ``recv`` 함수 또는 즉시 응답하는(*immediate* counter-parts)
+지점간 통신은  ``send/recv`` 함수 또는 즉시 응답하는(*immediate* counter-parts)
 ``isend`` 와 ``irecv`` 를 사용합니다.
 
 .. code:: python
@@ -116,7 +121,7 @@ PyTorch에 포함된 분산 패키지(예. ``torch.distributed``)는 연구자�
 증가시킨 후 1번 프로세스로 보내서 둘 다 1.0으로 종료됩니다. 이 때, 프로세스 1은
 수신한 데이터를 저장할 메모리를 할당해두어야 합니다.
 
-또한 ``send``/``recv`` 는 모두 **블로킹** 입니다: 두 프로세스는 통신이 완료될 때까지
+또한 ``send/recv`` 는 모두 **블로킹** 입니다: 두 프로세스는 통신이 완료될 때까지
 멈춰있습니다. 반면에 즉시 응답하는 것이 **논-블로킹** 입니다; 스크립트는 실행을
 계속하고 메소드는 ``wait()`` 를 선택할 수 있는 ``Work`` 객체를 반환합니다.
 
@@ -144,7 +149,7 @@ PyTorch에 포함된 분산 패키지(예. ``torch.distributed``)는 연구자�
 전에는 전송된 Tensor를 수정하거나 수신된 Tensor에 접근해서는 안됩니다.
 
 - ``dist.isend()`` 다음에 ``tensor`` 에 쓰면 정의되지 않은 동작이 발생합니다.
-- ``dist.irecv()`` 다음에 ``tensor`` 를 읽으면 정의되지 않은 동작이 발생합니다.
+- ``req.wait()`` 가 실행되기 전까지, ``dist.irecv()`` 다음에 ``tensor`` 를 읽으면 정의되지 않은 동작이 발생합니다.
 
 그러나, ``req.wait()`` 를 실행한 후에는 통신이 이루어진 것을 보장받을 수 있기 때문에,
 ``tensor[0]`` 에 저장된 값은 1.0이 됩니다.
@@ -207,10 +212,18 @@ PyTorch에 포함된 분산 패키지(예. ``torch.distributed``)는 연구자�
 -  ``dist.ReduceOp.SUM``,
 -  ``dist.ReduceOp.PRODUCT``,
 -  ``dist.ReduceOp.MAX``,
--  ``dist.ReduceOp.MIN``.
+-  ``dist.ReduceOp.MIN``,
+-  ``dist.ReduceOp.BAND``,
+-  ``dist.ReduceOp.BOR``,
+-  ``dist.ReduceOp.BXOR``,
+-  ``dist.ReduceOp.PREMUL_SUM``.
 
-PyTorch에는 현재 ``dist.all_reduce(tensor, op, group)`` 외에도 6개의 집합 통신이
-구현되어 있습니다.
+지원하는 연산의 전체 목록은
+`여기 <https://pytorch.org/docs/stable/distributed.html#torch.distributed.ReduceOp>`__ 에서 확인할 수 있습니다.
+
+
+PyTorch에는 현재 ``dist.all_reduce(tensor, op, group)`` 외에도 많은 추가적인 집합 통신이
+구현되어 있습니다. 여기 몇 가지 지원되는 집합 통신을 소개합니다.
 
 -  ``dist.broadcast(tensor, src, group)``: ``src`` 의 ``tensor`` 를 모든 프로세스의 ``tensor`` 에
    복사합니다.
@@ -226,6 +239,12 @@ PyTorch에는 현재 ``dist.all_reduce(tensor, op, group)`` 외에도 6개의 �
    모든 프로세스의 ``tensor_list`` 에 복사합니다.
 -  ``dist.barrier(group)``: `group` 내의 모든 프로세스가 이 함수에 진입할 때까지
    `group` 내의 모든 프로세스를 멈춥(block)니다.
+-  ``dist.all_to_all(output_tensor_list, input_tensor_list, group)``: `group` 내의 모든 프로세스에
+   `input_tensor_list` 의 Tensor들을 분산하고, `output_tensor_list` 에 수집된 Tensor들을 반환합니다.
+
+지원되는 집합 통신의 전체 목록은 PyTorch Distributed의 최신 문서 `(링크) <https://pytorch.org/docs/stable/distributed.html>`__
+를 참고하세요.
+
 
 분산 학습(Distributed Training)
 -----------------------------------
@@ -252,7 +271,7 @@ PyTorch에는 현재 ``dist.all_reduce(tensor, op, group)`` 외에도 6개의 �
 모든 프로세스가 각자의 데이터 배치(batch)에서 각자의 모델의 변화도(gradient)를
 계산한 후 평균을 계산합니다. 프로세스의 수를 변경해도 유사한 수렴 결과를 보장하기
 위해, 먼저 데이터셋을 분할해야 합니다.
-(아래 코드 대신 `tnt.dataset.SplitDataset <https://github.com/pytorch/tnt/blob/master/torchnet/dataset/splitdataset.py#L4>`__
+(아래 코드 대신 `torch.utils.data.random_split <https://pytorch.org/docs/stable/data.html#torch.utils.data.random_split>`__
 을 사용해도 됩니다.)
 
 .. code:: python
@@ -362,7 +381,7 @@ PyTorch에는 현재 ``dist.all_reduce(tensor, op, group)`` 외에도 6개의 �
 
 **참고:** 마지막 문장은 *기술적으로는* 참이지만, 동기식 SGD를 상용 수준(production-level)으로
 구현하기 위해서는 `더 많은 트릭 <https://seba-1511.github.io/dist_blog>`__ 이 필요합니다.
-다시 말씀드리지만, `테스트되고 최적화된 <https://pytorch.org/docs/stable/nn.html#torch.nn.parallel.DistributedDataParallel>`__
+다시 말씀드리지만, `테스트되고 최적화된 <https://pytorch.org/docs/stable/generated/torch.nn.parallel.DistributedDataParallel.html#torch.nn.parallel.DistributedDataParallel>`__
 것을 사용하십시오.
 
 사용자 정의 링-올리듀스(Ring-Allreduce)
@@ -398,7 +417,7 @@ PyTorch에는 현재 ``dist.all_reduce(tensor, op, group)`` 외에도 6개의 �
            send_req.wait()
        recv[:] = accum[:]
 
-위 스크립트에서, ``allreduct(send, recv)`` 함수는 PyTorch에 있는 것과는 약간
+위 스크립트에서, ``allreduce(send, recv)`` 함수는 PyTorch에 있는 것과는 약간
 다른 특징을 가지고 있습니다. 이는 ``recv`` Tensor를 받은 후 모든 ``send`` Tensor의
 합을 저장합니다. 여기에서 구현한 것과 DeepSpeech와는 다른 부분이 여전히 다른 부분이
 있는데, 이것은 숙제로 남겨두도록 하겠습니다: DeepSpeech의 구현은 통신 대역폭을
@@ -420,9 +439,11 @@ PyTorch에는 현재 ``dist.all_reduce(tensor, op, group)`` 외에도 6개의 �
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ``torch.distributed`` 의 가장 우아한 면 중 하나는 다른 백엔드를 기반으로 추상화하고
-구축하는 기능입니다. 앞에서 언급한 것처럼 현재 PyTorch에는 Gloo, NCLL 및 MPI의
-세 가지 백엔드가 구현되어 있습니다. 각각은 원하는 사용 사례에 따라 서로 다른 스펙과
-트레이드오프(tradeoffs)를 갖습니다. 지원하는 기능의 비교표는
+구축하는 기능입니다. 앞에서 언급한 것처럼 현재 PyTorch에는 여러 백엔드들이 구현되어 있습니다.
+이러한 백엔드들은 서로 다른 가속기(accelerator) 유형들에 해당하는 인터페이스를 제공하는
+`Accelerator API <https://pytorch.org/docs/stable/torch.html#accelerators>`__ 를
+사용하여 쉽게 선택할 수 있습니다. 일반적으로는 Gloo, NCLL 및 MPI를 많이 하숑합니다.
+각각은 원하는 사용 사례에 따라 서로 다른 스펙과 트레이드오프(tradeoffs)를 갖습니다. 지원하는 기능의 비교표는
 `여기 <https://pytorch.org/docs/stable/distributed.html#module-torch.distributed>`__
 에서 찾아보실 수 있습니다.
 
@@ -438,9 +459,10 @@ CUDA Tensor에 대한 집합 연산 구현은 NCCL 백엔드에서 제공하는 
 알고 계시겠지만, 위에서 만든 분산 SGD 예제는 GPU에 ``model`` 을 올리면 동작하지
 않습니다. 여러 GPU를 사용하기 위해서는 아래와 같이 수정이 필요합니다:
 
-1. ``device = torch.device("cuda:{}".format(rank))`` 사용
-2. ``model = Net()`` :math:`\rightarrow` ``model = Net().to(device)``
-3. ``data, target = data.to(device), target.to(device)`` 사용
+1. 가속기(Accelerator) API 사용: ``device_type = torch.accelerator.current_accelerator()``
+2. ``torch.device(f"{device_type}:{rank}")`` 사용
+3. ``model = Net()`` :math:`\rightarrow` ``model = Net().to(device)``
+4.  ``data, target = data.to(device), target.to(device)`` 사용
 
 위와 같이 변경하고 나면 이제 2개의 GPU에서 모델이 학습을 하며, ``watch nvidia-smi``
 로 사용률을 모니터링할 수 있습니다.
@@ -494,14 +516,20 @@ CUDA IPC와 GPU Direct 기술을 활용하고 있습니다.
 성능을 위해 이 백엔드를 사용하는 것을 고려해보시기 바랍니다. NCCL 백엔드는 미리
 빌드(pre-built)된 바이너리에 CUDA 지원과 함께 포함되어 있습니다.
 
+**XCCL 백엔드**
+
+`XCCL 백엔드` 는 XPU Tensor들에 대한 집합 연산의 최적화된 구현체를 제공합니다.
+만약 집합 연산에 XPU Tensor만 사용하는 경우, 이 백엔드는 동급 최고(Best-in-Class) 성능을 제공합니다.
+XCCL 백엔드는 XPU 지원과 함께 미리 빌드(pre-built)된 바이너리에 포함되어 있습니다.
+
+
 초기화 방법(Initialization Methods)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-마지막으로, 처음 호출했던 함수를 알아보겠습니다: ``dist.init_process_group(backend, init_method)``
-특히 각 프로세스 간의 초기 조정(initial coordination) 단계를 담당하는 다양한 초기화
+마지막으로, 처음 호출했던 함수를 살펴보겠습니다: ``dist.init_process_group(backend, init_method)``
+특히, 각 프로세스 간의 초기 조정(initial coordination) 단계를 담당하는 다양한 초기화
 방법들을 살펴보도록 하겠습니다. 이러한 방법들은 어떻게 이러한 조정이 수행되는지를
-정의할 수 있게 합니다. 하드웨어 설정에 따라 이러한 방법들 중 하나가 다른 방법들보다
-더 적합할 수 있습니다.
+정의할 수 있게 합니다. 초기화 방법의 선택은 하드웨어 설정에 따라 다르며, 하나의 방법이 다른 방법보다 더 적합할 수 있습니다.
 다음 섹션 외에도 `공식 문서 <https://pytorch.org/docs/stable/distributed.html#initialization>`__
 를 참고하실 수 있습니다.
 
@@ -514,7 +542,7 @@ CUDA IPC와 GPU Direct 기술을 활용하고 있습니다.
 -  ``MASTER_PORT``: 0-순위의 프로세스를 호스트할 기기의 비어있는 포트 번호(free port)
 -  ``MASTER_ADDR``: 0-순위의 프로세스를 호스트할 기기의 IP 주소
 -  ``WORLD_SIZE``: 전체 프로세스 수 - 마스터가 얼마나 많은 워커들을 기다릴지 알 수 있습니다
--  ``RANK``: 각 프로세스의 우선순위 - 워커의 마스터 여부를 확인할 수 있습니다.
+-  ``RANK``: 각 프로세스의 우선순위 - 워커 또는 마스터 여부를 확인할 수 있습니다.
 
 **공유 파일 시스템**
 

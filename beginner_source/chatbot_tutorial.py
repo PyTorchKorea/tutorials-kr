@@ -89,7 +89,7 @@
 # -----------
 #
 # 시작에 앞서, `여기 <https://zissou.infosci.cornell.edu/convokit/datasets/movie-corpus/movie-corpus.zip>`__ 에서
-# ZIP 파일 형태의 데이터를 내려받고, 현재 디렉토리 아래에 ``data/`` 라는
+# 영상-대화 말뭉치 ZIP 파일 형태의 데이터를 내려받고, 현재 디렉토리 아래에 ``data/`` 라는
 # 디렉토리를 만들어서 내려받은 데이터를 옮겨두시기 바랍니다.
 #
 # 그 다음에는, 몇 가지 필요한 도구들을 import 하겠습니다.
@@ -112,9 +112,10 @@ import math
 import json
 
 
-USE_CUDA = torch.cuda.is_available()
-device = torch.device("cuda" if USE_CUDA else "cpu")
-
+# 현재 사용 가능한 `가속기(accelerator) <https://pytorch.org/docs/stable/torch.html#accelerators>`__ 가 있다면 사용합니다.
+# 아니라면 CPU를 사용합니다.
+device = torch.accelerator.current_accelerator().type if torch.accelerator.is_available() else "cpu"
+print(f"Using {device} device")
 
 ######################################################################
 # 데이터 읽기 & 전처리하기
@@ -962,7 +963,7 @@ def train(input_variable, lengths, target_variable, mask, max_target_len, encode
     decoder_input = decoder_input.to(device)
 
     # 디코더의 초기 은닉 상태를 인코더의 마지막 은닉 상태로 둡니다
-    decoder_hidden = encoder_hidden[:decoder.n_layers]
+    decoder_hidden = encoder_hidden[:self.decoder.n_layers]
 
     # 이번 반복에서 teacher forcing을 사용할지를 결정합니다
     use_teacher_forcing = True if random.random() < teacher_forcing_ratio else False
@@ -1309,16 +1310,16 @@ if loadFilename:
     encoder_optimizer.load_state_dict(encoder_optimizer_sd)
     decoder_optimizer.load_state_dict(decoder_optimizer_sd)
 
-# CUDA가 있으면 CUDA를 설정합니다
+# accelerator를 사용할 수 있다면, accelerator를 설정합니다
 for state in encoder_optimizer.state.values():
     for k, v in state.items():
         if isinstance(v, torch.Tensor):
-            state[k] = v.cuda()
+            state[k] = v.to(device)
 
 for state in decoder_optimizer.state.values():
     for k, v in state.items():
         if isinstance(v, torch.Tensor):
-            state[k] = v.cuda()
+            state[k] = v.to(device)
 
 # 학습 단계를 수행합니다
 print("Starting Training!")

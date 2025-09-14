@@ -19,7 +19,7 @@ TorchVision Object Detection Finetuning Tutorial
 #
 #     This tutorial works only with torchvision version >=0.16 or nightly.
 #     If you're using torchvision<=0.15, please follow
-#     `this tutorial instead <https://github.com/pytorch/tutorials/blob/d686b662932a380a58b7683425faa00c06bcf502/intermediate_source/torchvision_tutorial.rst>`_.
+#     `this tutorial instead <https://github.com/pytorchkorea/tutorials-kr/blob/d686b662932a380a58b7683425faa00c06bcf502/intermediate_source/torchvision_tutorial.rst>`_.
 #
 #
 # Defining the Dataset
@@ -382,14 +382,12 @@ def get_transform(train):
 # expects during training and inference time on sample data.
 import utils
 
-
 model = torchvision.models.detection.fasterrcnn_resnet50_fpn(weights="DEFAULT")
 dataset = PennFudanDataset('data/PennFudanPed', get_transform(train=True))
 data_loader = torch.utils.data.DataLoader(
     dataset,
     batch_size=2,
     shuffle=True,
-    num_workers=4,
     collate_fn=utils.collate_fn
 )
 
@@ -408,14 +406,14 @@ print(predictions[0])
 
 
 ######################################################################
-# Let’s now write the main function which performs the training and the
-# validation:
+# We want to be able to train our model on an `accelerator <https://pytorch.org/docs/stable/torch.html#accelerators>`_
+# such as CUDA, MPS, MTIA, or XPU. Let’s now write the main function which performs the training and the validation:
 
 
 from engine import train_one_epoch, evaluate
 
-# train on the GPU or on the CPU, if a GPU is not available
-device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
+# train on the accelerator or on the CPU, if an accelerator is not available
+device = torch.accelerator.current_accelerator() if torch.accelerator.is_available() else torch.device('cpu')
 
 # our dataset has two classes only - background and person
 num_classes = 2
@@ -433,7 +431,6 @@ data_loader = torch.utils.data.DataLoader(
     dataset,
     batch_size=2,
     shuffle=True,
-    num_workers=4,
     collate_fn=utils.collate_fn
 )
 
@@ -441,7 +438,6 @@ data_loader_test = torch.utils.data.DataLoader(
     dataset_test,
     batch_size=1,
     shuffle=False,
-    num_workers=4,
     collate_fn=utils.collate_fn
 )
 

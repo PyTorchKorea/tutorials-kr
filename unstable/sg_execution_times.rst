@@ -1,0 +1,58 @@
+
+:orphan:
+
+.. _sphx_glr_unstable_sg_execution_times:
+
+
+Computation times
+=================
+**00:00.000** total execution time for 8 files **from unstable**:
+
+.. container::
+
+  .. raw:: html
+
+    <style scoped>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet" />
+    </style>
+    <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    <script type="text/javascript" class="init">
+    $(document).ready( function () {
+        $('table.sg-datatable').DataTable({order: [[1, 'desc']]});
+    } );
+    </script>
+
+  .. list-table::
+   :header-rows: 1
+   :class: table table-striped sg-datatable
+
+   * - Example
+     - Time
+     - Mem (MB)
+   * - :ref:`sphx_glr_unstable_gpu_direct_storage.py` (``gpu_direct_storage.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_unstable_gpu_quantization_torchao_tutorial.py` (``gpu_quantization_torchao_tutorial.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_unstable_maskedtensor_adagrad.py` (``maskedtensor_adagrad.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_unstable_maskedtensor_advanced_semantics.py` (``maskedtensor_advanced_semantics.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_unstable_maskedtensor_overview.py` (``maskedtensor_overview.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_unstable_maskedtensor_sparsity.py` (``maskedtensor_sparsity.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_unstable_nestedtensor.py` (``nestedtensor.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_unstable_vmap_recipe.py` (``vmap_recipe.py``)
+     - 00:00.000
+     - 0.0

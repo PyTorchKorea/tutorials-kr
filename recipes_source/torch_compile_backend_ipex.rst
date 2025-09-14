@@ -1,12 +1,12 @@
-Intel® Extension for PyTorch* 백엔드
-=====================================
+Intel® CPU에서의 Intel® Extension for PyTorch* 백엔드
+====================================================
 
 **저자**: `Hamid Shojanazeri <https://github.com/jingxu10>`_
 **번역:**: `김재현 <https://github.com/jh941213>`_
 
-- `torch.compile` 과 더 잘 작동하도록, Intel® Extension for PyTorch는 ``ipex`` 라는 백엔드를 구현했습니다.    
-- 이 백엔드는 Intel 플랫폼에서 하드웨어 자원 사용 효율성을 개선하여 성능을 향상시키는 것을 목표로 합니다.  
-- 모델 컴파일을 위한 Intel® Extension for PyTorch에 설계된 추가 커스터마이징을 통해, `ipex` 백엔드가 구현되었습니다.  
+- Intel® CPU에서 `torch.compile` 과 더 잘 작동하도록, Intel® Extension for PyTorch는 ``ipex`` 라는 백엔드를 구현했습니다.
+- 이 백엔드는 Intel 플랫폼에서 하드웨어 자원 사용 효율성을 개선하여 성능을 향상시키는 것을 목표로 합니다.
+- 모델 컴파일을 위한 Intel® Extension for PyTorch에 설계된 추가 커스터마이징을 통해, `ipex` 백엔드가 구현되었습니다.
 
 사용 예시
 ~~~~~~~~~~~~~

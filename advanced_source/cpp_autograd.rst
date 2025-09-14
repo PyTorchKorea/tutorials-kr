@@ -1,5 +1,5 @@
 C++ 프론트엔드의 자동 미분 (autograd)
-==================================
+========================================
 
 **번역**: `유용환 <https://github.com/yoosful>`_
 
@@ -13,7 +13,7 @@ C++ 프론트엔드의 자동 미분 (autograd)
 <https://tutorials.pytorch.kr/beginner/blitz/autograd_tutorial.html>`_ 을 읽어보세요.
 
 기초 자동 미분 연산
----------------
+-----------------------
 
 (`이 튜토리얼 <https://tutorials.pytorch.kr/beginner/blitz/autograd_tutorial.html#autograd-automatic-differentiation>`_ 의 내용에 기반함)
 
@@ -219,7 +219,7 @@ Out:
 <https://pytorch.org/cppdocs/api/classat_1_1_tensor.html>`_ 에서 확인하세요.
 
 C++로 고차원 그래디언트 계산하기
-----------------------------
+--------------------------------------
 
 고차원 그래디언트를 사용하는 사례로 그래디언트 패널티 계산이 있습니다.
 ``torch::autograd::grad`` 를 사용하는 예를 살펴봅시다.
@@ -258,13 +258,13 @@ Out:
   [ CPUFloatType{3,4} ]
 
 ``torch::autograd::backward``
-(`링크 <https://pytorch.org/cppdocs/api/function_namespacetorch_1_1autograd_1afa9b5d4329085df4b6b3d4b4be48914b.html>`_) 및
+(`링크 <https://pytorch.org/cppdocs/api/function_namespacetorch_1_1autograd_1a1403bf65b1f4f8c8506a9e6e5312d030.html>`_) 및
 ``torch::autograd::grad``
-(`링크 <https://pytorch.org/cppdocs/api/function_namespacetorch_1_1autograd_1a1e03c42b14b40c306f9eb947ef842d9c.html>`_) 문서에서
+(`링크 <https://pytorch.org/cppdocs/api/function_namespacetorch_1_1autograd_1ab9fa15dc09a8891c26525fb61d33401a.html>`_) 문서에서
 이 함수들의 사용법에 대해 더 알아보세요.
 
 C++에서 사용자 지정 자동 미분 함수 사용하기
--------------------------------------
+----------------------------------------------
 
 (`이 튜토리얼 <https://pytorch.org/docs/stable/notes/extending.html#extending-torch-autograd>`_ 의 내용에 기반함)
 
@@ -387,7 +387,7 @@ Out:
 `이 문서 <https://pytorch.org/cppdocs/api/structtorch_1_1autograd_1_1_function.html>`_ 에서 확인할 수 있습니다.
 
 파이썬 자동 미분 코드를 C++로 변환하기
-------------------------------
+----------------------------------------------
 
 개략적으로 말하면, C++에서 자동 미분을 사용하는 가장 쉬운 방법은 먼저
 파이썬에서 동작하는 자동 미분 코드를 작성한 후, 아래 표를 참고해 C++ 코드로
@@ -396,9 +396,9 @@ Out:
 +--------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | Python                         | C++                                                                                                                                                                    |
 +================================+========================================================================================================================================================================+
-| ``torch.autograd.backward``    | ``torch::autograd::backward`` (`링크 <https://pytorch.org/cppdocs/api/function_namespacetorch_1_1autograd_1afa9b5d4329085df4b6b3d4b4be48914b.html>`_)                  |
+| ``torch.autograd.backward``    | ``torch::autograd::backward`` (`링크 <https://pytorch.org/cppdocs/api/function_namespacetorch_1_1autograd_1a1403bf65b1f4f8c8506a9e6e5312d030.html>`_)                  |
 +--------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| ``torch.autograd.grad``        | ``torch::autograd::grad`` (`링크 <https://pytorch.org/cppdocs/api/function_namespacetorch_1_1autograd_1a1e03c42b14b40c306f9eb947ef842d9c.html>`_)                      |
+| ``torch.autograd.grad``        | ``torch::autograd::grad`` (`링크 <https://pytorch.org/cppdocs/api/function_namespacetorch_1_1autograd_1ab9fa15dc09a8891c26525fb61d33401a.html>`_)                      |
 +--------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | ``torch.Tensor.detach``        | ``torch::Tensor::detach`` (`링크 <https://pytorch.org/cppdocs/api/classat_1_1_tensor.html#_CPPv4NK2at6Tensor6detachEv>`_)                                              |
 +--------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
@@ -430,7 +430,7 @@ Out:
 최대한 빨리 고쳐드리겠습니다.
 
 결론
------
+---------
 
 이제 PyTorch의 C++ 자동 미분 API에 대한 개괄적인 이해가 생겼을 것입니다.
 여기서 사용된 코드 예제들은 `여기 <https://github.com/pytorch/examples/tree/master/cpp/autograd>`_ 에서

@@ -4,7 +4,7 @@ Getting Started with DeviceMesh
 **Author**: `Iris Zhang <https://github.com/wz337>`__, `Wanchao Liang <https://github.com/wanchaol>`__
 
 .. note::
-   |edit| View and edit this tutorial in `github <https://github.com/pytorch/tutorials/blob/main/recipes_source/distributed_device_mesh.rst>`__.
+   |edit| View and edit this tutorial in `github <https://github.com/pytorchkorea/tutorials-kr/blob/main/recipes_source/distributed_device_mesh.rst>`__.
 
 Prerequisites:
 
@@ -31,7 +31,7 @@ Users can also easily manage the underlying process_groups/devices for multi-dim
 Why DeviceMesh is Useful
 ------------------------
 DeviceMesh is useful when working with multi-dimensional parallelism (i.e. 3-D parallel) where parallelism composability is required. For example, when your parallelism solutions require both communication across hosts and within each host.
-The image above shows that we can create a 2D mesh that connects the devices within each host, and connects each device with its counterpart on the other hosts in a homogenous setup.
+The image above shows that we can create a 2D mesh that connects the devices within each host, and connects each device with its counterpart on the other hosts in a homogeneous setup.
 
 Without DeviceMesh, users would need to manually set up NCCL communicators, cuda devices on each process before applying any parallelism, which could be quite complicated.
 The following code snippet illustrates a hybrid sharding 2-D Parallel pattern setup without :class:`DeviceMesh`.
@@ -121,7 +121,7 @@ users would not need to manually create and manage shard group and replicate gro
     import torch.nn as nn
 
     from torch.distributed.device_mesh import init_device_mesh
-    from torch.distributed.fsdp import FullyShardedDataParallel as FSDP, ShardingStrategy
+    from torch.distributed.fsdp import fully_shard as FSDP
 
 
     class ToyModel(nn.Module):
@@ -136,9 +136,9 @@ users would not need to manually create and manage shard group and replicate gro
 
 
     # HSDP: MeshShape(2, 4)
-    mesh_2d = init_device_mesh("cuda", (2, 4))
+    mesh_2d = init_device_mesh("cuda", (2, 4), mesh_dim_names=("dp_replicate", "dp_shard"))
     model = FSDP(
-        ToyModel(), device_mesh=mesh_2d, sharding_strategy=ShardingStrategy.HYBRID_SHARD
+        ToyModel(), device_mesh=mesh_2d
     )
 
 Let's create a file named ``hsdp.py``.
@@ -148,6 +148,26 @@ Then, run the following `torch elastic/torchrun <https://pytorch.org/docs/stable
 
     torchrun --nproc_per_node=8 hsdp.py
 
+How to use DeviceMesh for your custom parallel solutions
+--------------------------------------------------------
+When working with large scale training, you might have more complex custom parallel training composition. For example, you may need to slice out sub-meshes for different parallelism solutions.
+DeviceMesh allows users to slice child mesh from the parent mesh and re-use the NCCL communicators already created when the parent mesh is initialized.
+
+.. code-block:: python
+
+    from torch.distributed.device_mesh import init_device_mesh
+    mesh_3d = init_device_mesh("cuda", (2, 2, 2), mesh_dim_names=("replicate", "shard", "tp"))
+
+    # Users can slice child meshes from the parent mesh.
+    hsdp_mesh = mesh_3d["replicate", "shard"]
+    tp_mesh = mesh_3d["tp"]
+
+    # Users can access the underlying process group thru `get_group` API.
+    replicate_group = hsdp_mesh["replicate"].get_group()
+    shard_group = hsdp_mesh["shard"].get_group()
+    tp_group = tp_mesh.get_group()
+
+
 Conclusion
 ----------
 In conclusion, we have learned about :class:`DeviceMesh` and :func:`init_device_mesh`, as well as how
@@ -155,5 +175,5 @@ they can be used to describe the layout of devices across the cluster.
 
 For more information, please see the following:
 
-- `2D parallel combining Tensor/Sequance Parallel with FSDP <https://github.com/pytorch/examples/blob/main/distributed/tensor_parallelism/fsdp_tp_example.py>`__
-- `Composable PyTorch Distributed with PT2 <chrome-extension://efaidnbmnnnibpcajpcglclefindmkaj/https://static.sched.com/hosted_files/pytorch2023/d1/%5BPTC%2023%5D%20Composable%20PyTorch%20Distributed%20with%20PT2.pdf>`__
+- `2D parallel combining Tensor/Sequence Parallel with FSDP <https://github.com/pytorch/examples/blob/main/distributed/tensor_parallelism/fsdp_tp_example.py>`__
+- `Composable PyTorch Distributed with PT2 <https://static.sched.com/hosted_files/pytorch2023/d1/%5BPTC%2023%5D%20Composable%20PyTorch%20Distributed%20with%20PT2.pdf>`__

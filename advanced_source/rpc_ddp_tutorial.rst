@@ -10,7 +10,7 @@
 이 튜토리얼은 간단한 예제를 사용하여 분산 데이터 병렬 처리(distributed data parallelism)와
 분산 모델 병렬 처리(distributed model parallelism)를 결합하여 간단한 모델 학습시킬 때
 `분산 데이터 병렬(DistributedDataParallel) <https://pytorch.org/docs/stable/nn.html#torch.nn.parallel.DistributedDataParallel>`__ (DDP)과
-`분산 RPC 프레임워크(Distributed RPC framework) <https://pytorch.org/docs/master/rpc.html>`__를 결합하는 방법에 대해 설명합니다.
+`분산 RPC 프레임워크(Distributed RPC framework) <https://pytorch.org/docs/master/rpc.html>`__ 를 결합하는 방법에 대해 설명합니다.
 예제의 소스 코드는 `여기 <https://github.com/pytorch/examples/tree/master/distributed/rpc/ddp_rpc>`__에서 확인할 수 있습니다.
 
 이전 튜토리얼 내용이었던
@@ -25,7 +25,7 @@
    이때 `분산 RPC 프레임워크 <https://pytorch.org/docs/master/rpc.html>`__는
    매개변수 서버에서 임베딩 찾기 작업(embedding lookup)을 수행하는 데 사용할 수 있습니다.
 2) 다음은 `PipeDream <https://arxiv.org/abs/1806.03377>`__ 문서에서 설명된 하이브리드 병렬 처리 활성화하기 입니다.
-   `분산 RPC 프레임워크 <https://pytorch.org/docs/master/rpc.html>`__를 사용하여
+   `분산 RPC 프레임워크 <https://pytorch.org/docs/master/rpc.html>`__ 를 사용하여
    여러 worker에 걸쳐 모델의 단계를 파이프라인(pipeline)할 수 있고
    (필요에 따라) `분산 데이터 병렬 <https://pytorch.org/docs/stable/nn.html#torch.nn.parallel.DistributedDataParallel>`__을 이용해서
    각 단계를 복제할 수 있습니다.
@@ -50,16 +50,16 @@
 2) 그런 다음 마스터는 트레이너의 학습 루프를 시작하고 원격 모듈(remote module)을 트레이너에게 전달합니다.
 3) 트레이너는 먼저 마스터에서 제공하는 원격 모듈을 사용하여
    임베딩 찾기 작업(embedding lookup)을 수행한 다음 DDP 내부에 감싸진 FC 레이어를 실행하는 ``HybridModel``을 생성합니다.
-4) 트레이너는 모델의 순방향 전달을 실행하고 손실을 사용하여 `분산 Autograd <https://pytorch.org/docs/master/rpc.html#distributed-autograd-framework>`__를
+4) 트레이너는 모델의 순방향 전달을 실행하고 손실을 사용하여 `분산 Autograd <https://pytorch.org/docs/master/rpc.html#distributed-autograd-framework>`__ 를
    사용하여 역방향 전달을 실행합니다.
 5) 역방향 전달의 일부로 FC 레이어의 변화도가 먼저 계산되고 DDP의 allreduce를 통해 모든 트레이너와 동기화됩니다.
 6) 다음으로, 분산 Autograd는 매개변수 서버로 변화도를 전파하고 그곳에서 임베딩 테이블의 변화도가 업데이트됩니다.
 7) 마지막으로, `분산 옵티마이저(DistributedOptimizer) <https://pytorch.org/docs/master/rpc.html#module-torch.distributed.optim>`__는 모든 매개변수를 업데이트하는 데 사용됩니다.
 
-.. 주의사항::
+.. warning::
 
   DDP와 RPC를 결합할 때, 역방향 전달에 대해 항상
-  `분산 Autograd <https://pytorch.org/docs/master/rpc.html#distributed-autograd-framework>`__를 사용해야 합니다.
+  `분산 Autograd <https://pytorch.org/docs/master/rpc.html#distributed-autograd-framework>`__ 를 사용해야 합니다.
 
 
 이제 각 부분을 자세히 살펴보겠습니다.
@@ -70,7 +70,7 @@ TCP init_method를 사용하여 4개의 모든 worker에서 RPC 프레임워크�
 RPC 초기화가 끝나면, 마스터는 `EmbeddingBag <https://pytorch.org/docs/master/generated/torch.nn.EmbeddingBag.html>`__ 레이어를
 `원격 모듈(RemoteModule) <https://pytorch.org/docs/master/rpc.html#remotemodule>`__을 사용하여
 매개변수 서버에 담고 있는 원격 모듈 하나를 생성합니다.
-그런 다음 마스터는 각 트레이너를 반복하고 `rpc_async <https://pytorch.org/docs/master/rpc.html#torch.distributed.rpc.rpc_async>`__를
+그런 다음 마스터는 각 트레이너를 반복하고 `rpc_async <https://pytorch.org/docs/master/rpc.html#torch.distributed.rpc.rpc_async>`__ 를
 사용하여 각 트레이너에서 ``_run_trainer``를 호출하여 반복 학습을 시작합니다.
 마지막으로 마스터는 종료하기 전에 모든 학습이 완료될 때까지 기다립니다.
 
@@ -111,7 +111,7 @@ RemoteModule의 ``forward``를 사용하여 매개변수 서버에서 임베딩 
 이제 `분산 옵티마이저(DistributedOptimizer) <https://pytorch.org/docs/master/rpc.html#module-torch.distributed.optim>`__로
 최적화하려는 모든 매개변수에 대한 RRef 목록을 검색해야 합니다.
 매개변수 서버에서 임베딩 테이블의 매개변수를 검색하기 위해
-RemoteModule의 `remote_parameters <https://pytorch.org/docs/master/rpc.html#torch.distributed.nn.api.remote_module.RemoteModule.remote_parameters>`__를 호출할 수 있습니다.
+RemoteModule의 `remote_parameters <https://pytorch.org/docs/master/rpc.html#torch.distributed.nn.api.remote_module.RemoteModule.remote_parameters>`__ 를 호출할 수 있습니다.
 그리고 이것은 기본적으로 임베딩 테이블의 모든 매개변수를 살펴보고 RRef 목록을 반환합니다.
 트레이너는 RPC를 통해 매개변수 서버에서 이 메서드를 호출하여 원하는 매개변수에 대한 RRef 목록을 수신합니다.
 DistributedOptimizer는 항상 최적화해야 하는 매개변수에 대한 RRef 목록을 가져오기 때문에 FC 레이어의 전역 매개변수에 대해서도 RRef를 생성해야 합니다.
@@ -131,7 +131,7 @@ DistributedOptimizer는 항상 최적화해야 하는 매개변수에 대한 RRe
 여러 에폭(epoch)과 각 배치(batch)에 대해 학습 루프를 실행합니다:
 
 1) 먼저 분산 Autograd에 대해
-   `분산 Autograd Context <https://pytorch.org/docs/master/rpc.html#torch.distributed.autograd.context>`__를 설정합니다.
+   `분산 Autograd Context <https://pytorch.org/docs/master/rpc.html#torch.distributed.autograd.context>`__ 를 설정합니다.
 2) 모델의 순방향 전달을 실행하고 해당 출력을 검색(retrieve)합니다.
 3) 손실 함수를 사용하여 출력과 목표를 기반으로 손실을 계산합니다.
 4) 분산 Autograd를 사용하여 손실을 사용하여 분산 역방향 전달을 실행합니다.

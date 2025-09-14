@@ -7,12 +7,13 @@
 분산 데이터 병렬 처리 (DDP) 란 무엇인가?
 =======================================
 
-저자: `Suraj Subramanian <https://github.com/suraj813>`__
+저자: `Suraj Subramanian <https://github.com/subramen>`__
 번역: `박지은 <https://github.com/rumjie>`__
 
 .. grid:: 2
 
    .. grid-item-card:: :octicon:`mortar-board;1em;` 이 장에서 배우는 것
+      :class-card: card-prerequisites
 
       *  DDP 의 내부 작동 원리
       *  ``DistributedSampler`` 이란 무엇인가?
@@ -20,8 +21,9 @@
 
 
    .. grid-item-card:: :octicon:`list-unordered;1em;` 필요 사항
+      :class-card: card-prerequisites
 
-      * 파이토치 `비분산 학습  <https://tutorials.pytorch.kr/beginner/basics/quickstart_tutorial.html>`__ 에 익숙할 것
+      * 파이토치의 `(분산이 아닌) 기본적인 학습 방법  <https://tutorials.pytorch.kr/beginner/basics/quickstart_tutorial.html>`__ 에 익숙할 것
 
 아래의 영상이나 `유투브 영상 youtube <https://www.youtube.com/watch/Cvdhwx-OBBo>`__ 을 따라 진행하세요.
 
@@ -33,13 +35,13 @@
 
 이 튜토리얼은 파이토치에서 분산 데이터 병렬 학습을 가능하게 하는 `분산 데이터 병렬 <https://pytorch.org/docs/stable/generated/torch.nn.parallel.DistributedDataParallel.html>`__ (DDP)
 에 대해 소개합니다. 데이터 병렬 처리란 더 높은 성능을 달성하기 위해
-여러 개의 디바이스에서 여러 데이터 배치들을 동시에 처리하는 방법입니다. 
-파이토치에서, `분산 샘플러 <https://pytorch.org/docs/stable/data.html#torch.utils.data.distributed.DistributedSampler>`__ 는 
+여러 개의 디바이스에서 여러 데이터 배치들을 동시에 처리하는 방법입니다.
+파이토치에서, `분산 샘플러 <https://pytorch.org/docs/stable/data.html#torch.utils.data.distributed.DistributedSampler>`__ 는
 각 디바이스가 서로 다른 입력 배치를 받는 것을 보장합니다.
 모델은 모든 디바이스에 복제되며, 각 사본은 변화도를 계산하는 동시에 `Ring-All-Reduce
 알고리즘 <https://tech.preferred.jp/en/blog/technologies-behind-distributed-deep-learning-allreduce/>`__ 을 사용해 다른 사본과 동기화됩니다.
 
-`예시 튜토리얼 <https://tutorials.pytorch.kr/intermediate/dist_tuto.html#>`__ 에서 DDP 메커니즘에 대해 파이썬 관점에서 심도 있는 설명을 볼 수 있습니다. 
+`예시 튜토리얼 <https://tutorials.pytorch.kr/intermediate/dist_tuto.html#>`__ 에서 DDP 메커니즘에 대해 파이썬 관점에서 심도 있는 설명을 볼 수 있습니다.
 
 ``데이터 병렬 DataParallel`` (DP) 보다 DDP가 나은 이유
 ----------------------------------------------------

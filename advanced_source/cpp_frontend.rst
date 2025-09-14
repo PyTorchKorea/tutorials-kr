@@ -58,7 +58,7 @@ C++ 프론트엔드를 만들었습니다. 예를 들면 다음과 같습니다.
   파이썬은 동시에 둘 이상의 시스템 쓰레드를 실행할 수 없습니다.
   대안으로 멀티프로세싱을 사용하면 확장성이 떨어지며 심각한 한계가
   있습니다. C++는 이러한 제약 조건이 없으며 쓰레드를 쉽게 만들고
-  사용할 수 있습니다. `Deep Neuroevolution <https://eng.uber.com/deep-neuroevolution/>`_ 에
+  사용할 수 있습니다. `Deep Neuroevolution <https://www.uber.com/blog/deep-neuroevolution/>`_ 에
   사용된 것과 같이 고도의 병렬화가 필요한 모델도 이를 활용할 수
   있습니다.
 - **기존의 C++ 코드베이스**: 백엔드 서버의 웹 페이지 서비스부터
@@ -663,7 +663,7 @@ DCGAN 모듈 정의하기
 
 이제 이 글에서 해결하려는 머신러닝 태스크를 위한 모듈을 정의하는데
 필요한 배경과 도입부 설명이 끝났습니다. 다시 상기하자면, 우리의 태스크는
-`MNIST 데이터셋  <http://yann.lecun.com/exdb/mnist/>`_ 의 숫자 이미지를
+`MNIST 데이터셋  <https://huggingface.co/datasets/ylecun/mnist>`_ 의 숫자 이미지를
 생성하는 것입니다. 우리는 이 태스크를 풀기 위해
 `적대적 생성 신경망(GAN) <https://papers.nips.cc/paper/5423-generative-adversarial-nets.pdf>`_ 을
 사용하고자 합니다. 그 중에서도 우리는 `DCGAN 아키텍처
@@ -677,7 +677,7 @@ DCGAN은 가장 초기에 발표됐던 제일 간단한 GAN이지만 이 태스�
   <https://github.com/pytorch/examples/tree/master/cpp/dcgan>`_ 에서 확인할 수 있습니다.
 
 GAN이 뭐였죠?
-***********
+******************
 
 GAN은 *생성기(generator)* 와 *판별기(discriminator)* 라는
 두 가지 신경망 모델로 구성됩니다. 생성기는 노이즈 분포에서 샘플을 입력받고,
@@ -966,7 +966,7 @@ optimizer는 `Adam <https://arxiv.org/pdf/1412.6980.pdf>`_ 알고리즘을 구�
       discriminator->zero_grad();
       torch::Tensor real_images = batch.data;
       torch::Tensor real_labels = torch::empty(batch.data.size(0)).uniform_(0.8, 1.0);
-      torch::Tensor real_output = discriminator->forward(real_images);
+      torch::Tensor real_output = discriminator->forward(real_images).reshape(real_labels.sizes());
       torch::Tensor d_loss_real = torch::binary_cross_entropy(real_output, real_labels);
       d_loss_real.backward();
 
@@ -974,7 +974,7 @@ optimizer는 `Adam <https://arxiv.org/pdf/1412.6980.pdf>`_ 알고리즘을 구�
       torch::Tensor noise = torch::randn({batch.data.size(0), kNoiseSize, 1, 1});
       torch::Tensor fake_images = generator->forward(noise);
       torch::Tensor fake_labels = torch::zeros(batch.data.size(0));
-      torch::Tensor fake_output = discriminator->forward(fake_images.detach());
+      torch::Tensor fake_output = discriminator->forward(fake_images.detach()).reshape(fake_labels.sizes());
       torch::Tensor d_loss_fake = torch::binary_cross_entropy(fake_output, fake_labels);
       d_loss_fake.backward();
 
@@ -984,7 +984,7 @@ optimizer는 `Adam <https://arxiv.org/pdf/1412.6980.pdf>`_ 알고리즘을 구�
       // Train generator.
       generator->zero_grad();
       fake_labels.fill_(1);
-      fake_output = discriminator->forward(fake_images);
+      fake_output = discriminator->forward(fake_images).reshape(fake_labels.sizes());
       torch::Tensor g_loss = torch::binary_cross_entropy(fake_output, fake_labels);
       g_loss.backward();
       generator_optimizer.step();
