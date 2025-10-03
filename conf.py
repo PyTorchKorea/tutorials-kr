@@ -27,13 +27,16 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
+
 import os
 import sys
 
-sys.path.insert(0, os.path.abspath('.'))
-sys.path.insert(0, os.path.abspath('./.build')) # pytorch/tutorials의 .jenkins/ 의 일부 파일들을 .build/ 에 복사하여 사용
-import pytorch_sphinx_theme
+sys.path.insert(0, os.path.abspath("."))
+sys.path.insert(0, os.path.abspath("./.build"))
+import pytorch_sphinx_theme2
 
+html_theme = "pytorch_sphinx_theme2"
+html_theme_path = [pytorch_sphinx_theme2.get_html_theme_path()]
 import distutils.file_util
 import glob
 import random
@@ -46,9 +49,8 @@ import plotly.io as pio
 import pypandoc
 import torch
 from get_sphinx_filenames import SPHINX_SHOULD_RUN
-from custom_directives import IncludeDirective, GalleryItemDirective, CustomGalleryItemDirective, CustomCalloutItemDirective, CustomCardItemDirective
 
-pio.renderers.default = 'sphinx_gallery'
+pio.renderers.default = "sphinx_gallery"
 import multiprocessing
 
 import sphinx_gallery.gen_rst
@@ -115,6 +117,7 @@ rst_epilog = """
            :height: 16px
 """
 
+
 # -- General configuration ------------------------------------------------
 
 # site base url
@@ -123,12 +126,6 @@ site_url = 'https://tutorials.pytorch.kr/'
 # If your documentation needs a minimal Sphinx version, state it here.
 #
 # needs_sphinx = '1.0'
-
-html_meta = {
-    'description': '초급/중급/고급 사용자들을 위해 단계별로 구성된 튜토리얼로 PyTorch를 마스터하세요. 오늘 바로 파이토치 전문가가 되는 여정을 시작하세요!',
-    'keywords': 'PyTorch, tutorials, Getting Started, deep learning, AI',
-    'author': 'PyTorch Contributors',
-}
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
@@ -153,6 +150,13 @@ intersphinx_mapping = {
     'torchtext': ('https://pytorch.org/text/stable/', None),
     'torchvision': ('https://pytorch.org/vision/stable/', None),
 }
+
+html_meta = {
+    'description': '초급/중급/고급 사용자들을 위해 단계별로 구성된 튜토리얼로 PyTorch를 학습하세요. 오늘 바로 파이토치 전문가가 되는 여정을 시작하세요!',
+    'keywords': 'PyTorch, tutorials, Getting Started, deep learning, AI, PyTorchKR, 파이토치 튜토리얼',
+    'author': 'PyTorch Contributors & PyTorchKR',
+}
+
 
 # -- Sphinxext-opengraph configuration ---------------------------------------
 
@@ -182,14 +186,18 @@ sphinx_gallery_conf = {
     ],
     'gallery_dirs': ['beginner', 'intermediate', 'advanced', 'recipes', 'unstable'],
     'filename_pattern': re.compile(SPHINX_SHOULD_RUN),
-    'promote_jupyter_magic': True,
+    'promote_jupyter_magic': False,  # Disable jupyter magic for Korean tutorials
     'backreferences_dir': None,
     'write_computation_times': True,
-    'download_all_examples': False,
+    'download_all_examples': False,  # Disable download buttons
     'show_signature': False,
-    'first_notebook_cell': ('# Google Colab에서 노트북을 실행하실 때에는 \n'
-                            '# https://tutorials.pytorch.kr/beginner/colab 를 참고하세요.\n'
-                            '%matplotlib inline'),
+    # Remove notebook buttons by not setting binder configuration
+    "first_notebook_cell": (
+        "# Google Colab에서 노트북을 실행하기 위한 팁은 다음을 참조하세요:\n"
+        "# https://tutorials.pytorch.kr/beginner/colab \n"
+        "%matplotlib inline"
+    ),
+    'notebook_images': False,  # Don't include images in notebooks
     # TODO: check before configuring build container
     #       reveiw below files before configuring build container
     #           - .ci/docker/Dockerfile
@@ -206,10 +214,11 @@ sphinx_gallery_conf = {
     },
 }
 
-# html_additional_pages = {
-#     '404': '404.html',
-# }
+html_additional_pages = {
+    '404': '404.html',
+}
 
+html_baseurl = 'https://tutorials.pytorch.kr/'
 sitemap_locales = [None]
 sitemap_excludes = [
     'search.html',
@@ -217,59 +226,51 @@ sitemap_excludes = [
 ]
 sitemap_url_scheme = '{link}'
 
-html_theme = 'pytorch_sphinx_theme'
-html_theme_path = [pytorch_sphinx_theme.get_html_theme_path()]
+html_theme = 'pytorch_sphinx_theme2'
+html_theme_path = [pytorch_sphinx_theme2.get_html_theme_path()]
 html_logo = '_static/logos/logo-kr-sm-dark.svg'
 html_favicon = '_static/favicon.ico'    # under html_static_path
 html_title = '파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)'
 html_theme_options = {
-    'pytorch_project': 'tutorials',
-    'collapse_navigation': False,
+    'navigation_with_keys': False,
+    'analytics_id': 'G-LZRD6GXDLF',   # Google Analytics ID 확인
+    'logo': {
+        'text': '',
+    },
+    'icon_links': [
+        {
+            'name': '한국어 튜토리얼 GitHub 저장소',
+            'url': 'https://github.com/PyTorchKorea/tutorials-kr',
+            'icon': 'fa-brands fa-github',
+        },
+        {
+            'name': '파이토치 한국어 커뮤니티',
+            'url': 'https://discuss.pytorch.kr/',
+            'icon': 'fa-brands fa-discourse',
+        },
+    ],
+    'use_edit_page_button': True,
+    'header_links_before_dropdown': 9,
+    'navbar_start': ['pytorch_version'],
+    'navbar_center': 'navbar-nav',
     'display_version': True,
-    'logo_only': False,
-    'navigation_with_keys': True,
+    'pytorch_project': 'tutorials',
+    'canonical_url': html_baseurl,
 }
 
-# # TODO: PyTorch 2.8 tutorials의 pytorch_sphinx_theme2 적용 후 반영
-# html_theme_options = {
-#     'navigation_with_keys': False,
-#     'analytics_id': 'G-LZRD6GXDLF',   # Google Analytics ID 확인
-#     'logo': {
-#         'text': '',
-#     },
-#     'icon_links': [
-#         {
-#             'name': 'GitHub 저장소',
-#             'url': 'https://github.com/pytorchkorea/tutorials-kr',
-#             'icon': 'fa-brands fa-github',
-#         },
-#         {
-#             'name': '파이토치 한국어 커뮤니티',
-#             'url': 'https://discuss.pytorch.kr/',
-#             'icon': 'fa-brands fa-discourse',
-#         },
-#     ],
-#     'use_edit_page_button': True,
-#     'header_links_before_dropdown': 9,
-#     'navbar_start': ['pytorch_version'],
-#     'navbar_center': 'navbar-nav',
-#     'display_version': True,
-#     'pytorch_project': 'tutorials',
-# }
-
-# theme_variables = pytorch_sphinx_theme.get_theme_variables()
+theme_variables = pytorch_sphinx_theme2.get_theme_variables()
 
 html_context = {
-    # 'theme_variables': theme_variables,
+    'theme_variables': theme_variables,
     'display_github': True,
     'github_url': 'https://github.com',
-    'github_user': 'pytorchkorea',
+    'github_user': 'PyTorchKorea',
     'github_repo': 'tutorials-kr',
-    'feedback_url': 'https://github.com/pytorchkorea/tutorials-kr',
+    'feedback_url': 'https://github.com/PyTorchKorea/tutorials-kr',
     'github_version': 'master',
     'doc_path': '.',
-    # 'library_links': theme_variables.get('library_links', []),
-    #'pytorch_project': 'tutorials-kr',
+    'library_links': theme_variables.get('library_links', []),
+    'pytorch_project': 'tutorials',
 }
 
 
@@ -303,7 +304,7 @@ for i in range(len(sphinx_gallery_conf['examples_dirs'])):
 # Add any paths that contain templates here, relative to this directory.
 templates_path = [
     '_templates',
-    os.path.join(os.path.dirname(pytorch_sphinx_theme.__file__), 'templates'),
+    os.path.join(os.path.dirname(pytorch_sphinx_theme2.__file__), 'templates'),
 ]
 
 # The suffix(es) of source filenames.
@@ -317,8 +318,8 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'PyTorch Tutorials KR'
-copyright = '2018-2025, PyTorch & 파이토치 한국 사용자 모임(PyTorch Korea User Group)'
-author = 'PyTorch contributors'
+copyright = '2018-2025, PyTorch & 파이토치 한국 사용자 모임(PyTorchKR)'
+author = 'PyTorch contributors & PyTorchKR'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -351,12 +352,11 @@ exclude_patterns += sphinx_gallery_conf['examples_dirs']
 exclude_patterns += ['*/index.rst']
 
 
-# # TODO:
-# # Handling for HuggingFace Hub jinja templates
-# def handle_jinja_templates(app, docname, source):
-#     if 'huggingface_hub/templates' in docname:
-#         # Replace Jinja templates with quoted strings
-#         source[0] = re.sub(r"(\{\{.*?\}\})", r'"\1"', source[0])
+# Handling for HuggingFace Hub jinja templates
+def handle_jinja_templates(app, docname, source):
+    if "huggingface_hub/templates" in docname:
+        # Replace Jinja templates with quoted strings
+        source[0] = re.sub(r"(\{\{.*?\}\})", r'"\1"', source[0])
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
@@ -399,7 +399,7 @@ html_static_path = ['_static']
 # -- Options for HTMLHelp output ------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'PyTorchTutorialsKRdoc'
+htmlhelp_basename = 'PyTorchTutorialsKRDoc'
 
 
 # -- Options for LaTeX output ---------------------------------------------
@@ -498,12 +498,5 @@ def html_page_context(app, pagename, templatename, context, doctree):
 
 
 def setup(app):
-    # # TODO: PyTorch 2.8 tutorials의 pytorch_sphinx_theme2 적용 후 반영
-    # app.connect('source-read', handle_jinja_templates)
-    # app.connect('html-page-context', html_page_context)
-
-    app.add_directive('includenodoc', IncludeDirective)
-    app.add_directive('galleryitem', GalleryItemDirective)
-    app.add_directive('customgalleryitem', CustomGalleryItemDirective)
-    app.add_directive('customcarditem', CustomCardItemDirective)
-    app.add_directive('customcalloutitem', CustomCalloutItemDirective)
+    app.connect('source-read', handle_jinja_templates)
+    app.connect('html-page-context', html_page_context)

@@ -809,202 +809,60 @@
 
     <div style='clear:both'></div>
 
-.. ----------------------------------------------------------------------------------------
+.. -----------------------------------------
 .. Page TOC
-.. ----------------------------------------------------------------------------------------
+.. -----------------------------------------
 .. toctree::
+   :glob:
    :maxdepth: 1
-   :caption: 파이토치(PyTorch) 시작하기
+   :hidden:
 
-   beginner/basics/intro
-   beginner/basics/quickstart_tutorial
-   beginner/basics/tensorqs_tutorial
-   beginner/basics/data_tutorial
-   beginner/basics/transforms_tutorial
-   beginner/basics/buildmodel_tutorial
-   beginner/basics/autogradqs_tutorial
-   beginner/basics/optimization_tutorial
-   beginner/basics/saveloadrun_tutorial
+   intro
 
 .. toctree::
    :maxdepth: 1
-   :caption: Introduction to PyTorch on YouTube
+   :hidden:
 
-   beginner/introyt/introyt1_tutorial
-   beginner/introyt/tensors_deeper_tutorial
-   beginner/introyt/autogradyt_tutorial
-   beginner/introyt/modelsyt_tutorial
-   beginner/introyt/tensorboardyt_tutorial
-   beginner/introyt/trainingyt
-   beginner/introyt/captumyt
-
-.. toctree::
-   :maxdepth: 1
-   :caption: 파이토치(PyTorch) 배우기
-
-   beginner/deep_learning_60min_blitz
-   beginner/pytorch_with_examples
-   beginner/nn_tutorial
-   beginner/understanding_leaf_vs_nonleaf_tutorial
-   intermediate/tensorboard_tutorial
-
-.. toctree::
-   :maxdepth: 1
-   :caption: 이미지/비디오
-
-   intermediate/torchvision_tutorial
-   beginner/transfer_learning_tutorial
-   beginner/fgsm_tutorial
-   beginner/dcgan_faces_tutorial
-   intermediate/tiatoolbox_tutorial
-
-.. toctree::
-   :maxdepth: 1
-   :caption: 오디오
-
-   beginner/audio_io_tutorial
-   beginner/audio_resampling_tutorial
-   beginner/audio_data_augmentation_tutorial
-   beginner/audio_feature_extractions_tutorial
-   beginner/audio_feature_augmentation_tutorial
-   beginner/audio_datasets_tutorial
-   intermediate/speech_recognition_pipeline_tutorial
-   intermediate/speech_command_classification_with_torchaudio_tutorial
-   intermediate/text_to_speech_with_torchaudio
-   intermediate/forced_alignment_with_torchaudio_tutorial
-
-.. toctree::
-   :maxdepth: 1
-   :caption: 텍스트
-
-   beginner/bettertransformer_tutorial
-   intermediate/char_rnn_classification_tutorial
-   intermediate/char_rnn_generation_tutorial
-   intermediate/seq2seq_translation_tutorial
-   intermediate/transformer_building_blocks
+   compilers_index
 
 .. toctree::
    :maxdepth: 2
-   :includehidden:
    :hidden:
-   :caption: 백엔드
 
-   beginner/onnx/intro_onnx
+   domains
+
+.. toctree:: 1
+   :hidden:
+   :maxdepth: 2
+
+   distributed
 
 .. toctree::
    :maxdepth: 1
-   :caption: 강화학습
-
-   intermediate/reinforcement_q_learning
-   intermediate/reinforcement_ppo
-   intermediate/mario_rl_tutorial
-   advanced/pendulum
-
-.. toctree::
-   :maxdepth: 2
-   :includehidden:
    :hidden:
-   :caption: PyTorch 모델을 프로덕션 환경에 배포하기
 
-   beginner/onnx/intro_onnx
-   intermediate/realtime_rpi
-
-.. toctree::
-   :maxdepth: 2
-   :includehidden:
-   :hidden:
-   :caption: PyTorch 프로파일링
-
-   beginner/profiler
-   beginner/hta_intro_tutorial
-   beginner/hta_trace_diff_tutorial
-
-.. toctree::
-   :maxdepth: 2
-   :includehidden:
-   :hidden:
-   :caption: Code Transforms with FX
-
-   intermediate/fx_profiling_tutorial
-
-.. toctree::
-   :maxdepth: 2
-   :includehidden:
-   :hidden:
-   :caption: 프론트엔드 API
-
-   intermediate/memory_format_tutorial
-   intermediate/forward_ad_usage
-   intermediate/jacobians_hessians
-   intermediate/ensembling
-   intermediate/per_sample_grads
-   intermediate/neural_tangent_kernels
-   intermediate/visualizing_gradients_tutorial
-   advanced/cpp_frontend
-   advanced/torch-script-parallelism
-   advanced/cpp_autograd
-
-.. toctree::
-   :maxdepth: 2
-   :includehidden:
-   :hidden:
-   :caption: PyTorch 확장하기
-
-   intermediate/custom_function_double_backward_tutorial
-   intermediate/custom_function_conv_bn_tutorial
-   advanced/cpp_extension
-   advanced/dispatcher
-   advanced/extend_dispatcher
-   advanced/privateuseone
+   deep-dive
 
 .. toctree::
    :maxdepth: 1
-   :caption: 모델 최적화
+   :hidden:
 
-   beginner/profiler
-   intermediate/tensorboard_profiler_tutorial
-   beginner/hyperparameter_tuning_tutorial
-   intermediate/parametrizations
-   intermediate/pruning_tutorial
-   advanced/static_quantization_tutorial
-   intermediate/ax_multiobjective_nas_tutorial
-   intermediate/torch_compile_tutorial
-   intermediate/compiled_autograd_tutorial
-   intermediate/inductor_debug_cpu
-   intermediate/scaled_dot_product_attention_tutorial
-   beginner/knowledge_distillation_tutorial
+   extension
 
 .. toctree::
    :maxdepth: 1
-   :caption: 병렬 및 분산 학습
+   :hidden:
 
-   beginner/dist_overview
-   beginner/ddp_series_intro
-   intermediate/model_parallel_tutorial
-   intermediate/ddp_tutorial
-   intermediate/dist_tuto
-   intermediate/FSDP_tutorial
-   intermediate/FSDP1_tutorial
-   intermediate/FSDP_advanced_tutorial
-   intermediate/TP_tutorial
-   intermediate/process_group_cpp_extension_tutorial
-   intermediate/rpc_tutorial
-   intermediate/rpc_param_server_tutorial
-   intermediate/dist_pipeline_parallel_tutorial
-   intermediate/rpc_async_execution
-   advanced/rpc_ddp_tutorial
-   advanced/ddp_pipeline
-   advanced/generic_join
+   ecosystem
 
 .. toctree::
-   :maxdepth: 2
-   :includehidden:
+   :maxdepth: 1
    :hidden:
-   :caption: Edge with ExecuTorch
 
-   Exporting to ExecuTorch Tutorial <https://pytorch.org/executorch/stable/tutorials/export-to-executorch-tutorial.html>
-   Running an ExecuTorch Model in C++ Tutorial < https://pytorch.org/executorch/stable/running-a-model-cpp-tutorial.html>
-   Using the ExecuTorch SDK to Profile a Model <https://pytorch.org/executorch/stable/tutorials/sdk-integration-tutorial.html>
-   Building an ExecuTorch iOS Demo App <https://pytorch.org/executorch/stable/demo-apps-ios.html>
-   Building an ExecuTorch Android Demo App <https://pytorch.org/executorch/stable/demo-apps-android.html>
-   Lowering a Model as a Delegate <https://pytorch.org/executorch/stable/examples-end-to-end-to-lower-model-to-delegate.html>
+   recipes_index
+
+.. toctree::
+   :maxdepth: 1
+   :hidden:
+
+   prototype/prototype_index
