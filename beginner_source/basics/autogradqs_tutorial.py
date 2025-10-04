@@ -147,7 +147,7 @@ print(z_det.requires_grad)
 #
 # .. note::
 #   **PyTorch에서 DAG들은 동적(dynamic)입니다.**
-#   주목해야 할 중요한 점은 그래프가 처음부터(from scratch) 다시 생성된다는 것입니다; 매번 ``.bachward()`` 가
+#   주목해야 할 중요한 점은 그래프가 처음부터(from scratch) 다시 생성된다는 것입니다; 매번 ``.backward()`` 가
 #   호출되고 나면, autograd는 새로운 그래프를 채우기(populate) 시작합니다. 이러한 점 덕분에 모델에서
 #   흐름 제어(control flow) 구문들을 사용할 수 있게 되는 것입니다; 매번 반복(iteration)할 때마다 필요하면
 #   모양(shape)이나 크기(size), 연산(operation)을 바꿀 수 있습니다.
