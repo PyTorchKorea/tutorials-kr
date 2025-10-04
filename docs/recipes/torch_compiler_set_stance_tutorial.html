@@ -1,0 +1,2111 @@
+
+<!DOCTYPE html>
+
+
+<html lang="ko" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <meta property="article:modified_time" content="2022-11-30T07:09:41+00:00" /><meta property="og:title" content="Dynamic Compilation Control with torch.compiler.set_stance" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://tutorials.pytorch.kr/recipes/torch_compiler_set_stance_tutorial.html" />
+<meta property="og:site_name" content="PyTorch Tutorials KR" />
+<meta property="og:description" content="Author: William Wen torch.compiler.set_stance is a torch.compiler API that enables you to change the behavior of torch.compile across different calls to your model without having to reapply torch.compile to your model. This recipe provides some examples on how to use torch.compiler.set_stance. Pr..." />
+<meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
+<meta property="og:image:alt" content="PyTorch Tutorials KR" />
+<meta name="description" content="Author: William Wen torch.compiler.set_stance is a torch.compiler API that enables you to change the behavior of torch.compile across different calls to your model without having to reapply torch.compile to your model. This recipe provides some examples on how to use torch.compiler.set_stance. Pr..." />
+<meta property="og:ignore_canonical" content="true" />
+
+    <title>Dynamic Compilation Control with torch.compiler.set_stance &#8212; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=536c50fe" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=4d2595e5" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/katex-math.css?v=91adb8b6" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/pytorch_theme.css?v=c326296f" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=097efa9c" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom2.css?v=b169ea90" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=725a5b95"></script>
+    <script src="../_static/doctools.js?v=92e14aea"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/translations.js?v=b5f768d8"></script>
+    <script src="../_static/katex.min.js?v=be8ff15f"></script>
+    <script src="../_static/auto-render.min.js?v=ad136472"></script>
+    <script src="../_static/katex_autorenderer.js?v=bebc588a"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'recipes/torch_compiler_set_stance_tutorial';</script>
+    <link rel="canonical" href="https://tutorials.pytorch.kr/recipes/torch_compiler_set_stance_tutorial.html" />
+    <link rel="icon" href="../_static/favicon.ico"/>
+    <link rel="index" title="색인" href="../genindex.html" />
+    <link rel="search" title="검색" href="../search.html" />
+    <link rel="next" title="Demonstration of torch.export flow, common challenges and the solutions to address them" href="torch_export_challenges_solutions.html" />
+    <link rel="prev" title="Inductor CPU backend debugging and profiling" href="../intermediate/inductor_debug_cpu.html" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="ko"/>
+    <meta name="docbuild:last-update" content="2022년 11월 30일"/>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/2.3.1/list.min.js"></script>
+<script>
+  if (window.location.hostname === 'docs.pytorch.org' || window.location.hostname === 'docs-preview.pytorch.org') {
+    const script = document.createElement('script');
+    script.src = 'https://cmp.osano.com/16A0DbT9yDNIaQkvZ/31b1b91a-e0b6-47ea-bde2-7f2bd13dbe5c/osano.js?variant=one';
+    document.head.appendChild(script);
+  }
+</script>
+<script>
+  // Cookie banner for non-LF projects
+  document.addEventListener('DOMContentLoaded', function () {
+    // Hide cookie banner on local environments and LF owned docs
+    if (window.location.hostname === 'localhost' ||
+      window.location.hostname === '0.0.0.0' ||
+      window.location.hostname === '127.0.0.1' ||
+      window.location.hostname === 'docs.pytorch.org' ||
+      window.location.hostname === 'docs-preview.pytorch.org' ||
+      window.location.hostname.startsWith('192.168.')) {
+      const banner = document.querySelector('.cookie-banner-wrapper');
+      if (banner) {
+        banner.style.display = 'none';
+      }
+    }
+  });
+</script>
+<!-- Conditional CSS for header and footer height adjustment -->
+
+<link rel="stylesheet" type="text/css" href="../_static/css/theme.css" crossorigin="anonymous">
+<script type="text/javascript" src="../_static/js/theme.js"></script>
+<script type="text/javascript" src="../_static/js/dropdown-menu.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700&family=Nanum+Gothic+Coding:wght@400;700&family=Montserrat:wght@300;400&display=swap" rel="stylesheet">
+<meta property="og:image" content="../_static/img/pytorch_seo.png" />
+<link rel="stylesheet" href="../_static/webfonts/all.min.css" crossorigin="anonymous">
+<meta http-equiv="Content-Security-Policy"
+  content="default-src * 'unsafe-inline' 'unsafe-eval' data: blob:; style-src * 'unsafe-inline'; script-src * 'unsafe-inline' 'unsafe-eval' blob:;">
+<meta name="pytorch_project" content="tutorials">
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=G-LZRD6GXDLF" height="0" width="0"
+    style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+<!-- Google Tag Manager -->
+<script>(function (w, d, s, l, i) {
+    w[l] = w[l] || []; w[l].push({
+      'gtm.start':
+        new Date().getTime(), event: 'gtm.js'
+    }); var f = d.getElementsByTagName(s)[0],
+      j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
+        'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
+    j.onload = function () {
+      window.dispatchEvent(new Event('gtm_loaded'));
+      console.log('GTM loaded successfully');
+    };
+  })(window, document, 'script', 'dataLayer', 'G-LZRD6GXDLF');
+</script>
+<!-- End Google Tag Manager -->
+<!-- Facebook Pixel Code -->
+<script>
+  !function (f, b, e, v, n, t, s) {
+    if (f.fbq) return; n = f.fbq = function () {
+      n.callMethod ?
+        n.callMethod.apply(n, arguments) : n.queue.push(arguments)
+    };
+    if (!f._fbq) f._fbq = n; n.push = n; n.loaded = !0; n.version = '2.0';
+    n.queue = []; t = b.createElement(e); t.async = !0;
+    t.src = v; s = b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t, s)
+  }(window, document, 'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init', '243028289693773');
+  fbq('track', 'PageView');
+</script>
+<script>
+  document.documentElement.setAttribute('data-version', 'v2.8.0+cu128');
+</script>
+<noscript>
+  <img height="1" width="1" src="https://www.facebook.com/tr?id=243028289693773&ev=PageView&noscript=1" />
+</noscript>
+<script>
+  function gtag() {
+    window.dataLayer.push(arguments);
+  }
+</script>
+<!-- End Facebook Pixel Code -->
+<!-- Script to Fix scrolling -->
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    // Fix anchor scrolling
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const targetId = this.getAttribute('href').substring(1);
+        const targetElement = document.getElementById(targetId);
+
+        if (targetElement) {
+          const headerHeight =
+            (document.querySelector('.header-holder') ? document.querySelector('.header-holder').offsetHeight : 0) +
+            (document.querySelector('.bd-header') ? document.querySelector('.bd-header').offsetHeight : 0) + 20;
+
+          const targetPosition = targetElement.getBoundingClientRect().top + window.pageYOffset - headerHeight;
+          window.scrollTo({
+            top: targetPosition,
+            behavior: 'smooth'
+          });
+
+          // Update URL hash without scrolling
+          history.pushState(null, null, '#' + targetId);
+        }
+      });
+    });
+  });
+</script>
+
+<script async src="https://cse.google.com/cse.js?cx=e65585f8c3ea1440e"></script>
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="ko"/>
+    <meta name="docbuild:last-update" content="2022년 11월 30일"/>
+
+  </head>
+
+<body data-feedback-url="https://github.com/PyTorchKorea/tutorials-kr" class="pytorch-body">
+  
+    <div class="container-fluid header-holder tutorials-header" id="header-holder">
+   <div class="header-container-wrapper">
+    <div class="header-container">
+      <a class="header-logo" href="https://pytorch.kr/" aria-label="PyTorchKR"></a>
+
+      <div class="main-menu">
+        <ul>
+
+          <li class="main-menu-item">
+          <div id="learnDropdownButton" data-toggle="learn-dropdown" class="learn-dropdown">
+              <a class="with-down-arrow">
+                <span>배우기</span>
+              </a>
+              <div class="learn-dropdown-menu dropdown-menu">
+                <a class="nav-dropdown-item" href="https://pytorch.kr/get-started/locally/">
+                  <span class="dropdown-title">PyTorch 시작하기</span>
+                </a>
+                <a class="nav-dropdown-item" href="https://tutorials.pytorch.kr/beginner/basics/intro.html">
+                  <span class="dropdown-title">기본 익히기</span>
+                </a>
+                <a class="nav-dropdown-item" href="https://tutorials.pytorch.kr/" target="_self">
+                  <span class="dropdown-title">한국어 튜토리얼</span>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.kr/hub/">
+                  <span class="dropdown-title">한국어 모델 허브</span>
+                </a>
+                <a class="nav-dropdown-item" href="https://docs.pytorch.org/tutorials/" target="_blank">
+                  <span class="dropdown-title">Official Tutorials</span>
+                </a>
+              </div>
+            </div>
+          </li>
+
+          <li class="main-menu-item">
+            <a href="https://pytorch.kr/blog/">
+              <span>블로그</span>
+            </a>
+          </li>
+
+          <li class="main-menu-item">
+          <div id="docsDropdownButton" data-toggle="docs-dropdown" class="docs-dropdown">
+              <a class="with-down-arrow">
+              <span>문서</span>
+              </a>
+              <div class="docs-dropdown-menu dropdown-menu">
+                <a class="nav-dropdown-item" href="https://docs.pytorch.org/docs/" target="_blank">
+                  <span class="dropdown-title">PyTorch API</span>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.kr/domains/">
+                  <span class="dropdown-title">Domain API 소개</span>
+                </a>
+                <a class="nav-dropdown-item" href="https://tutorials.pytorch.kr/" target="_self">
+                  <span class="dropdown-title">한국어 튜토리얼</span>
+                </a>
+                <a class="nav-dropdown-item" href="https://docs.pytorch.org/tutorials/" target="_blank">
+                  <span class="dropdown-title">Official Tutorials</span>
+                </a>
+              </div>
+            </div>
+          </li>
+
+          <li class="main-menu-item">
+          <div id="communityDropdownButton" data-toggle="community-dropdown" class="community-dropdown">
+              <a class="with-down-arrow">
+              <span>커뮤니티</span>
+              </a>
+              <div class="community-dropdown-menu dropdown-menu">
+                <a class="nav-dropdown-item" href="https://discuss.pytorch.kr/" target="_self">
+                  <span class="dropdown-title">한국어 커뮤니티</span>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.kr/resources/">
+                  <span class="dropdown-title">개발자 정보</span>
+                </a>
+                <a class="nav-dropdown-item" href="https://landscape.pytorch.org/" target="_blank">
+                  <span class="dropdown-title">Landscape</span>
+                </a>
+              </div>
+            </div>
+          </li>
+
+        </ul>
+      </div>
+
+      <a class="main-menu-open-button" href="#" data-behavior="open-mobile-menu">
+        <i class="fa-solid fa-ellipsis"></i>
+      </a>
+    </div>
+  </div>
+ </div>
+
+ <!-- Begin Mobile Menu -->
+
+<div class="mobile-main-menu">
+  <div class="container-fluid">
+    <div class="header-container-wrapper">
+      <div class="mobile-main-menu-header-container">
+        <a class="main-menu-close-button" href="#" data-behavior="close-mobile-menu">
+          <i class="fa-solid fa-xmark"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="mobile-main-menu-links-container">
+    <div class="main-menu">
+      <ul>
+         <li class="resources-mobile-menu-title">
+           <a>배우기</a>
+         </li>
+         <ul class="resources-mobile-menu-items">
+           <li>
+             <a href="https://pytorch.kr/get-started/locally/">PyTorch 시작하기</a>
+           </li>
+           <li>
+             <a href="https://tutorials.pytorch.kr/beginner/basics/intro.html">기본 익히기</a>
+           </li>
+           <li>
+             <a href="https://tutorials.pytorch.kr/">한국어 튜토리얼</a>
+           </li>
+           <li>
+             <a href="https://pytorch.kr/hub/">한국어 모델 허브</a>
+           </li>
+           <li>
+             <a href="https://docs.pytorch.org/tutorials/" target="_blank">Official Tutorials</a>
+           </li>
+        </ul>
+         <li class="resources-mobile-menu-title">
+           <a href="https://pytorch.kr/blog/">블로그</a>
+         </li>
+         <li class="resources-mobile-menu-title">
+           <a>문서</a>
+         </li>
+         <ul class="resources-mobile-menu-items">
+          <li>
+            <a href="https://docs.pytorch.org/docs/" target="_blank">PyTorch API</a>
+          </li>
+          <li>
+            <a href="https://pytorch.kr/domains/">Domain API 소개</a>
+          </li>
+          <li>
+            <a href="https://tutorials.pytorch.kr/">한국어 튜토리얼</a>
+          </li>
+          <li>
+            <a href="https://docs.pytorch.org/tutorials/" target="_blank">Official Tutorials</a>
+          </li>
+        </ul>
+        <li class="resources-mobile-menu-title">
+          <a>커뮤니티</a>
+        </li>
+         <ul class="resources-mobile-menu-items">
+          <li>
+            <a href="https://discuss.pytorch.kr/">한국어 커뮤니티</a>
+          </li>
+          <li>
+            <a href="https://pytorch.kr/resources/">개발자 정보</a>
+          </li>
+          <li>
+            <a href="https://landscape.pytorch.org/" target="_blank">Landscape</a>
+          </li>
+        </ul>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- End Mobile Menu -->
+  
+  
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class=" navbar-header-items__start">
+    
+      <div class="navbar-item">
+  <a href="../index.html" class="version">v2.8.0+cu128</a>
+</div>
+    
+  </div>
+  
+  <div class=" navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../intro.html">
+    Intro
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../compilers_index.html">
+    Compilers
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../domains.html">
+    Domains
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../distributed.html">
+    Distributed
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../deep-dive.html">
+    Deep Dive
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../extension.html">
+    Extension
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../ecosystem.html">
+    Ecosystem
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../recipes_index.html">
+    Recipes
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+      
+        <div class="navbar-item">
+<div class="search-container-wrapper">
+  <div id="sphinx-search" class="search-container">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </div>
+
+  <div id="google-search" class="search-container" style="display:none;">
+    <div class="gcse-search-wrapper">
+      <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+      <div class="gcse-search"></div>
+    </div>
+  </div>
+
+  <div class="search-toggle-container" data-bs-title="Google Search Off" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <div class="search-toggle-inner">
+      <label class="switch">
+        <input type="checkbox" id="search-toggle">
+        <span class="slider round"></span>
+      </label>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+  // Define the search callback
+  const myWebSearchStartingCallback = (gname, query) => {
+    if (typeof dataLayer !== 'undefined' && query) {
+      window.dataLayer = window.dataLayer || [];
+      dataLayer.push({
+        'event': 'google_search',
+        'search_term': query,
+        'event_category': 'Search',
+        'event_label': 'Google Search'
+      });
+    }
+    return '';
+  };
+
+  // Set up the GCSE search callbacks
+  window.__gcse || (window.__gcse = {});
+  window.__gcse.searchCallbacks = {
+    web: { starting: myWebSearchStartingCallback }
+  };
+
+  if (window.location.pathname.includes('/search.html')) {
+    document.body.classList.add('search-page');
+  }
+
+  // Function to reinitialize Google CSE
+  function reinitializeGoogleSearch() {
+    if (window.__gcse && window.__gcse.initializationCallback) {
+      window.__gcse.initializationCallback();
+    }
+  }
+
+  // Function to handle search toggle
+  function handleSearchToggle(toggle, sphinxSearch, googleSearch) {
+    if (!toggle || !sphinxSearch || !googleSearch) return;
+
+    // Check if the URL contains /stable/ or /tutorials/
+    const currentUrl = window.location.href;
+    // TODO: We've had reports that the google programmable search is returning stale documentation,
+    //       Simple reproduction is to turn google search on and search for multinomial which will
+    //       result in returning 1.8.1 documentation.
+    //       We should turn this back on when we resolve that bug.
+    const shouldDefaultToGoogle = false;
+    const savedPreference = localStorage.getItem('searchPreference');
+
+    // Set initial state
+    if (savedPreference === 'google' || (savedPreference === null && shouldDefaultToGoogle)) {
+      toggle.checked = true;
+      sphinxSearch.style.display = 'none';
+      googleSearch.style.display = 'block';
+      if (savedPreference === null) {
+        localStorage.setItem('searchPreference', 'google');
+      }
+      reinitializeGoogleSearch();
+    } else {
+      toggle.checked = false;
+      sphinxSearch.style.display = 'block';
+      googleSearch.style.display = 'none';
+    }
+
+    // Update tooltip
+    updateTooltip(toggle.checked);
+
+    // Skip if already initialized
+    if (toggle.hasAttribute('data-initialized')) return;
+    toggle.setAttribute('data-initialized', 'true');
+
+    toggle.addEventListener('change', function() {
+      if (this.checked) {
+        sphinxSearch.style.display = 'none';
+        googleSearch.style.display = 'block';
+        localStorage.setItem('searchPreference', 'google');
+        reinitializeGoogleSearch();
+        trackSearchEngineSwitch('Google');
+      } else {
+        sphinxSearch.style.display = 'block';
+        googleSearch.style.display = 'none';
+        localStorage.setItem('searchPreference', 'sphinx');
+        trackSearchEngineSwitch('Sphinx');
+      }
+
+      updateTooltip(this.checked);
+      updateMobileSearch();
+    });
+  }
+
+  // Update tooltip based on toggle state
+  function updateTooltip(isChecked) {
+    const tooltipElement = document.querySelector('.search-toggle-container');
+    if (!tooltipElement) return;
+
+    tooltipElement.setAttribute('data-bs-title', isChecked ? 'Google Search On' : 'Google Search Off');
+
+    if (bootstrap && bootstrap.Tooltip) {
+      const tooltipInstance = bootstrap.Tooltip.getInstance(tooltipElement);
+      if (tooltipInstance) tooltipInstance.dispose();
+      new bootstrap.Tooltip(tooltipElement);
+    }
+  }
+
+  // Track search engine switch
+  function trackSearchEngineSwitch(engine) {
+    if (typeof dataLayer !== 'undefined') {
+      window.dataLayer = window.dataLayer || [];
+      dataLayer.push({
+        'event': 'search_engine_switch',
+        'event_category': 'Search',
+        'event_label': engine
+      });
+    }
+  }
+
+  // Function to update mobile search based on current toggle state
+  function updateMobileSearch() {
+    const toggle = document.getElementById('search-toggle');
+    if (!toggle) return;
+
+    const mobileSearchContainer = document.querySelector('.sidebar-header-items__end .navbar-item .search-container-wrapper');
+    if (!mobileSearchContainer) return;
+
+    const mobileSphinxSearch = mobileSearchContainer.querySelector('#sphinx-search');
+    const mobileGoogleSearch = mobileSearchContainer.querySelector('#google-search');
+
+    if (mobileSphinxSearch && mobileGoogleSearch) {
+      mobileSphinxSearch.style.display = toggle.checked ? 'none' : 'block';
+      mobileGoogleSearch.style.display = toggle.checked ? 'block' : 'none';
+
+      if (toggle.checked) {
+        reinitializeGoogleSearch();
+      }
+    }
+  }
+
+  // Initialize desktop search toggle
+  const toggle = document.getElementById('search-toggle');
+  const sphinxSearch = document.getElementById('sphinx-search');
+  const googleSearch = document.getElementById('google-search');
+  handleSearchToggle(toggle, sphinxSearch, googleSearch);
+
+  // Set placeholder text for Google search input
+  const observer = new MutationObserver(function() {
+    document.querySelectorAll('.gsc-input input').forEach(input => {
+      if (input && !input.hasAttribute('data-placeholder-set')) {
+        input.setAttribute('placeholder', 'Search the docs ...');
+        input.setAttribute('data-placeholder-set', 'true');
+      }
+    });
+  });
+
+  observer.observe(document.body, { childList: true, subtree: true });
+
+  // Fix for scroll jump issue - improved approach
+  function setupSearchInputHandlers(input) {
+    if (input.hasAttribute('data-scroll-fixed')) return;
+    input.setAttribute('data-scroll-fixed', 'true');
+
+    let lastScrollPosition = 0;
+    let isTyping = false;
+    let scrollTimeout;
+
+    // Save position before typing starts
+    input.addEventListener('keydown', () => {
+      lastScrollPosition = window.scrollY;
+      isTyping = true;
+
+      // Reset typing state after a short delay
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        isTyping = false;
+      }, 100);
+    });
+
+    // Only maintain scroll position during typing
+    function maintainScroll() {
+      if (document.activeElement === input && isTyping) {
+        window.scrollTo(0, lastScrollPosition);
+        requestAnimationFrame(maintainScroll);
+      }
+    }
+
+    input.addEventListener('focus', () => {
+      // Just store initial position but don't force it
+      lastScrollPosition = window.scrollY;
+    });
+
+    input.addEventListener('input', () => {
+      isTyping = true;
+      window.scrollTo(0, lastScrollPosition);
+
+      // Reset typing state after a short delay
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        isTyping = false;
+      }, 100);
+
+      requestAnimationFrame(maintainScroll);
+    });
+  }
+
+  // Apply to all search inputs and observe for new ones
+  function applyToSearchInputs() {
+    document.querySelectorAll('.search-container input, .gsc-input input').forEach(setupSearchInputHandlers);
+  }
+
+  applyToSearchInputs();
+
+  const searchObserver = new MutationObserver(applyToSearchInputs);
+  searchObserver.observe(document.body, { childList: true, subtree: true });
+
+  // Watch for mobile menu creation
+  const mobileMenuObserver = new MutationObserver(function(mutations) {
+    for (const mutation of mutations) {
+      if (!mutation.addedNodes.length) continue;
+
+      // Style mobile search inputs
+      document.querySelectorAll('.sidebar-header-items__end .navbar-item .search-container-wrapper .gsc-input input').forEach(input => {
+        if (input) {
+          input.setAttribute('placeholder', 'Search the docs ...');
+          input.style.paddingLeft = '36px';
+        }
+      });
+
+      // Check for mobile search container
+      const mobileSearchContainer = document.querySelector('.sidebar-header-items__end .navbar-item .search-container-wrapper');
+      if (!mobileSearchContainer) continue;
+
+      const mobileToggle = mobileSearchContainer.querySelector('#search-toggle');
+      if (mobileToggle && toggle) {
+        // Sync mobile toggle with desktop toggle
+        mobileToggle.checked = toggle.checked;
+        updateMobileSearch();
+
+        // Add event listener to mobile toggle if not already added
+        if (!mobileToggle.hasAttribute('data-initialized')) {
+          mobileToggle.setAttribute('data-initialized', 'true');
+          mobileToggle.addEventListener('change', function() {
+            // Sync desktop toggle with mobile toggle
+            toggle.checked = this.checked;
+            // Trigger change event on desktop toggle to update both
+            toggle.dispatchEvent(new Event('change'));
+          });
+        }
+      }
+    }
+  });
+
+  mobileMenuObserver.observe(document.body, { childList: true, subtree: true });
+
+  // Ensure Google CSE is properly loaded
+  if (window.__gcse) {
+    window.__gcse.callback = function() {
+      // This will run after Google CSE is fully loaded
+      if (toggle && toggle.checked) {
+        reinitializeGoogleSearch();
+      }
+    };
+  } else {
+    window.__gcse = {
+      callback: function() {
+        if (toggle && toggle.checked) {
+          reinitializeGoogleSearch();
+        }
+      }
+    };
+  }
+});
+</script>
+</div>
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/PyTorchKorea/tutorials-kr" title="한국어 튜토리얼 GitHub 저장소" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">한국어 튜토리얼 GitHub 저장소</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://discuss.pytorch.kr/" title="파이토치 한국어 커뮤니티" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-discourse fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">파이토치 한국어 커뮤니티</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../intro.html">
+    Intro
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../compilers_index.html">
+    Compilers
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../domains.html">
+    Domains
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../distributed.html">
+    Distributed
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../deep-dive.html">
+    Deep Dive
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../extension.html">
+    Extension
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../ecosystem.html">
+    Ecosystem
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../recipes_index.html">
+    Recipes
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<div class="search-container-wrapper">
+  <div id="sphinx-search" class="search-container">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </div>
+
+  <div id="google-search" class="search-container" style="display:none;">
+    <div class="gcse-search-wrapper">
+      <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+      <div class="gcse-search"></div>
+    </div>
+  </div>
+
+  <div class="search-toggle-container" data-bs-title="Google Search Off" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <div class="search-toggle-inner">
+      <label class="switch">
+        <input type="checkbox" id="search-toggle">
+        <span class="slider round"></span>
+      </label>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+  // Define the search callback
+  const myWebSearchStartingCallback = (gname, query) => {
+    if (typeof dataLayer !== 'undefined' && query) {
+      window.dataLayer = window.dataLayer || [];
+      dataLayer.push({
+        'event': 'google_search',
+        'search_term': query,
+        'event_category': 'Search',
+        'event_label': 'Google Search'
+      });
+    }
+    return '';
+  };
+
+  // Set up the GCSE search callbacks
+  window.__gcse || (window.__gcse = {});
+  window.__gcse.searchCallbacks = {
+    web: { starting: myWebSearchStartingCallback }
+  };
+
+  if (window.location.pathname.includes('/search.html')) {
+    document.body.classList.add('search-page');
+  }
+
+  // Function to reinitialize Google CSE
+  function reinitializeGoogleSearch() {
+    if (window.__gcse && window.__gcse.initializationCallback) {
+      window.__gcse.initializationCallback();
+    }
+  }
+
+  // Function to handle search toggle
+  function handleSearchToggle(toggle, sphinxSearch, googleSearch) {
+    if (!toggle || !sphinxSearch || !googleSearch) return;
+
+    // Check if the URL contains /stable/ or /tutorials/
+    const currentUrl = window.location.href;
+    // TODO: We've had reports that the google programmable search is returning stale documentation,
+    //       Simple reproduction is to turn google search on and search for multinomial which will
+    //       result in returning 1.8.1 documentation.
+    //       We should turn this back on when we resolve that bug.
+    const shouldDefaultToGoogle = false;
+    const savedPreference = localStorage.getItem('searchPreference');
+
+    // Set initial state
+    if (savedPreference === 'google' || (savedPreference === null && shouldDefaultToGoogle)) {
+      toggle.checked = true;
+      sphinxSearch.style.display = 'none';
+      googleSearch.style.display = 'block';
+      if (savedPreference === null) {
+        localStorage.setItem('searchPreference', 'google');
+      }
+      reinitializeGoogleSearch();
+    } else {
+      toggle.checked = false;
+      sphinxSearch.style.display = 'block';
+      googleSearch.style.display = 'none';
+    }
+
+    // Update tooltip
+    updateTooltip(toggle.checked);
+
+    // Skip if already initialized
+    if (toggle.hasAttribute('data-initialized')) return;
+    toggle.setAttribute('data-initialized', 'true');
+
+    toggle.addEventListener('change', function() {
+      if (this.checked) {
+        sphinxSearch.style.display = 'none';
+        googleSearch.style.display = 'block';
+        localStorage.setItem('searchPreference', 'google');
+        reinitializeGoogleSearch();
+        trackSearchEngineSwitch('Google');
+      } else {
+        sphinxSearch.style.display = 'block';
+        googleSearch.style.display = 'none';
+        localStorage.setItem('searchPreference', 'sphinx');
+        trackSearchEngineSwitch('Sphinx');
+      }
+
+      updateTooltip(this.checked);
+      updateMobileSearch();
+    });
+  }
+
+  // Update tooltip based on toggle state
+  function updateTooltip(isChecked) {
+    const tooltipElement = document.querySelector('.search-toggle-container');
+    if (!tooltipElement) return;
+
+    tooltipElement.setAttribute('data-bs-title', isChecked ? 'Google Search On' : 'Google Search Off');
+
+    if (bootstrap && bootstrap.Tooltip) {
+      const tooltipInstance = bootstrap.Tooltip.getInstance(tooltipElement);
+      if (tooltipInstance) tooltipInstance.dispose();
+      new bootstrap.Tooltip(tooltipElement);
+    }
+  }
+
+  // Track search engine switch
+  function trackSearchEngineSwitch(engine) {
+    if (typeof dataLayer !== 'undefined') {
+      window.dataLayer = window.dataLayer || [];
+      dataLayer.push({
+        'event': 'search_engine_switch',
+        'event_category': 'Search',
+        'event_label': engine
+      });
+    }
+  }
+
+  // Function to update mobile search based on current toggle state
+  function updateMobileSearch() {
+    const toggle = document.getElementById('search-toggle');
+    if (!toggle) return;
+
+    const mobileSearchContainer = document.querySelector('.sidebar-header-items__end .navbar-item .search-container-wrapper');
+    if (!mobileSearchContainer) return;
+
+    const mobileSphinxSearch = mobileSearchContainer.querySelector('#sphinx-search');
+    const mobileGoogleSearch = mobileSearchContainer.querySelector('#google-search');
+
+    if (mobileSphinxSearch && mobileGoogleSearch) {
+      mobileSphinxSearch.style.display = toggle.checked ? 'none' : 'block';
+      mobileGoogleSearch.style.display = toggle.checked ? 'block' : 'none';
+
+      if (toggle.checked) {
+        reinitializeGoogleSearch();
+      }
+    }
+  }
+
+  // Initialize desktop search toggle
+  const toggle = document.getElementById('search-toggle');
+  const sphinxSearch = document.getElementById('sphinx-search');
+  const googleSearch = document.getElementById('google-search');
+  handleSearchToggle(toggle, sphinxSearch, googleSearch);
+
+  // Set placeholder text for Google search input
+  const observer = new MutationObserver(function() {
+    document.querySelectorAll('.gsc-input input').forEach(input => {
+      if (input && !input.hasAttribute('data-placeholder-set')) {
+        input.setAttribute('placeholder', 'Search the docs ...');
+        input.setAttribute('data-placeholder-set', 'true');
+      }
+    });
+  });
+
+  observer.observe(document.body, { childList: true, subtree: true });
+
+  // Fix for scroll jump issue - improved approach
+  function setupSearchInputHandlers(input) {
+    if (input.hasAttribute('data-scroll-fixed')) return;
+    input.setAttribute('data-scroll-fixed', 'true');
+
+    let lastScrollPosition = 0;
+    let isTyping = false;
+    let scrollTimeout;
+
+    // Save position before typing starts
+    input.addEventListener('keydown', () => {
+      lastScrollPosition = window.scrollY;
+      isTyping = true;
+
+      // Reset typing state after a short delay
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        isTyping = false;
+      }, 100);
+    });
+
+    // Only maintain scroll position during typing
+    function maintainScroll() {
+      if (document.activeElement === input && isTyping) {
+        window.scrollTo(0, lastScrollPosition);
+        requestAnimationFrame(maintainScroll);
+      }
+    }
+
+    input.addEventListener('focus', () => {
+      // Just store initial position but don't force it
+      lastScrollPosition = window.scrollY;
+    });
+
+    input.addEventListener('input', () => {
+      isTyping = true;
+      window.scrollTo(0, lastScrollPosition);
+
+      // Reset typing state after a short delay
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        isTyping = false;
+      }, 100);
+
+      requestAnimationFrame(maintainScroll);
+    });
+  }
+
+  // Apply to all search inputs and observe for new ones
+  function applyToSearchInputs() {
+    document.querySelectorAll('.search-container input, .gsc-input input').forEach(setupSearchInputHandlers);
+  }
+
+  applyToSearchInputs();
+
+  const searchObserver = new MutationObserver(applyToSearchInputs);
+  searchObserver.observe(document.body, { childList: true, subtree: true });
+
+  // Watch for mobile menu creation
+  const mobileMenuObserver = new MutationObserver(function(mutations) {
+    for (const mutation of mutations) {
+      if (!mutation.addedNodes.length) continue;
+
+      // Style mobile search inputs
+      document.querySelectorAll('.sidebar-header-items__end .navbar-item .search-container-wrapper .gsc-input input').forEach(input => {
+        if (input) {
+          input.setAttribute('placeholder', 'Search the docs ...');
+          input.style.paddingLeft = '36px';
+        }
+      });
+
+      // Check for mobile search container
+      const mobileSearchContainer = document.querySelector('.sidebar-header-items__end .navbar-item .search-container-wrapper');
+      if (!mobileSearchContainer) continue;
+
+      const mobileToggle = mobileSearchContainer.querySelector('#search-toggle');
+      if (mobileToggle && toggle) {
+        // Sync mobile toggle with desktop toggle
+        mobileToggle.checked = toggle.checked;
+        updateMobileSearch();
+
+        // Add event listener to mobile toggle if not already added
+        if (!mobileToggle.hasAttribute('data-initialized')) {
+          mobileToggle.setAttribute('data-initialized', 'true');
+          mobileToggle.addEventListener('change', function() {
+            // Sync desktop toggle with mobile toggle
+            toggle.checked = this.checked;
+            // Trigger change event on desktop toggle to update both
+            toggle.dispatchEvent(new Event('change'));
+          });
+        }
+      }
+    }
+  });
+
+  mobileMenuObserver.observe(document.body, { childList: true, subtree: true });
+
+  // Ensure Google CSE is properly loaded
+  if (window.__gcse) {
+    window.__gcse.callback = function() {
+      // This will run after Google CSE is fully loaded
+      if (toggle && toggle.checked) {
+        reinitializeGoogleSearch();
+      }
+    };
+  } else {
+    window.__gcse = {
+      callback: function() {
+        if (toggle && toggle.checked) {
+          reinitializeGoogleSearch();
+        }
+      }
+    };
+  }
+});
+</script>
+</div>
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/PyTorchKorea/tutorials-kr" title="한국어 튜토리얼 GitHub 저장소" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">한국어 튜토리얼 GitHub 저장소</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://discuss.pytorch.kr/" title="파이토치 한국어 커뮤니티" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-discourse fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">파이토치 한국어 커뮤니티</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">torch.compile</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/torch_compile_tutorial.html">Introduction to <code class="docutils literal notranslate"><span class="pre">torch.compile</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/compiled_autograd_tutorial.html">Compiled Autograd: Capturing a larger backward graph for <code class="docutils literal notranslate"><span class="pre">torch.compile</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/inductor_debug_cpu.html">Inductor CPU backend debugging and profiling</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Dynamic Compilation Control with <code class="docutils literal notranslate"><span class="pre">torch.compiler.set_stance</span></code></a></li>
+
+
+<li class="toctree-l1"><a class="reference internal" href="torch_export_challenges_solutions.html">Demonstration of torch.export flow, common challenges and the solutions to address them</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compiling_optimizer.html">(beta) Compiling the optimizer with torch.compile</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compiling_optimizer_lr_scheduler.html">(beta) Running the compiled optimizer with an LR Scheduler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_compile_user_defined_triton_kernel_tutorial.html">사용자 정의 Triton 커널을 ``torch.compile``과 함께 사용하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_compile_caching_tutorial.html">Compile Time Caching in <code class="docutils literal notranslate"><span class="pre">torch.compile</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="regional_compilation.html">Reducing torch.compile cold start compilation time with regional compilation</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">torch.export</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/torch_export_tutorial.html">torch.export Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_export_aoti_python.html"><code class="docutils literal notranslate"><span class="pre">torch.export</span></code> AOTInductor Tutorial for Python runtime (Beta)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="torch_export_challenges_solutions.html">Demonstration of torch.export flow, common challenges and the solutions to address them</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">ONNX</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../beginner/onnx/intro_onnx.html">Introduction to ONNX</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="simple">
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../beginner/onnx/export_simple_model_to_onnx_tutorial.html">Export a PyTorch model to ONNX</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="simple">
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../beginner/onnx/onnx_registry_tutorial.html">Extending the ONNX Registry</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="simple">
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../beginner/onnx/export_control_flow_model_to_onnx_tutorial.html">Export a model with control flow to ONNX</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="simple">
+</ul>
+</details></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Code Transforms with FX</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/torch_compile_conv_bn_fuser.html">Building a Convolution/Batch Norm fuser with torch.compile</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/fx_profiling_tutorial.html">(beta) Building a Simple CPU Performance Profiler with FX</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../compilers_index.html" class="nav-link">Compilers</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">Dynamic...</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+<div class="rating">
+    Rate this Page
+    <div class="stars">
+        
+        <span class="star" data-behavior="tutorial-rating" data-count="1" data-value="1">★</span>
+        
+        <span class="star" data-behavior="tutorial-rating" data-count="2" data-value="2">★</span>
+        
+        <span class="star" data-behavior="tutorial-rating" data-count="3" data-value="3">★</span>
+        
+        <span class="star" data-behavior="tutorial-rating" data-count="4" data-value="4">★</span>
+        
+        <span class="star" data-behavior="tutorial-rating" data-count="5" data-value="5">★</span>
+        
+    </div>
+</div>
+</div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+  
+<div id="searchbox"></div>
+  <article class="bd-article" id="pytorch-article">
+    <!-- Hidden breadcrumb schema for SEO only -->
+    <div style="display:none;" itemscope itemtype="https://schema.org/BreadcrumbList">
+      
+      <div itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <link itemprop="item" href="../compilers_index.html">
+        <meta itemprop="name" content="Compilers">
+        <meta itemprop="position" content="1">
+      </div>
+      
+      <div itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <meta itemprop="name" content="Dynamic Compilation Control with <code class="docutils literal notranslate"><span class="pre">torch.compiler.set_stance</span></code>">
+        <meta itemprop="position" content="2">
+      </div>
+    </div>
+
+    
+    <script>
+      if ((window.location.href.indexOf("/unstable/") != -1) && (window.location.href.indexOf("/unstable/unstable_index") < 1)) {
+        var div = '<div class="prototype-banner"><i class="fa fa-flask" aria-hidden="true"></i> <strong>Unstable feature:</strong> Not typically available in binary distributions like PyPI. Early stage for feedback and testing.</div>'
+        document.addEventListener('DOMContentLoaded', function () {
+          document.getElementById("pytorch-article").insertAdjacentHTML('afterBegin', div);
+        });
+      }
+    </script>
+    
+    
+    <div class="pytorch-call-to-action-links">
+      <div id="tutorial-type">recipes/torch_compiler_set_stance_tutorial</div>
+      <a id="colab-link" data-behavior="call-to-action-event" data-response="Run in Google Colab" target="_blank">
+        <div id="google-colab-link">
+          <img class="call-to-action-img" src="../_static/img/pytorch-colab.svg" />
+          <div class="call-to-action-desktop-view">Run in Google Colab</div>
+          <div class="call-to-action-mobile-view">Colab</div>
+        </div>
+      </a>
+      <a id="notebook-link" data-behavior="call-to-action-event" data-response="Download Notebook">
+        <div id="download-notebook-link">
+          <img class="call-to-action-notebook-img" src="../_static/img/pytorch-download.svg" />
+          <div class="call-to-action-desktop-view">Download Notebook</div>
+          <div class="call-to-action-mobile-view">Notebook</div>
+        </div>
+      </a>
+      <a id="github-link" data-behavior="call-to-action-event" data-response="View on Github" target="_blank">
+        <div id="github-view-link">
+          <img class="call-to-action-img" src="../_static/img/pytorch-github.svg" />
+          <div class="call-to-action-desktop-view">View on GitHub</div>
+          <div class="call-to-action-mobile-view">GitHub</div>
+        </div>
+      </a>
+    </div>
+    
+
+    
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">참고</p>
+<p><a class="reference internal" href="#sphx-glr-download-recipes-torch-compiler-set-stance-tutorial-py"><span class="std std-ref">Go to the end</span></a>
+to download the full example code.</p>
+</div>
+<section class="sphx-glr-example-title" id="dynamic-compilation-control-with-torch-compiler-set-stance">
+<span id="sphx-glr-recipes-torch-compiler-set-stance-tutorial-py"></span><h1>Dynamic Compilation Control with <code class="docutils literal notranslate"><span class="pre">torch.compiler.set_stance</span></code><a class="headerlink" href="#dynamic-compilation-control-with-torch-compiler-set-stance" title="Link to this heading">#</a></h1>
+<p><strong>Author:</strong> <a class="reference external" href="https://github.com/williamwen42">William Wen</a></p>
+<p><code class="docutils literal notranslate"><span class="pre">torch.compiler.set_stance</span></code> is a <code class="docutils literal notranslate"><span class="pre">torch.compiler</span></code> API that
+enables you to change the behavior of <code class="docutils literal notranslate"><span class="pre">torch.compile</span></code> across different
+calls to your model without having to reapply <code class="docutils literal notranslate"><span class="pre">torch.compile</span></code> to your model.</p>
+<p>This recipe provides some examples on how to use <code class="docutils literal notranslate"><span class="pre">torch.compiler.set_stance</span></code>.</p>
+<nav class="contents local" id="id1">
+<ul class="simple">
+<li><p><a class="reference internal" href="#prerequisites" id="id2">Prerequisites</a></p></li>
+<li><p><a class="reference internal" href="#description" id="id3">Description</a></p></li>
+<li><p><a class="reference internal" href="#examples" id="id4">Examples</a></p>
+<ul>
+<li><p><a class="reference internal" href="#preventing-recompilation" id="id5">Preventing recompilation</a></p></li>
+</ul>
+</li>
+</ul>
+</nav>
+<section id="prerequisites">
+<h2><a class="toc-backref" href="#id2" role="doc-backlink">Prerequisites</a><a class="headerlink" href="#prerequisites" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">torch</span> <span class="pre">&gt;=</span> <span class="pre">2.6</span></code></p></li>
+</ul>
+</section>
+<section id="description">
+<h2><a class="toc-backref" href="#id3" role="doc-backlink">Description</a><a class="headerlink" href="#description" title="Link to this heading">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">torch.compile.set_stance</span></code> can be used as a decorator, context manager, or raw function
+to change the behavior of <code class="docutils literal notranslate"><span class="pre">torch.compile</span></code> across different calls to your model.</p>
+<p>In the example below, the <code class="docutils literal notranslate"><span class="pre">&quot;force_eager&quot;</span></code> stance ignores all <code class="docutils literal notranslate"><span class="pre">torch.compile</span></code> directives.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+
+
+<span class="nd">@torch</span><span class="o">.</span><span class="n">compile</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">foo</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">compiler</span><span class="o">.</span><span class="n">is_compiling</span><span class="p">():</span>
+        <span class="c1"># torch.compile is active</span>
+        <span class="k">return</span> <span class="n">x</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># torch.compile is not active</span>
+        <span class="k">return</span> <span class="n">x</span> <span class="o">-</span> <span class="mi">1</span>
+
+
+<span class="n">inp</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">foo</span><span class="p">(</span><span class="n">inp</span><span class="p">))</span>  <span class="c1"># compiled, prints 1</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor([1., 1., 1.])
+</pre></div>
+</div>
+<p>Sample decorator usage</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="nd">@torch</span><span class="o">.</span><span class="n">compiler</span><span class="o">.</span><span class="n">set_stance</span><span class="p">(</span><span class="s2">&quot;force_eager&quot;</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">bar</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="c1"># force disable the compiler</span>
+    <span class="k">return</span> <span class="n">foo</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+
+<span class="nb">print</span><span class="p">(</span><span class="n">bar</span><span class="p">(</span><span class="n">inp</span><span class="p">))</span>  <span class="c1"># not compiled, prints -1</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor([-1., -1., -1.])
+</pre></div>
+</div>
+<p>Sample context manager usage</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">compiler</span><span class="o">.</span><span class="n">set_stance</span><span class="p">(</span><span class="s2">&quot;force_eager&quot;</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">foo</span><span class="p">(</span><span class="n">inp</span><span class="p">))</span>  <span class="c1"># not compiled, prints -1</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor([-1., -1., -1.])
+</pre></div>
+</div>
+<p>Sample raw function usage</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">torch</span><span class="o">.</span><span class="n">compiler</span><span class="o">.</span><span class="n">set_stance</span><span class="p">(</span><span class="s2">&quot;force_eager&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">foo</span><span class="p">(</span><span class="n">inp</span><span class="p">))</span>  <span class="c1"># not compiled, prints -1</span>
+<span class="n">torch</span><span class="o">.</span><span class="n">compiler</span><span class="o">.</span><span class="n">set_stance</span><span class="p">(</span><span class="s2">&quot;default&quot;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">foo</span><span class="p">(</span><span class="n">inp</span><span class="p">))</span>  <span class="c1"># compiled, prints 1</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor([-1., -1., -1.])
+tensor([1., 1., 1.])
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">torch.compile</span></code> stance can only be changed <strong>outside</strong> of any <code class="docutils literal notranslate"><span class="pre">torch.compile</span></code> region. Attempts
+to do otherwise will result in an error.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="nd">@torch</span><span class="o">.</span><span class="n">compile</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">baz</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="c1"># error!</span>
+    <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">compiler</span><span class="o">.</span><span class="n">set_stance</span><span class="p">(</span><span class="s2">&quot;force_eager&quot;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">x</span> <span class="o">+</span> <span class="mi">1</span>
+
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">baz</span><span class="p">(</span><span class="n">inp</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+
+
+<span class="nd">@torch</span><span class="o">.</span><span class="n">compiler</span><span class="o">.</span><span class="n">set_stance</span><span class="p">(</span><span class="s2">&quot;force_eager&quot;</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">inner</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">x</span> <span class="o">+</span> <span class="mi">1</span>
+
+
+<span class="nd">@torch</span><span class="o">.</span><span class="n">compile</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">outer</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="c1"># error!</span>
+    <span class="k">return</span> <span class="n">inner</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">outer</span><span class="p">(</span><span class="n">inp</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Attempt to trace forbidden callable &lt;function set_stance at 0x7f0dfdf845e0&gt;
+
+from user code:
+   File &quot;/workspace/tutorials-kr/recipes_source/torch_compiler_set_stance_tutorial.py&quot;, line 85, in baz
+    with torch.compiler.set_stance(&quot;force_eager&quot;):
+
+Set TORCHDYNAMO_VERBOSE=1 for the internal stack trace (please do this especially if you&#39;re reporting a bug to PyTorch). For even more developer context, set TORCH_LOGS=&quot;+dynamo&quot;
+
+Attempt to trace forbidden callable &lt;function inner at 0x7f0e4fac6de0&gt;
+
+from user code:
+   File &quot;/workspace/tutorials-kr/recipes_source/torch_compiler_set_stance_tutorial.py&quot;, line 103, in outer
+    return inner(x)
+
+Set TORCHDYNAMO_VERBOSE=1 for the internal stack trace (please do this especially if you&#39;re reporting a bug to PyTorch). For even more developer context, set TORCH_LOGS=&quot;+dynamo&quot;
+</pre></div>
+</div>
+<dl class="simple">
+<dt>Other stances include:</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;default&quot;</span></code>: The default stance, used for normal compilation.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;eager_on_recompile&quot;</span></code>: Run code eagerly when a recompile is necessary. If there is cached compiled code valid for the input, it will still be used.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;fail_on_recompile&quot;</span></code>: Raise an error when recompiling a function.</p></li>
+</ul>
+</dd>
+</dl>
+<p>See the <code class="docutils literal notranslate"><span class="pre">torch.compiler.set_stance</span></code> <a class="reference external" href="https://pytorch.org/docs/main/generated/torch.compiler.set_stance.html#torch.compiler.set_stance">doc page</a>
+for more stances and options. More stances/options may also be added in the future.</p>
+</section>
+<section id="examples">
+<h2><a class="toc-backref" href="#id4" role="doc-backlink">Examples</a><a class="headerlink" href="#examples" title="Link to this heading">#</a></h2>
+<section id="preventing-recompilation">
+<h3><a class="toc-backref" href="#id5" role="doc-backlink">Preventing recompilation</a><a class="headerlink" href="#preventing-recompilation" title="Link to this heading">#</a></h3>
+<p>Some models do not expect any recompilations - for example, you may always have inputs with the same shape.
+Since recompilations may be expensive, we may wish to error out when we attempt to recompile so we can detect and fix recompilation cases.
+The <code class="docutils literal notranslate"><span class="pre">&quot;fail_on_recompilation&quot;</span></code> stance can be used for this.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="nd">@torch</span><span class="o">.</span><span class="n">compile</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">my_big_model</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+
+<span class="c1"># first compilation</span>
+<span class="n">my_big_model</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
+
+<span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">compiler</span><span class="o">.</span><span class="n">set_stance</span><span class="p">(</span><span class="s2">&quot;fail_on_recompile&quot;</span><span class="p">):</span>
+    <span class="n">my_big_model</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>  <span class="c1"># no recompilation - OK</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">my_big_model</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">4</span><span class="p">))</span>  <span class="c1"># recompilation - error</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Detected recompile when torch.compile stance is &#39;fail_on_recompile&#39;
+</pre></div>
+</div>
+<p>If erroring out is too disruptive, we can use <code class="docutils literal notranslate"><span class="pre">&quot;eager_on_recompile&quot;</span></code> instead,
+which will cause <code class="docutils literal notranslate"><span class="pre">torch.compile</span></code> to fall back to eager instead of erroring out.
+This may be useful if we don’t expect recompilations to happen frequently, but
+when one is required, we’d rather pay the cost of running eagerly over the cost of recompilation.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="nd">@torch</span><span class="o">.</span><span class="n">compile</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">my_huge_model</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">compiler</span><span class="o">.</span><span class="n">is_compiling</span><span class="p">():</span>
+        <span class="k">return</span> <span class="n">x</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">x</span> <span class="o">-</span> <span class="mi">1</span>
+
+
+<span class="c1"># first compilation</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">my_huge_model</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">)))</span>  <span class="c1"># 1</span>
+
+<span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">compiler</span><span class="o">.</span><span class="n">set_stance</span><span class="p">(</span><span class="s2">&quot;eager_on_recompile&quot;</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">my_huge_model</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">)))</span>  <span class="c1"># 1</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">my_huge_model</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">4</span><span class="p">)))</span>  <span class="c1"># -1</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">my_huge_model</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">)))</span>  <span class="c1"># 1</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>tensor([1., 1., 1.])
+tensor([1., 1., 1.])
+tensor([-1., -1., -1., -1.])
+tensor([1., 1., 1.])
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+<section id="measuring-performance-gains">
+<h1>Measuring performance gains<a class="headerlink" href="#measuring-performance-gains" title="Link to this heading">#</a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">torch.compiler.set_stance</span></code> can be used to compare eager vs. compiled performance
+without having to define a separate eager model.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Returns the result of running `fn()` and the time it took for `fn()` to run,</span>
+<span class="c1"># in seconds. We use CUDA events and synchronization for the most accurate</span>
+<span class="c1"># measurements.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">timed</span><span class="p">(</span><span class="n">fn</span><span class="p">):</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span><span class="n">enable_timing</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">end</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span><span class="n">enable_timing</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">start</span><span class="o">.</span><span class="n">record</span><span class="p">()</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">fn</span><span class="p">()</span>
+    <span class="n">end</span><span class="o">.</span><span class="n">record</span><span class="p">()</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">synchronize</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">result</span><span class="p">,</span> <span class="n">start</span><span class="o">.</span><span class="n">elapsed_time</span><span class="p">(</span><span class="n">end</span><span class="p">)</span> <span class="o">/</span> <span class="mi">1000</span>
+
+
+<span class="nd">@torch</span><span class="o">.</span><span class="n">compile</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">my_gigantic_model</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">x</span> <span class="o">@</span> <span class="n">y</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">x</span> <span class="o">@</span> <span class="n">y</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">x</span> <span class="o">@</span> <span class="n">y</span>
+    <span class="k">return</span> <span class="n">x</span>
+
+
+<span class="n">inps</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+
+<span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">compiler</span><span class="o">.</span><span class="n">set_stance</span><span class="p">(</span><span class="s2">&quot;force_eager&quot;</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;eager:&quot;</span><span class="p">,</span> <span class="n">timed</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">my_gigantic_model</span><span class="p">(</span><span class="o">*</span><span class="n">inps</span><span class="p">))[</span><span class="mi">1</span><span class="p">])</span>
+
+<span class="c1"># warmups</span>
+<span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+    <span class="n">my_gigantic_model</span><span class="p">(</span><span class="o">*</span><span class="n">inps</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;compiled:&quot;</span><span class="p">,</span> <span class="n">timed</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">my_gigantic_model</span><span class="p">(</span><span class="o">*</span><span class="n">inps</span><span class="p">))[</span><span class="mi">1</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>eager: 0.00014636799693107605
+compiled: 5.9744000434875486e-05
+</pre></div>
+</div>
+</section>
+<section id="crashing-sooner">
+<h1>Crashing sooner<a class="headerlink" href="#crashing-sooner" title="Link to this heading">#</a></h1>
+<p>Running an eager iteration first before a compiled iteration using the <code class="docutils literal notranslate"><span class="pre">&quot;force_eager&quot;</span></code> stance
+can help us to catch errors unrelated to <code class="docutils literal notranslate"><span class="pre">torch.compile</span></code> before attempting a very long compile.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="nd">@torch</span><span class="o">.</span><span class="n">compile</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">my_humongous_model</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">compiler</span><span class="o">.</span><span class="n">set_stance</span><span class="p">(</span><span class="s2">&quot;force_eager&quot;</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">my_humongous_model</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">3</span><span class="p">)))</span>
+    <span class="c1"># this call to the compiled model won&#39;t run</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">my_humongous_model</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">3</span><span class="p">)))</span>
+<span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>sin() takes 1 positional argument but 2 were given
+</pre></div>
+</div>
+<section id="conclusion">
+<h2>Conclusion<a class="headerlink" href="#conclusion" title="Link to this heading">#</a></h2>
+<p>In this recipe, we have learned how to use the <code class="docutils literal notranslate"><span class="pre">torch.compiler.set_stance</span></code> API
+to modify the behavior of <code class="docutils literal notranslate"><span class="pre">torch.compile</span></code> across different calls to a model
+without needing to reapply it. The recipe demonstrates using
+<code class="docutils literal notranslate"><span class="pre">torch.compiler.set_stance</span></code> as a decorator, context manager, or raw function
+to control compilation stances like <code class="docutils literal notranslate"><span class="pre">force_eager</span></code>, <code class="docutils literal notranslate"><span class="pre">default</span></code>,
+<code class="docutils literal notranslate"><span class="pre">eager_on_recompile</span></code>, and “fail_on_recompile.”</p>
+<p>For more information, see: <a class="reference external" href="https://pytorch.org/docs/main/generated/torch.compiler.set_stance.html#torch.compiler.set_stance">torch.compiler.set_stance API documentation</a>.</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 12.579 seconds)</p>
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-recipes-torch-compiler-set-stance-tutorial-py">
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/60868f136246d48ff6f18abf35fdf18e/torch_compiler_set_stance_tutorial.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">torch_compiler_set_stance_tutorial.ipynb</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/12d57dfb5886880e71752ea149c1dc6d/torch_compiler_set_stance_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">torch_compiler_set_stance_tutorial.py</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-zip docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/20f245312699c4ccc60f9b83d2a0bc18/torch_compiler_set_stance_tutorial.zip"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">zipped:</span> <span class="pre">torch_compiler_set_stance_tutorial.zip</span></code></a></p>
+</div>
+</div>
+</section>
+</section>
+
+
+                </article>
+              
+  </article>
+  
+              
+              
+                <footer class="bd-footer-article">
+                  <div class="footer-article-items footer-article__inner">
+  
+    <div class="footer-article-item">
+<div class="feedback">
+  
+<div class="rating">
+    Rate this Page
+    <div class="stars">
+        
+        <span class="star" data-behavior="tutorial-rating" data-count="1" data-value="1">★</span>
+        
+        <span class="star" data-behavior="tutorial-rating" data-count="2" data-value="2">★</span>
+        
+        <span class="star" data-behavior="tutorial-rating" data-count="3" data-value="3">★</span>
+        
+        <span class="star" data-behavior="tutorial-rating" data-count="4" data-value="4">★</span>
+        
+        <span class="star" data-behavior="tutorial-rating" data-count="5" data-value="5">★</span>
+        
+    </div>
+</div>
+
+  <div class="feedback-send">
+    <button class="feedback-btn"
+            onclick="openGitHubIssue()"
+            data-bs-title="Create a GitHub Issue"
+            data-bs-placement="bottom"
+            data-bs-toggle="tooltip"
+            data-gtm="feedback-btn-click">Send Feedback
+    </button>
+  </div>
+</div>
+
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../intermediate/inductor_debug_cpu.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">이전</p>
+        <p class="prev-next-title">Inductor CPU backend debugging and profiling</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="torch_export_challenges_solutions.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">다음</p>
+        <p class="prev-next-title">Demonstration of torch.export flow, common challenges and the solutions to address them</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+
+<div class="footer-info">
+  <p class="copyright">
+    
+      
+        © Copyright 2018-2025, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorchKR).
+      
+      <br/>
+    
+  </p>
+
+  <p class="theme-version">
+    Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.4.
+  </p>
+</div>
+</div>
+  
+</div>
+                </footer>
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../intermediate/inductor_debug_cpu.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">이전</p>
+        <p class="prev-next-title">Inductor CPU backend debugging and profiling</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="torch_export_challenges_solutions.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">다음</p>
+        <p class="prev-next-title">Demonstration of torch.export flow, common challenges and the solutions to address them</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc">
+<div class="sidebar-secondary-items sidebar-secondary__inner">
+    
+       <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Dynamic Compilation Control with <code class="docutils literal notranslate"><span class="pre">torch.compiler.set_stance</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#prerequisites">Prerequisites</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#description">Description</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#examples">Examples</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#preventing-recompilation">Preventing recompilation</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#measuring-performance-gains">Measuring performance gains</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#crashing-sooner">Crashing sooner</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#conclusion">Conclusion</a></li>
+</ul>
+</li>
+</ul>
+
+  </nav></div>
+    
+
+
+
+
+<div class="sidebar-secondary-item">
+  <div class="sidebar-heading">PyTorch Libraries</div>
+  <ul style="list-style-type: none; padding: 0; padding-bottom: 80px;">
+  
+   <li><a class="nav-link nav-external" href="https://docs.pytorch.org/ao" style="color: var(--pst-color-text-muted)">torchao</a></li>
+  
+   <li><a class="nav-link nav-external" href="https://docs.pytorch.org/torchrec" style="color: var(--pst-color-text-muted)">torchrec</a></li>
+  
+   <li><a class="nav-link nav-external" href="https://docs.pytorch.org/torchft" style="color: var(--pst-color-text-muted)">torchft</a></li>
+  
+   <li><a class="nav-link nav-external" href="https://docs.pytorch.org/torchcodec" style="color: var(--pst-color-text-muted)">TorchCodec</a></li>
+  
+   <li><a class="nav-link nav-external" href="https://docs.pytorch.org/vision" style="color: var(--pst-color-text-muted)">torchvision</a></li>
+  
+   <li><a class="nav-link nav-external" href="https://docs.pytorch.org/executorch" style="color: var(--pst-color-text-muted)">ExecuTorch</a></li>
+  
+   <li><a class="nav-link nav-external" href="https://docs.pytorch.org/xla" style="color: var(--pst-color-text-muted)">PyTorch on XLA Devices</a></li>
+  
+  </ul>
+</div>
+
+</div>
+</div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <div class="container-fluid docs-tutorials-resources">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-4 text-center">
+        <h2>PyTorchKorea @ GitHub</h2>
+        <p>파이토치 한국 사용자 모임을 GitHub에서 만나보세요.</p>
+        <a class="with-right-arrow" href="https://github.com/PyTorchKorea">GitHub로 이동</a>
+      </div>
+
+      <div class="col-md-4 text-center">
+        <h2>한국어 튜토리얼</h2>
+        <p>한국어로 번역 중인 파이토치 튜토리얼을 만나보세요.</p>
+        <a class="with-right-arrow" href="https://tutorials.pytorch.kr/">튜토리얼로 이동</a>
+      </div>
+
+      <div class="col-md-4 text-center">
+        <h2>한국어 커뮤니티</h2>
+        <p>다른 사용자들과 의견을 나누고, 도와주세요!</p>
+        <a class="with-right-arrow" href="https://discuss.pytorch.kr/">커뮤니티로 이동</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="container footer-container">
+    <div class="footer-logo-wrapper">
+      <a href="https://pytorch.kr/" class="footer-logo"></a>
+    </div>
+
+    <div class="footer-links-wrapper">
+      <div class="footer-links-col">
+        <ul>
+          <li class="list-title"><a href="https://pytorch.kr/">파이토치 한국 사용자 모임</a></li>
+          <li><a href="https://pytorch.kr/about">사용자 모임 소개</a></li>
+          <li><a href="https://pytorch.kr/contributors">기여해주신 분들</a></li>
+          <li><a href="https://pytorch.kr/resources/">리소스</a></li>
+          <li><a href="https://pytorch.kr/coc">행동 강령</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="trademark-disclaimer">
+      <ul>
+        <li>이 사이트는 독립적인 파이토치 사용자 커뮤니티로, 최신 버전이 아니거나 잘못된 내용이 포함되어 있을 수 있습니다. This site is an independent user community and may be out of date or contain incorrect information.</li>
+        <li><a href="https://pytorch.kr/coc">행동 강령</a>을 읽고 지켜주세요. PyTorch 공식 로고 사용 규정은 <a href="https://www.linuxfoundation.org/policies/">Linux Foundation의 정책</a>을 따릅니다. Please read and follow <a href="https://pytorch.kr/coc">our code of conduct</a>. All PyTorch trademark policy applicable to <a href="https://www.linuxfoundation.org/policies/">Linux Foundation's policies</a>.</li>
+      </ul>
+    </div>
+  </div>
+</footer>
+
+<div class="cookie-banner-wrapper">
+  <div class="container">
+    <p class="gdpr-notice">To analyze traffic and optimize your experience, we serve cookies on this site. By clicking or navigating, you agree to allow our usage of cookies. As the current maintainers of this site, Facebook’s Cookies Policy applies. Learn more, including about available controls: <a href="https://www.facebook.com/policies/cookies/">Cookies Policy</a>.</p>
+    <img class="close-button" src="../_static/img/pytorch-x.svg">
+  </div>
+</div>
+  
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2018-2025, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorchKR).
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6 버전으로 생성되었습니다.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.4.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  <script type="application/ld+json">
+    {
+       "@context": "https://schema.org",
+       "@type": "Article",
+       "name": "Dynamic Compilation Control with torch.compiler.set_stance",
+       "headline": "Dynamic Compilation Control with torch.compiler.set_stance",
+       "description": "PyTorch Documentation. Explore PyTorch, an open-source machine learning library that accelerates the path from research prototyping to production deployment. Discover tutorials, API references, and guides to help you build and deploy deep learning models efficiently.",
+       "url": "/recipes/torch_compiler_set_stance_tutorial.html",
+       "articleBody": "\ucc38\uace0 Go to the end to download the full example code. Dynamic Compilation Control with torch.compiler.set_stance# Author: William Wen torch.compiler.set_stance is a torch.compiler API that enables you to change the behavior of torch.compile across different calls to your model without having to reapply torch.compile to your model. This recipe provides some examples on how to use torch.compiler.set_stance. Prerequisites Description Examples Preventing recompilation Prerequisites# torch \u003e= 2.6 Description# torch.compile.set_stance can be used as a decorator, context manager, or raw function to change the behavior of torch.compile across different calls to your model. In the example below, the \"force_eager\" stance ignores all torch.compile directives. import torch @torch.compile def foo(x): if torch.compiler.is_compiling(): # torch.compile is active return x + 1 else: # torch.compile is not active return x - 1 inp = torch.zeros(3) print(foo(inp)) # compiled, prints 1 tensor([1., 1., 1.]) Sample decorator usage @torch.compiler.set_stance(\"force_eager\") def bar(x): # force disable the compiler return foo(x) print(bar(inp)) # not compiled, prints -1 tensor([-1., -1., -1.]) Sample context manager usage with torch.compiler.set_stance(\"force_eager\"): print(foo(inp)) # not compiled, prints -1 tensor([-1., -1., -1.]) Sample raw function usage torch.compiler.set_stance(\"force_eager\") print(foo(inp)) # not compiled, prints -1 torch.compiler.set_stance(\"default\") print(foo(inp)) # compiled, prints 1 tensor([-1., -1., -1.]) tensor([1., 1., 1.]) torch.compile stance can only be changed outside of any torch.compile region. Attempts to do otherwise will result in an error. @torch.compile def baz(x): # error! with torch.compiler.set_stance(\"force_eager\"): return x + 1 try: baz(inp) except Exception as e: print(e) @torch.compiler.set_stance(\"force_eager\") def inner(x): return x + 1 @torch.compile def outer(x): # error! return inner(x) try: outer(inp) except Exception as e: print(e) Attempt to trace forbidden callable \u003cfunction set_stance at 0x7f0dfdf845e0\u003e from user code: File \"/workspace/tutorials-kr/recipes_source/torch_compiler_set_stance_tutorial.py\", line 85, in baz with torch.compiler.set_stance(\"force_eager\"): Set TORCHDYNAMO_VERBOSE=1 for the internal stack trace (please do this especially if you\u0027re reporting a bug to PyTorch). For even more developer context, set TORCH_LOGS=\"+dynamo\" Attempt to trace forbidden callable \u003cfunction inner at 0x7f0e4fac6de0\u003e from user code: File \"/workspace/tutorials-kr/recipes_source/torch_compiler_set_stance_tutorial.py\", line 103, in outer return inner(x) Set TORCHDYNAMO_VERBOSE=1 for the internal stack trace (please do this especially if you\u0027re reporting a bug to PyTorch). For even more developer context, set TORCH_LOGS=\"+dynamo\" Other stances include: \"default\": The default stance, used for normal compilation. \"eager_on_recompile\": Run code eagerly when a recompile is necessary. If there is cached compiled code valid for the input, it will still be used. \"fail_on_recompile\": Raise an error when recompiling a function. See the torch.compiler.set_stance doc page for more stances and options. More stances/options may also be added in the future. Examples# Preventing recompilation# Some models do not expect any recompilations - for example, you may always have inputs with the same shape. Since recompilations may be expensive, we may wish to error out when we attempt to recompile so we can detect and fix recompilation cases. The \"fail_on_recompilation\" stance can be used for this. @torch.compile def my_big_model(x): return torch.relu(x) # first compilation my_big_model(torch.randn(3)) with torch.compiler.set_stance(\"fail_on_recompile\"): my_big_model(torch.randn(3)) # no recompilation - OK try: my_big_model(torch.randn(4)) # recompilation - error except Exception as e: print(e) Detected recompile when torch.compile stance is \u0027fail_on_recompile\u0027 If erroring out is too disruptive, we can use \"eager_on_recompile\" instead, which will cause torch.compile to fall back to eager instead of erroring out. This may be useful if we don\u2019t expect recompilations to happen frequently, but when one is required, we\u2019d rather pay the cost of running eagerly over the cost of recompilation. @torch.compile def my_huge_model(x): if torch.compiler.is_compiling(): return x + 1 else: return x - 1 # first compilation print(my_huge_model(torch.zeros(3))) # 1 with torch.compiler.set_stance(\"eager_on_recompile\"): print(my_huge_model(torch.zeros(3))) # 1 print(my_huge_model(torch.zeros(4))) # -1 print(my_huge_model(torch.zeros(3))) # 1 tensor([1., 1., 1.]) tensor([1., 1., 1.]) tensor([-1., -1., -1., -1.]) tensor([1., 1., 1.]) Measuring performance gains# torch.compiler.set_stance can be used to compare eager vs. compiled performance without having to define a separate eager model. # Returns the result of running `fn()` and the time it took for `fn()` to run, # in seconds. We use CUDA events and synchronization for the most accurate # measurements. def timed(fn): start = torch.cuda.Event(enable_timing=True) end = torch.cuda.Event(enable_timing=True) start.record() result = fn() end.record() torch.cuda.synchronize() return result, start.elapsed_time(end) / 1000 @torch.compile def my_gigantic_model(x, y): x = x @ y x = x @ y x = x @ y return x inps = torch.randn(5, 5), torch.randn(5, 5) with torch.compiler.set_stance(\"force_eager\"): print(\"eager:\", timed(lambda: my_gigantic_model(*inps))[1]) # warmups for _ in range(3): my_gigantic_model(*inps) print(\"compiled:\", timed(lambda: my_gigantic_model(*inps))[1]) eager: 0.00014636799693107605 compiled: 5.9744000434875486e-05 Crashing sooner# Running an eager iteration first before a compiled iteration using the \"force_eager\" stance can help us to catch errors unrelated to torch.compile before attempting a very long compile. @torch.compile def my_humongous_model(x): return torch.sin(x, x) try: with torch.compiler.set_stance(\"force_eager\"): print(my_humongous_model(torch.randn(3))) # this call to the compiled model won\u0027t run print(my_humongous_model(torch.randn(3))) except Exception as e: print(e) sin() takes 1 positional argument but 2 were given Conclusion# In this recipe, we have learned how to use the torch.compiler.set_stance API to modify the behavior of torch.compile across different calls to a model without needing to reapply it. The recipe demonstrates using torch.compiler.set_stance as a decorator, context manager, or raw function to control compilation stances like force_eager, default, eager_on_recompile, and \u201cfail_on_recompile.\u201d For more information, see: torch.compiler.set_stance API documentation. Total running time of the script: (0 minutes 12.579 seconds) Download Jupyter notebook: torch_compiler_set_stance_tutorial.ipynb Download Python source code: torch_compiler_set_stance_tutorial.py Download zipped: torch_compiler_set_stance_tutorial.zip",
+       "author": {
+         "@type": "Organization",
+         "name": "PyTorch Contributors",
+         "url": "https://pytorch.org"
+       },
+       "image": "../_static/img/pytorch_seo.png",
+       "mainEntityOfPage": {
+         "@type": "WebPage",
+         "@id": "/recipes/torch_compiler_set_stance_tutorial.html"
+       },
+       "datePublished": "2023-01-01T00:00:00Z",
+       "dateModified": "2023-01-01T00:00:00Z"
+     }
+ </script>
+  <script>
+    // Tutorials Call to action event tracking
+    $("[data-behavior='call-to-action-event']").on('click', function () {
+      fbq('trackCustom', "Download", {
+        tutorialTitle: $('h1:first').text(),
+        downloadLink: this.href,
+        tutorialLink: window.location.href,
+        downloadTitle: $(this).attr("data-response")
+      });
+      if (typeof gtag === 'function') {
+        gtag('event', 'click', {
+          'event_category': $(this).attr("data-response"),
+          'event_label': $("h1").first().text(),
+          'tutorial_link': window.location.href
+        });
+      }
+    });
+  </script>
+  
+  </body>
+</html>

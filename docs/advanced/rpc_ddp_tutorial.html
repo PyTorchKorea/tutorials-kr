@@ -1,442 +1,1473 @@
 
-
-
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="ko" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="ko" > <!--<![endif]-->
-<head>
-  <meta charset="utf-8">
-  <meta property="og:title" content="분산 데이터 병렬(DDP)과 분산 RPC 프레임워크 결합" />
+
+
+<html lang="ko" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <meta property="article:modified_time" content="2022-11-30T07:09:41+00:00" /><meta property="og:title" content="분산 데이터 병렬(DDP)과 분산 RPC 프레임워크 결합" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://tutorials.pytorch.kr/advanced/rpc_ddp_tutorial.html" />
 <meta property="og:site_name" content="PyTorch Tutorials KR" />
-<meta property="og:description" content="저자: Pritam Damania and Yi Wang 번역: 박다정 이 튜토리얼은 간단한 예제를 사용하여 분산 데이터 병렬 처리(distributed data parallelism)와 분산 모델 병렬 처리(distributed model parallelism)를 결합하여 간단한 모델 학습시킬 때 분산 데이터 병렬(DistributedDataParallel)(DDP)과` 분산 RPC 프레임워크(Distributed RPC framework) < https://pytorch.org/docs/master/rpc.html>`__를 ..." />
+<meta property="og:description" content="저자: Pritam Damania and Yi Wang 번역: 박다정 이 튜토리얼은 간단한 예제를 사용하여 분산 데이터 병렬 처리(distributed data parallelism)와 분산 모델 병렬 처리(distributed model parallelism)를 결합하여 간단한 모델 학습시킬 때 분산 데이터 병렬(DistributedDataParallel)(DDP)과 분산 RPC 프레임워크(Distributed RPC framework) 를 결합하는 방법에 대해 설명합니다. 예제의 소스 코드는` 여기 &lt; pytorch/..." />
 <meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
 <meta property="og:image:alt" content="PyTorch Tutorials KR" />
-<meta name="description" content="저자: Pritam Damania and Yi Wang 번역: 박다정 이 튜토리얼은 간단한 예제를 사용하여 분산 데이터 병렬 처리(distributed data parallelism)와 분산 모델 병렬 처리(distributed model parallelism)를 결합하여 간단한 모델 학습시킬 때 분산 데이터 병렬(DistributedDataParallel)(DDP)과` 분산 RPC 프레임워크(Distributed RPC framework) < https://pytorch.org/docs/master/rpc.html>`__를 ..." />
+<meta name="description" content="저자: Pritam Damania and Yi Wang 번역: 박다정 이 튜토리얼은 간단한 예제를 사용하여 분산 데이터 병렬 처리(distributed data parallelism)와 분산 모델 병렬 처리(distributed model parallelism)를 결합하여 간단한 모델 학습시킬 때 분산 데이터 병렬(DistributedDataParallel)(DDP)과 분산 RPC 프레임워크(Distributed RPC framework) 를 결합하는 방법에 대해 설명합니다. 예제의 소스 코드는` 여기 &lt; pytorch/..." />
 <meta property="og:ignore_canonical" content="true" />
 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>분산 데이터 병렬(DDP)과 분산 RPC 프레임워크 결합 &#8212; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
   
-  <title>분산 데이터 병렬(DDP)과 분산 RPC 프레임워크 결합 &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
   
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
 
   
-  
-    <link rel="shortcut icon" href="../_static/favicon.ico"/>
-  
-  
-  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
 
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=536c50fe" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=4d2595e5" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/katex-math.css?v=91adb8b6" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/pytorch_theme.css?v=c326296f" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=097efa9c" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom2.css?v=b169ea90" />
   
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-  
-  
-    
-
-  
-
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <!-- <link rel="stylesheet" href="../_static/pygments.css" type="text/css" /> -->
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/katex-math.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/sg_gallery.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/sg_gallery-binder.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/sg_gallery-dataframe.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/sg_gallery-rendered-html.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/sphinx-design.5ea377869091fd0449014c60fc090103.min.css" type="text/css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/css/custom2.css" type="text/css" />
+    <script src="../_static/documentation_options.js?v=725a5b95"></script>
+    <script src="../_static/doctools.js?v=92e14aea"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/translations.js?v=b5f768d8"></script>
+    <script src="../_static/katex.min.js?v=be8ff15f"></script>
+    <script src="../_static/auto-render.min.js?v=ad136472"></script>
+    <script src="../_static/katex_autorenderer.js?v=bebc588a"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'advanced/rpc_ddp_tutorial';</script>
+    <link rel="canonical" href="https://tutorials.pytorch.kr/advanced/rpc_ddp_tutorial.html" />
+    <link rel="icon" href="../_static/favicon.ico"/>
     <link rel="index" title="색인" href="../genindex.html" />
     <link rel="search" title="검색" href="../search.html" />
-    <link rel="next" title="분산 데이터 병렬 처리와 병렬 처리 파이프라인을 사용한 트랜스포머 모델 학습" href="ddp_pipeline.html" />
-    <link rel="prev" title="Implementing Batch RPC Processing Using Asynchronous Executions" href="../intermediate/rpc_async_execution.html" /> 
+    <link rel="next" title="Distributed Training with Uneven Inputs Using the Join Context Manager" href="generic_join.html" />
+    <link rel="prev" title="Implementing Batch RPC Processing Using Asynchronous Executions" href="../intermediate/rpc_async_execution.html" />
 
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="ko"/>
+    <meta name="docbuild:last-update" content="2022년 11월 30일"/>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/2.3.1/list.min.js"></script>
+<script>
+  if (window.location.hostname === 'docs.pytorch.org' || window.location.hostname === 'docs-preview.pytorch.org') {
+    const script = document.createElement('script');
+    script.src = 'https://cmp.osano.com/16A0DbT9yDNIaQkvZ/31b1b91a-e0b6-47ea-bde2-7f2bd13dbe5c/osano.js?variant=one';
+    document.head.appendChild(script);
+  }
+</script>
+<script>
+  // Cookie banner for non-LF projects
+  document.addEventListener('DOMContentLoaded', function () {
+    // Hide cookie banner on local environments and LF owned docs
+    if (window.location.hostname === 'localhost' ||
+      window.location.hostname === '0.0.0.0' ||
+      window.location.hostname === '127.0.0.1' ||
+      window.location.hostname === 'docs.pytorch.org' ||
+      window.location.hostname === 'docs-preview.pytorch.org' ||
+      window.location.hostname.startsWith('192.168.')) {
+      const banner = document.querySelector('.cookie-banner-wrapper');
+      if (banner) {
+        banner.style.display = 'none';
+      }
+    }
+  });
+</script>
+<!-- Conditional CSS for header and footer height adjustment -->
+
+<link rel="stylesheet" type="text/css" href="../_static/css/theme.css" crossorigin="anonymous">
+<script type="text/javascript" src="../_static/js/theme.js"></script>
+<script type="text/javascript" src="../_static/js/dropdown-menu.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700&family=Nanum+Gothic+Coding:wght@400;700&family=Montserrat:wght@300;400&display=swap" rel="stylesheet">
+<meta property="og:image" content="../_static/img/pytorch_seo.png" />
+<link rel="stylesheet" href="../_static/webfonts/all.min.css" crossorigin="anonymous">
+<meta http-equiv="Content-Security-Policy"
+  content="default-src * 'unsafe-inline' 'unsafe-eval' data: blob:; style-src * 'unsafe-inline'; script-src * 'unsafe-inline' 'unsafe-eval' blob:;">
+<meta name="pytorch_project" content="tutorials">
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=G-LZRD6GXDLF" height="0" width="0"
+    style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+<!-- Google Tag Manager -->
+<script>(function (w, d, s, l, i) {
+    w[l] = w[l] || []; w[l].push({
+      'gtm.start':
+        new Date().getTime(), event: 'gtm.js'
+    }); var f = d.getElementsByTagName(s)[0],
+      j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
+        'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
+    j.onload = function () {
+      window.dispatchEvent(new Event('gtm_loaded'));
+      console.log('GTM loaded successfully');
+    };
+  })(window, document, 'script', 'dataLayer', 'G-LZRD6GXDLF');
+</script>
+<!-- End Google Tag Manager -->
+<!-- Facebook Pixel Code -->
+<script>
+  !function (f, b, e, v, n, t, s) {
+    if (f.fbq) return; n = f.fbq = function () {
+      n.callMethod ?
+        n.callMethod.apply(n, arguments) : n.queue.push(arguments)
+    };
+    if (!f._fbq) f._fbq = n; n.push = n; n.loaded = !0; n.version = '2.0';
+    n.queue = []; t = b.createElement(e); t.async = !0;
+    t.src = v; s = b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t, s)
+  }(window, document, 'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init', '243028289693773');
+  fbq('track', 'PageView');
+</script>
+<script>
+  document.documentElement.setAttribute('data-version', 'v2.8.0+cu128');
+</script>
+<noscript>
+  <img height="1" width="1" src="https://www.facebook.com/tr?id=243028289693773&ev=PageView&noscript=1" />
+</noscript>
+<script>
+  function gtag() {
+    window.dataLayer.push(arguments);
+  }
+</script>
+<!-- End Facebook Pixel Code -->
+<!-- Script to Fix scrolling -->
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    // Fix anchor scrolling
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const targetId = this.getAttribute('href').substring(1);
+        const targetElement = document.getElementById(targetId);
+
+        if (targetElement) {
+          const headerHeight =
+            (document.querySelector('.header-holder') ? document.querySelector('.header-holder').offsetHeight : 0) +
+            (document.querySelector('.bd-header') ? document.querySelector('.bd-header').offsetHeight : 0) + 20;
+
+          const targetPosition = targetElement.getBoundingClientRect().top + window.pageYOffset - headerHeight;
+          window.scrollTo({
+            top: targetPosition,
+            behavior: 'smooth'
+          });
+
+          // Update URL hash without scrolling
+          history.pushState(null, null, '#' + targetId);
+        }
+      });
+    });
+  });
+</script>
+
+<script async src="https://cse.google.com/cse.js?cx=e65585f8c3ea1440e"></script>
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="ko"/>
+    <meta name="docbuild:last-update" content="2022년 11월 30일"/>
+
+  </head>
+
+<body data-feedback-url="https://github.com/PyTorchKorea/tutorials-kr" class="pytorch-body">
   
-  <script src="../_static/js/modernizr.min.js"></script>
-
-  <!-- Preload the theme fonts -->
-
-<link rel="preload" href="../_static/fonts/FreightSans/freight-sans-book.woff2" as="font" type="font/woff2" crossorigin="anonymous">
-<link rel="preload" href="../_static/fonts/FreightSans/freight-sans-medium.woff2" as="font" type="font/woff2" crossorigin="anonymous">
-<link rel="preload" href="../_static/fonts/IBMPlexMono/IBMPlexMono-Medium.woff2" as="font" type="font/woff2" crossorigin="anonymous">
-<link rel="preload" href="../_static/fonts/FreightSans/freight-sans-bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
-<link rel="preload" href="../_static/fonts/FreightSans/freight-sans-medium-italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
-<link rel="preload" href="../_static/fonts/IBMPlexMono/IBMPlexMono-SemiBold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
-
-<!-- Preload the katex fonts -->
-
-<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Math-Italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
-<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
-<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
-<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size1-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
-<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size4-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
-<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size2-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
-<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size3-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
-<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Caligraphic-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
-  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.2/css/all.css" integrity="sha384-vSIIfh2YWi9wW0r9iZe7RJPrKwp6bG+s9QZMoITbCckVJqGCCRhc+ccxNcdpHuYu" crossorigin="anonymous">
-</head>
-
-<div class="container-fluid header-holder tutorials-header" id="header-holder">
-  <div class="container">
+    <div class="container-fluid header-holder tutorials-header" id="header-holder">
+   <div class="header-container-wrapper">
     <div class="header-container">
-      <a class="header-logo" href="https://pytorch.kr/" aria-label="PyTorch"></a>
+      <a class="header-logo" href="https://pytorch.kr/" aria-label="PyTorchKR"></a>
 
       <div class="main-menu">
         <ul>
-          <li>
-            <a href="https://pytorch.kr/get-started">시작하기</a>
+
+          <li class="main-menu-item">
+          <div id="learnDropdownButton" data-toggle="learn-dropdown" class="learn-dropdown">
+              <a class="with-down-arrow">
+                <span>배우기</span>
+              </a>
+              <div class="learn-dropdown-menu dropdown-menu">
+                <a class="nav-dropdown-item" href="https://pytorch.kr/get-started/locally/">
+                  <span class="dropdown-title">PyTorch 시작하기</span>
+                </a>
+                <a class="nav-dropdown-item" href="https://tutorials.pytorch.kr/beginner/basics/intro.html">
+                  <span class="dropdown-title">기본 익히기</span>
+                </a>
+                <a class="nav-dropdown-item" href="https://tutorials.pytorch.kr/" target="_self">
+                  <span class="dropdown-title">한국어 튜토리얼</span>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.kr/hub/">
+                  <span class="dropdown-title">한국어 모델 허브</span>
+                </a>
+                <a class="nav-dropdown-item" href="https://docs.pytorch.org/tutorials/" target="_blank">
+                  <span class="dropdown-title">Official Tutorials</span>
+                </a>
+              </div>
+            </div>
           </li>
 
-          <li class="active">
-            <a href="https://tutorials.pytorch.kr/">튜토리얼</a>
+          <li class="main-menu-item">
+            <a href="https://pytorch.kr/blog/">
+              <span>블로그</span>
+            </a>
           </li>
 
-          <li>
-            <a href="https://pytorch.kr/hub">허브</a>
+          <li class="main-menu-item">
+          <div id="docsDropdownButton" data-toggle="docs-dropdown" class="docs-dropdown">
+              <a class="with-down-arrow">
+              <span>문서</span>
+              </a>
+              <div class="docs-dropdown-menu dropdown-menu">
+                <a class="nav-dropdown-item" href="https://docs.pytorch.org/docs/" target="_blank">
+                  <span class="dropdown-title">PyTorch API</span>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.kr/domains/">
+                  <span class="dropdown-title">Domain API 소개</span>
+                </a>
+                <a class="nav-dropdown-item" href="https://tutorials.pytorch.kr/" target="_self">
+                  <span class="dropdown-title">한국어 튜토리얼</span>
+                </a>
+                <a class="nav-dropdown-item" href="https://docs.pytorch.org/tutorials/" target="_blank">
+                  <span class="dropdown-title">Official Tutorials</span>
+                </a>
+              </div>
+            </div>
           </li>
 
-          <li>
-            <a href="https://discuss.pytorch.kr/">커뮤니티</a>
+          <li class="main-menu-item">
+          <div id="communityDropdownButton" data-toggle="community-dropdown" class="community-dropdown">
+              <a class="with-down-arrow">
+              <span>커뮤니티</span>
+              </a>
+              <div class="community-dropdown-menu dropdown-menu">
+                <a class="nav-dropdown-item" href="https://discuss.pytorch.kr/" target="_self">
+                  <span class="dropdown-title">한국어 커뮤니티</span>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.kr/resources/">
+                  <span class="dropdown-title">개발자 정보</span>
+                </a>
+                <a class="nav-dropdown-item" href="https://landscape.pytorch.org/" target="_blank">
+                  <span class="dropdown-title">Landscape</span>
+                </a>
+              </div>
+            </div>
           </li>
+
         </ul>
       </div>
 
-      <a class="main-menu-open-button" href="#" data-behavior="open-mobile-menu"></a>
+      <a class="main-menu-open-button" href="#" data-behavior="open-mobile-menu">
+        <i class="fa-solid fa-ellipsis"></i>
+      </a>
+    </div>
+  </div>
+ </div>
+
+ <!-- Begin Mobile Menu -->
+
+<div class="mobile-main-menu">
+  <div class="container-fluid">
+    <div class="header-container-wrapper">
+      <div class="mobile-main-menu-header-container">
+        <a class="main-menu-close-button" href="#" data-behavior="close-mobile-menu">
+          <i class="fa-solid fa-xmark"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="mobile-main-menu-links-container">
+    <div class="main-menu">
+      <ul>
+         <li class="resources-mobile-menu-title">
+           <a>배우기</a>
+         </li>
+         <ul class="resources-mobile-menu-items">
+           <li>
+             <a href="https://pytorch.kr/get-started/locally/">PyTorch 시작하기</a>
+           </li>
+           <li>
+             <a href="https://tutorials.pytorch.kr/beginner/basics/intro.html">기본 익히기</a>
+           </li>
+           <li>
+             <a href="https://tutorials.pytorch.kr/">한국어 튜토리얼</a>
+           </li>
+           <li>
+             <a href="https://pytorch.kr/hub/">한국어 모델 허브</a>
+           </li>
+           <li>
+             <a href="https://docs.pytorch.org/tutorials/" target="_blank">Official Tutorials</a>
+           </li>
+        </ul>
+         <li class="resources-mobile-menu-title">
+           <a href="https://pytorch.kr/blog/">블로그</a>
+         </li>
+         <li class="resources-mobile-menu-title">
+           <a>문서</a>
+         </li>
+         <ul class="resources-mobile-menu-items">
+          <li>
+            <a href="https://docs.pytorch.org/docs/" target="_blank">PyTorch API</a>
+          </li>
+          <li>
+            <a href="https://pytorch.kr/domains/">Domain API 소개</a>
+          </li>
+          <li>
+            <a href="https://tutorials.pytorch.kr/">한국어 튜토리얼</a>
+          </li>
+          <li>
+            <a href="https://docs.pytorch.org/tutorials/" target="_blank">Official Tutorials</a>
+          </li>
+        </ul>
+        <li class="resources-mobile-menu-title">
+          <a>커뮤니티</a>
+        </li>
+         <ul class="resources-mobile-menu-items">
+          <li>
+            <a href="https://discuss.pytorch.kr/">한국어 커뮤니티</a>
+          </li>
+          <li>
+            <a href="https://pytorch.kr/resources/">개발자 정보</a>
+          </li>
+          <li>
+            <a href="https://landscape.pytorch.org/" target="_blank">Landscape</a>
+          </li>
+        </ul>
+      </ul>
     </div>
   </div>
 </div>
 
-<body class="pytorch-body">
-
-   
-
-    
-
-    <div class="table-of-contents-link-wrapper">
-      <span>Table of Contents</span>
-      <a href="#" class="toggle-table-of-contents" data-behavior="toggle-table-of-contents"></a>
-    </div>
-
-    <nav data-toggle="wy-nav-shift" class="pytorch-left-menu" id="pytorch-left-menu">
-      <div class="pytorch-side-scroll">
-        <div class="pytorch-menu pytorch-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          <div class="pytorch-left-menu-search">
-            
-
-            
-              
-              
-                <div class="version">
-                  2.3.1
-                </div>
-              
-            
-
-            
-
+<!-- End Mobile Menu -->
+  
+  
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
 
   
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
 
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
 
-<div role="search">
-  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search Tutorials" />
-    <input type="hidden" name="check_keywords" value="yes" />
-    <input type="hidden" name="area" value="default" />
-  </form>
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
 </div>
 
-            
-          </div>
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class=" navbar-header-items__start">
+    
+      <div class="navbar-item">
+  <a href="../index.html" class="version">v2.8.0+cu128</a>
+</div>
+    
+  </div>
+  
+  <div class=" navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../intro.html">
+    Intro
+  </a>
+</li>
 
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../compilers_index.html">
+    Compilers
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../domains.html">
+    Domains
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../distributed.html">
+    Distributed
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../deep-dive.html">
+    Deep Dive
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../extension.html">
+    Extension
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../ecosystem.html">
+    Ecosystem
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../recipes_index.html">
+    Recipes
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+      
+        <div class="navbar-item">
+<div class="search-container-wrapper">
+  <div id="sphinx-search" class="search-container">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </div>
+
+  <div id="google-search" class="search-container" style="display:none;">
+    <div class="gcse-search-wrapper">
+      <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+      <div class="gcse-search"></div>
+    </div>
+  </div>
+
+  <div class="search-toggle-container" data-bs-title="Google Search Off" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <div class="search-toggle-inner">
+      <label class="switch">
+        <input type="checkbox" id="search-toggle">
+        <span class="slider round"></span>
+      </label>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+  // Define the search callback
+  const myWebSearchStartingCallback = (gname, query) => {
+    if (typeof dataLayer !== 'undefined' && query) {
+      window.dataLayer = window.dataLayer || [];
+      dataLayer.push({
+        'event': 'google_search',
+        'search_term': query,
+        'event_category': 'Search',
+        'event_label': 'Google Search'
+      });
+    }
+    return '';
+  };
+
+  // Set up the GCSE search callbacks
+  window.__gcse || (window.__gcse = {});
+  window.__gcse.searchCallbacks = {
+    web: { starting: myWebSearchStartingCallback }
+  };
+
+  if (window.location.pathname.includes('/search.html')) {
+    document.body.classList.add('search-page');
+  }
+
+  // Function to reinitialize Google CSE
+  function reinitializeGoogleSearch() {
+    if (window.__gcse && window.__gcse.initializationCallback) {
+      window.__gcse.initializationCallback();
+    }
+  }
+
+  // Function to handle search toggle
+  function handleSearchToggle(toggle, sphinxSearch, googleSearch) {
+    if (!toggle || !sphinxSearch || !googleSearch) return;
+
+    // Check if the URL contains /stable/ or /tutorials/
+    const currentUrl = window.location.href;
+    // TODO: We've had reports that the google programmable search is returning stale documentation,
+    //       Simple reproduction is to turn google search on and search for multinomial which will
+    //       result in returning 1.8.1 documentation.
+    //       We should turn this back on when we resolve that bug.
+    const shouldDefaultToGoogle = false;
+    const savedPreference = localStorage.getItem('searchPreference');
+
+    // Set initial state
+    if (savedPreference === 'google' || (savedPreference === null && shouldDefaultToGoogle)) {
+      toggle.checked = true;
+      sphinxSearch.style.display = 'none';
+      googleSearch.style.display = 'block';
+      if (savedPreference === null) {
+        localStorage.setItem('searchPreference', 'google');
+      }
+      reinitializeGoogleSearch();
+    } else {
+      toggle.checked = false;
+      sphinxSearch.style.display = 'block';
+      googleSearch.style.display = 'none';
+    }
+
+    // Update tooltip
+    updateTooltip(toggle.checked);
+
+    // Skip if already initialized
+    if (toggle.hasAttribute('data-initialized')) return;
+    toggle.setAttribute('data-initialized', 'true');
+
+    toggle.addEventListener('change', function() {
+      if (this.checked) {
+        sphinxSearch.style.display = 'none';
+        googleSearch.style.display = 'block';
+        localStorage.setItem('searchPreference', 'google');
+        reinitializeGoogleSearch();
+        trackSearchEngineSwitch('Google');
+      } else {
+        sphinxSearch.style.display = 'block';
+        googleSearch.style.display = 'none';
+        localStorage.setItem('searchPreference', 'sphinx');
+        trackSearchEngineSwitch('Sphinx');
+      }
+
+      updateTooltip(this.checked);
+      updateMobileSearch();
+    });
+  }
+
+  // Update tooltip based on toggle state
+  function updateTooltip(isChecked) {
+    const tooltipElement = document.querySelector('.search-toggle-container');
+    if (!tooltipElement) return;
+
+    tooltipElement.setAttribute('data-bs-title', isChecked ? 'Google Search On' : 'Google Search Off');
+
+    if (bootstrap && bootstrap.Tooltip) {
+      const tooltipInstance = bootstrap.Tooltip.getInstance(tooltipElement);
+      if (tooltipInstance) tooltipInstance.dispose();
+      new bootstrap.Tooltip(tooltipElement);
+    }
+  }
+
+  // Track search engine switch
+  function trackSearchEngineSwitch(engine) {
+    if (typeof dataLayer !== 'undefined') {
+      window.dataLayer = window.dataLayer || [];
+      dataLayer.push({
+        'event': 'search_engine_switch',
+        'event_category': 'Search',
+        'event_label': engine
+      });
+    }
+  }
+
+  // Function to update mobile search based on current toggle state
+  function updateMobileSearch() {
+    const toggle = document.getElementById('search-toggle');
+    if (!toggle) return;
+
+    const mobileSearchContainer = document.querySelector('.sidebar-header-items__end .navbar-item .search-container-wrapper');
+    if (!mobileSearchContainer) return;
+
+    const mobileSphinxSearch = mobileSearchContainer.querySelector('#sphinx-search');
+    const mobileGoogleSearch = mobileSearchContainer.querySelector('#google-search');
+
+    if (mobileSphinxSearch && mobileGoogleSearch) {
+      mobileSphinxSearch.style.display = toggle.checked ? 'none' : 'block';
+      mobileGoogleSearch.style.display = toggle.checked ? 'block' : 'none';
+
+      if (toggle.checked) {
+        reinitializeGoogleSearch();
+      }
+    }
+  }
+
+  // Initialize desktop search toggle
+  const toggle = document.getElementById('search-toggle');
+  const sphinxSearch = document.getElementById('sphinx-search');
+  const googleSearch = document.getElementById('google-search');
+  handleSearchToggle(toggle, sphinxSearch, googleSearch);
+
+  // Set placeholder text for Google search input
+  const observer = new MutationObserver(function() {
+    document.querySelectorAll('.gsc-input input').forEach(input => {
+      if (input && !input.hasAttribute('data-placeholder-set')) {
+        input.setAttribute('placeholder', 'Search the docs ...');
+        input.setAttribute('data-placeholder-set', 'true');
+      }
+    });
+  });
+
+  observer.observe(document.body, { childList: true, subtree: true });
+
+  // Fix for scroll jump issue - improved approach
+  function setupSearchInputHandlers(input) {
+    if (input.hasAttribute('data-scroll-fixed')) return;
+    input.setAttribute('data-scroll-fixed', 'true');
+
+    let lastScrollPosition = 0;
+    let isTyping = false;
+    let scrollTimeout;
+
+    // Save position before typing starts
+    input.addEventListener('keydown', () => {
+      lastScrollPosition = window.scrollY;
+      isTyping = true;
+
+      // Reset typing state after a short delay
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        isTyping = false;
+      }, 100);
+    });
+
+    // Only maintain scroll position during typing
+    function maintainScroll() {
+      if (document.activeElement === input && isTyping) {
+        window.scrollTo(0, lastScrollPosition);
+        requestAnimationFrame(maintainScroll);
+      }
+    }
+
+    input.addEventListener('focus', () => {
+      // Just store initial position but don't force it
+      lastScrollPosition = window.scrollY;
+    });
+
+    input.addEventListener('input', () => {
+      isTyping = true;
+      window.scrollTo(0, lastScrollPosition);
+
+      // Reset typing state after a short delay
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        isTyping = false;
+      }, 100);
+
+      requestAnimationFrame(maintainScroll);
+    });
+  }
+
+  // Apply to all search inputs and observe for new ones
+  function applyToSearchInputs() {
+    document.querySelectorAll('.search-container input, .gsc-input input').forEach(setupSearchInputHandlers);
+  }
+
+  applyToSearchInputs();
+
+  const searchObserver = new MutationObserver(applyToSearchInputs);
+  searchObserver.observe(document.body, { childList: true, subtree: true });
+
+  // Watch for mobile menu creation
+  const mobileMenuObserver = new MutationObserver(function(mutations) {
+    for (const mutation of mutations) {
+      if (!mutation.addedNodes.length) continue;
+
+      // Style mobile search inputs
+      document.querySelectorAll('.sidebar-header-items__end .navbar-item .search-container-wrapper .gsc-input input').forEach(input => {
+        if (input) {
+          input.setAttribute('placeholder', 'Search the docs ...');
+          input.style.paddingLeft = '36px';
+        }
+      });
+
+      // Check for mobile search container
+      const mobileSearchContainer = document.querySelector('.sidebar-header-items__end .navbar-item .search-container-wrapper');
+      if (!mobileSearchContainer) continue;
+
+      const mobileToggle = mobileSearchContainer.querySelector('#search-toggle');
+      if (mobileToggle && toggle) {
+        // Sync mobile toggle with desktop toggle
+        mobileToggle.checked = toggle.checked;
+        updateMobileSearch();
+
+        // Add event listener to mobile toggle if not already added
+        if (!mobileToggle.hasAttribute('data-initialized')) {
+          mobileToggle.setAttribute('data-initialized', 'true');
+          mobileToggle.addEventListener('change', function() {
+            // Sync desktop toggle with mobile toggle
+            toggle.checked = this.checked;
+            // Trigger change event on desktop toggle to update both
+            toggle.dispatchEvent(new Event('change'));
+          });
+        }
+      }
+    }
+  });
+
+  mobileMenuObserver.observe(document.body, { childList: true, subtree: true });
+
+  // Ensure Google CSE is properly loaded
+  if (window.__gcse) {
+    window.__gcse.callback = function() {
+      // This will run after Google CSE is fully loaded
+      if (toggle && toggle.checked) {
+        reinitializeGoogleSearch();
+      }
+    };
+  } else {
+    window.__gcse = {
+      callback: function() {
+        if (toggle && toggle.checked) {
+          reinitializeGoogleSearch();
+        }
+      }
+    };
+  }
+});
+</script>
+</div>
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
           
-            
-            
-              
-            
-            
-              <p class="caption" role="heading"><span class="caption-text">파이토치(PyTorch) 레시피</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../recipes/recipes_index.html">모든 레시피 보기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../prototype/prototype_index.html">모든 프로토타입 레시피 보기</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">파이토치(PyTorch) 시작하기</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/basics/intro.html">파이토치(PyTorch) 기본 익히기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/basics/quickstart_tutorial.html">빠른 시작(Quickstart)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/basics/tensorqs_tutorial.html">텐서(Tensor)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/basics/data_tutorial.html">Dataset과 DataLoader</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/basics/transforms_tutorial.html">변형(Transform)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/basics/buildmodel_tutorial.html">신경망 모델 구성하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/basics/autogradqs_tutorial.html"><code class="docutils literal notranslate"><span class="pre">torch.autograd</span></code>를 사용한 자동 미분</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/basics/optimization_tutorial.html">모델 매개변수 최적화하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/basics/saveloadrun_tutorial.html">모델 저장하고 불러오기</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">Introduction to PyTorch on YouTube</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/introyt.html">PyTorch 소개 - YouTube 시리즈</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/introyt1_tutorial.html">PyTorch 소개</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/tensors_deeper_tutorial.html">Pytorch Tensor 소개</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/autogradyt_tutorial.html">The Fundamentals of Autograd</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/modelsyt_tutorial.html">Building Models with PyTorch</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/tensorboardyt_tutorial.html">PyTorch TensorBoard 지원</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/trainingyt.html">Training with PyTorch</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/captumyt.html">Model Understanding with Captum</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">파이토치(PyTorch) 배우기</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/deep_learning_60min_blitz.html">PyTorch로 딥러닝하기: 60분만에 끝장내기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/pytorch_with_examples.html">예제로 배우는 파이토치(PyTorch)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/nn_tutorial.html"><cite>torch.nn</cite> 이 <em>실제로</em> 무엇인가요?</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/tensorboard_tutorial.html">TensorBoard로 모델, 데이터, 학습 시각화하기</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">이미지/비디오</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/torchvision_tutorial.html">TorchVision Object Detection Finetuning Tutorial</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/transfer_learning_tutorial.html">컴퓨터 비전(Vision)을 위한 전이학습(Transfer Learning)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/fgsm_tutorial.html">적대적 예제 생성(Adversarial Example Generation)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/dcgan_faces_tutorial.html">DCGAN 튜토리얼</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/vt_tutorial.html">배포를 위해 비전 트랜스포머(Vision Transformer) 모델 최적화하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/tiatoolbox_tutorial.html">Pytorch와 TIAToolbox를 사용한 전체 슬라이드 이미지(Whole Slide Image) 분류</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">오디오</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/audio_io_tutorial.html">Audio I/O</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/audio_resampling_tutorial.html">Audio Resampling</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/audio_data_augmentation_tutorial.html">Audio Data Augmentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/audio_datasets_tutorial.html">오디오 데이터셋</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/speech_recognition_pipeline_tutorial.html">Speech Recognition with Wav2Vec2</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/text_to_speech_with_torchaudio.html">Text-to-speech with Tacotron2</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/forced_alignment_with_torchaudio_tutorial.html">wav2vec2을 이용한 강제 정렬</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">텍스트</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/bettertransformer_tutorial.html">Better Transformer를 이용한 고속 트랜스포머 추론</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/char_rnn_classification_tutorial.html">기초부터 시작하는 NLP: 문자-단위 RNN으로 이름 분류하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/char_rnn_generation_tutorial.html">기초부터 시작하는 NLP:  문자-단위 RNN으로 이름 생성하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/seq2seq_translation_tutorial.html">기초부터 시작하는 NLP: Sequence to Sequence 네트워크와 Attention을 이용한 번역</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/text_sentiment_ngrams_tutorial.html">torchtext 라이브러리로 텍스트 분류하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/translation_transformer.html"><code class="docutils literal notranslate"><span class="pre">nn.Transformer</span></code> 와 torchtext로 언어 번역하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/torchtext_custom_dataset_tutorial.html">TorchText를 사용하여 사용자 정의 글 데이터셋 전처리하기</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">백엔드</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/onnx/intro_onnx.html">Introduction to ONNX</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">강화학습</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/reinforcement_q_learning.html">강화 학습 (DQN) 튜토리얼</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/reinforcement_ppo.html">Reinforcement Learning (PPO) with TorchRL Tutorial</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/mario_rl_tutorial.html">마리오 게임 RL 에이전트로 학습하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="pendulum.html">Pendulum: Writing your environment and transforms with TorchRL</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">PyTorch 모델을 프로덕션 환경에 배포하기</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/onnx/intro_onnx.html">Introduction to ONNX</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/flask_rest_api_tutorial.html">Flask를 사용하여 Python에서 PyTorch를 REST API로 배포하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/Intro_to_TorchScript_tutorial.html">TorchScript 소개</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cpp_export.html">C++에서 TorchScript 모델 로딩하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="super_resolution_with_onnxruntime.html">(선택) PyTorch 모델을 ONNX으로 변환하고 ONNX 런타임에서 실행하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/realtime_rpi.html">Raspberry Pi 4 에서 실시간 추론(Inference) (30fps!)</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">PyTorch 프로파일링</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/profiler.html">PyTorch 모듈 프로파일링하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/hta_intro_tutorial.html">전체론적(Holistic Trace Analysis) 추적 분석 소개</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/hta_trace_diff_tutorial.html">종합적 분석을 이용한 트레이스 차이 분석</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">Code Transforms with FX</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/fx_conv_bn_fuser.html">(베타) FX에서 합성곱/배치 정규화(Convolution/Batch Norm) 결합기(Fuser) 만들기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/fx_profiling_tutorial.html">(beta) Building a Simple CPU Performance Profiler with FX</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">프론트엔드 API</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/memory_format_tutorial.html">(베타) PyTorch를 사용한 Channels Last 메모리 형식</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/forward_ad_usage.html">Forward-mode Automatic Differentiation (Beta)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/jacobians_hessians.html">Jacobians, Hessians, hvp, vhp, and more: composing function transforms</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/ensembling.html">모델 앙상블</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/per_sample_grads.html">Per-sample-gradients</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cpp_frontend.html">PyTorch C++ 프론트엔드 사용하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="torch-script-parallelism.html">TorchScript의 동적 병렬 처리(Dynamic Parallelism)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cpp_autograd.html">C++ 프론트엔드의 자동 미분 (autograd)</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">PyTorch 확장하기</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/custom_function_double_backward_tutorial.html">Double Backward with Custom Functions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/custom_function_conv_bn_tutorial.html">Fusing Convolution and Batch Norm using Custom Function</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cpp_extension.html">Custom C++ and CUDA Extensions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="torch_script_custom_ops.html">Extending TorchScript with Custom C++ Operators</a></li>
-<li class="toctree-l1"><a class="reference internal" href="torch_script_custom_classes.html">커스텀 C++ 클래스로 TorchScript 확장하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="dispatcher.html">Registering a Dispatched Operator in C++</a></li>
-<li class="toctree-l1"><a class="reference internal" href="extend_dispatcher.html">Extending dispatcher for a new backend in C++</a></li>
-<li class="toctree-l1"><a class="reference internal" href="privateuseone.html">Facilitating New Backend Integration by PrivateUse1</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">모델 최적화</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/profiler.html">PyTorch 모듈 프로파일링하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/tensorboard_profiler_tutorial.html">텐서보드를 이용한 파이토치 프로파일러</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/hyperparameter_tuning_tutorial.html">Ray Tune을 사용한 하이퍼파라미터 튜닝</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/vt_tutorial.html">배포를 위해 비전 트랜스포머(Vision Transformer) 모델 최적화하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/parametrizations.html">Parametrizations Tutorial</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/pruning_tutorial.html">가지치기 기법(Pruning) 튜토리얼</a></li>
-<li class="toctree-l1"><a class="reference internal" href="dynamic_quantization_tutorial.html">(베타) LSTM 기반 단어 단위 언어 모델의 동적 양자화</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/quantized_transfer_learning_tutorial.html">(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="static_quantization_tutorial.html">(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/torchserve_with_ipex.html">Grokking PyTorch Intel CPU performance from first principles</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/torchserve_with_ipex_2.html">Grokking PyTorch Intel CPU performance from first principles (Part 2)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/nvfuser_intro_tutorial.html">Getting Started - Accelerate Your Scripts with nvFuser</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/ax_multiobjective_nas_tutorial.html">Multi-Objective NAS with Ax</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/torch_compile_tutorial.html">Introduction to <code class="docutils literal notranslate"><span class="pre">torch.compile</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/inductor_debug_cpu.html">Inductor CPU backend debugging and profiling</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/scaled_dot_product_attention_tutorial.html">(Beta) Scaled Dot Product Attention (SDPA)로 고성능 트랜스포머(Transformers) 구현하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/scaled_dot_product_attention_tutorial.html#torch-compile-sdpa"><code class="docutils literal notranslate"><span class="pre">torch.compile</span></code> 과 함께 SDPA 사용하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/scaled_dot_product_attention_tutorial.html#sdpa-atteition-bias">SDPA를 <code class="docutils literal notranslate"><span class="pre">atteition.bias</span></code> 하위 클래스와 사용하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/scaled_dot_product_attention_tutorial.html#id8">결론</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/knowledge_distillation_tutorial.html">Knowledge Distillation Tutorial</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">병렬 및 분산 학습</span></p>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../distributed/home.html">Distributed and Parallel Training Tutorials</a></li>
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/PyTorchKorea/tutorials-kr" title="한국어 튜토리얼 GitHub 저장소" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">한국어 튜토리얼 GitHub 저장소</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://discuss.pytorch.kr/" title="파이토치 한국어 커뮤니티" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-discourse fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">파이토치 한국어 커뮤니티</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../intro.html">
+    Intro
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../compilers_index.html">
+    Compilers
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../domains.html">
+    Domains
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../distributed.html">
+    Distributed
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../deep-dive.html">
+    Deep Dive
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../extension.html">
+    Extension
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../ecosystem.html">
+    Ecosystem
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../recipes_index.html">
+    Recipes
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<div class="search-container-wrapper">
+  <div id="sphinx-search" class="search-container">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </div>
+
+  <div id="google-search" class="search-container" style="display:none;">
+    <div class="gcse-search-wrapper">
+      <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+      <div class="gcse-search"></div>
+    </div>
+  </div>
+
+  <div class="search-toggle-container" data-bs-title="Google Search Off" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <div class="search-toggle-inner">
+      <label class="switch">
+        <input type="checkbox" id="search-toggle">
+        <span class="slider round"></span>
+      </label>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+  // Define the search callback
+  const myWebSearchStartingCallback = (gname, query) => {
+    if (typeof dataLayer !== 'undefined' && query) {
+      window.dataLayer = window.dataLayer || [];
+      dataLayer.push({
+        'event': 'google_search',
+        'search_term': query,
+        'event_category': 'Search',
+        'event_label': 'Google Search'
+      });
+    }
+    return '';
+  };
+
+  // Set up the GCSE search callbacks
+  window.__gcse || (window.__gcse = {});
+  window.__gcse.searchCallbacks = {
+    web: { starting: myWebSearchStartingCallback }
+  };
+
+  if (window.location.pathname.includes('/search.html')) {
+    document.body.classList.add('search-page');
+  }
+
+  // Function to reinitialize Google CSE
+  function reinitializeGoogleSearch() {
+    if (window.__gcse && window.__gcse.initializationCallback) {
+      window.__gcse.initializationCallback();
+    }
+  }
+
+  // Function to handle search toggle
+  function handleSearchToggle(toggle, sphinxSearch, googleSearch) {
+    if (!toggle || !sphinxSearch || !googleSearch) return;
+
+    // Check if the URL contains /stable/ or /tutorials/
+    const currentUrl = window.location.href;
+    // TODO: We've had reports that the google programmable search is returning stale documentation,
+    //       Simple reproduction is to turn google search on and search for multinomial which will
+    //       result in returning 1.8.1 documentation.
+    //       We should turn this back on when we resolve that bug.
+    const shouldDefaultToGoogle = false;
+    const savedPreference = localStorage.getItem('searchPreference');
+
+    // Set initial state
+    if (savedPreference === 'google' || (savedPreference === null && shouldDefaultToGoogle)) {
+      toggle.checked = true;
+      sphinxSearch.style.display = 'none';
+      googleSearch.style.display = 'block';
+      if (savedPreference === null) {
+        localStorage.setItem('searchPreference', 'google');
+      }
+      reinitializeGoogleSearch();
+    } else {
+      toggle.checked = false;
+      sphinxSearch.style.display = 'block';
+      googleSearch.style.display = 'none';
+    }
+
+    // Update tooltip
+    updateTooltip(toggle.checked);
+
+    // Skip if already initialized
+    if (toggle.hasAttribute('data-initialized')) return;
+    toggle.setAttribute('data-initialized', 'true');
+
+    toggle.addEventListener('change', function() {
+      if (this.checked) {
+        sphinxSearch.style.display = 'none';
+        googleSearch.style.display = 'block';
+        localStorage.setItem('searchPreference', 'google');
+        reinitializeGoogleSearch();
+        trackSearchEngineSwitch('Google');
+      } else {
+        sphinxSearch.style.display = 'block';
+        googleSearch.style.display = 'none';
+        localStorage.setItem('searchPreference', 'sphinx');
+        trackSearchEngineSwitch('Sphinx');
+      }
+
+      updateTooltip(this.checked);
+      updateMobileSearch();
+    });
+  }
+
+  // Update tooltip based on toggle state
+  function updateTooltip(isChecked) {
+    const tooltipElement = document.querySelector('.search-toggle-container');
+    if (!tooltipElement) return;
+
+    tooltipElement.setAttribute('data-bs-title', isChecked ? 'Google Search On' : 'Google Search Off');
+
+    if (bootstrap && bootstrap.Tooltip) {
+      const tooltipInstance = bootstrap.Tooltip.getInstance(tooltipElement);
+      if (tooltipInstance) tooltipInstance.dispose();
+      new bootstrap.Tooltip(tooltipElement);
+    }
+  }
+
+  // Track search engine switch
+  function trackSearchEngineSwitch(engine) {
+    if (typeof dataLayer !== 'undefined') {
+      window.dataLayer = window.dataLayer || [];
+      dataLayer.push({
+        'event': 'search_engine_switch',
+        'event_category': 'Search',
+        'event_label': engine
+      });
+    }
+  }
+
+  // Function to update mobile search based on current toggle state
+  function updateMobileSearch() {
+    const toggle = document.getElementById('search-toggle');
+    if (!toggle) return;
+
+    const mobileSearchContainer = document.querySelector('.sidebar-header-items__end .navbar-item .search-container-wrapper');
+    if (!mobileSearchContainer) return;
+
+    const mobileSphinxSearch = mobileSearchContainer.querySelector('#sphinx-search');
+    const mobileGoogleSearch = mobileSearchContainer.querySelector('#google-search');
+
+    if (mobileSphinxSearch && mobileGoogleSearch) {
+      mobileSphinxSearch.style.display = toggle.checked ? 'none' : 'block';
+      mobileGoogleSearch.style.display = toggle.checked ? 'block' : 'none';
+
+      if (toggle.checked) {
+        reinitializeGoogleSearch();
+      }
+    }
+  }
+
+  // Initialize desktop search toggle
+  const toggle = document.getElementById('search-toggle');
+  const sphinxSearch = document.getElementById('sphinx-search');
+  const googleSearch = document.getElementById('google-search');
+  handleSearchToggle(toggle, sphinxSearch, googleSearch);
+
+  // Set placeholder text for Google search input
+  const observer = new MutationObserver(function() {
+    document.querySelectorAll('.gsc-input input').forEach(input => {
+      if (input && !input.hasAttribute('data-placeholder-set')) {
+        input.setAttribute('placeholder', 'Search the docs ...');
+        input.setAttribute('data-placeholder-set', 'true');
+      }
+    });
+  });
+
+  observer.observe(document.body, { childList: true, subtree: true });
+
+  // Fix for scroll jump issue - improved approach
+  function setupSearchInputHandlers(input) {
+    if (input.hasAttribute('data-scroll-fixed')) return;
+    input.setAttribute('data-scroll-fixed', 'true');
+
+    let lastScrollPosition = 0;
+    let isTyping = false;
+    let scrollTimeout;
+
+    // Save position before typing starts
+    input.addEventListener('keydown', () => {
+      lastScrollPosition = window.scrollY;
+      isTyping = true;
+
+      // Reset typing state after a short delay
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        isTyping = false;
+      }, 100);
+    });
+
+    // Only maintain scroll position during typing
+    function maintainScroll() {
+      if (document.activeElement === input && isTyping) {
+        window.scrollTo(0, lastScrollPosition);
+        requestAnimationFrame(maintainScroll);
+      }
+    }
+
+    input.addEventListener('focus', () => {
+      // Just store initial position but don't force it
+      lastScrollPosition = window.scrollY;
+    });
+
+    input.addEventListener('input', () => {
+      isTyping = true;
+      window.scrollTo(0, lastScrollPosition);
+
+      // Reset typing state after a short delay
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        isTyping = false;
+      }, 100);
+
+      requestAnimationFrame(maintainScroll);
+    });
+  }
+
+  // Apply to all search inputs and observe for new ones
+  function applyToSearchInputs() {
+    document.querySelectorAll('.search-container input, .gsc-input input').forEach(setupSearchInputHandlers);
+  }
+
+  applyToSearchInputs();
+
+  const searchObserver = new MutationObserver(applyToSearchInputs);
+  searchObserver.observe(document.body, { childList: true, subtree: true });
+
+  // Watch for mobile menu creation
+  const mobileMenuObserver = new MutationObserver(function(mutations) {
+    for (const mutation of mutations) {
+      if (!mutation.addedNodes.length) continue;
+
+      // Style mobile search inputs
+      document.querySelectorAll('.sidebar-header-items__end .navbar-item .search-container-wrapper .gsc-input input').forEach(input => {
+        if (input) {
+          input.setAttribute('placeholder', 'Search the docs ...');
+          input.style.paddingLeft = '36px';
+        }
+      });
+
+      // Check for mobile search container
+      const mobileSearchContainer = document.querySelector('.sidebar-header-items__end .navbar-item .search-container-wrapper');
+      if (!mobileSearchContainer) continue;
+
+      const mobileToggle = mobileSearchContainer.querySelector('#search-toggle');
+      if (mobileToggle && toggle) {
+        // Sync mobile toggle with desktop toggle
+        mobileToggle.checked = toggle.checked;
+        updateMobileSearch();
+
+        // Add event listener to mobile toggle if not already added
+        if (!mobileToggle.hasAttribute('data-initialized')) {
+          mobileToggle.setAttribute('data-initialized', 'true');
+          mobileToggle.addEventListener('change', function() {
+            // Sync desktop toggle with mobile toggle
+            toggle.checked = this.checked;
+            // Trigger change event on desktop toggle to update both
+            toggle.dispatchEvent(new Event('change'));
+          });
+        }
+      }
+    }
+  });
+
+  mobileMenuObserver.observe(document.body, { childList: true, subtree: true });
+
+  // Ensure Google CSE is properly loaded
+  if (window.__gcse) {
+    window.__gcse.callback = function() {
+      // This will run after Google CSE is fully loaded
+      if (toggle && toggle.checked) {
+        reinitializeGoogleSearch();
+      }
+    };
+  } else {
+    window.__gcse = {
+      callback: function() {
+        if (toggle && toggle.checked) {
+          reinitializeGoogleSearch();
+        }
+      }
+    };
+  }
+});
+</script>
+</div>
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/PyTorchKorea/tutorials-kr" title="한국어 튜토리얼 GitHub 저장소" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">한국어 튜토리얼 GitHub 저장소</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://discuss.pytorch.kr/" title="파이토치 한국어 커뮤니티" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-discourse fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">파이토치 한국어 커뮤니티</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="../beginner/dist_overview.html">PyTorch Distributed Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../beginner/ddp_series_intro.html">PyTorch의 분산 데이터 병렬 처리 - 비디오 튜토리얼</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/model_parallel_tutorial.html">단일 머신을 사용한 모델 병렬화 모범 사례</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/ddp_tutorial.html">분산 데이터 병렬 처리 시작하기</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/dist_tuto.html">PyTorch로 분산 어플리케이션 개발하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/FSDP_tutorial.html">Fully Sharded Data Parallel(FSDP) 시작하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/FSDP_adavnced_tutorial.html">Advanced Model Training with Fully Sharded Data Parallel (FSDP)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/FSDP_tutorial.html">Getting Started with Fully Sharded Data Parallel (FSDP2)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/TCPStore_libuv_backend.html">Introduction to Libuv TCPStore Backend</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/TP_tutorial.html">Large Scale Transformer model training with Tensor Parallel (TP)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intermediate/pipelining_tutorial.html">Introduction to Distributed Pipeline Parallelism</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/process_group_cpp_extension_tutorial.html">Cpp 확장을 사용한 프로세스 그룹 백엔드 사용자 정의</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/rpc_tutorial.html">Getting Started with Distributed RPC Framework</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/rpc_param_server_tutorial.html">Implementing a Parameter Server Using Distributed RPC Framework</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/dist_pipeline_parallel_tutorial.html">Distributed Pipeline Parallelism Using RPC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../intermediate/rpc_async_execution.html">Implementing Batch RPC Processing Using Asynchronous Executions</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">분산 데이터 병렬(DDP)과 분산 RPC 프레임워크 결합</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ddp_pipeline.html">분산 데이터 병렬 처리와 병렬 처리 파이프라인을 사용한 트랜스포머 모델 학습</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">분산 데이터 병렬(DDP)과 분산 RPC 프레임워크 결합</a></li>
 <li class="toctree-l1"><a class="reference internal" href="generic_join.html">Distributed Training with Uneven Inputs Using the Join Context Manager</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">Edge with ExecuTorch</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/executorch/stable/tutorials/export-to-executorch-tutorial.html">Exporting to ExecuTorch Tutorial</a></li>
-<li class="toctree-l1"><a class="reference external" href=" https://pytorch.org/executorch/stable/running-a-model-cpp-tutorial.html">Running an ExecuTorch Model in C++ Tutorial</a></li>
-<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/executorch/stable/tutorials/sdk-integration-tutorial.html">Using the ExecuTorch SDK to Profile a Model</a></li>
-<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/executorch/stable/demo-apps-ios.html">Building an ExecuTorch iOS Demo App</a></li>
-<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/executorch/stable/demo-apps-android.html">Building an ExecuTorch Android Demo App</a></li>
-<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/executorch/stable/examples-end-to-end-to-lower-model-to-delegate.html">Lowering a Model as a Delegate</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">추천 시스템</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../intermediate/torchrec_tutorial.html">TorchRec 소개</a></li>
-<li class="toctree-l1"><a class="reference internal" href="sharding.html">Exploring TorchRec sharding</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">Multimodality</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/flava_finetuning_tutorial.html">TorchMultimodal 튜토리얼: FLAVA 미세조정</a></li>
-</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
 
-            
-          
-        </div>
+
       </div>
-    </nav>
-
-    <div class="pytorch-container">
-      <div class="pytorch-page-level-bar" id="pytorch-page-level-bar">
-        <div class="pytorch-breadcrumbs-wrapper">
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
-  <ul class="pytorch-breadcrumbs">
-    
-      <li>
-        <a href="../index.html">
-          
-            Tutorials
-          
-        </a> &gt;
-      </li>
-
+      
+      <main id="main-content" class="bd-main" role="main">
         
-      <li>분산 데이터 병렬(DDP)과 분산 RPC 프레임워크 결합</li>
-    
-    
-      <li class="pytorch-breadcrumbs-aside">
         
-            
-            <a href="../_sources/advanced/rpc_ddp_tutorial.rst.txt" rel="nofollow"><img src="../_static/images/view-page-source-icon.svg"></a>
-          
-        
-      </li>
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
     
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../distributed.html" class="nav-link">Distributed</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">분산 데이터...</li>
   </ul>
-
+</nav>
+</div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+<div class="rating">
+    Rate this Page
+    <div class="stars">
+        
+        <span class="star" data-behavior="tutorial-rating" data-count="1" data-value="1">★</span>
+        
+        <span class="star" data-behavior="tutorial-rating" data-count="2" data-value="2">★</span>
+        
+        <span class="star" data-behavior="tutorial-rating" data-count="3" data-value="3">★</span>
+        
+        <span class="star" data-behavior="tutorial-rating" data-count="4" data-value="4">★</span>
+        
+        <span class="star" data-behavior="tutorial-rating" data-count="5" data-value="5">★</span>
+        
+    </div>
+</div>
+</div>
+      
+    </div>
   
 </div>
-        </div>
-
-        <div class="pytorch-shortcuts-wrapper" id="pytorch-shortcuts-wrapper">
-          Shortcuts
-        </div>
-      </div>
-
-      <section data-toggle="wy-nav-shift" id="pytorch-content-wrap" class="pytorch-content-wrap">
-        <div class="pytorch-content-left">
-
-        
-
-          <div class="pytorch-call-to-action-links">
-            <div id="tutorial-type">advanced/rpc_ddp_tutorial</div>
-
-            <div id="google-colab-link">
-              <img class="call-to-action-img" src="../_static/images/pytorch-colab.svg"/>
-              <div class="call-to-action-desktop-view">Run in Google Colab</div>
-              <div class="call-to-action-mobile-view">Colab</div>
-            </div>
-            <div id="download-notebook-link">
-              <img class="call-to-action-notebook-img" src="../_static/images/pytorch-download.svg"/>
-              <div class="call-to-action-desktop-view">Download Notebook</div>
-              <div class="call-to-action-mobile-view">Notebook</div>
-            </div>
-            <div id="github-view-link">
-              <img class="call-to-action-img" src="../_static/images/pytorch-github.svg"/>
-              <div class="call-to-action-desktop-view">View on GitHub</div>
-              <div class="call-to-action-mobile-view">GitHub</div>
-            </div>
-          </div>
-
-        
-
-          
-          <div class="rst-content">
-          
-            <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
-             <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
+</div>
               
-  <div class="section" id="ddp-rpc">
-<h1>분산 데이터 병렬(DDP)과 분산 RPC 프레임워크 결합<a class="headerlink" href="#ddp-rpc" title="이 제목에 대한 퍼머링크">¶</a></h1>
+              
+  
+<div id="searchbox"></div>
+  <article class="bd-article" id="pytorch-article">
+    <!-- Hidden breadcrumb schema for SEO only -->
+    <div style="display:none;" itemscope itemtype="https://schema.org/BreadcrumbList">
+      
+      <div itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <link itemprop="item" href="../distributed.html">
+        <meta itemprop="name" content="Distributed">
+        <meta itemprop="position" content="1">
+      </div>
+      
+      <div itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <meta itemprop="name" content="분산 데이터 병렬(DDP)과 분산 RPC 프레임워크 결합">
+        <meta itemprop="position" content="2">
+      </div>
+    </div>
+
+    
+    <script>
+      if ((window.location.href.indexOf("/unstable/") != -1) && (window.location.href.indexOf("/unstable/unstable_index") < 1)) {
+        var div = '<div class="prototype-banner"><i class="fa fa-flask" aria-hidden="true"></i> <strong>Unstable feature:</strong> Not typically available in binary distributions like PyPI. Early stage for feedback and testing.</div>'
+        document.addEventListener('DOMContentLoaded', function () {
+          document.getElementById("pytorch-article").insertAdjacentHTML('afterBegin', div);
+        });
+      }
+    </script>
+    
+    
+    <div class="pytorch-call-to-action-links">
+      <div id="tutorial-type">advanced/rpc_ddp_tutorial</div>
+      <a id="colab-link" data-behavior="call-to-action-event" data-response="Run in Google Colab" target="_blank">
+        <div id="google-colab-link">
+          <img class="call-to-action-img" src="../_static/img/pytorch-colab.svg" />
+          <div class="call-to-action-desktop-view">Run in Google Colab</div>
+          <div class="call-to-action-mobile-view">Colab</div>
+        </div>
+      </a>
+      <a id="notebook-link" data-behavior="call-to-action-event" data-response="Download Notebook">
+        <div id="download-notebook-link">
+          <img class="call-to-action-notebook-img" src="../_static/img/pytorch-download.svg" />
+          <div class="call-to-action-desktop-view">Download Notebook</div>
+          <div class="call-to-action-mobile-view">Notebook</div>
+        </div>
+      </a>
+      <a id="github-link" data-behavior="call-to-action-event" data-response="View on Github" target="_blank">
+        <div id="github-view-link">
+          <img class="call-to-action-img" src="../_static/img/pytorch-github.svg" />
+          <div class="call-to-action-desktop-view">View on GitHub</div>
+          <div class="call-to-action-mobile-view">GitHub</div>
+        </div>
+      </a>
+    </div>
+    
+
+    
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="ddp-rpc">
+<h1>분산 데이터 병렬(DDP)과 분산 RPC 프레임워크 결합<a class="headerlink" href="#ddp-rpc" title="Link to this heading">#</a></h1>
 <p><strong>저자</strong>: <a class="reference external" href="https://github.com/pritamdamania87">Pritam Damania</a> and <a class="reference external" href="https://github.com/wayi1">Yi Wang</a></p>
 <p><strong>번역</strong>: <a class="reference external" href="https://github.com/dajeongPark-dev">박다정</a></p>
 <div class="admonition note">
@@ -446,23 +1477,23 @@
 <p>이 튜토리얼은 간단한 예제를 사용하여 분산 데이터 병렬 처리(distributed data parallelism)와
 분산 모델 병렬 처리(distributed model parallelism)를 결합하여 간단한 모델 학습시킬 때
 <a class="reference external" href="https://pytorch.org/docs/stable/nn.html#torch.nn.parallel.DistributedDataParallel">분산 데이터 병렬(DistributedDataParallel)</a> (DDP)과
-<a href="#id2"><span class="problematic" id="id3">`</span></a>분산 RPC 프레임워크(Distributed RPC framework) &lt;<a class="reference external" href="https://pytorch.org/docs/master/rpc.html">https://pytorch.org/docs/master/rpc.html</a>&gt;`__를 결합하는 방법에 대해 설명합니다.
-예제의 소스 코드는 <a href="#id4"><span class="problematic" id="id5">`</span></a>여기 &lt;<a class="reference external" href="https://github.com/pytorch/examples/tree/master/distributed/rpc/ddp_rpc">https://github.com/pytorch/examples/tree/master/distributed/rpc/ddp_rpc</a>&gt;`__에서 확인할 수 있습니다.</p>
+<a class="reference external" href="https://pytorch.org/docs/master/rpc.html">분산 RPC 프레임워크(Distributed RPC framework)</a> 를 결합하는 방법에 대해 설명합니다.
+예제의 소스 코드는 <a href="#id2"><span class="problematic" id="id3">`</span></a>여기 &lt;<a class="github reference external" href="https://github.com/pytorch/examples/tree/master/distributed/rpc/ddp_rpc">pytorch/examples</a>&gt;`__에서 확인할 수 있습니다.</p>
 <p>이전 튜토리얼 내용이었던
-<a href="#id6"><span class="problematic" id="id7">`</span></a>분산 데이터 병렬 시작하기 &lt;<a class="reference external" href="https://tutorials.pytorch.kr/intermediate/ddp_tutorial.html">https://tutorials.pytorch.kr/intermediate/ddp_tutorial.html</a>&gt;`__와
-<a href="#id8"><span class="problematic" id="id9">`</span></a>분산 RPC 프레임워크 시작하기 &lt;<a class="reference external" href="https://tutorials.pytorch.kr/intermediate/rpc_tutorial.html">https://tutorials.pytorch.kr/intermediate/rpc_tutorial.html</a>&gt;`__는
+<a href="#id4"><span class="problematic" id="id5">`</span></a>분산 데이터 병렬 시작하기 &lt;<a class="reference external" href="https://tutorials.pytorch.kr/intermediate/ddp_tutorial.html">https://tutorials.pytorch.kr/intermediate/ddp_tutorial.html</a>&gt;`__와
+<a href="#id6"><span class="problematic" id="id7">`</span></a>분산 RPC 프레임워크 시작하기 &lt;<a class="reference external" href="https://tutorials.pytorch.kr/intermediate/rpc_tutorial.html">https://tutorials.pytorch.kr/intermediate/rpc_tutorial.html</a>&gt;`__는
 분산 데이터 병렬 및 분산 모델 병렬 학습을 각각 수행하는 방법에 대해 설명합니다.
 그러나 이 두 가지 기술을 결합할 수 있는 몇 가지 학습 패러다임이 있습니다. 예를 들어:</p>
 <ol class="arabic simple">
 <li><p>희소 부분(큰 임베딩 테이블)과 밀집 부분(FC 레이어)이 있는 모델이 있는 경우,
-매개변수 서버(parameter server)에 임베딩 테이블(embedding table)을 놓고 <a href="#id10"><span class="problematic" id="id11">`</span></a>분산 데이터 병렬 &lt;<a class="reference external" href="https://pytorch.org/docs/stable/nn.html#torch.nn.parallel.DistributedDataParallel">https://pytorch.org/docs/stable/nn.html#torch.nn.parallel.DistributedDataParallel</a>&gt;`__을 사용하여
+매개변수 서버(parameter server)에 임베딩 테이블(embedding table)을 놓고 <a href="#id8"><span class="problematic" id="id9">`</span></a>분산 데이터 병렬 &lt;<a class="reference external" href="https://pytorch.org/docs/stable/nn.html#torch.nn.parallel.DistributedDataParallel">https://pytorch.org/docs/stable/nn.html#torch.nn.parallel.DistributedDataParallel</a>&gt;`__을 사용하여
 여러 트레이너에 걸쳐 FC 레이어를 복제하는 것을 원할 수도 있습니다.
-이때 <a href="#id12"><span class="problematic" id="id13">`</span></a>분산 RPC 프레임워크 &lt;<a class="reference external" href="https://pytorch.org/docs/master/rpc.html">https://pytorch.org/docs/master/rpc.html</a>&gt;`__는
+이때 <a href="#id10"><span class="problematic" id="id11">`</span></a>분산 RPC 프레임워크 &lt;<a class="reference external" href="https://pytorch.org/docs/master/rpc.html">https://pytorch.org/docs/master/rpc.html</a>&gt;`__는
 매개변수 서버에서 임베딩 찾기 작업(embedding lookup)을 수행하는 데 사용할 수 있습니다.</p></li>
 <li><p>다음은 <a class="reference external" href="https://arxiv.org/abs/1806.03377">PipeDream</a> 문서에서 설명된 하이브리드 병렬 처리 활성화하기 입니다.
-<a href="#id14"><span class="problematic" id="id15">`</span></a>분산 RPC 프레임워크 &lt;<a class="reference external" href="https://pytorch.org/docs/master/rpc.html">https://pytorch.org/docs/master/rpc.html</a>&gt;`__를 사용하여
+<a class="reference external" href="https://pytorch.org/docs/master/rpc.html">분산 RPC 프레임워크</a> 를 사용하여
 여러 worker에 걸쳐 모델의 단계를 파이프라인(pipeline)할 수 있고
-(필요에 따라) <a href="#id16"><span class="problematic" id="id17">`</span></a>분산 데이터 병렬 &lt;<a class="reference external" href="https://pytorch.org/docs/stable/nn.html#torch.nn.parallel.DistributedDataParallel">https://pytorch.org/docs/stable/nn.html#torch.nn.parallel.DistributedDataParallel</a>&gt;`__을 이용해서
+(필요에 따라) <a href="#id12"><span class="problematic" id="id13">`</span></a>분산 데이터 병렬 &lt;<a class="reference external" href="https://pytorch.org/docs/stable/nn.html#torch.nn.parallel.DistributedDataParallel">https://pytorch.org/docs/stable/nn.html#torch.nn.parallel.DistributedDataParallel</a>&gt;`__을 이용해서
 각 단계를 복제할 수 있습니다.</p></li>
 </ol>
 <div class="line-block">
@@ -474,7 +1505,7 @@
 <li><p>1개의 마스터는 매개변수 서버에 임베딩 테이블(nn.EmbeddingBag) 생성을 담당합니다.
 또한 마스터는 두 트레이너의 학습 루프를 수행합니다.</p></li>
 <li><p>1개의 매개변수 서버는 기본적으로 메모리에 임베딩 테이블을 보유하고 마스터 및 트레이너의 RPC에 응답합니다.</p></li>
-<li><p>2개의 트레이너는 <a href="#id18"><span class="problematic" id="id19">`</span></a>분산 데이터 병렬 &lt;<a class="reference external" href="https://pytorch.org/docs/stable/nn.html#torch.nn.parallel.DistributedDataParallel">https://pytorch.org/docs/stable/nn.html#torch.nn.parallel.DistributedDataParallel</a>&gt;`__을
+<li><p>2개의 트레이너는 <a href="#id14"><span class="problematic" id="id15">`</span></a>분산 데이터 병렬 &lt;<a class="reference external" href="https://pytorch.org/docs/stable/nn.html#torch.nn.parallel.DistributedDataParallel">https://pytorch.org/docs/stable/nn.html#torch.nn.parallel.DistributedDataParallel</a>&gt;`__을
 사용하여 자체적으로 복제되는 FC 레이어(nn.Linear)를 저장합니다.
 트레이너는 또한 순방향 전달(forward pass), 역방향 전달(backward pass) 및 최적화 단계를 실행해야 합니다.</p></li>
 </ol>
@@ -484,25 +1515,30 @@
 <p>전체적인 학습과정은 다음과 같이 실행됩니다:</p>
 <ol class="arabic simple">
 <li><p>마스터는 매개변수 서버에 임베딩 테이블을 담고 있는
-<a href="#id20"><span class="problematic" id="id21">`</span></a>원격 모듈(RemoteModule) &lt;<a class="reference external" href="https://pytorch.org/docs/master/rpc.html#remotemodule">https://pytorch.org/docs/master/rpc.html#remotemodule</a>&gt;`__을 생성합니다.</p></li>
+<a href="#id16"><span class="problematic" id="id17">`</span></a>원격 모듈(RemoteModule) &lt;<a class="reference external" href="https://pytorch.org/docs/master/rpc.html#remotemodule">https://pytorch.org/docs/master/rpc.html#remotemodule</a>&gt;`__을 생성합니다.</p></li>
 <li><p>그런 다음 마스터는 트레이너의 학습 루프를 시작하고 원격 모듈(remote module)을 트레이너에게 전달합니다.</p></li>
 <li><p>트레이너는 먼저 마스터에서 제공하는 원격 모듈을 사용하여
-임베딩 찾기 작업(embedding lookup)을 수행한 다음 DDP 내부에 감싸진 FC 레이어를 실행하는 <a href="#id22"><span class="problematic" id="id23">``</span></a>HybridModel``을 생성합니다.</p></li>
-<li><p>트레이너는 모델의 순방향 전달을 실행하고 손실을 사용하여 <a href="#id24"><span class="problematic" id="id25">`</span></a>분산 Autograd &lt;<a class="reference external" href="https://pytorch.org/docs/master/rpc.html#distributed-autograd-framework">https://pytorch.org/docs/master/rpc.html#distributed-autograd-framework</a>&gt;`__를
+임베딩 찾기 작업(embedding lookup)을 수행한 다음 DDP 내부에 감싸진 FC 레이어를 실행하는 <a href="#id18"><span class="problematic" id="id19">``</span></a>HybridModel``을 생성합니다.</p></li>
+<li><p>트레이너는 모델의 순방향 전달을 실행하고 손실을 사용하여 <a class="reference external" href="https://pytorch.org/docs/master/rpc.html#distributed-autograd-framework">분산 Autograd</a> 를
 사용하여 역방향 전달을 실행합니다.</p></li>
 <li><p>역방향 전달의 일부로 FC 레이어의 변화도가 먼저 계산되고 DDP의 allreduce를 통해 모든 트레이너와 동기화됩니다.</p></li>
 <li><p>다음으로, 분산 Autograd는 매개변수 서버로 변화도를 전파하고 그곳에서 임베딩 테이블의 변화도가 업데이트됩니다.</p></li>
-<li><p>마지막으로, <a href="#id26"><span class="problematic" id="id27">`</span></a>분산 옵티마이저(DistributedOptimizer) &lt;<a class="reference external" href="https://pytorch.org/docs/master/rpc.html#module-torch.distributed.optim">https://pytorch.org/docs/master/rpc.html#module-torch.distributed.optim</a>&gt;`__는 모든 매개변수를 업데이트하는 데 사용됩니다.</p></li>
+<li><p>마지막으로, <a href="#id20"><span class="problematic" id="id21">`</span></a>분산 옵티마이저(DistributedOptimizer) &lt;<a class="reference external" href="https://pytorch.org/docs/master/rpc.html#module-torch.distributed.optim">https://pytorch.org/docs/master/rpc.html#module-torch.distributed.optim</a>&gt;`__는 모든 매개변수를 업데이트하는 데 사용됩니다.</p></li>
 </ol>
+<div class="admonition warning">
+<p class="admonition-title">경고</p>
+<p>DDP와 RPC를 결합할 때, 역방향 전달에 대해 항상
+<a class="reference external" href="https://pytorch.org/docs/master/rpc.html#distributed-autograd-framework">분산 Autograd</a> 를 사용해야 합니다.</p>
+</div>
 <p>이제 각 부분을 자세히 살펴보겠습니다.
 먼저 학습을 수행하기 전에 모든 작업자를 설정해야 합니다.
 순위 0과 1은 트레이너, 순위 2는 마스터, 순위 3은 매개변수 서버인 4개의 프로세스를 만듭니다.</p>
 <p>TCP init_method를 사용하여 4개의 모든 worker에서 RPC 프레임워크를 초기화합니다.
 RPC 초기화가 끝나면, 마스터는 <a class="reference external" href="https://pytorch.org/docs/master/generated/torch.nn.EmbeddingBag.html">EmbeddingBag</a> 레이어를
-<a href="#id28"><span class="problematic" id="id29">`</span></a>원격 모듈(RemoteModule) &lt;<a class="reference external" href="https://pytorch.org/docs/master/rpc.html#remotemodule">https://pytorch.org/docs/master/rpc.html#remotemodule</a>&gt;`__을 사용하여
+<a class="reference external" href="https://pytorch.org/docs/master/rpc.html#torch.distributed.rpc.rpc_async">원격 모듈(RemoteModule) &lt;https://pytorch.org/docs/master/rpc.html#remotemodule&gt;`__을 사용하여
 매개변수 서버에 담고 있는 원격 모듈 하나를 생성합니다.
-그런 다음 마스터는 각 트레이너를 반복하고 <a href="#id30"><span class="problematic" id="id31">`</span></a>rpc_async &lt;<a class="reference external" href="https://pytorch.org/docs/master/rpc.html#torch.distributed.rpc.rpc_async">https://pytorch.org/docs/master/rpc.html#torch.distributed.rpc.rpc_async</a>&gt;`__를
-사용하여 각 트레이너에서 <a href="#id32"><span class="problematic" id="id33">``</span></a>_run_trainer``를 호출하여 반복 학습을 시작합니다.
+그런 다음 마스터는 각 트레이너를 반복하고 `rpc_async</a> 를
+사용하여 각 트레이너에서 <a href="#id22"><span class="problematic" id="id23">``</span></a>_run_trainer``를 호출하여 반복 학습을 시작합니다.
 마지막으로 마스터는 종료하기 전에 모든 학습이 완료될 때까지 기다립니다.</p>
 <p>트레이너는 <cite>init_process_group &lt;https://pytorch.org/docs/stable/distributed.html#torch.distributed.init_process_group&gt;`__을 사용하여
 (2개의 트레이너) world_size=2로 DDP를 위해 ``ProcessGroup``을 초기화합니다.
@@ -511,7 +1547,7 @@ RPC 초기화가 끝나면, 마스터는 <a class="reference external" href="htt
 이는 두 프레임워크의 초기화 간에 포트 충돌을 피하기 위해서 입니다.
 초기화가 완료되면 트레이너는 마스터의 ``_run_trainer</cite> RPC를 기다리기만 하면 됩니다.</p>
 <p>파라피터 서버는 RPC 프레임워크를 초기화하고 트레이너와 마스터의 RPC를 기다립니다.</p>
-<div class="highlight-py notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">run_worker</span><span class="p">(</span><span class="n">rank</span><span class="p">,</span> <span class="n">world_size</span><span class="p">):</span>
+<div class="highlight-py notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">run_worker</span><span class="p">(</span><span class="n">rank</span><span class="p">,</span> <span class="n">world_size</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    이 함수는 RPC를 초기화하고, 함수를 호출하고,</span>
 <span class="sd">    RPC를 종료하는 래퍼 함수(wrapper function)입니다.</span>
@@ -587,12 +1623,12 @@ RPC 초기화가 끝나면, 마스터는 <a class="reference external" href="htt
 </pre></div>
 </div>
 <p>트레이너에 대한 자세한 설명에 앞서, 트레이너가 사용하는 <code class="docutils literal notranslate"><span class="pre">HybridModel``에</span> <span class="pre">대해</span> <span class="pre">설명드리겠습니다.</span>
-<span class="pre">아래에</span> <span class="pre">설명된</span> <span class="pre">대로</span> <span class="pre">``HybridModel``은</span> <span class="pre">매개변수</span> <span class="pre">서버의</span> <span class="pre">임베딩</span> <span class="pre">테이블(``remote_emb_module</span></code>)과 DDP에 사용할 <a href="#id34"><span class="problematic" id="id35">``</span></a>device``를 보유하는 원격 모듈을 사용하여 초기화됩니다.
+<span class="pre">아래에</span> <span class="pre">설명된</span> <span class="pre">대로</span> <span class="pre">``HybridModel``은</span> <span class="pre">매개변수</span> <span class="pre">서버의</span> <span class="pre">임베딩</span> <span class="pre">테이블(``remote_emb_module</span></code>)과 DDP에 사용할 <a href="#id24"><span class="problematic" id="id25">``</span></a>device``를 보유하는 원격 모듈을 사용하여 초기화됩니다.
 모델 초기화는 DDP 내부의 <a class="reference external" href="https://pytorch.org/docs/master/generated/torch.nn.Linear.html">nn.Linear</a> 레이어를
 감싸 모든 트레이너에서 이 레이어를 복제하고 동기화합니다.</p>
 <p>모델의 순방향(forward) 함수는 꽤 간단합니다.
-RemoteModule의 <a href="#id36"><span class="problematic" id="id37">``</span></a>forward``를 사용하여 매개변수 서버에서 임베딩 찾기 작업(embedding lookup)을 수행하고 그 출력을 FC 레이어에 전달합니다.</p>
-<div class="highlight-py notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">HybridModel</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+RemoteModule의 <a href="#id26"><span class="problematic" id="id27">``</span></a>forward``를 사용하여 매개변수 서버에서 임베딩 찾기 작업(embedding lookup)을 수행하고 그 출력을 FC 레이어에 전달합니다.</p>
+<div class="highlight-py notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">HybridModel</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    하이브리드 모델은 희소 부분과 밀집 부분이 있는 모델입니다.</span>
 <span class="sd">    1) 밀집 부분은 분산 데이터 병렬을 사용하여 모든 트레이너에 걸쳐 복제되는 nn.Linear 모듈입니다.</span>
@@ -600,32 +1636,32 @@ RemoteModule의 <a href="#id36"><span class="problematic" id="id37">``</span></a
 <span class="sd">    이 원격 모델은 매개변수 서버의 임베딩 테이블에 대한 원격 참조(Remote Reference)를 얻을 수 있습니다.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">remote_emb_module</span><span class="p">,</span> <span class="n">device</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">remote_emb_module</span><span class="p">,</span> <span class="n">device</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">HybridModel</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">remote_emb_module</span> <span class="o">=</span> <span class="n">remote_emb_module</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fc</span> <span class="o">=</span> <span class="n">DDP</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span><span class="o">.</span><span class="n">cuda</span><span class="p">(</span><span class="n">device</span><span class="p">),</span> <span class="n">device_ids</span><span class="o">=</span><span class="p">[</span><span class="n">device</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">device</span>
 
-    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indices</span><span class="p">,</span> <span class="n">offsets</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indices</span><span class="p">,</span> <span class="n">offsets</span><span class="p">):</span>
         <span class="n">emb_lookup</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">remote_emb_module</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">indices</span><span class="p">,</span> <span class="n">offsets</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fc</span><span class="p">(</span><span class="n">emb_lookup</span><span class="o">.</span><span class="n">cuda</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">))</span>
 </pre></div>
 </div>
 <p>다음으로 트레이너의 설정을 살펴보겠습니다.
 트레이너는 먼저 매개변수 서버의 임베딩 테이블과 자체 순위를 보유하는 원격 모듈을 사용하여
-위에서 설명한 <a href="#id38"><span class="problematic" id="id39">``</span></a>HybridModel``을 생성합니다.</p>
-<p>이제 <a href="#id40"><span class="problematic" id="id41">`</span></a>분산 옵티마이저(DistributedOptimizer) &lt;<a class="reference external" href="https://pytorch.org/docs/master/rpc.html#module-torch.distributed.optim">https://pytorch.org/docs/master/rpc.html#module-torch.distributed.optim</a>&gt;`__로
+위에서 설명한 <a href="#id28"><span class="problematic" id="id29">``</span></a>HybridModel``을 생성합니다.</p>
+<p>이제 <a class="reference external" href="https://pytorch.org/docs/master/rpc.html#torch.distributed.nn.api.remote_module.RemoteModule.remote_parameters">분산 옵티마이저(DistributedOptimizer) &lt;https://pytorch.org/docs/master/rpc.html#module-torch.distributed.optim&gt;`__로
 최적화하려는 모든 매개변수에 대한 RRef 목록을 검색해야 합니다.
 매개변수 서버에서 임베딩 테이블의 매개변수를 검색하기 위해
-RemoteModule의 <a href="#id42"><span class="problematic" id="id43">`</span></a>remote_parameters &lt;<a class="reference external" href="https://pytorch.org/docs/master/rpc.html#torch.distributed.nn.api.remote_module.RemoteModule.remote_parameters">https://pytorch.org/docs/master/rpc.html#torch.distributed.nn.api.remote_module.RemoteModule.remote_parameters</a>&gt;`__를 호출할 수 있습니다.
+RemoteModule의 `remote_parameters</a> 를 호출할 수 있습니다.
 그리고 이것은 기본적으로 임베딩 테이블의 모든 매개변수를 살펴보고 RRef 목록을 반환합니다.
 트레이너는 RPC를 통해 매개변수 서버에서 이 메서드를 호출하여 원하는 매개변수에 대한 RRef 목록을 수신합니다.
 DistributedOptimizer는 항상 최적화해야 하는 매개변수에 대한 RRef 목록을 가져오기 때문에 FC 레이어의 전역 매개변수에 대해서도 RRef를 생성해야 합니다.
-이것은 <a href="#id44"><span class="problematic" id="id45">``</span></a>model.fc.parameters()``를 탐색하고 각 매개변수에 대한 RRef를 생성하고
-<a href="#id46"><span class="problematic" id="id47">``</span></a>remote_parameters()``에서 반환된 목록에 추가함으로써 수행됩니다.
-참고로 <a href="#id48"><span class="problematic" id="id49">``</span></a>model.parameters()``는 사용할 수 없습니다. <a href="#id50"><span class="problematic" id="id51">``</span></a>RemoteModule``에서 지원하지 않는 <a href="#id52"><span class="problematic" id="id53">``</span></a>model.remote_emb_module.parameters()``를 재귀적으로 호출하기 때문입니다.</p>
+이것은 <a href="#id30"><span class="problematic" id="id31">``</span></a>model.fc.parameters()``를 탐색하고 각 매개변수에 대한 RRef를 생성하고
+<a href="#id32"><span class="problematic" id="id33">``</span></a>remote_parameters()``에서 반환된 목록에 추가함으로써 수행됩니다.
+참고로 <a href="#id34"><span class="problematic" id="id35">``</span></a>model.parameters()``는 사용할 수 없습니다. <a href="#id36"><span class="problematic" id="id37">``</span></a>RemoteModule``에서 지원하지 않는 <a href="#id38"><span class="problematic" id="id39">``</span></a>model.remote_emb_module.parameters()``를 재귀적으로 호출하기 때문입니다.</p>
 <p>마지막으로 모든 RRef를 사용하여 DistributedOptimizer를 만들고 CrossEntropyLoss 함수를 정의합니다.</p>
-<div class="highlight-py notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">_run_trainer</span><span class="p">(</span><span class="n">remote_emb_module</span><span class="p">,</span> <span class="n">rank</span><span class="p">):</span>
+<div class="highlight-py notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">_run_trainer</span><span class="p">(</span><span class="n">remote_emb_module</span><span class="p">,</span> <span class="n">rank</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    각 트레이너는 매개변수 서버에서 임베딩 찾기 작업(embedding lookup)을 포함하고</span>
 <span class="sd">    전역에서 nn.Linear를 실행하는 순방향 전달(forward pass)를 실행합니다.</span>
@@ -659,17 +1695,17 @@ DistributedOptimizer는 항상 최적화해야 하는 매개변수에 대한 RRe
 </pre></div>
 </div>
 <p>이제 각 트레이너에서 실행되는 기본 학습 루프를 소개하겠습니다.
-<a href="#id54"><span class="problematic" id="id55">``</span></a>get_next_batch``는 학습을 위한 임의의 입력과 대상을 생성하는 것을 도와주는 함수일 뿐입니다.
+<a href="#id40"><span class="problematic" id="id41">``</span></a>get_next_batch``는 학습을 위한 임의의 입력과 대상을 생성하는 것을 도와주는 함수일 뿐입니다.
 여러 에폭(epoch)과 각 배치(batch)에 대해 학습 루프를 실행합니다:</p>
 <ol class="arabic simple">
 <li><p>먼저 분산 Autograd에 대해
-<a href="#id56"><span class="problematic" id="id57">`</span></a>분산 Autograd Context &lt;<a class="reference external" href="https://pytorch.org/docs/master/rpc.html#torch.distributed.autograd.context">https://pytorch.org/docs/master/rpc.html#torch.distributed.autograd.context</a>&gt;`__를 설정합니다.</p></li>
+<a class="reference external" href="https://pytorch.org/docs/master/rpc.html#torch.distributed.autograd.context">분산 Autograd Context</a> 를 설정합니다.</p></li>
 <li><p>모델의 순방향 전달을 실행하고 해당 출력을 검색(retrieve)합니다.</p></li>
 <li><p>손실 함수를 사용하여 출력과 목표를 기반으로 손실을 계산합니다.</p></li>
 <li><p>분산 Autograd를 사용하여 손실을 사용하여 분산 역방향 전달을 실행합니다.</p></li>
 <li><p>마지막으로 분산 옵티마이저 단계를 실행하여 모든 매개변수를 최적화합니다.</p></li>
 </ol>
-<div class="highlight-py notranslate"><div class="highlight"><pre><span></span>    <span class="k">def</span> <span class="nf">get_next_batch</span><span class="p">(</span><span class="n">rank</span><span class="p">):</span>
+<div class="highlight-py notranslate"><div class="highlight"><pre><span></span>    <span class="k">def</span><span class="w"> </span><span class="nf">get_next_batch</span><span class="p">(</span><span class="n">rank</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
             <span class="n">num_indices</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
             <span class="n">indices</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">LongTensor</span><span class="p">(</span><span class="n">num_indices</span><span class="p">)</span><span class="o">.</span><span class="n">random_</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">NUM_EMBEDDINGS</span><span class="p">)</span>
@@ -706,309 +1742,272 @@ DistributedOptimizer는 항상 최적화해야 하는 매개변수에 대한 RRe
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Training done for epoch </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">epoch</span><span class="p">))</span>
 </pre></div>
 </div>
-<p>전체 예제의 소스 코드는 <a href="#id58"><span class="problematic" id="id59">`</span></a>여기 &lt;<a class="reference external" href="https://github.com/pytorch/examples/tree/master/distributed/rpc/ddp_rpc">https://github.com/pytorch/examples/tree/master/distributed/rpc/ddp_rpc</a>&gt;`__에서 찾을 수 있습니다.</p>
+<p>전체 예제의 소스 코드는 <a href="#id42"><span class="problematic" id="id43">`</span></a>여기 &lt;<a class="github reference external" href="https://github.com/pytorch/examples/tree/master/distributed/rpc/ddp_rpc">pytorch/examples</a>&gt;`__에서 찾을 수 있습니다.</p>
+</section>
+
+
+                </article>
+              
+  </article>
+  
+              
+              
+                <footer class="bd-footer-article">
+                  <div class="footer-article-items footer-article__inner">
+  
+    <div class="footer-article-item">
+<div class="feedback">
+  
+<div class="rating">
+    Rate this Page
+    <div class="stars">
+        
+        <span class="star" data-behavior="tutorial-rating" data-count="1" data-value="1">★</span>
+        
+        <span class="star" data-behavior="tutorial-rating" data-count="2" data-value="2">★</span>
+        
+        <span class="star" data-behavior="tutorial-rating" data-count="3" data-value="3">★</span>
+        
+        <span class="star" data-behavior="tutorial-rating" data-count="4" data-value="4">★</span>
+        
+        <span class="star" data-behavior="tutorial-rating" data-count="5" data-value="5">★</span>
+        
+    </div>
 </div>
 
-
-             </article>
-             
-            </div>
-            <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="ddp_pipeline.html" class="btn btn-neutral float-right" title="분산 데이터 병렬 처리와 병렬 처리 파이프라인을 사용한 트랜스포머 모델 학습" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
-      
-      
-        <a href="../intermediate/rpc_async_execution.html" class="btn btn-neutral" title="Implementing Batch RPC Processing Using Asynchronous Executions" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
-      
-    </div>
-  
-
-  
-    <hr class="community-hr hr-top" />
-    <div class="community-container">
-      <div class="community-prompt">더 궁금하시거나 개선할 내용이 있으신가요? 커뮤니티에 참여해보세요!</div>
-      <div class="community-link"><a href="https://discuss.pytorch.kr/" aria-label="PyTorchKoreaCommunity">한국어 커뮤니티 바로가기</a></div>
-    </div>
-    <hr class="community-hr hr-bottom"/>
-
-    <hr class="rating-hr hr-top" />
-    <div class="rating-container">
-      <div class="rating-prompt">이 튜토리얼이 어떠셨나요? 평가해주시면 이후 개선에 참고하겠습니다! :)</div>
-      <div class="stars-outer">
-        <i class="far fa-star" title="1 Star" data-behavior="tutorial-rating" data-count="1"></i>
-        <i class="far fa-star" title="2 Stars" data-behavior="tutorial-rating" data-count="2"></i>
-        <i class="far fa-star" title="3 Stars" data-behavior="tutorial-rating" data-count="3"></i>
-        <i class="far fa-star" title="4 Stars" data-behavior="tutorial-rating" data-count="4"></i>
-        <i class="far fa-star" title="5 Stars" data-behavior="tutorial-rating" data-count="5"></i>
-      </div>
-    </div>
-    <hr class="rating-hr hr-bottom"/>
-  
-
-  <div role="contentinfo">
-    <p>
-        &copy; Copyright 2018-2024, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorch Korea User Group).
-
-    </p>
+  <div class="feedback-send">
+    <button class="feedback-btn"
+            onclick="openGitHubIssue()"
+            data-bs-title="Create a GitHub Issue"
+            data-bs-placement="bottom"
+            data-bs-toggle="tooltip"
+            data-gtm="feedback-btn-click">Send Feedback
+    </button>
   </div>
-    
-      <div>
-        Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
-      </div>
-     
+</div>
 
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../intermediate/rpc_async_execution.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">이전</p>
+        <p class="prev-next-title">Implementing Batch RPC Processing Using Asynchronous Executions</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="generic_join.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">다음</p>
+        <p class="prev-next-title">Distributed Training with Uneven Inputs Using the Join Context Manager</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+
+<div class="footer-info">
+  <p class="copyright">
+    
+      
+        © Copyright 2018-2025, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorchKR).
+      
+      <br/>
+    
+  </p>
+
+  <p class="theme-version">
+    Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.4.
+  </p>
+</div>
+</div>
+  
+</div>
+                </footer>
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../intermediate/rpc_async_execution.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">이전</p>
+        <p class="prev-next-title">Implementing Batch RPC Processing Using Asynchronous Executions</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="generic_join.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">다음</p>
+        <p class="prev-next-title">Distributed Training with Uneven Inputs Using the Join Context Manager</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <div class="container-fluid docs-tutorials-resources">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-4 text-center">
+        <h2>PyTorchKorea @ GitHub</h2>
+        <p>파이토치 한국 사용자 모임을 GitHub에서 만나보세요.</p>
+        <a class="with-right-arrow" href="https://github.com/PyTorchKorea">GitHub로 이동</a>
+      </div>
+
+      <div class="col-md-4 text-center">
+        <h2>한국어 튜토리얼</h2>
+        <p>한국어로 번역 중인 파이토치 튜토리얼을 만나보세요.</p>
+        <a class="with-right-arrow" href="https://tutorials.pytorch.kr/">튜토리얼로 이동</a>
+      </div>
+
+      <div class="col-md-4 text-center">
+        <h2>한국어 커뮤니티</h2>
+        <p>다른 사용자들과 의견을 나누고, 도와주세요!</p>
+        <a class="with-right-arrow" href="https://discuss.pytorch.kr/">커뮤니티로 이동</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="container footer-container">
+    <div class="footer-logo-wrapper">
+      <a href="https://pytorch.kr/" class="footer-logo"></a>
+    </div>
+
+    <div class="footer-links-wrapper">
+      <div class="footer-links-col">
+        <ul>
+          <li class="list-title"><a href="https://pytorch.kr/">파이토치 한국 사용자 모임</a></li>
+          <li><a href="https://pytorch.kr/about">사용자 모임 소개</a></li>
+          <li><a href="https://pytorch.kr/contributors">기여해주신 분들</a></li>
+          <li><a href="https://pytorch.kr/resources/">리소스</a></li>
+          <li><a href="https://pytorch.kr/coc">행동 강령</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="trademark-disclaimer">
+      <ul>
+        <li>이 사이트는 독립적인 파이토치 사용자 커뮤니티로, 최신 버전이 아니거나 잘못된 내용이 포함되어 있을 수 있습니다. This site is an independent user community and may be out of date or contain incorrect information.</li>
+        <li><a href="https://pytorch.kr/coc">행동 강령</a>을 읽고 지켜주세요. PyTorch 공식 로고 사용 규정은 <a href="https://www.linuxfoundation.org/policies/">Linux Foundation의 정책</a>을 따릅니다. Please read and follow <a href="https://pytorch.kr/coc">our code of conduct</a>. All PyTorch trademark policy applicable to <a href="https://www.linuxfoundation.org/policies/">Linux Foundation's policies</a>.</li>
+      </ul>
+    </div>
+  </div>
 </footer>
 
-          </div>
-<script>
-if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.indexOf("/prototype/prototype_index")< 1))
-  {
-    var div = '<div class="admonition note"><p class="admonition-title">Note</p><p><i class="fa fa-flask" aria-hidden="true">&nbsp</i> 이 튜토리얼은 프로토타입(prototype) 기능들에 대해서 설명하고 있습니다. 프로토타입 기능은 일반적으로 피드백 및 테스트용으로, 런타임 플래그 없이는 PyPI나 Conda로 배포되는 바이너리에서는 사용할 수 없습니다.</p></div>'
-    document.getElementById("pytorch-article").insertAdjacentHTML('afterBegin', div)
-  }
-</script>
-        </div>
-
-        <div class="pytorch-content-right" id="pytorch-content-right">
-          <div class="pytorch-right-menu" id="pytorch-right-menu">
-            <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
-              <ul>
-<li><a class="reference internal" href="#">분산 데이터 병렬(DDP)과 분산 RPC 프레임워크 결합</a></li>
-</ul>
-
-            </div>
-          </div>
-        </div>
-      </section>
-    </div>
-
-  
-
-
-  
-  
-     
-       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-         <script src="../_static/jquery.js"></script>
-         <script src="../_static/underscore.js"></script>
-         <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-         <script src="../_static/doctools.js"></script>
-         <script src="../_static/clipboard.min.js"></script>
-         <script src="../_static/copybutton.js"></script>
-         <script src="../_static/translations.js"></script>
-         <script src="../_static/katex.min.js"></script>
-         <script src="../_static/auto-render.min.js"></script>
-         <script src="../_static/katex_autorenderer.js"></script>
-         <script src="../_static/design-tabs.js"></script>
-     
-  
-
-  <script type="text/javascript" src="../_static/js/vendor/popper.min.js"></script>
-  <script type="text/javascript" src="../_static/js/vendor/bootstrap.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
-  <script type="text/javascript" src="../_static/js/theme.js"></script>
-
-  <script type="text/javascript">
-      jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
-      });
-  </script>
- 
-<script>
-//add microsoft link
-if(window.location.href.indexOf("/beginner/basics/")!= -1)
-{
-  var url="https://docs.microsoft.com/learn/paths/pytorch-fundamentals/?wt.mc_id=aiml-7486-cxa";
-  switch(window.location.pathname.split("/").pop().replace('.html',''))
-  {
-    case"quickstart_tutorial":
-      url="https://docs.microsoft.com/learn/modules/intro-machine-learning-pytorch/9-quickstart?WT.mc_id=aiml-7486-cxa";
-      break;
-    case"tensorqs_tutorial":
-      url="https://docs.microsoft.com/learn/modules/intro-machine-learning-pytorch/2-tensors?WT.mc_id=aiml-7486-cxa";
-      break;
-    case"data_tutorial":
-      url="https://docs.microsoft.com/learn/modules/intro-machine-learning-pytorch/3-data?WT.mc_id=aiml-7486-cxa";
-      break;
-    case"transforms_tutorial":
-      url="https://docs.microsoft.com/learn/modules/intro-machine-learning-pytorch/4-transforms?WT.mc_id=aiml-7486-cxa";
-      break;
-    case"buildmodel_tutorial":
-      url="https://docs.microsoft.com/learn/modules/intro-machine-learning-pytorch/5-model?WT.mc_id=aiml-7486-cxa";
-      break;
-    case"autogradqs_tutorial":
-      url="https://docs.microsoft.com/learn/modules/intro-machine-learning-pytorch/6-autograd?WT.mc_id=aiml-7486-cxa";
-      break;
-    case"optimization_tutorial":
-      url="https://docs.microsoft.com/learn/modules/intro-machine-learning-pytorch/7-optimization?WT.mc_id=aiml-7486-cxa";
-      break;
-    case"saveloadrun_tutorial":
-      url="https://docs.microsoft.com/learn/modules/intro-machine-learning-pytorch/8-inference?WT.mc_id=aiml-7486-cxa";
-    }
-
-    $(".pytorch-call-to-action-links").children().first().before("<a href="+url+' data-behavior="call-to-action-event" data-response="Run in Microsoft Learn" target="_blank"><div id="microsoft-learn-link" style="padding-bottom: 0.625rem;border-bottom: 1px solid #f3f4f7;padding-right: 2.5rem;display: -webkit-box;  display: -ms-flexbox; display: flex; -webkit-box-align: center;-ms-flex-align: center;align-items: center;"><img class="call-to-action-img" src="../../_static/images/microsoft-logo.svg"/><div class="call-to-action-desktop-view">Run in Microsoft Learn</div><div class="call-to-action-mobile-view">Learn</div></div></a>')
-  }
-</script>
-
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-LZRD6GXDLF"></script>
-<script data-cfasync="false">
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-LZRD6GXDLF');   // GA4
-  gtag('config', 'UA-71919972-3');  // UA
-</script>
-
-
-<script data-cfasync="false">
-  $("[data-behavior='call-to-action-event']").on('click', function(){
-    ga('send', {
-      hitType: 'event',
-      eventCategory: $(this).attr("data-response"),
-      eventAction: 'click',
-      eventLabel: window.location.href
-    });
-
-    gtag('event', 'click', {
-      'event_category': $(this).attr("data-response"),
-      'event_label': $("h1").first().text(),
-      'tutorial_link': window.location.href
-    });
-   });
-
-   $("[data-behavior='tutorial-rating']").on('click', function(){
-    gtag('event', 'click', {
-      'event_category': 'Tutorial Rating',
-      'event_label': $("h1").first().text(),
-      'value': $(this).attr("data-count"),
-      'customEvent:Rating': $(this).attr("data-count") // send to GA custom dimension customEvent:Rating.
-    });
-   });
-
-   if (location.pathname == "/") {
-     $(".rating-container").hide();
-     $(".hr-bottom").hide();
-   }
-</script>
-
-<script type="text/javascript">
-  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', 'Introduction to PyTorch on YouTube', '이미지/비디오', '오디오', '텍스트', '백엔드', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'PyTorch 프로파일링', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Edge with ExecuTorch', '추천 시스템', 'Multimodality'];
-</script>
-
-
-
-  <!-- Begin Footer -->
-
-  <div class="container-fluid docs-tutorials-resources" id="docs-tutorials-resources">
-    <div class="container">
-      <div class="row">
-        <div class="col-md-4 text-center">
-          <h2>PyTorchKorea @ GitHub</h2>
-          <p>파이토치 한국 사용자 모임을 GitHub에서 만나보세요.</p>
-          <a class="with-right-arrow" href="https://github.com/PyTorchKorea" target="_blank">GitHub로 이동</a>
-        </div>
-
-        <div class="col-md-4 text-center">
-          <h2>한국어 튜토리얼</h2>
-          <p>한국어로 번역 중인 PyTorch 튜토리얼입니다.</p>
-          <a class="with-right-arrow" href="https://tutorials.pytorch.kr/">튜토리얼로 이동</a>
-        </div>
-
-        <div class="col-md-4 text-center">
-          <h2>커뮤니티</h2>
-          <p>다른 사용자들과 의견을 나누고, 도와주세요!</p>
-          <a class="with-right-arrow" href="https://discuss.pytorch.kr/">커뮤니티로 이동</a>
-        </div>
-      </div>
-    </div>
+<div class="cookie-banner-wrapper">
+  <div class="container">
+    <p class="gdpr-notice">To analyze traffic and optimize your experience, we serve cookies on this site. By clicking or navigating, you agree to allow our usage of cookies. As the current maintainers of this site, Facebook’s Cookies Policy applies. Learn more, including about available controls: <a href="https://www.facebook.com/policies/cookies/">Cookies Policy</a>.</p>
+    <img class="close-button" src="../_static/img/pytorch-x.svg">
   </div>
+</div>
+  
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
 
-  <footer class="site-footer">
-    <div class="container footer-container">
-      <div class="footer-logo-wrapper">
-        <a href="https://pytorch.kr/" class="footer-logo"></a>
-      </div>
+  <p class="copyright">
+    
+      © Copyright 2018-2025, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorchKR).
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
 
-      <div class="footer-links-wrapper">
-        <div class="footer-links-col">
-          <ul>
-            <li class="list-title"><a href="https://pytorch.kr/">파이토치 한국 사용자 모임</a></li>
-            <li><a href="https://pytorch.kr//about">사용자 모임 소개</a></li>
-            <li><a href="https://pytorch.kr//about/contributors">기여해주신 분들</a></li>
-            <li><a href="https://pytorch.kr//resources">리소스</a></li>
-            <li><a href="https://pytorch.kr//coc">행동 강령</a></li>
-          </ul>
-        </div>
-      </div>
-      <div class="trademark-disclaimer">
-        <ul>
-          <li>이 사이트는 독립적인 파이토치 사용자 커뮤니티로, 최신 버전이 아니거나 잘못된 내용이 포함되어 있을 수 있습니다. This site is an independent user community and may be out of date or contain incorrect information.</li>
-          <li><a href="https://pytorch.kr/coc">행동 강령</a>을 읽고 지켜주세요. PyTorch 공식 로고 사용 정책은 <a href="https://www.linuxfoundation.org/policies/">Linux Foundation의 정책</a>을 따릅니다. Please read and follow <a href="https://pytorch.kr/coc">our code of conduct</a>. All PyTorch trademark policy applicable to <a href="https://www.linuxfoundation.org/policies/">Linux Foundation's policies</a>.</li>
-        </ul>
-      </div>
+  <p class="sphinx-version">
+    <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6 버전으로 생성되었습니다.
+    <br/>
+  </p>
+</div>
+      
     </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.4.
+</p></div>
+      
+    </div>
+  
+</div>
+
   </footer>
-
-  <!-- End Footer -->
-
-  <!-- Begin Mobile Menu -->
-
-  <div class="mobile-main-menu">
-    <div class="container-fluid">
-      <div class="container">
-        <div class="mobile-main-menu-header-container">
-          <a class="header-logo" href="https://pytorch.kr/" aria-label="PyTorch"></a>
-          <a class="main-menu-close-button" href="#" data-behavior="close-mobile-menu"></a>
-        </div>
-      </div>
-    </div>
-
-    <div class="mobile-main-menu-links-container">
-      <div class="main-menu">
-        <ul>
-          <li>
-            <a href="https://pytorch.kr/get-started">시작하기</a>
-          </li>
-
-          <li class="active">
-            <a href="https://tutorials.pytorch.kr/">튜토리얼</a>
-          </li>
-
-          <li>
-            <a href="https://pytorch.kr/hub">허브</a>
-          </li>
-
-          <li>
-            <a href="https://discuss.pytorch.kr/">커뮤니티</a>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </div>
-
-  <!-- End Mobile Menu -->
-
-  <script type="text/javascript" src="../_static/js/vendor/anchor.min.js"></script>
-
-  <script type="text/javascript">
-    $(document).ready(function() {
-      mobileMenu.bind();
-      mobileTOC.bind();
-      pytorchAnchors.bind();
-      sideMenus.bind();
-      scrollToAnchor.bind();
-      highlightNavigation.bind();
-      mainMenuDropdown.bind();
-      filterTags.bind();
-
-      // Add class to links that have code blocks, since we cannot create links in code blocks
-      $("article.pytorch-article a span.pre").each(function(e) {
-        $(this).closest("a").addClass("has-code");
+  <script type="application/ld+json">
+    {
+       "@context": "https://schema.org",
+       "@type": "Article",
+       "name": "\ubd84\uc0b0 \ub370\uc774\ud130 \ubcd1\ub82c(DDP)\uacfc \ubd84\uc0b0 RPC \ud504\ub808\uc784\uc6cc\ud06c \uacb0\ud569",
+       "headline": "\ubd84\uc0b0 \ub370\uc774\ud130 \ubcd1\ub82c(DDP)\uacfc \ubd84\uc0b0 RPC \ud504\ub808\uc784\uc6cc\ud06c \uacb0\ud569",
+       "description": "PyTorch Documentation. Explore PyTorch, an open-source machine learning library that accelerates the path from research prototyping to production deployment. Discover tutorials, API references, and guides to help you build and deploy deep learning models efficiently.",
+       "url": "/advanced/rpc_ddp_tutorial.html",
+       "articleBody": "\ubd84\uc0b0 \ub370\uc774\ud130 \ubcd1\ub82c(DDP)\uacfc \ubd84\uc0b0 RPC \ud504\ub808\uc784\uc6cc\ud06c \uacb0\ud569# \uc800\uc790: Pritam Damania and Yi Wang \ubc88\uc5ed: \ubc15\ub2e4\uc815 \ucc38\uace0 \uc774 \ud29c\ud1a0\ub9ac\uc5bc\uc758 \uc18c\uc2a4 \ucf54\ub4dc\ub294 GitHub \uc5d0\uc11c \ud655\uc778\ud558\uace0 \ubcc0\uacbd\ud574 \ubcfc \uc218 \uc788\uc2b5\ub2c8\ub2e4. \uc774 \ud29c\ud1a0\ub9ac\uc5bc\uc740 \uac04\ub2e8\ud55c \uc608\uc81c\ub97c \uc0ac\uc6a9\ud558\uc5ec \ubd84\uc0b0 \ub370\uc774\ud130 \ubcd1\ub82c \ucc98\ub9ac(distributed data parallelism)\uc640 \ubd84\uc0b0 \ubaa8\ub378 \ubcd1\ub82c \ucc98\ub9ac(distributed model parallelism)\ub97c \uacb0\ud569\ud558\uc5ec \uac04\ub2e8\ud55c \ubaa8\ub378 \ud559\uc2b5\uc2dc\ud0ac \ub54c \ubd84\uc0b0 \ub370\uc774\ud130 \ubcd1\ub82c(DistributedDataParallel) (DDP)\uacfc \ubd84\uc0b0 RPC \ud504\ub808\uc784\uc6cc\ud06c(Distributed RPC framework) \ub97c \uacb0\ud569\ud558\ub294 \ubc29\ubc95\uc5d0 \ub300\ud574 \uc124\uba85\ud569\ub2c8\ub2e4. \uc608\uc81c\uc758 \uc18c\uc2a4 \ucf54\ub4dc\ub294 `\uc5ec\uae30 \u003cpytorch/examples\u003e`__\uc5d0\uc11c \ud655\uc778\ud560 \uc218 \uc788\uc2b5\ub2c8\ub2e4. \uc774\uc804 \ud29c\ud1a0\ub9ac\uc5bc \ub0b4\uc6a9\uc774\uc5c8\ub358 `\ubd84\uc0b0 \ub370\uc774\ud130 \ubcd1\ub82c \uc2dc\uc791\ud558\uae30 \u003chttps://tutorials.pytorch.kr/intermediate/ddp_tutorial.html\u003e`__\uc640 `\ubd84\uc0b0 RPC \ud504\ub808\uc784\uc6cc\ud06c \uc2dc\uc791\ud558\uae30 \u003chttps://tutorials.pytorch.kr/intermediate/rpc_tutorial.html\u003e`__\ub294 \ubd84\uc0b0 \ub370\uc774\ud130 \ubcd1\ub82c \ubc0f \ubd84\uc0b0 \ubaa8\ub378 \ubcd1\ub82c \ud559\uc2b5\uc744 \uac01\uac01 \uc218\ud589\ud558\ub294 \ubc29\ubc95\uc5d0 \ub300\ud574 \uc124\uba85\ud569\ub2c8\ub2e4. \uadf8\ub7ec\ub098 \uc774 \ub450 \uac00\uc9c0 \uae30\uc220\uc744 \uacb0\ud569\ud560 \uc218 \uc788\ub294 \uba87 \uac00\uc9c0 \ud559\uc2b5 \ud328\ub7ec\ub2e4\uc784\uc774 \uc788\uc2b5\ub2c8\ub2e4. \uc608\ub97c \ub4e4\uc5b4: \ud76c\uc18c \ubd80\ubd84(\ud070 \uc784\ubca0\ub529 \ud14c\uc774\ube14)\uacfc \ubc00\uc9d1 \ubd80\ubd84(FC \ub808\uc774\uc5b4)\uc774 \uc788\ub294 \ubaa8\ub378\uc774 \uc788\ub294 \uacbd\uc6b0, \ub9e4\uac1c\ubcc0\uc218 \uc11c\ubc84(parameter server)\uc5d0 \uc784\ubca0\ub529 \ud14c\uc774\ube14(embedding table)\uc744 \ub193\uace0 `\ubd84\uc0b0 \ub370\uc774\ud130 \ubcd1\ub82c \u003chttps://pytorch.org/docs/stable/nn.html#torch.nn.parallel.DistributedDataParallel\u003e`__\uc744 \uc0ac\uc6a9\ud558\uc5ec \uc5ec\ub7ec \ud2b8\ub808\uc774\ub108\uc5d0 \uac78\uccd0 FC \ub808\uc774\uc5b4\ub97c \ubcf5\uc81c\ud558\ub294 \uac83\uc744 \uc6d0\ud560 \uc218\ub3c4 \uc788\uc2b5\ub2c8\ub2e4. \uc774\ub54c `\ubd84\uc0b0 RPC \ud504\ub808\uc784\uc6cc\ud06c \u003chttps://pytorch.org/docs/master/rpc.html\u003e`__\ub294 \ub9e4\uac1c\ubcc0\uc218 \uc11c\ubc84\uc5d0\uc11c \uc784\ubca0\ub529 \ucc3e\uae30 \uc791\uc5c5(embedding lookup)\uc744 \uc218\ud589\ud558\ub294 \ub370 \uc0ac\uc6a9\ud560 \uc218 \uc788\uc2b5\ub2c8\ub2e4. \ub2e4\uc74c\uc740 PipeDream \ubb38\uc11c\uc5d0\uc11c \uc124\uba85\ub41c \ud558\uc774\ube0c\ub9ac\ub4dc \ubcd1\ub82c \ucc98\ub9ac \ud65c\uc131\ud654\ud558\uae30 \uc785\ub2c8\ub2e4. \ubd84\uc0b0 RPC \ud504\ub808\uc784\uc6cc\ud06c \ub97c \uc0ac\uc6a9\ud558\uc5ec \uc5ec\ub7ec worker\uc5d0 \uac78\uccd0 \ubaa8\ub378\uc758 \ub2e8\uacc4\ub97c \ud30c\uc774\ud504\ub77c\uc778(pipeline)\ud560 \uc218 \uc788\uace0 (\ud544\uc694\uc5d0 \ub530\ub77c) `\ubd84\uc0b0 \ub370\uc774\ud130 \ubcd1\ub82c \u003chttps://pytorch.org/docs/stable/nn.html#torch.nn.parallel.DistributedDataParallel\u003e`__\uc744 \uc774\uc6a9\ud574\uc11c \uac01 \ub2e8\uacc4\ub97c \ubcf5\uc81c\ud560 \uc218 \uc788\uc2b5\ub2c8\ub2e4. \uc774 \ud29c\ud1a0\ub9ac\uc5bc\uc5d0\uc11c\ub294 \uc704\uc5d0\uc11c \uc5b8\uae09\ud55c \uccab \ubc88\uc9f8 \uacbd\uc6b0\ub97c \ub2e4\ub8f0 \uac83\uc785\ub2c8\ub2e4. \ub2e4\uc74c\uacfc \uac19\uc774 \ucd1d 4\uac1c\uc758 worker\uac00 \uc788\uc2b5\ub2c8\ub2e4: 1\uac1c\uc758 \ub9c8\uc2a4\ud130\ub294 \ub9e4\uac1c\ubcc0\uc218 \uc11c\ubc84\uc5d0 \uc784\ubca0\ub529 \ud14c\uc774\ube14(nn.EmbeddingBag) \uc0dd\uc131\uc744 \ub2f4\ub2f9\ud569\ub2c8\ub2e4. \ub610\ud55c \ub9c8\uc2a4\ud130\ub294 \ub450 \ud2b8\ub808\uc774\ub108\uc758 \ud559\uc2b5 \ub8e8\ud504\ub97c \uc218\ud589\ud569\ub2c8\ub2e4. 1\uac1c\uc758 \ub9e4\uac1c\ubcc0\uc218 \uc11c\ubc84\ub294 \uae30\ubcf8\uc801\uc73c\ub85c \uba54\ubaa8\ub9ac\uc5d0 \uc784\ubca0\ub529 \ud14c\uc774\ube14\uc744 \ubcf4\uc720\ud558\uace0 \ub9c8\uc2a4\ud130 \ubc0f \ud2b8\ub808\uc774\ub108\uc758 RPC\uc5d0 \uc751\ub2f5\ud569\ub2c8\ub2e4. 2\uac1c\uc758 \ud2b8\ub808\uc774\ub108\ub294 `\ubd84\uc0b0 \ub370\uc774\ud130 \ubcd1\ub82c \u003chttps://pytorch.org/docs/stable/nn.html#torch.nn.parallel.DistributedDataParallel\u003e`__\uc744 \uc0ac\uc6a9\ud558\uc5ec \uc790\uccb4\uc801\uc73c\ub85c \ubcf5\uc81c\ub418\ub294 FC \ub808\uc774\uc5b4(nn.Linear)\ub97c \uc800\uc7a5\ud569\ub2c8\ub2e4. \ud2b8\ub808\uc774\ub108\ub294 \ub610\ud55c \uc21c\ubc29\ud5a5 \uc804\ub2ec(forward pass), \uc5ed\ubc29\ud5a5 \uc804\ub2ec(backward pass) \ubc0f \ucd5c\uc801\ud654 \ub2e8\uacc4\ub97c \uc2e4\ud589\ud574\uc57c \ud569\ub2c8\ub2e4. \uc804\uccb4\uc801\uc778 \ud559\uc2b5\uacfc\uc815\uc740 \ub2e4\uc74c\uacfc \uac19\uc774 \uc2e4\ud589\ub429\ub2c8\ub2e4: \ub9c8\uc2a4\ud130\ub294 \ub9e4\uac1c\ubcc0\uc218 \uc11c\ubc84\uc5d0 \uc784\ubca0\ub529 \ud14c\uc774\ube14\uc744 \ub2f4\uace0 \uc788\ub294 `\uc6d0\uaca9 \ubaa8\ub4c8(RemoteModule) \u003chttps://pytorch.org/docs/master/rpc.html#remotemodule\u003e`__\uc744 \uc0dd\uc131\ud569\ub2c8\ub2e4. \uadf8\ub7f0 \ub2e4\uc74c \ub9c8\uc2a4\ud130\ub294 \ud2b8\ub808\uc774\ub108\uc758 \ud559\uc2b5 \ub8e8\ud504\ub97c \uc2dc\uc791\ud558\uace0 \uc6d0\uaca9 \ubaa8\ub4c8(remote module)\uc744 \ud2b8\ub808\uc774\ub108\uc5d0\uac8c \uc804\ub2ec\ud569\ub2c8\ub2e4. \ud2b8\ub808\uc774\ub108\ub294 \uba3c\uc800 \ub9c8\uc2a4\ud130\uc5d0\uc11c \uc81c\uacf5\ud558\ub294 \uc6d0\uaca9 \ubaa8\ub4c8\uc744 \uc0ac\uc6a9\ud558\uc5ec \uc784\ubca0\ub529 \ucc3e\uae30 \uc791\uc5c5(embedding lookup)\uc744 \uc218\ud589\ud55c \ub2e4\uc74c DDP \ub0b4\ubd80\uc5d0 \uac10\uc2f8\uc9c4 FC \ub808\uc774\uc5b4\ub97c \uc2e4\ud589\ud558\ub294 ``HybridModel``\uc744 \uc0dd\uc131\ud569\ub2c8\ub2e4. \ud2b8\ub808\uc774\ub108\ub294 \ubaa8\ub378\uc758 \uc21c\ubc29\ud5a5 \uc804\ub2ec\uc744 \uc2e4\ud589\ud558\uace0 \uc190\uc2e4\uc744 \uc0ac\uc6a9\ud558\uc5ec \ubd84\uc0b0 Autograd \ub97c \uc0ac\uc6a9\ud558\uc5ec \uc5ed\ubc29\ud5a5 \uc804\ub2ec\uc744 \uc2e4\ud589\ud569\ub2c8\ub2e4. \uc5ed\ubc29\ud5a5 \uc804\ub2ec\uc758 \uc77c\ubd80\ub85c FC \ub808\uc774\uc5b4\uc758 \ubcc0\ud654\ub3c4\uac00 \uba3c\uc800 \uacc4\uc0b0\ub418\uace0 DDP\uc758 allreduce\ub97c \ud1b5\ud574 \ubaa8\ub4e0 \ud2b8\ub808\uc774\ub108\uc640 \ub3d9\uae30\ud654\ub429\ub2c8\ub2e4. \ub2e4\uc74c\uc73c\ub85c, \ubd84\uc0b0 Autograd\ub294 \ub9e4\uac1c\ubcc0\uc218 \uc11c\ubc84\ub85c \ubcc0\ud654\ub3c4\ub97c \uc804\ud30c\ud558\uace0 \uadf8\uacf3\uc5d0\uc11c \uc784\ubca0\ub529 \ud14c\uc774\ube14\uc758 \ubcc0\ud654\ub3c4\uac00 \uc5c5\ub370\uc774\ud2b8\ub429\ub2c8\ub2e4. \ub9c8\uc9c0\ub9c9\uc73c\ub85c, `\ubd84\uc0b0 \uc635\ud2f0\ub9c8\uc774\uc800(DistributedOptimizer) \u003chttps://pytorch.org/docs/master/rpc.html#module-torch.distributed.optim\u003e`__\ub294 \ubaa8\ub4e0 \ub9e4\uac1c\ubcc0\uc218\ub97c \uc5c5\ub370\uc774\ud2b8\ud558\ub294 \ub370 \uc0ac\uc6a9\ub429\ub2c8\ub2e4. \uacbd\uace0 DDP\uc640 RPC\ub97c \uacb0\ud569\ud560 \ub54c, \uc5ed\ubc29\ud5a5 \uc804\ub2ec\uc5d0 \ub300\ud574 \ud56d\uc0c1 \ubd84\uc0b0 Autograd \ub97c \uc0ac\uc6a9\ud574\uc57c \ud569\ub2c8\ub2e4. \uc774\uc81c \uac01 \ubd80\ubd84\uc744 \uc790\uc138\ud788 \uc0b4\ud3b4\ubcf4\uaca0\uc2b5\ub2c8\ub2e4. \uba3c\uc800 \ud559\uc2b5\uc744 \uc218\ud589\ud558\uae30 \uc804\uc5d0 \ubaa8\ub4e0 \uc791\uc5c5\uc790\ub97c \uc124\uc815\ud574\uc57c \ud569\ub2c8\ub2e4. \uc21c\uc704 0\uacfc 1\uc740 \ud2b8\ub808\uc774\ub108, \uc21c\uc704 2\ub294 \ub9c8\uc2a4\ud130, \uc21c\uc704 3\uc740 \ub9e4\uac1c\ubcc0\uc218 \uc11c\ubc84\uc778 4\uac1c\uc758 \ud504\ub85c\uc138\uc2a4\ub97c \ub9cc\ub4ed\ub2c8\ub2e4. TCP init_method\ub97c \uc0ac\uc6a9\ud558\uc5ec 4\uac1c\uc758 \ubaa8\ub4e0 worker\uc5d0\uc11c RPC \ud504\ub808\uc784\uc6cc\ud06c\ub97c \ucd08\uae30\ud654\ud569\ub2c8\ub2e4. RPC \ucd08\uae30\ud654\uac00 \ub05d\ub098\uba74, \ub9c8\uc2a4\ud130\ub294 EmbeddingBag \ub808\uc774\uc5b4\ub97c \uc6d0\uaca9 \ubaa8\ub4c8(RemoteModule) \u003chttps://pytorch.org/docs/master/rpc.html#remotemodule\u003e`__\uc744 \uc0ac\uc6a9\ud558\uc5ec \ub9e4\uac1c\ubcc0\uc218 \uc11c\ubc84\uc5d0 \ub2f4\uace0 \uc788\ub294 \uc6d0\uaca9 \ubaa8\ub4c8 \ud558\ub098\ub97c \uc0dd\uc131\ud569\ub2c8\ub2e4. \uadf8\ub7f0 \ub2e4\uc74c \ub9c8\uc2a4\ud130\ub294 \uac01 \ud2b8\ub808\uc774\ub108\ub97c \ubc18\ubcf5\ud558\uace0 `rpc_async \ub97c \uc0ac\uc6a9\ud558\uc5ec \uac01 \ud2b8\ub808\uc774\ub108\uc5d0\uc11c ``_run_trainer``\ub97c \ud638\ucd9c\ud558\uc5ec \ubc18\ubcf5 \ud559\uc2b5\uc744 \uc2dc\uc791\ud569\ub2c8\ub2e4. \ub9c8\uc9c0\ub9c9\uc73c\ub85c \ub9c8\uc2a4\ud130\ub294 \uc885\ub8cc\ud558\uae30 \uc804\uc5d0 \ubaa8\ub4e0 \ud559\uc2b5\uc774 \uc644\ub8cc\ub420 \ub54c\uae4c\uc9c0 \uae30\ub2e4\ub9bd\ub2c8\ub2e4. \ud2b8\ub808\uc774\ub108\ub294 init_process_group \u003chttps://pytorch.org/docs/stable/distributed.html#torch.distributed.init_process_group\u003e`__\uc744 \uc0ac\uc6a9\ud558\uc5ec (2\uac1c\uc758 \ud2b8\ub808\uc774\ub108) world_size=2\ub85c DDP\ub97c \uc704\ud574 ``ProcessGroup``\uc744 \ucd08\uae30\ud654\ud569\ub2c8\ub2e4. \ub2e4\uc74c\uc73c\ub85c TCP init_method\ub97c \uc0ac\uc6a9\ud558\uc5ec RPC \ud504\ub808\uc784\uc6cc\ud06c\ub97c \ucd08\uae30\ud654\ud569\ub2c8\ub2e4. \uc5ec\uae30\uc11c \uc8fc\uc758 \ud560 \uc810\uc740 RPC \ucd08\uae30\ud654\uc640 ProgressGroup \ucd08\uae30\ud654\uc5d0\uc11c \uc4f0\uc774\ub294 \ud3ec\ud2b8(port)\uac00 \ub2e4\ub974\ub2e4\ub294 \uac83\uc785\ub2c8\ub2e4. \uc774\ub294 \ub450 \ud504\ub808\uc784\uc6cc\ud06c\uc758 \ucd08\uae30\ud654 \uac04\uc5d0 \ud3ec\ud2b8 \ucda9\ub3cc\uc744 \ud53c\ud558\uae30 \uc704\ud574\uc11c \uc785\ub2c8\ub2e4. \ucd08\uae30\ud654\uac00 \uc644\ub8cc\ub418\uba74 \ud2b8\ub808\uc774\ub108\ub294 \ub9c8\uc2a4\ud130\uc758 ``_run_trainer RPC\ub97c \uae30\ub2e4\ub9ac\uae30\ub9cc \ud558\uba74 \ub429\ub2c8\ub2e4. \ud30c\ub77c\ud53c\ud130 \uc11c\ubc84\ub294 RPC \ud504\ub808\uc784\uc6cc\ud06c\ub97c \ucd08\uae30\ud654\ud558\uace0 \ud2b8\ub808\uc774\ub108\uc640 \ub9c8\uc2a4\ud130\uc758 RPC\ub97c \uae30\ub2e4\ub9bd\ub2c8\ub2e4. def run_worker(rank, world_size): r\"\"\" \uc774 \ud568\uc218\ub294 RPC\ub97c \ucd08\uae30\ud654\ud558\uace0, \ud568\uc218\ub97c \ud638\ucd9c\ud558\uace0, RPC\ub97c \uc885\ub8cc\ud558\ub294 \ub798\ud37c \ud568\uc218(wrapper function)\uc785\ub2c8\ub2e4. \"\"\" # \ud3ec\ud2b8 \ucda9\ub3cc\uc744 \ud53c\ud558\uae30 \uc704\ud574 init_rpc \ubc0f init_process_group\uc5d0 \ub300\ud574 # TCP init_method\uc5d0\uc11c \ub2e4\ub978 \ud3ec\ud2b8 \ubc88\ud638\ub97c \uc0ac\uc6a9\ud574\uc57c \ud569\ub2c8\ub2e4. rpc_backend_options = TensorPipeRpcBackendOptions() rpc_backend_options.init_method = \"tcp://localhost:29501\" # \uc21c\uc704(rank) 2\ub294 master\ub97c \uc758\ubbf8\ud558\uace0, 3\uc740 \ub9e4\uac1c\ubcc0\uc218 \uc11c\ubc84, \uadf8\ub9ac\uace0 0\uacfc 1\uc740 \ud2b8\ub808\uc774\ub108\ub97c \ub73b\ud569\ub2c8\ub2e4. if rank == 2: rpc.init_rpc( \"master\", rank=rank, world_size=world_size, rpc_backend_options=rpc_backend_options, ) remote_emb_module = RemoteModule( \"ps\", torch.nn.EmbeddingBag, args=(NUM_EMBEDDINGS, EMBEDDING_DIM), kwargs={\"mode\": \"sum\"}, ) # \ud2b8\ub808\uc774\ub108\uc5d0\uc11c \ud559\uc2b5 \ub8e8\ud504\ub97c \uc2e4\ud589\ud569\ub2c8\ub2e4. futs = [] for trainer_rank in [0, 1]: trainer_name = \"trainer{}\".format(trainer_rank) fut = rpc.rpc_async( trainer_name, _run_trainer, args=(remote_emb_module, trainer_rank) ) futs.append(fut) # \ubaa8\ub4e0 \ud559\uc2b5\uc774 \ub05d\ub0a0 \ub54c\uae4c\uc9c0 \uae30\ub2e4\ub9bd\ub2c8\ub2e4. for fut in futs: fut.wait() elif rank \u003c= 1: # \ud2b8\ub808\uc774\ub108\uc5d0\uc11c \ubd84\uc0b0 \ub370\uc774\ud130 \ubcd1\ub82c\uc5d0 \ub300\ud55c \ud504\ub85c\uc138\uc2a4 \uadf8\ub8f9\uc744 \ucd08\uae30\ud654\ud569\ub2c8\ub2e4. dist.init_process_group( backend=\"gloo\", rank=rank, world_size=2, init_method=\"tcp://localhost:29500\" ) # RPC\ub97c \ucd08\uae30\ud654\ud569\ub2c8\ub2e4. trainer_name = \"trainer{}\".format(rank) rpc.init_rpc( trainer_name, rank=rank, world_size=world_size, rpc_backend_options=rpc_backend_options, ) # \ud2b8\ub808\uc774\ub108\ub294 \ub9c8\uc2a4\ud130\uc758 RPC\ub97c \uae30\ub2e4\ub9ac\uae30\ub9cc \ud569\ub2c8\ub2e4. else: rpc.init_rpc( \"ps\", rank=rank, world_size=world_size, rpc_backend_options=rpc_backend_options, ) # \ub9e4\uac1c\ubcc0\uc218 \uc11c\ubc84\ub294 \uc544\ubb34\uac83\ub3c4 \ud558\uc9c0 \uc54a\uc2b5\ub2c8\ub2e4. pass # \ubaa8\ub4e0 rpc\uac00 \ub05d\ub0a0 \ub54c\uae4c\uc9c0 \ucc28\ub2e8\ud569\ub2c8\ub2e4. rpc.shutdown() if __name__ == \"__main__\": # 2\uac1c\uc758 \ud2b8\ub808\uc774\ub108, 1\uac1c\uc758 \ub9e4\uac1c\ubcc0\uc218 \uc11c\ubc84, 1\uac1c\uc758 \ub9c8\uc2a4\ud130 world_size = 4 mp.spawn(run_worker, args=(world_size,), nprocs=world_size, join=True) \ud2b8\ub808\uc774\ub108\uc5d0 \ub300\ud55c \uc790\uc138\ud55c \uc124\uba85\uc5d0 \uc55e\uc11c, \ud2b8\ub808\uc774\ub108\uac00 \uc0ac\uc6a9\ud558\ub294 HybridModel``\uc5d0 \ub300\ud574 \uc124\uba85\ub4dc\ub9ac\uaca0\uc2b5\ub2c8\ub2e4. \uc544\ub798\uc5d0 \uc124\uba85\ub41c \ub300\ub85c ``HybridModel``\uc740 \ub9e4\uac1c\ubcc0\uc218 \uc11c\ubc84\uc758 \uc784\ubca0\ub529 \ud14c\uc774\ube14(``remote_emb_module)\uacfc DDP\uc5d0 \uc0ac\uc6a9\ud560 ``device``\ub97c \ubcf4\uc720\ud558\ub294 \uc6d0\uaca9 \ubaa8\ub4c8\uc744 \uc0ac\uc6a9\ud558\uc5ec \ucd08\uae30\ud654\ub429\ub2c8\ub2e4. \ubaa8\ub378 \ucd08\uae30\ud654\ub294 DDP \ub0b4\ubd80\uc758 nn.Linear \ub808\uc774\uc5b4\ub97c \uac10\uc2f8 \ubaa8\ub4e0 \ud2b8\ub808\uc774\ub108\uc5d0\uc11c \uc774 \ub808\uc774\uc5b4\ub97c \ubcf5\uc81c\ud558\uace0 \ub3d9\uae30\ud654\ud569\ub2c8\ub2e4. \ubaa8\ub378\uc758 \uc21c\ubc29\ud5a5(forward) \ud568\uc218\ub294 \uaf64 \uac04\ub2e8\ud569\ub2c8\ub2e4. RemoteModule\uc758 ``forward``\ub97c \uc0ac\uc6a9\ud558\uc5ec \ub9e4\uac1c\ubcc0\uc218 \uc11c\ubc84\uc5d0\uc11c \uc784\ubca0\ub529 \ucc3e\uae30 \uc791\uc5c5(embedding lookup)\uc744 \uc218\ud589\ud558\uace0 \uadf8 \ucd9c\ub825\uc744 FC \ub808\uc774\uc5b4\uc5d0 \uc804\ub2ec\ud569\ub2c8\ub2e4. class HybridModel(torch.nn.Module): r\"\"\" \ud558\uc774\ube0c\ub9ac\ub4dc \ubaa8\ub378\uc740 \ud76c\uc18c \ubd80\ubd84\uacfc \ubc00\uc9d1 \ubd80\ubd84\uc774 \uc788\ub294 \ubaa8\ub378\uc785\ub2c8\ub2e4. 1) \ubc00\uc9d1 \ubd80\ubd84\uc740 \ubd84\uc0b0 \ub370\uc774\ud130 \ubcd1\ub82c\uc744 \uc0ac\uc6a9\ud558\uc5ec \ubaa8\ub4e0 \ud2b8\ub808\uc774\ub108\uc5d0 \uac78\uccd0 \ubcf5\uc81c\ub418\ub294 nn.Linear \ubaa8\ub4c8\uc785\ub2c8\ub2e4. 2) \ud76c\uc18c \ubd80\ubd84\uc740 \ub9e4\uac1c\ubcc0\uc218 \uc11c\ubc84\uc5d0\uc11c nn.EmbeddingBag\ub97c \uac00\uc9c0\uace0 \uc788\ub294 \uc6d0\uaca9 \ubaa8\ub4c8\uc785\ub2c8\ub2e4. \uc774 \uc6d0\uaca9 \ubaa8\ub378\uc740 \ub9e4\uac1c\ubcc0\uc218 \uc11c\ubc84\uc758 \uc784\ubca0\ub529 \ud14c\uc774\ube14\uc5d0 \ub300\ud55c \uc6d0\uaca9 \ucc38\uc870(Remote Reference)\ub97c \uc5bb\uc744 \uc218 \uc788\uc2b5\ub2c8\ub2e4. \"\"\" def __init__(self, remote_emb_module, device): super(HybridModel, self).__init__() self.remote_emb_module = remote_emb_module self.fc = DDP(torch.nn.Linear(16, 8).cuda(device), device_ids=[device]) self.device = device def forward(self, indices, offsets): emb_lookup = self.remote_emb_module.forward(indices, offsets) return self.fc(emb_lookup.cuda(self.device)) \ub2e4\uc74c\uc73c\ub85c \ud2b8\ub808\uc774\ub108\uc758 \uc124\uc815\uc744 \uc0b4\ud3b4\ubcf4\uaca0\uc2b5\ub2c8\ub2e4. \ud2b8\ub808\uc774\ub108\ub294 \uba3c\uc800 \ub9e4\uac1c\ubcc0\uc218 \uc11c\ubc84\uc758 \uc784\ubca0\ub529 \ud14c\uc774\ube14\uacfc \uc790\uccb4 \uc21c\uc704\ub97c \ubcf4\uc720\ud558\ub294 \uc6d0\uaca9 \ubaa8\ub4c8\uc744 \uc0ac\uc6a9\ud558\uc5ec \uc704\uc5d0\uc11c \uc124\uba85\ud55c ``HybridModel``\uc744 \uc0dd\uc131\ud569\ub2c8\ub2e4. \uc774\uc81c \ubd84\uc0b0 \uc635\ud2f0\ub9c8\uc774\uc800(DistributedOptimizer) \u003chttps://pytorch.org/docs/master/rpc.html#module-torch.distributed.optim\u003e`__\ub85c \ucd5c\uc801\ud654\ud558\ub824\ub294 \ubaa8\ub4e0 \ub9e4\uac1c\ubcc0\uc218\uc5d0 \ub300\ud55c RRef \ubaa9\ub85d\uc744 \uac80\uc0c9\ud574\uc57c \ud569\ub2c8\ub2e4. \ub9e4\uac1c\ubcc0\uc218 \uc11c\ubc84\uc5d0\uc11c \uc784\ubca0\ub529 \ud14c\uc774\ube14\uc758 \ub9e4\uac1c\ubcc0\uc218\ub97c \uac80\uc0c9\ud558\uae30 \uc704\ud574 RemoteModule\uc758 `remote_parameters \ub97c \ud638\ucd9c\ud560 \uc218 \uc788\uc2b5\ub2c8\ub2e4. \uadf8\ub9ac\uace0 \uc774\uac83\uc740 \uae30\ubcf8\uc801\uc73c\ub85c \uc784\ubca0\ub529 \ud14c\uc774\ube14\uc758 \ubaa8\ub4e0 \ub9e4\uac1c\ubcc0\uc218\ub97c \uc0b4\ud3b4\ubcf4\uace0 RRef \ubaa9\ub85d\uc744 \ubc18\ud658\ud569\ub2c8\ub2e4. \ud2b8\ub808\uc774\ub108\ub294 RPC\ub97c \ud1b5\ud574 \ub9e4\uac1c\ubcc0\uc218 \uc11c\ubc84\uc5d0\uc11c \uc774 \uba54\uc11c\ub4dc\ub97c \ud638\ucd9c\ud558\uc5ec \uc6d0\ud558\ub294 \ub9e4\uac1c\ubcc0\uc218\uc5d0 \ub300\ud55c RRef \ubaa9\ub85d\uc744 \uc218\uc2e0\ud569\ub2c8\ub2e4. DistributedOptimizer\ub294 \ud56d\uc0c1 \ucd5c\uc801\ud654\ud574\uc57c \ud558\ub294 \ub9e4\uac1c\ubcc0\uc218\uc5d0 \ub300\ud55c RRef \ubaa9\ub85d\uc744 \uac00\uc838\uc624\uae30 \ub54c\ubb38\uc5d0 FC \ub808\uc774\uc5b4\uc758 \uc804\uc5ed \ub9e4\uac1c\ubcc0\uc218\uc5d0 \ub300\ud574\uc11c\ub3c4 RRef\ub97c \uc0dd\uc131\ud574\uc57c \ud569\ub2c8\ub2e4. \uc774\uac83\uc740 ``model.fc.parameters()``\ub97c \ud0d0\uc0c9\ud558\uace0 \uac01 \ub9e4\uac1c\ubcc0\uc218\uc5d0 \ub300\ud55c RRef\ub97c \uc0dd\uc131\ud558\uace0 ``remote_parameters()``\uc5d0\uc11c \ubc18\ud658\ub41c \ubaa9\ub85d\uc5d0 \ucd94\uac00\ud568\uc73c\ub85c\uc368 \uc218\ud589\ub429\ub2c8\ub2e4. \ucc38\uace0\ub85c ``model.parameters()``\ub294 \uc0ac\uc6a9\ud560 \uc218 \uc5c6\uc2b5\ub2c8\ub2e4. ``RemoteModule``\uc5d0\uc11c \uc9c0\uc6d0\ud558\uc9c0 \uc54a\ub294 ``model.remote_emb_module.parameters()``\ub97c \uc7ac\uadc0\uc801\uc73c\ub85c \ud638\ucd9c\ud558\uae30 \ub54c\ubb38\uc785\ub2c8\ub2e4. \ub9c8\uc9c0\ub9c9\uc73c\ub85c \ubaa8\ub4e0 RRef\ub97c \uc0ac\uc6a9\ud558\uc5ec DistributedOptimizer\ub97c \ub9cc\ub4e4\uace0 CrossEntropyLoss \ud568\uc218\ub97c \uc815\uc758\ud569\ub2c8\ub2e4. def _run_trainer(remote_emb_module, rank): r\"\"\" \uac01 \ud2b8\ub808\uc774\ub108\ub294 \ub9e4\uac1c\ubcc0\uc218 \uc11c\ubc84\uc5d0\uc11c \uc784\ubca0\ub529 \ucc3e\uae30 \uc791\uc5c5(embedding lookup)\uc744 \ud3ec\ud568\ud558\uace0 \uc804\uc5ed\uc5d0\uc11c nn.Linear\ub97c \uc2e4\ud589\ud558\ub294 \uc21c\ubc29\ud5a5 \uc804\ub2ec(forward pass)\ub97c \uc2e4\ud589\ud569\ub2c8\ub2e4. \uc5ed\ubc29\ud5a5 \uc804\ub2ec(backward pass) \ub3d9\uc548\uc5d0, \ubd84\uc0b0 \ub370\uc774\ud130 \ubcd1\ub82c\uc740 \ubc00\uc9d1 \ubd80\ubd84(nn.Linear)\uc5d0 \ub300\ud55c \ubcc0\ud654\ub3c4 \uc9d1\uacc4\ub97c \ub2f4\ub2f9\ud558\uace0 \ubd84\uc0b0 autograd\ub294 \ubcc0\ud654\ub3c4 \uc5c5\ub370\uc774\ud2b8\uac00 \ub9e4\uac1c\ubcc0\uc218 \uc11c\ubc84\ub85c \uc804\ud30c\ub418\ub3c4\ub85d \ud569\ub2c8\ub2e4. \"\"\" # \ubaa8\ub378\uc744 \uc0dd\uc131\ud569\ub2c8\ub2e4. model = HybridModel(remote_emb_module, rank) # \ubaa8\ub4e0 \ubaa8\ub378 \ub9e4\uac1c\ubcc0\uc218\ub97c \ubd84\uc0b0 \uc635\ud2f0\ub9c8\uc774\uc800\uc5d0 \ub300\ud55c rrefs\ub85c \uac80\uc0c9\ud569\ub2c8\ub2e4. # \uc784\ubca0\ub529 \ud14c\uc774\ube14\uc5d0 \ub300\ud55c \ub9e4\uac1c\ubcc0\uc218\ub97c \uac80\uc0c9\ud569\ub2c8\ub2e4. model_parameter_rrefs = model.remote_emb_module.remote_parameters() # model.fc.parameters()\uc740 \uc624\uc9c1 \uc9c0\uc5ed \ub9e4\uac1c\ubcc0\uc218\ub9cc \ud3ec\ud568\ud569\ub2c8\ub2e4. # \ucc38\uace0: \uc5ec\uae30\uc5d0\uc11c\ub294 model.parameters()\ub97c \ud638\ucd9c\ud560 \uc218 \uc5c6\uc2b5\ub2c8\ub2e4. # \uc65c\ub0d0\ud558\uba74 parameters()\uac00 \uc544\ub2c8\ub77c remote_parameters()\ub97c \uc9c0\uc6d0\ud558\ub294 # remote_emb_module.parameters()\ub97c \ud638\ucd9c\ud558\uae30 \ub54c\ubb38\uc785\ub2c8\ub2e4. for param in model.fc.parameters(): model_parameter_rrefs.append(RRef(param)) # \ubd84\uc0b0 \uc635\ud2f0\ub9c8\uc774\uc800\ub97c \uc124\uc815\ud569\ub2c8\ub2e4. opt = DistributedOptimizer( optim.SGD, model_parameter_rrefs, lr=0.05, ) criterion = torch.nn.CrossEntropyLoss() \uc774\uc81c \uac01 \ud2b8\ub808\uc774\ub108\uc5d0\uc11c \uc2e4\ud589\ub418\ub294 \uae30\ubcf8 \ud559\uc2b5 \ub8e8\ud504\ub97c \uc18c\uac1c\ud558\uaca0\uc2b5\ub2c8\ub2e4. ``get_next_batch``\ub294 \ud559\uc2b5\uc744 \uc704\ud55c \uc784\uc758\uc758 \uc785\ub825\uacfc \ub300\uc0c1\uc744 \uc0dd\uc131\ud558\ub294 \uac83\uc744 \ub3c4\uc640\uc8fc\ub294 \ud568\uc218\uc77c \ubfd0\uc785\ub2c8\ub2e4. \uc5ec\ub7ec \uc5d0\ud3ed(epoch)\uacfc \uac01 \ubc30\uce58(batch)\uc5d0 \ub300\ud574 \ud559\uc2b5 \ub8e8\ud504\ub97c \uc2e4\ud589\ud569\ub2c8\ub2e4: \uba3c\uc800 \ubd84\uc0b0 Autograd\uc5d0 \ub300\ud574 \ubd84\uc0b0 Autograd Context \ub97c \uc124\uc815\ud569\ub2c8\ub2e4. \ubaa8\ub378\uc758 \uc21c\ubc29\ud5a5 \uc804\ub2ec\uc744 \uc2e4\ud589\ud558\uace0 \ud574\ub2f9 \ucd9c\ub825\uc744 \uac80\uc0c9(retrieve)\ud569\ub2c8\ub2e4. \uc190\uc2e4 \ud568\uc218\ub97c \uc0ac\uc6a9\ud558\uc5ec \ucd9c\ub825\uacfc \ubaa9\ud45c\ub97c \uae30\ubc18\uc73c\ub85c \uc190\uc2e4\uc744 \uacc4\uc0b0\ud569\ub2c8\ub2e4. \ubd84\uc0b0 Autograd\ub97c \uc0ac\uc6a9\ud558\uc5ec \uc190\uc2e4\uc744 \uc0ac\uc6a9\ud558\uc5ec \ubd84\uc0b0 \uc5ed\ubc29\ud5a5 \uc804\ub2ec\uc744 \uc2e4\ud589\ud569\ub2c8\ub2e4. \ub9c8\uc9c0\ub9c9\uc73c\ub85c \ubd84\uc0b0 \uc635\ud2f0\ub9c8\uc774\uc800 \ub2e8\uacc4\ub97c \uc2e4\ud589\ud558\uc5ec \ubaa8\ub4e0 \ub9e4\uac1c\ubcc0\uc218\ub97c \ucd5c\uc801\ud654\ud569\ub2c8\ub2e4. def get_next_batch(rank): for _ in range(10): num_indices = random.randint(20, 50) indices = torch.LongTensor(num_indices).random_(0, NUM_EMBEDDINGS) # \uc624\ud504\uc14b(offset)\uc744 \uc0dd\uc131\ud569\ub2c8\ub2e4. offsets = [] start = 0 batch_size = 0 while start \u003c num_indices: offsets.append(start) start += random.randint(1, 10) batch_size += 1 offsets_tensor = torch.LongTensor(offsets) target = torch.LongTensor(batch_size).random_(8).cuda(rank) yield indices, offsets_tensor, target # 100\uac1c\uc758 \uc5d0\ud3ed(epoch)\uc5d0 \ub300\ud574 \ud559\uc2b5\ud569\ub2c8\ub2e4. for epoch in range(100): # \ubd84\uc0b0 autograd context\ub97c \uc0dd\uc131\ud569\ub2c8\ub2e4. for indices, offsets, target in get_next_batch(rank): with dist_autograd.context() as context_id: output = model(indices, offsets) loss = criterion(output, target) # \ubd84\uc0b0 \uc5ed\ubc29\ud5a5 \uc804\ub2ec(distributed backward pass)\uc744 \uc2e4\ud589\ud569\ub2c8\ub2e4. dist_autograd.backward(context_id, [loss]) # \ubd84\uc0b0 \uc635\ud2f0\ub9c8\uc774\uc800\ub97c \uac31\uc2e0\ud569\ub2c8\ub2e4. opt.step(context_id) # \ubc18\ubcf5\ub420 \ub54c\ub9c8\ub2e4 \ub2e4\ub978 \ubcc0\ud654\ub3c4\ub97c \ud638\uc2a4\ud305\ud558\ub294 \ud558\ub098\uc758 \ub2e4\ub978 \ubd84\uc0b0 autograd context\ub97c \uc0dd\uc131\ud558\ubbc0\ub85c # \ubcc0\ud654\ub3c4\ub97c 0\uc73c\ub85c \ub9cc\ub4e4 \ud544\uc694\uac00 \uc5c6\uc2b5\ub2c8\ub2e4. print(\"Training done for epoch {}\".format(epoch)) \uc804\uccb4 \uc608\uc81c\uc758 \uc18c\uc2a4 \ucf54\ub4dc\ub294 `\uc5ec\uae30 \u003cpytorch/examples\u003e`__\uc5d0\uc11c \ucc3e\uc744 \uc218 \uc788\uc2b5\ub2c8\ub2e4.",
+       "author": {
+         "@type": "Organization",
+         "name": "PyTorch Contributors",
+         "url": "https://pytorch.org"
+       },
+       "image": "../_static/img/pytorch_seo.png",
+       "mainEntityOfPage": {
+         "@type": "WebPage",
+         "@id": "/advanced/rpc_ddp_tutorial.html"
+       },
+       "datePublished": "2023-01-01T00:00:00Z",
+       "dateModified": "2023-01-01T00:00:00Z"
+     }
+ </script>
+  <script>
+    // Tutorials Call to action event tracking
+    $("[data-behavior='call-to-action-event']").on('click', function () {
+      fbq('trackCustom', "Download", {
+        tutorialTitle: $('h1:first').text(),
+        downloadLink: this.href,
+        tutorialLink: window.location.href,
+        downloadTitle: $(this).attr("data-response")
       });
-    })
+      if (typeof gtag === 'function') {
+        gtag('event', 'click', {
+          'event_category': $(this).attr("data-response"),
+          'event_label': $("h1").first().text(),
+          'tutorial_link': window.location.href
+        });
+      }
+    });
   </script>
-</body>
+  
+  </body>
 </html>

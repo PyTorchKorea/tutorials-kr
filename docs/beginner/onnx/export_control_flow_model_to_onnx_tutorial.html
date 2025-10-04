@@ -1,0 +1,2353 @@
+
+<!DOCTYPE html>
+
+
+<html lang="ko" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <meta property="article:modified_time" content="2024-06-09T15:35:40+00:00" /><meta property="og:title" content="Export a model with control flow to ONNX" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://tutorials.pytorch.kr/beginner/onnx/export_control_flow_model_to_onnx_tutorial.html" />
+<meta property="og:site_name" content="PyTorch Tutorials KR" />
+<meta property="og:description" content="Introduction to ONNX|| Exporting a PyTorch model to ONNX|| Extending the ONNX exporter operator support||`Export a model with control flow to ONNX Author: Xavier Dupré Overview: This tutorial demonstrates how to handle control flow logic while exporting a PyTorch model to ONNX. It highlights the ..." />
+<meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
+<meta property="og:image:alt" content="PyTorch Tutorials KR" />
+<meta name="description" content="Introduction to ONNX|| Exporting a PyTorch model to ONNX|| Extending the ONNX exporter operator support||`Export a model with control flow to ONNX Author: Xavier Dupré Overview: This tutorial demonstrates how to handle control flow logic while exporting a PyTorch model to ONNX. It highlights the ..." />
+<meta property="og:ignore_canonical" content="true" />
+
+    <title>Export a model with control flow to ONNX &#8212; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=536c50fe" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=4d2595e5" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/katex-math.css?v=91adb8b6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/pytorch_theme.css?v=c326296f" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=097efa9c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom2.css?v=b169ea90" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../../_static/documentation_options.js?v=725a5b95"></script>
+    <script src="../../_static/doctools.js?v=92e14aea"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/translations.js?v=b5f768d8"></script>
+    <script src="../../_static/katex.min.js?v=be8ff15f"></script>
+    <script src="../../_static/auto-render.min.js?v=ad136472"></script>
+    <script src="../../_static/katex_autorenderer.js?v=bebc588a"></script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'beginner/onnx/export_control_flow_model_to_onnx_tutorial';</script>
+    <link rel="canonical" href="https://tutorials.pytorch.kr/beginner/onnx/export_control_flow_model_to_onnx_tutorial.html" />
+    <link rel="icon" href="../../_static/favicon.ico"/>
+    <link rel="index" title="색인" href="../../genindex.html" />
+    <link rel="search" title="검색" href="../../search.html" />
+    <link rel="next" title="Building a Convolution/Batch Norm fuser with torch.compile" href="../../intermediate/torch_compile_conv_bn_fuser.html" />
+    <link rel="prev" title="Extending the ONNX Registry" href="onnx_registry_tutorial.html" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="ko"/>
+    <meta name="docbuild:last-update" content="2024년 06월 09일"/>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/2.3.1/list.min.js"></script>
+<script>
+  if (window.location.hostname === 'docs.pytorch.org' || window.location.hostname === 'docs-preview.pytorch.org') {
+    const script = document.createElement('script');
+    script.src = 'https://cmp.osano.com/16A0DbT9yDNIaQkvZ/31b1b91a-e0b6-47ea-bde2-7f2bd13dbe5c/osano.js?variant=one';
+    document.head.appendChild(script);
+  }
+</script>
+<script>
+  // Cookie banner for non-LF projects
+  document.addEventListener('DOMContentLoaded', function () {
+    // Hide cookie banner on local environments and LF owned docs
+    if (window.location.hostname === 'localhost' ||
+      window.location.hostname === '0.0.0.0' ||
+      window.location.hostname === '127.0.0.1' ||
+      window.location.hostname === 'docs.pytorch.org' ||
+      window.location.hostname === 'docs-preview.pytorch.org' ||
+      window.location.hostname.startsWith('192.168.')) {
+      const banner = document.querySelector('.cookie-banner-wrapper');
+      if (banner) {
+        banner.style.display = 'none';
+      }
+    }
+  });
+</script>
+<!-- Conditional CSS for header and footer height adjustment -->
+
+<link rel="stylesheet" type="text/css" href="../../_static/css/theme.css" crossorigin="anonymous">
+<script type="text/javascript" src="../../_static/js/theme.js"></script>
+<script type="text/javascript" src="../../_static/js/dropdown-menu.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700&family=Nanum+Gothic+Coding:wght@400;700&family=Montserrat:wght@300;400&display=swap" rel="stylesheet">
+<meta property="og:image" content="../../_static/img/pytorch_seo.png" />
+<link rel="stylesheet" href="../../_static/webfonts/all.min.css" crossorigin="anonymous">
+<meta http-equiv="Content-Security-Policy"
+  content="default-src * 'unsafe-inline' 'unsafe-eval' data: blob:; style-src * 'unsafe-inline'; script-src * 'unsafe-inline' 'unsafe-eval' blob:;">
+<meta name="pytorch_project" content="tutorials">
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=G-LZRD6GXDLF" height="0" width="0"
+    style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+<!-- Google Tag Manager -->
+<script>(function (w, d, s, l, i) {
+    w[l] = w[l] || []; w[l].push({
+      'gtm.start':
+        new Date().getTime(), event: 'gtm.js'
+    }); var f = d.getElementsByTagName(s)[0],
+      j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
+        'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
+    j.onload = function () {
+      window.dispatchEvent(new Event('gtm_loaded'));
+      console.log('GTM loaded successfully');
+    };
+  })(window, document, 'script', 'dataLayer', 'G-LZRD6GXDLF');
+</script>
+<!-- End Google Tag Manager -->
+<!-- Facebook Pixel Code -->
+<script>
+  !function (f, b, e, v, n, t, s) {
+    if (f.fbq) return; n = f.fbq = function () {
+      n.callMethod ?
+        n.callMethod.apply(n, arguments) : n.queue.push(arguments)
+    };
+    if (!f._fbq) f._fbq = n; n.push = n; n.loaded = !0; n.version = '2.0';
+    n.queue = []; t = b.createElement(e); t.async = !0;
+    t.src = v; s = b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t, s)
+  }(window, document, 'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init', '243028289693773');
+  fbq('track', 'PageView');
+</script>
+<script>
+  document.documentElement.setAttribute('data-version', 'v2.8.0+cu128');
+</script>
+<noscript>
+  <img height="1" width="1" src="https://www.facebook.com/tr?id=243028289693773&ev=PageView&noscript=1" />
+</noscript>
+<script>
+  function gtag() {
+    window.dataLayer.push(arguments);
+  }
+</script>
+<!-- End Facebook Pixel Code -->
+<!-- Script to Fix scrolling -->
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    // Fix anchor scrolling
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const targetId = this.getAttribute('href').substring(1);
+        const targetElement = document.getElementById(targetId);
+
+        if (targetElement) {
+          const headerHeight =
+            (document.querySelector('.header-holder') ? document.querySelector('.header-holder').offsetHeight : 0) +
+            (document.querySelector('.bd-header') ? document.querySelector('.bd-header').offsetHeight : 0) + 20;
+
+          const targetPosition = targetElement.getBoundingClientRect().top + window.pageYOffset - headerHeight;
+          window.scrollTo({
+            top: targetPosition,
+            behavior: 'smooth'
+          });
+
+          // Update URL hash without scrolling
+          history.pushState(null, null, '#' + targetId);
+        }
+      });
+    });
+  });
+</script>
+
+<script async src="https://cse.google.com/cse.js?cx=e65585f8c3ea1440e"></script>
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="ko"/>
+    <meta name="docbuild:last-update" content="2024년 06월 09일"/>
+
+  </head>
+
+<body data-feedback-url="https://github.com/PyTorchKorea/tutorials-kr" class="pytorch-body">
+  
+    <div class="container-fluid header-holder tutorials-header" id="header-holder">
+   <div class="header-container-wrapper">
+    <div class="header-container">
+      <a class="header-logo" href="https://pytorch.kr/" aria-label="PyTorchKR"></a>
+
+      <div class="main-menu">
+        <ul>
+
+          <li class="main-menu-item">
+          <div id="learnDropdownButton" data-toggle="learn-dropdown" class="learn-dropdown">
+              <a class="with-down-arrow">
+                <span>배우기</span>
+              </a>
+              <div class="learn-dropdown-menu dropdown-menu">
+                <a class="nav-dropdown-item" href="https://pytorch.kr/get-started/locally/">
+                  <span class="dropdown-title">PyTorch 시작하기</span>
+                </a>
+                <a class="nav-dropdown-item" href="https://tutorials.pytorch.kr/beginner/basics/intro.html">
+                  <span class="dropdown-title">기본 익히기</span>
+                </a>
+                <a class="nav-dropdown-item" href="https://tutorials.pytorch.kr/" target="_self">
+                  <span class="dropdown-title">한국어 튜토리얼</span>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.kr/hub/">
+                  <span class="dropdown-title">한국어 모델 허브</span>
+                </a>
+                <a class="nav-dropdown-item" href="https://docs.pytorch.org/tutorials/" target="_blank">
+                  <span class="dropdown-title">Official Tutorials</span>
+                </a>
+              </div>
+            </div>
+          </li>
+
+          <li class="main-menu-item">
+            <a href="https://pytorch.kr/blog/">
+              <span>블로그</span>
+            </a>
+          </li>
+
+          <li class="main-menu-item">
+          <div id="docsDropdownButton" data-toggle="docs-dropdown" class="docs-dropdown">
+              <a class="with-down-arrow">
+              <span>문서</span>
+              </a>
+              <div class="docs-dropdown-menu dropdown-menu">
+                <a class="nav-dropdown-item" href="https://docs.pytorch.org/docs/" target="_blank">
+                  <span class="dropdown-title">PyTorch API</span>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.kr/domains/">
+                  <span class="dropdown-title">Domain API 소개</span>
+                </a>
+                <a class="nav-dropdown-item" href="https://tutorials.pytorch.kr/" target="_self">
+                  <span class="dropdown-title">한국어 튜토리얼</span>
+                </a>
+                <a class="nav-dropdown-item" href="https://docs.pytorch.org/tutorials/" target="_blank">
+                  <span class="dropdown-title">Official Tutorials</span>
+                </a>
+              </div>
+            </div>
+          </li>
+
+          <li class="main-menu-item">
+          <div id="communityDropdownButton" data-toggle="community-dropdown" class="community-dropdown">
+              <a class="with-down-arrow">
+              <span>커뮤니티</span>
+              </a>
+              <div class="community-dropdown-menu dropdown-menu">
+                <a class="nav-dropdown-item" href="https://discuss.pytorch.kr/" target="_self">
+                  <span class="dropdown-title">한국어 커뮤니티</span>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.kr/resources/">
+                  <span class="dropdown-title">개발자 정보</span>
+                </a>
+                <a class="nav-dropdown-item" href="https://landscape.pytorch.org/" target="_blank">
+                  <span class="dropdown-title">Landscape</span>
+                </a>
+              </div>
+            </div>
+          </li>
+
+        </ul>
+      </div>
+
+      <a class="main-menu-open-button" href="#" data-behavior="open-mobile-menu">
+        <i class="fa-solid fa-ellipsis"></i>
+      </a>
+    </div>
+  </div>
+ </div>
+
+ <!-- Begin Mobile Menu -->
+
+<div class="mobile-main-menu">
+  <div class="container-fluid">
+    <div class="header-container-wrapper">
+      <div class="mobile-main-menu-header-container">
+        <a class="main-menu-close-button" href="#" data-behavior="close-mobile-menu">
+          <i class="fa-solid fa-xmark"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="mobile-main-menu-links-container">
+    <div class="main-menu">
+      <ul>
+         <li class="resources-mobile-menu-title">
+           <a>배우기</a>
+         </li>
+         <ul class="resources-mobile-menu-items">
+           <li>
+             <a href="https://pytorch.kr/get-started/locally/">PyTorch 시작하기</a>
+           </li>
+           <li>
+             <a href="https://tutorials.pytorch.kr/beginner/basics/intro.html">기본 익히기</a>
+           </li>
+           <li>
+             <a href="https://tutorials.pytorch.kr/">한국어 튜토리얼</a>
+           </li>
+           <li>
+             <a href="https://pytorch.kr/hub/">한국어 모델 허브</a>
+           </li>
+           <li>
+             <a href="https://docs.pytorch.org/tutorials/" target="_blank">Official Tutorials</a>
+           </li>
+        </ul>
+         <li class="resources-mobile-menu-title">
+           <a href="https://pytorch.kr/blog/">블로그</a>
+         </li>
+         <li class="resources-mobile-menu-title">
+           <a>문서</a>
+         </li>
+         <ul class="resources-mobile-menu-items">
+          <li>
+            <a href="https://docs.pytorch.org/docs/" target="_blank">PyTorch API</a>
+          </li>
+          <li>
+            <a href="https://pytorch.kr/domains/">Domain API 소개</a>
+          </li>
+          <li>
+            <a href="https://tutorials.pytorch.kr/">한국어 튜토리얼</a>
+          </li>
+          <li>
+            <a href="https://docs.pytorch.org/tutorials/" target="_blank">Official Tutorials</a>
+          </li>
+        </ul>
+        <li class="resources-mobile-menu-title">
+          <a>커뮤니티</a>
+        </li>
+         <ul class="resources-mobile-menu-items">
+          <li>
+            <a href="https://discuss.pytorch.kr/">한국어 커뮤니티</a>
+          </li>
+          <li>
+            <a href="https://pytorch.kr/resources/">개발자 정보</a>
+          </li>
+          <li>
+            <a href="https://landscape.pytorch.org/" target="_blank">Landscape</a>
+          </li>
+        </ul>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- End Mobile Menu -->
+  
+  
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class=" navbar-header-items__start">
+    
+      <div class="navbar-item">
+  <a href="../../index.html" class="version">v2.8.0+cu128</a>
+</div>
+    
+  </div>
+  
+  <div class=" navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../intro.html">
+    Intro
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../../compilers_index.html">
+    Compilers
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../domains.html">
+    Domains
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../distributed.html">
+    Distributed
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../deep-dive.html">
+    Deep Dive
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../extension.html">
+    Extension
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../ecosystem.html">
+    Ecosystem
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../recipes_index.html">
+    Recipes
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+      
+        <div class="navbar-item">
+<div class="search-container-wrapper">
+  <div id="sphinx-search" class="search-container">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </div>
+
+  <div id="google-search" class="search-container" style="display:none;">
+    <div class="gcse-search-wrapper">
+      <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+      <div class="gcse-search"></div>
+    </div>
+  </div>
+
+  <div class="search-toggle-container" data-bs-title="Google Search Off" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <div class="search-toggle-inner">
+      <label class="switch">
+        <input type="checkbox" id="search-toggle">
+        <span class="slider round"></span>
+      </label>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+  // Define the search callback
+  const myWebSearchStartingCallback = (gname, query) => {
+    if (typeof dataLayer !== 'undefined' && query) {
+      window.dataLayer = window.dataLayer || [];
+      dataLayer.push({
+        'event': 'google_search',
+        'search_term': query,
+        'event_category': 'Search',
+        'event_label': 'Google Search'
+      });
+    }
+    return '';
+  };
+
+  // Set up the GCSE search callbacks
+  window.__gcse || (window.__gcse = {});
+  window.__gcse.searchCallbacks = {
+    web: { starting: myWebSearchStartingCallback }
+  };
+
+  if (window.location.pathname.includes('/search.html')) {
+    document.body.classList.add('search-page');
+  }
+
+  // Function to reinitialize Google CSE
+  function reinitializeGoogleSearch() {
+    if (window.__gcse && window.__gcse.initializationCallback) {
+      window.__gcse.initializationCallback();
+    }
+  }
+
+  // Function to handle search toggle
+  function handleSearchToggle(toggle, sphinxSearch, googleSearch) {
+    if (!toggle || !sphinxSearch || !googleSearch) return;
+
+    // Check if the URL contains /stable/ or /tutorials/
+    const currentUrl = window.location.href;
+    // TODO: We've had reports that the google programmable search is returning stale documentation,
+    //       Simple reproduction is to turn google search on and search for multinomial which will
+    //       result in returning 1.8.1 documentation.
+    //       We should turn this back on when we resolve that bug.
+    const shouldDefaultToGoogle = false;
+    const savedPreference = localStorage.getItem('searchPreference');
+
+    // Set initial state
+    if (savedPreference === 'google' || (savedPreference === null && shouldDefaultToGoogle)) {
+      toggle.checked = true;
+      sphinxSearch.style.display = 'none';
+      googleSearch.style.display = 'block';
+      if (savedPreference === null) {
+        localStorage.setItem('searchPreference', 'google');
+      }
+      reinitializeGoogleSearch();
+    } else {
+      toggle.checked = false;
+      sphinxSearch.style.display = 'block';
+      googleSearch.style.display = 'none';
+    }
+
+    // Update tooltip
+    updateTooltip(toggle.checked);
+
+    // Skip if already initialized
+    if (toggle.hasAttribute('data-initialized')) return;
+    toggle.setAttribute('data-initialized', 'true');
+
+    toggle.addEventListener('change', function() {
+      if (this.checked) {
+        sphinxSearch.style.display = 'none';
+        googleSearch.style.display = 'block';
+        localStorage.setItem('searchPreference', 'google');
+        reinitializeGoogleSearch();
+        trackSearchEngineSwitch('Google');
+      } else {
+        sphinxSearch.style.display = 'block';
+        googleSearch.style.display = 'none';
+        localStorage.setItem('searchPreference', 'sphinx');
+        trackSearchEngineSwitch('Sphinx');
+      }
+
+      updateTooltip(this.checked);
+      updateMobileSearch();
+    });
+  }
+
+  // Update tooltip based on toggle state
+  function updateTooltip(isChecked) {
+    const tooltipElement = document.querySelector('.search-toggle-container');
+    if (!tooltipElement) return;
+
+    tooltipElement.setAttribute('data-bs-title', isChecked ? 'Google Search On' : 'Google Search Off');
+
+    if (bootstrap && bootstrap.Tooltip) {
+      const tooltipInstance = bootstrap.Tooltip.getInstance(tooltipElement);
+      if (tooltipInstance) tooltipInstance.dispose();
+      new bootstrap.Tooltip(tooltipElement);
+    }
+  }
+
+  // Track search engine switch
+  function trackSearchEngineSwitch(engine) {
+    if (typeof dataLayer !== 'undefined') {
+      window.dataLayer = window.dataLayer || [];
+      dataLayer.push({
+        'event': 'search_engine_switch',
+        'event_category': 'Search',
+        'event_label': engine
+      });
+    }
+  }
+
+  // Function to update mobile search based on current toggle state
+  function updateMobileSearch() {
+    const toggle = document.getElementById('search-toggle');
+    if (!toggle) return;
+
+    const mobileSearchContainer = document.querySelector('.sidebar-header-items__end .navbar-item .search-container-wrapper');
+    if (!mobileSearchContainer) return;
+
+    const mobileSphinxSearch = mobileSearchContainer.querySelector('#sphinx-search');
+    const mobileGoogleSearch = mobileSearchContainer.querySelector('#google-search');
+
+    if (mobileSphinxSearch && mobileGoogleSearch) {
+      mobileSphinxSearch.style.display = toggle.checked ? 'none' : 'block';
+      mobileGoogleSearch.style.display = toggle.checked ? 'block' : 'none';
+
+      if (toggle.checked) {
+        reinitializeGoogleSearch();
+      }
+    }
+  }
+
+  // Initialize desktop search toggle
+  const toggle = document.getElementById('search-toggle');
+  const sphinxSearch = document.getElementById('sphinx-search');
+  const googleSearch = document.getElementById('google-search');
+  handleSearchToggle(toggle, sphinxSearch, googleSearch);
+
+  // Set placeholder text for Google search input
+  const observer = new MutationObserver(function() {
+    document.querySelectorAll('.gsc-input input').forEach(input => {
+      if (input && !input.hasAttribute('data-placeholder-set')) {
+        input.setAttribute('placeholder', 'Search the docs ...');
+        input.setAttribute('data-placeholder-set', 'true');
+      }
+    });
+  });
+
+  observer.observe(document.body, { childList: true, subtree: true });
+
+  // Fix for scroll jump issue - improved approach
+  function setupSearchInputHandlers(input) {
+    if (input.hasAttribute('data-scroll-fixed')) return;
+    input.setAttribute('data-scroll-fixed', 'true');
+
+    let lastScrollPosition = 0;
+    let isTyping = false;
+    let scrollTimeout;
+
+    // Save position before typing starts
+    input.addEventListener('keydown', () => {
+      lastScrollPosition = window.scrollY;
+      isTyping = true;
+
+      // Reset typing state after a short delay
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        isTyping = false;
+      }, 100);
+    });
+
+    // Only maintain scroll position during typing
+    function maintainScroll() {
+      if (document.activeElement === input && isTyping) {
+        window.scrollTo(0, lastScrollPosition);
+        requestAnimationFrame(maintainScroll);
+      }
+    }
+
+    input.addEventListener('focus', () => {
+      // Just store initial position but don't force it
+      lastScrollPosition = window.scrollY;
+    });
+
+    input.addEventListener('input', () => {
+      isTyping = true;
+      window.scrollTo(0, lastScrollPosition);
+
+      // Reset typing state after a short delay
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        isTyping = false;
+      }, 100);
+
+      requestAnimationFrame(maintainScroll);
+    });
+  }
+
+  // Apply to all search inputs and observe for new ones
+  function applyToSearchInputs() {
+    document.querySelectorAll('.search-container input, .gsc-input input').forEach(setupSearchInputHandlers);
+  }
+
+  applyToSearchInputs();
+
+  const searchObserver = new MutationObserver(applyToSearchInputs);
+  searchObserver.observe(document.body, { childList: true, subtree: true });
+
+  // Watch for mobile menu creation
+  const mobileMenuObserver = new MutationObserver(function(mutations) {
+    for (const mutation of mutations) {
+      if (!mutation.addedNodes.length) continue;
+
+      // Style mobile search inputs
+      document.querySelectorAll('.sidebar-header-items__end .navbar-item .search-container-wrapper .gsc-input input').forEach(input => {
+        if (input) {
+          input.setAttribute('placeholder', 'Search the docs ...');
+          input.style.paddingLeft = '36px';
+        }
+      });
+
+      // Check for mobile search container
+      const mobileSearchContainer = document.querySelector('.sidebar-header-items__end .navbar-item .search-container-wrapper');
+      if (!mobileSearchContainer) continue;
+
+      const mobileToggle = mobileSearchContainer.querySelector('#search-toggle');
+      if (mobileToggle && toggle) {
+        // Sync mobile toggle with desktop toggle
+        mobileToggle.checked = toggle.checked;
+        updateMobileSearch();
+
+        // Add event listener to mobile toggle if not already added
+        if (!mobileToggle.hasAttribute('data-initialized')) {
+          mobileToggle.setAttribute('data-initialized', 'true');
+          mobileToggle.addEventListener('change', function() {
+            // Sync desktop toggle with mobile toggle
+            toggle.checked = this.checked;
+            // Trigger change event on desktop toggle to update both
+            toggle.dispatchEvent(new Event('change'));
+          });
+        }
+      }
+    }
+  });
+
+  mobileMenuObserver.observe(document.body, { childList: true, subtree: true });
+
+  // Ensure Google CSE is properly loaded
+  if (window.__gcse) {
+    window.__gcse.callback = function() {
+      // This will run after Google CSE is fully loaded
+      if (toggle && toggle.checked) {
+        reinitializeGoogleSearch();
+      }
+    };
+  } else {
+    window.__gcse = {
+      callback: function() {
+        if (toggle && toggle.checked) {
+          reinitializeGoogleSearch();
+        }
+      }
+    };
+  }
+});
+</script>
+</div>
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/PyTorchKorea/tutorials-kr" title="한국어 튜토리얼 GitHub 저장소" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">한국어 튜토리얼 GitHub 저장소</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://discuss.pytorch.kr/" title="파이토치 한국어 커뮤니티" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-discourse fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">파이토치 한국어 커뮤니티</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../intro.html">
+    Intro
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../../compilers_index.html">
+    Compilers
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../domains.html">
+    Domains
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../distributed.html">
+    Distributed
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../deep-dive.html">
+    Deep Dive
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../extension.html">
+    Extension
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../ecosystem.html">
+    Ecosystem
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../recipes_index.html">
+    Recipes
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<div class="search-container-wrapper">
+  <div id="sphinx-search" class="search-container">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </div>
+
+  <div id="google-search" class="search-container" style="display:none;">
+    <div class="gcse-search-wrapper">
+      <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+      <div class="gcse-search"></div>
+    </div>
+  </div>
+
+  <div class="search-toggle-container" data-bs-title="Google Search Off" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <div class="search-toggle-inner">
+      <label class="switch">
+        <input type="checkbox" id="search-toggle">
+        <span class="slider round"></span>
+      </label>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+  // Define the search callback
+  const myWebSearchStartingCallback = (gname, query) => {
+    if (typeof dataLayer !== 'undefined' && query) {
+      window.dataLayer = window.dataLayer || [];
+      dataLayer.push({
+        'event': 'google_search',
+        'search_term': query,
+        'event_category': 'Search',
+        'event_label': 'Google Search'
+      });
+    }
+    return '';
+  };
+
+  // Set up the GCSE search callbacks
+  window.__gcse || (window.__gcse = {});
+  window.__gcse.searchCallbacks = {
+    web: { starting: myWebSearchStartingCallback }
+  };
+
+  if (window.location.pathname.includes('/search.html')) {
+    document.body.classList.add('search-page');
+  }
+
+  // Function to reinitialize Google CSE
+  function reinitializeGoogleSearch() {
+    if (window.__gcse && window.__gcse.initializationCallback) {
+      window.__gcse.initializationCallback();
+    }
+  }
+
+  // Function to handle search toggle
+  function handleSearchToggle(toggle, sphinxSearch, googleSearch) {
+    if (!toggle || !sphinxSearch || !googleSearch) return;
+
+    // Check if the URL contains /stable/ or /tutorials/
+    const currentUrl = window.location.href;
+    // TODO: We've had reports that the google programmable search is returning stale documentation,
+    //       Simple reproduction is to turn google search on and search for multinomial which will
+    //       result in returning 1.8.1 documentation.
+    //       We should turn this back on when we resolve that bug.
+    const shouldDefaultToGoogle = false;
+    const savedPreference = localStorage.getItem('searchPreference');
+
+    // Set initial state
+    if (savedPreference === 'google' || (savedPreference === null && shouldDefaultToGoogle)) {
+      toggle.checked = true;
+      sphinxSearch.style.display = 'none';
+      googleSearch.style.display = 'block';
+      if (savedPreference === null) {
+        localStorage.setItem('searchPreference', 'google');
+      }
+      reinitializeGoogleSearch();
+    } else {
+      toggle.checked = false;
+      sphinxSearch.style.display = 'block';
+      googleSearch.style.display = 'none';
+    }
+
+    // Update tooltip
+    updateTooltip(toggle.checked);
+
+    // Skip if already initialized
+    if (toggle.hasAttribute('data-initialized')) return;
+    toggle.setAttribute('data-initialized', 'true');
+
+    toggle.addEventListener('change', function() {
+      if (this.checked) {
+        sphinxSearch.style.display = 'none';
+        googleSearch.style.display = 'block';
+        localStorage.setItem('searchPreference', 'google');
+        reinitializeGoogleSearch();
+        trackSearchEngineSwitch('Google');
+      } else {
+        sphinxSearch.style.display = 'block';
+        googleSearch.style.display = 'none';
+        localStorage.setItem('searchPreference', 'sphinx');
+        trackSearchEngineSwitch('Sphinx');
+      }
+
+      updateTooltip(this.checked);
+      updateMobileSearch();
+    });
+  }
+
+  // Update tooltip based on toggle state
+  function updateTooltip(isChecked) {
+    const tooltipElement = document.querySelector('.search-toggle-container');
+    if (!tooltipElement) return;
+
+    tooltipElement.setAttribute('data-bs-title', isChecked ? 'Google Search On' : 'Google Search Off');
+
+    if (bootstrap && bootstrap.Tooltip) {
+      const tooltipInstance = bootstrap.Tooltip.getInstance(tooltipElement);
+      if (tooltipInstance) tooltipInstance.dispose();
+      new bootstrap.Tooltip(tooltipElement);
+    }
+  }
+
+  // Track search engine switch
+  function trackSearchEngineSwitch(engine) {
+    if (typeof dataLayer !== 'undefined') {
+      window.dataLayer = window.dataLayer || [];
+      dataLayer.push({
+        'event': 'search_engine_switch',
+        'event_category': 'Search',
+        'event_label': engine
+      });
+    }
+  }
+
+  // Function to update mobile search based on current toggle state
+  function updateMobileSearch() {
+    const toggle = document.getElementById('search-toggle');
+    if (!toggle) return;
+
+    const mobileSearchContainer = document.querySelector('.sidebar-header-items__end .navbar-item .search-container-wrapper');
+    if (!mobileSearchContainer) return;
+
+    const mobileSphinxSearch = mobileSearchContainer.querySelector('#sphinx-search');
+    const mobileGoogleSearch = mobileSearchContainer.querySelector('#google-search');
+
+    if (mobileSphinxSearch && mobileGoogleSearch) {
+      mobileSphinxSearch.style.display = toggle.checked ? 'none' : 'block';
+      mobileGoogleSearch.style.display = toggle.checked ? 'block' : 'none';
+
+      if (toggle.checked) {
+        reinitializeGoogleSearch();
+      }
+    }
+  }
+
+  // Initialize desktop search toggle
+  const toggle = document.getElementById('search-toggle');
+  const sphinxSearch = document.getElementById('sphinx-search');
+  const googleSearch = document.getElementById('google-search');
+  handleSearchToggle(toggle, sphinxSearch, googleSearch);
+
+  // Set placeholder text for Google search input
+  const observer = new MutationObserver(function() {
+    document.querySelectorAll('.gsc-input input').forEach(input => {
+      if (input && !input.hasAttribute('data-placeholder-set')) {
+        input.setAttribute('placeholder', 'Search the docs ...');
+        input.setAttribute('data-placeholder-set', 'true');
+      }
+    });
+  });
+
+  observer.observe(document.body, { childList: true, subtree: true });
+
+  // Fix for scroll jump issue - improved approach
+  function setupSearchInputHandlers(input) {
+    if (input.hasAttribute('data-scroll-fixed')) return;
+    input.setAttribute('data-scroll-fixed', 'true');
+
+    let lastScrollPosition = 0;
+    let isTyping = false;
+    let scrollTimeout;
+
+    // Save position before typing starts
+    input.addEventListener('keydown', () => {
+      lastScrollPosition = window.scrollY;
+      isTyping = true;
+
+      // Reset typing state after a short delay
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        isTyping = false;
+      }, 100);
+    });
+
+    // Only maintain scroll position during typing
+    function maintainScroll() {
+      if (document.activeElement === input && isTyping) {
+        window.scrollTo(0, lastScrollPosition);
+        requestAnimationFrame(maintainScroll);
+      }
+    }
+
+    input.addEventListener('focus', () => {
+      // Just store initial position but don't force it
+      lastScrollPosition = window.scrollY;
+    });
+
+    input.addEventListener('input', () => {
+      isTyping = true;
+      window.scrollTo(0, lastScrollPosition);
+
+      // Reset typing state after a short delay
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        isTyping = false;
+      }, 100);
+
+      requestAnimationFrame(maintainScroll);
+    });
+  }
+
+  // Apply to all search inputs and observe for new ones
+  function applyToSearchInputs() {
+    document.querySelectorAll('.search-container input, .gsc-input input').forEach(setupSearchInputHandlers);
+  }
+
+  applyToSearchInputs();
+
+  const searchObserver = new MutationObserver(applyToSearchInputs);
+  searchObserver.observe(document.body, { childList: true, subtree: true });
+
+  // Watch for mobile menu creation
+  const mobileMenuObserver = new MutationObserver(function(mutations) {
+    for (const mutation of mutations) {
+      if (!mutation.addedNodes.length) continue;
+
+      // Style mobile search inputs
+      document.querySelectorAll('.sidebar-header-items__end .navbar-item .search-container-wrapper .gsc-input input').forEach(input => {
+        if (input) {
+          input.setAttribute('placeholder', 'Search the docs ...');
+          input.style.paddingLeft = '36px';
+        }
+      });
+
+      // Check for mobile search container
+      const mobileSearchContainer = document.querySelector('.sidebar-header-items__end .navbar-item .search-container-wrapper');
+      if (!mobileSearchContainer) continue;
+
+      const mobileToggle = mobileSearchContainer.querySelector('#search-toggle');
+      if (mobileToggle && toggle) {
+        // Sync mobile toggle with desktop toggle
+        mobileToggle.checked = toggle.checked;
+        updateMobileSearch();
+
+        // Add event listener to mobile toggle if not already added
+        if (!mobileToggle.hasAttribute('data-initialized')) {
+          mobileToggle.setAttribute('data-initialized', 'true');
+          mobileToggle.addEventListener('change', function() {
+            // Sync desktop toggle with mobile toggle
+            toggle.checked = this.checked;
+            // Trigger change event on desktop toggle to update both
+            toggle.dispatchEvent(new Event('change'));
+          });
+        }
+      }
+    }
+  });
+
+  mobileMenuObserver.observe(document.body, { childList: true, subtree: true });
+
+  // Ensure Google CSE is properly loaded
+  if (window.__gcse) {
+    window.__gcse.callback = function() {
+      // This will run after Google CSE is fully loaded
+      if (toggle && toggle.checked) {
+        reinitializeGoogleSearch();
+      }
+    };
+  } else {
+    window.__gcse = {
+      callback: function() {
+        if (toggle && toggle.checked) {
+          reinitializeGoogleSearch();
+        }
+      }
+    };
+  }
+});
+</script>
+</div>
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/PyTorchKorea/tutorials-kr" title="한국어 튜토리얼 GitHub 저장소" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">한국어 튜토리얼 GitHub 저장소</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://discuss.pytorch.kr/" title="파이토치 한국어 커뮤니티" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-discourse fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">파이토치 한국어 커뮤니티</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">torch.compile</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../intermediate/torch_compile_tutorial.html">Introduction to <code class="docutils literal notranslate"><span class="pre">torch.compile</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../intermediate/compiled_autograd_tutorial.html">Compiled Autograd: Capturing a larger backward graph for <code class="docutils literal notranslate"><span class="pre">torch.compile</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../intermediate/inductor_debug_cpu.html">Inductor CPU backend debugging and profiling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../recipes/torch_compiler_set_stance_tutorial.html">Dynamic Compilation Control with <code class="docutils literal notranslate"><span class="pre">torch.compiler.set_stance</span></code></a></li>
+
+
+<li class="toctree-l1"><a class="reference internal" href="../../recipes/torch_export_challenges_solutions.html">Demonstration of torch.export flow, common challenges and the solutions to address them</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../recipes/compiling_optimizer.html">(beta) Compiling the optimizer with torch.compile</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../recipes/compiling_optimizer_lr_scheduler.html">(beta) Running the compiled optimizer with an LR Scheduler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../recipes/torch_compile_user_defined_triton_kernel_tutorial.html">사용자 정의 Triton 커널을 ``torch.compile``과 함께 사용하기</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../recipes/torch_compile_caching_tutorial.html">Compile Time Caching in <code class="docutils literal notranslate"><span class="pre">torch.compile</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../recipes/regional_compilation.html">Reducing torch.compile cold start compilation time with regional compilation</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">torch.export</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../intermediate/torch_export_tutorial.html">torch.export Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../recipes/torch_export_aoti_python.html"><code class="docutils literal notranslate"><span class="pre">torch.export</span></code> AOTInductor Tutorial for Python runtime (Beta)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../recipes/torch_export_challenges_solutions.html">Demonstration of torch.export flow, common challenges and the solutions to address them</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">ONNX</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="intro_onnx.html">Introduction to ONNX</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="simple">
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="export_simple_model_to_onnx_tutorial.html">Export a PyTorch model to ONNX</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="simple">
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="onnx_registry_tutorial.html">Extending the ONNX Registry</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="simple">
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="current reference internal" href="#">Export a model with control flow to ONNX</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="simple">
+</ul>
+</details></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Code Transforms with FX</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../intermediate/torch_compile_conv_bn_fuser.html">Building a Convolution/Batch Norm fuser with torch.compile</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../intermediate/fx_profiling_tutorial.html">(beta) Building a Simple CPU Performance Profiler with FX</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../compilers_index.html" class="nav-link">Compilers</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">Export a...</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+<div class="rating">
+    Rate this Page
+    <div class="stars">
+        
+        <span class="star" data-behavior="tutorial-rating" data-count="1" data-value="1">★</span>
+        
+        <span class="star" data-behavior="tutorial-rating" data-count="2" data-value="2">★</span>
+        
+        <span class="star" data-behavior="tutorial-rating" data-count="3" data-value="3">★</span>
+        
+        <span class="star" data-behavior="tutorial-rating" data-count="4" data-value="4">★</span>
+        
+        <span class="star" data-behavior="tutorial-rating" data-count="5" data-value="5">★</span>
+        
+    </div>
+</div>
+</div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+  
+<div id="searchbox"></div>
+  <article class="bd-article" id="pytorch-article">
+    <!-- Hidden breadcrumb schema for SEO only -->
+    <div style="display:none;" itemscope itemtype="https://schema.org/BreadcrumbList">
+      
+      <div itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <link itemprop="item" href="../../compilers_index.html">
+        <meta itemprop="name" content="Compilers">
+        <meta itemprop="position" content="1">
+      </div>
+      
+      <div itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <meta itemprop="name" content="Export a model with control flow to ONNX">
+        <meta itemprop="position" content="2">
+      </div>
+    </div>
+
+    
+    <script>
+      if ((window.location.href.indexOf("/unstable/") != -1) && (window.location.href.indexOf("/unstable/unstable_index") < 1)) {
+        var div = '<div class="prototype-banner"><i class="fa fa-flask" aria-hidden="true"></i> <strong>Unstable feature:</strong> Not typically available in binary distributions like PyPI. Early stage for feedback and testing.</div>'
+        document.addEventListener('DOMContentLoaded', function () {
+          document.getElementById("pytorch-article").insertAdjacentHTML('afterBegin', div);
+        });
+      }
+    </script>
+    
+    
+    <div class="pytorch-call-to-action-links">
+      <div id="tutorial-type">beginner/onnx/export_control_flow_model_to_onnx_tutorial</div>
+      <a id="colab-link" data-behavior="call-to-action-event" data-response="Run in Google Colab" target="_blank">
+        <div id="google-colab-link">
+          <img class="call-to-action-img" src="../../_static/img/pytorch-colab.svg" />
+          <div class="call-to-action-desktop-view">Run in Google Colab</div>
+          <div class="call-to-action-mobile-view">Colab</div>
+        </div>
+      </a>
+      <a id="notebook-link" data-behavior="call-to-action-event" data-response="Download Notebook">
+        <div id="download-notebook-link">
+          <img class="call-to-action-notebook-img" src="../../_static/img/pytorch-download.svg" />
+          <div class="call-to-action-desktop-view">Download Notebook</div>
+          <div class="call-to-action-mobile-view">Notebook</div>
+        </div>
+      </a>
+      <a id="github-link" data-behavior="call-to-action-event" data-response="View on Github" target="_blank">
+        <div id="github-view-link">
+          <img class="call-to-action-img" src="../../_static/img/pytorch-github.svg" />
+          <div class="call-to-action-desktop-view">View on GitHub</div>
+          <div class="call-to-action-mobile-view">GitHub</div>
+        </div>
+      </a>
+    </div>
+    
+
+    
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">참고</p>
+<p><a class="reference internal" href="#sphx-glr-download-beginner-onnx-export-control-flow-model-to-onnx-tutorial-py"><span class="std std-ref">Go to the end</span></a>
+to download the full example code.</p>
+</div>
+<p class="sphx-glr-example-title" id="sphx-glr-beginner-onnx-export-control-flow-model-to-onnx-tutorial-py"><a class="reference external" href="intro_onnx.html">Introduction to ONNX</a> ||
+<a class="reference external" href="export_simple_model_to_onnx_tutorial.html">Exporting a PyTorch model to ONNX</a> ||
+<a class="reference external" href="onnx_registry_tutorial.html">Extending the ONNX exporter operator support</a> ||
+<strong>`Export a model with control flow to ONNX</strong></p>
+<section id="export-a-model-with-control-flow-to-onnx">
+<h1>Export a model with control flow to ONNX<a class="headerlink" href="#export-a-model-with-control-flow-to-onnx" title="Link to this heading">#</a></h1>
+<p><strong>Author</strong>: <a class="reference external" href="https://github.com/xadupre">Xavier Dupré</a></p>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading">#</a></h2>
+<p>This tutorial demonstrates how to handle control flow logic while exporting
+a PyTorch model to ONNX. It highlights the challenges of exporting
+conditional statements directly and provides solutions to circumvent them.</p>
+<p>Conditional logic cannot be exported into ONNX unless they refactored
+to use <a class="reference external" href="https://docs.pytorch.org/docs/stable/generated/torch.cond.html#torch.cond" title="(PyTorch v2.8에서)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.cond()</span></code></a>. Let’s start with a simple model
+implementing a test.</p>
+<p>What you will learn:</p>
+<ul class="simple">
+<li><p>How to refactor the model to use <a class="reference external" href="https://docs.pytorch.org/docs/stable/generated/torch.cond.html#torch.cond" title="(PyTorch v2.8에서)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.cond()</span></code></a> for exporting.</p></li>
+<li><p>How to export a model with control flow logic to ONNX.</p></li>
+<li><p>How to optimize the exported model using the ONNX optimizer.</p></li>
+</ul>
+<section id="prerequisites">
+<h3>Prerequisites<a class="headerlink" href="#prerequisites" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">torch</span> <span class="pre">&gt;=</span> <span class="pre">2.6</span></code></p></li>
+</ul>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="define-the-models">
+<h2>Define the Models<a class="headerlink" href="#define-the-models" title="Link to this heading">#</a></h2>
+<p>Two models are defined:</p>
+<p><code class="docutils literal notranslate"><span class="pre">ForwardWithControlFlowTest</span></code>: A model with a forward method containing an
+if-else conditional.</p>
+<p><code class="docutils literal notranslate"><span class="pre">ModelWithControlFlowTest</span></code>: A model that incorporates <code class="docutils literal notranslate"><span class="pre">ForwardWithControlFlowTest</span></code>
+as part of a simple MLP. The models are tested with
+a random input tensor to confirm they execute as expected.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">ForwardWithControlFlowTest</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">sum</span><span class="p">():</span>
+            <span class="k">return</span> <span class="n">x</span> <span class="o">*</span> <span class="mi">2</span>
+        <span class="k">return</span> <span class="o">-</span><span class="n">x</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">ModelWithControlFlowTest</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mlp</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+            <span class="n">ForwardWithControlFlowTest</span><span class="p">(),</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mlp</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span>
+
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">ModelWithControlFlowTest</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+<section id="exporting-the-model-first-attempt">
+<h2>Exporting the Model: First Attempt<a class="headerlink" href="#exporting-the-model-first-attempt" title="Link to this heading">#</a></h2>
+<p>Exporting this model using torch.export.export fails because the control
+flow logic in the forward pass creates a graph break that the exporter cannot
+handle. This behavior is expected, as conditional logic not written using
+<a class="reference external" href="https://docs.pytorch.org/docs/stable/generated/torch.cond.html#torch.cond" title="(PyTorch v2.8에서)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.cond()</span></code></a> is unsupported.</p>
+<p>A try-except block is used to capture the expected failure during the export
+process. If the export unexpectedly succeeds, an <code class="docutils literal notranslate"><span class="pre">AssertionError</span></code> is raised.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">model</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">export</span><span class="o">.</span><span class="n">export</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="p">(</span><span class="n">x</span><span class="p">,),</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span><span class="s2">&quot;This export should failed unless PyTorch now supports this model.&quot;</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>def forward(self, arg0_1: &quot;f32[2, 3]&quot;, arg1_1: &quot;f32[2]&quot;, arg2_1: &quot;f32[1, 2]&quot;, arg3_1: &quot;f32[1]&quot;, arg4_1: &quot;f32[3]&quot;):
+     # File: /opt/conda/lib/python3.11/site-packages/torch/nn/modules/linear.py:125 in forward, code: return F.linear(input, self.weight, self.bias)
+    linear: &quot;f32[2]&quot; = torch.ops.aten.linear.default(arg4_1, arg0_1, arg1_1);  arg4_1 = arg0_1 = arg1_1 = None
+    linear_1: &quot;f32[1]&quot; = torch.ops.aten.linear.default(linear, arg2_1, arg3_1);  linear = arg2_1 = arg3_1 = None
+
+     # File: /workspace/tutorials-kr/beginner_source/onnx/export_control_flow_model_to_onnx_tutorial.py:56 in forward, code: if x.sum():
+    sum_1: &quot;f32[]&quot; = torch.ops.aten.sum.default(linear_1);  linear_1 = None
+    ne: &quot;b8[]&quot; = torch.ops.aten.ne.Scalar(sum_1, 0);  sum_1 = None
+    item: &quot;Sym(Eq(u0, 1))&quot; = torch.ops.aten.item.default(ne);  ne = item = None
+
+
+
+
+def forward(self, arg0_1: &quot;f32[2, 3]&quot;, arg1_1: &quot;f32[2]&quot;, arg2_1: &quot;f32[1, 2]&quot;, arg3_1: &quot;f32[1]&quot;, arg4_1: &quot;f32[3]&quot;):
+     # File: /opt/conda/lib/python3.11/site-packages/torch/nn/modules/linear.py:125 in forward, code: return F.linear(input, self.weight, self.bias)
+    linear: &quot;f32[2]&quot; = torch.ops.aten.linear.default(arg4_1, arg0_1, arg1_1);  arg4_1 = arg0_1 = arg1_1 = None
+    linear_1: &quot;f32[1]&quot; = torch.ops.aten.linear.default(linear, arg2_1, arg3_1);  linear = arg2_1 = arg3_1 = None
+
+     # File: /workspace/tutorials-kr/beginner_source/onnx/export_control_flow_model_to_onnx_tutorial.py:56 in forward, code: if x.sum():
+    sum_1: &quot;f32[]&quot; = torch.ops.aten.sum.default(linear_1);  linear_1 = None
+    ne: &quot;b8[]&quot; = torch.ops.aten.ne.Scalar(sum_1, 0);  sum_1 = None
+    item: &quot;Sym(Eq(u0, 1))&quot; = torch.ops.aten.item.default(ne);  ne = item = None
+
+Could not guard on data-dependent expression Eq(u0, 1) (unhinted: Eq(u0, 1)).  (Size-like symbols: none)
+
+Caused by: (_export/non_strict_utils.py:1051 in __torch_function__)
+For more information, run with TORCH_LOGS=&quot;dynamic&quot;
+For extended logs when we create symbols, also add TORCHDYNAMO_EXTENDED_DEBUG_CREATE_SYMBOL=&quot;u0&quot;
+If you suspect the guard was triggered from C++, add TORCHDYNAMO_EXTENDED_DEBUG_CPP=1
+For more debugging help, see https://docs.google.com/document/d/1HSuTTVvYH1pTew89Rtpeu84Ht3nQEFTYhAX3Ypa_xJs/edit?usp=sharing
+
+For C++ stack trace, run with TORCHDYNAMO_EXTENDED_DEBUG_CPP=1
+
+The following call raised this error:
+  File &quot;/workspace/tutorials-kr/beginner_source/onnx/export_control_flow_model_to_onnx_tutorial.py&quot;, line 56, in forward
+    if x.sum():
+
+
+The error above occurred when calling torch.export.export. If you would like to view some more information about this error, and get a list of all other errors that may occur in your export call, you can replace your `export()` call with `draft_export()`.
+</pre></div>
+</div>
+</section>
+<section id="using-torch-onnx-export-with-jit-tracing">
+<h2>Using <a class="reference external" href="https://docs.pytorch.org/docs/stable/onnx_dynamo.html#torch.onnx.export" title="(PyTorch v2.8에서)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.onnx.export()</span></code></a> with JIT Tracing<a class="headerlink" href="#using-torch-onnx-export-with-jit-tracing" title="Link to this heading">#</a></h2>
+<p>When exporting the model using <a class="reference external" href="https://docs.pytorch.org/docs/stable/onnx_dynamo.html#torch.onnx.export" title="(PyTorch v2.8에서)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.onnx.export()</span></code></a> with the dynamo=True
+argument, the exporter defaults to using JIT tracing. This fallback allows
+the model to export, but the resulting ONNX graph may not faithfully represent
+the original model logic due to the limitations of tracing.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">onnx_program</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">onnx</span><span class="o">.</span><span class="n">export</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="p">(</span><span class="n">x</span><span class="p">,),</span> <span class="n">dynamo</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">onnx_program</span><span class="o">.</span><span class="n">model</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[torch.onnx] Obtain model graph for `ModelWithControlFlowTest([...]` with `torch.export.export(..., strict=False)`...
+
+
+
+def forward(self, arg0_1: &quot;f32[2, 3]&quot;, arg1_1: &quot;f32[2]&quot;, arg2_1: &quot;f32[1, 2]&quot;, arg3_1: &quot;f32[1]&quot;, arg4_1: &quot;f32[3]&quot;):
+     # File: /opt/conda/lib/python3.11/site-packages/torch/nn/modules/linear.py:125 in forward, code: return F.linear(input, self.weight, self.bias)
+    linear: &quot;f32[2]&quot; = torch.ops.aten.linear.default(arg4_1, arg0_1, arg1_1);  arg4_1 = arg0_1 = arg1_1 = None
+    linear_1: &quot;f32[1]&quot; = torch.ops.aten.linear.default(linear, arg2_1, arg3_1);  linear = arg2_1 = arg3_1 = None
+
+     # File: /workspace/tutorials-kr/beginner_source/onnx/export_control_flow_model_to_onnx_tutorial.py:56 in forward, code: if x.sum():
+    sum_1: &quot;f32[]&quot; = torch.ops.aten.sum.default(linear_1);  linear_1 = None
+    ne: &quot;b8[]&quot; = torch.ops.aten.ne.Scalar(sum_1, 0);  sum_1 = None
+    item: &quot;Sym(Eq(u0, 1))&quot; = torch.ops.aten.item.default(ne);  ne = item = None
+
+
+
+
+def forward(self, arg0_1: &quot;f32[2, 3]&quot;, arg1_1: &quot;f32[2]&quot;, arg2_1: &quot;f32[1, 2]&quot;, arg3_1: &quot;f32[1]&quot;, arg4_1: &quot;f32[3]&quot;):
+     # File: /opt/conda/lib/python3.11/site-packages/torch/nn/modules/linear.py:125 in forward, code: return F.linear(input, self.weight, self.bias)
+    linear: &quot;f32[2]&quot; = torch.ops.aten.linear.default(arg4_1, arg0_1, arg1_1);  arg4_1 = arg0_1 = arg1_1 = None
+    linear_1: &quot;f32[1]&quot; = torch.ops.aten.linear.default(linear, arg2_1, arg3_1);  linear = arg2_1 = arg3_1 = None
+
+     # File: /workspace/tutorials-kr/beginner_source/onnx/export_control_flow_model_to_onnx_tutorial.py:56 in forward, code: if x.sum():
+    sum_1: &quot;f32[]&quot; = torch.ops.aten.sum.default(linear_1);  linear_1 = None
+    ne: &quot;b8[]&quot; = torch.ops.aten.ne.Scalar(sum_1, 0);  sum_1 = None
+    item: &quot;Sym(Eq(u0, 1))&quot; = torch.ops.aten.item.default(ne);  ne = item = None
+
+[torch.onnx] Obtain model graph for `ModelWithControlFlowTest([...]` with `torch.export.export(..., strict=False)`... ❌
+[torch.onnx] Obtain model graph for `ModelWithControlFlowTest([...]` with `torch.export.export(..., strict=True)`...
+class GraphModule(torch.nn.Module):
+    def forward(self, L_x_: &quot;f32[3][1]cpu&quot;):
+        l_x_ = L_x_
+
+         # File: /workspace/tutorials-kr/beginner_source/onnx/export_control_flow_model_to_onnx_tutorial.py:71 in forward, code: out = self.mlp(x)
+        l__self___mlp_0: &quot;f32[2][1]cpu&quot; = self.L__self___mlp_0(l_x_);  l_x_ = None
+        l__self___mlp_1: &quot;f32[1][1]cpu&quot; = self.L__self___mlp_1(l__self___mlp_0);  l__self___mlp_0 = None
+
+         # File: /workspace/tutorials-kr/beginner_source/onnx/export_control_flow_model_to_onnx_tutorial.py:56 in forward, code: if x.sum():
+        sum_1: &quot;f32[][]cpu&quot; = l__self___mlp_1.sum();  l__self___mlp_1 = sum_1 = None
+
+class GraphModule(torch.nn.Module):
+    def forward(self, L_x_: &quot;f32[3][1]cpu&quot;):
+        l_x_ = L_x_
+
+         # File: /workspace/tutorials-kr/beginner_source/onnx/export_control_flow_model_to_onnx_tutorial.py:71 in forward, code: out = self.mlp(x)
+        l__self___mlp_0: &quot;f32[2][1]cpu&quot; = self.L__self___mlp_0(l_x_);  l_x_ = None
+        l__self___mlp_1: &quot;f32[1][1]cpu&quot; = self.L__self___mlp_1(l__self___mlp_0);  l__self___mlp_0 = None
+
+         # File: /workspace/tutorials-kr/beginner_source/onnx/export_control_flow_model_to_onnx_tutorial.py:56 in forward, code: if x.sum():
+        sum_1: &quot;f32[][]cpu&quot; = l__self___mlp_1.sum();  l__self___mlp_1 = sum_1 = None
+
+[torch.onnx] Obtain model graph for `ModelWithControlFlowTest([...]` with `torch.export.export(..., strict=True)`... ❌
+[torch.onnx] Obtain model graph for `ModelWithControlFlowTest([...]` with `torch.export draft_export`...
+[torch.onnx] Draft Export report:
+
+###################################################################################################
+WARNING: 1 issue(s) found during export, and it was not able to soundly produce a graph.
+Please follow the instructions to fix the errors.
+###################################################################################################
+
+1. Data dependent error.
+    When exporting, we were unable to evaluate the value of `Eq(u0, 1)`.
+    This was encountered 1 times.
+    This occurred at the following user stacktrace:
+        File /opt/conda/lib/python3.11/site-packages/torch/nn/modules/module.py, lineno 1773, in _wrapped_call_impl
+        File /opt/conda/lib/python3.11/site-packages/torch/nn/modules/module.py, lineno 1784, in _call_impl
+            if x.sum():
+
+        Locals:
+            x: [&#39;Tensor(shape: torch.Size([1]), stride: (1,), storage_offset: 0)&#39;]
+
+    And the following framework stacktrace:
+        File /opt/conda/lib/python3.11/site-packages/torch/fx/experimental/proxy_tensor.py, lineno 1360, in __torch_function__
+        File /opt/conda/lib/python3.11/site-packages/torch/fx/experimental/proxy_tensor.py, lineno 1407, in __torch_function__
+            return func(*args, **kwargs)
+
+    As a result, it was specialized to a constant (e.g. `1` in the 1st occurrence), and asserts were inserted into the graph.
+
+    Please add `torch._check(...)` to the original code to assert this data-dependent assumption.
+    Please refer to https://docs.google.com/document/d/1kZ_BbB3JnoLbUZleDT6635dHs88ZVYId8jT-yTFgf3A/edit#heading=h.boi2xurpqa0o for more details.
+
+
+[torch.onnx] Obtain model graph for `ModelWithControlFlowTest([...]` with `torch.export draft_export`... ✅
+[torch.onnx] Run decomposition...
+[torch.onnx] Run decomposition... ✅
+[torch.onnx] Translate the graph into ONNX...
+[torch.onnx] Translate the graph into ONNX... ✅
+&lt;
+    ir_version=10,
+    opset_imports={&#39;&#39;: 18},
+    producer_name=&#39;pytorch&#39;,
+    producer_version=&#39;2.8.0+cu128&#39;,
+    domain=None,
+    model_version=None,
+&gt;
+graph(
+    name=main_graph,
+    inputs=(
+        %&quot;x&quot;&lt;FLOAT,[3]&gt;
+    ),
+    outputs=(
+        %&quot;mul&quot;&lt;FLOAT,[1]&gt;
+    ),
+    initializers=(
+        %&quot;mlp.0.bias&quot;&lt;FLOAT,[2]&gt;{TorchTensor&lt;FLOAT,[2]&gt;(Parameter containing: tensor([-0.5362, -0.1163], requires_grad=True), name=&#39;mlp.0.bias&#39;)},
+        %&quot;mlp.1.bias&quot;&lt;FLOAT,[1]&gt;{TorchTensor&lt;FLOAT,[1]&gt;(Parameter containing: tensor([-0.1978], requires_grad=True), name=&#39;mlp.1.bias&#39;)},
+        %&quot;val_0&quot;&lt;FLOAT,[3,2]&gt;{Tensor&lt;FLOAT,[3,2]&gt;(array([[ 0.35570052, -0.4287425 ], [-0.18541718,  0.0159563 ], [-0.17978263,  0.09059413]], dtype=float32), name=&#39;val_0&#39;)},
+        %&quot;val_2&quot;&lt;FLOAT,[2,1]&gt;{Tensor&lt;FLOAT,[2,1]&gt;(array([[0.43243274], [0.5972638 ]], dtype=float32), name=&#39;val_2&#39;)},
+        %&quot;scalar_tensor_default&quot;&lt;FLOAT,[]&gt;{Tensor&lt;FLOAT,[]&gt;(array(2., dtype=float32), name=&#39;scalar_tensor_default&#39;)}
+    ),
+) {
+    0 |  # node_MatMul_1
+         %&quot;val_1&quot;&lt;FLOAT,[2]&gt; ⬅️ ::MatMul(%&quot;x&quot;, %&quot;val_0&quot;{[[0.3557005226612091, -0.42874249815940857], [-0.18541717529296875, 0.015956301242113113], [-0.17978262901306152, 0.09059412777423859]]})
+    1 |  # node_linear
+         %&quot;linear&quot;&lt;FLOAT,[2]&gt; ⬅️ ::Add(%&quot;val_1&quot;, %&quot;mlp.0.bias&quot;{[-0.5362004637718201, -0.11629027128219604]})
+    2 |  # node_MatMul_3
+         %&quot;val_3&quot;&lt;FLOAT,[1]&gt; ⬅️ ::MatMul(%&quot;linear&quot;, %&quot;val_2&quot;{[[0.43243274092674255], [0.5972638130187988]]})
+    3 |  # node_linear_1
+         %&quot;linear_1&quot;&lt;FLOAT,[1]&gt; ⬅️ ::Add(%&quot;val_3&quot;, %&quot;mlp.1.bias&quot;{[-0.19781209528446198]})
+    4 |  # node_mul
+         %&quot;mul&quot;&lt;FLOAT,[1]&gt; ⬅️ ::Mul(%&quot;linear_1&quot;, %&quot;scalar_tensor_default&quot;{2.0})
+    return %&quot;mul&quot;&lt;FLOAT,[1]&gt;
+}
+</pre></div>
+</div>
+</section>
+<section id="suggested-patch-refactoring-with-torch-cond">
+<h2>Suggested Patch: Refactoring with <a class="reference external" href="https://docs.pytorch.org/docs/stable/generated/torch.cond.html#torch.cond" title="(PyTorch v2.8에서)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.cond()</span></code></a><a class="headerlink" href="#suggested-patch-refactoring-with-torch-cond" title="Link to this heading">#</a></h2>
+<p>To make the control flow exportable, the tutorial demonstrates replacing the
+forward method in <code class="docutils literal notranslate"><span class="pre">ForwardWithControlFlowTest</span></code> with a refactored version that
+uses <code class="xref py py-func docutils literal notranslate"><span class="pre">torch.cond`()</span></code>.</p>
+<p>Details of the Refactoring:</p>
+<p>Two helper functions (identity2 and neg) represent the branches of the conditional logic:
+* <code class="xref py py-func docutils literal notranslate"><span class="pre">torch.cond`()</span></code> is used to specify the condition and the two branches along with the input arguments.
+* The updated forward method is then dynamically assigned to the <code class="docutils literal notranslate"><span class="pre">ForwardWithControlFlowTest</span></code> instance within the model. A list of submodules is printed to confirm the replacement.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">new_forward</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">identity2</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">x</span> <span class="o">*</span> <span class="mi">2</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">neg</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+        <span class="k">return</span> <span class="o">-</span><span class="n">x</span>
+
+    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">cond</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="n">identity2</span><span class="p">,</span> <span class="n">neg</span><span class="p">,</span> <span class="p">(</span><span class="n">x</span><span class="p">,))</span>
+
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;the list of submodules&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">mod</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">named_modules</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">mod</span><span class="p">))</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="n">ForwardWithControlFlowTest</span><span class="p">):</span>
+        <span class="n">mod</span><span class="o">.</span><span class="n">forward</span> <span class="o">=</span> <span class="n">new_forward</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>the list of submodules
+ &lt;class &#39;__main__.ModelWithControlFlowTest&#39;&gt;
+mlp &lt;class &#39;torch.nn.modules.container.Sequential&#39;&gt;
+mlp.0 &lt;class &#39;torch.nn.modules.linear.Linear&#39;&gt;
+mlp.1 &lt;class &#39;torch.nn.modules.linear.Linear&#39;&gt;
+mlp.2 &lt;class &#39;__main__.ForwardWithControlFlowTest&#39;&gt;
+</pre></div>
+</div>
+<p>Let’s see what the FX graph looks like.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">export</span><span class="o">.</span><span class="n">export</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="p">(</span><span class="n">x</span><span class="p">,),</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>ExportedProgram:
+    class GraphModule(torch.nn.Module):
+        def forward(self, p_mlp_0_weight: &quot;f32[2, 3]&quot;, p_mlp_0_bias: &quot;f32[2]&quot;, p_mlp_1_weight: &quot;f32[1, 2]&quot;, p_mlp_1_bias: &quot;f32[1]&quot;, x: &quot;f32[3]&quot;):
+             # File: /opt/conda/lib/python3.11/site-packages/torch/nn/modules/linear.py:125 in forward, code: return F.linear(input, self.weight, self.bias)
+            linear: &quot;f32[2]&quot; = torch.ops.aten.linear.default(x, p_mlp_0_weight, p_mlp_0_bias);  x = p_mlp_0_weight = p_mlp_0_bias = None
+            linear_1: &quot;f32[1]&quot; = torch.ops.aten.linear.default(linear, p_mlp_1_weight, p_mlp_1_bias);  linear = p_mlp_1_weight = p_mlp_1_bias = None
+
+             # File: /opt/conda/lib/python3.11/site-packages/torch/nn/modules/container.py:244 in forward, code: input = module(input)
+            sum_1: &quot;f32[]&quot; = torch.ops.aten.sum.default(linear_1)
+            gt: &quot;b8[]&quot; = torch.ops.aten.gt.Scalar(sum_1, 0);  sum_1 = None
+
+             # File: &lt;eval_with_key&gt;.25:9 in forward, code: cond = torch.ops.higher_order.cond(l_args_0_, cond_true_0, cond_false_0, (l_args_3_0_,));  l_args_0_ = cond_true_0 = cond_false_0 = l_args_3_0_ = None
+            true_graph_0 = self.true_graph_0
+            false_graph_0 = self.false_graph_0
+            cond = torch.ops.higher_order.cond(gt, true_graph_0, false_graph_0, (linear_1,));  gt = true_graph_0 = false_graph_0 = linear_1 = None
+            getitem: &quot;f32[1]&quot; = cond[0];  cond = None
+            return (getitem,)
+
+        class true_graph_0(torch.nn.Module):
+            def forward(self, linear_1: &quot;f32[1]&quot;):
+                 # File: &lt;eval_with_key&gt;.22:6 in forward, code: mul = l_args_3_0__1.mul(2);  l_args_3_0__1 = None
+                mul: &quot;f32[1]&quot; = torch.ops.aten.mul.Tensor(linear_1, 2);  linear_1 = None
+                return (mul,)
+
+        class false_graph_0(torch.nn.Module):
+            def forward(self, linear_1: &quot;f32[1]&quot;):
+                 # File: &lt;eval_with_key&gt;.23:6 in forward, code: neg = l_args_3_0__1.neg();  l_args_3_0__1 = None
+                neg: &quot;f32[1]&quot; = torch.ops.aten.neg.default(linear_1);  linear_1 = None
+                return (neg,)
+
+Graph signature:
+    # inputs
+    p_mlp_0_weight: PARAMETER target=&#39;mlp.0.weight&#39;
+    p_mlp_0_bias: PARAMETER target=&#39;mlp.0.bias&#39;
+    p_mlp_1_weight: PARAMETER target=&#39;mlp.1.weight&#39;
+    p_mlp_1_bias: PARAMETER target=&#39;mlp.1.bias&#39;
+    x: USER_INPUT
+
+    # outputs
+    getitem: USER_OUTPUT
+
+Range constraints: {}
+</pre></div>
+</div>
+<p>Let’s export again.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">onnx_program</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">onnx</span><span class="o">.</span><span class="n">export</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="p">(</span><span class="n">x</span><span class="p">,),</span> <span class="n">dynamo</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">onnx_program</span><span class="o">.</span><span class="n">model</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[torch.onnx] Obtain model graph for `ModelWithControlFlowTest([...]` with `torch.export.export(..., strict=False)`...
+[torch.onnx] Obtain model graph for `ModelWithControlFlowTest([...]` with `torch.export.export(..., strict=False)`... ✅
+[torch.onnx] Run decomposition...
+[torch.onnx] Run decomposition... ✅
+[torch.onnx] Translate the graph into ONNX...
+[torch.onnx] Translate the graph into ONNX... ✅
+&lt;
+    ir_version=10,
+    opset_imports={&#39;&#39;: 18},
+    producer_name=&#39;pytorch&#39;,
+    producer_version=&#39;2.8.0+cu128&#39;,
+    domain=None,
+    model_version=None,
+&gt;
+graph(
+    name=main_graph,
+    inputs=(
+        %&quot;x&quot;&lt;FLOAT,[3]&gt;
+    ),
+    outputs=(
+        %&quot;getitem&quot;&lt;FLOAT,[1]&gt;
+    ),
+    initializers=(
+        %&quot;mlp.0.bias&quot;&lt;FLOAT,[2]&gt;{TorchTensor&lt;FLOAT,[2]&gt;(Parameter containing: tensor([-0.5362, -0.1163], requires_grad=True), name=&#39;mlp.0.bias&#39;)},
+        %&quot;mlp.1.bias&quot;&lt;FLOAT,[1]&gt;{TorchTensor&lt;FLOAT,[1]&gt;(Parameter containing: tensor([-0.1978], requires_grad=True), name=&#39;mlp.1.bias&#39;)},
+        %&quot;val_0&quot;&lt;FLOAT,[3,2]&gt;{Tensor&lt;FLOAT,[3,2]&gt;(array([[ 0.35570052, -0.4287425 ], [-0.18541718,  0.0159563 ], [-0.17978263,  0.09059413]], dtype=float32), name=&#39;val_0&#39;)},
+        %&quot;val_2&quot;&lt;FLOAT,[2,1]&gt;{Tensor&lt;FLOAT,[2,1]&gt;(array([[0.43243274], [0.5972638 ]], dtype=float32), name=&#39;val_2&#39;)},
+        %&quot;scalar_tensor_default&quot;&lt;FLOAT,[]&gt;{Tensor&lt;FLOAT,[]&gt;(array(0., dtype=float32), name=&#39;scalar_tensor_default&#39;)},
+        %&quot;scalar_tensor_default_2&quot;&lt;FLOAT,[]&gt;{Tensor&lt;FLOAT,[]&gt;(array(2., dtype=float32), name=&#39;scalar_tensor_default_2&#39;)}
+    ),
+) {
+    0 |  # node_MatMul_1
+         %&quot;val_1&quot;&lt;FLOAT,[2]&gt; ⬅️ ::MatMul(%&quot;x&quot;, %&quot;val_0&quot;{[[0.3557005226612091, -0.42874249815940857], [-0.18541717529296875, 0.015956301242113113], [-0.17978262901306152, 0.09059412777423859]]})
+    1 |  # node_linear
+         %&quot;linear&quot;&lt;FLOAT,[2]&gt; ⬅️ ::Add(%&quot;val_1&quot;, %&quot;mlp.0.bias&quot;{[-0.5362004637718201, -0.11629027128219604]})
+    2 |  # node_MatMul_3
+         %&quot;val_3&quot;&lt;FLOAT,[1]&gt; ⬅️ ::MatMul(%&quot;linear&quot;, %&quot;val_2&quot;{[[0.43243274092674255], [0.5972638130187988]]})
+    3 |  # node_linear_1
+         %&quot;linear_1&quot;&lt;FLOAT,[1]&gt; ⬅️ ::Add(%&quot;val_3&quot;, %&quot;mlp.1.bias&quot;{[-0.19781209528446198]})
+    4 |  # node_sum_1
+         %&quot;sum_1&quot;&lt;FLOAT,[]&gt; ⬅️ ::ReduceSum(%&quot;linear_1&quot;) {noop_with_empty_axes=0, keepdims=0}
+    5 |  # node_gt
+         %&quot;gt&quot;&lt;BOOL,[]&gt; ⬅️ ::Greater(%&quot;sum_1&quot;, %&quot;scalar_tensor_default&quot;{0.0})
+    6 |  # node_cond__0
+         %&quot;getitem&quot;&lt;FLOAT,[1]&gt; ⬅️ ::If(%&quot;gt&quot;) {then_branch=
+             graph(
+                 name=true_graph_0,
+                 inputs=(
+
+                 ),
+                 outputs=(
+                     %&quot;mul_true_graph_0&quot;&lt;FLOAT,[1]&gt;
+                 ),
+             ) {
+                 0 |  # node_mul
+                      %&quot;mul_true_graph_0&quot;&lt;FLOAT,[1]&gt; ⬅️ ::Mul(%&quot;linear_1&quot;, %&quot;scalar_tensor_default_2&quot;{2.0})
+                 return %&quot;mul_true_graph_0&quot;&lt;FLOAT,[1]&gt;
+             }, else_branch=
+             graph(
+                 name=false_graph_0,
+                 inputs=(
+
+                 ),
+                 outputs=(
+                     %&quot;neg_false_graph_0&quot;&lt;FLOAT,[1]&gt;
+                 ),
+             ) {
+                 0 |  # node_neg
+                      %&quot;neg_false_graph_0&quot;&lt;FLOAT,[1]&gt; ⬅️ ::Neg(%&quot;linear_1&quot;)
+                 return %&quot;neg_false_graph_0&quot;&lt;FLOAT,[1]&gt;
+             }}
+    return %&quot;getitem&quot;&lt;FLOAT,[1]&gt;
+}
+</pre></div>
+</div>
+<p>We can optimize the model and get rid of the model local functions created to capture the control flow branches.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">onnx_program</span><span class="o">.</span><span class="n">optimize</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">onnx_program</span><span class="o">.</span><span class="n">model</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;
+    ir_version=10,
+    opset_imports={&#39;&#39;: 18},
+    producer_name=&#39;pytorch&#39;,
+    producer_version=&#39;2.8.0+cu128&#39;,
+    domain=None,
+    model_version=None,
+&gt;
+graph(
+    name=main_graph,
+    inputs=(
+        %&quot;x&quot;&lt;FLOAT,[3]&gt;
+    ),
+    outputs=(
+        %&quot;getitem&quot;&lt;FLOAT,[1]&gt;
+    ),
+    initializers=(
+        %&quot;mlp.0.bias&quot;&lt;FLOAT,[2]&gt;{TorchTensor&lt;FLOAT,[2]&gt;(Parameter containing: tensor([-0.5362, -0.1163], requires_grad=True), name=&#39;mlp.0.bias&#39;)},
+        %&quot;mlp.1.bias&quot;&lt;FLOAT,[1]&gt;{TorchTensor&lt;FLOAT,[1]&gt;(Parameter containing: tensor([-0.1978], requires_grad=True), name=&#39;mlp.1.bias&#39;)},
+        %&quot;val_0&quot;&lt;FLOAT,[3,2]&gt;{Tensor&lt;FLOAT,[3,2]&gt;(array([[ 0.35570052, -0.4287425 ], [-0.18541718,  0.0159563 ], [-0.17978263,  0.09059413]], dtype=float32), name=&#39;val_0&#39;)},
+        %&quot;val_2&quot;&lt;FLOAT,[2,1]&gt;{Tensor&lt;FLOAT,[2,1]&gt;(array([[0.43243274], [0.5972638 ]], dtype=float32), name=&#39;val_2&#39;)},
+        %&quot;scalar_tensor_default&quot;&lt;FLOAT,[]&gt;{Tensor&lt;FLOAT,[]&gt;(array(0., dtype=float32), name=&#39;scalar_tensor_default&#39;)},
+        %&quot;scalar_tensor_default_2&quot;&lt;FLOAT,[]&gt;{Tensor&lt;FLOAT,[]&gt;(array(2., dtype=float32), name=&#39;scalar_tensor_default_2&#39;)}
+    ),
+) {
+    0 |  # node_MatMul_1
+         %&quot;val_1&quot;&lt;FLOAT,[2]&gt; ⬅️ ::MatMul(%&quot;x&quot;, %&quot;val_0&quot;{[[0.3557005226612091, -0.42874249815940857], [-0.18541717529296875, 0.015956301242113113], [-0.17978262901306152, 0.09059412777423859]]})
+    1 |  # node_linear
+         %&quot;linear&quot;&lt;FLOAT,[2]&gt; ⬅️ ::Add(%&quot;val_1&quot;, %&quot;mlp.0.bias&quot;{[-0.5362004637718201, -0.11629027128219604]})
+    2 |  # node_MatMul_3
+         %&quot;val_3&quot;&lt;FLOAT,[1]&gt; ⬅️ ::MatMul(%&quot;linear&quot;, %&quot;val_2&quot;{[[0.43243274092674255], [0.5972638130187988]]})
+    3 |  # node_linear_1
+         %&quot;linear_1&quot;&lt;FLOAT,[1]&gt; ⬅️ ::Add(%&quot;val_3&quot;, %&quot;mlp.1.bias&quot;{[-0.19781209528446198]})
+    4 |  # node_sum_1
+         %&quot;sum_1&quot;&lt;FLOAT,[]&gt; ⬅️ ::ReduceSum(%&quot;linear_1&quot;) {noop_with_empty_axes=0, keepdims=0}
+    5 |  # node_gt
+         %&quot;gt&quot;&lt;BOOL,[]&gt; ⬅️ ::Greater(%&quot;sum_1&quot;, %&quot;scalar_tensor_default&quot;{0.0})
+    6 |  # node_cond__0
+         %&quot;getitem&quot;&lt;FLOAT,[1]&gt; ⬅️ ::If(%&quot;gt&quot;) {then_branch=
+             graph(
+                 name=true_graph_0,
+                 inputs=(
+
+                 ),
+                 outputs=(
+                     %&quot;mul_true_graph_0&quot;&lt;FLOAT,[1]&gt;
+                 ),
+             ) {
+                 0 |  # node_mul
+                      %&quot;mul_true_graph_0&quot;&lt;FLOAT,[1]&gt; ⬅️ ::Mul(%&quot;linear_1&quot;, %&quot;scalar_tensor_default_2&quot;{2.0})
+                 return %&quot;mul_true_graph_0&quot;&lt;FLOAT,[1]&gt;
+             }, else_branch=
+             graph(
+                 name=false_graph_0,
+                 inputs=(
+
+                 ),
+                 outputs=(
+                     %&quot;neg_false_graph_0&quot;&lt;FLOAT,[1]&gt;
+                 ),
+             ) {
+                 0 |  # node_neg
+                      %&quot;neg_false_graph_0&quot;&lt;FLOAT,[1]&gt; ⬅️ ::Neg(%&quot;linear_1&quot;)
+                 return %&quot;neg_false_graph_0&quot;&lt;FLOAT,[1]&gt;
+             }}
+    return %&quot;getitem&quot;&lt;FLOAT,[1]&gt;
+}
+</pre></div>
+</div>
+</section>
+<section id="conclusion">
+<h2>Conclusion<a class="headerlink" href="#conclusion" title="Link to this heading">#</a></h2>
+<p>This tutorial demonstrates the challenges of exporting models with conditional
+logic to ONNX and presents a practical solution using <a class="reference external" href="https://docs.pytorch.org/docs/stable/generated/torch.cond.html#torch.cond" title="(PyTorch v2.8에서)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.cond()</span></code></a>.
+While the default exporters may fail or produce imperfect graphs, refactoring the
+model’s logic ensures compatibility and generates a faithful ONNX representation.</p>
+<p>By understanding these techniques, we can overcome common pitfalls when
+working with control flow in PyTorch models and ensure smooth integration with ONNX workflows.</p>
+</section>
+<section id="further-reading">
+<h2>Further reading<a class="headerlink" href="#further-reading" title="Link to this heading">#</a></h2>
+<p>The list below refers to tutorials that ranges from basic examples to advanced scenarios,
+not necessarily in the order they are listed.
+Feel free to jump directly to specific topics of your interest or
+sit tight and have fun going through all of them to learn all there is about the ONNX exporter.</p>
+<div class="line-block">
+<div class="line">1. <a class="reference external" href="export_simple_model_to_onnx_tutorial.html">Exporting a PyTorch model to ONNX</a></div>
+<div class="line">2. <a class="reference external" href="onnx_registry_tutorial.html">Extending the ONNX registry</a></div>
+</div>
+<div class="toctree-wrapper compound">
+</div>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 7.530 seconds)</p>
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-beginner-onnx-export-control-flow-model-to-onnx-tutorial-py">
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/1c5e336a8b06aec51ee1f67538b41344/export_control_flow_model_to_onnx_tutorial.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">export_control_flow_model_to_onnx_tutorial.ipynb</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/7c1717301d5ef4e2f2b6c974660ec4a9/export_control_flow_model_to_onnx_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">export_control_flow_model_to_onnx_tutorial.py</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-zip docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/0080a38f22bd92aa2613545074840623/export_control_flow_model_to_onnx_tutorial.zip"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">zipped:</span> <span class="pre">export_control_flow_model_to_onnx_tutorial.zip</span></code></a></p>
+</div>
+</div>
+</section>
+</section>
+
+
+                </article>
+              
+  </article>
+  
+              
+              
+                <footer class="bd-footer-article">
+                  <div class="footer-article-items footer-article__inner">
+  
+    <div class="footer-article-item">
+<div class="feedback">
+  
+<div class="rating">
+    Rate this Page
+    <div class="stars">
+        
+        <span class="star" data-behavior="tutorial-rating" data-count="1" data-value="1">★</span>
+        
+        <span class="star" data-behavior="tutorial-rating" data-count="2" data-value="2">★</span>
+        
+        <span class="star" data-behavior="tutorial-rating" data-count="3" data-value="3">★</span>
+        
+        <span class="star" data-behavior="tutorial-rating" data-count="4" data-value="4">★</span>
+        
+        <span class="star" data-behavior="tutorial-rating" data-count="5" data-value="5">★</span>
+        
+    </div>
+</div>
+
+  <div class="feedback-send">
+    <button class="feedback-btn"
+            onclick="openGitHubIssue()"
+            data-bs-title="Create a GitHub Issue"
+            data-bs-placement="bottom"
+            data-bs-toggle="tooltip"
+            data-gtm="feedback-btn-click">Send Feedback
+    </button>
+  </div>
+</div>
+
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="onnx_registry_tutorial.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">이전</p>
+        <p class="prev-next-title">Extending the ONNX Registry</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../../intermediate/torch_compile_conv_bn_fuser.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">다음</p>
+        <p class="prev-next-title">Building a Convolution/Batch Norm fuser with torch.compile</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+
+<div class="footer-info">
+  <p class="copyright">
+    
+      
+        © Copyright 2018-2025, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorchKR).
+      
+      <br/>
+    
+  </p>
+
+  <p class="theme-version">
+    Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.4.
+  </p>
+</div>
+</div>
+  
+</div>
+                </footer>
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="onnx_registry_tutorial.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">이전</p>
+        <p class="prev-next-title">Extending the ONNX Registry</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../../intermediate/torch_compile_conv_bn_fuser.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">다음</p>
+        <p class="prev-next-title">Building a Convolution/Batch Norm fuser with torch.compile</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc">
+<div class="sidebar-secondary-items sidebar-secondary__inner">
+    
+       <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#overview">Overview</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#prerequisites">Prerequisites</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#define-the-models">Define the Models</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exporting-the-model-first-attempt">Exporting the Model: First Attempt</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#using-torch-onnx-export-with-jit-tracing">Using <code class="xref py py-func docutils literal notranslate"><span class="pre">torch.onnx.export()</span></code> with JIT Tracing</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#suggested-patch-refactoring-with-torch-cond">Suggested Patch: Refactoring with <code class="xref py py-func docutils literal notranslate"><span class="pre">torch.cond()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#conclusion">Conclusion</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#further-reading">Further reading</a></li>
+</ul>
+  </nav></div>
+    
+
+
+
+
+<div class="sidebar-secondary-item">
+  <div class="sidebar-heading">PyTorch Libraries</div>
+  <ul style="list-style-type: none; padding: 0; padding-bottom: 80px;">
+  
+   <li><a class="nav-link nav-external" href="https://docs.pytorch.org/ao" style="color: var(--pst-color-text-muted)">torchao</a></li>
+  
+   <li><a class="nav-link nav-external" href="https://docs.pytorch.org/torchrec" style="color: var(--pst-color-text-muted)">torchrec</a></li>
+  
+   <li><a class="nav-link nav-external" href="https://docs.pytorch.org/torchft" style="color: var(--pst-color-text-muted)">torchft</a></li>
+  
+   <li><a class="nav-link nav-external" href="https://docs.pytorch.org/torchcodec" style="color: var(--pst-color-text-muted)">TorchCodec</a></li>
+  
+   <li><a class="nav-link nav-external" href="https://docs.pytorch.org/vision" style="color: var(--pst-color-text-muted)">torchvision</a></li>
+  
+   <li><a class="nav-link nav-external" href="https://docs.pytorch.org/executorch" style="color: var(--pst-color-text-muted)">ExecuTorch</a></li>
+  
+   <li><a class="nav-link nav-external" href="https://docs.pytorch.org/xla" style="color: var(--pst-color-text-muted)">PyTorch on XLA Devices</a></li>
+  
+  </ul>
+</div>
+
+</div>
+</div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <div class="container-fluid docs-tutorials-resources">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-4 text-center">
+        <h2>PyTorchKorea @ GitHub</h2>
+        <p>파이토치 한국 사용자 모임을 GitHub에서 만나보세요.</p>
+        <a class="with-right-arrow" href="https://github.com/PyTorchKorea">GitHub로 이동</a>
+      </div>
+
+      <div class="col-md-4 text-center">
+        <h2>한국어 튜토리얼</h2>
+        <p>한국어로 번역 중인 파이토치 튜토리얼을 만나보세요.</p>
+        <a class="with-right-arrow" href="https://tutorials.pytorch.kr/">튜토리얼로 이동</a>
+      </div>
+
+      <div class="col-md-4 text-center">
+        <h2>한국어 커뮤니티</h2>
+        <p>다른 사용자들과 의견을 나누고, 도와주세요!</p>
+        <a class="with-right-arrow" href="https://discuss.pytorch.kr/">커뮤니티로 이동</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="container footer-container">
+    <div class="footer-logo-wrapper">
+      <a href="https://pytorch.kr/" class="footer-logo"></a>
+    </div>
+
+    <div class="footer-links-wrapper">
+      <div class="footer-links-col">
+        <ul>
+          <li class="list-title"><a href="https://pytorch.kr/">파이토치 한국 사용자 모임</a></li>
+          <li><a href="https://pytorch.kr/about">사용자 모임 소개</a></li>
+          <li><a href="https://pytorch.kr/contributors">기여해주신 분들</a></li>
+          <li><a href="https://pytorch.kr/resources/">리소스</a></li>
+          <li><a href="https://pytorch.kr/coc">행동 강령</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="trademark-disclaimer">
+      <ul>
+        <li>이 사이트는 독립적인 파이토치 사용자 커뮤니티로, 최신 버전이 아니거나 잘못된 내용이 포함되어 있을 수 있습니다. This site is an independent user community and may be out of date or contain incorrect information.</li>
+        <li><a href="https://pytorch.kr/coc">행동 강령</a>을 읽고 지켜주세요. PyTorch 공식 로고 사용 규정은 <a href="https://www.linuxfoundation.org/policies/">Linux Foundation의 정책</a>을 따릅니다. Please read and follow <a href="https://pytorch.kr/coc">our code of conduct</a>. All PyTorch trademark policy applicable to <a href="https://www.linuxfoundation.org/policies/">Linux Foundation's policies</a>.</li>
+      </ul>
+    </div>
+  </div>
+</footer>
+
+<div class="cookie-banner-wrapper">
+  <div class="container">
+    <p class="gdpr-notice">To analyze traffic and optimize your experience, we serve cookies on this site. By clicking or navigating, you agree to allow our usage of cookies. As the current maintainers of this site, Facebook’s Cookies Policy applies. Learn more, including about available controls: <a href="https://www.facebook.com/policies/cookies/">Cookies Policy</a>.</p>
+    <img class="close-button" src="../../_static/img/pytorch-x.svg">
+  </div>
+</div>
+  
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2018-2025, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorchKR).
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6 버전으로 생성되었습니다.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.4.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  <script type="application/ld+json">
+    {
+       "@context": "https://schema.org",
+       "@type": "Article",
+       "name": "Export a model with control flow to ONNX",
+       "headline": "Export a model with control flow to ONNX",
+       "description": "PyTorch Documentation. Explore PyTorch, an open-source machine learning library that accelerates the path from research prototyping to production deployment. Discover tutorials, API references, and guides to help you build and deploy deep learning models efficiently.",
+       "url": "/beginner/onnx/export_control_flow_model_to_onnx_tutorial.html",
+       "articleBody": "\ucc38\uace0 Go to the end to download the full example code. Introduction to ONNX || Exporting a PyTorch model to ONNX || Extending the ONNX exporter operator support || `Export a model with control flow to ONNX Export a model with control flow to ONNX# Author: Xavier Dupr\u00e9 Overview# This tutorial demonstrates how to handle control flow logic while exporting a PyTorch model to ONNX. It highlights the challenges of exporting conditional statements directly and provides solutions to circumvent them. Conditional logic cannot be exported into ONNX unless they refactored to use torch.cond(). Let\u2019s start with a simple model implementing a test. What you will learn: How to refactor the model to use torch.cond() for exporting. How to export a model with control flow logic to ONNX. How to optimize the exported model using the ONNX optimizer. Prerequisites# torch \u003e= 2.6 import torch Define the Models# Two models are defined: ForwardWithControlFlowTest: A model with a forward method containing an if-else conditional. ModelWithControlFlowTest: A model that incorporates ForwardWithControlFlowTest as part of a simple MLP. The models are tested with a random input tensor to confirm they execute as expected. class ForwardWithControlFlowTest(torch.nn.Module): def forward(self, x): if x.sum(): return x * 2 return -x class ModelWithControlFlowTest(torch.nn.Module): def __init__(self): super().__init__() self.mlp = torch.nn.Sequential( torch.nn.Linear(3, 2), torch.nn.Linear(2, 1), ForwardWithControlFlowTest(), ) def forward(self, x): out = self.mlp(x) return out model = ModelWithControlFlowTest() Exporting the Model: First Attempt# Exporting this model using torch.export.export fails because the control flow logic in the forward pass creates a graph break that the exporter cannot handle. This behavior is expected, as conditional logic not written using torch.cond() is unsupported. A try-except block is used to capture the expected failure during the export process. If the export unexpectedly succeeds, an AssertionError is raised. x = torch.randn(3) model(x) try: torch.export.export(model, (x,), strict=False) raise AssertionError(\"This export should failed unless PyTorch now supports this model.\") except Exception as e: print(e) def forward(self, arg0_1: \"f32[2, 3]\", arg1_1: \"f32[2]\", arg2_1: \"f32[1, 2]\", arg3_1: \"f32[1]\", arg4_1: \"f32[3]\"): # File: /opt/conda/lib/python3.11/site-packages/torch/nn/modules/linear.py:125 in forward, code: return F.linear(input, self.weight, self.bias) linear: \"f32[2]\" = torch.ops.aten.linear.default(arg4_1, arg0_1, arg1_1); arg4_1 = arg0_1 = arg1_1 = None linear_1: \"f32[1]\" = torch.ops.aten.linear.default(linear, arg2_1, arg3_1); linear = arg2_1 = arg3_1 = None # File: /workspace/tutorials-kr/beginner_source/onnx/export_control_flow_model_to_onnx_tutorial.py:56 in forward, code: if x.sum(): sum_1: \"f32[]\" = torch.ops.aten.sum.default(linear_1); linear_1 = None ne: \"b8[]\" = torch.ops.aten.ne.Scalar(sum_1, 0); sum_1 = None item: \"Sym(Eq(u0, 1))\" = torch.ops.aten.item.default(ne); ne = item = None def forward(self, arg0_1: \"f32[2, 3]\", arg1_1: \"f32[2]\", arg2_1: \"f32[1, 2]\", arg3_1: \"f32[1]\", arg4_1: \"f32[3]\"): # File: /opt/conda/lib/python3.11/site-packages/torch/nn/modules/linear.py:125 in forward, code: return F.linear(input, self.weight, self.bias) linear: \"f32[2]\" = torch.ops.aten.linear.default(arg4_1, arg0_1, arg1_1); arg4_1 = arg0_1 = arg1_1 = None linear_1: \"f32[1]\" = torch.ops.aten.linear.default(linear, arg2_1, arg3_1); linear = arg2_1 = arg3_1 = None # File: /workspace/tutorials-kr/beginner_source/onnx/export_control_flow_model_to_onnx_tutorial.py:56 in forward, code: if x.sum(): sum_1: \"f32[]\" = torch.ops.aten.sum.default(linear_1); linear_1 = None ne: \"b8[]\" = torch.ops.aten.ne.Scalar(sum_1, 0); sum_1 = None item: \"Sym(Eq(u0, 1))\" = torch.ops.aten.item.default(ne); ne = item = None Could not guard on data-dependent expression Eq(u0, 1) (unhinted: Eq(u0, 1)). (Size-like symbols: none) Caused by: (_export/non_strict_utils.py:1051 in __torch_function__) For more information, run with TORCH_LOGS=\"dynamic\" For extended logs when we create symbols, also add TORCHDYNAMO_EXTENDED_DEBUG_CREATE_SYMBOL=\"u0\" If you suspect the guard was triggered from C++, add TORCHDYNAMO_EXTENDED_DEBUG_CPP=1 For more debugging help, see https://docs.google.com/document/d/1HSuTTVvYH1pTew89Rtpeu84Ht3nQEFTYhAX3Ypa_xJs/edit?usp=sharing For C++ stack trace, run with TORCHDYNAMO_EXTENDED_DEBUG_CPP=1 The following call raised this error: File \"/workspace/tutorials-kr/beginner_source/onnx/export_control_flow_model_to_onnx_tutorial.py\", line 56, in forward if x.sum(): The error above occurred when calling torch.export.export. If you would like to view some more information about this error, and get a list of all other errors that may occur in your export call, you can replace your `export()` call with `draft_export()`. Using torch.onnx.export() with JIT Tracing# When exporting the model using torch.onnx.export() with the dynamo=True argument, the exporter defaults to using JIT tracing. This fallback allows the model to export, but the resulting ONNX graph may not faithfully represent the original model logic due to the limitations of tracing. onnx_program = torch.onnx.export(model, (x,), dynamo=True) print(onnx_program.model) [torch.onnx] Obtain model graph for `ModelWithControlFlowTest([...]` with `torch.export.export(..., strict=False)`... def forward(self, arg0_1: \"f32[2, 3]\", arg1_1: \"f32[2]\", arg2_1: \"f32[1, 2]\", arg3_1: \"f32[1]\", arg4_1: \"f32[3]\"): # File: /opt/conda/lib/python3.11/site-packages/torch/nn/modules/linear.py:125 in forward, code: return F.linear(input, self.weight, self.bias) linear: \"f32[2]\" = torch.ops.aten.linear.default(arg4_1, arg0_1, arg1_1); arg4_1 = arg0_1 = arg1_1 = None linear_1: \"f32[1]\" = torch.ops.aten.linear.default(linear, arg2_1, arg3_1); linear = arg2_1 = arg3_1 = None # File: /workspace/tutorials-kr/beginner_source/onnx/export_control_flow_model_to_onnx_tutorial.py:56 in forward, code: if x.sum(): sum_1: \"f32[]\" = torch.ops.aten.sum.default(linear_1); linear_1 = None ne: \"b8[]\" = torch.ops.aten.ne.Scalar(sum_1, 0); sum_1 = None item: \"Sym(Eq(u0, 1))\" = torch.ops.aten.item.default(ne); ne = item = None def forward(self, arg0_1: \"f32[2, 3]\", arg1_1: \"f32[2]\", arg2_1: \"f32[1, 2]\", arg3_1: \"f32[1]\", arg4_1: \"f32[3]\"): # File: /opt/conda/lib/python3.11/site-packages/torch/nn/modules/linear.py:125 in forward, code: return F.linear(input, self.weight, self.bias) linear: \"f32[2]\" = torch.ops.aten.linear.default(arg4_1, arg0_1, arg1_1); arg4_1 = arg0_1 = arg1_1 = None linear_1: \"f32[1]\" = torch.ops.aten.linear.default(linear, arg2_1, arg3_1); linear = arg2_1 = arg3_1 = None # File: /workspace/tutorials-kr/beginner_source/onnx/export_control_flow_model_to_onnx_tutorial.py:56 in forward, code: if x.sum(): sum_1: \"f32[]\" = torch.ops.aten.sum.default(linear_1); linear_1 = None ne: \"b8[]\" = torch.ops.aten.ne.Scalar(sum_1, 0); sum_1 = None item: \"Sym(Eq(u0, 1))\" = torch.ops.aten.item.default(ne); ne = item = None [torch.onnx] Obtain model graph for `ModelWithControlFlowTest([...]` with `torch.export.export(..., strict=False)`... \u274c [torch.onnx] Obtain model graph for `ModelWithControlFlowTest([...]` with `torch.export.export(..., strict=True)`... class GraphModule(torch.nn.Module): def forward(self, L_x_: \"f32[3][1]cpu\"): l_x_ = L_x_ # File: /workspace/tutorials-kr/beginner_source/onnx/export_control_flow_model_to_onnx_tutorial.py:71 in forward, code: out = self.mlp(x) l__self___mlp_0: \"f32[2][1]cpu\" = self.L__self___mlp_0(l_x_); l_x_ = None l__self___mlp_1: \"f32[1][1]cpu\" = self.L__self___mlp_1(l__self___mlp_0); l__self___mlp_0 = None # File: /workspace/tutorials-kr/beginner_source/onnx/export_control_flow_model_to_onnx_tutorial.py:56 in forward, code: if x.sum(): sum_1: \"f32[][]cpu\" = l__self___mlp_1.sum(); l__self___mlp_1 = sum_1 = None class GraphModule(torch.nn.Module): def forward(self, L_x_: \"f32[3][1]cpu\"): l_x_ = L_x_ # File: /workspace/tutorials-kr/beginner_source/onnx/export_control_flow_model_to_onnx_tutorial.py:71 in forward, code: out = self.mlp(x) l__self___mlp_0: \"f32[2][1]cpu\" = self.L__self___mlp_0(l_x_); l_x_ = None l__self___mlp_1: \"f32[1][1]cpu\" = self.L__self___mlp_1(l__self___mlp_0); l__self___mlp_0 = None # File: /workspace/tutorials-kr/beginner_source/onnx/export_control_flow_model_to_onnx_tutorial.py:56 in forward, code: if x.sum(): sum_1: \"f32[][]cpu\" = l__self___mlp_1.sum(); l__self___mlp_1 = sum_1 = None [torch.onnx] Obtain model graph for `ModelWithControlFlowTest([...]` with `torch.export.export(..., strict=True)`... \u274c [torch.onnx] Obtain model graph for `ModelWithControlFlowTest([...]` with `torch.export draft_export`... [torch.onnx] Draft Export report: ################################################################################################### WARNING: 1 issue(s) found during export, and it was not able to soundly produce a graph. Please follow the instructions to fix the errors. ################################################################################################### 1. Data dependent error. When exporting, we were unable to evaluate the value of `Eq(u0, 1)`. This was encountered 1 times. This occurred at the following user stacktrace: File /opt/conda/lib/python3.11/site-packages/torch/nn/modules/module.py, lineno 1773, in _wrapped_call_impl File /opt/conda/lib/python3.11/site-packages/torch/nn/modules/module.py, lineno 1784, in _call_impl if x.sum(): Locals: x: [\u0027Tensor(shape: torch.Size([1]), stride: (1,), storage_offset: 0)\u0027] And the following framework stacktrace: File /opt/conda/lib/python3.11/site-packages/torch/fx/experimental/proxy_tensor.py, lineno 1360, in __torch_function__ File /opt/conda/lib/python3.11/site-packages/torch/fx/experimental/proxy_tensor.py, lineno 1407, in __torch_function__ return func(*args, **kwargs) As a result, it was specialized to a constant (e.g. `1` in the 1st occurrence), and asserts were inserted into the graph. Please add `torch._check(...)` to the original code to assert this data-dependent assumption. Please refer to https://docs.google.com/document/d/1kZ_BbB3JnoLbUZleDT6635dHs88ZVYId8jT-yTFgf3A/edit#heading=h.boi2xurpqa0o for more details. [torch.onnx] Obtain model graph for `ModelWithControlFlowTest([...]` with `torch.export draft_export`... \u2705 [torch.onnx] Run decomposition... [torch.onnx] Run decomposition... \u2705 [torch.onnx] Translate the graph into ONNX... [torch.onnx] Translate the graph into ONNX... \u2705 \u003c ir_version=10, opset_imports={\u0027\u0027: 18}, producer_name=\u0027pytorch\u0027, producer_version=\u00272.8.0+cu128\u0027, domain=None, model_version=None, \u003e graph( name=main_graph, inputs=( %\"x\"\u003cFLOAT,[3]\u003e ), outputs=( %\"mul\"\u003cFLOAT,[1]\u003e ), initializers=( %\"mlp.0.bias\"\u003cFLOAT,[2]\u003e{TorchTensor\u003cFLOAT,[2]\u003e(Parameter containing: tensor([-0.5362, -0.1163], requires_grad=True), name=\u0027mlp.0.bias\u0027)}, %\"mlp.1.bias\"\u003cFLOAT,[1]\u003e{TorchTensor\u003cFLOAT,[1]\u003e(Parameter containing: tensor([-0.1978], requires_grad=True), name=\u0027mlp.1.bias\u0027)}, %\"val_0\"\u003cFLOAT,[3,2]\u003e{Tensor\u003cFLOAT,[3,2]\u003e(array([[ 0.35570052, -0.4287425 ], [-0.18541718, 0.0159563 ], [-0.17978263, 0.09059413]], dtype=float32), name=\u0027val_0\u0027)}, %\"val_2\"\u003cFLOAT,[2,1]\u003e{Tensor\u003cFLOAT,[2,1]\u003e(array([[0.43243274], [0.5972638 ]], dtype=float32), name=\u0027val_2\u0027)}, %\"scalar_tensor_default\"\u003cFLOAT,[]\u003e{Tensor\u003cFLOAT,[]\u003e(array(2., dtype=float32), name=\u0027scalar_tensor_default\u0027)} ), ) { 0 | # node_MatMul_1 %\"val_1\"\u003cFLOAT,[2]\u003e \u2b05\ufe0f ::MatMul(%\"x\", %\"val_0\"{[[0.3557005226612091, -0.42874249815940857], [-0.18541717529296875, 0.015956301242113113], [-0.17978262901306152, 0.09059412777423859]]}) 1 | # node_linear %\"linear\"\u003cFLOAT,[2]\u003e \u2b05\ufe0f ::Add(%\"val_1\", %\"mlp.0.bias\"{[-0.5362004637718201, -0.11629027128219604]}) 2 | # node_MatMul_3 %\"val_3\"\u003cFLOAT,[1]\u003e \u2b05\ufe0f ::MatMul(%\"linear\", %\"val_2\"{[[0.43243274092674255], [0.5972638130187988]]}) 3 | # node_linear_1 %\"linear_1\"\u003cFLOAT,[1]\u003e \u2b05\ufe0f ::Add(%\"val_3\", %\"mlp.1.bias\"{[-0.19781209528446198]}) 4 | # node_mul %\"mul\"\u003cFLOAT,[1]\u003e \u2b05\ufe0f ::Mul(%\"linear_1\", %\"scalar_tensor_default\"{2.0}) return %\"mul\"\u003cFLOAT,[1]\u003e } Suggested Patch: Refactoring with torch.cond()# To make the control flow exportable, the tutorial demonstrates replacing the forward method in ForwardWithControlFlowTest with a refactored version that uses torch.cond`(). Details of the Refactoring: Two helper functions (identity2 and neg) represent the branches of the conditional logic: * torch.cond`() is used to specify the condition and the two branches along with the input arguments. * The updated forward method is then dynamically assigned to the ForwardWithControlFlowTest instance within the model. A list of submodules is printed to confirm the replacement. def new_forward(x): def identity2(x): return x * 2 def neg(x): return -x return torch.cond(x.sum() \u003e 0, identity2, neg, (x,)) print(\"the list of submodules\") for name, mod in model.named_modules(): print(name, type(mod)) if isinstance(mod, ForwardWithControlFlowTest): mod.forward = new_forward the list of submodules \u003cclass \u0027__main__.ModelWithControlFlowTest\u0027\u003e mlp \u003cclass \u0027torch.nn.modules.container.Sequential\u0027\u003e mlp.0 \u003cclass \u0027torch.nn.modules.linear.Linear\u0027\u003e mlp.1 \u003cclass \u0027torch.nn.modules.linear.Linear\u0027\u003e mlp.2 \u003cclass \u0027__main__.ForwardWithControlFlowTest\u0027\u003e Let\u2019s see what the FX graph looks like. print(torch.export.export(model, (x,), strict=False)) ExportedProgram: class GraphModule(torch.nn.Module): def forward(self, p_mlp_0_weight: \"f32[2, 3]\", p_mlp_0_bias: \"f32[2]\", p_mlp_1_weight: \"f32[1, 2]\", p_mlp_1_bias: \"f32[1]\", x: \"f32[3]\"): # File: /opt/conda/lib/python3.11/site-packages/torch/nn/modules/linear.py:125 in forward, code: return F.linear(input, self.weight, self.bias) linear: \"f32[2]\" = torch.ops.aten.linear.default(x, p_mlp_0_weight, p_mlp_0_bias); x = p_mlp_0_weight = p_mlp_0_bias = None linear_1: \"f32[1]\" = torch.ops.aten.linear.default(linear, p_mlp_1_weight, p_mlp_1_bias); linear = p_mlp_1_weight = p_mlp_1_bias = None # File: /opt/conda/lib/python3.11/site-packages/torch/nn/modules/container.py:244 in forward, code: input = module(input) sum_1: \"f32[]\" = torch.ops.aten.sum.default(linear_1) gt: \"b8[]\" = torch.ops.aten.gt.Scalar(sum_1, 0); sum_1 = None # File: \u003ceval_with_key\u003e.25:9 in forward, code: cond = torch.ops.higher_order.cond(l_args_0_, cond_true_0, cond_false_0, (l_args_3_0_,)); l_args_0_ = cond_true_0 = cond_false_0 = l_args_3_0_ = None true_graph_0 = self.true_graph_0 false_graph_0 = self.false_graph_0 cond = torch.ops.higher_order.cond(gt, true_graph_0, false_graph_0, (linear_1,)); gt = true_graph_0 = false_graph_0 = linear_1 = None getitem: \"f32[1]\" = cond[0]; cond = None return (getitem,) class true_graph_0(torch.nn.Module): def forward(self, linear_1: \"f32[1]\"): # File: \u003ceval_with_key\u003e.22:6 in forward, code: mul = l_args_3_0__1.mul(2); l_args_3_0__1 = None mul: \"f32[1]\" = torch.ops.aten.mul.Tensor(linear_1, 2); linear_1 = None return (mul,) class false_graph_0(torch.nn.Module): def forward(self, linear_1: \"f32[1]\"): # File: \u003ceval_with_key\u003e.23:6 in forward, code: neg = l_args_3_0__1.neg(); l_args_3_0__1 = None neg: \"f32[1]\" = torch.ops.aten.neg.default(linear_1); linear_1 = None return (neg,) Graph signature: # inputs p_mlp_0_weight: PARAMETER target=\u0027mlp.0.weight\u0027 p_mlp_0_bias: PARAMETER target=\u0027mlp.0.bias\u0027 p_mlp_1_weight: PARAMETER target=\u0027mlp.1.weight\u0027 p_mlp_1_bias: PARAMETER target=\u0027mlp.1.bias\u0027 x: USER_INPUT # outputs getitem: USER_OUTPUT Range constraints: {} Let\u2019s export again. onnx_program = torch.onnx.export(model, (x,), dynamo=True) print(onnx_program.model) [torch.onnx] Obtain model graph for `ModelWithControlFlowTest([...]` with `torch.export.export(..., strict=False)`... [torch.onnx] Obtain model graph for `ModelWithControlFlowTest([...]` with `torch.export.export(..., strict=False)`... \u2705 [torch.onnx] Run decomposition... [torch.onnx] Run decomposition... \u2705 [torch.onnx] Translate the graph into ONNX... [torch.onnx] Translate the graph into ONNX... \u2705 \u003c ir_version=10, opset_imports={\u0027\u0027: 18}, producer_name=\u0027pytorch\u0027, producer_version=\u00272.8.0+cu128\u0027, domain=None, model_version=None, \u003e graph( name=main_graph, inputs=( %\"x\"\u003cFLOAT,[3]\u003e ), outputs=( %\"getitem\"\u003cFLOAT,[1]\u003e ), initializers=( %\"mlp.0.bias\"\u003cFLOAT,[2]\u003e{TorchTensor\u003cFLOAT,[2]\u003e(Parameter containing: tensor([-0.5362, -0.1163], requires_grad=True), name=\u0027mlp.0.bias\u0027)}, %\"mlp.1.bias\"\u003cFLOAT,[1]\u003e{TorchTensor\u003cFLOAT,[1]\u003e(Parameter containing: tensor([-0.1978], requires_grad=True), name=\u0027mlp.1.bias\u0027)}, %\"val_0\"\u003cFLOAT,[3,2]\u003e{Tensor\u003cFLOAT,[3,2]\u003e(array([[ 0.35570052, -0.4287425 ], [-0.18541718, 0.0159563 ], [-0.17978263, 0.09059413]], dtype=float32), name=\u0027val_0\u0027)}, %\"val_2\"\u003cFLOAT,[2,1]\u003e{Tensor\u003cFLOAT,[2,1]\u003e(array([[0.43243274], [0.5972638 ]], dtype=float32), name=\u0027val_2\u0027)}, %\"scalar_tensor_default\"\u003cFLOAT,[]\u003e{Tensor\u003cFLOAT,[]\u003e(array(0., dtype=float32), name=\u0027scalar_tensor_default\u0027)}, %\"scalar_tensor_default_2\"\u003cFLOAT,[]\u003e{Tensor\u003cFLOAT,[]\u003e(array(2., dtype=float32), name=\u0027scalar_tensor_default_2\u0027)} ), ) { 0 | # node_MatMul_1 %\"val_1\"\u003cFLOAT,[2]\u003e \u2b05\ufe0f ::MatMul(%\"x\", %\"val_0\"{[[0.3557005226612091, -0.42874249815940857], [-0.18541717529296875, 0.015956301242113113], [-0.17978262901306152, 0.09059412777423859]]}) 1 | # node_linear %\"linear\"\u003cFLOAT,[2]\u003e \u2b05\ufe0f ::Add(%\"val_1\", %\"mlp.0.bias\"{[-0.5362004637718201, -0.11629027128219604]}) 2 | # node_MatMul_3 %\"val_3\"\u003cFLOAT,[1]\u003e \u2b05\ufe0f ::MatMul(%\"linear\", %\"val_2\"{[[0.43243274092674255], [0.5972638130187988]]}) 3 | # node_linear_1 %\"linear_1\"\u003cFLOAT,[1]\u003e \u2b05\ufe0f ::Add(%\"val_3\", %\"mlp.1.bias\"{[-0.19781209528446198]}) 4 | # node_sum_1 %\"sum_1\"\u003cFLOAT,[]\u003e \u2b05\ufe0f ::ReduceSum(%\"linear_1\") {noop_with_empty_axes=0, keepdims=0} 5 | # node_gt %\"gt\"\u003cBOOL,[]\u003e \u2b05\ufe0f ::Greater(%\"sum_1\", %\"scalar_tensor_default\"{0.0}) 6 | # node_cond__0 %\"getitem\"\u003cFLOAT,[1]\u003e \u2b05\ufe0f ::If(%\"gt\") {then_branch= graph( name=true_graph_0, inputs=( ), outputs=( %\"mul_true_graph_0\"\u003cFLOAT,[1]\u003e ), ) { 0 | # node_mul %\"mul_true_graph_0\"\u003cFLOAT,[1]\u003e \u2b05\ufe0f ::Mul(%\"linear_1\", %\"scalar_tensor_default_2\"{2.0}) return %\"mul_true_graph_0\"\u003cFLOAT,[1]\u003e }, else_branch= graph( name=false_graph_0, inputs=( ), outputs=( %\"neg_false_graph_0\"\u003cFLOAT,[1]\u003e ), ) { 0 | # node_neg %\"neg_false_graph_0\"\u003cFLOAT,[1]\u003e \u2b05\ufe0f ::Neg(%\"linear_1\") return %\"neg_false_graph_0\"\u003cFLOAT,[1]\u003e }} return %\"getitem\"\u003cFLOAT,[1]\u003e } We can optimize the model and get rid of the model local functions created to capture the control flow branches. onnx_program.optimize() print(onnx_program.model) \u003c ir_version=10, opset_imports={\u0027\u0027: 18}, producer_name=\u0027pytorch\u0027, producer_version=\u00272.8.0+cu128\u0027, domain=None, model_version=None, \u003e graph( name=main_graph, inputs=( %\"x\"\u003cFLOAT,[3]\u003e ), outputs=( %\"getitem\"\u003cFLOAT,[1]\u003e ), initializers=( %\"mlp.0.bias\"\u003cFLOAT,[2]\u003e{TorchTensor\u003cFLOAT,[2]\u003e(Parameter containing: tensor([-0.5362, -0.1163], requires_grad=True), name=\u0027mlp.0.bias\u0027)}, %\"mlp.1.bias\"\u003cFLOAT,[1]\u003e{TorchTensor\u003cFLOAT,[1]\u003e(Parameter containing: tensor([-0.1978], requires_grad=True), name=\u0027mlp.1.bias\u0027)}, %\"val_0\"\u003cFLOAT,[3,2]\u003e{Tensor\u003cFLOAT,[3,2]\u003e(array([[ 0.35570052, -0.4287425 ], [-0.18541718, 0.0159563 ], [-0.17978263, 0.09059413]], dtype=float32), name=\u0027val_0\u0027)}, %\"val_2\"\u003cFLOAT,[2,1]\u003e{Tensor\u003cFLOAT,[2,1]\u003e(array([[0.43243274], [0.5972638 ]], dtype=float32), name=\u0027val_2\u0027)}, %\"scalar_tensor_default\"\u003cFLOAT,[]\u003e{Tensor\u003cFLOAT,[]\u003e(array(0., dtype=float32), name=\u0027scalar_tensor_default\u0027)}, %\"scalar_tensor_default_2\"\u003cFLOAT,[]\u003e{Tensor\u003cFLOAT,[]\u003e(array(2., dtype=float32), name=\u0027scalar_tensor_default_2\u0027)} ), ) { 0 | # node_MatMul_1 %\"val_1\"\u003cFLOAT,[2]\u003e \u2b05\ufe0f ::MatMul(%\"x\", %\"val_0\"{[[0.3557005226612091, -0.42874249815940857], [-0.18541717529296875, 0.015956301242113113], [-0.17978262901306152, 0.09059412777423859]]}) 1 | # node_linear %\"linear\"\u003cFLOAT,[2]\u003e \u2b05\ufe0f ::Add(%\"val_1\", %\"mlp.0.bias\"{[-0.5362004637718201, -0.11629027128219604]}) 2 | # node_MatMul_3 %\"val_3\"\u003cFLOAT,[1]\u003e \u2b05\ufe0f ::MatMul(%\"linear\", %\"val_2\"{[[0.43243274092674255], [0.5972638130187988]]}) 3 | # node_linear_1 %\"linear_1\"\u003cFLOAT,[1]\u003e \u2b05\ufe0f ::Add(%\"val_3\", %\"mlp.1.bias\"{[-0.19781209528446198]}) 4 | # node_sum_1 %\"sum_1\"\u003cFLOAT,[]\u003e \u2b05\ufe0f ::ReduceSum(%\"linear_1\") {noop_with_empty_axes=0, keepdims=0} 5 | # node_gt %\"gt\"\u003cBOOL,[]\u003e \u2b05\ufe0f ::Greater(%\"sum_1\", %\"scalar_tensor_default\"{0.0}) 6 | # node_cond__0 %\"getitem\"\u003cFLOAT,[1]\u003e \u2b05\ufe0f ::If(%\"gt\") {then_branch= graph( name=true_graph_0, inputs=( ), outputs=( %\"mul_true_graph_0\"\u003cFLOAT,[1]\u003e ), ) { 0 | # node_mul %\"mul_true_graph_0\"\u003cFLOAT,[1]\u003e \u2b05\ufe0f ::Mul(%\"linear_1\", %\"scalar_tensor_default_2\"{2.0}) return %\"mul_true_graph_0\"\u003cFLOAT,[1]\u003e }, else_branch= graph( name=false_graph_0, inputs=( ), outputs=( %\"neg_false_graph_0\"\u003cFLOAT,[1]\u003e ), ) { 0 | # node_neg %\"neg_false_graph_0\"\u003cFLOAT,[1]\u003e \u2b05\ufe0f ::Neg(%\"linear_1\") return %\"neg_false_graph_0\"\u003cFLOAT,[1]\u003e }} return %\"getitem\"\u003cFLOAT,[1]\u003e } Conclusion# This tutorial demonstrates the challenges of exporting models with conditional logic to ONNX and presents a practical solution using torch.cond(). While the default exporters may fail or produce imperfect graphs, refactoring the model\u2019s logic ensures compatibility and generates a faithful ONNX representation. By understanding these techniques, we can overcome common pitfalls when working with control flow in PyTorch models and ensure smooth integration with ONNX workflows. Further reading# The list below refers to tutorials that ranges from basic examples to advanced scenarios, not necessarily in the order they are listed. Feel free to jump directly to specific topics of your interest or sit tight and have fun going through all of them to learn all there is about the ONNX exporter. 1. Exporting a PyTorch model to ONNX 2. Extending the ONNX registry Total running time of the script: (0 minutes 7.530 seconds) Download Jupyter notebook: export_control_flow_model_to_onnx_tutorial.ipynb Download Python source code: export_control_flow_model_to_onnx_tutorial.py Download zipped: export_control_flow_model_to_onnx_tutorial.zip",
+       "author": {
+         "@type": "Organization",
+         "name": "PyTorch Contributors",
+         "url": "https://pytorch.org"
+       },
+       "image": "../../_static/img/pytorch_seo.png",
+       "mainEntityOfPage": {
+         "@type": "WebPage",
+         "@id": "/beginner/onnx/export_control_flow_model_to_onnx_tutorial.html"
+       },
+       "datePublished": "2023-01-01T00:00:00Z",
+       "dateModified": "2023-01-01T00:00:00Z"
+     }
+ </script>
+  <script>
+    // Tutorials Call to action event tracking
+    $("[data-behavior='call-to-action-event']").on('click', function () {
+      fbq('trackCustom', "Download", {
+        tutorialTitle: $('h1:first').text(),
+        downloadLink: this.href,
+        tutorialLink: window.location.href,
+        downloadTitle: $(this).attr("data-response")
+      });
+      if (typeof gtag === 'function') {
+        gtag('event', 'click', {
+          'event_category': $(this).attr("data-response"),
+          'event_label': $("h1").first().text(),
+          'tutorial_link': window.location.href
+        });
+      }
+    });
+  </script>
+  
+  </body>
+</html>

@@ -95,14 +95,10 @@ import matplotlib.pyplot as plt
 # - ``pretrained_model`` - `pytorch/examples/mnist <https://github.com/pytorch/examples/tree/master/mnist>`__
 #    를 통해 미리 학습된 MNIST 모델의 경로.
 #    튜토리얼을 간편하게 하려면 `여기 <https://drive.google.com/file/d/1HJV2nUHJqclXQ8flKvcWmjZ-OU5DGatl/view?usp=drive_link>`__ 에서 미리 학습된 모델을 다운로드하세요.
-#
-# -  ``use_cuda`` - CUDA 를 사용할지 말지 정하는 이진 플래그.
-#    본 튜토리얼에서는 CPU 시간이 오래 걸리지 않으므로 CUDA를 지원하는 GPU 의 여부는 중요하지 않습니다.
-#
+
 
 epsilons = [0, .05, .1, .15, .2, .25, .3]
 pretrained_model = "data/lenet_mnist_model.pth"
-use_cuda=True
 # 재현을 위해 랜덤 시드(seed)를 설정합니다.
 torch.manual_seed(42)
 
@@ -150,9 +146,10 @@ test_loader = torch.utils.data.DataLoader(
             ])),
         batch_size=1, shuffle=True)
 
-# 어떤 디바이스를 사용할지 정의
-print("CUDA Available: ",torch.cuda.is_available())
-device = torch.device("cuda" if use_cuda and torch.cuda.is_available() else "cpu")
+# CUDA 또는 MPS, MTIA, XPU 와 같은 `가속기(accelerator) <https://pytorch.org/docs/stable/torch.html#accelerators>`__ 에서 모델을 학습할 수 있도록 합니다.
+# 현재 사용 가능한 가속기가 있다면 사용하고, 그렇지 않으면 CPU를 사용합니다.
+device = torch.accelerator.current_accelerator().type if torch.accelerator.is_available() else "cpu"
+print(f"Using {device} device")
 
 # 모델 초기화하기
 model = Net().to(device)

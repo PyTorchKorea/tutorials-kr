@@ -1,10 +1,16 @@
 # -*- coding: utf-8 -*-
 """
-기초부터 시작하는 NLP:  문자-단위 RNN으로 이름 생성하기
+기초부터 시작하는 NLP: 문자-단위 RNN으로 이름 생성하기
 ********************************************************************************
 
 **Author**: `Sean Robertson <https://github.com/spro>`_
   **번역**: `황성수 <https://github.com/adonisues>`_
+
+이 튜토리얼은 3부로 구성된 시리즈의 일부입니다:
+
+* `기초부터 시작하는 NLP: 문자-단위 RNN으로 이름 분류하기 <https://tutorials.pytorch.kr/intermediate/char_rnn_classification_tutorial.html>`__
+* `기초부터 시작하는 NLP: 문자-단위 RNN으로 이름 생성하기 <https://tutorials.pytorch.kr/intermediate/char_rnn_generation_tutorial.html>`__
+* `기초부터 시작하는 NLP: Sequence to Sequence 네트워크와 Attention을 이용한 번역 <https://tutorials.pytorch.kr/intermediate/seq2seq_translation_tutorial.html>`__
 
 이 튜토리얼은 3개로 이뤄진 "기초부터 시작하는 NLP"의 2번째 튜토리얼입니다.
 첫번째 튜토리얼인 :doc:`/intermediate/char_rnn_classification_tutorial`

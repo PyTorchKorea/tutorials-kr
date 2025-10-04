@@ -6,127 +6,82 @@
 **Author**: `Sean Robertson <https://github.com/spro>`_
   **번역**: `황성수 <https://github.com/adonisues>`_, `김제필 <https://github.com/garlicvread>`_
 
+이 튜토리얼은 3부로 구성된 시리즈의 일부입니다:
+
+* `기초부터 시작하는 NLP: 문자-단위 RNN으로 이름 분류하기 <https://tutorials.pytorch.kr/intermediate/char_rnn_classification_tutorial.html>`__
+* `기초부터 시작하는 NLP: 문자-단위 RNN으로 이름 생성하기 <https://tutorials.pytorch.kr/intermediate/char_rnn_generation_tutorial.html>`__
+* `기초부터 시작하는 NLP: Sequence to Sequence 네트워크와 Attention을 이용한 번역 <https://tutorials.pytorch.kr/intermediate/seq2seq_translation_tutorial.html>`__
 
 여기에서는 단어를 분류하기 위해 기초적인 문자-단위의 순환 신경망(RNN, Recurrent Nueral Network)을
 구축하고 학습할 예정입니다. 이 튜토리얼 및 이후 2개 튜토리얼인 :doc:`/intermediate/char_rnn_generation_tutorial`
 및 :doc:`/intermediate/seq2seq_translation_tutorial` 에서는 자연어 처리(NLP, Natural Language Processing)
 분야에서 어떻게 데이터를 전처리하고 NLP 모델을 구축하는지를 밑바닥부터(from scratch) 설명합니다.
-이를 위해 이 튜토리얼 시리즈에서는 `torchtext` 의 수많은 편리한 기능들을 사용하지 않고
-NLP 모델링을 위한 데이터 전처리가 밑바닥(low-level)에서 어떻게 진행되는지 알 수 있습니다.
+이를 위해 이 튜토리얼 시리즈에서는 NLP 모델링을 위한 데이터 전처리가 밑바닥(low-level)에서 어떻게 진행되는지 알 수 있습니다.
 
 문자-단위 RNN은 단어를 문자의 연속으로 읽어 들여서 각 단계의 예측과
 "은닉 상태(Hidden State)"를 출력하고, 다음 단계에 이전 단계의 은닉 상태를 전달합니다.
 단어가 속한 클래스로 출력되도록 최종 예측으로 선택합니다.
 
 구체적으로, 18개 언어로 된 수천 개의 성(姓)을 훈련시키고,
-철자에 따라 이름이 어떤 언어인지 예측합니다:
-
-.. code-block:: sh
-
-    $ python predict.py Hinton
-    (-0.47) Scottish
-    (-1.52) English
-    (-3.57) Irish
-
-    $ python predict.py Schmidhuber
-    (-0.19) German
-    (-2.48) Czech
-    (-2.68) Dutch
-
-
-준비 과정
-===========================
-
-이 튜토리얼을 시작하기 전, PyTorch를 이미 설치했으며, Python 프로그래밍 언어와
-Tensor에 대한 기본적인 이해를 하고 계셔야 합니다:
-
--  https://pytorch.kr/ 에서 설치 안내를 찾을 수 있으며,
--  :doc:`/beginner/deep_learning_60min_blitz` 를 통해 PyTorch의 일반적인 내용과 Tensor에 대해 익힐 수 있습니다.
--  :doc:`/beginner/pytorch_with_examples` 는 넓고 깊은 개요(overview)를 제공하며,
--  :doc:`/beginner/former_torchies_tutorial` 이전 Lua Torch 사용자를 위한 자료입니다.
-
-RNN과 그 작동 방식을 아는 것 또한 유용합니다:
-
--  `The Unreasonable Effectiveness of Recurrent Neural
-   Networks <https://karpathy.github.io/2015/05/21/rnn-effectiveness/>`__
-   실생활 예제를 보여 줍니다.
--  `Understanding LSTM
-   Networks <https://colah.github.io/posts/2015-08-Understanding-LSTMs/>`__
-   LSTM에 관한 것이지만 RNN에 관해서도 유익합니다.
-
-데이터 준비
-==================
-
-.. note::
-   `여기 <https://download.pytorch.org/tutorial/data.zip>`__ 에서 데이터를 다운로드 받고
-   현재 디렉토리에 압축을 푸십시오.
-
-``data/names`` 디렉토리에는 ``[Language].txt`` 라는 18 개의 텍스트 파일이 있습니다.
-각 파일에는 한 줄에 하나의 이름이 포함되어 있으며 대부분 로마자로 되어 있습니다.
-(그러나, 유니코드에서 ASCII로 변환해야 함).
-
-각 언어 별로 이름 목록 사전 ``{language: [names ...]}`` 을 만듭니다.
-일반 변수 "category" 와 "line" (우리의 경우 언어와 이름)은 이후의 확장성을 위해 사용됩니다.
-
-.. note::
-   역자 주: "line" 에 입력을 "category"에 클래스를 적용하여 다른 문제에도 활용할 수 있습니다.
-   여기서는 "line"에 이름(ex. Robert)을 입력으로, "category"에 클래스(ex. english)로 사용합니다.
-
+철자에 따라 이름이 어떤 언어인지 예측합니다.
 """
-from __future__ import unicode_literals, print_function, division
-from io import open
-import glob
-import os
+######################################################################
+# Torch 준비
+# ==========================
+#
+# 하드웨어(CPU 또는 CUDA)에 맞춰 GPU 가속을 사용할 수 있도록 적절한 장치를 기본 장치로 설정합니다.
+#
 
-def findFiles(path): return glob.glob(path)
+import torch
 
-print(findFiles('data/names/*.txt'))
+# Check if CUDA is available
+device = torch.device('cpu')
+if torch.cuda.is_available():
+    device = torch.device('cuda')
 
-import unicodedata
+torch.set_default_device(device)
+print(f"Using device = {torch.get_default_device()}")
+
+######################################################################
+# 데이터 준비
+# ==================
+#
+# `여기 <https://download.pytorch.org/tutorial/data.zip>`__ 에서 데이터를 다운로드 받고
+# 현재 디렉토리에 압축을 풉니다.
+#
+# ``data/names`` 디렉토리에는 ``[Language].txt`` 라는 18 개의 텍스트 파일이 있습니다.
+# 각 파일에는 한 줄에 하나의 이름이 포함되어 있으며 대부분 로마자로 되어 있습니다.
+# (하지만 유니코드에서 ASCII로 변환은 해야 합니다)
+#
+# 첫번째 단계는 데이터를 정의하고 정리하는 것입니다. 초기에는 유니코드를 일반 ASCII로 변환하여
+# RNN 입력 레이어를 제한해야 합니다. 이는 유니코드 문자열을 ASCII로 변환하고 허용된 문자의 작은 집합만을 허용하여 이루어집니다.
+
 import string
+import unicodedata
 
-all_letters = string.ascii_letters + " .,;'"
-n_letters = len(all_letters)
+# "_" 를 사용하여 어휘집(Vocabulary)에 없는 문자를 표현할 수 있습니다. 즉, 모델에서 처리하지 않는 모든 문자를 표현할 수 있습니다.
+allowed_characters = string.ascii_letters + " .,;'" + "_"
+n_letters = len(allowed_characters)
 
-# 유니코드 문자열을 ASCII로 변환, https://stackoverflow.com/a/518232/2809427
+# 유니코드 문자열을 일반 ASCII로 변환하기: https://stackoverflow.com/a/518232/2809427
 def unicodeToAscii(s):
     return ''.join(
         c for c in unicodedata.normalize('NFD', s)
         if unicodedata.category(c) != 'Mn'
-        and c in all_letters
+        and c in allowed_characters
     )
 
-print(unicodeToAscii('Ślusàrski'))
-
-# 각 언어의 이름 목록인 category_lines 사전 생성
-category_lines = {}
-all_categories = []
-
-# 파일을 읽고 줄 단위로 분리
-def readLines(filename):
-    lines = open(filename, encoding='utf-8').read().strip().split('\n')
-    return [unicodeToAscii(line) for line in lines]
-
-for filename in findFiles('data/names/*.txt'):
-    category = os.path.splitext(os.path.basename(filename))[0]
-    all_categories.append(category)
-    lines = readLines(filename)
-    category_lines[category] = lines
-
-n_categories = len(all_categories)
-
-######################################################################
-# 이제 각 ``category`` (언어)를 ``line`` (이름)에 매핑하는 사전인
-# ``category_lines`` 를 만들었습니다. 나중에 참조할 수 있도록
-# ``all_categories`` (언어 목록)와 ``n_categories`` 도 추적합니다.
+#########################
+# 유니코드 알파벳 이름을 일반 ASCII로 변환하는 예시입니다. 이렇게 하면 입력 레이어를 단순화할 수 있습니다.
 #
 
-print(category_lines['Italian'][:5])
+print (f"converting 'Ślusàrski' to {unicodeToAscii('Ślusàrski')}")
+
 
 
 ######################################################################
 # 이름을 Tensor로 변경
-# --------------------------
+# ==========================
 #
 # 이제 모든 이름을 체계화했으므로, 이를 활용하기 위해 Tensor로
 # 변환해야 합니다.
@@ -154,7 +109,11 @@ import torch
 
 # all_letters 로 문자의 주소 찾기, 예시 "a" = 0
 def letterToIndex(letter):
-    return all_letters.find(letter)
+    # 모델이 모르는 글자를 만나면, 어휘집에 존재하지 않는 문자("_")를 반환합니다.
+    if letter not in allowed_characters:
+        return allowed_characters.find("_")
+    else:
+        return allowed_characters.find(letter)
 
 # 검증을 위해서 한 개의 문자를 <1 x n_letters> Tensor로 변환
 def letterToTensor(letter):
@@ -174,6 +133,87 @@ print(letterToTensor('J'))
 
 print(lineToTensor('Jones').size())
 
+#########################
+# Here are some examples of how to use ``lineToTensor()`` for a single and multiple character string.
+
+print (f"The letter 'a' becomes {lineToTensor('a')}") #notice that the first position in the tensor = 1
+print (f"The name 'Ahn' becomes {lineToTensor('Ahn')}") #notice 'A' sets the 27th index to 1
+
+#########################
+# Congratulations, you have built the foundational tensor objects for this learning task! You can use a similar approach
+# for other RNN tasks with text.
+#
+# Next, we need to combine all our examples into a dataset so we can train, test and validate our models. For this,
+# we will use the `Dataset and DataLoader <https://tutorials.pytorch.kr/beginner/basics/data_tutorial.html>`__ classes
+# to hold our dataset. Each Dataset needs to implement three functions: ``__init__``, ``__len__``, and ``__getitem__``.
+from io import open
+import glob
+import os
+import time
+
+import torch
+from torch.utils.data import Dataset
+
+class NamesDataset(Dataset):
+
+    def __init__(self, data_dir):
+        self.data_dir = data_dir #for provenance of the dataset
+        self.load_time = time.localtime #for provenance of the dataset
+        labels_set = set() #set of all classes
+
+        self.data = []
+        self.data_tensors = []
+        self.labels = []
+        self.labels_tensors = []
+
+        #read all the ``.txt`` files in the specified directory
+        text_files = glob.glob(os.path.join(data_dir, '*.txt'))
+        for filename in text_files:
+            label = os.path.splitext(os.path.basename(filename))[0]
+            labels_set.add(label)
+            lines = open(filename, encoding='utf-8').read().strip().split('\n')
+            for name in lines:
+                self.data.append(name)
+                self.data_tensors.append(lineToTensor(name))
+                self.labels.append(label)
+
+        #Cache the tensor representation of the labels
+        self.labels_uniq = list(labels_set)
+        for idx in range(len(self.labels)):
+            temp_tensor = torch.tensor([self.labels_uniq.index(self.labels[idx])], dtype=torch.long)
+            self.labels_tensors.append(temp_tensor)
+
+    def __len__(self):
+        return len(self.data)
+
+    def __getitem__(self, idx):
+        data_item = self.data[idx]
+        data_label = self.labels[idx]
+        data_tensor = self.data_tensors[idx]
+        label_tensor = self.labels_tensors[idx]
+
+        return label_tensor, data_tensor, data_label, data_item
+
+#########################
+# Here we can load our example data into the ``NamesDataset``
+
+alldata = NamesDataset("data/names")
+print(f"loaded {len(alldata)} items of data")
+print(f"example = {alldata[0]}")
+
+#########################
+# Using the dataset object allows us to easily split the data into train and test sets. Here we create a 80/20
+# split but the ``torch.utils.data`` has more useful utilities. Here we specify a generator since we need to use the
+# same device as PyTorch defaults to above.
+
+train_set, test_set = torch.utils.data.random_split(alldata, [.85, .15], generator=torch.Generator(device=device).manual_seed(2024))
+
+print(f"train examples = {len(train_set)}, validation examples = {len(test_set)}")
+
+#########################
+# Now we have a basic dataset containing **20074** examples where each example is a pairing of label and name. We have also
+# split the dataset into training and testing so we can validate the model that we build.
+
 
 ######################################################################
 # 네트워크 생성
@@ -191,206 +231,127 @@ print(lineToTensor('Jones').size())
 # 이 RNN 모듈은 "기본(vanilla)적인 RNN"을 구현하며, 입력과 은닉 상태(hidden state),
 # 그리고 출력 뒤 동작하는 ``LogSoftmax`` 계층이 있는 3개의 선형 계층만을 가집니다.
 #
+# This CharRNN class implements an RNN with three components.
+# First, we use the `nn.RNN implementation <https://pytorch.org/docs/stable/generated/torch.nn.RNN.html>`__.
+# Next, we define a layer that maps the RNN hidden layers to our output. And finally, we apply a ``softmax`` function. Using ``nn.RNN``
+# leads to a significant improvement in performance, such as cuDNN-accelerated kernels, versus implementing
+# each layer as a ``nn.Linear``. It also simplifies the implementation in ``forward()``.
+#
 
 import torch.nn as nn
 import torch.nn.functional as F
 
-class RNN(nn.Module):
+class CharRNN(nn.Module):
     def __init__(self, input_size, hidden_size, output_size):
-        super(RNN, self).__init__()
+        super(CharRNN, self).__init__()
 
-        self.hidden_size = hidden_size
-
-        self.i2h = nn.Linear(input_size, hidden_size)
-        self.h2h = nn.Linear(hidden_size, hidden_size)
+        self.rnn = nn.RNN(input_size, hidden_size)
         self.h2o = nn.Linear(hidden_size, output_size)
         self.softmax = nn.LogSoftmax(dim=1)
 
-    def forward(self, input, hidden):
-        hidden = F.tanh(self.i2h(input) + self.h2h(hidden))
-        output = self.h2o(hidden)
+    def forward(self, line_tensor):
+        rnn_out, hidden = self.rnn(line_tensor)
+        output = self.h2o(hidden[0])
         output = self.softmax(output)
-        return output, hidden
 
-    def initHidden(self):
-        return torch.zeros(1, self.hidden_size)
+        return output
+
+
+###########################
+# We can then create an RNN with 58 input nodes, 128 hidden nodes, and 18 outputs:
 
 n_hidden = 128
-rnn = RNN(n_letters, n_hidden, n_categories)
-
-
-######################################################################
-# 이 네트워크의 한 단계를 실행하려면 입력(현재 문자 Tensor)과
-# 이전의 은닉 상태(처음에는 0으로 초기화)를 전달해야 합니다.
-# 출력(각 언어의 확률)과 다음 은닉 상태(다음 단계를 위해 유지)를
-# 돌려받습니다.
-#
-
-input = letterToTensor('A')
-hidden = torch.zeros(1, n_hidden)
-
-output, next_hidden = rnn(input, hidden)
-
+rnn = CharRNN(n_letters, n_hidden, len(alldata.labels_uniq))
+print(rnn)
 
 ######################################################################
-# 효율성을 위해서 매 단계마다 새로운 Tensor를 만들고 싶지 않기 때문에
-# ``letterToTensor`` 대신 ``lineToTensor`` 를 잘라서 사용할
-# 것입니다. 이것은 Tensor의 사전 연산(pre-computing) 배치에 의해
-# 더욱 최적화될 수 있습니다.
-#
+# After that we can pass our Tensor to the RNN to obtain a predicted output. Subsequently,
+# we use a helper function, ``label_from_output``, to derive a text label for the class.
+
+def label_from_output(output, output_labels):
+    top_n, top_i = output.topk(1)
+    label_i = top_i[0].item()
+    return output_labels[label_i], label_i
 
 input = lineToTensor('Albert')
-hidden = torch.zeros(1, n_hidden)
-
-output, next_hidden = rnn(input[0], hidden)
+output = rnn(input) #this is equivalent to ``output = rnn.forward(input)``
 print(output)
-
-
-######################################################################
-# 보시다시피 출력은 ``<1 x n_categories>`` Tensor이고, 모든 항목은
-# 해당 카테고리의 우도(likelihood)입니다(더 높은 것이 더 확률 높음).
-#
-
+print(label_from_output(output, alldata.labels_uniq))
 
 ######################################################################
 #
 # 학습
 # ========
-#
-# 학습 준비
-# ----------------------
-#
-# 학습에 들어가기 전, 몇몇 도움이 되는 함수(helper function)를 만들어야 합니다.
-# 첫째는 우리가 알아낸 각 카테고리의 우도(likelihood)인 네트워크 출력을 해석하는 함수입니다.
-# 가장 큰 값의 주소를 알기 위해서 ``Tensor.topk`` 를 사용할 수 있습니다.
-#
-# .. note::
-#    역자 주: 네트워크 출력(각 카테고리의 우도, likelihood)으로 가장 확률이 높은
-#    카테고리의 이름(언어)과 카테고리 번호를 반환합니다.
-#
-
-def categoryFromOutput(output):
-    top_n, top_i = output.topk(1)  # 텐서의 가장 큰 값 및 주소
-    category_i = top_i[0].item()   # 텐서에서 정수 값으로 변경
-    return all_categories[category_i], category_i
-
-print(categoryFromOutput(output))
 
 
 ######################################################################
-# 학습 예시(하나의 이름과 그 언어)를 얻는 빠른 방법도 필요합니다.:
-#
-
-import random
-
-def randomChoice(l):
-    return l[random.randint(0, len(l) - 1)]
-
-def randomTrainingExample():
-    category = randomChoice(all_categories)
-    line = randomChoice(category_lines[category])
-    category_tensor = torch.tensor([all_categories.index(category)], dtype=torch.long)
-    line_tensor = lineToTensor(line)
-    return category, line, category_tensor, line_tensor
-
-for i in range(10):
-    category, line, category_tensor, line_tensor = randomTrainingExample()
-    print('category =', category, '/ line =', line)
-
-
-######################################################################
-# 네트워크 학습
+# 신경망 학습
 # --------------------
 #
 # 이제 이 네트워크를 학습하는 데 필요한 예시(학습 데이터)를 보여주고 추정합니다.
 # 만일 틀렸다면 알려 줍니다.
 #
-# RNN의 마지막 계층이 ``nn.LogSoftmax`` 이므로 손실 함수로
-# ``nn.NLLLoss`` 가 적합합니다.
-#
+# We do this by defining a ``train()`` function which trains the model on a given dataset using minibatches. RNNs
+# RNNs are trained similarly to other networks; therefore, for completeness, we include a batched training method here.
+# The loop (``for i in batch``) computes the losses for each of the items in the batch before adjusting the
+# weights. This operation is repeated until the number of epochs is reached.
 
-criterion = nn.NLLLoss()
+import random
+import numpy as np
 
+def train(rnn, training_data, n_epoch = 10, n_batch_size = 64, report_every = 50, learning_rate = 0.2, criterion = nn.NLLLoss()):
+    """
+    Learn on a batch of training_data for a specified number of iterations and reporting thresholds
+    """
+    # Keep track of losses for plotting
+    current_loss = 0
+    all_losses = []
+    rnn.train()
+    optimizer = torch.optim.SGD(rnn.parameters(), lr=learning_rate)
 
-######################################################################
-# 각 학습 루프는 다음과 같습니다:
-#
-# -  입력과 목표 Tensor 생성
-# -  0 로 초기화 된 은닉 상태 생성
-# -  각 문자 읽기
-#
-# -  다음 문자를 위한 은닉 상태 유지
-#
-# -  목표와 최종 출력 비교
-# -  역전파
-# -  출력과 손실 반환
-#
+    start = time.time()
+    print(f"training on data set with n = {len(training_data)}")
 
-learning_rate = 0.005  # 학습률을 너무 높게 설정하면 발산할 수 있고, 너무 낮으면 학습이 되지 않을 수 있습니다.
+    for iter in range(1, n_epoch + 1):
+        rnn.zero_grad() # clear the gradients
 
-def train(category_tensor, line_tensor):
-    hidden = rnn.initHidden()
+        # create some minibatches
+        # we cannot use dataloaders because each of our names is a different length
+        batches = list(range(len(training_data)))
+        random.shuffle(batches)
+        batches = np.array_split(batches, len(batches) //n_batch_size )
 
-    rnn.zero_grad()
+        for idx, batch in enumerate(batches):
+            batch_loss = 0
+            for i in batch: #for each example in this batch
+                (label_tensor, text_tensor, label, text) = training_data[i]
+                output = rnn.forward(text_tensor)
+                loss = criterion(output, label_tensor)
+                batch_loss += loss
 
-    for i in range(line_tensor.size()[0]):
-        output, hidden = rnn(line_tensor[i], hidden)
+            # optimize parameters
+            batch_loss.backward()
+            nn.utils.clip_grad_norm_(rnn.parameters(), 3)
+            optimizer.step()
+            optimizer.zero_grad()
 
-    loss = criterion(output, category_tensor)
-    loss.backward()
+            current_loss += batch_loss.item() / len(batch)
 
-    # 매개변수의 경사도에 학습률을 곱해서 그 매개변수의 값에 더합니다.
-    for p in rnn.parameters():
-        p.data.add_(p.grad.data, alpha=-learning_rate)
-
-    return output, loss.item()
-
-
-######################################################################
-# 이제 예시 데이터를 사용하여 실행해야 합니다. ``train`` 함수가 출력과 손실을
-# 반환하기 때문에 추측을 화면에 출력하고 도식화를 위한 손실을 추적할 수
-# 있습니다. 1000개의 예시 데이터가 있기 때문에 ``print_every`` 예제만
-# 출력하고, 손실의 평균을 얻습니다.
-#
-
-import time
-import math
-
-n_iters = 100000
-print_every = 5000
-plot_every = 1000
-
-
-
-# 도식화를 위한 손실 추적
-current_loss = 0
-all_losses = []
-
-def timeSince(since):
-    now = time.time()
-    s = now - since
-    m = math.floor(s / 60)
-    s -= m * 60
-    return '%dm %ds' % (m, s)
-
-start = time.time()
-
-for iter in range(1, n_iters + 1):
-    category, line, category_tensor, line_tensor = randomTrainingExample()
-    output, loss = train(category_tensor, line_tensor)
-    current_loss += loss
-
-    # ``iter`` 숫자, 손실, 이름, 추측 화면 출력
-    if iter % print_every == 0:
-        guess, guess_i = categoryFromOutput(output)
-        correct = '✓' if guess == category else '✗ (%s)' % category
-        print('%d %d%% (%s) %.4f %s / %s %s' % (iter, iter / n_iters * 100, timeSince(start), loss, line, guess, correct))
-
-    # 현재 평균 손실을 전체 손실 리스트에 추가
-    if iter % plot_every == 0:
-        all_losses.append(current_loss / plot_every)
+        all_losses.append(current_loss / len(batches) )
+        if iter % report_every == 0:
+            print(f"{iter} ({iter / n_epoch:.0%}): \t average batch loss = {all_losses[-1]}")
         current_loss = 0
 
+    return all_losses
+
+##########################################################################
+# We can now train a dataset with minibatches for a specified number of epochs. The number of epochs for this
+# example is reduced to speed up the build. You can get better results with different parameters.
+
+start = time.time()
+all_losses = train(rnn, train_set, n_epoch=27, learning_rate=0.15, report_every=5)
+end = time.time()
+print(f"training took {end-start}s")
 
 ######################################################################
 # 결과 도식화
@@ -405,7 +366,7 @@ import matplotlib.ticker as ticker
 
 plt.figure()
 plt.plot(all_losses)
-
+plt.show()
 
 ######################################################################
 # 결과 평가
@@ -418,47 +379,45 @@ plt.plot(all_losses)
 # ``evaluate()`` 은 ``train ()`` 과 역전파를 빼면 동일합니다.
 #
 
-# 혼란 행렬에서 정확한 추측을 추적
-confusion = torch.zeros(n_categories, n_categories)
-n_confusion = 10000
 
-# 주어진 라인의 출력 반환
-def evaluate(line_tensor):
-    hidden = rnn.initHidden()
+def evaluate(rnn, testing_data, classes):
+    confusion = torch.zeros(len(classes), len(classes))
 
-    for i in range(line_tensor.size()[0]):
-        output, hidden = rnn(line_tensor[i], hidden)
+    rnn.eval() #set to eval mode
+    with torch.no_grad(): # do not record the gradients during eval phase
+        for i in range(len(testing_data)):
+            (label_tensor, text_tensor, label, text) = testing_data[i]
+            output = rnn(text_tensor)
+            guess, guess_i = label_from_output(output, classes)
+            label_i = classes.index(label)
+            confusion[label_i][guess_i] += 1
 
-    return output
+    # Normalize by dividing every row by its sum
+    for i in range(len(classes)):
+        denom = confusion[i].sum()
+        if denom > 0:
+            confusion[i] = confusion[i] / denom
 
-# 예시 중 어떤 것이 정확히 예측되었는지 기록
-for i in range(n_confusion):
-    category, line, category_tensor, line_tensor = randomTrainingExample()
-    output = evaluate(line_tensor)
-    guess, guess_i = categoryFromOutput(output)
-    category_i = all_categories.index(category)
-    confusion[category_i][guess_i] += 1
+    # Set up plot
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    cax = ax.matshow(confusion.cpu().numpy()) #numpy uses cpu here so we need to use a cpu version
+    fig.colorbar(cax)
 
-# 모든 행을 합계로 나누어 정규화
-for i in range(n_categories):
-    confusion[i] = confusion[i] / confusion[i].sum()
+    # Set up axes
+    ax.set_xticks(np.arange(len(classes)), labels=classes, rotation=90)
+    ax.set_yticks(np.arange(len(classes)), labels=classes)
 
-# 도식 설정
-fig = plt.figure()
-ax = fig.add_subplot(111)
-cax = ax.matshow(confusion.numpy())
-fig.colorbar(cax)
+    # Force label at every tick
+    ax.xaxis.set_major_locator(ticker.MultipleLocator(1))
+    ax.yaxis.set_major_locator(ticker.MultipleLocator(1))
 
-# 축 설정
-ax.set_xticklabels([''] + all_categories, rotation=90)
-ax.set_yticklabels([''] + all_categories)
+    # sphinx_gallery_thumbnail_number = 2
+    plt.show()
 
-# 모든 tick에서 레이블 지정
-ax.xaxis.set_major_locator(ticker.MultipleLocator(1))
-ax.yaxis.set_major_locator(ticker.MultipleLocator(1))
 
-# sphinx_gallery_thumbnail_number = 2
-plt.show()
+
+evaluate(rnn, test_set, classes=alldata.labels_uniq)
 
 
 ######################################################################
@@ -468,64 +427,18 @@ plt.show()
 # (다른 언어들과의 중첩 때문으로 추정)
 #
 
-
-######################################################################
-# 사용자 입력으로 실행
-# ---------------------
-#
-
-def predict(input_line, n_predictions=3):
-    print('\n> %s' % input_line)
-    with torch.no_grad():
-        output = evaluate(lineToTensor(input_line))
-
-        # Get top N categories
-        topv, topi = output.topk(n_predictions, 1, True)
-        predictions = []
-
-        for i in range(n_predictions):
-            value = topv[0][i].item()
-            category_index = topi[0][i].item()
-            print('(%.2f) %s' % (value, all_categories[category_index]))
-            predictions.append([value, all_categories[category_index]])
-
-predict('Dovesky')
-predict('Jackson')
-predict('Satoshi')
-
-
-######################################################################
-# `실용 PyTorch 저장소
-# <https://github.com/spro/practical-pytorch/tree/master/char-rnn-classification>`__
-# 의 최종 버전 스크립트는 위 코드를 몇 개의 파일로 분할했습니다.:
-#
-# -  ``data.py`` (파일 읽기)
-# -  ``model.py`` (RNN 정의)
-# -  ``train.py`` (학습 실행)
-# -  ``predict.py`` (커맨드 라인 인자로 ``predict()`` 실행)
-# -  ``server.py`` (``bottle.py`` 를 사용하여 JSON API로 예측 제공)
-#
-# ``train.py`` 를 실행하면 학습 및 신경망을 저장합니다.
-#
-# ``predict.py`` 를 실행하면 이름으로부터 예측을 실행합니다:
-#
-# .. code-block:: sh
-#
-#     $ python predict.py Hazaki
-#     (-0.42) Japanese
-#     (-1.39) Polish
-#     (-3.51) Czech
-#
-# ``server.py`` 를 실행하고 http://localhost:5533/Yourname 을 방문하면
-# 예측 값에 대한 JSON 출력을 확인할 수 있습니다.
-#
-
-
 ######################################################################
 # 연습
 # =========
 #
-# -  "line -> category" 의 다른 데이터 집합으로 시도해 보십시오, 예를 들어:
+# -  Get better results with a bigger and/or better shaped network
+#
+#    -  Adjust the hyperparameters to enhance performance, such as changing the number of epochs, batch size, and learning rate
+#    -  Try the ``nn.LSTM`` and ``nn.GRU`` layers
+#    -  Modify the size of the layers, such as increasing or decreasing the number of hidden nodes or adding additional linear layers
+#    -  Combine multiple of these RNNs as a higher level network
+#
+# -  "line -> label" 의 다른 데이터 집합으로 시도해 보십시오, 예를 들어:
 #
 #    -  단어 -> 언어
 #    -  이름 -> 성별

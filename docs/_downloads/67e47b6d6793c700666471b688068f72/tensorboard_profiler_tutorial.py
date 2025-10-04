@@ -7,6 +7,12 @@
 이 튜토리얼에서는 파이토치(PyTorch) 프로파일러(profiler)와 함께 텐서보드(TensorBoard) 플러그인(plugin)을 사용하여
 모델의 성능 병목 현상을 탐지하는 방법을 보여 줍니다.
 
+.. warning::
+   TensorBoard와 PyTorch 프로파일러의 통합은 이제 더 이상 사용되지 않습니다.
+   대신 Perfetto 또는 Chrome 트레이스를 사용하여 ``trace.json`` 파일을 볼 수 있습니다.
+   `트레이스 생성 <https://tutorials.pytorch.kr/recipes/recipes/profiler_recipe.html#using-tracing-functionality>`__ 후,
+   ``trace.json`` 파일을 `Perfetto UI <https://ui.perfetto.dev/>`__ 또는 ``chrome://tracing`` 에 드래그하여 프로파일을 시각화할 수 있습니다.
+
 소개
 ------------
 

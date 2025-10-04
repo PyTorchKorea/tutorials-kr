@@ -6,8 +6,24 @@
 **Author**: `Vitaly Fedyunin <https://github.com/VitalyFedyunin>`_
 **번역**: `Choi Yoonjeong <https://github.com/potatochips178>`_
 
-Channels last가 무엇인가요
-----------------------------
+.. grid:: 2
+
+    .. grid-item-card:: :octicon:`mortar-board;1em;` 무엇을 배울 수 있나요?
+       :class-card: card-prerequisites
+
+       * PyTorch에서의 Channels last 메모리 형식은 무엇인가요?
+       * 특정 연산자에서 성능을 향상시키기 위해 어떻게 사용할 수 있나요?
+
+    .. grid-item-card:: :octicon:`list-unordered;1em;` 전제 조건
+       :class-card: card-prerequisites
+
+       * PyTorch v1.5.0
+       * CUDA 지원 GPU
+
+#########################################################################
+# 개요 - Channels last가 무엇인가요?
+# ---------------------------------
+
 Channels last 메모리 형식(memory format)은 차원 순서를 유지하면서 메모리 상의 NCHW 텐서(tensor)를 정렬하는 또 다른 방식입니다.
 Channels last 텐서는 채널(Channel)이 가장 밀도가 높은(densest) 차원으로 정렬(예. 이미지를 픽셀x픽셀로 저장)됩니다.
 
@@ -21,10 +37,8 @@ Channels last 메모리 형식은 데이터를 다르게 정렬합니다:
 .. figure:: /_static/img/channels_last_memory_format.png
    :alt: channels_last_memory_format
 
-PyTorch는 기존의 스트라이드(strides) 구조를 사용함으로써 메모리 형식을 지원(하며, eager, JIT 및 TorchScript를 포함한
-기존의 모델들과 하위 호환성을 제공)합니다. 예를 들어, Channels last 형식에서 10x3x16x16 배치(batch)는 (768, 1, 48, 3)와
-같은 폭(strides)을 가지고 있게 됩니다.
-
+PyTorch는 기존의 스트라이드(strides) 구조를 사용함으로써 메모리 형식을 지원합니다.
+예를 들어, Channels last 형식에서 10x3x16x16 배치(batch)는 (768, 1, 48, 3)와 같은 폭(strides)을 가지고 있게 됩니다.
 """
 
 ######################################################################
@@ -371,3 +385,12 @@ for (m, attrs) in old_attrs.items():
 #
 # 개선할 부분에 대한 피드백 또는 제안이 있다면 `이슈를 만들어 <https://github.com/pytorch/pytorch/issues>`_ 알려주세요.
 #
+
+######################################################################
+# 결론
+# ----------
+#
+# 이 튜토리얼에서는 "channels last" 메모리 형식을 소개하고 성능 향상을 위해 어떻게 사용할 수 있는지 살펴보았습니다.
+# Channels last를 사용하여 비전 모델을 가속화하는 실질적인 예시는
+# `여기 <https://pytorch.org/blog/accelerating-pytorch-vision-models-with-channels-last-on-cpu/>`_
+# 를 참고하세요.

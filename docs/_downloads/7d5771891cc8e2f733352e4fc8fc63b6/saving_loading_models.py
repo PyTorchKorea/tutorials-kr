@@ -142,7 +142,7 @@
 # .. code:: python
 #
 #    model = TheModelClass(*args, **kwargs)
-#    model.load_state_dict(torch.load(PATH))
+#    model.load_state_dict(torch.load(PATH, weights_only=True))
 #    model.eval()
 #
 # .. note::
@@ -194,7 +194,7 @@
 # .. code:: python
 #
 #    # 모델 클래스는 어딘가에 반드시 선언되어 있어야 합니다.
-#    model = torch.load(PATH)
+#    model = torch.load(PATH, weights_only=False)
 #    model.eval()
 #
 # 이 저장하기/불러오기 과정은 가장 직관적인 문법을 사용하며 적은 양의
@@ -214,38 +214,30 @@
 # 정규화를 평가 모드로 설정하여야 합니다. 이것을 하지 않으면 추론 결과가 일관성
 # 없게 출력됩니다.
 #
-# TorchScript 포맷으로 모델 내보내기/가져오기
-# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+# ExportedProgram 저장하기
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-# 훈련된 모델로 추론을 수행하는 일반적인 방법 중 하나는 `TorchScript <https://pytorch.org/docs/stable/jit.html>`__ 를 사용하는 것입니다.
-# TorchScript는 파이썬 환경이나 C++와 같은 고성능 환경에서 실행할 수 있는
-# 파이토치 모델의 중간 표현(IR; Intermediate Representation)입니다.
-# TorchScript는 확장된 추론 및 배포에 권장되는 모델 형식이기도 합니다.
+# ``torch.export``를 사용하고 있다면, ``torch.export.save()`` 와 ``torch.export.load()`` API를 사용하여
+# ``.pt2`` 확장자를 갖는 ``ExportedProgram`` 을 저장하고 불러올 수 있습니다:
 #
-# .. note::
-#    TorchScript 형식을 사용하면 모델 클래스를 정의하지 않고도 내보낸 모델을 읽어 오거나 추론을 실행할 수 있습니다.
+# .. code-block:: python
 #
-# **Export:**
+#    class SimpleModel(torch.nn.Module):
+#         def forward(self, x):
+#             return x + 10
 #
-# .. code:: python
+#    # 예시 입력 생성
+#    sample_input = torch.randn(5)
 #
-#    model_scripted = torch.jit.script(model) # TorchScript 형식으로 내보내기
-#    model_scripted.save('model_scripted.pt') # 저장하기
+#    # 모델 내보내기
+#    exported_program = torch.export.export(SimpleModel(), sample_input)
 #
-# **Load:**
+#    # ExportedProgram 저장하기
+#    torch.export.save(exported_program, 'exported_program.pt2')
 #
-# .. code:: python
+#    # ExportedProgram 불러오기
+#    saved_exported_program = torch.export.load('exported_program.pt2')
 #
-#    model = torch.jit.load('model_scripted.pt')
-#    model.eval()
-#
-# 추론 실행 전, 드롭아웃 및 배치(batch) 정규화 레이어를 평가 모드로 설정하기 위해 ``model.eval()`` 을 호출해야
-# 합니다. 이 호출 과정이 없으면 일관성 없는 추론 결과가 나타납니다.
-#
-# TorchScript에 대한 추가 정보는 전용
-# `자습서 <https://tutorials.pytorch.kr/beginner/Intro_to_TorchScript_tutorial.html>`__ 에서 찾을 수 있습니다.
-# `C++ 환경 <https://tutorials.pytorch.kr/advanced/cpp_export.html>`__ 문서를 참고하여 트레이싱(Tracing) 변환을
-# 수행하는 방법과 C++ 환경에서 TorchScript 모듈을 실행하는 방법을 익힐 수 있습니다.
 
 
 
@@ -274,7 +266,7 @@
 #    model = TheModelClass(*args, **kwargs)
 #    optimizer = TheOptimizerClass(*args, **kwargs)
 #
-#    checkpoint = torch.load(PATH)
+#    checkpoint = torch.load(PATH, weights_only=True)
 #    model.load_state_dict(checkpoint['model_state_dict'])
 #    optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
 #    epoch = checkpoint['epoch']
@@ -333,7 +325,7 @@
 #    optimizerA = TheOptimizerAClass(*args, **kwargs)
 #    optimizerB = TheOptimizerBClass(*args, **kwargs)
 #
-#    checkpoint = torch.load(PATH)
+#    checkpoint = torch.load(PATH, weights_only=True)
 #    modelA.load_state_dict(checkpoint['modelA_state_dict'])
 #    modelB.load_state_dict(checkpoint['modelB_state_dict'])
 #    optimizerA.load_state_dict(checkpoint['optimizerA_state_dict'])
@@ -382,7 +374,7 @@
 # .. code:: python
 #
 #    modelB = TheModelBClass(*args, **kwargs)
-#    modelB.load_state_dict(torch.load(PATH), strict=False)
+#    modelB.load_state_dict(torch.load(PATH, weights_only=True), strict=False)
 #
 # 부분적으로 모델을 불러오거나, 모델의 일부를 불러오는 것은 전이학습 또는
 # 새로운 복잡한 모델을 학습할 때 일반적인 시나리오입니다. 학습된 매개변수를
@@ -419,7 +411,7 @@
 #
 #    device = torch.device('cpu')
 #    model = TheModelClass(*args, **kwargs)
-#    model.load_state_dict(torch.load(PATH, map_location=device))
+#    model.load_state_dict(torch.load(PATH, map_location=device, weights_only=True))
 #
 # GPU에서 학습한 모델을 CPU에서 불러올 때는 ``torch.load()`` 함수의
 # ``map_location`` 인자에 ``torch.device('cpu')`` 을 전달합니다.
@@ -441,7 +433,7 @@
 #
 #    device = torch.device("cuda")
 #    model = TheModelClass(*args, **kwargs)
-#    model.load_state_dict(torch.load(PATH))
+#    model.load_state_dict(torch.load(PATH, weights_only=True))
 #    model.to(device)
 #    # 모델에서 사용하는 input Tensor들은 input = input.to(device) 을 호출해야 합니다.
 #
@@ -467,7 +459,7 @@
 #
 #    device = torch.device("cuda")
 #    model = TheModelClass(*args, **kwargs)
-#    model.load_state_dict(torch.load(PATH, map_location="cuda:0"))  # 사용할 GPU 장치 번호를 선택합니다.
+#    model.load_state_dict(torch.load(PATH, weights_only=True, map_location="cuda:0"))  # 사용할 GPU 장치 번호를 선택합니다.
 #    model.to(device)
 #    # 모델에서 사용하는 input Tensor들은 input = input.to(device) 을 호출해야 합니다.
 #

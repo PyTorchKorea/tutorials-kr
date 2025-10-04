@@ -1,0 +1,2598 @@
+
+<!DOCTYPE html>
+
+
+<html lang="ko" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <meta property="article:modified_time" content="2025-09-14T14:59:38+00:00" /><meta property="og:title" content="A guide on good usage of non_blocking and pin_memory() in PyTorch" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://tutorials.pytorch.kr/intermediate/pinmem_nonblock.html" />
+<meta property="og:site_name" content="PyTorch Tutorials KR" />
+<meta property="og:description" content="Author: Vincent Moens Introduction: Transferring data from the CPU to the GPU is fundamental in many PyTorch applications. It’s crucial for users to understand the most effective tools and options available for moving data between devices. This tutorial examines two key methods for device-to-devi..." />
+<meta property="og:image" content="https://tutorials.pytorch.kr/_static/logos/logo-kr-sm-dark.png" />
+<meta property="og:image:alt" content="PyTorch Tutorials KR" />
+<meta name="description" content="Author: Vincent Moens Introduction: Transferring data from the CPU to the GPU is fundamental in many PyTorch applications. It’s crucial for users to understand the most effective tools and options available for moving data between devices. This tutorial examines two key methods for device-to-devi..." />
+<meta property="og:ignore_canonical" content="true" />
+
+    <title>A guide on good usage of non_blocking and pin_memory() in PyTorch &#8212; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=536c50fe" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=4d2595e5" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/katex-math.css?v=91adb8b6" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/pytorch_theme.css?v=c326296f" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=097efa9c" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom2.css?v=b169ea90" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=725a5b95"></script>
+    <script src="../_static/doctools.js?v=92e14aea"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/translations.js?v=b5f768d8"></script>
+    <script src="../_static/katex.min.js?v=be8ff15f"></script>
+    <script src="../_static/auto-render.min.js?v=ad136472"></script>
+    <script src="../_static/katex_autorenderer.js?v=bebc588a"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'intermediate/pinmem_nonblock';</script>
+    <link rel="canonical" href="https://tutorials.pytorch.kr/intermediate/pinmem_nonblock.html" />
+    <link rel="icon" href="../_static/favicon.ico"/>
+    <link rel="index" title="색인" href="../genindex.html" />
+    <link rel="search" title="검색" href="../search.html" />
+    <link rel="next" title="Visualizing Gradients" href="visualizing_gradients_tutorial.html" />
+    <link rel="prev" title="TensorBoard로 모델, 데이터, 학습 시각화하기" href="tensorboard_tutorial.html" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="ko"/>
+    <meta name="docbuild:last-update" content="2025년 09월 14일"/>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/2.3.1/list.min.js"></script>
+<script>
+  if (window.location.hostname === 'docs.pytorch.org' || window.location.hostname === 'docs-preview.pytorch.org') {
+    const script = document.createElement('script');
+    script.src = 'https://cmp.osano.com/16A0DbT9yDNIaQkvZ/31b1b91a-e0b6-47ea-bde2-7f2bd13dbe5c/osano.js?variant=one';
+    document.head.appendChild(script);
+  }
+</script>
+<script>
+  // Cookie banner for non-LF projects
+  document.addEventListener('DOMContentLoaded', function () {
+    // Hide cookie banner on local environments and LF owned docs
+    if (window.location.hostname === 'localhost' ||
+      window.location.hostname === '0.0.0.0' ||
+      window.location.hostname === '127.0.0.1' ||
+      window.location.hostname === 'docs.pytorch.org' ||
+      window.location.hostname === 'docs-preview.pytorch.org' ||
+      window.location.hostname.startsWith('192.168.')) {
+      const banner = document.querySelector('.cookie-banner-wrapper');
+      if (banner) {
+        banner.style.display = 'none';
+      }
+    }
+  });
+</script>
+<!-- Conditional CSS for header and footer height adjustment -->
+
+<link rel="stylesheet" type="text/css" href="../_static/css/theme.css" crossorigin="anonymous">
+<script type="text/javascript" src="../_static/js/theme.js"></script>
+<script type="text/javascript" src="../_static/js/dropdown-menu.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700&family=Nanum+Gothic+Coding:wght@400;700&family=Montserrat:wght@300;400&display=swap" rel="stylesheet">
+<meta property="og:image" content="../_static/img/pytorch_seo.png" />
+<link rel="stylesheet" href="../_static/webfonts/all.min.css" crossorigin="anonymous">
+<meta http-equiv="Content-Security-Policy"
+  content="default-src * 'unsafe-inline' 'unsafe-eval' data: blob:; style-src * 'unsafe-inline'; script-src * 'unsafe-inline' 'unsafe-eval' blob:;">
+<meta name="pytorch_project" content="tutorials">
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=G-LZRD6GXDLF" height="0" width="0"
+    style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+<!-- Google Tag Manager -->
+<script>(function (w, d, s, l, i) {
+    w[l] = w[l] || []; w[l].push({
+      'gtm.start':
+        new Date().getTime(), event: 'gtm.js'
+    }); var f = d.getElementsByTagName(s)[0],
+      j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
+        'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
+    j.onload = function () {
+      window.dispatchEvent(new Event('gtm_loaded'));
+      console.log('GTM loaded successfully');
+    };
+  })(window, document, 'script', 'dataLayer', 'G-LZRD6GXDLF');
+</script>
+<!-- End Google Tag Manager -->
+<!-- Facebook Pixel Code -->
+<script>
+  !function (f, b, e, v, n, t, s) {
+    if (f.fbq) return; n = f.fbq = function () {
+      n.callMethod ?
+        n.callMethod.apply(n, arguments) : n.queue.push(arguments)
+    };
+    if (!f._fbq) f._fbq = n; n.push = n; n.loaded = !0; n.version = '2.0';
+    n.queue = []; t = b.createElement(e); t.async = !0;
+    t.src = v; s = b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t, s)
+  }(window, document, 'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init', '243028289693773');
+  fbq('track', 'PageView');
+</script>
+<script>
+  document.documentElement.setAttribute('data-version', 'v2.8.0+cu128');
+</script>
+<noscript>
+  <img height="1" width="1" src="https://www.facebook.com/tr?id=243028289693773&ev=PageView&noscript=1" />
+</noscript>
+<script>
+  function gtag() {
+    window.dataLayer.push(arguments);
+  }
+</script>
+<!-- End Facebook Pixel Code -->
+<!-- Script to Fix scrolling -->
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    // Fix anchor scrolling
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const targetId = this.getAttribute('href').substring(1);
+        const targetElement = document.getElementById(targetId);
+
+        if (targetElement) {
+          const headerHeight =
+            (document.querySelector('.header-holder') ? document.querySelector('.header-holder').offsetHeight : 0) +
+            (document.querySelector('.bd-header') ? document.querySelector('.bd-header').offsetHeight : 0) + 20;
+
+          const targetPosition = targetElement.getBoundingClientRect().top + window.pageYOffset - headerHeight;
+          window.scrollTo({
+            top: targetPosition,
+            behavior: 'smooth'
+          });
+
+          // Update URL hash without scrolling
+          history.pushState(null, null, '#' + targetId);
+        }
+      });
+    });
+  });
+</script>
+
+<script async src="https://cse.google.com/cse.js?cx=e65585f8c3ea1440e"></script>
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="ko"/>
+    <meta name="docbuild:last-update" content="2025년 09월 14일"/>
+
+  </head>
+
+<body data-feedback-url="https://github.com/PyTorchKorea/tutorials-kr" class="pytorch-body">
+  
+    <div class="container-fluid header-holder tutorials-header" id="header-holder">
+   <div class="header-container-wrapper">
+    <div class="header-container">
+      <a class="header-logo" href="https://pytorch.kr/" aria-label="PyTorchKR"></a>
+
+      <div class="main-menu">
+        <ul>
+
+          <li class="main-menu-item">
+          <div id="learnDropdownButton" data-toggle="learn-dropdown" class="learn-dropdown">
+              <a class="with-down-arrow">
+                <span>배우기</span>
+              </a>
+              <div class="learn-dropdown-menu dropdown-menu">
+                <a class="nav-dropdown-item" href="https://pytorch.kr/get-started/locally/">
+                  <span class="dropdown-title">PyTorch 시작하기</span>
+                </a>
+                <a class="nav-dropdown-item" href="https://tutorials.pytorch.kr/beginner/basics/intro.html">
+                  <span class="dropdown-title">기본 익히기</span>
+                </a>
+                <a class="nav-dropdown-item" href="https://tutorials.pytorch.kr/" target="_self">
+                  <span class="dropdown-title">한국어 튜토리얼</span>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.kr/hub/">
+                  <span class="dropdown-title">한국어 모델 허브</span>
+                </a>
+                <a class="nav-dropdown-item" href="https://docs.pytorch.org/tutorials/" target="_blank">
+                  <span class="dropdown-title">Official Tutorials</span>
+                </a>
+              </div>
+            </div>
+          </li>
+
+          <li class="main-menu-item">
+            <a href="https://pytorch.kr/blog/">
+              <span>블로그</span>
+            </a>
+          </li>
+
+          <li class="main-menu-item">
+          <div id="docsDropdownButton" data-toggle="docs-dropdown" class="docs-dropdown">
+              <a class="with-down-arrow">
+              <span>문서</span>
+              </a>
+              <div class="docs-dropdown-menu dropdown-menu">
+                <a class="nav-dropdown-item" href="https://docs.pytorch.org/docs/" target="_blank">
+                  <span class="dropdown-title">PyTorch API</span>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.kr/domains/">
+                  <span class="dropdown-title">Domain API 소개</span>
+                </a>
+                <a class="nav-dropdown-item" href="https://tutorials.pytorch.kr/" target="_self">
+                  <span class="dropdown-title">한국어 튜토리얼</span>
+                </a>
+                <a class="nav-dropdown-item" href="https://docs.pytorch.org/tutorials/" target="_blank">
+                  <span class="dropdown-title">Official Tutorials</span>
+                </a>
+              </div>
+            </div>
+          </li>
+
+          <li class="main-menu-item">
+          <div id="communityDropdownButton" data-toggle="community-dropdown" class="community-dropdown">
+              <a class="with-down-arrow">
+              <span>커뮤니티</span>
+              </a>
+              <div class="community-dropdown-menu dropdown-menu">
+                <a class="nav-dropdown-item" href="https://discuss.pytorch.kr/" target="_self">
+                  <span class="dropdown-title">한국어 커뮤니티</span>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.kr/resources/">
+                  <span class="dropdown-title">개발자 정보</span>
+                </a>
+                <a class="nav-dropdown-item" href="https://landscape.pytorch.org/" target="_blank">
+                  <span class="dropdown-title">Landscape</span>
+                </a>
+              </div>
+            </div>
+          </li>
+
+        </ul>
+      </div>
+
+      <a class="main-menu-open-button" href="#" data-behavior="open-mobile-menu">
+        <i class="fa-solid fa-ellipsis"></i>
+      </a>
+    </div>
+  </div>
+ </div>
+
+ <!-- Begin Mobile Menu -->
+
+<div class="mobile-main-menu">
+  <div class="container-fluid">
+    <div class="header-container-wrapper">
+      <div class="mobile-main-menu-header-container">
+        <a class="main-menu-close-button" href="#" data-behavior="close-mobile-menu">
+          <i class="fa-solid fa-xmark"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="mobile-main-menu-links-container">
+    <div class="main-menu">
+      <ul>
+         <li class="resources-mobile-menu-title">
+           <a>배우기</a>
+         </li>
+         <ul class="resources-mobile-menu-items">
+           <li>
+             <a href="https://pytorch.kr/get-started/locally/">PyTorch 시작하기</a>
+           </li>
+           <li>
+             <a href="https://tutorials.pytorch.kr/beginner/basics/intro.html">기본 익히기</a>
+           </li>
+           <li>
+             <a href="https://tutorials.pytorch.kr/">한국어 튜토리얼</a>
+           </li>
+           <li>
+             <a href="https://pytorch.kr/hub/">한국어 모델 허브</a>
+           </li>
+           <li>
+             <a href="https://docs.pytorch.org/tutorials/" target="_blank">Official Tutorials</a>
+           </li>
+        </ul>
+         <li class="resources-mobile-menu-title">
+           <a href="https://pytorch.kr/blog/">블로그</a>
+         </li>
+         <li class="resources-mobile-menu-title">
+           <a>문서</a>
+         </li>
+         <ul class="resources-mobile-menu-items">
+          <li>
+            <a href="https://docs.pytorch.org/docs/" target="_blank">PyTorch API</a>
+          </li>
+          <li>
+            <a href="https://pytorch.kr/domains/">Domain API 소개</a>
+          </li>
+          <li>
+            <a href="https://tutorials.pytorch.kr/">한국어 튜토리얼</a>
+          </li>
+          <li>
+            <a href="https://docs.pytorch.org/tutorials/" target="_blank">Official Tutorials</a>
+          </li>
+        </ul>
+        <li class="resources-mobile-menu-title">
+          <a>커뮤니티</a>
+        </li>
+         <ul class="resources-mobile-menu-items">
+          <li>
+            <a href="https://discuss.pytorch.kr/">한국어 커뮤니티</a>
+          </li>
+          <li>
+            <a href="https://pytorch.kr/resources/">개발자 정보</a>
+          </li>
+          <li>
+            <a href="https://landscape.pytorch.org/" target="_blank">Landscape</a>
+          </li>
+        </ul>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- End Mobile Menu -->
+  
+  
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class=" navbar-header-items__start">
+    
+      <div class="navbar-item">
+  <a href="../index.html" class="version">v2.8.0+cu128</a>
+</div>
+    
+  </div>
+  
+  <div class=" navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../intro.html">
+    Intro
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../compilers_index.html">
+    Compilers
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../domains.html">
+    Domains
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../distributed.html">
+    Distributed
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../deep-dive.html">
+    Deep Dive
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../extension.html">
+    Extension
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../ecosystem.html">
+    Ecosystem
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../recipes_index.html">
+    Recipes
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+      
+        <div class="navbar-item">
+<div class="search-container-wrapper">
+  <div id="sphinx-search" class="search-container">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </div>
+
+  <div id="google-search" class="search-container" style="display:none;">
+    <div class="gcse-search-wrapper">
+      <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+      <div class="gcse-search"></div>
+    </div>
+  </div>
+
+  <div class="search-toggle-container" data-bs-title="Google Search Off" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <div class="search-toggle-inner">
+      <label class="switch">
+        <input type="checkbox" id="search-toggle">
+        <span class="slider round"></span>
+      </label>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+  // Define the search callback
+  const myWebSearchStartingCallback = (gname, query) => {
+    if (typeof dataLayer !== 'undefined' && query) {
+      window.dataLayer = window.dataLayer || [];
+      dataLayer.push({
+        'event': 'google_search',
+        'search_term': query,
+        'event_category': 'Search',
+        'event_label': 'Google Search'
+      });
+    }
+    return '';
+  };
+
+  // Set up the GCSE search callbacks
+  window.__gcse || (window.__gcse = {});
+  window.__gcse.searchCallbacks = {
+    web: { starting: myWebSearchStartingCallback }
+  };
+
+  if (window.location.pathname.includes('/search.html')) {
+    document.body.classList.add('search-page');
+  }
+
+  // Function to reinitialize Google CSE
+  function reinitializeGoogleSearch() {
+    if (window.__gcse && window.__gcse.initializationCallback) {
+      window.__gcse.initializationCallback();
+    }
+  }
+
+  // Function to handle search toggle
+  function handleSearchToggle(toggle, sphinxSearch, googleSearch) {
+    if (!toggle || !sphinxSearch || !googleSearch) return;
+
+    // Check if the URL contains /stable/ or /tutorials/
+    const currentUrl = window.location.href;
+    // TODO: We've had reports that the google programmable search is returning stale documentation,
+    //       Simple reproduction is to turn google search on and search for multinomial which will
+    //       result in returning 1.8.1 documentation.
+    //       We should turn this back on when we resolve that bug.
+    const shouldDefaultToGoogle = false;
+    const savedPreference = localStorage.getItem('searchPreference');
+
+    // Set initial state
+    if (savedPreference === 'google' || (savedPreference === null && shouldDefaultToGoogle)) {
+      toggle.checked = true;
+      sphinxSearch.style.display = 'none';
+      googleSearch.style.display = 'block';
+      if (savedPreference === null) {
+        localStorage.setItem('searchPreference', 'google');
+      }
+      reinitializeGoogleSearch();
+    } else {
+      toggle.checked = false;
+      sphinxSearch.style.display = 'block';
+      googleSearch.style.display = 'none';
+    }
+
+    // Update tooltip
+    updateTooltip(toggle.checked);
+
+    // Skip if already initialized
+    if (toggle.hasAttribute('data-initialized')) return;
+    toggle.setAttribute('data-initialized', 'true');
+
+    toggle.addEventListener('change', function() {
+      if (this.checked) {
+        sphinxSearch.style.display = 'none';
+        googleSearch.style.display = 'block';
+        localStorage.setItem('searchPreference', 'google');
+        reinitializeGoogleSearch();
+        trackSearchEngineSwitch('Google');
+      } else {
+        sphinxSearch.style.display = 'block';
+        googleSearch.style.display = 'none';
+        localStorage.setItem('searchPreference', 'sphinx');
+        trackSearchEngineSwitch('Sphinx');
+      }
+
+      updateTooltip(this.checked);
+      updateMobileSearch();
+    });
+  }
+
+  // Update tooltip based on toggle state
+  function updateTooltip(isChecked) {
+    const tooltipElement = document.querySelector('.search-toggle-container');
+    if (!tooltipElement) return;
+
+    tooltipElement.setAttribute('data-bs-title', isChecked ? 'Google Search On' : 'Google Search Off');
+
+    if (bootstrap && bootstrap.Tooltip) {
+      const tooltipInstance = bootstrap.Tooltip.getInstance(tooltipElement);
+      if (tooltipInstance) tooltipInstance.dispose();
+      new bootstrap.Tooltip(tooltipElement);
+    }
+  }
+
+  // Track search engine switch
+  function trackSearchEngineSwitch(engine) {
+    if (typeof dataLayer !== 'undefined') {
+      window.dataLayer = window.dataLayer || [];
+      dataLayer.push({
+        'event': 'search_engine_switch',
+        'event_category': 'Search',
+        'event_label': engine
+      });
+    }
+  }
+
+  // Function to update mobile search based on current toggle state
+  function updateMobileSearch() {
+    const toggle = document.getElementById('search-toggle');
+    if (!toggle) return;
+
+    const mobileSearchContainer = document.querySelector('.sidebar-header-items__end .navbar-item .search-container-wrapper');
+    if (!mobileSearchContainer) return;
+
+    const mobileSphinxSearch = mobileSearchContainer.querySelector('#sphinx-search');
+    const mobileGoogleSearch = mobileSearchContainer.querySelector('#google-search');
+
+    if (mobileSphinxSearch && mobileGoogleSearch) {
+      mobileSphinxSearch.style.display = toggle.checked ? 'none' : 'block';
+      mobileGoogleSearch.style.display = toggle.checked ? 'block' : 'none';
+
+      if (toggle.checked) {
+        reinitializeGoogleSearch();
+      }
+    }
+  }
+
+  // Initialize desktop search toggle
+  const toggle = document.getElementById('search-toggle');
+  const sphinxSearch = document.getElementById('sphinx-search');
+  const googleSearch = document.getElementById('google-search');
+  handleSearchToggle(toggle, sphinxSearch, googleSearch);
+
+  // Set placeholder text for Google search input
+  const observer = new MutationObserver(function() {
+    document.querySelectorAll('.gsc-input input').forEach(input => {
+      if (input && !input.hasAttribute('data-placeholder-set')) {
+        input.setAttribute('placeholder', 'Search the docs ...');
+        input.setAttribute('data-placeholder-set', 'true');
+      }
+    });
+  });
+
+  observer.observe(document.body, { childList: true, subtree: true });
+
+  // Fix for scroll jump issue - improved approach
+  function setupSearchInputHandlers(input) {
+    if (input.hasAttribute('data-scroll-fixed')) return;
+    input.setAttribute('data-scroll-fixed', 'true');
+
+    let lastScrollPosition = 0;
+    let isTyping = false;
+    let scrollTimeout;
+
+    // Save position before typing starts
+    input.addEventListener('keydown', () => {
+      lastScrollPosition = window.scrollY;
+      isTyping = true;
+
+      // Reset typing state after a short delay
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        isTyping = false;
+      }, 100);
+    });
+
+    // Only maintain scroll position during typing
+    function maintainScroll() {
+      if (document.activeElement === input && isTyping) {
+        window.scrollTo(0, lastScrollPosition);
+        requestAnimationFrame(maintainScroll);
+      }
+    }
+
+    input.addEventListener('focus', () => {
+      // Just store initial position but don't force it
+      lastScrollPosition = window.scrollY;
+    });
+
+    input.addEventListener('input', () => {
+      isTyping = true;
+      window.scrollTo(0, lastScrollPosition);
+
+      // Reset typing state after a short delay
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        isTyping = false;
+      }, 100);
+
+      requestAnimationFrame(maintainScroll);
+    });
+  }
+
+  // Apply to all search inputs and observe for new ones
+  function applyToSearchInputs() {
+    document.querySelectorAll('.search-container input, .gsc-input input').forEach(setupSearchInputHandlers);
+  }
+
+  applyToSearchInputs();
+
+  const searchObserver = new MutationObserver(applyToSearchInputs);
+  searchObserver.observe(document.body, { childList: true, subtree: true });
+
+  // Watch for mobile menu creation
+  const mobileMenuObserver = new MutationObserver(function(mutations) {
+    for (const mutation of mutations) {
+      if (!mutation.addedNodes.length) continue;
+
+      // Style mobile search inputs
+      document.querySelectorAll('.sidebar-header-items__end .navbar-item .search-container-wrapper .gsc-input input').forEach(input => {
+        if (input) {
+          input.setAttribute('placeholder', 'Search the docs ...');
+          input.style.paddingLeft = '36px';
+        }
+      });
+
+      // Check for mobile search container
+      const mobileSearchContainer = document.querySelector('.sidebar-header-items__end .navbar-item .search-container-wrapper');
+      if (!mobileSearchContainer) continue;
+
+      const mobileToggle = mobileSearchContainer.querySelector('#search-toggle');
+      if (mobileToggle && toggle) {
+        // Sync mobile toggle with desktop toggle
+        mobileToggle.checked = toggle.checked;
+        updateMobileSearch();
+
+        // Add event listener to mobile toggle if not already added
+        if (!mobileToggle.hasAttribute('data-initialized')) {
+          mobileToggle.setAttribute('data-initialized', 'true');
+          mobileToggle.addEventListener('change', function() {
+            // Sync desktop toggle with mobile toggle
+            toggle.checked = this.checked;
+            // Trigger change event on desktop toggle to update both
+            toggle.dispatchEvent(new Event('change'));
+          });
+        }
+      }
+    }
+  });
+
+  mobileMenuObserver.observe(document.body, { childList: true, subtree: true });
+
+  // Ensure Google CSE is properly loaded
+  if (window.__gcse) {
+    window.__gcse.callback = function() {
+      // This will run after Google CSE is fully loaded
+      if (toggle && toggle.checked) {
+        reinitializeGoogleSearch();
+      }
+    };
+  } else {
+    window.__gcse = {
+      callback: function() {
+        if (toggle && toggle.checked) {
+          reinitializeGoogleSearch();
+        }
+      }
+    };
+  }
+});
+</script>
+</div>
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/PyTorchKorea/tutorials-kr" title="한국어 튜토리얼 GitHub 저장소" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">한국어 튜토리얼 GitHub 저장소</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://discuss.pytorch.kr/" title="파이토치 한국어 커뮤니티" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-discourse fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">파이토치 한국어 커뮤니티</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../intro.html">
+    Intro
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../compilers_index.html">
+    Compilers
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../domains.html">
+    Domains
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../distributed.html">
+    Distributed
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../deep-dive.html">
+    Deep Dive
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../extension.html">
+    Extension
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../ecosystem.html">
+    Ecosystem
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../recipes_index.html">
+    Recipes
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<div class="search-container-wrapper">
+  <div id="sphinx-search" class="search-container">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </div>
+
+  <div id="google-search" class="search-container" style="display:none;">
+    <div class="gcse-search-wrapper">
+      <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+      <div class="gcse-search"></div>
+    </div>
+  </div>
+
+  <div class="search-toggle-container" data-bs-title="Google Search Off" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <div class="search-toggle-inner">
+      <label class="switch">
+        <input type="checkbox" id="search-toggle">
+        <span class="slider round"></span>
+      </label>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+  // Define the search callback
+  const myWebSearchStartingCallback = (gname, query) => {
+    if (typeof dataLayer !== 'undefined' && query) {
+      window.dataLayer = window.dataLayer || [];
+      dataLayer.push({
+        'event': 'google_search',
+        'search_term': query,
+        'event_category': 'Search',
+        'event_label': 'Google Search'
+      });
+    }
+    return '';
+  };
+
+  // Set up the GCSE search callbacks
+  window.__gcse || (window.__gcse = {});
+  window.__gcse.searchCallbacks = {
+    web: { starting: myWebSearchStartingCallback }
+  };
+
+  if (window.location.pathname.includes('/search.html')) {
+    document.body.classList.add('search-page');
+  }
+
+  // Function to reinitialize Google CSE
+  function reinitializeGoogleSearch() {
+    if (window.__gcse && window.__gcse.initializationCallback) {
+      window.__gcse.initializationCallback();
+    }
+  }
+
+  // Function to handle search toggle
+  function handleSearchToggle(toggle, sphinxSearch, googleSearch) {
+    if (!toggle || !sphinxSearch || !googleSearch) return;
+
+    // Check if the URL contains /stable/ or /tutorials/
+    const currentUrl = window.location.href;
+    // TODO: We've had reports that the google programmable search is returning stale documentation,
+    //       Simple reproduction is to turn google search on and search for multinomial which will
+    //       result in returning 1.8.1 documentation.
+    //       We should turn this back on when we resolve that bug.
+    const shouldDefaultToGoogle = false;
+    const savedPreference = localStorage.getItem('searchPreference');
+
+    // Set initial state
+    if (savedPreference === 'google' || (savedPreference === null && shouldDefaultToGoogle)) {
+      toggle.checked = true;
+      sphinxSearch.style.display = 'none';
+      googleSearch.style.display = 'block';
+      if (savedPreference === null) {
+        localStorage.setItem('searchPreference', 'google');
+      }
+      reinitializeGoogleSearch();
+    } else {
+      toggle.checked = false;
+      sphinxSearch.style.display = 'block';
+      googleSearch.style.display = 'none';
+    }
+
+    // Update tooltip
+    updateTooltip(toggle.checked);
+
+    // Skip if already initialized
+    if (toggle.hasAttribute('data-initialized')) return;
+    toggle.setAttribute('data-initialized', 'true');
+
+    toggle.addEventListener('change', function() {
+      if (this.checked) {
+        sphinxSearch.style.display = 'none';
+        googleSearch.style.display = 'block';
+        localStorage.setItem('searchPreference', 'google');
+        reinitializeGoogleSearch();
+        trackSearchEngineSwitch('Google');
+      } else {
+        sphinxSearch.style.display = 'block';
+        googleSearch.style.display = 'none';
+        localStorage.setItem('searchPreference', 'sphinx');
+        trackSearchEngineSwitch('Sphinx');
+      }
+
+      updateTooltip(this.checked);
+      updateMobileSearch();
+    });
+  }
+
+  // Update tooltip based on toggle state
+  function updateTooltip(isChecked) {
+    const tooltipElement = document.querySelector('.search-toggle-container');
+    if (!tooltipElement) return;
+
+    tooltipElement.setAttribute('data-bs-title', isChecked ? 'Google Search On' : 'Google Search Off');
+
+    if (bootstrap && bootstrap.Tooltip) {
+      const tooltipInstance = bootstrap.Tooltip.getInstance(tooltipElement);
+      if (tooltipInstance) tooltipInstance.dispose();
+      new bootstrap.Tooltip(tooltipElement);
+    }
+  }
+
+  // Track search engine switch
+  function trackSearchEngineSwitch(engine) {
+    if (typeof dataLayer !== 'undefined') {
+      window.dataLayer = window.dataLayer || [];
+      dataLayer.push({
+        'event': 'search_engine_switch',
+        'event_category': 'Search',
+        'event_label': engine
+      });
+    }
+  }
+
+  // Function to update mobile search based on current toggle state
+  function updateMobileSearch() {
+    const toggle = document.getElementById('search-toggle');
+    if (!toggle) return;
+
+    const mobileSearchContainer = document.querySelector('.sidebar-header-items__end .navbar-item .search-container-wrapper');
+    if (!mobileSearchContainer) return;
+
+    const mobileSphinxSearch = mobileSearchContainer.querySelector('#sphinx-search');
+    const mobileGoogleSearch = mobileSearchContainer.querySelector('#google-search');
+
+    if (mobileSphinxSearch && mobileGoogleSearch) {
+      mobileSphinxSearch.style.display = toggle.checked ? 'none' : 'block';
+      mobileGoogleSearch.style.display = toggle.checked ? 'block' : 'none';
+
+      if (toggle.checked) {
+        reinitializeGoogleSearch();
+      }
+    }
+  }
+
+  // Initialize desktop search toggle
+  const toggle = document.getElementById('search-toggle');
+  const sphinxSearch = document.getElementById('sphinx-search');
+  const googleSearch = document.getElementById('google-search');
+  handleSearchToggle(toggle, sphinxSearch, googleSearch);
+
+  // Set placeholder text for Google search input
+  const observer = new MutationObserver(function() {
+    document.querySelectorAll('.gsc-input input').forEach(input => {
+      if (input && !input.hasAttribute('data-placeholder-set')) {
+        input.setAttribute('placeholder', 'Search the docs ...');
+        input.setAttribute('data-placeholder-set', 'true');
+      }
+    });
+  });
+
+  observer.observe(document.body, { childList: true, subtree: true });
+
+  // Fix for scroll jump issue - improved approach
+  function setupSearchInputHandlers(input) {
+    if (input.hasAttribute('data-scroll-fixed')) return;
+    input.setAttribute('data-scroll-fixed', 'true');
+
+    let lastScrollPosition = 0;
+    let isTyping = false;
+    let scrollTimeout;
+
+    // Save position before typing starts
+    input.addEventListener('keydown', () => {
+      lastScrollPosition = window.scrollY;
+      isTyping = true;
+
+      // Reset typing state after a short delay
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        isTyping = false;
+      }, 100);
+    });
+
+    // Only maintain scroll position during typing
+    function maintainScroll() {
+      if (document.activeElement === input && isTyping) {
+        window.scrollTo(0, lastScrollPosition);
+        requestAnimationFrame(maintainScroll);
+      }
+    }
+
+    input.addEventListener('focus', () => {
+      // Just store initial position but don't force it
+      lastScrollPosition = window.scrollY;
+    });
+
+    input.addEventListener('input', () => {
+      isTyping = true;
+      window.scrollTo(0, lastScrollPosition);
+
+      // Reset typing state after a short delay
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        isTyping = false;
+      }, 100);
+
+      requestAnimationFrame(maintainScroll);
+    });
+  }
+
+  // Apply to all search inputs and observe for new ones
+  function applyToSearchInputs() {
+    document.querySelectorAll('.search-container input, .gsc-input input').forEach(setupSearchInputHandlers);
+  }
+
+  applyToSearchInputs();
+
+  const searchObserver = new MutationObserver(applyToSearchInputs);
+  searchObserver.observe(document.body, { childList: true, subtree: true });
+
+  // Watch for mobile menu creation
+  const mobileMenuObserver = new MutationObserver(function(mutations) {
+    for (const mutation of mutations) {
+      if (!mutation.addedNodes.length) continue;
+
+      // Style mobile search inputs
+      document.querySelectorAll('.sidebar-header-items__end .navbar-item .search-container-wrapper .gsc-input input').forEach(input => {
+        if (input) {
+          input.setAttribute('placeholder', 'Search the docs ...');
+          input.style.paddingLeft = '36px';
+        }
+      });
+
+      // Check for mobile search container
+      const mobileSearchContainer = document.querySelector('.sidebar-header-items__end .navbar-item .search-container-wrapper');
+      if (!mobileSearchContainer) continue;
+
+      const mobileToggle = mobileSearchContainer.querySelector('#search-toggle');
+      if (mobileToggle && toggle) {
+        // Sync mobile toggle with desktop toggle
+        mobileToggle.checked = toggle.checked;
+        updateMobileSearch();
+
+        // Add event listener to mobile toggle if not already added
+        if (!mobileToggle.hasAttribute('data-initialized')) {
+          mobileToggle.setAttribute('data-initialized', 'true');
+          mobileToggle.addEventListener('change', function() {
+            // Sync desktop toggle with mobile toggle
+            toggle.checked = this.checked;
+            // Trigger change event on desktop toggle to update both
+            toggle.dispatchEvent(new Event('change'));
+          });
+        }
+      }
+    }
+  });
+
+  mobileMenuObserver.observe(document.body, { childList: true, subtree: true });
+
+  // Ensure Google CSE is properly loaded
+  if (window.__gcse) {
+    window.__gcse.callback = function() {
+      // This will run after Google CSE is fully loaded
+      if (toggle && toggle.checked) {
+        reinitializeGoogleSearch();
+      }
+    };
+  } else {
+    window.__gcse = {
+      callback: function() {
+        if (toggle && toggle.checked) {
+          reinitializeGoogleSearch();
+        }
+      }
+    };
+  }
+});
+</script>
+</div>
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/PyTorchKorea/tutorials-kr" title="한국어 튜토리얼 GitHub 저장소" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">한국어 튜토리얼 GitHub 저장소</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://discuss.pytorch.kr/" title="파이토치 한국어 커뮤니티" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-discourse fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">파이토치 한국어 커뮤니티</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Getting Started with PyTorch</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../beginner/basics/intro.html">파이토치(PyTorch) 기본 익히기</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="simple">
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../beginner/introyt/introyt_index.html">PyTorch 소개 - YouTube 시리즈</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../beginner/introyt/introyt1_tutorial.html">PyTorch 소개</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../beginner/introyt/tensors_deeper_tutorial.html">Pytorch Tensor 소개</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../beginner/introyt/autogradyt_tutorial.html">The Fundamentals of Autograd</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../beginner/introyt/modelsyt_tutorial.html">Building Models with PyTorch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../beginner/introyt/tensorboardyt_tutorial.html">PyTorch TensorBoard 지원</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../beginner/introyt/trainingyt.html">Training with PyTorch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../beginner/introyt/captumyt.html">Model Understanding with Captum</a></li>
+</ul>
+</details></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Learning PyTorch</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../beginner/deep_learning_60min_blitz.html">PyTorch로 딥러닝하기: 60분만에 끝장내기</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../beginner/blitz/tensor_tutorial.html">텐서(Tensor)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../beginner/blitz/autograd_tutorial.html"><code class="docutils literal notranslate"><span class="pre">torch.autograd</span></code> 에 대한 간단한 소개</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../beginner/blitz/neural_networks_tutorial.html">신경망(Neural Networks)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../beginner/blitz/cifar10_tutorial.html">분류기(Classifier) 학습하기</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../beginner/pytorch_with_examples.html">예제로 배우는 파이토치(PyTorch)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../beginner/examples_tensor/polynomial_numpy.html">준비 운동: NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../beginner/examples_tensor/polynomial_tensor.html">파이토치(PyTorch): 텐서(Tensor)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../beginner/examples_autograd/polynomial_autograd.html">PyTorch: 텐서(Tensor)와 autograd</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../beginner/examples_autograd/polynomial_custom_function.html">PyTorch: 새 autograd Function 정의하기</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../beginner/examples_nn/polynomial_nn.html">PyTorch: nn</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../beginner/examples_nn/polynomial_optim.html">PyTorch: optim</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../beginner/examples_nn/polynomial_module.html">PyTorch: 사용자 정의 nn.Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../beginner/examples_nn/dynamic_net.html">PyTorch: 제어 흐름(Control Flow) + 가중치 공유(Weight Sharing)</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/nn_tutorial.html"><cite>torch.nn</cite> 이 <em>실제로</em> 무엇인가요?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beginner/understanding_leaf_vs_nonleaf_tutorial.html">Understanding requires_grad, retain_grad, Leaf, and Non-leaf Tensors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nlp_from_scratch_index.html">NLP from Scratch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tensorboard_tutorial.html">TensorBoard로 모델, 데이터, 학습 시각화하기</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">A guide on good usage of <code class="docutils literal notranslate"><span class="pre">non_blocking</span></code> and <code class="docutils literal notranslate"><span class="pre">pin_memory()</span></code> in PyTorch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="visualizing_gradients_tutorial.html">Visualizing Gradients</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../intro.html" class="nav-link">Intro</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">A guide on...</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+<div class="rating">
+    Rate this Page
+    <div class="stars">
+        
+        <span class="star" data-behavior="tutorial-rating" data-count="1" data-value="1">★</span>
+        
+        <span class="star" data-behavior="tutorial-rating" data-count="2" data-value="2">★</span>
+        
+        <span class="star" data-behavior="tutorial-rating" data-count="3" data-value="3">★</span>
+        
+        <span class="star" data-behavior="tutorial-rating" data-count="4" data-value="4">★</span>
+        
+        <span class="star" data-behavior="tutorial-rating" data-count="5" data-value="5">★</span>
+        
+    </div>
+</div>
+</div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+  
+<div id="searchbox"></div>
+  <article class="bd-article" id="pytorch-article">
+    <!-- Hidden breadcrumb schema for SEO only -->
+    <div style="display:none;" itemscope itemtype="https://schema.org/BreadcrumbList">
+      
+      <div itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <link itemprop="item" href="../intro.html">
+        <meta itemprop="name" content="Intro">
+        <meta itemprop="position" content="1">
+      </div>
+      
+      <div itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <meta itemprop="name" content="A guide on good usage of <code class="docutils literal notranslate"><span class="pre">non_blocking</span></code> and <code class="docutils literal notranslate"><span class="pre">pin_memory()</span></code> in PyTorch">
+        <meta itemprop="position" content="2">
+      </div>
+    </div>
+
+    
+    <script>
+      if ((window.location.href.indexOf("/unstable/") != -1) && (window.location.href.indexOf("/unstable/unstable_index") < 1)) {
+        var div = '<div class="prototype-banner"><i class="fa fa-flask" aria-hidden="true"></i> <strong>Unstable feature:</strong> Not typically available in binary distributions like PyPI. Early stage for feedback and testing.</div>'
+        document.addEventListener('DOMContentLoaded', function () {
+          document.getElementById("pytorch-article").insertAdjacentHTML('afterBegin', div);
+        });
+      }
+    </script>
+    
+    
+    <div class="pytorch-call-to-action-links">
+      <div id="tutorial-type">intermediate/pinmem_nonblock</div>
+      <a id="colab-link" data-behavior="call-to-action-event" data-response="Run in Google Colab" target="_blank">
+        <div id="google-colab-link">
+          <img class="call-to-action-img" src="../_static/img/pytorch-colab.svg" />
+          <div class="call-to-action-desktop-view">Run in Google Colab</div>
+          <div class="call-to-action-mobile-view">Colab</div>
+        </div>
+      </a>
+      <a id="notebook-link" data-behavior="call-to-action-event" data-response="Download Notebook">
+        <div id="download-notebook-link">
+          <img class="call-to-action-notebook-img" src="../_static/img/pytorch-download.svg" />
+          <div class="call-to-action-desktop-view">Download Notebook</div>
+          <div class="call-to-action-mobile-view">Notebook</div>
+        </div>
+      </a>
+      <a id="github-link" data-behavior="call-to-action-event" data-response="View on Github" target="_blank">
+        <div id="github-view-link">
+          <img class="call-to-action-img" src="../_static/img/pytorch-github.svg" />
+          <div class="call-to-action-desktop-view">View on GitHub</div>
+          <div class="call-to-action-mobile-view">GitHub</div>
+        </div>
+      </a>
+    </div>
+    
+
+    
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">참고</p>
+<p><a class="reference internal" href="#sphx-glr-download-intermediate-pinmem-nonblock-py"><span class="std std-ref">Go to the end</span></a>
+to download the full example code.</p>
+</div>
+<section class="sphx-glr-example-title" id="a-guide-on-good-usage-of-non-blocking-and-pin-memory-in-pytorch">
+<span id="sphx-glr-intermediate-pinmem-nonblock-py"></span><h1>A guide on good usage of <code class="docutils literal notranslate"><span class="pre">non_blocking</span></code> and <code class="docutils literal notranslate"><span class="pre">pin_memory()</span></code> in PyTorch<a class="headerlink" href="#a-guide-on-good-usage-of-non-blocking-and-pin-memory-in-pytorch" title="Link to this heading">#</a></h1>
+<p><strong>Author</strong>: <a class="reference external" href="https://github.com/vmoens">Vincent Moens</a></p>
+<section id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading">#</a></h2>
+<p>Transferring data from the CPU to the GPU is fundamental in many PyTorch applications.
+It’s crucial for users to understand the most effective tools and options available for moving data between devices.
+This tutorial examines two key methods for device-to-device data transfer in PyTorch:
+<a class="reference external" href="https://docs.pytorch.org/docs/stable/generated/torch.Tensor.pin_memory.html#torch.Tensor.pin_memory" title="(PyTorch v2.8에서)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pin_memory()</span></code></a> and <a class="reference external" href="https://docs.pytorch.org/docs/stable/generated/torch.Tensor.to.html#torch.Tensor.to" title="(PyTorch v2.8에서)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">to()</span></code></a> with the <code class="docutils literal notranslate"><span class="pre">non_blocking=True</span></code> option.</p>
+<section id="what-you-will-learn">
+<h3>What you will learn<a class="headerlink" href="#what-you-will-learn" title="Link to this heading">#</a></h3>
+<p>Optimizing the transfer of tensors from the CPU to the GPU can be achieved through asynchronous transfers and memory
+pinning. However, there are important considerations:</p>
+<ul class="simple">
+<li><p>Using <code class="docutils literal notranslate"><span class="pre">tensor.pin_memory().to(device,</span> <span class="pre">non_blocking=True)</span></code> can be up to twice as slow as a straightforward <code class="docutils literal notranslate"><span class="pre">tensor.to(device)</span></code>.</p></li>
+<li><p>Generally, <code class="docutils literal notranslate"><span class="pre">tensor.to(device,</span> <span class="pre">non_blocking=True)</span></code> is an effective choice for enhancing transfer speed.</p></li>
+<li><p>While <code class="docutils literal notranslate"><span class="pre">cpu_tensor.to(&quot;cuda&quot;,</span> <span class="pre">non_blocking=True).mean()</span></code> executes correctly, attempting
+<code class="docutils literal notranslate"><span class="pre">cuda_tensor.to(&quot;cpu&quot;,</span> <span class="pre">non_blocking=True).mean()</span></code> will result in erroneous outputs.</p></li>
+</ul>
+</section>
+<section id="preamble">
+<h3>Preamble<a class="headerlink" href="#preamble" title="Link to this heading">#</a></h3>
+<p>The performance reported in this tutorial are conditioned on the system used to build the tutorial.
+Although the conclusions are applicable across different systems, the specific observations may vary slightly
+depending on the hardware available, especially on older hardware.
+The primary objective of this tutorial is to offer a theoretical framework for understanding CPU to GPU data transfers.
+However, any design decisions should be tailored to individual cases and guided by benchmarked throughput measurements,
+as well as the specific requirements of the task at hand.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+
+<span class="k">assert</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">(),</span> <span class="s2">&quot;A cuda device is required to run this tutorial&quot;</span>
+</pre></div>
+</div>
+<p>This tutorial requires tensordict to be installed. If you don’t have tensordict in your environment yet, install it
+by running the following command in a separate cell:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Install tensordict with the following command</span>
+!pip3<span class="w"> </span>install<span class="w"> </span>tensordict
+</pre></div>
+</div>
+<p>We start by outlining the theory surrounding these concepts, and then move to concrete test examples of the features.</p>
+</section>
+</section>
+<section id="background">
+<h2>Background<a class="headerlink" href="#background" title="Link to this heading">#</a></h2>
+<blockquote>
+<div></div></blockquote>
+<section id="memory-management-basics">
+<span id="pinned-memory-background"></span><h3>Memory management basics<a class="headerlink" href="#memory-management-basics" title="Link to this heading">#</a></h3>
+<blockquote>
+<div></div></blockquote>
+<p id="pinned-memory-memory">When one creates a CPU tensor in PyTorch, the content of this tensor needs to be placed
+in memory. The memory we talk about here is a rather complex concept worth looking at carefully.
+We distinguish two types of memory that are handled by the Memory Management Unit: the RAM (for simplicity)
+and the swap space on disk (which may or may not be the hard drive). Together, the available space in disk and RAM (physical memory)
+make up the virtual memory, which is an abstraction of the total resources available.
+In short, the virtual memory makes it so that the available space is larger than what can be found on RAM in isolation
+and creates the illusion that the main memory is larger than it actually is.</p>
+<p>In normal circumstances, a regular CPU tensor is pageable which means that it is divided in blocks called pages that
+can live anywhere in the virtual memory (both in RAM or on disk). As mentioned earlier, this has the advantage that
+the memory seems larger than what the main memory actually is.</p>
+<p>Typically, when a program accesses a page that is not in RAM, a “page fault” occurs and the operating system (OS) then brings
+back this page into RAM (“swap in” or “page in”).
+In turn, the OS may have to swap out (or “page out”) another page to make room for the new page.</p>
+<p>In contrast to pageable memory, a pinned (or page-locked or non-pageable) memory is a type of memory that cannot
+be swapped out to disk.
+It allows for faster and more predictable access times, but has the downside that it is more limited than the
+pageable memory (aka the main memory).</p>
+<figure class="align-default">
+<img alt="" src="../_images/pinmem.png" />
+</figure>
+</section>
+<section id="cuda-and-non-pageable-memory">
+<h3>CUDA and (non-)pageable memory<a class="headerlink" href="#cuda-and-non-pageable-memory" title="Link to this heading">#</a></h3>
+<blockquote>
+<div></div></blockquote>
+<p id="pinned-memory-cuda-pageable-memory">To understand how CUDA copies a tensor from CPU to CUDA, let’s consider the two scenarios above:</p>
+<ul class="simple">
+<li><p>If the memory is page-locked, the device can access the memory directly in the main memory. The memory addresses are well
+defined and functions that need to read these data can be significantly accelerated.</p></li>
+<li><p>If the memory is pageable, all the pages will have to be brought to the main memory before being sent to the GPU.
+This operation may take time and is less predictable than when executed on page-locked tensors.</p></li>
+</ul>
+<p>More precisely, when CUDA sends pageable data from CPU to GPU, it must first create a page-locked copy of that data
+before making the transfer.</p>
+</section>
+<section id="asynchronous-vs-synchronous-operations-with-non-blocking-true-cuda-cudamemcpyasync">
+<h3>Asynchronous vs. Synchronous Operations with <code class="docutils literal notranslate"><span class="pre">non_blocking=True</span></code> (CUDA <code class="docutils literal notranslate"><span class="pre">cudaMemcpyAsync</span></code>)<a class="headerlink" href="#asynchronous-vs-synchronous-operations-with-non-blocking-true-cuda-cudamemcpyasync" title="Link to this heading">#</a></h3>
+<blockquote>
+<div></div></blockquote>
+<p id="pinned-memory-async-sync">When executing a copy from a host (such as, CPU) to a device (such as, GPU), the CUDA toolkit offers modalities to do these
+operations synchronously or asynchronously with respect to the host.</p>
+<p>In practice, when calling <a class="reference external" href="https://docs.pytorch.org/docs/stable/generated/torch.Tensor.to.html#torch.Tensor.to" title="(PyTorch v2.8에서)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">to()</span></code></a>, PyTorch always makes a call to
+<a class="reference external" href="https://docs.nvidia.com/cuda/cuda-runtime-api/group__CUDART__MEMORY.html#group__CUDART__MEMORY_1g85073372f776b4c4d5f89f7124b7bf79">cudaMemcpyAsync</a>.
+If <code class="docutils literal notranslate"><span class="pre">non_blocking=False</span></code> (default), a <code class="docutils literal notranslate"><span class="pre">cudaStreamSynchronize</span></code> will be called after each and every <code class="docutils literal notranslate"><span class="pre">cudaMemcpyAsync</span></code>, making
+the call to <a class="reference external" href="https://docs.pytorch.org/docs/stable/generated/torch.Tensor.to.html#torch.Tensor.to" title="(PyTorch v2.8에서)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">to()</span></code></a> blocking in the main thread.
+If <code class="docutils literal notranslate"><span class="pre">non_blocking=True</span></code>, no synchronization is triggered, and the main thread on the host is not blocked.
+Therefore, from the host perspective, multiple tensors can be sent to the device simultaneously,
+as the thread does not need to wait for one transfer to be completed to initiate the other.</p>
+<div class="admonition note">
+<p class="admonition-title">참고</p>
+<p>In general, the transfer is blocking on the device side (even if it isn’t on the host side):
+the copy on the device cannot occur while another operation is being executed.
+However, in some advanced scenarios, a copy and a kernel execution can be done simultaneously on the GPU side.
+As the following example will show, three requirements must be met to enable this:</p>
+<ol class="arabic simple">
+<li><p>The device must have at least one free DMA (Direct Memory Access) engine. Modern GPU architectures such as Volterra,
+Tesla, or H100 devices have more than one DMA engine.</p></li>
+<li><p>The transfer must be done on a separate, non-default cuda stream. In PyTorch, cuda streams can be handles using
+<a class="reference external" href="https://docs.pytorch.org/docs/stable/generated/torch.cuda.Stream.html#torch.cuda.Stream" title="(PyTorch v2.8에서)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Stream</span></code></a>.</p></li>
+<li><p>The source data must be in pinned memory.</p></li>
+</ol>
+<p>We demonstrate this by running profiles on the following script.</p>
+</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">contextlib</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch.cuda</span><span class="w"> </span><span class="kn">import</span> <span class="n">Stream</span>
+
+
+<span class="n">s</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+
+<span class="n">torch</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">t1_cpu_pinned</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">1024</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="mi">5</span><span class="p">,</span> <span class="n">pin_memory</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">t2_cpu_paged</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">1024</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="mi">5</span><span class="p">,</span> <span class="n">pin_memory</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">t3_cuda</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">1024</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="mi">5</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cuda:0&quot;</span><span class="p">)</span>
+
+<span class="k">assert</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span>
+<span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">current_device</span><span class="p">())</span>
+
+
+<span class="c1"># The function we want to profile</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">inner</span><span class="p">(</span><span class="n">pinned</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">streamed</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+    <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">stream</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">if</span> <span class="n">streamed</span> <span class="k">else</span> <span class="n">contextlib</span><span class="o">.</span><span class="n">nullcontext</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">pinned</span><span class="p">:</span>
+            <span class="n">t1_cuda</span> <span class="o">=</span> <span class="n">t1_cpu_pinned</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">,</span> <span class="n">non_blocking</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">t2_cuda</span> <span class="o">=</span> <span class="n">t2_cpu_paged</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">,</span> <span class="n">non_blocking</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">t_star_cuda_h2d_event</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">record_event</span><span class="p">()</span>
+    <span class="c1"># This operation can be executed during the CPU to GPU copy if and only if the tensor is pinned and the copy is</span>
+    <span class="c1">#  done in the other stream</span>
+    <span class="n">t3_cuda_mul</span> <span class="o">=</span> <span class="n">t3_cuda</span> <span class="o">*</span> <span class="n">t3_cuda</span> <span class="o">*</span> <span class="n">t3_cuda</span>
+    <span class="n">t3_cuda_h2d_event</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">current_stream</span><span class="p">()</span><span class="o">.</span><span class="n">record_event</span><span class="p">()</span>
+    <span class="n">t_star_cuda_h2d_event</span><span class="o">.</span><span class="n">synchronize</span><span class="p">()</span>
+    <span class="n">t3_cuda_h2d_event</span><span class="o">.</span><span class="n">synchronize</span><span class="p">()</span>
+
+
+<span class="c1"># Our profiler: profiles the `inner` function and stores the results in a .json file</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">benchmark_with_profiler</span><span class="p">(</span>
+    <span class="n">pinned</span><span class="p">,</span>
+    <span class="n">streamed</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">_C</span><span class="o">.</span><span class="n">_profiler</span><span class="o">.</span><span class="n">_set_cuda_sync_enabled_val</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">wait</span><span class="p">,</span> <span class="n">warmup</span><span class="p">,</span> <span class="n">active</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span>
+    <span class="n">num_steps</span> <span class="o">=</span> <span class="n">wait</span> <span class="o">+</span> <span class="n">warmup</span> <span class="o">+</span> <span class="n">active</span>
+    <span class="n">rank</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">profiler</span><span class="o">.</span><span class="n">profile</span><span class="p">(</span>
+        <span class="n">activities</span><span class="o">=</span><span class="p">[</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">profiler</span><span class="o">.</span><span class="n">ProfilerActivity</span><span class="o">.</span><span class="n">CPU</span><span class="p">,</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">profiler</span><span class="o">.</span><span class="n">ProfilerActivity</span><span class="o">.</span><span class="n">CUDA</span><span class="p">,</span>
+        <span class="p">],</span>
+        <span class="n">schedule</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">profiler</span><span class="o">.</span><span class="n">schedule</span><span class="p">(</span>
+            <span class="n">wait</span><span class="o">=</span><span class="n">wait</span><span class="p">,</span> <span class="n">warmup</span><span class="o">=</span><span class="n">warmup</span><span class="p">,</span> <span class="n">active</span><span class="o">=</span><span class="n">active</span><span class="p">,</span> <span class="n">repeat</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">skip_first</span><span class="o">=</span><span class="mi">1</span>
+        <span class="p">),</span>
+    <span class="p">)</span> <span class="k">as</span> <span class="n">prof</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">step_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_steps</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">inner</span><span class="p">(</span><span class="n">streamed</span><span class="o">=</span><span class="n">streamed</span><span class="p">,</span> <span class="n">pinned</span><span class="o">=</span><span class="n">pinned</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">rank</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">prof</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+    <span class="n">prof</span><span class="o">.</span><span class="n">export_chrome_trace</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;trace_streamed</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">streamed</span><span class="p">)</span><span class="si">}</span><span class="s2">_pinned</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">pinned</span><span class="p">)</span><span class="si">}</span><span class="s2">.json&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Loading these profile traces in chrome (<code class="docutils literal notranslate"><span class="pre">chrome://tracing</span></code>) shows the following results: first, let’s see
+what happens if both the arithmetic operation on <code class="docutils literal notranslate"><span class="pre">t3_cuda</span></code> is executed after the pageable tensor is sent to GPU
+in the main stream:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">benchmark_with_profiler</span><span class="p">(</span><span class="n">streamed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">pinned</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+<figure class="align-default">
+<img alt="" src="../_images/trace_streamed0_pinned0.png" />
+</figure>
+<p>Using a pinned tensor doesn’t change the trace much, both operations are still executed consecutively:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">benchmark_with_profiler</span><span class="p">(</span><span class="n">streamed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">pinned</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<figure class="align-default">
+<img alt="" src="../_images/trace_streamed0_pinned1.png" />
+</figure>
+<p>Sending a pageable tensor to GPU on a separate stream is also a blocking operation:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">benchmark_with_profiler</span><span class="p">(</span><span class="n">streamed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">pinned</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+<figure class="align-default">
+<img alt="" src="../_images/trace_streamed1_pinned0.png" />
+</figure>
+<p>Only pinned tensors copies to GPU on a separate stream overlap with another cuda kernel executed on
+the main stream:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">benchmark_with_profiler</span><span class="p">(</span><span class="n">streamed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">pinned</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<figure class="align-default">
+<img alt="" src="../_images/trace_streamed1_pinned1.png" />
+</figure>
+</section>
+</section>
+<section id="a-pytorch-perspective">
+<h2>A PyTorch perspective<a class="headerlink" href="#a-pytorch-perspective" title="Link to this heading">#</a></h2>
+<blockquote>
+<div></div></blockquote>
+<section id="pin-memory">
+<span id="pinned-memory-pt-perspective"></span><h3><code class="docutils literal notranslate"><span class="pre">pin_memory()</span></code><a class="headerlink" href="#pin-memory" title="Link to this heading">#</a></h3>
+<blockquote>
+<div></div></blockquote>
+<p id="pinned-memory-pinned">PyTorch offers the possibility to create and send tensors to page-locked memory through the
+<a class="reference external" href="https://docs.pytorch.org/docs/stable/generated/torch.Tensor.pin_memory.html#torch.Tensor.pin_memory" title="(PyTorch v2.8에서)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pin_memory()</span></code></a> method and constructor arguments.
+CPU tensors on a machine where CUDA is initialized can be cast to pinned memory through the <a class="reference external" href="https://docs.pytorch.org/docs/stable/generated/torch.Tensor.pin_memory.html#torch.Tensor.pin_memory" title="(PyTorch v2.8에서)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pin_memory()</span></code></a>
+method. Importantly, <code class="docutils literal notranslate"><span class="pre">pin_memory</span></code> is blocking on the main thread of the host: it will wait for the tensor to be copied to
+page-locked memory before executing the next operation.
+New tensors can be directly created in pinned memory with functions like <a class="reference external" href="https://docs.pytorch.org/docs/stable/generated/torch.zeros.html#torch.zeros" title="(PyTorch v2.8에서)"><code class="xref py py-func docutils literal notranslate"><span class="pre">zeros()</span></code></a>, <a class="reference external" href="https://docs.pytorch.org/docs/stable/generated/torch.ones.html#torch.ones" title="(PyTorch v2.8에서)"><code class="xref py py-func docutils literal notranslate"><span class="pre">ones()</span></code></a> and other
+constructors.</p>
+<p>Let us check the speed of pinning memory and sending tensors to CUDA:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">gc</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch.utils.benchmark</span><span class="w"> </span><span class="kn">import</span> <span class="n">Timer</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">timer</span><span class="p">(</span><span class="n">cmd</span><span class="p">):</span>
+    <span class="n">median</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">Timer</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="nb">globals</span><span class="o">=</span><span class="nb">globals</span><span class="p">())</span>
+        <span class="o">.</span><span class="n">adaptive_autorange</span><span class="p">(</span><span class="n">min_run_time</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">max_run_time</span><span class="o">=</span><span class="mf">20.0</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">median</span>
+        <span class="o">*</span> <span class="mi">1000</span>
+    <span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">median</span><span class="si">:</span><span class="s2"> 4.4f</span><span class="si">}</span><span class="s2"> ms&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">median</span>
+
+
+<span class="c1"># A tensor in pageable memory</span>
+<span class="n">pageable_tensor</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">1_000_000</span><span class="p">)</span>
+
+<span class="c1"># A tensor in page-locked (pinned) memory</span>
+<span class="n">pinned_tensor</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">1_000_000</span><span class="p">,</span> <span class="n">pin_memory</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># Runtimes:</span>
+<span class="n">pageable_to_device</span> <span class="o">=</span> <span class="n">timer</span><span class="p">(</span><span class="s2">&quot;pageable_tensor.to(&#39;cuda:0&#39;)&quot;</span><span class="p">)</span>
+<span class="n">pinned_to_device</span> <span class="o">=</span> <span class="n">timer</span><span class="p">(</span><span class="s2">&quot;pinned_tensor.to(&#39;cuda:0&#39;)&quot;</span><span class="p">)</span>
+<span class="n">pin_mem</span> <span class="o">=</span> <span class="n">timer</span><span class="p">(</span><span class="s2">&quot;pageable_tensor.pin_memory()&quot;</span><span class="p">)</span>
+<span class="n">pin_mem_to_device</span> <span class="o">=</span> <span class="n">timer</span><span class="p">(</span><span class="s2">&quot;pageable_tensor.pin_memory().to(&#39;cuda:0&#39;)&quot;</span><span class="p">)</span>
+
+<span class="c1"># Ratios:</span>
+<span class="n">r1</span> <span class="o">=</span> <span class="n">pinned_to_device</span> <span class="o">/</span> <span class="n">pageable_to_device</span>
+<span class="n">r2</span> <span class="o">=</span> <span class="n">pin_mem_to_device</span> <span class="o">/</span> <span class="n">pageable_to_device</span>
+
+<span class="c1"># Create a figure with the results</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+
+<span class="n">xlabels</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+<span class="n">bar_labels</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;pageable_tensor.to(device) (1x)&quot;</span><span class="p">,</span>
+    <span class="sa">f</span><span class="s2">&quot;pinned_tensor.to(device) (</span><span class="si">{</span><span class="n">r1</span><span class="si">:</span><span class="s2">4.2f</span><span class="si">}</span><span class="s2">x)&quot;</span><span class="p">,</span>
+    <span class="sa">f</span><span class="s2">&quot;pageable_tensor.pin_memory().to(device) (</span><span class="si">{</span><span class="n">r2</span><span class="si">:</span><span class="s2">4.2f</span><span class="si">}</span><span class="s2">x)&quot;</span>
+    <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">pin_memory()=</span><span class="si">{</span><span class="mi">100</span><span class="o">*</span><span class="n">pin_mem</span><span class="o">/</span><span class="n">pin_mem_to_device</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">% of runtime.&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+<span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="n">pageable_to_device</span><span class="p">,</span> <span class="n">pinned_to_device</span><span class="p">,</span> <span class="n">pin_mem_to_device</span><span class="p">]</span>
+<span class="n">colors</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;tab:blue&quot;</span><span class="p">,</span> <span class="s2">&quot;tab:red&quot;</span><span class="p">,</span> <span class="s2">&quot;tab:orange&quot;</span><span class="p">]</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">xlabels</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">bar_labels</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">colors</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Runtime (ms)&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Device casting runtime (pin-memory)&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([])</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="c1"># Clear tensors</span>
+<span class="k">del</span> <span class="n">pageable_tensor</span><span class="p">,</span> <span class="n">pinned_tensor</span>
+<span class="n">_</span> <span class="o">=</span> <span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
+</pre></div>
+</div>
+<img src="../_images/sphx_glr_pinmem_nonblock_001.png" srcset="../_images/sphx_glr_pinmem_nonblock_001.png" alt="Device casting runtime (pin-memory)" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>pageable_tensor.to(&#39;cuda:0&#39;):  0.2681 ms
+pinned_tensor.to(&#39;cuda:0&#39;):  0.0874 ms
+pageable_tensor.pin_memory():  0.2979 ms
+pageable_tensor.pin_memory().to(&#39;cuda:0&#39;):  0.3933 ms
+</pre></div>
+</div>
+<p>We can observe that casting a pinned-memory tensor to GPU is indeed much faster than a pageable tensor, because under
+the hood, a pageable tensor must be copied to pinned memory before being sent to GPU.</p>
+<p>However, contrary to a somewhat common belief, calling <a class="reference external" href="https://docs.pytorch.org/docs/stable/generated/torch.Tensor.pin_memory.html#torch.Tensor.pin_memory" title="(PyTorch v2.8에서)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pin_memory()</span></code></a> on a pageable tensor before
+casting it to GPU should not bring any significant speed-up, on the contrary this call is usually slower than just
+executing the transfer. This makes sense, since we’re actually asking Python to execute an operation that CUDA will
+perform anyway before copying the data from host to device.</p>
+<div class="admonition note">
+<p class="admonition-title">참고</p>
+<p>The PyTorch implementation of
+<a class="reference external" href="https://github.com/pytorch/pytorch/blob/5298acb5c76855bc5a99ae10016efc86b27949bd/aten/src/ATen/native/Memory.cpp#L58">pin_memory</a>
+which relies on creating a brand new storage in pinned memory through <a class="reference external" href="https://docs.nvidia.com/cuda/cuda-runtime-api/group__CUDART__MEMORY.html#group__CUDART__MEMORY_1gb65da58f444e7230d3322b6126bb4902">cudaHostAlloc</a>
+could be, in rare cases, faster than transitioning data in chunks as <code class="docutils literal notranslate"><span class="pre">cudaMemcpy</span></code> does.
+Here too, the observation may vary depending on the available hardware, the size of the tensors being sent or
+the amount of available RAM.</p>
+</div>
+</section>
+<section id="non-blocking-true">
+<h3><code class="docutils literal notranslate"><span class="pre">non_blocking=True</span></code><a class="headerlink" href="#non-blocking-true" title="Link to this heading">#</a></h3>
+<blockquote>
+<div></div></blockquote>
+<p id="pinned-memory-non-blocking">As mentioned earlier, many PyTorch operations have the option of being executed asynchronously with respect to the host
+through the <code class="docutils literal notranslate"><span class="pre">non_blocking</span></code> argument.</p>
+<p>Here, to account accurately of the benefits of using <code class="docutils literal notranslate"><span class="pre">non_blocking</span></code>, we will design a slightly more complex
+experiment since we want to assess how fast it is to send multiple tensors to GPU with and without calling
+<code class="docutils literal notranslate"><span class="pre">non_blocking</span></code>.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># A simple loop that copies all tensors to cuda</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">copy_to_device</span><span class="p">(</span><span class="o">*</span><span class="n">tensors</span><span class="p">):</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">tensor</span> <span class="ow">in</span> <span class="n">tensors</span><span class="p">:</span>
+        <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tensor</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s2">&quot;cuda:0&quot;</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">result</span>
+
+
+<span class="c1"># A loop that copies all tensors to cuda asynchronously</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">copy_to_device_nonblocking</span><span class="p">(</span><span class="o">*</span><span class="n">tensors</span><span class="p">):</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">tensor</span> <span class="ow">in</span> <span class="n">tensors</span><span class="p">:</span>
+        <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tensor</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s2">&quot;cuda:0&quot;</span><span class="p">,</span> <span class="n">non_blocking</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+    <span class="c1"># We need to synchronize</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">synchronize</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">result</span>
+
+
+<span class="c1"># Create a list of tensors</span>
+<span class="n">tensors</span> <span class="o">=</span> <span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000</span><span class="p">)]</span>
+<span class="n">to_device</span> <span class="o">=</span> <span class="n">timer</span><span class="p">(</span><span class="s2">&quot;copy_to_device(*tensors)&quot;</span><span class="p">)</span>
+<span class="n">to_device_nonblocking</span> <span class="o">=</span> <span class="n">timer</span><span class="p">(</span><span class="s2">&quot;copy_to_device_nonblocking(*tensors)&quot;</span><span class="p">)</span>
+
+<span class="c1"># Ratio</span>
+<span class="n">r1</span> <span class="o">=</span> <span class="n">to_device_nonblocking</span> <span class="o">/</span> <span class="n">to_device</span>
+
+<span class="c1"># Plot the results</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+
+<span class="n">xlabels</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+<span class="n">bar_labels</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;to(device) (1x)&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;to(device, non_blocking=True) (</span><span class="si">{</span><span class="n">r1</span><span class="si">:</span><span class="s2">4.2f</span><span class="si">}</span><span class="s2">x)&quot;</span><span class="p">]</span>
+<span class="n">colors</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;tab:blue&quot;</span><span class="p">,</span> <span class="s2">&quot;tab:red&quot;</span><span class="p">]</span>
+<span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="n">to_device</span><span class="p">,</span> <span class="n">to_device_nonblocking</span><span class="p">]</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">xlabels</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">bar_labels</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">colors</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Runtime (ms)&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Device casting runtime (non-blocking)&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([])</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img src="../_images/sphx_glr_pinmem_nonblock_002.png" srcset="../_images/sphx_glr_pinmem_nonblock_002.png" alt="Device casting runtime (non-blocking)" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>copy_to_device(*tensors):  13.5244 ms
+copy_to_device_nonblocking(*tensors):  8.6143 ms
+</pre></div>
+</div>
+<p>To get a better sense of what is happening here, let us profile these two functions:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">torch.profiler</span><span class="w"> </span><span class="kn">import</span> <span class="n">profile</span><span class="p">,</span> <span class="n">ProfilerActivity</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">profile_mem</span><span class="p">(</span><span class="n">cmd</span><span class="p">):</span>
+    <span class="k">with</span> <span class="n">profile</span><span class="p">(</span><span class="n">activities</span><span class="o">=</span><span class="p">[</span><span class="n">ProfilerActivity</span><span class="o">.</span><span class="n">CPU</span><span class="p">])</span> <span class="k">as</span> <span class="n">prof</span><span class="p">:</span>
+        <span class="n">exec</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">prof</span><span class="o">.</span><span class="n">key_averages</span><span class="p">()</span><span class="o">.</span><span class="n">table</span><span class="p">(</span><span class="n">row_limit</span><span class="o">=</span><span class="mi">10</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Let’s see the call stack with a regular <code class="docutils literal notranslate"><span class="pre">to(device)</span></code> first:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Call to `to(device)`&quot;</span><span class="p">,</span> <span class="n">profile_mem</span><span class="p">(</span><span class="s2">&quot;copy_to_device(*tensors)&quot;</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>copy_to_device(*tensors)
+-------------------------  ------------  ------------  ------------  ------------  ------------  ------------
+                     Name    Self CPU %      Self CPU   CPU total %     CPU total  CPU time avg    # of Calls
+-------------------------  ------------  ------------  ------------  ------------  ------------  ------------
+                 aten::to         3.33%     521.570us       100.00%      15.682ms      15.682us          1000
+           aten::_to_copy         9.19%       1.441ms        96.67%      15.160ms      15.160us          1000
+      aten::empty_strided        16.45%       2.580ms        16.45%       2.580ms       2.580us          1000
+              aten::copy_        22.03%       3.455ms        71.03%      11.139ms      11.139us          1000
+          cudaMemcpyAsync        16.55%       2.595ms        16.55%       2.595ms       2.595us          1000
+    cudaStreamSynchronize        32.45%       5.089ms        32.45%       5.089ms       5.089us          1000
+-------------------------  ------------  ------------  ------------  ------------  ------------  ------------
+Self CPU time total: 15.682ms
+
+Call to `to(device)` None
+</pre></div>
+</div>
+<p>and now the <code class="docutils literal notranslate"><span class="pre">non_blocking</span></code> version:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span>
+    <span class="s2">&quot;Call to `to(device, non_blocking=True)`&quot;</span><span class="p">,</span>
+    <span class="n">profile_mem</span><span class="p">(</span><span class="s2">&quot;copy_to_device_nonblocking(*tensors)&quot;</span><span class="p">),</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>copy_to_device_nonblocking(*tensors)
+-------------------------  ------------  ------------  ------------  ------------  ------------  ------------
+                     Name    Self CPU %      Self CPU   CPU total %     CPU total  CPU time avg    # of Calls
+-------------------------  ------------  ------------  ------------  ------------  ------------  ------------
+                 aten::to         4.83%     523.962us        99.88%      10.838ms      10.838us          1000
+           aten::_to_copy        12.52%       1.359ms        95.05%      10.314ms      10.314us          1000
+      aten::empty_strided        22.77%       2.471ms        22.77%       2.471ms       2.471us          1000
+              aten::copy_        35.03%       3.801ms        59.76%       6.484ms       6.484us          1000
+          cudaMemcpyAsync        24.72%       2.683ms        24.72%       2.683ms       2.683us          1000
+    cudaDeviceSynchronize         0.12%      12.746us         0.12%      12.746us      12.746us             1
+-------------------------  ------------  ------------  ------------  ------------  ------------  ------------
+Self CPU time total: 10.851ms
+
+Call to `to(device, non_blocking=True)` None
+</pre></div>
+</div>
+<p>The results are without any doubt better when using <code class="docutils literal notranslate"><span class="pre">non_blocking=True</span></code>, as all transfers are initiated simultaneously
+on the host side and only one synchronization is done.</p>
+<p>The benefit will vary depending on the number and the size of the tensors as well as depending on the hardware being
+used.</p>
+<div class="admonition note">
+<p class="admonition-title">참고</p>
+<p>Interestingly, the blocking <code class="docutils literal notranslate"><span class="pre">to(&quot;cuda&quot;)</span></code> actually performs the same asynchronous device casting operation
+(<code class="docutils literal notranslate"><span class="pre">cudaMemcpyAsync</span></code>) as the one with <code class="docutils literal notranslate"><span class="pre">non_blocking=True</span></code> with a synchronization point after each copy.</p>
+</div>
+</section>
+<section id="synergies">
+<h3>Synergies<a class="headerlink" href="#synergies" title="Link to this heading">#</a></h3>
+<blockquote>
+<div></div></blockquote>
+<p id="pinned-memory-synergies">Now that we have made the point that data transfer of tensors already in pinned memory to GPU is faster than from
+pageable memory, and that we know that doing these transfers asynchronously is also faster than synchronously, we can
+benchmark combinations of these approaches. First, let’s write a couple of new functions that will call <code class="docutils literal notranslate"><span class="pre">pin_memory</span></code>
+and <code class="docutils literal notranslate"><span class="pre">to(device)</span></code> on each tensor:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">pin_copy_to_device</span><span class="p">(</span><span class="o">*</span><span class="n">tensors</span><span class="p">):</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">tensor</span> <span class="ow">in</span> <span class="n">tensors</span><span class="p">:</span>
+        <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tensor</span><span class="o">.</span><span class="n">pin_memory</span><span class="p">()</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s2">&quot;cuda:0&quot;</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">result</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">pin_copy_to_device_nonblocking</span><span class="p">(</span><span class="o">*</span><span class="n">tensors</span><span class="p">):</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">tensor</span> <span class="ow">in</span> <span class="n">tensors</span><span class="p">:</span>
+        <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tensor</span><span class="o">.</span><span class="n">pin_memory</span><span class="p">()</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s2">&quot;cuda:0&quot;</span><span class="p">,</span> <span class="n">non_blocking</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+    <span class="c1"># We need to synchronize</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">synchronize</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">result</span>
+</pre></div>
+</div>
+<p>The benefits of using <a class="reference external" href="https://docs.pytorch.org/docs/stable/generated/torch.Tensor.pin_memory.html#torch.Tensor.pin_memory" title="(PyTorch v2.8에서)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pin_memory()</span></code></a> are more pronounced for
+somewhat large batches of large tensors:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">tensors</span> <span class="o">=</span> <span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">1_000_000</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000</span><span class="p">)]</span>
+<span class="n">page_copy</span> <span class="o">=</span> <span class="n">timer</span><span class="p">(</span><span class="s2">&quot;copy_to_device(*tensors)&quot;</span><span class="p">)</span>
+<span class="n">page_copy_nb</span> <span class="o">=</span> <span class="n">timer</span><span class="p">(</span><span class="s2">&quot;copy_to_device_nonblocking(*tensors)&quot;</span><span class="p">)</span>
+
+<span class="n">tensors_pinned</span> <span class="o">=</span> <span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">1_000_000</span><span class="p">,</span> <span class="n">pin_memory</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000</span><span class="p">)]</span>
+<span class="n">pinned_copy</span> <span class="o">=</span> <span class="n">timer</span><span class="p">(</span><span class="s2">&quot;copy_to_device(*tensors_pinned)&quot;</span><span class="p">)</span>
+<span class="n">pinned_copy_nb</span> <span class="o">=</span> <span class="n">timer</span><span class="p">(</span><span class="s2">&quot;copy_to_device_nonblocking(*tensors_pinned)&quot;</span><span class="p">)</span>
+
+<span class="n">pin_and_copy</span> <span class="o">=</span> <span class="n">timer</span><span class="p">(</span><span class="s2">&quot;pin_copy_to_device(*tensors)&quot;</span><span class="p">)</span>
+<span class="n">pin_and_copy_nb</span> <span class="o">=</span> <span class="n">timer</span><span class="p">(</span><span class="s2">&quot;pin_copy_to_device_nonblocking(*tensors)&quot;</span><span class="p">)</span>
+
+<span class="c1"># Plot</span>
+<span class="n">strategies</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;pageable copy&quot;</span><span class="p">,</span> <span class="s2">&quot;pinned copy&quot;</span><span class="p">,</span> <span class="s2">&quot;pin and copy&quot;</span><span class="p">)</span>
+<span class="n">blocking</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;blocking&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">page_copy</span><span class="p">,</span> <span class="n">pinned_copy</span><span class="p">,</span> <span class="n">pin_and_copy</span><span class="p">],</span>
+    <span class="s2">&quot;non-blocking&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">page_copy_nb</span><span class="p">,</span> <span class="n">pinned_copy_nb</span><span class="p">,</span> <span class="n">pin_and_copy_nb</span><span class="p">],</span>
+<span class="p">}</span>
+
+<span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">width</span> <span class="o">=</span> <span class="mf">0.25</span>
+<span class="n">multiplier</span> <span class="o">=</span> <span class="mi">0</span>
+
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">layout</span><span class="o">=</span><span class="s2">&quot;constrained&quot;</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">attribute</span><span class="p">,</span> <span class="n">runtimes</span> <span class="ow">in</span> <span class="n">blocking</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="n">offset</span> <span class="o">=</span> <span class="n">width</span> <span class="o">*</span> <span class="n">multiplier</span>
+    <span class="n">rects</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="n">offset</span><span class="p">,</span> <span class="n">runtimes</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">attribute</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">bar_label</span><span class="p">(</span><span class="n">rects</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%.2f</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">multiplier</span> <span class="o">+=</span> <span class="mi">1</span>
+
+<span class="c1"># Add some text for labels, title and custom x-axis tick labels, etc.</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Runtime (ms)&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Runtime (pin-mem and non-blocking)&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span><span class="n">strategies</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">setp</span><span class="p">(</span><span class="n">ax</span><span class="o">.</span><span class="n">get_xticklabels</span><span class="p">(),</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">45</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">,</span> <span class="n">rotation_mode</span><span class="o">=</span><span class="s2">&quot;anchor&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">&quot;upper left&quot;</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="k">del</span> <span class="n">tensors</span><span class="p">,</span> <span class="n">tensors_pinned</span>
+<span class="n">_</span> <span class="o">=</span> <span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
+</pre></div>
+</div>
+<img src="../_images/sphx_glr_pinmem_nonblock_003.png" srcset="../_images/sphx_glr_pinmem_nonblock_003.png" alt="Runtime (pin-mem and non-blocking)" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>copy_to_device(*tensors):  417.3499 ms
+copy_to_device_nonblocking(*tensors):  396.4463 ms
+copy_to_device(*tensors_pinned):  87.9670 ms
+copy_to_device_nonblocking(*tensors_pinned):  75.7368 ms
+pin_copy_to_device(*tensors):  474.7948 ms
+pin_copy_to_device_nonblocking(*tensors):  393.1761 ms
+</pre></div>
+</div>
+</section>
+<section id="other-copy-directions-gpu-cpu-cpu-mps">
+<h3>Other copy directions (GPU -&gt; CPU, CPU -&gt; MPS)<a class="headerlink" href="#other-copy-directions-gpu-cpu-cpu-mps" title="Link to this heading">#</a></h3>
+<blockquote>
+<div></div></blockquote>
+<p id="pinned-memory-other-direction">Until now, we have operated under the assumption that asynchronous copies from the CPU to the GPU are safe.
+This is generally true because CUDA automatically handles synchronization to ensure that the data being accessed is
+valid at read time __whenever the tensor is in pageable <a href="#id2"><span class="problematic" id="id3">memory__</span></a>.</p>
+<p>However, in other cases we cannot make the same assumption: when a tensor is placed in pinned memory, mutating the
+original copy after calling the host-to-device transfer may corrupt the data received on GPU.
+Similarly, when a transfer is achieved in the opposite direction, from GPU to CPU, or from any device that is not CPU
+or GPU to any device that is not a CUDA-handled GPU (such as, MPS), there is no guarantee that the data read on GPU is
+valid without explicit synchronization.</p>
+<p>In these scenarios, these transfers offer no assurance that the copy will be complete at the time of
+data access. Consequently, the data on the host might be incomplete or incorrect, effectively rendering it garbage.</p>
+<p>Let’s first demonstrate this with a pinned-memory tensor:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">DELAY</span> <span class="o">=</span> <span class="mi">100000000</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100</span><span class="p">):</span>
+        <span class="c1"># Create a tensor in pin-memory</span>
+        <span class="n">cpu_tensor</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">1024</span><span class="p">,</span> <span class="mi">1024</span><span class="p">,</span> <span class="n">pin_memory</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">synchronize</span><span class="p">()</span>
+        <span class="c1"># Send the tensor to CUDA</span>
+        <span class="n">cuda_tensor</span> <span class="o">=</span> <span class="n">cpu_tensor</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span><span class="p">,</span> <span class="n">non_blocking</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">_sleep</span><span class="p">(</span><span class="n">DELAY</span><span class="p">)</span>
+        <span class="c1"># Corrupt the original tensor</span>
+        <span class="n">cpu_tensor</span><span class="o">.</span><span class="n">zero_</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="p">(</span><span class="n">cuda_tensor</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No test failed with non_blocking and pinned tensor&quot;</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">AssertionError</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">th test failed with non_blocking and pinned tensor. Skipping remaining tests&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>1th test failed with non_blocking and pinned tensor. Skipping remaining tests
+</pre></div>
+</div>
+<p>Using a pageable tensor always works:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">i</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100</span><span class="p">):</span>
+    <span class="c1"># Create a tensor in pageable memory</span>
+    <span class="n">cpu_tensor</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">1024</span><span class="p">,</span> <span class="mi">1024</span><span class="p">)</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">synchronize</span><span class="p">()</span>
+    <span class="c1"># Send the tensor to CUDA</span>
+    <span class="n">cuda_tensor</span> <span class="o">=</span> <span class="n">cpu_tensor</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span><span class="p">,</span> <span class="n">non_blocking</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">_sleep</span><span class="p">(</span><span class="n">DELAY</span><span class="p">)</span>
+    <span class="c1"># Corrupt the original tensor</span>
+    <span class="n">cpu_tensor</span><span class="o">.</span><span class="n">zero_</span><span class="p">()</span>
+    <span class="k">assert</span> <span class="p">(</span><span class="n">cuda_tensor</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No test failed with non_blocking and pageable tensor&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>No test failed with non_blocking and pageable tensor
+</pre></div>
+</div>
+<p>Now let’s demonstrate that CUDA to CPU also fails to produce reliable outputs without synchronization:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">tensor</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1_000_000</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cuda&quot;</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">999999</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">clone</span><span class="p">()</span>
+<span class="p">)</span>
+<span class="n">torch</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_close</span><span class="p">(</span>
+    <span class="n">tensor</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mi">500_000</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cuda&quot;</span><span class="p">)</span>
+<span class="p">),</span> <span class="n">tensor</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100</span><span class="p">):</span>
+        <span class="n">cpu_tensor</span> <span class="o">=</span> <span class="n">tensor</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">,</span> <span class="n">non_blocking</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_close</span><span class="p">(</span>
+            <span class="n">cpu_tensor</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mi">500_000</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">)</span>
+        <span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No test failed with non_blocking&quot;</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">AssertionError</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">th test failed with non_blocking. Skipping remaining tests&quot;</span><span class="p">)</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100</span><span class="p">):</span>
+        <span class="n">cpu_tensor</span> <span class="o">=</span> <span class="n">tensor</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">,</span> <span class="n">non_blocking</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">synchronize</span><span class="p">()</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_close</span><span class="p">(</span>
+            <span class="n">cpu_tensor</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mi">500_000</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">)</span>
+        <span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No test failed with synchronize&quot;</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">AssertionError</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;One test failed with synchronize: </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">th assertion!&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>0th test failed with non_blocking. Skipping remaining tests
+No test failed with synchronize
+</pre></div>
+</div>
+<p>Generally, asynchronous copies to a device are safe without explicit synchronization only when the target is a
+CUDA-enabled device and the original tensor is in pageable memory.</p>
+<p>In summary, copying data from CPU to GPU is safe when using <code class="docutils literal notranslate"><span class="pre">non_blocking=True</span></code>, but for any other direction,
+<code class="docutils literal notranslate"><span class="pre">non_blocking=True</span></code> can still be used but the user must make sure that a device synchronization is executed before
+the data is accessed.</p>
+</section>
+</section>
+<section id="practical-recommendations">
+<h2>Practical recommendations<a class="headerlink" href="#practical-recommendations" title="Link to this heading">#</a></h2>
+<blockquote>
+<div></div></blockquote>
+<p id="pinned-memory-recommendations">We can now wrap up some early recommendations based on our observations:</p>
+<p>In general, <code class="docutils literal notranslate"><span class="pre">non_blocking=True</span></code> will provide good throughput, regardless of whether the original tensor is or
+isn’t in pinned memory.
+If the tensor is already in pinned memory, the transfer can be accelerated, but sending it to
+pin memory manually from python main thread is a blocking operation on the host, and hence will annihilate much of
+the benefit of using <code class="docutils literal notranslate"><span class="pre">non_blocking=True</span></code> (as CUDA does the <cite>pin_memory</cite> transfer anyway).</p>
+<p>One might now legitimately ask what use there is for the <a class="reference external" href="https://docs.pytorch.org/docs/stable/generated/torch.Tensor.pin_memory.html#torch.Tensor.pin_memory" title="(PyTorch v2.8에서)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pin_memory()</span></code></a> method.
+In the following section, we will explore further how this can be used to accelerate the data transfer even more.</p>
+</section>
+<section id="additional-considerations">
+<h2>Additional considerations<a class="headerlink" href="#additional-considerations" title="Link to this heading">#</a></h2>
+<blockquote>
+<div></div></blockquote>
+<p id="pinned-memory-considerations">PyTorch notoriously provides a <a class="reference external" href="https://docs.pytorch.org/docs/stable/data.html#torch.utils.data.DataLoader" title="(PyTorch v2.8에서)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataLoader</span></code></a> class whose constructor accepts a
+<code class="docutils literal notranslate"><span class="pre">pin_memory</span></code> argument.
+Considering our previous discussion on <code class="docutils literal notranslate"><span class="pre">pin_memory</span></code>, you might wonder how the <code class="docutils literal notranslate"><span class="pre">DataLoader</span></code> manages to
+accelerate data transfers if memory pinning is inherently blocking.</p>
+<p>The key lies in the DataLoader’s use of a separate thread to handle the transfer of data from pageable to pinned
+memory, thus preventing any blockage in the main thread.</p>
+<p>To illustrate this, we will use the TensorDict primitive from the homonymous library.
+When invoking <a class="reference external" href="https://docs.pytorch.org/tensordict/stable/reference/generated/tensordict.TensorDict.html#tensordict.TensorDict.to" title="(tensordict v0.10에서)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">to()</span></code></a>, the default behavior is to send tensors to the device asynchronously,
+followed by a single call to <code class="docutils literal notranslate"><span class="pre">torch.device.synchronize()</span></code> afterwards.</p>
+<p>Additionally, <code class="docutils literal notranslate"><span class="pre">TensorDict.to()</span></code> includes a <code class="docutils literal notranslate"><span class="pre">non_blocking_pin</span></code> option  which initiates multiple threads to execute
+<code class="docutils literal notranslate"><span class="pre">pin_memory()</span></code> before proceeding with to <code class="docutils literal notranslate"><span class="pre">to(device)</span></code>.
+This approach can further accelerate data transfers, as demonstrated in the following example.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">tensordict</span><span class="w"> </span><span class="kn">import</span> <span class="n">TensorDict</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch.utils.benchmark</span><span class="w"> </span><span class="kn">import</span> <span class="n">Timer</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+
+<span class="c1"># Create the dataset</span>
+<span class="n">td</span> <span class="o">=</span> <span class="n">TensorDict</span><span class="p">({</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">):</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">1_000_000</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000</span><span class="p">)})</span>
+
+<span class="c1"># Runtimes</span>
+<span class="n">copy_blocking</span> <span class="o">=</span> <span class="n">timer</span><span class="p">(</span><span class="s2">&quot;td.to(&#39;cuda:0&#39;, non_blocking=False)&quot;</span><span class="p">)</span>
+<span class="n">copy_non_blocking</span> <span class="o">=</span> <span class="n">timer</span><span class="p">(</span><span class="s2">&quot;td.to(&#39;cuda:0&#39;)&quot;</span><span class="p">)</span>
+<span class="n">copy_pin_nb</span> <span class="o">=</span> <span class="n">timer</span><span class="p">(</span><span class="s2">&quot;td.to(&#39;cuda:0&#39;, non_blocking_pin=True, num_threads=0)&quot;</span><span class="p">)</span>
+<span class="n">copy_pin_multithread_nb</span> <span class="o">=</span> <span class="n">timer</span><span class="p">(</span><span class="s2">&quot;td.to(&#39;cuda:0&#39;, non_blocking_pin=True, num_threads=4)&quot;</span><span class="p">)</span>
+
+<span class="c1"># Rations</span>
+<span class="n">r1</span> <span class="o">=</span> <span class="n">copy_non_blocking</span> <span class="o">/</span> <span class="n">copy_blocking</span>
+<span class="n">r2</span> <span class="o">=</span> <span class="n">copy_pin_nb</span> <span class="o">/</span> <span class="n">copy_blocking</span>
+<span class="n">r3</span> <span class="o">=</span> <span class="n">copy_pin_multithread_nb</span> <span class="o">/</span> <span class="n">copy_blocking</span>
+
+<span class="c1"># Figure</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+
+<span class="n">xlabels</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+<span class="n">bar_labels</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;Blocking copy (1x)&quot;</span><span class="p">,</span>
+    <span class="sa">f</span><span class="s2">&quot;Non-blocking copy (</span><span class="si">{</span><span class="n">r1</span><span class="si">:</span><span class="s2">4.2f</span><span class="si">}</span><span class="s2">x)&quot;</span><span class="p">,</span>
+    <span class="sa">f</span><span class="s2">&quot;Blocking pin, non-blocking copy (</span><span class="si">{</span><span class="n">r2</span><span class="si">:</span><span class="s2">4.2f</span><span class="si">}</span><span class="s2">x)&quot;</span><span class="p">,</span>
+    <span class="sa">f</span><span class="s2">&quot;Non-blocking pin, non-blocking copy (</span><span class="si">{</span><span class="n">r3</span><span class="si">:</span><span class="s2">4.2f</span><span class="si">}</span><span class="s2">x)&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+<span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="n">copy_blocking</span><span class="p">,</span> <span class="n">copy_non_blocking</span><span class="p">,</span> <span class="n">copy_pin_nb</span><span class="p">,</span> <span class="n">copy_pin_multithread_nb</span><span class="p">]</span>
+<span class="n">colors</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;tab:blue&quot;</span><span class="p">,</span> <span class="s2">&quot;tab:red&quot;</span><span class="p">,</span> <span class="s2">&quot;tab:orange&quot;</span><span class="p">,</span> <span class="s2">&quot;tab:green&quot;</span><span class="p">]</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">xlabels</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">bar_labels</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">colors</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Runtime (ms)&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Device casting runtime&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([])</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img src="../_images/sphx_glr_pinmem_nonblock_004.png" srcset="../_images/sphx_glr_pinmem_nonblock_004.png" alt="Device casting runtime" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>td.to(&#39;cuda:0&#39;, non_blocking=False):  420.5087 ms
+td.to(&#39;cuda:0&#39;):  398.7895 ms
+td.to(&#39;cuda:0&#39;, non_blocking_pin=True, num_threads=0):  394.1139 ms
+td.to(&#39;cuda:0&#39;, non_blocking_pin=True, num_threads=4):  99.4011 ms
+</pre></div>
+</div>
+<p>In this example, we are transferring many large tensors from the CPU to the GPU.
+This scenario is ideal for utilizing multithreaded <code class="docutils literal notranslate"><span class="pre">pin_memory()</span></code>, which can significantly enhance performance.
+However, if the tensors are small, the overhead associated with multithreading may outweigh the benefits.
+Similarly, if there are only a few tensors, the advantages of pinning tensors on separate threads become limited.</p>
+<p>As an additional note, while it might seem advantageous to create permanent buffers in pinned memory to shuttle
+tensors from pageable memory before transferring them to the GPU, this strategy does not necessarily expedite
+computation. The inherent bottleneck caused by copying data into pinned memory remains a limiting factor.</p>
+<p>Moreover, transferring data that resides on disk (whether in shared memory or files) to the GPU typically requires an
+intermediate step of copying the data into pinned memory (located in RAM).
+Utilizing non_blocking for large data transfers in this context can significantly increase RAM consumption,
+potentially leading to adverse effects.</p>
+<p>In practice, there is no one-size-fits-all solution.
+The effectiveness of using multithreaded <code class="docutils literal notranslate"><span class="pre">pin_memory</span></code> combined with <code class="docutils literal notranslate"><span class="pre">non_blocking</span></code> transfers depends on a
+variety of  factors, including the specific system, operating system, hardware, and the nature of the tasks
+being executed.
+Here is a list of factors to check when trying to speed-up data transfers between CPU and GPU, or comparing
+throughput’s across scenarios:</p>
+<ul>
+<li><p><strong>Number of available cores</strong></p>
+<p>How many CPU cores are available? Is the system shared with other users or processes that might compete for
+resources?</p>
+</li>
+<li><p><strong>Core utilization</strong></p>
+<p>Are the CPU cores heavily utilized by other processes? Does the application perform other CPU-intensive tasks
+concurrently with data transfers?</p>
+</li>
+<li><p><strong>Memory utilization</strong></p>
+<p>How much pageable and page-locked memory is currently being used? Is there sufficient free memory to allocate
+additional pinned memory without affecting system performance? Remember that nothing comes for free, for instance
+<code class="docutils literal notranslate"><span class="pre">pin_memory</span></code> will consume RAM and may impact other tasks.</p>
+</li>
+<li><p><strong>CUDA Device Capabilities</strong></p>
+<p>Does the GPU support multiple DMA engines for concurrent data transfers? What are the specific capabilities and
+limitations of the CUDA device being used?</p>
+</li>
+<li><p><strong>Number of tensors to be sent</strong></p>
+<p>How many tensors are transferred in a typical operation?</p>
+</li>
+<li><p><strong>Size of the tensors to be sent</strong></p>
+<p>What is the size of the tensors being transferred? A few large tensors or many small tensors may not benefit from
+the same transfer program.</p>
+</li>
+<li><p><strong>System Architecture</strong></p>
+<p>How is the system’s architecture influencing data transfer speeds (for example, bus speeds, network latency)?</p>
+</li>
+</ul>
+<p>Additionally, allocating a large number of tensors or sizable tensors in pinned memory can monopolize a substantial
+portion of RAM.
+This reduces the available memory for other critical operations, such as paging, which can negatively impact the
+overall performance of an algorithm.</p>
+</section>
+<section id="conclusion">
+<h2>Conclusion<a class="headerlink" href="#conclusion" title="Link to this heading">#</a></h2>
+<blockquote>
+<div></div></blockquote>
+<p id="pinned-memory-conclusion">Throughout this tutorial, we have explored several critical factors that influence transfer speeds and memory
+management when sending tensors from the host to the device. We’ve learned that using <code class="docutils literal notranslate"><span class="pre">non_blocking=True</span></code> generally
+accelerates data transfers, and that <a class="reference external" href="https://docs.pytorch.org/docs/stable/generated/torch.Tensor.pin_memory.html#torch.Tensor.pin_memory" title="(PyTorch v2.8에서)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pin_memory()</span></code></a> can also enhance performance if implemented
+correctly. However, these techniques require careful design and calibration to be effective.</p>
+<p>Remember that profiling your code and keeping an eye on the memory consumption are essential to optimize resource
+usage and achieve the best possible performance.</p>
+</section>
+<section id="additional-resources">
+<h2>Additional resources<a class="headerlink" href="#additional-resources" title="Link to this heading">#</a></h2>
+<blockquote>
+<div></div></blockquote>
+<p id="pinned-memory-resources">If you are dealing with issues with memory copies when using CUDA devices or want to learn more about
+what was discussed in this tutorial, check the following references:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://docs.nvidia.com/cuda/cuda-runtime-api/group__CUDART__MEMORY.html">CUDA toolkit memory management doc</a>;</p></li>
+<li><p><a class="reference external" href="https://forums.developer.nvidia.com/t/pinned-memory/268474">CUDA pin-memory note</a>;</p></li>
+<li><p><a class="reference external" href="https://developer.nvidia.com/blog/how-optimize-data-transfers-cuda-cc/">How to Optimize Data Transfers in CUDA C/C++</a>;</p></li>
+<li><p><a class="reference external" href="https://pytorch.org/tensordict/stable/index.html">tensordict doc</a> and <a class="reference external" href="https://github.com/pytorch/tensordict">repo</a>.</p></li>
+</ul>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (1 minutes 2.789 seconds)</p>
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-intermediate-pinmem-nonblock-py">
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/6a760a243fcbf87fb3368be3d4d860ee/pinmem_nonblock.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">pinmem_nonblock.ipynb</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/562d6bd0e2a429f010fcf8007f6a7cac/pinmem_nonblock.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">pinmem_nonblock.py</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-zip docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/54407d14cdf41a1a53e1378e68df1aa4/pinmem_nonblock.zip"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">zipped:</span> <span class="pre">pinmem_nonblock.zip</span></code></a></p>
+</div>
+</div>
+</section>
+</section>
+
+
+                </article>
+              
+  </article>
+  
+              
+              
+                <footer class="bd-footer-article">
+                  <div class="footer-article-items footer-article__inner">
+  
+    <div class="footer-article-item">
+<div class="feedback">
+  
+<div class="rating">
+    Rate this Page
+    <div class="stars">
+        
+        <span class="star" data-behavior="tutorial-rating" data-count="1" data-value="1">★</span>
+        
+        <span class="star" data-behavior="tutorial-rating" data-count="2" data-value="2">★</span>
+        
+        <span class="star" data-behavior="tutorial-rating" data-count="3" data-value="3">★</span>
+        
+        <span class="star" data-behavior="tutorial-rating" data-count="4" data-value="4">★</span>
+        
+        <span class="star" data-behavior="tutorial-rating" data-count="5" data-value="5">★</span>
+        
+    </div>
+</div>
+
+  <div class="feedback-send">
+    <button class="feedback-btn"
+            onclick="openGitHubIssue()"
+            data-bs-title="Create a GitHub Issue"
+            data-bs-placement="bottom"
+            data-bs-toggle="tooltip"
+            data-gtm="feedback-btn-click">Send Feedback
+    </button>
+  </div>
+</div>
+
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="tensorboard_tutorial.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">이전</p>
+        <p class="prev-next-title">TensorBoard로 모델, 데이터, 학습 시각화하기</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="visualizing_gradients_tutorial.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">다음</p>
+        <p class="prev-next-title">Visualizing Gradients</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+
+<div class="footer-info">
+  <p class="copyright">
+    
+      
+        © Copyright 2018-2025, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorchKR).
+      
+      <br/>
+    
+  </p>
+
+  <p class="theme-version">
+    Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.4.
+  </p>
+</div>
+</div>
+  
+</div>
+                </footer>
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="tensorboard_tutorial.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">이전</p>
+        <p class="prev-next-title">TensorBoard로 모델, 데이터, 학습 시각화하기</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="visualizing_gradients_tutorial.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">다음</p>
+        <p class="prev-next-title">Visualizing Gradients</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc">
+<div class="sidebar-secondary-items sidebar-secondary__inner">
+    
+       <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#introduction">Introduction</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#what-you-will-learn">What you will learn</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#preamble">Preamble</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#background">Background</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#memory-management-basics">Memory management basics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#cuda-and-non-pageable-memory">CUDA and (non-)pageable memory</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#asynchronous-vs-synchronous-operations-with-non-blocking-true-cuda-cudamemcpyasync">Asynchronous vs. Synchronous Operations with <code class="docutils literal notranslate"><span class="pre">non_blocking=True</span></code> (CUDA <code class="docutils literal notranslate"><span class="pre">cudaMemcpyAsync</span></code>)</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#a-pytorch-perspective">A PyTorch perspective</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pin-memory"><code class="docutils literal notranslate"><span class="pre">pin_memory()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#non-blocking-true"><code class="docutils literal notranslate"><span class="pre">non_blocking=True</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#synergies">Synergies</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#other-copy-directions-gpu-cpu-cpu-mps">Other copy directions (GPU -&gt; CPU, CPU -&gt; MPS)</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#practical-recommendations">Practical recommendations</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#additional-considerations">Additional considerations</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#conclusion">Conclusion</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#additional-resources">Additional resources</a></li>
+</ul>
+  </nav></div>
+    
+
+
+
+
+<div class="sidebar-secondary-item">
+  <div class="sidebar-heading">PyTorch Libraries</div>
+  <ul style="list-style-type: none; padding: 0; padding-bottom: 80px;">
+  
+   <li><a class="nav-link nav-external" href="https://docs.pytorch.org/ao" style="color: var(--pst-color-text-muted)">torchao</a></li>
+  
+   <li><a class="nav-link nav-external" href="https://docs.pytorch.org/torchrec" style="color: var(--pst-color-text-muted)">torchrec</a></li>
+  
+   <li><a class="nav-link nav-external" href="https://docs.pytorch.org/torchft" style="color: var(--pst-color-text-muted)">torchft</a></li>
+  
+   <li><a class="nav-link nav-external" href="https://docs.pytorch.org/torchcodec" style="color: var(--pst-color-text-muted)">TorchCodec</a></li>
+  
+   <li><a class="nav-link nav-external" href="https://docs.pytorch.org/vision" style="color: var(--pst-color-text-muted)">torchvision</a></li>
+  
+   <li><a class="nav-link nav-external" href="https://docs.pytorch.org/executorch" style="color: var(--pst-color-text-muted)">ExecuTorch</a></li>
+  
+   <li><a class="nav-link nav-external" href="https://docs.pytorch.org/xla" style="color: var(--pst-color-text-muted)">PyTorch on XLA Devices</a></li>
+  
+  </ul>
+</div>
+
+</div>
+</div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <div class="container-fluid docs-tutorials-resources">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-4 text-center">
+        <h2>PyTorchKorea @ GitHub</h2>
+        <p>파이토치 한국 사용자 모임을 GitHub에서 만나보세요.</p>
+        <a class="with-right-arrow" href="https://github.com/PyTorchKorea">GitHub로 이동</a>
+      </div>
+
+      <div class="col-md-4 text-center">
+        <h2>한국어 튜토리얼</h2>
+        <p>한국어로 번역 중인 파이토치 튜토리얼을 만나보세요.</p>
+        <a class="with-right-arrow" href="https://tutorials.pytorch.kr/">튜토리얼로 이동</a>
+      </div>
+
+      <div class="col-md-4 text-center">
+        <h2>한국어 커뮤니티</h2>
+        <p>다른 사용자들과 의견을 나누고, 도와주세요!</p>
+        <a class="with-right-arrow" href="https://discuss.pytorch.kr/">커뮤니티로 이동</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="container footer-container">
+    <div class="footer-logo-wrapper">
+      <a href="https://pytorch.kr/" class="footer-logo"></a>
+    </div>
+
+    <div class="footer-links-wrapper">
+      <div class="footer-links-col">
+        <ul>
+          <li class="list-title"><a href="https://pytorch.kr/">파이토치 한국 사용자 모임</a></li>
+          <li><a href="https://pytorch.kr/about">사용자 모임 소개</a></li>
+          <li><a href="https://pytorch.kr/contributors">기여해주신 분들</a></li>
+          <li><a href="https://pytorch.kr/resources/">리소스</a></li>
+          <li><a href="https://pytorch.kr/coc">행동 강령</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="trademark-disclaimer">
+      <ul>
+        <li>이 사이트는 독립적인 파이토치 사용자 커뮤니티로, 최신 버전이 아니거나 잘못된 내용이 포함되어 있을 수 있습니다. This site is an independent user community and may be out of date or contain incorrect information.</li>
+        <li><a href="https://pytorch.kr/coc">행동 강령</a>을 읽고 지켜주세요. PyTorch 공식 로고 사용 규정은 <a href="https://www.linuxfoundation.org/policies/">Linux Foundation의 정책</a>을 따릅니다. Please read and follow <a href="https://pytorch.kr/coc">our code of conduct</a>. All PyTorch trademark policy applicable to <a href="https://www.linuxfoundation.org/policies/">Linux Foundation's policies</a>.</li>
+      </ul>
+    </div>
+  </div>
+</footer>
+
+<div class="cookie-banner-wrapper">
+  <div class="container">
+    <p class="gdpr-notice">To analyze traffic and optimize your experience, we serve cookies on this site. By clicking or navigating, you agree to allow our usage of cookies. As the current maintainers of this site, Facebook’s Cookies Policy applies. Learn more, including about available controls: <a href="https://www.facebook.com/policies/cookies/">Cookies Policy</a>.</p>
+    <img class="close-button" src="../_static/img/pytorch-x.svg">
+  </div>
+</div>
+  
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2018-2025, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorchKR).
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6 버전으로 생성되었습니다.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.4.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  <script type="application/ld+json">
+    {
+       "@context": "https://schema.org",
+       "@type": "Article",
+       "name": "A guide on good usage of non_blocking and pin_memory() in PyTorch",
+       "headline": "A guide on good usage of non_blocking and pin_memory() in PyTorch",
+       "description": "PyTorch Documentation. Explore PyTorch, an open-source machine learning library that accelerates the path from research prototyping to production deployment. Discover tutorials, API references, and guides to help you build and deploy deep learning models efficiently.",
+       "url": "/intermediate/pinmem_nonblock.html",
+       "articleBody": "\ucc38\uace0 Go to the end to download the full example code. A guide on good usage of non_blocking and pin_memory() in PyTorch# Author: Vincent Moens Introduction# Transferring data from the CPU to the GPU is fundamental in many PyTorch applications. It\u2019s crucial for users to understand the most effective tools and options available for moving data between devices. This tutorial examines two key methods for device-to-device data transfer in PyTorch: pin_memory() and to() with the non_blocking=True option. What you will learn# Optimizing the transfer of tensors from the CPU to the GPU can be achieved through asynchronous transfers and memory pinning. However, there are important considerations: Using tensor.pin_memory().to(device, non_blocking=True) can be up to twice as slow as a straightforward tensor.to(device). Generally, tensor.to(device, non_blocking=True) is an effective choice for enhancing transfer speed. While cpu_tensor.to(\"cuda\", non_blocking=True).mean() executes correctly, attempting cuda_tensor.to(\"cpu\", non_blocking=True).mean() will result in erroneous outputs. Preamble# The performance reported in this tutorial are conditioned on the system used to build the tutorial. Although the conclusions are applicable across different systems, the specific observations may vary slightly depending on the hardware available, especially on older hardware. The primary objective of this tutorial is to offer a theoretical framework for understanding CPU to GPU data transfers. However, any design decisions should be tailored to individual cases and guided by benchmarked throughput measurements, as well as the specific requirements of the task at hand. import torch assert torch.cuda.is_available(), \"A cuda device is required to run this tutorial\" This tutorial requires tensordict to be installed. If you don\u2019t have tensordict in your environment yet, install it by running the following command in a separate cell: # Install tensordict with the following command !pip3 install tensordict We start by outlining the theory surrounding these concepts, and then move to concrete test examples of the features. Background# Memory management basics# When one creates a CPU tensor in PyTorch, the content of this tensor needs to be placed in memory. The memory we talk about here is a rather complex concept worth looking at carefully. We distinguish two types of memory that are handled by the Memory Management Unit: the RAM (for simplicity) and the swap space on disk (which may or may not be the hard drive). Together, the available space in disk and RAM (physical memory) make up the virtual memory, which is an abstraction of the total resources available. In short, the virtual memory makes it so that the available space is larger than what can be found on RAM in isolation and creates the illusion that the main memory is larger than it actually is. In normal circumstances, a regular CPU tensor is pageable which means that it is divided in blocks called pages that can live anywhere in the virtual memory (both in RAM or on disk). As mentioned earlier, this has the advantage that the memory seems larger than what the main memory actually is. Typically, when a program accesses a page that is not in RAM, a \u201cpage fault\u201d occurs and the operating system (OS) then brings back this page into RAM (\u201cswap in\u201d or \u201cpage in\u201d). In turn, the OS may have to swap out (or \u201cpage out\u201d) another page to make room for the new page. In contrast to pageable memory, a pinned (or page-locked or non-pageable) memory is a type of memory that cannot be swapped out to disk. It allows for faster and more predictable access times, but has the downside that it is more limited than the pageable memory (aka the main memory). CUDA and (non-)pageable memory# To understand how CUDA copies a tensor from CPU to CUDA, let\u2019s consider the two scenarios above: If the memory is page-locked, the device can access the memory directly in the main memory. The memory addresses are well defined and functions that need to read these data can be significantly accelerated. If the memory is pageable, all the pages will have to be brought to the main memory before being sent to the GPU. This operation may take time and is less predictable than when executed on page-locked tensors. More precisely, when CUDA sends pageable data from CPU to GPU, it must first create a page-locked copy of that data before making the transfer. Asynchronous vs. Synchronous Operations with non_blocking=True (CUDA cudaMemcpyAsync)# When executing a copy from a host (such as, CPU) to a device (such as, GPU), the CUDA toolkit offers modalities to do these operations synchronously or asynchronously with respect to the host. In practice, when calling to(), PyTorch always makes a call to cudaMemcpyAsync. If non_blocking=False (default), a cudaStreamSynchronize will be called after each and every cudaMemcpyAsync, making the call to to() blocking in the main thread. If non_blocking=True, no synchronization is triggered, and the main thread on the host is not blocked. Therefore, from the host perspective, multiple tensors can be sent to the device simultaneously, as the thread does not need to wait for one transfer to be completed to initiate the other. \ucc38\uace0 In general, the transfer is blocking on the device side (even if it isn\u2019t on the host side): the copy on the device cannot occur while another operation is being executed. However, in some advanced scenarios, a copy and a kernel execution can be done simultaneously on the GPU side. As the following example will show, three requirements must be met to enable this: The device must have at least one free DMA (Direct Memory Access) engine. Modern GPU architectures such as Volterra, Tesla, or H100 devices have more than one DMA engine. The transfer must be done on a separate, non-default cuda stream. In PyTorch, cuda streams can be handles using Stream. The source data must be in pinned memory. We demonstrate this by running profiles on the following script. import contextlib from torch.cuda import Stream s = Stream() torch.manual_seed(42) t1_cpu_pinned = torch.randn(1024**2 * 5, pin_memory=True) t2_cpu_paged = torch.randn(1024**2 * 5, pin_memory=False) t3_cuda = torch.randn(1024**2 * 5, device=\"cuda:0\") assert torch.cuda.is_available() device = torch.device(\"cuda\", torch.cuda.current_device()) # The function we want to profile def inner(pinned: bool, streamed: bool): with torch.cuda.stream(s) if streamed else contextlib.nullcontext(): if pinned: t1_cuda = t1_cpu_pinned.to(device, non_blocking=True) else: t2_cuda = t2_cpu_paged.to(device, non_blocking=True) t_star_cuda_h2d_event = s.record_event() # This operation can be executed during the CPU to GPU copy if and only if the tensor is pinned and the copy is # done in the other stream t3_cuda_mul = t3_cuda * t3_cuda * t3_cuda t3_cuda_h2d_event = torch.cuda.current_stream().record_event() t_star_cuda_h2d_event.synchronize() t3_cuda_h2d_event.synchronize() # Our profiler: profiles the `inner` function and stores the results in a .json file def benchmark_with_profiler( pinned, streamed, ) -\u003e None: torch._C._profiler._set_cuda_sync_enabled_val(True) wait, warmup, active = 1, 1, 2 num_steps = wait + warmup + active rank = 0 with torch.profiler.profile( activities=[ torch.profiler.ProfilerActivity.CPU, torch.profiler.ProfilerActivity.CUDA, ], schedule=torch.profiler.schedule( wait=wait, warmup=warmup, active=active, repeat=1, skip_first=1 ), ) as prof: for step_idx in range(1, num_steps + 1): inner(streamed=streamed, pinned=pinned) if rank is None or rank == 0: prof.step() prof.export_chrome_trace(f\"trace_streamed{int(streamed)}_pinned{int(pinned)}.json\") Loading these profile traces in chrome (chrome://tracing) shows the following results: first, let\u2019s see what happens if both the arithmetic operation on t3_cuda is executed after the pageable tensor is sent to GPU in the main stream: benchmark_with_profiler(streamed=False, pinned=False) Using a pinned tensor doesn\u2019t change the trace much, both operations are still executed consecutively: benchmark_with_profiler(streamed=False, pinned=True) Sending a pageable tensor to GPU on a separate stream is also a blocking operation: benchmark_with_profiler(streamed=True, pinned=False) Only pinned tensors copies to GPU on a separate stream overlap with another cuda kernel executed on the main stream: benchmark_with_profiler(streamed=True, pinned=True) A PyTorch perspective# pin_memory()# PyTorch offers the possibility to create and send tensors to page-locked memory through the pin_memory() method and constructor arguments. CPU tensors on a machine where CUDA is initialized can be cast to pinned memory through the pin_memory() method. Importantly, pin_memory is blocking on the main thread of the host: it will wait for the tensor to be copied to page-locked memory before executing the next operation. New tensors can be directly created in pinned memory with functions like zeros(), ones() and other constructors. Let us check the speed of pinning memory and sending tensors to CUDA: import torch import gc from torch.utils.benchmark import Timer import matplotlib.pyplot as plt def timer(cmd): median = ( Timer(cmd, globals=globals()) .adaptive_autorange(min_run_time=1.0, max_run_time=20.0) .median * 1000 ) print(f\"{cmd}: {median: 4.4f} ms\") return median # A tensor in pageable memory pageable_tensor = torch.randn(1_000_000) # A tensor in page-locked (pinned) memory pinned_tensor = torch.randn(1_000_000, pin_memory=True) # Runtimes: pageable_to_device = timer(\"pageable_tensor.to(\u0027cuda:0\u0027)\") pinned_to_device = timer(\"pinned_tensor.to(\u0027cuda:0\u0027)\") pin_mem = timer(\"pageable_tensor.pin_memory()\") pin_mem_to_device = timer(\"pageable_tensor.pin_memory().to(\u0027cuda:0\u0027)\") # Ratios: r1 = pinned_to_device / pageable_to_device r2 = pin_mem_to_device / pageable_to_device # Create a figure with the results fig, ax = plt.subplots() xlabels = [0, 1, 2] bar_labels = [ \"pageable_tensor.to(device) (1x)\", f\"pinned_tensor.to(device) ({r1:4.2f}x)\", f\"pageable_tensor.pin_memory().to(device) ({r2:4.2f}x)\" f\"\\npin_memory()={100*pin_mem/pin_mem_to_device:.2f}% of runtime.\", ] values = [pageable_to_device, pinned_to_device, pin_mem_to_device] colors = [\"tab:blue\", \"tab:red\", \"tab:orange\"] ax.bar(xlabels, values, label=bar_labels, color=colors) ax.set_ylabel(\"Runtime (ms)\") ax.set_title(\"Device casting runtime (pin-memory)\") ax.set_xticks([]) ax.legend() plt.show() # Clear tensors del pageable_tensor, pinned_tensor _ = gc.collect() pageable_tensor.to(\u0027cuda:0\u0027): 0.2681 ms pinned_tensor.to(\u0027cuda:0\u0027): 0.0874 ms pageable_tensor.pin_memory(): 0.2979 ms pageable_tensor.pin_memory().to(\u0027cuda:0\u0027): 0.3933 ms We can observe that casting a pinned-memory tensor to GPU is indeed much faster than a pageable tensor, because under the hood, a pageable tensor must be copied to pinned memory before being sent to GPU. However, contrary to a somewhat common belief, calling pin_memory() on a pageable tensor before casting it to GPU should not bring any significant speed-up, on the contrary this call is usually slower than just executing the transfer. This makes sense, since we\u2019re actually asking Python to execute an operation that CUDA will perform anyway before copying the data from host to device. \ucc38\uace0 The PyTorch implementation of pin_memory which relies on creating a brand new storage in pinned memory through cudaHostAlloc could be, in rare cases, faster than transitioning data in chunks as cudaMemcpy does. Here too, the observation may vary depending on the available hardware, the size of the tensors being sent or the amount of available RAM. non_blocking=True# As mentioned earlier, many PyTorch operations have the option of being executed asynchronously with respect to the host through the non_blocking argument. Here, to account accurately of the benefits of using non_blocking, we will design a slightly more complex experiment since we want to assess how fast it is to send multiple tensors to GPU with and without calling non_blocking. # A simple loop that copies all tensors to cuda def copy_to_device(*tensors): result = [] for tensor in tensors: result.append(tensor.to(\"cuda:0\")) return result # A loop that copies all tensors to cuda asynchronously def copy_to_device_nonblocking(*tensors): result = [] for tensor in tensors: result.append(tensor.to(\"cuda:0\", non_blocking=True)) # We need to synchronize torch.cuda.synchronize() return result # Create a list of tensors tensors = [torch.randn(1000) for _ in range(1000)] to_device = timer(\"copy_to_device(*tensors)\") to_device_nonblocking = timer(\"copy_to_device_nonblocking(*tensors)\") # Ratio r1 = to_device_nonblocking / to_device # Plot the results fig, ax = plt.subplots() xlabels = [0, 1] bar_labels = [f\"to(device) (1x)\", f\"to(device, non_blocking=True) ({r1:4.2f}x)\"] colors = [\"tab:blue\", \"tab:red\"] values = [to_device, to_device_nonblocking] ax.bar(xlabels, values, label=bar_labels, color=colors) ax.set_ylabel(\"Runtime (ms)\") ax.set_title(\"Device casting runtime (non-blocking)\") ax.set_xticks([]) ax.legend() plt.show() copy_to_device(*tensors): 13.5244 ms copy_to_device_nonblocking(*tensors): 8.6143 ms To get a better sense of what is happening here, let us profile these two functions: from torch.profiler import profile, ProfilerActivity def profile_mem(cmd): with profile(activities=[ProfilerActivity.CPU]) as prof: exec(cmd) print(cmd) print(prof.key_averages().table(row_limit=10)) Let\u2019s see the call stack with a regular to(device) first: print(\"Call to `to(device)`\", profile_mem(\"copy_to_device(*tensors)\")) copy_to_device(*tensors) ------------------------- ------------ ------------ ------------ ------------ ------------ ------------ Name Self CPU % Self CPU CPU total % CPU total CPU time avg # of Calls ------------------------- ------------ ------------ ------------ ------------ ------------ ------------ aten::to 3.33% 521.570us 100.00% 15.682ms 15.682us 1000 aten::_to_copy 9.19% 1.441ms 96.67% 15.160ms 15.160us 1000 aten::empty_strided 16.45% 2.580ms 16.45% 2.580ms 2.580us 1000 aten::copy_ 22.03% 3.455ms 71.03% 11.139ms 11.139us 1000 cudaMemcpyAsync 16.55% 2.595ms 16.55% 2.595ms 2.595us 1000 cudaStreamSynchronize 32.45% 5.089ms 32.45% 5.089ms 5.089us 1000 ------------------------- ------------ ------------ ------------ ------------ ------------ ------------ Self CPU time total: 15.682ms Call to `to(device)` None and now the non_blocking version: print( \"Call to `to(device, non_blocking=True)`\", profile_mem(\"copy_to_device_nonblocking(*tensors)\"), ) copy_to_device_nonblocking(*tensors) ------------------------- ------------ ------------ ------------ ------------ ------------ ------------ Name Self CPU % Self CPU CPU total % CPU total CPU time avg # of Calls ------------------------- ------------ ------------ ------------ ------------ ------------ ------------ aten::to 4.83% 523.962us 99.88% 10.838ms 10.838us 1000 aten::_to_copy 12.52% 1.359ms 95.05% 10.314ms 10.314us 1000 aten::empty_strided 22.77% 2.471ms 22.77% 2.471ms 2.471us 1000 aten::copy_ 35.03% 3.801ms 59.76% 6.484ms 6.484us 1000 cudaMemcpyAsync 24.72% 2.683ms 24.72% 2.683ms 2.683us 1000 cudaDeviceSynchronize 0.12% 12.746us 0.12% 12.746us 12.746us 1 ------------------------- ------------ ------------ ------------ ------------ ------------ ------------ Self CPU time total: 10.851ms Call to `to(device, non_blocking=True)` None The results are without any doubt better when using non_blocking=True, as all transfers are initiated simultaneously on the host side and only one synchronization is done. The benefit will vary depending on the number and the size of the tensors as well as depending on the hardware being used. \ucc38\uace0 Interestingly, the blocking to(\"cuda\") actually performs the same asynchronous device casting operation (cudaMemcpyAsync) as the one with non_blocking=True with a synchronization point after each copy. Synergies# Now that we have made the point that data transfer of tensors already in pinned memory to GPU is faster than from pageable memory, and that we know that doing these transfers asynchronously is also faster than synchronously, we can benchmark combinations of these approaches. First, let\u2019s write a couple of new functions that will call pin_memory and to(device) on each tensor: def pin_copy_to_device(*tensors): result = [] for tensor in tensors: result.append(tensor.pin_memory().to(\"cuda:0\")) return result def pin_copy_to_device_nonblocking(*tensors): result = [] for tensor in tensors: result.append(tensor.pin_memory().to(\"cuda:0\", non_blocking=True)) # We need to synchronize torch.cuda.synchronize() return result The benefits of using pin_memory() are more pronounced for somewhat large batches of large tensors: tensors = [torch.randn(1_000_000) for _ in range(1000)] page_copy = timer(\"copy_to_device(*tensors)\") page_copy_nb = timer(\"copy_to_device_nonblocking(*tensors)\") tensors_pinned = [torch.randn(1_000_000, pin_memory=True) for _ in range(1000)] pinned_copy = timer(\"copy_to_device(*tensors_pinned)\") pinned_copy_nb = timer(\"copy_to_device_nonblocking(*tensors_pinned)\") pin_and_copy = timer(\"pin_copy_to_device(*tensors)\") pin_and_copy_nb = timer(\"pin_copy_to_device_nonblocking(*tensors)\") # Plot strategies = (\"pageable copy\", \"pinned copy\", \"pin and copy\") blocking = { \"blocking\": [page_copy, pinned_copy, pin_and_copy], \"non-blocking\": [page_copy_nb, pinned_copy_nb, pin_and_copy_nb], } x = torch.arange(3) width = 0.25 multiplier = 0 fig, ax = plt.subplots(layout=\"constrained\") for attribute, runtimes in blocking.items(): offset = width * multiplier rects = ax.bar(x + offset, runtimes, width, label=attribute) ax.bar_label(rects, padding=3, fmt=\"%.2f\") multiplier += 1 # Add some text for labels, title and custom x-axis tick labels, etc. ax.set_ylabel(\"Runtime (ms)\") ax.set_title(\"Runtime (pin-mem and non-blocking)\") ax.set_xticks([0, 1, 2]) ax.set_xticklabels(strategies) plt.setp(ax.get_xticklabels(), rotation=45, ha=\"right\", rotation_mode=\"anchor\") ax.legend(loc=\"upper left\", ncols=3) plt.show() del tensors, tensors_pinned _ = gc.collect() copy_to_device(*tensors): 417.3499 ms copy_to_device_nonblocking(*tensors): 396.4463 ms copy_to_device(*tensors_pinned): 87.9670 ms copy_to_device_nonblocking(*tensors_pinned): 75.7368 ms pin_copy_to_device(*tensors): 474.7948 ms pin_copy_to_device_nonblocking(*tensors): 393.1761 ms Other copy directions (GPU -\u003e CPU, CPU -\u003e MPS)# Until now, we have operated under the assumption that asynchronous copies from the CPU to the GPU are safe. This is generally true because CUDA automatically handles synchronization to ensure that the data being accessed is valid at read time __whenever the tensor is in pageable memory__. However, in other cases we cannot make the same assumption: when a tensor is placed in pinned memory, mutating the original copy after calling the host-to-device transfer may corrupt the data received on GPU. Similarly, when a transfer is achieved in the opposite direction, from GPU to CPU, or from any device that is not CPU or GPU to any device that is not a CUDA-handled GPU (such as, MPS), there is no guarantee that the data read on GPU is valid without explicit synchronization. In these scenarios, these transfers offer no assurance that the copy will be complete at the time of data access. Consequently, the data on the host might be incomplete or incorrect, effectively rendering it garbage. Let\u2019s first demonstrate this with a pinned-memory tensor: DELAY = 100000000 try: i = -1 for i in range(100): # Create a tensor in pin-memory cpu_tensor = torch.ones(1024, 1024, pin_memory=True) torch.cuda.synchronize() # Send the tensor to CUDA cuda_tensor = cpu_tensor.to(\"cuda\", non_blocking=True) torch.cuda._sleep(DELAY) # Corrupt the original tensor cpu_tensor.zero_() assert (cuda_tensor == 1).all() print(\"No test failed with non_blocking and pinned tensor\") except AssertionError: print(f\"{i}th test failed with non_blocking and pinned tensor. Skipping remaining tests\") 1th test failed with non_blocking and pinned tensor. Skipping remaining tests Using a pageable tensor always works: i = -1 for i in range(100): # Create a tensor in pageable memory cpu_tensor = torch.ones(1024, 1024) torch.cuda.synchronize() # Send the tensor to CUDA cuda_tensor = cpu_tensor.to(\"cuda\", non_blocking=True) torch.cuda._sleep(DELAY) # Corrupt the original tensor cpu_tensor.zero_() assert (cuda_tensor == 1).all() print(\"No test failed with non_blocking and pageable tensor\") No test failed with non_blocking and pageable tensor Now let\u2019s demonstrate that CUDA to CPU also fails to produce reliable outputs without synchronization: tensor = ( torch.arange(1, 1_000_000, dtype=torch.double, device=\"cuda\") .expand(100, 999999) .clone() ) torch.testing.assert_close( tensor.mean(), torch.tensor(500_000, dtype=torch.double, device=\"cuda\") ), tensor.mean() try: i = -1 for i in range(100): cpu_tensor = tensor.to(\"cpu\", non_blocking=True) torch.testing.assert_close( cpu_tensor.mean(), torch.tensor(500_000, dtype=torch.double) ) print(\"No test failed with non_blocking\") except AssertionError: print(f\"{i}th test failed with non_blocking. Skipping remaining tests\") try: i = -1 for i in range(100): cpu_tensor = tensor.to(\"cpu\", non_blocking=True) torch.cuda.synchronize() torch.testing.assert_close( cpu_tensor.mean(), torch.tensor(500_000, dtype=torch.double) ) print(\"No test failed with synchronize\") except AssertionError: print(f\"One test failed with synchronize: {i}th assertion!\") 0th test failed with non_blocking. Skipping remaining tests No test failed with synchronize Generally, asynchronous copies to a device are safe without explicit synchronization only when the target is a CUDA-enabled device and the original tensor is in pageable memory. In summary, copying data from CPU to GPU is safe when using non_blocking=True, but for any other direction, non_blocking=True can still be used but the user must make sure that a device synchronization is executed before the data is accessed. Practical recommendations# We can now wrap up some early recommendations based on our observations: In general, non_blocking=True will provide good throughput, regardless of whether the original tensor is or isn\u2019t in pinned memory. If the tensor is already in pinned memory, the transfer can be accelerated, but sending it to pin memory manually from python main thread is a blocking operation on the host, and hence will annihilate much of the benefit of using non_blocking=True (as CUDA does the pin_memory transfer anyway). One might now legitimately ask what use there is for the pin_memory() method. In the following section, we will explore further how this can be used to accelerate the data transfer even more. Additional considerations# PyTorch notoriously provides a DataLoader class whose constructor accepts a pin_memory argument. Considering our previous discussion on pin_memory, you might wonder how the DataLoader manages to accelerate data transfers if memory pinning is inherently blocking. The key lies in the DataLoader\u2019s use of a separate thread to handle the transfer of data from pageable to pinned memory, thus preventing any blockage in the main thread. To illustrate this, we will use the TensorDict primitive from the homonymous library. When invoking to(), the default behavior is to send tensors to the device asynchronously, followed by a single call to torch.device.synchronize() afterwards. Additionally, TensorDict.to() includes a non_blocking_pin option which initiates multiple threads to execute pin_memory() before proceeding with to to(device). This approach can further accelerate data transfers, as demonstrated in the following example. from tensordict import TensorDict import torch from torch.utils.benchmark import Timer import matplotlib.pyplot as plt # Create the dataset td = TensorDict({str(i): torch.randn(1_000_000) for i in range(1000)}) # Runtimes copy_blocking = timer(\"td.to(\u0027cuda:0\u0027, non_blocking=False)\") copy_non_blocking = timer(\"td.to(\u0027cuda:0\u0027)\") copy_pin_nb = timer(\"td.to(\u0027cuda:0\u0027, non_blocking_pin=True, num_threads=0)\") copy_pin_multithread_nb = timer(\"td.to(\u0027cuda:0\u0027, non_blocking_pin=True, num_threads=4)\") # Rations r1 = copy_non_blocking / copy_blocking r2 = copy_pin_nb / copy_blocking r3 = copy_pin_multithread_nb / copy_blocking # Figure fig, ax = plt.subplots() xlabels = [0, 1, 2, 3] bar_labels = [ \"Blocking copy (1x)\", f\"Non-blocking copy ({r1:4.2f}x)\", f\"Blocking pin, non-blocking copy ({r2:4.2f}x)\", f\"Non-blocking pin, non-blocking copy ({r3:4.2f}x)\", ] values = [copy_blocking, copy_non_blocking, copy_pin_nb, copy_pin_multithread_nb] colors = [\"tab:blue\", \"tab:red\", \"tab:orange\", \"tab:green\"] ax.bar(xlabels, values, label=bar_labels, color=colors) ax.set_ylabel(\"Runtime (ms)\") ax.set_title(\"Device casting runtime\") ax.set_xticks([]) ax.legend() plt.show() td.to(\u0027cuda:0\u0027, non_blocking=False): 420.5087 ms td.to(\u0027cuda:0\u0027): 398.7895 ms td.to(\u0027cuda:0\u0027, non_blocking_pin=True, num_threads=0): 394.1139 ms td.to(\u0027cuda:0\u0027, non_blocking_pin=True, num_threads=4): 99.4011 ms In this example, we are transferring many large tensors from the CPU to the GPU. This scenario is ideal for utilizing multithreaded pin_memory(), which can significantly enhance performance. However, if the tensors are small, the overhead associated with multithreading may outweigh the benefits. Similarly, if there are only a few tensors, the advantages of pinning tensors on separate threads become limited. As an additional note, while it might seem advantageous to create permanent buffers in pinned memory to shuttle tensors from pageable memory before transferring them to the GPU, this strategy does not necessarily expedite computation. The inherent bottleneck caused by copying data into pinned memory remains a limiting factor. Moreover, transferring data that resides on disk (whether in shared memory or files) to the GPU typically requires an intermediate step of copying the data into pinned memory (located in RAM). Utilizing non_blocking for large data transfers in this context can significantly increase RAM consumption, potentially leading to adverse effects. In practice, there is no one-size-fits-all solution. The effectiveness of using multithreaded pin_memory combined with non_blocking transfers depends on a variety of factors, including the specific system, operating system, hardware, and the nature of the tasks being executed. Here is a list of factors to check when trying to speed-up data transfers between CPU and GPU, or comparing throughput\u2019s across scenarios: Number of available cores How many CPU cores are available? Is the system shared with other users or processes that might compete for resources? Core utilization Are the CPU cores heavily utilized by other processes? Does the application perform other CPU-intensive tasks concurrently with data transfers? Memory utilization How much pageable and page-locked memory is currently being used? Is there sufficient free memory to allocate additional pinned memory without affecting system performance? Remember that nothing comes for free, for instance pin_memory will consume RAM and may impact other tasks. CUDA Device Capabilities Does the GPU support multiple DMA engines for concurrent data transfers? What are the specific capabilities and limitations of the CUDA device being used? Number of tensors to be sent How many tensors are transferred in a typical operation? Size of the tensors to be sent What is the size of the tensors being transferred? A few large tensors or many small tensors may not benefit from the same transfer program. System Architecture How is the system\u2019s architecture influencing data transfer speeds (for example, bus speeds, network latency)? Additionally, allocating a large number of tensors or sizable tensors in pinned memory can monopolize a substantial portion of RAM. This reduces the available memory for other critical operations, such as paging, which can negatively impact the overall performance of an algorithm. Conclusion# Throughout this tutorial, we have explored several critical factors that influence transfer speeds and memory management when sending tensors from the host to the device. We\u2019ve learned that using non_blocking=True generally accelerates data transfers, and that pin_memory() can also enhance performance if implemented correctly. However, these techniques require careful design and calibration to be effective. Remember that profiling your code and keeping an eye on the memory consumption are essential to optimize resource usage and achieve the best possible performance. Additional resources# If you are dealing with issues with memory copies when using CUDA devices or want to learn more about what was discussed in this tutorial, check the following references: CUDA toolkit memory management doc; CUDA pin-memory note; How to Optimize Data Transfers in CUDA C/C++; tensordict doc and repo. Total running time of the script: (1 minutes 2.789 seconds) Download Jupyter notebook: pinmem_nonblock.ipynb Download Python source code: pinmem_nonblock.py Download zipped: pinmem_nonblock.zip",
+       "author": {
+         "@type": "Organization",
+         "name": "PyTorch Contributors",
+         "url": "https://pytorch.org"
+       },
+       "image": "../_static/img/pytorch_seo.png",
+       "mainEntityOfPage": {
+         "@type": "WebPage",
+         "@id": "/intermediate/pinmem_nonblock.html"
+       },
+       "datePublished": "2023-01-01T00:00:00Z",
+       "dateModified": "2023-01-01T00:00:00Z"
+     }
+ </script>
+  <script>
+    // Tutorials Call to action event tracking
+    $("[data-behavior='call-to-action-event']").on('click', function () {
+      fbq('trackCustom', "Download", {
+        tutorialTitle: $('h1:first').text(),
+        downloadLink: this.href,
+        tutorialLink: window.location.href,
+        downloadTitle: $(this).attr("data-response")
+      });
+      if (typeof gtag === 'function') {
+        gtag('event', 'click', {
+          'event_category': $(this).attr("data-response"),
+          'event_label': $("h1").first().text(),
+          'tutorial_link': window.location.href
+        });
+      }
+    });
+  </script>
+  
+  </body>
+</html>

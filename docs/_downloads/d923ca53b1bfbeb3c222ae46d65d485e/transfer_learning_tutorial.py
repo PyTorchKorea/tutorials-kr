@@ -95,7 +95,10 @@ dataloaders = {x: torch.utils.data.DataLoader(image_datasets[x], batch_size=4,
 dataset_sizes = {x: len(image_datasets[x]) for x in ['train', 'val']}
 class_names = image_datasets['train'].classes
 
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+# CUDA 또는 MPS, MTIA, XPU 와 같은 `가속기(accelerator) <https://pytorch.org/docs/stable/torch.html#accelerators>`__ 에서 모델을 학습할 수 있도록 합니다.
+# 현재 사용 가능한 가속기가 있다면 사용하고, 그렇지 않으면 CPU를 사용합니다.
+device = torch.accelerator.current_accelerator().type if torch.accelerator.is_available() else "cpu"
+print(f"Using {device} device")
 
 ######################################################################
 # 일부 이미지 시각화하기
@@ -205,7 +208,7 @@ def train_model(model, criterion, optimizer, scheduler, num_epochs=25):
         print(f'Best val Acc: {best_acc:4f}')
 
         # 가장 나은 모델 가중치를 불러오기
-        model.load_state_dict(torch.load(best_model_params_path))
+        model.load_state_dict(torch.load(best_model_params_path, weights_only=True))
     return model
 
 

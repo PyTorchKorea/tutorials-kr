@@ -35,7 +35,7 @@
 # -------------------
 #
 # 우리는 손으로 쓴 숫자(0에서 9 사이)의 흑백 이미지로 구성된 클래식
-# `MNIST <http://deeplearning.net/data/mnist/>`_ 데이터셋을 사용할 것입니다.
+# `MNIST <https://yann.lecun.com/exdb/mnist/index.html>`_ 데이터셋을 사용할 것입니다.
 #
 # 우리는 경로 설정을 담당하는 (Python3 표준 라이브러리의 일부인)
 # `pathlib <https://docs.python.org/3/library/pathlib.html>`_ 을 사용할 것이고,
@@ -132,7 +132,7 @@ bias = torch.zeros(10, requires_grad=True)
 # `log_softmax` 를 구현하고 사용할 것입니다.
 # PyTorch에서 많은 사전 구현된 손실 함수(loss function), 활성화 함수들이 제공되지만,
 # 일반적인 python을 사용하여 자신만의 함수를 쉽게 작성할 수 있음을 기억해 주세요.
-# PyTorch는 심지어 여러분의 함수를 위해서 빠른 GPU 또는 벡터화된 CPU 코드를 만들어줄 것입니다.
+# PyTorch는 심지어 여러분의 함수를 위해서 빠른 가속기(accelerator) 또는 벡터화된 CPU 코드를 만들어줄 것입니다.
 
 def log_softmax(x):
     return x - x.exp().sum(-1).log().unsqueeze(-1)
@@ -810,27 +810,24 @@ opt = optim.SGD(model.parameters(), lr=lr, momentum=0.9)
 fit(epochs, model, loss_func, opt, train_dl, valid_dl)
 
 ###############################################################################
-# GPU 사용하기
-# ---------------
+# `가속기(Accelerator) <https://pytorch.org/docs/stable/torch.html#accelerators>`__ 사용하기
+# -------------------------------------------------------------
 #
-# 만약 여러분들이 운이 좋아서 CUDA 지원 GPU (대부분의 클라우드 제공 업체에서
-# 시간당 약 $0.50 에 이용할 수 있습니다) 를 사용할 수 있다면, 코드 실행 속도를 높일 수 있습니다.
-# 먼저 GPU가 PyTorch에서 작동하는지 확인합니다:
+# 만약 여러분들이 운이 좋아서 CUDA와 같은 가속기(accelerator)를 사용할 수 있다면(대부분의 클라우드 제공 업체에서
+# 시간당 약 $0.50 에 이용할 수 있습니다), 코드 실행 속도를 높일 수 있습니다.
+# 먼저 가속기(accelerator)가 PyTorch에서 작동하는지 확인합니다:
 
-print(torch.cuda.is_available())
+# 현재 사용 가능한 가속기가 있다면 사용합니다. 아니라면 CPU를 사용합니다.
+device = torch.accelerator.current_accelerator().type if torch.accelerator.is_available() else "cpu"
+print(f"Using {device} device")
 
-###############################################################################
-# 그리고 이에 대한 디바이스 오브젝트를 생성합니다:
-
-dev = torch.device(
-    "cuda") if torch.cuda.is_available() else torch.device("cpu")
 
 ###############################################################################
-# GPU로 배치를 옮기도록 ``preprocess`` 를 업데이트 합시다:
+# 가속기로 배치를 옮기도록 ``preprocess`` 를 업데이트 합시다:
 
 
 def preprocess(x, y):
-    return x.view(-1, 1, 28, 28).to(dev), y.to(dev)
+    return x.view(-1, 1, 28, 28).to(device), y.to(device)
 
 
 train_dl, valid_dl = get_data(train_ds, valid_ds, bs)
@@ -838,9 +835,9 @@ train_dl = WrappedDataLoader(train_dl, preprocess)
 valid_dl = WrappedDataLoader(valid_dl, preprocess)
 
 ###############################################################################
-# 마지막으로 모델을 GPU로 이동시킬 수 있습니다.
+# 마지막으로 모델을 가속기로 이동시킬 수 있습니다.
 
-model.to(dev)
+model.to(device)
 opt = optim.SGD(model.parameters(), lr=lr, momentum=0.9)
 
 ###############################################################################

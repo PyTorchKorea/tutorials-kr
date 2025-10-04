@@ -1,12 +1,14 @@
 
-
-
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="ko" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="ko" > <!--<![endif]-->
-<head>
-  <meta charset="utf-8">
-  <meta property="og:title" content="Fusing Convolution and Batch Norm using Custom Function" />
+
+
+<html lang="ko" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <meta property="article:modified_time" content="2022-11-30T07:09:41+00:00" /><meta property="og:title" content="Fusing Convolution and Batch Norm using Custom Function" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://tutorials.pytorch.kr/intermediate/custom_function_conv_bn_tutorial.html" />
 <meta property="og:site_name" content="PyTorch Tutorials KR" />
@@ -16,432 +18,1460 @@
 <meta name="description" content="Fusing adjacent convolution and batch norm layers together is typically an inference-time optimization to improve run-time. It is usually achieved by eliminating the batch norm layer entirely and updating the weight and bias of the preceding convolution [0]. However, this technique is not applica..." />
 <meta property="og:ignore_canonical" content="true" />
 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fusing Convolution and Batch Norm using Custom Function &#8212; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
   
-  <title>Fusing Convolution and Batch Norm using Custom Function &mdash; 파이토치 한국어 튜토리얼 (PyTorch tutorials in Korean)</title>
   
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
 
   
-  
-    <link rel="shortcut icon" href="../_static/favicon.ico"/>
-  
-  
-  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
 
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=536c50fe" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=4d2595e5" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/katex-math.css?v=91adb8b6" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/pytorch_theme.css?v=c326296f" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=097efa9c" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom2.css?v=b169ea90" />
   
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-  
-  
-    
-
-  
-
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <!-- <link rel="stylesheet" href="../_static/pygments.css" type="text/css" /> -->
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/katex-math.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/sg_gallery.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/sg_gallery-binder.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/sg_gallery-dataframe.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/sg_gallery-rendered-html.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/sphinx-design.5ea377869091fd0449014c60fc090103.min.css" type="text/css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/css/custom2.css" type="text/css" />
+    <script src="../_static/documentation_options.js?v=725a5b95"></script>
+    <script src="../_static/doctools.js?v=92e14aea"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/translations.js?v=b5f768d8"></script>
+    <script src="../_static/katex.min.js?v=be8ff15f"></script>
+    <script src="../_static/auto-render.min.js?v=ad136472"></script>
+    <script src="../_static/katex_autorenderer.js?v=bebc588a"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'intermediate/custom_function_conv_bn_tutorial';</script>
+    <link rel="canonical" href="https://tutorials.pytorch.kr/intermediate/custom_function_conv_bn_tutorial.html" />
+    <link rel="icon" href="../_static/favicon.ico"/>
     <link rel="index" title="색인" href="../genindex.html" />
     <link rel="search" title="검색" href="../search.html" />
-    <link rel="next" title="Custom C++ and CUDA Extensions" href="../advanced/cpp_extension.html" />
-    <link rel="prev" title="Double Backward with Custom Functions" href="custom_function_double_backward_tutorial.html" /> 
+    <link rel="next" title="Registering a Dispatched Operator in C++" href="../advanced/dispatcher.html" />
+    <link rel="prev" title="Double Backward with Custom Functions" href="custom_function_double_backward_tutorial.html" />
 
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="ko"/>
+    <meta name="docbuild:last-update" content="2022년 11월 30일"/>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/2.3.1/list.min.js"></script>
+<script>
+  if (window.location.hostname === 'docs.pytorch.org' || window.location.hostname === 'docs-preview.pytorch.org') {
+    const script = document.createElement('script');
+    script.src = 'https://cmp.osano.com/16A0DbT9yDNIaQkvZ/31b1b91a-e0b6-47ea-bde2-7f2bd13dbe5c/osano.js?variant=one';
+    document.head.appendChild(script);
+  }
+</script>
+<script>
+  // Cookie banner for non-LF projects
+  document.addEventListener('DOMContentLoaded', function () {
+    // Hide cookie banner on local environments and LF owned docs
+    if (window.location.hostname === 'localhost' ||
+      window.location.hostname === '0.0.0.0' ||
+      window.location.hostname === '127.0.0.1' ||
+      window.location.hostname === 'docs.pytorch.org' ||
+      window.location.hostname === 'docs-preview.pytorch.org' ||
+      window.location.hostname.startsWith('192.168.')) {
+      const banner = document.querySelector('.cookie-banner-wrapper');
+      if (banner) {
+        banner.style.display = 'none';
+      }
+    }
+  });
+</script>
+<!-- Conditional CSS for header and footer height adjustment -->
+
+<link rel="stylesheet" type="text/css" href="../_static/css/theme.css" crossorigin="anonymous">
+<script type="text/javascript" src="../_static/js/theme.js"></script>
+<script type="text/javascript" src="../_static/js/dropdown-menu.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700&family=Nanum+Gothic+Coding:wght@400;700&family=Montserrat:wght@300;400&display=swap" rel="stylesheet">
+<meta property="og:image" content="../_static/img/pytorch_seo.png" />
+<link rel="stylesheet" href="../_static/webfonts/all.min.css" crossorigin="anonymous">
+<meta http-equiv="Content-Security-Policy"
+  content="default-src * 'unsafe-inline' 'unsafe-eval' data: blob:; style-src * 'unsafe-inline'; script-src * 'unsafe-inline' 'unsafe-eval' blob:;">
+<meta name="pytorch_project" content="tutorials">
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=G-LZRD6GXDLF" height="0" width="0"
+    style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+<!-- Google Tag Manager -->
+<script>(function (w, d, s, l, i) {
+    w[l] = w[l] || []; w[l].push({
+      'gtm.start':
+        new Date().getTime(), event: 'gtm.js'
+    }); var f = d.getElementsByTagName(s)[0],
+      j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
+        'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
+    j.onload = function () {
+      window.dispatchEvent(new Event('gtm_loaded'));
+      console.log('GTM loaded successfully');
+    };
+  })(window, document, 'script', 'dataLayer', 'G-LZRD6GXDLF');
+</script>
+<!-- End Google Tag Manager -->
+<!-- Facebook Pixel Code -->
+<script>
+  !function (f, b, e, v, n, t, s) {
+    if (f.fbq) return; n = f.fbq = function () {
+      n.callMethod ?
+        n.callMethod.apply(n, arguments) : n.queue.push(arguments)
+    };
+    if (!f._fbq) f._fbq = n; n.push = n; n.loaded = !0; n.version = '2.0';
+    n.queue = []; t = b.createElement(e); t.async = !0;
+    t.src = v; s = b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t, s)
+  }(window, document, 'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init', '243028289693773');
+  fbq('track', 'PageView');
+</script>
+<script>
+  document.documentElement.setAttribute('data-version', 'v2.8.0+cu128');
+</script>
+<noscript>
+  <img height="1" width="1" src="https://www.facebook.com/tr?id=243028289693773&ev=PageView&noscript=1" />
+</noscript>
+<script>
+  function gtag() {
+    window.dataLayer.push(arguments);
+  }
+</script>
+<!-- End Facebook Pixel Code -->
+<!-- Script to Fix scrolling -->
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    // Fix anchor scrolling
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const targetId = this.getAttribute('href').substring(1);
+        const targetElement = document.getElementById(targetId);
+
+        if (targetElement) {
+          const headerHeight =
+            (document.querySelector('.header-holder') ? document.querySelector('.header-holder').offsetHeight : 0) +
+            (document.querySelector('.bd-header') ? document.querySelector('.bd-header').offsetHeight : 0) + 20;
+
+          const targetPosition = targetElement.getBoundingClientRect().top + window.pageYOffset - headerHeight;
+          window.scrollTo({
+            top: targetPosition,
+            behavior: 'smooth'
+          });
+
+          // Update URL hash without scrolling
+          history.pushState(null, null, '#' + targetId);
+        }
+      });
+    });
+  });
+</script>
+
+<script async src="https://cse.google.com/cse.js?cx=e65585f8c3ea1440e"></script>
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="ko"/>
+    <meta name="docbuild:last-update" content="2022년 11월 30일"/>
+
+  </head>
+
+<body data-feedback-url="https://github.com/PyTorchKorea/tutorials-kr" class="pytorch-body">
   
-  <script src="../_static/js/modernizr.min.js"></script>
-
-  <!-- Preload the theme fonts -->
-
-<link rel="preload" href="../_static/fonts/FreightSans/freight-sans-book.woff2" as="font" type="font/woff2" crossorigin="anonymous">
-<link rel="preload" href="../_static/fonts/FreightSans/freight-sans-medium.woff2" as="font" type="font/woff2" crossorigin="anonymous">
-<link rel="preload" href="../_static/fonts/IBMPlexMono/IBMPlexMono-Medium.woff2" as="font" type="font/woff2" crossorigin="anonymous">
-<link rel="preload" href="../_static/fonts/FreightSans/freight-sans-bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
-<link rel="preload" href="../_static/fonts/FreightSans/freight-sans-medium-italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
-<link rel="preload" href="../_static/fonts/IBMPlexMono/IBMPlexMono-SemiBold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
-
-<!-- Preload the katex fonts -->
-
-<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Math-Italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
-<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
-<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
-<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size1-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
-<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size4-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
-<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size2-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
-<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size3-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
-<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Caligraphic-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
-  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.2/css/all.css" integrity="sha384-vSIIfh2YWi9wW0r9iZe7RJPrKwp6bG+s9QZMoITbCckVJqGCCRhc+ccxNcdpHuYu" crossorigin="anonymous">
-</head>
-
-<div class="container-fluid header-holder tutorials-header" id="header-holder">
-  <div class="container">
+    <div class="container-fluid header-holder tutorials-header" id="header-holder">
+   <div class="header-container-wrapper">
     <div class="header-container">
-      <a class="header-logo" href="https://pytorch.kr/" aria-label="PyTorch"></a>
+      <a class="header-logo" href="https://pytorch.kr/" aria-label="PyTorchKR"></a>
 
       <div class="main-menu">
         <ul>
-          <li>
-            <a href="https://pytorch.kr/get-started">시작하기</a>
+
+          <li class="main-menu-item">
+          <div id="learnDropdownButton" data-toggle="learn-dropdown" class="learn-dropdown">
+              <a class="with-down-arrow">
+                <span>배우기</span>
+              </a>
+              <div class="learn-dropdown-menu dropdown-menu">
+                <a class="nav-dropdown-item" href="https://pytorch.kr/get-started/locally/">
+                  <span class="dropdown-title">PyTorch 시작하기</span>
+                </a>
+                <a class="nav-dropdown-item" href="https://tutorials.pytorch.kr/beginner/basics/intro.html">
+                  <span class="dropdown-title">기본 익히기</span>
+                </a>
+                <a class="nav-dropdown-item" href="https://tutorials.pytorch.kr/" target="_self">
+                  <span class="dropdown-title">한국어 튜토리얼</span>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.kr/hub/">
+                  <span class="dropdown-title">한국어 모델 허브</span>
+                </a>
+                <a class="nav-dropdown-item" href="https://docs.pytorch.org/tutorials/" target="_blank">
+                  <span class="dropdown-title">Official Tutorials</span>
+                </a>
+              </div>
+            </div>
           </li>
 
-          <li class="active">
-            <a href="https://tutorials.pytorch.kr/">튜토리얼</a>
+          <li class="main-menu-item">
+            <a href="https://pytorch.kr/blog/">
+              <span>블로그</span>
+            </a>
           </li>
 
-          <li>
-            <a href="https://pytorch.kr/hub">허브</a>
+          <li class="main-menu-item">
+          <div id="docsDropdownButton" data-toggle="docs-dropdown" class="docs-dropdown">
+              <a class="with-down-arrow">
+              <span>문서</span>
+              </a>
+              <div class="docs-dropdown-menu dropdown-menu">
+                <a class="nav-dropdown-item" href="https://docs.pytorch.org/docs/" target="_blank">
+                  <span class="dropdown-title">PyTorch API</span>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.kr/domains/">
+                  <span class="dropdown-title">Domain API 소개</span>
+                </a>
+                <a class="nav-dropdown-item" href="https://tutorials.pytorch.kr/" target="_self">
+                  <span class="dropdown-title">한국어 튜토리얼</span>
+                </a>
+                <a class="nav-dropdown-item" href="https://docs.pytorch.org/tutorials/" target="_blank">
+                  <span class="dropdown-title">Official Tutorials</span>
+                </a>
+              </div>
+            </div>
           </li>
 
-          <li>
-            <a href="https://discuss.pytorch.kr/">커뮤니티</a>
+          <li class="main-menu-item">
+          <div id="communityDropdownButton" data-toggle="community-dropdown" class="community-dropdown">
+              <a class="with-down-arrow">
+              <span>커뮤니티</span>
+              </a>
+              <div class="community-dropdown-menu dropdown-menu">
+                <a class="nav-dropdown-item" href="https://discuss.pytorch.kr/" target="_self">
+                  <span class="dropdown-title">한국어 커뮤니티</span>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.kr/resources/">
+                  <span class="dropdown-title">개발자 정보</span>
+                </a>
+                <a class="nav-dropdown-item" href="https://landscape.pytorch.org/" target="_blank">
+                  <span class="dropdown-title">Landscape</span>
+                </a>
+              </div>
+            </div>
           </li>
+
         </ul>
       </div>
 
-      <a class="main-menu-open-button" href="#" data-behavior="open-mobile-menu"></a>
+      <a class="main-menu-open-button" href="#" data-behavior="open-mobile-menu">
+        <i class="fa-solid fa-ellipsis"></i>
+      </a>
+    </div>
+  </div>
+ </div>
+
+ <!-- Begin Mobile Menu -->
+
+<div class="mobile-main-menu">
+  <div class="container-fluid">
+    <div class="header-container-wrapper">
+      <div class="mobile-main-menu-header-container">
+        <a class="main-menu-close-button" href="#" data-behavior="close-mobile-menu">
+          <i class="fa-solid fa-xmark"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="mobile-main-menu-links-container">
+    <div class="main-menu">
+      <ul>
+         <li class="resources-mobile-menu-title">
+           <a>배우기</a>
+         </li>
+         <ul class="resources-mobile-menu-items">
+           <li>
+             <a href="https://pytorch.kr/get-started/locally/">PyTorch 시작하기</a>
+           </li>
+           <li>
+             <a href="https://tutorials.pytorch.kr/beginner/basics/intro.html">기본 익히기</a>
+           </li>
+           <li>
+             <a href="https://tutorials.pytorch.kr/">한국어 튜토리얼</a>
+           </li>
+           <li>
+             <a href="https://pytorch.kr/hub/">한국어 모델 허브</a>
+           </li>
+           <li>
+             <a href="https://docs.pytorch.org/tutorials/" target="_blank">Official Tutorials</a>
+           </li>
+        </ul>
+         <li class="resources-mobile-menu-title">
+           <a href="https://pytorch.kr/blog/">블로그</a>
+         </li>
+         <li class="resources-mobile-menu-title">
+           <a>문서</a>
+         </li>
+         <ul class="resources-mobile-menu-items">
+          <li>
+            <a href="https://docs.pytorch.org/docs/" target="_blank">PyTorch API</a>
+          </li>
+          <li>
+            <a href="https://pytorch.kr/domains/">Domain API 소개</a>
+          </li>
+          <li>
+            <a href="https://tutorials.pytorch.kr/">한국어 튜토리얼</a>
+          </li>
+          <li>
+            <a href="https://docs.pytorch.org/tutorials/" target="_blank">Official Tutorials</a>
+          </li>
+        </ul>
+        <li class="resources-mobile-menu-title">
+          <a>커뮤니티</a>
+        </li>
+         <ul class="resources-mobile-menu-items">
+          <li>
+            <a href="https://discuss.pytorch.kr/">한국어 커뮤니티</a>
+          </li>
+          <li>
+            <a href="https://pytorch.kr/resources/">개발자 정보</a>
+          </li>
+          <li>
+            <a href="https://landscape.pytorch.org/" target="_blank">Landscape</a>
+          </li>
+        </ul>
+      </ul>
     </div>
   </div>
 </div>
 
-<body class="pytorch-body">
-
-   
-
-    
-
-    <div class="table-of-contents-link-wrapper">
-      <span>Table of Contents</span>
-      <a href="#" class="toggle-table-of-contents" data-behavior="toggle-table-of-contents"></a>
-    </div>
-
-    <nav data-toggle="wy-nav-shift" class="pytorch-left-menu" id="pytorch-left-menu">
-      <div class="pytorch-side-scroll">
-        <div class="pytorch-menu pytorch-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          <div class="pytorch-left-menu-search">
-            
-
-            
-              
-              
-                <div class="version">
-                  2.3.1
-                </div>
-              
-            
-
-            
-
+<!-- End Mobile Menu -->
+  
+  
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
 
   
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
 
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
 
-<div role="search">
-  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search Tutorials" />
-    <input type="hidden" name="check_keywords" value="yes" />
-    <input type="hidden" name="area" value="default" />
-  </form>
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
 </div>
 
-            
-          </div>
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class=" navbar-header-items__start">
+    
+      <div class="navbar-item">
+  <a href="../index.html" class="version">v2.8.0+cu128</a>
+</div>
+    
+  </div>
+  
+  <div class=" navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../intro.html">
+    Intro
+  </a>
+</li>
 
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../compilers_index.html">
+    Compilers
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../domains.html">
+    Domains
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../distributed.html">
+    Distributed
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../deep-dive.html">
+    Deep Dive
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../extension.html">
+    Extension
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../ecosystem.html">
+    Ecosystem
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../recipes_index.html">
+    Recipes
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+      
+        <div class="navbar-item">
+<div class="search-container-wrapper">
+  <div id="sphinx-search" class="search-container">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </div>
+
+  <div id="google-search" class="search-container" style="display:none;">
+    <div class="gcse-search-wrapper">
+      <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+      <div class="gcse-search"></div>
+    </div>
+  </div>
+
+  <div class="search-toggle-container" data-bs-title="Google Search Off" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <div class="search-toggle-inner">
+      <label class="switch">
+        <input type="checkbox" id="search-toggle">
+        <span class="slider round"></span>
+      </label>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+  // Define the search callback
+  const myWebSearchStartingCallback = (gname, query) => {
+    if (typeof dataLayer !== 'undefined' && query) {
+      window.dataLayer = window.dataLayer || [];
+      dataLayer.push({
+        'event': 'google_search',
+        'search_term': query,
+        'event_category': 'Search',
+        'event_label': 'Google Search'
+      });
+    }
+    return '';
+  };
+
+  // Set up the GCSE search callbacks
+  window.__gcse || (window.__gcse = {});
+  window.__gcse.searchCallbacks = {
+    web: { starting: myWebSearchStartingCallback }
+  };
+
+  if (window.location.pathname.includes('/search.html')) {
+    document.body.classList.add('search-page');
+  }
+
+  // Function to reinitialize Google CSE
+  function reinitializeGoogleSearch() {
+    if (window.__gcse && window.__gcse.initializationCallback) {
+      window.__gcse.initializationCallback();
+    }
+  }
+
+  // Function to handle search toggle
+  function handleSearchToggle(toggle, sphinxSearch, googleSearch) {
+    if (!toggle || !sphinxSearch || !googleSearch) return;
+
+    // Check if the URL contains /stable/ or /tutorials/
+    const currentUrl = window.location.href;
+    // TODO: We've had reports that the google programmable search is returning stale documentation,
+    //       Simple reproduction is to turn google search on and search for multinomial which will
+    //       result in returning 1.8.1 documentation.
+    //       We should turn this back on when we resolve that bug.
+    const shouldDefaultToGoogle = false;
+    const savedPreference = localStorage.getItem('searchPreference');
+
+    // Set initial state
+    if (savedPreference === 'google' || (savedPreference === null && shouldDefaultToGoogle)) {
+      toggle.checked = true;
+      sphinxSearch.style.display = 'none';
+      googleSearch.style.display = 'block';
+      if (savedPreference === null) {
+        localStorage.setItem('searchPreference', 'google');
+      }
+      reinitializeGoogleSearch();
+    } else {
+      toggle.checked = false;
+      sphinxSearch.style.display = 'block';
+      googleSearch.style.display = 'none';
+    }
+
+    // Update tooltip
+    updateTooltip(toggle.checked);
+
+    // Skip if already initialized
+    if (toggle.hasAttribute('data-initialized')) return;
+    toggle.setAttribute('data-initialized', 'true');
+
+    toggle.addEventListener('change', function() {
+      if (this.checked) {
+        sphinxSearch.style.display = 'none';
+        googleSearch.style.display = 'block';
+        localStorage.setItem('searchPreference', 'google');
+        reinitializeGoogleSearch();
+        trackSearchEngineSwitch('Google');
+      } else {
+        sphinxSearch.style.display = 'block';
+        googleSearch.style.display = 'none';
+        localStorage.setItem('searchPreference', 'sphinx');
+        trackSearchEngineSwitch('Sphinx');
+      }
+
+      updateTooltip(this.checked);
+      updateMobileSearch();
+    });
+  }
+
+  // Update tooltip based on toggle state
+  function updateTooltip(isChecked) {
+    const tooltipElement = document.querySelector('.search-toggle-container');
+    if (!tooltipElement) return;
+
+    tooltipElement.setAttribute('data-bs-title', isChecked ? 'Google Search On' : 'Google Search Off');
+
+    if (bootstrap && bootstrap.Tooltip) {
+      const tooltipInstance = bootstrap.Tooltip.getInstance(tooltipElement);
+      if (tooltipInstance) tooltipInstance.dispose();
+      new bootstrap.Tooltip(tooltipElement);
+    }
+  }
+
+  // Track search engine switch
+  function trackSearchEngineSwitch(engine) {
+    if (typeof dataLayer !== 'undefined') {
+      window.dataLayer = window.dataLayer || [];
+      dataLayer.push({
+        'event': 'search_engine_switch',
+        'event_category': 'Search',
+        'event_label': engine
+      });
+    }
+  }
+
+  // Function to update mobile search based on current toggle state
+  function updateMobileSearch() {
+    const toggle = document.getElementById('search-toggle');
+    if (!toggle) return;
+
+    const mobileSearchContainer = document.querySelector('.sidebar-header-items__end .navbar-item .search-container-wrapper');
+    if (!mobileSearchContainer) return;
+
+    const mobileSphinxSearch = mobileSearchContainer.querySelector('#sphinx-search');
+    const mobileGoogleSearch = mobileSearchContainer.querySelector('#google-search');
+
+    if (mobileSphinxSearch && mobileGoogleSearch) {
+      mobileSphinxSearch.style.display = toggle.checked ? 'none' : 'block';
+      mobileGoogleSearch.style.display = toggle.checked ? 'block' : 'none';
+
+      if (toggle.checked) {
+        reinitializeGoogleSearch();
+      }
+    }
+  }
+
+  // Initialize desktop search toggle
+  const toggle = document.getElementById('search-toggle');
+  const sphinxSearch = document.getElementById('sphinx-search');
+  const googleSearch = document.getElementById('google-search');
+  handleSearchToggle(toggle, sphinxSearch, googleSearch);
+
+  // Set placeholder text for Google search input
+  const observer = new MutationObserver(function() {
+    document.querySelectorAll('.gsc-input input').forEach(input => {
+      if (input && !input.hasAttribute('data-placeholder-set')) {
+        input.setAttribute('placeholder', 'Search the docs ...');
+        input.setAttribute('data-placeholder-set', 'true');
+      }
+    });
+  });
+
+  observer.observe(document.body, { childList: true, subtree: true });
+
+  // Fix for scroll jump issue - improved approach
+  function setupSearchInputHandlers(input) {
+    if (input.hasAttribute('data-scroll-fixed')) return;
+    input.setAttribute('data-scroll-fixed', 'true');
+
+    let lastScrollPosition = 0;
+    let isTyping = false;
+    let scrollTimeout;
+
+    // Save position before typing starts
+    input.addEventListener('keydown', () => {
+      lastScrollPosition = window.scrollY;
+      isTyping = true;
+
+      // Reset typing state after a short delay
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        isTyping = false;
+      }, 100);
+    });
+
+    // Only maintain scroll position during typing
+    function maintainScroll() {
+      if (document.activeElement === input && isTyping) {
+        window.scrollTo(0, lastScrollPosition);
+        requestAnimationFrame(maintainScroll);
+      }
+    }
+
+    input.addEventListener('focus', () => {
+      // Just store initial position but don't force it
+      lastScrollPosition = window.scrollY;
+    });
+
+    input.addEventListener('input', () => {
+      isTyping = true;
+      window.scrollTo(0, lastScrollPosition);
+
+      // Reset typing state after a short delay
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        isTyping = false;
+      }, 100);
+
+      requestAnimationFrame(maintainScroll);
+    });
+  }
+
+  // Apply to all search inputs and observe for new ones
+  function applyToSearchInputs() {
+    document.querySelectorAll('.search-container input, .gsc-input input').forEach(setupSearchInputHandlers);
+  }
+
+  applyToSearchInputs();
+
+  const searchObserver = new MutationObserver(applyToSearchInputs);
+  searchObserver.observe(document.body, { childList: true, subtree: true });
+
+  // Watch for mobile menu creation
+  const mobileMenuObserver = new MutationObserver(function(mutations) {
+    for (const mutation of mutations) {
+      if (!mutation.addedNodes.length) continue;
+
+      // Style mobile search inputs
+      document.querySelectorAll('.sidebar-header-items__end .navbar-item .search-container-wrapper .gsc-input input').forEach(input => {
+        if (input) {
+          input.setAttribute('placeholder', 'Search the docs ...');
+          input.style.paddingLeft = '36px';
+        }
+      });
+
+      // Check for mobile search container
+      const mobileSearchContainer = document.querySelector('.sidebar-header-items__end .navbar-item .search-container-wrapper');
+      if (!mobileSearchContainer) continue;
+
+      const mobileToggle = mobileSearchContainer.querySelector('#search-toggle');
+      if (mobileToggle && toggle) {
+        // Sync mobile toggle with desktop toggle
+        mobileToggle.checked = toggle.checked;
+        updateMobileSearch();
+
+        // Add event listener to mobile toggle if not already added
+        if (!mobileToggle.hasAttribute('data-initialized')) {
+          mobileToggle.setAttribute('data-initialized', 'true');
+          mobileToggle.addEventListener('change', function() {
+            // Sync desktop toggle with mobile toggle
+            toggle.checked = this.checked;
+            // Trigger change event on desktop toggle to update both
+            toggle.dispatchEvent(new Event('change'));
+          });
+        }
+      }
+    }
+  });
+
+  mobileMenuObserver.observe(document.body, { childList: true, subtree: true });
+
+  // Ensure Google CSE is properly loaded
+  if (window.__gcse) {
+    window.__gcse.callback = function() {
+      // This will run after Google CSE is fully loaded
+      if (toggle && toggle.checked) {
+        reinitializeGoogleSearch();
+      }
+    };
+  } else {
+    window.__gcse = {
+      callback: function() {
+        if (toggle && toggle.checked) {
+          reinitializeGoogleSearch();
+        }
+      }
+    };
+  }
+});
+</script>
+</div>
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
           
-            
-            
-              
-            
-            
-              <p class="caption" role="heading"><span class="caption-text">파이토치(PyTorch) 레시피</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../recipes/recipes_index.html">모든 레시피 보기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../prototype/prototype_index.html">모든 프로토타입 레시피 보기</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">파이토치(PyTorch) 시작하기</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/basics/intro.html">파이토치(PyTorch) 기본 익히기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/basics/quickstart_tutorial.html">빠른 시작(Quickstart)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/basics/tensorqs_tutorial.html">텐서(Tensor)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/basics/data_tutorial.html">Dataset과 DataLoader</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/basics/transforms_tutorial.html">변형(Transform)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/basics/buildmodel_tutorial.html">신경망 모델 구성하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/basics/autogradqs_tutorial.html"><code class="docutils literal notranslate"><span class="pre">torch.autograd</span></code>를 사용한 자동 미분</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/basics/optimization_tutorial.html">모델 매개변수 최적화하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/basics/saveloadrun_tutorial.html">모델 저장하고 불러오기</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">Introduction to PyTorch on YouTube</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/introyt.html">PyTorch 소개 - YouTube 시리즈</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/introyt1_tutorial.html">PyTorch 소개</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/tensors_deeper_tutorial.html">Pytorch Tensor 소개</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/autogradyt_tutorial.html">The Fundamentals of Autograd</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/modelsyt_tutorial.html">Building Models with PyTorch</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/tensorboardyt_tutorial.html">PyTorch TensorBoard 지원</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/trainingyt.html">Training with PyTorch</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/introyt/captumyt.html">Model Understanding with Captum</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">파이토치(PyTorch) 배우기</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/deep_learning_60min_blitz.html">PyTorch로 딥러닝하기: 60분만에 끝장내기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/pytorch_with_examples.html">예제로 배우는 파이토치(PyTorch)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/nn_tutorial.html"><cite>torch.nn</cite> 이 <em>실제로</em> 무엇인가요?</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tensorboard_tutorial.html">TensorBoard로 모델, 데이터, 학습 시각화하기</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">이미지/비디오</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="torchvision_tutorial.html">TorchVision Object Detection Finetuning Tutorial</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/transfer_learning_tutorial.html">컴퓨터 비전(Vision)을 위한 전이학습(Transfer Learning)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/fgsm_tutorial.html">적대적 예제 생성(Adversarial Example Generation)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/dcgan_faces_tutorial.html">DCGAN 튜토리얼</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/vt_tutorial.html">배포를 위해 비전 트랜스포머(Vision Transformer) 모델 최적화하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tiatoolbox_tutorial.html">Pytorch와 TIAToolbox를 사용한 전체 슬라이드 이미지(Whole Slide Image) 분류</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">오디오</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/audio_io_tutorial.html">Audio I/O</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/audio_resampling_tutorial.html">Audio Resampling</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/audio_data_augmentation_tutorial.html">Audio Data Augmentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/audio_datasets_tutorial.html">오디오 데이터셋</a></li>
-<li class="toctree-l1"><a class="reference internal" href="speech_recognition_pipeline_tutorial.html">Speech Recognition with Wav2Vec2</a></li>
-<li class="toctree-l1"><a class="reference internal" href="text_to_speech_with_torchaudio.html">Text-to-speech with Tacotron2</a></li>
-<li class="toctree-l1"><a class="reference internal" href="forced_alignment_with_torchaudio_tutorial.html">wav2vec2을 이용한 강제 정렬</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">텍스트</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/bettertransformer_tutorial.html">Better Transformer를 이용한 고속 트랜스포머 추론</a></li>
-<li class="toctree-l1"><a class="reference internal" href="char_rnn_classification_tutorial.html">기초부터 시작하는 NLP: 문자-단위 RNN으로 이름 분류하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="char_rnn_generation_tutorial.html">기초부터 시작하는 NLP:  문자-단위 RNN으로 이름 생성하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="seq2seq_translation_tutorial.html">기초부터 시작하는 NLP: Sequence to Sequence 네트워크와 Attention을 이용한 번역</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/text_sentiment_ngrams_tutorial.html">torchtext 라이브러리로 텍스트 분류하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/translation_transformer.html"><code class="docutils literal notranslate"><span class="pre">nn.Transformer</span></code> 와 torchtext로 언어 번역하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/torchtext_custom_dataset_tutorial.html">TorchText를 사용하여 사용자 정의 글 데이터셋 전처리하기</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">백엔드</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/onnx/intro_onnx.html">Introduction to ONNX</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">강화학습</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="reinforcement_q_learning.html">강화 학습 (DQN) 튜토리얼</a></li>
-<li class="toctree-l1"><a class="reference internal" href="reinforcement_ppo.html">Reinforcement Learning (PPO) with TorchRL Tutorial</a></li>
-<li class="toctree-l1"><a class="reference internal" href="mario_rl_tutorial.html">마리오 게임 RL 에이전트로 학습하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../advanced/pendulum.html">Pendulum: Writing your environment and transforms with TorchRL</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">PyTorch 모델을 프로덕션 환경에 배포하기</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/onnx/intro_onnx.html">Introduction to ONNX</a></li>
-<li class="toctree-l1"><a class="reference internal" href="flask_rest_api_tutorial.html">Flask를 사용하여 Python에서 PyTorch를 REST API로 배포하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/Intro_to_TorchScript_tutorial.html">TorchScript 소개</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_export.html">C++에서 TorchScript 모델 로딩하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../advanced/super_resolution_with_onnxruntime.html">(선택) PyTorch 모델을 ONNX으로 변환하고 ONNX 런타임에서 실행하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="realtime_rpi.html">Raspberry Pi 4 에서 실시간 추론(Inference) (30fps!)</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">PyTorch 프로파일링</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/profiler.html">PyTorch 모듈 프로파일링하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/hta_intro_tutorial.html">전체론적(Holistic Trace Analysis) 추적 분석 소개</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/hta_trace_diff_tutorial.html">종합적 분석을 이용한 트레이스 차이 분석</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">Code Transforms with FX</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="fx_conv_bn_fuser.html">(베타) FX에서 합성곱/배치 정규화(Convolution/Batch Norm) 결합기(Fuser) 만들기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="fx_profiling_tutorial.html">(beta) Building a Simple CPU Performance Profiler with FX</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">프론트엔드 API</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="memory_format_tutorial.html">(베타) PyTorch를 사용한 Channels Last 메모리 형식</a></li>
-<li class="toctree-l1"><a class="reference internal" href="forward_ad_usage.html">Forward-mode Automatic Differentiation (Beta)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="jacobians_hessians.html">Jacobians, Hessians, hvp, vhp, and more: composing function transforms</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ensembling.html">모델 앙상블</a></li>
-<li class="toctree-l1"><a class="reference internal" href="per_sample_grads.html">Per-sample-gradients</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_frontend.html">PyTorch C++ 프론트엔드 사용하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../advanced/torch-script-parallelism.html">TorchScript의 동적 병렬 처리(Dynamic Parallelism)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_autograd.html">C++ 프론트엔드의 자동 미분 (autograd)</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">PyTorch 확장하기</span></p>
-<ul class="current">
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/PyTorchKorea/tutorials-kr" title="한국어 튜토리얼 GitHub 저장소" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">한국어 튜토리얼 GitHub 저장소</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://discuss.pytorch.kr/" title="파이토치 한국어 커뮤니티" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-discourse fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">파이토치 한국어 커뮤니티</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../intro.html">
+    Intro
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../compilers_index.html">
+    Compilers
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../domains.html">
+    Domains
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../distributed.html">
+    Distributed
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../deep-dive.html">
+    Deep Dive
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../extension.html">
+    Extension
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../ecosystem.html">
+    Ecosystem
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../recipes_index.html">
+    Recipes
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<div class="search-container-wrapper">
+  <div id="sphinx-search" class="search-container">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </div>
+
+  <div id="google-search" class="search-container" style="display:none;">
+    <div class="gcse-search-wrapper">
+      <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+      <div class="gcse-search"></div>
+    </div>
+  </div>
+
+  <div class="search-toggle-container" data-bs-title="Google Search Off" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <div class="search-toggle-inner">
+      <label class="switch">
+        <input type="checkbox" id="search-toggle">
+        <span class="slider round"></span>
+      </label>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+  // Define the search callback
+  const myWebSearchStartingCallback = (gname, query) => {
+    if (typeof dataLayer !== 'undefined' && query) {
+      window.dataLayer = window.dataLayer || [];
+      dataLayer.push({
+        'event': 'google_search',
+        'search_term': query,
+        'event_category': 'Search',
+        'event_label': 'Google Search'
+      });
+    }
+    return '';
+  };
+
+  // Set up the GCSE search callbacks
+  window.__gcse || (window.__gcse = {});
+  window.__gcse.searchCallbacks = {
+    web: { starting: myWebSearchStartingCallback }
+  };
+
+  if (window.location.pathname.includes('/search.html')) {
+    document.body.classList.add('search-page');
+  }
+
+  // Function to reinitialize Google CSE
+  function reinitializeGoogleSearch() {
+    if (window.__gcse && window.__gcse.initializationCallback) {
+      window.__gcse.initializationCallback();
+    }
+  }
+
+  // Function to handle search toggle
+  function handleSearchToggle(toggle, sphinxSearch, googleSearch) {
+    if (!toggle || !sphinxSearch || !googleSearch) return;
+
+    // Check if the URL contains /stable/ or /tutorials/
+    const currentUrl = window.location.href;
+    // TODO: We've had reports that the google programmable search is returning stale documentation,
+    //       Simple reproduction is to turn google search on and search for multinomial which will
+    //       result in returning 1.8.1 documentation.
+    //       We should turn this back on when we resolve that bug.
+    const shouldDefaultToGoogle = false;
+    const savedPreference = localStorage.getItem('searchPreference');
+
+    // Set initial state
+    if (savedPreference === 'google' || (savedPreference === null && shouldDefaultToGoogle)) {
+      toggle.checked = true;
+      sphinxSearch.style.display = 'none';
+      googleSearch.style.display = 'block';
+      if (savedPreference === null) {
+        localStorage.setItem('searchPreference', 'google');
+      }
+      reinitializeGoogleSearch();
+    } else {
+      toggle.checked = false;
+      sphinxSearch.style.display = 'block';
+      googleSearch.style.display = 'none';
+    }
+
+    // Update tooltip
+    updateTooltip(toggle.checked);
+
+    // Skip if already initialized
+    if (toggle.hasAttribute('data-initialized')) return;
+    toggle.setAttribute('data-initialized', 'true');
+
+    toggle.addEventListener('change', function() {
+      if (this.checked) {
+        sphinxSearch.style.display = 'none';
+        googleSearch.style.display = 'block';
+        localStorage.setItem('searchPreference', 'google');
+        reinitializeGoogleSearch();
+        trackSearchEngineSwitch('Google');
+      } else {
+        sphinxSearch.style.display = 'block';
+        googleSearch.style.display = 'none';
+        localStorage.setItem('searchPreference', 'sphinx');
+        trackSearchEngineSwitch('Sphinx');
+      }
+
+      updateTooltip(this.checked);
+      updateMobileSearch();
+    });
+  }
+
+  // Update tooltip based on toggle state
+  function updateTooltip(isChecked) {
+    const tooltipElement = document.querySelector('.search-toggle-container');
+    if (!tooltipElement) return;
+
+    tooltipElement.setAttribute('data-bs-title', isChecked ? 'Google Search On' : 'Google Search Off');
+
+    if (bootstrap && bootstrap.Tooltip) {
+      const tooltipInstance = bootstrap.Tooltip.getInstance(tooltipElement);
+      if (tooltipInstance) tooltipInstance.dispose();
+      new bootstrap.Tooltip(tooltipElement);
+    }
+  }
+
+  // Track search engine switch
+  function trackSearchEngineSwitch(engine) {
+    if (typeof dataLayer !== 'undefined') {
+      window.dataLayer = window.dataLayer || [];
+      dataLayer.push({
+        'event': 'search_engine_switch',
+        'event_category': 'Search',
+        'event_label': engine
+      });
+    }
+  }
+
+  // Function to update mobile search based on current toggle state
+  function updateMobileSearch() {
+    const toggle = document.getElementById('search-toggle');
+    if (!toggle) return;
+
+    const mobileSearchContainer = document.querySelector('.sidebar-header-items__end .navbar-item .search-container-wrapper');
+    if (!mobileSearchContainer) return;
+
+    const mobileSphinxSearch = mobileSearchContainer.querySelector('#sphinx-search');
+    const mobileGoogleSearch = mobileSearchContainer.querySelector('#google-search');
+
+    if (mobileSphinxSearch && mobileGoogleSearch) {
+      mobileSphinxSearch.style.display = toggle.checked ? 'none' : 'block';
+      mobileGoogleSearch.style.display = toggle.checked ? 'block' : 'none';
+
+      if (toggle.checked) {
+        reinitializeGoogleSearch();
+      }
+    }
+  }
+
+  // Initialize desktop search toggle
+  const toggle = document.getElementById('search-toggle');
+  const sphinxSearch = document.getElementById('sphinx-search');
+  const googleSearch = document.getElementById('google-search');
+  handleSearchToggle(toggle, sphinxSearch, googleSearch);
+
+  // Set placeholder text for Google search input
+  const observer = new MutationObserver(function() {
+    document.querySelectorAll('.gsc-input input').forEach(input => {
+      if (input && !input.hasAttribute('data-placeholder-set')) {
+        input.setAttribute('placeholder', 'Search the docs ...');
+        input.setAttribute('data-placeholder-set', 'true');
+      }
+    });
+  });
+
+  observer.observe(document.body, { childList: true, subtree: true });
+
+  // Fix for scroll jump issue - improved approach
+  function setupSearchInputHandlers(input) {
+    if (input.hasAttribute('data-scroll-fixed')) return;
+    input.setAttribute('data-scroll-fixed', 'true');
+
+    let lastScrollPosition = 0;
+    let isTyping = false;
+    let scrollTimeout;
+
+    // Save position before typing starts
+    input.addEventListener('keydown', () => {
+      lastScrollPosition = window.scrollY;
+      isTyping = true;
+
+      // Reset typing state after a short delay
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        isTyping = false;
+      }, 100);
+    });
+
+    // Only maintain scroll position during typing
+    function maintainScroll() {
+      if (document.activeElement === input && isTyping) {
+        window.scrollTo(0, lastScrollPosition);
+        requestAnimationFrame(maintainScroll);
+      }
+    }
+
+    input.addEventListener('focus', () => {
+      // Just store initial position but don't force it
+      lastScrollPosition = window.scrollY;
+    });
+
+    input.addEventListener('input', () => {
+      isTyping = true;
+      window.scrollTo(0, lastScrollPosition);
+
+      // Reset typing state after a short delay
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        isTyping = false;
+      }, 100);
+
+      requestAnimationFrame(maintainScroll);
+    });
+  }
+
+  // Apply to all search inputs and observe for new ones
+  function applyToSearchInputs() {
+    document.querySelectorAll('.search-container input, .gsc-input input').forEach(setupSearchInputHandlers);
+  }
+
+  applyToSearchInputs();
+
+  const searchObserver = new MutationObserver(applyToSearchInputs);
+  searchObserver.observe(document.body, { childList: true, subtree: true });
+
+  // Watch for mobile menu creation
+  const mobileMenuObserver = new MutationObserver(function(mutations) {
+    for (const mutation of mutations) {
+      if (!mutation.addedNodes.length) continue;
+
+      // Style mobile search inputs
+      document.querySelectorAll('.sidebar-header-items__end .navbar-item .search-container-wrapper .gsc-input input').forEach(input => {
+        if (input) {
+          input.setAttribute('placeholder', 'Search the docs ...');
+          input.style.paddingLeft = '36px';
+        }
+      });
+
+      // Check for mobile search container
+      const mobileSearchContainer = document.querySelector('.sidebar-header-items__end .navbar-item .search-container-wrapper');
+      if (!mobileSearchContainer) continue;
+
+      const mobileToggle = mobileSearchContainer.querySelector('#search-toggle');
+      if (mobileToggle && toggle) {
+        // Sync mobile toggle with desktop toggle
+        mobileToggle.checked = toggle.checked;
+        updateMobileSearch();
+
+        // Add event listener to mobile toggle if not already added
+        if (!mobileToggle.hasAttribute('data-initialized')) {
+          mobileToggle.setAttribute('data-initialized', 'true');
+          mobileToggle.addEventListener('change', function() {
+            // Sync desktop toggle with mobile toggle
+            toggle.checked = this.checked;
+            // Trigger change event on desktop toggle to update both
+            toggle.dispatchEvent(new Event('change'));
+          });
+        }
+      }
+    }
+  });
+
+  mobileMenuObserver.observe(document.body, { childList: true, subtree: true });
+
+  // Ensure Google CSE is properly loaded
+  if (window.__gcse) {
+    window.__gcse.callback = function() {
+      // This will run after Google CSE is fully loaded
+      if (toggle && toggle.checked) {
+        reinitializeGoogleSearch();
+      }
+    };
+  } else {
+    window.__gcse = {
+      callback: function() {
+        if (toggle && toggle.checked) {
+          reinitializeGoogleSearch();
+        }
+      }
+    };
+  }
+});
+</script>
+</div>
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/PyTorchKorea/tutorials-kr" title="한국어 튜토리얼 GitHub 저장소" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">한국어 튜토리얼 GitHub 저장소</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://discuss.pytorch.kr/" title="파이토치 한국어 커뮤니티" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-discourse fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">파이토치 한국어 커뮤니티</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Extending PyTorch</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../advanced/custom_ops_landing_page.html">PyTorch Custom Operators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/python_custom_ops.html">Custom Python Operators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_custom_ops.html">Custom C++ and CUDA Operators</a></li>
 <li class="toctree-l1"><a class="reference internal" href="custom_function_double_backward_tutorial.html">Double Backward with Custom Functions</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Fusing Convolution and Batch Norm using Custom Function</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../advanced/cpp_extension.html">Custom C++ and CUDA Extensions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../advanced/torch_script_custom_ops.html">Extending TorchScript with Custom C++ Operators</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../advanced/torch_script_custom_classes.html">커스텀 C++ 클래스로 TorchScript 확장하기</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Fusing Convolution and Batch Norm using Custom Function</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/dispatcher.html">Registering a Dispatched Operator in C++</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/extend_dispatcher.html">Extending dispatcher for a new backend in C++</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/privateuseone.html">Facilitating New Backend Integration by PrivateUse1</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">모델 최적화</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/profiler.html">PyTorch 모듈 프로파일링하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tensorboard_profiler_tutorial.html">텐서보드를 이용한 파이토치 프로파일러</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/hyperparameter_tuning_tutorial.html">Ray Tune을 사용한 하이퍼파라미터 튜닝</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/vt_tutorial.html">배포를 위해 비전 트랜스포머(Vision Transformer) 모델 최적화하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="parametrizations.html">Parametrizations Tutorial</a></li>
-<li class="toctree-l1"><a class="reference internal" href="pruning_tutorial.html">가지치기 기법(Pruning) 튜토리얼</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../advanced/dynamic_quantization_tutorial.html">(베타) LSTM 기반 단어 단위 언어 모델의 동적 양자화</a></li>
-<li class="toctree-l1"><a class="reference internal" href="dynamic_quantization_bert_tutorial.html">(베타) BERT 모델 동적 양자화하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="quantized_transfer_learning_tutorial.html">(베타) 컴퓨터 비전 튜토리얼을 위한 양자화된 전이학습(Quantized Transfer Learning)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../advanced/static_quantization_tutorial.html">(베타) PyTorch에서 Eager Mode를 이용한 정적 양자화</a></li>
-<li class="toctree-l1"><a class="reference internal" href="torchserve_with_ipex.html">Grokking PyTorch Intel CPU performance from first principles</a></li>
-<li class="toctree-l1"><a class="reference internal" href="torchserve_with_ipex_2.html">Grokking PyTorch Intel CPU performance from first principles (Part 2)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="nvfuser_intro_tutorial.html">Getting Started - Accelerate Your Scripts with nvFuser</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ax_multiobjective_nas_tutorial.html">Multi-Objective NAS with Ax</a></li>
-<li class="toctree-l1"><a class="reference internal" href="torch_compile_tutorial.html">Introduction to <code class="docutils literal notranslate"><span class="pre">torch.compile</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="inductor_debug_cpu.html">Inductor CPU backend debugging and profiling</a></li>
-<li class="toctree-l1"><a class="reference internal" href="scaled_dot_product_attention_tutorial.html">(Beta) Scaled Dot Product Attention (SDPA)로 고성능 트랜스포머(Transformers) 구현하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="scaled_dot_product_attention_tutorial.html#torch-compile-sdpa"><code class="docutils literal notranslate"><span class="pre">torch.compile</span></code> 과 함께 SDPA 사용하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="scaled_dot_product_attention_tutorial.html#sdpa-atteition-bias">SDPA를 <code class="docutils literal notranslate"><span class="pre">atteition.bias</span></code> 하위 클래스와 사용하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="scaled_dot_product_attention_tutorial.html#id8">결론</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/knowledge_distillation_tutorial.html">Knowledge Distillation Tutorial</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">병렬 및 분산 학습</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../distributed/home.html">Distributed and Parallel Training Tutorials</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/dist_overview.html">PyTorch Distributed Overview</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/ddp_series_intro.html">PyTorch의 분산 데이터 병렬 처리 - 비디오 튜토리얼</a></li>
-<li class="toctree-l1"><a class="reference internal" href="model_parallel_tutorial.html">단일 머신을 사용한 모델 병렬화 모범 사례</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ddp_tutorial.html">분산 데이터 병렬 처리 시작하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="dist_tuto.html">PyTorch로 분산 어플리케이션 개발하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="FSDP_tutorial.html">Fully Sharded Data Parallel(FSDP) 시작하기</a></li>
-<li class="toctree-l1"><a class="reference internal" href="FSDP_adavnced_tutorial.html">Advanced Model Training with Fully Sharded Data Parallel (FSDP)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="TP_tutorial.html">Large Scale Transformer model training with Tensor Parallel (TP)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="process_group_cpp_extension_tutorial.html">Cpp 확장을 사용한 프로세스 그룹 백엔드 사용자 정의</a></li>
-<li class="toctree-l1"><a class="reference internal" href="rpc_tutorial.html">Getting Started with Distributed RPC Framework</a></li>
-<li class="toctree-l1"><a class="reference internal" href="rpc_param_server_tutorial.html">Implementing a Parameter Server Using Distributed RPC Framework</a></li>
-<li class="toctree-l1"><a class="reference internal" href="dist_pipeline_parallel_tutorial.html">Distributed Pipeline Parallelism Using RPC</a></li>
-<li class="toctree-l1"><a class="reference internal" href="rpc_async_execution.html">Implementing Batch RPC Processing Using Asynchronous Executions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../advanced/rpc_ddp_tutorial.html">분산 데이터 병렬(DDP)과 분산 RPC 프레임워크 결합</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../advanced/ddp_pipeline.html">분산 데이터 병렬 처리와 병렬 처리 파이프라인을 사용한 트랜스포머 모델 학습</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../advanced/generic_join.html">Distributed Training with Uneven Inputs Using the Join Context Manager</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">Edge with ExecuTorch</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/executorch/stable/tutorials/export-to-executorch-tutorial.html">Exporting to ExecuTorch Tutorial</a></li>
-<li class="toctree-l1"><a class="reference external" href=" https://pytorch.org/executorch/stable/running-a-model-cpp-tutorial.html">Running an ExecuTorch Model in C++ Tutorial</a></li>
-<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/executorch/stable/tutorials/sdk-integration-tutorial.html">Using the ExecuTorch SDK to Profile a Model</a></li>
-<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/executorch/stable/demo-apps-ios.html">Building an ExecuTorch iOS Demo App</a></li>
-<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/executorch/stable/demo-apps-android.html">Building an ExecuTorch Android Demo App</a></li>
-<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/executorch/stable/examples-end-to-end-to-lower-model-to-delegate.html">Lowering a Model as a Delegate</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">추천 시스템</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="torchrec_tutorial.html">TorchRec 소개</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../advanced/sharding.html">Exploring TorchRec sharding</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">Multimodality</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../beginner/flava_finetuning_tutorial.html">TorchMultimodal 튜토리얼: FLAVA 미세조정</a></li>
-</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
 
-            
-          
-        </div>
+
       </div>
-    </nav>
-
-    <div class="pytorch-container">
-      <div class="pytorch-page-level-bar" id="pytorch-page-level-bar">
-        <div class="pytorch-breadcrumbs-wrapper">
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
-  <ul class="pytorch-breadcrumbs">
-    
-      <li>
-        <a href="../index.html">
-          
-            Tutorials
-          
-        </a> &gt;
-      </li>
-
+      
+      <main id="main-content" class="bd-main" role="main">
         
-      <li>Fusing Convolution and Batch Norm using Custom Function</li>
-    
-    
-      <li class="pytorch-breadcrumbs-aside">
         
-            
-            <a href="../_sources/intermediate/custom_function_conv_bn_tutorial.rst.txt" rel="nofollow"><img src="../_static/images/view-page-source-icon.svg"></a>
-          
-        
-      </li>
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
     
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../extension.html" class="nav-link">Extension</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">Fusing...</li>
   </ul>
-
+</nav>
+</div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+<div class="rating">
+    Rate this Page
+    <div class="stars">
+        
+        <span class="star" data-behavior="tutorial-rating" data-count="1" data-value="1">★</span>
+        
+        <span class="star" data-behavior="tutorial-rating" data-count="2" data-value="2">★</span>
+        
+        <span class="star" data-behavior="tutorial-rating" data-count="3" data-value="3">★</span>
+        
+        <span class="star" data-behavior="tutorial-rating" data-count="4" data-value="4">★</span>
+        
+        <span class="star" data-behavior="tutorial-rating" data-count="5" data-value="5">★</span>
+        
+    </div>
+</div>
+</div>
+      
+    </div>
   
 </div>
-        </div>
-
-        <div class="pytorch-shortcuts-wrapper" id="pytorch-shortcuts-wrapper">
-          Shortcuts
-        </div>
-      </div>
-
-      <section data-toggle="wy-nav-shift" id="pytorch-content-wrap" class="pytorch-content-wrap">
-        <div class="pytorch-content-left">
-
-        
-
-          <div class="pytorch-call-to-action-links">
-            <div id="tutorial-type">intermediate/custom_function_conv_bn_tutorial</div>
-
-            <div id="google-colab-link">
-              <img class="call-to-action-img" src="../_static/images/pytorch-colab.svg"/>
-              <div class="call-to-action-desktop-view">Run in Google Colab</div>
-              <div class="call-to-action-mobile-view">Colab</div>
-            </div>
-            <div id="download-notebook-link">
-              <img class="call-to-action-notebook-img" src="../_static/images/pytorch-download.svg"/>
-              <div class="call-to-action-desktop-view">Download Notebook</div>
-              <div class="call-to-action-mobile-view">Notebook</div>
-            </div>
-            <div id="github-view-link">
-              <img class="call-to-action-img" src="../_static/images/pytorch-github.svg"/>
-              <div class="call-to-action-desktop-view">View on GitHub</div>
-              <div class="call-to-action-mobile-view">GitHub</div>
-            </div>
-          </div>
-
-        
-
-          
-          <div class="rst-content">
-          
-            <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
-             <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
+</div>
               
+              
+  
+<div id="searchbox"></div>
+  <article class="bd-article" id="pytorch-article">
+    <!-- Hidden breadcrumb schema for SEO only -->
+    <div style="display:none;" itemscope itemtype="https://schema.org/BreadcrumbList">
+      
+      <div itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <link itemprop="item" href="../extension.html">
+        <meta itemprop="name" content="Extension">
+        <meta itemprop="position" content="1">
+      </div>
+      
+      <div itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <meta itemprop="name" content="Fusing Convolution and Batch Norm using Custom Function">
+        <meta itemprop="position" content="2">
+      </div>
+    </div>
+
+    
+    <script>
+      if ((window.location.href.indexOf("/unstable/") != -1) && (window.location.href.indexOf("/unstable/unstable_index") < 1)) {
+        var div = '<div class="prototype-banner"><i class="fa fa-flask" aria-hidden="true"></i> <strong>Unstable feature:</strong> Not typically available in binary distributions like PyPI. Early stage for feedback and testing.</div>'
+        document.addEventListener('DOMContentLoaded', function () {
+          document.getElementById("pytorch-article").insertAdjacentHTML('afterBegin', div);
+        });
+      }
+    </script>
+    
+    
+    <div class="pytorch-call-to-action-links">
+      <div id="tutorial-type">intermediate/custom_function_conv_bn_tutorial</div>
+      <a id="colab-link" data-behavior="call-to-action-event" data-response="Run in Google Colab" target="_blank">
+        <div id="google-colab-link">
+          <img class="call-to-action-img" src="../_static/img/pytorch-colab.svg" />
+          <div class="call-to-action-desktop-view">Run in Google Colab</div>
+          <div class="call-to-action-mobile-view">Colab</div>
+        </div>
+      </a>
+      <a id="notebook-link" data-behavior="call-to-action-event" data-response="Download Notebook">
+        <div id="download-notebook-link">
+          <img class="call-to-action-notebook-img" src="../_static/img/pytorch-download.svg" />
+          <div class="call-to-action-desktop-view">Download Notebook</div>
+          <div class="call-to-action-mobile-view">Notebook</div>
+        </div>
+      </a>
+      <a id="github-link" data-behavior="call-to-action-event" data-response="View on Github" target="_blank">
+        <div id="github-view-link">
+          <img class="call-to-action-img" src="../_static/img/pytorch-github.svg" />
+          <div class="call-to-action-desktop-view">View on GitHub</div>
+          <div class="call-to-action-mobile-view">GitHub</div>
+        </div>
+      </a>
+    </div>
+    
+
+    
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
   <div class="sphx-glr-download-link-note admonition note">
 <p class="admonition-title">참고</p>
-<p>Click <a class="reference internal" href="#sphx-glr-download-intermediate-custom-function-conv-bn-tutorial-py"><span class="std std-ref">here</span></a>
-to download the full example code</p>
+<p><a class="reference internal" href="#sphx-glr-download-intermediate-custom-function-conv-bn-tutorial-py"><span class="std std-ref">Go to the end</span></a>
+to download the full example code.</p>
 </div>
-<div class="sphx-glr-example-title section" id="fusing-convolution-and-batch-norm-using-custom-function">
-<span id="sphx-glr-intermediate-custom-function-conv-bn-tutorial-py"></span><h1>Fusing Convolution and Batch Norm using Custom Function<a class="headerlink" href="#fusing-convolution-and-batch-norm-using-custom-function" title="이 제목에 대한 퍼머링크">¶</a></h1>
+<section class="sphx-glr-example-title" id="fusing-convolution-and-batch-norm-using-custom-function">
+<span id="sphx-glr-intermediate-custom-function-conv-bn-tutorial-py"></span><h1>Fusing Convolution and Batch Norm using Custom Function<a class="headerlink" href="#fusing-convolution-and-batch-norm-using-custom-function" title="Link to this heading">#</a></h1>
 <p>Fusing adjacent convolution and batch norm layers together is typically an
 inference-time optimization to improve run-time. It is usually achieved
 by eliminating the batch norm layer entirely and updating the weight
@@ -472,38 +1502,38 @@ and <cite>groups=1</cite> for Conv2D. For BatchNorm2D, we hardcode <cite>eps=1e-
 is that we add epsilon in the denominator outside of the square root in the computation
 of batch norm.</p>
 <p>[0] <a class="reference external" href="https://nenadmarkus.com/p/fusing-batchnorm-and-conv/">https://nenadmarkus.com/p/fusing-batchnorm-and-conv/</a></p>
-<div class="section" id="backward-formula-implementation-for-convolution">
-<h2>Backward Formula Implementation for Convolution<a class="headerlink" href="#backward-formula-implementation-for-convolution" title="이 제목에 대한 퍼머링크">¶</a></h2>
+<section id="backward-formula-implementation-for-convolution">
+<h2>Backward Formula Implementation for Convolution<a class="headerlink" href="#backward-formula-implementation-for-convolution" title="Link to this heading">#</a></h2>
 <p>Implementing a custom function requires us to implement the backward
 ourselves. In this case, we need both the backward formulas for Conv2D
 and BatchNorm2D. Eventually we’d chain them together in our unified
 backward function, but below we first implement them as their own
 custom functions so we can validate their correctness individually</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">from</span> <span class="nn">torch.autograd.function</span> <span class="kn">import</span> <span class="n">once_differentiable</span>
-<span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="nn">F</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch.autograd.function</span><span class="w"> </span><span class="kn">import</span> <span class="n">once_differentiable</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch.nn.functional</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">F</span>
 
-<span class="k">def</span> <span class="nf">convolution_backward</span><span class="p">(</span><span class="n">grad_out</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">weight</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">convolution_backward</span><span class="p">(</span><span class="n">grad_out</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">weight</span><span class="p">):</span>
     <span class="n">grad_input</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">conv2d</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">grad_out</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
     <span class="n">grad_X</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">conv_transpose2d</span><span class="p">(</span><span class="n">grad_out</span><span class="p">,</span> <span class="n">weight</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">grad_X</span><span class="p">,</span> <span class="n">grad_input</span>
 
-<span class="k">class</span> <span class="nc">Conv2D</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">autograd</span><span class="o">.</span><span class="n">Function</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Conv2D</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">autograd</span><span class="o">.</span><span class="n">Function</span><span class="p">):</span>
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">weight</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">weight</span><span class="p">):</span>
         <span class="n">ctx</span><span class="o">.</span><span class="n">save_for_backward</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">weight</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">conv2d</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">weight</span><span class="p">)</span>
 
     <span class="c1"># Use @once_differentiable by default unless we intend to double backward</span>
     <span class="nd">@staticmethod</span>
     <span class="nd">@once_differentiable</span>
-    <span class="k">def</span> <span class="nf">backward</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">grad_out</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">backward</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">grad_out</span><span class="p">):</span>
         <span class="n">X</span><span class="p">,</span> <span class="n">weight</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">saved_tensors</span>
         <span class="k">return</span> <span class="n">convolution_backward</span><span class="p">(</span><span class="n">grad_out</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">weight</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>When testing with <code class="docutils literal notranslate"><span class="pre">gradcheck</span></code>, it is important to use double precision</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">weight</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">)</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">weight</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">)</span>
 <span class="n">X</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">)</span>
 <span class="n">torch</span><span class="o">.</span><span class="n">autograd</span><span class="o">.</span><span class="n">gradcheck</span><span class="p">(</span><span class="n">Conv2D</span><span class="o">.</span><span class="n">apply</span><span class="p">,</span> <span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">weight</span><span class="p">))</span>
 </pre></div>
@@ -511,19 +1541,19 @@ custom functions so we can validate their correctness individually</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>True
 </pre></div>
 </div>
-</div>
-<div class="section" id="backward-formula-implementation-for-batch-norm">
-<h2>Backward Formula Implementation for Batch Norm<a class="headerlink" href="#backward-formula-implementation-for-batch-norm" title="이 제목에 대한 퍼머링크">¶</a></h2>
+</section>
+<section id="backward-formula-implementation-for-batch-norm">
+<h2>Backward Formula Implementation for Batch Norm<a class="headerlink" href="#backward-formula-implementation-for-batch-norm" title="Link to this heading">#</a></h2>
 <p>Batch Norm has two modes: training and <code class="docutils literal notranslate"><span class="pre">eval</span></code> mode. In training mode
 the sample statistics are a function of the inputs. In <code class="docutils literal notranslate"><span class="pre">eval</span></code> mode,
 we use the saved running statistics, which are not a function of the inputs.
 This makes non-training mode’s backward significantly simpler. Below
 we implement and test only the training mode case.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">unsqueeze_all</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">unsqueeze_all</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
     <span class="c1"># Helper function to ``unsqueeze`` all the dimensions that we reduce over</span>
     <span class="k">return</span> <span class="n">t</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
 
-<span class="k">def</span> <span class="nf">batch_norm_backward</span><span class="p">(</span><span class="n">grad_out</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="nb">sum</span><span class="p">,</span> <span class="n">sqrt_var</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">eps</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">batch_norm_backward</span><span class="p">(</span><span class="n">grad_out</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="nb">sum</span><span class="p">,</span> <span class="n">sqrt_var</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">eps</span><span class="p">):</span>
     <span class="c1"># We use the formula: ``out = (X - mean(X)) / (sqrt(var(X)) + eps)``</span>
     <span class="c1"># in batch norm 2D forward. To simplify our derivation, we follow the</span>
     <span class="c1"># chain rule and compute the gradients as follows before accumulating</span>
@@ -557,9 +1587,9 @@ we implement and test only the training mode case.</p>
     <span class="n">grad_input</span> <span class="o">/=</span> <span class="n">unsqueeze_all</span><span class="p">(</span><span class="n">sqrt_var</span> <span class="o">+</span> <span class="n">eps</span><span class="p">)</span>  <span class="c1"># ``sqrt_var + eps &gt; 0!``</span>
     <span class="k">return</span> <span class="n">grad_input</span>
 
-<span class="k">class</span> <span class="nc">BatchNorm</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">autograd</span><span class="o">.</span><span class="n">Function</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">BatchNorm</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">autograd</span><span class="o">.</span><span class="n">Function</span><span class="p">):</span>
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">eps</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">eps</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">):</span>
         <span class="c1"># Don&#39;t save ``keepdim`` values for backward</span>
         <span class="nb">sum</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
         <span class="n">var</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">unbiased</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
@@ -578,30 +1608,30 @@ we implement and test only the training mode case.</p>
 
     <span class="nd">@staticmethod</span>
     <span class="nd">@once_differentiable</span>
-    <span class="k">def</span> <span class="nf">backward</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">grad_out</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">backward</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">grad_out</span><span class="p">):</span>
         <span class="n">X</span><span class="p">,</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">saved_tensors</span>
         <span class="k">return</span> <span class="n">batch_norm_backward</span><span class="p">(</span><span class="n">grad_out</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">ctx</span><span class="o">.</span><span class="n">sum</span><span class="p">,</span> <span class="n">ctx</span><span class="o">.</span><span class="n">sqrt_var</span><span class="p">,</span> <span class="n">ctx</span><span class="o">.</span><span class="n">N</span><span class="p">,</span> <span class="n">ctx</span><span class="o">.</span><span class="n">eps</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Testing with <code class="docutils literal notranslate"><span class="pre">gradcheck</span></code></p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">a</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">)</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">a</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">)</span>
 <span class="n">torch</span><span class="o">.</span><span class="n">autograd</span><span class="o">.</span><span class="n">gradcheck</span><span class="p">(</span><span class="n">BatchNorm</span><span class="o">.</span><span class="n">apply</span><span class="p">,</span> <span class="p">(</span><span class="n">a</span><span class="p">,),</span> <span class="n">fast_mode</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>True
 </pre></div>
 </div>
-</div>
-<div class="section" id="fusing-convolution-and-batchnorm">
-<h2>Fusing Convolution and BatchNorm<a class="headerlink" href="#fusing-convolution-and-batchnorm" title="이 제목에 대한 퍼머링크">¶</a></h2>
+</section>
+<section id="fusing-convolution-and-batchnorm">
+<h2>Fusing Convolution and BatchNorm<a class="headerlink" href="#fusing-convolution-and-batchnorm" title="Link to this heading">#</a></h2>
 <p>Now that the bulk of the work has been done, we can combine
 them together. Note that in (1) we only save a single buffer
 for backward, but this also means we recompute convolution forward
 in (5). Also see that in (2), (3), (4), and (6), it’s the same
 exact code as the examples above.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">FusedConvBN2DFunction</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">autograd</span><span class="o">.</span><span class="n">Function</span><span class="p">):</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">FusedConvBN2DFunction</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">autograd</span><span class="o">.</span><span class="n">Function</span><span class="p">):</span>
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">conv_weight</span><span class="p">,</span> <span class="n">eps</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">conv_weight</span><span class="p">,</span> <span class="n">eps</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">):</span>
         <span class="k">assert</span> <span class="n">X</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">4</span>  <span class="c1"># N, C, H, W</span>
         <span class="c1"># (1) Only need to save this single buffer for backward!</span>
         <span class="n">ctx</span><span class="o">.</span><span class="n">save_for_backward</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">conv_weight</span><span class="p">)</span>
@@ -627,7 +1657,7 @@ exact code as the examples above.</p>
         <span class="k">return</span> <span class="n">out</span>
 
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">backward</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">grad_out</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">backward</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">grad_out</span><span class="p">):</span>
         <span class="n">X</span><span class="p">,</span> <span class="n">conv_weight</span><span class="p">,</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">saved_tensors</span>
         <span class="c1"># (4) Batch norm backward</span>
         <span class="c1"># (5) We need to recompute conv</span>
@@ -641,11 +1671,11 @@ exact code as the examples above.</p>
 </div>
 <p>The next step is to wrap our functional variant in a stateful
 <cite>nn.Module</cite></p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
-<span class="kn">import</span> <span class="nn">math</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">torch.nn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nn</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
 
-<span class="k">class</span> <span class="nc">FusedConvBN</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">in_channels</span><span class="p">,</span> <span class="n">out_channels</span><span class="p">,</span> <span class="n">kernel_size</span><span class="p">,</span> <span class="n">exp_avg_factor</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">FusedConvBN</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">in_channels</span><span class="p">,</span> <span class="n">out_channels</span><span class="p">,</span> <span class="n">kernel_size</span><span class="p">,</span> <span class="n">exp_avg_factor</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
                  <span class="n">eps</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">FusedConvBN</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="n">factory_kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;device&#39;</span><span class="p">:</span> <span class="n">device</span><span class="p">,</span> <span class="s1">&#39;dtype&#39;</span><span class="p">:</span> <span class="n">dtype</span><span class="p">}</span>
@@ -659,15 +1689,15 @@ exact code as the examples above.</p>
         <span class="c1"># Initialize</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">reset_parameters</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">FusedConvBN2DFunction</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv_weight</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">reset_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">reset_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">nn</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">kaiming_uniform_</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conv_weight</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span>
 </pre></div>
 </div>
 <p>Use <code class="docutils literal notranslate"><span class="pre">gradcheck</span></code> to validate the correctness of our backward formula</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">weight</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">)</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">weight</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">)</span>
 <span class="n">X</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">)</span>
 <span class="n">torch</span><span class="o">.</span><span class="n">autograd</span><span class="o">.</span><span class="n">gradcheck</span><span class="p">(</span><span class="n">FusedConvBN2DFunction</span><span class="o">.</span><span class="n">apply</span><span class="p">,</span> <span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">weight</span><span class="p">))</span>
 </pre></div>
@@ -675,21 +1705,21 @@ exact code as the examples above.</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>True
 </pre></div>
 </div>
-</div>
-<div class="section" id="testing-out-our-new-layer">
-<h2>Testing out our new Layer<a class="headerlink" href="#testing-out-our-new-layer" title="이 제목에 대한 퍼머링크">¶</a></h2>
+</section>
+<section id="testing-out-our-new-layer">
+<h2>Testing out our new Layer<a class="headerlink" href="#testing-out-our-new-layer" title="Link to this heading">#</a></h2>
 <p>Use <code class="docutils literal notranslate"><span class="pre">FusedConvBN</span></code> to train a basic network
 The code below is after some light modifications to the example here:
-<a class="reference external" href="https://github.com/pytorch/examples/tree/master/mnist">https://github.com/pytorch/examples/tree/master/mnist</a></p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch.optim</span> <span class="k">as</span> <span class="nn">optim</span>
-<span class="kn">from</span> <span class="nn">torchvision</span> <span class="kn">import</span> <span class="n">datasets</span><span class="p">,</span> <span class="n">transforms</span>
-<span class="kn">from</span> <span class="nn">torch.optim.lr_scheduler</span> <span class="kn">import</span> <span class="n">StepLR</span>
+<a class="github reference external" href="https://github.com/pytorch/examples/tree/master/mnist">pytorch/examples</a></p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">torch.optim</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">optim</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torchvision</span><span class="w"> </span><span class="kn">import</span> <span class="n">datasets</span><span class="p">,</span> <span class="n">transforms</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch.optim.lr_scheduler</span><span class="w"> </span><span class="kn">import</span> <span class="n">StepLR</span>
 
 <span class="c1"># Record memory allocated at the end of the forward pass</span>
 <span class="n">memory_allocated</span> <span class="o">=</span> <span class="p">[[],[]]</span>
 
-<span class="k">class</span> <span class="nc">Net</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fused</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Net</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fused</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">Net</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fused</span> <span class="o">=</span> <span class="n">fused</span>
         <span class="k">if</span> <span class="n">fused</span><span class="p">:</span>
@@ -704,7 +1734,7 @@ The code below is after some light modifications to the example here:
         <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fc2</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fused</span><span class="p">:</span>
             <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">convbn1</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -731,7 +1761,7 @@ The code below is after some light modifications to the example here:
             <span class="n">memory_allocated</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">memory_allocated</span><span class="p">())</span>
         <span class="k">return</span> <span class="n">output</span>
 
-<span class="k">def</span> <span class="nf">train</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">device</span><span class="p">,</span> <span class="n">train_loader</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">epoch</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">train</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">device</span><span class="p">,</span> <span class="n">train_loader</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">epoch</span><span class="p">):</span>
     <span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">batch_idx</span><span class="p">,</span> <span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">train_loader</span><span class="p">):</span>
         <span class="n">data</span><span class="p">,</span> <span class="n">target</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">),</span> <span class="n">target</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
@@ -745,7 +1775,7 @@ The code below is after some light modifications to the example here:
                 <span class="n">epoch</span><span class="p">,</span> <span class="n">batch_idx</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">train_loader</span><span class="o">.</span><span class="n">dataset</span><span class="p">),</span>
                 <span class="mf">100.</span> <span class="o">*</span> <span class="n">batch_idx</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">train_loader</span><span class="p">),</span> <span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()))</span>
 
-<span class="k">def</span> <span class="nf">test</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">device</span><span class="p">,</span> <span class="n">test_loader</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">test</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">device</span><span class="p">,</span> <span class="n">test_loader</span><span class="p">):</span>
     <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
     <span class="n">test_loss</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">correct</span> <span class="o">=</span> <span class="mi">0</span>
@@ -790,9 +1820,9 @@ The code below is after some light modifications to the example here:
 <span class="n">test_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="n">dataset2</span><span class="p">,</span> <span class="o">**</span><span class="n">test_kwargs</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="a-comparison-of-memory-usage">
-<h2>A Comparison of Memory Usage<a class="headerlink" href="#a-comparison-of-memory-usage" title="이 제목에 대한 퍼머링크">¶</a></h2>
+</section>
+<section id="a-comparison-of-memory-usage">
+<h2>A Comparison of Memory Usage<a class="headerlink" href="#a-comparison-of-memory-usage" title="Link to this heading">#</a></h2>
 <p>If CUDA is enabled, print out memory usage for both <cite>fused=True</cite> and <cite>fused=False</cite>
 For an example run on NVIDIA GeForce RTX 3070, NVIDIA CUDA® Deep Neural Network library (cuDNN) 8.0.5: fused peak memory: 1.56GB,
 unfused peak memory: 2.68GB</p>
@@ -800,12 +1830,12 @@ unfused peak memory: 2.68GB</p>
 the specific cuDNN convolution algorithm used. For shallower models, it
 may be possible for the peak memory allocated of the fused model to exceed
 that of the unfused model! This is because the memory allocated to compute
-certain cuDNN convolution algorithms can be high enough to 《hide》 the typical peak
+certain cuDNN convolution algorithms can be high enough to “hide” the typical peak
 you would expect to be near the start of the backward pass.</p>
 <p>For this reason, we also record and display the memory allocated at the end
 of the forward pass as an approximation, and to demonstrate that we indeed
 allocate one fewer buffer per fused <code class="docutils literal notranslate"><span class="pre">conv-bn</span></code> pair.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">statistics</span> <span class="kn">import</span> <span class="n">mean</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">statistics</span><span class="w"> </span><span class="kn">import</span> <span class="n">mean</span>
 
 <span class="n">torch</span><span class="o">.</span><span class="n">backends</span><span class="o">.</span><span class="n">cudnn</span><span class="o">.</span><span class="n">enabled</span> <span class="o">=</span> <span class="kc">True</span>
 
@@ -834,369 +1864,374 @@ allocate one fewer buffer per fused <code class="docutils literal notranslate"><
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Train Epoch: 0 [0/60000 (0%)]   Loss: 2.348850
-Train Epoch: 0 [4096/60000 (7%)]        Loss: 7.906021
-Train Epoch: 0 [8192/60000 (13%)]       Loss: 3.857706
-Train Epoch: 0 [12288/60000 (20%)]      Loss: 2.177949
-Train Epoch: 0 [16384/60000 (27%)]      Loss: 1.888906
-Train Epoch: 0 [20480/60000 (33%)]      Loss: 1.741984
-Train Epoch: 0 [24576/60000 (40%)]      Loss: 1.593562
-Train Epoch: 0 [28672/60000 (47%)]      Loss: 1.549365
-Train Epoch: 0 [32768/60000 (53%)]      Loss: 1.189117
-Train Epoch: 0 [36864/60000 (60%)]      Loss: 1.088713
-Train Epoch: 0 [40960/60000 (67%)]      Loss: 1.633564
-Train Epoch: 0 [45056/60000 (73%)]      Loss: 1.097910
-Train Epoch: 0 [49152/60000 (80%)]      Loss: 1.063664
-Train Epoch: 0 [53248/60000 (87%)]      Loss: 0.828660
-Train Epoch: 0 [57344/60000 (93%)]      Loss: 0.737435
+Train Epoch: 0 [4096/60000 (7%)]        Loss: 7.906074
+Train Epoch: 0 [8192/60000 (13%)]       Loss: 3.857540
+Train Epoch: 0 [12288/60000 (20%)]      Loss: 2.177558
+Train Epoch: 0 [16384/60000 (27%)]      Loss: 1.891017
+Train Epoch: 0 [20480/60000 (33%)]      Loss: 1.749072
+Train Epoch: 0 [24576/60000 (40%)]      Loss: 1.587020
+Train Epoch: 0 [28672/60000 (47%)]      Loss: 1.613566
+Train Epoch: 0 [32768/60000 (53%)]      Loss: 1.389549
+Train Epoch: 0 [36864/60000 (60%)]      Loss: 1.317061
+Train Epoch: 0 [40960/60000 (67%)]      Loss: 1.143426
+Train Epoch: 0 [45056/60000 (73%)]      Loss: 1.298188
+Train Epoch: 0 [49152/60000 (80%)]      Loss: 1.011069
+Train Epoch: 0 [53248/60000 (87%)]      Loss: 0.872763
+Train Epoch: 0 [57344/60000 (93%)]      Loss: 0.875241
 
-Test set: Average loss: 0.4129, Accuracy: 8781/10000 (88%)
+Test set: Average loss: 0.4827, Accuracy: 8536/10000 (85%)
 
 Train Epoch: 0 [0/60000 (0%)]   Loss: 2.349131
-Train Epoch: 0 [4096/60000 (7%)]        Loss: 7.946099
-Train Epoch: 0 [8192/60000 (13%)]       Loss: 3.233133
-Train Epoch: 0 [12288/60000 (20%)]      Loss: 2.598296
-Train Epoch: 0 [16384/60000 (27%)]      Loss: 1.940175
-Train Epoch: 0 [20480/60000 (33%)]      Loss: 2.434550
-Train Epoch: 0 [24576/60000 (40%)]      Loss: 2.062638
-Train Epoch: 0 [28672/60000 (47%)]      Loss: 1.703422
-Train Epoch: 0 [32768/60000 (53%)]      Loss: 1.362726
-Train Epoch: 0 [36864/60000 (60%)]      Loss: 1.308855
-Train Epoch: 0 [40960/60000 (67%)]      Loss: 1.250186
-Train Epoch: 0 [45056/60000 (73%)]      Loss: 0.931947
-Train Epoch: 0 [49152/60000 (80%)]      Loss: 0.853111
-Train Epoch: 0 [53248/60000 (87%)]      Loss: 0.883910
-Train Epoch: 0 [57344/60000 (93%)]      Loss: 0.970279
+Train Epoch: 0 [4096/60000 (7%)]        Loss: 7.946092
+Train Epoch: 0 [8192/60000 (13%)]       Loss: 3.233117
+Train Epoch: 0 [12288/60000 (20%)]      Loss: 2.598350
+Train Epoch: 0 [16384/60000 (27%)]      Loss: 1.939522
+Train Epoch: 0 [20480/60000 (33%)]      Loss: 2.497825
+Train Epoch: 0 [24576/60000 (40%)]      Loss: 1.971835
+Train Epoch: 0 [28672/60000 (47%)]      Loss: 1.622973
+Train Epoch: 0 [32768/60000 (53%)]      Loss: 1.307358
+Train Epoch: 0 [36864/60000 (60%)]      Loss: 1.211977
+Train Epoch: 0 [40960/60000 (67%)]      Loss: 1.285530
+Train Epoch: 0 [45056/60000 (73%)]      Loss: 1.358958
+Train Epoch: 0 [49152/60000 (80%)]      Loss: 1.407919
+Train Epoch: 0 [53248/60000 (87%)]      Loss: 0.984275
+Train Epoch: 0 [57344/60000 (93%)]      Loss: 0.793069
 
-Test set: Average loss: 0.5670, Accuracy: 8066/10000 (81%)
+Test set: Average loss: 0.5630, Accuracy: 8323/10000 (83%)
 
-cuDNN version: 8902
+cuDNN version: 91002
 
 Peak memory allocated:
-fused: 4.27GB, unfused: 1.49GB
+fused: 1.99GB, unfused: 1.54GB
 Memory allocated at end of forward pass:
-fused: 0.59GB, unfused: 0.96GB
+fused: 0.63GB, unfused: 1.01GB
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  11.177 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 17.054 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-intermediate-custom-function-conv-bn-tutorial-py">
-<div class="sphx-glr-download sphx-glr-download-python docutils container">
-<p><a class="reference download internal" download="" href="../_downloads/187aea79daf1552dd05cdde1f4b4e34d/custom_function_conv_bn_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">custom_function_conv_bn_tutorial.py</span></code></a></p>
-</div>
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/e42651bf8aa9a118fc1867c909799393/custom_function_conv_bn_tutorial.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">custom_function_conv_bn_tutorial.ipynb</span></code></a></p>
 </div>
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/187aea79daf1552dd05cdde1f4b4e34d/custom_function_conv_bn_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">custom_function_conv_bn_tutorial.py</span></code></a></p>
 </div>
-<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+<div class="sphx-glr-download sphx-glr-download-zip docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/ece2140454444fcab89059884b672a81/custom_function_conv_bn_tutorial.zip"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">zipped:</span> <span class="pre">custom_function_conv_bn_tutorial.zip</span></code></a></p>
 </div>
 </div>
+</section>
+</section>
 
 
-             </article>
-             
-            </div>
-            <footer>
+                </article>
+              
+  </article>
   
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="../advanced/cpp_extension.html" class="btn btn-neutral float-right" title="Custom C++ and CUDA Extensions" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
-      
-      
-        <a href="custom_function_double_backward_tutorial.html" class="btn btn-neutral" title="Double Backward with Custom Functions" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
-      
+              
+              
+                <footer class="bd-footer-article">
+                  <div class="footer-article-items footer-article__inner">
+  
+    <div class="footer-article-item">
+<div class="feedback">
+  
+<div class="rating">
+    Rate this Page
+    <div class="stars">
+        
+        <span class="star" data-behavior="tutorial-rating" data-count="1" data-value="1">★</span>
+        
+        <span class="star" data-behavior="tutorial-rating" data-count="2" data-value="2">★</span>
+        
+        <span class="star" data-behavior="tutorial-rating" data-count="3" data-value="3">★</span>
+        
+        <span class="star" data-behavior="tutorial-rating" data-count="4" data-value="4">★</span>
+        
+        <span class="star" data-behavior="tutorial-rating" data-count="5" data-value="5">★</span>
+        
     </div>
-  
+</div>
 
-  
-    <hr class="community-hr hr-top" />
-    <div class="community-container">
-      <div class="community-prompt">더 궁금하시거나 개선할 내용이 있으신가요? 커뮤니티에 참여해보세요!</div>
-      <div class="community-link"><a href="https://discuss.pytorch.kr/" aria-label="PyTorchKoreaCommunity">한국어 커뮤니티 바로가기</a></div>
-    </div>
-    <hr class="community-hr hr-bottom"/>
-
-    <hr class="rating-hr hr-top" />
-    <div class="rating-container">
-      <div class="rating-prompt">이 튜토리얼이 어떠셨나요? 평가해주시면 이후 개선에 참고하겠습니다! :)</div>
-      <div class="stars-outer">
-        <i class="far fa-star" title="1 Star" data-behavior="tutorial-rating" data-count="1"></i>
-        <i class="far fa-star" title="2 Stars" data-behavior="tutorial-rating" data-count="2"></i>
-        <i class="far fa-star" title="3 Stars" data-behavior="tutorial-rating" data-count="3"></i>
-        <i class="far fa-star" title="4 Stars" data-behavior="tutorial-rating" data-count="4"></i>
-        <i class="far fa-star" title="5 Stars" data-behavior="tutorial-rating" data-count="5"></i>
-      </div>
-    </div>
-    <hr class="rating-hr hr-bottom"/>
-  
-
-  <div role="contentinfo">
-    <p>
-        &copy; Copyright 2018-2024, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorch Korea User Group).
-
-    </p>
+  <div class="feedback-send">
+    <button class="feedback-btn"
+            onclick="openGitHubIssue()"
+            data-bs-title="Create a GitHub Issue"
+            data-bs-placement="bottom"
+            data-bs-toggle="tooltip"
+            data-gtm="feedback-btn-click">Send Feedback
+    </button>
   </div>
-    
-      <div>
-        Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
-      </div>
-     
+</div>
 
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="custom_function_double_backward_tutorial.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">이전</p>
+        <p class="prev-next-title">Double Backward with Custom Functions</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../advanced/dispatcher.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">다음</p>
+        <p class="prev-next-title">Registering a Dispatched Operator in C++</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+
+<div class="footer-info">
+  <p class="copyright">
+    
+      
+        © Copyright 2018-2025, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorchKR).
+      
+      <br/>
+    
+  </p>
+
+  <p class="theme-version">
+    Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.4.
+  </p>
+</div>
+</div>
+  
+</div>
+                </footer>
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="custom_function_double_backward_tutorial.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">이전</p>
+        <p class="prev-next-title">Double Backward with Custom Functions</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../advanced/dispatcher.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">다음</p>
+        <p class="prev-next-title">Registering a Dispatched Operator in C++</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc">
+<div class="sidebar-secondary-items sidebar-secondary__inner">
+    
+       <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#backward-formula-implementation-for-convolution">Backward Formula Implementation for Convolution</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#backward-formula-implementation-for-batch-norm">Backward Formula Implementation for Batch Norm</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#fusing-convolution-and-batchnorm">Fusing Convolution and BatchNorm</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#testing-out-our-new-layer">Testing out our new Layer</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#a-comparison-of-memory-usage">A Comparison of Memory Usage</a></li>
+</ul>
+  </nav></div>
+    
+
+
+
+
+<div class="sidebar-secondary-item">
+  <div class="sidebar-heading">PyTorch Libraries</div>
+  <ul style="list-style-type: none; padding: 0; padding-bottom: 80px;">
+  
+   <li><a class="nav-link nav-external" href="https://docs.pytorch.org/ao" style="color: var(--pst-color-text-muted)">torchao</a></li>
+  
+   <li><a class="nav-link nav-external" href="https://docs.pytorch.org/torchrec" style="color: var(--pst-color-text-muted)">torchrec</a></li>
+  
+   <li><a class="nav-link nav-external" href="https://docs.pytorch.org/torchft" style="color: var(--pst-color-text-muted)">torchft</a></li>
+  
+   <li><a class="nav-link nav-external" href="https://docs.pytorch.org/torchcodec" style="color: var(--pst-color-text-muted)">TorchCodec</a></li>
+  
+   <li><a class="nav-link nav-external" href="https://docs.pytorch.org/vision" style="color: var(--pst-color-text-muted)">torchvision</a></li>
+  
+   <li><a class="nav-link nav-external" href="https://docs.pytorch.org/executorch" style="color: var(--pst-color-text-muted)">ExecuTorch</a></li>
+  
+   <li><a class="nav-link nav-external" href="https://docs.pytorch.org/xla" style="color: var(--pst-color-text-muted)">PyTorch on XLA Devices</a></li>
+  
+  </ul>
+</div>
+
+</div>
+</div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <div class="container-fluid docs-tutorials-resources">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-4 text-center">
+        <h2>PyTorchKorea @ GitHub</h2>
+        <p>파이토치 한국 사용자 모임을 GitHub에서 만나보세요.</p>
+        <a class="with-right-arrow" href="https://github.com/PyTorchKorea">GitHub로 이동</a>
+      </div>
+
+      <div class="col-md-4 text-center">
+        <h2>한국어 튜토리얼</h2>
+        <p>한국어로 번역 중인 파이토치 튜토리얼을 만나보세요.</p>
+        <a class="with-right-arrow" href="https://tutorials.pytorch.kr/">튜토리얼로 이동</a>
+      </div>
+
+      <div class="col-md-4 text-center">
+        <h2>한국어 커뮤니티</h2>
+        <p>다른 사용자들과 의견을 나누고, 도와주세요!</p>
+        <a class="with-right-arrow" href="https://discuss.pytorch.kr/">커뮤니티로 이동</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="container footer-container">
+    <div class="footer-logo-wrapper">
+      <a href="https://pytorch.kr/" class="footer-logo"></a>
+    </div>
+
+    <div class="footer-links-wrapper">
+      <div class="footer-links-col">
+        <ul>
+          <li class="list-title"><a href="https://pytorch.kr/">파이토치 한국 사용자 모임</a></li>
+          <li><a href="https://pytorch.kr/about">사용자 모임 소개</a></li>
+          <li><a href="https://pytorch.kr/contributors">기여해주신 분들</a></li>
+          <li><a href="https://pytorch.kr/resources/">리소스</a></li>
+          <li><a href="https://pytorch.kr/coc">행동 강령</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="trademark-disclaimer">
+      <ul>
+        <li>이 사이트는 독립적인 파이토치 사용자 커뮤니티로, 최신 버전이 아니거나 잘못된 내용이 포함되어 있을 수 있습니다. This site is an independent user community and may be out of date or contain incorrect information.</li>
+        <li><a href="https://pytorch.kr/coc">행동 강령</a>을 읽고 지켜주세요. PyTorch 공식 로고 사용 규정은 <a href="https://www.linuxfoundation.org/policies/">Linux Foundation의 정책</a>을 따릅니다. Please read and follow <a href="https://pytorch.kr/coc">our code of conduct</a>. All PyTorch trademark policy applicable to <a href="https://www.linuxfoundation.org/policies/">Linux Foundation's policies</a>.</li>
+      </ul>
+    </div>
+  </div>
 </footer>
 
-          </div>
-<script>
-if((window.location.href.indexOf("/prototype/")!= -1) && (window.location.href.indexOf("/prototype/prototype_index")< 1))
-  {
-    var div = '<div class="admonition note"><p class="admonition-title">Note</p><p><i class="fa fa-flask" aria-hidden="true">&nbsp</i> 이 튜토리얼은 프로토타입(prototype) 기능들에 대해서 설명하고 있습니다. 프로토타입 기능은 일반적으로 피드백 및 테스트용으로, 런타임 플래그 없이는 PyPI나 Conda로 배포되는 바이너리에서는 사용할 수 없습니다.</p></div>'
-    document.getElementById("pytorch-article").insertAdjacentHTML('afterBegin', div)
-  }
-</script>
-        </div>
-
-        <div class="pytorch-content-right" id="pytorch-content-right">
-          <div class="pytorch-right-menu" id="pytorch-right-menu">
-            <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
-              <ul>
-<li><a class="reference internal" href="#">Fusing Convolution and Batch Norm using Custom Function</a><ul>
-<li><a class="reference internal" href="#backward-formula-implementation-for-convolution">Backward Formula Implementation for Convolution</a></li>
-<li><a class="reference internal" href="#backward-formula-implementation-for-batch-norm">Backward Formula Implementation for Batch Norm</a></li>
-<li><a class="reference internal" href="#fusing-convolution-and-batchnorm">Fusing Convolution and BatchNorm</a></li>
-<li><a class="reference internal" href="#testing-out-our-new-layer">Testing out our new Layer</a></li>
-<li><a class="reference internal" href="#a-comparison-of-memory-usage">A Comparison of Memory Usage</a></li>
-</ul>
-</li>
-</ul>
-
-            </div>
-          </div>
-        </div>
-      </section>
-    </div>
-
-  
-
-
-  
-  
-     
-       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-         <script src="../_static/jquery.js"></script>
-         <script src="../_static/underscore.js"></script>
-         <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-         <script src="../_static/doctools.js"></script>
-         <script src="../_static/clipboard.min.js"></script>
-         <script src="../_static/copybutton.js"></script>
-         <script src="../_static/translations.js"></script>
-         <script src="../_static/katex.min.js"></script>
-         <script src="../_static/auto-render.min.js"></script>
-         <script src="../_static/katex_autorenderer.js"></script>
-         <script src="../_static/design-tabs.js"></script>
-     
-  
-
-  <script type="text/javascript" src="../_static/js/vendor/popper.min.js"></script>
-  <script type="text/javascript" src="../_static/js/vendor/bootstrap.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
-  <script type="text/javascript" src="../_static/js/theme.js"></script>
-
-  <script type="text/javascript">
-      jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
-      });
-  </script>
- 
-<script>
-//add microsoft link
-if(window.location.href.indexOf("/beginner/basics/")!= -1)
-{
-  var url="https://docs.microsoft.com/learn/paths/pytorch-fundamentals/?wt.mc_id=aiml-7486-cxa";
-  switch(window.location.pathname.split("/").pop().replace('.html',''))
-  {
-    case"quickstart_tutorial":
-      url="https://docs.microsoft.com/learn/modules/intro-machine-learning-pytorch/9-quickstart?WT.mc_id=aiml-7486-cxa";
-      break;
-    case"tensorqs_tutorial":
-      url="https://docs.microsoft.com/learn/modules/intro-machine-learning-pytorch/2-tensors?WT.mc_id=aiml-7486-cxa";
-      break;
-    case"data_tutorial":
-      url="https://docs.microsoft.com/learn/modules/intro-machine-learning-pytorch/3-data?WT.mc_id=aiml-7486-cxa";
-      break;
-    case"transforms_tutorial":
-      url="https://docs.microsoft.com/learn/modules/intro-machine-learning-pytorch/4-transforms?WT.mc_id=aiml-7486-cxa";
-      break;
-    case"buildmodel_tutorial":
-      url="https://docs.microsoft.com/learn/modules/intro-machine-learning-pytorch/5-model?WT.mc_id=aiml-7486-cxa";
-      break;
-    case"autogradqs_tutorial":
-      url="https://docs.microsoft.com/learn/modules/intro-machine-learning-pytorch/6-autograd?WT.mc_id=aiml-7486-cxa";
-      break;
-    case"optimization_tutorial":
-      url="https://docs.microsoft.com/learn/modules/intro-machine-learning-pytorch/7-optimization?WT.mc_id=aiml-7486-cxa";
-      break;
-    case"saveloadrun_tutorial":
-      url="https://docs.microsoft.com/learn/modules/intro-machine-learning-pytorch/8-inference?WT.mc_id=aiml-7486-cxa";
-    }
-
-    $(".pytorch-call-to-action-links").children().first().before("<a href="+url+' data-behavior="call-to-action-event" data-response="Run in Microsoft Learn" target="_blank"><div id="microsoft-learn-link" style="padding-bottom: 0.625rem;border-bottom: 1px solid #f3f4f7;padding-right: 2.5rem;display: -webkit-box;  display: -ms-flexbox; display: flex; -webkit-box-align: center;-ms-flex-align: center;align-items: center;"><img class="call-to-action-img" src="../../_static/images/microsoft-logo.svg"/><div class="call-to-action-desktop-view">Run in Microsoft Learn</div><div class="call-to-action-mobile-view">Learn</div></div></a>')
-  }
-</script>
-
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-LZRD6GXDLF"></script>
-<script data-cfasync="false">
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-LZRD6GXDLF');   // GA4
-  gtag('config', 'UA-71919972-3');  // UA
-</script>
-
-
-<script data-cfasync="false">
-  $("[data-behavior='call-to-action-event']").on('click', function(){
-    ga('send', {
-      hitType: 'event',
-      eventCategory: $(this).attr("data-response"),
-      eventAction: 'click',
-      eventLabel: window.location.href
-    });
-
-    gtag('event', 'click', {
-      'event_category': $(this).attr("data-response"),
-      'event_label': $("h1").first().text(),
-      'tutorial_link': window.location.href
-    });
-   });
-
-   $("[data-behavior='tutorial-rating']").on('click', function(){
-    gtag('event', 'click', {
-      'event_category': 'Tutorial Rating',
-      'event_label': $("h1").first().text(),
-      'value': $(this).attr("data-count"),
-      'customEvent:Rating': $(this).attr("data-count") // send to GA custom dimension customEvent:Rating.
-    });
-   });
-
-   if (location.pathname == "/") {
-     $(".rating-container").hide();
-     $(".hr-bottom").hide();
-   }
-</script>
-
-<script type="text/javascript">
-  var collapsedSections = ['파이토치(PyTorch) 레시피', '파이토치(PyTorch) 배우기', 'Introduction to PyTorch on YouTube', '이미지/비디오', '오디오', '텍스트', '백엔드', '강화학습', 'PyTorch 모델을 프로덕션 환경에 배포하기', 'PyTorch 프로파일링', 'Code Transforms with FX', '프론트엔드 API', 'PyTorch 확장하기', '모델 최적화', '병렬 및 분산 학습', 'Edge with ExecuTorch', '추천 시스템', 'Multimodality'];
-</script>
-
-
-
-  <!-- Begin Footer -->
-
-  <div class="container-fluid docs-tutorials-resources" id="docs-tutorials-resources">
-    <div class="container">
-      <div class="row">
-        <div class="col-md-4 text-center">
-          <h2>PyTorchKorea @ GitHub</h2>
-          <p>파이토치 한국 사용자 모임을 GitHub에서 만나보세요.</p>
-          <a class="with-right-arrow" href="https://github.com/PyTorchKorea" target="_blank">GitHub로 이동</a>
-        </div>
-
-        <div class="col-md-4 text-center">
-          <h2>한국어 튜토리얼</h2>
-          <p>한국어로 번역 중인 PyTorch 튜토리얼입니다.</p>
-          <a class="with-right-arrow" href="https://tutorials.pytorch.kr/">튜토리얼로 이동</a>
-        </div>
-
-        <div class="col-md-4 text-center">
-          <h2>커뮤니티</h2>
-          <p>다른 사용자들과 의견을 나누고, 도와주세요!</p>
-          <a class="with-right-arrow" href="https://discuss.pytorch.kr/">커뮤니티로 이동</a>
-        </div>
-      </div>
-    </div>
+<div class="cookie-banner-wrapper">
+  <div class="container">
+    <p class="gdpr-notice">To analyze traffic and optimize your experience, we serve cookies on this site. By clicking or navigating, you agree to allow our usage of cookies. As the current maintainers of this site, Facebook’s Cookies Policy applies. Learn more, including about available controls: <a href="https://www.facebook.com/policies/cookies/">Cookies Policy</a>.</p>
+    <img class="close-button" src="../_static/img/pytorch-x.svg">
   </div>
+</div>
+  
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
 
-  <footer class="site-footer">
-    <div class="container footer-container">
-      <div class="footer-logo-wrapper">
-        <a href="https://pytorch.kr/" class="footer-logo"></a>
-      </div>
+  <p class="copyright">
+    
+      © Copyright 2018-2025, PyTorch &amp; 파이토치 한국 사용자 모임(PyTorchKR).
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
 
-      <div class="footer-links-wrapper">
-        <div class="footer-links-col">
-          <ul>
-            <li class="list-title"><a href="https://pytorch.kr/">파이토치 한국 사용자 모임</a></li>
-            <li><a href="https://pytorch.kr//about">사용자 모임 소개</a></li>
-            <li><a href="https://pytorch.kr//about/contributors">기여해주신 분들</a></li>
-            <li><a href="https://pytorch.kr//resources">리소스</a></li>
-            <li><a href="https://pytorch.kr//coc">행동 강령</a></li>
-          </ul>
-        </div>
-      </div>
-      <div class="trademark-disclaimer">
-        <ul>
-          <li>이 사이트는 독립적인 파이토치 사용자 커뮤니티로, 최신 버전이 아니거나 잘못된 내용이 포함되어 있을 수 있습니다. This site is an independent user community and may be out of date or contain incorrect information.</li>
-          <li><a href="https://pytorch.kr/coc">행동 강령</a>을 읽고 지켜주세요. PyTorch 공식 로고 사용 정책은 <a href="https://www.linuxfoundation.org/policies/">Linux Foundation의 정책</a>을 따릅니다. Please read and follow <a href="https://pytorch.kr/coc">our code of conduct</a>. All PyTorch trademark policy applicable to <a href="https://www.linuxfoundation.org/policies/">Linux Foundation's policies</a>.</li>
-        </ul>
-      </div>
+  <p class="sphinx-version">
+    <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6 버전으로 생성되었습니다.
+    <br/>
+  </p>
+</div>
+      
     </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.4.
+</p></div>
+      
+    </div>
+  
+</div>
+
   </footer>
-
-  <!-- End Footer -->
-
-  <!-- Begin Mobile Menu -->
-
-  <div class="mobile-main-menu">
-    <div class="container-fluid">
-      <div class="container">
-        <div class="mobile-main-menu-header-container">
-          <a class="header-logo" href="https://pytorch.kr/" aria-label="PyTorch"></a>
-          <a class="main-menu-close-button" href="#" data-behavior="close-mobile-menu"></a>
-        </div>
-      </div>
-    </div>
-
-    <div class="mobile-main-menu-links-container">
-      <div class="main-menu">
-        <ul>
-          <li>
-            <a href="https://pytorch.kr/get-started">시작하기</a>
-          </li>
-
-          <li class="active">
-            <a href="https://tutorials.pytorch.kr/">튜토리얼</a>
-          </li>
-
-          <li>
-            <a href="https://pytorch.kr/hub">허브</a>
-          </li>
-
-          <li>
-            <a href="https://discuss.pytorch.kr/">커뮤니티</a>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </div>
-
-  <!-- End Mobile Menu -->
-
-  <script type="text/javascript" src="../_static/js/vendor/anchor.min.js"></script>
-
-  <script type="text/javascript">
-    $(document).ready(function() {
-      mobileMenu.bind();
-      mobileTOC.bind();
-      pytorchAnchors.bind();
-      sideMenus.bind();
-      scrollToAnchor.bind();
-      highlightNavigation.bind();
-      mainMenuDropdown.bind();
-      filterTags.bind();
-
-      // Add class to links that have code blocks, since we cannot create links in code blocks
-      $("article.pytorch-article a span.pre").each(function(e) {
-        $(this).closest("a").addClass("has-code");
+  <script type="application/ld+json">
+    {
+       "@context": "https://schema.org",
+       "@type": "Article",
+       "name": "Fusing Convolution and Batch Norm using Custom Function",
+       "headline": "Fusing Convolution and Batch Norm using Custom Function",
+       "description": "PyTorch Documentation. Explore PyTorch, an open-source machine learning library that accelerates the path from research prototyping to production deployment. Discover tutorials, API references, and guides to help you build and deploy deep learning models efficiently.",
+       "url": "/intermediate/custom_function_conv_bn_tutorial.html",
+       "articleBody": "\ucc38\uace0 Go to the end to download the full example code. Fusing Convolution and Batch Norm using Custom Function# Fusing adjacent convolution and batch norm layers together is typically an inference-time optimization to improve run-time. It is usually achieved by eliminating the batch norm layer entirely and updating the weight and bias of the preceding convolution [0]. However, this technique is not applicable for training models. In this tutorial, we will show a different technique to fuse the two layers that can be applied during training. Rather than improved runtime, the objective of this optimization is to reduce memory usage. The idea behind this optimization is to see that both convolution and batch norm (as well as many other ops) need to save a copy of their input during forward for the backward pass. For large batch sizes, these saved inputs are responsible for most of your memory usage, so being able to avoid allocating another input tensor for every convolution batch norm pair can be a significant reduction. In this tutorial, we avoid this extra allocation by combining convolution and batch norm into a single layer (as a custom function). In the forward of this combined layer, we perform normal convolution and batch norm as-is, with the only difference being that we will only save the inputs to the convolution. To obtain the input of batch norm, which is necessary to backward through it, we recompute convolution forward again during the backward pass. It is important to note that the usage of this optimization is situational. Though (by avoiding one buffer saved) we always reduce the memory allocated at the end of the forward pass, there are cases when the peak memory allocated may not actually be reduced. See the final section for more details. For simplicity, in this tutorial we hardcode bias=False, stride=1, padding=0, dilation=1, and groups=1 for Conv2D. For BatchNorm2D, we hardcode eps=1e-3, momentum=0.1, affine=False, and track_running_statistics=False. Another small difference is that we add epsilon in the denominator outside of the square root in the computation of batch norm. [0] https://nenadmarkus.com/p/fusing-batchnorm-and-conv/ Backward Formula Implementation for Convolution# Implementing a custom function requires us to implement the backward ourselves. In this case, we need both the backward formulas for Conv2D and BatchNorm2D. Eventually we\u2019d chain them together in our unified backward function, but below we first implement them as their own custom functions so we can validate their correctness individually import torch from torch.autograd.function import once_differentiable import torch.nn.functional as F def convolution_backward(grad_out, X, weight): grad_input = F.conv2d(X.transpose(0, 1), grad_out.transpose(0, 1)).transpose(0, 1) grad_X = F.conv_transpose2d(grad_out, weight) return grad_X, grad_input class Conv2D(torch.autograd.Function): @staticmethod def forward(ctx, X, weight): ctx.save_for_backward(X, weight) return F.conv2d(X, weight) # Use @once_differentiable by default unless we intend to double backward @staticmethod @once_differentiable def backward(ctx, grad_out): X, weight = ctx.saved_tensors return convolution_backward(grad_out, X, weight) When testing with gradcheck, it is important to use double precision weight = torch.rand(5, 3, 3, 3, requires_grad=True, dtype=torch.double) X = torch.rand(10, 3, 7, 7, requires_grad=True, dtype=torch.double) torch.autograd.gradcheck(Conv2D.apply, (X, weight)) True Backward Formula Implementation for Batch Norm# Batch Norm has two modes: training and eval mode. In training mode the sample statistics are a function of the inputs. In eval mode, we use the saved running statistics, which are not a function of the inputs. This makes non-training mode\u2019s backward significantly simpler. Below we implement and test only the training mode case. def unsqueeze_all(t): # Helper function to ``unsqueeze`` all the dimensions that we reduce over return t[None, :, None, None] def batch_norm_backward(grad_out, X, sum, sqrt_var, N, eps): # We use the formula: ``out = (X - mean(X)) / (sqrt(var(X)) + eps)`` # in batch norm 2D forward. To simplify our derivation, we follow the # chain rule and compute the gradients as follows before accumulating # them all into a final grad_input. # 1) ``grad of out wrt var(X)`` * ``grad of var(X) wrt X`` # 2) ``grad of out wrt mean(X)`` * ``grad of mean(X) wrt X`` # 3) ``grad of out wrt X in the numerator`` * ``grad of X wrt X`` # We then rewrite the formulas to use as few extra buffers as possible tmp = ((X - unsqueeze_all(sum) / N) * grad_out).sum(dim=(0, 2, 3)) tmp *= -1 d_denom = tmp / (sqrt_var + eps)**2 # ``d_denom = -num / denom**2`` # It is useful to delete tensors when you no longer need them with ``del`` # For example, we could\u0027ve done ``del tmp`` here because we won\u0027t use it later # In this case, it\u0027s not a big difference because ``tmp`` only has size of (C,) # The important thing is avoid allocating NCHW-sized tensors unnecessarily d_var = d_denom / (2 * sqrt_var) # ``denom = torch.sqrt(var) + eps`` # Compute ``d_mean_dx`` before allocating the final NCHW-sized grad_input buffer d_mean_dx = grad_out / unsqueeze_all(sqrt_var + eps) d_mean_dx = unsqueeze_all(-d_mean_dx.sum(dim=(0, 2, 3)) / N) # ``d_mean_dx`` has already been reassigned to a C-sized buffer so no need to worry # ``(1) unbiased_var(x) = ((X - unsqueeze_all(mean))**2).sum(dim=(0, 2, 3)) / (N - 1)`` grad_input = X * unsqueeze_all(d_var * N) grad_input += unsqueeze_all(-d_var * sum) grad_input *= 2 / ((N - 1) * N) # (2) mean (see above) grad_input += d_mean_dx # (3) Add \u0027grad_out / \u003cfactor\u003e\u0027 without allocating an extra buffer grad_input *= unsqueeze_all(sqrt_var + eps) grad_input += grad_out grad_input /= unsqueeze_all(sqrt_var + eps) # ``sqrt_var + eps \u003e 0!`` return grad_input class BatchNorm(torch.autograd.Function): @staticmethod def forward(ctx, X, eps=1e-3): # Don\u0027t save ``keepdim`` values for backward sum = X.sum(dim=(0, 2, 3)) var = X.var(unbiased=True, dim=(0, 2, 3)) N = X.numel() / X.size(1) sqrt_var = torch.sqrt(var) ctx.save_for_backward(X) ctx.eps = eps ctx.sum = sum ctx.N = N ctx.sqrt_var = sqrt_var mean = sum / N denom = sqrt_var + eps out = X - unsqueeze_all(mean) out /= unsqueeze_all(denom) return out @staticmethod @once_differentiable def backward(ctx, grad_out): X, = ctx.saved_tensors return batch_norm_backward(grad_out, X, ctx.sum, ctx.sqrt_var, ctx.N, ctx.eps) Testing with gradcheck a = torch.rand(1, 2, 3, 4, requires_grad=True, dtype=torch.double) torch.autograd.gradcheck(BatchNorm.apply, (a,), fast_mode=False) True Fusing Convolution and BatchNorm# Now that the bulk of the work has been done, we can combine them together. Note that in (1) we only save a single buffer for backward, but this also means we recompute convolution forward in (5). Also see that in (2), (3), (4), and (6), it\u2019s the same exact code as the examples above. class FusedConvBN2DFunction(torch.autograd.Function): @staticmethod def forward(ctx, X, conv_weight, eps=1e-3): assert X.ndim == 4 # N, C, H, W # (1) Only need to save this single buffer for backward! ctx.save_for_backward(X, conv_weight) # (2) Exact same Conv2D forward from example above X = F.conv2d(X, conv_weight) # (3) Exact same BatchNorm2D forward from example above sum = X.sum(dim=(0, 2, 3)) var = X.var(unbiased=True, dim=(0, 2, 3)) N = X.numel() / X.size(1) sqrt_var = torch.sqrt(var) ctx.eps = eps ctx.sum = sum ctx.N = N ctx.sqrt_var = sqrt_var mean = sum / N denom = sqrt_var + eps # Try to do as many things in-place as possible # Instead of `out = (X - a) / b`, doing `out = X - a; out /= b` # avoids allocating one extra NCHW-sized buffer here out = X - unsqueeze_all(mean) out /= unsqueeze_all(denom) return out @staticmethod def backward(ctx, grad_out): X, conv_weight, = ctx.saved_tensors # (4) Batch norm backward # (5) We need to recompute conv X_conv_out = F.conv2d(X, conv_weight) grad_out = batch_norm_backward(grad_out, X_conv_out, ctx.sum, ctx.sqrt_var, ctx.N, ctx.eps) # (6) Conv2d backward grad_X, grad_input = convolution_backward(grad_out, X, conv_weight) return grad_X, grad_input, None, None, None, None, None The next step is to wrap our functional variant in a stateful nn.Module import torch.nn as nn import math class FusedConvBN(nn.Module): def __init__(self, in_channels, out_channels, kernel_size, exp_avg_factor=0.1, eps=1e-3, device=None, dtype=None): super(FusedConvBN, self).__init__() factory_kwargs = {\u0027device\u0027: device, \u0027dtype\u0027: dtype} # Conv parameters weight_shape = (out_channels, in_channels, kernel_size, kernel_size) self.conv_weight = nn.Parameter(torch.empty(*weight_shape, **factory_kwargs)) # Batch norm parameters num_features = out_channels self.num_features = num_features self.eps = eps # Initialize self.reset_parameters() def forward(self, X): return FusedConvBN2DFunction.apply(X, self.conv_weight, self.eps) def reset_parameters(self) -\u003e None: nn.init.kaiming_uniform_(self.conv_weight, a=math.sqrt(5)) Use gradcheck to validate the correctness of our backward formula weight = torch.rand(5, 3, 3, 3, requires_grad=True, dtype=torch.double) X = torch.rand(2, 3, 4, 4, requires_grad=True, dtype=torch.double) torch.autograd.gradcheck(FusedConvBN2DFunction.apply, (X, weight)) True Testing out our new Layer# Use FusedConvBN to train a basic network The code below is after some light modifications to the example here: pytorch/examples import torch.optim as optim from torchvision import datasets, transforms from torch.optim.lr_scheduler import StepLR # Record memory allocated at the end of the forward pass memory_allocated = [[],[]] class Net(nn.Module): def __init__(self, fused=True): super(Net, self).__init__() self.fused = fused if fused: self.convbn1 = FusedConvBN(1, 32, 3) self.convbn2 = FusedConvBN(32, 64, 3) else: self.conv1 = nn.Conv2d(1, 32, 3, 1, bias=False) self.bn1 = nn.BatchNorm2d(32, affine=False, track_running_stats=False) self.conv2 = nn.Conv2d(32, 64, 3, 1, bias=False) self.bn2 = nn.BatchNorm2d(64, affine=False, track_running_stats=False) self.fc1 = nn.Linear(9216, 128) self.dropout = nn.Dropout(0.5) self.fc2 = nn.Linear(128, 10) def forward(self, x): if self.fused: x = self.convbn1(x) else: x = self.conv1(x) x = self.bn1(x) F.relu_(x) if self.fused: x = self.convbn2(x) else: x = self.conv2(x) x = self.bn2(x) F.relu_(x) x = F.max_pool2d(x, 2) F.relu_(x) x = x.flatten(1) x = self.fc1(x) x = self.dropout(x) F.relu_(x) x = self.fc2(x) output = F.log_softmax(x, dim=1) if fused: memory_allocated[0].append(torch.cuda.memory_allocated()) else: memory_allocated[1].append(torch.cuda.memory_allocated()) return output def train(model, device, train_loader, optimizer, epoch): model.train() for batch_idx, (data, target) in enumerate(train_loader): data, target = data.to(device), target.to(device) optimizer.zero_grad() output = model(data) loss = F.nll_loss(output, target) loss.backward() optimizer.step() if batch_idx % 2 == 0: print(\u0027Train Epoch: {} [{}/{} ({:.0f}%)]\\tLoss: {:.6f}\u0027.format( epoch, batch_idx * len(data), len(train_loader.dataset), 100. * batch_idx / len(train_loader), loss.item())) def test(model, device, test_loader): model.eval() test_loss = 0 correct = 0 # Use inference mode instead of no_grad, for free improved test-time performance with torch.inference_mode(): for data, target in test_loader: data, target = data.to(device), target.to(device) output = model(data) # sum up batch loss test_loss += F.nll_loss(output, target, reduction=\u0027sum\u0027).item() # get the index of the max log-probability pred = output.argmax(dim=1, keepdim=True) correct += pred.eq(target.view_as(pred)).sum().item() test_loss /= len(test_loader.dataset) print(\u0027\\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\\n\u0027.format( test_loss, correct, len(test_loader.dataset), 100. * correct / len(test_loader.dataset))) use_cuda = torch.cuda.is_available() device = torch.device(\"cuda\" if use_cuda else \"cpu\") train_kwargs = {\u0027batch_size\u0027: 2048} test_kwargs = {\u0027batch_size\u0027: 2048} if use_cuda: cuda_kwargs = {\u0027num_workers\u0027: 1, \u0027pin_memory\u0027: True, \u0027shuffle\u0027: True} train_kwargs.update(cuda_kwargs) test_kwargs.update(cuda_kwargs) transform = transforms.Compose([ transforms.ToTensor(), transforms.Normalize((0.1307,), (0.3081,)) ]) dataset1 = datasets.MNIST(\u0027../data\u0027, train=True, download=True, transform=transform) dataset2 = datasets.MNIST(\u0027../data\u0027, train=False, transform=transform) train_loader = torch.utils.data.DataLoader(dataset1, **train_kwargs) test_loader = torch.utils.data.DataLoader(dataset2, **test_kwargs) A Comparison of Memory Usage# If CUDA is enabled, print out memory usage for both fused=True and fused=False For an example run on NVIDIA GeForce RTX 3070, NVIDIA CUDA\u00ae Deep Neural Network library (cuDNN) 8.0.5: fused peak memory: 1.56GB, unfused peak memory: 2.68GB It is important to note that the peak memory usage for this model may vary depending the specific cuDNN convolution algorithm used. For shallower models, it may be possible for the peak memory allocated of the fused model to exceed that of the unfused model! This is because the memory allocated to compute certain cuDNN convolution algorithms can be high enough to \u201chide\u201d the typical peak you would expect to be near the start of the backward pass. For this reason, we also record and display the memory allocated at the end of the forward pass as an approximation, and to demonstrate that we indeed allocate one fewer buffer per fused conv-bn pair. from statistics import mean torch.backends.cudnn.enabled = True if use_cuda: peak_memory_allocated = [] for fused in (True, False): torch.manual_seed(123456) model = Net(fused=fused).to(device) optimizer = optim.Adadelta(model.parameters(), lr=1.0) scheduler = StepLR(optimizer, step_size=1, gamma=0.7) for epoch in range(1): train(model, device, train_loader, optimizer, epoch) test(model, device, test_loader) scheduler.step() peak_memory_allocated.append(torch.cuda.max_memory_allocated()) torch.cuda.reset_peak_memory_stats() print(\"cuDNN version:\", torch.backends.cudnn.version()) print() print(\"Peak memory allocated:\") print(f\"fused: {peak_memory_allocated[0]/1024**3:.2f}GB, unfused: {peak_memory_allocated[1]/1024**3:.2f}GB\") print(\"Memory allocated at end of forward pass:\") print(f\"fused: {mean(memory_allocated[0])/1024**3:.2f}GB, unfused: {mean(memory_allocated[1])/1024**3:.2f}GB\") Train Epoch: 0 [0/60000 (0%)] Loss: 2.348850 Train Epoch: 0 [4096/60000 (7%)] Loss: 7.906074 Train Epoch: 0 [8192/60000 (13%)] Loss: 3.857540 Train Epoch: 0 [12288/60000 (20%)] Loss: 2.177558 Train Epoch: 0 [16384/60000 (27%)] Loss: 1.891017 Train Epoch: 0 [20480/60000 (33%)] Loss: 1.749072 Train Epoch: 0 [24576/60000 (40%)] Loss: 1.587020 Train Epoch: 0 [28672/60000 (47%)] Loss: 1.613566 Train Epoch: 0 [32768/60000 (53%)] Loss: 1.389549 Train Epoch: 0 [36864/60000 (60%)] Loss: 1.317061 Train Epoch: 0 [40960/60000 (67%)] Loss: 1.143426 Train Epoch: 0 [45056/60000 (73%)] Loss: 1.298188 Train Epoch: 0 [49152/60000 (80%)] Loss: 1.011069 Train Epoch: 0 [53248/60000 (87%)] Loss: 0.872763 Train Epoch: 0 [57344/60000 (93%)] Loss: 0.875241 Test set: Average loss: 0.4827, Accuracy: 8536/10000 (85%) Train Epoch: 0 [0/60000 (0%)] Loss: 2.349131 Train Epoch: 0 [4096/60000 (7%)] Loss: 7.946092 Train Epoch: 0 [8192/60000 (13%)] Loss: 3.233117 Train Epoch: 0 [12288/60000 (20%)] Loss: 2.598350 Train Epoch: 0 [16384/60000 (27%)] Loss: 1.939522 Train Epoch: 0 [20480/60000 (33%)] Loss: 2.497825 Train Epoch: 0 [24576/60000 (40%)] Loss: 1.971835 Train Epoch: 0 [28672/60000 (47%)] Loss: 1.622973 Train Epoch: 0 [32768/60000 (53%)] Loss: 1.307358 Train Epoch: 0 [36864/60000 (60%)] Loss: 1.211977 Train Epoch: 0 [40960/60000 (67%)] Loss: 1.285530 Train Epoch: 0 [45056/60000 (73%)] Loss: 1.358958 Train Epoch: 0 [49152/60000 (80%)] Loss: 1.407919 Train Epoch: 0 [53248/60000 (87%)] Loss: 0.984275 Train Epoch: 0 [57344/60000 (93%)] Loss: 0.793069 Test set: Average loss: 0.5630, Accuracy: 8323/10000 (83%) cuDNN version: 91002 Peak memory allocated: fused: 1.99GB, unfused: 1.54GB Memory allocated at end of forward pass: fused: 0.63GB, unfused: 1.01GB Total running time of the script: (0 minutes 17.054 seconds) Download Jupyter notebook: custom_function_conv_bn_tutorial.ipynb Download Python source code: custom_function_conv_bn_tutorial.py Download zipped: custom_function_conv_bn_tutorial.zip",
+       "author": {
+         "@type": "Organization",
+         "name": "PyTorch Contributors",
+         "url": "https://pytorch.org"
+       },
+       "image": "../_static/img/pytorch_seo.png",
+       "mainEntityOfPage": {
+         "@type": "WebPage",
+         "@id": "/intermediate/custom_function_conv_bn_tutorial.html"
+       },
+       "datePublished": "2023-01-01T00:00:00Z",
+       "dateModified": "2023-01-01T00:00:00Z"
+     }
+ </script>
+  <script>
+    // Tutorials Call to action event tracking
+    $("[data-behavior='call-to-action-event']").on('click', function () {
+      fbq('trackCustom', "Download", {
+        tutorialTitle: $('h1:first').text(),
+        downloadLink: this.href,
+        tutorialLink: window.location.href,
+        downloadTitle: $(this).attr("data-response")
       });
-    })
+      if (typeof gtag === 'function') {
+        gtag('event', 'click', {
+          'event_category': $(this).attr("data-response"),
+          'event_label': $("h1").first().text(),
+          'tutorial_link': window.location.href
+        });
+      }
+    });
   </script>
-</body>
+  
+  </body>
 </html>

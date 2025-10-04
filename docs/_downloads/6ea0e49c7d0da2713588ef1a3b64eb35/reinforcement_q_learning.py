@@ -10,6 +10,8 @@
 CartPole-v1 태스크에서 DQN (Deep Q Learning) 에이전트를 학습하는데
 PyTorch를 사용하는 방법을 보여드립니다.
 
+`Deep Q Learning (DQN) <https://arxiv.org/abs/1312.5602>`__ 논문을 읽어보는 것도 도움이 될 수 있습니다.
+
 **태스크**
 
 에이전트는 연결된 막대가 똑바로 서 있도록 카트를 왼쪽이나 오른쪽으로
@@ -80,9 +82,30 @@ if is_ipython:
 
 plt.ion()
 
-# GPU를 사용할 경우
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+# GPU를 사용하는 경우
+device = torch.device(
+    "cuda" if torch.cuda.is_available() else
+    "mps" if torch.backends.mps.is_available() else
+    "cpu"
+)
 
+
+# 학습 중에 재현성(reproducibility)을 보장하기 위해, 아래 코드를 주석 해제하여
+# 무작위 시드 값(random seed)을 고정할 수 있습니다.
+# 이렇게 하면 결과가 일관성있게 유지되며, 디버깅 또는 다른 접근 방법을 비교하는 데 도움이 됩니다.
+#
+# 하지만 무작위성(randomness)을 허용하는 것은 실제로 유용할 수 있습니다,
+# 왜냐하면 모델이 다른 학습 경로를 탐색할 수 있기 때문입니다.
+
+
+# seed = 42
+# random.seed(seed)
+# torch.manual_seed(seed)
+# env.reset(seed=seed)
+# env.action_space.seed(seed)
+# env.observation_space.seed(seed)
+# if torch.cuda.is_available():
+#     torch.cuda.manual_seed(seed)
 
 ######################################################################
 # 재현 메모리(Replay Memory)
@@ -232,13 +255,14 @@ class DQN(nn.Module):
 # EPS_DECAY는 엡실론의 지수 감쇠(exponential decay) 속도 제어하며, 높을수록 감쇠 속도가 느립니다.
 # TAU는 목표 네트워크의 업데이트 속도입니다.
 # LR은 ``AdamW`` 옵티마이저의 학습율(learning rate)입니다.
+
 BATCH_SIZE = 128
 GAMMA = 0.99
 EPS_START = 0.9
-EPS_END = 0.05
-EPS_DECAY = 1000
+EPS_END = 0.01
+EPS_DECAY = 2500
 TAU = 0.005
-LR = 1e-4
+LR = 3e-4
 
 # gym 행동 공간에서 행동의 숫자를 얻습니다.
 n_actions = env.action_space.n
@@ -380,7 +404,7 @@ def optimize_model():
 # 수렴(convergence)이 관찰되지 않으면 학습을 재시작하는 것이 더 나은 결과를 얻을 수 있습니다.
 #
 
-if torch.cuda.is_available():
+if torch.cuda.is_available() or torch.backends.mps.is_available():
     num_episodes = 600
 else:
     num_episodes = 50

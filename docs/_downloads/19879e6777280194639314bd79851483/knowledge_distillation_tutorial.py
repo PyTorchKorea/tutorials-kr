@@ -37,8 +37,10 @@ import torch.optim as optim
 import torchvision.transforms as transforms
 import torchvision.datasets as datasets
 
-# Check if GPU is available, and if not, use the CPU
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+# Check if the current `accelerator <https://pytorch.org/docs/stable/torch.html#accelerators>`__
+# is available, and if not, use the CPU
+device = torch.accelerator.current_accelerator().type if torch.accelerator.is_available() else "cpu"
+print(f"Using {device} device")
 
 ######################################################################
 # Loading CIFAR-10
@@ -352,7 +354,7 @@ print(f"Student accuracy with CE + KD: {test_accuracy_light_ce_and_kd:.2f}%")
 # Cosine loss minimization run
 # ----------------------------
 # Feel free to play around with the temperature parameter that controls the softness of the softmax function and the loss coefficients.
-# In neural networks, it is easy to include to include additional loss functions to the main objectives to achieve goals like better generalization.
+# In neural networks, it is easy to include additional loss functions to the main objectives to achieve goals like better generalization.
 # Let's try including an objective for the student, but now let's focus on their hidden states rather than their output layers.
 # Our goal is to convey information from the teacher's representation to the student by including a naive loss function,
 # whose minimization implies that the flattened vectors that are subsequently passed to the classifiers have become more *similar* as the loss decreases.

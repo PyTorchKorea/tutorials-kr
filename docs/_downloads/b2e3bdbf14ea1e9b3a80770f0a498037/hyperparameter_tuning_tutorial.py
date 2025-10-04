@@ -10,7 +10,7 @@ Ray Tune을 사용한 하이퍼파라미터 튜닝
 
 다행히, 최적의 매개변수 조합을 찾는데 도움이 되는 도구가 있습니다.
 `Ray Tune <https://docs.ray.io/en/latest/tune.html>`_ 은 분산 하이퍼파라미터 튜닝을 위한 업계 표준 도구입니다.
-Ray Tune은 최신 하이퍼파라미터 검색 알고리즘을 포함하고 TensorBoard 및 기타 분석 라이브러리와 통합되며 기본적으로
+Ray Tune은 최신 하이퍼파라미터 검색 알고리즘을 포함하고 다양한 분석 라이브러리와 통합되며 기본적으로
 `Ray 의 분산 기계 학습 엔진 <https://ray.io/>`_ 을 통해 학습을 지원합니다.
 
 이 튜토리얼은 Ray Tune을 파이토치 학습 workflow에 통합하는 방법을 알려줍니다.
@@ -174,7 +174,7 @@ class Net(nn.Module):
 #         inputs, labels = inputs.to(device), labels.to(device)
 #
 # 이 코드는 이제 CPU들, 단일 GPU 및 다중 GPU에 대한 학습을 지원합니다.
-# 특히 Ray는 `fractional-GPU <https://docs.ray.io/en/master/using-ray-with-gpus.html#fractional-gpus>`_ 도 지원하므로
+# 특히 Ray는 `fractional-GPUs <https://docs.ray.io/en/latest/ray-core/scheduling/accelerators.html#fractional-accelerators>`_ 도 지원하므로
 # 모델이 GPU 메모리에 적합한 상황에서는 테스트 간에 GPU를 공유할 수 있습니다. 이는 나중에 다룰 것입니다.
 #
 # Ray Tune으로 통신하기

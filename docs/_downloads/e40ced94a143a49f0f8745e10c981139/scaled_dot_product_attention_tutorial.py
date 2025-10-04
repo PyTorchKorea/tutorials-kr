@@ -110,7 +110,7 @@ with sdpa_kernel(SDPBackend.EFFICIENT_ATTENTION):
 # ~~~~~~~~~~~~~~~~~~
 #
 # 위 셀을 어떤 머신에서 실행했는지와 사용 가능한 하드웨어에 따라 결과가 다를 수 있습니다.
-# - GPU가 없고 CPU에서 실행 중이라면 컨텍스트 매니저는 효과가 없고 세 가지 실행 모두
+# - GPU가 없고 FP32 지원 CPU에서 실행 중이라면 컨텍스트 매니저는 효과가 없고 세 가지 실행 모두
 # 유사한 시간을 반환할 것입니다.
 # - 그래픽 카드가 지원하는 컴퓨팅 능력에 따라 flash attention 또는
 # memory efficient 구현이 동작하지 않을 수 있습니다.
@@ -240,7 +240,7 @@ with sdpa_kernel(SDPBackend.FLASH_ATTENTION):
 
 ######################################################################
 # ``torch.compile`` 과 함께 SDPA 사용하기
-# ============================================
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 # PyTorch 2.0 릴리즈와 함께 ``torch.compile()`` 라는 새로운 기능이 추가되었는데,
 # 이는 eager mode보다 상당한 성능 향상을 제공할 수 있습니다.
@@ -320,7 +320,7 @@ print(prof.key_averages().table(sort_by="cuda_time_total", row_limit=10))
 
 ######################################################################
 # SDPA를 ``atteition.bias`` 하위 클래스와 사용하기
-# ====================================================
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 # PyTorch 2.3부터 텐서 하위 클래스를 포함하는 새로운 서브모듈을 추가했습니다.
 # 추가된 모듈의 이름은 ``torch.nn.attention.bias`` 이며, ``torch.nn.functional.scaled_dot_product_attention``
@@ -389,7 +389,7 @@ out_upper_left = compiled_sdpa(query, key, value, upper_left_bias)
 ######################################################################
 #
 # 결론
-# =======
+# ~~~~~~~~~~~~~
 #
 # 이 튜토리얼에서, ``torch.nn.functional.scaled_dot_product_attention`` 의 기본적인
 # 사용법을 살펴봤습니다. ``sdpa_kernel`` 컨텍스트 매니저로 GPU가 특정 구현을
