@@ -10,7 +10,7 @@ Captum을 사용하여 모델 해석하기
 # Captum을 사용하면 데이터 특징(features)이 모델의 예측 또는 뉴런 활성화에
 # 미치는 영향을 이해하고, 모델의 동작 방식을 알 수 있습니다.
 #
-# 그리고 \ ``Integrated Gradients``\ 와 \ ``Guided GradCam``\ 과 같은
+# 그리고 ``Integrated Gradients`` 와 ``Guided GradCam`` 과 같은
 # 최첨단의 feature attribution 알고리즘을 적용할 수 있습니다.
 #
 # 이 레시피에서는 Captum을 사용하여 다음을 수행하는 방법을 배웁니다:
@@ -61,14 +61,14 @@ input_img = normalize(center_crop(img)).unsqueeze(0)
 
 
 ######################################################################
-# 속성(attribution) 계산하기
+# 속성 계산하기
 # -------------------------------
 
 
 ######################################################################
 # 모델의 top-3 예측 중에는 개와 고양이에 해당하는 클래스 208과 283이 있습니다.
 #
-# Captum의 \ ``Occlusion``\ 알고리즘을 사용하여 각 예측을 입력의 해당 부분에 표시합니다.
+# Captum의 ``Occlusion`` 알고리즘을 사용하여 각 예측을 입력의 해당 부분에 표시합니다.
 
 from captum.attr import Occlusion
 
@@ -95,14 +95,14 @@ attribution_cat = occlusion.attribute(input_img,
 
 
 ######################################################################
-# Captum은 ``Occlusion`` 외에도 \ ``Integrated Gradients``\ , \ ``Deconvolution``\ ,
-# \ ``GuidedBackprop``\ , \ ``Guided GradCam``\ , \ ``DeepLift``\ ,
-# 그리고 \ ``GradientShap``\과 같은 많은 알고리즘을 제공합니다.
-# 이러한 모든 알고리즘은 초기화할 때 모델을 호출 가능한 \ ``forward_func``\ 으로 기대하며
-# 속성(attribution) 결과를 통합해서 반환하는 ``attribute(...)`` 메소드를 가지는
+# Captum은 ``Occlusion`` 외에도 ``Integrated Gradients`` , ``Deconvolution`` ,
+# ``GuidedBackprop`` , ``Guided GradCam`` , ``DeepLift`` ,
+# 그리고 ``GradientShap``과 같은 많은 알고리즘을 제공합니다.
+# 이러한 모든 알고리즘은 초기화할 때 모델을 호출 가능한 ``forward_func`` 으로 기대하며
+# 속성 결과를 통합해서 반환하는 ``attribute(...)`` 메소드를 가지는
 # ``Attribution`` 의 서브클래스 입니다.
 #
-# 이미지인 경우 속성(attribution) 결과를 시각화 해보겠습니다.
+# 이미지인 경우 속성 결과를 시각화 해보겠습니다.
 #
 
 ######################################################################
@@ -111,8 +111,8 @@ attribution_cat = occlusion.attribute(input_img,
 #
 
 ######################################################################
-# Captum의 \ ``visualization``\ 유틸리티는 그림과 텍스트 입력 모두에 대한
-# 속성(attribution) 결과를 시각화 할 수 있는 즉시 사용가능한 방법을 제공합니다.
+# Captum의 ``visualization`` 유틸리티는 그림과 텍스트 입력 모두에 대한
+# 속성 결과를 시각화 할 수 있는 즉시 사용가능한 방법을 제공합니다.
 #
 
 import numpy as np
@@ -148,14 +148,13 @@ _ = viz.visualize_image_attr_multiple(attribution_cat,
 
 ######################################################################
 # 만약 데이터가 텍스트인 경우 ``visualization.visualize_text()`` 는
-# 입력 텍스트 위에 속성(attribution)을 탐색할 수 있는 전용 뷰(view)를 제공합니다.
+# 입력 텍스트 위에 속성을 탐색할 수 있는 전용 뷰(view)를 제공합니다.
 # http://captum.ai/tutorials/IMDB_TorchText_Interpret 에서 자세한 내용을 확인하세요.
 #
 
 ######################################################################
 # 마지막 노트
 # ---------------
-#
 
 
 ######################################################################
