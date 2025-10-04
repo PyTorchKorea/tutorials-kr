@@ -89,6 +89,7 @@
 |method|메소드|장효영|[음차 표기](https://terms.tta.or.kr/dictionary/dictionaryView.do?word_seq=090780-1)|
 |mini-batch|미니 배치|박정환|음차 표기|
 |momentum|모멘텀|박정환|음차 표기|
+|Neural Architecture Search|신경망 구조 탐색|이준혁||
 |normalize|정규화|허남규||
 |NumPy|NumPy|박정환|번역하지 않음|
 |One-Hot|One-Hot|황성수|번역안함|
