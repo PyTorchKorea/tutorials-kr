@@ -100,6 +100,7 @@
 |plotting|도식화|황성수||
 |Production (environment, use)|Production|허남규|번역하지 않음|
 |pruning|가지치기|김지호||
+|perturbation|작은 변화|강호현||
 |rank 0|0-순위|박정환||
 |Read later|더 읽을거리|박정환||
 |recap|요약|박정환||
