@@ -71,6 +71,7 @@
 |Generative|생성 모델|박정환|ToC의 분류명입니다.|
 |Getting Started tutorial|시작하기 튜토리얼|박정환|ToC의 Getting Started를 뜻합니다.|
 |gradient|변화도|박정환||
+|hidden state|은닉 상태|박주혜||
 |Hyperparameter|하이퍼파라미터|김태영|음차 표기|
 |inference|추론|박지은||
 |Image|이미지|박정환|ToC의 분류명입니다.|
