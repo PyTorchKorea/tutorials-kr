@@ -74,7 +74,7 @@ tensor를 재사용할 수 있도록 tensor를 미리 할당하는 것입니다.
     training_step(model, optimizer, data, targets, output, loss);
   }
 
-여기서 ``training_step``은 단순히 해당 옵티마이저 호출과 함께 순전파 및 역전파로 구성됩니다
+여기서 ``training_step`` 은 단순히 해당 옵티마이저 호출과 함께 순전파 및 역전파로 구성됩니다.
 
 .. code-block:: cpp
 
@@ -92,7 +92,7 @@ tensor를 재사용할 수 있도록 tensor를 미리 할당하는 것입니다.
     optimizer.step();
   }
 
-파이토치의 CUDA 그래프 API는 스트림 캡처에 의존하고 있으며, 이 경우 다음처럼 사용됩니다
+파이토치의 CUDA 그래프 API는 스트림 캡처에 의존하고 있으며, 이 경우 다음처럼 사용됩니다.
 
 .. code-block:: cpp
 
@@ -117,12 +117,12 @@ CUDA 라이브러리(CUBLAS와 CUDNN같은)를 준비하는 것이 중요합니�
   }
 
 그래프 캡처에 성공하면 ``training_step(model, optimizer, data, target, output, loss);`` 호출을
-``graph.replay()``로 대체하여 학습 단계를 진행할 수 있습니다.
+``graph.replay()`` 로 대체하여 학습 단계를 진행할 수 있습니다.
 
 훈련 결과
 ----------------
 
-코드를 한 번 살펴보면 그래프가 아닌 일반 훈련에서 다음과 같은 결과를 볼 수 있습니다
+코드를 한 번 살펴보면 그래프가 아닌 일반 훈련에서 다음과 같은 결과를 볼 수 있습니다.
 
 .. code-block:: shell
 
@@ -152,7 +152,7 @@ CUDA 라이브러리(CUBLAS와 CUDNN같은)를 준비하는 것이 중요합니�
   user    0m44.018s
   sys    0m1.116s
 
-CUDA 그래프를 사용한 훈련은 다음과 같은 출력을 생성합니다
+CUDA 그래프를 사용한 훈련은 다음과 같은 출력을 생성합니다.
 
 .. code-block:: shell
 
