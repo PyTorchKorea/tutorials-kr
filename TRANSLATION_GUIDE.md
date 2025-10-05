@@ -117,3 +117,4 @@
 |warmstart|빠르게 시작하기|박정환|Warmstarting Model = 빠르게 모델 시작하기|
 |weight|가중치|박정환||
 |wrapper|래퍼|박정환|음차 표기|
+|automatic mixed precision (AMP)|자동 혼합 정밀도|공지원||
