@@ -1,7 +1,7 @@
 TorchRec 샤딩 방식 살펴보기
 ===========================
 
-이 튜토리얼에서는 ``EmbeddingPlanner``와 ``DistributedModelParallel`` API를 통해 
+이 튜토리얼에서는 ``EmbeddingPlanner`` 와 ``DistributedModelParallel`` API를 통해 
 임베딩 테이블의 샤딩(Sharding) 방식을 다루며, 각기 다른 샤딩 구성을 명시적으로 설정해 봄으로써 
 샤딩 방식에 따른 성능상의 이점을 탐구합니다.
 
@@ -10,7 +10,7 @@ TorchRec 샤딩 방식 살펴보기
 
 필수 요구사항: - python >= 3.7
 
-TorchRec을 사용할 때는 CUDA 환경을 사용하는 것을 강력히 권장합니다. 
+TorchRec을 사용할 때는 CUDA 환경을 사용하는 것을 강력히 권장합니다.   
 CUDA를 사용할 경우: - cuda >= 11.0
 
 .. code:: python
@@ -80,9 +80,7 @@ Colab에서는 런타임이 /usr/lib 폴더에서 공유 라이브러리를 탐�
 임베딩 모델 구성 (Constructing our embedding model)
 --------------------------------
 
-여기에서는
-`EmbeddingBagCollection <https://github.com/facebookresearch/torchrec/blob/main/torchrec/modules/embedding_modules.py#L59>`_을
-사용하여, 여러 개의 임베딩 테이블로 구성된 임베딩 백(embedding bag) 모델을 구축합니다.
+여기에서는 `EmbeddingBagCollection <https://github.com/facebookresearch/torchrec/blob/main/torchrec/modules/embedding_modules.py#L59>`_ 을 사용하여, 여러 개의 임베딩 테이블로 구성된 임베딩 백(embedding bag) 모델을 구축합니다.
 
 이번 예시에서는 4개의 임베딩 백(embedding bag) 으로 구성된 EmbeddingBagCollection (EBC)를 생성합니다.
 테이블은 두 가지 크기로 구분됩니다:
@@ -159,7 +157,7 @@ EBC를 처음 생성할 때 “meta” 디바이스에 할당하는 점에 주�
 
 이 코드에서는 다른 프로세스들과 함께 모델을 공동으로 샤딩하고, 그에 따라 메모리를 적절히 할당합니다.
 먼저 프로세스 그룹을 설정한 뒤, 플래너를 사용해 임베딩 테이블의 배치를 수행하고,
-그 결과를 바탕으로 ``DistributedModelParallel``을 통해 샤딩된 모델을 생성합니다.
+그 결과를 바탕으로 ``DistributedModelParallel`` 을 통해 샤딩된 모델을 생성합니다.
 
 .. code:: python
 
