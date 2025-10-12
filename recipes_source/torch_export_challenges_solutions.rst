@@ -2,59 +2,56 @@ Demonstration of torch.export flow, common challenges and the solutions to addre
 =======================================================================================
 **Authors:** `Ankith Gunapal <https://github.com/agunapal>`__, `Jordi Ramon <https://github.com/JordiFB>`__, `Marcos Carranza <https://github.com/macarran>`__
 
-In the `Introduction to torch.export Tutorial <https://tutorials.pytorch.kr/intermediate/torch_export_tutorial.html>`__ , we learned how to use `torch.export <https://pytorch.org/docs/stable/export.html>`__.
-This tutorial expands on the previous one and explores the process of exporting popular models with code, as well as addresses common challenges that may arise with ``torch.export``.
+`Introduction to torch.export Tutorial <https://tutorials.pytorch.kr/intermediate/torch_export_tutorial.html>`__ 에서, `torch.export <https://pytorch.org/docs/stable/export.html>`__ 할수 있는 방법을 배울 수 있습니다.
+이 튜토리얼은 이전 튜토리얼을 확장하며, 널리 사용되는 모델들을 코드와 함께 내보내는 과정과 ``torch.export``를 사용중 마주칠 수 있는 문제들을 다룹니다.
 
-In this tutorial, you will learn how to export models for these use cases:
+이 튜토리얼은 다음과 같은 사용 사례에 맞게 모델을 내보내는 방법을 배웁니다.
 
-* Video classifier (`MViT <https://pytorch.org/vision/main/models/video_mvit.html>`__)
-* Automatic Speech Recognition (`OpenAI Whisper-Tiny <https://huggingface.co/openai/whisper-tiny>`__)
-* Image Captioning (`BLIP <https://github.com/salesforce/BLIP>`__)
-* Promptable Image Segmentation (`SAM2 <https://ai.meta.com/sam2/>`__)
+* 영상 분류 (`MViT <https://pytorch.org/vision/main/models/video_mvit.html>`__)
+* 자동 음성 인식 (`OpenAI Whisper-Tiny <https://huggingface.co/openai/whisper-tiny>`__)
+* 이미지 캡셔닝 (`BLIP <https://github.com/salesforce/BLIP>`__)
+* 프롬프트 기반 이미지 분할 (`SAM2 <https://ai.meta.com/sam2/>`__)
 
-Each of the four models were chosen to demonstrate unique features of `torch.export`, as well as some practical considerations
-and issues faced in the implementation.
+네 가지 모델 각각은 ``torch.export``의 고유한 기능을 보여주고, 구현 과정에서의 실질적인 고려사항과 발생할 수 있는 문제들을 함께 다루기 위해 선정되었습니다.
 
 Prerequisites
 -------------
 
-* PyTorch 2.4 or later
-* Basic understanding of ``torch.export`` and PyTorch Eager inference.
-
+* PyTorch 2.4 이상 버전
+* ``torch.export`` 및 PyTorch Eager 추론에 대한 기본적인 이해
 
 Key requirement for ``torch.export``: No graph break
 ----------------------------------------------------
 
-`torch.compile <https://tutorials.pytorch.kr/intermediate/torch_compile_tutorial.html>`__ speeds up PyTorch code by using JIT to compile PyTorch code into optimized kernels. It optimizes the given model
-using ``TorchDynamo`` and creates an optimized graph , which is then lowered into the hardware using the backend specified in the API.
-When TorchDynamo encounters unsupported Python features, it breaks the computation graph, lets the default Python interpreter
-handle the unsupported code, and then resumes capturing the graph. This break in the computation graph is called a `graph break <https://tutorials.pytorch.kr/intermediate/torch_compile_tutorial.html#torchdynamo-and-fx-graphs>`__.
+`torch.compile <https://tutorials.pytorch.kr/intermediate/torch_compile_tutorial.html>`__ 은 JIT를 활용해 PyTorch 코드를 최적화된 커널로 컴파일함으로써 실행 속도를 향상시킵니다. 주어진 모델을 ``TorchDynamo``를 활용하여 최적화하고,
+ 최적화된 그래프를 만든 뒤, API에서 지정한 백엔드를 통해 하드웨어에 맞게 실행되도록 변환합니다.
 
-One of the key differences between ``torch.export`` and ``torch.compile`` is that ``torch.export`` doesn’t support graph breaks
-which means that the entire model or part of the model that you are exporting needs to be a single graph. This is because handling graph breaks
-involves interpreting the unsupported operation with default Python evaluation, which is incompatible with what ``torch.export`` is
-designed for. You can read details about the differences between the various PyTorch frameworks in this `link <https://pytorch.org/docs/main/export.html#existing-frameworks>`__
+TorchDynamo가 지원하지 않는 Python의 기능을 만나면, 계산 그래프는 중단하고 해당 코드는 기본 Python 인터프리터가 처리하도록 하고, 그래프 캡쳐를 이어나갑니다.
+이러한 중단된 계산 그래프를 `graph break <https://tutorials.pytorch.kr/intermediate/torch_compile_tutorial.html#torchdynamo-and-fx-graphs>`__ 라고 칭합니다.
 
-You can identify graph breaks in your program by using the following command:
+``torch.export``와 ``torch.compile``의 주요한 차이점 중 하나는 ``torch.export``는 graph breaks를 지원하지 않는다는 것입니다. 즉, 내보내려는 전체 모델 또는 모델의 일부는 단일 그래프 형태여야 합니다.
+이는 graph breaks를 처리하려면 지원되지 않는 연산을 기본 Python으로 평가해야하는데, 이러한 방식이 ``torch.export``의 설계와 호환되지 않기 때문입니다.
+다양한 PyTorch 프레임워크들의 차이점에 대한 세부적인 정보는 `link <https://pytorch.org/docs/main/export.html#existing-frameworks>`__ 에서 확인할 수 있습니다.
+
+아래의 커맨드를 사용해서 프로그램 내의 graph breaks를 확인할 수 있습니다.
 
 .. code:: sh
 
    TORCH_LOGS="graph_breaks" python <file_name>.py
 
-You will need to modify your program to get rid of graph breaks. Once resolved, you are ready to export the model.
-PyTorch runs `nightly benchmarks <https://hud.pytorch.org/benchmark/compilers>`__ for `torch.compile` on popular HuggingFace and TIMM models.
-Most of these models have no graph breaks.
+프로그램 내의 graph breaks을 제거하도록 코드를 수정해야 합니다. 문제가 해결된다면, 모델을 내보낼 준비가 된 것입니다.
+PyTorch는 인기 있는 HuggingFace와 TIMM 모델에서 ``torch.compile``을 위해서 `nightly benchmarks <https://hud.pytorch.org/benchmark/compilers>`__ 를 실행합니다.
+이러한 모델 대부분은 graph breaks가 없습니다.
 
-The models in this recipe have no graph breaks, but fail with `torch.export`.
+해당 레시피에 포함된 모델들은 graph breaks이 없지만, `torch.export` 는 실패합니다.
 
 Video Classification
 --------------------
 
-MViT is a class of models based on `MultiScale Vision Transformers <https://arxiv.org/abs/2104.11227>`__. This model has been trained for video classification using the `Kinetics-400 Dataset <https://arxiv.org/abs/1705.06950>`__.
-This model with a relevant dataset can be used for action recognition in the context of gaming.
+MViT는 `MultiScale Vision Transformers <https://arxiv.org/abs/2104.11227>`__ 을 기반으로한 모델의 클래스입니다. 이 모델은 `Kinetics-400 Dataset <https://arxiv.org/abs/1705.06950>`__ 을 사용하여 사전 훈련된 영상 분류 모델입니다.
+이 모델은 적절한 데이터 셋과 함께 사용한다면, 게임 환경에서의 동작 인식에 활용할 수 있습니다.
 
-
-The code below exports MViT by tracing with ``batch_size=2`` and then checks if the ExportedProgram can run with ``batch_size=4``.
+아래의 코드는 MViT를 ``batch_size=2``로 트레이싱하여 내보내고, 이후 ``batch_size=4``로 내보낸 프로그램이 정상적으로 실행되는지 확인합니다.
 
 .. code:: python
 
@@ -94,16 +91,16 @@ Error: Static batch size
    RuntimeError: Expected input at *args[0].shape[0] to be equal to 2, but got 4
 
 
-By default, the exporting flow will trace the program assuming that all input shapes are static, so if you run the program with
-input shapes that are different than the ones you used while tracing, you will run into an error.
+기본적으로 내보내는 과정에서는 모든 입력 형태가 고정되어 있다고 가정하고 트레이싱한다, 따라서 트레이싱을 할 때 사용한 입력 형태와 다른 형태로 프로그램을 실행하면 오류가 발생합니다.
 
 Solution
 ~~~~~~~~
 
-To address the error, we specify the first dimension of the input (``batch_size``) to be dynamic , specifying the expected range of ``batch_size``.
-In the corrected example shown below, we specify that the expected ``batch_size`` can range from 1 to 16.
-One detail to notice that ``min=2``  is not a bug and is explained in `The 0/1 Specialization Problem <https://docs.google.com/document/d/16VPOa3d-Liikf48teAOmxLc92rgvJdfosIy-yoT38Io/edit?fbclid=IwAR3HNwmmexcitV0pbZm_x1a4ykdXZ9th_eJWK-3hBtVgKnrkmemz6Pm5jRQ#heading=h.ez923tomjvyk>`__. A detailed description of dynamic shapes
-for ``torch.export`` can be found in the export tutorial. The code shown below demonstrates how to export mViT with dynamic batch sizes:
+이 오류를 해결하기 위해, 입력의 첫 번째 차원 (``batch_size``)을 동적으로 지정하고, 허용되는 ``batch_size``의 범위를 지정합니다.
+아래의 수정된 예제에서는, ``batch_size``의 허용 범위를 1부터 16까지로 지정합니다.
+여기서 알려드릴 세부사항은 ``min=2`` 은 버그가 아니라는 것이고 이에 대한 설명은 `The 0/1 Specialization Problem <https://docs.google.com/document/d/16VPOa3d-Liikf48teAOmxLc92rgvJdfosIy-yoT38Io/edit?fbclid=IwAR3HNwmmexcitV0pbZm_x1a4ykdXZ9th_eJWK-3hBtVgKnrkmemz6Pm5jRQ#heading=h.ez923tomjvyk>`__ 문서에서 확인할 수 있습니다.
+또한 ``torch.export``의 동적 입력 형태에 대한 자세한 설명은 export 튜토리얼에서 찾아볼 수 있습니다.
+아래의 코드는 동적 배치 사이즈를 사용하여 mViT를 내보내는 방법을 보여줍니다.
 
 .. code:: python
 
@@ -142,10 +139,9 @@ for ``torch.export`` can be found in the export tutorial. The code shown below d
 Automatic Speech Recognition
 ---------------
 
-**Automatic Speech Recognition** (ASR) is the use of machine learning to transcribe spoken language into text.
-`Whisper <https://arxiv.org/abs/2212.04356>`__ is a Transformer based encoder-decoder model from OpenAI, which was trained on 680k hours of labelled data for ASR and speech translation.
-The code below tries to export ``whisper-tiny`` model for ASR.
-
+자동 음성 인식은 기계학습을 활용하여 음성을 텍스트로 변환하는 기술입니다.
+`Whisper <https://arxiv.org/abs/2212.04356>`__ 는 OpenAI에서 개발한 인코더-디코더 구조의 트랜스포머 모델로, ASR과 음성 번역을 위해 68만 시간의 라벨링된 데이터를 사용해 학습되었습니다.
+아래의 코드로 자동 음성 인식을 위한 ``whisper-tiny`` 모델을 내보낼 수 있습니다.
 
 .. code:: python
 
@@ -175,16 +171,16 @@ Error: strict tracing with TorchDynamo
    torch._dynamo.exc.InternalTorchDynamoError: AttributeError: 'DynamicCache' object has no attribute 'key_cache'
 
 
-By default ``torch.export`` traces your code using `TorchDynamo <https://pytorch.org/docs/stable/torch.compiler_dynamo_overview.html>`__, a byte-code analysis engine,  which symbolically analyzes your code and builds a graph.
-This analysis provides a stronger guarantee about safety but not all Python code is supported. When we export the ``whisper-tiny`` model  using the
-default strict mode, it typically returns an error in Dynamo due to an unsupported feature. To understand why this errors in Dynamo, you can refer to this `GitHub issue <https://github.com/pytorch/pytorch/issues/144906>`__.
+기본적으로 ``torch.export``는 `TorchDynamo <https://pytorch.org/docs/stable/torch.compiler_dynamo_overview.html>`__ 라는 바이트코드 분석 엔진을 사용하여 코드를 처리합니다, 이는 코드를 심볼릭하게 분석하여 그래프를 생성합니다.
+이 분석은 안전성 보장을 강화해주지만, 모든 Python 코드를 지원하는 것은 아닙니다. ``whisper-tiny`` 모델을 기본 strict 모드로 내보낼 때, Dynamo에서 지원되지 않는 기능 때문에 일반적으로 오류가 발생합니다.
+Dynamo에서 이 에러가 발생하는 이유를 이해하려면, `GitHub issue <https://github.com/pytorch/pytorch/issues/144906>`__ 해당 깃허브 이슈를 참고하세요.
 
 Solution
 ~~~~~~~~
 
-To address the above error , ``torch.export`` supports  the ``non_strict`` mode where the program is traced using the Python interpreter, which works similar to
-PyTorch eager execution. The only difference is that all ``Tensor`` objects will be replaced by ``ProxyTensors``, which will record all their operations into
-a graph. By using ``strict=False``, we are able to export the program.
+위의 에러를 해결하기 위해, ``torch.export``는 Python 인터프리터를 사용해 프로그램을 트레이싱하는 ``non_strict`` 모드를 제공하며, 이는 PyTorch eager 실행과 유사하게 동작합니다.
+유일한 차이점은 모든 ``Tensor`` 객체가 ``ProxyTensors``로 대체 되며, 이는 모든 연산이 그래프에 기록된다는 것입니다.
+``strict=False``을 사용하면, 프로그램에서 내보낼 수 있습니다.
 
 .. code:: python
 
@@ -207,10 +203,9 @@ a graph. By using ``strict=False``, we are able to export the program.
 Image Captioning
 ----------------
 
-**Image Captioning** is the task of defining the contents of an image in words. In the context of gaming, Image Captioning can be used to enhance the
-gameplay experience by dynamically generating text description of the various game objects in the scene, thereby providing the gamer with additional
-details. `BLIP <https://arxiv.org/pdf/2201.12086>`__ is a popular model for Image Captioning `released by SalesForce Research <https://github.com/salesforce/BLIP>`__. The code below tries to export BLIP with ``batch_size=1``.
-
+**이미지 캡셔닝**은 이미지에 있는 단어의 내용을 정의하는 업무를 수행한다. 게임 환경에서 이미지 캡셔닝은 장면 내 다양한 게임 객체에 대한 텍스트 설명을 동적으로 생성하며, 게이머에게 추가적인 정보를 제공함으로써 게임 플레이 경험을 향상시키는데 활용될 수 있습니다.
+`BLIP <https://arxiv.org/pdf/2201.12086>`__ 는 이미지 캡셔닝 분야에서 널리 사용되는 모델로, `released by SalesForce Research <https://github.com/salesforce/BLIP>`__ 에서 공개되었습니다.
+아래 코드는 ``batch_size=1``로 BLIP를 내보내려고 시도합니다.
 
 .. code:: python
 
@@ -234,9 +229,9 @@ details. `BLIP <https://arxiv.org/pdf/2201.12086>`__ is a popular model for Imag
 Error: Cannot mutate tensors with frozen storage
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-While exporting a model, it might fail because the model implementation might contain certain Python operations which are not yet supported by ``torch.export``.
-Some of these failures may have a workaround. BLIP is an example where the original model errors, which can be resolved by making a small change in the code.
-``torch.export`` lists the common cases of supported and unsupported operations in `ExportDB <https://pytorch.org/docs/main/generated/exportdb/index.html>`__ and shows how you can modify your code to make it export compatible.
+모델을 내보낼 때, 모델 구현에서 ``torch.export`` 에서 아직 지원하지 않는 특정 Python 연산이 포함이 될 수 있기 때문에 실패할 수 있습니다.
+이 실패 사례들 중 일부는 해결 방법이 있을 수 있습니다. BLIP는 원래 모델에서 오류가 발생하는 예시이지만, 코드에 작은 수정을 가하면 해결할 수 있습니다.
+``torch.export``는 `ExportDB <https://pytorch.org/docs/main/generated/exportdb/index.html>`__ 에서 지원되는 연산과 지원되지 않는 연산의 일반적인 사례들을 나열하고, 코드에서 내보낼 수 있도록 수정하는 방법을 보여줍니다.
 
 .. code:: console
 
@@ -251,7 +246,7 @@ Some of these failures may have a workaround. BLIP is an example where the origi
 Solution
 ~~~~~~~~
 
-Clone the `tensor <https://github.com/salesforce/BLIP/blob/main/models/blip.py#L112>`__ where export fails.
+내보내기가 실패하는 위치에 있는 `tensor <https://github.com/salesforce/BLIP/blob/main/models/blip.py#L112>`__ 를 복제합니다.
 
 .. code:: python
 
@@ -264,14 +259,14 @@ Clone the `tensor <https://github.com/salesforce/BLIP/blob/main/models/blip.py#L
 Promptable Image Segmentation
 -----------------------------
 
-**Image segmentation** is a computer vision technique that divides a digital image into distinct groups of pixels, or segments, based on their characteristics.
-`Segment Anything Model (SAM) <https://ai.meta.com/blog/segment-anything-foundation-model-image-segmentation/>`__) introduced promptable image segmentation, which predicts object masks given prompts that indicate the desired object. `SAM 2 <https://ai.meta.com/sam2/>`__ is
-the first unified model for segmenting objects across images and videos. The `SAM2ImagePredictor <https://github.com/facebookresearch/sam2/blob/main/sam2/sam2_image_predictor.py#L20>`__ class provides an easy interface to the model for prompting
-the model. The model can take as input both point and box prompts, as well as masks from the previous iteration of prediction. Since SAM2 provides strong
-zero-shot performance for object tracking, it can be used for tracking game objects in a scene.
+**이미지 분할**은 디지털 이미지를 픽셀 단위의 특징에 따라 서로 다른 그룹, 즉 세그먼트로 나누는 컴퓨터 비전 기술입니다.
+`Segment Anything Model (SAM) <https://ai.meta.com/blog/segment-anything-foundation-model-image-segmentation/>`__) 은 프롬프트 기반 이미지 분할을 도입한 모델로, 사용자가 원하는 객체를 지정하는 프롬프트를 입력하면 해당 객체의 마스크를 예측합니다.
+`SAM 2 <https://ai.meta.com/sam2/>`__ 는 이미지와 비디오에서 객체를 분할하기 위한 최초의 통합 모델입니다. `SAM2ImagePredictor <https://github.com/facebookresearch/sam2/blob/main/sam2/sam2_image_predictor.py#L20>`__ 클래스는 모델에 프롬프트를 입력할 수 있는 간편한 인터페이스를 제공합니다.
+이 모델은 포인트와 박스 프롬프트는 물론, 이전 예측에서 생성된 마스크도 입력으로 받을 수 있습니다.
+SAM2는 객체 추적에서 강력한 제로샷 성능을 제공하므로, 장면 내 게임 객체를 추적하는 데 활용할 수 있습니다.
 
-
-The tensor operations in the predict method of `SAM2ImagePredictor <https://github.com/facebookresearch/sam2/blob/main/sam2/sam2_image_predictor.py#L20>`__  are happening in the `_predict <https://github.com/facebookresearch/sam2/blob/main/sam2/sam2_image_predictor.py#L291>`__ method. So, we try to export like this.
+`SAM2ImagePredictor <https://github.com/facebookresearch/sam2/blob/main/sam2/sam2_image_predictor.py#L20>`__ 의 예측 메서드에서 발생하는 텐서 연산은 실제로 `_predict <https://github.com/facebookresearch/sam2/blob/main/sam2/sam2_image_predictor.py#L291>`__ 메서드 안에서 수행됩니다.
+따라서 아래와 같이 내보내기를 시도합니다.
 
 .. code:: python
 
@@ -286,7 +281,7 @@ The tensor operations in the predict method of `SAM2ImagePredictor <https://gith
 Error: Model is not of type ``torch.nn.Module``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-``torch.export`` expects the module to be of type ``torch.nn.Module``. However, the module we are trying to export is a class method. Hence it errors.
+``torch.export`` 는 모듈이 ``torch.nn.Module`` 타입이어야 합니다. 하지만, 내보내기 하려는 모듈은 클래스 메서드이기 때문에 오류가 발생합니다.
 
 .. code:: console
 
@@ -303,7 +298,7 @@ Error: Model is not of type ``torch.nn.Module``
 Solution
 ~~~~~~~~
 
-We write a helper class, which inherits from ``torch.nn.Module`` and call the ``_predict method`` in the ``forward`` method of the class. The complete code can be found `here <https://github.com/anijain2305/sam2/blob/ued/sam2/sam2_image_predictor.py#L293-L311>`__.
+도우미 클래스를 작성하여 ``torch.nn.Module``을 상속하고, 클래스의 ``forward`` 메서드 안에서 ``_predict method``를 호출합니다. 전체 코드는 `here <https://github.com/anijain2305/sam2/blob/ued/sam2/sam2_image_predictor.py#L293-L311>`__ 에서 확인할 수 있습니다.
 
 .. code:: python
 
@@ -325,7 +320,6 @@ We write a helper class, which inherits from ``torch.nn.Module`` and call the ``
 Conclusion
 ----------
 
-In this tutorial, we have learned how to use ``torch.export`` to export models for popular use cases by addressing challenges through correct configuration and simple code modifications.
-Once you are able to export a model, you can lower the ``ExportedProgram`` into your hardware using `AOTInductor <https://pytorch.org/docs/stable/torch.compiler_aot_inductor.html>`__ in case of servers and `ExecuTorch <https://pytorch.org/executorch/stable/index.html>`__ in case of edge device.
-To learn more about ``AOTInductor`` (AOTI), please refer to the `AOTI tutorial <https://tutorials.pytorch.kr/recipes/torch_export_aoti_python.html>`__.
-To learn more about ``ExecuTorch`` , please refer to the `ExecuTorch tutorial <https://pytorch.org/executorch/stable/tutorials/export-to-executorch-tutorial.html>`__.
+이 튜토리얼에서는 ``torch.export``를 활용하여 다양한 대표적인 사용 사례의 모델을 내보내는 방법을 학습하였고, 올바른 설정과 간단한 코드 수정으로 발생할 수 있는 여러 문제들을 해결하는 방법도 함께 다뤘습니다.
+모델을 성공적으로 내보낸 후에, 서버 환경에서는 `AOTInductor <https://pytorch.org/docs/stable/torch.compiler_aot_inductor.html>`__ 를, 엣지 디바이스 환경에서는 `ExecuTorch <https://pytorch.org/executorch/stable/index.html>`__ 를 사용하여 ``ExportedProgram``을 하드웨어에 맞게 변환할 수 있습니다.
+``AOTInductor`` (AOTI)에 대한 자세한 내용은 `AOTI tutorial <https://tutorials.pytorch.kr/recipes/torch_export_aoti_python.html>`__ 을, ``ExecuTorch``에 대한 자세한 내용은 `ExecuTorch tutorial <https://pytorch.org/executorch/stable/tutorials/export-to-executorch-tutorial.html>`__ 을 참고하세요.
