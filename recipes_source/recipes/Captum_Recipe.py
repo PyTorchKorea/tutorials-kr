@@ -95,10 +95,17 @@ attribution_cat = occlusion.attribute(input_img,
 
 
 ######################################################################
+<<<<<<< Updated upstream
 # Captum은 ``Occlusion`` 외에도 ``Integrated Gradients`` , ``Deconvolution`` ,
 # ``GuidedBackprop`` , ``Guided GradCam`` , ``DeepLift`` ,
 # 그리고 ``GradientShap``과 같은 많은 알고리즘을 제공합니다.
 # 이러한 모든 알고리즘은 초기화할 때 모델을 호출 가능한 ``forward_func`` 으로 기대하며
+=======
+# Captum은 ``Occlusion`` 외에도 \ ``Integrated Gradients``\ , \ ``Deconvolution``\ ,
+# \ ``GuidedBackprop``\ , \ ``Guided GradCam``\ , \ ``DeepLift``\ ,
+# 그리고 \ ``GradientShap``\과 같은 많은 알고리즘을 제공합니다.
+# 이러한 모든 알고리즘은 초기화할 때 모델을 호출 가능한 \ ``forward_func``\ 으로 기대하며
+>>>>>>> Stashed changes
 # 속성 결과를 통합해서 반환하는 ``attribute(...)`` 메소드를 가지는
 # ``Attribution`` 의 서브클래스 입니다.
 #
@@ -111,7 +118,11 @@ attribution_cat = occlusion.attribute(input_img,
 #
 
 ######################################################################
+<<<<<<< Updated upstream
 # Captum의 ``visualization`` 유틸리티는 그림과 텍스트 입력 모두에 대한
+=======
+# Captum의 \ ``visualization``\ 유틸리티는 그림과 텍스트 입력 모두에 대한
+>>>>>>> Stashed changes
 # 속성 결과를 시각화 할 수 있는 즉시 사용가능한 방법을 제공합니다.
 #
 
