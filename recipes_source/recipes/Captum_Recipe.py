@@ -163,7 +163,7 @@ _ = viz.visualize_image_attr_multiple(attribution_cat,
 # Captum은 이미지, 텍스트 등을 포함하여 다양한 방식으로 PyTorch에서 대부분의 모델 타입을 처리할 수 있습니다.
 # Captum을 사용하면 다음을 수행할 수 있습니다.
 # \* 위에서 설명한 것처럼 특정한 출력을 모델 입력에 표시하기
-# \* 특정한 출outputs을 은닉층의 뉴런에 표시하기 (Captum API reference를 보세요).
+# \* 특정한 출력을 은닉층의 뉴런에 표시하기 (Captum API reference를 보세요).
 # \* 모델 입력에 대한 은닉층 뉴런의 반응을 표시하기 (Captum API reference를 보세요).
 #
 # 지원되는 메소드의 전체 API와 튜토리얼의 목록은 http://captum.ai 를 참조하세요.
