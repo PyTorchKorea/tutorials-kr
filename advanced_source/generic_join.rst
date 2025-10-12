@@ -9,7 +9,7 @@
     :language: python
 
 .. note::
-    |edit| 이 튜토리얼은 `github <https://github.com/pytorch/tutorials/blob/main/advanced_source/generic_join.rst>`_ 에서 확인하고 수정할 수 있습니다.
+    |edit| 이 튜토리얼은 `github <https://github.com/PyTorchKorea/tutorials-kr/blob/master/advanced_source/generic_join.rst>`_ 에서 확인하고 수정할 수 있습니다.
 
 .. note:: ``Join`` 은 PyTorch 1.10에서 프로토타입 기능으로 도입되었습니다.
     이 API는 변경될 수 있습니다.
