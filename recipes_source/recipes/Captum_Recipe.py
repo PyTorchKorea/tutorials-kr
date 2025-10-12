@@ -10,14 +10,14 @@ Captum을 사용하여 모델 해석하기
 # Captum을 사용하면 데이터 특징(features)이 모델의 예측 또는 뉴런 활성화에
 # 미치는 영향을 이해하고, 모델의 동작 방식을 알 수 있습니다.
 #
-# 그리고 ``Integrated Gradients`` 와 ``Guided GradCam`` 과 같은
+# 그리고 \ ``Integrated Gradients``\ 와 \ ``Guided GradCam``\ 과 같은
 # 최첨단의 feature attribution 알고리즘을 적용할 수 있습니다.
 #
 # 이 레시피에서는 Captum을 사용하여 다음을 수행하는 방법을 배웁니다:
 #
 # - 이미지 분류기(classifier)의 예측을 해당 이미지의 특징(features)에 표시하기
-# - 속성(attribution) 결과를 시각화 하기
-
+# - 속성(attribution) 결과를 시각화하기
+#
 ######################################################################
 # 시작하기 전에
 # ----------------
@@ -30,7 +30,7 @@ Captum을 사용하여 모델 해석하기
 # 자세한 지침은 https://captum.ai/ 의 설치 안내서를 참조하면 됩니다.
 
 ######################################################################
-# 모델의 경우, PyTorch에 내장 된 이미지 분류기(classifier)를 사용합니다.
+# 모델의 경우, PyTorch에 내장된 이미지 분류기(classifier)를 사용합니다.
 # Captum은 샘플 이미지의 어떤 부분이 모델에 의해 만들어진
 # 특정한 예측에 도움을 주는지 보여줍니다.
 
@@ -63,12 +63,13 @@ input_img = normalize(center_crop(img)).unsqueeze(0)
 ######################################################################
 # 속성 계산하기
 # -------------------------------
+#
 
 
 ######################################################################
 # 모델의 top-3 예측 중에는 개와 고양이에 해당하는 클래스 208과 283이 있습니다.
 #
-# Captum의 ``Occlusion`` 알고리즘을 사용하여 각 예측을 입력의 해당 부분에 표시합니다.
+# Captum의 \ ``Occlusion``\ 알고리즘을 사용하여 각 예측을 입력의 해당 부분에 표시합니다.
 
 from captum.attr import Occlusion
 
@@ -95,17 +96,10 @@ attribution_cat = occlusion.attribute(input_img,
 
 
 ######################################################################
-<<<<<<< Updated upstream
-# Captum은 ``Occlusion`` 외에도 ``Integrated Gradients`` , ``Deconvolution`` ,
-# ``GuidedBackprop`` , ``Guided GradCam`` , ``DeepLift`` ,
-# 그리고 ``GradientShap``과 같은 많은 알고리즘을 제공합니다.
-# 이러한 모든 알고리즘은 초기화할 때 모델을 호출 가능한 ``forward_func`` 으로 기대하며
-=======
 # Captum은 ``Occlusion`` 외에도 \ ``Integrated Gradients``\ , \ ``Deconvolution``\ ,
 # \ ``GuidedBackprop``\ , \ ``Guided GradCam``\ , \ ``DeepLift``\ ,
 # 그리고 \ ``GradientShap``\과 같은 많은 알고리즘을 제공합니다.
 # 이러한 모든 알고리즘은 초기화할 때 모델을 호출 가능한 \ ``forward_func``\ 으로 기대하며
->>>>>>> Stashed changes
 # 속성 결과를 통합해서 반환하는 ``attribute(...)`` 메소드를 가지는
 # ``Attribution`` 의 서브클래스 입니다.
 #
@@ -118,11 +112,7 @@ attribution_cat = occlusion.attribute(input_img,
 #
 
 ######################################################################
-<<<<<<< Updated upstream
-# Captum의 ``visualization`` 유틸리티는 그림과 텍스트 입력 모두에 대한
-=======
 # Captum의 \ ``visualization``\ 유틸리티는 그림과 텍스트 입력 모두에 대한
->>>>>>> Stashed changes
 # 속성 결과를 시각화 할 수 있는 즉시 사용가능한 방법을 제공합니다.
 #
 
@@ -166,13 +156,14 @@ _ = viz.visualize_image_attr_multiple(attribution_cat,
 ######################################################################
 # 마지막 노트
 # ---------------
+#
 
 
 ######################################################################
 # Captum은 이미지, 텍스트 등을 포함하여 다양한 방식으로 PyTorch에서 대부분의 모델 타입을 처리할 수 있습니다.
 # Captum을 사용하면 다음을 수행할 수 있습니다.
 # \* 위에서 설명한 것처럼 특정한 출력을 모델 입력에 표시하기
-# \* 특정한 출력을 은닉층의 뉴런에 표시하기 (Captum API reference를 보세요).
+# \* 특정한 출outputs을 은닉층의 뉴런에 표시하기 (Captum API reference를 보세요).
 # \* 모델 입력에 대한 은닉층 뉴런의 반응을 표시하기 (Captum API reference를 보세요).
 #
 # 지원되는 메소드의 전체 API와 튜토리얼의 목록은 http://captum.ai 를 참조하세요.
