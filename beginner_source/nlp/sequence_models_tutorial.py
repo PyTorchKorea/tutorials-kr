@@ -102,7 +102,7 @@ print(hidden)
 #
 # 모델은 다음과 같습니다. 단어가 :math:`w_i \in V` 일 때, 
 # 입력 문장을 :math:`w_1, \dots, w_M` 라고 합시다. 또한, 
-# :math:`T` 를 우리의 태그 집합이라고 하고, :math:`w_i` 의 단어 태그를 :math:`y_i` 라고 합니다. 
+# :math:`T` 를 우리의 태그 집합라고 하고, :math:`w_i` 의 단어 태그를 :math:`y_i` 라고 합니다. 
 # 단어 :math:`w_i` 에 대한 예측된 태그를 :math:`\hat{y}_i` 로 표시합니다. 
 # 
 #
