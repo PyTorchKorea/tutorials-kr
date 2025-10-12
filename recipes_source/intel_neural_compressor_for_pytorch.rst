@@ -20,7 +20,7 @@ Intel® Neural Compressor는 오픈소스 프로젝트이며, `Github <https://g
 - 사용이 간편한 API(Ease-of-use API): PyTorch의 ``prepare`` 및 ``convert`` API를 재사용해 쉽게 적용할 수 있습니다.
 - 정확도 기반 튜닝(Accuracy-driven Tuning): 정확도 기반 자동 튜닝 프로세스를 지원하며 ``autotune`` API를 제공합니다.
 - 다양한 양자화 방식(Kinds of Quantization): 고전적인 INT8 양자화, 가중치-전용(weight-only) 양자화, FP8 양자화를 지원합니다.
-  또한 MX 데이터 타입 에뮬레이션(emulation) 양자화 등 최신 연구도 포함됩니다.
+  또한 시뮬레이션 기반의 최신 연구로, MX 데이터 타입 에뮬레이션(emulation) 양자화도 포함됩니다.
   자세한 내용은 `Supported Matrix <https://github.com/intel/neural-compressor/blob/master/docs/source/3x/PyTorch.md#supported-matrix>`_ 를 참조하세요.
 
 시작하기(Getting Started)
