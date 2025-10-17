@@ -18,7 +18,7 @@ Export a PyTorch model to ONNX
 """
 
 ###############################################################################
-# In the `60 Minute Blitz <https://pytorch.org/tutorials/beginner/deep_learning_60min_blitz.html>`_,
+# In the `60 Minute Blitz <https://tutorials.pytorch.kr/beginner/deep_learning_60min_blitz.html>`_,
 # we had the opportunity to learn about PyTorch at a high level and train a small neural network to classify images.
 # In this tutorial, we are going to expand this to describe how to convert a model defined in PyTorch into the
 # ONNX format using the ``torch.onnx.export(..., dynamo=True)`` ONNX exporter.
@@ -53,7 +53,7 @@ Export a PyTorch model to ONNX
 # -----------------------------------------
 #
 # Once your environment is set up, let’s start modeling our image classifier with PyTorch,
-# exactly like we did in the `60 Minute Blitz <https://pytorch.org/tutorials/beginner/deep_learning_60min_blitz.html>`_.
+# exactly like we did in the `60 Minute Blitz <https://tutorials.pytorch.kr/beginner/deep_learning_60min_blitz.html>`_.
 #
 
 import torch
