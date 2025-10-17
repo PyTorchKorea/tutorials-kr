@@ -98,7 +98,7 @@
 |parameter|매개변수|박정환||
 |placeholder|플레이스홀더|박정환|음차 표기|
 |plotting|도식화|황성수||
-|primitive|프리미티브|강지현||
+|primitive|프리미티브|강지현|음차 표기|
 |Production (environment, use)|Production|허남규|번역하지 않음|
 |pruning|가지치기|김지호||
 |rank 0|0-순위|박정환||
