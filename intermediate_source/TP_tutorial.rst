@@ -22,7 +22,7 @@
 텐서 병렬(Tensor Parallel)은 어떻게 작동합니까?
 -----------
 텐서 병렬(TP)은 기존 `Megatron-LM <https://arxiv.org/abs/1909.08053>`__ 논문에서 제안된 방식으로, 대규모 트랜스포머(Transformer) 모델을 효율적으로 훈련하기 위한 모델 병렬처리(parallelism) 기법입니다.
-이 튜토리얼에서 언급한 `Sequence Parallel <https://arxiv.org/abs/2205.05198>`__ (SP)는 Tensor Parallel의 한 변형으로, 훈련 중 활성화 메모리를 절약하기 위해 ``nn.LayerNorm`` 혹은 ``RMSNorm`` 계층을 시퀀스 차원으로 분할(shard) 합니다.
+이 튜토리얼에서 언급한 `Sequence Parallel <https://arxiv.org/abs/2205.05198>`__ (SP)는 Tensor Parallel의 한 변형으로, 훈련 중 활성화 메모리를 절약하기 위해 ``nn.LayerNorm`` 혹은 ``RMSNorm`` 계층을 시퀀스 차원으로 샤딩 합니다.
 모델이 커질수록, 활성화 메모리가 병목이 되므로, Tensor Parallel 학습에서는 주로 ``LayerNorm`` 이나 ``RMSNorm`` 계층에 Sequence Parallel를 적용합니다.
 
 
@@ -38,13 +38,13 @@
 
 **Sharding 초기화**
 
-* 각 계층에 어떤 ``ParallelStyle`` 을 적용할지 결정하고, ``parallelize_module`` 을 호출해서 초기화된 모듈을 분할합니다.
-* 병렬화된 모듈은 모델 파라미터를 DTensor로 교체하고, DTensor는 분할된 계산을 사용하여 병렬화된 모듈을 실행하는 역할을 담당합니다.
+* 각 계층에 어떤 ``ParallelStyle`` 을 적용할지 결정하고, ``parallelize_module`` 을 호출해서 초기화된 모듈을 샤딩합니다.
+* 병렬화된 모듈은 모델 파라미터를 DTensor로 교체하고, DTensor는 샤딩하는 계산을 사용하여 병렬화된 모듈을 실행하는 역할을 담당합니다.
 
 **런타임 포워드/백워드**
 
 * 사용자가 지정한 개별 ``ParallelStyle`` 의 입력/출력 Dtensor 계층에 따라, 입력/출력에 대한 DTensor 계층을 변환하는 적절한 커뮤니케이션 동작을 실행합니다. (예를 들어, ``allreduce``, ``allgather``, ``reduce_scatter`` )
-* 병렬화된 계층( ``nn.Linear`` , ``nn.Embedding`` )은 연산 및 메모리를 절약하기 위해 분할된 연산을 실행합니다. 
+* 병렬화된 계층( ``nn.Linear`` , ``nn.Embedding`` )은 연산 및 메모리를 절약하기 위해 샤딩된 연산을 실행합니다. 
 
 텐서 병렬(Tensor Parallel)을 적용해야 하는 시기와 이유
 ---------------------------------------------
@@ -68,11 +68,11 @@ PyTorch 텐서 병렬 API는 모델의 각 개별 레이어에 대한 샤딩을 
 
 
 * ``ColwiseParallel`` 및 ``RowwiseParallel`` : 열 혹은 행 방식으로 ``nn.Linear`` 과 ``nn.Embedding`` 를 공유합니다.
-* ``SequenceParallel`` : ``nn.LayerNorm`` , ``nn.Dropout`` , ``RMSNormPython`` 등에서 샤드 연산을 수행합니다.
+* ``SequenceParallel`` : ``nn.LayerNorm`` , ``nn.Dropout`` , ``RMSNormPython`` 등에서 샤딩 연산을 수행합니다.
 * ``PrepareModuleInput`` 및 ``PrepareModuleOutput``: 적절한 커뮤니케이션 작업을 가진 모듈 입력/출력 샤딩 계층을 구성합니다.
 
 PyTorch 네이티브 텐서 병렬 API 사용하는 법을 설명하기 위해, 일반적인 트랜스포머 모델을 살펴보겠습니다. 이번 튜토리얼에서는 커뮤니티에서도 널리 사용되는 최신 `Llama2 모델 <https://github.com/pytorch/examples/blob/main/distributed/tensor_parallelism/llama2_model.py>`__ 을 레퍼런스 트랜스포머 모델 구현으로 사용합니다.
-텐서 병렬이 개별 텐서를 여러 디바이스에서 분할하기 때문에, 분산 환경(NCCL 통신기)을 설정해야 합니다.
+텐서 병렬이 개별 텐서를 여러 디바이스에서 샤딩하기 때문에, 먼저 분산 환경(NCCL 통신기)을 설정해야 합니다.
 
 텐서 병렬화(Tensor Parallelism)는 PyTorch DDP/FSDP와 유사한 단일 프로그램 멀티 데이터 (SPMD) 샤딩 알고리즘이며, 이 알고리즘은 PyTorch DTensor 내부 원리를 바탕으로 샤딩을 수행합니다. 또한 디바이스 관리 및 샤딩을 위해 DeviceMesh 추상화(내부적으로 프로세스 그룹 관리)를 활용합니다.
 DeviceMesh를 활용하여 다차원 병렬화를 활용하는 방법은 `이 튜토리얼 <https://tutorials.pytorch.kr/recipes/distributed_device_mesh.html>`__ 을 참조하세요. 텐서 병렬은 일반적으로 각 호스트 내부에서 작동하므로, 먼저 호스트 내 8개의 GPU를 연결하는 DeviceMesh를 초기화해보겠습니다.
