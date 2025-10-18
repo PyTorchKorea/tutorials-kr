@@ -1,42 +1,38 @@
-Double Backward with Custom Functions
+사용자 정의 함수와 이중 역전파
 =====================================
 
-It is sometimes useful to run backwards twice through backward graph, for
-example to compute higher-order gradients. It takes an understanding of
-autograd and some care to support double backwards, however. Functions
-that support performing backward a single time are not necessarily
-equipped to support double backward. In this tutorial we show how to
-write a custom autograd function that supports double backward, and
-point out some things to look out for.
+역전파 그래프를 통해 역전파를 두 번 실행하는 것은 가끔씩 유용한 경우가 있습니다. 
+예를 들어 고차 미분을 계산할 때입니다. 그러나 이중 역전파를 지원하려면 
+autograd의 이해와 주의가 필요합니다. 단일 역전파를 지원한다고 반드시 
+이중 역전파를 지원하는 것은 아닙니다. 이 튜토리얼에서는 어떻게 사용자 
+정의 함수로 이중 역전파를 지원하는지 알려주고 주의해야 할 점들을 안내합니다.
 
 
-When writing a custom autograd function to backward through twice,
-it is important to know when operations performed in a custom function
-are recorded by autograd, when they aren't, and most importantly, how
-`save_for_backward` works with all of this.
+이중 역전파를 사용하는 사용자 정의 autograd 함수를 사용할 때, 
+함수 내에서 어떻게 동작하는지 언제 계산 결과가 기록되고 언제 기록되지 
+않는지 이해하는 것이 중요합니다. 특히 전체 과정에서 `save_for_backward` 가 
+어떻게 동작하는지 아는 것이 가장 중요합니다.
 
-Custom functions implicitly affects grad mode in two ways:
+사용자 정의 함수는 암묵적으로 grad 모드에 두 가지 방식으로 영향을 줍니다:
 
-- During forward, autograd does not record any the graph for any
-  operations performed within the forward function. When forward
-  completes, the backward function of the custom function
-  becomes the `grad_fn` of each of the forward's outputs
+- 순전파를 진행하는 동안 autograd는 순전파 함수안에서 동작하는 
+  어떤 연산도 그래프에 기록하지 않습니다. 순전파가 끝나고 사용자 정의 함수의 
+  역전파는 순전파의 결과의 `grad_fn` 이 됩니다.
 
-- During backward, autograd records the computation graph used to
-  compute the backward pass if create_graph is specified
+- 역전파가 진행되는 동안 create_graph가 지정되어 있다면 
+  autograd는 역전파의 연산을 그래프에 기록합니다. 
 
-Next, to understand how `save_for_backward` interacts with the above,
-we can explore a couple examples:
+다음으로, `save_for_backward` 가 위의 내용과 어떻게 상호작용하는지 이해하기 위해서,
+몇 가지 예시를 살펴보겠습니다:
 
 
-Saving the Inputs
+입력값 저장하기
 -------------------------------------------------------------------
-Consider this simple squaring function. It saves an input tensor
-for backward. Double backward works automatically when autograd
-is able to record operations in the backward pass, so there is usually
-nothing to worry about when we save an input for backward as
-the input should have grad_fn if it is a function of any tensor
-that requires grad. This allows the gradients to be properly propagated.
+간단한 제곱 함수를 생각해 보겠습니다. 이 함수는 역전파를 위해서 입력 텐서를 저장합니다.
+역전파 과정을 autograd가 기록할 수 있다면 이중 역전파는 자동으로 동작합니다.
+따라서 역전파를 위해 입력을 저장할 때는 일반적으로 걱정할 필요가 없습니다. 
+입력이 grad를 요구하는 텐서부터 계산된 함수라면 grad_fn을 가지고 있고 
+이를 통해서 변화도가 올바르게 전파되기 때문입니다.
 
 .. code:: python
 
@@ -64,7 +60,7 @@ that requires grad. This allows the gradients to be properly propagated.
     torch.autograd.gradgradcheck(Square.apply, x)
 
 
-We can use torchviz to visualize the graph to see why this works
+torchviz로 그래프를 시각화해서 작동원리를 확인할 수 있습니다.
 
 .. code-block:: python
 
@@ -75,18 +71,17 @@ We can use torchviz to visualize the graph to see why this works
    grad_x, = torch.autograd.grad(out, x, create_graph=True)
    torchviz.make_dot((grad_x, x, out), {"grad_x": grad_x, "x": x, "out": out})
 
-We can see that the gradient wrt to x, is itself a function of x (dout/dx = 2x)
-And the graph of this function has been properly constructed
+x에 대한 변화도가 그 자체로 x의 함수라는 것을 확인할 수 있습니다(dout/dx = 2x). 
+이 함수에 대한 그래프도 제대로 생성되었습니다.
 
 .. image:: https://user-images.githubusercontent.com/13428986/126559699-e04f3cb1-aaf2-4a9a-a83d-b8767d04fbd9.png
    :width: 400
 
 
-Saving the Outputs
+결과 저장하기
 -------------------------------------------------------------------
-A slight variation on the previous example is to save an output
-instead of input. The mechanics are similar because outputs are also
-associated with a grad_fn.
+이전 예제를 조금 변형하면 입력대신 출력을 저장할수 있습니다. 
+출력도 grad_fn을 가지고있기에 방식을 비슷합니다.
 
 .. code-block:: python
 
@@ -111,7 +106,7 @@ associated with a grad_fn.
     torch.autograd.gradcheck(Exp.apply, x)
     torch.autograd.gradgradcheck(Exp.apply, x)
 
-Use torchviz to visualize the graph:
+torchviz로 그래프 시각화하기:
 
 .. code-block:: python
 
@@ -123,23 +118,22 @@ Use torchviz to visualize the graph:
    :width: 332
 
 
-Saving Intermediate Results
+중간 결과 저장하기
 -------------------------------------------------------------------
-A more tricky case is when we need to save an intermediate result.
-We demonstrate this case by implementing:
+중간 결과를 저장하는것은 좀 더 어렵습니다.
+다음을 구현하여 보여드리겠습니다:
 
 .. math::
   sinh(x) := \frac{e^x - e^{-x}}{2}
 
-Since the derivative of sinh is cosh, it might be useful to reuse
-`exp(x)` and `exp(-x)`, the two intermediate results in forward
-in the backward computation.
+sinh의 도함수는 cosh이므로, 순전파의 중간결과인 
+`exp(x)` 와 `exp(-x)` 를 역전파 계산에 재사용하면 효율적입니다.
 
-Intermediate results should not be directly saved and used in backward though.
-Because forward is performed in no-grad mode, if an intermediate result
-of the forward pass is used to compute gradients in the backward pass
-the backward graph of the gradients would not include the operations
-that computed the intermediate result. This leads to incorrect gradients.
+중간 결과를 직접 저장하여 역전파에 사용하면 안 됩니다. 
+순전파가 no-grad 모드에서 실행되기 때문에, 만약 순전파의 중간 결과가 
+역전파에서 변화도를 계산하는 데 사용되면 변화도의 역전파 그래프에 
+중간 결과를 계산한 연산들이 포함되지 않습니다.
+결과적으로 변화도가 부정확해집니다.
 
 .. code-block:: python
 
@@ -172,7 +166,7 @@ that computed the intermediate result. This leads to incorrect gradients.
     torch.autograd.gradgradcheck(sinh, x)
 
 
-Use torchviz to visualize the graph:
+torchviz로 그래프 시각화하기:
 
 .. code-block:: python
 
@@ -184,12 +178,11 @@ Use torchviz to visualize the graph:
    :width: 460
 
 
-Saving Intermediate Results: What not to do
+중간결과 저장하기: 잘못된 방법
 -------------------------------------------------------------------
-Now we show what happens when we don't also return our intermediate
-results as outputs: `grad_x` would not even have a  backward graph
-because it is purely a function `exp` and `expnegx`, which don't
-require grad.
+중간 결과를 출력으로 반환하지 않으면 어떤 일이 발생하는지 살펴보겠습니다. 
+`grad_x` 는 역전파 그래프를 아예 갖지 못합니다. 
+이것은 `grad_x` 가 오직 grad를 필요로 하지 않는 `exp` 와 `expnegx` 의 함수이기 때문입니다.
 
 .. code-block:: python
 
@@ -211,8 +204,8 @@ require grad.
             return grad_input
 
 
-Use torchviz to visualize the graph. Notice that `grad_x` is not
-part of the graph!
+torchviz로 그래프 시각화하기. 
+`grad_x` 가 그래프에 포함되지 않는것을 확인하세요!
 
 .. code-block:: python
 
@@ -225,15 +218,13 @@ part of the graph!
 
 
 
-When Backward is not Tracked
+역전파 추적이 불가능한 경우
 -------------------------------------------------------------------
-Finally, let's consider an example when it may not be possible for
-autograd to track gradients for a functions backward at all.
-We can imagine cube_backward to be a function that may require a
-non-PyTorch library like SciPy or NumPy, or written as a
-C++ extension. The workaround demonstrated here is to create another
-custom function CubeBackward where you also manually specify the
-backward of cube_backward!
+마지막으로 autograd가 함수의 역전파에 대한 변화도를 추적할 수 없는 
+상황을 살펴보겠습니다. cube_backward가 SciPy나 NumPy 같은 
+외부 라이브러리를 사용하거나 C++로 구현되었다고 가정해 보겠습니다. 
+이런 경우는 CubeBackward라는 또 다른 사용자 정의 함수를 생성하여 
+cube_backward의 역전파도 수동으로 지정하는 것입니다!
 
 
 .. code-block:: python
@@ -280,7 +271,7 @@ backward of cube_backward!
     torch.autograd.gradgradcheck(Cube.apply, x)
 
 
-Use torchviz to visualize the graph:
+torchviz로 그래프 시각화하기:
 
 .. code-block:: python
 
@@ -292,10 +283,9 @@ Use torchviz to visualize the graph:
    :width: 352
 
 
-To conclude, whether double backward works for your custom function
-simply depends on whether the backward pass can be tracked by autograd.
-With the first two examples we show situations where double backward
-works out of the box. With the third and fourth examples, we demonstrate
-techniques that enable a backward function to be tracked, when they
-otherwise would not be.
+결론적으로 사용자 정의 함수의 이중 역전파 작동여부는 autograd가 
+역전파 과정을 추적할 수 있느냐에 달려 있습니다. 처음 두 예제에서는 
+이중 역전파가 자동으로 동작하는 경우를 보여주었고, 
+세 번째와 네 번째 예제는 추적되지 않는 역전파 함수를 
+추적 가능하게 만드는 방법을 설명했습니다.
 
