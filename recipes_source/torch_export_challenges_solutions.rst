@@ -12,15 +12,15 @@ Demonstration of torch.export flow, common challenges and the solutions to addre
 * 이미지 캡셔닝 (`BLIP <https://github.com/salesforce/BLIP>`__)
 * 프롬프트 기반 이미지 분할 (`SAM2 <https://ai.meta.com/sam2/>`__)
 
-네 가지 모델 각각은 ``torch.export``의 고유한 기능을 보여주고, 구현 과정에서의 실질적인 고려사항과 발생할 수 있는 문제들을 함께 다루기 위해 선정되었습니다.
+각 네 가지 모델은 ``torch.export``의 고유한 기능을 보여주고, 구현 과정에서의 실질적인 고려사항과 발생할 수 있는 문제들을 함께 다루기 위해 선정되었습니다.
 
-Prerequisites
+전제 조건
 -------------
 
 * PyTorch 2.4 이상 버전
 * ``torch.export`` 및 PyTorch Eager 추론에 대한 기본적인 이해
 
-Key requirement for ``torch.export``: No graph break
+``torch.export``의 핵심 요구 사항: 그래프 분절(graph break) 없음
 ----------------------------------------------------
 
 `torch.compile <https://tutorials.pytorch.kr/intermediate/torch_compile_tutorial.html>`__ 은 JIT를 활용해 PyTorch 코드를 최적화된 커널로 컴파일함으로써 실행 속도를 향상시킵니다. 주어진 모델을 ``TorchDynamo``를 활용하여 최적화하고,
@@ -29,23 +29,23 @@ Key requirement for ``torch.export``: No graph break
 TorchDynamo가 지원하지 않는 Python의 기능을 만나면, 계산 그래프는 중단하고 해당 코드는 기본 Python 인터프리터가 처리하도록 하고, 그래프 캡쳐를 이어나갑니다.
 이러한 중단된 계산 그래프를 `graph break <https://tutorials.pytorch.kr/intermediate/torch_compile_tutorial.html#torchdynamo-and-fx-graphs>`__ 라고 칭합니다.
 
-``torch.export``와 ``torch.compile``의 주요한 차이점 중 하나는 ``torch.export``는 graph breaks를 지원하지 않는다는 것입니다. 즉, 내보내려는 전체 모델 또는 모델의 일부는 단일 그래프 형태여야 합니다.
-이는 graph breaks를 처리하려면 지원되지 않는 연산을 기본 Python으로 평가해야하는데, 이러한 방식이 ``torch.export``의 설계와 호환되지 않기 때문입니다.
+``torch.export``와 ``torch.compile``의 주요한 차이점 중 하나는 ``torch.export``는 그래프 분절(graph breaks)을 지원하지 않는다는 것입니다. 즉, 내보내려는 전체 모델 또는 모델의 일부는 단일 그래프 형태여야 합니다.
+이는 그래프 분절(graph breaks)을 처리하려면 지원되지 않는 연산을 기본 Python으로 평가해야하는데, 이러한 방식이 ``torch.export``의 설계와 호환되지 않기 때문입니다.
 다양한 PyTorch 프레임워크들의 차이점에 대한 세부적인 정보는 `link <https://pytorch.org/docs/main/export.html#existing-frameworks>`__ 에서 확인할 수 있습니다.
 
-아래의 커맨드를 사용해서 프로그램 내의 graph breaks를 확인할 수 있습니다.
+아래의 커맨드를 사용해서 프로그램 내의 그래프 분절(graph breaks)을 확인할 수 있습니다.
 
 .. code:: sh
 
    TORCH_LOGS="graph_breaks" python <file_name>.py
 
-프로그램 내의 graph breaks을 제거하도록 코드를 수정해야 합니다. 문제가 해결된다면, 모델을 내보낼 준비가 된 것입니다.
+프로그램 내의 그래프 분절(graph breaks)을 제거하도록 코드를 수정해야 합니다. 문제가 해결된다면, 모델을 내보낼 준비가 된 것입니다.
 PyTorch는 인기 있는 HuggingFace와 TIMM 모델에서 ``torch.compile``을 위해서 `nightly benchmarks <https://hud.pytorch.org/benchmark/compilers>`__ 를 실행합니다.
-이러한 모델 대부분은 graph breaks가 없습니다.
+이러한 모델 대부분은 그래프 분절(graph breaks)이 없습니다.
 
-해당 레시피에 포함된 모델들은 graph breaks이 없지만, `torch.export` 는 실패합니다.
+해당 레시피에 포함된 모델들은 그래프 분절(graph breaks)이 없지만, `torch.export` 는 실패합니다.
 
-Video Classification
+영상 분류
 --------------------
 
 MViT는 `MultiScale Vision Transformers <https://arxiv.org/abs/2104.11227>`__ 을 기반으로한 모델의 클래스입니다. 이 모델은 `Kinetics-400 Dataset <https://arxiv.org/abs/1705.06950>`__ 을 사용하여 사전 훈련된 영상 분류 모델입니다.
@@ -82,7 +82,7 @@ MViT는 `MultiScale Vision Transformers <https://arxiv.org/abs/2104.11227>`__ �
        tb.print_exc()
 
 
-Error: Static batch size
+에러: 정적 배치 크기
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: sh
@@ -91,9 +91,9 @@ Error: Static batch size
    RuntimeError: Expected input at *args[0].shape[0] to be equal to 2, but got 4
 
 
-기본적으로 내보내는 과정에서는 모든 입력 형태가 고정되어 있다고 가정하고 트레이싱한다, 따라서 트레이싱을 할 때 사용한 입력 형태와 다른 형태로 프로그램을 실행하면 오류가 발생합니다.
+기본적으로 내보내는 과정에서는 모든 입력 형태가 고정되어 있다고 가정하고 트레이스(trace) 합니다, 따라서 트레이싱(tracing)을 할 때 사용한 입력 형태와 다른 형태로 프로그램을 실행하면 오류가 발생합니다.
 
-Solution
+해결 방법
 ~~~~~~~~
 
 이 오류를 해결하기 위해, 입력의 첫 번째 차원 (``batch_size``)을 동적으로 지정하고, 허용되는 ``batch_size``의 범위를 지정합니다.
@@ -136,7 +136,7 @@ Solution
        tb.print_exc()
 
 
-Automatic Speech Recognition
+자동 음성 인식
 ---------------
 
 자동 음성 인식은 기계학습을 활용하여 음성을 텍스트로 변환하는 기술입니다.
@@ -163,7 +163,7 @@ Automatic Speech Recognition
 
 
 
-Error: strict tracing with TorchDynamo
+에러: TorchDynamo를 이용한 엄격한(strict) 트레이싱(tracing)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code:: console
@@ -175,7 +175,7 @@ Error: strict tracing with TorchDynamo
 이 분석은 안전성 보장을 강화해주지만, 모든 Python 코드를 지원하는 것은 아닙니다. ``whisper-tiny`` 모델을 기본 strict 모드로 내보낼 때, Dynamo에서 지원되지 않는 기능 때문에 일반적으로 오류가 발생합니다.
 Dynamo에서 이 에러가 발생하는 이유를 이해하려면, `GitHub issue <https://github.com/pytorch/pytorch/issues/144906>`__ 해당 깃허브 이슈를 참고하세요.
 
-Solution
+해결 방법
 ~~~~~~~~
 
 위의 에러를 해결하기 위해, ``torch.export``는 Python 인터프리터를 사용해 프로그램을 트레이싱하는 ``non_strict`` 모드를 제공하며, 이는 PyTorch eager 실행과 유사하게 동작합니다.
@@ -200,7 +200,7 @@ Solution
 
    exported_program: torch.export.ExportedProgram= torch.export.export(model, args=(input_features, attention_mask, decoder_input_ids,), strict=False)
 
-Image Captioning
+이미지 캡셔닝
 ----------------
 
 **이미지 캡셔닝**은 이미지에 있는 단어의 내용을 정의하는 업무를 수행한다. 게임 환경에서 이미지 캡셔닝은 장면 내 다양한 게임 객체에 대한 텍스트 설명을 동적으로 생성하며, 게이머에게 추가적인 정보를 제공함으로써 게임 플레이 경험을 향상시키는데 활용될 수 있습니다.
@@ -226,7 +226,7 @@ Image Captioning
 
 
 
-Error: Cannot mutate tensors with frozen storage
+에러: 동결된(frozen) 저장소를 가진 텐서를 변경할 수 없습니다.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 모델을 내보낼 때, 모델 구현에서 ``torch.export`` 에서 아직 지원하지 않는 특정 Python 연산이 포함이 될 수 있기 때문에 실패할 수 있습니다.
@@ -243,7 +243,7 @@ Error: Cannot mutate tensors with frozen storage
 
 
 
-Solution
+해결 방법
 ~~~~~~~~
 
 내보내기가 실패하는 위치에 있는 `tensor <https://github.com/salesforce/BLIP/blob/main/models/blip.py#L112>`__ 를 복제합니다.
@@ -256,7 +256,7 @@ Solution
 .. note::
    This constraint has been relaxed in PyTorch 2.7 nightlies. This should work out-of-the-box in PyTorch 2.7
 
-Promptable Image Segmentation
+프롬프트 기반 이미지 분할
 -----------------------------
 
 **이미지 분할**은 디지털 이미지를 픽셀 단위의 특징에 따라 서로 다른 그룹, 즉 세그먼트로 나누는 컴퓨터 비전 기술입니다.
@@ -278,7 +278,7 @@ SAM2는 객체 추적에서 강력한 제로샷 성능을 제공하므로, 장�
    )
 
 
-Error: Model is not of type ``torch.nn.Module``
+에러: 모델의 타입이 ``torch.nn.Module`` 아닙니다.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ``torch.export`` 는 모듈이 ``torch.nn.Module`` 타입이어야 합니다. 하지만, 내보내기 하려는 모듈은 클래스 메서드이기 때문에 오류가 발생합니다.
@@ -295,7 +295,7 @@ Error: Model is not of type ``torch.nn.Module``
    ValueError: Expected `mod` to be an instance of `torch.nn.Module`, got <class 'method'>.
 
 
-Solution
+해결 방법
 ~~~~~~~~
 
 도우미 클래스를 작성하여 ``torch.nn.Module``을 상속하고, 클래스의 ``forward`` 메서드 안에서 ``_predict method``를 호출합니다. 전체 코드는 `here <https://github.com/anijain2305/sam2/blob/ued/sam2/sam2_image_predictor.py#L293-L311>`__ 에서 확인할 수 있습니다.
@@ -317,7 +317,7 @@ Solution
          strict=False,
          )
 
-Conclusion
+결론
 ----------
 
 이 튜토리얼에서는 ``torch.export``를 활용하여 다양한 대표적인 사용 사례의 모델을 내보내는 방법을 학습하였고, 올바른 설정과 간단한 코드 수정으로 발생할 수 있는 여러 문제들을 해결하는 방법도 함께 다뤘습니다.
