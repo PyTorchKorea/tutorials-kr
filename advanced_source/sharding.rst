@@ -83,13 +83,13 @@ Colab에서는 런타임이 /usr/lib 폴더에서 공유 라이브러리를 탐�
 여기에서는 TorchRec의 `EmbeddingBagCollection <https://github.com/facebookresearch/torchrec/blob/main/torchrec/modules/embedding_modules.py#L59>`_ 을 사용하여, 여러 개의 임베딩 테이블로 구성된 임베딩 백(embedding bag) 모델을 구축합니다.
 
 이번 예시에서는 4개의 임베딩 백(embedding bag) 으로 구성된 EmbeddingBagCollection (EBC)를 생성합니다.
-테이블은 두 가지 크기로 구분됩니다:
+테이블은 두 가지 크기로 구분됩니다.
 큰 테이블과 작은 테이블로, 각각 행 크기 4096과 1024로 구분됩니다.
 모든 테이블의 임베딩 차원은 동일하게 64차원으로 설정합니다.
 
 또한, 각 테이블에 대해 ``ParameterConstraints`` 데이터 구조를 설정합니다.
 이 구조는 모델 병렬화 API가 테이블의 샤딩 및 배치 전략을 결정하는 데 도움이 되는 힌트를 제공합니다.
-TorchRec에서는 다음과 같은 샤딩 방식을 지원합니다:
+TorchRec에서는 다음과 같은 샤딩 방식을 지원합니다.
 \* ``table-wise``: 전체 테이블을 하나의 디바이스에 배치; \*
 ``row-wise``: 테이블을 행 단위로 균등 분할하여 통신 그룹의 각 디바이스에 하나씩 배치; \* 
 ``column-wise``:
