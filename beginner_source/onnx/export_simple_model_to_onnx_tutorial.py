@@ -25,8 +25,8 @@ PyTorch 모델을 ONNX로 내보내기
 # 이 튜토리얼에서는 그 내용의 확장으로 ``torch.onnx.export(..., dynamo=True)`` ONNX 익스포터를 사용하여
 # PyTorch에서 정의된 모델을 ONNX 형식으로 변환하는 방법을 알아보겠습니다.
 #
-# PyTorch는 모델을 반복 개발하는 데에 효과적이지만, 모델은 `ONNX <https://onnx.ai/>`_ (Open Neural Network Exchange) 등과 같이
-# 다양한 형식으로 프로덕션 환경에 배포될 수 있습니다!
+# 모델 개발과 실험에는 PyTorch가 매우 유용하고, PyTorch로 완성된 모델은 `ONNX <https://onnx.ai/>`_ (Open Neural Network Exchange)
+# 등 다양한 형식으로 변환해 실제 서비스 환경에 배포할 수 있습니다.
 #
 # ONNX는 머신러닝 모델을 나타내는 유연한 공개 표준 형식입니다. 이런 표준화된 표현을 사용하는 모델은
 # 대규모 클라우드 기반 슈퍼컴퓨터부터, 웹 브라우저나 휴대폰처럼 리소스가 제한된 엣지 디바이스까지
@@ -44,7 +44,7 @@ PyTorch 모델을 ONNX로 내보내기
 #
 # 1. 필요한 의존성 설치하기
 # ------------------------------------
-# ONNX 익스포터는 PyTorch 연산자를 ONNX 연산자로 변환하는 데에 ``onnx`` 와 ``onnxscript`` 를 사용하므로 
+# ONNX 익스포터는 PyTorch 연산자를 ONNX 연산자로 변환할 때 ``onnx`` 와 ``onnxscript`` 를 사용하므로 
 # 이에 대한 설치를 진행합니다.
 #
 #  .. code-block:: bash
