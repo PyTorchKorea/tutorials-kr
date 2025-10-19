@@ -4,7 +4,6 @@
 
 """
 
-
 ######################################################################
 # 파이토치는 일반적으로 역전파를 통해 기울기를 계산합니다.
 # 그러나 특정 작업에서는 역전파를 수행하기 위한 중간결과를 저장해야 합니다.
@@ -78,14 +77,16 @@ print(y.grad_fn._saved_other)
 # 계산 그래프가 깊어질수록 *저장된 tensor*가 더 많이 저장됩니다.
 # 한편, tensor는 그래프가 아니었다면 범위를 벗어나게 됩니다.
 
+
 def f(x):
     return x * x
+
 
 x = torch.randn(5, requires_grad=True)
 y = f(f(f(x)))
 
 ######################################################################
-#.. figure :: https://user-images.githubusercontent.com/8019486/130124570-f1074098-1bb3-459e-bf5a-03bf6f65b403.png
+# .. figure :: https://user-images.githubusercontent.com/8019486/130124570-f1074098-1bb3-459e-bf5a-03bf6f65b403.png
 #   :width: 500
 #   :align: center
 
@@ -93,14 +94,13 @@ y = f(f(f(x)))
 # 위의 예제에서 미분(grad)없이 실행하면 범위내의 ``x`` 와 ``y`` 는 유지되지만
 # 그래프에서는 ``f(x)`` 와 ``f(f(x))`` 가 추가로 저장됩니다.
 # 따라서 훈련 중 정방향 경로를 실행하면 평가중에
-# (더 정확하게는 자동미분(auto grad)가 필요하지 않은 경우보다)
+# (더 정확하게는 미분 자동화(autograd)가 필요하지 않은 경우보다)
 # 메모리 사용량이 더 많아지게 됩니다.
 
 
 ######################################################################
 # 패킹과 언패킹의 개념
 # ~~~~~~~~~~~~~~~~~~~~~~
-
 
 
 ######################################################################
@@ -111,7 +111,7 @@ a = torch.randn(5, requires_grad=True)
 b = torch.ones(5, requires_grad=True)
 y = a * b
 
-print(y.grad_fn._saved_self is a)   # True
+print(y.grad_fn._saved_self is a)  # True
 print(y.grad_fn._saved_other is b)  # True
 
 
@@ -121,7 +121,7 @@ print(y.grad_fn._saved_other is b)  # True
 a = torch.randn(5, requires_grad=True)
 y = torch.exp(a)
 print(y.grad_fn._saved_result.equal(y))  # True
-print(y.grad_fn._saved_result is y)      # False
+print(y.grad_fn._saved_result is y)  # False
 
 
 ######################################################################
@@ -136,18 +136,21 @@ print(y.grad_fn._saved_result is y)      # False
 # -----------------------
 
 
-
 ######################################################################
 # 파이토치는 tensor들이 어떻게 패킹되고 언패킹되는지
 # 저장할 수 있는 제어 가능한 API를 제공합니다.
+
 
 def pack_hook(x):
     print("Packing", x)
     return x
 
+
 def unpack_hook(x):
     print("Unpacking", x)
     return x
+
+
 a = torch.ones(5, requires_grad=True)
 b = torch.ones(5, requires_grad=True) * 2
 
@@ -168,7 +171,7 @@ x = torch.randn(5, requires_grad=True)
 with torch.autograd.graph.saved_tensors_hooks(lambda x: x * 4, lambda x: x / 4):
     y = torch.pow(x, 2)
 y.sum().backward()
-assert(x.grad.equal(2 * x))
+assert x.grad.equal(2 * x)
 
 
 ######################################################################
@@ -178,7 +181,6 @@ assert(x.grad.equal(2 * x))
 ######################################################################
 # 몇 가지 특이한 예제들
 # ~~~~~~~~~~~~~~~~~~~~~~~~
-
 
 
 ######################################################################
@@ -193,19 +195,22 @@ assert(x.grad.equal(2 * x))
 
 storage = []
 
+
 def pack(x):
     storage.append(x)
     return len(storage) - 1
 
+
 def unpack(x):
     return storage[x]
+
 
 x = torch.randn(5, requires_grad=True)
 with torch.autograd.graph.saved_tensors_hooks(pack, unpack):
     y = x * x
 y.sum().backward()
 
-assert(x.grad.equal(2 * x))
+assert x.grad.equal(2 * x)
 
 ######################################################################
 # 튜플(tuple) 반환
@@ -213,9 +218,11 @@ assert(x.grad.equal(2 * x))
 #
 # 일부 tensor와 함수를 반환하고 패킹을 푸는 방법은 이런 형태로는 유용하지 않을 것입니다.
 
+
 def pack(x):
     delta = torch.randn(*x.size())
     return x - delta, lambda x: x + delta
+
 
 def unpack(packed):
     x, f = packed
@@ -227,7 +234,7 @@ with torch.autograd.graph.saved_tensors_hooks(pack, unpack):
     y = x * x
 y.sum().backward()
 
-assert(torch.allclose(x.grad, 2 * x))
+assert torch.allclose(x.grad, 2 * x)
 
 ######################################################################
 # ``str`` 반환
@@ -237,10 +244,12 @@ assert(torch.allclose(x.grad, 2 * x))
 # 아마도 이렇게는 하지 않을 것입니다.
 
 x = torch.randn(5, requires_grad=True)
-with torch.autograd.graph.saved_tensors_hooks(lambda x: repr(x), lambda x: eval("torch." + x)):
+with torch.autograd.graph.saved_tensors_hooks(
+    lambda x: repr(x), lambda x: eval("torch." + x)
+):
     y = x * x
 y.sum().backward()
-assert(torch.all(x.grad - 2 * x <= 1e-4))
+assert torch.all(x.grad - 2 * x <= 1e-4)
 
 
 ######################################################################
@@ -255,7 +264,6 @@ assert(torch.all(x.grad - 2 * x <= 1e-4))
 # ~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-
 ######################################################################
 # 매우 빈번하게, tensor 계산 그래프 GPU에 살아 있습니다.
 # 대부분 경우에서 모델이 평가중에 정상적으로 수행되지만 훈련 중에 메모리가 부족하다면,
@@ -265,13 +273,14 @@ assert(torch.all(x.grad - 2 * x <= 1e-4))
 # hooks는 이를 구현하는 매우 간단한 방법을 제공합니다.
 
 
-
 def pack_hook(x):
     return (x.device, x.cpu())
+
 
 def unpack_hook(packed):
     device, tensor = packed
     return tensor.to(device)
+
 
 x = torch.randn(5, requires_grad=True)
 with torch.autograd.graph.saved_tensors_hooks(pack, unpack):
@@ -287,6 +296,7 @@ torch.allclose(x.grad, (2 * x))
 
 import torch.nn as nn
 
+
 class Model(nn.Module):
     def __init__(self):
         super().__init__()
@@ -296,6 +306,7 @@ class Model(nn.Module):
         with torch.autograd.graph.save_on_cpu(pin_memory=True):
             # some computation
             return self.w * x
+
 
 x = torch.randn(5)
 model = Model()
@@ -312,6 +323,7 @@ loss.backward()
 # 예를 들어, 어떤 모듈을 감싸두고 해당 tensor를 CPU에 저장하는 특별한
 # ``nn.Module`` 을 정의할 수 있습니다.
 
+
 class SaveToCpu(nn.Module):
     def __init__(self, module):
         super().__init__()
@@ -320,6 +332,7 @@ class SaveToCpu(nn.Module):
     def forward(self, *args, **kwargs):
         with torch.autograd.graph.save_on_cpu(pin_memory=True):
             return self.module(*args, **kwargs)
+
 
 model = nn.Sequential(
     nn.Linear(10, 100),
@@ -337,7 +350,6 @@ loss.backward()
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-
 ######################################################################
 # 비슷하게, 이러한 tensor를 디스크에 저장하고 싶을 수 도 있습니다.
 # 다시 말하지만 이것은 앞서말한 hooks로 달성할 수 있습니다.
@@ -348,12 +360,15 @@ loss.backward()
 # 모자란 버전(naive version) - 힌트: 이렇게 하지 마시오.
 
 import uuid
+
 tmp_dir = "temp"
+
 
 def pack_hook(tensor):
     name = os.path.join(tmp_dir, str(uuid.uuid4()))
     torch.save(tensor, name)
     return name
+
 
 def unpack_hook(name):
     return torch.load(name, weights_only=True)
@@ -368,13 +383,16 @@ def unpack_hook(name):
 import uuid
 import os
 import tempfile
+
 tmp_dir_obj = tempfile.TemporaryDirectory()
 tmp_dir = tmp_dir_obj.name
+
 
 def pack_hook(tensor):
     name = os.path.join(tmp_dir, str(uuid.uuid4()))
     torch.save(tensor, name)
     return name
+
 
 def unpack_hook(name):
     tensor = torch.load(name, weights_only=True)
@@ -403,17 +421,20 @@ except:
 # 파이토치는 저장된 데이터를 더이상 필요하지 않을 때
 # 자동으로 해제(삭제) 하는 이점을 활용하는 hooks의 버전을 작성할 수 있습니다.
 
-class SelfDeletingTempFile():
+
+class SelfDeletingTempFile:
     def __init__(self):
         self.name = os.path.join(tmp_dir, str(uuid.uuid4()))
 
     def __del__(self):
         os.remove(self.name)
 
+
 def pack_hook(tensor):
     temp_file = SelfDeletingTempFile()
     torch.save(tensor, temp_file.name)
     return temp_file
+
 
 def unpack_hook(temp_file):
     return torch.load(temp_file.name, weights_only=True)
@@ -429,6 +450,7 @@ def unpack_hook(temp_file):
 
 SAVE_ON_DISK_THRESHOLD = 1000
 
+
 def pack_hook(x):
     if x.numel() < SAVE_ON_DISK_THRESHOLD:
         return x
@@ -436,10 +458,12 @@ def pack_hook(x):
     torch.save(tensor, temp_file.name)
     return temp_file
 
+
 def unpack_hook(tensor_or_sctf):
     if isinstance(tensor_or_sctf, torch.Tensor):
         return tensor_or_sctf
     return torch.load(tensor_or_sctf.name)
+
 
 class SaveToDisk(nn.Module):
     def __init__(self, module):
@@ -449,6 +473,7 @@ class SaveToDisk(nn.Module):
     def forward(self, *args, **kwargs):
         with torch.autograd.graph.saved_tensors_hooks(pack_hook, unpack_hook):
             return self.module(*args, **kwargs)
+
 
 net = nn.DataParallel(SaveToDisk(Model()))
 
