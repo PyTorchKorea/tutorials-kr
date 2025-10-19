@@ -19,7 +19,7 @@ PyTorch 분산 개요
 병렬 처리 API
 ****************
 
-이러한 병렬화 모듈은 고수준 기능을 제공하며 기존 모델과 조합하여 사용할 수 있습니다:
+이러한 병렬화 모듈은 고수준 기능을 제공하며 기존 모델과 조합하여 사용할 수 있습니다.
 
 - `분산 데이터 병렬 처리 (DDP, Distributed Data-Parallel) <https://pytorch.org/docs/stable/generated/torch.nn.parallel.DistributedDataParallel.html>`__
 - `완전 샤딩 데이터 병렬 학습 (FSDP2, Fully Sharded Data-Parallel Training) <https://pytorch.org/docs/stable/distributed.fsdp.fully_shard.html>`__
@@ -37,7 +37,7 @@ PyTorch 분산 개요
 통신 API
 *******************
 
-`PyTorch 분산 통신 계층 (C10D) <https://pytorch.org/docs/stable/distributed.html>`__ 은 집단 통신 API (예: `all_reduce(전체 축소) <https://pytorch.org/docs/stable/distributed.html#torch.distributed.all_reduce>`__
+`PyTorch 분산 통신 계층 (C10D) <https://pytorch.org/docs/stable/distributed.html>`__ 은 집합 통신 API (예: `all_reduce(전체 축소) <https://pytorch.org/docs/stable/distributed.html#torch.distributed.all_reduce>`__
    , `all_gather(전체 수집) <https://pytorch.org/docs/stable/distributed.html#torch.distributed.all_gather>`__)
    와 P2P 통신 API (예: `send(동기 전송) <https://pytorch.org/docs/stable/distributed.html#torch.distributed.send>`__
    , `isend(비동기 전송) <https://pytorch.org/docs/stable/distributed.html#torch.distributed.isend>`__)를 모두 제공하며,
@@ -59,7 +59,7 @@ PyTorch 분산 개요
 
 모델 병렬화(Model Parallelism) 기법(또는 샤딩된 데이터 병렬화)은 모델이 GPU 메모리에 들어가지 않을 때 필요하며, 서로 결합해 다차원(N-D) 병렬화 기법을 구성할 수 있습니다.
 
-모델에 적용할 병렬화 기법을 결정할 때는 다음의 일반적인 지침을 참고하세요:
+모델에 적용할 병렬화 기법을 결정할 때는 다음의 일반적인 지침을 참고하세요.
 
 #. 모델이 단일 GPU를 탑재할 수 있지만, 여러 GPU로 쉽게 학습을 확장하고 싶다면 
    `DistributedDataParallel (DDP, 분산 데이터 병렬화) <https://pytorch.org/docs/stable/notes/ddp.html>`__ 를 사용하세요.
@@ -74,7 +74,7 @@ PyTorch 분산 개요
 
 #. FSDP2로는 확장 한계에 도달한 경우, `Tensor Parallel (TP, Tensor 병렬화) <https://pytorch.org/docs/stable/distributed.tensor.parallel.html>`__ 및/또는 `Pipeline Parallel (PP, 파이프라인 병렬화) <https://pytorch.org/docs/main/distributed.pipelining.html>`__ 를 사용하세요.
 
-   * `텐서 병렬화 튜토리얼 <https://tutorials.pytorch.kr/intermediate/TP_tutorial.html>`__ 을 확인해 보세요
+   * `텐서 병렬화 튜토리얼 <https://tutorials.pytorch.kr/intermediate/TP_tutorial.html>`__ 을 확인해 보세요.
 
    * 참고: `TorchTitan 3D 병렬화 전체(end to end) 예제 <https://github.com/pytorch/torchtitan>`__
 
