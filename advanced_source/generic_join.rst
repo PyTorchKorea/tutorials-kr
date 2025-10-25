@@ -1,4 +1,4 @@
-불균등한 입력에 대한 분산 학습을 위한 Join Context Manager 사용 예시
+불균등한 입력에 대한 분산 학습을 위한 Join 컨텍스트 관리자(context manager) 사용 예시
 =========================================================
 
 **저자**: `Andrew Gu <https://github.com/andwgu>`_
@@ -16,7 +16,7 @@
 
 이 튜토리얼에서는 다음을 다룹니다.
 
-- `Join`_ 컨텍스트 관리자(context manager) 개요
+- `Join`_ 컨텍스트 관리자 개요
 - ``DistributedDataParallel`` 과 함께 컨텍스트 관리자를 사용하는 예시
 - ``DistributedDataParallel`` 과 ``ZeroRedundancyOptimizer`` 를
   컨텍스트 관리자와 함께 사용하는 예시
@@ -74,7 +74,7 @@ PyTorch의 `DistributedDataParallel`_ 은 ``Join`` 컨텍스트 관리자와 함
         dist.init_process_group(BACKEND, rank=rank, world_size=WORLD_SIZE)
 
         model = DDP(torch.nn.Linear(1, 1).to(rank), device_ids=[rank])
-        # 랭크 1은 랭크 0보다 입력을 하나 더 받습니다
+        # 랭크 1은 랭크 0보다 입력을 하나 더 받습니다.
         inputs = [torch.tensor([1]).float() for _ in range(NUM_INPUTS + rank)]
 
         num_inputs = 0
@@ -93,7 +93,7 @@ PyTorch의 `DistributedDataParallel`_ 은 ``Join`` 컨텍스트 관리자와 함
         main()
 
 이 코드는 다음과 같은 출력을 생성합니다.
-(랭크 0과 랭크 1의 ``print()`` 출력 순서는 임의로 정렬될 수 있습니다)
+(랭크 0과 랭크 1의 ``print()`` 출력 순서는 임의로 정렬될 수 있습니다.)
 
 ::
 
