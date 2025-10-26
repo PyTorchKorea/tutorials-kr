@@ -1,12 +1,9 @@
 불균등한 입력에 대한 분산 학습을 위한 Join 컨텍스트 관리자(context manager) 사용 예시
-=========================================================
+======================================================================
 
-**저자**: `Andrew Gu <https://github.com/andwgu>`_
+**저자**\ : `Andrew Gu <https://github.com/andwgu>`_
 
-**번역**: `김민엽 <https://github.com/minyeamer>`_
-
-.. role:: python(code)
-    :language: python
+**번역**\ : `김민엽 <https://github.com/minyeamer>`_
 
 .. note::
     |edit| 이 튜토리얼은 `github <https://github.com/PyTorchKorea/tutorials-kr/blob/master/advanced_source/generic_join.rst>`_ 에서 확인하고 수정할 수 있습니다.
@@ -181,23 +178,23 @@ PyTorch의 `DistributedDataParallel`_ 은 ``Join`` 컨텍스트 관리자와 함
 
 시작하기에 앞서, ``Join`` 컨텍스트 관리자와 호환되는 클래스는
 기본 추상 클래스인 ``Joinable`` 을 상속해야 합니다. 특히, ``Joinable`` 은
-다음 메서드를 구현해야 합니다.
+다음 메소드를 구현해야 합니다.
 
-- :python:`join_hook(self, **kwargs) -> JoinHook`
+- ``join_hook(self, **kwargs) -> JoinHook``
 
-이 메서드는 ``Joinable`` 에 대한 ``JoinHook`` 인스턴스를 반환하며,
+이 메소드는 ``Joinable`` 에 대한 ``JoinHook`` 인스턴스를 반환하며,
 *join* 된 프로세스가 ``Joinable`` 이 수행하는 반복별 집합통신을
 어떻게 모방해야 하는지를 결정합니다.
 
-- :python:`join_device(self) -> torch.device`
+- ``join_device(self) -> torch.device``
 
-이 메서드는 ``Join`` 컨텍스트 관리자가 집합통신을 수행하는 데 사용할 장치를 반환합니다.
+이 메소드는 ``Join`` 컨텍스트 관리자가 집합통신을 수행하는 데 사용할 장치를 반환합니다.
 예를 들어, ``torch.device("cuda:0")`` 또는
 ``torch.device("cpu")`` 가 있습니다.
 
-- :python:`join_process_group(self) -> ProcessGroup`
+- ``join_process_group(self) -> ProcessGroup``
 
-이 메서드는 ``Join`` 컨텍스트 관리자가 집합통신을 수행하는 데
+이 메소드는 ``Join`` 컨텍스트 관리자가 집합통신을 수행하는 데
 사용할 프로세스 그룹을 반환합니다.
 
 특히, ``join_device`` 와 ``join_process_group`` 은
@@ -208,7 +205,7 @@ PyTorch의 `DistributedDataParallel`_ 은 ``Join`` 컨텍스트 관리자와 함
 동작을 구현할 때 사용됩니다.
 
 ``DistributedDataParallel`` 과 ``ZeroRedundancyOptimizer`` 는 이미
-``Joinable`` 을 상속하고 위 메서드들을 구현하고 있으므로,
+``Joinable`` 을 상속하고 위 메소드들을 구현하고 있으므로,
 앞선 예시에서 바로 사용할 수 있었습니다.
 
 ``Joinable`` 클래스를 만들 때는 반드시 ``Joinable`` 의 생성자를 호출해야 합니다.
@@ -222,14 +219,14 @@ PyTorch의 `DistributedDataParallel`_ 은 ``Join`` 컨텍스트 관리자와 함
 다음으로, ``JoinHook`` 클래스는 컨텍스트 관리자에 진입할 수 있는
 두 가지 진입점을 제공합니다.
 
-- :python:`main_hook(self) -> None`
+- ``main_hook(self) -> None``
 
 이 훅은 아직 *join* 되지 않은 랭크가 존재하는 동안, *join* 된 각 랭크에서
 반복적으로 호출됩니다.
 이는 각 학습 반복(순전파, 역전파, 옵티마이저 단계 등)에서
 ``Joinable`` 이 수행하는 집합통신을 모방하도록 설계되었습니다.
 
-- :python:`post_hook(self, is_last_joiner: bool) -> None`
+- ``post_hook(self, is_last_joiner: bool) -> None``
 
 이 훅은 모든 랭크가 *join* 된 후 한 번 호출됩니다.
 ``bool`` 타입의 추가 인자로 ``is_last_joiner`` 가 전달되며, 해당 랭크가
@@ -247,7 +244,7 @@ PyTorch의 `DistributedDataParallel`_ 은 ``Join`` 컨텍스트 관리자와 함
 
 마지막으로, 이러한 것들이 ``Join`` 클래스 내에서 어떻게 동작하는지 살펴보겠습니다.
 
-- :python:`__init__(self, joinables: List[Joinable], enable: bool = True, throw_on_early_termination: bool = False)`
+- ``__init__(self, joinables: List[Joinable], enable: bool = True, throw_on_early_termination: bool = False)``
 
 이전 예시에서 보았듯이, 생성자는 학습 반복 과정에 참여하는
 ``Joinable`` 객체들의 리스트를 받습니다.
@@ -267,8 +264,8 @@ PyTorch의 `DistributedDataParallel`_ 은 ``Join`` 컨텍스트 관리자와 함
 사용할 때가 해당됩니다. 이런 경우 해당 인자를 ``True`` 로 설정하여 애플리케이션 로직에서
 예외를 감지하고 적절히 처리할 수 있습니다.
 
-- 핵심 로직은 ``__exit__()`` 메서드에서 동작합니다.
-  이 메서드는 *join* 되지 않은 랭크가 존재하는 동안 각 ``Joinable`` 의 ``main_hook`` 을 호출하고,
+- 핵심 로직은 ``__exit__()`` 메소드에서 동작합니다.
+  이 메소드는 *join* 되지 않은 랭크가 존재하는 동안 각 ``Joinable`` 의 ``main_hook`` 을 호출하고,
   모든 랭크가 *join* 된 후에는 ``post_hook`` 을 호출합니다.
   ``main_hook`` 과 ``post_hook`` 은 ``Joinable`` 객체가
   전달된 순서대로 호출됩니다.
@@ -435,7 +432,7 @@ PyTorch의 `DistributedDataParallel`_ 은 ``Join`` 컨텍스트 관리자와 함
 - ``Counter`` 인스턴스는 각 반복마다 한 번의 all-reduce 연산만 수행하므로,
   ``main_hook`` 도 이를 따라 단일 all-reduce 연산을 수행합니다.
 
-- ``Counter`` 클래스는 ``__call__()`` 메서드 시작 부분에서
+- ``Counter`` 클래스는 ``__call__()`` 메소드 시작 부분에서
   ``Join.notify_join_context()`` 를 호출합니다.
   이는 각 반복별 집합통신(즉, all-reduce 연산) 전에 호출되어야 합니다.
 
