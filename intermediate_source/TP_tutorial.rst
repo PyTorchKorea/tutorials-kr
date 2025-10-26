@@ -2,7 +2,7 @@
 ======================================================
 
 **저자**: `Wanchao Liang <https://github.com/wanchaol>`__, `Tianyu Liu <https://github.com/tianyu-l>`__
-  **번역**: `강호현 <https://github.com/stats-dev>`__
+**번역**: `강호현 <https://github.com/stats-dev>`__
 
 .. note::
    |edit| 이 튜토리얼은 `github <https://github.com/pytorchkorea/tutorials-kr/blob/main/intermediate_source/TP_tutorial.rst>`__ 에서 확인하고 편집하세요.
