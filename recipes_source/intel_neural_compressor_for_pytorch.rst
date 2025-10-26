@@ -102,8 +102,8 @@ FP8 양자화는 Intel® Gaudi® 2 및 3 AI Accelerator(HPU)에서 지원됩니�
     )
 ..
 
-참고: Intel Neural Compressor는 처음 로드할 때 auto-gptq 형식을 HPU 형식으로 변환하고,
-다음 로드를 위해 로컬 캐시에 ``hpu_model.safetensors`` 파일을 저장합니다.
+참고: Intel Neural Compressor는 처음 모델을 불러올 때 auto-gptq 형식을 HPU 형식으로 변환하고,
+다음에 불러올 수 있도록 로컬 캐시에 `hpu_model.safetensors` 파일을 저장합니다.
 따라서 첫 로드에는 시간이 다소 걸릴 수 있습니다.
 
 PT2E 백엔드 기반 정적 양자화(Static Quantization with PT2E Backend)
