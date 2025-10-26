@@ -40,7 +40,7 @@
 * 각 계층에 어떤 ``ParallelStyle`` 을 적용할지 결정하고, ``parallelize_module`` 을 호출해서 초기화된 모듈을 샤딩합니다.
 * 병렬화된 모듈은 모델 파라미터를 DTensor로 교체하고, DTensor는 샤딩하는 계산을 사용하여 병렬화된 모듈을 실행하는 역할을 담당합니다.
 
-**런타임 포워드/백워드**
+**런타임 순방향/역방향**
 
 * 사용자가 지정한 개별 ``ParallelStyle`` 의 입력/출력 Dtensor 계층에 따라, 입력/출력에 대한 DTensor 계층을 변환하는 적절한 커뮤니케이션 동작을 실행합니다. (예를 들어, ``allreduce``, ``allgather``, ``reduce_scatter`` )
 * 병렬화된 계층( ``nn.Linear`` , ``nn.Embedding`` )은 연산 및 메모리를 절약하기 위해 샤딩된 연산을 실행합니다. 
