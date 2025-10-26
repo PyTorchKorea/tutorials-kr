@@ -30,13 +30,13 @@ PyTorch Compiler는 컴파일 지연 시간을 줄이기 위해 여러 가지 �
 
 ``torch.compile`` 은 다음과 같은 캐싱 기능을 제공합니다.
 
-* End to end caching (``Mega-Cache`` 라고도 불림)
+* 엔드 투 엔드 캐싱 (``Mega-Cache`` 라고도 불림)
 * ``TorchDynamo``, ``TorchInductor``, ``Triton`` 모듈별 캐싱
 
 캐시가 올바르게 동작하기 위해서는 캐시 아티팩트가 동일한 PyTorch 및 Triton 버전에서 생성된 것이어야 하며,  
 디바이스가 CUDA로 설정된 경우에는 같은 GPU 환경에서 사용되어야 한다는 점에 유의해야 합니다.
 
-``torch.compile`` end-to-end caching (``Mega-Cache``)
+``torch.compile`` 엔드 투 엔드 캐싱 (``Mega-Cache``)
 ------------------------------------------------------------
 
 ``Mega-Cache``”로 지칭되는 엔드 투 엔드 캐싱은, 캐시 데이터를 데이터베이스에 저장해 다른 머신에서도 불러올 수 있는 이식 가능한(portable) 캐싱 솔루션을 찾는 사용자에게 이상적인 방법입니다.
@@ -68,7 +68,7 @@ PyTorch Compiler는 컴파일 지연 시간을 줄이기 위해 여러 가지 �
     artifact_bytes, cache_info = artifacts
 
     # 이제 artifact_bytes를 데이터베이스에 저장할 수도 있습니다.
-    # cache_info는 기록할(logging)할 수 있습니다.
+    # cache_info는 기록(logging)할 수 있습니다.
 
 Later, you can jump-start the cache by the following:
 
@@ -77,7 +77,7 @@ Later, you can jump-start the cache by the following:
     # 데이터베이스에서 아티팩트를 다운로드하거나 불러올 수도 있습니다.
     torch.compiler.load_cache_artifacts(artifact_bytes)
 
-이 작업은 다음 섹션에서 다룰 모든 모듈별 캐시(modular caches) 를 미리 채웁니다. 여기에는 ``PGO``, ``AOTAutograd``, ``Inductor``, ``Triton``, 그리고 ``Autotuning`` 이 포함됩니다.
+이 작업은 다음 섹션에서 다룰 모든 모듈별 캐시(modular caches)를 미리 채웁니다. 여기에는 ``PGO``, ``AOTAutograd``, ``Inductor``, ``Triton``, 그리고 ``Autotuning`` 이 포함됩니다.
 
 
 ``TorchDynamo``, ``TorchInductor``, 그리고 ``Triton`` 의 모듈별 캐싱
