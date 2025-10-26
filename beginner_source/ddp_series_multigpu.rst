@@ -114,7 +114,7 @@ DDP 모델 구축
 -  `DistributedSampler <https://pytorch.org/docs/stable/data.html?highlight=distributedsampler#torch.utils.data.distributed.DistributedSampler>`__
    를 이용하여 모든 분산 프로세스에 입력 데이터를 나눕니다.
 -  `DataLoader <https://pytorch.org/docs/stable/data.html#torch.utils.data.DataLoader>`__ 는 데이터셋과 샘플러를 결합하여
-   주어진 데이터셋에 대한 반복 가능 객체를 제공합니다.combines a dataset and a
+   주어진 데이터셋에 대한 반복 가능 객체를 제공합니다.
 -  각각의 프로세스는 32개 샘플 크기의 입력 배치를 받습니다.
    이상적인 배치 크기는 ``32 * nprocs``, 혹은 4개의 GPU를 사용할 때 128입니다.
 
