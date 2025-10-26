@@ -129,11 +129,11 @@ PyTorch의 `DistributedDataParallel`_ 은 ``Join`` 컨텍스트 관리자와 함
 
         model = DDP(torch.nn.Linear(1, 1).to(rank), device_ids=[rank])
         optim = ZeRO(model.parameters(), Adam, lr=0.01)
-        # 랭크 1은 랭크 0보다 입력을 하나 더 받습니다
+        # 랭크 1은 랭크 0보다 입력을 하나 더 받습니다.
         inputs = [torch.tensor([1]).float() for _ in range(NUM_INPUTS + rank)]
 
         num_inputs = 0
-        # `model` 과 `optim` 을 모두 `Join()` 에 전달합니다
+        # `model` 과 `optim` 을 모두 `Join()` 에 전달합니다.
         with Join([model, optim]):
             for input in inputs:
                 num_inputs += 1
