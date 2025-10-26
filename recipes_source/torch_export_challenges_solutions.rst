@@ -1,9 +1,10 @@
-Demonstration of torch.export flow, common challenges and the solutions to address them
+torch.export 흐름의 설명, 일반적인 문제점과 이들을 해결하기 위한 해결책
 =======================================================================================
-**Authors:** `Ankith Gunapal <https://github.com/agunapal>`__, `Jordi Ramon <https://github.com/JordiFB>`__, `Marcos Carranza <https://github.com/macarran>`__
+**저자:** `Ankith Gunapal <https://github.com/agunapal>`__, `Jordi Ramon <https://github.com/JordiFB>`__, `Marcos Carranza <https://github.com/macarran>`__
+**번역:** `이현준 <https://github.com/joonda>`__
 
-`Introduction to torch.export Tutorial <https://tutorials.pytorch.kr/intermediate/torch_export_tutorial.html>`__ 에서, `torch.export <https://pytorch.org/docs/stable/export.html>`__ 할수 있는 방법을 배울 수 있습니다.
-이 튜토리얼은 이전 튜토리얼을 확장하며, 널리 사용되는 모델들을 코드와 함께 내보내는 과정과 ``torch.export``를 사용중 마주칠 수 있는 문제들을 다룹니다.
+`Introduction to torch.export Tutorial <https://tutorials.pytorch.kr/intermediate/torch_export_tutorial.html>`__ 에서, `torch.export <https://pytorch.org/docs/stable/export.html>`__ 를 사용하는 방법을 배웠습니다.
+이 튜토리얼은 이전 튜토리얼을 확장하며, 널리 사용되는 모델들을 코드와 함께 내보내는 과정과 ``torch.export`` 사용중 마주칠 수 있는 문제들을 다룹니다.
 
 이 튜토리얼은 다음과 같은 사용 사례에 맞게 모델을 내보내는 방법을 배웁니다.
 
@@ -29,21 +30,21 @@ Demonstration of torch.export flow, common challenges and the solutions to addre
 TorchDynamo가 지원하지 않는 Python의 기능을 만나면, 계산 그래프는 중단하고 해당 코드는 기본 Python 인터프리터가 처리하도록 하고, 그래프 캡쳐를 이어나갑니다.
 이러한 중단된 계산 그래프를 `graph break <https://tutorials.pytorch.kr/intermediate/torch_compile_tutorial.html#torchdynamo-and-fx-graphs>`__ 라고 칭합니다.
 
-``torch.export``와 ``torch.compile``의 주요한 차이점 중 하나는 ``torch.export``는 그래프 분절(graph breaks)을 지원하지 않는다는 것입니다. 즉, 내보내려는 전체 모델 또는 모델의 일부는 단일 그래프 형태여야 합니다.
-이는 그래프 분절(graph breaks)을 처리하려면 지원되지 않는 연산을 기본 Python으로 평가해야하는데, 이러한 방식이 ``torch.export``의 설계와 호환되지 않기 때문입니다.
+``torch.export``와 ``torch.compile``의 주요한 차이점 중 하나는 ``torch.export``는 그래프 분절을 지원하지 않는다는 것입니다. 즉, 내보내려는 전체 모델 또는 모델의 일부는 단일 그래프 형태여야 합니다.
+이는 그래프 분절을 처리하려면 지원되지 않는 연산을 기본 Python으로 평가해야하는데, 이러한 방식이 ``torch.export``의 설계와 호환되지 않기 때문입니다.
 다양한 PyTorch 프레임워크들의 차이점에 대한 세부적인 정보는 `link <https://pytorch.org/docs/main/export.html#existing-frameworks>`__ 에서 확인할 수 있습니다.
 
-아래의 커맨드를 사용해서 프로그램 내의 그래프 분절(graph breaks)을 확인할 수 있습니다.
+아래의 커맨드를 사용해서 프로그램 내의 그래프 분절을 확인할 수 있습니다.
 
 .. code:: sh
 
    TORCH_LOGS="graph_breaks" python <file_name>.py
 
-프로그램 내의 그래프 분절(graph breaks)을 제거하도록 코드를 수정해야 합니다. 문제가 해결된다면, 모델을 내보낼 준비가 된 것입니다.
+프로그램 내의 그래프 분절을 제거하도록 코드를 수정해야 합니다. 문제가 해결된다면, 모델을 내보낼 준비가 된 것입니다.
 PyTorch는 인기 있는 HuggingFace와 TIMM 모델에서 ``torch.compile``을 위해서 `nightly benchmarks <https://hud.pytorch.org/benchmark/compilers>`__ 를 실행합니다.
-이러한 모델 대부분은 그래프 분절(graph breaks)이 없습니다.
+이러한 모델 대부분은 그래프 분절이 없습니다.
 
-해당 레시피에 포함된 모델들은 그래프 분절(graph breaks)이 없지만, `torch.export` 는 실패합니다.
+해당 레시피에 포함된 모델들은 그래프 분절이 없지만, `torch.export` 는 실패합니다.
 
 영상 분류
 --------------------
@@ -62,19 +63,19 @@ MViT는 `MultiScale Vision Transformers <https://arxiv.org/abs/2104.11227>`__ �
 
    model = mvit_v1_b(weights=MViT_V1_B_Weights.DEFAULT)
 
-   # Create a batch of 2 videos, each with 16 frames of shape 224x224x3.
-   input_frames = torch.randn(2,16, 224, 224, 3)
+   # 2개의 비디오의 배치를 만들며, 각각의 형태는 224x224x3에 16 프레임을 가집니다.
+   input_frames = torch.randn(2, 16, 224, 224, 3)
    # Transpose to get [1, 3, num_clips, height, width].
    input_frames = np.transpose(input_frames, (0, 4, 1, 2, 3))
 
-   # Export the model.
+   # 모델을 내보냅니다.
    exported_program = torch.export.export(
        model,
        (input_frames,),
    )
 
-   # Create a batch of 4 videos, each with 16 frames of shape 224x224x3.
-   input_frames = torch.randn(4,16, 224, 224, 3)
+   # 4개의 비디오의 배치를 만들며, 각각의 형태는 224x224x3에 16 프레임을 가집니다.
+   input_frames = torch.randn(4, 16, 224, 224, 3)
    input_frames = np.transpose(input_frames, (0, 4, 1, 2, 3))
    try:
        exported_program.module()(input_frames)
@@ -112,13 +113,13 @@ MViT는 `MultiScale Vision Transformers <https://arxiv.org/abs/2104.11227>`__ �
 
    model = mvit_v1_b(weights=MViT_V1_B_Weights.DEFAULT)
 
-   # Create a batch of 2 videos, each with 16 frames of shape 224x224x3.
+   # 2개의 비디오의 배치를 만들며, 각각의 형태는 224x224x3에 16 프레임을 가집니다.
    input_frames = torch.randn(2,16, 224, 224, 3)
 
-   # Transpose to get [1, 3, num_clips, height, width].
+   # 차원을 바꿔 [1, 3, num_clips, height, width] 형태로 변환합니다.
    input_frames = np.transpose(input_frames, (0, 4, 1, 2, 3))
 
-   # Export the model.
+   # 모델을 내보냅니다.
    batch_dim = torch.export.Dim("batch", min=2, max=16)
    exported_program = torch.export.export(
        model,
@@ -127,7 +128,7 @@ MViT는 `MultiScale Vision Transformers <https://arxiv.org/abs/2104.11227>`__ �
        dynamic_shapes={"x": {0: batch_dim}},
    )
 
-   # Create a batch of 4 videos, each with 16 frames of shape 224x224x3.
+   # 4개의 비디오의 배치를 만들며, 각각의 형태는 224x224x3에 16 프레임을 가집니다.
    input_frames = torch.randn(4,16, 224, 224, 3)
    input_frames = np.transpose(input_frames, (0, 4, 1, 2, 3))
    try:
@@ -149,10 +150,10 @@ MViT는 `MultiScale Vision Transformers <https://arxiv.org/abs/2104.11227>`__ �
    from transformers import WhisperProcessor, WhisperForConditionalGeneration
    from datasets import load_dataset
 
-   # load model
+   # 모델을 가져옵니다.
    model = WhisperForConditionalGeneration.from_pretrained("openai/whisper-tiny")
 
-   # dummy inputs for exporting the model
+   # 모델 내보내기를 위한 더미 입력입니다.
    input_features = torch.randn(1,80, 3000)
    attention_mask = torch.ones(1, 3000)
    decoder_input_ids = torch.tensor([[1, 1, 1 , 1]]) * model.config.decoder_start_token_id
@@ -179,7 +180,7 @@ Dynamo에서 이 에러가 발생하는 이유를 이해하려면, `GitHub issue
 ~~~~~~~~
 
 위의 에러를 해결하기 위해, ``torch.export``는 Python 인터프리터를 사용해 프로그램을 트레이싱하는 ``non_strict`` 모드를 제공하며, 이는 PyTorch eager 실행과 유사하게 동작합니다.
-유일한 차이점은 모든 ``Tensor`` 객체가 ``ProxyTensors``로 대체 되며, 이는 모든 연산이 그래프에 기록된다는 것입니다.
+유일한 차이점은 모든 ``Tensor`` 객체가 ``ProxyTensors``로 대체되며, 이는 모든 연산이 그래프에 기록된다는 것입니다.
 ``strict=False``을 사용하면, 프로그램에서 내보낼 수 있습니다.
 
 .. code:: python
@@ -188,10 +189,10 @@ Dynamo에서 이 에러가 발생하는 이유를 이해하려면, `GitHub issue
    from transformers import WhisperProcessor, WhisperForConditionalGeneration
    from datasets import load_dataset
 
-   # load model
+   # 모델을 가져옵니다.
    model = WhisperForConditionalGeneration.from_pretrained("openai/whisper-tiny")
 
-   # dummy inputs for exporting the model
+   # 모델 내보내기를 위한 더미 입력입니다.
    input_features = torch.randn(1,80, 3000)
    attention_mask = torch.ones(1, 3000)
    decoder_input_ids = torch.tensor([[1, 1, 1 , 1]]) * model.config.decoder_start_token_id
@@ -230,8 +231,8 @@ Dynamo에서 이 에러가 발생하는 이유를 이해하려면, `GitHub issue
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 모델을 내보낼 때, 모델 구현에서 ``torch.export`` 에서 아직 지원하지 않는 특정 Python 연산이 포함이 될 수 있기 때문에 실패할 수 있습니다.
-이 실패 사례들 중 일부는 해결 방법이 있을 수 있습니다. BLIP는 원래 모델에서 오류가 발생하는 예시이지만, 코드에 작은 수정을 가하면 해결할 수 있습니다.
-``torch.export``는 `ExportDB <https://pytorch.org/docs/main/generated/exportdb/index.html>`__ 에서 지원되는 연산과 지원되지 않는 연산의 일반적인 사례들을 나열하고, 코드에서 내보낼 수 있도록 수정하는 방법을 보여줍니다.
+이 실패 사례들 중 일부는 해결 방법이 있을 수 있습니다. BLIP는 원래 모델에서 오류가 발생하는 예시이지만, 코드에 작은 수정을 하면 해결할 수 있습니다.
+``torch.export``는 `ExportDB <https://pytorch.org/docs/main/generated/exportdb/index.html>`__ 에서 지원하는 연산과 지원하지 않는 연산의 일반적인 사례들을 나열하고, 코드에서 내보낼 수 있도록 수정하는 방법을 보여줍니다.
 
 .. code:: console
 
@@ -255,6 +256,7 @@ Dynamo에서 이 에러가 발생하는 이유를 이해하려면, `GitHub issue
 
 .. note::
    This constraint has been relaxed in PyTorch 2.7 nightlies. This should work out-of-the-box in PyTorch 2.7
+   이 제약은 PyTorch 2.7 nightlies에서 완화되었습니다. PyTorch 2.7에서는 별도의 설정 없이 바로 동작할 것입니다.
 
 프롬프트 기반 이미지 분할
 -----------------------------
