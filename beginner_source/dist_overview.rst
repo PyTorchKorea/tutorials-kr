@@ -1,14 +1,14 @@
 PyTorch 분산 개요
 ============================
-**저자** `Will Constable <https://github.com/wconstab/>`_, `Wei Feng <https://github.com/weifengpy>`_
-**번역** `강지현 <https://github.com/KJH622>`_
+**저자**: `Will Constable <https://github.com/wconstab/>`_, `Wei Feng <https://github.com/weifengpy>`_
+**번역**: `강지현 <https://github.com/KJH622>`_
 .. note::
    |edit| 이 튜토리얼을 여기서 보고 편집하세요 `github <https://github.com/pytorchkorea/tutorials-kr/blob/main/beginner_source/dist_overview.rst>`__.
 
 이 문서는 ``torch.distributed`` 패키지의 개요 페이지입니다.
 이 페이지의 목표는 문서를 주제별로 분류하고 
 각 주제를 간략히 설명하는 것입니다. PyTorch로 분산 학습 애플리케이션을 처음 구축한다면,
-이 문서를 참고해 사용 사례에 가장 적합한 기술로 이동하시길 권장합니다.
+이 문서를 참고하여 여러분의 사용 사례에 가장 적합한 기술을 찾아보는 것을 권장합니다.
 
 서론
 ------------
@@ -26,7 +26,7 @@ PyTorch 분산 개요
 - `텐서 병렬 처리 (TP, Tensor Parallel) <https://pytorch.org/docs/stable/distributed.tensor.parallel.html>`__
 - `파이프라인 병렬 처리 (PP, Pipeline Parallel) <https://pytorch.org/docs/main/distributed.pipelining.html>`__
 
-샤딩 프리미티브(Sharding primitives)
+샤딩 기본 요소(Sharding primitives)
 *******************
 
 ``DTensor`` 와 ``DeviceMesh`` 는 N차원 프로세스 그룹에서 텐서를 샤딩하거나 복제하는 방식으로 병렬화를 구성할 때 사용하는 기본 구성요소입니다.
