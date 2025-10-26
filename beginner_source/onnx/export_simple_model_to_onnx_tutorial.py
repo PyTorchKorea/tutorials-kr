@@ -90,7 +90,7 @@ class ImageClassifierModel(nn.Module):
 # 이후 모델을 ONNX 형식으로 내보냅니다.
 
 torch_model = ImageClassifierModel()
-# 모델을 내보내기 위한 예시 입력을 생성합니다. 이때 입력은 텐서의 튜플이어야 합니다.
+# 모델을 내보내기 위한 예시 입력을 생성합니다. 이때 입력은 tensor의 튜플이어야 합니다.
 example_inputs = (torch.randn(1, 1, 32, 32),)
 onnx_program = torch.onnx.export(torch_model, example_inputs, dynamo=True)
 
@@ -150,8 +150,8 @@ onnx.checker.check_model(onnx_model)
 # 이 예제에서는 입력이 동일하지만, 더 복잡한 모델에서는
 # 기존 PyTorch 모델보다 더 많은 입력으로 나누어야 할 수 있습니다.
 #
-# ONNX Runtime은 모든 PyTorch 텐서를 (CPU의) Numpy 텐서로 변환한 뒤,
-# 입력 이름 문자열을 키로, Numpy 텐서를 값으로 하는 딕셔너리로 감싸는 추가 단계가 필요합니다.
+# ONNX Runtime은 모든 PyTorch tensor를 (CPU의) Numpy tensor로 변환한 뒤,
+# 입력 이름 문자열을 키로, Numpy tensor를 값으로 하는 딕셔너리로 감싸는 추가 단계가 필요합니다.
 #
 # 이제 *ONNX Runtime 추론 세션* 을 생성하고, 처리된 입력으로 ONNX 모델을 실행하여 출력을 얻을 수 있습니다.
 # 이 튜토리얼에서 ONNX Runtime은 CPU에서 실행되지만, GPU에서도 실행될 수 있습니다.
@@ -176,7 +176,7 @@ onnxruntime_outputs = ort_session.run(None, onnxruntime_input)[0]
 # ------------------------------------------------------------------
 #
 # 내보낸 모델이 올바르게 작동하는지 확인하는 가장 좋은 방법은
-# 진실 공급원(source of truth)인 PyTorch와 수치적으로 비교하는 것입니다.
+# 신뢰할 수 있는 기준(source of truth)이 되는 PyTorch와 수치적으로 비교하는 것입니다.
 #
 # 이를 위해 동일한 입력으로 PyTorch 모델을 실행하고 그 결과를 ONNX Runtime의 결과와 비교할 수 있습니다.
 # 결과를 비교하기 전에 PyTorch의 출력을 ONNX의 형식과 일치하도록 변환해야 합니다.
