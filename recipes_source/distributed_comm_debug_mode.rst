@@ -2,6 +2,7 @@ PyTorch에서 ``CommDebugMode`` 시작하기
 =====================================================
 
 **저자**: `Anshul Sinha <https://github.com/sinhaanshul>`__
+**역자:** `김유진 <https://github.com/yujinpink1023>`_
 
 이 튜토리얼에서는 PyTorch의 DistributedTensor(DTensor)와 함께 ``CommDebugMode``를 사용하는 방법을 살펴봅니다.  
 이를 통해 분산 학습 환경에서 수행되는 집합 연산(collective operation)을 추적하여 디버깅할 수 있습니다.
@@ -21,7 +22,7 @@ PyTorch에서 ``CommDebugMode`` 시작하기
 
 이 문제를 해결하기 위해 PyTorch는 `DistributedTensor(DTensor)  
 <https://github.com/pytorch/pytorch/blob/main/torch/distributed/tensor/examples/comm_mode_features_example.py>`_ 를 도입했습니다.  
-DTensor는 분산 학습 환경에서 텐서 통신의 복잡성을 추상화하여 사용자에게 일관되고 간결한 경험을 제공합니다.  
+DTensor는 분산 학습 환경에서 Tensor 통신의 복잡성을 추상화하여 사용자에게 일관되고 간결한 경험을 제공합니다.  
 
 그러나 이러한 통합 추상화를 사용하는 과정에서, 내부적으로 어떤 시점에 집합 통신이 수행되는지 명확히 알기 어려워  
 고급 사용자가 디버깅하거나 문제를 식별하기 어렵습니다.  
@@ -90,8 +91,7 @@ DTensor 사용 중 발생하는 집합 연산의 시점과 이유를 시각적�
 발생한다는 점을 정확히 확인할 수 있습니다.
 
 
-아래는 생성된 JSON 파일을 업로드하여 시각적으로 탐색할 수 있는  
-인터랙티브 모듈 트리 시각화(interactive module tree visualization)입니다:
+아래는 생성된 JSON 파일을 업로드하여 시각적으로 탐색할 수 있는 인터랙티브 모듈 트리 시각화(interactive module tree visualization)입니다:
 
 .. raw:: html
 
@@ -204,7 +204,7 @@ DTensor 사용 중 발생하는 집합 연산의 시점과 이유를 시각적�
 
 
 
-결론(Conclusion)
+결론
 ------------------------------------------
 
 이 레시피에서는 PyTorch의 ``CommDebugMode``를 사용하여  
