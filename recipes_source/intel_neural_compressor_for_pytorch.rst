@@ -1,7 +1,7 @@
 PyTorch에서 Intel® Neural Compressor를 활용한 손쉬운 양자화(Quantization)
 ==================================================================
 
-**번역**: `Hwisu <https://github.com/Brdy8294>`_
+**번역**: `정휘수 <https://github.com/Brdy8294>`_
 
 개요(Overview)
 --------------
