@@ -1,7 +1,7 @@
 ``torch.compile``의 컴파일 시점 캐싱
 =========================================================
-**저자** `Oguz Ulgen <https://github.com/oulgen>`_
-**번역** `김영준 <https://github.com/YoungyoungJ>`_
+**저자:** `Oguz Ulgen <https://github.com/oulgen>`_
+**번역:** `김영준 <https://github.com/YoungyoungJ>`_
 Introduction
 ------------------
 
@@ -30,16 +30,16 @@ PyTorch Compiler는 컴파일 지연 시간을 줄이기 위해 여러 가지 �
 
 ``torch.compile`` 은 다음과 같은 캐싱 기능을 제공합니다.
 
-* 엔드 투 엔드 캐싱 (``Mega-Cache`` 라고도 불림)
+* 엔드투엔드 캐싱 (``Mega-Cache`` 라고도 불림)
 * ``TorchDynamo``, ``TorchInductor``, ``Triton`` 모듈별 캐싱
 
 캐시가 올바르게 동작하기 위해서는 캐시 아티팩트가 동일한 PyTorch 및 Triton 버전에서 생성된 것이어야 하며,  
-디바이스가 CUDA로 설정된 경우에는 같은 GPU 환경에서 사용되어야 한다는 점에 유의해야 합니다.
+디바이스가 CUDA로 설정된 경우에는 같은 GPU에서 사용되어야 한다는 점에 유의해야 합니다.
 
-``torch.compile`` 엔드 투 엔드 캐싱 (``Mega-Cache``)
+``torch.compile`` 엔드투엔드 캐싱 (``Mega-Cache``)
 ------------------------------------------------------------
 
-``Mega-Cache``”로 지칭되는 엔드 투 엔드 캐싱은, 캐시 데이터를 데이터베이스에 저장해 다른 머신에서도 불러올 수 있는 이식 가능한(portable) 캐싱 솔루션을 찾는 사용자에게 이상적인 방법입니다.
+``Mega-Cache``”로 지칭되는 엔드투엔드 캐싱은, 캐시 데이터를 데이터베이스에 저장해 다른 머신에서도 불러올 수 있는 이식 가능한(portable) 캐싱 솔루션을 찾는 사용자에게 이상적인 방법입니다.
 
 ``Mega-Cache`` 는 다음 두 가지 컴파일러 API를 제공합니다.
 
