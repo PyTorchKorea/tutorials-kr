@@ -11,7 +11,6 @@
 
 사전 준비:
 
-
 - CUDA/Linux 환경에서 PyTorch 2.3.0 이상 설치되어야 합니다.
 -  `Tensor Parallel APIs <https://pytorch.org/docs/stable/distributed.tensor.parallel.html>`__
 -  `DeviceMesh 시작하기 <https://tutorials.pytorch.kr/recipes/distributed_device_mesh.html>`__
