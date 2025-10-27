@@ -61,7 +61,7 @@ input_img = normalize(center_crop(img)).unsqueeze(0)
 
 
 ######################################################################
-# 속성(attribution) 계산하기
+# 속성 계산하기
 # -------------------------------
 
 
@@ -99,10 +99,10 @@ attribution_cat = occlusion.attribute(input_img,
 # \ ``GuidedBackprop``\ , \ ``Guided GradCam``\ , \ ``DeepLift``\ ,
 # 그리고 \ ``GradientShap``\과 같은 많은 알고리즘을 제공합니다.
 # 이러한 모든 알고리즘은 초기화할 때 모델을 호출 가능한 \ ``forward_func``\ 으로 기대하며
-# 속성(attribution) 결과를 통합해서 반환하는 ``attribute(...)`` 메소드를 가지는
+# 속성 결과를 통합해서 반환하는 ``attribute(...)`` 메소드를 가지는
 # ``Attribution`` 의 서브클래스 입니다.
 #
-# 이미지인 경우 속성(attribution) 결과를 시각화 해보겠습니다.
+# 이미지인 경우 속성 결과를 시각화 해보겠습니다.
 #
 
 ######################################################################
@@ -112,7 +112,7 @@ attribution_cat = occlusion.attribute(input_img,
 
 ######################################################################
 # Captum의 \ ``visualization``\ 유틸리티는 그림과 텍스트 입력 모두에 대한
-# 속성(attribution) 결과를 시각화 할 수 있는 즉시 사용가능한 방법을 제공합니다.
+# 속성 결과를 시각화 할 수 있는 즉시 사용가능한 방법을 제공합니다.
 #
 
 import numpy as np
@@ -148,7 +148,7 @@ _ = viz.visualize_image_attr_multiple(attribution_cat,
 
 ######################################################################
 # 만약 데이터가 텍스트인 경우 ``visualization.visualize_text()`` 는
-# 입력 텍스트 위에 속성(attribution)을 탐색할 수 있는 전용 뷰(view)를 제공합니다.
+# 입력 텍스트 위에 속성을 탐색할 수 있는 전용 뷰(view)를 제공합니다.
 # http://captum.ai/tutorials/IMDB_TorchText_Interpret 에서 자세한 내용을 확인하세요.
 #
 
