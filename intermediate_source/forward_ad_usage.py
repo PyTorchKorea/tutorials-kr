@@ -13,9 +13,9 @@
 
 기본 사용법
 --------------------------------------------------------------------
-역전파 모드 자동 미분(Reverse-mode Automatic Differentiation)과 달리, 순전파 모드 자동 미분은 순전파(forward pass)를 진행하며 기울기(gradient)를 즉시(계산을 미루지 않고) 계산합니다. 순전파 모드 자동 미분으로 방향성 도함수를 계산하려면, 먼저 입력을 방향성 도함수의 방향을 나타내는 다른 텐서(야코비안-벡터 곱의 `v`에 해당)와 연결한 뒤 이전과 같이 순전파를 수행하면 됩니다. 'primal'이라고 부르는 입력이 'tangent'라고 부르는 '방향' 텐서와 연결될 때, 결과로 나오는 새로운 텐서 객체는 이중수(dual numbers) [0] 와의 관련성 때문에 '이중 텐서(dual tensor)'라고 불립니다.
+역전파 모드 자동 미분(Reverse-mode Automatic Differentiation)과 달리, 순전파 모드 자동 미분은 순전파(forward pass)를 진행하며 기울기(gradient)를 즉시(계산을 미루지 않고) 계산합니다. 순전파 모드 자동 미분으로 방향성 도함수를 계산하려면, 먼저 입력을 방향성 도함수의 방향을 나타내는 다른 tensor(야코비안-벡터 곱의 `v`에 해당)와 연결한 뒤 이전과 같이 순전파를 수행하면 됩니다. 'primal'이라고 부르는 입력이 'tangent'라고 부르는 '방향' tensor와 연결될 때, 결과로 나오는 새로운 tensor 객체는 이중수(dual numbers) [0] 와의 관련성 때문에 '이중 tensor(dual tensor)'라고 불립니다.
 
-순전파가 수행될 때, 입력 텐서 중 하나라도 이중 텐서이면 함수의 '민감도(sensitivity)'를 전파하기 위해 추가적인 연산이 수행됩니다.
+순전파가 수행될 때, 입력 tensor 중 하나라도 이중 tensor이면 함수의 '민감도(sensitivity)'를 전파하기 위해 추가적인 연산이 수행됩니다.
 
 """
 
@@ -29,17 +29,17 @@ def fn(x, y):
     return x ** 2 + y ** 2
 
 # 모든 순전파 자동 미분 연산은 ``dual_level`` 컨텍스트 안에서 수행해야 합니다.
-# 이 컨텍스트에서 생성된 모든 이중 텐서의 탄젠트는 컨텍스트를 벗어날 때 소멸됩니다.
+# 이 컨텍스트에서 생성된 모든 이중 tensor의 탄젠트는 컨텍스트를 벗어날 때 소멸됩니다.
 # 이는 해당 연산의 출력이나 중간 결과가 향후 다른 순전파 자동 미분 연산에 재사용될 때,
 # 현재 연산에 속한 탄젠트가 나중 연산의 탄젠트와 혼동되는 것을 방지하기 위함입니다.
 with fwAD.dual_level():
-    # 이중 텐서를 만들려면 'primal' 텐서를 같은 크기의 다른 텐서,
+    # 이중 tensor를 만들려면 'primal' tensor를 같은 크기의 다른 tensor,
     # 즉 '탄젠트(tangent)'와 연결합니다.
     # 만약 탄젠트의 레이아웃이 primal의 레이아웃과 다르면,
-    # 탄젠트의 값은 primal과 동일한 메타데이터를 갖는 새 텐서에 복사됩니다.
+    # 탄젠트의 값은 primal과 동일한 메타데이터를 갖는 새 tensor에 복사됩니다.
     # 그렇지 않으면 탄젠트 자체가 그대로 사용됩니다.
     #
-    # ``make_dual`` 로 생성된 이중 텐서는 primal 텐서의 **뷰(데이터를 공유하는 참조)** 라는 점도
+    # ``make_dual`` 로 생성된 이중 tensor는 primal tensor의 **뷰(데이터를 공유하는 참조)** 라는 점도
     # 중요합니다.
     dual_input = fwAD.make_dual(primal, tangent)
     assert fwAD.unpack_dual(dual_input).tangent is tangent
@@ -49,12 +49,12 @@ with fwAD.dual_level():
     dual_input_alt = fwAD.make_dual(primal, tangent.T)
     assert fwAD.unpack_dual(dual_input_alt).tangent is not tangent
 
-    # 탄젠트가 연결되지 않은 텐서는 자동으로
+    # 탄젠트가 연결되지 않은 tensor는 자동으로
     # 같은 shape을 가지며 0으로 채워진 탄젠트를 가진 것으로 간주됩니다.
     plain_tensor = torch.randn(10, 10)
     dual_output = fn(dual_input, plain_tensor)
 
-    # 이중 텐서를 풀면(unpack) ``primal`` 과 ``tangent`` 를
+    # 이중 tensor를 풀면(unpack) ``primal`` 과 ``tangent`` 를
     # 속성으로 갖는 ``namedtuple`` 이 반환됩니다.
     jvp = fwAD.unpack_dual(dual_output).tangent
 
@@ -64,9 +64,9 @@ assert fwAD.unpack_dual(dual_output).tangent is None
 # 모듈과 함께 사용하기
 # --------------------------------------------------------------------
 # ``nn.Module`` 을 순전파 자동 미분과 함께 사용하려면, 순전파를 수행하기 전에
-# 모델의 매개변수(parameter)를 이중 텐서로 교체해야 합니다. 현재 이중 텐서로 된
+# 모델의 매개변수(parameter)를 이중 tensor로 교체해야 합니다. 현재 이중 tensor로 된
 # `nn.Parameter` 는 생성할 수 없습니다. 이에 대한 해결 방법으로,
-# 이중 텐서를 모듈의 매개변수가 아닌 일반 속성으로 등록해야 합니다.
+# 이중 tensor를 모듈의 매개변수가 아닌 일반 속성으로 등록해야 합니다.
 
 import torch.nn as nn
 
@@ -121,7 +121,7 @@ class Fn(torch.autograd.Function):
     @staticmethod
     def forward(ctx, foo):
         result = torch.exp(foo)
-        # ``ctx`` 에 저장된 텐서는 이후의 순전파 기울기
+        # ``ctx`` 에 저장된 tensor는 이후의 순전파 기울기
         # 계산에 사용할 수 있습니다.
         ctx.result = result
         return result
@@ -129,7 +129,7 @@ class Fn(torch.autograd.Function):
     @staticmethod
     def jvp(ctx, gI):
         gO = gI * ctx.result
-        # ``ctx`` 에 저장된 텐서가 역전파에 사용되지 않을 경우,
+        # ``ctx`` 에 저장된 tensor가 역전파에 사용되지 않을 경우,
         # ``del`` 을 사용하여 수동으로 메모리에서 해제할 수 있습니다.
         del ctx.result
         return gO
@@ -161,7 +161,7 @@ torch.autograd.gradcheck(Fn.apply, (primal,), check_forward_ad=True,
 # Functorch는 야코비안-벡터 곱을 계산하기 위한 고수준 함수형 API도
 # 제공하며, 사용 사례에 따라 더 간단하게 사용할 수 있습니다.
 #
-# 함수형 API의 장점은 저수준의 이중 텐서 API를 이해하거나 사용할
+# 함수형 API의 장점은 저수준의 이중 tensor API를 이해하거나 사용할
 # 필요가 없으며, 다른 `functorch 변환(vmap 등)과 결합 <https://pytorch.org/functorch/stable/notebooks/jacobians_hessians.html>`_
 # 할 수 있다는 것입니다. 단점은 세밀한 제어가 어렵다는 점입니다.
 #
