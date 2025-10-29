@@ -206,7 +206,7 @@ torchviz로 그래프 시각화하기.
 
 
 torchviz로 그래프 시각화하기. 
-`grad_x` 가 그래프에 포함되지 않는것을 확인하세요!
+`grad_x` 가 그래프에 포함되지 않는 것을 확인하세요!
 
 .. code-block:: python
 
