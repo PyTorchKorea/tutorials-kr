@@ -54,6 +54,7 @@
 |Batch Normalization|배치 정규화|박정환||
 |bias|편향|이하람||
 |CUDA|CUDA|박지은|번역안함|
+|confusion matrix|혼동 행렬|김민엽||
 |convolution|합성곱|김현길||
 |Dropout|드롭아웃|김태형|음차 표기|
 |dataset|데이터셋|박정환|음차 표기|
@@ -103,11 +104,13 @@
 |rank 0|0-순위|박정환||
 |Read later|더 읽을거리|박정환||
 |recap|요약|박정환||
+|recipe|레시피|이현준|음차 표기|
 |resample|리샘플|||
 |resizing|크기 변경|박정환||
 |requirements|요구 사항|장보윤||
 |sampling rate|샘플링 레이트|||
 |scenario|시나리오|박정환|음차 표기|
+|shading|샤딩|오수연|음차 표기|
 |shape|shape|허남규|번역하지 않음|
 |size|크기|박정환||
 |Tensor / Tensors|Tensor|박정환|번역하지 않음|

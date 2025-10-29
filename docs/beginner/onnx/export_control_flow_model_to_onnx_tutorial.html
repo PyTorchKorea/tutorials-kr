@@ -1513,11 +1513,11 @@ to download the full example code.</p>
 a PyTorch model to ONNX. It highlights the challenges of exporting
 conditional statements directly and provides solutions to circumvent them.</p>
 <p>Conditional logic cannot be exported into ONNX unless they refactored
-to use <a class="reference external" href="https://docs.pytorch.org/docs/stable/generated/torch.cond.html#torch.cond" title="(PyTorch v2.8에서)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.cond()</span></code></a>. Let’s start with a simple model
+to use <a class="reference external" href="https://docs.pytorch.org/docs/stable/generated/torch.cond.html#torch.cond" title="(PyTorch v2.9에서)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.cond()</span></code></a>. Let’s start with a simple model
 implementing a test.</p>
 <p>What you will learn:</p>
 <ul class="simple">
-<li><p>How to refactor the model to use <a class="reference external" href="https://docs.pytorch.org/docs/stable/generated/torch.cond.html#torch.cond" title="(PyTorch v2.8에서)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.cond()</span></code></a> for exporting.</p></li>
+<li><p>How to refactor the model to use <a class="reference external" href="https://docs.pytorch.org/docs/stable/generated/torch.cond.html#torch.cond" title="(PyTorch v2.9에서)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.cond()</span></code></a> for exporting.</p></li>
 <li><p>How to export a model with control flow logic to ONNX.</p></li>
 <li><p>How to optimize the exported model using the ONNX optimizer.</p></li>
 </ul>
@@ -1569,7 +1569,7 @@ a random input tensor to confirm they execute as expected.</p>
 <p>Exporting this model using torch.export.export fails because the control
 flow logic in the forward pass creates a graph break that the exporter cannot
 handle. This behavior is expected, as conditional logic not written using
-<a class="reference external" href="https://docs.pytorch.org/docs/stable/generated/torch.cond.html#torch.cond" title="(PyTorch v2.8에서)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.cond()</span></code></a> is unsupported.</p>
+<a class="reference external" href="https://docs.pytorch.org/docs/stable/generated/torch.cond.html#torch.cond" title="(PyTorch v2.9에서)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.cond()</span></code></a> is unsupported.</p>
 <p>A try-except block is used to capture the expected failure during the export
 process. If the export unexpectedly succeeds, an <code class="docutils literal notranslate"><span class="pre">AssertionError</span></code> is raised.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
@@ -1625,8 +1625,8 @@ The error above occurred when calling torch.export.export. If you would like to 
 </div>
 </section>
 <section id="using-torch-onnx-export-with-jit-tracing">
-<h2>Using <a class="reference external" href="https://docs.pytorch.org/docs/stable/onnx_dynamo.html#torch.onnx.export" title="(PyTorch v2.8에서)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.onnx.export()</span></code></a> with JIT Tracing<a class="headerlink" href="#using-torch-onnx-export-with-jit-tracing" title="Link to this heading">#</a></h2>
-<p>When exporting the model using <a class="reference external" href="https://docs.pytorch.org/docs/stable/onnx_dynamo.html#torch.onnx.export" title="(PyTorch v2.8에서)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.onnx.export()</span></code></a> with the dynamo=True
+<h2>Using <a class="reference external" href="https://docs.pytorch.org/docs/stable/onnx_export.html#torch.onnx.export" title="(PyTorch v2.9에서)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.onnx.export()</span></code></a> with JIT Tracing<a class="headerlink" href="#using-torch-onnx-export-with-jit-tracing" title="Link to this heading">#</a></h2>
+<p>When exporting the model using <a class="reference external" href="https://docs.pytorch.org/docs/stable/onnx_export.html#torch.onnx.export" title="(PyTorch v2.9에서)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.onnx.export()</span></code></a> with the dynamo=True
 argument, the exporter defaults to using JIT tracing. This fallback allows
 the model to export, but the resulting ONNX graph may not faithfully represent
 the original model logic due to the limitations of tracing.</p>
@@ -1761,7 +1761,7 @@ graph(
 </div>
 </section>
 <section id="suggested-patch-refactoring-with-torch-cond">
-<h2>Suggested Patch: Refactoring with <a class="reference external" href="https://docs.pytorch.org/docs/stable/generated/torch.cond.html#torch.cond" title="(PyTorch v2.8에서)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.cond()</span></code></a><a class="headerlink" href="#suggested-patch-refactoring-with-torch-cond" title="Link to this heading">#</a></h2>
+<h2>Suggested Patch: Refactoring with <a class="reference external" href="https://docs.pytorch.org/docs/stable/generated/torch.cond.html#torch.cond" title="(PyTorch v2.9에서)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.cond()</span></code></a><a class="headerlink" href="#suggested-patch-refactoring-with-torch-cond" title="Link to this heading">#</a></h2>
 <p>To make the control flow exportable, the tutorial demonstrates replacing the
 forward method in <code class="docutils literal notranslate"><span class="pre">ForwardWithControlFlowTest</span></code> with a refactored version that
 uses <code class="xref py py-func docutils literal notranslate"><span class="pre">torch.cond`()</span></code>.</p>
@@ -2000,7 +2000,7 @@ graph(
 <section id="conclusion">
 <h2>Conclusion<a class="headerlink" href="#conclusion" title="Link to this heading">#</a></h2>
 <p>This tutorial demonstrates the challenges of exporting models with conditional
-logic to ONNX and presents a practical solution using <a class="reference external" href="https://docs.pytorch.org/docs/stable/generated/torch.cond.html#torch.cond" title="(PyTorch v2.8에서)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.cond()</span></code></a>.
+logic to ONNX and presents a practical solution using <a class="reference external" href="https://docs.pytorch.org/docs/stable/generated/torch.cond.html#torch.cond" title="(PyTorch v2.9에서)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.cond()</span></code></a>.
 While the default exporters may fail or produce imperfect graphs, refactoring the
 model’s logic ensures compatibility and generates a faithful ONNX representation.</p>
 <p>By understanding these techniques, we can overcome common pitfalls when
