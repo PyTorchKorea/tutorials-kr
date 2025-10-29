@@ -66,15 +66,15 @@ PyTorch 분산 개요
 
    * 여러 노드를 사용하는 경우, 여러 PyTorch 프로세스를 시작하려면 `torchrun <https://pytorch.org/docs/stable/elastic/run.html>`__ 을 사용하세요.
 
-   * 참고: `시작하기 분산 데이터 병렬(DDP) <../intermediate/ddp_tutorial.html>`__
+   * 참고: `분산 데이터 병렬(DDP) 시작하기 <../intermediate/ddp_tutorial.html>`__
 
-#. 모델이 단일 GPU에 탑재되지 않을 때는 `FullyShardedDataParallel (FSDP2, 완전 샤딩 데이터 병렬화) <https://pytorch.org/docs/stable/distributed.fsdp.fully_shard.html>`__ 을 사용하세요.
+#. 모델이 단일 GPU에 탑재되지 않을 때는 `FullyShardedDataParallel (FSDP2) <https://pytorch.org/docs/stable/distributed.fsdp.fully_shard.html>`__ 을 사용하세요.
 
-   * 참고: `시작하기 FSDP2 <https://tutorials.pytorch.kr/intermediate/FSDP_tutorial.html>`__
+   * 참고: `FSDP2 시작하기 <https://tutorials.pytorch.kr/intermediate/FSDP_tutorial.html>`__
 
 #. FSDP2로는 확장 한계에 도달한 경우, `Tensor Parallel (TP, Tensor 병렬화) <https://pytorch.org/docs/stable/distributed.tensor.parallel.html>`__ 및/또는 `Pipeline Parallel (PP, 파이프라인 병렬화) <https://pytorch.org/docs/main/distributed.pipelining.html>`__ 를 사용하세요.
 
-   * `텐서 병렬화 튜토리얼 <https://tutorials.pytorch.kr/intermediate/TP_tutorial.html>`__ 을 확인해 보세요.
+   * `Tensor 병렬화 튜토리얼 <https://tutorials.pytorch.kr/intermediate/TP_tutorial.html>`__ 을 확인해 보세요.
 
    * 참고: `TorchTitan 3D 병렬화 전체(end to end) 예제 <https://github.com/pytorch/torchtitan>`__
 
