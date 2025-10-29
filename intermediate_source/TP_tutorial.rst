@@ -70,7 +70,7 @@ PyTorch Tensor Parallel API는 모델의 각 개별 레이어에 대한 샤딩�
 * ``SequenceParallel`` : ``nn.LayerNorm`` , ``nn.Dropout`` , ``RMSNormPython`` 등에서 샤딩 연산을 수행합니다.
 * ``PrepareModuleInput`` 및 ``PrepareModuleOutput``: 적절한 커뮤니케이션 작업을 가진 모듈 입력/출력 샤딩 계층을 구성합니다.
 
-PyTorch 네이티브 Tensor Parallel API 사용하는 법을 설명하기 위해, 일반적인 트랜스포머 모델을 살펴보겠습니다. 이번 튜토리얼에서는 커뮤니티에서도 널리 사용되는 최신 `Llama2 모델 <https://github.com/pytorch/examples/blob/main/distributed/tensor_parallelism/llama2_model.py>`__ 을 레퍼런스 트랜스포머 모델 구현으로 사용합니다.
+PyTorch 네이티브 Tensor Parallel API를 사용하는 법을 설명하기 위해, 일반적인 트랜스포머 모델을 살펴보겠습니다. 이번 튜토리얼에서는 커뮤니티에서도 널리 사용되는 최신 `Llama2 모델 <https://github.com/pytorch/examples/blob/main/distributed/tensor_parallelism/llama2_model.py>`__ 을 레퍼런스 트랜스포머 모델 구현으로 사용합니다.
 Tensor Parallel이 개별 tensor를 여러 디바이스에서 샤딩하기 때문에, 먼저 분산 환경(NCCL 통신기)을 설정해야 합니다.
 
 Tensor Parallelism은 PyTorch DDP/FSDP와 유사한 단일 프로그램 멀티 데이터 (SPMD) 샤딩 알고리즘이며, 이 알고리즘은 PyTorch DTensor 내부 원리를 바탕으로 샤딩을 수행합니다. 또한 디바이스 관리 및 샤딩을 위해 DeviceMesh 추상화(내부적으로 프로세스 그룹 관리)를 활용합니다.
