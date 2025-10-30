@@ -63,7 +63,7 @@ Colab에서는 런타임이 /usr/lib 폴더에서 공유 라이브러리를 탐�
 
 
 분산 설정 (Distributed Setup)
------------------
+----------------------------
 
 노트북 환경에서는 `SPMD <https://en.wikipedia.org/wiki/SPMD>`_ 프로그램을 직접 실행할 
 수 없기 때문에, 여기서는 멀티프로세싱을 활용하여 이를 유사하게 구현합니다. TorchRec을 사용할 
@@ -80,7 +80,7 @@ Colab에서는 런타임이 /usr/lib 폴더에서 공유 라이브러리를 탐�
     os.environ["MASTER_PORT"] = "29500"
 
 임베딩 모델 구성 (Constructing our embedding model)
---------------------------------
+-------------------------------------------------
 
 여기에서는 TorchRec의 `EmbeddingBagCollection <https://github.com/facebookresearch/torchrec/blob/main/torchrec/modules/embedding_modules.py#L59>`_ 을 사용하여, 여러 개의 임베딩 테이블로 구성된 임베딩 백(embedding bag) 모델을 구축합니다.
 
@@ -216,7 +216,7 @@ EBC를 처음 생성할 때 'meta' 디바이스에 할당하는 점에 주의하
 
 
 멀티프로세싱 실행 (Multiprocessing Execution)
-~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 이제 여러 개의 GPU rank를 나타내는 다중 프로세스 환경에서 코드를 실행해 보겠습니다.
 
@@ -249,7 +249,7 @@ EBC를 처음 생성할 때 'meta' 디바이스에 할당하는 점에 주의하
           assert 0 == p.exitcode
 
 테이블 단위 샤딩 (Table-Wise Sharding)
-~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 이제 두 개의 GPU를 사용하여 2개의 프로세스로 코드를 실행해 보겠습니다. 출력된 plan을 보면, 
 각 테이블이 GPU 간에 어떻게 샤딩되었는지를 확인할 수 있습니다. 각 노드는 큰 테이블 하나와 
