@@ -82,7 +82,10 @@ Colab에서는 런타임이 /usr/lib 폴더에서 공유 라이브러리를 탐�
 임베딩 모델 구성 (Constructing our embedding model)
 -------------------------------------------------
 
-여기에서는 TorchRec의 `EmbeddingBagCollection <https://github.com/facebookresearch/torchrec/blob/main/torchrec/modules/embedding_modules.py#L59>`_ 을 사용하여, 여러 개의 임베딩 테이블로 구성된 임베딩 백(embedding bag) 모델을 구축합니다.
+여기에서는 TorchRec의 `EmbeddingBagCollection 
+<https://github.com/facebookresearch/torchrec/blob/
+main/torchrec/modules/embedding_modules.py#L59>`_ 을 사용하여, 
+여러 개의 임베딩 테이블로 구성된 임베딩 백(embedding bag) 모델을 구축합니다.
 
 이번 예시에서는 4개의 임베딩 백(embedding bag) 으로 구성된 EmbeddingBagCollection (EBC)를 생성합니다.
 테이블은 두 가지 크기로 구분됩니다.
