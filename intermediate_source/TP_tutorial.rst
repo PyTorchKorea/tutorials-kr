@@ -22,7 +22,7 @@ Tensor Parallel은 어떻게 작동합니까?
 -------------------------------------------
 Tensor Parallel (TP)는 기존 `Megatron-LM <https://arxiv.org/abs/1909.08053>`__ 논문에서 제안된 방식으로, 대규모 트랜스포머(Transformer) 모델을 효율적으로 훈련하기 위한 모델 병렬처리(parallelism) 기법입니다.
 이 튜토리얼에서 언급한 `Sequence Parallel <https://arxiv.org/abs/2205.05198>`__ (SP)는 Tensor Parallel의 한 변형으로, 훈련 중 활성화 메모리를 절약하기 위해 ``nn.LayerNorm`` 혹은 ``RMSNorm`` 레이아웃을 시퀀스 차원으로 샤딩 합니다.
-모델이 커질수록, 활성화 메모리가 병목이 되므로, Tensor Parallel 학습에서는 주로 ``LayerNorm`` 이나 ``RMSNorm`` 레이아웃에 Sequence Parallel를 적용합니다.
+모델이 커질수록, 활성화 메모리가 병목이 되므로, Tensor Parallel 학습에서는 주로 ``LayerNorm`` 이나 ``RMSNorm`` 레이아웃에 시퀀스 병렬(Sequence Parallel)을 적용합니다.
 
 
 .. figure:: /_static/img/distributed/megatron_lm.png
