@@ -39,7 +39,7 @@ PyTorch Compiler는 컴파일 지연 시간을 줄이기 위해 여러 가지 �
 ``torch.compile`` 엔드투엔드 캐싱 (``Mega-Cache``)
 ------------------------------------------------------------
 
-``Mega-Cache``”로 지칭되는 엔드투엔드 캐싱은, 캐시 데이터를 데이터베이스에 저장해 다른 머신에서도 불러올 수 있는 이식 가능한(portable) 캐싱 솔루션을 찾는 사용자에게 이상적인 방법입니다.
+``Mega-Cache`` 로 지칭되는 엔드투엔드 캐싱은, 캐시 데이터를 데이터베이스에 저장해 다른 머신에서도 불러올 수 있는 이식 가능한(portable) 캐싱 솔루션을 찾는 사용자에게 이상적인 방법입니다.
 
 ``Mega-Cache`` 는 다음 두 가지 컴파일러 API를 제공합니다.
 
@@ -70,7 +70,7 @@ PyTorch Compiler는 컴파일 지연 시간을 줄이기 위해 여러 가지 �
     # 이제 artifact_bytes를 데이터베이스에 저장할 수도 있습니다.
     # cache_info는 기록(logging)할 수 있습니다.
 
-Later, you can jump-start the cache by the following:
+이후에 아래 방법으로 캐시를 미리 불러와 실행 속도를 높일 수 있습니다.
 
 .. code-block:: python
 
@@ -86,7 +86,7 @@ Later, you can jump-start the cache by the following:
 앞서 언급한 ``Mega-Cache`` 는 사용자의 별도 개입 없이 자동으로 동작하는 개별 구성요소들로 이루어져 있습니다. 기본적으로 PyTorch Compiler는 ``TorchDynamo``, ``TorchInductor``, 그리고 ``Triton`` 을 위한  
 로컬 디스크 기반(on-disk) 캐시를 함께 제공합니다. 이러한 캐시에는 다음이 포함됩니다.
 
-* ``FXGraphCache``: 파일 과정에서 사용되는 그래프 기반 중간 표현(IR, Intermediate Representation) 구성요소를 저장하는 캐시입니다.
+* ``FXGraphCache``: 컴파일 과정에서 사용되는 그래프 기반 중간 표현(IR, Intermediate Representation) 구성요소를 저장하는 캐시입니다.
 * ``TritonCache``: 컴파일 결과를 저장하는 캐시로, ``Triton`` 에 의해 생성된 ``cubin`` 파일과 기타 캐싱 관련 아티팩트를 포함합니다.
 * ``InductorCache``: ``FXGraphCache`` 와 ``Triton`` 캐시를 함께 포함하는 통합 캐시(bundled cache) 입니다.
 * ``AOTAutogradCache``: 통합 그래프(joint graph) 관련 아티팩트를 저장하는 캐시입니다.
