@@ -22,7 +22,7 @@ Tensor Parallel은 어떻게 작동합니까?
 -------------------------------------------
 Tensor Parallel (TP)는 기존 `Megatron-LM <https://arxiv.org/abs/1909.08053>`__ 논문에서 제안된 방식으로, 대규모 트랜스포머(Transformer) 모델을 효율적으로 훈련하기 위한 모델 병렬처리(parallelism) 기법입니다.
 이 튜토리얼에서 언급한 `Sequence Parallel <https://arxiv.org/abs/2205.05198>`__ (SP)는 Tensor Parallel의 한 변형으로, 훈련 중 활성화 메모리를 절약하기 위해 ``nn.LayerNorm`` 혹은 ``RMSNorm`` 를 시퀀스 차원으로 샤딩 합니다.
-모델이 커질수록, 활성화 메모리가 병목이 되므로, Tensor Parallel 학습에서는 주로 ``LayerNorm`` 이나 ``RMSNorm`` 레이어에 시퀀스 병렬(Sequence Parallel)을 적용합니다.
+모델이 커질수록, 활성화 메모리가 병목이 되므로, Tensor Parallel 학습에서는 주로 ``LayerNorm`` 이나 ``RMSNorm`` 계층에 시퀀스 병렬(Sequence Parallel)을 적용합니다.
 
 
 .. figure:: /_static/img/distributed/megatron_lm.png
@@ -30,20 +30,20 @@ Tensor Parallel (TP)는 기존 `Megatron-LM <https://arxiv.org/abs/1909.08053>`_
    :align: center
    :alt: Megatron-LM TP
 
-   그림 1. 트랜스포머 모델의 MLP 및 Self-Attention 레이어에 행렬 연산이 attention/MLP에서 샤딩된 계산으로 이루어지고, 이는 Tensor Parallel 방식으로 sharding된 구조를 나타냅니다. (`이미지 출처 <https://arxiv.org/abs/1909.08053>`__)
+   그림 1. 트랜스포머 모델의 MLP 및 Self-Attention 계층에 행렬 연산이 attention/MLP에서 샤딩된 계산으로 이루어지고, 이는 Tensor Parallel 방식으로 sharding된 구조를 나타냅니다. (`이미지 출처 <https://arxiv.org/abs/1909.08053>`__)
 
 
 고수준에서 PyTorch Tensor Parallel은 다음과 같이 작동합니다.
 
 **Sharding 초기화**
 
-* 각 레이어에 어떤 ``ParallelStyle`` 을 적용할지 결정하고, ``parallelize_module`` 을 호출해서 초기화된 모듈을 샤딩합니다.
+* 각 계층에 어떤 ``ParallelStyle`` 을 적용할지 결정하고, ``parallelize_module`` 을 호출해서 초기화된 모듈을 샤딩합니다.
 * 병렬화된 모듈은 모델 파라미터를 DTensor로 교체하고, DTensor는 샤딩하는 연산을 사용하여 병렬화된 모듈을 실행하는 역할을 담당합니다.
 
 **런타임 순방향/역방향**
 
 * 사용자가 지정한 개별 ``ParallelStyle`` 의 입력/출력 DTensor 레이아웃에 따라, 입력/출력에 대한 DTensor 레이아웃을 변환하는 적절한 커뮤니케이션 동작을 실행합니다. (예를 들어, ``allreduce``, ``allgather``, ``reduce_scatter`` )
-* 병렬화된 레이어( ``nn.Linear`` , ``nn.Embedding`` )은 연산 및 메모리를 절약하기 위해 샤딩된 연산을 실행합니다. 
+* 병렬화된 계층( ``nn.Linear`` , ``nn.Embedding`` )은 연산 및 메모리를 절약하기 위해 샤딩된 연산을 실행합니다. 
 
 Tensor Parallel을 적용해야 하는 시기와 이유
 -----------------------------------------------
@@ -63,7 +63,7 @@ Tensor Parallel과 FSDP의 결합이 필요한, 다음과 같은 추가적인 �
 Tensor Parallel을 적용하는 방법
 --------------------------------------
 
-PyTorch Tensor Parallel API는 모델의 각 개별 레이어에 대한 샤딩을 구성하기 위해 다음과 같은 모듈 수준의 이전 세트 (``ParallelStyle``)를 제공합니다.
+PyTorch Tensor Parallel API는 모델의 각 개별 계층에 대한 샤딩을 구성하기 위해 다음과 같은 모듈 수준의 이전 세트 (``ParallelStyle``)를 제공합니다.
 
 
 * ``ColwiseParallel`` 및 ``RowwiseParallel`` : 열 혹은 행 방식으로 ``nn.Linear`` 과 ``nn.Embedding`` 를 공유합니다.
@@ -86,18 +86,18 @@ DeviceMesh를 활용하여 다차원 병렬화를 활용하는 방법은 `이 �
 이제 DeviceMesh를 초기화했으므로, Llama 2 모델 아키텍처를 자세히 살펴보고 Tensor Parallel 샤딩을 수행하는 방법을 살펴보겠습니다.
 여기서 트랜스포머 모델이 확장하기 위해 동일한 ``TransformerBlock`` 을 쌓는 핵심 ``TransformerBlock`` 에 초점을 둡니다.
 
-핵심 ``TransformerBlock`` 은 ``Attention`` 레이어와 ``FeedForward`` 레이어로 구성되어 있습니다. 먼저 더 간단한 ``FeedForward`` 레이어를 살펴보겠습니다.
-``FeedForward`` 레이어의 경우, 세 개의 선형 레이어로 구성되어 있고, 순방향 함수를 고려해서 SwiGLU 스타일의 MLP를 수행합니다.
+핵심 ``TransformerBlock`` 은 ``Attention`` 계층과 ``FeedForward`` 계층으로 구성되어 있습니다. 먼저 더 간단한 ``FeedForward`` 계층을 살펴보겠습니다.
+``FeedForward`` 계층의 경우, 세 개의 선형 계층으로 구성되어 있고, 순방향 함수를 고려해서 SwiGLU 스타일의 MLP를 수행합니다.
 
 .. code-block:: python
 
-    # 순전파 레이어에서 순방향으로
+    # 순전파 계층에서 순방향으로
     def forward(self, x):
         return self.w2(F.silu(self.w1(x)) * self.w3(x))
 
 ``w1`` 및 ``w3`` 행렬곱을 동시에 수행하고, 결합된 w1/w3 선형 투영 결과와 함께 ``w2`` 행렬곱을 수행합니다. 
-이는 Tensor Parallelism 논문의 아이디어를 사용해서 w1/w3 선형 레이어를 열 우선 방식으로 샤딩하고, 행 우선 방식으로 ``w2`` 선형 레이어를 샤딩하여, 세 레이어 모두 끝에서 하나의 ``allreduce`` 통신만 발생하는 것을 의미합니다.
-PyTorch 네이티브 Tensor Parallel을 사용하여 다음과 같이 ``FeedForward`` 레이어에 대해 ``parallelize_plan`` 을 간단히 만들 수 있습니다.
+이는 Tensor Parallelism 논문의 아이디어를 사용해서 w1/w3 선형 계층을 열 우선 방식으로 샤딩하고, 행 우선 방식으로 ``w2`` 선형 계층을 샤딩하여, 세 계층 모두 끝에서 하나의 ``allreduce`` 통신만 발생하는 것을 의미합니다.
+PyTorch 네이티브 Tensor Parallel을 사용하여 다음과 같이 ``FeedForward`` 계층에 대해 ``parallelize_plan`` 을 간단히 만들 수 있습니다.
 
 
 .. code-block:: python
@@ -114,8 +114,8 @@ PyTorch 네이티브 Tensor Parallel을 사용하여 다음과 같이 ``FeedForw
 
 
  
-이는 단순히 PyTorch Tensor Parallel API를 이용하여 ``FeedForward`` 레이어의 샤딩을 구성하는 방식입니다. 사용자는 개별 레이어를 샤딩하는 방법만 지정하면 되고, 통신(예를 들어, ``allreduce`` )은 내부적으로 발생한다는 점을 기억합니다.
- ``Attention`` 레이어로 넘어 갑니다. 이 레이어는 ``wq`` , ``wk`` , ``wv`` 선형 레이어로 구성되어, 입력을 ``q`` / ``k`` / ``v`` 로 투영한 다음에 ``wo`` 선형 레이어로 어텐션 및 출력 투영을 수행합니다.
+이는 단순히 PyTorch Tensor Parallel API를 이용하여 ``FeedForward`` 계층의 샤딩을 구성하는 방식입니다. 사용자는 개별 계층을 샤딩하는 방법만 지정하면 되고, 통신(예를 들어, ``allreduce`` )은 내부적으로 발생한다는 점을 기억합니다.
+ ``Attention`` 계층으로 넘어 갑니다. 이 계층은 ``wq`` , ``wk`` , ``wv`` 선형 계층으로 구성되어, 입력을 ``q`` / ``k`` / ``v`` 로 투영한 다음에 ``wo`` 선형 계층으로 어텐션 및 출력 투영을 수행합니다.
 여기서 Tensor Parallelism은 q/k/v 투영에 대해 열 중심으로 샤딩을 수행하고, ``wo`` 선형 투영에 대해 행 중심으로 샤딩을 수행합니다. 따라서, 방금 작성한 ``tp_plan`` 에 어텐션 플랜을 추가할 수 있습니다.
 
 .. code-block:: python
@@ -133,12 +133,12 @@ PyTorch 네이티브 Tensor Parallel을 사용하여 다음과 같이 ``FeedForw
     }
 
 
-이는 대체로 ``TransformerBlock`` 에 Tensor Parallel을 적용해야하는 ``layer_tp_plan`` 입니다. 그러나 알아야하는 한가지는 선형 레이어를 열 단위로 샤딩할 때, 선형 레이어의 출력이 마지막 tensor 차원에서 샤딩되고, 행 단위로 샤딩된 선형 레이어가 마지막 차원에서 샤딩된 입력을 직접 받아들인다는 것입니다.
+이는 대체로 ``TransformerBlock`` 에 Tensor Parallel을 적용해야하는 ``layer_tp_plan`` 입니다. 그러나 알아야하는 한가지는 선형 계층을 열 단위로 샤딩할 때, 선형 계층의 출력이 마지막 tensor 차원에서 샤딩되고, 행 단위로 샤딩된 선형 계층이 마지막 차원에서 샤딩된 입력을 직접 받아들인다는 것입니다.
 만일 열 단위 선형과 행 단위 선형 사이에 더 많은 tensor 연산 (예를 들어, view operation) 이 있다면, 샤딩된 형태로 관련 모양의 연산을 조정해야 합니다.
 
-Llama 모델의 경우, 어텐션 레이어에서는 형태와 관련된 여러 뷰 연산이 있습니다. 구체적으로, ``wq`` / ``wk`` / ``wv`` 선형 레이어에서 열 단위 병렬화의 경우, 활성화 tensor는  ``num_heads`` 차원에서 샤딩됩니다.
+Llama 모델의 경우, 어텐션 계층에서는 형태와 관련된 여러 뷰 연산이 있습니다. 구체적으로, ``wq`` / ``wk`` / ``wv`` 선형 계층에서 열 단위 병렬화의 경우, 활성화 tensor는  ``num_heads`` 차원에서 샤딩됩니다.
 
-마지막으로, 각 ``TransformerBlock`` 에 대한 계획을 효과적으로 실행하려면 ``parallelize_module`` API를 호출해야 합니다. 내부적으로는 ``Attention``  및  ``FeedForward`` 레이어 내부 모델 파라미터를 DTensor에 분배하고, 필요하다면 모델 입력과 출력(각각 모듈 이전 및 이후)에 대한 통신 훅을 등록합니다.
+마지막으로, 각 ``TransformerBlock`` 에 대한 계획을 효과적으로 실행하려면 ``parallelize_module`` API를 호출해야 합니다. 내부적으로는 ``Attention``  및  ``FeedForward`` 계층 내부 모델 파라미터를 DTensor에 분배하고, 필요하다면 모델 입력과 출력(각각 모듈 이전 및 이후)에 대한 통신 훅을 등록합니다.
 
 .. code-block:: python
 
@@ -151,7 +151,7 @@ Llama 모델의 경우, 어텐션 레이어에서는 형태와 관련된 여러 
             parallelize_plan=layer_tp_plan,
         )
 
-각 ``TransformerBlock`` 에 대한 샤딩 계획을 구체화했고, 보통 첫 번째 레아어에 ``nn.Embedding``가 있고, 마지막 ``nn.Linear`` 투영 레이어가 있는데, 첫 번째 ``nn.Embedding`` 에는 행 단위 혹은 열 단위 샤딩을 선택하고, 사용자가 적절한 입력 및 출력 레이아웃이 지정된 마지막 ``nn.Linear`` 투영 레이어에는 열 단위 샤딩을 선택할 수 있습니다.
+각 ``TransformerBlock`` 에 대한 샤딩 계획을 구체화했고, 보통 첫 번째 레아어에 ``nn.Embedding``가 있고, 마지막 ``nn.Linear`` 투영 계층이 있는데, 첫 번째 ``nn.Embedding`` 에는 행 단위 혹은 열 단위 샤딩을 선택하고, 사용자가 적절한 입력 및 출력 레이아웃이 지정된 마지막 ``nn.Linear`` 투영 계층에는 열 단위 샤딩을 선택할 수 있습니다.
 다음 예시를 참고합니다.
 
 .. code-block:: python
@@ -170,14 +170,14 @@ Llama 모델의 경우, 어텐션 레이어에서는 형태와 관련된 여러 
     )
 
 .. note::
-    해당 모델이 너무 커서 CPU 메모리에 맞지 않는 경우, ``meta`` 장치 초기화 (예를 들어, 메타 장치에서 먼저 초기화하거나 레이어를 샤딩하고 모델을 구체화하는 등)를 사용하거나 트랜스포머 모델 초기화 중에 ``TransformerBlock`` 레이어를 레이어별로 병렬화할 수 있습니다.
+    해당 모델이 너무 커서 CPU 메모리에 맞지 않는 경우, ``meta`` 장치 초기화 (예를 들어, 메타 장치에서 먼저 초기화하거나 계층을 샤딩하고 모델을 구체화하는 등)를 사용하거나 트랜스포머 모델 초기화 중에 ``TransformerBlock`` 계층을 계층별로 병렬화할 수 있습니다.
 
-``LayerNorm/RMSNorm`` 레이어에 시퀀스 병렬(Sequence Parallel) 적용하기
+``LayerNorm/RMSNorm`` 계층에 시퀀스 병렬(Sequence Parallel) 적용하기
 ----------------------------------------------------------------
 
 시퀀스 병렬(Sequence Parallel)은 앞서 설명한 Tensor Parallel 위에서 동작합니다. 기본적인 Tensor Parallel은  ``Attention`` 모듈과 ``FeedForward`` 모듈 내에서만 tensor를 샤딩하고 모듈 입력과 출력 (즉, forward pass의 활성화 및 backward pass에서 변화도)을 복제되도록 유지하는 것과 비교할 때, 시퀀스 병렬은 시퀀스 차원에서 샤딩된 상태를 유지합니다.
 
-일반적인 ``TransformerBlock`` 에서 순방향 함수는 norm 레이어( ``LayerNorm`` 혹은 ``RMSNorm`` ), 어텐션 레이어, 순전파 레이어, residual 연결을 결합합니다. 예를 들면, 다음과 같습니다.
+일반적인 ``TransformerBlock`` 에서 순방향 함수는 norm 계층( ``LayerNorm`` 혹은 ``RMSNorm`` ), 어텐션 계층, 순전파 계층, residual 연결을 결합합니다. 예를 들면, 다음과 같습니다.
 
 .. code-block:: python
 
@@ -189,7 +189,7 @@ Llama 모델의 경우, 어텐션 레이어에서는 형태와 관련된 여러 
 
 대부분 유즈케이스에서, 활성화 (그리고 변화도)는 ``Attention`` 및 ``FeedForward`` 모듈 외부의 ``[batch size, sequence length, hidden dimension]`` 모양입니다. DTensor의 언어로, 시퀀스 병렬은 모듈의 순방향/역방향 모두 ``Shard(1)`` 레이아웃을 사용하여 활성화 연산을 수행합니다.
 
-이전 코드 예시에 이어서, 아래 코드는 ``TransformerBlock`` 내부의 norm 레이어에 시퀀스 병렬을 적용하는 방법을 설명합니다.
+이전 코드 예시에 이어서, 아래 코드는 ``TransformerBlock`` 내부의 norm 계층에 시퀀스 병렬을 적용하는 방법을 설명합니다.
 
 먼저 시퀀스 병렬에 필요한 의존성을 가져오겠습니다.
 
@@ -201,7 +201,7 @@ Llama 모델의 경우, 어텐션 레이어에서는 형태와 관련된 여러 
     )
 
 
-다음으로  ``layer_tp_plan`` 을 수정해서 ``RMSNorm`` 레이어에 시퀀스 병렬을 가능하게 만듭니다.
+다음으로  ``layer_tp_plan`` 을 수정해서 ``RMSNorm`` 계층에 시퀀스 병렬을 가능하게 만듭니다.
 
 .. code-block:: python
 
@@ -228,11 +228,11 @@ Llama 모델의 경우, 어텐션 레이어에서는 형태와 관련된 여러 
     }
 
 
-이제 ``PrepareModuleInput`` 을 이용해서 어텐션과 순전파 레이어의 모듈 입력 레이아웃을 ``Shard(1)`` 에서 ``Replicate()`` 로 수정하고, 출력 레이아웃을 ``Shard(1)`` 으로 표시하는 것을 볼 수 있습니다.
-Tensor Parallelism과 마찬가지로, 입력과 출력의 tensor 샤딩 레이아웃만 지정하면, 레이어간 통신이 자동으로 이루어집니다.
+이제 ``PrepareModuleInput`` 을 이용해서 어텐션과 순전파 계층의 모듈 입력 레이아웃을 ``Shard(1)`` 에서 ``Replicate()`` 로 수정하고, 출력 레이아웃을 ``Shard(1)`` 으로 표시하는 것을 볼 수 있습니다.
+Tensor Parallelism과 마찬가지로, 입력과 출력의 tensor 샤딩 레이아웃만 지정하면, 계층 간 통신이 자동으로 이루어집니다.
 
 시퀀스 병렬을 활용하면, 시퀀스 차원에서 항상 ``TransformerBlock`` 의 입력과 출력이 샤딩되어, 다중 ``TransformerBlocks`` 이 원활하게 연결할 수 있다고 가정합니다.
-이는 시작하는 ``nn.Embedding`` 레이어의 출력과 최종 ``nn.Linear`` 입력 레이어를 ``Shard(1)`` 으로 명시적으로 지정하여 촉진할 수 있습니다.
+이는 시작하는 ``nn.Embedding`` 계층의 출력과 최종 ``nn.Linear`` 입력 계층을 ``Shard(1)`` 으로 명시적으로 지정하여 촉진할 수 있습니다.
 
 .. code-block:: python
 
@@ -267,7 +267,7 @@ Tensor Parallelism과 마찬가지로, 입력과 출력의 tensor 샤딩 레이�
 
 PyTorch Tensor Parallel API에서, 손실 병렬은 컨텍스트 관리자 ``loss_parallel`` 을 통해 사용할 수 있으며, 이를 통해 코드의 다른 부분을 수정하지 않고도 ``torch.nn.functional.cross_entropy`` 혹은 ``torch.nn.CrossEntropyLoss`` 를 직접 사용할 수 있습니다.
 
-손실 병렬을 적용하려면, 일반적으로 ``[batch size, sequence length, vocabulary size]`` 모양의 모델 예측을 어휘 차원에서 샤딩되어야 합니다. 이는 마지막 선형 투영 레이어 출력의 출력 레이아웃을 표기하여 쉽게 수행할 수 있습니다.
+손실 병렬을 적용하려면, 일반적으로 ``[batch size, sequence length, vocabulary size]`` 모양의 모델 예측을 어휘 차원에서 샤딩되어야 합니다. 이는 마지막 선형 투영 계층 결과에서 출력 레이아웃을 표기하여 쉽게 수행할 수 있습니다.
 
 .. code-block:: python
 
@@ -288,7 +288,7 @@ PyTorch Tensor Parallel API에서, 손실 병렬은 컨텍스트 관리자 ``los
         },
     )
 
-위 코드에서는 출력 전 norm 레이어에도 시퀀스 병렬을 적용합니다. 출력이 DTensor로 유지하고 ``loss_parallel`` 컨텍스트 관리자와 함께 작동하도록 ``use_local_output=False`` 을 적용합니다. 그 후, 다음과 같이 단순히 cross_entropy 손실 함수라고 부를 수 있습니다. 역방향 계산도 컨텍스트 내에서 이루어져야 하는 점도 유의하세요.
+위 코드에서는 출력 전 norm 계층에도 시퀀스 병렬을 적용합니다. 출력이 DTensor로 유지하고 ``loss_parallel`` 컨텍스트 관리자와 함께 작동하도록 ``use_local_output=False`` 을 적용합니다. 그 후, 다음과 같이 단순히 cross_entropy 손실 함수라고 부를 수 있습니다. 역방향 계산도 컨텍스트 내에서 이루어져야 하는 점도 유의하세요.
 
 .. code-block:: python
 
