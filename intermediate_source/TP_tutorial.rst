@@ -116,7 +116,7 @@ PyTorch 네이티브 Tensor Parallel을 사용하여 다음과 같이 ``FeedForw
  
 이는 단순히 PyTorch Tensor Parallel API를 이용하여 ``FeedForward`` 레이어의 샤딩을 구성하는 방식입니다. 사용자는 개별 레이어를 샤딩하는 방법만 지정하면 되고, 통신(예를 들어, ``allreduce`` )은 내부적으로 발생한다는 점을 기억합니다.
  ``Attention`` 레이어로 넘어 갑니다. 이 레이어는 ``wq`` , ``wk`` , ``wv`` 선형 레이어로 구성되어, 입력을 ``q`` / ``k`` / ``v`` 로 투영한 다음에 ``wo`` 선형 레이어로 어텐션 및 출력 투영을 수행합니다.
-여기서 Tensor Parallelism은 q/k/v 투영에 대해 샤딩을 수행하고, ``wo`` 선형 투영에 대한 행 중심으로 샤딩을 수행합니다. 따라서, 방금 작성한 ``tp_plan`` 에 어텐션 플랜을 추가할 수 있습니다.
+여기서 Tensor Parallelism은 q/k/v 투영에 대해 열 중심으로 샤딩을 수행하고, ``wo`` 선형 투영에 대해 행 중심으로 샤딩을 수행합니다. 따라서, 방금 작성한 ``tp_plan`` 에 어텐션 플랜을 추가할 수 있습니다.
 
 .. code-block:: python
 
