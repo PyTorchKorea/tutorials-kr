@@ -88,7 +88,7 @@ with fwAD.dual_level():
 # 함수형 모듈 API 사용하기 (Beta)
 # --------------------------------------------------------------------
 # ``nn.Module`` 을 순전파 자동 미분과 함께 사용하는 또 다른 방법은
-# 함수형 모듈 API를 활용하는 것입니다.
+# 함수형 모듈 API를 활용하는 것입니다. (상태가 없는 모듈 API라고도 함)
 
 from torch.func import functional_call
 
@@ -221,7 +221,6 @@ def func_params_only(params):
     return func(params, buffers, input)
 
 model_output, jvp_out = ft.jvp(func_params_only, (params,), (tangents,))
-
 
 ######################################################################
 # [0] https://en.wikipedia.org/wiki/Dual_number
