@@ -4,7 +4,7 @@ PyTorch에서 ``CommDebugMode`` 시작하기
 **저자**: `Anshul Sinha <https://github.com/sinhaanshul>`__
 **역자:** `김유진 <https://github.com/yujinpink1023>`_
 
-이 튜토리얼에서는 PyTorch의 DistributedTensor(DTensor)와 함께 ``CommDebugMode``를 사용하는 방법을 살펴봅니다.  
+이 튜토리얼에서는 PyTorch의 DistributedTensor(DTensor)와 함께 ``CommDebugMode`` 를 사용하는 방법을 살펴봅니다.  
 이를 통해 분산 학습 환경에서 수행되는 집합 연산(collective operation)을 추적하여 디버깅할 수 있습니다.
 
 사전 준비(Prerequisites)
@@ -14,7 +14,7 @@ PyTorch에서 ``CommDebugMode`` 시작하기
 * PyTorch 2.2 이상
 
 
-``CommDebugMode``란 무엇이며, 왜 유용한가
+``CommDebugMode`` 란 무엇이며, 왜 유용한가
 ----------------------------------------------------
 모델의 크기가 커짐에 따라, 사용자는 다양한 병렬화(parallelism) 전략을 조합하여 분산 학습(distributed training)을 확장하려 합니다.  
 하지만 기존 솔루션 간의 상호운용성(interoperability) 부족은 여전히 큰 과제로 남아 있습니다.  
@@ -27,7 +27,7 @@ DTensor는 분산 학습 환경에서 Tensor 통신의 복잡성을 추상화하
 그러나 이러한 통합 추상화를 사용하는 과정에서, 내부적으로 어떤 시점에 집합 통신이 수행되는지 명확히 알기 어려워  
 고급 사용자가 디버깅하거나 문제를 식별하기 어렵습니다.  
 
-이때 ``CommDebugMode``는 Python의 컨텍스트 매니저(context manager)로서  
+이때 ``CommDebugMode`` 는 Python의 컨텍스트 매니저(context manager)로서  
 DTensor 사용 중 발생하는 집합 연산의 시점과 이유를 시각적으로 추적할 수 있는 주요 디버깅 도구입니다.  
 이를 통해 사용자는 언제, 왜 collective 연산이 실행되는지를 명확히 파악할 수 있습니다.
 
@@ -35,7 +35,7 @@ DTensor 사용 중 발생하는 집합 연산의 시점과 이유를 시각적�
 ``CommDebugMode`` 사용법
 ------------------------
 
-다음은 ``CommDebugMode``를 사용하는 예시입니다:
+다음은 ``CommDebugMode`` 를 사용하는 예시입니다:
 
 .. code-block:: python
 
@@ -75,7 +75,7 @@ DTensor 사용 중 발생하는 집합 연산의 시점과 이유를 시각적�
                     *c10d_functional.all_reduce: 1
 
 
-``CommDebugMode``를 사용하려면 모델 실행 코드를 ``CommDebugMode`` 블록 안에 감싸고,  
+``CommDebugMode`` 를 사용하려면 모델 실행 코드를 ``CommDebugMode`` 블록 안에 감싸고,  
 원하는 정보를 표시하는 API를 호출하면 됩니다.  
 
 또한 ``noise_level`` 인자를 사용해 출력되는 정보의 상세 수준(verbosity level)을 제어할 수 있습니다.  
@@ -86,8 +86,8 @@ DTensor 사용 중 발생하는 집합 연산의 시점과 이유를 시각적�
 | 2. 중요하지 않은 연산을 제외한 텐서 단위 연산 출력  
 | 3. 모든 연산 출력  
 
-위의 예시에서 볼 수 있듯이, collective 연산인 all_reduce는 ``MLPModule``의 forward 단계에서 한 번 발생합니다.  
-또한 ``CommDebugMode``를 사용하면 이 all-reduce 연산이 ``MLPModule``의 두 번째 선형 계층(linear layer)에서  
+위의 예시에서 볼 수 있듯이, collective 연산인 all_reduce는 ``MLPModule`` 의 forward 단계에서 한 번 발생합니다.  
+또한 ``CommDebugMode`` 를 사용하면 이 all-reduce 연산이 ``MLPModule`` 의 두 번째 선형 계층(linear layer)에서  
 발생한다는 점을 정확히 확인할 수 있습니다.
 
 
@@ -207,10 +207,10 @@ DTensor 사용 중 발생하는 집합 연산의 시점과 이유를 시각적�
 결론
 ------------------------------------------
 
-이 레시피에서는 PyTorch의 ``CommDebugMode``를 사용하여  
+이 레시피에서는 PyTorch의 ``CommDebugMode`` 를 사용하여  
 집합 통신(collective communication)을 포함하는 DistributedTensor 및 병렬화 솔루션을 디버깅하는 방법을 배웠습니다.  
 또한 생성된 JSON 출력을 내장된 시각화 브라우저에서 직접 불러와 확인할 수도 있습니다. 
 
-``CommDebugMode``에 대한 보다 자세한 내용은  
+``CommDebugMode`` 에 대한 보다 자세한 내용은  
 `comm_mode_features_example.py  
 <https://github.com/pytorch/pytorch/blob/main/torch/distributed/tensor/examples/comm_mode_features_example.py>`_ 를 참고하세요.
