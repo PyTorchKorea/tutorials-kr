@@ -340,7 +340,7 @@ Tensor Parallelism는 연산을 방해하는 통신을 발생하므로, NVLink�
     model_2d = fully_shard(model_tp, mesh=dp_mesh, ...)
 
 
-이렇게 하면 각 호스트 내 (intra-host)에서 Tensor Parallel을 쉽게 적용하고 호스트 간에 (inter-hosts) FSDP를 **0 코드 변경** 으로 Llama 모델에 적용할 수 있습니다.
+이렇게 하면 각 호스트 내 (intra-host)에서 Tensor Parallel을 쉽게 적용하고 호스트 간에 (inter-hosts) FSDP를 **코드 변경 없이** Llama 모델에 적용할 수 있습니다.
 tensor(모델) 병렬 및 데이터 병렬 기술을 함께 결합하면 많은 GPU를 이용해서 모델 크기를 지속적으로 늘리고 효율적으로 학습할 수 있습니다.
 
 결론
