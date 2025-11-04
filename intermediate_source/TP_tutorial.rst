@@ -151,7 +151,7 @@ Llama 모델의 경우, 어텐션 계층에서는 형태와 관련된 여러 뷰
             parallelize_plan=layer_tp_plan,
         )
 
-각 ``TransformerBlock`` 에 대한 샤딩 계획을 구체화했고, 보통 첫 번째 레아어에 ``nn.Embedding``가 있고, 마지막 ``nn.Linear`` 투영 계층이 있는데, 첫 번째 ``nn.Embedding`` 에는 행 단위 혹은 열 단위 샤딩을 선택하고, 사용자가 적절한 입력 및 출력 레이아웃이 지정된 마지막 ``nn.Linear`` 투영 계층에는 열 단위 샤딩을 선택할 수 있습니다.
+각 ``TransformerBlock`` 에 대한 샤딩 계획을 구체화했고, 보통 첫 번째 계층에 ``nn.Embedding``가 있고, 마지막 ``nn.Linear`` 투영 계층이 있는데, 첫 번째 ``nn.Embedding`` 에는 행 단위 혹은 열 단위 샤딩을 선택하고, 사용자가 적절한 입력 및 출력 레이아웃이 지정된 마지막 ``nn.Linear`` 투영 계층에는 열 단위 샤딩을 선택할 수 있습니다.
 다음 예시를 참고합니다.
 
 .. code-block:: python
