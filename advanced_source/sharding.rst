@@ -17,7 +17,7 @@ CUDA를 사용할 경우: - cuda >= 11.0
 
 .. code:: python
 
-    # conda를 설치하면 condatoolkit 11.3과 함께 pytorch를 쉽게 설치할 수 있습니다.
+    # conda를 설치하면 cudatoolkit 11.3과 함께 pytorch를 쉽게 설치할 수 있습니다.
     !sudo rm Miniconda3-py37_4.9.2-Linux-x86_64.sh Miniconda3-py37_4.9.2-Linux-x86_64.sh.*
     !sudo wget https://repo.anaconda.com/miniconda/Miniconda3-py37_4.9.2-Linux-x86_64.sh
     !sudo chmod +x Miniconda3-py37_4.9.2-Linux-x86_64.sh
