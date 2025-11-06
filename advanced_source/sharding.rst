@@ -46,7 +46,7 @@ Colab 환경에서 다중 프로세싱을 사용하기 위해 multiprocess 패�
 Colab 런타임 환경 설정:
 Colab에서는 런타임이 /usr/lib 폴더에서 공유 라이브러리를 탐색하기 때문에, 
 /usr/local/lib/ 에 설치된 라이브러리를 복사해야 합니다.
-**이 과정은 Colab 환경에서 필수적인 단계 입니다.**.
+**이 과정은 Colab 환경에서 필수적인 단계 입니다.**
 
 .. code:: python
 
