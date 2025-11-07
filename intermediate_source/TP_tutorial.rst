@@ -1,85 +1,80 @@
-Large Scale Transformer model training with Tensor Parallel (TP)
+Tensor Parallel (TP)를 활용한 대규모 트랜스포머 모델 훈련
 ======================================================
 
-**Author**: `Wanchao Liang <https://github.com/wanchaol>`__, `Tianyu Liu <https://github.com/tianyu-l>`__
+**저자**: `Wanchao Liang <https://github.com/wanchaol>`__, `Tianyu Liu <https://github.com/tianyu-l>`__
+**번역**: `강호현 <https://github.com/stats-dev>`__
 
 .. note::
-   |edit| View and edit this tutorial in `github <https://github.com/pytorchkorea/tutorials-kr/blob/main/intermediate_source/TP_tutorial.rst>`__.
+   |edit| 이 튜토리얼은 `github <https://github.com/pytorchkorea/tutorials-kr/blob/main/intermediate_source/TP_tutorial.rst>`__ 에서 확인하고 편집하세요.
 
-This tutorial demonstrates how to train a large Transformer-like model across hundreds to thousands of GPUs using Tensor Parallel and Fully Sharded Data Parallel.
+이 튜토리얼에서는 Tensor Parallel과 Fully Sharded Data Parallel를 활용하여, 수백에서 수천 개의 GPU로 대규모 트랜스포머 계열의 모델을 훈련하는 방법을 설명합니다.
 
-Prerequisites:
+사전 준비:
 
-- PyTorch 2.3.0 or later installed with CUDA/Linux
+- CUDA/Linux 환경에서 PyTorch 2.3.0 이상 설치되어야 합니다.
 -  `Tensor Parallel APIs <https://pytorch.org/docs/stable/distributed.tensor.parallel.html>`__
--  `Getting Started with DeviceMesh <https://tutorials.pytorch.kr/recipes/distributed_device_mesh.html>`__
--  `Getting Started with Fully Sharded Data Parallel <https://tutorials.pytorch.kr/intermediate/FSDP_tutorial.html>`__
+-  `DeviceMesh 시작하기 <https://tutorials.pytorch.kr/recipes/distributed_device_mesh.html>`__
+-  `Fully Sharded Data Parallel 시작하기 <https://tutorials.pytorch.kr/intermediate/FSDP_tutorial.html>`__
 
 
-How Tensor Parallel works?
------------
-Tensor Parallel (TP) was originally proposed in the `Megatron-LM <https://arxiv.org/abs/1909.08053>`__ paper,
-and it is an efficient model parallelism technique to train large scale Transformer models.
-`Sequence Parallel <https://arxiv.org/abs/2205.05198>`__ (SP) we mention in this tutorial is a variant of Tensor
-Parallel that shards on the sequence dimension for ``nn.LayerNorm`` or ``RMSNorm`` to further save activation memory
-during training. As the model becomes larger, the activation memory becomes the bottleneck, so in Tensor
-Parallel training it usually applies Sequence Parallel to ``LayerNorm`` or ``RMSNorm`` layers.
+
+Tensor Parallel은 어떻게 작동합니까?
+-------------------------------------------
+Tensor Parallel (TP)는 기존 `Megatron-LM <https://arxiv.org/abs/1909.08053>`__ 논문에서 제안된 방식으로, 대규모 트랜스포머(Transformer) 모델을 효율적으로 훈련하기 위한 모델 병렬처리(parallelism) 기법입니다.
+이 튜토리얼에서 언급한 `Sequence Parallel <https://arxiv.org/abs/2205.05198>`__ (SP)는 Tensor Parallel의 한 변형으로, 훈련 중 활성화 메모리를 절약하기 위해 ``nn.LayerNorm`` 혹은 ``RMSNorm`` 를 시퀀스 차원으로 샤딩 합니다.
+모델이 커질수록, 활성화 메모리가 병목이 되므로, Tensor Parallel 학습에서는 주로 ``LayerNorm`` 이나 ``RMSNorm`` 계층에 시퀀스 병렬(Sequence Parallel)을 적용합니다.
+
 
 .. figure:: /_static/img/distributed/megatron_lm.png
    :width: 100%
    :align: center
    :alt: Megatron-LM TP
 
-   Figure 1. represents the sharding in Tensor Parallel style on a Transformer model’s MLP and Self-Attention layer, where the matrix multiplications in both attention/MLP happens through sharded computations (`image source <https://arxiv.org/abs/1909.08053>`__)
+   그림 1. 트랜스포머 모델의 MLP 및 Self-Attention 계층에 행렬 연산이 attention/MLP에서 샤딩된 계산으로 이루어지고, 이는 Tensor Parallel 방식으로 sharding된 구조를 나타냅니다. (`이미지 출처 <https://arxiv.org/abs/1909.08053>`__)
 
 
-At a high level, PyTorch Tensor Parallel works as follows:
+고수준에서 PyTorch Tensor Parallel은 다음과 같이 작동합니다.
 
-**Sharding initialization**
+**Sharding 초기화**
 
-* Determine which ``ParallelStyle`` to apply to each layer and shard the initialized module by calling ``parallelize_module``.
-* The parallelized modules would have their model parameters be swapped to DTensors, and DTensor would be responsible to run the parallelized module using sharded computation.
+* 각 계층에 어떤 ``ParallelStyle`` 을 적용할지 결정하고, ``parallelize_module`` 을 호출해서 초기화된 모듈을 샤딩합니다.
+* 병렬화된 모듈은 모델 파라미터를 DTensor로 교체하고, DTensor는 샤딩하는 연산을 사용하여 병렬화된 모듈을 실행하는 역할을 담당합니다.
 
-**Runtime foward/backward**
+**런타임 순방향/역방향**
 
-* Depending on the input/outputs DTensor layouts user specified for each ``ParallelStyle``, it would run proper communication operation to transform the DTensor layouts for inputs/outputs (such as ``allreduce``, ``allgather`` and ``reduce_scatter``).
-* Run sharded computation for the parallelized layers to save compute/memory (for example, ``nn.Linear``, ``nn.Embedding``).
+* 사용자가 지정한 개별 ``ParallelStyle`` 의 입력/출력 DTensor 레이아웃에 따라, 입력/출력에 대한 DTensor 레이아웃을 변환하는 적절한 커뮤니케이션 동작을 실행합니다. (예를 들어, ``allreduce``, ``allgather``, ``reduce_scatter`` )
+* 병렬화된 계층( ``nn.Linear`` , ``nn.Embedding`` )은 연산 및 메모리를 절약하기 위해 샤딩된 연산을 실행합니다. 
 
+Tensor Parallel을 적용해야 하는 시기와 이유
+-----------------------------------------------
+PyTorch의 Fully Sharded Data Parallel(FSDP)는 이미 모델 학습을 특정 수의 GPU로 조정할 수 있는 기능을 갖추고 있습니다. 그러나, 모델 크기와 GPU 양 측면에서 모델 학습을 더 확장하려면, 
+Tensor Parallel과 FSDP의 결합이 필요한, 다음과 같은 추가적인 과제가 다수 발생할 수 있습니다.
 
-When and Why you should apply Tensor Parallel
----------------------------------------------
-The PyTorch Fully Sharded Data Parallel (FSDP) already has the capability to scale model training to a specific
-number of GPUs. However, when it comes to further scale the model training in terms of model size and GPU quantity,
-many additional challenges arise that may require combining Tensor Parallel with FSDP.:
+1. GPU 수가 지나치게 커짐에 따라 (128/256 GPU 초과), FSDP 집합(예를 들어, ``allgather`` )은 ring latency에 많은 영향을 받습니다. TP/SP를 FSDP 위에 구현하여, FSDP를 호스트 간에만 적용하여 FSDP의 규모를 8개로 줄일 수 있으며, 그에 따라 지연 비용도 동일하게 줄일 수 있습니다.
+2. 수렴 및 GPU 메모리 제한으로 인해 글로벌 배치 크기를 GPU 수보다 높게 설정할 수 없는 데이터 병렬 처리의 한계를 달성하려면, Tensor/Sequence Parallel이 글로벌 배치 크기를 "추정(ballpark)"하고, 더 많은 GPU로 확장하는 유일한 방법입니다.
+3. 특정 유형의 모델에서는 로컬 배치 크기가 작아지면, TP/SP가 부동 소수점 연산(FLOPS)에 더 최적화된 행렬 곱 형태를 생성할 수 있습니다.
 
-1. As the world size (number of GPUs) is becoming excessively large (exceeding 128/256 GPUs), the FSDP collectives (such as ``allgather``) are being dominated by ring latency.
-   By implementing TP/SP on top of FSDP, the FSDP world size could be reduced by 8 by applying FSDP to be inter-host only, consequently decreasing the latency costs by the same amount.
-2. Hit data parallelism limit where you can not raise the global batch size to be above the number of GPUs due to both convergence and GPU memory limitations, Tensor/Sequence Parallel
-   is the only known way to “ballpark” the global batch size and continue scaling with more GPUs. This means both model size and number of GPUs could continue to scale.
-3. For certain types of models, when local batch size becomes smaller, TP/SP can yield matrix multiplication shapes that are more optimized for floating point operations (FLOPS).
+사전학습 시 이러한 한계를 경험하는 것은 흔한 일입니다. 현재로서는 수십억 혹은 수조 단위의 토큰으로 대규모 언어 모델(LLM)을 학습하려면 수천 대의 GPU를 사용하더라도 수개월이 걸릴 수 있습니다.
 
-So, when pre-training, how easy is it to hit those limits? As of now, pre-training a Large Language Model (LLM) with billions or trillions of tokens could take months, even when using thousands of GPUs.
-
-* It will always hit limitation 1 when training LLM on a large scale. For example, Llama 2 70B trained with 2k GPUs for 35 days, multi-dimensional parallelisms are needed at 2k scale.
-* When the Transformer model becomes larger (such as Llama2 70B), it will also quickly hit the limitation 2. One could not use FSDP alone with even local ``batch_size=1`` due to memory
-  and convergence constraints. For example, Llama 2 global batch size is 1K, so data parallelism alone can not be used at 2K GPUs.
+* LLM을 대규모로 훈련할 때는 항상 한계 1에 도달합니다. 예를 들어, Llama 2 70B 모델은 35일 동안 2천개 GPU로 훈련되었고, 2천개 규모에서는 다차원 병렬 처리가 필요합니다.
+* Transformer 모델이 커지면 (예를 들면, Llama2 70B), 빠르게 한계 2에 도달할 것입니다. 메모리 및 수렴 제약 조건 때문에 로컬 ``batch_size=1`` 조건 조차도 FSDP를 단독으로 사용할 수 없습니다. 예를 들어, Llama2 글로벌 배치 크기는 1K이므로, 2K GPU에서 오직 데이터 병렬 처리만으로 사용될 수 없습니다.
 
 
-How to apply Tensor Parallel
-----------------------------
+Tensor Parallel을 적용하는 방법
+--------------------------------------
 
-PyTorch Tensor Parallel APIs offers a set of module level primitives (``ParallelStyle``) to configure the sharding for each individual layers of the model, including:
+PyTorch Tensor Parallel API는 모델의 각 개별 계층에 대한 샤딩을 구성하기 위해 다음과 같은 모듈 수준의 이전 세트 (``ParallelStyle``)를 제공합니다.
 
-* ``ColwiseParallel`` and ``RowwiseParallel``: Shard the ``nn.Linear`` and ``nn.Embedding`` in the column or row fashion.
-* ``SequenceParallel``: Perform sharded computations on ``nn.LayerNorm``, ``nn.Dropout``, ``RMSNormPython``, etc.
-* ``PrepareModuleInput`` and ``PrepareModuleOutput``: Configure the module inputs/outputs sharding layouts with proper communication operations.
 
-To demonstrate how to use the PyTorch native Tensor Parallel APIs, let us look at a common Transformer model. In this tutorial, we use the most recent `Llama2 model <https://github.com/pytorch/examples/blob/main/distributed/tensor_parallelism/llama2_model.py>`__ as a reference Transformer model implementation, as it is also widely used in the community.
+* ``ColwiseParallel`` 및 ``RowwiseParallel`` : 열 혹은 행 방식으로 ``nn.Linear`` 과 ``nn.Embedding`` 를 공유합니다.
+* ``SequenceParallel`` : ``nn.LayerNorm`` , ``nn.Dropout`` , ``RMSNormPython`` 등에서 샤딩 연산을 수행합니다.
+* ``PrepareModuleInput`` 및 ``PrepareModuleOutput``: 적절한 커뮤니케이션 작업을 가진 모듈 입력/출력 샤딩 레이아웃을 구성합니다.
 
-Since Tensor Parallel shard individual tensors over a set of devices, we would need to set up the distributed environment (such as NCCL communicators) first.
-Tensor Parallelism is a Single-Program Multiple-Data (SPMD) sharding algorithm similar to PyTorch DDP/FSDP, and it under the hood leverages the PyTorch DTensor
-to perform sharding. It also utilizes the DeviceMesh abstraction (which under the hood manages ProcessGroups) for device management and sharding.
-To see how to utilize DeviceMesh to set up multi-dimensional parallelisms, please refer to `this tutorial <https://tutorials.pytorch.kr/recipes/distributed_device_mesh.html>`__. Tensor Parallel usually works within each host, so let us first initialize a DeviceMesh that connects 8 GPUs within a host.
+PyTorch 네이티브 Tensor Parallel API를 사용하는 법을 설명하기 위해, 일반적인 트랜스포머 모델을 살펴보겠습니다. 이번 튜토리얼에서는 커뮤니티에서도 널리 사용되는 최신 `Llama2 모델 <https://github.com/pytorch/examples/blob/main/distributed/tensor_parallelism/llama2_model.py>`__ 을 레퍼런스 트랜스포머 모델 구현으로 사용합니다.
+Tensor Parallel이 개별 tensor를 여러 디바이스에서 샤딩하기 때문에, 먼저 분산 환경(NCCL 통신기)을 설정해야 합니다.
+
+Tensor Parallelism은 PyTorch DDP/FSDP와 유사한 단일 프로그램 멀티 데이터 (SPMD) 샤딩 알고리즘이며, 이 알고리즘은 PyTorch DTensor 내부 원리를 바탕으로 샤딩을 수행합니다. 또한 디바이스 관리 및 샤딩을 위해 DeviceMesh 추상화(내부적으로 프로세스 그룹 관리)를 활용합니다.
+DeviceMesh를 활용하여 다차원 병렬화를 활용하는 방법은 `이 튜토리얼 <https://tutorials.pytorch.kr/recipes/distributed_device_mesh.html>`__ 을 참조하세요. Tensor Parallel은 일반적으로 각 호스트 내부에서 작동하므로, 먼저 호스트 내 8개의 GPU를 연결하는 DeviceMesh를 초기화해보겠습니다.
 
 .. code-block:: python
 
@@ -88,46 +83,46 @@ To see how to utilize DeviceMesh to set up multi-dimensional parallelisms, pleas
     tp_mesh = init_device_mesh("cuda", (8,))
 
 
-Now that we have initialized DeviceMesh, let us take a detailed look at the Llama 2 model architecture and see how we should perform the Tensor Parallel sharding.
-Here we focus on the core ``TransformerBlock``, where the Transformer model stacks the identical ``TransformerBlock`` s to scale up the model.
+이제 DeviceMesh를 초기화했으므로, Llama 2 모델 아키텍처를 자세히 살펴보고 Tensor Parallel 샤딩을 수행하는 방법을 살펴보겠습니다.
+여기서 트랜스포머 모델이 확장하기 위해 동일한 ``TransformerBlock`` 을 쌓는 핵심 ``TransformerBlock`` 에 초점을 둡니다.
 
-The core ``TransformerBlock`` consists of an ``Attention`` layer and a ``FeedForward`` layer. Let us first look at the simpler ``FeedForward`` layer.
-For the ``FeedForward`` Layer it consists of three Linear layers, where it performs a SwiGLU style MLP, looking at its forward function:
+핵심 ``TransformerBlock`` 은 ``Attention`` 계층과 ``FeedForward`` 계층으로 구성되어 있습니다. 먼저 더 간단한 ``FeedForward`` 계층을 살펴보겠습니다.
+``FeedForward`` 계층의 경우, 세 개의 선형 계층으로 구성되어 있고, 순방향 함수를 고려해서 SwiGLU 스타일의 MLP를 수행합니다.
 
 .. code-block:: python
 
-    # forward in the FeedForward layer
+    # 순전파 계층에서 순방향으로
     def forward(self, x):
         return self.w2(F.silu(self.w1(x)) * self.w3(x))
 
+``w1`` 및 ``w3`` 행렬곱을 동시에 수행하고, 결합된 w1/w3 선형 투영 결과와 함께 ``w2`` 행렬곱을 수행합니다. 
+이는 Tensor Parallelism 논문의 아이디어를 사용해서 w1/w3 선형 계층을 열 우선 방식으로 샤딩하고, 행 우선 방식으로 ``w2`` 선형 계층을 샤딩하여, 세 계층 모두 끝에서 하나의 ``allreduce`` 통신만 발생하는 것을 의미합니다.
+PyTorch 네이티브 Tensor Parallel을 사용하여 다음과 같이 ``FeedForward`` 계층에 대해 ``parallelize_plan`` 을 간단히 만들 수 있습니다.
 
-It performs ``w1`` and ``w3`` matmuls concurrently and followed by a ``w2`` matmul with the result of the combined w1/w3 linear projection results. This means we could
-use the idea from the Tensor Parallelism paper to shard the w1/w3 Linear layers in the colwise fashion and shard the ``w2`` Linear layer in the rowwise fashion, so that
-there is only one ``allreduce`` communication happening at the end of all the three layers. With the PyTorch native Tensor Parallel, we can simply create a ``parallelize_plan`` for the ``FeedForward`` layer like below:
 
 .. code-block:: python
 
     from torch.distributed.tensor.parallel import ColwiseParallel, RowwiseParallel, parallelize_module
 
     layer_tp_plan = {
-        # by default ColwiseParallel input layouts is replicated
-        # and RowwiseParallel output layouts is replicated
+        # 기본적으로 ColwiseParallel으로 입력 레이아웃이 복제됩니다
+        # RowwiseParallel으로 출력 레이아웃이 복제됩니다
         "feed_foward.w1": ColwiseParallel(),
         "feed_forward.w2": RowwiseParallel(),
         "feed_forward.w3": ColwiseParallel(),
     }
 
 
-That's simply how we configure the shardings for the ``FeedForward`` layer using the PyTorch Tensor Parallel APIs. Note that users would only need to specify how to shard the individual layers and the communications (for example, ``allreduce``) will happen under the hood.
-
-Moving on to the ``Attention`` Layer. It consists of ``wq``, ``wk``, ``wv`` Linear layers to project input to ``q``/ ``k`` / ``v``, and then it performs attention and output projection with the ``wo`` Linear layer. Tensor Parallelism here intends to perform column-wise sharding for the
-q/k/v projection and row-wise sharding for the ``wo`` linear projection. So we can add the Attention plan to the ``tp_plan`` that we just drafted up:
+ 
+이는 단순히 PyTorch Tensor Parallel API를 이용하여 ``FeedForward`` 계층의 샤딩을 구성하는 방식입니다. 사용자는 개별 계층을 샤딩하는 방법만 지정하면 되고, 통신(예를 들어, ``allreduce`` )은 내부적으로 발생한다는 점을 기억합니다.
+ ``Attention`` 계층으로 넘어 갑니다. 이 계층은 ``wq`` , ``wk`` , ``wv`` 선형 계층으로 구성되어, 입력을 ``q`` / ``k`` / ``v`` 로 투영한 다음에 ``wo`` 선형 계층으로 어텐션 및 출력 투영을 수행합니다.
+여기서 Tensor Parallelism은 q/k/v 투영에 대해 열 중심으로 샤딩을 수행하고, ``wo`` 선형 투영에 대해 행 중심으로 샤딩을 수행합니다. 따라서, 방금 작성한 ``tp_plan`` 에 어텐션 플랜을 추가할 수 있습니다.
 
 .. code-block:: python
 
     layer_tp_plan = {
-        # by default ColwiseParallel input layouts is replicated
-        # and RowwiseParallel output layouts is replicated
+        # 기본적으로 ColwiseParallel 입력 레이아웃 반복
+        # 그리고 RowwiseParallel 출력 레이아웃 반복
         "attention.wq": ColwiseParallel(use_local_output=False),
         "attention.wk": ColwiseParallel(use_local_output=False),
         "attention.wv": ColwiseParallel(use_local_output=False),
@@ -138,17 +133,17 @@ q/k/v projection and row-wise sharding for the ``wo`` linear projection. So we c
     }
 
 
-This is almost the ``layer_tp_plan`` we need to apply Tensor Parallelism to the ``TransformerBlock``. However, one thing we should be aware is that when sharding the linear layer column-wise, the output of the linear layers would become sharded on the last tensor dimension, and the row-wise sharding linear layer directly accepts an input that shards on the last dimension.
-If there are any more tensor operations (such as view operations) between the column-wise linear and the row-wise linear, we would need to adjust the relevant shape related ops to sharded shape.
+이는 대체로 ``TransformerBlock`` 에 Tensor Parallel을 적용해야하는 ``layer_tp_plan`` 입니다. 그러나 알아야하는 한가지는 선형 계층을 열 단위로 샤딩할 때, 선형 계층의 출력이 마지막 tensor 차원에서 샤딩되고, 행 단위로 샤딩된 선형 계층이 마지막 차원에서 샤딩된 입력을 직접 받아들인다는 것입니다.
+만일 열 단위 선형과 행 단위 선형 사이에 더 많은 tensor 연산 (예를 들어, view operation) 이 있다면, 샤딩된 형태로 관련 모양의 연산을 조정해야 합니다.
 
-For the Llama model, in the attention layer, there are several view operations related to shape. Specifically, for column-wise parallelism in the ``wq``/``wk``/``wv`` linear layers, the activation tensor is sharded on the ``num_heads`` dimension. To manage the difference between global and local ``num_heads``, we should set ``use_local_output=False`` to ensure the output is a DTensor. Unlike a regular tensor, a DTensor is aware of the parallelism plans and will automatically handle changes in the ``num_heads`` dimension.
+Llama 모델의 경우, 어텐션 계층에서는 형태와 관련된 여러 뷰 연산이 있습니다. 구체적으로, ``wq`` / ``wk`` / ``wv`` 선형 계층에서 열 단위 병렬화의 경우, 활성화 tensor는  ``num_heads`` 차원에서 샤딩됩니다.
 
-Finally, we need to call ``parallelize_module`` API to make the plan for each ``TransformerBlock`` effective. Under the hood, it distributes the model parameters inside ``Attention`` and ``FeedForward`` layers to DTensors, and registers communication hooks for model inputs and outputs (before and after each module respectively), if necessary:
+마지막으로, 각 ``TransformerBlock`` 에 대한 계획을 효과적으로 실행하려면 ``parallelize_module`` API를 호출해야 합니다. 내부적으로는 ``Attention``  및  ``FeedForward`` 계층 내부 모델 파라미터를 DTensor에 분배하고, 필요하다면 모델 입력과 출력(각각 모듈 이전 및 이후)에 대한 통신 훅을 등록합니다.
 
 .. code-block:: python
 
     for layer_id, transformer_block in enumerate(model.layers):
-        layer_tp_plan = {...}  # i.e. the plan we just generated
+        layer_tp_plan = {...}  # 예를 들어, 이전에 생성된 플랜
 
         parallelize_module(
             module=transformer_block,
@@ -156,8 +151,8 @@ Finally, we need to call ``parallelize_module`` API to make the plan for each ``
             parallelize_plan=layer_tp_plan,
         )
 
-Now that we have elaborated the sharding plan for each ``TransformerBlock``, there is usually a ``nn.Embedding`` in the first layer and a final ``nn.Linear`` projection layer, where user could choose row-wise or column-wise sharding to the first ``nn.Embedding`` and column-wise sharding to the last ``nn.Linear`` projection layer with proper input and output layouts specified.
-Here is an example:
+각 ``TransformerBlock`` 에 대한 샤딩 계획을 구체화했고, 보통 첫 번째 계층에 ``nn.Embedding``가 있고, 마지막 ``nn.Linear`` 투영 계층이 있는데, 첫 번째 ``nn.Embedding`` 에는 행 단위 혹은 열 단위 샤딩을 선택하고, 사용자가 적절한 입력 및 출력 레이아웃이 지정된 마지막 ``nn.Linear`` 투영 계층에는 열 단위 샤딩을 선택할 수 있습니다.
+다음 예시를 참고합니다.
 
 .. code-block:: python
 
@@ -175,27 +170,28 @@ Here is an example:
     )
 
 .. note::
-	If the model to be partitioned is too large to fit into CPU memory, one could either use ``meta`` device initialization (for example, initialize the model on meta device first, shard the layers, and the materialize the model), or parallelize the ``TransformerBlock`` layer by layer during the Transformer model initialization.
+    해당 모델이 너무 커서 CPU 메모리에 맞지 않는 경우, ``meta`` 장치 초기화 (예를 들어, 메타 장치에서 먼저 초기화하거나 계층을 샤딩하고 모델을 구체화하는 등)를 사용하거나 트랜스포머 모델 초기화 중에 ``TransformerBlock`` 계층을 계층별로 병렬화할 수 있습니다.
 
-Apply Sequence Parallel to ``LayerNorm/RMSNorm`` layers
--------------------------------------------------------
+``LayerNorm/RMSNorm`` 계층에 시퀀스 병렬(Sequence Parallel) 적용하기
+----------------------------------------------------------------
 
-Sequence Parallel works on top of the Tensor Parallel illustrated above. Compared with basic Tensor Parallel, which only shards tensors within the ``Attention`` modules and ``FeedForward`` modules and keep their module inputs and outputs (namely activations in the forward pass and gradients in the backward pass) replicated, Sequence Parallel keeps them sharded on the sequence dimension.
+시퀀스 병렬(Sequence Parallel)은 앞서 설명한 Tensor Parallel 위에서 동작합니다. 기본적인 Tensor Parallel은  ``Attention`` 모듈과 ``FeedForward`` 모듈 내에서만 tensor를 샤딩하고 모듈 입력과 출력 (즉, forward pass의 활성화 및 backward pass에서 변화도)을 복제되도록 유지하는 것과 비교할 때, 시퀀스 병렬은 시퀀스 차원에서 샤딩된 상태를 유지합니다.
 
-In a typical ``TransformerBlock``, the forward function combines norm layers (``LayerNorm`` or ``RMSNorm``), an attention layer, a feed forward layer, and residual connections. For example:
+일반적인 ``TransformerBlock`` 에서 순방향 함수는 norm 계층( ``LayerNorm`` 혹은 ``RMSNorm`` ), 어텐션 계층, 순전파 계층, residual 연결을 결합합니다. 예를 들면, 다음과 같습니다.
 
 .. code-block:: python
 
-    # forward in a TransformerBlock
+    # TransformerBlock에서 순방향
     def forward(self, x):
         h = x + self.attention(self.attention_norm(x))
         out = h + self.feed_forward(self.ffn_norm(h))
         return out
 
-In most use cases, the activations (and gradients) are of the shape ``[batch size, sequence length, hidden dimension]`` outside the ``Attention`` and ``FeedForward`` modules. In the DTensor’s language, Sequence Parallel performs activation computation using the ``Shard(1)`` layout for both forward/backward of the module.
-Following the code example earlier, the code below demonstrates how we apply Sequence Parallel to the norm layers within a ``TransformerBlock``:
+대부분 유즈케이스에서, 활성화 (그리고 변화도)는 ``Attention`` 및 ``FeedForward`` 모듈 외부의 ``[batch size, sequence length, hidden dimension]`` 모양입니다. DTensor의 언어로, 시퀀스 병렬은 모듈의 순방향/역방향 모두 ``Shard(1)`` 레이아웃을 사용하여 활성화 연산을 수행합니다.
 
-First let's import the required dependencies for Sequence Parallel:
+이전 코드 예시에 이어서, 아래 코드는 ``TransformerBlock`` 내부의 norm 계층에 시퀀스 병렬을 적용하는 방법을 설명합니다.
+
+먼저 시퀀스 병렬에 필요한 의존성을 가져오겠습니다.
 
 .. code-block:: python
 
@@ -205,13 +201,13 @@ First let's import the required dependencies for Sequence Parallel:
     )
 
 
-Next let's adjust the ``layer_tp_plan`` to enable sequence parallel on the ``RMSNorm`` layers:
+다음으로  ``layer_tp_plan`` 을 수정해서 ``RMSNorm`` 계층에 시퀀스 병렬을 가능하게 만듭니다.
 
 .. code-block:: python
 
     layer_tp_plan = {
-        # Now the input and output of SequenceParallel has Shard(1) layouts,
-        # to represent the input/output tensors sharded on the sequence dimension
+        # 이제 SequenceParallel의 입력과 출력은 Shard(1) 레이아웃을 가지고,
+        # 시퀀스 차원에서 샤딩된 입력/출력 tensor를 나타냅니다
         "attention_norm": SequenceParallel(),
         "attention": PrepareModuleInput(
             input_layouts=(Shard(1), Replicate()),
@@ -232,11 +228,11 @@ Next let's adjust the ``layer_tp_plan`` to enable sequence parallel on the ``RMS
     }
 
 
-One can see we now use ``PrepareModuleInput`` to modify the module input layouts to the Attention and FeedForward layers from ``Shard(1)`` to ``Replicate()``, and mark their output layouts as ``Shard(1)``.
-Just like what happens to Tensor Parallelism, one only needs to specify the tensor sharding layouts of the inputs and outputs, and the communication between layers will happen automatically.
+이제 ``PrepareModuleInput`` 을 이용해서 어텐션과 순전파 계층의 모듈 입력 레이아웃을 ``Shard(1)`` 에서 ``Replicate()`` 로 수정하고, 출력 레이아웃을 ``Shard(1)`` 으로 표시하는 것을 볼 수 있습니다.
+Tensor Parallelism과 마찬가지로, 입력과 출력의 tensor 샤딩 레이아웃만 지정하면, 계층 간 통신이 자동으로 이루어집니다.
 
-Note that with Sequence Parallel, we assume the inputs and outputs of a ``TransformerBlock`` are always sharded on the sequence dimension, so that multiple ``TransformerBlocks`` can be concatenated seamlessly.
-This can be facilitated by explicitly specifying the output of the beginning ``nn.Embedding`` layer and the input of the final ``nn.Linear`` projection layer to be ``Shard(1)``:
+시퀀스 병렬을 활용하면, 시퀀스 차원에서 항상 ``TransformerBlock`` 의 입력과 출력이 샤딩되어, 다중 ``TransformerBlocks`` 이 원활하게 연결할 수 있다고 가정합니다.
+이는 시작하는 ``nn.Embedding`` 계층의 출력과 최종 ``nn.Linear`` 입력 계층을 ``Shard(1)`` 으로 명시적으로 지정하여 촉진할 수 있습니다.
 
 .. code-block:: python
 
@@ -257,21 +253,21 @@ This can be facilitated by explicitly specifying the output of the beginning ``n
     )
 
 
-Apply Loss Parallel
--------------------
+손실 병렬(Loss Parallel) 적용하기
+-------------------------------
 
-Loss Parallel is a related technique to save memory and communication when the loss function is computed, as model outputs are usually very large. In Loss Parallel, when the model outputs are sharded on the (often huge) vocabulary dimension, the cross-entropy loss can be computed efficiently, without gathering all the model outputs to every single GPU. This not only significantly reduces the memory consumption, but also improves training speed by reducing communication overhead and doing sharded computation in parallel. The picture below briefly illustrates how Loss Parallel avoids gathering all model outputs to every GPU by doing sharded computation.
+손실 병렬(Loss Parallel)은 손실 함수를 계산할 때 메모리와 통신을 절약하는 관련 기술로, 일반적으로 모델 출력이 매우 크기 때문에 사용합니다. 손실 병렬에서는 모델 출력이 (자주 거대한) 어휘 차원에서 샤딩될 때, 모든 모델 출력은 매번 단일 GPU에 모으지 않고도 교차 엔트로피 손실을 효율적으로 계산할 수 있습니다. 이는 메모리 소비를 유의하게 줄일 뿐만 아니라, 통신 오버헤드를 줄이고 샤딩된 연산을 병렬로 처리하여 학습 속도를 개선합니다. 아래 그림은 손실 병렬이 샤딩된 연산을 통해 단일 GPU마다 모든 모델의 출력을 모으는 것을 피하는 방법을 간략히 보여줍니다.
 
 .. figure:: /_static/img/distributed/loss_parallel.png
    :width: 100%
    :align: center
    :alt: loss parallel
 
-   Figure 2. Cross-entropy loss forward computation with loss parallel on one GPU. Blue represents sharded tensors; green represents replicated tensors; yellow represents tensors with partial values (to be all-reduced). Black arrows are local computations; red arrows are functional collectives among GPUs.
+   그림 2. 단일 GPU에서 손실이 병렬로 발생하는 교차 엔트로피 손실의 순방향 계산. 파란색은 샤딩된 tensor를 나타내고, 녹색은 복제된 tensor를 나타내며, 노란색은 부분 값을 가지는 tensor를 나타냅니다 (모두 축소될 예정입니다). 검정 화살표는 로컬 계산이고, 붉은 화살표는 GPU 간의 기능적 집합체입니다.
 
-In the PyTorch Tensor Parallel API, Loss Parallel can be enabled via a context manager ``loss_parallel``, with which one can directly use ``torch.nn.functional.cross_entropy`` or ``torch.nn.CrossEntropyLoss`` without modifying other parts of their code.
+PyTorch Tensor Parallel API에서, 손실 병렬은 컨텍스트 관리자 ``loss_parallel`` 을 통해 사용할 수 있으며, 이를 통해 코드의 다른 부분을 수정하지 않고도 ``torch.nn.functional.cross_entropy`` 혹은 ``torch.nn.CrossEntropyLoss`` 를 직접 사용할 수 있습니다.
 
-To apply Loss Parallel, the model predictions, usually of the shape ``[batch size, sequence length, vocabulary size]``, should be sharded on the vocabulary dimension. This can be easily done via marking the output layouts of the last linear projection layer output:
+손실 병렬을 적용하려면, 일반적으로 ``[batch size, sequence length, vocabulary size]`` 모양의 모델 예측을 어휘 차원에서 샤딩되어야 합니다. 이는 마지막 선형 투영 계층 결과에서 출력 레이아웃을 표기하여 쉽게 수행할 수 있습니다.
 
 .. code-block:: python
 
@@ -286,13 +282,13 @@ To apply Loss Parallel, the model predictions, usually of the shape ``[batch siz
             "norm": SequenceParallel(),
             "output": ColwiseParallel(
                 input_layouts=Shard(1),
-                # use DTensor as the output
+                # DTensor를 출력으로 사용
                 use_local_output=False,
             ),
         },
     )
 
-In the code above, we also apply Sequence Parallel to the norm layer before output. We apply ``use_local_output=False`` to let the output stay as a DTensor, to work with the ``loss_parallel`` context manager. After that, one can simply call the cross_entropy loss function as is shown below. Note that the backward computation also needs to happen within the context.
+위 코드에서는 출력 전 norm 계층에도 시퀀스 병렬을 적용합니다. 출력이 DTensor로 유지하고 ``loss_parallel`` 컨텍스트 관리자와 함께 작동하도록 ``use_local_output=False`` 을 적용합니다. 그 후, 다음과 같이 단순히 cross_entropy 손실 함수라고 부를 수 있습니다. 역방향 계산도 컨텍스트 내에서 이루어져야 하는 점도 유의하세요.
 
 .. code-block:: python
 
@@ -301,28 +297,27 @@ In the code above, we also apply Sequence Parallel to the norm layer before outp
 
     pred = model(input_ids)
     with loss_parallel():
-        # assuming pred and labels are of the shape [batch, seq, vocab]
+        # pred 및 labels는 [batch, seq, vocab] 모양으로 가정
         loss = F.cross_entropy(pred.flatten(0, 1), labels.flatten(0, 1))
         loss.backward()
 
 
-Combine Tensor Parallel with Fully Sharded Data Parallel together
+Fully Sharded Data Parallel과 Tensor Parallel을 함께 결합하기
 -----------------------------------------------------------------
 
 
-Now that we have shown how to apply Tensor/Sequence Parallel to the model, let us also take a look at how Tensor Parallel and Fully Sharded Data Parallel could work together.
-Since Tensor Parallelism incurs communications that block the computation, we want to make sure it runs within a fast communication channel, such as NVLink.
-In practice, we usually apply Tensor Parallel within each host, and apply Fully Sharded Data Parallel across the hosts.
+이제 Tensor/Sequence Parallel을 모델에 적용하는 방법을 보여드렸으니, Tensor Parallel과 Fully Sharded Data Parallel이 어떻게 함께 작동할 수 있는지도 살펴보겠습니다.
+Tensor Parallelism는 연산을 방해하는 통신을 발생하므로, NVLink와 같은 빠른 통신 채널 내에서 실행되도록 하고 싶습니다.
+실제로, 일반적으로 각 호스트 내에서 Tensor Parallel을 적용하고, 호스트 간 Fully Sharded Data Parallel를 적용합니다.
 
 .. figure:: /_static/img/distributed/fsdp_tp.png
    :width: 100%
    :align: center
    :alt: fsdp + tp
 
-   Figure 3. FSDP and TP work on separate device dimensions, FSDP communication happens inter-host and TP communication happens intra-host.
+   그림 3. FSDP와 TP는 별도의 디바이스 차원에서 작동하며, FSDP 통신은 호스트 간에, TP 통신은 호스트 내에서 이루어집니다.
 
-
-This 2-D parallelism pattern can be easily expressed via a 2-D DeviceMesh, and we just need pass each “sub” DeviceMesh to each individual parallelism APIs:
+이 2-D 병렬 처리 패턴은 2-D DeviceMesh를 통해 쉽게 표현할 수 있으며, 각각의 "하위" DeviceMesh를 각각의 개별 병렬 처리 API로 전달하기만 하면 됩니다.
 
 .. code-block:: python
 
@@ -330,27 +325,27 @@ This 2-D parallelism pattern can be easily expressed via a 2-D DeviceMesh, and w
     from torch.distributed.tensor.parallel import ColwiseParallel, RowwiseParallel, parallelize_module
     from torch.distributed.fsdp import fully_shard
 
-    # i.e. 2-D mesh is [dp, tp], training on 64 GPUs that performs 8 way DP and 8 way TP
+    # 예를 들어, 2-D mesh는 [dp, tp]이고, 8 방향 DP와 8 방향 TP를 수행하는 64개의 GPU에서 훈련합니다
     mesh_2d = init_device_mesh("cuda", (8, 8))
-    tp_mesh = mesh_2d["tp"] # a submesh that connects intra-host devices
-    dp_mesh = mesh_2d["dp"] # a submesh that connects inter-host devices
+    tp_mesh = mesh_2d["tp"] # 호스트 내 디바이스를 연결하는 submesh
+    dp_mesh = mesh_2d["dp"] # 호스트 간 디바이스를 연결하는 submesh
 
     model = Model(...)
 
     tp_plan = {...}
 
-    # apply Tensor Parallel intra-host on tp_mesh
+    # tp_mesh에서 Tensor Parallel을 호스트 내 적용
     model_tp = parallelize_module(model, tp_mesh, tp_plan)
-    # apply FSDP inter-host on dp_mesh
+    # dp_mesh에서 FSDP를 호스트 간 적용
     model_2d = fully_shard(model_tp, mesh=dp_mesh, ...)
 
 
-This would allow us to easily apply Tensor Parallel within each host (intra-host) and apply FSDP across hosts (inter-hosts), with **0-code changes** to the Llama model.
-The Tensor(Model) Parallel and Data Parallel techniques combined together provides the ability to continue increasing model size and training efficiently using a large number of GPUs.
+이렇게 하면 각 호스트 내 (intra-host)에서 Tensor Parallel을 쉽게 적용하고 호스트 간에 (inter-hosts) FSDP를 **코드 변경 없이** Llama 모델에 적용할 수 있습니다.
+tensor(모델) 병렬 및 데이터 병렬 기술을 함께 결합하면 많은 GPU를 이용해서 모델 크기를 지속적으로 늘리고 효율적으로 학습할 수 있습니다.
 
-Conclusion
+결론
 ----------
-This tutorial demonstrates how to train a large Transformer-like model across hundreds to thousands of GPUs using Tensor Parallel in combination with Fully Sharded Data Parallel.
-It explains how to apply Tensor Parallel to different parts of the model, with **no code changes** to the model itself. Tensor Parallel is a efficient model parallelism technique for large scale training.
+이 튜토리얼은 Tensor Parallel과 Fully Sharded Data Parallel을 결합하여 수백에서 수천 개 GPU에서 대규모 트랜스포머와 유사한 모델을 학습하는 방법을 보여줍니다.
+Tensor Parallel을 모델의 여러 부분에 적용하고 **코드 변경 없이** 모델 자체에 적용하는 방법을 설명합니다. Tensor Parallel은 대규모 학습을 위한 효율적인 모델 병렬화 기술입니다.
 
-To see the complete end-to-end code example explained in this tutorial, please refer to the `Tensor Parallel examples <https://github.com/pytorch/examples/blob/main/distributed/tensor_parallelism/fsdp_tp_example.py>`__ in the pytorch/examples repository.
+이 튜토리얼에서 설명하는 전체(end-to-end) 코드 예제를 보려면, pytorch/examples 에 있는 `Tensor Parallel 예제 <https://github.com/pytorch/examples/blob/main/distributed/tensor_parallelism/fsdp_tp_example.py>`__ 를 참고하세요.
