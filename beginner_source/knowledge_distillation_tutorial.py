@@ -2,17 +2,19 @@
 """
 지식 증류 튜토리얼
 ===============================
-저자: Alexandros Chariton (<https://github.com/AlexandrosChrtn>)
+**저자**: `Alexandros Chariton <https://github.com/AlexandrosChrtn>`_
+
+**번역**: `이우제 <https://github.com/leewoojye>`_
 """
 
 ######################################################################
-# 지식 증류는 크고 계산 비용이 큰 모델로부터 지식을 작은 모델로 이전하는 기법입니다.
+# 지식 증류는 지식을 크고 계산 비용이 큰 모델로부터 작은 모델로 이전하는 기법입니다.
 # 유효성을 크게 잃지 않으면서 작은 모델로 지식을 옮길 수 있어 연산 자원이 제한된 환경에 배포할 수 있습니다.
 # 이로 인해 평가가 더 빠르고 효율적으로 이루어집니다.
 #
 # 이 튜토리얼에서는 경량 신경망의 정확도를 향상시키기 위한 여러 실험을 진행합니다.
 # 더 강력한 네트워크를 교사(teacher)로 활용해 경량 학생(student) 네트워크를 개선하는 방식입니다.
-# 경량 네트워크의 계산 비용과 속도는 변경되지 않으며, 우리는 순전히 가중치 학습 과정에만 개입합니다.
+# 경량 네트워크의 계산 비용과 속도는 변경되지 않으며, 순전히 가중치 학습 과정에만 개입합니다.
 # 이 기법은 드론이나 모바일 기기처럼 연산 자원이 제한적인 장치에 유용합니다.
 # 이 튜토리얼에서는 외부 패키지를 별도로 사용하지 않습니다. 필요한 기능은 `torch`와
 # `torchvision`에서 제공합니다.
@@ -77,7 +79,7 @@ test_dataset = datasets.CIFAR10(root='./data', train=False, download=True, trans
 #       #train_dataset = Subset(train_dataset, range(min(num_images_to_keep, 50_000)))
 #       #test_dataset = Subset(test_dataset, range(min(num_images_to_keep, 10_000)))
 
-# 데이터로더(Dataloaders)
+#데이터로더(Dataloaders)
 train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=128, shuffle=True, num_workers=2)
 test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=128, shuffle=False, num_workers=2)
 
@@ -88,7 +90,7 @@ test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=128, shuffle=
 # 두 아키텍처 모두 합성곱 계층을 특징 추출기로 사용하고 그 뒤에 10개 클래스를 분류하는 분류기가 붙는 CNN입니다.
 # 학생 모델 쪽이 필터와 뉴런 수가 더 적습니다.
 
-# 교사(teacher)로 사용할 더 깊은 신경망 클래스:
+# 교사로 사용할 더 깊은 신경망 클래스:
 class DeepNN(nn.Module):
     def __init__(self, num_classes=10):
         super(DeepNN, self).__init__()
@@ -117,7 +119,7 @@ class DeepNN(nn.Module):
         x = self.classifier(x)
         return x
 
-# 학생(student)으로 사용할 경량 신경망 클래스:
+# 학생으로 사용할 경량 신경망 클래스:
 class LightNN(nn.Module):
     def __init__(self, num_classes=10):
         super(LightNN, self).__init__()
@@ -154,7 +156,8 @@ class LightNN(nn.Module):
 #
 # 테스트 함수는 유사하며 `test_loader`를 사용해 테스트 세트의 이미지를 불러옵니다.
 #
-# (이미지: /../_static/img/knowledge_distillation/ce_only.png, 중앙 정렬)
+# .. figure:: /../_static/img/knowledge_distillation/ce_only.png
+#    :align: center
 #
 # 두 네트워크를 교차 엔트로피로 학습합니다. 학생 모델을 기준선(baseline)으로 사용합니다.
 
@@ -174,7 +177,7 @@ def train(model, train_loader, epochs, learning_rate, device):
             optimizer.zero_grad()
             outputs = model(inputs)
 
-            # 출력: batch_size x num_classes 크기의 텐서
+            # 출력: batch_size x num_classes 크기의 Tensor
             # 라벨: 실제 이미지 라벨 (길이 batch_size의 벡터)
             loss = criterion(outputs, labels)
             loss.backward()
@@ -267,7 +270,7 @@ print(f"Student accuracy: {test_accuracy_light_ce:.2f}%")
 # 원 논문은 soft target의 작은 확률들 간 비율을 활용하면 유사성 구조를 잘 학습하는 데 도움이 된다고 제안합니다.
 # 예를 들어 CIFAR-10에서 트럭은 자동차나 비행기로 오인될 수 있지만 개로 오인될 가능성은 낮습니다.
 # 따라서 전체 출력 분포에 유용한 정보가 포함되어 있다고 보는 것이 합리적입니다.
-# 그러나 교차 엔트로피만으로는 비예측 클래스의 활성화가 너무 작아 그래디언트가 충분히 전달되지 못하는 문제가 있습니다.
+# 그러나 교차 엔트로피만으로는 비예측 클래스의 활성화가 너무 작아 변화도가 충분히 전달되지 못하는 문제가 있습니다.
 #
 # 교사-학생 동작을 도입하는 헬퍼 함수를 정의할 때는 몇 가지 추가 파라미터가 필요합니다:
 #
@@ -275,7 +278,8 @@ print(f"Student accuracy: {test_accuracy_light_ce:.2f}%")
 # - `soft_target_loss_weight`: soft target 손실에 부여할 가중치
 # - `ce_loss_weight`: 교차 엔트로피 손실에 부여할 가중치
 #
-# (이미지: /../_static/img/knowledge_distillation/distillation_output_loss.png, 중앙 정렬)
+# .. figure:: /../_static/img/knowledge_distillation/distillation_output_loss.png
+#    :align: center
 #
 # 증류 손실은 네트워크의 로짓에서 계산되며 그래디언트는 학생에게만 전달됩니다.
 
