@@ -3,7 +3,6 @@
 지식 증류 튜토리얼
 ===============================
 **저자**: `Alexandros Chariton <https://github.com/AlexandrosChrtn>`_
-
 **번역**: `이우제 <https://github.com/leewoojye>`_
 """
 
