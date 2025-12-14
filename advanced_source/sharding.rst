@@ -1,7 +1,7 @@
 TorchRec 샤딩 방식 살펴보기
 ===========================
    
-**번역**: `공지원 <https://github.com/annakong23>`_.
+**번역**: `공지원 <https://github.com/annakong23>`_
    
 이 튜토리얼에서는 ``EmbeddingPlanner`` 와 ``DistributedModelParallel`` API를 통해 
 임베딩 테이블의 샤딩(Sharding) 방식을 다루며, 각기 다른 샤딩 구성을 명시적으로 설정해 봄으로써 
