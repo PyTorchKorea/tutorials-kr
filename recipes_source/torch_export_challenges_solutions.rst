@@ -261,7 +261,7 @@ Dynamo에서 이 에러가 발생하는 이유를 이해하려면, `GitHub issue
 -----------------------------
 
 **이미지 분할** 은 디지털 이미지를 픽셀 단위의 특징에 따라 서로 다른 그룹, 즉 세그먼트로 나누는 컴퓨터 비전 기술입니다.
-`Segment Anything Model (SAM) <https://ai.meta.com/blog/segment-anything-foundation-model-image-segmentation/>`__) 은 프롬프트 기반 이미지 분할을 도입한 모델로, 사용자가 원하는 객체를 지정하는 프롬프트를 입력하면 해당 객체의 마스크를 예측합니다.
+`Segment Anything Model (SAM) <https://ai.meta.com/blog/segment-anything-foundation-model-image-segmentation/>`__ 은 프롬프트 기반 이미지 분할을 도입한 모델로, 사용자가 원하는 객체를 지정하는 프롬프트를 입력하면 해당 객체의 마스크를 예측합니다.
 `SAM 2 <https://ai.meta.com/sam2/>`__ 는 이미지와 비디오에서 객체를 분할하기 위한 최초의 통합 모델입니다. `SAM2ImagePredictor <https://github.com/facebookresearch/sam2/blob/main/sam2/sam2_image_predictor.py#L20>`__ 클래스는 모델에 프롬프트를 입력할 수 있는 간편한 인터페이스를 제공합니다.
 이 모델은 포인트와 박스 프롬프트는 물론, 이전 예측에서 생성된 마스크도 입력으로 받을 수 있습니다.
 SAM2는 객체 추적에서 강력한 제로샷 성능을 제공하므로, 장면 내 게임 객체를 추적하는 데 활용할 수 있습니다.
