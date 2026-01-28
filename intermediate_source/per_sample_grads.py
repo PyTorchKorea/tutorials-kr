@@ -3,7 +3,7 @@
 샘플별 변화도(Per-sample-gradients)
 ====================
 
-**번역:** `최도윤 <https://github.com/justjs4evr>`_
+**번역:** `최도윤 <https://github.com/justjs4evr>`__
 
 무엇일까요?
 -----------
