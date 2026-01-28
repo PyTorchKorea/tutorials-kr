@@ -95,8 +95,8 @@ def compute_sample_grads(data, targets):
 per_sample_grads = compute_sample_grads(data, targets)
 
 ######################################################################
-# ``sample_grads[0]`` 는 ``model.conv1.weight``에 대한 샘플별 변화도입니다.
-# ``model.conv1.weight.shape``는 ``[32, 1, 3, 3]``입니다. 배치 내부에 샘플당 하나씩,
+# ``sample_grads[0]`` 는 ``model.conv1.weight`` 에 대한 샘플별 변화도입니다.
+# ``model.conv1.weight.shape`` 는 ``[32, 1, 3, 3]`` 입니다. 배치 내부에 샘플당 하나씩,
 # 총 64개의 변화도가 있다는 점을 주목하시길 바랍니다.
 
 print(per_sample_grads[0].shape)
@@ -106,13 +106,13 @@ print(per_sample_grads[0].shape)
 # ----------------------------------------------------------------
 # 함수 변환을 사용하면 더 효율적으로 샘플별 변화도를 알 수 있습니다.
 #
-# ``torch.func``의 함수 변환 API는 함수를 대상으로 동작합니다.
+# ``torch.func`` 의 함수 변환 API는 함수를 대상으로 동작합니다.
 # 먼저 손실 함수를 정의하고, 변환해서 
 # 샘플별 변화도를 계산하는 함수를 형성하는 것이 전략입니다.
 #
-# ``torch.func.functional_call`` 함수를 가지고 ``nn.Module``을 함수처럼 다룰 것입니다.
+# ``torch.func.functional_call`` 함수를 가지고 ``nn.Module`` 을 함수처럼 다룰 것입니다.
 #
-# 우선, ``model``의 상태를 매개변수와 버퍼, 두 딕셔너리로 추출해야 합니다.
+# 우선, ``model`` 의 상태를 매개변수와 버퍼, 두 딕셔너리로 추출해야 합니다.
 # 일반적인 PyTorch autograd(예: Tensor.backward(), torch.autograd.grad)를
 # 사용하지 않을 것이기 때문입니다.
 
@@ -127,7 +127,7 @@ buffers = {k: v.detach() for k, v in model.named_buffers()}
 # 그 인자들에 대해 변환을 적용할 것이기 때문입니다.
 #
 # 참고 - 모델은 배치를 원래 처리하도록 작성되었으니, 
-# ``torch.unsqueeze``로 배치 차원을 추가해 줍니다.
+# ``torch.unsqueeze`` 로 배치 차원을 추가해 줍니다.
 
 def compute_loss(params, buffers, sample, target):
     batch = sample.unsqueeze(0)
@@ -138,16 +138,16 @@ def compute_loss(params, buffers, sample, target):
     return loss
 
 ######################################################################
-# 이제, ``grad`` 변환을 사용해서 ``compute_loss``의 첫번째 인자인 
-# 매개변수 ``params``에 대해 변화도를 측정하는 새로운 함수를 만들어 봅시다.
+# 이제, ``grad`` 변환을 사용해서 ``compute_loss`` 의 첫번째 인자인 
+# 매개변수 ``params`` 에 대해 변화도를 측정하는 새로운 함수를 만들어 봅시다.
 
 ft_compute_grad = grad(compute_loss)
 
 ######################################################################
-# ``ft_compute_grad``는 단일 (샘플, 목표 변수) 쌍에 대한 변화도를 계산하는 함수입니다.
-# ``vmap``을 사용하면 전체 샘플 및 목표 변수들 배치에 대한 변화도를 알 수 있습니다.
-# 이때 ``in_dims=(None, None, 0, 0)``로 설정했는데, 이는 데이터와 목표 변수의 
-# 0번째 차원에 대해 ``ft_compute_grad``를 매핑하고, 매개변수와 버퍼는
+# ``ft_compute_grad`` 는 단일 (샘플, 목표 변수) 쌍에 대한 변화도를 계산하는 함수입니다.
+# ``vmap`` 을 사용하면 전체 샘플 및 목표 변수들 배치에 대한 변화도를 알 수 있습니다.
+# 이때 ``in_dims=(None, None, 0, 0)`` 로 설정했는데, 이는 데이터와 목표 변수의 
+# 0번째 차원에 대해 ``ft_compute_grad`` 를 매핑하고, 매개변수와 버퍼는
 # 각 샘플에 대해 똑같이 사용하기 위함입니다.
 
 ft_compute_sample_grad = vmap(ft_compute_grad, in_dims=(None, None, 0, 0))
@@ -158,22 +158,22 @@ ft_compute_sample_grad = vmap(ft_compute_grad, in_dims=(None, None, 0, 0))
 ft_per_sample_grads = ft_compute_sample_grad(params, buffers, data, targets)
 
 ######################################################################
-# ``grad``와 ``vmap``을 사용한 결과가 수동으로 하나씩 처리한 결과와 일치하는지 확인합니다:
+# ``grad`` 와 ``vmap`` 을 사용한 결과가 수동으로 하나씩 처리한 결과와 일치하는지 확인합니다:
 
 for per_sample_grad, ft_per_sample_grad in zip(per_sample_grads, ft_per_sample_grads.values()):
     assert torch.allclose(per_sample_grad, ft_per_sample_grad, atol=1.2e-1, rtol=1e-5)
 
 ######################################################################
-# 참고: ``vmap``으로 변환할 수 있는 함수의 유형에는 몇 가지 제한이 있습니다. 
+# 참고: ``vmap`` 으로 변환할 수 있는 함수의 유형에는 몇 가지 제한이 있습니다. 
 # 가장 변환하기 좋은 함수는 순수 함수(pure function)입니다. 즉, 출력이 오직 입력에 
 # 의해서만 결정되고 값 수정과 같은 부작용이 없는 함수입니다. 
-# ``vmap``은 임의의 파이썬 데이터 구조를 수정하는 작업은 처리할 수 없지만, 
+# ``vmap`` 은 임의의 파이썬 데이터 구조를 수정하는 작업은 처리할 수 없지만, 
 # 많은 PyTorch 인플레이스(in-place) 연산은 처리할 수 있습니다.
 #
 # 성능 비교
 # ----------------------
 #
-# ``vmap``의 성능이 얼마나 차이 나는지 궁금하신가요?
+# ``vmap`` 의 성능이 얼마나 차이 나는지 궁금하신가요?
 #
 # 현재 A100(Ampere)과 같은 최신 GPU에서 가장 좋은 결과를 얻을 수 있고,
 # 이 예제에서 최대 25배의 속도 향상을 확인했습니다. 한편 다음은 빌드 장비에서의 결과입니다:
@@ -204,10 +204,10 @@ get_perf(with_vmap_timing, "vmap", no_vmap_timing, "no vmap")
 ######################################################################
 # PyTorch에는 이런 방법보다 성능이 뛰어난 다른 최적화 솔루션
 # (예: https://github.com/pytorch/opacus)들도 존재합니다. 
-# 하지만 ``vmap``과 ``grad``를 조합하는 것만으로 이 정도의 속도 향상을
+# 하지만 ``vmap`` 과 ``grad`` 를 조합하는 것만으로 이 정도의 속도 향상을
 # 이룰 수 있다는 사실이 멋지지 않나요?
 #
-# 일반적으로 ``vmap``을 이용한 벡터화는 함수를 반복문에서 실행하는 것보다 빠르고, 
+# 일반적으로 ``vmap`` 을 이용한 벡터화는 함수를 반복문에서 실행하는 것보다 빠르고, 
 # 수동 배칭(manual batching)과 경쟁할 만한 성능을 보여줍니다. 
 # 다만 특정 연산에 대해 ``vmap`` 규칙이 없거나, 하위 커널이 오래된 하드웨어(GPU)에 
 # 최적화되지 않은 경우 등에서 예외가 있을 수 있습니다. 이런 경우를 하나라도 발견한다면, 
