@@ -3,7 +3,7 @@
 준비 운동: NumPy
 -------------------
 
-:math:`y=\sin(x)` 을 예측할 수 있도록, :math:`-\pi` 부터 :math:`pi` 까지
+:math:`y=\sin(x)` 을 예측할 수 있도록, :math:`-\pi` 부터 :math:`\pi` 까지
 유클리드 거리(Euclidean distance)를 최소화하도록 3차 다항식을 학습합니다.
 
 이 구현은 NumPy를 사용하여 순전파 단계와 손실(loss), 역전파 단계를 직접 계산합니다.

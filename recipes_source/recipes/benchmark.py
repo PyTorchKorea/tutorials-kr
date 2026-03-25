@@ -88,7 +88,7 @@ assert batched_dot_mul_sum(x, x).allclose(batched_dot_bmm(x, x))
 import timeit
 
 t0 = timeit.Timer(
-    stmt='batched_dot_mul_sum(x, x)',
+    stmt='batched_dot_mul_sum(x, x)', 
     setup='from __main__ import batched_dot_mul_sum',
     globals={'x': x})
 
@@ -122,7 +122,7 @@ print(f'bmm(x, x):      {t1.timeit(100) / 100 * 1e6:>5.1f} us')
 import torch.utils.benchmark as benchmark
 
 t0 = benchmark.Timer(
-    stmt='batched_dot_mul_sum(x, x)',
+    stmt='batched_dot_mul_sum(x, x)', 
     setup='from __main__ import batched_dot_mul_sum',
     globals={'x': x})
 
@@ -171,7 +171,7 @@ num_threads = torch.get_num_threads()
 print(f'Benchmarking on {num_threads} threads')
 
 t0 = benchmark.Timer(
-    stmt='batched_dot_mul_sum(x, x)',
+    stmt='batched_dot_mul_sum(x, x)', 
     setup='from __main__ import batched_dot_mul_sum',
     globals={'x': x},
     num_threads=num_threads,
@@ -218,7 +218,7 @@ print(t1.timeit(100))
 x = torch.randn(10000, 1024, device='cuda')
 
 t0 = timeit.Timer(
-    stmt='batched_dot_mul_sum(x, x)',
+    stmt='batched_dot_mul_sum(x, x)', 
     setup='from __main__ import batched_dot_mul_sum',
     globals={'x': x})
 
@@ -244,7 +244,7 @@ print(f'bmm(x, x):      {t1.timeit(100) / 100 * 1e6:>5.1f} us')
 #
 
 t0 = benchmark.Timer(
-    stmt='batched_dot_mul_sum(x, x)',
+    stmt='batched_dot_mul_sum(x, x)', 
     setup='from __main__ import batched_dot_mul_sum',
     globals={'x': x})
 
@@ -292,7 +292,7 @@ print(t1.timeit(100))
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 # While ``timeit.Timer.autorange`` takes a single continuous measurement
-# of at least 0.2 seconds, `torch.utils.benchmark.blocked_autorange`
+# of at least 0.2 seconds, `torch.utils.benchmark.Timer.blocked_autorange`
 # takes many measurements whose times total at least 0.2 seconds (which
 # can be changed by the `min_run_time` parameter) subject to the constraint
 # that timing overhead is a small fraction of the overall measurement.
@@ -395,7 +395,7 @@ compare.print()
 #    :caption: Output
 #
 #     [--------------- Batched dot ----------------]
-#                           |  mul/sum   |    bmm
+#                           |  mul/sum   |    bmm   
 #     1 threads: -----------------------------------
 #           [1, 1]          |       5.9  |      11.2
 #           [1, 64]         |       6.4  |      11.4
@@ -598,7 +598,7 @@ compare.print()
 #    :caption: Output
 #
 #     [--------------------- Batched dot ---------------------]
-#                                          |  mul/sum  |   bmm
+#                                          |  mul/sum  |   bmm 
 #     1 threads: ----------------------------------------------
 #           725    x 257                   |      87   |    180
 #           49     x 383                   |      15   |     30
@@ -611,7 +611,7 @@ compare.print()
 #           78     x 5    (discontiguous)  |       9   |     20
 #           187    x 1                     |      12   |     10
 #
-#     Times are in microseconds (us).
+#     Times are in microseconds (us). 
 #
 
 ######################################################################
@@ -654,7 +654,7 @@ compare.print()
 #    :caption: Output
 #
 #     [----------------------- Batched dot ------------------------]
-#                                              |  mul/sum  |   bmm
+#                                              |  mul/sum  |   bmm  
 #     1 threads: ---------------------------------------------------
 #           64     x 473  (discontiguous)      |    10000  |   40000
 #           16384  x 12642115 (discontiguous)  |       31  |      78
@@ -666,7 +666,7 @@ compare.print()
 #           488    x 62374                     |    90000  |  100000
 #           240372 x 69                        |    40000  |   16000
 #           40156  x 32   (discontiguous)      |     2670  |    5000
-#
+#    
 #     Times are in microseconds (us).
 #
 
@@ -780,7 +780,7 @@ pretty_print(t1.blocked_autorange())
 #     setup:
 #       from __main__ import batched_dot_mul_sum
 #       x = torch.randn(2, 2)
-#
+#    
 #       6.92 us
 #       1 measurement, 100000 runs , 1 thread
 #     <torch.utils.benchmark.utils.common.Measurement object at 0x7fb16935d2e8>
@@ -788,7 +788,7 @@ pretty_print(t1.blocked_autorange())
 #     setup:
 #       import cpp_lib
 #       x = torch.randn(2, 2)
-#
+#    
 #       5.29 us
 #       1 measurement, 100000 runs , 1 thread
 #     <torch.utils.benchmark.utils.common.Measurement object at 0x7fb16935d2e8>
@@ -796,7 +796,7 @@ pretty_print(t1.blocked_autorange())
 #     setup:
 #       import cpp_lib
 #       x = torch.randn(2, 2)
-#
+#    
 #       5.22 us
 #       1 measurement, 100000 runs , 1 thread
 #
@@ -884,5 +884,5 @@ print(delta)
 #
 # Take a look at these other recipes to continue your learning:
 #
-# -  `PyTorch Profiler <https://tutorials.pytorch.kr/recipes/recipes/profiler.html>`_
+# -  `PyTorch Profiler <https://docs.pytorch.org/tutorials/recipes/recipes/profiler_recipe.html>`_
 #

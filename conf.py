@@ -137,18 +137,17 @@ extensions = [
     'sphinx_gallery.gen_gallery',
     'sphinx_design',
     'sphinx_sitemap',
-    'sphinxext.opengraph',
     'sphinx_reredirects',
     'sphinxcontrib.mermaid',
 ]
 
 intersphinx_mapping = {
-    'torch': ('https://pytorch.org/docs/stable/', None),
-    'tensordict': ('https://pytorch.github.io/tensordict/stable', None),
-    'torchrl': ('https://pytorch.org/rl/stable', None),
-    'torchaudio': ('https://pytorch.org/audio/stable/', None),
-    'torchtext': ('https://pytorch.org/text/stable/', None),
-    'torchvision': ('https://pytorch.org/vision/stable/', None),
+    'torch': ('https://docs.pytorch.org/docs/stable/', None),
+    'tensordict': ('https://docs.pytorch.org/tensordict/stable', None),
+    'torchrl': ('https://docs.pytorch.org/rl/stable', None),
+    'torchaudio': ('https://docs.pytorch.org/audio/stable/', None),
+    'torchtext': ('https://docs.pytorch.org/text/stable/', None),
+    'torchvision': ('https://docs.pytorch.org/vision/stable/', None),
 }
 
 html_meta = {
@@ -156,17 +155,6 @@ html_meta = {
     'keywords': 'PyTorch, tutorials, Getting Started, deep learning, AI, PyTorchKR, 파이토치 튜토리얼',
     'author': 'PyTorch Contributors & PyTorchKR',
 }
-
-
-# -- Sphinxext-opengraph configuration ---------------------------------------
-
-ogp_site_url = site_url
-ogp_image = '{}{}'.format(site_url, '_static/logos/logo-kr-sm-dark.png')
-ogp_description_length = 300
-ogp_type = 'article'
-ogp_custom_meta_tags = [
-    '<meta property="og:ignore_canonical" content="true" />',
-]
 
 
 # -- Sphinx-sitemap configuration --------------------------------------------
@@ -198,16 +186,6 @@ sphinx_gallery_conf = {
         "%matplotlib inline"
     ),
     'notebook_images': False,  # Don't include images in notebooks
-    # TODO: check before configuring build container
-    #       reveiw below files before configuring build container
-    #           - .ci/docker/Dockerfile
-    #           - .ci/docker/common/install_base.sh
-    #           - .ci/docker/common/install_docs_reqs.sh
-    #           - .github/workflows/docker-build.yml
-    #           - .github/workflows/build-tutorials.yml
-    # TODO: review below files before building documentation & exporting to epub/pdf using pandoc
-    #           - .jenkins/build.sh
-    'ignore_pattern': r'_torch_export_nightly_tutorial.py',
     'pypandoc': {
         'extra_args': ['--mathjax', '--toc'],
         'filters': ['.build/custom_pandoc_filter.py'],
@@ -250,8 +228,8 @@ html_theme_options = {
         },
     ],
     'use_edit_page_button': True,
-    'header_links_before_dropdown': 9,
-    'navbar_start': ['pytorch_version'],
+    'header_links_before_dropdown': 7,
+    'navbar_start': ['navbar-logo', 'pytorch_version'],
     'navbar_center': 'navbar-nav',
     'display_version': True,
     'pytorch_project': 'tutorials',
@@ -282,8 +260,9 @@ if os.getenv('GALLERY_PATTERN'):
     # ignore_pattern also skips parsing.
     # See https://github.com/sphinx-gallery/sphinx-gallery/issues/721
     # for a more detailed description of the issue.
+    # GALLERY_PATTERN should be a regular expression.
     sphinx_gallery_conf['ignore_pattern'] = (
-        r'/(?!' + re.escape(os.getenv('GALLERY_PATTERN')) + r')[^/]+$'
+        r'^(?!.*' + os.getenv('GALLERY_PATTERN') + r')'
     )
 
 for i in range(len(sphinx_gallery_conf['examples_dirs'])):

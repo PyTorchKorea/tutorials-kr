@@ -3,7 +3,7 @@ Introduction to Distributed Pipeline Parallelism
 **Authors**: `Howard Huang <https://github.com/H-Huang>`_
 
 .. note::
-   |edit| View and edit this tutorial in `github <https://github.com/pytorchkorea/tutorials-kr/blob/main/intermediate_source/pipelining_tutorial.rst>`__.
+   |edit| View and edit this tutorial in `github <https://github.com/pytorch/tutorials/blob/main/intermediate_source/pipelining_tutorial.rst>`__.
 
 This tutorial uses a gpt-style transformer model to demonstrate implementing distributed
 pipeline parallelism with `torch.distributed.pipelining <https://pytorch.org/docs/main/distributed.pipelining.html>`__
@@ -22,7 +22,7 @@ APIs.
    .. grid-item-card:: :octicon:`list-unordered;1em;` Prerequisites
       :class-card: card-prerequisites
 
-      * Familiarity with `basic distributed training  <https://tutorials.pytorch.kr/beginner/dist_overview.html>`__ in PyTorch
+      * Familiarity with `basic distributed training  <https://pytorch.org/tutorials/beginner/dist_overview.html>`__ in PyTorch
 
 Setup
 -----
@@ -145,6 +145,7 @@ we are splitting before the before 4th transformer decoder layer, mirroring the 
 we can retrieve a ``PipelineStage`` by calling ``build_stage`` after this splitting is done.
 
 .. code:: python
+
    def tracer_model_split(model, example_input_microbatch) -> PipelineStage:
       pipe = pipeline(
          module=model,

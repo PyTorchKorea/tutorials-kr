@@ -49,7 +49,7 @@ class SimpleMLP(nn.Module):
 # 따라서 이미지는 28x28 사이즈이며 미니 배치 크기는 64입니다.
 # 더 나아가 10개의 서로 다른 모델에서 나온 예측값을 결합하고 싶다고 가정해 보겠습니다.
 
-device = 'cuda'
+device = torch.accelerator.current_accelerator()
 num_models = 10
 
 data = torch.randn(100, 64, 1, 28, 28, device=device)

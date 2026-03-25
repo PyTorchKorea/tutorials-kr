@@ -2,7 +2,7 @@
 PyTorch 모듈 프로파일링하기
 --------------------------------
 
-**Author:** `Suraj Subramanian <https://github.com/suraj813>`_
+**Author:** `Suraj Subramanian <https://github.com/subramen>`_
   **번역:** `이재복 <http://github.com/zzaebok>`_
 
 PyTorch는 코드 내의 다양한 Pytorch 연산에 대한 시간과 메모리 비용을 파악하는데 유용한 프로파일러(profiler) API를 포함하고 있습니다.

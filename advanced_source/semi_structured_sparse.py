@@ -38,6 +38,8 @@
 # -  PyTorch >= 2.1.
 # -  반구조적 희소성을 지원하는 NVIDIA GPU(Compute Capability 8.0+)
 #
+#  .. note:: 이 튜토리얼은 NVIDIA A100 80GB GPU에서 테스트되었습니다. 최신 GPU 아키텍처에서는 유사한 속도 향상을 보지 못할 수 있습니다. 반구조적 희소성 지원에 대한 최신 정보는 `여기 <https://github.com/pytorch/ao/tree/main/torchao/sparsity#torchao-sparsity>`__ 의 README를 참조하세요.
+#
 # 이 튜토리얼은 초보자에게 반구조적 희소성 및 일반적인 희소성을 맞춤 설명합니다.
 # 이미 2:4 희소 모델을 보유한 사용자에게는 ``to_sparse_semi_structured``를 사용하여
 # 추론을 위한 ``nn.Linear`` 레이어를 가속화하는 것이 매우 간단합니다. 다음은 그 예시입니다:
@@ -46,7 +48,6 @@
 import torch
 from torch.sparse import to_sparse_semi_structured, SparseSemiStructuredTensor
 from torch.utils.benchmark import Timer
-SparseSemiStructuredTensor._FORCE_CUTLASS = True
 
 # Linear 가중치를 2:4 희소성으로 마스킹
 mask = torch.Tensor([0, 0, 1, 1]).tile((3072, 2560)).cuda().bool()
@@ -187,7 +188,6 @@ from torch.ao.pruning import WeightNormSparsifier
 import transformers
 
 # ``cuSPARSELt``가 사용 불가능한 경우, 강제로 CUTLASS를 사용합니다.
-SparseSemiStructuredTensor._FORCE_CUTLASS = True
 torch.manual_seed(100)
 
 # 기본 장치를 "cuda:0"으로 설정합니다.

@@ -65,7 +65,8 @@ import torchvision.transforms as transforms
 # 이를 [-1, 1]의 범위로 정규화된 Tensor로 변환합니다.
 #
 # .. note::
-#     만약 Windows 환경에서 BrokenPipeError가 발생한다면,
+#     만약 Windows 또는 MacOS 환경에서 BrokenPipeError 또는
+#     멀티프로세싱 관련 RuntimeError가 발생한다면,
 #     torch.utils.data.DataLoader()의 num_worker를 0으로 설정해보세요.
 
 transform = transforms.Compose(

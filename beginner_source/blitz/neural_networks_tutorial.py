@@ -76,7 +76,7 @@ class Net(nn.Module):
         # 완전히 연결된 레이어 f6: (N, 120) Tensor를 입력으로 받아서
         # (N, 84) Tensor를 출력하며, 활성 함수로 RELU 사용
         f6 = F.relu(self.fc2(f5))
-        # 가우시안 레이어 출력: (N, 84) Tensor를 입력으로 받아서
+        # 완전히 연결된 레이어 출력: (N, 84) Tensor를 입력으로 받아서
         # (N, 10) Tensor를 출력
         output = self.fc3(f6)
         return output

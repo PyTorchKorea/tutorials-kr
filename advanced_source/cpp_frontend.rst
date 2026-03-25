@@ -1,14 +1,34 @@
+.. _cpp-frontend-tutorial:
+
 PyTorch C++ 프론트엔드 사용하기
 =================================
 
+**Author:** `Peter Goldsborough <https://github.com/goldsborough>`_
+
 **번역**: `유용환 <https://github.com/yoosful>`_
+
+.. grid:: 2
+
+    .. grid-item-card:: :octicon:`mortar-board;1em;` 학습 내용
+       :class-card: card-prerequisites
+
+       * C++ 애플리케이션에서 PyTorch C++ 프론트엔드를 활용하는 방법
+       * C++에서 PyTorch 추상화를 사용하여 신경망을 정의하고 학습하는 방법
+
+    .. grid-item-card:: :octicon:`list-unordered;1em;` 사전 준비
+       :class-card: card-prerequisites
+
+       * PyTorch 1.5 이상
+       * C++ 프로그래밍에 대한 기본 이해
+       * CMake >= 3.5가 설치된 기본 Ubuntu Linux 환경; MacOS / Windows 환경에서도 유사한 명령어 사용 가능
+       * (선택) GPU 학습 섹션을 위한 CUDA 기반 GPU
 
 PyTorch C++ 프론트엔드는 PyTorch 머신러닝 프레임워크의 순수 C++
 인터페이스입니다. PyTorch의 주된 인터페이스는 물론 파이썬이지만
 이 곳의 API는 텐서(tensor)나 자동 미분과 같은 기초적인 자료구조
 및 기능을 제공하는 C++ 코드베이스 위에 구현되었습니다. C++
 프론트엔드는 이러한 기초적인 C++ 코드베이스를 비롯해 머신러닝 학습과 추론을
-위해 필요한 도구들을 상속하는 순수 C++11 API를 제공합니다. 여기에는
+위해 필요한 도구들을 상속하는 순수 C++17 API를 제공합니다. 여기에는
 신경망 모델링을 위해 필요한 공용 컴포넌트들의 빌트인 모음, 그것을
 상속하기 위한 커스텀 모듈, 확률적 경사 하강법과 같은 유명한 최적화 알고리즘
 라이브러리, 병렬 데이터 로더 및 데이터셋을 정의하고 불러오기 위한
@@ -139,14 +159,14 @@ CMake 빌드 파일을 패키징하는 *LibTorch* 배포판의 사본이
 
 .. code-block:: cmake
 
-  cmake_minimum_required(VERSION 3.0 FATAL_ERROR)
+  cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
   project(dcgan)
 
   find_package(Torch REQUIRED)
 
   add_executable(dcgan dcgan.cpp)
   target_link_libraries(dcgan "${TORCH_LIBRARIES}")
-  set_property(TARGET dcgan PROPERTY CXX_STANDARD 14)
+  set_property(TARGET dcgan PROPERTY CXX_STANDARD 17)
 
 .. note::
 
@@ -859,7 +879,7 @@ API입니다. `Sequential` 을 사용하면 판별기는 대략 다음과 같습
 
 MNIST 데이터셋은 학습 바이너리 실행 위치를 기준으로 ``./mnist``
 디렉토리에 위치해야 합니다. MNIST 데이터셋은 `이 스크립트
-<https://gist.github.com/goldsborough/6dd52a5e01ed73a642c1e772084bcd03>`_ 를
+<https://gist.github.com/jbschlosser/94347505df6188f8764793ee29fd1bdd>`_ 를
 사용해 다운로드할 수 있습니다.
 
 다음으로, 데이터 로더를 만들고 이 데이터셋을 전달합니다. 새로운 데이터

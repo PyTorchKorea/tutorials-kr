@@ -25,6 +25,11 @@
    각각의 예제들은 :ref:`이 문서의 마지막 <examples-download>`
    부분에서 살펴볼 수 있습니다.
 
+아래의 튜토리얼을 실행하려면 `torch`_ 와 `numpy`_ 패키지가 설치되어 있어야 합니다.
+
+.. _torch: https://github.com/pytorch/pytorch
+.. _numpy: https://github.com/numpy/numpy
+
 .. contents:: Table of Contents
    :local:
 
@@ -196,7 +201,6 @@ Tensors
 
 .. toctree::
    :maxdepth: 2
-   :hidden:
 
    /beginner/examples_tensor/polynomial_numpy
    /beginner/examples_tensor/polynomial_tensor
@@ -214,7 +218,6 @@ Autograd
 
 .. toctree::
    :maxdepth: 2
-   :hidden:
 
    /beginner/examples_autograd/polynomial_autograd
    /beginner/examples_autograd/polynomial_custom_function
@@ -233,7 +236,6 @@ Autograd
 
 .. toctree::
    :maxdepth: 2
-   :hidden:
 
    /beginner/examples_nn/polynomial_nn
    /beginner/examples_nn/polynomial_optim

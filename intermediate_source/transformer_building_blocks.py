@@ -16,7 +16,7 @@ Accelerating PyTorch Transformers by replacing ``nn.Transformer`` with Nested Te
          nested tensors, ``scaled_dot_product_attention``, ``torch.compile()``, and ``FlexAttention``)
        * Discover how the above improve memory usage and performance using MultiHeadAttention as an example
        * Explore advanced customizations using the aforementioned building blocks
-
+    
     .. grid-item-card:: :octicon:`list-unordered;1em;` Prerequisites
        :class-card: card-prerequisites
 
@@ -71,7 +71,7 @@ contains a `gym of masks <https://github.com/meta-pytorch/attention-gym>`_.
 # ===============================
 # First, we will briefly introduce the four technologies mentioned in the introduction
 #
-# * `torch.nested <https://tutorials.pytorch.kr/unstable/nestedtensor.html>`_
+# * `torch.nested <https://pytorch.org/tutorials/unstable/nestedtensor.html>`_
 #
 # Nested tensors generalize the shape of regular dense tensors, allowing for
 # representation of ragged-sized data with the same tensor UX. In the context of
@@ -79,7 +79,7 @@ contains a `gym of masks <https://github.com/meta-pytorch/attention-gym>`_.
 # sequence lengths. They eliminate the need for the bug-prone practices of explicit
 # padding and masking (think ``key_padding_mask`` in ``nn.MultiHeadAttention``).
 #
-# * `scaled_dot_product_attention <https://tutorials.pytorch.kr/intermediate/scaled_dot_product_attention_tutorial.html>`_
+# * `scaled_dot_product_attention <https://pytorch.org/tutorials/intermediate/scaled_dot_product_attention_tutorial.html>`_
 #
 # ``scaled_dot_product_attention`` is a primitive for
 # :math:`\text{softmax}(\frac{QK^T}{\sqrt{E}} + B)V` that dispatches into either fused
@@ -89,7 +89,7 @@ contains a `gym of masks <https://github.com/meta-pytorch/attention-gym>`_.
 # with ``torch.compile()``. As of 2.6, it will also offer grouped query attention
 # natively.
 #
-# * `torch.compile() <https://tutorials.pytorch.kr/intermediate/torch_compile_tutorial.html>`_
+# * `torch.compile() <https://pytorch.org/tutorials/intermediate/torch_compile_tutorial.html>`_
 #
 # ``torch.compile()`` is a compiler introduced in version 2.0 that is able to
 # capture a graph of PyTorch code and perform various optimizations on it, such as
@@ -157,7 +157,7 @@ contains a `gym of masks <https://github.com/meta-pytorch/attention-gym>`_.
 #   skipped, performance and memory usage improve.
 #
 # We'll demonstrate the above by building upon the ``MultiheadAttention`` layer in the
-# `Nested Tensor tutorial <https://tutorials.pytorch.kr/unstable/nestedtensor.html>`_
+# `Nested Tensor tutorial <https://pytorch.org/tutorials/unstable/nestedtensor.html>`_
 # and comparing it to the ``nn.MultiheadAttention`` layer.
 
 import torch
@@ -564,7 +564,6 @@ print(
 #
 # * Cross Attention
 # * Fully masked rows no longer cause NaNs
-# * Modifying attention score: ALiBi with FlexAttention and NJT
 # * Packed Projection
 
 ###############################################################################
@@ -667,66 +666,6 @@ print(
 # existing "fast-path" in ``nn.MultiheadAttention`` as NJT's ability to model raggedness
 # appropriately makes it possible to properly express empty sequences.
 
-
-################################################################################
-# FlexAttention + NJT
-# ---------------------------------------------------------------------
-# NJT also composes with the ``FlexAttention`` module. This is a generalization
-# of the ``MultiheadAttention`` layer that allows for arbitrary modifications
-# to the attention score. The example below takes the ``alibi_mod``
-# that implements `ALiBi <https://arxiv.org/abs/2108.12409>`_ from
-# `attention gym <https://github.com/meta-pytorch/attention-gym>`_ and uses it
-# with nested input tensors.
-
-from torch.nn.attention.flex_attention import flex_attention
-
-
-def generate_alibi_bias(H: int):
-    """Returns an alibi bias score_mod given the number of heads H
-    Args:
-        H: number of heads
-    Returns:
-        alibi_bias: alibi bias score_mod
-    """
-
-    def alibi_mod(score, b, h, q_idx, kv_idx):
-        scale = torch.exp2(-((h + 1) * 8.0 / H))
-        bias = (q_idx - kv_idx) * scale
-        return score + bias
-
-    return alibi_mod
-
-
-query, key, value, _ = gen_batch(N, E_q, E_k, E_v, device)
-n_heads, D = 8, E_q // 8
-alibi_score_mod = generate_alibi_bias(n_heads)
-query = query.unflatten(-1, [n_heads, D]).transpose(1, 2).detach().requires_grad_()
-key = key.unflatten(-1, [n_heads, D]).transpose(1, 2).detach().requires_grad_()
-value = value.unflatten(-1, [n_heads, D]).transpose(1, 2).detach().requires_grad_()
-out_flex2 = flex_attention(query, key, value, score_mod=alibi_score_mod)
-
-###############################################################################
-# In addition, one can also use the ``block_mask`` utility of ``FlexAttention``
-# with NJTs via the ``create_nested_block_mask`` function. This is useful for
-# taking advantage of the sparsity of the mask to speed up the attention computation.
-# In particular, the function creates a sparse block mask for a "stacked sequence" of all
-# the variable length sequences in the NJT combined into one, while properly masking out
-# inter-sequence attention. In the following example, we show how to create a
-# causal block mask using this utility.
-
-from torch.nn.attention.flex_attention import create_nested_block_mask
-
-
-def causal_mask(b, h, q_idx, kv_idx):
-    return q_idx >= kv_idx
-
-
-query, key, value, _ = gen_batch(N, E_q, E_k, E_v, device)
-block_mask = create_nested_block_mask(causal_mask, 1, 1, query, _compile=True)
-query = query.unflatten(-1, [n_heads, D]).transpose(1, 2).detach().requires_grad_()
-key = key.unflatten(-1, [n_heads, D]).transpose(1, 2).detach().requires_grad_()
-value = value.unflatten(-1, [n_heads, D]).transpose(1, 2).detach().requires_grad_()
-out_flex = flex_attention(query, key, value, block_mask=block_mask)
 
 ###############################################################################
 # Packed Projection

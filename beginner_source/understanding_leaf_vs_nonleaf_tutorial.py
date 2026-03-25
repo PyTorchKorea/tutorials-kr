@@ -8,9 +8,9 @@ This tutorial explains the subtleties of ``requires_grad``,
 ``retain_grad``, leaf, and non-leaf tensors using a simple example.
 
 Before starting, make sure you understand `tensors and how to manipulate
-them <https://docs.tutorials.pytorch.kr/beginner/basics/tensorqs_tutorial.html>`__.
+them <https://docs.pytorch.org/tutorials/beginner/basics/tensorqs_tutorial.html>`__.
 A basic knowledge of `how autograd
-works <https://docs.tutorials.pytorch.kr/beginner/basics/autogradqs_tutorial.html>`__
+works <https://docs.pytorch.org/tutorials/beginner/basics/autogradqs_tutorial.html>`__
 would also be useful.
 
 """
@@ -66,7 +66,7 @@ loss = F.mse_loss(y_pred, y)              # scalar loss
 #
 # After running the forward pass, PyTorch autograd has built up a `dynamic
 # computational
-# graph <https://docs.tutorials.pytorch.kr/beginner/blitz/autograd_tutorial.html#computational-graph>`__
+# graph <https://docs.pytorch.org/tutorials/beginner/blitz/autograd_tutorial.html#computational-graph>`__
 # which is shown below. This is a `Directed Acyclic Graph
 # (DAG) <https://en.wikipedia.org/wiki/Directed_acyclic_graph>`__ which
 # keeps a record of input tensors (leaf nodes), all subsequent operations
@@ -161,7 +161,7 @@ print(f"{z.requires_grad=}") # prints True because tensor is a non-leaf node
 #
 # 1. Any ``nn.Module`` that has ``nn.Parameter`` will have
 #    ``requires_grad=True`` for its parameters (see
-#    `here <https://docs.tutorials.pytorch.kr/beginner/basics/quickstart_tutorial.html#creating-models>`__)
+#    `here <https://docs.pytorch.org/tutorials/beginner/basics/quickstart_tutorial.html#creating-models>`__)
 # 2. Locally disabling gradient computation with context managers (see
 #    `here <https://docs.pytorch.org/docs/stable/notes/autograd.html#locally-disabling-gradient-computation>`__)
 #
@@ -265,8 +265,10 @@ print(f"{loss.grad=}")
 #
 #    Computational graph after backward pass
 #
-# If you call ``retain_grad()`` on a non-leaf node, it results in a no-op.
-# If we call ``retain_grad()`` on a node that has ``requires_grad=False``,
+# If you call ``retain_grad()`` on a leaf tensor, it results in a no-op
+# since leaf tensors already retain their gradients by default (when
+# ``requires_grad=True``).
+# If we call ``retain_grad()`` on a tensor that has ``requires_grad=False``,
 # PyTorch actually throws an error, since it can’t store the gradient if
 # it is never calculated.
 #
@@ -298,13 +300,13 @@ print(f"{loss.grad=}")
 # +----------------+------------------------+------------------------+---------------------------------------------------+-------------------------------------+
 # |  ``is_leaf``   |   ``requires_grad``    |   ``retains_grad``     |  ``require_grad()``                               |   ``retain_grad()``                 |
 # +================+========================+========================+===================================================+=====================================+
-# | ``True``       | ``False``              | ``False``              | sets ``requires_grad`` to ``True`` or ``False``   | no-op                               |
+# | ``True``       | ``False``              | ``False``              | sets ``requires_grad`` to ``True`` or ``False``   | throws error                        |
 # +----------------+------------------------+------------------------+---------------------------------------------------+-------------------------------------+
-# | ``True``       | ``True``               | ``False``              | sets ``requires_grad`` to ``True`` or ``False``   | no-op                               |
+# | ``True``       | ``True``               | ``False``              | sets ``requires_grad`` to ``True`` or ``False``   | no-op (already retains)             |
 # +----------------+------------------------+------------------------+---------------------------------------------------+-------------------------------------+
 # | ``False``      | ``True``               | ``False``              | no-op                                             | sets ``retains_grad`` to ``True``   |
 # +----------------+------------------------+------------------------+---------------------------------------------------+-------------------------------------+
-# | ``False``      | ``True``               | ``True``               | no-op                                             | no-op                               |
+# | ``False``      | ``True``               | ``True``               | no-op                                             | no-op (already retains)             |
 # +----------------+------------------------+------------------------+---------------------------------------------------+-------------------------------------+
 #
 
@@ -321,7 +323,7 @@ print(f"{loss.grad=}")
 # works, please visit the `references <#references>`__ below. If you have
 # any feedback for this tutorial (improvements, typo fixes, etc.) then
 # please use the `PyTorch Forums <https://discuss.pytorch.org/>`__ and/or
-# the `issue tracker <https://github.com/pytorchkorea/tutorials-kr/issues>`__ to
+# the `issue tracker <https://github.com/pytorch/tutorials/issues>`__ to
 # reach out.
 #
 
@@ -331,9 +333,9 @@ print(f"{loss.grad=}")
 # ----------
 #
 # -  `A Gentle Introduction to
-#    torch.autograd <https://docs.tutorials.pytorch.kr/beginner/blitz/autograd_tutorial.html>`__
+#    torch.autograd <https://docs.pytorch.org/tutorials/beginner/blitz/autograd_tutorial.html>`__
 # -  `Automatic Differentiation with
-#    torch.autograd <https://docs.tutorials.pytorch.kr/beginner/basics/autogradqs_tutorial>`__
+#    torch.autograd <https://docs.pytorch.org/tutorials/beginner/basics/autogradqs_tutorial>`__
 # -  `Autograd
 #    mechanics <https://docs.pytorch.org/docs/stable/notes/autograd.html>`__
 #

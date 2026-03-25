@@ -5,10 +5,12 @@
 
 **아래 튜토리얼들이 새로 추가되었습니다:**
 
-* `Integrating Custom Operators with SYCL for Intel GPU <https://tutorials.pytorch.kr/advanced/cpp_custom_ops_sycl.html>`__
-* `Supporting Custom C++ Classes in torch.compile/torch.export <https://docs.tutorials.pytorch.kr/advanced/custom_class_pt2.html>`__
-* `Accelerating torch.save and torch.load with GPUDirect Storage <https://docs.tutorials.pytorch.kr/unstable/gpu_direct_storage.html>`__
-* `Getting Started with Fully Sharded Data Parallel (FSDP2) <https://docs.tutorials.pytorch.kr/intermediate/FSDP_tutorial.html>`__
+* `Distributed Training with Ray Train <https://docs.pytorch.org/tutorials/beginner/distributed_training_with_ray_tutorial.html>`__
+* `Serve PyTorch models at scale with Ray Serve <https://docs.pytorch.org/tutorials/beginner/serving_tutorial.html>`__
+* `Hyperparameter tuning using Ray Tune <https://docs.pytorch.org/tutorials/beginner/hyperparameter_tuning_tutorial.html>`__
+* `Memory Profiling with Mosaic <https://docs.pytorch.org/tutorials/beginner/mosaic_memory_profiling_tutorial.html>`__
+* `Using Variable Length Attention in PyTorch <https://docs.pytorch.org/tutorials/intermediate/variable_length_attention_tutorial.html>`__
+* `DebugMode: Recording Dispatched Operations and Numerical Debugging <https://docs.pytorch.org/tutorials/recipes/debug_mode_tutorial.html>`__
 
 .. raw:: html
 
@@ -97,7 +99,7 @@
 .. customcarditem::
    :header: Good usage of `non_blocking` and `pin_memory()` in PyTorch
    :card_description: A guide on best practices to copy data from CPU to GPU.
-   :image: _static/img/pinmem.png
+   :image: _static/img/thumbnails/cropped/generic-pytorch-logo.png
    :link: intermediate/pinmem_nonblock.html
    :tags: Getting-Started
 
@@ -153,27 +155,20 @@
    :tags: Image/Video
 
 .. customcarditem::
-   :header: Inference on Whole Slide Images with TIAToolbox
-   :card_description: Learn how to use the TIAToolbox to perform inference on whole slide images.
-   :image: _static/img/thumbnails/cropped/TIAToolbox-Tutorial.png
-   :link: intermediate/tiatoolbox_tutorial.html
-   :tags: Image/Video
-
-.. customcarditem::
    :header: Semi-Supervised Learning Tutorial Based on USB
    :card_description: Learn how to train semi-supervised learning algorithms (on custom data) using USB and PyTorch.
    :image: _static/img/usb_semisup_learn/code.png
    :link: advanced/usb_semisup_learn.html
    :tags: Image/Video
 
-.. Audio
-
 .. customcarditem::
-   :header: Audio IO
-   :card_description: Learn to load data with torchaudio.
-   :image: _static/img/thumbnails/cropped/torchaudio-Tutorial.png
-   :link: beginner/audio_io_tutorial.html
-   :tags: Audio
+   :header: Distributed Training with Ray Train
+   :card_description: Pre-train a transformer language model across multiple GPUs using PyTorch and Ray Train.
+   :image: _static/img/thumbnails/cropped/generic-pytorch-logo.png
+   :link: beginner/distributed_training_with_ray_tutorial.html
+   :tags: Text,Best-Practice,Ray-Distributed,Parallel-and-Distributed-Training
+
+.. Audio
 
 .. customcarditem::
    :header: Audio Resampling
@@ -332,6 +327,13 @@
 .. Deploying PyTorch Models in Production
 
 .. customcarditem::
+   :header: Serving PyTorch Tutorial
+   :card_description: Deploy and scale a PyTorch model with Ray Serve.
+   :image: _static/img/ray-serve.png
+   :link: beginner/serving_tutorial.html
+   :tags: Production,Best-Practice,Ray-Distributed,Ecosystem
+
+.. customcarditem::
    :header: Profiling PyTorch
    :card_description: Learn how to profile a PyTorch application
    :image: _static/img/thumbnails/cropped/generic-pytorch-logo.png
@@ -341,15 +343,23 @@
 .. customcarditem::
    :header: Profiling PyTorch
    :card_description: Introduction to Holistic Trace Analysis
+   :image: _static/img/thumbnails/cropped/generic-pytorch-logo.png
    :link: beginner/hta_intro_tutorial.html
    :tags: Profiling
 
 .. customcarditem::
    :header: Profiling PyTorch
    :card_description: Trace Diff using Holistic Trace Analysis
+   :image: _static/img/thumbnails/cropped/generic-pytorch-logo.png
    :link: beginner/hta_trace_diff_tutorial.html
    :tags: Profiling
 
+.. customcarditem::
+   :header: Memory Profiling with Mosaic
+   :card_description: Learn how to use the Mosaic memory profiler to visualize GPU memory usage and identify memory optimization opportunities in PyTorch models.
+   :image: _static/img/thumbnails/cropped/profiler.png
+   :link: beginner/mosaic_memory_profiling_tutorial.html
+   :tags: Model-Optimization,Best-Practice,Profiling
 
 .. Code Transformations with FX
 
@@ -502,7 +512,7 @@
    :card_description: Learn how to use Ray Tune to find the best performing set of hyperparameters for your model.
    :image: _static/img/ray-tune.png
    :link: beginner/hyperparameter_tuning_tutorial.html
-   :tags: Model-Optimization,Best-Practice
+   :tags: Model-Optimization,Best-Practice,Ray-Distributed,Parallel-and-Distributed-Training
 
 .. customcarditem::
    :header: Parametrizations Tutorial
@@ -544,6 +554,13 @@
    :card_description: Speed up your models with minimal code changes using torch.compile, the latest PyTorch compiler solution.
    :image: _static/img/thumbnails/cropped/generic-pytorch-logo.png
    :link: intermediate/torch_compile_tutorial.html
+   :tags: Model-Optimization
+
+.. customcarditem::
+   :header: torch.compile End-to-End Tutorial
+   :card_description: An example of applying torch.compile to a real model, demonstrating speedups.
+   :image: _static/img/thumbnails/cropped/generic-pytorch-logo.png
+   :link: intermediate/torch_compile_full_example.html
    :tags: Model-Optimization
 
 .. customcarditem::
@@ -650,7 +667,7 @@
 .. customcarditem::
    :header: Introduction to Distributed Pipeline Parallelism
    :card_description: Demonstrate how to implement pipeline parallelism using torch.distributed.pipelining
-   :image: _static/img/thumbnails/cropped/Introduction-to-Distributed-Pipeline-Parallelism.png
+   :image: _static/img/thumbnails/cropped/generic-pytorch-logo.png
    :link: intermediate/pipelining_tutorial.html
    :tags: Parallel-and-Distributed-Training
 
@@ -678,10 +695,16 @@
 .. customcarditem::
    :header: Introduction to Libuv TCPStore Backend
    :card_description: TCPStore now uses a new server backend for faster connection and better scalability.
-   :image: _static/img/thumbnails/cropped/Introduction-to-Libuv-Backend-TCPStore.png
+   :image: _static/img/thumbnails/cropped/generic-pytorch-logo.png
    :link: intermediate/TCPStore_libuv_backend.html
    :tags: Parallel-and-Distributed-Training
 
+.. customcarditem::
+   :header: Interactive Distributed Applications with Monarch
+   :card_description: Learn how to spin up distributed applications using Monarch's single controller model
+   :image: _static/img/thumbnails/cropped/generic-pytorch-logo.png
+   :link: intermediate/monarch_distributed_tutorial.html
+   :tags: Parallel-and-Distributed-Training
 
 .. Edge
 
@@ -865,4 +888,4 @@
    :maxdepth: 1
    :hidden:
 
-   prototype/prototype_index
+   unstable_index

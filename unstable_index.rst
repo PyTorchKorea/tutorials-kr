@@ -36,24 +36,6 @@ decide if we want to upgrade the level of commitment or to fail fast.
 
 .. Add prototype tutorial cards below this line
 
-.. Sparsity
-
-.. customcarditem::
-   :header: (prototype) Accelerating BERT with semi-structured (2:4) sparsity
-   :card_description: Prune BERT to be 2:4 sparse and accelerate for inference.
-   :image: _static/img/thumbnails/cropped/generic-pytorch-logo.png
-   :link: unstable/semi_structured_sparse.html
-   :tags: Model-Optimiziation
-
-.. Modules
-
-.. customcarditem::
-   :header: Skipping Module Parameter Initialization in PyTorch 1.10
-   :card_description: Describes skipping parameter initialization during module construction in PyTorch 1.10, avoiding wasted computation.
-   :image: _static/img/thumbnails/cropped/generic-pytorch-logo.png
-   :link: unstable/skip_param_init.html
-   :tags: Modules
-
 .. vmap
 
 .. customcarditem::
@@ -179,4 +161,3 @@ decide if we want to upgrade the level of commitment or to fail fast.
    unstable/python_extension_autoload
    unstable/gpu_direct_storage.html
    unstable/max_autotune_on_CPU_tutorial
-   unstable/skip_param_init.html
