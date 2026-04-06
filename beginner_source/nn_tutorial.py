@@ -715,7 +715,7 @@ fit(epochs, model, loss_func, opt, train_dl, valid_dl)
 #
 # ``torch.nn`` 에는 코드를 간단히 사용할 수 있는 또 다른 편리한 클래스인
 # `Sequential <https://pytorch.org/docs/stable/nn.html#torch.nn.Sequential>`_
-# 이 있습니다..
+# 이 있습니다.
 # ``Sequential`` 객체는 그 안에 포함된 각 모듈을 순차적으로 실행합니다.
 # 이것은 우리의 신경망을 작성하는 더 간단한 방법입니다.
 #
