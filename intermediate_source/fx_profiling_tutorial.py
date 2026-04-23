@@ -26,9 +26,9 @@ rn18 = models.resnet18()
 rn18.eval()
 
 ######################################################################
-# Now that we have our model, we want to inspect deeper into its
-# performance. That is, for the following invocation, which parts
-# of the model are taking the longest?
+# 이제 모델이 준비되었으므로, 모델의 성능을 좀 더 자세히 살펴봅니다.
+# 즉, 다음과 같이 호출했을 때 모델의 어느 부분이
+# 가장 오래 걸리는지 확인합니다.
 input = torch.randn(5, 3, 224, 224)
 output = rn18(input)
 
