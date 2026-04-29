@@ -61,9 +61,11 @@
 |dataset|데이터셋|박정환|음차 표기|
 |deep neural network|심층 신경망|박정환||
 |derivative|도함수|박정환||
+|discriminator|판별자|심기택||
 |Drop-out|Drop-out|황성수|번역안함|
 |embedding|임베딩|하동훈|음차 표기|
 |epoch|에폭|박정환|음차 표기|
+|et al|등|심기택||
 |evaluation mode|평가 모드|박정환||
 |Fine-tuning|미세 조정|오왕택||
 |feature|특징|백선희||
