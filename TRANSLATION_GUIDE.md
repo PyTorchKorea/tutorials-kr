@@ -55,6 +55,7 @@
 |Batch Normalization|배치 정규화|박정환||
 |bias|편향|이하람||
 |CUDA|CUDA|박지은|번역안함|
+|checkpoint|체크포인트|명준현|음차 표기|
 |confusion matrix|혼동 행렬|김민엽||
 |convolution|합성곱|김현길||
 |Dropout|드롭아웃|김태형|음차 표기|
