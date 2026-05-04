@@ -51,10 +51,6 @@ import matplotlib.pyplot as plt
 # `Identity <https://docs.pytorch.org/docs/stable/generated/torch.nn.Identity.html>`__
 # 변환을 사용할 것입니다.
 # 
-# 
-#
-# 
-#
 
 def fc_layer(in_size, out_size, norm_layer):
     """Return a stack of linear->norm->sigmoid layers"""
@@ -133,11 +129,8 @@ print(model_nobn.layers[0])
 #    
 # 다음 코드는 훅을 정의하고 네트워크 계층(network layer)에 대한 묘사 명칭(descriptive name)을 수집합니다.
 # 
-# 
-#
 
 # 인자를 전달할 수 있도록 파이썬 클로저를 위해 래퍼 함수가 사용된다는 점을 유의하세요.
-# 
 
 def hook_forward(module_name, grads, hook_backward):
     def hook(module, args, output):
@@ -211,7 +204,6 @@ for epoch in range(epochs):
 # ``grads_bn``과 ``grads_nobn``에 존재해야 합니다.
 # 두 모델을 비교할 수 있도록 각 기울기 행렬의 평균 절댓값을 계산합니다.
 # 
-#
 
 def get_grads(grads):
     layer_idx = []
@@ -262,7 +254,6 @@ plt.show()
 # 그리고/또는 `이슈 트래커 <https://github.com/pytorchkorea/tutorials-kr/issues>`__ 
 # 를 통해 알려주시기 바랍니다.
 # 
-#
 
 
 ######################################################################
@@ -275,8 +266,6 @@ plt.show()
 #    (*힌트: hook_forward() 함수가 원시 tensor 출력에 접근할 수 있습니다*)
 # -  변화도 소실 및 폭주 문제를 해결하기 위한 다른 방법에는 어떤 것들이 있을까요?
 # 
-#   
-#
 
 
 ######################################################################
