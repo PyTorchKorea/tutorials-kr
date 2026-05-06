@@ -1298,7 +1298,7 @@ n_iteration = 4000
 print_every = 1
 save_every = 500
 
-# Dropout 계층을 학습 모드로 둡니다
+# 드롭아웃 계층을 학습 모드로 둡니다
 encoder.train()
 decoder.train()
 
@@ -1335,7 +1335,7 @@ trainIters(model_name, voc, pairs, encoder, decoder, encoder_optimizer, decoder_
 # 여러분의 모델과 채팅을 해보고 싶다면 다음 블록을 수행하면 됩니다.
 #
 
-# Dropout 계층을 평가( ``eval`` ) 모드로 설정합니다
+# 드롭아웃 계층을 평가( ``eval`` ) 모드로 설정합니다
 encoder.eval()
 decoder.eval()
 

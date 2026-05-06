@@ -257,7 +257,7 @@ emsize = 200 # 임베딩 차원
 d_hid = 200 # ``nn.TransformerEncoder`` 에서 피드포워드 네트워크(feedforward network) 모델의 차원
 nlayers = 2 # ``nn.TransformerEncoder`` 내부의 nn.TransformerEncoderLayer 개수
 nhead = 2 # ``nn.MultiheadAttention`` 의 헤드 개수
-dropout = 0.2 # 드랍아웃(dropout) 확률
+dropout = 0.2 # 드롭아웃(dropout) 확률
 model = TransformerModel(ntokens, emsize, nhead, d_hid, nlayers, dropout).to(device)
 
 

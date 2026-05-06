@@ -242,7 +242,7 @@ emsize = 4096 # 임베딩 차원
 nhid = 4096 # ``nn.TransformerEncoder`` 에서 순전파(feedforward) 신경망 모델의 차원
 nlayers = 12 # ``nn.TransformerEncoder`` 내부의 ``nn.TransformerEncoderLayer`` 개수
 nhead = 16 # Multihead Attention 모델의 헤드 개수
-dropout = 0.2 # dropout 값
+dropout = 0.2 # 드롭아웃 값
 
 from torch.distributed import rpc
 tmpfile = tempfile.NamedTemporaryFile()
