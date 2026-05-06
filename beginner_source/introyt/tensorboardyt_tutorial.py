@@ -142,7 +142,7 @@ matplotlib_imshow(img_grid, one_channel=True)
 # 또한 ``flush()`` 를 호출하여 이미지가 즉시 디스크에 기록되도록 합니다.
 #
 
-# log_dir 인수 기본값은 "runs"입니다 - 하지만 구체적으로 정하는 것이 좋습니다.
+# log_dir 인자 기본값은 "runs"입니다 - 하지만 구체적으로 정하는 것이 좋습니다.
 # 위에서 torch.utils.tensorboard.SummaryWriter를 가져왔습니다.
 writer = SummaryWriter('runs/fashion_mnist_experiment_1')
 

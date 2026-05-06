@@ -387,7 +387,7 @@ torch.backends.cudnn.benchmark = True
 # 장치에서 생성합니다.
 # ``torch.rand(size, device='cuda')``
 #
-# 이는 다음과 같이 ``device`` 인수를 받아 새로운 tensor를 생성하는 모든 함수에 적용됩니다:
+# 이는 다음과 같이 ``device`` 인자를 받아 새로운 tensor를 생성하는 모든 함수에 적용됩니다:
 # `torch.rand() <https://pytorch.org/docs/stable/generated/torch.rand.html#torch.rand>`_,
 # `torch.zeros() <https://pytorch.org/docs/stable/generated/torch.zeros.html#torch.zeros>`_,
 # `torch.full() <https://pytorch.org/docs/stable/generated/torch.full.html#torch.full>`_

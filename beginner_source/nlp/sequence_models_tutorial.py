@@ -78,7 +78,7 @@ for i in inputs:
 # (아래의 "hidden"과 "out"의 마지막 슬라이스(slice)를 비교해 보면 둘은 동일합니다.)
 # 이렇게 하는 이유는 다음과 같습니다:
 # "out"은 시퀀스의 모든 은닉 상태에 대한 액세스를 제공하고,
-# "hidden"은 나중에 lstm에 인수 형태로 전달하여 
+# "hidden"은 나중에 lstm에 인자 형태로 전달하여 
 # 시퀀스를 계속하고, 역전파 하도록 합니다. 
 # 추가로 두 번째 차원을 더합니다. 
 inputs = torch.cat(inputs).view(len(inputs), 1, -1)

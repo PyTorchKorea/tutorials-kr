@@ -339,7 +339,7 @@ prof.stop()
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 # - 메모리 보기(Memory view)
-# 메모리 프로파일을 설정하려면 ``torch.profiler.profile`` 인수에서 ``profile_memory``를 ``True``로 설정해야 합니다.
+# 메모리 프로파일을 설정하려면 ``torch.profiler.profile`` 인자에서 ``profile_memory``를 ``True``로 설정해야 합니다.
 #
 # Azure의 기존 예제를 사용해 볼 수 있습니다.
 #
