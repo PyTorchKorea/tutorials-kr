@@ -792,7 +792,7 @@ train(train_dataloader, encoder, decoder, 80, print_every=5, plot_every=5)
 ######################################################################
 #
 #
-# 드롭아웃(dropout) 레이어들을 평가 (``eval``) 모드로 설정합니다.
+# 드롭아웃(dropout) 계층들을 평가 (``eval``) 모드로 설정합니다.
 
 encoder.eval()
 decoder.eval()
@@ -860,7 +860,7 @@ evaluateAndShowAttention('je suis reellement fiere de vous')
 # -  ``word2vec`` 또는 ``GloVe`` 같은 미리 학습된 word embedding 으로
 #    embedding 을 교체하십시오
 #
-# -  더 많은 레이어, 은닉 유닛, 더 많은 문장을 사용하십시오.
+# -  더 많은 계층, 은닉 유닛, 더 많은 문장을 사용하십시오.
 #    학습 시간과 결과를 비교해 보십시오
 # -  만약 같은 구문 두개의 쌍으로 된 번역 파일을 이용한다면,
 #    (``I am test \t I am test``), 이것을 오토인코더로
