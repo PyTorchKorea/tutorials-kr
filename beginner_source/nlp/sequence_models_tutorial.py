@@ -165,7 +165,7 @@ class LSTMTagger(nn.Module):
         # 차원이 hidden_dim인 은닉 상태를 출력합니다. 
         self.lstm = nn.LSTM(embedding_dim, hidden_dim)
 
-        # 은닉 상태 공간에서 태그 공간으로 매핑하는 선형 레이어
+        # 은닉 상태 공간에서 태그 공간으로 매핑하는 선형 계층
         self.hidden2tag = nn.Linear(hidden_dim, tagset_size)
 
     def forward(self, sentence):

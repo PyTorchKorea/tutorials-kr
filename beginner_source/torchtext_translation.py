@@ -142,7 +142,7 @@ test_iter = DataLoader(test_data, batch_size=BATCH_SIZE,
 # 참고 : 이 튜토리얼에서 사용하는 모델은 언어 번역을 위해 사용할 예시 모델입니다. 이 모델을 사용하는 것은
 # 이 작업에 적당한 표준 모델이기 때문이지, 번역에 적합한 모델이기 때문은 아닙니다. 여러분이 최신 기술 트렌드를
 # 잘 따라가고 있다면 잘 아시겠지만, 현재 번역에서 가장 뛰어난 모델은 Transformers입니다. PyTorch가
-# Transformer 레이어를 구현한 내용은 `여기 <https://pytorch.org/docs/stable/nn.html#transformer-layers>`__
+# Transformer 계층을 구현한 내용은 `여기 <https://pytorch.org/docs/stable/nn.html#transformer-layers>`__
 # 에서 확인할 수 있으며 이 튜토리얼의 모델이 사용하는 "attention" 은 Transformer 모델에서 제안하는
 # 멀티 헤드 셀프 어텐션(multi-headed self-attention) 과는 다르다는 점을 알려드립니다.
 

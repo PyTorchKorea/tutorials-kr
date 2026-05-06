@@ -54,7 +54,7 @@ print(f"Using device = {torch.get_default_device()}")
 # (하지만 유니코드에서 ASCII로 변환은 해야 합니다)
 #
 # 첫번째 단계는 데이터를 정의하고 정리하는 것입니다. 초기에는 유니코드를 일반 ASCII로 변환하여
-# RNN 입력 레이어를 제한해야 합니다. 이는 유니코드 문자열을 ASCII로 변환하고 허용된 문자의 작은 집합만을 허용하여 이루어집니다.
+# RNN 입력 계층을 제한해야 합니다. 이는 유니코드 문자열을 ASCII로 변환하고 허용된 문자의 작은 집합만을 허용하여 이루어집니다.
 
 import string
 import unicodedata
@@ -72,7 +72,7 @@ def unicodeToAscii(s):
     )
 
 #########################
-# 유니코드 알파벳 이름을 일반 ASCII로 변환하는 예시입니다. 이렇게 하면 입력 레이어를 단순화할 수 있습니다.
+# 유니코드 알파벳 이름을 일반 ASCII로 변환하는 예시입니다. 이렇게 하면 입력 계층을 단순화할 수 있습니다.
 #
 
 print (f"converting 'Ślusàrski' to {unicodeToAscii('Ślusàrski')}")
