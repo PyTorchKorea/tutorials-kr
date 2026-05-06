@@ -228,8 +228,8 @@ for epoch in range(10):
         # 바꾸고 파이토치 텐서로 감싸줍시다.)
         context_idxs = torch.tensor([word_to_ix[w] for w in context], dtype=torch.long)
 
-        # 두번째. 토치는 기울기가 *누적* 됩니다. 새 인스턴스를 넣어주기 전에
-        # 기울기를 초기화합니다.
+        # 두번째. 토치는 변화도가 *누적* 됩니다. 새 인스턴스를 넣어주기 전에
+        # 변화도를 초기화합니다.
         model.zero_grad()
 
         # 세번째. 순전파를 통해 다음에 올 단어에 대한 로그 확률을 구합니다.
@@ -238,7 +238,7 @@ for epoch in range(10):
         # 네번째. 손실함수를 계산합니다. (파이토치에서는 목표 단어를 텐서로 감싸줘야 합니다.)
         loss = loss_function(log_probs, torch.tensor([word_to_ix[target]], dtype=torch.long))
 
-        # 다섯번째. 역전파를 통해 기울기를 업데이트 해줍니다.
+        # 다섯번째. 역전파를 통해 변화도를 업데이트 해줍니다.
         loss.backward()
         optimizer.step()
 

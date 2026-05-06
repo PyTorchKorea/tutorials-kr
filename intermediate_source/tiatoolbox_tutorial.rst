@@ -823,7 +823,7 @@ TIAToolbox는 PyTorch의 `nn.Module <https://pytorch.org/docs/stable/generated/t
             """
             img_patches_device = batch_data.to('cuda') if on_gpu else batch_data
             model.eval()
-            # 기울기를 계산하지 않음(훈련이 아님)
+            # 변화도를 계산하지 않음(훈련이 아님)
             with torch.inference_mode():
                 output = model(img_patches_device)
             return [output.cpu().numpy()]

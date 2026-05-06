@@ -307,7 +307,7 @@ print ('Total parameters in model: {:,}'.format(get_total_params(model)))
 # 는 확률적 경사하강법(stochastic gradient descent method)을 구현합니다. 초기
 # 학습률(learning rate)은 5.0로 설정됩니다. `StepLR <https://pytorch.org/docs/master/optim.html?highlight=steplr#torch.optim.lr_scheduler.StepLR>`__ 는
 # 에폭(epoch)에 따라서 학습률을 조절하는 데 사용됩니다. 학습하는 동안,
-# 기울기 폭발(gradient exploding)을 방지하기 위해 모든 기울기를 함께 조정(scale)하는 함수
+# 변화도 폭발(gradient exploding)을 방지하기 위해 모든 변화도를 함께 조정(scale)하는 함수
 # `nn.utils.clip_grad_norm\_ <https://pytorch.org/docs/master/nn.html?highlight=nn%20utils%20clip_grad_norm#torch.nn.utils.clip_grad_norm_>`__
 # 을 이용합니다.
 #

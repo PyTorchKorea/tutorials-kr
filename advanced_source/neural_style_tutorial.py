@@ -151,7 +151,7 @@ imshow(content_img, title='Content Image')
 #
 # Content 거리를 계산하기 위해 사용되는 합성곱 계층 바로 뒤에 Content 손실 모듈을 추가합니다.
 # 이렇게 하면 입력 이미지가 입력될 때마다 Content 손실이 원하는 계층에서
-# 계산되고 autograd 을 통해 모든 기울기가 계산됩니다.
+# 계산되고 autograd 을 통해 모든 변화도가 계산됩니다.
 # 이제 Content 손실 계층을 만들기 위해 Content 손실을 계산한 다음 계층의 입력을 반환하는
 # ``forward`` 메소드를 정의해야합니다.
 # 계산된 손실은 모듈의 매개 변수로써 저장됩니다.
@@ -161,7 +161,7 @@ class ContentLoss(nn.Module):
 
     def __init__(self, target,):
         super(ContentLoss, self).__init__()
-        # 기울기를 동적으로 계산하는데 사용되는 tree로부터 타깃 Content를 `분리(detach)` 합니다.
+        # 변화도를 동적으로 계산하는데 사용되는 tree로부터 타깃 Content를 `분리(detach)` 합니다.
         # 이것은 변수가 아니라 명시된 값입니다.
         # 그렇지 않으면 criterion의 forward 메소드에서 오류가 발생합니다.
         self.target = target.detach()
@@ -174,7 +174,7 @@ class ContentLoss(nn.Module):
 # .. Note::
 #    **중요 세부 사항**: 모듈의 이름은 ``ContentLoss`` 지만, 실제 PyTorch의 손실 함수는 아닙니다.
 #    만약 Content 손실을 PyTorch의 손실 함수로 정의하려면 Pytorch의 autograd 함수를 생성하여
-#    ``backward`` 메소드에서 수동으로 기울기를 다시 계산 및 구현 해야 합니다.
+#    ``backward`` 메소드에서 수동으로 변화도를 다시 계산 및 구현 해야 합니다.
 
 ######################################################################
 # 스타일 손실(Style Loss)
@@ -372,7 +372,7 @@ imshow(input_img, title='Input Image')
 #
 
 def get_input_optimizer(input_img):
-    # 입력이 기울기가 필요한 매개 변수임을 표시하는 줄
+    # 입력이 변화도가 필요한 매개 변수임을 표시하는 줄
     optimizer = optim.LBFGS([input_img])
     return optimizer
 
@@ -380,7 +380,7 @@ def get_input_optimizer(input_img):
 ######################################################################
 # 마지막으로 뉴럴 변환(neural transfer)을 수행하는 함수를 정의해야 합니다.
 # 네트워크의 각 반복 동안, 업데이트된 입력이 주어지고 새로운 손실을 계산합니다.
-# 각 손실 모듈(Loss module)의 ``backward`` 메소드를 실행하여 기울기를 동적으로 계산합니다.
+# 각 손실 모듈(Loss module)의 ``backward`` 메소드를 실행하여 변화도를 동적으로 계산합니다.
 # optimizer는 모듈을 재평가하고 손실을 반환하는 “closure” 함수가 필요합니다.
 #
 # 여전히 해결해야 할 마지막 제약이 있습니다.

@@ -272,7 +272,7 @@ model = TransformerModel(ntokens, emsize, nhead, d_hid, nlayers, dropout).to(dev
 # `SGD <https://pytorch.org/docs/stable/generated/torch.optim.SGD.html>`__ (확률적 경사 하강법) 옵티마이저(optimizer)와
 # 함께 사용하였습니다. 학습률(learning rate)는 5.0으로 초기화하였으며 `StepLR <https://pytorch.org/docs/master/optim.html?highlight=steplr#torch.optim.lr_scheduler.StepLR>`__
 # 스케쥴을 따릅니다. 학습하는 동안, `nn.utils.clip_grad_norm\_ <https://pytorch.org/docs/stable/generated/torch.nn.utils.clip_grad_norm_.html>`__
-# 을 사용하여 기울기(gradient)가 폭발(exploding)하지 않도록 합니다.
+# 을 사용하여 변화도(gradient)가 폭발(exploding)하지 않도록 합니다.
 #
 
 import copy

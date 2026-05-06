@@ -13,7 +13,7 @@
 
 기본 사용법
 --------------------------------------------------------------------
-역전파 모드 자동 미분(Reverse-mode Automatic Differentiation)과 달리, 순전파 모드 자동 미분은 순전파(forward pass)를 진행하며 기울기(gradient)를 즉시(계산을 미루지 않고) 계산합니다. 순전파 모드 자동 미분으로 방향성 도함수를 계산하려면, 먼저 입력을 방향성 도함수의 방향을 나타내는 다른 tensor(야코비안-벡터 곱의 `v`에 해당)와 연결한 뒤 이전과 같이 순전파를 수행하면 됩니다. 'primal'이라고 부르는 입력이 'tangent'라고 부르는 '방향' tensor와 연결될 때, 결과로 나오는 새로운 tensor 객체는 이중수(dual numbers) [0] 와의 관련성 때문에 '이중 tensor(dual tensor)'라고 불립니다.
+역전파 모드 자동 미분(Reverse-mode Automatic Differentiation)과 달리, 순전파 모드 자동 미분은 순전파(forward pass)를 진행하며 변화도(gradient)를 즉시(계산을 미루지 않고) 계산합니다. 순전파 모드 자동 미분으로 방향성 도함수를 계산하려면, 먼저 입력을 방향성 도함수의 방향을 나타내는 다른 tensor(야코비안-벡터 곱의 `v`에 해당)와 연결한 뒤 이전과 같이 순전파를 수행하면 됩니다. 'primal'이라고 부르는 입력이 'tangent'라고 부르는 '방향' tensor와 연결될 때, 결과로 나오는 새로운 tensor 객체는 이중수(dual numbers) [0] 와의 관련성 때문에 '이중 tensor(dual tensor)'라고 불립니다.
 
 순전파가 수행될 때, 입력 tensor 중 하나라도 이중 tensor이면 함수의 '민감도(sensitivity)'를 전파하기 위해 추가적인 연산이 수행됩니다.
 
@@ -121,7 +121,7 @@ class Fn(torch.autograd.Function):
     @staticmethod
     def forward(ctx, foo):
         result = torch.exp(foo)
-        # ``ctx`` 에 저장된 tensor는 이후의 순전파 기울기
+        # ``ctx`` 에 저장된 tensor는 이후의 순전파 변화도
         # 계산에 사용할 수 있습니다.
         ctx.result = result
         return result
@@ -144,10 +144,10 @@ with fwAD.dual_level():
     dual_output = fn(dual_input)
     jvp = fwAD.unpack_dual(dual_output).tangent
 
-# 사용자 정의 autograd 함수가 기울기를 올바르게 계산하는지 확인하려면
+# 사용자 정의 autograd 함수가 변화도를 올바르게 계산하는지 확인하려면
 # ``autograd.gradcheck`` 를 사용하는 것이 중요합니다. 기본적으로
-# ``gradcheck`` 는 역전파 모드(reverse-mode) 자동 미분 기울기만 확인합니다.
-# ``check_forward_ad=True`` 를 지정하여 순전파 기울기도 확인하도록 할 수 있습니다.
+# ``gradcheck`` 는 역전파 모드(reverse-mode) 자동 미분 변화도만 확인합니다.
+# ``check_forward_ad=True`` 를 지정하여 순전파 변화도도 확인하도록 할 수 있습니다.
 # 만약 함수에 대한 역전파를 구현하지 않았다면, ``check_backward_ad=False``,
 # ``check_undefined_grad=False``, ``check_batched_grad=False`` 를 지정하여
 # ``gradcheck`` 가 역전파 모드 자동 미분이 필요한 테스트를 건너뛰도록 할 수 있습니다.
