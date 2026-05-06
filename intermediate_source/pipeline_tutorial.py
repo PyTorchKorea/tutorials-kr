@@ -331,7 +331,7 @@ def train():
         data, targets = get_batch(train_data, i)
         optimizer.zero_grad()
         # Pipe는 단일 호스트 내에 있고
-        # forward 메서드로 반환된 ``RRef`` 프로세스는 이 노드에 국한되어 있기 때문에
+        # forward 메소드로 반환된 ``RRef`` 프로세스는 이 노드에 국한되어 있기 때문에
         # ``RRef.local_value()`` 를 통해 간단히 찾을 수 있습니다.
         output = model(data).local_value()
         # 타겟을 파이프라인 출력이 있는
