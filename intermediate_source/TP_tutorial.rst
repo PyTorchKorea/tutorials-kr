@@ -38,7 +38,7 @@ Tensor Parallel (TP)는 기존 `Megatron-LM <https://arxiv.org/abs/1909.08053>`_
 **Sharding 초기화**
 
 * 각 계층에 어떤 ``ParallelStyle`` 을 적용할지 결정하고, ``parallelize_module`` 을 호출해서 초기화된 모듈을 샤딩합니다.
-* 병렬화된 모듈은 모델 파라미터를 DTensor로 교체하고, DTensor는 샤딩하는 연산을 사용하여 병렬화된 모듈을 실행하는 역할을 담당합니다.
+* 병렬화된 모듈은 모델 매개변수를 DTensor로 교체하고, DTensor는 샤딩하는 연산을 사용하여 병렬화된 모듈을 실행하는 역할을 담당합니다.
 
 **런타임 순방향/역방향**
 
@@ -138,7 +138,7 @@ PyTorch 네이티브 Tensor Parallel을 사용하여 다음과 같이 ``FeedForw
 
 Llama 모델의 경우, 어텐션 계층에서는 형태와 관련된 여러 뷰 연산이 있습니다. 구체적으로, ``wq`` / ``wk`` / ``wv`` 선형 계층에서 열 단위 병렬화의 경우, 활성화 tensor는  ``num_heads`` 차원에서 샤딩됩니다.
 
-마지막으로, 각 ``TransformerBlock`` 에 대한 계획을 효과적으로 실행하려면 ``parallelize_module`` API를 호출해야 합니다. 내부적으로는 ``Attention``  및  ``FeedForward`` 계층 내부 모델 파라미터를 DTensor에 분배하고, 필요하다면 모델 입력과 출력(각각 모듈 이전 및 이후)에 대한 통신 훅을 등록합니다.
+마지막으로, 각 ``TransformerBlock`` 에 대한 계획을 효과적으로 실행하려면 ``parallelize_module`` API를 호출해야 합니다. 내부적으로는 ``Attention``  및  ``FeedForward`` 계층 내부 모델 매개변수를 DTensor에 분배하고, 필요하다면 모델 입력과 출력(각각 모듈 이전 및 이후)에 대한 통신 훅을 등록합니다.
 
 .. code-block:: python
 

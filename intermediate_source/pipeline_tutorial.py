@@ -27,7 +27,7 @@
 # 이번 튜토리얼에서는, 트랜스포머 모델을 두 개의 GPU에 걸쳐서 나누고 파이프라인 병렬화로 학습시켜 보겠습니다.
 # 모델은 바로 `NN.TRANSFORMER 와 TORCHTEXT 로 시퀀스-투-시퀀스(SEQUENCE-TO-SEQUENCE) 모델링하기
 # <https://tutorials.pytorch.kr/beginner/transformer_tutorial.html>`__ 튜토리얼과
-# 똑같은 모델이지만 두 단계로 나뉩니다. 대부분 파라미터(parameter)들은
+# 똑같은 모델이지만 두 단계로 나뉩니다. 대부분 매개변수(parameter)들은
 # `nn.TransformerEncoder <https://pytorch.org/docs/stable/generated/torch.nn.TransformerEncoder.html>`__ 계층(layer)에 포함됩니다.
 # `nn.TransformerEncoder <https://pytorch.org/docs/stable/generated/torch.nn.TransformerEncoder.html>`__ 는
 # `nn.TransformerEncoderLayer <https://pytorch.org/docs/stable/generated/torch.nn.TransformerEncoderLayer.html>`__ 의 ``nlayers`` 로 구성되어 있습니다.
@@ -220,7 +220,7 @@ def get_batch(source, i):
 # 트랜스포머 계층 규모를 적절히 확장시킵니다. 4096차원의 임베딩 벡터, 4096의 은닉 사이즈,
 # 16개의 어텐션 헤드(attention head)와 총 12 개의 트랜스포머 계층
 # (``nn.TransformerEncoderLayer``)를 사용합니다. 이는 최대
-# **1.4억** 개의 파라미터를 갖는 모델을 생성합니다.
+# **1.4억** 개의 매개변수를 갖는 모델을 생성합니다.
 #
 # Pipe는 `RRef <https://pytorch.org/docs/stable/rpc.html#rref>`__ 를 통해
 # `RPC 프레임워크 <https://pytorch.org/docs/stable/rpc.html>`__ 에 의존하는데

@@ -93,7 +93,7 @@ from torch.func import stack_module_state
 params, buffers = stack_module_state(models)
 
 ######################################################################
-# 다음으로, ``vmap`` 에 대한 함수를 정의해야 합니다. 이 함수는 파라미터, 버퍼, 입력값이 주어지면 모델을 실행합니다.
+# 다음으로, ``vmap`` 에 대한 함수를 정의해야 합니다. 이 함수는 매개변수, 버퍼, 입력값이 주어지면 모델을 실행합니다.
 # 여기서는 ``torch.func.functional_call`` 을 활용하겠습니다.
 
 from torch.func import functional_call

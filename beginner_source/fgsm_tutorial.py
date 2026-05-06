@@ -56,7 +56,7 @@
 #
 # 그림으로부터, :math:`\mathbf{x}` 는 원본 입력 이미지가 "판다" 로 올바르게 분류된 것을 의미하고,
 # :math:`y` 는 :math:`\mathbf{x}` 를 위한 정답 라벨이며, :math:`\mathbf{\theta}` 는 모델의
-# 파라미터를, :math:`J(\mathbf{\theta}, \mathbf{x}, y)` 는 네트워크의 학습을 위해서 사용되는 손실을 나타냅니다.
+# 매개변수를, :math:`J(\mathbf{\theta}, \mathbf{x}, y)` 는 네트워크의 학습을 위해서 사용되는 손실을 나타냅니다.
 # 공격은 :math:`\nabla_{x} J(\mathbf{\theta}, \mathbf{x}, y)` 계산을 위해 입력 데이터에 변화도를 역전파합니다.
 # 그러고 나서, 변화도는 손실 값이 최대화되는 방향으로 (예를 들면, :math:`sign(\nabla_{x} J(\mathbf{\theta}, \mathbf{x}, y))` )
 # 작은 스텝(step) 만큼 (그림에서는 :math:`\epsilon` 혹은 :math:`0.007`) 입력 데이터에 적용됩니다.
@@ -166,7 +166,7 @@ model.eval()
 # ~~~~~~~~~~~
 #
 # 이제 원래 입력을 교란시켜 적대적인 예를 만드는 함수를 정의 할 수 있습니다.
-# ``fgsm_attack`` 함수는 입력 파라미터로 3가지를 가집니다. 첫 번째는 원본 *이미지* ( :math:`x` ),
+# ``fgsm_attack`` 함수는 입력 매개변수로 3가지를 가집니다. 첫 번째는 원본 *이미지* ( :math:`x` ),
 # 두 번째는 *엡실론* 으로 픽셀 단위의 작은 변화를 주는 값입니다 ( :math:`\epsilon` ).
 # 마지막은 *data_grad* 로 입력 영상 ( :math:`\nabla_{x} J(\mathbf{\theta}, \mathbf{x}, y)` ) 에 대한 변화도 손실 값입니다.
 # 아래 식에 따른 작은 변화가 적용된 이미지를 생성합니다.
