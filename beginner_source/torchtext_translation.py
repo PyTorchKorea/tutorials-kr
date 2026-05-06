@@ -132,7 +132,7 @@ test_iter = DataLoader(test_data, batch_size=BATCH_SIZE,
 # ``nn.Module`` 과 ``Optimizer`` 정의하기
 # ------------------------------------------
 # 대부분은 ``torchtext`` 가 알아서 해줍니다 : 데이터셋이 만들어지고 반복자가 정의되면, 이 튜토리얼에서
-# 우리가 해야 할 일이라고는 그저 ``nn.Module`` 와 ``Optimizer`` 를 모델로서 정의하고 훈련시키는 것이 전부입니다.
+# 우리가 해야 할 일이라고는 그저 ``nn.Module`` 와 ``Optimizer`` 를 모델로서 정의하고 학습시키는 것이 전부입니다.
 #
 #
 # 이 튜토리얼에서 사용할 모델은 `이곳 <https://arxiv.org/abs/1409.0473>`__ 에서 설명하고 있는 구조를 따르고 있으며,
@@ -387,7 +387,7 @@ PAD_IDX = en_vocab.stoi['<pad>']
 criterion = nn.CrossEntropyLoss(ignore_index=PAD_IDX)
 
 ######################################################################
-# 마지막으로 이 모델을 훈련하고 평가합니다 :
+# 마지막으로 이 모델을 학습하고 평가합니다 :
 
 import math
 import time

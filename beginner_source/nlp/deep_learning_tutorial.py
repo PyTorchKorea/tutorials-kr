@@ -312,7 +312,7 @@ label_to_ix = {"SPANISH": 0, "ENGLISH": 1}
 # Log softmax 인 이유입니다. 손실 함수 nn.CrossEntropyLoss()는 Log softmax를 제외하고는 NLLLoss()와 같습니다.
 #
 
-# 훈련하기 전에 테스트 데이터를 실행하여 전후를 볼 수 있습니다.
+# 학습하기 전에 테스트 데이터를 실행하여 전후를 볼 수 있습니다.
 with torch.no_grad():
     for instance, label in test_data:
         bow_vec = make_bow_vector(instance, word_to_ix)

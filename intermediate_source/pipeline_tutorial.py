@@ -122,7 +122,7 @@ class PositionalEncoding(nn.Module):
 # 학습 프로세스는 ``torchtext`` 의 Wikitext-2 데이터셋을 사용합니다.
 # torchtext 데이터셋에 접근하기 전에, https://github.com/pytorch/data 을 참고하여 torchdata를 설치하시기 바랍니다.
 #
-# 단어 오브젝트는 훈련 데이터셋으로 만들어지고, 토큰을 텐서(tensor)로 수치화하는데 사용됩니다.
+# 단어 오브젝트는 학습 데이터셋으로 만들어지고, 토큰을 텐서(tensor)로 수치화하는데 사용됩니다.
 # 시퀀스 데이터로부터 시작하여, ``batchify()`` 함수는 데이터셋을 열(column)들로 정리하고,
 # ``batch_size`` 사이즈의 배치들로 나눈 후에 남은 모든 토큰을 버립니다.
 # 예를 들어, 알파벳을 시퀀스(총 길이 26)로 생각하고 배치 사이즈를 4라고 한다면,
@@ -319,7 +319,7 @@ scheduler = torch.optim.lr_scheduler.StepLR(optimizer, 1.0, gamma=0.95)
 
 import time
 def train():
-    model.train() # 훈련 모드로 전환
+    model.train() # 학습 모드로 전환
     total_loss = 0.
     start_time = time.time()
     ntokens = len(vocab)

@@ -190,7 +190,7 @@ def accuracy(out, yb):
 print(accuracy(preds, yb))
 
 ###############################################################################
-# 이제 우리는 훈련 루프(training loop)를 실행할 수 있습니다. 매 반복마다, 다음을 수행할 것입니다:
+# 이제 우리는 학습 루프(training loop)를 실행할 수 있습니다. 매 반복마다, 다음을 수행할 것입니다:
 #
 # - 데이터의 미니배치를 선택 (``bs`` 크기)
 # - 모델을 이용하여 예측 수행
@@ -215,7 +215,7 @@ print(accuracy(preds, yb))
 from IPython.core.debugger import set_trace
 
 lr = 0.5  # 학습률(learning rate)
-epochs = 2  # 훈련에 사용할 에폭(epoch) 수
+epochs = 2  # 학습에 사용할 에폭(epoch) 수
 
 for epoch in range(epochs):
     for i in range((n - 1) // bs + 1):
@@ -236,7 +236,7 @@ for epoch in range(epochs):
 
 ###############################################################################
 # 이제 다 됐습니다: 제일 간단한 신경망(neural network)의 모든 것을 밑바닥부터 생성하고
-# 훈련하였습니다! (이번에는 은닉층(hidden layer)이 없기 때문에,
+# 학습하였습니다! (이번에는 은닉층(hidden layer)이 없기 때문에,
 # 로지스틱 회귀(logistic regression)입니다).
 #
 # 이제 손실과 정확도를 이전 값들과 비교하면서 확인해봅시다.
@@ -282,7 +282,7 @@ print(loss_func(model(xb), yb), accuracy(model(xb), yb))
 ###############################################################################
 # ``nn.Module`` 을 이용하여 리팩토링 하기
 # -----------------------------------------
-# 다음으로, 더 명확하고 간결한 훈련 루프를 위해 ``nn.Module`` 및 ``nn.Parameter`` 를 사용합니다.
+# 다음으로, 더 명확하고 간결한 학습 루프를 위해 ``nn.Module`` 및 ``nn.Parameter`` 를 사용합니다.
 # 우리는 ``nn.Module`` (자체가 클래스이고 상태를 추적할 수 있는) 하위 클래스(subclass)를 만듭니다.
 # 이 경우에는, 포워드(forward) 단계에 대한 가중치, 절편, 그리고 메소드(method) 등을 유지하는
 # 클래스를 만들고자 합니다.
@@ -319,7 +319,7 @@ model = Mnist_Logistic()
 print(loss_func(model(xb), yb))
 
 ###############################################################################
-# 이전에는 훈련 루프를 위해 이름 별로 각 매개변수(parameter)의 값을 업데이트하고 다음과 같이
+# 이전에는 학습 루프를 위해 이름 별로 각 매개변수(parameter)의 값을 업데이트하고 다음과 같이
 # 각 매개 변수에 대한 변화도들을 개별적으로 수동으로 0으로 제거해야 했습니다:
 #
 # .. code-block:: python
@@ -342,7 +342,7 @@ print(loss_func(model(xb), yb))
 #        model.zero_grad()
 #
 #
-# 이제 이것을 나중에 다시 실행할 수 있도록 ``fit`` 함수로 작은 훈련 루프를 감쌀 것입니다.
+# 이제 이것을 나중에 다시 실행할 수 있도록 ``fit`` 함수로 작은 학습 루프를 감쌀 것입니다.
 
 def fit():
     for epoch in range(epochs):
@@ -468,7 +468,7 @@ print(loss_func(model(xb), yb))
 # PyTorch 의 `TensorDataset <https://pytorch.org/docs/stable/_modules/torch/utils/data/dataset.html#TensorDataset>`_
 # 은 텐서를 감싸는(wrapping) Dataset 입니다.
 # 길이와 인덱싱 방식을 정의함으로써 텐서의 첫 번째 차원을 따라 반복, 인덱싱 및 슬라이스(slice)하는 방법도 제공합니다.
-# 이렇게하면 훈련 할 때 동일한 라인에서 독립(independent) 변수와 종속(dependent) 변수에 쉽게 액세스 할 수 있습니다.
+# 이렇게하면 학습 할 때 동일한 라인에서 독립(independent) 변수와 종속(dependent) 변수에 쉽게 액세스 할 수 있습니다.
 
 from torch.utils.data import TensorDataset
 
@@ -553,19 +553,19 @@ for epoch in range(epochs):
 print(loss_func(model(xb), yb))
 
 ###############################################################################
-# PyTorch의 nn.Module, nn.Parameter, Dataset 및 DataLoader 덕분에 이제 훈련 루프가
+# PyTorch의 nn.Module, nn.Parameter, Dataset 및 DataLoader 덕분에 이제 학습 루프가
 # 훨씬 더 작아지고 이해하기 쉬워졌습니다.
 # 이제 실제로 효과적인 모델을 만드는 데 필요한 기본 기능을 추가해 보겠습니다.
 #
 # 검증(validation) 추가하기
 # ---------------------------
 #
-# 섹션 1에서, 우리는 훈련 데이터에 사용하기 위해 합리적인 훈련 루프를 설정하려고했습니다.
+# 섹션 1에서, 우리는 학습 데이터에 사용하기 위해 합리적인 학습 루프를 설정하려고했습니다.
 # 실전에서, 여러분들은 과적합(overfitting)을 확인하기 위해서 **항상**
 # `검증 데이터셋(validation set) <https://www.fast.ai/2017/11/13/validation-sets/>`_ 이
 # 있어야 합니다.
 #
-# 훈련 데이터를 섞는(shuffling) 것은 배치와 과적합 사이의 상관관계를 방지하기 위해
+# 학습 데이터를 섞는(shuffling) 것은 배치와 과적합 사이의 상관관계를 방지하기 위해
 # `중요합니다. <https://www.quora.com/Does-the-order-of-training-data-matter-when-training-neural-networks>`_
 # 반면에, 검증 손실(validation loss)은 검증 데이터셋을 섞든 안섞든 동일합니다.
 # 데이터를 섞는 것은 추가 시간이 걸리므로, 검증 데이터를 섞는 것은 의미가 없습니다.
@@ -584,9 +584,9 @@ valid_dl = DataLoader(valid_ds, batch_size=bs * 2)
 ###############################################################################
 # 각 에폭이 끝날 때 검증 손실을 계산하고 프린트 할 것입니다.
 #
-# (훈련 전에 항상 ``model.train()`` 을 호출하고, 추론(inference) 전에 ``model.eval()``
+# (학습 전에 항상 ``model.train()`` 을 호출하고, 추론(inference) 전에 ``model.eval()``
 # 을 호출합니다, 이는 ``nn.BatchNorm2d`` 및 ``nn.Dropout`` 과 같은 계층에서
-# 이러한 다른 단계(훈련, 추론) 에 대한 적절한 동작이 일어나게 하기 위함입니다.)
+# 이러한 다른 단계(학습, 추론) 에 대한 적절한 동작이 일어나게 하기 위함입니다.)
 
 model, opt = get_model()
 
@@ -611,10 +611,10 @@ for epoch in range(epochs):
 # ----------------------------------
 #
 # 이제 우리는 우리만의 작은 리팩토링을 수행할 것입니다.
-# 훈련 데이터셋과 검증 데이터셋 모두에 대한 손실을 계산하는 유사한 프로세스를 두 번 거치므로,
+# 학습 데이터셋과 검증 데이터셋 모두에 대한 손실을 계산하는 유사한 프로세스를 두 번 거치므로,
 # 이를 하나의 배치에 대한 손실을 계산하는 자체 함수 ``loss_batch`` 로 만들어보겠습니다.
 #
-# 훈련 데이터셋에 대한 옵티마이저를 전달하고 이를 사용하여 역전파를 수행합니다.
+# 학습 데이터셋에 대한 옵티마이저를 전달하고 이를 사용하여 역전파를 수행합니다.
 # 검증 데이터셋의 경우 옵티마이저를 전달하지 않으므로 메소드가 역전파를 수행하지 않습니다.
 
 
@@ -629,7 +629,7 @@ def loss_batch(model, loss_func, xb, yb, opt=None):
     return loss.item(), len(xb)
 
 ###############################################################################
-# ``fit`` 은 모델을 훈련하고 각 에폭에 대한 훈련 및 검증 손실을 계산하는 작업을 수행합니다.
+# ``fit`` 은 모델을 학습하고 각 에폭에 대한 학습 및 검증 손실을 계산하는 작업을 수행합니다.
 
 import numpy as np
 
@@ -659,15 +659,15 @@ def get_data(train_ds, valid_ds, bs):
     )
 
 ###############################################################################
-# 이제 dataloader를 가져오고 모델을 훈련하는 전체 프로세스를 3 줄의 코드로 실행할 수 있습니다:
+# 이제 dataloader를 가져오고 모델을 학습하는 전체 프로세스를 3 줄의 코드로 실행할 수 있습니다:
 
 train_dl, valid_dl = get_data(train_ds, valid_ds, bs)
 model, opt = get_model()
 fit(epochs, model, loss_func, opt, train_dl, valid_dl)
 
 ###############################################################################
-# 이러한 기본 3줄의 코드를 사용하여 다양한 모델을 훈련할 수 있습니다.
-# 컨볼루션 신경망(CNN)을 훈련하는 데 사용할 수 있는지 살펴 보겠습니다!
+# 이러한 기본 3줄의 코드를 사용하여 다양한 모델을 학습할 수 있습니다.
+# 컨볼루션 신경망(CNN)을 학습하는 데 사용할 수 있는지 살펴 보겠습니다!
 #
 # CNN 으로 넘어가기
 # --------------------
@@ -701,7 +701,7 @@ lr = 0.1
 
 ###############################################################################
 # `모멘텀(Momentum) <https://cs231n.github.io/neural-networks-3/#sgd>`_ 은
-# 이전 업데이트도 고려하고 일반적으로 더 빠른 훈련으로 이어지는 확률적 경사하강법(stochastic gradient descent)
+# 이전 업데이트도 고려하고 일반적으로 더 빠른 학습으로 이어지는 확률적 경사하강법(stochastic gradient descent)
 # 의 변형입니다.
 
 model = Mnist_CNN()
@@ -850,11 +850,11 @@ fit(epochs, model, loss_func, opt, train_dl, valid_dl)
 # -----------------
 #
 # 이제 PyTorch를 사용하여 다양한 유형의 모델을 학습하는 데 사용할 수 있는 일반 데이터 파이프 라인과
-# 훈련 루프가 있습니다.
+# 학습 루프가 있습니다.
 # 이제 모델 학습이 얼마나 간단한지 확인하려면 `mnist_sample 노트북 <https://github.com/fastai/fastai_dev/blob/master/dev_nb/mnist_sample.ipynb>`__ 을 살펴보세요.
 #
 # 물론 데이터 증강(data augmentation), 초매개변수 조정(hyperparameter tuning),
-# 훈련과정 모니터링(monitoring training), 전이 학습(transfer learning) 등과 같이
+# 학습과정 모니터링(monitoring training), 전이 학습(transfer learning) 등과 같이
 # 추가하고 싶은 항목들이 많이 있을 것입니다.
 # 이러한 기능들은 이 튜토리얼에 표시된 것과 동일한 설계 접근 방식을 사용하여 개발된 fastai 라이브러리에서
 # 사용할 수 있으며, 모델을 더욱 발전시키려는 실무자에게 자연스러운 다음 단계를 제공합니다.

@@ -496,7 +496,7 @@ optimizerG = optim.Adam(netG.parameters(), lr=lr, betas=(beta1, 0.999))
 # **Part 1 - 구분자의 학습**
 #
 # 구분자의 목적은 주어진 입력값이 진짜인지 가짜인지 판별하는 것임을 상기합시다.
-# Goodfellow의 말을 빌리자면, 구분자는 “변화도(gradient)를 상승(ascending)시키며 훈련”하게 됩니다.
+# Goodfellow의 말을 빌리자면, 구분자는 “변화도(gradient)를 상승(ascending)시키며 학습”하게 됩니다.
 # 실전적으로 얘기하면, :math:`log(D(x)) + log(1-D(G(z)))` 를 최대화시키는 것과 같습니다.
 # `ganhacks <https://github.com/soumith/ganhacks>`__ 에서 미니 배치(mini-batch)를 분리하여 사용한 개념을 가져와서,
 # 우리 역시 두 가지 스텝으로 분리해 계산을 해보겠습니다. 먼저,
@@ -517,7 +517,7 @@ optimizerG = optim.Adam(netG.parameters(), lr=lr, betas=(beta1, 0.999))
 # 바꿈으로써 :math:`log(x)` 라는 ``BCELoss`` 의 일부분을 사용할 수 있게 합니다 (앞서 우리는 BCELoss에서 라벨을 이용해 원하는 로그 계산
 # 요소를 고를 수 있음을 알아봤습니다).
 #
-# 마무리로 G의 훈련 상태를 알아보기 위하여, 몇가지 통계적인 수치들과, fixed_noise를 통과시킨
+# 마무리로 G의 학습 상태를 알아보기 위하여, 몇가지 통계적인 수치들과, fixed_noise를 통과시킨
 # 결과를 화면에 출력하는 코드를 추가하겠습니다. 이때 통계적인 수치들이라 함은:
 #
 # -  **Loss_D** - 진짜 데이터와 가짜 데이터들 모두에서 구해진 손실값. (:math:`log(D(x)) + log(1 - D(G(z)))`).
@@ -598,7 +598,7 @@ for epoch in range(num_epochs):
         # G를 업데이트 합니다
         optimizerG.step()
 
-        # 훈련 상태를 출력합니다
+        # 학습 상태를 출력합니다
         if i % 50 == 0:
             print('[%d/%d][%d/%d]\tLoss_D: %.4f\tLoss_G: %.4f\tD(x): %.4f\tD(G(z)): %.4f / %.4f'
                   % (epoch, num_epochs, i, len(dataloader),
@@ -689,7 +689,7 @@ plt.show()
 # 무엇을 더 시도해볼 수 있을까요?
 #
 # -  결과물이 얼마나 더 좋아지는지 확인해보기 위해서 학습시간을 늘려볼 수 있습니다
-# -  다른 데이터셋을 이용해 훈련시켜보거나, 이미지의 사이즈를 다르게 해보거나, 아키텍쳐의 구성을 바꿔볼 수도 있습니다
+# -  다른 데이터셋을 이용해 학습시켜보거나, 이미지의 사이즈를 다르게 해보거나, 아키텍쳐의 구성을 바꿔볼 수도 있습니다
 # -  `여기 <https://github.com/nashory/gans-awesome-applications>`__ 에서 더욱 멋진 GAN 프로젝트들을 찾을수도 있죠
 # -  `음악 <https://www.deepmind.com/blog/wavenet-a-generative-model-for-raw-audio/>`__ 을 작곡하는 GAN도 만들 수 있습니다
 #

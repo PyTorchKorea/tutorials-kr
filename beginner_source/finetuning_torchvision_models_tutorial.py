@@ -32,10 +32,10 @@ Torchvision 모델의 미세 조정(Finetuning)
 #
 # 일반적으로 두 전이 학습 방법 모두 몇 가지 단계를 동일하게 따릅니다.
 #
-# - 사전 훈련된 모델을 초기화합니다.
+# - 사전 학습된 모델을 초기화합니다.
 # - 최종 계층을 재구성하여 새 데이터 집합의 클래스 수와 동일한 수의 출력을 갖도록 합니다.
 # - 새 데이터셋의 클래스 수와 동일한 출력 수를 갖도록 최종 계층을 재구성합니다.
-# - 훈련 중에 업데이트할 매개변수를 최적화 알고리즘에 맞게 정의합니다.
+# - 학습 중에 업데이트할 매개변수를 최적화 알고리즘에 맞게 정의합니다.
 # - 학습 단계를 실행합니다.
 #
 
@@ -75,9 +75,9 @@ print("Torchvision Version: ",torchvision.__version__)
 #    [resnet, alexnet, vgg, squeezenet, densenet, inception]
 #
 # 다른 입력은 다음과 같습니다. ``num_classes`` 은 데이터셋의 클래스 수,
-# ``batch_size`` 는 훈련에 사용되는 배치 크기로
+# ``batch_size`` 는 학습에 사용되는 배치 크기로
 # 모델의 성능에 따라 조정할 수 있으며,
-# ``num_epochs`` 는 실행하려는 훈련 에폭 수,
+# ``num_epochs`` 는 실행하려는 학습 에폭 수,
 # ``feature_extract`` 는 미세 조정 또는 특징 추출 여부를 정의하는 부울(boolean)입니다.
 # ``feature_extract = False``이면 모델이 미세 조정되고
 # 모든 모델의 매개변수가 업데이트됩니다.
@@ -94,10 +94,10 @@ model_name = "squeezenet"
 # 데이터 집합의 클래스 수
 num_classes = 2
 
-# 훈련을 위한 배치 크기 (메모리 용량에 따라 변경됩니다.)
+# 학습을 위한 배치 크기 (메모리 용량에 따라 변경됩니다.)
 batch_size = 8
 
-# 훈련할 에폭 수
+# 학습할 에폭 수
 num_epochs = 15
 
 # 특징 추출을 위한 플래그(flag)입니다. False일 경우, 전체 모델을 미세 조정하고
@@ -112,12 +112,12 @@ feature_extract = True
 # 모델을 조정하는 코드를 작성하기 전에
 # 몇 가지 도우미 함수(Helper Functions)를 정의해 보겠습니다.
 #
-# 모델 훈련 및 검증 코드
+# 모델 학습 및 검증 코드
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 # ``train_model`` 함수는 주어진 모델의 학습과 검증을 처리합니다.
 # 이 함수는 PyTorch 모델, 데이터로더(dataloader) 딕셔너리, 손실 함수,
-# 옵티마이저, 훈련 및 검증을 위해 정해진 에폭 수,
+# 옵티마이저, 학습 및 검증을 위해 정해진 에폭 수,
 # 그리고 Inception 모델일 때를 나타내는 부울 플래그(boolean flag)를 입력으로 받습니다.
 # 이 아키텍처는 보조(auxiliary) 출력을 사용하고, 전체 모델 손실은
 # `여기 <https://discuss.pytorch.org/t/how-to-optimize-inception-model-with-auxiliary-classifiers/7958>`__ 에 설명된 대로
@@ -127,7 +127,7 @@ feature_extract = True
 # 각 에폭이 끝난 후 전체 검증 단계를 실행합니다.
 # 또한, 검증 정확도 측면에서 가장 성능이 좋은 모델을 추적하고
 # 학습이 끝나면 해당 모델을 반환합니다.
-# 각 에폭이 끝나면 훈련 및 검증 정확도를 볼 수 있습니다.
+# 각 에폭이 끝나면 학습 및 검증 정확도를 볼 수 있습니다.
 #
 
 def train_model(model, dataloaders, criterion, optimizer, num_epochs=25, is_inception=False):
@@ -161,7 +161,7 @@ def train_model(model, dataloaders, criterion, optimizer, num_epochs=25, is_ince
                 optimizer.zero_grad()
 
                 # 순방향
-                # 훈련 하는 동안만 기록을 추적합니다.
+                # 학습 하는 동안만 기록을 추적합니다.
                 with torch.set_grad_enabled(phase == 'train'):
                     # 모델의 출력을 가져오고 손실을 계산합니다.
                     # 학습 시 보조(auxiliary) 출력이 있는 inception의 특별한 경우입니다.
