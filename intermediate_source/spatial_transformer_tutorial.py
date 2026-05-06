@@ -72,12 +72,12 @@ test_loader = torch.utils.data.DataLoader(
 #
 # STN은 다음의 세 가지 주요 구성 요소로 요약됩니다.
 #
-# -  위치 결정 네트워크(localization network)는 공간 변환 파라미터를 예측(regress)
+# -  위치 결정 네트워크(localization network)는 공간 변환 매개변수를 예측(regress)
 #    하는 일반적인 CNN 입니다. 공간 변환은 데이터 셋으로부터 명시적으로 학습되지 않고,
 #    신경망이 전체 정확도를 향상 시키도록 공간 변환을 자동으로 학습합니다.
 # -  그리드 생성기(grid generator)는 출력 이미지로부터 각 픽셀에 대응하는 입력
 #    이미지 내 좌표 그리드를 생성합니다.
-# -  샘플러(sampler)는 공간 변환 파라미터를 입력 이미지에 적용합니다.
+# -  샘플러(sampler)는 공간 변환 매개변수를 입력 이미지에 적용합니다.
 #
 # .. figure:: /_static/img/stn/stn-arch.png
 #
