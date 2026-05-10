@@ -782,6 +782,6 @@ for e in range(episodes):
 # 결론
 # """""""""""""""
 #
-# 이 튜토리얼에서는 PyTorch를 사용하여 게임 플레이 AI를 훈련하는 방법을 살펴보았습니다. `OpenAI gym <https://gym.openai.com/>`__
-# 에 있는 어떤 게임이든 동일한 방법으로 AI를 훈련시키고 게임을 진행할 수 있습니다. 이 튜토리얼이 도움이 되었기를 바라며,
+# 이 튜토리얼에서는 PyTorch를 사용하여 게임 플레이 AI를 학습하는 방법을 살펴보았습니다. `OpenAI gym <https://gym.openai.com/>`__
+# 에 있는 어떤 게임이든 동일한 방법으로 AI를 학습시키고 게임을 진행할 수 있습니다. 이 튜토리얼이 도움이 되었기를 바라며,
 # `Github 저장소 <https://github.com/yuansongFeng/MadMario/>`__ 에서 편하게 저자들에게 연락을 하셔도 됩니다!

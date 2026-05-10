@@ -228,8 +228,8 @@ for epoch in range(10):
         # 바꾸고 파이토치 텐서로 감싸줍시다.)
         context_idxs = torch.tensor([word_to_ix[w] for w in context], dtype=torch.long)
 
-        # 두번째. 토치는 기울기가 *누적* 됩니다. 새 인스턴스를 넣어주기 전에
-        # 기울기를 초기화합니다.
+        # 두번째. 토치는 변화도가 *누적* 됩니다. 새 인스턴스를 넣어주기 전에
+        # 변화도를 초기화합니다.
         model.zero_grad()
 
         # 세번째. 순전파를 통해 다음에 올 단어에 대한 로그 확률을 구합니다.
@@ -238,7 +238,7 @@ for epoch in range(10):
         # 네번째. 손실함수를 계산합니다. (파이토치에서는 목표 단어를 텐서로 감싸줘야 합니다.)
         loss = loss_function(log_probs, torch.tensor([word_to_ix[target]], dtype=torch.long))
 
-        # 다섯번째. 역전파를 통해 기울기를 업데이트 해줍니다.
+        # 다섯번째. 역전파를 통해 변화도를 업데이트 해줍니다.
         loss.backward()
         optimizer.step()
 
@@ -258,7 +258,7 @@ print(model.embeddings.weight[word_to_ix["beauty"]])
 # 이 모델은 문장 내에서 주변 단어, 즉 앞 몇 단어와 뒤 몇 단어를 보고 특정
 # 단어를 예측하는데, 언어 모델링과는 달리 순차적이지도 않고 확률적이지도 않습니다.
 # 주로 CBOW는 복잡한 모델의 초기 입력값으로 쓰일 단어 임베딩을 빠르게 학습하는
-# 데에 쓰입니다. 이것을 *사전 훈련된(pre-trained) 임베딩* 이라고 부르죠.
+# 데에 쓰입니다. 이것을 *사전 학습된(pre-trained) 임베딩* 이라고 부르죠.
 # 몇 퍼센트 정도의 성능 향상을 기대할 수 있는 기법입니다.
 #
 # CBOW 모델은 다음과 같습니다. 목표 단어 :math:`w_i` 와 그 양쪽에 :math:`N` 개의

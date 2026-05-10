@@ -132,7 +132,7 @@ test_iter = DataLoader(test_data, batch_size=BATCH_SIZE,
 # ``nn.Module`` 과 ``Optimizer`` 정의하기
 # ------------------------------------------
 # 대부분은 ``torchtext`` 가 알아서 해줍니다 : 데이터셋이 만들어지고 반복자가 정의되면, 이 튜토리얼에서
-# 우리가 해야 할 일이라고는 그저 ``nn.Module`` 와 ``Optimizer`` 를 모델로서 정의하고 훈련시키는 것이 전부입니다.
+# 우리가 해야 할 일이라고는 그저 ``nn.Module`` 와 ``Optimizer`` 를 모델로서 정의하고 학습시키는 것이 전부입니다.
 #
 #
 # 이 튜토리얼에서 사용할 모델은 `이곳 <https://arxiv.org/abs/1409.0473>`__ 에서 설명하고 있는 구조를 따르고 있으며,
@@ -142,7 +142,7 @@ test_iter = DataLoader(test_data, batch_size=BATCH_SIZE,
 # 참고 : 이 튜토리얼에서 사용하는 모델은 언어 번역을 위해 사용할 예시 모델입니다. 이 모델을 사용하는 것은
 # 이 작업에 적당한 표준 모델이기 때문이지, 번역에 적합한 모델이기 때문은 아닙니다. 여러분이 최신 기술 트렌드를
 # 잘 따라가고 있다면 잘 아시겠지만, 현재 번역에서 가장 뛰어난 모델은 Transformers입니다. PyTorch가
-# Transformer 레이어를 구현한 내용은 `여기 <https://pytorch.org/docs/stable/nn.html#transformer-layers>`__
+# Transformer 계층을 구현한 내용은 `여기 <https://pytorch.org/docs/stable/nn.html#transformer-layers>`__
 # 에서 확인할 수 있으며 이 튜토리얼의 모델이 사용하는 "attention" 은 Transformer 모델에서 제안하는
 # 멀티 헤드 셀프 어텐션(multi-headed self-attention) 과는 다르다는 점을 알려드립니다.
 
@@ -387,7 +387,7 @@ PAD_IDX = en_vocab.stoi['<pad>']
 criterion = nn.CrossEntropyLoss(ignore_index=PAD_IDX)
 
 ######################################################################
-# 마지막으로 이 모델을 훈련하고 평가합니다 :
+# 마지막으로 이 모델을 학습하고 평가합니다 :
 
 import math
 import time

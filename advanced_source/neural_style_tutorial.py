@@ -75,10 +75,10 @@ torch.set_default_device(device)
 # 지금 Style, Content 이미지를 가져올 것입니다. 원본 PIL 이미지는 0과 255 사이의 값을 갖지만,
 # 텐서로 변환될 때 0에서 1사이로 변환됩니다.
 # 이미지도 동일한 차원을 가지도록 크기가 변환되어야 합니다.
-# 주목해야 할 중요한 세부 사항은 torch 라이브러리의 신경망은 0에서 1사이의 텐서 값으로 훈련된다는 것입니다.
+# 주목해야 할 중요한 세부 사항은 torch 라이브러리의 신경망은 0에서 1사이의 텐서 값으로 학습된다는 것입니다.
 # 만약 0에서 255값을 가지는 텐서 이미지가 네트워크에 입력되는 경우,
 # 활성화된 특징 맵이 Content와 Style을 감지할 수 없습니다.
-# 그러나, Caffe 라이브러리의 미리 학습된 네트워크는 0에서 255값을 가지는 입력으로 훈련됩니다.
+# 그러나, Caffe 라이브러리의 미리 학습된 네트워크는 0에서 255값을 가지는 입력으로 학습됩니다.
 #
 #
 # .. Note::
@@ -142,7 +142,7 @@ imshow(content_img, title='Content Image')
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 # Content 손실은 각 계층에 대한 Content 거리의 가중치 버전을 나타냅니다.
-# 이 함수는 입력 :math:`X` 를 처리하는 레이어 :math:`L` 의 특징 맵 :math:`F_{XL}` 을 가져와서
+# 이 함수는 입력 :math:`X` 를 처리하는 계층 :math:`L` 의 특징 맵 :math:`F_{XL}` 을 가져와서
 # 이미지 :math:`X` 와 Content 이미지 :math:`C` 사이의
 # 가중 콘텐츠 거리(weighted content distance) :math:`w_{CL}.D_C^L(X,C)` 를 반환합니다.
 # Content 거리를 계산하기 위해 Content 이미지(:math:`F_{CL}`)의 특징 맵을 함수에서 알고 있어야합니다.
@@ -150,8 +150,8 @@ imshow(content_img, title='Content Image')
 # 거리 :math:`\|F_{XL} - F_{CL}\|^2` 는 두 개의 특징 맵 집합의 평균 제곱 오차이며 ``nn.MSELoss`` 를 사용하여 계산할 수 있습니다.
 #
 # Content 거리를 계산하기 위해 사용되는 합성곱 계층 바로 뒤에 Content 손실 모듈을 추가합니다.
-# 이렇게 하면 입력 이미지가 입력될 때마다 Content 손실이 원하는 레이어에서
-# 계산되고 autograd 을 통해 모든 기울기가 계산됩니다.
+# 이렇게 하면 입력 이미지가 입력될 때마다 Content 손실이 원하는 계층에서
+# 계산되고 autograd 을 통해 모든 변화도가 계산됩니다.
 # 이제 Content 손실 계층을 만들기 위해 Content 손실을 계산한 다음 계층의 입력을 반환하는
 # ``forward`` 메소드를 정의해야합니다.
 # 계산된 손실은 모듈의 매개 변수로써 저장됩니다.
@@ -161,7 +161,7 @@ class ContentLoss(nn.Module):
 
     def __init__(self, target,):
         super(ContentLoss, self).__init__()
-        # 기울기를 동적으로 계산하는데 사용되는 tree로부터 타깃 Content를 `분리(detach)` 합니다.
+        # 변화도를 동적으로 계산하는데 사용되는 tree로부터 타깃 Content를 `분리(detach)` 합니다.
         # 이것은 변수가 아니라 명시된 값입니다.
         # 그렇지 않으면 criterion의 forward 메소드에서 오류가 발생합니다.
         self.target = target.detach()
@@ -174,7 +174,7 @@ class ContentLoss(nn.Module):
 # .. Note::
 #    **중요 세부 사항**: 모듈의 이름은 ``ContentLoss`` 지만, 실제 PyTorch의 손실 함수는 아닙니다.
 #    만약 Content 손실을 PyTorch의 손실 함수로 정의하려면 Pytorch의 autograd 함수를 생성하여
-#    ``backward`` 메소드에서 수동으로 기울기를 다시 계산 및 구현 해야 합니다.
+#    ``backward`` 메소드에서 수동으로 변화도를 다시 계산 및 구현 해야 합니다.
 
 ######################################################################
 # 스타일 손실(Style Loss)
@@ -232,13 +232,13 @@ class StyleLoss(nn.Module):
 # 모델 가져오기
 # -------------------
 #
-# 이제는 사전 훈련된 신경망을 가져와야 합니다.
+# 이제는 사전 학습된 신경망을 가져와야 합니다.
 # 논문에서 사용된 것과 같이 19 계층을 가진 VGG 네트워크를 사용할 것입니다.
 #
 # PyTorch의 VGG 구현은 ``features`` (합성곱 및 풀링 계층 포함) 와
 # ``classifier`` (완전 연결 계층 포함) 두 가지 하위 ``Sequential`` 모듈로 구분 된 모듈입니다.
 # Content 및 Style 손실을 측정하기 위해서 각 합성곱 계층의 출력이 필요하기 때문에 ``features`` 모듈을 사용할 것입니다.
-# 일부 계층은 훈련하는 중 평가와 다른 동작을 하므로, 네트워크를 ``.eval()`` 를 사용해 평가 모드로 설정해야합니다.
+# 일부 계층은 학습하는 중 평가와 다른 동작을 하므로, 네트워크를 ``.eval()`` 를 사용해 평가 모드로 설정해야합니다.
 #
 
 cnn = vgg19(weights=VGG19_Weights.DEFAULT).features.eval()
@@ -248,7 +248,7 @@ cnn = vgg19(weights=VGG19_Weights.DEFAULT).features.eval()
 ######################################################################
 # 추가적으로, VGG 네트워크는
 # mean=[0.485, 0.456, 0.406] 와 std=[0.229, 0.224, 0.225]로 각 채널이 정규화 된
-# 이미지로 훈련됩니다.
+# 이미지로 학습됩니다.
 # 이미지를 네트워크로 입력하기 전에 정규화하는데 사용합니다.
 #
 
@@ -367,12 +367,12 @@ imshow(input_img, title='Input Image')
 # 알고리즘 작성자인 Leon Gatys가
 # `여기 <https://discuss.pytorch.org/t/pytorch-tutorial-for-neural-transfert-of-artistic-style/336/20?u=alexis-jacq>`__ 에서 제안했던 것처럼,
 # L-BFGS 알고리즘을 사용하여 경사 하강법을 수행합니다.
-# 네트워크 훈련과 다르게 Content / Style 손실을 최소화하기 위해 입력 이미지를 훈련하려고 합니다.
+# 네트워크 학습과 다르게 Content / Style 손실을 최소화하기 위해 입력 이미지를 학습하려고 합니다.
 # 파이토치 L-BFGS optimizer ``optim.LBFGS`` 를 만들고 최적화 할 텐서로 이미지를 전달합니다.
 #
 
 def get_input_optimizer(input_img):
-    # 입력이 기울기가 필요한 매개 변수임을 표시하는 줄
+    # 입력이 변화도가 필요한 매개 변수임을 표시하는 줄
     optimizer = optim.LBFGS([input_img])
     return optimizer
 
@@ -380,7 +380,7 @@ def get_input_optimizer(input_img):
 ######################################################################
 # 마지막으로 뉴럴 변환(neural transfer)을 수행하는 함수를 정의해야 합니다.
 # 네트워크의 각 반복 동안, 업데이트된 입력이 주어지고 새로운 손실을 계산합니다.
-# 각 손실 모듈(Loss module)의 ``backward`` 메소드를 실행하여 기울기를 동적으로 계산합니다.
+# 각 손실 모듈(Loss module)의 ``backward`` 메소드를 실행하여 변화도를 동적으로 계산합니다.
 # optimizer는 모듈을 재평가하고 손실을 반환하는 “closure” 함수가 필요합니다.
 #
 # 여전히 해결해야 할 마지막 제약이 있습니다.
@@ -400,7 +400,7 @@ def run_style_transfer(cnn, normalization_mean, normalization_std,
     # 이에 맞춰서 requires_grad 값을 갱신합니다.
     input_img.requires_grad_(True)
     # 또한, 모델을 평가(eval) 모드로 전환하여
-    # 드롭아웃(dropout) 및 배치 정규화(batch normalization)와 같은 특정 레이어가 올바르게 동작하도록 합니다.
+    # 드롭아웃(dropout) 및 배치 정규화(batch normalization)와 같은 특정 계층이 올바르게 동작하도록 합니다.
     model.eval()
     model.requires_grad_(False)
 

@@ -8,7 +8,7 @@
 지금까지 ``autograd`` 를 살펴봤는데요, ``nn`` 은 모델을 정의하고 미분하는데
 ``autograd`` 를 사용합니다.
 ``nn.Module`` 은 계층(layer)과 ``output`` 을 반환하는 ``forward(input)``
-메서드를 포함하고 있습니다.
+메소드를 포함하고 있습니다.
 
 숫자 이미지를 분류하는 신경망을 예제로 살펴보겠습니다:
 
@@ -54,29 +54,29 @@ class Net(nn.Module):
         self.fc3 = nn.Linear(84, 10)
 
     def forward(self, input):
-        # 합성곱(Convolution) 레이어 c1: 입력 이미지 채널 1, 출력 채널 6,
+        # 합성곱(Convolution) 계층 c1: 입력 이미지 채널 1, 출력 채널 6,
         # 5x5 정사각 합성곱, 활성 함수로 RELU 사용 및 (N, 6, 28, 28)의 크기를
         # 갖는 Tensor를 출력 (N은 배치 크기)
         c1 = F.relu(self.conv1(input))
-        # 서브샘플링(Subsampling) 레이어 s2: 2x2 격자, 순전히 기능적인 레이어로,
-        # 이 레이어는 어떠한 매개변수도 가지지 않고 (N, 6, 14, 14) Tensor를 출력
+        # 서브샘플링(Subsampling) 계층 s2: 2x2 격자, 순전히 기능적인 계층으로,
+        # 이 계층은 어떠한 매개변수도 가지지 않고 (N, 6, 14, 14) Tensor를 출력
         s2 = F.max_pool2d(c1, (2, 2))
-        # 합성곱(Convolution) 레이어 c3: 입력 채널 6, 출력 채널 16,
+        # 합성곱(Convolution) 계층 c3: 입력 채널 6, 출력 채널 16,
         # 5x5 정사각 합성곱, 활성 함수로 RELU 사용 및 (N, 16, 10, 10)의 크기를
         # 갖는 Tensor를 출력
         c3 = F.relu(self.conv2(s2))
-        # 서브샘플링(Subsampling) 레이어 s4: 2x2 격자, 순전히 기능적인 레이어로,
-        # 이 레이어는 어떠한 매개변수도 가지지 않고 (N, 16, 5, 5) Tensor를 출력
+        # 서브샘플링(Subsampling) 계층 s4: 2x2 격자, 순전히 기능적인 계층으로,
+        # 이 계층은 어떠한 매개변수도 가지지 않고 (N, 16, 5, 5) Tensor를 출력
         s4 = F.max_pool2d(c3, 2)
         # 평탄화(flatten) 연산: 순전히 기능적으로 동작하며, (N, 400) Tensor를 출력
         s4 = torch.flatten(s4, 1)
-        # 완전히 연결된 레이어 f5: (N, 400) Tensor를 입력으로 받아서
+        # 완전히 연결된 계층 f5: (N, 400) Tensor를 입력으로 받아서
         # (N, 120) Tensor를 출력하며, 활성 함수로 RELU 사용
         f5 = F.relu(self.fc1(s4))
-        # 완전히 연결된 레이어 f6: (N, 120) Tensor를 입력으로 받아서
+        # 완전히 연결된 계층 f6: (N, 120) Tensor를 입력으로 받아서
         # (N, 84) Tensor를 출력하며, 활성 함수로 RELU 사용
         f6 = F.relu(self.fc2(f5))
-        # 가우시안 레이어 출력: (N, 84) Tensor를 입력으로 받아서
+        # 가우시안 계층 출력: (N, 84) Tensor를 입력으로 받아서
         # (N, 10) Tensor를 출력
         output = self.fc3(f6)
         return output

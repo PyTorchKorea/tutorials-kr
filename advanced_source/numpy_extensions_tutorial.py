@@ -72,7 +72,7 @@ print(input)
 #
 # 학습 가능한 가중치를 가는 필터(커널)를 갖는 상호 상관 계층을 구현해보겠습니다.
 #
-# 역전파 단계(backward pass)에서는 입력에 대한 기울기(gradient)와 필터에 대한 기울기를 계산합니다.
+# 역전파 단계(backward pass)에서는 입력에 대한 변화도(gradient)와 필터에 대한 변화도를 계산합니다.
 
 from numpy import flip
 import numpy as np
@@ -126,7 +126,7 @@ output.backward(torch.randn(8, 8))
 print("Gradient for the input map: ", input.grad)
 
 ###############################################################
-# **기울기(gradient) 확인:**
+# **변화도(gradient) 확인:**
 
 from torch.autograd.gradcheck import gradcheck
 

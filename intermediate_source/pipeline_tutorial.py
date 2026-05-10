@@ -27,7 +27,7 @@
 # 이번 튜토리얼에서는, 트랜스포머 모델을 두 개의 GPU에 걸쳐서 나누고 파이프라인 병렬화로 학습시켜 보겠습니다.
 # 모델은 바로 `NN.TRANSFORMER 와 TORCHTEXT 로 시퀀스-투-시퀀스(SEQUENCE-TO-SEQUENCE) 모델링하기
 # <https://tutorials.pytorch.kr/beginner/transformer_tutorial.html>`__ 튜토리얼과
-# 똑같은 모델이지만 두 단계로 나뉩니다. 대부분 파라미터(parameter)들은
+# 똑같은 모델이지만 두 단계로 나뉩니다. 대부분 매개변수(parameter)들은
 # `nn.TransformerEncoder <https://pytorch.org/docs/stable/generated/torch.nn.TransformerEncoder.html>`__ 계층(layer)에 포함됩니다.
 # `nn.TransformerEncoder <https://pytorch.org/docs/stable/generated/torch.nn.TransformerEncoder.html>`__ 는
 # `nn.TransformerEncoderLayer <https://pytorch.org/docs/stable/generated/torch.nn.TransformerEncoderLayer.html>`__ 의 ``nlayers`` 로 구성되어 있습니다.
@@ -122,7 +122,7 @@ class PositionalEncoding(nn.Module):
 # 학습 프로세스는 ``torchtext`` 의 Wikitext-2 데이터셋을 사용합니다.
 # torchtext 데이터셋에 접근하기 전에, https://github.com/pytorch/data 을 참고하여 torchdata를 설치하시기 바랍니다.
 #
-# 단어 오브젝트는 훈련 데이터셋으로 만들어지고, 토큰을 텐서(tensor)로 수치화하는데 사용됩니다.
+# 단어 오브젝트는 학습 데이터셋으로 만들어지고, 토큰을 텐서(tensor)로 수치화하는데 사용됩니다.
 # 시퀀스 데이터로부터 시작하여, ``batchify()`` 함수는 데이터셋을 열(column)들로 정리하고,
 # ``batch_size`` 사이즈의 배치들로 나눈 후에 남은 모든 토큰을 버립니다.
 # 예를 들어, 알파벳을 시퀀스(총 길이 26)로 생각하고 배치 사이즈를 4라고 한다면,
@@ -220,7 +220,7 @@ def get_batch(source, i):
 # 트랜스포머 계층 규모를 적절히 확장시킵니다. 4096차원의 임베딩 벡터, 4096의 은닉 사이즈,
 # 16개의 어텐션 헤드(attention head)와 총 12 개의 트랜스포머 계층
 # (``nn.TransformerEncoderLayer``)를 사용합니다. 이는 최대
-# **1.4억** 개의 파라미터를 갖는 모델을 생성합니다.
+# **1.4억** 개의 매개변수를 갖는 모델을 생성합니다.
 #
 # Pipe는 `RRef <https://pytorch.org/docs/stable/rpc.html#rref>`__ 를 통해
 # `RPC 프레임워크 <https://pytorch.org/docs/stable/rpc.html>`__ 에 의존하는데
@@ -229,7 +229,7 @@ def get_batch(source, i):
 # 여러 GPU를 다루기 위해 프로세스 하나만 사용하고 있기 때문입니다.
 #
 # 그런 다음 파이프라인은 한 GPU에 8개의 트랜스포머와
-# 다른 GPU에 8개의 트랜스포머 레이어로 초기화됩니다.
+# 다른 GPU에 8개의 트랜스포머 계층으로 초기화됩니다.
 #
 # .. note::
 #    효율성을 위해 ``Pipe`` 에 전달된 ``nn.Sequential`` 이
@@ -242,7 +242,7 @@ emsize = 4096 # 임베딩 차원
 nhid = 4096 # ``nn.TransformerEncoder`` 에서 순전파(feedforward) 신경망 모델의 차원
 nlayers = 12 # ``nn.TransformerEncoder`` 내부의 ``nn.TransformerEncoderLayer`` 개수
 nhead = 16 # Multihead Attention 모델의 헤드 개수
-dropout = 0.2 # dropout 값
+dropout = 0.2 # 드롭아웃 값
 
 from torch.distributed import rpc
 tmpfile = tempfile.NamedTemporaryFile()
@@ -307,7 +307,7 @@ print ('Total parameters in model: {:,}'.format(get_total_params(model)))
 # 는 확률적 경사하강법(stochastic gradient descent method)을 구현합니다. 초기
 # 학습률(learning rate)은 5.0로 설정됩니다. `StepLR <https://pytorch.org/docs/master/optim.html?highlight=steplr#torch.optim.lr_scheduler.StepLR>`__ 는
 # 에폭(epoch)에 따라서 학습률을 조절하는 데 사용됩니다. 학습하는 동안,
-# 기울기 폭발(gradient exploding)을 방지하기 위해 모든 기울기를 함께 조정(scale)하는 함수
+# 변화도 폭발(gradient exploding)을 방지하기 위해 모든 변화도를 함께 조정(scale)하는 함수
 # `nn.utils.clip_grad_norm\_ <https://pytorch.org/docs/master/nn.html?highlight=nn%20utils%20clip_grad_norm#torch.nn.utils.clip_grad_norm_>`__
 # 을 이용합니다.
 #
@@ -319,7 +319,7 @@ scheduler = torch.optim.lr_scheduler.StepLR(optimizer, 1.0, gamma=0.95)
 
 import time
 def train():
-    model.train() # 훈련 모드로 전환
+    model.train() # 학습 모드로 전환
     total_loss = 0.
     start_time = time.time()
     ntokens = len(vocab)
@@ -331,7 +331,7 @@ def train():
         data, targets = get_batch(train_data, i)
         optimizer.zero_grad()
         # Pipe는 단일 호스트 내에 있고
-        # forward 메서드로 반환된 ``RRef`` 프로세스는 이 노드에 국한되어 있기 때문에
+        # forward 메소드로 반환된 ``RRef`` 프로세스는 이 노드에 국한되어 있기 때문에
         # ``RRef.local_value()`` 를 통해 간단히 찾을 수 있습니다.
         output = model(data).local_value()
         # 타겟을 파이프라인 출력이 있는

@@ -23,19 +23,19 @@ Torchvision 모델의 미세 조정(Finetuning)
 # **미세 조정** 에서는, 사전 학습된 모델로 시작해
 # 새로운 작업을 위해 모델의 매개변수 *모두* 를 업데이트 하여 본질적으로 전체 모델을 재학습합니다.
 # **특징 추출**에서는, 사전 학습된 모델로 시작해
-# 예측을 도출하는 최종 레이어의 가중치만 업데이트합니다.
+# 예측을 도출하는 최종 계층의 가중치만 업데이트합니다.
 # 사전 학습된 CNN을 고정된 특징 추출기(feature-extractor)로 사용하고
-# 출력 레이어만 변경하기 때문에 이를 특징 추출이라고 합니다.
+# 출력 계층만 변경하기 때문에 이를 특징 추출이라고 합니다.
 # 전송(transfer)에 대한 자세한 기술 정보는
 #  `여기 <https://cs231n.github.io/transfer-learning/>`__ 와
 # `여기 <https://ruder.io/transfer-learning/>`__ 를 재구성합니다.
 #
 # 일반적으로 두 전이 학습 방법 모두 몇 가지 단계를 동일하게 따릅니다.
 #
-# - 사전 훈련된 모델을 초기화합니다.
-# - 최종 레이어를 재구성하여 새 데이터 집합의 클래스 수와 동일한 수의 출력을 갖도록 합니다.
-# - 새 데이터셋의 클래스 수와 동일한 출력 수를 갖도록 최종 레이어를 재구성합니다.
-# - 훈련 중에 업데이트할 매개변수를 최적화 알고리즘에 맞게 정의합니다.
+# - 사전 학습된 모델을 초기화합니다.
+# - 최종 계층을 재구성하여 새 데이터 집합의 클래스 수와 동일한 수의 출력을 갖도록 합니다.
+# - 새 데이터셋의 클래스 수와 동일한 출력 수를 갖도록 최종 계층을 재구성합니다.
+# - 학습 중에 업데이트할 매개변수를 최적화 알고리즘에 맞게 정의합니다.
 # - 학습 단계를 실행합니다.
 #
 
@@ -75,13 +75,13 @@ print("Torchvision Version: ",torchvision.__version__)
 #    [resnet, alexnet, vgg, squeezenet, densenet, inception]
 #
 # 다른 입력은 다음과 같습니다. ``num_classes`` 은 데이터셋의 클래스 수,
-# ``batch_size`` 는 훈련에 사용되는 배치 크기로
+# ``batch_size`` 는 학습에 사용되는 배치 크기로
 # 모델의 성능에 따라 조정할 수 있으며,
-# ``num_epochs`` 는 실행하려는 훈련 에폭 수,
+# ``num_epochs`` 는 실행하려는 학습 에폭 수,
 # ``feature_extract`` 는 미세 조정 또는 특징 추출 여부를 정의하는 부울(boolean)입니다.
 # ``feature_extract = False``이면 모델이 미세 조정되고
 # 모든 모델의 매개변수가 업데이트됩니다.
-# ``feature_extract = True``인 경우 마지막 레이어의 매개변수만 업데이트되고
+# ``feature_extract = True``인 경우 마지막 계층의 매개변수만 업데이트되고
 # 다른 매개변수는 고정된 상태로 유지됩니다.
 
 # 최상위 데이터 디렉토리입니다. 여기서는 디렉토리 형식이
@@ -94,14 +94,14 @@ model_name = "squeezenet"
 # 데이터 집합의 클래스 수
 num_classes = 2
 
-# 훈련을 위한 배치 크기 (메모리 용량에 따라 변경됩니다.)
+# 학습을 위한 배치 크기 (메모리 용량에 따라 변경됩니다.)
 batch_size = 8
 
-# 훈련할 에폭 수
+# 학습할 에폭 수
 num_epochs = 15
 
 # 특징 추출을 위한 플래그(flag)입니다. False일 경우, 전체 모델을 미세 조정하고
-# True일 경우 재형성된 레이어어의 매개변수만 업데이트합니다.
+# True일 경우 재형성된 계층의 매개변수만 업데이트합니다.
 feature_extract = True
 
 
@@ -112,12 +112,12 @@ feature_extract = True
 # 모델을 조정하는 코드를 작성하기 전에
 # 몇 가지 도우미 함수(Helper Functions)를 정의해 보겠습니다.
 #
-# 모델 훈련 및 검증 코드
+# 모델 학습 및 검증 코드
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 # ``train_model`` 함수는 주어진 모델의 학습과 검증을 처리합니다.
 # 이 함수는 PyTorch 모델, 데이터로더(dataloader) 딕셔너리, 손실 함수,
-# 옵티마이저, 훈련 및 검증을 위해 정해진 에폭 수,
+# 옵티마이저, 학습 및 검증을 위해 정해진 에폭 수,
 # 그리고 Inception 모델일 때를 나타내는 부울 플래그(boolean flag)를 입력으로 받습니다.
 # 이 아키텍처는 보조(auxiliary) 출력을 사용하고, 전체 모델 손실은
 # `여기 <https://discuss.pytorch.org/t/how-to-optimize-inception-model-with-auxiliary-classifiers/7958>`__ 에 설명된 대로
@@ -127,7 +127,7 @@ feature_extract = True
 # 각 에폭이 끝난 후 전체 검증 단계를 실행합니다.
 # 또한, 검증 정확도 측면에서 가장 성능이 좋은 모델을 추적하고
 # 학습이 끝나면 해당 모델을 반환합니다.
-# 각 에폭이 끝나면 훈련 및 검증 정확도를 볼 수 있습니다.
+# 각 에폭이 끝나면 학습 및 검증 정확도를 볼 수 있습니다.
 #
 
 def train_model(model, dataloaders, criterion, optimizer, num_epochs=25, is_inception=False):
@@ -161,7 +161,7 @@ def train_model(model, dataloaders, criterion, optimizer, num_epochs=25, is_ince
                 optimizer.zero_grad()
 
                 # 순방향
-                # 훈련 하는 동안만 기록을 추적합니다.
+                # 학습 하는 동안만 기록을 추적합니다.
                 with torch.set_grad_enabled(phase == 'train'):
                     # 모델의 출력을 가져오고 손실을 계산합니다.
                     # 학습 시 보조(auxiliary) 출력이 있는 inception의 특별한 경우입니다.
@@ -220,7 +220,7 @@ def train_model(model, dataloaders, criterion, optimizer, num_epochs=25, is_ince
 # 기본적으로, 사전 학습된 모델을 읽어 들일 때 모든 매개변수가
 # ``.requires_grad=True``로 설정되어 있으므로
 # 처음부터 학습하거나 미세 조정하는 경우라면 괜찮습니다.
-# 그러나 특징 추출 중이고 새로 초기화된 레이어에 대한 경사도만 계산하려는 경우
+# 그러나 특징 추출 중이고 새로 초기화된 계층에 대한 경사도만 계산하려는 경우
 # 다른 모든 매개변수에는 경사도가 필요하지 않아야 합니다.
 # 이것은 나중에 더 이해를 할 수 있을 것입니다.
 #
@@ -238,24 +238,24 @@ def set_parameter_requires_grad(model, feature_extracting):
 # 이제 가장 흥미로운 부분입니다.
 # 여기서는 각 네트워크의 재구성을 처리합니다.
 # 이 절차는 자동 절차가 아니며 각 모델마다 고유합니다.
-# CNN 모델의 최종 레이어(FC layer라고도 불림)는
+# CNN 모델의 최종 계층(FC layer라고도 불림)는
 # 데이터셋의 출력 클래스 수와 동일한 수의 노드를 가지고 있습니다.
 # 모든 모델은 이미 ImageNet에서 사전 학습 되었기 때문에
-# 각 클래스당 하나의 노드씩 1000 크기의 출력 레이어를 가지고 있습니다.
+# 각 클래스당 하나의 노드씩 1000 크기의 출력 계층을 가지고 있습니다.
 # 여기서의 목표는 이전과 동일한 수의 입력을 갖고,
-# 데이터셋의 클래스 수와 동일한 수의 출력을 갖도록 마지막 레이어를 재구성하는 것입니다.
+# 데이터셋의 클래스 수와 동일한 수의 출력을 갖도록 마지막 계층을 재구성하는 것입니다.
 # 다음 섹션에서는 각 모델의 아키텍처를
 # 개별적으로 변경하는 방법에 대해 설명하겠습니다.
 # 하지만 먼저, 미세 조정과 특징 추출의 차이점에 대한
 # 한 가지 중요한 세부 사항이 있습니다.
 #
-# 특징 추출 시 마지막 레이어의 매개변수만 업데이트 하고 싶을 때
-# 다시 말해, 재구성하는 레이어의 매개변수만 업데이트를 하고 싶은 경우가 있습니다.
+# 특징 추출 시 마지막 계층의 매개변수만 업데이트 하고 싶을 때
+# 다시 말해, 재구성하는 계층의 매개변수만 업데이트를 하고 싶은 경우가 있습니다.
 # 이런 경우에는 변경하지 않는 매개변수의 경사도를 계산할 필요가 없으므로
 # 효율성을 위해 .requires_grad 속성을 False로 설정합니다.
 # 기본적으로 이 속성은 True로 설정되어 있기 때문에 이 설정은 중요합니다.
-# 그런 다음 새 레이어를 초기화할 때 기본적으로 새 매개변수에는 ``.requires_grad=True``가 있으므로
-# 새 레이어의 매개변수만 업데이트됩니다.
+# 그런 다음 새 계층을 초기화할 때 기본적으로 새 매개변수에는 ``.requires_grad=True``가 있으므로
+# 새 계층의 매개변수만 업데이트됩니다.
 # 미세 조정할 때는 모든 .requires_grad를 기본값인 True로 설정할 수 있습니다.
 #
 # 마지막으로, inception_v3는 입력 크기를 (299,299)로 요구하지만,
@@ -270,13 +270,13 @@ def set_parameter_requires_grad(model, feature_extracting):
 # 모두 torchvision 모델에서 사용할 수 있습니다.
 # 여기서는 데이터셋이 작고 클래스가 두 개 뿐인 Resnet18을 사용합니다.
 # 모델을 출력하면 아래 그림과 같이
-# 마지막 레이어가 완전히 연결된 레이어임을 알 수 있습니다.
+# 마지막 계층이 완전히 연결된 계층임을 알 수 있습니다.
 #
 # ::
 #
 #    (fc): Linear(in_features=512, out_features=1000, bias=True)
 #
-# 입력 특징이 512개, 출력 특징이 2개인 선형 레이어가 되도록
+# 입력 특징이 512개, 출력 특징이 2개인 선형 계층이 되도록
 # ``model.fc``를 다시 초기화해야 합니다.
 #
 # ::
@@ -291,7 +291,7 @@ def set_parameter_requires_grad(model, feature_extracting):
 # Networks <https://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks.pdf>`__ 논문에 소개된 바 있으며
 # ImageNet 데이터셋에서 최초로 매우 성공적인 CNN을 구현한 바 있습니다.
 # 모델의 아키텍처를 출력하면 모델 출력이
-# 분류기(classifier)의 6번째 레이어에서 나오는 것을 볼 수 있습니다.
+# 분류기(classifier)의 6번째 계층에서 나오는 것을 볼 수 있습니다.
 #
 # ::
 #
@@ -300,7 +300,7 @@ def set_parameter_requires_grad(model, feature_extracting):
 #        (6): Linear(in_features=4096, out_features=1000, bias=True)
 #     )
 #
-# 데이터셋과 함께 모델을 사용하려면 이 레이어를 다음과 같이 다시 초기화합니다.
+# 데이터셋과 함께 모델을 사용하려면 이 계층을 다음과 같이 다시 초기화합니다.
 #
 # ::
 #
@@ -311,10 +311,10 @@ def set_parameter_requires_grad(model, feature_extracting):
 #
 # VGG는 `Very Deep Convolutional Networks for
 # Large-Scale Image Recognition <https://arxiv.org/pdf/1409.1556.pdf>`__ 논문에서 소개되었습니다.
-# Torchvision 다양한 길이와 배치 정규화 레이어가 있는
+# Torchvision 다양한 길이와 배치 정규화 계층이 있는
 # 8가지 버전의 VGG를 제공합니다.
 # 여기서는 배치 정규화 기능이 있는 VGG-11을 사용합니다.
-# 출력 레이어는 Alexnet과 유사합니다.
+# 출력 계층은 Alexnet과 유사합니다.
 #
 # ::
 #
@@ -323,7 +323,7 @@ def set_parameter_requires_grad(model, feature_extracting):
 #        (6): Linear(in_features=4096, out_features=1000, bias=True)
 #     )
 #
-# 따라서 동일한 기술을 사용해 출력 레이어를 수정합니다.
+# 따라서 동일한 기술을 사용해 출력 계층을 수정합니다.
 #
 # ::
 #
@@ -338,8 +338,8 @@ def set_parameter_requires_grad(model, feature_extracting):
 # AlexNet 수준의 정확도를 제공하면서
 # 여기에 표시된 모델들과는 다른 출력 구조를 사용합니다.
 # Torchvision에는 두 가지 버전의 Squeezenet이 있고 여기서는 1.0 버전을 사용합니다.
-# 출력은 분류기(classifier)의 첫 번째 레이어인
-# 1x1 합성곱 레이어에서 나옵니다.
+# 출력은 분류기(classifier)의 첫 번째 계층인
+# 1x1 합성곱 계층에서 나옵니다.
 #
 # ::
 #
@@ -350,7 +350,7 @@ def set_parameter_requires_grad(model, feature_extracting):
 #        (3): AvgPool2d(kernel_size=13, stride=1, padding=0)
 #     )
 #
-# 네트워크를 수정하기 위해 Conv2d 레이어를 다시 초기화하여
+# 네트워크를 수정하기 위해 Conv2d 계층을 다시 초기화하여
 # 깊이 2의 특징 맵을 다음과 같이 출력합니다.
 #
 # ::
@@ -364,13 +364,13 @@ def set_parameter_requires_grad(model, feature_extracting):
 # Networks <https://arxiv.org/abs/1608.06993>`__ 논문에서 소개되었습니다.
 # Torchvision에는 4가지의 변형 Densenet이 있지만
 # 여기서는 Densenet-121만 사용합니다.
-# 출력 레이는 1024개의 입력 특징을 가진 선형 레이어 입니다.
+# 출력 계층은 1024개의 입력 특징을 가진 선형 계층 입니다.
 #
 # ::
 #
 #    (classifier): Linear(in_features=1024, out_features=1000, bias=True)
 #
-# 네트워크를 재구성하기 위해 분류기(classifier)의 선형 레이어를
+# 네트워크를 재구성하기 위해 분류기(classifier)의 선형 계층을
 # 다음과 같이 다시 초기화합니다.
 #
 # ::
@@ -383,10 +383,10 @@ def set_parameter_requires_grad(model, feature_extracting):
 # 마지막으로 Inception v3은 `Rethinking the Inception
 # Architecture for Computer
 # Vision <https://arxiv.org/pdf/1512.00567v1.pdf>`__ 에서 처음 설명했습니다.
-# 이 네트워크는 학습 시 두 개의 출력 레이어가 있다는 점이 독특합니다.
+# 이 네트워크는 학습 시 두 개의 출력 계층이 있다는 점이 독특합니다.
 # 두 번째 출력은 보조(axuiliary) 출력으로 알려져 있으며
 # 네트워크의 AuxLogits 부분에 포함되어 있습니다.
-# 기본 출력은 네트워크 끝에 있는 선형 레이어이며
+# 기본 출력은 네트워크 끝에 있는 선형 계층이며
 # 테스트할 때는 기본 출력만 고려합니다.
 # 읽어 들인 모델의 보조(auxiliary) 출력과 기본 출력은 다음과 같이 출력됩니다.
 #
@@ -399,7 +399,7 @@ def set_parameter_requires_grad(model, feature_extracting):
 #     ...
 #    (fc): Linear(in_features=2048, out_features=1000, bias=True)
 #
-# 이 모델을 미세 조정하려면 두 레이어를
+# 이 모델을 미세 조정하려면 두 계층을
 # 다음과 같이 모두 재구성해야 합니다.
 #
 # ::
@@ -538,7 +538,7 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 # 사전 학습된 모델을 읽어 들인 후 구조를 재조정하기 전에
 # ``feature_extract=True``인 경우 매개변수의
 # 모든 ``.requires_grad`` 속성을 일일이 False로 설정한 것을 기억하세요.
-# 그러면 재초기화된 레이어의 파라미터는
+# 그러면 재초기화된 계층의 매개변수는
 # 기본적으로 ``.requires_grad=True``를 갖습니다.
 # 이제 *.requires_grad=True인 모든 매개변수가
 # 최적화되어야 한다는 것을 알았습니다.*
@@ -549,7 +549,7 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 # 미세 조정할 때 이 목록은 길어야 하며
 # 모든 모델의 매개변수를 포함해야 합니다.
 # 하지만, 특징을 추출할 때는 이 목록이 짧아야 하며
-# 재구성된 레이어의 가중치와 편향(bias)만 포함해야 합니다.
+# 재구성된 계층의 가중치와 편향(bias)만 포함해야 합니다.
 #
 
 # GPU로 모델 전송

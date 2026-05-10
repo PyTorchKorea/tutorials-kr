@@ -261,9 +261,9 @@ printLines(datafile)
 # 이를 위해 우리는 ``Voc`` 라는 클래스를 만들어 단어에서 인덱스로의
 # 매핑, 인덱스에서 단어로의 역 매핑, 각 단어의 등장 횟수, 전체 단어 수
 # 등을 관리하려 합니다. 이 클래스는 어휘집에 새로운 단어를 추가하는
-# 메서드( ``addWord``), 문장에 등장하는 모든 단어를 추가하는
-# 메서드( ``addSentence``), 그리고 자주 등장하지 않는 단어를 정리하는
-# 메서드( ``trim``)를 제공합니다. 단어를 정리하는 내용에 대해서는 뒤에서
+# 메소드( ``addWord``), 문장에 등장하는 모든 단어를 추가하는
+# 메소드( ``addSentence``), 그리고 자주 등장하지 않는 단어를 정리하는
+# 메소드( ``trim``)를 제공합니다. 단어를 정리하는 내용에 대해서는 뒤에서
 # 좀 더 자세히 살펴보겠습니다.
 #
 
@@ -568,7 +568,7 @@ print("max_target_len:", max_target_len)
 # 순환 신경망을 같이 이용하여 이러한 목적을 달성할 수 있음을 발견했습니다.
 # RNN 하나는 **인코더** 로, 가변 길이 입력 시퀀스를 고정된 길이의 문맥
 # 벡터(context vector)로 인코딩합니다. 이론상 문맥 벡터(RNN의 마지막
-# 은닉 레이어)는 봇에게 입력으로 주어지는 질의 문장에 대한 의미론적 정보를
+# 은닉 계층)는 봇에게 입력으로 주어지는 질의 문장에 대한 의미론적 정보를
 # 담고 있을 것입니다. 두 번째 RNN은 **디코더** 입니다. 디코더는 단어 하나와
 # 문맥 벡터를 입력으로 받고, 시퀀스의 다음 단어가 무엇일지를 추론하여
 # 반환하며, 다음 단계에서 사용할 은닉 상태도 같이 반환합니다.
@@ -594,7 +594,7 @@ print("max_target_len:", max_target_len)
 # 나중에 디코더는 이를 이용하여 주어진 문제에 대해 의미 있는 출력을
 # 구할 것입니다.
 #
-# 인코더의 핵심 부분에는 다중 레이어 게이트 순환 유닛(multi-layered Gated
+# 인코더의 핵심 부분에는 다중 계층 게이트 순환 유닛(multi-layered Gated
 # Recurrent Unit)이 있습니다. 이는 `Cho 등 <https://arxiv.org/pdf/1406.1078v3.pdf>`__
 # 이 2014년에 고안한 것입니다. 우리는 GRU를 양방향으로 변환한 형태를
 # 사용할 것이며, 이는 본질적으로 두 개의 독립된 RNN이 존재한다는
@@ -612,9 +612,9 @@ print("max_target_len:", max_target_len)
 #
 # 그림 출처: https://colah.github.io/posts/2015-09-NN-Types-FP/
 #
-# ``embedding`` 레이어가 단어 인덱스를 임의 크기의 피처 공간으로
+# ``embedding`` 계층이 단어 인덱스를 임의 크기의 피처 공간으로
 # 인코딩하는 데 사용되었음에 유의하기 바랍니다. 우리의 모델에서는 이
-# 레이어가 각 단어를 크기가 *hidden_size* 인 피처 공간으로 매핑할
+# 계층이 각 단어를 크기가 *hidden_size* 인 피처 공간으로 매핑할
 # 것입니다. 학습을 거치면 서로 뜻이 유사한 단어는 의미적으로 유사하게
 # 인코딩될 것입니다.
 #
@@ -643,7 +643,7 @@ print("max_target_len:", max_target_len)
 #
 # **출력:**
 #
-# -  ``outputs``: GRU의 마지막 은닉 레이어에 대한 출력 피처 값(양방향
+# -  ``outputs``: GRU의 마지막 은닉 계층에 대한 출력 피처 값(양방향
 #    (출력을 합산한 것). shape=\ *(max_length, batch_size, hidden_size)*
 # -  ``hidden``: GRU의 최종 은닉 상태. shape=\ *(n_layers x
 #    num_directions, batch_size, hidden_size)*
@@ -727,7 +727,7 @@ class EncoderRNN(nn.Module):
 # 모든 상태를 뜻합니다.
 #
 # 종합해 보면, 전역 어텐션 메커니즘을 다음 그림과 같이 요약할 수 있을
-# 것입니다. 우리가 '어텐션 레이어'를 ``Attn`` 라는 독립적인 ``nn.Module`` 로
+# 것입니다. 우리가 '어텐션 계층'을 ``Attn`` 라는 독립적인 ``nn.Module`` 로
 # 구현할 것임에 유의하기 바랍니다. 이 모듈의 출력은 모양이 *(batch_size, 1,
 # max_length)* 인 정규화된 softmax 가중치 텐서입니다.
 #
@@ -737,7 +737,7 @@ class EncoderRNN(nn.Module):
 #    :alt: global_attn
 #
 
-# Luong 어텐션 레이어
+# Luong 어텐션 계층
 class Attn(nn.Module):
     def __init__(self, method, hidden_size):
         super(Attn, self).__init__()
@@ -798,7 +798,7 @@ class Attn(nn.Module):
 #
 # -  ``input_step``: 입력 시퀀스 배치에 대한 한 단위 시간(한 단어).
 #    shape=\ *(1, batch_size)*
-# -  ``last_hidden``: GRU의 마지막 은닉 레이어. shape=\ *(n_layers x
+# -  ``last_hidden``: GRU의 마지막 은닉 계층. shape=\ *(n_layers x
 #    num_directions, batch_size, hidden_size)*
 # -  ``encoder_outputs``: 인코더 모델의 출력. shape=\ *(max_length,
 #    batch_size, hidden_size)*
@@ -823,7 +823,7 @@ class LuongAttnDecoderRNN(nn.Module):
         self.n_layers = n_layers
         self.dropout = dropout
 
-        # 레이어를 정의합니다
+        # 계층을 정의합니다
         self.embedding = embedding
         self.embedding_dropout = nn.Dropout(dropout)
         self.gru = nn.GRU(hidden_size, hidden_size, n_layers, dropout=(0 if n_layers == 1 else dropout))
@@ -924,8 +924,8 @@ def maskNLLLoss(inp, target, mask):
 # .. warning::
 #
 #   PyTorch의 RNN 모듈( ``RNN``, ``LSTM``, ``GRU`` )은 전체 입력 시퀀스(또는
-#   시퀀스의 배치)를 단순히 넣어주기만 하면 다른 비순환 레이어처럼 사용할 수
-#   있습니다. 우리는 ``encoder`` 에서 ``GRU`` 레이어를 이런 식으로 사용합니다.
+#   시퀀스의 배치)를 단순히 넣어주기만 하면 다른 비순환 계층처럼 사용할 수
+#   있습니다. 우리는 ``encoder`` 에서 ``GRU`` 계층을 이런 식으로 사용합니다.
 #   그 안이 실제로 어떻게 되어 있는지를 살펴보면, 매 시간 단계마다 은닉 상태를
 #   계산하는 반복 프로세스가 존재합니다. 또 다른 방법은, 이 모듈을 매번 한 단위
 #   시간만큼 수행할 수도 있습니다. 그 경우에는 우리가 ``decoder`` 모델을 다룰
@@ -1102,7 +1102,7 @@ def trainIters(model_name, voc, pairs, encoder, decoder, encoder_optimizer, deco
 # **연산 그래프:**
 #
 #    1) 인코더 모델로 입력을 포워드 패스합니다.
-#    2) 인코더의 마지막 은닉 레이어가 디코더의 첫 번째 은닉 레이어의 입력이 되도록 준비합니다.
+#    2) 인코더의 마지막 은닉 계층이 디코더의 첫 번째 은닉 계층의 입력이 되도록 준비합니다.
 #    3) 디코더의 첫 번째 입력을 SOS_token으로 초기화합니다.
 #    4) 디코더가 단어를 덧붙여 나갈 텐서를 초기화합니다.
 #    5) 반복적으로 각 단계마다 하나의 단어 토큰을 디코딩합니다.
@@ -1122,7 +1122,7 @@ class GreedySearchDecoder(nn.Module):
     def forward(self, input_seq, input_length, max_length):
         # 인코더 모델로 입력을 포워드 패스합니다
         encoder_outputs, encoder_hidden = self.encoder(input_seq, input_length)
-        # 인코더의 마지막 은닉 레이어가 디코더의 첫 번째 은닉 레이어의 입력이 되도록 준비합니다
+        # 인코더의 마지막 은닉 계층이 디코더의 첫 번째 은닉 계층의 입력이 되도록 준비합니다
         decoder_hidden = encoder_hidden[:decoder.n_layers]
         # 디코더의 첫 번째 입력을 SOS_token으로 초기화합니다
         decoder_input = torch.ones(1, 1, device=device, dtype=torch.long) * SOS_token
@@ -1298,7 +1298,7 @@ n_iteration = 4000
 print_every = 1
 save_every = 500
 
-# Dropout 레이어를 학습 모드로 둡니다
+# 드롭아웃 계층을 학습 모드로 둡니다
 encoder.train()
 decoder.train()
 
@@ -1335,7 +1335,7 @@ trainIters(model_name, voc, pairs, encoder, decoder, encoder_optimizer, decoder_
 # 여러분의 모델과 채팅을 해보고 싶다면 다음 블록을 수행하면 됩니다.
 #
 
-# Dropout 레이어를 평가( ``eval`` ) 모드로 설정합니다
+# 드롭아웃 계층을 평가( ``eval`` ) 모드로 설정합니다
 encoder.eval()
 decoder.eval()
 

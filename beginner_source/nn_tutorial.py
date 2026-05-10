@@ -107,12 +107,12 @@ print(y_train.min(), y_train.max())
 # PyTorch는 랜덤 또는 0으로만 이루어진 텐서를 생성하는 메소드를 제공하고,
 # 우리는 간단한 선형 모델의 가중치(weights)와 절편(bias)을 생성하기 위해서 이것을 사용할 것입니다.
 # 이들은 일반적인 텐서에 매우 특별한 한 가지가 추가된 것입니다: 우리는 PyTorch에게 이들이
-# 기울기(gradient)가 필요하다고 알려줍니다.
+# 변화도(gradient)가 필요하다고 알려줍니다.
 # 이를 통해 PyTorch는 텐서에 행해지는 모든 연산을 기록하게 하고,
-# 따라서 *자동적으로* 역전파(back-propagation) 동안에 기울기를 계산할 수 있습니다!
+# 따라서 *자동적으로* 역전파(back-propagation) 동안에 변화도를 계산할 수 있습니다!
 #
 # 가중치에 대해서는 ``requires_grad`` 를 초기화(initialization) **다음에** 설정합니다,
-# 왜냐하면 우리는 해당 단계가 기울기에 포함되는 것을 원치 않기 때문입니다.
+# 왜냐하면 우리는 해당 단계가 변화도에 포함되는 것을 원치 않기 때문입니다.
 # (PyTorch에서 ``_`` 다음에 오는 메소드 이름은 연산이 인플레이스(in-place)로 수행되는 것을 의미합니다.)
 #
 # .. note:: `Xavier initialisation <http://proceedings.mlr.press/v9/glorot10a/glorot10a.pdf>`_
@@ -125,7 +125,7 @@ weights.requires_grad_()
 bias = torch.zeros(10, requires_grad=True)
 
 ###############################################################################
-# PyTorch의 기울기를 자동으로 계산 해주는 기능 덕분에, Python 표준 함수
+# PyTorch의 변화도를 자동으로 계산 해주는 기능 덕분에, Python 표준 함수
 # (또는 호출 가능한 객체)를 모델로 사용할 수 있습니다!
 # 그러므로 간단한 선형 모델을 만들기 위해서 단순한 행렬 곱셈과 브로드캐스트(broadcast)
 # 덧셈을 사용하여 보겠습니다. 또한, 우리는 활성화 함수(activation function)가 필요하므로,
@@ -155,7 +155,7 @@ print(preds[0], preds.shape)
 
 ###############################################################################
 # 여러분이 보시듯이, ``preds`` 텐서(tensor)는 텐서 값 외에도, 또한
-# 기울기 함수(gradient function)를 담고 있습니다.
+# 변화도 함수(gradient function)를 담고 있습니다.
 # 우리는 나중에 이것을 역전파(backpropagation)를 위해 사용할 것입니다.
 # 이제 손실함수(loss function)로 사용하기 위한 음의 로그 우도(negative log-likelihood)를
 # 구현합시다. (다시 말하지만, 우리는 표준 Python을 사용할 수 있습니다.):
@@ -190,22 +190,22 @@ def accuracy(out, yb):
 print(accuracy(preds, yb))
 
 ###############################################################################
-# 이제 우리는 훈련 루프(training loop)를 실행할 수 있습니다. 매 반복마다, 다음을 수행할 것입니다:
+# 이제 우리는 학습 루프(training loop)를 실행할 수 있습니다. 매 반복마다, 다음을 수행할 것입니다:
 #
 # - 데이터의 미니배치를 선택 (``bs`` 크기)
 # - 모델을 이용하여 예측 수행
 # - 손실 계산
-# - ``loss.backward()`` 를 이용하여 모델의 기울기 업데이트, 이 경우에는, ``weights`` 와 ``bias``.
+# - ``loss.backward()`` 를 이용하여 모델의 변화도 업데이트, 이 경우에는, ``weights`` 와 ``bias``.
 #
-# 이제 우리는 이 기울기들을 이용하여 가중치와 절편을 업데이트 합니다.
+# 이제 우리는 이 변화도들을 이용하여 가중치와 절편을 업데이트 합니다.
 # 우리는 이것을 ``torch.no_grad()`` 컨텍스트 매니저(context manager) 내에서 실행합니다,
-# 왜냐하면 이러한 실행이 다음 기울기의 계산에 기록되지 않기를 원하기 때문입니다.
-# PyTorch의 자동 기울기(Autograd)가 어떻게 연산을 기록하는지
+# 왜냐하면 이러한 실행이 다음 변화도의 계산에 기록되지 않기를 원하기 때문입니다.
+# PyTorch의 자동 변화도(Autograd)가 어떻게 연산을 기록하는지
 # `여기 <https://pytorch.org/docs/stable/notes/autograd.html>`_\에서 더 알아볼 수 있습니다.
 #
-# 그러고 나서 기울기를 0으로 설정합니다, 그럼으로써 다음 루프(loop)에 준비하게 됩니다.
-# 그렇지 않으면, 우리의 기울기들은 일어난 모든 연산의 누적 집계를 기록하게 되어버립니다.
-# (즉, ``loss.backward()`` 가 이미 저장된 것을 대체하기보단, 기존 값에 기울기를 *더하게* 됩니다).
+# 그러고 나서 변화도를 0으로 설정합니다, 그럼으로써 다음 루프(loop)에 준비하게 됩니다.
+# 그렇지 않으면, 우리의 변화도들은 일어난 모든 연산의 누적 집계를 기록하게 되어버립니다.
+# (즉, ``loss.backward()`` 가 이미 저장된 것을 대체하기보단, 기존 값에 변화도를 *더하게* 됩니다).
 #
 # .. tip:: 여러분들은 PyTorch 코드에 대하여 표준 python 디버거(debugger)를 사용할 수 있으므로,
 #    매 단계마다 다양한 변수 값을 점검할 수 있습니다.
@@ -215,7 +215,7 @@ print(accuracy(preds, yb))
 from IPython.core.debugger import set_trace
 
 lr = 0.5  # 학습률(learning rate)
-epochs = 2  # 훈련에 사용할 에폭(epoch) 수
+epochs = 2  # 학습에 사용할 에폭(epoch) 수
 
 for epoch in range(epochs):
     for i in range((n - 1) // bs + 1):
@@ -236,7 +236,7 @@ for epoch in range(epochs):
 
 ###############################################################################
 # 이제 다 됐습니다: 제일 간단한 신경망(neural network)의 모든 것을 밑바닥부터 생성하고
-# 훈련하였습니다! (이번에는 은닉층(hidden layer)이 없기 때문에,
+# 학습하였습니다! (이번에는 은닉층(hidden layer)이 없기 때문에,
 # 로지스틱 회귀(logistic regression)입니다).
 #
 # 이제 손실과 정확도를 이전 값들과 비교하면서 확인해봅시다.
@@ -259,7 +259,7 @@ print(loss_func(model(xb), yb), accuracy(model(xb), yb))
 # (라이브러리의 다른 부분에는 클래스가 포함되어 있습니다.)
 # 다양한 손실 및 활성화 함수뿐만 아니라, 풀링(pooling) 함수와 같이 신경망을 만드는데
 # 편리한 몇 가지 함수도 여기에서 찾을 수 있습니다.
-# (컨볼루션(convolution) 연산, 선형(linear) 레이어, 등을 수행하는 함수도 있지만,
+# (컨볼루션(convolution) 연산, 선형(linear) 계층, 등을 수행하는 함수도 있지만,
 # 앞으로 보시겠지만 대개는 라이브러리의 다른 부분을 사용하여 더 잘 처리할 수 있습니다.)
 #
 # 만약 여러분들이 음의 로그 우도 손실과 로그 소프트맥스 (log softmax) 활성화 함수를 사용하는 경우,
@@ -282,7 +282,7 @@ print(loss_func(model(xb), yb), accuracy(model(xb), yb))
 ###############################################################################
 # ``nn.Module`` 을 이용하여 리팩토링 하기
 # -----------------------------------------
-# 다음으로, 더 명확하고 간결한 훈련 루프를 위해 ``nn.Module`` 및 ``nn.Parameter`` 를 사용합니다.
+# 다음으로, 더 명확하고 간결한 학습 루프를 위해 ``nn.Module`` 및 ``nn.Parameter`` 를 사용합니다.
 # 우리는 ``nn.Module`` (자체가 클래스이고 상태를 추적할 수 있는) 하위 클래스(subclass)를 만듭니다.
 # 이 경우에는, 포워드(forward) 단계에 대한 가중치, 절편, 그리고 메소드(method) 등을 유지하는
 # 클래스를 만들고자 합니다.
@@ -319,8 +319,8 @@ model = Mnist_Logistic()
 print(loss_func(model(xb), yb))
 
 ###############################################################################
-# 이전에는 훈련 루프를 위해 이름 별로 각 매개변수(parameter)의 값을 업데이트하고 다음과 같이
-# 각 매개 변수에 대한 기울기들을 개별적으로 수동으로 0으로 제거해야 했습니다:
+# 이전에는 학습 루프를 위해 이름 별로 각 매개변수(parameter)의 값을 업데이트하고 다음과 같이
+# 각 매개 변수에 대한 변화도들을 개별적으로 수동으로 0으로 제거해야 했습니다:
 #
 # .. code-block:: python
 #
@@ -342,7 +342,7 @@ print(loss_func(model(xb), yb))
 #        model.zero_grad()
 #
 #
-# 이제 이것을 나중에 다시 실행할 수 있도록 ``fit`` 함수로 작은 훈련 루프를 감쌀 것입니다.
+# 이제 이것을 나중에 다시 실행할 수 있도록 ``fit`` 함수로 작은 학습 루프를 감쌀 것입니다.
 
 def fit():
     for epoch in range(epochs):
@@ -375,8 +375,8 @@ print(loss_func(model(xb), yb))
 # 초기화하고, ``xb  @ self.weights + self.bias`` 를 계산하는 대신에,
 # 위의 모든 것을 해줄 PyTorch 클래스인
 # `nn.Linear <https://pytorch.org/docs/stable/nn.html#linear-layers>`_ 를 선형
-# 레이어로 사용합니다.
-# PyTorch 에는 다양한 유형의 코드를 크게 단순화 할 수 있는 미리 정의된 레이어가 있고 이는 또한
+# 계층으로 사용합니다.
+# PyTorch 에는 다양한 유형의 코드를 크게 단순화 할 수 있는 미리 정의된 계층이 있고 이는 또한
 # 종종 기존 코드보다 속도를 빠르게 합니다.
 
 class Mnist_Logistic(nn.Module):
@@ -423,8 +423,8 @@ print(loss_func(model(xb), yb))
 #    opt.step()
 #    opt.zero_grad()
 #
-# (``optim.zero_grad()`` 는 기울기를 0으로 재설정 해줍니다. 다음 미니 배치에 대한
-# 기울기를 계산하기 전에 호출해야 합니다.)
+# (``optim.zero_grad()`` 는 변화도를 0으로 재설정 해줍니다. 다음 미니 배치에 대한
+# 변화도를 계산하기 전에 호출해야 합니다.)
 
 from torch import optim
 
@@ -468,7 +468,7 @@ print(loss_func(model(xb), yb))
 # PyTorch 의 `TensorDataset <https://pytorch.org/docs/stable/_modules/torch/utils/data/dataset.html#TensorDataset>`_
 # 은 텐서를 감싸는(wrapping) Dataset 입니다.
 # 길이와 인덱싱 방식을 정의함으로써 텐서의 첫 번째 차원을 따라 반복, 인덱싱 및 슬라이스(slice)하는 방법도 제공합니다.
-# 이렇게하면 훈련 할 때 동일한 라인에서 독립(independent) 변수와 종속(dependent) 변수에 쉽게 액세스 할 수 있습니다.
+# 이렇게하면 학습 할 때 동일한 라인에서 독립(independent) 변수와 종속(dependent) 변수에 쉽게 액세스 할 수 있습니다.
 
 from torch.utils.data import TensorDataset
 
@@ -553,26 +553,26 @@ for epoch in range(epochs):
 print(loss_func(model(xb), yb))
 
 ###############################################################################
-# PyTorch의 nn.Module, nn.Parameter, Dataset 및 DataLoader 덕분에 이제 훈련 루프가
+# PyTorch의 nn.Module, nn.Parameter, Dataset 및 DataLoader 덕분에 이제 학습 루프가
 # 훨씬 더 작아지고 이해하기 쉬워졌습니다.
 # 이제 실제로 효과적인 모델을 만드는 데 필요한 기본 기능을 추가해 보겠습니다.
 #
 # 검증(validation) 추가하기
 # ---------------------------
 #
-# 섹션 1에서, 우리는 훈련 데이터에 사용하기 위해 합리적인 훈련 루프를 설정하려고했습니다.
+# 섹션 1에서, 우리는 학습 데이터에 사용하기 위해 합리적인 학습 루프를 설정하려고했습니다.
 # 실전에서, 여러분들은 과적합(overfitting)을 확인하기 위해서 **항상**
 # `검증 데이터셋(validation set) <https://www.fast.ai/2017/11/13/validation-sets/>`_ 이
 # 있어야 합니다.
 #
-# 훈련 데이터를 섞는(shuffling) 것은 배치와 과적합 사이의 상관관계를 방지하기 위해
+# 학습 데이터를 섞는(shuffling) 것은 배치와 과적합 사이의 상관관계를 방지하기 위해
 # `중요합니다. <https://www.quora.com/Does-the-order-of-training-data-matter-when-training-neural-networks>`_
 # 반면에, 검증 손실(validation loss)은 검증 데이터셋을 섞든 안섞든 동일합니다.
 # 데이터를 섞는 것은 추가 시간이 걸리므로, 검증 데이터를 섞는 것은 의미가 없습니다.
 #
 # 검증 데이터셋에 대한 배치 크기는 학습 데이터셋 배치 크기의 2배를 사용할 것입니다.
 # 이는 검증 데이터셋에 대해서는 역전파(backpropagation)가 필요하지 않으므로 메모리를
-# 덜 사용하기 때문입니다 (기울기를 저장할 필요가 없음).
+# 덜 사용하기 때문입니다 (변화도를 저장할 필요가 없음).
 # 더 큰 배치 크기를 사용하여 손실을 더 빨리 계산하기 위해 이렇게 합니다.
 
 train_ds = TensorDataset(x_train, y_train)
@@ -584,9 +584,9 @@ valid_dl = DataLoader(valid_ds, batch_size=bs * 2)
 ###############################################################################
 # 각 에폭이 끝날 때 검증 손실을 계산하고 프린트 할 것입니다.
 #
-# (훈련 전에 항상 ``model.train()`` 을 호출하고, 추론(inference) 전에 ``model.eval()``
-# 을 호출합니다, 이는 ``nn.BatchNorm2d`` 및 ``nn.Dropout`` 과 같은 레이어에서
-# 이러한 다른 단계(훈련, 추론) 에 대한 적절한 동작이 일어나게 하기 위함입니다.)
+# (학습 전에 항상 ``model.train()`` 을 호출하고, 추론(inference) 전에 ``model.eval()``
+# 을 호출합니다, 이는 ``nn.BatchNorm2d`` 및 ``nn.Dropout`` 과 같은 계층에서
+# 이러한 다른 단계(학습, 추론) 에 대한 적절한 동작이 일어나게 하기 위함입니다.)
 
 model, opt = get_model()
 
@@ -611,10 +611,10 @@ for epoch in range(epochs):
 # ----------------------------------
 #
 # 이제 우리는 우리만의 작은 리팩토링을 수행할 것입니다.
-# 훈련 데이터셋과 검증 데이터셋 모두에 대한 손실을 계산하는 유사한 프로세스를 두 번 거치므로,
+# 학습 데이터셋과 검증 데이터셋 모두에 대한 손실을 계산하는 유사한 프로세스를 두 번 거치므로,
 # 이를 하나의 배치에 대한 손실을 계산하는 자체 함수 ``loss_batch`` 로 만들어보겠습니다.
 #
-# 훈련 데이터셋에 대한 옵티마이저를 전달하고 이를 사용하여 역전파를 수행합니다.
+# 학습 데이터셋에 대한 옵티마이저를 전달하고 이를 사용하여 역전파를 수행합니다.
 # 검증 데이터셋의 경우 옵티마이저를 전달하지 않으므로 메소드가 역전파를 수행하지 않습니다.
 
 
@@ -629,7 +629,7 @@ def loss_batch(model, loss_func, xb, yb, opt=None):
     return loss.item(), len(xb)
 
 ###############################################################################
-# ``fit`` 은 모델을 훈련하고 각 에폭에 대한 훈련 및 검증 손실을 계산하는 작업을 수행합니다.
+# ``fit`` 은 모델을 학습하고 각 에폭에 대한 학습 및 검증 손실을 계산하는 작업을 수행합니다.
 
 import numpy as np
 
@@ -659,26 +659,26 @@ def get_data(train_ds, valid_ds, bs):
     )
 
 ###############################################################################
-# 이제 dataloader를 가져오고 모델을 훈련하는 전체 프로세스를 3 줄의 코드로 실행할 수 있습니다:
+# 이제 dataloader를 가져오고 모델을 학습하는 전체 프로세스를 3 줄의 코드로 실행할 수 있습니다:
 
 train_dl, valid_dl = get_data(train_ds, valid_ds, bs)
 model, opt = get_model()
 fit(epochs, model, loss_func, opt, train_dl, valid_dl)
 
 ###############################################################################
-# 이러한 기본 3줄의 코드를 사용하여 다양한 모델을 훈련할 수 있습니다.
-# 컨볼루션 신경망(CNN)을 훈련하는 데 사용할 수 있는지 살펴 보겠습니다!
+# 이러한 기본 3줄의 코드를 사용하여 다양한 모델을 학습할 수 있습니다.
+# 컨볼루션 신경망(CNN)을 학습하는 데 사용할 수 있는지 살펴 보겠습니다!
 #
 # CNN 으로 넘어가기
 # --------------------
 #
-# 이제 3개의 컨볼루션 레이어로 신경망을 구축할 것입니다.
+# 이제 3개의 컨볼루션 계층으로 신경망을 구축할 것입니다.
 # 이전 섹션의 어떤 함수도 모델의 형식에 대해 가정하지 않기 때문에,
 # 별도의 수정없이 CNN을 학습하는 데 사용할 수 있습니다.
 #
 # Pytorch의 사전정의된
 # `Conv2d <https://pytorch.org/docs/stable/nn.html#torch.nn.Conv2d>`_ 클래스를
-# 컨볼루션 레이어로 사용합니다. 3개의 컨볼루션 레이어로 CNN을 정의합니다.
+# 컨볼루션 계층으로 사용합니다. 3개의 컨볼루션 계층으로 CNN을 정의합니다.
 # 각 컨볼루션 뒤에는 ReLU가 있습니다. 마지막으로 평균 풀링(average pooling)을 수행합니다.
 # (``view`` 는 PyTorch의 NumPy ``reshape`` 버전입니다.)
 
@@ -701,7 +701,7 @@ lr = 0.1
 
 ###############################################################################
 # `모멘텀(Momentum) <https://cs231n.github.io/neural-networks-3/#sgd>`_ 은
-# 이전 업데이트도 고려하고 일반적으로 더 빠른 훈련으로 이어지는 확률적 경사하강법(stochastic gradient descent)
+# 이전 업데이트도 고려하고 일반적으로 더 빠른 학습으로 이어지는 확률적 경사하강법(stochastic gradient descent)
 # 의 변형입니다.
 
 model = Mnist_CNN()
@@ -719,10 +719,10 @@ fit(epochs, model, loss_func, opt, train_dl, valid_dl)
 # ``Sequential`` 객체는 그 안에 포함된 각 모듈을 순차적으로 실행합니다.
 # 이것은 우리의 신경망을 작성하는 더 간단한 방법입니다.
 #
-# 이를 활용하려면 주어진 함수에서 **사용자정의 레이어(custom layer)** 를 쉽게
+# 이를 활용하려면 주어진 함수에서 **사용자정의 계층(custom layer)** 을 쉽게
 # 정의할 수 있어야 합니다.
-# 예를 들어, PyTorch에는 `view` 레이어가 없으므로 우리의 신경망 용으로 만들어야 합니다.
-# ``Lambda`` 는 ``Sequential`` 로 신경망을 정의할 때 사용할 수 있는 레이어를 생성할 것입니다.
+# 예를 들어, PyTorch에는 `view` 계층이 없으므로 우리의 신경망 용으로 만들어야 합니다.
+# ``Lambda`` 는 ``Sequential`` 로 신경망을 정의할 때 사용할 수 있는 계층을 생성할 것입니다.
 
 class Lambda(nn.Module):
     def __init__(self, func):
@@ -764,7 +764,7 @@ fit(epochs, model, loss_func, opt, train_dl, valid_dl)
 #  - 최종적으로 CNN 그리드 크기는 4\*4 라고 가정합니다. (이것은 우리가 사용한 평균 풀링 커널 크기 때문입니다.)
 #
 # 이 두 가지 가정을 제거하여 모델이 모든 2d 단일 채널(channel) 이미지에서 작동하도록 하겠습니다.
-# 먼저 초기 Lambda 레이어를 제거하고 데이터 전처리를 제네레이터(generator)로 이동시킬 수 있습니다:
+# 먼저 초기 Lambda 계층을 제거하고 데이터 전처리를 제네레이터(generator)로 이동시킬 수 있습니다:
 
 def preprocess(x, y):
     return x.view(-1, 1, 28, 28), y
@@ -850,11 +850,11 @@ fit(epochs, model, loss_func, opt, train_dl, valid_dl)
 # -----------------
 #
 # 이제 PyTorch를 사용하여 다양한 유형의 모델을 학습하는 데 사용할 수 있는 일반 데이터 파이프 라인과
-# 훈련 루프가 있습니다.
+# 학습 루프가 있습니다.
 # 이제 모델 학습이 얼마나 간단한지 확인하려면 `mnist_sample 노트북 <https://github.com/fastai/fastai_dev/blob/master/dev_nb/mnist_sample.ipynb>`__ 을 살펴보세요.
 #
 # 물론 데이터 증강(data augmentation), 초매개변수 조정(hyperparameter tuning),
-# 훈련과정 모니터링(monitoring training), 전이 학습(transfer learning) 등과 같이
+# 학습과정 모니터링(monitoring training), 전이 학습(transfer learning) 등과 같이
 # 추가하고 싶은 항목들이 많이 있을 것입니다.
 # 이러한 기능들은 이 튜토리얼에 표시된 것과 동일한 설계 접근 방식을 사용하여 개발된 fastai 라이브러리에서
 # 사용할 수 있으며, 모델을 더욱 발전시키려는 실무자에게 자연스러운 다음 단계를 제공합니다.
@@ -865,15 +865,15 @@ fit(epochs, model, loss_func, opt, train_dl, valid_dl)
 #
 #  - ``torch.nn``:
 #
-#    + ``Module``: 함수처럼 동작하지만, 또한 상태(state) (예를 들어, 신경망의 레이어 가중치)를
+#    + ``Module``: 함수처럼 동작하지만, 또한 상태(state) (예를 들어, 신경망의 계층 가중치)를
 #      포함할 수 있는 호출 가능한 오브젝트를 생성합니다.
-#      이는 포함된 ``Parameter`` (들)가 어떤 것인지 알고, 모든 기울기를 0으로 설정하고 가중치
+#      이는 포함된 ``Parameter`` (들)가 어떤 것인지 알고, 모든 변화도를 0으로 설정하고 가중치
 #      업데이트 등을 위해 반복할 수 있습니다.
 #    + ``Parameter``: ``Module`` 에 역전파 동안 업데이트가 필요한 가중치가 있음을 알려주는
 #      텐서용 래퍼입니다. `requires_grad` 속성이 설정된 텐서만 업데이트 됩니다.
 #    + ``functional``: 활성화 함수, 손실 함수 등을 포함하는 모듈 (관례에 따라 일반적으로
-#      ``F`` 네임스페이스로 임포트 됩니다) 이고, 물론 컨볼루션 및 선형 레이어 등에 대해서
-#      상태를 저장하지않는(non-stateful) 버전의 레이어를 포함합니다.
+#      ``F`` 네임스페이스로 임포트 됩니다) 이고, 물론 컨볼루션 및 선형 계층 등에 대해서
+#      상태를 저장하지않는(non-stateful) 버전의 계층을 포함합니다.
 #  - ``torch.optim``: 역전파 단계에서 ``Parameter`` 의 가중치를 업데이트하는,
 #    ``SGD`` 와 같은 옵티마이저를 포함합니다.
 #  - ``Dataset``: ``TensorDataset`` 과 같이 PyTorch와 함께 제공되는 클래스를 포함하여 ``__len__`` 및

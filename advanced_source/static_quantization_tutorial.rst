@@ -449,7 +449,7 @@ ImageNet 데이터
     top1, top5 = evaluate(myModel, criterion, data_loader_test, neval_batches=num_eval_batches)
     print('Evaluation accuracy on %d images, %2.2f'%(num_eval_batches * eval_batch_size, top1.avg))
 
-양자화된 모델은 eval 데이터셋에서 56.7%의 정확도를 보여줍니다. 이는 양자화 파라미터를 결정하기 위해 단순 min/max Observer를 사용했기 때문입니다. 그럼에도 불구하고 모델의 크기를 3.6 MB 밑으로 줄였습니다. 이는 거의 4분의 1 로 줄어든 크기입니다.
+양자화된 모델은 eval 데이터셋에서 56.7%의 정확도를 보여줍니다. 이는 양자화 매개변수를 결정하기 위해 단순 min/max Observer를 사용했기 때문입니다. 그럼에도 불구하고 모델의 크기를 3.6 MB 밑으로 줄였습니다. 이는 거의 4분의 1 로 줄어든 크기입니다.
 
 이에 더해 단순히 다른 양자화 설정을 사용하기만 해도 정확도를 큰 폭으로 향상시킬 수 있습니다.
 x86 아키텍처에서 양자화를 위한 권장 설정을 그대로 쓰기만 해도 됩니다.

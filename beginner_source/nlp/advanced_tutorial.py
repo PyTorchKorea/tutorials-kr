@@ -278,7 +278,7 @@ class BiLSTM_CRF(nn.Module):
         return score, tag_seq
 
 #####################################################################
-# 훈련 실행
+# 학습 실행
 
 
 START_TAG = "<START>"
@@ -286,7 +286,7 @@ STOP_TAG = "<STOP>"
 EMBEDDING_DIM = 5
 HIDDEN_DIM = 4
 
-# 훈련용 데이터를 만듭니다.
+# 학습용 데이터를 만듭니다.
 training_data = [(
     "the wall street journal reported today that apple corporation made money".split(),
     "B I I I O O O B I O O".split()
@@ -306,7 +306,7 @@ tag_to_ix = {"B": 0, "I": 1, "O": 2, START_TAG: 3, STOP_TAG: 4}
 model = BiLSTM_CRF(len(word_to_ix), tag_to_ix, EMBEDDING_DIM, HIDDEN_DIM)
 optimizer = optim.SGD(model.parameters(), lr=0.01, weight_decay=1e-4)
 
-# 훈련 전 예측 결과를 확인합니다.
+# 학습 전 예측 결과를 확인합니다.
 with torch.no_grad():
     precheck_sent = prepare_sequence(training_data[0][0], word_to_ix)
     precheck_tags = torch.tensor([tag_to_ix[t] for t in training_data[0][1]], dtype=torch.long)
@@ -334,7 +334,7 @@ for epoch in range(
         loss.backward()
         optimizer.step()
 
-# 훈련이 끝난 후 예측 결과를 확인합니다.
+# 학습이 끝난 후 예측 결과를 확인합니다.
 with torch.no_grad():
     precheck_sent = prepare_sequence(training_data[0][0], word_to_ix)
     print(model(precheck_sent))

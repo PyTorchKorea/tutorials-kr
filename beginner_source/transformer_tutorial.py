@@ -30,15 +30,15 @@ PyTorch 1.2 버젼에는 `Attention is All You Need <https://arxiv.org/pdf/1706.
 ######################################################################
 # 이 튜토리얼에서, 우리는 ``nn.TransformerEncoder`` 모델을 언어 모델링(language modeling) 과제에 대해서 학습시킬 것입니다.
 # 언어 모델링 과제는 주어진 단어 (또는 단어의 시퀀스) 가 다음에 이어지는 단어 시퀀스를 따를 가능성(likelihood)에 대한 확률을 할당하는 것입니다.
-# 먼저, 토큰(token) 들의 시퀀스가 임베딩(embedding) 레이어로 전달되며, 이어서 포지셔널 인코딩(positional encoding) 레이어가 각 단어의 순서를 설명합니다.
+# 먼저, 토큰(token) 들의 시퀀스가 임베딩(embedding) 계층으로 전달되며, 이어서 포지셔널 인코딩(positional encoding) 계층이 각 단어의 순서를 설명합니다.
 # (더 자세한 설명은 다음 단락을 참고해주세요.)
 # ``nn.TransformerEncoder`` 는 여러 개의
 # `nn.TransformerEncoderLayer <https://pytorch.org/docs/stable/generated/torch.nn.TransformerEncoderLayer.html>`__
-# 레이어로 구성되어 있습니다.
-# ``nn.TransformerEncoder`` 내부의 셀프-어텐션(self-attention) 레이어들은 시퀀스 안에서의 이전 포지션에만 집중하도록 허용되기 때문에,
+# 계층으로 구성되어 있습니다.
+# ``nn.TransformerEncoder`` 내부의 셀프-어텐션(self-attention) 계층들은 시퀀스 안에서의 이전 포지션에만 집중하도록 허용되기 때문에,
 # 입력(input) 순서와 함께, 정사각 형태의 어텐션 마스크(attention mask) 가 필요합니다.
 # 언어 모델링 과제를 위해서, 미래의 포지션에 있는 모든 토큰들은 마스킹 되어야(가려져야) 합니다.
-# 실제 단어를 얻기 위해서, ``nn.TransformerEncoder`` 의 출력은 로그-소프트맥스(log-Softmax) 로 이어지는 최종 선형(Linear) 레이어로 전달 됩니다.
+# 실제 단어를 얻기 위해서, ``nn.TransformerEncoder`` 의 출력은 로그-소프트맥스(log-Softmax) 로 이어지는 최종 선형(Linear) 계층으로 전달 됩니다.
 #
 
 import math
@@ -137,7 +137,7 @@ class PositionalEncoding(nn.Module):
 #      %%bash
 #      pip install torchdata
 #
-# 어휘(vocab) 객체는 훈련 데이터셋(train dataset) 에 의하여 만들어지고, 토큰(token)을 텐서(tensor)로 수치화하는데 사용됩니다.
+# 어휘(vocab) 객체는 학습 데이터셋(train dataset) 에 의하여 만들어지고, 토큰(token)을 텐서(tensor)로 수치화하는데 사용됩니다.
 # Wikitext-2에서 보기 드문 토큰(rare token)은 `<unk>` 로 표현됩니다.
 #
 # 주어진 1D 벡터의 시퀀스 데이터에서, ``batchify()`` 함수는 데이터를 ``batch_size`` 컬럼들로 정렬합니다.
@@ -257,7 +257,7 @@ emsize = 200 # 임베딩 차원
 d_hid = 200 # ``nn.TransformerEncoder`` 에서 피드포워드 네트워크(feedforward network) 모델의 차원
 nlayers = 2 # ``nn.TransformerEncoder`` 내부의 nn.TransformerEncoderLayer 개수
 nhead = 2 # ``nn.MultiheadAttention`` 의 헤드 개수
-dropout = 0.2 # 드랍아웃(dropout) 확률
+dropout = 0.2 # 드롭아웃(dropout) 확률
 model = TransformerModel(ntokens, emsize, nhead, d_hid, nlayers, dropout).to(device)
 
 
@@ -272,7 +272,7 @@ model = TransformerModel(ntokens, emsize, nhead, d_hid, nlayers, dropout).to(dev
 # `SGD <https://pytorch.org/docs/stable/generated/torch.optim.SGD.html>`__ (확률적 경사 하강법) 옵티마이저(optimizer)와
 # 함께 사용하였습니다. 학습률(learning rate)는 5.0으로 초기화하였으며 `StepLR <https://pytorch.org/docs/master/optim.html?highlight=steplr#torch.optim.lr_scheduler.StepLR>`__
 # 스케쥴을 따릅니다. 학습하는 동안, `nn.utils.clip_grad_norm\_ <https://pytorch.org/docs/stable/generated/torch.nn.utils.clip_grad_norm_.html>`__
-# 을 사용하여 기울기(gradient)가 폭발(exploding)하지 않도록 합니다.
+# 을 사용하여 변화도(gradient)가 폭발(exploding)하지 않도록 합니다.
 #
 
 import copy

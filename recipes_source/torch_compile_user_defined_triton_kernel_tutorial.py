@@ -89,7 +89,7 @@ else:
 # 실행할 수 있습니다. 아래는 ``torch.compile``과 ``triton.autotune``을 사용하는 예제입니다.
 #
 # .. note::
-#   ``torch.compile``은 ``triton.autotune``에 대한 configs와 key 인수만 지원합니다.
+#   ``torch.compile``은 ``triton.autotune``에 대한 configs와 key 인자만 지원합니다.
 #
 
 if not has_triton():

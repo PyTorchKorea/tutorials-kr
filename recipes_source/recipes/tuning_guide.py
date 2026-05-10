@@ -142,7 +142,7 @@ def gelu(x):
 # 효율을 개선할 수 있습니다.
 #
 # 체크포인트 저장할 대상은 신중하게 선택해야 합니다. 가장 좋은 방법은 재계산 비용이 적은 대규모 
-# 레이어의 출력을 저장하지 않는 것입니다. 예를 들어, 활성화 함수(예시: ``ReLU`` , ``Sigmoid`` 
+# 계층의 출력을 저장하지 않는 것입니다. 예를 들어, 활성화 함수(예시: ``ReLU`` , ``Sigmoid`` 
 # , ``Tanh`` ), up/down 샘플링, 작은 누적 깊이(accumulation depth)를 가진 행렬-벡터 연산 
 # 등이 체크포인트 저장 대상으로 적합합니다.
 #
@@ -387,7 +387,7 @@ torch.backends.cudnn.benchmark = True
 # 장치에서 생성합니다.
 # ``torch.rand(size, device='cuda')``
 #
-# 이는 다음과 같이 ``device`` 인수를 받아 새로운 tensor를 생성하는 모든 함수에 적용됩니다:
+# 이는 다음과 같이 ``device`` 인자를 받아 새로운 tensor를 생성하는 모든 함수에 적용됩니다:
 # `torch.rand() <https://pytorch.org/docs/stable/generated/torch.rand.html#torch.rand>`_,
 # `torch.zeros() <https://pytorch.org/docs/stable/generated/torch.zeros.html#torch.zeros>`_,
 # `torch.full() <https://pytorch.org/docs/stable/generated/torch.full.html#torch.full>`_
@@ -408,8 +408,8 @@ torch.backends.cudnn.benchmark = True
 #
 #   * `Deep Learning Performance Documentation
 #     <https://docs.nvidia.com/deeplearning/performance/index.html#optimizing-performance>`_
-#     에서 자세한 정보와 레이어 유형에 따른 가이드라인을 참조하세요.
-#   * 레이어 크기가 고정되지 않고 다른 매개변수에서 유도되는 경우에도 명시적으로 패딩할 수 있습니다. 
+#     에서 자세한 정보와 계층 유형에 따른 가이드라인을 참조하세요.
+#   * 계층 크기가 고정되지 않고 다른 매개변수에서 유도되는 경우에도 명시적으로 패딩할 수 있습니다. 
 #     (예시: NLP 모델의 어휘 크기 등).
 #
 # * AMP 활성화하기
@@ -436,7 +436,7 @@ torch.backends.cudnn.benchmark = True
 # 일반적인 해결 방법은 미리 할당(preallocation)을 구현하는 것입니다. 
 # 다음 단계로 구성됩니다:
 #
-# #. 최대 시퀀스 길이(훈련 데이터 세트의 최대 길이 또는 사전 정의된 임계값에 해당)를 갖는 (일반적으로 
+# #. 최대 시퀀스 길이(학습 데이터 세트의 최대 길이 또는 사전 정의된 임계값에 해당)를 갖는 (일반적으로 
 #    무작위) 입력 배치를 생성합니다.
 # #. 생성된 배치로 순방향 및 역방향 과정을 실행합니다. 옵티마이저나 학습률 스케줄러는 실행하지 않으며, 
 #    이 단계는 이후 학습에서 재사용할 수 있는 최대 크기의 버퍼를 미리 할당합니다.
@@ -478,13 +478,13 @@ torch.backends.cudnn.benchmark = True
 # 따르고 필요한 변화도 all-reduce를 수행해야 합니다.
 
 ###############################################################################
-# ``DistributedDataParallel(find_unused_parameters=True)`` 를 사용할 때 생성자와 실행 레이어 순서를 일치시키는 방법
+# ``DistributedDataParallel(find_unused_parameters=True)`` 를 사용할 때 생성자와 실행 계층 순서를 일치시키는 방법
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # `torch.nn.parallel.DistributedDataParallel <https://pytorch.org/docs/stable/generated/torch.nn.parallel.DistributedDataParallel.html#torch.nn.parallel.DistributedDataParallel>`_
-# 은 ``find_unused_parameters=True`` 와 함께 모델 생성자에서의 레이어와 파라미터 순서를 
+# 은 ``find_unused_parameters=True`` 와 함께 모델 생성자에서의 계층과 매개변수 순서를 
 # 사용하여 ``DistributedDataParallel`` 변화도 all-reduce를 위한 버킷을 만듭니다. 
 # ``DistributedDataParallel`` 은 all-reduce를 역전파와 겹치게 수행합니다. 특정 버킷에 대한 
-# all-reduce는 주어진 버킷의 모든 파라미터에 대한 변화도가 모두 준비되었을 때 비동기적으로 작동됩니다.
+# all-reduce는 주어진 버킷의 모든 매개변수에 대한 변화도가 모두 준비되었을 때 비동기적으로 작동됩니다.
 #
 # 최대로 겹치게 하려면 모델 생성자에서의 순서가 실제 실행 중인 순서와 대략적으로 일치해야 합니다. 
 # 순서가 맞지 않으면 전체 버킷에 대한 all-reduce는 마지막으로 도착하는 변화도를 기다리게 되며, 
@@ -493,8 +493,8 @@ torch.backends.cudnn.benchmark = True
 #
 # ``find_unused_parameters=False`` 가 (기본 설정)인 ``DistributedDataParallel`` 은 
 # 역전파 중에 발견된 연산 순서를 기반으로 자동으로 버킷을 형성합니다. 
-# ``find_unused_parameters=False`` 를 사용할 때는 최적의 성능을 달성하기 위해 레이어나 
-# 파라미터의 순서를 재조정할 필요가 없습니다.
+# ``find_unused_parameters=False`` 를 사용할 때는 최적의 성능을 달성하기 위해 계층이나 
+# 매개변수의 순서를 재조정할 필요가 없습니다.
 
 ###############################################################################
 # 분산 설정에서 작업 부하를 분산하는 방법
