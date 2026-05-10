@@ -48,6 +48,7 @@
 |activation|활성화|조형서||
 |API endpoint|API 엔드포인트|박정환|음차 표기|
 |argument|인자|박정환||
+|attention|어텐션|강정민|음차 표기|
 |attribution|속성|정휘수||
 |Audio|오디오|박정환|ToC의 분류명입니다.|
 |augmentation|증강|이재복||
