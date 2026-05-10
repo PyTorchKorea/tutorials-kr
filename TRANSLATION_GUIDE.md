@@ -81,6 +81,7 @@
 |instance|인스턴스|박정환|음차 표기|
 |instantiate|생성하다|박정환||
 |interpreter|인터프리터|이종법|음차 표기|
+|knowledge distillation|지식 증류|정인호||
 |Layer|계층|박정환||
 |learning rate, lr|학습률|박정환||
 |loss|손실|박정환||
