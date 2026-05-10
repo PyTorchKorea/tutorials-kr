@@ -94,6 +94,7 @@
 |momentum|모멘텀|박정환|음차 표기|
 |normalize|정규화|허남규||
 |NumPy|NumPy|박정환|번역하지 않음|
+|object detection|객체 탐지|임예윤||
 |One-Hot|One-Hot|황성수|번역안함|
 |Optimizer|옵티마이저|박정환|음차 표기|
 |output|출력|박정환||
