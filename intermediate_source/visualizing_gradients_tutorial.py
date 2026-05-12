@@ -1,32 +1,29 @@
 """
-Visualizing Gradients
+변화도 시각화
 =====================
 
-**Author:** `Justin Silver <https://github.com/j-silv>`__
+**저자:** `Justin Silver <https://github.com/j-silv>`__
 
-This tutorial explains how to extract and visualize gradients at any
-layer in a neural network. By inspecting how information flows from the
-end of the network to the parameters we want to optimize, we can debug
-issues such as `vanishing or exploding
-gradients <https://arxiv.org/abs/1211.5063>`__ that occur during
-training.
+이 튜토리얼은 신경망의 어떤 계층에서든 변화도를 추출하고 시각화하는 방법을 설명합니다. 
+어떻게 정보가 네트워크의 끝에서 우리가 원하는 매개변수까지 흐르는지 점검함으로써 
+우리는 학습 중 발생하는 `변화도 소실 또는 폭발 <https://arxiv.org/abs/1211.5063>`__과 같은 
+문제를 디버깅할 수 있습니다.
 
-Before starting, make sure you understand `tensors and how to manipulate
-them <https://docs.tutorials.pytorch.kr/beginner/basics/tensorqs_tutorial.html>`__.
-A basic knowledge of `how autograd
-works <https://docs.tutorials.pytorch.kr/beginner/basics/autogradqs_tutorial.html>`__
-would also be useful.
-
+시작하기 전에 `tensor와 그것들을 조작하는 방법
+<https://docs.tutorials.pytorch.kr/beginner/basics/tensorqs_tutorial.html>`__을 확실히 이해하세요.
+기본적인 `autograd 작동법
+<https://docs.tutorials.pytorch.kr/beginner/basics/autogradqs_tutorial.html>`__
+을 알아두는 것 또한 유용합니다.
 """
 
 
 ######################################################################
-# Setup
+# 설정
 # -----
 #
-# First, make sure `PyTorch is
-# installed <https://pytorch.org/get-started/locally/>`__ and then import
-# the necessary libraries.
+# 우선, `파이토치가 설치되었는지
+# <https://pytorch.org/get-started/locally/>`__ 확인하고
+# 필요한 라이브러리들을 import하세요.
 #
 
 import torch
@@ -37,25 +34,25 @@ import matplotlib.pyplot as plt
 
 
 ######################################################################
-# Next, we’ll be creating a network intended for the MNIST dataset,
-# similar to the architecture described by the `batch normalization
-# paper <https://arxiv.org/abs/1502.03167>`__.
+# 다음으로, '배치 정규화 논문 <https://arxiv.org/abs/1502.03167>'__에서
+# 설명된 아키텍처와 유사한, MNIST 데이터셋에 적합한 네트워크를 구축할 것입니다.
+# 
 #
-# To illustrate the importance of gradient visualization, we will
-# instantiate one version of the network with batch normalization
-# (BatchNorm), and one without it. Batch normalization is an extremely
-# effective technique to resolve `vanishing/exploding
-# gradients <https://arxiv.org/abs/1211.5063>`__, and we will be verifying
-# that experimentally.
+# 변화도 시각화의 중요성을 설명하기 위해, 우리는 배치 정규화를 적용한
+# 네트워크 버전(BatchNorm)과 적용하지 않은 버전을 각각 하나씩 생성할 것입니다.
+# 우리는 배치 정규화가 `변화도 소실/폭발 <https://arxiv.org/abs/1211.5063>`__을
+# 해결하는 데 매우 효과적인 기술임을 실험적으로 검증할 것입니다.
+# 
+# 
 #
-# The model we use has a configurable number of repeating fully-connected
-# layers which alternate between ``nn.Linear``, ``norm_layer``, and
-# ``nn.Sigmoid``. If batch normalization is enabled, then ``norm_layer``
-# will use
-# `BatchNorm1d <https://docs.pytorch.org/docs/stable/generated/torch.nn.BatchNorm1d.html>`__,
-# otherwise it will use the
+# 우리가 사용하는 모델은 ``nn.Linear``, ``norm_layer``, 그리고 ``nn.Sigmoid``를
+# 번갈아 사용하는 변경 가능한 개수의, 반복되는 완전 연결(fully-connected) 계층을 가지고 있습니다.
+# `norm_layer`는 배치 정규화가 활성화된 경우에는 
+# `BatchNorm1d <https://docs.pytorch.org/docs/stable/generated/torch.nn.BatchNorm1d.html>`__
+# 을 사용하고 그렇지 않은 경우에는
 # `Identity <https://docs.pytorch.org/docs/stable/generated/torch.nn.Identity.html>`__
-# transformation.
+# 변환을 사용할 것입니다.
+# 
 #
 
 def fc_layer(in_size, out_size, norm_layer):
@@ -88,15 +85,15 @@ class Net(nn.Module):
 
 
 ######################################################################
-# Next we set up some dummy data, instantiate two versions of the model,
-# and initialize the optimizers.
+# 이제 우리는 더미 데이터(dummy data)를 준비하여 두 버전의 모델을 생성하고
+# 옵티마이저를 초기화합니다.
 #
 
-# set up dummy data
+# 더미 데이터(dummy data) 설정
 x = torch.randn(10, 28, 28)
 y = torch.randint(10, (10, ))
 
-# init model
+# 모델 초기화
 model_bn = Net(batchnorm=True, num_layers=3)
 model_nobn = Net(batchnorm=False, num_layers=3)
 
@@ -109,8 +106,8 @@ optimizer_nobn = optim.SGD(model_nobn.parameters(), lr=0.01, momentum=0.9)
 
 
 ######################################################################
-# We can verify that batch normalization is only being applied to one of
-# the models by probing one of the internal layers:
+# 우리는 내부 레이어 중 하나를 조사하여 배치 정규화가 하나의 모델에만 
+# 적용되는지 확인할 수 있습니다.
 #
 
 print(model_bn.layers[0])
@@ -118,28 +115,28 @@ print(model_nobn.layers[0])
 
 
 ######################################################################
-# Registering hooks
+# 훅 등록
 # -----------------
 #
 
 
 ######################################################################
-# Because we wrapped up the logic and state of our model in a
-# ``nn.Module``, we need another method to access the intermediate
-# gradients if we want to avoid modifying the module code directly. This
-# is done by `registering a
-# hook <https://docs.pytorch.org/docs/stable/notes/autograd.html#backward-hooks-execution>`__.
+# 우리가 ``nn.Module`` 안에 있는 모델의 논리(logic)와 상태를 래핑(wrap up)했기 때문에, 
+# 모듈 코드를 직접 수정하지 않고 중간 변화도에 접근하기 위해서는 새로운 방법이 필요합니다.
+# 새로운 방법은 `훅 등록하기 <https://docs.pytorch.org/docs/stable/notes/autograd.html#backward-hooks-execution>`__
+# 를 통해 수행할 수 있습니다.
+# 
 #
-# .. warning::
+# .. 경고::
 #
-#    Using backward pass hooks attached to output tensors is preferred over using ``retain_grad()`` on the tensors themselves. An alternative method is to directly attach module hooks (e.g. ``register_full_backward_hook()``) so long as the ``nn.Module`` instance does not do perform any in-place operations. For more information, please refer to `this issue <https://github.com/pytorch/pytorch/issues/61519>`__.
+#    tensor 자체에 ``retain_grad()``를 사용하는 것보다 출력 tensor에 연결된 역전파 훅을 사용하는 것이 권장됩니다. ``nn.Module`` 인스턴스가 제자리 연산(in-place operation)을 수행하지 않는다면 모듈 훅을 직접 연결하는 대안(예:``register_full_backward_hook()``)도 있습니다. 더 자세한 정보는 `이 이슈 <https://github.com/pytorch/pytorch/issues/61519>`__를 참고해 주세요.
 #
-# The following code defines our hooks and gathers descriptive names for
-# the network’s layers.
+# 다음 코드는 훅을 정의하고 네트워크 계층(network layer)에 대한 묘사 명칭(descriptive name)을 수집합니다.
+# 
 #
 
-# note that wrapper functions are used for Python closure
-# so that we can pass arguments.
+# 인자를 전달할 수 있도록 파이썬 클로저를 위해 래퍼 함수가 사용된다는 점을 유의하세요.
+# 
 
 def hook_forward(module_name, grads, hook_backward):
     def hook(module, args, output):
@@ -154,12 +151,12 @@ def hook_backward(module_name, grads):
     return hook
 
 def get_all_layers(model, hook_forward, hook_backward):
-    """Register forward pass hook (which registers a backward hook) to model outputs
+    """모델 출력값에 순전파 훅을 등록하고, 이 훅 내부에서 역전파 훅도 등록합니다.
 
-    Returns:
-        - layers: a dict with keys as layer/module and values as layer/module names
+    반환값:
+        - 계층: 계층/모듈 객체와 이름을 각각 key와 value로 가지는 딕셔너리
                   e.g. layers[nn.Conv2d] = layer1.0.conv1
-        - grads: a list of tuples with module name and tensor output gradient
+        - 변화도: 모듈 이름과 출력 tensor의 변화도로 이루어진 튜플들의 목록
                  e.g. grads[0] == (layer1.0.conv1, tensor.Torch(...))
     """
     layers = dict()
@@ -171,24 +168,24 @@ def get_all_layers(model, hook_forward, hook_backward):
             layer.register_forward_hook(hook_forward(name, grads, hook_backward))
     return layers, grads
 
-# register hooks
+# 훅 등록
 layers_bn, grads_bn = get_all_layers(model_bn, hook_forward, hook_backward)
 layers_nobn, grads_nobn = get_all_layers(model_nobn, hook_forward, hook_backward)
 
 
 ######################################################################
-# Training and visualization
+# 학습 및 시각
 # --------------------------
 #
-# Let’s now train the models for a few epochs:
+# 이제 모델을 몇 에폭 동안 학습시켜 보겠습니다:
 #
 
 epochs = 10
 
 for epoch in range(epochs):
 
-    # important to clear, because we append to
-    # outputs everytime we do a forward pass
+    # 순전파를 수행할 때마다 출력값을 덧붙일 것이므로 비우는 것(clear)이 중요합니다.  
+    # 
     grads_bn.clear()
     grads_nobn.clear()
 
@@ -209,10 +206,10 @@ for epoch in range(epochs):
 
 
 ######################################################################
-# After running the forward and backward pass, the gradients for all the
-# intermediate tensors should be present in ``grads_bn`` and
-# ``grads_nobn``. We compute the mean absolute value of each gradient
-# matrix so that we can compare the two models.
+# 순방향 및 역방향 패스를 실행한 후, 모든 중간 tensor에 대한 변화도는
+# ``grads_bn``과 ``grads_nobn``에 존재해야 합니다.
+# 두 모델을 비교할 수 있도록 각 기울기 행렬의 평균 절댓값을 계산합니다.
+# 
 #
 
 def get_grads(grads):
@@ -231,11 +228,11 @@ layer_idx_nobn, avg_grads_nobn = get_grads(grads_nobn)
 
 
 ######################################################################
-# With the average gradients computed, we can now plot them and see how
-# the values change as a function of the network depth. Notice that when
-# we don’t apply batch normalization, the gradient values in the
-# intermediate layers fall to zero very quickly. The batch normalization
-# model, however, maintains non-zero gradients in its intermediate layers.
+# 우리는 이제 계산한 평균 변화도를 그래프로 나타내어 네트워크 깊이에 따라
+# 값이 어떻게 변하는지 확인할 수 있습니다.
+# 우리가 배치 정규화를 적용하지 않으면 중간 기울기의 변화도가
+# 급격하게 0으로 낮아지는 것을 알 수 있습니다.
+# 
 #
 
 fig, ax = plt.subplots()
@@ -250,39 +247,39 @@ plt.show()
 
 
 ######################################################################
-# Conclusion
+# 결론
 # ----------
+# 이 튜토리얼에서는 `nn.Module`클래스로 래핑된 신경망을 통해 변화도 흐름을
+# 시각화하는 방법을 설명하였습니다.
+# 또한, 배치 정규화가 심층 신경망에서 발생하는 기울기 소실 문제를 완화하는 데
+# 어떻게 도움이 되는지를 정성적으로 보여주었습니다.
+# 
 #
-# In this tutorial, we demonstrated how to visualize the gradient flow
-# through a neural network wrapped in a ``nn.Module`` class. We
-# qualitatively showed how batch normalization helps to alleviate the
-# vanishing gradient issue which occurs with deep neural networks.
-#
-# If you would like to learn more about how PyTorch’s autograd system
-# works, please visit the `references <#references>`__ below. If you have
-# any feedback for this tutorial (improvements, typo fixes, etc.) then
-# please use the `PyTorch Forums <https://discuss.pytorch.org/>`__ and/or
-# the `issue tracker <https://github.com/pytorchkorea/tutorials-kr/issues>`__ to
-# reach out.
+# 파이토치의 자동 미분 시스템 작동하는 방식을 추가로 학습하고 싶다면
+# 아래 `참고 자료 <#references>`__를 확인하세요.
+# 이 튜토리얼에 대한 피드백(개선 사항, 오타 수정 등)이 있다면 `파이토치 포럼<https://discuss.pytorch.org/>`__
+# 그리고/또는 `이슈 트래커 <https://github.com/pytorchkorea/tutorials-kr/issues>`__
+# 를 통해 알려주시기 바랍니다.
+# 
 #
 
 
 ######################################################################
-# (Optional) Additional exercises
+# (선택 사항) 추가 연습
 # -------------------------------
 #
-# -  Try increasing the number of layers (``num_layers``) in our model and
-#    see what effect this has on the gradient flow graph
-# -  How would you adapt the code to visualize average activations instead
-#    of average gradients? (*Hint: in the hook_forward() function we have
-#    access to the raw tensor output*)
-# -  What are some other methods to deal with vanishing and exploding
-#    gradients?
+# -  모델의 레이어 수(``num_layers``)를 늘려보고 
+#    이것이 변화 흐름 그래프에 어떤 영향을 미치는지 확인해 보세요.
+# -  평균 변화도 대신 평균 활성값을 시각화하려면 코드를 어떻게 수정해야 할까요?
+#    (*힌트: hook_forward() 함수가 원시 tensor 출력에 접근할 수 있습니다*)
+#    
+# -  변화도 소실 및 폭주 문제를 해결하기 위한 다른 방법에는 어떤 것들이 있을까요?
+#    
 #
 
 
 ######################################################################
-# References
+# 참고 문헌
 # ----------
 #
 # -  `A Gentle Introduction to
