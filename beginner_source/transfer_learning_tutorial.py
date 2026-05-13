@@ -65,7 +65,7 @@ plt.ion()   # 대화형 모드
 # 이 데이터셋은 ImageNet의 아주 작은 일부입니다.
 #
 # .. Note ::
-#    데이터를 `여기 <https://download.pytorch.org/tutorial/hymenoptera_data.zip>`_\
+#    데이터를 `여기 <https://download.pytorch.org/tutorial/hymenoptera_data.zip>`_
 #    에서 다운로드 받아 현재 디렉토리에 압축을 푸십시오.
 
 # 학습을 위해 데이터 증가(augmentation) 및 일반화(normalization)
