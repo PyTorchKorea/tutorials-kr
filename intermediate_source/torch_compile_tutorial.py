@@ -1,29 +1,29 @@
 # -*- coding: utf-8 -*-
 
 """
-Introduction to ``torch.compile``
+``torch.compile`` 소개
 =================================
-**Author:** William Wen
+**저자:** William Wen
 """
 
 ######################################################################
-# ``torch.compile`` is the latest method to speed up your PyTorch code!
-# ``torch.compile`` makes PyTorch code run faster by
-# JIT-compiling PyTorch code into optimized kernels,
-# all while requiring minimal code changes.
+# ``torch.compile``은 PyTorch 코드를 더 빠르게 실행하는 최신 메소드입니다!
+# ``torch.compile``은 PyTorch 코드를
+# 최적화된 커널로 JIT 컴파일하여
+# 최소한의 코드 변경만으로 PyTorch 코드를 더 빠르게 실행합니다.
 #
-# In this tutorial, we cover basic ``torch.compile`` usage,
-# and demonstrate the advantages of ``torch.compile`` over
-# previous PyTorch compiler solutions, such as
-# `TorchScript <https://pytorch.org/docs/stable/jit.html>`__ and
-# `FX Tracing <https://pytorch.org/docs/stable/fx.html#torch.fx.symbolic_trace>`__.
+# 이 튜토리얼에서는 ``torch.compile``의 기본 사용법을 다루며
+# `TorchScript <https://pytorch.org/docs/stable/jit.html>`__ 및
+# `FX Tracing <https://pytorch.org/docs/stable/fx.html#torch.fx.symbolic_trace>`__\ 과 같은
+# 이전 PyTorch 컴파일러 솔루션에 비해
+# ``torch.compile``의 장점을 보여줍니다.
 #
-# **Contents**
+# **목차**
 #
 # .. contents::
 #     :local:
 #
-# **Required pip Dependencies**
+# **필수 pip 의존성**
 #
 # - ``torch >= 2.0``
 # - ``torchvision``
@@ -31,13 +31,13 @@ Introduction to ``torch.compile``
 # - ``scipy``
 # - ``tabulate``
 #
-# **System Requirements**
-# - A C++ compiler, such as ``g++``
-# - Python development package (``python-devel``/``python-dev``)
+# **시스템 요구 사항**
+# - ``g++``와 같은 C++ 컴파일러
+# - Python 개발 패키지(``python-devel``/``python-dev``)
 
 ######################################################################
-# NOTE: a modern NVIDIA GPU (H100, A100, or V100) is recommended for this tutorial in
-# order to reproduce the speedup numbers shown below and documented elsewhere.
+# 참고: 아래와 다른 문서에 제시된 속도 향상 수치를 재현하기 위해
+# 이 튜토리얼에는 최신 NVIDIA GPU(H100, A100 또는 V100)를 사용하는 것이 좋습니다.
 
 import torch
 import warnings
@@ -55,18 +55,18 @@ if not gpu_ok:
     )
 
 ######################################################################
-# Basic Usage
+# 기본 사용법
 # ------------
 #
-# ``torch.compile`` is included in the latest PyTorch.
-# Running TorchInductor on GPU requires Triton, which is included with the PyTorch 2.0 nightly
-# binary. If Triton is still missing, try installing ``torchtriton`` via pip
-# (``pip install torchtriton --extra-index-url "https://download.pytorch.org/whl/nightly/cu117"``
-# for CUDA 11.7).
+# ``torch.compile``은 최신 PyTorch에 포함되어 있습니다.
+# GPU에서 TorchInductor를 실행하려면 Triton이 필요하며 Triton은 PyTorch 2.0 nightly
+# 바이너리에 포함되어 있습니다. Triton이 없다면 pip로 ``torchtriton`` 설치를 시도해보세요
+# (CUDA 11.7의 경우
+# ``pip install torchtriton --extra-index-url "https://download.pytorch.org/whl/nightly/cu117"``).
 #
-# Arbitrary Python functions can be optimized by passing the callable to
-# ``torch.compile``. We can then call the returned optimized
-# function in place of the original function.
+# 임의의 Python 함수는 호출 가능한 객체(callable)를
+# ``torch.compile``에 전달하여 최적화할 수 있습니다.
+# 그러면 반환한 최적화 함수를 원래 함수 대신 호출할 수 있습니다.
 
 def foo(x, y):
     a = torch.sin(x)
@@ -76,7 +76,7 @@ opt_foo1 = torch.compile(foo)
 print(opt_foo1(torch.randn(10, 10), torch.randn(10, 10)))
 
 ######################################################################
-# Alternatively, we can decorate the function.
+# 또는 함수를 데코레이트할 수 있습니다.
 t1 = torch.randn(10, 10)
 t2 = torch.randn(10, 10)
 
@@ -88,7 +88,7 @@ def opt_foo2(x, y):
 print(opt_foo2(t1, t2))
 
 ######################################################################
-# We can also optimize ``torch.nn.Module`` instances.
+# ``torch.nn.Module`` 인스턴스도 최적화할 수 있습니다.
 
 t = torch.randn(10, 100)
 
@@ -103,14 +103,14 @@ class MyModule(torch.nn.Module):
 mod = MyModule()
 mod.compile()
 print(mod(t))
-## or:
+## 또는:
 # opt_mod = torch.compile(mod)
 # print(opt_mod(t))
 
 ######################################################################
-# torch.compile and Nested Calls
+# torch.compile과 중첩 호출
 # ------------------------------
-# Nested function calls within the decorated function will also be compiled.
+# ``torch.compile``은 데코레이트한 함수 안의 중첩 함수 호출도 함께 컴파일합니다.
 
 def nested_function(x):
     return torch.sin(x)
@@ -124,8 +124,8 @@ def outer_function(x, y):
 print(outer_function(t1, t2))
 
 ######################################################################
-# In the same fashion, when compiling a module all sub-modules and methods
-# within it, that are not in a skip list, are also compiled.
+# 같은 방식으로 모듈을 컴파일할 때 컴파일에서 제외할 목록(skip list)에 없는
+# 모듈 안의 모든 하위 모듈과 메소드도 함께 컴파일합니다.
 
 class OuterModule(torch.nn.Module):
     def __init__(self):
@@ -142,19 +142,18 @@ outer_mod.compile()
 print(outer_mod(t))
 
 ######################################################################
-# We can also disable some functions from being compiled by using
-# ``torch.compiler.disable``. Suppose you want to disable the tracing on just
-# the ``complex_function`` function, but want to continue the tracing back in
-# ``complex_conjugate``. In this case, you can use
-# ``torch.compiler.disable(recursive=False)`` option. Otherwise, the default is
-# ``recursive=True``.
+# ``torch.compiler.disable``을 사용하여 일부 함수의 컴파일을 비활성화할 수도 있습니다.
+# ``complex_function`` 함수에서만 추적을 비활성화하고
+# ``complex_conjugate``에서는 다시 추적을 계속하고 싶다고 가정해봅시다.
+# 이 경우 ``torch.compiler.disable(recursive=False)`` 옵션을 사용할 수 있습니다.
+# 그렇지 않으면 기본값은 ``recursive=True``입니다.
 
 def complex_conjugate(z):
     return torch.conj(z)
 
 @torch.compiler.disable(recursive=False)
 def complex_function(real, imag):
-    # Assuming this function cause problems in the compilation
+    # 이 함수가 컴파일 중 문제를 일으킨다고 가정합니다.
     z = torch.complex(real, imag)
     return complex_conjugate(z)
 
@@ -164,7 +163,7 @@ def outer_function():
     z = complex_function(real, imag)
     return torch.abs(z)
 
-# Try to compile the outer_function
+# outer_function 컴파일을 시도합니다.
 try:
     opt_outer_function = torch.compile(outer_function)
     print(opt_outer_function())
@@ -172,54 +171,54 @@ except Exception as e:
     print("Compilation of outer_function failed:", e)
 
 ######################################################################
-# Best Practices and Recommendations
+# 모범 사례와 권장 사항
 # ----------------------------------
 #
-# Behavior of ``torch.compile`` with Nested Modules and Function Calls
+# 중첩 모듈과 함수 호출에서 ``torch.compile``의 동작
 #
-# When you use ``torch.compile``, the compiler will try to recursively compile
-# every function call inside the target function or module inside the target
-# function or module that is not in a skip list (such as built-ins, some functions in
-# the torch.* namespace).
+# ``torch.compile``을 사용하면 컴파일러는 대상 함수 또는 모듈 안에서 호출되는
+# 모든 함수 중 컴파일에서 제외할 목록(skip list)에 없는 함수를 재귀적으로
+# 컴파일하려고 시도합니다(예: 내장 함수, torch.* 네임스페이스의 일부 함수).
 #
-# **Best Practices:**
+# **모범 사례**
 #
-# 1. **Top-Level Compilation:** One approach is to compile at the highest level
-# possible (i.e., when the top-level module is initialized/called) and
-# selectively disable compilation when encountering excessive graph breaks or
-# errors. If there are still many compile issues, compile individual
-# subcomponents instead.
+# 1. **최상위 수준 컴파일** 한 가지 방법은 가능한 가장 높은 수준에서
+# 컴파일하고(즉, 최상위 모듈을 초기화하거나 호출할 때) 과도한 그래프 분리나
+# 오류가 발생하면 선택적으로 컴파일을 비활성화하는 것입니다.
+# 그래도 컴파일 문제가 많이 남아 있다면
+# 대신 개별 하위 구성 요소를 컴파일합니다.
 #
-# 2. **Modular Testing:** Test individual functions and modules with ``torch.compile``
-# before integrating them into larger models to isolate potential issues.
+# 2. **모듈식 테스트** 큰 모델에 통합하기 전에 개별 함수와 모듈을
+# ``torch.compile``로 테스트하여 잠재적인 문제를 분리합니다.
 #
-# 3. **Disable Compilation Selectively:** If certain functions or sub-modules
-# cannot be handled by `torch.compile`, use the `torch.compiler.disable` context
-# managers to recursively exclude them from compilation.
+# 3. **선택적으로 컴파일 비활성화** 특정 함수나 하위 모듈을 ``torch.compile``에서
+# 처리할 수 없다면 ``torch.compiler.disable`` 컨텍스트 매니저를 사용하여
+# 해당 함수나 하위 모듈을 컴파일에서 재귀적으로 제외합니다.
 #
-# 4. **Compile Leaf Functions First:** In complex models with multiple nested
-# functions and modules, start by compiling the leaf functions or modules first.
-# For more information see `TorchDynamo APIs for fine-grained tracing <https://pytorch.org/docs/stable/torch.compiler_fine_grain_apis.html>`__.
+# 4. **리프 함수 먼저 컴파일** 중첩 함수와 모듈이 여러 개 있는 복잡한 모델에서는
+# 리프 함수나 모듈부터 먼저 컴파일합니다. 자세한 내용은
+# `세밀한 추적을 위한 TorchDynamo API <https://pytorch.org/docs/stable/torch.compiler_fine_grain_apis.html>`__\ 를 참고하세요.
 #
-# 5. **Prefer ``mod.compile()`` over ``torch.compile(mod)``:** Avoids ``_orig_`` prefix issues in ``state_dict``.
+# 5. **``torch.compile(mod)``보다 ``mod.compile()`` 선호** ``state_dict``에서
+# ``_orig_`` 접두사 문제가 발생하지 않도록 합니다.
 #
-# 6. **Use ``fullgraph=True`` to catch graph breaks:** Helps ensure end-to-end compilation, maximizing speedup
-# and compatibility with ``torch.export``.
+# 6. **그래프 분리를 잡기 위해 ``fullgraph=True`` 사용** 종단 간 컴파일을 보장하도록
+# 도와 속도 향상을 극대화하고 ``torch.export``와의 호환성을 높입니다.
 
 
 ######################################################################
-# Demonstrating Speedups
+# 속도 향상 확인하기
 # -----------------------
 #
-# Let's now demonstrate that using ``torch.compile`` can speed
-# up real models. We will compare standard eager mode and
-# ``torch.compile`` by evaluating and training a ``torchvision`` model on random data.
+# 이제 ``torch.compile``을 사용하면 실제 모델의 속도를 높일 수 있음을 보여줍니다.
+# 무작위 데이터에서 ``torchvision`` 모델을 평가하고 학습하여 표준 즉시 실행 모드와
+# ``torch.compile``을 비교합니다.
 #
-# Before we start, we need to define some utility functions.
+# 시작하기 전에 몇 가지 유틸리티 함수를 정의해야 합니다.
 
-# Returns the result of running `fn()` and the time it took for `fn()` to run,
-# in seconds. We use CUDA events and synchronization for the most accurate
-# measurements.
+# `fn()`\ 을 실행한 결과와 `fn()` 실행에 걸린 시간을 초 단위로 반환합니다.
+# 가장 정확하게 측정하기 위해
+# CUDA 이벤트와 동기화를 사용합니다.
 def timed(fn):
     start = torch.cuda.Event(enable_timing=True)
     end = torch.cuda.Event(enable_timing=True)
@@ -229,8 +228,8 @@ def timed(fn):
     torch.cuda.synchronize()
     return result, start.elapsed_time(end) / 1000
 
-# Generates random input and targets data for the model, where `b` is
-# batch size.
+# 모델에 사용할 무작위 입력과 대상 데이터를 생성하며 여기서 `b`\ 는
+# 배치 크기입니다.
 def generate_data(b):
     return (
         torch.randn(b, 3, 128, 128).to(torch.float32).cuda(),
@@ -244,14 +243,14 @@ def init_model():
     return densenet121().to(torch.float32).cuda()
 
 ######################################################################
-# First, let's compare inference.
+# 먼저 추론을 비교해봅시다.
 #
-# Note that in the call to ``torch.compile``, we have the additional
-# ``mode`` argument, which we will discuss below.
+# ``torch.compile``을 호출할 때 추가 ``mode`` 인자가 있으며
+# 이에 대해서는 아래에서 설명합니다.
 
 model = init_model()
 
-# Reset since we are using a different mode.
+# 다른 모드를 사용하므로 초기화합니다.
 import torch._dynamo
 torch._dynamo.reset()
 
@@ -263,12 +262,11 @@ with torch.no_grad():
     print("compile:", timed(lambda: model_opt(inp))[1])
 
 ######################################################################
-# Notice that ``torch.compile`` takes a lot longer to complete
-# compared to eager. This is because ``torch.compile`` compiles
-# the model into optimized kernels as it executes. In our example, the
-# structure of the model doesn't change, and so recompilation is not
-# needed. So if we run our optimized model several more times, we should
-# see a significant improvement compared to eager.
+# ``torch.compile``은 eager와 비교해 완료하는 데 훨씬 더 오래 걸린다는 점에
+# 주목하세요. 이는 ``torch.compile``이 실행 중에 모델을 최적화된 커널로 컴파일하기 때문입니다.
+# 이 예제에서는 모델의 구조가 바뀌지 않으므로 다시 컴파일할 필요가 없습니다.
+# 따라서 최적화한 모델을 몇 번 더 실행하면 eager와 비교해
+# 상당한 개선을 확인할 수 있습니다.
 
 eager_times = []
 for i in range(N_ITERS):
@@ -298,28 +296,27 @@ print(f"(eval) eager median: {eager_med}, compile median: {compile_med}, speedup
 print("~" * 10)
 
 ######################################################################
-# And indeed, we can see that running our model with ``torch.compile``
-# results in a significant speedup. Speedup mainly comes from reducing Python overhead and
-# GPU read/writes, and so the observed speedup may vary on factors such as model
-# architecture and batch size. For example, if a model's architecture is simple
-# and the amount of data is large, then the bottleneck would be
-# GPU compute and the observed speedup may be less significant.
+# 실제로 ``torch.compile``로 모델을 실행하면 상당한 속도 향상이 나타나는 것을 확인할 수 있습니다.
+# 속도 향상은 주로 Python 오버헤드와 GPU 읽기·쓰기를 줄이는 데서 나오므로
+# 관찰되는 속도 향상은 모델 구조와 배치 크기 같은 요인에 따라 달라질 수 있습니다.
+# 예를 들어 모델 구조가 단순하고 데이터의 양이 많다면 GPU 연산에서 병목이 발생하며
+# 관찰되는 속도 향상이 크지 않을 수 있습니다.
 #
-# You may also see different speedup results depending on the chosen ``mode``
-# argument. The ``"reduce-overhead"`` mode uses CUDA graphs to further reduce
-# the overhead of Python. For your own models,
-# you may need to experiment with different modes to maximize speedup. You can
-# read more about modes `here <https://pytorch.org/get-started/pytorch-2.0/#user-experience>`__.
+# 선택한 ``mode`` 인자에 따라 다른 속도 향상 결과를 볼 수도 있습니다.
+# ``"reduce-overhead"`` 모드는 CUDA 그래프를 사용하여 Python 오버헤드를
+# 더 줄입니다. 직접 만든 모델에서는 속도 향상을 극대화하기 위해
+# 여러 모드를 실험해야 할 수도 있습니다. 모드에 대한 자세한 내용은
+# `사용자 경험 <https://pytorch.org/get-started/pytorch-2.0/#user-experience>`__\ 에서 읽을 수 있습니다.
 #
-# You may might also notice that the second time we run our model with ``torch.compile`` is significantly
-# slower than the other runs, although it is much faster than the first run. This is because the ``"reduce-overhead"``
-# mode runs a few warm-up iterations for CUDA graphs.
+# 또한 ``torch.compile``로 모델을 두 번째로 실행할 때 첫 번째 실행보다는 훨씬 빠르지만
+# 다른 실행보다 상당히 느리다는 점을 볼 수도 있습니다. 이는 ``"reduce-overhead"``
+# 모드가 CUDA 그래프를 위해 몇 번의 워밍업 반복을 실행하기 때문입니다.
 #
-# For general PyTorch benchmarking, you can try using ``torch.utils.benchmark`` instead of the ``timed``
-# function we defined above. We wrote our own timing function in this tutorial to show
-# ``torch.compile``'s compilation latency.
+# 일반적인 PyTorch 벤치마킹에는 위에서 정의한 ``timed`` 함수 대신
+# ``torch.utils.benchmark``를 사용할 수 있습니다. 이 튜토리얼에서는
+# ``torch.compile``의 컴파일 지연 시간을 보여주기 위해 자체 시간 측정 함수를 작성했습니다.
 #
-# Now, let's consider comparing training.
+# 이제 학습을 비교해보겠습니다.
 
 model = init_model()
 opt = torch.optim.Adam(model.parameters())
@@ -359,36 +356,35 @@ print(f"(train) eager median: {eager_med}, compile median: {compile_med}, speedu
 print("~" * 10)
 
 ######################################################################
-# Again, we can see that ``torch.compile`` takes longer in the first
-# iteration, as it must compile the model, but in subsequent iterations, we see
-# significant speedups compared to eager.
+# 마찬가지로 ``torch.compile``은 모델을 컴파일해야 하므로 첫 번째 반복에서는
+# 더 오래 걸리지만, 이후 반복에서는 eager와 비교해
+# 상당한 속도 향상을 확인할 수 있습니다.
 #
-# We remark that the speedup numbers presented in this tutorial are for
-# demonstration purposes only. Official speedup values can be seen at the
-# `TorchInductor performance dashboard <https://hud.pytorch.org/benchmark/compilers>`__.
+# 이 튜토리얼에 제시된 속도 향상 수치는 설명을 위한 예시일 뿐입니다.
+# 공식 속도 향상 수치는
+# `TorchInductor 성능 대시보드 <https://hud.pytorch.org/benchmark/compilers>`__\ 에서 확인할 수 있습니다.
 
 ######################################################################
-# Comparison to TorchScript and FX Tracing
+# TorchScript 및 FX Tracing과 비교
 # -----------------------------------------
 #
-# We have seen that ``torch.compile`` can speed up PyTorch code.
-# Why else should we use ``torch.compile`` over existing PyTorch
-# compiler solutions, such as TorchScript or FX Tracing? Primarily, the
-# advantage of ``torch.compile`` lies in its ability to handle
-# arbitrary Python code with minimal changes to existing code.
+# 지금까지 ``torch.compile``이 PyTorch 코드의 속도를 높일 수 있음을 살펴봤습니다.
+# 그렇다면 TorchScript나 FX Tracing과 같은 기존 PyTorch 컴파일러 솔루션보다
+# ``torch.compile``을 사용해야 하는 또 다른 이유는 무엇일까요? 주된 장점은
+# ``torch.compile``이 기존 코드를 최소한만 변경하여 임의의 Python 코드를
+# 처리할 수 있다는 점에 있습니다.
 #
-# One case that ``torch.compile`` can handle that other compiler
-# solutions struggle with is data-dependent control flow (the
-# ``if x.sum() < 0:`` line below).
+# 다른 컴파일러 솔루션은 처리하기 어려워하지만 ``torch.compile``은 처리할 수 있는
+# 한 가지 경우가 데이터 의존 제어 흐름입니다(아래의 ``if x.sum() < 0:`` 줄).
 
 def f1(x, y):
     if x.sum() < 0:
         return -y
     return y
 
-# Test that `fn1` and `fn2` return the same result, given
-# the same arguments `args`. Typically, `fn1` will be an eager function
-# while `fn2` will be a compiled function (torch.compile, TorchScript, or FX graph).
+# 동일한 인자 `args`\ 가 주어졌을 때 `fn1`\ 과 `fn2`\ 가 같은 결과를 반환하는지 테스트합니다.
+# 일반적으로 `fn1`\ 은 eager 함수이고 `fn2`\ 는 컴파일된 함수입니다
+# (torch.compile, TorchScript 또는 FX graph).
 def test_fns(fn1, fn2, args):
     out1 = fn1(*args)
     out2 = fn2(*args)
@@ -398,17 +394,16 @@ inp1 = torch.randn(5, 5)
 inp2 = torch.randn(5, 5)
 
 ######################################################################
-# TorchScript tracing ``f1`` results in
-# silently incorrect results, since only the actual control flow path
-# is traced.
+# TorchScript로 ``f1``을 추적하면 실제 제어 흐름 경로만 추적하므로
+# 조용히 잘못된 결과가 나옵니다.
 
 traced_f1 = torch.jit.trace(f1, (inp1, inp2))
 print("traced 1, 1:", test_fns(f1, traced_f1, (inp1, inp2)))
 print("traced 1, 2:", test_fns(f1, traced_f1, (-inp1, inp2)))
 
 ######################################################################
-# FX tracing ``f1`` results in an error due to the presence of
-# data-dependent control flow.
+# FX 추적은 데이터 의존 제어 흐름이 있으므로
+# ``f1``에서 오류를 발생시킵니다.
 
 import traceback as tb
 try:
@@ -417,19 +412,18 @@ except:
     tb.print_exc()
 
 ######################################################################
-# If we provide a value for ``x`` as we try to FX trace ``f1``, then
-# we run into the same problem as TorchScript tracing, as the data-dependent
-# control flow is removed in the traced function.
+# FX로 ``f1``을 추적하려고 할 때 ``x`` 값을 제공하면 추적된 함수에서
+# 데이터 의존 제어 흐름이 제거되므로 TorchScript 추적과 같은 문제가 발생합니다.
 
 fx_f1 = torch.fx.symbolic_trace(f1, concrete_args={"x": inp1})
 print("fx 1, 1:", test_fns(f1, fx_f1, (inp1, inp2)))
 print("fx 1, 2:", test_fns(f1, fx_f1, (-inp1, inp2)))
 
 ######################################################################
-# Now we can see that ``torch.compile`` correctly handles
-# data-dependent control flow.
+# 이제 ``torch.compile``이 데이터 의존 제어 흐름을 올바르게 처리하는 것을
+# 확인할 수 있습니다.
 
-# Reset since we are using a different mode.
+# 다른 모드를 사용하므로 초기화합니다.
 torch._dynamo.reset()
 
 compile_f1 = torch.compile(f1)
@@ -438,14 +432,14 @@ print("compile 1, 2:", test_fns(f1, compile_f1, (-inp1, inp2)))
 print("~" * 10)
 
 ######################################################################
-# TorchScript scripting can handle data-dependent control flow, but this
-# solution comes with its own set of problems. Namely, TorchScript scripting
-# can require major code changes and will raise errors when unsupported Python
-# is used.
+# TorchScript scripting은 데이터 의존 제어 흐름을 처리할 수 있지만
+# 이 솔루션에는 자체적인 문제가 따릅니다. 구체적으로 TorchScript scripting은
+# 코드를 크게 변경해야 할 수 있으며 지원하지 않는 Python 기능을 사용하면
+# 오류를 발생시킵니다.
 #
-# In the example below, we forget TorchScript type annotations and we receive
-# a TorchScript error because the input type for argument ``y``, an ``int``,
-# does not match with the default argument type, ``torch.Tensor``.
+# 아래 예제에서는 TorchScript 타입 주석을 잊어버렸고, 인자 ``y``의 입력 타입인 ``int``가
+# 기본 인자 타입인 ``torch.Tensor``와 일치하지 않기 때문에
+# TorchScript 오류가 발생합니다.
 
 def f2(x, y):
     return x + y
@@ -460,15 +454,15 @@ except:
     tb.print_exc()
 
 ######################################################################
-# However, ``torch.compile`` is easily able to handle ``f2``.
+# 하지만 ``torch.compile``은 ``f2``를 쉽게 처리할 수 있습니다.
 
 compile_f2 = torch.compile(f2)
 print("compile 2:", test_fns(f2, compile_f2, (inp1, inp2)))
 print("~" * 10)
 
 ######################################################################
-# Another case that ``torch.compile`` handles well compared to
-# previous compilers solutions is the usage of non-PyTorch functions.
+# 이전 컴파일러 솔루션과 비교했을 때 ``torch.compile``이 잘 처리하는
+# 또 다른 경우는 PyTorch가 아닌 함수의 사용입니다.
 
 import scipy
 def f3(x):
@@ -479,8 +473,8 @@ def f3(x):
     return x
 
 ######################################################################
-# TorchScript tracing treats results from non-PyTorch function calls
-# as constants, and so our results can be silently wrong.
+# TorchScript 추적은 PyTorch가 아닌 함수 호출의 결과를 상수로 취급하므로
+# 결과가 조용히 잘못될 수 있습니다.
 
 inp1 = torch.randn(5, 5)
 inp2 = torch.randn(5, 5)
@@ -488,7 +482,7 @@ traced_f3 = torch.jit.trace(f3, (inp1,))
 print("traced 3:", test_fns(f3, traced_f3, (inp2,)))
 
 ######################################################################
-# TorchScript scripting and FX tracing disallow non-PyTorch function calls.
+# TorchScript scripting과 FX 추적은 PyTorch가 아닌 함수 호출을 허용하지 않습니다.
 
 try:
     torch.jit.script(f3)
@@ -501,27 +495,26 @@ except:
     tb.print_exc()
 
 ######################################################################
-# In comparison, ``torch.compile`` is easily able to handle
-# the non-PyTorch function call.
+# 이에 비해 ``torch.compile``은 PyTorch가 아닌 함수 호출을 쉽게 처리할 수 있습니다.
 
 compile_f3 = torch.compile(f3)
 print("compile 3:", test_fns(f3, compile_f3, (inp2,)))
 
 ######################################################################
-# TorchDynamo and FX Graphs
+# TorchDynamo와 FX 그래프
 # --------------------------
 #
-# One important component of ``torch.compile`` is TorchDynamo.
-# TorchDynamo is responsible for JIT compiling arbitrary Python code into
-# `FX graphs <https://pytorch.org/docs/stable/fx.html#torch.fx.Graph>`__, which can
-# then be further optimized. TorchDynamo extracts FX graphs by analyzing Python bytecode
-# during runtime and detecting calls to PyTorch operations.
+# ``torch.compile``의 중요한 구성 요소 중 하나는 TorchDynamo입니다.
+# TorchDynamo는 임의의 Python 코드를 JIT 컴파일하여
+# `FX 그래프 <https://pytorch.org/docs/stable/fx.html#torch.fx.Graph>`__\ 로 만드는 역할을 하며
+# 이후 이 그래프를 더 최적화할 수 있습니다. TorchDynamo는 런타임 중에 Python 바이트코드를
+# 분석하고 PyTorch 연산 호출을 감지하여 FX 그래프를 추출합니다.
 #
-# Normally, TorchInductor, another component of ``torch.compile``,
-# further compiles the FX graphs into optimized kernels,
-# but TorchDynamo allows for different backends to be used. In order to inspect
-# the FX graphs that TorchDynamo outputs, let us create a custom backend that
-# outputs the FX graph and simply returns the graph's unoptimized forward method.
+# 일반적으로 ``torch.compile``의 또 다른 구성 요소인 TorchInductor는
+# FX 그래프를 최적화된 커널로 추가 컴파일하지만
+# TorchDynamo는 다양한 백엔드를 사용할 수 있도록 합니다. TorchDynamo가 출력하는
+# FX 그래프를 살펴보기 위해 FX 그래프를 출력하고 그래프의 최적화되지 않은 forward 메소드를
+# 그대로 반환하는 사용자 정의 백엔드를 만들어보겠습니다.
 
 from typing import List
 def custom_backend(gm: torch.fx.GraphModule, example_inputs: List[torch.Tensor]):
@@ -529,16 +522,16 @@ def custom_backend(gm: torch.fx.GraphModule, example_inputs: List[torch.Tensor])
     gm.graph.print_tabular()
     return gm.forward
 
-# Reset since we are using a different backend.
+# 다른 백엔드를 사용하므로 초기화합니다.
 torch._dynamo.reset()
 
 opt_model = torch.compile(init_model(), backend=custom_backend)
 opt_model(generate_data(16)[0])
 
 ######################################################################
-# Using our custom backend, we can now see how TorchDynamo is able to handle
-# data-dependent control flow. Consider the function below, where the line
-# ``if b.sum() < 0`` is the source of data-dependent control flow.
+# 이제 사용자 정의 백엔드를 사용하여 TorchDynamo가 데이터 의존 제어 흐름을
+# 어떻게 처리할 수 있는지 확인할 수 있습니다. 아래 함수를 살펴보면
+# ``if b.sum() < 0`` 줄이 데이터 의존 제어 흐름의 원인입니다.
 
 def bar(a, b):
     x = a / (torch.abs(a) + 1)
@@ -553,40 +546,38 @@ opt_bar(inp1, inp2)
 opt_bar(inp1, -inp2)
 
 ######################################################################
-# The output reveals that TorchDynamo extracted 3 different FX graphs
-# corresponding the following code (order may differ from the output above):
+# 출력 결과를 보면 TorchDynamo가 다음 코드에 해당하는 서로 다른 FX 그래프 3개를
+# 추출했음을 알 수 있습니다(순서는 위 출력과 다를 수 있습니다).
 #
 # 1. ``x = a / (torch.abs(a) + 1)``
 # 2. ``b = b * -1; return x * b``
 # 3. ``return x * b``
 #
-# When TorchDynamo encounters unsupported Python features, such as data-dependent
-# control flow, it breaks the computation graph, lets the default Python
-# interpreter handle the unsupported code, then resumes capturing the graph.
+# TorchDynamo가 데이터 의존 제어 흐름과 같이 지원하지 않는 Python 기능을 만나면
+# 연산 그래프를 분리하고 지원하지 않는 코드는 기본 Python 인터프리터가 처리하도록 한 뒤
+# 그래프 캡처를 다시 시작합니다.
 #
-# Let's investigate by example how TorchDynamo would step through ``bar``.
-# If ``b.sum() < 0``, then TorchDynamo would run graph 1, let
-# Python determine the result of the conditional, then run
-# graph 2. On the other hand, if ``not b.sum() < 0``, then TorchDynamo
-# would run graph 1, let Python determine the result of the conditional, then
-# run graph 3.
+# TorchDynamo가 ``bar``를 어떻게 단계별로 실행하는지 예제로 살펴보겠습니다.
+# ``b.sum() < 0``이면 TorchDynamo는 그래프 1을 실행하고 Python이 조건문의
+# 결과를 결정하도록 한 뒤 그래프 2를 실행합니다. 반면 ``not b.sum() < 0``이면
+# TorchDynamo는 그래프 1을 실행하고 Python이 조건문의 결과를 결정하도록 한 뒤
+# 그래프 3을 실행합니다.
 #
-# This highlights a major difference between TorchDynamo and previous PyTorch
-# compiler solutions. When encountering unsupported Python features,
-# previous solutions either raise an error or silently fail.
-# TorchDynamo, on the other hand, will break the computation graph.
+# 이는 TorchDynamo와 이전 PyTorch 컴파일러 솔루션 사이의 주요 차이점을 보여줍니다.
+# 지원하지 않는 Python 기능을 만나면 이전 솔루션은 오류를 발생시키거나 조용히 실패합니다.
+# 반면 TorchDynamo는 연산 그래프를 분리합니다.
 #
-# We can see where TorchDynamo breaks the graph by using ``torch._dynamo.explain``:
+# ``torch._dynamo.explain``을 사용하면 TorchDynamo가 그래프를 어디서 분리하는지 확인할 수 있습니다.
 
-# Reset since we are using a different backend.
+# 다른 백엔드를 사용하므로 초기화합니다.
 torch._dynamo.reset()
 explain_output = torch._dynamo.explain(bar)(torch.randn(10), torch.randn(10))
 print(explain_output)
 
 ######################################################################
-# In order to maximize speedup, graph breaks should be limited.
-# We can force TorchDynamo to raise an error upon the first graph
-# break encountered by using ``fullgraph=True``:
+# 속도 향상을 극대화하려면 그래프 분리를 제한해야 합니다.
+# ``fullgraph=True``를 사용하면 TorchDynamo가 처음 만나는 그래프 분리에서
+# 오류를 발생시키도록 강제할 수 있습니다.
 
 opt_bar = torch.compile(bar, fullgraph=True)
 try:
@@ -595,25 +586,24 @@ except:
     tb.print_exc()
 
 ######################################################################
-# And below, we demonstrate that TorchDynamo does not break the graph on
-# the model we used above for demonstrating speedups.
+# 아래에서는 TorchDynamo가 앞에서 속도 향상을 보여주기 위해 사용한
+# 모델에서 그래프를 분리하지 않는다는 것을 보여줍니다.
 
 opt_model = torch.compile(init_model(), fullgraph=True)
 print(opt_model(generate_data(16)[0]))
 
 ######################################################################
-# We can use ``torch.export`` (from PyTorch 2.1+) to extract a single, exportable
-# FX graph from the input PyTorch program. The exported graph is intended to be
-# run on different (i.e. Python-less) environments. One important restriction
-# is that the ``torch.export`` does not support graph breaks. Please check
-# `this tutorial <https://tutorials.pytorch.kr/intermediate/torch_export_tutorial.html>`__
-# for more details on ``torch.export``.
+# ``torch.export`` (PyTorch 2.1 이상)를 사용하면 입력 PyTorch 프로그램에서
+# 내보낼 수 있는 단일 FX 그래프를 추출할 수 있습니다. 내보낸 그래프는
+# 서로 다른 환경, 즉 Python이 없는 환경에서 실행하는 것을 목적으로 합니다.
+# 한 가지 중요한 제약은 ``torch.export``가 그래프 분리를 지원하지 않는다는 점입니다.
+# ``torch.export``에 대한 자세한 내용은
+# `이 튜토리얼 <https://tutorials.pytorch.kr/intermediate/torch_export_tutorial.html>`__\ 을 참고하세요.
 
 ######################################################################
-# Conclusion
+# 마무리
 # ------------
 #
-# In this tutorial, we introduced ``torch.compile`` by covering
-# basic usage, demonstrating speedups over eager mode, comparing to previous
-# PyTorch compiler solutions, and briefly investigating TorchDynamo and its interactions
-# with FX graphs. We hope that you will give ``torch.compile`` a try!
+# 이 튜토리얼에서는 기본 사용법을 다루고 eager 모드와 비교한 속도 향상을 보여주며
+# 이전 PyTorch 컴파일러 솔루션과 비교하고 TorchDynamo와 FX 그래프의 상호작용을
+# 간단히 살펴보면서 ``torch.compile``을 소개했습니다. ``torch.compile``을 한번 사용해보세요!
