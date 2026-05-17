@@ -2,73 +2,70 @@
 
 """
 .. meta::
-   :description: An end-to-end example of how to use AOTInductor for Python runtime.
+   :description: Python 런타임에서 AOTInductor를 사용하는 엔드 투 엔드 예제
    :keywords: torch.export, AOTInductor, torch._inductor.aoti_compile_and_package, aot_compile, torch._export.aoti_load_package
 
-``torch.export`` AOTInductor Tutorial for Python runtime (Beta)
-===============================================================
-**Author:** Ankith Gunapal, Bin Bao, Angela Yi
+(Beta) Python 런타임을 위한 ``torch.export`` AOTInductor 튜토리얼
+==================================================================
+**저자:** Ankith Gunapal, Bin Bao, Angela Yi
+**번역:** `김정연 <https://github.com/jykimai>`_
 """
 
 ######################################################################
 #
 # .. warning::
 #
-#     ``torch._inductor.aoti_compile_and_package`` and
-#     ``torch._inductor.aoti_load_package`` are in Beta status and are subject
-#     to backwards compatibility breaking changes. This tutorial provides an
-#     example of how to use these APIs for model deployment using Python
-#     runtime.
+#     ``torch._inductor.aoti_compile_and_package`` 와
+#     ``torch._inductor.aoti_load_package`` 는 Beta 상태이며, 하위 호환성을 깨는
+#     변경이 발생할 수 있습니다. 이 튜토리얼은 Python 런타임을 사용한
+#     모델 배포에 이러한 API를 활용하는 방법을 예제로 보여줍니다.
 #
-# It has been shown `previously
-# <https://pytorch.org/docs/stable/torch.compiler_aot_inductor.html#>`__ how
-# AOTInductor can be used to do Ahead-of-Time compilation of PyTorch exported
-# models by creating an artifact that can be run in a non-Python environment.
-# In this tutorial, you will learn an end-to-end example of how to use
-# AOTInductor for Python runtime.
+# `이전 문서 <https://pytorch.org/docs/stable/torch.compiler_aot_inductor.html#>`__ 에서
+# AOTInductor를 사용하여 PyTorch로 내보낸(exported) 모델을 사전 컴파일(Ahead-of-Time compilation)하고,
+# Python이 아닌 환경에서도 실행할 수 있는 산출물(artifact)을 생성하는 방법을 살펴보았습니다.
+# 이 튜토리얼에서는 Python 런타임에서 AOTInductor를 사용하는 방법을 엔드 투 엔드 예제로 알아봅니다.
 #
-# **Contents**
+# **목차**
 #
 # .. contents::
 #     :local:
 
 ######################################################################
-# Prerequisites
+# 전제조건
 # -------------
-# * PyTorch 2.6 or later
-# * Basic understanding of ``torch.export`` and AOTInductor
-# * Complete the `AOTInductor: Ahead-Of-Time Compilation for Torch.Export-ed Models <https://pytorch.org/docs/stable/torch.compiler_aot_inductor.html#>`_ tutorial
+# * PyTorch 2.6 이상
+# * ``torch.export`` 와 AOTInductor에 대한 기본적인 이해
+# * `AOTInductor: Torch.Export로 내보낸 모델의 사전 컴파일(Ahead-of-Time Compilation) <https://pytorch.org/docs/stable/torch.compiler_aot_inductor.html#>`_ 튜토리얼 완료
 
 ######################################################################
-# What you will learn
+# 이 튜토리얼에서 배울 내용
 # ----------------------
-# * How to use AOTInductor for Python runtime.
-# * How to use :func:`torch._inductor.aoti_compile_and_package` along with :func:`torch.export.export` to generate a compiled artifact
-# * How to load and run the artifact in a Python runtime using :func:`torch._export.aot_load`.
-# * When to you use AOTInductor with a Python runtime
+# * Python 런타임에서 AOTInductor를 사용하는 방법
+# * :func:`torch._inductor.aoti_compile_and_package` 와 :func:`torch.export.export` 를 함께 사용하여 컴파일된 산출물(artifact)을 생성하는 방법
+# * :func:`torch._export.aot_load` 를 사용하여 Python 런타임에서 산출물을 불러오고 실행하는 방법
+# * Python 런타임과 함께 AOTInductor를 사용해야 하는 경우
 
 ######################################################################
-# Model Compilation
+# 모델 컴파일
 # -----------------
 #
-# We will use the TorchVision pretrained ``ResNet18`` model as an example.
+# 예시로 TorchVision의 사전 학습된 ``ResNet18`` 모델을 사용합니다.
 #
-# The first step is to export the model to a graph representation using
-# :func:`torch.export.export`. To learn more about using this function, you can
-# check out the `docs <https://pytorch.org/docs/main/export.html>`_ or the
-# `tutorial <https://tutorials.pytorch.kr/intermediate/torch_export_tutorial.html>`_.
+# 첫 번째 단계는 :func:`torch.export.export` 를 사용하여 모델을 그래프 표현으로
+# 내보내는 것입니다. 이 함수에 대해 더 자세히 알아보려면
+# `문서 <https://pytorch.org/docs/main/export.html>`_ 나
+# `튜토리얼 <https://tutorials.pytorch.kr/intermediate/torch_export_tutorial.html>`_ 을 참고하세요.
 #
-# Once we have exported the PyTorch model and obtained an ``ExportedProgram``,
-# we can apply :func:`torch._inductor.aoti_compile_and_package` to AOTInductor
-# to compile the program to a specified device, and save the generated contents
-# into a ".pt2" artifact.
+# PyTorch 모델을 내보내어 ``ExportedProgram`` 을 얻은 후에는,
+# :func:`torch._inductor.aoti_compile_and_package` 를 AOTInductor에 적용하여
+# 지정된 디바이스에 맞춰 프로그램을 컴파일하고, 생성된 내용을 ".pt2" 산출물로 저장할 수 있습니다.
 #
 # .. note::
 #
-#       This API supports the same available options that :func:`torch.compile`
-#       has, such as ``mode`` and ``max_autotune`` (for those who want to enable
-#       CUDA graphs and leverage Triton based matrix multiplications and
-#       convolutions)
+#       이 API는 :func:`torch.compile` 에서 사용할 수 있는 옵션과 동일한 옵션을 지원합니다.
+#       예를 들어 ``mode`` 와 ``max_autotune`` 같은 옵션이 있으며,
+#       이는 CUDA 그래프를 활성화하고 Triton 기반의 행렬 곱셈과 합성곱(convolution)을
+#       활용하고자 하는 경우에 사용합니다.
 
 import os
 import torch
@@ -101,15 +98,14 @@ with torch.inference_mode():
     )
 
 ######################################################################
-# The result of :func:`aoti_compile_and_package` is an artifact "resnet18.pt2"
-# which can be loaded and executed in Python and C++.
+# :func:`aoti_compile_and_package` 의 결과로 "resnet18.pt2" 산출물이 생성되며,
+# Python과 C++ 환경 모두에서 불러와 실행할 수 있습니다.
 #
-# The artifact itself contains a bunch of AOTInductor generated code, such as
-# a generated C++ runner file, a shared library compiled from the C++ file, and
-# CUDA binary files, aka cubin files, if optimizing for CUDA.
+# 산출물 자체에는 AOTInductor가 생성한 다양한 코드가 포함되어 있습니다.
+# 예를 들어 생성된 C++ 러너 파일, C++ 파일로부터 컴파일된 공유 라이브러리,
+# 그리고 CUDA에 최적화하는 경우에는 CUDA 바이너리 파일(cubin 파일)이 함께 들어 있습니다.
 #
-# Structure-wise, the artifact is a structured ``.zip`` file, with the following
-# specification:
+# 구조 측면에서 산출물은 다음과 같은 명세를 가진 구조화된 ``.zip`` 파일입니다.
 #
 # .. code::
 #    .
@@ -118,10 +114,10 @@ with torch.inference_mode():
 #    ├── data
 #    │   ├── aotinductor
 #    │   │   └── model
-#    │   │       ├── xxx.cpp            # AOTInductor generated cpp file
-#    │   │       ├── xxx.so             # AOTInductor generated shared library
-#    │   │       ├── xxx.cubin          # Cubin files (if running on CUDA)
-#    │   │       └── xxx_metadata.json  # Additional metadata to save
+#    │   │       ├── xxx.cpp            # AOTInductor가 생성한 cpp 파일
+#    │   │       ├── xxx.so             # AOTInductor가 생성한 공유 라이브러리
+#    │   │       ├── xxx.cubin          # Cubin 파일 (CUDA에서 실행하는 경우)
+#    │   │       └── xxx_metadata.json  # 저장할 추가 메타데이터
 #    │   ├── weights
 #    │   │  └── TBD
 #    │   └── constants
@@ -129,7 +125,11 @@ with torch.inference_mode():
 #    └── extra
 #        └── metadata.json
 #
-# We can use the following command to inspect the artifact contents:
+# 다음 명령어를 사용하여 산출물의 내용을 확인할 수 있습니다.
+#
+# .. code:: bash
+#
+#    $ unzip -l resnet18.pt2
 #
 # .. code:: bash
 #
@@ -163,10 +163,10 @@ with torch.inference_mode():
 
 
 ######################################################################
-# Model Inference in Python
+# Python에서의 모델 추론
 # -------------------------
 #
-# To load and run the artifact in Python, we can use :func:`torch._inductor.aoti_load_package`.
+# Python에서 산출물을 불러와 실행하려면 :func:`torch._inductor.aoti_load_package` 를 사용할 수 있습니다.
 #
 
 import os
@@ -183,33 +183,30 @@ with torch.inference_mode():
 
 
 ######################################################################
-# When to use AOTInductor with a Python Runtime
+# Python 런타임과 함께 AOTInductor를 사용해야 하는 경우
 # ---------------------------------------------
 #
-# There are mainly two reasons why one would use AOTInductor with a Python Runtime:
+# Python 런타임과 함께 AOTInductor를 사용하는 주된 이유는 크게 두 가지입니다.
 #
-# -  ``torch._inductor.aoti_compile_and_package`` generates a singular
-#    serialized artifact. This is useful for model versioning for deployments
-#    and tracking model performance over time.
-# -  With :func:`torch.compile` being a JIT compiler, there is a warmup
-#    cost associated with the first compilation. Your deployment needs to
-#    account for the compilation time taken for the first inference. With
-#    AOTInductor, the compilation is done ahead of time using
-#    ``torch.export.export`` and ``torch._inductor.aoti_compile_and_package``.
-#    At deployment time, after loading the model, running inference does not
-#    have any additional cost.
+# -  ``torch._inductor.aoti_compile_and_package`` 는 하나의 직렬화된 산출물을
+#    생성합니다. 이는 배포 시 모델 버전 관리와 시간에 따른 모델 성능 추적에 유용합니다.
+# -  :func:`torch.compile` 은 JIT 컴파일러이므로 첫 컴파일 시 워밍업 비용이 발생합니다.
+#    따라서 배포 시 첫 추론에 걸리는 컴파일 시간을 고려해야 합니다.
+#    반면 AOTInductor를 사용하면 ``torch.export.export`` 와
+#    ``torch._inductor.aoti_compile_and_package`` 를 통해 컴파일이 미리 수행됩니다.
+#    배포 시점에는 모델을 불러온 후 추론을 실행할 때 추가 비용이 발생하지 않습니다.
 #
 #
-# The section below shows the speedup achieved with AOTInductor for first inference
+# 아래 섹션에서는 AOTInductor를 사용했을 때 첫 추론에서 얻을 수 있는 속도 향상을 보여줍니다.
 #
-# We define a utility function ``timed`` to measure the time taken for inference
+# 추론에 걸리는 시간을 측정하기 위해 ``timed`` 라는 유틸리티 함수를 정의합니다.
 #
 
 import time
 def timed(fn):
-    # Returns the result of running `fn()` and the time it took for `fn()` to run,
-    # in seconds. We use CUDA events and synchronization for accurate
-    # measurement on CUDA enabled devices.
+    # `fn()` 을 실행한 결과와 `fn()` 의 실행 시간(초)을 반환합니다.
+    # CUDA를 지원하는 디바이스에서 정확하게 측정하기 위해
+    # CUDA 이벤트와 동기화를 사용합니다.
     if torch.cuda.is_available():
         start = torch.cuda.Event(enable_timing=True)
         end = torch.cuda.Event(enable_timing=True)
@@ -224,7 +221,7 @@ def timed(fn):
     else:
         end = time.time()
 
-    # Measure time taken to execute the function in miliseconds
+    # 함수 실행에 걸린 시간을 밀리초 단위로 측정합니다.
     if torch.cuda.is_available():
         duration = start.elapsed_time(end)
     else:
@@ -234,7 +231,7 @@ def timed(fn):
 
 
 ######################################################################
-# Lets measure the time for first inference using AOTInductor
+# AOTInductor를 사용한 첫 추론 시간을 측정해 보겠습니다.
 
 torch._dynamo.reset()
 
@@ -247,7 +244,7 @@ with torch.inference_mode():
 
 
 ######################################################################
-# Lets measure the time for first inference using ``torch.compile``
+# ``torch.compile`` 을 사용한 첫 추론 시간을 측정해 보겠습니다.
 
 torch._dynamo.reset()
 
@@ -262,15 +259,13 @@ with torch.inference_mode():
     print(f"Time taken for first inference for torch.compile is {time_taken:.2f} ms")
 
 ######################################################################
-# We see that there is a drastic speedup in first inference time using AOTInductor compared
-# to ``torch.compile``
+# AOTInductor를 사용하면 ``torch.compile`` 에 비해 첫 추론 시간이 크게 단축되는 것을 확인할 수 있습니다.
 
 ######################################################################
-# Conclusion
+# 결론
 # ----------
 #
-# In this recipe, we have learned how to effectively use the AOTInductor for Python runtime by
-# compiling and loading a pretrained ``ResNet18`` model. This process
-# demonstrates the practical application of generating a compiled artifact and
-# running it within a Python environment. We also looked at the advantage of using
-# AOTInductor in model deployments, with regards to speed up in first inference time.
+# 이 튜토리얼에서는 사전 학습된 ``ResNet18`` 모델을 컴파일하고 불러오는 방법을 통해
+# Python 런타임에서 AOTInductor를 효과적으로 사용하는 방법을 알아보았습니다.
+# 이 과정은 컴파일된 산출물을 생성하고 Python 환경에서 실행하는 실용적인 활용 방법을 보여줍니다.
+# 또한 첫 추론 시간 단축이라는 측면에서 모델 배포에 AOTInductor를 사용했을 때의 장점도 함께 살펴보았습니다.
