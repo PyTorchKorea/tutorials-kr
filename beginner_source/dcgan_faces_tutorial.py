@@ -27,7 +27,7 @@ DCGAN 튜토리얼
 # 그래서 GAN이 뭘까요?
 # ~~~~~~~~~~~~~~~~~~~~~~~
 #
-# GAN은 기존 데이터의 분포를 학습하여 그와 동일한 특징을 지닌 새로운 데이터를 만들어내는 딥러닝 프레임워크입니다.
+# GAN은 기존 데이터의 분포를 학습하여 그와 동일한 분포를 지닌 새로운 데이터를 만들어내는 딥러닝 프레임워크입니다.
 # GAN은 2014년 Ian Goodfellow가 개발했으며,
 # `Generative Adversarial Nets <https://papers.nips.cc/paper/5423-generative-adversarial-nets.pdf>`__ 논문에서
 # 처음 소개되었습니다.
