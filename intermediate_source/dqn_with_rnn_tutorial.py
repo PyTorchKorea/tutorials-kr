@@ -76,7 +76,7 @@ from torch import multiprocessing
 
 # TorchRL은 spawn 메소드를 선호하며, ``~torchrl.envs.ParallelEnv`` 생성을
 # `__main__` 메소드 호출 내부로 제한하지만, 코드의 가독성을 위해 fork로 전환합니다.
-# fork는 Google Colaboratory에서도 기본 spawn 메소드입니다.
+# fork는 Google Colaboratory에서도 기본 시작 방식입니다.
 try:
     multiprocessing.set_start_method("fork")
 except RuntimeError:
@@ -119,8 +119,8 @@ device = (
 # -----------
 #
 # 먼저 환경을 구성합니다. 이를 통해 문제를 정의하고 그에 맞는 정책 네트워크를
-# 구성할 수 있습니다. 이 튜토리얼에서는 CartPole gym 환경의 단일 픽셀 기반
-# 인스턴스 를 사용하며, 몇 가지 사용자 정의 변환(transform)을 적용합니다.
+# 구성할 수 있습니다. 이 튜토리얼에서는 CartPole gym 환경의 픽셀 관측을 사용하는 단일 환경
+# 인스턴스를 사용하며, 몇 가지 사용자 정의 변환(transform)을 적용합니다.
 # 그레이스케일 변환, 84x84 크기 변경, 보상 스케일링, 관측 정규화 등을 수행합니다.
 #
 # .. note::
@@ -178,7 +178,7 @@ td = env.reset()
 # 합성곱 네트워크
 # ~~~~~~~~~~~~~~~~~~~~~
 #
-# 출력 을 크기 64의 벡터로 압축하는 :class:`torch.nn.AdaptiveAvgPool2d` 를 포함한
+# 출력을 크기 64의 벡터로 압축하는 :class:`torch.nn.AdaptiveAvgPool2d` 를 포함한
 # 합성곱 네트워크를 구성합니다. :class:`~torchrl.modules.ConvNet` 이 이를
 # 지원합니다.
 #
@@ -326,7 +326,7 @@ stoch_policy = Seq(
 # 지정하면 됩니다.
 # 일반적으로 LSTM 모듈의 복사본 2개를 갖게 되므로,
 # :meth:`~torchrl.modules.LSTMModule.set_recurrent_mode` 메소드를 호출하여
-# 입력 데이터가 순차적임을 가정하는 새 인스턴스(가중치 공유)를 반환합니다.
+# 입력 데이터가 순차적임을 처리하는 새 인스턴스(가중치 공유)를 반환합니다.
 #
 policy = Seq(feature, lstm.set_recurrent_mode(True), mlp, qval)
 
@@ -351,7 +351,7 @@ loss_fn = DQNLoss(policy, action_space=env.action_spec, delay_value=True)
 
 ######################################################################
 # Double DQN을 사용하고 있으므로 타겟 매개변수를 갱신해야 합니다.
-# :class:`~torchrl.objectives.SoftUpdate` 인스턴스 를 사용하여 이 작업을
+# :class:`~torchrl.objectives.SoftUpdate` 인스턴스를 사용하여 이 작업을
 # 수행합니다.
 #
 updater = SoftUpdate(loss_fn, eps=0.95)
