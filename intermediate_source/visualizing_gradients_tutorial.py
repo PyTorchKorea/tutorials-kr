@@ -14,6 +14,7 @@
 기본적인 `autograd 작동법
 <https://docs.tutorials.pytorch.kr/beginner/basics/autogradqs_tutorial.html>`__
 을 알아두는 것 또한 유용합니다.
+
 """
 
 
@@ -37,14 +38,11 @@ import matplotlib.pyplot as plt
 # 다음으로, '배치 정규화 논문 <https://arxiv.org/abs/1502.03167>'__에서
 # 설명된 아키텍처와 유사한, MNIST 데이터셋에 적합한 네트워크를 구축할 것입니다.
 # 
-#
 # 변화도 시각화의 중요성을 설명하기 위해, 우리는 배치 정규화를 적용한
 # 네트워크 버전(BatchNorm)과 적용하지 않은 버전을 각각 하나씩 생성할 것입니다.
 # 우리는 배치 정규화가 `변화도 소실/폭발 <https://arxiv.org/abs/1211.5063>`__을
 # 해결하는 데 매우 효과적인 기술임을 실험적으로 검증할 것입니다.
 # 
-# 
-#
 # 우리가 사용하는 모델은 ``nn.Linear``, ``norm_layer``, 그리고 ``nn.Sigmoid``를
 # 번갈아 사용하는 변경 가능한 개수의, 반복되는 완전 연결(fully-connected) 계층을 가지고 있습니다.
 # `norm_layer`는 배치 정규화가 활성화된 경우에는 
@@ -53,7 +51,6 @@ import matplotlib.pyplot as plt
 # `Identity <https://docs.pytorch.org/docs/stable/generated/torch.nn.Identity.html>`__
 # 변환을 사용할 것입니다.
 # 
-#
 
 def fc_layer(in_size, out_size, norm_layer):
     """Return a stack of linear->norm->sigmoid layers"""
@@ -126,17 +123,14 @@ print(model_nobn.layers[0])
 # 새로운 방법은 `훅 등록하기 <https://docs.pytorch.org/docs/stable/notes/autograd.html#backward-hooks-execution>`__
 # 를 통해 수행할 수 있습니다.
 # 
-#
 # .. 경고::
 #
 #    tensor 자체에 ``retain_grad()``를 사용하는 것보다 출력 tensor에 연결된 역전파 훅을 사용하는 것이 권장됩니다. ``nn.Module`` 인스턴스가 제자리 연산(in-place operation)을 수행하지 않는다면 모듈 훅을 직접 연결하는 대안(예:``register_full_backward_hook()``)도 있습니다. 더 자세한 정보는 `이 이슈 <https://github.com/pytorch/pytorch/issues/61519>`__를 참고해 주세요.
 #
 # 다음 코드는 훅을 정의하고 네트워크 계층(network layer)에 대한 묘사 명칭(descriptive name)을 수집합니다.
 # 
-#
 
 # 인자를 전달할 수 있도록 파이썬 클로저를 위해 래퍼 함수가 사용된다는 점을 유의하세요.
-# 
 
 def hook_forward(module_name, grads, hook_backward):
     def hook(module, args, output):
@@ -210,7 +204,6 @@ for epoch in range(epochs):
 # ``grads_bn``과 ``grads_nobn``에 존재해야 합니다.
 # 두 모델을 비교할 수 있도록 각 기울기 행렬의 평균 절댓값을 계산합니다.
 # 
-#
 
 def get_grads(grads):
     layer_idx = []
@@ -233,7 +226,6 @@ layer_idx_nobn, avg_grads_nobn = get_grads(grads_nobn)
 # 우리가 배치 정규화를 적용하지 않으면 중간 기울기의 변화도가
 # 급격하게 0으로 낮아지는 것을 알 수 있습니다.
 # 
-#
 
 fig, ax = plt.subplots()
 ax.plot(layer_idx_bn, avg_grads_bn, label="With BatchNorm", marker="o")
@@ -249,19 +241,18 @@ plt.show()
 ######################################################################
 # 결론
 # ----------
+#
 # 이 튜토리얼에서는 `nn.Module`클래스로 래핑된 신경망을 통해 변화도 흐름을
 # 시각화하는 방법을 설명하였습니다.
 # 또한, 배치 정규화가 심층 신경망에서 발생하는 기울기 소실 문제를 완화하는 데
 # 어떻게 도움이 되는지를 정성적으로 보여주었습니다.
 # 
-#
 # 파이토치의 자동 미분 시스템 작동하는 방식을 추가로 학습하고 싶다면
 # 아래 `참고 자료 <#references>`__를 확인하세요.
 # 이 튜토리얼에 대한 피드백(개선 사항, 오타 수정 등)이 있다면 `파이토치 포럼<https://discuss.pytorch.org/>`__
 # 그리고/또는 `이슈 트래커 <https://github.com/pytorchkorea/tutorials-kr/issues>`__
 # 를 통해 알려주시기 바랍니다.
 # 
-#
 
 
 ######################################################################
@@ -275,7 +266,6 @@ plt.show()
 #    
 # -  변화도 소실 및 폭주 문제를 해결하기 위한 다른 방법에는 어떤 것들이 있을까요?
 #    
-#
 
 
 ######################################################################
