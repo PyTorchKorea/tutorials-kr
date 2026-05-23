@@ -48,6 +48,7 @@
 |activation|활성화|조형서||
 |API endpoint|API 엔드포인트|박정환|음차 표기|
 |argument|인자|박정환||
+|attention|어텐션|강정민|음차 표기|
 |attribution|속성|정휘수||
 |Audio|오디오|박정환|ToC의 분류명입니다.|
 |augmentation|증강|이재복||
@@ -55,6 +56,7 @@
 |Batch Normalization|배치 정규화|박정환||
 |bias|편향|이하람||
 |CUDA|CUDA|박지은|번역안함|
+|checkpoint|체크포인트|명준현|음차 표기|
 |confusion matrix|혼동 행렬|김민엽||
 |convolution|합성곱|김현길||
 |Dropout|드롭아웃|김태형|음차 표기|
@@ -81,6 +83,7 @@
 |instance|인스턴스|박정환|음차 표기|
 |instantiate|생성하다|박정환||
 |interpreter|인터프리터|이종법|음차 표기|
+|knowledge distillation|지식 증류|정인호||
 |Layer|계층|박정환||
 |learning rate, lr|학습률|박정환||
 |loss|손실|박정환||
@@ -93,6 +96,7 @@
 |momentum|모멘텀|박정환|음차 표기|
 |normalize|정규화|허남규||
 |NumPy|NumPy|박정환|번역하지 않음|
+|object detection|객체 탐지|임예윤||
 |One-Hot|One-Hot|황성수|번역안함|
 |Optimizer|옵티마이저|박정환|음차 표기|
 |output|출력|박정환||
