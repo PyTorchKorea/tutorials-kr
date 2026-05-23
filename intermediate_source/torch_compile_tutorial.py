@@ -36,7 +36,7 @@
 # - Python 개발 패키지(``python-devel``/``python-dev``)
 
 ######################################################################
-# 참고: 아래와 다른 문서에 제시된 속도 향상 수치를 재현하기 위해
+# 참고: 아래 및 다른 문서에 제시된 속도 향상 수치를 재현하기 위해
 # 이 튜토리얼에는 최신 NVIDIA GPU(H100, A100 또는 V100)를 사용하는 것이 좋습니다.
 
 import torch
@@ -66,7 +66,7 @@ if not gpu_ok:
 #
 # 임의의 Python 함수는 호출 가능한 객체(callable)를
 # ``torch.compile``에 전달하여 최적화할 수 있습니다.
-# 그러면 반환한 최적화 함수를 원래 함수 대신 호출할 수 있습니다.
+# 그러면 반환된 최적화 함수를 원래 함수 대신 호출할 수 있습니다.
 
 def foo(x, y):
     a = torch.sin(x)
@@ -76,7 +76,7 @@ opt_foo1 = torch.compile(foo)
 print(opt_foo1(torch.randn(10, 10), torch.randn(10, 10)))
 
 ######################################################################
-# 또는 함수를 데코레이트할 수 있습니다.
+# 또는 함수에 데코레이터를 사용할 수 있습니다.
 t1 = torch.randn(10, 10)
 t2 = torch.randn(10, 10)
 
@@ -306,7 +306,7 @@ print("~" * 10)
 # ``"reduce-overhead"`` 모드는 CUDA 그래프를 사용하여 Python 오버헤드를
 # 더 줄입니다. 직접 만든 모델에서는 속도 향상을 극대화하기 위해
 # 여러 모드를 실험해야 할 수도 있습니다. 모드에 대한 자세한 내용은
-# `사용자 경험 <https://pytorch.org/get-started/pytorch-2.0/#user-experience>`__\ 에서 읽을 수 있습니다.
+# `여기 <https://pytorch.org/get-started/pytorch-2.0/#user-experience>`__\ 에서 읽을 수 있습니다.
 #
 # 또한 ``torch.compile``로 모델을 두 번째로 실행할 때 첫 번째 실행보다는 훨씬 빠르지만
 # 다른 실행보다 상당히 느리다는 점을 볼 수도 있습니다. 이는 ``"reduce-overhead"``
@@ -375,7 +375,8 @@ print("~" * 10)
 # 처리할 수 있다는 점에 있습니다.
 #
 # 다른 컴파일러 솔루션은 처리하기 어려워하지만 ``torch.compile``은 처리할 수 있는
-# 한 가지 경우가 데이터 의존 제어 흐름입니다(아래의 ``if x.sum() < 0:`` 줄).
+# 한 가지 경우가 데이터 의존 제어 흐름(data-dependent control flow)입니다
+# (아래의 ``if x.sum() < 0:`` 줄).
 
 def f1(x, y):
     if x.sum() < 0:
