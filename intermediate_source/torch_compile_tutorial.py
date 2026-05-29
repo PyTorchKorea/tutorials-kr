@@ -3,14 +3,15 @@
 """
 ``torch.compile`` 소개
 =================================
-**저자:** William Wen
+**저자**: William Wen
+**번역**: `명준현 <https://github.com/Junhyun17>`_
 """
 
 ######################################################################
 # ``torch.compile``은 PyTorch 코드를 더 빠르게 실행하는 최신 메소드입니다!
 # ``torch.compile``은 PyTorch 코드를
 # 최적화된 커널로 JIT 컴파일하여
-# 최소한의 코드 변경만으로 PyTorch 코드를 더 빠르게 실행합니다.
+# 코드 변경을 최소화하면서 PyTorch 코드를 더 빠르게 실행합니다.
 #
 # 이 튜토리얼에서는 ``torch.compile``의 기본 사용법을 다루며
 # `TorchScript <https://pytorch.org/docs/stable/jit.html>`__ 및
@@ -396,7 +397,7 @@ inp2 = torch.randn(5, 5)
 
 ######################################################################
 # TorchScript로 ``f1``을 추적하면 실제 제어 흐름 경로만 추적하므로
-# 조용히 잘못된 결과가 나옵니다.
+# 경고 없이 잘못된 결과가 나옵니다.
 
 traced_f1 = torch.jit.trace(f1, (inp1, inp2))
 print("traced 1, 1:", test_fns(f1, traced_f1, (inp1, inp2)))
@@ -475,7 +476,7 @@ def f3(x):
 
 ######################################################################
 # TorchScript 추적은 PyTorch가 아닌 함수 호출의 결과를 상수로 취급하므로
-# 결과가 조용히 잘못될 수 있습니다.
+# 경고 없이 잘못된 결과가 나올 수 있습니다.
 
 inp1 = torch.randn(5, 5)
 inp2 = torch.randn(5, 5)
@@ -607,4 +608,4 @@ print(opt_model(generate_data(16)[0]))
 #
 # 이 튜토리얼에서는 기본 사용법을 다루고 eager 모드와 비교한 속도 향상을 보여주며
 # 이전 PyTorch 컴파일러 솔루션과 비교하고 TorchDynamo와 FX 그래프의 상호작용을
-# 간단히 살펴보면서 ``torch.compile``을 소개했습니다. ``torch.compile``을 한번 사용해보세요!
+# 간단히 살펴보면서 ``torch.compile``을 소개했습니다. ``torch.compile``을 한번 사용해 보세요!
