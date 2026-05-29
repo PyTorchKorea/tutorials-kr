@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 """
-표본별 변화도
+표본별 변화도(Per-sample gradients)
 ====================
 
-표본별 변화도란
+표본별 변화도(Per-sample gradients)란
 -----------
 
-표본별 변화도(per-sample-gradient) 계산은 데이터 배치에 있는 각 표본의 변화도를 하나씩
+표본별 변화도(Per-sample gradients) 계산은 데이터 배치에 있는 각 표본의 변화도를 하나씩
 계산하는 작업입니다. 이는 차등 개인정보 보호(differential privacy), 메타 학습(meta-learning),
 최적화 연구에서 유용하게 쓰이는 값입니다.
 
@@ -115,7 +115,7 @@ print(per_sample_grads[0].shape)
 #
 # 먼저 ``model``의 상태를 parameters와 buffers라는 두 딕셔너리로 추출합니다.
 # 일반적인 PyTorch autograd(예: Tensor.backward(), torch.autograd.grad)는 사용하지 않으므로
-# 이 값을 detach합니다.
+# 이 값을 분리(detach)합니다.
 
 from torch.func import functional_call, vmap, grad
 
@@ -123,10 +123,10 @@ params = {k: v.detach() for k, v in model.named_parameters()}
 buffers = {k: v.detach() for k, v in model.named_buffers()}
 
 ######################################################################
-# 다음으로 입력 배치가 아니라 단일 입력이 주어졌을 때
+# 다음으로 입력 배치가 아니라 단일 인자가 주어졌을 때
 # 모델의 손실을 계산하는 함수를 정의하겠습니다.
-# 이 함수는 매개변수, 입력, target을 인자로 받아야 합니다.
-# 변환을 이 인자들에 대해 적용할 예정이기 때문입니다.
+# 이 함수는 배치 차원이 제거된 단일 인자를 받아야 합니다.
+# 변환은 이 인자에 대해 적용할 예정이기 때문입니다.
 #
 # 참고로 모델은 원래 배치를 처리하도록 작성되었으므로 ``torch.unsqueeze``로
 # 배치 차원을 추가합니다.
