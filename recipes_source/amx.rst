@@ -8,22 +8,22 @@ Intel® Advanced Matrix Extensions 활용하기
 
 Advanced Matrix Extensions(AMX)는 Intel® Advanced Matrix Extensions(Intel® AMX)라고도 부르는 x86 확장 기능입니다.
 이 확장 기능은 두 가지 새로운 구성 요소를 도입합니다. 하나는 ‘tiles’라고 불리는 2차원 레지스터 파일이고, 다른 하나는 이러한 tiles에서 동작할 수 있는 Tile Matrix Multiplication(TMUL) 가속기입니다.
-AMX는 행렬에서 동작하도록 설계되어 CPU에서 딥러닝 학습과 추론을 가속하며, 자연어 처리, 추천 시스템, 이미지 인식과 같은 워크로드에 이상적입니다.
+AMX는 행렬 연산에 최적화되어 CPU에서 딥러닝 학습과 추론을 가속하며, 자연어 처리, 추천 시스템, 이미지 인식과 같은 작업에 이상적입니다.
 
 
 Intel은 4세대 Intel® Xeon® Scalable 프로세서와 Intel® AMX를 통해 AI 기능을 발전시켜, 이전 세대 대비 3배에서 10배 더 높은 추론 및 학습 성능을 제공합니다. `Accelerate AI Workloads with Intel® AMX`_ 를 참고하세요.
 Intel® Advanced Vector Extensions 512 Neural Network Instructions(Intel® AVX-512 VNNI)를 실행하는 3세대 Intel Xeon Scalable 프로세서와 비교했을 때,
-Intel AMX를 실행하는 4세대 Intel Xeon Scalable 프로세서는 한 사이클당 256개의 INT8 연산이 아니라 2,048개의 INT8 연산을 수행할 수 있습니다. 또한 한 사이클당 64개의 FP32 연산과 비교해, 한 사이클당 1,024개의 BF16 연산도 수행할 수 있습니다. `Accelerate AI Workloads with Intel® AMX`_ 의 4페이지를 참고하세요. AMX에 대한 더 자세한 정보는 `Intel® AMX Overview`_ 를 참고하세요.
+Intel AMX를 지원하는 4세대 Intel Xeon Scalable 프로세서는 한 사이클당 256개의 INT8 연산이 아니라 2,048개의 INT8 연산을 수행할 수 있습니다. 또한 한 사이클당 64개의 FP32 연산과 비교해, 한 사이클당 1,024개의 BF16 연산도 수행할 수 있습니다. `Accelerate AI Workloads with Intel® AMX`_ 의 4페이지를 참고하세요. AMX에 대한 더 자세한 정보는 `Intel® AMX Overview`_ 를 참고하세요.
 
 
 PyTorch에서의 AMX
 ==================
 
-PyTorch는 백엔드인 oneDNN을 통해 BFloat16 기반의 연산 집약적 연산자와 INT8 기반의 양자화에 AMX를 활용하여,
+PyTorch는 백엔드인 oneDNN을 통해 BFloat16 기반의 연산 집약적 연산자와 INT8 양자화에 AMX를 활용하여,
 AMX를 지원하는 x86 CPU에서 별도의 설정 없이 더 높은 성능을 얻을 수 있도록 합니다.
 oneDNN에 대한 더 자세한 정보는 `oneDNN`_ 을 참고하세요.
 
-이 연산은 생성된 실행 코드 경로에 따라 oneDNN이 전적으로 처리합니다. 예를 들어, AMX를 지원하는 하드웨어 플랫폼에서 oneDNN 구현으로 지원하는 연산을 실행하면, oneDNN 내부에서 AMX 명령어를 자동으로 호출합니다.
+이 연산은 생성된 실행 코드 경로에 따라 oneDNN이 전적으로 처리합니다. 예를 들어, AMX를 지원하는 하드웨어 플랫폼에서 oneDNN 구현이 지원하는 연산을 실행하면, oneDNN 내부에서 AMX 명령어를 자동으로 호출합니다.
 oneDNN은 PyTorch CPU의 기본 가속 라이브러리이므로, AMX 지원을 활성화하기 위해 별도의 수동 작업은 필요하지 않습니다.
 
 AMX를 워크로드에 활용하기 위한 가이드라인
@@ -49,7 +49,7 @@ AMX를 워크로드에 활용하기 위한 가이드라인
 
 - torch.compile:
 
-  - 생성된 그래프 모델이 지원되는 연산자를 사용하여 oneDNN 구현으로 실행될 때, AMX 가속이 활성화됩니다.
+  - 생성된 그래프 모델이 oneDNN의 지원 연산으로 실행되면 AMX 가속이 활성화됩니다.
 
 .. note:: AMX를 지원하는 CPU에서 PyTorch를 사용할 경우, 프레임워크는 기본적으로 AMX 사용을 자동으로 활성화합니다. 즉, PyTorch는 행렬 곱셈 연산의 속도를 높이기 위해 가능한 경우 AMX 기능을 활용하려고 시도합니다. 그러나 AMX 커널로 디스패치할지 여부는 최종적으로 PyTorch가 성능 향상을 위해 의존하는 oneDNN 라이브러리와 양자화 백엔드의 내부 최적화 전략에 따라 결정된다는 점에 유의해야 합니다. PyTorch와 oneDNN 라이브러리 내부에서 AMX 활용이 처리되는 구체적인 방식은 프레임워크의 업데이트와 개선에 따라 변경될 수 있습니다.
 
