@@ -2,7 +2,7 @@
 
 """
 순환 DQN(Recurrent DQN): 순환 정책 학습하기
-==========================================
+================================================
 
 **저자**: `Vincent Moens <https://github.com/vmoens>`_
 **번역**: `강정민 <https://github.com/testofschool>`_
