@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 
 """
-순환 DQN: 순환 정책 학습하기
+순환 DQN(Recurrent DQN): 순환 정책 학습하기
 ==========================================
 
 **저자**: `Vincent Moens <https://github.com/vmoens>`_
+**번역**: `강정민 <https://github.com/testofschool>`_
 
 .. grid:: 2
 
@@ -74,7 +75,7 @@ import warnings
 warnings.filterwarnings("ignore")
 from torch import multiprocessing
 
-# TorchRL은 spawn 메소드를 선호하며, ``~torchrl.envs.ParallelEnv`` 생성을
+# TorchRL은 spawn 시작 방식을 선호하며, ``~torchrl.envs.ParallelEnv`` 생성을
 # `__main__` 메소드 호출 내부로 제한하지만, 코드의 가독성을 위해 fork로 전환합니다.
 # fork는 Google Colaboratory에서도 기본 시작 방식입니다.
 try:
@@ -119,12 +120,12 @@ device = (
 # -----------
 #
 # 먼저 환경을 구성합니다. 이를 통해 문제를 정의하고 그에 맞는 정책 네트워크를
-# 구성할 수 있습니다. 이 튜토리얼에서는 CartPole gym 환경의 픽셀 관측을 사용하는 단일 환경
+# 구성할 수 있습니다. 이 튜토리얼에서는 픽셀 관측 기반의 단일 CartPole 환경
 # 인스턴스를 사용하며, 몇 가지 사용자 정의 변환(transform)을 적용합니다.
 # 그레이스케일 변환, 84x84 크기 변경, 보상 스케일링, 관측 정규화 등을 수행합니다.
 #
 # .. note::
-#   :class:`~torchrl.envs.transforms.StepCounter` 변환은 보조적입니다. CartPole
+#   :class:`~torchrl.envs.transforms.StepCounter` 변환은 선택사항입니다. CartPole
 #   태스크의 목표는 궤적(trajectory)을 가능한 한 길게 만드는 것이므로, 단계를 세는 것이
 #   정책의 성능을 추적하는 데 도움이 됩니다.
 #
@@ -137,10 +138,10 @@ device = (
 # - :class:`~torchrl.envs.transforms.TensorDictPrimer` 변환은 좀 더 기술적입니다.
 #   RNN 정책을 사용하는 데 반드시 필요하지는 않습니다. 그러나 환경(및 이후의
 #   수집기)에 추가 키가 필요함을 알려줍니다. 추가되면 ``env.reset()`` 호출 시
-#   프라이머에 지정된 항목이 0으로 초기화된 Tensor로 채워집니다. 이 텐서가
+#   프라이머에 지정된 항목이 0으로 초기화된 Tensor로 채워집니다. 이 Tensor가
 #   정책에 필요하다는 것을 알고 있으므로 수집기는 수집 과정에서 이를 전달합니다.
 #   결국 은닉 상태를 리플레이 버퍼에 저장하게 되며, 이는 손실 모듈에서
-#   RNN 연산의 부트스트랩 계산에 도움이 됩니다(그렇지 않으면 0으로 초기화됩니다).
+#   RNN 계산의 초기 상태를 잡는 데 도움이 됩니다(그렇지 않으면 0으로 초기화됩니다).
 #   요약하면 이 변환을 포함하지 않아도 정책 학습에 큰 영향은 없지만, 수집된
 #   데이터와 리플레이 버퍼에서 순환 키가 사라지게 되어 학습이 다소 최적에 미치지
 #   못할 수 있습니다.
@@ -217,7 +218,7 @@ n_cells = feature(env.reset())["embed"].shape[-1]
 #   :class:`~torchrl.modules.LSTMModule` 은 이 기본 동작을 변경하므로
 #   기본 호출만으로 충분합니다.
 #
-#   또한 LSTM의 ``bidirectional`` 속성이 ``True`` 로 설정되면 온라인 환경에서
+#   또한 LSTM의 ``bidirectional`` 속성이 ``True`` 로 설정되면 온라인 추론 환경에서는
 #   사용할 수 없으므로, 기본값 그대로 사용합니다.
 #
 
