@@ -250,7 +250,7 @@ base_env = GymEnv("InvertedDoublePendulum-v4", device=device)
 #
 # 나중에 보겠지만, TorchRL의 많은 클래스는 통신을 위해 :class:`~tensordict.TensorDict`에
 # 의존합니다. 이를 몇 가지 추가적인 tensor 기능이 포함된 파이썬 딕셔너리로 생각할 수 있습니다.
-# 실질적으로 이는 우리가 다루게 될 많은 모듈에, 수신할 ``tensordict`` 내에서
+# 실질적으로 이는 앞으로 다루게 될 많은 모듈에, 수신할 ``tensordict`` 내에서
 # 어떤 키를 읽어야 하고(``in_keys``) 어떤 키에 써야 하는지(``out_keys``)를
 # 알려주어야 함을 의미합니다. 보통 ``out_keys``가 생략되면, ``in_keys`` 항목들이
 # in-place에서 업데이트된다고 가정합니다. 변환에서 관심을 두는
@@ -271,7 +271,7 @@ env = TransformedEnv(
 ######################################################################
 # 알아차렸을 수도 있겠지만, 정규화 레이어를 생성할 때 정규화 파라미터들을
 # 설정하지 않았습니다. 이를 위해, :class:`~torchrl.envs.transforms.ObservationNorm`은
-# 우리 환경의 요약 통계량을 자동으로 수집할 수 있습니다.
+# 환경의 요약 통계량을 자동으로 수집할 수 있습니다.
 #
 env.transform[0].init_stats(num_iter=1000, reduce_dim=0, cat_dim=0)
 
@@ -329,8 +329,8 @@ print("Shape of the rollout TensorDict:", rollout.batch_size)
 ######################################################################
 # 롤아웃 데이터는 ``torch.Size([3])``의 형태를 가지며, 이는 앞서 실행한
 # 스텝 수와 일치합니다. ``"next"`` 항목은 현재 스텝 이후에 나오는 데이터를 가리킵니다.
-# 대부분의 경우, 시간 `t`에서의 ``"next"`` 데이터는 ``t+1``에서의 데이터와 일치하지만,
-# 우리가 특정 변환(멀티 스텝 등)을 사용하는 경우에는 그렇지 않을 수도 있습니다.
+# 대부분의 경우 시간 `t`에서의 ``"next"`` 데이터는 ``t+1``에서의 데이터와 일치하지만,
+# 특정 변환(멀티 스텝 등)을 사용하는 경우에는 그렇지 않을 수도 있습니다.
 
 #
 # 정책(Policy)
@@ -353,7 +353,7 @@ print("Shape of the rollout TensorDict:", rollout.batch_size)
 #
 # 아래 세 단계로 정책을 설계합니다.
 #
-# 1. ``D_obs`` -> ``2 * D_action`` 신경망을 정의합니다. 실제로 우리의 ``loc`` (mu)와 ``scale`` (sigma)은 모두 ``D_action`` 차원을 가집니다.
+# 1. ``D_obs`` -> ``2 * D_action`` 신경망을 정의합니다. 실제로 ``loc`` (mu)와 ``scale`` (sigma)은 모두 ``D_action`` 차원을 가집니다.
 #
 # 2. :class:`~tensordict.nn.distributions.NormalParamExtractor`를 추가하여 위치와 스케일을 추출합니다 (예를 들어, 입력을 두 개의 동일한 부분으로 분할하고 스케일 매개변수에 양수 변환을 적용합니다).
 
@@ -514,7 +514,7 @@ replay_buffer = ReplayBuffer(
 # PPO는 어떤 "어드밴티지 추정(advantage estimation)"이 계산되어야 합니다.
 # 요약하자면, advantage는 편향과 분산의 트레이드오프(bias / variance tradeoff)를
 # 처리하면서 반환값(return value)에 대한 기댓값을 반영하는 값입니다.
-# advantage를 계산하려면, 단순히 (1) 우리의 가치 연산자(value operator)를 활용하는
+# advantage를 계산하려면, 단순히 (1) 가치 연산자(value operator)를 활용하는
 # 어드밴티지 모듈을 구축하고, (2) 각 에폭 전에 각 데이터 배치를 이 모듈에
 # 통과시키기만 하면 됩니다.
 # GAE 모듈은 입력 ``tensordict``를 새로운 ``"advantage"`` 및 ``"value_target"``
@@ -608,7 +608,7 @@ for i, tensordict_data in enumerate(collector):
     lr_str = f"lr policy: {logs['lr'][-1]: 4.4f}"
     if i % 10 == 0:
         # 데이터 배치가 10번 쌓일 때마다 정책을 평가합니다.
-        # 평가는 다소 간단합니다. 지정된 스텝 수(우리의 ``env`` 수평선인 1000스텝) 동안
+        # 평가는 다소 간단합니다. 지정된 스텝 수(``env`` 수평선인 1000스텝) 동안
         # 탐색 없이(액션 분포의 기댓값을 취함) 정책을 실행합니다.
         # ``env``의 ``rollout`` 메서드는 정책을 인자로 받을 수 있습니다.
         # 그러면 각 스텝에서 이 정책을 실행하게 됩니다.
