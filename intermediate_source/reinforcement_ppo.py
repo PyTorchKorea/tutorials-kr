@@ -215,17 +215,17 @@ base_env = GymEnv("InvertedDoublePendulum-v4", device=device)
 # 대신 ``gym.make(env_name, **kwargs)``를 사용하여 gym 환경을 직접 생성하고,
 # 이를 `GymWrapper` 클래스로 감싸는 것도 가능합니다.
 #
-# 둘째, 우리는 상태(state) 정보와 행동(action)이 위치할 ``device``를 지정했습니다.
+# 둘째, 상태(state) 정보와 행동(action)이 위치할 ``device``를 지정했습니다.
 # GymEnv`의 경우, 이 인자는 입력 액션과 관측된 상태가 저장될 디바이스만 제어할 뿐,
 # 실제 시뮬레이션은 언제나 CPU에서 수행됩니다. 명시적으로 지정되지 않는 한, gym이 장치 내부(on-device) 실행을
-# 지원하지 않기 때문입니다. 다른 라이브러리의 경우, 우리는 실행 장치를
+# 지원하지 않기 때문입니다. 다른 라이브러리의 경우, 실행 장치를
 # 제어할 수 있으며 가능한 한 저장 및 실행 백엔드를 일관되게 
 # 유지하려 노력합니다.
 #
 # 변환(Transforms)
 # ~~~~~~~~~~
 #
-# 우리는 정책을 위한 데이터를 준비하기 위해 몇 가지 변환(transforms)을 환경에 추가할 것입니다.
+# 정책을 위한 데이터를 준비하기 위해 몇 가지 변환(transforms)을 환경에 추가할 것입니다.
 # Gym에서는 주로 래퍼(wrappers)를 통해 이를 달성합니다. TorchRL은 변환의 사용을 통해, 다른
 # pytorch 도메인 라이브러리들과 더 유사한 다른 접근 방식을 취합니다. 
 # 환경에 변환을 추가하려면, 단순히 이를 :class:`~torchrl.envs.transforms.TransformedEnv`
@@ -238,14 +238,14 @@ base_env = GymEnv("InvertedDoublePendulum-v4", device=device)
 #
 # 가장 먼저 인코딩할 것은 정규화 변환입니다.
 # 경험상, 데이터가 대략적으로 표준 가우시안 분포와 일치하도록
-# 만드는 것이 바람직합니다. 이를 달성하기 위해, 우리는
+# 만드는 것이 바람직합니다. 이를 달성하기 위해
 # 환경에서 일정 횟수의 무작위 스텝을 실행하고
 # 이러한 관측치들의 요약 통계량을 계산할 것입니다.
 #
-# 우리는 다른 두 가지 변환도 추가할 것입니다. :class:`~torchrl.envs.transforms.DoubleToFloat` 변환은
+# 다른 두 가지 변환도 추가할 것입니다. :class:`~torchrl.envs.transforms.DoubleToFloat` 변환은
 # double 입력을 정책(policy)이 읽을 준비가 된 단일 정밀도(single-precision) 숫자로
 # 변환합니다. :class:`~torchrl.envs.transforms.StepCounter` 변환은 환경이 종료되기 전까지의
-# 스텝을 세는 데 사용됩니다. 우리는 이 측정값을 성능의 부가적인 측정 기준으로
+# 스텝을 세는 데 사용됩니다. 이 측정값을 성능의 부가적인 측정 기준으로
 # 사용할 것입니다.
 #
 # 나중에 보겠지만, TorchRL의 많은 클래스는 통신을 위해 :class:`~tensordict.TensorDict`에
@@ -269,7 +269,7 @@ env = TransformedEnv(
 )
 
 ######################################################################
-# 알아차렸을 수도 있겠지만, 우리는 정규화 레이어를 생성했지만 그것의 정규화 파라미터들을
+# 알아차렸을 수도 있겠지만, 정규화 레이어를 생성할 때 정규화 파라미터들을
 # 설정하지 않았습니다. 이를 위해, :class:`~torchrl.envs.transforms.ObservationNorm`은
 # 우리 환경의 요약 통계량을 자동으로 수집할 수 있습니다.
 #
@@ -319,8 +319,8 @@ check_env_specs(env)
 # done 상태를 출력합니다. 관측치는 복합적(composite)일 수 있으며, 이는 둘 이상의
 # tensor로 구성될 수 있음을 의미합니다. 전체 관측치 세트가 출력 :class:`~tensordict.TensorDict`에
 # 자동으로 패킹되므로 이는 TorchRL에서 문제가 되지 않습니다. 지정된 스텝 수 동안
-# 롤아웃(예를 들어, 일련의 환경 스텝 및 무작위 액션 생성)을 실행한 후, 우리는 이 
-# 궤적(trajectory) 길이와 일치하는 형태(shape)를 가진 :class:`~tensordict.TensorDict` 인스턴스를 얻게 됩니다.
+# 롤아웃(예를 들어 일련의 환경 스텝 및 무작위 액션 생성하는 것)을 실행한 후,
+# 이 궤적(trajectory) 길이와 일치하는 형태(shape)를 가진 :class:`~tensordict.TensorDict` 인스턴스를 얻게 됩니다.
 #
 rollout = env.rollout(3)
 print("rollout of three steps:", rollout)
@@ -340,8 +340,8 @@ print("Shape of the rollout TensorDict:", rollout.batch_size)
 # 신경망이 취할 액션에 해당하는 단일 값을 출력하는 대신, 분포의 매개변수(parameters)를
 # 출력해야 함을 의미합니다.
 #
-# 데이터가 연속적(continuous)이므로, 우리는 액션 공간의 경계를 준수하기 위해 Tanh-Normal 분포를
-# 사용합니다. TorchRL은 이러한 분포를 제공하며, 신경망을 구축할 때 신경 써야 할 유일한 것은
+# 데이터가 연속적(continuous)이므로, 액션 공간의 경계를 준수하기 위해 Tanh-Normal 분포를
+# 사용할 것입니다. TorchRL은 이러한 분포를 제공하며, 신경망을 구축할 때 신경 써야 할 유일한 것은
 # 정책이 작동할 수 있도록 올바른 개수의 매개변수(위치 혹은 평균, 그리고 스케일)를 출력하는 것입니다.
 #
 # .. math::
@@ -384,7 +384,7 @@ policy_module = TensorDictModule(
 
 ######################################################################
 # 이제 가우시안 분포의 위치와 스케일로부터 분포를 빌드해야 합니다.
-# 이를 위해, 우리는 :class:`~torchrl.modules.tensordict_module.ProbabilisticActor`
+# 이를 위해 :class:`~torchrl.modules.tensordict_module.ProbabilisticActor`
 # 클래스가 위치와 스케일 매개변수로부터 :class:`~torchrl.modules.TanhNormal`을 빌드하도록
 # 지시합니다. 환경 명세(specs)에서 수집한 이 분포의 최솟값과 최댓값 또한
 # 함께 제공합니다.
@@ -491,7 +491,7 @@ collector = SyncDataCollector(
 # 샘플러(sampler) 및 가용한 몇 가지 변환(transforms)을 인자로 받는 공통 컨테이너인
 # :class:`~torchrl.data.ReplayBuffer`를 사용하여 빌드됩니다.
 # 리플레이 버퍼의 용량을 나타내는 저장소만 필수적입니다.
-# 우리는 또한 한 에폭 내에서 동일한 아이템이 여러 번 샘플링되는 것을 방지하기 위해
+# 또, 한 에폭 내에서 동일한 아이템이 여러 번 샘플링되는 것을 방지하기 위해
 # 중복 없는 샘플러를 지정합니다.
 # PPO에서 리플레이 버퍼를 사용하는 것이 필수적인 것은 아니며 수집된 배치에서 직접
 # 서브 배치를 샘플링할 수도 있지만, 이 클래스들을 사용하면 내부 학습 루프를
@@ -548,7 +548,7 @@ scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
 ######################################################################
 # 학습 루프
 # -------------
-# 이제 우리는 학습 루프를 코딩하는 데 필요한 모든 요소를 갖추었습니다.
+# 이제 학습 루프를 코딩하는 데 필요한 모든 요소를 갖추었습니다.
 # 단계는 다음과 같습니다.
 #
 # * 데이터 수집
@@ -576,7 +576,7 @@ for i, tensordict_data in enumerate(collector):
     for _ in range(num_epochs):
         # PPO를 작동시키려면 "advantage" 신호가 필요합니다.
         # 내부 루프에서 업데이트되는 가치 네트워크에 그 값이 의존하므로,
-        # 우리는 매 에폭마다 이를 다시 계산합니다.
+        # 매 에폭마다 이를 다시 계산합니다.
         advantage_module(tensordict_data)
         data_view = tensordict_data.reshape(-1)
         replay_buffer.extend(data_view.cpu())
