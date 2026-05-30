@@ -3,14 +3,14 @@
 PyTorch: 텐서(Tensor)와 autograd
 -----------------------------------
 
-:math:`y=\sin(x)` 을 예측할 수 있도록, :math:`-\pi` 부터 :math:`\pi` 까지
+:math:`y=\sin(x)`를 예측할 수 있도록, :math:`-\pi`부터 :math:`\pi`까지
 유클리드 거리(Euclidean distance)를 최소화하도록 3차 다항식을 학습합니다.
 
 이 구현은 PyTorch 텐서 연산을 사용하여 순전파 단계를 계산하고, PyTorch autograd를 사용하여
 변화도(gradient)를 계산합니다.
 
-PyTorch 텐서는 연산 그래프에서 노드(node)로 표현됩니다. 만약 ``x`` 가 ``x.requires_grad=True`` 인
-텐서라면, ``x.grad`` 는 어떤 스칼라 값에 대한 ``x`` 의 변화도를 갖는 또다른 텐서입니다.
+PyTorch 텐서는 연산 그래프에서 노드(node)로 표현됩니다. 만약 ``x``가 ``x.requires_grad=True``인
+텐서라면, ``x.grad``는 어떤 스칼라 값에 대한 ``x``의 변화도를 갖는 또 다른 텐서입니다.
 """
 import torch
 import math
@@ -39,9 +39,9 @@ for t in range(2000):
     # 순전파 단계: 텐서들 간의 연산을 사용하여 예측값 y를 계산합니다.
     y_pred = a + b * x + c * x ** 2 + d * x ** 3
 
-    # 텐서들간의 연산을 사용하여 손실(loss)을 계산하고 출력합니다.
-    # 이 때 손실은 (1,) shape을 갖는 텐서입니다.
-    # loss.item() 으로 손실이 갖고 있는 스칼라 값을 가져올 수 있습니다.
+    # 텐서들 간의 연산을 사용하여 손실(loss)을 계산하고 출력합니다.
+    # 이때 손실은 (1,) shape를 갖는 텐서입니다.
+    # loss.item()으로 손실이 갖고 있는 스칼라 값을 가져올 수 있습니다.
     loss = (y_pred - y).pow(2).sum()
     if t % 100 == 99:
         print(t, loss.item())
@@ -53,7 +53,7 @@ for t in range(2000):
     loss.backward()
 
     # 경사하강법(gradient descent)을 사용하여 가중치를 직접 갱신합니다.
-    # torch.no_grad()로 감싸는 이유는, 가중치들이 requires_grad=True 지만
+    # torch.no_grad()로 감싸는 이유는, 가중치들이 requires_grad=True지만
     # autograd에서는 이를 추적하지 않을 것이기 때문입니다.
     with torch.no_grad():
         a -= learning_rate * a.grad
