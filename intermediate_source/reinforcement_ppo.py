@@ -61,7 +61,7 @@ Inverted Pendulum 문제를 해결하는 방법을 설명합니다.
 # 1. 일정 단계동안 환경 내에서 정책을 이용해 데이터를 샘플링합니다.
 # 2. 수집한 batch 데이터의 무작위 부표본(sub-sample)에서 clipped REINFORCE loss를 사용해
 # 주어진 횟수만큼 최적화 단계를 수행합니다.
-# 3. 클리핑(clipping)은 손실에 회의적 제한을 두어 비교적 낮은 추정값을
+# 3. 클리핑(clipping)은 손실에 보수적인 제한을 두어 비교적 낮은 추정값을
 # 선호하게 만듭니다.
 # 손실 수식은 아래와 같습니다.
 #
@@ -97,7 +97,7 @@ Inverted Pendulum 문제를 해결하는 방법을 설명합니다.
 # 5. 마지막으로, 학습 루프를 실행하고 결과를 분석합니다.
 #
 # 이 튜토리얼 전반에서 :mod:`tensordict` 라이브러리를 사용합니다.
-# :class:`~tensordict.TensorDict` 는 TorchRL의 매개어입니다.
+# :class:`~tensordict.TensorDict` 는 TorchRL의 공통 인터페이스 역할을 합니다.
 # 이는 각 모듈이 어떤 데이터를 읽고 쓰는지를 추상화하며,  
 # 특정 데이터 구조 자체보다 그 알고리즘에 더 집중할 수 있게 합니다.
 #
@@ -170,7 +170,7 @@ max_grad_norm = 1.0
 # 즉, ``total_frames``값이 낮을 수록 좋습니다.
 #
 frames_per_batch = 1000
-# 온전한 학습을 위해 100만까지 프레임 수를 늘리세요.
+# 완전한 학습을 위해 100만까지 프레임 수를 늘리세요.
 total_frames = 50_000
 
 ######################################################################
@@ -181,7 +181,7 @@ total_frames = 50_000
 # 매번 중첩된 학습 루프 안에서 방금 획득한 전체 데이터를 소비합니다.
 # 여기서 ``sub_batch_size``는 위의 ``frames_per_batch``와 다릅니다.
 # 수집기(collector)로부터 수집되고 ``frames_per_batch``에 의해 크기가 정의된 "데이터 배치"를 가지고 작업하며,
-# 내부 학습 루프 동안 이를 더 작은 서브 배치(sub-batche)로 세분화한다는 점을 기억하세요.
+# 내부 학습 루프 동안 이를 더 작은 서브 배치(sub-batch)로 세분화한다는 점을 기억하세요.
 # 이 서브 배치의 크기는 ``sub_batch_size``에 의해 제어됩니다.
 #
 sub_batch_size = 64  # 내부 루프 최적화 단계에서 현재 데이터로부터 수집된 서브 샘플의 수(cardinality)
@@ -208,7 +208,7 @@ entropy_eps = 1e-4
 base_env = GymEnv("InvertedDoublePendulum-v4", device=device)
 
 ######################################################################
-# 이 코드에서 몇 가지 주의 깊게 볼 사항이 있습니다. 첫째, 우리는 ``GymEnv``
+# 이 코드에서 몇 가지 주의 깊게 볼 사항이 있습니다. 첫째, ``GymEnv``
 # 클래스를 호출하여 환경을 생성했습니다. 만약 일반적인 내부 환경 매개변수를
 # 변경해야 한다면(``GymEnv("Pendulum-v1", g=9.81)``과 같이 중력 가속도를 설정하는 등),
 # 이러한 인수들을 변환 레이어가 아닌 ``GymEnv`` 커스텀 빌더로 직접 전달하면 됩니다.
@@ -227,7 +227,7 @@ base_env = GymEnv("InvertedDoublePendulum-v4", device=device)
 #
 # 우리는 정책을 위한 데이터를 준비하기 위해 몇 가지 변환(transforms)을 환경에 추가할 것입니다.
 # Gym에서는 주로 래퍼(wrappers)를 통해 이를 달성합니다. TorchRL은 변환의 사용을 통해, 다른
-# pytorch 도메인 라이브러리들과 더 유사한 색다른 접근 방식을 취합니다. 
+# pytorch 도메인 라이브러리들과 더 유사한 다른 접근 방식을 취합니다. 
 # 환경에 변환을 추가하려면, 단순히 이를 :class:`~torchrl.envs.transforms.TransformedEnv`
 # 인스턴스로 감싸고 여기에 변환 시퀀스를 추가하면 됩니다. 변환된 환경은
 # 감싸진 환경의 디바이스와 메타데이터를 상속받으며, 포함하고 있는 변환 시퀀스에 
@@ -279,7 +279,7 @@ env.transform[0].init_stats(num_iter=1000, reduce_dim=0, cat_dim=0)
 # 이제 :class:`~torchrl.envs.transforms.ObservationNorm` 변환은 데이터를 정규화하는 데
 # 사용될 위치와 스케일(scale) 값들로 채워졌습니다.
 #
-# 요약 통계량의 형태에 대해 간단한 온전성 검사(sanity check)를 해봅시다.
+# 요약 통계량의 형태에 대해 간단한 기본 검증(sanity check)를 해봅시다.
 #
 print("normalization constant shape:", env.transform[0].loc.shape)
 
@@ -320,7 +320,7 @@ check_env_specs(env)
 # tensor로 구성될 수 있음을 의미합니다. 전체 관측치 세트가 출력 :class:`~tensordict.TensorDict`에
 # 자동으로 패킹되므로 이는 TorchRL에서 문제가 되지 않습니다. 지정된 스텝 수 동안
 # 롤아웃(예를 들어, 일련의 환경 스텝 및 무작위 액션 생성)을 실행한 후, 우리는 이 
-# 궤적(trajectory) 길이와 일치하는 형태(shape)를 가진 :class:`~tensordict.TensorDict` 인스턴스를 회수하게 됩니다.
+# 궤적(trajectory) 길이와 일치하는 형태(shape)를 가진 :class:`~tensordict.TensorDict` 인스턴스를 얻게 됩니다.
 #
 rollout = env.rollout(3)
 print("rollout of three steps:", rollout)
@@ -414,7 +414,7 @@ policy_module = ProbabilisticActor(
 # -------------
 #
 # 가치 네트워크는 추론 시점에는 사용되지 않지만, PPO 알고리즘의 매우 중요한 구성 요소입니다.
-# 이 모듈은 관측치를 읽고 이어지는 궤적이 무시된 반환값의 추정치를 반환합니다.
+# 이 모듈은 관측치를 읽고 이어지는 궤적이 줄어든 반환값의 추정치를 반환합니다.
 # 이를 통해 학습 중에 즉석에서 학습되는 어떤 유틸리티 추정치에 의존함으로써
 # 학습 비용을 균등하게 분산할 수 있습니다.
 # 가치 네트워크는 정책과 동일한 구조를 공유하지만,
@@ -628,8 +628,8 @@ for i, tensordict_data in enumerate(collector):
             del eval_rollout
     pbar.set_description(", ".join([eval_str, cum_reward_str, stepcount_str, lr_str]))
 
-    # 우리는 학습률 스케줄러(learning rate scheduler)도 사용하고 있습니다. 변화도 클리핑과 마찬가지로,
-    # 이것은 있으면 좋은 것이지만, PPO가 작동하는 데 필수적인 것은 아닙니다.
+    # 학습률 스케줄러(learning rate scheduler)도 사용하고 있습니다. 변화도 클리핑과 마찬가지로,
+    # 있으면 좋지만 PPO가 작동하는 데 필수적인 것은 아닙니다.
     scheduler.step()
 
 ######################################################################
