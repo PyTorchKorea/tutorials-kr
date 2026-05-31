@@ -3,6 +3,8 @@
 표본별 변화도(Per-sample gradients)
 ====================
 
+**번역:** `INHO JEUNG <https://github.com/NamsanMan>`__
+
 표본별 변화도(Per-sample gradients)란
 -----------
 
