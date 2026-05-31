@@ -216,14 +216,14 @@ base_env = GymEnv("InvertedDoublePendulum-v4", device=device)
 # 이를 `GymWrapper` 클래스로 감싸는 것도 가능합니다.
 #
 # 둘째, 상태(state) 정보와 행동(action)이 위치할 ``device``를 지정했습니다.
-# GymEnv`의 경우, 이 인자는 입력 액션과 관측된 상태가 저장될 디바이스만 제어할 뿐,
+# gym의 경우, 이 인자는 입력 액션과 관측된 상태가 저장될 디바이스만 제어할 뿐,
 # 실제 시뮬레이션은 언제나 CPU에서 수행됩니다. 명시적으로 지정되지 않는 한, gym이 장치 내부(on-device) 실행을
 # 지원하지 않기 때문입니다. 다른 라이브러리의 경우, 실행 장치를
 # 제어할 수 있으며 가능한 한 저장 및 실행 백엔드를 일관되게 
 # 유지하려 노력합니다.
 #
 # 변환(Transforms)
-# ~~~~~~~~~~
+# ~~~~~~~~~~~~~~~~
 #
 # 정책을 위한 데이터를 준비하기 위해 몇 가지 변환(transforms)을 환경에 추가할 것입니다.
 # Gym에서는 주로 래퍼(wrappers)를 통해 이를 달성합니다. TorchRL은 변환의 사용을 통해, 다른
@@ -304,7 +304,7 @@ print("input_spec:", env.input_spec)
 print("action_spec (as defined by input_spec):", env.action_spec)
 
 ######################################################################
-# func:`check_env_specs` 함수는 작은 롤아웃(rollout)을 실행하고 그 출력을 환경 명세와
+# :func:`check_env_specs` 함수는 작은 롤아웃(rollout)을 실행하고 그 출력을 환경 명세와
 # 비교합니다. 오류가 발생하지 않는다면, 명세가 올바르게 정의되었다고 확신할 수 있습니다.
 #
 check_env_specs(env)
@@ -334,7 +334,7 @@ print("Shape of the rollout TensorDict:", rollout.batch_size)
 
 #
 # 정책(Policy)
-# ------
+# ------------
 #
 # PPO는 탐색(exploration)을 처리하기 위해 확률적 정책(stochastic policy)을 활용합니다. 이는
 # 신경망이 취할 액션에 해당하는 단일 값을 출력하는 대신, 분포의 매개변수(parameters)를
@@ -411,7 +411,7 @@ policy_module = ProbabilisticActor(
 
 ######################################################################
 # 가치 네트워크(Value network)
-# -------------
+# ---------------------------
 #
 # 가치 네트워크는 추론 시점에는 사용되지 않지만, PPO 알고리즘의 매우 중요한 구성 요소입니다.
 # 이 모듈은 관측치를 읽고 이어지는 궤적이 줄어든 반환값의 추정치를 반환합니다.
@@ -446,7 +446,7 @@ print("Running value:", value_module(env.reset()))
 
 ######################################################################
 # 데이터 수집기(Data collector)
-# --------------
+# ----------------------------
 #
 # TorchRL은 일련의 `DataCollector 클래스들 <https://pytorch.org/rl/reference/collectors.html>`__을 제공합니다.
 # 간단히 말해서, 이 클래스들은 세 가지 연산을 수행합니다: 환경을 리셋하고,
@@ -481,7 +481,7 @@ collector = SyncDataCollector(
 
 ######################################################################
 # 리플레이 버퍼(Replay buffer)
-# -------------
+# ---------------------------
 #
 # 리플레이 버퍼는 오프폴리시(off-policy) RL 알고리즘의 흔한 빌딩 블록입니다.
 # on-policy 컨텍스트에서 리플레이 버퍼는 데이터 배치가 수집될 때마다 새로 채워지며,
@@ -671,7 +671,7 @@ plt.show()
 #   병렬로 실행할 수 있습니다.
 #   자세한 내용은 :class:`~torchrl.envs.ParallelEnv`를 참조하세요.
 #
-# *  로깅 측면에서는, 역진자가 움직이는 모습을 시각적으로 렌더링하기 위해
+# * 로깅 측면에서는, 역진자가 움직이는 모습을 시각적으로 렌더링하기 위해
 #   렌더링을 요청한 후 환경에 :class:`torchrl.record.VideoRecorder` 변환을
 #   추가할 수 있습니다.
 #   자세한 내용은 :py:mod:`torchrl.record`를 참조하세요.
