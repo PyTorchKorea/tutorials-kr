@@ -44,8 +44,8 @@ import matplotlib.pyplot as plt
 # 배치 정규화가 `변화도 소실/폭발 <https://arxiv.org/abs/1211.5063>`__을
 # 해결하는 데 매우 효과적인 기술임을 실험적으로 검증할 것입니다.
 # 
-# 사용하는 모델은 ``nn.Linear``, ``norm_layer``, ``nn.Sigmoid``를
-# 번갈아 사용하는 변경 가능한 개수의, 반복되는 완전 연결(fully-connected) 계층을 가지고 있습니다.
+# 사용하는 모델은 ``nn.Linear``, ``norm_layer``, ``nn.Sigmoid``가
+# 교대로 반복되는 완전 연결(fully-connected) 계층 구조를 가지며, 필요에 따라 계층 수를 조정할 수 있습니다.
 # `norm_layer`는 배치 정규화가 활성화된 경우에는 
 # `BatchNorm1d <https://docs.pytorch.org/docs/stable/generated/torch.nn.BatchNorm1d.html>`__
 # 을 사용하고 그렇지 않은 경우에는
