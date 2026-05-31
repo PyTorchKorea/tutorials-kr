@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 torch.compile 기반 합성곱·배치 정규화 퓨저(Convolution/Batch Norm fuser) 만들기
-===========================================================
+=========================================================================
 
-**저자:** `Horace He <https://github.com/chillee>`_, `Will Feng <https://github.com/yf225>`_ 번역: `심기택 <https://github.com/skt0725>`_
+**저자:** `Horace He <https://github.com/chillee>`_, `Will Feng <https://github.com/yf225>`_ 
+**번역:** `심기택 <https://github.com/skt0725>`_
 
 .. grid:: 2
 
@@ -210,7 +211,7 @@ config.pattern_matcher = True
 fused_model = torch.compile(model, backend="inductor")
 inp = torch.randn(5, 1, 1, 1).to(device)
 
-# 모델을 실행하여 컴파일과 패턴 매칭 과정을 동작시킵니다.
+# 모델을 실행하여 컴파일과 패턴 매칭 과정을 수행합니다.
 with torch.no_grad():
     output = fused_model(inp)
     expected = model(inp)
@@ -271,7 +272,7 @@ compiled_with_pattern_matching = torch.compile(rn18, backend="inductor")
 print("\ntorch.compile (with conv-bn pattern matching and other fusions): ", benchmark(compiled_with_pattern_matching))
 
 
-######################################################################
+############
 # 결론
 # ----------
 # 보시다시피 torch.compile은 패턴 매칭을 통해 그래프 변환 및 최적화를 구현하는 매우 강력한 방법을
