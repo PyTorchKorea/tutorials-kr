@@ -128,7 +128,7 @@ print(model_nobn.layers[0])
 #
 #    tensor 자체에 ``retain_grad()``를 사용하는 것보다 출력 tensor에 연결된 역전파 훅을 사용하는 것이 권장됩니다. ``nn.Module`` 인스턴스가 제자리 연산(in-place operation)을 수행하지 않는다면 모듈 훅을 직접 연결하는 대안(예:``register_full_backward_hook()``)도 있습니다. 더 자세한 정보는 `이 이슈 <https://github.com/pytorch/pytorch/issues/61519>`__를 참고해 주세요.
 #
-# 다음 코드는 훅을 정의하고 네트워크 계층(network layer)에 대한 설명용 이(descriptive name)을 수집합니다.
+# 다음 코드는 훅을 정의하고 네트워크 계층(network layer)에 대한 설명용 이름(descriptive name)을 수집합니다.
 # 
 
 # 인자를 전달할 수 있도록 파이썬 클로저를 위해 래퍼 함수가 사용된다는 점을 유의하세요.
