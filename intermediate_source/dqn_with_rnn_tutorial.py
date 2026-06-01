@@ -274,11 +274,11 @@ mlp[-1].bias.data.fill_(0.0)
 mlp = Mod(mlp, in_keys=["embed"], out_keys=["action_value"])
 
 ######################################################################
-# Q-값을 사용한 행동 선택
+# Q-Value을 사용한 행동 선택
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-# 정책의 마지막 부분은 Q-값 모듈입니다.
-# Q-값 모듈 :class:`~torchrl.modules.tensordict_module.QValueModule` 은
+# 정책의 마지막 부분은 Q-Value 모듈입니다.
+# Q-Value 모듈 :class:`~torchrl.modules.tensordict_module.QValueModule` 은
 # MLP가 생성한 ``"action_values"`` 키를 읽고, 가장 높은 값을 가진 행동을
 # 선택합니다.
 # 행동 공간(action space)만 지정하면 되며, 문자열 또는 action-spec을 전달하여
