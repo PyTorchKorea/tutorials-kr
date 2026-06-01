@@ -38,7 +38,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 ######################################################################
 # 이번 튜토리얼에서는 합성곱과 배치 정규화로 구성된 모델을 만들어 보겠습니다.
 # 이 모델에는 몇 가지 까다로운 요소가 있다는 점에 유의하세요.
-# 일부 합성곱·배치 정규화 패턴은 Sequential 내부에 숨겨져 있으며, 배치 정규화 중 하나는 또 다른
+# 일부 합성곱·배치 정규화 패턴은 Sequential 내부에 숨겨져 있으며, BatchNorms 중 하나는 또 다른
 # Module로 감싸져 있습니다.
 
 class WrappedBatchNorm(nn.Module):
@@ -132,7 +132,7 @@ def fuse_conv_bn_weights(conv_w, conv_b, bn_rm, bn_rv, bn_eps, bn_w, bn_b):
 # 이제 퓨전 로직을 구현했으므로 컴파일 과정에서 torch.compile의 패턴 매처가 인식하고 치환할 수 있는
 # 패턴을 등록해야 합니다.
 
-# 매칭하려는 패턴을 정의합니다: conv2d 다음에 batch_norm이 오는 패턴입니다.
+# 매칭하려는 패턴을 정의합니다. conv2d 다음에 batch_norm이 오는 패턴입니다.
 def conv_bn_pattern(x, conv_weight, conv_bias, bn_mean, bn_var, bn_weight, bn_bias):
     conv_out = torch.nn.functional.conv2d(x, conv_weight, conv_bias)
     bn_out = torch.nn.functional.batch_norm(
@@ -152,12 +152,12 @@ def conv_bn_replacement(x, conv_weight, conv_bias, bn_mean, bn_var, bn_weight, b
 # 이들은 패턴 함수를 추적하여 매치 템플릿을 만드는 데 사용됩니다.
 # 중요: 패턴 매처는 입력 형태에 구애받지 않습니다! 여기서 사용하는 특정 형태가 매칭될 형태를 제한하지 않습니다.
 # 채널, 커널 크기, 공간 차원에 관계없이 유효한 conv2d -> batch_norm 시퀀스라면 모두 매칭됩니다.
-# - x: 입력 텐서 (배치 크기, 채널, 높이, 너비)
+# - x: 입력 tensor (배치 크기, 채널, 높이, 너비)
 # - conv_weight: (출력 채널, 입력 채널, 커널 높이, 커널 너비)
 # - conv_bias: (출력 채널,)
 # - bn_mean, bn_var, bn_weight, bn_bias: 모두 출력 채널과 일치하는 형태(num_features,)를 가집니다.
 example_inputs = [
-    torch.randn(1, 1, 4, 4).to(device),  # x: 입력 텐서
+    torch.randn(1, 1, 4, 4).to(device),  # x: 입력 tensor
     torch.randn(1, 1, 1, 1).to(device),  # conv_weight: 출력 채널 1, 입력 채널 1, 1x1 커널
     torch.randn(1).to(device),           # conv_bias: 출력 채널 1
     torch.randn(1).to(device),           # bn_mean: 배치 정규화 이동 평균
