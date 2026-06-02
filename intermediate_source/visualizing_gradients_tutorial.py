@@ -23,7 +23,7 @@
 # 설정
 # -----
 #
-# 우선, `파이토치가 설치되었는지
+# 우선, `PyTorch가 설치되었는지
 # <https://pytorch.org/get-started/locally/>`__ 확인하고
 # 필요한 라이브러리들을 import하세요.
 #
@@ -248,9 +248,9 @@ plt.show()
 # 또한, 배치 정규화가 심층 신경망에서 발생하는 변화도 소실 문제를 완화하는 데
 # 어떻게 도움이 되는지를 정성적으로 보여주었습니다.
 # 
-# 파이토치의 자동 미분 시스템이 작동하는 방식을 추가로 학습하고 싶다면
+# PyTorch의 자동 미분 시스템이 작동하는 방식을 추가로 학습하고 싶다면
 # 아래 `참고 자료 <#references>`__를 확인하세요.
-# 이 튜토리얼에 대한 피드백(개선 사항, 오타 수정 등)이 있다면 `파이토치 포럼 <https://discuss.pytorch.org/>`__
+# 이 튜토리얼에 대한 피드백(개선 사항, 오타 수정 등)이 있다면 `PyTorch 포럼 <https://discuss.pytorch.org/>`__
 # 그리고/또는 `이슈 트래커 <https://github.com/pytorchkorea/tutorials-kr/issues>`__
 # 를 통해 알려주시기 바랍니다.
 # 
