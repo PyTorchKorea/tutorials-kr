@@ -38,7 +38,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 ######################################################################
 # 이번 튜토리얼에서는 합성곱과 배치 정규화로 구성된 모델을 만들어 보겠습니다.
 # 이 모델에는 몇 가지 까다로운 요소가 있다는 점에 유의하세요.
-# 일부 합성곱·배치 정규화 패턴은 Sequential 내부에 숨겨져 있으며, BatchNorms 중 하나는 또 다른
+# 일부 합성곱·배치 정규화 패턴은 Sequential 내부에 숨겨져 있으며, ``BatchNorms`` 중 하나는 또 다른
 # Module로 감싸져 있습니다.
 
 class WrappedBatchNorm(nn.Module):
