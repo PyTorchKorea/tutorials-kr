@@ -2,7 +2,7 @@
 
 """
 .. meta::
-   :description: Python 런타임에서 AOTInductor를 사용하는 엔드 투 엔드 예제
+   :description: Python 런타임에서 AOTInductor를 사용하는 end-to-end 예제
    :keywords: torch.export, AOTInductor, torch._inductor.aoti_compile_and_package, aot_compile, torch._export.aoti_load_package
 
 (Beta) Python 런타임을 위한 ``torch.export`` AOTInductor 튜토리얼
@@ -105,7 +105,7 @@ with torch.inference_mode():
 # 예를 들어 생성된 C++ 러너 파일, C++ 파일로부터 컴파일된 공유 라이브러리,
 # 그리고 CUDA에 최적화하는 경우에는 CUDA 바이너리 파일(cubin 파일)이 함께 들어 있습니다.
 #
-# 구조 측면에서 산출물은 다음과 같은 명세를 가진 구조화된 ``.zip`` 파일입니다.
+# 구조 측면에서 산출물은 구조화된 ``.zip`` 파일이며, 아래와 같은 사양을 가지고 있습니다.
 #
 # .. code::
 #    .
