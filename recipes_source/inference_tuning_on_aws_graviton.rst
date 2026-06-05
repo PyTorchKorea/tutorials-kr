@@ -1,39 +1,40 @@
-(Beta) PyTorch Inference Performance Tuning on AWS Graviton Processors
+(Beta) AWS Graviton 프로세서에서의 PyTorch 추론 성능 튜닝
 ======================================================================
 
-**Author**: `Sunita Nadampalli <https://github.com/snadampal>`_
+**저자**: `Sunita Nadampalli <https://github.com/snadampal>`_
+**역자**: `임예윤 <https://github.com/imyeyun>`_
 
-`AWS Graviton <https://aws.amazon.com/ec2/graviton/>`_ is a series of ARM-based processors designed by AWS. AWS Graviton3 processors are optimized for Machine Learning (ML) workloads, including support for ``bfloat16``, Scalable Vector Extension (SVE) and twice the Single Instruction Multiple Data (SIMD) bandwidth compared to Graviton2.
+`AWS Graviton <https://aws.amazon.com/ec2/graviton/>`_ 은 AWS에서 설계된 ARM 기반 프로세서 시리즈입니다. AWS Graviton3 프로세서는 머신러닝(ML) 워크로드에 최적화 되어있으며 ``bfloat16``, Scalable Vector Extension (SVE) 그리고 Graviton2 대비 두 배의 Single Instruction Multiple Data(SIMD) 대역폭을 지원합니다.
 
-PyTorch provides native reference ATen kernels for the machine learning operators like convolutions, matmul, relu, etc. These operators can be accelerated with platform specific kernel implementations from Basic Linear Algebra (BLAS) libraries. On AWS Graviton CPUs, MKLDNN with Arm Compute Library (`ACL <https://github.com/ARM-software/ComputeLibrary>`_) and `OpenBLAS <https://github.com/OpenMathLib/OpenBLAS>`_ libraries provide optimized implementations for a subset of the operators. Both these libraries are integrated into PyTorch with PyTorch 2.0 version.
+PyTorch는 합성곱(convolution), matmul, relu 등 머신러닝 연산자를 위한 기본 참조 ATen 커널을 제공합니다. 이러한 연산자는 기초 선형대수학(BLAS, Basic Linear Algebra Subprograms) 라이브러리에서 제공하는 플랫폼별 커널 구현을 통해 가속할 수 있습니다. AWS Graviton CPU에서는 MKLDNN과 Arm Compute 라이브러리(`ACL <https://github.com/ARM-software/ComputeLibrary>`_) 그리고 `OpenBLAS <https://github.com/OpenMathLib/OpenBLAS>`_ 라이브러리가 일부 연산자에 대해 최적화된 구현을 제공합니다. 두 라이브러리는 모두 PyTorch 2.0 버전부터 PyTorch에 통합되었습니다.
 
-In this tutorial we will cover how to achieve the best inference performance for linear layer neural network on AWS Graviton3 CPUs (`AWS c7g instance <https://aws.amazon.com/ec2/instance-types/c7g/>`_) with ``bfloa16`` kernels and with the right backend selection.
+이 튜토리얼에서는 ``bfloat16`` 커널과 적절한 백엔드 선택을 통해 AWS Graviton3 CPU (`AWS c7g 인스턴스 <https://aws.amazon.com/ec2/instance-types/c7g/>`_)에서 선형 계층 신경망의 최적 추론 성능을 얻는 방법을 다룹니다.
 
-Contents
+목차
 --------
-1. Basic Usage
-2. Speed up inference with Bfloat16 fast math kernels
-3. Improve inference performance with OpenBLAS for smaller batch dimensions
-4. Optimize memory allocation overhead with Linux Transparent huge pages
-5. Conclusion
+1. 기본 사용법
+2. Bfloat16 고속 연산 커널을 사용한 추론 속도 향상
+3. 작은 배치 차원에서 OpenBLAS를 사용한 추론 성능 개선
+4. Linux Transparent Huge Pages를 사용한 메모리 할당 오버헤드 최적화
+5. 결론
 
 .. note::
-   To successfully run this tutorial and reproduce the speedup numbers shown below, you need an instance from the Graviton3 family (``c7g/r7g/m7g``) of hardware. For this tutorial, we used the `c7g.xl (4vcpu) instance <https://aws.amazon.com/ec2/instance-types/c7g/>`_ .
+   이 튜토리얼을 성공적으로 실행하고 아래에 제시된 속도 향상 수치를 재현하려면 Graviton3 계열 (``c7g/r7g/m7g``) 하드웨어 인스턴스가 필요합니다. 이 튜토리얼에서 `c7g.xl (4vcpu) 인스턴스 <https://aws.amazon.com/ec2/instance-types/c7g/>`_\ 를 사용했습니다.
 
-Basic Usage
+기본 사용법
 ---------------
 
-PyTorch natively supports AWS Graviton3 optimizations starting with PyTorch 2.0 version.
-Please refer to this `blog <https://pytorch.org/blog/optimized-pytorch-w-graviton/>`_ for more details on the optimizations.
+PyTorch는 PyTorch 2.0 버전부터 AWS Graviton3 최적화를 기본적으로 지원합니다.
+최적화에 대한 자세한 내용은 이 `블로그 <https://pytorch.org/blog/optimized-pytorch-w-graviton/>`_ 를 참고하세요.
 
-1. Install PyTorch by running the following command:
+1. 다음 명령어를 실행하여 PyTorch를 설치합니다.
 
    .. code-block::
 
       python3 -m pip install torch
 
-2. We will start by importing the required dependencies and defining the device will run on:
-
+2. 먼저 필요한 라이브러리를 import하고 실행할 장치를 정의합니다.
+    
 .. code-block:: python
 
     import torch
@@ -45,7 +46,7 @@ Please refer to this `blog <https://pytorch.org/blog/optimized-pytorch-w-gravito
     print(f"Using {device} device")
 
 
-3. Given linear layers are at the heart of several neural networks, including transformers, we take a linear layer for this demo. We define our neural network by subclassing ``nn.Module``, and initializing the layers in ``__init__``. We construct the network with a typical large language model parameters to match the real world scenario:
+3. 선형 계층은 트랜스포머를 포함한 여러 신경망의 핵심 요소이므로 이 데모에서는 선형 계층을 사용합니다. ``nn.Module`` 을 서브클래싱하고 ``__init__`` 에서 계층을 초기화하여 신경망을 정의합니다. 실제 환경에 가까운 시나리오를 만들기 위해 일반적인 대규모 언어 모델 규모의 매개변수를 사용하여 네트워크를 구성합니다.
 
 .. code-block:: python
 
@@ -66,14 +67,14 @@ Please refer to this `blog <https://pytorch.org/blog/optimized-pytorch-w-gravito
         logits = self.linear_relu_stack(x)
         return logits
 
-4. Let's create an instance of ``MyNeuralNetwork``, and move it to the device:
+4. ``MyNeuralNetwork`` 의 인스턴스를 생성하고 장치로 이동합니다.
 
 .. code-block:: python
 
     model = MyNeuralNetwork().to(device)
     print(model)
 
-Next, let's get the prediction probabilities by passing them through an instance of the ``nn.Softmax`` module:
+다음으로 ``nn.Softmax`` 모듈의 인스턴스를 통과시켜 예측 확률을 얻습니다.
 
 .. code-block:: python
 
@@ -83,19 +84,19 @@ Next, let's get the prediction probabilities by passing them through an instance
     y_pred = pred_probab.argmax(1)
     print(f"Predicted class: {y_pred}")
 
-output:
+출력:
 
 .. code-block::
 
     Predicted class: tensor([2])
 
-Our network functionality is verified. Next, we will profile the performance. Lets' check two different scenarios: small and large batch dimensions.
+네트워크가 정상적으로 동작하는 것을 검증했습니다. 다음으로 성능을 프로파일링합니다. 작은 배치 차원과 큰 배치 차원, 두 가지 시나리오를 확인해 보겠습니다.
 
-**Scenario 1:** A larger batch dimension, for example 256:
+**시나리오 1:** 예를 들어 256과 같은 큰 배치 차원
 
 .. code-block:: python
 
-    # warm it up first and loop over multiple times to have enough execution time
+    # 충분한 실행 시간을 확보하기 위해 먼저 워밍업하고 여러 번 반복합니다.
 
     X = torch.rand(256, 64, 64, device=device)
 
@@ -110,7 +111,7 @@ Our network functionality is verified. Next, we will profile the performance. Le
     print(prof.key_averages().table(sort_by="self_cpu_time_total"))
 
 
-Following is the profiler output with the default PyTorch configuration:
+다음은 기본 PyTorch 설정에서의 프로파일러 출력입니다.
 
 .. table::
    :widths: auto
@@ -130,17 +131,17 @@ Following is the profiler output with the default PyTorch configuration:
 **Self CPU time total:** 16.201s
 
 
-Speed up Inference with ``bfloat16`` Fast Math Kernels
+``bfloat16`` 고속 연산 커널을 사용한 추론 속도 향상
 ----------------------------------------------------------
 
-AWS Graviton3 processors support `bfloat16 MMLA instructions <https://developer.arm.com/documentation/ddi0596/2020-12/SVE-Instructions/BFMMLA--BFloat16-floating-point-matrix-multiply-accumulate->`_. Arm Compute Library (`ACL <https://github.com/ARM-software/ComputeLibrary>`_) provides optimized ``bfloat16`` General Matrix Multiplication (GEMM) kernels for AWS Graviton processors, and are integrated into PyTorch via MKLDNN backend starting with PyTorch 2.0.  The inference performance can be optimized with the fast math GEMM kernels. The fast math mode is not enabled by default because these kernels perform GEMM in ``bfloat16`` precision instead of ``float``, and hence results in a slight drop in the model inference accuracy. However, the accuracy drop is within the ``cosine similarity`` threshold defined for ``bfloat16`` backend in ``torchbench`` test suite, and hence acceptable for majority of the applications. To enable the fast math GEMM kernels, set the following environment variable:
+AWS Graviton3 프로세서는 `bfloat16 MMLA 명령어 <https://developer.arm.com/documentation/ddi0596/2020-12/SVE-Instructions/BFMMLA--BFloat16-floating-point-matrix-multiply-accumulate->`_ 를 지원합니다. Arm Compute 라이브러리 (`ACL <https://github.com/ARM-software/ComputeLibrary>`_)는 AWS Graviton 프로세서를 위한 최적화된 ``bfloat16`` General Matrix Multiplication(GEMM) 커널을 제공하며, PyTorch 2.0부터 MKLDNN 백엔드를 통해 PyTorch에 통합되었습니다. 고속 연산 GEMM 커널을 사용하면 추론 성능을 최적화할 수 있습니다. 고속 연산 모드는 기본적으로 활성화되어 있지 않습니다. 이 커널들은 GEMM을 ``float`` 대신 ``bfloat16`` 정밀도로 수행하므로 모델 추론 정확도가 약간 낮아질 수 있기 때문입니다. 하지만 정확도 하락은 ``torchbench`` 테스트 스위트에서 ``bfloat16`` 백엔드에 대해 정의한 ``코사인 유사도`` 임계값 안에 있으므로, 대부분의 애플리케이션에서 허용 가능한 수준입니다. 고속 연산 GEMM 커널을 활성화하려면 다음 환경 변수를 설정합니다.
 
 .. code-block:: bash
 
     $ export DNNL_DEFAULT_FPMATH_MODE=BF16
 
 
-When you run the above inference script, you should see the following profiler output with the MKLDNN fast math mode enabled:
+위의 추론 스크립트를 실행하면 MKLDNN 고속 연산 모드가 활성화된 상태에서 다음과 같은 프로파일러 출력을 볼 수 있습니다.
 
 .. table::
    :widths: auto
@@ -160,9 +161,9 @@ When you run the above inference script, you should see the following profiler o
 **Self CPU time total:** 7.262s
 
 
-This is around ``2x (7.262s vs 16.201s)`` performance improvement with the ``bfloat16`` fastmath kernels. Next, let’s look at the smaller batch dimension scenario.
+이는 bfloat16 고속 연산 커널을 사용했을 때 약 ``2배 (7.262s vs 16.201s)`` 의 성능 향상입니다. 다음으로 더 작은 배치 차원의 시나리오를 살펴보겠습니다.
 
-**Scenario 2:** A smaller batch dimension, for example, 32:
+**시나리오 2:** 예를 들어 32와 같은 작은 배치 차원
 
 .. code-block:: python
 
@@ -178,7 +179,7 @@ This is around ``2x (7.262s vs 16.201s)`` performance improvement with the ``bfl
     print(prof.key_averages().table(sort_by="self_cpu_time_total"))
 
 
-You should see the following profiler output when the above script is run with the PyTorch default configuration:
+위 스크립트를 PyTorch 기본 설정으로 실행하면 다음과 같은 프로파일러 출력을 볼 수 있습니다.
 
 .. table::
    :widths: auto
@@ -198,7 +199,7 @@ You should see the following profiler output when the above script is run with t
 **Self CPU time total:** 6.094s
 
 
-The following output is the profiler output when run with the MKLDNN fast math mode enabled:
+다음 출력은 MKLDNN 고속 연산 모드를 활성화하여 실행했을 때의 프로파일러 출력입니다.
 
 .. code-block:: bash
 
@@ -221,19 +222,19 @@ The following output is the profiler output when run with the MKLDNN fast math m
 
 **Self CPU time total:** 4.123s
 
-The MKLDNN fast math mode yields approximately a **1.47x  (4.123s vs 6.094s)**  performance improvement for smaller batch dimensions. Although this improvement is noteworthy, the overall performance still leaves room for improvement. This is because of the runtime overhead (weights reorders and kernel launch time) from oneDNN and ACL backend outweighing the compute benefits from the ACL GEMM kernels for the smaller batch compute.
+MKLDNN 고속 연산 모드는 작은 배치 차원에서 약 **1.47x  (4.123s vs 6.094s)** 의 성능 향상을 제공합니다. 이 개선은 의미가 있지만, 전체 성능에는 여전히 개선의 여지가 있습니다. 작은 배치 연산에서는 oneDNN과 ACL 백엔드에서 발생하는 런타임 오버헤드 (가중치 재정렬과 커널 실행 시간)가 ACL GEMM 커널의 연산 이점보다 더 크기 때문입니다.
 
 
-Improve Inference Performance with OpenBLAS for Smaller Batch Dimensions
+작은 배치 차원에서 OpenBLAS를 사용한 추론 성능 개선
 ------------------------------------------------------------------------
 
-The inference performance for smaller batch dimensions can be improved by offloading the smaller shapes from MKLDNN to OpenBLAS backend. We are working on making the backend selection automatic, with robust heuristics, for the future releases. Till the heuristics are implemented, the smaller shapes can be offloaded to OpenBLAS by increasing the threshold for MKLDNN backend selection. In the following example, we use ``64`` as the threshold, so that input with ``batch dimension of 32`` is not dispatched to MKLDNN. Instead, it is dispatched to OpenBLAS.
+작은 배치 차원에서의 추론 성능은 작은 shape를 MKLDNN에서 OpenBLAS 백엔드로 넘김으로써 개선할 수 있습니다. 향후 릴리스에서는 안정적인 휴리스틱을 사용해 백엔드 선택을 자동화하는 작업을 진행하고 있습니다. 이러한 휴리스틱이 구현되기 전까지는 MKLDNN 백엔드 선택 임계값을 높여 작은 shape을 OpenBLAS로 넘길 수 있습니다. 다음 예제에서는 ``64`` 를 임계값으로 사용하여 ``배치 차원이 32`` 인 입력이 MKLDNN으로 디스패치되지 않도록 합니다. 대신 OpenBLAS로 디스패치됩니다.
 
 .. code-block:: bash
 
    $ export TORCH_MKLDNN_MATMUL_MIN_DIM=64
 
-Here is the profiler output with OpenBLAS backend:
+다음은 OpenBLAS 백엔드를 사용했을 때의 프로파일러 출력입니다.
 
 .. table::
    :widths: auto
@@ -253,7 +254,8 @@ Here is the profiler output with OpenBLAS backend:
 **Self CPU time total:** 2.034s
 
 
-As you can see above, switching to OpenBLAS doubled the performance **(2.034s vs 4.123s)** compared to the default MKLDNN backend configuration. This becomes significant for even smaller batch dimensions, for example, for a batch dimension of 10:
+위에서 볼 수 있듯이 OpenBLAS로 전환하면 기본 MKLDNN 백엔드 설정과 비교해 성능이 두 배 향상되었습니다 **(2.034s vs 4.123s)**. 이는 배치 차원이 더 작을수록 더욱 중요해집니다. 예를 들어 배치 차원이 10인 경우를 살펴보겠습니다.
+
 
 .. code-block:: python
 
@@ -269,7 +271,7 @@ As you can see above, switching to OpenBLAS doubled the performance **(2.034s vs
     print(prof.key_averages().table(sort_by="self_cpu_time_total"))
 
 
-The following is the profiler output with MKLDNN fast math mode:
+다음은 고속 연산 모드를 사용했을 때의 프로파일러 출력입니다.
 
 .. table::
    :widths: auto
@@ -289,7 +291,7 @@ The following is the profiler output with MKLDNN fast math mode:
 **Self CPU time total:** 4.115s
 
 
-and the following is the profiler output with the OpenBLAS backend:
+그리고 다음은 OpenBLAS 백엔드를 사용했을 때의 출력입니다.
 
 .. code-block:: bash
 
@@ -313,19 +315,19 @@ and the following is the profiler output with the OpenBLAS backend:
 **Self CPU time total:** 1.272s
 
 
-Here we observed **3.2x (1.272s vs 4.115s)** performance improvement by tuning the backend thresholds appropriately.
+여기서는 백엔드 임계값을 적절히 조정함으로써 **3.2배(1.272s vs 4.115s)** 의 성능 향상을 확인했습니다.
 
 
-Optimize Memory Allocation Overhead with Linux Transparent Huge Pages (THP)
+Linux Transparent Huge Pages (THP)를 사용한 메모리 할당 오버헤드 최적화
 ---------------------------------------------------------------------------
 
-We also observed that for these larger networks, tensor memory allocations take significant portion of the inference latency. This can be optimized by enabling Linux transparent huge page allocations from PyTorch C10 memory allocator. Currently the feature is not enabled by default because it will increase the memory footprint marginally. Set the following environment variable to enable it:
+또한 이러한 큰 네트워크에서는 Tensor 메모리 할당이 추론 지연 시간의 상당 부분을 차지한다는 점을 확인했습니다. 이는 PyTorch C10 메모리 할당자에서 Linux transparent huge page 할당을 활성화하여 최적화할 수 있습니다. 현재 이 특징은 메모리 전체 사용량을 약간 증가시키기 때문에 기본적으로 활성화되어 있지 않습니다. 활성화하려면 다음 환경 변수를 설정합니다.
 
 .. code-block:: bash
 
     $ export THP_MEM_ALLOC_ENABLE=1
 
-For the batch dimension of 256 and with MKLDNN fast math mode:
+배치 차원이 256이고 MKLDNN 고속 연산 모드를 사용하는 경우:
 
 .. code-block:: python
 
@@ -341,7 +343,7 @@ For the batch dimension of 256 and with MKLDNN fast math mode:
     print(prof.key_averages().table(sort_by="self_cpu_time_total"))
 
 
-The following is the profiler output with THP memory allocations enabled:
+다음은 THP 메모리 할당을 활성화했을 때의 프로파일러 출력입니다.
 
 .. table::
    :widths: auto
@@ -359,10 +361,10 @@ The following is the profiler output with THP memory allocations enabled:
 
 **Self CPU time total:** 6.697s
 
-This is an additional **1.08x or 8% (6.697s vs 7.262s)** improvement on top of the already optimized MKLDNN fast math mode measured above.
+이는 앞서 측정한 이미 최적화된 MKLDNN 고속 연산 모드에 더해 추가로 **1.08배 또는 8%(6.697s vs 7.262s)** 의 성능 향상입니다.
 
 
-Conclusion
+결론
 ------------
 
-In this tutorial, we covered PyTorch inference on AWS Graviton3 instances by covering the basic usage, demonstrating speedups with fast math kernels, comparing different backends for different batch dimensions, and how to optimize tensor memory allocation latencies with Linux transparent huge pages. The recommendation is to use MKLDNN backend with Bfloat16 fastmath mode and THP memory allocations for larger tensor shapes and to use OpenBLAS backend for smaller tensor shapes. We hope that you will give it a try!
+이 튜토리얼에서는 AWS Graviton3 인스턴스에서의 PyTorch 추론을 다루었습니다. 기본 사용법을 살펴보고 고속 연산 커널을 사용한 속도 향상을 보여주었으며 배치 차원에 따른 서로 다른 백엔드를 비교하고, Linux transparent huge pages를 사용하여 Tensor 메모리 할당 지연 시간을 최적화하는 방법을 설명했습니다. 권장 사항은 큰 Tensor shape에는 Bfloat16 고속 연산 모드와 THP 메모리 할당을 함께 사용한 MKLDNN 백엔드를 사용하고, 작은 Tensor shape에는 OpenBLAS 백엔드를 사용하는 것입니다. 직접 시도해 보길 바랍니다!

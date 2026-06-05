@@ -3,7 +3,7 @@
 PyTorch: Tensor와 autograd
 -----------------------------------
 
-:math:`y=\sin(x)` 을 예측할 수 있도록, :math:`-\pi` 부터 :math:`\pi` 까지
+:math:`y=\sin(x)`를 예측할 수 있도록, :math:`-\pi`부터 :math:`\pi`까지
 유클리드 거리(Euclidean distance)를 최소화하도록 3차 다항식을 학습합니다.
 
 이 구현은 PyTorch Tensor 연산을 사용하여 순전파 단계를 계산하고, PyTorch autograd를 사용하여
@@ -53,7 +53,7 @@ for t in range(2000):
     loss.backward()
 
     # 경사하강법(gradient descent)을 사용하여 가중치를 직접 갱신합니다.
-    # torch.no_grad()로 감싸는 이유는, 가중치들이 requires_grad=True 지만
+    # torch.no_grad()로 감싸는 이유는, 가중치들이 requires_grad=True지만
     # autograd에서는 이를 추적하지 않을 것이기 때문입니다.
     with torch.no_grad():
         a -= learning_rate * a.grad
