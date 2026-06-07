@@ -12,7 +12,7 @@
 * `기초부터 시작하는 NLP: 문자-단위 RNN으로 이름 생성하기 <https://tutorials.pytorch.kr/intermediate/char_rnn_generation_tutorial.html>`__
 * `기초부터 시작하는 NLP: Sequence to Sequence 네트워크와 Attention을 이용한 번역 <https://tutorials.pytorch.kr/intermediate/seq2seq_translation_tutorial.html>`__
 
-여기에서는 단어를 분류하기 위해 기초적인 문자-단위의 순환 신경망(RNN, Recurrent Nueral Network)을
+여기에서는 단어를 분류하기 위해 기초적인 문자-단위의 순환 신경망(RNN, Recurrent Neural Network)을
 구축하고 학습할 예정입니다. 이 튜토리얼 및 이후 2개 튜토리얼인 :doc:`/intermediate/char_rnn_generation_tutorial`
 및 :doc:`/intermediate/seq2seq_translation_tutorial` 에서는 자연어 처리(NLP, Natural Language Processing)
 분야에서 어떻게 데이터를 전처리하고 NLP 모델을 구축하는지를 밑바닥부터(from scratch) 설명합니다.
