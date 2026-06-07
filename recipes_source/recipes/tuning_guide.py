@@ -481,10 +481,10 @@ torch.backends.cudnn.benchmark = True
 # ``DistributedDataParallel(find_unused_parameters=True)`` 를 사용할 때 생성자와 실행 레이어 순서를 일치시키는 방법
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # `torch.nn.parallel.DistributedDataParallel <https://pytorch.org/docs/stable/generated/torch.nn.parallel.DistributedDataParallel.html#torch.nn.parallel.DistributedDataParallel>`_
-# 은 ``find_unused_parameters=True`` 와 함께 모델 생성자에서의 레이어와 파라미터 순서를 
+# 은 ``find_unused_parameters=True`` 와 함께 모델 생성자에서의 계층과 매개변수 순서를 
 # 사용하여 ``DistributedDataParallel`` 변화도 all-reduce를 위한 버킷을 만듭니다. 
 # ``DistributedDataParallel`` 은 all-reduce를 역전파와 겹치게 수행합니다. 특정 버킷에 대한 
-# all-reduce는 주어진 버킷의 모든 파라미터에 대한 변화도가 모두 준비되었을 때 비동기적으로 작동됩니다.
+# all-reduce는 주어진 버킷의 모든 매개변수에 대한 변화도가 모두 준비되었을 때 비동기적으로 작동됩니다.
 #
 # 최대로 겹치게 하려면 모델 생성자에서의 순서가 실제 실행 중인 순서와 대략적으로 일치해야 합니다. 
 # 순서가 맞지 않으면 전체 버킷에 대한 all-reduce는 마지막으로 도착하는 변화도를 기다리게 되며, 
@@ -493,8 +493,8 @@ torch.backends.cudnn.benchmark = True
 #
 # ``find_unused_parameters=False`` 가 (기본 설정)인 ``DistributedDataParallel`` 은 
 # 역전파 중에 발견된 연산 순서를 기반으로 자동으로 버킷을 형성합니다. 
-# ``find_unused_parameters=False`` 를 사용할 때는 최적의 성능을 달성하기 위해 레이어나 
-# 파라미터의 순서를 재조정할 필요가 없습니다.
+# ``find_unused_parameters=False`` 를 사용할 때는 최적의 성능을 달성하기 위해 계층이나 
+# 매개변수의 순서를 재조정할 필요가 없습니다.
 
 ###############################################################################
 # 분산 설정에서 작업 부하를 분산하는 방법

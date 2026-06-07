@@ -538,7 +538,7 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 # 사전 학습된 모델을 읽어 들인 후 구조를 재조정하기 전에
 # ``feature_extract=True``인 경우 매개변수의
 # 모든 ``.requires_grad`` 속성을 일일이 False로 설정한 것을 기억하세요.
-# 그러면 재초기화된 레이어의 파라미터는
+# 그러면 재초기화된 레이어의 매개변수는
 # 기본적으로 ``.requires_grad=True``를 갖습니다.
 # 이제 *.requires_grad=True인 모든 매개변수가
 # 최적화되어야 한다는 것을 알았습니다.*
