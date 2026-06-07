@@ -9,10 +9,10 @@
 """
 
 ###############################################################################
-# 이 튜토리얼을 스크립트가 아닌 노트북으로 실행하기를 권장합니다. 노트북 (``.ipynb``) 파일을 다운 받으시려면,
+# 이 튜토리얼을 스크립트가 아닌 노트북으로 실행하기를 권장합니다. 노트북 (``.ipynb``) 파일을 다운받으시려면,
 # 페이지 상단에 있는 링크를 클릭해 주세요.
 #
-# PyTorch는 여러분이 신경망(neural network)를 생성하고 학습시키는 것을 도와주기 위해서
+# PyTorch는 여러분이 신경망(neural network)을 생성하고 학습시키는 것을 도와주기 위해서
 # `torch.nn <https://pytorch.org/docs/stable/nn.html>`_ ,
 # `torch.optim <https://pytorch.org/docs/stable/optim.html>`_ ,
 # `Dataset <https://pytorch.org/docs/stable/data.html?highlight=dataset#torch.utils.data.Dataset>`_ ,
@@ -40,7 +40,7 @@
 # 우리는 경로 설정을 담당하는 (Python3 표준 라이브러리의 일부인)
 # `pathlib <https://docs.python.org/3/library/pathlib.html>`_ 을 사용할 것이고,
 # `requests <http://docs.python-requests.org/en/master/>`_ 를 이용하여
-# 데이터셋을 다운로드 할 것입니다. 우리는 모듈을 사용할 때만 임포트(import) 할 것이므로,
+# 데이터셋을 다운로드할 것입니다. 우리는 모듈을 사용할 때만 임포트(import) 할 것이므로,
 # 여러분은 매 포인트마다 정확히 어떤 것이 사용되는지 확인할 수 있습니다.
 
 from pathlib import Path
@@ -116,7 +116,7 @@ print(y_train.min(), y_train.max())
 # (PyTorch에서 ``_`` 다음에 오는 메소드 이름은 연산이 인플레이스(in-place)로 수행되는 것을 의미합니다.)
 #
 # .. note:: `Xavier initialisation <http://proceedings.mlr.press/v9/glorot10a/glorot10a.pdf>`_
-#    기법을 이용하여 가중치를 초기화 합니다. (``1/sqrt(n)`` 을 곱해서 초기화).
+#    기법을 이용하여 가중치를 초기화합니다. (``1/sqrt(n)`` 을 곱해서 초기화).
 
 import math
 
@@ -125,7 +125,7 @@ weights.requires_grad_()
 bias = torch.zeros(10, requires_grad=True)
 
 ###############################################################################
-# PyTorch의 기울기를 자동으로 계산 해주는 기능 덕분에, Python 표준 함수
+# PyTorch의 기울기를 자동으로 계산해주는 기능 덕분에, Python 표준 함수
 # (또는 호출 가능한 객체)를 모델로 사용할 수 있습니다!
 # 그러므로 간단한 선형 모델을 만들기 위해서 단순한 행렬 곱셈과 브로드캐스트(broadcast)
 # 덧셈을 사용하여 보겠습니다. 또한, 우리는 활성화 함수(activation function)가 필요하므로,
@@ -405,7 +405,7 @@ print(loss_func(model(xb), yb))
 # ---------------------------------
 #
 # PyTorch에는 다양한 최적화(optimization) 알고리즘을 가진 패키지인 ``torch.optim`` 도 있습니다.
-# 각 매개변수를 수동으로 업데이트 하는 대신, 옵티마이저(optimizer)의 ``step`` 메소드를 사용하여
+# 각 매개변수를 수동으로 업데이트하는 대신, 옵티마이저(optimizer)의 ``step`` 메소드를 사용하여
 # 업데이트를 진행할 수 있습니다.
 #
 # 이렇게 하면 이전에 수동으로 코딩한 최적화 단계를 대체할 수 있습니다:
@@ -423,7 +423,7 @@ print(loss_func(model(xb), yb))
 #    opt.step()
 #    opt.zero_grad()
 #
-# (``optim.zero_grad()`` 는 기울기를 0으로 재설정 해줍니다. 다음 미니 배치에 대한
+# (``optim.zero_grad()`` 는 기울기를 0으로 재설정해줍니다. 다음 미니 배치에 대한
 # 기울기를 계산하기 전에 호출해야 합니다.)
 
 from torch import optim
@@ -468,13 +468,13 @@ print(loss_func(model(xb), yb))
 # PyTorch 의 `TensorDataset <https://pytorch.org/docs/stable/_modules/torch/utils/data/dataset.html#TensorDataset>`_
 # 은 텐서를 감싸는(wrapping) Dataset 입니다.
 # 길이와 인덱싱 방식을 정의함으로써 텐서의 첫 번째 차원을 따라 반복, 인덱싱 및 슬라이스(slice)하는 방법도 제공합니다.
-# 이렇게하면 훈련 할 때 동일한 라인에서 독립(independent) 변수와 종속(dependent) 변수에 쉽게 액세스 할 수 있습니다.
+# 이렇게 하면 훈련할 때 동일한 라인에서 독립(independent) 변수와 종속(dependent) 변수에 쉽게 액세스 할 수 있습니다.
 
 from torch.utils.data import TensorDataset
 
 ###############################################################################
 # ``x_train`` 및 ``y_train`` 모두 하나의 ``TensorDataset`` 에 합쳐질 수 있습니다,
-# 따라서 반복시키고 슬라이스 하기 편리합니다.
+# 따라서 반복시키고 슬라이스하기 편리합니다.
 
 train_ds = TensorDataset(x_train, y_train)
 
@@ -560,7 +560,7 @@ print(loss_func(model(xb), yb))
 # 검증(validation) 추가하기
 # ---------------------------
 #
-# 섹션 1에서, 우리는 훈련 데이터에 사용하기 위해 합리적인 훈련 루프를 설정하려고했습니다.
+# 섹션 1에서, 우리는 훈련 데이터에 사용하기 위해 합리적인 훈련 루프를 설정하려고 했습니다.
 # 실전에서, 여러분들은 과적합(overfitting)을 확인하기 위해서 **항상**
 # `검증 데이터셋(validation set) <https://www.fast.ai/2017/11/13/validation-sets/>`_ 이
 # 있어야 합니다.
@@ -659,7 +659,7 @@ def get_data(train_ds, valid_ds, bs):
     )
 
 ###############################################################################
-# 이제 dataloader를 가져오고 모델을 훈련하는 전체 프로세스를 3 줄의 코드로 실행할 수 있습니다:
+# 이제 dataloader를 가져오고 모델을 훈련하는 전체 프로세스를 3줄의 코드로 실행할 수 있습니다:
 
 train_dl, valid_dl = get_data(train_ds, valid_ds, bs)
 model, opt = get_model()
@@ -676,7 +676,7 @@ fit(epochs, model, loss_func, opt, train_dl, valid_dl)
 # 이전 섹션의 어떤 함수도 모델의 형식에 대해 가정하지 않기 때문에,
 # 별도의 수정없이 CNN을 학습하는 데 사용할 수 있습니다.
 #
-# Pytorch의 사전정의된
+# PyTorch의 사전정의된
 # `Conv2d <https://pytorch.org/docs/stable/nn.html#torch.nn.Conv2d>`_ 클래스를
 # 컨볼루션 레이어로 사용합니다. 3개의 컨볼루션 레이어로 CNN을 정의합니다.
 # 각 컨볼루션 뒤에는 ReLU가 있습니다. 마지막으로 평균 풀링(average pooling)을 수행합니다.
@@ -713,9 +713,9 @@ fit(epochs, model, loss_func, opt, train_dl, valid_dl)
 # ``nn.Sequential`` 사용하기
 # ----------------------------
 #
-# ``torch.nn`` 에는 코드를 간단히 사용할 수 있는 또 다른 편리한 클래스인
+# ``torch.nn`` 에는 코드를 간단히 할 수 있는 또 다른 편리한 클래스인
 # `Sequential <https://pytorch.org/docs/stable/nn.html#torch.nn.Sequential>`_
-# 이 있습니다..
+# 이 있습니다.
 # ``Sequential`` 객체는 그 안에 포함된 각 모듈을 순차적으로 실행합니다.
 # 이것은 우리의 신경망을 작성하는 더 간단한 방법입니다.
 #
@@ -849,7 +849,7 @@ fit(epochs, model, loss_func, opt, train_dl, valid_dl)
 # 마치면서
 # -----------------
 #
-# 이제 PyTorch를 사용하여 다양한 유형의 모델을 학습하는 데 사용할 수 있는 일반 데이터 파이프 라인과
+# 이제 PyTorch를 사용하여 다양한 유형의 모델을 학습하는 데 사용할 수 있는 일반 데이터 파이프라인과
 # 훈련 루프가 있습니다.
 # 이제 모델 학습이 얼마나 간단한지 확인하려면 `mnist_sample 노트북 <https://github.com/fastai/fastai_dev/blob/master/dev_nb/mnist_sample.ipynb>`__ 을 살펴보세요.
 #
@@ -860,7 +860,7 @@ fit(epochs, model, loss_func, opt, train_dl, valid_dl)
 # 사용할 수 있으며, 모델을 더욱 발전시키려는 실무자에게 자연스러운 다음 단계를 제공합니다.
 #
 # 이 튜토리얼의 시작 부분에서 ``torch.nn``, ``torch.optim``, ``Dataset``,
-# 그리고 ``DataLoader`` 의 각 예제를 통해 설명하겠다고 이야기했었습니다.
+# 그리고 ``DataLoader`` 의 각 예제를 통해 설명하겠다고 이야기했습니다.
 # 이제 위의 내용들을 요약해보겠습니다:
 #
 #  - ``torch.nn``:
@@ -870,10 +870,10 @@ fit(epochs, model, loss_func, opt, train_dl, valid_dl)
 #      이는 포함된 ``Parameter`` (들)가 어떤 것인지 알고, 모든 기울기를 0으로 설정하고 가중치
 #      업데이트 등을 위해 반복할 수 있습니다.
 #    + ``Parameter``: ``Module`` 에 역전파 동안 업데이트가 필요한 가중치가 있음을 알려주는
-#      텐서용 래퍼입니다. `requires_grad` 속성이 설정된 텐서만 업데이트 됩니다.
+#      텐서용 래퍼입니다. `requires_grad` 속성이 설정된 텐서만 업데이트됩니다.
 #    + ``functional``: 활성화 함수, 손실 함수 등을 포함하는 모듈 (관례에 따라 일반적으로
 #      ``F`` 네임스페이스로 임포트 됩니다) 이고, 물론 컨볼루션 및 선형 레이어 등에 대해서
-#      상태를 저장하지않는(non-stateful) 버전의 레이어를 포함합니다.
+#      상태를 저장하지 않는(non-stateful) 버전의 레이어를 포함합니다.
 #  - ``torch.optim``: 역전파 단계에서 ``Parameter`` 의 가중치를 업데이트하는,
 #    ``SGD`` 와 같은 옵티마이저를 포함합니다.
 #  - ``Dataset``: ``TensorDataset`` 과 같이 PyTorch와 함께 제공되는 클래스를 포함하여 ``__len__`` 및
