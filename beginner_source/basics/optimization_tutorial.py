@@ -149,7 +149,7 @@ optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
 
 def train_loop(dataloader, model, loss_fn, optimizer):
     size = len(dataloader.dataset)
-    # 모델을 학습(train) 모드로 설정합니다 - 배치 정규화(Batch Normalization) 및 드롭아웃(Dropout) 레이어들에 중요합니다.
+    # 모델을 학습(train) 모드로 설정합니다 - 배치 정규화(Batch Normalization) 및 드롭아웃(Dropout) 계층들에 중요합니다.
     # 이 예시에서는 없어도 되지만, 모범 사례를 위해 추가해두었습니다.
     model.train()
     for batch, (X, y) in enumerate(dataloader):
@@ -168,7 +168,7 @@ def train_loop(dataloader, model, loss_fn, optimizer):
 
 
 def test_loop(dataloader, model, loss_fn):
-    # 모델을 평가(eval) 모드로 설정합니다 - 배치 정규화(Batch Normalization) 및 드롭아웃(Dropout) 레이어들에 중요합니다.
+    # 모델을 평가(eval) 모드로 설정합니다 - 배치 정규화(Batch Normalization) 및 드롭아웃(Dropout) 계층들에 중요합니다.
     # 이 예시에서는 없어도 되지만, 모범 사례를 위해 추가해두었습니다.
     model.eval()
     size = len(dataloader.dataset)

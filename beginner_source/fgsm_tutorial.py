@@ -157,7 +157,7 @@ model = Net().to(device)
 # 미리 학습된 모델 읽어오기
 model.load_state_dict(torch.load(pretrained_model, map_location=device))
 
-# 모델을 평가 모드로 설정하기. 드롭아웃 레이어들을 위해 사용됨
+# 모델을 평가 모드로 설정하기. 드롭아웃 계층들을 위해 사용됨
 model.eval()
 
 

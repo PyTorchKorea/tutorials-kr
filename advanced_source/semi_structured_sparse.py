@@ -40,7 +40,7 @@
 #
 # 이 튜토리얼은 초보자에게 반구조적 희소성 및 일반적인 희소성을 맞춤 설명합니다.
 # 이미 2:4 희소 모델을 보유한 사용자에게는 ``to_sparse_semi_structured``를 사용하여
-# 추론을 위한 ``nn.Linear`` 레이어를 가속화하는 것이 매우 간단합니다. 다음은 그 예시입니다:
+# 추론을 위한 ``nn.Linear`` 계층을 가속화하는 것이 매우 간단합니다. 다음은 그 예시입니다:
 #
 
 import torch
@@ -467,10 +467,10 @@ df.plot.line(x='step', y='loss', title="Loss vs. # steps", ylabel="loss")
 # 도구가 포함되어 있습니다. 이러한 희소화 도구는 모델의 가중치 텐서에 마스크 매개변수화를 적용하여
 # 작동합니다. 이를 통해 가지치기된 가중치를 마스킹하여 희소성을 시뮬레이션할 수 있습니다.
 #
-# 또한, 모델의 어느 레이어에 희소성을 적용할지 결정해야 합니다. 이 경우에는 각각의 테스크 헤드 출력을
-# 제외한 모든 ``nn.Linear`` 레이어에 적용합니다. 이는 반구조적 희소성(semi-structured sparsity)이
+# 또한, 모델의 어느 계층에 희소성을 적용할지 결정해야 합니다. 이 경우에는 각각의 테스크 헤드 출력을
+# 제외한 모든 ``nn.Linear`` 계층에 적용합니다. 이는 반구조적 희소성(semi-structured sparsity)이
 # `형상 제약 <https://pytorch.org/docs/2.1/sparse.html#constructing-sparse-semi-structured-tensors>`_
-# 을 가지기 때문이며, 각각의 task ``nn.Linear`` 레이어는 이러한 제약을 충족하지 않기 때문입니다.
+# 을 가지기 때문이며, 각각의 task ``nn.Linear`` 계층은 이러한 제약을 충족하지 않기 때문입니다.
 #
 
 sparsifier = WeightNormSparsifier(

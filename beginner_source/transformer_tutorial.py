@@ -30,15 +30,15 @@ PyTorch 1.2 버젼에는 `Attention is All You Need <https://arxiv.org/pdf/1706.
 ######################################################################
 # 이 튜토리얼에서, 우리는 ``nn.TransformerEncoder`` 모델을 언어 모델링(language modeling) 과제에 대해서 학습시킬 것입니다.
 # 언어 모델링 과제는 주어진 단어 (또는 단어의 시퀀스) 가 다음에 이어지는 단어 시퀀스를 따를 가능성(likelihood)에 대한 확률을 할당하는 것입니다.
-# 먼저, 토큰(token) 들의 시퀀스가 임베딩(embedding) 레이어로 전달되며, 이어서 포지셔널 인코딩(positional encoding) 레이어가 각 단어의 순서를 설명합니다.
+# 먼저, 토큰(token) 들의 시퀀스가 임베딩(embedding) 계층으로 전달되며, 이어서 포지셔널 인코딩(positional encoding) 계층이 각 단어의 순서를 설명합니다.
 # (더 자세한 설명은 다음 단락을 참고해주세요.)
 # ``nn.TransformerEncoder`` 는 여러 개의
 # `nn.TransformerEncoderLayer <https://pytorch.org/docs/stable/generated/torch.nn.TransformerEncoderLayer.html>`__
-# 레이어로 구성되어 있습니다.
-# ``nn.TransformerEncoder`` 내부의 셀프-어텐션(self-attention) 레이어들은 시퀀스 안에서의 이전 포지션에만 집중하도록 허용되기 때문에,
+# 계층으로 구성되어 있습니다.
+# ``nn.TransformerEncoder`` 내부의 셀프-어텐션(self-attention) 계층들은 시퀀스 안에서의 이전 포지션에만 집중하도록 허용되기 때문에,
 # 입력(input) 순서와 함께, 정사각 형태의 어텐션 마스크(attention mask) 가 필요합니다.
 # 언어 모델링 과제를 위해서, 미래의 포지션에 있는 모든 토큰들은 마스킹 되어야(가려져야) 합니다.
-# 실제 단어를 얻기 위해서, ``nn.TransformerEncoder`` 의 출력은 로그-소프트맥스(log-Softmax) 로 이어지는 최종 선형(Linear) 레이어로 전달 됩니다.
+# 실제 단어를 얻기 위해서, ``nn.TransformerEncoder`` 의 출력은 로그-소프트맥스(log-Softmax) 로 이어지는 최종 선형(Linear) 계층으로 전달 됩니다.
 #
 
 import math

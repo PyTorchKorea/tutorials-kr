@@ -259,7 +259,7 @@ print(loss_func(model(xb), yb), accuracy(model(xb), yb))
 # (라이브러리의 다른 부분에는 클래스가 포함되어 있습니다.)
 # 다양한 손실 및 활성화 함수뿐만 아니라, 풀링(pooling) 함수와 같이 신경망을 만드는데
 # 편리한 몇 가지 함수도 여기에서 찾을 수 있습니다.
-# (컨볼루션(convolution) 연산, 선형(linear) 레이어, 등을 수행하는 함수도 있지만,
+# (컨볼루션(convolution) 연산, 선형(linear) 계층, 등을 수행하는 함수도 있지만,
 # 앞으로 보시겠지만 대개는 라이브러리의 다른 부분을 사용하여 더 잘 처리할 수 있습니다.)
 #
 # 만약 여러분들이 음의 로그 우도 손실과 로그 소프트맥스 (log softmax) 활성화 함수를 사용하는 경우,
@@ -375,8 +375,8 @@ print(loss_func(model(xb), yb))
 # 초기화하고, ``xb  @ self.weights + self.bias`` 를 계산하는 대신에,
 # 위의 모든 것을 해줄 PyTorch 클래스인
 # `nn.Linear <https://pytorch.org/docs/stable/nn.html#linear-layers>`_ 를 선형
-# 레이어로 사용합니다.
-# PyTorch 에는 다양한 유형의 코드를 크게 단순화 할 수 있는 미리 정의된 레이어가 있고 이는 또한
+# 계층으로 사용합니다.
+# PyTorch 에는 다양한 유형의 코드를 크게 단순화 할 수 있는 미리 정의된 계층이 있고 이는 또한
 # 종종 기존 코드보다 속도를 빠르게 합니다.
 
 class Mnist_Logistic(nn.Module):
@@ -585,7 +585,7 @@ valid_dl = DataLoader(valid_ds, batch_size=bs * 2)
 # 각 에폭이 끝날 때 검증 손실을 계산하고 프린트 할 것입니다.
 #
 # (훈련 전에 항상 ``model.train()`` 을 호출하고, 추론(inference) 전에 ``model.eval()``
-# 을 호출합니다, 이는 ``nn.BatchNorm2d`` 및 ``nn.Dropout`` 과 같은 레이어에서
+# 을 호출합니다, 이는 ``nn.BatchNorm2d`` 및 ``nn.Dropout`` 과 같은 계층에서
 # 이러한 다른 단계(훈련, 추론) 에 대한 적절한 동작이 일어나게 하기 위함입니다.)
 
 model, opt = get_model()
@@ -672,13 +672,13 @@ fit(epochs, model, loss_func, opt, train_dl, valid_dl)
 # CNN 으로 넘어가기
 # --------------------
 #
-# 이제 3개의 컨볼루션 레이어로 신경망을 구축할 것입니다.
+# 이제 3개의 컨볼루션 계층으로 신경망을 구축할 것입니다.
 # 이전 섹션의 어떤 함수도 모델의 형식에 대해 가정하지 않기 때문에,
 # 별도의 수정없이 CNN을 학습하는 데 사용할 수 있습니다.
 #
 # PyTorch의 사전정의된
 # `Conv2d <https://pytorch.org/docs/stable/nn.html#torch.nn.Conv2d>`_ 클래스를
-# 컨볼루션 레이어로 사용합니다. 3개의 컨볼루션 레이어로 CNN을 정의합니다.
+# 컨볼루션 계층으로 사용합니다. 3개의 컨볼루션 계층으로 CNN을 정의합니다.
 # 각 컨볼루션 뒤에는 ReLU가 있습니다. 마지막으로 평균 풀링(average pooling)을 수행합니다.
 # (``view`` 는 PyTorch의 NumPy ``reshape`` 버전입니다.)
 
@@ -719,10 +719,10 @@ fit(epochs, model, loss_func, opt, train_dl, valid_dl)
 # ``Sequential`` 객체는 그 안에 포함된 각 모듈을 순차적으로 실행합니다.
 # 이것은 우리의 신경망을 작성하는 더 간단한 방법입니다.
 #
-# 이를 활용하려면 주어진 함수에서 **사용자정의 레이어(custom layer)** 를 쉽게
+# 이를 활용하려면 주어진 함수에서 **사용자정의 계층(custom layer)** 을 쉽게
 # 정의할 수 있어야 합니다.
-# 예를 들어, PyTorch에는 `view` 레이어가 없으므로 우리의 신경망 용으로 만들어야 합니다.
-# ``Lambda`` 는 ``Sequential`` 로 신경망을 정의할 때 사용할 수 있는 레이어를 생성할 것입니다.
+# 예를 들어, PyTorch에는 `view` 계층이 없으므로 우리의 신경망 용으로 만들어야 합니다.
+# ``Lambda`` 는 ``Sequential`` 로 신경망을 정의할 때 사용할 수 있는 계층을 생성할 것입니다.
 
 class Lambda(nn.Module):
     def __init__(self, func):
@@ -764,7 +764,7 @@ fit(epochs, model, loss_func, opt, train_dl, valid_dl)
 #  - 최종적으로 CNN 그리드 크기는 4\*4 라고 가정합니다. (이것은 우리가 사용한 평균 풀링 커널 크기 때문입니다.)
 #
 # 이 두 가지 가정을 제거하여 모델이 모든 2d 단일 채널(channel) 이미지에서 작동하도록 하겠습니다.
-# 먼저 초기 Lambda 레이어를 제거하고 데이터 전처리를 제네레이터(generator)로 이동시킬 수 있습니다:
+# 먼저 초기 Lambda 계층을 제거하고 데이터 전처리를 제네레이터(generator)로 이동시킬 수 있습니다:
 
 def preprocess(x, y):
     return x.view(-1, 1, 28, 28), y
@@ -865,15 +865,15 @@ fit(epochs, model, loss_func, opt, train_dl, valid_dl)
 #
 #  - ``torch.nn``:
 #
-#    + ``Module``: 함수처럼 동작하지만, 또한 상태(state) (예를 들어, 신경망의 레이어 가중치)를
+#    + ``Module``: 함수처럼 동작하지만, 또한 상태(state) (예를 들어, 신경망의 계층 가중치)를
 #      포함할 수 있는 호출 가능한 오브젝트를 생성합니다.
 #      이는 포함된 ``Parameter`` (들)가 어떤 것인지 알고, 모든 기울기를 0으로 설정하고 가중치
 #      업데이트 등을 위해 반복할 수 있습니다.
 #    + ``Parameter``: ``Module`` 에 역전파 동안 업데이트가 필요한 가중치가 있음을 알려주는
 #      텐서용 래퍼입니다. `requires_grad` 속성이 설정된 텐서만 업데이트됩니다.
 #    + ``functional``: 활성화 함수, 손실 함수 등을 포함하는 모듈 (관례에 따라 일반적으로
-#      ``F`` 네임스페이스로 임포트 됩니다) 이고, 물론 컨볼루션 및 선형 레이어 등에 대해서
-#      상태를 저장하지 않는(non-stateful) 버전의 레이어를 포함합니다.
+#      ``F`` 네임스페이스로 임포트 됩니다) 이고, 물론 컨볼루션 및 선형 계층 등에 대해서
+#      상태를 저장하지 않는(non-stateful) 버전의 계층을 포함합니다.
 #  - ``torch.optim``: 역전파 단계에서 ``Parameter`` 의 가중치를 업데이트하는,
 #    ``SGD`` 와 같은 옵티마이저를 포함합니다.
 #  - ``Dataset``: ``TensorDataset`` 과 같이 PyTorch와 함께 제공되는 클래스를 포함하여 ``__len__`` 및
